@@ -97,6 +97,9 @@ class Dvr : public DvrServices
                                                  const QDateTime &StartTime,
                                                  const QString   &OffsetType );
 
+        DTC::CutList*     GetRecordedSeek      ( int              RecordedId,
+                                                 const QString   &OffsetType );
+
         DTC::ProgramList* GetConflictList     ( int              StartIndex,
                                                 int              Count,
                                                 int              RecordId );
@@ -230,6 +233,8 @@ class Dvr : public DvrServices
         bool              EnableRecordSchedule ( uint             RecordId   );
 
         bool              DisableRecordSchedule( uint             RecordId   );
+
+        int               RecordedIdForPathname( const QString   &Filename );
 
         QString           RecStatusToString    ( int              RecStatus );
 

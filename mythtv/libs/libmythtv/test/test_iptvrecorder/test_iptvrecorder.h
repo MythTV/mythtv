@@ -67,6 +67,11 @@ class TestIPTVRecorder: public QObject
         tuning.SetDataURL(QUrl(QString("http://yourdreambox:8001/1:0:1:488:3FE:22F1:EEEE0000:0:0:0:")));
         QVERIFY (tuning.IsValid());
         QVERIFY (tuning.IsHTTPTS());
+
+        /* test url from #12820 with https protocol */
+        tuning.SetDataURL(QUrl(QString("https://svt10-lh.akamaihd.net/i/svt10_0@77505/master.m3u8")));
+        QVERIFY (tuning.IsValid());
+        QVERIFY (tuning.IsHTTPTS());
     }
 
 

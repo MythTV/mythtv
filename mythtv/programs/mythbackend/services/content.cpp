@@ -570,8 +570,8 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
         if (!pginfo.IsLocal())
             return QFileInfo();
 
-        PreviewGenerator *previewgen = new PreviewGenerator( &pginfo, 
-                                                             QString(), 
+        PreviewGenerator *previewgen = new PreviewGenerator( &pginfo,
+                                                             QString(),
                                                              PreviewGenerator::kLocal);
         previewgen->SetPreviewTimeAsSeconds( nSecsIn          );
         previewgen->SetOutputFilename      ( sPreviewFileName );

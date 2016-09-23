@@ -209,9 +209,9 @@ class MTV_PUBLIC IPTVTuningData
             m_protocol = IPTVTuningData::rtp;
         else if (m_data_url.scheme() == "rtsp")
             m_protocol = IPTVTuningData::rtsp;
-        else if ((m_data_url.scheme() == "http") && IsHLSPlaylist())
+        else if (((m_data_url.scheme() == "http") || (m_data_url.scheme() == "https")) && IsHLSPlaylist())
             m_protocol = IPTVTuningData::http_hls;
-        else if (m_data_url.scheme() == "http")
+        else if ((m_data_url.scheme() == "http") || (m_data_url.scheme() == "https"))
             m_protocol = IPTVTuningData::http_ts;
         else
             m_protocol = IPTVTuningData::inValid;

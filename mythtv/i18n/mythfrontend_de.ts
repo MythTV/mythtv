@@ -1710,32 +1710,32 @@
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="41"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1483"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1507"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1511"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1535"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroupeditor.cpp" line="43"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1486"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1509"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1567"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1652"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1514"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1537"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1595"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1680"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1488"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1511"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1569"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1654"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1516"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1539"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1597"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1682"/>
         <source>Cancel All</source>
         <translation>Alle abbrechen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/modulationsetting.h" line="71"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2609"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2627"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2617"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2635"/>
         <source>Auto</source>
         <comment>Automatic</comment>
         <translation>Automatisch</translation>
@@ -1875,29 +1875,29 @@
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1010"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1279"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1287"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2612"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2620"/>
         <source>OpenGL 2</source>
         <translation>OpenGL 2</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2614"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2622"/>
         <source>OpenGL 1</source>
         <translation>OpenGL 1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/iptvchannelfetcher.cpp" line="124"/>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="142"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1333"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="146"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1341"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2608"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2616"/>
         <source>Qt</source>
         <translation>Qt</translation>
     </message>
@@ -1906,7 +1906,7 @@
         <translation type="vanished">OpenGL</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2618"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2626"/>
         <source>Direct3D</source>
         <translation>Direct3D</translation>
     </message>
@@ -2307,12 +2307,12 @@ Prüfen Sie, ob die Videodatei existiert</translation>
 <context>
     <name>ASIConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1963"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1974"/>
         <source>Not a valid DVEO ASI card</source>
         <translation>Dies ist keine gültige DVEO ASI Karte</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1968"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1979"/>
         <source>Valid DVEO ASI card</source>
         <translation>Dies ist eine gültige DVEO ASI Karte</translation>
     </message>
@@ -2405,241 +2405,241 @@ Prüfen Sie, ob die Videodatei existiert</translation>
 <context>
     <name>AppearanceSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1462"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1470"/>
         <source>Menu theme</source>
         <translation>Menüthema</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1992"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2000"/>
         <source>All</source>
         <translation>Alle</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1994"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2002"/>
         <source>Display on screen</source>
         <translation>Auf Bildschirm zeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1998"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2006"/>
         <source>Run on the specified screen or spanning all screens.</source>
         <translation>Nur den angegebenen oder alle vorhandenen Bildschirme verwenden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2008"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2016"/>
         <source>Monitor aspect ratio</source>
         <translation>Seitenverhältnis des Monitors</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2010"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2018"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2011"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2019"/>
         <source>16:10</source>
         <translation>16:10</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2012"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2020"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2014"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2022"/>
         <source>The aspect ratio of a Xinerama display cannot be queried from the display, so it must be specified.</source>
         <translation>Das Seitenverhältnis eines Xinerama-Bildschirms kann nicht autom. ermittelt werden, es muss daher hier angegeben werden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2079"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2087"/>
         <source>GUI width (pixels)</source>
         <translation>GUI-Breite (Pixel)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2083"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2091"/>
         <source>The width of the GUI. Do not make the GUI wider than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
         <translation>Die Breite des MythTV-Fensters. Stellen Sie die Breite nicht größer als die wirkliche Auflösung ein. Bei 0 wird automatisch auf Vollbild skaliert.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2095"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2103"/>
         <source>GUI height (pixels)</source>
         <translation>GUI-Höhe (Pixel)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2099"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2107"/>
         <source>The height of the GUI. Do not make the GUI taller than your actual screen resolution. Set to 0 to automatically scale to fullscreen.</source>
         <translation>Die Höhe des MythTV-Fensters. Stellen Sie die Höhe nicht größer als die wirkliche Auflösung ein. Bei 0 wird automatisch auf Vollbild skaliert.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2111"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2119"/>
         <source>GUI X offset</source>
         <translation>GUI-Versatz X</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2115"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2123"/>
         <source>The horizontal offset where the GUI will be displayed. May only work if run in a window.</source>
         <translation>Der horizontale Versatz, mit dem die GUI angezeigt wird. Könnte nur funktionieren, falls MythTV im Fenster gestartet wird.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2125"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2133"/>
         <source>GUI Y offset</source>
         <translation>GUI-Versatz Y</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2129"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2137"/>
         <source>The vertical offset where the GUI will be displayed.</source>
         <translation>Der vertikale Versatz, mit dem die GUI angezeigt wird.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2139"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2147"/>
         <source>Display size - width</source>
         <translation>Bildschirmgröße - Breite</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2143"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2151"/>
         <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
         <translation>Horizontale Größe des Monitors oder Fernsehers. Damit wird das tatsächliche Seitenverhältnis berechnet und überstimmt die DisplaySize Einstellung des X Window Systems.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2154"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2162"/>
         <source>Display size - height</source>
         <translation>Bildschirmgröße - Höhe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2158"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2166"/>
         <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
         <translation>Vertikale Größe des Monitors oder Fernsehers. Damit wird das tatsächliche Seitenverhältnis berechnet und überstimmt die DisplaySize Einstellung des X Window Systems.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2170"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2178"/>
         <source>Use GUI size for TV playback</source>
         <translation>GUI-Größe für TV-Bild verwenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2174"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2182"/>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
         <translation>Falls gesetzt, wird das Fernsehbild auf GUI-Größe angepasst, ansonsten auf Vollbildgröße.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2414"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2422"/>
         <source>Hide mouse cursor in MythTV</source>
         <translation>Mauszeiger verstecken</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2418"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2426"/>
         <source>Toggles mouse cursor visibility for touchscreens. By default MythTV will auto-hide the cursor if the mouse doesn&apos;t move for a period, this setting disables the cursor entirely.</source>
         <translation>Schaltet die Sichtbarkeit des Mauszeiger für Touchscreens um. Standardmäßig versteckt MythTV den Mauszeiger automatisch falls sich dieser eine bestimmte Zeitspanne nicht bewegt. Diese Einstellung deaktiviert den Mauszeiger komplett.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2432"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2440"/>
         <source>Use window border</source>
         <translation>Fensterrahmen verwenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2436"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2444"/>
         <source>Toggles between windowed and borderless operation.</source>
         <translation>Schaltet die rahmenlose Darstellung ein/aus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2445"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2453"/>
         <source>Use fixed window size</source>
         <translation>Feste Fenstergrösse verwenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2449"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2457"/>
         <source>If disabled, the video playback window can be resized</source>
         <translation>Falls deaktiviert, kann das Video-Wiedergabefenster in der Grösse angepasst werden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2458"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2466"/>
         <source>Always On Top</source>
         <translation>Immer zuoberst</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2462"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2470"/>
         <source>If enabled, MythTV will always be on top</source>
         <translation>Wenn aktiviert ist MythTV immer zuoberst</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2470"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2478"/>
         <source>Date format</source>
         <translation>Datumsformat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2473"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2528"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2481"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2536"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Die Beispiele gelten für das heutige Datum.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2479"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2534"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2487"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2542"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>Die Beispiele gelten für morgen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2515"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2523"/>
         <source>Your preferred date format. %1</source>
         <extracomment>%1 gives additional information regarding the date format</extracomment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2524"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2532"/>
         <source>Short date format</source>
         <translation>Kurzes Datumsformat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2569"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2577"/>
         <source>Your preferred short date format. %1</source>
         <extracomment>%1 gives additional information regarding the date format</extracomment>
         <translation>Ihr bevorzugtes kurzes Datumsformat. %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2578"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2586"/>
         <source>Time format</source>
         <translation>Zeitformat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2593"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2601"/>
         <source>Your preferred time format. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation>Ihr bevorzugtes Zeitformat. Einträge mit &quot;am&quot; bzw &quot;pm&quot; zeigen die Zeit mit 12 Stunden Teilung an, alle anderen im 24-Stunden-Format.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2606"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2614"/>
         <source>Paint engine</source>
         <translation>Zeichenmethode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2622"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2630"/>
         <source>This selects what MythTV uses to draw. Choosing &apos;%1&apos; is recommended, unless running on systems with broken OpenGL implementations (broken hardware or drivers or windowing systems) where only Qt works.</source>
         <translation>Dies bestimmt was MythTV zum zeichnen benutzt. Die bevorzugte Methode ist &apos;%1&apos;, außer das System hat eine kaputte OpenGL Implementierung (kaputte Hardware, Treiber oder Fenstermanager) mit der nur Qt arbeitet.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2951"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2959"/>
         <source>Language</source>
         <translation>Sprache</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2970"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2978"/>
         <source>Your preferred language for the user interface.</source>
         <translation>Ihre bevorzugte Sprache für die GUI-Schnittstelle.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3006"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3014"/>
         <source>Guide language #%1</source>
         <translation>EPG-Sprache #%1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3012"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3020"/>
         <source>Your #%1 preferred language for Program Guide data and captions.</source>
         <translation>Ihre #%1 bevorzugte Sprache für Programminformationen und Untertitel.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4200"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4208"/>
         <source>Theme / Screen Settings</source>
         <translation>Theme- / Bildschirmeinstellungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4253"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4261"/>
         <source>Localization</source>
         <translation>Lokalisierung</translation>
     </message>
@@ -3433,65 +3433,65 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>CaptureCardEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3752"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3738"/>
         <source>Capture cards</source>
         <translation>TV-Karten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3796"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3782"/>
         <source>Capture Card Menu</source>
         <translation>TV-Kartenmenü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3874"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3860"/>
         <source>Are you sure you want to delete this capture card?</source>
         <translation>Soll diese TV-Karte wirklich gelöscht werden?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3875"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3861"/>
         <source>Yes, delete capture card</source>
         <translation>Ja, TV-Karte löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3818"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3853"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3876"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3804"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3839"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3862"/>
         <source>No, don&apos;t</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3850"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3836"/>
         <source>Are you sure you want to delete ALL capture cards?</source>
         <translation>Sind Sie sicher, dass Sie ALLE Aufnahmekarten löschen wollen?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3817"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3852"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3803"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3838"/>
         <source>Yes, delete capture cards</source>
         <translation>Ja, alle TV-Karten löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3797"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3783"/>
         <source>Edit...</source>
         <translation>Bearbeiten...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3798"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3784"/>
         <source>Delete...</source>
         <translation>Löschen...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3815"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3801"/>
         <source>Are you sure you want to delete ALL capture cards on %1?</source>
         <translation>Sind Sie sicher, dass Sie ALLE Aufnahmekarten auf %1 löschen wollen?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3834"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3820"/>
         <source>Error getting list of cards for this host</source>
         <translation>Fehler beim Holen der Kartenliste für diesen Host</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3835"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3821"/>
         <source>Unable to delete capturecards for %1</source>
         <translation>Kann Aufnahmekarten auf %1 nicht löschen</translation>
     </message>
@@ -3499,53 +3499,53 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>CardInput</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3456"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3409"/>
         <source>Scan for channels</source>
         <translation>Sendersuchlauf</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3460"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3413"/>
         <source>Fetch channels from listings source</source>
         <translation>Verwenden Sie den Suchlauf, um die Sender für diesen Eingang zu finden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3458"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3411"/>
         <source>Use channel scanner to find channels for this input.</source>
         <translation>Senderliste von der EPG-Datenquelle holen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3462"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3415"/>
         <source>This uses the listings data source to provide the channels for this input.</source>
         <translation>Verwendet die EPG-Datenquelle (XMLTV u.ä.), um eine Senderliste für diesen Eingang zu bekommen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3464"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3417"/>
         <source>This can take a long time to run.</source>
         <translation>Dieser Vorgang kann sehr lange dauern.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3545"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3515"/>
         <source>Create Input Group</source>
         <translation>Eingangsgruppe anlegen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3546"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3516"/>
         <source>Enter new group name</source>
         <translation>Neuer Gruppenname</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3554"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3577"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3524"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3547"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3555"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3525"/>
         <source>Sorry, this Input Group name cannot be blank.</source>
         <translation>Der Name darf nicht leer sein.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3578"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3548"/>
         <source>Sorry, this Input Group name is already in use.</source>
         <translation>Dieser Name wird bereits verwendet.</translation>
     </message>
@@ -3553,7 +3553,7 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>CardInputEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3987"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3973"/>
         <source>Input connections</source>
         <translation>Eingangsverknüpfungen</translation>
     </message>
@@ -3561,7 +3561,7 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>CetonConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2426"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2415"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
@@ -3569,12 +3569,12 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>CetonDeviceID</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2377"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2368"/>
         <source>Device ID</source>
         <translation>Geräte-ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2378"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2369"/>
         <source>Device ID of Ceton device</source>
         <translation>Geräte-ID des Ceton-Geräts</translation>
     </message>
@@ -3763,28 +3763,28 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>ChannelGroupSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2675"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2735"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2683"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2743"/>
         <source>Remember last channel group</source>
         <translation>Letzte Sendergruppe merken</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2677"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2685"/>
         <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
         <translation>Falls gesetzt, werden im EPG nur Sender der zuletzt gewählten Sendergruppe angezeigt. Die Taste &quot;4&quot; wechselt zwischen Sendergruppen und allen Sendern.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2692"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2700"/>
         <source>Default channel group</source>
         <translation>Standard-Sendergruppe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2698"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2706"/>
         <source>All Channels</source>
         <translation>Alle Sender</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2705"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2713"/>
         <source>Default channel group to be shown in the EPG.  Pressing GUIDE key will toggle channel group.</source>
         <translation>Die Standard-Sendergruppe, die im EPG gezeigt wird.  Mit der &apos;GUIDE&apos;-Taste zwischen Sendergruppen und allen Sendern wechseln.</translation>
     </message>
@@ -3797,11 +3797,11 @@ Gerät unterstützt bis zu %1</translation>
     <name>ChannelImporter</name>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="47"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1291"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1358"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1421"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1547"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1629"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1319"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1386"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1449"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1575"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1657"/>
         <source>Channel Importer</source>
         <translation>Sender importieren</translation>
     </message>
@@ -3877,7 +3877,7 @@ Gerät unterstützt bis zu %1</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1132"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1152"/>
         <source>Found %n transport(s):
 </source>
         <extracomment>%n is the number of transports</extracomment>
@@ -3889,148 +3889,148 @@ Gerät unterstützt bis zu %1</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1133"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1153"/>
         <source>Channels: FTA Enc Dec
 </source>
         <translation>Sender: FTA Enc Dec
 </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1147"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1167"/>
         <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
 </source>
         <translation>Eindeutig: prog %1 atsc %2 atsc minor %3 channum %4
 </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1150"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1170"/>
         <source>Max atsc major count: %1</source>
         <translation>Max atsc major count: %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1282"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1310"/>
         <source>Delete all</source>
         <translation>Alle löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1283"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1311"/>
         <source>Set all invisible</source>
         <translation>Alle als unsichtbar markieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1285"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1352"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1415"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1313"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1380"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1443"/>
         <source>Ignore all</source>
         <translation>Alle ignorieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1308"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1373"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1436"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1336"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1401"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1464"/>
         <source>Do you want to:</source>
         <translation>Möchten Sie:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1310"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1338"/>
         <source>1. Delete all</source>
         <translation>1. Alle löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1312"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1340"/>
         <source>2. Set all invisible</source>
         <translation>2. Alle als unsichtbar markieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1315"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1343"/>
         <source>4. Ignore all</source>
         <translation>4. Alle ignorieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1334"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1362"/>
         <source>Please enter either 1, 2 or 4:</source>
         <translation>Bitten geben Sie 1, 2 oder 4 ein:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1350"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1378"/>
         <source>Insert all</source>
         <translation>Alle einfügen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1351"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1379"/>
         <source>Insert manually</source>
         <translation>Manuell einfügen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1375"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1403"/>
         <source>1. Insert all</source>
         <translation>1. Alle einfügen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1377"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1405"/>
         <source>2. Insert manually</source>
         <translation>2. Manuell einfügen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1379"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1442"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1407"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1470"/>
         <source>3. Ignore all</source>
         <translation>3. Alle ignorieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1396"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1459"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1424"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1487"/>
         <source>Please enter either 1, 2, or 3:</source>
         <translation>Bitten geben Sie 1, 2 oder 3 ein:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1413"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1441"/>
         <source>Update all</source>
         <translation>Alle aktualisieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1414"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1442"/>
         <source>Update manually</source>
         <translation>Manuell aktualisieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1438"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1466"/>
         <source>1. Update all</source>
         <translation>1. Alle aktualisieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1440"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1468"/>
         <source>2. Update manually</source>
         <translation>2. Manuell aktualisieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1485"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1513"/>
         <source>Suggest</source>
         <translation>Vorschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1532"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1560"/>
         <source>Channel %1 was found to be in conflict with other channels.</source>
         <translation>Der Sender &quot;%1&quot; steht im Konflikt mit anderen Sendern.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1543"/>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1625"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1571"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1653"/>
         <source>Please enter a unique channel number.</source>
         <translation>Bitte geben Sie einen eindeutigen Senderplatz ein.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1571"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1599"/>
         <source>Please enter a non-conflicting channel number (or type &apos;%1&apos; to skip, &apos;%2&apos; to skip all):</source>
         <translation>Bitte geben Sie einen eindeutigen Senderplatz ein (oder %1 zum Überspingen bzw. %2, um alle zu überspringen): </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1614"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1642"/>
         <source>You chose to manually insert channel %1.</source>
         <translation>Sie haben den Sender &quot;%1&quot; manuell eingefügt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1658"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1686"/>
         <source>Please enter a non-conflicting channel number (or type &apos;%1&apos; to skip, &apos;%2&apos; to skip all): </source>
         <extracomment>%1 is the translation of &quot;cancel&quot;, %2 of &quot;cancel all&quot;</extracomment>
         <translation>Bitte geben Sie einen eindeutigen Senderplatz ein (oder %1 zum Überspingen bzw. %2, um alle zu überspringen): </translation>
@@ -4110,7 +4110,7 @@ Gerät unterstützt bis zu %1</translation>
         <translation>Scannen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscanner_gui.cpp" line="171"/>
+        <location filename="../libs/libmythtv/channelscan/channelscanner_gui.cpp" line="176"/>
         <source>ScanWizard</source>
         <translation>Scan-Assistent</translation>
     </message>
@@ -4691,27 +4691,27 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4322"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4299"/>
         <source>Recording Options</source>
         <translation>Aufnahmeoptionen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4331"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4308"/>
         <source>Input and satellite settings.</source>
         <translation>Eingangs- und Satelliteneinstellungen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4124"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4110"/>
         <source>Could not open card %1</source>
         <translation>Konnte Karte %1 nicht ansprechen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4125"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4111"/>
         <source>Could not get card info for card %1</source>
         <translation>Konnte keine Informationen über Karte %1 ermitteln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4330"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4307"/>
         <source>DiSEqC (Switch, LNB, and Rotor Configuration)</source>
         <translation>DiSEqC (Switch-, LNB- und Motor-Konfiguration)</translation>
     </message>
@@ -4767,7 +4767,7 @@ Gerät unterstützt bis zu %1</translation>
 <context>
     <name>DataDirectLineupSelector</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="366"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="387"/>
         <source>Fetching lineups from %1...</source>
         <translation>Hole Senderliste von %1...</translation>
     </message>
@@ -4917,67 +4917,51 @@ Gerät unterstützt bis zu %1</translation>
         <translation>* %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="144"/>
         <source>Database Settings</source>
-        <translation>Datenbankeinstellungen</translation>
+        <translation type="vanished">Datenbankeinstellungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="144"/>
         <source> (Requires edit privileges)</source>
-        <translation> (Benötigt Änderungsrechte)</translation>
+        <translation type="vanished"> (Benötigt Änderungsrechte)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="153"/>
         <source>Scanner Exclusions</source>
-        <translation>Scanner Ausschlüsse</translation>
+        <translation type="vanished">Scanner Ausschlüsse</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="154"/>
         <source>Comma-separated list of filenames/directory names to be ignored when scanning. Glob wildcards * and ? are valid.</source>
         <translatorcomment>I don&apos;t think germans know what Glob means. https://en.wikipedia.org/wiki/Glob_%28programming%29</translatorcomment>
-        <translation>Liste der Dateinamen / Verzeichnisnamen die beim Scan ignoriert werden, getrennt durch Komma. Die Platzhalter * und ? sind erlaubt.</translation>
+        <translation type="vanished">Liste der Dateinamen / Verzeichnisnamen die beim Scan ignoriert werden, getrennt durch Komma. Die Platzhalter * und ? sind erlaubt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="165"/>
         <source>Start Gallery when media inserted</source>
-        <translation>Starte Galerie wenn ein Medium eingesteckt wird</translation>
+        <translation type="vanished">Starte Galerie wenn ein Medium eingesteckt wird</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="166"/>
-        <source>Set to automatically start Gallery when media (USB/CD&apos;s containing images) are inserted.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="176"/>
         <source>Password</source>
-        <translation>Passwort</translation>
+        <translation type="vanished">Passwort</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="178"/>
         <source>When set all actions that modify the filesystem or database are protected (copy, move, transform, hiding, covers). Hidden items cannot be viewed. Applies to all frontends. 
 Disabled by an empty password. Privileges persist until Gallery exits to main menu.</source>
-        <translation>Alle Aktionen die das Dateisystem oder die Datenbank verändern werden geschützt (kopieren, verschieben, umwandeln, Cover). Versteckte Dinge können nicht angesehen werden. Gilt für alle Frontends. 
+        <translation type="vanished">Alle Aktionen die das Dateisystem oder die Datenbank verändern werden geschützt (kopieren, verschieben, umwandeln, Cover). Versteckte Dinge können nicht angesehen werden. Gilt für alle Frontends. 
 Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie zum Hauptmenü verlassen wird.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="193"/>
         <source>Reset Image Database</source>
-        <translation>Bilddatenbank zurücksetzen</translation>
+        <translation type="vanished">Bilddatenbank zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="194"/>
         <source>Clears the database and thumbnails for the Image Storage Group. A rescan will be required. Images for local media will persist.</source>
-        <translation>Leert die Datenbank und Vorschaubilder der Speichergruppe Bilder. Macht einen erneuten Scan notwendig. Bilder für lokale Medien bleiben bestehen.</translation>
+        <translation type="vanished">Leert die Datenbank und Vorschaubilder der Speichergruppe Bilder. Macht einen erneuten Scan notwendig. Bilder für lokale Medien bleiben bestehen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="202"/>
         <source>Clear Now!</source>
-        <translation>Jetzt Löschen!</translation>
+        <translation type="vanished">Jetzt Löschen!</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="203"/>
         <source>Warning! This will erase settings for: hidden images, directory covers and re-orientations. You will have to set them again after re-scanning.</source>
-        <translation>Achtung! Das löscht die Einstellungen für: versteckte Bilder, Ordnercover und Orientierung. Sie müssen diese alle nach dem Scannen neu setzen.</translation>
+        <translation type="vanished">Achtung! Das löscht die Einstellungen für: versteckte Bilder, Ordnercover und Orientierung. Sie müssen diese alle nach dem Scannen neu setzen.</translation>
     </message>
 </context>
 <context>
@@ -5117,32 +5101,32 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
 <context>
     <name>DemoConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2552"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2535"/>
         <source>A local MPEG file used to simulate a recording. Must be entered as file:/path/movie.mpg</source>
         <translation>Eine lokale MPEG-Datei, um eine Aufnahme zu simulieren. Muss eingeben werden als: file:/path/movie.mpg</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2560"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2543"/>
         <source>File info</source>
         <translation>Dateiinformation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2563"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2546"/>
         <source>File size</source>
         <translation>Dateigrösse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2589"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2572"/>
         <source>%1 MB</source>
         <translation>%1 MB</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2592"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2575"/>
         <source>File not readable</source>
         <translation>Datei ist nicht lesbar</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2596"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2579"/>
         <source>File does not exist</source>
         <translation>Datei existiert nicht</translation>
     </message>
@@ -5624,7 +5608,7 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
 <context>
     <name>EPGSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2921"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2929"/>
         <source>Guide starts at channel</source>
         <translation>EPG startet bei Sender</translation>
     </message>
@@ -5633,17 +5617,17 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
         <translation type="vanished">Das EPG startet bei diesem Sender, falls es nicht im LiveTV-Modus aufgerufen wurde.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2925"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2933"/>
         <source>The program guide starts on this channel if it is run from outside of Live TV mode. Leave blank to enable Live TV automatic start channel.</source>
         <translation>Das EPG startet bei diesem Sender, falls es nicht im LiveTV-Modus aufgerufen wurde. Leerlassen für den LiveTV Startsender.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2937"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2945"/>
         <source>Record threshold</source>
         <translation>Aufnahmeschwellwert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2941"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2949"/>
         <source>Pressing SELECT on a show that is at least this many minutes into the future will schedule a recording.</source>
         <translation>Das Drücken von SELECT bei einer Sendung, die mindestens so viele Minuten in der Zukunft beginnt, wird eine Aufnahme planen.</translation>
     </message>
@@ -5656,7 +5640,7 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
         <translation type="vanished">Zeigt die Programmübersicht im LiveTV-Modus, wenn Fernsehen ausgewählt wird.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4163"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4171"/>
         <source>Program Guide %1/%2</source>
         <translation>Programmübersicht %1/%2</translation>
     </message>
@@ -5819,32 +5803,32 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
 <context>
     <name>ExternalConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2611"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2593"/>
         <source>A &apos;black box&apos; application controlled via stdin, status on stderr and TransportStream read from stdout</source>
         <translation>Eine &apos;Black Box&apos;-Anwendung, gesteuert über stdin, Status über stderr und TransportStream gelesen von stdout</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2616"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2598"/>
         <source>File info</source>
         <translation>Dateiinformation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2638"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2617"/>
         <source>&apos;%1&apos; is valid.</source>
         <translation>&apos;%1&apos; ist gültig.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2640"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2619"/>
         <source>&apos;%1&apos; is not readable.</source>
         <translation>&apos;%1&apos; ist nicht lesbar.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2642"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2621"/>
         <source>&apos;%1&apos; is not executable.</source>
         <translation>&apos;%1&apos; ist nicht ausführbar.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2646"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2625"/>
         <source>&apos;%1&apos; does not exist.</source>
         <translation>&apos;%1&apos; existiert nicht.</translation>
     </message>
@@ -5960,15 +5944,80 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
 <context>
     <name>FirewireDesc</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1255"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1276"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
 </context>
 <context>
+    <name>GalleryDbSettings</name>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="155"/>
+        <source>Database Settings</source>
+        <translation>Datenbankeinstellungen</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="155"/>
+        <source> (Requires edit privileges)</source>
+        <translation> (Benötigt Änderungsrechte)</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="164"/>
+        <source>Scanner Exclusions</source>
+        <translation>Scanner Ausschlüsse</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="165"/>
+        <source>Comma-separated list of filenames/directory names to be ignored when scanning. Glob wildcards * and ? are valid.</source>
+        <translation>Liste der Dateinamen / Verzeichnisnamen die beim Scan ignoriert werden, getrennt durch Komma. Die Platzhalter * und ? sind erlaubt.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="176"/>
+        <source>Start Gallery when media inserted</source>
+        <translation>Starte Galerie wenn ein Medium eingesteckt wird</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="177"/>
+        <source>Set to automatically start Gallery when media (USB/CD&apos;s containing images) are inserted.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="187"/>
+        <source>Password</source>
+        <translation>Passwort</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="189"/>
+        <source>When set all actions that modify the filesystem or database are protected (copy, move, transform, hiding, covers). Hidden items cannot be viewed. Applies to all frontends. 
+Disabled by an empty password. Privileges persist until Gallery exits to main menu.</source>
+        <translation>Alle Aktionen die das Dateisystem oder die Datenbank verändern werden geschützt (kopieren, verschieben, umwandeln, Cover). Versteckte Dinge können nicht angesehen werden. Gilt für alle Frontends. 
+Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie zum Hauptmenü verlassen wird.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="204"/>
+        <source>Reset Image Database</source>
+        <translation>Bilddatenbank zurücksetzen</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="205"/>
+        <source>Clears the database and thumbnails for the Image Storage Group. A rescan will be required. Images for local media will persist.</source>
+        <translation>Leert die Datenbank und Vorschaubilder der Speichergruppe Bilder. Macht einen erneuten Scan notwendig. Bilder für lokale Medien bleiben bestehen.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="213"/>
+        <source>Clear Now!</source>
+        <translation>Jetzt Löschen!</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="214"/>
+        <source>Warning! This will erase settings for: hidden images, directory covers and re-orientations. You will have to set them again after re-scanning.</source>
+        <translation>Achtung! Das löscht die Einstellungen für: versteckte Bilder, Ordnercover und Orientierung. Sie müssen diese alle nach dem Scannen neu setzen.</translation>
+    </message>
+</context>
+<context>
     <name>GallerySettings</name>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="109"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="120"/>
         <source>Gallery Settings</source>
         <translation>Gallerieeinstellungen</translation>
     </message>
@@ -5976,133 +6025,133 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
 <context>
     <name>GallerySlideView</name>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="100"/>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="524"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="106"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="533"/>
         <source>Hide</source>
         <translation>Ausblenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="258"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="268"/>
         <source>Slideshow Options</source>
         <translation>Diaschauoptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="262"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="272"/>
         <source>Play Video</source>
         <translation>Video abspielen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="265"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="275"/>
         <source>Stop</source>
         <translation>Stopp</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="267"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="277"/>
         <source>Start SlideShow</source>
         <translation>Beginne Diaschau</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="270"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="280"/>
         <source>Turn Repeat Off</source>
         <translation>Wiederholung ausschalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="272"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="282"/>
         <source>Turn Repeat On</source>
         <translation>Wiederholung einschalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="279"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="289"/>
         <source>Hide Captions</source>
         <translation>Titel ausblenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="281"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="291"/>
         <source>Show Captions</source>
         <translation>Titel anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="287"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="297"/>
         <source>More Details</source>
         <translation>Mehr Details</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="288"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="298"/>
         <source>Less Details</source>
         <translation>Weniger Details</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="290"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="300"/>
         <source>Show Details</source>
         <translation>Details anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="295"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="305"/>
         <source>Hide Details</source>
         <translation>Details ausblenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="315"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="325"/>
         <source>Transform Options</source>
         <translation>Transformierungsoptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="319"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="329"/>
         <source>Rotate CW</source>
         <translation>im Uhrzeigersinn drehen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="320"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="330"/>
         <source>Rotate CCW</source>
         <translation>gegen den Uhrzeigersinn drehen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="321"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="331"/>
         <source>Flip Horizontal</source>
         <translation>Horizontal Spiegeln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="322"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="332"/>
         <source>Flip Vertical</source>
         <translation>Vertikal Spiegeln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="323"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="333"/>
         <source>Reset to Exif</source>
         <translation>Auf Exif zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="327"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="337"/>
         <source>Zoom In</source>
         <translation>Vergrößern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="330"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="340"/>
         <source>Zoom Out</source>
         <translation>Verkleinern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="332"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="342"/>
         <source>Transforms</source>
         <translation>Transformierungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="409"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="419"/>
         <source>Stopped</source>
         <translation>Angehalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="425"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="434"/>
         <source>Playing</source>
         <translation>Abspielend</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="547"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="556"/>
         <source>Loading</source>
         <translation>Lade</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="585"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="759"/>
         <source>Failed to load %1</source>
         <translation>Konnte %1 nicht laden</translation>
     </message>
@@ -6117,7 +6166,7 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
         <translation>Anfang</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="689"/>
+        <location filename="../programs/mythfrontend/galleryslideview.cpp" line="692"/>
         <source>End</source>
         <extracomment>Slideshow has reached last slide</extracomment>
         <translation>Ende</translation>
@@ -6126,12 +6175,12 @@ Ein leeres Passwort schaltet den Schutz ab. Berechtigung besteht bis die Galerie
 <context>
     <name>GalleryThumbView</name>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="467"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="480"/>
         <source>Invalid Name</source>
         <translation>Ungültiger Name</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="617"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="633"/>
         <source>No images found.
 Scan storage group using menu,
 or insert/mount local media.
@@ -6142,438 +6191,438 @@ oder geben/hängen Sie ein lokales Speichermedium ein.
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="896"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="918"/>
         <source>%L1 of %L3</source>
         <translation>%L1 von %L3</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="953"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="977"/>
         <source>Hidden</source>
         <translation>ausgeblendet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="962"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="986"/>
         <source>Pictures</source>
         <translation>Bilder</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="963"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="987"/>
         <source>Videos</source>
         <translation>Videos</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="984"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1008"/>
         <source>Gallery Options</source>
         <translation>Galerieoptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1001"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1025"/>
         <source>Enable Edits</source>
         <translation>Gestatte Bearbeitungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1006"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1030"/>
         <source>Stop Scan</source>
         <translation>Scan stoppen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1008"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1032"/>
         <source>Scan Storage Group</source>
         <translation>Scanne Speichergruppen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1010"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1034"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1031"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1090"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1111"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1150"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1055"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1114"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1135"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1174"/>
         <source>%L1 marked</source>
         <translation>%L1 gewählt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1038"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1062"/>
         <source>Unmark File</source>
         <translation>Wähle Datei ab</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1040"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1064"/>
         <source>Mark File</source>
         <translation>Wähle Datei</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1047"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1071"/>
         <source>Unmark Directory</source>
         <translation>Wähle Verzeichnis ab</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1049"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1073"/>
         <source>Mark Directory</source>
         <translation>Wähle Verzeichnis</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1056"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1080"/>
         <source>Mark All</source>
         <translation>Wähle Alle</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1061"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1085"/>
         <source>Unmark All</source>
         <translation>Wähle Alle ab</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1062"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1086"/>
         <source>Invert Marked</source>
         <translation>Auswahl umkehren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1069"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1093"/>
         <source>Mark</source>
         <translation>Wähle</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1094"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1118"/>
         <source>Move Marked Into</source>
         <translation>Verschiebe Auswahl hierher</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1095"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1119"/>
         <source>Copy Marked Into</source>
         <translation>Kopiere Auswahl hierher</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1097"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1121"/>
         <source>Paste</source>
         <translation>Einfügen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1115"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1139"/>
         <source>Rotate Marked CW</source>
         <translation>Drehe Auswahl im Uhrzeigersinn</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1116"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1140"/>
         <source>Rotate Marked CCW</source>
         <translation>Drehe Auswahl gegen den Uhrzeigersinn</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1117"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1141"/>
         <source>Flip Marked Horizontal</source>
         <translation>Auswahl Horizontal Spiegeln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1118"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1142"/>
         <source>Flip Marked Vertical</source>
         <translation>Auswahl Vertikal Spiegeln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1119"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1143"/>
         <source>Reset Marked to Exif</source>
         <translation>Auswahl auf Exif zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1121"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1133"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1145"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1157"/>
         <source>Transforms</source>
         <translation>Transformierungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1127"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1151"/>
         <source>Rotate CW</source>
         <translation>im Uhrzeigersinn drehen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1128"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1152"/>
         <source>Rotate CCW</source>
         <translation>gegen den Uhrzeigersinn drehen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1129"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1153"/>
         <source>Flip Horizontal</source>
         <translation>Horizontal Spiegeln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1130"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1154"/>
         <source>Flip Vertical</source>
         <translation>Vertikal Spiegeln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1131"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1155"/>
         <source>Reset to Exif</source>
         <translation>Auf Exif zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1156"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1180"/>
         <source>Hide Marked</source>
         <translation>blende Auswahl aus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1158"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1182"/>
         <source>Unhide Marked</source>
         <translation>blende Auswahl ein</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1160"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1184"/>
         <source>Delete Marked</source>
         <translation>Auswahl löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1171"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1195"/>
         <source>Unhide</source>
         <translation>Einblenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1173"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1197"/>
         <source>Hide</source>
         <translation>Ausblenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1175"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1199"/>
         <source>Use as Cover</source>
         <translation>Als Cover verwenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1176"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1200"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1177"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1201"/>
         <source>Rename</source>
         <translation>Umbenennen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1180"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1204"/>
         <source>Reset Cover</source>
         <translation>Cover zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1186"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1210"/>
         <source>Create Directory</source>
         <translation>Verzeichnis erstellen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1191"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1215"/>
         <source>Import</source>
         <translation>Import</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1195"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1219"/>
         <source>Eject media</source>
         <translation>Medien auswerfen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1200"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1224"/>
         <source>Actions</source>
         <translation>Funktionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1215"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1241"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1239"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1265"/>
         <source>Shuffled</source>
         <translation>Gemischt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1216"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1242"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1240"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1266"/>
         <source>Random</source>
         <translation>Zufällig</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1217"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1243"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1241"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1267"/>
         <source>Seasonal</source>
         <translation>Jahreszeitlich</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1219"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1240"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1243"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1264"/>
         <source>Ordered</source>
         <translation>Geordnet</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1222"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1252"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1246"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1276"/>
         <source>Slideshow</source>
         <translation>Diaschau</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1229"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1253"/>
         <source>Directory</source>
         <translation>Verzeichnis</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1232"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1256"/>
         <source>Recursive</source>
         <translation>Rekursiv</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1235"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1259"/>
         <source>Current Directory</source>
         <translation>Aktuelles Verzeichnis</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1237"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1261"/>
         <source>Slideshow Order</source>
         <translation>Präsentationsfolge</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1245"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1269"/>
         <source>Change Order</source>
         <translation>Reiheinfolge Ändern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1248"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1272"/>
         <source>Turn Repeat Off</source>
         <translation>Wiederholung ausschalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1250"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1274"/>
         <source>Turn Repeat On</source>
         <translation>Wiederholung einschalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1262"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1286"/>
         <source>Show Options</source>
         <translation>Optionen anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1267"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1291"/>
         <source>Hide Pictures</source>
         <translation>Bilder verstecken</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1268"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1292"/>
         <source>Hide Videos</source>
         <translation>Videos verstecken</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1271"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1295"/>
         <source>Show Videos</source>
         <translation>Videos anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1271"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1295"/>
         <source>Show Pictures</source>
         <translation>Bilder anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1275"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1283"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1299"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1307"/>
         <source>Image Captions</source>
         <translation>Bildtitel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1278"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1288"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1302"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1312"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1279"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1289"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1303"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1313"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1280"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1304"/>
         <source>Comment</source>
         <translation>Anmerkung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1281"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1290"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1305"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1314"/>
         <source>None</source>
         <translation>Keine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1286"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1292"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1310"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1316"/>
         <source>Directory Captions</source>
         <translation>Verzeichnistitel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1297"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1321"/>
         <source>Hide Hidden Items</source>
         <translation>Versteckte Dinge verbergen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1299"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1323"/>
         <source>Show Hidden Items</source>
         <translation>Versteckte Dinge anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1303"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1327"/>
         <source>Zoom Out</source>
         <translation>Verkleinern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1305"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1329"/>
         <source>Zoom In</source>
         <translation>Vergrößern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1308"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1332"/>
         <source>Show Details</source>
         <translation>Details anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1308"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1332"/>
         <source>Hide Details</source>
         <translation>Details ausblenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1312"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1336"/>
         <source>Show</source>
         <translation>Anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1567"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1591"/>
         <source>Do you want to delete
 %1 ?</source>
         <translation>Möchten Sie %1 Löschen?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1577"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1601"/>
         <source>Do you want to delete all marked files ?</source>
         <translation>Möchten Sie alle markierten Dateien löschen?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1675"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1699"/>
         <source>Enter a new name:</source>
         <translation>Geben Sie einen neuen Namen ein:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1703"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1727"/>
         <source>Enter password:</source>
         <translation>Passwort eingeben:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1817"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1841"/>
         <source>Enter name of new directory</source>
         <translation>Geben Sie den Namen des neuen Verzeichnis ein</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1863"/>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1990"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1887"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2014"/>
         <source>No files specified</source>
         <translation>Keine Dateien angegeben</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1874"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1898"/>
         <source>No images</source>
         <translation>Keine Bilder</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1901"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1925"/>
         <source>Copying files</source>
         <translation>Kopiere Dateien</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1919"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="1943"/>
         <source>Failed to copy %L1/%Ln file(s)</source>
         <translation>
             <numerusform>Kopieren von %L1/%Ln Datei fehlgeschlagen</numerusform>
@@ -6581,17 +6630,17 @@ oder geben/hängen Sie ein lokales Speichermedium ein.
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2007"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2031"/>
         <source>No images specified</source>
         <translation>Keine Bilder ausgewählt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2035"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2059"/>
         <source>Moving files</source>
         <translation>Verschiebe Dateien</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2054"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2078"/>
         <source>Failed to move %L1/%Ln file(s)</source>
         <translation>
             <numerusform>Verschieben von %L1/%Ln Datei fehlgeschlagen</numerusform>
@@ -6599,19 +6648,19 @@ oder geben/hängen Sie ein lokales Speichermedium ein.
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2083"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2107"/>
         <source>Failed to create temporary directory.</source>
         <translation>Anlegen des temporären Verzeichnis fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2093"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2117"/>
         <source>Running Import command.
 Please wait...</source>
         <translation>Importbefehl läuft.
 Bitten warten...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2103"/>
+        <location filename="../programs/mythfrontend/gallerythumbview.cpp" line="2127"/>
         <source>Import command failed.
 Error: %1</source>
         <translation>Importbefehl fehlgeschlagen.
@@ -6621,7 +6670,7 @@ Fehler: %1</translation>
 <context>
     <name>GeneralRecPrioritiesSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2756"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2764"/>
         <source>Avoid back to back recordings</source>
         <translation>Aufeinanderfolgende Aufnahmen vermeiden</translation>
     </message>
@@ -6630,112 +6679,112 @@ Fehler: %1</translation>
         <translation type="vanished">Falls gesetzt, so wird versucht, unmittelbar aufeinander folgende Aufnahmen auf verschiedenen Sendern nicht für die gleiche TV-Karte zu planen. Bei Konflikten wird dies dennoch geschehen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2760"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2768"/>
         <source>Selects the situations where the scheduler will avoid assigning shows to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
         <translation>Falls gesetzt, so wird versucht, unmittelbar aufeinander folgende Aufnahmen auf verschiedenen Sendern nicht für die gleiche TV-Karte zu planen. Bei Konflikten wird dies dennoch geschehen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2767"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2775"/>
         <source>Never</source>
         <translation>Niemals</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2768"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2776"/>
         <source>Different Channels</source>
         <translation>Verschiedene Sender</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2770"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2778"/>
         <source>Always</source>
         <translation>Immer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2781"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2789"/>
         <source>Preferred input priority</source>
         <translation>Priorität für bevorzugte Eingänge</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2783"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2791"/>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
         <translation>Zusätzliche Priorität, die dann greift, wenn eine Ausstrahlung mit dem unter &apos;Aufnahmeoptionen&apos; gewählten bevorzugten Eingang einer Aufnahmeregel übereinstimmt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2798"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2806"/>
         <source>HDTV recording priority</source>
         <translation>Priorität bei HDTV-Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2800"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2808"/>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
         <translation>Zusätzliche Priorität, wenn eine Ausstrahlung als HDTV-Sendung gekennzeichnet ist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2814"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2822"/>
         <source>Widescreen recording priority</source>
         <translation>Aufnahmepriorität bei Breitbildformat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2817"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2825"/>
         <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
         <translation>Zusätzliche Priorität wenn eine Ausstrahlung im Breitbildformat erfolgt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2832"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2840"/>
         <source>Sign language recording priority</source>
         <translation>Aufnahmepriorität bei Gebärdensprache</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2835"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2843"/>
         <source>Additional priority when a showing is marked as having in-vision sign language.</source>
         <translation>Zusätzliche Priorität für Ausstrahlungen mit Gebärdensprache.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2851"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2859"/>
         <source>In-vision Subtitles Recording Priority</source>
         <translation>Aufnahmepriorität bei Untertiteln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2854"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2862"/>
         <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
         <translation>Zusätzliche Priorität für Ausstrahlungen mit Videotext-Untertiteln.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2869"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2877"/>
         <source>Subtitles/CC recording priority</source>
         <translation>Aufnahmepriorität bei Untertiteln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2872"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2880"/>
         <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
         <translation>Zusätzliche Priorität, wenn eine Ausstrahlung mit Untertiteln erfolgt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2888"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2896"/>
         <source>Hard of hearing priority</source>
         <translation>Priorität bei Hörgeschädigten-Ton</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2890"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2898"/>
         <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
         <translation>Zusätzliche Priorität wenn eine Ausstrahlung als für Hörgeschädigte geeignet markiert ist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2906"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2914"/>
         <source>Audio described priority</source>
         <translation>Priorität bei Sehgeschädigten-Tonspur</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2908"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2916"/>
         <source>Additional priority when a showing is marked as being Audio Described.</source>
         <translation>Zusätzliche Priorität für Ausstrahlungen mit Tonspur für Sehgeschädigte.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4175"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4183"/>
         <source>Scheduler Options</source>
         <translation>Programmplaneroptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4186"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4194"/>
         <source>Accessibility Options</source>
         <translation>Barrierefrei-Optionen</translation>
     </message>
@@ -6913,98 +6962,98 @@ Fehler: %1</translation>
         <translation>Kategorie Zusatzaufnahmezeit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1521"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1529"/>
         <source>Channel ordering</source>
         <translation>Sendersortierung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1523"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1531"/>
         <source>channel number</source>
         <translation>Sendernummer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1524"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2642"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2661"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1532"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2650"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2669"/>
         <source>callsign</source>
         <translation>Kurzname</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2637"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2645"/>
         <source>Channel format</source>
         <translation>Format (kurz)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2639"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2658"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2647"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2666"/>
         <source>number</source>
         <translation>Senderplatz</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2640"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2659"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2648"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2667"/>
         <source>number callsign</source>
         <translation>Senderplatz Kurzname</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2641"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2660"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2649"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2668"/>
         <source>number name</source>
         <translation>Senderplatz Sendername</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2643"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2662"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2651"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2670"/>
         <source>name</source>
         <translation>Sendername</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2645"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2653"/>
         <source>Your preferred channel format.</source>
         <translation>Wählen Sie aus, welche Informationen zu einem Sender bei knappen Platzverhältnissen angezeigt werden sollen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2656"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2664"/>
         <source>Long channel format</source>
         <translation>Format (ausführlich)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2664"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2672"/>
         <source>Your preferred long channel format.</source>
         <translation>Wählen Sie aus, welche Informationen zu einem Sender angezeigt werden sollen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2718"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2726"/>
         <source>Browse/change channels from Channel Group</source>
         <translation>Nur Sender der Sendergruppe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2721"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2729"/>
         <source>If enabled, Live TV will browse or change channels from the selected channel group. The &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
         <translation>Falls gesetzt, wird LiveTV nur Sender der gewählten Sendergruppe anzeigen. Um alle Sender zu sehen, bitte die Sendergruppe &quot;Alle Sender&quot; wählen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4090"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4098"/>
         <source>General (Basic)</source>
         <translation>Allgemeines (Grundeinstellungen)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4099"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4107"/>
         <source>General (Auto-Expire)</source>
         <translation>Allgemeines (Automatisches Löschen)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4130"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4138"/>
         <source>General (Jobs)</source>
         <translation>Allgemeines (Auftragsliste)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4141"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4149"/>
         <source>General (Advanced)</source>
         <translation>Allgemeines (Erweitert)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4150"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4158"/>
         <source>General (Channel Groups)</source>
         <translation>Allgemeines (Sendergruppen)</translation>
     </message>
@@ -7229,14 +7278,14 @@ Fehler: %1</translation>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1696"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1863"/>
-        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2235"/>
-        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2236"/>
+        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2232"/>
+        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2233"/>
         <source>Unknown</source>
         <comment>Unknown program title</comment>
         <translation>Unbekannt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2730"/>
+        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2727"/>
         <source>Jump to a specific date and time in the guide</source>
         <translation>Zu einem bestimmten Zeitpunkt im Programm springen</translation>
     </message>
@@ -7297,17 +7346,17 @@ Fehler: %1</translation>
         <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2289"/>
+        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2286"/>
         <source>You don&apos;t have any channel groups defined</source>
         <translation>Sie haben noch keine Sendergruppen angelegt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2303"/>
+        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2300"/>
         <source>Select Channel Group</source>
         <translation>Sendergruppe wählen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2588"/>
+        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2585"/>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Lösche Regel &quot;%1&quot; %2?</translation>
     </message>
@@ -7315,12 +7364,12 @@ Fehler: %1</translation>
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2082"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2084"/>
         <source>Recording Options</source>
         <translation>Aufnahmeoptionen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2067"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2069"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
@@ -7328,12 +7377,12 @@ Fehler: %1</translation>
 <context>
     <name>HDHomeRunDeviceID</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1415"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1436"/>
         <source>Device ID</source>
         <translation>Geräte-ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1416"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1437"/>
         <source>Device ID of HDHomeRun device</source>
         <translation>Geräte-ID des HDHomeRun-Geräts</translation>
     </message>
@@ -7341,9 +7390,9 @@ Fehler: %1</translation>
 <context>
     <name>HDHomeRunDeviceIDList</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1509"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1565"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1575"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1530"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1586"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1596"/>
         <source>Manually Enter IP Address</source>
         <translation>IP-Adresse eingeben</translation>
     </message>
@@ -7351,17 +7400,17 @@ Fehler: %1</translation>
 <context>
     <name>HDPVRConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2662"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2641"/>
         <source>Probed info</source>
         <translation>Geräteinformation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2679"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2658"/>
         <source>Failed to open</source>
         <translation>Öffnen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2685"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2664"/>
         <source>Failed to probe</source>
         <translation>Untersuchung fehlgeschlagen</translation>
     </message>
@@ -7369,102 +7418,102 @@ Fehler: %1</translation>
 <context>
     <name>HelpPopup</name>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5516"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5541"/>
         <source>Commercials are flagged</source>
         <translation>Werbung markiert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5517"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5542"/>
         <source>An editing cutlist is present</source>
         <translation>Schnittpunkte gesetzt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5518"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5543"/>
         <source>The program is able to auto-expire</source>
         <translation>Autom. Löschen erlaubt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5519"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5544"/>
         <source>Commercials are being flagged</source>
         <translation>Werbung wird markiert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5520"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5545"/>
         <source>A bookmark is set</source>
         <translation>Position gesetzt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5522"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5547"/>
         <source>Recording is in use</source>
         <translation>Aufnahme wird gerade benutzt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5523"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5548"/>
         <source>Recording has been transcoded</source>
         <translation>Aufnahme wurde transkodiert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5526"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5551"/>
         <source>Recording is in Mono</source>
         <translation>Mono</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5527"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5552"/>
         <source>Recording is in Stereo</source>
         <translation>Stereo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5528"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5553"/>
         <source>Recording is in Surround Sound</source>
         <translation>Surround</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5529"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5554"/>
         <source>Recording is in Dolby Surround Sound</source>
         <translation>Dolby-Surround</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5531"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5556"/>
         <source>Recording is Closed Captioned</source>
         <translation>Untertitel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5532"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5557"/>
         <source>Recording has Subtitles Available</source>
         <translation>Mit Untertitel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5533"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5558"/>
         <source>Recording is Subtitled</source>
         <translation>Untertitelt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5535"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5560"/>
         <source>Recording is in 1080i/p High Definition</source>
         <translation>1080i/p HDTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5536"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5561"/>
         <source>Recording is in 720p High Definition</source>
         <translation>720p HDTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5537"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5562"/>
         <source>Recording is in High Definition</source>
         <translation>HDTV (High Definition)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5538"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5563"/>
         <source>Recording is Widescreen</source>
         <translation>Breitbildformat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5539"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5564"/>
         <source>Recording is in HD using H.264 codec</source>
         <translation>Aufnahme ist in HD (H.264)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5541"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5566"/>
         <source>Recording has been watched</source>
         <translation>Wurde schon angesehen</translation>
     </message>
@@ -8982,32 +9031,32 @@ Fehler: %1</translation>
 <context>
     <name>ImportConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1980"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1991"/>
         <source>A local file used to simulate a recording. Leave empty to use MythEvents to trigger an external program to import recording files.</source>
         <translation>Eine lokale Datei zum Simulieren einer Aufnahme. Leer lassen, um per MythEvents ein externes Programm zum Importieren von Aufnahmen zu starten.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1988"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1999"/>
         <source>File info</source>
         <translation>Dateiinformation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1991"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2002"/>
         <source>File size</source>
         <translation>Dateigrösse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2014"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2025"/>
         <source>%1 MB</source>
         <translation>%1 MB</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2017"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2028"/>
         <source>File not readable</source>
         <translation>Datei nicht lesbar</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2021"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2032"/>
         <source>File %1 does not exist</source>
         <translation>Datei %1 existiert nicht</translation>
     </message>
@@ -9130,17 +9179,17 @@ Fehler: %1</translation>
 <context>
     <name>ImportSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="122"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="133"/>
         <source>Import</source>
         <translation>Import</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="126"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="137"/>
         <source>Import Command</source>
         <translation>Importkommando</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="127"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="138"/>
         <source>Command/script that can be run from the menu. 
 %TMPDIR% will be replaced by a new temporary directory, which the import dialog will show automatically. The directory will be removed when Gallery exits.</source>
         <translation>Kommando/Skript das vom Menü ausgeführt werden kann. 
@@ -9542,157 +9591,157 @@ Fehler: %1</translation>
 <context>
     <name>LcdSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3335"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3343"/>
         <source>Display time</source>
         <translation>Zeit anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3337"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3345"/>
         <source>Display current time on idle LCD display.</source>
         <translation>Die aktuelle Uhrzeit am LCD Display anzeigen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3349"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3357"/>
         <source>Display recording status</source>
         <translation>Aufnahmestatus anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3351"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3359"/>
         <source>Display current recordings information on LCD display.</source>
         <translation>Informationen zu laufenden Aufnahmen am LCD Display anzeigen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3363"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3371"/>
         <source>Display menus</source>
         <translation>Menüs anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3365"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3373"/>
         <source>Display selected menu on LCD display. </source>
         <translation>Das gewählte Menü anzeigen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3376"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3384"/>
         <source>Menu pop-up time</source>
         <translation>Menü-Anzeigedauer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3378"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3386"/>
         <source>How many seconds the menu will remain visible after navigation.</source>
         <translation>Wie lange (in Sek.) das Menü angezeigt wird.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3390"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3398"/>
         <source>Display music artist and title</source>
         <translation>Interpret/Liedtitel anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3392"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3400"/>
         <source>Display playing artist and song title in MythMusic on LCD display.</source>
         <translation>Den aktuellen Künstler und Liedtitel in MythMusic anzeigen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3404"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3412"/>
         <source>Items</source>
         <translation>Elemente</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3406"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3414"/>
         <source>Artist - Title</source>
         <translation>Künstler - Titel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3407"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3415"/>
         <source>Artist [Album] Title</source>
         <translation>Künstler [Album] Titel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3410"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3418"/>
         <source>Which items to show when playing music.</source>
         <translation>Welche Elemente in MythMusic gezeigt werden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3419"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3427"/>
         <source>Display channel information</source>
         <translation>Senderinformationen anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3421"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3429"/>
         <source>Display tuned channel information on LCD display.</source>
         <translation>Zeigt Informationen zum aktuellen Sender.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3433"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3441"/>
         <source>Display volume information</source>
         <translation>Momentane Lautstärke anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3435"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3443"/>
         <source>Display volume level information on LCD display.</source>
         <translation>Zeigt die momentane Lautstärke an.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3447"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3455"/>
         <source>Display generic information</source>
         <translation>Allgemeine Informationen anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3449"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3457"/>
         <source>Display generic information on LCD display.</source>
         <translation>Zeigt allgemeine Informationen an.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3460"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3468"/>
         <source>Backlight always on</source>
         <translation>Hintergrundbeleuchtung immer ein</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3462"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3470"/>
         <source>Turn on the backlight permanently on the LCD display.</source>
         <translation>Die Hintergrundbeleuchtung permanent einschalten.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3473"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3481"/>
         <source>Heartbeat always on</source>
         <translation>&quot;Herzschlag&quot; immer ein</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3475"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3483"/>
         <source>Turn on the LCD heartbeat.</source>
         <translation>Den LCD-&quot;Herzschlag&quot; einschalten.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3486"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3494"/>
         <source>Display large clock</source>
         <translation>Große Uhr anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3488"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3496"/>
         <source>On multiline displays try and display the time as large as possible.</source>
         <translation>Zeigt bei mehrzeiligen Displays die Uhrzeit so gross wie möglich an.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3500"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3508"/>
         <source>LCD key order</source>
         <translation>LCD-Tastenanordnung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3505"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3513"/>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
         <translation>Geben Sie die sechs Tastaturrückgabewerte der LCD-Tastatur in der Reihenfolge ein, in der Sie die Funktionen auf/ab/links/rechts/ja/nein betätigen wollen. (Siehe lcdproc/server/drivers/hd44780.c/keyMapMatrix[] oder die Matrix Ihres Displays)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3517"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3525"/>
         <source>Enable LCD device</source>
         <translation>Nutze LCD-Display</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3519"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3527"/>
         <source>Use an LCD display to view MythTV status information.</source>
         <translation>MythTV kann auf einem LCD-Display verschiedene Statusinformationen anzeigen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3532"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3540"/>
         <source>LCD device display</source>
         <translation>LC-Display</translation>
     </message>
@@ -9715,17 +9764,17 @@ Fehler: %1</translation>
 <context>
     <name>MPEGConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2513"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2496"/>
         <source>Probed info</source>
         <translation>Geräteinformation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2528"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2511"/>
         <source>Failed to open</source>
         <translation>Öffnen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2535"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2518"/>
         <source>Failed to probe</source>
         <translation>Untersuchung fehlgeschlagen</translation>
     </message>
@@ -9733,23 +9782,23 @@ Fehler: %1</translation>
 <context>
     <name>MacDesktopSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3799"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3830"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3807"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3838"/>
         <source>Video on the desktop</source>
         <translation>Video auf dem Desktop</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3803"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3811"/>
         <source>If enabled, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Falls gesetzt, wird das Videobild auf dem Desktop, hinter den Finder-Symbolen, angezeigt. Nur gültig, falls &quot;GUI-Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3817"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3825"/>
         <source>Frames to skip</source>
         <translation>Frames auslassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3821"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3829"/>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Wird das Videobild auf dem Desktop angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
@@ -9757,23 +9806,23 @@ Fehler: %1</translation>
 <context>
     <name>MacDockSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3755"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3783"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3763"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3791"/>
         <source>Video in the dock</source>
         <translation>Video im Dock</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3759"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3767"/>
         <source>If enabled, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Falls gesetzt, wird das Videobild im Dock-Icon der Anwendung angezeigt. Nur gültig, falls &quot;GUI-Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3771"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3779"/>
         <source>Frames to skip</source>
         <translation>Frames auslassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3775"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3783"/>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Wird das Videobild im Dock-Icon angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
@@ -9781,33 +9830,33 @@ Fehler: %1</translation>
 <context>
     <name>MacFloatSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3690"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3734"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3698"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3742"/>
         <source>Video in floating window</source>
         <translation>Video in schwebendem Fenster</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3694"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3702"/>
         <source>If enabled, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Falls gesetzt, wird das Videobild in einem schwebenden Fenster angezeigt. Nur gültig, falls &quot;GUI-Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3706"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3714"/>
         <source>Frames to skip</source>
         <translation>Frames auslassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3710"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3718"/>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Wird das Videobild in einem schwebenden Fenster angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3721"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3729"/>
         <source>Opacity</source>
         <translation>Undurchsichtigkeit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3725"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3733"/>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Die Undurchsichtigkeit des schwebenden Fensters. Für vollständige Undurchsichtigkeit auf 100, und auf 0 für vollständige Durchsichtigkeit setzen.</translation>
     </message>
@@ -9815,8 +9864,8 @@ Fehler: %1</translation>
 <context>
     <name>MacMainSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3625"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3670"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3633"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3678"/>
         <source>Video in main window</source>
         <translation>Video im Hauptfenster</translation>
     </message>
@@ -9825,27 +9874,27 @@ Fehler: %1</translation>
         <translation type="obsolete">Falls gesetzt, wird das Videobild im Hauptfenster der GUI angezeigt. Diese Option abwählen, wenn Sie das Videobild nur auf dem Desktop oder in einem schwebenden Fenster möchten. Nur gültig, falls &quot;GUI-Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3629"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3637"/>
         <source>If enabled, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
         <translation>Falls gesetzt, wird das Videobild im Hauptfenster der GUI angezeigt. Diese Option abwählen, wenn Sie das Videobild nur auf dem Desktop oder in einem schwebenden Fenster möchten. Nur gültig, falls &quot;GUI-Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3643"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3651"/>
         <source>Frames to skip</source>
         <translation>Frames auslassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3647"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3655"/>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
         <translation>Wird das Videobild im Hauptfenster angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3658"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3666"/>
         <source>Opacity</source>
         <translation>Undurchsichtigkeit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3662"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3670"/>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
         <translation>Die Undurchsichtigkeit des Hauptfensters. Für vollständige Undurchsichtigkeit auf 100, und auf 0 für vollständige Durchsichtigkeit setzen.</translation>
     </message>
@@ -9853,252 +9902,252 @@ Fehler: %1</translation>
 <context>
     <name>MainGeneralSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1834"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1842"/>
         <source>Use line edit virtual keyboards</source>
         <translation>Virtuelle Tastatur benutzen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1838"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1846"/>
         <source>If enabled, you can use a virtual keyboard in MythTV&apos;s line edit boxes. To use, hit SELECT (Enter or Space) while a line edit is in focus.</source>
         <translation>Erlaubt die Benutzung einer virtuellen Tastatur für die Dateneingabe. Zum Aktivieren dieser Tastatur bitte OK oder SELECT im Eingabefeld drücken.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1850"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1858"/>
         <source>Idle time before entering standby mode (minutes)</source>
         <translation>Leerlauf (in Minuten) bevor Standby</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1855"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1863"/>
         <source>Number of minutes to wait when the frontend is idle before entering standby mode. Standby mode allows the backend to power down if configured to do so. Any remote or mouse input will cause the countdown to start again and/or exit idle mode. Video playback suspends the countdown. A value of zero prevents the frontend automatically entering standby.</source>
         <translation>Anzahl an Minuten die bei Leerlauf des Frontends gewartet werden bevor der Standby Modus aktiviert wird. Der Standby Modus erlaubt das Backend das Ausschalten des Frontends, falls dies konfiguriert wurde. Jede Eingabe per Fernbedienung oder Maus setzt den Countdown zurück oder beendet den Leerlauf. Videowiedergabe hebt den Countdown auf. Der Wert 0 verhindert den Standby Modus für das Frontend.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1874"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1882"/>
         <source>Customize exit menu options</source>
         <translation>&quot;Beenden&quot;-Menü anpassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1876"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1884"/>
         <source>Default</source>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1877"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1885"/>
         <source>Show quit</source>
         <translation>Zeige &quot;Beenden&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1878"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1886"/>
         <source>Show quit and shutdown</source>
         <translation>Zeige &quot;Beenden&quot; und &quot;Abschalten&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1879"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1887"/>
         <source>Show quit, reboot and shutdown</source>
         <translation>Zeige &quot;Beenden&quot;, &quot;Neustart&quot; und &quot;Abschalten&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1881"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1889"/>
         <source>Show shutdown</source>
         <translation>Zeige &quot;Abschalten&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1882"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1890"/>
         <source>Show reboot</source>
         <translation>Zeige &quot;Neustart&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1883"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1891"/>
         <source>Show reboot and shutdown</source>
         <translation>Zeige &quot;Neustart&quot; und &quot;Abschalten&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1884"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1892"/>
         <source>Show standby</source>
         <translation>Zeige Standby</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1887"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1895"/>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
         <translation>Standardmässig werden nur bei entfernten Frontends die &quot;Abschalten&quot;-Optionen im &quot;Beenden&quot;-Menü angezeigt. Hier können Sie bestimmen, welche Optionen angezeigt werden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1898"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1906"/>
         <source>Reboot command</source>
         <translation>&quot;Neustart&quot;-Befehl</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1902"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1910"/>
         <source>Optional. Script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
         <translation>Optional. Der Befehl, der ausgeführt wird, wenn im &apos;Beenden&apos;-Menü die &apos;Neustart&apos;-Option gewählt wird. Um das &apos;Beenden&apos;-Menü zu sehen, müssen Sie eine &apos;Beenden&apos;-Taste festlegen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1915"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1923"/>
         <source>Halt command</source>
         <translation>Befehl zum Ausschalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1919"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1927"/>
         <source>Optional. Script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
         <translation>Optional. Der Befehl, der ausgeführt wird, wenn im &quot;Beenden&quot;-Menü die &quot;Abschalten&quot;-Option gewählt wird. Um das &quot;Beenden&quot;-Menü zu sehen, müssen Sie eine &quot;Beenden&quot;-Taste festlegen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1932"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1940"/>
         <source>LIRC daemon socket</source>
         <translation>LIRC-Server Socket</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1942"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1950"/>
         <source>UNIX socket or IP address[:port] to connect in order to communicate with the LIRC Daemon.</source>
         <translation>UNIX-Socket oder IP-Adresse[:Port] für die Kommunikation mit dem LIRC-Server.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1954"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1962"/>
         <source>Screen shot path</source>
         <translation>Pfad für Bildschirmfotos</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1958"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1966"/>
         <source>Path to screenshot storage location. Should be writable by the frontend</source>
         <translation>Pfad für Bildschirmfotos. Sollte vom Frontend aus beschreibbar sein</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1969"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1977"/>
         <source>Setup PIN code</source>
         <translation>Setup PIN-Code</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1971"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1979"/>
         <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier. Set it to blank to disable. If enabled, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>Dieser PIN dient als Zugangskontrolle zu den Setupmenüs. Falls Sie diese Einstellung nutzen sollten Sie nur Zahlen nutzen. Lassen Sie das Feld leer um diese Einstellung zu deaktivieren. Falls Sie diese Einstellung aktivieren können Sie nur auf diese Seite zurückkehren indem Sie den PIN eingeben.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3022"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3030"/>
         <source>Enable Network Remote Control interface</source>
         <translation>Fernsteuerung via LAN</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3025"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3033"/>
         <source>This enables support for controlling MythFrontend over the network.</source>
         <translation>Erlaubt die Steuerung von MythFrontend über das Netzwerk.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3038"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3046"/>
         <source>Network Remote Control port</source>
         <translation>Port für die Fernsteuerung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3042"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3050"/>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
         <translation>Der Port, auf dem auf eine Verbindung zur Fernsteuerung des Frontends gewartet wird.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3053"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3061"/>
         <source>UDP notify port</source>
         <translation>UDP notify port</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3057"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3065"/>
         <source>MythTV will listen for connections from the &quot;mythutil&quot; program on this port.</source>
         <translation>MythTV wird auf diesem Port auf Verbindungen von &quot;mythutil&quot; warten.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3070"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3078"/>
         <source>Enable AirPlay</source>
         <translation>AirPlay aktivieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3072"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3080"/>
         <source>AirPlay lets you wirelessly view content on your TV from your iPhone, iPad, iPod Touch, or iTunes on your computer.</source>
         <translation>AirPlay läßt Sie Inhalte von Ihrem iPhone, iPad, iPad Touch oder iTunes schnurlos auf Ihrem TV ansehen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3086"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3094"/>
         <source>Only support AirTunes (no video)</source>
         <translation>Nur AirTunes nutzen (kein Video)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3088"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3096"/>
         <source>Only stream audio from your iPhone, iPad, iPod Touch, or iTunes on your computer</source>
         <translation>Nur Audio von iPhone, iPad, iPad Touch oder iTunes streamen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3101"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3109"/>
         <source>Require password</source>
         <translation>Passwort benötigt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3105"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3113"/>
         <source>Require a password to use AirPlay. Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you when required</source>
         <translation>Benötigt ein Passwort zur Benutzung. Ihr iPhone, iPad, iPad Touch oder iTunes wird Sie danach fragen falls benötigt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3118"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3126"/>
         <source>Your iPhone, iPad, iPod Touch, or iTunes on your computer will prompt you for this password when required</source>
         <translation>Ihr iPhone, iPad, iPad Touch oder iTunes wird Sie nach diesem Passwort fragen falls benötigt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3140"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3148"/>
         <source>AirPlay full screen playback</source>
         <translation>AirPlay Vollbildwiedergabe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3144"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3152"/>
         <source>During music playback, displays album cover and various media information in full screen mode</source>
         <translation>Zeigt während der Musikwiedergabe das Album Cover und verschiedene Medieninformationen im Volbildmodus an</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3154"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3162"/>
         <source>All AirPlay settings take effect when you restart MythFrontend.</source>
         <translation>Alle AirPlay Einstellungen benötigen einen Neustart des Mythtv Frontends.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3165"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3173"/>
         <source>AirTunes RSA key couldn&apos;t be loaded. Check http://www.mythtv.org/wiki/AirTunes/AirPlay. Last Error: %1</source>
         <translation>AirTunes RSA-Schlüssel konnte nicht geladen werden. Besuchen Sie http://www.mythtv.org/wiki/AirTunes/AirPlay. Letzter Fehler: %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3172"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3180"/>
         <source>AirTunes RSA key successfully loaded.</source>
         <translation>AirTunes RSA-Schlüssel erfolgreich geladen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3200"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3208"/>
         <source>Ignore devices</source>
         <translation>Folgende Geräte ignorieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3204"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3212"/>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them. Requires restart.</source>
         <translation>Falls Sie einige Geräte nicht überwachen wollen listen Sie diese hier kommagetrennt auf. Die Plugins werden diese dann ignorieren. Benötigt einen Restart.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3848"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3856"/>
         <source>Settings Access</source>
         <translation>Zugangseinstellungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3854"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3862"/>
         <source>General</source>
         <translation>Allgemeines</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3861"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3869"/>
         <source>Media Monitor</source>
         <translation>Medien-Monitor</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3867"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3875"/>
         <source>Remote Control</source>
         <translation>Fernbedienung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3877"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3885"/>
         <source>AirPlay Settings</source>
         <translation>AirPlay Einstellungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3889"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3897"/>
         <source>Shutdown/Reboot Settings</source>
         <translation>Ausschalten/Neustart Einstellungen</translation>
     </message>
@@ -10120,7 +10169,6 @@ Fehler: %1</translation>
     <name>MediaMonitor</name>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="197"/>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="673"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -10150,37 +10198,35 @@ Fehler: %1</translation>
         <translation>Konnte %1 nicht auswerfen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="679"/>
         <source>Media Handler Selection</source>
-        <translation>Medienhandlerauswahl</translation>
+        <translation type="vanished">Medienhandlerauswahl</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="680"/>
         <source>The new media contains mixed content that can be rendered in different ways. Select your preferred method.</source>
-        <translation>Das neue Medium enhält gemischten Inhalt, der auf unterschiedliche Weise dargestellt werden kann. Wählen sie ihre bevorzugte Methode.</translation>
+        <translation type="vanished">Das neue Medium enhält gemischten Inhalt, der auf unterschiedliche Weise dargestellt werden kann. Wählen sie ihre bevorzugte Methode.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="872"/>
+        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="849"/>
         <source>Select a CD drive</source>
         <translation>CD-Laufwerk wählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="881"/>
+        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="858"/>
         <source>Select a VCD drive</source>
         <translation>VCD-Laufwerk wählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="890"/>
+        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="867"/>
         <source>Select a DVD drive</source>
         <translation>DVD-Laufwerk wählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="899"/>
+        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="876"/>
         <source>Select a CD writer</source>
         <translation>CD-Brenner wählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="911"/>
+        <location filename="../libs/libmyth/mythmediamonitor.cpp" line="888"/>
         <source>Select a DVD writer</source>
         <translation>DVD-Brenner wählen</translation>
     </message>
@@ -10761,17 +10807,21 @@ Fehler: %1</translation>
         <translation>Bild wieder zentrieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="1535"/>
-        <source>MythDVD media</source>
-        <translation>MythDVD Medium</translation>
+        <location filename="../programs/mythfrontend/main.cpp" line="1476"/>
+        <source>Set or clear cover image</source>
+        <translation>Coverbild setzen oder löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="1538"/>
+        <source>MythDVD media</source>
+        <translation type="vanished">MythDVD Medium</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/main.cpp" line="1537"/>
         <source>MythImage Media Handler 1/2</source>
         <translation>MythImga Medienhandlerauswahl 1/2</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="1545"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="1544"/>
         <source>MythImage Media Handler 2/2</source>
         <translation>MythImga Medienhandlerauswahl 2/2</translation>
     </message>
@@ -10780,7 +10830,7 @@ Fehler: %1</translation>
         <translation type="obsolete">Bildschirmfoto</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="1530"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="1532"/>
         <source>MythTV&apos;s native media player.</source>
         <translation>MythTVs interner Medienabspieler.</translation>
     </message>
@@ -12149,7 +12199,7 @@ Fehler: %1</translation>
 <context>
     <name>MythPlayer</name>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="494"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="504"/>
         <source>Failed to initialize video output</source>
         <translation>Konnte die Videoausgabe nicht initialisieren</translation>
     </message>
@@ -12158,179 +12208,179 @@ Fehler: %1</translation>
         <translation type="obsolete">Muss die Video-Darstellungsmethode wechseln.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="582"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="592"/>
         <source>Need to switch video renderer</source>
         <translation>Videorenderer muß geändert werden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="603"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="613"/>
         <source>Failed to reinitialize video output</source>
         <translation>Konnte die Videoausgabe nicht reinitialisieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="948"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="958"/>
         <source>Could not read first %1 bytes</source>
         <translation>Kann die ersten %1 bytes nicht lesen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="968"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="978"/>
         <source>Could not find an A/V decoder</source>
         <translation>Kann keinen A/V Decoder finden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="977"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="987"/>
         <source>Could not initialize A/V decoder</source>
         <translation>Kann A/V Decoder nicht initialisieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1002"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1012"/>
         <source>Could not open decoder</source>
         <translation>Kann Decoder nicht öffnen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1391"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1404"/>
         <source>TXT CAP</source>
         <translation>TXT CAP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1411"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1439"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1424"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1455"/>
         <source>Text subtitles</source>
         <translation>Text-Untertitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1417"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1430"/>
         <source>Off</source>
         <translation>Aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1442"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1458"/>
         <source>TXT %1</source>
         <translation>TXT %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1456"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1472"/>
         <source>On</source>
         <translation>Ein</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1512"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1530"/>
         <source>No captions</source>
         <comment>CC/Teletext/Subtitle text not available</comment>
         <translation>Keine Untertitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1621"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1639"/>
         <source>Forced Subtitles On</source>
         <translation>Erzwungene Untertitel an</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1622"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1640"/>
         <source>Forced Subtitles Off</source>
         <translation>Erzwungene Untertitel aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1839"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1874"/>
         <source>Failed to initialize A/V Sync</source>
         <translation>Konnte die A/V-Synchronisierung nicht initialisieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="1942"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2122"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="1984"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2166"/>
         <source>Serious error detected in Video Output</source>
         <translation>Kritischen Fehler in der Videoausgabe entdeckt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2200"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2244"/>
         <source>Video frame buffering failed too many times.</source>
         <translation>Puffern der Videobilder zu oft fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2639"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2673"/>
         <source>Error opening switch program buffer</source>
         <translation>Fehler beim Öffnen des Puffers zum Programmwechsel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2664"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2698"/>
         <source>Error opening switch program file</source>
         <translation>Fehler beim Öffnen der Datei zum Programmwechsel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2791"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2823"/>
         <source>Error opening jump program file buffer</source>
         <translation>Fehler beim Öffnen des Puffers zum Springen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2801"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2833"/>
         <source>Error opening jump program file</source>
         <translation>Fehler beim Öffnen der Datei zum Springen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="2810"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="2842"/>
         <source>Error reopening video decoder</source>
         <translation>Fehler beim erneuten Öffnen des Videodekoders</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3044"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3077"/>
         <source>Irrecoverable recorder error</source>
         <translation>Nicht behebbarer Rekorderfehler</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="3134"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="3167"/>
         <source>Not Flagged</source>
         <extracomment>The commercials/adverts have not been flagged</extracomment>
         <translation>Nicht markiert</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4035"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4059"/>
         <source>Searching</source>
         <translation>Suche</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4106"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4130"/>
         <source>No Seektable</source>
         <translation>Nicht suchbar</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4136"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4160"/>
         <source>Using previously auto-saved cuts</source>
         <translation>Benutze die letzten automatisch gespeicherten Schnittpunkte</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4185"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4209"/>
         <source>Paused</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4270"/>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4306"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4294"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4330"/>
         <source>New cut added.</source>
         <translation>Neuen Schnitt hinzugefügt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4275"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4299"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4280"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4304"/>
         <source>Undo Changes</source>
         <translation>Änderungen rückgängig machen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4311"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4335"/>
         <source>Undo - %1</source>
         <extracomment>%1 is the undo message</extracomment>
         <translation>Rückgängig - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="4317"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="4341"/>
         <source>Redo - %1</source>
         <extracomment>%1 is the redo message</extracomment>
         <translation>Wiederherstellen - %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5122"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5146"/>
         <source>%n second(s)</source>
         <translation>
             <numerusform>%n Sekunde</numerusform>
@@ -12338,42 +12388,42 @@ Fehler: %1</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5126"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5150"/>
         <source>Still Frame</source>
         <translation>Standbild</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5127"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5151"/>
         <source>%1 of %2</source>
         <translation>%1 von %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5353"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5377"/>
         <source>Error opening remote stream buffer</source>
         <translation>Fehler beim Öffnen des entfernten Stream Buffers</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5366"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5390"/>
         <source>Error opening remote stream</source>
         <translation>Fehler beim Öffnen des entfernten Streams</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5532"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5556"/>
         <source>Enabled Studio Levels</source>
         <translation>Studio Levels eingeschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5533"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5557"/>
         <source>Disabled Studio Levels</source>
         <translation>Studio Levels ausgeschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5557"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5581"/>
         <source>Enabled Night Mode</source>
         <translation>Nachtmodus aktiviert</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/mythplayer.cpp" line="5563"/>
+        <location filename="../libs/libmythtv/mythplayer.cpp" line="5587"/>
         <source>Disabled Night Mode</source>
         <translation>Nachtmodus deaktiviert</translation>
     </message>
@@ -12852,8 +12902,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
 <context>
     <name>MythUISearchDialog</name>
     <message numerus="yes">
-        <location filename="../libs/libmythui/mythdialogbox.cpp" line="798"/>
-        <location filename="../libs/libmythui/mythdialogbox.cpp" line="859"/>
+        <location filename="../libs/libmythui/mythdialogbox.cpp" line="808"/>
+        <location filename="../libs/libmythui/mythdialogbox.cpp" line="869"/>
         <source>%n match(es)</source>
         <translation>
             <numerusform>%n Treffer</numerusform>
@@ -13036,7 +13086,7 @@ Kehre nun ins vorherige Menü zurück.</translation>
 <context>
     <name>NetworkControl</name>
     <message>
-        <location filename="../programs/mythfrontend/networkcontrol.cpp" line="1505"/>
+        <location filename="../programs/mythfrontend/networkcontrol.cpp" line="1511"/>
         <source>Network Control</source>
         <translation>Network Control</translation>
     </message>
@@ -13044,87 +13094,87 @@ Kehre nun ins vorherige Menü zurück.</translation>
 <context>
     <name>OSDSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1484"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1492"/>
         <source>Decode VBI format</source>
         <translation>VBI-Dekoder Format</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1486"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1494"/>
         <source>None</source>
         <translation>Keine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1488"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1496"/>
         <source>PAL teletext</source>
         <translation>PAL-Teletext</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1490"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1498"/>
         <source>NTSC closed caption</source>
         <translation>NTSC-Untertitel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1494"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1502"/>
         <source>If enabled, this overrides the mythtv-setup setting used during recording when decoding captions.</source>
         <translation>Falls gesetzt, überschreibt die mythtv-setup-Einstellung der Untertitel-Dekodierung bei Aufnahmen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1504"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1512"/>
         <source>Subtitle Codec</source>
         <translation>Untertitel-Codec</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1589"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1597"/>
         <source>Always display closed captioning or subtitles</source>
         <translation>Untertitel permanent anzeigen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1594"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1602"/>
         <source>If enabled, captions will be displayed when playing back recordings or watching Live TV. Closed Captioning can be turned on or off by pressing &quot;T&quot; duringplayback.</source>
         <translation>Falls gesetzt, werden Untertitel beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit &quot;T&quot; können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1606"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1614"/>
         <source>Enable interactive TV</source>
         <translation>Interaktives TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1610"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1618"/>
         <source>If enabled, interactive TV applications (MHEG) will be activated. This is used for teletext and logos for radio and channels that are currently off-air.</source>
         <translation>Falls gesetzt, können interaktive TV-Applikationen (MHEG) aktiviert werden. Dies wird für Teletext und Logos von Radiostationen und Sendern in den Sendepausen genutzt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1620"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1628"/>
         <source>Enable network access for interactive TV</source>
         <translation>Netzwerkzugriff für interaktives Fernsehen einschalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1622"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1630"/>
         <source>If enabled, interactive TV applications (MHEG) will be able to access interactive content over the Internet. This is used for BBC iPlayer.</source>
         <translation>Erlaubt interaktiven Fernsehanwendungen (MHEG) den Zugriff auf interaktive Inhalte über das Internet. Wird vom BBC iPlayer genutzt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1633"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1641"/>
         <source>Always use browse mode in Live TV</source>
         <translation>Browse-Modus bei LiveTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1637"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1645"/>
         <source>If enabled, browse mode will automatically be activated whenever you use channel up/down while watching Live TV.</source>
         <translation>Falls gesetzt, wird nach dem Senderwechsel der Browse-Modus aktiviert.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1648"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1656"/>
         <source>Browse all channels</source>
         <translation>Browse-Modus mit allen Sendern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1652"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1660"/>
         <source>If enabled, browse mode will show channels on all available recording devices, instead of showing channels on just the current recorder.</source>
         <translation>Falls gesetzt, zeigt der Browse-Modus die Sender aller verfügbaren Aufnahmegeräte an, und nicht nur die der aktuellen TV-Karte.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4065"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4073"/>
         <source>On-screen Display</source>
         <translation>On-Screen-Display</translation>
     </message>
@@ -13391,57 +13441,57 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation type="obsolete">% belegt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2588"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2610"/>
         <source>Are you sure you want to delete:</source>
         <translation>Diese Aufnahme wirklich löschen:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2594"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2616"/>
         <source>Are you sure you want to stop:</source>
         <translation>Sind Sie sicher, dass Sie abbrechen wollen:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2747"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3220"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2769"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3242"/>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3243"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3267"/>
         <source>Stop Recording</source>
         <translation>Aufnahme abbrechen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2766"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3201"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3272"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2788"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3223"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3296"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2631"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2635"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2653"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2657"/>
         <source>Yes, delete it</source>
         <translation>Ja, bitte löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2441"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2463"/>
         <source>Change Group View</source>
         <translation>Gruppenansicht wechseln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2445"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2467"/>
         <source>Change Group Password</source>
         <translation>Gruppenpasswort ändern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2780"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2999"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2802"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3021"/>
         <source>Change Recording Group</source>
         <translation>Aufnahmegruppe wechseln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3017"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3039"/>
         <source>Edit Recording Schedule</source>
         <translation>Aufnahmeplan ändern</translation>
     </message>
@@ -13450,79 +13500,79 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation type="obsolete">, %1 GB frei</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2852"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3066"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2874"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3088"/>
         <source>Stop Transcoding</source>
         <translation>Umwandlung stoppen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2850"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3066"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2872"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3088"/>
         <source>Begin Transcoding</source>
         <translation>Umwandlung starten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3119"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4506"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4715"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4758"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4987"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3141"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4530"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4737"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4780"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5009"/>
         <source>Default</source>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2623"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2645"/>
         <source>Yes, and allow re-record</source>
         <translation>Ja, aber erneut aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2978"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3000"/>
         <source>Play from beginning</source>
         <translation>Wiedergabe von Anfang an</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2977"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2999"/>
         <source>Play from bookmark</source>
         <translation>Wiedergabe ab Position</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2996"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3018"/>
         <source>Do not preserve this episode</source>
         <translation>Diese Folge nicht behalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2996"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3018"/>
         <source>Preserve this episode</source>
         <translation>Diese Folge behalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3218"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3240"/>
         <source>Play from...</source>
         <translation>Wiedergabe ab...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2764"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2992"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3251"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2786"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3014"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3275"/>
         <source>Storage Options</source>
         <translation>Speicheroptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3177"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3192"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3252"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3199"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3214"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3276"/>
         <source>Recording Options</source>
         <translation>Aufnahmeoptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2765"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3036"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3253"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2787"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3058"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3277"/>
         <source>Job Options</source>
         <translation>Auftragsoptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2748"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2770"/>
         <source>Shuffle Play</source>
         <translation>Zufallswiedergabe</translation>
     </message>
@@ -13531,90 +13581,90 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation type="obsolete">Wiedergabeliste Optionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2461"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2483"/>
         <source>Add this recording to Playlist</source>
         <translation>Diese Aufnahme der Playlist hinzufügen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2749"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2771"/>
         <source>Clear Playlist</source>
         <translation>Playlist löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2754"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2776"/>
         <source>Toggle playlist for this Category/Title</source>
         <translation>Playlist wechseln für diese Kategorie/Titel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2761"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2783"/>
         <source>Toggle playlist for this recording</source>
         <translation>Playlist wechseln für diese Aufnahme</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3185"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3227"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3207"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3249"/>
         <source>Remove from Playlist</source>
         <translation>Aus der Playlist entfernen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3187"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3230"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3209"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3252"/>
         <source>Add to Playlist</source>
         <translation>Der Playlist hinzufügen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3096"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3118"/>
         <source>User Job</source>
         <translation>Auftrag</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2873"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2886"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2899"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2912"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3097"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2895"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2908"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2921"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2934"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3119"/>
         <source>Stop</source>
         <translation>Stopp</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2870"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2883"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2896"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2909"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3098"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2892"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2905"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2918"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2931"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3120"/>
         <source>Begin</source>
         <translation>Starten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2438"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2460"/>
         <source>Change Group Filter</source>
         <translation>Gruppe wechseln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2456"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2478"/>
         <source>Add this Group to Playlist</source>
         <translation>Diese Gruppe der Playlist hinzufügen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="590"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4485"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="594"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4509"/>
         <source>Groups</source>
         <translation>Gruppen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4564"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4588"/>
         <source>Categories</source>
         <translation>Kategorien</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2782"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2994"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2804"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3016"/>
         <source>Disable Auto Expire</source>
         <translation>Automatisches Löschen deaktivieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2783"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2994"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2805"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3016"/>
         <source>Enable Auto Expire</source>
         <translation>Automatisches Löschen aktivieren</translation>
     </message>
@@ -13623,8 +13673,8 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation type="obsolete">Aufnahmetitel ändern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2781"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3000"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2803"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3022"/>
         <source>Change Playback Group</source>
         <translation>Wiedergabegruppe wechseln</translation>
     </message>
@@ -13633,59 +13683,59 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation type="obsolete">Zeige Sendungsinformationen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3120"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3142"/>
         <source>Autodetect</source>
         <translation>Automatisch wählen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3143"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3165"/>
         <source>High Quality</source>
         <translation>Hohe Qualität</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3145"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3167"/>
         <source>Medium Quality</source>
         <translation>Mittlere Qualität</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3147"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3169"/>
         <source>Low Quality</source>
         <translation>Niedrige Qualität</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="413"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="416"/>
         <source>Watch List</source>
         <translation>Beobachtungsliste</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1453"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1458"/>
         <source>There are no recordings in your current view</source>
         <translation>Keine Aufnahmen in der aktuellen Ansicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1452"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1457"/>
         <source>There are no recordings available</source>
         <translation>Keine Aufnahmen verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2785"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3247"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2807"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3271"/>
         <source>Mark as Unwatched</source>
         <translation>Als nicht gesehen markieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2784"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3249"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2806"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3273"/>
         <source>Mark as Watched</source>
         <translation>Als gesehen markieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1680"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1725"/>
         <source>_NO_TITLE_</source>
         <translation>_KEIN_TITEL_</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="710"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="715"/>
         <source>There is/are %n recording(s) in this display group</source>
         <translation>
             <numerusform>Es ist %n Aufnahme in dieser Gruppe</numerusform>
@@ -13693,90 +13743,90 @@ Kehre nun ins vorherige Menü zurück.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1692"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4537"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4539"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4543"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4554"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1673"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4561"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4563"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4567"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4578"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1715"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2123"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2124"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3586"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3588"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4508"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4717"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1742"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2145"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2146"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3610"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3612"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4532"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4739"/>
         <source>Live TV</source>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2331"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2346"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2351"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2353"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2368"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2373"/>
         <source>Cannot delete
 </source>
         <translation>Löschen nicht möglich
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2332"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2347"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2354"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2369"/>
         <source>This recording is already being deleted</source>
         <translation>Diese Aufnahme wird schon gelöscht</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2466"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2488"/>
         <source>Help (Status Icons)</source>
         <translation>Symbolerklärung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2695"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2702"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2717"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2724"/>
         <source>Recording Available
 </source>
         <translation>Aufnahme verfügbar
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2709"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2715"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2721"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2727"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2733"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2731"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2737"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2743"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2749"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2755"/>
         <source>Recording Unavailable
 </source>
         <translation>Aufnahme nicht verfügbar
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2767"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2789"/>
         <source>Delete, and allow re-record</source>
         <translation>Löschen, aber wieder aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2786"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2808"/>
         <source>Allow Re-record</source>
         <translation>Erneut aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2855"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3067"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2877"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3089"/>
         <source>Begin Commercial Detection</source>
         <translation>Werbeerkennung starten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2857"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3067"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2879"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3089"/>
         <source>Stop Commercial Detection</source>
         <translation>Werbeerkennung stoppen</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2742"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2775"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2793"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2764"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2797"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2815"/>
         <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
         <translation>
             <numerusform>Es ist %n Eintrag in der Liste. Aktionen betreffen alle Einträge der Wiedergabeliste</numerusform>
@@ -13784,12 +13834,12 @@ Kehre nun ins vorherige Menü zurück.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2972"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2994"/>
         <source>Play Options</source>
         <translation>Wiedergabeoptionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3013"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3035"/>
         <source>Scheduling Options</source>
         <translation>Planungsoptionen</translation>
     </message>
@@ -13798,145 +13848,145 @@ Kehre nun ins vorherige Menü zurück.</translation>
         <translation type="obsolete">Diese Sendung erneut aufnehmen lassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3023"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3045"/>
         <source>Change Recording Metadata</source>
         <translation>Metadaten der Aufnahme ändern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3174"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3196"/>
         <source>Recording file cannot be found</source>
         <translation>Aufnahmedatei kann nicht gefunden werden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3176"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3198"/>
         <source>Recording file contains no data</source>
         <translation>Aufnahmedatei ist leer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3267"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3291"/>
         <source>Undelete</source>
         <translation>Wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3268"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3292"/>
         <source>Delete Forever</source>
         <translation>Für immer löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4507"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4719"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4531"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4741"/>
         <source>Deleted</source>
         <translation>Gelöscht</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="635"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="639"/>
         <source>Password for group &apos;%1&apos;:</source>
         <translation>Passwort für Gruppe &quot;%1&quot;:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="591"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="595"/>
         <source>Recordings</source>
         <translation>Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="734"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="739"/>
         <source>, which consume %1</source>
         <translation>, die %1 belegen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="735"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="740"/>
         <source>GB</source>
         <comment>GigaBytes</comment>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2432"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2454"/>
         <source>Group List Menu</source>
         <translation>Gruppenlistenmenü</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2590"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2612"/>
         <source>Recording file does not exist.
 Are you sure you want to delete:</source>
         <translation>Aufnahmedatei existiert nicht.
 Soll die folgende Sendung wirklich gelöscht werden:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2639"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2661"/>
         <source>Yes, stop recording</source>
         <translation>Ja, Aufnahme abbrechen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2653"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2675"/>
         <source>Yes, delete it and the remaining %1 list items</source>
         <translation>Löschen, und auch die anderen %1 Einträge</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2663"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2685"/>
         <source>No, keep it</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2667"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2689"/>
         <source>No, continue recording</source>
         <translation>Nein, weiter aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2675"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2697"/>
         <source>No, and keep the remaining %1 list items</source>
         <translation>Nein, und auch die anderen %1 Einträge behalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2352"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2697"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2374"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2719"/>
         <source>This recording is currently in use by:</source>
         <translation>Diese Aufnahme wird derzeit benutzt von:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1308"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1313"/>
         <source>%1% used, %2 GB free</source>
         <comment>Diskspace</comment>
         <translation>%1% benutzer, %2 GB frei</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2450"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3190"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3234"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2472"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3212"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3256"/>
         <source>Playlist Options</source>
         <translation>Wiedergabeliste Optionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2704"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2726"/>
         <source>This recording is currently Available</source>
         <translation>Diese Aufnahme ist verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2711"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2733"/>
         <source>This recording is currently being deleted and is unavailable</source>
         <translation>Diese Aufnahme wird gerade gelöscht und ist daher nicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2717"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2739"/>
         <source>This recording has been deleted and is unavailable</source>
         <translation>Diese Aufnahme wurde gelöscht und ist daher nicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2723"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2745"/>
         <source>The file for this recording can not be found</source>
         <translation>Die Datei zu dieser Aufnahme wurde nicht gefunden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2729"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2751"/>
         <source>The file for this recording is empty.</source>
         <translation>Die Datei zu dieser Aufnahme ist leer.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2735"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2757"/>
         <source>This recording is not yet available.</source>
         <translation>Diese Aufnahme ist noch nicht verfügbar.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2757"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2779"/>
         <source>Toggle playlist for this Group</source>
         <translation>Playlist wechseln für diese Gruppe</translation>
     </message>
@@ -13949,60 +13999,60 @@ Soll die folgende Sendung wirklich gelöscht werden:</translation>
         <translation type="obsolete">Als nicht gesehen markieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2860"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3068"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2882"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3090"/>
         <source>Begin Metadata Lookup</source>
         <translation>Starte Erkennung der Metadaten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2862"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3068"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2884"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3090"/>
         <source>Stop Metadata Lookup</source>
         <translation>Stoppe Erkennung der Metadaten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2980"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3002"/>
         <source>Play from last played position</source>
         <translation>Von letzter Position wiedergeben</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3019"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3041"/>
         <source>Allow this episode to re-record</source>
         <translation>Diese Folge erneut aufnehmen lassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3021"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3043"/>
         <source>Show Recording Details</source>
         <translation>Zeige Aufnahmedetails</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3025"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3047"/>
         <source>Custom Edit</source>
         <translation>Freie Planung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3115"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3137"/>
         <source>Transcoding profiles</source>
         <translation>Umwandlungsprofile</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3195"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3256"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3217"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3280"/>
         <source>List Recorded Episodes</source>
         <translation>Zeige aufgezeichnete Folgen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3198"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3259"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3220"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3283"/>
         <source>List All Recordings</source>
         <translation>Zeigen alle Aufnamen</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4510"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4517"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4545"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4556"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4721"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4534"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4541"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4569"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4580"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4743"/>
         <source>%1 [%n item(s)]</source>
         <translation>
             <numerusform>%1 [%n Eintrag]</numerusform>
@@ -14010,27 +14060,27 @@ Soll die folgende Sendung wirklich gelöscht werden:</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4574"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4598"/>
         <source>Change Filter</source>
         <translation>Filter ändern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4703"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4725"/>
         <source>Add New</source>
         <translation>Neu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4725"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4747"/>
         <source>Select Recording Group</source>
         <translation>Aufnahmegruppe wählen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4769"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4791"/>
         <source>Select Playback Group</source>
         <translation>Wiedergabegruppe wählen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4920"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4942"/>
         <source>New Recording Group</source>
         <translation>Neue Aufnahmegruppe</translation>
     </message>
@@ -14062,29 +14112,29 @@ Soll die folgende Sendung wirklich gelöscht werden:</translation>
         <translation>Wiedergabeprofile %1</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1267"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1275"/>
         <source>Current Video Playback Profile</source>
         <translation>Aktuelles Video-Wiedergabeprofil</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1278"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1286"/>
         <source>Add New</source>
         <translation>Neues Profil</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1317"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1325"/>
         <source>Enter Playback Group Name</source>
         <translation>Name der Wiedergabegruppe eingeben</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1328"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1336"/>
         <source>Sorry, playback group
 name cannot be blank.</source>
         <translation>Der Namer der Wiedergabegruppe
 kann nicht leer sein.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1329"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1337"/>
         <source>Sorry, playback group name
 &apos;%1&apos; is already being used.</source>
         <translation>Der Name &apos;%1&apos;
@@ -14356,12 +14406,12 @@ wird bereits verwendet.</translation>
         <translation>Behandelt aufeinanderfolgende Werbeblöcke, die kürzer als dieser Wert sind, als einen. Nützlich, falls Sie in Werbeblöcken noch vorwärts springen müssen. Gilt auch bei &quot;Autom. überspringen&quot;. Mit 0 deaktivieren.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1375"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1383"/>
         <source>Sort all sub-titles/multi-titles Ascending</source>
         <translation>Sortiere aufsteigend nach Untertitel/Multititel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1376"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1384"/>
         <source>Sort all sub-titles/multi-titles Descending</source>
         <translation>Sortiere absteigend nach Untertitel/Multititel</translation>
     </message>
@@ -14370,350 +14420,350 @@ wird bereits verwendet.</translation>
         <translation type="obsolete">Sortiere absteigend nach Untertitel, aufsteigend nach Multititel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1377"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1385"/>
         <source>Sort sub-titles Descending, multi-titles Ascending</source>
         <translation>Sortiere absteigend nach Untertitel, aufsteigend nach Multititel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1379"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1387"/>
         <source>Sort sub-titles Ascending, multi-titles Descending</source>
         <translation>Sortiere aufsteigend nach Untertitel, absteigend nach Multititel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1382"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1390"/>
         <source>Selects how to sort show episodes. Sub-titles refers to the episodes listed under a specific show title. Multi-title refers to sections (e.g. &quot;All Programs&quot;) which list multiple titles. Sections in parentheses are not affected.</source>
         <translation>Bestimmt die Sortierung einzelner Folgen. &quot;Untertitel&quot; meint alle Folgen einer Serie, Multititel sind Abschnitte (z.B. &quot;Alle Sendungen&quot;), die mehrere Sendungen zeigen. Abschnitte in Klammern sind davon nicht betroffen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1392"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1400"/>
         <source>Episode sort orderings</source>
         <translation>Seriensortierung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1407"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1415"/>
         <source>Sort episodes</source>
         <translation>Sortiere Folgen nach</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1409"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1417"/>
         <source>Record date</source>
         <translation>Aufnahmedatum</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1410"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1418"/>
         <source>Season/Episode</source>
         <translation>Staffel/Episode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1411"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1419"/>
         <source>Original air date</source>
         <translation>Erstausstrahlung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1412"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1420"/>
         <source>Program ID</source>
         <translation>Programm-ID</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1414"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1422"/>
         <source>Selects how to sort a show&apos;s episodes</source>
         <translation>Bestimmt, wie die einzelnen Folgen der gleichen Serie sortiert werden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1424"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1432"/>
         <source>Fast forward/rewind reposition amount</source>
         <translation>Neupositionierungsdauer nach Beenden des Vor-/Rücklaufs</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1428"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1436"/>
         <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
         <translation>Beim Beenden des schnellen Vor-/Rücklaufs im &quot;Klebrige Tasten&quot;-Modus wird erst neu positioniert, bevor die Wiedergabe einsetzt. Dies gleicht die Verzögerung beim Beenden des schnellen Vor-/Rücklaufs aus.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1443"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1451"/>
         <source>Reverse direction in fast forward/rewind</source>
         <translation>Umgekehrte Richtung für schnellen Vor-/Rücklauf</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1448"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1456"/>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
         <translation>Falls gesetzt, wird beim Drücken der klebrigen Rückspultaste währen des Vorspulens auf Rückspulen gewechselt und umgekehrt. Falls nicht gesetzt, wird die Geschwindigkeit reduziert bzw. in den Wiedergabemodus gewechselt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1533"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1541"/>
         <source>Vertical scaling</source>
         <translation>Vertikale Skalierung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1537"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1545"/>
         <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
         <translation>Hier können Sie die vertikale Bildgröße einstellen. Erlaubter Bereich: -100% bis +100%</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1547"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1555"/>
         <source>Horizontal scaling</source>
         <translation>Horizontale Skalierung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1551"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1559"/>
         <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
         <translation>Hier können Sie die horizontale Bildgröße einstellen. Erlaubter Bereich: -100% bis +100%</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1561"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1569"/>
         <source>Scan displacement (X)</source>
         <translation>Bildposition (horiz.)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1565"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1573"/>
         <source>Adjust this to move the image horizontally.</source>
         <translation>Verschiebt das Bild horizontal.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1575"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1583"/>
         <source>Scan displacement (Y)</source>
         <translation>Bildposition (vert.)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1579"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1587"/>
         <source>Adjust this to move the image vertically.</source>
         <translation>Verschiebt das Bild vertikal.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1663"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1671"/>
         <source>Clear bookmark on playback</source>
         <translation>Position bei Wiedergabe löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1667"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1675"/>
         <source>If enabled, automatically clear the bookmark on a recording when the recording is played back. If disabled, you can mark the beginning with rewind then save position.</source>
         <translation>Die gespeicherte Position bei der Wiedergabe automatisch löschen. Falls deaktiviert, können Sie den Beginn durch Zurückspulen und Position speichern markieren.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1680"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1688"/>
         <source>Alternate clear and save bookmark</source>
         <translation>Position abwechselnd löschen/speichern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1684"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1692"/>
         <source>During playback the SELECT key (Enter or Space) will alternate between &quot;Bookmark Saved&quot; and &quot;Bookmark Cleared&quot;. If disabled, the SELECT key will save the current position for each keypress.</source>
         <translation>Während der Wiedergabe wird die SELECT-Taste zwischen &apos;Position speichern&apos; und &apos;Position löschen&apos; wechseln. Wenn die Option abgewählt ist, wird bei jedem Tastendruck die aktuelle Position gespeichert.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1697"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1705"/>
         <source>Action on playback exit</source>
         <translation>Verhalten bei Wiedergabe-Ende</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1699"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1707"/>
         <source>Just exit</source>
         <translation>Einfach beenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1700"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1708"/>
         <source>Save position and exit</source>
         <translation>Position speichern und beenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1701"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1709"/>
         <source>Always prompt (excluding Live TV)</source>
         <translation>Immer nachfragen (außer LiveTV)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1703"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1711"/>
         <source>Always prompt (including Live TV)</source>
         <translation>Immer nachfragen (auch bei LiveTV)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1705"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1713"/>
         <source>Prompt for Live TV only</source>
         <translation>Nur bei LiveTV nachfragen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1707"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1715"/>
         <source>If set to prompt, a menu will be displayed when you exit playback mode. The options available will allow you to save your position, delete the recording, or continue watching.</source>
         <translation>Wenn &quot;Nachfragen&quot; ausgewählt ist, wird beim Verlassen des Wiedergabemodus ein Menü eingeblendet. Dabei können Sie die aktuelle Position speichern, die Aufnahme löschen oder weiter ansehen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1720"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1728"/>
         <source>Prompt at end of recording</source>
         <translation>Menü bei Wiedergabeende einblenden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1724"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1732"/>
         <source>If enabled, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
         <translation>Falls gesetzt, wird am Ende der Wiedergabe einer Aufnahme ein Menü eingeblendet, womit die Aufnahme gelöscht werden kann.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1734"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1742"/>
         <source>Jump to program OSD</source>
         <translation>Springe zum Sendungs-OSD</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1738"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1746"/>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If enabled, the recordings are shown in the OSD</source>
         <translation>Wählen Sie, ob die aktuelle Aufnahmegruppe im OSD oder der &apos;Aufnahmen ansehen&apos; Bildschirm angezeigt werden soll, falls &apos;Springe zur Sendung&apos; aktiviert ist. Falls gesetzt, werden die Aufnahmen im OSD gezeigt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1751"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1759"/>
         <source>Continue playback when embedded</source>
         <translation>Wiedergabe auch im kleinen Fenster</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1755"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1763"/>
         <source>If enabled, TV playback continues when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
         <translation>Setzt die TV-Wiedergabe auch dann fort, wenn das TV-Bild im EPG oder im &quot;Aufnahmen ansehen&quot; Menü angezeigt wird. Die Vorgabe ist, die Wiedergabe anzuhalten.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1768"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1776"/>
         <source>Automatically mark a recording as watched</source>
         <translation>Aufnahmen autom. als &quot;Gesehen&quot; markieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1773"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1781"/>
         <source>If enabled, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
         <translation>Falls gesetzt, wird die Aufnahme dann als gesehen markiert, wenn Sie diese fast am Ende verlassen. Diese Erkennung ist nicht perfekt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1787"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1795"/>
         <source>Live TV idle timeout (mins)</source>
         <translation>LiveTV Leerlaufzeit (Min.)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1791"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="1799"/>
         <source>Exit Live TV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
         <translation>LiveTV automatisch nach der angegebenen Zeit (in Minuten) beenden. &apos;0&apos; blockiert die Leerlaufzeit.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2025"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2033"/>
         <source>Letterboxing color</source>
         <translation>Letterbox-Farbe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2030"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2038"/>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in. Currently only works with XVideo video renderer.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2043"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2051"/>
         <source>Video aspect override</source>
         <translation>Seitenverhältnis festlegen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2048"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2056"/>
         <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
         <translation>Legt das Seitenverhältnis abweichend vom tatsächlichen Seitenverhältnis der Videodaten fest.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2058"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2066"/>
         <source>Zoom</source>
         <translation>Zoom</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2067"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2075"/>
         <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
         <translation>Falls gesetzt, wird der definierte Zoomfaktor bei jeder Wiedergabe berücksichtigt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3184"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3192"/>
         <source>Enable realtime priority threads</source>
         <translation>Erlaube Echtzeit-Threads</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3186"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3194"/>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if MythFrontend freezes during video playback.</source>
         <translation>Einige Threads laufen mit höherer Priorität ab, falls mythfrontend mit Root-Rechten gestartet wird. Schalten Sie diese Option aus, falls mythfrontend bei der Video-Wiedergabe hängen bleibt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3216"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3224"/>
         <source>Sort titles</source>
         <translation>Sortiere Titel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3218"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3226"/>
         <source>Alphabetically</source>
         <translation>Alphabetisch</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3220"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3228"/>
         <source>By recording priority</source>
         <translation>Nach Aufnahmepriorität</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3223"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3231"/>
         <source>Sets the title sorting order when the view is set to Titles only.</source>
         <translation>Bestimmt die Titelsortierung, wenn &quot;Nur Titel zeigen&quot; gewählt wurde.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3577"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3585"/>
         <source>Enable gamma correction for video</source>
         <translation>Aktiviere Gamma-Korrektur</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3581"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3589"/>
         <source>If enabled, QuickTime will correct the gamma of the video to match your monitor. Turning this off can save some CPU cycles.</source>
         <translation>Falls gesetzt, wird QuickTime den Gammawert des Videobildes an Ihren Monitor anpassen. Diese Funktion belastet die CPU geringfügig.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3592"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3600"/>
         <source>Scale video as necessary</source>
         <translation>Video skalieren</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3596"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3604"/>
         <source>If enabled, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
         <translation>Falls gesetzt, wird das Videobild passend zum Fenster bzw. Bildschirm skaliert. Ansonsten wird es nicht größer als in Originalgröße dargestellt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3607"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3615"/>
         <source>Frames to skip in fullscreen mode</source>
         <translation>Frames im Vollbildmodus auslassen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3611"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3619"/>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
         <translation>Wird das Videobild im Vollbild- oder Nicht-Fenstermodus angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt. Nur gültig, falls entweder &quot;GUI-Größe für TV-Bild verwenden&quot; oder &quot;MythTV im Fenster starten&quot; nicht gesetzt sind.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3909"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3941"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3917"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3949"/>
         <source>General Playback (%1/%2)</source>
         <extracomment>%2 is the position, %2 is the total</extracomment>
         <translation>Allgemeines Wiedergabe (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3976"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4000"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3984"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4008"/>
         <source>View Recordings (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Aufnahmen ansehen (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3989"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3997"/>
         <source>Recording Groups (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Aufnahmegruppen (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4010"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4018"/>
         <source>Seeking (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Suchen (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4021"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4029"/>
         <source>Commercial Skip (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Werbung überspringen (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4035"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4043"/>
         <source>Mac OS X Video Setting (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Mac OS X Video-Einstellungen (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4046"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="4054"/>
         <source>Mac OS X Video Settings (%1/%2)</source>
         <extracomment>%1 is the position, %2 is the total</extracomment>
         <translation>Mac OS X Video-Einstellungen (%1/%2)</translation>
@@ -14863,22 +14913,22 @@ wird bereits verwendet.</translation>
 <context>
     <name>ProgDetails</name>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="278"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="237"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="281"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="241"/>
         <source>Title Pronounce</source>
         <translation>Titel verkünden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="288"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="248"/>
         <source>Part %1 of %2, </source>
         <translation>Teil %1 von %2,</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="298"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="258"/>
         <source>%n star(s)</source>
         <translation>
             <numerusform>%n Stern</numerusform>
@@ -14886,103 +14936,108 @@ wird bereits verwendet.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="304"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="264"/>
         <source>Mono</source>
         <translation>Mono</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="306"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="266"/>
         <source>Stereo</source>
         <translation>Stereo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="308"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="268"/>
         <source>Surround Sound</source>
         <translation>Surround</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="310"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="270"/>
         <source>Dolby Sound</source>
         <translation>Dolby</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="312"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="272"/>
         <source>Audio for Hearing Impaired</source>
         <translation>Ton für Hörgeschädigte</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="314"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="274"/>
         <source>Audio for Visually Impaired</source>
         <translation>Ton für Sehgeschädigte</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="317"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="277"/>
         <source>HDTV</source>
         <translation>HDTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="319"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="279"/>
         <source>Widescreen</source>
         <translation>Breitbildformat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="321"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="281"/>
         <source>AVC/H.264</source>
         <translation>AVC/H.264</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="323"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="283"/>
         <source>720p Resolution</source>
         <translation>720p Auflösung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="325"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="285"/>
         <source>1080i/p Resolution</source>
         <translation>1080i/p Auflösung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="328"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="288"/>
         <source>CC</source>
         <comment>Closed Captioned</comment>
         <translation>CC</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="330"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="290"/>
         <source>Subtitles Available</source>
         <translation>Untertitel verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="332"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="292"/>
         <source>Subtitled</source>
         <translation>Mit Untertiteln</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="334"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="294"/>
         <source>Deaf Signing</source>
         <translation>Gebärdensprache</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="337"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="297"/>
         <source>Unidentified Episode</source>
         <translation>Unbekannte Folge</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="339"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="299"/>
         <source>Repeat</source>
         <translation>Wiederholung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="347"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="307"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="367"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="424"/>
         <source>Category</source>
         <translation>Kategorie</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="378"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="441"/>
+        <source>Genre</source>
+        <translation>Genre</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="453"/>
         <source>Type</source>
         <comment>category_type</comment>
         <translation>Typ</translation>
@@ -14992,72 +15047,72 @@ wird bereits verwendet.</translation>
         <translation type="vanished">Episodennummer</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="405"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="482"/>
         <source>Original Airdate</source>
         <translation>Aufgenommen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="407"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="484"/>
         <source>Program ID</source>
         <translation>Programm-ID</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="512"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="412"/>
         <source>Actors</source>
         <translation>Darsteller</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="513"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="418"/>
         <source>Director</source>
         <translation>Regisseur</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="514"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="419"/>
         <source>Producer</source>
         <translation>Produzent</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="515"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="420"/>
         <source>Executive Producer</source>
         <translation>Ausführender Produzent</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="516"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="421"/>
         <source>Writer</source>
         <translation>Autor</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="517"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="413"/>
         <source>Guest Star</source>
         <translation>Gaststar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="518"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="415"/>
         <source>Host</source>
         <translation>Gastgeber</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="519"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="422"/>
         <source>Adapter</source>
         <translation>Bearbeiter</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="520"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="416"/>
         <source>Presenter</source>
         <translation>Moderator</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="521"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="417"/>
         <source>Commentator</source>
         <translation>Kommentator</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="522"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="414"/>
         <source>Guest</source>
         <translation>Gäste</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="586"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="550"/>
         <source>MythTV Status</source>
         <translation>MythTV Status</translation>
     </message>
@@ -15066,28 +15121,28 @@ wird bereits verwendet.</translation>
         <translation type="obsolete">Status</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="384"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="464"/>
         <source>%1 of %2</source>
         <translation>%1 von %2</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="389"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="470"/>
         <source>Episode</source>
         <translation>Folge</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="394"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="458"/>
         <source>Season</source>
         <translation>Staffel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="396"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="472"/>
         <source>Syndicated Episode Number</source>
         <translatorcomment>http://tvtropes.org/pmwiki/pmwiki.php/Main/EpisodeCodeNumber</translatorcomment>
         <translation>Kennnummer der Folge</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="619"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="583"/>
         <source>%n hour(s)</source>
         <translation>
             <numerusform>%n Stunde</numerusform>
@@ -15095,133 +15150,126 @@ wird bereits verwendet.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="633"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="597"/>
         <source>Auto-expire off</source>
         <translation>Autom. Löschen aus</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="636"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="600"/>
         <source>Marked as &apos;watched&apos;</source>
         <translation>Als gesehen markiert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="639"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="603"/>
         <source>Not the earliest episode</source>
         <translation>Nicht die früheste Folge</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="642"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="606"/>
         <source>Recently deleted episode</source>
         <translation>Kürzlich gelöschte Folge</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="654"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="615"/>
         <source>Recording Rule</source>
         <translation>Aufnahmeregel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="655"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="616"/>
         <source>Last Recorded</source>
         <translation>Letzte Aufnahme am</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="656"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="617"/>
         <source>Next Recording</source>
         <translation>Nächste Aufnahme am</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="657"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="618"/>
         <source>Average Time Shift</source>
         <translation>ø Zeitversatz</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="658"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="619"/>
         <source>Watch List Score</source>
         <translation>Punktzahl Beobachtungsliste</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="659"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="620"/>
         <source>Watch List Status</source>
         <translation>Status Beobachtungsliste</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="660"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="621"/>
         <source>Search Phrase</source>
         <translation>Suchtext</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="671"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="632"/>
         <source>Find ID</source>
         <translation>Suche ID</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="690"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="651"/>
         <source>GB</source>
         <comment>GigaBytes</comment>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="710"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="671"/>
         <source>Recording Host</source>
         <translation>Aufgenommen von</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="711"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="672"/>
         <source>Recording Input</source>
         <translation>Eingang</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="712"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="673"/>
         <source>Recorded File Name</source>
         <translation>Dateiname</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="713"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="674"/>
         <source>Recorded File Size</source>
         <translation>Dateigröße</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="714"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="675"/>
         <source>Recording Profile</source>
         <translation>Aufnahmeprofil</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="715"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="676"/>
         <source>Recording Group</source>
         <translation>Aufnahmegruppe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="716"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="677"/>
         <source>Storage Group</source>
         <translation>Speichergruppe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="717"/>
+        <location filename="../programs/mythfrontend/progdetails.cpp" line="678"/>
         <source>Playback Group</source>
         <translation>Wiedergabegruppe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="755"/>
         <source>Options</source>
-        <translation>Optionen</translation>
+        <translation type="vanished">Optionen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="764"/>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="789"/>
         <source>Zoom In</source>
-        <translation>Vergrößern</translation>
+        <translation type="vanished">Vergrößern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="765"/>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="787"/>
         <source>Zoom Out</source>
-        <translation>Verkleinern</translation>
+        <translation type="vanished">Verkleinern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="766"/>
-        <location filename="../programs/mythfrontend/progdetails.cpp" line="791"/>
         <source>Switch Page</source>
-        <translation>Seite wechseln</translation>
+        <translation type="vanished">Seite wechseln</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -15559,14 +15607,14 @@ wird bereits verwendet.</translation>
         <translation>Freie Planung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1388"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1394"/>
         <source>^(The |A |An )</source>
         <comment>Regular Expression for what to ignore when sorting</comment>
         <translation>^(The |A |An |Der |Die |Das ¦Ein ¦Eine )</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1579"/>
-        <location filename="../programs/mythfrontend/proglist.cpp" line="1608"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1585"/>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1614"/>
         <source>%1 of %2</source>
         <comment>Current position in list where %1 is the position, %2 is the total count</comment>
         <translation>%1 von %2</translation>
@@ -15876,29 +15924,29 @@ wird bereits verwendet.</translation>
         <translation>Keine UPnP-Backends gefunden</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="700"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="701"/>
         <source>Cannot find (ping) database host %1 on the network</source>
         <comment>Backend Setup</comment>
         <translation>Kann den Datenbankserver %1 nicht mittels &quot;ping&quot; erreichen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="715"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="716"/>
         <source>Cannot login to database</source>
         <comment>Backend Setup</comment>
         <translation>Kann nicht an Datenbank anmelden</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1038"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1039"/>
         <source>Could not connect to master backend</source>
         <translation>Verbindung zum Master Backend fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1053"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1054"/>
         <source>Backend is online</source>
         <translation>Backend ist online</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1134"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1135"/>
         <source>This application is not compatible with the installed MythTV libraries.</source>
         <translation>Diese Anwendung ist nicht mit den installierten MythTV-Bibliotheken kompatibel.</translation>
     </message>
@@ -15979,7 +16027,6 @@ wird bereits verwendet.</translation>
         <translation>Profil</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="176"/>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="45"/>
         <source>Not Recording</source>
         <translation>Nicht geplant</translation>
@@ -16178,12 +16225,12 @@ wird bereits verwendet.</translation>
         <translation type="obsolete">Falls gesetzt, sind Sprünge genauer, aber langsamer.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="393"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="96"/>
         <source>Blank Frame + Scene Change</source>
         <translation>Dunkle Frames und Szenenwechsel</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="401"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="104"/>
         <source>Scene Change Detection</source>
         <translation>Szenenwechsel</translation>
     </message>
@@ -16321,7 +16368,7 @@ wird bereits verwendet.</translation>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="333"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="587"/>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="677"/>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="704"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="709"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="301"/>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2298"/>
         <source>None</source>
@@ -16364,13 +16411,11 @@ wird bereits verwendet.</translation>
         <translation type="obsolete">EPG startet bei Sender</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3111"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="4980"/>
-        <location filename="../libs/libmyth/programtypes.cpp" line="228"/>
-        <location filename="../libs/libmyth/programtypes.cpp" line="231"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3112"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="4981"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="137"/>
         <location filename="../libs/libmythtv/videoouttypes.h" line="160"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1053"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1060"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
@@ -16981,26 +17026,23 @@ wird bereits verwendet.</translation>
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="716"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1436"/>
-        <location filename="../programs/mythfrontend/viewschedulediff.cpp" line="144"/>
+        <location filename="../programs/mythfrontend/viewschedulediff.cpp" line="147"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1767"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1772"/>
-        <location filename="../libs/libmyth/programtypes.cpp" line="212"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1768"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1773"/>
         <source>Repeat</source>
         <translation>Wiederholung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="208"/>
         <source>Conflicting</source>
-        <translation>Überschneidung</translation>
+        <translation type="vanished">Überschneidung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="191"/>
         <source>Will Record</source>
-        <translation>Geplant</translation>
+        <translation type="vanished">Geplant</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videoouttypes.h" line="194"/>
@@ -17047,44 +17089,38 @@ wird bereits verwendet.</translation>
         <translation type="obsolete">Aktiviert die Unterstützung zur Überwachung Ihrer CD-/DVD-Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="183"/>
         <source>Recorded</source>
-        <translation>Aufgenommen</translation>
+        <translation type="vanished">Aufgenommen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3122"/>
-        <location filename="../libs/libmyth/programtypes.cpp" line="185"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3123"/>
         <source>Recording</source>
         <translation>Aufnehmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3124"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3125"/>
         <source>File transfer</source>
         <translation>Datenübertragung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="201"/>
         <source>Max Recordings</source>
-        <translation>Max. Aufnahmen</translation>
+        <translation type="vanished">Max. Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="203"/>
         <source>Manual Cancel</source>
-        <translation>Manueller Abbruch</translation>
+        <translation type="vanished">Manueller Abbruch</translation>
     </message>
     <message>
         <source>Missed Future</source>
         <translation type="obsolete">Missed Future</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="216"/>
         <source>Low Disk Space</source>
-        <translation>Knapper Speicherplatz</translation>
+        <translation type="vanished">Knapper Speicherplatz</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="218"/>
         <source>Tuner Busy</source>
-        <translation>Tuner belegt</translation>
+        <translation type="vanished">Tuner belegt</translation>
     </message>
     <message>
         <source>Other Recording</source>
@@ -17095,28 +17131,24 @@ wird bereits verwendet.</translation>
         <translation type="vanished">Tuning sonstiges</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="239"/>
         <source>This showing is not scheduled to record</source>
-        <translation>Diese Sendung wird nicht aufgenommen</translation>
+        <translation type="vanished">Diese Sendung wird nicht aufgenommen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="249"/>
         <source>This showing will be recorded.</source>
-        <translation>Diese Sendung wird aufgenommen.</translation>
+        <translation type="vanished">Diese Sendung wird aufgenommen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="252"/>
         <source>This showing is being recorded.</source>
-        <translation>Diese Sendung wird gerade aufgenommen.</translation>
+        <translation type="vanished">Diese Sendung wird gerade aufgenommen.</translation>
     </message>
     <message>
         <source>The channel is being tuned.</source>
         <translation type="obsolete">Der Sender wird eingestellt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="262"/>
         <source>This showing was recorded.</source>
-        <translation>Diese Sendung wurde aufgenommen.</translation>
+        <translation type="vanished">Diese Sendung wurde aufgenommen.</translation>
     </message>
     <message>
         <source>This showing was not recorded because the master backend was hung or not running.</source>
@@ -17135,178 +17167,147 @@ wird bereits verwendet.</translation>
         <translation type="obsolete">Der Rekorder konnte nicht aufnehmen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="96"/>
         <source>A</source>
         <comment>RecStatusChar RecStatus::Aborted</comment>
-        <translation>A</translation>
+        <translation type="vanished">A</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="99"/>
         <source>R</source>
         <comment>RecStatusChar RecStatus::Recorded</comment>
-        <translation>R</translation>
+        <translation type="vanished">R</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="114"/>
         <source>X</source>
         <comment>RecStatusChar RecStatus::DontRecord</comment>
-        <translation>X</translation>
+        <translation type="vanished">X</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="117"/>
         <source>P</source>
         <comment>RecStatusChar RecStatus::PreviousRecording</comment>
-        <translation>P</translation>
+        <translation type="vanished">P</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="120"/>
         <source>R</source>
         <comment>RecStatusChar RecStatus::CurrentRecording</comment>
-        <translation>R</translation>
+        <translation type="vanished">R</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="123"/>
         <source>E</source>
         <comment>RecStatusChar RecStatus::EarlierShowing</comment>
-        <translation>E</translation>
+        <translation type="vanished">E</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="126"/>
         <source>T</source>
         <comment>RecStatusChar RecStatus::TooManyRecordings</comment>
-        <translation>T</translation>
+        <translation type="vanished">T</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="129"/>
         <source>c</source>
         <comment>RecStatusChar RecStatus::Cancelled</comment>
-        <translation>c</translation>
+        <translation type="vanished">c</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="133"/>
         <source>M</source>
         <comment>RecStatusChar RecStatus::Missed</comment>
-        <translation>M</translation>
+        <translation type="vanished">M</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="136"/>
         <source>C</source>
         <comment>RecStatusChar RecStatus::Conflict</comment>
-        <translation>C</translation>
+        <translation type="vanished">C</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="139"/>
         <source>L</source>
         <comment>RecStatusChar RecStatus::LaterShowing</comment>
-        <translation>L</translation>
+        <translation type="vanished">L</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="142"/>
         <source>r</source>
         <comment>RecStatusChar RecStatus::Repeat</comment>
-        <translation>r</translation>
+        <translation type="vanished">r</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="145"/>
         <source>x</source>
         <comment>RecStatusChar RecStatus::Inactive</comment>
-        <translation>x</translation>
+        <translation type="vanished">x</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="148"/>
         <source>K</source>
         <comment>RecStatusChar RecStatus::LowDiskSpace</comment>
-        <translation>K</translation>
+        <translation type="vanished">K</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="151"/>
         <source>B</source>
         <comment>RecStatusChar RecStatus::TunerBusy</comment>
-        <translation>B</translation>
+        <translation type="vanished">B</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="154"/>
         <source>f</source>
         <comment>RecStatusChar RecStatus::Failed</comment>
-        <translation>f</translation>
+        <translation type="vanished">f</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="157"/>
         <source>N</source>
         <comment>RecStatusChar RecStatus::NotListed</comment>
-        <translation>N</translation>
+        <translation type="vanished">N</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="160"/>
         <source>V</source>
         <comment>RecStatusChar RecStatus::NeverRecord</comment>
-        <translation>V</translation>
+        <translation type="vanished">V</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="163"/>
         <source>F</source>
         <comment>RecStatusChar RecStatus::Offline</comment>
-        <translation>F</translation>
+        <translation type="vanished">F</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="189"/>
         <source>Failing</source>
-        <translation>Fehlschlagend</translation>
+        <translation type="vanished">Fehlschlagend</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="258"/>
         <source>The showing is failing to record because of errors.</source>
-        <translation>Die Aufnahme der Sendung schlägt wegen Fehlern fehl.</translation>
+        <translation type="vanished">Die Aufnahme der Sendung schlägt wegen Fehlern fehl.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="290"/>
         <source>The status of this showing is unknown.</source>
-        <translation>Der Status dieser Sendung ist unbekannt.</translation>
+        <translation type="vanished">Der Status dieser Sendung ist unbekannt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="298"/>
         <source>This showing will not be recorded because </source>
-        <translation>Diese Sendung wird nicht aufgenommen weil </translation>
+        <translation type="vanished">Diese Sendung wird nicht aufgenommen weil </translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="300"/>
         <source>This showing was not recorded because </source>
-        <translation>Diese Sendung wurde nicht aufgenommen weil </translation>
+        <translation type="vanished">Diese Sendung wurde nicht aufgenommen weil </translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="305"/>
         <source>it was manually set to not record.</source>
-        <translation>sie manuell geblockt wurde.</translation>
+        <translation type="vanished">sie manuell geblockt wurde.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="308"/>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
-        <translation>nach den Kriterien für Wiederholungen diese Folge schon aufgenommen wurde.</translation>
+        <translation type="vanished">nach den Kriterien für Wiederholungen diese Folge schon aufgenommen wurde.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="313"/>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
-        <translation>diese Folge bereits aufgenommen und noch nicht gelöscht wurde.</translation>
+        <translation type="vanished">diese Folge bereits aufgenommen und noch nicht gelöscht wurde.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="322"/>
         <source>too many recordings of this program have already been recorded.</source>
-        <translation>für diese Serie schon zu viele Folgen aufgenommen wurden.</translation>
+        <translation type="vanished">für diese Serie schon zu viele Folgen aufgenommen wurden.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="347"/>
         <source>the required recorder is off-line.</source>
-        <translation>Das benötigte Aufnahmegerät ist offline. </translation>
+        <translation type="vanished">Das benötigte Aufnahmegerät ist offline. </translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="351"/>
         <source>This showing will not be recorded.</source>
-        <translation>Diese Sendung wird nicht aufgenommen.</translation>
+        <translation type="vanished">Diese Sendung wird nicht aufgenommen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="353"/>
         <source>This showing was not recorded.</source>
-        <translation>Diese Sendung wurde nicht aufgenommen.</translation>
+        <translation type="vanished">Diese Sendung wurde nicht aufgenommen.</translation>
     </message>
     <message>
         <source>ProfileGroup</source>
@@ -17711,12 +17712,12 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation>Kartentyp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2984"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2935"/>
         <source>Card type</source>
         <translation>Kartentyp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2985"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2936"/>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
         <translation>Ändern Sie den Kartentyp entsprechend Ihrer TV-Karte.</translation>
     </message>
@@ -17725,24 +17726,39 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="obsolete">MJPEG-Enkoderkarte (Matrox G200, DC10)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3767"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3753"/>
         <source>(New capture card)</source>
         <translation>(Neue TV-Karte)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3912"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3898"/>
         <source>(New video source)</source>
         <translation>(Neue Videoquelle)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="226"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="241"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="247"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="262"/>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="170"/>
         <source>Channel frequency table</source>
         <translation>Tabelle der Senderfrequenzen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="232"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="135"/>
+        <source>Maximum number of simultaneous recordings MythTV will attempt using this device.  If set to a value other than 1, MythTV can sometimes record multiple programs on the same multiplex or overlapping copies of the same program on a single channel.</source>
+        <translation>Die Maximalzahl der gleichzeitig laufenden Aufnahmen für dieses Gerät.  Bei anderen Werten als 1 kann MythTV manchmal mehrere Sendungen vom gleichen Multiplex oder überlappende Sendungen vom gleichen Sender aufnehmen.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/videosource.cpp" line="152"/>
+        <source>Schedule as group</source>
+        <translation>Als Gruppe planen</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/videosource.cpp" line="155"/>
+        <source>Schedule all virtual inputs on this device as a group.  This is more efficient than scheduling each input individually, but can result in scheduling more simultaneous recordings than is allowed.  Be sure to set the maximum number of simultaneous recordings above high enough to handle all expected cases.</source>
+        <translation>Plane alle virtuellen Eingänge dieses Gerät als Gruppe.  Das ist effizienter als jeden Eingang einzeln zu planen, kann aber dazu führen, das mehr gleichzeitige Aufnahmen als erlaubt geplant werden.  Stelle sicher, das die maximale Anzahl gleichzeitiger Aufnahmen für alle zu erwartenden Fälle ausreicht.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/videosource.cpp" line="253"/>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
         <translation>Ändern Sie diese Einstellung nur, falls diese Quelle eine von der Grundeinstellung abweichende Frequenztabelle verwendet.</translation>
     </message>
@@ -17757,66 +17773,66 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.h" line="860"/>
+        <location filename="../libs/libmythtv/videosource.h" line="843"/>
         <source>Starting Live TV channel.</source>
         <translation>Startsender für LiveTV.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="747"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="768"/>
         <source>Video device</source>
         <translation>Videogerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="858"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="879"/>
         <source>VBI device</source>
         <translation>VBI-Gerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="860"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="881"/>
         <source>Device to read VBI (captions) from.</source>
         <translation>Gerät zum Lesen des VBI (Untertitel).</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="926"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="947"/>
         <source>Arguments</source>
         <translation>Argumente</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="937"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="958"/>
         <source>File path</source>
         <translation>Dateipfad</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="948"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="969"/>
         <source>Audio device</source>
         <translation>Audiogerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="958"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1008"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3073"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3110"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3121"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="979"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1029"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3024"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3061"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3072"/>
         <source>(None)</source>
         <translation>(Nichts)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="959"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="980"/>
         <source>Device to read audio from, if audio is separate from the video.</source>
         <translation>Gerät zum Lesen des Ton, falls Ton vom Video getrennt ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="971"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="992"/>
         <source>Signal timeout (ms)</source>
         <translation>Signalzeitüberschreitung (ms)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="973"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="994"/>
         <source>Maximum time (in milliseconds) MythTV waits for a signal when scanning for channels.</source>
         <translation>Wie lange MythTV beim Sendersuchlauf auf ein Signal wartet.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="986"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1007"/>
         <source>Tuning timeout (ms)</source>
         <translation>Zeitüberschreitung (ms)</translation>
     </message>
@@ -17825,7 +17841,7 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="obsolete">Maximale Zeit, die MythTV auf einen Senderlock beim Sendersuchlauf wartet. Oder um beim LiveTV-Modus eine Warnung zu geben.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1004"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1025"/>
         <source>If non-zero, override the audio sampling rate in the recording profile when this card is used.  Use this if your capture card does not support all of the standard rates.</source>
         <translation>Überschreibt die im Aufnahmeprofil gespeicherte Abtastrate, wenn diese Karte benutzt wird.  Nur benutzen, falls Ihre TV-Karte nicht die üblichen Abtastraten unterstützt.</translation>
     </message>
@@ -17838,80 +17854,80 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="obsolete">DVB-Gerätenummer</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1039"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1060"/>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
         <translation>Wenn Sie diese Einstellung verändern, sollte im Feld darunter der Name und Typ Ihrer Karte angezeigt werden. Falls die Karte nicht angesprochen werden kann, wird eine Fehlermeldung ausgegeben.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1130"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1151"/>
         <source>If enabled, drop packets from the start of a DVB recording until a sequence start header is seen.</source>
         <translation>Wenn aktiviert, werden bei DVB-Aufnahmen solange alle Pakete ignoriert, bis ein &quot;Sequence start&quot;-Header gefunden wird.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1145"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1166"/>
         <source>If enabled, only open the DVB card when required, leaving it free for other programs at other times.</source>
         <translation>Wenn aktiviert, wird die DVB-Karte nur angesprochen, wenn sie benötigt wird. Ansonsten wird sie für andere anwendungen freigegeben.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1157"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1178"/>
         <source>Use DVB card for active EIT scan</source>
         <translation>DVB-Karte für aktiven EIT-Scan verwenden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1160"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1181"/>
         <source>If enabled, activate active scanning for program data (EIT). When this option is enabled the DVB card is constantly in-use.</source>
         <translation>Falls gesetzt, so wird aktiv nach Programmdaten gesucht (EPG über EIT). Damit ist die DVB-Karte aber auch dauerhaft belegt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1173"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1194"/>
         <source>DVB tuning delay (ms)</source>
         <translation>DVB-Tunigverzug (Millisek.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1176"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1197"/>
         <source>Some Linux DVB drivers, in particular for the Hauppauge Nova-T, require that we slow down the tuning process by specifying a delay (in milliseconds).</source>
         <translation>Einige Linux DVB-Treiber, insbesondere Hauppauge Nova-T, sind beim Tuning etwas langsam und benötigen eine Herabsetzung der Tuninggeschwindigkeit (in Millisekunden).</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1216"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1237"/>
         <source>Motorola Generic</source>
         <translation>Motorola Generic</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1217"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1238"/>
         <source>SA/Cisco Generic</source>
         <translation>SA/Cisco Generic</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1471"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1707"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1492"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1728"/>
         <source>Available devices</source>
         <translation>Verfügbare Geräte</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1473"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1494"/>
         <source>Device ID and Tuner Number of available HDHomeRun devices.</source>
         <translation>Device-ID und Tuner-Nummer aller verfügbaren HDHomeRun-Geräte.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1815"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1836"/>
         <source>URL of M3U containing RTSP/RTP/UDP channel URLs.</source>
         <translation>URL der M3U, die die RTSP/RTP/UDP-Sender-URLs enthält.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1850"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1865"/>
         <source>ASI device</source>
         <translation>ASI device</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1909"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1924"/>
         <source>Warning: unable to open</source>
         <translation>Warnung: Kann nicht geöffnet werden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2045"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2245"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4283"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2048"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2238"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4261"/>
         <source>Recorder Options</source>
         <translation>Aufnahmeeinstellungen</translation>
     </message>
@@ -17924,7 +17940,7 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="obsolete">Netzwerkrekorder</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3045"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2996"/>
         <source>DVEO ASI recorder</source>
         <translation>DVEO ASI recorder</translation>
     </message>
@@ -17933,12 +17949,12 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="obsolete">Ceton Kabeltuner </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3048"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2999"/>
         <source>Import test recorder</source>
         <translation>Import Test Rekorder</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3049"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3000"/>
         <source>Demo test recorder</source>
         <translation>Demo Test Rekorder</translation>
     </message>
@@ -17947,17 +17963,17 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="vanished">Aufnahmegerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3094"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3045"/>
         <source>Display name (optional)</source>
         <translation>Anzeigename (optional)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3095"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3046"/>
         <source>This name is displayed on screen when Live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
         <translation>Dieser Name wird beim Fernsehen oder beim Wechsel des Eingangs oder der Karte angezeigt. Stellen Sie sicher, dass der Name für jeden Videoeingang eindeutig ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3109"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3060"/>
         <source>Video source</source>
         <translation>Videoquelle</translation>
     </message>
@@ -17966,32 +17982,32 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="vanished">Eingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3133"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3084"/>
         <source>Input group</source>
         <translation>Eingangsgruppe</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3262"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3213"/>
         <source>If enabled, MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
         <translation>Falls gesetzt, wird MythTV den Sender nur anhand der MPEG-Programmnummern tunen. Die Programmnummern ändern sich häufiger als die DVB- oder ATSC-Tuningparameter, so dass diese Option weniger zuverlässig ist. Die EIT-Suche ist dabei nicht möglich.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3280"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3231"/>
         <source>External channel change command</source>
         <translation>Externes Programm, um den Sender zu wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3296"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3247"/>
         <source>Preset tuner to channel</source>
         <translation>Standardsender</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.h" line="859"/>
+        <location filename="../libs/libmythtv/videosource.h" line="842"/>
         <source>Starting channel</source>
         <translation>Startsender</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3434"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3387"/>
         <source>Connect source to input</source>
         <translation>Quelle mit Eingang verbinden</translation>
     </message>
@@ -18055,7 +18071,7 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation>Abschalten/Aufwecken</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1127"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1148"/>
         <source>Wait for SEQ start header.</source>
         <translation>Warte auf SEQ-Start Header.</translation>
     </message>
@@ -18065,7 +18081,7 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation>Auf Frontend warten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1142"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1163"/>
         <source>Open DVB card on demand</source>
         <translation>DVB-Karte bei Bedarf ansprechen</translation>
     </message>
@@ -18094,7 +18110,7 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="obsolete">Am Ende, kann nicht überspringen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="403"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="106"/>
         <source>Logo Detection</source>
         <translation>Logo-Erkennung</translation>
     </message>
@@ -18111,19 +18127,16 @@ Die meisten DVB-C Transponder senden mit einer Symbolrate von 6,9 oder 6,875 Mil
         <translation type="obsolete">Deaktiviere Audio</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="199"/>
         <source>Earlier Showing</source>
-        <translation>Frühere Ausstrahlung</translation>
+        <translation type="vanished">Frühere Ausstrahlung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="210"/>
         <source>Later Showing</source>
-        <translation>Spätere Ausstrahlung</translation>
+        <translation type="vanished">Spätere Ausstrahlung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="318"/>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation>bereits eine frühere Ausstrahlung aufgenommen wird.</translation>
+        <translation type="vanished">bereits eine frühere Ausstrahlung aufgenommen wird.</translation>
     </message>
     <message>
         <source>30m</source>
@@ -18302,8 +18315,8 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">LC-Display</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1743"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1747"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1744"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1748"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="125"/>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2421"/>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="2459"/>
@@ -18313,22 +18326,22 @@ Möchten Sie weitersehen?</translation>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="337"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="358"/>
         <source>User ID</source>
         <translation>Benutzer ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="349"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="370"/>
         <source>Password</source>
         <translation>Passwort</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1022"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1043"/>
         <source>Do not adjust volume</source>
         <translation>Lautstärke nicht anpassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2787"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2764"/>
         <source>Capture Card Setup</source>
         <translation>TV-Karte einrichten</translation>
     </message>
@@ -18391,9 +18404,8 @@ Möchten Sie weitersehen?</translation>
         <translation>Aufnahme deaktiviert</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="193"/>
         <source>Don&apos;t Record</source>
-        <translation>Nicht aufnehmen</translation>
+        <translation type="vanished">Nicht aufnehmen</translation>
     </message>
     <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
@@ -18416,7 +18428,7 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Falls gesetzt, wird das Master-Backend Aufnahmen löschen oder an ein Frontend übertragen. Nützlich, wenn Sie Aufnahmen zentral speichern und ein Slave-Backend nicht eingeschaltet ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="378"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="81"/>
         <source>Commercial Free</source>
         <translation>Ohne Werbung</translation>
     </message>
@@ -18466,14 +18478,12 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">GB</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="334"/>
         <source>this episode is a repeat.</source>
-        <translation>diese Folge eine Wiederhohlung ist.</translation>
+        <translation type="vanished">diese Folge eine Wiederhohlung ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="326"/>
         <source>another program with a higher priority will be recorded.</source>
-        <translation>bereits eine Aufnahme mit höherer Priorität geplant ist.</translation>
+        <translation type="vanished">bereits eine Aufnahme mit höherer Priorität geplant ist.</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time.</source>
@@ -18489,22 +18499,22 @@ Möchten Sie weitersehen?</translation>
         <translation>Mit dem &quot;%1&quot; Profil aufnehmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3282"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3233"/>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
         <translation>Falls angegeben, wird für Eingänge mit externem Tuner (z. B. Premiere-Dekoderbox) dieses Programm gestartet, um den Sender umzuschalten. Als erstes Argument wird der Senderplatz übergeben.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3298"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3249"/>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
         <translation>Lassen Sie dieses Feld leer, außer Sie haben am Tunereingang Ihrer TV-Karte einen externen Tuner (Satellitentuner, Premiere-Dekoder u.ä.) angeschlossen. In diesem Fall geben Sie den vorgegebenen Sender an (meist 3 oder 4).</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="706"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="711"/>
         <source>Linear blend</source>
         <translation>Linear blend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="722"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="727"/>
         <source>One field</source>
         <translation>One Field</translation>
     </message>
@@ -18938,24 +18948,20 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Suche Wöchentlich</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="195"/>
         <source>Previously Recorded</source>
-        <translation>Frühere Aufnahmen</translation>
+        <translation type="vanished">Frühere Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="197"/>
         <source>Currently Recorded</source>
-        <translation>Aktuelle Aufnahmen</translation>
+        <translation type="vanished">Aktuelle Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="214"/>
         <source>Inactive</source>
-        <translation>Inaktiv</translation>
+        <translation type="vanished">Inaktiv</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="255"/>
         <source>The showing is being tuned.</source>
-        <translation>Diese Sendung wird gerade angesehen.</translation>
+        <translation type="vanished">Diese Sendung wird gerade angesehen.</translation>
     </message>
     <message>
         <source>This showing is being recorded on a different channel.</source>
@@ -18966,43 +18972,36 @@ Möchten Sie weitersehen?</translation>
         <translation type="vanished">Diese Sendung wird gerade auf einem anderen Sender angesehen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="265"/>
         <source>This showing was recorded but was aborted before completion.</source>
-        <translation>Diese Sendung wurde zwar aufgenommen aber abgebrochen bevor sie fertig war.</translation>
+        <translation type="vanished">Diese Sendung wurde zwar aufgenommen aber abgebrochen bevor sie fertig war.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="270"/>
         <source>This showing was not recorded because the master backend was not running.</source>
-        <translation>Diese Sendung wurde nicht aufgenommen da das Master Backend nicht gelaufen ist.</translation>
+        <translation type="vanished">Diese Sendung wurde nicht aufgenommen da das Master Backend nicht gelaufen ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="278"/>
         <source>This showing was not recorded because there wasn&apos;t enough disk space.</source>
-        <translation>Diese Sendung wurde nicht aufgenommen da nicht genügend Speicherplatz zu Verfügung stand.</translation>
+        <translation type="vanished">Diese Sendung wurde nicht aufgenommen da nicht genügend Speicherplatz zu Verfügung stand.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="282"/>
         <source>This showing was not recorded because the recorder was already in use.</source>
-        <translation>Diese Sendung wurde nicht aufgenommen da das Aufnahmegerät schon verwendet wurde.</translation>
+        <translation type="vanished">Diese Sendung wurde nicht aufgenommen da das Aufnahmegerät schon verwendet wurde.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="286"/>
         <source>This showing was not recorded because the recorder failed.</source>
-        <translation>Diese Sendung wurde nicht aufgenommen da das Aufnahmegerät fehlgeschlagen ist.</translation>
+        <translation type="vanished">Diese Sendung wurde nicht aufgenommen da das Aufnahmegerät fehlgeschlagen ist.</translation>
     </message>
     <message>
         <source>This showing will be recorded on a different channel.</source>
         <translation type="vanished">Diese Sendung wird auf einem anderen Sender aufgenommen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="330"/>
         <source>this episode will be recorded at a later time instead.</source>
-        <translation>diese Folge zu einem späteren Zeitpunkt aufgenommen wird.</translation>
+        <translation type="vanished">diese Folge zu einem späteren Zeitpunkt aufgenommen wird.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="337"/>
         <source>this recording rule is inactive.</source>
-        <translation>diese Aufnahme inaktiv ist.</translation>
+        <translation type="vanished">diese Aufnahme inaktiv ist.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanmiscsettings.h" line="240"/>
@@ -19162,17 +19161,17 @@ Möchten Sie weitersehen?</translation>
         <translation>Folge beim Dateien löschen symb. Links</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1288"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1309"/>
         <source>100Mbps</source>
         <translation>100 Mbps</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1289"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1310"/>
         <source>200Mbps</source>
         <translation>200 Mbps</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1290"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1311"/>
         <source>400Mbps</source>
         <translation>400 Mbps</translation>
     </message>
@@ -19259,13 +19258,13 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">Diese globale Einstellung erlaubt es MythTV, eine Aufnahme später als geplant zu beenden. Dies hat keine Auswirkung auf die Aufnahmeplanung und wird ignoriert, falls zwischen zwei Aufnahmen nicht genügend Zeit ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1275"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1296"/>
         <source>Point to Point</source>
         <translation>Point to Point</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/frequencytablesetting.cpp" line="38"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1276"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1297"/>
         <source>Broadcast</source>
         <translation>Broadcast</translation>
     </message>
@@ -19421,12 +19420,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="vanished">N</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="222"/>
         <source>Not Listed</source>
-        <translation>Nicht im TV-Programm</translation>
+        <translation type="vanished">Nicht im TV-Programm</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2079"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2086"/>
         <source>ATSC Channel %1</source>
         <translation>ATSC Sender %1</translation>
     </message>
@@ -19724,7 +19722,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">%2/%1 belegt, %3 (%4%) frei.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1725"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1726"/>
         <source>Re-Record</source>
         <translation>Erneut aufnehmen</translation>
     </message>
@@ -19734,14 +19732,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="vanished">V</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="224"/>
         <source>Never Record</source>
-        <translation>Niemals aufnehmen</translation>
+        <translation type="vanished">Niemals aufnehmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="344"/>
         <source>it was marked to never be recorded.</source>
-        <translation>sie als &quot;Niemals aufnehmen&quot; markiert ist.</translation>
+        <translation type="vanished">sie als &quot;Niemals aufnehmen&quot; markiert ist.</translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
@@ -19811,19 +19807,16 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">m</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="181"/>
         <source>Aborted</source>
-        <translation>Abgebrochen</translation>
+        <translation type="vanished">Abgebrochen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="187"/>
         <source>Tuning</source>
-        <translation>Tuning</translation>
+        <translation type="vanished">Tuning</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="206"/>
         <source>Missed</source>
-        <translation>Verpasst</translation>
+        <translation type="vanished">Verpasst</translation>
     </message>
     <message>
         <source>This showing was recorded but was aborted before recording was completed.</source>
@@ -19834,9 +19827,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">Diese Sendung wurde nicht aufgenommen, weil die Aufnahme nach der Ausstrahlung geplant wurde.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="274"/>
         <source>This showing was not recorded because it was manually cancelled.</source>
-        <translation>Diese Sendung wurde nicht aufgenommen, weil sie manuell deaktiviert wurde.</translation>
+        <translation type="vanished">Diese Sendung wurde nicht aufgenommen, weil sie manuell deaktiviert wurde.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
@@ -19883,7 +19875,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Transponder bearbeiten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3770"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3756"/>
         <source>(Delete all capture cards)</source>
         <translation>(Alle TV-Karten löschen)</translation>
     </message>
@@ -19902,7 +19894,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">16:10</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3913"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3899"/>
         <source>(Delete all video sources)</source>
         <translation>(Alle Videoquellen löschen)</translation>
     </message>
@@ -19911,7 +19903,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">Zeigt die momentane Lautstärke an.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3126"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3127"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
@@ -19924,7 +19916,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">DVB DTV TV-Karte (v3.x)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3018"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2969"/>
         <source>FireWire cable box</source>
         <translation>FireWire Set-Top Box</translation>
     </message>
@@ -19933,7 +19925,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">USB MPEG-4 Enkoder (Plextor ConvertX u.a.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.h" line="861"/>
+        <location filename="../libs/libmythtv/videosource.h" line="844"/>
         <source>This is updated on every successful channel change.</source>
         <translation>Dies wird bei jedem erfolgreichen Senderwechsel aktualisiert.</translation>
     </message>
@@ -20003,43 +19995,43 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Frequenztabelle, die benutzt werden soll.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="986"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="1003"/>
         <source>Input %1:%2</source>
         <translation>Eingang %1:%2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="1563"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="1591"/>
         <source>Could not query inputs.</source>
         <translation>Konnte die verfügbaren Eingange nicht ermitteln.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="1594"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="1622"/>
         <source>ERROR, Compile with V4L support to query inputs</source>
         <translation>FEHLER: Video4Linux Unterstützung fehlt, kann die verfügbaren Eingänge nicht ermitteln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2087"/>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2145"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2136"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2194"/>
         <source>Unable to connect to device.</source>
         <translation>Konnte nicht zum Gerät verbinden.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2101"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2150"/>
         <source>Invalid Device ID</source>
         <translation>Ungültige Geräte-ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2111"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2160"/>
         <source>Invalid Device ID or address.</source>
         <translation>Ungültige Geräte-ID oder Adresse.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2126"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2175"/>
         <source>, firmware: %2</source>
         <translation>, firmware: %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="2160"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="2209"/>
         <source>The VBox software version is too old (%1), we require %2</source>
         <translation>Die Softwareversion der VBox ist zu alt (%1), wir benötigen %2</translation>
     </message>
@@ -20048,38 +20040,38 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="vanished">Die Softwareversion der VBox ist zu alt (%1), benötigt wird %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1107"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1128"/>
         <source>Subtype</source>
         <translation>Untertyp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1116"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1137"/>
         <source>Frontend ID</source>
         <translation>Frontend-ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1215"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1236"/>
         <source>Cable box model</source>
         <translation>Kabelbox Modell</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1274"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1295"/>
         <source>Connection Type</source>
         <translation>Verbindungstyp</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1287"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1308"/>
         <source>Speed</source>
         <translation>Geschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="1691"/>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="1724"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="1719"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="1752"/>
         <source>Could not open &apos;%1&apos; to probe its inputs.</source>
         <translation>Konnte &quot;%1&quot; nicht ansprechen, um die Eingänge zu ermitteln.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="1761"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="1789"/>
         <source>ERROR, Compile with DVB support to query inputs</source>
         <translation>FEHLER: DVB Unterstützung fehlt, kann die verfügbaren Eingänge nicht ermitteln</translation>
     </message>
@@ -20124,17 +20116,17 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">Befehl zum Starten von Xterm. Wird deaktiviert, wenn diese Einstellung leer bleibt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="509"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="530"/>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation>Dies funktioniert normalerweise nur bei DVB- oder ATSC-Sendern,</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="513"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="534"/>
         <source>and generally provides data only for the next few days.</source>
         <translation>und liefert nur für die nächsten Tage EPG-Daten.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="505"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="526"/>
         <source>Use only the transmitted guide data.</source>
         <translation>Nur die EPG-Daten des EIT-Service verwenden.</translation>
     </message>
@@ -20155,17 +20147,17 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">Endzeit</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3115"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3116"/>
         <source>Playing</source>
         <translation>Abspielend</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3130"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3131"/>
         <source>Transcoding</source>
         <translation>Umwandeln</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3117"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3118"/>
         <source>PIP</source>
         <translation>PiP</translation>
     </message>
@@ -20175,7 +20167,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Die folgenden Sendungen werden stattdessen aufgenommen:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/viewschedulediff.cpp" line="137"/>
+        <location filename="../programs/mythfrontend/viewschedulediff.cpp" line="140"/>
         <source>Program Status</source>
         <translation>Programmstatus</translation>
     </message>
@@ -20298,12 +20290,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Wenn die Höhe auf &quot;Auto&quot; gesetzt wird, dann wird diese aus der Breite und dem physikalischen Seitenverhältnis der Aufnahme berechnet.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="391"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="94"/>
         <source>All Available Methods</source>
         <translation>Alle möglichen Methoden</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="399"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="102"/>
         <source>Blank Frame Detection</source>
         <translation>Dunkle Frames Erkennung</translation>
     </message>
@@ -20357,16 +20349,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="vanished">F</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="226"/>
         <source>Recorder Off-Line</source>
-        <translation>Rekorder nicht angeschlossen</translation>
+        <translation type="vanished">Rekorder nicht angeschlossen</translation>
     </message>
     <message>
         <source>the backend recorder is off-line.</source>
         <translation type="obsolete">der Backend-Rekorder ist nicht aktiv.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3404"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3355"/>
         <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
         <translation>Falls Sie ihre Satellitenschüssel nach DishNet&apos;s Satelliten ausrichten, sollten Sie diese Funktion setzen.</translation>
     </message>
@@ -20751,7 +20742,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">Abwechslung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1831"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1832"/>
         <source>Video</source>
         <translation>Video</translation>
     </message>
@@ -21017,8 +21008,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">UNBEKANNT%1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1376"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1628"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1397"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1649"/>
         <source>Tuner</source>
         <translation>Empfänger</translation>
     </message>
@@ -21027,17 +21018,17 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">HDHomeRun DTV Tunereinheit</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3349"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3300"/>
         <source>Input priority</source>
         <translation>Eingangspriorität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3351"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3302"/>
         <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
         <translation>Wenn die Priorität der Eingänge unterschiedlich ist, könnte MythTV eine Aufnahme für einen späteren Zeitpunkt planen, damit ein Eingang höherer Priorität genutzt werden kann.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3768"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3754"/>
         <source>(Delete all capture cards on %1)</source>
         <translation>(Alle Aufnahmegeräte von %1 löschen)</translation>
     </message>
@@ -21106,7 +21097,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="obsolete">Episode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="393"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="396"/>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An |Der |Die |Das |Ein |Eine )</translation>
     </message>
@@ -21131,7 +21122,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Seite nicht vorhanden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1233"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1254"/>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
         <translation>Wählen Sie das Modell, das Ihrem am ähnlichsten ist. Je nach Firmware kann SA42200HD besser für eine SA3250HD Box funktionieren.</translation>
     </message>
@@ -21175,12 +21166,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Lautstärke</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1024"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1045"/>
         <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
         <translation>Setzen Sie diese Option für preisgünstige BT878 DVB-T Karten, z. B. AverTV DVB-T, die eine Veränderung der Lautstärke nicht vertragen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="406"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="109"/>
         <source>Experimental</source>
         <translation>Experimentell</translation>
     </message>
@@ -21287,9 +21278,8 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
         <translation type="obsolete">O</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="220"/>
         <source>Recorder Failed</source>
-        <translation>Rekorder schlug fehl</translation>
+        <translation type="vanished">Rekorder schlug fehl</translation>
     </message>
     <message>
         <source>Other Showing</source>
@@ -21405,12 +21395,12 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
         <translation>Höhe für die Enkodierung. Bei PVR-x50 TV-Karten können Bildstörungen auftreten, falls der Wert nicht auf 768 bei PAL bzw. 720 bei NTSC gesetzt ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="202"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="223"/>
         <source>Listings grabber</source>
         <translation>TV-Programm Grabberskript</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="213"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="234"/>
         <source>Network ID</source>
         <translation>Network ID</translation>
     </message>
@@ -21419,38 +21409,33 @@ Die meisten DVB-S Transponder senden mit einer Symbolrate von 27,5 Millionen.</t
         <translation type="vanished">Setzen Sie dies auf die tatsächliche Netzwerk-ID Ihres Standortes, falls Ihr Provider eine kaputte NIT sendet. Lassen Sie den Wert auf -1 wenn alles funktioniert.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="323"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="344"/>
         <source>Perform EIT scan</source>
         <translation>Nach EPG-Daten suchen (EIT)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="324"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="345"/>
         <source>If enabled, program guide data for channels on this source will be updated with data provided by the channels themselves &apos;Over-the-Air&apos;.</source>
         <translation>Falls aktiviert, wird das TV-Programm mit den Programmdaten aktualisiert, die die Sender ausstrahlen (EIT-Service).</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3179"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3130"/>
         <source>Generic</source>
         <translation>Generisch</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1291"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1312"/>
         <source>800Mbps</source>
         <translation>800 Mbps</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="132"/>
-        <source>Maximum number of simultaneous recordings this device should make. Some digital transmitters transmit multiple programs on a multiplex, if this is set to a value greater than one MythTV can sometimes take advantage of this. If only a single program is available, setting this to 2 allows overlapping schedules to record.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="216"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="237"/>
         <source>If your provider has asked you to configure a specific network identifier (Network_ID), enter it here. Leave it at -1 otherwise.</source>
         <extracomment>Network_ID is the name of an identifier in the DVB&apos;s Service Information standard specification.</extracomment>
         <translation>Wenn ihr Anbieter sie aufgefordert hat eine bestimmte Netzwerknummer (Netzwerk-ID) einzurichten geben sie diese hier ein. Andernfalls lassen sie sie auf -1.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="474"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="495"/>
         <source>You MUST run &apos;mythfilldatabase --manual&apos; the first time,
 instead of just &apos;mythfilldatabase&apos;.
 Your grabber does not provide channel numbers, so you have to set them manually.</source>
@@ -21459,7 +21444,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
 Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1813"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1834"/>
         <source>M3U URL</source>
         <translation>M3U-Url</translation>
     </message>
@@ -21468,17 +21453,17 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">URL der M3U, die die IPTV-Sender-URLs enthält.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3258"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3209"/>
         <source>Use quick tuning</source>
         <translation>Nutze schnelles Tuning</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3259"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3210"/>
         <source>Never</source>
         <translation>Niemals</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3261"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3212"/>
         <source>Always</source>
         <translation>Immer</translation>
     </message>
@@ -21562,7 +21547,7 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Wählen Sie die Methode, um Werbungen auf diesem Sender zu erkennen. Diese Option wird ignoriert, falls der Sender als &apos;werbefrei&apos; markiert wird.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="380"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="83"/>
         <source>Use Global Setting</source>
         <translation>Nutze allgemeine Einstellung</translation>
     </message>
@@ -21641,17 +21626,17 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Diese Datenbank bzw. Backend als Standard speichern?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1029"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1030"/>
         <source>The connection to the master backend server has gone away for some reason. Is it running?</source>
         <translation>Die Verbindung zum Master-Backend wurde unterbrochen. Läuft der Server?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1033"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1034"/>
         <source>Could not connect to the master backend server. Is it running?  Is the IP address set for it in mythtv-setup correct?</source>
         <translation>Konnte nicht zum Master-Backend verbinden - ist es gestartet? Stimmt seine IP-Adresse im Setup?</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/mythcontext.cpp" line="1067"/>
+        <location filename="../libs/libmyth/mythcontext.cpp" line="1068"/>
         <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
         <translation>Das Backend verwendet das Netzwerkprotokoll in Version %1, aber dieses Frontend versteht nur Version %2. Stellen Sie sicher, dass Sie nur kompatible Front- und Backends verwenden.</translation>
     </message>
@@ -21675,12 +21660,12 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
     </message>
     <message>
         <location filename="../libs/libmyth/recordingtypes.cpp" line="228"/>
-        <location filename="../libs/libmythtv/avformatdecoder.cpp" line="4127"/>
+        <location filename="../libs/libmythtv/avformatdecoder.cpp" line="4135"/>
         <source>Subtitle</source>
         <translation>Untertitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/avformatdecoder.cpp" line="4079"/>
+        <location filename="../libs/libmythtv/avformatdecoder.cpp" line="4087"/>
         <source> (forced)</source>
         <translation> (erzwungen)</translation>
     </message>
@@ -21693,9 +21678,8 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Titel %1 Kapitel %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="340"/>
         <source>this rule does not match any showings in the current program listings.</source>
-        <translation>diese Regel auf keine Sendung im aktuellen TV-Programm zutrifft.</translation>
+        <translation type="vanished">diese Regel auf keine Sendung im aktuellen TV-Programm zutrifft.</translation>
     </message>
     <message>
         <source>this episode will be recorded on a different channel in this time slot.</source>
@@ -21711,7 +21695,7 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1170"/>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1736"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1743"/>
         <source> offset %2</source>
         <translation> Versatz %2</translation>
     </message>
@@ -21742,195 +21726,211 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation>VAAPI wird versuchen, die Grafikkartenhardware zur Beschleunigung der Videodekodierung zu verwenden. Benötigt OpenGL Zeichner.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="708"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="699"/>
+        <source>Openmax will use the graphics hardware to accelerate video decoding on Raspberry Pi. </source>
+        <translation>OpenMAX wird die Grafikkartenhardware zur Beschleunigung der Videodekodierung aus Raspberry Pi zu verwenden.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="713"/>
         <source>Kernel</source>
         <translation>Kernel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="710"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="715"/>
         <source>Kernel (2x)</source>
         <translation>Kernel (2x)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="712"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="717"/>
         <source>Greedy HighMotion</source>
         <translation>Greedy HighMotion</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="714"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="719"/>
         <source>Greedy HighMotion (2x)</source>
         <translation>Greedy HighMotion (2x)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="716"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="721"/>
         <source>Yadif</source>
         <translation>Yadif</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="718"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="723"/>
         <source>Yadif (2x)</source>
         <translation>Yadif (2x)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="720"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="725"/>
         <source>Bob (2x)</source>
         <translation>Bob (2x)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="724"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="729"/>
         <source>Interlaced (2x)</source>
         <translation>Interlaced (2x)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="726"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="731"/>
         <source>Linear blend (HW)</source>
         <translation>Linear blend (HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="728"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="733"/>
         <source>Kernel (HW)</source>
         <translation>Kernel (HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="730"/>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="742"/>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="754"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="735"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="747"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="759"/>
         <source>Bob (2x, HW)</source>
         <translation>Bob (2x, HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="732"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="737"/>
         <source>One field (HW)</source>
         <translation>One Field (HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="734"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="739"/>
         <source>Kernel (2x, HW)</source>
         <translation>Kernel (2x, HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="736"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="741"/>
         <source>Linear blend (2x, HW)</source>
         <translation>Linear blend (2x, HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="757"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="762"/>
         <source>Advanced (HW)</source>
         <translation>Advanced (HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="759"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="764"/>
         <source>Fast (HW)</source>
         <translation>Schnell (HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="761"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="766"/>
         <source>Line double (HW)</source>
         <translation>Zeilendoppelung (HW)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1066"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1071"/>
         <source>VDPAU High Quality</source>
         <comment>Sample: VDPAU high quality</comment>
         <translation>VDPAU hohe Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1074"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1079"/>
         <source>VDPAU Normal</source>
         <comment>Sample: VDPAU average quality</comment>
         <translation>VDPAU normal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1086"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1091"/>
         <source>VDPAU Slim</source>
         <comment>Sample: VDPAU low power GPU</comment>
         <translation>VDPAU schonend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1097"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1102"/>
         <source>VDA High Quality</source>
         <comment>Sample: VDA high quality</comment>
         <translation>VDA hohe Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1109"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1114"/>
         <source>VDA Normal</source>
         <comment>Sample: VDA average quality</comment>
         <translation>VDA normal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1121"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1126"/>
         <source>VDA Slim</source>
         <comment>Sample: VDA low power GPU</comment>
         <translation>VDA schonend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1136"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1141"/>
         <source>OpenGL High Quality</source>
         <comment>Sample: OpenGL high quality</comment>
         <translation>OpenGL hohe Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1144"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1149"/>
         <source>OpenGL Normal</source>
         <comment>Sample: OpenGL average quality</comment>
         <translation>OpenGL normal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1152"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1157"/>
         <source>OpenGL Slim</source>
         <comment>Sample: OpenGL low power GPU</comment>
         <translation>OpenGL schonend</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1163"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1168"/>
         <source>VAAPI Normal</source>
         <comment>Sample: VAAPI average quality</comment>
         <translation>VAAPI normal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1178"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1185"/>
+        <source>OpenMAX High Quality</source>
+        <comment>Sample: OpenMAX High Quality</comment>
+        <translation>OpenMAX hohe Qualität</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1194"/>
         <source>OpenMAX Normal</source>
         <comment>Sample: OpenMAX Normal</comment>
         <translation>OpenMAX normal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1208"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1225"/>
         <source>Video rendering method</source>
         <translation>Video-Darstellungsmethode</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1215"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1232"/>
         <source>Render video offscreen. Used internally.</source>
         <translation>Video Offscreen darstellen. Wird intern genutzt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1219"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1236"/>
         <source>Use X11 pixel copy to render video. This is not recommended if any other option is available. The video will not be scaled to fit the screen. This will work with all X11 servers, local and remote.</source>
         <translation>Benutzt &quot;X11 pixel copy&quot; zur Videodarstellung. Nicht empfehlenswert, falls andere Methoden möglich sind. Das Bild wird dabei nicht auf die volle Bildschirmgröße vergrößert. Funktioniert mit allen X11-Servern, lokal und übers Netz.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1226"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1243"/>
         <source>Use X11 shared memory pixel transfer to render video. This is only recommended over the X11 pixel copy renderer. The video will not be scaled to fit the screen. This works with most local X11 servers.</source>
         <translation>Benutzt &quot;X11 shared memory pixel transfer&quot; zur Videodarstellung. Dies ist etwas besser als die &quot;X11 pixel copy&quot; Methode. Das Bild wird dabei nicht auf die volle Bildschirmgröße vergrößert. Funktioniert mit den meisten lokalen X11-Servern.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1233"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1250"/>
         <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
         <translation>Die Standard-Darstellungsmethode für X11-Systeme. Benutzt XVideo-Harware-Unterstützung zur Skalierung und Farbkonvertierung. Falls die Hardware eine Bildkontrolle anbietet, wird sie genutzt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1340"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1357"/>
         <source>This deinterlacer attempts to synchronize with interlaced displays whose size and refresh rate exactly match the video source. It has low CPU requirements.</source>
         <translation>Dieser Deinterlacer versucht mit einer interlaced Anzeige zu synchronisieren, deren Auflösung und Bildwiederholrate identisch zum Videobild ist, und benötigt weniger CPU-Leistung.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1433"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1450"/>
         <source>Render the OSD using the XVideo chromakey feature.This renderer does not alpha blend but is the fastest OSD renderer for XVideo.</source>
         <translation>Rendert das OSD mittels der XVideo chromakey Funktion. Dieser Renderer unterstützt kein alpha blend, er ist jedoch der schnellste OSD Renderer für XVideo.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1457"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1473"/>
+        <source>Uses OpenGL in a separate thread to overlay the OSD onto the video.</source>
+        <translation>Verwendet OpenGL in einem getrennten Thread, um das OSD über das Videobild einzublenden.</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1480"/>
         <source>Uses OpenMAX to alpha blend the OSD onto the video.</source>
         <translation>Verwendet OpenMAX, um das OSD über das Videobild einzublenden.</translation>
     </message>
@@ -21939,12 +21939,12 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Dieser Videorenderer nutzt OpenGL für Skalierung und Farbanpassung mit allen Bildkontrollen. Die GPU kann für Deinterlacing genutzt werden. Dies benötigt eine stärkere GPU als XVideo.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1253"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1270"/>
         <source>This video renderer uses OpenGL for scaling and color conversion. It uses faster OpenGL functionality when available but at the expense of picture controls and GPU based deinterlacing.</source>
         <translation>Dieser Videorenderer nutzt OpenGL für Skalierung und Farbanpassung. Er benutzt, falls verfügbar, schnellere OpenGL-Funktionen, aber auf Kosten der Bildkontrollen und GPU-basiertem Deinterlacing.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1266"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1283"/>
         <source>This video renderer uses VAAPI for video decoding and OpenGL for scaling and color conversion.</source>
         <translation>Dieser Videorenderer nutzt VAAPI fürs Videodecoding und OpenGL für Skalierung und Farbanpassung.</translation>
     </message>
@@ -21961,7 +21961,7 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Diese Darstellungsmethode nutzt DirectFB zur Skalierung und Farbkonvertierung.DirectFB bietet weniger Funktionen als die Standard-Darstellungsmethode, läuft aber auf Linux-Hardware ohne einen X11-Server.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1239"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1256"/>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
         <translation>Darstellungsmethode für MS Windows basierend auf Direct3D. Benötigt eine Direct3D 9 kompatible Grafikkarte. Dies ist die bevorzugte Methode für aktuelle Windows-Systeme.</translation>
     </message>
@@ -21978,48 +21978,48 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Diese Darstellungsmethode nutzt OpenGL zur Skalierung und Farbkonvertierung und bietet eine eingeschränkte BIldkontrolle. Dies benötigt eine schnellere GPU als XVideo. Ausserdem benötigt die Bildkontrolle zusätzliche Resourcen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1302"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1319"/>
         <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
         <translation>Dieser Deinterlacer benötigt eine Anzeige, die die doppelte Bildwiederholrate des Videos verarbeiten kann.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1307"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1324"/>
         <source>Perform no deinterlacing.</source>
         <translation>Ohne Deinterlacing.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1308"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1325"/>
         <source>Use this with an interlaced display whose resolution exactly matches the video size. This is incompatible with MythTV zoom modes.</source>
         <translation>Verwenden Sie diese Option bei einem interlaced Bildschirm (Röhrenfernseher), dessen Auflösung identisch zum Videobild ist. Die Zoom-Modi funktionieren dabei nicht.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1313"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1330"/>
         <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
         <translation>Zeigt nur ein Halbbild des kompletten Bildes an. Dies sieht besonders bei der Darstellung eines 1080i-Videos mit vielen Bewegungen auf einem 720p-Bildschirm gut aus.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1318"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1335"/>
         <source>Shows one field of the frame followed by the other field displaced vertically.</source>
         <translation>Stellt abwechselnd die beiden Halbbilder dar.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1323"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1340"/>
         <source>Blends the odd and even fields linearly into one frame.</source>
         <translation>Interpoliert aus beiden Halbbildern je ein Vollbild und berechnet deren Mittelwert.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1326"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1343"/>
         <source>This filter disables deinterlacing when the two fields are similar, and performs linear deinterlacing otherwise.</source>
         <translation>Dieser Filter schaltet Deinterlacing aus, wenn beide Halbbilder ähnlich sind, andernfalls wird lineares Deinterlacing angewendet.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1330"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1347"/>
         <source>(Hardware Accelerated)</source>
         <translation>(Hardware-beschleunigt)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1332"/>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1336"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1349"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1353"/>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
         <translation>Dieser Deinterlacer nutzt mehrere Halbbilder um Bewegungsunschärfe zu reduzieren, benötigt aber mehr CPU-Leistung.</translation>
     </message>
@@ -22028,22 +22028,22 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Dieser Deinterlacer versucht mit einer interlaced Anzeige zu synchronisieren, deren Auflösung und Bildwiederholrate identisch zum Videobild ist, und benötigt weniger CPU-Leistung.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1345"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1362"/>
         <source>This deinterlacer uses several fields to reduce motion blur. </source>
         <translation>Dieser Deinterlacer nutzt mehrere Halbbilder, um Bewegungsunschärfe zu reduzieren.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1348"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1365"/>
         <source>This deinterlacer uses multiple fields to reduce motion blur and smooth edges. </source>
         <translation>Dieser Deinterlacer nutzt mehrere Halbbilder um Bewegungsunschärfe zu reduzieren und Kanten zu glätten.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1405"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1422"/>
         <source>&apos;%1&apos; has not been documented yet.</source>
         <translation>&quot;%1&quot; wurde noch nicht dokumentiert.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1427"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1444"/>
         <source>OSD rendering method</source>
         <translation>OSD-Darstellungsmethode</translation>
     </message>
@@ -22052,12 +22052,12 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Zeichnet das OSD mit der XVideo-Chromakey-Methode. Diese Methode bietet keine Teiltransparenz ist aber die schnellste OSD-Zeichenmethode. Und im Vergleich zur ia44blend OSD-Zeichenmethode für XvMC ist es besonders effizient.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1437"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1454"/>
         <source>Note: nVidia hardware after the 5xxx series does not have XVideo chromakey support.</source>
         <translation>Hinweis: Grafikkarten von nVidia nach der 5xxx-Serie unterstützen XVideo Chromakey nicht mehr.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1444"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1461"/>
         <source>Software OSD rendering uses your CPU to alpha blend the OSD.</source>
         <translation>Diese OSD-Zeichenmethode benutzt die CPU, um das OSD transparent einzublenden.</translation>
     </message>
@@ -22070,12 +22070,12 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="obsolete">Hinweis: Nicht empfohlen bei Chipsätzen von nVidia oder Intel. Dies belegt zwei der begrenzt verfügbaren XvMC-Puffer.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1450"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1467"/>
         <source>Uses OpenGL to alpha blend the OSD onto the video.</source>
         <translation>Verwendet OpenGL, um das OSD über das Videobild einzublenden.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="130"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="132"/>
         <source>Max recordings</source>
         <translation>max. gleichz. Aufnahmen</translation>
     </message>
@@ -22092,7 +22092,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
 Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="483"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="504"/>
         <source>Warning.</source>
         <translation>Warnung.</translation>
     </message>
@@ -22101,156 +22101,156 @@ Ihr Grabber übergibt keine Sendernummern, diese müssen Sie manuell setzen.</tr
         <translation type="vanished">Wie lange (in Millisekunden) MythTV auf ein Signal wartet.  Die Zeit wird bei Aufnahmen verdoppelt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1037"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1058"/>
         <source>DVB device</source>
         <translation>DVB Gerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1079"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1526"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1744"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1892"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1100"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1547"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1765"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1907"/>
         <source>Warning: already in use</source>
         <translation>Achtung: bereits belegt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1190"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1211"/>
         <source>GUID</source>
         <translation>GUID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1340"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1596"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1361"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1617"/>
         <source>IP Address</source>
         <translation>IP-Adresse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1597"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1618"/>
         <source>Device IP or ID of a VBox device. eg. &apos;192.168.1.100&apos; or &apos;vbox_3718&apos;</source>
         <translation>Device-IP oder -ID enes VBox-Geräts, z.B. &apos;192.168.1.100&apos; oder &apos;vbox_3718&apos;</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1629"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1650"/>
         <source>Number and type of the tuner to use. eg &apos;1-DVBT/T2&apos;.</source>
         <translation>Nummer und Art des zu verwendenden Tuners, z.B. &apos;1-DVBT/T2&apos;.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1709"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1730"/>
         <source>Device IP or ID, tuner number and tuner type of available VBox devices.</source>
         <translation>Device-ID, Tuner-Nummer und Art des Tuners aller verfügbaren VBox-Geräte.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2701"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2679"/>
         <source>V4L2 encoder devices (multirec capable)</source>
         <translation>V4L2 Aufnahmegeräte (multirecfähig)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2994"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2945"/>
         <source>DVB-T/S/C, ATSC or ISDB-T tuner card</source>
         <translation>DVB-T/S/C, ATSC oder ISDB Tunerkarte</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2999"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2950"/>
         <source>V4L2 encoder</source>
         <translation>V4L2 Aufnahmegerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3002"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2953"/>
         <source>HD-PVR H.264 encoder</source>
         <translation>HD-PVR H.264 Aufnahmegerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3008"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2959"/>
         <source>HDHomeRun networked tuner</source>
         <translation>HDHomeRun Netzwerktuner</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3013"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2964"/>
         <source>V@Box TV Gateway networked tuner</source>
         <translation>V@Box TV Gateway Netzwerktuner</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3023"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2974"/>
         <source>Ceton Cablecard tuner</source>
         <translation>Ceton Kabeltuner</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3027"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2978"/>
         <source>IPTV recorder</source>
         <translation>IPTV Rekorder</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3033"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2984"/>
         <source>Analog to MPEG-2 encoder card (PVR-150/250/350, etc)</source>
         <translation>Analog zu MPEG2 Aufnahmegerät (PVR-150/250/350, etc.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3036"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2987"/>
         <source>Analog to MJPEG encoder card (Matrox G200, DC10, etc)</source>
         <translation>Analog zu MJPEG Aufnahmegerät (Matrox G200, DC10, etc.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3038"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2989"/>
         <source>Analog to MPEG-4 encoder (Plextor ConvertX USB, etc)</source>
         <translation>Analog zu MPEG4 Aufnahmegerät (Plextor ConvertX USB, etc.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3041"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2992"/>
         <source>Analog capture card</source>
         <translation>Analoges Aufnahmegerät</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3051"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3002"/>
         <source>External (black box) recorder</source>
         <translation>Externer (Blackbox) Rekorder</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3062"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3013"/>
         <source>Input name</source>
         <translation>Name des Eingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3135"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3086"/>
         <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
         <translation>Auf &quot;Generisch&quot; belassen, außer dieser Eingang wird mit anderen Geräten geteilt. Es wird immer nur ein Eingang einer Eingangsgruppe eine Aufnahme durchführen dürfen.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3260"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3211"/>
         <source>Live TV only</source>
         <translation>Nur LiveTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3365"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3316"/>
         <source>Schedule order</source>
         <translation>Planungsreihenfolge</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3367"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3318"/>
         <source>If priorities and other factors are equal the scheduler will choose the available input with the lowest, non-zero value.  Setting this value to zero will make the input unavailable to the scheduler.</source>
         <translation>Falls Prioritäten und andere Faktoren gleich sind wird der Scheduler den Eingang mit dem kleinsten Wert ungleich Null wählen. Wird dieser Wert auf 0 gesetzt ist dieser Eingang für den Scheduler nicht nutzbar.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3382"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3333"/>
         <source>Live TV order</source>
         <translation>Live TV Reihenfolge</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3384"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3335"/>
         <source>When entering Live TV, the available, local input with the lowest, non-zero value will be used.  If no local inputs are available, the available, remote input with the lowest, non-zero value will be used.  Setting this value to zero will make the input unavailable to live TV.</source>
         <translation>Für Live-TV wird der Eingang mit dem kleinsten Wert ungleich Null benutzt. Zuerst wird nach verfügbaren lokalen Eingängen gesucht, danach nach verfügbaren entfernten Eingängen. Der Wert 0 deaktiviert diesen Eingang für LiveTV.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3479"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3432"/>
         <source>Interactions between inputs</source>
         <translation>Relationen zwischen Eingängen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3485"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3445"/>
         <source>Create a New Input Group</source>
         <translation>Neue Eingangsgruppe anlegen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4238"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4224"/>
         <source>If there is more than one audio input, select which one to use.</source>
         <translation>Wählen sie den zu verwendenden Toneingang, wenn es mehr als einen gibt</translation>
     </message>
@@ -23770,19 +23770,19 @@ wird bereits verwendet.</translation>
         <translation type="obsolete">CPU--</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1033"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1038"/>
         <source>High Quality</source>
         <comment>Sample: high quality</comment>
         <translation>Hohe Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1043"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1048"/>
         <source>Normal</source>
         <comment>Sample: average quality</comment>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1053"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1058"/>
         <source>Slim</source>
         <comment>Sample: low CPU usage</comment>
         <translation>Schonend</translation>
@@ -23844,17 +23844,17 @@ You may have to use the eject button under its tray.</source>
 Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/cardutil.cpp" line="1626"/>
+        <location filename="../libs/libmythtv/cardutil.cpp" line="1654"/>
         <source>ERROR, Compile with V4L support to query audio inputs</source>
         <translation>FEHLER: Bitte mit Video4Linux Unterstützung übersetzen, um die Audioeingänge zu ermitteln</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="395"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="98"/>
         <source>Blank Frame + Logo Detection</source>
         <translation>Dunkle Frames + Logoerkennung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="397"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="100"/>
         <source>Scene Change + Logo Detection</source>
         <translation>Szenenwechsel + Logoerkennung</translation>
     </message>
@@ -23893,7 +23893,7 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation>Hohe Auflösung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tvremoteutil.cpp" line="467"/>
+        <location filename="../libs/libmythtv/tvremoteutil.cpp" line="442"/>
         <source>Error querying recorder state</source>
         <translation>Fehler beim Ermitteln des Rekorderstatus</translation>
     </message>
@@ -23903,37 +23903,37 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation>Frankreich</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="533"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="554"/>
         <source>Do not configure a grabber</source>
         <translation>Kein Grabberskript konfigurieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="564"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="585"/>
         <source>North America (SchedulesDirect.org) (Internal)</source>
         <translation>Nordamerika (SchedulesDirect.org) (intern)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="568"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="589"/>
         <source>Transmitted guide only (EIT)</source>
         <translation>Nur ausgestrahltes EPG (EIT)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="570"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="591"/>
         <source>No grabber</source>
         <translation>Kein Grabber</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="686"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="707"/>
         <source>Video Source Setup</source>
         <translation>Videoquelle einrichten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="988"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1009"/>
         <source>Maximum time (in milliseconds) MythTV waits for a channel lock.  For recordings, if this time is exceeded, the recording will be marked as failed.</source>
         <translation>Maximale Zeit, die MythTV auf einen Senderlock beim Sendersuchlauf wartet. Für Aufnahmen gilt, wenn die Zeit um ist, werden die Aufnahme als fehlgeschlagen ausgezeichnet.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1002"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1023"/>
         <source>Force audio sampling rate</source>
         <translation>Audioabtastrate erzwingen</translation>
     </message>
@@ -23942,17 +23942,17 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation type="obsolete">H.264 Hardware-Kodierer (HD-PVR)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3401"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3352"/>
         <source>Use DishNet long-term EIT data</source>
         <translation>DishNet&apos;s langfristige EIT-Daten verwenden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3487"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3447"/>
         <source>Input groups are only needed when two or more cards share the same resource such as a FireWire card and an analog card input controlling the same set top box.</source>
         <translation>Eingangsgruppen werden nur benötigt, wenn sich mehrere TV-Karten die gleiche Resource teilen (z. B. eine FireWire-Karte und eine analoge TV-Karte, die beide die gleiche Set-Top-Box kontrollieren).</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="4237"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="4223"/>
         <source>Audio input</source>
         <translation>Audioeingang</translation>
     </message>
@@ -24162,12 +24162,12 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation>%1 - %2 mögliche Sender gefunden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1740"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1747"/>
         <source>ScanTransport Tuning to %1 mplexid(%2)</source>
         <translation>ScanTransport stelle %1 ein mplexid(%2)</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1754"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1761"/>
         <source>: Found %n</source>
         <translation>
             <numerusform>: %n gefunden</numerusform>
@@ -24175,17 +24175,17 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2016"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2023"/>
         <source>Frequency %1</source>
         <translation>Frequenz %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2174"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2181"/>
         <source>as</source>
         <translation>als</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2179"/>
+        <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="2186"/>
         <source>Skipping %1, not in imported channel map</source>
         <translation>Ignoriere %1, nicht in eingelesener Senderliste</translation>
     </message>
@@ -24424,8 +24424,8 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation type="obsolete">Position gelöscht</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmyth/programinfo.cpp" line="1697"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1702"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1698"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1703"/>
         <source>%n hour(s)</source>
         <translation>
             <numerusform>%n Stunde</numerusform>
@@ -24433,8 +24433,8 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmyth/programinfo.cpp" line="1686"/>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1695"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1687"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1696"/>
         <source>%n minute(s)</source>
         <translation>
             <numerusform>%n Minute</numerusform>
@@ -24442,12 +24442,12 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1035"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1036"/>
         <source>Manual Record</source>
         <translation>Manuelle Aufnahme</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmyth/programinfo.cpp" line="1795"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1796"/>
         <source>%n star(s)</source>
         <translation>
             <numerusform>%n Stern</numerusform>
@@ -24460,58 +24460,58 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation type="vanished">f</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5223"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5224"/>
         <source>Default</source>
         <comment>Recording Profile Default</comment>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5224"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5225"/>
         <source>High Quality</source>
         <comment>Recording Profile High Quality</comment>
         <translation>Hohe Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5225"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5226"/>
         <source>Live TV</source>
         <comment>Recording Profile Live TV</comment>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5226"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5227"/>
         <source>Low Quality</source>
         <comment>Recording Profile Low Quality</comment>
         <translation>Niedrige Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5227"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5228"/>
         <source>Medium Quality</source>
         <comment>Recording Profile Medium Quality</comment>
         <translation>Mittlere Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5233"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5234"/>
         <source>CRC IP Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>CRC IP Rekorder</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3128"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3129"/>
         <source>Commercial Detection</source>
         <translation>Werbeerkennung</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1835"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1836"/>
         <source>DVD</source>
         <translation>DVD</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1839"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1840"/>
         <source>HTTP Streaming</source>
         <translation>HTTP Streaming</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1843"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1844"/>
         <source>RTSP Streaming</source>
         <translation>RTSP Streaming</translation>
     </message>
@@ -24520,184 +24520,184 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation type="obsolete">Blu-Ray Disc</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1852"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1853"/>
         <source>Recording</source>
         <comment>Recorded file, object not action</comment>
         <translation>Aufnahme</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3132"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3133"/>
         <source>Preview Generation</source>
         <translation>Vorschaubild erzeugen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3134"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3135"/>
         <source>User Job</source>
         <translation>Auftrag</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5228"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5229"/>
         <source>MPEG-2</source>
         <comment>Recording Profile MPEG-2</comment>
         <translation>MPEG-2</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5229"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5230"/>
         <source>RTjpeg/MPEG-4</source>
         <comment>Recording Profile RTjpeg/MPEG-4</comment>
         <translation>RTjpeg/MPEG-4</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5235"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5236"/>
         <source>FireWire Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>FireWire-Eingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5237"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5238"/>
         <source>Freebox Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Freebox-Eingang</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5239"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5240"/>
         <source>Hardware DVB Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>DVB-Kodierer</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5241"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5242"/>
         <source>Hardware HDTV</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HDTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5243"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5244"/>
         <source>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>MJPEG-Kodierer (Matrox G200, Miro DC10 u.a.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5245"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5246"/>
         <source>HD-PVR Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HD-PVR Rekorder</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5247"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5248"/>
         <source>HDHomeRun Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>HDHomeRun Rekorder</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5249"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5250"/>
         <source>MPEG-2 Encoders (PVR-x50, PVR-500)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>MPEG-2 Kodierer (PVR-x50, PVR-500)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5251"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5252"/>
         <source>Software Encoders (V4L based)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Software-Kodierer (auf V4L basierend)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5255"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5256"/>
         <source>USB MPEG-4 Encoder (Plextor ConvertX, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation>USB MPEG-4 Kodierer (Plextor ConvertX u.a.)</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5257"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5258"/>
         <source>V4L2 Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>V4L2 Kodierer</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5263"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5264"/>
         <source>Live TV</source>
         <comment>Recording Group Live TV</comment>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5268"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5269"/>
         <source>All Programs - %1</source>
         <comment>Show all programs from a specific recording group</comment>
         <translation>Alle Sendungen - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5273"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5274"/>
         <source>Live TV</source>
         <comment>Storage Group Name</comment>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5253"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5254"/>
         <source>Transcoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation>Umwandler</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1679"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1680"/>
         <source>%1 GB</source>
         <comment>GigaBytes</comment>
         <translation>%1 GB</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="1847"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="1848"/>
         <source>Blu-ray Disc</source>
         <translation>Blu-Ray Disc</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5261"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5262"/>
         <source>All Programs</source>
         <comment>Recording Group All Programs</comment>
         <translation>Alle Sendungen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5262"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5263"/>
         <source>All</source>
         <comment>Recording Group All Programs -- short form</comment>
         <translation>Alle</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5264"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5265"/>
         <source>Default</source>
         <comment>Recording Group Default</comment>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5265"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5266"/>
         <source>Deleted</source>
         <comment>Recording Group Deleted</comment>
         <translation>Gelöscht</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5272"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5273"/>
         <source>Default</source>
         <comment>Storage Group Name</comment>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5274"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5275"/>
         <source>Thumbnails</source>
         <comment>Storage Group Name</comment>
         <translation>Vorschaubilder</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5275"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5276"/>
         <source>DB Backups</source>
         <comment>Storage Group Name</comment>
         <translation>DB-Sicherungen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="5278"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="5279"/>
         <source>Default</source>
         <comment>Playback Group Name</comment>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programtypes.cpp" line="408"/>
+        <location filename="../libs/libmyth/programtypes.cpp" line="111"/>
         <source>Pre &amp; Post Roll</source>
         <translation>Vor- und nachfolgende Werbung (Pre &amp; Post Roll)</translation>
     </message>
@@ -24745,7 +24745,7 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation>VDA wird versuchen, die Grafikkartenhardware zur Beschleunigung der Videodekodierung zu verwenden. (Nur h264, benötigt Mac OS 10.6.3)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="738"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="743"/>
         <source>Interlaced (2x, HW)</source>
         <translation>Interlaced (2x, HW)</translation>
     </message>
@@ -24758,38 +24758,38 @@ Verwenden Sie den Auswurfknopf am Laufwerk.</translation>
         <translation type="obsolete">Yadif (Hw)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="740"/>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="752"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="745"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="757"/>
         <source>One Field (1x, HW)</source>
         <translation>One Field (1x, Hw)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="744"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="749"/>
         <source>Temporal (1x, HW)</source>
         <translation>Temporal (1x, Hw)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="746"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="751"/>
         <source>Temporal (2x, HW)</source>
         <translation>Temporal (2x, Hw)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="748"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="753"/>
         <source>Advanced (1x, HW)</source>
         <translation>Advanced (1x, Hw)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="750"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="755"/>
         <source>Advanced (2x, HW)</source>
         <translation>Advanced (2x, Hw)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1246"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1263"/>
         <source>This video renderer uses OpenGL for scaling and color conversion with full picture controls. The GPU can be used for deinterlacing. This requires a faster GPU than XVideo.</source>
         <translation>Dieser Videorenderer nutzt OpenGL für Skalierung und Farbanpassung mit allen Bildkontrollen. Die GPU kann für Deinterlacing genutzt werden. Dies benötigt eine stärkere GPU als XVideo.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1260"/>
+        <location filename="../libs/libmythtv/videodisplayprofile.cpp" line="1277"/>
         <source>This is the only video renderer for NVidia VDPAU decoding.</source>
         <translation>Dies ist die einzige Video-Darstellungsmethode für NVidia VDPAU-Dekodierung.</translation>
     </message>
@@ -25817,7 +25817,7 @@ kann nicht leer sein.</translation>
         <translation>Wiedergabe</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/programinfo.cpp" line="3119"/>
+        <location filename="../libs/libmyth/programinfo.cpp" line="3120"/>
         <source>PBP</source>
         <translation>PBP</translation>
     </message>
@@ -25860,7 +25860,7 @@ kann nicht leer sein.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="2012"/>
-        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2319"/>
+        <location filename="../programs/mythfrontend/guidegrid.cpp" line="2316"/>
         <source>All Channels</source>
         <translation>Alle Sender</translation>
     </message>
@@ -26393,22 +26393,22 @@ Device supports up to %1</source>
         <translation type="obsolete">Update Videodatenbank</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1033"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1040"/>
         <source>%1 TB</source>
         <translation>%1 TB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1038"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1045"/>
         <source>%1 GB</source>
         <translation>%1 GB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1043"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1050"/>
         <source>%1 MB</source>
         <translation>%1 MB</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1046"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1053"/>
         <source>%1 KB</source>
         <translation>%1 KB</translation>
     </message>
@@ -26616,22 +26616,22 @@ Device supports up to %1</source>
         <translation>SetParameters() called with handle == NULL!</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="670"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="676"/>
         <source>Aborting Audio Reconfigure. Can&apos;t handle audio with more than 8 channels.</source>
         <translation>Breche Audiorekonfiguration ab. Audio mit mehr als 8 Kanälen wird nicht unterstützt.</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="722"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="728"/>
         <source>Error creating resampler: %1</source>
         <translation>Fehler beim Erstellen des Resamplers: %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="758"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="764"/>
         <source>AC-3 encoder initialization failed</source>
         <translation>Initialisierung des AC-3 Encoders fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="819"/>
+        <location filename="../libs/libmyth/audio/audiooutputbase.cpp" line="825"/>
         <source>Aborting reconfigure</source>
         <translation>Breche Rekonfiguration ab</translation>
     </message>
@@ -27061,12 +27061,12 @@ Device supports up to %1</source>
 <context>
     <name>RecMetadataEdit</name>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5356"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5381"/>
         <source>Trying to manually find this recording online...</source>
         <translation>Versuche diese Aufnahme manuell online zu finden...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5479"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="5504"/>
         <source>No match found for this recording. You can try entering a TVDB/TMDB number, season, and episode manually.</source>
         <translation>Kein Treffer für diese Aufnahme. Sie können versuchen die TVDB/TMDB Nummer, Staffel und Folge manuell zu setzen.</translation>
     </message>
@@ -27447,105 +27447,105 @@ Device supports up to %1</source>
         <translation type="obsolete">Manuelle Korrektur löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="288"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="294"/>
         <source>The following programs will be recorded instead:</source>
         <translation>Die folgenden Sendungen werden stattdessen aufgenommen:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="329"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="381"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="471"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="335"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="389"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="479"/>
         <source>Record this showing</source>
         <translation>Diese Ausstrahlung aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="331"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="482"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="337"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="490"/>
         <source>Record all showings</source>
         <translation>Alle Ausstrahlungen Aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="336"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="485"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="342"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="493"/>
         <source>Record one showing</source>
         <translation>Eine Ausstrahlung aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="339"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="484"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="345"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="492"/>
         <source>Record one showing (this episode)</source>
         <translation>Eine Ausstrahlung aufnehmen (diese Episode)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="343"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="491"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="349"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="499"/>
         <source>Record all showings (this channel)</source>
         <translation>Alle Ausstrahlungen aufnehmen (dieser Sender)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="345"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="445"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="521"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="351"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="453"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="529"/>
         <source>Edit recording rule</source>
         <translation>Aufnahmeregel bearbeiten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="352"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="497"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="360"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="505"/>
         <source>Stop this recording</source>
         <translation>Diese Aufnahme anhalten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="354"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="501"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="362"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="509"/>
         <source>Modify recording options</source>
         <translation>Aufnahmeoptionen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="364"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="511"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="372"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="519"/>
         <source>Restart this recording</source>
         <translation>Diese Aufnahme neu starten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="387"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="513"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="395"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="521"/>
         <source>Forget previous recording</source>
         <translation>Vorherige Aufnahmen vergessen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="404"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="515"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="412"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="523"/>
         <source>Don&apos;t record this showing</source>
         <translation>Diese Ausstrahlung nicht aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="426"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="517"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="434"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="525"/>
         <source>Never record this episode</source>
         <translation>Diese Folge niemals aufnehmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="434"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="522"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="442"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="530"/>
         <source>Edit override rule</source>
         <translation>Manuelle Korrektur bearbeiten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="436"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="525"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="444"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="533"/>
         <source>Delete override rule</source>
         <translation>Manuelle Korrektur löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="443"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="502"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="451"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="510"/>
         <source>Add override rule</source>
         <translation>Manuelle Korrektur hinzufügen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="447"/>
-        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="524"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="455"/>
+        <location filename="../programs/mythfrontend/schedulecommon.cpp" line="532"/>
         <source>Delete recording rule</source>
         <translation>Aufnahmeregel löschen</translation>
     </message>
@@ -27943,47 +27943,57 @@ und ist unter %2 zu finden</translation>
 <context>
     <name>SlideSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="68"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="73"/>
         <source>Slideshow</source>
         <translation>Diaschau</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="71"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="76"/>
         <source>Transition</source>
         <translation>Übergang</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="72"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="77"/>
         <source>Effect to use between slides</source>
         <translation>Effekt der zwischen den Dias genutzt wird</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="86"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="91"/>
         <source>Slide Duration (ms)</source>
         <translation>Diadauer (ms)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="87"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="92"/>
         <source>The time that a slide is displayed (between transitions), in milliseconds.</source>
         <translation>Dies Zeit, die ein Dia gezeigt wird (zwischen Übergängen), in Millisekunden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="92"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="97"/>
         <source>Transition Duration (ms)</source>
         <translation>Übergangsdauer (ms)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="93"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="98"/>
         <source>The time that each transition lasts, in milliseconds.</source>
         <translation>Die Zeit die jeder Übergang dauert, in Millisekunden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="97"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="102"/>
+        <source>Status Delay (ms)</source>
+        <translation>Statusverzögerung (ms)</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="103"/>
+        <source>The delay before showing the Loading/Playing status, in milliseconds.</source>
+        <translation>Die Verzögerung, in Millisekunden, bevor der Lade/Spiele Status angezeigt wird.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="108"/>
         <source>Use transitions when browsing</source>
         <translation>Benutze Übergänge beim Stöbern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="98"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="109"/>
         <source>When cleared, transitions will only be used during a slideshow.</source>
         <translation>Wenn frei, werden Übergänge nur während einer Diaschau benutzt.</translation>
     </message>
@@ -28034,7 +28044,7 @@ und ist unter %2 zu finden</translation>
 <context>
     <name>StartingChannel</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3318"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3269"/>
         <source>Please add channels to this source</source>
         <translation>Bitte Sender zur Videoquelle hinzufügen</translation>
     </message>
@@ -28042,22 +28052,22 @@ und ist unter %2 zu finden</translation>
 <context>
     <name>StatusBox</name>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="857"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="864"/>
         <source>is recording</source>
         <translation>nimmt auf</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="859"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="866"/>
         <source>is not recording</source>
         <translation>ist verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="983"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="990"/>
         <source>Job:</source>
         <translation>Auftrag:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="985"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="992"/>
         <source>Status: </source>
         <translation>Status: </translation>
     </message>
@@ -28078,22 +28088,22 @@ No other details</source>
 Keine weiteren Informationen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="847"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="854"/>
         <source>is unavailable</source>
         <translation>ist nicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="992"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="999"/>
         <source>Scheduled Run Time:</source>
         <translation>Geplante Laufzeit:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="772"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="779"/>
         <source>marked as HDTV</source>
         <translation>als HDTV markiert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="782"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="789"/>
         <source>from source</source>
         <translation>von Quelle</translation>
     </message>
@@ -28276,27 +28286,27 @@ Keine weiteren Informationen</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="766"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="773"/>
         <source>with lower priority</source>
         <translation>mit geringerer Priorität</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="792"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="799"/>
         <source>on card</source>
         <translation>auf Karte</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="845"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="852"/>
         <source>has an error</source>
         <translation>hat ein Problem</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="854"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="861"/>
         <source>is watching Live TV</source>
         <translation>sieht fern</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="916"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="923"/>
         <source>On %1 from %2.%3
 %4
 </source>
@@ -28305,27 +28315,27 @@ Keine weiteren Informationen</translation>
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="928"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="935"/>
         <source>No further details</source>
         <translation>Keine weiteren Details</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="949"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="956"/>
         <source>Job Queue shows any jobs currently in MythTV&apos;s Job Queue such as a commercial detection job.</source>
         <translation>Zeigt alle noch zu bearbeitenden Aufnahmen (z. B. um sie auf Werbung zu untersuchen).</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1057"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1064"/>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
         <translation>%2/%1 belegt, %3 (%4%) frei.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1074"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1081"/>
         <source>, using your %1 rate of %2 kb/s</source>
         <translation>, bei %1 %2 Kb/Sek</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1090"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1097"/>
         <source>%n hour(s)</source>
         <translation>
             <numerusform>%n Stunde</numerusform>
@@ -28333,7 +28343,7 @@ Keine weiteren Informationen</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1091"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1098"/>
         <source>%n minute(s)</source>
         <translation>
             <numerusform>%n Minute</numerusform>
@@ -28341,42 +28351,42 @@ Keine weiteren Informationen</translation>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1092"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1099"/>
         <source>%1 remaining</source>
         <comment>time</comment>
         <translation>%1 übrig</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1096"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1103"/>
         <source>%1 and %2 remaining</source>
         <comment>time</comment>
         <translation>%1 und %2 übrig</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1108"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1115"/>
         <source>Uptime</source>
         <translation>Betriebszeit</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1111"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1118"/>
         <source>unknown</source>
         <comment>unknown uptime</comment>
         <translation>unbekannt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1161"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1168"/>
         <source>average</source>
         <comment>average rate</comment>
         <translation>Durchschnitt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1181"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1188"/>
         <source>maximum</source>
         <comment>maximum rate</comment>
         <translation>Maximum</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1435"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1442"/>
         <source>%n (is) LiveTV and consume(s) %1
 </source>
         <translation>
@@ -28387,7 +28397,7 @@ Keine weiteren Informationen</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1439"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1446"/>
         <source>%n (is) Deleted and consume(s) %1
 </source>
         <translation>
@@ -28413,124 +28423,124 @@ Keine weiteren Informationen</translation>
         <translation>Zeigt Informationen zu geplanten Aufnahmen.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="804"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="811"/>
         <source>Tuner Status shows the current information about the state of backend tuner cards</source>
         <translation>Zeigt die aktuelle Belegung der Backend TV-Karten</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="849"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="856"/>
         <source>is asleep</source>
         <translation>schläft</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="861"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="868"/>
         <source>Tuner %1 %2 %3</source>
         <translation>Tuner %1 %2 %3</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="894"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="901"/>
         <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
         <translation>Zeigt alle ungelesenen Systemmeldungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="936"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="943"/>
         <source>No items found at priority level %1 or lower.</source>
         <translation>Keine Meldungen ≤ %1 vorhanden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="938"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="945"/>
         <source>Use 1-8 to change priority level.</source>
         <translation>Mit 1-8 die Prioritätsstufe ändern.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1015"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1022"/>
         <source>Job Queue is currently empty.</source>
         <translation>Die Auftragsliste ist leer.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1203"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1210"/>
         <source>Machine Status shows some operating system statistics of this machine</source>
         <translation>Zeigt die Betriebsdaten dieses Rechners</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1206"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1213"/>
         <source>and the MythTV server</source>
         <translation>und der MythTV Server</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1219"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1226"/>
         <source>System:</source>
         <translation>System:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1221"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1228"/>
         <source>This machine:</source>
         <translation>Dieser Rechner:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1230"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1278"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1237"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1285"/>
         <source>Load</source>
         <translation>Last</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1233"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1237"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1288"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1240"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1244"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1295"/>
         <source>unknown</source>
         <translation>unbekannt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1233"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1237"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1240"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1244"/>
         <source>failed</source>
         <translation>fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1255"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1298"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1262"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1305"/>
         <source>RAM</source>
         <translation>RAM</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1261"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1306"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1268"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1313"/>
         <source>Swap</source>
         <translation>Swap</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1269"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1276"/>
         <source>MythTV server</source>
         <translation>MythTV Server</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1339"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1346"/>
         <source>Total Disk Space:</source>
         <translation>Gesamter Speicherplatz:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1344"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1351"/>
         <source>MythTV Drive #%1:</source>
         <translation>MythTV Laufwerk #%1:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1351"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1358"/>
         <source>Directories:</source>
         <translation>Verzeichnisse:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1360"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1367"/>
         <source>Directory:</source>
         <translation>Verzeichnis:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1384"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1391"/>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
         <translation>Zeigt alle Aufnahmen, die automatisch gelöscht werden. Sendungen am Anfang der Liste werden zuerst gelöscht.</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="592"/>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1123"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1130"/>
         <source>%n day(s)</source>
         <translation>
             <numerusform>%n Tag</numerusform>
@@ -28562,7 +28572,7 @@ Keine weiteren Informationen</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1431"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1438"/>
         <source>%n recording(s) consuming %1 (is) allowed to expire
 </source>
         <translation>
@@ -28779,274 +28789,274 @@ aus der Speichergruppe entfernen?</translation>
         <translation>Nicht aufnehmen, ich will fernsehen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13255"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13173"/>
         <source>Save this position and go to the menu</source>
         <translation>Position merken und ins Menü wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13257"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13175"/>
         <source>Do not save, just exit to the menu</source>
         <translation>Einfach zurück ins Menü wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13268"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13186"/>
         <source>Keep watching</source>
         <translation>Weiter ansehen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13265"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13183"/>
         <source>Delete this recording</source>
         <translation>Diese Aufnahme löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6474"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8040"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6479"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8033"/>
         <source>Paused</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5011"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8040"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5016"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8033"/>
         <source>Position</source>
         <translation>Position</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6762"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12140"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13076"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13161"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6767"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12058"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12994"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13079"/>
         <source>Jump Ahead</source>
         <translation>Vorwärts</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6765"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12145"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13088"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13116"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6770"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12063"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13006"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13034"/>
         <source>Jump Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12503"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12421"/>
         <source>Adjust Picture</source>
         <translation>Bild anpassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5440"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8950"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10181"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5445"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8868"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10099"/>
         <source>Adjust Volume</source>
         <translation>Lautstärke</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9190"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9108"/>
         <source>Mute On</source>
         <translation>Stumm</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9189"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9107"/>
         <source>Mute Off</source>
         <translation>Stumm aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6975"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6980"/>
         <source>Stopping Transcode</source>
         <translation>Stoppe Konvertierung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6993"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6998"/>
         <source>Transcoding</source>
         <translation>Konvertiere</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6642"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6647"/>
         <source>Forward</source>
         <translation>Vorwärts</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5316"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6687"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6691"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5321"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6692"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6696"/>
         <source>Skip Ahead</source>
         <translation>Vorwärts</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6641"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6646"/>
         <source>Rewind</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5320"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6680"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5325"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6685"/>
         <source>Skip Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6817"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6822"/>
         <source>Speed 3X</source>
         <translation>Zeitraffer 3x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6818"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6823"/>
         <source>Speed 2X</source>
         <translation>Zeitraffer 2x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6820"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6825"/>
         <source>Speed 1/3X</source>
         <translation>Zeitlupe 1/3</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6821"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6826"/>
         <source>Speed 1/8X</source>
         <translation>Zeitlupe 1/8</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6822"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6827"/>
         <source>Speed 1/16X</source>
         <translation>Zeitlupe 1/16</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7160"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7165"/>
         <source>Skip</source>
         <translation>Springen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10393"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10311"/>
         <source>This program is currently being edited</source>
         <translation>Diese Aufnahme wird momentan bearbeitet</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10396"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10314"/>
         <source>Continue Editing</source>
         <translation>Weiterhin bearbeiten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10397"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10315"/>
         <source>Do not edit</source>
         <translation>Nicht bearbeiten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10017"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10040"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9935"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9958"/>
         <source>Record</source>
         <translation>Aufnahme</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6744"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6779"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6749"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6784"/>
         <source>Jump To</source>
         <translation>Springe zu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12703"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12621"/>
         <source>Auto-Expire OFF</source>
         <translation>Autom. löschen AUS</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12708"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12626"/>
         <source>Auto-Expire ON</source>
         <translation>Autom. löschen EIN</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10903"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10821"/>
         <source>Zoom Mode ON</source>
         <translation>Zoom EIN</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9191"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9109"/>
         <source>Left Channel Muted</source>
         <translation>Linker Kanal stumm</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9192"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9110"/>
         <source>Right Channel Muted</source>
         <translation>Rechter Kanal stumm</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9220"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9138"/>
         <source>Sleep </source>
         <translation>Abschalttimer</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12177"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12095"/>
         <source>Program Guide</source>
         <translation>Programmübersicht (EPG)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12516"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12434"/>
         <source>Picture-in-Picture</source>
         <translation>Bild-im-Bild</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12084"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12002"/>
         <source>Change Active Window</source>
         <translation>Aktives Fenster wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12173"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12091"/>
         <source>Previous Channel</source>
         <translation>Vorheriger Sender</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12217"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12135"/>
         <source>Edit Recording</source>
         <translation>Aufnahme bearbeiten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12520"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12438"/>
         <source>Commercial Auto-Skip</source>
         <translation>Werbung überspringen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12226"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12144"/>
         <source>Turn Auto-Expire OFF</source>
         <translation>Schalte Autom. löschen AUS</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12226"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12144"/>
         <source>Turn Auto-Expire ON</source>
         <translation>Schalte Autom. löschen EIN</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12501"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12419"/>
         <source>Change Aspect Ratio</source>
         <translation>Seitenverhältnis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11966"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11884"/>
         <source>Manual Zoom Mode</source>
         <translation>Manueller Zoom</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12234"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12152"/>
         <source>Stop Transcoding</source>
         <translation>Umwandlung stoppen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12530"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12448"/>
         <source>Begin Transcoding</source>
         <translation>Umwandlung starten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4653"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5312"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4658"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5317"/>
         <source>Jump to Beginning</source>
         <translation>Zum Anfang springen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6986"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6991"/>
         <source>Try Again</source>
         <translation>Wiederholen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9031"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12515"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8949"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12433"/>
         <source>Adjust Time Stretch</source>
         <translation>Zeitraffer ändern</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11777"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11695"/>
         <source>Adjust</source>
         <translation>Anpassen</translation>
     </message>
@@ -29071,14 +29081,14 @@ aus der Speichergruppe entfernen?</translation>
         <translation type="obsolete">1,5x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12517"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12929"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12931"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12435"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12847"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12849"/>
         <source>Sleep</source>
         <translation>Einschlaftimer</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11798"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11716"/>
         <source>Sleep Off</source>
         <translation>Einschlaftimer aus</translation>
     </message>
@@ -29103,12 +29113,12 @@ aus der Speichergruppe entfernen?</translation>
         <translation type="obsolete">Nächstes Kapitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6926"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6931"/>
         <source>Forward %1X</source>
         <translation>Vorwärts %1x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6936"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6941"/>
         <source>Rewind %1X</source>
         <translation>Zurück %1x</translation>
     </message>
@@ -29117,60 +29127,60 @@ aus der Speichergruppe entfernen?</translation>
         <translation type="obsolete">Audio neu synchr.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9154"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9072"/>
         <source>Audio Sync</source>
         <translation>Audiosynchronisation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9154"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11931"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9072"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11849"/>
         <source>Adjust Audio Sync</source>
         <translation>Audiosynchr. anpassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4647"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4652"/>
         <source>Jump to Bookmark</source>
         <translation>Zur gespeicherten Position springen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8298"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8291"/>
         <source>Partial Lock</source>
         <translation>Teilw. Lock</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8299"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8292"/>
         <source>Lock</source>
         <translation>Lock</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8400"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12964"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13342"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8393"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12882"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13260"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12498"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12416"/>
         <source>Select Audio Track</source>
         <translation>Tonspur wählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8301"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8294"/>
         <source>Signal %1%</source>
         <translation>Signal %1%</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4606"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4611"/>
         <source>Seek:</source>
         <translation>Springe:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7500"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7495"/>
         <source>CC:</source>
         <translation>CC:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10052"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9970"/>
         <source>Cancel Record</source>
         <translation>Aufnahme abbrechen</translation>
     </message>
@@ -29180,160 +29190,160 @@ aus der Speichergruppe entfernen?</translation>
         <translation>%1 Option</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7500"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7495"/>
         <source>TXT:</source>
         <translation>TXT:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7504"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7499"/>
         <source>Seek:</source>
         <comment>seek to location</comment>
         <translation>Springe:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8303"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8296"/>
         <source>S/N %1dB</source>
         <translation>S/N %1dB</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8305"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8298"/>
         <source>BE %1</source>
         <comment>Bit Errors</comment>
         <translation>Bitfehler %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8298"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8291"/>
         <source>No Lock</source>
         <translation>Kein Lock</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6815"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6820"/>
         <source>Speed 16X</source>
         <translation>Zeitraffer 16x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6816"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6821"/>
         <source>Speed 8X</source>
         <translation>Zeitraffer 8x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13146"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13064"/>
         <source>Skip Still Frame</source>
         <translation>Standbild auslassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13172"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13090"/>
         <source>Next Title</source>
         <translation>Nächster Titel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12152"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12070"/>
         <source>DVD Root Menu</source>
         <translation>DVD-Hauptmenü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12181"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12099"/>
         <source>Program Finder</source>
         <translation>Sendung suchen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12189"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12107"/>
         <source>Edit Recording Schedule</source>
         <translation>Aufnahmeplan ändern</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13127"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13045"/>
         <source>Previous Title</source>
         <translation>Vorheriger Titel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13104"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13022"/>
         <source>Skip Back Not Allowed</source>
         <translation>Zurückspringen nicht erlaubt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12526"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12444"/>
         <source>Jump to Program</source>
         <translation>Springe zu Sendung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12193"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12574"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12111"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12492"/>
         <source>Recorded Program</source>
         <translation>Aufgenommene Sendung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12234"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12152"/>
         <source>Default</source>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12242"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12160"/>
         <source>Autodetect</source>
         <translation>Automatisch</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12250"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12168"/>
         <source>High Quality</source>
         <translation>Hohe Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12258"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12176"/>
         <source>Medium Quality</source>
         <translation>Mittlere Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12266"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12184"/>
         <source>Low Quality</source>
         <translation>Niedrige Qualität</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12022"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11940"/>
         <source>Toggle Teletext Menu</source>
         <translation>Teletext Menü Ein/Aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12045"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11963"/>
         <source>Toggle</source>
         <translation>Ein/Aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11710"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11628"/>
         <source>Detect</source>
         <translation>Erkenne</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11712"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11630"/>
         <source>Progressive</source>
         <translation>Progressiv</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11714"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11632"/>
         <source>Interlaced (Normal)</source>
         <translation>Interlaced (normal)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11716"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11634"/>
         <source>Interlaced (Reversed)</source>
         <translation>Interlaced (umgekehrt)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12509"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12427"/>
         <source>Select Subtitle</source>
         <translation>Untertitel wählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12512"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12430"/>
         <source>Select VBI CC</source>
         <translation>VBI-Untertitel auswählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12511"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12429"/>
         <source>Select ATSC CC</source>
         <translation>ATSC-Untertitel auswählen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8307"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8300"/>
         <source>Rotor %1%</source>
         <translation>Rotor %1%</translation>
     </message>
@@ -29348,12 +29358,12 @@ Select a Current Recording</source>
 Wählen Sie eine laufende Aufnahme</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="3520"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="3525"/>
         <source>End Of Recording</source>
         <translation>Ende der Aufnahme</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="2948"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="2953"/>
         <source>Last Program: %1 Doesn&apos;t Exist</source>
         <translation>Letzte Sendung: %1 liegt nicht vor</translation>
     </message>
@@ -29362,33 +29372,33 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation type="obsolete">Diese Aufnahme löschen?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8467"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8964"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8460"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8882"/>
         <source>DVD</source>
         <translation>DVD</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8472"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8465"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8476"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8469"/>
         <source>Still Frame</source>
         <translation>Standbild</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8487"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8480"/>
         <source>Title: %1 (%2)</source>
         <translation>Titel: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8488"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8481"/>
         <source>Chapter: %1/%2</source>
         <translation>Kapitel: %1/%2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12168"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12086"/>
         <source>DVD Chapter Menu</source>
         <translation>DVD-Kapitelmenü</translation>
     </message>
@@ -29438,13 +29448,13 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation>Nicht aufnehmen, Ich möchte fernsehen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5440"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8950"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5445"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8868"/>
         <source>Volume</source>
         <translation>Lautstärke</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5953"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5958"/>
         <source>Sorry, PBP only supports %n video stream(s)</source>
         <translation>
             <numerusform>Entschuldigung, PBP unterstützt nur %n Videostrom</numerusform>
@@ -29452,7 +29462,7 @@ Wählen Sie eine laufende Aufnahme</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5960"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5965"/>
         <source>Sorry, PIP only supports %n video stream(s)</source>
         <translation>
             <numerusform>Entschuldigung, PIP unterstützt nur %n Videostrom</numerusform>
@@ -29460,13 +29470,13 @@ Wählen Sie eine laufende Aufnahme</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5965"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5970"/>
         <source>Sorry, cannot mix PBP and PIP views</source>
         <translation>Kann PBP- und PIP-Ansichten nicht mischen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9242"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9305"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9160"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9223"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
@@ -29475,12 +29485,12 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation type="obsolete">Visualisierung umschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12502"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12420"/>
         <source>Adjust Fill</source>
         <translation>Bildgröße anpassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12505"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12423"/>
         <source>Advanced</source>
         <translation>Erweitert</translation>
     </message>
@@ -29493,22 +29503,22 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation type="obsolete">Studio Levels einschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12507"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12425"/>
         <source>Deinterlacer</source>
         <translation>Deinterlacer</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12152"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12070"/>
         <source>Top menu</source>
         <translation>Hauptmenü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12158"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12076"/>
         <source>Popup menu</source>
         <translation>Popup-Menü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12527"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12445"/>
         <source>Switch Input</source>
         <translation>Eingang wechseln</translation>
     </message>
@@ -29523,12 +29533,12 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation type="obsolete">I</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12528"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12446"/>
         <source>Switch Source</source>
         <translation>Quelle wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12185"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12103"/>
         <source>Upcoming Recordings</source>
         <translation>Nächste Aufnahmen</translation>
     </message>
@@ -29537,28 +29547,28 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation type="obsolete">Fehler</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13251"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13169"/>
         <source>You are exiting %1</source>
         <translation>Sie verlassen %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13261"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13179"/>
         <source>Exit %1</source>
         <translation>Beende %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9243"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9306"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9161"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9224"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12955"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12873"/>
         <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
         <translation>MythTV hat keine TV-Karten definiert. Bitte starten Sie mythtv-setup.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8391"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8384"/>
         <source>You should have received a channel lock by now. You can continue to wait for a signal, or you can change the channel with %1 or %2, change video source (%3), inputs (%4), etc.</source>
         <translation>Sie sollten inzwischen einen Senderlock erhalten haben. Sie können weiterhin auf ein Signal warten, oder mit %1 oder %2 den Sender, mit %3 die Videoquelle, mit %4 den Eingang usw. wechseln.</translation>
     </message>
@@ -29619,194 +29629,194 @@ Wählen Sie eine laufende Aufnahme</translation>
         <translation>Wiedergabe kann nicht gestartet werden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4380"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4385"/>
         <source>%1 Committed</source>
         <translation>%1 übernehmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5004"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5009"/>
         <source>Bookmark Cleared</source>
         <translation>Position gelöscht</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5014"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5019"/>
         <source>Bookmark Saved</source>
         <translation>Position gespeichert</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9125"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12035"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9043"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11953"/>
         <source>Adjust Subtitle Delay</source>
         <translation>Untertitel Verzögerung anpassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9125"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9043"/>
         <source>Subtitle Delay</source>
         <translation>Untertitel Verzögerung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9235"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9153"/>
         <source>MythTV was set to sleep after %1 minutes and will exit in %d seconds.
 Do you wish to continue watching?</source>
         <translation>Der Einschlaftimer ist auf %1 Minuten gesetzt. MythTV wird in %d Sekunden beendet.
 Möchten Sie weitersehen?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9299"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9217"/>
         <source>MythTV has been idle for %1 minutes and will exit in %d seconds. Are you still watching?</source>
         <translation>MythTV war für %1 Minuten im Leerlauf und wird in %d Sekunden beendet. Sehen Sie noch zu?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10289"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10304"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12533"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10207"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10222"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12451"/>
         <source>Edit Cut Points</source>
         <translation>Schnittpunkte bearbeiten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10323"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10241"/>
         <source>Exit Recording Editor</source>
         <translation>Aufnahmeeditor verlassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10324"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11585"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10242"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11503"/>
         <source>Save Cuts and Exit</source>
         <translation>Schnitte speichern und Beenden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10326"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11577"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10244"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11495"/>
         <source>Exit Without Saving</source>
         <translation>Beenden, ohne zu speichern</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10328"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11581"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10246"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11499"/>
         <source>Save Cuts</source>
         <translation>Schnitte speichern</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10330"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11573"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10248"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11491"/>
         <source>Undo Changes</source>
         <translation>Änderungen rückgängig machen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10577"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10495"/>
         <source>UNKNOWN%1</source>
         <comment>Synthesized callsign</comment>
         <translation>UNBEKANNT%1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11500"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11418"/>
         <source>Move Previous Cut End Here</source>
         <translation>Letztes Schnittende hierhin verschieben</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11501"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11419"/>
         <source>Move Start of Cut Here</source>
         <translation>Schnittstart hierhin verschieben</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11512"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11430"/>
         <source>Move Next Cut Start Here</source>
         <translation>Nächsten Schnittstart hierher verschieben</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11513"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11431"/>
         <source>Move End of Cut Here</source>
         <translation>Schnittende hierhin verschieben</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11521"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11439"/>
         <source>Cut to Beginning</source>
         <translation>Bis zum Anfang ausschneiden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11529"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11447"/>
         <source>Cut to End</source>
         <translation>Bis zum Ende ausschneiden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11535"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11453"/>
         <source>Delete This Cut</source>
         <translation>Diesen Schnitt löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11536"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11454"/>
         <source>Join Surrounding Cuts</source>
         <translation>Vereinige umgebende Schnitte</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11541"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11459"/>
         <source>Add New Cut</source>
         <translation>Neuen Schnitt hinzufügen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11547"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11465"/>
         <source>Undo - %1</source>
         <extracomment>%1 is the undo message</extracomment>
         <translation>Rückgängig - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11555"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11473"/>
         <source>Redo - %1</source>
         <extracomment>%1 is the redo message</extracomment>
         <translation>Wiederherstellen - %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11561"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11479"/>
         <source>Clear Cuts</source>
         <translation>Schnitte löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11565"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11483"/>
         <source>Reverse Cuts</source>
         <translation>Absteigend nach Schnitten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11569"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11487"/>
         <source>Load Detected Commercials</source>
         <translation>Lade erkannte Werbungen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11778"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11696"/>
         <source>0.5x</source>
         <translation>0.5x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11779"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11697"/>
         <source>0.9x</source>
         <translation>0.9x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11780"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11698"/>
         <source>1.0x</source>
         <translation>1.0x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11781"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11699"/>
         <source>1.1x</source>
         <translation>1.1x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11782"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11700"/>
         <source>1.2x</source>
         <translation>1.2x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11783"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11701"/>
         <source>1.3x</source>
         <translation>1.3x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11784"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11702"/>
         <source>1.4x</source>
         <translation>1.4x</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11785"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11703"/>
         <source>1.5x</source>
         <translation>1.5x</translation>
     </message>
@@ -29817,7 +29827,7 @@ Möchten Sie weitersehen?</translation>
         <translation type="vanished">%1 - %2</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12093"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12011"/>
         <source>Close PIP(s)</source>
         <translation>
             <numerusform>PIPs schließen</numerusform>
@@ -29825,7 +29835,7 @@ Möchten Sie weitersehen?</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12103"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12021"/>
         <source>Close PBP(s)</source>
         <translation>
             <numerusform>PBPs schließen</numerusform>
@@ -29833,93 +29843,93 @@ Möchten Sie weitersehen?</translation>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12135"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12053"/>
         <source>Playback Data</source>
         <translation>Wiedergabedaten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12496"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12547"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12414"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12465"/>
         <source>Playback Compact Menu</source>
         <translation>Kompaktes Playback Menü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12524"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12442"/>
         <source>Schedule</source>
         <translation>Planung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12534"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12452"/>
         <source>Edit Cut Points (Compact)</source>
         <translation>Schnittpunkte bearbeiten (Kompakt)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12535"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12453"/>
         <source>Cut List Options</source>
         <translation>Schnittlisten-Optionen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12942"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12860"/>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch Live TV, cancel one of the in-progress recordings from the delete menu.</source>
         <translation>MythTV benutzt schon alle verfügbaren Eingänge für Aufnahmen. Wenn Sie eine gerade laufende Aufnahme ansehen wollen, wählen Sie sie aus dem Wiedergabe-Menü. Wenn Sie dennoch fernsehen wollen, brechen Sie im Löschen-Menü eine laufende Aufnahme ab.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13235"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13153"/>
         <source>Live TV</source>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13237"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13155"/>
         <source>this DVD</source>
         <translation>diese DVD</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13241"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13159"/>
         <source>this Video</source>
         <translation>dieses Video</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13245"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13163"/>
         <source>this recording</source>
         <translation>diese Aufnahme</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13314"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13232"/>
         <source>Cannot delete program </source>
         <translation>Kann Programm nicht löschen </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13323"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13241"/>
         <source>because it is not a recording.</source>
         <translation>da es keine Aufnahme ist.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13327"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13245"/>
         <source>because it is in use by</source>
         <translation>da es in Benutzung ist von</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13373"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13291"/>
         <source>Delete it, but allow it to re-record</source>
         <translation>Löschen, aber wieder aufnehmen lassen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13375"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13293"/>
         <source>Delete it</source>
         <translation>Bitte löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13377"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13295"/>
         <source>Save it so I can watch it again</source>
         <translation>Behalten, ich möchte es noch einmal sehen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13382"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13300"/>
         <source>Yes, and allow re-record</source>
         <translation>Ja, aber erneut aufnehmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13384"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13302"/>
         <source>Yes, delete it</source>
         <translation>Ja, bitte löschen</translation>
     </message>
@@ -29928,14 +29938,14 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Nein</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4324"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4353"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4370"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4329"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4358"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4375"/>
         <source>Zoom Committed</source>
         <translation>Zoom übernommen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4375"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4380"/>
         <source>Zoom Ignored</source>
         <translation>Zoom ignoriert</translation>
     </message>
@@ -29944,67 +29954,67 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Visualisierung an</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="4954"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="4959"/>
         <source>Visualisation Off</source>
         <translation>Visualisierung aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5982"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5987"/>
         <source>Creating PBP</source>
         <translation>Erstelle PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5982"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5987"/>
         <source>Creating PIP</source>
         <translation>Erstelle PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5983"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5988"/>
         <source>Cannot create PBP</source>
         <translation>Kann PBP nicht anlegen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5983"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5988"/>
         <source>Cannot create PIP</source>
         <translation>Kann PIP nicht anlegen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6002"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6007"/>
         <source>Stopping PIP</source>
         <translation>Stoppe PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6002"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6007"/>
         <source>Stopping PBP</source>
         <translation>Stoppe PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6012"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6017"/>
         <source>Stopping all PIPs</source>
         <translation>Stoppe alle PIPs</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6012"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6017"/>
         <source>Stopping all PBPs</source>
         <translation>Stoppe alle PBPs</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6059"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6064"/>
         <source>Too many views to switch</source>
         <translation>Zu viele Ansichten, um zu wechseln</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="6476"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="6481"/>
         <source>Aux Paused</source>
         <translation>AUX pausiert</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7036"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7041"/>
         <source>Jump Chapter</source>
         <translation>Springe zu Kapitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7161"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7166"/>
         <source>Searching</source>
         <translation>Suche</translation>
     </message>
@@ -30013,7 +30023,7 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Springe zu Titel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7139"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7144"/>
         <source>Switch Angle</source>
         <translation>Winkel wechseln</translation>
     </message>
@@ -30022,72 +30032,72 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Wechsle</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8961"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8879"/>
         <source>TV</source>
         <translation>TV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9031"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8949"/>
         <source>Time Stretch</source>
         <translation>Zeitraffer</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9061"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8979"/>
         <source>Upmixer On</source>
         <translation>Upmixer Ein</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9061"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8979"/>
         <source>Upmixer Off</source>
         <translation>Upmixer Aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9672"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9590"/>
         <source>PiP</source>
         <comment>Picture-in-Picture</comment>
         <translation>PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9673"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9591"/>
         <source>PbP</source>
         <comment>Picture-by-Picture</comment>
         <translation>PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9675"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9593"/>
         <source>Disabling %1 for recording</source>
         <translation>Deaktiviere %1 für Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10276"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10194"/>
         <source>Active Changed</source>
         <translation>Aktives Fenster gesetzt</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="10334"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12485"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="10252"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12403"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12495"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12543"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12413"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12461"/>
         <source>Playback Menu</source>
         <translation>Wiedergabemenü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12497"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12415"/>
         <source>Audio</source>
         <translation>Audio</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8958"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12500"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8876"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12418"/>
         <source>Video</source>
         <translation>Video</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12508"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12426"/>
         <source>Subtitles</source>
         <translation>Untertitel</translation>
     </message>
@@ -30096,12 +30106,12 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Untertitel ein-/ausblenden</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12510"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12428"/>
         <source>Text Subtitles</source>
         <translation>Text-Untertitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12513"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12431"/>
         <source>Select Teletext CC</source>
         <translation>Teletext Untertitel auswählen</translation>
     </message>
@@ -30110,37 +30120,37 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Externe Untertitel umschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12519"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12437"/>
         <source>Navigate</source>
         <translation>Navigieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12163"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12081"/>
         <source>DVD Title Menu</source>
         <translation>DVD-Titelmenü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12522"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12440"/>
         <source>Angle</source>
         <translation>Winkel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12523"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12441"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12525"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12443"/>
         <source>Source</source>
         <translation>Quelle</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12529"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12447"/>
         <source>Jobs</source>
         <translation>Aufträge</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12217"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12135"/>
         <source>Edit Channel</source>
         <translation>Sender bearbeiten</translation>
     </message>
@@ -30149,17 +30159,17 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Audio-Upmixer ein/aus</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12518"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12436"/>
         <source>Channel Groups</source>
         <translation>Sendergruppen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11809"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11727"/>
         <source>All Channels</source>
         <translation>Alle Sender</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12521"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12439"/>
         <source>Chapter</source>
         <translation>Kapitel</translation>
     </message>
@@ -30170,34 +30180,34 @@ Möchten Sie weitersehen?</translation>
         <translation>Externe Untertitel</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="5078"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13427"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="5083"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13345"/>
         <source>Are you sure you want to delete:</source>
         <translation>Diese Aufnahme wirklich löschen:</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="7123"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="7128"/>
         <source>Switch Title</source>
         <translation>Titel umschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9087"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12027"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9005"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11945"/>
         <source>Adjust Subtitle Zoom</source>
         <translation>Untertitelvergrößerung einstellen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="9087"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9005"/>
         <source>Subtitle Zoom</source>
         <translation>Untertitelvergrößerung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12499"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12417"/>
         <source>Visualisation</source>
         <translation>Visualisierung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11943"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11861"/>
         <source>Disable Audio Upmixer</source>
         <translation>Audio-Upmixer ausschalten</translation>
     </message>
@@ -30206,98 +30216,98 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Audio-Upmixer einschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11696"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11936"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11614"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11854"/>
         <source>None</source>
         <translation>Keine</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12504"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12422"/>
         <source>3D</source>
         <translation>3D</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11974"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11892"/>
         <source>Disable Night Mode</source>
         <translation>Nachtmodus deaktivieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11974"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11892"/>
         <source>Enable Night Mode</source>
         <translation>Nachtmodus aktivieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11698"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11616"/>
         <source>Side by Side</source>
         <translation>Side by Side</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11700"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11618"/>
         <source>Discard Side by Side</source>
         <translation>Side by Side verwerfen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11702"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11620"/>
         <source>Top and Bottom</source>
         <translation>Top and Bottom</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11704"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11622"/>
         <source>Discard Top and Bottom</source>
         <translation>Top and Bottom verwerfen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11981"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11899"/>
         <source>Disable Subtitles</source>
         <translation>Untertitel ausschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11987"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11905"/>
         <source>Enable Subtitles</source>
         <translation>Untertitel einschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11995"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11913"/>
         <source>Disable Forced Subtitles</source>
         <translation>Erzwungene Untertitel deaktivieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12004"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11922"/>
         <source>Enable Forced Subtitles</source>
         <translation>Erzwungene Untertitel aktivieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12011"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11929"/>
         <source>Disable External Subtitles</source>
         <translation>Externe Untertitiel deaktivieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12017"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11935"/>
         <source>Enable External Subtitles</source>
         <translation>Externe Untertitel aktivieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12514"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12432"/>
         <source>Playback</source>
         <translation>Wiedergabe</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12041"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11959"/>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12041"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11959"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12126"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12044"/>
         <source>Toggle Browse Mode</source>
         <translation>Browsemodus umschalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12131"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12049"/>
         <source>Cancel Playlist</source>
         <translation>Abspielliste abbrechen</translation>
     </message>
@@ -30306,22 +30316,22 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Wiedergabedaten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12053"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11971"/>
         <source>Open Live TV PIP</source>
         <translation>Öffne LiveTV PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12062"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11980"/>
         <source>Open Live TV PBP</source>
         <translation>Öffne LiveTV PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12070"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11988"/>
         <source>Open Recording PIP</source>
         <translation>Öffne Aufnahmen PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12078"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11996"/>
         <source>Open Recording PBP</source>
         <translation>Öffne Aufnahmen PBP</translation>
     </message>
@@ -30342,65 +30352,65 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">PIPs schliessen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12110"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12028"/>
         <source>Swap Windows</source>
         <translation>Fenster tauschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12120"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12038"/>
         <source>Switch to PIP</source>
         <translation>Wechsel zu PIP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12120"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12038"/>
         <source>Switch to PBP</source>
         <translation>Wechsel zu PBP</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="13386"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="13304"/>
         <source>No, keep it</source>
         <translation>Nein, behalten</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11951"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11961"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11869"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11879"/>
         <source>Auto Detect</source>
         <translation>Autom. Erkennung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12429"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12347"/>
         <source>(I)</source>
         <comment>Interlaced (Normal)</comment>
         <translation>(I)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12431"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12349"/>
         <source>(i)</source>
         <comment>Interlaced (Reversed)</comment>
         <translation>(i)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12433"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12351"/>
         <source>(P)</source>
         <comment>Progressive</comment>
         <translation>(P)</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12506"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12424"/>
         <source>Video Scan</source>
         <translation>Bildabtastung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="12951"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="12869"/>
         <source>Error: MythTV is using all inputs, but there are no active recordings?</source>
         <translation>Fehler: Alle Eingänge sind belegt, aber es gibt keine laufenden Aufnahmen?</translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/tv_play.cpp" line="8447"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11799"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11800"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11801"/>
-        <location filename="../libs/libmythtv/tv_play.cpp" line="11802"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="8440"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11717"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11718"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11719"/>
+        <location filename="../libs/libmythtv/tv_play.cpp" line="11720"/>
         <location filename="../libs/libmythtv/tvbrowsehelper.cpp" line="26"/>
         <location filename="../libs/libmythtv/tvbrowsehelper.cpp" line="310"/>
         <source>%n minute(s)</source>
@@ -30579,7 +30589,7 @@ Möchten Sie weitersehen?</translation>
         <translation>Sender:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1026"/>
+        <location filename="../themes/themestrings.h" line="1025"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
         <translation>Sie haben noch keine Aufnahmen geplant</translation>
     </message>
@@ -30703,7 +30713,7 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Hier die Beschreibung einfügen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1043"/>
+        <location filename="../themes/themestrings.h" line="1042"/>
         <source>Prev</source>
         <translation>Letztes</translation>
     </message>
@@ -30840,17 +30850,17 @@ Möchten Sie weitersehen?</translation>
         <translation>Letztes</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="908"/>
+        <location filename="../themes/themestrings.h" line="907"/>
         <source>Arclight is a sleek theme meant for widescreen HD displays.  It is high contrast and uses shapes and an attractive layout to convey information simply and consistently.</source>
         <translation>Arclight ist ein schlichtes Theme gedacht für Breitbild HD-Displays.  Es ist kontrastreich und nutzt Formen und ein attraktives Layout, um Informationen einfach und konsistent zu übermitteln.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="972"/>
+        <location filename="../themes/themestrings.h" line="971"/>
         <source>Childish is the first MythTV theme designed specifically with children in mind.  It was the winner of MythTV&apos;s v0.23 theming contest.</source>
         <translation>Childish ist das erste MythTV Theme, welches speziell für Kinder entwickelt wurde.  Es ist der Gewinner des MythTV 0.23 Theme Wettbewerbs.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1006"/>
+        <location filename="../themes/themestrings.h" line="1005"/>
         <source>Theater name</source>
         <translation>Name des Kinos</translation>
     </message>
@@ -31007,7 +31017,7 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">DVD-Wiedergabe und Import einrichten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="852"/>
+        <location filename="../themes/themestrings.h" line="851"/>
         <source>Date:</source>
         <translation>Datum:</translation>
     </message>
@@ -31021,22 +31031,22 @@ Möchten Sie weitersehen?</translation>
         <translation type="vanished">Bewegen Sie den gewählten Pfeil in die Ecke des Bildschirms.  Drücken Sie SELECT, um den anderen Pfeil auszuwählen.  Drücken Sie MENÜ, um die Bewegungssensitivität einzustellen oder um ohne zu Speichern zu beenden.  Wenn Sie fertig sind, drücken Sie die ZURÜCK-Taste.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="792"/>
+        <location filename="../themes/themestrings.h" line="791"/>
         <source>Go up a level</source>
         <translation>Eine Ebene hochsteigen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="794"/>
+        <location filename="../themes/themestrings.h" line="793"/>
         <source>Twitter Timeline</source>
         <translation>Twitter Zeitleiste</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="795"/>
+        <location filename="../themes/themestrings.h" line="794"/>
         <source>Edit Channels</source>
         <translation>Sender bearbeiten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="796"/>
+        <location filename="../themes/themestrings.h" line="795"/>
         <source>Modify, Add, and Delete television channels.</source>
         <translation>TV-Sender bearbeiten, hinzufügen und löschen.</translation>
     </message>
@@ -31045,37 +31055,37 @@ Möchten Sie weitersehen?</translation>
         <translation type="obsolete">Quelle löschen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="798"/>
+        <location filename="../themes/themestrings.h" line="797"/>
         <source>Import Icons</source>
         <translation>Logos importieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="799"/>
+        <location filename="../themes/themestrings.h" line="798"/>
         <source>Edit On Screen Display</source>
         <translation>On-Screen-Display bearbeiten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="800"/>
+        <location filename="../themes/themestrings.h" line="799"/>
         <source>Select the menu items you want to see by playback mode.</source>
         <translation>Wählen Sie die Menüeinträge, welche Sie im Wiedergabemodus angezeigt bekommen wollen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="801"/>
+        <location filename="../themes/themestrings.h" line="800"/>
         <source>OSD Context</source>
         <translation>OSD-Kontext</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="802"/>
+        <location filename="../themes/themestrings.h" line="801"/>
         <source>OSD Menu Items</source>
         <translation>OSD-Menüpunkte</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="821"/>
+        <location filename="../themes/themestrings.h" line="820"/>
         <source>Edit Key Bindings</source>
         <translation>Tastenbelegung ändern</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="822"/>
+        <location filename="../themes/themestrings.h" line="821"/>
         <source>Assign custom keys to MythTV shortcuts.</source>
         <translation>Benutzerdefinierte Tasten zu den MythTV-Shortcuts hinzufügen.</translation>
     </message>
@@ -31247,12 +31257,12 @@ Möchten Sie weitersehen?</translation>
         <translation>Fanart</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1041"/>
+        <location filename="../themes/themestrings.h" line="1040"/>
         <source>This is the classic Mythbuntu theme. It is not actively developed, but patches are accepted.</source>
         <translation>Dies ist das klassische Mythbuntu Theme. Es wird nicht aktiv weiterentwickelt. Patches werden jedoch angenommen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1049"/>
+        <location filename="../themes/themestrings.h" line="1048"/>
         <source>%|RATING| %%|(STARS|) %%DESCRIPTION%%
 
 Part |PARTNUMBER| of %%PARTTOTAL%</source>
@@ -31261,52 +31271,52 @@ Part |PARTNUMBER| of %%PARTTOTAL%</source>
 Teil |PARTNUMBER| von %%PARTTOTAL%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1054"/>
+        <location filename="../themes/themestrings.h" line="1053"/>
         <source>Released %1</source>
         <translation>Erschienen %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="793"/>
+        <location filename="../themes/themestrings.h" line="792"/>
         <source>User Rating: %1</source>
         <translation>Bewertung: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="804"/>
+        <location filename="../themes/themestrings.h" line="803"/>
         <source>Submit Your Hardware Profile</source>
         <translation>Hardwareprofil übermitteln</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="805"/>
+        <location filename="../themes/themestrings.h" line="804"/>
         <source>Visit Your Hardware Profile</source>
         <translation>Hardwareprofil ansehen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="806"/>
+        <location filename="../themes/themestrings.h" line="805"/>
         <source>Delete Your Hardware Profile</source>
         <translation>Hardwareprofil löschen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="807"/>
+        <location filename="../themes/themestrings.h" line="806"/>
         <source>Your profile is located at:</source>
         <translation>Ihr Hardwareprofil ist abgelegt unter: </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="808"/>
+        <location filename="../themes/themestrings.h" line="807"/>
         <source>Your profile&apos;s admin password is:</source>
         <translation>Das Admin-Passwort Ihres Profils ist:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="810"/>
+        <location filename="../themes/themestrings.h" line="809"/>
         <source>My receiver supports Dolby Digital Plus</source>
         <translation>Mein Receiver unterstützt Dolby Digital Plus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="812"/>
+        <location filename="../themes/themestrings.h" line="811"/>
         <source>My receiver supports DTS-HD</source>
         <translation>Mein Receiver unterstützt DTS-HD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="813"/>
+        <location filename="../themes/themestrings.h" line="812"/>
         <source>My receiver supports TrueHD</source>
         <translation>Mein Receiver unterstützt TrueHD</translation>
     </message>
@@ -31315,27 +31325,27 @@ Teil |PARTNUMBER| von %%PARTTOTAL%</translation>
         <translation type="vanished">Staffel %SEASON%, Episode %EPISODE%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="825"/>
+        <location filename="../themes/themestrings.h" line="824"/>
         <source>Edit the details about this channel.</source>
         <translation>Senderdetails bearbeiten.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="826"/>
+        <location filename="../themes/themestrings.h" line="825"/>
         <source>Channel #:</source>
         <translation>Sender #:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="827"/>
+        <location filename="../themes/themestrings.h" line="826"/>
         <source>Chan Name:</source>
         <translation>Sendername:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="828"/>
+        <location filename="../themes/themestrings.h" line="827"/>
         <source>XMLTV #:</source>
         <translation>XMLTV #:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="658"/>
+        <location filename="../themes/themestrings.h" line="657"/>
         <source>Frame %1</source>
         <translation>Frame %1</translation>
     </message>
@@ -31345,102 +31355,102 @@ Teil |PARTNUMBER| von %%PARTTOTAL%</translation>
         <translation>%TITLE%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="829"/>
+        <location filename="../themes/themestrings.h" line="828"/>
         <source>%00x00| - %%SUBTITLE%</source>
         <translation>%00x00| - %%SUBTITLE%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="830"/>
+        <location filename="../themes/themestrings.h" line="829"/>
         <source>Recording...</source>
         <translation>Aufnahme läuft...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="831"/>
+        <location filename="../themes/themestrings.h" line="830"/>
         <source>Transcoding...</source>
         <translation>Umwandlung läuft...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="832"/>
+        <location filename="../themes/themestrings.h" line="831"/>
         <source>Original Airdate: %1</source>
         <translation>Produktionsjahr/Sendezeit: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="833"/>
+        <location filename="../themes/themestrings.h" line="832"/>
         <source>Custom Export</source>
         <translation>Freier Export</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="834"/>
+        <location filename="../themes/themestrings.h" line="833"/>
         <source>Directory Format</source>
         <translation>Verzeichnisformat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="835"/>
+        <location filename="../themes/themestrings.h" line="834"/>
         <source>File Format</source>
         <translation>Dateiformat</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="836"/>
+        <location filename="../themes/themestrings.h" line="835"/>
         <source>Export</source>
         <translation>Export</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="837"/>
+        <location filename="../themes/themestrings.h" line="836"/>
         <source>Change Group View</source>
         <translation>Gruppenansicht wechseln</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="838"/>
+        <location filename="../themes/themestrings.h" line="837"/>
         <source>Enable and disable the checkboxes below to filter the way recordings are displayed.</source>
         <translation>Benutzer Sie die unteren Auswahlfelder, um die Anzeigeart der Aufnahmen zu ändern.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="839"/>
+        <location filename="../themes/themestrings.h" line="838"/>
         <source>Show Program Titles</source>
         <translation>Sendungstitel zeigen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="840"/>
+        <location filename="../themes/themestrings.h" line="839"/>
         <source>Show Program Categories</source>
         <translation>Sendungskategorien zeigen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="841"/>
+        <location filename="../themes/themestrings.h" line="840"/>
         <source>Show Live TV</source>
         <translation>LiveTV zeigen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="842"/>
+        <location filename="../themes/themestrings.h" line="841"/>
         <source>Change Group Password</source>
         <translation>Gruppenpasswort ändern</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="843"/>
+        <location filename="../themes/themestrings.h" line="842"/>
         <source>Old:</source>
         <translation>Alt:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="844"/>
+        <location filename="../themes/themestrings.h" line="843"/>
         <source>New:</source>
         <translation>Neu:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="845"/>
+        <location filename="../themes/themestrings.h" line="844"/>
         <source>Change Filter</source>
         <translation>Filter ändern</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="696"/>
+        <location filename="../themes/themestrings.h" line="695"/>
         <source>Status Icon Help</source>
         <translation>Symbolerklärung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="846"/>
+        <location filename="../themes/themestrings.h" line="845"/>
         <source>These icons represent information about your recordings.</source>
         <translation>Diese Icons zeigen Informationen über Ihre Aufnahmen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="847"/>
+        <location filename="../themes/themestrings.h" line="846"/>
         <source>Using the text areas below, you can change the recording title, subtitle, and description.
 
 Once you have completed your modifications, click the &quot;OK&quot; button.</source>
@@ -31453,32 +31463,32 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="vanished">(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="850"/>
+        <location filename="../themes/themestrings.h" line="849"/>
         <source>Manually Schedule A Recording</source>
         <translation>Manuelle Aufnahme</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="719"/>
+        <location filename="../themes/themestrings.h" line="718"/>
         <source>To manually schedule a recording, enter a title (optional).  Then set the channel, date, start time, and duration of your recording.  Note that this recording will not have any listings data or other information provided by an EPG.</source>
         <translation>Für eine manuelle Aufnahme können Sie einen Titel eingeben, ansonsten wird er automatisch gewählt.  Dann wählen Sie Sender, Datum, Startzeit und Dauer der Aufnahme.  Beachten Sie, dass manuelle Aufnahmen nicht mit Daten aus dem EPG gefüllt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="853"/>
+        <location filename="../themes/themestrings.h" line="852"/>
         <source>Hour:</source>
         <translation>Stunde:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="854"/>
+        <location filename="../themes/themestrings.h" line="853"/>
         <source>Minute:</source>
         <translation>Minute:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="855"/>
+        <location filename="../themes/themestrings.h" line="854"/>
         <source>No Recordings Scheduled...</source>
         <translation>Keine Aufnahmen geplant...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="856"/>
+        <location filename="../themes/themestrings.h" line="855"/>
         <source>Filter: %1</source>
         <translation>Filter: %1</translation>
     </message>
@@ -31487,7 +31497,7 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="vanished">Um die Priorität eines Senders zu ändern, wählen Sie ihn in der Liste aus. Mit den Pfeilen links/rechts können Sie die Priorität senken/erhöhen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="896"/>
+        <location filename="../themes/themestrings.h" line="895"/>
         <source>Program Title</source>
         <translation>Sendungstitel</translation>
     </message>
@@ -31504,27 +31514,27 @@ Once you have completed your rule, can can Test, Delete, or Install it right awa
 Wenn Sie Ihre Regel fertiggestellt haben können Sie sie anschließend testen, löschen oder installieren.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="859"/>
+        <location filename="../themes/themestrings.h" line="858"/>
         <source>Existing:</source>
         <translation>Bestehende:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="860"/>
+        <location filename="../themes/themestrings.h" line="859"/>
         <source>Clause:</source>
         <translation>Klausel:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="861"/>
+        <location filename="../themes/themestrings.h" line="860"/>
         <source>Clause SQL:</source>
         <translation>SQL-Klausel:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="862"/>
+        <location filename="../themes/themestrings.h" line="861"/>
         <source>Click to add clause...</source>
         <translation>Klicken, um eine Klausel hinzuzufügen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="863"/>
+        <location filename="../themes/themestrings.h" line="862"/>
         <source>Edit Power Search</source>
         <translation>Erweiterte Suche bearbeiten</translation>
     </message>
@@ -31537,27 +31547,27 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
 Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="730"/>
+        <location filename="../themes/themestrings.h" line="729"/>
         <source>Below you will find the program details of the selected item.  There are two available screens.  You can toggle between them by pressing INFO.</source>
         <translation>Unterhalb finden Sie Details zum gewählten Programm. Es gibt zwei Ansichten, diese können Sie mit der INFO-Taste durchschalten.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="867"/>
+        <location filename="../themes/themestrings.h" line="866"/>
         <source>First Letter:</source>
         <translation>Erster Buchstabe:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="740"/>
+        <location filename="../themes/themestrings.h" line="739"/>
         <source>Preview Schedule</source>
         <translation>Letzte Planung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="869"/>
+        <location filename="../themes/themestrings.h" line="868"/>
         <source>Select the options for this recording.</source>
         <translation>Wählen Sie die Optionen für diese Aufnahme.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="870"/>
+        <location filename="../themes/themestrings.h" line="869"/>
         <source>-%n</source>
         <translation>
             <numerusform>-%n</numerusform>
@@ -31565,12 +31575,12 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="871"/>
+        <location filename="../themes/themestrings.h" line="870"/>
         <source>Normal</source>
         <translation>Normal</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="872"/>
+        <location filename="../themes/themestrings.h" line="871"/>
         <source>+%n</source>
         <translation>
             <numerusform>+%n</numerusform>
@@ -31578,17 +31588,17 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="873"/>
+        <location filename="../themes/themestrings.h" line="872"/>
         <source>Input:</source>
         <translation>Eingang:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="874"/>
+        <location filename="../themes/themestrings.h" line="873"/>
         <source>Start Offset:</source>
         <translation>Aufnahmebeginn:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="875"/>
+        <location filename="../themes/themestrings.h" line="874"/>
         <source>%n minute(s) late</source>
         <translation>
             <numerusform>%n Minute später</numerusform>
@@ -31596,12 +31606,12 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="876"/>
+        <location filename="../themes/themestrings.h" line="875"/>
         <source>Start on time</source>
         <translation>Pünktlich starten</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="877"/>
+        <location filename="../themes/themestrings.h" line="876"/>
         <source>%n minute(s) early</source>
         <translation>
             <numerusform>%n Minute früher</numerusform>
@@ -31609,87 +31619,87 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="878"/>
+        <location filename="../themes/themestrings.h" line="877"/>
         <source>End Offset:</source>
         <translation>Aufnahmeende:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="879"/>
+        <location filename="../themes/themestrings.h" line="878"/>
         <source>End on time</source>
         <translation>Pünktlich enden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="880"/>
+        <location filename="../themes/themestrings.h" line="879"/>
         <source>Dup Method:</source>
         <translation>Methode für Wdhgn:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="881"/>
+        <location filename="../themes/themestrings.h" line="880"/>
         <source>Dup Scope:</source>
         <translation>Bereich der Wdhgn:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="882"/>
+        <location filename="../themes/themestrings.h" line="881"/>
         <source>Recording Rule is Active</source>
         <translation>Aufnahmeregel ist aktiv</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="884"/>
+        <location filename="../themes/themestrings.h" line="883"/>
         <source>Select how the recording file should be treated.</source>
         <translation>Wählen Sie, wie die Aufnahmedatei behandelt werden soll.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="885"/>
+        <location filename="../themes/themestrings.h" line="884"/>
         <source>Rec. Profile:</source>
         <translation>Aufnahmeprofil:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="886"/>
+        <location filename="../themes/themestrings.h" line="885"/>
         <source>Rec. Group:</source>
         <translation>Aufnahmegruppe:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="887"/>
+        <location filename="../themes/themestrings.h" line="886"/>
         <source>Strg. Group:</source>
         <translation>Speichergruppe:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="888"/>
+        <location filename="../themes/themestrings.h" line="887"/>
         <source>Play Group:</source>
         <translation>Wiedergabegruppe:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="889"/>
+        <location filename="../themes/themestrings.h" line="888"/>
         <source>Max to Keep:</source>
         <translation>Max. behalten:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="890"/>
+        <location filename="../themes/themestrings.h" line="889"/>
         <source>Max Newest:</source>
         <translation>Max. Neueste:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="891"/>
+        <location filename="../themes/themestrings.h" line="890"/>
         <source>Allow Recordings to Auto-Expire</source>
         <translation>Automatisches Löschen aktivieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="892"/>
+        <location filename="../themes/themestrings.h" line="891"/>
         <source>Post Processing Options</source>
         <translation>Nachbearbeitung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="893"/>
+        <location filename="../themes/themestrings.h" line="892"/>
         <source>Select any jobs you want run on the recording.</source>
         <translation>Wählen Sie alle Jobs, die zu dieser Aufnahme laufen sollen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="894"/>
+        <location filename="../themes/themestrings.h" line="893"/>
         <source>Automatically Commercial Flag Recordings</source>
         <translation>Autom. auf Werbung untersuchen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="895"/>
+        <location filename="../themes/themestrings.h" line="894"/>
         <source>Automatically Transcode Recordings</source>
         <translation>Aufnahmen autom. umwandeln</translation>
     </message>
@@ -31699,12 +31709,12 @@ Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
         <translation>Auftrag 2 starten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="897"/>
+        <location filename="../themes/themestrings.h" line="896"/>
         <source>Last Recorded/Priority</source>
         <translation>Zuletzt aufgenommen/Priorität</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="706"/>
+        <location filename="../themes/themestrings.h" line="705"/>
         <source>Create a Custom Recording Rule</source>
         <translation>Manuelle Aufnahmeregel hinzufügen</translation>
     </message>
@@ -31715,42 +31725,42 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="vanished">Um eine manuelle Aufnahmeregel hinzuzufügen, können Sie entweder eine existierende Regel auswählen oder eine Neue hinzufügen, indem Sie einen Namen eingeben. Dann wählen Sie einen Regeltyp und drücken Enter. Der entsprechende SQL-Code wird unten eingefügt. Sie können dann Informationen zur Aufnahme hinzufügen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="899"/>
+        <location filename="../themes/themestrings.h" line="898"/>
         <source>Rule Type:</source>
         <translation>Regeltyp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="900"/>
+        <location filename="../themes/themestrings.h" line="899"/>
         <source>Rule SQL:</source>
         <translation>SQL-Regel:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="708"/>
+        <location filename="../themes/themestrings.h" line="707"/>
         <source>Tables:</source>
         <translation>Tabellen:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="901"/>
+        <location filename="../themes/themestrings.h" line="900"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded...</source>
         <translation>Sie haben noch keine Aufnahmen geplant...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="904"/>
+        <location filename="../themes/themestrings.h" line="903"/>
         <source>By %1</source>
         <translation>Um %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="905"/>
+        <location filename="../themes/themestrings.h" line="904"/>
         <source>Native Resolution: %1</source>
         <translation>Native Auflösung: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="906"/>
+        <location filename="../themes/themestrings.h" line="905"/>
         <source>Version %1</source>
         <translation>Version %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="907"/>
+        <location filename="../themes/themestrings.h" line="906"/>
         <source>Learn what your system is up to.</source>
         <translation>Anzeigen, was das System tut.</translation>
     </message>
@@ -31764,7 +31774,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">(%STARTTIME% - %ENDTIME%) %LENMINS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="980"/>
+        <location filename="../themes/themestrings.h" line="979"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
         <translation>%PLAYEDTIME% von %TOTALTIME% %(|REMAININGTIME| übrig)%%(|BEHINDTIME| zurück)%</translation>
     </message>
@@ -31877,42 +31887,42 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">Blue Abstract benutzt mehrere der klassischen MythTV Layouts, die Gebrauch der neuen MythUI-Features machen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="909"/>
+        <location filename="../themes/themestrings.h" line="908"/>
         <source>Type your tweet below.  Select &quot;Send&quot; to submit it.</source>
         <translation>Geben Sie unten ihren Tweet ein und wählen Sie &quot;Senden&quot;, um ihn abzusenden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="910"/>
+        <location filename="../themes/themestrings.h" line="909"/>
         <source>Send</source>
         <translation>Senden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="911"/>
+        <location filename="../themes/themestrings.h" line="910"/>
         <source>Enter Your Twitter Login Details</source>
         <translation>Geben Sie ihre Zugangsdaten für Twitter ein</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="912"/>
+        <location filename="../themes/themestrings.h" line="911"/>
         <source>Login:</source>
         <translation>Benutzername:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="913"/>
+        <location filename="../themes/themestrings.h" line="912"/>
         <source>Password:</source>
         <translation>Passwort:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="914"/>
+        <location filename="../themes/themestrings.h" line="913"/>
         <source>Send a Tweet</source>
         <translation>Einen Tweet senden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="950"/>
+        <location filename="../themes/themestrings.h" line="949"/>
         <source>MythTV is idle and will shut down shortly.</source>
         <translation>MythTV ist untätig und wird in Kürze ausschalten.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="951"/>
+        <location filename="../themes/themestrings.h" line="950"/>
         <source>Current Recording(s):</source>
         <translation>Laufende Aufnahmen:</translation>
     </message>
@@ -31922,7 +31932,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>Ermittle den Aufnahmestatus...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="952"/>
+        <location filename="../themes/themestrings.h" line="951"/>
         <source>Next Scheduled Recording(s):</source>
         <translation>Die nächsten geplanten Aufnahmen:</translation>
     </message>
@@ -31932,17 +31942,17 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>Ermittle die geplanten Aufnahmen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="955"/>
+        <location filename="../themes/themestrings.h" line="954"/>
         <source>Up</source>
         <translation>Hoch</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="956"/>
+        <location filename="../themes/themestrings.h" line="955"/>
         <source>Please wait...</source>
         <translation>Bitte warten...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="957"/>
+        <location filename="../themes/themestrings.h" line="956"/>
         <source>Icon Downloader</source>
         <translation>Logo Downloader</translation>
     </message>
@@ -31959,32 +31969,32 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">Menüeintrag</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="958"/>
+        <location filename="../themes/themestrings.h" line="957"/>
         <source>Program Search</source>
         <translation>Programmsuche</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="959"/>
+        <location filename="../themes/themestrings.h" line="958"/>
         <source>Optical</source>
         <translation>Optisch</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="960"/>
+        <location filename="../themes/themestrings.h" line="959"/>
         <source>Info Center</source>
         <translation>Info-Zentrale</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="760"/>
+        <location filename="../themes/themestrings.h" line="759"/>
         <source>Rating:</source>
         <translation>Bewertung:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="962"/>
+        <location filename="../themes/themestrings.h" line="961"/>
         <source>Running Time:</source>
         <translation>Länge:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="963"/>
+        <location filename="../themes/themestrings.h" line="962"/>
         <source>Show Times:</source>
         <translation>Zeiten anzeigen:</translation>
     </message>
@@ -32001,175 +32011,175 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">0 MB</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="965"/>
+        <location filename="../themes/themestrings.h" line="964"/>
         <source>Channel Priorities</source>
         <translation>Senderprioritäten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="967"/>
+        <location filename="../themes/themestrings.h" line="966"/>
         <source>Hello</source>
         <translation>Hallo</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="970"/>
+        <location filename="../themes/themestrings.h" line="969"/>
         <source>Program List</source>
         <translation>TV-Programm</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="977"/>
+        <location filename="../themes/themestrings.h" line="976"/>
         <source>Filename</source>
         <translation>Dateiname</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="978"/>
+        <location filename="../themes/themestrings.h" line="977"/>
         <source>Select an Icon</source>
         <translation>Logo wählen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="979"/>
+        <location filename="../themes/themestrings.h" line="978"/>
         <source>Icon Download Status...</source>
         <translation>Logo Download Status...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="981"/>
+        <location filename="../themes/themestrings.h" line="980"/>
         <source>%|&quot;SUBTITLE|&quot;%</source>
         <translation>%|&quot;SUBTITLE|&quot;%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="982"/>
+        <location filename="../themes/themestrings.h" line="981"/>
         <source>No Recordings Present...</source>
         <translation>Keine Aufnahmen vorhanden...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="983"/>
+        <location filename="../themes/themestrings.h" line="982"/>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
         <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="984"/>
+        <location filename="../themes/themestrings.h" line="983"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
         <translation>Sie haben noch keine Aufnahmen geplant.
  Um eine Aufnahme zu planen, wählen Sie &quot;Übersicht&quot; oder &quot;Suche&quot; </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="985"/>
+        <location filename="../themes/themestrings.h" line="984"/>
         <source>Search Term</source>
         <translation>Suchbegriff</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="986"/>
+        <location filename="../themes/themestrings.h" line="985"/>
         <source>Show Name:</source>
         <translation>Name der Sendung:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="987"/>
+        <location filename="../themes/themestrings.h" line="986"/>
         <source>Air Date:</source>
         <translation>Sendezeit:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="989"/>
+        <location filename="../themes/themestrings.h" line="988"/>
         <source>Dupe Method:</source>
         <translation>Methode für Wdhg.:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="990"/>
+        <location filename="../themes/themestrings.h" line="989"/>
         <source>Dupe Scope:</source>
         <translation>Bereich der Wdhgn:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="991"/>
+        <location filename="../themes/themestrings.h" line="990"/>
         <source>Rec Profile:</source>
         <translation>Aufnahmeprofil:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="992"/>
+        <location filename="../themes/themestrings.h" line="991"/>
         <source>Rec Group:</source>
         <translation>Aufnahmegruppe:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="993"/>
+        <location filename="../themes/themestrings.h" line="992"/>
         <source># to Keep:</source>
         <translation># zu behalten:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="994"/>
+        <location filename="../themes/themestrings.h" line="993"/>
         <source>Limit Handling:</source>
         <translation>Handling von Limits:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="995"/>
+        <location filename="../themes/themestrings.h" line="994"/>
         <source>Graphite is a theme emphasizing MythUI interface improvements such as alpha, animation, unique layouts, and user-supplied backdrop content.  It is extremely memory-hungry.</source>
         <translation>Graphite hebt die Neuerungen des MythUI Interfaces hervor und nutzt u. a. Transparenz, Animation, einzigartige Layouts und benutzergenerierten Hintergrund. Es ist extrem speicherfressend.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="996"/>
+        <location filename="../themes/themestrings.h" line="995"/>
         <source>Airdate:</source>
         <translation>Datum der Ausstrahlung:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1000"/>
+        <location filename="../themes/themestrings.h" line="999"/>
         <source>This is a Christmas version of the popular MythCenter-wide theme with animated snow backgrounds and festive colour scheme.</source>
         <translation>Dies ist die Weihnachtsversion des beliebten Theme MythCenter-wide, mit animierten Schneehintergründen und festlichem Farbschema.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1001"/>
+        <location filename="../themes/themestrings.h" line="1000"/>
         <source>No videos in library, or no files found.
  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
         <translation>Keine Videos in der Bibliothek, oder keine Dateien gefunden.
  Wenn ein videoverzeichnis konfiguriert wurde, drücken Sie &quot;M&quot; (oder den Menü-Knopf) und wählen Sie &quot;Nach Videos suchen&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1002"/>
+        <location filename="../themes/themestrings.h" line="1001"/>
         <source>Filters Video List</source>
         <translation>Filtert die Videoliste</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1004"/>
+        <location filename="../themes/themestrings.h" line="1003"/>
         <source>%TITLESUBTITLE% %YEARSTARS%</source>
         <translation>%TITLESUBTITLE% %YEARSTARS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1007"/>
+        <location filename="../themes/themestrings.h" line="1006"/>
         <source>%DESCRIPTION% %(|EXTRA|)%</source>
         <translation>%DESCRIPTION% %(|EXTRA|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1008"/>
+        <location filename="../themes/themestrings.h" line="1007"/>
         <source>%DESCRIPTION% %
 (|EXTRA|)%</source>
         <translation>%DESCRIPTION% %
 (|EXTRA|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1012"/>
+        <location filename="../themes/themestrings.h" line="1011"/>
         <source>No Recordings available, or screen loading...</source>
         <translation>Keine Aufnahmen verfügbar oder lädt noch...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1014"/>
+        <location filename="../themes/themestrings.h" line="1013"/>
         <source>%STARTTIME%%-|ENDTIME| %%00X00| %
 %&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|)%</source>
         <translation>%STARTTIME%%-|ENDTIME| %%00X00| %
 %&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1039"/>
+        <location filename="../themes/themestrings.h" line="1038"/>
         <source>(1) All (2) Important</source>
         <translation>(1) Alle (2) Wichtige</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1022"/>
+        <location filename="../themes/themestrings.h" line="1021"/>
         <source>Schedule Options Editor</source>
         <translation>Planungsoptionen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1024"/>
+        <location filename="../themes/themestrings.h" line="1023"/>
         <source>Storage Options Editor</source>
         <translation>Speicheroptionen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1025"/>
+        <location filename="../themes/themestrings.h" line="1024"/>
         <source>Post Processing Editor</source>
         <translation>Nachbearbeitungseditor</translation>
     </message>
@@ -32219,7 +32229,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">TV-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="662"/>
+        <location filename="../themes/themestrings.h" line="661"/>
         <source>DVD</source>
         <translation>DVD</translation>
     </message>
@@ -32245,7 +32255,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>Untersuchen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="732"/>
+        <location filename="../themes/themestrings.h" line="731"/>
         <source>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</source>
         <translation>%YEARSTARS% %DESCRIPTION% %LONGREPEAT%</translation>
     </message>
@@ -32254,7 +32264,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">Cert.:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1033"/>
+        <location filename="../themes/themestrings.h" line="1032"/>
         <source>Age:</source>
         <translation>Alter:</translation>
     </message>
@@ -32263,72 +32273,72 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">TMDB/TVDB Nr.:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1035"/>
+        <location filename="../themes/themestrings.h" line="1034"/>
         <source>Unique Player:</source>
         <translation>Eigener Player:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1034"/>
+        <location filename="../themes/themestrings.h" line="1033"/>
         <source>Search...</source>
         <translation>Suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1042"/>
+        <location filename="../themes/themestrings.h" line="1041"/>
         <source>%DATE%   %TIME%</source>
         <translation>%DATE%   %TIME%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1044"/>
+        <location filename="../themes/themestrings.h" line="1043"/>
         <source>unrestricted</source>
         <translation>Uneingeschränkt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1045"/>
+        <location filename="../themes/themestrings.h" line="1044"/>
         <source>partially restricted</source>
         <translation>Teilweise eingeschränkt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1046"/>
+        <location filename="../themes/themestrings.h" line="1045"/>
         <source>mostly restricted</source>
         <translation>Hauptsächlich eingeschränkt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1047"/>
+        <location filename="../themes/themestrings.h" line="1046"/>
         <source>restricted</source>
         <translation>Eingeschränkt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1048"/>
+        <location filename="../themes/themestrings.h" line="1047"/>
         <source>(%1)</source>
         <translation>(%1)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1051"/>
+        <location filename="../themes/themestrings.h" line="1050"/>
         <source>%|RATING| %%|(STARS|) %%DESCRIPTION%</source>
         <translation>%|RATING| %%|(STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1011"/>
+        <location filename="../themes/themestrings.h" line="1010"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1053"/>
+        <location filename="../themes/themestrings.h" line="1052"/>
         <source>%1 matches</source>
         <translation>%1 Treffer</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1032"/>
+        <location filename="../themes/themestrings.h" line="1031"/>
         <source>%TITLE%% - |SUBTITLE%</source>
         <translation>%TITLE%% - |SUBTITLE%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1016"/>
+        <location filename="../themes/themestrings.h" line="1015"/>
         <source>Showing: %1</source>
         <translation>Zeige: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1028"/>
+        <location filename="../themes/themestrings.h" line="1027"/>
         <source>%DESCRIPTION|
 %%ERRATA%</source>
         <translation>%DESCRIPTION|
@@ -32343,47 +32353,47 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="vanished">%year%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1055"/>
+        <location filename="../themes/themestrings.h" line="1054"/>
         <source>Channel Icons</source>
         <translation>Sendericons</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1058"/>
+        <location filename="../themes/themestrings.h" line="1057"/>
         <source>Storage to Buffer</source>
         <translation>Speicher zu Puffer</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1059"/>
+        <location filename="../themes/themestrings.h" line="1058"/>
         <source>: %1</source>
         <translation>: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1060"/>
+        <location filename="../themes/themestrings.h" line="1059"/>
         <source>Buffer to Decoder</source>
         <translation>Puffer zu Decoder</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1061"/>
+        <location filename="../themes/themestrings.h" line="1060"/>
         <source>Available Buffer</source>
         <translation>Verfügbarer Puffer</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1062"/>
+        <location filename="../themes/themestrings.h" line="1061"/>
         <source>: %BUFFERAVAIL% of %BUFFERSIZE%Mb</source>
         <translation>: %BUFFERAVAIL% of %BUFFERSIZE%Mb</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1063"/>
+        <location filename="../themes/themestrings.h" line="1062"/>
         <source>FPS</source>
         <translation>FPS</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1064"/>
+        <location filename="../themes/themestrings.h" line="1063"/>
         <source>A/V Sync</source>
         <translation>A/V Sync</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1065"/>
+        <location filename="../themes/themestrings.h" line="1064"/>
         <source>Frames decoded /free</source>
         <translation>Frames decoded/free</translation>
     </message>
@@ -32392,27 +32402,27 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="vanished">CPUs</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1066"/>
+        <location filename="../themes/themestrings.h" line="1065"/>
         <source>Codec/Dec</source>
         <translation>Codec/Dec</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1067"/>
+        <location filename="../themes/themestrings.h" line="1066"/>
         <source>: %VIDEOCODEC% %VIDEODECODER%</source>
         <translation>: %VIDEOCODEC% %VIDEODECODER%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1068"/>
+        <location filename="../themes/themestrings.h" line="1067"/>
         <source>: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</source>
         <translation>: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1069"/>
+        <location filename="../themes/themestrings.h" line="1068"/>
         <source>Sample rate</source>
         <translation>Sample rate</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1070"/>
+        <location filename="../themes/themestrings.h" line="1069"/>
         <source>%DESCRIPTION% %(|REMAININGTIME|)%%(|BEHINDTIME|)%%VALUE%%UNITS%</source>
         <translation>%DESCRIPTION% %(|REMAININGTIME|)%%(|BEHINDTIME|)%%VALUE%%UNITS%</translation>
     </message>
@@ -32421,22 +32431,22 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation type="obsolete">%STARTDATE%   %STARTTIME% - %ENDTIME%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1072"/>
+        <location filename="../themes/themestrings.h" line="1071"/>
         <source>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;% %|(STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1074"/>
+        <location filename="../themes/themestrings.h" line="1073"/>
         <source>Channel Name:</source>
         <translation>Sendername:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1075"/>
+        <location filename="../themes/themestrings.h" line="1074"/>
         <source>XMLTV ID:</source>
         <translation>XMLTV-ID:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1076"/>
+        <location filename="../themes/themestrings.h" line="1075"/>
         <source>No recordings exist</source>
         <translation>Keine Aufnahme verfügbar</translation>
     </message>
@@ -33094,7 +33104,7 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>Radio streams abspielen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="797"/>
+        <location filename="../themes/themestrings.h" line="796"/>
         <source>Delete Channels</source>
         <translation>Sender löschen</translation>
     </message>
@@ -33111,96 +33121,96 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
         <translation>%TITLE%% - |SUBTITLE%% (|YEAR|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1003"/>
+        <location filename="../themes/themestrings.h" line="1002"/>
         <source>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
 %%YEARSTARS| %%DESCRIPTION%</source>
         <translation>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
 %%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1005"/>
+        <location filename="../themes/themestrings.h" line="1004"/>
         <source>Hide channels without channel number</source>
         <translation>Sender ohne Senderplatz ausblenden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1036"/>
+        <location filename="../themes/themestrings.h" line="1035"/>
         <source>%STARTDATE|, %%STARTTIME%% - |ENDTIME|: %%LENMINS%</source>
         <translation>%STARTDATE|, %%STARTTIME%% - |ENDTIME|: %%LENMINS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1037"/>
+        <location filename="../themes/themestrings.h" line="1036"/>
         <source>%STARTTIME%% - |ENDTIME|: %%LENMINS%</source>
         <translation>%STARTTIME%% - |ENDTIME|: %%LENMINS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1038"/>
+        <location filename="../themes/themestrings.h" line="1037"/>
         <source>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
 %</source>
         <translation>%&quot;|SUBTITLE|&quot; %%00X00| %%(|ORIGINALAIRDATE|)
 %</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1015"/>
+        <location filename="../themes/themestrings.h" line="1014"/>
         <source>%YEARSTARS| %%DESCRIPTION%</source>
         <translation>%YEARSTARS| %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1017"/>
+        <location filename="../themes/themestrings.h" line="1016"/>
         <source>INFO</source>
         <translation>INFO</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1018"/>
+        <location filename="../themes/themestrings.h" line="1017"/>
         <source>for more</source>
         <translation>für mehr</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1019"/>
+        <location filename="../themes/themestrings.h" line="1018"/>
         <source>ZOOMIN</source>
         <translation>ZOOMIN</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1020"/>
+        <location filename="../themes/themestrings.h" line="1019"/>
         <source>ZOOMOUT</source>
         <translation>ZOOMOUT</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1021"/>
+        <location filename="../themes/themestrings.h" line="1020"/>
         <source>to adjust text size</source>
         <translation>um die Schriftgröße anzupassen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1027"/>
+        <location filename="../themes/themestrings.h" line="1026"/>
         <source>For %ASPECT% displays.% By |AUTHORNAME%% &lt;|AUTHOREMAIL|&gt;%.</source>
         <translation>Für %ASPECT% Monitore.% Von |AUTHORNAME%% &lt;|AUTHOREMAIL|&gt;%.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1029"/>
+        <location filename="../themes/themestrings.h" line="1028"/>
         <source>= Update available</source>
         <translation>= Update verfügbar</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1030"/>
+        <location filename="../themes/themestrings.h" line="1029"/>
         <source>A sleek black theme that is the default theme for the Mythbuntu distribution. The Mythbuntu theme is inspired by ProjectGrayhem.</source>
         <translation>Ein dunkles, glänzendes Theme welches Standard bei Mythbuntu ist. Das Mythbuntu Theme ist angelehnt an ProjectGrayhem.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1056"/>
+        <location filename="../themes/themestrings.h" line="1055"/>
         <source>Language Selection</source>
         <translation>Sprachauswahl</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1071"/>
+        <location filename="../themes/themestrings.h" line="1070"/>
         <source>%s00e00%   %STARTDATE%   %STARTTIME%% - |ENDTIME%</source>
         <translation>%s00e00%   %STARTDATE%   %STARTTIME%% - |ENDTIME%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1073"/>
+        <location filename="../themes/themestrings.h" line="1072"/>
         <source>%channum% %callsign%</source>
         <translation>%channum% %callsign%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1078"/>
+        <location filename="../themes/themestrings.h" line="1077"/>
         <source>Using the text areas below, you can change the recording title, subtitle, and description.
 
 Once you have completed your modifications, click the &quot;Save&quot; button.</source>
@@ -33209,22 +33219,22 @@ Once you have completed your modifications, click the &quot;Save&quot; button.</
 Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="741"/>
+        <location filename="../themes/themestrings.h" line="740"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded. To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
         <translation>Sie haben noch keine Aufnahmen geplant. Um eine Aufnahme zu planen, wählen Sie &quot;Übersicht&quot; oder &quot;Suche&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1081"/>
+        <location filename="../themes/themestrings.h" line="1080"/>
         <source>Press Up/Down from letter list, to navigate to another list.  Press Left/Right from Show or Episode list to navigate to another list.</source>
         <translation>Drücken Sie Oben/Unten in der Liste um zu einer anderen Liste zu wechseln.  Drücken Sie Links/Rechts um aus der Sendungs- oder Episodenliste in eine andere Liste zu wechseln. </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1084"/>
+        <location filename="../themes/themestrings.h" line="1083"/>
         <source>Use [Menu] or [PREVVIEW]/[NEXTVIEW] to cycle through other settings</source>
         <translation>Benutzen Sie [Menu] oder [PREVVIEW]/[NEXTVIEW] um die Einstellungen zu wechseln</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1082"/>
+        <location filename="../themes/themestrings.h" line="1081"/>
         <source>%Using the &apos;|TEMPLATE|&apos; template%</source>
         <translation>%Benutze &apos;|TEMPLATE|&apos; Vorlage%</translation>
     </message>
@@ -33233,12 +33243,12 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="obsolete">Blue-abstract ist ein modern aussehenden Theme für Breitbild HD-Displays. Der blaue Hintergrund und das konsistente Layout ergeben ein attraktives und elegant aussehendes Theme. Dieses Theme kann mit 0.26 und höher genutzt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1085"/>
+        <location filename="../themes/themestrings.h" line="1084"/>
         <source>Schedule Type:</source>
         <translation>Planungstyp:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1086"/>
+        <location filename="../themes/themestrings.h" line="1085"/>
         <source>Repeats:</source>
         <translation>Wiederholungen:</translation>
     </message>
@@ -33255,7 +33265,7 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="obsolete">%channel% (%station%)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1164"/>
+        <location filename="../themes/themestrings.h" line="1163"/>
         <source>%1 -</source>
         <translation>%1 -</translation>
     </message>
@@ -33296,12 +33306,12 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="obsolete">Designed um einige andere Elementanordnungen aus 0.25 zu zeigen.  Getestet in 1280x720 und Französisch. In der Aufnahmenübersicht kann mit [Zurückspulen] und [Vorspulen] die Aufnahmegruppe gewechselt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1107"/>
+        <location filename="../themes/themestrings.h" line="1106"/>
         <source>No videos in library, or no files found.  If you have configured a video directory, press MENU and select &quot;Scan for Changes.&quot;</source>
         <translation>Keine Videos in der Bibliothek, oder keine Dateien gefunden.  Wenn ein videoverzeichnis konfiguriert wurde, drücken Sie &quot;M&quot; (oder den Menü-Knopf) und wählen Sie &quot;Nach Videos suchen&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1023"/>
+        <location filename="../themes/themestrings.h" line="1022"/>
         <source>Schedule Filter</source>
         <translation>Planungsfilter</translation>
     </message>
@@ -33314,7 +33324,7 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="obsolete">Designed um einige andere Elementanordnungen aus 0.25 zu zeigen.  Getestet in 1280x720 und Französisch. Erinnerung: In der Aufnahmenübersicht kann mit [Zurückspulen] und [Vorspulen] die Aufnahmegruppe gewechselt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="746"/>
+        <location filename="../themes/themestrings.h" line="745"/>
         <source>Animation, transparency and fanart for mythtv 0.25</source>
         <translation>Animation, Transparenz und Fanart für mythtv 0.25</translation>
     </message>
@@ -33323,12 +33333,12 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="obsolete">Inspiriert von MediaStream. Das Theme wurde ähnlich dem XBMC Original Theme erstellt. Es sieht am Besten aus, wenn die Menüstruktur aus dem Ordner MythMediaStreamMenu übernommen wird, da das Theme Menü diesem angepasst wurde. </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1218"/>
+        <location filename="../themes/themestrings.h" line="1216"/>
         <source>Readability is a theme for MythTV 0.25 and above that focusses on showing UI elements in a way that is easily readable on a TV when viewed from a distance. It is based on the Mythbuntu theme, but also borrows from a number of XBMC theme (Aeon and Confluence) for inspiration.</source>
         <translation>Readability ist ein Theme für MythTV ab 0.25. Das Hauptziel dieses Themes ist die leichte Lesbarkeit aus der Distanz, dazu wurden die UI-Elemente entsprechend angepasst. Es basiert auf dem Mythbuntu Theme und diversen Elementen aus XBMC Themes, z.B. Aeon und Confluence.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1222"/>
+        <location filename="../themes/themestrings.h" line="1220"/>
         <source>A UI and OSD theme with focus on fanart, banners and cover display.</source>
         <translation>Ein UI und OSD Theme mit Fokus auf Fanart, Banner und Cover.</translation>
     </message>
@@ -33476,19 +33486,19 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation>Überwachung, Wetter, Nachrichten und Internet konfigurieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1040"/>
+        <location filename="../themes/themestrings.h" line="1039"/>
         <source>%DESCRIPTION%
 %ERRATA%</source>
         <translation>%DESCRIPTION%
 %ERRATA%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1050"/>
+        <location filename="../themes/themestrings.h" line="1049"/>
         <source>%|[SYNDICATEDEPISODE|]%</source>
         <translation>%|[SYNDICATEDEPISODE|]%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1052"/>
+        <location filename="../themes/themestrings.h" line="1051"/>
         <source>%Part |PARTNUMBER| of %%PARTTOTAL%</source>
         <translation>%Part |PARTNUMBER| von %%PARTTOTAL%</translation>
     </message>
@@ -33497,7 +33507,7 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="vanished">%STARTDATE%   %STARTTIME%% - |ENDTIME%</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="1077"/>
+        <location filename="../themes/themestrings.h" line="1076"/>
         <source>There is/are %n recording(s) in this display group</source>
         <translation>
             <numerusform>Es ist %n Aufnahme in dieser Gruppe</numerusform>
@@ -33519,7 +33529,7 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
  Um eine Aufnahme zu planen, wählen Sie &apos;Programmübersicht&apos; oder &apos;Programmsuche&apos;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1079"/>
+        <location filename="../themes/themestrings.h" line="1078"/>
         <source>name</source>
         <translation>Name</translation>
     </message>
@@ -33533,89 +33543,89 @@ Wenn Sie fertig sind, drücken Sie den &apos;Ok&apos; Button.</translation>
         <translation type="obsolete">Drücken Sie Oben/Unten in der Liste um zu einer anderen Liste zu wechseln.  Drücken Sie Links/Rechts um aus der Sendungs- oder Episodenliste in eine andere Liste zu wechseln. </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="868"/>
+        <location filename="../themes/themestrings.h" line="867"/>
         <source>Filter Options</source>
         <translation>Filteroptionen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1080"/>
+        <location filename="../themes/themestrings.h" line="1079"/>
         <source>Current:</source>
         <translation>Aktuell:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1083"/>
+        <location filename="../themes/themestrings.h" line="1082"/>
         <source>Active filters</source>
         <translation>aktive Filter</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1087"/>
+        <location filename="../themes/themestrings.h" line="1086"/>
         <source>Select the filters that should be applied for this recording.</source>
         <translation>Wählen Sie die Filter  die auf diese Aufnahme angewandt werden sollen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1088"/>
+        <location filename="../themes/themestrings.h" line="1087"/>
         <source>The recording schedule was not changed.</source>
         <translation>Der Aufnahmeplan wurde nicht verändert.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1089"/>
+        <location filename="../themes/themestrings.h" line="1088"/>
         <source>-&gt;</source>
         <translation>-&gt;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1090"/>
+        <location filename="../themes/themestrings.h" line="1089"/>
         <source>TMDB/TVDB #</source>
         <translation>TMDB/TVDB #</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1091"/>
+        <location filename="../themes/themestrings.h" line="1090"/>
         <source>%description%
       Errata: %errata%</source>
         <translation>%description%
       Errata: %errata%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1092"/>
+        <location filename="../themes/themestrings.h" line="1091"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1093"/>
+        <location filename="../themes/themestrings.h" line="1092"/>
         <source>Execute</source>
         <translation>Ausführen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1094"/>
+        <location filename="../themes/themestrings.h" line="1093"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1095"/>
+        <location filename="../themes/themestrings.h" line="1094"/>
         <source>Upcoming Recording(s):</source>
         <translation>Kommende Aufnahme(n):</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1096"/>
+        <location filename="../themes/themestrings.h" line="1095"/>
         <source>There are no scheduled recordings.</source>
         <translation>Es gibt keine geplanten Aufnahmen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1097"/>
+        <location filename="../themes/themestrings.h" line="1096"/>
         <source>Currently recording:</source>
         <translation>Nimmt gerade auf:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1098"/>
+        <location filename="../themes/themestrings.h" line="1097"/>
         <source>There are no recordings currently taking place.</source>
         <translation>Im Augenblick finden keine Aufnahmen statt.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1099"/>
+        <location filename="../themes/themestrings.h" line="1098"/>
         <source>Schedule conflict(s):</source>
         <translation>Überschneidende Planungen:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1108"/>
+        <location filename="../themes/themestrings.h" line="1107"/>
         <source>%|RATING| %%|(STARS|) %%DESCRIPTION%%
 
 Part |PARTNUMBER| of %%PARTTOTAL%%
@@ -33632,27 +33642,27 @@ Besetzung: |CAST%%
 Regisseur: |DIRECTOR%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1122"/>
+        <location filename="../themes/themestrings.h" line="1121"/>
         <source>Standby Mode</source>
         <translation>Standby Modus</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1100"/>
+        <location filename="../themes/themestrings.h" line="1099"/>
         <source>(%1) +</source>
         <translation>(%1) +</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1101"/>
+        <location filename="../themes/themestrings.h" line="1100"/>
         <source>= %1</source>
         <translation>= %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1102"/>
+        <location filename="../themes/themestrings.h" line="1101"/>
         <source>(Last: %1)</source>
         <translation>(Last: %1)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1103"/>
+        <location filename="../themes/themestrings.h" line="1102"/>
         <source>%|(STARS|) %%DESCRIPTION%</source>
         <translation>%|(STARS|) %%DESCRIPTION%</translation>
     </message>
@@ -33661,12 +33671,12 @@ Regisseur: |DIRECTOR%</translation>
         <translation type="obsolete">Zeigt verschiedene in 0.25 verfügbare Elementanordnungen.  Getestet mit 1280x720 in französisch</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1105"/>
+        <location filename="../themes/themestrings.h" line="1104"/>
         <source>Year: %1</source>
         <translation>Jahr: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1106"/>
+        <location filename="../themes/themestrings.h" line="1105"/>
         <source>IMDB: %1</source>
         <translation>IMDB: %1</translation>
     </message>
@@ -33679,67 +33689,67 @@ Regisseur: |DIRECTOR%</translation>
         <translation type="vanished">Kategorie: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1109"/>
+        <location filename="../themes/themestrings.h" line="1108"/>
         <source>Use default player</source>
         <translation>Standardplayer verwenden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1110"/>
+        <location filename="../themes/themestrings.h" line="1109"/>
         <source>Ignore</source>
         <translation>Ignorieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1111"/>
+        <location filename="../themes/themestrings.h" line="1110"/>
         <source>Find local trailers</source>
         <translation>Lokale Filmvorschauen finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1112"/>
+        <location filename="../themes/themestrings.h" line="1111"/>
         <source>Get Banner</source>
         <translation>Banner holen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1113"/>
+        <location filename="../themes/themestrings.h" line="1112"/>
         <source>Find local banner</source>
         <translation>Banner lokal finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1114"/>
+        <location filename="../themes/themestrings.h" line="1113"/>
         <source>Get coverart</source>
         <translation>Coverart holen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1115"/>
+        <location filename="../themes/themestrings.h" line="1114"/>
         <source>Find local coverart</source>
         <translation>Coverart lokal finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1116"/>
+        <location filename="../themes/themestrings.h" line="1115"/>
         <source>Get Fanart</source>
         <translation>Fanart holen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1117"/>
+        <location filename="../themes/themestrings.h" line="1116"/>
         <source>Find local fanart</source>
         <translation>Fanart lokal finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1118"/>
+        <location filename="../themes/themestrings.h" line="1117"/>
         <source>Get Screenshot</source>
         <translation>Screenshot holen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1119"/>
+        <location filename="../themes/themestrings.h" line="1118"/>
         <source>Find local screenshot</source>
         <translation>Lokalen Screenshot finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1120"/>
+        <location filename="../themes/themestrings.h" line="1119"/>
         <source>Browsable</source>
         <translation>Durchsuchbar</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1121"/>
+        <location filename="../themes/themestrings.h" line="1120"/>
         <source>Filter video list</source>
         <translation>Videoliste filtern</translation>
     </message>
@@ -34079,392 +34089,390 @@ Regisseur: |DIRECTOR%</translation>
         <translation>4</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="648"/>
         <source>Stati</source>
-        <translation>Stati</translation>
+        <translation type="vanished">Stati</translation>
+    </message>
+    <message>
+        <source>Categorie</source>
+        <translation type="vanished">Kategorie</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="649"/>
-        <source>Categorie</source>
-        <translation>Kategorie</translation>
-    </message>
-    <message>
-        <location filename="../themes/themestrings.h" line="650"/>
         <source>Key Shortcuts</source>
         <translation>Tastenkürzel</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="651"/>
+        <location filename="../themes/themestrings.h" line="650"/>
         <source>%STARTTIME% - %ENDTIME% (%LENTIME%)</source>
         <translation>%STARTTIME% - %ENDTIME% (%LENTIME%)</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="652"/>
+        <location filename="../themes/themestrings.h" line="651"/>
         <source>%CARD% - %OUTPUTFILTERS%</source>
         <translation>%CARD% - %OUTPUTFILTERS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="653"/>
+        <location filename="../themes/themestrings.h" line="652"/>
         <source>Edit the details about this channel</source>
         <translation>Senderdetails bearbeiten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="654"/>
+        <location filename="../themes/themestrings.h" line="653"/>
         <source>Callsign :</source>
         <translation>Kurzname:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="655"/>
+        <location filename="../themes/themestrings.h" line="654"/>
         <source>Channel # :</source>
         <translation>Sender #:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="656"/>
+        <location filename="../themes/themestrings.h" line="655"/>
         <source>Chan Name :</source>
         <translation>Sendername:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="657"/>
+        <location filename="../themes/themestrings.h" line="656"/>
         <source>XMLTV # :</source>
         <translation>XMLTV #:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="659"/>
+        <location filename="../themes/themestrings.h" line="658"/>
         <source>%PLAYEDTIME% of %TOTALTIME% %(|REMAININGTIME| remaining)%</source>
         <translation>%PLAYEDTIME% von %TOTALTIME% %(|REMAININGTIME| übrig)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="660"/>
+        <location filename="../themes/themestrings.h" line="659"/>
         <source>LiveTV</source>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="661"/>
+        <location filename="../themes/themestrings.h" line="660"/>
         <source>Recorded</source>
         <translation>Aufgenommen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="663"/>
+        <location filename="../themes/themestrings.h" line="662"/>
         <source>BD</source>
         <translation>BD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="664"/>
+        <location filename="../themes/themestrings.h" line="663"/>
         <source>Recording</source>
         <translation>Aufnahme</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="665"/>
+        <location filename="../themes/themestrings.h" line="664"/>
         <source>PCM-DVD</source>
         <translation>PCM-DVD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="666"/>
+        <location filename="../themes/themestrings.h" line="665"/>
         <source>PCM-BluRay</source>
         <translation>PCM-Blueray</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="667"/>
+        <location filename="../themes/themestrings.h" line="666"/>
         <source>AC3</source>
         <translation>AC3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="668"/>
+        <location filename="../themes/themestrings.h" line="667"/>
         <source>E-AC3</source>
         <translation>E-AC3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="669"/>
+        <location filename="../themes/themestrings.h" line="668"/>
         <source>TrueHD</source>
         <translation>TrueHD</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="670"/>
+        <location filename="../themes/themestrings.h" line="669"/>
         <source>WMAPro</source>
         <translation>WMAPro</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="671"/>
+        <location filename="../themes/themestrings.h" line="670"/>
         <source>DTS</source>
         <translation>DTS</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="672"/>
+        <location filename="../themes/themestrings.h" line="671"/>
         <source>AAC</source>
         <translation>AAC</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="673"/>
+        <location filename="../themes/themestrings.h" line="672"/>
         <source>MPEG2</source>
         <translation>MPEG2</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="674"/>
+        <location filename="../themes/themestrings.h" line="673"/>
         <source>MP3</source>
         <translation>MP3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="675"/>
+        <location filename="../themes/themestrings.h" line="674"/>
         <source>Vorbis</source>
         <translation>Vorbis</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="676"/>
+        <location filename="../themes/themestrings.h" line="675"/>
         <source>Mono 1.0</source>
         <translation>Mono 1.0</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="677"/>
+        <location filename="../themes/themestrings.h" line="676"/>
         <source>Stereo 2.0</source>
         <translation>Stereo 2.0</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="678"/>
+        <location filename="../themes/themestrings.h" line="677"/>
         <source>Surround 5.0</source>
         <translation>Surround 5.0</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="679"/>
+        <location filename="../themes/themestrings.h" line="678"/>
         <source>Surround 5.1</source>
         <translation>Surround 5.1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="680"/>
+        <location filename="../themes/themestrings.h" line="679"/>
         <source>Surround 7.0</source>
         <translation>Surround 7.0</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="681"/>
+        <location filename="../themes/themestrings.h" line="680"/>
         <source>Surround 7.1</source>
         <translation>Surround 7.1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="682"/>
+        <location filename="../themes/themestrings.h" line="681"/>
         <source>MPEG-2</source>
         <translation>MPEG-2</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="683"/>
+        <location filename="../themes/themestrings.h" line="682"/>
         <source>VC-1</source>
         <translation>VC-1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="684"/>
+        <location filename="../themes/themestrings.h" line="683"/>
         <source>H.264</source>
         <translation>H.264</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="685"/>
+        <location filename="../themes/themestrings.h" line="684"/>
         <source>MPEG-4</source>
         <translation>MPEG-4</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="686"/>
+        <location filename="../themes/themestrings.h" line="685"/>
         <source>RTjpeg</source>
         <translation>RTjpeg</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="687"/>
+        <location filename="../themes/themestrings.h" line="686"/>
         <source>WMV3</source>
         <translation>WMV3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="688"/>
+        <location filename="../themes/themestrings.h" line="687"/>
         <source>H.263</source>
         <translation>H.263</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="689"/>
+        <location filename="../themes/themestrings.h" line="688"/>
         <source>Standard</source>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="690"/>
+        <location filename="../themes/themestrings.h" line="689"/>
         <source>720P</source>
         <translation>720P</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="691"/>
+        <location filename="../themes/themestrings.h" line="690"/>
         <source>1080i</source>
         <translation>1080i</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="692"/>
+        <location filename="../themes/themestrings.h" line="691"/>
         <source>1080p</source>
         <translation>1080p</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="693"/>
+        <location filename="../themes/themestrings.h" line="692"/>
         <source>Season</source>
         <translation>Staffel</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="694"/>
+        <location filename="../themes/themestrings.h" line="693"/>
         <source>Episode</source>
         <translation>Episode</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="695"/>
+        <location filename="../themes/themestrings.h" line="694"/>
         <source>Change Groups</source>
         <translation>Gruppe wechseln</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="697"/>
+        <location filename="../themes/themestrings.h" line="696"/>
         <source>Change Password</source>
         <translation>Passwort ändern</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="698"/>
+        <location filename="../themes/themestrings.h" line="697"/>
         <source>%startdate|, %%starttime%</source>
         <translation>%startdate|, %%starttime%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="699"/>
+        <location filename="../themes/themestrings.h" line="698"/>
         <source>%00x00| - %%&quot;|description|&quot;%</source>
         <translation>%00x00| - %%&quot;|description|&quot;%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="700"/>
+        <location filename="../themes/themestrings.h" line="699"/>
         <source>%startdate|, %%starttime%% - |endtime%</source>
         <translation>%startdate|, %%starttime%% - |endtime%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="701"/>
+        <location filename="../themes/themestrings.h" line="700"/>
         <source>%longchannel%% (|RECSTARTTIME%% - |RECENDTIME|)%</source>
         <translation>%longchannel%% (|RECSTARTTIME%% - |RECENDTIME|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="702"/>
+        <location filename="../themes/themestrings.h" line="701"/>
         <source>%REC_COUNT| recordings in this group%</source>
         <translation>%REC_COUNT| Aufnahmen in dieser Gruppe%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="703"/>
+        <location filename="../themes/themestrings.h" line="702"/>
         <source>Channel Rec. Prio.</source>
         <translation>Sender Aufnahmenpriorität</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="704"/>
+        <location filename="../themes/themestrings.h" line="703"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="705"/>
+        <location filename="../themes/themestrings.h" line="704"/>
         <source>Source</source>
         <translation>Quelle</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="707"/>
+        <location filename="../themes/themestrings.h" line="706"/>
         <source>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information. Finally, you can test, immediately activate, store, or cancel your rule.</source>
         <translation>Um eine manuelle Aufnahmeregel hinzuzufügen, können Sie entweder eine existierende Regel auswählen oder eine Neue hinzufügen, indem Sie einen Namen eingeben. Dann wählen Sie einen Regeltyp und drücken Enter. Der entsprechende SQL-Code wird unten eingefügt. Sie können dann Informationen zur Aufnahme hinzufügen. Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="709"/>
+        <location filename="../themes/themestrings.h" line="708"/>
         <source>Category list:</source>
         <translation>Kategorieliste:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="710"/>
+        <location filename="../themes/themestrings.h" line="709"/>
         <source>Genres list:</source>
         <translation>Genreliste:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="711"/>
+        <location filename="../themes/themestrings.h" line="710"/>
         <source>Channel list:</source>
         <translation>Senderliste:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="712"/>
+        <location filename="../themes/themestrings.h" line="711"/>
         <source>Manage Rec. Rules</source>
         <translation>Aufnahmeregeln verwalten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="713"/>
+        <location filename="../themes/themestrings.h" line="712"/>
         <source>%Final Priority: |finalpriority%</source>
         <translation>%Endpriorität: |finalpriority%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="714"/>
+        <location filename="../themes/themestrings.h" line="713"/>
         <source>%|&quot;subtitle|&quot;%% |stars| %%description%</source>
         <translation>%|&quot;subtitle|&quot;%% |stars| %%description%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="715"/>
+        <location filename="../themes/themestrings.h" line="714"/>
         <source>%Recording Profile: |recordingprofile%</source>
         <translation>%Aufnahmeprofil: |recordingprofile%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="716"/>
+        <location filename="../themes/themestrings.h" line="715"/>
         <source>%Rec. Group: |recgroup%</source>
         <translation>%Aufnahmegruppe: |recgroup%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="717"/>
+        <location filename="../themes/themestrings.h" line="716"/>
         <source>%Storage Group: |storagegroup%</source>
         <translation>%Speichergruppe: |storagegroup%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="718"/>
+        <location filename="../themes/themestrings.h" line="717"/>
         <source>%Category: |category%</source>
         <translation>%Kategorie: |category%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="720"/>
+        <location filename="../themes/themestrings.h" line="719"/>
         <source>Start Time (hh:mm):</source>
         <translation>Startzeit (hh:mm):</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="721"/>
+        <location filename="../themes/themestrings.h" line="720"/>
         <source>Duration (min):</source>
         <translation>Länge (Min):</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="731"/>
+        <location filename="../themes/themestrings.h" line="730"/>
         <source>%channel% - %shortstarttimedate%</source>
         <translation>%channel% - %shortstarttimedate%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="733"/>
+        <location filename="../themes/themestrings.h" line="732"/>
         <source>Sort by (1) Time, (2) Title:</source>
         <translation>Sortieren nach (1) Zeit, (2) Titel</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="735"/>
+        <location filename="../themes/themestrings.h" line="734"/>
         <source>Sort by (1) Title, (2) Priority, (4) Type</source>
         <translation>Sortieren nach (1) Titel, (2) Priorität, (4) Typ</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="736"/>
+        <location filename="../themes/themestrings.h" line="735"/>
         <source>Final Priority: %finalpriority%</source>
         <translation>%Endpriorität: |finalpriority%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="737"/>
+        <location filename="../themes/themestrings.h" line="736"/>
         <source>%|&quot;subtitle|&quot; %%stars| %%description%</source>
         <translation>%|&quot;subtitle|&quot; %%stars| %%description%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="738"/>
+        <location filename="../themes/themestrings.h" line="737"/>
         <source>Program Priority : %progpriority%</source>
         <translation>Programmpriorität: %progpriority%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="739"/>
+        <location filename="../themes/themestrings.h" line="738"/>
         <source>Type Priority : %storagegroup%</source>
         <translation>Typpriorität: %storagegroup%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="742"/>
+        <location filename="../themes/themestrings.h" line="741"/>
         <source>Sort by (1) Time, (2) Important</source>
         <translation>Sortieren nach (1) Zeit, (2) Wichtigkeit</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="743"/>
+        <location filename="../themes/themestrings.h" line="742"/>
         <source>System Event command Editor</source>
         <translation>Systemereignisse Befehlseditor</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themes/themestrings.h" line="744"/>
+        <location filename="../themes/themestrings.h" line="743"/>
         <source>%name%% (v.|version%)</source>
         <translation>
             <numerusform>%name%% (v.|version%)</numerusform>
@@ -34472,249 +34480,249 @@ Regisseur: |DIRECTOR%</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="745"/>
+        <location filename="../themes/themestrings.h" line="744"/>
         <source>%resolution% %(|aspect|)%</source>
         <translation>%resolution% %(|aspect|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="747"/>
+        <location filename="../themes/themestrings.h" line="746"/>
         <source>%title%% (|year|)%</source>
         <translation>%title%% (|year|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="748"/>
+        <location filename="../themes/themestrings.h" line="747"/>
         <source>%Director: |director%</source>
         <translation>%Regisseur: |director%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="749"/>
+        <location filename="../themes/themestrings.h" line="748"/>
         <source>%Cast: |cast%</source>
         <translation>%Besetzung: |cast%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="750"/>
+        <location filename="../themes/themestrings.h" line="749"/>
         <source>%Rating: |rating%</source>
         <translation>%Bewertung: |rating%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="751"/>
+        <location filename="../themes/themestrings.h" line="750"/>
         <source>Videolevel: 1</source>
         <translation>Videolevel: 1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="752"/>
+        <location filename="../themes/themestrings.h" line="751"/>
         <source>Videolevel: 2</source>
         <translation>Videolevel: 2</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="753"/>
+        <location filename="../themes/themestrings.h" line="752"/>
         <source>Videolevel: 3</source>
         <translation>Videolevel: 3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="754"/>
+        <location filename="../themes/themestrings.h" line="753"/>
         <source>Videolevel: 4</source>
         <translation>Videolevel: 4</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="756"/>
+        <location filename="../themes/themestrings.h" line="755"/>
         <source>Edit Metadata</source>
         <translation>Metadaten bearbeiten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="763"/>
+        <location filename="../themes/themestrings.h" line="762"/>
         <source>Player Cmd:</source>
         <translation>Playerkommando:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="764"/>
+        <location filename="../themes/themestrings.h" line="763"/>
         <source>Cover Art</source>
         <translation>Cover Art</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="765"/>
+        <location filename="../themes/themestrings.h" line="764"/>
         <source>Net Search</source>
         <translation>Netzsuche</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="766"/>
+        <location filename="../themes/themestrings.h" line="765"/>
         <source>Banner</source>
         <translation>Banner</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="767"/>
+        <location filename="../themes/themestrings.h" line="766"/>
         <source>Screenshot</source>
         <translation>Bildschirmfoto</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="768"/>
+        <location filename="../themes/themestrings.h" line="767"/>
         <source>Trailer</source>
         <translation>Filmvorschau</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="771"/>
+        <location filename="../themes/themestrings.h" line="770"/>
         <source>No videos in library, or no files found. If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
         <translation>Keine Videos in der Bibliothek, oder keine Dateien gefunden.  Wenn ein videoverzeichnis konfiguriert wurde, drücken Sie &quot;M&quot; (oder den Menü-Knopf) und wählen Sie &quot;Nach Änderungen suchen&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="775"/>
+        <location filename="../themes/themestrings.h" line="774"/>
         <source>Rated: %rating%</source>
         <translation>%Bewertung: |rating%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="776"/>
+        <location filename="../themes/themestrings.h" line="775"/>
         <source>Parental: 0</source>
         <translation>Altersfreigabe: 0</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="777"/>
+        <location filename="../themes/themestrings.h" line="776"/>
         <source>Parental: 1</source>
         <translation>Altersfreigabe: 1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="778"/>
+        <location filename="../themes/themestrings.h" line="777"/>
         <source>Parental: 2</source>
         <translation>Altersfreigabe: 2</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="779"/>
+        <location filename="../themes/themestrings.h" line="778"/>
         <source>Parental: 3</source>
         <translation>Altersfreigabe: 3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="780"/>
+        <location filename="../themes/themestrings.h" line="779"/>
         <source>Parental: 4</source>
         <translation>Altersfreigabe: 4</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="782"/>
+        <location filename="../themes/themestrings.h" line="781"/>
         <source>BluRay Player:</source>
         <translation>Blueray Player:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="783"/>
+        <location filename="../themes/themestrings.h" line="782"/>
         <source>BluRay Region:</source>
         <translation>Blueray Region:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="784"/>
+        <location filename="../themes/themestrings.h" line="783"/>
         <source>Welcome</source>
         <translation>Willkommen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="785"/>
+        <location filename="../themes/themestrings.h" line="784"/>
         <source>Retrieving Recording Status ...</source>
         <translation>Ermittle den Aufnahmestatus...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="786"/>
+        <location filename="../themes/themestrings.h" line="785"/>
         <source>Retrieving Scheduled Recordings ...</source>
         <translation>Ermittle die geplanten Aufnahmen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="787"/>
+        <location filename="../themes/themestrings.h" line="786"/>
         <source>Move the selected corner of the preview image to the corner of the TV screen.</source>
         <translation>Verschiebe die gewählte Ecke des Vorschaubildes in die Ecke des TV-Bildschirms.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="788"/>
+        <location filename="../themes/themestrings.h" line="787"/>
         <source>Press SELECT to edit the other corner.</source>
         <translation>Drücken Sie SELECT um die andere Ecke zu bearbeiten.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="789"/>
+        <location filename="../themes/themestrings.h" line="788"/>
         <source>Press MENU for options and ESC to quit.</source>
         <translation>Drücken Sie MENÜ für Optionen und ESC zum Verlassen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="790"/>
+        <location filename="../themes/themestrings.h" line="789"/>
         <source>Results found!</source>
         <translation>Ergebnisse gefunden!</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="791"/>
+        <location filename="../themes/themestrings.h" line="790"/>
         <source>No results found.</source>
         <translation>Keine Ergebnisse gefunden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="803"/>
+        <location filename="../themes/themestrings.h" line="802"/>
         <source>Let&apos;s set up your DVR! On the next few screens, we will configure your system to play back audio and video, optimize your color and contrast, and make sure we are taking advantage of all of your hardware.  Press next to begin!</source>
         <translation>Assistent zur Einrichtung Ihres DVR! Auf den folgenden Seiten wird Ihr System zur Wiedergabe von Audio und Video konfiguriert, Farben und Kontrast optimiert und sichergestellt, dass die Hardware optimal konfiguriert wird.  Wählen Sie &quot;Weiter&quot; um fortzufahren!</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="809"/>
+        <location filename="../themes/themestrings.h" line="808"/>
         <source>My receiver supports Dolby Digital</source>
         <translation>Mein Receiver unterstützt Dolby Digital</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="811"/>
+        <location filename="../themes/themestrings.h" line="810"/>
         <source>My receiver supports DTS</source>
         <translation>Mein Receiver unterstützt DTS</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="814"/>
+        <location filename="../themes/themestrings.h" line="813"/>
         <source>Test Audio</source>
         <translation>Audio testen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="815"/>
+        <location filename="../themes/themestrings.h" line="814"/>
         <source>Test SD Playback</source>
         <translation>SD-Wiedergabe testen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="816"/>
+        <location filename="../themes/themestrings.h" line="815"/>
         <source>Test HD Playback</source>
         <translation>HD-Wiedergabe testen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="817"/>
+        <location filename="../themes/themestrings.h" line="816"/>
         <source>Data and Artwork Sources</source>
         <translation>Artwork und Datenquellen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="818"/>
+        <location filename="../themes/themestrings.h" line="817"/>
         <source>Movies:</source>
         <translation>Filme:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="819"/>
+        <location filename="../themes/themestrings.h" line="818"/>
         <source>Television:</source>
         <translation>Fernsehen:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="820"/>
+        <location filename="../themes/themestrings.h" line="819"/>
         <source>Games:</source>
         <translation>Spiele:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="823"/>
+        <location filename="../themes/themestrings.h" line="822"/>
         <source>%TITLE%% (|YEAR|)%</source>
         <translation>%TITLE%% (|YEAR|)%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="848"/>
+        <location filename="../themes/themestrings.h" line="847"/>
         <source>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%CHANNEL%
 %DESCRIPTION%</source>
         <translation>(%STARTTIME% - %ENDTIME%) %LONGREPEAT% %YEARSTARS%%CHANNEL%
 %DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="849"/>
+        <location filename="../themes/themestrings.h" line="848"/>
         <source>%CHANNELNUMBER% %CALLSIGN%</source>
         <translation>%CHANNELNUMBER% %CALLSIGN%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="851"/>
+        <location filename="../themes/themestrings.h" line="850"/>
         <source>To manually schedule a recording, enter a title (optional). Then set the channel, date, start time, and duration of your recording. Note that this recording will not have any listings data or other information provided by an EPG.</source>
         <translation>Für eine manuelle Aufnahme können Sie einen Titel eingeben, ansonsten wird er automatisch gewählt.  Dann wählen Sie Sender, Datum, Startzeit und Dauer der Aufnahme.  Beachten Sie, dass manuelle Aufnahmen nicht mit Daten aus dem EPG gefüllt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="857"/>
+        <location filename="../themes/themestrings.h" line="856"/>
         <source>To give greater or lesser priority to a channel in your lineup, select it from the list. To increase the channel&apos;s priority, press the right arrow. To decrease its priority, press the left arrow.</source>
         <translation>Um die Priorität eines Senders zu ändern, wählen Sie ihn in der Liste aus. Mit den Pfeilen links/rechts können Sie die Priorität senken/erhöhen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="858"/>
+        <location filename="../themes/themestrings.h" line="857"/>
         <source>To create a custom priority rule, enter a name and priority adjustment. You can them select from existing priority templates or create one of your own using SQL syntax in the &quot;Clause SQL&quot; edit box.
 
 Once you have completed your rule, can can Test, Delete, or Install it right away.</source>
@@ -34723,7 +34731,7 @@ Once you have completed your rule, can can Test, Delete, or Install it right awa
 Wenn Sie Ihre Regel fertiggestellt haben können Sie diese anschließend testen, löschen oder installieren.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="864"/>
+        <location filename="../themes/themestrings.h" line="863"/>
         <source>You can specify basic criteria to create powerful search and record rules. Below, you may enter title, subtitle, and description phrases (all optional), as well as category, genre, and channel values to refine a complex search for programs.
 
 When you have completed your configuration, press &quot;OK&quot; to search.</source>
@@ -34732,17 +34740,17 @@ When you have completed your configuration, press &quot;OK&quot; to search.</sou
 Wenn Sie fertig sind drücken Sie &quot;OK&quot; um zu suchen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="866"/>
+        <location filename="../themes/themestrings.h" line="865"/>
         <source>Below you will find the program details of the selected item. There are two available screens. You can toggle between them by pressing INFO.</source>
         <translation>Unterhalb finden Sie Details zur gewählten Sendung. Es gibt zwei Ansichten, diese können Sie mit der INFO-Taste durchschalten.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="883"/>
+        <location filename="../themes/themestrings.h" line="882"/>
         <source>Select the filter options for this recording.</source>
         <translation>Wählen Sie die Filteroptionen für diese Aufnahme.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="898"/>
+        <location filename="../themes/themestrings.h" line="897"/>
         <source>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name. Then select a rule type and hit enter. The SQL code will be transferred below, and you can edit it and insert your own program information.
 
 Finally, you can test, immediately activate, store, or cancel your rule.</source>
@@ -34751,22 +34759,22 @@ Finally, you can test, immediately activate, store, or cancel your rule.</source
 Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="902"/>
+        <location filename="../themes/themestrings.h" line="901"/>
         <source>Select artwork, and find recording information online.</source>
         <translation>Artwork auswählen und Aufnahmeinformationen online suchen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="903"/>
+        <location filename="../themes/themestrings.h" line="902"/>
         <source>Season/Episode:</source>
         <translation>Staffel/Episode:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1216"/>
+        <location filename="../themes/themestrings.h" line="1214"/>
         <source>This theme is based on, and inspired by, the original XBMC skin called Aeon Nox by BigNoid. When using this theme you should select the customized menu called &apos;MythAeon&apos; as this menu lay-out and items are tailored for this particular theme.</source>
         <translation>Dieses Theme wurde ähnlich dem XBMC Original Theme Aeon Nox von BigNoid erstellt. Es sieht am Besten aus, wenn das Menü &apos;MythAeon&apos; übernommen wird, da das Theme Menü diesem angepasst wurde.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1217"/>
+        <location filename="../themes/themestrings.h" line="1215"/>
         <source>A redesign of the MythMediaStream theme, inspired by the MediaStream Redux skin created by JezzX: This theme has been made to look like the original XBMC skin were posible and/or applicable. Looks best with the matching menu called &apos;MythMediaStream&apos; as this menu lay-out and items are tailored for this particular theme.</source>
         <translation>Ein Redesign des Theme MythMediaStream, vom Skin MediaStream Redux von JezzX inspiriert: Dieses Theme wurde im Aussehen soweit möglich und/oder sinnvoll an die original XBMC Skin angepasst. Es sieht am Besten aus, wenn das Menü &apos;MythMediaStream&apos; übernommen wird, da das Theme Menü diesem angepasst wurde.</translation>
     </message>
@@ -34779,12 +34787,12 @@ Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</
         <translation type="vanished">%PROGRESS_TEXT% %PROGRESS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1009"/>
+        <location filename="../themes/themestrings.h" line="1008"/>
         <source>%STARTDATE|, %%STARTTIME%% - |ENDTIME%</source>
         <translation>%STARTDATE|, %%STARTTIME%% - |ENDTIME%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1010"/>
+        <location filename="../themes/themestrings.h" line="1009"/>
         <source>%STARTTIME%% - |ENDTIME%</source>
         <translation>%STARTTIME%% - |ENDTIME%</translation>
     </message>
@@ -34799,7 +34807,7 @@ Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</
 %%YEARSTARS%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1013"/>
+        <location filename="../themes/themestrings.h" line="1012"/>
         <source>%CHANNELNUMBER|
 %%CALLSIGN%</source>
         <translation>%CHANNELNUMBER|
@@ -34812,17 +34820,17 @@ Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</
 %</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1104"/>
+        <location filename="../themes/themestrings.h" line="1103"/>
         <source>Designed to show off some different element arrangements.  Tested at 1280x720 and with Français. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
         <translation>Designed um einige andere Elementanordnungen zu zeigen.  Getestet in 1280x720 auf Französisch. In der Aufnahmeübersicht kann mit [Zurückspulen] und [Vorspulen] die Aufnahmegruppe gewechselt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1202"/>
+        <location filename="../themes/themestrings.h" line="1200"/>
         <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. It also contains a custom menu.</source>
         <translation>Blue-abstract ist ein modern aussehenden Theme für Breitbild HD-Displays. Der blaue Hintergrund und das konsistente Layout ergeben ein attraktives und elegant aussehendes Theme. Es beinhaltet eine angepasste Menüstruktur.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1203"/>
+        <location filename="../themes/themestrings.h" line="1201"/>
         <source>No videos in library or files are being loaded...</source>
         <translation>Es befinden sich keine Videos in der Sammlung oder die Dateien werden geladen...</translation>
     </message>
@@ -34831,386 +34839,386 @@ Zum Schluß können Sie die Regel testen, aktivieren, speichern oder löschen.</
         <translation type="vanished">Designed um einige andere Elementanordnungen zu zeigen.  Getestet in 1280x720 und Französisch. In der Aufnahmenübersicht kann mit [Zurückspulen] und [Vorspulen] die Aufnahmegruppe gewechselt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1123"/>
+        <location filename="../themes/themestrings.h" line="1122"/>
         <source>Designed to show off some different element arrangements.  Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
         <translation>Designed um einige andere Elementanordnungen zu zeigen.  Getestet in 1280x720 und Französisch. Erinnerung: In der Aufnahmenübersicht kann mit [Zurückspulen] und [Vorspulen] die Aufnahmegruppe gewechselt werden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1124"/>
+        <location filename="../themes/themestrings.h" line="1123"/>
         <source>Import DVD</source>
         <translation>DVD importieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1125"/>
+        <location filename="../themes/themestrings.h" line="1124"/>
         <source>Import video from a movie DVD and convert it</source>
         <translation>Ein Video von einer DVD importieren und konvertieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1126"/>
+        <location filename="../themes/themestrings.h" line="1125"/>
         <source>Read music from a CD and convert it</source>
         <translation>Musik von einer CD lesen und konvertieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1127"/>
+        <location filename="../themes/themestrings.h" line="1126"/>
         <source>Webbrowser</source>
         <translation>Webbrowser</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1128"/>
+        <location filename="../themes/themestrings.h" line="1127"/>
         <source>Start surfing from your selected homepage</source>
         <translation>Mit der gewählten Homepage starten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1129"/>
+        <location filename="../themes/themestrings.h" line="1128"/>
         <source>Bookmarks</source>
         <translation>Lesezeichen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1130"/>
+        <location filename="../themes/themestrings.h" line="1129"/>
         <source>Choose favourite webpages from a list</source>
         <translation>Lesezeichen aus einer Liste wählen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1131"/>
+        <location filename="../themes/themestrings.h" line="1130"/>
         <source>Zoneminder</source>
         <translation>Videoüberwachung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1132"/>
+        <location filename="../themes/themestrings.h" line="1131"/>
         <source>Monitor your cameras</source>
         <translation>Kameras überwachen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1133"/>
+        <location filename="../themes/themestrings.h" line="1132"/>
         <source>Listen to your Music</source>
         <translation>Musik hören</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1134"/>
+        <location filename="../themes/themestrings.h" line="1133"/>
         <source>Listen to music from your current playlist</source>
         <translation>Musik aus der aktuellen Playlist anhören</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1135"/>
+        <location filename="../themes/themestrings.h" line="1134"/>
         <source>Play Streams</source>
         <translation>Streams abspielen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1136"/>
+        <location filename="../themes/themestrings.h" line="1135"/>
         <source>Listen to music from the internet</source>
         <translation>Musik aus dem Internet anhören</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1137"/>
+        <location filename="../themes/themestrings.h" line="1136"/>
         <source>Select Music</source>
         <translation>Musik auswählen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1138"/>
+        <location filename="../themes/themestrings.h" line="1137"/>
         <source>Create and manage your music playlists</source>
         <translation>Playlisten erstellen und verwalten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1139"/>
+        <location filename="../themes/themestrings.h" line="1138"/>
         <source>Scan for New Music</source>
         <translation>Nach neuer Musik suchen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1140"/>
+        <location filename="../themes/themestrings.h" line="1139"/>
         <source>Update your collection by looking for new music</source>
         <translation>Die Musiksammlung updaten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1141"/>
+        <location filename="../themes/themestrings.h" line="1140"/>
         <source>Blue-abstract is a modern looking theme meant for widescreen HD displays. The blue background and the consistent layout makes it an attractive and elegant looking theme. This contains an adjusted menu structure for the theme.</source>
         <translation>Blue-abstract ist ein modern aussehenden Theme für Breitbild HD-Displays. Der blaue Hintergrund und das konsistente Layout ergeben ein attraktives und elegant aussehendes Theme. Es beinhaltet eine angepasste Menüstruktur.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1142"/>
+        <location filename="../themes/themestrings.h" line="1141"/>
         <source>Live TV</source>
         <translation>LiveTV</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1143"/>
+        <location filename="../themes/themestrings.h" line="1142"/>
         <source>Look at the program list and schedule them</source>
         <translation>Die Programmliste anzeigen und Sendungen aufnehmen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1144"/>
+        <location filename="../themes/themestrings.h" line="1143"/>
         <source>Organize Recordings</source>
         <translation>Aufnahmen verwalten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1145"/>
+        <location filename="../themes/themestrings.h" line="1144"/>
         <source>Find shows or pick shows to record or delete</source>
         <translation>Sendungen suchen oder auswählen um sie aufzunehmen oder zu löschen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1146"/>
+        <location filename="../themes/themestrings.h" line="1145"/>
         <source>Advanced planning</source>
         <translation>Erweiterte Planung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1147"/>
+        <location filename="../themes/themestrings.h" line="1146"/>
         <source>Search for shows and more options</source>
         <translation>Nach Sendungen suchen und weitere Optionen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1148"/>
+        <location filename="../themes/themestrings.h" line="1147"/>
         <source>TV Recordings</source>
         <translation>TV Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1150"/>
+        <location filename="../themes/themestrings.h" line="1149"/>
         <source>Browse video highlights and popular sites</source>
         <translation>Video-Highlights und populäre Seiten durchsuchen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1151"/>
+        <location filename="../themes/themestrings.h" line="1150"/>
         <source>File Browser</source>
         <translation>Dateibrowser</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1152"/>
+        <location filename="../themes/themestrings.h" line="1151"/>
         <source>Directory:</source>
         <translation>Verzeichnis:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1153"/>
+        <location filename="../themes/themestrings.h" line="1152"/>
         <source>Metadata Search Results</source>
         <translation>Metadaten Ergebnisse</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1154"/>
+        <location filename="../themes/themestrings.h" line="1153"/>
         <source>Artwork Search Results</source>
         <translation>Artwork Ergebnisse</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1155"/>
+        <location filename="../themes/themestrings.h" line="1154"/>
         <source>Search Term:</source>
         <translation>Suchbegriff:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1156"/>
+        <location filename="../themes/themestrings.h" line="1155"/>
         <source>Search State:</source>
         <translation>Stand der Suche:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1157"/>
+        <location filename="../themes/themestrings.h" line="1156"/>
         <source>%&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|) %%(|STARS|) %%DESCRIPTION%</source>
         <translation>%&quot;|SUBTITLE|&quot; %%(|ORIGINALAIRDATE|) %%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1158"/>
+        <location filename="../themes/themestrings.h" line="1157"/>
         <source>Channel: %1</source>
         <translation>Sender: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1159"/>
+        <location filename="../themes/themestrings.h" line="1158"/>
         <source>%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</source>
         <translation>%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1160"/>
+        <location filename="../themes/themestrings.h" line="1159"/>
         <source>Season: %1</source>
         <translation>Staffel: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1161"/>
+        <location filename="../themes/themestrings.h" line="1160"/>
         <source>Episode: %1</source>
         <translation>Folge: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1162"/>
+        <location filename="../themes/themestrings.h" line="1161"/>
         <source>Icon import</source>
         <translation>Logos importieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1163"/>
+        <location filename="../themes/themestrings.h" line="1162"/>
         <source>Result:</source>
         <translation>Ergebnis:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1165"/>
+        <location filename="../themes/themestrings.h" line="648"/>
         <source>States</source>
         <translation>Zustand</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1166"/>
+        <location filename="../themes/themestrings.h" line="1164"/>
         <source>Use this language for the Movie Metadata</source>
         <translation>Diese Sprache für Filmmetadaten benutzen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1167"/>
+        <location filename="../themes/themestrings.h" line="1165"/>
         <source>Use this language for TV Metadata</source>
         <translation>Diese Sprache für TV-Metadaten benutzen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1168"/>
+        <location filename="../themes/themestrings.h" line="1166"/>
         <source>Use this language for Game Metadata</source>
         <translation>Diese Sprache für Spielmetadaten benutzen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1169"/>
+        <location filename="../themes/themestrings.h" line="1167"/>
         <source>Current Profile:</source>
         <translation>Aktuelles Profil:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1170"/>
+        <location filename="../themes/themestrings.h" line="1168"/>
         <source>View</source>
         <translation>Anzeigen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1171"/>
+        <location filename="../themes/themestrings.h" line="1169"/>
         <source>Submit</source>
         <translation>Senden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1172"/>
+        <location filename="../themes/themestrings.h" line="1170"/>
         <source>Video Profile Format:</source>
         <translation>Video Profil Format:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1173"/>
+        <location filename="../themes/themestrings.h" line="1171"/>
         <source>Version: %1</source>
         <translation>Version: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1174"/>
+        <location filename="../themes/themestrings.h" line="1172"/>
         <source>Protocol-Version: %1</source>
         <translation>Protokolversion: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1175"/>
+        <location filename="../themes/themestrings.h" line="1173"/>
         <source>Connection Ok</source>
         <translation>Verbindung Ok</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1176"/>
+        <location filename="../themes/themestrings.h" line="1174"/>
         <source>Protocol Version Mismatch</source>
         <translation>Protokollversion stimmt nicht überein</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1177"/>
+        <location filename="../themes/themestrings.h" line="1175"/>
         <source>Blocked By Firewall</source>
         <translation>Von einer Firewall geblockt</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1178"/>
+        <location filename="../themes/themestrings.h" line="1176"/>
         <source>Watch live TV or schedule recordings</source>
         <translation>Live TV sehen oder Aufnahmen planen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1179"/>
+        <location filename="../themes/themestrings.h" line="1177"/>
         <source>Browse the internet or your video library</source>
         <translation>Das Internet oder die Videobibliothek durchsuchen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1180"/>
+        <location filename="../themes/themestrings.h" line="1178"/>
         <source>Listen to your music or from the internet</source>
         <translation>Musik aus dem Internet oder der Sammlung anhören</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1181"/>
+        <location filename="../themes/themestrings.h" line="1179"/>
         <source>Pictures</source>
         <translation>Bilder</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1183"/>
+        <location filename="../themes/themestrings.h" line="1181"/>
         <source>Internet and Information</source>
         <translation>Internet und Informationen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1184"/>
+        <location filename="../themes/themestrings.h" line="1182"/>
         <source>Surf the net, read news and more</source>
         <translation>Im Internet surfen, Nachrichten lesen und mehr</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1185"/>
+        <location filename="../themes/themestrings.h" line="1183"/>
         <source>Extras</source>
         <translation>Extras</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1186"/>
+        <location filename="../themes/themestrings.h" line="1184"/>
         <source>Setup, status information and import</source>
         <translation>Einstellungen, Statusinformationen und Importieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1187"/>
+        <location filename="../themes/themestrings.h" line="1185"/>
         <source>OSD Debug Information</source>
         <translation>OSD Debug Informationen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1188"/>
+        <location filename="../themes/themestrings.h" line="1186"/>
         <source>OSD Input</source>
         <translation>OSD Eingang</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1189"/>
+        <location filename="../themes/themestrings.h" line="1187"/>
         <source>Bluray</source>
         <translation>Bluray</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1190"/>
+        <location filename="../themes/themestrings.h" line="1188"/>
         <source>Frames: %1</source>
         <translation>Frames: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1191"/>
+        <location filename="../themes/themestrings.h" line="1189"/>
         <source>Seek: %1</source>
         <translation>Springe: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1192"/>
+        <location filename="../themes/themestrings.h" line="1190"/>
         <source>Action: %1</source>
         <translation>Aktion: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1193"/>
+        <location filename="../themes/themestrings.h" line="1191"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded.
 To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
         <translation>Sie haben noch keine Aufnahmen geplant. Um eine Aufnahme zu planen, wählen Sie &quot;Übersicht&quot; oder &quot;Suche&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1194"/>
+        <location filename="../themes/themestrings.h" line="1192"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
         <translation>Sie haben noch keine Aufnahmen geplant. Um eine Aufnahme zu planen, wählen Sie &quot;Übersicht&quot; oder &quot;Suche&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1195"/>
+        <location filename="../themes/themestrings.h" line="1193"/>
         <source>Custom Recording Rules</source>
         <translation>Manuelle Aufnahmeregeln</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1196"/>
+        <location filename="../themes/themestrings.h" line="1194"/>
         <source>System Event Command Editor</source>
         <translation>Systemereignisse Befehlseditor</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1197"/>
+        <location filename="../themes/themestrings.h" line="1195"/>
         <source>Event command:</source>
         <translation>Ereigniskommando:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1198"/>
+        <location filename="../themes/themestrings.h" line="1196"/>
         <source>Resolution: %RESOLUTION%</source>
         <translation>Auflösung: %RESOLUTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1199"/>
+        <location filename="../themes/themestrings.h" line="1197"/>
         <source>Download progress:</source>
         <translation>Download läuft:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1200"/>
+        <location filename="../themes/themestrings.h" line="1198"/>
         <source>Description: %DESCRIPTION%
 Errata: %ERRATA%</source>
         <translation>Beschreibung: %DESCRIPTION%
 Errata: %ERRATA%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1201"/>
+        <location filename="../themes/themestrings.h" line="1199"/>
         <source>Frontend in standby mode</source>
         <translation>Frontend in Standby</translation>
     </message>
@@ -35223,7 +35231,7 @@ Errata: %ERRATA%</translation>
         <translation type="vanished">Es befinden sich keine Videos in der Sammlung oder die Dateien werden geladen...&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1204"/>
+        <location filename="../themes/themestrings.h" line="1202"/>
         <source>No videos in library, or no files found.
 
  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
@@ -35232,32 +35240,32 @@ Errata: %ERRATA%</translation>
  Wenn ein videoverzeichnis konfiguriert wurde, drücken Sie &quot;M&quot; (oder den Menü-Knopf) und wählen Sie &quot;Nach Änderungen suchen&quot;</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1205"/>
+        <location filename="../themes/themestrings.h" line="1203"/>
         <source>Video Tree</source>
         <translation>Videos - Baumstruktur</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1206"/>
+        <location filename="../themes/themestrings.h" line="1204"/>
         <source>Edit File Extensions</source>
         <translation>Dateierweiterungen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1207"/>
+        <location filename="../themes/themestrings.h" line="1205"/>
         <source>InetRef:</source>
         <translation>Inetref:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1208"/>
+        <location filename="../themes/themestrings.h" line="1206"/>
         <source>Sort by:</source>
         <translation>Sortieren nach:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1209"/>
+        <location filename="../themes/themestrings.h" line="1207"/>
         <source>Video Details</source>
         <translation>Details anzeigen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1210"/>
+        <location filename="../themes/themestrings.h" line="1208"/>
         <source>Browseable:</source>
         <translation>Durchsuchbar</translation>
     </message>
@@ -35266,107 +35274,107 @@ Errata: %ERRATA%</translation>
         <translation type="vanished">Nicht definiert</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1211"/>
+        <location filename="../themes/themestrings.h" line="1209"/>
         <source>Perform metadata update after video scan:</source>
         <translation>Update der Metadaten nach Videosuche durchführen:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1212"/>
+        <location filename="../themes/themestrings.h" line="1210"/>
         <source>Enable Random Trailer Playback:</source>
         <translation>Zufällige Filmvorschau-Wiedergabe aktivieren:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1213"/>
+        <location filename="../themes/themestrings.h" line="1211"/>
         <source>Enable metadata in file browse mode:</source>
         <translation>Metadaten im Datei-Browse-Modus aktivieren:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1214"/>
+        <location filename="../themes/themestrings.h" line="1212"/>
         <source>Display unknown file types:</source>
         <translation>Unbekannte Dateitypen anzeigen:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="723"/>
+        <location filename="../themes/themestrings.h" line="722"/>
         <source>Find Coverart Online</source>
         <translation>Coverart online finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="724"/>
+        <location filename="../themes/themestrings.h" line="723"/>
         <source>Select Local Coverart</source>
         <translation>Lokale Coverart auswählen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="725"/>
+        <location filename="../themes/themestrings.h" line="724"/>
         <source>Find Fanart Online</source>
         <translation>Fanart online finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="726"/>
+        <location filename="../themes/themestrings.h" line="725"/>
         <source>Select Local Fanart</source>
         <translation>Lokale Fanart auswählen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="727"/>
+        <location filename="../themes/themestrings.h" line="726"/>
         <source>Find Banners Online</source>
         <translation>Banner online finden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="728"/>
+        <location filename="../themes/themestrings.h" line="727"/>
         <source>Select Local Banner</source>
         <translation>Banner lokal auswählen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="755"/>
+        <location filename="../themes/themestrings.h" line="754"/>
         <source>Cast</source>
         <translation>Besetzung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="915"/>
+        <location filename="../themes/themestrings.h" line="914"/>
         <source>Plot</source>
         <translation>Handlung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="824"/>
+        <location filename="../themes/themestrings.h" line="823"/>
         <source>Season/Episode: %1</source>
         <translation>Staffel/Episode: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="916"/>
+        <location filename="../themes/themestrings.h" line="915"/>
         <source>Starring: %1</source>
         <translation>Hauptdarsteller: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="917"/>
+        <location filename="../themes/themestrings.h" line="916"/>
         <source>Parental Level 0</source>
         <translation>Altersfreigabe Stufe 0</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="918"/>
+        <location filename="../themes/themestrings.h" line="917"/>
         <source>Parental Level 1</source>
         <translation>Altersfreigabe Stufe 1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="919"/>
+        <location filename="../themes/themestrings.h" line="918"/>
         <source>Parental Level 2</source>
         <translation>Altersfreigabe Stufe 2</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="920"/>
+        <location filename="../themes/themestrings.h" line="919"/>
         <source>Parental Level 3</source>
         <translation>Altersfreigabe Stufe 3</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="921"/>
+        <location filename="../themes/themestrings.h" line="920"/>
         <source>Parental Level 4</source>
         <translation>Altersfreigabe Stufe 4</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="769"/>
+        <location filename="../themes/themestrings.h" line="768"/>
         <source>Add New File Types</source>
         <translation>Neue Dateitypen hinzufügen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="922"/>
+        <location filename="../themes/themestrings.h" line="921"/>
         <source>On this screen, you can add new extensions to be recognized by the Video Plugin.  If a scan does not add your files, create a new extension below by clicking the &quot;New&quot; button.
 
 If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</source>
@@ -35375,108 +35383,108 @@ If you select &quot;Use Default Player,&quot; the player command set for the ext
 Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen Dateityp gesetzte Kommando ignoriert.  &quot;Diesen Dateityp ignorieren&quot; verhindert die Anzeige von Dateien mit dieser Erweiterung.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="923"/>
+        <location filename="../themes/themestrings.h" line="922"/>
         <source>Use Default Player</source>
         <translation>Standardplayer verwenden</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="924"/>
+        <location filename="../themes/themestrings.h" line="923"/>
         <source>Ignore This File Type</source>
         <translation>Diesen Dateityp ignorieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="925"/>
+        <location filename="../themes/themestrings.h" line="924"/>
         <source>Tagline:</source>
         <translation>Inhalt:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="926"/>
+        <location filename="../themes/themestrings.h" line="925"/>
         <source>TMDB Number:</source>
         <translation>TMDB Nummer:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="927"/>
+        <location filename="../themes/themestrings.h" line="926"/>
         <source>Homepage:</source>
         <translation>Homepage:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="928"/>
+        <location filename="../themes/themestrings.h" line="927"/>
         <source>Custom Player:</source>
         <translation>Eigener Player:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="758"/>
+        <location filename="../themes/themestrings.h" line="757"/>
         <source>Length:</source>
         <translation>Länge:
 </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="761"/>
+        <location filename="../themes/themestrings.h" line="760"/>
         <source>Next File:</source>
         <translation>Nächste Datei:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="929"/>
+        <location filename="../themes/themestrings.h" line="928"/>
         <source>Click here to search existing coverart...</source>
         <translation>Hier klicken um nach existierender Coverart zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="930"/>
+        <location filename="../themes/themestrings.h" line="929"/>
         <source>Click to select from online coverart...</source>
         <translation>Hier klicken um online nach Coverart zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="931"/>
+        <location filename="../themes/themestrings.h" line="930"/>
         <source>Click here to search existing screenshots...</source>
         <translation>Hier klicken um nach existierenden Screenshots zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="932"/>
+        <location filename="../themes/themestrings.h" line="931"/>
         <source>Click to select from online screenshots...</source>
         <translation>Hier klicken um online nach Screenshots zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="933"/>
+        <location filename="../themes/themestrings.h" line="932"/>
         <source>Click here to search existing banners...</source>
         <translation>Hier klicken um nach existierender Bannern zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="934"/>
+        <location filename="../themes/themestrings.h" line="933"/>
         <source>Click to select from online banners...</source>
         <translation>Hier klicken um online nach Bannern zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="935"/>
+        <location filename="../themes/themestrings.h" line="934"/>
         <source>Click here to search existing fanart...</source>
         <translation>Hier klicken um nach existierender Fanart zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="936"/>
+        <location filename="../themes/themestrings.h" line="935"/>
         <source>Click to select from online fanart...</source>
         <translation>Hier klicken um online nach Fanart zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="937"/>
+        <location filename="../themes/themestrings.h" line="936"/>
         <source>Click here to search existing trailers...</source>
         <translation>Hier klicken um nach existierenden Trailern zu suchen...</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="938"/>
+        <location filename="../themes/themestrings.h" line="937"/>
         <source>Filter Videos</source>
         <translation>Videos filtern</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="939"/>
+        <location filename="../themes/themestrings.h" line="938"/>
         <source>Country:</source>
         <translation>Land:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="940"/>
+        <location filename="../themes/themestrings.h" line="939"/>
         <source>Actor/Actress:</source>
         <translation>Schauspieler:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="762"/>
+        <location filename="../themes/themestrings.h" line="761"/>
         <source>Browse:</source>
         <translation>Durchsuchen:</translation>
     </message>
@@ -35486,52 +35494,52 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Regisseur: %1</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="941"/>
+        <location filename="../themes/themestrings.h" line="940"/>
         <source>This item was released on %1.</source>
         <translation>Dieser Eintrag ist %1 erschienen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="942"/>
+        <location filename="../themes/themestrings.h" line="941"/>
         <source>It was added to your collection on %1.</source>
         <translation>Es wurde zu Ihrer Kollektion am %1 hinzugefügt.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="781"/>
+        <location filename="../themes/themestrings.h" line="780"/>
         <source>Video Player Settings</source>
         <translation>Videoplayer Einstellungen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="943"/>
+        <location filename="../themes/themestrings.h" line="942"/>
         <source>Default:</source>
         <translation>Standard:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="944"/>
+        <location filename="../themes/themestrings.h" line="943"/>
         <source>BD Mount:</source>
         <translation>BD Mountpunkt:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="945"/>
+        <location filename="../themes/themestrings.h" line="944"/>
         <source>BD Region:</source>
         <translation>BD Region:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="946"/>
+        <location filename="../themes/themestrings.h" line="945"/>
         <source>Enable Alternate Player</source>
         <translation>Alternativen Player aktivieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="947"/>
+        <location filename="../themes/themestrings.h" line="946"/>
         <source>Alt. Player:</source>
         <translation>Alt. Player:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="948"/>
+        <location filename="../themes/themestrings.h" line="947"/>
         <source>Update metadata after video scan</source>
         <translation>Metadaten nach einem Videoscan aktualisieren</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="949"/>
+        <location filename="../themes/themestrings.h" line="948"/>
         <source>Trailer #:</source>
         <translation>Trailer #:</translation>
     </message>
@@ -35541,7 +35549,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>OSD-Menü Editor</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="973"/>
+        <location filename="../themes/themestrings.h" line="972"/>
         <source>Video File Associations</source>
         <translation>Video-Dateierweiterungen</translation>
     </message>
@@ -35551,62 +35559,62 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Nächste abzuspielende Datei:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="774"/>
+        <location filename="../themes/themestrings.h" line="773"/>
         <source>Videos - Manager</source>
         <translation>Videomanager</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="773"/>
+        <location filename="../themes/themestrings.h" line="772"/>
         <source>Cast:</source>
         <translation>Besetzung:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="974"/>
+        <location filename="../themes/themestrings.h" line="973"/>
         <source>Videos - Browser</source>
         <translation>Videobrowser</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="975"/>
+        <location filename="../themes/themestrings.h" line="974"/>
         <source>Movie Grabber:</source>
         <translation>Film Grabber:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="976"/>
+        <location filename="../themes/themestrings.h" line="975"/>
         <source>TV Grabber:</source>
         <translation>TV Grabber:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="757"/>
+        <location filename="../themes/themestrings.h" line="756"/>
         <source>TMDB:</source>
         <translation>TMDB:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="759"/>
+        <location filename="../themes/themestrings.h" line="758"/>
         <source>Parental Lvl:</source>
         <translation>Altersfreigabe:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="997"/>
+        <location filename="../themes/themestrings.h" line="996"/>
         <source>Browseable</source>
         <translation>Durchsuchbar</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="998"/>
+        <location filename="../themes/themestrings.h" line="997"/>
         <source>Player Command:</source>
         <translation>Playerkommando:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="770"/>
+        <location filename="../themes/themestrings.h" line="769"/>
         <source>Text Filter :</source>
         <translation>Text Filter:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="999"/>
+        <location filename="../themes/themestrings.h" line="998"/>
         <source>Seas/Ep:</source>
         <translation>St/Ep:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1031"/>
+        <location filename="../themes/themestrings.h" line="1030"/>
         <source>Background:</source>
         <translation>Hintergrund:</translation>
     </message>
@@ -35631,7 +35639,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation type="obsolete">Ein weiteres Theme basierend auf der neuen UI-Bibliothek. Änderungsvorschläge und Bugs an https://code.google.com/p/a-forest/. Spezieller Dank geht an Steve Adeff für seine Hilfe an diesem Projekt.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1215"/>
+        <location filename="../themes/themestrings.h" line="1213"/>
         <source>LCARS</source>
         <translation>LCARS</translation>
     </message>
@@ -35644,17 +35652,17 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation type="vanished">Inspiriert von MediaStream. Das Theme wurde ähnlich dem XBMC Original Theme erstellt. Es sieht am Besten aus, wenn das Menü &apos;MythMediaStream&apos; benutzt wird, da das Theme Menü diesem angepasst wurde.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1219"/>
+        <location filename="../themes/themestrings.h" line="1217"/>
         <source> Retro Originally by Gerhard Aldorf MythUI version based on MythCenter by Jeroen Brosens Conversion of Retro to MythUI by Chris Candreva A generally blue theme. Icon style is realistic based on clasic, &apos;Retro&apos; styles. </source>
         <translation> Retro Original von Gerhard Aldorf, MythUI-Version basierend auf MythCenter von Jeroen Brosens. Konversion von Retro zu MythUI von Chris Candreva. Ein überwiegend blaues Theme. Icon-Stile basierend auf Classic, &apos;Retro&apos;-Stilen. </translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1220"/>
+        <location filename="../themes/themestrings.h" line="1218"/>
         <source>TintedGlass is a transparent theme that is a little old school MythTV yet takes advantage of new MythUI features.</source>
         <translation>TintedGlass ist ein transparentes, antiquiertes Theme. Aktuell zieht MythTV Vorteile aus den neuen MythUI Funktionen.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1221"/>
+        <location filename="../themes/themestrings.h" line="1219"/>
         <source>a nice transparent theme to use your own background if you want. just copy your favorite picture (be sure that its resolution is 1920x1200) to /usr/share/mythtv/themes/TransBlue/background.jpg</source>
         <translation>Ein nettes, transparentes Theme mit benutzerdefiniertem Hintergrund. Einfach ein eigenes Bild (1920x1080) nach /usr/share/mythtv/themes/TransBlue/background.jpg kopieren</translation>
     </message>
@@ -35667,7 +35675,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation type="obsolete">Dieses Theme bricht mit vielen Konventionen. Es benutzt squirrly Schriften!</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1223"/>
+        <location filename="../themes/themestrings.h" line="1221"/>
         <source>blootube-ng is a theme based on the original blootube-wide by Justin Hornsby (justin.hornsby@gmail.com) which uses very large graphics associated with every menu entry. All changes where made to bring this theme forward to MythTV 0.24.</source>
         <translation>blootube-ng ist ein Theme basierend auf dem originalen blootube-wide von Justin Hornsby (justin.hornsby@gmail.com) welches sehr große Grafiken mit jedem Menüeintrag verknüpft. Alle Änderungen zielen in Richtung MythTV 0.24.</translation>
     </message>
@@ -35787,7 +35795,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation type="obsolete">Videoüberwachung</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="961"/>
+        <location filename="../themes/themestrings.h" line="960"/>
         <source>Movie Times</source>
         <translation>Kinoprogramm</translation>
     </message>
@@ -35851,7 +35859,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Keine Termine für diese Sendung gefunden.</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="772"/>
+        <location filename="../themes/themestrings.h" line="771"/>
         <source>Description:</source>
         <translation>Inhalt:</translation>
     </message>
@@ -35955,7 +35963,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Jahr:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="865"/>
+        <location filename="../themes/themestrings.h" line="864"/>
         <source>Genre:</source>
         <translation>Genre:</translation>
     </message>
@@ -36016,7 +36024,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation type="obsolete">Wiedergabe:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1057"/>
+        <location filename="../themes/themestrings.h" line="1056"/>
         <source>None</source>
         <translation>Keine</translation>
     </message>
@@ -36171,22 +36179,22 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>(1) Sender (2) Rang</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="734"/>
+        <location filename="../themes/themestrings.h" line="733"/>
         <source>Schedule Priorities</source>
         <translation>Planungsprioritäten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="966"/>
+        <location filename="../themes/themestrings.h" line="965"/>
         <source>Final</source>
         <translation>Abschluss</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="968"/>
+        <location filename="../themes/themestrings.h" line="967"/>
         <source>Type Priority:</source>
         <translation>Moduspriorität:</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="969"/>
+        <location filename="../themes/themestrings.h" line="968"/>
         <source>Final Priority:</source>
         <translation>Endpriorität:</translation>
     </message>
@@ -36787,7 +36795,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Erscheinungsbild-Assistent</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="954"/>
+        <location filename="../themes/themestrings.h" line="953"/>
         <source>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</source>
         <translation>Verschieben Sie den markierten Pfeil in die Ecke des Fernsehbildes. SELECT wechselt zum anderen Pfeil. Wählen Sie MENU für Optionen oder ESC zum Beenden.</translation>
     </message>
@@ -36822,7 +36830,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Funktionen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="722"/>
+        <location filename="../themes/themestrings.h" line="721"/>
         <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</translation>
     </message>
@@ -36851,7 +36859,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation type="obsolete">%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="964"/>
+        <location filename="../themes/themestrings.h" line="963"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;%
@@ -36910,7 +36918,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="988"/>
+        <location filename="../themes/themestrings.h" line="987"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;%
@@ -36937,7 +36945,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="971"/>
+        <location filename="../themes/themestrings.h" line="970"/>
         <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
         <translation>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
@@ -36957,7 +36965,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Auftrag #1 starten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="729"/>
+        <location filename="../themes/themestrings.h" line="728"/>
         <source>Run User job #2</source>
         <translation>Auftrag #2 starten</translation>
     </message>
@@ -37027,12 +37035,12 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation>Musik hören</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="953"/>
+        <location filename="../themes/themestrings.h" line="952"/>
         <source>Image Gallery</source>
         <translation>Bilder ansehen</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1182"/>
+        <location filename="../themes/themestrings.h" line="1180"/>
         <source>Look at Pictures</source>
         <translation>Bilder ansehen</translation>
     </message>
@@ -37105,7 +37113,7 @@ Falls Sie &quot;Standardplayer verwenden&quot; auswählen wird das für diesen D
         <translation type="obsolete">Prioritäten</translation>
     </message>
     <message>
-        <location filename="../themes/themestrings.h" line="1149"/>
+        <location filename="../themes/themestrings.h" line="1148"/>
         <source>Play DVD</source>
         <translation>DVD abspielen</translation>
     </message>
@@ -37599,7 +37607,7 @@ dd MMM yyyy</translation>
         <translation>Datumsformat</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="60"/>
+        <location filename="../programs/mythfrontend/galleryconfig.cpp" line="65"/>
         <source>Date format of thumbnail captions. Other places use the system date format. Sample shows 3rd May 2002.</source>
         <translation>Datumsformat von Bilduntertiteln der Vorschaubilder. Andere Stellen benutzten das Datumsformat des Systems. Das Beispiel zeigt den dritten Mai 2002.</translation>
     </message>
@@ -37821,17 +37829,17 @@ dd MMM yyyy</translation>
 <context>
     <name>V4L2encGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2705"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2683"/>
         <source>Probed info</source>
         <translation>Geräteinformation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2729"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2706"/>
         <source>Failed to open</source>
         <translation>Öffnen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2735"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2712"/>
         <source>Failed to probe</source>
         <translation>Untersuchung fehlgeschlagen</translation>
     </message>
@@ -37839,17 +37847,17 @@ dd MMM yyyy</translation>
 <context>
     <name>V4LConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2470"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2453"/>
         <source>Probed info</source>
         <translation>Geräteinformation</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2485"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2468"/>
         <source>Failed to open</source>
         <translation>Öffnen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2492"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2475"/>
         <source>Failed to probe</source>
         <translation>Untersuchung fehlgeschlagen</translation>
     </message>
@@ -37857,53 +37865,53 @@ dd MMM yyyy</translation>
 <context>
     <name>VBoxChannelFetcher</name>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="128"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="132"/>
         <source>Downloading Channel List</source>
         <translation>Lade Senderliste herunter</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="144"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="148"/>
         <source>Downloading Channel List Failed</source>
         <translation>Laden der Senderliste fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="156"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="160"/>
         <source>Adding Channels</source>
         <translation>Füge Sender hinzu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="177"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="181"/>
         <source>Channel #%1 : %2</source>
         <extracomment>%1 is the channel number, %2 is the channel name</extracomment>
         <translation>Sender #%1 : %2</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="187"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="191"/>
         <source>Ignoring Encrypted %1</source>
         <translation>Ingoriere verschlüsselten Sender %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="195"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="199"/>
         <source>Ignoring Radio %1</source>
         <translation>Ignoriere Radiosender %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="203"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="207"/>
         <source>Ignoring Bad Transmission Type %1</source>
         <translation>Ingoriere schlechten Übertragungstyp %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="213"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="217"/>
         <source>Adding %1</source>
         <translation>Füge %1 hinzu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="227"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="231"/>
         <source>Updating %1</source>
         <translation>Aktualisiere %1</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="242"/>
+        <location filename="../libs/libmythtv/channelscan/vboxchannelfetcher.cpp" line="246"/>
         <source>Done</source>
         <translation>Fertig</translation>
     </message>
@@ -37911,12 +37919,12 @@ dd MMM yyyy</translation>
 <context>
     <name>VBoxConfigurationGroup</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2267"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2259"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="2282"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="2274"/>
         <source>Recording Options</source>
         <translation>Aufnahmeoptionen</translation>
     </message>
@@ -37924,12 +37932,12 @@ dd MMM yyyy</translation>
 <context>
     <name>VBoxDeviceID</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1663"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1684"/>
         <source>Device ID</source>
         <translation>Geräte-ID</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1664"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1685"/>
         <source>Device ID of VBox device</source>
         <translation>Geräte-ID des VBox-Geräts</translation>
     </message>
@@ -37937,9 +37945,9 @@ dd MMM yyyy</translation>
 <context>
     <name>VBoxDeviceIDList</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1735"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1779"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="1786"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1756"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1800"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="1807"/>
         <source>Manually Enter IP Address</source>
         <translation>IP-Adresse eingeben</translation>
     </message>
@@ -38678,110 +38686,110 @@ dd MMM yyyy</translation>
 <context>
     <name>VideoModeSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2184"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2192"/>
         <source>Separate video modes for GUI and TV playback</source>
         <translation>Getrennte Einstellungen für GUI und TV-Wiedergabe</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2189"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2197"/>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
         <translation>Schaltet die X Window Bildschirmauflösung für die TV-Wiedergabe um. Benötigt die &quot;xrandr&quot;-Unterstützung des X Window Systems.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2199"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2207"/>
         <source>In X</source>
         <comment>Video mode width</comment>
         <translation>In X</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2206"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2214"/>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
         <translation>Horizontale Auflösung, für die eine bestimmte Wiedergabeauflösung notwendig ist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2217"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2225"/>
         <source>In Y</source>
         <comment>Video mode height</comment>
         <translation>In Y</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2224"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2232"/>
         <source>Vertical resolution of video which needs a special output resolution.</source>
         <translation>Vertikale Auflösung, für die eine bestimmte Wiedergabeauflösung notwendig ist.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2234"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2242"/>
         <source>GUI</source>
         <translation>GUI</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2238"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2246"/>
         <source>Resolution of screen when not watching a video.</source>
         <translation>Bildschirmauflösung für die GUI.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2268"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2276"/>
         <source>Default screen resolution when watching a video.</source>
         <translation>Bildschirmauflösung für die Videowiedergabe.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2270"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2278"/>
         <source>Screen resolution when watching a video at a specific resolution.</source>
         <translation>Bildschirmauflösung für die Videowiedergabe in einer best. Auflösung.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2276"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2284"/>
         <source>Video output</source>
         <translation>Videoauflösung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2277"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2285"/>
         <source>Output</source>
         <translation>Auflösung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2298"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2306"/>
         <source>Default refresh rate when watching a video. Leave at &quot;Auto&quot; to automatically use the best available</source>
         <translation>Standardwiederholrate bei Videowiedergabe. &quot;Auto&quot; wählt automatisch den besten Wert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2302"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2310"/>
         <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Auto&quot; to automatically use the best available</source>
         <translation>Standardwiederholrate bei Videowiedergabe mit einer bestimmten Auflösung. &quot;Auto&quot; wählt automatisch den besten Wert</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2310"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2318"/>
         <source>Rate</source>
         <translation>Bildwiederholfrequenz</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2322"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2330"/>
         <source>Aspect ratio when watching a video. Leave at &quot;%1&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation>Seitenverhältnis während der Videowiedergabe.&quot;%1&quot; behält das vom Monitor gemeldete Seitenverhältnis. Wählen Sie 16:9 oder 4:3 für ein benutzerdefiniertes Seitenverhältnis.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2330"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2338"/>
         <source>Aspect ratio when watching a video at a specific resolution. Leave at &quot;%1&quot; to use ratio reported by the monitor. Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation>Seitenverhältnis während der Videowiedergabe mit einer bestimmten Auflösung.&quot;%1&quot; behält das vom Monitor gemeldete Seitenverhältnis. Wählen Sie 16:9 oder 4:3 für ein benutzerdefiniertes Seitenverhältnis.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2342"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2350"/>
         <source>Aspect</source>
         <translation>Seitenverhältnis</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2348"/>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2350"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2356"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2358"/>
         <source>Default</source>
         <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2360"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2368"/>
         <source>Video Mode Settings</source>
         <translation>Bildschirmeinstellungen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2383"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="2391"/>
         <source>Overrides for specific video sizes</source>
         <translation>Einstellungen für best. Video-Auflösungen</translation>
     </message>
@@ -38912,48 +38920,48 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
 <context>
     <name>VideoSourceEditor</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3887"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3873"/>
         <source>Video sources</source>
         <translation>Videoquellen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3929"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3915"/>
         <source>Video Source Menu</source>
         <translation>Videoquellen-Menü</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3972"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3958"/>
         <source>Are you sure you want to delete this video source?</source>
         <translation>Soll diese Videoquelle wirklich gelöscht werden?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3974"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3960"/>
         <source>Yes, delete video source</source>
         <translation>Ja, Videoquelle löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3951"/>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3975"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3937"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3961"/>
         <source>No, don&apos;t</source>
         <translation>Nicht löschen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3930"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3916"/>
         <source>Edit...</source>
         <translation>Bearbeiten...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3931"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3917"/>
         <source>Delete...</source>
         <translation>Löschen...</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3948"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3934"/>
         <source>Are you sure you want to delete ALL video sources?</source>
         <translation>Sind Sie sicher, dass Sie alle Videoquellen löschen wollen?</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="3950"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="3936"/>
         <source>Yes, delete video sources</source>
         <translation>Ja, Videoquellen löschen</translation>
     </message>
@@ -38973,13 +38981,13 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
         <translation type="obsolete">Zeitüberschneidung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="500"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="501"/>
         <source>No Conflicts</source>
         <translation>Keine Überschneidungen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="334"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="507"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="508"/>
         <source>All</source>
         <translation>Alle</translation>
     </message>
@@ -39000,31 +39008,31 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="226"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="644"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="645"/>
         <source>Show Important</source>
         <translation>Nur wichtige zeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="228"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="648"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="649"/>
         <source>Show All</source>
         <translation>Alle zeigen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="229"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="652"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="653"/>
         <source>Program Details</source>
         <translation>Weitere Informationen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="230"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="656"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="657"/>
         <source>Program Guide</source>
         <translation>Programmübersicht (EPG)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="231"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="660"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="661"/>
         <source>Channel Search</source>
         <translation>Sendersuche</translation>
     </message>
@@ -39034,13 +39042,13 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="235"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="676"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="677"/>
         <source>Custom Edit</source>
         <translation>Freie Planung</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="236"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="680"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="681"/>
         <source>Delete Rule</source>
         <translation>Regel löschen</translation>
     </message>
@@ -39050,7 +39058,7 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="237"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="684"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="685"/>
         <source>Show Inputs</source>
         <translation>Eingänge zeigen</translation>
     </message>
@@ -39059,12 +39067,12 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
         <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="509"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="510"/>
         <source>Important</source>
         <translation>Wichtige</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="553"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="554"/>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Lösche Regel &quot;%1&quot; %2?</translation>
     </message>
@@ -39074,24 +39082,24 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="232"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="664"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="665"/>
         <source>Upcoming by title</source>
         <translation>Nächste nach Title</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="233"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="668"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="669"/>
         <source>Upcoming scheduled</source>
         <translation>Nächste geplante</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="234"/>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="672"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="673"/>
         <source>Previously Recorded</source>
         <translation>Frühere Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="493"/>
+        <location filename="../programs/mythfrontend/viewscheduled.cpp" line="494"/>
         <source>Conflict %1</source>
         <translation>Überschneidung %1</translation>
     </message>
@@ -39099,52 +39107,52 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
 <context>
     <name>WatchListSettings</name>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3232"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3240"/>
         <source>Include the &apos;Watch List&apos; group</source>
         <translation>Mit &quot;Beobachtungsliste&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3236"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3244"/>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
         <translation>Die &quot;Beobachtungsliste&quot; beinhaltet alle Sendungen, die Ihre besondere Aufmerksamkeit brauchen, um auf dem laufenden zu bleiben (z.B. Daily Soaps).</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3248"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3256"/>
         <source>Start from the Watch List view</source>
         <translation>Starte in der &quot;Beobachtungsliste&quot;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3252"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3260"/>
         <source>If enabled, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
         <translation>Falls gesetzt, wird im &quot;Aufnahmen Ansehen&quot; Menü zuerst die &quot;Beobachtungsliste&quot; angezeigt</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3262"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3270"/>
         <source>Exclude recordings not set for Auto-Expire</source>
         <translation>Nur Aufnahmen zeigen, die autom. gelöscht werden</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3267"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3275"/>
         <source>Set this if you turn off Auto-Expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
         <translation>Diese Option ist dann nützlich, wenn das autom. Löschen grundsätzlich aktiviert ist und nur bei Sendungen, die man behalten möchte, deaktiviert wird. Solche Aufnahmen werden dann nicht in der &quot;Beobachtungsliste&quot; aufgeführt.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3280"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3288"/>
         <source>Maximum days counted in the score</source>
         <translation>Max. Tage für Bewertung</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3284"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3292"/>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
         <translation>Zur Bewertung der Sendungen in der &quot;Beobachtungsliste&quot; wird für jeden Tag nach der Aufnahme ein Punkt vergeben. Hier können Sie die max. Punktezahl aufgrund des Alters einer Aufnahme begrenzen. Dies beeinflusst auch andere Gewichtungsfaktoren.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3296"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3304"/>
         <source>Days to exclude weekly episodes after delete</source>
         <translation>Ignoriere wöchentliche Folgen nach Löschen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3301"/>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="3309"/>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
         <translation>Wenn eine Folge gelöscht oder als gesehen markiert wurde, werden andere Folgen einer Serie für die angegebene Zeitspanne nicht in der &quot;Beobachtungsliste&quot; berücksichtigt. Tägliche Sendungen haben einen kleineren Wert, basierend auf diesem Wert.</translation>
     </message>
@@ -39303,12 +39311,12 @@ bitte entfernen Sie diese falls sie nicht länger existieren</translation>
 <context>
     <name>XMLTV_generic_config</name>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="462"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="483"/>
         <source>Configure</source>
         <translation>Konfigurieren</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/videosource.cpp" line="463"/>
+        <location filename="../libs/libmythtv/videosource.cpp" line="484"/>
         <source>Run XMLTV configure command.</source>
         <translation>Starte die XMLTV-Konfiguration.</translation>
     </message>
