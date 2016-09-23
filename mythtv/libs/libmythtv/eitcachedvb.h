@@ -53,12 +53,12 @@ class EitCacheDVB
 			RUNNING = 4
 		} RunningStatusEnum;
 		
-		typedef enum class EventStatus
+		typedef enum class TableStatus
 		{
 			UNINITIALISED = 0,
 			VALID = 1,
-			EMPTY = 3
-		} EventStatusEnum;
+			EMPTY = 2
+		} TableStatusEnum;
 #else
 		struct RunningStatus
 		{
@@ -73,40 +73,40 @@ class EitCacheDVB
 		};
 		typedef RunningStatus::type  RunningStatusEnum;
 		
-		struct EventStatus
+		struct TableStatus
 		{
 			enum type
 			{
 				UNINITIALISED = 0,
 				VALID = 1,
-				EMPTY = 3
+				EMPTY = 2
 			};
 		};
-		typedef EventStatus::type  EventStatusEnum;
+		typedef TableStatus::type  TableStatusEnum;
 #endif
 			
 		struct Event
 		{
-			Event() {}
+			Event() : running_status(EitCacheDVB::RunningStatusEnum::UNDEFINED) {}
 			Event(uint event_id,
 					time_t start_time,
 					time_t end_time,
 					RunningStatusEnum runningStatus,
 					bool isScrambled,
-					EventStatusEnum eventStatus) :
+					TableStatusEnum eventStatus) :
 					event_id(event_id),
 					start_time(start_time),
 					end_time(end_time),
-					runningStatus(runningStatus),
-					isScrambled(isScrambled),
-					eventStatus(eventStatus) {}
+					running_status(runningStatus),
+					is_scrambled(isScrambled),
+					event_status(eventStatus) {}
 
 			uint event_id;
 			time_t start_time;
 			time_t end_time;			
-			RunningStatusEnum runningStatus;
-			bool isScrambled;			
-			EventStatusEnum eventStatus;
+			RunningStatusEnum running_status;
+			bool is_scrambled;			
+			TableStatusEnum event_status;
 			// TODO Need to decide how/whether to handle descriptors
 			
 			bool operator== (const Event &e2) const
@@ -114,27 +114,29 @@ class EitCacheDVB
 				return (event_id == e2.event_id) &&
 						(start_time == e2.start_time) &&
 						(end_time == e2.end_time) &&
-						(runningStatus == e2.runningStatus) &&
-						(isScrambled == e2.isScrambled) &&
-						(eventStatus == e2.eventStatus);
+						(running_status == e2.running_status) &&
+						(is_scrambled == e2.is_scrambled) &&
+						(event_status == e2.event_status);
 			}
 		};
 		
 		struct Section
 		{
+			Section() : section_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+			TableStatusEnum section_status;
 			QMap<time_t, struct Event*> events;
 		};
 		
 		struct Segment
 		{
+			Segment() : segment_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+			TableStatusEnum segment_status;
 			QMap<int, struct Section> sections;
 		};
 		
 		struct TableBase
 		{
-			TableBase() : current_version_number(VERSION_UNINITIALISED)
-			{
-			}
+			TableBase() : current_version_number(VERSION_UNINITIALISED) {}
 			
 			void SetOriginalNetworkId(uint id)
 			{
@@ -152,7 +154,6 @@ class EitCacheDVB
 			}
 			
 			static const uint VERSION_UNINITIALISED = 32;
-			static const time_t EVENT_TIME_LEEWAY = 2;
 			uint original_network_id;
 			uint transport_stream_id;
 			uint service_id;
@@ -168,7 +169,7 @@ class EitCacheDVB
 								const bool actual);
 
 		private: // Data
-			QMap<int, struct Segment> segments;
+			Segment segments[8];
 		};
 		
 		struct PfTable : public TableBase
