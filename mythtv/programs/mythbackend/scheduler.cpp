@@ -4783,6 +4783,14 @@ int Scheduler::FillRecordingDir(
 {
     LOG(VB_SCHEDULE, LOG_INFO, LOC + "FillRecordingDir: Starting");
 
+    uint cnt = 0;
+    while (!m_mainServer)
+    {
+        if (cnt++ % 20 == 0)
+            LOG(VB_SCHEDULE, LOG_WARNING, "Waiting for main server.");
+        usleep(50000);
+    }
+
     int fsID = -1;
     MSqlQuery query(MSqlQuery::InitCon());
     QMap<QString, FileSystemInfo>::Iterator fsit;
