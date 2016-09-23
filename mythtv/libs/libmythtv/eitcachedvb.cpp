@@ -356,7 +356,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint segment_last_section_number = eit->SegmentLastSectionNumber();
     uint event_count = eit->EventCount();
-    struct Event *pfEvent;
+    struct Event *ScheduleEvent;
     
     LOG(VB_EIT, LOG_DEBUG, LOC + QString(
         "Processing Table %1/%2/%3")
@@ -514,6 +514,28 @@ bool EitCacheDVB::PfTable::ProcessSection(
 }
 
 
+bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
+                const DVBEventInformationTable *eit, 
+                uint event_count,
+                uint section_number)
+{
+    static const uint SECONDS_IN_A_DAY = 86400;
+    static const uint SECONDS_IN_A_FULL_FULL_SUB_TABLE = // 96 hours
+    static const uint SECONDS_IN_A_SEGMENT = 10800; // 3 hours
+    
+    
+    // Calculate the time span for this section
+    uint last_midnight = (QDateTime::currentDateTimeUtc().toTime_t()
+                    / SECONDS_IN_A_DAY) * SECONDS_IN_A_DAY;
+    uint sub_table_index = eit->TableID() - (actual ? 0x50 : 0x60);
+    uint segment_index = section_number / 32;
+    uint sub_table_start_time = last_midnight + (SECONDS_IN_A_FULL_FULL_SUB_TABLE * sub_table_index);
+    uint start_time_span = sub_table_start_time + (SECONDS_IN_A_SEGMENT * segment_index);
+    uint end_time_span = sub_table_start_time + (SECONDS_IN_A_SEGMENT * (segment_index + 1);
+        
+    return true;
+}
+
 bool EitCacheDVB::ScheduleTable::ProcessSection(
                 const DVBEventInformationTable *eit, const bool actual)
 {
@@ -526,9 +548,12 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint segment_last_section_number = eit->SegmentLastSectionNumber();
     uint event_count = eit->EventCount();
-    Segment& segment = segments[(section_number - (section_number % 8)) / 8];
-    LOG(VB_EIT, LOG_DEBUG, LOC + QString("Processing segment %1")
-        .arg((section_number - (section_number % 8)) / 8));
+    uint segment_number = section_number / 8;
+    uint segment_index = section_number - (segment_number * 8);
+    LOG(VB_EIT, LOG_DEBUG, LOC + QString("Processing segment %1 "
+                        "index %2 ")
+        .arg(segment_number)
+        .arg(section_index));
 
     if ((segment_last_section_number > last_section_number) ||
             (section_number > segment_last_section_number))
@@ -537,7 +562,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 "Bad segment_last_section_number %1 "
                 "or section_number %2 - "
                 "last_section_number %3 "
-                "actual %5")
+                "actual %4")
                 .arg(segment_last_section_number)
                 .arg(section_number)
                 .arg(last_section_number)
@@ -545,6 +570,84 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         return false;
     }
     
+/*    
+    // Check the version number against the current table if any
+    if (VERSION_UNINITIALISED == current_version_number)
+    {
+        // No previous table - I will initialise the version number
+        // from this section provided the event times (if present) are
+        // reasonable.
+        if (!ValidateEventTimes(eit, event_count, section_number))
+            return false;
+            
+        current_version_number = version_number; // for tidyness
+    }
+    else
+    {
+        // Previous table version exists
+        if ((current_version_number + 1) % 32 == version_number)
+        {
+            // Ignore if event times are invalid
+            if (!ValidateEventTimes(eit, event_count, section_number))
+                return false;
+            // Invalidate the other sections
+        }
+        else
+        {
+            // It is either a duplicate or a discontinuity
+            if (current_version_number == version_number)
+            {
+                // Possible duplicate
+                if (event_count == 0)
+                {
+                    // Same version number no incoming events
+                    if (sub_tables[segment_number].segments[]->event_status == TableStatusEnum::EMPTY)
+                        // No events available to compare
+                        // reject as duplicate
+                        return false;
+                    // At this point I have the same version number,
+                    // no events in the incoming section,
+                    // some events in the stored section.
+                    if (!actual)
+                    {
+                        // On the "other" stream reject as duplicate
+                        return false;
+                    }
+                    // On the "actual" stream accept
+                    // the incoming section as a wrap around
+                    // discontinuity. 
+                }
+                else
+                {
+                    // Same version number some incoming events
+                    if (pfEvent->event_status == TableStatusEnum::VALID)
+                    {
+                        // Some events to compare
+                        if (Event(eit->EventID(0),
+                                eit->StartTimeUnixUTC(0),
+                                eit->EndTimeUnixUTC(0),
+                                RunningStatus(eit->RunningStatus(0)),
+                                eit->IsScrambled(0),
+                                TableStatusEnum::VALID) ==
+                                *pfEvent)
+                            return false;
+                    }
+                    // Ignore if event times are invalid
+                    if (!ValidateEventTimes(eit, event_count, section_number))
+                        return false;
+                    // Some data is better than no data
+                }
+            }
+            else
+            {
+                // Discontinuity
+                if (!ValidateEventTimes(eit, event_count, section_number))
+                    return false;
+            }
+        }
+    }
+*/    
+    // Section has passed all the checks
     
     return true;
 }

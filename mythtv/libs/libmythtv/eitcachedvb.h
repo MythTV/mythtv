@@ -129,9 +129,11 @@ class EitCacheDVB
 		
 		struct Segment
 		{
-			Segment() : segment_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
-			TableStatusEnum segment_status;
-			QMap<int, struct Section> sections;
+			Section sections[8];
+		
+		struct SubTable
+		{
+			Section segments[32];
 		};
 		
 		struct TableBase
@@ -168,8 +170,13 @@ class EitCacheDVB
 			bool ProcessSection(const DVBEventInformationTable *eit,
 								const bool actual);
 
+		private: // Methods
+			bool ValidateEventTimes(const DVBEventInformationTable *eit,
+					uint event_count,
+					uint section_number);
+					
 		private: // Data
-			Segment segments[8];
+			SubTable sub_tables[8];
 		};
 		
 		struct PfTable : public TableBase
@@ -181,7 +188,8 @@ class EitCacheDVB
 		private: // Methods
 			bool ValidateEventTimes(const DVBEventInformationTable *eit,
 					uint event_count,
-					uint section_number);
+					uint section_number,
+					uint segment_last_section);
 				
 		private: // Data			
 			struct Event present;
