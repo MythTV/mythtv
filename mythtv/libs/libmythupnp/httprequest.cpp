@@ -1486,6 +1486,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 
         if (nCount > 1)
         {
+            m_sOriginalUrl = tokens[1].toUtf8(); // Used by authorization check
             m_sRequestUrl = QUrl::fromPercentEncoding(tokens[1].toUtf8());
             m_sBaseUrl = m_sRequestUrl.section( '?', 0, 0).trimmed();
 
@@ -2004,7 +2005,7 @@ bool HTTPRequest::DigestAuthentication()
     if (paramMap["username"] == "nouser") // Special logout username
         return false;
 
-    if (paramMap["uri"] != m_sRequestUrl)
+    if (paramMap["uri"] != m_sOriginalUrl)
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization URI doesn't match the "
                                      "request URI");
