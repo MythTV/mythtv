@@ -124,16 +124,21 @@ class EitCacheDVB
 		{
 			Section() : section_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
 			TableStatusEnum section_status;
-			QMap<time_t, struct Event*> events;
+			QList<struct Event> events;
 		};
 		
 		struct Segment
 		{
+			Segment() : segment_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+			TableStatusEnum segment_status;
 			Section sections[8];
+		};
 		
 		struct SubTable
 		{
-			Section segments[32];
+			SubTable() : subtable_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+			TableStatusEnum subtable_status;
+			Segment segments[32];
 		};
 		
 		struct TableBase
@@ -160,9 +165,6 @@ class EitCacheDVB
 			uint transport_stream_id;
 			uint service_id;
 			uint current_version_number;
-			bool version_from_actual; // True if the section contains
-									// a version from the "actual" transport
-									// stream and original network.
 		};
 		
 		struct ScheduleTable : public TableBase
@@ -173,10 +175,13 @@ class EitCacheDVB
 		private: // Methods
 			bool ValidateEventTimes(const DVBEventInformationTable *eit,
 					uint event_count,
-					uint section_number);
+					uint section_number,
+					uint segment_last_section_number,
+					bool actual);
+			void InvalidateEverything();
 					
 		private: // Data
-			SubTable sub_tables[8];
+			SubTable subtables[8];
 		};
 		
 		struct PfTable : public TableBase
@@ -188,8 +193,7 @@ class EitCacheDVB
 		private: // Methods
 			bool ValidateEventTimes(const DVBEventInformationTable *eit,
 					uint event_count,
-					uint section_number,
-					uint segment_last_section);
+					uint section_number);
 				
 		private: // Data			
 			struct Event present;
