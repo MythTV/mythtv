@@ -546,7 +546,7 @@ bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
                 const DVBEventInformationTable *eit, 
                 uint event_count,
                 uint section_number,
-                uint segment_last_section_number, bool actual)
+                bool actual)
 {
     static const uint SECONDS_IN_A_DAY = 86400;
     static const uint SECONDS_IN_A_FULL_SUB_TABLE = 345600; // 96 hours
@@ -558,9 +558,14 @@ bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
                     / SECONDS_IN_A_DAY) * SECONDS_IN_A_DAY;
     uint sub_table_index = eit->TableID() - (actual ? 0x50 : 0x60);
     uint segment_index = section_number / 32;
-    uint sub_table_start_time = last_midnight + (SECONDS_IN_A_FULL_SUB_TABLE * sub_table_index);
-    uint start_time_span = sub_table_start_time + (SECONDS_IN_A_SEGMENT * segment_index);
-    uint end_time_span = sub_table_start_time + (SECONDS_IN_A_SEGMENT * (segment_index + 1));
+    uint sub_table_start_time = last_midnight
+                                + (SECONDS_IN_A_FULL_SUB_TABLE 
+                                * sub_table_index);
+    uint start_time_span = sub_table_start_time
+                            + (SECONDS_IN_A_SEGMENT * segment_index);
+    uint end_time_span = sub_table_start_time
+                        + (SECONDS_IN_A_SEGMENT
+                        * (segment_index + 1));
     
     for (uint ievent = 0; ievent < event_count; ievent++)
     {
@@ -597,6 +602,9 @@ bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
 
 void EitCacheDVB::ScheduleTable::InvalidateEverything()
 {
+    
+    subtable_count = 0;
+    
     for (uint isubtable = 0; isubtable < 8; isubtable++)
     {
         SubTable& subtable = subtables[isubtable];
@@ -604,6 +612,7 @@ void EitCacheDVB::ScheduleTable::InvalidateEverything()
         for (uint isegment = 0; isegment < 32; isegment++)
         {
             Segment& segment = subtable.segments[isegment];
+            segment.section_count = 0;
             segment.segment_status = TableStatusEnum::UNINITIALISED;
             for (uint isection = 0; isection < 8; isection++)
             {
@@ -630,16 +639,22 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     uint event_count = eit->EventCount();
     uint subtable_index = table_id - (actual ? 0x50 : 0x60);
     uint segment_index = section_number / 32;
-    uint section_index = section_number - (segment_index * 8);
+    uint section_index = section_number - (segment_index * 32);
+    uint incoming_subtable_count = last_table_id 
+                                - (actual ? 0x50 : 0x60)
+                                + 1;
+    uint incoming_section_count = (segment_last_section_number / 32)
+                                    + 1;
+
     
     
     if (table_id > last_table_id)
     {
         LOG(VB_EIT, LOG_DEBUG, LOC + QString("Bad table_id "
                             "table_id %1 "
-                            "last_table_id %2"
+                            "last_table_id %2 "
                             "segment_last_section_number %3 "
-                            "last_section_number %4"
+                            "last_section_number %4 "
                             "actual %5")
                             .arg(table_id)
                             .arg(last_table_id)
@@ -656,9 +671,9 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         LOG(VB_EIT, LOG_DEBUG, LOC + QString(
                             "Bad segment_last_section_number "
                             "table_id %1 "
-                            "last_table_id %2"
+                            "last_table_id %2 "
                             "segment_last_section_number %3 "
-                            "last_section_number %4"
+                            "last_section_number %4 "
                             "actual %5")
                             .arg(table_id)
                             .arg(last_table_id)
@@ -674,9 +689,9 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         LOG(VB_EIT, LOG_DEBUG, LOC + QString(
                             "Bad section_number "
                             "table_id %1 "
-                            "last_table_id %2"
+                            "last_table_id %2 "
                             "segment_last_section_number %3 "
-                            "last_section_number %4"
+                            "last_section_number %4 "
                             "actual %5")
                             .arg(table_id)
                             .arg(last_table_id)
@@ -690,14 +705,16 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     
     LOG(VB_EIT, LOG_DEBUG, LOC + QString("Processing "
                         "table_id %1 "
-                        "last_table_id %2"
+                        "last_table_id %2 "
                         "segment_last_section_number %3 "
-                        "last_section_number %4"
+                        "last_section_number %4 "
                         "subtable index %5 "
                         "segment index %6 "
                         "section index %7 "
                         "section_number %8 "
-                        "actual %9")
+                        "incoming_subtable_count %9 "
+                        "incoming_section_count %10 "
+                        "actual %11")
                         .arg(table_id)
                         .arg(last_table_id)
                         .arg(segment_last_section_number)
@@ -706,6 +723,8 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         .arg(segment_index)
                         .arg(section_index)
                         .arg(section_number)
+                        .arg(incoming_subtable_count)
+                        .arg(incoming_section_count)
                         .arg(actual));
 
     // Check the version number against the current table if any
@@ -715,7 +734,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         // from this section provided the event times (if present) are
         // reasonable.
         if (!ValidateEventTimes(eit, event_count, section_number,
-                segment_last_section_number, actual))
+                                actual))
             return false;
             
         current_version_number = version_number; // for tidyness
@@ -727,7 +746,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         {
             // Ignore if event times are invalid
             if (!ValidateEventTimes(eit, event_count, section_number,
-                            segment_last_section_number, actual))
+                                    actual))
                 return false;
             // New table version
             InvalidateEverything();
@@ -825,7 +844,6 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                     // Ignore if event times are invalid
                     if (!ValidateEventTimes(eit, event_count,
                                             section_number,
-                                            segment_last_section_number,
                                             actual))
                         return false;
                     // Some data is better than no data
@@ -836,7 +854,6 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 // Discontinuity
                 if (!ValidateEventTimes(eit, event_count,
                                         section_number,
-                                        segment_last_section_number,
                                         actual))
                     return false;
             }
@@ -846,15 +863,16 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     // Section has passed all the checks
 
     current_version_number = version_number;
-    subtables[subtable_index].subtable_status = TableStatusEnum::VALID;
-    subtables[subtable_index]
-        .segments[segment_index]
-        .segment_status = TableStatusEnum::VALID;
-    Section& current_section =subtables[subtable_index]
-        .segments[segment_index]
-        .sections[section_index];
+    subtable_count = incoming_subtable_count;
+    SubTable& current_subtable = subtables[subtable_index];
+    current_subtable.subtable_status = TableStatusEnum::VALID;
+    Segment& current_segment = current_subtable.segments[segment_index];
+    current_segment.segment_status = TableStatusEnum::VALID;
+    current_segment.section_count = incoming_section_count;
+    Section& current_section = current_segment.sections[section_index];
     current_section.section_status = TableStatusEnum::VALID;
-    current_section.events.clear();
+    if (!current_section.events.isEmpty())
+        current_section.events.clear();
     for (uint ievent = 0; ievent < event_count; ievent++)
         current_section.events.append(
             Event(eit->EventID(0),

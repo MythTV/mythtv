@@ -122,28 +122,78 @@ class EitCacheDVB
 		
 		struct Section
 		{
-			Section() : section_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+			Section() : section_status(
+						EitCacheDVB::TableStatusEnum::UNINITIALISED) 
+						{}
+						
+			Section(const Section &other)
+			{
+				*this = other;
+			}
+
+			Section& operator = (const Section &other)
+			{
+				section_status = other.section_status;
+				events = other.events;
+				return *this;
+			}
+
 			TableStatusEnum section_status;
 			QList<struct Event> events;
 		};
 		
 		struct Segment
 		{
-			Segment() : segment_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+			Segment() : segment_status(
+						EitCacheDVB::TableStatusEnum::UNINITIALISED),
+						section_count(0) {}
+						
+			Segment(const Segment &other)
+			{
+				*this = other;
+			}
+
+			Segment& operator = (const Segment &other)
+			{
+				segment_status = other.segment_status;
+				section_count = other.section_count;
+				for (uint i = 0; i < 8; i++)
+					sections[i] = other.sections[i];
+				return *this;
+			}
+
 			TableStatusEnum segment_status;
+			uint section_count;
 			Section sections[8];
 		};
 		
 		struct SubTable
 		{
-			SubTable() : subtable_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+			SubTable() : subtable_status(
+						EitCacheDVB::TableStatusEnum::UNINITIALISED)
+						{}
+						
+			SubTable(const SubTable &other)
+			{
+				*this = other;
+			}
+
+			SubTable& operator = (const SubTable &other)
+			{
+				subtable_status = other.subtable_status;
+				for (uint i = 0; i < 32; i++)
+					segments[i] = other.segments[i];
+				return *this;
+			}
+			
 			TableStatusEnum subtable_status;
 			Segment segments[32];
 		};
 		
 		struct TableBase
 		{
-			TableBase() : current_version_number(VERSION_UNINITIALISED) {}
+			TableBase() : current_version_number(VERSION_UNINITIALISED)
+							{}
 			
 			void SetOriginalNetworkId(uint id)
 			{
@@ -169,6 +219,7 @@ class EitCacheDVB
 		
 		struct ScheduleTable : public TableBase
 		{
+			ScheduleTable() : subtable_count(0) {}
 			bool ProcessSection(const DVBEventInformationTable *eit,
 								const bool actual);
 
@@ -176,11 +227,11 @@ class EitCacheDVB
 			bool ValidateEventTimes(const DVBEventInformationTable *eit,
 					uint event_count,
 					uint section_number,
-					uint segment_last_section_number,
 					bool actual);
 			void InvalidateEverything();
 					
 		private: // Data
+			uint subtable_count;
 			SubTable subtables[8];
 		};
 		
@@ -209,7 +260,7 @@ class EitCacheDVB
 	private: // Data
 		// The first paragraph of ETR 211 section 4.1.4 statues that
 		// for each "service" a separate EIT sub-table exists.
-		// ETR 211 section 4.1.1 states that eache "service" can be
+		// ETR 211 section 4.1.1 states that each "service" can be
 		// uniquely referenced through the path
 		// original_network_id/transport_stream_id/service_id
 		// I use that 48 bit path to index the following tables 
