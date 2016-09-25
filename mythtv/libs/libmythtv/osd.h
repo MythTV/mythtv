@@ -220,6 +220,7 @@ class OSD
     QString         m_PulsedDialogText;
     QDateTime       m_NextPulseUpdate;
     bool            m_Refresh;
+    bool            m_Visible;
     int             m_Timeouts[4];
 
     bool            m_UIScaleOverride;

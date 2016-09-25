@@ -152,7 +152,7 @@ OSD::OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
   : m_parent(player), m_ParentObject(parent), m_CurrentPainter(painter),
     m_Rect(QRect()), m_Effects(true), m_FadeTime(kOSDFadeTime), m_Dialog(NULL),
     m_PulsedDialogText(QString()), m_NextPulseUpdate(QDateTime()),
-    m_Refresh(false),   m_UIScaleOverride(false),
+    m_Refresh(false), m_Visible(false), m_UIScaleOverride(false),
     m_SavedWMult(1.0f), m_SavedHMult(1.0f),   m_SavedUIRect(QRect()),
     m_fontStretch(100), m_savedFontStretch(100),
     m_FunctionalType(kOSDFunctionalType_Default), m_FunctionalWindow(QString())
@@ -740,6 +740,11 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
         }
         painter->End();
     }
+
+    // Force a redraw if it just became invisible
+    if (m_Visible && !visible)
+        redraw=true;
+    m_Visible = visible;
 
     return redraw;
 }
