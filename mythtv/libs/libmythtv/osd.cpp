@@ -704,6 +704,8 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
             {
                 QTime expires = nc->ScreenExpiryTime(*it2).time();
                 int left = now.msecsTo(expires);
+                if (left < 0)
+                    left = 0;
                 if (expires.isValid() && left < m_FadeTime)
                     (*it2)->SetAlpha((255 * left) / m_FadeTime);
             }
