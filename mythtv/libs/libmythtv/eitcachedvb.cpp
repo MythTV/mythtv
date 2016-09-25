@@ -638,13 +638,13 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     uint last_table_id = eit->LastTableID();
     uint event_count = eit->EventCount();
     uint subtable_index = table_id - (actual ? 0x50 : 0x60);
-    uint segment_index = section_number / 32;
-    uint section_index = section_number - (segment_index * 32);
+    uint segment_index = section_number / 8;
+    uint section_index = section_number - (segment_index * 8);
     uint incoming_subtable_count = last_table_id 
                                 - (actual ? 0x50 : 0x60)
                                 + 1;
-    uint incoming_section_count = (segment_last_section_number / 32)
-                                    + 1;
+    uint incoming_section_count = segment_last_section_number + 1
+                                - 8 * (segment_last_section_number / 8);
 
     
     
@@ -708,9 +708,9 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         "last_table_id %2 "
                         "segment_last_section_number %3 "
                         "last_section_number %4 "
-                        "subtable index %5 "
-                        "segment index %6 "
-                        "section index %7 "
+                        "subtable_index %5 "
+                        "segment_index %6 "
+                        "section_index %7 "
                         "section_number %8 "
                         "incoming_subtable_count %9 "
                         "incoming_section_count %10 "
