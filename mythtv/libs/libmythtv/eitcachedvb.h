@@ -224,7 +224,7 @@ class EitCacheDVB
 								const bool actual);
 
 		private: // Methods
-			bool ValidateEventTimes(const DVBEventInformationTable *eit,
+			bool ValidateEventStartTimes(const DVBEventInformationTable *eit,
 					uint event_count,
 					uint section_number,
 					bool actual);

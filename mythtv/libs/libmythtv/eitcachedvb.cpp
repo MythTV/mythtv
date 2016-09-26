@@ -518,6 +518,19 @@ bool EitCacheDVB::PfTable::ProcessSection(
             .arg(eit->RunningStatus(0))
             .arg(eit->IsScrambled(0))
             .arg(event_count));
+
+    LOG(VB_EIT, LOG_INFO, LOC + QString(
+    		"EIT PF section  %1 change - original_network_id %2 "
+    		"transport_stream_id %3 "
+    		"service_id %4 "
+    		"version_number %5 "
+    		"actual %6")
+    		.arg(section_number)
+            .arg(original_network_id)
+            .arg(transport_stream_id)
+            .arg(service_id)
+            .arg(version_number)
+            .arg(actual));
             
     if (pfEvent->running_status != RunningStatusEnum(eit->RunningStatus(0)))
         LOG(VB_EIT, LOG_INFO, LOC + QString(
@@ -542,7 +555,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
 }
 
 
-bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
+bool EitCacheDVB::ScheduleTable::ValidateEventStartTimes(
                 const DVBEventInformationTable *eit, 
                 uint event_count,
                 uint section_number,
@@ -565,14 +578,13 @@ bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
                             + (SECONDS_IN_A_SEGMENT * segment_index);
     uint end_time_span = sub_table_start_time
                         + (SECONDS_IN_A_SEGMENT
-                        * (segment_index + 1));
+                        * (segment_index + 1)) - 1;
     
     for (uint ievent = 0; ievent < event_count; ievent++)
     {
         time_t start_time = eit->StartTimeUnixUTC(0);
-        time_t end_time = eit->EndTimeUnixUTC(0);
         if ((start_time < start_time_span)
-            || (end_time > end_time_span))
+            || (start_time > end_time_span))
             {
                 LOG(VB_EIT, LOG_DEBUG, LOC + QString(
                     "Schedule table event %1 failed time span check "
@@ -582,8 +594,7 @@ bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
                     "sub_table_start_time %5 "
                     "start_time_span %6 "
                     "end_time_span %7 "
-                    "start_time %8 "
-                    "end_time %9")
+                    "start_time %8 ")
                     .arg(eit->EventID(ievent))
                     .arg(last_midnight)
                     .arg(sub_table_index)
@@ -591,8 +602,7 @@ bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
                     .arg(sub_table_start_time)
                     .arg(start_time_span)
                     .arg(end_time_span)
-                    .arg(start_time)
-                    .arg(end_time));
+                    .arg(start_time));
                 return false;
             }
         }
@@ -733,7 +743,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         // No previous table - I will initialise the version number
         // from this section provided the event times (if present) are
         // reasonable.
-        if (!ValidateEventTimes(eit, event_count, section_number,
+        if (!ValidateEventStartTimes(eit, event_count, section_number,
                                 actual))
             return false;
             
@@ -745,7 +755,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         if ((current_version_number + 1) % 32 == version_number)
         {
             // Ignore if event times are invalid
-            if (!ValidateEventTimes(eit, event_count, section_number,
+            if (!ValidateEventStartTimes(eit, event_count, section_number,
                                     actual))
                 return false;
             // New table version
@@ -842,7 +852,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         }
                     }
                     // Ignore if event times are invalid
-                    if (!ValidateEventTimes(eit, event_count,
+                    if (!ValidateEventStartTimes(eit, event_count,
                                             section_number,
                                             actual))
                         return false;
@@ -852,7 +862,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
             else
             {
                 // Discontinuity
-                if (!ValidateEventTimes(eit, event_count,
+                if (!ValidateEventStartTimes(eit, event_count,
                                         section_number,
                                         actual))
                     return false;
@@ -881,6 +891,32 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         RunningStatus(eit->RunningStatus(0)),
                         eit->IsScrambled(0),
                         TableStatusEnum::VALID));
+
+    LOG(VB_EIT, LOG_DEBUG, LOC + QString("Schedule table change "
+                        "table_id %1 "
+                        "last_table_id %2 "
+                        "segment_last_section_number %3 "
+                        "last_section_number %4 "
+                        "subtable_index %5 "
+                        "segment_index %6 "
+                        "section_index %7 "
+                        "section_number %8 "
+                        "incoming_subtable_count %9 "
+                        "incoming_section_count %10 "
+    					"version_nunber %11"
+                        "actual %12")
+                        .arg(table_id)
+                        .arg(last_table_id)
+                        .arg(segment_last_section_number)
+                        .arg(last_section_number)
+                        .arg(subtable_index)
+                        .arg(segment_index)
+                        .arg(section_index)
+                        .arg(section_number)
+                        .arg(incoming_subtable_count)
+                        .arg(incoming_section_count)
+						.arg(version_number)
+                        .arg(actual));
 
     return true;
 }
