@@ -118,6 +118,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QString             m_sRawRequest; // e.g. GET /foo/bar.html HTTP/1.1
 
+        QString             m_sOriginalUrl; // Raw request URL before % decoded
         QString             m_sRequestUrl; // Raw request URL
         QString             m_sBaseUrl; // Path section of URL, without parameters
         QString             m_sResourceUrl; // Duplicate of Base URL!?

@@ -3,12 +3,14 @@
    <button>
       <type>ARCHIVE_CREATE_DVD</type>
       <text>Create DVD</text>
+      <description>Save recordings and videos to video DVD</description>
       <action>ARCHIVE_CREATE_DVD</action>
    </button>
 
    <button>
       <type>ARCHIVE_CREATE_ARCHIVE</type>
       <text>Create Archive</text>
+      <description>Save recordings and videos to a native archive</description>
       <action>ARCHIVE_CREATE_ARCHIVE</action>
   </button>
 
@@ -22,12 +24,14 @@
    <button>
        <type>ARCHIVE_IMPORT_VIDEO</type>
        <text>Import Archive</text>
+       <description>Import recordings from a native archive</description>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 
    <button>
        <type>ARCHIVE_UTILITIES</type>
        <text>Archive Utilities</text>
+       <description>Utilities for MythArchive</description>
        <action>MENU archiveutils.xml</action>
    </button>
 

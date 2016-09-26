@@ -610,10 +610,7 @@ void ProgDetails::loadPage(void)
         }
         if (record->m_searchType != kManualSearch &&
             record->m_description != m_progInfo.GetDescription())
-        {
-            searchPhrase = record->m_description
-                .replace("<", "&lt;").replace(">", "&gt;").replace("\n", " ");
-        }
+            searchPhrase = record->m_description;
     }
     addItem(tr("Recording Rule"), recordingRule, ProgInfoList::kLevel1);
     addItem(tr("Last Recorded"), lastRecorded, ProgInfoList::kLevel2);

@@ -51,7 +51,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                                            int              nChannelGroupId,
                                            int              nStartIndex,
                                            int              nCount)
-{     
+{
     if (!rawStartTime.isValid())
         throw( "StartTime is invalid" );
 
@@ -148,18 +148,18 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     pGuide->setStartTime    ( dtStartTime   );
     pGuide->setEndTime      ( dtEndTime     );
     pGuide->setDetails      ( bDetails      );
-    
+
     pGuide->setStartIndex    ( nStartIndex     );
     pGuide->setCount         ( chanList.size() );
     pGuide->setTotalAvailable( nTotalAvailable );
     pGuide->setAsOf          ( MythDate::current() );
-    
+
     pGuide->setVersion      ( MYTH_BINARY_VERSION );
     pGuide->setProtoVer     ( MYTH_PROTO_VERSION  );
-    
+
     return pGuide;
 }
- 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -330,7 +330,7 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
 
 DTC::Program* Guide::GetProgramDetails( int              nChanId,
                                         const QDateTime &rawStartTime )
-                                          
+
 {
     if (!(nChanId > 0))
         throw( "Channel ID is invalid" );
@@ -525,4 +525,3 @@ QStringList Guide::GetStoredSearches( const QString& sType )
 
     return keywordList;
 }
-

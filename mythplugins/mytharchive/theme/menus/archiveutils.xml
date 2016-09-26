@@ -2,19 +2,22 @@
 
    <button>
       <type>ARCHIVE_LAST_LOG</type>
-      <text>Show Log Viewer</text>
+      <text>Log Viewer</text>
+      <description>Show the Archive Log Viewer</description>
       <action>ARCHIVE_LAST_LOG</action>
    </button>
 
    <button>
        <type>ARCHIVE_TEST_DVD</type>
        <text>Play Created DVD</text>
+       <description>Play the last created archive DVD</description>
        <action>ARCHIVE_TEST_DVD</action>
    </button>
 
    <button>
        <type>ARCHIVE_BURN_DVD</type>
-       <text>Burn DVD</text>
+       <text>Burn Created DVD</text>
+       <description>Burn the last created archive to DVD</description>
        <action>ARCHIVE_BURN_DVD</action>
    </button>
 

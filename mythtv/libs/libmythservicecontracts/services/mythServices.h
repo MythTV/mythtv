@@ -2,10 +2,10 @@
 // Program Name: mythservices.h
 // Created     : Jan. 19, 2010
 //
-// Purpose - Myth Services API Interface definition 
+// Purpose - Myth Services API Interface definition
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -176,4 +176,3 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 };
 
 #endif
-

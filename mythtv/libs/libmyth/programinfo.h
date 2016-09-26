@@ -69,7 +69,7 @@ class MPUBLIC ProgramInfo
   public:
     enum CategoryType { kCategoryNone, kCategoryMovie, kCategorySeries,
                         kCategorySports, kCategoryTVShow };
-                        
+
     /// Null constructor
     ProgramInfo(void);
     /// Copy constructor
@@ -677,6 +677,8 @@ class MPUBLIC ProgramInfo
         const QString &pathname, uint &chanid, QDateTime &recstartts);
     static bool QueryKeyFromPathname(
         const QString &pathname, uint &chanid, QDateTime &recstartts);
+    static bool QueryRecordedIdFromPathname(const QString &pathname,
+        uint &recordedid);
 
     static QString  QueryRecordingGroupPassword(const QString &group);
     static uint64_t QueryBookmark(uint chanid, const QDateTime &recstartts);

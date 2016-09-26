@@ -2,10 +2,10 @@
 // Program Name: dvrServices.h
 // Created     : Mar. 7, 2011
 //
-// Purpose - DVR Services API Interface definition 
+// Purpose - DVR Services API Interface definition
 //
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "6.2" );
+    Q_CLASSINFO( "version"    , "6.3" );
     Q_CLASSINFO( "RemoveRecorded_Method",                       "POST" )
     Q_CLASSINFO( "DeleteRecording_Method",                      "POST" )
     Q_CLASSINFO( "UnDeleteRecording",                           "POST" )
@@ -77,7 +77,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
     public slots:
 
-        virtual DTC::ProgramList*  GetExpiringList       ( int              StartIndex, 
+        virtual DTC::ProgramList*  GetExpiringList       ( int              StartIndex,
                                                            int              Count      ) = 0;
 
         virtual DTC::ProgramList*  GetRecordedList       ( bool             Descending,
@@ -107,6 +107,12 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            int              ChanId,
                                                            const QDateTime &StartTime ) = 0;
 
+        virtual bool               StopRecording         ( int              RecordedId ) = 0;
+
+        virtual bool               ReactivateRecording   ( int              RecordedId ) = 0;
+
+        virtual bool               RescheduleRecordings  ( void ) = 0;
+
         virtual bool               UpdateRecordedWatchedStatus ( int              RecordedId,
                                                                  int   ChanId,
                                                                  const QDateTime &StartTime,
@@ -131,6 +137,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual DTC::CutList*      GetRecordedCommBreak  ( int              RecordedId,
                                                            int              ChanId,
                                                            const QDateTime &StartTime,
+                                                           const QString   &OffsetType ) = 0;
+
+        virtual DTC::CutList*      GetRecordedSeek       ( int              RecordedId,
                                                            const QString   &OffsetType ) = 0;
 
         virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
@@ -267,6 +276,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual bool               DisableRecordSchedule ( uint             RecordId   ) = 0;
 
+        virtual int                RecordedIdForPathname ( const QString   &Pathname   ) = 0;
+
         // The following are all temporary, pending implementation of a
         // 'enum metadata' endpoint
         virtual QString            RecStatusToString     ( int              RecStatus  ) = 0;
@@ -289,4 +300,3 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 };
 
 #endif
-
