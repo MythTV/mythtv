@@ -557,7 +557,7 @@ bool EitCacheDVB::ScheduleTable::ValidateEventTimes(
     uint last_midnight = (QDateTime::currentDateTimeUtc().toTime_t()
                     / SECONDS_IN_A_DAY) * SECONDS_IN_A_DAY;
     uint sub_table_index = eit->TableID() - (actual ? 0x50 : 0x60);
-    uint segment_index = section_number / 32;
+    uint segment_index = section_number / 8;
     uint sub_table_start_time = last_midnight
                                 + (SECONDS_IN_A_FULL_SUB_TABLE 
                                 * sub_table_index);
