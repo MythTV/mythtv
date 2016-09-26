@@ -1154,7 +1154,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     if ((!checkFile.exists() && !mrl.startsWith("dvd:")
          && !mrl.startsWith("bd:")
          && !mrl.startsWith("myth:")
-         && !mrl.startsWith("http://")))
+         && !mrl.startsWith("http://")
+         && !mrl.startsWith("https://")))
     {
         QString errorText = qApp->translate("(MythFrontendMain)",
             "Failed to open \n '%1' in %2 \n"
