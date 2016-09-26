@@ -355,7 +355,10 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
     EitCacheDVB& TestEITCache = EitCacheDVB::GetInstance();
-    TestEITCache.ProcessSection(eit);
+    if (!TestEITCache.ProcessSection(eit))
+        LOG(VB_EIT, LOG_INFO, LOC + QString("EITCacheDVB is suggesting"
+                                " incoming EIT section is discarded"));
+
     
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||

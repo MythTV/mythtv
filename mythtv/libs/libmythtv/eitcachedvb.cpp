@@ -892,7 +892,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         eit->IsScrambled(0),
                         TableStatusEnum::VALID));
 
-    LOG(VB_EIT, LOG_DEBUG, LOC + QString("Schedule table change "
+    LOG(VB_EIT, LOG_INFO, LOC + QString("Schedule table change "
                         "table_id %1 "
                         "last_table_id %2 "
                         "segment_last_section_number %3 "
