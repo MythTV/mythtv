@@ -735,8 +735,6 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         if (!ValidateEventStartTimes(eit, event_count, section_number,
                                 actual))
             return false;
-            
-        current_version_number = version_number; // for tidyness
     }
     else
     {
@@ -861,17 +859,23 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     
     // Section has passed all the checks
     bool version_changed = false;
+    uint old_version_number;
     bool subtable_count_changed = false;
+    uint old_subtable_count;
     bool section_count_changed = false;
+    uint old_section_count;
     bool event_count_changed = false;
+    uint old_event_count;
 
     if (current_version_number != version_number)
     {
+        old_version_number = current_version_number;;
         current_version_number = version_number;
-        bool version_changed = true;
+        version_changed = true;
     }
     if (subtable_count != incoming_subtable_count)
     {
+        old_subtable_count = subtable_count;
         subtable_count = incoming_subtable_count;
         subtable_count_changed = true;
     }
@@ -881,13 +885,17 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     current_segment.segment_status = TableStatusEnum::VALID;
     if (current_segment.section_count != incoming_section_count)
     {
+        old_section_count = current_segment.section_count;
         current_segment.section_count = incoming_section_count;
         section_count_changed = true;
     }
     Section& current_section = current_segment.sections[section_index];
     current_section.section_status = TableStatusEnum::VALID;
-    if (event_count != current_section.events.size())
+    if (event_count != uint(current_section.events.size()))
+    {
+        old_event_count = uint(current_section.events.size());
         event_count_changed = true;
+    }
     if (!current_section.events.isEmpty())
         current_section.events.clear();
     for (uint ievent = 0; ievent < event_count; ievent++)
@@ -898,6 +906,11 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         RunningStatus(eit->RunningStatus(0)),
                         eit->IsScrambled(0),
                         TableStatusEnum::VALID));
+    if (!version_changed &&
+            !subtable_count_changed &&
+            !section_count_changed &&
+            !event_count_changed)
+        LOG(VB_EITDVB, LOG_INFO, LOC + QString("EIT WDF nothing major changed!"));
 
     LOG(VB_EITDVB, LOG_INFO, LOC + QString("EIT schedule table change "
                         "original_network_id %1 "
@@ -922,7 +935,8 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         .arg(table_id)
                         .arg(section_number)
 						.arg(version_number)
-                            .arg(version_changed ? "*" : "")
+                            .arg(version_changed ? QString("* %1")
+                                .arg(old_version_number) : "")
                         .arg(last_table_id)
                         .arg(segment_last_section_number)
                         .arg(last_section_number)
@@ -930,11 +944,14 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         .arg(segment_index)
                         .arg(section_index)
                         .arg(incoming_subtable_count)
-                            .arg(subtable_count_changed ? "*" : "")
+                            .arg(subtable_count_changed ? QString("* %1")
+                                .arg(old_subtable_count) : "")
                         .arg(incoming_section_count)
-                            .arg(section_count_changed ? "*" : "")
+                            .arg(section_count_changed ? QString("* %1")
+                                .arg(old_section_count) : "")
                         .arg(event_count)
-                            .arg(event_count_changed ? "*" : "")
+                            .arg(event_count_changed ? QString("* %1")
+                                .arg(old_event_count) : "")
                         .arg(actual));
 
     return true;
