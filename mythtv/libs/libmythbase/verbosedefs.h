@@ -114,6 +114,8 @@ VERBOSE_MAP(VB_SIPARSER,  0x00002000, true,
             "Siparser related messages")
 VERBOSE_MAP(VB_EIT,       0x00004000, true,
             "EIT related messages")
+VERBOSE_MAP(VB_EITDVB,       0x00004000, true,
+            "EIT DVB table cache related messages")
 VERBOSE_MAP(VB_VBI,       0x00008000, true,
             "VBI related messages")
 VERBOSE_MAP(VB_DATABASE,  0x00010000, true,
