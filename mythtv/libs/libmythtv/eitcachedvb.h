@@ -87,7 +87,9 @@ class EitCacheDVB
 			
 		struct Event
 		{
-			Event() : running_status(EitCacheDVB::RunningStatusEnum::UNDEFINED) {}
+			Event() : running_status
+                        (EitCacheDVB::RunningStatusEnum::UNDEFINED),
+                        event_status(TableStatusEnum::UNINITIALISED) {}
 			Event(uint event_id,
 					time_t start_time,
 					time_t end_time,
@@ -170,7 +172,8 @@ class EitCacheDVB
 		struct SubTable
 		{
 			SubTable() : subtable_status(
-						EitCacheDVB::TableStatusEnum::UNINITIALISED)
+						EitCacheDVB::TableStatusEnum::UNINITIALISED),
+						subtable_version(TableBase::VERSION_UNINITIALISED)
 						{}
 						
 			SubTable(const SubTable &other)
@@ -181,6 +184,7 @@ class EitCacheDVB
 			SubTable& operator = (const SubTable &other)
 			{
 				subtable_status = other.subtable_status;
+                subtable_version = other.subtable_version;
 				for (uint i = 0; i < 32; i++)
 					segments[i] = other.segments[i];
 				return *this;
@@ -188,18 +192,11 @@ class EitCacheDVB
 			
 			TableStatusEnum subtable_status;
 			Segment segments[32];
+            uint subtable_version;
 		};
 		
 		struct TableBase
 		{
-			TableBase() : current_version_number(VERSION_UNINITIALISED)
-							{}
-			
-			void SetTableId(uint id)
-			{
-				table_id = id;
-			}
-			
 			void SetOriginalNetworkId(uint id)
 			{
 				original_network_id = id;
@@ -216,11 +213,9 @@ class EitCacheDVB
 			}
 			
 			static const uint VERSION_UNINITIALISED = 32;
-            uint table_id;
 			uint original_network_id;
 			uint transport_stream_id;
 			uint service_id;
-			uint current_version_number;
 		};
 		
 		struct ScheduleTable : public TableBase
@@ -244,7 +239,10 @@ class EitCacheDVB
 		struct PfTable : public TableBase
 		{
 			// Methods
-			PfTable();	
+			PfTable() :
+			    pf_version(VERSION_UNINITIALISED) {}
+
+
 			bool ProcessSection(const DVBEventInformationTable *eit,
 								const bool actual);
 		private: // Methods
@@ -255,6 +253,7 @@ class EitCacheDVB
 		private: // Data			
 			struct Event present;
 			struct Event following;
+            uint pf_version;
 		};
 		
 	private: // Methods

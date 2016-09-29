@@ -216,13 +216,6 @@
 
 #define LOC QString("EitCacheDVB: ")
 
-EitCacheDVB::PfTable::PfTable()
-{
-    LOG(VB_EITDVB, LOG_DEBUG, LOC + QString("Constructing a PfTable"));
-    present.event_status = TableStatusEnum::UNINITIALISED;
-    following.event_status = TableStatusEnum::UNINITIALISED;
-}
-
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
 {
     int table_id = eit->TableID();
@@ -238,17 +231,16 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
 bool actual)
 {
     // See if this section is for the pf table or the schedule table
-    long long table_id = eit->TableID();
     long long original_network_id = eit->OriginalNetworkID();
     uint transport_stream_id = eit->TSID();
     uint service_id = eit->ServiceID();
-    unsigned long long key = table_id << 48 | original_network_id << 32 | transport_stream_id  << 16 | service_id;
+    uint table_id = eit->TableID();
+    unsigned long long key = original_network_id << 32 | transport_stream_id  << 16 | service_id;
     if ((table_id == TableID::PF_EIT) || (table_id == TableID::PF_EITo))
     {
         if (!pfTables.contains(key))
         {
             struct PfTable new_table;
-            new_table.SetTableId(table_id);
             new_table.SetOriginalNetworkId(original_network_id);
             new_table.SetTransportStreamId(transport_stream_id);
             new_table.SetServiceId(service_id);
@@ -379,7 +371,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
     }
     
     // Check the version number against the current table if any
-    if (VERSION_UNINITIALISED == current_version_number)
+    if (VERSION_UNINITIALISED == pf_version)
     {
         // No previous table - I will initialise the version number
         // from this section provided the event times (if present) are
@@ -390,7 +382,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
     else
     {
         // Previous table version exists
-        if ((current_version_number + 1) % 32 == version_number)
+        if ((pf_version + 1) % 32 == version_number)
         {
             // Ignore if event times are invalid
             if (!ValidateEventTimes(eit, event_count, section_number))
@@ -408,7 +400,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 pfEvent = &present;
             else
                 pfEvent = &following;
-            if (current_version_number == version_number)
+            if (pf_version == version_number)
             {
                 // Possible duplicate
                 if (event_count == 0)
@@ -491,8 +483,8 @@ bool EitCacheDVB::PfTable::ProcessSection(
     }
     
     // Section has passed all the checks
-    bool version_change = current_version_number != version_number;
-    current_version_number = version_number;
+    bool version_change = pf_version != version_number;
+    pf_version = version_number;
     uint  event_id = eit->EventID(0);
     time_t start_time = eit->StartTimeUnixUTC(0);
     time_t end_time = eit->EndTimeUnixUTC(0);
@@ -647,6 +639,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                                 + 1;
     uint incoming_section_count = segment_last_section_number + 1
                                 - 8 * (segment_last_section_number / 8);
+    uint current_version_number = subtables[subtable_index].subtable_version;
 
     
     
@@ -828,6 +821,11 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 else
                 {
                     // Same version number some incoming events
+                    // TODO !!!!! 
+                    // Throwing the baby away with the bath water
+                    // need to accept the section
+                    // if the event table is empty
+
                     if ((subtables[subtable_index]
                         .subtable_status == TableStatusEnum::VALID)
                         && (subtables[subtable_index]
@@ -836,63 +834,62 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         && (subtables[subtable_index]
                         .segments[segment_index]
                         .sections[section_index]
-                        .section_status == TableStatusEnum::VALID)
-                        && (subtables[subtable_index]
-                        .segments[segment_index]
-                        .sections[section_index]
-                        .events.size() > 0))
+                        .section_status == TableStatusEnum::VALID))
                     {
                         Section& current_section = 
                                 subtables[subtable_index]
                                 .segments[segment_index]
                                 .sections[section_index];
                         // Some events to compare
-                        if (event_count == uint(current_section.events.size()))
+                        if (current_section.events.size() > 0)
                         {
-                            uint ievent;
-                            for (ievent = 0; ievent < event_count; ievent++)
-                                if (!(Event(eit->EventID(ievent),
-                                        eit->StartTimeUnixUTC(ievent),
-                                        eit->EndTimeUnixUTC(ievent),
-                                        RunningStatus(
-                                            eit->RunningStatus(ievent)),
-                                        eit->IsScrambled(ievent),
-                                        TableStatusEnum::VALID) ==
-                                        current_section.events[ievent]))
-                                    break;
-                            if (event_count == ievent)
+                            if (event_count == uint(current_section.events.size()))
                             {
-                                LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
-                                    "Schedule same version some"
-                                    " incoming events - duplicate"));
-                                return false;
+                                uint ievent;
+                                for (ievent = 0; ievent < event_count; ievent++)
+                                    if (!(Event(eit->EventID(ievent),
+                                            eit->StartTimeUnixUTC(ievent),
+                                            eit->EndTimeUnixUTC(ievent),
+                                            RunningStatus(
+                                                eit->RunningStatus(ievent)),
+                                            eit->IsScrambled(ievent),
+                                            TableStatusEnum::VALID) ==
+                                            current_section.events[ievent]))
+                                        break;
+                                if (event_count == ievent)
+                                {
+                                    LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
+                                        "Schedule same version some"
+                                        " incoming events - duplicate"));
+                                    return false;
+                                }
+                                else
+                                    LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
+                                        "Schedule same version some"
+                                        " incoming events but "
+                                        "different number of events in "
+                                        "old table"));
                             }
-                            else
-                                LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
-                                    "Schedule same version some"
-                                    " incoming events but "
-                                    "different number of events in "
-                                    "old table"));
+                        }
+                        else
+                        {
+                            LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
+                                "Schedule same version some "
+                                "incoming events but no stored ones "
+                                "- reject"));
+                            return false;
+                        }
+                        // Ignore if event times are invalid
+                        if (!ValidateEventStartTimes(eit, event_count,
+                                                section_number,
+                                                actual))
+                        {
+                            LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
+                                "Schedule same version "
+                                "but bad event times - reject"));
+                            return false;
                         }
                     }
-                    else
-                        LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
-                            "Schedule same version some "
-                            "incoming events but no stored ones "
-                            "- reject"));
-                        return false;
-
-                    // Ignore if event times are invalid
-                    if (!ValidateEventStartTimes(eit, event_count,
-                                            section_number,
-                                            actual))
-                    {
-                        LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
-                            "Schedule same version "
-                            "but bad event times - reject"));
-                        return false;
-                    }
-                    
                     // Some data is better than no data
                     LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
                             "Some data is better than no data"));
@@ -904,10 +901,12 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 if (!ValidateEventStartTimes(eit, event_count,
                                         section_number,
                                         actual))
+                {
                     LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
                         "Schedule table discontinuity incoming "
                         "events invalid times"));
                     return false;
+                }
                 LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
                     "Schedule table discontinuity accepted"));
             }
@@ -916,7 +915,6 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     
     // Section has passed all the checks
     bool version_changed = false;
-    uint old_version_number;
     bool subtable_count_changed = false;
     uint old_subtable_count;
     bool section_count_changed = false;
@@ -930,8 +928,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
             "Schedule table version number changed old %1 new %2")
             .arg(current_version_number)
             .arg(version_number));
-        old_version_number = current_version_number;;
-        current_version_number = version_number;
+        subtables[subtable_index].subtable_version = version_number;
         version_changed = true;
     }
     if (subtable_count != incoming_subtable_count)
@@ -1009,7 +1006,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         .arg(section_number)
 						.arg(version_number)
                             .arg(version_changed ? QString("* %1")
-                                .arg(old_version_number) : "")
+                                .arg(current_version_number) : "")
                         .arg(last_table_id)
                         .arg(segment_last_section_number)
                         .arg(last_section_number)
