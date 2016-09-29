@@ -45,6 +45,7 @@
 #endif //def OSD_EGL
 
 #include "mythmainwindow.h"
+#include "mythuihelper.h"
 #include "mythcorecontext.h"
 
 #include "filtermanager.h"
@@ -352,6 +353,7 @@ VideoOutputOMX::~VideoOutputOMX()
     {
         m_backgroundscreen->Close();
         m_backgroundscreen = 0;
+        GetMythUI()->RemoveCurrentLocation();
     }
 }
 
@@ -825,6 +827,7 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
                                           m_backgroundscreen))
         {
             mainStack->AddScreen(m_backgroundscreen, false);
+            GetMythUI()->AddCurrentLocation("Playback");
             if (mainWindow->GetPaintWindow())
                 mainWindow->GetPaintWindow()->update();
             qApp->processEvents();
