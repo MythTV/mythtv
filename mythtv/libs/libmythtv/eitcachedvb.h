@@ -195,6 +195,11 @@ class EitCacheDVB
 			TableBase() : current_version_number(VERSION_UNINITIALISED)
 							{}
 			
+			void SetTableId(uint id)
+			{
+				table_id = id;
+			}
+			
 			void SetOriginalNetworkId(uint id)
 			{
 				original_network_id = id;
@@ -211,6 +216,7 @@ class EitCacheDVB
 			}
 			
 			static const uint VERSION_UNINITIALISED = 32;
+            uint table_id;
 			uint original_network_id;
 			uint transport_stream_id;
 			uint service_id;
@@ -264,8 +270,8 @@ class EitCacheDVB
 		// uniquely referenced through the path
 		// original_network_id/transport_stream_id/service_id
 		// I use that 48 bit path to index the following tables 
-		QMap<long, struct PfTable> pfTables;
-		QMap<long, struct ScheduleTable> scheduleTables;
+		QMap<unsigned long long, struct PfTable> pfTables;
+		QMap<unsigned long long, struct ScheduleTable> scheduleTables;
 };
 
 #endif // _EITCACHEDVB_H_

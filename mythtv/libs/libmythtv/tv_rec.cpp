@@ -1286,11 +1286,14 @@ void TVRec::run(void)
         (dvbOpt.dvb_eitscan || get_use_eit(inputid)))
     {
         scanner = new EITScanner(inputid);
-        eitScanStartTime = eitScanStartTime.addSecs(
-            eitCrawlIdleStart + eit_start_rand(inputid, eitTransportTimeout));
+        //eitScanStartTime = eitScanStartTime.addSecs(
+            //eitCrawlIdleStart + eit_start_rand(inputid, eitTransportTimeout));
     }
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
+
+    LOG(VB_EITDVB, LOG_INFO, LOC + QString("eitScanStartTime %1")
+        .arg(eitScanStartTime.toLocalTime().time().toString()));
 
     while (HasFlags(kFlagRunMainLoop))
     {

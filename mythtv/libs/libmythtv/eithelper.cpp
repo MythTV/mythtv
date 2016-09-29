@@ -357,7 +357,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     EitCacheDVB& TestEITCache = EitCacheDVB::GetInstance();
     if (TestEITCache.ProcessSection(eit))
         LOG(VB_EITDVB, LOG_INFO, LOC + QString("EITCacheDVB is suggesting"
-                                " incoming EIT section is processsed"));
+                                " incoming EIT section is processed"));
     else
         LOG(VB_EITDVB, LOG_INFO, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is discarded"));
