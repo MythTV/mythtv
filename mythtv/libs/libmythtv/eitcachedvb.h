@@ -146,9 +146,7 @@ class EitCacheDVB
 		
 		struct Segment
 		{
-			Segment() : segment_status(
-						EitCacheDVB::TableStatusEnum::UNINITIALISED),
-						section_count(0) {}
+			Segment() : section_count(0) {}
 						
 			Segment(const Segment &other)
 			{
@@ -157,14 +155,12 @@ class EitCacheDVB
 
 			Segment& operator = (const Segment &other)
 			{
-				segment_status = other.segment_status;
 				section_count = other.section_count;
 				for (uint i = 0; i < 8; i++)
 					sections[i] = other.sections[i];
 				return *this;
 			}
 
-			TableStatusEnum segment_status;
 			uint section_count;
 			Section sections[8];
 		};
