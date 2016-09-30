@@ -148,8 +148,8 @@ bool ChannelBase::IsTunable(const QString &channum) const
         return false;
     }
 
-    uint mplexid_restriction;
-    uint chanid_restriction;
+    uint mplexid_restriction = 0;
+    uint chanid_restriction = 0;
     if (!IsInputAvailable(mplexid_restriction, chanid_restriction))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
@@ -182,7 +182,8 @@ bool ChannelBase::IsTunable(const QString &channum) const
     }
 
     if ((mplexid_restriction && (mplexid != mplexid_restriction)) ||
-        (chanid_restriction && (chanid != chanid_restriction)))
+        (!mplexid_restriction &&
+         chanid_restriction && (chanid != chanid_restriction)))
     {
         LOG(VB_GENERAL, LOG_ERR, loc + " " +
             QString("Channel is valid, but tuner is busy "
