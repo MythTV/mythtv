@@ -218,23 +218,17 @@
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
 {
-    int table_id = eit->TableID();
-    // See if this section is for a currently tuned transport stream
-    bool actual = (table_id == TableID::PF_EIT) ||
-        ((table_id >= TableID::SC_EITbeg) && 
-        (table_id <= TableID::SC_EITend));
-
-	return ProcessSection(eit, actual);
-}
-	
-bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
-bool actual)
-{
-    // See if this section is for the pf table or the schedule table
     long long original_network_id = eit->OriginalNetworkID();
     uint transport_stream_id = eit->TSID();
     uint service_id = eit->ServiceID();
     uint table_id = eit->TableID();
+    
+    // See if this section is for a currently tuned transport stream
+    bool actual = (table_id == TableID::PF_EIT) ||
+        ((table_id >= TableID::SC_EITbeg) && 
+        (table_id <= TableID::SC_EITend));
+        
+    // See if this section is for the pf table or the schedule table
     unsigned long long key = original_network_id << 32 | transport_stream_id  << 16 | service_id;
     if ((table_id == TableID::PF_EIT) || (table_id == TableID::PF_EITo))
     {
@@ -348,7 +342,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint segment_last_section_number = eit->SegmentLastSectionNumber();
     uint event_count = eit->EventCount();
-    struct Event *pfEvent;
+    PfEvent *pfEvent;
     
     LOG(VB_EITDVB, LOG_DEBUG, LOC + QString(
         "Processing Table %1/%2/%3")
@@ -438,7 +432,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                     if (pfEvent->event_status == TableStatusEnum::VALID)
                     {
                         // Some events to compare
-                        if (Event(eit->EventID(0),
+                        if (PfEvent(eit->EventID(0),
                                 eit->StartTimeUnixUTC(0),
                                 eit->EndTimeUnixUTC(0),
                                 RunningStatus(eit->RunningStatus(0)),
@@ -526,7 +520,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
             .arg(is_scrambled)
             .arg(actual));
             
-    *pfEvent = Event(event_id,
+    *pfEvent = PfEvent(event_id,
                         start_time,
                         end_time,
                         running_status,
@@ -878,8 +872,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                                                 eit->EndTimeUnixUTC(ievent),
                                                 RunningStatus(
                                                     eit->RunningStatus(ievent)),
-                                                eit->IsScrambled(ievent),
-                                                TableStatusEnum::VALID) ==
+                                                eit->IsScrambled(ievent)) ==
                                                 current_section.events[ievent]))
                                             break;
                                     if (event_count == ievent)
@@ -1004,8 +997,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         eit->StartTimeUnixUTC(ievent),
                         eit->EndTimeUnixUTC(ievent),
                         RunningStatus(eit->RunningStatus(ievent)),
-                        eit->IsScrambled(ievent),
-                        TableStatusEnum::VALID));
+                        eit->IsScrambled(ievent)));
     if (!version_changed &&
             !subtable_count_changed &&
             !section_count_changed &&
