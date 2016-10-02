@@ -544,28 +544,30 @@ bool EitCacheDVB::PfTable::ProcessSection(
     LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
             "EIT PF change - "
             "original_network_id %1 "
-    		"transport_stream_id %2 "
-    		"service_id %3 "
+            "transport_stream_id %2 "
+            "service_id %3 "
             "section_number %4 "
-    		"version_number %5%6 "
+            "version_number %5%6 "
             "event_count %7 "
-            "event_id %8%9 "
-            "start_time %10%11 "
-            "end_time %11%13 "
-            "running_status %14%15 "
-            "is_scrambled %16 "
-            "actual %17")
+            "event_id %8 "
+            "start_time %9%10 "
+            "end_time %11%12 "
+            "running_status %13%14 "
+            "is_scrambled %15 "
+            "actual %16")
             .arg(original_network_id)
             .arg(transport_stream_id)
             .arg(service_id)
-    		.arg(section_number)
+            .arg(section_number)
             .arg(version_number).arg(version_change ? "*" : "")
             .arg(event_count)
             .arg(event_id)
-            .arg(start_time).arg(
-                start_time != pfEvent.start_time ? "*" : "")
-            .arg(end_time).arg(
-                end_time != pfEvent.end_time ? "*" : "")
+            .arg(QDateTime::fromTime_t(start_time)
+                .toString(Qt::SystemLocaleShortDate))
+                .arg(start_time != pfEvent.start_time ? "*" : "")
+            .arg(QDateTime::fromTime_t(end_time)
+                .toString(Qt::SystemLocaleShortDate))
+                .arg(end_time != pfEvent.end_time ? "*" : "")
             .arg(uint(running_status)).arg(
                 running_status != pfEvent.running_status ? "*" : "")
             .arg(is_scrambled)
