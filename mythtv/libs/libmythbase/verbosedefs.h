@@ -114,8 +114,6 @@ VERBOSE_MAP(VB_SIPARSER,  0x00002000, true,
             "Siparser related messages")
 VERBOSE_MAP(VB_EIT,       0x00004000, true,
             "EIT related messages")
-VERBOSE_MAP(VB_EITDVB,       0x00004000, true,
-            "EIT DVB table cache related messages")
 VERBOSE_MAP(VB_VBI,       0x00008000, true,
             "VBI related messages")
 VERBOSE_MAP(VB_DATABASE,  0x00010000, true,
@@ -180,6 +178,10 @@ VERBOSE_MAP(VB_REFCOUNT,  0x20000000000ULL, true,
             "Reference Count messages")
 VERBOSE_MAP(VB_HTTP,  0x40000000000ULL, true,
             "HTTP Server messages")
+VERBOSE_MAP(VB_EITDVBPF, 0x80000000000ULL, true,
+            "EIT DVB PF table cache related messages")
+VERBOSE_MAP(VB_EITDVBSCH, 0x100000000000ULL, true,
+            "EIT DVB Schedule table cache related messages")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE

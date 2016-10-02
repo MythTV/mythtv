@@ -255,7 +255,8 @@ private: // Declarations
     {
     // Methods
     PfTable() :
-        pf_version(VERSION_UNINITIALISED) {}
+        table_version(VERSION_UNINITIALISED),
+        table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
 
 
     bool ProcessSection(const DVBEventInformationTable *eit,
@@ -267,9 +268,10 @@ private: // Declarations
                 uint section_number);
             
     private: // Data			
+        uint table_version;
+        TableStatusEnum table_status;
         PfEvent present;
         PfEvent following;
-        uint pf_version;
     };
     
 private: // Methods

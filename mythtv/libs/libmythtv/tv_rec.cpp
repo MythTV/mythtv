@@ -1292,9 +1292,6 @@ void TVRec::run(void)
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
 
-    LOG(VB_EITDVB, LOG_INFO, LOC + QString("eitScanStartTime %1")
-        .arg(eitScanStartTime.toLocalTime().time().toString()));
-
     while (HasFlags(kFlagRunMainLoop))
     {
         // If there is a state change queued up, do it...
