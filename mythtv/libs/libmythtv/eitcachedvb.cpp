@@ -282,9 +282,12 @@ bool EitCacheDVB::PfTable::ValidateEventTimes(
             {
                 LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                     "Present event does not span current time %1 %2 %3")
-                    .arg(start_time)
-                    .arg(end_time)
-                    .arg(current_time));
+                    .arg(QDateTime::fromTime_t(start_time)
+                            .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(end_time)
+                            .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(current_time)
+                            .toString(Qt::SystemLocaleShortDate)));
                 return false;
             }
         }
@@ -305,9 +308,12 @@ bool EitCacheDVB::PfTable::ValidateEventTimes(
                         "Paused following event must "
                         "start some time in the past and finish "
                         "some time in the future %1 %2 %3")
-                        .arg(start_time)
-                        .arg(end_time)
-                        .arg(current_time));
+                    .arg(QDateTime::fromTime_t(start_time)
+                            .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(end_time)
+                            .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(current_time)
+                            .toString(Qt::SystemLocaleShortDate)));
                     return false;
                 }
             }
@@ -319,9 +325,12 @@ bool EitCacheDVB::PfTable::ValidateEventTimes(
                     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                         "Following event must be in the "
                         "future %1 %2 %3")
-                        .arg(start_time)
-                        .arg(end_time)
-                        .arg(current_time));
+                    .arg(QDateTime::fromTime_t(start_time)
+                            .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(end_time)
+                            .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(current_time)
+                            .toString(Qt::SystemLocaleShortDate)));
                     return false;
                 }
             }
@@ -393,7 +402,14 @@ bool EitCacheDVB::PfTable::ProcessSection(
         // No previous data, initialise the table if
         // the event is valid.
         if (!ValidateEventTimes(eit, event_count, section_number))
-                return false;
+        {
+            LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+                "Table uninitialised but bad event times - reject"));
+            return false;
+        }
+        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+            "Table uninitialised - accepting "
+            "incoming data"));
     }
     else
     {
@@ -457,7 +473,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                             LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                                 "PF table same version no incoming "
                                 "and no stored events present - reject duplicate"));
-                        return false;
+                            return false;
                         }
                         // At this point I have the same version number,
                         // no events in the incoming section,
@@ -476,6 +492,9 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         // the incoming section as a wrap around
                         // discontinuity.
                         // Invalidate verything it will be set right later
+                        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+                            "PF table same version no incoming events "
+                        "on actual stream - accept"));
                         table_status = TableStatusEnum::UNINITIALISED;
                         following.event_status = TableStatusEnum::UNINITIALISED;
                         present.event_status = TableStatusEnum::UNINITIALISED;
@@ -521,12 +540,12 @@ bool EitCacheDVB::PfTable::ProcessSection(
                     if (!ValidateEventTimes(eit, event_count,
                                             section_number))
                     {
-                        LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+                        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                             "PF table discontinuity incoming "
                             "events invalid times"));
                         return false;
                     }
-                    LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                         "PF table discontinuity accepted"));
                 }
             }
@@ -541,7 +560,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
     RunningStatusEnum running_status = RunningStatusEnum(eit->RunningStatus(0));
     uint is_scrambled = eit->IsScrambled(0);
     
-    LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
             "EIT PF change - "
             "original_network_id %1 "
             "transport_stream_id %2 "
@@ -631,10 +650,14 @@ bool EitCacheDVB::ScheduleTable::ValidateEventStartTimes(
                     .arg(last_midnight)
                     .arg(sub_table_index)
                     .arg(segment_index)
-                    .arg(sub_table_start_time)
-                    .arg(start_time_span)
-                    .arg(end_time_span)
-                    .arg(start_time));
+                    .arg(QDateTime::fromTime_t(sub_table_start_time)
+                        .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(start_time_span)
+                        .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(end_time_span)
+                        .toString(Qt::SystemLocaleShortDate))
+                    .arg(QDateTime::fromTime_t(start_time)
+                        .toString(Qt::SystemLocaleShortDate)));
                 return false;
             }
         }
@@ -794,7 +817,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 "Subtable uninitialised but bad event times - reject"));
             return false;
         }
-        LOG(VB_EITDVBSCH, LOG_INFO, LOC + QString(
+        LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
             "Subtable uninitialised - accepting "
             "incoming data"));
     }
@@ -822,7 +845,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 "Section uninitialised but bad event times - reject"));
                 return false;
             }
-            LOG(VB_EITDVBSCH, LOG_INFO, LOC + QString(
+            LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
                 "Section uninitialised - accepting "
                 "incoming data"));
         }
@@ -937,7 +960,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                                 }
                                 else
                                 {
-                                    LOG(VB_EITDVBSCH, LOG_INFO, LOC + QString(
+                                    LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
                                         "Schedule same version some"
                                         " incoming events but "
                                         "different number of events in "
@@ -1054,9 +1077,9 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
             !subtable_count_changed &&
             !section_count_changed &&
             !event_count_changed)
-        LOG(VB_EITDVBSCH, LOG_INFO, LOC + QString("EIT WDF nothing major changed!"));
+        LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EIT WDF nothing major changed!"));
 
-    LOG(VB_EITDVBSCH, LOG_INFO, LOC + QString("EIT schedule table change "
+    LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EIT schedule table change "
                         "original_network_id %1 "
                         "transport_stream_id %2 "
                         "service_id %3 "
@@ -1078,7 +1101,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         .arg(service_id)
                         .arg(table_id)
                         .arg(section_number)
-						.arg(version_number)
+                        .arg(version_number)
                             .arg(version_changed ? QString("* %1")
                                 .arg(subtable_version) : "")
                         .arg(last_table_id)
