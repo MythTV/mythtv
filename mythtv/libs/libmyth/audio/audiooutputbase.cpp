@@ -24,6 +24,7 @@ using namespace std;
 #include "freesurround.h"
 #include "spdifencoder.h"
 #include "mythlogging.h"
+#include "mythconfig.h"
 
 #define LOC QString("AOBase: ")
 
@@ -363,7 +364,14 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         pSoundStretch->setSampleRate(samplerate);
         pSoundStretch->setChannels(channels);
         pSoundStretch->setTempo(stretchfactor);
+#if ARCH_ARM
+        // use less demanding settings for Raspberry pi
+        pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 82);
+        pSoundStretch->setSetting(SETTING_USE_AA_FILTER, 0);
+        pSoundStretch->setSetting(SETTING_USE_QUICKSEEK, 1);
+#else
         pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 35);
+#endif
         /* If we weren't already processing we need to turn on float conversion
            adjust sample and frame sizes accordingly and dump the contents of
            the audiobuffer */
