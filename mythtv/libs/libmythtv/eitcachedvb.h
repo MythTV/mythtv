@@ -5,6 +5,7 @@
 
 // Qt includes
 #include <QMap>
+#include <QMutex>
 
 /** \file eitcachedvb.h
  *  \code
@@ -290,6 +291,7 @@ private: // Data
     // I use that 48 bit path to index the following tables 
     QMap<unsigned long long, struct PfTable> pfTables;
     QMap<unsigned long long, struct ScheduleTable> scheduleTables;
+    QMutex tableLock;
 };
 
 #endif // _EITCACHEDVB_H_

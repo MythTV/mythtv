@@ -354,15 +354,17 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
-    EitCacheDVB& TestEITCache = EitCacheDVB::GetInstance();
-    if (TestEITCache.ProcessSection(eit))
+    EitCacheDVB& dvbEITCache = EitCacheDVB::GetInstance();
+    if (dvbEITCache.ProcessSection(eit))
         LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_INFO, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is processed"));
     else
+    {
         LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_INFO, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is discarded"));
+        return;
+    }
 
-    
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||
         ((eit->TableID() >= TableID::SC_EITbeg) && (eit->TableID() <= TableID::SC_EITend)))

@@ -218,6 +218,9 @@
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
 {
+    // Single thread this function
+    QMutexLocker lock(&tableLock);
+    
     long long original_network_id = eit->OriginalNetworkID();
     uint transport_stream_id = eit->TSID();
     uint service_id = eit->ServiceID();
