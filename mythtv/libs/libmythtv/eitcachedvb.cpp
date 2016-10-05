@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QDateTime>
+#include <QStringList>
 
 /* Extract from ETSI ETR 211
  * 
@@ -216,6 +217,16 @@
 
 #define LOC QString("EitCacheDVB: ")
 
+static QStringList RSTNames(QStringList() << "Undefined"
+                                << "not running"
+                                << "starts in a few seconds"
+                                << "pausing"
+                                << "running"
+                                << "service off-air"
+                                << "reserved"
+                                << "reserved");
+
+
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
 {
     // Single thread this function
@@ -261,6 +272,15 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
         }
         
         return scheduleTables[key].ProcessSection(eit, actual);
+    }
+    else if (table_id == TableID::RST)
+    {
+        // The long lost running status table has finally been found
+        //  send for the doctor. "Doctor Who?". "Of Course!".
+        LOG(VB_RST, LOG_INFO, LOC + QString(
+                "The long lost running status table has finally been found, "
+                "send for the doctor. \"Doctor Who?\". \"Of Course!\"."));
+        return true;
     }
     else
         return false;
@@ -590,7 +610,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
             .arg(QDateTime::fromTime_t(end_time)
                 .toString(Qt::SystemLocaleShortDate))
                 .arg(end_time != pfEvent.end_time ? "*" : "")
-            .arg(uint(running_status)).arg(
+            .arg(RSTNames[uint(running_status)]).arg(
                 running_status != pfEvent.running_status ? "*" : "")
             .arg(is_scrambled)
             .arg(actual));

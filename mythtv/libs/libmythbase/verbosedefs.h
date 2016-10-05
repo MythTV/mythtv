@@ -182,6 +182,8 @@ VERBOSE_MAP(VB_EITDVBPF, 0x80000000000ULL, true,
             "EIT DVB PF table cache related messages")
 VERBOSE_MAP(VB_EITDVBSCH, 0x100000000000ULL, true,
             "EIT DVB Schedule table cache related messages")
+VERBOSE_MAP(VB_RST, 0x200000000000ULL, true,
+            "Running status table related messages")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE

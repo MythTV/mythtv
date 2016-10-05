@@ -29,6 +29,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
     SetVersionNITo(-1,0);
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
+    AddListeningPID(DVB_RST_PID);
     AddListeningPID(DVB_TDT_PID);
 }
 
@@ -218,6 +219,7 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
     }
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
+    AddListeningPID(DVB_RST_PID);
     AddListeningPID(DVB_TDT_PID);
 }
 

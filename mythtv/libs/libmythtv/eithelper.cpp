@@ -356,11 +356,11 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
     EitCacheDVB& dvbEITCache = EitCacheDVB::GetInstance();
     if (dvbEITCache.ProcessSection(eit))
-        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_INFO, LOC + QString("EITCacheDVB is suggesting"
+        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is processed"));
     else
     {
-        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_INFO, LOC + QString("EITCacheDVB is suggesting"
+        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is discarded"));
         return;
     }
@@ -400,11 +400,19 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     uint version   = eit->Version();
     for (uint i = 0; i < eit->EventCount(); i++)
     {
+
+/// \todo
+/// The eitcachedvb code should have handled duplicates
+/// so do not ignore this event if it already available in the cache.
+/// TODO - more debate needed on this. How do we handle running status?
+/// Do we put it the cache? Do we add it to the DBEventEIT?
+/// Do we abandon the eitcache altogether for ETSI DVB systems?
+///
         // Skip event if we have already processed it before...
         if (!eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
                               eit->EndTimeUnixUTC(i)))
         {
-            continue;
+//            continue;
         }
 
         QString title         = QString("");
@@ -693,6 +701,12 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         // fix starttime only if the duration is a multiple of a minute
         if (!(eit->DurationInSeconds(i) % 60))
             EITFixUp::TimeFix(starttime);
+            
+// Modify the start time according to the running status
+// I hope this will catch changes to the start time
+// This will be a horrible hack!!!
+
+
         QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
 
         DBEventEIT *event = new DBEventEIT(
