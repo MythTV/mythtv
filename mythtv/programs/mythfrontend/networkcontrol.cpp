@@ -1037,8 +1037,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
              (nc->getArg(3).contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
         return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
-    else if (is_abbrev("recordings", nc->getArg(1)))
+    else if ((nc->getArgCount() == 2) && is_abbrev("recordings", nc->getArg(1)))
         return listRecordings();
+    else if ((nc->getArgCount() == 3) && is_abbrev("recordings", nc->getArg(1)))
+        return listRecordings("", "", nc->getArg(2));
     else if (is_abbrev("channels", nc->getArg(1)))
     {
         if (nc->getArgCount() == 2)
@@ -1049,6 +1051,14 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         else
             return QString("ERROR: See 'help %1' for usage information "
                            "(parameters mismatch)").arg(nc->getArg(0));
+    }
+    else if (is_abbrev("videos", nc->getArg(1)))
+    {
+        return listVideos();
+    }
+    else if (is_abbrev("storagegroups", nc->getArg(1)))
+    {
+        return listStorageGroups();
     }
     else
         return QString("ERROR: See 'help %1' for usage information")
@@ -1408,18 +1418,23 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
             "query location        - Query current screen or location\r\n"
             "query volume          - Query the current playback volume\r\n"
             "query recordings      - List currently available recordings\r\n"
+            "query recordings STORAGEGROUP\r\n"
+            "                      - List currently available recordings for the specified storage group\r\n"
             "query recording CHANID STARTTIME\r\n"
             "                      - List info about the specified program\r\n"
             "query liveTV          - List current TV schedule\r\n"
             "query liveTV CHANID   - Query current program for specified channel\r\n"
             "query load            - List 1/5/15 load averages\r\n"
             "query memstats        - List free and total, physical and swap memory\r\n"
+            "query storagegroups   - Query storage group directories\r\n"
             "query time            - Query current time on frontend\r\n"
             "query uptime          - Query machine uptime\r\n"
             "query verbose         - Get current VERBOSE mask\r\n"
             "query version         - Query Frontend version details\r\n"
             "query channels        - Query available channels\r\n"
-            "query channels START LIMIT - Query available channels from START and limit results to LIMIT lines\r\n";
+            "query channels START LIMIT\r\n"
+            "                      - Query available channels from START and limit results to LIMIT lines\r\n"
+            "query videos          - Query available videos\r\n";
     }
     else if (is_abbrev("set", command))
     {
@@ -1636,17 +1651,17 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     QString result("");
     MSqlQuery query(MSqlQuery::InitCon());
     bool appendCRLF = true;
-    QString queryStr("SELECT chanid, starttime, endtime, title, subtitle "
-                         "FROM program "
-                         "WHERE starttime < :START AND endtime > :END ");
+    QString queryStr("SELECT program.chanid, starttime, endtime, title, subtitle "
+                         "FROM program, channel "
+                         "WHERE program.chanid = channel.chanid and starttime < :START AND endtime > :END ");
 
     if (!chanID.isEmpty())
     {
-        queryStr += " AND chanid = :CHANID";
+        queryStr += " AND program.chanid = :CHANID";
         appendCRLF = false;
     }
 
-    queryStr += " ORDER BY starttime, endtime, chanid";
+    queryStr += " ORDER BY starttime, endtime, program.chanid";
 
     query.prepare(queryStr);
     query.bindValue(":START", MythDate::current());
@@ -1686,7 +1701,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     return result;
 }
 
-QString NetworkControl::listRecordings(QString chanid, QString starttime)
+QString NetworkControl::listRecordings(QString chanid, QString starttime, QString storageGroup)
 {
     QString result;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1701,6 +1716,10 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
         queryStr += "AND chanid = " + chanid + " "
                     "AND starttime = '" + starttime + "' ";
         appendCRLF = false;
+    }
+
+    if (!storageGroup.isEmpty()) {
+        queryStr += "AND storageGroup = '" + storageGroup + "' ";
     }
 
     queryStr += "ORDER BY starttime, title;";
@@ -1732,6 +1751,35 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     }
     else
         result = "ERROR: Unable to retrieve recordings list.";
+
+    return result;
+}
+
+QString NetworkControl::listVideos()
+{
+    QString result;
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString queryStr;
+
+    queryStr = "SELECT title, subtitle, season, episode, filename "
+               "FROM videometadata ORDER BY title, season, episode, filename;";
+
+    query.prepare(queryStr);
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            result +=
+                QString("\"%1\" \"%2\" %3 %4 \"%5\"\r\n")
+                        .arg(query.value(0).toString()) // title
+                        .arg(query.value(1).toString()) // subtitle
+                        .arg(query.value(2).toInt()) // season
+                        .arg(query.value(3).toInt()) // episode
+                        .arg(query.value(4).toString()); // filename
+        }
+    }
+    else
+        result = "ERROR: Unable to retrieve videos list.";
 
     return result;
 }
@@ -1783,6 +1831,32 @@ QString NetworkControl::listChannels(const uint start, const uint limit) const
                           .arg(query.value(1).toString())
                           .arg(query.value(2).toString());
     }
+
+    return result;
+}
+
+QString NetworkControl::listStorageGroups()
+{
+    QString result;
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString queryStr;
+
+    queryStr = "SELECT groupName, dirName "
+               "FROM storagegroup ORDER BY groupName;";
+
+    query.prepare(queryStr);
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            result +=
+                QString("\"%1\" \"%2\"\r\n")
+                        .arg(query.value(0).toString()) // groupName
+                        .arg(query.value(1).toString()); // dirName
+        }
+    }
+    else
+        result = "ERROR: Unable to retrieve storage groups.";
 
     return result;
 }
