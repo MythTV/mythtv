@@ -31,7 +31,8 @@ public: // Methods
         return instance;
     }
     
-    bool ProcessSection(const DVBEventInformationTable *eit);
+    bool ProcessSection(const DVBEventInformationTable *eit,
+                        bool &section_version_changed);
     
 public: // Data
     // NONE
@@ -121,7 +122,8 @@ private: // Declarations
     {
         // Methods
         PfEvent() :
-                event_status(TableStatusEnum::UNINITIALISED) {}
+                event_status(TableStatusEnum::UNINITIALISED),
+                section_version(TableBase::VERSION_UNINITIALISED) {}
                 
         PfEvent(uint event_id,
                 time_t start_time,
@@ -132,6 +134,7 @@ private: // Declarations
                 Event(event_id, start_time, end_time, running_status,
                     is_scrambled),
                 event_status(event_status) {}
+        
         bool operator == (const PfEvent &e2) const
         {
             return Event(e2) == Event(*this) &&
@@ -140,13 +143,14 @@ private: // Declarations
         
         // data
         TableStatusEnum event_status;
+        uint section_version;
     };
     
     struct Section
     {
-        Section() : section_status(
-                    EitCacheDVB::TableStatusEnum::UNINITIALISED) 
-                    {}
+        Section() :
+            section_status(EitCacheDVB::TableStatusEnum::UNINITIALISED),
+            section_version(TableBase::VERSION_UNINITIALISED) {}
                     
         Section(const Section &other)
         {
@@ -161,6 +165,7 @@ private: // Declarations
         }
 
         TableStatusEnum section_status;
+        uint section_version;
         QList<struct Event> events;
     };
     
@@ -237,8 +242,9 @@ private: // Declarations
     struct ScheduleTable : public TableBase
     {
         ScheduleTable() : subtable_count(0) {}
-        bool ProcessSection(const DVBEventInformationTable *eit,
-                            const bool actual);
+        virtual bool ProcessSection(const DVBEventInformationTable *eit,
+                            const bool actual,
+                            bool &section_version_changed);
 
     private: // Methods
         bool ValidateEventStartTimes(const DVBEventInformationTable *eit,
@@ -254,15 +260,16 @@ private: // Declarations
     
     struct PfTable : public TableBase
     {
-    // Methods
-    PfTable() :
-        table_version(VERSION_UNINITIALISED),
-        table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+        // Methods
+        PfTable() :
+            table_version(VERSION_UNINITIALISED),
+            table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
 
 
-    bool ProcessSection(const DVBEventInformationTable *eit,
-                        const bool actual);
-                        
+        virtual bool ProcessSection(const DVBEventInformationTable *eit,
+                            const bool actual,
+                            bool &section_version_changed);
+
     private: // Methods
         bool ValidateEventTimes(const DVBEventInformationTable *eit,
                 uint event_count,
@@ -291,6 +298,14 @@ private: // Data
     // I use that 48 bit path to index the following tables 
     QMap<unsigned long long, struct PfTable> pfTables;
     QMap<unsigned long long, struct ScheduleTable> scheduleTables;
+    
+    // I want to maintain all the event data in a single shared space
+    // indexed by eventId within original network id.
+    // Need to work out how to automate the removal of events when nobody
+    // holds a reference to them.
+    
+    QMap<unsigned long, struct Event> events;
+    
     QMutex tableLock;
 };
 

@@ -354,8 +354,10 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
+    // Process a DVB EIT section
     EitCacheDVB& dvbEITCache = EitCacheDVB::GetInstance();
-    if (dvbEITCache.ProcessSection(eit))
+    bool section_version_changed;
+    if (dvbEITCache.ProcessSection(eit, section_version_changed))
         LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is processed"));
     else
@@ -376,14 +378,15 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     {
         // EITo(ther)
         chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
-        // do not reschedule if its only present+following
-        if (eit->TableID() != TableID::PF_EITo)
-        {
-            seenEITother = true;
-        }
     }
     if (!chanid)
+        // Ignore EIT sections I cannot find a channel for
         return;
+
+    // I will use sections from the schedule table to update the database.
+    // Sections from the PF table will be used to drive the scheduler.
+    // The schedule table is made of up to 8 sub-tables identified by TableID.
+    //
 
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
     FixupValue fix = fixup.value((FixupKey)eit->OriginalNetworkID() << 16);
