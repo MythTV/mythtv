@@ -82,7 +82,14 @@ void VideoOutputD3D::TearDown(void)
     }
 
     delete m_osd_painter;
-    m_osd_painter = NULL;
+    {
+        // Hack to ensure that the osd painter is not
+        // deleted while image load thread is still busy
+        // loading images with that painter
+        if (invalid_osd_painter)
+            delete invalid_osd_painter;
+        invalid_osd_painter = m_osd_painter;
+    }
 
     DeleteDecoder();
     DestroyContext();

@@ -355,6 +355,8 @@ class VideoOutput
     // OSD painter and surface
     MythYUVAPainter *osd_painter;
     MythImage       *osd_image;
+    // Hack to ensure osd painter not deleted to soon
+    MythPainter     *invalid_osd_painter;
 
     // Visualisation
     VideoVisual     *m_visual;
