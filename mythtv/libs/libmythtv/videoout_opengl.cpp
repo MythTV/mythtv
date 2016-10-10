@@ -152,7 +152,14 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
 #endif
 
     if (gl_created_painter)
-        delete gl_painter;
+    {
+        // Hack to ensure that the osd painter is not
+        // deleted while image load thread is still busy
+        // loading images with that painter
+        if (invalid_osd_painter)
+            delete invalid_osd_painter;
+        invalid_osd_painter = gl_painter;
+    }
     else if (gl_painter)
         gl_painter->SetSwapControl(true);
 
