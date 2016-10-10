@@ -696,6 +696,9 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
             {
                 OverrideUIScale(false);
             }
+
+            (*it2)->SetPainter(m_CurrentPainter);
+
             nc->UpdateScreen(*it2);
 
             visible = true;
