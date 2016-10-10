@@ -463,8 +463,13 @@ class CetonConfigurationGroup : public VerticalConfigurationGroup
 {
     Q_OBJECT
 
+    friend class CetonExtra;
+
   public:
     CetonConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void CetonExtraPanel(void);
 
   private:
     CaptureCard         &parent;

@@ -2415,6 +2415,25 @@ void CetonDeviceID::UpdateValues(void)
         emit LoadedInstances((int)_parent.GetInstanceCount());
 }
 
+class CetonExtra : public ConfigurationWizard
+{
+  public:
+    CetonExtra(CetonConfigurationGroup &parent);
+};
+
+CetonExtra::CetonExtra(CetonConfigurationGroup &parent)
+{
+    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+    rec->setLabel(QObject::tr("Recorder Options"));
+    rec->setUseLabel(false);
+
+    rec->addChild(new SignalTimeout(parent.parent, 1000, 250));
+    rec->addChild(new ChannelTimeout(parent.parent, 3000, 1750));
+
+    addChild(rec);
+}
+
+
 CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent), instances(new InstanceCount(parent))
@@ -2437,6 +2456,10 @@ CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
     addChild(desc);
     addChild(instances);
 
+    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
+    buttonRecOpt->setLabel(tr("Recording Options"));
+    addChild(buttonRecOpt);
+
     connect(ip,       SIGNAL(NewValue(const QString&)),
             deviceid, SLOT(  SetIP(const QString&)));
     connect(tuner,    SIGNAL(NewValue(const QString&)),
@@ -2451,7 +2474,19 @@ CetonConfigurationGroup::CetonConfigurationGroup(CaptureCard& a_parent) :
     connect(instances, SIGNAL(valueChanged(int)),
             &parent,   SLOT(  SetInstanceCount(int)));
 
+    connect(buttonRecOpt, SIGNAL(pressed()),
+            this,         SLOT(  CetonExtraPanel()));
+
 };
+
+void CetonConfigurationGroup::CetonExtraPanel(void)
+{
+    parent.reload(); // ensure card id is valid
+
+    CetonExtra acw(*this);
+    acw.exec();
+}
+
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
