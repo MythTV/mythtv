@@ -613,11 +613,6 @@ void ProgDetails::loadPage(void)
             searchPhrase = record->m_description;
     }
     addItem(tr("Recording Rule"), recordingRule, ProgInfoList::kLevel1);
-    addItem(tr("Last Recorded"), lastRecorded, ProgInfoList::kLevel2);
-    addItem(tr("Next Recording"), nextRecording, ProgInfoList::kLevel2);
-    addItem(tr("Average Time Shift"), averageTimeShift, ProgInfoList::kLevel2);
-    addItem(tr("Watch List Score"), watchListScore, ProgInfoList::kLevel2);
-    addItem(tr("Watch List Status"), watchListStatus, ProgInfoList::kLevel2);
     addItem(tr("Search Phrase"), searchPhrase, ProgInfoList::kLevel1);
 
     s.clear();
@@ -630,6 +625,12 @@ void ProgDetails::loadPage(void)
                      fdate, MythDate::kDateFull | MythDate::kAddYear));
     }
     addItem(tr("Find ID"), s, ProgInfoList::kLevel2);
+
+    addItem(tr("Last Recorded"), lastRecorded, ProgInfoList::kLevel2);
+    addItem(tr("Next Recording"), nextRecording, ProgInfoList::kLevel2);
+    addItem(tr("Average Time Shift"), averageTimeShift, ProgInfoList::kLevel2);
+    addItem(tr("Watch List Score"), watchListScore, ProgInfoList::kLevel2);
+    addItem(tr("Watch List Status"), watchListStatus, ProgInfoList::kLevel2);
 
     QString recordingHost;
     QString recordingInput;
