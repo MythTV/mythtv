@@ -5,7 +5,7 @@ MythTV Project Info
 Useful project links
 -----
 
- - `Trac bug tracker <http://code.mythtv.org/trac>`_
+ - `Trac bug tracker <https://code.mythtv.org/trac>`_
 
    - Please note: If you create a pull request, we expect a corresponding
      ticket to be created in Trac with a link to the pull request in it.  
@@ -17,7 +17,7 @@ Useful project links
      reports to the owners of the fork where the code was committed.
 
  - `Forums <https://forum.mythtv.org>`_
- - `Documentation wiki <http://www.mythtv.org/wiki>`_
+ - `Documentation wiki <https://www.mythtv.org/wiki>`_
  - `Mailing lists <http://lists.mythtv.org/mailman/listinfo>`_
  - `IRC <irc://freenode.net/mythtv-users>`_ at Freenode.net, #mythtv-users
 
