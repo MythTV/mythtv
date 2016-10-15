@@ -6,6 +6,7 @@
 // Qt includes
 #include <QMap>
 #include <QMutex>
+#include <QSharedData>
 
 /** \file eitcachedvb.h
  *  \code
@@ -17,7 +18,7 @@ class DVBEventInformationTable;
 class EitCacheDVB
 {
 public: // Declarations
-		// NONE
+        // NONE
 public: // Methods
 #if __cplusplus >= 201103L
     EitCacheDVB(EitCacheDVB const&) = delete;
@@ -71,7 +72,7 @@ private: // Declarations
             RUNNING = 4
         };	
     };
-    typedef RunningStatus::type  RunningStatusEnum;
+    typedef RunningStatus::type RunningStatusEnum;
     
     struct TableStatus
     {
@@ -82,25 +83,33 @@ private: // Declarations
             EMPTY = 2
         };
     };
-    typedef TableStatus::type  TableStatusEnum;
+    typedef TableStatus::type TableStatusEnum;
 #endif
 
-    struct Event
+    struct Event : public QSharedData
     {
-        Event() : running_status
-                    (EitCacheDVB::RunningStatusEnum::UNDEFINED) {}
-                    
+        typedef QMap<unsigned long long, struct Event> EventTable;
+
+        Event(Event::EventTable& events) : running_status
+                    (EitCacheDVB::RunningStatusEnum::UNDEFINED),
+                    events(events) {}
+
         Event(uint event_id,
                 time_t start_time,
                 time_t end_time,
                 RunningStatusEnum running_status,
-                bool is_scrambled) :
+                bool is_scrambled,
+                EventTable& events) :
                 event_id(event_id),
                 start_time(start_time),
                 end_time(end_time),
                 running_status(running_status),
-                is_scrambled(is_scrambled) {}
+                is_scrambled(is_scrambled),
+                events(events) {}
 
+        //Event(const Event &other) : QSharedData(other) { }
+        //~Event() { }
+        
         uint event_id;
         time_t start_time;
         time_t end_time;			
@@ -116,35 +125,11 @@ private: // Declarations
                     (running_status == e2.running_status) &&
                     (is_scrambled == e2.is_scrambled);
         }
+        
+
+        EventTable& events;
     };
     
-    struct PfEvent : public Event
-    {
-        // Methods
-        PfEvent() :
-                event_status(TableStatusEnum::UNINITIALISED),
-                section_version(TableBase::VERSION_UNINITIALISED) {}
-                
-        PfEvent(uint event_id,
-                time_t start_time,
-                time_t end_time,
-                RunningStatusEnum running_status,
-                bool is_scrambled,
-                TableStatusEnum event_status) :
-                Event(event_id, start_time, end_time, running_status,
-                    is_scrambled),
-                event_status(event_status) {}
-        
-        bool operator == (const PfEvent &e2) const
-        {
-            return Event(e2) == Event(*this) &&
-            event_status == e2.event_status;
-        }
-        
-        // data
-        TableStatusEnum event_status;
-        uint section_version;
-    };
     
     struct Section
     {
@@ -166,7 +151,7 @@ private: // Declarations
 
         TableStatusEnum section_status;
         uint section_version;
-        QList<struct Event> events;
+        QList< QExplicitlySharedDataPointer<Event> > events;
     };
     
     struct Segment
@@ -218,6 +203,22 @@ private: // Declarations
     
     struct TableBase
     {
+        TableBase(Event::EventTable& events) : events(events) {}
+        
+        TableBase(const TableBase &other) : events(other.events)
+        {
+            *this = other;
+        }
+
+        TableBase& operator = (const TableBase &other)
+        {
+            original_network_id = other.original_network_id;
+            transport_stream_id = other.transport_stream_id;
+            service_id = other.service_id;
+            events = other.events;
+            return *this;
+        }
+        
         void SetOriginalNetworkId(uint id)
         {
             original_network_id = id;
@@ -237,11 +238,30 @@ private: // Declarations
         uint original_network_id;
         uint transport_stream_id;
         uint service_id;
+        Event::EventTable& events;
     };
     
     struct ScheduleTable : public TableBase
     {
-        ScheduleTable() : subtable_count(0) {}
+        static Event::EventTable DummyEventTable;
+        
+        ScheduleTable() :
+            TableBase(DummyEventTable)
+            {}
+            
+        ScheduleTable(Event::EventTable& events) : TableBase(events),
+                                            subtable_count(0) {}
+                                            
+        ScheduleTable(const ScheduleTable &other) : TableBase(other)
+        {
+            *this = other;
+        }
+
+        ScheduleTable& operator = (const ScheduleTable &other)
+        {
+            return *this;
+        }
+        
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             const bool actual,
                             bool &section_version_changed);
@@ -260,11 +280,58 @@ private: // Declarations
     
     struct PfTable : public TableBase
     {
-        // Methods
-        PfTable() :
-            table_version(VERSION_UNINITIALISED),
-            table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED) {}
+        struct EventWrapper
+        {
+            EventWrapper(Event::EventTable& events) :
+                event_status(TableStatusEnum::UNINITIALISED),
+                section_version(TableBase::VERSION_UNINITIALISED),
+                event(new Event(events)) {}
+                
+            
+            EventWrapper(const EventWrapper &other)
+            {
+                *this = other;
+            }
 
+            EventWrapper& operator = (const EventWrapper &other)
+            {
+                return *this;
+            }
+
+            TableStatusEnum event_status;
+            uint section_version;
+            QExplicitlySharedDataPointer<Event> event;
+        };
+            
+        // Methods
+        static Event::EventTable DummyEventTable;
+        
+        PfTable() :
+            TableBase(DummyEventTable),
+            present(events),
+            following(events)
+            {}
+            
+        
+        PfTable(Event::EventTable& events) :
+            TableBase(events),
+            table_version(VERSION_UNINITIALISED),
+            table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED),
+            present(events),
+            following(events)
+            {}
+            
+        PfTable(const PfTable &other) : TableBase(other),
+                                        present(other.present),
+                                        following(other.following)
+        {
+            *this = other;
+        }
+
+        PfTable& operator = (const PfTable &other)
+        {
+            return *this;
+        }
 
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             const bool actual,
@@ -275,11 +342,11 @@ private: // Declarations
                 uint event_count,
                 uint section_number);
             
-    private: // Data			
+    private: // Data
         uint table_version;
         TableStatusEnum table_status;
-        PfEvent present;
-        PfEvent following;
+        EventWrapper present;
+        EventWrapper following;
     };
     
 private: // Methods
@@ -295,18 +362,17 @@ private: // Data
     // ETR 211 section 4.1.1 states that each "service" can be
     // uniquely referenced through the path
     // original_network_id/transport_stream_id/service_id
-    // I use that 48 bit path to index the following tables 
+    // I use that 48 bit path to index the following tables
     QMap<unsigned long long, struct PfTable> pfTables;
     QMap<unsigned long long, struct ScheduleTable> scheduleTables;
     
     // I want to maintain all the event data in a single shared space
-    // indexed by eventId within original network id.
-    // Need to work out how to automate the removal of events when nobody
-    // holds a reference to them.
+    // indexed by original_network_id/transport_stream_id/service_id/eventId
     
-    QMap<unsigned long, struct Event> events;
+    Event::EventTable events;
     
     QMutex tableLock;
 };
 
 #endif // _EITCACHEDVB_H_
+
