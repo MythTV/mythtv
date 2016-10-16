@@ -88,24 +88,19 @@ private: // Declarations
 
     struct Event : public QSharedData
     {
+
+        Event() : running_status
+                    (EitCacheDVB::RunningStatusEnum::UNDEFINED) {}
+
         typedef QMap<unsigned long long, struct Event> EventTable;
-
-        Event(Event::EventTable& events) : running_status
-                    (EitCacheDVB::RunningStatusEnum::UNDEFINED),
-                    events(events) {}
-
+        
         Event(uint event_id,
                 time_t start_time,
                 time_t end_time,
                 RunningStatusEnum running_status,
                 bool is_scrambled,
-                EventTable& events) :
-                event_id(event_id),
-                start_time(start_time),
-                end_time(end_time),
-                running_status(running_status),
-                is_scrambled(is_scrambled),
-                events(events) {}
+                EventTable& events,
+                unsigned long long table_key);
 
         //Event(const Event &other) : QSharedData(other) { }
         //~Event() { }
@@ -125,12 +120,8 @@ private: // Declarations
                     (running_status == e2.running_status) &&
                     (is_scrambled == e2.is_scrambled);
         }
-        
-
-        EventTable& events;
     };
-    
-    
+        
     struct Section
     {
         Section() :
@@ -203,9 +194,9 @@ private: // Declarations
     
     struct TableBase
     {
-        TableBase(Event::EventTable& events) : events(events) {}
-        
-        TableBase(const TableBase &other) : events(other.events)
+        TableBase() {}
+                
+        TableBase(const TableBase &other)
         {
             *this = other;
         }
@@ -215,7 +206,6 @@ private: // Declarations
             original_network_id = other.original_network_id;
             transport_stream_id = other.transport_stream_id;
             service_id = other.service_id;
-            events = other.events;
             return *this;
         }
         
@@ -238,21 +228,13 @@ private: // Declarations
         uint original_network_id;
         uint transport_stream_id;
         uint service_id;
-        Event::EventTable& events;
     };
     
     struct ScheduleTable : public TableBase
     {
-        static Event::EventTable DummyEventTable;
-        
-        ScheduleTable() :
-            TableBase(DummyEventTable)
-            {}
-            
-        ScheduleTable(Event::EventTable& events) : TableBase(events),
-                                            subtable_count(0) {}
+        ScheduleTable() : subtable_count(0) {}
                                             
-        ScheduleTable(const ScheduleTable &other) : TableBase(other)
+        ScheduleTable(const ScheduleTable &other)
         {
             *this = other;
         }
@@ -263,8 +245,8 @@ private: // Declarations
         }
         
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
-                            const bool actual,
-                            bool &section_version_changed);
+                            const bool actual, Event::EventTable& events,
+                            bool &section_version_changed, unsigned long long table_key);
 
     private: // Methods
         bool ValidateEventStartTimes(const DVBEventInformationTable *eit,
@@ -282,10 +264,9 @@ private: // Declarations
     {
         struct EventWrapper
         {
-            EventWrapper(Event::EventTable& events) :
+            EventWrapper() :
                 event_status(TableStatusEnum::UNINITIALISED),
-                section_version(TableBase::VERSION_UNINITIALISED),
-                event(new Event(events)) {}
+                section_version(TableBase::VERSION_UNINITIALISED) {}
                 
             
             EventWrapper(const EventWrapper &other)
@@ -304,21 +285,10 @@ private: // Declarations
         };
             
         // Methods
-        static Event::EventTable DummyEventTable;
         
         PfTable() :
-            TableBase(DummyEventTable),
-            present(events),
-            following(events)
-            {}
-            
-        
-        PfTable(Event::EventTable& events) :
-            TableBase(events),
             table_version(VERSION_UNINITIALISED),
-            table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED),
-            present(events),
-            following(events)
+            table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED)
             {}
             
         PfTable(const PfTable &other) : TableBase(other),
@@ -334,8 +304,8 @@ private: // Declarations
         }
 
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
-                            const bool actual,
-                            bool &section_version_changed);
+                            const bool actual, Event::EventTable& events,
+                            bool &section_version_changed, unsigned long long table_key);
 
     private: // Methods
         bool ValidateEventTimes(const DVBEventInformationTable *eit,

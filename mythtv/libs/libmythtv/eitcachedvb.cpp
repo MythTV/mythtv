@@ -16,11 +16,27 @@ static QStringList RSTNames(QStringList() << "Undefined"
                                 << "service off-air"
                                 << "reserved"
                                 << "reserved");
-
-EitCacheDVB::Event::EventTable EitCacheDVB::PfTable::DummyEventTable;
-EitCacheDVB::Event::EventTable EitCacheDVB::ScheduleTable::DummyEventTable;
-
-
+                                
+EitCacheDVB::Event::Event(uint event_id,
+                time_t start_time,
+                time_t end_time,
+                RunningStatusEnum running_status,
+                bool is_scrambled,
+                EventTable& events,
+                unsigned long long table_key) :
+                event_id(event_id),
+                start_time(start_time),
+                end_time(end_time),
+                running_status(running_status),
+                is_scrambled(is_scrambled)
+{
+    // Construct the key
+    if (0 != table_key)
+    {
+        // Handle shared table
+        unsigned long long key = table_key << 16 | event_id;
+    }
+}
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
                                  bool &section_version_changed)
@@ -46,14 +62,14 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
     {
         if (!pfTables.contains(key))
         {
-            PfTable new_table(events);
+            PfTable new_table;
             new_table.SetOriginalNetworkId(original_network_id);
             new_table.SetTransportStreamId(transport_stream_id);
             new_table.SetServiceId(service_id);
             pfTables.insert(key, new_table);
         }
 
-        return pfTables[key].ProcessSection(eit, actual, section_version_changed);
+        return pfTables[key].ProcessSection(eit, actual, events, section_version_changed, key);
     }
     else if (((table_id >= TableID::SC_EITbeg) &&
             (table_id <= TableID::SC_EITend)) ||
@@ -62,14 +78,14 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
     {
         if (!scheduleTables.contains(key))
         {
-            ScheduleTable new_table(events);
+            ScheduleTable new_table;
             new_table.SetOriginalNetworkId(original_network_id);
             new_table.SetTransportStreamId(transport_stream_id);
             new_table.SetServiceId(service_id);
             scheduleTables.insert(key, new_table);
         }
         
-        return scheduleTables[key].ProcessSection(eit, actual, section_version_changed);
+        return scheduleTables[key].ProcessSection(eit, actual, events, section_version_changed, key);
     }
     else if (table_id == TableID::RST)
     {
@@ -164,7 +180,9 @@ bool EitCacheDVB::PfTable::ValidateEventTimes(
 
 bool EitCacheDVB::PfTable::ProcessSection(
                 const DVBEventInformationTable *eit, const bool actual,
-                bool &section_version_changed)
+                Event::EventTable& events,
+                bool &section_version_changed,
+                unsigned long long table_key)
 {
     // Validate against ETSI EN 300 468 V1.11.1 and
     // and ETSI ETR 211 second edition
@@ -339,7 +357,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                                     eit->StartTimeUnixUTC(0),
                                     eit->EndTimeUnixUTC(0),
                                     RunningStatus(eit->RunningStatus(0)),
-                                    eit->IsScrambled(0), events) ==
+                                    eit->IsScrambled(0), events, 0) ==
                                     *pfEvent.event)
                             {
                                 LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
@@ -391,7 +409,8 @@ bool EitCacheDVB::PfTable::ProcessSection(
     time_t end_time = eit->EndTimeUnixUTC(0);
     RunningStatusEnum running_status = RunningStatusEnum(eit->RunningStatus(0));
     
-    if (running_status != pfEvent.event->running_status)
+    if ((pfEvent.event_status == TableStatusEnum::VALID)
+            && (running_status != pfEvent.event->running_status))
     {
         LOG(VB_EITRS, LOG_INFO, LOC + QString(
                         "Running status for %1/%2/%3/%4 change in PD %5 data - "
@@ -404,6 +423,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 .arg(RSTNames[uint(pfEvent.event->running_status)])
                 .arg(RSTNames[uint(running_status)]));
     }
+    
     uint is_scrambled = eit->IsScrambled(0);
     
     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
@@ -429,12 +449,22 @@ bool EitCacheDVB::PfTable::ProcessSection(
             .arg(event_id)
             .arg(QDateTime::fromTime_t(start_time)
                 .toString(Qt::SystemLocaleShortDate))
-                .arg(start_time != pfEvent.event->start_time ? "*" : "")
+                .arg(((pfEvent.event_status
+                    == TableStatusEnum::VALID)
+                    && (start_time != pfEvent.event->start_time))
+                    ? "*" : "")
             .arg(QDateTime::fromTime_t(end_time)
                 .toString(Qt::SystemLocaleShortDate))
-                .arg(end_time != pfEvent.event->end_time ? "*" : "")
+                .arg(((pfEvent.event_status
+                    == TableStatusEnum::VALID)
+                    && (end_time != pfEvent.event->end_time))
+                    ? "*" : "")
             .arg(RSTNames[uint(running_status)]).arg(
-                running_status != pfEvent.event->running_status ? "*" : "")
+                ((pfEvent.event_status
+                    == TableStatusEnum::VALID)
+                    && (running_status
+                    != pfEvent.event->running_status))
+                    ? "*" : "")
             .arg(is_scrambled)
             .arg(actual));
 
@@ -447,7 +477,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         end_time,
                         running_status,
                         is_scrambled,
-                        events);
+                        events, table_key);
     return true;
 }
 
@@ -535,7 +565,9 @@ void EitCacheDVB::ScheduleTable::InvalidateEverything()
 
 bool EitCacheDVB::ScheduleTable::ProcessSection(
                 const DVBEventInformationTable *eit, const bool actual,
-                bool &section_version_changed)
+                 Event::EventTable& events,
+                 bool &section_version_changed,
+                 unsigned long long table_key)
 {
     // Validate against ETSI EN 300 468 V1.15.1 and
     // and ETSI TS 101 211 V1.12.1
@@ -797,7 +829,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                                                 eit->EndTimeUnixUTC(ievent),
                                                 RunningStatus(
                                                     eit->RunningStatus(ievent)),
-                                                eit->IsScrambled(ievent), events) ==
+                                                eit->IsScrambled(ievent), events, 0) ==
                                                 *current_section.events[ievent]))
                                             break;
                                     if (event_count == ievent)
@@ -929,7 +961,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         eit->EndTimeUnixUTC(ievent),
                         RunningStatus(eit->RunningStatus(ievent)),
                         eit->IsScrambled(ievent),
-                        events)));
+                        events, table_key)));
 
     if (!version_changed &&
             !subtable_count_changed &&
