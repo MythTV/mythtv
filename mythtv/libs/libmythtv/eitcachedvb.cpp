@@ -35,7 +35,62 @@ EitCacheDVB::Event::Event(uint event_id,
     {
         // Handle shared table
         unsigned long long key = table_key << 16 | event_id;
+/*
+        if (events.contains(key))
+        {
+            LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+                "Event is already in events table %1")
+                .arg(events[key]->ref._q_value));
+                
+            // Take a temp ref on the existing event
+            QExplicitlySharedDataPointer<Event> old_entry
+                = events[key];
+            
+            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+                "old_entry ref before insert %1")
+                .arg(old_entry->ref._q_value));
+                
+            events.insert(key,
+                            QExplicitlySharedDataPointer<Event>(this));
+                            
+            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+                "old_entry ref after insert %1")
+                .arg(old_entry->ref._q_value));
+                
+            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+                "new entry refcount after insert %1")
+                .arg(events[key]->ref._q_value));
+        }
+        else
+        {
+            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+                "Event is not in events table %1")
+                .arg(ref._q_value));
+            events.insert(key,
+                            QExplicitlySharedDataPointer<Event>(this));
+            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+                "Ref count after  insert %1")
+                .arg(events[key]->ref._q_value));
+        }
+*/
+        // If you uncomment the debug stuff above rememeber to
+        // comment this out
+        events.insert(key,
+                        QExplicitlySharedDataPointer<Event>(this));
     }
+    
+    //LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+    //    "Constructing event %1").arg(quintptr(this),
+    //                QT_POINTER_SIZE * 2, 16, QChar('0')));
+}
+
+EitCacheDVB::Event::~Event()
+{
+    /*
+    LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+    "Destroying event %1").arg(quintptr(this), 
+                    QT_POINTER_SIZE * 2, 16, QChar('0')));
+    */
 }
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
@@ -57,7 +112,8 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
         (table_id <= TableID::SC_EITend));
         
     // See if this section is for the pf table or the schedule table
-    unsigned long long key = original_network_id << 32 | transport_stream_id  << 16 | service_id;
+    unsigned long long key = original_network_id << 32 |
+                    transport_stream_id  << 16 | service_id;
     if ((table_id == TableID::PF_EIT) || (table_id == TableID::PF_EITo))
     {
         if (!pfTables.contains(key))
@@ -69,7 +125,8 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             pfTables.insert(key, new_table);
         }
 
-        return pfTables[key].ProcessSection(eit, actual, events, section_version_changed, key);
+        return pfTables[key].ProcessSection(eit, actual, events,
+                                        section_version_changed, key);
     }
     else if (((table_id >= TableID::SC_EITbeg) &&
             (table_id <= TableID::SC_EITend)) ||
@@ -85,96 +142,20 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             scheduleTables.insert(key, new_table);
         }
         
-        return scheduleTables[key].ProcessSection(eit, actual, events, section_version_changed, key);
+        return scheduleTables[key].ProcessSection(eit, actual, events,
+                                        section_version_changed, key);
     }
     else if (table_id == TableID::RST)
     {
-        // The long lost running status table has finally been found
-        //  send for the doctor. "Doctor Who?". "Of Course!".
         LOG(VB_EITRS, LOG_INFO, LOC + QString(
-                "The long lost running status table has finally been found, "
-                "send for the doctor. \"Doctor Who?\". \"Of Course!\"."));
+                "The long lost running status table has finally been "
+                "found, send for the doctor. \"Doctor Who?\". \"Of "
+                "Course!\"."));
         return true;
     }
     else
         return false;
         
-    return true;
-}
-
-bool EitCacheDVB::PfTable::ValidateEventTimes(
-                const DVBEventInformationTable *eit, 
-                uint event_count,
-                uint section_number)
-{
-    if (event_count > 0)
-    {
-        time_t current_time = QDateTime::currentDateTimeUtc()
-            .toTime_t();
-        time_t start_time = eit->StartTimeUnixUTC(0);
-        time_t end_time = eit->EndTimeUnixUTC(0);
-        if (0 == section_number)
-        {
-            // "Present" section (0)
-            // Event (0) should span the current time
-            if ((start_time > current_time) || (end_time < current_time))
-            {
-                LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                    "Present event does not span current time %1 %2 %3")
-                    .arg(QDateTime::fromTime_t(start_time)
-                            .toString(Qt::SystemLocaleShortDate))
-                    .arg(QDateTime::fromTime_t(end_time)
-                            .toString(Qt::SystemLocaleShortDate))
-                    .arg(QDateTime::fromTime_t(current_time)
-                            .toString(Qt::SystemLocaleShortDate)));
-                return false;
-            }
-        }
-        else
-        {
-            // "Following" section (1) 
-            // If Event (0) does not have the running_status
-            // "Paused" it should be in the future.
-            if (RunningStatusEnum::PAUSING
-                        == RunningStatusEnum(eit->RunningStatus(0)))
-            {
-                // Event is paused it should start some time in the
-                // past and finish some time in the future
-                if ((start_time >= current_time) ||
-                        (end_time <= current_time))
-                {
-                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                        "Paused following event must "
-                        "start some time in the past and finish "
-                        "some time in the future %1 %2 %3")
-                    .arg(QDateTime::fromTime_t(start_time)
-                            .toString(Qt::SystemLocaleShortDate))
-                    .arg(QDateTime::fromTime_t(end_time)
-                            .toString(Qt::SystemLocaleShortDate))
-                    .arg(QDateTime::fromTime_t(current_time)
-                            .toString(Qt::SystemLocaleShortDate)));
-                    return false;
-                }
-            }
-            else
-            {
-                // Event must be in the the future
-                if (start_time < current_time)
-                {
-                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                        "Following event must be in the "
-                        "future %1 %2 %3")
-                    .arg(QDateTime::fromTime_t(start_time)
-                            .toString(Qt::SystemLocaleShortDate))
-                    .arg(QDateTime::fromTime_t(end_time)
-                            .toString(Qt::SystemLocaleShortDate))
-                    .arg(QDateTime::fromTime_t(current_time)
-                            .toString(Qt::SystemLocaleShortDate)));
-                    return false;
-                }
-            }
-        }
-    }
     return true;
 }
 
@@ -184,8 +165,8 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 bool &section_version_changed,
                 unsigned long long table_key)
 {
-    // Validate against ETSI EN 300 468 V1.11.1 and
-    // and ETSI ETR 211 second edition
+    // Validate against ETSI EN 300 468 V1.15.1 and
+    // and ETSI TS 101 211 V1.12.1
     
     section_version_changed = false;
 
@@ -238,19 +219,15 @@ bool EitCacheDVB::PfTable::ProcessSection(
         return false;
     }
     
-    EventWrapper& pfEvent  =  (0 == section_number) ? present : following;
+    // TODO validate running status
+    
+    EventWrapper& pfEvent  =  (0 == section_number)
+                                ? present : following;
 
     // Check the version number against the current table if any
     if (table_status == TableStatusEnum::UNINITIALISED)
     {
-        // No previous data, initialise the table if
-        // the event is valid.
-        if (!ValidateEventTimes(eit, event_count, section_number))
-        {
-            LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                "Table uninitialised but bad event times - reject"));
-            return false;
-        }
+        // No previous data, initialise the table
         LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
             "Table uninitialised - accepting "
             "incoming data"));
@@ -269,15 +246,8 @@ bool EitCacheDVB::PfTable::ProcessSection(
 
         if (pfEvent.event_status == TableStatusEnum::UNINITIALISED)
         {
-            // No previous event section - I will initialise the version number
-            // from this section provided the event times (if present) are
-            // reasonable.
-            if (!ValidateEventTimes(eit, event_count, section_number))
-            {
-                LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                    "Event uninitialised but bad event times - reject"));
-                return false;
-            }
+            // No previous event section - I will initialise the
+            //version number from this section
             LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                 "Event uninitialised - accepting "
                 "incoming data"));
@@ -287,12 +257,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
             // Something to check against
             if ((table_version + 1) % 32 == version_number)
             {
-                // Ignore if event times are invalid
-                if (!ValidateEventTimes(eit, event_count, section_number))
-                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                        "PF potential next version but bad "
-                        "event times - reject"));
-                    return false;
                 LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                     "PF potential next version invalidate everything "
                     "and accept"));
@@ -312,13 +276,15 @@ bool EitCacheDVB::PfTable::ProcessSection(
                     if (event_count == 0)
                     {
                         // Same version number no incoming events
-                        if (pfEvent.event_status == TableStatusEnum::EMPTY)
+                        if (pfEvent.event_status
+                                    == TableStatusEnum::EMPTY)
                         {
                             // No incoming events 
                             // table valid but empty
                             LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                                 "PF table same version no incoming "
-                                "and no stored events present - reject duplicate"));
+                                "and no stored events present - reject"
+                                " duplicate"));
                             return false;
                         }
                         // At this point I have the same version number,
@@ -330,14 +296,16 @@ bool EitCacheDVB::PfTable::ProcessSection(
                             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                             // On the "other" stream reject as duplicate
                             LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                                "PF table same version no incoming events "
-                            "not on actual stream - reject"));
+                                "PF table same version no incoming "
+                                "events not on actual stream "
+                                "- reject"));
                             return false;
                         }
                         // On the "actual" stream accept
                         // the incoming section as a wrap around
                         // discontinuity.
-                        // Invalidate verything it will be set right later
+                        // Invalidate verything it will be set right
+                        // later
                         LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                             "PF table same version no incoming events "
                         "on actual stream - accept"));
@@ -366,15 +334,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
                                 return false;
                             }
                         }
-                        // Ignore if event times are invalid
-                        if (!ValidateEventTimes(eit, event_count,
-                                                section_number))
-                        {
-                            LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                                "PF table incoming "
-                                "events invalid times"));
-                            return false;
-                        }
                         // Some data is better than no data
                         // fall through
                         LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
@@ -384,16 +343,9 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 else
                 {
                     // Discontinuity
-                    if (!ValidateEventTimes(eit, event_count,
-                                            section_number))
-                    {
-                        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                            "PF table discontinuity incoming "
-                            "events invalid times"));
-                        return false;
-                    }
                     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                        "PF table discontinuity accepted"));
+                        "PF table discontinuity accepted %1")
+                        .arg(actual ? "actual" : "other"));
                 }
             }
         }
@@ -469,6 +421,17 @@ bool EitCacheDVB::PfTable::ProcessSection(
             .arg(actual));
 
     table_status = TableStatusEnum::VALID;
+
+    if (bool(pfEvent.event))
+        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+            "Old event %1 before reallocation - count %2")
+            .arg(quintptr(pfEvent.event.data()),	
+                QT_POINTER_SIZE * 2, 16, QChar('0'))
+            .arg(pfEvent.event->ref._q_value));
+    else
+        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+            "Event wrapper is current empty"));
+            
     pfEvent.event_status = event_count > 0 ?
                             TableStatusEnum::VALID :
                             TableStatusEnum::EMPTY;
@@ -478,6 +441,13 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         running_status,
                         is_scrambled,
                         events, table_key);
+                        
+    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+        "New event %1 after reallocation - count %2")
+        .arg(quintptr(pfEvent.event.data()),
+            QT_POINTER_SIZE * 2, 16, QChar('0'))
+        .arg(pfEvent.event->ref._q_value));
+        
     return true;
 }
 

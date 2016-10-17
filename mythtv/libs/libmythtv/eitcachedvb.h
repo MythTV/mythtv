@@ -92,7 +92,7 @@ private: // Declarations
         Event() : running_status
                     (EitCacheDVB::RunningStatusEnum::UNDEFINED) {}
 
-        typedef QMap<unsigned long long, struct Event> EventTable;
+        typedef QMap<unsigned long long, struct QExplicitlySharedDataPointer<Event> > EventTable;
         
         Event(uint event_id,
                 time_t start_time,
@@ -102,8 +102,7 @@ private: // Declarations
                 EventTable& events,
                 unsigned long long table_key);
 
-        //Event(const Event &other) : QSharedData(other) { }
-        //~Event() { }
+        ~Event();
         
         uint event_id;
         time_t start_time;
