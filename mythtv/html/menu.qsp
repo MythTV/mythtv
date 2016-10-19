@@ -29,7 +29,7 @@
                 <li><a href='#' onClick="hideMainMenu();loadSetupPage('channeleditor')"><i18n>Channel Editor</i18n></a></li>
               </ul>
             </li>
-            <li><a href='#' onClick="hideMainMenu();loadContent('/misc/placeholder.html')"><i18n>Recording Devices</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadFrontendContent('/misc/placeholder.html')"><i18n>Recording Devices</i18n></a></li>
             <li><a href='#' onClick="hideMainMenu();loadSetupPage('storagegroups')"><i18n>Storage Groups</i18n></a></li>
             <li><a href='#' onClick="hideMainMenu();loadSetupPage('jobqueue')"><i18n>Job Queue</i18n></a></li>
             <li><a href='#' onClick="hideMainMenu();loadSetupPage('systemevents')"><i18n>System Events</i18n></a></li>
@@ -85,8 +85,8 @@
 %>
         <li><a href='#'><i18n>Server Side Scripting</i18n></a>
           <ul class="acitem">
-            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
-            <li><a href='#' onClick="hideMainMenu();loadContent('/samples/storagegroups.qsp', '/samples/js/samples.js')"><i18n>GetStorageGroups()</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadFrontendContent('/samples/serverside.qsp', '/samples/js/samples.js')"><i18n>Overview</i18n></a></li>
+            <li><a href='#' onClick="hideMainMenu();loadFrontendContent('/samples/storagegroups.qsp', '/samples/js/samples.js')"><i18n>GetStorageGroups()</i18n></a></li>
           </ul>
         </li>
 <%
@@ -96,7 +96,7 @@
     </li>
     <li><a href='#'><i18n>3rd Party Software</i18n></a>
       <ul class="acitem collapsible">
-        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadContent('/3rdParty/jwplayer.qsp')"><i18n>JW Player&trade;</i18n></a></li>
+        <li><a class='menuitem' href='#' onClick="hideMainMenu();loadFrontendContent('/3rdParty/jwplayer.qsp')"><i18n>JW Player&trade;</i18n></a></li>
       </ul>
     </li>
   </ul>
