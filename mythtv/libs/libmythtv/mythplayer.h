@@ -843,6 +843,9 @@ class MTV_PUBLIC MythPlayer
     TV *m_tv;
     bool isDummy;
 
+    // Counter for buffering messages
+    int  bufferingCounter;
+
     // Debugging variables
     Jitterometer *output_jmeter;
 
