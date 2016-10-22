@@ -119,7 +119,8 @@ class AudioOutputBase : public AudioOutput, public MThread
     static const uint kAudioSRCInputSize = 16384;
 
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
-    static const uint kAudioRingBufferSize   = 3072000u;
+    // In other words, divisible by 96.
+    static const uint kAudioRingBufferSize   = 10239936u;
 
  protected:
     // Following function must be called from subclass constructor

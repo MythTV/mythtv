@@ -1297,10 +1297,10 @@ int RingBuffer::Peek(void *buf, int count)
 
 bool RingBuffer::WaitForReadsAllowed(void)
 {
-    // Wait up to 10000 ms for reads allowed (or readsdesired if post seek/open)
+    // Wait up to 30000 ms for reads allowed (or readsdesired if post seek/open)
     bool &check = (recentseek || readInternalMode) ? readsdesired : readsallowed;
     recentseek = false;
-    int timeout_ms = 10000;
+    int timeout_ms = 30000;
     int count = 0;
     MythTimer t;
     t.start();
@@ -1309,7 +1309,7 @@ bool RingBuffer::WaitForReadsAllowed(void)
            !request_pause && !commserror && readaheadrunning)
     {
         generalWait.wait(&rwlock, clamp(timeout_ms - t.elapsed(), 10, 100));
-        if (!check && t.elapsed() > 1000 && (count % 10) == 0)
+        if (!check && t.elapsed() > 1000 && (count % 100) == 0)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Taking too long to be allowed to read..");
@@ -1517,7 +1517,7 @@ int RingBuffer::ReadPriv(void *buf, int count, bool peek)
         if (avail > 0)
             break;
     }
-    if (t.elapsed() > 2000)
+    if (t.elapsed() > 6000)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + loc_desc +
             QString(" -- waited %1 ms for avail(%2) > count(%3)")

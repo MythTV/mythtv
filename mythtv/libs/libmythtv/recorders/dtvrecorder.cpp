@@ -88,7 +88,8 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _total_duration(0),
     _td_base(0),
     _td_tick_count(0),
-    _td_tick_framerate(0)
+    _td_tick_framerate(0),
+    music_choice(false)
 {
     SetPositionMapType(MARK_GOP_BYFRAME);
     _payload_buffer.reserve(TSPacket::kSize * (50 + 1));
@@ -538,6 +539,14 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
                 int64_t dts = extract_timestamp(
                     bufptr, bytes_left, kExtractPTS);
                 HandleTimestamps(stream_id, pts, dts);
+                // Detect music choice program (very slow frame rate and audio)
+                if (_first_keyframe < 0
+                    &&  _ts_last[stream_id] - _ts_first[stream_id] > 3*90000)
+                {
+                    hasKeyFrame = true;
+                    music_choice = true;
+                    LOG(VB_GENERAL, LOG_INFO, LOC + "Music Choice program detected");
+                }
             }
         }
     }
@@ -636,6 +645,9 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         gap_threshold = 2*90000; // two seconds, compensate for GOP ordering
     }
 
+    if (music_choice)
+        gap_threshold = 8*90000; // music choice uses frames every 6 seconds
+
     if (_ts_last[stream_id] >= 0)
     {
         int64_t diff = ts - _ts_last[stream_id];
@@ -649,7 +661,7 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
         if (diff < 0)
             diff = -diff;
 
-        if (diff > gap_threshold)
+        if (diff > gap_threshold && _first_keyframe >= 0)
         {
             QMutexLocker locker(&statisticsLock);
 
