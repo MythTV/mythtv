@@ -165,7 +165,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                 bool &section_version_changed,
                 unsigned long long table_key)
 {
-    // Validate against ETSI EN 300 468 V1.15.1 and
+    // Validate against ETSI EN 300 468 V1.15.1
     // and ETSI TS 101 211 V1.12.1
     
     section_version_changed = false;
@@ -539,7 +539,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                  bool &section_version_changed,
                  unsigned long long table_key)
 {
-    // Validate against ETSI EN 300 468 V1.15.1 and
+    // Validate against ETSI EN 300 468 V1.15.1
     // and ETSI TS 101 211 V1.12.1
     
     // Basic checks
