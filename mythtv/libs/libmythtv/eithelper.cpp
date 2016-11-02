@@ -357,11 +357,14 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     // Process a DVB EIT section
     EitCacheDVB& dvbEITCache = EitCacheDVB::GetInstance();
     bool section_version_changed;
-    if (dvbEITCache.ProcessSection(eit, section_version_changed))
+    bool table_version_change_complete;
+    if (dvbEITCache.ProcessSection(eit, section_version_changed,
+                                   table_version_change_complete))
         LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is processed"));
     else
     {
+        // May need to modify this to handle dish stuff (DESC)
         LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is discarded"));
         return;
@@ -385,10 +388,13 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
     // I will use sections from the schedule table to update the database.
     // Sections from the PF table will be used to drive the scheduler.
-    // The schedule table is made of up to 8 sub-tables identified by TableID.
-    //
 
-    uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
+    // At the moment I will never see section  with table ids like this so..
+    // uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
+    // TODO further investigation needed
+    uint descCompression = 1;
+
+
     FixupValue fix = fixup.value((FixupKey)eit->OriginalNetworkID() << 16);
     fix |= fixup.value((((FixupKey)eit->TSID()) << 32) |
                  ((FixupKey)eit->OriginalNetworkID() << 16));
@@ -404,19 +410,14 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     for (uint i = 0; i < eit->EventCount(); i++)
     {
 
-/// \todo
-/// The eitcachedvb code should have handled duplicates
-/// so do not ignore this event if it already available in the cache.
-/// TODO - more debate needed on this. How do we handle running status?
-/// Do we put it the cache? Do we add it to the DBEventEIT?
-/// Do we abandon the eitcache altogether for ETSI DVB systems?
-///
-        // Skip event if we have already processed it before...
-        if (!eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
-                              eit->EndTimeUnixUTC(i)))
-        {
-//            continue;
-        }
+        /// \todo
+        /// The eitcachedvb code has handled duplicates
+        /// At this point his is either a completely new event
+        /// or a change to an event that is still in the table.
+
+        // Update the cache this puts the event id into the cache
+        eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
+                              eit->EndTimeUnixUTC(i));
 
         QString title         = QString("");
         QString subtitle      = QString("");
@@ -725,6 +726,15 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         event->items = items;
 
         db_events.enqueue(event);
+    }
+
+    // TODO remove deleted events
+    // Iterate the events for this channel in the cache
+    if (section_version_changed && table_version_change_complete)
+    {
+        // I have just got a complete new table for this channel
+        // Iterate all the events in the myth eit cache and delete
+        // ones that are not in the DVB cache.
     }
 }
 

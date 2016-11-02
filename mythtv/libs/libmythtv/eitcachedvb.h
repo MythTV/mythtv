@@ -33,7 +33,8 @@ public: // Methods
     }
     
     bool ProcessSection(const DVBEventInformationTable *eit,
-                        bool &section_version_changed);
+                        bool &section_version_changed,
+                        bool &table_version_change_complete);
     
 public: // Data
     // NONE
@@ -188,7 +189,9 @@ private: // Declarations
         
         TableStatusEnum subtable_status;
         Segment segments[32];
-        uint subtable_version;
+        uint segment_count;
+        uint subtable_version; // TODO check whether the same version is always
+                                // common across all subtables
     };
     
     struct TableBase
@@ -223,6 +226,12 @@ private: // Declarations
             service_id = id;
         }
         
+        virtual bool ProcessSection(const DVBEventInformationTable *eit,
+                            const bool actual, Event::EventTable& events,
+                            bool &section_version_changed,
+                            bool &table_version_change_complete,
+                            unsigned long long table_key) = 0;
+
         static const uint VERSION_UNINITIALISED = 32;
         uint original_network_id;
         uint transport_stream_id;
@@ -245,7 +254,9 @@ private: // Declarations
         
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             const bool actual, Event::EventTable& events,
-                            bool &section_version_changed, unsigned long long table_key);
+                            bool &section_version_changed,
+                            bool &table_version_change_complete,
+                            unsigned long long table_key);
 
     private: // Methods
         bool ValidateEventStartTimes(const DVBEventInformationTable *eit,
@@ -304,7 +315,9 @@ private: // Declarations
 
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             const bool actual, Event::EventTable& events,
-                            bool &section_version_changed, unsigned long long table_key);
+                            bool &section_version_changed,
+                            bool &table_version_change_complete,
+                            unsigned long long table_key);
 
     private: // Methods
         bool ValidateEventTimes(const DVBEventInformationTable *eit,
