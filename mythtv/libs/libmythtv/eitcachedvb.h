@@ -90,8 +90,12 @@ private: // Declarations
     struct Event : public QSharedData
     {
 
-        Event() : running_status
-                    (EitCacheDVB::RunningStatusEnum::UNDEFINED) {}
+        Event() : event_id(0),
+                    start_time(0),
+                    end_time(0),
+                    running_status
+                        (EitCacheDVB::RunningStatusEnum::UNDEFINED),
+                    is_scrambled(false) {}
 
         typedef QMap<unsigned long long, struct QExplicitlySharedDataPointer<Event> > EventTable;
         
@@ -147,7 +151,10 @@ private: // Declarations
     
     struct Segment
     {
-        Segment() : section_count(0) {}
+        Segment() :
+            section_count(0),
+            segment_status(EitCacheDVB::TableStatusEnum::UNINITIALISED),
+            segment_version(TableBase::VERSION_UNINITIALISED) {}
                     
         Segment(const Segment &other)
         {
@@ -156,6 +163,8 @@ private: // Declarations
 
         Segment& operator = (const Segment &other)
         {
+            segment_status = other.segment_status;
+            segment_version = other.segment_version;
             section_count = other.section_count;
             for (uint i = 0; i < 8; i++)
                 sections[i] = other.sections[i];
@@ -163,6 +172,8 @@ private: // Declarations
         }
 
         uint section_count;
+        TableStatusEnum segment_status;
+        uint segment_version;
         Section sections[8];
     };
     
@@ -170,7 +181,8 @@ private: // Declarations
     {
         SubTable() : subtable_status(
                     EitCacheDVB::TableStatusEnum::UNINITIALISED),
-                    subtable_version(TableBase::VERSION_UNINITIALISED)
+                    subtable_version(TableBase::VERSION_UNINITIALISED),
+                    segment_count(0)
                     {}
                     
         SubTable(const SubTable &other)
@@ -189,14 +201,16 @@ private: // Declarations
         
         TableStatusEnum subtable_status;
         Segment segments[32];
-        uint segment_count;
         uint subtable_version; // TODO check whether the same version is always
                                 // common across all subtables
+        uint segment_count;
     };
     
     struct TableBase
     {
-        TableBase() {}
+        TableBase() : original_network_id(0),
+                        transport_stream_id(0),
+                        service_id(0) {}
                 
         TableBase(const TableBase &other)
         {
