@@ -6,6 +6,89 @@
 #include <QDateTime>
 #include <QStringList>
 
+
+
+// This code processes sections from the Event Information Tables(EIT).
+// according to the rules defined in ETSI EN 300 468 V1.15.1
+// and ETSI TS 101 211 V1.12.1
+
+// There are two Event Information Tables, the Present / Following (P/F)
+// table and the Schedule table.
+//
+// When encoded into transport stream packets these tables are identified
+// by unique table id numbers. For encoding, each table is split into
+// numbered sections, each section is carried in a separate transport packet.
+// These sections carry the body of the table, which is made up a events
+// each with a numeric identifier that is unique for a particular transport
+// service. A transport service corresponds to mythtv's concept of a channel.
+//
+// The P/F table is identified by two numbers, PF_EIT (0x4e decimal 78)
+// and PF_EITo (0x4f decimal 79). Both these numbers refer to the SAME
+// table. PF_EIT is used when the table is being carried in the same
+// transport stream as the one its content refers to. PF_EITo is used when
+// the table is being carried in a different transport stream than the
+// one its content refers to.
+//
+// The Schedule table is a bit more complex. It is identified by by two
+// sets of table id numbers. SC_EITbeg (0x50 80) to SC_EITend (0x5f 95)
+// and SC_EITbeg0 (0x60 96) to SC_EITendo (0x6f 111). Once again both
+// these sets of numbers refer to the SAME table, and significance is the
+// same as it is for the P/F table. The different table numbers correspond
+// to consecutive 96 hour periods starting from the UTC midnight on the
+// present day. So sections in table 0x50 (or 0x60) will only carry events
+// starting in the present day and 3 following days, this of course means
+// that as well as events that are due to be broadcast later it can carry
+// at most one event that is currently being broadcast (running) and zero
+// or more events that are already in the past depending on the current
+// time. Table 0x51 (0x61) carries events starting 4 days in the future ,
+// and so on up to table 0x5f (0x6f) that carries events starting 60 to
+// 63 days into the future. A particular event can enter the table at any
+// point depending on how far into the future the broadcaster publishes
+// schedule data, at that point it will migrate downwards over time towards
+// table 0x50 (0x60). The sections of the table are ordered chronologically
+// as are the events in the sections. The 256 possible numbered sections of
+// the table are also grouped into 32  segments each containing up to 8
+// sections. Each segment contains events for a 3 hour period. Segments may contain
+// less than eight sections but the sections must be numbered consecutively
+// starting at the base number defined for the segment.
+//
+// The base numbers and time periods are as follows.
+//
+// Segment   Base section   Time period (UTC)  Day
+// ===============================================
+//    0           0             0:0 - 2:59     0
+//    1           8             3:0 - 5:59     0
+//    2           16            6:0 - 8:59     0
+//    3           24            9:0 - 11:59    0
+//    4           32            12:0 - 14:59   0
+//    5           40            15:0 - 17:59   0
+//    6           48            18:0 - 20:59   0
+//    7           56            21:0 - 23:59   0
+//    8           64            0:0 - 2:59     1
+//    9           72            3:0 - 5:59     1
+//    10          80            6:0 - 8:59     1
+//    11          88            9:0 - 11:59    1
+//    12          96            12:0 - 14:59   1
+//    13          104           15:0 - 17:59   1
+//    14          112           18:0 - 20:59   1
+//    15          120           21:0 - 23:59   1
+//    16          128           0:0 - 2:59     2
+//    17          136           3:0 - 5:59     2
+//    18          144           6:0 - 8:59     2
+//    19          152           9:0 - 11:59    2
+//    20          160           12:0 - 14:59   2
+//    21          168           15:0 - 17:59   2
+//    22          176           18:0 - 20:59   2
+//    23          184           21:0 - 23:59   2
+//    24          192           0:0 - 2:59     3
+//    25          200           3:0 - 5:59     3
+//    26          208           6:0 - 8:59     3
+//    27          216           9:0 - 11:59    3
+//    28          224           12:0 - 14:59   3
+//    29          232           15:0 - 17:59   3
+//    30          240           18:0 - 20:59   3
+//    31          248           21:0 - 23:59   3
+
 #define LOC QString("EitCacheDVB: ")
 
 static QStringList RSTNames(QStringList() << "Undefined"
@@ -355,11 +438,21 @@ bool EitCacheDVB::PfTable::ProcessSection(
      // Section has passed all the checks
     bool version_change = table_version != version_number;
     table_version = version_number;
+
     if (pfEvent.section_version != version_number)
         section_version_changed = true;
+
     pfEvent.section_version = version_number;
+
     if (present.section_version == following.section_version)
         table_version_change_complete = true;
+
+    if (section_version_changed)
+        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+                "Pf table version change %1")
+                .arg(table_version_change_complete
+                     ? "complete" : "incomplete"));
+
     uint  event_id = eit->EventID(0);
     time_t start_time = eit->StartTimeUnixUTC(0);
     time_t end_time = eit->EndTimeUnixUTC(0);

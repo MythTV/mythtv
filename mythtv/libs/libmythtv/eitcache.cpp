@@ -382,18 +382,6 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
             //
             // !!! AFAIK for ETSI DVB broadcasts
             // A lower table number is not "better"
-            // It just means that the event starts sooner
-            // or in fact has already started or even finished.
-            // It can also mean that the event is for a transport
-            // stream "other" than the one it was received on.
-            // So the same event can be observed migrating downwards over time
-            // through two series of table ids, 0x5F to 0x50 when the table
-            // is being received on the "actual" transport stream the
-            // event relates, and 0x6f to 0x60 when the same table is being received
-            // on an "other" transport stream. The information contained in for
-            // example tableid 0x50 and tableid 0x60 should be subtantially identical
-            // Each tableid in the schedule table relates to a single 24 hour period
-            // starting at UTC midnight.
 
             tblChgCnt++;
         }
