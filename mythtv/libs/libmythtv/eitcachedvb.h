@@ -263,6 +263,7 @@ private: // Declarations
 
         ScheduleTable& operator = (const ScheduleTable &other)
         {
+            TableBase::operator = (other);
             return *this;
         }
         
@@ -324,6 +325,7 @@ private: // Declarations
 
         PfTable& operator = (const PfTable &other)
         {
+            TableBase::operator = (other);
             return *this;
         }
 
