@@ -12,6 +12,7 @@ class MythRenderVDPAU;
 
 class MUI_PUBLIC MythVDPAUPainter : public MythPainter
 {
+    friend class VideoOutputVDPAU;
   public:
     explicit MythVDPAUPainter(MythRenderVDPAU *render = NULL);
    ~MythVDPAUPainter();
