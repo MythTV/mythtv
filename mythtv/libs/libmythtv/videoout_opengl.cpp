@@ -156,6 +156,7 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
         // Hack to ensure that the osd painter is not
         // deleted while image load thread is still busy
         // loading images with that painter
+        gl_painter->Teardown();
         if (invalid_osd_painter)
             delete invalid_osd_painter;
         invalid_osd_painter = gl_painter;

@@ -12,6 +12,7 @@ class MythRenderD3D9;
 
 class MUI_PUBLIC MythD3D9Painter : public MythPainter
 {
+    friend class VideoOutputD3D;
   public:
     explicit MythD3D9Painter(MythRenderD3D9 *render = NULL);
    ~MythD3D9Painter();
