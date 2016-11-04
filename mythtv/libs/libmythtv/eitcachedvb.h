@@ -20,6 +20,7 @@ class EitCacheDVB
 public: // Declarations
         // NONE
 public: // Methods
+// Disable implicit copy semantics for this singleton class
 #if __cplusplus >= 201103L
     EitCacheDVB(EitCacheDVB const&) = delete;
         
@@ -89,7 +90,7 @@ private: // Declarations
 
     struct Event : public QSharedData
     {
-
+        // Default constructor
         Event() : event_id(0),
                     start_time(0),
                     end_time(0),
@@ -109,13 +110,6 @@ private: // Declarations
 
         ~Event();
         
-        uint event_id;
-        time_t start_time;
-        time_t end_time;			
-        RunningStatusEnum running_status;
-        bool is_scrambled;			
-        // TODO Need to decide how/whether to handle descriptors
-        
         bool operator == (const Event &e2) const
         {
             return (event_id == e2.event_id) &&
@@ -124,6 +118,14 @@ private: // Declarations
                     (running_status == e2.running_status) &&
                     (is_scrambled == e2.is_scrambled);
         }
+
+        uint event_id;
+        time_t start_time;
+        time_t end_time;
+        RunningStatusEnum running_status;
+        bool is_scrambled;
+        // TODO Need to decide how/whether to handle descriptors
+
     };
         
     struct Section
@@ -140,12 +142,15 @@ private: // Declarations
         Section& operator = (const Section &other)
         {
             section_status = other.section_status;
+            section_version = other.section_version;
             events = other.events;
             return *this;
         }
 
         TableStatusEnum section_status;
         uint section_version;
+        // TODO - check whether this QList can be handled
+        // by an implicit copy constructor
         QList< QExplicitlySharedDataPointer<Event> > events;
     };
     
@@ -156,7 +161,7 @@ private: // Declarations
             segment_status(EitCacheDVB::TableStatusEnum::UNINITIALISED),
             segment_version(TableBase::VERSION_UNINITIALISED) {}
                     
-        Segment(const Segment &other)
+/*        Segment(const Segment &other)
         {
             *this = other;
         }
@@ -169,7 +174,7 @@ private: // Declarations
             for (uint i = 0; i < 8; i++)
                 sections[i] = other.sections[i];
             return *this;
-        }
+        }*/
 
         uint section_count;
         TableStatusEnum segment_status;
@@ -185,7 +190,7 @@ private: // Declarations
                     segment_count(0)
                     {}
                     
-        SubTable(const SubTable &other)
+/*        SubTable(const SubTable &other)
         {
             *this = other;
         }
@@ -197,7 +202,7 @@ private: // Declarations
             for (uint i = 0; i < 32; i++)
                 segments[i] = other.segments[i];
             return *this;
-        }
+        }*/
         
         TableStatusEnum subtable_status;
         Segment segments[32];
@@ -212,7 +217,7 @@ private: // Declarations
                         transport_stream_id(0),
                         service_id(0) {}
                 
-        TableBase(const TableBase &other)
+/*        TableBase(const TableBase &other)
         {
             *this = other;
         }
@@ -223,7 +228,7 @@ private: // Declarations
             transport_stream_id = other.transport_stream_id;
             service_id = other.service_id;
             return *this;
-        }
+        }*/
         
         void SetOriginalNetworkId(uint id)
         {
@@ -254,7 +259,7 @@ private: // Declarations
     
     struct ScheduleTable : public TableBase
     {
-        ScheduleTable() : subtable_count(0) {}
+/*        ScheduleTable() : subtable_count(0) {}
                                             
         ScheduleTable(const ScheduleTable &other)
         {
@@ -265,7 +270,7 @@ private: // Declarations
         {
             TableBase::operator = (other);
             return *this;
-        }
+        }*/
         
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             const bool actual, Event::EventTable& events,
@@ -294,7 +299,7 @@ private: // Declarations
                 section_version(TableBase::VERSION_UNINITIALISED) {}
                 
             
-            EventWrapper(const EventWrapper &other)
+/*            EventWrapper(const EventWrapper &other)
             {
                 *this = other;
             }
@@ -302,7 +307,7 @@ private: // Declarations
             EventWrapper& operator = (const EventWrapper &other)
             {
                 return *this;
-            }
+            }*/
 
             TableStatusEnum event_status;
             uint section_version;
@@ -316,7 +321,7 @@ private: // Declarations
             table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED)
             {}
             
-        PfTable(const PfTable &other) : TableBase(other),
+/*        PfTable(const PfTable &other) : TableBase(other),
                                         present(other.present),
                                         following(other.following)
         {
@@ -327,7 +332,7 @@ private: // Declarations
         {
             TableBase::operator = (other);
             return *this;
-        }
+        }*/
 
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             const bool actual, Event::EventTable& events,
@@ -350,6 +355,7 @@ private: // Declarations
 private: // Methods
     EitCacheDVB() {};
 #if __cplusplus < 201103L
+    // Disable implicit copy semantics for this singleton class
     EitCacheDVB(EitCacheDVB const&); // Do NOT implement
     void operator=(EitCacheDVB const&); // Do NOT implement
 #endif

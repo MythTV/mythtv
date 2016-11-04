@@ -1122,26 +1122,34 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         }
         if (table_version_change_complete)
             LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                + QString("EIT schedule table version change complete "
-                "original_network_id %1 "
-                "transport_stream_id %2 "
-                "service_id %3 "
-                "table_id %4 ")
+                + QString("EIT_SCH %1/%2/%3/%4 complete "
+                        "v %5 "
+                        "s %6 "
+                        "slsn %7 "
+                        "lsn %8")
                 .arg(original_network_id)
                 .arg(transport_stream_id)
                 .arg(service_id)
-                .arg(table_id));
+                .arg(table_id)
+                .arg(version_number)
+                .arg(section_number)
+                .arg(segment_last_section_number)
+                .arg(last_section_number));
         else
             LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                + QString("EIT schedule table version change incomplete "
-                "original_network_id %1 "
-                "transport_stream_id %2 "
-                "service_id %3 "
-                "table_id %4 ")
+                + QString("EIT_SCH %1/%2/%3/%4 incomplete "
+                        "v %5 "
+                        "s %6 "
+                        "slsn %7 "
+                        "lsn %8")
                 .arg(original_network_id)
                 .arg(transport_stream_id)
                 .arg(service_id)
-                .arg(table_id));
+                .arg(table_id)
+                .arg(version_number)
+                .arg(section_number)
+                .arg(segment_last_section_number)
+                .arg(last_section_number));
     }
 
     return true;
