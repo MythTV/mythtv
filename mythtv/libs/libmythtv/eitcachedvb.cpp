@@ -88,6 +88,38 @@
 //    29          232           15:0 - 17:59   3
 //    30          240           18:0 - 20:59   3
 //    31          248           21:0 - 23:59   3
+//
+// Table version numbers
+// =====================
+//
+// A strict interpretation of the ETSI standard means that
+// the version number of a table for a particular service
+// shall be the same whether it is carried in an "actual"
+// transport stream or it is carried in an "other" transport
+// stream.
+//
+// However the United Kingdom Digital Television Group
+// have applied what they refer to as a severe "relaxation"
+// of the standard on the UK digital terrestrial television
+// network (original network id 9018). On the UK network there
+// is no requirement that the version number of actual and
+// other versions of the same table shall carry the same version
+// numbers.
+//
+// This means it is impossible to synchronise the data between
+// these tables. The implication is that I have to maintain a complete
+// table structure of the "actual" data and for each occurrence of
+// the same table seen on a different "other" transport streams,
+// An algorithm is needed when an up to date "actual" version of a
+// table is not available to determine which of the set of
+// "other" tables can be used as "second best".
+//
+// DTG have stated in the past that it should be possible to
+// synchronise version numbers between the same "other" tables
+// carried on different multiplexes within the same network.
+//
+// I have asked them to clarfy the current situation but so far
+// have received no response. (7 November 2016)
 
 #define LOC QString("EitCacheDVB: ")
 
