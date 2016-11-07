@@ -427,6 +427,7 @@ VideoOutput::VideoOutput() :
 
     // OSD
     osd_painter(NULL),                  osd_image(NULL),
+    invalid_osd_painter(0),
 
     // Visualisation
     m_visual(NULL),
@@ -459,6 +460,9 @@ VideoOutput::~VideoOutput()
         osd_image->DecrRef();
     if (osd_painter)
         delete osd_painter;
+    if (invalid_osd_painter)
+        delete invalid_osd_painter;
+    invalid_osd_painter = 0;
 
     ShutdownPipResize();
 

@@ -220,6 +220,8 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       savedAudioTimecodeOffset(0),
       // LiveTVChain stuff
       m_tv(NULL),                   isDummy(false),
+      // Counter for buffering messages
+      bufferingCounter(0),
       // Debugging variables
       output_jmeter(new Jitterometer(LOC)),
       disable_passthrough(false)
@@ -941,14 +943,15 @@ int MythPlayer::OpenFile(uint retries)
     int testreadsize = 2048;
 
     MythTimer bigTimer; bigTimer.start();
-    int timeout = max((retries + 1) * 500, 15000U);
+    int timeout = max((retries + 1) * 500, 30000U);
     while (testreadsize <= kDecoderProbeBufferSize)
     {
         MythTimer peekTimer; peekTimer.start();
         while (player_ctx->buffer->Peek(testbuf, testreadsize) != testreadsize)
         {
             // NB need to allow for streams encountering network congestion
-            if (peekTimer.elapsed() > 30000 || bigTimer.elapsed() > timeout)
+            if (peekTimer.elapsed() > 30000 || bigTimer.elapsed() > timeout
+                || player_ctx->buffer->GetStopReads())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("OpenFile(): Could not read first %1 bytes of '%2'")
@@ -2215,16 +2218,33 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         int last_msg = buffering_last_msg.msecsTo(QTime::currentTime());
         if (last_msg > 100)
         {
-            LOG(VB_GENERAL, LOG_NOTICE, LOC +
-                QString("Waited %1ms for video buffers %2")
-                    .arg(waited_for).arg(videoOutput->GetFrameStatus()));
+            if (++bufferingCounter == 10)
+                LOG(VB_GENERAL, LOG_NOTICE, LOC +
+                    "To see more buffering messages use -v playback");
+            if (bufferingCounter >= 10)
+                LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
+                    QString("Waited %1ms for video buffers %2")
+                    .arg(waited_for).arg(videoOutput->GetFrameStatus())); 
+            else
+                LOG(VB_GENERAL, LOG_NOTICE, LOC +
+                    QString("Waited %1ms for video buffers %2")
+                        .arg(waited_for).arg(videoOutput->GetFrameStatus()));
             buffering_last_msg = QTime::currentTime();
-            if (audio.IsBufferAlmostFull())
+            // music choice only sends a frame every 6 seconds
+            // so wait 7 seconds before doing this reset
+            if (waited_for > 7000 && audio.IsBufferAlmostFull())
             {
                 // We are likely to enter this condition
                 // if the audio buffer was too full during GetFrame in AVFD
-                LOG(VB_AUDIO, LOG_INFO, LOC + "Resetting audio buffer");
+                LOG(VB_GENERAL, LOG_NOTICE, LOC + "Resetting audio buffer");
                 audio.Reset();
+            }
+            // Finish audio pause for sync after 1 second
+            // in case of infrequent video frames (e.g. music choice)
+            if (avsync_audiopaused && waited_for > 1000)
+            {
+                avsync_audiopaused = false;
+                audio.Pause(false);
             }
         }
         if ((waited_for > 500) && !videoOutput->EnoughFreeFrames())
@@ -2904,6 +2924,7 @@ bool MythPlayer::StartPlaying(void)
     next_play_speed = audio.GetStretchFactor();
     jumpchapter = 0;
     commBreakMap.SkipCommercials(0);
+    bufferingCounter=0;
 
     if (!InitVideo())
     {

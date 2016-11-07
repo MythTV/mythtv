@@ -1464,7 +1464,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     if (len > afree)
     {
-        VBAUDIOTS("Buffer is full, AddData returning false");
+        VBERROR("Buffer is full, AddData returning false");
         return false; // would overflow
     }
 

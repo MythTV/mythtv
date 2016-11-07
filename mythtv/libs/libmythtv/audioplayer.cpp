@@ -514,7 +514,7 @@ bool AudioPlayer::IsBufferAlmostFull(void)
         othresh =  ((ototal>>1) + (ototal>>2));
         if (ofill > othresh)
             return true;
-        return GetAudioBufferedTime() > 2000;
+        return GetAudioBufferedTime() > 8000;
     }
     return false;
 }

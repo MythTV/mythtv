@@ -13,6 +13,7 @@ class MythRenderOpenGL;
 
 class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 {
+    friend class VideoOutputOpenGL;
   public:
     MythOpenGLPainter(MythRenderOpenGL *render =  NULL, QWidget *parent = NULL);
    ~MythOpenGLPainter();
