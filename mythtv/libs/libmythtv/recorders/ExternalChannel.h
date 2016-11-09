@@ -29,6 +29,7 @@ class ExternalChannel : public DTVChannel
     using DTVChannel::Tune;
     virtual bool Tune(const DTVMultiplex&) { return true; }
     virtual bool Tune(const QString &channum);
+    virtual bool Tune(const QString &freqid, int /*finetune*/);
 
     virtual bool EnterPowerSavingMode(void);
 
