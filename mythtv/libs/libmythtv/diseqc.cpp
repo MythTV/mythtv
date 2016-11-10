@@ -980,7 +980,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
             node = new DiSEqCDevSCR(tree, dev_id);
             if (node)
                 node->SetDescription("Unicable");
-                break;
+            break;
         case kTypeLNB:
             node = new DiSEqCDevLNB(tree, dev_id);
             if (node)
