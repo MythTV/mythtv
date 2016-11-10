@@ -601,7 +601,7 @@ void ExternalStreamHandler::run(void)
             m_notify = false;
         }
 
-        while (buffer.size() > 188*50 ||
+        while (read_len = 0, buffer.size() > 188*50 ||
                (read_len = m_IO->Read(buffer, PACKET_SIZE, 100)) > 0)
         {
             if (m_IO->Error())
@@ -616,6 +616,9 @@ void ExternalStreamHandler::run(void)
 
             if (!_running_desired)
                 break;
+
+            if (read_len > 0)
+                empty_cnt = 0;
 
             if (!_listener_lock.tryLock())
                 continue;
