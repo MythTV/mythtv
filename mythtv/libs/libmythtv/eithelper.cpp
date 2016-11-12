@@ -39,6 +39,7 @@ EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),
     gps_offset(-1 * GPS_LEAP_SECONDS),
     sourceid(0), channelid(0),
+    tsid(0),
     maxStarttime(QDateTime()), seenEITother(false)
 {
     init_fixup(fixup);
@@ -141,6 +142,14 @@ void EITHelper::SetChannelID(uint _channelid)
 {
     QMutexLocker locker(&eitList_lock);
     channelid = _channelid;
+    QString dummy1;
+    uint64_t dummy2;
+    uint dummy3;
+    ChannelUtil::GetTuningParams(ChannelUtil::GetMplexID(channelid),
+                                      dummy1,dummy2,
+                                      tsid,
+                                      dummy3,
+                                      dummy1);
 }
 
 void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
@@ -358,7 +367,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     EitCacheDVB& dvbEITCache = EitCacheDVB::GetInstance();
     bool section_version_changed;
     bool table_version_change_complete;
-    if (dvbEITCache.ProcessSection(eit, section_version_changed,
+    if (dvbEITCache.ProcessSection(eit, tsid, section_version_changed,
                                    table_version_change_complete))
         LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is processed"));

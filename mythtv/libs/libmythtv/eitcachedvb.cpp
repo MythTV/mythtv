@@ -123,6 +123,8 @@
 
 #define LOC QString("EitCacheDVB: ")
 
+static const uint UK_DTT_NETWORK = 0x233a;
+
 static QStringList RSTNames(QStringList() << "Undefined"
                                 << "not running"
                                 << "starts in a few seconds"
@@ -209,6 +211,7 @@ EitCacheDVB::Event::~Event()
 }
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
+                                 uint current_tsid,
                                  bool &section_version_changed,
                                  bool &table_version_change_complete)
 {
@@ -223,16 +226,11 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
     section_version_changed = false;
     table_version_change_complete = false;
     
-
     // See if this section is for a currently tuned transport stream
     bool actual = (table_id == TableID::PF_EIT) ||
         ((table_id >= TableID::SC_EITbeg) && 
         (table_id <= TableID::SC_EITend));
         
-    // DEBUG - Ditch "other" sections
-    if  (!actual)
-        return false;
-
     // See if this section is for the pf table or the schedule table
     unsigned long long key = original_network_id << 32 |
                     transport_stream_id  << 16 | service_id;
@@ -247,7 +245,7 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             pfTables.insert(key, new_table);
         }
 
-        section_handled = pfTables[key].ProcessSection(eit, actual, events,
+        section_handled = pfTables[key].ProcessSection(eit, current_tsid, actual, events,
                                         section_version_changed,
                                         table_version_change_complete, key);
     }
@@ -265,7 +263,7 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             scheduleTables.insert(key, new_table);
         }
         
-        section_handled = scheduleTables[key].ProcessSection(eit, actual, events,
+        section_handled = scheduleTables[key].ProcessSection(eit, current_tsid, actual, events,
                                         section_version_changed,
                                         table_version_change_complete, key);
     }
@@ -282,7 +280,9 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
 }
 
 bool EitCacheDVB::PfTable::ProcessSection(
-                const DVBEventInformationTable *eit, const bool actual,
+                const DVBEventInformationTable *eit,
+                uint current_tsid,
+                const bool actual,
                 Event::EventTable& events,
                 bool &section_version_changed,
                 bool &table_version_change_complete,
@@ -302,9 +302,9 @@ bool EitCacheDVB::PfTable::ProcessSection(
     
     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString("Processing present"
                         "/following section "
-                        "original_network_id %1 "
-                        "transport_stream_id %2 "
-                        "service_id %3 "
+                        "original_network_id 0x%1 "
+                        "transport_stream_id 0x%2 "
+                        "service_id 0x%3 "
                         "table_id %4 "
                         "section_number %5 "
                         "version_number %6 "
@@ -312,10 +312,11 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         "segment_last_section_number %8 "
                         "last_section_number %9 "
                         "event_count %10 "
-                        "actual %11")
-                        .arg(original_network_id)
-                        .arg(transport_stream_id)
-                        .arg(service_id)
+                        "actual %11 "
+                        "current_tsid %12")
+                        .arg(original_network_id,0,16)
+                        .arg(transport_stream_id,0,16)
+                        .arg(service_id,0,16)
                         .arg(table_id)
                         .arg(section_number)
                         .arg(version_number)
@@ -323,7 +324,8 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         .arg(segment_last_section_number)
                         .arg(last_section_number)
                         .arg(event_count)
-                        .arg(actual));
+                        .arg(actual)
+                        .arg(current_tsid,0,16));
 
         
     if ((section_number > 1) || (last_section_number > 1) ||
@@ -498,11 +500,11 @@ bool EitCacheDVB::PfTable::ProcessSection(
             && (running_status != pfEvent.event->running_status))
     {
         LOG(VB_EITRS, LOG_INFO, LOC + QString(
-                        "Running status for %1/%2/%3/%4 change in PD %5 data - "
+                        "Running status for 0x%1/0x%2/0x%3/%4 change in PD %5 data - "
                         "was %6 is %7")
-                .arg(original_network_id)
-                .arg(transport_stream_id)
-                .arg(service_id)
+                .arg(original_network_id,0,16)
+                .arg(transport_stream_id,0,16)
+                .arg(service_id,0,16)
                 .arg(event_id)
                 .arg(section_number == 0 ? "present" : "following")
                 .arg(RSTNames[uint(pfEvent.event->running_status)])
@@ -513,9 +515,9 @@ bool EitCacheDVB::PfTable::ProcessSection(
     
     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
             "EIT PF change - "
-            "original_network_id %1 "
-            "transport_stream_id %2 "
-            "service_id %3 "
+            "original_network_id 0x%1 "
+            "transport_stream_id 0x%2 "
+            "service_id 0x%3 "
             "section_number %4 "
             "version_number %5%6 "
             "event_count %7 "
@@ -525,9 +527,9 @@ bool EitCacheDVB::PfTable::ProcessSection(
             "running_status %13%14 "
             "is_scrambled %15 "
             "actual %16")
-            .arg(original_network_id)
-            .arg(transport_stream_id)
-            .arg(service_id)
+            .arg(original_network_id,0,16)
+            .arg(transport_stream_id,0,16)
+            .arg(service_id,0,16)
             .arg(section_number)
             .arg(version_number).arg(version_change ? "*" : "")
             .arg(event_count)
@@ -667,11 +669,13 @@ void EitCacheDVB::ScheduleTable::InvalidateEverything()
 }
 
 bool EitCacheDVB::ScheduleTable::ProcessSection(
-                const DVBEventInformationTable *eit, const bool actual,
-                 Event::EventTable& events,
-                 bool &section_version_changed,
-                 bool &table_version_change_complete,
-                 unsigned long long table_key)
+                    const DVBEventInformationTable *eit,
+                    uint current_tsid,
+                    const bool actual,
+                    Event::EventTable& events,
+                    bool &section_version_changed,
+                    bool &table_version_change_complete,
+                    unsigned long long table_key)
 {
     // Validate against ETSI EN 300 468 V1.15.1
     // and ETSI TS 101 211 V1.12.1
@@ -711,7 +715,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     uint& current_section_version = current_section.section_version;
 
     LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("Processing schedule section "
-                        "%1/%2/%3/%4 "
+                        "0x%1/0x%2/0x%3/%4 "
                         "section_number %5 "
                         "version_number %6 "
                         "last_table_id %7 "
@@ -724,10 +728,11 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         "section_count %14 "
                         "section_index %15 "
                         "event_count %16 "
-                        "actual %17")
-                        .arg(original_network_id)
-                        .arg(transport_stream_id)
-                        .arg(service_id)
+                        "actual %17 "
+                        "current_tsid %18")
+                        .arg(original_network_id,0,16)
+                        .arg(transport_stream_id,0,16)
+                        .arg(service_id,0,16)
                         .arg(table_id)
                         .arg(section_number)
                         .arg(version_number)
@@ -741,7 +746,8 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         .arg(incoming_section_count)
                         .arg(section_index)
                         .arg(event_count)
-                        .arg(actual));
+                        .arg(actual)
+                        .arg(current_tsid,0,16));
 
     if (table_id > last_table_id)
     {
@@ -797,6 +803,16 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         return false;
     }
     
+    // UK DTT other schedule tables need special handling
+    if (UK_DTT_NETWORK == original_network_id)
+    {
+        if (!actual)
+        {
+            LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("UK_DTT network ditching other"));
+            return false;
+        }
+    }
+
     
     // Check the version number against the current table if any
     if (subtables[subtable_index]
@@ -1132,8 +1148,8 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 || (current_subtable.subtable_version != version_number))
         {
             LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                + QString("%1/%2 Early bailout l1 %3/%4")
-                .arg(service_id).arg(table_id)
+                + QString("0x%1/%2 Early bailout l1 %3/%4")
+                .arg(service_id,0,16).arg(table_id)
                 .arg(uint(current_subtable.subtable_status))
                 .arg(current_subtable.subtable_version));
             table_version_change_complete = false;
@@ -1150,8 +1166,8 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 {
                     table_version_change_complete = false;
                     LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                        + QString("%1/%2 Early bailout l2 %3/%4/%5/%6")
-                        .arg(service_id).arg(table_id)
+                        + QString("0x%1/%2 Early bailout l2 %3/%4/%5/%6")
+                        .arg(service_id,0,16).arg(table_id)
                         .arg(i).arg(j)
                         .arg(uint(segment.segment_status))
                         .arg(segment.segment_version));
@@ -1165,8 +1181,8 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                              || (section.section_version != version_number))
                     {
                         LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                            + QString("%1/%2 Bailout l3 %3/%4/%5/%6")
-                            .arg(service_id).arg(table_id)
+                            + QString("0x%1/%2 Bailout l3 %3/%4/%5/%6")
+                            .arg(service_id,0,16).arg(table_id)
                             .arg(i).arg(j)
                             .arg(uint(section.section_status))
                             .arg(section.section_version));
@@ -1177,16 +1193,16 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         }
         if (table_version_change_complete)
             LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                + QString("EIT_SCH %1/%2/%3/%4 complete "
+                + QString("EIT_SCH 0x%1/0x%2/0x%3/%4 complete "
                         "v %5 "
                         "s %6 "
                         "slsn %7 "
                         "lsn %8 "
                         "sgi %9 "
                         "sci %10")
-                .arg(original_network_id)
-                .arg(transport_stream_id)
-                .arg(service_id)
+                .arg(original_network_id,0,16)
+                .arg(transport_stream_id,0,16)
+                .arg(service_id,0,16)
                 .arg(table_id)
                 .arg(version_number)
                 .arg(section_number)
@@ -1196,7 +1212,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 .arg(section_index));
         else
             LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                + QString("EIT_SCH %1/%2/%3/%4 incomplete "
+                + QString("EIT_SCH 0x%1/0x%2/0x%3/%4 incomplete "
                         "v %5 "
                         "s %6 "
                         "slsn %7 "
@@ -1205,9 +1221,9 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         "sci %10 "
                         "i %11 "
                         "j %12")
-                .arg(original_network_id)
-                .arg(transport_stream_id)
-                .arg(service_id)
+                .arg(original_network_id,0,16)
+                .arg(transport_stream_id,0,16)
+                .arg(service_id,0,16)
                 .arg(table_id)
                 .arg(version_number)
                 .arg(section_number)

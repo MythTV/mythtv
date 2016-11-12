@@ -34,6 +34,7 @@ public: // Methods
     }
     
     bool ProcessSection(const DVBEventInformationTable *eit,
+                        uint current_tsid,
                         bool &section_version_changed,
                         bool &table_version_change_complete);
     
@@ -246,6 +247,7 @@ private: // Declarations
         }
         
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
+                            uint current_tsid,
                             const bool actual, Event::EventTable& events,
                             bool &section_version_changed,
                             bool &table_version_change_complete,
@@ -273,6 +275,7 @@ private: // Declarations
         }*/
         
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
+                            uint current_tsid,
                             const bool actual, Event::EventTable& events,
                             bool &section_version_changed,
                             bool &table_version_change_complete,
@@ -335,6 +338,7 @@ private: // Declarations
         }*/
 
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
+                            uint current_tsid,
                             const bool actual, Event::EventTable& events,
                             bool &section_version_changed,
                             bool &table_version_change_complete,
