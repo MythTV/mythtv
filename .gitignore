@@ -37,3 +37,4 @@ release
 bin
 *.ipch
 .directory
+.vscode
