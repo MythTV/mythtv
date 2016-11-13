@@ -123,7 +123,11 @@
 
 #define LOC QString("EitCacheDVB: ")
 
-static const uint UK_DTT_NETWORK = 0x233a;
+// Networks that do not maintain consistent version numbers
+// across actual and other tables
+enum {UK_DTT_NETWORK,
+      NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS};
+static const uint ncv_networks[] = {[UK_DTT_NETWORK] = 0x233a};
 
 static QStringList RSTNames(QStringList() << "Undefined"
                                 << "not running"
@@ -190,25 +194,20 @@ EitCacheDVB::Event::Event(uint event_id,
                 .arg(events[key]->ref._q_value));
         }
 */
-        // If you uncomment the debug stuff above rememeber to
+        // If you uncomment the debug stuff above remember to
         // comment this out
         events.insert(key,
                         QExplicitlySharedDataPointer<Event>(this));
     }
     
-    //LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-    //    "Constructing event %1").arg(quintptr(this),
-    //                QT_POINTER_SIZE * 2, 16, QChar('0')));
 }
 
-EitCacheDVB::Event::~Event()
-{
-    /*
-    LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-    "Destroying event %1").arg(quintptr(this), 
-                    QT_POINTER_SIZE * 2, 16, QChar('0')));
-    */
-}
+//EitCacheDVB::Event::~Event()
+//{
+//    LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
+//    "Destroying event %1").arg(quintptr(this),
+//                    QT_POINTER_SIZE * 2, 16, QChar('0')));
+//}
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
                                  uint current_tsid,
@@ -557,16 +556,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
 
     table_status = TableStatusEnum::VALID;
 
-    if (bool(pfEvent.event))
-        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-            "Old event %1 before reallocation - count %2")
-            .arg(quintptr(pfEvent.event.data()),	
-                QT_POINTER_SIZE * 2, 16, QChar('0'))
-            .arg(pfEvent.event->ref._q_value));
-    else
-        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-            "Event wrapper is current empty"));
-            
     pfEvent.event_status = event_count > 0 ?
                             TableStatusEnum::VALID :
                             TableStatusEnum::EMPTY;
@@ -577,12 +566,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         is_scrambled,
                         events, table_key);
                         
-    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-        "New event %1 after reallocation - count %2")
-        .arg(quintptr(pfEvent.event.data()),
-            QT_POINTER_SIZE * 2, 16, QChar('0'))
-        .arg(pfEvent.event->ref._q_value));
-        
     return true;
 }
 
@@ -677,6 +660,24 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                     bool &table_version_change_complete,
                     unsigned long long table_key)
 {
+    // Some network schedule tables need special handling
+    // For the time being I am ignoring them.
+    // In the future we could use the current_tsid value
+    // passed into this function to maintain separate version
+    // information for individual original networks
+    if (!actual)
+    {
+        for (int i = 0; i < NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS; i++)
+        {
+            if (ncv_networks[i] == original_network_id)
+            {
+                //LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
+                //        "Original network %1 ditching other").arg(original_network_id));
+                return false;
+            }
+        }
+    }
+
     // Validate against ETSI EN 300 468 V1.15.1
     // and ETSI TS 101 211 V1.12.1
     
@@ -802,17 +803,6 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                             .arg(actual));
         return false;
     }
-    
-    // UK DTT other schedule tables need special handling
-    if (UK_DTT_NETWORK == original_network_id)
-    {
-        if (!actual)
-        {
-            LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("UK_DTT network ditching other"));
-            return false;
-        }
-    }
-
     
     // Check the version number against the current table if any
     if (subtables[subtable_index]
@@ -1237,4 +1227,3 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
 
     return true;
 }
-

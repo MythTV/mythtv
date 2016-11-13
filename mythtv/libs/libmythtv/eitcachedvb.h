@@ -109,7 +109,7 @@ private: // Declarations
                 EventTable& events,
                 unsigned long long table_key);
 
-        ~Event();
+        //~Event(); // Debugging
         
         bool operator == (const Event &e2) const
         {
@@ -162,21 +162,6 @@ private: // Declarations
             segment_status(EitCacheDVB::TableStatusEnum::UNINITIALISED),
             segment_version(TableBase::VERSION_UNINITIALISED) {}
                     
-/*        Segment(const Segment &other)
-        {
-            *this = other;
-        }
-
-        Segment& operator = (const Segment &other)
-        {
-            segment_status = other.segment_status;
-            segment_version = other.segment_version;
-            section_count = other.section_count;
-            for (uint i = 0; i < 8; i++)
-                sections[i] = other.sections[i];
-            return *this;
-        }*/
-
         uint section_count;
         TableStatusEnum segment_status;
         uint segment_version;
@@ -191,20 +176,6 @@ private: // Declarations
                     segment_count(0)
                     {}
                     
-/*        SubTable(const SubTable &other)
-        {
-            *this = other;
-        }
-
-        SubTable& operator = (const SubTable &other)
-        {
-            subtable_status = other.subtable_status;
-            subtable_version = other.subtable_version;
-            for (uint i = 0; i < 32; i++)
-                segments[i] = other.segments[i];
-            return *this;
-        }*/
-        
         TableStatusEnum subtable_status;
         Segment segments[32];
         uint subtable_version; // TODO check whether the same version is always
@@ -218,19 +189,6 @@ private: // Declarations
                         transport_stream_id(0),
                         service_id(0) {}
                 
-/*        TableBase(const TableBase &other)
-        {
-            *this = other;
-        }
-
-        TableBase& operator = (const TableBase &other)
-        {
-            original_network_id = other.original_network_id;
-            transport_stream_id = other.transport_stream_id;
-            service_id = other.service_id;
-            return *this;
-        }*/
-        
         void SetOriginalNetworkId(uint id)
         {
             original_network_id = id;
@@ -261,19 +219,6 @@ private: // Declarations
     
     struct ScheduleTable : public TableBase
     {
-/*        ScheduleTable() : subtable_count(0) {}
-                                            
-        ScheduleTable(const ScheduleTable &other)
-        {
-            *this = other;
-        }
-
-        ScheduleTable& operator = (const ScheduleTable &other)
-        {
-            TableBase::operator = (other);
-            return *this;
-        }*/
-        
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             uint current_tsid,
                             const bool actual, Event::EventTable& events,
@@ -302,16 +247,6 @@ private: // Declarations
                 section_version(TableBase::VERSION_UNINITIALISED) {}
                 
             
-/*            EventWrapper(const EventWrapper &other)
-            {
-                *this = other;
-            }
-
-            EventWrapper& operator = (const EventWrapper &other)
-            {
-                return *this;
-            }*/
-
             TableStatusEnum event_status;
             uint section_version;
             QExplicitlySharedDataPointer<Event> event;
@@ -324,19 +259,6 @@ private: // Declarations
             table_status(EitCacheDVB::TableStatusEnum::UNINITIALISED)
             {}
             
-/*        PfTable(const PfTable &other) : TableBase(other),
-                                        present(other.present),
-                                        following(other.following)
-        {
-            *this = other;
-        }
-
-        PfTable& operator = (const PfTable &other)
-        {
-            TableBase::operator = (other);
-            return *this;
-        }*/
-
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
                             uint current_tsid,
                             const bool actual, Event::EventTable& events,

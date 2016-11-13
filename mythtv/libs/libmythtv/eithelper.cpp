@@ -372,12 +372,8 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
                                 " incoming EIT section is processed"));
     else
-    {
         // May need to modify this to handle dish stuff (DESC)
-        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
-                                " incoming EIT section is discarded"));
         return;
-    }
 
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||
