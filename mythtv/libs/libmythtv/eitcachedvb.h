@@ -178,8 +178,8 @@ private: // Declarations
                     
         TableStatusEnum subtable_status;
         Segment segments[32];
-        uint subtable_version; // TODO check whether the same version is always
-                                // common across all subtables
+        uint subtable_version;
+        QMap<uint, uint> nonconformant_versions;
         uint segment_count;
     };
     
@@ -300,7 +300,7 @@ private: // Data
     // indexed by original_network_id/transport_stream_id/service_id/eventId
     
     Event::EventTable events;
-    
+
     QMutex tableLock;
 };
 

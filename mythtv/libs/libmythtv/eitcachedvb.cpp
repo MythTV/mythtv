@@ -299,6 +299,27 @@ bool EitCacheDVB::PfTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint event_count = eit->EventCount();
     
+    // Some networks need special handling because they
+    // do not have consistent version numbers when
+    // tables are carried in "other" transport streams.
+    // This implies having version data stored for
+    // each different transport stream we see data on.
+    // I use the the current_tsid passed in for this.
+    // Until this work is complete I am ignoring "other" table
+    // sections for these networks.
+    if (!actual)
+    {
+        for (int i = 0; i < NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS; i++)
+        {
+            if (ncv_networks[i] == original_network_id)
+            {
+                //LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+                //        "Original network %1 ditching other").arg(original_network_id));
+                return false;
+            }
+        }
+    }
+
     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString("Processing present"
                         "/following section "
                         "original_network_id 0x%1 "
@@ -660,24 +681,6 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                     bool &table_version_change_complete,
                     unsigned long long table_key)
 {
-    // Some network schedule tables need special handling
-    // For the time being I am ignoring them.
-    // In the future we could use the current_tsid value
-    // passed into this function to maintain separate version
-    // information for individual original networks
-    if (!actual)
-    {
-        for (int i = 0; i < NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS; i++)
-        {
-            if (ncv_networks[i] == original_network_id)
-            {
-                //LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
-                //        "Original network %1 ditching other").arg(original_network_id));
-                return false;
-            }
-        }
-    }
-
     // Validate against ETSI EN 300 468 V1.15.1
     // and ETSI TS 101 211 V1.12.1
     
@@ -714,6 +717,28 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     Section& current_section = current_segment.sections[section_index];
     TableStatusEnum& current_section_status = current_section.section_status;
     uint& current_section_version = current_section.section_version;
+
+    // Some networks need special handling because they
+    // do not have consistent version numbers when
+    // tables are carried in "other" transport streams.
+    // This implies having version data stored for
+    // each different transport stream we see data on.
+    // I use the the current_tsid passed in for this.
+    // Until this work is complete I am ignoring "other" table
+    // sections for these networks.
+    if (!actual)
+    {
+        for (int i = 0; i < NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS; i++)
+        {
+            if (ncv_networks[i] == original_network_id)
+            {
+                //LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
+                //        "Original network %1 ditching other").arg(original_network_id));
+                current_subtable.nonconformant_versions.insert(transport_stream_id, version_number);
+                return false;
+            }
+        }
+    }
 
     LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("Processing schedule section "
                         "0x%1/0x%2/0x%3/%4 "
