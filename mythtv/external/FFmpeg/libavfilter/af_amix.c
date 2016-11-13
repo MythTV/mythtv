@@ -235,7 +235,7 @@ static int config_output(AVFilterLink *outlink)
     if (!s->fifos)
         return AVERROR(ENOMEM);
 
-    s->nb_channels = av_get_channel_layout_nb_channels(outlink->channel_layout);
+    s->nb_channels = outlink->channels;
     for (i = 0; i < s->nb_inputs; i++) {
         s->fifos[i] = av_audio_fifo_alloc(outlink->format, s->nb_channels, 1024);
         if (!s->fifos[i])
@@ -311,6 +311,9 @@ static int output_frame(AVFilterLink *outlink)
     frame_list_remove_samples(s->frame_list, nb_samples);
 
     calculate_scales(s, nb_samples);
+
+    if (nb_samples == 0)
+        return 0;
 
     out_buf = ff_get_audio_buffer(outlink, nb_samples);
     if (!out_buf)
@@ -518,7 +521,7 @@ static int query_formats(AVFilterContext *ctx)
     AVFilterChannelLayouts *layouts;
     int ret;
 
-    layouts = ff_all_channel_layouts();
+    layouts = ff_all_channel_counts();
     if (!layouts) {
         ret = AVERROR(ENOMEM);
         goto fail;

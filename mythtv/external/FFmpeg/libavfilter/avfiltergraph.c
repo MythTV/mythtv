@@ -93,12 +93,17 @@ AVFilterGraph *avfilter_graph_alloc(void)
 
 void ff_filter_graph_remove_filter(AVFilterGraph *graph, AVFilterContext *filter)
 {
-    int i;
+    int i, j;
     for (i = 0; i < graph->nb_filters; i++) {
         if (graph->filters[i] == filter) {
             FFSWAP(AVFilterContext*, graph->filters[i],
                    graph->filters[graph->nb_filters - 1]);
             graph->nb_filters--;
+            filter->graph = NULL;
+            for (j = 0; j<filter->nb_outputs; j++)
+                if (filter->outputs[j])
+                    filter->outputs[j]->graph = NULL;
+
             return;
         }
     }
@@ -501,6 +506,14 @@ static int query_formats(AVFilterGraph *graph, AVClass *log_ctx)
                 AVFilterLink *inlink, *outlink;
                 char scale_args[256];
                 char inst_name[30];
+
+                if (graph->disable_auto_convert) {
+                    av_log(log_ctx, AV_LOG_ERROR,
+                           "The filters '%s' and '%s' do not have a common format "
+                           "and automatic conversion is disabled.\n",
+                           link->src->name, link->dst->name);
+                    return AVERROR(EINVAL);
+                }
 
                 /* couldn't merge format lists. auto-insert conversion filter */
                 switch (link->type) {

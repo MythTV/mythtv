@@ -32,20 +32,18 @@
 #include <stdlib.h>
 
 #include "libavutil/channel_layout.h"
-#include "avcodec.h"
-#include "internal.h"
-#include "mathops.h"
 
 #define BITSTREAM_READER_LE
-#include "get_bits.h"
+#include "avcodec.h"
 #include "bytestream.h"
+#include "get_bits.h"
+#include "internal.h"
+#include "mathops.h"
 
 #define SMKTREE_BITS 9
 #define SMK_NODE 0x80000000
 
-/*
- * Decoder context
- */
+
 typedef struct SmackVContext {
     AVCodecContext *avctx;
     AVFrame *pic;
@@ -549,12 +547,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 }
 
 
-
-/*
- *
- * Uninit smacker decoder
- *
- */
 static av_cold int decode_end(AVCodecContext *avctx)
 {
     SmackVContext * const smk = avctx->priv_data;
@@ -570,11 +562,6 @@ static av_cold int decode_end(AVCodecContext *avctx)
 }
 
 
-/*
- *
- * Init smacker decoder
- *
- */
 static av_cold int decode_init(AVCodecContext *avctx)
 {
     SmackVContext * const c = avctx->priv_data;

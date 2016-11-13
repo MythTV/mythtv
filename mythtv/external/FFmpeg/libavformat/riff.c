@@ -56,6 +56,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_H263I,        MKTAG('I', '2', '6', '3') }, /* Intel H.263 */
     { AV_CODEC_ID_H261,         MKTAG('H', '2', '6', '1') },
     { AV_CODEC_ID_H263,         MKTAG('U', '2', '6', '3') },
+    { AV_CODEC_ID_H263,         MKTAG('V', 'S', 'M', '4') }, /* needs -vf il=l=i:c=i */
     { AV_CODEC_ID_MPEG4,        MKTAG('F', 'M', 'P', '4') },
     { AV_CODEC_ID_MPEG4,        MKTAG('D', 'I', 'V', 'X') },
     { AV_CODEC_ID_MPEG4,        MKTAG('D', 'X', '5', '0') },
@@ -113,6 +114,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_MPEG4,        MKTAG('G', 'L', 'V', '4') },
     { AV_CODEC_ID_MPEG4,        MKTAG('G', 'M', 'P', '4') }, /* GeoVision camera */
     { AV_CODEC_ID_MPEG4,        MKTAG('M', 'N', 'M', '4') }, /* March Networks DVR */
+    { AV_CODEC_ID_MPEG4,        MKTAG('G', 'T', 'M', '4') }, /* Telefactor */
     { AV_CODEC_ID_MSMPEG4V3,    MKTAG('M', 'P', '4', '3') },
     { AV_CODEC_ID_MSMPEG4V3,    MKTAG('D', 'I', 'V', '3') },
     { AV_CODEC_ID_MSMPEG4V3,    MKTAG('M', 'P', 'G', '3') },
@@ -168,6 +170,9 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_MPEG2VIDEO,   MKTAG('E', 'M', '2', 'V') },
     /* Matrox MPEG-2 intra-only */
     { AV_CODEC_ID_MPEG2VIDEO,   MKTAG('M', '7', '0', '1') },
+    { AV_CODEC_ID_MPEG2VIDEO,   MKTAG('M', '7', '0', '2') },
+    { AV_CODEC_ID_MPEG2VIDEO,   MKTAG('M', '7', '0', '3') },
+    { AV_CODEC_ID_MPEG2VIDEO,   MKTAG('M', '7', '0', '4') },
     { AV_CODEC_ID_MPEG2VIDEO,   MKTAG('M', '7', '0', '5') },
     { AV_CODEC_ID_MPEG2VIDEO,   MKTAG('m', 'p', 'g', 'v') },
     { AV_CODEC_ID_MPEG1VIDEO,   MKTAG('B', 'W', '1', '0') },
@@ -177,6 +182,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_MJPEG,        MKTAG('L', 'J', 'P', 'G') },
     { AV_CODEC_ID_MJPEG,        MKTAG('d', 'm', 'b', '1') },
     { AV_CODEC_ID_MJPEG,        MKTAG('m', 'j', 'p', 'a') },
+    { AV_CODEC_ID_MJPEG,        MKTAG('J', 'R', '2', '4') }, /* Quadrox Mjpeg */
     { AV_CODEC_ID_LJPEG,        MKTAG('L', 'J', 'P', 'G') },
     /* Pegasus lossless JPEG */
     { AV_CODEC_ID_MJPEG,        MKTAG('J', 'P', 'G', 'L') },
@@ -351,6 +357,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_FRAPS,        MKTAG('F', 'P', 'S', '1') },
     { AV_CODEC_ID_THEORA,       MKTAG('t', 'h', 'e', 'o') },
     { AV_CODEC_ID_TRUEMOTION2,  MKTAG('T', 'M', '2', '0') },
+    { AV_CODEC_ID_TRUEMOTION2RT,MKTAG('T', 'R', '2', '0') },
     { AV_CODEC_ID_CSCD,         MKTAG('C', 'S', 'C', 'D') },
     { AV_CODEC_ID_ZMBV,         MKTAG('Z', 'M', 'B', 'V') },
     { AV_CODEC_ID_KMVC,         MKTAG('K', 'M', 'V', 'C') },
@@ -382,10 +389,14 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'R', 'G') },
     { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '0') },
     { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '2') },
+    { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'Y', '4') },
     /* Ut Video version 13.0.1 BT.709 codecs */
     { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'H', '0') },
     { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'H', '2') },
+    { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'L', 'H', '4') },
     { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'Q', 'Y', '2') },
+    { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'Q', 'R', 'A') },
+    { AV_CODEC_ID_UTVIDEO,      MKTAG('U', 'Q', 'R', 'G') },
     { AV_CODEC_ID_VBLE,         MKTAG('V', 'B', 'L', 'E') },
     { AV_CODEC_ID_ESCAPE130,    MKTAG('E', '1', '3', '0') },
     { AV_CODEC_ID_DXTORY,       MKTAG('x', 't', 'o', 'r') },
@@ -414,6 +425,11 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_RSCC,         MKTAG('R', 'S', 'C', 'C') },
     { AV_CODEC_ID_RSCC,         MKTAG('I', 'S', 'C', 'C') },
     { AV_CODEC_ID_CFHD,         MKTAG('C', 'F', 'H', 'D') },
+    { AV_CODEC_ID_M101,         MKTAG('M', '1', '0', '1') },
+    { AV_CODEC_ID_M101,         MKTAG('M', '1', '0', '2') },
+    { AV_CODEC_ID_MAGICYUV,     MKTAG('M', 'A', 'G', 'Y') },
+    { AV_CODEC_ID_YLC,          MKTAG('Y', 'L', 'C', '0') },
+
     { AV_CODEC_ID_NONE,         0 }
 };
 
@@ -423,6 +439,7 @@ const AVCodecTag ff_codec_wav_tags[] = {
     { AV_CODEC_ID_PCM_U8,          0x0001 },
     { AV_CODEC_ID_PCM_S24LE,       0x0001 },
     { AV_CODEC_ID_PCM_S32LE,       0x0001 },
+    { AV_CODEC_ID_PCM_S64LE,       0x0001 },
     { AV_CODEC_ID_ADPCM_MS,        0x0002 },
     { AV_CODEC_ID_PCM_F32LE,       0x0003 },
     /* must come after f32le in this list */
@@ -442,6 +459,8 @@ const AVCodecTag ff_codec_wav_tags[] = {
     { AV_CODEC_ID_AMR_NB,          0x0038 },  /* rogue format number */
     { AV_CODEC_ID_G723_1,          0x0042 },
     { AV_CODEC_ID_ADPCM_G726,      0x0045 },
+    { AV_CODEC_ID_ADPCM_G726,      0x0014 },  /* g723 Antex */
+    { AV_CODEC_ID_ADPCM_G726,      0x0040 },  /* g721 Antex */
     { AV_CODEC_ID_MP2,             0x0050 },
     { AV_CODEC_ID_MP3,             0x0055 },
     { AV_CODEC_ID_AMR_NB,          0x0057 },

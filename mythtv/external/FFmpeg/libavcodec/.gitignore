@@ -1,1 +1,5 @@
 codec_names.h
+/*_tablegen
+/*_tables.c
+/*_tables.h
+/bsf_list.c

@@ -128,6 +128,8 @@ typedef struct MOVStreamContext {
     MOVStts *ctts_data;
     unsigned int stsc_count;
     MOVStsc *stsc_data;
+    int stsc_index;
+    int stsc_sample;
     unsigned int stps_count;
     unsigned *stps_data;  ///< partial sync sample for mpeg-2 open gop
     MOVElst *elst_data;
@@ -153,7 +155,6 @@ typedef struct MOVStreamContext {
     MOVDref *drefs;
     int dref_id;
     int timecode_track;
-    int wrong_dts;        ///< dts are wrong due to huge ctts offset (iMovie files)
     int width;            ///< tkhd width
     int height;           ///< tkhd height
     int dts_shift;        ///< dts shift when ctts is negative
@@ -169,6 +170,12 @@ typedef struct MOVStreamContext {
     int nb_frames_for_fps;
     int64_t duration_for_fps;
 
+    /** extradata array (and size) for multiple stsd */
+    uint8_t **extradata;
+    int *extradata_size;
+    int last_stsd_index;
+    int stsd_count;
+
     int32_t *display_matrix;
     uint32_t format;
 
@@ -177,6 +184,9 @@ typedef struct MOVStreamContext {
         uint8_t* auxiliary_info;
         uint8_t* auxiliary_info_end;
         uint8_t* auxiliary_info_pos;
+        uint8_t auxiliary_info_default_size;
+        uint8_t* auxiliary_info_sizes;
+        size_t auxiliary_info_sizes_count;
         struct AVAESCTR* aes_ctr;
     } cenc;
 } MOVStreamContext;
@@ -200,7 +210,8 @@ typedef struct MOVContext {
     unsigned trex_count;
     int itunes_metadata;  ///< metadata are itunes style
     int handbrake_version;
-    int chapter_track;
+    int *chapter_tracks;
+    unsigned int nb_chapter_tracks;
     int use_absolute_path;
     int ignore_editlist;
     int ignore_chapters;

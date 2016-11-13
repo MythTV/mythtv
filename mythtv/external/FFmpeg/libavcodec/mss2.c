@@ -28,9 +28,9 @@
 #include "internal.h"
 #include "mpeg_er.h"
 #include "msmpeg4.h"
-#include "msmpeg4data.h"
 #include "qpeldsp.h"
 #include "vc1.h"
+#include "wmv2data.h"
 #include "mss12.h"
 #include "mss2dsp.h"
 
@@ -481,9 +481,6 @@ static int mss2_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
     Rectangle wmv9rects[MAX_WMV9_RECTANGLES], *r;
     int used_rects = 0, i, implicit_rect = 0, av_uninit(wmv9_mask);
-
-    av_assert0(AV_INPUT_BUFFER_PADDING_SIZE >=
-               ARITH2_PADDING + (MIN_CACHE_BITS + 7) / 8);
 
     if ((ret = init_get_bits8(&gb, buf, buf_size)) < 0)
         return ret;
