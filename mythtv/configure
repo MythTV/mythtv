@@ -162,7 +162,6 @@ Advanced options (experts only):
 
 External codec library options (used for mythffmpeg and streaming transcode):
   --enable-libmp3lame      enable MP3 encoding via libmp3lame [no]
-  --enable-libfaac         enable AAC encoding via libfaac [no]
   --enable-libx264         enable H.264 encoding via x264 [no]
   --enable-libvpx          enable VP8 encoding via libvpx [no]
   --enable-libxvid         enable Xvid encoding via xvidcore,
@@ -8378,7 +8377,6 @@ echo ""
 
 echo "# External Codec Options"
 echo "mp3lame                   ${libmp3lame-no}"
-echo "faac                      ${libfaac-no}"
 echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
 echo "x265 (HEVC)               ${libx265-no}"

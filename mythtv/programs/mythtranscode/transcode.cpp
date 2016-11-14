@@ -489,22 +489,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 audioOnlyBitrate = hls->GetAudioOnlyBitrate();
 
                 avfw2 = new AVFormatWriter();
-
                 avfw2->SetContainer("mpegts");
-
-                if (!gCoreContext->GetSetting("HLSAUDIO").isEmpty())
-                    avfw2->SetAudioCodec(gCoreContext->GetSetting("HLSAUDIO"));
-                else
-#if CONFIG_LIBFAAC_ENCODER
-                avfw2->SetAudioCodec("libfaac");
-#else
-# if CONFIG_LIBMP3LAME_ENCODER
-                avfw2->SetAudioCodec("libmp3lame");
-# else
                 avfw2->SetAudioCodec("aac");
-# endif
-#endif
-
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
                 avfw2->SetAudioFrameRate(arb->m_eff_audiorate);
@@ -513,20 +499,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
-
-            if (!gCoreContext->GetSetting("HLSAUDIO").isEmpty())
-                avfw->SetAudioCodec(gCoreContext->GetSetting("HLSAUDIO"));
-            else
-#if CONFIG_LIBFAAC_ENCODER
-                avfw->SetAudioCodec("libfaac");
-#else
-# if CONFIG_LIBMP3LAME_ENCODER
-                avfw->SetAudioCodec("libmp3lame");
-# else
-                avfw->SetAudioCodec("aac");
-# endif
-#endif
-
+            avfw->SetAudioCodec("aac");
             hls->UpdateStatus(kHLSStatusStarting);
             hls->UpdateStatusMessage("Transcoding Starting");
             hls->UpdateSizeInfo(newWidth, newHeight, video_width, video_height);
