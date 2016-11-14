@@ -35,6 +35,7 @@
 #include <QKeyEvent>
 #include <QDomDocument>
 #include <QNetworkCookieJar>
+#include <QNetworkConfiguration>
 
 #include <unistd.h> // for usleep()
 
@@ -108,6 +109,9 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
         return networkManager;
 
     networkManager = new MythNetworkAccessManager();
+    QNetworkConfiguration currConf = networkManager->configuration();
+    QNetworkConfiguration *newConf = new QNetworkConfiguration(currConf);
+    networkManager->setConfiguration(*newConf);
     LOG(VB_GENERAL, LOG_DEBUG, "Copying DLManager's Cookie Jar");
     GetMythDownloadManager()->loadCookieJar(GetConfDir() + "/MythBrowser/cookiejar.txt");
     networkManager->setCookieJar(GetMythDownloadManager()->copyCookieJar());
