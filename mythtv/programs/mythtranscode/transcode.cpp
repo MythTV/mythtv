@@ -23,7 +23,9 @@
 #include "deletemap.h"
 #include "tvremoteutil.h"
 
+#if CONFIG_LIBMP3LAME
 #include "NuppelVideoRecorder.h"
+#endif
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
@@ -69,8 +71,10 @@ Transcode::Transcode(ProgramInfo *pginfo) :
 
 Transcode::~Transcode()
 {
+#if CONFIG_LIBMP3LAME
     if (nvr)
         delete nvr;
+#endif
     SetPlayerContext(NULL);
     if (outRingBuffer)
         delete outRingBuffer;
@@ -164,6 +168,7 @@ void Transcode::SetPlayerContext(PlayerContext *player_ctx)
     ctx = player_ctx;
 }
 
+#if CONFIG_LIBMP3LAME
 static QString get_str_option(RecordingProfile *profile, const QString &name)
 {
     const Setting *setting = profile->byName(name);
@@ -200,6 +205,7 @@ static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
     NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
     nvr->WriteText(buf, len, timecode, pagenr);
 }
+#endif // CONFIG_LIBMP3LAME
 
 int Transcode::TranscodeFile(const QString &inputname,
                              const QString &outputname,
@@ -242,14 +248,13 @@ int Transcode::TranscodeFile(const QString &inputname,
 
     if (!avfMode)
     {
+#if CONFIG_LIBMP3LAME
         nvr = new NuppelVideoRecorder(NULL, NULL);
-
-        if (!nvr)
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Transcoding aborted, error creating NuppelVideoRecorder.");
-            return REENCODE_ERROR;
-        }
+#else
+        LOG(VB_GENERAL, LOG_ERR,
+            "Not compiled with libmp3lame support");
+        return REENCODE_ERROR;
+#endif
     }
 
     // Input setup
@@ -620,6 +625,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         GetPlayer()->SetVideoFilters(
             gCoreContext->GetSetting("HTTPLiveStreamFilters", "yadif=1:-1:1"));
     }
+#if CONFIG_LIBMP3LAME 
     else if (fifodir.isEmpty())
     {
         if (!GetProfile(profileName, encodingType, video_height,
@@ -839,6 +845,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         copyvideo = true;
         LOG(VB_GENERAL, LOG_INFO, "Reencoding video in 'raw' mode");
     }
+#endif // CONFIG_LIBMP3LAME
 
     if (honorCutList && deleteMap.size() > 0)
     {
@@ -994,18 +1001,19 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_INFO, "Created fifos. Waiting for connection.");
     }
 
+#if CONFIG_LIBMP3LAME
     bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
+    bool writekeyframe = true;
+    long lastKeyFrame = 0;
+    int num_keyframes = 0;
+#endif
 
     frm_dir_map_t::iterator dm_iter;
-    bool writekeyframe = true;
-
-    int num_keyframes = 0;
 
     int did_ff = 0;
 
     long curFrameNum = 0;
     frame.frameNumber = 1;
-    long lastKeyFrame = 0;
     long totalAudio = 0;
     int dropvideo = 0;
     // timecode of the last read video frame in input time
@@ -1183,6 +1191,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
         else if (copyaudio)
         {
+#if CONFIG_LIBMP3LAME
             // Encoding from NuppelVideo to NuppelVideo with MP3 audio
             // So let's not decode/reencode audio
             if (!GetPlayer()->GetRawAudioState())
@@ -1297,6 +1306,11 @@ int Transcode::TranscodeFile(const QString &inputname,
                 nvr->WriteVideo(&frame, true, writekeyframe);
             }
             GetPlayer()->GetCC608Reader()->FlushTxtBuffers();
+#else
+        LOG(VB_GENERAL, LOG_ERR,
+            "Not compiled with libmp3lame support. Should never get here");
+        return REENCODE_ERROR;
+#endif // CONFIG_LIBMP3LAME
         }
         else
         {
@@ -1310,8 +1324,10 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (video_aspect != new_aspect)
             {
                 video_aspect = new_aspect;
+#if CONFIG_LIBMP3LAME
                 if (nvr)
                     nvr->SetNewVideoParams(video_aspect);
+#endif
             }
 
 
@@ -1380,6 +1396,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                         ++audioFrame;
                     }
                 }
+#if CONFIG_LIBMP3LAME
                 else
                 {
                     nvr->SetOption("audioframesize", ab->size());
@@ -1400,14 +1417,20 @@ int Transcode::TranscodeFile(const QString &inputname,
                         return REENCODE_ERROR;
                     }
                 }
-
+#endif
                 delete ab;
             }
 
             if (!avfMode)
             {
+#if CONFIG_LIBMP3LAME
                 GetPlayer()->GetCC608Reader()->
                     TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));
+#else
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Not compiled with libmp3lame support");
+                return REENCODE_ERROR;
+#endif
             }
             lasttimecode = frame.timecode;
             frame.timecode -= timecodeOffset;
@@ -1445,6 +1468,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 }
             }
+#if CONFIG_LIBMP3LAME
             else
             {
                 if (forceKeyFrames)
@@ -1453,6 +1477,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     nvr->WriteVideo(&frame);
                 lastWrittenTime = frame.timecode + timecodeOffset;
             }
+#endif
         }
         if (MythDate::current() > statustime)
         {
@@ -1557,12 +1582,14 @@ int Transcode::TranscodeFile(const QString &inputname,
             m_proginfo->ClearPositionMap(MARK_DURATION_MS);
         }
 
+#if CONFIG_LIBMP3LAME
         if (nvr)
         {
             nvr->WriteSeekTable();
             if (!kfa_table->empty())
                 nvr->WriteKeyFrameAdjustTable(*kfa_table);
         }
+#endif // CONFIG_LIBMP3LAME
     } else {
         fifow->FIFODrain();
     }

@@ -3,7 +3,6 @@
 #include <algorithm> // for min
 using namespace std;
 
-#include "NuppelVideoRecorder.h"
 #include "firewirerecorder.h"
 #include "recordingprofile.h"
 #include "firewirechannel.h"
@@ -33,6 +32,9 @@ using namespace std;
 #include "cardutil.h"
 #include "tv_rec.h"
 #include "mythdate.h"
+#if CONFIG_LIBMP3LAME
+#include "NuppelVideoRecorder.h"
+#endif
 
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetInputId()) : "NULL")
@@ -922,7 +924,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     }
     else if (CardUtil::IsV4L(genOpt.inputtype))
     {
-#ifdef USING_V4L2
+#if CONFIG_LIBMP3LAME && defined(USING_V4L2)
         // V4L/MJPEG/GO7007 from here on
         recorder = new NuppelVideoRecorder(tvrec, channel);
         recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);

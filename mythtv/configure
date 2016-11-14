@@ -7535,9 +7535,6 @@ if enabled systemd_journal ; then
 fi
 
 # Check that all MythTV build "requirements" are met:
-enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
-    die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
-
 enabled exiv2 && $(pkg-config --exists exiv2) ||
     die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
 
@@ -8736,6 +8733,10 @@ if enabled libxml2; then
     fi
     append CCONFIG "using_libxml2"
   fi
+fi
+
+if enabled libmp3lame; then
+  append CCONFIG "using_libmp3lame"
 fi
 
 if enabled taglib; then

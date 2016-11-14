@@ -21,7 +21,6 @@
 
 #include "mythlogging.h"
 #include "mythcorecontext.h"
-//#include "NuppelVideoRecorder.h"
 #include "avformatwriter.h"
 #include "audiooutpututil.h"
 
