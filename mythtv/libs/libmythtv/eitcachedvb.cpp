@@ -138,6 +138,8 @@ static QStringList UKMultiplexNames(QStringList()
                     << "Arqiva - Mux C/Com 5"
                     << "Arqiva - Mux D/Com 6"
                     << "NI JV - NI Mux"
+                    << "Comux - Local TV"
+                    << "Comux - Local TV"
                     << "Arqiva - Com 7"
                     << "Arqiva - Com 8"
                     << "Other regional(non-Local TV)");
@@ -252,6 +254,9 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             mux_id = 0xc;
         original_network_id = 0xff00  + mux_id; // Shift id to private
                                                 // temporary use range
+        int test1 = UKMultiplexNames.size();
+        int test2 = RSTNames.size();
+        test1 = test2 = 0;
         if (VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_INFO)
                 || VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_INFO))
         {
