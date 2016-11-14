@@ -106,6 +106,7 @@ private: // Declarations
                 time_t end_time,
                 RunningStatusEnum running_status,
                 bool is_scrambled,
+                const QByteArray& descriptors,
                 EventTable& events,
                 unsigned long long table_key);
 
@@ -125,8 +126,7 @@ private: // Declarations
         time_t end_time;
         RunningStatusEnum running_status;
         bool is_scrambled;
-        // TODO Need to decide how/whether to handle descriptors
-
+        QByteArray descriptors;
     };
         
     struct Section
@@ -173,13 +173,15 @@ private: // Declarations
         SubTable() : subtable_status(
                     EitCacheDVB::TableStatusEnum::UNINITIALISED),
                     subtable_version(TableBase::VERSION_UNINITIALISED),
+                    //ncsch_size(0),
                     segment_count(0)
                     {}
                     
         TableStatusEnum subtable_status;
         Segment segments[32];
         uint subtable_version;
-        QMap<uint, uint> nonconformant_versions;
+//        QMap<uint, uint> nonconformant_versions;
+//        int ncsch_size;
         uint segment_count;
     };
     
@@ -273,6 +275,7 @@ private: // Declarations
             
     private: // Data
         uint table_version;
+        //QMap<uint, uint> nonconformant_versions;
         TableStatusEnum table_status;
         EventWrapper present;
         EventWrapper following;

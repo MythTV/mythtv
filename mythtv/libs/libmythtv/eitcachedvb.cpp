@@ -129,27 +129,43 @@ enum {UK_DTT_NETWORK,
       NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS};
 static const uint ncv_networks[] = {[UK_DTT_NETWORK] = 0x233a};
 
-static QStringList RSTNames(QStringList() << "Undefined"
-                                << "not running"
-                                << "starts in a few seconds"
-                                << "pausing"
-                                << "running"
-                                << "service off-air"
-                                << "reserved"
-                                << "reserved");
+static QStringList UKMultiplexNames(QStringList()
+                    << "Not allocated"
+                    << "BBC - Mux 1/PSB 1"
+                    << "D3/4 - Mux 2/PSB 2"
+                    << "SDN - Mux A/Com 4"
+                    << "BBC - Mux B/PSB 3"
+                    << "Arqiva - Mux C/Com 5"
+                    << "Arqiva - Mux D/Com 6"
+                    << "NI JV - NI Mux"
+                    << "Arqiva - Com 7"
+                    << "Arqiva - Com 8"
+                    << "Other regional(non-Local TV)");
+
+static QStringList RSTNames(QStringList()
+                    << "Undefined"
+                    << "not running"
+                    << "starts in a few seconds"
+                    << "pausing"
+                    << "running"
+                    << "service off-air"
+                    << "reserved"
+                    << "reserved");
                                 
 EitCacheDVB::Event::Event(uint event_id,
                 time_t start_time,
                 time_t end_time,
                 RunningStatusEnum running_status,
                 bool is_scrambled,
+                const QByteArray& descriptors,
                 EventTable& events,
                 unsigned long long table_key) :
                 event_id(event_id),
                 start_time(start_time),
                 end_time(end_time),
                 running_status(running_status),
-                is_scrambled(is_scrambled)
+                is_scrambled(is_scrambled),
+                descriptors(descriptors)
 {
     // Construct the key
     if (0 != table_key)
@@ -225,6 +241,31 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
     section_version_changed = false;
     table_version_change_complete = false;
     
+    if (ncv_networks[UK_DTT_NETWORK] == original_network_id)
+    {
+        // Use a temporary original network id derived from
+        // the multiplex id encoded into the tsid
+        uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+        if (mux_id > 0xb)
+            mux_id = 0;
+        if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+            mux_id = 0xc;
+        original_network_id = 0xff00  + mux_id; // Shift id to private
+                                                // temporary use range
+        if (VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_INFO)
+                || VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_INFO))
+        {
+            LogPrintLine(VB_EITDVBPF, (LogLevel_t)LOG_INFO,
+                         __FILE__, __LINE__, __FUNCTION__, 1,
+                         QString(QString(
+                                 "UK DTT using local network id 0x%1"
+                                 " for multiplex \"%2\"")
+                                 .arg(original_network_id,0,16)
+                                 .arg(UKMultiplexNames[mux_id]))
+                                 .toLocal8Bit().constData());
+        }
+    }
+
     // See if this section is for a currently tuned transport stream
     bool actual = (table_id == TableID::PF_EIT) ||
         ((table_id >= TableID::SC_EITbeg) && 
@@ -299,12 +340,11 @@ bool EitCacheDVB::PfTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint event_count = eit->EventCount();
     
-    // Some networks need special handling because they
+/*    // Some networks need special handling because they
     // do not have consistent version numbers when
     // tables are carried in "other" transport streams.
     // This implies having version data stored for
     // each different transport stream we see data on.
-    // I use the the current_tsid passed in for this.
     // Until this work is complete I am ignoring "other" table
     // sections for these networks.
     if (!actual)
@@ -313,12 +353,22 @@ bool EitCacheDVB::PfTable::ProcessSection(
         {
             if (ncv_networks[i] == original_network_id)
             {
+                static int ncpf_size = 0;
                 //LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
                 //        "Original network %1 ditching other").arg(original_network_id));
+                nonconformant_versions.insert(transport_stream_id, version_number);
+                int size = nonconformant_versions.size();
+                if (size != ncpf_size)
+                {
+                    ncpf_size = size;
+                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+                        "ncpf_size %1").arg(ncpf_size));
+                }
                 return false;
             }
         }
-    }
+    }*/
+
 
     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString("Processing present"
                         "/following section "
@@ -468,7 +518,9 @@ bool EitCacheDVB::PfTable::ProcessSection(
                                     eit->StartTimeUnixUTC(0),
                                     eit->EndTimeUnixUTC(0),
                                     RunningStatus(eit->RunningStatus(0)),
-                                    eit->IsScrambled(0), events, 0) ==
+                                    eit->IsScrambled(0),
+                                    QByteArray(),
+                                    events, 0) ==
                                     *pfEvent.event)
                             {
                                 LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
@@ -585,7 +637,10 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         end_time,
                         running_status,
                         is_scrambled,
-                        events, table_key);
+                        QByteArray((const char*)(eit->Descriptors(0)),
+                                   int(eit->DescriptorsLength(0))),
+                        events,
+                        table_key);
                         
     return true;
 }
@@ -717,13 +772,11 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     Section& current_section = current_segment.sections[section_index];
     TableStatusEnum& current_section_status = current_section.section_status;
     uint& current_section_version = current_section.section_version;
-
-    // Some networks need special handling because they
+/*    // Some networks need special handling because they
     // do not have consistent version numbers when
     // tables are carried in "other" transport streams.
     // This implies having version data stored for
     // each different transport stream we see data on.
-    // I use the the current_tsid passed in for this.
     // Until this work is complete I am ignoring "other" table
     // sections for these networks.
     if (!actual)
@@ -735,10 +788,19 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 //LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
                 //        "Original network %1 ditching other").arg(original_network_id));
                 current_subtable.nonconformant_versions.insert(transport_stream_id, version_number);
+                int size = current_subtable.nonconformant_versions.size();
+                if (size != current_subtable.ncsch_size)
+                {
+                    current_subtable.ncsch_size = size;
+                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
+                        "subtable %1 ncsch_size %2")
+                        .arg(table_id,0,16)
+                        .arg(size));
+                }
                 return false;
             }
         }
-    }
+    }*/
 
     LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("Processing schedule section "
                         "0x%1/0x%2/0x%3/%4 "
@@ -973,7 +1035,10 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                                                 eit->EndTimeUnixUTC(ievent),
                                                 RunningStatus(
                                                     eit->RunningStatus(ievent)),
-                                                eit->IsScrambled(ievent), events, 0) ==
+                                                eit->IsScrambled(ievent),
+                                                QByteArray((const char*)(eit->Descriptors(0)),
+                                                    int(eit->DescriptorsLength(0))),
+                                                events, 0) ==
                                                 *current_section.events[ievent]))
                                             break;
                                     if (event_count == ievent)
@@ -1123,6 +1188,8 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         eit->EndTimeUnixUTC(ievent),
                         RunningStatus(eit->RunningStatus(ievent)),
                         eit->IsScrambled(ievent),
+                        QByteArray((const char*)(eit->Descriptors(0)),
+                            int(eit->DescriptorsLength(0))),
                         events, table_key)));
 
     if (!version_changed &&
