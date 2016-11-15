@@ -110,8 +110,6 @@ private: // Declarations
                 EventTable& events,
                 unsigned long long table_key);
 
-        //~Event(); // Debugging
-        
         bool operator == (const Event &e2) const
         {
             return (event_id == e2.event_id) &&
@@ -173,15 +171,12 @@ private: // Declarations
         SubTable() : subtable_status(
                     EitCacheDVB::TableStatusEnum::UNINITIALISED),
                     subtable_version(TableBase::VERSION_UNINITIALISED),
-                    //ncsch_size(0),
                     segment_count(0)
                     {}
                     
         TableStatusEnum subtable_status;
         Segment segments[32];
         uint subtable_version;
-//        QMap<uint, uint> nonconformant_versions;
-//        int ncsch_size;
         uint segment_count;
     };
     
@@ -275,7 +270,6 @@ private: // Declarations
             
     private: // Data
         uint table_version;
-        //QMap<uint, uint> nonconformant_versions;
         TableStatusEnum table_status;
         EventWrapper present;
         EventWrapper following;

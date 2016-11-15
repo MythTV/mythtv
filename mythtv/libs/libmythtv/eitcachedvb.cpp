@@ -129,7 +129,9 @@ enum {UK_DTT_NETWORK,
       NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS};
 static const uint ncv_networks[] = {[UK_DTT_NETWORK] = 0x233a};
 
-static QStringList UKMultiplexNames(QStringList()
+static const uint TEMPORARY_LOCAL_NETWORK_BASE = 0xFF01;
+
+static const QStringList UKMultiplexNames(QStringList()
                     << "Not allocated"
                     << "BBC - Mux 1/PSB 1"
                     << "D3/4 - Mux 2/PSB 2"
@@ -144,7 +146,7 @@ static QStringList UKMultiplexNames(QStringList()
                     << "Arqiva - Com 8"
                     << "Other regional(non-Local TV)");
 
-static QStringList RSTNames(QStringList()
+static const QStringList RSTNames(QStringList()
                     << "Undefined"
                     << "not running"
                     << "starts in a few seconds"
@@ -174,58 +176,11 @@ EitCacheDVB::Event::Event(uint event_id,
     {
         // Handle shared table
         unsigned long long key = table_key << 16 | event_id;
-/*
-        if (events.contains(key))
-        {
-            LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                "Event is already in events table %1")
-                .arg(events[key]->ref._q_value));
-                
-            // Take a temp ref on the existing event
-            QExplicitlySharedDataPointer<Event> old_entry
-                = events[key];
-            
-            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-                "old_entry ref before insert %1")
-                .arg(old_entry->ref._q_value));
-                
-            events.insert(key,
-                            QExplicitlySharedDataPointer<Event>(this));
-                            
-            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-                "old_entry ref after insert %1")
-                .arg(old_entry->ref._q_value));
-                
-            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-                "new entry refcount after insert %1")
-                .arg(events[key]->ref._q_value));
-        }
-        else
-        {
-            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-                "Event is not in events table %1")
-                .arg(ref._q_value));
-            events.insert(key,
-                            QExplicitlySharedDataPointer<Event>(this));
-            LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-                "Ref count after  insert %1")
-                .arg(events[key]->ref._q_value));
-        }
-*/
-        // If you uncomment the debug stuff above remember to
-        // comment this out
         events.insert(key,
                         QExplicitlySharedDataPointer<Event>(this));
     }
     
 }
-
-//EitCacheDVB::Event::~Event()
-//{
-//    LOG(VB_EITDVBPF, LOG_INFO, LOC + QString(
-//    "Destroying event %1").arg(quintptr(this),
-//                    QT_POINTER_SIZE * 2, 16, QChar('0')));
-//}
 
 bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
                                  uint current_tsid,
@@ -252,15 +207,12 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             mux_id = 0;
         if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
             mux_id = 0xc;
-        original_network_id = 0xff00  + mux_id; // Shift id to private
-                                                // temporary use range
-        int test1 = UKMultiplexNames.size();
-        int test2 = RSTNames.size();
-        test1 = test2 = 0;
-        if (VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_INFO)
-                || VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_INFO))
+        // Shift id to private temporary use range
+        original_network_id = TEMPORARY_LOCAL_NETWORK_BASE  + mux_id; 
+        if (VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_DEBUG)
+                || VERBOSE_LEVEL_CHECK(VB_EITDVBPF, LOG_DEBUG))
         {
-            LogPrintLine(VB_EITDVBPF, (LogLevel_t)LOG_INFO,
+            LogPrintLine(VB_EITDVBPF, (LogLevel_t)LOG_DEBUG,
                          __FILE__, __LINE__, __FUNCTION__, 1,
                          QString(QString(
                                  "UK DTT using local network id 0x%1"
@@ -314,7 +266,7 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
     }
     else if (table_id == TableID::RST)
     {
-        LOG(VB_EITRS, LOG_INFO, LOC + QString(
+        LOG(VB_EITRS, LOG_DEBUG, LOC + QString(
                 "The long lost running status table has finally been "
                 "found, send for the doctor. \"Doctor Who?\". \"Of "
                 "Course!\"."));
@@ -345,36 +297,6 @@ bool EitCacheDVB::PfTable::ProcessSection(
     uint last_section_number = eit->LastSection();
     uint event_count = eit->EventCount();
     
-/*    // Some networks need special handling because they
-    // do not have consistent version numbers when
-    // tables are carried in "other" transport streams.
-    // This implies having version data stored for
-    // each different transport stream we see data on.
-    // Until this work is complete I am ignoring "other" table
-    // sections for these networks.
-    if (!actual)
-    {
-        for (int i = 0; i < NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS; i++)
-        {
-            if (ncv_networks[i] == original_network_id)
-            {
-                static int ncpf_size = 0;
-                //LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                //        "Original network %1 ditching other").arg(original_network_id));
-                nonconformant_versions.insert(transport_stream_id, version_number);
-                int size = nonconformant_versions.size();
-                if (size != ncpf_size)
-                {
-                    ncpf_size = size;
-                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                        "ncpf_size %1").arg(ncpf_size));
-                }
-                return false;
-            }
-        }
-    }*/
-
-
     LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString("Processing present"
                         "/following section "
                         "original_network_id 0x%1 "
@@ -562,11 +484,15 @@ bool EitCacheDVB::PfTable::ProcessSection(
     if (present.section_version == following.section_version)
         table_version_change_complete = true;
 
-    if (section_version_changed)
-        LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                "Pf table version change %1")
-                .arg(table_version_change_complete
-                     ? "complete" : "incomplete"));
+    if (table_version_change_complete)
+        LOG(VB_EITDVBPF, LOG_INFO, LOC
+                + QString("EIT_PF 0x%1/0x%2/0x%3/%4 "
+                        "version change complete %5")
+                .arg(original_network_id,0,16)
+                .arg(transport_stream_id,0,16)
+                .arg(service_id,0,16)
+                .arg(table_id)
+                .arg(version_number));
 
     uint  event_id = eit->EventID(0);
     time_t start_time = eit->StartTimeUnixUTC(0);
@@ -576,7 +502,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
     if ((pfEvent.event_status == TableStatusEnum::VALID)
             && (running_status != pfEvent.event->running_status))
     {
-        LOG(VB_EITRS, LOG_INFO, LOC + QString(
+        LOG(VB_EITRS, LOG_DEBUG, LOC + QString(
                         "Running status for 0x%1/0x%2/0x%3/%4 change in PD %5 data - "
                         "was %6 is %7")
                 .arg(original_network_id,0,16)
@@ -777,35 +703,6 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
     Section& current_section = current_segment.sections[section_index];
     TableStatusEnum& current_section_status = current_section.section_status;
     uint& current_section_version = current_section.section_version;
-/*    // Some networks need special handling because they
-    // do not have consistent version numbers when
-    // tables are carried in "other" transport streams.
-    // This implies having version data stored for
-    // each different transport stream we see data on.
-    // Until this work is complete I am ignoring "other" table
-    // sections for these networks.
-    if (!actual)
-    {
-        for (int i = 0; i < NETWORKS_WITH_NON_CONFORMANT_VERSION_NUMBERS; i++)
-        {
-            if (ncv_networks[i] == original_network_id)
-            {
-                //LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
-                //        "Original network %1 ditching other").arg(original_network_id));
-                current_subtable.nonconformant_versions.insert(transport_stream_id, version_number);
-                int size = current_subtable.nonconformant_versions.size();
-                if (size != current_subtable.ncsch_size)
-                {
-                    current_subtable.ncsch_size = size;
-                    LOG(VB_EITDVBPF, LOG_DEBUG, LOC + QString(
-                        "subtable %1 ncsch_size %2")
-                        .arg(table_id,0,16)
-                        .arg(size));
-                }
-                return false;
-            }
-        }
-    }*/
 
     LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString("Processing schedule section "
                         "0x%1/0x%2/0x%3/%4 "
@@ -1234,7 +1131,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 || (current_subtable.subtable_version == TableBase::VERSION_UNINITIALISED)
                 || (current_subtable.subtable_version != version_number))
         {
-            LOG(VB_EITDVBSCH, LOG_INFO, LOC
+            LOG(VB_EITDVBSCH, LOG_DEBUG, LOC
                 + QString("0x%1/%2 Early bailout l1 %3/%4")
                 .arg(service_id,0,16).arg(table_id)
                 .arg(uint(current_subtable.subtable_status))
@@ -1252,7 +1149,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         || (segment.segment_version != version_number))
                 {
                     table_version_change_complete = false;
-                    LOG(VB_EITDVBSCH, LOG_INFO, LOC
+                    LOG(VB_EITDVBSCH, LOG_DEBUG, LOC
                         + QString("0x%1/%2 Early bailout l2 %3/%4/%5/%6")
                         .arg(service_id,0,16).arg(table_id)
                         .arg(i).arg(j)
@@ -1267,7 +1164,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                              || (section.section_version == TableBase::VERSION_UNINITIALISED)
                              || (section.section_version != version_number))
                     {
-                        LOG(VB_EITDVBSCH, LOG_INFO, LOC
+                        LOG(VB_EITDVBSCH, LOG_DEBUG, LOC
                             + QString("0x%1/%2 Bailout l3 %3/%4/%5/%6")
                             .arg(service_id,0,16).arg(table_id)
                             .arg(i).arg(j)
@@ -1280,25 +1177,15 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
         }
         if (table_version_change_complete)
             LOG(VB_EITDVBSCH, LOG_INFO, LOC
-                + QString("EIT_SCH 0x%1/0x%2/0x%3/%4 complete "
-                        "v %5 "
-                        "s %6 "
-                        "slsn %7 "
-                        "lsn %8 "
-                        "sgi %9 "
-                        "sci %10")
+                + QString("EIT_SCH 0x%1/0x%2/0x%3/%4 "
+                        "version change complete %5")
                 .arg(original_network_id,0,16)
                 .arg(transport_stream_id,0,16)
                 .arg(service_id,0,16)
                 .arg(table_id)
-                .arg(version_number)
-                .arg(section_number)
-                .arg(segment_last_section_number)
-                .arg(last_section_number)
-                .arg(segment_index)
-                .arg(section_index));
+                .arg(version_number));
         else
-            LOG(VB_EITDVBSCH, LOG_INFO, LOC
+            LOG(VB_EITDVBSCH, LOG_DEBUG, LOC
                 + QString("EIT_SCH 0x%1/0x%2/0x%3/%4 incomplete "
                         "v %5 "
                         "s %6 "
