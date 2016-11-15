@@ -19,8 +19,7 @@
 
 ProgDetails::ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo) :
     MythScreenType (parent, "progdetails"),
-    m_progInfo(*progInfo), m_browser(NULL),
-    m_currentPage(0)
+    m_progInfo(*progInfo), m_infoList(*this)
 {
 }
 
@@ -29,26 +28,19 @@ bool ProgDetails::Create(void)
     bool foundtheme = false;
 
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("schedule-ui.xml", "progdetails", this);
+    foundtheme = LoadWindowFromXML("schedule-ui.xml", "programdetails", this);
 
     if (!foundtheme)
         return false;
 
-    bool err = false;
-    UIUtilE::Assign(this, m_browser, "browser", &err);
-
-    if (err)
+    // Initialise details list
+    if (!m_infoList.Create(true))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'progdetails'");
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load 'Info buttonlist'");
         return false;
     }
 
     BuildFocusList();
-
-    SetFocusWidget(m_browser);
-
-    float zoom = gCoreContext->GetSetting("ProgDetailsZoom", "1.0").toFloat();
-    m_browser->SetZoom(zoom);
 
     return true;
 }
@@ -107,26 +99,36 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
     return ratings + "Advisory" + advisory;
 }
 
-void ProgDetails::Init()
+ProgDetails::~ProgDetails(void)
+{
+    m_infoList.Hide();
+}
+
+void ProgDetails::Init(void)
 {
     updatePage();
 }
 
-ProgDetails::~ProgDetails(void)
+void ProgDetails::updatePage(void)
 {
-    if (!m_browser)
-        return;
+    if (m_data.isEmpty())
+        loadPage();
 
-    float zoom = m_browser->GetZoom();
-    gCoreContext->SaveSetting("ProgDetailsZoom", QString().setNum(zoom));
+    m_infoList.Display(m_data);
+}
+
+void ProgDetails::addItem(const QString &title, const QString &value,
+                          ProgInfoList::VisibleLevel level)
+{
+    if (value.isEmpty())
+        return;
+    ProgInfoList::DataItem item = std::make_tuple(title, value, level);
+    m_data.append(item);
 }
 
 bool ProgDetails::keyPressEvent(QKeyEvent *event)
 {
-    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
-        return true;
-
-    bool handled = false;
+    bool handled;
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
@@ -137,14 +139,17 @@ bool ProgDetails::keyPressEvent(QKeyEvent *event)
 
         if (action == "INFO")
         {
-            m_currentPage++;
-            if (m_currentPage >= LASTPAGE)
-                m_currentPage = 0;
-
+            m_infoList.Toggle();
             updatePage();
         }
-        else if (action == "MENU")
-            showMenu();
+        else if (action == "DOWN")
+        {
+            m_infoList.PageDown();
+        }
+        else if (action == "UP")
+        {
+            m_infoList.PageUp();
+        }
         else
             handled = false;
     }
@@ -155,60 +160,11 @@ bool ProgDetails::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void ProgDetails::updatePage(void)
-{
-    if (m_page[m_currentPage].isEmpty())
-        loadPage();
-
-    m_browser->SetHtml(m_page[m_currentPage]);
-}
-
-void ProgDetails::addItem(const QString &key, const QString &title, const QString &data)
-{
-    QString escapedKey = "%" + key + "%";
-
-    if (data.isEmpty())
-    {
-        removeItem(key);
-        return;
-    }
-
-    // find the key in the html and replace with the correct data
-    for (int x = 0; x < m_html.size(); x++)
-    {
-        QString s = m_html[x];
-        if (s.contains(escapedKey))
-        {
-            // replace the label first
-            s.replace("%" + key + "_LABEL%", title);
-            // now replace the data
-            s.replace(escapedKey, data);
-            m_html[x] = s;
-        }
-    }
-}
-
-void ProgDetails::removeItem(const QString &key)
-{
-    // remove all line in the html that have key in them (should only be one line)
-    for (int x = 0; x < m_html.size(); x++)
-    {
-        QString s = m_html[x];
-        if (s.contains("%" + key + "%"))
-        {
-            m_html.removeAll(s);
-            return;
-        }
-    }
-}
-
 void ProgDetails::loadPage(void)
 {
-    loadHTML();
-
     MSqlQuery query(MSqlQuery::InitCon());
-    QString category_type, showtype, year, syndicatedEpisodeNum, rating, colorcode,
-            title_pronounce;
+    QString category_type, showtype, year, syndicatedEpisodeNum;
+    QString rating, colorcode, title_pronounce;
     float stars = 0.0;
     int partnumber = 0, parttotal = 0;
     int audioprop = 0, videoprop = 0, subtype = 0, generic = 0;
@@ -278,10 +234,11 @@ void ProgDetails::loadPage(void)
            category_type = "tvshow";
     }
 
-    addItem("TITLE", tr("Title"),
-            m_progInfo.toString(ProgramInfo::kTitleSubtitle, " - "));
+    addItem(tr("Title"),
+            m_progInfo.toString(ProgramInfo::kTitleSubtitle, " - "),
+            ProgInfoList::kLevel1);
 
-    addItem("TITLE_PRONOUNCE", tr("Title Pronounce"), title_pronounce);
+    addItem(tr("Title Pronounce"), title_pronounce, ProgInfoList::kLevel2);
 
     QString s = m_progInfo.GetDescription();
 
@@ -347,67 +304,7 @@ void ProgDetails::loadPage(void)
         s += " (" + attr + ")";
     }
 
-    addItem("DESCRIPTION", tr("Description"), s);
-
-    s.clear();
-    if (!m_progInfo.GetCategory().isEmpty())
-    {
-        s = m_progInfo.GetCategory();
-
-        query.prepare("SELECT genre FROM programgenres "
-                      "WHERE chanid = :CHANID AND starttime = :STARTTIME "
-                      "AND relevance > 0 ORDER BY relevance;");
-
-        query.bindValue(":CHANID",    m_progInfo.GetChanID());
-        query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
-
-        if (query.exec())
-        {
-            while (query.next())
-                s += ", " + query.value(0).toString();
-        }
-    }
-    addItem("CATEGORY", tr("Category"), s);
-
-    s.clear();
-    if (!category_type.isEmpty())
-    {
-        s = category_type;
-        if (!m_progInfo.GetSeriesID().isEmpty())
-            s += "  (" + m_progInfo.GetSeriesID() + ")";
-        if (!showtype.isEmpty())
-            s += "  " + showtype;
-    }
-    addItem("CATEGORY_TYPE", tr("Type", "category_type"), s);
-
-    s.clear();
-    if (m_progInfo.GetEpisode() > 0)
-    {
-        if (m_progInfo.GetEpisodeTotal() > 0)
-            s = tr("%1 of %2").arg(m_progInfo.GetEpisode()).arg(m_progInfo.GetEpisodeTotal());
-        else
-            s = QString::number(m_progInfo.GetEpisode());
-
-    }
-    addItem("EPISODE", tr("Episode"), s);
-
-    s.clear();
-    if (m_progInfo.GetSeason() > 0)
-        s = QString::number(m_progInfo.GetSeason());
-    addItem("SEASON", tr("Season"), s);
-
-    addItem("SYNDICATEDEPISODENUMBER", tr("Syndicated Episode Number"), syndicatedEpisodeNum);
-
-    s.clear();
-    if (m_progInfo.GetOriginalAirDate().isValid() &&
-        category_type != "movie")
-    {
-        s = MythDate::toString(m_progInfo.GetOriginalAirDate(),
-                               MythDate::kDateFull | MythDate::kAddYear);
-    }
-    addItem("ORIGINAL_AIRDATE", tr("Original Airdate"), s);
-
-    addItem("PROGRAMID", tr("Program ID"), m_progInfo.GetProgramID());
+    addItem(tr("Description"), s, ProgInfoList::kLevel1);
 
     QString actors, directors, producers, execProducers;
     QString writers, guestStars, hosts, adapters;
@@ -512,20 +409,81 @@ void ProgDetails::loadPage(void)
                 guests =  plist.join(", ");
         }
     }
-    addItem("ACTORS", tr("Actors"), actors);
-    addItem("DIRECTOR", tr("Director"), directors);
-    addItem("PRODUCER", tr("Producer"), producers);
-    addItem("EXECUTIVE_PRODUCER", tr("Executive Producer"), execProducers);
-    addItem("WRITER", tr("Writer"), writers);
-    addItem("GUEST_STAR", tr("Guest Star"), guestStars);
-    addItem("HOST", tr("Host"), hosts);
-    addItem("ADAPTER", tr("Adapter"), adapters);
-    addItem("PRESENTER", tr("Presenter"), presenters);
-    addItem("COMMENTATOR", tr("Commentator"), commentators);
-    addItem("GUEST", tr("Guest"), guests);
+    addItem(tr("Actors"), actors, ProgInfoList::kLevel1);
+    addItem(tr("Guest Star"), guestStars, ProgInfoList::kLevel1);
+    addItem(tr("Guest"), guests, ProgInfoList::kLevel1);
+    addItem(tr("Host"), hosts, ProgInfoList::kLevel1);
+    addItem(tr("Presenter"), presenters, ProgInfoList::kLevel1);
+    addItem(tr("Commentator"), commentators, ProgInfoList::kLevel1);
+    addItem(tr("Director"), directors, ProgInfoList::kLevel1);
+    addItem(tr("Producer"), producers, ProgInfoList::kLevel2);
+    addItem(tr("Executive Producer"), execProducers, ProgInfoList::kLevel2);
+    addItem(tr("Writer"), writers, ProgInfoList::kLevel2);
+    addItem(tr("Adapter"), adapters, ProgInfoList::kLevel2);
+
+    addItem(tr("Category"), m_progInfo.GetCategory(), ProgInfoList::kLevel1);
+
+    query.prepare("SELECT genre FROM programgenres "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME "
+                  "AND relevance > 0 ORDER BY relevance;");
+    query.bindValue(":CHANID",    m_progInfo.GetChanID());
+    query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
+
+    if (query.exec())
+    {
+        s.clear();
+        while (query.next())
+        {
+            if (!s.isEmpty())
+                s += ", ";
+            s += query.value(0).toString();
+        }
+        addItem(tr("Genre"), s, ProgInfoList::kLevel1);
+    }
+
+    s.clear();
+    if (!category_type.isEmpty())
+    {
+        s = category_type;
+        if (!m_progInfo.GetSeriesID().isEmpty())
+            s += "  (" + m_progInfo.GetSeriesID() + ")";
+        if (!showtype.isEmpty())
+            s += "  " + showtype;
+    }
+    addItem(tr("Type", "category_type"), s, ProgInfoList::kLevel1);
+
+    s.clear();
+    if (m_progInfo.GetSeason() > 0)
+        s = QString::number(m_progInfo.GetSeason());
+    addItem(tr("Season"), s, ProgInfoList::kLevel1);
+
+    s.clear();
+    if (m_progInfo.GetEpisode() > 0)
+    {
+        if (m_progInfo.GetEpisodeTotal() > 0)
+            s = tr("%1 of %2").arg(m_progInfo.GetEpisode())
+                              .arg(m_progInfo.GetEpisodeTotal());
+        else
+            s = QString::number(m_progInfo.GetEpisode());
+
+    }
+    addItem(tr("Episode"), s, ProgInfoList::kLevel1);
+
+    addItem(tr("Syndicated Episode Number"), syndicatedEpisodeNum,
+            ProgInfoList::kLevel1);
+
+    s.clear();
+    if (m_progInfo.GetOriginalAirDate().isValid() &&
+        category_type != "movie")
+    {
+        s = MythDate::toString(m_progInfo.GetOriginalAirDate(),
+                               MythDate::kDateFull | MythDate::kAddYear);
+    }
+    addItem(tr("Original Airdate"), s, ProgInfoList::kLevel1);
+
+    addItem(tr("Program ID"), m_progInfo.GetProgramID(), ProgInfoList::kLevel1);
 
     // Begin MythTV information not found in the listings info
-//    msg += "<br>";
     QDateTime statusDate;
     if (m_progInfo.GetRecordingStatus() == RecStatus::WillRecord ||
         m_progInfo.GetRecordingStatus() == RecStatus::Pending)
@@ -534,7 +492,8 @@ void ProgDetails::loadPage(void)
     RecordingType rectype = kSingleRecord; // avoid kNotRecording
     RecStatus::Type recstatus = m_progInfo.GetRecordingStatus();
 
-    if (recstatus == RecStatus::PreviousRecording || recstatus == RecStatus::NeverRecord ||
+    if (recstatus == RecStatus::PreviousRecording ||
+        recstatus == RecStatus::NeverRecord ||
         recstatus == RecStatus::Unknown)
     {
         query.prepare("SELECT recstatus, starttime "
@@ -585,9 +544,10 @@ void ProgDetails::loadPage(void)
     s = RecStatus::toString(recstatus, rectype);
 
     if (statusDate.isValid())
-        s += " " + MythDate::toString(statusDate, MythDate::kDateFull | MythDate::kAddYear);
+        s += " " + MythDate::toString(statusDate, MythDate::kDateFull |
+                                      MythDate::kAddYear);
 
-    addItem("MYTHTV_STATUS", tr("MythTV Status"), s);
+    addItem(tr("MythTV Status"), s, ProgInfoList::kLevel1);
 
     QString recordingRule;
     QString lastRecorded;
@@ -650,18 +610,10 @@ void ProgDetails::loadPage(void)
         }
         if (record->m_searchType != kManualSearch &&
             record->m_description != m_progInfo.GetDescription())
-        {
-            searchPhrase = record->m_description
-                .replace("<", "&lt;").replace(">", "&gt;").replace("\n", " ");
-        }
+            searchPhrase = record->m_description;
     }
-    addItem("RECORDING_RULE", tr("Recording Rule"), recordingRule);
-    addItem("LAST_RECORDED", tr("Last Recorded"), lastRecorded);
-    addItem("NEXT_RECORDING", tr("Next Recording"), nextRecording);
-    addItem("AVERAGE_TIME_SHIFT", tr("Average Time Shift"), averageTimeShift);
-    addItem("WATCH_LIST_SCORE", tr("Watch List Score"), watchListScore);
-    addItem("WATCH_LIST_STATUS", tr("Watch List Status"), watchListStatus);
-    addItem("SEARCH_PHRASE", tr("Search Phrase"), searchPhrase);
+    addItem(tr("Recording Rule"), recordingRule, ProgInfoList::kLevel1);
+    addItem(tr("Search Phrase"), searchPhrase, ProgInfoList::kLevel1);
 
     s.clear();
     if (m_progInfo.GetFindID())
@@ -672,7 +624,13 @@ void ProgDetails::loadPage(void)
             .arg(MythDate::toString(
                      fdate, MythDate::kDateFull | MythDate::kAddYear));
     }
-    addItem("FINDID", tr("Find ID"), s);
+    addItem(tr("Find ID"), s, ProgInfoList::kLevel2);
+
+    addItem(tr("Last Recorded"), lastRecorded, ProgInfoList::kLevel2);
+    addItem(tr("Next Recording"), nextRecording, ProgInfoList::kLevel2);
+    addItem(tr("Average Time Shift"), averageTimeShift, ProgInfoList::kLevel2);
+    addItem(tr("Watch List Score"), watchListScore, ProgInfoList::kLevel2);
+    addItem(tr("Watch List Status"), watchListStatus, ProgInfoList::kLevel2);
 
     QString recordingHost;
     QString recordingInput;
@@ -711,95 +669,14 @@ void ProgDetails::loadPage(void)
     {
         recordingProfile =  record->m_recProfile;
     }
-    addItem("RECORDING_HOST", tr("Recording Host"), recordingHost);
-    addItem("RECORDING_INPUT", tr("Recording Input"), recordingInput);
-    addItem("RECORDED_FILE_NAME", tr("Recorded File Name"), recordedFilename);
-    addItem("RECORDED_FILE_SIZE", tr("Recorded File Size"), recordedFileSize);
-    addItem("RECORDING_PROFILE", tr("Recording Profile"), recordingProfile);
-    addItem("RECORDING_GROUP", tr("Recording Group"), recordingGroup);
-    addItem("STORAGE_GROUP", tr("Storage Group"), storageGroup);
-    addItem("PLAYBACK_GROUP", tr("Playback Group"),  playbackGroup);
-
-    m_page[m_currentPage] = m_html.join("\n");
+    addItem(tr("Recording Host"), recordingHost, ProgInfoList::kLevel2);
+    addItem(tr("Recording Input"), recordingInput, ProgInfoList::kLevel2);
+    addItem(tr("Recorded File Name"), recordedFilename, ProgInfoList::kLevel1);
+    addItem(tr("Recorded File Size"), recordedFileSize, ProgInfoList::kLevel1);
+    addItem(tr("Recording Profile"), recordingProfile, ProgInfoList::kLevel2);
+    addItem(tr("Recording Group"), recordingGroup, ProgInfoList::kLevel1);
+    addItem(tr("Storage Group"), storageGroup, ProgInfoList::kLevel2);
+    addItem(tr("Playback Group"),  playbackGroup, ProgInfoList::kLevel2);
 
     delete record;
-}
-
-bool ProgDetails::loadHTML(void)
-{
-    m_html.clear();
-
-    QString filename = QString("htmls/progdetails_page%1.html").arg(m_currentPage + 1);
-    if (!GetMythUI()->FindThemeFile(filename))
-        return false;
-
-    QFile file(QLatin1String(qPrintable(filename)));
-
-    if (!file.exists())
-        return false;
-
-    if (file.open( QIODevice::ReadOnly ))
-    {
-        QTextStream stream(&file);
-
-        while ( !stream.atEnd() )
-        {
-            m_html.append(stream.readLine());
-        }
-        file.close();
-    }
-    else
-        return false;
-
-    return true;
-}
-
-void ProgDetails::showMenu(void)
-{
-    QString label = tr("Options");
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
-
-    if (menuPopup->Create())
-    {
-        menuPopup->SetReturnEvent(this, "menu");
-
-        menuPopup->AddButton(tr("Zoom In"));
-        menuPopup->AddButton(tr("Zoom Out"));
-        menuPopup->AddButton(tr("Switch Page"));
-
-        popupStack->AddScreen(menuPopup);
-    }
-    else
-    {
-        delete menuPopup;
-    }
-}
-
-void ProgDetails::customEvent(QEvent *event)
-{
-    if (event->type() == DialogCompletionEvent::kEventType)
-    {
-        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
-
-        QString resultid   = dce->GetId();
-        QString resulttext = dce->GetResultText();
-
-        if (resultid == "menu")
-        {
-            if (resulttext == tr("Zoom Out"))
-                m_browser->ZoomOut();
-            else if (resulttext == tr("Zoom In"))
-                m_browser->ZoomIn();
-            else if (resulttext == tr("Switch Page"))
-            {
-                m_currentPage++;
-                if (m_currentPage >= LASTPAGE)
-                    m_currentPage = 0;
-
-                updatePage();
-            }
-        }
-    }
 }

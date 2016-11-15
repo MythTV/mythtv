@@ -24,6 +24,7 @@ using namespace std;
 #include "freesurround.h"
 #include "spdifencoder.h"
 #include "mythlogging.h"
+#include "mythconfig.h"
 
 #define LOC QString("AOBase: ")
 
@@ -76,6 +77,8 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     configured_channels(0),
     max_channels(0),
     src_quality(QUALITY_MEDIUM),
+    source_bitrate(-1),
+    source_samplerate(0),
 
     // private
     output_settingsraw(NULL),   output_settings(NULL),
@@ -84,7 +87,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
 
     pSoundStretch(NULL),
     encoder(NULL),              upmixer(NULL),
-    source_channels(-1),        source_samplerate(0),
+    source_channels(-1),
     source_bytes_per_frame(0),  upmix_default(false),
     needs_upmix(false),         needs_downmix(false),
     surround_mode(QUALITY_LOW), old_stretchfactor(1.0f),
@@ -101,7 +104,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     audbuf_timecode(0),
 
     killAudioLock(QMutex::NonRecursive),
-    current_seconds(-1),        source_bitrate(-1),
+    current_seconds(-1),
 
     memory_corruption_test0(0xdeadbeef),
     memory_corruption_test1(0xdeadbeef),
@@ -361,7 +364,14 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         pSoundStretch->setSampleRate(samplerate);
         pSoundStretch->setChannels(channels);
         pSoundStretch->setTempo(stretchfactor);
+#if ARCH_ARM
+        // use less demanding settings for Raspberry pi
+        pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 82);
+        pSoundStretch->setSetting(SETTING_USE_AA_FILTER, 0);
+        pSoundStretch->setSetting(SETTING_USE_QUICKSEEK, 1);
+#else
         pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 35);
+#endif
         /* If we weren't already processing we need to turn on float conversion
            adjust sample and frame sizes accordingly and dump the contents of
            the audiobuffer */
@@ -459,8 +469,12 @@ bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
         delete m_spdifenc;
     }
 
-    m_spdifenc = new SPDIFEncoder("spdif", codec);
-    if (m_spdifenc->Succeeded() && codec == AV_CODEC_ID_DTS)
+    // No spdif encoder if using openmax audio
+    if (main_device.startsWith("OpenMAX:"))
+        m_spdifenc = 0;
+    else
+        m_spdifenc = new SPDIFEncoder("spdif", codec);
+    if (m_spdifenc && m_spdifenc->Succeeded() && codec == AV_CODEC_ID_DTS)
     {
         switch(codec_profile)
         {
@@ -476,7 +490,7 @@ bool AudioOutputBase::SetupPassthrough(int codec, int codec_profile,
         }
     }
 
-    if (!m_spdifenc->Succeeded())
+    if (m_spdifenc && !m_spdifenc->Succeeded())
     {
         delete m_spdifenc;
         m_spdifenc = NULL;
@@ -1058,10 +1072,12 @@ int64_t AudioOutputBase::GetAudiotime(void)
 
        We use these variables:
 
-       'effdsp' is frames/sec
+       'effdsp' is 100 * frames/sec
 
-       'audbuf_timecode' is the timecode of the audio that has just been
-       written into the buffer.
+       'audbuf_timecode' is the timecode in milliseconds of the
+       audio that has just been written into the buffer.
+
+       'eff_stretchfactor' is stretch factor * 100,000
 
        'totalbuffer' is the total # of bytes in our audio buffer, and the
        sound card's buffer. */
@@ -1091,16 +1107,16 @@ int64_t AudioOutputBase::GetAudiotime(void)
     if (audiotime < oldaudiotime)
         audiotime = oldaudiotime;
 
-    VBAUDIOTS(QString("GetAudiotime audt=%1 atc=%2 mb=%3 sb=%4 tb=%5 "
-                      "sr=%6 obpf=%7 bpf=%8 sf=%9 %10 %11")
-              .arg(audiotime).arg(audbuf_timecode)
-              .arg(main_buffer)
-              .arg(soundcard_buffer)
-              .arg(main_buffer+soundcard_buffer)
-              .arg(samplerate).arg(obpf).arg(bytes_per_frame).arg(stretchfactor)
-              .arg((main_buffer + soundcard_buffer) * eff_stretchfactor)
-              .arg((effdsp && obpf) ? ((main_buffer + soundcard_buffer) *
-                   eff_stretchfactor ) / (effdsp * obpf) : 0)
+    VBAUDIOTS(QString("GetAudiotime audt=%1 abtc=%2 mb=%3 sb=%4 tb=%5 "
+                      "sr=%6 obpf=%7 bpf=%8 esf=%9 edsp=%10 sbr=%11")
+              .arg(audiotime).arg(audbuf_timecode)  // 1, 2
+              .arg(main_buffer)                     // 3
+              .arg(soundcard_buffer)                // 4
+              .arg(main_buffer+soundcard_buffer)    // 5
+              .arg(samplerate).arg(obpf)            // 6, 7
+              .arg(bytes_per_frame)                 // 8
+              .arg(eff_stretchfactor)               // 9
+              .arg(effdsp).arg(source_bitrate)      // 10, 11
               );
 
     return audiotime;
@@ -1448,7 +1464,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
     if (len > afree)
     {
-        VBAUDIOTS("Buffer is full, AddData returning false");
+        VBERROR("Buffer is full, AddData returning false");
         return false; // would overflow
     }
 

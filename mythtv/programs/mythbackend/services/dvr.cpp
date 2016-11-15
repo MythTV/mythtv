@@ -241,6 +241,62 @@ bool Dvr::UnDeleteRecording(int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool Dvr::StopRecording(int RecordedId)
+{
+    if (RecordedId <= 0)
+        throw QString("Recorded ID is invalid.");
+
+    RecordingInfo ri = RecordingInfo(RecordedId);
+
+    if (ri.GetChanID())
+    {
+        QString cmd = QString("STOP_RECORDING %1 %2")
+                      .arg(ri.GetChanID())
+                      .arg(ri.GetRecordingStartTime(MythDate::ISODate));
+        MythEvent me(cmd);
+
+        gCoreContext->dispatch(me);
+        return true;
+    }
+    else
+        throw QString("RecordID %1 not found").arg(RecordedId);
+
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::ReactivateRecording(int RecordedId)
+{
+    if (RecordedId <= 0)
+        throw QString("Recorded ID is invalid.");
+
+    RecordingInfo ri = RecordingInfo(RecordedId);
+
+    ri.ReactivateRecording();
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::RescheduleRecordings(void)
+{
+    QString cmd = QString("RESCHEDULE_RECORDINGS");
+    MythEvent me(cmd);
+
+    gCoreContext->dispatch(me);
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
                                         int   chanid,
                                         const QDateTime &recstarttsRaw,
@@ -288,9 +344,9 @@ long Dvr::GetSavedBookmark( int RecordedId,
     bool isend=true;
     uint64_t position = ri.QueryBookmark();
     if (offsettype.toLower() == "position"){
-    	ri.QueryKeyFramePosition(&offset, position, isend);
-    	return offset;
-    } 
+        ri.QueryKeyFramePosition(&offset, position, isend);
+        return offset;
+    }
     else if (offsettype.toLower() == "duration"){
         ri.QueryKeyFrameDuration(&offset, position, isend);
         return offset;
@@ -324,12 +380,12 @@ bool Dvr::SetSavedBookmark( int RecordedId,
     uint64_t position;
     bool isend=true;
     if (offsettype.toLower() == "position"){
-    	if (!ri.QueryPositionKeyFrame(&position, Offset, isend))
-    		return false;
-    } 
+        if (!ri.QueryPositionKeyFrame(&position, Offset, isend))
+                return false;
+    }
     else if (offsettype.toLower() == "duration"){
         if (!ri.QueryDurationKeyFrame(&position, Offset, isend))
-        	return false;
+                return false;
     }
     else
         position = Offset;
@@ -407,6 +463,33 @@ DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::CutList* Dvr::GetRecordedSeek ( int RecordedId,
+                                     const QString &offsettype )
+{
+    MarkTypes marktype;
+    if (RecordedId <= 0)
+        throw QString("Recorded ID appears invalid.");
+
+    RecordingInfo ri;
+    ri = RecordingInfo(RecordedId);
+
+    DTC::CutList* pCutList = new DTC::CutList();
+    if (offsettype == "BYTES")
+        marktype = MARK_GOP_BYFRAME;
+    else if (offsettype == "DURATION")
+        marktype = MARK_DURATION_MS;
+    else
+        throw QString("Type must be 'BYTES' or 'DURATION'.");
+
+    FillSeek(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
                                         int nCount      )
 {
@@ -470,7 +553,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
         if (elink != NULL)
         {
             DTC::Encoder *pEncoder = pList->AddNewEncoder();
-            
+
             pEncoder->setId            ( elink->GetInputID()      );
             pEncoder->setState         ( elink->GetState()        );
             pEncoder->setLocal         ( elink->IsLocal()         );
@@ -762,7 +845,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
     pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
-    
+
     return pPrograms;
 }
 
@@ -1232,7 +1315,7 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
         delete recList.back();
         recList.pop_back();
     }
-    
+
     return pRecRules;
 }
 
@@ -1327,6 +1410,16 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     }
 
     return bResult;
+}
+
+int Dvr::RecordedIdForPathname(const QString & pathname)
+{
+    uint recordedid;
+
+    if (!ProgramInfo::QueryRecordedIdFromPathname(pathname, recordedid))
+        return -1;
+
+    return recordedid;
 }
 
 QString Dvr::RecStatusToString(int RecStatus)

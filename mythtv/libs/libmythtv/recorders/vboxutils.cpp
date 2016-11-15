@@ -246,7 +246,7 @@ bool VBox::checkVersion(QString &version)
         sList = version.split('.');
 
         // sanity check this looks like a VBox version string
-        if (sList.count() != 3 || !version.startsWith("VB."))
+        if (sList.count() != 3 || !(version.startsWith("VB.") || version.startsWith("VJ.")))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Failed to parse version from %1").arg(version));
             delete xmlDoc;

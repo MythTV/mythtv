@@ -88,11 +88,12 @@ class SyslogLogger : public LoggerBase
 
   public:
     SyslogLogger();
+    SyslogLogger(bool open);
     ~SyslogLogger();
     bool logmsg(LoggingItem *item);
     /// \brief Unused for this logger.
     void reopen(void) { };
-    static SyslogLogger *create(QMutex *mutex);
+    static SyslogLogger *create(QMutex *mutex, bool open = true);
   protected:
     bool setupZMQSocket(void);
   private:

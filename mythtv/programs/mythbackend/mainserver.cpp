@@ -497,6 +497,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     line = line.simplified();
     QStringList tokens = line.split(' ', QString::SkipEmptyParts);
     QString command = tokens[0];
+
     if (command == "MYTH_PROTO_VERSION")
     {
         if (tokens.size() < 2)
@@ -1268,6 +1269,37 @@ void MainServer::customEvent(QEvent *e)
             }
 
             m_sched->GetNextLiveTVDir(tokens[1].toInt());
+            return;
+        }
+
+        if (me->Message().startsWith("STOP_RECORDING"))
+        {
+            QStringList tokens = me->Message().split(" ",
+                                                     QString::SkipEmptyParts);
+
+
+            if (tokens.size() < 3 || tokens.size() > 3)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("Bad STOP_RECORDING message: %1")
+                        .arg(me->Message()));
+                return;
+            }
+
+            QDateTime startts = MythDate::fromString(tokens[2]);
+            RecordingInfo recInfo(tokens[1].toUInt(), startts);
+
+            if (recInfo.GetChanID())
+            {
+                DoHandleStopRecording(recInfo, NULL);
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("Cannot find program info for '%1' while "
+                            "attempting to stop recording.").arg(me->Message()));
+            }
+
             return;
         }
 
@@ -3103,17 +3135,12 @@ void MainServer::DoHandleUndeleteRecording(
 void MainServer::HandleRescheduleRecordings(const QStringList &request,
                                             PlaybackSock *pbs)
 {
-    QStringList result;
-    if (m_sched)
-    {
-        m_sched->Reschedule(request);
-        result = QStringList( QString::number(1) );
-    }
-    else
-        result = QStringList( QString::number(0) );
+     ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                         "HandleRescheduleRecordings");
 
     if (pbs)
     {
+        QStringList result  = QStringList( QString::number(1) );
         MythSocket *pbssock = pbs->getSocket();
         if (pbssock)
             SendResponse(pbssock, result);
@@ -8117,4 +8144,3 @@ void MainServer::SendSlaveDisconnectedEvent(
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-

@@ -1160,6 +1160,8 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     string eventID(tokens[2]);
     int frameNo = atoi(tokens[3].c_str());
     string eventTime(tokens[4]);
+    int frameID;
+    int frameCount = 0;
 
     if (m_debug)
         cout << "Getting analysis frame " << frameNo << " for event " << eventID
@@ -1183,17 +1185,13 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     }
 
     res = mysql_store_result(&g_dbConn);
-    int frameCount = mysql_num_rows(res);
-    int frameID;
-    string fileFormat = m_analysisFileFormat;
+    frameCount = mysql_num_rows(res);
 
-    // if we didn't find any analysis frames look for a normal frame instead
-    if (frameCount == 0 || m_useAnalysisImages == false)
+    // if we didn't find any alarm frames get the list of normal frames
+    if (frameCount == 0)
     {
         mysql_free_result(res);
 
-        frameNo = 0;
-        fileFormat = m_eventFileFormat;
         sql  = "SELECT FrameId FROM Frames ";
         sql += "WHERE EventID = " + eventID + " ";
         sql += "ORDER BY FrameID";
@@ -1207,6 +1205,14 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
 
         res = mysql_store_result(&g_dbConn);
         frameCount = mysql_num_rows(res);
+    }
+
+    // if frameCount is 0 then we can't go any further
+    if (frameCount == 0)
+    {
+        cout << "handleGetAnalyseFrame: Failed to find any frames" << endl;
+        sendError(ERROR_NO_FRAMES);
+        return;
     }
 
     // if the required frame mumber is 0 or out of bounds then use the middle frame
@@ -1233,35 +1239,55 @@ void ZMServer::handleGetAnalysisFrame(vector<string> tokens)
     mysql_free_result(res);
 
     string outStr("");
+    string filepath("");
+    string frameFile("");
+
+    if (m_useDeepStorage)
+        filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
+    else
+        filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
 
     ADD_STR(outStr, "OK")
 
-    // try to find the analyse frame file
-    string filepath("");
-    if (m_useDeepStorage)
-    {
-        filepath = g_webPath + "/events/" + monitorID + "/" + eventTime + "/";
-        sprintf(str, fileFormat.c_str(), frameID);
-        filepath += str;
-    }
-    else
-    {
-        filepath = g_webPath + "/events/" + monitorID + "/" + eventID + "/";
-        sprintf(str, fileFormat.c_str(), frameID);
-        filepath += str;
-    }
-
     FILE *fd;
     int fileSize = 0;
-    if ((fd = fopen(filepath.c_str(), "r" )))
+
+    // try to find an analysis frame for the frameID
+    if (m_useAnalysisImages)
+    {
+        sprintf(str, m_analysisFileFormat.c_str(), frameID);
+        frameFile = filepath + str;
+
+        if ((fd = fopen(frameFile.c_str(), "r" )))
+        {
+            fileSize = fread(buffer, 1, sizeof(buffer), fd);
+            fclose(fd);
+
+            if (m_debug)
+                cout << "Frame size: " <<  fileSize << endl;
+
+            // get the file size
+            ADD_INT(outStr, fileSize)
+
+            // send the data
+            send(outStr, buffer, fileSize);
+            return;
+        }
+    }
+
+    // try to find a normal frame for the frameID these should always be available
+    sprintf(str, m_eventFileFormat.c_str(), frameID);
+    frameFile = filepath + str;
+
+    if ((fd = fopen(frameFile.c_str(), "r" )))
     {
         fileSize = fread(buffer, 1, sizeof(buffer), fd);
         fclose(fd);
     }
     else
     {
-        cout << "Can't open " << filepath << ": " << strerror(errno) << endl;
-        sendError(ERROR_FILE_OPEN + string(" - ") + filepath + " : " + strerror(errno));
+        cout << "Can't open " << frameFile << ": " << strerror(errno) << endl;
+        sendError(ERROR_FILE_OPEN + string(" - ") + frameFile + " : " + strerror(errno));
         return;
     }
 

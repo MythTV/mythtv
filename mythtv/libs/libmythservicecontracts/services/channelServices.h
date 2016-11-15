@@ -162,4 +162,3 @@ class SERVICE_PUBLIC ChannelServices : public Service
 };
 
 #endif
-

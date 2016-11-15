@@ -119,7 +119,8 @@ class AudioOutputBase : public AudioOutput, public MThread
     static const uint kAudioSRCInputSize = 16384;
 
     /// Audio Buffer Size -- should be divisible by 32,24,16,12,10,8,6,4,2..
-    static const uint kAudioRingBufferSize   = 3072000u;
+    // In other words, divisible by 96.
+    static const uint kAudioRingBufferSize   = 10239936u;
 
  protected:
     // Following function must be called from subclass constructor
@@ -201,6 +202,8 @@ class AudioOutputBase : public AudioOutput, public MThread
         QUALITY_HIGH     =  2,
     };
     int src_quality;
+    long source_bitrate;
+    int source_samplerate;
 
  private:
     bool SetupPassthrough(int codec, int codec_profile,
@@ -219,7 +222,6 @@ class AudioOutputBase : public AudioOutput, public MThread
     FreeSurround              *upmixer;
 
     int source_channels;
-    int source_samplerate;
     int source_bytes_per_frame;
     bool upmix_default;
     bool needs_upmix;
@@ -265,7 +267,6 @@ class AudioOutputBase : public AudioOutput, public MThread
     QMutex killAudioLock;
 
     long current_seconds;
-    long source_bitrate;
 
     float *src_in;
 

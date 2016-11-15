@@ -69,7 +69,7 @@ bool ManualSchedule::Create(void)
     }
 
     QString chanorder = gCoreContext->GetSetting("ChannelOrdering", "channum");
-    ChannelInfoList channels = ChannelUtil::GetChannels(0, false, "channum,callsign");
+    ChannelInfoList channels = ChannelUtil::GetChannels(0, true, "channum,callsign");
     ChannelUtil::SortChannels(channels, chanorder);
 
     for (uint i = 0; i < channels.size(); i++)

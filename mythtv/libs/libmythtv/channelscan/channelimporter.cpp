@@ -448,6 +448,12 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         chan.chan_num = QString("%1")
                                             .arg(chan.service_id);
                     }
+                    else if (chan.freqid.isEmpty())
+                    {
+                        chan.chan_num = QString("%1-%2")
+                                            .arg(chan.source_id)
+                                            .arg(chan.service_id);
+                    }
                     else
                     {
                         chan.chan_num = QString("%1-%2")
@@ -628,6 +634,12 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     else if (chan.si_standard == "dvb")
                     {
                         chan.chan_num = QString("%1")
+                                            .arg(chan.service_id);
+                    }
+                    else if (chan.freqid.isEmpty())
+                    {
+                        chan.chan_num = QString("%1-%2")
+                                            .arg(chan.source_id)
                                             .arg(chan.service_id);
                     }
                     else
@@ -1088,6 +1100,10 @@ QString ChannelImporter::SimpleFormatChannel(
             ssMsg << (QString("%1-%2")
                   .arg(chan.atsc_major_channel)
                   .arg(chan.atsc_minor_channel)).toLatin1().constData();
+        else if (chan.freqid.isEmpty())
+            ssMsg << (QString("%1-%2")
+                  .arg(chan.source_id)
+                  .arg(chan.service_id)).toLatin1().constData();
         else
             ssMsg << (QString("%1-%2")
                   .arg(chan.freqid)
@@ -1101,6 +1117,10 @@ QString ChannelImporter::SimpleFormatChannel(
         ssMsg << (QString("%1 (%2 %3)")
                   .arg(chan.service_name).arg(chan.service_id)
                   .arg(chan.netid)).toLatin1().constData();
+    else if (chan.freqid.isEmpty())
+        ssMsg << (QString("%1-%2")
+                  .arg(chan.source_id).arg(chan.service_id))
+                  .toLatin1().constData();
     else
         ssMsg << (QString("%1-%2")
                   .arg(chan.freqid).arg(chan.service_id))
@@ -1250,10 +1270,18 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
             chan_num = QString("%1")
                           .arg(chan.service_id);
         }
+        else if (chan.freqid.isEmpty())
+        {
+            chan_num = QString("%1-%2")
+                          .arg(chan.source_id)
+                          .arg(chan.service_id);
+        }
         else
+        {
             chan_num = QString("%1-%2")
                           .arg(chan.freqid)
                           .arg(chan.service_id);
+        }
     }
 
     if (!ChannelUtil::IsConflicting(chan_num, chan.source_id))

@@ -776,7 +776,7 @@ void CECAdapter::Action(const QString &action)
         m_priv->powerOnTV = true;
     else if (ACTION_TVPOWEROFF == action)
         m_priv->powerOffTV = true;
-        gActionsReady->wakeAll();
+    gActionsReady->wakeAll();
 }
 
 static int CECLogMessageCallback(void *adapter, const cec_log_message CEC_CALLBACK_PARAM_TYPE message)

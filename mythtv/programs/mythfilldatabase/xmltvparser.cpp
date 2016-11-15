@@ -352,6 +352,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     // Hack for tv_grab_uk_rt
                     pginfo->categoryType = ProgramInfo::kCategoryMovie;
                 }
+
+                pginfo->genres.append(cat);
             }
             else if (info.tagName() == "date" && !pginfo->airdate)
             {
@@ -545,7 +547,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
         pginfo->categoryType != ProgramInfo::kCategoryNone)
         pginfo->category = myth_category_type_to_string(pginfo->categoryType);
 
-    if (!pginfo->airdate)
+    if (!pginfo->airdate
+        && ProgramInfo::kCategorySeries != pginfo->categoryType)
         pginfo->airdate = current_year;
 
     /* Let's build ourself a programid */

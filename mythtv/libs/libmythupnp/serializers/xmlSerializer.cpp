@@ -91,7 +91,10 @@ void XmlSerializer::BeginObject( const QString &sName, const QObject  *pObject )
 
     const QMetaObject *pMeta = pObject->metaObject();
 
-    int nIdx = pMeta->indexOfClassInfo( "version" );
+    int nIdx = -1;
+
+    if (pMeta)
+        nIdx = pMeta->indexOfClassInfo( "version" );
 
     if (nIdx >=0)
         m_pXmlWriter->writeAttribute( "version", pMeta->classInfo( nIdx ).value() );
@@ -324,9 +327,12 @@ QString XmlSerializer::GetContentName( const QString        &sName,
 {
     // Try to read Name or TypeName from classinfo metadata.
 
-    int nClassIdx = pMetaObject->indexOfClassInfo( sName.toLatin1() );
+    int nClassIdx = -1;
 
-    if (nClassIdx >=0)
+    if ( pMetaObject )
+        nClassIdx = pMetaObject->indexOfClassInfo( sName.toLatin1() );
+
+    if (nClassIdx >=0 )
     {
         QString     sOptionData = pMetaObject->classInfo( nClassIdx ).value();
         QStringList sOptions    = sOptionData.split( ';' );

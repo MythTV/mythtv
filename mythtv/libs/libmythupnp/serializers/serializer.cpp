@@ -152,7 +152,10 @@ QString Serializer::ReadPropertyMetadata( const QObject *pObject,
 {
     const QMetaObject *pMeta = pObject->metaObject();
 
-    int nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8() );
+    int nIdx = -1;
+
+    if (pMeta)
+        nIdx = pMeta->indexOfClassInfo( sPropName.toUtf8());
 
     if (nIdx >=0)
     {

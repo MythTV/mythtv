@@ -1335,11 +1335,12 @@ void MythUIButtonList::CalculateButtonPositions(void)
                                     m_columns * m_columns;
             }
 
-
+            // Adjusted if last item is deleted
             if (((m_itemList.count() - m_topPosition)
                  < static_cast<int>(m_itemsVisible)) &&
                 (m_selPosition - (static_cast<int>(m_itemsVisible) - 1)
-                 < m_topPosition))
+                 < m_topPosition) &&
+                 m_columns == 1)
                 m_topPosition = m_selPosition -
                                 (static_cast<int>(m_itemsVisible) - 1);
 
