@@ -309,7 +309,7 @@ void MythUIFileBrowser::PathClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-        MFileInfo finfo = item->GetData().value<MFileInfo>();
+    MFileInfo finfo = item->GetData().value<MFileInfo>();
 
     if (finfo.isFile())
     {

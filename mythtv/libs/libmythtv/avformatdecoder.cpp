@@ -2997,14 +2997,22 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len, bool scte)
     if (len < 2+(3*cc_count))
         return;
 
+    DecodeCCx08(buf+2, cc_count*3, scte);
+}
+
+void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint len, bool scte)
+{
+    if (!len)
+        return;
+
     bool had_608 = false, had_708 = false;
-    for (uint cur = 0; cur < cc_count; cur++)
+    for (uint cur = 0; cur < len; cur += 3)
     {
-        uint cc_code  = buf[2+(cur*3)];
+        uint cc_code  = buf[cur];
         bool cc_valid = cc_code & 0x04;
 
-        uint data1    = buf[3+(cur*3)];
-        uint data2    = buf[4+(cur*3)];
+        uint data1    = buf[cur+1];
+        uint data2    = buf[cur+2];
         uint data     = (data2 << 8) | data1;
         uint cc_type  = cc_code & 0x03;
         uint field;
@@ -3676,6 +3684,14 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     // Decode CEA-608 and CEA-708 captions
     for (uint i = 0; i < cc_len; i += ((cc_buf[i] & 0x1f) * 3) + 2)
         DecodeDTVCC(cc_buf + i, cc_len - i, scte);
+
+    if (cc_len == 0) {
+        // look for A53 captions
+        AVFrameSideData *side_data = av_frame_get_side_data(mpa_pic, AV_FRAME_DATA_A53_CC);
+        if (side_data && (side_data->size > 0)) {
+            DecodeCCx08(side_data->data, side_data->size, false);
+        }
+    }
 
     VideoFrame *picframe = (VideoFrame *)(mpa_pic->opaque);
 

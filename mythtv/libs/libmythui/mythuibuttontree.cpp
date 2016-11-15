@@ -403,7 +403,7 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
     if (!item || !m_rootNode)
         return;
 
-        MythGenericTree *node = item->GetData().value<MythGenericTree *>();
+    MythGenericTree *node = item->GetData().value<MythGenericTree *>();
 
     if (node && node->getParent())
     {
@@ -554,7 +554,7 @@ void MythUIButtonTree::handleClick(MythUIButtonListItem *item)
     if (!item)
         return;
 
-        MythGenericTree *node = item->GetData().value<MythGenericTree *>();
+    MythGenericTree *node = item->GetData().value<MythGenericTree *>();
 
     if (DoSetCurrentNode(node))
         emit itemClicked(item);

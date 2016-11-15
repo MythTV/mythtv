@@ -1569,7 +1569,7 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
     if (!item)
         return;
 
-        ProgramRecPriorityInfo *pgRecInfo = item->GetData()
+    ProgramRecPriorityInfo *pgRecInfo = item->GetData()
                                   .value<ProgramRecPriorityInfo *>();
 
     if (!pgRecInfo)
