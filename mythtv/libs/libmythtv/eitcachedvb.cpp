@@ -182,21 +182,17 @@ EitCacheDVB::Event::Event(uint event_id,
     
 }
 
-bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
-                                 uint current_tsid,
-                                 bool &section_version_changed,
-                                 bool &table_version_change_complete)
+bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
 {
     // Single thread this function
     QMutexLocker lock(&tableLock);
     
+    bool table_version_change_complete = false;
+
     long long original_network_id = eit->OriginalNetworkID();
     uint transport_stream_id = eit->TSID();
     uint service_id = eit->ServiceID();
     uint table_id = eit->TableID();
-    bool section_handled = false;
-    section_version_changed = false;
-    table_version_change_complete = false;
     
     if (ncv_networks[UK_DTT_NETWORK] == original_network_id)
     {
@@ -242,14 +238,15 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             pfTables.insert(key, new_table);
         }
 
-        section_handled = pfTables[key].ProcessSection(eit, current_tsid, actual, events,
-                                        section_version_changed,
-                                        table_version_change_complete, key);
+        table_version_change_complete =
+                pfTables[key].ProcessSection(eit, actual, events, key);
     }
     else if (((table_id >= TableID::SC_EITbeg) &&
             (table_id <= TableID::SC_EITend)) ||
             ((table_id >= TableID::SC_EITbego) &&
-            (table_id <= TableID::SC_EITendo)))
+            (table_id <= TableID::SC_EITendo)) ||
+            ((table_id >= TableID::DN_EITbego) && // Dishnet and Bell range
+            (table_id <= TableID::DN_EITendo)))
     {
         if (!scheduleTables.contains(key))
         {
@@ -260,9 +257,8 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
             scheduleTables.insert(key, new_table);
         }
         
-        section_handled = scheduleTables[key].ProcessSection(eit, current_tsid, actual, events,
-                                        section_version_changed,
-                                        table_version_change_complete, key);
+        table_version_change_complete =
+                scheduleTables[key].ProcessSection(eit, actual, events,key);
     }
     else if (table_id == TableID::RST)
     {
@@ -270,21 +266,19 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit,
                 "The long lost running status table has finally been "
                 "found, send for the doctor. \"Doctor Who?\". \"Of "
                 "Course!\"."));
-        section_handled = true;
     }
 
-    return section_handled;
+    return table_version_change_complete;
 }
 
 bool EitCacheDVB::PfTable::ProcessSection(
                 const DVBEventInformationTable *eit,
-                uint current_tsid,
                 const bool actual,
                 Event::EventTable& events,
-                bool &section_version_changed,
-                bool &table_version_change_complete,
                 unsigned long long table_key)
 {
+    bool table_version_change_complete =false;;
+    bool section_version_changed = false;
     // Validate against ETSI EN 300 468 V1.15.1
     // and ETSI TS 101 211 V1.12.1
     
@@ -309,8 +303,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         "segment_last_section_number %8 "
                         "last_section_number %9 "
                         "event_count %10 "
-                        "actual %11 "
-                        "current_tsid %12")
+                        "actual %11 ")
                         .arg(original_network_id,0,16)
                         .arg(transport_stream_id,0,16)
                         .arg(service_id,0,16)
@@ -321,8 +314,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         .arg(segment_last_section_number)
                         .arg(last_section_number)
                         .arg(event_count)
-                        .arg(actual)
-                        .arg(current_tsid,0,16));
+                        .arg(actual));
 
         
     if ((section_number > 1) || (last_section_number > 1) ||
@@ -573,7 +565,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                         events,
                         table_key);
                         
-    return true;
+    return table_version_change_complete;
 }
 
 
@@ -660,13 +652,12 @@ void EitCacheDVB::ScheduleTable::InvalidateEverything()
 
 bool EitCacheDVB::ScheduleTable::ProcessSection(
                     const DVBEventInformationTable *eit,
-                    uint current_tsid,
                     const bool actual,
                     Event::EventTable& events,
-                    bool &section_version_changed,
-                    bool &table_version_change_complete,
                     unsigned long long table_key)
 {
+    bool table_version_change_complete;
+    bool section_version_changed = false;
     // Validate against ETSI EN 300 468 V1.15.1
     // and ETSI TS 101 211 V1.12.1
     
@@ -718,8 +709,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         "section_count %14 "
                         "section_index %15 "
                         "event_count %16 "
-                        "actual %17 "
-                        "current_tsid %18")
+                        "actual %17 ")
                         .arg(original_network_id,0,16)
                         .arg(transport_stream_id,0,16)
                         .arg(service_id,0,16)
@@ -736,8 +726,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                         .arg(incoming_section_count)
                         .arg(section_index)
                         .arg(event_count)
-                        .arg(actual)
-                        .arg(current_tsid,0,16));
+                        .arg(actual));
 
     if (table_id > last_table_id)
     {
@@ -1123,9 +1112,9 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                             .arg(event_count_changed ? QString("* %1")
                                 .arg(old_event_count) : ""));
 
-    table_version_change_complete = true;
     if (section_version_changed)
     {
+        table_version_change_complete = true;
         int i(-1), j(-1);
         if ((current_subtable.subtable_status == TableStatusEnum::UNINITIALISED)
                 || (current_subtable.subtable_version == TableBase::VERSION_UNINITIALISED)
@@ -1209,5 +1198,5 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
                 .arg(j));
     }
 
-    return true;
+    return table_version_change_complete;
 }

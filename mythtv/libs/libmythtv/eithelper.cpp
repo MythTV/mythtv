@@ -367,13 +367,13 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     EitCacheDVB& dvbEITCache = EitCacheDVB::GetInstance();
     bool section_version_changed;
     bool table_version_change_complete;
-    if (dvbEITCache.ProcessSection(eit, tsid, section_version_changed,
-                                   table_version_change_complete))
-        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB is suggesting"
-                                " incoming EIT section is processed"));
+    if (dvbEITCache.ProcessSection(eit))
+        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB - "
+                "Table version change complete"));
     else
-        // May need to modify this to handle dish stuff (DESC)
         return;
+
+/*
 
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||
@@ -645,7 +645,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             {
                 ContentDescriptor content(content_data);
                 category      = content.GetDescription(0);
-#if 0 /* there is no category_type in DVB EIT */
+#if 0 // there is no category_type in DVB EIT
                 category_type = content.GetMythCategory(0);
 #endif
             }
@@ -683,10 +683,10 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             }
         }
 
-        /* if we don't have a subtitle, try to parse one from private descriptors */
+        // if we don't have a subtitle, try to parse one from private descriptors
         if (subtitle.isEmpty()) {
             bool isUPC = false;
-            /* is this event carrying UPC private data? */
+            // is this event carrying UPC private data?
             desc_list_t private_data_specifiers = MPEGDescriptor::FindAll(list, DescriptorID::private_data_specifier);
             for (uint j = 0; j < private_data_specifiers.size(); j++) {
                 PrivateDataSpecifierDescriptor desc(private_data_specifiers[j]);
@@ -740,7 +740,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         // I have just got a complete new table for this channel
         // Iterate all the events in the myth eit cache and delete
         // ones that are not in the DVB cache.
-    }
+    }*/
 }
 
 // This function gets special EIT data from the German provider Premiere

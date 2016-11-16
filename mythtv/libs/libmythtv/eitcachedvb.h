@@ -33,10 +33,7 @@ public: // Methods
         return instance;
     }
     
-    bool ProcessSection(const DVBEventInformationTable *eit,
-                        uint current_tsid,
-                        bool &section_version_changed,
-                        bool &table_version_change_complete);
+    bool ProcessSection(const DVBEventInformationTable *eit);
     
 public: // Data
     // NONE
@@ -202,10 +199,7 @@ private: // Declarations
         }
         
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
-                            uint current_tsid,
                             const bool actual, Event::EventTable& events,
-                            bool &section_version_changed,
-                            bool &table_version_change_complete,
                             unsigned long long table_key) = 0;
 
         static const uint VERSION_UNINITIALISED = 32;
@@ -217,10 +211,7 @@ private: // Declarations
     struct ScheduleTable : public TableBase
     {
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
-                            uint current_tsid,
                             const bool actual, Event::EventTable& events,
-                            bool &section_version_changed,
-                            bool &table_version_change_complete,
                             unsigned long long table_key);
 
     private: // Methods
@@ -257,10 +248,7 @@ private: // Declarations
             {}
             
         virtual bool ProcessSection(const DVBEventInformationTable *eit,
-                            uint current_tsid,
                             const bool actual, Event::EventTable& events,
-                            bool &section_version_changed,
-                            bool &table_version_change_complete,
                             unsigned long long table_key);
 
     private: // Methods

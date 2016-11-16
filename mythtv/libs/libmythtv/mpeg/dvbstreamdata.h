@@ -105,19 +105,51 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         return *it;
     }
 
-    void SetVersionEIT(uint tableid, uint serviceid, int version, uint last_section)
+    void SetVersionEIT(uint original_network_id, uint transport_stream_id,
+                       uint serviceid, uint tableid,
+                       int version, uint last_section)
     {
-        if (VersionEIT(tableid, serviceid) == version)
+        if (VersionEIT(original_network_id, transport_stream_id,
+                       serviceid, tableid) == version)
             return;
-        uint key = (tableid << 16) | serviceid;
+        if (original_network_id == 0x233a)
+        {
+            // Convert United Kingdom DTT id to temporary temporary local range
+            uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+            if (mux_id > 0xb)
+                mux_id = 0;
+            if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+                mux_id = 0xc;
+            // Shift id to private temporary use range
+            original_network_id = 0xff01  + mux_id;
+        }
+        unsigned long long key =
+                (unsigned long long)(original_network_id) << 48 |
+                (unsigned long long)(transport_stream_id)  << 32 |
+                serviceid << 16 | tableid;
         _eit_version[key] = version;
         init_sections(_eit_section_seen[key], last_section);
     }
 
-    int VersionEIT(uint tableid, uint serviceid) const
+    int VersionEIT(uint original_network_id, uint transport_stream_id,
+                   uint serviceid, uint tableid) const
     {
-        uint key = (tableid << 16) | serviceid;
-        const QMap<uint, int>::const_iterator it = _eit_version.find(key);
+        if (original_network_id == 0x233a)
+        {
+            // Convert United Kingdom DTT id to temporary temporary local range
+            uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+            if (mux_id > 0xb)
+                mux_id = 0;
+            if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+                mux_id = 0xc;
+            // Shift id to private temporary use range
+            original_network_id = 0xff01  + mux_id;
+        }
+        unsigned long long key =
+                (unsigned long long)(original_network_id) << 48 |
+                (unsigned long long)(transport_stream_id)  << 32 |
+                serviceid << 16 | tableid;
+        const QMap<unsigned long long, int>::const_iterator it = _eit_version.find(key);
         if (it == _eit_version.end())
             return -1;
         return *it;
@@ -237,7 +269,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     QMap<uint, int>           _sdt_versions;
     sections_t                _nit_section_seen;
     sections_map_t            _sdt_section_seen;
-    QMap<uint, int>           _eit_version;
+    QMap<unsigned long long, int>  _eit_version;
     sections_map_t            _eit_section_seen;
     // Premiere private ContentInformationTable
     QMap<uint, int>           _cit_version;

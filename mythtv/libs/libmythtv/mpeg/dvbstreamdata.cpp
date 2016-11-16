@@ -122,10 +122,11 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     }
     if (is_eit)
     {
-        uint service_id = psip.TableIDExtension();
-        if (VersionEIT(table_id, service_id) != version)
+        DVBEventInformationTable eit(psip);
+        if (VersionEIT(eit.OriginalNetworkID(), eit.TSID(),
+                       eit.ServiceID(), eit.TableID()) != version)
             return false;
-        return EITSectionSeen(table_id, service_id, psip.Section());
+        return EITSectionSeen(eit.TableID(), eit.ServiceID(), psip.Section());
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -162,10 +163,11 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     }
     if (is_eit)
     {
-        uint service_id = psip.TableIDExtension();
-        if (VersionEIT(table_id, service_id) != version)
+        DVBEventInformationTable eit(psip);
+        if (VersionEIT(eit.OriginalNetworkID(), eit.TSID(),
+                       eit.ServiceID(), eit.TableID()) != version)
             return false;
-        return EITSectionSeen(table_id, service_id, psip.Section());
+        return EITSectionSeen(eit.TableID(), eit.ServiceID(), psip.Section());
     }
 
     if (((PREMIERE_EIT_DIREKT_PID == pid) || (PREMIERE_EIT_SPORT_PID == pid)) &&
@@ -395,11 +397,13 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if (!_dvb_eit_listeners.size() && !_eit_helper)
             return true;
 
-        uint service_id = psip.TableIDExtension();
-        SetVersionEIT(psip.TableID(), service_id, psip.Version(),  psip.LastSection());
-        SetEITSectionSeen(psip.TableID(), service_id, psip.Section());
-
         DVBEventInformationTable eit(psip);
+
+        SetVersionEIT(eit.OriginalNetworkID(), eit.TSID(),
+                      eit.ServiceID(), eit.TableID(),
+                      eit.Version(), eit.LastSection());
+        SetEITSectionSeen(eit.TableID(), eit.ServiceID(), psip.Section());
+
         for (uint i = 0; i < _dvb_eit_listeners.size(); i++)
             _dvb_eit_listeners[i]->HandleEIT(&eit);
 
