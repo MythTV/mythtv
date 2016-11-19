@@ -217,6 +217,7 @@ bool PBHEventHandler::event(QEvent *e)
                 QStringList &res = (ok) ? successes : failures;
 
                 res.push_back(QString::number(recordingID));
+                list.pop_front();
             }
             if (!successes.empty())
             {
