@@ -158,7 +158,7 @@ static const QStringList RSTNames(QStringList()
                                 
 EitCacheDVB::Event::Event(uint event_id,
                 time_t start_time,
-                time_t end_time,
+                time_t duration,
                 RunningStatusEnum running_status,
                 bool is_scrambled,
                 const QByteArray& descriptors,
@@ -166,7 +166,7 @@ EitCacheDVB::Event::Event(uint event_id,
                 unsigned long long table_key) :
                 event_id(event_id),
                 start_time(start_time),
-                end_time(end_time),
+                duration(duration),
                 running_status(running_status),
                 is_scrambled(is_scrambled),
                 descriptors(descriptors)
@@ -269,6 +269,22 @@ bool EitCacheDVB::ProcessSection(const DVBEventInformationTable *eit)
     }
 
     return table_version_change_complete;
+}
+
+EitCacheDVB::ScheduleTable& EitCacheDVB::GetScheduleTable(const DVBEventInformationTable *eit)
+{
+    // Single thread this function
+    QMutexLocker lock(&tableLock);
+
+    long long original_network_id = eit->OriginalNetworkID();
+    uint transport_stream_id = eit->TSID();
+    uint service_id = eit->ServiceID();
+    uint table_id = eit->TableID();
+
+    unsigned long long key = original_network_id << 32 |
+                    transport_stream_id  << 16 | service_id;
+
+    return scheduleTables[key];
 }
 
 bool EitCacheDVB::PfTable::ProcessSection(
@@ -488,7 +504,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
 
     uint  event_id = eit->EventID(0);
     time_t start_time = eit->StartTimeUnixUTC(0);
-    time_t end_time = eit->EndTimeUnixUTC(0);
+    time_t duration = eit->DurationInSeconds(0);
     RunningStatusEnum running_status = RunningStatusEnum(eit->RunningStatus(0));
     
     if ((pfEvent.event_status == TableStatusEnum::VALID)
@@ -518,7 +534,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
             "event_count %7 "
             "event_id %8 "
             "start_time %9%10 "
-            "end_time %11%12 "
+            "duration %11%12 "
             "running_status %13%14 "
             "is_scrambled %15 "
             "actual %16")
@@ -535,11 +551,10 @@ bool EitCacheDVB::PfTable::ProcessSection(
                     == TableStatusEnum::VALID)
                     && (start_time != pfEvent.event->start_time))
                     ? "*" : "")
-            .arg(QDateTime::fromTime_t(end_time)
-                .toString(Qt::SystemLocaleShortDate))
+            .arg(duration)
                 .arg(((pfEvent.event_status
                     == TableStatusEnum::VALID)
-                    && (end_time != pfEvent.event->end_time))
+                    && (duration != pfEvent.event->duration))
                     ? "*" : "")
             .arg(RSTNames[uint(running_status)]).arg(
                 ((pfEvent.event_status
@@ -557,7 +572,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
                             TableStatusEnum::EMPTY;
     pfEvent.event = new Event(event_id,
                         start_time,
-                        end_time,
+                        duration,
                         running_status,
                         is_scrambled,
                         QByteArray((const char*)(eit->Descriptors(0)),

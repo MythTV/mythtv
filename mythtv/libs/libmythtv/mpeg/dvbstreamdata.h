@@ -123,9 +123,9 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
             // Shift id to private temporary use range
             original_network_id = 0xff01  + mux_id;
         }
-        unsigned long long key =
-                (unsigned long long)(original_network_id) << 48 |
-                (unsigned long long)(transport_stream_id)  << 32 |
+        uint64_t key =
+                uint64_t(original_network_id) << 48 |
+                uint64_t(transport_stream_id)  << 32 |
                 serviceid << 16 | tableid;
         _eit_version[key] = version;
         init_sections(_eit_section_seen[key], last_section);
@@ -145,11 +145,11 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
             // Shift id to private temporary use range
             original_network_id = 0xff01  + mux_id;
         }
-        unsigned long long key =
-                (unsigned long long)(original_network_id) << 48 |
-                (unsigned long long)(transport_stream_id)  << 32 |
+        uint64_t key =
+                uint64_t(original_network_id) << 48 |
+                uint64_t(transport_stream_id)  << 32 |
                 serviceid << 16 | tableid;
-        const QMap<unsigned long long, int>::const_iterator it = _eit_version.find(key);
+        const QMap<uint64_t, int>::const_iterator it = _eit_version.find(key);
         if (it == _eit_version.end())
             return -1;
         return *it;
@@ -203,8 +203,13 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool SDToSectionSeen(uint tsid, uint section) const;
     bool HasAllSDToSections(uint tsid) const;
 
-    void SetEITSectionSeen(uint tableid, uint serviceid, uint section);
-    bool EITSectionSeen(uint tableid, uint serviceid, uint section) const;
+    void SetEITSectionSeen(uint original_network_id, uint transport_stream_id,
+                           uint serviceid, uint tableid, uint section,
+                           uint segment_last_section);
+    bool EITSectionSeen(uint original_network_id, uint transport_stream_id,
+                        uint serviceid, uint tableid, uint section) const;
+    bool HasAllEITSections(uint original_network_id, uint transport_stream_id,
+                           uint serviceid, uint tableid) const;
 
     void SetBATSectionSeen(uint bid, uint section);
     bool BATSectionSeen(uint bid, uint section) const;
@@ -269,8 +274,8 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     QMap<uint, int>           _sdt_versions;
     sections_t                _nit_section_seen;
     sections_map_t            _sdt_section_seen;
-    QMap<unsigned long long, int>  _eit_version;
-    sections_map_t            _eit_section_seen;
+    QMap<uint64_t, int>       _eit_version;
+    QMap<uint64_t, sections_t> _eit_section_seen;
     // Premiere private ContentInformationTable
     QMap<uint, int>           _cit_version;
     sections_map_t            _cit_section_seen;

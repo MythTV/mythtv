@@ -126,7 +126,9 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         if (VersionEIT(eit.OriginalNetworkID(), eit.TSID(),
                        eit.ServiceID(), eit.TableID()) != version)
             return false;
-        return EITSectionSeen(eit.TableID(), eit.ServiceID(), psip.Section());
+        return EITSectionSeen(eit.OriginalNetworkID(), eit.TSID(),
+                              eit.ServiceID(), eit.TableID(),
+                              eit.Section());
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -167,7 +169,9 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         if (VersionEIT(eit.OriginalNetworkID(), eit.TSID(),
                        eit.ServiceID(), eit.TableID()) != version)
             return false;
-        return EITSectionSeen(eit.TableID(), eit.ServiceID(), psip.Section());
+        return EITSectionSeen(eit.OriginalNetworkID(), eit.TSID(),
+                              eit.ServiceID(), eit.TableID(),
+                              eit.Section());
     }
 
     if (((PREMIERE_EIT_DIREKT_PID == pid) || (PREMIERE_EIT_SPORT_PID == pid)) &&
@@ -402,7 +406,9 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         SetVersionEIT(eit.OriginalNetworkID(), eit.TSID(),
                       eit.ServiceID(), eit.TableID(),
                       eit.Version(), eit.LastSection());
-        SetEITSectionSeen(eit.TableID(), eit.ServiceID(), psip.Section());
+        SetEITSectionSeen(eit.OriginalNetworkID(), eit.TSID(),
+                          eit.ServiceID(), eit.TableID(),
+                          eit.Section(), eit.SegmentLastSectionNumber());
 
         for (uint i = 0; i < _dvb_eit_listeners.size(); i++)
             _dvb_eit_listeners[i]->HandleEIT(&eit);
@@ -702,27 +708,60 @@ bool DVBStreamData::HasAllBATSections(uint bid) const
     return true;
 }
 
-void DVBStreamData::SetEITSectionSeen(uint tableid, uint serviceid,
-                                      uint section)
+void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_stream_id,
+                                      uint serviceid, uint tableid,
+                                      uint section, uint segment_last_section)
 {
-    uint key = (tableid<<16) | serviceid;
-    sections_map_t::iterator it = _eit_section_seen.find(key);
+    // Array of with bit masks with or 1 to 8 least significant bits cleared
+    static const unsigned char init_bits[8] =
+        { 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, };
+
+    uint64_t key =
+            uint64_t(original_network_id) << 48 |
+            uint64_t(transport_stream_id)  << 32 |
+            serviceid << 16 | tableid;
+
+    QMap<uint64_t, sections_t>::iterator it = _eit_section_seen.find(key);
     if (it == _eit_section_seen.end())
     {
         _eit_section_seen[key].resize(32, 0);
         it = _eit_section_seen.find(key);
     }
     (*it)[section>>3] |= bit_sel[section & 0x7];
+    (*it)[segment_last_section >> 3] |= init_bits[segment_last_section & 0x7];
 }
 
-bool DVBStreamData::EITSectionSeen(uint tableid, uint serviceid,
+bool DVBStreamData::EITSectionSeen(uint original_network_id, uint transport_stream_id,
+                                   uint serviceid, uint tableid,
                                    uint section) const
 {
-    uint key = (tableid<<16) | serviceid;
-    sections_map_t::const_iterator it = _eit_section_seen.find(key);
+    uint64_t key =
+            uint64_t(original_network_id) << 48 |
+            uint64_t(transport_stream_id)  << 32 |
+            serviceid << 16 | tableid;
+
+    QMap<uint64_t, sections_t>::const_iterator it = _eit_section_seen.find(key);
     if (it == _eit_section_seen.end())
         return false;
     return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+}
+
+bool DVBStreamData::HasAllEITSections(uint original_network_id, uint transport_stream_id,
+                                      uint serviceid, uint tableid) const
+{
+    uint64_t key =
+            uint64_t(original_network_id) << 48 |
+            uint64_t(transport_stream_id)  << 32 |
+            serviceid << 16 | tableid;
+
+    QMap<uint64_t, sections_t>::const_iterator it = _eit_section_seen.find(key);
+
+    if (it == _eit_section_seen.end())
+        return false;
+    for (uint i = 0; i < 32; i++)
+        if ((*it)[i] != 0xff)
+            return false;
+    return true;
 }
 
 void DVBStreamData::SetCITSectionSeen(uint contentid, uint section)

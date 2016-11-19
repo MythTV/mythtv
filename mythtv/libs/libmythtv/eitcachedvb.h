@@ -18,32 +18,6 @@ class DVBEventInformationTable;
 class EitCacheDVB
 {
 public: // Declarations
-        // NONE
-public: // Methods
-// Disable implicit copy semantics for this singleton class
-#if __cplusplus >= 201103L
-    EitCacheDVB(EitCacheDVB const&) = delete;
-        
-    void operator=(EitCacheDVB const&) = delete;
-#endif
-
-    static EitCacheDVB& GetInstance()
-    {
-        static EitCacheDVB instance;
-        return instance;
-    }
-    
-    bool ProcessSection(const DVBEventInformationTable *eit);
-    
-public: // Data
-    // NONE
-protected: // Declarations
-    // NONE
-protected: // Methods
-    // NONE
-protected: // Data
-    // NONE
-private: // Declarations
 #if __cplusplus >= 201103L
     typedef enum class RunningStatus
     {
@@ -70,7 +44,7 @@ private: // Declarations
             STARTS_IN_A_FEW_SECONDS = 2,
             PAUSING = 3,
             RUNNING = 4
-        };	
+        };
     };
     typedef RunningStatus::type RunningStatusEnum;
     
@@ -91,7 +65,7 @@ private: // Declarations
         // Default constructor
         Event() : event_id(0),
                     start_time(0),
-                    end_time(0),
+                    duration(0),
                     running_status
                         (EitCacheDVB::RunningStatusEnum::UNDEFINED),
                     is_scrambled(false) {}
@@ -100,7 +74,7 @@ private: // Declarations
         
         Event(uint event_id,
                 time_t start_time,
-                time_t end_time,
+                time_t duration,
                 RunningStatusEnum running_status,
                 bool is_scrambled,
                 const QByteArray& descriptors,
@@ -111,14 +85,14 @@ private: // Declarations
         {
             return (event_id == e2.event_id) &&
                     (start_time == e2.start_time) &&
-                    (end_time == e2.end_time) &&
+                    (duration == e2.duration) &&
                     (running_status == e2.running_status) &&
                     (is_scrambled == e2.is_scrambled);
         }
 
         uint event_id;
         time_t start_time;
-        time_t end_time;
+        time_t duration;
         RunningStatusEnum running_status;
         bool is_scrambled;
         QByteArray descriptors;
@@ -145,9 +119,9 @@ private: // Declarations
 
         TableStatusEnum section_status;
         uint section_version;
-        // TODO - check whether this QList can be handled
-        // by an implicit copy constructor
-        QList< QExplicitlySharedDataPointer<Event> > events;
+        typedef QExplicitlySharedDataPointer<Event> EventPointer;
+        typedef QList< EventPointer > Events;
+        Events events;
     };
     
     struct Segment
@@ -220,8 +194,8 @@ private: // Declarations
                 uint section_number,
                 bool actual);
         void InvalidateEverything();
-                
-    private: // Data
+
+    public:
         uint subtable_count;
         SubTable subtables[8];
     };
@@ -263,6 +237,36 @@ private: // Declarations
         EventWrapper following;
     };
     
+public: // Methods
+// Disable implicit copy semantics for this singleton class
+#if __cplusplus >= 201103L
+    EitCacheDVB(EitCacheDVB const&) = delete;
+
+    void operator=(EitCacheDVB const&) = delete;
+#endif
+
+    static EitCacheDVB& GetInstance()
+    {
+        static EitCacheDVB instance;
+        return instance;
+    }
+
+    bool ProcessSection(const DVBEventInformationTable *eit);
+
+    ScheduleTable& GetScheduleTable(const DVBEventInformationTable *eit);
+
+    QMutex* GetTableLock() { return &tableLock; }
+
+public: // Data
+    // NONE
+protected: // Declarations
+    // NONE
+protected: // Methods
+    // NONE
+protected: // Data
+    // NONE
+private: // Declarations
+
 private: // Methods
     EitCacheDVB() {};
 #if __cplusplus < 201103L
