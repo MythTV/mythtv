@@ -410,6 +410,10 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                           eit.ServiceID(), eit.TableID(),
                           eit.Section(), eit.SegmentLastSectionNumber());
 
+        // In the future I could pass this to the handlers
+        bool dummy = HasAllEITSections(eit.OriginalNetworkID(), eit.TSID(),
+                      eit.ServiceID(), eit.TableID());
+
         for (uint i = 0; i < _dvb_eit_listeners.size(); i++)
             _dvb_eit_listeners[i]->HandleEIT(&eit);
 
@@ -716,6 +720,18 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
     static const unsigned char init_bits[8] =
         { 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, };
 
+    if (original_network_id == 0x233a)
+    {
+        // Convert United Kingdom DTT id to temporary temporary local range
+        uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+        if (mux_id > 0xb)
+            mux_id = 0;
+        if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+            mux_id = 0xc;
+        // Shift id to private temporary use range
+        original_network_id = 0xff01  + mux_id;
+    }
+
     uint64_t key =
             uint64_t(original_network_id) << 48 |
             uint64_t(transport_stream_id)  << 32 |
@@ -740,6 +756,18 @@ bool DVBStreamData::EITSectionSeen(uint original_network_id, uint transport_stre
             uint64_t(transport_stream_id)  << 32 |
             serviceid << 16 | tableid;
 
+    if (original_network_id == 0x233a)
+    {
+        // Convert United Kingdom DTT id to temporary temporary local range
+        uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+        if (mux_id > 0xb)
+            mux_id = 0;
+        if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+            mux_id = 0xc;
+        // Shift id to private temporary use range
+        original_network_id = 0xff01  + mux_id;
+    }
+
     QMap<uint64_t, sections_t>::const_iterator it = _eit_section_seen.find(key);
     if (it == _eit_section_seen.end())
         return false;
@@ -753,6 +781,18 @@ bool DVBStreamData::HasAllEITSections(uint original_network_id, uint transport_s
             uint64_t(original_network_id) << 48 |
             uint64_t(transport_stream_id)  << 32 |
             serviceid << 16 | tableid;
+
+    if (original_network_id == 0x233a)
+    {
+        // Convert United Kingdom DTT id to temporary temporary local range
+        uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+        if (mux_id > 0xb)
+            mux_id = 0;
+        if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+            mux_id = 0xc;
+        // Shift id to private temporary use range
+        original_network_id = 0xff01  + mux_id;
+    }
 
     QMap<uint64_t, sections_t>::const_iterator it = _eit_section_seen.find(key);
 
