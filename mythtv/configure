@@ -2411,7 +2411,7 @@ MYTHTV_CONFIG_LIST='
     qtwebkit
     qtscript
     qtdbus
-    sdl
+    sdl2
     taglib
     v4l2
     v4l1
@@ -3738,7 +3738,7 @@ enable x11
 enable xrandr
 enable xv
 disable indevs
-disable sdl
+disable sdl2
 enable libfftw3
 enable taglib
 disable mythlogserver
@@ -8378,7 +8378,7 @@ echo "xvid                      ${libxvid-no}"
 echo "x264                      ${libx264-no}"
 echo "x265 (HEVC)               ${libx265-no}"
 echo "vpx                       ${libvpx-no}"
-echo "SDL                       ${sdl-no}"
+echo "SDL2                      ${sdl2-no}"
 echo ""
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h
