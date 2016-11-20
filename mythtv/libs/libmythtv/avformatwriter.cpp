@@ -24,6 +24,7 @@
 //#include "NuppelVideoRecorder.h"
 #include "avformatwriter.h"
 #include "audiooutpututil.h"
+#include "mythavutil.h"
 
 extern "C" {
 #if HAVE_BIGENDIAN
@@ -31,7 +32,6 @@ extern "C" {
 #endif
 #include "libavutil/opt.h"
 #include "libavutil/samplefmt.h"
-#include "libavutil/mem.h" // for av_free
 }
 
 #define LOC QString("AVFW(%1): ").arg(m_filename)
@@ -235,24 +235,10 @@ bool AVFormatWriter::NextFrameIsKeyFrame(void)
 
 int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
 {
-    //AVCodecContext *c = m_videoStream->codec;
-
-    uint8_t *planes[3];
-    unsigned char *buf = frame->buf;
     int framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
-    planes[0] = buf;
-    planes[1] = planes[0] + frame->width * frame->height;
-    planes[2] = planes[1] + (frame->width * frame->height) /
-        4; // (pictureFormat == AV_PIX_FMT_YUV422P ? 2 : 4);
-
     av_frame_unref(m_picture);
-    m_picture->data[0] = planes[0];
-    m_picture->data[1] = planes[1];
-    m_picture->data[2] = planes[2];
-    m_picture->linesize[0] = frame->width;
-    m_picture->linesize[1] = frame->width / 2;
-    m_picture->linesize[2] = frame->width / 2;
+    AVPictureFill(reinterpret_cast<AVPicture*>(m_picture), frame);
     m_picture->pts = framesEncoded + 1;
 
     if ((framesEncoded % m_keyFrameDist) == 0)
