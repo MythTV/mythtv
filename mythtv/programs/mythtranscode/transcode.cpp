@@ -40,6 +40,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 }
+#include "mythavutil.h"
 
 #include <unistd.h> // for unlink()
 
@@ -886,9 +887,9 @@ int Transcode::TranscodeFile(const QString &inputname,
     // we have to fudge the output size here.  nuvexport knows how to handle
     // this and as of right now it is the only app that uses the fifo ability.
     if (video_height == 1080)
-        vidSize = (1088 * video_width) * 3 / 2;
+        vidSize = buffersize(FMT_YV12, video_width, 1088);
     else
-        vidSize = (video_height * video_width) * 3 / 2;
+        vidSize = buffersize(FMT_YV12, video_width, video_height);
 
     VideoFrame frame;
     frame.codec = FMT_YV12;
@@ -1287,8 +1288,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 else
                 {
                     frame.buf = newFrame;
-                    avpicture_fill(&imageIn, lastDecode->buf, AV_PIX_FMT_YUV420P,
-                                   video_width, video_height);
+                    AVPictureFill(&imageIn, lastDecode);
                     avpicture_fill(&imageOut, frame.buf, AV_PIX_FMT_YUV420P,
                                    newWidth, newHeight);
 
@@ -1352,8 +1352,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             else
             {
                 frame.buf = newFrame;
-                avpicture_fill(&imageIn, lastDecode->buf, AV_PIX_FMT_YUV420P,
-                               video_width, video_height);
+                AVPictureFill(&imageIn, lastDecode);
                 avpicture_fill(&imageOut, frame.buf, AV_PIX_FMT_YUV420P,
                                newWidth, newHeight);
 
