@@ -367,6 +367,8 @@ int main(int argc, char *argv[])
         AudioTrackNo = cmdline.toInt("audiotrack");
     if (cmdline.toBool("passthru"))
         passthru = true;
+    // Set if we want to delete the original file once conversion succeeded.
+    bool deleteOriginal = cmdline.toBool("delete") || jobID >= 0;
 
     CleanupGuard callCleanup(cleanup);
 
@@ -732,7 +734,7 @@ int main(int argc, char *argv[])
         exitcode = result;
     }
 
-    if (!cmdline.toBool("hls"))
+    if (deleteOriginal)
         CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode, result);
 
     transcode->deleteLater();
