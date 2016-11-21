@@ -384,6 +384,8 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
     // base, the event names are listed in comments.
     m_settings["EventCmdRecPending"]           = // REC_PENDING
         tr("Recording pending");
+    m_settings["EventCmdRecPreFail"]           = // REC_PREFAIL
+        tr("Recording about to fail");
     m_settings["EventCmdRecFailing"]           = // REC_FAILING
         tr("Recording failing");
     m_settings["EventCmdRecStarted"]           = // REC_STARTED

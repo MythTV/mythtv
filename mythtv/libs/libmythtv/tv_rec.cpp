@@ -87,6 +87,7 @@ TVRec::TVRec(int _inputid)
       signalEventCmdSent(false),
       signalMonitorCheckCnt(0),
       reachedRecordingDeadline(false),
+      reachedPreFail(false),
       // Various threads
       eventThread(new MThread("TVRecEvent", this)),
       recorderThread(NULL),
@@ -3847,21 +3848,26 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                 SetFlags(kFlagWaitingForSignal, __FILE__, __LINE__);
                 if (curRecording)
                 {
-                    reachedRecordingDeadline = false;
+                    reachedRecordingDeadline = reachedPreFail = false;
                     // If startRecordingDeadline is passed, this
                     // recording is marked as failed, so the scheduler
                     // can try another showing.
                     startRecordingDeadline =
                         expire.addMSecs(genOpt.channel_timeout);
+                    preFailDeadline =
+                        expire.addMSecs(genOpt.channel_timeout * 2 / 3);
                     // Keep trying to record this showing (even if it
                     // has been marked as failed) until the scheduled
                     // end time.
                     signalMonitorDeadline =
                         curRecording->GetRecordingEndTime();
 
-                    LOG(VB_RECORD, LOG_DEBUG, LOC +
-                        QString("Start recording deadline: %1 "
-                                "Good signal deadline: %2")
+                    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                        QString("Pre-fail start deadline: %1 "
+                                "Start recording deadline: %2 "
+                                "Good signal deadline: %3")
+                        .arg(preFailDeadline.toLocalTime()
+                             .toString("hh:mm:ss.zzz"))
                         .arg(startRecordingDeadline.toLocalTime()
                              .toString("hh:mm:ss.zzz"))
                         .arg(signalMonitorDeadline.toLocalTime()
@@ -3916,26 +3922,27 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
     RecStatus::Type newRecStatus;
     bool keep_trying  = false;
+    QDateTime current_time = MythDate::current();
 
-    if ((signalMonitor->IsErrored() ||
-         MythDate::current() > signalEventCmdTimeout) &&
+    if ((signalMonitor->IsErrored() || current_time > signalEventCmdTimeout) &&
          !signalEventCmdSent)
     {
-        gCoreContext->SendSystemEvent(QString("TUNING_SIGNAL_TIMEOUT CARDID %1").arg(inputid));
-        signalEventCmdSent=true;
+        gCoreContext->SendSystemEvent(QString("TUNING_SIGNAL_TIMEOUT CARDID %1")
+                                      .arg(inputid));
+        signalEventCmdSent = true;
     }
 
     if (signalMonitor->IsAllGood())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Good signal");
-        if (curRecording && (MythDate::current() > startRecordingDeadline))
+        if (curRecording && (current_time > startRecordingDeadline))
         {
             newRecStatus = RecStatus::Failing;
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
 
             QString desc = tr("Good signal seen after %1 ms")
                            .arg(genOpt.channel_timeout +
-                        startRecordingDeadline.msecsTo(MythDate::current()));
+                        startRecordingDeadline.msecsTo(current_time));
             QString title = curRecording->GetTitle();
             if (!curRecording->GetSubtitle().isEmpty())
                 title += " - " + curRecording->GetSubtitle();
@@ -3959,8 +3966,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             newRecStatus = RecStatus::Recording;
         }
     }
-    else if (signalMonitor->IsErrored() ||
-             MythDate::current() > signalMonitorDeadline)
+    else if (signalMonitor->IsErrored() || current_time > signalMonitorDeadline)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "TuningSignalCheck: SignalMonitor " +
             (signalMonitor->IsErrored() ? "failed" : "timed out"));
@@ -3972,13 +3978,20 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         {
             scanner->StopActiveScan();
             ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-            eitScanStartTime = MythDate::current();
+            eitScanStartTime = current_time;
             eitScanStartTime = eitScanStartTime.addSecs(eitCrawlIdleStart +
                                   eit_start_rand(inputid, eitTransportTimeout));
         }
     }
+    else if (curRecording && !reachedPreFail && current_time > preFailDeadline)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "TuningSignalCheck: Hit pre-fail timeout");
+        SendMythSystemRecEvent("REC_PREFAIL", curRecording);
+        reachedPreFail = true;
+    }
     else if (curRecording && !reachedRecordingDeadline &&
-             MythDate::current() > startRecordingDeadline)
+             current_time > startRecordingDeadline)
     {
         newRecStatus = RecStatus::Failing;
         reachedRecordingDeadline = true;
