@@ -646,6 +646,11 @@ int Transcode::TranscodeFile(const QString &inputname,
             while (loop < options.size())
             {
                 QStringList tokens = options[loop].split("=");
+                if (tokens.length() < 2)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, invalid option settings.");
+                    return REENCODE_ERROR;
+                }
                 recorderOptionsMap[tokens[0]] = tokens[1];
 
                 loop++;
