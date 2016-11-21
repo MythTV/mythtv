@@ -10,6 +10,7 @@
 #define MythTV_mythavutil_h
 
 #include "mythtvexp.h" // for MUNUSED
+#include "mythframe.h"
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
@@ -78,7 +79,6 @@ private:
     AVFrame *m_frame;
 };
 
-typedef struct VideoFrame_ VideoFrame;
 class MythAVCopyPrivate;
 
 /**
@@ -126,6 +126,13 @@ private:
  */
 int MTV_PUBLIC AVPictureFill(AVPicture *pic, const VideoFrame *frame,
                              AVPixelFormat fmt = AV_PIX_FMT_NONE);
+
+/**
+ * Convert VideoFrameType into FFmpeg's PixelFormat equivalent and
+ * vice-versa.
+ */
+MTV_PUBLIC AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type);
+MTV_PUBLIC VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt);
 
 /**
  * MythPictureDeinterlacer

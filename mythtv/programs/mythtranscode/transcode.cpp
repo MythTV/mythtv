@@ -1140,8 +1140,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             AVPictureFill(&imageOut, &frame);
 
             scontext = sws_getCachedContext(scontext,
-                           lastDecode->width, lastDecode->height, AV_PIX_FMT_YUV420P,
-                           frame.width, frame.height, AV_PIX_FMT_YUV420P,
+                           lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
+                           frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
                            SWS_FAST_BILINEAR, NULL, NULL, NULL);
             // Typically, wee aren't rescaling per say, we're just correcting the stride set by the decoder.
             // However, it allows to properly handle recordings that see their resolution change half-way.
@@ -1347,14 +1347,14 @@ int Transcode::TranscodeFile(const QString &inputname,
                     AVPictureFill(&imageIn, lastDecode);
                     AVPictureFill(&imageOut, &frame);
 
-                    int bottomBand = (video_height == 1088) ? 8 : 0;
-                    scontext = sws_getCachedContext(scontext, video_width,
-                                   video_height, AV_PIX_FMT_YUV420P, newWidth,
-                                   newHeight, AV_PIX_FMT_YUV420P,
+                    int bottomBand = (lastDecode->height == 1088) ? 8 : 0;
+                    scontext = sws_getCachedContext(scontext,
+                                   lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
+                                   frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
                                    SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
                     sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
-                              video_height - bottomBand,
+                              lastDecode->height - bottomBand,
                               imageOut.data, imageOut.linesize);
                 }
 
@@ -1398,14 +1398,14 @@ int Transcode::TranscodeFile(const QString &inputname,
                 AVPictureFill(&imageIn, lastDecode);
                 AVPictureFill(&imageOut, &frame);
 
-                int bottomBand = (video_height == 1088) ? 8 : 0;
-                scontext = sws_getCachedContext(scontext, video_width,
-                               video_height, AV_PIX_FMT_YUV420P, newWidth,
-                               newHeight, AV_PIX_FMT_YUV420P,
+                int bottomBand = (lastDecode->height == 1088) ? 8 : 0;
+                scontext = sws_getCachedContext(scontext,
+                               lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
+                               frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
                                SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
                 sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
-                          video_height - bottomBand,
+                          lastDecode->height - bottomBand,
                           imageOut.data, imageOut.linesize);
             }
 
