@@ -34,7 +34,7 @@ using namespace std;
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                         frm_dir_map_t *deleteMap, int &exitCode,
-                        int resultCode);
+                        int resultCode, bool forceDelete);
 
 static int glbl_jobID = -1;
 static QString recorderOptions = "";
@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
     if (cmdline.toBool("passthru"))
         passthru = true;
     // Set if we want to delete the original file once conversion succeeded.
-    bool deleteOriginal = cmdline.toBool("delete") || jobID >= 0;
+    bool deleteOriginal = cmdline.toBool("delete");
 
     CleanupGuard callCleanup(cleanup);
 
@@ -734,8 +734,8 @@ int main(int argc, char *argv[])
         exitcode = result;
     }
 
-    if (deleteOriginal)
-        CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode, result);
+    if (deleteOriginal || jobID >= 0)
+        CompleteJob(jobID, pginfo, useCutlist, &deleteMap, exitcode, result, deleteOriginal);
 
     transcode->deleteLater();
 
@@ -860,7 +860,7 @@ static void WaitToDelete(ProgramInfo *pginfo)
 }
 
 static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
-                 frm_dir_map_t *deleteMap, int &exitCode, int resultCode)
+                 frm_dir_map_t *deleteMap, int &exitCode, int resultCode, bool forceDelete)
 {
     int status = JOB_UNKNOWN;
     if (jobID >= 0)
@@ -942,7 +942,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                     .arg(tmpfile).arg(newfile) + ENO);
         }
 
-        if (!gCoreContext->GetNumSetting("SaveTranscoding", 0))
+        if (!gCoreContext->GetNumSetting("SaveTranscoding", 0) || forceDelete)
         {
             int err;
             bool followLinks =
