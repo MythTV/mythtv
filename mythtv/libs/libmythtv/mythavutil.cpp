@@ -17,7 +17,7 @@ extern "C" {
 #include "libavfilter/buffersink.h"
 }
 
-static AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
+AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
 {
     switch (type)
     {
@@ -38,7 +38,7 @@ static AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
     }
 }
 
-static VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
+VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
 {
     switch (fmt)
     {
