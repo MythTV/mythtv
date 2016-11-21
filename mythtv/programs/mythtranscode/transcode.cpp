@@ -888,14 +888,18 @@ int Transcode::TranscodeFile(const QString &inputname,
 
     VideoFrame frame;
     memset(&frame, 0, sizeof(frame));
+    // Do not use padding when compressing to RTjpeg or when in fifomode.
+    // The RTjpeg compressor doesn't know how to handle strides different to
+    // video width.
+    bool nonAligned = vidsetting == "RTjpeg" || !fifodir.isEmpty(); 
     bool rescale =
         (video_width != newWidth) || (video_height != newHeight)
-        || !fifodir.isEmpty();
+        || nonAligned;
 
     if (rescale)
     {
         size_t newSize;
-        if (!fifodir.isEmpty())
+        if (nonAligned)
         {
             // Set a stride identical to actual width, to ease fifo post-conversion process.
             // 1080i/p video is actually 1088 because of the 16x16 blocks so
@@ -913,7 +917,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             // OOM
             return REENCODE_ERROR;
         }
-        if (!fifodir.isEmpty())
+        if (nonAligned)
         {
             // Set a stride identical to actual width, to ease fifo post-conversion process.
             init(&frame, FMT_YV12, newFrame, video_width, video_height, newSize, NULL, NULL, -1, -1, 0 /* aligned */);
