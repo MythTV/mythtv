@@ -105,6 +105,18 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         return *it;
     }
 
+    static uint GenerateUniqueUKOriginalNetworkID(uint transport_stream_id)
+    {
+        // Convert United Kingdom DTT id to temporary temporary local range
+        uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+        if (mux_id > 0xb)
+            mux_id = 0;
+        if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+            mux_id = 0xc;
+        // Shift id to private temporary use range
+        return 0xff01  + mux_id;
+    }
+
     void SetVersionEIT(uint original_network_id, uint transport_stream_id,
                        uint serviceid, uint tableid,
                        int version, uint last_section)
@@ -112,21 +124,15 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         if (VersionEIT(original_network_id, transport_stream_id,
                        serviceid, tableid) == version)
             return;
+
         if (original_network_id == 0x233a)
-        {
-            // Convert United Kingdom DTT id to temporary temporary local range
-            uint mux_id = (transport_stream_id & 0x3f000) >> 12;
-            if (mux_id > 0xb)
-                mux_id = 0;
-            if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
-                mux_id = 0xc;
-            // Shift id to private temporary use range
-            original_network_id = 0xff01  + mux_id;
-        }
+            original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+
         uint64_t key =
                 uint64_t(original_network_id) << 48 |
                 uint64_t(transport_stream_id)  << 32 |
                 serviceid << 16 | tableid;
+
         _eit_version[key] = version;
         init_sections(_eit_section_seen[key], last_section);
     }
@@ -135,20 +141,13 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
                    uint serviceid, uint tableid) const
     {
         if (original_network_id == 0x233a)
-        {
-            // Convert United Kingdom DTT id to temporary temporary local range
-            uint mux_id = (transport_stream_id & 0x3f000) >> 12;
-            if (mux_id > 0xb)
-                mux_id = 0;
-            if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
-                mux_id = 0xc;
-            // Shift id to private temporary use range
-            original_network_id = 0xff01  + mux_id;
-        }
+            original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+
         uint64_t key =
                 uint64_t(original_network_id) << 48 |
                 uint64_t(transport_stream_id)  << 32 |
                 serviceid << 16 | tableid;
+
         const QMap<uint64_t, int>::const_iterator it = _eit_version.find(key);
         if (it == _eit_version.end())
             return -1;
