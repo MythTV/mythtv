@@ -881,28 +881,43 @@ int Transcode::TranscodeFile(const QString &inputname,
         return REENCODE_ERROR;
     }
 
-    // 1080i/p video is actually 1088 because of the 16x16 blocks so
-    // we have to fudge the output size here.  nuvexport knows how to handle
-    // this and as of right now it is the only app that uses the fifo ability.
-    int vidSize =
-        buffersize(FMT_YV12, video_width, video_height == 1080 ? 1088 : video_height);
-
     VideoFrame frame;
     memset(&frame, 0, sizeof(frame));
     bool rescale =
-        ((video_width != newWidth) || (video_height != newHeight))
-        && fifodir.isEmpty();
+        (video_width != newWidth) || (video_height != newHeight)
+        || !fifodir.isEmpty();
 
     if (rescale)
     {
-        size_t newSize = buffersize(FMT_YV12, newWidth, newHeight);
+        size_t newSize;
+        if (!fifodir.isEmpty())
+        {
+            // Set a stride identical to actual width, to ease fifo post-conversion process.
+            // 1080i/p video is actually 1088 because of the 16x16 blocks so
+            // we have to fudge the output size here.  nuvexport knows how to handle
+            // this and as of right now it is the only app that uses the fifo ability.
+            newSize = buffersize(FMT_YV12, video_width, video_height == 1080 ? 1088 : video_height, 0 /* aligned */);
+        }
+        else
+        {
+            newSize = buffersize(FMT_YV12, newWidth, newHeight);
+        }
         unsigned char *newFrame = (unsigned char *)av_malloc(newSize);
         if (!newFrame)
         {
             // OOM
             return REENCODE_ERROR;
         }
-        init(&frame, FMT_YV12, newFrame, newWidth, newHeight, newSize);
+        if (!fifodir.isEmpty())
+        {
+            // Set a stride identical to actual width, to ease fifo post-conversion process.
+            init(&frame, FMT_YV12, newFrame, video_width, video_height, newSize, NULL, NULL, -1, -1, 0 /* aligned */);
+        }
+        else
+        {
+            // use default stride size.
+            init(&frame, FMT_YV12, newFrame, newWidth, newHeight, newSize);
+        }
     }
 
     if (!fifodir.isEmpty())
@@ -996,7 +1011,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_INFO, "Enforcing sync on fifos");
         fifow = new FIFOWriter(2, framecontrol);
 
-        if (!fifow->FIFOInit(0, QString("video"), vidfifo, vidSize, 50) ||
+        if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
             !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -1102,6 +1117,18 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (fifow)
         {
+            AVPictureFill(&imageIn, lastDecode);
+            AVPictureFill(&imageOut, &frame);
+
+            scontext = sws_getCachedContext(scontext,
+                           lastDecode->width, lastDecode->height, AV_PIX_FMT_YUV420P,
+                           frame.width, frame.height, AV_PIX_FMT_YUV420P,
+                           SWS_FAST_BILINEAR, NULL, NULL, NULL);
+            // Typically, wee aren't rescaling per say, we're just correcting the stride set by the decoder.
+            // However, it allows to properly handle recordings that see their resolution change half-way.
+            sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
+                      lastDecode->height, imageOut.data, imageOut.linesize);
+
             totalAudio += arb->GetSamples(frame.timecode);
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = frame.timecode - audbufTime;
@@ -1136,7 +1163,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     while (delta > vidFrameTime)
                     {
                         if (!cutter || !cutter->InhibitDummyFrame())
-                            fifow->FIFOWrite(0, lastDecode->buf, vidSize);
+                            fifow->FIFOWrite(0, frame.buf, frame.size);
 
                         count++;
                         delta -= (int)vidFrameTime;
@@ -1179,7 +1206,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (dropvideo < 0)
             {
                 if (cutter && cutter->InhibitDropFrame())
-                    fifow->FIFOWrite(0, lastDecode->buf, vidSize);
+                    fifow->FIFOWrite(0, frame.buf, frame.size);
 
                 LOG(VB_GENERAL, LOG_INFO, "Dropping video frame");
                 dropvideo++;
@@ -1188,12 +1215,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             else
             {
                 if (!cutter || !cutter->InhibitUseVideoFrame())
-                    fifow->FIFOWrite(0, lastDecode->buf, vidSize);
+                    fifow->FIFOWrite(0, frame.buf, frame.size);
 
                 if (dropvideo)
                 {
                     if (!cutter || !cutter->InhibitDummyFrame())
-                        fifow->FIFOWrite(0, lastDecode->buf, vidSize);
+                        fifow->FIFOWrite(0, frame.buf, frame.size);
 
                     curFrameNum++;
                     dropvideo--;
