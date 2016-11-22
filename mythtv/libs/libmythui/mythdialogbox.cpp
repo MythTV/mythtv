@@ -62,20 +62,24 @@ void MythMenu::Init()
 void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu, bool selected, bool checked)
 {
     MythMenuItem *item = new MythMenuItem(title, slot, checked, subMenu);
-
-    m_menuItems.append(item);
-
-    if (selected)
-        m_selectedItem = m_menuItems.indexOf(item);
-
-    if (subMenu)
-        subMenu->SetParent(this);
+    AddItem(item, selected, subMenu);
 }
 
 void MythMenu::AddItem(const QString &title, QVariant data, MythMenu *subMenu, bool selected, bool checked)
 {
     MythMenuItem *item = new MythMenuItem(title, data, checked, subMenu);
+    AddItem(item, selected, subMenu);
+}
 
+void MythMenu::AddItem(const QString &title, const MythUIButtonCallback &slot,
+                       MythMenu *subMenu, bool selected, bool checked)
+{
+    MythMenuItem *item = new MythMenuItem(title, slot, checked, subMenu);
+    AddItem(item, selected, subMenu);
+}
+
+void MythMenu::AddItem(MythMenuItem *item, bool selected, MythMenu *subMenu)
+{
     m_menuItems.append(item);
 
     if (selected)

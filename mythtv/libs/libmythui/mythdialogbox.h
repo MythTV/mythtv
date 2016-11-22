@@ -8,6 +8,8 @@
 
 #include "mythscreentype.h"
 #include "mythuitextedit.h"
+#include "mythmainwindow.h"
+#include "mythlogging.h"
 
 #include <functional>
 
@@ -92,10 +94,7 @@ class MUI_PUBLIC MythMenu
                  bool selected = false, bool checked = false);
     void AddItem(const QString &title, const MythUIButtonCallback &slot,
                  MythMenu *subMenu = NULL, bool selected = false,
-                 bool checked = false)
-    {
-        AddItem(title, QVariant::fromValue(slot), subMenu, selected, checked);
-    }
+                 bool checked = false);
 
     void SetSelectedByTitle(const QString &title);
     void SetSelectedByData(QVariant data);
@@ -106,6 +105,7 @@ class MUI_PUBLIC MythMenu
 
   private:
     void Init(void);
+    void AddItem(MythMenuItem *, bool selected, MythMenu *subMenu);
 
     MythMenu *m_parentMenu;
     QString   m_title;
@@ -424,6 +424,48 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
 
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
+template <typename Func>
+MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
+                                             Func slot, bool showCancel = false)
+{
+    QString                  LOC = "ShowOkPopup('" + message + "') - ";
+    MythConfirmationDialog  *pop;
+    MythScreenStack         *stk = NULL;
+
+    MythMainWindow *win = GetMythMainWindow();
+
+    if (win)
+        stk = win->GetStack("popup stack");
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
+        return NULL;
+    }
+
+    if (!stk)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
+                                       "Is there a MythThemeBase?");
+        return NULL;
+    }
+
+    pop = new MythConfirmationDialog(stk, message, showCancel);
+    if (pop->Create())
+    {
+        stk->AddScreen(pop);
+        if (parent)
+            QObject::connect(pop, &MythConfirmationDialog::haveResult, parent, slot,
+                             Qt::QueuedConnection);
+    }
+    else
+    {
+        delete pop;
+        pop = NULL;
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't Create() Dialog");
+    }
+
+    return pop;
+}
 
 Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
