@@ -22,7 +22,7 @@ extern "C" {
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
 SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
-    : m_complete(false), m_oc(NULL), m_stream(NULL), m_size(0)
+    : m_complete(false), m_oc(NULL), m_size(0)
 {
     memset(&m_buffer, 0, sizeof(m_buffer));
 
@@ -60,20 +60,33 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     m_oc->pb->seekable    = 0;
     m_oc->flags          |= AVFMT_NOFILE | AVFMT_FLAG_IGNIDX;
 
-    m_stream = avformat_new_stream(m_oc, NULL);
-    if (!m_stream)
+    const AVCodec *codec = avcodec_find_decoder(static_cast<AVCodecID>(codec_id));
+    if (!codec)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + "avcodec_find_decoder");
+        Destroy();
+        return;
+    }
+
+    AVStream *stream = avformat_new_stream(m_oc, NULL);
+    if (!stream)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "avformat_new_stream");
         Destroy();
         return;
     }
 
-    m_stream->id          = 1;
+    stream->id                    = 1;
+    stream->codecpar->codec_id    = codec->id;
+    stream->codecpar->codec_type  = codec->type;
+    stream->codecpar->sample_rate = 48000; // dummy rate, so codecpar initialization doesn't fail.
 
-    AVCodecContext *codec = m_stream->codec;
-
-    codec->codec_id       = (AVCodecID)codec_id;
-    avformat_write_header(m_oc, NULL);
+    if (avformat_write_header(m_oc, NULL) < 0)
+    {
+        LOG(VB_AUDIO, LOG_ERR, LOC + "avformat_write_header");
+        Destroy();
+        return;
+    }
 
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Creating %1 encoder (for %2)")
             .arg(muxer).arg(ff_codec_id_string((AVCodecID)codec_id)));
@@ -172,19 +185,13 @@ void SPDIFEncoder::Destroy()
         av_write_trailer(m_oc);
     }
 
-    if (m_stream)
-    {
-        delete[] m_stream->codec->extradata;
-        avcodec_close(m_stream->codec);
-        av_freep(&m_stream);
-    }
-
     if (m_oc )
     {
         if (m_oc->pb)
         {
             av_freep(&m_oc->pb);
         }
-        av_freep(&m_oc);
+        avformat_free_context(m_oc);
+        m_oc = nullptr;
     }
 }
