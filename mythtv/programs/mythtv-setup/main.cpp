@@ -100,9 +100,7 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     else if (sel == "video sources")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        StandardSettingDialog *ssd =
-            new StandardSettingDialog(mainStack, "videosourceeditor",
-                                      new VideoSourceEditor());
+        StandardSettingDialog *ssd = new VideoSourceDialog(mainStack);
 
         if (ssd->Create())
             mainStack->AddScreen(ssd);

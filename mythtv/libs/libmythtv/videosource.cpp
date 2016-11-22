@@ -691,6 +691,57 @@ VideoSource::VideoSource()
     addChild(new DVBNetID(*this, -1, -1));
 }
 
+VideoSourceDialog::VideoSourceDialog(MythScreenStack *parent) :
+    StandardSettingDialog(parent, "videosourceeditor", new VideoSourceEditor())
+{
+}
+
+void VideoSourceDialog::ShowDeleteSourceDialog(void)
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (!item)
+        return;
+
+    VideoSource *videosource = item->GetData().value<VideoSource*>();
+    if (!videosource)
+        return;
+
+    QString message = tr("Do you want to delete the '%1' video source?")
+        .arg(videosource->getSourceName());
+    ShowOkPopup(message, this,
+                [videosource, this](bool result)
+                {
+                    if (result)
+                        DeleteSource(videosource);
+                },
+                true);
+}
+
+void VideoSourceDialog::ShowMenu()
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (!item)
+        return;
+
+    VideoSource *videosource = item->GetData().value<VideoSource*>();
+    if (!videosource)
+        return;
+
+    MythMenu *menu = new MythMenu(tr("Video Source Menu"), this, "mainmenu");
+    menu->AddItem(tr("Delete"), SLOT(ShowDeleteSourceDialog()));
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
+                                                 "menudialog");
+    menuPopup->SetReturnEvent(this, "mainmenu");
+
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
+    else
+        delete menuPopup;
+}
+
 bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
                                          const QString &thecardtype)
 {
@@ -3834,24 +3885,11 @@ void VideoSourceEditor::DeleteAllSources(bool doDelete)
     emit settingsChanged(this);
 }
 
-/* TODO
-void VideoSourceEditor::del()
+void VideoSourceDialog::DeleteSource(VideoSource *videosource)
 {
-    DialogCode val = MythPopupBox::Show2ButtonPopup(
-        GetMythMainWindow(), "",
-        tr("Are you sure you want to delete "
-           "this video source?"),
-        tr("Yes, delete video source"),
-        tr("No, don't"),
-        kDialogCodeButton1);
-
-    if (kDialogCodeButton0 == val)
-    {
-        SourceUtil::DeleteSource(listbox->getValue().toUInt());
-        Load();
-    }
+    SourceUtil::DeleteSource(videosource->getSourceID());
+    GetGroupSettings()->removeChild(videosource);
 }
-*/
 
 void VideoSourceEditor::NewSource(void)
 {

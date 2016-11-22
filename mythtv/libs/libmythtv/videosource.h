@@ -223,7 +223,9 @@ public:
 };
 
 class VideoSource : public GroupSetting {
-public:
+    Q_OBJECT
+
+  public:
     VideoSource();
 
     int getSourceID(void) const { return id->intValue(); };
@@ -776,6 +778,21 @@ class MTV_PUBLIC CaptureCardEditor : public GroupSetting
     void DeleteAllCaptureCards(bool);
     void DeleteAllCaptureCardsOnHost(bool);
     void AddNewCard(void);
+};
+
+class MTV_PUBLIC VideoSourceDialog : public StandardSettingDialog
+{
+    Q_OBJECT
+
+    public:
+      VideoSourceDialog(MythScreenStack *parent);
+      void ShowMenu(void);
+
+    private slots:
+      void ShowDeleteSourceDialog(void);
+
+    private:
+      void DeleteSource(VideoSource *videosource);
 };
 
 class MTV_PUBLIC VideoSourceEditor : public GroupSetting
