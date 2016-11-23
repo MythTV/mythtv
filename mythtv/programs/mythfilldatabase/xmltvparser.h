@@ -17,6 +17,7 @@ class XMLTVParser
 {
   public:
     XMLTVParser();
+    void lateInit();
 
     ChannelInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
     ProgInfo *parseProgram(QDomElement &element);
@@ -25,6 +26,8 @@ class XMLTVParser
 
   private:
     unsigned int current_year;
+    QString _movieGrabberPath;
+    QString _tvGrabberPath;
 };
 
 #endif // _XMLTVPARSER_H_

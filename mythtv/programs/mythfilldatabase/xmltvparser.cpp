@@ -34,6 +34,12 @@ XMLTVParser::XMLTVParser() : current_year(0)
     current_year = MythDate::current().date().toString("yyyy").toUInt();
 }
 
+void XMLTVParser::lateInit()
+{
+    _movieGrabberPath = MetadataDownload::GetMovieGrabber();
+    _tvGrabberPath = MetadataDownload::GetTelevisionGrabber();
+}
+
 static uint ELFHash(const QByteArray &ba)
 {
     const uchar *k = (const uchar *)ba.data();
@@ -519,7 +525,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     }
                 }
                 else if ((info.attribute("system") == "themoviedb.org") &&
-                    (MetadataDownload::GetMovieGrabber().endsWith(QString("/tmdb3.py"))))
+                    (_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
                 {
                     /* text is movie/<inetref> */
                     QString inetrefRaw(getFirstText(info));
@@ -529,7 +535,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     }
                 }
                 else if ((info.attribute("system") == "thetvdb.com") &&
-                    (MetadataDownload::GetTelevisionGrabber().endsWith(QString("/ttvdb.py"))))
+                    (_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
                 {
                     /* text is series/<inetref> */
                     QString inetrefRaw(getFirstText(info));
