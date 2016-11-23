@@ -38,3 +38,4 @@ bin
 *.ipch
 .directory
 .vscode
+.qmake.stash
