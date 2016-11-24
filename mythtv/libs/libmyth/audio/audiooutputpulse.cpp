@@ -43,6 +43,7 @@ AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     // unecessary initialization to keep coverity happy
     memset(&sample_spec, 0, sizeof(sample_spec));
     memset(&channel_map, 0, sizeof(channel_map));
+    memset(&buffer_settings, 0, sizeof(buffer_settings));
 
     InitSettings(settings);
     if (settings.init)
