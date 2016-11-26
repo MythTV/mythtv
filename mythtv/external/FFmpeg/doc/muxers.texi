@@ -147,6 +147,11 @@ Place AAC sequence header based on audio stream data.
 
 @item no_sequence_end
 Disable sequence end tag.
+
+@item no_duration_filesize
+Disable duration and filesize in metadata when they are equal to zero
+at the end of stream. (Be used to non-seekable living stream).
+
 @end table
 @end table
 
