@@ -60,23 +60,11 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
         { _cvct_version[tsid] = version; }
     void SetVersionRRT(uint region, int version)
         { _rrt_version[region&0xff] = version; }
-    void SetVersionEIT(uint pid, uint atsc_source_id, int version)
-    {
-        if (VersionEIT(pid, atsc_source_id) == version)
-            return;
-        uint key = (pid<<16) | atsc_source_id;
-        _eit_version[key] = version;
-        _eit_section_seen[key].clear();
-        _eit_section_seen[key].resize(32, 0);
-    }
-    void SetEITSectionSeen(uint pid, uint atsc_source_id, uint section);
 
     int VersionMGT() const { return _mgt_version; }
     inline int VersionTVCT(uint tsid) const;
     inline int VersionCVCT(uint tsid) const;
     inline int VersionRRT(uint region) const;
-    inline int VersionEIT(uint pid, uint atsc_sourceid) const;
-    bool EITSectionSeen(uint pid, uint atsc_source_id, uint section) const;
 
     // Caching
     bool HasCachedMGT(bool current = true) const;
@@ -155,8 +143,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     QMap<uint, int> _tvct_version;
     QMap<uint, int> _cvct_version;
     QMap<uint, int> _rrt_version;
-    QMap<uint, int> _eit_version;
-    sections_map_t  _eit_section_seen;
+    TableStatusMap  _eit_status;
 
     // Caching
     mutable MasterGuideTable *_cached_mgt;
@@ -201,15 +188,6 @@ inline int ATSCStreamData::VersionRRT(uint region) const
 {
     const QMap<uint, int>::const_iterator it = _rrt_version.find(region&0xff);
     if (it == _rrt_version.end())
-        return -1;
-    return *it;
-}
-
-inline int ATSCStreamData::VersionEIT(uint pid, uint atsc_source_id) const
-{
-    uint key = (pid<<16) | atsc_source_id;
-    const QMap<uint, int>::const_iterator it = _eit_version.find(key);
-    if (it == _eit_version.end())
         return -1;
     return *it;
 }
