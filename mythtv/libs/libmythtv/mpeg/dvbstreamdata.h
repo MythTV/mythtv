@@ -80,21 +80,6 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         return 0xff01  + mux_id;
     }
 
-    void SetVersionEIT(uint original_network_id, uint transport_stream_id,
-                       uint serviceid, uint tableid,
-                       int version, uint last_section)
-    {
-        if (original_network_id == 0x233a)
-            original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
-
-        uint64_t key =
-                uint64_t(original_network_id) << 48 |
-                uint64_t(transport_stream_id)  << 32 |
-                serviceid << 16 | tableid;
-
-        _eit_status.SetVersion(key, version, last_section);
-    }
-
    // Sections seen
     bool HasAllNITSections(void) const;
 

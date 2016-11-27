@@ -175,7 +175,7 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
 
     _nit_status.SetVersion(-1,0);
     _sdt_status.clear();
-    //_eit_status.clear();
+    _eit_status.clear();
     _cit_status.clear();
 
     _nito_status.SetVersion(-1,0);
@@ -375,9 +375,10 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
         DVBEventInformationTable eit(psip);
 
-        SetVersionEIT(eit.OriginalNetworkID(), eit.TSID(),
+        SetEITSectionSeen(eit.OriginalNetworkID(), eit.TSID(),
                       eit.ServiceID(), eit.TableID(),
-                      eit.Version(), eit.LastSection());
+                      eit.Version(), eit.Section(),
+					  eit.SegmentLastSectionNumber(), eit.LastSection());
 
         // In the future I could pass this to the handlers
         if(HasAllEITSections(eit.OriginalNetworkID(), eit.TSID(),
@@ -603,7 +604,7 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
             uint64_t(original_network_id) << 48 |
             uint64_t(transport_stream_id)  << 32 |
             serviceid << 16 | tableid;
-    _eit_status.SetSectionSeen(key, version, section, segment_last_section, last_section);
+    _eit_status.SetSectionSeen(key, version, section, last_section, segment_last_section);
 
 }
 
