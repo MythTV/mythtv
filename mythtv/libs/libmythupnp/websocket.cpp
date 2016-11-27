@@ -148,6 +148,7 @@ WebSocketWorker::~WebSocketWorker()
 
     m_eventLoop->deleteLater();
     m_eventLoop = NULL;
+    delete m_heartBeat;
 }
 
 void WebSocketWorker::Exec()
