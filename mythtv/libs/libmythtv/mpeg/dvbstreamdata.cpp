@@ -384,14 +384,14 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if(HasAllEITSections(eit.OriginalNetworkID(), eit.TSID(),
                       eit.ServiceID(), eit.TableID()))
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString(
-                    "Table %1 complete subtable id 0x%2/0x%3/0x%4 version %5")
-                .arg(eit.TableID())
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString(
+                    "Subtable 0x%1/0x%2/0x%3/%4 complete version %5")
                 .arg(eit.OriginalNetworkID() == 0x233a ?
                         GenerateUniqueUKOriginalNetworkID(eit.TSID()) :
                         eit.OriginalNetworkID(),0,16)
                 .arg(eit.TSID(),0,16)
                 .arg(eit.ServiceID(),0,16)
+                .arg(eit.TableID())
                 .arg(eit.Version()));
         }
 
@@ -604,8 +604,82 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
             uint64_t(original_network_id) << 48 |
             uint64_t(transport_stream_id)  << 32 |
             serviceid << 16 | tableid;
+
+    TableStatusMap::const_iterator table_status = _eit_status.find(key);
+    if (table_status != _eit_status.end())
+    {
+		QString bitmap;
+		uint count = 1;
+		for (TableStatus::sections_t::const_iterator iTr
+					= table_status->m_sections.begin();
+				iTr != table_status->m_sections.end();
+				iTr++)
+		{
+			bitmap.append(QString("%1 ").arg(*iTr, 8, 2, QChar('0')));
+			if (!(count % 8))
+				bitmap.append(QString("\n"));
+			count++;
+		}
+
+		LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
+				"Subtable 0x%1/0x%2/0x%3/%4 version %5 section %6(%7/%8) "
+				"sls %9(%10/%11) ls %12(%13/%14) - old map\n"
+				"%15")
+			.arg(key >> 48, 0, 16)
+			.arg((key >> 32) & 0xffff, 0, 16)
+			.arg((key >> 16) & 0xffff, 0, 16)
+			.arg(key & 0xffff)
+			.arg(version)
+			.arg(section)
+			.arg(section >> 3)
+			.arg(section % 8)
+			.arg(segment_last_section)
+			.arg(segment_last_section >> 3)
+			.arg(segment_last_section % 8)
+			.arg(last_section)
+			.arg(last_section >> 3)
+			.arg(last_section % 8)
+			.arg(bitmap));
+    }
+
     _eit_status.SetSectionSeen(key, version, section, last_section, segment_last_section);
 
+    table_status = _eit_status.find(key);
+    if (table_status != _eit_status.end())
+    {
+		QString bitmap;
+		uint count = 1;
+		for (TableStatus::sections_t::const_iterator iTr
+					= table_status->m_sections.begin();
+				iTr != table_status->m_sections.end();
+				iTr++)
+		{
+			bitmap.append(QString("%1 ").arg(*iTr, 8, 2, QChar('0')));
+			if (!(count % 8))
+				bitmap.append(QString("\n"));
+			count++;
+		}
+
+		LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
+				"Subtable 0x%1/0x%2/0x%3/%4 version %5 section %6(%7/%8) "
+				"sls %9(%10/%11) ls %12(%13/%14) - new map\n"
+				"%15")
+			.arg(key >> 48, 0, 16)
+			.arg((key >> 32) & 0xffff, 0, 16)
+			.arg((key >> 16) & 0xffff, 0, 16)
+			.arg(key & 0xffff)
+			.arg(version)
+			.arg(section)
+			.arg(section >> 3)
+			.arg(section % 8)
+			.arg(segment_last_section)
+			.arg(segment_last_section >> 3)
+			.arg(segment_last_section % 8)
+			.arg(last_section)
+			.arg(last_section >> 3)
+			.arg(last_section % 8)
+			.arg(bitmap));
+    }
 }
 
 bool DVBStreamData::EITSectionSeen(uint original_network_id, uint transport_stream_id,

@@ -493,7 +493,7 @@ bool EitCacheDVB::PfTable::ProcessSection(
         table_version_change_complete = true;
 
     if (table_version_change_complete)
-        LOG(VB_EITDVBPF, LOG_INFO, LOC
+        LOG(VB_EITDVBPF, LOG_DEBUG, LOC
                 + QString("EIT_PF 0x%1/0x%2/0x%3/%4 "
                         "version change complete %5")
                 .arg(original_network_id,0,16)
@@ -1180,7 +1180,7 @@ bool EitCacheDVB::ScheduleTable::ProcessSection(
             }
         }
         if (table_version_change_complete)
-            LOG(VB_EITDVBSCH, LOG_INFO, LOC
+            LOG(VB_EITDVBSCH, LOG_DEBUG, LOC
                 + QString("EIT_SCH 0x%1/0x%2/0x%3/%4 "
                         "version change complete %5")
                 .arg(original_network_id,0,16)
