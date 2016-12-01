@@ -27,6 +27,7 @@
 #include "libavcodec/avfft.h"
 #include "libavutil/avassert.h"
 #include "libavutil/channel_layout.h"
+#include "libavutil/ffmath.h"
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
 #include "avfilter.h"
@@ -418,6 +419,8 @@ static int try_push_frame(AVFilterContext *ctx, int x)
                 }
 
                 ret = ff_filter_frame(outlink, out);
+                if (ret < 0)
+                    return ret;
             }
         }
     }

@@ -665,6 +665,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "dnxhd",
         .long_name = NULL_IF_CONFIG_SMALL("VC3/DNxHD"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .profiles  = NULL_IF_CONFIG_SMALL(ff_dnxhd_profiles),
     },
     {
         .id        = AV_CODEC_ID_THP,
@@ -887,7 +888,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .id        = AV_CODEC_ID_IFF_ILBM,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "iff_ilbm",
-        .long_name = NULL_IF_CONFIG_SMALL("IFF ILBM"),
+        .long_name = NULL_IF_CONFIG_SMALL("IFF ACBM/ANIM/DEEP/ILBM/PBM/RGB8/RGBN"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
@@ -945,6 +946,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "r10k",
         .long_name = NULL_IF_CONFIG_SMALL("AJA Kona 10-bit RGB Codec"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_M101,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "m101",
+        .long_name = NULL_IF_CONFIG_SMALL("Matrox Uncompressed SD"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
     {
@@ -1296,6 +1304,41 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("innoHeim/Rsupport Screen Capture Codec"),
         .props     = AV_CODEC_PROP_LOSSLESS,
     },
+    {
+        .id        = AV_CODEC_ID_MAGICYUV,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "magicyuv",
+        .long_name = NULL_IF_CONFIG_SMALL("MagicYUV video"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_TRUEMOTION2RT,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "truemotion2rt",
+        .long_name = NULL_IF_CONFIG_SMALL("Duck TrueMotion 2.0 Real Time"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_CFHD,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "cfhd",
+        .long_name = NULL_IF_CONFIG_SMALL("Cineform HD"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_SHEERVIDEO,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "sheervideo",
+        .long_name = NULL_IF_CONFIG_SMALL("BitJazz SheerVideo"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_YLC,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "ylc",
+        .long_name = NULL_IF_CONFIG_SMALL("YUY2 Lossless Codec"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
 
     /* image codecs */
     {
@@ -1521,13 +1564,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSLESS,
         .mime_types= MT("image/png"),
     },
-    {
-        .id        = AV_CODEC_ID_CFHD,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "cfhd",
-        .long_name = NULL_IF_CONFIG_SMALL("Cineform HD"),
-        .props     = AV_CODEC_PROP_LOSSY,
-    },
 
     /* various PCM "codecs" */
     {
@@ -1598,6 +1634,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "pcm_s32be",
         .long_name = NULL_IF_CONFIG_SMALL("PCM signed 32-bit big-endian"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_PCM_S64LE,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "pcm_s64le",
+        .long_name = NULL_IF_CONFIG_SMALL("PCM signed 64-bit little-endian"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_PCM_S64BE,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "pcm_s64be",
+        .long_name = NULL_IF_CONFIG_SMALL("PCM signed 64-bit big-endian"),
         .props     = AV_CODEC_PROP_LOSSLESS,
     },
     {
@@ -2020,6 +2070,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "adpcm_aica",
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM Yamaha AICA"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_DAT4,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_ima_dat4",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Eurocom DAT4"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
 
@@ -2662,6 +2719,20 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Xbox Media Audio 2"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_DST,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "dst",
+        .long_name = NULL_IF_CONFIG_SMALL("DST (Direct Stream Transfer)"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_MTAF,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_mtaf",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM MTAF"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* subtitle codecs */
     {
@@ -2904,6 +2975,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "bin_data",
         .long_name = NULL_IF_CONFIG_SMALL("binary data"),
         .mime_types= MT("application/octet-stream"),
+    },
+    {
+        .id        = AV_CODEC_ID_SCTE_35,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "scte_35",
+        .long_name = NULL_IF_CONFIG_SMALL("SCTE 35 Message Queue"),
     },
 
     /* deprecated codec ids */

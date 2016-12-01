@@ -175,7 +175,7 @@ fate-aac-pns-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.w
 fate-aac-pns-encode: CMP_SHIFT = -4096
 fate-aac-pns-encode: CMP_TARGET = 616
 fate-aac-pns-encode: SIZE_TOLERANCE = 3560
-fate-aac-pns-encode: FUZZ = 72
+fate-aac-pns-encode: FUZZ = 74
 
 FATE_AAC_ENCODE += fate-aac-tns-encode
 fate-aac-tns-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_tns 1 -aac_is 0 -aac_pns 0 -aac_ms 0 -b:a 128k -cutoff 22050  -fflags +bitexact -flags +bitexact
@@ -213,6 +213,17 @@ fate-aac-ltp-encode: CMP_TARGET = 1270
 fate-aac-ltp-encode: SIZE_TOLERANCE = 3560
 fate-aac-ltp-encode: FUZZ = 17
 
+#Ticket1784
+FATE_AAC_ENCODE += fate-aac-yoraw-encode
+fate-aac-yoraw-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/yo.raw-short.wav -c:a aac -fflags +bitexact -flags +bitexact
+fate-aac-yoraw-encode: CMP = stddev
+fate-aac-yoraw-encode: REF = $(SAMPLES)/audio-reference/yo.raw-short.wav
+fate-aac-yoraw-encode: CMP_SHIFT = -12288
+fate-aac-yoraw-encode: CMP_TARGET = 259
+fate-aac-yoraw-encode: SIZE_TOLERANCE = 3560
+fate-aac-yoraw-encode: FUZZ = 17
+
+
 FATE_AAC_ENCODE += fate-aac-pred-encode
 fate-aac-pred-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -profile:a aac_main -c:a aac -aac_is 0 -aac_pns 0 -aac_ms 0 -aac_tns 0 -b:a 128k -cutoff 22050
 fate-aac-pred-encode: CMP = stddev
@@ -230,6 +241,10 @@ FATE_AAC_LATM += fate-aac-latm_stereo_to_51
 fate-aac-latm_stereo_to_51: CMD = pcm -i $(TARGET_SAMPLES)/aac/latm_stereo_to_51.ts -channel_layout 5.1
 fate-aac-latm_stereo_to_51: REF = $(SAMPLES)/aac/latm_stereo_to_51_ref.s16
 
+fate-aac-autobsf-adtstoasc: CMD = md5 -i $(TARGET_SAMPLES)/audiomatch/tones_afconvert_16000_mono_aac_lc.adts -acodec copy -fflags +bitexact -f matroska
+fate-aac-autobsf-adtstoasc: CMP = oneline
+fate-aac-autobsf-adtstoasc: REF = 8c6fbebb64ebbe9e01b345d77844d7cd
+
 FATE_AAC-$(call      DEMDEC, AAC,    AAC)      += $(FATE_AAC_CT_RAW)
 FATE_AAC-$(call      DEMDEC, MOV,    AAC)      += $(FATE_AAC)
 FATE_AAC_LATM-$(call DEMDEC, MPEGTS, AAC_LATM) += $(FATE_AAC_LATM)
@@ -242,7 +257,9 @@ $(FATE_AAC_ALL): FUZZ = 2
 
 FATE_AAC_ENCODE-$(call ENCMUX, AAC, ADTS) += $(FATE_AAC_ENCODE)
 
-FATE_SAMPLES_FFMPEG += $(FATE_AAC_ALL) $(FATE_AAC_ENCODE-yes)
+FATE_AAC_BSF-$(call ALLYES, AAC_DEMUXER AAC_ADTSTOASC_BSF MATROSKA_MUXER) += fate-aac-autobsf-adtstoasc
 
-fate-aac: $(FATE_AAC_ALL) $(FATE_AAC_ENCODE)
+FATE_SAMPLES_FFMPEG += $(FATE_AAC_ALL) $(FATE_AAC_ENCODE-yes) $(FATE_AAC_BSF-yes)
+
+fate-aac: $(FATE_AAC_ALL) $(FATE_AAC_ENCODE) $(FATE_AAC_BSF-yes)
 fate-aac-latm: $(FATE_AAC_LATM-yes)

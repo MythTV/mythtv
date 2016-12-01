@@ -23,7 +23,9 @@
 #include "deletemap.h"
 #include "tvremoteutil.h"
 
+#if CONFIG_LIBMP3LAME
 #include "NuppelVideoRecorder.h"
+#endif
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "mythdbcon.h"
@@ -38,6 +40,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 }
+#include "mythavutil.h"
 
 #include <unistd.h> // for unlink()
 
@@ -69,8 +72,10 @@ Transcode::Transcode(ProgramInfo *pginfo) :
 
 Transcode::~Transcode()
 {
+#if CONFIG_LIBMP3LAME
     if (nvr)
         delete nvr;
+#endif
     SetPlayerContext(NULL);
     if (outRingBuffer)
         delete outRingBuffer;
@@ -164,6 +169,7 @@ void Transcode::SetPlayerContext(PlayerContext *player_ctx)
     ctx = player_ctx;
 }
 
+#if CONFIG_LIBMP3LAME
 static QString get_str_option(RecordingProfile *profile, const QString &name)
 {
     const Setting *setting = profile->byName(name);
@@ -200,6 +206,7 @@ static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
     NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)ptr;
     nvr->WriteText(buf, len, timecode, pagenr);
 }
+#endif // CONFIG_LIBMP3LAME
 
 int Transcode::TranscodeFile(const QString &inputname,
                              const QString &outputname,
@@ -242,14 +249,13 @@ int Transcode::TranscodeFile(const QString &inputname,
 
     if (!avfMode)
     {
+#if CONFIG_LIBMP3LAME
         nvr = new NuppelVideoRecorder(NULL, NULL);
-
-        if (!nvr)
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Transcoding aborted, error creating NuppelVideoRecorder.");
-            return REENCODE_ERROR;
-        }
+#else
+        LOG(VB_GENERAL, LOG_ERR,
+            "Not compiled with libmp3lame support");
+        return REENCODE_ERROR;
+#endif
     }
 
     // Input setup
@@ -489,22 +495,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 audioOnlyBitrate = hls->GetAudioOnlyBitrate();
 
                 avfw2 = new AVFormatWriter();
-
                 avfw2->SetContainer("mpegts");
-
-                if (!gCoreContext->GetSetting("HLSAUDIO").isEmpty())
-                    avfw2->SetAudioCodec(gCoreContext->GetSetting("HLSAUDIO"));
-                else
-#if CONFIG_LIBFAAC_ENCODER
-                avfw2->SetAudioCodec("libfaac");
-#else
-# if CONFIG_LIBMP3LAME_ENCODER
-                avfw2->SetAudioCodec("libmp3lame");
-# else
                 avfw2->SetAudioCodec("aac");
-# endif
-#endif
-
                 avfw2->SetAudioBitrate(audioOnlyBitrate);
                 avfw2->SetAudioChannels(arb->m_channels);
                 avfw2->SetAudioFrameRate(arb->m_eff_audiorate);
@@ -513,20 +505,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             avfw->SetContainer("mpegts");
             avfw->SetVideoCodec("libx264");
-
-            if (!gCoreContext->GetSetting("HLSAUDIO").isEmpty())
-                avfw->SetAudioCodec(gCoreContext->GetSetting("HLSAUDIO"));
-            else
-#if CONFIG_LIBFAAC_ENCODER
-                avfw->SetAudioCodec("libfaac");
-#else
-# if CONFIG_LIBMP3LAME_ENCODER
-                avfw->SetAudioCodec("libmp3lame");
-# else
-                avfw->SetAudioCodec("aac");
-# endif
-#endif
-
+            avfw->SetAudioCodec("aac");
             hls->UpdateStatus(kHLSStatusStarting);
             hls->UpdateStatusMessage("Transcoding Starting");
             hls->UpdateSizeInfo(newWidth, newHeight, video_width, video_height);
@@ -647,6 +626,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         GetPlayer()->SetVideoFilters(
             gCoreContext->GetSetting("HTTPLiveStreamFilters", "yadif=1:-1:1"));
     }
+#if CONFIG_LIBMP3LAME 
     else if (fifodir.isEmpty())
     {
         if (!GetProfile(profileName, encodingType, video_height,
@@ -666,6 +646,11 @@ int Transcode::TranscodeFile(const QString &inputname,
             while (loop < options.size())
             {
                 QStringList tokens = options[loop].split("=");
+                if (tokens.length() < 2)
+                {
+                    LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, invalid option settings.");
+                    return REENCODE_ERROR;
+                }
                 recorderOptionsMap[tokens[0]] = tokens[1];
 
                 loop++;
@@ -866,6 +851,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         copyvideo = true;
         LOG(VB_GENERAL, LOG_INFO, "Reencoding video in 'raw' mode");
     }
+#endif // CONFIG_LIBMP3LAME
 
     if (honorCutList && deleteMap.size() > 0)
     {
@@ -900,21 +886,48 @@ int Transcode::TranscodeFile(const QString &inputname,
         return REENCODE_ERROR;
     }
 
-    int vidSize = 0;
-
-    // 1080i/p video is actually 1088 because of the 16x16 blocks so
-    // we have to fudge the output size here.  nuvexport knows how to handle
-    // this and as of right now it is the only app that uses the fifo ability.
-    if (video_height == 1080)
-        vidSize = (1088 * video_width) * 3 / 2;
-    else
-        vidSize = (video_height * video_width) * 3 / 2;
-
     VideoFrame frame;
-    frame.codec = FMT_YV12;
-    frame.width = newWidth;
-    frame.height = newHeight;
-    frame.size = newWidth * newHeight * 3 / 2;
+    memset(&frame, 0, sizeof(frame));
+    // Do not use padding when compressing to RTjpeg or when in fifomode.
+    // The RTjpeg compressor doesn't know how to handle strides different to
+    // video width.
+    bool nonAligned = vidsetting == "RTjpeg" || !fifodir.isEmpty(); 
+    bool rescale =
+        (video_width != newWidth) || (video_height != newHeight)
+        || nonAligned;
+
+    if (rescale)
+    {
+        size_t newSize;
+        if (nonAligned)
+        {
+            // Set a stride identical to actual width, to ease fifo post-conversion process.
+            // 1080i/p video is actually 1088 because of the 16x16 blocks so
+            // we have to fudge the output size here.  nuvexport knows how to handle
+            // this and as of right now it is the only app that uses the fifo ability.
+            newSize = buffersize(FMT_YV12, video_width, video_height == 1080 ? 1088 : video_height, 0 /* aligned */);
+        }
+        else
+        {
+            newSize = buffersize(FMT_YV12, newWidth, newHeight);
+        }
+        unsigned char *newFrame = (unsigned char *)av_malloc(newSize);
+        if (!newFrame)
+        {
+            // OOM
+            return REENCODE_ERROR;
+        }
+        if (nonAligned)
+        {
+            // Set a stride identical to actual width, to ease fifo post-conversion process.
+            init(&frame, FMT_YV12, newFrame, video_width, video_height, newSize, NULL, NULL, -1, -1, 0 /* aligned */);
+        }
+        else
+        {
+            // use default stride size.
+            init(&frame, FMT_YV12, newFrame, newWidth, newHeight, newSize);
+        }
+    }
 
     if (!fifodir.isEmpty())
     {
@@ -991,6 +1004,10 @@ int Transcode::TranscodeFile(const QString &inputname,
             // the actual transcode, so stop here.
             unlink(outputname.toLocal8Bit().constData());
             SetPlayerContext(NULL);
+            if (rescale)
+            {
+                av_freep(&frame.buf);
+            }
             delete hls;
             return REENCODE_OK;
         }
@@ -1003,13 +1020,17 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_INFO, "Enforcing sync on fifos");
         fifow = new FIFOWriter(2, framecontrol);
 
-        if (!fifow->FIFOInit(0, QString("video"), vidfifo, vidSize, 50) ||
+        if (!fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
             !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "Error initializing fifo writer.  Aborting");
             unlink(outputname.toLocal8Bit().constData());
             SetPlayerContext(NULL);
+            if (rescale)
+            {
+                av_freep(&frame.buf);
+            }
             delete hls;
             return REENCODE_ERROR;
         }
@@ -1021,18 +1042,19 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_INFO, "Created fifos. Waiting for connection.");
     }
 
+#if CONFIG_LIBMP3LAME
     bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
+    bool writekeyframe = true;
+    long lastKeyFrame = 0;
+    int num_keyframes = 0;
+#endif
 
     frm_dir_map_t::iterator dm_iter;
-    bool writekeyframe = true;
-
-    int num_keyframes = 0;
 
     int did_ff = 0;
 
     long curFrameNum = 0;
     frame.frameNumber = 1;
-    long lastKeyFrame = 0;
     long totalAudio = 0;
     int dropvideo = 0;
     // timecode of the last read video frame in input time
@@ -1048,8 +1070,6 @@ int Transcode::TranscodeFile(const QString &inputname,
     VideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
-    unsigned char *newFrame = (unsigned char *)av_malloc(frame.size);
-    frame.buf = newFrame;
     AVPicture imageIn, imageOut;
     struct SwsContext  *scontext = NULL;
 
@@ -1106,7 +1126,18 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (fifow)
         {
-            frame.buf = lastDecode->buf;
+            AVPictureFill(&imageIn, lastDecode);
+            AVPictureFill(&imageOut, &frame);
+
+            scontext = sws_getCachedContext(scontext,
+                           lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
+                           frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
+                           SWS_FAST_BILINEAR, NULL, NULL, NULL);
+            // Typically, wee aren't rescaling per say, we're just correcting the stride set by the decoder.
+            // However, it allows to properly handle recordings that see their resolution change half-way.
+            sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
+                      lastDecode->height, imageOut.data, imageOut.linesize);
+
             totalAudio += arb->GetSamples(frame.timecode);
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = frame.timecode - audbufTime;
@@ -1141,7 +1172,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     while (delta > vidFrameTime)
                     {
                         if (!cutter || !cutter->InhibitDummyFrame())
-                            fifow->FIFOWrite(0, frame.buf, vidSize);
+                            fifow->FIFOWrite(0, frame.buf, frame.size);
 
                         count++;
                         delta -= (int)vidFrameTime;
@@ -1184,7 +1215,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (dropvideo < 0)
             {
                 if (cutter && cutter->InhibitDropFrame())
-                    fifow->FIFOWrite(0, frame.buf, vidSize);
+                    fifow->FIFOWrite(0, frame.buf, frame.size);
 
                 LOG(VB_GENERAL, LOG_INFO, "Dropping video frame");
                 dropvideo++;
@@ -1193,12 +1224,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             else
             {
                 if (!cutter || !cutter->InhibitUseVideoFrame())
-                    fifow->FIFOWrite(0, frame.buf, vidSize);
+                    fifow->FIFOWrite(0, frame.buf, frame.size);
 
                 if (dropvideo)
                 {
                     if (!cutter || !cutter->InhibitDummyFrame())
-                        fifow->FIFOWrite(0, frame.buf, vidSize);
+                        fifow->FIFOWrite(0, frame.buf, frame.size);
 
                     curFrameNum++;
                     dropvideo--;
@@ -1210,6 +1241,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
         else if (copyaudio)
         {
+#if CONFIG_LIBMP3LAME
             // Encoding from NuppelVideo to NuppelVideo with MP3 audio
             // So let's not decode/reencode audio
             if (!GetPlayer()->GetRawAudioState())
@@ -1219,7 +1251,10 @@ int Transcode::TranscodeFile(const QString &inputname,
                                          "is not in raw audio mode.");
 
                 unlink(outputname.toLocal8Bit().constData());
-                av_free(newFrame);
+                if (rescale)
+                {
+                    av_freep(&frame.buf);
+                }
                 SetPlayerContext(NULL);
                 if (videoBuffer)
                     videoBuffer->stop();
@@ -1298,32 +1333,30 @@ int Transcode::TranscodeFile(const QString &inputname,
                   writekeyframe = true;
                 }
 
-                if ((video_width == newWidth) && (video_height == newHeight))
+                if (rescale)
                 {
-                    frame.buf = lastDecode->buf;
-                }
-                else
-                {
-                    frame.buf = newFrame;
-                    avpicture_fill(&imageIn, lastDecode->buf, AV_PIX_FMT_YUV420P,
-                                   video_width, video_height);
-                    avpicture_fill(&imageOut, frame.buf, AV_PIX_FMT_YUV420P,
-                                   newWidth, newHeight);
+                    AVPictureFill(&imageIn, lastDecode);
+                    AVPictureFill(&imageOut, &frame);
 
-                    int bottomBand = (video_height == 1088) ? 8 : 0;
-                    scontext = sws_getCachedContext(scontext, video_width,
-                                   video_height, AV_PIX_FMT_YUV420P, newWidth,
-                                   newHeight, AV_PIX_FMT_YUV420P,
+                    int bottomBand = (lastDecode->height == 1088) ? 8 : 0;
+                    scontext = sws_getCachedContext(scontext,
+                                   lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
+                                   frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
                                    SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
                     sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
-                              video_height - bottomBand,
+                              lastDecode->height - bottomBand,
                               imageOut.data, imageOut.linesize);
                 }
 
-                nvr->WriteVideo(&frame, true, writekeyframe);
+                nvr->WriteVideo(rescale ? &frame : lastDecode, true, writekeyframe);
             }
             GetPlayer()->GetCC608Reader()->FlushTxtBuffers();
+#else
+        LOG(VB_GENERAL, LOG_ERR,
+            "Not compiled with libmp3lame support. Should never get here");
+        return REENCODE_ERROR;
+#endif // CONFIG_LIBMP3LAME
         }
         else
         {
@@ -1337,8 +1370,10 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (video_aspect != new_aspect)
             {
                 video_aspect = new_aspect;
+#if CONFIG_LIBMP3LAME
                 if (nvr)
                     nvr->SetNewVideoParams(video_aspect);
+#endif
             }
 
 
@@ -1356,26 +1391,19 @@ int Transcode::TranscodeFile(const QString &inputname,
                         .arg(newWidth).arg(newHeight));
             }
 
-            if ((video_width == newWidth) && (video_height == newHeight))
+            if (rescale)
             {
-                frame.buf = lastDecode->buf;
-            }
-            else
-            {
-                frame.buf = newFrame;
-                avpicture_fill(&imageIn, lastDecode->buf, AV_PIX_FMT_YUV420P,
-                               video_width, video_height);
-                avpicture_fill(&imageOut, frame.buf, AV_PIX_FMT_YUV420P,
-                               newWidth, newHeight);
+                AVPictureFill(&imageIn, lastDecode);
+                AVPictureFill(&imageOut, &frame);
 
-                int bottomBand = (video_height == 1088) ? 8 : 0;
-                scontext = sws_getCachedContext(scontext, video_width,
-                               video_height, AV_PIX_FMT_YUV420P, newWidth,
-                               newHeight, AV_PIX_FMT_YUV420P,
+                int bottomBand = (lastDecode->height == 1088) ? 8 : 0;
+                scontext = sws_getCachedContext(scontext,
+                               lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
+                               frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
                                SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
                 sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
-                          video_height - bottomBand,
+                          lastDecode->height - bottomBand,
                           imageOut.data, imageOut.linesize);
             }
 
@@ -1407,6 +1435,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                         ++audioFrame;
                     }
                 }
+#if CONFIG_LIBMP3LAME
                 else
                 {
                     nvr->SetOption("audioframesize", ab->size());
@@ -1418,7 +1447,10 @@ int Transcode::TranscodeFile(const QString &inputname,
                             "Transcode: Encountered irrecoverable error in "
                             "NVR::WriteAudio");
 
-                        av_free(newFrame);
+                        if (rescale)
+                        {
+                            av_freep(&frame.buf);
+                        }
                         SetPlayerContext(NULL);
                         if (videoBuffer)
                             videoBuffer->stop();
@@ -1427,14 +1459,20 @@ int Transcode::TranscodeFile(const QString &inputname,
                         return REENCODE_ERROR;
                     }
                 }
-
+#endif
                 delete ab;
             }
 
             if (!avfMode)
             {
+#if CONFIG_LIBMP3LAME
                 GetPlayer()->GetCC608Reader()->
                     TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));
+#else
+                LOG(VB_GENERAL, LOG_ERR,
+                    "Not compiled with libmp3lame support");
+                return REENCODE_ERROR;
+#endif
             }
             lasttimecode = frame.timecode;
             frame.timecode -= timecodeOffset;
@@ -1463,7 +1501,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                         hlsSegmentFrames = 0;
                     }
 
-                    if (avfw->WriteVideoFrame(&frame) > 0)
+                    if (avfw->WriteVideoFrame(rescale ? &frame : lastDecode) > 0)
                     {
                         lastWrittenTime = frame.timecode + timecodeOffset;
                         if (hls)
@@ -1472,14 +1510,16 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 }
             }
+#if CONFIG_LIBMP3LAME
             else
             {
                 if (forceKeyFrames)
-                    nvr->WriteVideo(&frame, true, true);
+                    nvr->WriteVideo(rescale ? &frame : lastDecode, true, true);
                 else
-                    nvr->WriteVideo(&frame);
+                    nvr->WriteVideo(rescale ? &frame : lastDecode);
                 lastWrittenTime = frame.timecode + timecodeOffset;
             }
+#endif
         }
         if (MythDate::current() > statustime)
         {
@@ -1508,7 +1548,10 @@ int Transcode::TranscodeFile(const QString &inputname,
                     "Transcoding aborted, cutlist updated");
 
                 unlink(outputname.toLocal8Bit().constData());
-                av_free(newFrame);
+                if (rescale)
+                {
+                    av_freep(&frame.buf);
+                }
                 SetPlayerContext(NULL);
                 if (videoBuffer)
                     videoBuffer->stop();
@@ -1523,7 +1566,10 @@ int Transcode::TranscodeFile(const QString &inputname,
                         "Transcoding STOPped by JobQueue");
 
                     unlink(outputname.toLocal8Bit().constData());
-                    av_free(newFrame);
+                    if (rescale)
+                    {
+                        av_freep(&frame.buf);
+                    }
                     SetPlayerContext(NULL);
                     if (videoBuffer)
                         videoBuffer->stop();
@@ -1584,12 +1630,14 @@ int Transcode::TranscodeFile(const QString &inputname,
             m_proginfo->ClearPositionMap(MARK_DURATION_MS);
         }
 
+#if CONFIG_LIBMP3LAME
         if (nvr)
         {
             nvr->WriteSeekTable();
             if (!kfa_table->empty())
                 nvr->WriteKeyFrameAdjustTable(*kfa_table);
         }
+#endif // CONFIG_LIBMP3LAME
     } else {
         fifow->FIFODrain();
     }
@@ -1624,7 +1672,10 @@ int Transcode::TranscodeFile(const QString &inputname,
         videoBuffer->stop();
     }
 
-    av_free(newFrame);
+    if (rescale)
+    {
+        av_freep(&frame.buf);
+    }
     SetPlayerContext(NULL);
 
     return REENCODE_OK;

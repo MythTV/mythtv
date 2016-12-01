@@ -109,7 +109,7 @@ FF_DISABLE_DEPRECATION_WARNINGS
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
-    return ffio_open_whitelist(pb, url, flags, &s->interrupt_callback, options, s->protocol_whitelist);
+    return ffio_open_whitelist(pb, url, flags, &s->interrupt_callback, options, s->protocol_whitelist, s->protocol_blacklist);
 }
 
 static void io_close_default(AVFormatContext *s, AVIOContext *pb)
@@ -143,6 +143,7 @@ AVFormatContext *avformat_alloc_context(void)
     }
     ic->internal->offset = AV_NOPTS_VALUE;
     ic->internal->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
+    ic->internal->shortest_end = AV_NOPTS_VALUE;
 
     return ic;
 }

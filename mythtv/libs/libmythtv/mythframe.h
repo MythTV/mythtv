@@ -305,7 +305,9 @@ static inline uint buffersize(VideoFrameType type, int width, int height,
     {
         adj_w = (width  + _aligned - 1) & ~(_aligned - 1);
     }
-    return (adj_w * height * bpp + 4/* to round up */) / bpb;
+    // Calculate rounding as necessary.
+    uint remainder = (adj_w * height * bpp) % bpb;
+    return (adj_w * height * bpp) / bpb + (remainder ? 1 : 0);
 }
 
 static inline void copybuffer(VideoFrame *dst, uint8_t *buffer,

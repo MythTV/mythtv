@@ -2036,6 +2036,22 @@ void ImportConfigurationGroup::probeCard(const QString &device)
     size->setValue(cs);
 }
 
+class HDHomeRunEITScan : public CheckBoxSetting, public CaptureCardDBStorage
+{
+  public:
+    HDHomeRunEITScan(const CaptureCard &parent) :
+        CheckBoxSetting(this),
+        CaptureCardDBStorage(this, parent, "dvb_eitscan")
+    {
+        setLabel(QObject::tr("Use HD HomeRun for active EIT scan"));
+        setValue(true);
+        setHelpText(
+            QObject::tr("If enabled, activate active scanning for "
+                        "program data (EIT). When this option is enabled "
+                        "the HD HomeRun is constantly in-use."));
+    };
+};
+
 class HDHomeRunExtra : public ConfigurationWizard
 {
   public:
@@ -2050,6 +2066,7 @@ HDHomeRunExtra::HDHomeRunExtra(HDHomeRunConfigurationGroup &parent)
 
     rec->addChild(new SignalTimeout(parent.parent, 1000, 250));
     rec->addChild(new ChannelTimeout(parent.parent, 3000, 1750));
+    rec->addChild(new HDHomeRunEITScan(parent.parent));
 
     addChild(rec);
 }
