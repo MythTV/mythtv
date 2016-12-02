@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2012
 
-#include "TableStatus.h"
+#include "tablestatus.h"
 
 #define BIT_SEL(x) (1 << (x))
 

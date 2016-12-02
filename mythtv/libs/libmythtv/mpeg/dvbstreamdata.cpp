@@ -384,7 +384,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if(HasAllEITSections(eit.OriginalNetworkID(), eit.TSID(),
                       eit.ServiceID(), eit.TableID()))
         {
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString(
+            LOG(VB_EIT, LOG_DEBUG, LOC + QString(
                     "Subtable 0x%1/0x%2/0x%3/%4 complete version %5")
                 .arg(eit.OriginalNetworkID() == 0x233a ?
                         GenerateUniqueUKOriginalNetworkID(eit.TSID()) :
@@ -621,7 +621,7 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
 			count++;
 		}
 
-		LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
+		LOG(VB_EIT, LOG_DEBUG, LOC + QString(
 				"Subtable 0x%1/0x%2/0x%3/%4 version %5 section %6(%7/%8) "
 				"sls %9(%10/%11) ls %12(%13/%14) - old map\n"
 				"%15")
@@ -660,7 +660,7 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
 			count++;
 		}
 
-		LOG(VB_EITDVBSCH, LOG_DEBUG, LOC + QString(
+		LOG(VB_EIT, LOG_DEBUG, LOC + QString(
 				"Subtable 0x%1/0x%2/0x%3/%4 version %5 section %6(%7/%8) "
 				"sls %9(%10/%11) ls %12(%13/%14) - new map\n"
 				"%15")

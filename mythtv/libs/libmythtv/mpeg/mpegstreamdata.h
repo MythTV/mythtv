@@ -18,7 +18,7 @@ using namespace std;
 #include "streamlisteners.h"
 #include "eitscanner.h"
 #include "mythtvexp.h"
-#include "TableStatus.h"
+#include "tablestatus.h"
 
 class EITHelper;
 class PSIPTable;

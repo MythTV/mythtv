@@ -5,7 +5,6 @@
 
 #include "mpegstreamdata.h"
 #include "mythtvexp.h"
-#include "TableStatus.h"
 
 typedef NetworkInformationTable* nit_ptr_t;
 typedef NetworkInformationTable const* nit_const_ptr_t;
