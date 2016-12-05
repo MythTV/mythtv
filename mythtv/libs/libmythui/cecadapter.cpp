@@ -214,16 +214,14 @@ class CECAdapterPriv
 
         LOG(VB_GENERAL, LOG_INFO, LOC + "Opened CEC device.");
 
-        // all good to go
-        valid = true;
-
         // turn on tv (if configured)
         powerOnTV = powerOnTVOnStart;
 
         // switch input (if configured)
         switchInput = true;
 
-        HandleActions();
+        // all good to go
+        valid = true;
 
         return true;
     }
@@ -1148,6 +1146,11 @@ CECAdapter::CECAdapter() : MThread("CECAdapter"), m_priv(new CECAdapterPriv)
 void CECAdapter::run()
 {
     RunProlog();
+    // Handle any actions at startup
+    // This is done outside the lock to handle initial setup -
+    // we know that nothing else can be calling us this early.
+    m_priv->HandleActions();
+
     while (IsValid()) {
         // Note that a lock is used because the QWaitCondition needs it
         // None of the other HandleActions callers need the lock because
