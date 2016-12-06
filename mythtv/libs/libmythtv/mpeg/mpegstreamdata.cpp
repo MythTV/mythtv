@@ -8,7 +8,7 @@ using namespace std;
 #include <sys/time.h> // for gettimeofday
 
 // Qt headers
-#include <QString>
+#include "qstring.h"
 
 // MythTV headers
 #include "mpegstreamdata.h"
@@ -177,17 +177,17 @@ void MPEGStreamData::Reset(int desiredProgram)
 
         pat_cache_t::iterator it1 = _cached_pats.begin();
         for (; it1 != _cached_pats.end(); ++it1)
-            DeleteCachedTable(*it1);
+            DeleteCachedTableSection(*it1);
         _cached_pats.clear();
 
         pmt_cache_t::iterator it2 = _cached_pmts.begin();
         for (; it2 != _cached_pmts.end(); ++it2)
-            DeleteCachedTable(*it2);
+            DeleteCachedTableSection(*it2);
         _cached_pmts.clear();
 
         cat_cache_t::iterator it3 = _cached_cats.begin();
         for (; it3 != _cached_cats.end(); ++it3)
-            DeleteCachedTable(*it3);
+            DeleteCachedTableSection(*it3);
         _cached_cats.clear();
     }
 
@@ -1471,7 +1471,7 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
         psip_refcnt_map_t::iterator it;
         it = _cached_slated_for_deletion.find(psip);
         if (it != _cached_slated_for_deletion.end())
-            DeleteCachedTable(const_cast<PSIPTable*>(psip));
+            DeleteCachedTableSection(const_cast<PSIPTable*>(psip));
     }
 }
 
@@ -1523,7 +1523,7 @@ void MPEGStreamData::IncrementRefCnt(const PSIPTable *psip) const
     _cached_ref_cnt[psip] = _cached_ref_cnt[psip] + 1;
 }
 
-bool MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool MPEGStreamData::DeleteCachedTableSection(PSIPTable *psip) const
 {
     if (!psip)
         return false;
@@ -1576,7 +1576,7 @@ void MPEGStreamData::CachePAT(const ProgramAssociationTable *_pat)
 
     pat_cache_t::iterator it = _cached_pats.find(key);
     if (it != _cached_pats.end())
-        DeleteCachedTable(*it);
+        DeleteCachedTableSection(*it);
 
     _cached_pats[key] = pat;
 }
@@ -1590,7 +1590,7 @@ void MPEGStreamData::CacheCAT(const ConditionalAccessTable *_cat)
 
     cat_cache_t::iterator it = _cached_cats.find(key);
     if (it != _cached_cats.end())
-        DeleteCachedTable(*it);
+        DeleteCachedTableSection(*it);
 
     _cached_cats[key] = cat;
 }
@@ -1604,7 +1604,7 @@ void MPEGStreamData::CachePMT(const ProgramMapTable *_pmt)
 
     pmt_cache_t::iterator it = _cached_pmts.find(key);
     if (it != _cached_pmts.end())
-        DeleteCachedTable(*it);
+        DeleteCachedTableSection(*it);
 
     _cached_pmts[key] = pmt;
 }

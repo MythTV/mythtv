@@ -11,7 +11,7 @@
 using namespace std;
 
 // Qt
-#include <QMap>
+#include "qmap.h"
 
 #include "tspacket.h"
 #include "mythtimer.h"
@@ -308,7 +308,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
     void CacheCAT(const ConditionalAccessTable *pat);
     void CachePMT(const ProgramMapTable *pmt);

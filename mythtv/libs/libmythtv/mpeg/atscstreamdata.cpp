@@ -134,17 +134,17 @@ void ATSCStreamData::Reset(int major, int minor)
     {
         QMutexLocker locker(&_cache_lock);
 
-        DeleteCachedTable(_cached_mgt);
+        DeleteCachedTableSection(_cached_mgt);
         _cached_mgt = NULL;
 
         tvct_cache_t::iterator tit = _cached_tvcts.begin();
         for (; tit != _cached_tvcts.end(); ++tit)
-            DeleteCachedTable(*tit);
+            DeleteCachedTableSection(*tit);
         _cached_tvcts.clear();
 
         cvct_cache_t::iterator cit = _cached_cvcts.begin();
         for (; cit != _cached_cvcts.end(); ++cit)
-            DeleteCachedTable(*cit);
+            DeleteCachedTableSection(*cit);
         _cached_cvcts.clear();
     }
 
@@ -838,7 +838,7 @@ void ATSCStreamData::CacheMGT(MasterGuideTable *mgt)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_mgt);
+    DeleteCachedTableSection(_cached_mgt);
     _cached_mgt = mgt;
 }
 
@@ -846,7 +846,7 @@ void ATSCStreamData::CacheTVCT(uint pid, TerrestrialVirtualChannelTable* tvct)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_tvcts[pid]);
+    DeleteCachedTableSection(_cached_tvcts[pid]);
     _cached_tvcts[pid] = tvct;
 }
 
@@ -854,11 +854,11 @@ void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_cvcts[pid]);
+    DeleteCachedTableSection(_cached_cvcts[pid]);
     _cached_cvcts[pid] = cvct;
 }
 
-bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool ATSCStreamData::DeleteCachedTableSection(PSIPTable *psip) const
 {
     if (!psip)
         return false;
@@ -889,7 +889,7 @@ bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
     }
     else
     {
-        return MPEGStreamData::DeleteCachedTable(psip);
+        return MPEGStreamData::DeleteCachedTableSection(psip);
     }
     psip_refcnt_map_t::iterator it;
     it = _cached_slated_for_deletion.find(psip);

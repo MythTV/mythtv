@@ -11,7 +11,7 @@
 using namespace std;
 
 // Qt
-#include <QMap>
+#include "qmap.h"
 
 class TableStatus
 {

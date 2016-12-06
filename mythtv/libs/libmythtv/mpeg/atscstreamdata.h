@@ -120,7 +120,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
     void CacheCVCT(uint pid, CableVirtualChannelTable*);
   protected:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
 
   private:
     uint                      _GPS_UTC_offset;

@@ -33,8 +33,8 @@ class MTV_PUBLIC ScanStreamData :
     void SetFreesatAdditionalSI(bool freesat_si);
 
   private:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
-    /// listen for addiotional Freesat service information
+    virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
+    /// listen for additional Freesat service information
     int dvb_uk_freesat_si;
     bool m_no_default_pid;
 };

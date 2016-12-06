@@ -3,24 +3,47 @@
 #ifndef DVBSTREAMDATA_H_
 #define DVBSTREAMDATA_H_
 
+/// \file dvbstreamdata.h
+
 #include "mpegstreamdata.h"
 #include "mythtvexp.h"
 
 typedef NetworkInformationTable* nit_ptr_t;
-typedef NetworkInformationTable const* nit_const_ptr_t;
-typedef vector<const NetworkInformationTable*>  nit_vec_t;
+typedef NetworkInformationTable const * nit_const_ptr_t;
+typedef vector<nit_const_ptr_t>  nit_vec_t;
 typedef QMap<uint, nit_ptr_t>    nit_cache_t; // section->sdts
 
 typedef ServiceDescriptionTable* sdt_ptr_t;
-typedef ServiceDescriptionTable const* sdt_const_ptr_t;
-typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
+typedef ServiceDescriptionTable const * sdt_const_ptr_t;
+typedef vector<sdt_const_ptr_t>  sdt_vec_t;
 typedef QMap<uint, sdt_ptr_t>    sdt_cache_t; // tsid+section->sdts
 typedef QMap<uint, sdt_vec_t>    sdt_map_t;   // tsid->sdts
 
-typedef EventInformationTable* eit_ptr_t;
-typedef EventInformationTable const* eit_const_ptr_t;
-typedef vector<const EventInformationTable*>  eit_vec_t;
-typedef QMap<uint64_t, eit_ptr_t>    eit_cache_t;
+///@{
+typedef DVBEventInformationTable* eit_ptr_t;
+typedef DVBEventInformationTable const * eit_const_ptr_t;
+typedef vector<eit_const_ptr_t>  eit_vec_t;
+///@}
+
+
+///@{
+/// EIT table sections are held in a cache that is indexed by
+/// section number within table ID within service ID within transport stream
+/// ID within original network ID.
+///
+typedef QMap<uint16_t, eit_ptr_t>
+		eit_sections_cache_t; 					///< Section level cache
+typedef QMap<uint16_t, eit_sections_cache_t>
+		eit_st_cache_t;							///< Table level cache
+typedef QMap<uint16_t,eit_st_cache_t>
+		eit_sts_cache_t;						///< Service level cache
+typedef QMap<uint16_t,eit_sts_cache_t>
+		eit_stss_cache_t;						///< Transport stream level cache
+typedef QMap<uint16_t,eit_stss_cache_t>
+		eit_stssn_cache_t;						///< Original network ID level cache
+///@}
+
+
 
 typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
 typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
@@ -28,6 +51,9 @@ typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
 
 typedef QMap<uint, bool>                 dvb_has_eit_t;
 
+/** \class DVBStreamData
+ *  \brief Methods for managing a DVB stream
+*/
 class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 {
   public:
@@ -47,7 +73,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     // Table processing
     bool HandleTables(uint pid, const PSIPTable&);
     bool IsRedundant(uint pid, const PSIPTable&) const;
-    void ProcessSDT(uint tsid, const ServiceDescriptionTable*);
+    void ProcessSDT(uint tsid, sdt_const_ptr_t);
 
     // NIT for broken providers
     inline void SetRealNetworkID(int);
@@ -67,6 +93,10 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         _sdt_status.SetVersion(tsid, version, last_section);
     }
 
+    /** \fn static uint GenerateUniqueUKOriginalNetworkID(uint transport_stream_id)
+     *  \brief Generates a unique original network ID in the locally allocated range
+     *  using the UK multiplex identifier extracted from the transport stream ID.
+     */
     static uint GenerateUniqueUKOriginalNetworkID(uint transport_stream_id)
     {
         // Convert United Kingdom DTT id to temporary temporary local range
@@ -103,18 +133,17 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     // Caching
     bool HasCachedAnyNIT(bool current = true) const;
     bool HasCachedAllNIT(bool current = true) const;
+    nit_const_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
+    nit_vec_t GetCachedNIT(bool current = true) const;
+
     bool HasCachedAnySDT(uint tsid, bool current = true) const;
     bool HasCachedAllSDT(uint tsid, bool current = true) const;
     bool HasCachedSDT(bool current = true) const;
-    bool HasCachedAnySDTs(bool current = true) const;
-    bool HasCachedAllSDTs(bool current = true) const;
-
-    nit_const_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
-    nit_vec_t GetCachedNIT(bool current = true) const;
     sdt_const_ptr_t GetCachedSDT(uint tsid, uint section_num,
                            bool current = true) const;
     sdt_vec_t GetCachedSDTs(bool current = true) const;
-
+    bool HasCachedAnySDTs(bool current = true) const;
+    bool HasCachedAllSDTs(bool current = true) const;
     void ReturnCachedSDTTables(sdt_vec_t&) const;
 
     void AddDVBMainListener(DVBMainStreamListener*);
@@ -127,10 +156,15 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
   private:
     // Caching
-    void CacheNIT(NetworkInformationTable*);
-    void CacheSDT(ServiceDescriptionTable*);
+    void CacheNIT(nit_ptr_t);
+    void CacheSDT(sdt_ptr_t);
+    void CacheEIT(eit_ptr_t);
+
   protected:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    /** \fn virtual bool DeleteCachedTableSection(PSIPTable *psip) const
+     *  \brief Deletes a table section or the whole table if it is not sectioned.
+     */
+   virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
 
   private:
     /// DVB table monitoring
@@ -159,14 +193,10 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     TableStatusMap            _bat_status;
     TableStatusMap            _eit_status;
 
-    //QMap<uint64_t, int>       _eit_version;
-    //QMap<uint64_t, sections_t> _eit_section_seen;
-    // Premiere private ContentInformationTable
-
     // Caching
     mutable nit_cache_t       _cached_nit;  // section -> sdt
     mutable sdt_cache_t       _cached_sdts; // tsid+section -> sdt
-    mutable eit_cache_t       _cached_eits;
+    mutable eit_stssn_cache_t _cached_eits;
 };
 
 inline void DVBStreamData::SetDishNetEIT(bool use_dishnet_eit)
