@@ -438,18 +438,20 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             	table.push_back(*i);
 
 
-            // and pass up to the EIT helper TODO
-
+            // and pass up to the EIT helper
+            // Temporary testing using old code
+            if (_eit_helper)
+            {
+                eit_vec_t::iterator i = table.begin();
+                for (; i != table.end(); ++i)
+                    _eit_helper->AddEIT(*i);
+            }
 
             // Delete the table sections from the cache
             eit_sections_cache_t::iterator j = sections.begin();
             for (; j != sections.end(); ++j)
                 DeleteCachedTableSection(*j);
         }
-
-
-        if (_eit_helper)
-            _eit_helper->AddEIT(&eit);
 
         return true;
     }
