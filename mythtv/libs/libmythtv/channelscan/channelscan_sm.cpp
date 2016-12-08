@@ -109,7 +109,7 @@ class ScannedChannelInfo
     tvct_vec_t        tvcts;
 
     // DVB
-    nit_vec_t         nits;
+    nit_const_vec_t   nits;
     sdt_map_t         sdts;
 };
 
@@ -824,7 +824,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         m_currentInfo->nits = sd->GetCachedNIT();
     }
 
-    sdt_vec_t sdttmp = sd->GetCachedSDTs();
+    sdt_const_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
     for (uint i = 0; i < sdttmp.size(); i++)
     {
@@ -918,7 +918,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         !m_currentInfo->nits.empty())
     {
         // append delivery system descriptos to scan list
-        nit_vec_t::const_iterator it = m_currentInfo->nits.begin();
+        nit_const_vec_t::const_iterator it = m_currentInfo->nits.begin();
         while (it != m_currentInfo->nits.end())
         {
             UpdateScanTransports(*it);
@@ -1288,7 +1288,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     sdt_map_t::const_iterator sdt_list_it = scan_info->sdts.begin();
     for (; sdt_list_it != scan_info->sdts.end(); ++sdt_list_it)
     {
-        sdt_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
+        sdt_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
         for (; sdt_it != (*sdt_list_it).end(); ++sdt_it)
         {
             for (uint i = 0; i < (*sdt_it)->ServiceCount(); i++)
@@ -1309,7 +1309,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         ChannelInsertInfo &info = *dbchan_it;
 
         // NIT
-        nit_vec_t::const_iterator nits_it = scan_info->nits.begin();
+        nit_const_vec_t::const_iterator nits_it = scan_info->nits.begin();
         for (; nits_it != scan_info->nits.end(); ++nits_it)
         {
             for (uint i = 0; i < (*nits_it)->TransportStreamCount(); i++)

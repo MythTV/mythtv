@@ -185,41 +185,84 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
     {
         _cache_lock.lock();
 
-        nit_cache_t::iterator nit = _cached_nit.begin();
-        for (; nit != _cached_nit.end(); ++nit)
+        nit_vec_t nit_sections;;
+        for (nit_cache_t::iterator nit = _cached_nit.begin();
+                nit != _cached_nit.end(); ++nit)
+            nit_sections.push_back(*nit);
+        for (nit_vec_t::iterator nit = nit_sections.begin();
+                nit != nit_sections.end(); ++nit)
             DeleteCachedTableSection(*nit);
-        _cached_nit.clear();
-
-        sdt_cache_t::iterator sit = _cached_sdts.begin();
-        for (; sit != _cached_sdts.end(); ++sit)
-            DeleteCachedTableSection(*sit);
-        _cached_sdts.clear();
-
-        eit_stssn_cache_t::iterator network = _cached_eits.begin();
-        for (; network != _cached_eits.end(); ++network)
+        if (!_cached_nit.empty())
         {
-            eit_stss_cache_t::iterator stream = (*network).begin();
-            for (; stream != (*network).end(); ++stream)
-            {
-                eit_sts_cache_t::iterator service = (*stream).begin();
-                for (; service != (*stream).end(); ++service)
-                {
-                    eit_st_cache_t::iterator table = (*service).begin();
-                    for (; table != (*service).end(); ++table)
-                    {
-                    	eit_sections_cache_t::iterator section = (*table).begin();
-                        for (; section != (*table).end(); ++section)
-                        	DeleteCachedTableSection(*section);
-                        (*table).clear();
-                    }
-                    (*service).clear();
-                }
-                (*stream).clear();
-            }
-            (*network).clear();
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString(
+                    "Nit section cache should be empty...clearing"));
+            _cached_nit.clear();
         }
 
-        _cached_eits.clear();
+        sdt_vec_t sdt_sections;;
+        for (sdt_cache_t::iterator sdt = _cached_sdts.begin();
+                sdt != _cached_sdts.end(); ++sdt)
+            sdt_sections.push_back(*sdt);
+
+        for (sdt_vec_t::iterator sdt = sdt_sections.begin();
+                sdt != sdt_sections.end(); ++sdt)
+            DeleteCachedTableSection(*sdt);
+        if (!_cached_nit.empty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString(
+                    "Nit section cache should be empty...clearing"));
+            _cached_sdts.clear();
+        }
+
+        for (eit_stssn_cache_t::iterator network = _cached_eits.begin();
+                network != _cached_eits.end(); ++network)
+        {
+            for (eit_stss_cache_t::iterator stream = (*network).begin();
+                    stream != (*network).end(); ++stream)
+            {
+                for (eit_sts_cache_t::iterator service = (*stream).begin();
+                        service != (*stream).end(); ++service)
+                {
+                    for (eit_st_cache_t::iterator table = (*service).begin(); table != (*service).end(); ++table)
+                    {
+                        for (eit_sections_cache_t::iterator section = (*table).begin();
+                                section != (*table).end(); ++section)
+                        	DeleteCachedTableSection(*section);
+                        if (!(*table).empty())
+                        {
+                            LOG(VB_GENERAL, LOG_ERR, LOC + QString(
+                                    "EIT table level cache should be empty...clearing"));
+                            (*table).clear();
+                        }
+                    }
+                    if (!(*service).empty())
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, LOC + QString(
+                                "EIT service level cache should be empty...clearing"));
+                        (*service).clear();
+                    }
+                }
+                if (!(*stream).empty())
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC + QString(
+                            "EIT stream level cache should be empty...clearing"));
+                    (*stream).clear();
+                }
+            }
+            if (!(*network).empty())
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString(
+                        "EIT network level cache should be empty...clearing"));
+                (*network).clear();
+            }
+        }
+
+        if (!_cached_eits.empty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString(
+                    "EIT top level cache should be empty...clearing"));
+            _cached_eits.clear();
+        }
 
         _cache_lock.unlock();
     }
@@ -399,32 +442,33 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if (!_dvb_eit_listeners.size() && !_eit_helper)
             return true;
 
-        DVBEventInformationTable eit(psip);
+        DVBEventInformationTable* eit = new DVBEventInformationTable(psip);
 
-        SetEITSectionSeen(eit.OriginalNetworkID(), eit.TSID(),
-                      eit.ServiceID(), eit.TableID(),
-                      eit.Version(), eit.Section(),
-					  eit.SegmentLastSectionNumber(), eit.LastSection());
+        SetEITSectionSeen(eit->OriginalNetworkID(), eit->TSID(),
+                      eit->ServiceID(), eit->TableID(),
+                      eit->Version(), eit->Section(),
+					  eit->SegmentLastSectionNumber(), eit->LastSection());
+        CacheEIT(eit);
 
         for (uint i = 0; i < _dvb_eit_listeners.size(); i++)
-            _dvb_eit_listeners[i]->HandleEIT(&eit);
+            _dvb_eit_listeners[i]->HandleEIT(eit);
 
-        if(HasAllEITSections(eit.OriginalNetworkID(), eit.TSID(),
-                      eit.ServiceID(), eit.TableID()))
+        if(HasAllEITSections(eit->OriginalNetworkID(), eit->TSID(),
+                      eit->ServiceID(), eit->TableID()))
         {
-        	uint onid = eit.OriginalNetworkID();
-        	uint tsid = eit.TSID();
-        	if (onid== 0x233a)
-        		onid = GenerateUniqueUKOriginalNetworkID(tsid);
-        	uint sid = eit.ServiceID();
-        	uint tid = eit.TableID();
-            LOG(VB_EIT, LOG_DEBUG, LOC + QString(
+            uint onid = eit->OriginalNetworkID();
+            uint tsid = eit->TSID();
+            if (onid== 0x233a)
+                onid = GenerateUniqueUKOriginalNetworkID(tsid);
+            uint sid = eit->ServiceID();
+            uint tid = eit->TableID();
+            LOG(VB_EITDVBCACHE, LOG_INFO, LOC + QString(
                     "Subtable 0x%1/0x%2/0x%3/%4 complete version %5")
                 .arg(onid,0,16)
                 .arg(tsid,0,16)
                 .arg(sid,0,16)
                 .arg(tid)
-                .arg(eit.Version()));
+                .arg(eit->Version()));
 
             // Complete table seen
             // Grab the cache lock
@@ -433,24 +477,20 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             // Build a vector of the cached table sections
             eit_vec_t table;
             eit_sections_cache_t& sections = _cached_eits[onid][tsid][sid][tid];
-            eit_sections_cache_t::const_iterator i = sections.constBegin();
-                        for (; i != sections.constEnd(); ++i)
+            for (eit_sections_cache_t::iterator i = sections.begin(); i != sections.end(); ++i)
             	table.push_back(*i);
-
 
             // and pass up to the EIT helper
             // Temporary testing using old code
             if (_eit_helper)
             {
-                eit_vec_t::iterator i = table.begin();
-                for (; i != table.end(); ++i)
+                for (eit_vec_t::iterator i = table.begin(); i != table.end(); ++i)
                     _eit_helper->AddEIT(*i);
             }
 
             // Delete the table sections from the cache
-            eit_sections_cache_t::iterator j = sections.begin();
-            for (; j != sections.end(); ++j)
-                DeleteCachedTableSection(*j);
+            for (eit_vec_t::iterator i = table.begin(); i != table.end(); ++i)
+                DeleteCachedTableSection(*i);
         }
 
         return true;
@@ -897,11 +937,11 @@ nit_const_ptr_t DVBStreamData::GetCachedNIT(
     return nit;
 }
 
-nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
+nit_const_vec_t DVBStreamData::GetCachedNIT(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
 
-    nit_vec_t nits;
+    nit_const_vec_t nits;
 
     for (uint i = 0; i < 256; i++)
     {
@@ -932,7 +972,7 @@ sdt_const_ptr_t DVBStreamData::GetCachedSDT(
     return sdt;
 }
 
-sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
+sdt_const_vec_t DVBStreamData::GetCachedSDTs(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
 
@@ -940,7 +980,7 @@ sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    sdt_vec_t sdts;
+    sdt_const_vec_t sdts;
 
     sdt_cache_t::const_iterator it = _cached_sdts.begin();
     for (; it != _cached_sdts.end(); ++it)
@@ -952,9 +992,9 @@ sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
     return sdts;
 }
 
-void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
+void DVBStreamData::ReturnCachedSDTTables(sdt_const_vec_t &sdts) const
 {
-    for (sdt_vec_t::iterator it = sdts.begin(); it != sdts.end(); ++it)
+    for (sdt_const_vec_t::iterator it = sdts.begin(); it != sdts.end(); ++it)
         ReturnCachedTable(*it);
     sdts.clear();
 }
@@ -1051,10 +1091,12 @@ void DVBStreamData::CacheSDT(sdt_ptr_t sdt)
 
 void DVBStreamData::CacheEIT(eit_ptr_t eit)
 {
-	uint onid = eit->OriginalNetworkID();
-	uint sec = eit->Section();
-	uint tsid = eit->TSID();
-
+    uint onid = eit->OriginalNetworkID();
+    uint tsid = eit->TSID();
+    uint sid = eit->ServiceID();
+    uint tid = eit->TableID();
+    uint sec = eit->Section();
+ 
     if (onid == 0x233a)
     	onid = GenerateUniqueUKOriginalNetworkID(tsid);
 
@@ -1062,8 +1104,8 @@ void DVBStreamData::CacheEIT(eit_ptr_t eit)
 
     eit_sections_cache_t& sections = _cached_eits[onid]
 												  [tsid]
-												   [eit->ServiceID()]
-												    [eit->TableID()];
+												   [sid]
+												    [tid];
 
     eit_sections_cache_t::iterator it = sections.find(sec);
 
@@ -1071,6 +1113,14 @@ void DVBStreamData::CacheEIT(eit_ptr_t eit)
         DeleteCachedTableSection(*it);
 
     sections[sec] = eit;
+    LOG(VB_EITDVBCACHE, LOG_DEBUG, LOC + QString(
+                        "Added eit cache entry 0x%1/0x%2/0x%3/0x%4/%5 count %6")
+                        .arg(onid,4,16)
+                        .arg(tsid,4,16)
+                        .arg(sid,4,16)
+                        .arg(tid,2,16)
+                        .arg(sec)
+                        .arg(sections.size()));
 }
 
 void DVBStreamData::AddDVBMainListener(DVBMainStreamListener *val)

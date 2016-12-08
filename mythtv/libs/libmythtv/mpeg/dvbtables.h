@@ -285,21 +285,9 @@ class MTV_PUBLIC SelectionInformationTable : public PSIPTable
 class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
 {
   public:
-    DVBEventInformationTable(const PSIPTable& table) : PSIPTable(table)
-    {
-    // table_id                 8   0.0       0xC7
-        assert(IsEIT(TableID()));
-    // section_syntax_indicator 1   1.0          1
-    // private_indicator        1   1.1          1
-    // reserved                 2   1.2          3
-    // section_length          12   1.4
-    // reserved                 2   5.0          3
-    // version_number           5   5.2
-    // current_next_indicator   1   5.7          1
-    // section_number           8   6.0
-    // last_section_number      8   7.0
-        Parse();
-    }
+    DVBEventInformationTable(const PSIPTable& table);
+
+    ~DVBEventInformationTable();
 
     // service_id              16   3.0
     uint ServiceID(void) const { return TableIDExtension(); }
