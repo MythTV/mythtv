@@ -754,6 +754,7 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 // We always redraw the whole scene.
 void MHIContext::RequireRedraw(const QRegion &)
 {
+    m_updated = false;
     m_display_lock.lock();
     ClearDisplay();
     m_display_lock.unlock();
