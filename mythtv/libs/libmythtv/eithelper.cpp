@@ -692,11 +692,11 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                                 .arg(eit->OriginalNetworkID(),0,16)
                                 .arg(eit->TSID(),0,16)
                                 .arg(eit->ServiceID(),0,16)
-                                .arg(eit->EventID(i),0.16)
+                                .arg(eit->EventID(i),0,16)
                                 .arg(starttime.toString(QString("yyyyMMdd'T'hhmmss")))
-                                .arg(duration_hours,2)
-                                .arg(duration_mins,2)
-                                .arg(duration_secs,2));
+                                .arg(duration_hours,2,10,' ')
+                                .arg(duration_mins,2,10,' ')
+                                .arg(duration_secs,2,10,' '));
 
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("DVB URL -- %1")
             .arg(etsiEventUrl));
