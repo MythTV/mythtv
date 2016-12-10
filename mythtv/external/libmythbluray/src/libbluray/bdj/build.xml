@@ -7,7 +7,7 @@
     <property name="build" location="build"/>
     <property name="dist"  location="../../.libs"/>
     <property name="src_awt" value=""/>
-    <property name="src_asm" value="../../asm/src/"/>
+    <property name="src_asm" value="../../../contrib/asm/src/"/>
     <property name="bootclasspath" value=""/>
     <property name="version" value=""/>
 
