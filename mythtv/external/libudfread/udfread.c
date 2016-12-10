@@ -283,7 +283,7 @@ static int _probe_volume(udfread_block_input *input)
             }
             if (!memcmp(buf, bea, sizeof(bea))) {
                 udf_trace("ECMA 167 Volume, BEA01\n");
-                bea_seen++;
+                bea_seen = 1;
             }
 
             if (bea_seen) {
@@ -771,15 +771,11 @@ static int _read_metadata_blocks(udfread *udf, uint8_t *buf,
     return tag_id;
 }
 
-static struct file_entry *_read_file_entry(udfread *udf,
-                                           const struct long_ad *icb)
+static uint8_t *_read_metadata(udfread *udf, const struct long_ad *icb, int *tag_id)
 {
-    struct file_entry *fe = NULL;
     uint32_t  num_blocks = (icb->length + UDF_BLOCK_SIZE - 1) / UDF_BLOCK_SIZE;
     uint8_t  *buf;
-    int       tag_id;
 
-    udf_trace("file entry size %u bytes\n", icb->length);
     if (num_blocks < 1) {
         return NULL;
     }
@@ -790,10 +786,28 @@ static struct file_entry *_read_file_entry(udfread *udf,
         return NULL;
     }
 
-    tag_id = _read_metadata_blocks(udf, buf, icb);
-    if (tag_id < 0) {
-        udf_error("reading file entry failed\n");
+    *tag_id = _read_metadata_blocks(udf, buf, icb);
+    if (*tag_id < 0) {
+        udf_log("reading icb blocks failed\n");
         free(buf);
+        return NULL;
+    }
+
+    return buf;
+}
+
+static struct file_entry *_read_file_entry(udfread *udf,
+                                           const struct long_ad *icb)
+{
+    struct file_entry *fe = NULL;
+    uint8_t  *buf;
+    int       tag_id;
+
+    udf_trace("file entry size %u bytes\n", icb->length);
+
+    buf = _read_metadata(udf, icb, &tag_id);
+    if (!buf) {
+        udf_error("reading file entry failed\n");
         return NULL;
     }
 
@@ -857,27 +871,17 @@ static int _parse_dir(const uint8_t *data, uint32_t length, struct udf_dir *dir)
 
 static struct udf_dir *_read_dir_file(udfread *udf, const struct long_ad *loc)
 {
-    uint32_t        num_blocks = (loc->length + UDF_BLOCK_SIZE - 1) / UDF_BLOCK_SIZE;
-    uint8_t        *data;
     struct udf_dir *dir = NULL;
-
-    if (num_blocks < 1) {
-        return NULL;
-    }
-
-    data = (uint8_t *)malloc(num_blocks * UDF_BLOCK_SIZE);
-    if (!data) {
-        udf_error("out of memory\n");
-        return NULL;
-    }
-
-    if (_read_metadata_blocks(udf, data, loc) < 0) {
-        udf_error("reading directory file failed\n");
-        free(data);
-        return NULL;
-    }
+    uint8_t        *data;
+    int             tag_id;
 
     udf_trace("directory size %u bytes\n", loc->length);
+
+    data = _read_metadata(udf, loc, &tag_id);
+    if (!data) {
+        udf_error("reading directory file failed\n");
+        return NULL;
+    }
 
     dir = (struct udf_dir *)calloc(1, sizeof(struct udf_dir));
     if (dir) {
@@ -1339,26 +1343,26 @@ void udfread_file_close(UDFFILE *p)
  * block access
  */
 
-uint32_t udfread_file_lba(UDFFILE *p, uint32_t file_block)
+static uint32_t _file_lba(UDFFILE *p, uint32_t file_block)
 {
     const struct file_entry *fe;
     unsigned int i;
     uint32_t     ad_size;
 
-    if (!p) {
-        return 0;
-    }
-
     fe = p->fe;
-    if (fe->content_inline) {
-        udf_error("can't map lba for inline file\n");
-        return 0;
-    }
 
     for (i = 0; i < fe->num_ad; i++) {
         const struct long_ad *ad = &fe->data.ad[0];
         ad_size = (ad[i].length + UDF_BLOCK_SIZE - 1) / UDF_BLOCK_SIZE;
         if (file_block < ad_size) {
+
+            if (ad[i].extent_type != ECMA_AD_EXTENT_NORMAL) {
+                if (ad[i].extent_type == ECMA_AD_EXTENT_AD) {
+                    udf_error("unsupported allocation desriptor: extent type %u\n", ad[i].extent_type);
+                }
+                return 0;
+            }
+
             if (!ad[i].lba) {
                 /* empty file / no allocated space */
                 return 0;
@@ -1376,21 +1380,59 @@ uint32_t udfread_file_lba(UDFFILE *p, uint32_t file_block)
     return 0;
 }
 
+static int _file_lba_exists(UDFFILE *p)
+{
+    if (!p) {
+        return 0;
+    }
+
+    if (p->fe->content_inline) {
+        udf_error("can't map lba for inline file\n");
+        return 0;
+    }
+
+    return 1;
+}
+
+uint32_t udfread_file_lba(UDFFILE *p, uint32_t file_block)
+{
+    if (!_file_lba_exists(p)) {
+        return 0;
+    }
+
+    return _file_lba(p, file_block);
+}
+
 uint32_t udfread_read_blocks(UDFFILE *p, void *buf, uint32_t file_block, uint32_t num_blocks, int flags)
 {
     uint32_t i;
 
-    if (!p || !num_blocks || !buf) {
+    if (!num_blocks || !buf) {
+        return 0;
+    }
+
+    if (!_file_lba_exists(p)) {
         return 0;
     }
 
     for (i = 0; i < num_blocks; i++) {
-        uint32_t lba = udfread_file_lba(p, file_block + i);
+        uint32_t lba = _file_lba(p, file_block + i);
         uint8_t *block = (uint8_t *)buf + UDF_BLOCK_SIZE * i;
+
         udf_trace("map block %u to lba %u\n", file_block + i, lba);
+
         if (!lba) {
+            /* unallocated/unwritten block or EOF */
+            uint32_t file_blocks = (udfread_file_size(p) + UDF_BLOCK_SIZE - 1) / UDF_BLOCK_SIZE;
+            if (file_block + i < file_blocks) {
+                udf_trace("zero-fill unallocated / unwritten block %u\n", file_block + i);
+                memset(block, 0, UDF_BLOCK_SIZE);
+                continue;
+            }
+            udf_error("block %u outside of file (size %u blocks)\n", file_block + i, file_blocks);
             break;
         }
+
         if (_read_blocks(p->udf->input, lba, block, 1, flags) != 1) {
             break;
         }
@@ -1405,20 +1447,20 @@ uint32_t udfread_read_blocks(UDFFILE *p, void *buf, uint32_t file_block, uint32_
 static ssize_t _read(UDFFILE *p, void *buf, size_t bytes)
 {
     /* start from middle of block ? */
-    int64_t pos_off = p->pos % UDF_BLOCK_SIZE;
+    size_t pos_off = p->pos % UDF_BLOCK_SIZE;
     if (pos_off) {
-        int64_t chunk_size = UDF_BLOCK_SIZE - pos_off;
+        size_t chunk_size = UDF_BLOCK_SIZE - pos_off;
         if (!p->block_valid) {
             if (udfread_read_blocks(p, p->block, p->pos / UDF_BLOCK_SIZE, 1, 0) != 1) {
                 return -1;
             }
             p->block_valid = 1;
         }
-        if (chunk_size > (int64_t)bytes) {
+        if (chunk_size > bytes) {
             chunk_size = bytes;
         }
         memcpy(buf, p->block + pos_off, chunk_size);
-        p->pos += chunk_size;
+        p->pos += (int64_t)chunk_size;
         return chunk_size;
     }
 
@@ -1478,7 +1520,7 @@ ssize_t udfread_file_read(UDFFILE *p, void *buf, size_t bytes)
 
     /* read chunks */
     while (bytes > 0) {
-        int64_t r = _read(p, bufpt, bytes);
+        ssize_t r = _read(p, bufpt, bytes);
         if (r < 0) {
             if (bufpt != buf) {
                 /* got some bytes */
@@ -1510,7 +1552,7 @@ int64_t udfread_file_seek(UDFFILE *p, int64_t pos, int whence)
                 pos += p->pos;
                 break;
             case UDF_SEEK_END:
-                pos = udfread_file_size(p) - pos;
+                pos = udfread_file_size(p) + pos;
                 break;
             case UDF_SEEK_SET:
             default:
