@@ -37,11 +37,18 @@
  */
 
 /* fixed-length dstring, ECMA 1/7.2.12 */
-static int _decode_dstring(const uint8_t *p, int field_length, uint8_t *str)
+static size_t _decode_dstring(const uint8_t *p, size_t field_length, uint8_t *str)
 {
-    int length = _get_u8(p + field_length - 1);
-    if (length > field_length - 1) {
-        length = field_length - 1;
+    size_t length;
+
+    if (field_length < 1) {
+        return 0;
+    }
+    field_length--;
+
+    length = _get_u8(p + field_length);
+    if (length > field_length) {
+        length = field_length;
     }
     memcpy(str, p, length);
     return length;
@@ -64,8 +71,6 @@ void decode_entity_id(const uint8_t *p, struct entity_id *eid)
 /*
  * Part 3: Volume Structure
  */
-
-#define AD_LENGTH_MASK    0x3fffffff
 
 /* Descriptor Tag (ECMA 167, 3/7.2) */
 enum tag_identifier decode_descriptor_tag(const uint8_t *buf)
@@ -122,6 +127,8 @@ void decode_partition(const uint8_t *p, struct partition_descriptor *pd)
 /* Logical Volume Descriptor (ECMA 167 3/10.6) */
 void decode_logical_volume(const uint8_t *p, struct logical_volume_descriptor *lvd)
 {
+    size_t map_size;
+
     lvd->block_size = _get_u32(p + 212);
 
     decode_entity_id(p + 216, &lvd->domain_id);
@@ -132,7 +139,7 @@ void decode_logical_volume(const uint8_t *p, struct logical_volume_descriptor *l
     lvd->num_partition_maps         = _get_u32(p + 268);
 
     /* XXX cut long maps */
-    uint32_t map_size = lvd->partition_map_lable_length;
+    map_size = lvd->partition_map_lable_length;
     if (map_size > sizeof(lvd->partition_map_table)) {
         map_size = sizeof(lvd->partition_map_table);
     }
@@ -153,7 +160,7 @@ void decode_file_set_descriptor(const uint8_t *p, struct file_set_descriptor *fs
 /* File Identifier (ECMA 167 4/14.4) */
 size_t decode_file_identifier(const uint8_t *p, struct file_identifier *fi)
 {
-    uint16_t       l_iu; /* length of implementation use field */
+    size_t l_iu; /* length of implementation use field */
 
     fi->characteristic = _get_u8(p + 18);
     fi->filename_len   = _get_u8(p + 19);
@@ -170,7 +177,7 @@ size_t decode_file_identifier(const uint8_t *p, struct file_identifier *fi)
      * padding size 4 * ip((L_FI+L_IU+38+3)/4) - (L_FI+L_IU+38)
      * => padded to dwords
      */
-    return 4 * ((38 + fi->filename_len + l_iu + 3) / 4);
+    return 4 * ((38 + (size_t)fi->filename_len + l_iu + 3) / 4);
 }
 
 /* ICB Tag (ECMA 167 4/14.6) */
@@ -188,10 +195,17 @@ static void _decode_icb_tag(const uint8_t *p, struct icb_tag *tag)
     tag->flags         = _get_u16(p + 18);
 }
 
+/* Allocation Descriptors */
+
+#define AD_LENGTH_MASK    0x3fffffff
+#define AD_TYPE(length)  ((length) >> 30)
+
 /* Short Allocation Descriptor (ECMA 167, 4/14.14.1) */
 static void _decode_short_ad(const uint8_t *buf, uint16_t partition, struct long_ad *ad)
 {
-    ad->length    = _get_u32(buf + 0) & AD_LENGTH_MASK;
+    uint32_t u32 = _get_u32(buf + 0);
+    ad->extent_type = AD_TYPE(u32);
+    ad->length    = u32 & AD_LENGTH_MASK;
     ad->lba       = _get_u32(buf + 4);
     ad->partition = partition;
 }
@@ -199,7 +213,9 @@ static void _decode_short_ad(const uint8_t *buf, uint16_t partition, struct long
 /* Long Allocation Descriptor (ECMA 167, 4/14.14.2) */
 void decode_long_ad(const uint8_t *buf, struct long_ad *ad)
 {
-    ad->length    = _get_u32(buf + 0) & AD_LENGTH_MASK;
+    uint32_t u32 = _get_u32(buf + 0);
+    ad->extent_type = AD_TYPE(u32);
+    ad->length    = u32 & AD_LENGTH_MASK;
     ad->lba       = _get_u32(buf + 4);
     ad->partition = _get_u16(buf + 8);
 }
@@ -207,7 +223,9 @@ void decode_long_ad(const uint8_t *buf, struct long_ad *ad)
 /* Exrtended Allocation Descriptor (ECMA 167, 4/14.14.3) */
 static void _decode_extended_ad(const uint8_t *buf, struct long_ad *ad)
 {
-    ad->length    = _get_u32(buf + 0) & AD_LENGTH_MASK;
+    uint32_t u32 = _get_u32(buf + 0);
+    ad->extent_type = AD_TYPE(u32);
+    ad->length    = u32 & AD_LENGTH_MASK;
     ad->lba       = _get_u32(buf + 12);
     ad->partition = _get_u16(buf + 16);
 }
@@ -242,7 +260,7 @@ static struct file_entry *_decode_file_entry(const uint8_t *p, size_t size,
 {
     struct file_entry *fe;
     struct icb_tag     tag;
-    int                num_ad;
+    uint32_t           num_ad;
     int                content_inline = 0;
 
     if (p_ad + l_ad > size) {
@@ -270,7 +288,7 @@ static struct file_entry *_decode_file_entry(const uint8_t *p, size_t size,
             return NULL;
     }
 
-    if (content_inline) {
+    if (num_ad < 1) {
         fe = (struct file_entry *)calloc(1, sizeof(struct file_entry) + l_ad);
     } else {
         fe = (struct file_entry *)calloc(1, sizeof(struct file_entry) + sizeof(struct long_ad) * (num_ad - 1));
