@@ -45,6 +45,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "v4l2util.h"
 #include "mythnotification.h"
+#include "mythterminal.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -630,9 +631,14 @@ void XMLTV_generic_config::Save()
 
 void XMLTV_generic_config::RunConfig(void)
 {
-    TerminalWizard *tw = new TerminalWizard(grabber, grabberArgs);
-    tw->exec(false, true);
-    delete tw;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythScreenType *ssd =
+        new MythTerminal(mainStack, grabber, grabberArgs);
+
+    if (ssd->Create())
+        mainStack->AddScreen(ssd);
+    else
+        delete ssd;
 }
 
 EITOnly_config::EITOnly_config(const VideoSource& _parent, StandardSetting *_setting)

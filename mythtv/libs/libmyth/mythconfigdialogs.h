@@ -80,16 +80,4 @@ class MPUBLIC ConfigurationWizard : public ConfigurationDialog
                                      const char *widgetName);
 };
 
-class MythTerminal;
-class MPUBLIC TerminalWizard : public ConfigurationWizard
-{
-  public:
-    TerminalWizard(QString program, QStringList args);
-
-    virtual DialogCode exec(bool saveOnExec = false, bool doLoad = false);
-
-  private:
-    MythTerminal *terminal;
-};
-
 #endif // MYTH_CONFIG_DIALOGS_H

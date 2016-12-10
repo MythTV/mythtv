@@ -11,17 +11,24 @@
 
 // MythTV headers
 #include "mythexp.h"
-#include "settings.h"
+#include "mythscreentype.h"
 
-class MythTerminalKeyFilter;
-class MPUBLIC MythTerminal : public TransListBoxSetting
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUITextEdit;
+
+class MPUBLIC MythTerminal : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    MythTerminal(QString program, QStringList arguments);
+    MythTerminal(MythScreenStack *stack, QString program,
+                 QStringList arguments);
     virtual void deleteLater(void)
-        { TeardownAll(); TransListBoxSetting::deleteLater(); }
+        { TeardownAll(); MythScreenType::deleteLater(); }
+    virtual void Init(void);
+    virtual bool Create(void);
 
   public slots:
     void Start(void);
@@ -31,32 +38,21 @@ class MPUBLIC MythTerminal : public TransListBoxSetting
 
   protected slots:
     void ProcessHasText(void); // connected to from process' readyRead signal
-    void ProcessSendKeyPress(QKeyEvent *e);
     void ProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
   protected:
     virtual ~MythTerminal() { TeardownAll(); }
     void TeardownAll(void);
 
-    mutable QMutex         lock;
-    bool                   running;
-    QProcess              *process;
-    QString                program;
-    QStringList            arguments;
-    QString                curLabel;
-    uint                   curValue;
-    MythTerminalKeyFilter *filter;
-};
-
-class MPUBLIC MythTerminalKeyFilter : public QObject
-{
-    Q_OBJECT
-
-  signals:
-    void KeyPressd(QKeyEvent *e);
-
-  protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    mutable QMutex         m_lock;
+    bool                   m_running;
+    QProcess              *m_process;
+    QString                m_program;
+    QStringList            m_arguments;
+    MythUIButtonListItem  *m_currentLine;
+    MythUIButtonList      *m_output;
+    MythUITextEdit        *m_textEdit;
+    MythUIButton          *m_enterButton;
 };
 
 #endif // MYTH_TERMINAL_H
