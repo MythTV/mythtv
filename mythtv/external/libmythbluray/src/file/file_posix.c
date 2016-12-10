@@ -48,7 +48,9 @@
 static void _file_close(BD_FILE_H *file)
 {
     if (file) {
-        close((int)(intptr_t)file->internal);
+        if (close((int)(intptr_t)file->internal)) {
+            BD_DEBUG(DBG_CRIT | DBG_FILE, "Error closing POSIX file (%p)\n", (void*)file);
+        }
 
         BD_DEBUG(DBG_FILE, "Closed POSIX file (%p)\n", (void*)file);
 
@@ -108,6 +110,13 @@ static int64_t _file_write(BD_FILE_H *file, const uint8_t *buf, int64_t size)
     ssize_t written, result;
 
     if (size <= 0 || size >= BD_MAX_SSIZE) {
+        if (size == 0) {
+            if (fsync((int)(intptr_t)file->internal)) {
+                BD_DEBUG(DBG_FILE, "fsync() failed (%p)\n", (void*)file);
+                return -1;
+            }
+            return 0;
+        }
         BD_DEBUG(DBG_FILE | DBG_CRIT, "Ignoring invalid write of size %"PRId64" (%p)\n", size, (void*)file);
         return 0;
     }

@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class InsufficientResourcesException extends DSMCCException {
-    public InsufficientResourcesException()
-    {
+    public InsufficientResourcesException() {
         super();
     }
 
-    public InsufficientResourcesException(String reason)
-    {
+    public InsufficientResourcesException(String reason) {
         super(reason);
     }
 

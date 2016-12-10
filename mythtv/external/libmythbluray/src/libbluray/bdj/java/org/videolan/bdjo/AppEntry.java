@@ -140,7 +140,8 @@ public class AppEntry implements AppAttributes {
     }
 
     public boolean isVisible() {
-        return ((visibility & VISIBLE_TO_USERS) != 0);
+        // Annex S
+        return false;
     }
 
     public boolean isDiscBound() {

@@ -29,8 +29,7 @@ import org.davic.media.NotAuthorizedException;
 import org.videolan.StreamInfo;
 
 public abstract class StreamControl implements Control {
-    protected StreamControl(Handler player) {
-        this.player = player;
+    protected StreamControl() {
     }
 
     protected abstract StreamInfo[] getStreams();
@@ -125,6 +124,4 @@ public abstract class StreamControl implements Control {
         }
         throw new LanguageNotAvailableException();
     }
-
-    protected Handler player;
 }

@@ -23,15 +23,13 @@ import javax.tv.service.*;
 
 public class ServiceComponentChangeEvent extends ServiceDetailsSIChangeEvent {
     public ServiceComponentChangeEvent(ServiceDetails details,
-            SIChangeType type, ServiceComponent component)
-    {
+            SIChangeType type, ServiceComponent component) {
         super(details, type, component);
 
         this.component = component;
     }
 
-    public ServiceComponent getServiceComponent()
-    {
+    public ServiceComponent getServiceComponent() {
         return component;
     }
 

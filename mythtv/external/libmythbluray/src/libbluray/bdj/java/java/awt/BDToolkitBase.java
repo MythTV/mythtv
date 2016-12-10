@@ -61,7 +61,7 @@ abstract class BDToolkitBase extends Toolkit {
             if (toolkit instanceof BDToolkit) {
                 ((BDToolkit)toolkit).shutdown();
             }
-        } catch (Throwable t) {
+        } catch (Exception t) {
             logger.error("shutdownDisc() failed: " + t + "\n" + Logger.dumpStack(t));
         }
     }

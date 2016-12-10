@@ -23,8 +23,24 @@ import javax.tv.locator.Locator;
 import javax.tv.locator.InvalidLocatorException;
 import javax.tv.service.Service;
 
+import org.bluray.net.BDLocator;
+import org.bluray.ti.TitleImpl;
+
 public final class LocatorFilter extends ServiceFilter {
     public LocatorFilter(Locator[] locators) throws InvalidLocatorException {
+        if (locators == null)
+            throw new NullPointerException();
+
+        for (int i = 0; i < locators.length; i++) {
+            try {
+                if (locators[i] == null)
+                    throw new InvalidLocatorException(locators[i]);
+                new BDLocator(locators[i].toExternalForm());
+            } catch (org.davic.net.InvalidLocatorException e) {
+                throw new InvalidLocatorException(locators[i]);
+            }
+        }
+
         this.locators = locators;
     }
 
@@ -36,9 +52,17 @@ public final class LocatorFilter extends ServiceFilter {
         if (service == null)
             throw new NullPointerException();
 
+        if (!(service instanceof TitleImpl))
+            return false;
+
+        int num = ((TitleImpl)service).getTitleNum();
         for (int i = 0; i < locators.length; i++) {
-            if (locators[i].equals(service.getLocator()))
-                return true;
+
+            try {
+                BDLocator bdl = new BDLocator(locators[i].toExternalForm());
+                if (bdl.getTitleNumber() == num)
+                    return true;
+            } catch (org.davic.net.InvalidLocatorException e) { }
         }
 
         return false;

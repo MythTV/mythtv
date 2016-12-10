@@ -20,10 +20,9 @@
 package org.havi.ui.event;
 
 public class HScreenConfigurationEvent extends java.util.EventObject {
-    public HScreenConfigurationEvent(Object source)
-    {
+    public HScreenConfigurationEvent(Object source) {
         super(source);
     }
-    
+
     private static final long serialVersionUID = 8631615705134051342L;
 }

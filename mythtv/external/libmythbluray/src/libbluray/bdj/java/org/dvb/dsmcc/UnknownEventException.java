@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class UnknownEventException extends DSMCCException {
-    public UnknownEventException()
-    {
+    public UnknownEventException() {
         super();
     }
 
-    public UnknownEventException(String reason)
-    {
+    public UnknownEventException(String reason) {
         super(reason);
     }
 

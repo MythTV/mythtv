@@ -20,13 +20,11 @@
 package javax.media;
 
 public class MediaError extends Error {
-    public MediaError()
-    {
+    public MediaError() {
         super();
     }
 
-    public MediaError(String reason)
-    {
+    public MediaError(String reason) {
         super(reason);
     }
 

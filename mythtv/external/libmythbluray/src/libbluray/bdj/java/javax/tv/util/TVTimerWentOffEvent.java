@@ -1,7 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  William Hahne
- * Copyright (C) 2015  Petri Hintukainen
+ * Copyright (C) 2016  VideoLAN
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,22 +17,20 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package org.videolan.media.content.playlist;
+package javax.tv.util;
 
-import java.awt.Component;
-import org.bluray.media.PrimaryGainControl;
+import java.util.EventObject;
 
-import org.videolan.media.content.BDHandler;
-
-public class PrimaryGainControlImpl extends GainControlImpl implements PrimaryGainControl {
-    PrimaryGainControlImpl(BDHandler player) {
-        this.player = player;
+public class TVTimerWentOffEvent extends EventObject
+{
+    public TVTimerWentOffEvent(TVTimer source, TVTimerSpec spec) {
+        super(source);
+        this.spec = spec;
     }
 
-    protected void setGain(boolean mute, float level) {
-        player.setGain(BDHandler.GAIN_PRIMARY, mute, level);
-        super.valueChanged();
+    public TVTimerSpec getTimerSpec() {
+        return spec;
     }
 
-    private BDHandler player;
+    private TVTimerSpec spec = null;
 }

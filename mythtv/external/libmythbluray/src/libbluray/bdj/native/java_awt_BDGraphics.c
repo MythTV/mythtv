@@ -57,6 +57,9 @@ Java_java_awt_BDGraphics_drawStringN(JNIEnv * env, jobject obj, jlong ftFace, js
     unsigned j, k;
     FT_Face face = (FT_Face)(intptr_t)ftFace;
 
+    if (!face)
+        return;
+
     length = (*env)->GetStringLength(env, string);
     if (length <= 0)
       return;
@@ -67,7 +70,7 @@ Java_java_awt_BDGraphics_drawStringN(JNIEnv * env, jobject obj, jlong ftFace, js
     cls = (*env)->GetObjectClass(env, obj);
     mid = (*env)->GetMethodID(env, cls, "drawPoint", "(III)V");
 
-    a = (rgb >> 24) & 0xff;
+    a = ((unsigned)rgb >> 24) & 0xff;
     c = rgb & 0xffffff;
 
     for (i = 0; i < length; i++) {
@@ -76,7 +79,7 @@ Java_java_awt_BDGraphics_drawStringN(JNIEnv * env, jobject obj, jlong ftFace, js
                 for (k = 0; k < face->glyph->bitmap.width; k++) {
                     jint pixel;
                     pixel = face->glyph->bitmap.buffer[j*face->glyph->bitmap.pitch + k];
-                    pixel = ((a * pixel / 255) << 24) | c;
+                    pixel = ((unsigned)(a * pixel / 255) << 24) | c;
                     (*env)->CallVoidMethod(env, obj, mid,
                                            x + face->glyph->bitmap_left + k,
                                            y - face->glyph->bitmap_top + j,

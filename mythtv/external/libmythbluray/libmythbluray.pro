@@ -21,7 +21,7 @@ DEFINES += ENABLE_UDF
 
 bluray_major = 0
 bluray_minor = 9
-bluray_micro = 2
+bluray_micro = 3
 bluray_version = $$bluray_major"."$$bluray_minor"."$$bluray_micro
 
 DEFINES += BLURAY_VERSION_MAJOR=$$bluray_major

@@ -20,18 +20,15 @@
 package org.havi.ui;
 
 public class HImageHints {
-    public HImageHints()
-    {
+    public HImageHints() {
         type = NATURAL_IMAGE;
     }
 
-    public void setType(int type)
-    {
+    public void setType(int type) {
         this.type = type;
     }
 
-    public int getType()
-    {
+    public int getType() {
         return type;
     }
 

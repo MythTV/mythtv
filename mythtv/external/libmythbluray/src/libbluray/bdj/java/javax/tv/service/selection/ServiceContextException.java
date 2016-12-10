@@ -20,13 +20,11 @@
 package javax.tv.service.selection;
 
 public class ServiceContextException extends Exception {
-    public ServiceContextException()
-    {
+    public ServiceContextException() {
         super();
     }
 
-    public ServiceContextException(String reason)
-    {
+    public ServiceContextException(String reason) {
         super(reason);
     }
 

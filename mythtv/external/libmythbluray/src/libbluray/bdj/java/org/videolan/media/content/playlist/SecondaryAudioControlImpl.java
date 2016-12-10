@@ -26,7 +26,7 @@ import org.videolan.TIClip;
 
 public class SecondaryAudioControlImpl extends StreamControl implements SecondaryAudioControl {
     protected SecondaryAudioControlImpl(Handler player) {
-        super(player);
+        this.player = player;
     }
 
     protected StreamInfo[] getStreams() {
@@ -47,4 +47,6 @@ public class SecondaryAudioControlImpl extends StreamControl implements Secondar
     protected void setStreamNumber(int num) {
         Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, num, 0x000000ff);
     }
+
+    private Handler player;
 }

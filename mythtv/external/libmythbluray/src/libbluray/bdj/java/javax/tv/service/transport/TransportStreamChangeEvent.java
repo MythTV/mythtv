@@ -23,20 +23,17 @@ import javax.tv.service.SIChangeType;
 
 public class TransportStreamChangeEvent extends TransportSIChangeEvent {
     public TransportStreamChangeEvent(TransportStreamCollection collection,
-            SIChangeType type, TransportStream stream)
-    {
+            SIChangeType type, TransportStream stream) {
         super(collection, type, stream);
         this.collection = collection;
         this.stream = stream;
     }
 
-    public TransportStreamCollection getTransportStreamCollection()
-    {
+    public TransportStreamCollection getTransportStreamCollection() {
         return collection;
     }
 
-    public TransportStream getTransportStream()
-    {
+    public TransportStream getTransportStream() {
         return stream;
     }
 

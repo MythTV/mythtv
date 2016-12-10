@@ -20,10 +20,9 @@
 package org.davic.media;
 
 public class ResourceWithdrawnEvent extends javax.media.ControllerEvent {
-    public ResourceWithdrawnEvent(javax.media.Controller controller)
-    {
+    public ResourceWithdrawnEvent(javax.media.Controller controller) {
         super(controller);
     }
-    
+
     private static final long serialVersionUID = -7166847584806713058L;
 }

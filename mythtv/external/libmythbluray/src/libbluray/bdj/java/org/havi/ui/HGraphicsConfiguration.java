@@ -31,7 +31,6 @@ import java.awt.Color;
 
 public class HGraphicsConfiguration extends HScreenConfiguration {
     protected HGraphicsConfiguration() {
-
     }
 
     HGraphicsConfiguration(HGraphicsConfigTemplate hgct) {
@@ -78,26 +77,25 @@ public class HGraphicsConfiguration extends HScreenConfiguration {
 
     public Color getPunchThroughToBackgroundColor(int percentage) {
         org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
-        throw new Error("Not implemented");
+        return null;
     }
 
     public Color getPunchThroughToBackgroundColor(int percentage, HVideoDevice hvd) {
         org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
-        throw new Error("Not implemented");
+        return null;
     }
 
     public Color getPunchThroughToBackgroundColor(Color color, int percentage) {
         org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
-        throw new Error("Not implemented");
+        return null;
     }
 
     public Color getPunchThroughToBackgroundColor(Color color, int percentage, HVideoDevice v) {
         org.videolan.Logger.unimplemented("HGraphicsConfigTemplate", "");
-        throw new Error("Not implemented");
+        return null;
     }
 
     public void dispose(Color c) {
-
     }
 
     private HGraphicsConfigTemplate hgct;

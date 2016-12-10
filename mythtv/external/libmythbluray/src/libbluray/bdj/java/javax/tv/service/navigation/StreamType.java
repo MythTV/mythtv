@@ -20,15 +20,13 @@
 package javax.tv.service.navigation;
 
 public class StreamType {
-    protected StreamType(String name)
-    {
+    protected StreamType(String name) {
         if (name == null)
             throw new NullPointerException();
         this.name = name;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return name;
     }
 

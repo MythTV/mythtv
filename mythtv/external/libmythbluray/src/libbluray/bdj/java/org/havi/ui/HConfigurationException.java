@@ -20,13 +20,11 @@
 package org.havi.ui;
 
 public class HConfigurationException extends java.lang.Exception {
-    public HConfigurationException()
-    {
+    public HConfigurationException() {
         super();
     }
 
-    public HConfigurationException(String reason)
-    {
+    public HConfigurationException(String reason) {
         super(reason);
     }
 

@@ -21,60 +21,59 @@ package org.havi.ui;
 
 import java.awt.Graphics;
 import java.awt.Dimension;
+import java.awt.Insets;
+
+import org.videolan.Logger;
 
 public class HAnimateLook implements HExtendedLook {
-    public HAnimateLook()
-    {
-        org.videolan.Logger.unimplemented(HAnimateLook.class.getName(), "");
+    public HAnimateLook() {
+        logger.unimplemented("");
     }
 
-    public void fillBackground(Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void fillBackground(Graphics g, HVisible visible, int state) {
+        logger.unimplemented("");
     }
 
-    public void renderBorders(Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void renderBorders(Graphics g, HVisible visible, int state) {
+        logger.unimplemented("");
     }
 
-    public void renderVisible(java.awt.Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void renderVisible(Graphics g, HVisible visible, int state) {
+        logger.unimplemented("renderVisible");
     }
 
-    public void showLook(java.awt.Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void showLook(Graphics g, HVisible visible, int state) {
+        logger.unimplemented("renderVisible");
     }
 
-    public void widgetChanged(HVisible visible, HChangeData[] changes)
-    {
-        throw new Error("Not implemented");
+    public void widgetChanged(HVisible visible, HChangeData[] changes) {
+        logger.unimplemented("renderVisible");
     }
 
-    public Dimension getMinimumSize(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getMinimumSize(HVisible hvisible) {
+        logger.unimplemented("getMinimumSize");
+        return hvisible.getSize();
     }
 
-    public Dimension getPreferredSize(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getPreferredSize(HVisible hvisible) {
+        logger.unimplemented("getPreferredSize");
+        return hvisible.getSize();
     }
 
-    public Dimension getMaximumSize(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getMaximumSize(HVisible hvisible) {
+        logger.unimplemented("getMaximumSize");
+        return hvisible.getSize();
     }
 
-    public boolean isOpaque(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public boolean isOpaque(HVisible visible) {
+        logger.unimplemented("getMaximumSize");
+        return false;
     }
 
-    public java.awt.Insets getInsets(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Insets getInsets(HVisible hvisible) {
+        logger.unimplemented("getMaximumSize");
+        return new Insets(0, 0, 0, 0);
     }
+
+    private static final Logger logger = Logger.getLogger(HAnimateLook.class.getName());
 }

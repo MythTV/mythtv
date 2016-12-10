@@ -71,6 +71,7 @@ typedef BD_DIR_H* (*BD_DIR_OPEN) (const char* dirname);
  * @param p function pointer
  * @return previous function pointer registered
  */
+/* deprecated - use bd_open_files() instead */
 BD_FILE_OPEN bd_register_file(BD_FILE_OPEN p);
 
 /**
@@ -80,6 +81,7 @@ BD_FILE_OPEN bd_register_file(BD_FILE_OPEN p);
  * @param p function pointer
  * @return previous function pointer registered
  */
+/* deprecated - use bd_open_files() instead */
 BD_DIR_OPEN bd_register_dir(BD_DIR_OPEN p);
 
 #ifdef __cplusplus

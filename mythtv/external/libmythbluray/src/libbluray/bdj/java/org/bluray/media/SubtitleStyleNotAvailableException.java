@@ -20,13 +20,11 @@
 package org.bluray.media;
 
 public class SubtitleStyleNotAvailableException extends Exception {
-    public SubtitleStyleNotAvailableException()
-    {
+    public SubtitleStyleNotAvailableException() {
         super();
     }
 
-    public SubtitleStyleNotAvailableException(String reason)
-    {
+    public SubtitleStyleNotAvailableException(String reason) {
         super(reason);
     }
 

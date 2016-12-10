@@ -24,22 +24,19 @@ import org.davic.resources.ResourceProxy;
 
 public class RepositoryDescriptor implements ResourceProxy {
 
-    protected RepositoryDescriptor(ResourceClient client, String name)
-    {
+    protected RepositoryDescriptor(ResourceClient client, String name) {
         this.name = name;
         this.client = client;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public ResourceClient getClient()
-    {
+    public ResourceClient getClient() {
         return client;
     }
-    
+
     private String name;
     private ResourceClient client;
 }

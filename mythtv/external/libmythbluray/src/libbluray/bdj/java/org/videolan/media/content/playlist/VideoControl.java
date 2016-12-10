@@ -29,8 +29,7 @@ import org.havi.ui.HVideoConfiguration;
 import org.videolan.StreamInfo;
 
 public abstract class VideoControl extends StreamControl implements VideoPresentationControl {
-    protected VideoControl(Handler player, int plane) {
-        super(player);
+    protected VideoControl(int plane) {
         this.plane = plane;
     }
 

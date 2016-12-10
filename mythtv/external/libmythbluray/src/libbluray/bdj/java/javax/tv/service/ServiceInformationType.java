@@ -21,13 +21,13 @@ package javax.tv.service;
 
 public class ServiceInformationType {
 
-    protected ServiceInformationType(String name)
-    {
+    protected ServiceInformationType(String name) {
+        if (name == null)
+            throw new NullPointerException();
         this.name = name;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return name;
     }
 

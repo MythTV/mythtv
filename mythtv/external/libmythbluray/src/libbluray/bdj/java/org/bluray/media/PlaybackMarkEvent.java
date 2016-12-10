@@ -22,18 +22,20 @@ package org.bluray.media;
 import java.util.EventObject;
 
 public class PlaybackMarkEvent extends EventObject {
-    public PlaybackMarkEvent(PlaybackControl source, int mark)
-    {
+    public PlaybackMarkEvent(PlaybackControl source, int mark) {
         super(source);
 
         this.mark = mark;
     }
 
-    public int getMark()
-    {
+    public int getMark() {
         return this.mark;
     }
 
-    private int mark;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",mark=" + mark + "]";
+    }
+
+    private final int mark;
     private static final long serialVersionUID = -6679776995045036356L;
 }

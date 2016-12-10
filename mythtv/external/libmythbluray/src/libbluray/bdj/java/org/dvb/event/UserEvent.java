@@ -23,10 +23,9 @@ import java.awt.event.KeyEvent;
 
 public class UserEvent extends java.util.EventObject {
     public UserEvent(Object source, int family, int type, int code,
-            int modifiers, long when)
-    {
+            int modifiers, long when) {
         super(source);
-        
+
         this.family = family;
         this.type = type;
         this.code = code;
@@ -34,10 +33,9 @@ public class UserEvent extends java.util.EventObject {
         this.when = when;
     }
 
-    public UserEvent(Object source, int family, char keyChar, long when)
-    {
+    public UserEvent(Object source, int family, char keyChar, long when) {
         super(source);
-       
+
         this.family = family;
         this.type = KeyEvent.KEY_TYPED;
         this.code = keyChar;
@@ -45,56 +43,46 @@ public class UserEvent extends java.util.EventObject {
         this.when = when;
     }
 
-    public int getFamily()
-    {
+    public int getFamily() {
         return family;
     }
 
-    public int getType()
-    {
+    public int getType() {
         return type;
     }
 
-    public int getCode()
-    {
+    public int getCode() {
         return code;
     }
 
-    public char getKeyChar()
-    {
+    public char getKeyChar() {
         return (char) code;
     }
 
-    public int getModifiers()
-    {
+    public int getModifiers() {
         return modifiers;
     }
 
-    public boolean isShiftDown()
-    {
+    public boolean isShiftDown() {
         return (KeyEvent.SHIFT_MASK & modifiers) != 0;
     }
 
-    public boolean isControlDown()
-    {
+    public boolean isControlDown() {
         return (KeyEvent.CTRL_MASK & modifiers) != 0;
     }
 
-    public boolean isMetaDown()
-    {
+    public boolean isMetaDown() {
         return (KeyEvent.META_MASK & modifiers) != 0;
     }
 
-    public boolean isAltDown()
-    {
+    public boolean isAltDown() {
         return (KeyEvent.ALT_MASK & modifiers) != 0;
     }
 
-    public long getWhen()
-    {
+    public long getWhen() {
         return when;
     }
-    
+
     public static final int UEF_KEY_EVENT = 1;
 
     private int family;
@@ -102,5 +90,5 @@ public class UserEvent extends java.util.EventObject {
     private int code;
     private int modifiers;
     private long when;
-    private static final long serialVersionUID = -4734616177850745290L; 
+    private static final long serialVersionUID = -4734616177850745290L;
 }

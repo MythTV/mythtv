@@ -37,12 +37,12 @@ static const char *dlerror(char *buf, int buf_size)
     DWORD error_code = GetLastError();
     wchar_t wbuf[256];
 
-    if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
-                       FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                       NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                       wbuf, sizeof(wbuf)/sizeof(wbuf[0]), NULL)) {
-        WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, buf, buf_size, NULL, NULL);
-    } else {
+    if (!FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
+                        FORMAT_MESSAGE_MAX_WIDTH_MASK,
+                        NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                        wbuf, sizeof(wbuf)/sizeof(wbuf[0]), NULL) ||
+        !WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, buf, buf_size, NULL, NULL)) {
+
 #ifdef _MSC_VER
         _snprintf(buf, buf_size, "error %d", (int)error_code);
 #else
@@ -60,6 +60,7 @@ void *dl_dlopen(const char *path, const char *version)
     wchar_t wname[MAX_PATH];
     char *name;
     void *result;
+    int iresult;
 
     name = str_printf("%s.dll", path);
     if (!name) {
@@ -67,8 +68,13 @@ void *dl_dlopen(const char *path, const char *version)
         return NULL;
     }
 
-    MultiByteToWideChar(CP_UTF8, 0, name, -1, wname, MAX_PATH);
+    iresult = MultiByteToWideChar(CP_UTF8, 0, name, -1, wname, MAX_PATH);
     X_FREE(name);
+
+    if (!iresult) {
+        BD_DEBUG(DBG_FILE, "can't convert file name '%s'\n", path);
+        return NULL;
+    }
 
     result = LoadLibraryW(wname);
 
@@ -113,10 +119,19 @@ const char *dl_get_path(void)
         HMODULE hModule;
         wchar_t wpath[MAX_PATH];
 
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)&dl_get_path, &hModule);
-        GetModuleFileNameW(hModule, wpath, MAX_PATH);
-        WideCharToMultiByte(CP_UTF8, 0, wpath, -1, path, MAX_PATH, NULL, NULL);
-        lib_path = path;
+        if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                              GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                              (LPCTSTR)&dl_get_path, &hModule)) {
+
+            DWORD dw = GetModuleFileNameW(hModule, wpath, MAX_PATH);
+            if (dw > 0 && dw < MAX_PATH) {
+
+                if (WideCharToMultiByte(CP_UTF8, 0, wpath, -1, path, MAX_PATH, NULL, NULL)) {
+
+                    lib_path = path;
+                }
+            }
+        }
 
         if (lib_path) {
             /* cut library name from path */
@@ -126,7 +141,7 @@ const char *dl_get_path(void)
             }
             BD_DEBUG(DBG_FILE, "library file is %s\n", lib_path);
         } else {
-            BD_DEBUG(DBG_FILE, "Can't determine libbluray.dll install path\n");
+            BD_DEBUG(DBG_FILE | DBG_CRIT, "Can't determine libbluray.dll install path\n");
         }
     }
 

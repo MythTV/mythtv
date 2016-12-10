@@ -22,8 +22,7 @@ package org.bluray.ti;
 import javax.tv.service.ServiceType;
 
 public class TitleType extends ServiceType {
-    protected TitleType(String name)
-    {
+    protected TitleType(String name) {
         super(name);
     }
 

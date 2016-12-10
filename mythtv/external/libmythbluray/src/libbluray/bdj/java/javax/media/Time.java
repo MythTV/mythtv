@@ -25,28 +25,23 @@ public class Time implements Serializable {
     public static final long ONE_SECOND = 1000000000L;
     protected long nanoseconds;
 
-    public Time(long nano)
-    {
+    public Time(long nano) {
         this.nanoseconds = nano;
     }
 
-    public Time(double seconds)
-    {
+    public Time(double seconds) {
         this.nanoseconds = secondsToNanoseconds(seconds);
     }
 
-    protected long secondsToNanoseconds(double seconds)
-    {
+    protected long secondsToNanoseconds(double seconds) {
         return (long) (seconds * ONE_SECOND);
     }
 
-    public long getNanoseconds()
-    {
+    public long getNanoseconds() {
         return nanoseconds;
     }
 
-    public double getSeconds()
-    {
+    public double getSeconds() {
         return nanoseconds / (double) ONE_SECOND;
     }
 

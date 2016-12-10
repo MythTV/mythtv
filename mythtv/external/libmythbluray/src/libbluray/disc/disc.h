@@ -29,6 +29,18 @@ struct bd_file_s;
 struct bd_dir_s;
 struct bd_enc_info;
 
+/* application provided file system access (optional) */
+typedef struct fs_access {
+    void *fs_handle;
+
+    /* method 1: block (device) access */
+    int (*read_blocks)(void *fs_handle, void *buf, int lba, int num_blocks);
+
+    /* method 2: file access */
+    struct bd_dir_s  *(*open_dir) (void *fs_handle, const char *rel_path);
+    struct bd_file_s *(*open_file)(void *fs_handle, const char *rel_path);
+} fs_access;
+
 /*
  * BluRay Virtual File System
  *
@@ -38,8 +50,7 @@ struct bd_enc_info;
 typedef struct bd_disc BD_DISC;
 
 BD_PRIVATE BD_DISC *disc_open(const char *device_path,
-                              void *read_blocks_handle,
-                              int (*read_blocks)(void *handle, void *buf, int lba, int num_blocks),
+                              fs_access *p_fs,
                               struct bd_enc_info *enc_info,
                               const char *keyfile_path,
                               void *regs, void *psr_read, void *psr_write);

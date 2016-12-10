@@ -20,13 +20,11 @@
 package org.havi.ui;
 
 public class HMatteException extends HUIException {
-    public HMatteException()
-    {
+    public HMatteException() {
         super();
     }
 
-    public HMatteException(String reason)
-    {
+    public HMatteException(String reason) {
         super(reason);
     }
 

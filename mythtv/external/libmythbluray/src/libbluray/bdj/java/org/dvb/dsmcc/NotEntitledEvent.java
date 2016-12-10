@@ -20,15 +20,13 @@
 package org.dvb.dsmcc;
 
 public class NotEntitledEvent extends AsynchronousLoadingEvent {
-    public NotEntitledEvent(DSMCCObject source)
-    {
+    public NotEntitledEvent(DSMCCObject source) {
         super(source);
 
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

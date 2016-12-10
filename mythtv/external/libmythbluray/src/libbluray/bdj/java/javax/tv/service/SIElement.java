@@ -21,8 +21,8 @@ package javax.tv.service;
 
 import javax.tv.locator.Locator;
 
-public interface SIElement extends SIRetrievable
-{
+public interface SIElement extends SIRetrievable {
+
     public Locator getLocator();
 
     public boolean equals(Object obj);

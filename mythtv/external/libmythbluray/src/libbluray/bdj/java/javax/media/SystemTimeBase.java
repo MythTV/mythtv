@@ -1,30 +1,45 @@
+/*
+ * This file is part of libbluray
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package javax.media;
 
 /**
  * This file is from FMJ (fmj-sf.net)
- * 
+ *
  * Complete.
  * @author Ken Larson
  *
  */
-public final class SystemTimeBase implements TimeBase
-{
+public final class SystemTimeBase implements TimeBase {
 
-    private static long start = -1L; 
-    public long getNanoseconds()
-    {
+    private static long start = -1L;
+
+    public long getNanoseconds() {
         // This version only has millisecond accuracy.
-        
-        if (start < 0)
-        {   start = System.currentTimeMillis();
+
+        if (start < 0) {
+            start = System.currentTimeMillis();
             return 0;
         }
         return (System.currentTimeMillis() - start) * 1000000L;
-        //return System.nanoTime(); // TODO: does this need to be relative to a specific point in time?
     }
 
-    public Time getTime()
-    {
+    public Time getTime() {
         return new Time(getNanoseconds());
     }
 

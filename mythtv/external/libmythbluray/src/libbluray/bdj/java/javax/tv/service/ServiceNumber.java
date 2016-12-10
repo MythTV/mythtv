@@ -19,7 +19,6 @@
 
 package javax.tv.service;
 
-public interface ServiceNumber
-{
+public interface ServiceNumber {
     public int getServiceNumber();
 }

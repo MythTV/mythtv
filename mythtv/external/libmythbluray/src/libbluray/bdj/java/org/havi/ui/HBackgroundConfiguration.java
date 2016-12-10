@@ -23,7 +23,6 @@ import java.awt.Color;
 
 public class HBackgroundConfiguration extends HScreenConfiguration {
     protected HBackgroundConfiguration() {
-
     }
 
     protected HBackgroundConfiguration(HBackgroundConfigTemplate hbct, Color color) {

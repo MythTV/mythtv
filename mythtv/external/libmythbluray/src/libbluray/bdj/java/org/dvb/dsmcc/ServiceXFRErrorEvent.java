@@ -20,21 +20,18 @@
 package org.dvb.dsmcc;
 
 public class ServiceXFRErrorEvent extends AsynchronousLoadingEvent {
-    public ServiceXFRErrorEvent(DSMCCObject source, ServiceXFRReference ref)
-    {
+    public ServiceXFRErrorEvent(DSMCCObject source, ServiceXFRReference ref) {
         super(source);
 
         this.source = source;
         this.ref = ref;
     }
 
-    public java.lang.Object getSource()
-    {
+    public java.lang.Object getSource() {
         return source;
     }
 
-    public ServiceXFRReference getServiceXFR()
-    {
+    public ServiceXFRReference getServiceXFR() {
         return ref;
     }
 

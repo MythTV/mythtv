@@ -87,7 +87,9 @@ static void *_load_jvm_win32(const char **p_java_home)
     }
 
     if (debug_mask & DBG_BDJ) {
-        WideCharToMultiByte(CP_UTF8, 0, buf_vers, -1, strbuf, sizeof(strbuf), NULL, NULL);
+        if (!WideCharToMultiByte(CP_UTF8, 0, buf_vers, -1, strbuf, sizeof(strbuf), NULL, NULL)) {
+            strbuf[0] = 0;
+        }
         BD_DEBUG(DBG_BDJ, "JRE version: %s\n", strbuf);
     }
     wcscat(buf_loc, buf_vers);
@@ -103,8 +105,9 @@ static void *_load_jvm_win32(const char **p_java_home)
 
     if (r == ERROR_SUCCESS) {
         /* do not fail even if not found */
-        WideCharToMultiByte(CP_UTF8, 0, buf_loc, -1, java_home, sizeof(java_home), NULL, NULL);
-        *p_java_home = java_home;
+        if (WideCharToMultiByte(CP_UTF8, 0, buf_loc, -1, java_home, sizeof(java_home), NULL, NULL)) {
+            *p_java_home = java_home;
+        }
         BD_DEBUG(DBG_BDJ, "JavaHome: %s\n", java_home);
 
         wcscat(java_path, buf_loc);
@@ -124,7 +127,9 @@ static void *_load_jvm_win32(const char **p_java_home)
     void *result = LoadLibraryW(buf_loc);
     SetDllDirectoryW(NULL);
 
-    WideCharToMultiByte(CP_UTF8, 0, buf_loc, -1, strbuf, sizeof(strbuf), NULL, NULL);
+    if (!WideCharToMultiByte(CP_UTF8, 0, buf_loc, -1, strbuf, sizeof(strbuf), NULL, NULL)) {
+        strbuf[0] = 0;
+    }
     if (!result) {
         BD_DEBUG(DBG_BDJ | DBG_CRIT, "can't open library '%s'\n", strbuf);
     } else {
@@ -139,7 +144,7 @@ static void *_load_jvm_win32(const char **p_java_home)
 static inline char *_utf8_to_cp(const char *utf8)
 {
     int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
-    if (wlen == 0) {
+    if (wlen <= 0) {
         return NULL;
     }
 
@@ -147,17 +152,22 @@ static inline char *_utf8_to_cp(const char *utf8)
     if (!wide) {
         return NULL;
     }
-    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wide, wlen);
+    if (!MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wide, wlen)) {
+        X_FREE(wide);
+        return NULL;
+    }
 
     size_t len = WideCharToMultiByte(CP_ACP, 0, wide, -1, NULL, 0, NULL, NULL);
-    if (len == 0) {
+    if (len <= 0) {
         X_FREE(wide);
         return NULL;
     }
 
     char *out = (char *)malloc(len);
     if (out != NULL) {
-        WideCharToMultiByte(CP_ACP, 0, wide, -1, out, len, NULL, NULL);
+        if (!WideCharToMultiByte(CP_ACP, 0, wide, -1, out, len, NULL, NULL)) {
+            X_FREE(out);
+        }
     }
     X_FREE(wide);
     return out;
@@ -167,7 +177,7 @@ static inline char *_utf8_to_cp(const char *utf8)
 static void *_jvm_dlopen(const char *java_home, const char *jvm_dir, const char *jvm_lib)
 {
     if (java_home) {
-        char *path = str_printf("%s/%s/%s", java_home, jvm_dir, jvm_lib);
+        char *path = str_printf("%s" DIR_SEP "%s" DIR_SEP "%s", java_home, jvm_dir, jvm_lib);
         if (!path) {
             BD_DEBUG(DBG_CRIT, "out of memory\n");
             return NULL;
@@ -197,14 +207,18 @@ static void *_load_jvm(const char **p_java_home)
 #else
 # ifdef _WIN32
     static const char *jvm_path[] = {NULL, JDK_HOME};
-    static const char  jvm_dir[]  = "jre/bin/server";
+    static const char  jvm_dir[]  = "jre\\bin\\server";
     static const char  jvm_lib[]  = "jvm";
 # else
     static const char *jvm_path[] = {NULL, JDK_HOME,
-                                    "/usr/lib/jvm/default-java",
-                                    "/usr/lib/jvm/java-6-openjdk",
-                                    "/usr/lib/jvm/java-7-openjdk",
-                                    "/etc/java-config-2/current-system-vm"};
+                                     "/usr/lib/jvm/default-java",
+                                     "/usr/lib/jvm/default",
+                                     "/usr/lib/jvm/",
+                                     "/etc/java-config-2/current-system-vm",
+                                     "/usr/lib/jvm/java-7-openjdk",
+                                     "/usr/lib/jvm/java-8-openjdk",
+                                     "/usr/lib/jvm/java-6-openjdk",
+    };
     static const char  jvm_dir[]  = "jre/lib/" JAVA_ARCH "/server";
     static const char  jvm_lib[]  = "libjvm";
 # endif
@@ -293,6 +307,11 @@ static const char *_find_libbluray_jar(BDJ_STORAGE *storage)
             storage->classpath = str_dup(classpath);
         }
 
+        if (!storage->classpath) {
+            BD_DEBUG(DBG_CRIT, "out of memory\n");
+            return NULL;
+        }
+
         if (_can_read_file(storage->classpath)) {
             return storage->classpath;
         }
@@ -308,6 +327,11 @@ static const char *_find_libbluray_jar(BDJ_STORAGE *storage)
     const char *lib_path = dl_get_path();
     if (lib_path) {
         char *cp = str_printf("%s" BDJ_JARFILE, lib_path);
+        if (!cp) {
+            BD_DEBUG(DBG_CRIT, "out of memory\n");
+            return NULL;
+        }
+
         BD_DEBUG(DBG_BDJ, "Checking %s ...\n", cp);
         if (_can_read_file(cp)) {
             storage->classpath = cp;
@@ -343,6 +367,10 @@ static const char *_bdj_persistent_root(BDJ_STORAGE *storage)
     const char *root;
     char       *data_home;
 
+    if (storage->no_persistent_storage) {
+        return NULL;
+    }
+
     if (!storage->persistent_root) {
 
         root = getenv("LIBBLURAY_PERSISTENT_ROOT");
@@ -351,10 +379,15 @@ static const char *_bdj_persistent_root(BDJ_STORAGE *storage)
         }
 
         data_home = file_get_data_home();
-        storage->persistent_root = str_printf("%s" DIR_SEP "bluray" DIR_SEP "dvb.persistent.root" DIR_SEP, data_home ? data_home : "");
-        X_FREE(data_home);
+        if (data_home) {
+            storage->persistent_root = str_printf("%s" DIR_SEP "bluray" DIR_SEP "dvb.persistent.root" DIR_SEP, data_home);
+            X_FREE(data_home);
+            BD_DEBUG(DBG_BDJ, "LIBBLURAY_PERSISTENT_ROOT not set, using %s\n", storage->persistent_root);
+        }
 
-        BD_DEBUG(DBG_BDJ, "LIBBLURAY_PERSISTENT_ROOT not set, using %s\n", storage->persistent_root);
+        if (!storage->persistent_root) {
+            BD_DEBUG(DBG_BDJ | DBG_CRIT, "WARNING: BD-J persistent root not set\n");
+        }
     }
 
     return storage->persistent_root;
@@ -365,6 +398,10 @@ static const char *_bdj_buda_root(BDJ_STORAGE *storage)
     const char *root;
     char       *cache_home;
 
+    if (storage->no_persistent_storage) {
+        return NULL;
+    }
+
     if (!storage->cache_root) {
 
         root = getenv("LIBBLURAY_CACHE_ROOT");
@@ -373,10 +410,15 @@ static const char *_bdj_buda_root(BDJ_STORAGE *storage)
         }
 
         cache_home = file_get_cache_home();
-        storage->cache_root = str_printf("%s" DIR_SEP "bluray" DIR_SEP "bluray.bindingunit.root" DIR_SEP, cache_home ? cache_home : "");
-        X_FREE(cache_home);
+        if (cache_home) {
+            storage->cache_root = str_printf("%s" DIR_SEP "bluray" DIR_SEP "bluray.bindingunit.root" DIR_SEP, cache_home);
+            X_FREE(cache_home);
+            BD_DEBUG(DBG_BDJ, "LIBBLURAY_CACHE_ROOT not set, using %s\n", storage->cache_root);
+        }
 
-        BD_DEBUG(DBG_BDJ, "LIBBLURAY_CACHE_ROOT not set, using %s\n", storage->cache_root);
+        if (!storage->cache_root) {
+            BD_DEBUG(DBG_BDJ | DBG_CRIT, "WARNING: BD-J cache root not set\n");
+        }
     }
 
     return storage->cache_root;
@@ -435,16 +477,18 @@ static int _bdj_init(JNIEnv *env, struct bluray *bd, const char *disc_root, cons
                                  param_bdjava_ptr, param_disc_id, param_disc_root,
                                  param_persistent_root, param_buda_root);
 
+    (*env)->DeleteLocalRef(env, init_class);
+    (*env)->DeleteLocalRef(env, param_disc_id);
+    (*env)->DeleteLocalRef(env, param_disc_root);
+    (*env)->DeleteLocalRef(env, param_persistent_root);
+    (*env)->DeleteLocalRef(env, param_buda_root);
+
     if ((*env)->ExceptionOccurred(env)) {
         (*env)->ExceptionDescribe(env);
         BD_DEBUG(DBG_BDJ | DBG_CRIT, "Failed to initialize BD-J (uncaught exception)\n");
         (*env)->ExceptionClear(env);
         return 0;
     }
-
-    (*env)->DeleteLocalRef(env, init_class);
-    (*env)->DeleteLocalRef(env, param_disc_id);
-    (*env)->DeleteLocalRef(env, param_disc_root);
 
     return 1;
 }
@@ -511,6 +555,7 @@ static int _create_jvm(void *jvm_lib, const char *java_home, const char *jar_fil
     JavaVMInitArgs args;
     option[n++].optionString = str_dup   ("-Dawt.toolkit=java.awt.BDToolkit");
     option[n++].optionString = str_dup   ("-Djava.awt.graphicsenv=java.awt.BDGraphicsEnvironment");
+    option[n++].optionString = str_dup   ("-Djavax.accessibility.assistive_technologies= ");
     option[n++].optionString = str_printf("-Xbootclasspath/p:%s", jar_file);
     option[n++].optionString = str_dup   ("-Xms256M");
     option[n++].optionString = str_dup   ("-Xmx256M");
@@ -552,8 +597,12 @@ static int _create_jvm(void *jvm_lib, const char *java_home, const char *jar_fil
     int ii;
     for (ii = 0; ii < n; ii++) {
         char *tmp = _utf8_to_cp(option[ii].optionString);
-        X_FREE(option[ii].optionString);
-        option[ii].optionString = tmp;
+        if (tmp) {
+            X_FREE(option[ii].optionString);
+            option[ii].optionString = tmp;
+        } else {
+            BD_DEBUG(DBG_BDJ | DBG_CRIT, "Failed to convert %s\n", option[ii].optionString);
+        }
     }
 #endif
 
@@ -676,25 +725,30 @@ void bdj_close(BDJAVA *bdjava)
 int bdj_process_event(BDJAVA *bdjava, unsigned ev, unsigned param)
 {
     static const char * const ev_name[] = {
-        "NONE",
-        "CHAPTER",
-        "PLAYITEM",
-        "ANGLE",
-        "SUBTITLE",
-        "END_OF_PLAYLIST",
-        "PTS",
-        "VK_KEY",
-        "MARK",
-        "PSR102",
-        "PLAYLIST",
+        /*  0 */ "NONE",
 
-        "START",
-        "STOP",
+        /*  1 */ "START",
+        /*  2 */ "STOP",
+        /*  3 */ "PSR102",
 
-        "RATE",
-        "AUDIO_STREAM",
-        "SECONDARY_STREAM",
-        "UO_MASKED",
+        /*  4 */ "PLAYLIST",
+        /*  5 */ "PLAYITEM",
+        /*  6 */ "CHAPTER",
+        /*  7 */ "MARK",
+        /*  8 */ "PTS",
+        /*  9 */ "END_OF_PLAYLIST",
+
+        /* 10 */ "SEEK",
+        /* 11 */ "RATE",
+
+        /* 12 */ "ANGLE",
+        /* 13 */ "AUDIO_STREAM",
+        /* 14 */ "SUBTITLE",
+        /* 15 */ "SECONDARY_STREAM",
+
+        /* 16 */ "VK_KEY",
+        /* 17 */ "UO_MASKED",
+        /* 18 */ "MOUSE",
     };
 
     JNIEnv* env;
@@ -707,8 +761,11 @@ int bdj_process_event(BDJAVA *bdjava, unsigned ev, unsigned param)
         return -1;
     }
 
+    if (ev > BDJ_EVENT_LAST) {
+        BD_DEBUG(DBG_BDJ | DBG_CRIT, "bdj_process_event(%d,%d): unknown event\n", ev, param);
+    }
     // Disable too verbose logging (PTS)
-    if (ev != BDJ_EVENT_PTS) {
+    else if (ev != BDJ_EVENT_PTS) {
         BD_DEBUG(DBG_BDJ, "bdj_process_event(%s,%d)\n", ev_name[ev], param);
     }
 

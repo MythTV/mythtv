@@ -20,18 +20,9 @@
 package org.davic.resources;
 
 public class ResourceStatusEvent extends java.util.EventObject {
-    public ResourceStatusEvent(Object source)
-    {
+    public ResourceStatusEvent(Object source) {
         super(source);
-
-        this.source = source;
     }
 
-    public Object getSource()
-    {
-        return source;
-    }
-
-    private Object source;
     private static final long serialVersionUID = 2431644213385584745L;
 }

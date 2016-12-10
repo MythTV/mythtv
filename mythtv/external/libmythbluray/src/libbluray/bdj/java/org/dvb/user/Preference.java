@@ -24,7 +24,6 @@ import java.util.Vector;
 
 public class Preference {
     protected Preference() {
-
     }
 
     public Preference(String name, String value) {

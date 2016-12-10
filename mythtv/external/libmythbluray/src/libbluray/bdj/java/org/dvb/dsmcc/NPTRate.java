@@ -24,19 +24,16 @@ import java.io.Serializable;
 public class NPTRate implements Serializable {
 
     // should only be called internally
-    public NPTRate(int numerator, int denominator)
-    {
+    public NPTRate(int numerator, int denominator) {
         this.numerator = numerator;
         this.denominator = denominator;
     }
 
-    public int getNumerator()
-    {
+    public int getNumerator() {
         return numerator;
     }
 
-    public int getDenominator()
-    {
+    public int getDenominator() {
         return denominator;
     }
 

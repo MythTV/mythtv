@@ -28,6 +28,6 @@ public interface XletContext
     public Object getXletProperty(String key);
 
     public void resumeRequest();
-    
+
     public static final String ARGS = "javax.tv.xlet.args";
 }

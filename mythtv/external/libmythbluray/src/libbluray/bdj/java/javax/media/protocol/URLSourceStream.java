@@ -22,77 +22,63 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 
-class URLSourceStream
-    implements PullSourceStream
-{
+class URLSourceStream implements PullSourceStream {
+
     protected URLConnection conn;
     protected InputStream stream;
     protected boolean eosReached;
     ContentDescriptor contentType;
 
     public URLSourceStream(URLConnection conn, ContentDescriptor type)
-        throws IOException
-    {
+        throws IOException {
+
         this.conn = conn;
         this.stream = conn.getInputStream();
         this.eosReached = false;
         this.contentType = type;
     }
 
-    public ContentDescriptor getContentDescriptor()
-    {
-        return this.contentType;
+    public ContentDescriptor getContentDescriptor() {
+        return contentType;
     }
 
-    public boolean willReadBlock()
-    {
-        if (this.eosReached == true)
+    public boolean willReadBlock() {
+        if (eosReached == true)
             return true;
-        try
-        {
-            return this.stream.available() == 0;
+        try {
+            return stream.available() == 0;
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
         }
         return true;
     }
 
     public int read(byte[] buffer, int offset, int length)
-        throws IOException
-    {
-        int bytesRead = this.stream.read(buffer, offset, length);
+        throws IOException {
+
+        int bytesRead = stream.read(buffer, offset, length);
         if (bytesRead == -1)
             this.eosReached = true;
         return bytesRead;
     }
 
-    public void close()
-        throws IOException
-    {
-        this.stream.close();
+    public void close() throws IOException {
+        stream.close();
     }
 
-    public boolean endOfStream()
-    {
-        return this.eosReached;
+    public boolean endOfStream() {
+        return eosReached;
     }
 
-    public Object[] getControls()
-    {
+    public Object[] getControls() {
         return new Object[0];
     }
 
-    public Object getControl(String controlName)
-    {
+    public Object getControl(String controlName) {
         return null;
     }
 
-    public long getContentLength()
-    {
-        long len = this.conn.getContentLength();
-        len = len == -1L ? -1L : len;
-
-        return len;
+    public long getContentLength() {
+        return conn.getContentLength();
     }
 }

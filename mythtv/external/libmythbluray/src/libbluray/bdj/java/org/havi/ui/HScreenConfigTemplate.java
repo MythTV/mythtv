@@ -22,6 +22,8 @@ package org.havi.ui;
 import java.awt.Dimension;
 import java.util.Arrays;
 
+import org.videolan.Logger;
+
 public abstract class HScreenConfigTemplate {
     HScreenConfigTemplate() {
         objectArray = new Object[getPreferenceObjectCount()];
@@ -30,35 +32,47 @@ public abstract class HScreenConfigTemplate {
     }
 
     public void setPreference(int preference, int priority) {
-        if ((priority < REQUIRED) || (priority > REQUIRED_NOT))
+        if ((priority < REQUIRED) || (priority > REQUIRED_NOT)) {
+            logger.error("invalid priority " + priority);
             throw new IllegalArgumentException("invalid priority");
+        }
         int index = getPreferenceIndex(preference);
-        if (index < 0)
+        if (index < 0) {
+            logger.error("invalid preference " + preference);
             throw new IllegalArgumentException("invalid preference");
+        }
         priorityArray[index] = priority;
     }
 
     public void setPreference(int preference, Object object, int priority) {
-        if ((priority < REQUIRED) || (priority > REQUIRED_NOT))
+        if ((priority < REQUIRED) || (priority > REQUIRED_NOT)) {
+            logger.error("invalid priority " + priority);
             throw new IllegalArgumentException("invalid priority");
+        }
         int index = getPreferenceObjectIndex(preference);
-        if (index < 0)
+        if (index < 0) {
+            logger.error("invalid preference " + preference);
             throw new IllegalArgumentException("invalid preference");
+        }
         objectArray[index] = object;
         priorityArray[getPreferenceIndex(preference)] = priority;
     }
 
     public int getPreferencePriority(int preference) {
         int index = getPreferenceIndex(preference);
-        if (index < 0)
+        if (index < 0) {
+            logger.error("invalid preference " + preference);
             throw new IllegalArgumentException("invalid preference");
+        }
         return priorityArray[getPreferenceIndex(preference)];
     }
 
     public Object getPreferenceObject(int preference) {
         int index = getPreferenceObjectIndex(preference);
-        if (index < 0)
+        if (index < 0) {
+            logger.error("invalid preference " + preference);
             throw new IllegalArgumentException("invalid preference");
+        }
         return objectArray[getPreferenceObjectIndex(preference)];
     }
 
@@ -169,4 +183,6 @@ public abstract class HScreenConfigTemplate {
 
         { 960, 540, 16, 9 },
     };
+
+    private static final Logger logger = Logger.getLogger(HScreenConfigTemplate.class.getName());
 }

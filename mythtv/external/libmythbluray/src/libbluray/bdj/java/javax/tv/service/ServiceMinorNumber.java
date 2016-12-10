@@ -19,7 +19,6 @@
 
 package javax.tv.service;
 
-public interface ServiceMinorNumber extends ServiceNumber
-{
+public interface ServiceMinorNumber extends ServiceNumber {
     public int getMinorNumber();
 }

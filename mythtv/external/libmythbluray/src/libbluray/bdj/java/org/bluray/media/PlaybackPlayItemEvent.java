@@ -22,17 +22,18 @@ package org.bluray.media;
 import java.util.EventObject;
 
 public class PlaybackPlayItemEvent extends EventObject {
-    public PlaybackPlayItemEvent(PlaybackControl source, int playItem)
-    {
+    public PlaybackPlayItemEvent(PlaybackControl source, int playItem) {
         super(source);
         this.playItem = playItem;
     }
 
-    public int getPlayItem()
-    {
+    public int getPlayItem() {
         return playItem;
     }
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",playItem=" + playItem + "]";
+    }
 
-    private int playItem;
+    private final int playItem;
     private static final long serialVersionUID = -2550042660300066017L;
 }

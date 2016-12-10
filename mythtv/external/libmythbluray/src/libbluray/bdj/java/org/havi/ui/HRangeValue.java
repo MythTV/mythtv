@@ -25,148 +25,129 @@ import org.havi.ui.event.HFocusEvent;
 import org.havi.ui.event.HFocusListener;
 
 public class HRangeValue extends HRange implements HAdjustmentValue {
-    public HRangeValue()
-    {
+    public HRangeValue() {
         org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
     public HRangeValue(int orientation, int minimum, int maximum, int value,
-            int x, int y, int width, int height)
-    {
+            int x, int y, int width, int height) {
         org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public HRangeValue(int orientation, int minimum, int maximum, int value)
-    {
+    public HRangeValue(int orientation, int minimum, int maximum, int value) {
         org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public static void setDefaultLook(HRangeLook look)
-    {
+    public static void setDefaultLook(HRangeLook look) {
         DefaultLook = look;
     }
 
-    public static HRangeLook getDefaultLook()
-    {
+    public static HRangeLook getDefaultLook() {
         if (DefaultLook == null)
             org.videolan.Logger.unimplemented("", "getDefaultLook");
         return DefaultLook;
     }
 
-    public void setMove(int keyCode, HNavigable target)
-    {
-        throw new Error("Not implemented");
+    public void setMove(int keyCode, HNavigable target) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public HNavigable getMove(int keyCode)
-    {
-        throw new Error("Not implemented");
+    public HNavigable getMove(int keyCode) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return null;
     }
 
     public void setFocusTraversal(HNavigable up, HNavigable down,
-            HNavigable left, HNavigable right)
-    {
-        throw new Error("Not implemented");
+            HNavigable left, HNavigable right) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public boolean isSelected()
-    {
-        throw new Error("Not implemented");
+    public boolean isSelected() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return false;
     }
 
-    public void setGainFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setGainFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public void setLoseFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setLoseFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public HSound getGainFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getGainFocusSound() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return null;
     }
 
-    public HSound getLoseFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getLoseFocusSound() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return null;
     }
 
-    public void addHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void addHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public void removeHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public int[] getNavigationKeys()
-    {
-        throw new Error("Not implemented");
+    public int[] getNavigationKeys() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return null;
     }
 
-    public void processHFocusEvent(HFocusEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHFocusEvent(HFocusEvent evt) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public void setUnitIncrement(int increment)
-    {
-        throw new Error("Not implemented");
+    public void setUnitIncrement(int increment) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public int getUnitIncrement()
-    {
-        throw new Error("Not implemented");
+    public int getUnitIncrement() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return 0;
     }
 
-    public void setBlockIncrement(int increment)
-    {
-        throw new Error("Not implemented");
+    public void setBlockIncrement(int increment) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public int getBlockIncrement()
-    {
-        throw new Error("Not implemented");
+    public int getBlockIncrement() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return 0;
     }
 
-    public void addAdjustmentListener(HAdjustmentListener l)
-    {
-        throw new Error("Not implemented");
+    public void addAdjustmentListener(HAdjustmentListener l) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public void removeAdjustmentListener(HAdjustmentListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeAdjustmentListener(HAdjustmentListener l) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public void setAdjustmentSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setAdjustmentSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public HSound getAdjustmentSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getAdjustmentSound() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return null;
     }
 
-    public boolean getAdjustMode()
-    {
-        throw new Error("Not implemented");
+    public boolean getAdjustMode() {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
+        return false;
     }
 
-    public void setAdjustMode(boolean adjust)
-    {
-        throw new Error("Not implemented");
+    public void setAdjustMode(boolean adjust) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
-    public void processHAdjustmentEvent(HAdjustmentEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHAdjustmentEvent(HAdjustmentEvent evt) {
+        org.videolan.Logger.unimplemented(HRangeValue.class.getName(), "");
     }
 
     private static HRangeLook DefaultLook = null;

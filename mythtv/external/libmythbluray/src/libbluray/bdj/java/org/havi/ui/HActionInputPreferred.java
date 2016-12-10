@@ -21,8 +21,7 @@ package org.havi.ui;
 
 import org.havi.ui.event.HActionEvent;
 
-public interface HActionInputPreferred 
-{
+public interface HActionInputPreferred {
     public void processHActionEvent(HActionEvent event);
 
     public String getActionCommand();

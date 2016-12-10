@@ -21,31 +21,25 @@ package org.bluray.system;
 import org.videolan.Libbluray;
 
 public class RegisterAccess {
-    private RegisterAccess()
-    {
-        
+    private RegisterAccess() {
     }
-    
-    public static RegisterAccess getInstance()
-    {
+
+    public static RegisterAccess getInstance() {
         return instance;
     }
-    
-    public int getGPR(int num)
-    {
+
+    public int getGPR(int num) {
         return Libbluray.readGPR(num);
     }
-    
-    public int getPSR(int num)
-    {
+
+    public int getPSR(int num) {
         return Libbluray.readPSR(num);
     }
-    
-    public void setGPR(int num, int value)
-    {
+
+    public void setGPR(int num, int value) {
         Libbluray.writeGPR(num, value);
     }
-    
+
     public static final int PSR_AUDIO_STN = 1;
     public static final int PSR_PG_TXTST_STN = 2;
     public static final int PSR_ANGLE_NR = 3;
@@ -54,7 +48,7 @@ public class RegisterAccess {
     public static final int PSR_PLAYLIST_ID = 6;
     public static final int PSR_PLAYITEM_ID = 7;
     public static final int PSR_PRES_TIME = 8;
-    
+
     public static final int PSR_USER_STYLE_NR = 12;
     public static final int PSR_PARENTAL_LVL = 13;
     public static final int PSR_SECONDARY_AUDIO_STN = 14;
@@ -64,10 +58,10 @@ public class RegisterAccess {
     public static final int PSR_MENU_DESCR_LANG_CODE = 18;
     public static final int PSR_COUNTRY_CODE = 19;
     public static final int PSR_REGION_PLAYBACK_CODE = 20;
-    
+
     public static final int PSR_VIDEO_CAPABILITY = 29;
     public static final int PSR_PLAYER_CAP_TXTST = 30;
     public static final int PSR_PLAYER_PROFILE = 31;
-    
+
     private static final RegisterAccess instance = new RegisterAccess();
 }

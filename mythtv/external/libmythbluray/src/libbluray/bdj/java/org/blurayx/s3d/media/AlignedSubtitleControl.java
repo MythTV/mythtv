@@ -21,8 +21,8 @@ package org.blurayx.s3d.media;
 
 import javax.media.Control;
 
-public abstract interface AlignedSubtitleControl extends Control
-{
+public abstract interface AlignedSubtitleControl extends Control {
+
     public abstract int getAlignedSubtitle();
 
     public abstract void setAlignedSubtitle(int paramInt)

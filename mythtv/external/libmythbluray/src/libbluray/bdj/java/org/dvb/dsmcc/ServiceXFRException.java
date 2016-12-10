@@ -21,18 +21,15 @@ package org.dvb.dsmcc;
 
 public class ServiceXFRException extends DSMCCException {
     public ServiceXFRException(org.davic.net.Locator aService, int carouselId,
-            String pathName)
-    {
+            String pathName) {
         this.ref = new ServiceXFRReference(aService, carouselId, pathName);
     }
 
-    public ServiceXFRException(byte[] NSAPAddress, String pathName)
-    {
+    public ServiceXFRException(byte[] NSAPAddress, String pathName) {
         this.ref = new ServiceXFRReference(NSAPAddress, pathName);
     }
 
-    public ServiceXFRReference getServiceXFR()
-    {
+    public ServiceXFRReference getServiceXFR() {
         return ref;
     }
 

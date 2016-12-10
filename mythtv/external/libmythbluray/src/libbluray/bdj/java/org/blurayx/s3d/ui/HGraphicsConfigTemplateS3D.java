@@ -21,8 +21,8 @@ package org.blurayx.s3d.ui;
 
 import org.havi.ui.HGraphicsConfigTemplate;
 
-public class HGraphicsConfigTemplateS3D extends HGraphicsConfigTemplate
-{
+public class HGraphicsConfigTemplateS3D extends HGraphicsConfigTemplate {
+
     public static final int S3D = 17;
 
     protected int getPreferenceCount() {

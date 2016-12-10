@@ -22,13 +22,11 @@ package javax.tv.service.navigation;
 import javax.tv.service.SIException;
 
 public class FilterNotSupportedException extends SIException {
-    public FilterNotSupportedException()
-    {
+    public FilterNotSupportedException() {
         super();
     }
 
-    public FilterNotSupportedException(String reason)
-    {
+    public FilterNotSupportedException(String reason) {
         super(reason);
     }
 

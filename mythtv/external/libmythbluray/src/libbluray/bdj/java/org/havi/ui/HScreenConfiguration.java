@@ -24,7 +24,6 @@ import java.awt.Dimension;
 
 public abstract class HScreenConfiguration extends Object {
     HScreenConfiguration() {
-
     }
 
     HScreenConfiguration(HScreenConfigTemplate hsct) {

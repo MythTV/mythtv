@@ -34,6 +34,8 @@ typedef struct bd_enc_info {
     uint8_t  disc_id[20];
     uint8_t  bdplus_gen;
     uint32_t bdplus_date;
+
+    uint8_t  no_menu_support;
 } BD_ENC_INFO;
 
 #endif /* _BD_DISC_ENC_INFO_H_ */

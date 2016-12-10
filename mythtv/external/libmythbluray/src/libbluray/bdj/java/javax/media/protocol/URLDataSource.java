@@ -27,78 +27,63 @@ import javax.media.Duration;
 import javax.media.MediaLocator;
 
 public class URLDataSource extends PullDataSource {
-    protected URLDataSource()
-    {
+    protected URLDataSource() {
     }
 
-    public URLDataSource(URL url) throws IOException
-    {
+    public URLDataSource(URL url) throws IOException {
         setLocator(new MediaLocator(url));
-        this.connected = false;
+        connected = false;
     }
 
-    public PullSourceStream[] getStreams()
-    {
-        if (!this.connected)
+    public PullSourceStream[] getStreams() {
+        if (!connected)
             throw new Error("Unconnected source.");
-        return this.sources;
+        return sources;
     }
 
-    public void connect() throws IOException
-    {
-        this.conn = getLocator().getURL().openConnection();
-        this.conn.connect();
-        this.connected = true;
-        String str = this.conn.getContentType();
+    public void connect() throws IOException {
+        conn = getLocator().getURL().openConnection();
+        conn.connect();
+        connected = true;
+        String str = conn.getContentType();
         if (str == null)
             str = "UnknownContent";
-        this.contentType = new ContentDescriptor(ContentDescriptor.mimeTypeToPackageName(str));
-        this.sources = new URLSourceStream[1];
-        this.sources[0] = new URLSourceStream(this.conn, this.contentType);
+        contentType = new ContentDescriptor(ContentDescriptor.mimeTypeToPackageName(str));
+        sources = new URLSourceStream[1];
+        sources[0] = new URLSourceStream(conn, contentType);
     }
 
-    public String getContentType()
-    {
-        if (!this.connected)
+    public String getContentType() {
+        if (!connected)
             throw new Error("Source is unconnected.");
-        return this.contentType.getContentType();
+        return contentType.getContentType();
     }
 
-    public void disconnect()
-    {
-        if (this.connected)
-        {
-            try
-            {
-                this.sources[0].close();
+    public void disconnect() {
+        if (connected) {
+            try {
+                sources[0].close();
+            } catch (IOException ioe) {
             }
-            catch (IOException localIOException)
-            {
-            }
-            this.connected = false;
+            connected = false;
         }
     }
 
-    public void start() throws IOException
-    {
+    public void start() throws IOException {
     }
 
-    public void stop() throws IOException
-    {
+    public void stop() throws IOException {
     }
 
-    public Time getDuration()
-    {
+    public Time getDuration() {
         return Duration.DURATION_UNKNOWN;
     }
 
-    public Object[] getControls()
-    {
+    public Object[] getControls() {
         return new Object[0];
     }
 
-    public Object getControl(String controlName)
-    {
+    public Object getControl(String controlName) {
         return null;
     }
 

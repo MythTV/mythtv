@@ -193,14 +193,25 @@ JNIEXPORT jbyteArray JNICALL Java_org_videolan_Libbluray_getAacsDataN
 {
     BLURAY* bd = (BLURAY*)(intptr_t)np;
     const uint8_t *data = bd_get_aacs_data(bd, type);
+    size_t data_size = 16;
 
     BD_DEBUG(DBG_JNI, "getAacsDataN(%d) -> %p\n", (int)type, (const void *)data);
 
     if (!data) {
         return NULL;
     }
-    jbyteArray array = (*env)->NewByteArray(env, 16);
-    (*env)->SetByteArrayRegion(env, array, 0, 16, (const jbyte *)data);
+    if (type == 1/*BD_AACS_DISC_ID*/) {
+        data_size = 20;
+    }
+    if (type == 7/*BD_AACS_CONTENT_CERT_ID*/) {
+        data_size = 6;
+    }
+    if (type == 8/*BD_AACS_BDJ_ROOT_CERT_HASH*/) {
+        data_size = 20;
+    }
+
+    jbyteArray array = (*env)->NewByteArray(env, data_size);
+    (*env)->SetByteArrayRegion(env, array, 0, data_size, (const jbyte *)data);
     return array;
 }
 

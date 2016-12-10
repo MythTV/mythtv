@@ -30,6 +30,7 @@
 #include "util/strutl.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 
 struct bd_aacs {
@@ -41,12 +42,9 @@ struct bd_aacs {
 
     /* function pointers */
     fptr_int       decrypt_unit;
+    fptr_int       decrypt_bus;
 
-    fptr_p_void    get_vid;
-    fptr_p_void    get_pmsn;
-    fptr_p_void    get_device_binding_id;
-    fptr_p_void    get_device_nonce;
-    fptr_p_void    get_media_key;
+    int            impl_id;
 };
 
 
@@ -58,15 +56,19 @@ static void _libaacs_close(BD_AACS *p)
     }
 }
 
+static void _unload(BD_AACS *p)
+{
+    _libaacs_close(p);
+
+    if (p->h_libaacs) {
+        dl_dlclose(p->h_libaacs);
+    }
+}
+
 void libaacs_unload(BD_AACS **p)
 {
     if (p && *p) {
-        _libaacs_close(*p);
-
-        if ((*p)->h_libaacs) {
-            dl_dlclose((*p)->h_libaacs);
-        }
-
+        _unload(*p);
         X_FREE(*p);
     }
 }
@@ -82,7 +84,11 @@ int libaacs_required(void *have_file_handle, int (*have_file)(void *, const char
     return 0;
 }
 
-static void *_open_libaacs(void)
+#define IMPL_USER       0
+#define IMPL_LIBAACS    1
+#define IMPL_LIBMMBD    2
+
+static void *_open_libaacs(int *impl_id)
 {
     const char * const libaacs[] = {
       getenv("LIBAACS_PATH"),
@@ -91,10 +97,11 @@ static void *_open_libaacs(void)
     };
     unsigned ii;
 
-    for (ii = 0; ii < sizeof(libaacs) / sizeof(libaacs[0]); ii++) {
+    for (ii = *impl_id; ii < sizeof(libaacs) / sizeof(libaacs[0]); ii++) {
         if (libaacs[ii]) {
             void *handle = dl_dlopen(libaacs[ii], "0");
             if (handle) {
+                *impl_id = ii;
                 BD_DEBUG(DBG_BLURAY, "Using %s for AACS\n", libaacs[ii]);
                 return handle;
             }
@@ -105,14 +112,15 @@ static void *_open_libaacs(void)
     return NULL;
 }
 
-BD_AACS *libaacs_load(void)
+static BD_AACS *_load(int impl_id)
 {
     BD_AACS *p = calloc(1, sizeof(BD_AACS));
     if (!p) {
         return NULL;
     }
+    p->impl_id = impl_id;
 
-    p->h_libaacs = _open_libaacs();
+    p->h_libaacs = _open_libaacs(&p->impl_id);
     if (!p->h_libaacs) {
         X_FREE(p);
         return NULL;
@@ -121,11 +129,7 @@ BD_AACS *libaacs_load(void)
     BD_DEBUG(DBG_BLURAY, "Loading aacs library (%p)\n", p->h_libaacs);
 
     *(void **)(&p->decrypt_unit) = dl_dlsym(p->h_libaacs, "aacs_decrypt_unit");
-    *(void **)(&p->get_vid)      = dl_dlsym(p->h_libaacs, "aacs_get_vid");
-    *(void **)(&p->get_pmsn)     = dl_dlsym(p->h_libaacs, "aacs_get_pmsn");
-    *(void **)(&p->get_device_binding_id) = dl_dlsym(p->h_libaacs, "aacs_get_device_binding_id");
-    *(void **)(&p->get_device_nonce)      = dl_dlsym(p->h_libaacs, "aacs_get_device_nonce");
-    *(void **)(&p->get_media_key)         = dl_dlsym(p->h_libaacs, "aacs_get_mk");
+    *(void **)(&p->decrypt_bus)  = dl_dlsym(p->h_libaacs, "aacs_decrypt_bus");
 
     if (!p->decrypt_unit) {
         BD_DEBUG(DBG_BLURAY | DBG_CRIT, "libaacs dlsym failed! (%p)\n", p->h_libaacs);
@@ -141,6 +145,11 @@ BD_AACS *libaacs_load(void)
     }
 
     return p;
+}
+
+BD_AACS *libaacs_load(int force_mmbd)
+{
+    return _load(force_mmbd ? IMPL_LIBMMBD : 0);
 }
 
 int libaacs_open(BD_AACS *p, const char *device,
@@ -173,11 +182,36 @@ int libaacs_open(BD_AACS *p, const char *device,
     } else if (open2) {
         BD_DEBUG(DBG_BLURAY, "Using old aacs_open2(), no UDF support available\n");
         p->aacs = open2(device, keyfile_path, &error_code);
+
+        /* libmmbd needs dev: for devices */
+        if (!p->aacs && p->impl_id == IMPL_LIBMMBD && !strncmp(device, "/dev/", 5)) {
+            char *tmp_device = str_printf("dev:%s", device);
+            if (tmp_device) {
+                p->aacs = open2(tmp_device, keyfile_path, &error_code);
+                X_FREE(tmp_device);
+            }
+        }
     } else if (open) {
         BD_DEBUG(DBG_BLURAY, "Using old aacs_open(), no verbose error reporting available\n");
         p->aacs = open(device, keyfile_path);
     } else {
         BD_DEBUG(DBG_BLURAY, "aacs_open() not found\n");
+    }
+
+    if (error_code) {
+        /* failed. try next aacs implementation if available. */
+        BD_AACS *p2 = _load(p->impl_id + 1);
+        if (p2) {
+            if (!libaacs_open(p2, device, file_open_handle, file_open_fp, keyfile_path)) {
+                /* succeed - swap implementations */
+                _unload(p);
+                *p = *p2;
+                X_FREE(p2);
+                return 0;
+            }
+            /* failed - report original errors */
+            libaacs_unload(&p2);
+        }
     }
 
     if (p->aacs) {
@@ -217,63 +251,55 @@ int libaacs_decrypt_unit(BD_AACS *p, uint8_t *buf)
     return 0;
 }
 
+int libaacs_decrypt_bus(BD_AACS *p, uint8_t *buf)
+{
+    if (p && p->aacs && p->decrypt_bus) {
+        if (p->decrypt_bus(p->aacs, buf) > 0) {
+            return 0;
+        }
+    }
+
+    BD_DEBUG(DBG_AACS | DBG_CRIT, "Unable to BUS decrypt unit (AACS)!\n");
+    return -1;
+}
+
 /*
  *
  */
 
-static const uint8_t *_get_vid(BD_AACS *p)
-{
-    if (!p->get_vid) {
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_get_vid() dlsym failed!\n");
-        return NULL;
-    }
-
-    return (const uint8_t*)p->get_vid(p->aacs);
-}
-
-static const uint8_t *_get_pmsn(BD_AACS *p)
-{
-    if (!p->get_pmsn) {
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_get_pmsn() dlsym failed!\n");
-        return NULL;
-    }
-
-    return (const uint8_t*)p->get_pmsn(p->aacs);
-}
-
-static const uint8_t *_get_device_binding_id(BD_AACS *p)
-{
-    if (!p->get_device_binding_id) {
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_get_device_binding_id() dlsym failed!\n");
-        return NULL;
-    }
-
-    return (const uint8_t*)p->get_device_binding_id(p->aacs);
-}
-
-static const uint8_t *_get_device_nonce(BD_AACS *p)
-{
-    if (!p->get_device_nonce) {
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_get_device_nonce() dlsym failed!\n");
-        return NULL;
-    }
-
-    return (const uint8_t*)p->get_device_nonce(p->aacs);
-}
-
-static const uint8_t *_get_media_key(BD_AACS *p)
-{
-    if (!p->get_media_key) {
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_get_mk() dlsym failed!\n");
-        return NULL;
-    }
-
-    return (const uint8_t*)p->get_media_key(p->aacs);
-}
-
 uint32_t libaacs_get_mkbv(BD_AACS *p)
 {
     return p ? p->mkbv : 0;
+}
+
+int libaacs_get_bec_enabled(BD_AACS *p)
+{
+    fptr_int get_bec;
+
+    if (!p || !p->h_libaacs) {
+        return 0;
+    }
+
+    *(void **)(&get_bec) = dl_dlsym(p->h_libaacs, "aacs_get_bus_encryption");
+    if (!get_bec) {
+        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_get_bus_encryption() dlsym failed!\n");
+        return 0;
+    }
+
+    return get_bec(p->aacs) == 3;
+}
+
+static const uint8_t *_get_data(BD_AACS *p, const char *func)
+{
+    fptr_p_void fp;
+
+    *(void **)(&fp) = dl_dlsym(p->h_libaacs, func);
+    if (!fp) {
+        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "%s() dlsym failed!\n", func);
+        return NULL;
+    }
+
+    return (const uint8_t*)fp(p->aacs);
 }
 
 static const char *_type2str(int type)
@@ -285,6 +311,8 @@ static const char *_type2str(int type)
     case BD_AACS_DEVICE_BINDING_ID:  return "DEVICE_BINDING_ID";
     case BD_AACS_DEVICE_NONCE:       return "DEVICE_NONCE";
     case BD_AACS_MEDIA_KEY:          return "MEDIA_KEY";
+    case BD_AACS_CONTENT_CERT_ID:    return "CONTENT_CERT_ID";
+    case BD_AACS_BDJ_ROOT_CERT_HASH: return "BDJ_ROOT_CERT_HASH";
     default: return "???";
     }
 }
@@ -301,19 +329,25 @@ BD_PRIVATE const uint8_t *libaacs_get_aacs_data(BD_AACS *p, int type)
             return p->disc_id;
 
         case BD_AACS_MEDIA_VID:
-            return _get_vid(p);
+            return _get_data(p, "aacs_get_vid");
 
         case BD_AACS_MEDIA_PMSN:
-            return _get_pmsn(p);
+            return _get_data(p, "aacs_get_pmsn");
 
         case BD_AACS_DEVICE_BINDING_ID:
-            return _get_device_binding_id(p);
+            return _get_data(p, "aacs_get_device_binding_id");
 
         case BD_AACS_DEVICE_NONCE:
-            return _get_device_nonce(p);
+            return _get_data(p, "aacs_get_device_nonce");
 
         case BD_AACS_MEDIA_KEY:
-            return _get_media_key(p);
+            return _get_data(p, "aacs_get_mk");
+
+        case BD_AACS_CONTENT_CERT_ID:
+            return _get_data(p, "aacs_get_content_cert_id");
+
+        case BD_AACS_BDJ_ROOT_CERT_HASH:
+            return _get_data(p, "aacs_get_bdj_root_cert_hash");
     }
 
     BD_DEBUG(DBG_BLURAY | DBG_CRIT, "get_aacs_data(): unknown query %d\n", type);

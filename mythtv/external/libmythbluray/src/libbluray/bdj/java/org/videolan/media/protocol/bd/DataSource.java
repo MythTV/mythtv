@@ -34,7 +34,7 @@ public class DataSource extends javax.media.protocol.DataSource {
 
     public Time getDuration() {
         org.videolan.Logger.unimplemented(DataSource.class.getName(), "getDuration");
-        return null;
+        return DURATION_UNKNOWN;
     }
 
     public String getContentType() {

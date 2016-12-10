@@ -24,18 +24,15 @@ import javax.tv.service.SIChangeType;
 
 public class ProgramScheduleEvent extends SIChangeEvent {
     public ProgramScheduleEvent(ProgramSchedule schedule, SIChangeType type,
-            ProgramEvent event)
-    {
+            ProgramEvent event) {
         super(schedule, type, event);
     }
 
-    public ProgramSchedule getProgramSchedule()
-    {
+    public ProgramSchedule getProgramSchedule() {
         return (ProgramSchedule)getSource();
     }
 
-    public ProgramEvent getProgramEvent()
-    {
+    public ProgramEvent getProgramEvent() {
         return (ProgramEvent)getSIElement();
     }
 

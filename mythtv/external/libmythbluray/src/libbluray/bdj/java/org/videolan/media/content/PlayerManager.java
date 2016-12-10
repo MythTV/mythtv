@@ -138,24 +138,15 @@ public class PlayerManager {
      *
      */
 
-    public void onEvent(int event, int param) {
+    public boolean onEvent(int event, int param) {
         synchronized (stoppingLock) {
-            if (stopping) return;
+            if (stopping) return false;
             synchronized (playlistPlayerLock) {
                 if (playlistPlayer != null)
-                    playlistPlayer.statusEvent(event, param);
+                    return playlistPlayer.statusEvent(event, param);
             }
         }
-    }
-
-    public void onRateChange(float rate) {
-        synchronized (stoppingLock) {
-            if (stopping) return;
-        synchronized (playlistPlayerLock) {
-            if (playlistPlayer != null)
-                playlistPlayer.rateChanged(rate);
-        }
-        }
+        return false;
     }
 
     private static final Logger logger = Logger.getLogger(PlayerManager.class.getName());

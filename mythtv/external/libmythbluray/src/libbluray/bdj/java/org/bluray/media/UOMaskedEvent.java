@@ -22,17 +22,19 @@ package org.bluray.media;
 import java.util.EventObject;
 
 public class UOMaskedEvent extends EventObject {
-    public UOMaskedEvent(UOMaskTableControl source, int position)
-    {
+    public UOMaskedEvent(UOMaskTableControl source, int position) {
         super(source);
         this.position = position;
     }
 
-    public int getUOMaskPosition()
-    {
+    public int getUOMaskPosition() {
         return position;
     }
 
-    private int position;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",position=" + position + "]";
+    }
+
+    private final int position;
     private static final long serialVersionUID = -1417936916531803863L;
 }

@@ -20,13 +20,11 @@
 package org.dvb.ui;
 
 public class FontFormatException extends Exception {
-    public FontFormatException()
-    {
+    public FontFormatException() {
         super();
     }
 
-    public FontFormatException(String reason)
-    {
+    public FontFormatException(String reason) {
         super(reason);
     }
 

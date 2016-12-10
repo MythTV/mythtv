@@ -45,7 +45,7 @@ abstract class BDGraphicsConfigurationBase extends GraphicsConfiguration {
         return BufferedImage.TYPE_INT_ARGB;
     }
 
-    public synchronized ColorModel getColorModel() {
+    public ColorModel getColorModel() {
         return new DirectColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),
                                     32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000, true,
                                     DataBuffer.TYPE_INT);

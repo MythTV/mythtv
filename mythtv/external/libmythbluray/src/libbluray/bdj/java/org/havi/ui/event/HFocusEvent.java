@@ -25,28 +25,26 @@ public class HFocusEvent extends java.awt.event.FocusEvent {
     public static final int HFOCUS_LAST = FOCUS_TRANSFER;
     public static final int NO_TRANSFER_ID = -1;
 
-    public HFocusEvent(java.awt.Component source, int id)
-    {
+    public HFocusEvent(java.awt.Component source, int id) {
         super(source, id, false);
 
         this.transfer = NO_TRANSFER_ID;
     }
 
-    public HFocusEvent(java.awt.Component source, int id, int transfer)
-    {
+    public HFocusEvent(java.awt.Component source, int id, int transfer) {
         super(source, id, false);
 
         this.transfer = transfer;
     }
 
-    public boolean isTemporary()
-    {
+    public boolean isTemporary() {
         return false;
     }
 
-    public int getTransferId()
-    {
-        return transfer;
+    public int getTransferId() {
+        if (getID() == FOCUS_TRANSFER)
+            return transfer;
+        return NO_TRANSFER_ID;
     }
 
     private int transfer;

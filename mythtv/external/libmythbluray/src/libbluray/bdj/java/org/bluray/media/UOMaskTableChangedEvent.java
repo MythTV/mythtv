@@ -22,8 +22,7 @@ package org.bluray.media;
 import java.util.EventObject;
 
 public class UOMaskTableChangedEvent extends EventObject {
-    public UOMaskTableChangedEvent(UOMaskTableControl source)
-    {
+    public UOMaskTableChangedEvent(UOMaskTableControl source) {
         super(source);
     }
 

@@ -29,12 +29,10 @@ import org.videolan.Logger;
 
 public class HTextLook implements HExtendedLook {
 
-    public HTextLook()
-    {
+    public HTextLook() {
     }
 
-    public void fillBackground(Graphics g, HVisible visible, int state)
-    {
+    public void fillBackground(Graphics g, HVisible visible, int state) {
         if (visible.getBackgroundMode() == HVisible.BACKGROUND_FILL) {
             Color color = visible.getBackground();
             Dimension dimension = visible.getSize();
@@ -43,8 +41,7 @@ public class HTextLook implements HExtendedLook {
         }
     }
 
-    public void renderBorders(Graphics g, HVisible visible, int state)
-    {
+    public void renderBorders(Graphics g, HVisible visible, int state) {
         Insets insets = getInsets(visible);
         Color fg = visible.getForeground();
         Dimension dimension = visible.getSize();
@@ -58,8 +55,7 @@ public class HTextLook implements HExtendedLook {
         }
     }
 
-    public void renderVisible(Graphics g, HVisible visible, int state)
-    {
+    public void renderVisible(Graphics g, HVisible visible, int state) {
         String text = visible.getTextContent(state);
         Insets insets = getInsets(visible);
         if (text == null) {
@@ -68,38 +64,32 @@ public class HTextLook implements HExtendedLook {
         logger.unimplemented("renderVisible[text=" + text + "]");
     }
 
-    public void showLook(Graphics g, HVisible visible, int state)
-    {
+    public void showLook(Graphics g, HVisible visible, int state) {
         fillBackground(g, visible, state);
         renderVisible(g, visible, state);
         renderBorders(g, visible, state);
     }
 
-    public void widgetChanged(HVisible visible, HChangeData[] changes)
-    {
+    public void widgetChanged(HVisible visible, HChangeData[] changes) {
         visible.repaint();
     }
 
-    public Dimension getMinimumSize(HVisible hvisible)
-    {
+    public Dimension getMinimumSize(HVisible hvisible) {
         logger.unimplemented("getMinimumSize");
         return null;
     }
 
-    public Dimension getPreferredSize(HVisible hvisible)
-    {
+    public Dimension getPreferredSize(HVisible hvisible) {
         logger.unimplemented("getPreferredSize");
         return null;
     }
 
-    public Dimension getMaximumSize(HVisible hvisible)
-    {
+    public Dimension getMaximumSize(HVisible hvisible) {
         logger.unimplemented("getMAximumSize");
         return null;
     }
 
-    public boolean isOpaque(HVisible visible)
-    {
+    public boolean isOpaque(HVisible visible) {
         if (visible.getBackgroundMode() != 1) {
             return false;
         }
@@ -112,8 +102,7 @@ public class HTextLook implements HExtendedLook {
         return true;
     }
 
-    public Insets getInsets(HVisible visible)
-    {
+    public Insets getInsets(HVisible visible) {
         if (!visible.getBordersEnabled()) {
             return new Insets(0, 0, 0, 0);
         }

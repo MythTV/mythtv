@@ -40,19 +40,43 @@ void bb_init( BITBUFFER *bb, const uint8_t *p_data, size_t i_data )
     bb->i_left  = 8;
 }
 
-void bs_init( BITSTREAM *bs, BD_FILE_H *fp )
+static int _bs_read( BITSTREAM *bs)
+{
+    int result = 0;
+    int64_t got;
+
+    got = file_read(bs->fp, bs->buf, BF_BUF_SIZE);
+    if (got <= 0 || got > BF_BUF_SIZE) {
+        BD_DEBUG(DBG_FILE, "_bs_read(): read error\n");
+        got = 0;
+        result = -1;
+    }
+
+    bs->size = (size_t)got;
+    bb_init(&bs->bb, bs->buf, bs->size);
+
+    return result;
+}
+
+static int _bs_read_at( BITSTREAM *bs, int64_t off )
+{
+    if (file_seek(bs->fp, off, SEEK_SET) < 0) {
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "bs_read(): seek failed\n");
+        /* no change in state. Caller _must_ check return value. */
+        return -1;
+    }
+    bs->pos = off;
+    return _bs_read(bs);
+}
+
+int bs_init( BITSTREAM *bs, BD_FILE_H *fp )
 {
     int64_t size = file_size(fp);;
     bs->fp = fp;
     bs->pos = 0;
     bs->end = (size < 0) ? 0 : size;
-    bs->size = file_read(bs->fp, bs->buf, BF_BUF_SIZE);
-    if (bs->size == 0 || bs->size > BF_BUF_SIZE) {
-        bs->size = 0;
-        bs->end = 0;
-        BD_DEBUG(DBG_FILE|DBG_CRIT, "bs_init(): read error!\n");
-    }
-    bb_init(&bs->bb, bs->buf, bs->size);
+
+    return _bs_read(bs);
 }
 
 void bb_seek( BITBUFFER *bb, int64_t off, int whence)
@@ -82,8 +106,9 @@ void bb_seek( BITBUFFER *bb, int64_t off, int whence)
     }
 }
 
-void bs_seek( BITSTREAM *bs, int64_t off, int whence)
+static int _bs_seek( BITSTREAM *bs, int64_t off, int whence)
 {
+    int result = 0;
     int64_t b;
 
     switch (whence) {
@@ -97,39 +122,43 @@ void bs_seek( BITSTREAM *bs, int64_t off, int whence)
         default:
             break;
     }
+    if (off < 0) {
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "bs_seek(): seek failed (negative offset)\n");
+        return -1;
+    }
+
     b = off >> 3;
     if (b >= bs->end)
     {
+        int64_t pos;
         if (BF_BUF_SIZE < bs->end) {
-            bs->pos = bs->end - BF_BUF_SIZE;
-            file_seek(bs->fp, BF_BUF_SIZE, SEEK_END);
+            pos = bs->end - BF_BUF_SIZE;
         } else {
-            bs->pos = 0;
-            file_seek(bs->fp, 0, SEEK_SET);
+            pos = 0;
         }
-        bs->size = file_read(bs->fp, bs->buf, BF_BUF_SIZE);
-        bb_init(&bs->bb, bs->buf, bs->size);
+        result = _bs_read_at(bs, pos);
         bs->bb.p = bs->bb.p_end;
     } else if (b < bs->pos || b >= (bs->pos + BF_BUF_SIZE)) {
-        file_seek(bs->fp, b, SEEK_SET);
-        bs->pos = b;
-        bs->size = file_read(bs->fp, bs->buf, BF_BUF_SIZE);
-        bb_init(&bs->bb, bs->buf, bs->size);
+        result  = _bs_read_at(bs, b);
     } else {
         b -= bs->pos;
         bs->bb.p = &bs->bb.p_start[b];
         bs->bb.i_left = 8 - (off & 0x07);
     }
+
+    return result;
 }
 
+#if 0
 void bb_seek_byte( BITBUFFER *bb, int64_t off)
 {
     bb_seek(bb, off << 3, SEEK_SET);
 }
+#endif
 
-void bs_seek_byte( BITSTREAM *s, int64_t off)
+int bs_seek_byte( BITSTREAM *s, int64_t off)
 {
-    bs_seek(s, off << 3, SEEK_SET);
+    return _bs_seek(s, off << 3, SEEK_SET);
 }
 
 
@@ -167,7 +196,7 @@ uint32_t bb_read( BITBUFFER *bb, int i_count )
             return( i_result );
         } else {
             /* less in the buffer than requested */
-           i_result |= (*bb->p&i_mask[bb->i_left]) << -i_shr;
+           i_result |= (unsigned)(*bb->p&i_mask[bb->i_left]) << -i_shr;
            i_count  -= bb->i_left;
            bb->p++;
            bb->i_left = 8;

@@ -29,7 +29,8 @@ typedef struct bd_bdplus BD_BDPLUS;
 
 BD_PRIVATE int  libbdplus_required(void *have_file_handle, int (*have_file)(void *, const char *, const char *));
 BD_PRIVATE BD_BDPLUS *libbdplus_load(void);
-BD_PRIVATE int  libbdplus_init(BD_BDPLUS *p, const char *root,
+BD_PRIVATE int  libbdplus_is_mmbd(BD_BDPLUS *);
+BD_PRIVATE int  libbdplus_init(BD_BDPLUS *p, const char *root, const char *device,
                                void *open_file_handle, void *open_file_fp,
                                const uint8_t *vid, const uint8_t *mk);
 BD_PRIVATE void libbdplus_unload(BD_BDPLUS **p);

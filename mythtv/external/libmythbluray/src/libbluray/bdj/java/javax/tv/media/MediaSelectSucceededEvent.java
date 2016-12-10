@@ -23,8 +23,7 @@ import javax.tv.locator.Locator;
 import javax.media.Controller;
 
 public class MediaSelectSucceededEvent extends MediaSelectEvent {
-    public MediaSelectSucceededEvent(Controller source, Locator[] selection)
-    {
+    public MediaSelectSucceededEvent(Controller source, Locator[] selection) {
         super(source, selection);
     }
 

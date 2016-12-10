@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2016  VideoLAN
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,31 +17,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package org.videolan.media.content.sound;
+package javax.tv.util;
 
-import java.awt.Component;
-
-import javax.media.Time;
-
-import org.davic.media.MediaTimePositionControl;
-
-public class MediaTimePositionControlImpl implements MediaTimePositionControl {
-    protected MediaTimePositionControlImpl(Handler player) {
-        this.player = player;
+public class TVTimerScheduleFailedException extends Exception
+{
+    public TVTimerScheduleFailedException() {
     }
 
-    public Component getControlComponent() {
-        return null;
+    public TVTimerScheduleFailedException(String param) {
+        super(param);
     }
-
-    public Time setMediaTimePosition(Time mediaTime) {
-        player.setMediaTime(mediaTime);
-        return player.getMediaTime();
-    }
-
-    public Time getMediaTimePosition() {
-        return player.getMediaTime();
-    }
-
-    private Handler player;
 }

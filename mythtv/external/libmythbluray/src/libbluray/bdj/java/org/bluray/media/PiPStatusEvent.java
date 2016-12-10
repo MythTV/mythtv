@@ -23,18 +23,20 @@ package org.bluray.media;
 import java.util.EventObject;
 
 public class PiPStatusEvent extends EventObject {
-    public PiPStatusEvent(boolean available, PiPControl source)
-    {
+    public PiPStatusEvent(boolean available, PiPControl source) {
         super(source);
 
         this.available = available;
     }
 
-    public boolean isPiPAvailable()
-    {
+    public boolean isPiPAvailable() {
         return this.available;
     }
 
-    private boolean available;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",available=" + available + "]";
+    }
+
+    private final boolean available;
     private static final long serialVersionUID = -1233930796504204430L;
 }

@@ -27,13 +27,11 @@ import org.havi.ui.event.HRcEvent;
 
 public class UserEventRepository extends RepositoryDescriptor {
 
-    public UserEventRepository(String name)
-    {
+    public UserEventRepository(String name) {
         super(null, name);
     }
 
-    public void addUserEvent(UserEvent event)
-    {
+    public void addUserEvent(UserEvent event) {
         if (contains(event)) {
             return;
         }
@@ -41,8 +39,7 @@ public class UserEventRepository extends RepositoryDescriptor {
         events.add(event);
     }
 
-    public UserEvent[] getUserEvent()
-    {
+    public UserEvent[] getUserEvent() {
         int size = events.size();
         UserEvent[] userEvents = new UserEvent[size];
         for (int i = 0; i < size; i++)
@@ -50,21 +47,18 @@ public class UserEventRepository extends RepositoryDescriptor {
         return userEvents;
     }
 
-    public void removeUserEvent(UserEvent event)
-    {
+    public void removeUserEvent(UserEvent event) {
         events.remove(event);
     }
 
-    public void addKey(int keycode)
-    {
+    public void addKey(int keycode) {
         addUserEvent(new UserEvent(this, UserEvent.UEF_KEY_EVENT,
                                    KeyEvent.KEY_PRESSED, keycode, 0, 0));
         addUserEvent(new UserEvent(this, UserEvent.UEF_KEY_EVENT,
                                    KeyEvent.KEY_RELEASED, keycode, 0, 0));
     }
 
-    public void removeKey(int keycode)
-    {
+    public void removeKey(int keycode) {
         for(Iterator it = events.iterator(); it.hasNext() == true; ) {
             UserEvent event = (UserEvent)it.next();
 
@@ -73,8 +67,7 @@ public class UserEventRepository extends RepositoryDescriptor {
         }
     }
 
-    public void addAllNumericKeys()
-    {
+    public void addAllNumericKeys() {
         addKey(HRcEvent.VK_0);
         addKey(HRcEvent.VK_1);
         addKey(HRcEvent.VK_2);
@@ -87,24 +80,21 @@ public class UserEventRepository extends RepositoryDescriptor {
         addKey(HRcEvent.VK_9);
     }
 
-    public void addAllColourKeys()
-    {
+    public void addAllColourKeys() {
         addKey(HRcEvent.VK_COLORED_KEY_0);
         addKey(HRcEvent.VK_COLORED_KEY_1);
         addKey(HRcEvent.VK_COLORED_KEY_2);
         addKey(HRcEvent.VK_COLORED_KEY_3);
     }
 
-    public void addAllArrowKeys()
-    {
+    public void addAllArrowKeys() {
         addKey(HRcEvent.VK_LEFT);
         addKey(HRcEvent.VK_RIGHT);
         addKey(HRcEvent.VK_UP);
         addKey(HRcEvent.VK_DOWN);
     }
 
-    public void removeAllNumericKeys()
-    {
+    public void removeAllNumericKeys() {
         removeKey(HRcEvent.VK_0);
         removeKey(HRcEvent.VK_1);
         removeKey(HRcEvent.VK_2);
@@ -117,25 +107,22 @@ public class UserEventRepository extends RepositoryDescriptor {
         removeKey(HRcEvent.VK_9);
     }
 
-    public void removeAllColourKeys()
-    {
+    public void removeAllColourKeys() {
         removeKey(HRcEvent.VK_COLORED_KEY_0);
         removeKey(HRcEvent.VK_COLORED_KEY_1);
         removeKey(HRcEvent.VK_COLORED_KEY_2);
         removeKey(HRcEvent.VK_COLORED_KEY_3);
     }
 
-    public void removeAllArrowKeys()
-    {
+    public void removeAllArrowKeys() {
         removeKey(HRcEvent.VK_LEFT);
         removeKey(HRcEvent.VK_RIGHT);
         removeKey(HRcEvent.VK_UP);
         removeKey(HRcEvent.VK_DOWN);
     }
 
-    boolean contains(UserEvent event)
-    {
-        for(Iterator it = events.iterator(); it.hasNext() == true; ) {
+    boolean contains(UserEvent event) {
+        for (Iterator it = events.iterator(); it.hasNext() == true; ) {
             UserEvent e = (UserEvent)it.next();
             if (e.getFamily() == event.getFamily() && e.getType() == event.getType() && e.getCode() == event.getCode()) {
                 return true;
@@ -146,14 +133,12 @@ public class UserEventRepository extends RepositoryDescriptor {
 
     /* deep copy */
 
-    private UserEventRepository(UserEventRepository r)
-    {
+    private UserEventRepository(UserEventRepository r) {
         super(r.getClient(), r.getName());
         events = ((LinkedList)r.events.clone());
     }
 
-    protected UserEventRepository getNewInstance()
-    {
+    protected UserEventRepository getNewInstance() {
         return new UserEventRepository(this);
     }
 

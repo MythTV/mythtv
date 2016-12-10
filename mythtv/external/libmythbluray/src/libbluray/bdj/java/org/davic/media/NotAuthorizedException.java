@@ -22,13 +22,11 @@ package org.davic.media;
 import java.io.IOException;
 
 public class NotAuthorizedException extends IOException {
-    public NotAuthorizedException()
-    {
+    public NotAuthorizedException() {
         super();
     }
 
-    public NotAuthorizedException(String reason)
-    {
+    public NotAuthorizedException(String reason) {
         super(reason);
     }
 

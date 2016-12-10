@@ -26,41 +26,34 @@ import org.dvb.ui.TestOpacity;
 
 import java.awt.BDToolkit;
 
-public abstract class HComponent extends Component implements HMatteLayer,
-        TestOpacity {
-    public HComponent()
-    {
+public abstract class HComponent extends Component implements HMatteLayer, TestOpacity {
+
+    public HComponent() {
         this(0, 0, 0, 0);
         BDToolkit.addComponent(this);
     }
 
-    public HComponent(int x, int y, int width, int height)
-    {
+    public HComponent(int x, int y, int width, int height) {
         setBounds(x, y, width, height);
     }
 
-    public void setMatte(HMatte m) throws HMatteException
-    {
+    public void setMatte(HMatte m) throws HMatteException {
         matte = m;
     }
 
-    public HMatte getMatte()
-    {
+    public HMatte getMatte() {
         return matte;
     }
 
-    public boolean isDoubleBuffered()
-    {
+    public boolean isDoubleBuffered() {
         return false;
     }
 
-    public boolean isOpaque()
-    {
+    public boolean isOpaque() {
         return false;
     }
 
-    public void setEnabled(boolean b)
-    {
+    public void setEnabled(boolean b) {
         if (b != super.isEnabled()) {
             super.setEnabled(b);
             super.setFocusable(b);
@@ -68,13 +61,11 @@ public abstract class HComponent extends Component implements HMatteLayer,
         }
     }
 
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return super.isEnabled();
     }
 
-    protected void processEvent(AWTEvent event)
-    {
+    protected void processEvent(AWTEvent event) {
         org.videolan.Logger.unimplemented(HComponent.class.getName(), "processEvent");
 
         super.processEvent(event);

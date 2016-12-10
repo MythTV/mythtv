@@ -23,21 +23,18 @@ import javax.tv.locator.*;
 import javax.media.Controller;
 
 public abstract class MediaSelectEvent extends java.util.EventObject {
-    public MediaSelectEvent(Controller controller, Locator[] selection)
-    {
+    public MediaSelectEvent(Controller controller, Locator[] selection) {
         super(controller);
 
         this.controller = controller;
         this.selection = selection;
     }
 
-    public Controller getController()
-    {
+    public Controller getController() {
         return controller;
     }
 
-    public Locator[] getSelection()
-    {
+    public Locator[] getSelection() {
         return selection;
     }
 

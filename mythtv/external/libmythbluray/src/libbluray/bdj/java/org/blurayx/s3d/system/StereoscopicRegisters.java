@@ -19,8 +19,7 @@
 
 package org.blurayx.s3d.system;
 
-public abstract interface StereoscopicRegisters
-{
+public abstract interface StereoscopicRegisters {
     public static final int PSR_OUTPUT_MODE_PREFERENCE = 21;
     public static final int PSR_STEREOSCOPIC_STATUS = 22;
     public static final int PSR_DISPLAY_CAPABILITY = 23;

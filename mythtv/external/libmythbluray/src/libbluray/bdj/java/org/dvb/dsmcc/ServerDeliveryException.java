@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class ServerDeliveryException extends DSMCCException {
-    public ServerDeliveryException()
-    {
+    public ServerDeliveryException() {
         super();
     }
 
-    public ServerDeliveryException(String reason)
-    {
+    public ServerDeliveryException(String reason) {
         super(reason);
     }
 

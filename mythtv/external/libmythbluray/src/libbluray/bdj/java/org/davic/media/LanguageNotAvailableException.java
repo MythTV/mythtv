@@ -20,13 +20,11 @@
 package org.davic.media;
 
 public class LanguageNotAvailableException extends javax.media.MediaException {
-    public LanguageNotAvailableException()
-    {
+    public LanguageNotAvailableException() {
         super();
     }
 
-    public LanguageNotAvailableException(String reason)
-    {
+    public LanguageNotAvailableException(String reason) {
         super(reason);
     }
 

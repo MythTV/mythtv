@@ -28,13 +28,11 @@ import org.videolan.Logger;
 
 public abstract class FrameAccurateAnimation extends Component {
 
-    public static final float getDefaultFrameRate()
-    {
+    public static final float getDefaultFrameRate() {
         return defaultRate;
     }
 
-    public static boolean setDefaultFrameRate(float framerate)
-    {
+    public static boolean setDefaultFrameRate(float framerate) {
         if (framerate != FRAME_RATE_23_976 &&
             framerate != FRAME_RATE_24 &&
             framerate != FRAME_RATE_25 &&
@@ -49,13 +47,11 @@ public abstract class FrameAccurateAnimation extends Component {
         return true;
     }
 
-    public FrameAccurateAnimation()
-    {
+    public FrameAccurateAnimation() {
         logger.unimplemented("FrameAccurateAnimation");
     }
 
-    public FrameAccurateAnimation(AnimationParameters params)
-    {
+    public FrameAccurateAnimation(AnimationParameters params) {
         context = BDJXletContext.getCurrentContext();
         if (context != null) {
             context.addFAA(this);
@@ -66,8 +62,7 @@ public abstract class FrameAccurateAnimation extends Component {
         this.params = new AnimationParameters(params);
     }
 
-    public synchronized void destroy()
-    {
+    public synchronized void destroy() {
         if (context != null) {
             context.removeFAA(this);
             context = null;
@@ -76,27 +71,23 @@ public abstract class FrameAccurateAnimation extends Component {
         destroyImpl();
     }
 
-    public long getCompletedFrameCount()
-    {
+    public long getCompletedFrameCount() {
         logger.unimplemented("getCompletedFrameCount");
         return 0;
     }
 
-    public float getFrameRate()
-    {
+    public float getFrameRate() {
         logger.unimplemented("getFrameRate");
         // TODO: rate of background video. if none, defaultRate.
         return getDefaultFrameRate();
     }
 
-    public Graphics getGraphics()
-    {
+    public Graphics getGraphics() {
         logger.unimplemented("getGraphics");
         return super.getGraphics();
     }
 
-    public int[] getRepeatCounts()
-    {
+    public int[] getRepeatCounts() {
         int[] repeatCount = null;
         if (params != null && params.repeatCount != null) {
             repeatCount = (int[])params.repeatCount.clone();
@@ -104,41 +95,34 @@ public abstract class FrameAccurateAnimation extends Component {
         return repeatCount;
     }
 
-    public int getThreadPriority()
-    {
+    public int getThreadPriority() {
         return params.threadPriority;
     }
 
-    public synchronized boolean isAnimated()
-    {
+    public synchronized boolean isAnimated() {
         return running;
     }
 
-    public void paint(Graphics g)
-    {
+    public void paint(Graphics g) {
         // should be implemented in derived classes
         logger.unimplemented("paint");
     }
 
     public synchronized void resetStartStopTime(
-            FrameAccurateAnimationTimer newTimer)
-    {
+            FrameAccurateAnimationTimer newTimer) {
         params.faaTimer = new FrameAccurateAnimationTimer(newTimer);
         logger.unimplemented("resetStartStopTime");
     }
 
-    public void setBounds(int x, int y, int width, int height)
-    {
+    public void setBounds(int x, int y, int width, int height) {
         super.setBounds(x, y, width, height);
     }
 
-    public void setLocation(int x, int y)
-    {
+    public void setLocation(int x, int y) {
         super.setLocation(x, y);
     }
 
-    public void setThreadPriority(int p)
-    {
+    public void setThreadPriority(int p) {
         params.threadPriority = p;
     }
 
@@ -157,8 +141,7 @@ public abstract class FrameAccurateAnimation extends Component {
         logger.unimplemented("destroyImpl");
     }
 
-    public synchronized void start()
-    {
+    public synchronized void start() {
         if (!running) {
             running = true;
             // TODO: compare timer against video
@@ -171,16 +154,14 @@ public abstract class FrameAccurateAnimation extends Component {
         }
     }
 
-    public synchronized void stop()
-    {
+    public synchronized void stop() {
         if (running) {
             running = false;
             stopImpl();
         }
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "FrameAccurateAnimation";
     }
 

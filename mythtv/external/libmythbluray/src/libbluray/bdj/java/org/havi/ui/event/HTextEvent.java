@@ -23,8 +23,7 @@ import org.havi.ui.HKeyboardInputPreferred;
 import java.awt.AWTEvent;
 
 public class HTextEvent extends AWTEvent {
-    public HTextEvent(HKeyboardInputPreferred source, int id)
-    {
+    public HTextEvent(HKeyboardInputPreferred source, int id) {
         super(source, id);
     }
 

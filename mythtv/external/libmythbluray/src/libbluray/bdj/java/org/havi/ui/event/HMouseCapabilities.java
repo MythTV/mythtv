@@ -20,13 +20,10 @@
 package org.havi.ui.event;
 
 public class HMouseCapabilities {
-    protected HMouseCapabilities()
-    {
-
+    protected HMouseCapabilities() {
     }
 
-    public static boolean getInputDeviceSupported()
-    {
-        return true;
+    public static boolean getInputDeviceSupported() {
+        return false;
     }
 }

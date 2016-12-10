@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class NotEntitledException extends DSMCCException {
-    public NotEntitledException()
-    {
+    public NotEntitledException() {
         super();
     }
 
-    public NotEntitledException(String reason)
-    {
+    public NotEntitledException(String reason) {
         super(reason);
     }
 

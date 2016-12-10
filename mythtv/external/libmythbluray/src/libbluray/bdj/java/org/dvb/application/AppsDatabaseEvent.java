@@ -22,22 +22,23 @@ package org.dvb.application;
 import java.util.EventObject;
 
 public class AppsDatabaseEvent extends EventObject {
-    public AppsDatabaseEvent(int id, AppID appid, Object source)
-    {
+    public AppsDatabaseEvent(int id, AppID appid, Object source) {
         super(source);
 
         this.appid = appid;
         this.id = id;
     }
 
-    public AppID getAppID()
-    {
+    public AppID getAppID() {
         return appid;
     }
 
-    public int getEventId()
-    {
+    public int getEventId() {
         return id;
+    }
+
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",id=" + id + ",appid" + appid + "]";
     }
 
     static public final int NEW_DATABASE = 0;

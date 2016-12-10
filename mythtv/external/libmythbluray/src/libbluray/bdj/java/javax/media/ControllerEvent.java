@@ -22,23 +22,24 @@ package javax.media;
 import java.util.EventObject;
 
 public class ControllerEvent extends EventObject implements MediaEvent {
-    public ControllerEvent(Controller source)
-    {
+    public ControllerEvent(Controller source) {
         super(source);
 
         this.source = source;
     }
 
-    public Controller getSourceController()
-    {
+    public Controller getSourceController() {
         return source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 
-    private Controller source;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + "]";
+    }
+
+    protected final Controller source;
     private static final long serialVersionUID = 2637536605185993242L;
 }

@@ -22,24 +22,18 @@ package org.dvb.dsmcc;
 import java.util.EventObject;
 
 public class ObjectChangeEvent extends EventObject {
-    public ObjectChangeEvent(DSMCCObject source, int aVersionNumber)
-
-    {
+    public ObjectChangeEvent(DSMCCObject source, int aVersionNumber) {
         super(source);
 
         this.source = source;
         this.aVersionNumber = aVersionNumber;
     }
 
-    public int getNewVersionNumber()
-
-    {
+    public int getNewVersionNumber() {
         return aVersionNumber;
-
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

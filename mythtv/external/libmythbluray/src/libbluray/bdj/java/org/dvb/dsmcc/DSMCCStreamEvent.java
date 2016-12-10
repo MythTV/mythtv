@@ -23,49 +23,45 @@ import java.io.IOException;
 public class DSMCCStreamEvent extends DSMCCStream {
 
     public DSMCCStreamEvent(DSMCCObject aDSMCCObject)
-            throws NotLoadedException, IllegalObjectTypeException
-    {
+            throws NotLoadedException, IllegalObjectTypeException {
+
         super(aDSMCCObject);
         org.videolan.Logger.unimplemented(DSMCCStreamEvent.class.getName(), "");
         throw new Error("Not implemented");
     }
 
     public DSMCCStreamEvent(String path) throws IOException,
-            IllegalObjectTypeException
-    {
+            IllegalObjectTypeException {
+
         super(path);
         org.videolan.Logger.unimplemented(DSMCCStreamEvent.class.getName(), "");
         throw new Error("Not implemented");
     }
 
     public DSMCCStreamEvent(String path, String name) throws IOException,
-            IllegalObjectTypeException
-    {
+            IllegalObjectTypeException {
+
         super(path, name);
         org.videolan.Logger.unimplemented(DSMCCStreamEvent.class.getName(), "");
         throw new Error("Not implemented");
     }
 
     public synchronized int subscribe(String eventName, StreamEventListener l)
-            throws UnknownEventException, InsufficientResourcesException
-    {
+            throws UnknownEventException, InsufficientResourcesException {
         throw new Error("Not implemented");
     }
 
     public synchronized void unsubscribe(int eventId, StreamEventListener l)
-            throws UnknownEventException
-    {
+            throws UnknownEventException {
         throw new Error("Not implemented");
     }
 
     public synchronized void unsubscribe(String eventName, StreamEventListener l)
-            throws UnknownEventException
-    {
+            throws UnknownEventException {
         throw new Error("Not implemented");
     }
 
-    public String[] getEventList()
-    {
+    public String[] getEventList() {
         throw new Error("Not implemented");
     }
 

@@ -26,12 +26,12 @@ import org.havi.ui.HPermissionDeniedException;
 import org.havi.ui.HScreenRectangle;
 import org.havi.ui.HStillImageBackgroundConfiguration;
 
-public class HBackgroundConfigurationS3D extends HStillImageBackgroundConfiguration
-{
+public class HBackgroundConfigurationS3D extends HStillImageBackgroundConfiguration {
+
     public void displayImage(HBackgroundImage leftImage,
                              HBackgroundImage rightImage)
-        throws IOException, HPermissionDeniedException, HConfigurationException
-    {
+        throws IOException, HPermissionDeniedException, HConfigurationException {
+
         displayImage(leftImage, rightImage,
                      new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f),
                      new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f));
@@ -40,9 +40,9 @@ public class HBackgroundConfigurationS3D extends HStillImageBackgroundConfigurat
     public void displayImage(HBackgroundImage leftImage,
                              HBackgroundImage rightImage,
                              HScreenRectangle leftUpdateArea,
-                             HScreenRectangle rightUpdateAreaparamHScreenRectangle2)
-        throws IOException, HPermissionDeniedException, HConfigurationException
-    {
+                             HScreenRectangle rightUpdateArea)
+        throws IOException, HPermissionDeniedException, HConfigurationException {
+
         displayImage(leftImage, leftUpdateArea);
         org.videolan.Logger.unimplemented("HBackgroundConfigurationS3D", "displayImage");
     }

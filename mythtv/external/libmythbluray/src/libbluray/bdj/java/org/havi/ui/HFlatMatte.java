@@ -23,23 +23,19 @@ package org.havi.ui;
 public class HFlatMatte implements HMatte {
     private float data;
 
-    public HFlatMatte()
-    {
+    public HFlatMatte() {
         this.data = 1.0F;
     }
 
-    public HFlatMatte(float data)
-    {
+    public HFlatMatte(float data) {
         this.data = data;
     }
 
-    public void setMatteData(float data)
-    {
+    public void setMatteData(float data) {
         this.data = data;
     }
 
-    public float getMatteData()
-    {
+    public float getMatteData() {
         return data;
     }
 }

@@ -23,8 +23,7 @@ import javax.media.ControllerEvent;
 import javax.media.Controller;
 
 public class MediaPresentedEvent extends ControllerEvent {
-    public MediaPresentedEvent(Controller source)
-    {
+    public MediaPresentedEvent(Controller source) {
         super(source);
     }
 

@@ -31,7 +31,7 @@ class BDGraphicsEnvironment extends GraphicsEnvironment {
         graphicsDevice = new BDGraphicsDevice(this);
     }
 
-    public synchronized GraphicsDevice[] getScreenDevices() {
+    public GraphicsDevice[] getScreenDevices() {
         return new GraphicsDevice[] { graphicsDevice };
     }
 

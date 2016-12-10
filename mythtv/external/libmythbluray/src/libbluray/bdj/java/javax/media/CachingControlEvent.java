@@ -21,25 +21,27 @@ package javax.media;
 
 public class CachingControlEvent extends ControllerEvent {
     public CachingControlEvent(Controller from, CachingControl cacheControl,
-            long progress)
-    {
+            long progress) {
         super(from);
 
         this.cacheControl = cacheControl;
         this.progress = progress;
     }
 
-    public CachingControl getCachingControl()
-    {
+    public CachingControl getCachingControl() {
         return cacheControl;
     }
 
-    public long getContentProgress()
-    {
+    public long getContentProgress() {
         return progress;
     }
 
-    private CachingControl cacheControl;
-    private long progress;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",cacheControl=" + cacheControl + ",progress=" + progress + "]";
+    }
+
+    private final CachingControl cacheControl;
+    private final long progress;
+
     private static final long serialVersionUID = 8877038236738665179L;
 }

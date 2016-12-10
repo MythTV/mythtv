@@ -25,78 +25,72 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 
 public class HListGroupLook implements HExtendedLook, HAdjustableLook {
-    public HListGroupLook()
-    {
+    public HListGroupLook() {
         org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
     }
 
-    public void showLook(Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void showLook(Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
     }
 
-    public void fillBackground(Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void fillBackground(Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
     }
 
-    public void renderBorders(Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void renderBorders(Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
     }
 
-    public void renderVisible(Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void renderVisible(Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
     }
 
-    public void widgetChanged(HVisible visible, HChangeData[] changes)
-    {
-        throw new Error("Not implemented");
+    public void widgetChanged(HVisible visible, HChangeData[] changes) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
     }
 
-    public Dimension getMinimumSize(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getMinimumSize(HVisible visible) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return null;
     }
 
-    public Dimension getPreferredSize(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getPreferredSize(HVisible visible) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return null;
     }
 
-    public Dimension getMaximumSize(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getMaximumSize(HVisible visible) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return null;
     }
 
-    public boolean isOpaque(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public boolean isOpaque(HVisible visible) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return false;
     }
 
-    public java.awt.Insets getInsets(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Insets getInsets(HVisible hvisible) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return null;
     }
 
-    public int hitTest(HOrientable component, Point pt)
-    {
-        throw new Error("Not implemented");
+    public int hitTest(HOrientable component, Point pt) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return 0;
     }
 
-    public Integer getValue(HOrientable component, Point pt)
-    {
-        throw new Error("Not implemented");
+    public Integer getValue(HOrientable component, Point pt) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return null;
     }
 
-    public Insets getElementInsets()
-    {
-        throw new Error("Not implemented");
+    public Insets getElementInsets() {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return null;
     }
 
-    public int getNumVisible(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public int getNumVisible(HVisible visible) {
+        org.videolan.Logger.unimplemented(HListGroupLook.class.getName(), "");
+        return 0;
     }
 }

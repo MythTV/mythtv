@@ -20,14 +20,12 @@
 package org.dvb.dsmcc;
 
 public class LoadingAbortedEvent extends AsynchronousLoadingEvent {
-    public LoadingAbortedEvent(DSMCCObject source)
-    {
+    public LoadingAbortedEvent(DSMCCObject source) {
         super(source);
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

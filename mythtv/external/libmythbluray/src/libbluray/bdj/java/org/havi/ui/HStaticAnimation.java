@@ -23,93 +23,81 @@ import java.awt.Image;
 
 public class HStaticAnimation extends HVisible implements HNoInputPreferred,
         HAnimateEffect {
-    public HStaticAnimation()
-    {
+    public HStaticAnimation() {
         org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
     public HStaticAnimation(Image[] imagesNormal, int delay, int playMode,
-            int repeatCount, int x, int y, int width, int height)
-    {
+            int repeatCount, int x, int y, int width, int height) {
         org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
     public HStaticAnimation(Image[] imagesNormal, int delay, int playMode,
-            int repeatCount)
-    {
+            int repeatCount) {
         org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public void setLook(HLook hlook) throws HInvalidLookException
-    {
-        throw new Error("Not implemented");
+    public void setLook(HLook hlook) throws HInvalidLookException {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public static void setDefaultLook(HAnimateLook hlook)
-    {
+    public static void setDefaultLook(HAnimateLook hlook) {
         DefaultLook = hlook;
     }
 
-    public static HAnimateLook getDefaultLook()
-    {
+    public static HAnimateLook getDefaultLook() {
         if (DefaultLook == null)
             org.videolan.Logger.unimplemented("", "getDefaultLook");
         return DefaultLook;
     }
 
-    public void start()
-    {
-        throw new Error("Not implemented");
+    public void start() {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public void stop()
-    {
-        throw new Error("Not implemented");
+    public void stop() {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public boolean isAnimated()
-    {
-        throw new Error("Not implemented");
+    public boolean isAnimated() {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
+        return false;
     }
 
-    public void setPosition(int position)
-    {
-        throw new Error("Not implemented");
+    public void setPosition(int position) {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public int getPosition()
-    {
-        throw new Error("Not implemented");
+    public int getPosition() {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
+        return 0;
     }
 
-    public void setRepeatCount(int count)
-    {
-        throw new Error("Not implemented");
+    public void setRepeatCount(int count) {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public int getRepeatCount()
-    {
-        throw new Error("Not implemented");
+    public int getRepeatCount() {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
+        return 0;
     }
 
-    public void setDelay(int count)
-    {
-        throw new Error("Not implemented");
+    public void setDelay(int count) {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public int getDelay()
-    {
-        throw new Error("Not implemented");
+    public int getDelay() {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
+        return 0;
     }
 
-    public void setPlayMode(int mode)
-    {
-        throw new Error("Not implemented");
+    public void setPlayMode(int mode) {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
     }
 
-    public int getPlayMode()
-    {
-        throw new Error("Not implemented");
+    public int getPlayMode() {
+        org.videolan.Logger.unimplemented(HStaticAnimation.class.getName(), "");
+        return 0;
     }
 
     private static HAnimateLook DefaultLook = null;

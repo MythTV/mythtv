@@ -20,10 +20,9 @@
 package javax.tv.service.selection;
 
 public class ServiceContextDestroyedEvent extends ServiceContextEvent {
-    public ServiceContextDestroyedEvent(ServiceContext context)
-    {
+    public ServiceContextDestroyedEvent(ServiceContext context) {
         super(context);
     }
-    
+
     private static final long serialVersionUID = -5793301376652925098L;
 }

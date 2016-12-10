@@ -20,13 +20,11 @@
 package org.bluray.media;
 
 public class InvalidPlayListException extends Exception {
-    public InvalidPlayListException()
-    {
+    public InvalidPlayListException() {
         super();
     }
 
-    public InvalidPlayListException(String reason)
-    {
+    public InvalidPlayListException(String reason) {
         super(reason);
     }
 

@@ -26,32 +26,28 @@ import java.awt.Font;
 import org.havi.ui.event.HFocusEvent;
 import org.havi.ui.event.HFocusListener;
 
+import org.videolan.BDJXletContext;
 import org.videolan.Logger;
 
 public class HText extends HStaticText implements HNavigable {
-    public HText()
-    {
+    public HText() {
         this(null);
     }
 
-    public HText(String text)
-    {
+    public HText(String text) {
         this(text, text, 0, 0, 0, 0);
     }
 
-    public HText(String textNormal, String textFocus)
-    {
+    public HText(String textNormal, String textFocus) {
         this(textNormal, textFocus, 0, 0, 0, 0);
     }
 
-    public HText(String text, int x, int y, int width, int height)
-    {
+    public HText(String text, int x, int y, int width, int height) {
         this(text, text, x, y, width, height);
     }
 
     public HText(String textNormal, String textFocus, int x, int y, int width,
-            int height)
-    {
+            int height) {
         super(textNormal, x, y, width, height);
         try {
             setLook(getDefaultLook());
@@ -68,27 +64,23 @@ public class HText extends HStaticText implements HNavigable {
     }
 
     public HText(String text, Font font, Color foreground, Color background,
-            HTextLayoutManager tlm)
-    {
+            HTextLayoutManager tlm) {
         this(text, text, 0, 0, 0, 0, font, foreground, background, tlm);
     }
 
     public HText(String textNormal, String textFocus, Font font,
-            Color foreground, Color background, HTextLayoutManager tlm)
-    {
+            Color foreground, Color background, HTextLayoutManager tlm) {
         this(textNormal, textFocus, 0, 0, 0, 0, font, foreground, background, tlm);
     }
 
     public HText(String text, int x, int y, int width, int height, Font font,
-            Color foreground, Color background, HTextLayoutManager tlm)
-    {
+            Color foreground, Color background, HTextLayoutManager tlm) {
         this(text, text, x, y, width, height, font, foreground, background, tlm);
     }
 
     public HText(String textNormal, String textFocus, int x, int y, int width,
             int height, Font font, Color foreground, Color background,
-            HTextLayoutManager tlm)
-    {
+            HTextLayoutManager tlm) {
         this(textNormal, textFocus, x, y, width, height);
         setFont(font);
         setForeground(foreground);
@@ -96,90 +88,74 @@ public class HText extends HStaticText implements HNavigable {
         setTextLayoutManager(tlm);
     }
 
-    public static void setDefaultLook(HTextLook look)
-    {
-        DefaultLook = look;
-    }
-
-    public static HTextLook getDefaultLook()
-    {
-        if (DefaultLook == null)
-            DefaultLook = new HTextLook();
-        return DefaultLook;
-    }
-
-    public void setMove(int keyCode, HNavigable target)
-    {
+    public void setMove(int keyCode, HNavigable target) {
         logger.unimplemented("setMove");
     }
 
-    public HNavigable getMove(int keyCode)
-    {
+    public HNavigable getMove(int keyCode) {
         logger.unimplemented("getMove");
         return this;
     }
 
-    public boolean isFocusable()
-    {
+    public boolean isFocusable() {
         return true;
     }
 
     public void setFocusTraversal(HNavigable up, HNavigable down,
-            HNavigable left, HNavigable right)
-    {
+            HNavigable left, HNavigable right) {
         logger.unimplemented("setFocusTraversal");
     }
 
-    public boolean isSelected()
-    {
+    public boolean isSelected() {
         logger.unimplemented("isSelected");
         return false;
     }
 
-    public void setGainFocusSound(HSound sound)
-    {
+    public void setGainFocusSound(HSound sound) {
         logger.unimplemented("setGainFocusSound");
     }
 
-    public void setLoseFocusSound(HSound sound)
-    {
+    public void setLoseFocusSound(HSound sound) {
         logger.unimplemented("setLoseFocusSound");
     }
 
-    public HSound getGainFocusSound()
-    {
+    public HSound getGainFocusSound() {
         logger.unimplemented("getGainFocusSound");
         return null;
     }
 
-    public HSound getLoseFocusSound()
-    {
+    public HSound getLoseFocusSound() {
         logger.unimplemented("getLoseFocusSound");
         return null;
     }
 
-    public void addHFocusListener(HFocusListener l)
-    {
+    public void addHFocusListener(HFocusListener l) {
         logger.unimplemented("addHFocusListener");
     }
 
-    public void removeHFocusListener(HFocusListener l)
-    {
+    public void removeHFocusListener(HFocusListener l) {
         logger.unimplemented("removeHFocusListener");
     }
 
-    public int[] getNavigationKeys()
-    {
+    public int[] getNavigationKeys() {
         logger.unimplemented("getNavigationKeys");
         return null;
     }
 
-    public void processHFocusEvent(HFocusEvent evt)
-    {
+    public void processHFocusEvent(HFocusEvent evt) {
         logger.unimplemented("processHFocusEvent");
     }
 
-    private static HTextLook DefaultLook = null;
+    public static void setDefaultLook(HTextLook hlook) {
+        BDJXletContext.setXletDefaultLook(PROPERTY_LOOK, hlook);
+    }
+
+    public static HTextLook getDefaultLook() {
+        return (HTextLook) BDJXletContext.getXletDefaultLook(PROPERTY_LOOK, DEFAULT_LOOK);
+    }
+
+    static final Class DEFAULT_LOOK = HTextLook.class;
+    private static final String PROPERTY_LOOK = HText.class.getName();
 
     private static final long serialVersionUID = -8178609258303529066L;
 

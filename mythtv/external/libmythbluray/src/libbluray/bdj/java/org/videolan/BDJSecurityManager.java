@@ -35,6 +35,15 @@ final class BDJSecurityManager extends SecurityManager {
     private String persistentRoot;
     private boolean usingUdf = false;
 
+    private static Class urlPermission = null;
+    static {
+        try {
+            /* Java 8 */
+            urlPermission = Class.forName("java.net.URLPermission");
+        } catch (Exception e) {
+        }
+    }
+
     BDJSecurityManager(String discRoot, String persistentRoot, String budaRoot) {
         this.discRoot  = discRoot;
         this.cacheRoot = null;
@@ -68,6 +77,12 @@ final class BDJSecurityManager extends SecurityManager {
     public void checkPermission(Permission perm) {
         if (perm instanceof RuntimePermission) {
             if (perm.implies(new RuntimePermission("createSecurityManager"))) {
+
+                // allow initializing of javax.crypto.JceSecurityManager
+                if (classDepth("javax.crypto.JceSecurityManager") < 3) {
+                    return;
+                }
+
                 deny(perm);
             }
             if (perm.implies(new RuntimePermission("setSecurityManager"))) {
@@ -138,6 +153,11 @@ final class BDJSecurityManager extends SecurityManager {
             if (new java.net.SocketPermission("*", "connect,resolve").implies(perm)) {
                 return;
             }
+        }
+        else if (urlPermission != null &&
+                 urlPermission.isInstance(perm)) {
+            logger.info("grant " + perm);
+            return;
         }
 
         /* Java TV */

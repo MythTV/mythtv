@@ -20,18 +20,21 @@
 package javax.media;
 
 public class MediaTimeSetEvent extends ControllerEvent {
-    public MediaTimeSetEvent(Controller from, Time mediaTime)
-    {
+    public MediaTimeSetEvent(Controller from, Time mediaTime) {
         super(from);
-        
+
         this.mediaTime = mediaTime;
     }
 
-    public Time getMediaTime()
-    {
+    public Time getMediaTime() {
         return mediaTime;
     }
 
-    private Time mediaTime;
+    public String toString() {
+        return getClass().toString() + "[source=" + source + ",mediaTime=" + mediaTime + "]";
+    }
+
+    private final Time mediaTime;
+
     private static final long serialVersionUID = -628446955261317468L;
 }

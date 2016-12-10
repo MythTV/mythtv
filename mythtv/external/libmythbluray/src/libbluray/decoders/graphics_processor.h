@@ -29,7 +29,6 @@
 #include <stdint.h>
 
 typedef struct graphics_processor_s GRAPHICS_PROCESSOR;
-struct pes_buffer_s;
 
 /*
  * PG_DISPLAY_SET

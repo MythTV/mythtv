@@ -295,7 +295,8 @@ class VFSCache {
         String relPath = absPath.substring(vfsRootLength);
         String[] names = Libbluray.listBdFiles(relPath, true);
         if (names != null) {
-            /* this is directory */
+            /* this is directory. Make sure it exists. */
+            Libbluray.cacheBdRomFile(relPath + "/", cacheRoot + relPath + "/");
             return;
         }
 

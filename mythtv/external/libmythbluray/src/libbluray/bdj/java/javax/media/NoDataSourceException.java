@@ -20,13 +20,11 @@
 package javax.media;
 
 public class NoDataSourceException extends MediaException {
-    public NoDataSourceException()
-    {
+    public NoDataSourceException() {
         super();
     }
 
-    public NoDataSourceException(String reason)
-    {
+    public NoDataSourceException(String reason) {
         super(reason);
     }
 

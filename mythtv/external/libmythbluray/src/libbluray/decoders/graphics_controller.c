@@ -361,6 +361,10 @@ static int _save_page_state(GRAPHICS_CONTROLLER *gc)
         GC_TRACE("_save_page_state(): no bog data !\n");
         return -1;
     }
+    if (!gc->igs || !gc->igs->ics) {
+        GC_TRACE("_save_page_state(): no IG composition\n");
+        return -1;
+    }
 
     PG_DISPLAY_SET *s       = gc->igs;
     BD_IG_PAGE     *page    = NULL;
@@ -624,8 +628,13 @@ static void _render_composition_object(GRAPHICS_CONTROLLER *gc,
 
         if (cobj->crop_flag) {
             if (cobj->crop_x || cobj->crop_y || cobj->crop_w != object->width) {
-                ov.img = cropped_img = rle_crop_object(object->img, object->width,
-                                                       cobj->crop_x, cobj->crop_y, cobj->crop_w, cobj->crop_h);
+                cropped_img = rle_crop_object(object->img, object->width,
+                                              cobj->crop_x, cobj->crop_y, cobj->crop_w, cobj->crop_h);
+                if (!cropped_img) {
+                    BD_DEBUG(DBG_DECODE | DBG_CRIT, "Error cropping PG object\n");
+                    return;
+                }
+                ov.img = cropped_img;
             }
             ov.w  = cobj->crop_w;
             ov.h  = cobj->crop_h;
@@ -967,26 +976,38 @@ static int _render_textst_region(GRAPHICS_CONTROLLER *p, int64_t pts, BD_TEXTST_
     uint16_t y;
     RLE_ENC  rle;
 
-    rle_begin(&rle);
+    if (rle_begin(&rle) < 0) {
+        return -1;
+    }
 
     for (y = 0, bmp_y = 0; y < style->region_info.region.height; y++) {
         if (y < style->text_box.ypos || y >= style->text_box.ypos + style->text_box.height) {
-            rle_add_bite(&rle, style->region_info.background_color, style->region_info.region.width);
+            if (rle_add_bite(&rle, style->region_info.background_color, style->region_info.region.width) < 0)
+                break;
         } else {
-            rle_add_bite(&rle, style->region_info.background_color, style->text_box.xpos);
-            rle_compress_chunk(&rle, bmp->mem + bmp->stride * bmp_y, bmp->width);
+            if (rle_add_bite(&rle, style->region_info.background_color, style->text_box.xpos) < 0)
+                break;
+            if (rle_compress_chunk(&rle, bmp->mem + bmp->stride * bmp_y, bmp->width) < 0)
+                break;
             bmp_y++;
-            rle_add_bite(&rle, style->region_info.background_color,
-                         style->region_info.region.width - style->text_box.width - style->text_box.xpos);
+            if (rle_add_bite(&rle, style->region_info.background_color,
+                             style->region_info.region.width - style->text_box.width - style->text_box.xpos) < 0)
+                break;
         }
 
-        rle_add_eol(&rle);
+        if (rle_add_eol(&rle) < 0)
+            break;
     }
 
-    _render_rle(p, pts, rle_get(&rle),
-                style->region_info.region.xpos, style->region_info.region.ypos,
-                style->region_info.region.width, style->region_info.region.height,
-                palette);
+    BD_PG_RLE_ELEM *img = rle_get(&rle);
+    if (img) {
+        _render_rle(p, pts, img,
+                    style->region_info.region.xpos, style->region_info.region.ypos,
+                    style->region_info.region.width, style->region_info.region.height,
+                    palette);
+    } else {
+        BD_DEBUG(DBG_DECODE | DBG_CRIT, "Error encoding Text Subtitle region\n");
+    }
 
     rle_end(&rle);
 

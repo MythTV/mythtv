@@ -27,32 +27,26 @@ public class HImageMatte implements HMatte {
     private Image data = null;
     private Point offset = new Point(0, 0);
 
-    public HImageMatte()
-    {
+    public HImageMatte() {
     }
 
-    public HImageMatte(Image data)
-    {
+    public HImageMatte(Image data) {
         this.data = data;
     }
 
-    public void setMatteData(Image data)
-    {
+    public void setMatteData(Image data) {
         this.data = data;
     }
 
-    public Image getMatteData()
-    {
+    public Image getMatteData() {
         return this.data;
     }
 
-    public void setOffset(Point p)
-    {
+    public void setOffset(Point p) {
         this.offset = p;
     }
 
-    public Point getOffset()
-    {
+    public Point getOffset() {
         return this.offset;
     }
 }

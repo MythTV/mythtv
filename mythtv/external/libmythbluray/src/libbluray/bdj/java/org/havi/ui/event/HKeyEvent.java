@@ -23,16 +23,14 @@ import java.awt.Component;
 
 public class HKeyEvent extends HRcEvent {
     public HKeyEvent(Component source, int id, long when, int modifiers,
-            int keyCode, char keyChar)
-    {
+            int keyCode, char keyChar) {
         super(source, id, when, modifiers, keyCode, keyChar);
     }
 
     public HKeyEvent(Component source, int id, long when, int modifiers,
-            int keyCode)
-    {
+            int keyCode) {
         super(source, id, when, modifiers, keyCode);
     }
-    
+
     private static final long serialVersionUID = 1896658905645675252L;
 }

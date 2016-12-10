@@ -26,9 +26,9 @@ public class RunningApplicationsFilter extends AppsDatabaseFilter {
     }
 
     public boolean accept(AppID appid) {
-    	AppProxy proxy = AppsDatabase.getAppsDatabase().getAppProxy(appid);
-    	if (proxy == null)
-    	    return false;
+        AppProxy proxy = AppsDatabase.getAppsDatabase().getAppProxy(appid);
+        if (proxy == null)
+            return false;
         return proxy.getState() == AppProxy.STARTED;
     }
 }

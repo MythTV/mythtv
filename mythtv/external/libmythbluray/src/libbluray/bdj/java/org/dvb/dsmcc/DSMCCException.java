@@ -22,13 +22,11 @@ package org.dvb.dsmcc;
 import java.io.IOException;
 
 public class DSMCCException extends IOException {
-    public DSMCCException()
-    {
+    public DSMCCException() {
         super();
     }
 
-    public DSMCCException(String reason)
-    {
+    public DSMCCException(String reason) {
         super(reason);
     }
 

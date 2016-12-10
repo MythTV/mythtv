@@ -58,4 +58,10 @@
 #  define BD_UNLIKELY(x) __builtin_expect((x),0)
 #endif
 
+#if defined(__GNUC__) && __GNUC__ > 3
+#  define BD_USED  __attribute__((warn_unused_result))
+#else
+#  define BD_USED
+#endif
+
 #endif /* LIBBLURAY_ATTRIBUTES_H_ */

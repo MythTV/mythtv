@@ -20,15 +20,13 @@
 package org.dvb.event;
 
 public class OverallRepository extends UserEventRepository {
-    public OverallRepository()
-    {
+    public OverallRepository() {
         this("OverallRepository");
     }
 
-    public OverallRepository(String name)
-    {
+    public OverallRepository(String name) {
         super(name);
-        
+
         super.addAllArrowKeys();
         super.addAllColourKeys();
         super.addAllNumericKeys();

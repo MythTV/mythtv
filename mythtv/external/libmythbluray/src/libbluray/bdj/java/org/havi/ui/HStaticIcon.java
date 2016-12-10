@@ -23,38 +23,32 @@ import java.awt.Image;
 import org.videolan.BDJXletContext;
 
 public class HStaticIcon extends HVisible implements HNoInputPreferred {
-    public HStaticIcon()
-    {
+    public HStaticIcon() {
         super(getDefaultLook());
     }
 
-    public HStaticIcon(Image imageNormal, int x, int y, int width, int height)
-    {
+    public HStaticIcon(Image imageNormal, int x, int y, int width, int height) {
         super(getDefaultLook(), x, y, width, height);
         setGraphicContent(imageNormal, NORMAL_STATE);
     }
 
-    public HStaticIcon(Image imageNormal)
-    {
+    public HStaticIcon(Image imageNormal) {
         super(getDefaultLook());
         setGraphicContent(imageNormal, NORMAL_STATE);
     }
 
-    public void setLook(HLook hlook) throws HInvalidLookException
-    {
+    public void setLook(HLook hlook) throws HInvalidLookException {
         if ((hlook != null) && !(hlook instanceof HGraphicLook)) {
             throw new HInvalidLookException();
         }
         super.setLook(hlook);
     }
 
-    public static void setDefaultLook(HGraphicLook hlook)
-    {
+    public static void setDefaultLook(HGraphicLook hlook) {
         BDJXletContext.setXletDefaultLook(PROPERTY_LOOK,hlook);
     }
 
-    public static HGraphicLook getDefaultLook()
-    {
+    public static HGraphicLook getDefaultLook() {
         return (HGraphicLook) BDJXletContext.getXletDefaultLook(PROPERTY_LOOK,DEFAULT_LOOK);
     }
 

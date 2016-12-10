@@ -21,7 +21,6 @@ package org.blurayx.s3d.media;
 
 import java.util.EventListener;
 
-public abstract interface GraphicsOffsetSequenceChangeListener extends EventListener
-{
+public abstract interface GraphicsOffsetSequenceChangeListener extends EventListener {
     public abstract void offsetSequenceChange(GraphicsOffsetSequenceChangeEvent paramGraphicsOffsetSequenceChangeEvent);
 }

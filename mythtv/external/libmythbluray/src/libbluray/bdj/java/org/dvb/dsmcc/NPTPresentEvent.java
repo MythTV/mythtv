@@ -20,8 +20,7 @@
 package org.dvb.dsmcc;
 
 public class NPTPresentEvent extends NPTStatusEvent {
-    public NPTPresentEvent(DSMCCStream source)
-    {
+    public NPTPresentEvent(DSMCCStream source) {
         super(source);
     }
 

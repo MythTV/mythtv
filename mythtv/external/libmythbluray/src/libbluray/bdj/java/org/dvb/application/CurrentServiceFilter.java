@@ -20,11 +20,14 @@
 package org.dvb.application;
 
 public class CurrentServiceFilter extends AppsDatabaseFilter {
+
+    private final AppsDatabase db = AppsDatabase.getAppsDatabase();
+
     public CurrentServiceFilter() {
         super();
     }
 
     public boolean accept(AppID appid) {
-        return true;
+        return db.getAppProxy(appid) != null;
     }
 }

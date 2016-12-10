@@ -19,16 +19,17 @@
 
 package javax.tv.service;
 
-public class ServiceType
-{
-    protected ServiceType(String name) { 
+public class ServiceType {
+    protected ServiceType(String name) {
+        if (name == null)
+            throw new NullPointerException();
         this.name = name;
     }
 
     public String toString() {
         return name;
     }
-    
+
     public static final ServiceType DIGITAL_TV = new ServiceType("DIGITAL_TV");
     public static final ServiceType DIGITAL_RADIO = new ServiceType("DIGITAL_RADIO");
     public static final ServiceType NVOD_REFERENCE = new ServiceType("NVOD_REFERENCE");
@@ -38,6 +39,6 @@ public class ServiceType
     public static final ServiceType DATA_BROADCAST = new ServiceType("DATA_BROADCAST");
     public static final ServiceType DATA_APPLICATION = new ServiceType("DATA_APPLICATION");
     public static final ServiceType UNKNOWN = new ServiceType("UNKNOWN");
-    
+
     private String name;
 }

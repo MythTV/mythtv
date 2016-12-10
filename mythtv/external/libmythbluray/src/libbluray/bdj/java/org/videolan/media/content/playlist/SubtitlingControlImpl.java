@@ -38,7 +38,7 @@ import org.videolan.TIClip;
 
 public class SubtitlingControlImpl extends StreamControl implements SubtitlingControl {
     protected SubtitlingControlImpl(Handler player) {
-        super(player);
+        this.player = player;
     }
 
     protected StreamInfo[] getStreams() {
@@ -137,6 +137,6 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
         }
     }
 
-
+    private Handler player;
     private BDJListeners listeners = new BDJListeners();
 }

@@ -22,27 +22,23 @@ package org.havi.ui;
 import org.havi.ui.event.HScreenLocationModifiedListener;
 
 public class HVideoComponent extends HComponent {
-    protected HVideoComponent()
-    {
+    protected HVideoComponent() {
         org.videolan.Logger.unimplemented(HVideoComponent.class.getName(), "");
     }
 
-    public HVideoDevice getVideoDevice()
-    {
+    public HVideoDevice getVideoDevice() {
         org.videolan.Logger.unimplemented(HVideoComponent.class.getName(), "getVideoDevice");
         return new HVideoDevice();
     }
 
     public void addOnScreenLocationModifiedListener(
-            HScreenLocationModifiedListener slml)
-    {
+            HScreenLocationModifiedListener slml) {
         org.videolan.Logger.unimplemented(HVideoComponent.class.getName(),
                                           "addOnScreenLocationModifiedListener");
     }
 
     public void removeOnScreenLocationModifiedListener(
-            HScreenLocationModifiedListener slml)
-    {
+            HScreenLocationModifiedListener slml) {
         org.videolan.Logger.unimplemented(HVideoComponent.class.getName(),
                                           "removeOnScreenLocationModifiedListener");
     }

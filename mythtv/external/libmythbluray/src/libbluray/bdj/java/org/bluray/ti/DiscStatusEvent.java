@@ -21,8 +21,7 @@ package org.bluray.ti;
 import java.util.EventObject;
 
 public class DiscStatusEvent extends EventObject {
-    public DiscStatusEvent(Object source)
-    {
+    public DiscStatusEvent(Object source) {
         super(source);
     }
 

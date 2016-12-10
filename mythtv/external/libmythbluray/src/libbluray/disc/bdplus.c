@@ -30,6 +30,7 @@
 #include "util/strutl.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 
 struct bd_bdplus {
@@ -46,6 +47,8 @@ struct bd_bdplus {
 
     /* old API */
     fptr_p_void    title;
+
+    int impl_id;
 };
 
 
@@ -57,15 +60,19 @@ static void _libbdplus_close(BD_BDPLUS *p)
     }
 }
 
+static void _unload(BD_BDPLUS *p)
+{
+    _libbdplus_close(p);
+
+    if (p->h_libbdplus) {
+        dl_dlclose(p->h_libbdplus);
+    }
+}
+
 void libbdplus_unload(BD_BDPLUS **p)
 {
     if (p && *p) {
-        _libbdplus_close(*p);
-
-        if ((*p)->h_libbdplus) {
-            dl_dlclose((*p)->h_libbdplus);
-        }
-
+        _unload(*p);
         X_FREE(*p);
     }
 }
@@ -81,7 +88,11 @@ int libbdplus_required(void *have_file_handle, int (*have_file)(void *, const ch
     return 0;
 }
 
-static void *_libbdplus_open(void)
+#define IMPL_USER       0
+#define IMPL_LIBBDPLUS  1
+#define IMPL_LIBMMBD    2
+
+static void *_libbdplus_open(int *impl_id)
 {
     const char * const libbdplus[] = {
       getenv("LIBBDPLUS_PATH"),
@@ -90,10 +101,11 @@ static void *_libbdplus_open(void)
     };
     unsigned ii;
 
-    for (ii = 0; ii < sizeof(libbdplus) / sizeof(libbdplus[0]); ii++) {
+    for (ii = *impl_id; ii < sizeof(libbdplus) / sizeof(libbdplus[0]); ii++) {
         if (libbdplus[ii]) {
             void *handle = dl_dlopen(libbdplus[ii], "0");
             if (handle) {
+                *impl_id = ii;
                 BD_DEBUG(DBG_BLURAY, "Using %s for BD+\n", libbdplus[ii]);
                 return handle;
             }
@@ -104,16 +116,22 @@ static void *_libbdplus_open(void)
     return NULL;
 }
 
-BD_BDPLUS *libbdplus_load(void)
+int libbdplus_is_mmbd(BD_BDPLUS *p)
+{
+    return p && (p->impl_id == IMPL_LIBMMBD);
+}
+
+static BD_BDPLUS *_load(int impl_id)
 {
     BD_BDPLUS *p = calloc(1, sizeof(BD_BDPLUS));
     if (!p) {
         return NULL;
     }
+    p->impl_id = impl_id;
 
     BD_DEBUG(DBG_BDPLUS, "attempting to load libbdplus\n");
 
-    p->h_libbdplus = _libbdplus_open();
+    p->h_libbdplus = _libbdplus_open(&p->impl_id);
     if (!p->h_libbdplus) {
         X_FREE(p);
         return NULL;
@@ -144,7 +162,12 @@ BD_BDPLUS *libbdplus_load(void)
     return p;
 }
 
-int libbdplus_init(BD_BDPLUS *p, const char *root,
+BD_BDPLUS *libbdplus_load()
+{
+    return _load(0);
+}
+
+int libbdplus_init(BD_BDPLUS *p, const char *root, const char *device,
                    void *file_open_handle, void *file_open_fp,
                    const uint8_t *vid, const uint8_t *mk)
 {
@@ -152,6 +175,28 @@ int libbdplus_init(BD_BDPLUS *p, const char *root,
     fptr_void      set_fopen;
 
     _libbdplus_close(p);
+
+    /* force libmmbd BD+ if no AACS media key:
+     * - libbdplus requires media key
+     * - libmmbd does not export media key
+     *   (=> libbdplus won't work with libmmbd AACS)
+     */
+    if (mk == NULL && p->impl_id == IMPL_LIBBDPLUS) {
+        BD_BDPLUS *p2 = _load(IMPL_LIBMMBD);
+        if (p2) {
+            if (!libbdplus_init(p2, root, device, file_open_handle, file_open_fp, vid, mk)) {
+                /* succeed - swap implementations */
+                _unload(p);
+                *p = *p2;
+                X_FREE(p2);
+                return 0;
+            }
+            /* failed - continue with original bd+ implementation */
+            libbdplus_unload(&p2);
+        }
+    }
+
+    /* */
 
     *(void **)(&bdplus_init) = dl_dlsym(p->h_libbdplus, "bdplus_init");
     *(void **)(&set_fopen)   = dl_dlsym(p->h_libbdplus, "bdplus_set_fopen");
@@ -162,10 +207,23 @@ int libbdplus_init(BD_BDPLUS *p, const char *root,
     }
 
     if (set_fopen) {
+        /* New libbdplus. Use libbluray for file I/O */
         p->bdplus = bdplus_init(NULL, NULL, vid);
         set_fopen(p->bdplus, file_open_handle, file_open_fp);
-    } else {
+    } else if (root) {
+        /* Old libbdplus or libmmbd. Disc is mounted. */
         p->bdplus = bdplus_init(root, NULL, vid);
+    } else if (device) {
+        /* Unmounted device */
+        if (p->impl_id == IMPL_LIBMMBD && !strncmp(device, "/dev/", 5)) {
+            char *tmp = str_printf("dev:%s", device);
+            if (tmp) {
+                p->bdplus = bdplus_init(tmp, NULL, vid);
+                X_FREE(tmp);
+            }
+        } else {
+            BD_DEBUG(DBG_BLURAY | DBG_CRIT, "Too old libbdplus detected. Disc must be mounted first.\n");
+        }
     }
 
     if (!p->bdplus) {

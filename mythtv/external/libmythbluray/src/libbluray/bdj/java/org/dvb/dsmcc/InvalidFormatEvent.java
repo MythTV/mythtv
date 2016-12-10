@@ -20,15 +20,13 @@
 package org.dvb.dsmcc;
 
 public class InvalidFormatEvent extends AsynchronousLoadingEvent {
-    public InvalidFormatEvent(DSMCCObject source)
-    {
+    public InvalidFormatEvent(DSMCCObject source) {
         super(source);
-        
+
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

@@ -53,27 +53,34 @@ public class ServiceListImpl implements ServiceList {
             try {
                 bdLocator = new BDLocator(locator.toExternalForm());
             } catch (org.davic.net.InvalidLocatorException e) {
+                System.err.println("invalid locator");
                 throw new InvalidLocatorException(locator);
             }
         } else {
             bdLocator = (BDLocator)locator;
         }
         int title = bdLocator.getTitleNumber();
-        if (title < 0)
+        if (title < 0) {
+            System.err.println("invalid title in locator");
             throw new InvalidLocatorException(locator);
+        }
         for (int i = 0; i < size(); i++) {
             TitleImpl ti = (TitleImpl)services.get(i);
             if (((TitleImpl)services.get(i)).getTitleNum() == title)
                 return ti;
         }
+        System.err.println("findService: " + locator + " not found");
         return null;
     }
 
     public ServiceList filterServices(ServiceFilter filter) {
+        if (filter == null) {
+            System.err.println("null service filter");
+        }
         LinkedList list = new LinkedList();
         for (int i = 0; i < size(); i++) {
             Service service = getService(i);
-            if (filter.accept(service))
+            if (filter == null || filter.accept(service))
                 list.add(service);
         }
         return new ServiceListImpl(list);

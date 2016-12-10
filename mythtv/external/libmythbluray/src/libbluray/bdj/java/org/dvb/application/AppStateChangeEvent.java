@@ -23,8 +23,7 @@ import java.util.EventObject;
 
 public class AppStateChangeEvent extends EventObject {
     public AppStateChangeEvent(AppID appid, int fromstate, int tostate,
-            Object source, boolean hasFailed)
-    {
+            Object source, boolean hasFailed) {
         super(source);
 
         this.appid = appid;
@@ -33,29 +32,29 @@ public class AppStateChangeEvent extends EventObject {
         this.hasFailed = hasFailed;
     }
 
-    public AppID getAppID()
-    {
+    public AppID getAppID() {
         return appid;
     }
 
-    public int getFromState()
-    {
+    public int getFromState() {
         return fromstate;
     }
 
-    public int getToState()
-    {
+    public int getToState() {
         return tostate;
     }
 
-    public boolean hasFailed()
-    {
+    public boolean hasFailed() {
         return hasFailed;
     }
 
-    private AppID appid;
-    private int fromstate;
-    private int tostate;
-    private boolean hasFailed;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",appid=" + appid + ",fromstate=" + fromstate + ",tostate=" + tostate + ",hasFailed=" + hasFailed + "]";
+    }
+
+    private final AppID appid;
+    private final int fromstate;
+    private final int tostate;
+    private final boolean hasFailed;
     private static final long serialVersionUID = -5634352176873439145L;
 }

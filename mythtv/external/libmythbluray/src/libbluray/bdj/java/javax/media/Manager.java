@@ -1,3 +1,21 @@
+/*
+ * This file is part of libbluray
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package javax.media;
 
 import java.io.IOException;
@@ -16,14 +34,12 @@ import org.videolan.Logger;
  */
 public final class Manager {
     public static Player createPlayer(URL sourceURL) throws IOException,
-            NoPlayerException
-    {
+            NoPlayerException {
         return createPlayer(new MediaLocator(sourceURL));
     }
 
     public static Player createPlayer(MediaLocator sourceLocator)
-            throws IOException, NoPlayerException
-    {
+            throws IOException, NoPlayerException {
         final String protocol = sourceLocator.getProtocol();
         final Vector dataSourceList = getDataSourceList(protocol);
         for (int i = 0; i < dataSourceList.size(); ++i) {
@@ -83,20 +99,17 @@ public final class Manager {
     }
 
     public static Player createPlayer(DataSource source) throws IOException,
-            NoPlayerException
-    {
+            NoPlayerException {
         return createPlayer(source, source.getContentType());
     }
 
     public static DataSource createDataSource(URL sourceURL)
-            throws IOException, NoDataSourceException
-    {
+            throws IOException, NoDataSourceException {
         return createDataSource(new MediaLocator(sourceURL));
     }
 
     public static DataSource createDataSource(MediaLocator sourceLocator)
-            throws IOException, NoDataSourceException
-    {
+            throws IOException, NoDataSourceException {
         final String protocol = sourceLocator.getProtocol();
         final Vector dataSourceList = getDataSourceList(protocol);
         for (int i = 0; i < dataSourceList.size(); ++i) {
@@ -140,24 +153,20 @@ public final class Manager {
         return dataSource;
     }
 
-    public static TimeBase getSystemTimeBase()
-    {
+    public static TimeBase getSystemTimeBase() {
         return systemTimeBase;
     }
 
-    public static Vector getDataSourceList(String protocolName)
-    {
+    public static Vector getDataSourceList(String protocolName) {
         return getClassList(protocolName, PackageManager.getProtocolPrefixList(), "protocol", "DataSource");
     }
 
-    public static Vector getHandlerClassList(String contentName)
-    {
+    public static Vector getHandlerClassList(String contentName) {
         return getClassList(toPackageFriendly(contentName), PackageManager.getContentPrefixList(), "content", "Handler");
     }
 
     private static Player createPlayer(DataSource source, String contentType)
-        throws IOException, NoPlayerException
-    {
+        throws IOException, NoPlayerException {
         final Vector handlerClassList = getHandlerClassList(contentType);
         for (int i = 0; i < handlerClassList.size(); ++i) {
             final String handlerClassName = (String) handlerClassList.get(i);
@@ -210,8 +219,7 @@ public final class Manager {
         throw new NoPlayerException("No player found for " + source.getLocator());
     }
 
-    private static char toPackageFriendly(char c)
-    {
+    private static char toPackageFriendly(char c) {
         if (c >= 'a' && c <= 'z')
             return c;
         else if (c >= 'A' && c <= 'Z')
@@ -226,8 +234,7 @@ public final class Manager {
             return '_';
     }
 
-    private static String toPackageFriendly(String contentName)
-    {
+    private static String toPackageFriendly(String contentName) {
         final StringBuffer b = new StringBuffer();
         for (int i = 0; i < contentName.length(); ++i) {
             final char c = contentName.charAt(i);
@@ -236,8 +243,7 @@ public final class Manager {
         return b.toString();
     }
 
-    public static Vector getClassList(String contentName, Vector packages, String component2, String className)
-    {
+    public static Vector getClassList(String contentName, Vector packages, String component2, String className) {
         final Vector result = new Vector();
         //result.add("media." + component2 + "." + contentName + "." + className);
 

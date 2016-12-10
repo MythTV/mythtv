@@ -21,6 +21,7 @@ package org.dvb.application;
 
 import java.util.LinkedList;
 import java.util.Enumeration;
+import java.util.Collections;
 import org.videolan.BDJAppsDatabase;
 import org.videolan.BDJListeners;
 import org.videolan.Logger;
@@ -37,12 +38,12 @@ public class AppsDatabase {
 
     public Enumeration getAppIDs(AppsDatabaseFilter filter) {
         logger.unimplemented("getAppIDs");
-        return null;
+        return Collections.emptyEnumeration();
     }
 
     public Enumeration getAppAttributes(AppsDatabaseFilter filter) {
         logger.unimplemented("getAppAttributes");
-        return null;
+        return Collections.emptyEnumeration();
     }
 
     public AppAttributes getAppAttributes(AppID key) {

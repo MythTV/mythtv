@@ -22,24 +22,21 @@ package org.blurayx.s3d.ui;
 import java.awt.Image;
 import java.awt.Rectangle;
 
-public class DirectDrawS3D
-{
+public class DirectDrawS3D {
+
     public void drawStereoscopic(Image leftImage, int leftX, int leftY,
                                  Rectangle[] leftUpdateAreas,
                                  Image rightImage, int rightX, int rightY,
-                                 Rectangle[] rightUpdateAreas)
-    {
+                                 Rectangle[] rightUpdateAreas) {
     }
 
     public void drawStereoscopicImages(Image[] leftImages, int[] leftXs, int[] leftYs,
                                        Rectangle[] leftUpdateAreas,
                                        Image[] rightImages, int[] rightXs, int[] rightYs,
-                                       Rectangle[] rightUpdateAreas)
-    {
+                                       Rectangle[] rightUpdateAreas) {
     }
 
-    public static DirectDrawS3D getInstance()
-    {
+    public static DirectDrawS3D getInstance() {
         org.videolan.Logger.unimplemented("DirectDrawS3D", "getInstance");
         return null;
     }

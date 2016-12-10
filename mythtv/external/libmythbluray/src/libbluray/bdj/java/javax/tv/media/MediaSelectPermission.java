@@ -32,31 +32,36 @@ public final class MediaSelectPermission extends Permission
         if (locator == null)
             this.locator = "*";
         else
-        this.locator = locator.toExternalForm();
+            this.locator = locator.toExternalForm();
     }
 
     public MediaSelectPermission(String locator, String actions) {
         super("javax.tv.media.MediaSelectPermission");
 
+        if (locator == null)
+            throw new NullPointerException("null locator");
+
         this.locator = locator;
     }
 
     public boolean implies(Permission perm) {
-        return (perm instanceof MediaSelectPermission) && (this.equals(perm) || this.locator.equals("*"));
+        if (perm == null)
+            throw new NullPointerException("permission is null");
+
+        if (!(perm instanceof MediaSelectPermission))
+            return false;
+
+        return equals(perm) || locator.equals("*");
     }
 
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
         if (this == obj)
             return true;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof MediaSelectPermission))
             return false;
+
         MediaSelectPermission other = (MediaSelectPermission) obj;
-        if (locator == null) {
-            if (other.locator != null)
-                return false;
-        } else if (!locator.equals(other.locator))
+        if (!locator.equals(other.locator))
             return false;
         return true;
     }

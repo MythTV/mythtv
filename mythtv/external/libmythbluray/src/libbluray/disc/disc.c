@@ -32,6 +32,7 @@
 #include "file/file.h"
 #include "file/mount.h"
 
+#include <ctype.h>
 #include <string.h>
 
 #ifdef ENABLE_UDF
@@ -52,6 +53,8 @@ struct bd_disc {
     void        (*pf_fs_close)(void *);
 
     const char   *udf_volid;
+
+    int8_t        avchd;  /* -1 - unknown. 0 - no. 1 - yes */
 };
 
 /*
@@ -90,6 +93,44 @@ static BD_DIR_H *_bdrom_open_dir(void *p, const char *dir)
     X_FREE(path);
 
     return dp;
+}
+
+/*
+ * AVCHD 8.3 filenames
+ */
+
+static char *_avchd_file_name(const char *rel_path)
+{
+    static const char map[][2][6] = {
+        { ".mpls", ".MPL" },
+        { ".clpi", ".CPI" },
+        { ".m2ts", ".MTS" },
+        { ".bdmv", ".BDM" },
+    };
+    char *avchd_path = str_dup(rel_path);
+    char *name = avchd_path ? strrchr(avchd_path, DIR_SEP_CHAR) : NULL;
+    char *dot = name ? strrchr(name, '.') : NULL;
+    size_t i;
+
+    if (dot) {
+
+        /* take up to 8 chars from file name */
+        for (i = 0; *name && name < dot && i < 9; i++, name++) {
+            *name = toupper(*name);
+        }
+
+        /* convert extension */
+        for (i = 0; i < sizeof(map) / sizeof(map[0]); i++) {
+            if (!strcmp(dot, map[i][0])) {
+                strcpy(name, map[i][1]);
+                return avchd_path;
+            }
+        }
+    }
+
+    /* failed */
+    X_FREE(avchd_path);
+    return NULL;
 }
 
 /*
@@ -177,7 +218,7 @@ static void _comb_dir_append(BD_DIR_H *dp, BD_DIRENT *entry)
     }
 
     /* append */
-    priv = realloc(priv, sizeof(*priv) + priv->count * sizeof(BD_DIRENT));
+    priv = realloc(dp->internal, sizeof(*priv) + priv->count * sizeof(BD_DIRENT));
     if (!priv) {
         return;
     }
@@ -229,6 +270,8 @@ static BD_DISC *_disc_init()
         p->fs_handle          = (void*)p;
         p->pf_file_open_bdrom = _bdrom_open_path;
         p->pf_dir_open_bdrom  = _bdrom_open_dir;
+
+        p->avchd = -1;
     }
     return p;
 }
@@ -249,8 +292,7 @@ static void _set_paths(BD_DISC *p, const char *device_path)
 }
 
 BD_DISC *disc_open(const char *device_path,
-                   void *read_blocks_handle,
-                   int (*read_blocks)(void *handle, void *buf, int lba, int num_blocks),
+                   fs_access *p_fs,
                    struct bd_enc_info *enc_info,
                    const char *keyfile_path,
                    void *regs, void *psr_read, void *psr_write)
@@ -258,13 +300,19 @@ BD_DISC *disc_open(const char *device_path,
     BD_DISC *p = _disc_init();
 
     if (p) {
+        if (p_fs && p_fs->open_dir) {
+            p->fs_handle          = p_fs->fs_handle;
+            p->pf_file_open_bdrom = p_fs->open_file;
+            p->pf_dir_open_bdrom  = p_fs->open_dir;
+        }
+
         _set_paths(p, device_path);
 
 #ifdef ENABLE_UDF
         /* check if disc root directory can be opened. If not, treat it as device/image file. */
         BD_DIR_H *dp_img = device_path ? dir_open(device_path) : NULL;
         if (!dp_img) {
-            void *udf = udf_image_open(device_path, read_blocks_handle, read_blocks);
+            void *udf = udf_image_open(device_path, p_fs ? p_fs->fs_handle : NULL, p_fs ? p_fs->read_blocks : NULL);
             if (!udf) {
                 BD_DEBUG(DBG_FILE | DBG_CRIT, "failed opening UDF image %s\n", device_path);
             } else {
@@ -282,9 +330,6 @@ BD_DISC *disc_open(const char *device_path,
             dir_close(dp_img);
             BD_DEBUG(DBG_FILE, "%s does not seem to be image file or device node\n", device_path);
         }
-#else
-        (void)read_blocks_handle;
-        (void)read_blocks;
 #endif
 
         struct dec_dev dev = { p->fs_handle, p->pf_file_open_bdrom, p, (file_openFp)disc_open_path, p->disc_root, device_path };
@@ -339,6 +384,18 @@ BD_FILE_H *disc_open_path(BD_DISC *p, const char *rel_path)
 {
     BD_FILE_H *fp;
 
+    if (p->avchd > 0) {
+        char *avchd_path = _avchd_file_name(rel_path);
+        if (avchd_path) {
+            BD_DEBUG(DBG_FILE, "AVCHD: %s -> %s\n", rel_path, avchd_path);
+            fp = p->pf_file_open_bdrom(p->fs_handle, avchd_path);
+            X_FREE(avchd_path);
+            if (fp) {
+                return fp;
+            }
+        }
+    }
+
     /* search file from overlay */
     fp = _overlay_open_path(p, rel_path);
 
@@ -347,7 +404,19 @@ BD_FILE_H *disc_open_path(BD_DISC *p, const char *rel_path)
         fp = p->pf_file_open_bdrom(p->fs_handle, rel_path);
 
         if (!fp) {
-            BD_DEBUG(DBG_FILE | DBG_CRIT, "error opening file %s\n", rel_path);
+
+            /* AVCHD short filenames detection */
+            if (p->avchd < 0 && !strcmp(rel_path, "BDMV" DIR_SEP "index.bdmv")) {
+                fp = p->pf_file_open_bdrom(p->fs_handle, "BDMV" DIR_SEP "INDEX.BDM");
+                if (fp) {
+                    BD_DEBUG(DBG_FILE | DBG_CRIT, "detected AVCHD 8.3 filenames\n");
+                }
+                p->avchd = !!fp;
+            }
+
+            if (!fp) {
+                BD_DEBUG(DBG_FILE | DBG_CRIT, "error opening file %s\n", rel_path);
+            }
         }
     }
 
@@ -451,6 +520,22 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
     BD_FILE_H *fp_in;
     BD_FILE_H *fp_out;
     int64_t    got;
+    size_t     size;
+
+    if (!cache_path || !cache_path[0]) {
+        return -1;
+    }
+
+    /* make sure cache directory exists */
+    if (file_mkdirs(cache_path) < 0) {
+        return -1;
+    }
+
+    /* plain directory ? */
+    size = strlen(rel_path);
+    if (rel_path[size - 1] == '/' || rel_path[size - 1] == '\\') {
+        return 0;
+    }
 
     /* input file from BD-ROM */
     fp_in = p->pf_file_open_bdrom(p->fs_handle, rel_path);
@@ -458,9 +543,6 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
         BD_DEBUG(DBG_FILE | DBG_CRIT, "error caching file %s (does not exist ?)\n", rel_path);
         return -1;
     }
-
-    /* make sure path exists */
-    file_mkdirs(cache_path);
 
     /* output file in local filesystem */
     fp_out = file_open(cache_path, "wb");
@@ -470,20 +552,20 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
         return -1;
     }
 
-    while (1) {
+    do {
         uint8_t buf[16*2048];
         got = file_read(fp_in, buf, sizeof(buf));
-        if (got <= 0) {
-            break;
-        }
-        if (fp_out->write(fp_out, buf, got) != got) {
+
+        /* we'll call write(fp, buf, 0) after EOF. It is used to check for errors. */
+        if (got < 0 || fp_out->write(fp_out, buf, got) != got) {
             BD_DEBUG(DBG_FILE | DBG_CRIT, "error caching file %s\n", rel_path);
             file_close(fp_out);
             file_close(fp_in);
             (void)file_unlink(cache_path);
             return -1;
         }
-    }
+    } while (got > 0);
+
     BD_DEBUG(DBG_FILE, "cached %s to %s\n", rel_path, cache_path);
 
     file_close(fp_out);

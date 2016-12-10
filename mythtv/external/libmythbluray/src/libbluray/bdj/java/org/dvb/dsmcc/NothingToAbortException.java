@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class NothingToAbortException extends DSMCCException {
-    public NothingToAbortException()
-    {
+    public NothingToAbortException() {
         super();
     }
 
-    public NothingToAbortException(String reason)
-    {
+    public NothingToAbortException(String reason) {
         super(reason);
     }
 

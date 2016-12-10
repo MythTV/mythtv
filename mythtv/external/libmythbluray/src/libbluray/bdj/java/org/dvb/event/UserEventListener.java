@@ -23,5 +23,4 @@ import java.util.EventListener;
 
 public interface UserEventListener extends EventListener {
     public void userEventReceived(UserEvent event);
-
 }

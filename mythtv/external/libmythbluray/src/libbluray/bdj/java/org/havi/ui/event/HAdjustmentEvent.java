@@ -23,8 +23,7 @@ import java.awt.AWTEvent;
 import org.havi.ui.HAdjustmentInputPreferred;
 
 public class HAdjustmentEvent extends AWTEvent {
-    public HAdjustmentEvent(HAdjustmentInputPreferred source, int id)
-    {
+    public HAdjustmentEvent(HAdjustmentInputPreferred source, int id) {
         super(source, id);
     }
 

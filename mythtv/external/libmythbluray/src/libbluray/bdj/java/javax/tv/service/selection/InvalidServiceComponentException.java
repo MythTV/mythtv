@@ -22,22 +22,19 @@ package javax.tv.service.selection;
 import javax.tv.locator.Locator;
 
 public class InvalidServiceComponentException extends ServiceContextException {
-    public InvalidServiceComponentException(Locator locator)
-    {
+    public InvalidServiceComponentException(Locator locator) {
         super();
 
         this.locator = locator;
     }
 
-    public InvalidServiceComponentException(Locator locator, String reason)
-    {
+    public InvalidServiceComponentException(Locator locator, String reason) {
         super(reason);
 
         this.locator = locator;
     }
 
-    public Locator getInvalidServiceComponent()
-    {
+    public Locator getInvalidServiceComponent() {
         return locator;
     }
 

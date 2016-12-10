@@ -20,13 +20,11 @@
 package javax.media;
 
 public class MediaException extends Exception {
-    public MediaException()
-    {
+    public MediaException() {
         super();
     }
 
-    public MediaException(String reason)
-    {
+    public MediaException(String reason) {
         super(reason);
     }
 

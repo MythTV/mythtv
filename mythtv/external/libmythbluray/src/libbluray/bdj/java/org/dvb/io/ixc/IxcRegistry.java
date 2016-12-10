@@ -30,10 +30,12 @@ import org.videolan.IxcRegistryImpl;
 
 public class IxcRegistry {
 
+    private static final Object instanceLock = new Object();
+
     private static IxcRegistryImpl registry = null;
 
     private static IxcRegistryImpl getIxcRegistry() {
-        synchronized (IxcRegistry.class) {
+        synchronized (instanceLock) {
             if (registry == null) {
                 registry = new IxcRegistryImpl();
             }
@@ -43,7 +45,7 @@ public class IxcRegistry {
 
     public static void shutdown() {
         IxcRegistryImpl r;
-        synchronized (IxcRegistry.class) {
+        synchronized (instanceLock) {
             r = registry;
             registry = null;
         }

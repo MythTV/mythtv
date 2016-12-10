@@ -20,18 +20,20 @@
 package javax.media;
 
 public class DurationUpdateEvent extends ControllerEvent {
-    public DurationUpdateEvent(Controller source, Time duration)
-    {
+    public DurationUpdateEvent(Controller source, Time duration) {
         super(source);
 
         this.duration = duration;
     }
 
-    public Time getDuration()
-    {
+    public Time getDuration() {
         return duration;
     }
 
-    private Time duration;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",duration=" + duration + "]";
+    }
+
+    private final Time duration;
     private static final long serialVersionUID = 400898256354068250L;
 }

@@ -21,7 +21,6 @@ package org.havi.ui;
 
 public class HVideoConfiguration extends HScreenConfiguration {
     protected HVideoConfiguration() {
-
     }
 
     HVideoConfiguration(HVideoConfigTemplate hvct) {

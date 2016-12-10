@@ -20,13 +20,11 @@
 package javax.media;
 
 public class ClockStartedError extends MediaError {
-    public ClockStartedError()
-    {
+    public ClockStartedError() {
         super();
     }
 
-    public ClockStartedError(String reason)
-    {
+    public ClockStartedError(String reason) {
         super(reason);
     }
 

@@ -22,17 +22,19 @@ package org.bluray.media;
 import java.util.EventObject;
 
 public class AngleChangeEvent extends EventObject {
-    public AngleChangeEvent(AngleControl source, int angle)
-    {
+    public AngleChangeEvent(AngleControl source, int angle) {
         super(source);
         this.angle = angle;
     }
 
-    public int getAngle()
-    {
+    public int getAngle() {
         return this.angle;
     }
 
-    private int angle;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",angle=" + angle + "]";
+    }
+
+    private final int angle;
     private static final long serialVersionUID = -2582705865081165327L;
 }

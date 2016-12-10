@@ -28,7 +28,7 @@
 typedef struct bd_aacs BD_AACS;
 
 BD_PRIVATE int  libaacs_required(void *h, int (*have_file)(void *, const char *, const char *));
-BD_PRIVATE BD_AACS *libaacs_load(void);
+BD_PRIVATE BD_AACS *libaacs_load(int force_mmbd);
 BD_PRIVATE int  libaacs_open(BD_AACS *p, const char *device,
                              void *file_open_handle, void *file_open_fp,
                              const char *keyfile_path);
@@ -36,8 +36,10 @@ BD_PRIVATE void libaacs_unload(BD_AACS **p);
 
 BD_PRIVATE void libaacs_select_title(BD_AACS *p, uint32_t title);
 BD_PRIVATE int  libaacs_decrypt_unit(BD_AACS *p, uint8_t *buf);
+BD_PRIVATE int  libaacs_decrypt_bus(BD_AACS *p, uint8_t *buf);
 
 BD_PRIVATE uint32_t libaacs_get_mkbv(BD_AACS *p);
+BD_PRIVATE int      libaacs_get_bec_enabled(BD_AACS *p);
 
 #define BD_AACS_DISC_ID            1
 #define BD_AACS_MEDIA_VID          2
@@ -45,6 +47,8 @@ BD_PRIVATE uint32_t libaacs_get_mkbv(BD_AACS *p);
 #define BD_AACS_DEVICE_BINDING_ID  4
 #define BD_AACS_DEVICE_NONCE       5
 #define BD_AACS_MEDIA_KEY          6
+#define BD_AACS_CONTENT_CERT_ID    7
+#define BD_AACS_BDJ_ROOT_CERT_HASH 8
 
 BD_PRIVATE const uint8_t *libaacs_get_aacs_data(BD_AACS *p, int type);
 

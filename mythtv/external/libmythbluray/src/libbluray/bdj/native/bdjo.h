@@ -26,6 +26,12 @@
 
 struct bdjo_data;
 
+/*
+ * Note:
+ * This function should be called only from Java side.
+ * If it is called from native C thread, lot of references are leaked !
+ */
+
 BD_PRIVATE jobject bdjo_make_jobj(JNIEnv* env, const struct bdjo_data *bdjo);
 
 #endif /* BDJO_H_ */

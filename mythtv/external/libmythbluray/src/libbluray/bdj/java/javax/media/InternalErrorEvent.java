@@ -20,13 +20,11 @@
 package javax.media;
 
 public class InternalErrorEvent extends ControllerErrorEvent {
-    public InternalErrorEvent(Controller source)
-    {
+    public InternalErrorEvent(Controller source) {
         super(source);
     }
 
-    public InternalErrorEvent(Controller source, String reason)
-    {
+    public InternalErrorEvent(Controller source, String reason) {
         super(source, reason);
     }
 

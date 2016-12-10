@@ -20,88 +20,75 @@
 package org.havi.ui;
 
 public class HScreen {
-    private HScreen()
-    {
+    private HScreen() {
         hVideoDevice = new HVideoDevice();
         hGraphicsDevice = new HGraphicsDevice();
         hBackgroundDevice = new HBackgroundDevice();
     }
 
-    public static HScreen[] getHScreens()
-    {
+    public static HScreen[] getHScreens() {
          HScreen[] screens = new HScreen[1];
          screens[0] = DEFAULT_HSCREEN;
          return screens;
     }
 
-    public static HScreen getDefaultHScreen()
-    {
+    public static HScreen getDefaultHScreen() {
         return DEFAULT_HSCREEN;
     }
 
-    public HVideoDevice[] getHVideoDevices()
-    {
+    public HVideoDevice[] getHVideoDevices() {
         HVideoDevice[] devices = new HVideoDevice[1];
         devices[0] = hVideoDevice;
         return devices;
     }
 
-    public HVideoDevice getDefaultHVideoDevice()
-    {
+    public HVideoDevice getDefaultHVideoDevice() {
         return hVideoDevice;
     }
 
-    public HVideoConfiguration getBestConfiguration(HVideoConfigTemplate[] hvcta)
-    {
+    public HVideoConfiguration getBestConfiguration(HVideoConfigTemplate[] hvcta) {
         return hVideoDevice.getBestConfiguration(hvcta);
     }
 
-    public HGraphicsDevice[] getHGraphicsDevices()
-    {
+    public HGraphicsDevice[] getHGraphicsDevices() {
         HGraphicsDevice[] devices = new HGraphicsDevice[1];
         devices[0] = hGraphicsDevice;
         return devices;
     }
 
-    public HGraphicsDevice getDefaultHGraphicsDevice()
-    {
+    public HGraphicsDevice getDefaultHGraphicsDevice() {
         return hGraphicsDevice;
     }
 
     public HGraphicsConfiguration getBestConfiguration(
-            HGraphicsConfigTemplate[] hgcta)
-    {
+            HGraphicsConfigTemplate[] hgcta) {
         return hGraphicsDevice.getBestConfiguration(hgcta);
     }
 
-    public HBackgroundDevice[] getHBackgroundDevices()
-    {
+    public HBackgroundDevice[] getHBackgroundDevices() {
         HBackgroundDevice[] devices = new HBackgroundDevice[1];
         devices[0] = hBackgroundDevice;
         return devices;
     }
 
-    public HBackgroundDevice getDefaultHBackgroundDevice()
-    {
+    public HBackgroundDevice getDefaultHBackgroundDevice() {
         return hBackgroundDevice;
     }
 
     public HBackgroundConfiguration getBestConfiguration(
-            HBackgroundConfigTemplate[] hbcta)
-    {
+            HBackgroundConfigTemplate[] hbcta) {
         return hBackgroundDevice.getBestConfiguration(hbcta);
     }
 
     public HScreenConfiguration[] getCoherentScreenConfigurations(
-            HScreenConfigTemplate[] hscta)
-    {
+            HScreenConfigTemplate[] hscta) {
+
         if ((hscta == null) || (hscta.length == 0))
             throw new IllegalArgumentException("HScreenConfigTemplate[] hscta cannot be null");
 
         HScreenConfiguration[] hsc = new HScreenConfiguration[hscta.length];
 
-        for (int i = 0; i < hscta.length; i++)
-        {
+        for (int i = 0; i < hscta.length; i++) {
             if ((hscta[i] instanceof HVideoConfigTemplate))
                 hsc[i] = hVideoDevice.getBestConfiguration((HVideoConfigTemplate)hscta[i]);
             else if ((hscta[i] instanceof HGraphicsConfigTemplate))
@@ -117,8 +104,8 @@ public class HScreen {
 
     public boolean setCoherentScreenConfigurations(HScreenConfiguration[] hsca)
             throws java.lang.SecurityException, HPermissionDeniedException,
-            HConfigurationException
-    {
+            HConfigurationException {
+
         if ((hsca == null) || (hsca.length == 0))
             throw new IllegalArgumentException("HScreenConfiguration[] hsca cannot be null");
 

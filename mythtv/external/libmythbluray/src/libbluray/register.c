@@ -530,3 +530,33 @@ void registers_restore(BD_REGISTERS *p, const uint32_t *psr, const uint32_t *gpr
 
     bd_psr_unlock(p);
 }
+
+/*
+ *
+ */
+
+void psr_init_3D(BD_REGISTERS *p, int initial_mode)
+{
+    bd_psr_lock(p);
+
+    bd_psr_setting_write(p, PSR_OUTPUT_PREFER,
+                         BLURAY_OUTPUT_PREFER_3D);
+
+    bd_psr_setting_write(p, PSR_DISPLAY_CAP,
+                         BLURAY_DCAP_1080p_720p_3D |
+                         BLURAY_DCAP_720p_50Hz_3D |
+                         BLURAY_DCAP_NO_3D_CLASSES_REQUIRED |
+                         BLURAY_DCAP_INTERLACED_3D |
+                         0);
+
+    bd_psr_setting_write(p, PSR_3D_CAP,
+                         /* TODO */ 0xffffffff );
+
+    bd_psr_setting_write(p, PSR_PROFILE_VERSION,
+                         BLURAY_PLAYER_PROFILE_5_v2_4);
+
+    bd_psr_write(p, PSR_3D_STATUS,
+                 !!initial_mode);
+
+    bd_psr_unlock(p);
+}

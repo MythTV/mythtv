@@ -20,8 +20,7 @@
 package javax.media;
 
 public class StopTimeSetError extends MediaError {
-    public StopTimeSetError(String reason)
-    {
+    public StopTimeSetError(String reason) {
         super(reason);
     }
 

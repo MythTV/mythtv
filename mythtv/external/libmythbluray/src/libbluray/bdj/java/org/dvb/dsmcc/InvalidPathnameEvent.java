@@ -20,15 +20,13 @@
 package org.dvb.dsmcc;
 
 public class InvalidPathnameEvent extends AsynchronousLoadingEvent {
-    public InvalidPathnameEvent(DSMCCObject source)
-    {
+    public InvalidPathnameEvent(DSMCCObject source) {
         super(source);
 
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

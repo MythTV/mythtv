@@ -34,16 +34,22 @@ import org.videolan.FontIndexData;
 import org.videolan.Logger;
 
 public class FontFactory {
-    public static synchronized void loadDiscFonts() {
+    public static void loadDiscFonts() {
         unloadDiscFonts();
+
+        // fonts are loaded on demand
     }
 
-    public static synchronized void unloadDiscFonts() {
-        fonts = null;
-        fontIds = null;
+    public static void unloadDiscFonts() {
+        synchronized (fontsLock) {
+            fonts = null;
+            fontIds = null;
+        }
     }
 
-    private static synchronized void readDiscFonts() throws FontFormatException, IOException {
+    private static void readDiscFonts() throws FontFormatException, IOException {
+        synchronized (fontsLock) {
+
         if (fonts != null)
             return;
 
@@ -57,6 +63,7 @@ public class FontFactory {
             try {
                 File fontFile = org.videolan.BDJLoader.addFont(data.getFileName());
                 if (fontFile == null) {
+                    logger.error("error caching font");
                     throw new IOException("error caching font");
                 }
 
@@ -84,7 +91,7 @@ public class FontFactory {
                 }
             }
         }
-
+        }
     }
 
     public FontFactory() throws FontFormatException, IOException {
@@ -99,6 +106,7 @@ public class FontFactory {
 
             File fontFile = org.videolan.BDJLoader.addFont(inStream);
             if (fontFile == null) {
+                logger.error("error caching font");
                 throw new IOException("error caching font");
             }
 
@@ -118,10 +126,15 @@ public class FontFactory {
         }
     }
 
+    // used by root window / .bdjo default font
     public Font createFont(String fontId) {
         Font font = null;
-        synchronized (FontFactory.class) {
-            font = (Font)fontIds.get(fontId);
+        synchronized (fontsLock) {
+            if (fontIds == null) {
+                logger.error("no disc fonts loaded");
+            } else {
+                font = (Font)fontIds.get(fontId);
+            }
         }
         if (font != null) {
             return font.deriveFont(0, 12);
@@ -134,6 +147,7 @@ public class FontFactory {
         logger.info("Creating font: " + name + " " + style + " " + size);
 
         if (style < 0 || size <= 0 || (style & ~3) != 0) {
+            logger.error("invalid font size / style");
             throw new IllegalArgumentException();
         }
 
@@ -148,8 +162,9 @@ public class FontFactory {
 
         /* Factory created for fonts in dvb.fontindex */
         Font font = null;
-        synchronized (FontFactory.class) {
-            font = (Font)fonts.get(name + "." + style);
+        synchronized (fontsLock) {
+            if (fonts != null)
+                font = (Font)fonts.get(name + "." + style);
         }
 
         if (font == null) {
@@ -161,6 +176,8 @@ public class FontFactory {
     }
 
     private Font urlFont = null;
+
+    private static final Object fontsLock = new Object();
 
     private static Map fonts = null;
     private static Map fontIds = null;

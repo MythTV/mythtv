@@ -35,7 +35,8 @@ import org.videolan.TIClip;
 public class BackgroundVideoPresentationControlImpl extends VideoControl
                 implements BackgroundVideoPresentationControl, AWTVideoSizeControl {
     protected BackgroundVideoPresentationControlImpl(Handler player) {
-        super(player, 0);
+        super(0);
+        this.player = player;
     }
 
     protected StreamInfo[] getStreams() {
@@ -137,4 +138,6 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
         Rectangle dr = size.getDestination();
         return new AWTVideoSize(sr, dr);
     }
+
+    private Handler player;
 }

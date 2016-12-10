@@ -23,24 +23,22 @@ import javax.tv.service.Service;
 
 public final class PreferenceFilter extends ServiceFilter {
 
-    public PreferenceFilter(FavoriteServicesName name)
-    {
+    public PreferenceFilter(FavoriteServicesName name) {
+        System.err.println("No preference");
+        if (name == null)
+            throw new NullPointerException();
         throw new IllegalArgumentException();
     }
 
-    public static FavoriteServicesName[] listPreferences()
-    {
+    public static FavoriteServicesName[] listPreferences() {
         return new FavoriteServicesName[0];
     }
 
-    public FavoriteServicesName getFilterValue()
-    {
+    public FavoriteServicesName getFilterValue() {
         return null;
     }
 
-    public boolean accept(Service service)
-    {
+    public boolean accept(Service service) {
         return false;
     }
-
 }

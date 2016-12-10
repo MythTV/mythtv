@@ -20,12 +20,11 @@
 package org.bluray.storage;
 
 public class StorageManager {
+
+    private static final StorageManager instance = new StorageManager();
+
     public static StorageManager getInstance() {
-        synchronized (StorageManager.class) {
-            if (instance == null)
-                instance = new StorageManager();
-            return instance;
-        }
+        return instance;
     }
 
     protected StorageManager() {
@@ -38,6 +37,4 @@ public class StorageManager {
     public DataAreaInfo getPersistentDataAreaInfo() {
         return new PersistentDataAreaInfo();
     }
-
-    private static StorageManager instance = null;
 }

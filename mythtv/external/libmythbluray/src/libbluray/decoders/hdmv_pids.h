@@ -40,6 +40,11 @@
 #define HDMV_PID_PG_FIRST         0x1200
 #define HDMV_PID_PG_LAST          0x121f
 
+#define HDMV_PID_PG_B_FIRST       0x1220  /* base view */
+#define HDMV_PID_PG_B_LAST        0x123f
+#define HDMV_PID_PG_E_FIRST       0x1240  /* enhanced view */
+#define HDMV_PID_PG_E_LAST        0x125f
+
 #define HDMV_PID_IG_FIRST         0x1400
 #define HDMV_PID_IG_LAST          0x141f
 

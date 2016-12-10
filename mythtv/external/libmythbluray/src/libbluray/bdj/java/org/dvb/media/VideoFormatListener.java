@@ -21,9 +21,8 @@ package org.dvb.media;
 
 import java.util.EventListener;
 
-public interface VideoFormatListener extends EventListener
-{
-	public void receiveVideoFormatEvent(VideoFormatEvent event);
+public interface VideoFormatListener extends EventListener {
+    public void receiveVideoFormatEvent(VideoFormatEvent event);
 }
 
 

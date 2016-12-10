@@ -21,8 +21,8 @@ package org.blurayx.s3d.ui;
 
 import org.bluray.ui.BDVideoConfigTemplate;
 
-public class HVideoConfigTemplateS3D extends BDVideoConfigTemplate
-{
+public class HVideoConfigTemplateS3D extends BDVideoConfigTemplate {
+
     public static final int S3D = 17;
 
     protected int getPreferenceCount() {

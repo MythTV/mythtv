@@ -22,5 +22,4 @@ package org.havi.ui.event;
 import java.awt.event.FocusListener;
 
 public interface HFocusListener extends FocusListener {
-
 }

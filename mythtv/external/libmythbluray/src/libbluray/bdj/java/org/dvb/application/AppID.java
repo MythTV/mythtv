@@ -22,29 +22,24 @@ package org.dvb.application;
 import java.io.Serializable;
 
 public class AppID implements Serializable {
-    public AppID(int oid, int aid)
-    {
+    public AppID(int oid, int aid) {
         this.oid = oid;
         this.aid = aid;
     }
-    
-    public int getOID()
-    {
+
+    public int getOID() {
         return oid;
     }
-    
-    public int getAID()
-    {
+
+    public int getAID() {
         return aid;
     }
-    
-    public String toString()
-    {
+
+    public String toString() {
         return Long.toString(((long)oid << 16) + aid, 16);
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + aid;
@@ -52,13 +47,8 @@ public class AppID implements Serializable {
         return result;
     }
 
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AppID))
             return false;
         AppID other = (AppID) obj;
         if (aid != other.aid)
@@ -68,8 +58,6 @@ public class AppID implements Serializable {
         return true;
     }
 
-    int oid;
-    int aid;
-
-    private static final long serialVersionUID = 1;
+    private int oid;
+    private int aid;
 }

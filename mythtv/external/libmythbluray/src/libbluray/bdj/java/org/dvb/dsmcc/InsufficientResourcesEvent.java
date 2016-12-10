@@ -20,15 +20,13 @@
 package org.dvb.dsmcc;
 
 public class InsufficientResourcesEvent extends AsynchronousLoadingEvent {
-    public InsufficientResourcesEvent(DSMCCObject source)
-    {
+    public InsufficientResourcesEvent(DSMCCObject source) {
         super(source);
-        
+
         this.source = source;
     }
 
-    public java.lang.Object getSource()
-    {
+    public java.lang.Object getSource() {
         return source;
     }
 

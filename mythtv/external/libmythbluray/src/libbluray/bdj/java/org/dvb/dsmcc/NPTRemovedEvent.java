@@ -20,10 +20,9 @@
 package org.dvb.dsmcc;
 
 public class NPTRemovedEvent extends NPTStatusEvent {
-    public NPTRemovedEvent(DSMCCStream source)
-    {
+    public NPTRemovedEvent(DSMCCStream source) {
         super(source);
     }
-    
+
     private static final long serialVersionUID = -317867772336548880L;
 }

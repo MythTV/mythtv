@@ -22,25 +22,33 @@ package javax.tv.service;
 import java.util.EventObject;
 
 public abstract class SIChangeEvent extends EventObject {
-    public SIChangeEvent(Object source, SIChangeType type, SIElement element)
-    {
+    public SIChangeEvent(Object source, SIChangeType type, SIElement element) {
         super(source);
-        
+
+        this.source = source;
         this.type = type;
         this.element = element;
     }
 
-    public SIChangeType getChangeType()
-    {
+    public SIChangeType getChangeType() {
         return type;
     }
-    
-    public SIElement getSIElement()
-    {
+
+    public SIElement getSIElement() {
         return element;
-    } 
-    
-    private SIChangeType type;
-    private SIElement element;
+    }
+
+    public Object getSource() {
+        return source;
+    }
+
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",type=" + type + ",element=" + element + "]";
+    }
+
+    private final Object source;
+    private final SIChangeType type;
+    private final SIElement element;
+
     private static final long serialVersionUID = -2585934355425778816L;
 }

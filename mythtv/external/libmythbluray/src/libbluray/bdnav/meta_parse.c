@@ -185,7 +185,7 @@ META_ROOT *meta_parse(BD_DISC *disc)
                     root->dl_entries[i].toc_entries = NULL;
                     root->dl_entries[i].thumbnails = NULL;
                     _parseManifestNode(root_element, &root->dl_entries[i]);
-                    XML_FREE(doc);
+                    xmlFreeDoc(doc);
                 }
             X_FREE(data);
         }

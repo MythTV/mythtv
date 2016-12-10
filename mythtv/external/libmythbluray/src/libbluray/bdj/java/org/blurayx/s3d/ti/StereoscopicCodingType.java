@@ -24,8 +24,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import org.bluray.ti.CodingType;
 
-public class StereoscopicCodingType
-{
+public class StereoscopicCodingType {
+
     public static final CodingType MPEG4_MVC_VIDEO =
         (CodingType)AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run() {

@@ -23,8 +23,85 @@ import org.davic.net.Locator;
 import org.davic.net.InvalidLocatorException;
 
 import org.videolan.BDJUtil;
+import org.videolan.Logger;
 
 public class BDLocator extends Locator {
+
+    /*
+    /* range checks
+     */
+
+    private void checkDiscId(String disc) throws InvalidLocatorException {
+        if (disc == null) {
+            return;
+        }
+        if (disc.length() == 32) {
+            try {
+                new java.math.BigInteger(disc, 16);
+                return;
+            } catch (NumberFormatException e) {
+            }
+        }
+        logger.error("Invalid Disc ID: " + disc);
+        throw new InvalidLocatorException();
+    }
+
+    private void checkTitle(int title) throws InvalidLocatorException {
+        if ((title >= -1) && (title <= 999)) {
+            return;
+        }
+        if ((title == 65534) || (title == 65535)) {
+            // "resume" and First Play
+            return;
+        }
+        logger.error("Invalid title number: " + title);
+        throw new InvalidLocatorException();
+    }
+
+    private void checkPlaylist(int pl) throws InvalidLocatorException {
+        if ((pl >= -1) && (pl <= 1999)) {
+            return;
+        }
+        logger.error("Invalid playlist id: " + pl);
+        throw new InvalidLocatorException();
+    }
+
+    private void checkPlayitem(int pi) throws InvalidLocatorException {
+        if ((pi >= -1) && (pi <= 998)) {
+            return;
+        }
+        logger.error("Invalid playitem id: " + pi);
+        throw new InvalidLocatorException();
+    }
+
+    private void checkMark(int mark) throws InvalidLocatorException {
+        if ((mark >= -1) && (mark <= 998)) {
+            return;
+        }
+        logger.error("Invalid playmark id: " + mark);
+        throw new InvalidLocatorException();
+    }
+
+    private void checkJar(int jar) throws InvalidLocatorException {
+        if ((jar >= -1) && (jar <= 99999)) {
+            return;
+        }
+        logger.error("Invalid JAR id: " + jar);
+        throw new InvalidLocatorException();
+    }
+
+    private void checkSound(int sound) throws InvalidLocatorException {
+        if ((sound >= -1) && (sound <= 127)) {
+            return;
+        }
+        logger.error("Invalid sound id: " + sound);
+        throw new InvalidLocatorException();
+    }
+
+    /*
+     *
+     */
+
     public BDLocator(String url) throws InvalidLocatorException {
         super(url);
         try {
@@ -36,13 +113,18 @@ public class BDLocator extends Locator {
                 throw new InvalidLocatorException();
 
         } catch (InvalidLocatorException e) {
-            System.err.println("Invalid locator: " + url);
+            logger.error("Invalid locator: " + url);
             throw e;
         }
     }
 
     public BDLocator(String disc, int titleNum, int playList) throws InvalidLocatorException {
         super(null);
+
+        checkDiscId(disc);
+        checkTitle(titleNum);
+        checkPlaylist(playList);
+
         this.disc = disc;
         this.titleNum = titleNum;
         this.playList = playList;
@@ -51,8 +133,17 @@ public class BDLocator extends Locator {
 
     public BDLocator(String disc, int titleNum, int jar, int sound) throws InvalidLocatorException {
         super(null);
-        if ((jar >= 0) && (sound >= 0))
+
+        checkDiscId(disc);
+        checkTitle(titleNum);
+        checkJar(jar);
+        checkSound(sound);
+
+        if ((jar >= 0) && (sound >= 0)) {
+            logger.error("Invalid locator: jar ID and sound ID set");
             throw new InvalidLocatorException();
+        }
+
         this.disc = disc;
         this.titleNum = titleNum;
         this.jar = jar;
@@ -63,11 +154,19 @@ public class BDLocator extends Locator {
     public BDLocator(String disc, int titleNum, int playList, int playItem, int mark, String[] componentTags)
             throws InvalidLocatorException {
         super(null);
+
+        checkDiscId(disc);
+        checkTitle(titleNum);
+        checkPlaylist(playList);
+        checkPlayitem(playItem);
+        checkMark(mark);
+
         this.disc = disc;
         this.titleNum = titleNum;
         this.playList = playList;
         this.playItem = playItem;
         this.mark = mark;
+
         if (componentTags != null) {
             try {
                 for (int i = 0; i < componentTags.length; i++) {
@@ -82,15 +181,22 @@ public class BDLocator extends Locator {
                         secondaryVideoNum = Integer.parseInt(comp.substring(3));
                     else if (comp.startsWith("P:"))
                         textStreamNum = Integer.parseInt(comp.substring(2));
-                    else
+                    else {
+                        logger.error("Invalid locator: unknown component tag in " + comp);
                         throw new InvalidLocatorException();
+                    }
                 }
             } catch (NumberFormatException e) {
+                logger.error("Invalid locator: invalid component tag found");
                 throw new InvalidLocatorException();
             }
         }
         url = getUrl();
     }
+
+    /*
+     *
+     */
 
     public boolean equals(Object obj) {
         if (obj == null)
@@ -200,6 +306,10 @@ public class BDLocator extends Locator {
     public int getPGTextStreamNumber() {
         return textStreamNum;
     }
+
+    /*
+     *
+     */
 
     public void setPlayListId(int id) {
         if ((id >= 0) && (id != playList)) {
@@ -320,6 +430,10 @@ public class BDLocator extends Locator {
         return str;
     }
 
+    /*
+     * parsing (used in constructor)
+     */
+
     private boolean parseJar(String str) throws InvalidLocatorException {
         if (!str.startsWith("JAR:"))
             return false;
@@ -358,18 +472,24 @@ public class BDLocator extends Locator {
             String element = str.substring(begin, end);
             try {
                 if (playList < 0) {
-                    if ((end - begin) == 32)
+                    if ((end - begin) == 32) {
+                        checkDiscId(element);
                         disc = element;
-                    else if ((end - begin) <= 4)
+                    } else if ((end - begin) <= 4) {
                         titleNum = Integer.parseInt(element, 16);
-                    else if (element.startsWith("PLAYLIST:"))
+                        checkTitle(titleNum);
+                    } else if (element.startsWith("PLAYLIST:")) {
                         playList = Integer.parseInt(element.substring(9));
-                    else
+                        checkPlaylist(playList);
+                    } else {
                         throw new InvalidLocatorException();
+                    }
                 } else if (element.startsWith("MARK:")) {
                     mark = Integer.parseInt(element.substring(5));
+                    checkMark(mark);
                 } else if (element.startsWith("ITEM:")) {
                     playItem = Integer.parseInt(element.substring(5));
+                    checkPlayitem(playItem);
                 } else if (element.startsWith("A1:")) {
                     primaryAudioNum = Integer.parseInt(element.substring(3));
                     if (primaryAudioNum < 0)
@@ -396,9 +516,11 @@ public class BDLocator extends Locator {
                         throw new InvalidLocatorException();
                     isTag = true;
                 } else {
+                    logger.error("Unknown tag: " + element);
                     throw new InvalidLocatorException();
                 }
             } catch (NumberFormatException e) {
+                logger.error("Parse error: " + e);
                 throw new InvalidLocatorException();
             }
             if (end >= length)
@@ -437,4 +559,6 @@ public class BDLocator extends Locator {
     protected int playList = -1;
     protected int sound = -1;
     protected int titleNum = -1;
+
+    private static final Logger logger = Logger.getLogger(BDLocator.class.getName());
 }

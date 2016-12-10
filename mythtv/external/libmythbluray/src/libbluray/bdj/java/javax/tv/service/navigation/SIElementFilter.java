@@ -1,7 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
- * Copyright (C) 2015  Petri Hintukainen
+ * Copyright (C) 2015-2016  Petri Hintukainen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,19 +20,24 @@
 
 package javax.tv.service.navigation;
 
-import javax.tv.service.SIRetrievable;
 import javax.tv.service.Service;
 import javax.tv.service.SIElement;
-import javax.tv.service.SIRequest;
-import javax.tv.service.SIRequestorImpl;
 
 import org.bluray.net.BDLocator;
+
+import org.bluray.ti.PlayItem;
+import org.bluray.ti.PlayItemImpl;
+import org.bluray.ti.PlayList;
+import org.bluray.ti.PlayListImpl;
+import org.bluray.ti.TitleImpl;
 
 public final class SIElementFilter extends ServiceFilter
 {
     public SIElementFilter(SIElement element) throws FilterNotSupportedException {
-        if (element == null)
+        if (element == null) {
+            System.err.println("null element");
             throw new NullPointerException();
+        }
 
         try {
             new BDLocator(element.getLocator().toExternalForm());
@@ -49,6 +54,52 @@ public final class SIElementFilter extends ServiceFilter
     }
 
     public boolean accept(Service service) {
+
+        if (service == null) {
+            System.err.println("null service");
+            throw new NullPointerException();
+        }
+
+        if (!(service instanceof TitleImpl))
+            return false;
+        TitleImpl title = (TitleImpl)service;
+
+        if (element instanceof PlayListImpl) {
+            int id = ((PlayListImpl)element).getId();
+            PlayList[] pls = title.getPlayLists();
+            for (int i = 0; i < pls.length; i++) {
+                if (id == pls[i].getId()) {
+                    return true;
+                }
+            }
+            return false;
+
+        } else if (element instanceof PlayItemImpl) {
+
+            int piId = ((PlayItemImpl)element).getPlayItemId();
+            int plId = ((PlayItemImpl)element).getPlayListId();
+
+            PlayList[] pls = title.getPlayLists();
+            for (int i = 0; i < pls.length; i++) {
+                if (plId == pls[i].getId()) {
+
+                    PlayItem pis[] = pls[i].getPlayItems();
+                    for (int j = 0; j < pis.length; j++) {
+                        if (piId == ((PlayItemImpl)pis[j]).getPlayItemId()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+
+        } else if (element instanceof ServiceDetails) {
+            return element.getLocator() == service.getLocator();
+        }
+
+        System.err.println("Unsupported SI element");
+        return false;
+        /*
         SIRequestorImpl requestor = new SIRequestorImpl();
 
         SIRequest req = service.retrieveDetails(requestor);
@@ -81,6 +132,7 @@ public final class SIElementFilter extends ServiceFilter
         }
 
         return false;
+        */
     }
 
     SIElement element;

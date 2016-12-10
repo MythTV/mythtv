@@ -20,15 +20,13 @@
 package org.havi.ui;
 
 public class HInvalidLookException extends HUIException {
-    public HInvalidLookException()
-    {
+    public HInvalidLookException() {
         super();
     }
 
-    public HInvalidLookException(String reason)
-    {
+    public HInvalidLookException(String reason) {
         super(reason);
     }
-    
+
     private static final long serialVersionUID = -930701028428083791L;
 }

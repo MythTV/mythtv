@@ -21,7 +21,6 @@ package javax.tv.locator;
 
 public abstract class LocatorFactory extends Object {
     protected LocatorFactory() {
-
     }
 
     public static LocatorFactory getInstance() {

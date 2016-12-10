@@ -21,8 +21,7 @@ package javax.media;
 
 public class RestartingEvent extends StopEvent {
     public RestartingEvent(Controller source, int previous, int current,
-            int target, Time mediaTime)
-    {
+            int target, Time mediaTime) {
         super(source, previous, current, target, mediaTime);
     }
 

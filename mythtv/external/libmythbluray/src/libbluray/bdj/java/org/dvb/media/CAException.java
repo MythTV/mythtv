@@ -20,13 +20,11 @@
 package org.dvb.media;
 
 public class CAException extends java.io.IOException {
-    public CAException()
-    {
+    public CAException() {
         super();
     }
 
-    public CAException(String reason)
-    {
+    public CAException(String reason) {
         super(reason);
     }
 

@@ -24,102 +24,91 @@ import java.awt.Image;
 import org.havi.ui.event.HFocusEvent;
 import org.havi.ui.event.HFocusListener;
 
+import org.videolan.BDJXletContext;
+import org.videolan.Logger;
+
 public class HIcon extends HStaticIcon implements HNavigable {
-    public HIcon()
-    {
+    public HIcon() {
         org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
-    public HIcon(Image image)
-    {
+    public HIcon(Image image) {
         org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
-    public HIcon(Image image, int x, int y, int width, int height)
-    {
+    public HIcon(Image image, int x, int y, int width, int height) {
         org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
     public HIcon(Image imageNormal, Image imageFocus, int x, int y, int width,
-            int height)
-    {
+            int height) {
         org.videolan.Logger.unimplemented(HIcon.class.getName(), "");
     }
 
-    public static void setDefaultLook(HGraphicLook hlook)
-    {
-        DefaultLook = hlook;
+    public static void setDefaultLook(HGraphicLook hlook) {
+        BDJXletContext.setXletDefaultLook(PROPERTY_LOOK, hlook);
     }
 
-    public static HGraphicLook getDefaultLook()
-    {
-        if (DefaultLook == null)
-            org.videolan.Logger.unimplemented("", "getDefaultLook");
-        return DefaultLook;
+    public static HGraphicLook getDefaultLook() {
+        return (HGraphicLook)BDJXletContext.getXletDefaultLook(PROPERTY_LOOK, DEFAULT_LOOK);
     }
 
-    public void setMove(int keyCode, HNavigable target)
-    {
-        throw new Error("Not implemented");
+    public void setMove(int keyCode, HNavigable target) {
+        Logger.unimplemented("", "");
     }
 
-    public HNavigable getMove(int keyCode)
-    {
-        throw new Error("Not implemented");
+    public HNavigable getMove(int keyCode) {
+        Logger.unimplemented("", "");
+        return null;
     }
 
     public void setFocusTraversal(HNavigable up, HNavigable down,
-            HNavigable left, HNavigable right)
-    {
-        throw new Error("Not implemented");
+            HNavigable left, HNavigable right) {
+        Logger.unimplemented("", "");
     }
 
-    public boolean isSelected()
-    {
-        throw new Error("Not implemented");
+    public boolean isSelected() {
+        Logger.unimplemented("", "");
+        return false;
     }
 
-    public void setGainFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setGainFocusSound(HSound sound) {
+        Logger.unimplemented("", "");
     }
 
-    public void setLoseFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setLoseFocusSound(HSound sound) {
+        Logger.unimplemented("", "");
     }
 
-    public HSound getGainFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getGainFocusSound() {
+        Logger.unimplemented("", "");
+        return null;
     }
 
-    public HSound getLoseFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getLoseFocusSound() {
+        Logger.unimplemented("", "");
+        return null;
     }
 
-    public void addHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void addHFocusListener(HFocusListener l) {
+        Logger.unimplemented("", "");
     }
 
-    public void removeHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeHFocusListener(HFocusListener l) {
+        Logger.unimplemented("", "");
     }
 
-    public int[] getNavigationKeys()
-    {
-        throw new Error("Not implemented");
+    public int[] getNavigationKeys() {
+        Logger.unimplemented("", "");
+        return null;
     }
 
-    public void processHFocusEvent(HFocusEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHFocusEvent(HFocusEvent evt) {
+        Logger.unimplemented("", "");
     }
 
-    private static HGraphicLook DefaultLook = null;
+    static final Class DEFAULT_LOOK = HGraphicLook.class;
+    private static final String PROPERTY_LOOK = HIcon.class.getName();
 
     private static final long serialVersionUID = 2006124827619610922L;
 }

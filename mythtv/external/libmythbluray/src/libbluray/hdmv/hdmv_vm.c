@@ -1058,9 +1058,9 @@ static int _hdmv_step(HDMV_VM *p)
                         case INSN_PLAY_PL:      _play_at(p, dst,  -1,  -1); break;
                         case INSN_PLAY_PL_PI:   _play_at(p, dst, src,  -1); break;
                         case INSN_PLAY_PL_PM:   _play_at(p, dst,  -1, src); break;
-                        case INSN_TERMINATE_PL: _play_stop(p);              break;
                         case INSN_LINK_PI:      _play_at(p,  -1, dst,  -1); break;
                         case INSN_LINK_MK:      _play_at(p,  -1,  -1, dst); break;
+                        case INSN_TERMINATE_PL: if (!_play_stop(p)) { inc_pc = 0; } break;
                         default:
                             BD_DEBUG(DBG_HDMV|DBG_CRIT, "unknown BRANCH/PLAY option %d in opcode 0x%08x\n",
                                      insn->branch_opt, *(uint32_t*)insn);

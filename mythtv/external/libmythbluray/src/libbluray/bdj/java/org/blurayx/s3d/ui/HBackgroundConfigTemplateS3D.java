@@ -22,8 +22,8 @@ package org.blurayx.s3d.ui;
 import org.havi.ui.HBackgroundConfigTemplate;
 import org.havi.ui.HBackgroundConfiguration;
 
-public class HBackgroundConfigTemplateS3D extends HBackgroundConfigTemplate
-{
+public class HBackgroundConfigTemplateS3D extends HBackgroundConfigTemplate {
+
     public static final int S3D = 17;
 
     protected int getPreferenceCount() {

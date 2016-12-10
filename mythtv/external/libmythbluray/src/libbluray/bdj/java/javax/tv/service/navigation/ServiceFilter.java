@@ -22,8 +22,7 @@ package javax.tv.service.navigation;
 import javax.tv.service.Service;
 
 public abstract class ServiceFilter {
-    protected ServiceFilter()
-    {
+    protected ServiceFilter() {
     }
 
     public abstract boolean accept(Service service);

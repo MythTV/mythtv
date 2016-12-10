@@ -23,58 +23,47 @@ import java.awt.Color;
 import java.awt.Font;
 
 public class HMultilineEntry extends HSinglelineEntry {
-    public HMultilineEntry()
-    {
+    public HMultilineEntry() {
         org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
     }
 
     public HMultilineEntry(String text, int x, int y, int width, int height,
-            int maxChars, Font font, Color color)
-    {
+            int maxChars, Font font, Color color) {
         org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
     }
 
-    public HMultilineEntry(int x, int y, int width, int height, int maxChars)
-    {
-        org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
-        throw new Error("Not implemented");
-    }
-
-    public HMultilineEntry(String text, int maxChars, Font font, Color color)
-    {
+    public HMultilineEntry(int x, int y, int width, int height, int maxChars) {
         org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
     }
 
-    public HMultilineEntry(int maxChars)
-    {
+    public HMultilineEntry(String text, int maxChars, Font font, Color color) {
         org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
     }
 
-    public static void setDefaultLook(HMultilineEntryLook look)
-    {
+    public HMultilineEntry(int maxChars) {
+        org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
+    }
+
+    public static void setDefaultLook(HMultilineEntryLook look) {
         DefaultLook = look;
     }
 
-    public static HSinglelineEntryLook getDefaultLook()
-    {
+    public static HSinglelineEntryLook getDefaultLook() {
         if (DefaultLook == null)
             org.videolan.Logger.unimplemented("", "getDefaultLook");
         return DefaultLook;
     }
 
-    public void setLook(HLook hlook) throws HInvalidLookException
-    {
-        throw new Error("Not implemented");
+    public void setLook(HLook hlook) throws HInvalidLookException {
+        org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
     }
 
-    public void caretNextLine()
-    {
-        throw new Error("Not implemented");
+    public void caretNextLine() {
+        org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
     }
 
-    public void caretPreviousLine()
-    {
-        throw new Error("Not implemented");
+    public void caretPreviousLine() {
+        org.videolan.Logger.unimplemented(HMultilineEntry.class.getName(), "");
     }
 
     private static HSinglelineEntryLook DefaultLook = null;

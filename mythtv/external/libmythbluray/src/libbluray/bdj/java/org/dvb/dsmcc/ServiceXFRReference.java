@@ -25,35 +25,29 @@ import org.davic.net.Locator;
 
 public class ServiceXFRReference implements Serializable {
     public ServiceXFRReference(Locator serviceLocator, int carouselId,
-            String pathName)
-    {
+            String pathName) {
         org.videolan.Logger.unimplemented(ServiceXFRReference.class.getName(), "");
         throw new Error("Not implemented");
     }
 
-    public ServiceXFRReference(byte[] nsapAddress, String pathName)
-    {
+    public ServiceXFRReference(byte[] nsapAddress, String pathName) {
         org.videolan.Logger.unimplemented(ServiceXFRReference.class.getName(), "");
         throw new Error("Not implemented");
     }
 
-    public Locator getLocator()
-    {
+    public Locator getLocator() {
         throw new Error("Not implemented");
     }
 
-    public int getCarouselId()
-    {
+    public int getCarouselId() {
         throw new Error("Not implemented");
     }
 
-    public String getPathName()
-    {
+    public String getPathName() {
         throw new Error("Not implemented");
     }
 
-    public byte[] getNSAPAddress()
-    {
+    public byte[] getNSAPAddress() {
         throw new Error("Not implemented");
     }
 

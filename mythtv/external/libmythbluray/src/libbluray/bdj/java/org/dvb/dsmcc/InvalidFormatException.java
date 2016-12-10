@@ -21,13 +21,11 @@ package org.dvb.dsmcc;
 
 public class InvalidFormatException extends DSMCCException {
 
-    public InvalidFormatException()
-    {
+    public InvalidFormatException() {
         super();
     }
 
-    public InvalidFormatException(String reason)
-    {
+    public InvalidFormatException(String reason) {
         super(reason);
     }
 

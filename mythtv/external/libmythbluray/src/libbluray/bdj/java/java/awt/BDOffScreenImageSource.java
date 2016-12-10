@@ -39,16 +39,16 @@ class BDOffScreenImageSource implements ImageProducer {
         this.buffer = buffer;
     }
 
-    public synchronized void addConsumer(ImageConsumer ic) {
+    public void addConsumer(ImageConsumer ic) {
         consumer = ic;
         produce();
     }
 
-    public synchronized boolean isConsumer(ImageConsumer ic) {
+    public boolean isConsumer(ImageConsumer ic) {
         return (ic == consumer);
     }
 
-    public synchronized void removeConsumer(ImageConsumer ic) {
+    public void removeConsumer(ImageConsumer ic) {
         if (consumer == ic) {
             consumer = null;
         }

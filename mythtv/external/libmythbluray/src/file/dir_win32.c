@@ -62,7 +62,9 @@ static int _dir_read_win32(BD_DIR_H *dir, BD_DIRENT *entry)
     if (!priv->info.name[0]) {
         return 1;
     }
-    WideCharToMultiByte(CP_UTF8, 0, priv->info.name, -1, entry->d_name, sizeof(entry->d_name), NULL, NULL);
+    if (!WideCharToMultiByte(CP_UTF8, 0, priv->info.name, -1, entry->d_name, sizeof(entry->d_name), NULL, NULL)) {
+        return -1;
+    }
 
     priv->info.name[0] = 0;
     _wfindnext(priv->handle, &priv->info);
@@ -70,37 +72,58 @@ static int _dir_read_win32(BD_DIR_H *dir, BD_DIRENT *entry)
     return 0;
 }
 
+static dir_data_t *_open_impl(const char *dirname)
+{
+    dir_data_t *priv;
+    char *filespec;
+    wchar_t wfilespec[MAX_PATH];
+    int result;
+
+    filespec = str_printf("%s" DIR_SEP "*", dirname);
+    if (!filespec) {
+        return NULL;
+    }
+
+    result = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filespec, -1, wfilespec, MAX_PATH);
+    X_FREE(filespec);
+    if (!result) {
+        return NULL;
+    }
+
+    priv = calloc(1, sizeof(dir_data_t));
+    if (!priv) {
+        return NULL;
+    }
+
+    priv->handle = _wfindfirst(wfilespec, &priv->info);
+    if (priv->handle == -1) {
+        X_FREE(priv);
+    }
+
+    return priv;
+}
+
 static BD_DIR_H *_dir_open_win32(const char* dirname)
 {
     BD_DIR_H *dir = calloc(1, sizeof(BD_DIR_H));
+    dir_data_t *priv = NULL;
 
     BD_DEBUG(DBG_DIR, "Opening WIN32 dir %s... (%p)\n", dirname, (void*)dir);
+
     if (!dir) {
         return NULL;
     }
-    dir->close = _dir_close_win32;
-    dir->read = _dir_read_win32;
 
-    char       *filespec = str_printf("%s/*", dirname);
-    dir_data_t *priv     = calloc(1, sizeof(dir_data_t));
+    priv = _open_impl(dirname);
+    if (priv) {
+        dir->close = _dir_close_win32;
+        dir->read = _dir_read_win32;
+        dir->internal = priv;
 
-    dir->internal = priv;
-
-    wchar_t wfilespec[MAX_PATH];
-    if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filespec, -1, wfilespec, MAX_PATH))
-        priv->handle = _wfindfirst(wfilespec, &priv->info);
-    else
-        priv->handle = -1;
-
-    X_FREE(filespec);
-
-    if (priv->handle != -1) {
         return dir;
     }
 
-    BD_DEBUG(DBG_DIR, "Error opening dir! (%p)\n", (void*)dir);
-
-    X_FREE(dir->internal);
+    BD_DEBUG(DBG_DIR, "Error opening dir %s\n", dirname);
     X_FREE(dir);
 
     return NULL;

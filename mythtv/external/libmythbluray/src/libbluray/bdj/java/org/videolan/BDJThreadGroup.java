@@ -39,7 +39,7 @@ class BDJThreadGroup extends ThreadGroup {
         }
 
         if (e instanceof ThreadDeath) {
-            logger.error("Thread " + t + " killed" + stack);
+            logger.error("Thread " + t + " killed" /*+ stack*/);
         } else {
             logger.error("Unhandled exception in thread " + t + ": " + e + stack);
         }
@@ -85,8 +85,11 @@ class BDJThreadGroup extends ThreadGroup {
             waitForShutdown(500, 0);
         }
 
+        if (destroyed) return;
+
         try {
             destroy();
+            destroyed = true;
         } catch (IllegalThreadStateException e) {
             logger.error("ThreadGroup destroy failed: " + e);
         }
@@ -109,6 +112,7 @@ class BDJThreadGroup extends ThreadGroup {
         }
     }
 
+    private boolean destroyed = false;
     private final BDJXletContext context;
     private static final Logger logger = Logger.getLogger(BDJThreadGroup.class.getName());
 }

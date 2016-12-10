@@ -37,7 +37,8 @@ import org.videolan.TIClip;
 
 public class PiPControlImpl extends VideoControl implements PiPControl, AsynchronousPiPControl {
     protected PiPControlImpl(Handler player) {
-        super(player, 1);
+        super(1);
+        this.player = player;
     }
 
     protected StreamInfo[] getStreams() {
@@ -117,5 +118,6 @@ public class PiPControlImpl extends VideoControl implements PiPControl, Asynchro
         return null;
     }
 
+    private Handler player;
     private BDJListeners listeners = new BDJListeners();
 }

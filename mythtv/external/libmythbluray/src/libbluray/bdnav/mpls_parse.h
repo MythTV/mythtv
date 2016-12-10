@@ -1,7 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2009-2010  John Stebbins
- * Copyright (C) 2012       Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2012-2016  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -94,7 +94,6 @@ typedef struct
 
 typedef struct
 {
-    uint8_t         mark_id;
     uint8_t         mark_type;
     uint16_t        play_item_ref;
     uint32_t        time;
@@ -132,20 +131,34 @@ typedef struct
     MPLS_SUB_PI     *sub_play_item;
 } MPLS_SUB;
 
-typedef struct {
-    uint32_t        time;
-    uint16_t        xpos;
-    uint16_t        ypos;
-    uint8_t         scale_factor;
-} MPLS_PIP_DATA;
+typedef enum {
+    pip_scaling_none = 1,       /* unscaled */
+    pip_scaling_half = 2,       /* 1:2 */
+    pip_scaling_quarter = 3,    /* 1:4 */
+    pip_scaling_one_half = 4,   /* 3:2 */
+    pip_scaling_fullscreen = 5, /* scale to main video size */
+} mpls_pip_scaling;
 
 typedef struct {
-    uint16_t        clip_ref;
-    uint8_t         secondary_video_ref;
-    uint8_t         timeline_type;
-    uint8_t         luma_key_flag;
-    uint8_t         upper_limit_luma_key;
-    uint8_t         trick_play_flag;
+    uint32_t        time;          /* start timestamp (clip time) when the block is valid */
+    uint16_t        xpos;
+    uint16_t        ypos;
+    uint8_t         scale_factor;  /* mpls_pip_scaling. Note: PSR14 may override this ! */
+} MPLS_PIP_DATA;
+
+typedef enum {
+    pip_timeline_sync_mainpath = 1,  /* timeline refers to main path */
+    pip_timeline_async_subpath = 2,  /* timeline refers to sub-path time */
+    pip_timeline_async_mainpath = 3, /* timeline refers to main path */
+} mpls_pip_timeline;
+
+typedef struct {
+    uint16_t        clip_ref;             /* clip id for secondary_video_ref (STN) */
+    uint8_t         secondary_video_ref;  /* secondary video stream id (STN) */
+    uint8_t         timeline_type;        /* mpls_pip_timeline */
+    uint8_t         luma_key_flag;        /* use luma keying */
+    uint8_t         upper_limit_luma_key; /* luma key (secondary video pixels with Y <= this value are transparent) */
+    uint8_t         trick_play_flag;      /* show synchronous PiP when playing trick speed */
 
     uint16_t        data_count;
     MPLS_PIP_DATA   *data;

@@ -34,7 +34,7 @@ public class HRcCapabilities extends HKeyCapabilities {
     public static HEventRepresentation getRepresentation(int keyCode) {
         if (!isSupported(keyCode))
             return null;
-        return new HEventRepresentation(true, getKeyText(keyCode), getKeyColor(keyCode), null);
+        return new HEventRepresentation(getKeyText(keyCode), getKeyColor(keyCode), null);
     }
 
     public static boolean getInputDeviceSupported() {
@@ -71,7 +71,7 @@ public class HRcCapabilities extends HKeyCapabilities {
             case HRcEvent.VK_BASS_BOOST_UP:
                 return "Bass Boost Up";
             case HRcEvent.VK_CHANNEL_DOWN:
-                return "Channel DOwn";
+                return "Channel Down";
             case HRcEvent.VK_CHANNEL_UP:
                 return "Channel Up";
             case HRcEvent.VK_CLEAR_FAVORITE_0:

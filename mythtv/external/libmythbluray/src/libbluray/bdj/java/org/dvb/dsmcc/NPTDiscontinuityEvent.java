@@ -20,21 +20,18 @@
 package org.dvb.dsmcc;
 
 public class NPTDiscontinuityEvent extends NPTStatusEvent {
-    public NPTDiscontinuityEvent(DSMCCStream source, long before, long after)
-    {
+    public NPTDiscontinuityEvent(DSMCCStream source, long before, long after) {
         super(source);
 
         this.before = before;
         this.after = after;
     }
 
-    public long getLastNPT()
-    {
+    public long getLastNPT() {
         return before;
     }
 
-    public long getFirstNPT()
-    {
+    public long getFirstNPT() {
         return after;
     }
 

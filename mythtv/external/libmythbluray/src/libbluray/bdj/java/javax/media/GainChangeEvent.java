@@ -23,8 +23,7 @@ import java.util.EventObject;
 
 public class GainChangeEvent extends EventObject implements MediaEvent {
     public GainChangeEvent(GainControl source, boolean mute, float dB,
-            float level)
-    {
+            float level) {
         super(source);
         this.source = source;
         this.mute = mute;
@@ -32,34 +31,34 @@ public class GainChangeEvent extends EventObject implements MediaEvent {
         this.level = level;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 
-    public GainControl getSourceGainControl()
-    {
+    public GainControl getSourceGainControl() {
         return source;
     }
 
-    public boolean getMute()
-    {
+    public boolean getMute() {
         return mute;
     }
 
-    public float getDB()
-    {
+    public float getDB() {
         return dB;
     }
 
-    public float getLevel()
-    {
+    public float getLevel() {
         return level;
     }
 
-    private GainControl source;
-    private boolean mute;
-    private float dB;
-    private float level;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",mute=" + mute + ",db=" + dB + ",level=" + level + "]";
+    }
+
+    private final GainControl source;
+    private final boolean mute;
+    private final float dB;
+    private final float level;
+
     private static final long serialVersionUID = -3685931181525562650L;
 }

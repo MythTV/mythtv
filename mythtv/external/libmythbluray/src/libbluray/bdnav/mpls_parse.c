@@ -111,12 +111,12 @@ _parse_uo(BITSTREAM *bits, BD_UO_MASK *uo)
 static int
 _parse_appinfo(BITSTREAM *bits, MPLS_AI *ai)
 {
-    int64_t pos, len;
+    int64_t /*pos,*/ len;
 
     if (!bs_is_align(bits, 0x07)) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_appinfo: alignment error\n");
     }
-    pos = bs_pos(bits) >> 3;
+    //pos = bs_pos(bits) >> 3;
     len = bs_read(bits, 32);
 
     if (bs_avail(bits) < len * 8) {
@@ -137,9 +137,11 @@ _parse_appinfo(BITSTREAM *bits, MPLS_AI *ai)
     ai->random_access_flag = bs_read(bits, 1);
     ai->audio_mix_flag = bs_read(bits, 1);
     ai->lossless_bypass_flag = bs_read(bits, 1);
+#if 0
     // Reserved
     bs_skip(bits, 13);
     bs_seek_byte(bits, pos + len);
+#endif
     return 1;
 }
 
@@ -212,7 +214,9 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
             break;
     };
 
-    bs_seek_byte(bits, pos + len);
+    if (bs_seek_byte(bits, pos + len) < 0) {
+        return 0;
+    }
 
     len = bs_read(bits, 8);
     pos = bs_pos(bits) >> 3;
@@ -260,7 +264,10 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
     };
     s->lang[3] = '\0';
 
-    bs_seek_byte(bits, pos + len);
+    if (bs_seek_byte(bits, pos + len) < 0) {
+        return 0;
+    }
+
     return 1;
 }
 
@@ -414,7 +421,10 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     }
     stn->secondary_video = ss;
 
-    bs_seek_byte(bits, pos + len);
+    if (bs_seek_byte(bits, pos + len) < 0) {
+        return 0;
+    }
+
     return 1;
 }
 
@@ -515,8 +525,12 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
     if (!_parse_stn(bits, &pi->stn)) {
         return 0;
     }
+
     // Seek past any unused items
-    bs_seek_byte(bits, pos + len);
+    if (bs_seek_byte(bits, pos + len) < 0) {
+        return 0;
+    }
+
     return 1;
 }
 
@@ -592,7 +606,10 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
 
 
     // Seek to end of subpath
-    bs_seek_byte(bits, pos + len);
+    if (bs_seek_byte(bits, pos + len) < 0) {
+        return 0;
+    }
+
     return 1;
 }
 
@@ -635,7 +652,10 @@ _parse_subpath(BITSTREAM *bits, MPLS_SUB *sp)
     sp->sub_play_item = spi;
 
     // Seek to end of subpath
-    bs_seek_byte(bits, pos + len);
+    if (bs_seek_byte(bits, pos + len) < 0) {
+        return 0;
+    }
+
     return 1;
 }
 
@@ -657,7 +677,10 @@ _parse_playlistmark(BITSTREAM *bits, MPLS_PL *pl)
     int ii;
     MPLS_PLM *plm = NULL;
 
-    bs_seek_byte(bits, pl->mark_pos);
+    if (bs_seek_byte(bits, pl->mark_pos) < 0) {
+        return 0;
+    }
+
     // length field
     len = bs_read(bits, 32);
 
@@ -671,7 +694,7 @@ _parse_playlistmark(BITSTREAM *bits, MPLS_PL *pl)
 
     plm = calloc(pl->mark_count, sizeof(MPLS_PLM));
     for (ii = 0; ii < pl->mark_count; ii++) {
-        plm[ii].mark_id       = bs_read(bits, 8);
+        bs_skip(bits, 8); /* reserved */
         plm[ii].mark_type     = bs_read(bits, 8);
         plm[ii].play_item_ref = bs_read(bits, 16);
         plm[ii].time          = bs_read(bits, 32);
@@ -690,7 +713,10 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
     MPLS_PI *pi = NULL;
     MPLS_SUB *sub_path = NULL;
 
-    bs_seek_byte(bits, pl->list_pos);
+    if (bs_seek_byte(bits, pl->list_pos) < 0) {
+        return 0;
+    }
+
     // playlist length
     len = bs_read(bits, 32);
 
@@ -730,6 +756,11 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
     return 1;
 }
 
+static void _clean_pip_data(MPLS_PIP_METADATA *p)
+{
+    X_FREE(p->data);
+}
+
 static void
 _clean_playlist(MPLS_PL *pl)
 {
@@ -756,6 +787,13 @@ _clean_playlist(MPLS_PL *pl)
         }
         X_FREE(pl->ext_sub_path);
     }
+    if (pl->ext_pip_data != NULL) {
+        for (ii = 0; ii < pl->ext_pip_data_count; ii++) {
+            _clean_pip_data(&pl->ext_pip_data[ii]);
+        }
+        X_FREE(pl->ext_pip_data);
+    }
+
     X_FREE(pl->play_mark);
     X_FREE(pl);
 }
@@ -778,6 +816,11 @@ _parse_pip_data(BITSTREAM *bits, MPLS_PIP_METADATA *block)
     }
 
     data = calloc(entries, sizeof(MPLS_PIP_DATA));
+    if (!data) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        return 0;
+    }
+
     for (ii = 0; ii < entries; ii++) {
 
         data[ii].time = bs_read(bits, 32);
@@ -818,9 +861,13 @@ _parse_pip_metadata_block(BITSTREAM *bits, uint32_t start_address, MPLS_PIP_META
     data_address = bs_read(bits, 32);
 
     pos = bs_pos(bits) / 8;
-    bs_seek_byte(bits, start_address + data_address);
+    if (bs_seek_byte(bits, start_address + data_address) < 0) {
+        return 0;
+    }
     result = _parse_pip_data(bits, data);
-    bs_seek_byte(bits, pos);
+    if (bs_seek_byte(bits, pos) < 0) {
+        return 0;
+    }
 
     return result;
 }
@@ -840,11 +887,14 @@ _parse_pip_metadata_extension(BITSTREAM *bits, MPLS_PL *pl)
     }
 
     data = calloc(entries, sizeof(MPLS_PIP_METADATA));
+    if (!data) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        return 0;
+    }
+
     for (ii = 0; ii < entries; ii++) {
-      if (!_parse_pip_metadata_block(bits, start_address, data)) {
-            X_FREE(data);
-            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing pip metadata extension\n");
-            return 0;
+        if (!_parse_pip_metadata_block(bits, start_address, &data[ii])) {
+            goto error;
         }
     }
 
@@ -852,6 +902,15 @@ _parse_pip_metadata_extension(BITSTREAM *bits, MPLS_PL *pl)
     pl->ext_pip_data       = data;
 
     return 1;
+
+ error:
+    BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing pip metadata extension\n");
+    for (ii = 0; ii < entries; ii++) {
+        _clean_pip_data(&data[ii]);
+    }
+    X_FREE(data);
+    return 0;
+
 }
 
 static int
@@ -868,17 +927,28 @@ _parse_subpath_extension(BITSTREAM *bits, MPLS_PL *pl)
     }
 
     sub_path = calloc(sub_count,  sizeof(MPLS_SUB));
+    if (!sub_path) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        return 0;
+    }
+
     for (ii = 0; ii < sub_count; ii++) {
         if (!_parse_subpath(bits, &sub_path[ii])) {
-            X_FREE(sub_path);
-            BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing extension subpath\n");
-            return 0;
+            goto error;
         }
     }
     pl->ext_sub_path  = sub_path;
     pl->ext_sub_count = sub_count;
 
     return 1;
+
+ error:
+    BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing extension subpath\n");
+    for (ii = 0; ii < sub_count; ii++) {
+        _clean_subpath(&sub_path[ii]);
+    }
+    X_FREE(sub_path);
+    return 0;
 }
 
 static int
@@ -914,13 +984,16 @@ _mpls_parse(BD_FILE_H *fp)
     BITSTREAM  bits;
     MPLS_PL   *pl = NULL;
 
+    if (bs_init(&bits, fp) < 0) {
+        BD_DEBUG(DBG_NAV, "?????.mpls: read error\n");
+        return NULL;
+    }
+
     pl = calloc(1, sizeof(MPLS_PL));
     if (pl == NULL) {
         BD_DEBUG(DBG_CRIT, "out of memory\n");
         return NULL;
     }
-
-    bs_init(&bits, fp);
 
     if (!_parse_header(&bits, pl)) {
         _clean_playlist(pl);

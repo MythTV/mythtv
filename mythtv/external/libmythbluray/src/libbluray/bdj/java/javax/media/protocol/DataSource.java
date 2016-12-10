@@ -25,22 +25,18 @@ import javax.media.Duration;
 import javax.media.MediaLocator;
 
 public abstract class DataSource implements Controls, Duration {
-    public DataSource()
-    {
+    public DataSource() {
     }
 
-    public DataSource(MediaLocator source)
-    {
+    public DataSource(MediaLocator source) {
         locator = source;
     }
 
-    public void setLocator(MediaLocator source)
-    {
+    public void setLocator(MediaLocator source) {
         locator = source;
     }
 
-    public MediaLocator getLocator()
-    {
+    public MediaLocator getLocator() {
         return locator;
     }
 
@@ -54,8 +50,7 @@ public abstract class DataSource implements Controls, Duration {
 
     public abstract void stop() throws IOException;
 
-    protected void initCheck()
-    {
+    protected void initCheck() {
         if (locator == null)
             throw new Error("Locator can't be null");
     }

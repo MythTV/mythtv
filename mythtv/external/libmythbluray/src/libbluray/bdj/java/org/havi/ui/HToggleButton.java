@@ -24,35 +24,30 @@ import java.awt.Image;
 import org.videolan.BDJXletContext;
 
 public class HToggleButton extends HGraphicButton implements HSwitchable {
-    public HToggleButton()
-    {
+    public HToggleButton() {
         super();
         iniz();
     }
 
-    public HToggleButton(Image image, int x, int y, int width, int height)
-    {
+    public HToggleButton(Image image, int x, int y, int width, int height) {
         super(image, x, y, width, height);
         iniz();
     }
 
-    public HToggleButton(Image image)
-    {
+    public HToggleButton(Image image) {
         super(image);
         iniz();
     }
 
     public HToggleButton(Image image, int x, int y, int width, int height,
-            boolean state)
-    {
+            boolean state) {
         this(image, x, y, width, height);
         setSwitchableState(state);
     }
 
     public HToggleButton(Image imageNormal, Image imageFocused,
             Image imageActioned, Image imageNormalActioned, int x, int y,
-            int width, int height, boolean state)
-    {
+            int width, int height, boolean state) {
         super(imageNormal, imageFocused, imageActioned, x, y, width, height);
         setGraphicContent(imageNormalActioned, ACTIONED_STATE);
         setSwitchableState(state);
@@ -60,8 +55,7 @@ public class HToggleButton extends HGraphicButton implements HSwitchable {
     }
 
     public HToggleButton(Image imageNormal, Image imageFocused,
-            Image imageActioned, Image imageNormalActioned, boolean state)
-    {
+            Image imageActioned, Image imageNormalActioned, boolean state) {
         super(imageNormal, imageFocused, imageActioned);
         setGraphicContent(imageNormalActioned, ACTIONED_STATE);
         setSwitchableState(state);
@@ -69,14 +63,12 @@ public class HToggleButton extends HGraphicButton implements HSwitchable {
     }
 
     public HToggleButton(Image image, int x, int y, int width, int height,
-            boolean state, HToggleGroup group)
-    {
+            boolean state, HToggleGroup group) {
         this(image, x, y, width, height, state);
         setToggleGroup(group);
     }
 
-    public HToggleButton(Image image, boolean state, HToggleGroup group)
-    {
+    public HToggleButton(Image image, boolean state, HToggleGroup group) {
         this(image);
         setSwitchableState(state);
         setToggleGroup(group);
@@ -84,30 +76,26 @@ public class HToggleButton extends HGraphicButton implements HSwitchable {
 
     public HToggleButton(Image imageNormal, Image imageFocused,
             Image imageActioned, Image imageNormalActioned, int x, int y,
-            int width, int height, boolean state, HToggleGroup group)
-    {
+            int width, int height, boolean state, HToggleGroup group) {
         this(imageNormal, imageFocused, imageActioned, imageNormalActioned, x, y, width, height, state);
         setToggleGroup(group);
     }
 
     public HToggleButton(Image imageNormal, Image imageFocused,
             Image imageActioned, Image imageNormalActioned, boolean state,
-            HToggleGroup group)
-    {
+            HToggleGroup group) {
         this(imageNormal, imageFocused, imageActioned, imageNormalActioned, state);
         setToggleGroup(group);
     }
 
-    private void iniz()
-    {
+    private void iniz() {
         try {
             setLook(getDefaultLook());
         } catch (HInvalidLookException ignored) {
         }
     }
 
-    public void setToggleGroup(HToggleGroup group)
-    {
+    public void setToggleGroup(HToggleGroup group) {
         HToggleGroup oldGroup = toggleGroup;
 
         // Remove ourselves if already a member of a group
@@ -127,44 +115,36 @@ public class HToggleButton extends HGraphicButton implements HSwitchable {
         }
     }
 
-    public HToggleGroup getToggleGroup()
-    {
+    public HToggleGroup getToggleGroup() {
         return toggleGroup;
     }
 
-    public void removeToggleGroup()
-    {
+    public void removeToggleGroup() {
         setToggleGroup(null);
     }
 
-    public static void setDefaultLook(HGraphicLook hlook)
-    {
+    public static void setDefaultLook(HGraphicLook hlook) {
         BDJXletContext.setXletDefaultLook(PROPERTY_LOOK, hlook);
     }
 
-    public static HGraphicLook getDefaultLook()
-    {
+    public static HGraphicLook getDefaultLook() {
         return (HGraphicLook) BDJXletContext.getXletDefaultLook(PROPERTY_LOOK, DEFAULT_LOOK);
     }
 
-    public boolean getSwitchableState()
-    {
+    public boolean getSwitchableState() {
         return (getInteractionState() & ACTIONED_STATE_BIT) != 0;
     }
 
-    public void setSwitchableState(boolean state)
-    {
+    public void setSwitchableState(boolean state) {
         int old = getInteractionState();
         setInteractionState(state ? (old | ACTIONED_STATE_BIT) : (old & ~ACTIONED_STATE_BIT));
     }
 
-    public void setUnsetActionSound(HSound sound)
-    {
+    public void setUnsetActionSound(HSound sound) {
         unsetActionSound = sound;
     }
 
-    public HSound getUnsetActionSound()
-    {
+    public HSound getUnsetActionSound() {
         return unsetActionSound;
     }
 

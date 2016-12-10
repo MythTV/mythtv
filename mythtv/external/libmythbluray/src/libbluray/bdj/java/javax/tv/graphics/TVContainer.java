@@ -23,16 +23,18 @@ import javax.tv.xlet.XletContext;
 import org.havi.ui.HSceneFactory;
 
 import org.videolan.BDJXletContext;
+import org.videolan.Logger;
 
 public class TVContainer {
     public static Container getRootContainer(XletContext context)
     {
         if (context == null) {
+            Logger.getLogger(TVContainer.class.getName()).error("null context");
             throw new NullPointerException();
         }
 
         if (!(context instanceof BDJXletContext) || (BDJXletContext)context != BDJXletContext.getCurrentContext()) {
-            org.videolan.Logger.getLogger(TVContainer.class.getName()).error("wrong context");
+            Logger.getLogger(TVContainer.class.getName()).error("wrong context");
         }
 
         /* GEM: return instance of org.havi.ui.HScene or NULL */

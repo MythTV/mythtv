@@ -20,11 +20,10 @@
 package org.davic.media;
 
 public class ResourceReturnedEvent extends javax.media.ControllerEvent {
-    public ResourceReturnedEvent(javax.media.Controller controller)
-	{
-		super(controller);
-	}
-    
+    public ResourceReturnedEvent(javax.media.Controller controller) {
+        super(controller);
+    }
+
     private static final long serialVersionUID = 833405652804231956L;
 }
 

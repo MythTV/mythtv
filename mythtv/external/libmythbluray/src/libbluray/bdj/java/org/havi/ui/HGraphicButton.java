@@ -27,139 +27,120 @@ import org.havi.ui.event.HFocusEvent;
 import org.havi.ui.event.HFocusListener;
 
 public class HGraphicButton extends HIcon implements HActionable {
-    public HGraphicButton()
-    {
+    public HGraphicButton() {
         org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public HGraphicButton(Image image, int x, int y, int width, int height)
-    {
-        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
-    }
-
-    public HGraphicButton(Image imageNormal, Image imageFocused,
-            Image imageActioned, int x, int y, int width, int height)
-    {
-        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
-    }
-
-    public HGraphicButton(Image image)
-    {
+    public HGraphicButton(Image image, int x, int y, int width, int height) {
         org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
     public HGraphicButton(Image imageNormal, Image imageFocused,
-            Image imageActioned)
-    {
+            Image imageActioned, int x, int y, int width, int height) {
         org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public static void setDefaultLook(HGraphicLook hlook)
-    {
+    public HGraphicButton(Image image) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+    }
+
+    public HGraphicButton(Image imageNormal, Image imageFocused,
+            Image imageActioned) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+    }
+
+    public static void setDefaultLook(HGraphicLook hlook) {
         DefaultLook = hlook;
     }
 
-    public static HGraphicLook getDefaultLook()
-    {
+    public static HGraphicLook getDefaultLook() {
         if (DefaultLook == null)
             org.videolan.Logger.unimplemented("", "getDefaultLook");
         return DefaultLook;
     }
 
-    public void setMove(int keyCode, HNavigable target)
-    {
-        throw new Error("Not implemented");
+    public void setMove(int keyCode, HNavigable target) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public HNavigable getMove(int keyCode)
-    {
-        throw new Error("Not implemented");
+    public HNavigable getMove(int keyCode) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+        return null;
     }
 
     public void setFocusTraversal(HNavigable up, HNavigable down,
-            HNavigable left, HNavigable right)
-    {
-        throw new Error("Not implemented");
+            HNavigable left, HNavigable right) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public boolean isSelected()
-    {
-        throw new Error("Not implemented");
+    public boolean isSelected() {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+        return false;
     }
 
-    public void setGainFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setGainFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public void setLoseFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setLoseFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public HSound getGainFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getGainFocusSound() {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+        return null;
     }
 
-    public HSound getLoseFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getLoseFocusSound() {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+        return null;
     }
 
-    public void addHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void addHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public void removeHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public int[] getNavigationKeys()
-    {
-        throw new Error("Not implemented");
+    public int[] getNavigationKeys() {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+        return null;
     }
 
-    public void processHFocusEvent(HFocusEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHFocusEvent(HFocusEvent evt) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public void addHActionListener(HActionListener l)
-    {
-        throw new Error("Not implemented");
+    public void addHActionListener(HActionListener l) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public void removeHActionListener(HActionListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeHActionListener(HActionListener l) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public void setActionCommand(String command)
-    {
-        throw new Error("Not implemented");
+    public void setActionCommand(String command) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public void setActionSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setActionSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public HSound getActionSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getActionSound() {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+        return null;
     }
 
-    public void processHActionEvent(HActionEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHActionEvent(HActionEvent evt) {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
     }
 
-    public String getActionCommand()
-    {
-        throw new Error("Not implemented");
+    public String getActionCommand() {
+        org.videolan.Logger.unimplemented(HGraphicButton.class.getName(), "");
+        return "";
     }
 
     private static HGraphicLook DefaultLook = null;

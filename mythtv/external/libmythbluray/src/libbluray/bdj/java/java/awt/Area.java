@@ -40,21 +40,21 @@ class Area {
         this.y1 = y1;
     }
 
-    public void clear() {
+    private void clear() {
         x0 = Integer.MAX_VALUE;
         y0 = Integer.MAX_VALUE;
         x1 = -1;
         y1 = -1;
     }
 
-    public void add(int newx, int newy) {
+    public synchronized void add(int newx, int newy) {
         x0 = Math.min(x0, newx);
         x1 = Math.max(x1, newx);
         y0 = Math.min(y0, newy);
         y1 = Math.max(y1, newy);
     }
 
-    public void add(Rectangle r) {
+    public synchronized void add(Rectangle r) {
         if ((r.x | r.width | r.y | r.height) >= 0) {
             x0 = Math.min(x0, r.x);
             x1 = Math.max(x1, r.x + r.width - 1);
@@ -63,11 +63,21 @@ class Area {
         }
     }
 
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return (x1 < x0) || (y1 < y0);
     }
 
-    public Area getBounds() {
+    private synchronized Area getBounds() {
         return new Area(x0, y0, x1, y1);
+    }
+
+    protected synchronized Area getBoundsAndClear() {
+        Area a = getBounds();
+        clear();
+        return a;
+    }
+
+    public String toString() {
+        return getClass().getName() + "[" + x0 + "," + y0 + "-" + x1 + "," + y1 + "]";
     }
 }

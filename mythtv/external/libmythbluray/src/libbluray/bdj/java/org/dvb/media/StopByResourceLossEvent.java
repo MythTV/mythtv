@@ -25,18 +25,20 @@ import javax.media.Controller;
 
 public class StopByResourceLossEvent extends StopEvent {
     public StopByResourceLossEvent(Controller source, int previous,
-            int current, int target, MediaLocator stream)
-    {
+            int current, int target, MediaLocator stream) {
         super(source, 0, 0, 0, null);
 
         this.stream = stream;
     }
 
-    public MediaLocator getStream()
-    {
+    public MediaLocator getStream() {
         return stream;
     }
 
-    private MediaLocator stream;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",stream=" + stream + "]";
+    }
+
+    private final MediaLocator stream;
     private static final long serialVersionUID = -2924890229807383503L;
 }

@@ -92,6 +92,7 @@ typedef struct {
     /* Disc ID */
     uint8_t  disc_id[20];
 
+    /* BD-J */
     uint8_t  bdj_detected;     /* 1 if disc uses BD-J */
     uint8_t  bdj_supported;    /* 1 if BD-J support was compiled in */
     uint8_t  libjvm_detected;  /* 1 if usable Java VM was found */
@@ -119,6 +120,9 @@ typedef struct {
     char bdj_disc_id[33];    /* (BD-J) disc ID */
 
     const char *udf_volume_id; /* optional UDF volume identifier */
+
+    uint8_t no_menu_support;   /* 1 if this disc can't be played using on-disc menus */
+
 } BLURAY_DISC_INFO;
 
 /*
@@ -204,6 +208,11 @@ typedef enum {
     BLURAY_STILL_INFINITE = 0x02,
 } bd_still_mode_e;
 
+typedef enum {
+    BLURAY_MARK_ENTRY     = 0x01,  /* entry mark for chapter search */
+    BLURAY_MARK_LINK      = 0x02,  /* link point */
+} bd_mark_type_e;
+
 typedef struct bd_stream_info {
     uint8_t     coding_type;
     uint8_t     format;
@@ -232,25 +241,25 @@ typedef struct bd_clip {
     BLURAY_STREAM_INFO *sec_audio_streams;
     BLURAY_STREAM_INFO *sec_video_streams;
 
-    uint64_t           start_time;
-    uint64_t           in_time;
-    uint64_t           out_time;
+    uint64_t           start_time;  /* start media time, 90kHz, ("playlist time") */
+    uint64_t           in_time;     /* start timestamp, 90kHz */
+    uint64_t           out_time;    /* end timestamp, 90kHz */
 } BLURAY_CLIP_INFO;
 
 typedef struct bd_chapter {
     uint32_t    idx;
-    uint64_t    start;
-    uint64_t    duration;
-    uint64_t    offset;
+    uint64_t    start;     /* start media time, 90kHz, ("playlist time") */
+    uint64_t    duration;  /* duration */
+    uint64_t    offset;    /* distance from title start, bytes */
     unsigned    clip_ref;
 } BLURAY_TITLE_CHAPTER;
 
 typedef struct bd_mark {
     uint32_t    idx;
-    int         type;
-    uint64_t    start;
-    uint64_t    duration;
-    uint64_t    offset;
+    int         type;      /* bd_mark_type_e */
+    uint64_t    start;     /* mark media time, 90kHz, ("playlist time") */
+    uint64_t    duration;  /* time to next mark */
+    uint64_t    offset;    /* mark distance from title start, bytes */
     unsigned    clip_ref;
 } BLURAY_TITLE_MARK;
 
@@ -330,6 +339,22 @@ int bd_open_disc(BLURAY *bd, const char *device_path, const char *keyfile_path);
 int bd_open_stream(BLURAY *bd,
                    void *read_blocks_handle,
                    int (*read_blocks)(void *handle, void *buf, int lba, int num_blocks));
+
+/**
+ *  Open BluRay disc
+ *
+ * @param bd  BLURAY object
+ * @param handle  opaque handle for open_dir and open_file
+ * @param open_dir  function used to open a directory
+ * @param open_file  function used to open a file
+ * @return 1 on success, 0 if error
+ */
+struct bd_dir_s;
+struct bd_file_s;
+int bd_open_files(BLURAY *bd,
+                  void *handle,
+                  struct bd_dir_s *(*open_dir)(void *handle, const char *rel_path),
+                  struct bd_file_s *(*open_file)(void *handle, const char *rel_path));
 
 /**
  *  Close BluRay disc
@@ -640,7 +665,9 @@ typedef enum {
     BLURAY_PLAYER_SETTING_TEXT_CAP       = 30,    /* Text Subtitle capability.    Bit mask. */
     BLURAY_PLAYER_SETTING_PLAYER_PROFILE = 31,    /* Player profile and version. */
 
-    BLURAY_PLAYER_SETTING_DECODE_PG      = 0x100, /* Enable/disable PG (subtitle) decoder. Integer. */
+    BLURAY_PLAYER_SETTING_DECODE_PG          = 0x100, /* Enable/disable PG (subtitle) decoder. Integer. Default: disabled. */
+    BLURAY_PLAYER_SETTING_PERSISTENT_STORAGE = 0x101, /* Enable/disable BD-J persistent storage. Integer. Default: enabled. */
+
     BLURAY_PLAYER_PERSISTENT_ROOT        = 400,   /* Root path to the BD_J persistent storage location. String. */
     BLURAY_PLAYER_CACHE_ROOT             = 401,   /* Root path to the BD_J cache storage location. String. */
 } bd_player_setting;
@@ -717,7 +744,7 @@ typedef enum {
     BD_EVENT_DISCONTINUITY          = 28,  /* new timestamp (45 kHz) */
 
     /* HDMV VM or JVM seeked the stream. Next read() will return data from new position. Flush all buffers. */
-    BD_EVENT_SEEK                   = 21,
+    BD_EVENT_SEEK                   = 21,  /* new media time (45 kHz) */
 
     /* still playback (pause) */
     BD_EVENT_STILL                  = 22,  /* 0 - off, 1 - on */
@@ -733,7 +760,8 @@ typedef enum {
      * status
      */
 
-    /* Nothing to do. Playlist is not playing, but title applet is running. */
+    /* Nothing to do. Playlist is not playing, but title applet is running.
+     * Application should not call bd_read*() immediately again to avoid busy loop. */
     BD_EVENT_IDLE                   = 29,
 
     /* Pop-Up menu available */
@@ -948,6 +976,23 @@ int bd_get_sound_effect(BLURAY *bd, unsigned sound_id, struct bd_sound_effect *e
  * @param pts current playback position (1/90000s) or -1
  */
 void bd_set_scr(BLURAY *bd, int64_t pts);
+
+/**
+ *
+ *  Set current playback rate.
+ *
+ *  Notify BD-J media player when user changes playback rate
+ *  (ex. pauses playback).
+ *  Changing rate may fail if corresponding UO is masked or
+ *  playlist is not playing.
+ *
+ * @param bd  BLURAY object
+ * @param rate current playback rate * 90000 (0 = paused, 90000 = normal)
+ * @return <0 on error, 0 on success
+ */
+#define BLURAY_RATE_PAUSED  0
+#define BLURAY_RATE_NORMAL  90000
+int bd_set_rate(BLURAY *bd, uint32_t rate);
 
 /**
  *

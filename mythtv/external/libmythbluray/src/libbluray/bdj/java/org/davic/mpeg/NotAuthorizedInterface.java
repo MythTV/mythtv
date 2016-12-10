@@ -21,9 +21,9 @@ package org.davic.mpeg;
 
 public interface NotAuthorizedInterface {
     public int getType();
-    
+
     //public Service getService();
-    
+
     //public ElementaryStream[] getElementaryStreams();
 
     public int[] getReason(int index)

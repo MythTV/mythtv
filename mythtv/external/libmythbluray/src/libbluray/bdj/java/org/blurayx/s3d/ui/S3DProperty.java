@@ -19,15 +19,15 @@
 
 package org.blurayx.s3d.ui;
 
-public class S3DProperty
-{
+public class S3DProperty {
+
     public static final S3DProperty ONE_PLANE = new S3DProperty("ONE_PLANE");
     public static final S3DProperty TWO_PLANES = new S3DProperty("TWO_PLANES");
     public static final S3DProperty TWOD_OUTPUT = new S3DProperty("TWOD_OUTPUT");
 
-    private String value;
-    protected S3DProperty(String value)
-    {
-        this.value = value;
+    private String name;
+
+    protected S3DProperty(String name) {
+        this.name = name;
     }
 }

@@ -19,17 +19,16 @@
 
 package org.dvb.event;
 
-public class UserEventUnavailableEvent extends
-        org.davic.resources.ResourceStatusEvent {
-    public UserEventUnavailableEvent(Object source)
-    {
+import org.davic.resources.ResourceStatusEvent;
+
+public class UserEventUnavailableEvent extends ResourceStatusEvent {
+    public UserEventUnavailableEvent(Object source) {
         super(source);
 
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

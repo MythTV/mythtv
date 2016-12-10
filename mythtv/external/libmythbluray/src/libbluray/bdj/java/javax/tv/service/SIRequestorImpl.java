@@ -20,30 +20,25 @@
 package javax.tv.service;
 
 public class SIRequestorImpl implements SIRequestor {
-    public void notifyFailure(SIRequestFailureType reason)
-    {
+    public void notifyFailure(SIRequestFailureType reason) {
         this.response = true;
         this.reason = reason;
     }
 
-    public void notifySuccess(SIRetrievable[] result)
-    {
+    public void notifySuccess(SIRetrievable[] result) {
         this.response = true;
         this.result = result;
     }
 
-    public boolean getResponse()
-    {
+    public boolean getResponse() {
         return response;
     }
 
-    public SIRetrievable[] getResult()
-    {
+    public SIRetrievable[] getResult() {
         return result;
     }
 
-    public SIRequestFailureType getReason()
-    {
+    public SIRequestFailureType getReason() {
         return reason;
     }
 

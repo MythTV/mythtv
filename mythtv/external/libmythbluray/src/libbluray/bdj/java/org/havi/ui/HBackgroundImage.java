@@ -40,6 +40,10 @@ public class HBackgroundImage implements ImageObserver {
     }
 
     public HBackgroundImage(byte pixels[]) {
+        if (pixels == null) {
+            System.err.println("null pixels from " + org.videolan.Logger.dumpStack());
+            return;
+        }
         producer = new ByteArrayImageSource(pixels);
         img = Toolkit.getDefaultToolkit().createImage(producer);
     }
@@ -100,7 +104,7 @@ public class HBackgroundImage implements ImageObserver {
         }
         for (int i = 0; i < list.size(); i++) {
             HBackgroundImageListener listener = (HBackgroundImageListener)list.get(i);
-            if (event.getID()== HBackgroundImageEvent.BACKGROUNDIMAGE_LOADED)
+            if (event.getID() == HBackgroundImageEvent.BACKGROUNDIMAGE_LOADED)
                 listener.imageLoaded(event);
             else
                 listener.imageLoadFailed(event);

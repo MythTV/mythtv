@@ -22,13 +22,11 @@ package org.dvb.event;
 import org.davic.resources.ResourceStatusEvent;
 
 public class UserEventAvailableEvent extends ResourceStatusEvent {
-    public UserEventAvailableEvent(Object source)
-    {
+    public UserEventAvailableEvent(Object source) {
         super(source);
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return super.getSource();
     }
 

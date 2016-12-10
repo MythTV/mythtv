@@ -20,13 +20,11 @@
 package javax.media;
 
 public class ResourceUnavailableEvent extends ControllerErrorEvent {
-    public ResourceUnavailableEvent(Controller source)
-    {
+    public ResourceUnavailableEvent(Controller source) {
         super(source);
     }
 
-    public ResourceUnavailableEvent(Controller source, String message)
-    {
+    public ResourceUnavailableEvent(Controller source, String message) {
         super(source);
     }
 

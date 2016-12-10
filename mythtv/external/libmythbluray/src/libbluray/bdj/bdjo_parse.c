@@ -178,7 +178,9 @@ static int _count_app_strings(BITSTREAM *bs, uint16_t data_length, uint16_t pref
 
     // seek back
     if (bytes_read) {
-        bs_seek_byte(bs, pos);
+        if (bs_seek_byte(bs, pos) < 0) {
+            return -1;
+        }
     }
 
     if (bytes_read != data_length) {
@@ -252,9 +254,14 @@ static char *_read_app_string(BITSTREAM *bs)
 static int _parse_app_names(BITSTREAM *bs, BDJO_APP *p)
 {
     unsigned ii;
+    int r;
 
     uint32_t data_length = bs_read(bs, 16);
-    p->num_name = _count_app_strings(bs, data_length, 3, "names");
+    r = _count_app_strings(bs, data_length, 3, "names");
+    if (r < 0) {
+        return -1;
+    }
+    p->num_name = r;
 
     if (data_length == 0) return 1;
 
@@ -286,9 +293,14 @@ static int _parse_app_names(BITSTREAM *bs, BDJO_APP *p)
 static int _parse_app_params(BITSTREAM *bs, BDJO_APP *p)
 {
     unsigned ii;
+    int r;
 
     uint32_t data_length = bs_read(bs, 8);
-    p->num_param = _count_app_strings(bs, data_length, 0, "params");
+    r = _count_app_strings(bs, data_length, 0, "params");
+    if (r < 0) {
+        return -1;
+    }
+    p->num_param = r;
 
     if (p->num_param) {
         p->param = calloc(p->num_param, sizeof(BDJO_APP_PARAM));
@@ -507,7 +519,10 @@ static BDJO *_bdjo_parse(BD_FILE_H *fp)
     BITSTREAM   bs;
     BDJO       *p;
 
-    bs_init(&bs, fp);
+    if (bs_init(&bs, fp) < 0) {
+        BD_DEBUG(DBG_BDJ, "?????.bdjo: read error\n");
+        return NULL;
+    }
 
     p = calloc(1, sizeof(BDJO));
     if (!p) {

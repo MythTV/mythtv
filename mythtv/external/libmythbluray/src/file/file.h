@@ -26,6 +26,7 @@
 #include "util/attributes.h"
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef _WIN32
 # define DIR_SEP "\\"
@@ -39,12 +40,29 @@
  * file access
  */
 
-#define file_close(X)    X->close(X)
-#define file_seek(X,Y,Z) X->seek(X,Y,Z)
-#define file_tell(X)     X->tell(X)
 //#define file_eof(X) X->eof(X)
-#define file_read(X,Y,Z) (size_t)X->read(X,Y,Z)
 //#define file_write(X,Y,Z) (size_t)X->write(X,Y,Z)
+
+static inline void file_close(BD_FILE_H *fp)
+{
+    fp->close(fp);
+}
+
+static inline int64_t file_tell(BD_FILE_H *fp)
+{
+    return fp->tell(fp);
+}
+
+static inline BD_USED int64_t file_seek(BD_FILE_H *fp, int64_t offset, int32_t origin)
+{
+    return fp->seek(fp, offset, origin);
+}
+
+static inline BD_USED size_t file_read(BD_FILE_H *fp, uint8_t *buf, size_t size)
+{
+    return (size_t)fp->read(fp, buf, (int64_t)size);
+}
+
 BD_PRIVATE int64_t file_size(BD_FILE_H *fp);
 
 BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode);

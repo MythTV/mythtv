@@ -20,15 +20,13 @@
 package javax.tv.service;
 
 public class SIException extends Exception {
-    public SIException()
-    {
+    public SIException() {
         super();
     }
 
-    public SIException(String reason)
-    {
+    public SIException(String reason) {
         super(reason);
     }
-    
+
     private static final long serialVersionUID = 37140385594509973L;
 }

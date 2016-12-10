@@ -26,7 +26,7 @@ import org.videolan.TIClip;
 
 public class PrimaryAudioControlImpl extends StreamControl implements PrimaryAudioControl {
     protected PrimaryAudioControlImpl(Handler player) {
-        super(player);
+        this.player = player;
     }
 
     protected StreamInfo[] getStreams() {
@@ -47,4 +47,6 @@ public class PrimaryAudioControlImpl extends StreamControl implements PrimaryAud
     protected void setStreamNumber(int num) {
         Libbluray.writePSR(Libbluray.PSR_PRIMARY_AUDIO_ID, num);
     }
+
+    private Handler player;
 }

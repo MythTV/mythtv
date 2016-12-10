@@ -20,10 +20,9 @@
 package javax.tv.service.selection;
 
 public class AlternativeContentEvent extends PresentationChangedEvent {
-    public AlternativeContentEvent(ServiceContext context)
-    {
+    public AlternativeContentEvent(ServiceContext context) {
         super(context);
     }
-    
+
     private static final long serialVersionUID = -4788942169012231066L;
 }

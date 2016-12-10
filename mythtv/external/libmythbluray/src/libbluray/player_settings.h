@@ -102,6 +102,22 @@ enum {
 
 
 /*
+ * BLURAY_PLAYER_SETTING_DISPLAY_CAP (PSR23)
+ *
+ * Display capability (bit mask) and display size
+ */
+
+#define BLURAY_DCAP_1080p_720p_3D           0x01  /* capable of 1920x1080 23.976Hz and 1280x720 59.94Hz 3D */
+#define BLURAY_DCAP_720p_50Hz_3D            0x02  /* capable of 1280x720 50Hz 3D */
+#define BLURAY_DCAP_NO_3D_CLASSES_REQUIRED  0x04  /* 3D glasses are not required */
+#define BLURAY_DCAP_INTERLACED_3D           0x08  /* */
+
+/* horizintal display size in centimeters */
+#define BLURAY_DCAP_DISPLAY_SIZE_UNDEFINED  0
+#define BLURAY_DCAP_DISPLAY_SIZE(cm)        (((cm) > 0xfff ? 0xfff : (cm)) << 8)
+
+
+/*
  * BLURAY_PLAYER_SETTING_VIDEO_CAP (PSR29)
  *
  * Player capability for video (bit mask)
@@ -116,10 +132,48 @@ enum {
  * BLURAY_PLAYER_SETTING_PLAYER_PROFILE (PSR31)
  *
  * Player profile and version
+ *
+ * Profile 1, version 1.0: no local storage, no VFS, no internet
+ * Profile 1, version 1.1: PiP, VFS, sec. audio, 256MB local storage, no internet
+ * Profile 2, version 2.0: BdLive (internet), 1GB local storage
  */
 
 enum {
+    BLURAY_PLAYER_PROFILE_1_v1_0 = ((0x00 << 16) | (0x0100)),   /* Profile 1, version 1.0 (Initial Standard Profile) */
+    BLURAY_PLAYER_PROFILE_1_v1_1 = ((0x01 << 16) | (0x0110)),   /* Profile 1, version 1.1 (secondary stream support) */
     BLURAY_PLAYER_PROFILE_2_v2_0 = ((0x03 << 16) | (0x0200)),   /* Profile 2, version 2.0 (network access, BdLive) */
+    BLURAY_PLAYER_PROFILE_3_v2_0 = ((0x08 << 16) | (0x0200)),   /* Profile 3, version 2.0 (audio only player) */
+    BLURAY_PLAYER_PROFILE_5_v2_4 = ((0x13 << 16) | (0x0240)),   /* Profile 5, version 2.4 (3D) */
+};
+
+
+/*
+ * BLURAY_PLAYER_SETTING_DECODE_PG
+ *
+ * Enable Presentation Graphics and Text Subtitle decoder
+ */
+
+enum {
+    BLURAY_PG_TEXTST_DECODER_DISABLE  = 0,  /* disable both decoders */
+    BLURAY_PG_TEXTST_DECODER_ENABLE   = 1,  /* enable both decoders */
+};
+
+
+/*
+ * BLURAY_PLAYER_SETTING_PERSISTENT_STORAGE
+ *
+ * Enable / disable BD-J persistent storage.
+ *
+ * If persistent storage is disabled, BD-J Xlets can't access any data
+ * stored during earlier playback sessions. Persistent data stored during
+ * current playback session will be removed and can't be accessed later.
+ *
+ * This setting can't be changed after bd_play() has been called.
+ */
+
+enum {
+    BLURAY_PERSISTENT_STORAGE_DISABLE = 0,  /* disable persistent storage between playback sessions */
+    BLURAY_PERSISTENT_STORAGE_ENABLE  = 1,  /* enable persistent storage */
 };
 
 #endif /* BD_PLAYER_SETTINGS_H_ */

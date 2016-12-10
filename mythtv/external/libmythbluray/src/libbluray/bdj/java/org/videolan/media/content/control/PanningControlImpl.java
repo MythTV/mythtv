@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package org.videolan.media.content.playlist;
+package org.videolan.media.content.control;
 
 import java.awt.Component;
 

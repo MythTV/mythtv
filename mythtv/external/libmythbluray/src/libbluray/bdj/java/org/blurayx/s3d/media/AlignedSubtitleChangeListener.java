@@ -21,7 +21,6 @@ package org.blurayx.s3d.media;
 
 import java.util.EventListener;
 
-public abstract interface AlignedSubtitleChangeListener extends EventListener
-{
+public abstract interface AlignedSubtitleChangeListener extends EventListener {
     public abstract void alignedSubtitleChange(AlignedSubtitleChangeEvent paramAlignedSubtitleChangeEvent);
 }

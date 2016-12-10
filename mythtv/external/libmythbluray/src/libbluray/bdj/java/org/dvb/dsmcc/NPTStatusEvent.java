@@ -20,15 +20,13 @@
 package org.dvb.dsmcc;
 
 public abstract class NPTStatusEvent extends java.util.EventObject {
-    public NPTStatusEvent(DSMCCStream source)
-    {
+    public NPTStatusEvent(DSMCCStream source) {
         super(source);
 
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

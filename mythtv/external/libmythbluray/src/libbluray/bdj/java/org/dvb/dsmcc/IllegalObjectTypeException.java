@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class IllegalObjectTypeException extends DSMCCException {
-    public IllegalObjectTypeException()
-    {
+    public IllegalObjectTypeException() {
         super();
     }
 
-    public IllegalObjectTypeException(String reason)
-    {
+    public IllegalObjectTypeException(String reason) {
         super(reason);
     }
 

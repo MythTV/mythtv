@@ -20,15 +20,13 @@
 package javax.tv.service.selection;
 
 public class InsufficientResourcesException extends ServiceContextException {
-    public InsufficientResourcesException()
-    {
+    public InsufficientResourcesException() {
         super();
     }
 
-    public InsufficientResourcesException(String reason)
-    {
+    public InsufficientResourcesException(String reason) {
         super(reason);
     }
-    
+
     private static final long serialVersionUID = 4013749854109414180L;
 }

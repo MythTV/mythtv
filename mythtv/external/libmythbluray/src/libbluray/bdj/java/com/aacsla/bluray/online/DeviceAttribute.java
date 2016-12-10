@@ -30,6 +30,7 @@ public class DeviceAttribute {
         byte bid[] = Libbluray.getAacsData(Libbluray.AACS_DEVICE_BINDING_ID);
         if (bid == null) {
             Logger.getLogger(DeviceAttribute.class.getName()).warning("getDeviceBindingID() failed");
+            return new byte[16];
         }
         return bid;
     }

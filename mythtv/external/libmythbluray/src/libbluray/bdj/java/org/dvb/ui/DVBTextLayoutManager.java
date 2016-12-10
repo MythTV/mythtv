@@ -25,14 +25,12 @@ import org.havi.ui.HVisible;
 
 public class DVBTextLayoutManager implements org.havi.ui.HTextLayoutManager {
 
-    public void render(String markedUpString, java.awt.Graphics g, HVisible v, Insets insets)
-    {
+    public void render(String markedUpString, java.awt.Graphics g, HVisible v, Insets insets) {
         /* this class is defined in GEM specifications */
         logger.unimplemented("render(" + markedUpString + ")");
     }
 
-    public DVBTextLayoutManager()
-    {
+    public DVBTextLayoutManager() {
         this(HORIZONTAL_START_ALIGN, VERTICAL_START_ALIGN, LINE_ORIENTATION_HORIZONTAL, START_CORNER_UPPER_LEFT, true,
              /* linespace = (point size of the default font for HVisible) + 7 */ 12 + 7,
              0, 56);
@@ -40,8 +38,7 @@ public class DVBTextLayoutManager implements org.havi.ui.HTextLayoutManager {
 
     public DVBTextLayoutManager(int horizontalAlign, int verticalAlign,
             int lineOrientation, int startCorner, boolean wrap, int linespace,
-            int letterspace, int horizontalTabSpace)
-    {
+            int letterspace, int horizontalTabSpace) {
         this.horizontalAlign = horizontalAlign;
         this.verticalAlign = verticalAlign;
         this.lineOrientation = lineOrientation;
@@ -52,103 +49,83 @@ public class DVBTextLayoutManager implements org.havi.ui.HTextLayoutManager {
         this.horizontalTabSpace = horizontalTabSpace;
     }
 
-    public void setHorizontalAlign(int horizontalAlign)
-    {
+    public void setHorizontalAlign(int horizontalAlign) {
         this.horizontalAlign = horizontalAlign;
     }
 
-    public void setVerticalAlign(int verticalAlign)
-    {
+    public void setVerticalAlign(int verticalAlign) {
         this.verticalAlign = verticalAlign;
     }
 
-    public void setLineOrientation(int lineOrientation)
-    {
+    public void setLineOrientation(int lineOrientation) {
         this.lineOrientation = lineOrientation;
     }
 
-    public void setStartCorner(int startCorner)
-    {
+    public void setStartCorner(int startCorner) {
         this.startCorner = startCorner;
     }
 
-    public void setTextWrapping(boolean wrap)
-    {
+    public void setTextWrapping(boolean wrap) {
         this.wrap = wrap;
     }
 
-    public void setLineSpace(int lineSpace)
-    {
+    public void setLineSpace(int lineSpace) {
         this.linespace = lineSpace;
     }
 
-    public void setLetterSpace(int letterSpace)
-    {
+    public void setLetterSpace(int letterSpace) {
         this.letterspace = letterSpace;
     }
 
-    public void setHorizontalTabSpacing(int horizontalTabSpace)
-    {
+    public void setHorizontalTabSpacing(int horizontalTabSpace) {
         this.horizontalTabSpace = horizontalTabSpace;
     }
 
-    public int getHorizontalAlign()
-    {
+    public int getHorizontalAlign() {
         return horizontalAlign;
     }
 
-    public int getVerticalAlign()
-    {
+    public int getVerticalAlign() {
         return verticalAlign;
     }
 
-    public int getLineOrientation()
-    {
+    public int getLineOrientation() {
         return lineOrientation;
     }
 
-    public int getStartCorner()
-    {
+    public int getStartCorner() {
         return startCorner;
     }
 
-    public boolean getTextWrapping()
-    {
+    public boolean getTextWrapping() {
         return wrap;
     }
 
-    public int getLineSpace()
-    {
+    public int getLineSpace() {
         return linespace;
     }
 
-    public int getLetterSpace()
-    {
+    public int getLetterSpace() {
         return letterspace;
     }
 
-    public int getHorizontalTabSpacing()
-    {
+    public int getHorizontalTabSpacing() {
         return horizontalTabSpace;
     }
 
-    public void setInsets(Insets insets)
-    {
+    public void setInsets(Insets insets) {
         this.insets = insets;
     }
 
-    public Insets getInsets()
-    {
+    public Insets getInsets() {
         return this.insets;
     }
 
-    public void addTextOverflowListener(TextOverflowListener listener)
-    {
+    public void addTextOverflowListener(TextOverflowListener listener) {
         logger.unimplemented("addTextOverflowListener");
     }
 
-    public void removeTextOverflowListener(TextOverflowListener listener)
-    {
+    public void removeTextOverflowListener(TextOverflowListener listener) {
         logger.unimplemented("removeTextOverflowListener");
     }
 

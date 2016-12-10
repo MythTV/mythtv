@@ -34,8 +34,11 @@ import org.bluray.ti.TitleImpl;
 import org.videolan.Libbluray;
 
 public class SIManagerImpl extends SIManager {
+
+    private static final Object instanceLock = new Object();
+
     public static SIManager createInstance() {
-        synchronized (SIManagerImpl.class) {
+        synchronized (instanceLock) {
             if (instance == null)
                 instance = new SIManagerImpl();
             return instance;
@@ -43,7 +46,7 @@ public class SIManagerImpl extends SIManager {
     }
 
     public static void shutdown() {
-        synchronized (SIManagerImpl.class) {
+        synchronized (instanceLock) {
             instance = null;
         }
     }

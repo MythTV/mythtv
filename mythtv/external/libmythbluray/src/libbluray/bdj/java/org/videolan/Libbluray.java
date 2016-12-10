@@ -110,8 +110,26 @@ public class Libbluray {
         initOnce();
 
         /* set up directories */
-        persistentRoot = canonicalize(persistentRoot, true);
-        budaRoot       = canonicalize(budaRoot, true);
+
+        try {
+            if (persistentRoot == null) {
+                /* no persistent storage */
+                persistentRoot = CacheDir.create("dvb.persistent.root").getPath() + File.separator;
+            }
+            if (budaRoot == null) {
+                /* no persistent storage for BUDA */
+                budaRoot = CacheDir.create("bluray.bindingunit.root").getPath() + File.separator;
+            }
+        } catch (java.io.IOException e) {
+            System.err.println("Cache creation failed: " + e);
+            /* not fatal with most discs */
+        }
+        if (persistentRoot != null) {
+            persistentRoot = canonicalize(persistentRoot, true);
+        }
+        if (budaRoot != null) {
+            budaRoot       = canonicalize(budaRoot, true);
+        }
 
         System.setProperty("dvb.persistent.root", persistentRoot);
         System.setProperty("bluray.bindingunit.root", budaRoot);
@@ -122,6 +140,8 @@ public class Libbluray {
         } else {
             System.getProperties().remove("bluray.vfs.root");
         }
+
+        /* */
 
         Libbluray.nativePointer = nativePointer;
         DiscManager.getDiscManager().setCurrentDisc(discID);
@@ -135,7 +155,9 @@ public class Libbluray {
         PackageManager.commitContentPrefixList();
         PackageManager.commitProtocolPrefixList();
 
-        BDFontMetrics.init();
+        try {
+            BDFontMetrics.init();
+        } catch (Throwable t) {}
 
         System.setProperty("mhp.profile.enhanced_broadcast", "YES");
         System.setProperty("mhp.profile.interactive_broadcast", "YES");
@@ -157,15 +179,27 @@ public class Libbluray {
 
         System.setProperty("dvb.returnchannel.timeout", "30");
 
+        /* get profile from PSR */
+        int psr31 = readPSR(PSR_PROFILE_VERSION);
+        int profile = psr31 >> 16;
+        boolean p11 = (profile & 0x01) != 0;
+        boolean p2  = (profile & 0x02) != 0;
+        boolean p5  = (profile & 0x10) != 0;
+
         System.setProperty("bluray.profile.1", "YES");
         System.setProperty("bluray.p1.version.major", "1");
-        System.setProperty("bluray.p1.version.minor", "1");
+        System.setProperty("bluray.p1.version.minor", p11 ? "1" : "0");
         System.setProperty("bluray.p1.version.micro", "0");
 
-        System.setProperty("bluray.profile.2", "YES");
+        System.setProperty("bluray.profile.2", p2 ? "YES" : "NO");
         System.setProperty("bluray.p2.version.major", "1");
         System.setProperty("bluray.p2.version.minor", "0");
         System.setProperty("bluray.p2.version.micro", "0");
+
+        System.setProperty("bluray.profile.5", p5 ? "YES" : "NO");
+        System.setProperty("bluray.p5.version.major", "1");
+        System.setProperty("bluray.p5.version.minor", "0");
+        System.setProperty("bluray.p5.version.micro", "0");
 
         System.setProperty("bluray.disc.avplayback.readcapability", "NO");
 
@@ -244,7 +278,9 @@ public class Libbluray {
         }
         nativePointer = 0;
         titleInfos = null;
-        bdjoFiles = null;
+        synchronized (bdjoFilesLock) {
+            bdjoFiles = null;
+        }
     }
 
     /*
@@ -533,14 +569,9 @@ public class Libbluray {
         case BDJ_EVENT_END_OF_PLAYLIST:
         case BDJ_EVENT_PTS:
         case BDJ_EVENT_UO_MASKED:
-            PlayerManager.getInstance().onEvent(event, param);
-            break;
+        case BDJ_EVENT_SEEK:
         case BDJ_EVENT_RATE:
-            float rate = (float)param / 90000.0f;
-            if (rate < 0.0f) rate = -rate;
-            if (rate < 0.01f) rate = 0.0f;
-            if (rate > 0.99f && rate < 1.01f) rate = 1.0f;
-            PlayerManager.getInstance().onRateChange(rate);
+            result = PlayerManager.getInstance().onEvent(event, param);
             break;
 
         case BDJ_EVENT_PSR102:
@@ -569,6 +600,10 @@ public class Libbluray {
             case 404: key = HRcEvent.VK_COLORED_KEY_1; break;
             case 405: key = HRcEvent.VK_COLORED_KEY_2; break;
             case 406: key = HRcEvent.VK_COLORED_KEY_3; break;
+            case 17:
+                result = java.awt.BDJHelper.postMouseEvent(0);
+                key = -1;
+                break;
             default:
                 key = -1;
                 result = false;
@@ -580,6 +615,9 @@ public class Libbluray {
                 boolean r3 = EventManager.getInstance().receiveKeyEventN(KeyEvent.KEY_RELEASED, 0, key);
                 result = r1 || r2 || r3;
             }
+            break;
+        case BDJ_EVENT_MOUSE:
+            result = java.awt.BDJHelper.postMouseEvent(param >> 16, param & 0xffff);
             break;
         default:
             System.err.println("Unknown event " + event + "." + param);
@@ -598,24 +636,28 @@ public class Libbluray {
         }
     }
 
-    public  static final int BDJ_EVENT_CHAPTER                  = 1;
-    public  static final int BDJ_EVENT_PLAYITEM                 = 2;
-    public  static final int BDJ_EVENT_ANGLE                    = 3;
-    public  static final int BDJ_EVENT_SUBTITLE                 = 4;
-    public  static final int BDJ_EVENT_END_OF_PLAYLIST          = 5;
-    public  static final int BDJ_EVENT_PTS                      = 6;
-    private static final int BDJ_EVENT_VK_KEY                   = 7;
-    public  static final int BDJ_EVENT_MARK                     = 8;
-    private static final int BDJ_EVENT_PSR102                   = 9;
-    public  static final int BDJ_EVENT_PLAYLIST                 = 10;
+    private static final int BDJ_EVENT_START                    = 1;
+    private static final int BDJ_EVENT_STOP                     = 2;
+    private static final int BDJ_EVENT_PSR102                   = 3;
 
-    private static final int BDJ_EVENT_START                    = 11;
-    private static final int BDJ_EVENT_STOP                     = 12;
+    public  static final int BDJ_EVENT_PLAYLIST                 = 4;
+    public  static final int BDJ_EVENT_PLAYITEM                 = 5;
+    public  static final int BDJ_EVENT_CHAPTER                  = 6;
+    public  static final int BDJ_EVENT_MARK                     = 7;
+    public  static final int BDJ_EVENT_PTS                      = 8;
+    public  static final int BDJ_EVENT_END_OF_PLAYLIST          = 9;
 
-    public  static final int BDJ_EVENT_RATE                     = 13;
-    public  static final int BDJ_EVENT_AUDIO_STREAM             = 14;
+    public  static final int BDJ_EVENT_SEEK                     = 10;
+    public  static final int BDJ_EVENT_RATE                     = 11;
+
+    public  static final int BDJ_EVENT_ANGLE                    = 12;
+    public  static final int BDJ_EVENT_AUDIO_STREAM             = 13;
+    public  static final int BDJ_EVENT_SUBTITLE                 = 14;
     public  static final int BDJ_EVENT_SECONDARY_STREAM         = 15;
-    public  static final int BDJ_EVENT_UO_MASKED                = 16;
+
+    private static final int BDJ_EVENT_VK_KEY                   = 16;
+    public  static final int BDJ_EVENT_UO_MASKED                = 17;
+    private static final int BDJ_EVENT_MOUSE                    = 18;
 
     /* TODO: use org/bluray/system/RegisterAccess instead */
     public static final int PSR_IG_STREAM_ID     = 0;
@@ -656,6 +698,9 @@ public class Libbluray {
     public static final int AACS_MEDIA_PMSN        = 3;
     public static final int AACS_DEVICE_BINDING_ID = 4;
     public static final int AACS_DEVICE_NONCE      = 5;
+    public static final int AACS_MEDIA_KEY         = 6;
+    public static final int AACS_CONTENT_CERT_ID   = 7;
+    public static final int AACS_BDJ_ROOT_CERT_HASH= 8;
 
     private static native byte[] getAacsDataN(long np, int type);
     private static native TitleInfo[] getTitleInfosN(long np);

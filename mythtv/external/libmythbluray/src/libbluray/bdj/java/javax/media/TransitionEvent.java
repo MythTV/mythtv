@@ -21,31 +21,32 @@ package javax.media;
 
 public class TransitionEvent extends ControllerEvent {
     public TransitionEvent(Controller from, int previous, int current,
-            int target)
-    {
+            int target) {
         super(from);
         this.previous = previous;
         this.current = current;
         this.target = target;
     }
 
-    public int getPreviousState()
-    {
+    public int getPreviousState() {
         return previous;
     }
 
-    public int getCurrentState()
-    {
+    public int getCurrentState() {
         return current;
     }
 
-    public int getTargetState()
-    {
+    public int getTargetState() {
         return target;
     }
 
-    private int previous;
-    private int current;
-    private int target;
+    public String toString() {
+        return getClass().toString() + "[source=" + source + ",previous=" + previous + ",current=" + current + ",target=" + target + "]";
+    }
+
+    private final int previous;
+    private final int current;
+    private final int target;
+
     private static final long serialVersionUID = 6818216020447063912L;
 }

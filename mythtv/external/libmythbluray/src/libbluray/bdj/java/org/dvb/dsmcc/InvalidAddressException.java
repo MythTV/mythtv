@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class InvalidAddressException extends DSMCCException {
-    public InvalidAddressException()
-    {
+    public InvalidAddressException() {
         super();
     }
 
-    public InvalidAddressException(String reason)
-    {
+    public InvalidAddressException(String reason) {
         super(reason);
     }
 

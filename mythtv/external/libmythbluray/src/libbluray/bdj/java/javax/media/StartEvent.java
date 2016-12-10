@@ -21,24 +21,26 @@ package javax.media;
 
 public class StartEvent extends TransitionEvent {
     public StartEvent(Controller source, int previous, int current, int target,
-            Time mediaTime, Time tbTime)
-    {
+            Time mediaTime, Time tbTime) {
         super(source, previous, current, target);
         this.mediaTime = mediaTime;
         this.tbTime = tbTime;
     }
 
-    public Time getMediaTime()
-    {
+    public Time getMediaTime() {
         return mediaTime;
     }
 
-    public Time getTimeBaseTime()
-    {
+    public Time getTimeBaseTime() {
         return tbTime;
     }
 
-    private Time mediaTime;
-    private Time tbTime;
+    public String toString() {
+        return getClass().toString() + "[source=" + source + ",mediaTime=" + mediaTime + ",tbTime=" + tbTime + "]";
+    }
+
+    private final Time mediaTime;
+    private final Time tbTime;
+
     private static final long serialVersionUID = -6779753774143606328L;
 }

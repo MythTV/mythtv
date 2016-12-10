@@ -23,15 +23,13 @@ import javax.tv.service.SIChangeType;
 
 public class ProgramScheduleChangeType extends SIChangeType
 {
-    
-
-    protected ProgramScheduleChangeType(String name) { 
+    protected ProgramScheduleChangeType(String name) {
         super(name);
     }
 
     public String toString() {
-        return name;
+        return super.toString();
     }
-    
+
     public static final ProgramScheduleChangeType CURRENT_PROGRAM_EVENT = new ProgramScheduleChangeType("CURRENT_PROGRAM_EVENT");
 }

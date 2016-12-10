@@ -25,10 +25,13 @@ import java.util.LinkedList;
 
 public class UserPreferenceManager {
     private UserPreferenceManager() {
+        org.videolan.Logger.getLogger("UserPreferenceManager").unimplemented("UserPreferenceManager");
     }
 
+    private static final Object instanceLock = new Object();
+
     public static UserPreferenceManager getInstance() {
-        synchronized (UserPreferenceManager.class) {
+        synchronized (instanceLock) {
             if (instance == null)
                 instance = new UserPreferenceManager();
             return instance;

@@ -20,18 +20,20 @@
 package org.dvb.media;
 
 public class DFCChangedEvent extends VideoFormatEvent {
-    public DFCChangedEvent(Object source, int newDFC)
-    {
+    public DFCChangedEvent(Object source, int newDFC) {
         super(source);
 
         this.newDFC = newDFC;
     }
 
-    public int getNewDFC()
-    {
+    public int getNewDFC() {
         return newDFC;
     }
 
-    private int newDFC;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",newDFC=" + newDFC + "]";
+    }
+
+    private final int newDFC;
     private static final long serialVersionUID = -4351969268893058245L;
 }

@@ -20,25 +20,21 @@
 package org.havi.ui;
 
 public class HEmulatedGraphicsConfiguration extends HGraphicsConfiguration {
-    protected HEmulatedGraphicsConfiguration()
-    {
+    protected HEmulatedGraphicsConfiguration() {
         org.videolan.Logger.unimplemented(null, "HEmulatedGraphicsConfiguration");
     }
 
-    public HGraphicsConfigTemplate getConfigTemplate()
-    {
+    public HGraphicsConfigTemplate getConfigTemplate() {
         org.videolan.Logger.unimplemented("HEmulatedGraphicsConfiguration", "getConfigTemplate");
         return null;
     }
 
-    public HGraphicsConfigTemplate getEmulation()
-    {
+    public HGraphicsConfigTemplate getEmulation() {
         org.videolan.Logger.unimplemented("HEmulatedGraphicsConfiguration", "getEmulation");
         return null;
     }
 
-    public HGraphicsConfigTemplate getImplementation()
-    {
+    public HGraphicsConfigTemplate getImplementation() {
         org.videolan.Logger.unimplemented("HEmulatedGraphicsConfiguration", "getImplementation");
         return null;
     }

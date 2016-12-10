@@ -22,13 +22,11 @@ package javax.media;
 import javax.media.Controller;
 
 public class ConnectionErrorEvent extends ControllerErrorEvent {
-    public ConnectionErrorEvent(Controller source)
-    {
+    public ConnectionErrorEvent(Controller source) {
         super(source);
     }
 
-    public ConnectionErrorEvent(Controller source, String reason)
-    {
+    public ConnectionErrorEvent(Controller source, String reason) {
         super(source, reason);
     }
 

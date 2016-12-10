@@ -33,18 +33,15 @@ public class HImageEffectMatte implements HMatte, HAnimateEffect {
     private int position = 0;
     private int repeatCount = -1;
 
-    public HImageEffectMatte()
-    {
+    public HImageEffectMatte() {
     }
 
-    public HImageEffectMatte(Image[] data)
-    {
+    public HImageEffectMatte(Image[] data) {
         this();
         setMatteData(data);
     }
 
-    public void setMatteData(Image[] data)
-    {
+    public void setMatteData(Image[] data) {
         if (data == null) {
             matteData = null;
             offsets = null;
@@ -61,13 +58,11 @@ public class HImageEffectMatte implements HMatte, HAnimateEffect {
             offsets[i] = new Point(0, 0);
     }
 
-    public Image[] getMatteData()
-    {
+    public Image[] getMatteData() {
         return matteData;
     }
 
-    public void setOffset(Point p, int index)
-    {
+    public void setOffset(Point p, int index) {
         if (p == null) {
             org.videolan.Logger.getLogger("HImageEffectMatte").error("setOffset(): no point");
             throw new IllegalArgumentException("setOffset(): point is null");
@@ -81,28 +76,23 @@ public class HImageEffectMatte implements HMatte, HAnimateEffect {
         offsets[index] = p;
     }
 
-    public Point getOffset(int index)
-    {
+    public Point getOffset(int index) {
         return offsets[index];
     }
 
-    public void start()
-    {
+    public void start() {
         isAnimated = true;
     }
 
-    public void stop()
-    {
+    public void stop() {
         isAnimated = false;
     }
 
-    public boolean isAnimated()
-    {
+    public boolean isAnimated() {
         return isAnimated;
     }
 
-    public void setPosition(int position)
-    {
+    public void setPosition(int position) {
         if (matteData == null)
             return;
         if (position < 0)
@@ -113,13 +103,11 @@ public class HImageEffectMatte implements HMatte, HAnimateEffect {
         this.position = position;
     }
 
-    public int getPosition()
-    {
+    public int getPosition() {
         return position;
     }
 
-    public void setRepeatCount(int count)
-    {
+    public void setRepeatCount(int count) {
         if (count <= 0 && count != -1) {
             org.videolan.Logger.getLogger("HImageEffectMatte").error("setRepeatCount(): invalid count");
             throw new IllegalArgumentException("setRepeatCount(): invalid count");
@@ -128,25 +116,21 @@ public class HImageEffectMatte implements HMatte, HAnimateEffect {
         repeatCount = count;
     }
 
-    public int getRepeatCount()
-    {
+    public int getRepeatCount() {
         return repeatCount;
     }
 
-    public void setDelay(int count)
-    {
+    public void setDelay(int count) {
         if (count < 1)
             count = 1;
         delay = count;
     }
 
-    public int getDelay()
-    {
+    public int getDelay() {
         return delay;
     }
 
-    public void setPlayMode(int mode)
-    {
+    public void setPlayMode(int mode) {
         if (mode != PLAY_REPEATING && mode != PLAY_ALTERNATING) {
             org.videolan.Logger.getLogger("HImageEffectMatte").error("setPlayMode(): invalid mode");
             throw new IllegalArgumentException("setPlayMode(): invalid mode");
@@ -154,8 +138,7 @@ public class HImageEffectMatte implements HMatte, HAnimateEffect {
         this.mode = mode;
     }
 
-    public int getPlayMode()
-    {
+    public int getPlayMode() {
         return mode;
     }
 }

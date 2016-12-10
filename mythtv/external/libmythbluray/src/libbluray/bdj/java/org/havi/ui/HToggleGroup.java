@@ -24,17 +24,14 @@ import java.util.Vector;
 
 public class HToggleGroup {
 
-    public HToggleGroup()
-    {
+    public HToggleGroup() {
     }
 
-    public HToggleButton getCurrent()
-    {
+    public HToggleButton getCurrent() {
         return current;
     }
 
-    public void setCurrent(HToggleButton selection)
-    {
+    public void setCurrent(HToggleButton selection) {
         // Treat null as unselection
         if (selection == null) {
             HToggleButton tmp = getCurrent();
@@ -56,8 +53,7 @@ public class HToggleGroup {
         }
     }
 
-    public void setForcedSelection(boolean forceSelection)
-    {
+    public void setForcedSelection(boolean forceSelection) {
         this.forceSelection = forceSelection;
 
         // Enforce new setting
@@ -66,26 +62,22 @@ public class HToggleGroup {
         }
     }
 
-    public boolean getForcedSelection()
-    {
+    public boolean getForcedSelection() {
         return forceSelection;
     }
 
-    public void setEnabled(boolean enable)
-    {
+    public void setEnabled(boolean enable) {
         enabled = enable;
         for (Enumeration e = buttons.elements(); e.hasMoreElements();) {
             setEnabled((HToggleButton) e.nextElement(), enable);
         }
     }
 
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    protected void add(HToggleButton button)
-    {
+    protected void add(HToggleButton button) {
         // Only add if not already added
         if (!buttons.contains(button)) {
             buttons.addElement(button);
@@ -106,8 +98,7 @@ public class HToggleGroup {
         }
     }
 
-    protected void remove(HToggleButton button)
-    {
+    protected void remove(HToggleButton button) {
         if (!buttons.removeElement(button)) {
             throw new IllegalArgumentException("Not a member of this HToggleGroup");
         } else {
@@ -122,16 +113,14 @@ public class HToggleGroup {
     }
 
 
-    private void unswitch(HToggleButton button)
-    {
+    private void unswitch(HToggleButton button) {
         for (Enumeration e = buttons.elements(); e.hasMoreElements();) {
             HToggleButton b = (HToggleButton) e.nextElement();
             if (b != button) b.setSwitchableState(false);
         }
     }
 
-    private void forceSelect()
-    {
+    private void forceSelect() {
         // assert(getCurrent() == null);
         if (buttons.size() > 0) {
             HToggleButton b = (HToggleButton) buttons.elementAt(0);
@@ -140,8 +129,7 @@ public class HToggleGroup {
         }
     }
 
-    private void setEnabled(HToggleButton tb, boolean enable)
-    {
+    private void setEnabled(HToggleButton tb, boolean enable) {
         if (false) { // If HAVi 1.1
             tb.setEnabled(enable);
         } else {

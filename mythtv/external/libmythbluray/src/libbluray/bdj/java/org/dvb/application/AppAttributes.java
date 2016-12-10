@@ -23,7 +23,6 @@ import org.davic.net.Locator;
 
 public abstract interface AppAttributes {
 
-
     public abstract AppIcon getAppIcon();
 
     public abstract AppID getIdentifier();
@@ -33,7 +32,7 @@ public abstract interface AppAttributes {
     public abstract String getName();
 
     public abstract String getName(String language)
-      throws LanguageNotAvailableException;
+        throws LanguageNotAvailableException;
 
     public abstract String[][] getNames();
 
@@ -48,12 +47,12 @@ public abstract interface AppAttributes {
     public abstract int getType();
 
     public abstract int[] getVersions(String profile)
-      throws IllegalProfileParameterException;
+        throws IllegalProfileParameterException;
 
     public abstract boolean isStartable();
 
     public abstract boolean isVisible();
-    
+
     public static final int DVB_HTML_application = 2;
     public static final int DVB_J_application = 1;
 }

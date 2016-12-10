@@ -20,13 +20,11 @@
 package org.bluray.media;
 
 public class StreamNotAvailableException extends Exception {
-    public StreamNotAvailableException()
-    {
+    public StreamNotAvailableException() {
         super();
     }
 
-    public StreamNotAvailableException(String reason)
-    {
+    public StreamNotAvailableException(String reason) {
         super(reason);
     }
 

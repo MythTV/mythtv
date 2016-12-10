@@ -23,93 +23,81 @@ import org.havi.ui.event.HFocusEvent;
 import org.havi.ui.event.HFocusListener;
 
 public class HRange extends HStaticRange implements HNavigable {
-    public HRange()
-    {
+    public HRange() {
         org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
     public HRange(int orientation, int minimum, int maximum, int value, int x,
-            int y, int width, int height)
-    {
+            int y, int width, int height) {
         org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public HRange(int orientation, int minimum, int maximum, int value)
-    {
+    public HRange(int orientation, int minimum, int maximum, int value) {
         org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public static void setDefaultLook(HRangeLook look)
-    {
+    public static void setDefaultLook(HRangeLook look) {
         DefaultLook = look;
     }
 
-    public static HRangeLook getDefaultLook()
-    {
+    public static HRangeLook getDefaultLook() {
         if (DefaultLook == null)
             org.videolan.Logger.unimplemented("", "getDefaultLook");
         return DefaultLook;
     }
 
-    public void setMove(int keyCode, HNavigable target)
-    {
-        throw new Error("Not implemented");
+    public void setMove(int keyCode, HNavigable target) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public HNavigable getMove(int keyCode)
-    {
-        throw new Error("Not implemented");
+    public HNavigable getMove(int keyCode) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
+        return null;
     }
 
     public void setFocusTraversal(HNavigable up, HNavigable down,
-            HNavigable left, HNavigable right)
-    {
-        throw new Error("Not implemented");
+            HNavigable left, HNavigable right) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public boolean isSelected()
-    {
-        throw new Error("Not implemented");
+    public boolean isSelected() {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
+        return false;
     }
 
-    public void setGainFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setGainFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public void setLoseFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setLoseFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public HSound getGainFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getGainFocusSound() {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
+        return null;
     }
 
-    public HSound getLoseFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getLoseFocusSound() {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
+        return null;
     }
 
-    public void addHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void addHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public void removeHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
-    public int[] getNavigationKeys()
-    {
-        throw new Error("Not implemented");
+    public int[] getNavigationKeys() {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
+        return null;
     }
 
-    public void processHFocusEvent(HFocusEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHFocusEvent(HFocusEvent evt) {
+        org.videolan.Logger.unimplemented(HRange.class.getName(), "");
     }
 
     private static HRangeLook DefaultLook = null;

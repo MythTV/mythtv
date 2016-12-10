@@ -20,14 +20,12 @@
 package org.dvb.dsmcc;
 
 public class SuccessEvent extends AsynchronousLoadingEvent {
-    public SuccessEvent(DSMCCObject source)
-    {
+    public SuccessEvent(DSMCCObject source) {
         super(source);
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

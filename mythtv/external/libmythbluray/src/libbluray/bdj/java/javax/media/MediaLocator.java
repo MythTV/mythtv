@@ -26,26 +26,39 @@ import java.net.URL;
 public class MediaLocator implements Serializable
 {
     public MediaLocator(URL url) {
-        this(url.toExternalForm());
+        this.url = url;
+        if (url != null) {
+            this.locatorString = url.toString().trim();
+        }
     }
 
     public MediaLocator(String locatorString) {
-        int index = locatorString.indexOf(":");
-        if (index <= 0)
-            throw new IllegalArgumentException("Bad locator string.");
-        protocol = locatorString.substring(0, index);
-        remainder = locatorString.substring(index + 1);
+        if (locatorString != null)
+            this.locatorString = locatorString.trim();
     }
 
     public URL getURL() throws MalformedURLException {
-        return new URL(toExternalForm());
+        if (url == null) {
+            url = new URL(locatorString);
+        }
+        return url;
     }
 
     public String getProtocol() {
+        String protocol = "";
+        int col = locatorString.indexOf(":");
+        if (col >= 0) {
+            protocol = locatorString.substring(0, col);
+        }
         return protocol;
     }
 
     public String getRemainder() {
+        String remainder = "";
+        int col = locatorString.indexOf(":");
+        if (col >= 0) {
+            remainder = locatorString.substring(col + 1);
+        }
         return remainder;
     }
 
@@ -54,11 +67,11 @@ public class MediaLocator implements Serializable
     }
 
     public String toExternalForm() {
-        return protocol + ":" + remainder;
+        return locatorString;
     }
 
-    private String protocol = "";
-    private String remainder = "";
+    private String locatorString = "";
+    private URL url = null;
 
     private static final long serialVersionUID = 1L;
 }

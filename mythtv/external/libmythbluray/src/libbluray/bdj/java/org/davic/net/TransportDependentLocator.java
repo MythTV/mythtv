@@ -20,5 +20,4 @@
 package org.davic.net;
 
 public interface TransportDependentLocator {
-
 }

@@ -321,7 +321,7 @@ static uint32_t _cmd_to_u32(HDMV_INSN *insn)
         uint8_t u8[4];
     } tmp;
     tmp.insn = *insn;
-    return (tmp.u8[0] << 24) | (tmp.u8[1] << 16) | (tmp.u8[2] << 8) | tmp.u8[3];
+    return ((unsigned)tmp.u8[0] << 24) | (tmp.u8[1] << 16) | (tmp.u8[2] << 8) | tmp.u8[3];
 }
 
 int mobj_sprint_cmd(char *buf, MOBJ_CMD *cmd)

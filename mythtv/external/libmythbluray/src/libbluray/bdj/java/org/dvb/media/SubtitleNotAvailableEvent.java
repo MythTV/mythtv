@@ -22,17 +22,15 @@ package org.dvb.media;
 import java.util.EventObject;
 
 public class SubtitleNotAvailableEvent extends EventObject {
-    public SubtitleNotAvailableEvent(Object source)
-    {
+    public SubtitleNotAvailableEvent(Object source) {
         super(source);
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 
-    private Object source;
+    protected final Object source;
     private static final long serialVersionUID = -5092068346063671440L;
 }

@@ -19,23 +19,21 @@
 
 package javax.tv.service;
 
-import java.io.Serializable;
+public class SIChangeType {
 
-public class SIChangeType implements Serializable
-{
     public static final SIChangeType ADD = new SIChangeType("ADD");
     public static final SIChangeType REMOVE = new SIChangeType("REMOVE");
     public static final SIChangeType MODIFY = new SIChangeType("MODIFY");
 
-    protected SIChangeType(String name) { 
+    protected SIChangeType(String name) {
         this.name = name;
+        if (name == null)
+            throw new NullPointerException();
     }
 
     public String toString() {
         return name;
     }
-    
-    protected String name;
 
-    private static final long serialVersionUID = 1L;
+    protected String name;
 }

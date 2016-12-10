@@ -20,13 +20,11 @@
 package org.havi.ui;
 
 public class HUIException extends Exception {
-    public HUIException()
-    {
+    public HUIException() {
         super();
     }
 
-    public HUIException(String reason)
-    {
+    public HUIException(String reason) {
         super(reason);
     }
 

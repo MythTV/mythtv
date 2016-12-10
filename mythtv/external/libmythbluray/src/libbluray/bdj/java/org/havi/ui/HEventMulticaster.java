@@ -49,17 +49,15 @@ public class HEventMulticaster implements HBackgroundImageListener,
         HItemListener, HTextListener, HKeyListener, ResourceStatusListener {
 
 
-    protected HEventMulticaster(EventListener a, EventListener b)
-    {
+    protected HEventMulticaster(EventListener a, EventListener b) {
         this.a = a;
         this.b = b;
     }
 
-    protected EventListener remove(EventListener oldListener)
-    {
-        if (oldListener == a) 
+    protected EventListener remove(EventListener oldListener) {
+        if (oldListener == a)
             return b;
-        else if (oldListener == b) 
+        else if (oldListener == b)
             return a;
         EventListener a2 = removeInternal(a, oldListener);
         EventListener b2 = removeInternal(b, oldListener);
@@ -69,8 +67,7 @@ public class HEventMulticaster implements HBackgroundImageListener,
             return addInternal(a2, b2);
     }
 
-    protected static EventListener addInternal(EventListener a, EventListener b)
-    {
+    protected static EventListener addInternal(EventListener a, EventListener b) {
         if (a == null)
             return b;
         else if (b == null)
@@ -80,8 +77,7 @@ public class HEventMulticaster implements HBackgroundImageListener,
     }
 
     protected static EventListener removeInternal(EventListener listener,
-            EventListener oldListener)
-    {
+            EventListener oldListener) {
         if (listener == null || listener.equals(oldListener))
             return null;
         else if (listener instanceof HEventMulticaster)
@@ -91,26 +87,22 @@ public class HEventMulticaster implements HBackgroundImageListener,
     }
 
     public static HBackgroundImageListener add(HBackgroundImageListener a,
-            HBackgroundImageListener b)
-    {
+            HBackgroundImageListener b) {
         return (HBackgroundImageListener) addInternal(a, b);
     }
 
     public static HBackgroundImageListener remove(
             HBackgroundImageListener listener,
-            HBackgroundImageListener oldListener)
-    {
+            HBackgroundImageListener oldListener) {
         return (HBackgroundImageListener) removeInternal(listener, oldListener);
     }
 
-    public static WindowListener add(WindowListener a, WindowListener b)
-    {
+    public static WindowListener add(WindowListener a, WindowListener b) {
         return (WindowListener) addInternal(a, b);
     }
 
     public static WindowListener remove(WindowListener listener,
-            WindowListener oldListener)
-    {
+            WindowListener oldListener) {
         return (WindowListener) removeInternal(listener, oldListener);
     }
 
@@ -122,247 +114,205 @@ public class HEventMulticaster implements HBackgroundImageListener,
 
     public static HScreenConfigurationListener add(
             HScreenConfigurationListener a, HScreenConfigurationListener b,
-            HScreenConfigTemplate template)
-    {
-        
+            HScreenConfigTemplate template) {
         return (HScreenConfigurationListener) addInternal(a, b);
     }
 
     public static HScreenConfigurationListener remove(
             HScreenConfigurationListener listener,
-            HScreenConfigurationListener oldListener)
-    {
+            HScreenConfigurationListener oldListener) {
         return (HScreenConfigurationListener) removeInternal(listener,
                 oldListener);
     }
 
     public static HScreenLocationModifiedListener add(
-            HScreenLocationModifiedListener a, HScreenLocationModifiedListener b)
-    {
+            HScreenLocationModifiedListener a, HScreenLocationModifiedListener b) {
         return (HScreenLocationModifiedListener) addInternal(a, b);
     }
 
     public static HScreenLocationModifiedListener remove(
             HScreenLocationModifiedListener listener,
-            HScreenLocationModifiedListener oldListener)
-    {
+            HScreenLocationModifiedListener oldListener) {
         return (HScreenLocationModifiedListener) removeInternal(listener,
                 oldListener);
     }
 
-    public static HTextListener add(HTextListener a, HTextListener b)
-    {
+    public static HTextListener add(HTextListener a, HTextListener b) {
         return (HTextListener) addInternal(a, b);
     }
 
     public static HTextListener remove(HTextListener listener,
-            HTextListener oldListener)
-    {
+            HTextListener oldListener) {
         return (HTextListener) removeInternal(listener, oldListener);
     }
 
-    public static HItemListener add(HItemListener a, HItemListener b)
-    {
+    public static HItemListener add(HItemListener a, HItemListener b) {
         return (HItemListener) addInternal(a, b);
     }
 
     public static HItemListener remove(HItemListener listener,
-            HItemListener oldListener)
-    {
+            HItemListener oldListener) {
         return (HItemListener) removeInternal(listener, oldListener);
     }
 
-    public static HFocusListener add(HFocusListener a, HFocusListener b)
-    {
+    public static HFocusListener add(HFocusListener a, HFocusListener b) {
         return (HFocusListener) addInternal(a, b);
     }
 
     public static HFocusListener remove(HFocusListener listener,
-            HFocusListener oldListener)
-    {
+            HFocusListener oldListener) {
         return (HFocusListener) removeInternal(listener, oldListener);
     }
 
     public static HAdjustmentListener add(HAdjustmentListener a,
-            HAdjustmentListener b)
-    {
+            HAdjustmentListener b) {
         return (HAdjustmentListener) addInternal(a, b);
     }
 
     public static HAdjustmentListener remove(HAdjustmentListener listener,
-            HAdjustmentListener oldListener)
-    {
+            HAdjustmentListener oldListener) {
         return (HAdjustmentListener) removeInternal(listener, oldListener);
     }
 
-    public static HActionListener add(HActionListener a, HActionListener b)
-    {
+    public static HActionListener add(HActionListener a, HActionListener b) {
         return (HActionListener) addInternal(a, b);
     }
 
     public static HActionListener remove(HActionListener listener,
-            HActionListener oldListener)
-    {
+            HActionListener oldListener) {
         return (HActionListener) removeInternal(listener, oldListener);
     }
 
-    public static HKeyListener add(HKeyListener a, HKeyListener b)
-    {
+    public static HKeyListener add(HKeyListener a, HKeyListener b) {
         return (HKeyListener) addInternal(a, b);
     }
 
     public static HKeyListener remove(HKeyListener listener,
-            HKeyListener oldListener)
-    {
+            HKeyListener oldListener) {
         return (HKeyListener) removeInternal(listener, oldListener);
     }
 
     public static ResourceStatusListener add(ResourceStatusListener a,
-            ResourceStatusListener b)
-    {
+            ResourceStatusListener b) {
         return (ResourceStatusListener) addInternal(a, b);
     }
 
     public static ResourceStatusListener remove(
-            ResourceStatusListener listener, ResourceStatusListener oldListener)
-    {
+            ResourceStatusListener listener, ResourceStatusListener oldListener) {
         return (ResourceStatusListener) removeInternal(listener, oldListener);
     }
 
-    public void imageLoaded(HBackgroundImageEvent event)
-    {
+    public void imageLoaded(HBackgroundImageEvent event) {
         if (a != null) ((HBackgroundImageListener)a).imageLoaded(event);
         if (b != null) ((HBackgroundImageListener)b).imageLoaded(event);
     }
 
-    public void imageLoadFailed(HBackgroundImageEvent event)
-    {
+    public void imageLoadFailed(HBackgroundImageEvent event) {
         if (a != null) ((HBackgroundImageListener)a).imageLoadFailed(event);
         if (b != null) ((HBackgroundImageListener)b).imageLoadFailed(event);
     }
 
-    public void report(HScreenConfigurationEvent event)
-    {
+    public void report(HScreenConfigurationEvent event) {
         if (a != null) ((HScreenConfigurationListener)a).report(event);
         if (b != null) ((HScreenConfigurationListener)b).report(event);
     }
 
-    public void report(HScreenLocationModifiedEvent event)
-    {
+    public void report(HScreenLocationModifiedEvent event) {
         if (a != null) ((HScreenLocationModifiedListener)a).report(event);
         if (b != null) ((HScreenLocationModifiedListener)b).report(event);
     }
 
-    public void windowOpened(WindowEvent event)
-    {
+    public void windowOpened(WindowEvent event) {
         if (a != null) ((WindowListener)a).windowOpened(event);
         if (b != null) ((WindowListener)b).windowOpened(event);
     }
 
-    public void windowClosing(WindowEvent event)
-    {
+    public void windowClosing(WindowEvent event) {
         if (a != null) ((WindowListener)a).windowClosing(event);
         if (b != null) ((WindowListener)b).windowClosing(event);
     }
 
-    public void windowClosed(WindowEvent event)
-    {
+    public void windowClosed(WindowEvent event) {
         if (a != null) ((WindowListener)a).windowClosed(event);
         if (b != null) ((WindowListener)b).windowClosed(event);
     }
 
-    public void windowIconified(WindowEvent event)
-    {
+    public void windowIconified(WindowEvent event) {
         if (a != null) ((WindowListener)a).windowIconified(event);
         if (b != null) ((WindowListener)b).windowIconified(event);
     }
 
-    public void windowDeiconified(WindowEvent event)
-    {
+    public void windowDeiconified(WindowEvent event) {
         if (a != null) ((WindowListener)a).windowDeiconified(event);
         if (b != null) ((WindowListener)b).windowDeiconified(event);
     }
 
-    public void windowActivated(WindowEvent event)
-    {
+    public void windowActivated(WindowEvent event) {
         if (a != null) ((WindowListener)a).windowActivated(event);
         if (b != null) ((WindowListener)b).windowActivated(event);
     }
 
-    public void windowDeactivated(WindowEvent event)
-    {
+    public void windowDeactivated(WindowEvent event) {
         if (a != null) ((WindowListener)a).windowDeactivated(event);
         if (b != null) ((WindowListener)b).windowDeactivated(event);
     }
 
-    public void actionPerformed(ActionEvent event)
-    {
+    public void actionPerformed(ActionEvent event) {
         if (a != null) ((HActionListener)a).actionPerformed(event);
         if (b != null) ((HActionListener)b).actionPerformed(event);
     }
 
-    public void focusLost(FocusEvent event)
-    {
+    public void focusLost(FocusEvent event) {
         if (a != null) ((HFocusListener)a).focusLost(event);
         if (b != null) ((HFocusListener)b).focusLost(event);
     }
 
-    public void focusGained(FocusEvent event)
-    {
+    public void focusGained(FocusEvent event) {
         if (a != null) ((HFocusListener)a).focusGained(event);
         if (b != null) ((HFocusListener)b).focusGained(event);
     }
 
-    public void valueChanged(HAdjustmentEvent event)
-    {
+    public void valueChanged(HAdjustmentEvent event) {
         if (a != null) ((HAdjustmentListener)a).valueChanged(event);
         if (b != null) ((HAdjustmentListener)b).valueChanged(event);
     }
 
-    public void selectionChanged(HItemEvent event)
-    {
+    public void selectionChanged(HItemEvent event) {
         if (a != null) ((HItemListener)a).selectionChanged(event);
         if (b != null) ((HItemListener)b).selectionChanged(event);
     }
 
-    public void currentItemChanged(HItemEvent event)
-    {
+    public void currentItemChanged(HItemEvent event) {
         if (a != null) ((HItemListener)a).currentItemChanged(event);
         if (b != null) ((HItemListener)b).currentItemChanged(event);
     }
 
-    public void textChanged(HTextEvent event)
-    {
+    public void textChanged(HTextEvent event) {
         if (a != null) ((HTextListener)a).textChanged(event);
         if (b != null) ((HTextListener)b).textChanged(event);
     }
 
-    public void caretMoved(HTextEvent event)
-    {
+    public void caretMoved(HTextEvent event) {
         if (a != null) ((HTextListener)a).caretMoved(event);
         if (b != null) ((HTextListener)b).caretMoved(event);
     }
 
-    public void keyTyped(KeyEvent event)
-    {
+    public void keyTyped(KeyEvent event) {
         if (a != null) ((HKeyListener)a).keyTyped(event);
         if (b != null) ((HKeyListener)b).keyTyped(event);
     }
 
-    public void keyPressed(KeyEvent event)
-    {
+    public void keyPressed(KeyEvent event) {
         if (a != null) ((HKeyListener)a).keyPressed(event);
         if (b != null) ((HKeyListener)b).keyPressed(event);
     }
 
-    public void keyReleased(KeyEvent event)
-    {
+    public void keyReleased(KeyEvent event) {
         if (a != null) ((HKeyListener)a).keyReleased(event);
         if (b != null) ((HKeyListener)b).keyReleased(event);
     }
 
-    public void statusChanged(ResourceStatusEvent event)
-    {
+    public void statusChanged(ResourceStatusEvent event) {
         if (a != null) ((ResourceStatusListener)a).statusChanged(event);
         if (b != null) ((ResourceStatusListener)b).statusChanged(event);
     }

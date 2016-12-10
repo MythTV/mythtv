@@ -35,5 +35,13 @@ public class Locator implements javax.tv.locator.Locator {
         return url;
     }
 
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Locator) || url == null)
+            return false;
+
+        Locator locator = (Locator)obj;
+        return toExternalForm().equals(locator.toExternalForm());
+    }
+
     protected String url;
 }

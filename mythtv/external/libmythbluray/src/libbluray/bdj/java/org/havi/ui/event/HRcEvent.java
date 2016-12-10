@@ -24,15 +24,19 @@ import java.awt.event.KeyEvent;
 
 public class HRcEvent extends KeyEvent {
     public HRcEvent(Component source, int id, long when, int modifiers,
-            int keyCode)
-    {
+            int keyCode) {
         super(source, id, when, modifiers, keyCode, (char)keyCode);
     }
 
     public HRcEvent(Component source, int id, long when, int modifiers,
-            int keyCode, char keyChar)
-    {
+            int keyCode, char keyChar) {
         super(source, id, when, modifiers, keyCode, keyChar);
+    }
+
+    public String toString() {
+        return getClass().getName() + "[source=" + this.source + ",id=" + getID() +
+            ",when=" + getWhen() + ",modifiers=" + getModifiers() +
+            ",keyCode=" + getKeyCode() + ",keyChar=" + getKeyChar() + "]";
     }
 
     public static final int RC_FIRST = 400;

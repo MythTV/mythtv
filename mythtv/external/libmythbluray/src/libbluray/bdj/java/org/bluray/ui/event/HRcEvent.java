@@ -23,8 +23,7 @@ import java.awt.Component;
 
 public abstract class HRcEvent extends org.havi.ui.event.HRcEvent {
     public HRcEvent(Component source, int id, long when, int modifiers,
-            int keyCode, char keyChar)
-    {
+            int keyCode, char keyChar) {
         super(source, id, when, modifiers, keyCode, keyChar);
     }
 

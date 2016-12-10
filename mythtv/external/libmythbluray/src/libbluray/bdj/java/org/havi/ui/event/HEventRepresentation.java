@@ -22,9 +22,8 @@ package org.havi.ui.event;
 import java.awt.Color;
 import java.awt.Image;
 
-public class HEventRepresentation extends Object {
-    protected HEventRepresentation(boolean supported, String text, Color color, Image symbol) {
-        this.supported = supported;
+public class HEventRepresentation {
+    protected HEventRepresentation(String text, Color color, Image symbol) {
         this.text = text;
         this.color = color;
         this.symbol = symbol;
@@ -39,7 +38,7 @@ public class HEventRepresentation extends Object {
     }
 
     public boolean isSupported() {
-        return supported;
+        return type != ER_TYPE_NOT_SUPPORTED;
     }
 
     protected void setType(int aType) {
@@ -91,7 +90,6 @@ public class HEventRepresentation extends Object {
     public static final int ER_TYPE_COLOR = 2;
     public static final int ER_TYPE_SYMBOL = 4;
 
-    private boolean supported;
     private String text;
     private Color color;
     private Image symbol;

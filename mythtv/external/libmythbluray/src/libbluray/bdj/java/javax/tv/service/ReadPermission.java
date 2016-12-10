@@ -24,54 +24,54 @@ import javax.tv.locator.Locator;
 import java.io.Serializable;
 
 public final class ReadPermission extends Permission implements Serializable {
-    public ReadPermission(Locator locator)
-    {
-        super(locator.toExternalForm());
-        
-        this.locator = locator.toExternalForm();
+    public ReadPermission(Locator locator) {
+        super(locator == null ? "*" : locator.toExternalForm());
+
+        if (locator == null)
+            this.locator = "*";
+        else
+            this.locator = locator.toExternalForm();
     }
 
-    public ReadPermission(String locator, String actions)
-    {
-        super(null);
-        
+    public ReadPermission(String locator, String actions) {
+        super(locator == null ? "*" : locator);
+
+        if (locator == null)
+            throw new NullPointerException();
+
         this.locator = locator;
     }
 
-    public boolean implies(Permission perm)
-    {
-        return (perm instanceof ReadPermission) && (this.equals(perm) || this.equals("*"));
+    public boolean implies(Permission perm) {
+        if (perm == null)
+            throw new NullPointerException();
+        if (!(perm instanceof ReadPermission))
+            return false;
+
+        ReadPermission other = (ReadPermission)perm;
+        return locator.equals(other.locator) || locator.equals("*");
     }
 
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
-            return false;
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof ReadPermission))
             return false;
+
         ReadPermission other = (ReadPermission) obj;
-        if (locator == null) {
-            if (other.locator != null)
-                return false;
-        } else if (!locator.equals(other.locator))
-            return false;
-        return true;
+        return locator.equals(other.locator);
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = prime + ((locator == null) ? 0 : locator.hashCode());
         return result;
     }
 
-    public String getActions()
-    {
+    public String getActions() {
         return "";
     }
-    
+
     private String locator;
     private static final long serialVersionUID = 3887436671296398427L;
 }

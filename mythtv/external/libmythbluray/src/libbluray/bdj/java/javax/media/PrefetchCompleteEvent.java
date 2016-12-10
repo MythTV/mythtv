@@ -21,8 +21,7 @@ package javax.media;
 
 public class PrefetchCompleteEvent extends TransitionEvent {
     public PrefetchCompleteEvent(Controller source, int previous, int current,
-            int target)
-    {
+            int target) {
         super(source, previous, current, target);
     }
 

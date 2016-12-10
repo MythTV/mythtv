@@ -89,12 +89,21 @@ class BDJAppProxy implements DVBJProxy, Runnable {
         }
     }
 
-    public void stop(boolean force) {
+    public void stop(boolean force, int timeout) {
         AppCommand cmd = new AppCommand(AppCommand.CMD_STOP, new Boolean(force));
         synchronized(cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
+        if (timeout > 0) {
+            if (!cmd.waitDone(timeout)) {
+                logger.error("stop() timeout: Xlet " + context.getThreadGroup().getName());
+            }
+        }
+    }
+
+    public void stop(boolean force) {
+        stop(force, -1);
     }
 
     public void pause() {
@@ -242,6 +251,8 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
                 context.closeSockets();
                 context.getThreadGroup().waitForShutdown(1000, 1 + context.numEventQueueThreads());
+
+                context.exitXlet();
 
             } catch (Throwable e) {
                 logger.error("doStop() failed: " + e + "\n" + Logger.dumpStack(e));

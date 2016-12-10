@@ -24,8 +24,11 @@ import org.videolan.Libbluray;
 import org.videolan.Logger;
 
 public class Status {
+
+    private static final Object instanceLock = new Object();
+
     public static Status getInstance() {
-        synchronized (Status.class) {
+        synchronized (instanceLock) {
             if (instance == null)
                 instance = new Status();
             return instance;
@@ -34,7 +37,7 @@ public class Status {
 
     public static void shutdown() {
         Status s;
-        synchronized (Status.class) {
+        synchronized (instanceLock) {
             s = instance;
             instance = null;
         }

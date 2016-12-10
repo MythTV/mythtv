@@ -39,8 +39,8 @@ public class ImageFrameAccurateAnimation extends FrameAccurateAnimation
     implements ImageObserver/*, java.awt.MenuContainer*/ {
     public static ImageFrameAccurateAnimation getInstance(Image[] images,
             Dimension size, AnimationParameters params, int playmode)
-            throws NullPointerException, IllegalArgumentException
-    {
+            throws NullPointerException, IllegalArgumentException {
+
         if (images == null || size == null || params == null)
             throw new NullPointerException();
         if (playmode < PLAY_REPEATING || playmode > PLAY_ONCE)
@@ -75,36 +75,31 @@ public class ImageFrameAccurateAnimation extends FrameAccurateAnimation
     }
 
     private ImageFrameAccurateAnimation(Image[] images,
-            Dimension size, AnimationParameters params, int playmode)
-    {
+            Dimension size, AnimationParameters params, int playmode) {
+
         super(params);
         this.images = ((Image[])images.clone());
         this.size = ((Dimension)size.clone());
         this.playmode = playmode;
     }
 
-    public AnimationParameters getAnimationParameters()
-    {
+    public AnimationParameters getAnimationParameters() {
         return new AnimationParameters(params);
     }
 
-    public Image[] getImages()
-    {
+    public Image[] getImages() {
         return (Image[])images.clone();
     }
 
-    public int getPlayMode()
-    {
+    public int getPlayMode() {
         return playmode;
     }
 
-    public int getPosition()
-    {
+    public int getPosition() {
         return position;
     }
 
-    public void prepareImages()
-    {
+    public void prepareImages() {
         if (prepared) {
             return;
         }
@@ -130,31 +125,27 @@ public class ImageFrameAccurateAnimation extends FrameAccurateAnimation
         prepared = true;
     }
 
-    public void setPlayMode(int mode) throws IllegalArgumentException
-    {
+    public void setPlayMode(int mode) throws IllegalArgumentException {
         if (mode < PLAY_REPEATING  || mode > PLAY_ONCE)
             throw new IllegalArgumentException();
         this.playmode = mode;
     }
 
-    public void setPosition(int position)
-    {
+    public void setPosition(int position) {
         if (position < 0 || position >= images.length)
             throw new IllegalArgumentException();
         this.position = position;
     }
 
 
-    protected void destroyImpl()
-    {
+    protected void destroyImpl() {
         stopImpl();
 
         images = null;
         scaledImages = null;
     }
 
-    protected void startImpl()
-    {
+    protected void startImpl() {
         if (!prepared) {
             prepareImages();
         }
@@ -164,16 +155,14 @@ public class ImageFrameAccurateAnimation extends FrameAccurateAnimation
         }
     }
 
-    protected void stopImpl()
-    {
+    protected void stopImpl() {
         if (animation != null) {
             animation.stop();
             animation = null;
         }
     }
 
-    public void paint(Graphics g)
-    {
+    public void paint(Graphics g) {
         if (images != null && images[position] != null) {
             if (!g.drawImage(images[position], super.getBounds().x, super.getBounds().y, this)) {
                 logger.warning("paint(" + position + ") failed");
@@ -253,7 +242,6 @@ public class ImageFrameAccurateAnimation extends FrameAccurateAnimation
             faa.running = false;
         }
     }
-
 
     public static final int PLAY_REPEATING = 1;
     public static final int PLAY_ALTERNATING = 2;

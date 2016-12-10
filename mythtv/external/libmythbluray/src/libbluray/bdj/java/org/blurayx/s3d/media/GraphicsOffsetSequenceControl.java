@@ -21,8 +21,8 @@ package org.blurayx.s3d.media;
 
 import javax.media.Control;
 
-public abstract interface GraphicsOffsetSequenceControl extends Control
-{
+public abstract interface GraphicsOffsetSequenceControl extends Control {
+
     public abstract int getSequenceId();
 
     public abstract void setSequenceId(int paramInt)

@@ -20,13 +20,11 @@
 package org.dvb.dsmcc;
 
 public class InvalidPathNameException extends DSMCCException {
-    public InvalidPathNameException()
-    {
+    public InvalidPathNameException() {
         super();
     }
 
-    public InvalidPathNameException(String reason)
-    {
+    public InvalidPathNameException(String reason) {
         super(reason);
     }
 

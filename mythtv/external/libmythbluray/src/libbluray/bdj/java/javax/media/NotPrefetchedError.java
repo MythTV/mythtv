@@ -20,8 +20,7 @@
 package javax.media;
 
 public class NotPrefetchedError extends MediaError {
-    public NotPrefetchedError(String reason)
-    {
+    public NotPrefetchedError(String reason) {
         super(reason);
     }
 

@@ -20,8 +20,7 @@
 package javax.media.protocol;
 
 public abstract class PushDataSource extends DataSource {
-    public PushDataSource()
-    {
+    public PushDataSource() {
     }
 
     public abstract PushSourceStream[] getStreams();

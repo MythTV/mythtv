@@ -37,13 +37,19 @@ import org.bluray.media.InvalidPlayListException;
 import org.bluray.net.BDLocator;
 import org.bluray.system.RegisterAccess;
 import org.bluray.ti.selection.TitleContextImpl;
+
 import org.videolan.BDJAction;
-import org.videolan.BDJActionManager;
 import org.videolan.Libbluray;
 import org.videolan.Logger;
 import org.videolan.PlaylistInfo;
 import org.videolan.TIClip;
 import org.videolan.media.content.BDHandler;
+
+import org.videolan.media.content.control.MediaTimePositionControlImpl;
+import org.videolan.media.content.control.OverallGainControlImpl;
+import org.videolan.media.content.control.PanningControlImpl;
+import org.videolan.media.content.control.PrimaryGainControlImpl;
+import org.videolan.media.content.control.SecondaryGainControlImpl;
 
 public class Handler extends BDHandler {
     public Handler() {
@@ -69,67 +75,101 @@ public class Handler extends BDHandler {
     }
 
     public void setSource(DataSource source) throws IOException, IncompatibleSourceException {
+
+        /* validate source */
+        BDLocator newLocator;
+        try {
+            newLocator = new BDLocator(source.getLocator().toExternalForm());
+        } catch (org.davic.net.InvalidLocatorException e) {
+            logger.error("incompatible source: " + source);
+            throw new IncompatibleSourceException();
+        } catch (Exception e) {
+            logger.error("unexpected expection: " + e);
+            throw new IncompatibleSourceException();
+        }
+
+        if (!newLocator.isPlayListItem()) {
+            logger.error("not playlist: " + newLocator);
+            throw new IncompatibleSourceException();
+        }
+
+        /* get playlist info */
+        PlaylistInfo newPi = Libbluray.getPlaylistInfo(newLocator.getPlayListId());
+        if (newPi == null) {
+            logger.error("getPlaylistInfo failed for " + newLocator);
+            throw new IOException();
+        }
+
+        /* commit changes and prefetch */
         synchronized (this) {
-            try {
-                locator = new BDLocator(source.getLocator().toExternalForm());
-                currentLocator = null;
-            } catch (org.davic.net.InvalidLocatorException e) {
-                throw new IncompatibleSourceException();
-            }
-            if (!locator.isPlayListItem())
-                throw new IncompatibleSourceException();
-            pi = Libbluray.getPlaylistInfo(locator.getPlayListId());
-            if (pi == null)
-                throw new IOException();
+
+            sourceLocator = newLocator;
+            currentLocator = null;
+            pi = newPi;
+
             baseMediaTime = 0;
             if (state == Prefetched)
                 doPrefetch();
         }
     }
 
+    public Locator[] getServiceContentLocators() {
+        if (sourceLocator == null)
+            return new Locator[0];
+        Locator[] locators = new Locator[1];
+        if (currentLocator != null && getState() >= Prefetched)
+            locators[0] = currentLocator;
+        else
+            locators[0] = sourceLocator;
+        return locators;
+    }
+
     public Time getDuration() {
-        long duration = pi.getDuration() ;
-        return new Time(duration * TO_SECONDS);
+        if (pi != null) {
+            long duration = pi.getDuration();
+            return new Time(duration * TO_SECONDS);
+        }
+        return DURATION_UNKNOWN;
     }
 
     protected ControllerErrorEvent doPrefetch() {
         synchronized (this) {
             try {
                 int stream;
-                stream = locator.getPrimaryAudioStreamNumber();
+                stream = sourceLocator.getPrimaryAudioStreamNumber();
                 if (stream > 0)
                     Libbluray.writePSR(Libbluray.PSR_PRIMARY_AUDIO_ID, stream);
-                stream = locator.getPGTextStreamNumber();
+                stream = sourceLocator.getPGTextStreamNumber();
                 if (stream > 0) {
                     Libbluray.writePSR(Libbluray.PSR_PG_STREAM, stream, 0x00000fff);
                 }
-                stream = locator.getSecondaryVideoStreamNumber();
+                stream = sourceLocator.getSecondaryVideoStreamNumber();
                 if (stream > 0) {
                     Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, stream << 8, 0x0000ff00);
                 }
-                stream = locator.getSecondaryAudioStreamNumber();
+                stream = sourceLocator.getSecondaryAudioStreamNumber();
                 if (stream > 0) {
                     Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, stream, 0x000000ff);
                 }
 
-                int pl = locator.getPlayListId();
+                int plId = sourceLocator.getPlayListId();
                 long time = -1;
-                int pi = -1, mark = -1;
+                int piId = -1, mark = -1;
                 if (baseMediaTime != 0) {
                     time = (long)(baseMediaTime * FROM_NAROSECONDS);
-                } /*else*/ if (locator.getMarkId() > 0) {
-                    mark = locator.getMarkId();
-                } /*else*/ if (locator.getPlayItemId() > 0) {
-                    pi = locator.getPlayItemId();
+                } /*else*/ if (sourceLocator.getMarkId() > 0) {
+                    mark = sourceLocator.getMarkId();
+                } /*else*/ if (sourceLocator.getPlayItemId() > 0) {
+                    piId = sourceLocator.getPlayItemId();
                 }
 
-                if (!Libbluray.selectPlaylist(pl, pi, mark, time)) {
+                if (!Libbluray.selectPlaylist(plId, piId, mark, time)) {
                     return new ConnectionErrorEvent(this);
                 }
 
                 updateTime(new Time(Libbluray.tellTime() * TO_SECONDS));
 
-                currentLocator = new BDLocator(locator.toExternalForm());
+                currentLocator = new BDLocator(sourceLocator.toExternalForm());
             } catch (Exception e) {
                 return new ConnectionErrorEvent(this);
             }
@@ -158,9 +198,12 @@ public class Handler extends BDHandler {
         }
     }
 
-    protected ControllerErrorEvent doStop() {
+    protected ControllerErrorEvent doStop(boolean eof) {
         Libbluray.selectRate(0.0f, false);
-        return super.doStop();
+        if (!eof) {
+            Libbluray.stopPlaylist();
+        }
+        return super.doStop(eof);
     }
 
     protected void doSeekTime(Time at) {
@@ -267,14 +310,14 @@ public class Handler extends BDHandler {
 
     protected void doAudioStreamChanged(int param) {
         if (currentLocator != null) {
-            locator.setPrimaryAudioStreamNumber(param);
+            currentLocator.setPrimaryAudioStreamNumber(param);
             postMediaSelectSucceeded(currentLocator);
         }
     }
 
     private void doSecondaryVideoChanged(int stream, boolean enable) {
         if (currentLocator != null) {
-            locator.setSecondaryVideoStreamNumber(stream);
+            currentLocator.setSecondaryVideoStreamNumber(stream);
             postMediaSelectSucceeded(currentLocator);
         }
 
@@ -283,7 +326,7 @@ public class Handler extends BDHandler {
 
     private void doSecondaryAudioChanged(int stream, boolean enable) {
         if (currentLocator != null) {
-            locator.setSecondaryAudioStreamNumber(stream);
+            currentLocator.setSecondaryAudioStreamNumber(stream);
             postMediaSelectSucceeded(currentLocator);
         }
     }
@@ -295,12 +338,12 @@ public class Handler extends BDHandler {
 
     protected void doEndOfMediaReached(int playlist) {
         synchronized (this) {
-            if (locator == null) {
-                System.err.println("endOfMedia(" + playlist + ") ignored: no current locator");
+            if (currentLocator == null) {
+                logger.error("endOfMedia(" + playlist + ") ignored: no current locator");
                 return;
             }
-            if (locator.getPlayListId() != playlist) {
-                System.err.println("endOfMedia ignored: playlist does not match (" + playlist + " != " + locator.getPlayListId());
+            if (currentLocator.getPlayListId() != playlist) {
+                logger.error("endOfMedia ignored: playlist does not match (" + playlist + " != " + currentLocator.getPlayListId());
                 return;
             }
         }
@@ -308,8 +351,15 @@ public class Handler extends BDHandler {
         super.doEndOfMediaReached(playlist);
     }
 
-    protected BDLocator getLocator() {
-        return locator;
+    protected void doSeekNotify(long tick) {
+        super.doSeekNotify(Libbluray.tellTime());
+    }
+
+    /* used by DVBMediaSelectControlImpl */
+    protected BDLocator getCurrentLocator() {
+        if (currentLocator != null)
+            return currentLocator;
+        return sourceLocator;
     }
 
     protected PlaylistInfo getPlaylistInfo() {
@@ -332,16 +382,32 @@ public class Handler extends BDHandler {
 
     protected void selectPlayList(BDLocator locator)
             throws InvalidPlayListException, InvalidLocatorException, ClockStartedError {
+
+        if (locator == null) {
+            logger.error("null locator");
+            throw new NullPointerException();
+        }
+        if (!locator.isPlayListItem()) {
+            logger.error("not playlist: " + locator);
+            throw new InvalidLocatorException(locator);
+        }
+
+        PlaylistInfo newPi = Libbluray.getPlaylistInfo(locator.getPlayListId());
+        if (newPi == null) {
+            logger.error("invalid playlist");
+            throw new InvalidPlayListException();
+        }
+
         synchronized (this) {
-            if (getState() == Started)
+            if (getState() == Started) {
+                logger.error("throw ClockStartedError");
                 throw new ClockStartedError();
-            if (!locator.isPlayListItem())
-                throw new InvalidLocatorException(locator);
-            pi = Libbluray.getPlaylistInfo(locator.getPlayListId());
-            if (pi == null)
-                throw new InvalidPlayListException();
-            this.locator = locator;
+            }
+
+            this.pi = newPi;
+            this.sourceLocator = locator;
             this.currentLocator = null;
+
             baseMediaTime = 0;
             if (state == Prefetched)
                 doPrefetch();
@@ -379,18 +445,18 @@ public class Handler extends BDHandler {
                 if ((player.getState() == Prefetched) || (player.getState() == Started)) {
                     Libbluray.seekMark(param);
                     player.updateTime(new Time(Libbluray.tellTime() * TO_SECONDS));
-                } else if (player.locator != null) {
-                    player.locator.setMarkId(param);
-                    player.locator.setPlayItemId(-1);
+                } else if (player.sourceLocator != null) {
+                    player.sourceLocator.setMarkId(param);
+                    player.sourceLocator.setPlayItemId(-1);
                 }
                 break;
             case ACTION_SEEK_PLAYITEM:
                 if ((player.getState() == Prefetched) || (player.getState() == Started)) {
                     Libbluray.seekPlayItem(param);
                     player.updateTime(new Time(Libbluray.tellTime() * TO_SECONDS));
-                } else if (player.locator != null) {
-                    player.locator.setMarkId(-1);
-                    player.locator.setPlayItemId(param);
+                } else if (player.sourceLocator != null) {
+                    player.sourceLocator.setMarkId(-1);
+                    player.sourceLocator.setPlayItemId(param);
                 }
                 break;
             }
@@ -406,4 +472,7 @@ public class Handler extends BDHandler {
 
     private PlaylistInfo pi = null;
     private BDLocator currentLocator = null;
+    private BDLocator sourceLocator = null;
+
+    private static final Logger logger = Logger.getLogger(Handler.class.getName());
 }

@@ -20,13 +20,11 @@
 package javax.media;
 
 public class NoPlayerException extends MediaException {
-    public NoPlayerException()
-    {
+    public NoPlayerException() {
         super();
     }
 
-    public NoPlayerException(String reason)
-    {
+    public NoPlayerException(String reason) {
         super(reason);
     }
 

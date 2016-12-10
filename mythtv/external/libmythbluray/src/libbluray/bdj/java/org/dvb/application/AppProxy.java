@@ -43,5 +43,4 @@ public interface AppProxy {
 
     public void removeAppStateChangeEventListener(
             AppStateChangeEventListener listener);
-
 }

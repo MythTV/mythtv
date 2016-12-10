@@ -52,6 +52,12 @@ public class TitleImpl implements Title {
     }
 
     public String getName() {
+        if (titleNum == 0)
+            return "Top Menu";
+        if (titleNum == 65535)
+            return "First Playback";
+        if (titleNum == 65534)
+            return "Suspended Title";
         return "Title " + titleNum;
     }
 
@@ -67,6 +73,15 @@ public class TitleImpl implements Title {
             return TitleType.BDJ_INTERACTIVE;
         }
         return TitleType.UNKNOWN;
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TitleImpl)) {
+            return false;
+        }
+        TitleImpl other = (TitleImpl)obj;
+        int otherNum = other.getTitleNum();
+        return otherNum == titleNum;
     }
 
     public boolean hasMultipleInstances() {

@@ -22,25 +22,22 @@ package org.bluray.media;
 import java.util.EventObject;
 
 public class PanningChangeEvent extends EventObject {
-    public PanningChangeEvent(PanningControl source, float balance, float fade)
-    {
+    public PanningChangeEvent(PanningControl source, float balance, float fade) {
         super(source);
 
         this.balance = balance;
         this.fade = fade;
     }
 
-    public float getFrontRear()
-    {
+    public float getFrontRear() {
         return fade;
     }
 
-    public float getLeftRight()
-    {
+    public float getLeftRight() {
         return balance;
     }
 
-    private float balance;
-    private float fade;
+    private final float balance;
+    private final float fade;
     private static final long serialVersionUID = 75180748900043421L;
 }

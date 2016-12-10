@@ -44,19 +44,15 @@ public class LocatorImpl implements Locator {
     }
 
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
+        if (!(obj instanceof Locator))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        LocatorImpl other = (LocatorImpl) obj;
-        if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
-            return false;
-        return true;
+
+        Locator other = (Locator) obj;
+        String extForm = toExternalForm();
+        if (extForm == null) {
+            return other.toExternalForm() == null;
+        }
+        return extForm.equals(other.toExternalForm());
     }
 
     private String url;

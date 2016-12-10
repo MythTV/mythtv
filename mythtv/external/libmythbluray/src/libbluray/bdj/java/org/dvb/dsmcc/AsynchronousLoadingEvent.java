@@ -22,13 +22,11 @@ package org.dvb.dsmcc;
 import java.util.EventObject;
 
 public abstract class AsynchronousLoadingEvent extends EventObject {
-    public AsynchronousLoadingEvent(DSMCCObject source)
-    {
+    public AsynchronousLoadingEvent(DSMCCObject source) {
         super(source);
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return super.getSource();
     }
 

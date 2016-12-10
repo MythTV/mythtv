@@ -21,21 +21,18 @@
 package org.dvb.dsmcc;
 
 public class NPTRateChangeEvent extends java.util.EventObject {
-    public NPTRateChangeEvent(DSMCCStream source, NPTRate rate)
-    {
+    public NPTRateChangeEvent(DSMCCStream source, NPTRate rate) {
         super(source);
 
         this.source = source;
         this.rate = rate;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 
-    public NPTRate getRate()
-    {
+    public NPTRate getRate() {
         return rate;
     }
 

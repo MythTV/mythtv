@@ -22,18 +22,9 @@ package org.havi.ui.event;
 import org.davic.resources.ResourceStatusEvent;
 
 public class HScreenDeviceReleasedEvent extends ResourceStatusEvent {
-    public HScreenDeviceReleasedEvent(Object source)
-    {
+    public HScreenDeviceReleasedEvent(Object source) {
         super(source);
-
-        this.source = source;
     }
 
-    public Object getSource()
-    {
-        return source;
-    }
-
-    private Object source;
     private static final long serialVersionUID = -5310071769898889888L;
 }

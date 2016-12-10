@@ -25,272 +25,243 @@ import org.havi.ui.event.HFocusListener;
 import org.havi.ui.event.HItemEvent;
 
 public class HListGroup extends HVisible implements HItemValue {
-    public HListGroup()
-    {
+    public HListGroup() {
         org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public HListGroup(HListElement[] items)
-    {
+    public HListGroup(HListElement[] items) {
         org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public HListGroup(HListElement[] items, int x, int y, int width, int height)
-    {
+    public HListGroup(HListElement[] items, int x, int y, int width, int height) {
         org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void setLook(HLook hlook) throws HInvalidLookException
-    {
-        throw new Error("Not implemented");
+    public void setLook(HLook hlook) throws HInvalidLookException {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public static void setDefaultLook(HListGroupLook look)
-    {
+    public static void setDefaultLook(HListGroupLook look) {
         DefaultLook = look;
     }
 
-    public static HListGroupLook getDefaultLook()
-    {
+    public static HListGroupLook getDefaultLook() {
         if (DefaultLook == null)
             org.videolan.Logger.unimplemented("", "getDefaultLook");
         return DefaultLook;
     }
 
-    public HListElement[] getListContent()
-    {
-        throw new Error("Not implemented");
+    public HListElement[] getListContent() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public void setListContent(HListElement[] elements)
-    {
-        throw new Error("Not implemented");
+    public void setListContent(HListElement[] elements) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void addItem(HListElement item, int index)
-    {
-        throw new Error("Not implemented");
+    public void addItem(HListElement item, int index) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void addItems(HListElement[] items, int index)
-    {
-        throw new Error("Not implemented");
+    public void addItems(HListElement[] items, int index)  {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public HListElement getItem(int index)
-    {
-        throw new Error("Not implemented");
+    public HListElement getItem(int index) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public int getIndex(HListElement item)
-    {
-        throw new Error("Not implemented");
+    public int getIndex(HListElement item) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return 0;
     }
 
-    public int getNumItems()
-    {
-        throw new Error("Not implemented");
+    public int getNumItems() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return 0;
     }
 
-    public HListElement removeItem(int index)
-    {
-        throw new Error("Not implemented");
+    public HListElement removeItem(int index) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public void removeAllItems()
-    {
-        throw new Error("Not implemented");
+    public void removeAllItems() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public int getCurrentIndex()
-    {
-        throw new Error("Not implemented");
+    public int getCurrentIndex() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return 0;
     }
 
-    public HListElement getCurrentItem()
-    {
-        throw new Error("Not implemented");
+    public HListElement getCurrentItem() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public boolean setCurrentItem(int index)
-    {
-        throw new Error("Not implemented");
+    public boolean setCurrentItem(int index) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return false;
     }
 
-    public int[] getSelectionIndices()
-    {
-        throw new Error("Not implemented");
+    public int[] getSelectionIndices() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public HListElement[] getSelection()
-    {
-        throw new Error("Not implemented");
+    public HListElement[] getSelection() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public void clearSelection()
-    {
-        throw new Error("Not implemented");
+    public void clearSelection() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public int getNumSelected()
-    {
-        throw new Error("Not implemented");
+    public int getNumSelected() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return 0;
     }
 
-    public boolean getMultiSelection()
-    {
-        throw new Error("Not implemented");
+    public boolean getMultiSelection() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return false;
     }
 
-    public void setMultiSelection(boolean multi)
-    {
-        throw new Error("Not implemented");
+    public void setMultiSelection(boolean multi) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void setItemSelected(int index, boolean sel)
-    {
-        throw new Error("Not implemented");
+    public void setItemSelected(int index, boolean sel) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public boolean isItemSelected(int index)
-    {
-        throw new Error("Not implemented");
+    public boolean isItemSelected(int index) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return false;
     }
 
-    public int getScrollPosition()
-    {
-        throw new Error("Not implemented");
+    public int getScrollPosition() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return 0;
     }
 
-    public void setScrollPosition(int scroll)
-    {
-        throw new Error("Not implemented");
+    public void setScrollPosition(int scroll) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public Dimension getIconSize()
-    {
-        throw new Error("Not implemented");
+    public Dimension getIconSize() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public void setIconSize(Dimension size)
-    {
-        throw new Error("Not implemented");
+    public void setIconSize(Dimension size) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public Dimension getLabelSize()
-    {
-        throw new Error("Not implemented");
+    public Dimension getLabelSize() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public void setLabelSize(Dimension size)
-    {
-        throw new Error("Not implemented");
+    public void setLabelSize(Dimension size) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void setMove(int keyCode, HNavigable target)
-    {
-        throw new Error("Not implemented");
+    public void setMove(int keyCode, HNavigable target) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public HNavigable getMove(int keyCode)
-    {
-        throw new Error("Not implemented");
+    public HNavigable getMove(int keyCode) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
     public void setFocusTraversal(HNavigable up, HNavigable down,
-            HNavigable left, HNavigable right)
-    {
-        throw new Error("Not implemented");
+            HNavigable left, HNavigable right) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public boolean isSelected()
-    {
-        throw new Error("Not implemented");
+    public boolean isSelected() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return false;
     }
 
-    public void setGainFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setGainFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void setLoseFocusSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setLoseFocusSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public HSound getGainFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getGainFocusSound() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public HSound getLoseFocusSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getLoseFocusSound() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public void addHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void addHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void removeHFocusListener(HFocusListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeHFocusListener(HFocusListener l) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public int[] getNavigationKeys()
-    {
-        throw new Error("Not implemented");
+    public int[] getNavigationKeys() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public void processHFocusEvent(HFocusEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHFocusEvent(HFocusEvent evt) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public int getOrientation()
-    {
-        throw new Error("Not implemented");
+    public int getOrientation() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return 0;
     }
 
-    public void setOrientation(int orient)
-    {
-        throw new Error("Not implemented");
+    public void setOrientation(int orient) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void addItemListener(org.havi.ui.event.HItemListener l)
-    {
-        throw new Error("Not implemented");
+    public void addItemListener(org.havi.ui.event.HItemListener l) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void removeItemListener(org.havi.ui.event.HItemListener l)
-    {
-        throw new Error("Not implemented");
+    public void removeItemListener(org.havi.ui.event.HItemListener l) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void setSelectionSound(HSound sound)
-    {
-        throw new Error("Not implemented");
+    public void setSelectionSound(HSound sound) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public HSound getSelectionSound()
-    {
-        throw new Error("Not implemented");
+    public HSound getSelectionSound() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return null;
     }
 
-    public boolean getSelectionMode()
-    {
-        throw new Error("Not implemented");
+    public boolean getSelectionMode() {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
+        return false;
     }
 
-    public void setSelectionMode(boolean edit)
-    {
-        throw new Error("Not implemented");
+    public void setSelectionMode(boolean edit) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
-    public void processHItemEvent(HItemEvent evt)
-    {
-        throw new Error("Not implemented");
+    public void processHItemEvent(HItemEvent evt) {
+        org.videolan.Logger.unimplemented(HListGroup.class.getName(), "");
     }
 
     public static final int ITEM_NOT_FOUND = -1;

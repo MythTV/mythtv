@@ -20,45 +20,38 @@
 package javax.media.protocol;
 
 public class RateRange {
-    public RateRange(RateRange r)
-    {
+    public RateRange(RateRange r) {
         this.current = r.current;
         this.min = r.min;
         this.max = r.max;
         this.isExact = r.isExact;
     }
 
-    public RateRange(float init, float min, float max, boolean isExact)
-    {
+    public RateRange(float init, float min, float max, boolean isExact) {
         this.current = init;
         this.min = min;
         this.max = max;
         this.isExact = isExact;
     }
 
-    public float setCurrentRate(float rate)
-    {
+    public float setCurrentRate(float rate) {
         this.current = rate;
         return current;
     }
 
-    public float getCurrentRate()
-    {
+    public float getCurrentRate() {
         return current;
     }
 
-    public float getMinimumRate()
-    {
+    public float getMinimumRate() {
         return min;
     }
 
-    public float getMaximumRate()
-    {
+    public float getMaximumRate() {
         return max;
     }
 
-    public boolean isExact()
-    {
+    public boolean isExact() {
         return isExact;
     }
 

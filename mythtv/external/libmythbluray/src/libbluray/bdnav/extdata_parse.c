@@ -37,7 +37,9 @@ int bdmv_parse_extension_data(BITSTREAM *bits,
     if (start_address < 1) return 0;
     if (start_address > bits->end - 12) return 0;
 
-    bs_seek_byte(bits, start_address);
+    if (bs_seek_byte(bits, start_address) < 0) {
+        return 0;
+    }
 
     length      = bs_read(bits, 32); /* length of extension data block */
     if (length < 1) return 0;
@@ -57,11 +59,13 @@ int bdmv_parse_extension_data(BITSTREAM *bits,
 
         if (ext_start + start_address + ext_len > bits->end) return 0;
 
-        bs_seek_byte(bits, start_address + ext_start);
+        if (bs_seek_byte(bits, start_address + ext_start) >= 0) {
+            (handler)(bits, id1, id2, handle);
+        }
 
-        (handler)(bits, id1, id2, handle);
-
-        bs_seek_byte(bits, saved_pos);
+        if (bs_seek_byte(bits, saved_pos) < 0) {
+            return 0;
+        }
     }
 
     return 1;

@@ -20,17 +20,21 @@
 package javax.tv.service.selection;
 
 public class SelectionFailedEvent extends ServiceContextEvent {
-    public SelectionFailedEvent(ServiceContext context, int reason)
-    {
+    public SelectionFailedEvent(ServiceContext context, int reason) {
         super(context);
 
         this.reason = reason;
     }
 
-    public int getReason()
-    {
+    public int getReason() {
         return reason;
     }
+
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",reason=" + reason + "]";
+    }
+
+    private final int reason;
 
     public static final int INTERRUPTED = 1;
     public static final int CA_REFUSAL = 2;
@@ -40,6 +44,5 @@ public class SelectionFailedEvent extends ServiceContextEvent {
     public static final int INSUFFICIENT_RESOURCES = 6;
     public static final int OTHER = 255;
 
-    private int reason;
     private static final long serialVersionUID = 3991728273494160910L;
 }

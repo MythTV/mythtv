@@ -23,83 +23,76 @@ import java.awt.Dimension;
 import java.awt.Insets;
 
 public class HMultilineEntryLook extends HSinglelineEntryLook {
-    public HMultilineEntryLook()
-    {
+    public HMultilineEntryLook() {
         org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
     }
 
-    public void fillBackground(java.awt.Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void fillBackground(java.awt.Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
     }
 
-    public void renderBorders(java.awt.Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void renderBorders(java.awt.Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
     }
 
-    public void renderVisible(java.awt.Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void renderVisible(java.awt.Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
     }
 
-    public void showLook(java.awt.Graphics g, HVisible visible, int state)
-    {
-        throw new Error("Not implemented");
+    public void showLook(java.awt.Graphics g, HVisible visible, int state) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
     }
 
-    public void widgetChanged(HVisible visible, HChangeData[] changes)
-    {
-        throw new Error("Not implemented");
+    public void widgetChanged(HVisible visible, HChangeData[] changes) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
     }
 
-    public Dimension getMinimumSize(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getMinimumSize(HVisible hvisible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return null;
     }
 
-    public Dimension getPreferredSize(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getPreferredSize(HVisible hvisible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return null;
     }
 
-    public Dimension getMaximumSize(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Dimension getMaximumSize(HVisible hvisible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return null;
     }
 
-    public boolean isOpaque(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public boolean isOpaque(HVisible visible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return false;
     }
 
-    public Insets getInsets(HVisible hvisible)
-    {
-        throw new Error("Not implemented");
+    public Insets getInsets(HVisible hvisible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return null;
     }
 
-    public int getCaretPositionNextLine(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public int getCaretPositionNextLine(HVisible visible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return 0;
     }
 
-    public int getCaretPositionPreviousLine(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public int getCaretPositionPreviousLine(HVisible visible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return 0;
     }
 
-    public int getCaretCharPositionForLine(HVisible visible, int line)
-    {
-        throw new Error("Not implemented");
+    public int getCaretCharPositionForLine(HVisible visible, int line) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return 0;
     }
 
-    public int[] getVisibleSoftLineBreakPositions(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public int[] getVisibleSoftLineBreakPositions(HVisible visible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return null;
     }
-
-    public int[] getSoftLineBreakPositions(HVisible visible)
-    {
-        throw new Error("Not implemented");
+    public int[] getSoftLineBreakPositions(HVisible visible) {
+        org.videolan.Logger.unimplemented(HMultilineEntryLook.class.getName(), "");
+        return null;
     }
 }

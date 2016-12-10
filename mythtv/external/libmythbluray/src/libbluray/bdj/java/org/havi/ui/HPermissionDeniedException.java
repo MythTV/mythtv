@@ -20,13 +20,11 @@
 package org.havi.ui;
 
 public class HPermissionDeniedException extends Exception {
-    public HPermissionDeniedException()
-    {
+    public HPermissionDeniedException() {
         super();
     }
 
-    public HPermissionDeniedException(String reason)
-    {
+    public HPermissionDeniedException(String reason) {
         super(reason);
     }
 

@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2016  Petri Hintukainen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,33 +23,31 @@ package org.havi.ui;
 import java.awt.Image;
 
 public class HListElement {
-    public HListElement(String label)
-    {
-        org.videolan.Logger.unimplemented(HListElement.class.getName(), "");
+    public HListElement(String label) {
+        this.label = label;
     }
 
-    public HListElement(Image icon, String label)
-    {
-        org.videolan.Logger.unimplemented(HListElement.class.getName(), "");
+    public HListElement(Image icon, String label) {
+        this.label = label;
+        this.icon = icon;
     }
 
-    public String getLabel()
-    {
-        throw new Error("Not implemented");
+    public String getLabel() {
+        return label;
     }
 
-    public Image getIcon()
-    {
-        throw new Error("Not implemented");
+    public Image getIcon() {
+        return icon;
     }
 
-    public void setLabel(String label)
-    {
-        throw new Error("Not implemented");
+    public void setLabel(String label) {
+        this.label = label;
     }
 
-    public void setIcon(Image icon)
-    {
-        throw new Error("Not implemented");
+    public void setIcon(Image icon) {
+        this.icon = icon;
     }
+
+    private Image icon = null;
+    private String label = null;
 }

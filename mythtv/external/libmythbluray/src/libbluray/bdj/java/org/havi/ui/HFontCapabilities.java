@@ -22,19 +22,16 @@ package org.havi.ui;
 import java.awt.Font;
 
 public class HFontCapabilities {
-    protected HFontCapabilities()
-    {
+    protected HFontCapabilities() {
         org.videolan.Logger.unimplemented(null, "HFontCapabilities");
     }
 
-    public static int[] getSupportedCharacterRanges(Font font)
-    {
+    public static int[] getSupportedCharacterRanges(Font font) {
         org.videolan.Logger.unimplemented("HFontCapabilities", "getSupportedCharacterRanges");
         return null;
     }
 
-    public static boolean isCharAvailable(Font font, char c)
-    {
+    public static boolean isCharAvailable(Font font, char c) {
         org.videolan.Logger.unimplemented("HFontCapabilities", "isCharAvailable");
         return true;
     }

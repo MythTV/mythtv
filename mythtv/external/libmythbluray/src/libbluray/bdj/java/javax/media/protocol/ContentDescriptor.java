@@ -22,18 +22,15 @@ package javax.media.protocol;
 import java.lang.Character;
 
 public class ContentDescriptor {
-    public ContentDescriptor(String cdName)
-    {
+    public ContentDescriptor(String cdName) {
         this.cdName = cdName;
     }
 
-    public String getContentType()
-    {
+    public String getContentType() {
         return cdName;
     }
 
-    public static final String mimeTypeToPackageName(String mimeType)
-    {
+    public static final String mimeTypeToPackageName(String mimeType) {
         char[] name = mimeType.toLowerCase().toCharArray();
         for (int i = 0; i < name.length; i++) {
             char c = name[i];

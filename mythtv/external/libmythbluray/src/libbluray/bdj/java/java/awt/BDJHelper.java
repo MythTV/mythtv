@@ -68,6 +68,14 @@ public class BDJHelper {
         }
     }
 
+    public static boolean postMouseEvent(int x, int y) {
+        return false;
+    }
+
+    public static boolean postMouseEvent(int button) {
+        return false;
+    }
+
     public static boolean postKeyEvent(int id, int modifiers, int keyCode) {
         Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getGlobalFocusOwner();
         if (focusOwner != null) {

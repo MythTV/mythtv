@@ -20,18 +20,21 @@
 package javax.media;
 
 public class StopTimeChangeEvent extends ControllerEvent {
-    public StopTimeChangeEvent(Controller from, Time stopTime)
-    {
+    public StopTimeChangeEvent(Controller from, Time stopTime) {
         super(from);
 
         this.stopTime = stopTime;
     }
 
-    public Time getStopTime()
-    {
+    public Time getStopTime() {
         return stopTime;
     }
 
-    private Time stopTime;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",stopTime=" + stopTime + "]";
+    }
+
+    private final Time stopTime;
+
     private static final long serialVersionUID = -3236645692389122978L;
 }

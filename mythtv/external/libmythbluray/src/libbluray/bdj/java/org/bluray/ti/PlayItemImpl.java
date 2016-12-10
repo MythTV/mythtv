@@ -33,36 +33,39 @@ import org.videolan.StreamInfo;
 import org.videolan.TIClip;
 
 public class PlayItemImpl implements PlayItem {
-    protected PlayItemImpl(int playlistId, int playitemId, TIClip clip, Title service)
-    {
+    protected PlayItemImpl(int playlistId, int playitemId, TIClip clip, Title service) {
         this.playlistId = playlistId;
         this.playitemId = playitemId;
         this.clip = clip;
         this.service = service;
     }
 
-    public Locator getLocator()
-    {
+    public int getPlayItemId() {
+        return playitemId;
+    }
+
+    public int getPlayListId() {
+        return playlistId;
+    }
+
+    public Locator getLocator() {
         int title = Libbluray.getCurrentTitle();
         try {
-            return new BDLocator("bd://" + title + ".PLAYLIST:" + playlistId + ".ITEM:" + playitemId);
+            return new BDLocator("bd://" + Integer.toHexString(title) + ".PLAYLIST:" + playlistId + ".ITEM:" + playitemId);
         } catch (InvalidLocatorException e) {
             return null;
         }
     }
 
-    public ServiceInformationType getServiceInformationType()
-    {
+    public ServiceInformationType getServiceInformationType() {
         return TitleInformationType.BD_ROM;
     }
 
-    public Date getUpdateTime()
-    {
+    public Date getUpdateTime() {
         return null;
     }
 
-    public ServiceComponent[] getComponents()
-    {
+    public ServiceComponent[] getComponents() {
         StreamInfo[] video = clip.getVideoStreams();
         StreamInfo[] audio = clip.getVideoStreams();
         StreamInfo[] pg = clip.getVideoStreams();
@@ -92,8 +95,8 @@ public class PlayItemImpl implements PlayItem {
         return components;
     }
 
-    int playlistId;
-    int playitemId;
-    TIClip clip;
-    Title service;
+    private int playlistId;
+    private int playitemId;
+    private TIClip clip;
+    private Title service;
 }

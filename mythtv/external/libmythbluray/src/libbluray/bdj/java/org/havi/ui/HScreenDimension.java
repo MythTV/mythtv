@@ -20,14 +20,15 @@
 package org.havi.ui;
 
 public class HScreenDimension {
-    public HScreenDimension(float width, float height)
-    {
-        this.width = width;
-        this.height = height;
+    public HScreenDimension(float width, float height) {
+        setSize(width, height);
     }
 
-    public void setSize(float width, float height)
-    {
+    public void setSize(float width, float height) {
+        if (width < 0.0f)
+            width = 0.0f;
+        if (height < 0.0f)
+            height = 0.0f;
         this.width = width;
         this.height = height;
     }

@@ -20,13 +20,11 @@
 package javax.media;
 
 public class IncompatibleTimeBaseException extends MediaException {
-    public IncompatibleTimeBaseException()
-    {
+    public IncompatibleTimeBaseException() {
         super();
     }
 
-    public IncompatibleTimeBaseException(String reason)
-    {
+    public IncompatibleTimeBaseException(String reason) {
         super(reason);
     }
 

@@ -510,8 +510,8 @@ public class IxcRegistryImpl {
     }
 
     public void unbindAll(XletContext xc) {
-
-        if (null != BDJXletContext.getCurrentContext()) {
+        XletContext requestor = BDJXletContext.getCurrentContext();
+        if (requestor != null && requestor != xc) {
             logger.error("unbindAll(ctx) from wrong thread: " + Logger.dumpStack());
             return;
         }

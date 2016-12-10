@@ -24,73 +24,60 @@ import org.davic.net.Locator;
 
 public class DSMCCStream implements Serializable {
     public DSMCCStream(DSMCCObject aDSMCCObject) throws NotLoadedException,
-            IllegalObjectTypeException
-    {
+            IllegalObjectTypeException {
         org.videolan.Logger.unimplemented(DSMCCStream.class.getName(), "");
         throw new Error("Not implemented");
     }
 
     public DSMCCStream(String path) throws IOException,
-            IllegalObjectTypeException
-    {
+            IllegalObjectTypeException {
         org.videolan.Logger.unimplemented(DSMCCStream.class.getName(), "");
         throw new Error("Not implemented");
     }
 
     public DSMCCStream(String path, String name) throws IOException,
-            IllegalObjectTypeException
-    {
+            IllegalObjectTypeException {
         org.videolan.Logger.unimplemented(DSMCCStream.class.getName(), "");
         throw new Error("Not implemented");
     }
 
-    public long getDuration()
-    {
+    public long getDuration() {
         throw new Error("Not implemented");
     }
 
-    public long getNPT() throws MPEGDeliveryException
-    {
+    public long getNPT() throws MPEGDeliveryException {
         throw new Error("Not implemented");
     }
 
-    public Locator getStreamLocator()
-    {
+    public Locator getStreamLocator() {
         throw new Error("Not implemented");
     }
 
-    public boolean isMPEGProgram()
-    {
+    public boolean isMPEGProgram() {
         throw new Error("Not implemented");
     }
 
-    public boolean isAudio()
-    {
+    public boolean isAudio() {
         throw new Error("Not implemented");
     }
 
-    public boolean isVideo()
-    {
+    public boolean isVideo() {
         throw new Error("Not implemented");
     }
 
-    public boolean isData()
-    {
+    public boolean isData() {
         throw new Error("Not implemented");
     }
 
-    public NPTRate getNPTRate() throws MPEGDeliveryException
-    {
+    public NPTRate getNPTRate() throws MPEGDeliveryException {
         throw new Error("Not implemented");
     }
 
-    public void addNPTListener(NPTListener listener)
-    {
+    public void addNPTListener(NPTListener listener) {
         throw new Error("Not implemented");
     }
 
-    public void removeNPTListener(NPTListener listener)
-    {
+    public void removeNPTListener(NPTListener listener) {
         throw new Error("Not implemented");
     }
 

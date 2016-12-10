@@ -27,58 +27,58 @@ import org.videolan.Logger;
 public class VFSManager {
 
     private static VFSManager instance = null;
+    private static final Object instanceLock = new Object();
 
     public static VFSManager getInstance() throws SecurityException,
-            UnsupportedOperationException
-    {
-        if (instance == null) {
-            instance = new VFSManager();
-        }
+            UnsupportedOperationException {
 
-        return instance;
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null)
+            sm.checkPermission(new VFSPermission("*"));
+
+        synchronized (instanceLock) {
+            if (instance == null) {
+                instance = new VFSManager();
+            }
+            return instance;
+        }
     }
 
-    protected VFSManager()
-    {
+    protected VFSManager() {
         state = STABLE;
     }
 
-    public boolean disableClip(String streamfile)
-    {
+    public boolean disableClip(String streamfile) {
         logger.unimplemented("disableClip");
         return true;
     }
 
-    public boolean enableClip(String streamfile)
-    {
+    public boolean enableClip(String streamfile) {
         logger.unimplemented("enableClip");
         return true;
     }
 
-    public String[] getDisabledClipIDs()
-    {
+    public String[] getDisabledClipIDs() {
         logger.unimplemented("getDisabledClipIDs");
         return new String[]{};
     }
 
-    public int getState()
-    {
+    public int getState() {
         return state;
     }
 
-    public boolean isEnabledClip(String clipID)
-    {
+    public boolean isEnabledClip(String clipID) {
         logger.unimplemented("isEnabledClip");
         return true;
     }
 
     public void requestUpdating(String manifestfile, String signaturefile,
-            boolean initBackupRegs) throws PreparingFailedException
-    {
+            boolean initBackupRegs) throws PreparingFailedException {
         state = PREPARING;
 
         BUMFAsset[] assets = BUMFParser.parse(manifestfile);
         if (assets == null) {
+            logger.error("manifest parsing failed");
             state = STABLE;
             throw new PreparingFailedException();
         }

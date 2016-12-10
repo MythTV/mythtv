@@ -20,15 +20,13 @@
 package org.dvb.dsmcc;
 
 public class ServerDeliveryErrorEvent extends AsynchronousLoadingEvent {
-    public ServerDeliveryErrorEvent(DSMCCObject source)
-    {
+    public ServerDeliveryErrorEvent(DSMCCObject source) {
         super(source);
 
         this.source = source;
     }
 
-    public java.lang.Object getSource()
-    {
+    public java.lang.Object getSource() {
         return source;
     }
 

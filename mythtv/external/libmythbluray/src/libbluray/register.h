@@ -159,7 +159,7 @@ int bd_psr_write(BD_REGISTERS *, int reg, uint32_t val);
  * @param mask  bit mask. bits to be written are set to 1.
  * @return 0 on success, -1 on error (invalid register number)
  */
-int bd_psr_write_bits(BD_REGISTERS *, int reg, uint32_t val, uint32_t mask);
+BD_PRIVATE int bd_psr_write_bits(BD_REGISTERS *, int reg, uint32_t val, uint32_t mask);
 
 /**
  *
@@ -172,7 +172,7 @@ int bd_psr_write_bits(BD_REGISTERS *, int reg, uint32_t val, uint32_t mask);
  * @param val  new value for register
  * @return 0 on success, -1 on error (invalid register number)
  */
-int bd_psr_setting_write(BD_REGISTERS *, int reg, uint32_t val);
+BD_PRIVATE int bd_psr_setting_write(BD_REGISTERS *, int reg, uint32_t val);
 
 /**
  *
@@ -180,7 +180,7 @@ int bd_psr_setting_write(BD_REGISTERS *, int reg, uint32_t val);
  *
  * @param registers  BD_REGISTERS object
  */
-void bd_psr_lock(BD_REGISTERS *);
+BD_PRIVATE void bd_psr_lock(BD_REGISTERS *);
 
 /**
  *
@@ -188,7 +188,7 @@ void bd_psr_lock(BD_REGISTERS *);
  *
  * @param registers  BD_REGISTERS object
  */
-void bd_psr_unlock(BD_REGISTERS *);
+BD_PRIVATE void bd_psr_unlock(BD_REGISTERS *);
 
 /**
  *
@@ -198,7 +198,7 @@ void bd_psr_unlock(BD_REGISTERS *);
  *
  * @param registers  BD_REGISTERS object
  */
-void bd_psr_save_state(BD_REGISTERS *);
+BD_PRIVATE void bd_psr_save_state(BD_REGISTERS *);
 
 /**
  *
@@ -209,7 +209,7 @@ void bd_psr_save_state(BD_REGISTERS *);
  *
  * @param registers  BD_REGISTERS object
  */
-void bd_psr_restore_state(BD_REGISTERS *);
+BD_PRIVATE void bd_psr_restore_state(BD_REGISTERS *);
 
 /**
  *
@@ -219,7 +219,7 @@ void bd_psr_restore_state(BD_REGISTERS *);
  *
  * @param registers  BD_REGISTERS object
  */
-void bd_psr_reset_backup_registers(BD_REGISTERS *);
+BD_PRIVATE void bd_psr_reset_backup_registers(BD_REGISTERS *);
 
 
 /*
@@ -262,6 +262,8 @@ void bd_psr_register_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), v
  * @param handle  application-specific handle that was used when callback was registered
  */
 void bd_psr_unregister_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle);
+
+BD_PRIVATE void psr_init_3D(BD_REGISTERS *, int initial_mode);
 
 
 /*

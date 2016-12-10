@@ -41,7 +41,9 @@ static int _bclk_parse_header(BITSTREAM *bs, uint32_t *data_start, uint32_t *ext
 {
     uint32_t sig1, sig2;
 
-    bs_seek_byte(bs, 0);
+    if (bs_seek_byte(bs, 0) < 0) {
+        return 0;
+    }
 
     sig1 = bs_read(bs, 32);
     sig2 = bs_read(bs, 32);
@@ -149,14 +151,19 @@ static SOUND_DATA *_sound_parse(BD_FILE_H *fp)
     uint32_t      data_start, extension_data_start;
     uint32_t     *data_offsets = NULL;
 
-    bs_init(&bs, fp);
+    if (bs_init(&bs, fp) < 0) {
+        BD_DEBUG(DBG_NAV, "sound.bdmv: read error\n");
+        goto error;
+    }
 
     if (!_bclk_parse_header(&bs, &data_start, &extension_data_start)) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "invalid header\n");
         goto error;
     }
 
-    bs_seek_byte(&bs, 40);
+    if (bs_seek_byte(&bs, 40) < 0) {
+        goto error;
+    }
 
     data_len = bs_read(&bs, 32);
     bs_skip(&bs, 8); /* reserved */
@@ -169,7 +176,7 @@ static SOUND_DATA *_sound_parse(BD_FILE_H *fp)
 
     data_offsets = calloc(num_sounds, sizeof(uint32_t));
     data = calloc(1, sizeof(SOUND_DATA));
-    if (!data_offsets | !data) {
+    if (!data_offsets || !data) {
         BD_DEBUG(DBG_CRIT, "out of memory\n");
         goto error;
     }
@@ -193,7 +200,11 @@ static SOUND_DATA *_sound_parse(BD_FILE_H *fp)
 
     for (i = 0; i < data->num_sounds; i++) {
 
-        bs_seek_byte(&bs, data_start + data_offsets[i]);
+        if (bs_seek_byte(&bs, data_start + data_offsets[i]) < 0) {
+            BD_DEBUG(DBG_NAV | DBG_CRIT, "error reading samples for sound %d\n", i);
+            data->sounds[i].num_frames = 0;
+            continue;
+        }
 
         if (!_sound_read_samples(&bs, &data->sounds[i])) {
             BD_DEBUG(DBG_NAV | DBG_CRIT, "error reading samples for sound %d\n", i);

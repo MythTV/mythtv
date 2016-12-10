@@ -22,17 +22,15 @@ package org.dvb.media;
 import java.util.EventObject;
 
 public class SubtitleSelectedEvent extends EventObject {
-    public SubtitleSelectedEvent(Object source)
-    {
+    public SubtitleSelectedEvent(Object source) {
         super(source);
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 
-    private Object source;
+    protected final Object source;
     private static final long serialVersionUID = -4464632374027942754L;
 }

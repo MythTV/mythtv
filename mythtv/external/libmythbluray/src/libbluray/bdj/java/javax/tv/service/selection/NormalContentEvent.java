@@ -21,9 +21,9 @@ package javax.tv.service.selection;
 
 public class NormalContentEvent extends PresentationChangedEvent
 {
-    public NormalContentEvent(ServiceContext context) { 
+    public NormalContentEvent(ServiceContext context) {
         super(context);
     }
-    
+
     private static final long serialVersionUID = 1246777807760132155L;
 }

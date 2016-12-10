@@ -20,13 +20,11 @@
 package org.bluray.media;
 
 public class InvalidAngleException extends Exception {
-    public InvalidAngleException()
-    {
+    public InvalidAngleException() {
         super();
     }
 
-    public InvalidAngleException(String reason)
-    {
+    public InvalidAngleException(String reason) {
         super(reason);
     }
 

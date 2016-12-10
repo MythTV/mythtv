@@ -20,13 +20,11 @@
 package org.davic.media;
 
 public class MediaFreezeException extends javax.media.MediaException {
-    public MediaFreezeException()
-    {
+    public MediaFreezeException() {
         super();
     }
 
-    public MediaFreezeException(String reason)
-    {
+    public MediaFreezeException(String reason) {
         super(reason);
     }
 

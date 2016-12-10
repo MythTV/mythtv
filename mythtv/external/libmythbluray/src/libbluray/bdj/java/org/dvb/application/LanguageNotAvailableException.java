@@ -20,13 +20,11 @@
 package org.dvb.application;
 
 public class LanguageNotAvailableException extends Exception {
-    public LanguageNotAvailableException()
-    {
+    public LanguageNotAvailableException() {
         super();
     }
 
-    public LanguageNotAvailableException(String reason)
-    {
+    public LanguageNotAvailableException(String reason) {
         super(reason);
     }
 

@@ -23,18 +23,21 @@ import javax.media.Controller;
 
 public class StopEvent extends TransitionEvent {
     public StopEvent(Controller source, int previous, int current, int target,
-            Time mediaTime)
-    {
+            Time mediaTime) {
         super(source, previous, current, target);
 
         this.mediaTime = mediaTime;
     }
 
-    public Time getMediaTime()
-    {
+    public Time getMediaTime() {
         return mediaTime;
     }
 
-    private Time mediaTime;
+    public String toString() {
+        return getClass().toString() + "[source=" + source + ",mediaTime=" + mediaTime + "]";
+    }
+
+    private final Time mediaTime;
+
     private static final long serialVersionUID = -4224879148377028872L;
 }

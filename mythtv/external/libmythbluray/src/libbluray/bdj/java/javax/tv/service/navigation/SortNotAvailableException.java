@@ -23,9 +23,12 @@ import javax.tv.service.SIException;
 
 public class SortNotAvailableException extends SIException
 {
-    public SortNotAvailableException() { }
+    public SortNotAvailableException() {
+    }
 
-    public SortNotAvailableException(String reason) { }
-    
+    public SortNotAvailableException(String reason) {
+        super(reason);
+    }
+
     private static final long serialVersionUID = 5524379730037808067L;
 }

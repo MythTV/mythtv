@@ -25,7 +25,6 @@ import java.io.IOException;
 public class HStillImageBackgroundConfiguration extends
         HBackgroundConfiguration {
     protected HStillImageBackgroundConfiguration() {
-
     }
 
     protected HStillImageBackgroundConfiguration(HBackgroundConfigTemplate hbct, Color color) {
@@ -39,8 +38,7 @@ public class HStillImageBackgroundConfiguration extends
 
     public void displayImage(HBackgroundImage image, HScreenRectangle r)
             throws IOException, HPermissionDeniedException,
-            HConfigurationException
-    {
+            HConfigurationException {
         this.image = image;
         this.rect = r;
     }

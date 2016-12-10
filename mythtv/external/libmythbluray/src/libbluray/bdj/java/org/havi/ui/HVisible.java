@@ -29,18 +29,15 @@ import java.util.Map;
 import org.videolan.Logger;
 
 public class HVisible extends HComponent implements HState {
-    public HVisible()
-    {
+    public HVisible() {
         this(null);
     }
 
-    public HVisible(HLook hlook)
-    {
+    public HVisible(HLook hlook) {
         this(hlook, 0, 0, 0, 0);
     }
 
-    public HVisible(HLook hlook, int x, int y, int width, int height)
-    {
+    public HVisible(HLook hlook, int x, int y, int width, int height) {
         super(x, y, width, height);
         hLook = hlook;
         TextLayoutManager = new HDefaultTextLayoutManager();
@@ -48,48 +45,40 @@ public class HVisible extends HComponent implements HState {
         content = new Object[LAST_STATE - FIRST_STATE + 1];
     }
 
-    public boolean isFocusTraversable()
-    {
+    public boolean isFocusTraversable() {
         if (this instanceof HNavigable || this instanceof HSelectionInputPreferred) {
             return true;
         }
         return false;
     }
 
-    public void paint(Graphics g)
-    {
+    public void paint(Graphics g) {
         if (hLook != null)
             hLook.showLook(g, this, InteractionState);
     }
 
-    public void update(Graphics g)
-    {
+    public void update(Graphics g) {
         g.setColor(getBackground());
         paint(g);
     }
 
-    public void setTextContent(String string, int state)
-    {
+    public void setTextContent(String string, int state) {
         setContentImpl(string, state, TEXT_CONTENT_CHANGE);
     }
 
-    public void setGraphicContent(Image image, int state)
-    {
+    public void setGraphicContent(Image image, int state) {
         setContentImpl(image, state, GRAPHIC_CONTENT_CHANGE);
     }
 
-    public void setAnimateContent(Image[] imageArray, int state)
-    {
+    public void setAnimateContent(Image[] imageArray, int state) {
         setContentImpl(imageArray, state, ANIMATE_CONTENT_CHANGE);
     }
 
-    public void setContent(Object object, int state)
-    {
+    public void setContent(Object object, int state) {
         setContentImpl(object, state, CONTENT_CHANGE);
     }
 
-    private void setContentImpl(Object object, int state, int hint)
-    {
+    private void setContentImpl(Object object, int state, int hint) {
         int states = LAST_STATE - FIRST_STATE + 1;
 
         Object[] oldData = new Object[states + 1];
@@ -154,34 +143,29 @@ public class HVisible extends HComponent implements HState {
         return content[state - FIRST_STATE];
     }
 
-    public void setLook(HLook hlook) throws HInvalidLookException
-    {
+    public void setLook(HLook hlook) throws HInvalidLookException {
         hLook = hlook;
     }
 
-    public HLook getLook()
-    {
+    public HLook getLook() {
         return hLook;
     }
 
-    public Dimension getPreferredSize()
-    {
+    public Dimension getPreferredSize() {
         if (hLook != null) {
             return hLook.getPreferredSize(this);
         }
         return getSize();
     }
 
-    public Dimension getMaximumSize()
-    {
+    public Dimension getMaximumSize() {
         if (hLook != null) {
             return hLook.getMaximumSize(this);
         }
         return getSize();
     }
 
-    public Dimension getMinimumSize()
-    {
+    public Dimension getMinimumSize() {
         if (hLook != null) {
             return hLook.getMinimumSize(this);
         }
@@ -195,8 +179,7 @@ public class HVisible extends HComponent implements HState {
             setInteractionState(InteractionState | FOCUSED_STATE_BIT);
     }
 
-    protected void setInteractionState(int state)
-    {
+    protected void setInteractionState(int state) {
         if (InteractionState == state)
             return;
 
@@ -205,28 +188,23 @@ public class HVisible extends HComponent implements HState {
         visibleChanged(STATE_CHANGE, oldState);
     }
 
-    public int getInteractionState()
-    {
+    public int getInteractionState() {
         return InteractionState;
     }
 
-    public void setTextLayoutManager(HTextLayoutManager manager)
-    {
+    public void setTextLayoutManager(HTextLayoutManager manager) {
         TextLayoutManager = manager;
     }
 
-    public HTextLayoutManager getTextLayoutManager()
-    {
+    public HTextLayoutManager getTextLayoutManager() {
         return TextLayoutManager;
     }
 
-    public int getBackgroundMode()
-    {
+    public int getBackgroundMode() {
         return BackgroundMode;
     }
 
-    public void setBackgroundMode(int mode)
-    {
+    public void setBackgroundMode(int mode) {
         if (mode != BACKGROUND_FILL && mode != NO_BACKGROUND_FILL) {
             logger.info("mode out of range in setBackgroundMode()");
             throw new IllegalArgumentException("Unknown background fill mode");
@@ -234,34 +212,29 @@ public class HVisible extends HComponent implements HState {
         BackgroundMode = mode;
     }
 
-    public boolean isOpaque()
-    {
+    public boolean isOpaque() {
         if (hLook == null) {
             return false;
         }
         return hLook.isOpaque(this);
     }
 
-    public void setDefaultSize(Dimension defaultSize)
-    {
+    public void setDefaultSize(Dimension defaultSize) {
         this.defaultSize = defaultSize;
     }
 
-    public Dimension getDefaultSize()
-    {
+    public Dimension getDefaultSize() {
         return defaultSize;
     }
 
-    public Object getLookData(Object key)
-    {
+    public Object getLookData(Object key) {
         if (lookData == null || !lookData.containsKey(key)) {
             return null;
         }
         return lookData.get(key);
     }
 
-    public void setLookData(Object key, Object data)
-    {
+    public void setLookData(Object key, Object data) {
         if (lookData == null) {
             lookData = new Hashtable();
         }
@@ -277,8 +250,7 @@ public class HVisible extends HComponent implements HState {
         lookData.put(key, data);
     }
 
-    public void setHorizontalAlignment(int halign)
-    {
+    public void setHorizontalAlignment(int halign) {
         if (halign != HALIGN_LEFT && halign != HALIGN_CENTER &&
             halign != HALIGN_RIGHT && halign != HALIGN_JUSTIFY) {
             logger.info("align out of range in setHorizontalAlignment()");
@@ -289,8 +261,7 @@ public class HVisible extends HComponent implements HState {
         visibleChanged(UNKNOWN_CHANGE, new Integer(UNKNOWN_CHANGE));
     }
 
-    public void setVerticalAlignment(int valign)
-    {
+    public void setVerticalAlignment(int valign) {
         if (valign != VALIGN_TOP && valign != VALIGN_CENTER &&
             valign != VALIGN_BOTTOM && valign != VALIGN_JUSTIFY) {
             logger.info("align out of range in setVerticalAlignment()");
@@ -301,18 +272,15 @@ public class HVisible extends HComponent implements HState {
         visibleChanged(UNKNOWN_CHANGE, new Integer(UNKNOWN_CHANGE));
     }
 
-    public int getHorizontalAlignment()
-    {
+    public int getHorizontalAlignment() {
         return halign;
     }
 
-    public int getVerticalAlignment()
-    {
+    public int getVerticalAlignment() {
         return valign;
     }
 
-    public void setResizeMode(int resize)
-    {
+    public void setResizeMode(int resize) {
         if (resize != RESIZE_NONE && resize != RESIZE_PRESERVE_ASPECT &&
             resize != RESIZE_ARBITRARY) {
             logger.info("resize out of range in setResizeMode()");
@@ -323,13 +291,11 @@ public class HVisible extends HComponent implements HState {
         visibleChanged(UNKNOWN_CHANGE, new Integer(UNKNOWN_CHANGE));
     }
 
-    public int getResizeMode()
-    {
+    public int getResizeMode() {
         return resizeMode;
     }
 
-    public void setEnabled(boolean b)
-    {
+    public void setEnabled(boolean b) {
         super.setEnabled(b);
         if (b) {
             setInteractionState(InteractionState & (~DISABLED_STATE_BIT));
@@ -338,8 +304,7 @@ public class HVisible extends HComponent implements HState {
         }
     }
 
-    public void setBordersEnabled(boolean enable)
-    {
+    public void setBordersEnabled(boolean enable) {
         if (enable == BordersEnabled)
             return;
 
@@ -352,8 +317,7 @@ public class HVisible extends HComponent implements HState {
         }
     }
 
-    public boolean getBordersEnabled()
-    {
+    public boolean getBordersEnabled() {
         return BordersEnabled;
     }
 

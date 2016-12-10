@@ -17,6 +17,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * Note:
+ * This module should be called only from Java side.
+ * If it is called from native C thread, lot of references are leaked !
+ */
+
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -35,10 +41,16 @@
  * https://hdcookbook.dev.java.net/
  */
 
-#define JNICHK(a) if((*env)->ExceptionOccurred(env)) { \
-    BD_DEBUG(DBG_BDJ, "Exception occured\n"); \
-    (*env)->ExceptionDescribe(env); \
-    } if (!a) return NULL;
+#define JNICHK(a) \
+  do {                                                              \
+      if ((*env)->ExceptionOccurred(env)) {                         \
+          BD_DEBUG(DBG_BDJ | DBG_CRIT, "Exception occured\n");      \
+          (*env)->ExceptionDescribe(env);                           \
+      }                                                             \
+      if (!(a)) {                                                   \
+          return NULL;                                              \
+      } \
+  } while (0)
 
 /*
  *

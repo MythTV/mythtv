@@ -22,5 +22,4 @@ package org.havi.ui.event;
 import java.awt.event.KeyListener;
 
 public interface HKeyListener extends KeyListener {
-
 }

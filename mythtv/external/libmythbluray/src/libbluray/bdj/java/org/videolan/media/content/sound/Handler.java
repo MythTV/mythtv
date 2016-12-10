@@ -37,9 +37,9 @@ import javax.media.protocol.DataSource;
 
 import org.bluray.net.BDLocator;
 
-//import org.videolan.media.content.playlist.MediaTimePositionControlImpl;
-import org.videolan.media.content.playlist.OverallGainControlImpl;
-import org.videolan.media.content.playlist.PanningControlImpl;
+import org.videolan.media.content.control.MediaTimePositionControlImpl;
+import org.videolan.media.content.control.OverallGainControlImpl;
+import org.videolan.media.content.control.PanningControlImpl;
 
 import org.videolan.media.content.BDHandler;
 
@@ -96,9 +96,11 @@ public class Handler extends BDHandler {
         return null;
     }
 
-    protected ControllerErrorEvent doStop() {
-        return super.doStop();
+    /*
+    protected ControllerErrorEvent doStop(boolean eof) {
+        return super.doStop(eof);
     }
+    */
 
     protected BDLocator getLocator() {
         return locator;

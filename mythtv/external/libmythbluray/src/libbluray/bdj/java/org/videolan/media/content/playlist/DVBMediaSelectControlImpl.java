@@ -158,7 +158,7 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
     }
 
     public Locator[] getCurrentSelection() {
-        BDLocator locator = player.getLocator();
+        BDLocator locator = player.getCurrentLocator();
         if (locator == null)
             return new Locator[0];
         String[] tags = locator.getComponentTags();

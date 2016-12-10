@@ -21,10 +21,9 @@ package org.dvb.dsmcc;
 
 public class StreamEvent extends java.util.EventObject {
     public StreamEvent(DSMCCStreamEvent source, long npt, String name,
-            int eventId, byte[] eventData)
-    {
+            int eventId, byte[] eventData) {
         super(source);
-        
+
         this.source = source;
         this.npt = npt;
         this.name = name;
@@ -32,35 +31,30 @@ public class StreamEvent extends java.util.EventObject {
         this.eventData = eventData;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 
-    public String getEventName()
-    {
+    public String getEventName() {
         return name;
     }
 
-    public int getEventId()
-    {
+    public int getEventId() {
         return eventId;
     }
 
-    public long getEventNPT()
-    {
+    public long getEventNPT() {
         return npt;
     }
 
-    public byte[] getEventData()
-    {
+    public byte[] getEventData() {
         return eventData;
     }
 
     private DSMCCStreamEvent source;
     private long npt;
     private String name;
-    private int eventId; 
+    private int eventId;
     private byte[] eventData;
     private static final long serialVersionUID = -8054274744134638856L;
 }

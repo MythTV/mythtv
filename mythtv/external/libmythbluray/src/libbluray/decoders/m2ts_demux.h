@@ -34,6 +34,8 @@ typedef struct m2ts_demux_s M2TS_DEMUX;
 BD_PRIVATE M2TS_DEMUX *m2ts_demux_init(uint16_t pid);
 BD_PRIVATE void        m2ts_demux_free(M2TS_DEMUX **);
 
+BD_PRIVATE void m2ts_demux_reset(M2TS_DEMUX *);
+
 /*
  *   Demux aligned unit (mpeg-ts + pes).
  *   input:  aligned unit (6144 bytes). NULL to flush demuxer buffer.

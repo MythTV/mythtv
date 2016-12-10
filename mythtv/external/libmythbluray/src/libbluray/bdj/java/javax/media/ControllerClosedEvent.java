@@ -20,21 +20,22 @@
 package javax.media;
 
 public class ControllerClosedEvent extends ControllerEvent {
-    public ControllerClosedEvent(Controller source)
-    {
+    public ControllerClosedEvent(Controller source) {
         super(source);
     }
 
-    public ControllerClosedEvent(Controller source, String reason)
-    {
+    public ControllerClosedEvent(Controller source, String reason) {
         super(source);
 
         this.reason = reason;
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         return reason;
+    }
+
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",reason=" + reason + "]";
     }
 
     private String reason = "";

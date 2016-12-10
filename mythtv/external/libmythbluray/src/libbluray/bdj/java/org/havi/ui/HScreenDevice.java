@@ -56,7 +56,7 @@ public class HScreenDevice implements ResourceProxy, ResourceServer {
 
     public Dimension getScreenAspectRatio() {
         org.videolan.Logger.unimplemented(HScreenDevice.class.getName(), "getScreenAspectRatio");
-        throw new Error("Not implemented");
+        return new Dimension(16, 9);
     }
 
     public boolean reserveDevice(ResourceClient client) {

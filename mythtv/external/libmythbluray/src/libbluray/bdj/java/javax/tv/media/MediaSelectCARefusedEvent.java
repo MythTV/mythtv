@@ -23,10 +23,9 @@ import javax.tv.locator.Locator;
 import javax.media.Controller;
 
 public class MediaSelectCARefusedEvent extends MediaSelectFailedEvent {
-    public MediaSelectCARefusedEvent(Controller source, Locator[] selection)
-    {
+    public MediaSelectCARefusedEvent(Controller source, Locator[] selection) {
         super(source, selection);
     }
-    
+
     private static final long serialVersionUID = -8706477571753234088L;
 }

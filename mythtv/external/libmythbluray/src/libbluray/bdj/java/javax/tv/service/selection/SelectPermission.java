@@ -24,36 +24,34 @@ import javax.tv.locator.Locator;
 import java.io.Serializable;
 
 public final class SelectPermission extends Permission implements Serializable {
-    public SelectPermission(Locator locator, String actions)
-    {
-        super(locator.toExternalForm());
+    public SelectPermission(Locator locator, String actions) {
+        super(locator == null ? "*" : locator.toExternalForm());
 
-        if (!actions.equals("own") && !actions.equals("*"))
-            throw new IllegalArgumentException();
+        if (actions == null)
+            throw new NullPointerException();
 
-        this.locator = locator.toExternalForm();
+        this.locator = locator == null ? "*" : locator.toExternalForm();
         this.actions = actions;
     }
 
-    public SelectPermission(String locator, String actions)
-    {
-        super(locator);
+    public SelectPermission(String locator, String actions) {
+        super(locator == null ? "*" : locator);
 
-        if (!actions.equals("own") && !actions.equals("*"))
-            throw new IllegalArgumentException();
+        if (actions == null)
+            throw new NullPointerException();
 
-        this.locator = locator;
+        this.locator = locator == null ? "*" : locator;
         this.actions = actions;
     }
 
-    public boolean implies(Permission perm)
-    {
+    public boolean implies(Permission perm) {
         if (!(perm instanceof SelectPermission))
-            return false;
-        if (!perm.getActions().equals(actions) && !actions.equals("*"))
             return false;
 
         SelectPermission sperm = (SelectPermission) perm;
+
+        if (!sperm.actions.equals(actions) && !actions.equals("*"))
+            return false;
 
         if (!sperm.locator.equals(locator) && !locator.equals("*"))
             return false;
@@ -61,30 +59,19 @@ public final class SelectPermission extends Permission implements Serializable {
         return true;
     }
 
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SelectPermission))
             return false;
-        if (this == obj)
-            return true;
-        if (getClass() != obj.getClass())
-            return false;
+
         SelectPermission other = (SelectPermission) obj;
-        if (actions == null) {
-            if (other.actions != null)
-                return false;
-        } else if (!actions.equals(other.actions))
+        if (!actions.equals(other.actions))
             return false;
-        if (locator == null) {
-            if (other.locator != null)
-                return false;
-        } else if (!locator.equals(other.locator))
+        if (!locator.equals(other.locator))
             return false;
         return true;
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((actions == null) ? 0 : actions.hashCode());
@@ -92,8 +79,7 @@ public final class SelectPermission extends Permission implements Serializable {
         return result;
     }
 
-    public String getActions()
-    {
+    public String getActions() {
         return actions;
     }
 

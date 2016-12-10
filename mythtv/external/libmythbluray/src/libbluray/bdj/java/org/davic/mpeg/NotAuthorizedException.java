@@ -20,25 +20,21 @@
 package org.davic.mpeg;
 
 public class NotAuthorizedException extends Exception implements NotAuthorizedInterface {
-    public NotAuthorizedException()
-    {
+    public NotAuthorizedException() {
         super();
     }
 
-    public NotAuthorizedException(String reason)
-    {
+    public NotAuthorizedException(String reason) {
         super(reason);
     }
 
-    public int[] getReason(int index) throws IndexOutOfBoundsException
-    {
+    public int[] getReason(int index) throws IndexOutOfBoundsException {
         return null;
     }
-    
-    public int getType()
-    {
+
+    public int getType() {
         return 0;
     }
-    
+
     private static final long serialVersionUID = 1567106534419982722L;
 }

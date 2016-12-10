@@ -23,20 +23,17 @@ import javax.tv.service.SIChangeType;
 
 public class BouquetChangeEvent extends TransportSIChangeEvent {
     public BouquetChangeEvent(BouquetCollection collection, SIChangeType type,
-            Bouquet bouquet)
-    {
+            Bouquet bouquet) {
         super(collection, type, bouquet);
         this.collection = collection;
         this.bouquet = bouquet;
     }
 
-    public BouquetCollection getBouquetCollection()
-    {
+    public BouquetCollection getBouquetCollection() {
         return collection;
     }
 
-    public Bouquet getBouquet()
-    {
+    public Bouquet getBouquet() {
         return bouquet;
     }
 

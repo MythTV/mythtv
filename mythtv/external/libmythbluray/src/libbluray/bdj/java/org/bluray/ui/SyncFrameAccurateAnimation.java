@@ -31,8 +31,8 @@ import org.videolan.Logger;
 public class SyncFrameAccurateAnimation extends FrameAccurateAnimation {
     public static SyncFrameAccurateAnimation getInstance(Dimension size,
             int numFrames, AnimationParameters params)
-            throws NullPointerException, IllegalArgumentException
-    {
+            throws NullPointerException, IllegalArgumentException {
+
         if (size == null || params == null)
             throw new NullPointerException();
         if (numFrames < 1)
@@ -58,47 +58,40 @@ public class SyncFrameAccurateAnimation extends FrameAccurateAnimation {
     }
 
     private SyncFrameAccurateAnimation(Dimension size,
-            int numFrames, AnimationParameters params)
-    {
+            int numFrames, AnimationParameters params) {
         super(params);
         logger.unimplemented("SyncFrameAccurateAnimation");
     }
 
     public boolean finishDrawing(long frameNumber)
-            throws IllegalArgumentException
-    {
+            throws IllegalArgumentException {
         logger.unimplemented("finishDrawing");
         return true;
     }
 
     public boolean finishDrawing(long frameNumber, Rectangle[] updateArea)
-            throws IllegalArgumentException
-    {
+            throws IllegalArgumentException {
         logger.unimplemented("finishDrawing");
         return true;
     }
 
     public Time getAnimationFrameTime(long animationFrame)
-            throws IllegalStateException
-    {
+            throws IllegalStateException {
         logger.unimplemented("getAnimationFrameTime");
         return new Time(40000000);
     }
 
-    public void paint(Graphics graphics)
-    {
+    public void paint(Graphics graphics) {
         logger.unimplemented("paint");
     }
 
-    public void setBounds(int x, int y, int width, int height)
-    {
+    public void setBounds(int x, int y, int width, int height) {
         logger.unimplemented("setBounds");
         super.setBounds(x, y, width, height);
     }
 
     public Graphics2D startDrawing(long frameNumber)
-            throws IllegalArgumentException
-    {
+            throws IllegalArgumentException {
         logger.unimplemented("startDrawing");
         return null;
     }

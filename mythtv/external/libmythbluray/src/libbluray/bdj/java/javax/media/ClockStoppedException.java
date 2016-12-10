@@ -20,13 +20,11 @@
 package javax.media;
 
 public class ClockStoppedException extends MediaException {
-    public ClockStoppedException()
-    {
+    public ClockStoppedException() {
         super();
     }
 
-    public ClockStoppedException(String reason)
-    {
+    public ClockStoppedException(String reason) {
         super(reason);
     }
 

@@ -20,13 +20,11 @@
 package javax.media;
 
 public class ControllerErrorEvent extends ControllerClosedEvent {
-    public ControllerErrorEvent(Controller source)
-    {
+    public ControllerErrorEvent(Controller source) {
         super(source);
     }
 
-    public ControllerErrorEvent(Controller source, String reason)
-    {
+    public ControllerErrorEvent(Controller source, String reason) {
         super(source, reason);
     }
 

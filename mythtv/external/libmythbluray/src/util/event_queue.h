@@ -1,7 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  William Hahne
- * Copyright (C) 2015  Petri Hintukainen
+ * Copyright (C) 2010-2016  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,22 +17,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package org.videolan.media.content.playlist;
+#if !defined(BD_EVENT_QUEUE_H_)
+#define BD_EVENT_QUEUE_H_
 
-import java.awt.Component;
-import org.bluray.media.OverallGainControl;
+#include "util/attributes.h"
 
-import org.videolan.media.content.BDHandler;
+#include <stddef.h>
 
-public class OverallGainControlImpl extends GainControlImpl implements OverallGainControl {
-    public OverallGainControlImpl(BDHandler player) {
-        this.player = player;
-    }
+typedef struct bd_event_queue BD_EVENT_QUEUE;
 
-    protected void setGain(boolean mute, float level) {
-        player.setGain(BDHandler.GAIN_OVERALL, mute, level);
-        super.valueChanged();
-    }
+BD_PRIVATE BD_EVENT_QUEUE *event_queue_new(size_t event_size);
+BD_PRIVATE void            event_queue_destroy(BD_EVENT_QUEUE **);
 
-    private BDHandler player;
-}
+BD_PRIVATE int event_queue_get(BD_EVENT_QUEUE *eq, void *ev);
+BD_PRIVATE int event_queue_put(BD_EVENT_QUEUE *eq, const void *ev);
+
+#endif /* BD_EVENT_QUEUE_H_ */

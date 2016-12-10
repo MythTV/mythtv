@@ -21,7 +21,5 @@ package javax.tv.service;
 
 import java.util.EventListener;
 
-public interface SIChangeListener extends EventListener
-{
-    
+public interface SIChangeListener extends EventListener {
 }

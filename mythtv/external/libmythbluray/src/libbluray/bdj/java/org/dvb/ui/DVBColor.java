@@ -23,55 +23,45 @@ import java.awt.Color;
 import javax.tv.graphics.AlphaColor;
 
 public class DVBColor extends AlphaColor {
-    public DVBColor(float r, float g, float b, float a)
-    {
+    public DVBColor(float r, float g, float b, float a) {
         super(r, g, b, a);
     }
 
-    public DVBColor(int r, int g, int b, int a)
-    {
+    public DVBColor(int r, int g, int b, int a) {
         super(r, g, b, a);
     }
 
-    public DVBColor(int rgba, boolean hasAlpha)
-    {
+    public DVBColor(int rgba, boolean hasAlpha) {
         super(rgba, hasAlpha);
     }
 
-    public DVBColor(Color color)
-    {
+    public DVBColor(Color color) {
         super(color);
     }
 
-    public Color brighter()
-    {
-        return super.brighter();
+    public Color brighter() {
+        return new DVBColor(super.brighter());
     }
 
-    public Color darker()
-    {
-        return super.darker();
+    public Color darker() {
+        return new DVBColor(super.darker());
     }
 
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
-    public int getAlpha()
-    {
+    public int getAlpha() {
         return super.getAlpha();
     }
 
-    public int getRGB()
-    {
+    public int getRGB() {
         return super.getRGB();
     }
 
-    public String toString()
-    {
+    public String toString() {
         return super.toString();
     }
-    
+
     private static final long serialVersionUID = -5411538049776187650L;
 }

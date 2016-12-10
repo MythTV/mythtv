@@ -39,7 +39,25 @@ public class AlphaColor extends Color {
 
     public AlphaColor(Color c)
     {
-        super(c.getRGB());
+        super(c.getRGB(), true);
+    }
+
+    public Color brighter()
+    {
+        Color c = super.brighter();
+        int a = getAlpha();
+
+        // JSR927: "Returns: A new AlphaColor object"
+        return new AlphaColor(c.getRed(), c.getGreen(), c.getBlue(), a);
+    }
+
+    public Color darker()
+    {
+        Color c = super.darker();
+        int a = getAlpha();
+
+        // JSR927: "Returns: A new AlphaColor object"
+        return new AlphaColor(c.getRed(), c.getGreen(), c.getBlue(), a);
     }
 
     private static final long serialVersionUID = -3466072971590811211L;

@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2016  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,30 +22,24 @@ package org.dvb.ui;
 
 public final class DVBAlphaComposite {
 
-    private DVBAlphaComposite(int rule)
-    {
-        this.rule = rule;
-        this.alpha = 1.0f;
+    private DVBAlphaComposite(int rule) {
+        this(rule, 1.0f);
     }
 
-    private DVBAlphaComposite(int rule, float alpha)
-    {
+    private DVBAlphaComposite(int rule, float alpha) {
         this.rule = rule;
         this.alpha = alpha;
     }
 
-    public int getRule()
-    {
+    public int getRule() {
         return rule;
     }
 
-    public float getAlpha()
-    {
+    public float getAlpha() {
         return alpha;
     }
 
-    public static DVBAlphaComposite getInstance(int rule)
-    {
+    public static DVBAlphaComposite getInstance(int rule) {
         switch (rule) {
         case CLEAR:
             return Clear;
@@ -63,17 +58,29 @@ public final class DVBAlphaComposite {
         case DST_OUT:
             return DstOut;
         default:
+            System.err.println("Unknown composite rule");
             throw new IllegalArgumentException("Unknown rule");
         }
     }
 
-    public static DVBAlphaComposite getInstance(int rule, float alpha)
-    {
+    public static DVBAlphaComposite getInstance(int rule, float alpha) {
+        if (rule < 1 || rule > 8) {
+            System.err.println("Unknown composite rule");
+            throw new IllegalArgumentException("Unknown rule");
+        }
+
+        if (alpha < 0.0f || alpha > 1.0f) {
+            System.err.println("Alpha value out of range");
+            throw new IllegalArgumentException("invalid alpha");
+        }
+
+        if (alpha >= 1.0f)
+            return getInstance(rule);
+
         return new DVBAlphaComposite(rule, alpha);
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + Float.floatToIntBits(alpha);
@@ -81,16 +88,13 @@ public final class DVBAlphaComposite {
         return result;
     }
 
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-            return true;
-        if (obj == null)
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DVBAlphaComposite))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
+
         DVBAlphaComposite other = (DVBAlphaComposite) obj;
-        if (Float.floatToIntBits(alpha) != Float.floatToIntBits(other.alpha))
+        //if (Float.floatToIntBits(alpha) != Float.floatToIntBits(other.alpha))
+        if (Float.compare(alpha, other.alpha) != 0)
             return false;
         if (rule != other.rule)
             return false;
@@ -108,17 +112,13 @@ public final class DVBAlphaComposite {
 
     public static final DVBAlphaComposite Clear = new DVBAlphaComposite(CLEAR);
     public static final DVBAlphaComposite Src = new DVBAlphaComposite(SRC);
-    public static final DVBAlphaComposite SrcOver = new DVBAlphaComposite(
-            SRC_OVER);
-    public static final DVBAlphaComposite DstOver = new DVBAlphaComposite(
-            DST_OVER);
+    public static final DVBAlphaComposite SrcOver = new DVBAlphaComposite(SRC_OVER);
+    public static final DVBAlphaComposite DstOver = new DVBAlphaComposite(DST_OVER);
     public static final DVBAlphaComposite SrcIn = new DVBAlphaComposite(SRC_IN);
     public static final DVBAlphaComposite DstIn = new DVBAlphaComposite(DST_IN);
-    public static final DVBAlphaComposite SrcOut = new DVBAlphaComposite(
-            SRC_OUT);
-    public static final DVBAlphaComposite DstOut = new DVBAlphaComposite(
-            DST_OUT);
+    public static final DVBAlphaComposite SrcOut = new DVBAlphaComposite(SRC_OUT);
+    public static final DVBAlphaComposite DstOut = new DVBAlphaComposite(DST_OUT);
 
-    float alpha;
-    int rule;
+    private float alpha;
+    private int rule;
 }

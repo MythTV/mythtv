@@ -103,7 +103,10 @@ public class TitleContextImpl implements TitleContext {
     public void select(Locator[] locators)
         throws InvalidLocatorException, InvalidServiceComponentException, SecurityException {
 
-        org.videolan.Logger.unimplemented("TitleContextImpl", "select(Locator[])");
+        Logger.unimplemented("TitleContextImpl", "select(Locator[])");
+
+        for (int i = 0; i < locators.length; i++)
+            logger.info("  [" + i + "]: " + locators[i]);
 
         select(SIManager.createInstance().getService(locators[0]));
     }

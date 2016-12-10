@@ -46,9 +46,12 @@ import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
 public class DVBGraphicsImpl extends DVBGraphics {
+
+    private Graphics2D gfx;
+
     protected DVBGraphicsImpl(Graphics2D gfx)
     {
-        super(gfx);
+        this.gfx = gfx;
     }
 
     /*

@@ -28,22 +28,18 @@ import org.videolan.MountException;
 import org.videolan.MountManager;
 
 public class ServiceDomain {
-    public ServiceDomain()
-    {
-
+    public ServiceDomain() {
     }
 
     public void attach(Locator dvbService, int carouselId)
             throws ServiceXFRException, InterruptedIOException,
-            MPEGDeliveryException
-    {
+            MPEGDeliveryException {
         org.videolan.Logger.unimplemented("ServiceDomain", "attach");
         throw new Error("Not implemented");
     }
 
     public void attach(Locator locator) throws DSMCCException,
-            InterruptedIOException, MPEGDeliveryException
-    {
+            InterruptedIOException, MPEGDeliveryException {
         BDLocator bdl = checkLocator(locator);
         if (bdl == null)
             throw new DSMCCException("invalid BDLocator");
@@ -62,28 +58,25 @@ public class ServiceDomain {
 
     public void attach(byte[] NSAPAddress) throws DSMCCException,
             InterruptedIOException, InvalidAddressException,
-            MPEGDeliveryException
-    {
+            MPEGDeliveryException {
         org.videolan.Logger.unimplemented("ServiceDomain", "attach");
         throw new Error("Not implemented");
     }
 
-    public void detach() throws NotLoadedException
-    {
+    public void detach() throws NotLoadedException {
         if (mountPoint == null)
             throw new NotLoadedException();
     }
 
-    public byte[] getNSAPAddress() throws NotLoadedException
-    {
+    public byte[] getNSAPAddress() throws NotLoadedException {
         org.videolan.Logger.unimplemented("ServiceDomain", "getNSAPAddress");
         throw new Error("Not implemented");
     }
 
     public static URL getURL(Locator locator)
             throws NotLoadedException, InvalidLocatorException,
-            FileNotFoundException
-    {
+            FileNotFoundException {
+
         BDLocator bdl = checkLocator(locator);
         if (bdl == null)
             throw new InvalidLocatorException("invalid BDLocator");
@@ -105,29 +98,24 @@ public class ServiceDomain {
         throw new InvalidLocatorException();
     }
 
-    public DSMCCObject getMountPoint()
-    {
+    public DSMCCObject getMountPoint() {
         return mountPoint;
     }
 
-    public boolean isNetworkConnectionAvailable()
-    {
+    public boolean isNetworkConnectionAvailable() {
         org.videolan.Logger.unimplemented("ServiceDomain", "isNetworkConnectionAvailable");
         return false;
     }
 
-    public boolean isAttached()
-    {
+    public boolean isAttached() {
         return mountPoint != null;
     }
 
-    public Locator getLocator()
-    {
+    public Locator getLocator() {
         return locator;
     }
 
-    private static BDLocator checkLocator(Locator locator)
-    {
+    private static BDLocator checkLocator(Locator locator) {
         if (!(locator instanceof BDLocator))
             return null;
 

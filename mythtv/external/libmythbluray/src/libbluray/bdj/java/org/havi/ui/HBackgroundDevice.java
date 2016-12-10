@@ -53,7 +53,7 @@ public class HBackgroundDevice extends HScreenDevice {
     public HBackgroundConfiguration getBestConfiguration(HBackgroundConfigTemplate hbcta[]) {
         int score = -1;
         HBackgroundConfiguration hbc = null;
-        for (int i = 0; i < hbcArray.length; i++) 
+        for (int i = 0; i < hbcArray.length; i++)
             for (int j = 0; j < hbcta.length; j++)
                 if (hbcta[j].match(hbcArray[i]) > score)
                     hbc = hbcArray[i];

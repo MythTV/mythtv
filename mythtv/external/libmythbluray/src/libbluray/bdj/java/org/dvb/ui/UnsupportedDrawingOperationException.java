@@ -20,8 +20,7 @@
 package org.dvb.ui;
 
 public class UnsupportedDrawingOperationException extends Exception {
-    public UnsupportedDrawingOperationException(String reason)
-    {
+    public UnsupportedDrawingOperationException(String reason) {
         super(reason);
     }
 

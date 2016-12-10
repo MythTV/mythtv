@@ -20,13 +20,11 @@
 package org.dvb.ui;
 
 public class FontNotAvailableException extends Exception {
-    public FontNotAvailableException()
-    {
+    public FontNotAvailableException() {
         super();
     }
 
-    public FontNotAvailableException(String reason)
-    {
+    public FontNotAvailableException(String reason) {
         super(reason);
     }
 

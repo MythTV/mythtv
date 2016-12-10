@@ -20,18 +20,20 @@
 package org.dvb.media;
 
 public class ActiveFormatDescriptionChangedEvent extends VideoFormatEvent {
-    public ActiveFormatDescriptionChangedEvent(Object source, int newFormat)
-    {
+    public ActiveFormatDescriptionChangedEvent(Object source, int newFormat) {
         super(source);
 
         this.newFormat = newFormat;
     }
 
-    public int getNewFormat()
-    {
+    public int getNewFormat() {
         return newFormat;
     }
 
-    private int newFormat;
+    public String toString() {
+        return getClass().getName() + "[source=" + source + ",newFormat=" + newFormat + "]";
+    }
+
+    private final int newFormat;
     private static final long serialVersionUID = -1102487117285915146L;
 }

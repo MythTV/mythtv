@@ -105,6 +105,7 @@ void textst_render_free(TEXTST_RENDER **pp)
                 }
                 X_FREE(p->font[ii].mem);
             }
+            X_FREE(p->font);
 
             FT_Done_FreeType(p->ft_lib);
         }

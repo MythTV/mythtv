@@ -24,13 +24,11 @@ import javax.tv.xlet.XletContext;
 import org.bluray.ti.selection.TitleContextImpl;
 
 public class ServiceContextFactoryImpl extends ServiceContextFactory {
-    protected ServiceContextFactoryImpl() {
-        serviceContexts = new ServiceContext[1];
-        serviceContexts[0] = new TitleContextImpl();
-    }
+
+    private static final Object instanceLock = new Object();
 
     public static ServiceContextFactory getInstance() {
-        synchronized (ServiceContextFactoryImpl.class) {
+        synchronized (instanceLock) {
             if (instance == null)
                 instance = new ServiceContextFactoryImpl();
             return instance;
@@ -38,9 +36,14 @@ public class ServiceContextFactoryImpl extends ServiceContextFactory {
     }
 
     public static void shutdown() {
-        synchronized (ServiceContextFactoryImpl.class) {
+        synchronized (instanceLock) {
             instance = null;
         }
+    }
+
+    protected ServiceContextFactoryImpl() {
+        serviceContexts = new ServiceContext[1];
+        serviceContexts[0] = new TitleContextImpl();
     }
 
     public ServiceContext createServiceContext()

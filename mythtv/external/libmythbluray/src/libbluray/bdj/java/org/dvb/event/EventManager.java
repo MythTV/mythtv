@@ -36,8 +36,11 @@ import org.videolan.GUIManager;
 import org.videolan.Logger;
 
 public class EventManager implements ResourceServer {
+
+    private static final Object instanceLock = new Object();
+
     public static EventManager getInstance() {
-        synchronized (EventManager.class) {
+        synchronized (instanceLock) {
             if (instance == null)
                 instance = new EventManager();
             return instance;
@@ -46,7 +49,7 @@ public class EventManager implements ResourceServer {
 
     public static void shutdown() {
         EventManager e;
-        synchronized (EventManager.class) {
+        synchronized (instanceLock) {
             e = instance;
             instance = null;
         }
@@ -164,10 +167,13 @@ public class EventManager implements ResourceServer {
                 if (item.context == context) {
                     if (item.userEvents.contains(ue)) {
                         result = BDJHelper.postKeyEvent(type, modifiers, keyCode);
+                        logger.info("Key posted to exclusive AWT event listener, r=" + result);
                         return true;
                     }
                 }
             }
+        } else {
+            logger.info("No focused HScene found !");
         }
 
         for (Iterator it = exclusiveUserEventListener.iterator(); it.hasNext(); ) {
@@ -179,6 +185,7 @@ public class EventManager implements ResourceServer {
             }
             if (item.userEvents.contains(ue)) {
                 item.context.putUserEvent(new UserEventAction(item, ue));
+                logger.info("Key posted to exclusive UE listener");
                 return true;
             }
         }
@@ -194,6 +201,7 @@ public class EventManager implements ResourceServer {
             }
             if (item.userEvents.contains(ue)) {
                 item.context.putUserEvent(new UserEventAction(item, ue));
+                logger.info("Key posted to shared UE listener");
                 result = true;
             }
         }
@@ -266,10 +274,10 @@ public class EventManager implements ResourceServer {
             }
         }
 
-        public BDJXletContext context;
-        public UserEventListener listener;
-        public ResourceClient client;
-        public UserEventRepository userEvents;
+        public final BDJXletContext context;
+        public final UserEventListener listener;
+        public final ResourceClient client;
+        public final UserEventRepository userEvents;
     }
 
     private static class UserEventAction extends BDJAction {

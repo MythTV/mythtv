@@ -31,8 +31,7 @@ import org.videolan.StrUtil;
 public class HDefaultTextLayoutManager implements HTextLayoutManager {
     static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
 
-    public HDefaultTextLayoutManager()
-    {
+    public HDefaultTextLayoutManager() {
     }
 
     public Dimension getMinimumSize(HVisible hvisible)
@@ -67,18 +66,15 @@ public class HDefaultTextLayoutManager implements HTextLayoutManager {
         return size;
     }
 
-    public Dimension getMaximumSize(HVisible hvisible)
-    {
+    public Dimension getMaximumSize(HVisible hvisible) {
         return new Dimension(Short.MAX_VALUE, Short.MAX_VALUE);
     }
 
-    public Dimension getPreferredSize(HVisible hvisible)
-    {
+    public Dimension getPreferredSize(HVisible hvisible) {
         return getMinimumSize(hvisible);
     }
 
-    public void render(String markedUpString, Graphics g, HVisible v, Insets insets)
-    {
+    public void render(String markedUpString, Graphics g, HVisible v, Insets insets) {
         if (markedUpString == null)
             return;
 

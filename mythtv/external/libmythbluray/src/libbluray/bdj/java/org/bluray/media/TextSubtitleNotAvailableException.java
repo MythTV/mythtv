@@ -20,13 +20,11 @@
 package org.bluray.media;
 
 public class TextSubtitleNotAvailableException extends Exception {
-    public TextSubtitleNotAvailableException()
-    {
+    public TextSubtitleNotAvailableException() {
         super();
     }
 
-    public TextSubtitleNotAvailableException(String reason)
-    {
+    public TextSubtitleNotAvailableException(String reason) {
         super(reason);
     }
 

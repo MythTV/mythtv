@@ -20,14 +20,12 @@
 package org.dvb.dsmcc;
 
 public class MPEGDeliveryErrorEvent extends AsynchronousLoadingEvent {
-    public MPEGDeliveryErrorEvent(DSMCCObject source)
-    {
+    public MPEGDeliveryErrorEvent(DSMCCObject source) {
         super(source);
         this.source = source;
     }
 
-    public Object getSource()
-    {
+    public Object getSource() {
         return source;
     }
 

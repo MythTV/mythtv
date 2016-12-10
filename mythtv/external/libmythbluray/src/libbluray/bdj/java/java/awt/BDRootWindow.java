@@ -82,6 +82,13 @@ public class BDRootWindow extends Frame {
         return null;
     }
 
+    private boolean isBackBufferClear() {
+        int v = 0;
+        for (int i = 0; i < height * width; i++)
+            v |= backBuffer[i];
+        return v == 0;
+    }
+
     public void notifyChanged() {
         if (!isVisible()) {
             logger.error("sync(): not visible");
@@ -108,11 +115,26 @@ public class BDRootWindow extends Frame {
             }
             changeCount = 0;
 
-            Area a = dirty.getBounds();
-            dirty.clear();
+            if (!isVisible()) {
+                if (overlay_open) {
+                    logger.info("sync(): close OSD (not visible)");
+                    close();
+                }
+                logger.info("sync() ignored (not visible)");
+                return;
+            }
+
+            Area a = dirty.getBoundsAndClear();
 
             if (!a.isEmpty()) {
                 if (!overlay_open) {
+
+                    /* delay opening overlay until something has been drawn */
+                    if (isBackBufferClear()) {
+                        logger.info("sync() ignored (overlay not open, empty overlay)");
+                        return;
+                    }
+
                     Libbluray.updateGraphic(getWidth(), getHeight(), null);
                     overlay_open = true;
                     a = new Area(getWidth(), getHeight()); /* force full plane update */
@@ -165,8 +187,8 @@ public class BDRootWindow extends Frame {
             if (overlay_open) {
                 logger.error("clearOverlay() ignored (overlay is visible)");
             } else {
+                dirty.getBoundsAndClear();
                 Arrays.fill(backBuffer, 0);
-                dirty.clear();
             }
         }
     }

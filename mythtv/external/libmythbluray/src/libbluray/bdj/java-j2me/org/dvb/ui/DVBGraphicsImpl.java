@@ -36,9 +36,12 @@ import java.awt.image.ImageObserver;
 import java.text.AttributedCharacterIterator;
 
 public class DVBGraphicsImpl extends DVBGraphics {
+
+    private Graphics2D gfx;
+
     protected DVBGraphicsImpl(Graphics2D gfx)
     {
-        super(gfx);
+        this.gfx = gfx;
     }
 
     /*

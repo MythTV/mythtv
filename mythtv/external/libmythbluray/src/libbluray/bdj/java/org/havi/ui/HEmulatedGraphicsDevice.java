@@ -20,15 +20,13 @@
 package org.havi.ui;
 
 public abstract class HEmulatedGraphicsDevice extends HGraphicsDevice {
-    protected HEmulatedGraphicsDevice()
-    {
+    protected HEmulatedGraphicsDevice() {
         org.videolan.Logger.unimplemented(null, "HEmulatedGraphicsDevice");
     }
 
     public boolean setGraphicsConfiguration(HEmulatedGraphicsConfiguration hegc)
             throws SecurityException, HPermissionDeniedException,
-            HConfigurationException
-    {
+            HConfigurationException {
         org.videolan.Logger.unimplemented("HEmulatedGraphicsDevice", "setGraphicsConfiguration");
         return false;
     }

@@ -19,6 +19,7 @@
 package javax.tv.service.navigation;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 import javax.tv.service.Service;
 
@@ -36,15 +37,15 @@ public class ServiceIteratorImpl implements ServiceIterator {
     }
 
     public Service nextService() {
-        if (index < services.size())
-            return (Service)services.get(index++);
-        return null;
+        if (!hasNext())
+            throw new NoSuchElementException("End of list reached");
+        return (Service)services.get(index++);
     }
 
     public Service previousService() {
-        if (index > 0)
-            return (Service)services.get(--index);
-        return null;
+        if (!hasPrevious())
+            throw new NoSuchElementException("Start of list reached");
+        return (Service)services.get(--index);
     }
 
     public boolean hasNext() {

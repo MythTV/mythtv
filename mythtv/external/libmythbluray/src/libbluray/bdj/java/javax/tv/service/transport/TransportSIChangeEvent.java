@@ -23,14 +23,12 @@ import javax.tv.service.*;
 
 public abstract class TransportSIChangeEvent extends SIChangeEvent {
     public TransportSIChangeEvent(Transport transport, SIChangeType type,
-            SIElement element)
-    {
+            SIElement element) {
         super(transport, type, element);
         this.transport = transport;
     }
 
-    public Transport getTransport()
-    {
+    public Transport getTransport() {
         return transport;
     }
 

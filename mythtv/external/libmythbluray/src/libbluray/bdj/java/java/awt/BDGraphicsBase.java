@@ -31,13 +31,16 @@ import java.awt.image.ImageConsumer;
 import java.awt.image.ImageObserver;
 
 import org.dvb.ui.DVBBufferedImage;
+import org.dvb.ui.DVBAlphaComposite;
+import org.dvb.ui.DVBGraphics;
+import org.dvb.ui.UnsupportedDrawingOperationException;
 
 import sun.awt.ConstrainableGraphics;
 
 import org.videolan.GUIManager;
 import org.videolan.Logger;
 
-abstract class BDGraphicsBase extends Graphics2D implements ConstrainableGraphics {
+abstract class BDGraphicsBase extends DVBGraphics implements ConstrainableGraphics {
     private static final Color DEFAULT_COLOR = Color.BLACK;
     private static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
 
@@ -146,6 +149,52 @@ abstract class BDGraphicsBase extends Graphics2D implements ConstrainableGraphic
         return new BDGraphics((BDGraphics)this);
     }
 
+    /*
+     * DVBGraphics methods
+     */
+
+    public int[] getAvailableCompositeRules()
+    {
+        /*
+        int[] rules = { DVBAlphaComposite.CLEAR, DVBAlphaComposite.SRC,
+                        DVBAlphaComposite.SRC_OVER, DVBAlphaComposite.DST_OVER,
+                        DVBAlphaComposite.SRC_IN, DVBAlphaComposite.DST_IN,
+                        DVBAlphaComposite.SRC_OUT, DVBAlphaComposite.DST_OUT };
+        */
+        int[] rules = {
+            DVBAlphaComposite.CLEAR,
+            DVBAlphaComposite.SRC,
+            DVBAlphaComposite.SRC_OVER };
+
+        return rules;
+    }
+
+    public DVBAlphaComposite getDVBComposite()
+    {
+        Composite comp = getComposite();
+        if (!(comp instanceof AlphaComposite))
+            return null;
+        return DVBAlphaComposite.getInstance(
+                                             ((AlphaComposite)comp).getRule(),
+                                             ((AlphaComposite)comp).getAlpha());
+    }
+
+    public void setDVBComposite(DVBAlphaComposite comp)
+                    throws UnsupportedDrawingOperationException
+    {
+        if ((comp.getRule() < DVBAlphaComposite.CLEAR) ||
+            (comp.getRule() > DVBAlphaComposite.SRC_OVER)) {
+            logger.error("setDVBComposite() FAILED: unsupported rule " + comp.getRule());
+            throw new UnsupportedDrawingOperationException("Unsupported composition rule: " + comp.getRule());
+        }
+
+        setComposite(AlphaComposite.getInstance(comp.getRule(), comp.getAlpha()));
+    }
+
+    /*
+     *
+     */
+
     public void translate(int x, int y) {
         originX += x;
         originY += y;
@@ -159,6 +208,8 @@ abstract class BDGraphicsBase extends Graphics2D implements ConstrainableGraphic
     }
 
     public Font getFont() {
+        if (font == null)
+            return DEFAULT_FONT;
         return font;
     }
 
@@ -166,11 +217,18 @@ abstract class BDGraphicsBase extends Graphics2D implements ConstrainableGraphic
         if (font != null && fontMetrics == null) {
             fontMetrics = BDFontMetrics.getFontMetrics(font);
         }
+        if (fontMetrics == null) {
+            logger.error("getFontMetrics() failed");
+        }
         return fontMetrics;
     }
 
     public FontMetrics getFontMetrics(Font font) {
-        return BDFontMetrics.getFontMetrics(font);
+        if (font != null) {
+            return BDFontMetrics.getFontMetrics(font);
+        }
+        logger.error("getFontMetrics(null) from " + Logger.dumpStack());
+        return null;
     }
 
     public void setColor(Color c) {
@@ -187,13 +245,17 @@ abstract class BDGraphicsBase extends Graphics2D implements ConstrainableGraphic
     }
 
     public GraphicsConfiguration getDeviceConfiguration() {
+        if (gc == null)
+            logger.error("getDeviceConfiguration() failed");
         return gc;
     }
 
     public void setComposite(Composite comp) {
         if ((comp != null) && (comp != composite)) {
-            if (!(comp instanceof AlphaComposite))
+            if (!(comp instanceof AlphaComposite)) {
+                logger.error("Composite is not AlphaComposite");
                 throw new IllegalArgumentException("Only AlphaComposite is supported");
+            }
             composite = (AlphaComposite) comp;
         }
     }
@@ -255,8 +317,10 @@ abstract class BDGraphicsBase extends Graphics2D implements ConstrainableGraphic
         } else if (clip instanceof Rectangle) {
             Rectangle rect = (Rectangle) clip;
             setClip(rect.x, rect.y, rect.width, rect.height);
-        } else
+        } else {
+            logger.error("Shape is not Rectangle: " + clip.getClass().getName());
             throw new IllegalArgumentException("setClip(Shape) only supports Rectangle objects");
+        }
     }
 
     private void setupClip() {
@@ -1463,9 +1527,11 @@ abstract class BDGraphicsBase extends Graphics2D implements ConstrainableGraphic
         try {
             return (Image)bufferedImagePeer.get(image);
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            logger.error("Failed getting buffered image peer: " + e + "\n" +
+                         Logger.dumpStack(e));
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.error("Failed getting buffered image peer: " + e + "\n" +
+                         Logger.dumpStack(e));
         }
         return null;
     }

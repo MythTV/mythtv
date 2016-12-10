@@ -20,13 +20,11 @@
 package org.dvb.application;
 
 public class IllegalProfileParameterException extends Exception {
-    public IllegalProfileParameterException()
-    {
+    public IllegalProfileParameterException() {
         super();
     }
 
-    public IllegalProfileParameterException(String reason)
-    {
+    public IllegalProfileParameterException(String reason) {
         super(reason);
     }
 

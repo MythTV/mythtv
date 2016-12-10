@@ -27,13 +27,11 @@ import org.videolan.BDJXletContext;
 import org.videolan.Logger;
 
 public class HStaticText extends HVisible implements HNoInputPreferred {
-    public HStaticText()
-    {
+    public HStaticText() {
         this(null, 0, 0, 0, 0);
     }
 
-    public HStaticText(String textNormal, int x, int y, int width, int height)
-    {
+    public HStaticText(String textNormal, int x, int y, int width, int height) {
         super(getDefaultLook(), x, y, width, height);
         setTextContent(textNormal, ALL_STATES);
         logger.info("HStaticText " + textNormal + " at " + x + "," + y + " " + width + "x" + height);
@@ -41,8 +39,7 @@ public class HStaticText extends HVisible implements HNoInputPreferred {
 
     public HStaticText(String textNormal, int x, int y, int width, int height,
             Font font, Color foreground, Color background,
-            HTextLayoutManager tlm)
-    {
+            HTextLayoutManager tlm) {
         this(textNormal, x, y, width, height);
         setFont(font);
         setForeground(foreground);
@@ -50,15 +47,13 @@ public class HStaticText extends HVisible implements HNoInputPreferred {
         setTextLayoutManager(tlm);
     }
 
-    public HStaticText(String textNormal)
-    {
+    public HStaticText(String textNormal) {
         this(textNormal, 0, 0, 0, 0);
         setTextContent(textNormal, NORMAL_STATE);
     }
 
     public HStaticText(String textNormal, Font font, Color foreground,
-            Color background, HTextLayoutManager tlm)
-    {
+            Color background, HTextLayoutManager tlm) {
         this(textNormal, 0, 0, 0, 0);
         setFont(font);
         setForeground(foreground);
@@ -66,20 +61,17 @@ public class HStaticText extends HVisible implements HNoInputPreferred {
         setTextLayoutManager(tlm);
     }
 
-    public void setLook(HLook hlook) throws HInvalidLookException
-    {
+    public void setLook(HLook hlook) throws HInvalidLookException {
         if ((hlook != null) && !(hlook instanceof HTextLook))
             throw new HInvalidLookException();
         super.setLook(hlook);
     }
 
-    public static void setDefaultLook(HTextLook hlook)
-    {
+    public static void setDefaultLook(HTextLook hlook) {
         BDJXletContext.setXletDefaultLook(PROPERTY_LOOK,hlook);
     }
 
-    public static HTextLook getDefaultLook()
-    {
+    public static HTextLook getDefaultLook() {
         return (HTextLook) BDJXletContext.getXletDefaultLook(PROPERTY_LOOK,DEFAULT_LOOK);
     }
 
