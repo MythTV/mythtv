@@ -67,8 +67,8 @@ HEADERS += src/libbluray/disc/aacs.h src/libbluray/disc/bdplus.h src/libbluray/d
 HEADERS += src/libbluray/disc/enc_info.h src/libbluray/disc/udf_fs.h
 HEADERS += src/libbluray/hdmv/hdmv_insn.h src/libbluray/hdmv/hdmv_vm.h src/libbluray/hdmv/mobj_parse.h
 HEADERS += src/file/dirs.h src/file/dl.h src/file/file.h src/file/filesystem.h src/file/mount.h
-HEADERS += src/util/array.h src/util/attributes.h src/util/bits.h src/util/logging.h src/util/log_control.h
-HEADERS += src/util/macro.h src/util/mutex.h src/util/refcnt.h src/util/strutl.h src/util/time.h
+HEADERS += src/util/array.h src/util/attributes.h src/util/bits.h src/util/event_queue.h src/util/logging.h
+HEADERS += src/util/log_control.h src/util/macro.h src/util/mutex.h src/util/refcnt.h src/util/strutl.h src/util/time.h
 
 SOURCES += src/libbluray/bluray.c src/libbluray/register.c
 SOURCES += src/libbluray/bdnav/bdid_parse.c src/libbluray/bdnav/clpi_parse.c src/libbluray/bdnav/extdata_parse.c
@@ -82,7 +82,8 @@ SOURCES += src/libbluray/disc/aacs.c src/libbluray/disc/bdplus.c src/libbluray/d
 SOURCES += src/libbluray/disc/udf_fs.c
 SOURCES += src/file/file.c src/file/filesystem.c
 SOURCES += src/libbluray/hdmv/hdmv_vm.c src/libbluray/hdmv/mobj_parse.c src/libbluray/hdmv/mobj_print.c
-SOURCES += src/util/array.c src/util/bits.c src/util/logging.c src/util/mutex.c src/util/refcnt.c src/util/strutl.c src/util/time.c
+SOURCES += src/util/array.c src/util/bits.c src/util/event_queue.c src/util/logging.c src/util/mutex.c
+SOURCES += src/util/refcnt.c src/util/strutl.c src/util/time.c
 
 macx {
     SOURCES += src/file/dir_posix.c src/file/dirs_darwin.c src/file/dl_posix.c src/file/file_posix.c src/file/mount_darwin.c
