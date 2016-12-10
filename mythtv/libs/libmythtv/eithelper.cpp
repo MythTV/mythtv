@@ -20,7 +20,6 @@ using namespace std;
 #include "programinfo.h" // for subtitle types and audio and video properties
 #include "scheduledrecording.h" // for ScheduledRecording
 #include "compat.h" // for gmtime_r on windows.
-#include "eitcachedvb.h"
 
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::eitcache = new EITCache();
@@ -39,7 +38,6 @@ EITHelper::EITHelper() :
     eitfixup(new EITFixUp()),
     gps_offset(-1 * GPS_LEAP_SECONDS),
     sourceid(0), channelid(0),
-    tsid(0),
     maxStarttime(QDateTime()), seenEITother(false)
 {
     init_fixup(fixup);
@@ -142,14 +140,6 @@ void EITHelper::SetChannelID(uint _channelid)
 {
     QMutexLocker locker(&eitList_lock);
     channelid = _channelid;
-    QString dummy1;
-    uint64_t dummy2;
-    uint dummy3;
-    ChannelUtil::GetTuningParams(ChannelUtil::GetMplexID(channelid),
-                                      dummy1,dummy2,
-                                      tsid,
-                                      dummy3,
-                                      dummy1);
 }
 
 void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
@@ -363,15 +353,6 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
-    // Process a DVB EIT section
-    EitCacheDVB& dvbEITCache = EitCacheDVB::GetInstance();
-    if (dvbEITCache.ProcessSection(eit))
-        LOG(VB_EITDVBPF | VB_EITDVBSCH, LOG_DEBUG, LOC + QString("EITCacheDVB - "
-                "Table version change complete"));
-    else
-        return;
-
-
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||
         ((eit->TableID() >= TableID::SC_EITbeg) && (eit->TableID() <= TableID::SC_EITend)))
@@ -383,16 +364,16 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     {
         // EITo(ther)
         chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(), eit->TSID());
+        // do not reschedule if its only present+following
+        if (eit->TableID() != TableID::PF_EITo)
+        {
+            seenEITother = true;
+        }
     }
     if (!chanid)
-        // Ignore EIT sections I cannot find a channel for
         return;
 
-    // I will use sections from the schedule table to update the database.
-    // Sections from the PF table will be used to drive the scheduler.
-
     uint descCompression = (eit->TableID() > 0x80) ? 2 : 1;
-
     FixupValue fix = fixup.value((FixupKey)eit->OriginalNetworkID() << 16);
     fix |= fixup.value((((FixupKey)eit->TSID()) << 32) |
                  ((FixupKey)eit->OriginalNetworkID() << 16));
@@ -405,350 +386,335 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
     uint tableid   = eit->TableID();
     uint version   = eit->Version();
-
-    // Iterate  the table
+    for (uint i = 0; i < eit->EventCount(); i++)
     {
-        QMutexLocker(dvbEITCache.GetTableLock());
-        EitCacheDVB::ScheduleTable& scheduleTable = dvbEITCache.GetScheduleTable(eit);
-        for (uint subtable_index = 0; subtable_index < scheduleTable.subtable_count; subtable_index++)
+        // Skip event if we have already processed it before...
+        if (!eitcache->IsNewEIT(chanid, tableid, version, eit->EventID(i),
+                              eit->EndTimeUnixUTC(i)))
         {
-            EitCacheDVB::SubTable& subtable
-                    = scheduleTable.subtables[subtable_index];
+            continue;
+        }
 
-            for (uint segment_index = 0; segment_index < subtable.segment_count; segment_index++)
+        QString title         = QString("");
+        QString subtitle      = QString("");
+        QString description   = QString("");
+        QString category      = QString("");
+        ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
+        unsigned char subtitle_type=0, audio_props=0, video_props=0;
+        uint season = 0, episode = 0, totalepisodes = 0;
+        QMap<QString,QString> items;
+
+        // Parse descriptors
+        desc_list_t list = MPEGDescriptor::Parse(
+            eit->Descriptors(i), eit->DescriptorsLength(i));
+
+        const unsigned char *dish_event_name = NULL;
+        if (EITFixUp::kFixDish & fix)
+        {
+            dish_event_name = MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_name);
+        }
+
+        if (dish_event_name)
+        {
+            DishEventNameDescriptor dend(dish_event_name);
+            if (dend.HasName())
+                title = dend.Name(descCompression);
+
+            const unsigned char *dish_event_description =
+                MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_description);
+            if (dish_event_description)
             {
-                EitCacheDVB::Segment& segment
-                        = subtable.segments[segment_index];
-                for (uint section_index = 0; section_index < segment.section_count; section_index++)
+                DishEventDescriptionDescriptor dedd(dish_event_description);
+                if (dedd.HasDescription())
+                    description = dedd.Description(descCompression);
+            }
+        }
+        else
+        {
+            parse_dvb_event_descriptors(list, fix, languagePreferences,
+                                        title, subtitle, description, items);
+        }
+
+        parse_dvb_component_descriptors(list, subtitle_type, audio_props,
+                                        video_props);
+
+        QString programId = QString("");
+        QString seriesId  = QString("");
+        QString rating    = QString("");
+        QString rating_system = QString("");
+        QString advisory = QString("");
+        float stars = 0.0;
+        QDate originalairdate;
+
+        if (EITFixUp::kFixDish & fix)
+        {
+            const unsigned char *mpaa_data = MPEGDescriptor::Find(
+                list, PrivateDescriptorID::dish_event_mpaa);
+            if (mpaa_data)
+            {
+                DishEventMPAADescriptor mpaa(mpaa_data);
+                stars = mpaa.stars();
+
+                if (stars) // Only movies for now
                 {
-                    EitCacheDVB::Section& section
-                            = segment.sections[section_index];
-                    for (EitCacheDVB::Section::Events::Iterator iTr = section.events.begin();
-                            iTr != section.events.end(); iTr++)
+                    rating = mpaa.rating();
+                    rating_system = "MPAA";
+                    advisory = mpaa.advisory();
+                }
+            }
+
+            if (!stars) // Not MPAA rated, check VCHIP
+            {
+                const unsigned char *vchip_data = MPEGDescriptor::Find(
+                    list, PrivateDescriptorID::dish_event_vchip);
+                if (vchip_data)
+                {
+                    DishEventVCHIPDescriptor vchip(vchip_data);
+                    rating = vchip.rating();
+                    rating_system = "VCHIP";
+                    advisory = vchip.advisory();
+                }
+            }
+
+            if (!advisory.isEmpty() && !rating.isEmpty())
+                rating += ", " + advisory;
+            else if (!advisory.isEmpty())
+            {
+                rating = advisory;
+                rating_system = "advisory";
+            }
+
+            const unsigned char *tags_data = MPEGDescriptor::Find(
+                list, PrivateDescriptorID::dish_event_tags);
+            if (tags_data)
+            {
+                DishEventTagsDescriptor tags(tags_data);
+                seriesId  = tags.seriesid();
+                programId = tags.programid();
+                originalairdate = tags.originalairdate(); // future use
+
+                if (programId.startsWith("MV") || programId.startsWith("SP"))
+                    seriesId = "";
+            }
+
+            const unsigned char *properties_data = MPEGDescriptor::Find(
+                list, PrivateDescriptorID::dish_event_properties);
+            if (properties_data)
+            {
+                DishEventPropertiesDescriptor properties(properties_data);
+                subtitle_type |= properties.SubtitleProperties(descCompression);
+                audio_props   |= properties.AudioProperties(descCompression);
+            }
+        }
+
+        const unsigned char *content_data =
+            MPEGDescriptor::Find(list, DescriptorID::content);
+        if (content_data)
+        {
+            if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
+            {
+                DishContentDescriptor content(content_data);
+                switch (content.GetTheme())
+                {
+                    case kThemeMovie :
+                        category_type = ProgramInfo::kCategoryMovie;
+                        break;
+                    case kThemeSeries :
+                        category_type = ProgramInfo::kCategorySeries;
+                        break;
+                    case kThemeSports :
+                        category_type = ProgramInfo::kCategorySports;
+                        break;
+                    default :
+                        category_type = ProgramInfo::kCategoryNone;
+                }
+                if (EITFixUp::kFixDish & fix)
+                    category  = content.GetCategory();
+            }
+            else if (EITFixUp::kFixAUDescription & fix)//AU Freeview assigned genres
+            {
+                ContentDescriptor content(content_data);
+                switch (content.Nibble1(0))
+                {
+                    case 0x01:
+                        category = "Movie";
+                        break;
+                    case 0x02:
+                        category = "News";
+                        break;
+                    case 0x03:
+                        category = "Entertainment";
+                        break;
+                    case 0x04:
+                        category = "Sport";
+                        break;
+                    case 0x05:
+                        category = "Children";
+                        break;
+                    case 0x06:
+                        category = "Music";
+                        break;
+                    case 0x07:
+                        category = "Arts/Culture";
+                        break;
+                    case 0x08:
+                        category = "Current Affairs";
+                        break;
+                    case 0x09:
+                        category = "Education";
+                        break;
+                    case 0x0A:
+                        category = "Infotainment";
+                        break;
+                    case 0x0B:
+                        category = "Special";
+                        break;
+                    case 0x0C:
+                        category = "Comedy";
+                        break;
+                    case 0x0D:
+                        category = "Drama";
+                        break;
+                    case 0x0E:
+                        category = "Documentary";
+                        break;
+                    default:
+                        category = "";
+                        break;
+                }
+                category_type = content.GetMythCategory(0);
+            }
+            else if (EITFixUp::kFixGreekEIT & fix)//Greek
+            {
+                ContentDescriptor content(content_data);
+                switch (content.Nibble2(0))
+                {
+                    case 0x01:
+                        category = "Ταινία";       // confirmed
+                        break;
+                    case 0x02:
+                        category = "Ενημερωτικό";  // confirmed
+                        break;
+                    case 0x04:
+                        category = "Αθλητικό";     // confirmed
+                        break;
+                    case 0x05:
+                        category = "Παιδικό";      // confirmed
+                        break;
+                    case 0x09:
+                        category = "Ντοκιμαντέρ";  // confirmed
+                        break;
+                    default:
+                        category = "";
+                        break;
+                }
+                category_type = content.GetMythCategory(2);
+            }
+            else
+            {
+                ContentDescriptor content(content_data);
+                category      = content.GetDescription(0);
+#if 0 /* there is no category_type in DVB EIT */
+                category_type = content.GetMythCategory(0);
+#endif
+            }
+        }
+
+        desc_list_t contentIds =
+            MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
+        for (uint j = 0; j < contentIds.size(); j++)
+        {
+            DVBContentIdentifierDescriptor desc(contentIds[j]);
+            for (uint k = 0; k < desc.CRIDCount(); k++)
+            {
+                if (desc.ContentEncoding(k) == 0)
+                {
+                    // The CRID is a URI.  It could contain UTF8 sequences encoded
+                    // as %XX but there's no advantage in decoding them.
+                    // The BBC currently uses private types 0x31 and 0x32.
+                    // IDs from the authority eventis.nl are not fit for our scheduler
+                    if (desc.ContentType(k) == 0x01 || desc.ContentType(k) == 0x31)
                     {
-                        // Take a ref
-                        EitCacheDVB::Section::EventPointer event = *iTr;
-
-                        // TODO this stuff really needs an overhaul
-                        // Update the cache this puts the event id into the cache
-                        eitcache->IsNewEIT(chanid, tableid, version, event->event_id,
-                                              event->start_time + event->duration);
-
-                        QString title         = QString("");
-                        QString subtitle      = QString("");
-                        QString description   = QString("");
-                        QString category      = QString("");
-                        ProgramInfo::CategoryType category_type = ProgramInfo::kCategoryNone;
-                        unsigned char subtitle_type=0, audio_props=0, video_props=0;
-                        uint season = 0, episode = 0, totalepisodes = 0;
-                        QMap<QString,QString> items;
-
-                        // Parse descriptors
-                        desc_list_t list = MPEGDescriptor::Parse(
-                                (const unsigned char*)(event->descriptors.constData()),
-                                event->descriptors.size());
-
-                        const unsigned char *dish_event_name = NULL;
-                        if (EITFixUp::kFixDish & fix)
+                        if (!desc.ContentId(k).startsWith ("eventis.nl/"))
                         {
-                            dish_event_name = MPEGDescriptor::Find(
-                                    list, PrivateDescriptorID::dish_event_name);
+                            programId = desc.ContentId(k);
                         }
-
-                        if (dish_event_name)
+                    }
+                    else if (desc.ContentType(k) == 0x02 || desc.ContentType(k) == 0x32)
+                    {
+                        if (!desc.ContentId(k).startsWith ("eventis.nl/"))
                         {
-                            DishEventNameDescriptor dend(dish_event_name);
-                            if (dend.HasName())
-                                title = dend.Name(descCompression);
-
-                            const unsigned char *dish_event_description =
-                                MPEGDescriptor::Find(
-                                    list, PrivateDescriptorID::dish_event_description);
-                            if (dish_event_description)
-                            {
-                                DishEventDescriptionDescriptor dedd(dish_event_description);
-                                if (dedd.HasDescription())
-                                    description = dedd.Description(descCompression);
-                            }
+                            seriesId = desc.ContentId(k);
                         }
-                        else
-                        {
-                            parse_dvb_event_descriptors(list, fix, languagePreferences,
-                                                        title, subtitle, description, items);
-                        }
-
-                        parse_dvb_component_descriptors(list, subtitle_type, audio_props,
-                                                        video_props);
-
-                        QString programId = QString("");
-                        QString seriesId  = QString("");
-                        QString rating    = QString("");
-                        QString rating_system = QString("");
-                        QString advisory = QString("");
-                        float stars = 0.0;
-                        QDate originalairdate;
-
-                        if (EITFixUp::kFixDish & fix)
-                        {
-                            const unsigned char *mpaa_data = MPEGDescriptor::Find(
-                                list, PrivateDescriptorID::dish_event_mpaa);
-                            if (mpaa_data)
-                            {
-                                DishEventMPAADescriptor mpaa(mpaa_data);
-                                stars = mpaa.stars();
-
-                                if (stars) // Only movies for now
-                                {
-                                    rating = mpaa.rating();
-                                    rating_system = "MPAA";
-                                    advisory = mpaa.advisory();
-                                }
-                            }
-
-                            if (!stars) // Not MPAA rated, check VCHIP
-                            {
-                                const unsigned char *vchip_data = MPEGDescriptor::Find(
-                                    list, PrivateDescriptorID::dish_event_vchip);
-                                if (vchip_data)
-                                {
-                                    DishEventVCHIPDescriptor vchip(vchip_data);
-                                    rating = vchip.rating();
-                                    rating_system = "VCHIP";
-                                    advisory = vchip.advisory();
-                                }
-                            }
-
-                            if (!advisory.isEmpty() && !rating.isEmpty())
-                                rating += ", " + advisory;
-                            else if (!advisory.isEmpty())
-                            {
-                                rating = advisory;
-                                rating_system = "advisory";
-                            }
-
-                            const unsigned char *tags_data = MPEGDescriptor::Find(
-                                list, PrivateDescriptorID::dish_event_tags);
-                            if (tags_data)
-                            {
-                                DishEventTagsDescriptor tags(tags_data);
-                                seriesId  = tags.seriesid();
-                                programId = tags.programid();
-                                originalairdate = tags.originalairdate(); // future use
-
-                                if (programId.startsWith("MV") || programId.startsWith("SP"))
-                                    seriesId = "";
-                            }
-
-                            const unsigned char *properties_data = MPEGDescriptor::Find(
-                                list, PrivateDescriptorID::dish_event_properties);
-                            if (properties_data)
-                            {
-                                DishEventPropertiesDescriptor properties(properties_data);
-                                subtitle_type |= properties.SubtitleProperties(descCompression);
-                                audio_props   |= properties.AudioProperties(descCompression);
-                            }
-                            const unsigned char *content_data =
-                                MPEGDescriptor::Find(list, DescriptorID::content);
-                            if (content_data)
-                            {
-                                if ((EITFixUp::kFixDish & fix) || (EITFixUp::kFixBell & fix))
-                                {
-                                    DishContentDescriptor content(content_data);
-                                    switch (content.GetTheme())
-                                    {
-                                        case kThemeMovie :
-                                            category_type = ProgramInfo::kCategoryMovie;
-                                            break;
-                                        case kThemeSeries :
-                                            category_type = ProgramInfo::kCategorySeries;
-                                            break;
-                                        case kThemeSports :
-                                            category_type = ProgramInfo::kCategorySports;
-                                            break;
-                                        default :
-                                            category_type = ProgramInfo::kCategoryNone;
-                                    }
-                                    if (EITFixUp::kFixDish & fix)
-                                        category  = content.GetCategory();
-                                }
-                                else if (EITFixUp::kFixAUDescription & fix)//AU Freeview assigned genres
-                                {
-                                    ContentDescriptor content(content_data);
-                                    switch (content.Nibble1(0))
-                                    {
-                                        case 0x01:
-                                            category = "Movie";
-                                            break;
-                                        case 0x02:
-                                            category = "News";
-                                            break;
-                                        case 0x03:
-                                            category = "Entertainment";
-                                            break;
-                                        case 0x04:
-                                            category = "Sport";
-                                            break;
-                                        case 0x05:
-                                            category = "Children";
-                                            break;
-                                        case 0x06:
-                                            category = "Music";
-                                            break;
-                                        case 0x07:
-                                            category = "Arts/Culture";
-                                            break;
-                                        case 0x08:
-                                            category = "Current Affairs";
-                                            break;
-                                        case 0x09:
-                                            category = "Education";
-                                            break;
-                                        case 0x0A:
-                                            category = "Infotainment";
-                                            break;
-                                        case 0x0B:
-                                            category = "Special";
-                                            break;
-                                        case 0x0C:
-                                            category = "Comedy";
-                                            break;
-                                        case 0x0D:
-                                            category = "Drama";
-                                            break;
-                                        case 0x0E:
-                                            category = "Documentary";
-                                            break;
-                                        default:
-                                            category = "";
-                                            break;
-                                    }
-                                    category_type = content.GetMythCategory(0);
-                                }
-                                else if (EITFixUp::kFixGreekEIT & fix)//Greek
-                                {
-                                    ContentDescriptor content(content_data);
-                                    switch (content.Nibble2(0))
-                                    {
-                                        case 0x01:
-                                            category = "Ταινία";       // confirmed
-                                            break;
-                                        case 0x02:
-                                            category = "Ενημερωτικό";  // confirmed
-                                            break;
-                                        case 0x04:
-                                            category = "Αθλητικό";     // confirmed
-                                            break;
-                                        case 0x05:
-                                            category = "Παιδικό";      // confirmed
-                                            break;
-                                        case 0x09:
-                                            category = "Ντοκιμαντέρ";  // confirmed
-                                            break;
-                                        default:
-                                            category = "";
-                                            break;
-                                    }
-                                    category_type = content.GetMythCategory(2);
-                                }
-                                else
-                                {
-                                    ContentDescriptor content(content_data);
-                                    category      = content.GetDescription(0);
-                    #if 0 // there is no category_type in DVB EIT
-                                    category_type = content.GetMythCategory(0);
-                    #endif
-                                }
-                            }
-
-                            desc_list_t contentIds =
-                                MPEGDescriptor::FindAll(list, DescriptorID::dvb_content_identifier);
-                            for (uint j = 0; j < contentIds.size(); j++)
-                            {
-                                DVBContentIdentifierDescriptor desc(contentIds[j]);
-                                for (uint k = 0; k < desc.CRIDCount(); k++)
-                                {
-                                    if (desc.ContentEncoding(k) == 0)
-                                    {
-                                        // The CRID is a URI.  It could contain UTF8 sequences encoded
-                                        // as %XX but there's no advantage in decoding them.
-                                        // The BBC currently uses private types 0x31 and 0x32.
-                                        // IDs from the authority eventis.nl are not fit for our scheduler
-                                        if (desc.ContentType(k) == 0x01 || desc.ContentType(k) == 0x31)
-                                        {
-                                            if (!desc.ContentId(k).startsWith ("eventis.nl/"))
-                                            {
-                                                programId = desc.ContentId(k);
-                                            }
-                                        }
-                                        else if (desc.ContentType(k) == 0x02 || desc.ContentType(k) == 0x32)
-                                        {
-                                            if (!desc.ContentId(k).startsWith ("eventis.nl/"))
-                                            {
-                                                seriesId = desc.ContentId(k);
-                                            }
-                                            category_type = ProgramInfo::kCategorySeries;
-                                        }
-                                    }
-                                }
-                            }
-
-                            // if we don't have a subtitle, try to parse one from private descriptors
-                            if (subtitle.isEmpty()) {
-                                bool isUPC = false;
-                                // is this event carrying UPC private data?
-                                desc_list_t private_data_specifiers = MPEGDescriptor::FindAll(list, DescriptorID::private_data_specifier);
-                                for (uint j = 0; j < private_data_specifiers.size(); j++) {
-                                    PrivateDataSpecifierDescriptor desc(private_data_specifiers[j]);
-                                    if (desc.PrivateDataSpecifier() == PrivateDataSpecifierID::UPC1) {
-                                        isUPC = true;
-                                    }
-                                }
-
-                                if (isUPC) {
-                                    desc_list_t subtitles = MPEGDescriptor::FindAll(list, PrivateDescriptorID::upc_event_episode_title);
-                                    for (uint j = 0; j < subtitles.size(); j++) {
-                                        PrivateUPCCablecomEpisodeTitleDescriptor desc(subtitles[j]);
-
-                                        subtitle = desc.Text();
-                                    }
-                                }
-                            }
-
-
-                            QDateTime starttime;
-                            starttime.fromTime_t(event->start_time);
-                            // fix starttime only if the duration is a multiple of a minute
-                            if (!(event->duration % 60))
-                                EITFixUp::TimeFix(starttime);
-
-
-                            QDateTime endtime = starttime.addSecs(event->duration);
-
-                            DBEventEIT *event = new DBEventEIT(
-                                chanid,
-                                title,     subtitle,      description,
-                                category,  category_type,
-                                starttime, endtime,       fix,
-                                subtitle_type,
-                                audio_props,
-                                video_props, stars,
-                                seriesId,  programId,
-                                season, episode, totalepisodes);
-                            event->items = items;
-
-                            db_events.enqueue(event);
-                        }
+                        category_type = ProgramInfo::kCategorySeries;
                     }
                 }
             }
         }
+
+        /* if we don't have a subtitle, try to parse one from private descriptors */
+        if (subtitle.isEmpty()) {
+            bool isUPC = false;
+            /* is this event carrying UPC private data? */
+            desc_list_t private_data_specifiers = MPEGDescriptor::FindAll(list, DescriptorID::private_data_specifier);
+            for (uint j = 0; j < private_data_specifiers.size(); j++) {
+                PrivateDataSpecifierDescriptor desc(private_data_specifiers[j]);
+                if (desc.PrivateDataSpecifier() == PrivateDataSpecifierID::UPC1) {
+                    isUPC = true;
+                }
+            }
+
+            if (isUPC) {
+                desc_list_t subtitles = MPEGDescriptor::FindAll(list, PrivateDescriptorID::upc_event_episode_title);
+                for (uint j = 0; j < subtitles.size(); j++) {
+                    PrivateUPCCablecomEpisodeTitleDescriptor desc(subtitles[j]);
+
+                    subtitle = desc.Text();
+                }
+            }
+        }
+
+
+        QDateTime starttime = eit->StartTimeUTC(i);
+        // fix starttime only if the duration is a multiple of a minute
+        uint total_duration = eit->DurationInSeconds(i);
+        if (!(total_duration % 60))
+            EITFixUp::TimeFix(starttime);
+        QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
+
+        // Make an ETSI TS 102 851 compliant event URL
+        uint duration_hours = total_duration / 3600;
+        uint duration_mins = (total_duration - (duration_hours * 3600)) / 60;
+        uint duration_secs = total_duration % 60;
+        QString etsiEventUrl(QString("dvb://%1.%2.%3;%4~%5Z--PT%6H%7M%8S")
+                                .arg(eit->OriginalNetworkID(),0,16)
+                                .arg(eit->TSID(),0,16)
+                                .arg(eit->ServiceID(),0,16)
+                                .arg(eit->EventID(i),0.16)
+                                .arg(starttime.toString(QString("yyyyMMdd'T'hhmmss")))
+                                .arg(duration_hours,2)
+                                .arg(duration_mins,2)
+                                .arg(duration_secs,2));
+
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("DVB URL -- %1")
+            .arg(etsiEventUrl));
+
+        DBEventEIT *event = new DBEventEIT(
+            chanid,
+            title,     subtitle,      description,
+            category,  category_type,
+            starttime, endtime,       fix,
+            subtitle_type,
+            audio_props,
+            video_props, stars,
+            seriesId,  programId,
+            season, episode, totalepisodes);
+        event->items = items;
+
+        db_events.enqueue(event);
     }
-
-    // TODO remove deleted events
-    // I have just got a complete new table for this channel
-    // Iterate all the events in the myth eit cache and delete
-    // ones that are not in the DVB cache.
-
 }
 
 // This function gets special EIT data from the German provider Premiere

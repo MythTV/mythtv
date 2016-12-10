@@ -148,7 +148,6 @@ class EITHelper
     /* carry some values to optimize channel lookup and reschedules */
     uint                    sourceid;            ///< id of the video source
     uint                    channelid;           ///< id of the channel
-    uint                    tsid;                ///< tsid of active channel
     QDateTime               maxStarttime;        ///< latest starttime of changed events
     bool                    seenEITother;        ///< if false we only reschedule the active mplex
 
