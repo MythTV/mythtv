@@ -1988,7 +1988,7 @@ void ZMServer::zmcControl(MONITOR *monitor, const string &mode)
     else
     {
         sql += "WHERE Id = '" + monitor->getIdStr() + "'";
-        zmcArgs = "-m " + monitor->mon_id;
+        zmcArgs = "-m " + monitor->getIdStr();
     }
 
     if (mysql_query(&g_dbConn, sql.c_str()))
