@@ -176,7 +176,7 @@ class DVBMainStreamListener
   public:
     virtual void HandleTDT(const TimeDateTable*) = 0;
     virtual void HandleNIT(const NetworkInformationTable*) = 0;
-    virtual void HandleSDT(uint tsid, const ServiceDescriptionTable*) = 0;
+    virtual void HandleSDT(const ServiceDescriptionTable*) = 0;
 };
 
 class DVBOtherStreamListener

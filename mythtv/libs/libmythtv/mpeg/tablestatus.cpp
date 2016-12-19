@@ -55,14 +55,14 @@ bool TableStatus::HasAllSections() const
 }
 
 
-void TableStatusMap::SetVersion(uint64_t key, int32_t version, uint32_t last_section)
+void TableStatusMap::SetVersion(uint32_t key, int32_t version, uint32_t last_section)
 {
     TableStatus &status = (*this)[key];
     //NOTE: relies on status.m_version being invalid(-2) if a new entry was just added to the map
     status.SetVersion(version, last_section);
 }
 
-void TableStatusMap::SetSectionSeen(uint64_t key, int32_t version, uint32_t section,
+void TableStatusMap::SetSectionSeen(uint32_t key, int32_t version, uint32_t section,
                                     uint32_t last_section, uint32_t segment_last_section)
 {
     TableStatus &status = (*this)[key];
@@ -70,7 +70,7 @@ void TableStatusMap::SetSectionSeen(uint64_t key, int32_t version, uint32_t sect
     status.SetSectionSeen(version, section, last_section, segment_last_section);
 }
 
-bool TableStatusMap::IsSectionSeen(uint64_t key, int32_t version, uint32_t section) const
+bool TableStatusMap::IsSectionSeen(uint32_t key, int32_t version, uint32_t section) const
 {
     const_iterator it = this->find(key);
     if (it == this->end() || it->m_version != version)
@@ -78,7 +78,7 @@ bool TableStatusMap::IsSectionSeen(uint64_t key, int32_t version, uint32_t secti
     return (bool) (it->m_sections[section>>3] & BIT_SEL(section & 0x7));
 }
 
-bool TableStatusMap::HasAllSections(uint64_t key) const
+bool TableStatusMap::HasAllSections(uint32_t key) const
 {
     const_iterator it = this->find(key);
     if (it == this->end())

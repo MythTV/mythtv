@@ -490,7 +490,7 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
         return;
 }
 
-void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
+void DTVSignalMonitor::HandleSDT(const ServiceDescriptionTable *sdt)
 {
     AddFlags(kDTVSigMon_SDTSeen);
 
@@ -509,7 +509,8 @@ void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
 
     if (sdt->OriginalNetworkID() != networkID || sdt->TSID() != transportID)
     {
-        GetDVBStreamData()->SetVersionSDT(sdt->TSID(), -1, 0);
+        GetDVBStreamData()->SetVersionSDT(detectedNetworkID, detectedTransportID,
+                                          sdt->TableID(), -1, 0);
     }
     else
     {

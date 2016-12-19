@@ -33,35 +33,15 @@ private:
     static const uint8_t init_bits[8];
 };
 
-class TableStatusMap : public QMap<uint64_t, TableStatus>
+
+class TableStatusMap : public QMap<uint32_t, TableStatus>
 {
 public:
-    void SetVersion(uint32_t key, int32_t version, uint32_t last_section)
-    {
-        SetVersion(uint64_t(key), version, last_section);
-    }
-
+    void SetVersion(uint32_t key, int32_t version, uint32_t last_section);
     void SetSectionSeen(uint32_t key, int32_t version, uint32_t section,
-                        uint32_t last_section, uint32_t segment_last_section = 0xffff)
-    {
-        SetSectionSeen(uint64_t(key), version, section, last_section, segment_last_section);
-    }
-
-    bool IsSectionSeen(uint32_t key, int32_t version, uint32_t section) const
-    {
-        return IsSectionSeen(uint64_t(key), version, section);
-    }
-
-    bool HasAllSections(uint32_t key) const
-    {
-        return HasAllSections(uint64_t(key));
-    }
-
-    void SetVersion(uint64_t key, int32_t version, uint32_t last_section);
-    void SetSectionSeen(uint64_t key, int32_t version, uint32_t section,
                         uint32_t last_section, uint32_t segment_last_section = 0xffff);
-    bool IsSectionSeen(uint64_t key, int32_t version, uint32_t section) const;
-    bool HasAllSections(uint64_t key) const;
+    bool IsSectionSeen(uint32_t key, int32_t version, uint32_t section) const;
+    bool HasAllSections(uint32_t key) const;
 };
 
 #endif // TABLESTATUS_H_

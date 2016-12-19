@@ -65,6 +65,8 @@ using namespace std;
 #include "hdhrchannel.h"
 #include "v4lchannel.h"
 
+typedef QMap<uint, sdt_const_vec_t> sdt_map_t;
+
 /// SDT's should be sent every 2 seconds and NIT's every
 /// 10 seconds, so lets wait at least 30 seconds, in
 /// case of bad transmitter or lost packets.
@@ -110,7 +112,7 @@ class ScannedChannelInfo
 
     // DVB
     nit_const_vec_t   nits;
-    sdt_map_t         sdts;
+    sdt_map_t   sdts;
 };
 
 /** \class ChannelScanSM
@@ -420,7 +422,7 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
     UpdateChannelInfo(true);
 }
 
-void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
+void ChannelScanSM::HandleSDT(const ServiceDescriptionTable *sdt)
 {
     QMutexLocker locker(&m_lock);
 
@@ -449,7 +451,8 @@ void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
     {
         // Set the version for the SDT so we see it again.
         GetDTVSignalMonitor()->GetDVBStreamData()->
-            SetVersionSDT(sdt->TSID(), -1, 0);
+            SetVersionSDT(sdt->OriginalNetworkID(), sdt->TSID(),
+                          sdt->TableID(), -1, 0);
     }
 
     uint id = sdt->OriginalNetworkID() << 16 | sdt->TSID();
@@ -828,6 +831,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     tsid_checked.clear();
     for (uint i = 0; i < sdttmp.size(); i++)
     {
+        uint onid = sdttmp[i]->OriginalNetworkID();
         uint tsid = sdttmp[i]->TSID();
         if (tsid_checked[tsid])
             continue;
@@ -835,10 +839,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (m_currentInfo->sdts.contains(tsid))
             continue;
 
-        if (!wait_until_complete || sd->HasCachedAllSDT(tsid))
-            m_currentInfo->sdts[tsid] = sd->GetCachedSDTs(tsid);
+        if (!wait_until_complete || sd->HasAllSDTSections(onid, tsid, TableID::SDT))
+            m_currentInfo->sdts[tsid] = sd->GetCachedSDTs();
     }
-    sd->ReturnCachedSDTTables(sdttmp);
 
     // Check if transport tuning is complete
     if (transport_tune_complete)
