@@ -1,3 +1,9 @@
+<html><head>
+<script src="/js/utility.js"></script> <!-- ECMA not JS -->
+<script src="/js/util.qjs"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
+</head><body>
 <h3>JW Player&trade; by LongTail Video</h3>
 <a href='http://www.longtailvideo.com/players/'>JW Player&trade;</a>&nbsp;
 is a Flash &amp; HTML5 Video Player for FLV, H.264, MP3 and YouTube Videos.<br>
@@ -27,15 +33,15 @@ If you are unsure whether you need to purchase a license, please <a href="http:/
     {
 %>
 <h3>JW Player&trade; is <b>not</b> installed.</h3>
-<input type=button value='Install JW Player' onClick='installPackage("jwplayer.zip"); loadContent("/3rdParty/jwplayer.qsp");'><br>
+<input type=button value='Install JW Player' onClick='installPackage("jwplayer.zip"); loadFrontendContent("/3rdParty/jwplayer.qsp");'><br>
 <%
     }
     else
     {
 %>
 <h3>JW Player&trade; is installed.</h3>
-<input type=button value='Re-Install JW Player' onClick='installPackage("jwplayer.zip"); loadContent("/3rdParty/jwplayer.qsp");'><br>
+<input type=button value='Re-Install JW Player' onClick='installPackage("jwplayer.zip"); loadFrontendContent("/3rdParty/jwplayer.qsp");'><br>
 <%
     }
 %>
-
+</body></html>

@@ -286,7 +286,7 @@ LIBS += -lmythdvdnav-$$LIBVERSION
 
 #Bluray stuff
 DEPENDPATH   += ../../external/libmythbluray/
-INCLUDEPATH  += ../../external/libmythbluray/
+INCLUDEPATH  += ../../external/libmythbluray/src/
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 HEADERS += Bluray/bdiowrapper.h Bluray/bdringbuffer.h
 SOURCES += Bluray/bdiowrapper.cpp Bluray/bdringbuffer.cpp

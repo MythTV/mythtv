@@ -8,8 +8,9 @@ CONFIG -= qt
 target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
-INCLUDEPATH += ./libbluray
-INCLUDEPATH += ./libbluray/bdnav
+INCLUDEPATH += ./src
+INCLUDEPATH += ./src/libbluray
+INCLUDEPATH += ./src/libbluray/bdnav
 INCLUDEPATH += ../libudfread
 INCLUDEPATH += ../../libs/libmythbase
 INCLUDEPATH += ../../libs/libmythtv
@@ -20,7 +21,7 @@ DEFINES += ENABLE_UDF
 
 bluray_major = 0
 bluray_minor = 9
-bluray_micro = 2
+bluray_micro = 3
 bluray_version = $$bluray_major"."$$bluray_minor"."$$bluray_micro
 
 DEFINES += BLURAY_VERSION_MAJOR=$$bluray_major
@@ -49,50 +50,51 @@ DEFINES += HAVE_LIBXML2
 QMAKE_CLEAN += $(TARGET)
 
 # bdnav
-HEADERS += libbluray/bluray.h libbluray/bluray_internal.h libbluray/bluray-version.h
-HEADERS += libbluray/player_settings.h libbluray/register.h
-HEADERS += libbluray/bdnav/bdid_parse.h libbluray/bdnav/bdparse.h libbluray/bdnav/clpi_data.h
-HEADERS += libbluray/bdnav/clpi_parse.h libbluray/bdnav/extdata_parse.h libbluray/bdnav/index_parse.h
-HEADERS += libbluray/bdnav/meta_data.h libbluray/bdnav/meta_parse.h libbluray/bdnav/mpls_parse.h
-HEADERS += libbluray/bdnav/navigation.h libbluray/bdnav/sound_parse.h libbluray/bdnav/uo_mask_table.h
-HEADERS += libbluray/decoders/graphics_controller.h libbluray/decoders/graphics_processor.h
-HEADERS += libbluray/decoders/hdmv_pids.h
-HEADERS += libbluray/decoders/ig.h libbluray/decoders/ig_decode.h libbluray/decoders/m2ts_demux.h
-HEADERS += libbluray/decoders/m2ts_filter.h
-HEADERS += libbluray/decoders/overlay.h libbluray/decoders/pes_buffer.h libbluray/decoders/pg.h
-HEADERS += libbluray/decoders/pg_decode.h libbluray/decoders/rle.h libbluray/decoders/textst.h
-HEADERS += libbluray/decoders/textst_decode.h libbluray/decoders/textst_render.h
-HEADERS += libbluray/disc/aacs.h libbluray/disc/bdplus.h libbluray/disc/dec.h libbluray/disc/disc.h
-HEADERS += libbluray/disc/enc_info.h libbluray/disc/udf_fs.h
-HEADERS += libbluray/hdmv/hdmv_insn.h libbluray/hdmv/hdmv_vm.h libbluray/hdmv/mobj_parse.h
-HEADERS += file/dirs.h file/dl.h file/file.h file/filesystem.h file/mount.h
-HEADERS += util/array.h util/attributes.h util/bits.h util/logging.h util/log_control.h
-HEADERS += util/macro.h util/mutex.h util/refcnt.h util/strutl.h util/time.h
+HEADERS += src/libbluray/bluray.h src/libbluray/bluray_internal.h src/libbluray/bluray-version.h
+HEADERS += src/libbluray/player_settings.h src/libbluray/register.h
+HEADERS += src/libbluray/bdnav/bdid_parse.h src/libbluray/bdnav/bdparse.h src/libbluray/bdnav/clpi_data.h
+HEADERS += src/libbluray/bdnav/clpi_parse.h src/libbluray/bdnav/extdata_parse.h src/libbluray/bdnav/index_parse.h
+HEADERS += src/libbluray/bdnav/meta_data.h src/libbluray/bdnav/meta_parse.h src/libbluray/bdnav/mpls_parse.h
+HEADERS += src/libbluray/bdnav/navigation.h src/libbluray/bdnav/sound_parse.h src/libbluray/bdnav/uo_mask_table.h
+HEADERS += src/libbluray/decoders/graphics_controller.h src/libbluray/decoders/graphics_processor.h
+HEADERS += src/libbluray/decoders/hdmv_pids.h
+HEADERS += src/libbluray/decoders/ig.h src/libbluray/decoders/ig_decode.h src/libbluray/decoders/m2ts_demux.h
+HEADERS += src/libbluray/decoders/m2ts_filter.h
+HEADERS += src/libbluray/decoders/overlay.h src/libbluray/decoders/pes_buffer.h src/libbluray/decoders/pg.h
+HEADERS += src/libbluray/decoders/pg_decode.h src/libbluray/decoders/rle.h src/libbluray/decoders/textst.h
+HEADERS += src/libbluray/decoders/textst_decode.h src/libbluray/decoders/textst_render.h
+HEADERS += src/libbluray/disc/aacs.h src/libbluray/disc/bdplus.h src/libbluray/disc/dec.h src/libbluray/disc/disc.h
+HEADERS += src/libbluray/disc/enc_info.h src/libbluray/disc/udf_fs.h
+HEADERS += src/libbluray/hdmv/hdmv_insn.h src/libbluray/hdmv/hdmv_vm.h src/libbluray/hdmv/mobj_parse.h
+HEADERS += src/file/dirs.h src/file/dl.h src/file/file.h src/file/filesystem.h src/file/mount.h
+HEADERS += src/util/array.h src/util/attributes.h src/util/bits.h src/util/event_queue.h src/util/logging.h
+HEADERS += src/util/log_control.h src/util/macro.h src/util/mutex.h src/util/refcnt.h src/util/strutl.h src/util/time.h
 
-SOURCES += libbluray/bluray.c libbluray/register.c 
-SOURCES += libbluray/bdnav/bdid_parse.c libbluray/bdnav/clpi_parse.c libbluray/bdnav/extdata_parse.c
-SOURCES += libbluray/bdnav/index_parse.c libbluray/bdnav/meta_parse.c libbluray/bdnav/mpls_parse.c
-SOURCES += libbluray/bdnav/navigation.c libbluray/bdnav/sound_parse.c
-SOURCES += libbluray/decoders/graphics_controller.c libbluray/decoders/graphics_processor.c
-SOURCES += libbluray/decoders/ig_decode.c libbluray/decoders/m2ts_filter.c libbluray/decoders/m2ts_demux.c 
-SOURCES += libbluray/decoders/pes_buffer.c libbluray/decoders/pg_decode.c
-SOURCES += libbluray/decoders/rle.c libbluray/decoders/textst_decode.c libbluray/decoders/textst_render.c
-SOURCES += libbluray/disc/aacs.c libbluray/disc/bdplus.c libbluray/disc/dec.c libbluray/disc/disc.c
-SOURCES += libbluray/disc/udf_fs.c
-SOURCES += file/file.c file/filesystem.c
-SOURCES += libbluray/hdmv/hdmv_vm.c libbluray/hdmv/mobj_parse.c libbluray/hdmv/mobj_print.c
-SOURCES += util/array.c util/bits.c util/logging.c util/mutex.c util/refcnt.c util/strutl.c util/time.c
+SOURCES += src/libbluray/bluray.c src/libbluray/register.c
+SOURCES += src/libbluray/bdnav/bdid_parse.c src/libbluray/bdnav/clpi_parse.c src/libbluray/bdnav/extdata_parse.c
+SOURCES += src/libbluray/bdnav/index_parse.c src/libbluray/bdnav/meta_parse.c src/libbluray/bdnav/mpls_parse.c
+SOURCES += src/libbluray/bdnav/navigation.c src/libbluray/bdnav/sound_parse.c
+SOURCES += src/libbluray/decoders/graphics_controller.c src/libbluray/decoders/graphics_processor.c
+SOURCES += src/libbluray/decoders/ig_decode.c src/libbluray/decoders/m2ts_filter.c src/libbluray/decoders/m2ts_demux.c
+SOURCES += src/libbluray/decoders/pes_buffer.c src/libbluray/decoders/pg_decode.c
+SOURCES += src/libbluray/decoders/rle.c src/libbluray/decoders/textst_decode.c src/libbluray/decoders/textst_render.c
+SOURCES += src/libbluray/disc/aacs.c src/libbluray/disc/bdplus.c src/libbluray/disc/dec.c src/libbluray/disc/disc.c
+SOURCES += src/libbluray/disc/udf_fs.c
+SOURCES += src/file/file.c src/file/filesystem.c
+SOURCES += src/libbluray/hdmv/hdmv_vm.c src/libbluray/hdmv/mobj_parse.c src/libbluray/hdmv/mobj_print.c
+SOURCES += src/util/array.c src/util/bits.c src/util/event_queue.c src/util/logging.c src/util/mutex.c
+SOURCES += src/util/refcnt.c src/util/strutl.c src/util/time.c
 
 macx {
-    SOURCES += file/dir_posix.c file/dirs_darwin.c file/dl_posix.c file/file_posix.c file/mount_darwin.c
+    SOURCES += src/file/dir_posix.c src/file/dirs_darwin.c src/file/dl_posix.c src/file/file_posix.c src/file/mount_darwin.c
 } else:win32 {
-    SOURCES += file/dir_win32.c file/dirs_win32.c file/dl_win32.c file/file_win32.c file/mount.c
+    SOURCES += src/file/dir_win32.c src/file/dirs_win32.c src/file/dl_win32.c src/file/file_win32.c src/file/mount.c
 } else {
-    SOURCES += file/dir_posix.c file/dirs_xdg.c file/dl_posix.c file/file_posix.c file/mount.c
+    SOURCES += src/file/dir_posix.c src/file/dirs_xdg.c src/file/dl_posix.c src/file/file_posix.c src/file/mount.c
 }
 
 inc_bdnav.path = $${PREFIX}/include/mythtv/bluray
-inc_bdnav.files = libbluray/bluray.h libbluray/bdnav/*.h libbluray/hdmv/*.h file/*.h util/*.h
+inc_bdnav.files = src/libbluray/bluray.h src/libbluray/bdnav/*.h src/libbluray/hdmv/*.h src/file/*.h src/util/*.h
 
 INSTALLS += inc_bdnav
 
@@ -115,16 +117,16 @@ using_bdjava {
         INCLUDEPATH += $${JDK_HOME}/include $${JDK_HOME}/include/$$javaos
     }
 
-    HEADERS += libbluray/bdj/bdj.h libbluray/bdj/bdjo_data.h libbluray/bdj/bdjo_parse.h
-    HEADERS += libbluray/bdj/native/bdjo.h libbluray/bdj/native/java_awt_BDFontMetrics.h libbluray/bdj/native/java_awt_BDGraphics.h
-    HEADERS += libbluray/bdj/native/org_videolan_Libbluray.h org_videolan_Logger.h register_native.h util.h
-    SOURCES += libbluray/bdj/bdj.c libbluray/bdj/bdjo_parse.c libbluray/bdj/native/bdjo.c
-    SOURCES += libbluray/bdj/native/java_awt_BDFontMetrics.c libbluray/bdj/native/java_awt_BDGraphics.c
-    SOURCES += libbluray/bdj/native/org_videolan_Libbluray.c libbluray/bdj/native/org_videolan_Logger.c
-    SOURCES += libbluray/bdj/native/register_native.c libbluray/bdj/native/util.c
+    HEADERS += src/libbluray/bdj/bdj.h src/libbluray/bdj/bdjo_data.h src/libbluray/bdj/bdjo_parse.h
+    HEADERS += src/libbluray/bdj/native/bdjo.h src/libbluray/bdj/native/java_awt_BDFontMetrics.h src/libbluray/bdj/native/java_awt_BDGraphics.h
+    HEADERS += src/libbluray/bdj/native/org_videolan_Libbluray.h org_videolan_Logger.h register_native.h util.h
+    SOURCES += src/libbluray/bdj/bdj.c src/libbluray/bdj/bdjo_parse.c src/libbluray/bdj/native/bdjo.c
+    SOURCES += src/libbluray/bdj/native/java_awt_BDFontMetrics.c src/libbluray/bdj/native/java_awt_BDGraphics.c
+    SOURCES += src/libbluray/bdj/native/org_videolan_Libbluray.c src/libbluray/bdj/native/org_videolan_Logger.c
+    SOURCES += src/libbluray/bdj/native/register_native.c src/libbluray/bdj/native/util.c
 
-    bdjava.target = libbluray/bdj/.libs/libmythbluray-$${BDJ_TYPE}-"$$bluray_version".jar
-    bdjava.depends = libbluray/bdj/build.xml
+    bdjava.target = src/libbluray/bdj/.libs/libmythbluray-$${BDJ_TYPE}-"$$bluray_version".jar
+    bdjava.depends = src/libbluray/bdj/build.xml
     bdjava.commands = $${ANTBIN} -f $$bdjava.depends -Dbuild=\'build\' -Ddist=\'.libs\' -Dsrc_awt=:java-$${BDJ_TYPE} -Dversion='$${BDJ_TYPE}-$$bluray_version'
 
     bdjava_clean.commands = $${ANTBIN} -f $$bdjava.depends -Dbuild=\'build\' -Ddist=\'.libs\' -Dversion='$${BDJ_TYPE}-$$bluray_version clean'
