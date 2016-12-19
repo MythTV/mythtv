@@ -1287,6 +1287,19 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                                 .arg(ev.param));
             m_currentChapter = ev.param;
             break;
+        case BD_EVENT_PLAYMARK:
+            /* playmark reached */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_PLAYMARK"));
+            break;
+
+        /* playback control */
+        case BD_EVENT_PLAYLIST_STOP:
+            /* HDMV VM or JVM stopped playlist playback. Flush all buffers. */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("ToDo EVENT_PLAYLIST_STOP %1")
+                .arg(ev.param));
+            break;
+
         case BD_EVENT_STILL:
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_STILL %1").arg(ev.param));
@@ -1363,6 +1376,20 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                 QString("EVENT_MENU %1")
                 .arg(ev.param==0 ? "no" : "yes"));
             m_inMenu = (ev.param == 1);
+            break;
+
+        case BD_EVENT_KEY_INTEREST_TABLE:
+            /* BD-J key interest table changed */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("ToDo EVENT_KEY_INTEREST_TABLE %1")
+                .arg(ev.param));
+            break;
+
+        case BD_EVENT_UO_MASK_CHANGED:
+            /* User operations mask was changed */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("ToDo EVENT_UO_MASK_CHANGED %1")
+                .arg(ev.param));
             break;
 
         default:
