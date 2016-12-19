@@ -7,10 +7,12 @@
 #include <QString>
 #include <QRect>
 #include <QHash>
+#include <QImage>
 #include <QCoreApplication>
 
 // external/libmythbluray
 #include "libbluray/bluray.h"
+#include "libbluray/decoders/overlay.h"
 
 #include "ringbuffer.h"
 
@@ -39,35 +41,28 @@ protected:
     QString     m_lastError;
 };
 
+class BDOverlay
+{
+  public:
+    BDOverlay();
+    BDOverlay(const bd_overlay_s * const overlay);
+    BDOverlay(const bd_argb_overlay_s * const overlay);
+
+    void    setPalette(const BD_PG_PALETTE_ENTRY *palette);
+    void    wipe();
+    void    wipe(int x, int y, int width, int height);
+
+    QImage  image;
+    int64_t pts;
+    int     x;
+    int     y;
+};
+
 /** \class BDRingBufferPriv
  *  \brief RingBuffer class for Blu-rays
  *
  *   A class to allow a RingBuffer to read from BDs.
  */
-
-class BDOverlay
-{
-  public:
-    BDOverlay(uint8_t *data, uint8_t *palette, QRect position, int plane,
-              int64_t pts)
-     : m_data(data), m_palette(palette), m_position(position),
-       m_plane(plane), m_pts(pts) { }
-
-   ~BDOverlay()
-    {
-        if (m_data)
-            av_free(m_data);
-        if (m_palette)
-            av_free(m_palette);
-    }
-
-    uint8_t *m_data;
-    uint8_t *m_palette;
-    QRect    m_position;
-    int      m_plane;
-    int64_t  m_pts;
-};
-
 class MTV_PUBLIC BDRingBuffer : public RingBuffer
 {
     Q_DECLARE_TR_FUNCTIONS(BDRingBuffer)
@@ -92,6 +87,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     void ClearOverlays(void);
     BDOverlay* GetOverlay(void);
     void SubmitOverlay(const bd_overlay_s * const overlay);
+    void SubmitARGBOverlay(const bd_argb_overlay_s * const overlay);
 
     uint32_t GetNumTitles(void) const { return m_numTitles; }
     int      GetCurrentTitle(void);
@@ -138,7 +134,6 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint64_t SeekInternal(uint64_t pos);
 
   private:
-
     // private player interaction
     void WaitForPlayer(void);
 
@@ -195,6 +190,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
 
     QMutex             m_overlayLock;
     QList<BDOverlay*>  m_overlayImages;
+    QVector<BDOverlay*> m_overlayPlanes;
 
     uint8_t            m_stillTime;
     uint8_t            m_stillMode;

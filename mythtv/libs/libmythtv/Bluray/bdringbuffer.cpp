@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QPainter>
 
 #include "util/log_control.h"
 #include "libbluray/bdnav/mpls_parse.h"
@@ -29,11 +30,95 @@
 
 #define LOC      QString("BDRingBuf: ")
 
+BDOverlay::BDOverlay()
+  : pts(-1),
+    x(0),
+    y(0)
+{
+}
+
+BDOverlay::BDOverlay(const bd_overlay_s * const overlay)
+  : image(overlay->w, overlay->h, QImage::Format_Indexed8),
+    pts(-1),
+    x(overlay->x),
+    y(overlay->y)
+{
+    wipe();
+}
+
+BDOverlay::BDOverlay(const bd_argb_overlay_s * const overlay)
+  : image(overlay->w, overlay->h, QImage::Format_ARGB32),
+    pts(-1),
+    x(overlay->x),
+    y(overlay->y)
+{
+}
+
+void BDOverlay::setPalette(const BD_PG_PALETTE_ENTRY *palette)
+{
+    if( palette )
+    {
+        QVector<QRgb> rgbpalette;
+        for (int i = 0; i < 256; i++)
+        {
+            int y  = palette[i].Y;
+            int cr = palette[i].Cr;
+            int cb = palette[i].Cb;
+            int a  = palette[i].T;
+            int r  = int(y + 1.4022 * (cr - 128));
+            int b  = int(y + 1.7710 * (cb - 128));
+            int g  = int(1.7047 * y - (0.1952 * b) - (0.5647 * r));
+            if (r < 0) r = 0;
+            if (g < 0) g = 0;
+            if (b < 0) b = 0;
+            if (r > 0xff) r = 0xff;
+            if (g > 0xff) g = 0xff;
+            if (b > 0xff) b = 0xff;
+            rgbpalette.push_back((a << 24) | (r << 16) | (g << 8) | b);
+        }
+
+        image.setColorTable(rgbpalette);
+    }
+}
+
+void BDOverlay::wipe()
+{
+    wipe(0, 0, image.width(), image.height());
+}
+
+void BDOverlay::wipe(int x, int y, int width, int height)
+{
+    if (image.format() == QImage::Format_Indexed8)
+    {
+        uint8_t *data = image.bits();
+        uint32_t offset = (y * image.bytesPerLine()) + x;
+        for (int i = 0; i < height; i++ )
+        {
+            memset( &data[offset], 0xff, width );
+            offset += image.bytesPerLine();
+        }
+    }
+    else
+    {
+        QColor   transparent(0, 0, 0, 255);
+        QPainter painter(&image);
+        painter.setCompositionMode(QPainter::CompositionMode_Source);
+        painter.fillRect(x, y, width, height, transparent);
+    }
+}
+
 static void HandleOverlayCallback(void *data, const bd_overlay_s *const overlay)
 {
     BDRingBuffer *bdrb = (BDRingBuffer*) data;
     if (bdrb)
         bdrb->SubmitOverlay(overlay);
+}
+
+static void HandleARGBOverlayCallback(void *data, const bd_argb_overlay_s *const overlay)
+{
+    BDRingBuffer *bdrb = (BDRingBuffer*) data;
+    if (bdrb)
+        bdrb->SubmitARGBOverlay(overlay);
 }
 
 static void file_opened_callback(void* bdr)
@@ -214,6 +299,7 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
     m_numTitles(0), m_currentTitleInfo(NULL), m_imgHandle(-1),
     m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
+    m_overlayPlanes(2, NULL),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
     m_infoLock(QMutex::Recursive), m_mainThread(NULL)
 {
@@ -657,6 +743,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
         // Register the Menu Overlay Callback
         bd_register_overlay_proc(bdnav, this, HandleOverlayCallback);
+        bd_register_argb_overlay_proc(bdnav, this, HandleARGBOverlayCallback, NULL);
     }
     else
     {
@@ -1263,7 +1350,19 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
             m_secondaryVideoIsFullscreen = ev.param;
             break;
 
+        /* status */
         case BD_EVENT_IDLE:
+            /* Nothing to do. Playlist is not playing, but title applet is running.
+             * Application should not call bd_read*() immediately again to avoid busy loop. */
+            usleep(40000);
+            break;
+
+        case BD_EVENT_MENU:
+            /* Interactive menu visible */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("EVENT_MENU %1")
+                .arg(ev.param==0 ? "no" : "yes"));
+            m_inMenu = (ev.param == 1);
             break;
 
         default:
@@ -1400,6 +1499,17 @@ void BDRingBuffer::ClearOverlays(void)
         delete overlay;
         overlay = NULL;
     }
+
+    for (int i = 0; i < m_overlayPlanes.size(); i++)
+    {
+        BDOverlay*& osd = m_overlayPlanes[i];
+
+        if (osd)
+        {
+            delete osd;
+            osd = NULL;
+        }
+    }
 }
 
 BDOverlay* BDRingBuffer::GetOverlay(void)
@@ -1412,62 +1522,171 @@ BDOverlay* BDRingBuffer::GetOverlay(void)
 
 void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
 {
-    QMutexLocker lock(&m_overlayLock);
-
-    if (!overlay)
+    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
         return;
 
-    if ((overlay->w < 1) || (overlay->w > 1920) || (overlay->x > 1920) ||
-        (overlay->h < 1) || (overlay->h > 1080) || (overlay->y > 1080))
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->cmd    = %1, %2").arg(overlay->cmd).arg(overlay->plane));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay rect    = (%1,%2,%3,%4)").arg(overlay->x).arg(overlay->y)
+                                                                          .arg(overlay->w).arg(overlay->h));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->pts    = %1").arg(overlay->pts));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("update palette  = %1").arg(overlay->palette_update_flag ? "yes":"no"));
+
+    BDOverlay*& osd = m_overlayPlanes[overlay->plane];
+
+    switch(overlay->cmd)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Invalid overlay size: %1x%2+%3+%4")
-                .arg(overlay->w).arg(overlay->h)
-                .arg(overlay->x).arg(overlay->y));
+        case BD_OVERLAY_INIT:    /* init overlay plane. Size and position of plane in x,y,w,h */
+            /* init overlay plane. Size of plane in w,h */
+            if (osd)
+            {
+                delete osd;
+            }
+            osd = new BDOverlay(overlay);
+            break;
+
+        case BD_OVERLAY_CLOSE:   /* close overlay plane */
+            /* close overlay */
+            {
+                if (osd)
+                {
+                    delete osd;
+                    osd = NULL;
+                }
+
+                QMutexLocker lock(&m_overlayLock);
+                m_overlayImages.append(new BDOverlay());
+            }
+            break;
+
+        /* following events can be processed immediately, but changes
+         * should not be flushed to display before next FLUSH event
+         */
+        case BD_OVERLAY_HIDE:    /* overlay is empty and can be hidden */
+        case BD_OVERLAY_CLEAR:   /* clear plane */
+            if (osd)
+                osd->wipe();
+            break;
+
+        case BD_OVERLAY_WIPE:    /* clear area (x,y,w,h) */
+            if (osd)
+                osd->wipe(overlay->x, overlay->y, overlay->w, overlay->h);
+            break;
+
+        case BD_OVERLAY_DRAW:    /* draw bitmap (x,y,w,h,img,palette,crop) */
+            if (osd)
+            {
+                const BD_PG_RLE_ELEM *rlep = overlay->img;
+                unsigned actual = overlay->w * overlay->h;
+                uint8_t *data   = osd->image.bits();
+                data = &data[(overlay->y * osd->image.bytesPerLine()) + overlay->x];
+
+                for (unsigned i = 0; i < actual; i += rlep->len, rlep++)
+                {
+                    int dst_y = (i / overlay->w) * osd->image.bytesPerLine();
+                    int dst_x = (i % overlay->w);
+                    memset(data + dst_y + dst_x, rlep->color, rlep->len);
+                }
+
+                osd->setPalette(overlay->palette);
+            }
+            break;
+
+        case BD_OVERLAY_FLUSH:   /* all changes have been done, flush overlay to display at given pts */
+            if (osd)
+            {
+                BDOverlay* newOverlay = new BDOverlay(*osd);
+                newOverlay->image.convertToFormat(QImage::Format_ARGB32);
+                newOverlay->pts = overlay->pts;
+
+                QMutexLocker lock(&m_overlayLock);
+                m_overlayImages.append(newOverlay);
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
+void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
+{
+    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
         return;
-    }
 
-    if (!overlay->img)
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->cmd,plane = %1, %2").arg(overlay->cmd)
+                                                                      .arg(overlay->plane));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->(x,y,w,h) = %1,%2,%3x%4 - %5").arg(overlay->x)
+                                                                                .arg(overlay->y)
+                                                                                .arg(overlay->w)
+                                                                                .arg(overlay->h)
+                                                                                .arg(overlay->stride));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->pts       = %1").arg(overlay->pts));
+
+    BDOverlay*& osd = m_overlayPlanes[overlay->plane];
+
+    switch(overlay->cmd)
     {
-        m_inMenu = false;
-        QRect pos(overlay->x, overlay->y, overlay->w, overlay->h);
-        m_overlayImages.append(new BDOverlay(NULL, NULL, pos,
-                               overlay->plane, overlay->pts));
-        return;
+        case BD_ARGB_OVERLAY_INIT:
+            /* init overlay plane. Size of plane in w,h */
+            if (osd)
+                delete osd;
+
+            osd = new BDOverlay(overlay);
+            break;
+
+        case BD_ARGB_OVERLAY_CLOSE:
+            /* close overlay */
+            {
+                if (osd)
+                {
+                    delete osd;
+                    osd = NULL;
+                }
+
+                QMutexLocker lock(&m_overlayLock);
+                m_overlayImages.append(new BDOverlay());
+            }
+            break;
+
+        /* following events can be processed immediately, but changes
+         * should not be flushed to display before next FLUSH event
+         */
+        case BD_ARGB_OVERLAY_DRAW:
+            if (osd)
+            {
+                /* draw image */
+                uint8_t* data = osd->image.bits();
+
+                uint32_t srcOffset = 0;
+                uint32_t dstOffset = (overlay->y * osd->image.bytesPerLine()) + (overlay->x * 4);
+
+                for (uint16_t y = 0; y < overlay->h; y++)
+                {
+                    memcpy(&data[dstOffset],
+                           &overlay->argb[srcOffset],
+                           overlay->w * 4);
+
+                    dstOffset += osd->image.bytesPerLine();
+                    srcOffset += overlay->stride;
+                }
+            }
+            break;
+
+        case BD_ARGB_OVERLAY_FLUSH:
+            /* all changes have been done, flush overlay to display at given pts */
+            if (osd)
+            {
+                QMutexLocker lock(&m_overlayLock);
+                BDOverlay* newOverlay = new BDOverlay(*osd);
+                newOverlay->pts = overlay->pts;
+                m_overlayImages.append(newOverlay);
+            }
+            break;
+
+        default:
+            LOG(VB_PLAYBACK, LOG_ERR, QString("Unknown ARGB overlay - %1").arg(overlay->cmd));
+            break;
     }
-
-    const BD_PG_RLE_ELEM *rlep = overlay->img;
-    static const unsigned palettesize = 256 * 4;
-    unsigned width   = (overlay->w + 0x3) & (~0x3);
-    unsigned pixels  = ((overlay->w + 0xf) & (~0xf)) *
-                       ((overlay->h + 0xf) & (~0xf));
-    unsigned actual  = overlay->w * overlay->h;
-    uint8_t *data    = (uint8_t*)av_mallocz(pixels);
-    uint8_t *palette = (uint8_t*)av_mallocz(palettesize);
-
-    int line = 0;
-    int this_line = 0;
-    for (unsigned i = 0; i < actual; i += rlep->len, rlep++)
-    {
-        if ((rlep->color == 0 && rlep->len == 0) || this_line >= overlay->w)
-        {
-            this_line = 0;
-            line++;
-            i = (line * width) + 1;
-        }
-        else
-        {
-            this_line += rlep->len;
-            memset(data + i, rlep->color, rlep->len);
-        }
-    }
-
-    memcpy(palette, overlay->palette, palettesize);
-
-    QRect pos(overlay->x, overlay->y, width, overlay->h);
-    m_overlayImages.append(new BDOverlay(data, palette, pos,
-                           overlay->plane, overlay->pts));
-
-    if (overlay->plane == 1)
-        m_inMenu = true;
 }
