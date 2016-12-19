@@ -967,22 +967,27 @@ int BDRingBuffer::safe_read(void *data, uint sz)
     int result = 0;
     if (m_isHDMVNavigation)
     {
-        HandleBDEvents();
+        result = HandleBDEvents() ? 0 : -1;
         while (result == 0)
         {
             BD_EVENT event;
             result = bd_read_ext(bdnav,
                                  (unsigned char *)data,
                                   sz, &event);
-            HandleBDEvent(event);
             if (result == 0)
-                HandleBDEvents();
+            {
+                HandleBDEvent(event);
+                result = HandleBDEvents() ? 0 : -1;
+            }
         }
     }
     else
     {
         result = bd_read(bdnav, (unsigned char *)data, sz);
     }
+
+    if (result < 0)
+        StopReads();
 
     m_currentTime = bd_tell_time(bdnav);
     return result;
