@@ -3317,9 +3317,6 @@ QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
     if (!pginfo.GetSubtitle().isEmpty())
     {
         extra = QString('\n') + pginfo.GetSubtitle();
-        int maxll = max(title.length(), 20);
-        if (extra.length() > maxll)
-            extra = extra.left(maxll - 3) + "...";
     }
 
     return QString("\n%1%2\n%3").arg(title).arg(extra).arg(timedate);
