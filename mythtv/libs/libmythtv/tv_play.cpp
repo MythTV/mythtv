@@ -7397,8 +7397,8 @@ void TV::SwitchInputs(PlayerContext *ctx,
         delete testrec;
     }
 
-    UpdateOSDInput(ctx);
     UnpauseLiveTV(ctx);
+    UpdateOSDInput(ctx);
 
     ITVRestart(ctx, true);
 }
