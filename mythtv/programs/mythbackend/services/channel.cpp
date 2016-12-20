@@ -377,6 +377,7 @@ DTC::LineupList* Channel::GetDDLineupList( const QString &sSource,
         DataDirectProcessor ddp(source, sUserId, sPassword);
         if (!ddp.GrabLineupsOnly())
         {
+            delete pLineups;
             throw( QString("Unable to grab lineups. Check info."));
         }
         const DDLineupList lineups = ddp.GetLineups();
