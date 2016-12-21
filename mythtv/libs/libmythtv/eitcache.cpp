@@ -382,6 +382,10 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
             //
             // !!! AFAIK for ETSI DVB broadcasts
             // A lower table number is not "better"
+            // it just means that the events it contains
+            // are nearer to the present time, or for events
+            // on the current day it might contain events
+            // in the past
 
             tblChgCnt++;
         }
