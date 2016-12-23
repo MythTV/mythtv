@@ -47,6 +47,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL), pipLocation(0),
     useNullVideo(false)
 {
+    playingRecStart = QDateTime();
     lastSignalMsgTime.start();
     lastSignalMsgTime.addMSecs(-2 * (int)kSMExitTimeout);
 }
@@ -884,6 +885,7 @@ void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
         if (!ignoreDB)
             playingInfo->MarkAsInUse(true, recUsage);
         playingLen = playingInfo->GetSecondsInRecording();
+        playingRecStart = playingInfo->GetRecordingStartTime();
     }
 }
 
