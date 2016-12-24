@@ -1385,7 +1385,8 @@ OMX_ERRORTYPE VideoOutputOMX::UseBuffersCB()
 OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
 {
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
-    assert(vbuffers.Size() >= cmpnt.PortDef().nBufferCountActual);
+    const OMX_PARAM_PORTDEFINITIONTYPE &def = cmpnt.PortDef();
+    assert(vbuffers.Size() >= def.nBufferCountActual);
 
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {
