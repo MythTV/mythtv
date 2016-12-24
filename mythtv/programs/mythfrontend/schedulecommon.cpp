@@ -24,10 +24,7 @@
 #include "proglist.h"
 #include "customedit.h"
 #include "guidegrid.h"
-
-#ifdef CONFIG_QTWEBKIT
 #include "progdetails.h"
-#endif
 
 /**
 *  \brief Show the Program Details screen
@@ -38,7 +35,6 @@ void ScheduleCommon::ShowDetails(void) const
     if (!pginfo)
         return;
 
-#ifdef CONFIG_QTWEBKIT
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgDetails *details_dialog  = new ProgDetails(mainStack, pginfo);
 
@@ -49,7 +45,6 @@ void ScheduleCommon::ShowDetails(void) const
     }
 
     mainStack->AddScreen(details_dialog);
-#endif
 }
 
 /**

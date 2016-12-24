@@ -38,7 +38,7 @@
 #include "mythuicheckbox.h"
 #include "mythuispinbox.h"
 
-#ifdef CONFIG_QTWEBKIT
+#if CONFIG_QTWEBKIT
 #include "mythuiwebbrowser.h"
 #endif
 
@@ -1117,7 +1117,7 @@ QString NetworkControl::getWidgetType(MythUIType* type)
         return "MythUIImage";
     else if (dynamic_cast<MythUISpinBox *>(type))
         return "MythUISpinBox";
-#ifdef CONFIG_QTWEBKIT
+#if CONFIG_QTWEBKIT
     else if (dynamic_cast<MythUIWebBrowser *>(type))
         return "MythUIWebBrowser";
 #endif
