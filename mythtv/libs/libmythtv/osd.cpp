@@ -435,7 +435,7 @@ void OSD::SetText(const QString &window, const InfoMap &map,
         MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("audiochannels"));
         if (state)
             state->DisplayState(map["audiochannels"]);
-    }
+    } 
     if (map.contains("chanid"))
     {
         MythUIImage *icon = dynamic_cast<MythUIImage *> (win->GetChild("iconpath"));
@@ -542,6 +542,13 @@ void OSD::SetText(const QString &window, const InfoMap &map,
         bar->SetStart(0);
         bar->SetTotal(1000);
     }
+ 
+	if (map.contains("wallclock"))
+    {
+        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("wallclock"));
+        if (state)
+            state->DisplayState(map["wallclock"]);
+    }  
 
     win->SetVisible(true);
 
