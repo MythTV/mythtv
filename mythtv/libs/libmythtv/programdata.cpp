@@ -36,7 +36,7 @@ static QVariant denullify(const QDateTime &dt)
     return dt.isNull() ? QVariant("0000-00-00 00:00:00") : QVariant(dt);
 }
 
-void add_genres(MSqlQuery &query, const QStringList &genres,
+static void add_genres(MSqlQuery &query, const QStringList &genres,
                 uint chanid, const QDateTime &starttime)
 {
     QString relevance = QStringLiteral("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
