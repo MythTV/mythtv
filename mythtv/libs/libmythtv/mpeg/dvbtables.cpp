@@ -225,26 +225,26 @@ DVBEventInformationTable::DVBEventInformationTable(const PSIPTable& table) : PSI
     // section_number           8   6.0
     // last_section_number      8   7.0
     Parse();
-    LOG(VB_EITDVBCACHE, LOG_DEBUG, QString(
+/*    LOG(VB_DVBSICACHE, LOG_DEBUG, QString(
                         "Constructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
                         .arg(OriginalNetworkID(),4,16)
                         .arg(TSID(),4,16)
                         .arg(ServiceID(),4,16)
                         .arg(TableID(),2,16)
                         .arg(Section())
-                        .arg(uint64_t(this),0,16));
+                        .arg(uint64_t(this),0,16));*/
 }
 
 DVBEventInformationTable::~DVBEventInformationTable()
 {
-    LOG(VB_EITDVBCACHE, LOG_DEBUG, QString(
+/*    LOG(VB_DVBSICACHE, LOG_DEBUG, QString(
                         "Destructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
                         .arg(OriginalNetworkID(),4,16)
                         .arg(TSID(),4,16)
                         .arg(ServiceID(),4,16)
                         .arg(TableID(),2,16)
                         .arg(Section())
-                        .arg(uint64_t(this),0,16));
+                        .arg(uint64_t(this),0,16));*/
 }
 
 void DVBEventInformationTable::Parse(void) const

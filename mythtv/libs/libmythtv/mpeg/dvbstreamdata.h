@@ -193,6 +193,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     void CacheSDT(sdt_ptr_t);
     void CacheEIT(eit_ptr_t);
     void ValidateEITCache();
+    void ValidateSDTCache();
 
   protected:
     /** \fn virtual bool DeleteCachedTableSection(PSIPTable *psip) const

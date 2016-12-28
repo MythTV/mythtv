@@ -178,8 +178,8 @@ VERBOSE_MAP(VB_REFCOUNT,  0x20000000000ULL, true,
             "Reference Count messages")
 VERBOSE_MAP(VB_HTTP,  0x40000000000ULL, true,
             "HTTP Server messages")
-VERBOSE_MAP(VB_EITDVBCACHE, 0x80000000000ULL, true,
-            "EIT DVB Cache related messages")
+VERBOSE_MAP(VB_DVBSICACHE, 0x80000000000ULL, true,
+            "DVB SI table section cache related messages")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE
