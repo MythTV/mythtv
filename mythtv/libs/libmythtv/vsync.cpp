@@ -21,6 +21,8 @@
 #include <cmath>
 #include <cstdlib> // for abs(int)
 #include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 #include <fcntl.h>
 
 #include <sys/types.h>
@@ -388,7 +390,7 @@ int RTCVideoSync::WaitForFrame(int sync_delay)
         m_delay = CalcDelay();
 
         if ((val < 0) && (m_delay > 0))
-            usleep(m_delay);
+            std::this_thread::sleep_for(std::chrono::microseconds(m_delay));
     }
     return 0;
 }
@@ -425,7 +427,7 @@ int BusyWaitVideoSync::WaitForFrame(int sync_delay)
         // The usleep() is shortened by "cheat" so that this process gets
         // the CPU early for about half the frames.
         if (m_delay > (m_cheat - m_fudge))
-            usleep(m_delay - (m_cheat - m_fudge));
+            std::this_thread::sleep_for(std::chrono::microseconds(m_delay - (m_cheat - m_fudge)));
 
         // If late, draw the frame ASAP.  If early, hold the CPU until
         // half as late as the previous frame (fudge).
@@ -465,6 +467,6 @@ int USleepVideoSync::WaitForFrame(int sync_delay)
 
     m_delay = CalcDelay();
     if (m_delay > 0)
-        usleep(m_delay);
+        std::this_thread::sleep_for(std::chrono::microseconds(m_delay));
     return 0;
 }

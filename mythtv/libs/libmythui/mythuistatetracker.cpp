@@ -1,4 +1,6 @@
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
 #include <QCoreApplication>
 #include "mythmainwindow.h"
 #include "mythevent.h"
@@ -49,7 +51,7 @@ void MythUIStateTracker::GetFreshState(QVariantMap &state)
 
     int tries = 0;
     while ((tries++ < 100) && (MythUIStateTracker::TimeSinceLastUpdate() >= 500))
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     MythUIStateTracker::GetState(state);
 }

@@ -19,6 +19,8 @@
  */
 
 #include <sys/ioctl.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt includes
 #include <QString>
@@ -189,7 +191,7 @@ void V4L2encRecorder::run(void)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Recording will not commence until a PMT is set.");
-            usleep(5000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             continue;
         }
 

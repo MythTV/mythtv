@@ -2,7 +2,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt
 #include <QApplication>
@@ -142,7 +143,7 @@ int main(int argc, char **argv)
         do
         {
             qApp->processEvents();
-            usleep(5000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         } while (mainStack->TotalScreens() > 0);
     }
 

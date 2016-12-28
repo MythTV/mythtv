@@ -13,7 +13,8 @@
 // ANSI C headers
 #include <cstdlib>
 
-#include <unistd.h> // for usleep()
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt headers
 #include <QStringList>
@@ -128,7 +129,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
-        usleep( random() % 250000 );
+        std::this_thread::sleep_for(std::chrono::milliseconds(random() % 250));
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
     }

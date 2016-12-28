@@ -2,9 +2,10 @@
 
 // POSIX headers
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt headers
 #include <QString>
@@ -153,7 +154,7 @@ void DVBStreamHandler::RunTS(void)
             _error = true;
             return;
         }
-        usleep(50000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     int remainder = 0;
@@ -240,7 +241,7 @@ void DVBStreamHandler::RunTS(void)
 
             if ((0 == len) || (-1 == len))
             {
-                usleep(100);
+                std::this_thread::sleep_for(std::chrono::microseconds(100));
                 continue;
             }
         }
@@ -346,7 +347,7 @@ void DVBStreamHandler::RunSR(void)
         }
 
         if (!readSomething)
-            usleep(3000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(3));
     }
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "shutdown");
 

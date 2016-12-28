@@ -1,4 +1,5 @@
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt
 #include <QString>
@@ -55,7 +56,7 @@ QStringList VBox::probeDevices(void)
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < milliSeconds)
     {
-        usleep(25000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(25));
         int ttl = milliSeconds - totalTime.elapsed();
         if ((searchTime.elapsed() > 249) && (ttl > 1000))
         {

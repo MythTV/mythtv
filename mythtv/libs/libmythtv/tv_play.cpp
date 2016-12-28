@@ -4,10 +4,12 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <cmath>
-#include <unistd.h>
 #include <stdint.h>
 
 #include <algorithm>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
 using namespace std;
 
 #include <QApplication>
@@ -262,7 +264,7 @@ static void multi_lock(QMutex *mutex0, ...)
             {
                 for (uint j = 0; j < i; j++)
                     mutex[j]->unlock();
-                usleep(25 * 1000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(25));
             }
         }
     }
@@ -2666,7 +2668,7 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
             SetErrored(ctx);
             return false;
         }
-        usleep(5000);
+        std::this_thread::sleep_for(std::chrono::microseconds(5));
     }
 
     if (!recording || exitPlayerTimerId)

@@ -1,8 +1,7 @@
-// POSIX headers
-#include <unistd.h>
-
 // ANSI C headers
 #include <cstdlib>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // MythTV headers
 #include "mythcorecontext.h"
@@ -140,7 +139,7 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
             }
 
             if (!commDetector->fullSpeed)
-                usleep(10000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             DetectEdges(vf, edgeCounts, edgeDiffs[i]);
 

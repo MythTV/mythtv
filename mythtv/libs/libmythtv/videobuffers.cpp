@@ -1,7 +1,8 @@
 // Copyright (c) 2005, Daniel Thor Kristjansson
 // based on earlier work in MythTV's videout_xvmc.cpp
 
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "mythconfig.h"
 
@@ -302,7 +303,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
                 QString("GetNextFreeFrame() TryLock has "
                         "spun %1 times, this is a lot.").arg(tries));
         }
-        usleep(TRY_LOCK_SPIN_WAIT);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TRY_LOCK_SPIN_WAIT));
     }
 
     return NULL;

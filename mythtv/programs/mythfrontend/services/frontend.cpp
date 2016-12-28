@@ -2,7 +2,8 @@
 #include <QKeyEvent>
 #include <QEvent>
 
-#include <unistd.h> // for usleep
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "mythcorecontext.h"
 #include "keybindings.h"
@@ -150,7 +151,7 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
         timer.start();
         while ((timer.elapsed() < 10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
@@ -161,12 +162,12 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
         timer.start();
         while ((timer.elapsed() < 10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         timer.start();
         while ((timer.elapsed() < 10000) &&
                (!GetMythUI()->IsTopScreenInitialized()))
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")

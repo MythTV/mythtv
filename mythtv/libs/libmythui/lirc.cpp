@@ -9,6 +9,8 @@
 
 // C++ headers
 #include <algorithm>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 #include <vector>
 using namespace std;
 
@@ -423,7 +425,7 @@ void LIRC::run(void)
     while (IsDoRunSet())
     {
         if (eofCount && retryCount)
-            usleep(100 * 1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         if ((eofCount >= 10) || (!d->lircState))
         {
@@ -444,7 +446,8 @@ void LIRC::run(void)
             if (Init())
                 retryCount = 0;
             else
-                sleep(2); // wait a while before we retry..
+                // wait a while before we retry..
+                std::this_thread::sleep_for(std::chrono::seconds(2));
 
             continue;
         }

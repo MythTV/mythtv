@@ -5,6 +5,8 @@
 
 // C++ headers
 #include <algorithm>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 #include <vector>
 using namespace std;
 
@@ -1042,7 +1044,7 @@ void MpegRecorder::run(void)
                 elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 while ((bytesRead / elapsed) > dummyBPS)
                 {
-                    usleep(50000);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
                     elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 }
             }
@@ -1051,7 +1053,7 @@ void MpegRecorder::run(void)
                 elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 while ((GetFramesWritten() / elapsed) > 30)
                 {
-                    usleep(50000);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
                     elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 }
             }
@@ -1400,7 +1402,7 @@ bool MpegRecorder::StartEncoding(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "StartEncoding: read failing, re-opening device: " + ENO);
             close(readfd);
-            usleep(2000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
             readfd = open(videodevice.toLatin1().constData(),
                           O_RDWR | O_NONBLOCK);
             if (readfd < 0)
@@ -1416,7 +1418,7 @@ bool MpegRecorder::StartEncoding(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("StartEncoding: read failed, retry in %1 msec:")
                 .arg(100 * idx) + ENO);
-            usleep(100 * idx);
+            std::this_thread::sleep_for(std::chrono::microseconds(idx * 100));
         }
     }
     if (idx == 50)
@@ -1480,7 +1482,8 @@ void MpegRecorder::StopEncoding(void)
 
     if (_device_read_buffer && _device_read_buffer->IsRunning())
     {
-        usleep(20 * 1000); // allow last bits of data through..
+        // allow last bits of data through..
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
         _device_read_buffer->Stop();
     }
 

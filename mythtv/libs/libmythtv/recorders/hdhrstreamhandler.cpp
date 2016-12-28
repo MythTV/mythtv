@@ -7,6 +7,8 @@
 #include <sys/select.h>
 #include <sys/ioctl.h>
 #endif
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // MythTV headers
 #include "hdhrstreamhandler.h"
@@ -160,7 +162,7 @@ void HDHRStreamHandler::run(void)
 
         if (!data_buffer)
         {
-            usleep(20000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
             continue;
         }
 

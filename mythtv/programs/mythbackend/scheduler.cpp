@@ -1,8 +1,9 @@
-#include <unistd.h>
-
 #include <iostream>
 #include <algorithm>
 #include <list>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
 using namespace std;
 
 #ifdef __linux__
@@ -5053,7 +5054,7 @@ int Scheduler::FillRecordingDir(
     {
         if (cnt++ % 20 == 0)
             LOG(VB_SCHEDULE, LOG_WARNING, "Waiting for main server.");
-        usleep(50000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     int fsID = -1;

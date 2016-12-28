@@ -1,4 +1,5 @@
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "PrePostRollFlagger.h"
 
@@ -48,7 +49,7 @@ bool PrePostRollFlagger::go()
         if (m_bStop)
             return false;
 
-        sleep(5);
+        std::this_thread::sleep_for(std::chrono::seconds(5));
         secsSince = startedAt.secsTo(MythDate::current());
     }
 
@@ -157,7 +158,7 @@ bool PrePostRollFlagger::go()
                 return false;
             emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
                 "Waiting for recording to finish"));
-            sleep(5);
+            std::this_thread::sleep_for(std::chrono::seconds(5));
         }
         stillRecording = false;
          myTotalFrames = player->GetTotalFrameCount();
@@ -283,12 +284,12 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
         while (m_bPaused)
         {
             emit breathe();
-            sleep(1);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
         // sleep a little so we don't use all cpu even if we're niced
         if (!fullSpeed && !stillRecording)
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         if (((currentFrameNumber % 500) == 0) ||
             ((showProgress || stillRecording) &&
@@ -381,7 +382,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                 usecSleep = (long)(usecPerFrame * 1.5);
 
             if (usecSleep > 0)
-                usleep(usecSleep);
+                std::this_thread::sleep_for(std::chrono::microseconds(usecSleep));
         }
 
         player->DiscardVideoFrame(currentFrame);

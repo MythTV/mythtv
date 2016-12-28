@@ -2,7 +2,8 @@
 #include "mythrender_vdpau.h"
 
 #include <math.h>
-#include <unistd.h> // for usleep()
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include <QSize>
 
@@ -484,7 +485,7 @@ void MythRenderVDPAU::WaitForFlip(void)
 
     INIT_ST
     VdpTime dummy = 0;
-    usleep(2000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
     vdp_st = vdp_presentation_queue_block_until_surface_idle(
                 m_flipQueue, surface, &dummy);
     CHECK_ST

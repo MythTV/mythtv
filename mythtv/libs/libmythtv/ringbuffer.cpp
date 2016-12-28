@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // POSIX C headers
 #include <sys/types.h>
@@ -1228,7 +1230,7 @@ void RingBuffer::run(void)
             // like us, yield (currently implemented with short usleep).
             generalWait.wakeAll();
             rwlock.unlock();
-            usleep(5 * 1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             rwlock.lockForRead();
         }
         else
@@ -1244,7 +1246,7 @@ void RingBuffer::run(void)
               // reader gets a chance to read before the buffer is full.
                 generalWait.wakeAll();
                 rwlock.unlock();
-                usleep(5 * 1000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
                 rwlock.lockForRead();
             }
         }
