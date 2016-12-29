@@ -273,7 +273,7 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
             DeleteCachedTableSection(*nit);
         _cached_nit.clear();
 
-        //ValidateSDTCache();
+        ValidateSDTCache();
 
         for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
                 network != _cached_sdts.end(); ++network)
@@ -974,7 +974,7 @@ sdt_const_vec_t DVBStreamData::GetCachedSDTs() const
             for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
             {
                 for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
-                        section != (*table).sections.end(); ++table)
+                        section != (*table).sections.end(); ++section)
                     sdts.push_back(*section);
             }
         }
@@ -1164,8 +1164,9 @@ void DVBStreamData::ValidateEITCache()
             }
         }
     }
-    LOG(VB_DVBSICACHE|VB_FLUSH, LOG_DEBUG, LOC + QString(
+    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
             "============================================="));
+    LOG(VB_FLUSH, LOG_DEBUG, "");
 }
 
 
@@ -1202,8 +1203,9 @@ void DVBStreamData::ValidateSDTCache()
             }
         }
     }
-    LOG(VB_DVBSICACHE|VB_FLUSH, LOG_DEBUG, LOC + QString(
+    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
             "============================================="));
+    LOG(VB_FLUSH, LOG_DEBUG, "");
 }
 
 
