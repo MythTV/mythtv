@@ -53,7 +53,7 @@ class RemoteAVFormatContext
             if (!m_rf->isOpen())
                 return false;
 
-            const int BUFFER_SIZE = 0x10000;
+            const int BUFFER_SIZE = 0x20000;
             if (!m_buffer)
             {
                 m_buffer = (unsigned char*)av_malloc(BUFFER_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
