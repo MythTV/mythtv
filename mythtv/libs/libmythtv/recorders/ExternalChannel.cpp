@@ -95,6 +95,11 @@ bool ExternalChannel::Tune(const QString &channum)
     return true;
 }
 
+bool ExternalChannel::Tune(const QString &freqid, int /*finetune*/)
+{
+    return ExternalChannel::Tune(freqid);
+}
+
 bool ExternalChannel::EnterPowerSavingMode(void)
 {
     Close();

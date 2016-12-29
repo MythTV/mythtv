@@ -195,7 +195,7 @@ int MusicFileScanner::GetDirectoryId(const QString &directory, const int &parent
 
     // Load the directory id or insert it and get the id
     query.prepare("SELECT directory_id FROM music_directories "
-                "WHERE path = :DIRECTORY ;");
+                "WHERE path = BINARY :DIRECTORY ;");
     query.bindValue(":DIRECTORY", directory);
 
     if (!query.exec())
@@ -785,7 +785,7 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
     query.prepare("SELECT CONCAT_WS('/', path, filename), date_modified "
                   "FROM music_songs LEFT JOIN music_directories ON "
                   "music_songs.directory_id=music_directories.directory_id "
-                  "WHERE filename NOT LIKE ('%://%') "
+                  "WHERE filename NOT LIKE BINARY ('%://%') "
                   "AND hostname = :HOSTNAME");
 
     query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
