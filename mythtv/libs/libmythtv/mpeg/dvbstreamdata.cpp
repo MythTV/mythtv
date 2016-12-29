@@ -959,8 +959,9 @@ sdt_const_ptr_t DVBStreamData::GetCachedSDTSection(
 sdt_const_vec_t DVBStreamData::GetCachedSDTs() const
 {
     // This function is purely for use by channelscan_sm
-    // It should return all the actual SD table sections
-    // in the cache
+    // It returns a copy of all the actual SD table sections
+    // in the cache. It is the responsibility of the caller
+    // to delete these copies
     QMutexLocker locker(&_cache_lock);
 
 
@@ -975,7 +976,7 @@ sdt_const_vec_t DVBStreamData::GetCachedSDTs() const
             {
                 for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
                         section != (*table).sections.end(); ++section)
-                    sdts.push_back(*section);
+                    sdts.push_back(new ServiceDescriptionTable(**section));
             }
         }
     }
