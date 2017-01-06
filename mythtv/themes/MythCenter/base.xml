@@ -4,13 +4,13 @@
 
     <!-- Base Font Definitions -->
     <fontdef name="basesmall" face="Droid Sans">
-        <pixelsize>22</pixelsize>
+        <pixelsize>20</pixelsize>
         <color>#EEEEEE</color>
         <weight>bold</weight>
     </fontdef>
 
     <fontdef name="basesmaller" from="basesmall">
-        <pixelsize>18</pixelsize>
+        <pixelsize>16</pixelsize>
     </fontdef>
 
     <fontdef name="basesmallbold" from="basesmall">
@@ -24,16 +24,16 @@
     </fontdef>
 
     <fontdef name="basemedium" from="basesmall" face="Liberation Sans">
-        <pixelsize>24</pixelsize>
+        <pixelsize>23</pixelsize>
     </fontdef>
 
     <fontdef name="basemediumbold" from="basemedium">
-        <pixelsize>24</pixelsize>
+        <pixelsize>23</pixelsize>
         <weight>bold</weight>
     </fontdef>
 
     <fontdef name="baselarge" from="basemedium">
-        <pixelsize>26</pixelsize>
+        <pixelsize>27</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>2,2</shadowoffset>
         <shadowalpha>100</shadowalpha>
@@ -132,7 +132,7 @@
 
     <!-- Fonts for specific screens -->
     <fontdef name="baseguide" from="basesmall">
-        <pixelsize>20</pixelsize>
+        <pixelsize>18</pixelsize>
         <weight>normal</weight>
     </fontdef>
 
@@ -732,7 +732,7 @@
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>590,116,140,28</area>
+            <area>590,144,140,28</area>
             <align>right</align>
         </textarea>
 
@@ -1171,19 +1171,19 @@
 
         <fontdef name="medium" face="Droid Sans">
             <color>#FFFFFF</color>
-            <pixelsize>22</pixelsize>
+            <pixelsize>23</pixelsize>
             <weight>bold</weight>
         </fontdef>
 
         <fontdef name="large" face="Liberation Sans">
              <color>#FFFFFF</color>
-             <pixelsize>28</pixelsize>
+             <pixelsize>25</pixelsize>
              <weight>bold</weight>
         </fontdef>
 
         <fontdef name="clock" face="Liberation Sans">
              <color>#FFFFFF</color>
-             <pixelsize>25</pixelsize>
+             <pixelsize>23</pixelsize>
              <weight>bold</weight>
         </fontdef>
     </window>
