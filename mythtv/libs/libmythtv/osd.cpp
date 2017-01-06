@@ -543,13 +543,6 @@ void OSD::SetText(const QString &window, const InfoMap &map,
         bar->SetTotal(1000);
     }
  
-	if (map.contains("wallclock"))
-    {
-        MythUIStateType *state = dynamic_cast<MythUIStateType *> (win->GetChild("wallclock"));
-        if (state)
-            state->DisplayState(map["wallclock"]);
-    }  
-
     win->SetVisible(true);
 
     if (win == m_Dialog)
