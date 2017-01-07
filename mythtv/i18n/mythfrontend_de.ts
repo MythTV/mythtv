@@ -13946,7 +13946,7 @@ Soll die folgende Sendung wirklich gelöscht werden:</translation>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="1313"/>
         <source>%1% used, %2 GB free</source>
         <comment>Diskspace</comment>
-        <translation>%1% benutzer, %2 GB frei</translation>
+        <translation>%1% benutzt %2 GB frei</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2472"/>
