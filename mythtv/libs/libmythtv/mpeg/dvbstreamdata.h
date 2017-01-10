@@ -42,8 +42,10 @@ typedef QMap<uint16_t,sdt_sections_cache_wrapper_t>
         sdt_t_cache_t;                       ///< Table level cache
 typedef QMap<uint16_t,sdt_t_cache_t>
         sdt_ts_cache_t;                       ///< Transport stream level cache
-typedef QMap<uint16_t,sdt_ts_cache_t>
-        sdt_tsn_cache_t;                      ///< Original network ID level cache
+typedef struct SdtCache : public QMap<uint16_t,sdt_ts_cache_t>
+{
+	~SdtCache();
+}        sdt_tsn_cache_t;                      ///< Original network ID level cache
 ///@}
 
 ///@{
@@ -75,8 +77,10 @@ typedef QMap<uint16_t,eit_t_cache_t>
 		eit_ts_cache_t;						///< Service level cache
 typedef QMap<uint16_t,eit_ts_cache_t>
 		eit_tss_cache_t;						///< Transport stream level cache
-typedef QMap<uint16_t,eit_tss_cache_t>
-		eit_tssn_cache_t;						///< Original network ID level cache
+typedef struct EitCache : public QMap<uint16_t,eit_tss_cache_t>
+{
+	~EitCache();
+} eit_tssn_cache_t;						///< Original network ID level cache
 ///@}
 
 

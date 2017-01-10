@@ -31,6 +31,50 @@ QMutex            DVBStreamData::_cached_eits_lock;
 sdt_tsn_cache_t   DVBStreamData::_cached_sdts;
 QMutex            DVBStreamData::_cached_sdts_lock;
 
+EitCache::~EitCache()
+{
+	// Tidy up for heap debugging
+    for (eit_tssn_cache_t::iterator network = begin();
+            network != end(); ++network)
+    {
+        for (eit_tss_cache_t::iterator stream = (*network).begin();
+                stream != (*network).end(); ++stream)
+        {
+            for (eit_ts_cache_t::iterator service = (*stream).begin();
+                    service != (*stream).end(); ++service)
+            {
+                for (eit_t_cache_t::iterator table = (*service).begin(); table != (*service).end(); ++table)
+                {
+                    for (eit_sections_cache_t::iterator section = (*table).sections.begin();
+                            section != (*table).sections.end(); ++section)
+                    	if (NULL != *section)
+                    		delete *section;
+                }
+           }
+        }
+    }
+}
+
+SdtCache::~SdtCache()
+{
+	// Tidy up for heap debugging
+    for (sdt_tsn_cache_t::iterator network = begin();
+            network != end(); ++network)
+    {
+        for (sdt_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
+        {
+            for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
+            {
+				for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
+						section != (*table).sections.end(); ++section)
+                	if (NULL != *section)
+                		delete *section;
+            }
+        }
+    }
+
+}
+
 // service_id is synonymous with the MPEG program number in the PMT.
 DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
                              int desired_program, int cardnum, bool cacheTableSections)
