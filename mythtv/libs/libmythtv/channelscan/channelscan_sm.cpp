@@ -92,6 +92,15 @@ class ScannedChannelInfo
   public:
     ScannedChannelInfo() : mgt(NULL) {}
 
+    ~ScannedChannelInfo()
+    {
+        for (sdt_map_t::const_iterator sdt_list_it = sdts.begin();
+                sdt_list_it != sdts.end(); ++sdt_list_it)
+            for (sdt_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
+                    sdt_it != (*sdt_list_it).end(); ++sdt_it)
+                delete *sdt_it;
+    }
+
     bool IsEmpty() const
     {
         return pats.empty() && pmts.empty()        &&
@@ -827,12 +836,14 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         m_currentInfo->nits = sd->GetCachedNIT();
     }
 
+
     sdt_const_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
     for (uint i = 0; i < sdttmp.size(); i++)
     {
         uint onid = sdttmp[i]->OriginalNetworkID();
         uint tsid = sdttmp[i]->TSID();
+        delete sdttmp[i];
         if (tsid_checked[tsid])
             continue;
         tsid_checked[tsid] = true;

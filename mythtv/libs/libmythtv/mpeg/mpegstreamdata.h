@@ -92,10 +92,10 @@ typedef QMap<uint, PIDPriority> pid_map_t;
 class MTV_PUBLIC MPEGStreamData : public EITSource
 {
   public:
-    MPEGStreamData(int desiredProgram, int cardnum, bool cacheTables);
+    MPEGStreamData(int desiredProgram, int cardnum, bool cacheTableSections);
     virtual ~MPEGStreamData();
 
-    void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
+    void SetCaching(bool cacheTableSections) { _cache_tables = cacheTableSections; }
     void SetListeningDisabled(bool lt) { _listening_disabled = lt; }
 
     virtual void Reset(void) { Reset(-1); }

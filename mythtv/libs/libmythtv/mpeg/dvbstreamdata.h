@@ -25,13 +25,18 @@ typedef vector<sdt_ptr_t>  sdt_vec_t;
 // original network ID.
 ///
 typedef QMap<uint16_t, sdt_ptr_t>
-        sdt_sections_cache_t;                   ///< Section level cache
+        sdt_sections_cache_t;                  ///< Section level cache
 typedef struct SdtSectionsAndStatus
 {
     SdtSectionsAndStatus() { status.SetVersion(-1,0); }
+    void DeepCopy(const SdtSectionsAndStatus& orig)
+    {
+        // Deep copy ?
+    }
     sdt_sections_cache_t sections;
     TableStatus status;
     QDateTime timestamp;
+    QMap<uint16_t, QByteArray> hashes;
 } sdt_sections_cache_wrapper_t;
 typedef QMap<uint16_t,sdt_sections_cache_wrapper_t>
         sdt_t_cache_t;                       ///< Table level cache
@@ -62,6 +67,7 @@ typedef struct EitSectionsAndStatus
     eit_sections_cache_t sections;
     TableStatus status;
     QDateTime timestamp;
+    QMap<uint16_t, QByteArray> hashes;
 } eit_sections_cache_wrapper_t;
 typedef QMap<uint16_t, eit_sections_cache_wrapper_t>
 		eit_t_cache_t;							///< Table level cache
@@ -88,7 +94,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 {
   public:
     DVBStreamData(uint desired_netid, uint desired_tsid,
-                  int desired_program, int cardnum, bool cacheTables = false);
+                  int desired_program, int cardnum, bool cacheTableSections = false);
     virtual ~DVBStreamData();
 
     using MPEGStreamData::Reset;
@@ -102,8 +108,8 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     // Table processing
     bool HandleTables(uint pid, const PSIPTable&);
-    void CheckStaleEIT(uint onid, uint tsid, uint sid, uint tid) const;
-    void CheckStaleSDT(uint onid, uint tsid, uint tid) const;
+    void CheckStaleEIT(const DVBEventInformationTable& eit, uint onid, uint tsid, uint sid, uint tid) const;
+    void CheckStaleSDT(const ServiceDescriptionTable& sdt, uint onid, uint tsid, uint tid) const;
     bool IsRedundant(uint pid, const PSIPTable&) const;
     // RFJ SDT needs ONID as well
     void ProcessSDT(sdt_const_ptr_t);
@@ -227,11 +233,15 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     // Caching
     mutable nit_cache_t       _cached_nit;  // NIT sections cached within transport stream ID
-    mutable sdt_tsn_cache_t   _cached_sdts; // SDT sections cached within transport stream ID
+
+    // Static shared caches
+    static sdt_tsn_cache_t    _cached_sdts; // SDT sections cached within transport stream ID
                                             // within original network ID
-    mutable eit_tssn_cache_t  _cached_eits; // EIT sections cached within table ID within
+    static QMutex             _cached_sdts_lock;
+    static eit_tssn_cache_t   _cached_eits; // EIT sections cached within table ID within
                                             // service ID within transport stream ID within
                                             // original network ID
+    static QMutex             _cached_eits_lock;
 
     static qint64 EIT_STALE_TIME;
     static qint64 SDT_STALE_TIME;

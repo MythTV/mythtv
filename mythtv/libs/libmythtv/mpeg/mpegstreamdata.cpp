@@ -33,10 +33,10 @@ using namespace std;
  *
  *  \param desiredProgram If you want rewritten PAT and PMTs, for
  *                        a desired program set this to a value > -1
- *  \param cacheTables    If true PAT and PMT tables will be cached
+ *  \param cacheTableSections If true psip sections PAT and PMT tables will be cached
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
-                               bool cacheTables)
+                               bool cacheTableSections)
     : _cardid(cardnum),
       _sistandard("mpeg"),
       _have_CRC_bug(false),
@@ -45,7 +45,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
       _eit_helper(NULL), _eit_rate(0.0f),
       _listening_disabled(false),
       _encryption_lock(QMutex::Recursive), _listener_lock(QMutex::Recursive),
-      _cache_tables(cacheTables), _cache_lock(QMutex::Recursive),
+      _cache_tables(cacheTableSections), _cache_lock(QMutex::Recursive),
       // Single program stuff
       _desired_program(desiredProgram),
       _recording_type("all"),

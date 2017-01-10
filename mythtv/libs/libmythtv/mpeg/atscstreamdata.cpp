@@ -27,12 +27,12 @@ using namespace std;
  *                             channel set this to a value greater than zero.
  *  \param desiredMinorChannel If you want rewritten PAT and PMTs for a desired
  *                             channel set this to a value greater than zero.
- *  \param cacheTables         If true important tables will be cached.
+ *  \param cacheTableSections  If true the psip sections of important tables will be cached.
  */
 ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
                                int desiredMinorChannel,
-                               int cardnum, bool cacheTables)
-    : MPEGStreamData(-1, cardnum, cacheTables),
+                               int cardnum, bool cacheTableSections)
+    : MPEGStreamData(-1, cardnum, cacheTableSections),
       _GPS_UTC_offset(GPS_LEAP_SECONDS),
       _atsc_eit_reset(false),
       _mgt_version(-1),
