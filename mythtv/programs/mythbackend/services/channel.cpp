@@ -84,6 +84,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
         if (!FillChannelInfo(pChannelInfo, channelInfo, bDetails))
         {
             delete pChannelInfo;
+            delete pChannelInfos;
             throw( QString("Channel ID appears invalid."));
         }
     }

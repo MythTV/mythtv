@@ -484,6 +484,7 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
     if (!query.exec(sql))
     {
         MythDB::DBError("Retrieving log applications", query);
+        delete pList;
         throw( QString( "Database Error executing query." ));
     }
     while (query.next())
