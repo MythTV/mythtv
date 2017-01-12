@@ -207,7 +207,8 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
   protected:
     /** \fn virtual bool DeleteCachedTableSection(PSIPTable *psip) const
-     *  \brief Deletes a table section or the whole table if it is not sectioned.
+     *  \brief Deletes the PESPacket containing this teable section. Because
+     *  the destructor is virtual any derived class oblects will be deleted as well.
      */
    virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
 
