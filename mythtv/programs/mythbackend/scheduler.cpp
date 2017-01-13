@@ -2226,8 +2226,8 @@ void Scheduler::ResetDuplicates(uint recordid, uint findid,
                       "SET oldrecduplicate = -1 "
                       "WHERE rm.recordid = :RECORDID "
                       "      AND rm.findid = :FINDID");
-        query.bindValue("RECORDID", recordid);
-        query.bindValue("FINDID", findid);
+        query.bindValue(":RECORDID", recordid);
+        query.bindValue(":FINDID", findid);
         if (!query.exec())
             MythDB::DBError("ResetDuplicates2", query);
     }
