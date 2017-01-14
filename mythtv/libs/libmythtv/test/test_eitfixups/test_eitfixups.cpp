@@ -365,6 +365,7 @@ void TestEITFixups::testUKLawAndOrder()
     PRINT_EVENT(*event);
     QCOMPARE(event->title,    QString("Law & Order: Special Victims Unit"));
     QCOMPARE(event->subtitle, QString(""));
+
     delete event;
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixUK,
@@ -378,6 +379,7 @@ void TestEITFixups::testUKLawAndOrder()
     QCOMPARE(event2->title,    QString("Law & Order: Special Victims Unit"));
     QCOMPARE(event2->subtitle, QString("Sugar"));
     QCOMPARE(event2->description, QString("Police drama series about an elite sex crime  ..."));
+
     delete event2;
 }
 
@@ -395,6 +397,7 @@ void TestEITFixups::testUKMarvel()
     PRINT_EVENT(*event);
     QCOMPARE(event->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
     QCOMPARE(event->subtitle, QString("Maveth"));
+
     delete event;
 
 
@@ -408,6 +411,7 @@ void TestEITFixups::testUKMarvel()
     PRINT_EVENT(*event2);
     QCOMPARE(event2->title,    QString("Marvel's Agents of S.H.I.E.L.D."));
     QCOMPARE(event2->subtitle, QString("Bouncing Back"));
+
     delete event2;
 }
 
@@ -471,6 +475,7 @@ void TestEITFixups::testDEPro7Sat1()
     QCOMPARE(event->title,    QString("Titel"));
     QCOMPARE(event->subtitle, QString("Folgentitel"));
     QCOMPARE(event->airdate,  (unsigned short) 2011);
+
     delete event;
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
@@ -482,6 +487,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event2);
     QCOMPARE(event2->subtitle, QString(""));
     QCOMPARE(event2->airdate,  (unsigned short) 2015);
+
     delete event2;
 
     DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
@@ -493,6 +499,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event3);
     QCOMPARE(event3->subtitle, QString("Folgentitel"));
     QCOMPARE(event3->airdate,  (unsigned short) 0);
+
     delete event3;
 
     DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
@@ -504,6 +511,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event4);
     QCOMPARE(event4->subtitle, QString("\"Lokal\", Ort"));
     QCOMPARE(event4->airdate,  (unsigned short) 2015);
+
     delete event4;
 
     DBEventEIT *event5 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
@@ -515,6 +523,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event5);
     QCOMPARE(event5->subtitle, QString("In Morpheus' Armen"));
     QCOMPARE(event5->airdate,  (unsigned short) 2006);
+
     delete event5;
 
     DBEventEIT *event6 = SimpleDBEventEIT (EITFixUp::kFixP7S1,
@@ -526,6 +535,7 @@ void TestEITFixups::testDEPro7Sat1()
     PRINT_EVENT(*event6);
     QCOMPARE(event6->subtitle, QString("Drei Kleintiere durchschneiden (1)"));
     QCOMPARE(event6->airdate,  (unsigned short) 2014);
+
     delete event6;
 
     /* #12151 */
@@ -544,6 +554,7 @@ void TestEITFixups::testDEPro7Sat1()
     QCOMPARE(event7->subtitle, QString("<episode title>"));
     QCOMPARE(event7->airdate,  (unsigned short) 2011);
     QCOMPARE(event7->description, QString("<plot summary>"));
+
     delete event7;
 }
 
@@ -597,7 +608,6 @@ void TestEITFixups::testHTMLFixup()
     PRINT_EVENT(event3);
     QCOMPARE(event3.title,       QString("Jericho"));
     QCOMPARE(event3.description, QString("Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho."));
-
 }
 
 void TestEITFixups::testSkyEpisodes()
@@ -617,6 +627,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event->episode, 16u);
     /* FixPremiere should scrape the credits, too! */
     QVERIFY(event->HasCredits());
+
     delete event;
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
@@ -630,6 +641,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event2->description, QString("Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. Ab 12 Jahren"));
     QCOMPARE(event2->season,  0u);
     QCOMPARE(event2->episode, 0u);
+
     delete event2;
 
     DBEventEIT *event3 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
@@ -643,6 +655,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event3->description, QString("Ab 12 Jahren"));
     QCOMPARE(event3->season,  0u);
     QCOMPARE(event3->episode, 0u);
+
     delete event3;
 
     DBEventEIT *event4 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
@@ -657,6 +670,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event4->episode, 0u);
     QCOMPARE(event4->airdate,  (unsigned short) 2011);
     QVERIFY(event4->HasCredits());
+
     delete event4;
 
     DBEventEIT *event5 = SimpleDBEventEIT (EITFixUp::kFixPremiere,
@@ -671,6 +685,7 @@ void TestEITFixups::testSkyEpisodes()
     QCOMPARE(event5->episode, 11u);
     QCOMPARE(event5->airdate,  (unsigned short) 1999);
     QVERIFY(event5->HasCredits());
+
     delete event5;
 }
 
@@ -702,6 +717,7 @@ void TestEITFixups::testUnitymedia()
     QCOMPARE(event->description, QString("Beschreibung ..."));
     QCOMPARE(event->stars, 0.89f);
     QCOMPARE(event->items.count(), 1);
+
     delete event;
 }
 
@@ -719,8 +735,10 @@ void TestEITFixups::testDeDisneyChannel()
     PRINT_EVENT(*event);
     QCOMPARE(event->title,    QString("Meine Schwester Charlie"));
     QCOMPARE(event->subtitle, QString("Das Ablenkungsmanöver"));
-     QCOMPARE(event->category, QString("Familien-Serie"));
-     QCOMPARE(event->categoryType, ProgramInfo::kCategorySeries);
+    QCOMPARE(event->category, QString("Familien-Serie"));
+    QCOMPARE(event->categoryType, ProgramInfo::kCategorySeries);
+
+    delete event;
 
     DBEventEIT *event2 = SimpleDBEventEIT (EITFixUp::kFixDisneyChannel,
                                          "Phineas und Ferb",
@@ -732,6 +750,8 @@ void TestEITFixups::testDeDisneyChannel()
     PRINT_EVENT(*event2);
     QCOMPARE(event2->title,    QString("Phineas und Ferb"));
     QCOMPARE(event2->subtitle, QString("Das Achterbahn - Musical"));
+
+    delete event2;
 }
 
 void TestEITFixups::testATV()
@@ -749,6 +769,7 @@ void TestEITFixups::testATV()
     QCOMPARE(event->title,    QString("Gilmore Girls"));
     QCOMPARE(event->subtitle, QString("Eine Hochzeit und ein Todesfall"));
 
+    delete event;
 }
 
 void TestEITFixups::test64BitEnum(void)
