@@ -719,6 +719,20 @@ void TestEITFixups::testUnitymedia()
     QCOMPARE(event->items.count(), 1);
 
     delete event;
+
+    /* test star rating without space */
+    event = SimpleDBEventEIT (EITFixUp::kFixUnitymedia,
+                              "Titel",
+                              "",
+                              "Beschreibung ... IMDb Rating: 8.9/10");
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+
+    QCOMPARE(event->stars, 0.89f);
+
+    delete event;
 }
 
 void TestEITFixups::testDeDisneyChannel()
