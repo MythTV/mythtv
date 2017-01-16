@@ -52,7 +52,7 @@ class ExternIO
 
 class ExternalStreamHandler : public StreamHandler
 {
-    enum constants {PACKET_SIZE = 188 * 32768};
+    enum constants {PACKET_SIZE = 188 * 32768, TOO_FAST_SIZE = 188 * 1024 };
 
   public:
     static ExternalStreamHandler *Get(const QString &devicename);
@@ -70,8 +70,12 @@ class ExternalStreamHandler : public StreamHandler
     bool HasTuner(void) const { return m_hasTuner; }
     bool HasPictureAttributes(void) const { return m_hasPictureAttributes; }
 
+    bool RestartStream(void);
+
     bool StartStreaming(bool flush_buffer);
     bool StopStreaming(void);
+
+    bool CheckForError(void);
 
     void PurgeBuffer(void);
 

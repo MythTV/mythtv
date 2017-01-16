@@ -542,6 +542,9 @@ void ExternalStreamHandler::run(void)
     QByteArray buffer;
     uint       len, read_len;
     uint       empty_cnt = 0;
+    MythTimer timer;
+
+    timer.start();
 
     RunProlog();
 
@@ -614,7 +617,7 @@ void ExternalStreamHandler::run(void)
                 break;
             }
 
-            if (!_running_desired)
+            if (!_running_desired || _error)
                 break;
 
             if (read_len > 0)
@@ -632,18 +635,38 @@ void ExternalStreamHandler::run(void)
 
             if (xon)
             {
-                if (!m_poll_mode)
+                if (timer.elapsed() >= 2000)
                 {
-                    ProcessCommand(QString("XOFF"), 50, result);
-                    if (result.startsWith("ERR"))
+                    // Since we may never need to send the XOFF
+                    // command, occationally check to see if the
+                    // External recorder needs to report an issue.
+                    if (CheckForError())
                     {
-                        LOG(VB_GENERAL, LOG_ERR, LOC +
-                            QString("Aborting: XOFF -> %2")
-                            .arg(result));
-                        _error = true;
+                        buffer.clear();
+                        RestartStream();
+                        xon = false;
+                        break;
                     }
+                    timer.restart();
                 }
-                xon = false;
+
+                if (buffer.size() > TOO_FAST_SIZE)
+                {
+                    if (!m_poll_mode)
+                    {
+                        // Data is comming a little too fast, so XOFF
+                        // to give us time to process it.
+                        ProcessCommand(QString("XOFF"), 50, result);
+                        if (result.startsWith("ERR"))
+                        {
+                            LOG(VB_GENERAL, LOG_ERR, LOC +
+                                QString("Aborting: XOFF -> %2")
+                                .arg(result));
+                            _error = true;
+                        }
+                    }
+                    xon = false;
+                }
             }
 
             StreamDataList::const_iterator sit = _stream_data_list.begin();
@@ -831,6 +854,27 @@ void ExternalStreamHandler::CloseApp(void)
     m_IO_lock.unlock();
 }
 
+bool ExternalStreamHandler::RestartStream(void)
+{
+    bool streaming = (StreamingCount() > 0);
+
+    if (streaming)
+    {
+        if (!StopStreaming())
+            return false;
+    }
+
+    usleep(1000000);
+
+    if (streaming)
+    {
+        if (!StartStreaming(false))
+            return false;
+    }
+
+    return true;
+}
+
 bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
 {
     QString result;
@@ -988,7 +1032,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
 
     /* Try to keep in sync, if External app was too slow in responding
      * to previous query, consume the response before sending new query */
-    m_IO->GetStatus(5);
+    m_IO->GetStatus(0);
 
     /* Send new query */
     m_IO->Write(buf);
@@ -1020,6 +1064,30 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
     m_notify = false;
 
     return result.startsWith("OK");
+}
+
+bool ExternalStreamHandler::CheckForError(void)
+{
+    QString result;
+
+    QMutexLocker locker(&m_IO_lock);
+
+    if (!m_IO)
+    {
+        m_error = "External I/O not ready!";
+        LOG(VB_RECORD, LOG_ERR, LOC + m_error);
+        return true;
+    }
+
+    if (m_IO->Error())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "External Recorder in bad state: " +
+            m_IO->ErrorString());
+        return true;
+    }
+
+    result = m_IO->GetStatus(0);
+    return (result.startsWith("ERR"));
 }
 
 void ExternalStreamHandler::PurgeBuffer(void)
