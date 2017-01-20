@@ -44,9 +44,9 @@ class AggregateDataEventTable;
 
 class NetworkInformationTable;
 class BouquetAssociationTable;
-class ServiceDescriptionTable;
+class ServiceDescriptionTableSection;
 class TimeDateTable;
-class DVBEventInformationTable;
+class DVBEventInformationTableSection;
 class PremiereContentInformationTable;
 
 class TSDataListener
@@ -176,7 +176,7 @@ class DVBMainStreamListener
   public:
     virtual void HandleTDT(const TimeDateTable*) = 0;
     virtual void HandleNIT(const NetworkInformationTable*) = 0;
-    virtual void HandleSDT(const ServiceDescriptionTable*) = 0;
+    virtual void HandleSDT(const ServiceDescriptionTableSection*) = 0;
 };
 
 class DVBOtherStreamListener
@@ -185,7 +185,7 @@ class DVBOtherStreamListener
     virtual ~DVBOtherStreamListener() {}
   public:
     virtual void HandleNITo(const NetworkInformationTable*) = 0;
-    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable*) = 0;
+    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTableSection*) = 0;
     virtual void HandleBAT(const BouquetAssociationTable*) = 0;
 };
 
@@ -194,7 +194,7 @@ class DVBEITStreamListener
   protected:
     virtual ~DVBEITStreamListener() {}
   public:
-    virtual void HandleEIT(const DVBEventInformationTable*) = 0;
+    virtual void HandleEIT(const DVBEventInformationTableSection*) = 0;
     virtual void HandleEIT(const PremiereContentInformationTable*) = 0;
 };
 

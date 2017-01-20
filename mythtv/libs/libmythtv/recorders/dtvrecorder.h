@@ -78,7 +78,7 @@ class DTVRecorder :
     // DVBMainStreamListener
     void HandleTDT(const TimeDateTable*) { UpdateCAMTimeOffset(); }
     void HandleNIT(const NetworkInformationTable*) {}
-    void HandleSDT(const ServiceDescriptionTable*) {}
+    void HandleSDT(const ServiceDescriptionTableSection*) {}
 
     // TSPacketListener
     bool ProcessTSPacket(const TSPacket &tspacket);

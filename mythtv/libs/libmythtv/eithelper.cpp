@@ -351,7 +351,7 @@ static inline void parse_dvb_component_descriptors(desc_list_t list,
     }
 }
 
-void EITHelper::AddEIT(const DVBEventInformationTable *eit)
+void EITHelper::AddEIT(const DVBEventInformationTableSection *eit)
 {
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||

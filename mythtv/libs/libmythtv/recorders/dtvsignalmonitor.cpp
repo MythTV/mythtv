@@ -490,7 +490,7 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
         return;
 }
 
-void DTVSignalMonitor::HandleSDT(const ServiceDescriptionTable *sdt)
+void DTVSignalMonitor::HandleSDT(const ServiceDescriptionTableSection *sdt)
 {
     AddFlags(kDTVSigMon_SDTSeen);
 

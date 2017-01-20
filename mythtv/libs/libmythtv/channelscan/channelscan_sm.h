@@ -147,12 +147,12 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // DVB Main
     void HandleNIT(const NetworkInformationTable*);
-    void HandleSDT(const ServiceDescriptionTable*);
+    void HandleSDT(const ServiceDescriptionTableSection*);
     void HandleTDT(const TimeDateTable*) {}
 
     // DVB Other
     void HandleNITo(const NetworkInformationTable*) {}
-    void HandleSDTo(uint tsid, const ServiceDescriptionTable*);
+    void HandleSDTo(uint tsid, const ServiceDescriptionTableSection*);
     void HandleBAT(const BouquetAssociationTable*);
 
   private:

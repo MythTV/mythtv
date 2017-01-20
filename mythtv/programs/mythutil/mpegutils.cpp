@@ -666,7 +666,7 @@ class PrintDVBMainStreamListener :
         Output(nit);
     }
 
-    virtual void HandleSDT(const ServiceDescriptionTable *sdt)
+    virtual void HandleSDT(const ServiceDescriptionTableSection *sdt)
     {
         Output(sdt);
     }
@@ -685,7 +685,7 @@ class PrintDVBOtherStreamListener :
         Output(nit);
     }
 
-    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
+    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTableSection *sdt)
     {
         Output(sdt);
     }
@@ -704,7 +704,7 @@ class PrintDVBEITStreamListener :
     PrintDVBEITStreamListener(RingBuffer *out, bool use_xml) :
         PrintOutput(out, use_xml) { }
 
-    virtual void HandleEIT(const DVBEventInformationTable *eit)
+    virtual void HandleEIT(const DVBEventInformationTableSection *eit)
     {
         Output(eit);
     }

@@ -65,7 +65,7 @@ using namespace std;
 #include "hdhrchannel.h"
 #include "v4lchannel.h"
 
-typedef QMap<uint, sdt_const_vec_t> sdt_map_t;
+typedef QMap<uint, sdt_section_const_vec_t> sdt_map_t;
 
 /// SDT's should be sent every 2 seconds and NIT's every
 /// 10 seconds, so lets wait at least 30 seconds, in
@@ -96,7 +96,7 @@ class ScannedChannelInfo
     {
         for (sdt_map_t::const_iterator sdt_list_it = sdts.begin();
                 sdt_list_it != sdts.end(); ++sdt_list_it)
-            for (sdt_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
+            for (sdt_section_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
                     sdt_it != (*sdt_list_it).end(); ++sdt_it)
                 delete *sdt_it;
     }
@@ -431,7 +431,7 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
     UpdateChannelInfo(true);
 }
 
-void ChannelScanSM::HandleSDT(const ServiceDescriptionTable *sdt)
+void ChannelScanSM::HandleSDT(const ServiceDescriptionTableSection *sdt)
 {
     QMutexLocker locker(&m_lock);
 
@@ -532,7 +532,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
     }
 }
 
-void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
+void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTableSection *sdt)
 {
     QMutexLocker locker(&m_lock);
 
@@ -837,7 +837,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
 
-    sdt_const_vec_t sdttmp = sd->GetCachedSDTs();
+    sdt_section_const_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
     for (uint i = 0; i < sdttmp.size(); i++)
     {
@@ -850,8 +850,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         if (m_currentInfo->sdts.contains(tsid))
             continue;
 
-        if (!wait_until_complete || sd->HasAllSDTSections(onid, tsid, TableID::SDT))
-            m_currentInfo->sdts[tsid] = sd->GetCachedSDTs();
+//        if (!wait_until_complete || sd->HasAllSDTSections(onid, tsid, TableID::SDT))
+ //           m_currentInfo->sdts[tsid] = sd->GetCachedSDTs();
     }
 
     // Check if transport tuning is complete
@@ -1078,7 +1078,7 @@ static void update_info(ChannelInsertInfo &info,
 }
 
 static void update_info(ChannelInsertInfo &info,
-                        const ServiceDescriptionTable *sdt, uint i,
+                        const ServiceDescriptionTableSection *sdt, uint i,
                         const QMap<uint64_t, QString> &defAuthorities)
 {
     // HACK beg -- special exception for these networks
@@ -1302,7 +1302,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     sdt_map_t::const_iterator sdt_list_it = scan_info->sdts.begin();
     for (; sdt_list_it != scan_info->sdts.end(); ++sdt_list_it)
     {
-        sdt_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
+        sdt_section_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
         for (; sdt_it != (*sdt_list_it).end(); ++sdt_it)
         {
             for (uint i = 0; i < (*sdt_it)->ServiceCount(); i++)

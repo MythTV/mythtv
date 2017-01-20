@@ -1,6 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include <algorithm>
+#include <iostream>
 using namespace std;
 
 #include "qsharedpointer.h"
@@ -33,46 +34,112 @@ QMutex            DVBStreamData::_cached_sdts_lock;
 
 EitCache::~EitCache()
 {
+	unsigned long bytes = 0;
+	uint sections = 0;
+
 	// Tidy up for heap debugging
     for (eit_tssn_cache_t::iterator network = begin();
             network != end(); ++network)
     {
+        cerr << QString(
+                "ONID 0x%1")
+                .arg(network.key(),4,16).toStdString() << endl;
         for (eit_tss_cache_t::iterator stream = (*network).begin();
                 stream != (*network).end(); ++stream)
         {
+        	cerr << QString(
+                    "TSID 0x%1")
+                    .arg(stream.key(),4,16).toStdString() << endl;
             for (eit_ts_cache_t::iterator service = (*stream).begin();
                     service != (*stream).end(); ++service)
             {
+            	cerr << QString(
+                        "SID 0x%1")
+                        .arg(service.key(),4,16).toStdString() << endl;
                 for (eit_t_cache_t::iterator table = (*service).begin(); table != (*service).end(); ++table)
                 {
+                	cerr << QString(
+                            "TID 0x%1 Sections %2 Status %3")
+                            .arg(table.key(),2,16)
+							.arg((*table).sections.size())
+							.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
+							.toStdString()
+							<< endl;
                     for (eit_sections_cache_t::iterator section = (*table).sections.begin();
                             section != (*table).sections.end(); ++section)
+                    {
                     	if (NULL != *section)
+                    	{
+                    		bytes += (*section)->SectionLength();
                     		delete *section;
+                    	}
+                    	sections++;
+                    }
+                    (*table).sections.clear();
                 }
-           }
+                (*service).clear();
+            }
+            (*stream).clear();
         }
+        (*network).clear();
     }
+    clear();
+    cerr << "EIT cache deleted approximately "
+    		<< bytes
+			<<" bytes in "
+			<< sections
+			<< " sections"
+			<< endl;
 }
 
 SdtCache::~SdtCache()
 {
+	unsigned long bytes  = 0;
+	uint sections = 0;
+
 	// Tidy up for heap debugging
     for (sdt_tsn_cache_t::iterator network = begin();
             network != end(); ++network)
     {
+        cerr << QString(
+                "ONID 0x%1")
+                .arg(network.key(),4,16).toStdString() << endl;
         for (sdt_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
         {
+        	cerr << QString(
+                    "TSID 0x%1")
+                    .arg(stream.key(),4,16).toStdString() << endl;
             for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
             {
+            	cerr << QString(
+                        "TID 0x%1 Sections %2 Status %3")
+                        .arg(table.key(),2,16)
+						.arg((*table).sections.size())
+						.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
+						.toStdString() << endl;
 				for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
 						section != (*table).sections.end(); ++section)
+				{
                 	if (NULL != *section)
+                	{
+                		bytes += (*section)->SectionLength();
                 		delete *section;
+                	}
+                   	sections++;
+				}
+                (*table).sections.clear();
             }
+            (*stream).clear();
         }
+        (*network).clear();
     }
-
+    clear();
+    cerr << "SDT cache deleted approximately "
+    		<< bytes
+			<<" bytes in "
+			<< sections
+			<< " entries"
+			<< endl;
 }
 
 // service_id is synonymous with the MPEG program number in the PMT.
@@ -108,38 +175,24 @@ void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
 {
     bool reset = true;
 
-    if (HasAllSDTSections(netid, tsid, TableID::SDT))
+/*    if (HasAllSDTSections(netid, tsid, TableID::SDT))
     {
-        sdt_const_ptr_t first_sdt = GetCachedSDTSection(netid, tsid, TableID::SDT, 0);
-        uint networkID = first_sdt->OriginalNetworkID();
-        if (networkID == netid)
-        {
-            reset = false;
-            _desired_netid = netid;
-            _desired_tsid = tsid;
-            uint last_section = first_sdt->LastSection();
-            ProcessSDT(first_sdt);
-            ReturnCachedTable(first_sdt);
-            for (uint i = 1; i <= last_section; ++i)
-            {
-                sdt_const_ptr_t sdt = GetCachedSDTSection(netid, _desired_tsid, TableID::SDT, i);
-                ProcessSDT(sdt);
-                ReturnCachedTable(sdt);
-            }
-            SetDesiredProgram(serviceid);
-        }
-    }
+    	// TODO Not sure why this is needed RFJ
+		reset = false;
+		_desired_netid = netid;
+		_desired_tsid = tsid;
+		SetDesiredProgram(serviceid);
+    }*/
 
     if (reset)
         Reset(netid, tsid, serviceid);
 }
 
-void DVBStreamData::CheckStaleEIT(const DVBEventInformationTable& eit, uint onid, uint tsid, uint sid, uint tid) const
+void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, uint onid, uint tsid, uint sid, uint tid) const
 {
     uint section = eit.Section();
 
-    if (onid == 0x233a)
-        onid = GenerateUniqueUKOriginalNetworkID(tsid);
+    onid = InternalOriginalNetworkID(onid, tsid);
 
     if (!(_cached_eits.contains(onid) &&
     		_cached_eits[onid].contains(tsid) &&
@@ -179,12 +232,11 @@ void DVBStreamData::CheckStaleEIT(const DVBEventInformationTable& eit, uint onid
     }
 }
 
-void DVBStreamData::CheckStaleSDT(const ServiceDescriptionTable& sdt, uint onid, uint tsid, uint tid) const
+void DVBStreamData::CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uint onid, uint tsid, uint tid) const
 {
     uint section = sdt.Section();
 
-    if (onid == 0x233a)
-        onid = GenerateUniqueUKOriginalNetworkID(tsid);
+    onid = InternalOriginalNetworkID(onid, tsid);
 
     if (!(_cached_sdts.contains(onid) &&
     		_cached_sdts[onid].contains(tsid) &&
@@ -241,15 +293,14 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::SDT == table_id)
     {
-        ServiceDescriptionTable sdt(psip);
+        ServiceDescriptionTableSection sdt(psip);
 
         uint onid = sdt.OriginalNetworkID();
         uint tsid = sdt.TSID();
 
         CheckStaleSDT(sdt, onid, tsid, table_id);
 
-        return SDTSectionSeen(onid, tsid, table_id,
-                              version, sdt.Section());
+        return SDTSectionSeen(sdt);
     }
 
     if (TableID::TDT == table_id)
@@ -271,7 +322,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     }
     if (is_eit)
     {
-        DVBEventInformationTable eit(psip);
+        DVBEventInformationTableSection eit(psip);
 
         uint onid = eit.OriginalNetworkID();
         uint tsid = eit.TSID();
@@ -279,8 +330,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
         CheckStaleEIT(eit, onid, tsid, sid, table_id);
 
-        return EITSectionSeen(onid, tsid, sid, table_id,
-                              version, eit.Section());
+        return EITSectionSeen(eit);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -293,15 +343,14 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::SDTo == table_id)
     {
-        ServiceDescriptionTable sdt(psip);
+        ServiceDescriptionTableSection sdt(psip);
 
         uint onid = sdt.OriginalNetworkID();
         uint tsid = sdt.TSID();
 
         CheckStaleSDT(sdt, onid, tsid, table_id);
 
-        return SDTSectionSeen(onid, tsid, table_id,
-                              version, sdt.Section());
+        return SDTSectionSeen(sdt);
     }
 
     if (DVB_EIT_PID == pid || FREESAT_EIT_PID == pid || MCA_EIT_PID == pid)
@@ -321,7 +370,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     }
     if (is_eit)
     {
-        DVBEventInformationTable eit(psip);
+        DVBEventInformationTableSection eit(psip);
 
         uint onid = eit.OriginalNetworkID();
         uint tsid = eit.TSID();
@@ -329,8 +378,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
         CheckStaleEIT(eit, onid, tsid, sid, table_id);
 
-        return EITSectionSeen(onid, tsid, sid, table_id,
-                              version, eit.Section());
+        return EITSectionSeen(eit);
     }
 
     if (((PREMIERE_EIT_DIREKT_PID == pid) || (PREMIERE_EIT_SPORT_PID == pid)) &&
@@ -368,7 +416,7 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
         _cached_nit.clear();
     }
 
-    ValidateSDTCache();
+    //ValidateSDTCache();
     {
         QMutexLocker locker(&_cached_sdts_lock);
         for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
@@ -415,6 +463,7 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
                 {
                     for (eit_t_cache_t::iterator table = (*service).begin(); table != (*service).end();)
                     {
+                        // Reset any incomplete tables
                         if (!(*table).status.HasAllSections())
                         {
 							for (eit_sections_cache_t::iterator section = (*table).sections.begin();
@@ -499,11 +548,8 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::SDT:
         {
-            ServiceDescriptionTable *sdt= new ServiceDescriptionTable(psip);
-            SetSDTSectionSeen(sdt->OriginalNetworkID(), sdt->TSID(),
-                              sdt->TableID(), sdt->Version(),
-                              sdt->Section(), sdt->LastSection());
-            CacheSDT(sdt);
+            ServiceDescriptionTableSection *sdt= new ServiceDescriptionTableSection(psip);
+            SetSDTSectionSeen(*sdt);
             ProcessSDT(sdt);
 
             return true;
@@ -549,23 +595,20 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::SDTo:
         {
             uint tsid = psip.TableIDExtension();
-            ServiceDescriptionTable sdt(psip);
+            ServiceDescriptionTableSection sdt(psip);
             // some providers send the SDT for the current multiplex as SDTo
             // this routine changes the TableID to SDT and recalculates the CRC
             if (_desired_netid == sdt.OriginalNetworkID() &&
                 _desired_tsid  == tsid)
             {
-                ServiceDescriptionTable *sdta =
-                    new ServiceDescriptionTable(psip);
+                ServiceDescriptionTableSection *sdta =
+                    new ServiceDescriptionTableSection(psip);
                 if (!sdta->Mutate())
                 {
                     delete sdta;
                     return true;
                 }
-                SetSDTSectionSeen(sdta->OriginalNetworkID(), sdta->TSID(),
-                                  sdta->TableID(), sdta->Version(),
-                                  sdta->Section(), sdta->LastSection());
-                CacheSDT(sdta);
+                SetSDTSectionSeen(*sdta);
                 ProcessSDT(sdta);
                 return true;
             }
@@ -595,46 +638,66 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         ((MCA_ONID == _desired_netid) && (MCA_EIT_TSID == _desired_tsid) &&
         (MCA_EIT_PID == pid)) || DVB_BVLONG_EIT_PID == pid) &&
 
-        DVBEventInformationTable::IsEIT(psip.TableID()))
+        DVBEventInformationTableSection::IsEIT(psip.TableID()))
     {
         QMutexLocker locker(&_listener_lock);
         if (!_dvb_eit_listeners.size() && !_eit_helper)
             return true;
 
-        DVBEventInformationTable* eit = new DVBEventInformationTable(psip);
+        DVBEventInformationTableSection* eit_section = new DVBEventInformationTableSection(psip);
 
-        SetEITSectionSeen(eit->OriginalNetworkID(), eit->TSID(),
-                      eit->ServiceID(), eit->TableID(),
-                      eit->Version(), eit->Section(),
-					  eit->SegmentLastSectionNumber(), eit->LastSection());
-        CacheEIT(eit);
+        uint onid = eit_section->OriginalNetworkID();
+        uint tsid = eit_section->TSID();
+        uint sid = eit_section->ServiceID();
+        uint tid = eit_section->TableID();
+        uint version = eit_section->Version();
+        uint section_number = eit_section->Section();
+        uint segment_last_section = eit_section->SegmentLastSectionNumber();
+        uint last_section = eit_section->LastSection();
+
+        LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("New EIT section "
+                "0x%1(0x%2)/0x%3/0x%4/%5/%6 %7(%8/%9) %10(%11/%12) %13(%14/%15)")
+            .arg(onid,0,16)
+            .arg(InternalOriginalNetworkID(onid, tsid),0,16)
+            .arg(tsid,0,16)
+            .arg(sid,0,16)
+            .arg(tid)
+            .arg(version)
+            .arg(section_number)
+            .arg(section_number >> 3)
+            .arg(section_number % 8)
+            .arg(segment_last_section)
+            .arg(segment_last_section >> 3)
+            .arg(segment_last_section % 8)
+            .arg(last_section)
+            .arg(last_section >> 3)
+            .arg(last_section % 8)
+            );
+
+        SetEITSectionSeen(*eit_section);
 
         for (uint i = 0; i < _dvb_eit_listeners.size(); i++)
-            _dvb_eit_listeners[i]->HandleEIT(eit);
+            _dvb_eit_listeners[i]->HandleEIT(eit_section);
 
-        if(HasAllEITSections(eit->OriginalNetworkID(), eit->TSID(),
-                      eit->ServiceID(), eit->TableID()))
+        if(HasAllEITSections(*eit_section))
         {
-            uint onid = eit->OriginalNetworkID();
-            uint tsid = eit->TSID();
-            if (onid== 0x233a)
-                onid = GenerateUniqueUKOriginalNetworkID(tsid);
-            uint sid = eit->ServiceID();
-            uint tid = eit->TableID();
+        	// Translate the onid
+            onid = InternalOriginalNetworkID(onid, tsid);
+
             LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
                     "Subtable 0x%1/0x%2/0x%3/%4 complete version %5")
                 .arg(onid,0,16)
                 .arg(tsid,0,16)
                 .arg(sid,0,16)
                 .arg(tid)
-                .arg(eit->Version()));
+                .arg(version));
 
             // Complete table seen
             // Grab the eit cache lock
             QMutexLocker locker(&_cached_eits_lock);
 
             // Build a vector of the cached table sections
-            eit_vec_t table;
+            eit_section_vec_t table;
             eit_sections_cache_t& sections = _cached_eits[onid][tsid][sid][tid].sections;
             for (eit_sections_cache_t::iterator i = sections.begin(); i != sections.end(); ++i)
             	table.push_back(*i);
@@ -643,16 +706,15 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             // Temporary testing using old code
             if (_eit_helper)
             {
-                for (eit_vec_t::iterator i = table.begin(); i != table.end(); ++i)
+                for (eit_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
                     _eit_helper->AddEIT(*i);
             }
 
-            /* I do not think I need to do this
             // Delete the table sections from the cache
             // But leave the status information intact
-            for (eit_vec_t::iterator i = table.begin(); i != table.end(); ++i)
+            for (eit_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
                 DeleteCachedTableSection(*i);
-            sections.clear();*/
+            sections.clear();
         }
 
         return true;
@@ -681,7 +743,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     return false;
 }
 
-void DVBStreamData::ProcessSDT(sdt_const_ptr_t sdt)
+void DVBStreamData::ProcessSDT(sdt_section_const_ptr_t sdt)
 {
     QMutexLocker locker(&_listener_lock);
 
@@ -699,9 +761,39 @@ void DVBStreamData::ProcessSDT(sdt_const_ptr_t sdt)
             _dvb_has_eit[sdt->ServiceID(i)] = true;
     }
 
-    for (uint i = 0; i < _dvb_main_listeners.size(); i++)
+    uint tsid = sdt->TSID();
+    uint onid = InternalOriginalNetworkID(sdt->OriginalNetworkID(), tsid);
+    uint tid = sdt->TableID();
 
-        _dvb_main_listeners[i]->HandleSDT(sdt);
+    if(HasAllSDTSections(*sdt))
+    {
+        // Complete table seen
+        // Grab the eit cache lock
+        QMutexLocker locker(&_cached_sdts_lock);
+
+        // Build a vector of the cached table sections
+        sdt_section_vec_t table;
+        sdt_sections_cache_t& sections = _cached_sdts[onid]
+													  [tsid]
+													   [tid].sections;
+        for (sdt_sections_cache_t::iterator i = sections.begin(); i != sections.end(); ++i)
+        	table.push_back(*i);
+
+        // and pass up to the sdt listeners
+		for (sdt_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
+			for (uint i = 0; i < _dvb_main_listeners.size(); i++)
+				if (TableID::SDT == tid)
+					_dvb_main_listeners[i]->HandleSDT(sdt);
+				else
+					_dvb_other_listeners[i]->HandleSDTo(tsid, sdt);
+
+
+        // Delete the table sections from the cache
+        // But leave the status information intact
+        for (sdt_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
+            DeleteCachedTableSection(*i);
+        sections.clear();
+    }
 }
 
 bool DVBStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
@@ -836,18 +928,25 @@ bool DVBStreamData::HasAllBATSections(uint bid) const
     return _bat_status.HasAllSections(bid);
 }
 
-void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_stream_id,
-                                      uint serviceid, uint tableid,
-                                      uint version, uint section,
-                                      uint segment_last_section, uint last_section)
+void DVBStreamData::SetEITSectionSeen(DVBEventInformationTableSection& eit_section)
 {
-    if (original_network_id == 0x233a)
-        original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+    uint transport_stream_id = eit_section.TSID();
+    uint original_network_id = InternalOriginalNetworkID(eit_section.OriginalNetworkID(), transport_stream_id);
+    uint serviceid = eit_section.ServiceID();
+    uint tableid = eit_section.TableID();
+    uint version = eit_section.Version();
+    uint section_number = eit_section.Section();
+    uint segment_last_section = eit_section.SegmentLastSectionNumber();
+    uint last_section = eit_section.LastSection();
 
     QMutexLocker locker(&_cached_eits_lock);
 
-    TableStatus& status = _cached_eits[original_network_id][transport_stream_id]
-                                                            [serviceid][tableid].status;
+    // This will create the index entries if needed
+    eit_sections_cache_wrapper_t& wrapper = _cached_eits[original_network_id][transport_stream_id]
+                                                            [serviceid][tableid];
+    TableStatus& status = wrapper.status;
+	eit_sections_cache_t& sections = wrapper.sections;
+
     QString bitmap;
     uint count = 1;
     for (TableStatus::sections_t::const_iterator iTr
@@ -870,9 +969,9 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
         .arg(serviceid, 0, 16)
         .arg(tableid)
         .arg(version)
-        .arg(section)
-        .arg(section >> 3)
-        .arg(section % 8)
+        .arg(section_number)
+        .arg(section_number >> 3)
+        .arg(section_number % 8)
         .arg(segment_last_section)
         .arg(segment_last_section >> 3)
         .arg(segment_last_section % 8)
@@ -881,7 +980,7 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
         .arg(last_section % 8)
         .arg(bitmap));
 
-    status.SetSectionSeen(version, section, last_section, segment_last_section);
+    status.SetSectionSeen(version, section_number, last_section, segment_last_section);
 
     for (TableStatus::sections_t::const_iterator iTr
                 = status.m_sections.begin();
@@ -903,9 +1002,9 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
         .arg(serviceid, 0, 16)
         .arg(tableid)
         .arg(version)
-        .arg(section)
-        .arg(section >> 3)
-        .arg(section % 8)
+        .arg(section_number)
+        .arg(section_number >> 3)
+        .arg(section_number % 8)
         .arg(segment_last_section)
         .arg(segment_last_section >> 3)
         .arg(segment_last_section % 8)
@@ -914,21 +1013,42 @@ void DVBStreamData::SetEITSectionSeen(uint original_network_id, uint transport_s
         .arg(last_section % 8)
         .arg(bitmap));
 
+    eit_sections_cache_t::iterator it = sections.find(section_number);
+
+    if (it != sections.end())
+        DeleteCachedTableSection(*it);
+
+    sections[section_number] = &eit_section;
+    wrapper.timestamp = QDateTime::currentDateTimeUtc();
+    wrapper.hashes[section_number] = QCryptographicHash::hash(
+            QByteArray((const char*)(eit_section.psipdata()), eit_section.Length() - 4),
+            QCryptographicHash::Md5); // Hash the events loop
+
+    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+                        "Added eit cache entry 0x%1/0x%2/0x%3/0x%4/%5 count %6")
+                        .arg(original_network_id,4,16)
+                        .arg(transport_stream_id,4,16)
+                        .arg(serviceid,4,16)
+                        .arg(tableid,2,16)
+                        .arg(section_number)
+                        .arg(sections.size()));
 }
 
-bool DVBStreamData::EITSectionSeen(uint original_network_id, uint transport_stream_id,
-                                   uint serviceid, uint tableid,
-                                   uint version, uint section) const
+bool DVBStreamData::EITSectionSeen(const DVBEventInformationTableSection& eit_section) const
 {
-    if (original_network_id == 0x233a)
-        original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+    uint transport_stream_id = eit_section.TSID();
+    uint original_network_id = InternalOriginalNetworkID(eit_section.OriginalNetworkID(), transport_stream_id);
+    uint serviceid = eit_section.ServiceID();
+    uint tableid = eit_section.TableID();
+    uint version = eit_section.Version();
+    uint section = eit_section.Section();
 
     QMutexLocker locker(&_cached_eits_lock);
 
-    if (!(_cached_eits.contains(original_network_id) &&
+    if (_cached_eits.contains(original_network_id) &&
     		_cached_eits[original_network_id].contains(transport_stream_id) &&
 			_cached_eits[original_network_id][transport_stream_id].contains(serviceid) &&
-			_cached_eits[original_network_id][transport_stream_id][serviceid].contains(tableid)))
+			_cached_eits[original_network_id][transport_stream_id][serviceid].contains(tableid))
     	return _cached_eits[original_network_id]
 						[transport_stream_id]
 						 [serviceid]
@@ -937,46 +1057,62 @@ bool DVBStreamData::EITSectionSeen(uint original_network_id, uint transport_stre
     	return false;
 }
 
-bool DVBStreamData::HasAllEITSections(uint original_network_id, uint transport_stream_id,
-                                      uint serviceid, uint tableid) const
+bool DVBStreamData::HasAllEITSections(const DVBEventInformationTableSection& eit_section) const
 {
-    if (original_network_id == 0x233a)
-        original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+    uint transport_stream_id = eit_section.TSID();
+    uint original_network_id = InternalOriginalNetworkID(eit_section.OriginalNetworkID(), transport_stream_id);
+    uint serviceid = eit_section.ServiceID();
+    uint tableid = eit_section.TableID();
 
     QMutexLocker locker(&_cached_eits_lock);
 
-    if (!(_cached_eits.contains(original_network_id) &&
-    		_cached_eits[original_network_id].contains(transport_stream_id) &&
-			_cached_eits[original_network_id][transport_stream_id].contains(serviceid) &&
-			_cached_eits[original_network_id][transport_stream_id][serviceid].contains(tableid)))
-    	return _cached_eits[original_network_id]
-                        [transport_stream_id]
-						 [serviceid]
-						  [tableid].status.HasAllSections();
-    else
-    	return false;
+    return (_cached_eits.contains(original_network_id) &&
+        _cached_eits[original_network_id].contains(transport_stream_id) &&
+        _cached_eits[original_network_id][transport_stream_id].contains(serviceid) &&
+        _cached_eits[original_network_id][transport_stream_id][serviceid].contains(tableid) &&
+        _cached_eits[original_network_id][transport_stream_id][serviceid][tableid].status.HasAllSections() &&
+        !_cached_eits[original_network_id][transport_stream_id][serviceid][tableid].sections.isEmpty());
 }
 
-void DVBStreamData::SetSDTSectionSeen(uint original_network_id, uint transport_stream_id,
-                                      uint tableid, uint version,
-                                      uint section, uint last_section)
+void DVBStreamData::SetSDTSectionSeen(ServiceDescriptionTableSection& sdt_section)
 {
-    if (original_network_id == 0x233a)
-        original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+    uint transport_stream_id = sdt_section.TSID();
+    uint original_network_id = InternalOriginalNetworkID(sdt_section.OriginalNetworkID(), transport_stream_id);
+    uint tableid = sdt_section.TableID();
+    uint version = sdt_section.Version();
+    uint section_number = sdt_section.Section();
+    uint last_section = sdt_section.LastSection();
 
     QMutexLocker locker(&_cached_sdts_lock);
 
-    TableStatus& status = _cached_sdts[original_network_id]
+    // This will create the indexes if needed
+	sdt_sections_cache_wrapper_t& wrapper = _cached_sdts[original_network_id]
                                       [transport_stream_id]
-                                      [tableid].status;
-    status.SetSectionSeen(version, section, last_section);
+                                      [tableid];
+
+    wrapper.status.SetSectionSeen(version, section_number, last_section);
+
+    sdt_sections_cache_t& sections = wrapper.sections;
+
+    sdt_sections_cache_t::iterator it = sections.find(section_number);
+
+    if (it != sections.end())
+        DeleteCachedTableSection(*it);
+
+    sections[section_number] = &sdt_section;
+    wrapper.timestamp = QDateTime::currentDateTimeUtc();
+    wrapper.hashes[section_number] = QCryptographicHash::hash(
+            QByteArray((const char*)(sdt_section.psipdata()), sdt_section.Length() - 4),
+            QCryptographicHash::Md5); // Hash the events loop
 }
 
-bool DVBStreamData::SDTSectionSeen(uint original_network_id, uint transport_stream_id,
-                                   uint tableid, uint version, uint section) const
+bool DVBStreamData::SDTSectionSeen(const ServiceDescriptionTableSection& sdt_section) const
 {
-    if (original_network_id == 0x233a)
-        original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+    uint transport_stream_id = sdt_section.TSID();
+    uint original_network_id = InternalOriginalNetworkID(sdt_section.OriginalNetworkID(), transport_stream_id);
+    uint tableid = sdt_section.TableID();
+    uint version = sdt_section.Version();
+    uint section = sdt_section.Section();
 
     QMutexLocker locker(&_cached_sdts_lock);
 
@@ -990,20 +1126,25 @@ bool DVBStreamData::SDTSectionSeen(uint original_network_id, uint transport_stre
     	return false;
 }
 
-bool DVBStreamData::HasAllSDTSections(uint original_network_id, uint transport_stream_id,
-                                        uint tableid) const
+bool DVBStreamData::HasAllSDTSections(const ServiceDescriptionTableSection& sdt_section) const
 {
-    if (original_network_id == 0x233a)
-        original_network_id = GenerateUniqueUKOriginalNetworkID(transport_stream_id);
+    uint transport_stream_id = sdt_section.TSID();
+    uint original_network_id = InternalOriginalNetworkID(sdt_section.OriginalNetworkID(), transport_stream_id);
+    uint tableid = sdt_section.TableID();
 
     QMutexLocker locker(&_cached_sdts_lock);
 
     if (_cached_sdts.contains(original_network_id) &&
     		_cached_sdts[original_network_id].contains(transport_stream_id) &&
-			_cached_sdts[original_network_id][transport_stream_id].contains(tableid))
-		return _cached_sdts[original_network_id]
-                        [transport_stream_id]
-                        [tableid].status.HasAllSections();
+			_cached_sdts[original_network_id]
+						 [transport_stream_id].contains(tableid) &&
+			_cached_sdts[original_network_id]
+						 [transport_stream_id]
+						  [tableid].status.HasAllSections() &&
+			!_cached_sdts[original_network_id]
+						 [transport_stream_id]
+						  [tableid].sections.isEmpty())
+    	return true;
     else
     	return false;
 }
@@ -1081,22 +1222,7 @@ nit_const_vec_t DVBStreamData::GetCachedNIT(bool current) const
     return nits;
 }
 
-sdt_const_ptr_t DVBStreamData::GetCachedSDTSection(
-    uint onid, uint tsid, uint tid, uint section_num) const
-{
-    QMutexLocker locker(&_cached_sdts_lock);
-
-    // Avoid creating any entries
-    if (_cached_sdts.contains(onid) &&
-    		_cached_sdts[onid].contains(tsid) &&
-			_cached_sdts[onid][tsid].contains(tid) &&
-			_cached_sdts[onid][tsid][tid].sections.contains(section_num))
-    	return _cached_sdts[onid][tsid][tid].sections[section_num];
-    else
-    	return NULL;
-}
-
-sdt_const_vec_t DVBStreamData::GetCachedSDTs() const
+sdt_section_const_vec_t DVBStreamData::GetCachedSDTs() const
 {
     // This function is purely for use by channelscan_sm
     // It returns a copy of all the actual SD table sections
@@ -1105,7 +1231,7 @@ sdt_const_vec_t DVBStreamData::GetCachedSDTs() const
     QMutexLocker locker(&_cached_sdts_lock);
 
 
-    sdt_const_vec_t sdts;
+    sdt_section_const_vec_t sdts;
 
     for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
             network != _cached_sdts.end(); ++network)
@@ -1116,7 +1242,7 @@ sdt_const_vec_t DVBStreamData::GetCachedSDTs() const
             {
                 for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
                         section != (*table).sections.end(); ++section)
-                    sdts.push_back(new ServiceDescriptionTable(**section));
+                    sdts.push_back(new ServiceDescriptionTableSection(**section));
             }
         }
     }
@@ -1144,12 +1270,10 @@ bool DVBStreamData::DeleteCachedTableSection(PSIPTable *psip) const
     }
     else if ((TableID::SDT == tableID) || (TableID::SDTo == tableID))
     {
-        ServiceDescriptionTable* sdt = (ServiceDescriptionTable*)(psip);
-        uint onid = sdt->OriginalNetworkID();
+        ServiceDescriptionTableSection* sdt = (ServiceDescriptionTableSection*)(psip);
         uint tsid = sdt->TSID();
+        uint onid = InternalOriginalNetworkID(sdt->OriginalNetworkID(), tsid);
         uint section= sdt->Section();
-        if (onid== 0x233a)
-            onid = GenerateUniqueUKOriginalNetworkID(tsid);
         sdt_sections_cache_t& sections = _cached_sdts[onid]
                                                       [tsid]
                                                        [tableID].sections;
@@ -1159,15 +1283,13 @@ bool DVBStreamData::DeleteCachedTableSection(PSIPTable *psip) const
             delete psip;
         }
     }
-    else if (DVBEventInformationTable::IsEIT(tableID))
+    else if (DVBEventInformationTableSection::IsEIT(tableID))
     {
-        DVBEventInformationTable* eit = (DVBEventInformationTable*)(psip);
-        uint onid = eit->OriginalNetworkID();
+        DVBEventInformationTableSection* eit = (DVBEventInformationTableSection*)(psip);
         uint tsid = eit->TSID();
+        uint onid = InternalOriginalNetworkID(eit->OriginalNetworkID(), tsid);
         uint sid = eit->ServiceID();
         uint section= eit->Section();
-        if (onid== 0x233a)
-            onid = GenerateUniqueUKOriginalNetworkID(tsid);
 
         // It should be in the cache - maybe if it is not I should treat that as an error
         eit_sections_cache_t& sections = _cached_eits[onid]
@@ -1203,75 +1325,6 @@ void DVBStreamData::CacheNIT(nit_ptr_t nit)
     _cached_nit[nit->Section()] = nit;
 }
 
-void DVBStreamData::CacheSDT(sdt_ptr_t sdt)
-{
-    uint onid = sdt->OriginalNetworkID();
-    uint tsid = sdt->TSID();
-    uint tid = sdt->TableID();
-    uint sec = sdt->Section();
-
-    if (onid == 0x233a)
-        onid = GenerateUniqueUKOriginalNetworkID(tsid);
-
-    QMutexLocker locker(&_cached_sdts_lock);
-
-    sdt_sections_cache_wrapper_t& wrapper = _cached_sdts[onid][tsid][tid];
-
-    sdt_sections_cache_t& sections = wrapper.sections;
-
-    sdt_sections_cache_t::iterator it = sections.find(sec);
-
-    if (it != sections.end())
-        DeleteCachedTableSection(*it);
-
-    sections[sec] = sdt;
-    wrapper.timestamp = QDateTime::currentDateTimeUtc();
-    wrapper.hashes[sec] = QCryptographicHash::hash(
-            QByteArray((const char*)(sdt->psipdata()), sdt->Length() - 4),
-            QCryptographicHash::Md5); // Hash the events loop
-}
-
-void DVBStreamData::CacheEIT(eit_ptr_t eit)
-{
-    uint onid = eit->OriginalNetworkID();
-    uint tsid = eit->TSID();
-    uint sid = eit->ServiceID();
-    uint tid = eit->TableID();
-    uint sec = eit->Section();
- 
-    if (onid == 0x233a)
-    	onid = GenerateUniqueUKOriginalNetworkID(tsid);
-
-    QMutexLocker locker(&_cached_eits_lock);
-
-    eit_sections_cache_wrapper_t& wrapper = _cached_eits[onid]
-												  [tsid]
-												   [sid]
-												    [tid];
-
-	eit_sections_cache_t& sections = wrapper.sections;
-
-    eit_sections_cache_t::iterator it = sections.find(sec);
-
-    if (it != sections.end())
-        DeleteCachedTableSection(*it);
-
-    sections[sec] = eit;
-    wrapper.timestamp = QDateTime::currentDateTimeUtc();
-    wrapper.hashes[sec] = QCryptographicHash::hash(
-            QByteArray((const char*)(eit->psipdata()), eit->Length() - 4),
-            QCryptographicHash::Md5); // Hash the events loop
-
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-                        "Added eit cache entry 0x%1/0x%2/0x%3/0x%4/%5 count %6")
-                        .arg(onid,4,16)
-                        .arg(tsid,4,16)
-                        .arg(sid,4,16)
-                        .arg(tid,2,16)
-                        .arg(sec)
-                        .arg(sections.size()));
-}
-
 void DVBStreamData::ValidateEITCache()
 {
     uint approximate_cached_sections_size = 0;
@@ -1299,8 +1352,11 @@ void DVBStreamData::ValidateEITCache()
                 for (eit_t_cache_t::iterator table = (*service).begin(); table != (*service).end(); ++table)
                 {
                     LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-                            "TID 0x%1")
-                            .arg(table.key(),2,16));
+                            "TID 0x%1 Sections %2 Status %3")
+                            .arg(table.key(),2,16)
+							.arg((*table).sections.size())
+							.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
+							);
                     for (eit_sections_cache_t::iterator section = (*table).sections.begin();
                             section != (*table).sections.end(); ++section)
                     {
@@ -1344,8 +1400,11 @@ void DVBStreamData::ValidateSDTCache()
             for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
             {
                 LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-                        "TID 0x%1")
-                        .arg(table.key(),2,16));
+                        "TID 0x%1 Sections %2 Status %3")
+                        .arg(table.key(),2,16)
+						.arg((*table).sections.size())
+						.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
+						);
                 for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
                         section != (*table).sections.end(); ++section)
                 {

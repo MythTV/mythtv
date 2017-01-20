@@ -14,17 +14,17 @@ typedef vector<nit_const_ptr_t>  nit_const_vec_t;
 typedef vector<nit_ptr_t>  nit_vec_t;
 typedef QMap<uint, nit_ptr_t>    nit_cache_t; // section->sdts
 
-typedef ServiceDescriptionTable* sdt_ptr_t;
-typedef ServiceDescriptionTable const * sdt_const_ptr_t;
-typedef vector<sdt_const_ptr_t>  sdt_const_vec_t;
-typedef vector<sdt_ptr_t>  sdt_vec_t;
+typedef ServiceDescriptionTableSection* sdt_section_ptr_t;
+typedef ServiceDescriptionTableSection const * sdt_section_const_ptr_t;
+typedef vector<sdt_section_const_ptr_t>  sdt_section_const_vec_t;
+typedef vector<sdt_section_ptr_t>  sdt_section_vec_t;
 
 ///@{
 // SDT table sections are held in a cache that is indexed by
 // section number within transport stream ID within
 // original network ID.
 ///
-typedef QMap<uint16_t, sdt_ptr_t>
+typedef QMap<uint16_t, sdt_section_ptr_t>
         sdt_sections_cache_t;                  ///< Section level cache
 typedef struct SdtSectionsAndStatus
 {
@@ -49,10 +49,10 @@ typedef struct SdtCache : public QMap<uint16_t,sdt_ts_cache_t>
 ///@}
 
 ///@{
-typedef DVBEventInformationTable* eit_ptr_t;
-typedef DVBEventInformationTable const * eit_const_ptr_t;
-typedef vector<eit_ptr_t>  eit_vec_t;
-typedef vector<eit_const_ptr_t>  eit_const_vec_t;
+typedef DVBEventInformationTableSection* eit_section_ptr_t;
+typedef DVBEventInformationTableSection const * eit_section_const_ptr_t;
+typedef vector<eit_section_ptr_t>  eit_section_vec_t;
+typedef vector<eit_section_const_ptr_t>  eit_section_const_vec_t;
 ///@}
 
 
@@ -61,7 +61,7 @@ typedef vector<eit_const_ptr_t>  eit_const_vec_t;
 /// section number within table ID within service ID within transport stream
 /// ID within original network ID.
 ///
-typedef QMap<uint16_t, eit_ptr_t>
+typedef QMap<uint16_t, eit_section_ptr_t>
 		eit_sections_cache_t; 					///< Section level cache
 typedef struct EitSectionsAndStatus
 {
@@ -107,16 +107,14 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     // DVB table monitoring
     void SetDesiredService(uint netid, uint tsid, int serviceid);
-    uint DesiredNetworkID(void)   const { return _desired_netid; }
-    uint DesiredTransportID(void) const { return _desired_tsid;  }
 
     // Table processing
     bool HandleTables(uint pid, const PSIPTable&);
-    void CheckStaleEIT(const DVBEventInformationTable& eit, uint onid, uint tsid, uint sid, uint tid) const;
-    void CheckStaleSDT(const ServiceDescriptionTable& sdt, uint onid, uint tsid, uint tid) const;
+    void CheckStaleEIT(const DVBEventInformationTableSection& eit, uint onid, uint tsid, uint sid, uint tid) const;
+    void CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uint onid, uint tsid, uint tid) const;
     bool IsRedundant(uint pid, const PSIPTable&) const;
     // RFJ SDT needs ONID as well
-    void ProcessSDT(sdt_const_ptr_t);
+    void ProcessSDT(sdt_section_const_ptr_t);
 
     // NIT for broken providers
     inline void SetRealNetworkID(int);
@@ -136,20 +134,29 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         _cached_sdts[onid][tsid][tid].status.SetVersion(version, last_section);
     }
 
-    /** \fn static uint GenerateUniqueUKOriginalNetworkID(uint transport_stream_id)
+    /** \fn static uint InternalOriginalNetworkID(uint transport_stream_id)
      *  \brief Generates a unique original network ID in the locally allocated range
-     *  using the UK multiplex identifier extracted from the transport stream ID.
+     *  at the moment this only applies to UK onids.
      */
-    static uint GenerateUniqueUKOriginalNetworkID(uint transport_stream_id)
+    static uint InternalOriginalNetworkID(uint onid, uint tsid)
     {
-        // Convert United Kingdom DTT id to temporary temporary local range
-        uint mux_id = (transport_stream_id & 0x3f000) >> 12;
-        if (mux_id > 0xb)
-            mux_id = 0;
-        if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
-            mux_id = 0xc;
-        // Shift id to private temporary use range
-        return 0xff01  + mux_id;
+        switch (onid)
+        {
+        case 0x233a:
+        {
+			// Convert United Kingdom DTT id to temporary temporary local range
+			uint mux_id = (tsid & 0x3f000) >> 12;
+			if (mux_id > 0xb)
+				mux_id = 0;
+			if ((mux_id == 0x7) && ((tsid & 0xfff) < 0x3ff))
+				mux_id = 0xc;
+			// Shift id to private temporary use range
+			return 0xff01  + mux_id;
+        }
+
+        default:
+        	return onid;
+        }
     }
 
    // Sections seen
@@ -157,24 +164,14 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     bool HasAllNIToSections(void) const;
 
-    void SetEITSectionSeen(uint original_network_id, uint transport_stream_id,
-                           uint serviceid, uint tableid,
-                           uint version, uint section,
-                           uint segment_last_section, uint last_section);
-    bool EITSectionSeen(uint original_network_id, uint transport_stream_id,
-                        uint serviceid, uint tableid,
-                        uint version, uint section) const;
-    bool HasAllEITSections(uint original_network_id, uint transport_stream_id,
-                           uint serviceid, uint tableid) const;
+    void SetEITSectionSeen(DVBEventInformationTableSection& eit_section);
+    bool EITSectionSeen(const DVBEventInformationTableSection& eit_section) const;
+    bool HasAllEITSections(const DVBEventInformationTableSection& eit_section) const;
 
 
-    void SetSDTSectionSeen(uint original_network_id, uint transport_stream_id,
-                           uint tableid, uint version,
-                           uint section, uint last_section);
-    bool SDTSectionSeen(uint original_network_id, uint transport_stream_id,
-                        uint tableid, uint version, uint section) const;
-    bool HasAllSDTSections(uint original_network_id, uint transport_stream_id,
-                           uint tableid) const;
+    void SetSDTSectionSeen(ServiceDescriptionTableSection& sdt_section);
+    bool SDTSectionSeen(const ServiceDescriptionTableSection& sdt_section) const;
+    bool HasAllSDTSections(const ServiceDescriptionTableSection& sdt_section) const;
 
 
     bool HasAllBATSections(uint bid) const;
@@ -185,8 +182,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     nit_const_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
     nit_const_vec_t GetCachedNIT(bool current = true) const;
 
-    sdt_const_ptr_t GetCachedSDTSection(uint onid, uint tsid, uint tid, uint section_num) const;
-    sdt_const_vec_t GetCachedSDTs() const;
+    sdt_section_const_vec_t GetCachedSDTs() const;
     bool HasCachedAnySDTs() const;
 
     void AddDVBMainListener(DVBMainStreamListener*);
@@ -200,8 +196,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
   private:
     // Caching
     void CacheNIT(nit_ptr_t);
-    void CacheSDT(sdt_ptr_t);
-    void CacheEIT(eit_ptr_t);
+    void CacheEIT(eit_section_ptr_t);
     void ValidateEITCache();
     void ValidateSDTCache();
 

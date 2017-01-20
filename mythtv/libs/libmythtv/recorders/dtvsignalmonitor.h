@@ -97,7 +97,7 @@ class DTVSignalMonitor : public SignalMonitor,
     // DVB Main
     void HandleTDT(const TimeDateTable*);
     void HandleNIT(const NetworkInformationTable*);
-    void HandleSDT(const ServiceDescriptionTable*);
+    void HandleSDT(const ServiceDescriptionTableSection*);
 
     void IgnoreEncrypted(bool ignore) { ignore_encrypted = ignore; }
 

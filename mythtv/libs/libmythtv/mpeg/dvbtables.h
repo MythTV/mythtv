@@ -94,25 +94,25 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
     mutable vector<const unsigned char*> _ptrs; // used to parse
 };
 
-/** \class ServiceDescriptionTable
+/** \class ServiceDescriptionTableSection
  *  \brief This table tells the decoder on which PIDs to find A/V data.
  *  \todo This is just a stub.
  */
-class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
+class MTV_PUBLIC ServiceDescriptionTableSection : public PSIPTable
 {
   public:
-    ServiceDescriptionTable(const ServiceDescriptionTable& table)
+    ServiceDescriptionTableSection(const ServiceDescriptionTableSection& table)
         : PSIPTable(table)
     {
         assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
     }
-    ServiceDescriptionTable(const PSIPTable& table) : PSIPTable(table)
+    ServiceDescriptionTableSection(const PSIPTable& table) : PSIPTable(table)
     {
         assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
     }
-    ~ServiceDescriptionTable() { ; }
+    ~ServiceDescriptionTableSection() { ; }
 
     // table_id                 8   0.0       0x42/0x46
     // section_syntax_indicator 1   1.0          1
@@ -282,12 +282,12 @@ class MTV_PUBLIC SelectionInformationTable : public PSIPTable
     // CRC_32 32 rpchof
 };
 
-class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
+class MTV_PUBLIC DVBEventInformationTableSection : public PSIPTable
 {
   public:
-    DVBEventInformationTable(const PSIPTable& table);
+    DVBEventInformationTableSection(const PSIPTable& table);
 
-    ~DVBEventInformationTable();
+    ~DVBEventInformationTableSection();
 
     // service_id              16   3.0
     uint ServiceID(void) const { return TableIDExtension(); }

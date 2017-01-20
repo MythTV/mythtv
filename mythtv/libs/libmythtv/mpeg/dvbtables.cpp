@@ -90,7 +90,7 @@ bool NetworkInformationTable::Mutate(void)
         return false;
 }
 
-void ServiceDescriptionTable::Parse(void) const
+void ServiceDescriptionTableSection::Parse(void) const
 {
     _ptrs.clear();
     _ptrs.push_back(pesdata() + 11);
@@ -102,7 +102,7 @@ void ServiceDescriptionTable::Parse(void) const
     }
 }
 
-QString ServiceDescriptionTable::toString(void) const
+QString ServiceDescriptionTableSection::toString(void) const
 {
     QString str =
         QString("SDT: TSID(0x%1) original_network_id(0x%2) services(%3)\n")
@@ -133,7 +133,7 @@ QString ServiceDescriptionTable::toString(void) const
     return str;
 }
 
-ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
+ServiceDescriptor *ServiceDescriptionTableSection::GetServiceDescriptor(uint i) const
 {
     desc_list_t parsed =
         MPEGDescriptor::Parse(ServiceDescriptors(i),
@@ -148,7 +148,7 @@ ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
     return NULL;
 }
 
-bool ServiceDescriptionTable::Mutate(void)
+bool ServiceDescriptionTableSection::Mutate(void)
 {
     if (VerifyCRC())
     {
@@ -211,7 +211,7 @@ QString BouquetAssociationTable::toString(void) const
     return str;
 }
 
-DVBEventInformationTable::DVBEventInformationTable(const PSIPTable& table) : PSIPTable(table)
+DVBEventInformationTableSection::DVBEventInformationTableSection(const PSIPTable& table) : PSIPTable(table)
 {
     // table_id                 8   0.0       0xC7
     assert(IsEIT(TableID()));
@@ -235,7 +235,7 @@ DVBEventInformationTable::DVBEventInformationTable(const PSIPTable& table) : PSI
                         .arg(uint64_t(this),0,16));
 }
 
-DVBEventInformationTable::~DVBEventInformationTable()
+DVBEventInformationTableSection::~DVBEventInformationTableSection()
 {
     LOG(VB_DVBSICACHE, LOG_DEBUG, QString(
                         "Destructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
@@ -248,7 +248,7 @@ DVBEventInformationTable::~DVBEventInformationTable()
 
 }
 
-void DVBEventInformationTable::Parse(void) const
+void DVBEventInformationTableSection::Parse(void) const
 {
     _ptrs.clear();
     _ptrs.push_back(psipdata() + 6);
@@ -260,7 +260,7 @@ void DVBEventInformationTable::Parse(void) const
     }
 }
 
-bool DVBEventInformationTable::IsEIT(uint table_id)
+bool DVBEventInformationTableSection::IsEIT(uint table_id)
 {
     bool is_eit = false;
 
