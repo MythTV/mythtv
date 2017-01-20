@@ -6,7 +6,7 @@
 
         <fontdef name="menufont" face="Liberation Sans">
             <color>#FFFFFF</color>
-            <pixelsize>26</pixelsize>
+            <pixelsize>27</pixelsize>
             <weight>bold</weight>
             <shadowcolor>#000000</shadowcolor>
             <shadowoffset>2,2</shadowoffset>
@@ -14,11 +14,11 @@
         </fontdef>
 
         <fontdef name="clock" from="small">
-            <pixelsize>28</pixelsize>
+            <pixelsize>25</pixelsize>
         </fontdef>
 
         <clock name="clock">
-            <area>280,525,500,40</area>
+            <area>487,33,300,33</area>
             <font>clock</font>
             <template>%DATE%, %TIME%</template>
             <align>center</align>

@@ -95,7 +95,7 @@
         </buttonlist>
 
         <buttonlist name="channellist">
-            <area>16,200,135,380</area>
+            <area>16,197,135,386</area>
             <buttonarea>0,0,100%,100%</buttonarea>
             <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
@@ -265,6 +265,8 @@
 
         <buttonlist name="channellist">
             <area>16,255,135,325</area>
+            <layout>vertical</layout>
+            <spacing>0</spacing>
             <buttonarea>0,0,100%,100%</buttonarea>
             <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
             <statetype name="buttonitem">
@@ -1882,7 +1884,7 @@
             </button>
 
             <button name="back" from="basebutton">
-                <position>40,535</position>
+                <position>315,330</position>
                 <value>Back</value>
             </button>
 

@@ -240,7 +240,7 @@ EITFixUp::EITFixUp()
       m_grCategSciFi("(?:\\W)?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)(?:\\W)?",Qt::CaseInsensitive),
       m_grCategHealth("(?:\\W)?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)(?:\\W)?",Qt::CaseInsensitive),
       m_grCategSpecial("(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",Qt::CaseInsensitive),
-      m_unitymediaImdbrating("\\s*IMDb Rating: (\\d\\.\\d) /10$")
+      m_unitymediaImdbrating("\\s*IMDb Rating: (\\d\\.\\d)\\s?/10$")
 {
 }
 
