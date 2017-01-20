@@ -104,6 +104,20 @@ static int ParseVideoFilename(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
+static int LogSICache(const MythUtilCommandLineParser &cmdline)
+{
+    if (gCoreContext->ConnectToMasterServer(false, false))
+    {
+        gCoreContext->SendMessage("LOG_SI_CACHE");
+        LOG(VB_GENERAL, LOG_INFO, "Sent LOG_SI_CACHE message");
+        return GENERIC_EXIT_OK;
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, "Unable to connect to backend, settings "
+        "SI cache will not be logged.");
+    return GENERIC_EXIT_CONNECT_ERROR;
+}
+
 void registerBackendUtils(UtilMap &utilMap)
 {
     utilMap["clearcache"]           = &ClearSettingsCache;
@@ -112,6 +126,7 @@ void registerBackendUtils(UtilMap &utilMap)
     utilMap["scanvideos"]           = &ScanVideos;
     utilMap["systemevent"]          = &SendSystemEvent;
     utilMap["parsevideo"]           = &ParseVideoFilename;
+    utilMap["logsicache"]           = &LogSICache;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -192,13 +192,11 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     void RemoveDVBMainListener(DVBMainStreamListener*);
     void RemoveDVBOtherListener(DVBOtherStreamListener*);
     void RemoveDVBEITListener(DVBEITStreamListener*);
+    static void LogSICache();
 
   private:
     // Caching
     void CacheNIT(nit_ptr_t);
-    void CacheEIT(eit_section_ptr_t);
-    void ValidateEITCache();
-    void ValidateSDTCache();
 
   protected:
     /** \fn virtual bool DeleteCachedTableSection(PSIPTable *psip) const

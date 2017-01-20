@@ -77,6 +77,7 @@ using namespace std;
 #include "musicmetadata.h"
 #include "imagemanager.h"
 #include "cardutil.h"
+#include "dvbstreamdata.h"
 
 // mythbackend headers
 #include "backendcontext.h"
@@ -1426,6 +1427,9 @@ void MainServer::customEvent(QEvent *e)
 
         if (me->Message() == "CLEAR_SETTINGS_CACHE")
             gCoreContext->ClearSettingsCache();
+
+        if (me->Message() == "LOG_SI_CACHE")
+        	DVBStreamData::LogSICache();
 
         if (me->Message().startsWith("RESET_IDLETIME") && m_sched)
             m_sched->ResetIdleTime();

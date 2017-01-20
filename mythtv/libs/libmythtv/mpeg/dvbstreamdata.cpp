@@ -1325,33 +1325,75 @@ void DVBStreamData::CacheNIT(nit_ptr_t nit)
     _cached_nit[nit->Section()] = nit;
 }
 
-void DVBStreamData::ValidateEITCache()
+void DVBStreamData::LogSICache()
 {
     uint approximate_cached_sections_size = 0;
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-            "Validate EIT cache top level entries %1")
+    LOG(VB_GENERAL, LOG_INFO, QString(
+            "Validate SDT cache top level entries %1")
+                        .arg(_cached_sdts.size()));
+    for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
+            network != _cached_sdts.end(); ++network)
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString(
+                "ONID 0x%1")
+                .arg(network.key(),4,16));
+        for (sdt_ts_cache_t::iterator stream = (*network).begin();
+                stream != (*network).end(); ++stream)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString(
+                    "TSID 0x%1")
+                    .arg(stream.key(),4,16));
+            for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString(
+                        "TID 0x%1 Sections %2 Status %3")
+                        .arg(table.key(),2,16)
+						.arg((*table).sections.size())
+						.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
+						);
+                for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
+                        section != (*table).sections.end(); ++section)
+                {
+                    LOG(VB_GENERAL, LOG_INFO, QString(
+                            "Section %1 value 0x%2")
+                            .arg(section.key())
+                            .arg(uint64_t(section.value()),0,16));
+                    approximate_cached_sections_size += (*section)->Length();
+                }
+            }
+        }
+    }
+    LOG(VB_GENERAL, LOG_INFO, QString(
+            "============================================="));
+    LOG(VB_GENERAL, LOG_INFO, QString(
+            "Approximate size of sdt section cache %1Mb")
+    		.arg(approximate_cached_sections_size / (0x100000)));
+
+    approximate_cached_sections_size = 0;
+    LOG(VB_GENERAL, LOG_INFO, QString(
+            "EIT cache top level entries %1")
                         .arg(_cached_eits.size()));
     for (eit_tssn_cache_t::iterator network = _cached_eits.begin();
             network != _cached_eits.end(); ++network)
     {
-        LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+        LOG(VB_GENERAL, LOG_INFO, QString(
                 "ONID 0x%1")
                 .arg(network.key(),4,16));
         for (eit_tss_cache_t::iterator stream = (*network).begin();
                 stream != (*network).end(); ++stream)
         {
-            LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+            LOG(VB_GENERAL, LOG_INFO, QString(
                     "TSID 0x%1")
                     .arg(stream.key(),4,16));
             for (eit_ts_cache_t::iterator service = (*stream).begin();
                     service != (*stream).end(); ++service)
             {
-                LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+                LOG(VB_GENERAL, LOG_INFO, QString(
                         "SID 0x%1")
                         .arg(service.key(),4,16));
                 for (eit_t_cache_t::iterator table = (*service).begin(); table != (*service).end(); ++table)
                 {
-                    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+                    LOG(VB_GENERAL, LOG_INFO, QString(
                             "TID 0x%1 Sections %2 Status %3")
                             .arg(table.key(),2,16)
 							.arg((*table).sections.size())
@@ -1360,7 +1402,7 @@ void DVBStreamData::ValidateEITCache()
                     for (eit_sections_cache_t::iterator section = (*table).sections.begin();
                             section != (*table).sections.end(); ++section)
                     {
-                        LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+                        LOG(VB_GENERAL, LOG_INFO, QString(
                                 "Section %1 value 0x%2")
                                 .arg(section.key())
                                 .arg(uint64_t(section.value()),0,16));
@@ -1370,62 +1412,13 @@ void DVBStreamData::ValidateEITCache()
             }
         }
     }
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+    LOG(VB_GENERAL, LOG_INFO, QString(
             "============================================="));
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
+    LOG(VB_GENERAL, LOG_INFO, QString(
             "Approximate size of eit section cache %1Mb")
     		.arg(approximate_cached_sections_size / (0x100000)));
-    LOG(VB_FLUSH, LOG_DEBUG, "");
+    LOG(VB_FLUSH, LOG_INFO, "");
 }
-
-
-void DVBStreamData::ValidateSDTCache()
-{
-    uint approximate_cached_sections_size = 0;
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-            "Validate SDT cache top level entries %1")
-                        .arg(_cached_sdts.size()));
-    for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
-            network != _cached_sdts.end(); ++network)
-    {
-        LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-                "ONID 0x%1")
-                .arg(network.key(),4,16));
-        for (sdt_ts_cache_t::iterator stream = (*network).begin();
-                stream != (*network).end(); ++stream)
-        {
-            LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-                    "TSID 0x%1")
-                    .arg(stream.key(),4,16));
-            for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
-            {
-                LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-                        "TID 0x%1 Sections %2 Status %3")
-                        .arg(table.key(),2,16)
-						.arg((*table).sections.size())
-						.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
-						);
-                for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
-                        section != (*table).sections.end(); ++section)
-                {
-                    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-                            "Section %1 value 0x%2")
-                            .arg(section.key())
-                            .arg(uint64_t(section.value()),0,16));
-                    approximate_cached_sections_size += (*section)->Length();
-                }
-            }
-        }
-    }
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-            "============================================="));
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
-            "Approximate size of sdt section cache %1Mb")
-    		.arg(approximate_cached_sections_size / (0x100000)));
-    LOG(VB_FLUSH, LOG_DEBUG, "");
-}
-
-
 void DVBStreamData::AddDVBMainListener(DVBMainStreamListener *val)
 {
     QMutexLocker locker(&_listener_lock);
