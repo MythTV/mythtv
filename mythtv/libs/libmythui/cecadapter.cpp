@@ -1194,16 +1194,19 @@ void CECAdapter::Action(const QString &action)
 }
 
 #if CEC_LIB_VERSION_MAJOR <= 3
+// cppcheck-suppress passedByValue
 static int CECLogMessageCallback(void *adapter, const cec_log_message CEC_CALLBACK_PARAM_TYPE message)
 {
     return ((CECAdapterPriv*)adapter)->LogMessage(message);
 }
 
+// cppcheck-suppress passedByValue
 static int CECKeyPressCallback(void *adapter, const cec_keypress CEC_CALLBACK_PARAM_TYPE keypress)
 {
     return ((CECAdapterPriv*)adapter)->HandleKeyPress(keypress);
 }
 
+// cppcheck-suppress passedByValue
 static int CECCommandCallback(void *adapter, const cec_command CEC_CALLBACK_PARAM_TYPE command)
 {
     return ((CECAdapterPriv*)adapter)->HandleCommand(command);
@@ -1228,6 +1231,7 @@ static void CECCommandCallback(void *adapter, const cec_command* command)
 
 #if CEC_LIB_VERSION_MAJOR >= 2
 #if CEC_LIB_VERSION_MAJOR <= 3
+// cppcheck-suppress passedByValue
 static int CECAlertCallback(void *adapter, const libcec_alert alert, const libcec_parameter CEC_CALLBACK_PARAM_TYPE data)
 {
     return ((CECAdapterPriv*)adapter)->HandleAlert(alert, data);
