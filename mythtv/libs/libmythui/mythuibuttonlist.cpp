@@ -3596,53 +3596,61 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     while (string_it != m_strings.end())
     {
-        text = dynamic_cast<MythUIText *>
-               (buttonstate->GetChild(string_it.key()));
+        MythUITypeList textlist = buttonstate->GetChildren(string_it.key());
+        MythUITypeList::iterator Ilist;
 
-        if (text)
+        // For each child matching the element name, set the value.
+        for (Ilist = textlist.begin(); Ilist != textlist.end(); ++Ilist)
         {
-            TextProperties textprop = string_it.value();
+            text = dynamic_cast<MythUIText *>(*Ilist);
 
-            QString newText = text->GetTemplateText();
-
-            QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
-            regexp.setMinimal(true);
-
-            if (!newText.isEmpty() && newText.contains(regexp))
+            if (text)
             {
-                int pos = 0;
-                QString tempString = newText;
 
-                while ((pos = regexp.indexIn(newText, pos)) != -1)
+                TextProperties textprop = string_it.value();
+
+                QString newText = text->GetTemplateText();
+
+                QRegExp regexp("%(([^\\|%]+)?\\||\\|(.))?([\\w#]+)(\\|(.+))?%");
+                regexp.setMinimal(true);
+
+                if (!newText.isEmpty() && newText.contains(regexp))
                 {
-                    QString key = regexp.cap(4).toLower().trimmed();
-                    QString replacement;
-                    QString value = m_strings.value(key).text;
+                    int pos = 0;
+                    QString tempString = newText;
 
-                    if (!value.isEmpty())
+                    while ((pos = regexp.indexIn(newText, pos)) != -1)
                     {
-                        replacement = QString("%1%2%3%4")
-                                      .arg(regexp.cap(2))
-                                      .arg(regexp.cap(3))
-                                      .arg(m_strings.value(key).text)
-                                      .arg(regexp.cap(6));
+                        QString key = regexp.cap(4).toLower().trimmed();
+                        QString replacement;
+                        QString value = m_strings.value(key).text;
+
+                        if (!value.isEmpty())
+                        {
+                            replacement = QString("%1%2%3%4")
+                                          .arg(regexp.cap(2))
+                                          .arg(regexp.cap(3))
+                                          .arg(m_strings.value(key).text)
+                                          .arg(regexp.cap(6));
+                        }
+
+                        tempString.replace(regexp.cap(0), replacement);
+                        pos += regexp.matchedLength();
                     }
 
-                    tempString.replace(regexp.cap(0), replacement);
-                    pos += regexp.matchedLength();
+                    newText = tempString;
                 }
+                else
+                    newText = textprop.text;
 
-                newText = tempString;
+                if (newText.isEmpty())
+                    text->Reset();
+                else
+                    text->SetText(newText);
+
+                text->SetFontState(textprop.state.isEmpty() ?
+                                   m_fontState : textprop.state);
             }
-            else
-                newText = textprop.text;
-
-            if (newText.isEmpty())
-                text->Reset();
-            else
-                text->SetText(newText);
-
-            text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
         }
 
         ++string_it;
