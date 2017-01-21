@@ -462,7 +462,7 @@ class Frequency : public LineEditSetting, public MuxDBStorage
 class DVBSymbolRate : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DVBSymbolRate(const MultiplexID *id) :
+    explicit DVBSymbolRate(const MultiplexID *id) :
         ComboBoxSetting(this, true), MuxDBStorage(this, id, "symbolrate")
     {
         setLabel(QObject::tr("Symbol Rate"));
@@ -485,7 +485,7 @@ class DVBSymbolRate : public ComboBoxSetting, public MuxDBStorage
 class SignalPolarity : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    SignalPolarity(const MultiplexID *id) :
+    explicit SignalPolarity(const MultiplexID *id) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "polarity")
     {
         setLabel(QObject::tr("Polarity"));
@@ -549,7 +549,7 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
 class DVBInversion : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DVBInversion(const MultiplexID *id) :
+    explicit DVBInversion(const MultiplexID *id) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "inversion")
     {
         setLabel(QObject::tr("Inversion"));
@@ -565,7 +565,7 @@ class DVBInversion : public ComboBoxSetting, public MuxDBStorage
 class DVBTBandwidth : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DVBTBandwidth(const MultiplexID *id) :
+    explicit DVBTBandwidth(const MultiplexID *id) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "bandwidth")
     {
         setLabel(QObject::tr("Bandwidth"));
@@ -580,7 +580,7 @@ class DVBTBandwidth : public ComboBoxSetting, public MuxDBStorage
 class DVBForwardErrorCorrectionSelector : public ComboBoxSetting
 {
   public:
-    DVBForwardErrorCorrectionSelector(Storage *_storage) :
+    explicit DVBForwardErrorCorrectionSelector(Storage *_storage) :
         ComboBoxSetting(_storage)
     {
         addSelection(QObject::tr("Auto"), "auto");
@@ -600,7 +600,7 @@ class DVBForwardErrorCorrection :
     public DVBForwardErrorCorrectionSelector, public MuxDBStorage
 {
   public:
-    DVBForwardErrorCorrection(const MultiplexID *id) :
+    explicit DVBForwardErrorCorrection(const MultiplexID *id) :
         DVBForwardErrorCorrectionSelector(this),
         MuxDBStorage(this, id, "fec")
     {
@@ -613,7 +613,7 @@ class DVBTCoderateLP :
     public DVBForwardErrorCorrectionSelector, public MuxDBStorage
 {
   public:
-    DVBTCoderateLP(const MultiplexID *id) :
+    explicit DVBTCoderateLP(const MultiplexID *id) :
         DVBForwardErrorCorrectionSelector(this),
         MuxDBStorage(this, id, "lp_code_rate")
     {
@@ -626,7 +626,7 @@ class DVBTCoderateHP :
     public DVBForwardErrorCorrectionSelector, public MuxDBStorage
 {
   public:
-    DVBTCoderateHP(const MultiplexID *id) :
+    explicit DVBTCoderateHP(const MultiplexID *id) :
         DVBForwardErrorCorrectionSelector(this),
         MuxDBStorage(this, id, "hp_code_rate")
     {
@@ -638,7 +638,7 @@ class DVBTCoderateHP :
 class DVBTGuardInterval : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DVBTGuardInterval(const MultiplexID *id) :
+    explicit DVBTGuardInterval(const MultiplexID *id) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "guard_interval")
     {
         setLabel(QObject::tr("Guard Interval"));
@@ -654,7 +654,7 @@ class DVBTGuardInterval : public ComboBoxSetting, public MuxDBStorage
 class DVBTTransmissionMode : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DVBTTransmissionMode(const MultiplexID *id) :
+    explicit DVBTTransmissionMode(const MultiplexID *id) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "transmission_mode")
     {
         setLabel(QObject::tr("Trans. Mode"));
@@ -668,7 +668,7 @@ class DVBTTransmissionMode : public ComboBoxSetting, public MuxDBStorage
 class DVBTHierarchy : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DVBTHierarchy(const MultiplexID *id) :
+    explicit DVBTHierarchy(const MultiplexID *id) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "hierarchy")
     {
         setLabel(QObject::tr("Hierarchy"));
@@ -684,7 +684,7 @@ class DVBTHierarchy : public ComboBoxSetting, public MuxDBStorage
 class DVBTModulationSystem : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DVBTModulationSystem(const MultiplexID *id) :
+    explicit DVBTModulationSystem(const MultiplexID *id) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "mod_sys")
     {
         setLabel(QObject::tr("Modulation System"));

@@ -74,7 +74,7 @@ class MTV_PUBLIC TransportListEditor : public QObject, public ConfigurationDialo
     Q_OBJECT
 
   public:
-    TransportListEditor(uint initial_sourceid);
+    explicit TransportListEditor(uint initial_sourceid);
 
     virtual DialogCode exec(void);
     virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
