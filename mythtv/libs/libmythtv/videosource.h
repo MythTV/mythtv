@@ -90,7 +90,7 @@ class FreqTableSelector :
 {
     Q_OBJECT
 public:
-    FreqTableSelector(const VideoSource& parent);
+    explicit FreqTableSelector(const VideoSource& parent);
 protected:
     QString freq;
 };
@@ -98,7 +98,7 @@ protected:
 class TransFreqTableSelector : public ComboBoxSetting, public TransientStorage
 {
   public:
-    TransFreqTableSelector(uint _sourceid);
+    explicit TransFreqTableSelector(uint _sourceid);
 
     virtual void Load(void);
 
@@ -117,7 +117,7 @@ class DataDirectLineupSelector :
 {
    Q_OBJECT
 public:
-   DataDirectLineupSelector(const VideoSource& parent) :
+   explicit DataDirectLineupSelector(const VideoSource& parent) :
        ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "lineupid")
    {
        setLabel(QObject::tr("Data Direct lineup"));
@@ -182,7 +182,7 @@ class XMLTV_generic_config: public VerticalConfigurationGroup
 class EITOnly_config: public VerticalConfigurationGroup
 {
 public:
-    EITOnly_config(const VideoSource& _parent);
+    explicit EITOnly_config(const VideoSource& _parent);
 
     virtual void Save();
     virtual void Save(QString) { Save(); }
@@ -194,7 +194,7 @@ protected:
 class NoGrabber_config: public VerticalConfigurationGroup
 {
 public:
-    NoGrabber_config(const VideoSource& _parent);
+    explicit NoGrabber_config(const VideoSource& _parent);
 
     virtual void Save(void);
     virtual void Save(QString) { Save(); }
@@ -210,7 +210,7 @@ class XMLTVConfig : public TriggeredConfigurationGroup
     Q_OBJECT
 
   public:
-    XMLTVConfig(const VideoSource &aparent);
+    explicit XMLTVConfig(const VideoSource &aparent);
 
     virtual void Load(void);
     virtual void Save(void);
@@ -262,7 +262,7 @@ public:
     class Name : public LineEditSetting, public VideoSourceDBStorage
     {
       public:
-        Name(const VideoSource &parent) :
+        explicit Name(const VideoSource &parent) :
             LineEditSetting(this), VideoSourceDBStorage(this, parent, "name")
         {
             setLabel(QObject::tr("Video source name"));
@@ -314,7 +314,7 @@ class EmptyAudioDevice : public LineEditSetting, public CaptureCardDBStorage
 {
     Q_OBJECT
   public:
-    EmptyAudioDevice(const CaptureCard &parent) :
+    explicit EmptyAudioDevice(const CaptureCard &parent) :
         LineEditSetting(this),
         CaptureCardDBStorage(this, parent, "audiodevice")
     {
@@ -340,7 +340,7 @@ class EmptyVBIDevice : public LineEditSetting, public CaptureCardDBStorage
     Q_OBJECT
 
   public:
-    EmptyVBIDevice(const CaptureCard &parent) :
+    explicit EmptyVBIDevice(const CaptureCard &parent) :
         LineEditSetting(this),
         CaptureCardDBStorage(this, parent, "vbidevice")
     {
@@ -364,7 +364,7 @@ class EmptyVBIDevice : public LineEditSetting, public CaptureCardDBStorage
 class CardType : public ComboBoxSetting, public CaptureCardDBStorage
 {
 public:
-    CardType(const CaptureCard& parent);
+    explicit CardType(const CaptureCard& parent);
     static void fillSelections(SelectSetting* setting);
 };
 
@@ -393,7 +393,7 @@ class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
     friend class HDHomeRunExtra;
 
   public:
-    HDHomeRunConfigurationGroup(CaptureCard &parent);
+    explicit HDHomeRunConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void HDHomeRunExtraPanel(void);
@@ -438,7 +438,7 @@ class VBoxConfigurationGroup : public VerticalConfigurationGroup
     friend class VBoxExtra;
 
   public:
-    VBoxConfigurationGroup(CaptureCard &parent);
+    explicit VBoxConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void VBoxExtraPanel(void);
@@ -465,7 +465,7 @@ class CetonConfigurationGroup : public VerticalConfigurationGroup
     friend class CetonExtra;
 
   public:
-    CetonConfigurationGroup(CaptureCard &parent);
+    explicit CetonConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void CetonExtraPanel(void);
@@ -504,7 +504,7 @@ class MPEGConfigurationGroup: public VerticalConfigurationGroup
    Q_OBJECT
 
   public:
-    MPEGConfigurationGroup(CaptureCard &parent);
+    explicit MPEGConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void probeCard(const QString &device);
@@ -521,7 +521,7 @@ class HDPVRConfigurationGroup: public VerticalConfigurationGroup
    Q_OBJECT
 
   public:
-    HDPVRConfigurationGroup(CaptureCard &parent);
+    explicit HDPVRConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void probeCard(const QString &device);
@@ -540,7 +540,7 @@ class V4L2encGroup: public TriggeredConfigurationGroup
     Q_OBJECT
 
   public:
-    V4L2encGroup(CaptureCard& parent);
+    explicit V4L2encGroup(CaptureCard& parent);
 
   private:
     CaptureCard         &m_parent;
@@ -558,7 +558,7 @@ class ASIConfigurationGroup: public VerticalConfigurationGroup
    Q_OBJECT
 
   public:
-    ASIConfigurationGroup(CaptureCard &parent);
+    explicit ASIConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void probeCard(const QString &device);
@@ -574,7 +574,7 @@ class ImportConfigurationGroup: public VerticalConfigurationGroup
    Q_OBJECT
 
   public:
-    ImportConfigurationGroup(CaptureCard &parent);
+    explicit ImportConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void probeCard(const QString &device);
@@ -590,7 +590,7 @@ class DemoConfigurationGroup: public VerticalConfigurationGroup
    Q_OBJECT
 
   public:
-    DemoConfigurationGroup(CaptureCard &parent);
+    explicit DemoConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void probeCard(const QString &device);
@@ -630,7 +630,7 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
     friend class DVBExtra;
 
   public:
-    DVBConfigurationGroup(CaptureCard& a_parent);
+    explicit DVBConfigurationGroup(CaptureCard& a_parent);
     ~DVBConfigurationGroup();
 
     virtual void Load(void);
@@ -680,7 +680,7 @@ class FirewireDesc : public TransLabelSetting
     Q_OBJECT
 
   public:
-    FirewireDesc(const FirewireGUID *_guid) :
+    explicit FirewireDesc(const FirewireGUID *_guid) :
         TransLabelSetting(), guid(_guid) { }
 
   public slots:
@@ -694,7 +694,7 @@ class CaptureCardGroup : public TriggeredConfigurationGroup
 {
     Q_OBJECT
 public:
-    CaptureCardGroup(CaptureCard& parent);
+    explicit CaptureCardGroup(CaptureCard& parent);
 
 protected slots:
     virtual void triggerChanged(const QString& value);
@@ -704,7 +704,7 @@ class CaptureCard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 public:
-    CaptureCard(bool use_card_group = true);
+    explicit CaptureCard(bool use_card_group = true);
 
     int  getCardID(void) const { return id->intValue(); }
     QString GetRawCardType(void) const;
@@ -732,7 +732,7 @@ private:
     class Hostname : public HostnameSetting, public CaptureCardDBStorage
     {
       public:
-        Hostname(const CaptureCard &parent) :
+        explicit Hostname(const CaptureCard &parent) :
             HostnameSetting(this),
             CaptureCardDBStorage(this, parent, "hostname") { }
     };
@@ -840,7 +840,7 @@ class StartingChannel : public ComboBoxSetting, public CardInputDBStorage
 {
     Q_OBJECT
   public:
-    StartingChannel(const CardInput &parent) :
+    explicit StartingChannel(const CardInput &parent) :
         ComboBoxSetting(this, false, 1),
         CardInputDBStorage(this, parent, "startchan")
     {
@@ -981,7 +981,7 @@ class HDHomeRunDeviceID : public LabelSetting, public CaptureCardDBStorage
     Q_OBJECT
 
   public:
-    HDHomeRunDeviceID(const CaptureCard &parent);
+    explicit HDHomeRunDeviceID(const CaptureCard &parent);
 
     virtual void Load(void);
 
@@ -1075,7 +1075,7 @@ class VBoxDeviceID : public LabelSetting, public CaptureCardDBStorage
     Q_OBJECT
 
   public:
-    VBoxDeviceID(const CaptureCard &parent);
+    explicit VBoxDeviceID(const CaptureCard &parent);
 
     virtual void Load(void);
 
@@ -1110,7 +1110,7 @@ class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
     Q_OBJECT
 
   public:
-    CetonDeviceID(const CaptureCard &parent);
+    explicit CetonDeviceID(const CaptureCard &parent);
 
     virtual void Load(void);
     void UpdateValues();
