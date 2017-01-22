@@ -16,6 +16,7 @@
 
 // MythTV includes
 #include "mythdeque.h"
+#include "dvbstreamdata.h"
 
 class MSqlQuery;
 
@@ -111,12 +112,12 @@ class EITHelper
                 const EventInformationTable *eit);
     void AddETT(uint atsc_major, uint atsc_minor,
                 const ExtendedTextTable     *ett);
-    void AddEIT(const DVBEventInformationTableSection *eit);
+    void AddEIT(eit_sections_cache_const_t& EventInformationTable);
     void AddEIT(const PremiereContentInformationTable *eit);
 #else // if !USING_BACKEND
     void AddEIT(uint, uint, const EventInformationTable*) {}
     void AddETT(uint, uint, const ExtendedTextTable*) {}
-    void AddEIT(const DVBEventInformationTableSection*) {}
+    void AddEIT(eit_sections_cache_const_t& EventInformationTable) {}
     void AddEIT(const PremiereContentInformationTable*) {}
 #endif // !USING_BACKEND
 

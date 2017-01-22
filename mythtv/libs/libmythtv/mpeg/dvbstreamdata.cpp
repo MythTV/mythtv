@@ -696,24 +696,16 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
             // Grab the eit cache lock
             QMutexLocker locker(&_cached_eits_lock);
 
-            // Build a vector of the cached table sections
-            eit_section_vec_t table;
             eit_sections_cache_t& sections = _cached_eits[onid][tsid][sid][tid].sections;
-            for (eit_sections_cache_t::iterator i = sections.begin(); i != sections.end(); ++i)
-            	table.push_back(*i);
 
-            // and pass up to the EIT helper
-            // Temporary testing using old code
             if (_eit_helper)
-            {
-                for (eit_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
-                    _eit_helper->AddEIT(*i);
-            }
+            	_eit_helper->AddEIT(sections);
 
             // Delete the table sections from the cache
             // But leave the status information intact
-            for (eit_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
+            for (eit_sections_cache_t::iterator i = sections.begin(); i != sections.end(); ++i)
                 DeleteCachedTableSection(*i);
+
             sections.clear();
         }
 

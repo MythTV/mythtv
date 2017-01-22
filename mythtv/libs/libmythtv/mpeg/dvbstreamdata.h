@@ -63,6 +63,8 @@ typedef vector<eit_section_const_ptr_t>  eit_section_const_vec_t;
 ///
 typedef QMap<uint16_t, eit_section_ptr_t>
 		eit_sections_cache_t; 					///< Section level cache
+typedef QMap<uint16_t, eit_section_ptr_t> const
+		eit_sections_cache_const_t; 					///< Section level cache
 typedef struct EitSectionsAndStatus
 {
     EitSectionsAndStatus() { status.SetVersion(-1,0); }
