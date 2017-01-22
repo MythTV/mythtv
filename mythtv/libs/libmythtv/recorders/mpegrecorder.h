@@ -15,7 +15,7 @@ class MpegRecorder : public V4LRecorder,
                      public DeviceReaderCB
 {
   public:
-    MpegRecorder(TVRec*);
+    explicit MpegRecorder(TVRec*);
    ~MpegRecorder();
     void TeardownAll(void);
 

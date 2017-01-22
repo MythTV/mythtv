@@ -27,7 +27,7 @@
 class AudioInputOSS : public AudioInput
 {
     public:
-        AudioInputOSS(const QString &device);
+        explicit AudioInputOSS(const QString &device);
         ~AudioInputOSS() { Close(); };
 
         bool Open(uint sample_bits, uint sample_rate, uint channels);

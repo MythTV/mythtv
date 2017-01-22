@@ -44,7 +44,7 @@ class AudioInput
     static AudioInput *CreateDevice(const QByteArray &device);
 
   protected:
-    AudioInput(const QString &device);
+    explicit AudioInput(const QString &device);
 
     QByteArray m_audio_device;
     int        m_audio_channels;

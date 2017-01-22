@@ -16,7 +16,7 @@ using namespace std;
 class DummyChannel : public ChannelBase
 {
   public:
-    DummyChannel(TVRec *parent): ChannelBase(parent)
+    explicit DummyChannel(TVRec *parent): ChannelBase(parent)
         { (void)parent; m_curchannelname.clear(); curinputname.clear(); return; }
     ~DummyChannel(void) { return; }
 

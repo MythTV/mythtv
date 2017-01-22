@@ -59,7 +59,7 @@ class ExternalStreamHandler : public StreamHandler
     static void Return(ExternalStreamHandler * & ref);
 
   public:
-    ExternalStreamHandler(const QString & path);
+    explicit ExternalStreamHandler(const QString & path);
     ~ExternalStreamHandler(void) { CloseApp(); }
 
     virtual void run(void); // MThread

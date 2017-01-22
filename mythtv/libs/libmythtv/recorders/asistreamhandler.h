@@ -59,7 +59,7 @@ class ASIStreamHandler : public StreamHandler
     void SetRXMode(ASIRXMode m);
 
   private:
-    ASIStreamHandler(const QString &);
+    explicit ASIStreamHandler(const QString &);
 
     bool Open(void);
     void Close(void);

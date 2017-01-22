@@ -67,7 +67,7 @@ class HDHRStreamHandler : public StreamHandler
     bool EnterPowerSavingMode(void);
 
   private:
-    HDHRStreamHandler(const QString &);
+    explicit HDHRStreamHandler(const QString &);
 
     bool Connect(void);
 

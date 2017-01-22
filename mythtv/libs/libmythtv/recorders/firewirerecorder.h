@@ -55,7 +55,7 @@ class FirewireRecorder :
 
   protected:
     virtual void InitStreamData(void);
-    FirewireRecorder(TVRec *rec);
+    explicit FirewireRecorder(TVRec *rec);
 
   private:
     FirewireChannel       *channel;
