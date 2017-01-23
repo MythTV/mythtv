@@ -431,9 +431,11 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
     UpdateChannelInfo(true);
 }
 
-void ChannelScanSM::HandleSDT(const ServiceDescriptionTableSection *sdt)
+void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
     QMutexLocker locker(&m_lock);
+
+    sdt_section_const_ptr_t sdt = sections[0];
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Got a Service Description Table for %1")
@@ -532,9 +534,11 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
     }
 }
 
-void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTableSection *sdt)
+void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 {
     QMutexLocker locker(&m_lock);
+
+    sdt_section_const_ptr_t sdt = sections[0];
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         "Got a Service Description Table (other)\n" + sdt->toString());
@@ -542,6 +546,7 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTableSection *
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
 
     uint netid = sdt->OriginalNetworkID();
+    uint tsid = sdt->TSID();
 
     for (uint i = 0; i < sdt->ServiceCount(); i++)
     {

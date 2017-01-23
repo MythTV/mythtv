@@ -666,9 +666,12 @@ class PrintDVBMainStreamListener :
         Output(nit);
     }
 
-    virtual void HandleSDT(const ServiceDescriptionTableSection *sdt)
+    virtual void HandleSDT(const sdt_sections_cache_const_t& sections)
     {
-        Output(sdt);
+        for (sdt_sections_cache_const_t::const_iterator section = sections.begin();
+                section != sections.end();
+                ++section)
+            Output(*section);
     }
 
 };
@@ -685,9 +688,12 @@ class PrintDVBOtherStreamListener :
         Output(nit);
     }
 
-    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTableSection *sdt)
+    virtual void HandleSDTo(const sdt_sections_cache_const_t& sections)
     {
-        Output(sdt);
+        for (sdt_sections_cache_const_t::const_iterator section = sections.begin();
+                section != sections.end();
+                ++section)
+            Output(*section);
     }
 
     virtual void HandleBAT(const BouquetAssociationTable *bat)

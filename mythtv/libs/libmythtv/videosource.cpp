@@ -35,6 +35,7 @@ using namespace std;
 #include "channelutil.h"
 #include "frequencies.h"
 #include "diseqcsettings.h"
+#include "dvbstreamdata.h"
 #include "firewiredevice.h"
 #include "compat.h"
 #include "mythdb.h"

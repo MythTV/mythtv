@@ -546,14 +546,15 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             return true;
         }
-        case TableID::SDT:
-        {
-            ServiceDescriptionTableSection *sdt= new ServiceDescriptionTableSection(psip);
-            SetSDTSectionSeen(*sdt);
-            ProcessSDT(sdt);
 
+        case TableID::SDT:
+        case TableID::SDTo:
+        {
+            ServiceDescriptionTableSection *sdtsection = new ServiceDescriptionTableSection(psip);
+            ProcessSDTSection(sdtsection);
             return true;
         }
+
         case TableID::TDT:
         {
             TimeDateTable tdt(psip);
@@ -592,11 +593,11 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             return true;
         }
+/*
         case TableID::SDTo:
         {
-            uint tsid = psip.TableIDExtension();
-            ServiceDescriptionTableSection sdt(psip);
-            // some providers send the SDT for the current multiplex as SDTo
+            ServiceDescriptionTableSection *sdtsection= new ServiceDescriptionTableSection(psip);
+          // some providers send the SDT for the current multiplex as SDTo
             // this routine changes the TableID to SDT and recalculates the CRC
             if (_desired_netid == sdt.OriginalNetworkID() &&
                 _desired_tsid  == tsid)
@@ -613,12 +614,11 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 return true;
             }
 
-            QMutexLocker locker(&_listener_lock);
-            for (uint i = 0; i < _dvb_other_listeners.size(); i++)
-                _dvb_other_listeners[i]->HandleSDTo(tsid, &sdt);
+            ProcessSDTSection(sdtsection);
 
             return true;
         }
+*/
         case TableID::BAT:
         {
             uint bid = psip.TableIDExtension();
@@ -735,11 +735,11 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     return false;
 }
 
-void DVBStreamData::ProcessSDT(sdt_section_const_ptr_t sdt)
+void DVBStreamData::ProcessSDTSection(sdt_section_ptr_t sdtsection)
 {
     QMutexLocker locker(&_listener_lock);
 
-    for (uint i = 0; i < sdt->ServiceCount(); i++)
+    for (uint i = 0; i < sdtsection->ServiceCount(); i++)
     {
         /*
          * FIXME always signal EIT presence. We filter later. To many
@@ -748,41 +748,39 @@ void DVBStreamData::ProcessSDT(sdt_section_const_ptr_t sdt)
          * channel manually.
          */
 #if 0
-        if (sdt->HasEITSchedule(i) || sdt->HasEITPresentFollowing(i))
+        if (sdtsection->HasEITSchedule(i) || sdtsection->HasEITPresentFollowing(i))
 #endif
-            _dvb_has_eit[sdt->ServiceID(i)] = true;
+            _dvb_has_eit[sdtsection->ServiceID(i)] = true;
     }
 
-    uint tsid = sdt->TSID();
-    uint onid = InternalOriginalNetworkID(sdt->OriginalNetworkID(), tsid);
-    uint tid = sdt->TableID();
+    uint tsid = sdtsection->TSID();
+    uint onid = InternalOriginalNetworkID(sdtsection->OriginalNetworkID(), tsid);
+    uint tid = sdtsection->TableID();
 
-    if(HasAllSDTSections(*sdt))
+    SetSDTSectionSeen(*sdtsection);
+
+    if(HasAllSDTSections(*sdtsection))
     {
         // Complete table seen
         // Grab the eit cache lock
         QMutexLocker locker(&_cached_sdts_lock);
 
         // Build a vector of the cached table sections
-        sdt_section_vec_t table;
         sdt_sections_cache_t& sections = _cached_sdts[onid]
 													  [tsid]
 													   [tid].sections;
-        for (sdt_sections_cache_t::iterator i = sections.begin(); i != sections.end(); ++i)
-        	table.push_back(*i);
 
         // and pass up to the sdt listeners
-		for (sdt_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
-			for (uint i = 0; i < _dvb_main_listeners.size(); i++)
-				if (TableID::SDT == tid)
-					_dvb_main_listeners[i]->HandleSDT(sdt);
-				else
-					_dvb_other_listeners[i]->HandleSDTo(tsid, sdt);
+		for (uint i = 0; i < _dvb_main_listeners.size(); i++)
+            if (TableID::SDT == tid)
+                _dvb_main_listeners[i]->HandleSDT(sections);
+            else
+                _dvb_other_listeners[i]->HandleSDTo(sections);
 
 
         // Delete the table sections from the cache
         // But leave the status information intact
-        for (sdt_section_vec_t::iterator i = table.begin(); i != table.end(); ++i)
+        for (sdt_sections_cache_t::iterator i = sections.begin(); i != sections.end(); ++i)
             DeleteCachedTableSection(*i);
         sections.clear();
     }

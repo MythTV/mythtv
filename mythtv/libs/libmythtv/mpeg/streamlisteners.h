@@ -4,6 +4,7 @@
 
 #include "tspacket.h"
 #include "mythdate.h"
+#include "sicachetypes.h"
 
 class TSPacket;
 class TSPacket_nonconst;
@@ -176,7 +177,7 @@ class DVBMainStreamListener
   public:
     virtual void HandleTDT(const TimeDateTable*) = 0;
     virtual void HandleNIT(const NetworkInformationTable*) = 0;
-    virtual void HandleSDT(const ServiceDescriptionTableSection*) = 0;
+    virtual void HandleSDT(const sdt_sections_cache_const_t&) = 0;
 };
 
 class DVBOtherStreamListener
@@ -185,7 +186,7 @@ class DVBOtherStreamListener
     virtual ~DVBOtherStreamListener() {}
   public:
     virtual void HandleNITo(const NetworkInformationTable*) = 0;
-    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTableSection*) = 0;
+    virtual void HandleSDTo(const sdt_sections_cache_const_t&) = 0;
     virtual void HandleBAT(const BouquetAssociationTable*) = 0;
 };
 

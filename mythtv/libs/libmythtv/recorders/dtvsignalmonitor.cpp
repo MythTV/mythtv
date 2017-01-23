@@ -490,9 +490,11 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
         return;
 }
 
-void DTVSignalMonitor::HandleSDT(const ServiceDescriptionTableSection *sdt)
+void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
     AddFlags(kDTVSigMon_SDTSeen);
+
+    sdt_section_const_ptr_t sdt = sections[0];
 
     detectedNetworkID = sdt->OriginalNetworkID();
     detectedTransportID = sdt->TSID();
