@@ -59,6 +59,7 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 }
 
 BDInfo::BDInfo(const QString &filename)
+    : m_isValid(true)
 {
     BLURAY* bdnav = NULL;
 
@@ -120,6 +121,7 @@ BDInfo::BDInfo(const QString &filename)
     {
         m_lastError = tr("Could not open Blu-ray device: %1").arg(name);
         LOG(VB_GENERAL, LOG_ERR, QString("BDInfo: ") + m_lastError);
+        m_isValid = false;
     }
     else
     {

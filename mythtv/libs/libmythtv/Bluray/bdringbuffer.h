@@ -22,7 +22,7 @@ class MTV_PUBLIC BDInfo
   public:
     BDInfo(const QString &filename);
    ~BDInfo(void);
-    bool IsValid(void) const { return !m_serialnumber.isEmpty(); }
+    bool IsValid(void) const { return m_isValid; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
     QString GetLastError(void) const { return m_lastError; }
 
@@ -37,6 +37,7 @@ protected:
     QString     m_name;
     QString     m_serialnumber;
     QString     m_lastError;
+    bool        m_isValid;
 };
 
 /** \class BDRingBufferPriv
