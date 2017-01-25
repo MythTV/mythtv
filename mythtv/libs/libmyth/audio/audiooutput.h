@@ -177,7 +177,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     /**
      * MAX_SIZE_BUFFER is the maximum size of a buffer to be used with DecodeAudio
      */
-    static const int MAX_SIZE_BUFFER = 192000;
+    static const int MAX_SIZE_BUFFER = 384000;
 
   protected:
     void Error(const QString &msg);
