@@ -40,8 +40,6 @@
 #  endif // !CONFIG_CYGWIN
 #endif
 
-#include "mythtv/mythconfig.h"
-
 #if CONFIG_DARWIN
 #define MSG_NOSIGNAL 0  // Apple also has SO_NOSIGPIPE?
 #endif

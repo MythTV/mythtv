@@ -17,9 +17,6 @@ The server is designed to be as lean as possible and doesn't require Myth or QT 
 be installed in order to compile or run. It does require the mysql client library but
 that must already be installed for ZM to run.
 
-It's best to run ./configure in the mythplugins directory before copying the source to 
-the server machine to make sure the config.h is created properly.
-
 Copy the mythzmserver directory to the machine where you want to run the server.
 
 run :- 'make -f Makefile.standalone'
