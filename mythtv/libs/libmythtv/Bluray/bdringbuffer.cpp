@@ -249,7 +249,7 @@ void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
 
     // Try to find the first clip info file and
     // use its SHA1 hash as a serial number.
-    for (uint32_t idx = 0; idx < 100; idx++)
+    for (uint32_t idx = 0; idx < 200; idx++)
     {
         QString clip = QString("BDMV/CLIPINF/%1.clpi").arg(idx, 5, 10, QChar('0'));
 
