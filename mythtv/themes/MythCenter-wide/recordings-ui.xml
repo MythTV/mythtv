@@ -399,24 +399,12 @@
             <align>right</align>
         </textarea>
 
-        <textarea name="subtitle" from="basetextarea">
-            <area>30,480,885,40</area>
-            <multiline>no</multiline>
-            <cutdown>no</cutdown>
-        </textarea>
-
-        <textarea name="description+sub" from="basetextarea" depends="subtitle">
-            <area>30,520,885,210</area>
-            <multiline>yes</multiline>
-            <scroll direction="vertical" />
-            <cutdown>no</cutdown>
-        </textarea>
-
-        <textarea name="description+no" from="basetextarea" depends="!subtitle">
+        <textarea name="description" from="basetextarea">
             <area>30,480,885,210</area>
             <multiline>yes</multiline>
             <scroll direction="vertical" />
             <cutdown>no</cutdown>
+            <template>%"|SUBTITLE|" %%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
 
         <imagetype name="preview" depends="!coverart">
