@@ -68,7 +68,7 @@ ExternIO::~ExternIO(void)
     delete[] m_buffer;
 }
 
-bool ExternIO::Ready(int fd, int timeout)
+bool ExternIO::Ready(int fd, int timeout, const QString & what)
 {
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
     struct pollfd m_poll[2];
@@ -80,7 +80,7 @@ bool ExternIO::Ready(int fd, int timeout)
 
     if (m_poll[0].revents & POLLHUP)
     {
-        m_error = "poll eof (POLLHUP)";
+        m_error = what + " poll eof (POLLHUP)";
         return false;
     }
     else if (m_poll[0].revents & POLLNVAL)
@@ -111,8 +111,9 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
         return 0;
     }
 
-    if (!Ready(m_appout, timeout))
+    if (!Ready(m_appout, timeout, "data"))
         return 0;
+
     if (m_bufsize < maxlen)
     {
         m_bufsize = maxlen;
@@ -150,7 +151,7 @@ QString ExternIO::GetStatus(int timeout)
         return QByteArray();
     }
 
-    if (!Ready(m_apperr, timeout))
+    if (!Ready(m_apperr, timeout, "status"))
         return QByteArray();
 
     char buffer[2048];
@@ -485,6 +486,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref)
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternSH: Closing handler for %1")
                            .arg(devname));
+        (*it)->CloseApp();
         delete *it;
         m_handlers.erase(it);
     }
@@ -700,6 +702,7 @@ void ExternalStreamHandler::run(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Error from External Recorder: %1")
                 .arg(m_error));
+            CloseApp();
             break;
         }
     }
@@ -837,7 +840,7 @@ void ExternalStreamHandler::CloseApp(void)
 
         if (!ok)
             m_error = result;
-        else if (!result.startsWith("OK:Terminating"))
+        if (!result.startsWith("OK:Terminating"))
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 "CloseRecorder failed, sending kill.");
@@ -854,19 +857,35 @@ void ExternalStreamHandler::CloseApp(void)
 bool ExternalStreamHandler::RestartStream(void)
 {
     bool streaming = (StreamingCount() > 0);
+    int  idx;
+
+    LOG(VB_RECORD, LOG_INFO, LOC + "Restarting stream.");
 
     if (streaming)
     {
-        if (!StopStreaming())
-            return false;
+        for (idx = 0; idx < 5; ++idx)
+        {
+            ClearError();
+            m_IO->ClearError();
+            if (StopStreaming())
+                break;
+            usleep(100000);
+        }
     }
 
-    usleep(1000000);
+    usleep(500000);
 
     if (streaming)
     {
-        if (!StartStreaming(false))
-            return false;
+        for (idx = 0; idx < 5; ++idx)
+        {
+            ClearError();
+            m_IO->ClearError();
+            if (StartStreaming(false))
+                return true;
+            usleep(100000);
+        }
+        return false;
     }
 
     return true;
@@ -1054,8 +1073,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
     else
         m_io_errcnt = 0;
 
-    m_notify |= (!result.startsWith("OK") ||
-                 (!cmd.startsWith("SendBytes") && !cmd.startsWith("XO")));
+    m_notify |= (!result.startsWith("OK") || !cmd.startsWith("SendBytes"));
     LOG(VB_RECORD, m_notify ? LOG_INFO : LOG_DEBUG,
         LOC + QString("ProcessCommand('%1') = '%2'").arg(cmd).arg(result));
     m_notify = false;
