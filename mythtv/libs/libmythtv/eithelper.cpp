@@ -698,6 +698,38 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         db_events.enqueue(event);
     }
 }
+        // UPC cablecom subtitles support
+        if (subtitle.isEmpty()) {
+                desc_list_t SubTitleIds = MPEGDescriptor::FindAll(list, 0xa7);
+                for (uint j = 0; j < SubTitleIds.size(); j++) {
+                        SubTitleUPCCablecomDescriptor desc(SubTitleIds[j]);
+                        if (!desc.SubTitleUPCCablecomCountryCode().isEmpty()) {
+                                subtitle = desc.SubTitleUPCCablecomSubTitle().remove(title);
+                                if (subtitle.length()==31) {
+                                        QString temp = title;
+                                        temp.truncate(31);
+                                        subtitle.remove(temp);
+                                }
+                                //if (subtitle.lenght<=1) {
+                                  //  subitite="";
+                               // }
+                        }
+                }
+        }
+
+        DBEventEIT *event = new DBEventEIT(
+            chanid,
+            title,     subtitle,      description,
+            category,  category_type,
+            starttime, endtime,       fix,
+            subtitle_type,
+            audio_props,
+            video_props, stars,
+            seriesId,  programId);
+
+        db_events.enqueue(event);
+    }
+}
 
 // This function gets special EIT data from the German provider Premiere
 // for the option channels Premiere Sport and Premiere Direkt
