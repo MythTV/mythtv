@@ -66,6 +66,18 @@ class ScannedChannelInfo;
 typedef QPair<transport_scan_items_it_t, ScannedChannelInfo*> ChannelListItem;
 typedef QList<ChannelListItem> ChannelList;
 
+// SD Tables cache
+typedef QMap<uint16_t,sdt_sections_cache_t>
+        SDT_t_cache_t;                       ///< Table level cache
+typedef QMap<uint16_t,SDT_t_cache_t>
+        SDT_ts_cache_t;                       ///< Transport stream level cache
+typedef struct ServiceDescriptionTablesCache : public QMap<uint16_t, SDT_ts_cache_t>
+{
+    void CacheTable(sdt_sections_cache_const_t& table);
+    ~ServiceDescriptionTablesCache();
+}        SDT_tsn_cache_t;                      ///< Original network ID level cache
+
+
 class ChannelScanSM;
 class AnalogSignalHandler : public SignalMonitorListener
 {
@@ -239,6 +251,7 @@ class ChannelScanSM : public MPEGStreamListener,
     QMap<uint, bool>            m_currentEncryptionStatusChecked;
     QMap<uint64_t, QString>     m_defAuthorities;
     bool                        m_dvbt2Tried;
+
 
     /// Found Channel Info
     ChannelList       m_channelList;

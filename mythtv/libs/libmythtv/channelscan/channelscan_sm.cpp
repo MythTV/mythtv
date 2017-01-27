@@ -76,6 +76,56 @@ const uint ChannelScanSM::kATSCTableTimeout = 10 * 1000;
 /// No logic here, lets just wait at least 15 seconds.
 const uint ChannelScanSM::kMPEGTableTimeout = 15 * 1000;
 
+void ServiceDescriptionTablesCache::CacheTable(sdt_sections_cache_const_t& table)
+{
+    // Deep copy assert if entry exists
+    sdt_sections_cache_const_t::const_iterator section = table.begin();
+    uint tsid = (*section)->TSID();
+    uint onid = DVBStreamData::InternalOriginalNetworkID((*section)->OriginalNetworkID(), tsid);
+    uint tid = (*section)->TableID();
+
+    // Only one copy allowed (I should probably assert on this)
+    if (contains(onid) && (*this)[onid].contains(tsid) && (*this)[onid][tsid].contains(tid))
+    {
+       LOG(VB_CHANSCAN, LOG_INFO, QString("Duplicate SD table discarded 0x%1/0x%2/0x%3")
+               .arg(onid,0,16)
+               .arg(tsid,0,16)
+               .arg(tid,0,16));
+       return;
+    }
+
+    // Create the entry
+    sdt_sections_cache_t& sections = (*this)[onid][tsid][tid];
+
+    // Populate it
+    for (; section != table.end(); ++section)
+        sections[(*section)->Section()] = new ServiceDescriptionTableSection(**section);
+}
+
+ServiceDescriptionTablesCache::~ServiceDescriptionTablesCache()
+{
+    // Clean the section entries
+    // Tidy up for heap debugging
+    for (SDT_tsn_cache_t::iterator network = begin();
+            network != end(); ++network)
+    {
+        for (SDT_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
+        {
+            for (SDT_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
+            {
+                for (sdt_sections_cache_t::iterator section = (*table).begin();
+                        section != (*table).end(); ++section)
+                    if (NULL != *section)
+                        delete *section;
+                (*table).clear();
+            }
+            (*stream).clear();
+        }
+        (*network).clear();
+    }
+    clear();
+}
+
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 {
     if (siscan && siscan->m_channel)
@@ -92,21 +142,12 @@ class ScannedChannelInfo
   public:
     ScannedChannelInfo() : mgt(NULL) {}
 
-    ~ScannedChannelInfo()
-    {
-        for (sdt_map_t::const_iterator sdt_list_it = sdts.begin();
-                sdt_list_it != sdts.end(); ++sdt_list_it)
-            for (sdt_section_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
-                    sdt_it != (*sdt_list_it).end(); ++sdt_it)
-                delete *sdt_it;
-    }
-
     bool IsEmpty() const
     {
         return pats.empty() && pmts.empty()        &&
                program_encryption_status.isEmpty() &&
                !mgt         && cvcts.empty()       && tvcts.empty() &&
-               nits.empty() && sdts.empty();
+               nits.empty() && serviceDescriptionTablesCache.empty();
     }
 
     // MPEG
@@ -121,7 +162,8 @@ class ScannedChannelInfo
 
     // DVB
     nit_const_vec_t   nits;
-    sdt_map_t   sdts;
+    // Local Service Description Tables cache
+    SDT_tsn_cache_t serviceDescriptionTablesCache;
 };
 
 /** \class ChannelScanSM
@@ -435,7 +477,8 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
     QMutexLocker locker(&m_lock);
 
-    sdt_section_const_ptr_t sdt = sections[0];
+    sdt_sections_cache_const_t::const_iterator section = sections.begin();
+    sdt_section_const_ptr_t sdt = *section;
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Got a Service Description Table for %1")
@@ -458,24 +501,24 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
                     "additional Freesat SI").arg(sdt->OriginalNetworkID()));
     }
 
-    if ((uint)m_timer.elapsed() < m_otherTableTime)
-    {
-        // Set the version for the SDT so we see it again.
-        GetDTVSignalMonitor()->GetDVBStreamData()->
-            SetVersionSDT(sdt->OriginalNetworkID(), sdt->TSID(),
-                          sdt->TableID(), -1, 0);
-    }
-
     uint id = sdt->OriginalNetworkID() << 16 | sdt->TSID();
     m_tsScanned.insert(id);
 
-    for (uint i = 0; !m_currentTestingDecryption && i < sdt->ServiceCount(); i++)
+    for (; section != sections.end(); ++section)
     {
-        if (sdt->IsEncrypted(i))
+        for (uint i = 0; !m_currentTestingDecryption && i < (*section)->ServiceCount(); i++)
         {
-            m_currentEncryptionStatus[sdt->ServiceID(i)] = kEncUnknown;
+            if (sdt->IsEncrypted(i))
+            {
+                m_currentEncryptionStatus[(*section)->ServiceID(i)] = kEncUnknown;
+            }
         }
     }
+
+    // Copy table into my local cache
+    if (!m_currentInfo)
+        m_currentInfo = new ScannedChannelInfo();
+    m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
 
     UpdateChannelInfo(true);
 }
@@ -538,35 +581,43 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 {
     QMutexLocker locker(&m_lock);
 
-    sdt_section_const_ptr_t sdt = sections[0];
+    sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
-        "Got a Service Description Table (other)\n" + sdt->toString());
+        "Got a Service Description Table (other)\n" + (*section)->toString());
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
 
-    uint netid = sdt->OriginalNetworkID();
-    uint tsid = sdt->TSID();
+    uint netid = (*section)->OriginalNetworkID();
+    uint tsid = (*section)->TSID();
 
-    for (uint i = 0; i < sdt->ServiceCount(); i++)
+    for (; section != sections.end(); ++section)
     {
-        uint serviceId = sdt->ServiceID(i);
-        desc_list_t parsed =
-            MPEGDescriptor::Parse(sdt->ServiceDescriptors(i),
-                                  sdt->ServiceDescriptorsLength(i));
-        // Look for default authority
-        const unsigned char *def_auth =
-            MPEGDescriptor::Find(parsed, DescriptorID::default_authority);
-        if (def_auth)
+        for (uint i = 0; i < (*section)->ServiceCount(); i++)
         {
-            DefaultAuthorityDescriptor authority(def_auth);
-            LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("found default authority(SDTo) for service %1 %2 %3")
-                    .arg(netid).arg(tsid).arg(serviceId));
-            m_defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
-                authority.DefaultAuthority();
+            uint serviceId = (*section)->ServiceID(i);
+            desc_list_t parsed =
+                MPEGDescriptor::Parse((*section)->ServiceDescriptors(i),
+                                        (*section)->ServiceDescriptorsLength(i));
+            // Look for default authority
+            const unsigned char *def_auth =
+                MPEGDescriptor::Find(parsed, DescriptorID::default_authority);
+            if (def_auth)
+            {
+                DefaultAuthorityDescriptor authority(def_auth);
+                LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                    QString("found default authority(SDTo) for service %1 %2 %3")
+                        .arg(netid).arg(tsid).arg(serviceId));
+                m_defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
+                    authority.DefaultAuthority();
+            }
         }
     }
+
+    // Copy table into my local cache
+    if (!m_currentInfo)
+        m_currentInfo = new ScannedChannelInfo();
+    m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
 }
 
 void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
@@ -841,24 +892,6 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         m_currentInfo->nits = sd->GetCachedNIT();
     }
 
-
-    sdt_section_const_vec_t sdttmp = sd->GetCachedSDTs();
-    tsid_checked.clear();
-    for (uint i = 0; i < sdttmp.size(); i++)
-    {
-        uint onid = sdttmp[i]->OriginalNetworkID();
-        uint tsid = sdttmp[i]->TSID();
-        delete sdttmp[i];
-        if (tsid_checked[tsid])
-            continue;
-        tsid_checked[tsid] = true;
-        if (m_currentInfo->sdts.contains(tsid))
-            continue;
-
-//        if (!wait_until_complete || sd->HasAllSDTSections(onid, tsid, TableID::SDT))
- //           m_currentInfo->sdts[tsid] = sd->GetCachedSDTs();
-    }
-
     // Check if transport tuning is complete
     if (transport_tune_complete)
     {
@@ -869,25 +902,21 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             transport_tune_complete &=
                 (!m_currentInfo->tvcts.empty() || !m_currentInfo->cvcts.empty());
         }
-        if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
-        {
+        if (sd->HasCachedAnyNIT() || !m_currentInfo->serviceDescriptionTablesCache.empty())
             transport_tune_complete &= !m_currentInfo->nits.empty();
-            transport_tune_complete &= !m_currentInfo->sdts.empty();
-        }
+
         if (transport_tune_complete)
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("transport_tune_complete: "
                         "\n\t\t\tcurrentInfo->pmts.empty():     %1"
                         "\n\t\t\tsd->HasCachedAnyNIT():         %2"
-                        "\n\t\t\tsd->HasCachedAnySDTs():        %3"
-                        "\n\t\t\tcurrentInfo->nits.empty():     %4"
-                        "\n\t\t\tcurrentInfo->sdts.empty():     %5")
+                        "\n\t\t\tHasSeenAnySDTables:        %3"
+                        "\n\t\t\tcurrentInfo->nits.empty():     %4")
                     .arg(m_currentInfo->pmts.empty())
                     .arg(sd->HasCachedAnyNIT())
-                    .arg(sd->HasCachedAnySDTs())
-                    .arg(m_currentInfo->nits.empty())
-                    .arg(m_currentInfo->sdts.empty()));
+                    .arg(!m_currentInfo->serviceDescriptionTablesCache.empty())
+                    .arg(m_currentInfo->nits.empty()));
         }
     }
     transport_tune_complete |= !wait_until_complete;
@@ -1304,17 +1333,23 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // SDTs
-    sdt_map_t::const_iterator sdt_list_it = scan_info->sdts.begin();
-    for (; sdt_list_it != scan_info->sdts.end(); ++sdt_list_it)
+    for (SDT_tsn_cache_t::iterator network = scan_info->serviceDescriptionTablesCache.begin();
+            network != scan_info->serviceDescriptionTablesCache.end(); ++network)
     {
-        sdt_section_const_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
-        for (; sdt_it != (*sdt_list_it).end(); ++sdt_it)
+        for (SDT_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
         {
-            for (uint i = 0; i < (*sdt_it)->ServiceCount(); i++)
+            for (SDT_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
             {
-                uint pnum = (*sdt_it)->ServiceID(i);
-                PCM_INFO_INIT("dvb");
-                update_info(info, *sdt_it, i, m_defAuthorities);
+                for (sdt_sections_cache_t::iterator section = (*table).begin();
+                        section != (*table).end(); ++section)
+                {
+                    for (uint i = 0; i < (*section)->ServiceCount(); i++)
+                    {
+                        uint pnum = (*section)->ServiceID(i);
+                        PCM_INFO_INIT("dvb");
+                        update_info(info, *section, i, m_defAuthorities);
+                    }
+                }
             }
         }
     }
@@ -1605,7 +1640,7 @@ bool ChannelScanSM::HasTimedOut(void)
         if (!sd)
             return true;
 
-        if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
+        if (sd->HasCachedAnyNIT() || !m_currentInfo->serviceDescriptionTablesCache.empty())
             return m_timer.elapsed() > (int) kDVBTableTimeout;
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
             return m_timer.elapsed() > (int) kATSCTableTimeout;
@@ -1631,7 +1666,8 @@ bool ChannelScanSM::HasTimedOut(void)
         // tables...
         if (!sd->HasCachedAnyPAT() && !sd->HasCachedAnyPMTs() &&
             !sd->HasCachedMGT()    && !sd->HasCachedAnyVCTs() &&
-            !sd->HasCachedAnyNIT() && !sd->HasCachedAnySDTs())
+            !sd->HasCachedAnyNIT() &&
+            (m_currentInfo == NULL || !m_currentInfo->serviceDescriptionTablesCache.empty()))
         {
             return true;
         }

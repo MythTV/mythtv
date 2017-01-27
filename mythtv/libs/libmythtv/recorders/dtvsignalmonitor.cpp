@@ -505,19 +505,36 @@ void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
     {
         networkID = detectedNetworkID;
         transportID = detectedTransportID;
-
-        // FIXME assert if TableID == SDTo
     }
 
-    if (sdt->OriginalNetworkID() != networkID || sdt->TSID() != transportID)
+    if (detectedNetworkID == networkID && detectedTransportID == transportID)
     {
-        GetDVBStreamData()->SetVersionSDT(detectedNetworkID, detectedTransportID,
-                                          sdt->TableID(), -1, 0);
+        DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
+               .arg(detectedTransportID).arg(detectedNetworkID));
+        AddFlags(kDTVSigMon_SDTMatch);
+        RemoveFlags(kDVBSigMon_WaitForPos);
     }
     else
     {
-        DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
+        DBG_SM("SetSDT()", QString("Looks like I am tuned to the wrong channel"
+                " tsid = %1 orig_net_id = %2")
                .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
+    }
+}
+
+void DTVSignalMonitor::HandleSDTo(const sdt_sections_cache_const_t& sections)
+{
+    sdt_section_const_ptr_t sdt = sections[0];
+
+    detectedNetworkID = sdt->OriginalNetworkID();
+    detectedTransportID = sdt->TSID();
+
+    if (detectedNetworkID == networkID && detectedTransportID == transportID)
+    {
+        // Looks like I am on a non standard system that transmit SDT as SDTo
+        DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
+               .arg(detectedTransportID).arg(detectedNetworkID));
+        AddFlags(kDTVSigMon_SDTSeen);
         AddFlags(kDTVSigMon_SDTMatch);
         RemoveFlags(kDVBSigMon_WaitForPos);
     }

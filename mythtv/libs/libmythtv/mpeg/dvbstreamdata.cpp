@@ -173,18 +173,9 @@ DVBStreamData::~DVBStreamData()
 
 void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
 {
-    bool reset = true;
-
-/*    if (HasAllSDTSections(netid, tsid, TableID::SDT))
-    {
-    	// TODO Not sure why this is needed RFJ
-		reset = false;
-		_desired_netid = netid;
-		_desired_tsid = tsid;
-		SetDesiredProgram(serviceid);
-    }*/
-
-    if (reset)
+    if ((_desired_netid == netid) && (_desired_tsid == tsid))
+        SetDesiredProgram(serviceid);
+    else
         Reset(netid, tsid, serviceid);
 }
 
@@ -207,7 +198,7 @@ void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, ui
                 > EIT_STALE_TIME)
     {
         LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("Table 0x%1/0x%2/0x%3/0x%4 section %5 check EIT hash")
-            .arg(onid).arg(tsid).arg(sid).arg(tid).arg(section));
+            .arg(onid,0,16).arg(tsid,0,16).arg(sid,0,16).arg(tid,0,16).arg(section));
         // Check the hash
         if (QCryptographicHash::hash(QByteArray((const char*)(eit.psipdata()),
                                                 eit.Length() - 4),
@@ -216,7 +207,7 @@ void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, ui
         {
             // Table is stale. Remove it from the cache.
             LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("Table 0x%1/0x%2/0x%3/0x%4 is stale - removing")
-                .arg(onid).arg(tsid).arg(sid).arg(tid));
+                .arg(onid,0,16).arg(tsid,0,16).arg(sid,0,16).arg(tid,0,16));
             for (eit_sections_cache_t::iterator section = wrapper.sections.begin();
                     section != wrapper.sections.end(); ++section)
                 DeleteCachedTableSection(*section);
@@ -416,7 +407,6 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
         _cached_nit.clear();
     }
 
-    //ValidateSDTCache();
     {
         QMutexLocker locker(&_cached_sdts_lock);
         for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
@@ -449,7 +439,6 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
         }
     }
 
-    //ValidateEITCache(); // Uncomment this to debug the eit cache
     {
         QMutexLocker locker(&_cached_eits_lock);
         for (eit_tssn_cache_t::iterator network = _cached_eits.begin();
@@ -771,11 +760,12 @@ void DVBStreamData::ProcessSDTSection(sdt_section_ptr_t sdtsection)
 													   [tid].sections;
 
         // and pass up to the sdt listeners
-		for (uint i = 0; i < _dvb_main_listeners.size(); i++)
-            if (TableID::SDT == tid)
+        if (TableID::SDT == tid)
+            for (uint i = 0; i < _dvb_main_listeners.size(); i++)
                 _dvb_main_listeners[i]->HandleSDT(sections);
-            else
-                _dvb_other_listeners[i]->HandleSDTo(sections);
+        else
+            for (uint i = 0; i < _dvb_other_listeners.size(); i++)
+               _dvb_other_listeners[i]->HandleSDTo(sections);
 
 
         // Delete the table sections from the cache
@@ -1172,12 +1162,6 @@ bool DVBStreamData::HasCachedAllNIT(bool current) const
     return true;
 }
 
-bool DVBStreamData::HasCachedAnySDTs() const
-{
-    QMutexLocker locker(&_cached_sdts_lock);
-    return !_cached_sdts.empty();
-}
-
 nit_const_ptr_t DVBStreamData::GetCachedNIT(
     uint section_num, bool current) const
 {
@@ -1210,33 +1194,6 @@ nit_const_vec_t DVBStreamData::GetCachedNIT(bool current) const
     }
 
     return nits;
-}
-
-sdt_section_const_vec_t DVBStreamData::GetCachedSDTs() const
-{
-    // This function is purely for use by channelscan_sm
-    // It returns a copy of all the actual SD table sections
-    // in the cache. It is the responsibility of the caller
-    // to delete these copies
-    QMutexLocker locker(&_cached_sdts_lock);
-
-
-    sdt_section_const_vec_t sdts;
-
-    for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
-            network != _cached_sdts.end(); ++network)
-    {
-        for (sdt_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
-        {
-            for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
-            {
-                for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
-                        section != (*table).sections.end(); ++section)
-                    sdts.push_back(new ServiceDescriptionTableSection(**section));
-            }
-        }
-    }
-    return sdts;
 }
 
 bool DVBStreamData::DeleteCachedTableSection(PSIPTable *psip) const

@@ -16,7 +16,8 @@ class DTVSignalMonitor : public SignalMonitor,
                          public MPEGStreamListener,
                          public ATSCMainStreamListener,
                          public ATSCAuxStreamListener,
-                         public DVBMainStreamListener
+                         public DVBMainStreamListener,
+                         public DVBOtherStreamListener
 {
   public:
     DTVSignalMonitor(int db_cardnum,
@@ -98,6 +99,11 @@ class DTVSignalMonitor : public SignalMonitor,
     void HandleTDT(const TimeDateTable*);
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(const sdt_sections_cache_const_t&);
+
+    // DVB Other
+    void HandleNITo(const NetworkInformationTable*) {}
+    void HandleSDTo(const sdt_sections_cache_const_t&);
+    void HandleBAT(const BouquetAssociationTable*) {}
 
     void IgnoreEncrypted(bool ignore) { ignore_encrypted = ignore; }
 

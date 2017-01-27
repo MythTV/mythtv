@@ -35,10 +35,6 @@ typedef QMap<uint16_t, sdt_section_ptr_t> const
 typedef struct SdtSectionsAndStatus
 {
     SdtSectionsAndStatus() { status.SetVersion(-1,0); }
-    void DeepCopy(const SdtSectionsAndStatus& orig)
-    {
-        // Deep copy ?
-    }
     sdt_sections_cache_t sections;
     TableStatus status;
     QDateTime timestamp;

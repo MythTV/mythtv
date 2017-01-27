@@ -55,11 +55,6 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
                           uint_vec_t &del_pids) const;
 
     // Table versions
-    void SetVersionSDT(uint onid, uint tsid, uint tid, int version, uint last_section)
-    {
-        _cached_sdts[onid][tsid][tid].status.SetVersion(version, last_section);
-    }
-
     /** \fn static uint InternalOriginalNetworkID(uint transport_stream_id)
      *  \brief Generates a unique original network ID in the locally allocated range
      *  at the moment this only applies to UK onids.
@@ -107,9 +102,6 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool HasCachedAllNIT(bool current = true) const;
     nit_const_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
     nit_const_vec_t GetCachedNIT(bool current = true) const;
-
-    sdt_section_const_vec_t GetCachedSDTs() const;
-    bool HasCachedAnySDTs() const;
 
     void AddDVBMainListener(DVBMainStreamListener*);
     void AddDVBOtherListener(DVBOtherStreamListener*);
