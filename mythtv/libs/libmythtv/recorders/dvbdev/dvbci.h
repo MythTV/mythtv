@@ -61,7 +61,7 @@ private:
   cMutex *mutex;
   bool locked;
 public:
-  cMutexLock(cMutex *Mutex = NULL);
+  explicit cMutexLock(cMutex *Mutex = NULL);
   ~cMutexLock();
   bool Lock(cMutex *Mutex);
   };
@@ -101,7 +101,7 @@ private:
   char *text;
   bool blind;
   int expectedLength;
-  cCiEnquiry(cCiMMI *MMI);
+  explicit cCiEnquiry(cCiMMI *MMI);
 public:
   ~cCiEnquiry();
   const char *Text(void) { return text; }

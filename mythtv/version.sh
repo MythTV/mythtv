@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# small shell script to generate version.cpp
+# small shell script to generate version.h
 # it expects one parameter
 # first parameter is the root of the source directory
 

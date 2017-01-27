@@ -12,7 +12,7 @@ class HLSReader;
 class HLSStreamWorker : public MThread
 {
   public:
-    HLSStreamWorker(HLSReader* parent);
+    explicit HLSStreamWorker(HLSReader* parent);
     ~HLSStreamWorker(void);
 
     void Cancel(void);

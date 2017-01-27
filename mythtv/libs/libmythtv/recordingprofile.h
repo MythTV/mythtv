@@ -59,7 +59,7 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     class Name: public LineEditSetting, public RecordingProfileStorage
     {
       public:
-        Name(const RecordingProfile &parent):
+        explicit Name(const RecordingProfile &parent):
             LineEditSetting(this, false),
             RecordingProfileStorage(this, parent, "name")
         {
@@ -83,7 +83,7 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 
   public:
     // initializers
-    RecordingProfile(QString profName = QString());
+    explicit RecordingProfile(QString profName = QString());
     virtual ~RecordingProfile(void);
     virtual void loadByID(int id);
     virtual bool loadByType(const QString &name, const QString &cardtype,

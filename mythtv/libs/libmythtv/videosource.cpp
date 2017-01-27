@@ -146,7 +146,7 @@ class InstanceCount : public SpinBoxSetting, public CardInputDBStorage
 class SchedGroup : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
-    SchedGroup(const CardInput &parent) :
+    explicit SchedGroup(const CardInput &parent) :
         CheckBoxSetting(this),
         CardInputDBStorage(this, parent, "schedgroup")
     {
@@ -217,7 +217,7 @@ QString CaptureCardDBStorage::GetSetClause(MSqlBindings& bindings) const
 class XMLTVGrabber : public ComboBoxSetting, public VideoSourceDBStorage
 {
   public:
-    XMLTVGrabber(const VideoSource &parent) :
+    explicit XMLTVGrabber(const VideoSource &parent) :
         ComboBoxSetting(this),
         VideoSourceDBStorage(this, parent, "xmltvgrabber")
     {
@@ -339,7 +339,7 @@ void TransFreqTableSelector::SetSourceID(uint _sourceid)
 class UseEIT : public CheckBoxSetting, public VideoSourceDBStorage
 {
   public:
-    UseEIT(const VideoSource &parent) :
+    explicit UseEIT(const VideoSource &parent) :
         CheckBoxSetting(this), VideoSourceDBStorage(this, parent, "useeit")
     {
         setLabel(QObject::tr("Perform EIT scan"));
@@ -353,7 +353,7 @@ class UseEIT : public CheckBoxSetting, public VideoSourceDBStorage
 class DataDirectUserID : public LineEditSetting, public VideoSourceDBStorage
 {
   public:
-    DataDirectUserID(const VideoSource &parent) :
+    explicit DataDirectUserID(const VideoSource &parent) :
         LineEditSetting(this), VideoSourceDBStorage(this, parent, "userid")
     {
         setLabel(QObject::tr("User ID"));
@@ -363,7 +363,7 @@ class DataDirectUserID : public LineEditSetting, public VideoSourceDBStorage
 class DataDirectPassword : public LineEditSetting, public VideoSourceDBStorage
 {
   public:
-    DataDirectPassword(const VideoSource &parent) :
+    explicit DataDirectPassword(const VideoSource &parent) :
         LineEditSetting(this, true),
         VideoSourceDBStorage(this, parent, "password")
     {
@@ -873,7 +873,7 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
 class VBIDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
-    VBIDevice(const CaptureCard &parent) :
+    explicit VBIDevice(const CaptureCard &parent) :
         PathSetting(this, true),
         CaptureCardDBStorage(this, parent, "vbidevice")
     {
@@ -941,7 +941,7 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
 class ArgumentString : public LineEditSetting, public CaptureCardDBStorage
 {
   public:
-    ArgumentString(const CaptureCard &parent) :
+    explicit ArgumentString(const CaptureCard &parent) :
         LineEditSetting(this, true),
         CaptureCardDBStorage(this, parent, "audiodevice") // change to arguments
     {
@@ -952,7 +952,7 @@ class ArgumentString : public LineEditSetting, public CaptureCardDBStorage
 class FileDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
-    FileDevice(const CaptureCard &parent) :
+    explicit FileDevice(const CaptureCard &parent) :
         PathSetting(this, false),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
@@ -963,7 +963,7 @@ class FileDevice : public PathSetting, public CaptureCardDBStorage
 class AudioDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
-    AudioDevice(const CaptureCard &parent) :
+    explicit AudioDevice(const CaptureCard &parent) :
         PathSetting(this, false),
         CaptureCardDBStorage(this, parent, "audiodevice")
     {
@@ -1017,7 +1017,7 @@ class ChannelTimeout : public SpinBoxSetting, public CaptureCardDBStorage
 class AudioRateLimit : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    AudioRateLimit(const CaptureCard &parent) :
+    explicit AudioRateLimit(const CaptureCard &parent) :
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "audioratelimit")
     {
@@ -1037,7 +1037,7 @@ class AudioRateLimit : public ComboBoxSetting, public CaptureCardDBStorage
 class SkipBtAudio : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    SkipBtAudio(const CaptureCard &parent) :
+    explicit SkipBtAudio(const CaptureCard &parent) :
         CheckBoxSetting(this),
         CaptureCardDBStorage(this, parent, "skipbtaudio")
     {
@@ -1052,7 +1052,7 @@ class SkipBtAudio : public CheckBoxSetting, public CaptureCardDBStorage
 class DVBCardNum : public PathSetting, public CaptureCardDBStorage
 {
   public:
-    DVBCardNum(const CaptureCard &parent) :
+    explicit DVBCardNum(const CaptureCard &parent) :
         PathSetting(this, true),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
@@ -1142,7 +1142,7 @@ class DVBCardName : public TransLabelSetting
 class DVBNoSeqStart : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBNoSeqStart(const CaptureCard &parent) :
+    explicit DVBNoSeqStart(const CaptureCard &parent) :
         CheckBoxSetting(this),
         CaptureCardDBStorage(this, parent, "dvb_wait_for_seqstart")
     {
@@ -1157,7 +1157,7 @@ class DVBNoSeqStart : public CheckBoxSetting, public CaptureCardDBStorage
 class DVBOnDemand : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBOnDemand(const CaptureCard &parent) :
+    explicit DVBOnDemand(const CaptureCard &parent) :
         CheckBoxSetting(this),
         CaptureCardDBStorage(this, parent, "dvb_on_demand")
     {
@@ -1172,7 +1172,7 @@ class DVBOnDemand : public CheckBoxSetting, public CaptureCardDBStorage
 class DVBEITScan : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBEITScan(const CaptureCard &parent) :
+    explicit DVBEITScan(const CaptureCard &parent) :
         CheckBoxSetting(this),
         CaptureCardDBStorage(this, parent, "dvb_eitscan")
     {
@@ -1188,7 +1188,7 @@ class DVBEITScan : public CheckBoxSetting, public CaptureCardDBStorage
 class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
 {
   public:
-    DVBTuningDelay(const CaptureCard &parent) :
+    explicit DVBTuningDelay(const CaptureCard &parent) :
         SpinBoxSetting(this, 0, 2000, 25),
         CaptureCardDBStorage(this, parent, "dvb_tuning_delay")
     {
@@ -1205,7 +1205,7 @@ class DVBTuningDelay : public SpinBoxSetting, public CaptureCardDBStorage
 class FirewireGUID : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireGUID(const CaptureCard &parent) :
+    explicit FirewireGUID(const CaptureCard &parent) :
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
@@ -1289,7 +1289,7 @@ void FirewireDesc::SetGUID(const QString &_guid)
 class FirewireConnection : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireConnection(const CaptureCard &parent) :
+    explicit FirewireConnection(const CaptureCard &parent) :
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "firewire_connection")
     {
@@ -1302,7 +1302,7 @@ class FirewireConnection : public ComboBoxSetting, public CaptureCardDBStorage
 class FirewireSpeed : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    FirewireSpeed(const CaptureCard &parent) :
+    explicit FirewireSpeed(const CaptureCard &parent) :
         ComboBoxSetting(this),
         CaptureCardDBStorage(this, parent, "firewire_speed")
     {
@@ -1317,7 +1317,7 @@ class FirewireSpeed : public ComboBoxSetting, public CaptureCardDBStorage
 class FirewireConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
-    FirewireConfigurationGroup(CaptureCard& a_parent) :
+    explicit FirewireConfigurationGroup(CaptureCard& a_parent) :
         VerticalConfigurationGroup(false, true, false, false),
         parent(a_parent),
         dev(new FirewireGUID(parent)),
@@ -1827,7 +1827,7 @@ void VBoxDeviceIDList::UpdateDevices(const QString &v)
 class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
 {
   public:
-    IPTVHost(const CaptureCard &parent) :
+    explicit IPTVHost(const CaptureCard &parent) :
         LineEditSetting(this),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
@@ -1841,7 +1841,7 @@ class IPTVHost : public LineEditSetting, public CaptureCardDBStorage
 class IPTVConfigurationGroup : public VerticalConfigurationGroup
 {
   public:
-    IPTVConfigurationGroup(CaptureCard& a_parent) :
+    explicit IPTVConfigurationGroup(CaptureCard& a_parent) :
        VerticalConfigurationGroup(false, true, false, false),
        parent(a_parent)
     {
@@ -1859,7 +1859,7 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
 class ASIDevice : public ComboBoxSetting, public CaptureCardDBStorage
 {
   public:
-    ASIDevice(const CaptureCard &parent) :
+    explicit ASIDevice(const CaptureCard &parent) :
         ComboBoxSetting(this, true),
         CaptureCardDBStorage(this, parent, "videodevice")
     {
@@ -2040,7 +2040,7 @@ void ImportConfigurationGroup::probeCard(const QString &device)
 class HDHomeRunEITScan : public CheckBoxSetting, public CaptureCardDBStorage
 {
   public:
-    HDHomeRunEITScan(const CaptureCard &parent) :
+    explicit HDHomeRunEITScan(const CaptureCard &parent) :
         CheckBoxSetting(this),
         CaptureCardDBStorage(this, parent, "dvb_eitscan")
     {
@@ -2056,7 +2056,7 @@ class HDHomeRunEITScan : public CheckBoxSetting, public CaptureCardDBStorage
 class HDHomeRunExtra : public ConfigurationWizard
 {
   public:
-    HDHomeRunExtra(HDHomeRunConfigurationGroup &parent);
+    explicit HDHomeRunExtra(HDHomeRunConfigurationGroup &parent);
 };
 
 HDHomeRunExtra::HDHomeRunExtra(HDHomeRunConfigurationGroup &parent)
@@ -2247,7 +2247,7 @@ void HDHomeRunConfigurationGroup::HDHomeRunExtraPanel(void)
 class VBoxExtra : public ConfigurationWizard
 {
   public:
-    VBoxExtra(VBoxConfigurationGroup &parent);
+    explicit VBoxExtra(VBoxConfigurationGroup &parent);
 };
 
 VBoxExtra::VBoxExtra(VBoxConfigurationGroup &parent)
@@ -2425,7 +2425,7 @@ void CetonDeviceID::UpdateValues(void)
 class CetonExtra : public ConfigurationWizard
 {
   public:
-    CetonExtra(CetonConfigurationGroup &parent);
+    explicit CetonExtra(CetonConfigurationGroup &parent);
 };
 
 CetonExtra::CetonExtra(CetonConfigurationGroup &parent)
@@ -3061,7 +3061,7 @@ void CardType::fillSelections(SelectSetting* setting)
 class InputName : public ComboBoxSetting, public CardInputDBStorage
 {
   public:
-    InputName(const CardInput &parent) :
+    explicit InputName(const CardInput &parent) :
         ComboBoxSetting(this), CardInputDBStorage(this, parent, "inputname")
     {
         setLabel(QObject::tr("Input name"));
@@ -3092,7 +3092,7 @@ class InputName : public ComboBoxSetting, public CardInputDBStorage
 class InputDisplayName : public LineEditSetting, public CardInputDBStorage
 {
   public:
-    InputDisplayName(const CardInput &parent) :
+    explicit InputDisplayName(const CardInput &parent) :
         LineEditSetting(this),
         CardInputDBStorage(this, parent, "displayname")
     {
@@ -3108,7 +3108,7 @@ class InputDisplayName : public LineEditSetting, public CardInputDBStorage
 class SourceID : public ComboBoxSetting, public CardInputDBStorage
 {
   public:
-    SourceID(const CardInput &parent) :
+    explicit SourceID(const CardInput &parent) :
         ComboBoxSetting(this), CardInputDBStorage(this, parent, "sourceid")
     {
         setLabel(QObject::tr("Video source"));
@@ -3257,7 +3257,7 @@ void InputGroup::Load(void)
 class QuickTune : public ComboBoxSetting, public CardInputDBStorage
 {
   public:
-    QuickTune(const CardInput &parent) :
+    explicit QuickTune(const CardInput &parent) :
         ComboBoxSetting(this), CardInputDBStorage(this, parent, "quicktune")
     {
         setLabel(QObject::tr("Use quick tuning"));
@@ -3278,7 +3278,7 @@ class ExternalChannelCommand :
     public LineEditSetting, public CardInputDBStorage
 {
   public:
-    ExternalChannelCommand(const CardInput &parent) :
+    explicit ExternalChannelCommand(const CardInput &parent) :
         LineEditSetting(this),
         CardInputDBStorage(this, parent, "externalcommand")
     {
@@ -3294,7 +3294,7 @@ class ExternalChannelCommand :
 class PresetTuner : public LineEditSetting, public CardInputDBStorage
 {
   public:
-    PresetTuner(const CardInput &parent) :
+    explicit PresetTuner(const CardInput &parent) :
         LineEditSetting(this),
         CardInputDBStorage(this, parent, "tunechan")
     {
@@ -3347,7 +3347,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
 class InputPriority : public SpinBoxSetting, public CardInputDBStorage
 {
   public:
-    InputPriority(const CardInput &parent) :
+    explicit InputPriority(const CardInput &parent) :
         SpinBoxSetting(this, -99, 99, 1),
         CardInputDBStorage(this, parent, "recpriority")
     {
@@ -3399,7 +3399,7 @@ class LiveTVOrder : public SpinBoxSetting, public CardInputDBStorage
 class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
-    DishNetEIT(const CardInput &parent) :
+    explicit DishNetEIT(const CardInput &parent) :
         CheckBoxSetting(this),
         CardInputDBStorage(this, parent, "dishnet_eit")
     {
@@ -4306,7 +4306,7 @@ void TunerCardAudioInput::fillSelections(const QString &device)
 class DVBExtra : public ConfigurationWizard
 {
   public:
-    DVBExtra(DVBConfigurationGroup &parent);
+    explicit DVBExtra(DVBConfigurationGroup &parent);
 };
 
 DVBExtra::DVBExtra(DVBConfigurationGroup &parent)

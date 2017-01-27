@@ -68,7 +68,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     friend class Transcode; // for access to SetIntOption(), SetStrOption()
 
   public:
-    RecorderBase(TVRec *rec);
+    explicit RecorderBase(TVRec *rec);
     virtual ~RecorderBase();
 
     /// \brief Sets the video frame rate.

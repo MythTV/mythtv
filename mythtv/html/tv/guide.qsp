@@ -3,6 +3,7 @@
 
 import "/js/utility.js"
 import "/tv/js/constants.js"
+import "/tv/js/tvutil.qjs"
 
     var guideOnly = 0;
     if (getArg("ListOnly"))
@@ -342,8 +343,8 @@ if (chanGroups.length)
 
             var categoryClass = "category_" + toCapitalCase(escapeHTML(program.Category).replace(/ /g, ''))
 
-            var statusStr = dvr.RecStatusToString(program.Recording.Status);
-            var statusClass = "program" + statusStr.replace(/ /g, '');
+            // RecStatusToClass() - /tv/js/tvutil.qjs
+            var statusClass = RecStatusToClass(program.Recording.Status);
 
             var menu = "normalMenu scheduleMenu";
             if (program.Recording.Status != 0)

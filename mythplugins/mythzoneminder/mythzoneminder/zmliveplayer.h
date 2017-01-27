@@ -48,8 +48,6 @@ class Player
     Monitor *getMonitor(void) { return &m_monitor; }
 
   private:
-    void getMonitorList(void);
-
     MythUIImage *m_frameImage;
     MythUIText  *m_statusText;
     MythUIText  *m_cameraText;
@@ -76,7 +74,6 @@ class ZMLivePlayer : public MythScreenType
   protected slots:
     void updateFrame(void);
     bool initMonitorLayout(int layout);
-    void getMonitorList(void);
 
   protected:
     MythUIType* GetMythUIType(const QString &name, bool optional = false);

@@ -50,7 +50,7 @@ class IPTVStreamHandlerWriteHelper : QObject
     Q_OBJECT
 
 public:
-    IPTVStreamHandlerWriteHelper(IPTVStreamHandler *);
+    explicit IPTVStreamHandlerWriteHelper(IPTVStreamHandler *);
     ~IPTVStreamHandlerWriteHelper();
 
     void Start(void)
@@ -91,7 +91,7 @@ class IPTVStreamHandler : public StreamHandler
     } // StreamHandler
 
   protected:
-    IPTVStreamHandler(const IPTVTuningData &tuning);
+    explicit IPTVStreamHandler(const IPTVTuningData &tuning);
 
     virtual void run(void); // MThread
 

@@ -15,7 +15,7 @@
 class RTPPacketBuffer : public PacketBuffer
 {
   public:
-    RTPPacketBuffer(unsigned int bitrate) :
+    explicit RTPPacketBuffer(unsigned int bitrate) :
         PacketBuffer(bitrate),
         m_large_sequence_number_seen_recently(0),
         m_current_sequence(0ULL)

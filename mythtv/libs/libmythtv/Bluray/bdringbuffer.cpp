@@ -144,6 +144,7 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 }
 
 BDInfo::BDInfo(const QString &filename)
+    : m_isValid(true)
 {
     BLURAY* bdnav = NULL;
 
@@ -205,6 +206,7 @@ BDInfo::BDInfo(const QString &filename)
     {
         m_lastError = tr("Could not open Blu-ray device: %1").arg(name);
         LOG(VB_GENERAL, LOG_ERR, QString("BDInfo: ") + m_lastError);
+        m_isValid = false;
     }
     else
     {
@@ -249,7 +251,7 @@ void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
 
     // Try to find the first clip info file and
     // use its SHA1 hash as a serial number.
-    for (uint32_t idx = 0; idx < 100; idx++)
+    for (uint32_t idx = 0; idx < 200; idx++)
     {
         QString clip = QString("BDMV/CLIPINF/%1.clpi").arg(idx, 5, 10, QChar('0'));
 
