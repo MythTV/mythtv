@@ -866,29 +866,15 @@ bool ExternalStreamHandler::RestartStream(void)
 
     if (streaming)
     {
-        for (idx = 0; idx < 5; ++idx)
-        {
-            ClearError();
-            m_IO->ClearError();
-            if (StopStreaming())
-                break;
-            usleep(100000);
-        }
+        if (!StopStreaming())
+            return false;
     }
 
     usleep(500000);
 
     if (streaming)
     {
-        for (idx = 0; idx < 5; ++idx)
-        {
-            ClearError();
-            m_IO->ClearError();
-            if (StartStreaming(false))
-                return true;
-            usleep(100000);
-        }
-        return false;
+        return StartStreaming(false);
     }
 
     return true;
@@ -1027,61 +1013,78 @@ bool ExternalStreamHandler::StopStreaming(void)
 bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
                                            QString & result)
 {
+    bool okay;
+
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessCommand('%1')")
         .arg(cmd));
 
-    QMutexLocker locker(&m_IO_lock);
-
-    if (!m_IO)
+    for (int idx = 0; idx < 10; ++idx)
     {
-        m_error = "External I/O not ready!";
-        LOG(VB_RECORD, LOG_ERR, LOC + m_error);
-        return false;
-    }
+        QMutexLocker locker(&m_IO_lock);
 
-    QByteArray buf(cmd.toUtf8(), cmd.size());
-    buf += '\n';
+        if (!m_IO)
+        {
+            m_error = "External I/O not ready!";
+            LOG(VB_RECORD, LOG_ERR, LOC + m_error);
+            return false;
+        }
 
-    if (m_IO->Error())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "External Recorder in bad state: " +
-            m_IO->ErrorString());
-        return false;
-    }
+        QByteArray buf(cmd.toUtf8(), cmd.size());
+        buf += '\n';
 
-    /* Try to keep in sync, if External app was too slow in responding
-     * to previous query, consume the response before sending new query */
-    m_IO->GetStatus(0);
+        if (m_IO->Error())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "External Recorder in bad state: " +
+                m_IO->ErrorString());
+            return false;
+        }
 
-    /* Send new query */
-    m_IO->Write(buf);
-    result = m_IO->GetStatus(timeout);
-    if (m_IO->Error())
-    {
-        m_error = m_IO->ErrorString();
-        _error = true;
-        LOG(VB_GENERAL, LOG_ERR, "Failed to read from External Recorder: " +
-            m_error);
-        return false;
-    }
+        /* Try to keep in sync, if External app was too slow in responding
+         * to previous query, consume the response before sending new query */
+        m_IO->GetStatus(0);
 
-    if (result.size() < 1)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("External Recorder did not respond to '%1'").arg(cmd));
+        /* Send new query */
+        m_IO->Write(buf);
+        result = m_IO->GetStatus(timeout);
+        if (m_IO->Error())
+        {
+            m_error = m_IO->ErrorString();
+            _error = true;
+            LOG(VB_GENERAL, LOG_ERR, "Failed to read from External Recorder: " +
+                m_error);
+            return false;
+        }
+
+        if (result.size() < 1)
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("External Recorder did not respond to '%1'").arg(cmd));
+        else
+        {
+            okay = result.startsWith("OK");
+            if (okay || result.startsWith("WARN") || result.startsWith("ERR"))
+            {
+                m_io_errcnt = 0;
+
+                m_notify |= (!okay || !cmd.startsWith("SendBytes"));
+                LOG(VB_RECORD, m_notify ? LOG_INFO : LOG_DEBUG,
+                    LOC + QString("ProcessCommand('%1') = '%2'")
+                    .arg(cmd).arg(result));
+                m_notify = false;
+
+                return okay;
+            }
+            else
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("External Recorder invalid response to '%1': '%2'")
+                    .arg(cmd).arg(result));
+        }
+
         if (++m_io_errcnt > 10)
             _error = true;
-        return false;
+        usleep(timeout);
     }
-    else
-        m_io_errcnt = 0;
 
-    m_notify |= (!result.startsWith("OK") || !cmd.startsWith("SendBytes"));
-    LOG(VB_RECORD, m_notify ? LOG_INFO : LOG_DEBUG,
-        LOC + QString("ProcessCommand('%1') = '%2'").arg(cmd).arg(result));
-    m_notify = false;
-
-    return result.startsWith("OK");
+    return false;
 }
 
 bool ExternalStreamHandler::CheckForError(void)
