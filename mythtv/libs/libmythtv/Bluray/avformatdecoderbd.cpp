@@ -64,17 +64,17 @@ void AvFormatDecoderBD::StreamChangeCheck(void)
 int AvFormatDecoderBD::GetSubtitleLanguage(uint subtitle_index,
                                            uint stream_index)
 {
-    (void)stream_index;
+    (void)subtitle_index;
     if (ringBuffer && ringBuffer->IsBD())
-        return ringBuffer->BD()->GetSubtitleLanguage(subtitle_index);
+        return ringBuffer->BD()->GetSubtitleLanguage(ic->streams[stream_index]->id);
     return iso639_str3_to_key("und");
 }
 
 int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
 {
-    (void)stream_index;
+    (void)audio_index;
     if (ringBuffer && ringBuffer->IsBD())
-        return ringBuffer->BD()->GetAudioLanguage(audio_index);
+        return ringBuffer->BD()->GetAudioLanguage(ic->streams[stream_index]->id);
     return iso639_str3_to_key("und");
 }
 
