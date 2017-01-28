@@ -111,6 +111,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     virtual bool IsInMenu(void) const { return m_inMenu; }
     virtual bool IsInStillFrame(void) const;
     bool TitleChanged(void);
+    bool IsValidStream(int streamid);
 
     void GetDescForPos(QString &desc);
     double GetFrameRate(void);
