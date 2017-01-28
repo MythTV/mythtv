@@ -1297,6 +1297,28 @@ const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(int streamid, BLURAY_STREAM_I
     return stream;
 }
 
+bool BDRingBuffer::IsValidStream(int streamid)
+{
+    bool valid = false;
+
+    if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
+    {
+        bd_clip& clip = m_currentTitleInfo->clips[0];
+        if( FindStream(streamid,clip.audio_streams,     clip.audio_stream_count) ||
+            FindStream(streamid,clip.video_streams,     clip.video_stream_count) ||
+            FindStream(streamid,clip.ig_streams,        clip.ig_stream_count) ||
+            FindStream(streamid,clip.pg_streams,        clip.pg_stream_count) ||
+            FindStream(streamid,clip.sec_audio_streams, clip.sec_audio_stream_count) ||
+            FindStream(streamid,clip.sec_video_streams, clip.sec_video_stream_count)
+          )
+        {
+            valid = true;
+        }
+    }
+
+    return valid;
+}
+
 void BDRingBuffer::WaitForPlayer(void)
 {
     if (m_ignorePlayerWait)

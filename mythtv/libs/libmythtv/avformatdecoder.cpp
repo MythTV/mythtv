@@ -2236,6 +2236,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 continue;
         }
 
+        if (!IsValidStream(ic->streams[i]->id))
+        {
+            /* Hide this stream if it's not valid in this context.
+             * This can happen, for example, on a Blu-ray disc if there
+             * are more physical streams than there is metadata about them.
+             * (e.g. Despicable Me)
+             */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Stream 0x%1 is not valid in this context - skipping")
+                .arg(ic->streams[i]->id, 4, 16));
+            continue;
+        }
+
         if (enc->codec_type == AVMEDIA_TYPE_SUBTITLE)
         {
             bool forced = ic->streams[i]->disposition & AV_DISPOSITION_FORCED;
