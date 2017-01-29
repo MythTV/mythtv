@@ -33,14 +33,14 @@
 #else
 #  include <sys/param.h>
 #  include <sys/mount.h>
-#  if CONFIG_CYGWIN
+#  ifdef __CYGWIN__
 #    include <sys/statfs.h>
-#  else // if !CONFIG_CYGWIN
+#  else // if !__CYGWIN__
 #    include <sys/sysctl.h>
-#  endif // !CONFIG_CYGWIN
+#  endif // !__CYGWIN__
 #endif
 
-#if CONFIG_DARWIN
+#ifdef __APPLE__
 #define MSG_NOSIGNAL 0  // Apple also has SO_NOSIGPIPE?
 #endif
 
