@@ -1338,8 +1338,11 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         for (SDT_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
         {
-            for (SDT_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
+            //for (SDT_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
+            // For the time being only use SDT(actual) tables
+            if ((*stream).contains(TableID::SDT))
             {
+                SDT_t_cache_t::iterator table = (*stream).find(TableID::SDT);
                 for (sdt_sections_cache_t::iterator section = (*table).begin();
                         section != (*table).end(); ++section)
                 {

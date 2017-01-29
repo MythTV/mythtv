@@ -19,6 +19,8 @@ using namespace std;
 
 #define LOC QString("DVBStream[%1]: ").arg(_cardid)
 
+//#define PRINT_CACHE_DESTRUCTORS // Print EIT and SDT cache destructors to STDERR
+
 /// \remarks The time in seconds after which an EIT table is
 // considered stale and the event hash needs to be checked.
 qint64 DVBStreamData::EIT_STALE_TIME = 600;
@@ -34,6 +36,7 @@ QMutex            DVBStreamData::_cached_sdts_lock;
 
 EitCache::~EitCache()
 {
+#ifdef PRINT_CACHE_DESTRUCTORS
 	unsigned long bytes = 0;
 	uint sections = 0;
 
@@ -90,10 +93,12 @@ EitCache::~EitCache()
 			<< sections
 			<< " sections"
 			<< endl;
+#endif
 }
 
 SdtCache::~SdtCache()
 {
+#ifdef PRINT_CACHE_DESTRUCTORS
 	unsigned long bytes  = 0;
 	uint sections = 0;
 
@@ -140,6 +145,7 @@ SdtCache::~SdtCache()
 			<< sections
 			<< " entries"
 			<< endl;
+#endif
 }
 
 // service_id is synonymous with the MPEG program number in the PMT.
