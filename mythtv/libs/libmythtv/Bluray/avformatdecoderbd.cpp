@@ -73,16 +73,26 @@ int AvFormatDecoderBD::GetSubtitleLanguage(uint subtitle_index,
                                            uint stream_index)
 {
     (void)subtitle_index;
-    if (ringBuffer && ringBuffer->IsBD())
+    if (ringBuffer && ringBuffer->IsBD() &&
+        stream_index < ic->nb_streams &&
+        ic->streams[stream_index] != nullptr)
+    {
         return ringBuffer->BD()->GetSubtitleLanguage(ic->streams[stream_index]->id);
+    }
+
     return iso639_str3_to_key("und");
 }
 
 int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
 {
     (void)audio_index;
-    if (ringBuffer && ringBuffer->IsBD())
+    if (ringBuffer && ringBuffer->IsBD() &&
+        stream_index < ic->nb_streams &&
+        ic->streams[stream_index] != nullptr)
+    {
         return ringBuffer->BD()->GetAudioLanguage(ic->streams[stream_index]->id);
+    }
+
     return iso639_str3_to_key("und");
 }
 
