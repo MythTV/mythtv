@@ -346,6 +346,7 @@ package MythTV::Program;
         ($fields{'S'} = ($self->{'subtitle'}    or '')) =~ s/%/%%/g;
         ($fields{'R'} = ($self->{'description'} or '')) =~ s/%/%%/g;
         ($fields{'C'} = ($self->{'category'}    or '')) =~ s/%/%%/g;
+        ($fields{'Ct'} = ($self->{'categorytype'}    or '')) =~ s/%/%%/g;
         ($fields{'U'} = ($self->{'recgroup'}    or '')) =~ s/%/%%/g;
     # Misc
         ($fields{'hn'} = ($self->{'hostname'}    or '')) =~ s/%/%%/g;
