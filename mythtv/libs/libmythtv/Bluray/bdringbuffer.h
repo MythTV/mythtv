@@ -112,6 +112,9 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     virtual bool IsInStillFrame(void) const;
     bool TitleChanged(void);
     bool IsValidStream(int streamid);
+    void UnblockReading(void)             { m_processState = PROCESS_REPROCESS; }
+    bool IsReadingBlocked(void)           { return (m_processState == PROCESS_WAIT); }
+    int64_t AdjustTimestamp(int64_t timestamp);
 
     void GetDescForPos(QString &desc);
     double GetFrameRate(void);
@@ -153,6 +156,14 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     void HandleBDEvent(BD_EVENT &event);
 
     const BLURAY_STREAM_INFO* FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount) const;
+
+
+    typedef enum
+    {
+        PROCESS_NORMAL,
+        PROCESS_REPROCESS,
+        PROCESS_WAIT
+    }processState_t;
 
     BLURAY            *bdnav;
     bool               m_isHDMVNavigation;
@@ -199,6 +210,10 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     uint8_t            m_stillTime;
     uint8_t            m_stillMode;
     volatile bool      m_inMenu;
+    BD_EVENT           m_lastEvent;
+    processState_t     m_processState;
+    QByteArray         m_pendingData;
+    int64_t            m_timeDiff;
 
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedTitleInfo;
     QHash<uint32_t,BLURAY_TITLE_INFO*> m_cachedPlaylistInfo;

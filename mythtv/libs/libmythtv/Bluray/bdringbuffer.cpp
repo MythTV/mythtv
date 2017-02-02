@@ -303,6 +303,7 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
     m_ignorePlayerWait(true),
     m_overlayPlanes(2, NULL),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
+    m_processState(PROCESS_NORMAL),
     m_infoLock(QMutex::Recursive), m_mainThread(NULL)
 {
     m_tryHDMVNavigation = NULL != getenv("MYTHTV_HDMV");
@@ -412,6 +413,7 @@ long long BDRingBuffer::SeekInternal(long long pos, int whence)
 uint64_t BDRingBuffer::SeekInternal(uint64_t pos)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Seeking to %1.").arg(pos));
+    m_processState = PROCESS_NORMAL;
     if (bdnav)
         return bd_seek_time(bdnav, pos);
     return 0;
@@ -715,6 +717,10 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_currentTime = 0;
     m_currentTitleInfo = NULL;
     m_currentTitleAngleCount = 0;
+    m_processState = PROCESS_NORMAL;
+    m_lastEvent.event = BD_EVENT_NONE;
+    m_lastEvent.param = 0;
+
 
     // Mostly event-driven values below
     m_currentAngle = 0;
@@ -733,6 +739,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_secondaryVideoIsFullscreen = false;
     m_stillMode = BLURAY_STILL_NONE;
     m_stillTime = 0;
+    m_timeDiff = 0;
     m_inMenu = false;
 
     // First, attempt to initialize the disc in HDMV navigation mode.
@@ -942,6 +949,8 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
+    m_currentPlayitem = 0;
+    m_timeDiff = 0;
     m_titlesize = bd_get_title_size(bdnav);
     uint32_t chapter_count = GetNumChapters();
     uint64_t total_secs = m_currentTitleLength / 90000;
@@ -1051,6 +1060,18 @@ uint64_t BDRingBuffer::GetTotalReadPosition(void)
     return 0;
 }
 
+int64_t BDRingBuffer::AdjustTimestamp(int64_t timestamp)
+{
+    int64_t newTimestamp = timestamp;
+
+    if (newTimestamp != AV_NOPTS_VALUE && newTimestamp >= m_timeDiff)
+    {
+        newTimestamp -= m_timeDiff;
+    }
+
+    return newTimestamp;
+}
+
 int BDRingBuffer::safe_read(void *data, uint sz)
 {
     int result = 0;
@@ -1072,7 +1093,32 @@ int BDRingBuffer::safe_read(void *data, uint sz)
     }
     else
     {
-        result = bd_read(bdnav, (unsigned char *)data, sz);
+        if (m_processState != PROCESS_WAIT)
+        {
+            processState_t lastState = m_processState;
+
+            if (m_processState == PROCESS_NORMAL)
+                result = bd_read(bdnav, (unsigned char *)data, sz);
+
+            HandleBDEvents();
+
+            if (m_processState == PROCESS_WAIT && lastState == PROCESS_NORMAL)
+            {
+                // We're waiting for the decoder to drain its buffers
+                // so don't give it any more data just yet.
+                m_pendingData = QByteArray((const char*)data, result);
+                result = 0;
+            }
+            else
+            if (m_processState == PROCESS_NORMAL && lastState == PROCESS_REPROCESS)
+            {
+                // The decoder has finished draining its buffers so give
+                // it that last block of data we read
+                result = m_pendingData.size();
+                memcpy(data, m_pendingData.constData(), result);
+                m_pendingData.clear();
+            }
+        }
     }
 
     if (result < 0)
@@ -1227,14 +1273,23 @@ bool BDRingBuffer::GoToMenu(const QString &str, int64_t pts)
 
 bool BDRingBuffer::HandleBDEvents(void)
 {
-    BD_EVENT ev;
-    while (bd_get_event(bdnav, &ev))
+    if (m_processState != PROCESS_WAIT)
     {
-        HandleBDEvent(ev);
-        if (ev.event == BD_EVENT_NONE ||
-            ev.event == BD_EVENT_ERROR)
+        if (m_processState == PROCESS_REPROCESS)
         {
-            return false;
+            HandleBDEvent(m_lastEvent);
+            // HandleBDEvent will change the process state
+            // if it needs to so don't do it here.
+        }
+
+        while (m_processState == PROCESS_NORMAL && bd_get_event(bdnav, &m_lastEvent))
+        {
+            HandleBDEvent(m_lastEvent);
+            if (m_lastEvent.event == BD_EVENT_NONE ||
+                m_lastEvent.event == BD_EVENT_ERROR)
+            {
+                return false;
+            }
         }
     }
     return true;
@@ -1278,12 +1333,39 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                                 .arg(ev.param).arg(m_currentPlaylist));
             m_currentPlaylist = ev.param;
             m_currentTitle = bd_get_current_title(bdnav);
+            m_timeDiff = 0;
+            m_currentPlayitem = 0;
             SwitchPlaylist(m_currentPlaylist);
             break;
         case BD_EVENT_PLAYITEM:
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_PLAYITEM %1").arg(ev.param));
-            m_currentPlayitem = ev.param;
+            {
+                int64_t diff = 0;
+
+                if (m_currentPlayitem != (int)ev.param)
+                {
+                    int64_t out = m_currentTitleInfo->clips[m_currentPlayitem].out_time;
+                    int64_t in  = m_currentTitleInfo->clips[ev.param].in_time;
+
+                    diff = in - out;
+
+                    if (diff != 0 && m_processState == PROCESS_NORMAL)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PTS discontinuity - waiting for decoder: this %1, last %2, diff %3")
+                            .arg(in)
+                            .arg(out)
+                            .arg(diff));
+
+                        m_processState = PROCESS_WAIT;
+                        break;
+                    }
+
+                    m_timeDiff += diff;
+                    m_processState = PROCESS_NORMAL;
+                    m_currentPlayitem = (int)ev.param;
+                }
+            }
             break;
         case BD_EVENT_CHAPTER:
             // N.B. event chapter numbering 1...N, chapter seeks etc 0...

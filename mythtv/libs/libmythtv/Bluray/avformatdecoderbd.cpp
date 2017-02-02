@@ -96,6 +96,35 @@ int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
     return iso639_str3_to_key("und");
 }
 
+int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket)
+{
+    QMutexLocker locker(avcodeclock);
+
+    int result = av_read_frame(ctx, pkt);
+
+    /* If we seem to have hit the end of the file, the ringbuffer may
+     * just be blocked in order to drain the ffmpeg buffers, so try
+     * unblocking it and reading again.
+     * If ffmpeg's buffers are empty, it takes a couple of goes to
+     * fill and read from them.
+     */
+    for (int count = 0; (count < 3) && (result == AVERROR_EOF); count++)
+    {
+        if (ringBuffer->BD()->IsReadingBlocked())
+            ringBuffer->BD()->UnblockReading();
+
+        result = av_read_frame(ctx, pkt);
+    }
+
+    if (result >= 0)
+    {
+        pkt->dts = ringBuffer->BD()->AdjustTimestamp(pkt->dts);
+        pkt->pts = ringBuffer->BD()->AdjustTimestamp(pkt->pts);
+    }
+
+    return result;
+}
+
 long long AvFormatDecoderBD::BDFindPosition(long long desiredFrame)
 {
     if (!ringBuffer->IsBD())
