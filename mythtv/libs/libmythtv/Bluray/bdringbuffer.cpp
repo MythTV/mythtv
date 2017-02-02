@@ -424,7 +424,7 @@ void BDRingBuffer::GetDescForPos(QString &desc)
     if (!m_infoLock.tryLock())
         return;
     desc = tr("Title %1 chapter %2")
-                       .arg(m_currentTitleInfo->idx)
+                       .arg(m_currentTitle)
                        .arg(m_currentTitleInfo->chapters->idx);
     m_infoLock.unlock();
 }
@@ -724,7 +724,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
     // Mostly event-driven values below
     m_currentAngle = 0;
-    m_currentTitle = 0;
+    m_currentTitle = -1;
     m_currentPlaylist = 0;
     m_currentPlayitem = 0;
     m_currentChapter = 0;
@@ -846,9 +846,7 @@ uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
 int BDRingBuffer::GetCurrentTitle(void)
 {
     QMutexLocker locker(&m_infoLock);
-    if (m_currentTitleInfo)
-        return m_currentTitleInfo->idx;
-    return -1;
+    return m_currentTitle;
 }
 
 int BDRingBuffer::GetTitleDuration(int title)
@@ -889,6 +887,7 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 
     m_infoLock.lock();
     m_currentTitleInfo = GetPlaylistInfo(index);
+    m_currentTitle = bd_get_current_title(bdnav);
     m_infoLock.unlock();
     bool result = UpdateTitleInfo();
 
@@ -964,7 +963,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New title info: Index %1 Playlist: %2 Duration: %3 "
                 "Chapters: %5")
-            .arg(m_currentTitleInfo->idx).arg(m_currentTitleInfo->playlist)
+            .arg(m_currentTitle).arg(m_currentTitleInfo->playlist)
             .arg(duration).arg(chapter_count));
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New title info: Clips: %1 Angles: %2 Title Size: %3 "
@@ -1332,7 +1331,6 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                 QString("EVENT_PLAYLIST %1 (old %2)")
                                 .arg(ev.param).arg(m_currentPlaylist));
             m_currentPlaylist = ev.param;
-            m_currentTitle = bd_get_current_title(bdnav);
             m_timeDiff = 0;
             m_currentPlayitem = 0;
             SwitchPlaylist(m_currentPlaylist);
