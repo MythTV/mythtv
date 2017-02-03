@@ -11,6 +11,10 @@
 
 #include "sicachetypes.h"
 
+class DVBMainStreamListener;
+class DVBOtherStreamListener;
+class DVBEITStreamListener;
+
 typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
 typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
 typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
