@@ -303,6 +303,7 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
     m_ignorePlayerWait(true),
     m_overlayPlanes(2, NULL),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
+    m_processState(PROCESS_NORMAL),
     m_infoLock(QMutex::Recursive), m_mainThread(NULL)
 {
     m_tryHDMVNavigation = NULL != getenv("MYTHTV_HDMV");
@@ -412,6 +413,7 @@ long long BDRingBuffer::SeekInternal(long long pos, int whence)
 uint64_t BDRingBuffer::SeekInternal(uint64_t pos)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Seeking to %1.").arg(pos));
+    m_processState = PROCESS_NORMAL;
     if (bdnav)
         return bd_seek_time(bdnav, pos);
     return 0;
@@ -422,7 +424,7 @@ void BDRingBuffer::GetDescForPos(QString &desc)
     if (!m_infoLock.tryLock())
         return;
     desc = tr("Title %1 chapter %2")
-                       .arg(m_currentTitleInfo->idx)
+                       .arg(m_currentTitle)
                        .arg(m_currentTitleInfo->chapters->idx);
     m_infoLock.unlock();
 }
@@ -715,10 +717,14 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_currentTime = 0;
     m_currentTitleInfo = NULL;
     m_currentTitleAngleCount = 0;
+    m_processState = PROCESS_NORMAL;
+    m_lastEvent.event = BD_EVENT_NONE;
+    m_lastEvent.param = 0;
+
 
     // Mostly event-driven values below
     m_currentAngle = 0;
-    m_currentTitle = 0;
+    m_currentTitle = -1;
     m_currentPlaylist = 0;
     m_currentPlayitem = 0;
     m_currentChapter = 0;
@@ -733,6 +739,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_secondaryVideoIsFullscreen = false;
     m_stillMode = BLURAY_STILL_NONE;
     m_stillTime = 0;
+    m_timeDiff = 0;
     m_inMenu = false;
 
     // First, attempt to initialize the disc in HDMV navigation mode.
@@ -839,9 +846,7 @@ uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
 int BDRingBuffer::GetCurrentTitle(void)
 {
     QMutexLocker locker(&m_infoLock);
-    if (m_currentTitleInfo)
-        return m_currentTitleInfo->idx;
-    return -1;
+    return m_currentTitle;
 }
 
 int BDRingBuffer::GetTitleDuration(int title)
@@ -882,6 +887,7 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 
     m_infoLock.lock();
     m_currentTitleInfo = GetPlaylistInfo(index);
+    m_currentTitle = bd_get_current_title(bdnav);
     m_infoLock.unlock();
     bool result = UpdateTitleInfo();
 
@@ -942,6 +948,8 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
+    m_currentPlayitem = 0;
+    m_timeDiff = 0;
     m_titlesize = bd_get_title_size(bdnav);
     uint32_t chapter_count = GetNumChapters();
     uint64_t total_secs = m_currentTitleLength / 90000;
@@ -955,7 +963,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New title info: Index %1 Playlist: %2 Duration: %3 "
                 "Chapters: %5")
-            .arg(m_currentTitleInfo->idx).arg(m_currentTitleInfo->playlist)
+            .arg(m_currentTitle).arg(m_currentTitleInfo->playlist)
             .arg(duration).arg(chapter_count));
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New title info: Clips: %1 Angles: %2 Title Size: %3 "
@@ -1051,6 +1059,18 @@ uint64_t BDRingBuffer::GetTotalReadPosition(void)
     return 0;
 }
 
+int64_t BDRingBuffer::AdjustTimestamp(int64_t timestamp)
+{
+    int64_t newTimestamp = timestamp;
+
+    if (newTimestamp != AV_NOPTS_VALUE && newTimestamp >= m_timeDiff)
+    {
+        newTimestamp -= m_timeDiff;
+    }
+
+    return newTimestamp;
+}
+
 int BDRingBuffer::safe_read(void *data, uint sz)
 {
     int result = 0;
@@ -1072,7 +1092,32 @@ int BDRingBuffer::safe_read(void *data, uint sz)
     }
     else
     {
-        result = bd_read(bdnav, (unsigned char *)data, sz);
+        if (m_processState != PROCESS_WAIT)
+        {
+            processState_t lastState = m_processState;
+
+            if (m_processState == PROCESS_NORMAL)
+                result = bd_read(bdnav, (unsigned char *)data, sz);
+
+            HandleBDEvents();
+
+            if (m_processState == PROCESS_WAIT && lastState == PROCESS_NORMAL)
+            {
+                // We're waiting for the decoder to drain its buffers
+                // so don't give it any more data just yet.
+                m_pendingData = QByteArray((const char*)data, result);
+                result = 0;
+            }
+            else
+            if (m_processState == PROCESS_NORMAL && lastState == PROCESS_REPROCESS)
+            {
+                // The decoder has finished draining its buffers so give
+                // it that last block of data we read
+                result = m_pendingData.size();
+                memcpy(data, m_pendingData.constData(), result);
+                m_pendingData.clear();
+            }
+        }
     }
 
     if (result < 0)
@@ -1119,16 +1164,24 @@ double BDRingBuffer::GetFrameRate(void)
 int BDRingBuffer::GetAudioLanguage(uint streamID)
 {
     QMutexLocker locker(&m_infoLock);
-    if (!m_currentTitleInfo ||
-        streamID >= m_currentTitleInfo->clips->audio_stream_count)
-        return iso639_str3_to_key("und");
 
-    uint8_t lang[4] = { 0, 0, 0, 0 };
-    memcpy(lang, m_currentTitleInfo->clips->audio_streams[streamID].lang, 4);
-    int code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
+    int code = iso639_str3_to_key("und");
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Audio Lang: %1 Code: %2")
-                                  .arg(code).arg(iso639_key_to_str3(code)));
+    if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
+    {
+        bd_clip& clip = m_currentTitleInfo->clips[0];
+
+        const BLURAY_STREAM_INFO* stream = FindStream(streamID, clip.audio_streams, clip.audio_stream_count);
+
+        if (stream)
+        {
+            const uint8_t* lang = stream->lang;
+            code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
+        }
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Audio Lang: 0x%1 Code: %2")
+                                  .arg(code, 3, 16).arg(iso639_key_to_str3(code)));
 
     return code;
 }
@@ -1136,32 +1189,26 @@ int BDRingBuffer::GetAudioLanguage(uint streamID)
 int BDRingBuffer::GetSubtitleLanguage(uint streamID)
 {
     QMutexLocker locker(&m_infoLock);
-    if (!m_currentTitleInfo)
-        return iso639_str3_to_key("und");
 
-    int pgCount = m_currentTitleInfo->clips->pg_stream_count;
-    uint subCount = 0;
-    for (int i = 0; i < pgCount; ++i)
+    int code = iso639_str3_to_key("und");
+
+    if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
     {
-        if (m_currentTitleInfo->clips->pg_streams[i].coding_type >= 0x90 &&
-            m_currentTitleInfo->clips->pg_streams[i].coding_type <= 0x92)
+        bd_clip& clip = m_currentTitleInfo->clips[0];
+
+        const BLURAY_STREAM_INFO* stream = FindStream(streamID, clip.pg_streams, clip.pg_stream_count);
+
+        if (stream)
         {
-            if (streamID == subCount)
-            {
-                uint8_t lang[4] = { 0, 0, 0, 0 };
-                memcpy(lang,
-                       m_currentTitleInfo->clips->pg_streams[streamID].lang, 4);
-                int key = (lang[0]<<16)|(lang[1]<<8)|lang[2];
-                int code = iso639_key_to_canonical_key(key);
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                        QString("Subtitle Lang: %1 Code: %2")
-                            .arg(code).arg(iso639_key_to_str3(code)));
-                return code;
-            }
-            subCount++;
+            const uint8_t* lang = stream->lang;
+            code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
         }
     }
-    return iso639_str3_to_key("und");
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Subtitle Lang: 0x%1 Code: %2")
+                                  .arg(code, 3, 16).arg(iso639_key_to_str3(code)));
+
+    return code;
 }
 
 void BDRingBuffer::PressButton(int32_t key, int64_t pts)
@@ -1225,14 +1272,23 @@ bool BDRingBuffer::GoToMenu(const QString &str, int64_t pts)
 
 bool BDRingBuffer::HandleBDEvents(void)
 {
-    BD_EVENT ev;
-    while (bd_get_event(bdnav, &ev))
+    if (m_processState != PROCESS_WAIT)
     {
-        HandleBDEvent(ev);
-        if (ev.event == BD_EVENT_NONE ||
-            ev.event == BD_EVENT_ERROR)
+        if (m_processState == PROCESS_REPROCESS)
         {
-            return false;
+            HandleBDEvent(m_lastEvent);
+            // HandleBDEvent will change the process state
+            // if it needs to so don't do it here.
+        }
+
+        while (m_processState == PROCESS_NORMAL && bd_get_event(bdnav, &m_lastEvent))
+        {
+            HandleBDEvent(m_lastEvent);
+            if (m_lastEvent.event == BD_EVENT_NONE ||
+                m_lastEvent.event == BD_EVENT_ERROR)
+            {
+                return false;
+            }
         }
     }
     return true;
@@ -1275,13 +1331,39 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                 QString("EVENT_PLAYLIST %1 (old %2)")
                                 .arg(ev.param).arg(m_currentPlaylist));
             m_currentPlaylist = ev.param;
-            m_currentTitle = bd_get_current_title(bdnav);
+            m_timeDiff = 0;
+            m_currentPlayitem = 0;
             SwitchPlaylist(m_currentPlaylist);
             break;
         case BD_EVENT_PLAYITEM:
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_PLAYITEM %1").arg(ev.param));
-            m_currentPlayitem = ev.param;
+            {
+                int64_t diff = 0;
+
+                if (m_currentPlayitem != (int)ev.param)
+                {
+                    int64_t out = m_currentTitleInfo->clips[m_currentPlayitem].out_time;
+                    int64_t in  = m_currentTitleInfo->clips[ev.param].in_time;
+
+                    diff = in - out;
+
+                    if (diff != 0 && m_processState == PROCESS_NORMAL)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PTS discontinuity - waiting for decoder: this %1, last %2, diff %3")
+                            .arg(in)
+                            .arg(out)
+                            .arg(diff));
+
+                        m_processState = PROCESS_WAIT;
+                        break;
+                    }
+
+                    m_timeDiff += diff;
+                    m_processState = PROCESS_NORMAL;
+                    m_currentPlayitem = (int)ev.param;
+                }
+            }
             break;
         case BD_EVENT_CHAPTER:
             // N.B. event chapter numbering 1...N, chapter seeks etc 0...
@@ -1404,6 +1486,48 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
 bool BDRingBuffer::IsInStillFrame(void) const
 {
     return m_stillTime > 0 && m_stillMode != BLURAY_STILL_NONE;
+}
+
+/**
+ * \brief Find the stream with the given ID from an array of streams.
+ * \param streamid      The stream ID (pid) to look for
+ * \param streams       Pointer to an array of streams
+ * \param streamCount   Number of streams in the array
+ * \return Pointer to the matching stream if found, otherwise nullptr.
+ */
+const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount) const
+{
+    const BLURAY_STREAM_INFO* stream = nullptr;
+
+    for(int i = 0; i < streamCount && !stream; i++)
+    {
+        if (streams[i].pid == streamid)
+            stream = &streams[i];
+    }
+
+    return stream;
+}
+
+bool BDRingBuffer::IsValidStream(int streamid)
+{
+    bool valid = false;
+
+    if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
+    {
+        bd_clip& clip = m_currentTitleInfo->clips[0];
+        if( FindStream(streamid,clip.audio_streams,     clip.audio_stream_count) ||
+            FindStream(streamid,clip.video_streams,     clip.video_stream_count) ||
+            FindStream(streamid,clip.ig_streams,        clip.ig_stream_count) ||
+            FindStream(streamid,clip.pg_streams,        clip.pg_stream_count) ||
+            FindStream(streamid,clip.sec_audio_streams, clip.sec_audio_stream_count) ||
+            FindStream(streamid,clip.sec_video_streams, clip.sec_video_stream_count)
+          )
+        {
+            valid = true;
+        }
+    }
+
+    return valid;
 }
 
 void BDRingBuffer::WaitForPlayer(void)

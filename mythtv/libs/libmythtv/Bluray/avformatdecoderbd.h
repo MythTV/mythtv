@@ -10,6 +10,10 @@ class AvFormatDecoderBD : public AvFormatDecoder
                       PlayerFlags flags);
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
     virtual void UpdateFramesPlayed(void);
+    virtual int ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket);
+
+  protected:
+    virtual bool IsValidStream(int streamid);
 
   private:
     virtual bool DoRewindSeek(long long desiredFrame);

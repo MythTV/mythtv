@@ -114,6 +114,7 @@ options:
     \%ep  = Episode (leading zero)
     \%in  = Internet reference number
     \%C   = Category
+    \%Ct  = Category Type
     \%U   = RecGroup
     \%hn  = Hostname of the machine where the file resides
     \%c   = Channel:  MythTV chanid
