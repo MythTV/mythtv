@@ -732,7 +732,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::PMT:
         {
             uint prog_num = psip.TableIDExtension();
-            _pat_status.SetSectionSeen(prog_num, version, psip.Section(),
+            _pmt_status.SetSectionSeen(prog_num, version, psip.Section(),
                                        psip.LastSection());
 
             ProgramMapTable pmt(psip);
