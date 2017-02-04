@@ -4,7 +4,7 @@
 
     <!-- Base Font Definitions -->
     <fontdef name="basesmall" face="Droid Sans">
-        <pixelsize>20</pixelsize>
+        <pixelsize>19</pixelsize>
         <color>#EEEEEE</color>
         <weight>bold</weight>
     </fontdef>
@@ -24,7 +24,7 @@
     </fontdef>
 
     <fontdef name="basemedium" from="basesmall" face="Liberation Sans">
-        <pixelsize>23</pixelsize>
+        <pixelsize>22</pixelsize>
     </fontdef>
 
     <fontdef name="basemediumbold" from="basemedium">
@@ -33,7 +33,7 @@
     </fontdef>
 
     <fontdef name="baselarge" from="basemedium">
-        <pixelsize>27</pixelsize>
+        <pixelsize>25</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>2,2</shadowoffset>
         <shadowalpha>100</shadowalpha>

@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QMutex>
 #include <QDateTime>
+#include <QTcpSocket>
+#include <QEventLoop>
 
 #include <cmath>
 #include <iostream>
@@ -41,6 +43,7 @@ using namespace std;
 #include "mythmiscutil.h"
 
 #include "mythplugin.h"
+#include "guistartup.h"
 
 #include <unistd.h> // for usleep(), gethostname
 
@@ -83,6 +86,13 @@ class MythContextPrivate : public QObject
     int     UPnPautoconf(const int milliSeconds = 2000);
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
+    void    ShowGuiStartup(void);
+    bool    CheckPort(QString &host, int port, int wakeupTime);
+    bool    processEvents(void);
+    bool    saveSettingsCache(void);
+    void    loadSettingsCacheOverride(void);
+    void    clearSettingsCacheOverride(void);
+
 
   protected:
     bool event(QEvent*);
@@ -108,11 +118,16 @@ class MythContextPrivate : public QObject
 
     MythUIHelper *m_ui;
     MythContextSlotHandler *m_sh;
+    GUIStartup *m_guiStartup;
+    QEventLoop *m_loop;
+    bool needsBackend;
 
   private:
     MythConfirmationDialog *MBEversionPopup;
     int m_registration;
     QDateTime m_lastCheck;
+    QTcpSocket *m_socket;
+    static const QString settingsToSave[];
 };
 
 static void exec_program_cb(const QString &cmd)
@@ -218,9 +233,13 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       disableeventpopup(false),
       m_ui(NULL),
       m_sh(new MythContextSlotHandler(this)),
+      m_guiStartup(0),
+      needsBackend(false),
       MBEversionPopup(NULL),
-      m_registration(-1)
+      m_registration(-1),
+      m_socket(0)
 {
+    m_loop = new QEventLoop(this);
     InitializeMythDirs();
 }
 
@@ -232,6 +251,12 @@ MythContextPrivate::~MythContextPrivate()
     {
         GetNotificationCenter()->UnRegister(this, m_registration, true);
     }
+
+    if (m_loop)
+    {
+        delete m_loop;
+    }
+
     if (m_ui)
         DestroyMythUI();
     if (m_sh)
@@ -255,11 +280,14 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
     SilenceDBerrors();
 
-    gCoreContext->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
+    loadSettingsCacheOverride();
+    parent->SetDisableEventPopup(true);
+
 #ifdef Q_OS_MAC
     // Qt 4.4 has window-focus problems
     gCoreContext->OverrideSettingForSession("RunFrontendInWindow", "1");
 #endif
+    GetMythUI()->Init();
     GetMythUI()->LoadQtConfig();
 
     MythMainWindow *mainWindow = MythMainWindow::getMainWindow(false);
@@ -275,9 +303,65 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
 void MythContextPrivate::EndTempWindow(void)
 {
-    DestroyMythMainWindow();
-    gCoreContext->ClearOverrideSettingForSession("Theme");
+    if (HasMythMainWindow())
+    {
+        if (m_guiStartup && !m_guiStartup->m_Exit)
+        {
+            MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+            if (mainStack) {
+                mainStack->PopScreen(m_guiStartup, false);
+                m_guiStartup = 0;
+            }
+        }
+        DestroyMythMainWindow();
+    }
+    clearSettingsCacheOverride();
+    parent->SetDisableEventPopup(false);
     EnableDBerrors();
+}
+
+// Check if a port is open
+// We cannot use the common routine telnet(host, port)
+// because that uses the database.
+bool MythContextPrivate::CheckPort(QString &host, int port, int timeLimit) {
+    LOG(VB_GENERAL, LOG_DEBUG, QString("host %1 port %2 timeLimit %3")
+        .arg(host).arg(port).arg(timeLimit));
+    int wakeupMillis = timeLimit * 1000;
+    MythTimer timer(MythTimer::kStartRunning);
+    m_socket = new QTcpSocket(this);
+    QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
+    int retryCount = 0;
+    while (state != QAbstractSocket::ConnectedState
+        && timer.elapsed() < wakeupMillis)
+    {
+        if (state == QAbstractSocket::UnconnectedState)
+        {
+            m_socket->connectToHost(host, port);
+            retryCount=0;
+        }
+        else
+            retryCount++;
+        if (retryCount > 6)
+            m_socket->abort();
+        if (processEvents())
+            break;
+        // Check if user got impatient and canceled
+        if (m_guiStartup) {
+            if (m_guiStartup->m_Exit
+              || m_guiStartup->m_Setup
+              || m_guiStartup->m_Retry)
+                break;
+        }
+        usleep(500000);
+        state = m_socket->state();
+        LOG(VB_GENERAL, LOG_DEBUG, QString("socket state %1")
+            .arg(state));
+    }
+    m_socket->abort();
+    processEvents();
+    delete m_socket;
+    m_socket = 0;
+    return (state == QAbstractSocket::ConnectedState);
 }
 
 bool MythContextPrivate::Init(const bool gui,
@@ -287,6 +371,9 @@ bool MythContextPrivate::Init(const bool gui,
 {
     gCoreContext->GetDB()->IgnoreDatabase(ignoreDB);
     m_gui = gui;
+
+    if (gCoreContext->IsFrontend())
+        needsBackend = true;
 
     // We don't have a database yet, so lets use the config.xml file.
     m_pConfig = new XmlConfiguration("config.xml");
@@ -298,7 +385,10 @@ bool MythContextPrivate::Init(const bool gui,
     // ---- database connection stuff ----
 
     if (!ignoreDB && !FindDatabase(promptForBackend, noPrompt))
+    {
+        EndTempWindow();
         return false;
+    }
 
     // ---- keep all DB-using stuff below this line ----
 
@@ -309,10 +399,18 @@ bool MythContextPrivate::Init(const bool gui,
         TempMainWindow(false);
         LanguageSelection::prompt();
         MythTranslation::load("mythfrontend");
-        EndTempWindow();
     }
     gCoreContext->InitLocale();
     gCoreContext->SaveLocaleDefaults();
+
+    // Close GUI Startup Window.
+    if (m_guiStartup) {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        if (mainStack)
+            mainStack->PopScreen(m_guiStartup, false);
+        m_guiStartup=0;
+    }
+    EndTempWindow();
 
     if (gui)
     {
@@ -373,6 +471,8 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
         failure = TestDBconnection();
         if (failure.isEmpty())
             goto DBfound;
+        if (m_guiStartup && m_guiStartup->m_Exit)
+            return false;
     }
 
 
@@ -389,6 +489,8 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
             failure = TestDBconnection();
             if (failure.isEmpty())
                 goto DBfound;
+            if (m_guiStartup && m_guiStartup->m_Exit)
+                return false;
         }
 
         // Multiple BEs, or needs PIN.
@@ -426,6 +528,8 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
         failure = TestDBconnection();
         if (!failure.isEmpty())
             LOG(VB_GENERAL, LOG_ALERT, failure);
+        if (m_guiStartup && m_guiStartup->m_Exit)
+            return false;
     }
     while (!failure.isEmpty());
 
@@ -652,49 +756,199 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
  */
 QString MythContextPrivate::TestDBconnection(void)
 {
-    bool    doPing = m_DBparams.dbHostPing;
     QString err    = QString::null;
     QString host   = m_DBparams.dbHostName;
 
+    // Jan 20, 2017
+    // Changed to use port check instead of ping
 
-    // 1. Check the supplied host or IP address, to prevent the app
-    //    appearing to hang if we cannot route to the machine:
+    bool configXmlFound
+        =    !(m_pConfig->GetValue(kDefaultDB + "Host", "")).isEmpty()
+          || !(m_pConfig->GetValue(kDefaultMFE + "DBHostName", "")).isEmpty();
+    int port = m_DBparams.dbPort;
 
-    // No need to ping myself
-    if ((host == "localhost") ||
-        (host == "127.0.0.1") ||
-        gCoreContext->IsThisHost(host))
-        doPing = false;
+    // 1 = db awake, 2 = db listening, 3 = db connects,
+    // 4 = backend awake, 5 = backend listening
+    // 9 = all ok, 10 = quit
 
-    // If WOL is setup, the backend might be sleeping:
-    if (doPing && m_DBparams.wolEnabled)
-        for (int attempt = 0; attempt < m_DBparams.wolRetry; ++attempt)
+    enum  startupStates {
+        st_start = 0,
+        st_dbAwake = 1,
+        st_dbStarted = 2,
+        st_dbConnects = 3,
+        st_beWOL = 4,
+        st_beAwake = 5,
+        st_success = 6
+    } startupState = st_start;
+
+    static const QString guiStatuses[7] =
+        {"start","dbAwake","dbStarted","dbConnects","beWOL","beAwake",
+            "success" };
+
+    if (configXmlFound)
+    {
+        do
         {
-            int wakeupTime = m_DBparams.wolReconnect;
+            int wakeupTime = 3;
+            int attempts = 11;
+            if (m_DBparams.wolEnabled) {
+                wakeupTime = m_DBparams.wolReconnect;
+                attempts = m_DBparams.wolRetry + 1;
+                startupState = st_start;
+            }
+            else
+                startupState = st_dbAwake;
+            if (attempts < 1)
+                attempts = 1;
+            if (wakeupTime < 1)
+                wakeupTime = 1;
 
-            if (ping(host, wakeupTime))
+            int progressTotal = wakeupTime * attempts;
+
+            if (m_guiStartup)
+                m_guiStartup->setTotal(progressTotal);
+
+            QString beWOLCmd = QString();
+            QString backendIP = QString();
+            int backendPort = 0;
+
+            for (int attempt = 0;
+                attempt <= attempts && startupState != st_success;
+                ++attempt)
             {
-                doPing = false;
+                // The first time do everything with minimum timeout and
+                // no GUI, for the normal case where all is OK
+                // After that show the GUI (if this is a GUI program)
+
+                LOG(VB_GENERAL, LOG_INFO,
+                     QString("Start up testing connections. host %1, attempt %2, status %3")
+                          .arg(host).arg(attempt).arg(guiStatuses[startupState]));
+
+                int useTimeout = wakeupTime;
+                if (attempt == 0)
+                    useTimeout=1;
+
+                if (m_gui && !m_guiStartup)
+                {
+                    if (attempt > 0)
+                    {
+                        ShowGuiStartup();
+                        if (m_guiStartup)
+                            m_guiStartup->setTotal(progressTotal);
+                    }
+                }
+                if (m_guiStartup)
+                {
+                    if (attempt > 0)
+                        m_guiStartup->setStatusState(guiStatuses[startupState]);
+                    m_guiStartup->setMessageState("empty");
+                    processEvents();
+                }
+                switch (startupState) {
+                case st_start:
+                    if (m_DBparams.wolEnabled)
+                    {
+                        if (attempt > 0)
+                            myth_system(m_DBparams.wolCommand);
+                        if (!CheckPort(host, port, useTimeout))
+                            break;
+                    }
+                    startupState = st_dbAwake;
+                    // Fall through to next case
+                case st_dbAwake:
+                    if (!CheckPort(host, port, useTimeout))
+                        break;
+                    startupState = st_dbStarted;
+                    // Fall through to next case
+                case st_dbStarted:
+                    EnableDBerrors();
+                    ResetDatabase();
+                    if (!MSqlQuery::testDBConnection())
+                    {
+                        for (int temp = 0; temp < useTimeout * 2 ; temp++)
+                        {
+                            if (processEvents())
+                                break;
+                            usleep(500000);
+                        }
+                        break;
+                    }
+                    startupState = st_dbConnects;
+                    // Fall through to next case
+                case st_dbConnects:
+                    if (needsBackend)
+                    {
+                        beWOLCmd = gCoreContext->GetSetting("WOLbackendCommand", "");
+                        if (!beWOLCmd.isEmpty())
+                        {
+                            wakeupTime += gCoreContext->GetNumSetting
+                                ("WOLbackendReconnectWaitTime", 0);
+                            attempts += gCoreContext->GetNumSetting
+                                ("WOLbackendConnectRetry", 0);
+                            useTimeout = wakeupTime;
+                            if (m_gui && !m_guiStartup && attempt == 0)
+                                useTimeout=1;
+                            progressTotal = wakeupTime * attempts;
+                            if (m_guiStartup)
+                                m_guiStartup->setTotal(progressTotal);
+                            startupState = st_beWOL;
+                        }
+                    }
+                    else {
+                        startupState = st_success;
+                        break;
+                    }
+                    backendIP = gCoreContext->GetSetting("MasterServerIP", "");
+                    backendPort = gCoreContext->GetNumSetting("MasterServerPort", 0);
+                    // Fall through to next case
+                case st_beWOL:
+                    if (!beWOLCmd.isEmpty()) {
+                        if (attempt > 0)
+                            myth_system(beWOLCmd);
+                        if (!CheckPort(backendIP, backendPort, useTimeout))
+                            break;
+                    }
+                    startupState = st_beAwake;
+                    // Fall through to next case
+                case st_beAwake:
+                    if (!CheckPort(backendIP, backendPort, useTimeout))
+                        break;
+                    startupState = st_success;
+                }
+                if (m_guiStartup)
+                {
+                    if (m_guiStartup->m_Exit
+                      || m_guiStartup->m_Setup
+                      || m_guiStartup->m_Retry)
+                        break;
+                }
+                if (processEvents())
+                    break;
+
+            }
+            if (startupState == st_success)
                 break;
+
+            QString stateMsg = guiStatuses[startupState];
+            stateMsg.append("Fail");
+            LOG(VB_GENERAL, LOG_INFO,
+                 QString("Start up failure. host %1, status %2")
+                      .arg(host).arg(stateMsg));
+
+            if (m_guiStartup
+              && !m_guiStartup->m_Exit
+              && !m_guiStartup->m_Setup
+              && !m_guiStartup->m_Retry)
+            {
+                m_guiStartup->updateProgress(true);
+                m_guiStartup->setStatusState(stateMsg);
+                m_guiStartup->setMessageState("makeselection");
+                m_loop->exec();
             }
 
-            LOG(VB_GENERAL, LOG_INFO,
-                     QString("Trying to wake up host %1, attempt %2")
-                          .arg(host).arg(attempt));
-            myth_system(m_DBparams.wolCommand);
-
-            LOG(VB_GENERAL, LOG_INFO,
-                     QString("Waiting for %1 seconds").arg(wakeupTime));
-            sleep(m_DBparams.wolReconnect);
-        }
-
-    if (doPing)
-    {
-        LOG(VB_GENERAL, LOG_INFO,
-                 QString("Testing network connectivity to '%1'").arg(host));
+        } while (m_guiStartup && m_guiStartup->m_Retry);
     }
-
-    if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
+    if (startupState < st_dbAwake)
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Pinging to %1 failed, database will be unavailable").arg(host));
         SilenceDBerrors();
@@ -704,20 +958,48 @@ QString MythContextPrivate::TestDBconnection(void)
         return err.arg(host);
     }
 
-
-    // 2. Try to login, et c:
-
-    // Current DB connection may have been silenced (invalid):
-    ResetDatabase();
-
-    if (!MSqlQuery::testDBConnection())
+    if (startupState < st_dbConnects)
     {
         SilenceDBerrors();
         return QObject::tr("Cannot login to database", "Backend Setup");
     }
 
+    if (startupState < st_success)
+    {
+        return QObject::tr("Cannot connect to backend", "Backend Setup");
+    }
+
+    // Current DB connection may have been silenced (invalid):
+    EnableDBerrors();
+    ResetDatabase();
+    saveSettingsCache();
 
     return QString::null;
+}
+
+// Show the Gui Startup window.
+// This is called if there is a delay in startup for any reason
+// such as the database being unavailable
+void MythContextPrivate::ShowGuiStartup(void)
+{
+    if (!m_gui)
+        return;
+    TempMainWindow(false);
+    MythMainWindow *mainWindow = GetMythMainWindow();
+    MythScreenStack *mainStack = mainWindow->GetMainStack();
+    if (mainStack) {
+        if (!m_guiStartup) {
+            m_guiStartup = new GUIStartup(mainStack,m_loop);
+            if (!m_guiStartup->Create()) {
+                delete m_guiStartup;
+                m_guiStartup = 0;
+            }
+            if (m_guiStartup) {
+                mainStack->AddScreen(m_guiStartup, false);
+                processEvents();
+            }
+        }
+    }
 }
 
 /**
@@ -1084,13 +1366,81 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
     }
 }
 
+// Process Events while waiting for connection
+// return true if progress is 100%
+bool MythContextPrivate::processEvents(void)
+{
+    bool ret = false;
+    if (m_guiStartup)
+        ret = m_guiStartup->updateProgress();
+    m_loop->processEvents(QEventLoop::AllEvents, 250);
+    m_loop->processEvents(QEventLoop::AllEvents, 250);
+    return ret;
+}
+
+// cache some settings in cache/contextcache.xml
+// only call this if the database is available.
+
+const QString MythContextPrivate::settingsToSave[] =
+{ "Theme", "Language", "Country", "GuiHeight",
+  "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow" };
+
+
+bool MythContextPrivate::saveSettingsCache(void)
+{
+    QString cacheDirName = GetConfDir() + "/cache/";
+    QDir dir(cacheDirName);
+    dir.mkpath(cacheDirName);
+    // remove prior cache in case it was corrupt
+    QFile::remove(cacheDirName+"contextcache.xml");
+    XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
+
+    clearSettingsCacheOverride();
+
+    static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
+    for (int ix = 0; ix < arraySize; ix++)
+    {
+        QString value = gCoreContext->GetSetting(settingsToSave[ix],QString());
+        if (!value.isEmpty())
+            config.SetValue("Settings/"+settingsToSave[ix],value);
+    }
+    return config.Save();
+}
+
+void MythContextPrivate::loadSettingsCacheOverride(void)
+{
+    XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
+    static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
+    for (int ix = 0; ix < arraySize; ix++)
+    {
+        QString value = config.GetValue("Settings/"+settingsToSave[ix],QString());
+        if (!value.isEmpty())
+            gCoreContext->OverrideSettingForSession(settingsToSave[ix], value);
+    }
+    QString language = gCoreContext->GetSetting("Language",QString());
+    MythTranslation::load("mythfrontend");
+}
+
+void MythContextPrivate::clearSettingsCacheOverride(void)
+{
+    QString language = gCoreContext->GetSetting("Language",QString());
+    static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
+    for (int ix = 0; ix < arraySize; ix++)
+    {
+        gCoreContext->ClearOverrideSettingForSession(settingsToSave[ix]);
+    }
+    if (language != gCoreContext->GetSetting("Language",QString()))
+        MythTranslation::load("mythfrontend");
+}
+
+
 void MythContextSlotHandler::VersionMismatchPopupClosed(void)
 {
     d->MBEversionPopup = NULL;
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
-MythContext::MythContext(const QString &binversion)
+MythContext::MythContext(const QString &binversion, bool needsBackend)
     : d(NULL), app_binary_version(binversion)
 {
 #ifdef _WIN32
@@ -1104,6 +1454,7 @@ MythContext::MythContext(const QString &binversion)
 #endif
 
     d = new MythContextPrivate(this);
+    d->needsBackend = needsBackend;
 
     gCoreContext = new MythCoreContext(app_binary_version, d);
 
@@ -1220,6 +1571,11 @@ DatabaseParams MythContext::GetDatabaseParams(void)
 bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
 {
     return d->SaveDatabaseParams(params, false);
+}
+
+bool MythContext::saveSettingsCache(void)
+{
+    return d->saveSettingsCache();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

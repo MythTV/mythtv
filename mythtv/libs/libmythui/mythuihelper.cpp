@@ -437,6 +437,15 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
         .arg(d->m_maxCacheSize.fetchAndAddRelease(0)));
 }
 
+// This init is used for showing the startup UI that is shown
+// before the database is initialized. The above init is called later,
+// after the DB is available.
+// This class does not mind being Initialized twice.
+void MythUIHelper::Init(void)
+{
+    d->Init();
+}
+
 MythUIMenuCallbacks *MythUIHelper::GetMenuCBs(void)
 {
     return &(d->callbacks);
