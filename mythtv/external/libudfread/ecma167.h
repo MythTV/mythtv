@@ -149,12 +149,21 @@ void decode_logical_volume(const uint8_t *p, struct logical_volume_descriptor *l
  * Part 4: File Structure
  */
 
+enum {
+    ECMA_AD_EXTENT_NORMAL = 0,        /* allocated and recorded file data */
+    ECMA_AD_EXTENT_NOT_RECORDED = 1,
+    ECMA_AD_EXTENT_NOT_ALLOCATED = 2,
+    ECMA_AD_EXTENT_AD = 3,            /* pointer to next extent of allocation descriptors */
+};
+
+
 /* Short/Long/Extended Allocation Descriptor (ECMA 167, 4/14.14.[1,2,3]) */
 
 struct long_ad {
     uint32_t lba;    /* start block, relative to partition start */
     uint32_t length; /* in bytes */
     uint16_t partition;
+    uint8_t  extent_type;
 };
 
 void decode_long_ad(const uint8_t *p, struct long_ad *ad);

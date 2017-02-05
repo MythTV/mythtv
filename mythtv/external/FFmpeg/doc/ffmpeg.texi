@@ -223,7 +223,7 @@ with the highest resolution, for audio, it is the stream with the most channels,
 subtitles, it is the first subtitle stream. In the case where several streams of
 the same type rate equally, the stream with the lowest index is chosen.
 
-You can disable some of those defaults by using the @code{-vn/-an/-sn} options. For
+You can disable some of those defaults by using the @code{-vn/-an/-sn/-dn} options. For
 full manual control, use the @code{-map} option, which disables the defaults just
 described.
 
@@ -720,7 +720,7 @@ For DXVA2, this option should contain the number of the display adapter to use.
 If this option is not specified, the default adapter is used.
 
 @item qsv
-For QSV, this option corresponds to the valus of MFX_IMPL_* . Allowed values
+For QSV, this option corresponds to the values of MFX_IMPL_* . Allowed values
 are:
 @table @option
 @item auto
@@ -1008,7 +1008,7 @@ Dump each input packet to stderr.
 @item -hex (@emph{global})
 When dumping packets, also dump the payload.
 @item -re (@emph{input})
-Read input at native frame rate. Mainly used to simulate a grab device.
+Read input at native frame rate. Mainly used to simulate a grab device,
 or live input stream (e.g. when reading from a file). Should not be used
 with actual grab devices or live input streams (where it can cause packet
 loss).
@@ -1278,6 +1278,15 @@ No packets were passed to the muxer, the output is empty.
 
 @item -xerror (@emph{global})
 Stop and exit on error
+
+@item -max_muxing_queue_size @var{packets} (@emph{output,per-stream})
+When transcoding audio and/or video streams, ffmpeg will not begin writing into
+the output until it has one packet for each such stream. While waiting for that
+to happen, packets for other streams are buffered. This option sets the size of
+this buffer, in packets, for the matching output stream.
+
+The default value of this option should be high enough for most uses, so only
+touch this option if you are sure that you need it.
 
 @end table
 

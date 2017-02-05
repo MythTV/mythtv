@@ -25,7 +25,7 @@ class PIDInfo
   public:
     PIDInfo() :
         _pid(0xffffffff), filter_fd(-1), streamType(0), pesType(-1) {;}
-    PIDInfo(uint pid) :
+    explicit PIDInfo(uint pid) :
         _pid(pid),        filter_fd(-1), streamType(0), pesType(-1) {;}
     PIDInfo(uint pid, uint stream_type, int pes_type) :
         _pid(pid),                       filter_fd(-1),
@@ -69,7 +69,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     virtual void RemoveNamedOutputFile(const QString &filename);
 
   protected:
-    StreamHandler(const QString &device);
+    explicit StreamHandler(const QString &device);
     ~StreamHandler();
 
     void Start(void);

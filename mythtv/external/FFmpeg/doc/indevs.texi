@@ -251,6 +251,32 @@ To use this option, ffmpeg needs to be compiled with @code{--enable-libzvbi}.
 Defines number of audio channels to capture. Must be @samp{2}, @samp{8} or @samp{16}.
 Defaults to @samp{2}.
 
+@item duplex_mode
+Sets the decklink device duplex mode. Must be @samp{unset}, @samp{half} or @samp{full}.
+Defaults to @samp{unset}.
+
+@item video_input
+Sets the video input source. Must be @samp{unset}, @samp{sdi}, @samp{hdmi},
+@samp{optical_sdi}, @samp{component}, @samp{composite} or @samp{s_video}.
+Defaults to @samp{unset}.
+
+@item audio_input
+Sets the audio input source. Must be @samp{unset}, @samp{embedded},
+@samp{aes_ebu}, @samp{analog}, @samp{analog_xlr}, @samp{analog_rca} or
+@samp{microphone}. Defaults to @samp{unset}.
+
+@item video_pts
+Sets the video packet timestamp source. Must be @samp{video}, @samp{audio},
+@samp{reference} or @samp{wallclock}. Defaults to @samp{video}.
+
+@item audio_pts
+Sets the audio packet timestamp source. Must be @samp{video}, @samp{audio},
+@samp{reference} or @samp{wallclock}. Defaults to @samp{audio}.
+
+@item draw_bars
+If set to @samp{true}, color bars are drawn in the event of a signal loss.
+Defaults to @samp{true}.
+
 @end table
 
 @subsection Examples
@@ -656,7 +682,7 @@ is an exact value. For HDV, it is not frame exact, since HDV does
 not have a fixed frame size.
 
 @item dvguid
-Select the capture device by specifying it's GUID. Capturing will only
+Select the capture device by specifying its GUID. Capturing will only
 be performed from the specified device and fails if no device with the
 given GUID is found. This is useful to select the input if multiple
 devices are connected at the same time.
@@ -1319,7 +1345,7 @@ ffmpeg -f x11grab -framerate 25 -video_size cif -i :0.0+10,20 out.mpg
 
 @table @option
 @item draw_mouse
-Specify whether to draw the mouse pointer. A value of @code{0} specify
+Specify whether to draw the mouse pointer. A value of @code{0} specifies
 not to draw the pointer. Default value is @code{1}.
 
 @item follow_mouse

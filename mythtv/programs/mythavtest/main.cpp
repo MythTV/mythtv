@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
     else if (cmdline.GetArgs().size() >= 1)
         filename = cmdline.GetArgs()[0];
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext = new MythContext(MYTH_BINARY_VERSION, true);
     if (!gContext->Init())
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");

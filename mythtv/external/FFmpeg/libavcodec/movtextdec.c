@@ -99,6 +99,7 @@ typedef struct {
     uint64_t tracksize;
     int size_var;
     int count_s, count_f;
+    int readorder;
 } MovTextContext;
 
 typedef struct {
@@ -424,7 +425,7 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
 {
     AVSubtitle *sub = data;
     MovTextContext *m = avctx->priv_data;
-    int ret, ts_start, ts_end;
+    int ret;
     AVBPrint buf;
     char *ptr = avpkt->data;
     char *end;
@@ -454,13 +455,6 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
     end = ptr + FFMIN(2 + text_length, avpkt->size);
     ptr += 2;
 
-    ts_start = av_rescale_q(avpkt->pts,
-                            avctx->time_base,
-                            (AVRational){1,100});
-    ts_end   = av_rescale_q(avpkt->pts + avpkt->duration,
-                            avctx->time_base,
-                            (AVRational){1,100});
-
     tsmb_size = 0;
     m->tracksize = 2 + text_length;
     m->style_entries = 0;
@@ -476,6 +470,10 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
             tsmb += 4;
             tsmb_type = AV_RB32(tsmb);
             tsmb += 4;
+
+            if (tsmb_size == 0) {
+              return AVERROR_INVALIDDATA;
+            }
 
             if (tsmb_size == 1) {
                 if (m->tracksize + 16 > avpkt->size)
@@ -506,7 +504,7 @@ static int mov_text_decode_frame(AVCodecContext *avctx,
     } else
         text_to_ass(&buf, ptr, end, m);
 
-    ret = ff_ass_add_rect_bprint(sub, &buf, ts_start, ts_end - ts_start);
+    ret = ff_ass_add_rect(sub, buf.str, m->readorder++, 0, NULL, NULL);
     av_bprint_finalize(&buf, NULL);
     if (ret < 0)
         return ret;
@@ -521,6 +519,13 @@ static int mov_text_decode_close(AVCodecContext *avctx)
     return 0;
 }
 
+static void mov_text_flush(AVCodecContext *avctx)
+{
+    MovTextContext *m = avctx->priv_data;
+    if (!(avctx->flags2 & AV_CODEC_FLAG2_RO_FLUSH_NOOP))
+        m->readorder = 0;
+}
+
 AVCodec ff_movtext_decoder = {
     .name         = "mov_text",
     .long_name    = NULL_IF_CONFIG_SMALL("3GPP Timed Text subtitle"),
@@ -530,4 +535,5 @@ AVCodec ff_movtext_decoder = {
     .init         = mov_text_init,
     .decode       = mov_text_decode_frame,
     .close        = mov_text_decode_close,
+    .flush        = mov_text_flush,
 };

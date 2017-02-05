@@ -264,6 +264,7 @@ class AvFormatDecoder : public DecoderBase
     virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
     virtual void StreamChangeCheck(void) { }
     virtual void PostProcessTracks(void) { }
+    virtual bool IsValidStream(int streamid) {return true;}
 
     int DecodeAudio(AVCodecContext *ctx, uint8_t *buffer, int &data_size,
                     AVPacket *pkt);

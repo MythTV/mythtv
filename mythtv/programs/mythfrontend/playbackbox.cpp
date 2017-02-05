@@ -679,6 +679,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
 {
     InfoMap infoMap;
     int countInGroup;
+    QString desc;
 
     infoMap["group"] = m_groupDisplayName;
     infoMap["title"] = grouplabel;
@@ -712,10 +713,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         }
     }
 
-    QString desc = tr("There is/are %n recording(s) in this display group",
-                      "", countInGroup);
 
-    if (countInGroup > 1)
+    if (countInGroup >= 1)
     {
         ProgramList  group     = m_progLists[groupname];
         float        groupSize = 0.0;
@@ -736,10 +735,13 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
             }
         }
 
-        desc += tr(", which consume %1");
-        desc += tr("GB", "GigaBytes");
-
-        desc = desc.arg(groupSize / 1024.0 / 1024.0 / 1024.0, 0, 'f', 2);
+        desc = tr("There is/are %n recording(s) in this display "
+                  "group, which consume(s) %1 GiB.", "", countInGroup)
+               .arg(groupSize / 1024.0 / 1024.0 / 1024.0, 0, 'f', 2);
+    }
+    else
+    {
+        desc = tr("There is no recording in this display group.");
     }
 
     infoMap["description"] = desc;
@@ -2997,10 +2999,10 @@ MythMenu* PlaybackBox::createPlayFromMenu()
 
     if (pginfo->IsBookmarkSet())
         menu->AddItem(tr("Play from bookmark"), SLOT(PlayFromBookmark()));
-    menu->AddItem(tr("Play from beginning"), SLOT(PlayFromBeginning()));
     if (pginfo->QueryLastPlayPos())
         menu->AddItem(tr("Play from last played position"),
                       SLOT(PlayFromLastPlayPos()));
+    menu->AddItem(tr("Play from beginning"), SLOT(PlayFromBeginning()));
 
     return menu;
 }
@@ -3317,9 +3319,6 @@ QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
     if (!pginfo.GetSubtitle().isEmpty())
     {
         extra = QString('\n') + pginfo.GetSubtitle();
-        int maxll = max(title.length(), 20);
-        if (extra.length() > maxll)
-            extra = extra.left(maxll - 3) + "...";
     }
 
     return QString("\n%1%2\n%3").arg(title).arg(extra).arg(timedate);

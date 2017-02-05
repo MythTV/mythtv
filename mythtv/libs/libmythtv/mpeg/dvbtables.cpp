@@ -108,6 +108,8 @@ QString ServiceDescriptionTable::toString(void) const
         QString("SDT: TSID(0x%1) original_network_id(0x%2) services(%3)\n")
         .arg(TSID(), 0, 16).arg(OriginalNetworkID(), 0, 16)
         .arg(ServiceCount());
+    str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
+        .arg(Section()).arg(LastSection()).arg(IsCurrent()));
 
     for (uint i = 0; i < ServiceCount(); i++)
     {

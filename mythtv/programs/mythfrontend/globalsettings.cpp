@@ -37,6 +37,7 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 #include "mythuidefines.h"
+#include "langsettings.h"
 
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"

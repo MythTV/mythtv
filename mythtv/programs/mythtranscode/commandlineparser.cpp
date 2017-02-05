@@ -113,5 +113,7 @@ void MythTranscodeCommandLineParser::LoadArguments(void)
         ->SetChildOf("hls");
     add("--hlsstreamid", "hlsstreamid", -1, "Stream ID to process", "")
         ->SetChildOf("hls");
+    add(QStringList(QStringList() << "-d" << "--delete" ), "delete", false,
+            "Delete original after successful transcoding", "")
+        ->SetGroup("Encoding");
 }
-

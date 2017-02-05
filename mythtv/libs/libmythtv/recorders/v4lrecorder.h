@@ -24,7 +24,7 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
 {
     friend class VBIThread;
   public:
-    V4LRecorder(TVRec *rec);
+    explicit V4LRecorder(TVRec *rec);
     virtual ~V4LRecorder();
 
     virtual void StopRecording(void); // RecorderBase
@@ -61,7 +61,7 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
 class VBIThread : public MThread
 {
   public:
-    VBIThread(V4LRecorder *_parent) :
+    explicit VBIThread(V4LRecorder *_parent) :
         MThread("VBIThread"), parent(_parent)
     {
         start();

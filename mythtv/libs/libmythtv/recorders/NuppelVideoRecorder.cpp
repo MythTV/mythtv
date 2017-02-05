@@ -930,10 +930,9 @@ void NuppelVideoRecorder::InitBuffers(void)
 
     if (!video_buffer_size)
     {
-        if (picture_format == AV_PIX_FMT_YUV422P)
-            video_buffer_size = w_out * h_out * 2;
-        else
-            video_buffer_size = w_out * h_out * 3 / 2;
+        video_buffer_size =
+            buffersize(picture_format == AV_PIX_FMT_YUV422P ? FMT_YUV422P : FMT_YV12,
+                       w_out, h_out);
     }
 
     if (width >= 480 || height > 288)
@@ -2878,18 +2877,14 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     lzo_uint out_len = OUT_LEN;
     struct rtframeheader frameheader;
     int raw = 0, compressthis = compression;
-    uint8_t *planes[3];
-    int len = frame->size;
+    uint8_t *planes[3] = {
+        frame->buf + frame->offsets[0],
+        frame->buf + frame->offsets[1],
+        frame->buf + frame->offsets[2] };
     int fnum = frame->frameNumber;
     long long timecode = frame->timecode;
-    unsigned char *buf = frame->buf;
 
     memset(&frameheader, 0, sizeof(frameheader));
-
-    planes[0] = buf;
-    planes[1] = planes[0] + frame->width * frame->height;
-    planes[2] = planes[1] + (frame->width * frame->height) /
-                            (picture_format == AV_PIX_FMT_YUV422P ? 2 : 4);
 
     if (lf == 0)
     {   // this will be triggered every new file
@@ -2949,23 +2944,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     if (useavcodec)
     {
         MythAVFrame mpa_picture;
-
-        switch (picture_format)
-        {
-            case AV_PIX_FMT_YUV420P:
-            case AV_PIX_FMT_YUV422P:
-            case AV_PIX_FMT_YUVJ420P:
-                mpa_picture->linesize[0] = w_out;
-                mpa_picture->linesize[1] = w_out / 2;
-                mpa_picture->linesize[2] = w_out / 2;
-                break;
-        }
-        mpa_picture->data[0] = planes[0];
-        mpa_picture->data[1] = planes[1];
-        mpa_picture->data[2] = planes[2];
-        mpa_picture->linesize[0] = frame->width;
-        mpa_picture->linesize[1] = frame->width / 2;
-        mpa_picture->linesize[2] = frame->width / 2;
+        AVPictureFill(mpa_picture, frame);
 
         if (wantkeyframe)
             mpa_picture->pict_type = AV_PICTURE_TYPE_I;
@@ -2977,7 +2956,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             AVPacket packet;
             av_init_packet(&packet);
             packet.data = (uint8_t *)strm;
-            packet.size = len;
+            packet.size = frame->size;
 
             int got_packet = 0;
 
@@ -3021,14 +3000,14 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             tmp = rtjc->Compress(strm, planes);
         }
         else
-            tmp = len;
+            tmp = frame->size;
 
         // here is lzo compression afterwards
         if (compressthis)
         {
             int r = 0;
             if (raw)
-                r = lzo1x_1_compress((unsigned char*)buf, len,
+                r = lzo1x_1_compress((unsigned char*)frame->buf, frame->size,
                                      out, &out_len, wrkmem);
             else
                 r = lzo1x_1_compress((unsigned char *)strm, tmp, out,
@@ -3052,16 +3031,16 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         if (mpa_vidcodec->id == AV_CODEC_ID_RAWVIDEO)
         {
             frameheader.comptype = '0';
-            frameheader.packetlength = len;
+            frameheader.packetlength = frame->size;
             WriteFrameheader(&frameheader);
-            ringBuffer->Write(buf, len);
+            ringBuffer->Write(frame->buf, frame->size);
         }
         else if (hardware_encode)
         {
             frameheader.comptype = '4';
-            frameheader.packetlength = len;
+            frameheader.packetlength = frame->size;
             WriteFrameheader(&frameheader);
-            ringBuffer->Write(buf, len);
+            ringBuffer->Write(frame->buf, frame->size);
         }
         else
         {
@@ -3083,9 +3062,9 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         else
         {
             frameheader.comptype  = '0'; // raw YUV420
-            frameheader.packetlength = len;
+            frameheader.packetlength = frame->size;
             WriteFrameheader(&frameheader);
-            ringBuffer->Write(buf, len); // we write buf directly
+            ringBuffer->Write(frame->buf, frame->size); // we write buf directly
         }
     }
     else

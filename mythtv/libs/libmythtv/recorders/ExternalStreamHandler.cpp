@@ -68,7 +68,7 @@ ExternIO::~ExternIO(void)
     delete[] m_buffer;
 }
 
-bool ExternIO::Ready(int fd, int timeout)
+bool ExternIO::Ready(int fd, int timeout, const QString & what)
 {
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
     struct pollfd m_poll[2];
@@ -80,7 +80,7 @@ bool ExternIO::Ready(int fd, int timeout)
 
     if (m_poll[0].revents & POLLHUP)
     {
-        m_error = "poll eof (POLLHUP)";
+        m_error = what + " poll eof (POLLHUP)";
         return false;
     }
     else if (m_poll[0].revents & POLLNVAL)
@@ -111,8 +111,9 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
         return 0;
     }
 
-    if (!Ready(m_appout, timeout))
+    if (!Ready(m_appout, timeout, "data"))
         return 0;
+
     if (m_bufsize < maxlen)
     {
         m_bufsize = maxlen;
@@ -150,7 +151,7 @@ QString ExternIO::GetStatus(int timeout)
         return QByteArray();
     }
 
-    if (!Ready(m_apperr, timeout))
+    if (!Ready(m_apperr, timeout, "status"))
         return QByteArray();
 
     char buffer[2048];
@@ -485,6 +486,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref)
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternSH: Closing handler for %1")
                            .arg(devname));
+        (*it)->CloseApp();
         delete *it;
         m_handlers.erase(it);
     }
@@ -542,6 +544,9 @@ void ExternalStreamHandler::run(void)
     QByteArray buffer;
     uint       len, read_len;
     uint       empty_cnt = 0;
+    MythTimer timer;
+
+    timer.start();
 
     RunProlog();
 
@@ -601,7 +606,7 @@ void ExternalStreamHandler::run(void)
             m_notify = false;
         }
 
-        while (buffer.size() > 188*50 ||
+        while (read_len = 0, buffer.size() > 188*50 ||
                (read_len = m_IO->Read(buffer, PACKET_SIZE, 100)) > 0)
         {
             if (m_IO->Error())
@@ -614,8 +619,11 @@ void ExternalStreamHandler::run(void)
                 break;
             }
 
-            if (!_running_desired)
+            if (!_running_desired || _error)
                 break;
+
+            if (read_len > 0)
+                empty_cnt = 0;
 
             if (!_listener_lock.tryLock())
                 continue;
@@ -629,18 +637,38 @@ void ExternalStreamHandler::run(void)
 
             if (xon)
             {
-                if (!m_poll_mode)
+                if (timer.elapsed() >= 2000)
                 {
-                    ProcessCommand(QString("XOFF"), 50, result);
-                    if (result.startsWith("ERR"))
+                    // Since we may never need to send the XOFF
+                    // command, occationally check to see if the
+                    // External recorder needs to report an issue.
+                    if (CheckForError())
                     {
-                        LOG(VB_GENERAL, LOG_ERR, LOC +
-                            QString("Aborting: XOFF -> %2")
-                            .arg(result));
-                        _error = true;
+                        buffer.clear();
+                        RestartStream();
+                        xon = false;
+                        break;
                     }
+                    timer.restart();
                 }
-                xon = false;
+
+                if (buffer.size() > TOO_FAST_SIZE)
+                {
+                    if (!m_poll_mode)
+                    {
+                        // Data is comming a little too fast, so XOFF
+                        // to give us time to process it.
+                        ProcessCommand(QString("XOFF"), 50, result);
+                        if (result.startsWith("ERR"))
+                        {
+                            LOG(VB_GENERAL, LOG_ERR, LOC +
+                                QString("Aborting: XOFF -> %2")
+                                .arg(result));
+                            _error = true;
+                        }
+                    }
+                    xon = false;
+                }
             }
 
             StreamDataList::const_iterator sit = _stream_data_list.begin();
@@ -677,6 +705,7 @@ void ExternalStreamHandler::run(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Error from External Recorder: %1")
                 .arg(m_error));
+            CloseApp();
             break;
         }
     }
@@ -814,7 +843,7 @@ void ExternalStreamHandler::CloseApp(void)
 
         if (!ok)
             m_error = result;
-        else if (!result.startsWith("OK:Terminating"))
+        if (!result.startsWith("OK:Terminating"))
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 "CloseRecorder failed, sending kill.");
@@ -826,6 +855,29 @@ void ExternalStreamHandler::CloseApp(void)
         m_IO = 0;
     }
     m_IO_lock.unlock();
+}
+
+bool ExternalStreamHandler::RestartStream(void)
+{
+    bool streaming = (StreamingCount() > 0);
+    int  idx;
+
+    LOG(VB_RECORD, LOG_INFO, LOC + "Restarting stream.");
+
+    if (streaming)
+    {
+        if (!StopStreaming())
+            return false;
+    }
+
+    usleep(500000);
+
+    if (streaming)
+    {
+        return StartStreaming(false);
+    }
+
+    return true;
 }
 
 bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
@@ -961,8 +1013,83 @@ bool ExternalStreamHandler::StopStreaming(void)
 bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
                                            QString & result)
 {
+    bool okay;
+
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessCommand('%1')")
         .arg(cmd));
+
+    for (int idx = 0; idx < 10; ++idx)
+    {
+        QMutexLocker locker(&m_IO_lock);
+
+        if (!m_IO)
+        {
+            m_error = "External I/O not ready!";
+            LOG(VB_RECORD, LOG_ERR, LOC + m_error);
+            return false;
+        }
+
+        QByteArray buf(cmd.toUtf8(), cmd.size());
+        buf += '\n';
+
+        if (m_IO->Error())
+        {
+            LOG(VB_GENERAL, LOG_ERR, "External Recorder in bad state: " +
+                m_IO->ErrorString());
+            return false;
+        }
+
+        /* Try to keep in sync, if External app was too slow in responding
+         * to previous query, consume the response before sending new query */
+        m_IO->GetStatus(0);
+
+        /* Send new query */
+        m_IO->Write(buf);
+        result = m_IO->GetStatus(timeout);
+        if (m_IO->Error())
+        {
+            m_error = m_IO->ErrorString();
+            _error = true;
+            LOG(VB_GENERAL, LOG_ERR, "Failed to read from External Recorder: " +
+                m_error);
+            return false;
+        }
+
+        if (result.size() < 1)
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                QString("External Recorder did not respond to '%1'").arg(cmd));
+        else
+        {
+            okay = result.startsWith("OK");
+            if (okay || result.startsWith("WARN") || result.startsWith("ERR"))
+            {
+                m_io_errcnt = 0;
+
+                m_notify |= (!okay || !cmd.startsWith("SendBytes"));
+                LOG(VB_RECORD, m_notify ? LOG_INFO : LOG_DEBUG,
+                    LOC + QString("ProcessCommand('%1') = '%2'")
+                    .arg(cmd).arg(result));
+                m_notify = false;
+
+                return okay;
+            }
+            else
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("External Recorder invalid response to '%1': '%2'")
+                    .arg(cmd).arg(result));
+        }
+
+        if (++m_io_errcnt > 10)
+            _error = true;
+        usleep(timeout);
+    }
+
+    return false;
+}
+
+bool ExternalStreamHandler::CheckForError(void)
+{
+    QString result;
 
     QMutexLocker locker(&m_IO_lock);
 
@@ -970,53 +1097,18 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
     {
         m_error = "External I/O not ready!";
         LOG(VB_RECORD, LOG_ERR, LOC + m_error);
-        return false;
+        return true;
     }
-
-    QByteArray buf(cmd.toUtf8(), cmd.size());
-    buf += '\n';
 
     if (m_IO->Error())
     {
         LOG(VB_GENERAL, LOG_ERR, "External Recorder in bad state: " +
             m_IO->ErrorString());
-        return false;
+        return true;
     }
 
-    /* Try to keep in sync, if External app was too slow in responding
-     * to previous query, consume the response before sending new query */
-    m_IO->GetStatus(5);
-
-    /* Send new query */
-    m_IO->Write(buf);
-    result = m_IO->GetStatus(timeout);
-    if (m_IO->Error())
-    {
-        m_error = m_IO->ErrorString();
-        _error = true;
-        LOG(VB_GENERAL, LOG_ERR, "Failed to read from External Recorder: " +
-            m_error);
-        return false;
-    }
-
-    if (result.size() < 1)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("External Recorder did not respond to '%1'").arg(cmd));
-        if (++m_io_errcnt > 10)
-            _error = true;
-        return false;
-    }
-    else
-        m_io_errcnt = 0;
-
-    m_notify |= (!result.startsWith("OK") ||
-                 (!cmd.startsWith("SendBytes") && !cmd.startsWith("XO")));
-    LOG(VB_RECORD, m_notify ? LOG_INFO : LOG_DEBUG,
-        LOC + QString("ProcessCommand('%1') = '%2'").arg(cmd).arg(result));
-    m_notify = false;
-
-    return result.startsWith("OK");
+    result = m_IO->GetStatus(0);
+    return (result.startsWith("ERR"));
 }
 
 void ExternalStreamHandler::PurgeBuffer(void)

@@ -36,7 +36,7 @@ class TVRec;
 class DTVChannel : public ChannelBase
 {
   public:
-    DTVChannel(TVRec *parent);
+    explicit DTVChannel(TVRec *parent);
     virtual ~DTVChannel();
 
     // Commands

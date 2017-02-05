@@ -13,8 +13,8 @@
 class RTPFECPacket : public UDPPacket
 {
   public:
-    RTPFECPacket(const UDPPacket &o) : UDPPacket(o) { }
-    RTPFECPacket(uint64_t key) : UDPPacket(key) { }
+    explicit RTPFECPacket(const UDPPacket &o) : UDPPacket(o) { }
+    explicit RTPFECPacket(uint64_t key) : UDPPacket(key) { }
     RTPFECPacket(void) : UDPPacket(0ULL) { }
 
     // TODO

@@ -53,8 +53,8 @@ version 1.0.17.
 
 See the UPGRADING file for information on upgrading between releases.
 
-Compiling and setup instructions are all in the documentation in the docs/
-subdir (or at http://www.mythtv.org/docs/ ) these days.  Read those carefully.
+Compiling and setup instructions are all in the wiki these day
+https://www.mythtv.org/wiki/MythTV-HOWTO
 
 keys.txt has a listing of all the various default key bindings.  All
 keybindings can be changed via MythWeb.

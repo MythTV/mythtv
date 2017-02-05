@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+<mythuitheme>
+
+    <window name="status">
+
+        <textarea name="heading">
+            <area>30,10,740,40</area>
+            <font>baselarge</font>
+            <value>System Status</value>
+        </textarea>
+
+        <shape name="list_background" from="basebackground">
+            <area>15,100,770,280</area>
+        </shape>
+
+        <buttonlist name="category">
+            <area>15,50,770,30</area>
+            <layout>horizontal</layout>
+            <wrapstyle>selection</wrapstyle>
+            <spacing>6</spacing>
+            <buttonarea>15,0,740,40</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,180,40</area>
+                    <shape name="background" from="basewidgetshape" />
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,0,180,40</area>
+                        <font>basesmall</font>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="background" from="baseselectedwidgetshape" />
+                </state>
+                <state name="selectedinactive" from="active">
+                    <textarea name="buttontext">
+                        <font>basesmallgrey</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>756,10</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-rtarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-rtarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>0,10</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-ltarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-ltarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <buttonlist name="log" from="basebuttonlist2">
+            <area>20,108,760,320</area>
+            <buttonarea>0,0,760,270</buttonarea>
+
+            <statetype name="upscrollarrow">
+                <position>700,280</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>730,280</position>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="helplabel">
+            <area>30,390,740,30</area>
+            <value>Details</value>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>40,430,730,150</area>
+            <value>This screen displays the status of various system components</value>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
+    <window name="standbymode">
+        <fontdef name="info" from="basesmall">
+            <color>#ffffff</color>
+            <size>14</size>
+            <weight>bold</weight>
+        </fontdef>
+
+        <fontdef name="warning" from="basesmall">
+            <color>#ff0000</color>
+            <size>14</size>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>2,2</shadowoffset>
+            <weight>bold</weight>
+        </fontdef>
+
+        <fontdef name="clock" from="small">
+            <pixelsize>25</pixelsize>
+        </fontdef>
+
+        <clock name="clock">
+            <area>488,33,300,33</area>
+            <font>clock</font>
+            <template>%DATE%, %TIME%</template>
+            <align>center</align>
+        </clock>
+
+        <imagetype name="watermark">
+            <position>15,23</position>
+            <filename>title/title_main.png</filename>
+        </imagetype>
+
+        <imagetype name="logo">
+            <position>19,495</position>
+            <filename>ui/mythtv_logo.png</filename>
+        </imagetype>
+
+        <group name="popup">
+            <area>0,58,800,333</area>
+
+            <textarea name="heading">
+                <area>13,0,775,33</area>
+                <font>baseextralarge</font>
+                <align>allcenter</align>
+                <value>MythTV is in standby</value>
+            </textarea>
+
+            <statetype name="backendstatus">
+                <area>13,46,775,83</area>
+                <state name="idle">
+                    <area>0,0,775,83</area>
+                    <imagetype name="icon">
+                        <area>281,8,50,67</area>
+                        <filename>watermark/play.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <area>344,8,375,67</area>
+                        <font>basemedium</font>
+                        <align>left,vcenter</align>
+                        <value>Backend is idle</value>
+                        <multiline>true</multiline>
+                    </textarea>
+                </state>
+                <state name="recording" from="idle">
+                    <imagetype name="icon">
+                        <filename>watermark/record.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <value>Backend is recording</value>
+                    </textarea>
+                </state>
+                <state name="shuttingdown" from="idle">
+                    <imagetype name="icon">
+                        <filename>watermark/big_arrow_down.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <value>Backend is shutting down</value>
+                    </textarea>
+                </state>
+                <state name="offline" from="idle">
+                    <imagetype name="icon">
+                        <filename>watermark/error.png</filename>
+                    </imagetype>
+                    <textarea name="status">
+                        <value>Backend is offline</value>
+                    </textarea>
+                </state>
+            </statetype>
+
+            <imagetype name="horizon_top">
+                <position>166,142</position>
+                <filename>ui/horizon.png</filename>
+                <alpha>100</alpha>
+            </imagetype>
+
+            <textarea name="currentrecordingheading">
+                <area>13,150,775,25</area>
+                <font>label</font>
+                <align>allcenter</align>
+                <value>Current Recordings</value>
+            </textarea>
+
+            <textarea name="nothingrecording" depends="!currentrecording">
+                <area>13,175,775,42</area>
+                <font>info</font>
+                <value>There are no recordings currently taking place</value>
+                <align>allcenter</align>
+            </textarea>
+
+            <buttonlist name="currentrecording">
+                <area>13,175,775,96</area>
+                <layout>vertical</layout>
+                <spacing>4</spacing>
+                <buttonarea>0,0,100%,100%</buttonarea>
+                <statetype name="buttonitem">
+                    <area>0,0,63,22</area>
+                    <state name="active">
+                        <textarea name="title">
+                            <font>basesmall</font>
+                            <align>allcenter</align>
+                            <area>0,1,775,20</area>
+                            <template>%TITLESUBTITLE% on %CHANNAME% (%SHORTTIMEDATE%)</template>
+                        </textarea>
+                    </state>
+                    <state name="selectedactive" from="active"/>
+                    <state name="selectedinactive" from="selectedactive" />
+                </statetype>
+            </buttonlist>
+
+            <imagetype name="horizon_middle">
+                <position>166,283</position>
+                <filename>ui/horizon.png</filename>
+                <alpha>100</alpha>
+            </imagetype>
+
+            <textarea name="nextrecordingheading">
+                <area>13,292,775,25</area>
+                <font>label</font>
+                <align>allcenter</align>
+                <value>Next recordings</value>
+            </textarea>
+
+            <textarea name="nothingscheduled" depends="!nextrecording">
+                <area>13,317,775,42</area>
+                <font>info</font>
+                <value>There are no scheduled recordings</value>
+                <align>allcenter</align>
+            </textarea>
+
+            <buttonlist name="nextrecording" from="currentrecording">
+                <area>13,317,775,100</area>
+            </buttonlist>
+
+            <imagetype name="horizon_bottom">
+                <position>166,425</position>
+                <filename>ui/horizon.png</filename>
+                <alpha>100</alpha>
+            </imagetype>
+
+            <!--
+                scheduled recordings conflict warning
+            -->
+            <textarea name="conflictwarning">
+                <area>13,508,775,25</area>
+                <font>warning</font>
+                <align>hcenter</align>
+                <value>WARNING: There are conflicting scheduled recordings!</value>
+            </textarea>
+        </group>
+    </window>
+
+</mythuitheme>
+

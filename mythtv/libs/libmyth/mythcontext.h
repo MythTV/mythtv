@@ -40,7 +40,7 @@ class MythContextSlotHandler : public QObject
 class MPUBLIC MythContext
 {
   public:
-    MythContext(const QString &binversion);
+    MythContext(const QString &binversion, bool needsBackend = false);
     virtual ~MythContext();
 
     bool Init(const bool gui = true,
@@ -50,6 +50,7 @@ class MPUBLIC MythContext
 
     DatabaseParams GetDatabaseParams(void);
     bool SaveDatabaseParams(const DatabaseParams &params);
+    bool saveSettingsCache(void);
 
     void SetDisableEventPopup(bool check);
 

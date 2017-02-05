@@ -33,16 +33,14 @@
 #else
 #  include <sys/param.h>
 #  include <sys/mount.h>
-#  if CONFIG_CYGWIN
+#  ifdef __CYGWIN__
 #    include <sys/statfs.h>
-#  else // if !CONFIG_CYGWIN
+#  else // if !__CYGWIN__
 #    include <sys/sysctl.h>
-#  endif // !CONFIG_CYGWIN
+#  endif // !__CYGWIN__
 #endif
 
-#include "mythtv/mythconfig.h"
-
-#if CONFIG_DARWIN
+#ifdef __APPLE__
 #define MSG_NOSIGNAL 0  // Apple also has SO_NOSIGPIPE?
 #endif
 
@@ -1988,7 +1986,7 @@ void ZMServer::zmcControl(MONITOR *monitor, const string &mode)
     else
     {
         sql += "WHERE Id = '" + monitor->getIdStr() + "'";
-        zmcArgs = "-m " + monitor->mon_id;
+        zmcArgs = "-m " + monitor->getIdStr();
     }
 
     if (mysql_query(&g_dbConn, sql.c_str()))

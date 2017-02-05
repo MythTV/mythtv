@@ -767,8 +767,12 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
         request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                              QNetworkRequest::PreferCache);
 
-    request.setRawHeader("User-Agent",
-                         "MythTV v" MYTH_BINARY_VERSION " MythDownloadManager");
+    if (!request.hasRawHeader("User-Agent"))
+    {
+        request.setRawHeader("User-Agent",
+                             "MythTV v" MYTH_BINARY_VERSION
+                             " MythDownloadManager");
+    }
 
     if (dlInfo->m_headers)
     {

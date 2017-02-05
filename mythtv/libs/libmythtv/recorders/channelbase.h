@@ -33,7 +33,7 @@ class ChannelBase
     friend class SignalMonitor;
 
   public:
-    ChannelBase(TVRec *parent);
+    explicit ChannelBase(TVRec *parent);
     virtual ~ChannelBase(void);
 
     virtual bool Init(QString &startchannel, bool setchan);

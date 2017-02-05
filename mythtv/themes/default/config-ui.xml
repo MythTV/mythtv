@@ -384,7 +384,7 @@
         </buttonlist>
 
         <textarea name="helptext" from="basetextarea">
-            <area>200,470,400,60</area>
+            <area>200,85%,400,60</area>
             <align>allcenter</align>
             <multiline>true</multiline>
         </textarea>
@@ -826,6 +826,138 @@
         <button name="cancel" from="basebutton">
             <position>40,530</position>
             <value>Cancel</value>
+        </button>
+
+    </window>
+
+    <!-- To allow for different size themes, use percentages -->
+    <window name="guistartup">
+
+        <textarea name="label">
+            <font>baselarge</font>
+            <area>5%,3%,90%,5%</area>
+            <value>MythTV Startup Status</value>
+            <align>allcenter</align>
+        </textarea>
+
+        <statetype name="statusstate">
+            <area>5%,20%,90%,10%</area>
+            <state name="start">
+                <area>0,0,100%,100%</area>
+                <textarea name="status">
+                    <area>0,0,100%,100%</area>
+                    <font>basemedium</font>
+                    <align>allcenter</align>
+                    <value>Waking up Database Machine.</value>
+                    <multiline>true</multiline>
+                </textarea>
+            </state>
+            <state name="startFail" from="start">
+                <textarea name="status">
+                    <value>Database machine failed to wake up.</value>
+                </textarea>
+            </state>
+            <state name="dbAwake" from="start">
+                <textarea name="status">
+                    <value>Waiting for Database to start.</value>
+                </textarea>
+            </state>
+            <state name="dbAwakeFail" from="start">
+                <textarea name="status">
+                    <value>Database failed to start.</value>
+                </textarea>
+            </state>
+            <state name="dbStarted" from="start">
+                <textarea name="status">
+                    <value>Attempting to connect to Database.</value>
+                </textarea>
+            </state>
+            <state name="dbStartedFail" from="start">
+                <textarea name="status">
+                    <value>Unable to connect to Database.</value>
+                </textarea>
+            </state>
+            <state name="beWOL" from="start">
+                <textarea name="status">
+                    <value>Attempting to wake master backend.</value>
+                </textarea>
+            </state>
+            <state name="beWOLFail" from="start">
+                <textarea name="status">
+                    <value>Master backend failed to wake.</value>
+                </textarea>
+            </state>
+            <state name="beAwake" from="start">
+                <textarea name="status">
+                    <value>Attempting to connect to master backend.</value>
+                </textarea>
+            </state>
+            <state name="beAwakeFail" from="start">
+                <textarea name="status">
+                    <value>Unable to connect to master backend.</value>
+                </textarea>
+            </state>
+        </statetype>
+
+        <statetype name="messagestate">
+            <area>5%,40%,90%,15%</area>
+            <state name="makeselection">
+                <area>0,0,100%,100%</area>
+                <textarea name="message">
+                    <area>0,0,100%,100%</area>
+                    <font>basemedium</font>
+                    <align>allcenter</align>
+                    <value>Select an option below.</value>
+                    <multiline>true</multiline>
+                </textarea>
+            </state>
+            <state name="empty" from="makeselection">
+                <textarea name="message">
+                    <value></value>
+                </textarea>
+            </state>
+        </statetype>
+
+        <progressbar name="progress" from="baseprogressbar">
+            <area>15%,60%,80%,10%</area>
+            <imagetype name="background">
+                <area>0,0,100%,100%</area>
+                <preserveaspect>false</preserveaspect>
+            </imagetype>
+            <imagetype name="progressimage">
+                <area>0,0,100%,100%</area>
+                <preserveaspect>false</preserveaspect>
+            </imagetype>
+        </progressbar>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>5%,80%,90%,20%</area>
+            <align>allcenter</align>
+            <multiline>true</multiline>
+        </textarea>
+
+        <button name="dummy" from="basebutton">
+            <area>0%,80%,0,0</area>
+            <value></value>
+            <helptext></helptext>
+        </button>
+
+        <button name="retry" from="basewidebutton">
+            <area>5%,88%,20%,50%</area>
+            <value>Retry</value>
+            <helptext>Try again to establish connections.</helptext>
+        </button>
+
+        <button name="setup" from="retry">
+            <position>39%,88%</position>
+            <value>Setup</value>
+            <helptext>Use Database setup to enter database parameters.</helptext>
+        </button>
+
+        <button name="exit" from="retry">
+            <position>76%,88%</position>
+            <value>Exit</value>
+            <helptext>Exit from MythTV.</helptext>
         </button>
 
     </window>

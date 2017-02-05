@@ -16,7 +16,7 @@ win32-msvc* {
   INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 }
 
-INCLUDEPATH += ../../external/libmythbluray
+INCLUDEPATH += ../../external/libmythbluray/src
 INCLUDEPATH += ../../external/libmythsoundtouch
 INCLUDEPATH += ../../external/libudfread
 INCLUDEPATH += ../../external/libsamplerate

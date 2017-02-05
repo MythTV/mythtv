@@ -39,6 +39,8 @@ class MythUIProgressBar;
 class MythUIWebBrowser;
 #endif
 
+#define MythUITypeList QList<MythUIType*>
+
 /**
  * \defgroup MythUI MythTV User Interface Library
  *
@@ -77,6 +79,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     MythUIType *GetChild(const QString &name) const;
     MythUIType *GetChildAt(const QPoint &p, bool recursive=true,
                            bool focusable=true) const;
+    MythUITypeList GetChildren(const QString &name) const;
     QList<MythUIType *> *GetAllChildren(void);
 
     void DeleteChild(const QString &name);

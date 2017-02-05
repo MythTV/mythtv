@@ -433,7 +433,7 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
         long long nframes, unsigned int passno, unsigned int npasses)
 {
     float fps = elapsedms ? (float)frameno * 1000 / elapsedms : 0;
-    int prevpercent = -1;
+    static int prevpercent = -1;
 
     /* Assume that 0-th pass is negligible in terms of computational cost. */
     int percentage = (passno == 0 || npasses == 1 || nframes == 0) ? 0 :

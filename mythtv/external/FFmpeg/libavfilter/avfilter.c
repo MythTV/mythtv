@@ -22,9 +22,11 @@
 #include "libavutil/atomic.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
+#include "libavutil/buffer.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/common.h"
 #include "libavutil/eval.h"
+#include "libavutil/hwcontext.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/opt.h"
@@ -312,6 +314,17 @@ int avfilter_config_links(AVFilterContext *filter)
 
                 if (!link->time_base.num && !link->time_base.den)
                     link->time_base = (AVRational) {1, link->sample_rate};
+            }
+
+            if (link->src->nb_inputs && link->src->inputs[0]->hw_frames_ctx &&
+                !link->hw_frames_ctx) {
+                AVHWFramesContext *input_ctx = (AVHWFramesContext*)link->src->inputs[0]->hw_frames_ctx->data;
+
+                if (input_ctx->format == link->format) {
+                    link->hw_frames_ctx = av_buffer_ref(link->src->inputs[0]->hw_frames_ctx);
+                    if (!link->hw_frames_ctx)
+                        return AVERROR(ENOMEM);
+                }
             }
 
             if ((config_link = link->dstpad->config_props))
@@ -603,6 +616,8 @@ static const AVOption avfilter_options[] = {
         { .i64 = AVFILTER_THREAD_SLICE }, 0, INT_MAX, FLAGS, "thread_type" },
         { "slice", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = AVFILTER_THREAD_SLICE }, .unit = "thread_type" },
     { "enable", "set enable expression", OFFSET(enable_str), AV_OPT_TYPE_STRING, {.str=NULL}, .flags = FLAGS },
+    { "threads", "Allowed number of threads", OFFSET(nb_threads), AV_OPT_TYPE_INT,
+        { .i64 = 0 }, 0, INT_MAX, FLAGS },
     { NULL },
 };
 
@@ -715,6 +730,8 @@ static void free_link(AVFilterLink *link)
     if (link->dst)
         link->dst->inputs[link->dstpad - link->dst->input_pads] = NULL;
 
+    av_buffer_unref(&link->hw_frames_ctx);
+
     ff_formats_unref(&link->in_formats);
     ff_formats_unref(&link->out_formats);
     ff_formats_unref(&link->in_samplerates);
@@ -747,6 +764,8 @@ void avfilter_free(AVFilterContext *filter)
     if (filter->filter->priv_class)
         av_opt_free(filter->priv);
 
+    av_buffer_unref(&filter->hw_device_ctx);
+
     av_freep(&filter->name);
     av_freep(&filter->input_pads);
     av_freep(&filter->output_pads);
@@ -762,6 +781,13 @@ void avfilter_free(AVFilterContext *filter)
     av_freep(&filter->var_values);
     av_freep(&filter->internal);
     av_free(filter);
+}
+
+int ff_filter_get_nb_threads(AVFilterContext *ctx)
+{
+     if (ctx->nb_threads > 0)
+         return FFMIN(ctx->nb_threads, ctx->graph->nb_threads);
+     return ctx->graph->nb_threads;
 }
 
 static int process_options(AVFilterContext *ctx, AVDictionary **options,

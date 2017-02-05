@@ -252,7 +252,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 // replace a few HTML characters
                 artText.replace("&#8232;", "");   // LSEP
                 artText.replace("&#8233;", "");   // PSEP
-                artText.replace("&#163;",  "£");  // POUND
+                artText.replace("&#163;",  u8"\u00A3");  // POUND
                 artText.replace("&#173;",  "");   // ?
                 artText.replace("&#8211;", "-");  // EN-DASH
                 artText.replace("&#8220;", """"); // LEFT-DOUBLE-QUOTE

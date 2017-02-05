@@ -754,6 +754,7 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 // We always redraw the whole scene.
 void MHIContext::RequireRedraw(const QRegion &)
 {
+    m_updated = false;
     m_display_lock.lock();
     ClearDisplay();
     m_display_lock.unlock();
@@ -1290,7 +1291,9 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
     if (error)
         return QRect(0,0,0,0);
 
-    int maxAscent = 0, maxDescent = 0, width = 0;
+    int maxAscent  =  face->size->metrics.ascender;
+    int maxDescent = -face->size->metrics.descender;
+    int width = 0;
     FT_Bool useKerning = FT_HAS_KERNING(face);
     FT_UInt previous = 0;
 

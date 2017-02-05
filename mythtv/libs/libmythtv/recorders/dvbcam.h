@@ -23,7 +23,7 @@ typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
 class DVBCam : public QRunnable
 {
   public:
-    DVBCam(const QString &device);
+    explicit DVBCam(const QString &device);
     ~DVBCam();
 
     bool Start(void);

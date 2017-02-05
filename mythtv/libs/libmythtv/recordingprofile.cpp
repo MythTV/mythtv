@@ -69,7 +69,7 @@ QString CodecParamStorage::GetWhereClause(MSqlBindings &bindings) const
 class AudioCodecName: public ComboBoxSetting, public RecordingProfileStorage
 {
   public:
-    AudioCodecName(const RecordingProfile &parent) :
+    explicit AudioCodecName(const RecordingProfile &parent) :
         ComboBoxSetting(this),
         RecordingProfileStorage(this, parent, "audiocodec")
     {
@@ -80,7 +80,7 @@ class AudioCodecName: public ComboBoxSetting, public RecordingProfileStorage
 class MP3Quality : public SliderSetting, public CodecParamStorage
 {
   public:
-    MP3Quality(const RecordingProfile &parent) :
+    explicit MP3Quality(const RecordingProfile &parent) :
         SliderSetting(this, 1, 9, 1),
         CodecParamStorage(this, parent, "mp3quality")
     {
@@ -95,7 +95,7 @@ class MP3Quality : public SliderSetting, public CodecParamStorage
 class BTTVVolume : public SliderSetting, public CodecParamStorage
 {
   public:
-    BTTVVolume(const RecordingProfile& parent) :
+    explicit BTTVVolume(const RecordingProfile& parent) :
         SliderSetting(this, 0, 100, 1),
         CodecParamStorage(this, parent, "volume")
     {
@@ -235,7 +235,7 @@ class MPEG2audType : public ComboBoxSetting, public CodecParamStorage
 class MPEG2audBitrateL1 : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG2audBitrateL1(const RecordingProfile &parent) :
+    explicit MPEG2audBitrateL1(const RecordingProfile &parent) :
         ComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2audbitratel1")
     {
@@ -263,7 +263,7 @@ class MPEG2audBitrateL1 : public ComboBoxSetting, public CodecParamStorage
 class MPEG2audBitrateL2 : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG2audBitrateL2(const RecordingProfile &parent) :
+    explicit MPEG2audBitrateL2(const RecordingProfile &parent) :
         ComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2audbitratel2")
     {
@@ -291,7 +291,7 @@ class MPEG2audBitrateL2 : public ComboBoxSetting, public CodecParamStorage
 class MPEG2audBitrateL3 : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG2audBitrateL3(const RecordingProfile &parent) :
+    explicit MPEG2audBitrateL3(const RecordingProfile &parent) :
         ComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2audbitratel3")
     {
@@ -319,7 +319,7 @@ class MPEG2audBitrateL3 : public ComboBoxSetting, public CodecParamStorage
 class MPEG2audVolume : public SliderSetting, public CodecParamStorage
 {
   public:
-    MPEG2audVolume(const RecordingProfile &parent) :
+    explicit MPEG2audVolume(const RecordingProfile &parent) :
         SliderSetting(this, 0, 100, 1),
         CodecParamStorage(this, parent, "mpeg2audvolume")
     {
@@ -363,7 +363,7 @@ class MPEG2AudioBitrateSettings : public TriggeredConfigurationGroup
 class MPEG2Language : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG2Language(const RecordingProfile &parent) :
+    explicit MPEG2Language(const RecordingProfile &parent) :
         ComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2language")
     {
         setLabel(QObject::tr("SAP/Bilingual"));
@@ -562,7 +562,7 @@ private:
 class VideoCodecName : public ComboBoxSetting, public RecordingProfileStorage
 {
   public:
-    VideoCodecName(const RecordingProfile &parent) :
+    explicit VideoCodecName(const RecordingProfile &parent) :
         ComboBoxSetting(this),
         RecordingProfileStorage(this, parent, "videocodec")
     {
@@ -573,7 +573,7 @@ class VideoCodecName : public ComboBoxSetting, public RecordingProfileStorage
 class RTjpegQuality : public SliderSetting, public CodecParamStorage
 {
   public:
-    RTjpegQuality(const RecordingProfile &parent) :
+    explicit RTjpegQuality(const RecordingProfile &parent) :
         SliderSetting(this, 1, 255, 1),
         CodecParamStorage(this, parent, "rtjpegquality")
     {
@@ -586,7 +586,7 @@ class RTjpegQuality : public SliderSetting, public CodecParamStorage
 class RTjpegLumaFilter : public SpinBoxSetting, public CodecParamStorage
 {
   public:
-    RTjpegLumaFilter(const RecordingProfile &parent) :
+    explicit RTjpegLumaFilter(const RecordingProfile &parent) :
         SpinBoxSetting(this, 0, 31, 1),
         CodecParamStorage(this, parent, "rtjpeglumafilter")
     {
@@ -599,7 +599,7 @@ class RTjpegLumaFilter : public SpinBoxSetting, public CodecParamStorage
 class RTjpegChromaFilter : public SpinBoxSetting, public CodecParamStorage
 {
   public:
-    RTjpegChromaFilter(const RecordingProfile &parent) :
+    explicit RTjpegChromaFilter(const RecordingProfile &parent) :
         SpinBoxSetting(this, 0, 31, 1),
         CodecParamStorage(this, parent, "rtjpegchromafilter")
     {
@@ -626,7 +626,7 @@ class MPEG4bitrate : public SliderSetting, public CodecParamStorage
 class ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    ScaleBitrate(const RecordingProfile &parent) :
+    explicit ScaleBitrate(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "scalebitrate")
     {
@@ -641,7 +641,7 @@ class ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
 class MPEG4MinQuality : public SliderSetting, public CodecParamStorage
 {
   public:
-    MPEG4MinQuality(const RecordingProfile &parent) :
+    explicit MPEG4MinQuality(const RecordingProfile &parent) :
         SliderSetting(this, 1, 31, 1),
         CodecParamStorage(this, parent, "mpeg4minquality")
     {
@@ -655,7 +655,7 @@ class MPEG4MinQuality : public SliderSetting, public CodecParamStorage
 class MPEG4MaxQuality : public SliderSetting, public CodecParamStorage
 {
   public:
-    MPEG4MaxQuality(const RecordingProfile &parent) :
+    explicit MPEG4MaxQuality(const RecordingProfile &parent) :
         SliderSetting(this, 1, 31, 1),
         CodecParamStorage(this, parent, "mpeg4maxquality")
     {
@@ -669,7 +669,7 @@ class MPEG4MaxQuality : public SliderSetting, public CodecParamStorage
 class MPEG4QualDiff : public SliderSetting, public CodecParamStorage
 {
   public:
-    MPEG4QualDiff(const RecordingProfile &parent) :
+    explicit MPEG4QualDiff(const RecordingProfile &parent) :
         SliderSetting(this, 1, 31, 1),
         CodecParamStorage(this, parent, "mpeg4qualdiff")
     {
@@ -684,7 +684,7 @@ class MPEG4QualDiff : public SliderSetting, public CodecParamStorage
 class MPEG4OptionIDCT : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG4OptionIDCT(const RecordingProfile &parent) :
+    explicit MPEG4OptionIDCT(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4optionidct")
     {
@@ -700,7 +700,7 @@ class MPEG4OptionIDCT : public CheckBoxSetting, public CodecParamStorage
 class MPEG4OptionIME : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG4OptionIME(const RecordingProfile &parent) :
+    explicit MPEG4OptionIME(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4optionime")
     {
@@ -716,7 +716,7 @@ class MPEG4OptionIME : public CheckBoxSetting, public CodecParamStorage
 class MPEG4OptionVHQ : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG4OptionVHQ(const RecordingProfile &parent) :
+    explicit MPEG4OptionVHQ(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4optionvhq")
     {
@@ -731,7 +731,7 @@ class MPEG4OptionVHQ : public CheckBoxSetting, public CodecParamStorage
 class MPEG4Option4MV : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG4Option4MV(const RecordingProfile &parent) :
+    explicit MPEG4Option4MV(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4option4mv")
     {
@@ -748,7 +748,7 @@ class MPEG4Option4MV : public CheckBoxSetting, public CodecParamStorage
 class EncodingThreadCount : public SliderSetting, public CodecParamStorage
 {
   public:
-    EncodingThreadCount(const RecordingProfile &parent) :
+    explicit EncodingThreadCount(const RecordingProfile &parent) :
         SliderSetting(this, 1, 8, 1),
         CodecParamStorage(this, parent, "encodingthreadcount")
     {
@@ -857,7 +857,7 @@ class MPEG2aspectRatio : public ComboBoxSetting, public CodecParamStorage
 class HardwareMJPEGQuality : public SliderSetting, public CodecParamStorage
 {
   public:
-    HardwareMJPEGQuality(const RecordingProfile &parent) :
+    explicit HardwareMJPEGQuality(const RecordingProfile &parent) :
         SliderSetting(this, 0, 100, 1),
         CodecParamStorage(this, parent, "hardwaremjpegquality")
     {
@@ -870,7 +870,7 @@ class HardwareMJPEGHDecimation : public ComboBoxSetting,
                                  public CodecParamStorage
 {
   public:
-    HardwareMJPEGHDecimation(const RecordingProfile &parent) :
+    explicit HardwareMJPEGHDecimation(const RecordingProfile &parent) :
         ComboBoxSetting(this),
         CodecParamStorage(this, parent, "hardwaremjpeghdecimation")
     {
@@ -886,7 +886,7 @@ class HardwareMJPEGVDecimation : public ComboBoxSetting,
                                  public CodecParamStorage
 {
   public:
-    HardwareMJPEGVDecimation(const RecordingProfile &parent) :
+    explicit HardwareMJPEGVDecimation(const RecordingProfile &parent) :
         ComboBoxSetting(this),
         CodecParamStorage(this, parent, "hardwaremjpegvdecimation") {
         setLabel(QObject::tr("Vertical Decimation"));
@@ -1204,7 +1204,7 @@ private:
 class AutoTranscode : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    AutoTranscode(const RecordingProfile &parent) :
+    explicit AutoTranscode(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "autotranscode")
     {
@@ -1219,7 +1219,7 @@ class AutoTranscode : public CheckBoxSetting, public CodecParamStorage
 class TranscodeResize : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    TranscodeResize(const RecordingProfile &parent) :
+    explicit TranscodeResize(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "transcoderesize")
     {
@@ -1233,7 +1233,7 @@ class TranscodeResize : public CheckBoxSetting, public CodecParamStorage
 class TranscodeLossless : public CheckBoxSetting, public CodecParamStorage
 {
   public:
-    TranscodeLossless(const RecordingProfile &parent) :
+    explicit TranscodeLossless(const RecordingProfile &parent) :
         CheckBoxSetting(this),
         CodecParamStorage(this, parent, "transcodelossless")
     {
@@ -1251,7 +1251,7 @@ class TranscodeLossless : public CheckBoxSetting, public CodecParamStorage
 class RecordingType : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    RecordingType(const RecordingProfile &parent) :
+    explicit RecordingType(const RecordingProfile &parent) :
         ComboBoxSetting(this), CodecParamStorage(this, parent, "recordingtype")
     {
         setLabel(QObject::tr("Recording Type"));
@@ -1273,7 +1273,7 @@ class RecordingType : public ComboBoxSetting, public CodecParamStorage
 class RecordFullTSStream : public ComboBoxSetting, public CodecParamStorage
 {
   public:
-    RecordFullTSStream(const RecordingProfile &parent) :
+    explicit RecordFullTSStream(const RecordingProfile &parent) :
         ComboBoxSetting(this), CodecParamStorage(this, parent, "recordmpts")
     {
         setLabel(QObject::tr("Record Full TS?"));
@@ -1294,7 +1294,7 @@ class RecordFullTSStream : public ComboBoxSetting, public CodecParamStorage
 class TranscodeFilters : public LineEditSetting, public CodecParamStorage
 {
   public:
-    TranscodeFilters(const RecordingProfile &parent) :
+    explicit TranscodeFilters(const RecordingProfile &parent) :
         LineEditSetting(this),
         CodecParamStorage(this, parent, "transcodefilters")
     {

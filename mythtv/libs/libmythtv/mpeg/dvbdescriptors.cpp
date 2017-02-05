@@ -558,7 +558,8 @@ QString SatelliteDeliverySystemDescriptor::toString() const
 {
     QString str = QString("SatelliteDeliverySystemDescriptor: ");
 
-    str.append(QString("Frequency: %1\n").arg(FrequencyHz()));
+    str.append(QString("Frequency: %1, Type: %2\n").arg(FrequencyHz())
+        .arg(ModulationSystemString()));
     str.append(QString("      Mod=%1, SymbR=%2, FECInner=%3, Orbit=%4, Pol=%5")
         .arg(ModulationString())
         .arg(SymbolRateHz())

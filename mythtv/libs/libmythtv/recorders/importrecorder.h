@@ -22,7 +22,7 @@ struct AVPacket;
 class ImportRecorder : public DTVRecorder
 {
   public:
-    ImportRecorder(TVRec*);
+    explicit ImportRecorder(TVRec*);
     ~ImportRecorder();
 
     // RecorderBase

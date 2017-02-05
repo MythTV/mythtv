@@ -33,6 +33,7 @@
 #include "libavutil/avstring.h"
 #include "libavutil/channel_layout.h"
 #include "libavutil/dict.h"
+#include "libavutil/ffmath.h"
 #include "libavutil/xga_font_data.h"
 #include "libavutil/opt.h"
 #include "libavutil/timestamp.h"
@@ -140,7 +141,7 @@ typedef struct {
     int loglevel;                   ///< log level for frame logging
     int metadata;                   ///< whether or not to inject loudness results in frames
     int dual_mono;                  ///< whether or not to treat single channel input files as dual-mono
-    double pan_law;                 ///< pan law value used to calulate dual-mono measurements
+    double pan_law;                 ///< pan law value used to calculate dual-mono measurements
 } EBUR128Context;
 
 enum {

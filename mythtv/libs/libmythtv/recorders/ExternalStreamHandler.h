@@ -23,7 +23,7 @@ class ExternIO
     ExternIO(const QString & app, const QStringList & args);
     ~ExternIO(void);
 
-    bool Ready(int fd, int timeout);
+    bool Ready(int fd, int timeout, const QString & what);
     int Read(QByteArray & buffer, int maxlen, int timeout = 2500);
     QString GetStatus(int timeout = 2500);
     int Write(const QByteArray & buffer);
@@ -31,6 +31,7 @@ class ExternIO
     void Term(bool force = false);
     bool Error(void) const { return !m_error.isEmpty(); }
     QString ErrorString(void) const { return m_error; }
+    void ClearError(void) { m_error.clear(); }
 
   private:
     bool KillIfRunning(const QString & cmd);
@@ -52,14 +53,14 @@ class ExternIO
 
 class ExternalStreamHandler : public StreamHandler
 {
-    enum constants {PACKET_SIZE = 188 * 32768};
+    enum constants {PACKET_SIZE = 188 * 32768, TOO_FAST_SIZE = 188 * 4196 };
 
   public:
     static ExternalStreamHandler *Get(const QString &devicename);
     static void Return(ExternalStreamHandler * & ref);
 
   public:
-    ExternalStreamHandler(const QString & path);
+    explicit ExternalStreamHandler(const QString & path);
     ~ExternalStreamHandler(void) { CloseApp(); }
 
     virtual void run(void); // MThread
@@ -70,12 +71,17 @@ class ExternalStreamHandler : public StreamHandler
     bool HasTuner(void) const { return m_hasTuner; }
     bool HasPictureAttributes(void) const { return m_hasPictureAttributes; }
 
+    bool RestartStream(void);
+
     bool StartStreaming(bool flush_buffer);
     bool StopStreaming(void);
+
+    bool CheckForError(void);
 
     void PurgeBuffer(void);
 
     QString ErrorString(void) const { return m_error; }
+    void ClearError(void) { m_error.clear(); _error = false; }
 
     bool ProcessCommand(const QString & cmd, uint timeout,
                         QString & result);

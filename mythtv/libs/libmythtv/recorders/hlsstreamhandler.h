@@ -28,7 +28,7 @@ class HLSStreamHandler : public IPTVStreamHandler
     static void Return(HLSStreamHandler* & ref);
 
   protected:
-    HLSStreamHandler(const IPTVTuningData &tuning);
+    explicit HLSStreamHandler(const IPTVTuningData &tuning);
     virtual ~HLSStreamHandler(void);
 
     virtual void run(void); // MThread

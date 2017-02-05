@@ -55,6 +55,7 @@ HEADERS += rawsettingseditor.h
 HEADERS += programinfo.h          programinfoupdater.h
 HEADERS += programtypes.h         recordingtypes.h
 HEADERS += rssparse.h
+HEADERS += guistartup.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
 SOURCES += audio/spdifencoder.cpp audio/audiooutputdigitalencoder.cpp
@@ -80,6 +81,7 @@ SOURCES += rawsettingseditor.cpp
 SOURCES += programinfo.cpp        programinfoupdater.cpp
 SOURCES += programtypes.cpp       recordingtypes.cpp
 SOURCES += rssparse.cpp
+SOURCES += guistartup.cpp
 
 # This stuff is not Qt5 compatible..
 # Really? It builds under Qt5, so lets let it

@@ -251,7 +251,7 @@ SOURCES += srtwriter.cpp
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = playgroup.h
 inc.files += mythtvexp.h            metadataimagehelper.h
-inc.files += mythavutil.h
+inc.files += mythavutil.h           mythframe.h
 
 INSTALLS += inc
 
@@ -284,7 +284,7 @@ LIBS += -lmythdvdnav-$$LIBVERSION
 
 #Bluray stuff
 DEPENDPATH   += ../../external/libmythbluray/
-INCLUDEPATH  += ../../external/libmythbluray/
+INCLUDEPATH  += ../../external/libmythbluray/src/
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 HEADERS += Bluray/bdiowrapper.h Bluray/bdringbuffer.h
 SOURCES += Bluray/bdiowrapper.cpp Bluray/bdringbuffer.cpp
@@ -607,16 +607,19 @@ using_backend {
     HEADERS += recorders/importrecorder.h
     SOURCES += recorders/importrecorder.cpp
 
-    # Simple NuppelVideo Recorder
-    #INCLUDEPATH += ../../external/minilzo
-    #DEPENDPATH += ../../external/minilzo
-    using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
-    !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
+    using_libmp3lame {
+      # Simple NuppelVideo Recorder
+      #INCLUDEPATH += ../../external/minilzo
+      #DEPENDPATH += ../../external/minilzo
+      using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
+      !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
+      !mingw:!win32-msvc*:SOURCES += recorders/NuppelVideoRecorder.cpp
+    }
+
     HEADERS += recorders/RTjpegN.h
     HEADERS += recorders/audioinput.h
     HEADERS += recorders/go7007_myth.h
 
-    !mingw:!win32-msvc*:SOURCES += recorders/NuppelVideoRecorder.cpp
     SOURCES += recorders/RTjpegN.cpp
     SOURCES += recorders/audioinput.cpp
     using_alsa {
@@ -921,7 +924,7 @@ LIBS += -lmythservicecontracts-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
-using_backend: LIBS += -lmp3lame
+using_backend:using_mp3lame: LIBS += -lmp3lame
 using_backend: LIBS += -L../../external/minilzo -lmythminilzo-$$LIBVERSION
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 

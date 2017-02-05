@@ -11,7 +11,7 @@ class HLSReader;
 class HLSPlaylistWorker : public MThread
 {
   public:
-    HLSPlaylistWorker(HLSReader* parent);
+    explicit HLSPlaylistWorker(HLSReader* parent);
     ~HLSPlaylistWorker(void);
     
     void Cancel(void);

@@ -68,9 +68,6 @@ static const struct {
     #if CONFIG_ALAC_DECODER
         { "alacdsp", checkasm_check_alacdsp },
     #endif
-    #if CONFIG_BLEND_FILTER
-        { "vf_blend", checkasm_check_blend },
-    #endif
     #if CONFIG_BSWAPDSP
         { "bswapdsp", checkasm_check_bswapdsp },
     #endif
@@ -82,6 +79,9 @@ static const struct {
     #endif
     #if CONFIG_FMTCONVERT
         { "fmtconvert", checkasm_check_fmtconvert },
+    #endif
+    #if CONFIG_H264DSP
+        { "h264dsp", checkasm_check_h264dsp },
     #endif
     #if CONFIG_H264PRED
         { "h264pred", checkasm_check_h264pred },
@@ -103,6 +103,14 @@ static const struct {
     #endif
     #if CONFIG_VIDEODSP
         { "videodsp", checkasm_check_videodsp },
+    #endif
+#endif
+#if CONFIG_AVFILTER
+    #if CONFIG_BLEND_FILTER
+        { "vf_blend", checkasm_check_blend },
+    #endif
+    #if CONFIG_COLORSPACE_FILTER
+        { "vf_colorspace", checkasm_check_colorspace },
     #endif
 #endif
     { NULL }

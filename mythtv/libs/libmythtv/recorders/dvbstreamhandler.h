@@ -23,7 +23,7 @@ class DeviceReadBuffer;
 class DVBPIDInfo : public PIDInfo
 {
   public:
-    DVBPIDInfo(uint pid) : PIDInfo(pid) {}
+    explicit DVBPIDInfo(uint pid) : PIDInfo(pid) {}
     DVBPIDInfo(uint pid, uint stream_type, int pes_type) :
         PIDInfo(pid, stream_type, pes_type) {}
     bool Open(const QString &dvb_dev, bool use_section_reader);
@@ -47,7 +47,7 @@ class DVBStreamHandler : public StreamHandler
                           DVBChannel       *dvbchan);
 
   private:
-    DVBStreamHandler(const QString &);
+    explicit DVBStreamHandler(const QString &);
 
     virtual void run(void); // MThread
     void RunTS(void);

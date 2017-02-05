@@ -9,8 +9,8 @@
 #include "mythuiexp.h"
 #include "themeinfo.h"
 
-#define DEFAULT_UI_THEME "Terra"
-#define FALLBACK_UI_THEME "MythCenter-wide"
+#define DEFAULT_UI_THEME "MythCenter"
+#define FALLBACK_UI_THEME "Terra"
 
 class MythUIHelperPrivate;
 class MThreadPool;
@@ -43,6 +43,7 @@ class MUI_PUBLIC MythUIHelper
 {
   public:
     void Init(MythUIMenuCallbacks &cbs);
+    void Init(void);
 
     MythUIMenuCallbacks *GetMenuCBs(void);
 

@@ -13,7 +13,7 @@
 class VBox
 {
   public:
-    VBox(const QString &url);
+    explicit VBox(const QString &url);
     ~VBox(void);
 
     static QStringList probeDevices(void);

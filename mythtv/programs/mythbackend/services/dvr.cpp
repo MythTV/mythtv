@@ -479,7 +479,10 @@ DTC::CutList* Dvr::GetRecordedSeek ( int RecordedId,
     else if (offsettype == "DURATION")
         marktype = MARK_DURATION_MS;
     else
+    {
+        delete pCutList;
         throw QString("Type must be 'BYTES' or 'DURATION'.");
+    }
 
     FillSeek(pCutList, &ri, marktype);
 

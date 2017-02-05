@@ -16,8 +16,6 @@ class BDOverlayScreen : public MythScreenType
 
   private:
     MythPlayer *m_player;
-    QRect       m_overlayArea;
-    QMap<QString,MythUIImage*> m_overlayMap;
 };
 
 #endif // BDOVERLAYSCREEN_H

@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QPainter>
 
 #include "util/log_control.h"
 #include "libbluray/bdnav/mpls_parse.h"
@@ -29,11 +30,95 @@
 
 #define LOC      QString("BDRingBuf: ")
 
+BDOverlay::BDOverlay()
+  : pts(-1),
+    x(0),
+    y(0)
+{
+}
+
+BDOverlay::BDOverlay(const bd_overlay_s * const overlay)
+  : image(overlay->w, overlay->h, QImage::Format_Indexed8),
+    pts(-1),
+    x(overlay->x),
+    y(overlay->y)
+{
+    wipe();
+}
+
+BDOverlay::BDOverlay(const bd_argb_overlay_s * const overlay)
+  : image(overlay->w, overlay->h, QImage::Format_ARGB32),
+    pts(-1),
+    x(overlay->x),
+    y(overlay->y)
+{
+}
+
+void BDOverlay::setPalette(const BD_PG_PALETTE_ENTRY *palette)
+{
+    if( palette )
+    {
+        QVector<QRgb> rgbpalette;
+        for (int i = 0; i < 256; i++)
+        {
+            int y  = palette[i].Y;
+            int cr = palette[i].Cr;
+            int cb = palette[i].Cb;
+            int a  = palette[i].T;
+            int r  = int(y + 1.4022 * (cr - 128));
+            int b  = int(y + 1.7710 * (cb - 128));
+            int g  = int(1.7047 * y - (0.1952 * b) - (0.5647 * r));
+            if (r < 0) r = 0;
+            if (g < 0) g = 0;
+            if (b < 0) b = 0;
+            if (r > 0xff) r = 0xff;
+            if (g > 0xff) g = 0xff;
+            if (b > 0xff) b = 0xff;
+            rgbpalette.push_back((a << 24) | (r << 16) | (g << 8) | b);
+        }
+
+        image.setColorTable(rgbpalette);
+    }
+}
+
+void BDOverlay::wipe()
+{
+    wipe(0, 0, image.width(), image.height());
+}
+
+void BDOverlay::wipe(int x, int y, int width, int height)
+{
+    if (image.format() == QImage::Format_Indexed8)
+    {
+        uint8_t *data = image.bits();
+        uint32_t offset = (y * image.bytesPerLine()) + x;
+        for (int i = 0; i < height; i++ )
+        {
+            memset( &data[offset], 0xff, width );
+            offset += image.bytesPerLine();
+        }
+    }
+    else
+    {
+        QColor   transparent(0, 0, 0, 255);
+        QPainter painter(&image);
+        painter.setCompositionMode(QPainter::CompositionMode_Source);
+        painter.fillRect(x, y, width, height, transparent);
+    }
+}
+
 static void HandleOverlayCallback(void *data, const bd_overlay_s *const overlay)
 {
     BDRingBuffer *bdrb = (BDRingBuffer*) data;
     if (bdrb)
         bdrb->SubmitOverlay(overlay);
+}
+
+static void HandleARGBOverlayCallback(void *data, const bd_argb_overlay_s *const overlay)
+{
+    BDRingBuffer *bdrb = (BDRingBuffer*) data;
+    if (bdrb)
+        bdrb->SubmitARGBOverlay(overlay);
 }
 
 static void file_opened_callback(void* bdr)
@@ -59,6 +144,7 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 }
 
 BDInfo::BDInfo(const QString &filename)
+    : m_isValid(true)
 {
     BLURAY* bdnav = NULL;
 
@@ -120,6 +206,7 @@ BDInfo::BDInfo(const QString &filename)
     {
         m_lastError = tr("Could not open Blu-ray device: %1").arg(name);
         LOG(VB_GENERAL, LOG_ERR, QString("BDInfo: ") + m_lastError);
+        m_isValid = false;
     }
     else
     {
@@ -164,7 +251,7 @@ void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
 
     // Try to find the first clip info file and
     // use its SHA1 hash as a serial number.
-    for (uint32_t idx = 0; idx < 100; idx++)
+    for (uint32_t idx = 0; idx < 200; idx++)
     {
         QString clip = QString("BDMV/CLIPINF/%1.clpi").arg(idx, 5, 10, QChar('0'));
 
@@ -214,7 +301,9 @@ BDRingBuffer::BDRingBuffer(const QString &lfilename)
     m_numTitles(0), m_currentTitleInfo(NULL), m_imgHandle(-1),
     m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
+    m_overlayPlanes(2, NULL),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
+    m_processState(PROCESS_NORMAL),
     m_infoLock(QMutex::Recursive), m_mainThread(NULL)
 {
     m_tryHDMVNavigation = NULL != getenv("MYTHTV_HDMV");
@@ -324,6 +413,7 @@ long long BDRingBuffer::SeekInternal(long long pos, int whence)
 uint64_t BDRingBuffer::SeekInternal(uint64_t pos)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Seeking to %1.").arg(pos));
+    m_processState = PROCESS_NORMAL;
     if (bdnav)
         return bd_seek_time(bdnav, pos);
     return 0;
@@ -334,7 +424,7 @@ void BDRingBuffer::GetDescForPos(QString &desc)
     if (!m_infoLock.tryLock())
         return;
     desc = tr("Title %1 chapter %2")
-                       .arg(m_currentTitleInfo->idx)
+                       .arg(m_currentTitle)
                        .arg(m_currentTitleInfo->chapters->idx);
     m_infoLock.unlock();
 }
@@ -627,10 +717,14 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_currentTime = 0;
     m_currentTitleInfo = NULL;
     m_currentTitleAngleCount = 0;
+    m_processState = PROCESS_NORMAL;
+    m_lastEvent.event = BD_EVENT_NONE;
+    m_lastEvent.param = 0;
+
 
     // Mostly event-driven values below
     m_currentAngle = 0;
-    m_currentTitle = 0;
+    m_currentTitle = -1;
     m_currentPlaylist = 0;
     m_currentPlayitem = 0;
     m_currentChapter = 0;
@@ -645,6 +739,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
     m_secondaryVideoIsFullscreen = false;
     m_stillMode = BLURAY_STILL_NONE;
     m_stillTime = 0;
+    m_timeDiff = 0;
     m_inMenu = false;
 
     // First, attempt to initialize the disc in HDMV navigation mode.
@@ -657,6 +752,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
 
         // Register the Menu Overlay Callback
         bd_register_overlay_proc(bdnav, this, HandleOverlayCallback);
+        bd_register_argb_overlay_proc(bdnav, this, HandleARGBOverlayCallback, NULL);
     }
     else
     {
@@ -750,9 +846,7 @@ uint64_t BDRingBuffer::GetChapterStartFrame(uint32_t chapter)
 int BDRingBuffer::GetCurrentTitle(void)
 {
     QMutexLocker locker(&m_infoLock);
-    if (m_currentTitleInfo)
-        return m_currentTitleInfo->idx;
-    return -1;
+    return m_currentTitle;
 }
 
 int BDRingBuffer::GetTitleDuration(int title)
@@ -793,6 +887,7 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 
     m_infoLock.lock();
     m_currentTitleInfo = GetPlaylistInfo(index);
+    m_currentTitle = bd_get_current_title(bdnav);
     m_infoLock.unlock();
     bool result = UpdateTitleInfo();
 
@@ -853,6 +948,8 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     m_currentTitleLength = m_currentTitleInfo->duration;
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
+    m_currentPlayitem = 0;
+    m_timeDiff = 0;
     m_titlesize = bd_get_title_size(bdnav);
     uint32_t chapter_count = GetNumChapters();
     uint64_t total_secs = m_currentTitleLength / 90000;
@@ -866,7 +963,7 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New title info: Index %1 Playlist: %2 Duration: %3 "
                 "Chapters: %5")
-            .arg(m_currentTitleInfo->idx).arg(m_currentTitleInfo->playlist)
+            .arg(m_currentTitle).arg(m_currentTitleInfo->playlist)
             .arg(duration).arg(chapter_count));
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New title info: Clips: %1 Angles: %2 Title Size: %3 "
@@ -962,27 +1059,69 @@ uint64_t BDRingBuffer::GetTotalReadPosition(void)
     return 0;
 }
 
+int64_t BDRingBuffer::AdjustTimestamp(int64_t timestamp)
+{
+    int64_t newTimestamp = timestamp;
+
+    if (newTimestamp != AV_NOPTS_VALUE && newTimestamp >= m_timeDiff)
+    {
+        newTimestamp -= m_timeDiff;
+    }
+
+    return newTimestamp;
+}
+
 int BDRingBuffer::safe_read(void *data, uint sz)
 {
     int result = 0;
     if (m_isHDMVNavigation)
     {
-        HandleBDEvents();
+        result = HandleBDEvents() ? 0 : -1;
         while (result == 0)
         {
             BD_EVENT event;
             result = bd_read_ext(bdnav,
                                  (unsigned char *)data,
                                   sz, &event);
-            HandleBDEvent(event);
             if (result == 0)
-                HandleBDEvents();
+            {
+                HandleBDEvent(event);
+                result = HandleBDEvents() ? 0 : -1;
+            }
         }
     }
     else
     {
-        result = bd_read(bdnav, (unsigned char *)data, sz);
+        if (m_processState != PROCESS_WAIT)
+        {
+            processState_t lastState = m_processState;
+
+            if (m_processState == PROCESS_NORMAL)
+                result = bd_read(bdnav, (unsigned char *)data, sz);
+
+            HandleBDEvents();
+
+            if (m_processState == PROCESS_WAIT && lastState == PROCESS_NORMAL)
+            {
+                // We're waiting for the decoder to drain its buffers
+                // so don't give it any more data just yet.
+                m_pendingData = QByteArray((const char*)data, result);
+                result = 0;
+            }
+            else
+            if (m_processState == PROCESS_NORMAL && lastState == PROCESS_REPROCESS)
+            {
+                // The decoder has finished draining its buffers so give
+                // it that last block of data we read
+                result = m_pendingData.size();
+                memcpy(data, m_pendingData.constData(), result);
+                m_pendingData.clear();
+            }
+        }
     }
+
+    if (result < 0)
+        StopReads();
 
     m_currentTime = bd_tell_time(bdnav);
     return result;
@@ -1025,16 +1164,24 @@ double BDRingBuffer::GetFrameRate(void)
 int BDRingBuffer::GetAudioLanguage(uint streamID)
 {
     QMutexLocker locker(&m_infoLock);
-    if (!m_currentTitleInfo ||
-        streamID >= m_currentTitleInfo->clips->audio_stream_count)
-        return iso639_str3_to_key("und");
 
-    uint8_t lang[4] = { 0, 0, 0, 0 };
-    memcpy(lang, m_currentTitleInfo->clips->audio_streams[streamID].lang, 4);
-    int code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
+    int code = iso639_str3_to_key("und");
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Audio Lang: %1 Code: %2")
-                                  .arg(code).arg(iso639_key_to_str3(code)));
+    if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
+    {
+        bd_clip& clip = m_currentTitleInfo->clips[0];
+
+        const BLURAY_STREAM_INFO* stream = FindStream(streamID, clip.audio_streams, clip.audio_stream_count);
+
+        if (stream)
+        {
+            const uint8_t* lang = stream->lang;
+            code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
+        }
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Audio Lang: 0x%1 Code: %2")
+                                  .arg(code, 3, 16).arg(iso639_key_to_str3(code)));
 
     return code;
 }
@@ -1042,32 +1189,26 @@ int BDRingBuffer::GetAudioLanguage(uint streamID)
 int BDRingBuffer::GetSubtitleLanguage(uint streamID)
 {
     QMutexLocker locker(&m_infoLock);
-    if (!m_currentTitleInfo)
-        return iso639_str3_to_key("und");
 
-    int pgCount = m_currentTitleInfo->clips->pg_stream_count;
-    uint subCount = 0;
-    for (int i = 0; i < pgCount; ++i)
+    int code = iso639_str3_to_key("und");
+
+    if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
     {
-        if (m_currentTitleInfo->clips->pg_streams[i].coding_type >= 0x90 &&
-            m_currentTitleInfo->clips->pg_streams[i].coding_type <= 0x92)
+        bd_clip& clip = m_currentTitleInfo->clips[0];
+
+        const BLURAY_STREAM_INFO* stream = FindStream(streamID, clip.pg_streams, clip.pg_stream_count);
+
+        if (stream)
         {
-            if (streamID == subCount)
-            {
-                uint8_t lang[4] = { 0, 0, 0, 0 };
-                memcpy(lang,
-                       m_currentTitleInfo->clips->pg_streams[streamID].lang, 4);
-                int key = (lang[0]<<16)|(lang[1]<<8)|lang[2];
-                int code = iso639_key_to_canonical_key(key);
-                LOG(VB_GENERAL, LOG_INFO, LOC +
-                        QString("Subtitle Lang: %1 Code: %2")
-                            .arg(code).arg(iso639_key_to_str3(code)));
-                return code;
-            }
-            subCount++;
+            const uint8_t* lang = stream->lang;
+            code = iso639_key_to_canonical_key((lang[0]<<16)|(lang[1]<<8)|lang[2]);
         }
     }
-    return iso639_str3_to_key("und");
+
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Subtitle Lang: 0x%1 Code: %2")
+                                  .arg(code, 3, 16).arg(iso639_key_to_str3(code)));
+
+    return code;
 }
 
 void BDRingBuffer::PressButton(int32_t key, int64_t pts)
@@ -1131,14 +1272,23 @@ bool BDRingBuffer::GoToMenu(const QString &str, int64_t pts)
 
 bool BDRingBuffer::HandleBDEvents(void)
 {
-    BD_EVENT ev;
-    while (bd_get_event(bdnav, &ev))
+    if (m_processState != PROCESS_WAIT)
     {
-        HandleBDEvent(ev);
-        if (ev.event == BD_EVENT_NONE ||
-            ev.event == BD_EVENT_ERROR)
+        if (m_processState == PROCESS_REPROCESS)
         {
-            return false;
+            HandleBDEvent(m_lastEvent);
+            // HandleBDEvent will change the process state
+            // if it needs to so don't do it here.
+        }
+
+        while (m_processState == PROCESS_NORMAL && bd_get_event(bdnav, &m_lastEvent))
+        {
+            HandleBDEvent(m_lastEvent);
+            if (m_lastEvent.event == BD_EVENT_NONE ||
+                m_lastEvent.event == BD_EVENT_ERROR)
+            {
+                return false;
+            }
         }
     }
     return true;
@@ -1181,13 +1331,39 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                 QString("EVENT_PLAYLIST %1 (old %2)")
                                 .arg(ev.param).arg(m_currentPlaylist));
             m_currentPlaylist = ev.param;
-            m_currentTitle = bd_get_current_title(bdnav);
+            m_timeDiff = 0;
+            m_currentPlayitem = 0;
             SwitchPlaylist(m_currentPlaylist);
             break;
         case BD_EVENT_PLAYITEM:
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_PLAYITEM %1").arg(ev.param));
-            m_currentPlayitem = ev.param;
+            {
+                int64_t diff = 0;
+
+                if (m_currentPlayitem != (int)ev.param)
+                {
+                    int64_t out = m_currentTitleInfo->clips[m_currentPlayitem].out_time;
+                    int64_t in  = m_currentTitleInfo->clips[ev.param].in_time;
+
+                    diff = in - out;
+
+                    if (diff != 0 && m_processState == PROCESS_NORMAL)
+                    {
+                        LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PTS discontinuity - waiting for decoder: this %1, last %2, diff %3")
+                            .arg(in)
+                            .arg(out)
+                            .arg(diff));
+
+                        m_processState = PROCESS_WAIT;
+                        break;
+                    }
+
+                    m_timeDiff += diff;
+                    m_processState = PROCESS_NORMAL;
+                    m_currentPlayitem = (int)ev.param;
+                }
+            }
             break;
         case BD_EVENT_CHAPTER:
             // N.B. event chapter numbering 1...N, chapter seeks etc 0...
@@ -1195,6 +1371,19 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
                                 .arg(ev.param));
             m_currentChapter = ev.param;
             break;
+        case BD_EVENT_PLAYMARK:
+            /* playmark reached */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_PLAYMARK"));
+            break;
+
+        /* playback control */
+        case BD_EVENT_PLAYLIST_STOP:
+            /* HDMV VM or JVM stopped playlist playback. Flush all buffers. */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("ToDo EVENT_PLAYLIST_STOP %1")
+                .arg(ev.param));
+            break;
+
         case BD_EVENT_STILL:
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_STILL %1").arg(ev.param));
@@ -1258,7 +1447,33 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
             m_secondaryVideoIsFullscreen = ev.param;
             break;
 
+        /* status */
         case BD_EVENT_IDLE:
+            /* Nothing to do. Playlist is not playing, but title applet is running.
+             * Application should not call bd_read*() immediately again to avoid busy loop. */
+            usleep(40000);
+            break;
+
+        case BD_EVENT_MENU:
+            /* Interactive menu visible */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("EVENT_MENU %1")
+                .arg(ev.param==0 ? "no" : "yes"));
+            m_inMenu = (ev.param == 1);
+            break;
+
+        case BD_EVENT_KEY_INTEREST_TABLE:
+            /* BD-J key interest table changed */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("ToDo EVENT_KEY_INTEREST_TABLE %1")
+                .arg(ev.param));
+            break;
+
+        case BD_EVENT_UO_MASK_CHANGED:
+            /* User operations mask was changed */
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("ToDo EVENT_UO_MASK_CHANGED %1")
+                .arg(ev.param));
             break;
 
         default:
@@ -1271,6 +1486,48 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
 bool BDRingBuffer::IsInStillFrame(void) const
 {
     return m_stillTime > 0 && m_stillMode != BLURAY_STILL_NONE;
+}
+
+/**
+ * \brief Find the stream with the given ID from an array of streams.
+ * \param streamid      The stream ID (pid) to look for
+ * \param streams       Pointer to an array of streams
+ * \param streamCount   Number of streams in the array
+ * \return Pointer to the matching stream if found, otherwise nullptr.
+ */
+const BLURAY_STREAM_INFO* BDRingBuffer::FindStream(int streamid, BLURAY_STREAM_INFO* streams, int streamCount) const
+{
+    const BLURAY_STREAM_INFO* stream = nullptr;
+
+    for(int i = 0; i < streamCount && !stream; i++)
+    {
+        if (streams[i].pid == streamid)
+            stream = &streams[i];
+    }
+
+    return stream;
+}
+
+bool BDRingBuffer::IsValidStream(int streamid)
+{
+    bool valid = false;
+
+    if (m_currentTitleInfo && m_currentTitleInfo->clip_count > 0)
+    {
+        bd_clip& clip = m_currentTitleInfo->clips[0];
+        if( FindStream(streamid,clip.audio_streams,     clip.audio_stream_count) ||
+            FindStream(streamid,clip.video_streams,     clip.video_stream_count) ||
+            FindStream(streamid,clip.ig_streams,        clip.ig_stream_count) ||
+            FindStream(streamid,clip.pg_streams,        clip.pg_stream_count) ||
+            FindStream(streamid,clip.sec_audio_streams, clip.sec_audio_stream_count) ||
+            FindStream(streamid,clip.sec_video_streams, clip.sec_video_stream_count)
+          )
+        {
+            valid = true;
+        }
+    }
+
+    return valid;
 }
 
 void BDRingBuffer::WaitForPlayer(void)
@@ -1395,6 +1652,17 @@ void BDRingBuffer::ClearOverlays(void)
         delete overlay;
         overlay = NULL;
     }
+
+    for (int i = 0; i < m_overlayPlanes.size(); i++)
+    {
+        BDOverlay*& osd = m_overlayPlanes[i];
+
+        if (osd)
+        {
+            delete osd;
+            osd = NULL;
+        }
+    }
 }
 
 BDOverlay* BDRingBuffer::GetOverlay(void)
@@ -1407,62 +1675,171 @@ BDOverlay* BDRingBuffer::GetOverlay(void)
 
 void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
 {
-    QMutexLocker lock(&m_overlayLock);
-
-    if (!overlay)
+    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
         return;
 
-    if ((overlay->w < 1) || (overlay->w > 1920) || (overlay->x > 1920) ||
-        (overlay->h < 1) || (overlay->h > 1080) || (overlay->y > 1080))
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->cmd    = %1, %2").arg(overlay->cmd).arg(overlay->plane));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay rect    = (%1,%2,%3,%4)").arg(overlay->x).arg(overlay->y)
+                                                                          .arg(overlay->w).arg(overlay->h));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->pts    = %1").arg(overlay->pts));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("update palette  = %1").arg(overlay->palette_update_flag ? "yes":"no"));
+
+    BDOverlay*& osd = m_overlayPlanes[overlay->plane];
+
+    switch(overlay->cmd)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Invalid overlay size: %1x%2+%3+%4")
-                .arg(overlay->w).arg(overlay->h)
-                .arg(overlay->x).arg(overlay->y));
+        case BD_OVERLAY_INIT:    /* init overlay plane. Size and position of plane in x,y,w,h */
+            /* init overlay plane. Size of plane in w,h */
+            if (osd)
+            {
+                delete osd;
+            }
+            osd = new BDOverlay(overlay);
+            break;
+
+        case BD_OVERLAY_CLOSE:   /* close overlay plane */
+            /* close overlay */
+            {
+                if (osd)
+                {
+                    delete osd;
+                    osd = NULL;
+                }
+
+                QMutexLocker lock(&m_overlayLock);
+                m_overlayImages.append(new BDOverlay());
+            }
+            break;
+
+        /* following events can be processed immediately, but changes
+         * should not be flushed to display before next FLUSH event
+         */
+        case BD_OVERLAY_HIDE:    /* overlay is empty and can be hidden */
+        case BD_OVERLAY_CLEAR:   /* clear plane */
+            if (osd)
+                osd->wipe();
+            break;
+
+        case BD_OVERLAY_WIPE:    /* clear area (x,y,w,h) */
+            if (osd)
+                osd->wipe(overlay->x, overlay->y, overlay->w, overlay->h);
+            break;
+
+        case BD_OVERLAY_DRAW:    /* draw bitmap (x,y,w,h,img,palette,crop) */
+            if (osd)
+            {
+                const BD_PG_RLE_ELEM *rlep = overlay->img;
+                unsigned actual = overlay->w * overlay->h;
+                uint8_t *data   = osd->image.bits();
+                data = &data[(overlay->y * osd->image.bytesPerLine()) + overlay->x];
+
+                for (unsigned i = 0; i < actual; i += rlep->len, rlep++)
+                {
+                    int dst_y = (i / overlay->w) * osd->image.bytesPerLine();
+                    int dst_x = (i % overlay->w);
+                    memset(data + dst_y + dst_x, rlep->color, rlep->len);
+                }
+
+                osd->setPalette(overlay->palette);
+            }
+            break;
+
+        case BD_OVERLAY_FLUSH:   /* all changes have been done, flush overlay to display at given pts */
+            if (osd)
+            {
+                BDOverlay* newOverlay = new BDOverlay(*osd);
+                newOverlay->image.convertToFormat(QImage::Format_ARGB32);
+                newOverlay->pts = overlay->pts;
+
+                QMutexLocker lock(&m_overlayLock);
+                m_overlayImages.append(newOverlay);
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
+void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
+{
+    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
         return;
-    }
 
-    if (!overlay->img)
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->cmd,plane = %1, %2").arg(overlay->cmd)
+                                                                      .arg(overlay->plane));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->(x,y,w,h) = %1,%2,%3x%4 - %5").arg(overlay->x)
+                                                                                .arg(overlay->y)
+                                                                                .arg(overlay->w)
+                                                                                .arg(overlay->h)
+                                                                                .arg(overlay->stride));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->pts       = %1").arg(overlay->pts));
+
+    BDOverlay*& osd = m_overlayPlanes[overlay->plane];
+
+    switch(overlay->cmd)
     {
-        m_inMenu = false;
-        QRect pos(overlay->x, overlay->y, overlay->w, overlay->h);
-        m_overlayImages.append(new BDOverlay(NULL, NULL, pos,
-                               overlay->plane, overlay->pts));
-        return;
+        case BD_ARGB_OVERLAY_INIT:
+            /* init overlay plane. Size of plane in w,h */
+            if (osd)
+                delete osd;
+
+            osd = new BDOverlay(overlay);
+            break;
+
+        case BD_ARGB_OVERLAY_CLOSE:
+            /* close overlay */
+            {
+                if (osd)
+                {
+                    delete osd;
+                    osd = NULL;
+                }
+
+                QMutexLocker lock(&m_overlayLock);
+                m_overlayImages.append(new BDOverlay());
+            }
+            break;
+
+        /* following events can be processed immediately, but changes
+         * should not be flushed to display before next FLUSH event
+         */
+        case BD_ARGB_OVERLAY_DRAW:
+            if (osd)
+            {
+                /* draw image */
+                uint8_t* data = osd->image.bits();
+
+                uint32_t srcOffset = 0;
+                uint32_t dstOffset = (overlay->y * osd->image.bytesPerLine()) + (overlay->x * 4);
+
+                for (uint16_t y = 0; y < overlay->h; y++)
+                {
+                    memcpy(&data[dstOffset],
+                           &overlay->argb[srcOffset],
+                           overlay->w * 4);
+
+                    dstOffset += osd->image.bytesPerLine();
+                    srcOffset += overlay->stride;
+                }
+            }
+            break;
+
+        case BD_ARGB_OVERLAY_FLUSH:
+            /* all changes have been done, flush overlay to display at given pts */
+            if (osd)
+            {
+                QMutexLocker lock(&m_overlayLock);
+                BDOverlay* newOverlay = new BDOverlay(*osd);
+                newOverlay->pts = overlay->pts;
+                m_overlayImages.append(newOverlay);
+            }
+            break;
+
+        default:
+            LOG(VB_PLAYBACK, LOG_ERR, QString("Unknown ARGB overlay - %1").arg(overlay->cmd));
+            break;
     }
-
-    const BD_PG_RLE_ELEM *rlep = overlay->img;
-    static const unsigned palettesize = 256 * 4;
-    unsigned width   = (overlay->w + 0x3) & (~0x3);
-    unsigned pixels  = ((overlay->w + 0xf) & (~0xf)) *
-                       ((overlay->h + 0xf) & (~0xf));
-    unsigned actual  = overlay->w * overlay->h;
-    uint8_t *data    = (uint8_t*)av_mallocz(pixels);
-    uint8_t *palette = (uint8_t*)av_mallocz(palettesize);
-
-    int line = 0;
-    int this_line = 0;
-    for (unsigned i = 0; i < actual; i += rlep->len, rlep++)
-    {
-        if ((rlep->color == 0 && rlep->len == 0) || this_line >= overlay->w)
-        {
-            this_line = 0;
-            line++;
-            i = (line * width) + 1;
-        }
-        else
-        {
-            this_line += rlep->len;
-            memset(data + i, rlep->color, rlep->len);
-        }
-    }
-
-    memcpy(palette, overlay->palette, palettesize);
-
-    QRect pos(overlay->x, overlay->y, width, overlay->h);
-    m_overlayImages.append(new BDOverlay(data, palette, pos,
-                           overlay->plane, overlay->pts));
-
-    if (overlay->plane == 1)
-        m_inMenu = true;
 }

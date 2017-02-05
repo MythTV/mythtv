@@ -104,7 +104,7 @@ static const AVOption zoompan_options[] = {
     { "y", "set the y expression", OFFSET(y_expr_str), AV_OPT_TYPE_STRING, {.str="0"}, .flags = FLAGS },
     { "d", "set the duration expression", OFFSET(duration_expr_str), AV_OPT_TYPE_STRING, {.str="90"}, .flags = FLAGS },
     { "s", "set the output image size", OFFSET(w), AV_OPT_TYPE_IMAGE_SIZE, {.str="hd720"}, .flags = FLAGS },
-    { "fps", "set the output framerate", OFFSET(framerate), AV_OPT_TYPE_VIDEO_RATE, { .str = "25" }, .flags = FLAGS },
+    { "fps", "set the output framerate", OFFSET(framerate), AV_OPT_TYPE_VIDEO_RATE, { .str = "25" }, 0, INT_MAX, .flags = FLAGS },
     { NULL }
 };
 
@@ -143,6 +143,10 @@ static int output_single_frame(AVFilterContext *ctx, AVFrame *in, double *var_va
     int px[4], py[4];
     AVFrame *out;
 
+    var_values[VAR_PX]    = s->x;
+    var_values[VAR_PY]    = s->y;
+    var_values[VAR_PZOOM] = s->prev_zoom;
+    var_values[VAR_PDURATION] = s->prev_nb_frames;
     var_values[VAR_TIME] = pts * av_q2d(outlink->time_base);
     var_values[VAR_FRAME] = i;
     var_values[VAR_ON] = outlink->frame_count + 1;
@@ -265,7 +269,7 @@ static int request_frame(AVFilterLink *outlink)
     AVFilterContext *ctx = outlink->src;
     ZPContext *s = ctx->priv;
     AVFrame *in = s->in;
-    double zoom=1, dx=0, dy=0;
+    double zoom=-1, dx=-1, dy=-1;
     int ret = -1;
 
     if (in) {
@@ -276,9 +280,12 @@ static int request_frame(AVFilterLink *outlink)
     }
 
     if (s->current_frame >= s->nb_frames) {
-        s->x = dx;
-        s->y = dy;
-        s->prev_zoom = zoom;
+        if (dx != -1)
+            s->x = dx;
+        if (dy != -1)
+            s->y = dy;
+        if (zoom != -1)
+            s->prev_zoom = zoom;
         s->prev_nb_frames = s->nb_frames;
         s->nb_frames = 0;
         s->current_frame = 0;

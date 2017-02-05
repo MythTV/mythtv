@@ -1,7 +1,8 @@
 This code was resynced upstream to:
 
 git://source.ffmpeg.org/ffmpeg.git at n3.0-1-g0aa2fbd on February 19th, 2016 (jya) (release/3.0 branch, release 3.0)
-git://source.ffmpeg.org/ffmpeg.git at n3.0-3-gb80083a on February 36th, 2016 (jya) (release/3.0 branch, release 3.0)
+git://source.ffmpeg.org/ffmpeg.git at n3.0-3-gb80083a on February 26th, 2016 (jya) (release/3.0 branch, release 3.0)
+git://source.ffmpeg.org/ffmpeg.git at n3.2-3-g7568b0f on November 14th, 2016 (jya) (release/3.2 branch, release 3.2)
 
 List of files modified from original FFmpeg:
 Makefile
@@ -9,6 +10,7 @@ README.sync
 common.mak
 configure
 libavcodec/Makefile
+libavcodec/audiotoolboxdec.c    // dual language support
 libavcodec/avcodec.h            // add subtitle support
 libavcodec/codec_desc.c         // add subtitle codec description
 libavcodec/dvbsubdec.c          // DVB subtitles fixes

@@ -36,7 +36,7 @@ class DTVRecorder :
     public PSStreamListener
 {
   public:
-    DTVRecorder(TVRec *rec);
+    explicit DTVRecorder(TVRec *rec);
     virtual ~DTVRecorder();
 
     virtual void SetOption(const QString &opt, const QString &value);

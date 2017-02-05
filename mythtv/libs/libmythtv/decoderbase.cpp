@@ -508,7 +508,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
         QString(" --> \n\t\t\t[%1:%2(%3),%4:%5(%6)]")
             .arg(lower_bound)
             .arg(empty ? -1 : GetKey(m_positionMap[lower_bound]))
-            .arg(m_positionMap[lower_bound].pos)
+            .arg(empty ? -1 : m_positionMap[lower_bound].pos)
             .arg(upper_bound)
             .arg(empty ? -1 : GetKey(m_positionMap[upper_bound]))
             .arg(empty ? -1 : m_positionMap[upper_bound].pos));
