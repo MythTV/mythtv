@@ -77,7 +77,7 @@ class MythContextPrivate : public QObject
     bool SaveDatabaseParams(const DatabaseParams &params, bool force);
 
     bool    PromptForDatabaseParams(const QString &error);
-    QString TestDBconnection(void);
+    QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors(void);
     void    EnableDBerrors(void);
     void    ResetDatabase(void);
@@ -468,7 +468,7 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
             if (failure.length())
                 LOG(VB_GENERAL, LOG_ALERT, failure);
 
-        failure = TestDBconnection();
+        failure = TestDBconnection(loaded);
         if (failure.isEmpty())
             goto DBfound;
         if (m_guiStartup && m_guiStartup->m_Exit)
@@ -754,7 +754,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
  *
  * \todo  Rationalise the WOL stuff. We should have one method to wake BEs
  */
-QString MythContextPrivate::TestDBconnection(void)
+QString MythContextPrivate::TestDBconnection(bool prompt)
 {
     QString err    = QString::null;
     QString host   = m_DBparams.dbHostName;
@@ -762,9 +762,6 @@ QString MythContextPrivate::TestDBconnection(void)
     // Jan 20, 2017
     // Changed to use port check instead of ping
 
-    bool configXmlFound
-        =    !(m_pConfig->GetValue(kDefaultDB + "Host", "")).isEmpty()
-          || !(m_pConfig->GetValue(kDefaultMFE + "DBHostName", "")).isEmpty();
     int port = m_DBparams.dbPort;
 
     // 1 = db awake, 2 = db listening, 3 = db connects,
@@ -785,8 +782,6 @@ QString MythContextPrivate::TestDBconnection(void)
         {"start","dbAwake","dbStarted","dbConnects","beWOL","beAwake",
             "success" };
 
-    if (configXmlFound)
-    {
         do
         {
             int wakeupTime = 3;
@@ -800,6 +795,8 @@ QString MythContextPrivate::TestDBconnection(void)
                 startupState = st_dbAwake;
             if (attempts < 1)
                 attempts = 1;
+            if (!prompt)
+                attempts=1;
             if (wakeupTime < 1)
                 wakeupTime = 1;
 
@@ -813,7 +810,7 @@ QString MythContextPrivate::TestDBconnection(void)
             int backendPort = 0;
 
             for (int attempt = 0;
-                attempt <= attempts && startupState != st_success;
+                attempt < attempts && startupState != st_success;
                 ++attempt)
             {
                 // The first time do everything with minimum timeout and
@@ -946,8 +943,9 @@ QString MythContextPrivate::TestDBconnection(void)
                 m_loop->exec();
             }
 
-        } while (m_guiStartup && m_guiStartup->m_Retry);
     }
+    while (m_guiStartup && m_guiStartup->m_Retry);
+
     if (startupState < st_dbAwake)
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Pinging to %1 failed, database will be unavailable").arg(host));
