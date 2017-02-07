@@ -69,13 +69,12 @@ void AudioDeviceComboBox::AudioRescan()
     QString value = getValue();
     clearSelections();
 
-    bool found = false;
+    // Adding the current value first avoids marking the setting as changed
+    addSelection(value, value, true);
     for (it = vect.begin(); it != vect.end(); ++it)
-        addSelection(it->name, it->name,
-                     value == it->name ? (found = true) : false);
-    if (!found)
     {
-        addSelection(value, value, true);
+        if (value != it->name)
+            addSelection(it->name, it->name);
     }
 }
 
