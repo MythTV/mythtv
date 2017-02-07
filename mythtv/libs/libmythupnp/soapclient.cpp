@@ -267,9 +267,11 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     list.clear();
 
     QDomDocument doc;
+    int ErrLineNum = 0;
 
-    if (!doc.setContent(sXml, true, &sErrDesc, &nErrCode))
+    if (!doc.setContent(sXml, true, &sErrDesc, &ErrLineNum))
     {
+        nErrCode = UPnPResult_MythTV_XmlParseError;
         LOG(VB_UPNP, LOG_ERR,
             QString("SendSOAPRequest( %1 ) - Invalid response from %2")
                 .arg(sMethod).arg(url.toString()) + 
