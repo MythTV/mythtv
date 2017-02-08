@@ -624,6 +624,10 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     if (nPos < 0)
         return false;
 
+    // Ignore link local ip addresses
+    if (sDescURL.startsWith("http://[fe80::",Qt::CaseInsensitive))
+        return false;
+
     if ((nPos = sCache.indexOf("=", nPos)) < 0)
         return false;
 

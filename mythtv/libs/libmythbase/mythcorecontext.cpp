@@ -346,6 +346,9 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
     }
 
     QString server = GetMasterServerIP();
+    if (server.isEmpty())
+        return false;
+
     int     port   = GetMasterServerPort();
     bool    proto_mismatch = false;
 
@@ -903,8 +906,9 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
 QString MythCoreContext::GetMasterServerIP(void)
 {
     QString master = resolveSettingAddress("MasterServerIP");
-
-    return master.isEmpty() ? "localhost" : master;
+    // Even if empty, return it here if we were to assume that localhost
+    // should be used it just causes a lot of unnecessary error messages.
+    return master;
 }
 
 /**

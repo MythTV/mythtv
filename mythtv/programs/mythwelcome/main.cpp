@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext = new MythContext(MYTH_BINARY_VERSION, true);
     if (!gContext->Init())
     {
         LOG(VB_GENERAL, LOG_ERR,

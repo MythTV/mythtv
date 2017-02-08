@@ -1774,14 +1774,14 @@ int main(int argc, char **argv)
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext = new MythContext(MYTH_BINARY_VERSION, true);
+    gCoreContext->SetAsFrontend(true);
 
     if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
-    gCoreContext->SetAsFrontend(true);
 
     cmdline.ApplySettingsOverride();
 
@@ -1824,7 +1824,7 @@ int main(int argc, char **argv)
         LOG(VB_GENERAL, LOG_NOTICE, "Appearance settings and language have "
                                     "been reset to defaults. You will need to "
                                     "restart the frontend.");
-
+        gContext-> saveSettingsCache();
         return GENERIC_EXIT_OK;
     }
 
@@ -2032,6 +2032,9 @@ int main(int argc, char **argv)
     }
 
     int ret = qApp->exec();
+
+    if (ret==0)
+        gContext-> saveSettingsCache();
 
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 

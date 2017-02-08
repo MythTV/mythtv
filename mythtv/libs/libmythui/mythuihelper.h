@@ -43,6 +43,7 @@ class MUI_PUBLIC MythUIHelper
 {
   public:
     void Init(MythUIMenuCallbacks &cbs);
+    void Init(void);
 
     MythUIMenuCallbacks *GetMenuCBs(void);
 
