@@ -333,6 +333,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     QMutex         nextRingBufferLock;
     RingBuffer    *nextRingBuffer;
     RecordingInfo *nextRecording;
+    MythTimer      ringBufferCheckTimer;
 
     // Seektable  support
     MarkTypes      positionMapType;

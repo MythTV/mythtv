@@ -392,6 +392,8 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 
     if (recq && tvrec)
         tvrec->RingBufferChanged(ringBuffer, curRecording, recq);
+
+    ringBufferCheckTimer.restart();
 }
 
 void RecorderBase::SetRecordingStatus(RecStatus::Type status,
@@ -635,6 +637,18 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     else
     {
         positionMapLock.unlock();
+    }
+
+    // Make sure a ringbuffer switch is checked at least every 10
+    // seconds.  Otherwise, this check is only performed on keyframes,
+    // and if there is a problem with the input we may never see one
+    // again, resulting in a wedged recording.
+    if (ringBufferCheckTimer.isRunning() &&
+        ringBufferCheckTimer.elapsed() > 10000)
+    {
+        LOG(VB_RECORD, LOG_WARNING, LOC + "It is has been over 10 seconds "
+            "since we've checked for a ringbuffer switch.");
+        CheckForRingBufferSwitch();
     }
 }
 
