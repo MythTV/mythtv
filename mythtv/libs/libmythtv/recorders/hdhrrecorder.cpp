@@ -35,7 +35,8 @@ bool HDHRRecorder::Open(void)
 
     ResetForNewFile();
 
-    _stream_handler = HDHRStreamHandler::Get(_channel->GetDevice());
+    _stream_handler = HDHRStreamHandler::Get(_channel->GetDevice(),
+                                     (tvrec ? tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "HDHR opened successfully");
 
@@ -47,7 +48,8 @@ void HDHRRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        HDHRStreamHandler::Return(_stream_handler);
+        HDHRStreamHandler::Return(_stream_handler,
+                                  (tvrec ? tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }

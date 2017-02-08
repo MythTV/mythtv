@@ -26,7 +26,8 @@
 #include "cardutil.h"
 #include "exitcodes.h"
 
-#define LOC      QString("ExternSH(%1): ").arg(_device)
+#define LOC QString("ExternalRec%1(%2): ").arg(_recorder_ids_string) \
+                                          .arg(_device)
 
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
@@ -429,7 +430,8 @@ QMap<QString,ExternalStreamHandler*> ExternalStreamHandler::m_handlers;
 QMap<QString,uint>              ExternalStreamHandler::m_handlers_refcnt;
 QMutex                          ExternalStreamHandler::m_handlers_lock;
 
-ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname)
+ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
+                                                  int recorder_id)
 {
     QMutexLocker locker(&m_handlers_lock);
 
@@ -457,10 +459,12 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname)
                 .arg(devkey) + QString(" (%1 in use)").arg(rcount));
     }
 
+    m_handlers[devkey]->AddRecorderId(recorder_id);
     return m_handlers[devkey];
 }
 
-void ExternalStreamHandler::Return(ExternalStreamHandler * & ref)
+void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
+                                   int recorder_id)
 {
     QMutexLocker locker(&m_handlers_lock);
 
@@ -469,6 +473,11 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref)
     QMap<QString,uint>::iterator rit = m_handlers_refcnt.find(devname);
     if (rit == m_handlers_refcnt.end())
         return;
+
+    QMap<QString, ExternalStreamHandler*>::iterator it =
+        m_handlers.find(devname);
+    if (it != m_handlers.end())
+        (*it)->DelRecorderId(recorder_id);
 
     LOG(VB_RECORD, LOG_INFO, QString("ExternSH: Return '%1' in use %2")
         .arg(devname).arg(*rit));
@@ -480,8 +489,6 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref)
         return;
     }
 
-    QMap<QString, ExternalStreamHandler*>::iterator it =
-        m_handlers.find(devname);
     if ((it != m_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternSH: Closing handler for %1")

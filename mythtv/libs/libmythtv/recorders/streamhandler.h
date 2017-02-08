@@ -72,6 +72,9 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     explicit StreamHandler(const QString &device);
     ~StreamHandler();
 
+    void AddRecorderId(int id);
+    void DelRecorderId(int id);
+
     void Start(void);
     void Stop(void);
 
@@ -107,6 +110,8 @@ class StreamHandler : protected MThread, public DeviceReaderCB
 
   protected:
     QString           _device;
+    QSet<int>         _recorder_ids;
+    QString           _recorder_ids_string;
     bool              _needs_buffering;
     bool              _allow_section_reader;
 

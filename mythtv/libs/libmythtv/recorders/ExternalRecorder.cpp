@@ -134,7 +134,9 @@ bool ExternalRecorder::Open(void)
 
     ResetForNewFile();
 
-    m_stream_handler = ExternalStreamHandler::Get(m_channel->GetDevice());
+    m_stream_handler = ExternalStreamHandler::Get(m_channel->GetDevice(),
+                                          (tvrec ? tvrec->GetInputId() : -1));
+
     if (m_stream_handler)
     {
         if (m_stream_handler->IsAppOpen())
@@ -144,7 +146,9 @@ bool ExternalRecorder::Open(void)
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("Failed to open recorder: %1")
                 .arg(m_stream_handler->ErrorString()));
-            ExternalStreamHandler::Return(m_stream_handler);
+            ExternalStreamHandler::Return(m_stream_handler,
+                                          (tvrec ? tvrec->GetInputId() : -1));
+
             return false;
         }
         return true;
@@ -161,7 +165,8 @@ void ExternalRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        ExternalStreamHandler::Return(m_stream_handler);
+        ExternalStreamHandler::Return(m_stream_handler,
+                                      (tvrec ? tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }

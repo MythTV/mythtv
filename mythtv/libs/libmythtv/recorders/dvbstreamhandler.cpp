@@ -21,7 +21,8 @@
 #include "diseqc.h" // for rotor retune
 #include "mythlogging.h"
 
-#define LOC      QString("DVBSH(%1): ").arg(_device)
+#define LOC      QString("DVBSH%1(%2): ").arg(_recorder_ids_string) \
+                                         .arg(_device)
 
 QMap<QString,bool> DVBStreamHandler::_rec_supports_ts_monitoring;
 QMutex             DVBStreamHandler::_rec_supports_ts_monitoring_lock;
@@ -30,7 +31,8 @@ QMap<QString,DVBStreamHandler*> DVBStreamHandler::_handlers;
 QMap<QString,uint>              DVBStreamHandler::_handlers_refcnt;
 QMutex                          DVBStreamHandler::_handlers_lock;
 
-DVBStreamHandler *DVBStreamHandler::Get(const QString &devname)
+DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
+                                        int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -47,10 +49,12 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname)
         _handlers_refcnt[devname]++;
     }
 
+    _handlers[devname]->AddRecorderId(recorder_id);
     return _handlers[devname];
 }
 
-void DVBStreamHandler::Return(DVBStreamHandler * & ref)
+void DVBStreamHandler::Return(DVBStreamHandler * & ref,
+                              int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -60,6 +64,10 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref)
     if (rit == _handlers_refcnt.end())
         return;
 
+    QMap<QString,DVBStreamHandler*>::iterator it = _handlers.find(devname);
+    if (it != _handlers.end())
+        (*it)->DelRecorderId(recorder_id);
+
     if (*rit > 1)
     {
         ref = NULL;
@@ -67,7 +75,6 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref)
         return;
     }
 
-    QMap<QString,DVBStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
         delete *it;

@@ -52,7 +52,8 @@ bool DVBRecorder::Open(void)
 
     ResetForNewFile();
 
-    _stream_handler = DVBStreamHandler::Get(videodevice);
+    _stream_handler = DVBStreamHandler::Get(videodevice,
+                                            tvrec ? tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Card opened successfully");
 
@@ -68,7 +69,7 @@ void DVBRecorder::Close(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
-    DVBStreamHandler::Return(_stream_handler);
+    DVBStreamHandler::Return(_stream_handler, tvrec ? tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
