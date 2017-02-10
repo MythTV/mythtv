@@ -664,8 +664,12 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
                 !pause.contains(At(i)) &&
                 !displayed.contains(At(i)))
             {
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("VideoBuffers::DiscardFrames(): ERROR, %1 (%2) not "
+                // This message is DEBUG because it does occur
+                // after Reset is called.
+                // That happens when failing over from OpenGL
+                // to another method, if QT painter is selected.
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("VideoBuffers::DiscardFrames(): %1 (%2) not "
                             "in available, pause, or displayed %3")
                         .arg(DebugString(At(i), true)).arg((long long)At(i))
                         .arg(GetStatus()));
