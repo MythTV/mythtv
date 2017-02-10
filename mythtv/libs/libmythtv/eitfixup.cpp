@@ -2658,8 +2658,10 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         bool ok;
         uint y = tmpRegEx.cap(1).toUInt(&ok);
         if (ok)
+        {
             event.originalairdate = QDate(y, 1, 1);
             event.description.replace(tmpRegEx, "");
+        }
     }
     // Remove white spaces
     event.description = event.description.trimmed();
