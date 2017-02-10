@@ -175,7 +175,12 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                             .arg(m_dbparms.wolCommand));
                 }
 
-                sleep(m_dbparms.wolReconnect);
+                QTime sleepTime = QTime::currentTime().addSecs(m_dbparms.wolReconnect);
+                while (QTime::currentTime() < sleepTime)
+                {
+                     QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 100);
+                     sleep(1); // Must not be longer than the X session manager save session timeout (usually 90 seconds).
+                }
                 connected = m_db.open();
             }
 
