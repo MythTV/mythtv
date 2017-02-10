@@ -1675,7 +1675,7 @@ BDOverlay* BDRingBuffer::GetOverlay(void)
 
 void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
 {
-    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
+    if (!overlay || overlay->plane > m_overlayPlanes.size())
         return;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
@@ -1764,7 +1764,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
 
 void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
 {
-    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
+    if (!overlay || overlay->plane > m_overlayPlanes.size())
         return;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
