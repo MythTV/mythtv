@@ -478,15 +478,16 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
     QMutexLocker locker(&m_lock);
 
     sdt_sections_cache_const_t::const_iterator section = sections.begin();
-    sdt_section_const_ptr_t sdt = *section;
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Got a Service Description Table for %1")
-            .arg((*m_current).FriendlyName) + "\n" + sdt->toString());
+            .arg((*m_current).FriendlyName) + "\n" + (*section)->toString());
+
+    // Process common fields
 
     // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
-    if (!m_setOtherTables && (sdt->OriginalNetworkID() == 2 ||
-        sdt->OriginalNetworkID() == 59))
+    if (!m_setOtherTables && ((*section)->OriginalNetworkID() == 2 ||
+        (*section)->OriginalNetworkID() == 59))
     {
         GetDTVSignalMonitor()->GetScanStreamData()->
                                SetFreesatAdditionalSI(true);
@@ -498,17 +499,19 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("SDT has OriginalNetworkID %1, look for "
-                    "additional Freesat SI").arg(sdt->OriginalNetworkID()));
+                    "additional Freesat SI").arg((*section)->OriginalNetworkID()));
     }
 
-    uint id = sdt->OriginalNetworkID() << 16 | sdt->TSID();
+    uint id = (*section)->OriginalNetworkID() << 16 | (*section)->TSID();
     m_tsScanned.insert(id);
+
+    // Process per section fields
 
     for (; section != sections.end(); ++section)
     {
         for (uint i = 0; !m_currentTestingDecryption && i < (*section)->ServiceCount(); i++)
         {
-            if (sdt->IsEncrypted(i))
+            if ((*section)->IsEncrypted(i))
             {
                 m_currentEncryptionStatus[(*section)->ServiceID(i)] = kEncUnknown;
             }
@@ -588,8 +591,12 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
 
+    // Process common fields
+
     uint netid = (*section)->OriginalNetworkID();
     uint tsid = (*section)->TSID();
+
+    // Process per section fields
 
     for (; section != sections.end(); ++section)
     {
