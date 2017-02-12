@@ -763,6 +763,8 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
     // Changed to use port check instead of ping
 
     int port = m_DBparams.dbPort;
+    if (port == 0)
+        port = 3306;
 
     // 1 = db awake, 2 = db listening, 3 = db connects,
     // 4 = backend awake, 5 = backend listening
@@ -785,7 +787,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
     do
     {
         int wakeupTime = 3;
-        int attempts = 11;
+        int attempts = 21;
         if (m_DBparams.wolEnabled) {
             wakeupTime = m_DBparams.wolReconnect;
             attempts = m_DBparams.wolRetry + 1;
@@ -818,8 +820,8 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
             // After that show the GUI (if this is a GUI program)
 
             LOG(VB_GENERAL, LOG_INFO,
-                 QString("Start up testing connections. host %1, attempt %2, status %3")
-                      .arg(host).arg(attempt).arg(guiStatuses[startupState]));
+                 QString("Start up testing connections. DB %1, BE %2, attempt %3, status %4")
+                      .arg(host).arg(backendIP).arg(attempt).arg(guiStatuses[startupState]));
 
             int useTimeout = wakeupTime;
             if (attempt == 0)

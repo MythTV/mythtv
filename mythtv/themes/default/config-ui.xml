@@ -942,8 +942,8 @@
             <helptext></helptext>
         </button>
 
-        <button name="retry" from="basewidebutton">
-            <area>5%,88%,20%,50%</area>
+        <button name="retry" from="basebutton">
+            <position>5%,88%</position>
             <value>Retry</value>
             <helptext>Try again to establish connections.</helptext>
         </button>
