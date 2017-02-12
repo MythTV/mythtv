@@ -11184,6 +11184,9 @@ bool MenuBase::LoadStringHelper(const QString &text,
                                 int includeLevel)
 {
     bool result = false;
+
+    m_translationContext = translationContext;
+    m_keyBindingContext = keyBindingContext;
     m_document = new QDomDocument();
     if (m_document->setContent(text))
     {

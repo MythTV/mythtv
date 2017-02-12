@@ -131,7 +131,11 @@ void MythTerminal::ProcessFinished(
     int exitCode, QProcess::ExitStatus exitStatus)
 {
     QMutexLocker locker(&m_lock);
-    AddText(tr("*** Exited with status: %1 ***").arg(exitCode));
+    if (exitStatus == QProcess::CrashExit) {
+        AddText(tr("*** Crashed with status: %1 ***").arg(exitCode));
+    } else {
+        AddText(tr("*** Exited with status: %1 ***").arg(exitCode));
+    }
     m_running = false;
     m_enterButton->SetEnabled(false);
     m_textEdit->SetEnabled(false);

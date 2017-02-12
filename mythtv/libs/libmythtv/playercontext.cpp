@@ -360,7 +360,7 @@ bool PlayerContext::CalcPlayerSliderPosition(osdInfo &info,
     QMutexLocker locker(&deletePlayerLock);
     if (player)
     {
-        player->calcSliderPos(info);
+        player->calcSliderPos(info, paddedFields);
         return true;
     }
     return false;
