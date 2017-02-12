@@ -25,28 +25,28 @@ class VideoOutputNullVAAPI : public VideoOutput
                               void        *codec_private,
                               bool        &aspect_only);
 
-    virtual bool SetupDeinterlace(bool, const QString &ovrf = "") { return false; }
+    virtual bool SetupDeinterlace(bool, const QString & = "")     { return false; }
     virtual bool SetDeinterlacingEnabled(bool)                    { return false; }
-    virtual bool ApproveDeintFilter(const QString& filtername) const { return false; }
+    virtual bool ApproveDeintFilter(const QString&) const         { return false; }
     virtual void ReleaseFrame(VideoFrame *frame);
-    virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
-                              FilterChain *filterList,
-                              const PIPMap &pipPlayers,
-                              FrameScanType scan)         {;}
-    virtual void PrepareFrame(VideoFrame *buffer,
-                              FrameScanType, OSD *osd)    {;}
+    virtual void ProcessFrame(VideoFrame *, OSD *,
+                              FilterChain *,
+                              const PIPMap &,
+                              FrameScanType)              {;}
+    virtual void PrepareFrame(VideoFrame *,
+                              FrameScanType, OSD *)       {;}
     virtual void Show(FrameScanType )                     {;}
 
-    virtual void Zoom(ZoomDirection direction)            {;}
-    virtual void EmbedInWidget(const QRect &rect)         {;}
+    virtual void Zoom(ZoomDirection)                      {;}
+    virtual void EmbedInWidget(const QRect &)             {;}
     virtual void StopEmbedding(void)                      {;}
-    virtual void DrawUnusedRects(bool sync = true)        {;}
-    virtual void UpdatePauseFrame(int64_t &disp_timecode) {;}
+    virtual void DrawUnusedRects(bool = true)             {;}
+    virtual void UpdatePauseFrame(int64_t &)              {;}
     virtual void MoveResizeWindow(QRect )                 {;}
-    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
+    virtual bool CanVisualise(AudioPlayer *, MythRender *)
         { return false; }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
-                                    const QString &name) { return false; }
+    virtual bool SetupVisualisation(AudioPlayer *, MythRender *,
+                                    const QString &) { return false; }
     virtual MythPainter *GetOSDPainter(void) { return NULL; }
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);

@@ -77,7 +77,7 @@ class VideoOutput
                               OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
 
-    virtual void WindowResized(const QSize &new_size) {}
+    virtual void WindowResized(const QSize &) {}
 
     virtual bool InputChanged(const QSize &video_dim_buf,
                               const QSize &video_dim_disp,
@@ -151,7 +151,7 @@ class VideoOutput
 
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
-    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id) { return NULL; }
+    virtual void* GetDecoderContext(unsigned char*, uint8_t*&) { return NULL; }
 
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
@@ -243,14 +243,13 @@ class VideoOutput
     virtual QRect GetPIPRect(PIPLocation location,
                              MythPlayer *pipplayer = NULL,
                              bool do_pixel_adj = true) const;
-    virtual void RemovePIP(MythPlayer *pipplayer) { }
+    virtual void RemovePIP(MythPlayer *) { }
 
     virtual void SetPIPState(PIPState setting);
 
     virtual QString GetOSDRenderer(void) const;
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)osd_painter; }
-    virtual bool GetScreenShot(int width = 0, int height = 0,
-                               QString filename = "") { return false; }
+    virtual bool GetScreenShot(int = 0, int = 0, QString = "") { return false; }
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space
