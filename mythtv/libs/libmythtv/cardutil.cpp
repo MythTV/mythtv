@@ -2440,7 +2440,8 @@ bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
     }
     return ok;
 #else
-    (void) device_num;
+    Q_UNUSED(device_num);
+    Q_UNUSED(mode);
     if (error)
         *error = "Not compiled with ASI support.";
     return false;

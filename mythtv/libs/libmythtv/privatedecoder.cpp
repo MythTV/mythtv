@@ -25,6 +25,10 @@ void PrivateDecoder::GetDecoders(render_opts &opts)
 #ifdef USING_CRYSTALHD
     PrivateDecoderCrystalHD::GetDecoders(opts);
 #endif
+
+#if !(defined(Q_OS_MACX) || USING_OPENMAX || USING_CRYSTALHD)
+    Q_UNUSED(opts);
+#endif
 }
 
 PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
@@ -50,6 +54,12 @@ PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
     if (chd && chd->Init(decoder, flags, avctx))
         return chd;
     delete chd;
+#endif
+
+#if !(defined(Q_OS_MACX) || USING_OPENMAX || USING_CRYSTALHD)
+    Q_UNUSED(decoder);
+    Q_UNUSED(flags);
+    Q_UNUSED(avctx);
 #endif
 
     return NULL;

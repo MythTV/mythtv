@@ -1972,6 +1972,7 @@ void ASIConfigurationGroup::probeCard(const QString &device)
     }
     cardinfo->setValue(tr("Valid DVEO ASI card"));
 #else
+    Q_UNUSED(device);
     cardinfo->setValue(QString("Not compiled with ASI support"));
 #endif
 }

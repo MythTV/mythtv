@@ -562,6 +562,8 @@ bool Xsd::IsEnum( const QMetaProperty &metaProperty, const QString &sType )
         return true;
     }
 
+#else
+    Q_UNUSED(sType);
 #endif
 
     return false;
