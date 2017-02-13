@@ -302,8 +302,7 @@ static void parseAudio(QDomElement &element, ProgInfo *pginfo)
 
 ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
 {
-    QString uniqueid, season, episode, totalepisodes;
-    int dd_progid_done = 0;
+    QString programid, season, episode, totalepisodes;
     ProgInfo *pginfo = new ProgInfo();
 
     QString text = element.attribute("start", "");
@@ -476,8 +475,11 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     int idx = episodenum.indexOf('.');
                     if (idx != -1)
                         episodenum.remove(idx, 1);
-                    pginfo->programId = episodenum;
-                    dd_progid_done = 1;
+                    programid = episodenum;
+                    /* Only EPisodes and SHows are part of a series for SD */
+                    if (programid.startsWith(QString("EP")) ||
+                        programid.startsWith(QString("SH")))
+                        pginfo->seriesId = QString("EP") + programid.mid(2,8);
                 }
                 else if (info.attribute("system") == "xmltv_ns")
                 {
@@ -574,22 +576,20 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
         && ProgramInfo::kCategorySeries != pginfo->categoryType)
         pginfo->airdate = current_year;
 
-    /* Let's build ourself a programid */
-    QString programid;
-
-    if (ProgramInfo::kCategoryMovie == pginfo->categoryType)
-        programid = "MV";
-    else if (ProgramInfo::kCategorySeries == pginfo->categoryType)
-        programid = "EP";
-    else if (ProgramInfo::kCategorySports == pginfo->categoryType)
-        programid = "SP";
-    else
-        programid = "SH";
-
-    if (!uniqueid.isEmpty()) // we already have a unique id ready for use
-        programid.append(uniqueid);
-    else
+    if (programid.isEmpty())
     {
+
+        /* Let's build ourself a programid */
+
+        if (ProgramInfo::kCategoryMovie == pginfo->categoryType)
+            programid = "MV";
+        else if (ProgramInfo::kCategorySeries == pginfo->categoryType)
+            programid = "EP";
+        else if (ProgramInfo::kCategorySports == pginfo->categoryType)
+            programid = "SP";
+        else
+            programid = "SH";
+
         QString seriesid = QString::number(ELFHash(pginfo->title.toUtf8()));
         pginfo->seriesId = seriesid;
         programid.append(seriesid);
@@ -627,8 +627,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 programid.clear();
         }
     }
-    if (dd_progid_done == 0)
-        pginfo->programId = programid;
+
+    pginfo->programId = programid;
 
     return pginfo;
 }
