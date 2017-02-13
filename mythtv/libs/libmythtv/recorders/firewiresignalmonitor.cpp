@@ -2,8 +2,9 @@
 // Copyright (c) 2006, Daniel Thor Kristjansson
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/select.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "mythdbcon.h"
 #include "atscstreamdata.h"
@@ -146,7 +147,8 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
         while (dtvMonitorRunning)
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err end");
         return;
     }
@@ -157,7 +159,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->AddListener(this);
 
     while (dtvMonitorRunning && GetStreamData())
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- shutdown ");
 
@@ -165,7 +167,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->ClosePort();
 
     while (dtvMonitorRunning)
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- end");
 }
@@ -291,7 +293,7 @@ void FirewireSignalMonitor::UpdateValues(void)
                 "Waiting for table monitor to start");
 
         while (!dtvMonitorRunning)
-            usleep(5000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues() -- "
                 "Table monitor started");

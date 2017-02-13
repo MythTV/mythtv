@@ -26,6 +26,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
 // Qt
 #include <QDir>
 
@@ -186,7 +189,7 @@ bool ImportRecorder::Open(void)
         // Slow down run open loop when debugging -v record.
         // This is just to make the debugging output less spammy.
         if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_ANY))
-            usleep(250 * 1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
         return false;
     }

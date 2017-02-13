@@ -1,7 +1,8 @@
 
 #include "networkcontrol.h"
 
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include <QCoreApplication>
 #include <QRegExp>
@@ -465,7 +466,7 @@ QString NetworkControl::processJump(NetworkCommand *nc)
     timer.start();
     while ((timer.elapsed() < FE_SHORT_TO) &&
            (GetMythUI()->GetCurrentLocation().toLower() != nc->getArg(1)))
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     return result;
 }
@@ -497,7 +498,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
 
         if (nc->getArg(curToken) == "sleep")
         {
-            sleep(1);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
         else if (keyMap.contains(nc->getArg(curToken)))
         {
@@ -592,7 +593,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             timer.start();
             while ((timer.elapsed() < FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu"))
-                usleep(10000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
         if (GetMythUI()->GetCurrentLocation().toLower() == "mainmenu")
@@ -621,7 +622,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             timer.start();
             while ((timer.elapsed() < FE_LONG_TO) &&
                    (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
-                usleep(10000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
         if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
@@ -632,12 +633,12 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             timer.start();
             while ((timer.elapsed() < 10000) &&
                    (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
-                usleep(10000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             timer.start();
             while ((timer.elapsed() < 10000) &&
                    (!GetMythUI()->IsTopScreenInitialized()))
-                usleep(10000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
         if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")
@@ -659,7 +660,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             gCoreContext->dispatch(me);
 
             while (timer.elapsed() < FE_LONG_TO && !gotAnswer)
-                usleep(10000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             if (gotAnswer)
                 result += answer;
@@ -707,7 +708,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 while (timer.elapsed() < FE_SHORT_TO && !gotAnswer)
                 {
                     qApp->processEvents();
-                    usleep(10000);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
 
                 if (gotAnswer)
@@ -727,7 +728,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 while (timer.elapsed() < FE_SHORT_TO && !gotAnswer)
                 {
                     qApp->processEvents();
-                    usleep(10000);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
 
                 if (gotAnswer)
@@ -747,7 +748,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                 while (timer.elapsed() < FE_SHORT_TO && !gotAnswer)
                 {
                     qApp->processEvents();
-                    usleep(10000);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
 
                 if (gotAnswer)
@@ -933,7 +934,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
             QTime timer;
             timer.start();
             while (timer.elapsed() < FE_SHORT_TO  && !gotAnswer)
-                usleep(10000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             if (gotAnswer)
                 result += answer;
@@ -1022,7 +1023,7 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
         QTime timer;
         timer.start();
         while (timer.elapsed() < FE_SHORT_TO  && !gotAnswer)
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         if (gotAnswer)
             str = answer;

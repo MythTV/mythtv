@@ -2,7 +2,8 @@
 // -*- Mode: c++ -*-
 
 // Standard UNIX C headers
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -731,11 +732,11 @@ void AudioTestThread::run()
                         LOG(VB_AUDIO, LOG_ERR, "AddData() Audio buffer "
                                                "overflow, audio data lost!");
                     }
-                    usleep(m_audioOutput->LengthLastData() * 1000);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(m_audioOutput->LengthLastData()));
                 }
                 m_audioOutput->Drain();
                 m_audioOutput->Pause(true);
-                usleep(500000); // .5s pause
+                std::this_thread::sleep_for(std::chrono::milliseconds(500)); // .5s pause
                 m_audioOutput->Pause(false);
             }
             if (m_channel >= 0)

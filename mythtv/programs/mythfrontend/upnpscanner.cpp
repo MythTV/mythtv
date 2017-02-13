@@ -6,7 +6,8 @@
 #include "ssdp.h"
 #include "upnpscanner.h"
 
-#include <unistd.h> // for sleep()
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
@@ -261,7 +262,7 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
 
     int count = 0;
     while (!m_scanComplete && (count++ < 300))
-        usleep(100000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // some scans may just take too long (PlayOn)
     if (!m_scanComplete)
@@ -319,7 +320,7 @@ bool UPNPScanner::GetMetadata(QVariant &data)
     LOG(VB_GENERAL, LOG_INFO, "START");
     while (!found && (count++ < 100)) // 10 seconds
     {
-        usleep(100000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         m_lock.lock();
         if (m_servers.contains(usn))
         {

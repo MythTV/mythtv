@@ -2,8 +2,8 @@
 #include "httptsstreamhandler.h"
 #include "mythlogging.h"
 
-// POSIX headers
-#include <unistd.h> // for usleep
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #define LOC QString("HTTPTSSH(%1): ").arg(_device)
 
@@ -102,7 +102,7 @@ HTTPTSStreamHandler::~HTTPTSStreamHandler(void)
 void HTTPTSStreamHandler::run(void)
 {
     RunProlog();
-    int open_sleep = 250000;
+    int open_sleep = 250;
     LOG(VB_RECORD, LOG_INFO, LOC + "run() -- begin");
     SetRunning(true, false, false);
 
@@ -112,12 +112,12 @@ void HTTPTSStreamHandler::run(void)
         if (!m_reader->DownloadStream(m_tuning.GetURL(0)))
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "DownloadStream failed to receive bytes from " + m_tuning.GetURL(0).toString());
-            usleep(open_sleep);
-            if (open_sleep < 10000000)
-                open_sleep += 250000;
+            std::this_thread::sleep_for(std::chrono::milliseconds(open_sleep));
+            if (open_sleep < 10000)
+                open_sleep += 250;
             continue;
         }
-        open_sleep = 250000;
+        open_sleep = 250;
     }
 
     delete m_reader;

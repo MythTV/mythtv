@@ -10,6 +10,8 @@
 //#include <sys/select.h>
 #include <sys/ioctl.h>
 #endif
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt headers
 #include <QString>
@@ -565,7 +567,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "StartEncoding: read failing, re-opening device: " + ENO);
                 close(m_fd);
-                usleep(2000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
                 m_fd = open(_device.toLatin1().constData(), O_RDWR | O_NONBLOCK);
                 if (m_fd < 0)
                 {
@@ -580,7 +582,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("StartEncoding: read failed, retry in %1 msec:")
                     .arg(100 * idx) + ENO);
-                usleep(100 * idx);
+                std::this_thread::sleep_for(std::chrono::microseconds(idx * 100));
             }
         }
         if (idx == 50)
@@ -658,7 +660,7 @@ bool V4L2encStreamHandler::StopEncoding(void)
 
     // allow last bits of data through..
     if (m_drb && m_drb->IsRunning())
-        usleep(20 * 1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
 #if 0
     // close the fd so streamoff/streamon work in V4LChannel    Close();
     close(m_fd);
@@ -982,7 +984,7 @@ bool V4L2encStreamHandler::SetBitrateForResolution(void)
             m_v4l2.Close();
             m_v4l2.Open(_device, m_vbi_device);
         }
-        usleep(100);
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
     if (idx == 5)
         return false;

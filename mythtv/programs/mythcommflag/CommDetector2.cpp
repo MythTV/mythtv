@@ -1,9 +1,8 @@
-// POSIX headers
-#include <unistd.h>
-
 // ANSI C headers
 #include <cmath>
 #include <cerrno>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // C++ headers
 #include <algorithm>
@@ -74,7 +73,7 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
         // Slow down; increase sleep time
         sleepus = sleepus * 3 / 2;
     }
-    usleep(sleepus);
+    std::this_thread::sleep_for(std::chrono::microseconds(sleepus));
 }
 
 bool MythPlayerInited(FrameAnalyzerItem &pass,
@@ -632,7 +631,7 @@ bool CommDetector2::go(void)
             while (m_bPaused)
             {
                 emit breathe();
-                sleep(1);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
             }
 
             if (!searchingForLogo(logoFinder, *currentPass) &&
@@ -675,7 +674,7 @@ bool CommDetector2::go(void)
 
             // sleep a little so we don't use all cpu even if we're niced
             if (!fullSpeed && !isRecording)
-                usleep(10000);  // 10ms
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
             if (sendBreakMapUpdates && (breakMapUpdateRequested ||
                         !(currentFrameNumber % 500)))

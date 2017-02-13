@@ -8,7 +8,8 @@
 */
 
 // c/c++
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 #include <stdlib.h>
 #include <cmath>
 
@@ -191,7 +192,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
         while (--timeout && m_socket->state() != QAbstractSocket::ConnectedState)
         {
             qApp->processEvents();
-            usleep(1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
             if (m_socket->state() == QAbstractSocket::ConnectedState)
             {

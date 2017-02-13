@@ -11,6 +11,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "upnp.h"
 #include "mythlogging.h"
@@ -241,7 +243,7 @@ void SSDP::PerformSearch(const QString &sST, uint timeout_secs)
         LOG(VB_GENERAL, LOG_INFO,
             "SSDP::PerformSearch - did not write entire buffer.");
 
-    usleep( random() % 250000 );
+    std::this_thread::sleep_for(std::chrono::milliseconds(random() % 250));
 
     if ( pSocket->writeBlock( sRequest.data(),
                               sRequest.size(), address, SSDP_PORT ) != nSize)
@@ -358,7 +360,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
                         break;
                     }
                     retries++;
-                    usleep(10000);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     continue;
                 }
                 LOG(VB_GENERAL, LOG_ERR, QString("Socket readBlock error %1")
@@ -622,6 +624,10 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     int nPos = sCache.indexOf("max-age", 0, Qt::CaseInsensitive);
 
     if (nPos < 0)
+        return false;
+
+    // Ignore link local ip addresses
+    if (sDescURL.startsWith("http://[fe80::",Qt::CaseInsensitive))
         return false;
 
     if ((nPos = sCache.indexOf("=", nPos)) < 0)

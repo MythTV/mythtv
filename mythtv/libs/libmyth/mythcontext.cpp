@@ -77,7 +77,7 @@ class MythContextPrivate : public QObject
     bool SaveDatabaseParams(const DatabaseParams &params, bool force);
 
     bool    PromptForDatabaseParams(const QString &error);
-    QString TestDBconnection(void);
+    QString TestDBconnection(bool prompt=true);
     void    SilenceDBerrors(void);
     void    EnableDBerrors(void);
     void    ResetDatabase(void);
@@ -468,7 +468,7 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
             if (failure.length())
                 LOG(VB_GENERAL, LOG_ALERT, failure);
 
-        failure = TestDBconnection();
+        failure = TestDBconnection(loaded);
         if (failure.isEmpty())
             goto DBfound;
         if (m_guiStartup && m_guiStartup->m_Exit)
@@ -754,7 +754,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
  *
  * \todo  Rationalise the WOL stuff. We should have one method to wake BEs
  */
-QString MythContextPrivate::TestDBconnection(void)
+QString MythContextPrivate::TestDBconnection(bool prompt)
 {
     QString err    = QString::null;
     QString host   = m_DBparams.dbHostName;
@@ -762,10 +762,9 @@ QString MythContextPrivate::TestDBconnection(void)
     // Jan 20, 2017
     // Changed to use port check instead of ping
 
-    bool configXmlFound
-        =    !(m_pConfig->GetValue(kDefaultDB + "Host", "")).isEmpty()
-          || !(m_pConfig->GetValue(kDefaultMFE + "DBHostName", "")).isEmpty();
     int port = m_DBparams.dbPort;
+    if (port == 0)
+        port = 3306;
 
     // 1 = db awake, 2 = db listening, 3 = db connects,
     // 4 = backend awake, 5 = backend listening
@@ -785,169 +784,168 @@ QString MythContextPrivate::TestDBconnection(void)
         {"start","dbAwake","dbStarted","dbConnects","beWOL","beAwake",
             "success" };
 
-    if (configXmlFound)
+    do
     {
-        do
+        int wakeupTime = 3;
+        int attempts = 21;
+        if (m_DBparams.wolEnabled) {
+            wakeupTime = m_DBparams.wolReconnect;
+            attempts = m_DBparams.wolRetry + 1;
+            startupState = st_start;
+        }
+        else
+            startupState = st_dbAwake;
+        if (attempts < 1)
+            attempts = 1;
+        if (!prompt)
+            attempts=1;
+        if (wakeupTime < 1)
+            wakeupTime = 1;
+
+        int progressTotal = wakeupTime * attempts;
+
+        if (m_guiStartup)
+            m_guiStartup->setTotal(progressTotal);
+
+        QString beWOLCmd = QString();
+        QString backendIP = QString();
+        int backendPort = 0;
+
+        for (int attempt = 0;
+            attempt < attempts && startupState != st_success;
+            ++attempt)
         {
-            int wakeupTime = 3;
-            int attempts = 11;
-            if (m_DBparams.wolEnabled) {
-                wakeupTime = m_DBparams.wolReconnect;
-                attempts = m_DBparams.wolRetry + 1;
-                startupState = st_start;
-            }
-            else
-                startupState = st_dbAwake;
-            if (attempts < 1)
-                attempts = 1;
-            if (wakeupTime < 1)
-                wakeupTime = 1;
+            // The first time do everything with minimum timeout and
+            // no GUI, for the normal case where all is OK
+            // After that show the GUI (if this is a GUI program)
 
-            int progressTotal = wakeupTime * attempts;
+            LOG(VB_GENERAL, LOG_INFO,
+                 QString("Start up testing connections. DB %1, BE %2, attempt %3, status %4")
+                      .arg(host).arg(backendIP).arg(attempt).arg(guiStatuses[startupState]));
 
-            if (m_guiStartup)
-                m_guiStartup->setTotal(progressTotal);
+            int useTimeout = wakeupTime;
+            if (attempt == 0)
+                useTimeout=1;
 
-            QString beWOLCmd = QString();
-            QString backendIP = QString();
-            int backendPort = 0;
-
-            for (int attempt = 0;
-                attempt <= attempts && startupState != st_success;
-                ++attempt)
+            if (m_gui && !m_guiStartup)
             {
-                // The first time do everything with minimum timeout and
-                // no GUI, for the normal case where all is OK
-                // After that show the GUI (if this is a GUI program)
-
-                LOG(VB_GENERAL, LOG_INFO,
-                     QString("Start up testing connections. host %1, attempt %2, status %3")
-                          .arg(host).arg(attempt).arg(guiStatuses[startupState]));
-
-                int useTimeout = wakeupTime;
-                if (attempt == 0)
-                    useTimeout=1;
-
-                if (m_gui && !m_guiStartup)
+                if (attempt > 0)
+                {
+                    ShowGuiStartup();
+                    if (m_guiStartup)
+                        m_guiStartup->setTotal(progressTotal);
+                }
+            }
+            if (m_guiStartup)
+            {
+                if (attempt > 0)
+                    m_guiStartup->setStatusState(guiStatuses[startupState]);
+                m_guiStartup->setMessageState("empty");
+                processEvents();
+            }
+            switch (startupState) {
+            case st_start:
+                if (m_DBparams.wolEnabled)
                 {
                     if (attempt > 0)
-                    {
-                        ShowGuiStartup();
-                        if (m_guiStartup)
-                            m_guiStartup->setTotal(progressTotal);
-                    }
-                }
-                if (m_guiStartup)
-                {
-                    if (attempt > 0)
-                        m_guiStartup->setStatusState(guiStatuses[startupState]);
-                    m_guiStartup->setMessageState("empty");
-                    processEvents();
-                }
-                switch (startupState) {
-                case st_start:
-                    if (m_DBparams.wolEnabled)
-                    {
-                        if (attempt > 0)
-                            myth_system(m_DBparams.wolCommand);
-                        if (!CheckPort(host, port, useTimeout))
-                            break;
-                    }
-                    startupState = st_dbAwake;
-                    // Fall through to next case
-                case st_dbAwake:
+                        myth_system(m_DBparams.wolCommand);
                     if (!CheckPort(host, port, useTimeout))
                         break;
-                    startupState = st_dbStarted;
-                    // Fall through to next case
-                case st_dbStarted:
-                    EnableDBerrors();
-                    ResetDatabase();
-                    if (!MSqlQuery::testDBConnection())
+                }
+                startupState = st_dbAwake;
+                // Fall through to next case
+            case st_dbAwake:
+                if (!CheckPort(host, port, useTimeout))
+                    break;
+                startupState = st_dbStarted;
+                // Fall through to next case
+            case st_dbStarted:
+                EnableDBerrors();
+                ResetDatabase();
+                if (!MSqlQuery::testDBConnection())
+                {
+                    for (int temp = 0; temp < useTimeout * 2 ; temp++)
                     {
-                        for (int temp = 0; temp < useTimeout * 2 ; temp++)
-                        {
-                            if (processEvents())
-                                break;
-                            usleep(500000);
-                        }
-                        break;
-                    }
-                    startupState = st_dbConnects;
-                    // Fall through to next case
-                case st_dbConnects:
-                    if (needsBackend)
-                    {
-                        beWOLCmd = gCoreContext->GetSetting("WOLbackendCommand", "");
-                        if (!beWOLCmd.isEmpty())
-                        {
-                            wakeupTime += gCoreContext->GetNumSetting
-                                ("WOLbackendReconnectWaitTime", 0);
-                            attempts += gCoreContext->GetNumSetting
-                                ("WOLbackendConnectRetry", 0);
-                            useTimeout = wakeupTime;
-                            if (m_gui && !m_guiStartup && attempt == 0)
-                                useTimeout=1;
-                            progressTotal = wakeupTime * attempts;
-                            if (m_guiStartup)
-                                m_guiStartup->setTotal(progressTotal);
-                            startupState = st_beWOL;
-                        }
-                    }
-                    else {
-                        startupState = st_success;
-                        break;
-                    }
-                    backendIP = gCoreContext->GetSetting("MasterServerIP", "");
-                    backendPort = gCoreContext->GetNumSetting("MasterServerPort", 0);
-                    // Fall through to next case
-                case st_beWOL:
-                    if (!beWOLCmd.isEmpty()) {
-                        if (attempt > 0)
-                            myth_system(beWOLCmd);
-                        if (!CheckPort(backendIP, backendPort, useTimeout))
+                        if (processEvents())
                             break;
+                        usleep(500000);
                     }
-                    startupState = st_beAwake;
-                    // Fall through to next case
-                case st_beAwake:
+                    break;
+                }
+                startupState = st_dbConnects;
+                // Fall through to next case
+            case st_dbConnects:
+                if (needsBackend)
+                {
+                    beWOLCmd = gCoreContext->GetSetting("WOLbackendCommand", "");
+                    if (!beWOLCmd.isEmpty())
+                    {
+                        wakeupTime += gCoreContext->GetNumSetting
+                            ("WOLbackendReconnectWaitTime", 0);
+                        attempts += gCoreContext->GetNumSetting
+                            ("WOLbackendConnectRetry", 0);
+                        useTimeout = wakeupTime;
+                        if (m_gui && !m_guiStartup && attempt == 0)
+                            useTimeout=1;
+                        progressTotal = wakeupTime * attempts;
+                        if (m_guiStartup)
+                            m_guiStartup->setTotal(progressTotal);
+                        startupState = st_beWOL;
+                    }
+                }
+                else {
+                    startupState = st_success;
+                    break;
+                }
+                backendIP = gCoreContext->GetSetting("MasterServerIP", "");
+                backendPort = gCoreContext->GetNumSetting("MasterServerPort", 0);
+                // Fall through to next case
+            case st_beWOL:
+                if (!beWOLCmd.isEmpty()) {
+                    if (attempt > 0)
+                        myth_system(beWOLCmd);
                     if (!CheckPort(backendIP, backendPort, useTimeout))
                         break;
-                    startupState = st_success;
                 }
-                if (m_guiStartup)
-                {
-                    if (m_guiStartup->m_Exit
-                      || m_guiStartup->m_Setup
-                      || m_guiStartup->m_Retry)
-                        break;
-                }
-                if (processEvents())
+                startupState = st_beAwake;
+                // Fall through to next case
+            case st_beAwake:
+                if (!CheckPort(backendIP, backendPort, useTimeout))
                     break;
-
+                startupState = st_success;
             }
-            if (startupState == st_success)
-                break;
-
-            QString stateMsg = guiStatuses[startupState];
-            stateMsg.append("Fail");
-            LOG(VB_GENERAL, LOG_INFO,
-                 QString("Start up failure. host %1, status %2")
-                      .arg(host).arg(stateMsg));
-
-            if (m_guiStartup
-              && !m_guiStartup->m_Exit
-              && !m_guiStartup->m_Setup
-              && !m_guiStartup->m_Retry)
+            if (m_guiStartup)
             {
-                m_guiStartup->updateProgress(true);
-                m_guiStartup->setStatusState(stateMsg);
-                m_guiStartup->setMessageState("makeselection");
-                m_loop->exec();
+                if (m_guiStartup->m_Exit
+                  || m_guiStartup->m_Setup
+                  || m_guiStartup->m_Retry)
+                    break;
             }
+            if (processEvents())
+                break;
+        }
+        if (startupState == st_success)
+            break;
 
-        } while (m_guiStartup && m_guiStartup->m_Retry);
+        QString stateMsg = guiStatuses[startupState];
+        stateMsg.append("Fail");
+        LOG(VB_GENERAL, LOG_INFO,
+             QString("Start up failure. host %1, status %2")
+                  .arg(host).arg(stateMsg));
+
+        if (m_guiStartup
+          && !m_guiStartup->m_Exit
+          && !m_guiStartup->m_Setup
+          && !m_guiStartup->m_Retry)
+        {
+            m_guiStartup->updateProgress(true);
+            m_guiStartup->setStatusState(stateMsg);
+            m_guiStartup->setMessageState("makeselection");
+            m_loop->exec();
+        }
     }
+    while (m_guiStartup && m_guiStartup->m_Retry);
+
     if (startupState < st_dbAwake)
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Pinging to %1 failed, database will be unavailable").arg(host));

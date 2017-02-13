@@ -1,6 +1,6 @@
-
-// C headers
-#include <unistd.h>
+// ANSI C++ headers
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // QT headers
 #include <QMap>                         // for QMap
@@ -268,7 +268,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     if (local)
     {
         while (kState_ChangingState == GetState())
-            usleep(100);
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
 
         if (IsBusyRecording())
             tvrec = tv->GetRecording();

@@ -5,6 +5,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
 // MythTV headers
 #include "hlsstreamhandler.h"
 #include "mythlogging.h"
@@ -117,7 +120,7 @@ void HLSStreamHandler::run(void)
     QString url = m_tuning.GetURL(0).toString();
     int err_cnt = 0;
     int nil_cnt = 0;
-    int open_sleep = 500000;
+    int open_sleep = 500;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "run() -- begin");
 
@@ -136,12 +139,12 @@ void HLSStreamHandler::run(void)
             {
                 if (m_hls->FatalError())
                     break;
-                usleep(open_sleep);
-                if (open_sleep < 20000000)
-                    open_sleep += 500000;
+                std::this_thread::sleep_for(std::chrono::milliseconds(open_sleep));
+                if (open_sleep < 20000)
+                    open_sleep += 500;
                 continue;
             }
-            open_sleep = 500000;
+            open_sleep = 500;
             m_hls->Throttle(m_throttle);
             m_throttle = false;
         }
@@ -168,7 +171,8 @@ void HLSStreamHandler::run(void)
         {
             if (nil_cnt < 4)
                 ++nil_cnt;
-            usleep(250000 * nil_cnt - 1);  // range .25 to 1 second, minus 1
+            // range .25 to 1 second
+            std::this_thread::sleep_for(std::chrono::milliseconds(nil_cnt *250));
             continue;
         }
         nil_cnt = 0;
@@ -201,16 +205,17 @@ void HLSStreamHandler::run(void)
         }
 
         if (m_hls->IsThrottled())
-            usleep(999999);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         else if (size < BUFFER_SIZE)
         {
             LOG(VB_RECORD, LOG_DEBUG, LOC +
                 QString("Requested %1 bytes, got %2 bytes.")
                 .arg(BUFFER_SIZE).arg(size));
-            usleep(10000); // hundredth of a second.
+            // hundredth of a second.
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         else
-            usleep(1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     m_hls->Throttle(false);

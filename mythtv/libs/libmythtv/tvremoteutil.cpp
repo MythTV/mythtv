@@ -1,4 +1,5 @@
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "tvremoteutil.h"
 #include "cardutil.h"
@@ -406,7 +407,7 @@ bool RemoteGetRecordingStatus(
 
             state = strlist[0].toInt();
             if (kState_ChangingState == state)
-                usleep(5000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
 
         if (kState_RecordingOnly == state || kState_WatchingRecording == state)

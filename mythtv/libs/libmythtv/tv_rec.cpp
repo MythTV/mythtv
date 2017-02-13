@@ -2,8 +2,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <unistd.h>
 #include <sched.h> // for sched_yield
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // MythTV headers
 
@@ -1544,7 +1545,7 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
 
         int te = t2.elapsed();
         if (!ok && te < 10)
-            usleep((10-te) * 1000);
+            std::this_thread::sleep_for(std::chrono::microseconds(10-te));
     }
     return ok;
 }
@@ -4311,7 +4312,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     // Wait for recorder to start.
     stateChangeLock.unlock();
     while (!recorder->IsRecording() && !recorder->IsErrored())
-        usleep(5 * 1000);
+        std::this_thread::sleep_for(std::chrono::microseconds(5));
     stateChangeLock.lock();
 
     if (GetV4LChannel())

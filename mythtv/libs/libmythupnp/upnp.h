@@ -80,6 +80,7 @@ typedef enum
     UPnPResult_MS_AccessDenied               = 801,
 
     UPnPResult_MythTV_NoNamespaceGiven       = 32001,
+    UPnPResult_MythTV_XmlParseError          = 32002,
 
 } UPnPResultCode;
 

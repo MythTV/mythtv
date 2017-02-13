@@ -16,7 +16,8 @@
 #include "exitcodes.h"
 #include "mythtimezone.h"
 
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 using namespace MythTZ;
 
@@ -55,7 +56,7 @@ BackendConnectionManager::BackendConnectionManager() :
 BackendConnectionManager::~BackendConnectionManager()
 {
     while (m_reconnecting)
-        usleep(250*1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
     gCoreContext->removeListener(this);
 }
 

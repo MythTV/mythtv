@@ -4,10 +4,11 @@
 #include <algorithm>
 #include <cerrno>
 #include <memory>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 using namespace std;
 
 #include <math.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include "mythconfig.h"
 
@@ -2298,8 +2299,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
-    sleep(3);
-    usleep(random()%2000);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::milliseconds(random()%2));
 
     deletelock.lock();
 
@@ -2387,7 +2388,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     else
     {
         delete_file_immediately(ds->m_filename, followLinks, false);
-        sleep(2);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
         if (checkFile.exists())
             errmsg = true;
     }
@@ -2538,7 +2539,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
             QString("Error deleting recorded entry for %1.") .arg(logInfo));
     }
 
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1")
@@ -2546,7 +2547,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     gCoreContext->SendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
-    sleep(3);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 
     query.prepare("DELETE FROM recordedmarkup "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
@@ -2729,7 +2730,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
 
         count++;
 
-        usleep(sleep_time * 1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
     }
 
     bool ok = (0 == close(fd));
@@ -2882,7 +2883,7 @@ void MainServer::DoHandleStopRecording(
             while (elink->IsBusyRecording() ||
                    elink->GetState() == kState_ChangingState)
             {
-                usleep(100);
+                std::this_thread::sleep_for(std::chrono::microseconds(100));
             }
 
             if (ismaster)
@@ -7637,7 +7638,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                         if (enc->IsLocal())
                         {
                             while (enc->GetState() == kState_ChangingState)
-                                usleep(500);
+                                std::this_thread::sleep_for(std::chrono::microseconds(500));
 
                             if (enc->IsBusy() &&
                                 enc->GetChainID() == chain->GetID())
