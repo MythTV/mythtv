@@ -1650,7 +1650,7 @@ bool ChannelScanSM::HasTimedOut(void)
         if (!sd)
             return true;
 
-        if (sd->HasCachedAnyNIT() || !m_currentInfo->serviceDescriptionTablesCache.empty())
+        if (sd->HasCachedAnyNIT() || ((NULL != m_currentInfo) && !m_currentInfo->serviceDescriptionTablesCache.empty()))
             return m_timer.elapsed() > (int) kDVBTableTimeout;
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
             return m_timer.elapsed() > (int) kATSCTableTimeout;
