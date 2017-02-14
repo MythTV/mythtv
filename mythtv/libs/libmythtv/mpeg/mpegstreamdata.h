@@ -11,13 +11,14 @@
 using namespace std;
 
 // Qt
-#include <QMap>
+#include "qmap.h"
 
 #include "tspacket.h"
 #include "mythtimer.h"
 #include "streamlisteners.h"
 #include "eitscanner.h"
 #include "mythtvexp.h"
+#include "tablestatus.h"
 
 class EITHelper;
 class PSIPTable;
@@ -47,8 +48,6 @@ typedef QMap<uint, pmt_vec_t>           pmt_map_t;
 typedef QMap<uint, ProgramMapTable*>    pmt_cache_t;
 
 typedef vector<unsigned char>           uchar_vec_t;
-typedef uchar_vec_t                     sections_t;
-typedef QMap<uint, sections_t>          sections_map_t;
 
 typedef vector<MPEGStreamListener*>     mpeg_listener_vec_t;
 typedef vector<TSPacketListener*>       ts_listener_vec_t;
@@ -80,8 +79,6 @@ class MTV_PUBLIC CryptInfo
     uint encrypted_min;
     uint decrypted_min;
 };
-
-void init_sections(sections_t &sect, uint last_section);
 
 typedef enum
 {
@@ -167,60 +164,19 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     // Table versions
     void SetVersionPAT(uint tsid, int version, uint last_section)
     {
-        if (VersionPAT(tsid) == version)
-            return;
-        _pat_version[tsid] = version;
-        init_sections(_pat_section_seen[tsid], last_section);
-    }
-    int  VersionPAT(uint tsid) const
-    {
-        const QMap<uint, int>::const_iterator it = _pat_version.find(tsid);
-        if (it == _pat_version.end())
-            return -1;
-        return *it;
+        _pat_status.SetVersion(tsid, version, last_section);
     }
 
-    void SetVersionCAT(uint tsid, int version, uint last_section)
+    void SetVersionPMT(uint pnum, int version, uint last_section)
     {
-        if (VersionCAT(tsid) == version)
-            return;
-        _cat_version[tsid] = version;
-        init_sections(_cat_section_seen[tsid], last_section);
-    }
-    int  VersionCAT(uint tsid) const
-    {
-        const QMap<uint, int>::const_iterator it = _cat_version.find(tsid);
-        if (it == _cat_version.end())
-            return -1;
-        return *it;
-    }
-
-    void SetVersionPMT(uint program_num, int version, uint last_section)
-    {
-        if (VersionPMT(program_num) == version)
-            return;
-        _pmt_version[program_num] = version;
-        init_sections(_pmt_section_seen[program_num], last_section);
-    }
-    int  VersionPMT(uint prog_num) const
-    {
-        const QMap<uint, int>::const_iterator it = _pmt_version.find(prog_num);
-        if (it == _pmt_version.end())
-            return -1;
-        return *it;
+        _pmt_status.SetVersion(pnum, version, last_section);
     }
 
     // Sections seen
-    void SetPATSectionSeen(uint tsid, uint section);
-    bool PATSectionSeen(   uint tsid, uint section) const;
     bool HasAllPATSections(uint tsid) const;
 
-    void SetCATSectionSeen(uint tsid, uint section);
-    bool CATSectionSeen(   uint tsid, uint section) const;
     bool HasAllCATSections(uint tsid) const;
 
-    void SetPMTSectionSeen(uint prog_num, uint section);
-    bool PMTSectionSeen(   uint prog_num, uint section) const;
     bool HasAllPMTSections(uint prog_num) const;
 
     // Caching
@@ -352,7 +308,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
     void CacheCAT(const ConditionalAccessTable *pat);
     void CachePMT(const ProgramMapTable *pmt);
@@ -395,13 +351,9 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     ps_listener_vec_t         _ps_listeners;
 
     // Table versions
-    QMap<uint, int>           _pat_version;
-    QMap<uint, int>           _cat_version;
-    QMap<uint, int>           _pmt_version;
-
-    sections_map_t            _pat_section_seen;
-    sections_map_t            _cat_section_seen;
-    sections_map_t            _pmt_section_seen;
+    TableStatusMap            _pat_status;
+    TableStatusMap            _cat_status;
+    TableStatusMap            _pmt_status;
 
     // PSIP construction
     pid_psip_map_t            _partial_psip_packet_cache;
@@ -432,9 +384,6 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool                      _invalid_pat_seen;
     bool                      _invalid_pat_warning;
     MythTimer                 _invalid_pat_timer;
-
-  protected:
-    static const unsigned char bit_sel[8];
 };
 
 #include "mpegtables.h"

@@ -268,6 +268,17 @@ bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
             if (modified(*it))
             {
                 replace_in_db(value_clauses, chanid, it.key(), *it);
+                // Populate the rest of the eit fields
+                // service_id
+                // current_next_indicator
+                // section_number
+                // last_section_number
+                // transport_id
+                // start_time
+                // duration
+                // running_status
+                // free_CA_mode
+                // value_clauses.last() <<
                 updated++;
                 *it &= ~(uint64_t)0 >> 1; // mark as synced
             }
@@ -368,6 +379,14 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
         if (extract_table_id(*it) > tableid)
         {
             // EIT from lower (ie. better) table number
+            //
+            // !!! AFAIK for ETSI DVB broadcasts
+            // A lower table number is not "better"
+            // it just means that the events it contains
+            // are nearer to the present time, or for events
+            // on the current day it might contain events
+            // in the past
+
             tblChgCnt++;
         }
         else if ((extract_table_id(*it) == tableid) &&

@@ -125,8 +125,7 @@ void ATSCStreamData::Reset(int major, int minor)
     _mgt_version = -1;
     _tvct_version.clear();
     _cvct_version.clear();
-    _eit_version.clear();
-    _eit_section_seen.clear();
+    _eit_status.clear();
 
     _sourceid_to_atsc_maj_min.clear();
     _atsc_eit_pids.clear();
@@ -135,17 +134,17 @@ void ATSCStreamData::Reset(int major, int minor)
     {
         QMutexLocker locker(&_cache_lock);
 
-        DeleteCachedTable(_cached_mgt);
+        DeleteCachedTableSection(_cached_mgt);
         _cached_mgt = NULL;
 
         tvct_cache_t::iterator tit = _cached_tvcts.begin();
         for (; tit != _cached_tvcts.end(); ++tit)
-            DeleteCachedTable(*tit);
+            DeleteCachedTableSection(*tit);
         _cached_tvcts.clear();
 
         cvct_cache_t::iterator cit = _cached_cvcts.begin();
         for (; cit != _cached_cvcts.end(); ++cit)
-            DeleteCachedTable(*cit);
+            DeleteCachedTableSection(*cit);
         _cached_cvcts.clear();
     }
 
@@ -169,9 +168,8 @@ bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::EIT == table_id)
     {
-        if (VersionEIT(pid, psip.TableIDExtension()) != version)
-            return false;
-        return EITSectionSeen(pid, psip.TableIDExtension(), psip.Section());
+        uint key = (pid<<16) | psip.TableIDExtension();
+        return _eit_status.IsSectionSeen(key, version, psip.Section());
     }
 
     if (TableID::ETT == table_id)
@@ -289,9 +287,8 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             if (!_atsc_eit_listeners.size() && !_eit_helper)
                 return true;
 
-            if (VersionEIT(pid, psip.TableIDExtension()) != version)
-                SetVersionEIT(pid, psip.TableIDExtension(), version);
-            SetEITSectionSeen(pid, psip.TableIDExtension(), psip.Section());
+            uint key = (pid<<16) | psip.TableIDExtension();
+            _eit_status.SetSectionSeen(key, version, psip.Section(), psip.LastSection());
 
             EventInformationTable eit(psip);
             for (uint i = 0; i < _atsc_eit_listeners.size(); i++)
@@ -483,29 +480,6 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
     }
     return false;
-}
-
-void ATSCStreamData::SetEITSectionSeen(uint pid, uint atsc_source_id,
-                                       uint section)
-{
-    uint key = (pid<<16) | atsc_source_id;
-    sections_map_t::iterator it = _eit_section_seen.find(key);
-    if (it == _eit_section_seen.end())
-    {
-        _eit_section_seen[key].resize(32, 0);
-        it = _eit_section_seen.find(key);
-    }
-    (*it)[section>>3] |= bit_sel[section & 0x7];
-}
-
-bool ATSCStreamData::EITSectionSeen(uint pid, uint atsc_source_id,
-                                    uint section) const
-{
-    uint key = (pid<<16) | atsc_source_id;
-    sections_map_t::const_iterator it = _eit_section_seen.find(key);
-    if (it == _eit_section_seen.end())
-        return false;
-    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
 }
 
 bool ATSCStreamData::HasEITPIDChanges(const uint_vec_t &in_use_pids) const
@@ -864,7 +838,7 @@ void ATSCStreamData::CacheMGT(MasterGuideTable *mgt)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_mgt);
+    DeleteCachedTableSection(_cached_mgt);
     _cached_mgt = mgt;
 }
 
@@ -872,7 +846,7 @@ void ATSCStreamData::CacheTVCT(uint pid, TerrestrialVirtualChannelTable* tvct)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_tvcts[pid]);
+    DeleteCachedTableSection(_cached_tvcts[pid]);
     _cached_tvcts[pid] = tvct;
 }
 
@@ -880,11 +854,11 @@ void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_cvcts[pid]);
+    DeleteCachedTableSection(_cached_cvcts[pid]);
     _cached_cvcts[pid] = cvct;
 }
 
-bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool ATSCStreamData::DeleteCachedTableSection(PSIPTable *psip) const
 {
     if (!psip)
         return false;
@@ -915,7 +889,7 @@ bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
     }
     else
     {
-        return MPEGStreamData::DeleteCachedTable(psip);
+        return MPEGStreamData::DeleteCachedTableSection(psip);
     }
     psip_refcnt_map_t::iterator it;
     it = _cached_slated_for_deletion.find(psip);

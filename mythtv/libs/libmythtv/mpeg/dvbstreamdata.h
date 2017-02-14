@@ -3,19 +3,77 @@
 #ifndef DVBSTREAMDATA_H_
 #define DVBSTREAMDATA_H_
 
+/// \file dvbstreamdata.h
+
 #include "mpegstreamdata.h"
 #include "mythtvexp.h"
 
 typedef NetworkInformationTable* nit_ptr_t;
-typedef NetworkInformationTable const* nit_const_ptr_t;
-typedef vector<const NetworkInformationTable*>  nit_vec_t;
+typedef NetworkInformationTable const * nit_const_ptr_t;
+typedef vector<nit_const_ptr_t>  nit_const_vec_t;
+typedef vector<nit_ptr_t>  nit_vec_t;
 typedef QMap<uint, nit_ptr_t>    nit_cache_t; // section->sdts
 
 typedef ServiceDescriptionTable* sdt_ptr_t;
-typedef ServiceDescriptionTable const* sdt_const_ptr_t;
-typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
-typedef QMap<uint, sdt_ptr_t>    sdt_cache_t; // tsid+section->sdts
-typedef QMap<uint, sdt_vec_t>    sdt_map_t;   // tsid->sdts
+typedef ServiceDescriptionTable const * sdt_const_ptr_t;
+typedef vector<sdt_const_ptr_t>  sdt_const_vec_t;
+typedef vector<sdt_ptr_t>  sdt_vec_t;
+
+///@{
+// SDT table sections are held in a cache that is indexed by
+// section number within transport stream ID within
+// original network ID.
+///
+typedef QMap<uint16_t, sdt_ptr_t>
+        sdt_sections_cache_t;                   ///< Section level cache
+typedef struct SdtSectionsAndStatus
+{
+    SdtSectionsAndStatus() { status.SetVersion(-1,0); }
+    sdt_sections_cache_t sections;
+    TableStatus status;
+    QDateTime timestamp;
+} sdt_sections_cache_wrapper_t;
+typedef QMap<uint16_t,sdt_sections_cache_wrapper_t>
+        sdt_t_cache_t;                       ///< Table level cache
+typedef QMap<uint16_t,sdt_t_cache_t>
+        sdt_ts_cache_t;                       ///< Transport stream level cache
+typedef QMap<uint16_t,sdt_ts_cache_t>
+        sdt_tsn_cache_t;                      ///< Original network ID level cache
+///@}
+
+///@{
+typedef DVBEventInformationTable* eit_ptr_t;
+typedef DVBEventInformationTable const * eit_const_ptr_t;
+typedef vector<eit_ptr_t>  eit_vec_t;
+typedef vector<eit_const_ptr_t>  eit_const_vec_t;
+///@}
+
+
+///@{
+/// EIT table sections are held in a cache that is indexed by
+/// section number within table ID within service ID within transport stream
+/// ID within original network ID.
+///
+typedef QMap<uint16_t, eit_ptr_t>
+		eit_sections_cache_t; 					///< Section level cache
+typedef struct EitSectionsAndStatus
+{
+    EitSectionsAndStatus() { status.SetVersion(-1,0); }
+    eit_sections_cache_t sections;
+    TableStatus status;
+    QDateTime timestamp;
+} eit_sections_cache_wrapper_t;
+typedef QMap<uint16_t, eit_sections_cache_wrapper_t>
+		eit_t_cache_t;							///< Table level cache
+typedef QMap<uint16_t,eit_t_cache_t>
+		eit_ts_cache_t;						///< Service level cache
+typedef QMap<uint16_t,eit_ts_cache_t>
+		eit_tss_cache_t;						///< Transport stream level cache
+typedef QMap<uint16_t,eit_tss_cache_t>
+		eit_tssn_cache_t;						///< Original network ID level cache
+///@}
+
+
 
 typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
 typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
@@ -23,6 +81,9 @@ typedef vector<DVBEITStreamListener*>    dvb_eit_listener_vec_t;
 
 typedef QMap<uint, bool>                 dvb_has_eit_t;
 
+/** \class DVBStreamData
+ *  \brief Methods for managing a DVB stream
+*/
 class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 {
   public:
@@ -41,8 +102,11 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     // Table processing
     bool HandleTables(uint pid, const PSIPTable&);
+    void CheckStaleEIT(uint onid, uint tsid, uint sid, uint tid) const;
+    void CheckStaleSDT(uint onid, uint tsid, uint tid) const;
     bool IsRedundant(uint pid, const PSIPTable&) const;
-    void ProcessSDT(uint tsid, const ServiceDescriptionTable*);
+    // RFJ SDT needs ONID as well
+    void ProcessSDT(sdt_const_ptr_t);
 
     // NIT for broken providers
     inline void SetRealNetworkID(int);
@@ -57,147 +121,63 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
                           uint_vec_t &del_pids) const;
 
     // Table versions
-    void SetVersionNIT(int version, uint last_section)
+    void SetVersionSDT(uint onid, uint tsid, uint tid, int version, uint last_section)
     {
-        if (_nit_version == version)
-            return;
-        _nit_version = version;
-        init_sections(_nit_section_seen, last_section);
-    }
-    int  VersionNIT() const { return _nit_version; }
-
-    void SetVersionNITo(int version, uint last_section)
-    {
-        if (_nito_version == version)
-            return;
-        _nito_version = version;
-        init_sections(_nito_section_seen, last_section);
-    }
-    int  VersionNITo() const { return _nito_version; }
-
-    void SetVersionSDT(uint tsid, int version, uint last_section)
-    {
-        if (VersionSDT(tsid) == version)
-            return;
-        _sdt_versions[tsid] = version;
-        init_sections(_sdt_section_seen[tsid], last_section);
-    }
-    int VersionSDT(uint tsid) const
-    {
-        const QMap<uint, int>::const_iterator it = _sdt_versions.find(tsid);
-        if (it == _sdt_versions.end())
-            return -1;
-        return *it;
+        _cached_sdts[onid][tsid][tid].status.SetVersion(version, last_section);
     }
 
-    void SetVersionSDTo(uint tsid, int version, uint last_section)
+    /** \fn static uint GenerateUniqueUKOriginalNetworkID(uint transport_stream_id)
+     *  \brief Generates a unique original network ID in the locally allocated range
+     *  using the UK multiplex identifier extracted from the transport stream ID.
+     */
+    static uint GenerateUniqueUKOriginalNetworkID(uint transport_stream_id)
     {
-        if (_sdto_versions[tsid] == version)
-            return;
-        _sdto_versions[tsid] = version;
-        init_sections(_sdto_section_seen[tsid], last_section);
-    }
-    int VersionSDTo(uint tsid) const
-    {
-        const QMap<uint, int>::const_iterator it = _sdto_versions.find(tsid);
-        if (it == _sdto_versions.end())
-            return -1;
-        return *it;
-    }
-
-    void SetVersionEIT(uint tableid, uint serviceid, int version, uint last_section)
-    {
-        if (VersionEIT(tableid, serviceid) == version)
-            return;
-        uint key = (tableid << 16) | serviceid;
-        _eit_version[key] = version;
-        init_sections(_eit_section_seen[key], last_section);
+        // Convert United Kingdom DTT id to temporary temporary local range
+        uint mux_id = (transport_stream_id & 0x3f000) >> 12;
+        if (mux_id > 0xb)
+            mux_id = 0;
+        if ((mux_id == 0x7) && ((transport_stream_id & 0xfff) < 0x3ff))
+            mux_id = 0xc;
+        // Shift id to private temporary use range
+        return 0xff01  + mux_id;
     }
 
-    int VersionEIT(uint tableid, uint serviceid) const
-    {
-        uint key = (tableid << 16) | serviceid;
-        const QMap<uint, int>::const_iterator it = _eit_version.find(key);
-        if (it == _eit_version.end())
-            return -1;
-        return *it;
-    }
-
-    void SetVersionBAT(uint bid, int version, uint last_section)
-    {
-        if (_bat_versions[bid] == version)
-            return;
-        _bat_versions[bid] = version;
-        init_sections(_bat_section_seen[bid], last_section);
-    }
-    int VersionBAT(uint bid) const
-    {
-        const QMap<uint, int>::const_iterator it = _bat_versions.find(bid);
-        if (it == _bat_versions.end())
-            return -1;
-        return *it;
-    }
-
-    // Premiere private ContentInformationTable
-    void SetVersionCIT(uint contentid, int version)
-    {
-        if (VersionCIT(contentid) == version)
-            return;
-        _cit_version[contentid] = version;
-    }
-
-    int VersionCIT(uint contentid) const
-    {
-        const QMap<uint, int>::const_iterator it = _cit_version.find(contentid);
-        if (it == _cit_version.end())
-            return -1;
-        return *it;
-    }
-
-    // Sections seen
-    void SetNITSectionSeen(uint section);
-    bool NITSectionSeen(uint section) const;
+   // Sections seen
     bool HasAllNITSections(void) const;
 
-    void SetNIToSectionSeen(uint section);
-    bool NIToSectionSeen(uint section) const;
     bool HasAllNIToSections(void) const;
 
-    void SetSDTSectionSeen(uint tsid, uint section);
-    bool SDTSectionSeen(uint tsid, uint section) const;
-    bool HasAllSDTSections(uint tsid) const;
+    void SetEITSectionSeen(uint original_network_id, uint transport_stream_id,
+                           uint serviceid, uint tableid,
+                           uint version, uint section,
+                           uint segment_last_section, uint last_section);
+    bool EITSectionSeen(uint original_network_id, uint transport_stream_id,
+                        uint serviceid, uint tableid,
+                        uint version, uint section) const;
+    bool HasAllEITSections(uint original_network_id, uint transport_stream_id,
+                           uint serviceid, uint tableid) const;
 
-    void SetSDToSectionSeen(uint tsid, uint section);
-    bool SDToSectionSeen(uint tsid, uint section) const;
-    bool HasAllSDToSections(uint tsid) const;
 
-    void SetEITSectionSeen(uint tableid, uint serviceid, uint section);
-    bool EITSectionSeen(uint tableid, uint serviceid, uint section) const;
+    void SetSDTSectionSeen(uint original_network_id, uint transport_stream_id,
+                           uint tableid, uint version,
+                           uint section, uint last_section);
+    bool SDTSectionSeen(uint original_network_id, uint transport_stream_id,
+                        uint tableid, uint version, uint section) const;
+    bool HasAllSDTSections(uint original_network_id, uint transport_stream_id,
+                           uint tableid) const;
 
-    void SetBATSectionSeen(uint bid, uint section);
-    bool BATSectionSeen(uint bid, uint section) const;
+
     bool HasAllBATSections(uint bid) const;
-
-    // Premiere private ContentInformationTable
-    void SetCITSectionSeen(uint contentid, uint section);
-    bool CITSectionSeen(uint contentid, uint section) const;
 
     // Caching
     bool HasCachedAnyNIT(bool current = true) const;
     bool HasCachedAllNIT(bool current = true) const;
-    bool HasCachedAnySDT(uint tsid, bool current = true) const;
-    bool HasCachedAllSDT(uint tsid, bool current = true) const;
-    bool HasCachedSDT(bool current = true) const;
-    bool HasCachedAnySDTs(bool current = true) const;
-    bool HasCachedAllSDTs(bool current = true) const;
-
     nit_const_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
-    nit_vec_t GetCachedNIT(bool current = true) const;
-    sdt_const_ptr_t GetCachedSDT(uint tsid, uint section_num,
-                           bool current = true) const;
-    sdt_vec_t GetCachedSDTs(bool current = true) const;
+    nit_const_vec_t GetCachedNIT(bool current = true) const;
 
-    void ReturnCachedSDTTables(sdt_vec_t&) const;
+    sdt_const_ptr_t GetCachedSDTSection(uint onid, uint tsid, uint tid, uint section_num) const;
+    sdt_const_vec_t GetCachedSDTs() const;
+    bool HasCachedAnySDTs() const;
 
     void AddDVBMainListener(DVBMainStreamListener*);
     void AddDVBOtherListener(DVBOtherStreamListener*);
@@ -209,10 +189,16 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
   private:
     // Caching
-    void CacheNIT(NetworkInformationTable*);
-    void CacheSDT(ServiceDescriptionTable*);
+    void CacheNIT(nit_ptr_t);
+    void CacheSDT(sdt_ptr_t);
+    void CacheEIT(eit_ptr_t);
+    void ValidateEITCache();
+
   protected:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    /** \fn virtual bool DeleteCachedTableSection(PSIPTable *psip) const
+     *  \brief Deletes a table section or the whole table if it is not sectioned.
+     */
+   virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
 
   private:
     /// DVB table monitoring
@@ -233,26 +219,21 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     dvb_eit_listener_vec_t    _dvb_eit_listeners;
 
     // Table versions
-    int                       _nit_version;
-    QMap<uint, int>           _sdt_versions;
-    sections_t                _nit_section_seen;
-    sections_map_t            _sdt_section_seen;
-    QMap<uint, int>           _eit_version;
-    sections_map_t            _eit_section_seen;
-    // Premiere private ContentInformationTable
-    QMap<uint, int>           _cit_version;
-    sections_map_t            _cit_section_seen;
-
-    int                       _nito_version;
-    QMap<uint, int>           _sdto_versions;
-    sections_t                _nito_section_seen;
-    sections_map_t            _sdto_section_seen;
-    QMap<uint, int>           _bat_versions;
-    sections_map_t            _bat_section_seen;
+    TableStatus               _nit_status;
+    TableStatus               _nito_status;
+    TableStatusMap            _cit_status;
+    TableStatusMap            _bat_status;
 
     // Caching
-    mutable nit_cache_t       _cached_nit;  // section -> sdt
-    mutable sdt_cache_t       _cached_sdts; // tsid+section -> sdt
+    mutable nit_cache_t       _cached_nit;  // NIT sections cached within transport stream ID
+    mutable sdt_tsn_cache_t   _cached_sdts; // SDT sections cached within transport stream ID
+                                            // within original network ID
+    mutable eit_tssn_cache_t  _cached_eits; // EIT sections cached within table ID within
+                                            // service ID within transport stream ID within
+                                            // original network ID
+
+    static qint64 EIT_STALE_TIME;
+    static qint64 SDT_STALE_TIME;
 };
 
 inline void DVBStreamData::SetDishNetEIT(bool use_dishnet_eit)

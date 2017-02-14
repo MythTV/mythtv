@@ -679,9 +679,27 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 
         QDateTime starttime = eit->StartTimeUTC(i);
         // fix starttime only if the duration is a multiple of a minute
-        if (!(eit->DurationInSeconds(i) % 60))
+        uint total_duration = eit->DurationInSeconds(i);
+        if (!(total_duration % 60))
             EITFixUp::TimeFix(starttime);
         QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
+
+        // Make an ETSI TS 102 851 compliant event URL
+        uint duration_hours = total_duration / 3600;
+        uint duration_mins = (total_duration - (duration_hours * 3600)) / 60;
+        uint duration_secs = total_duration % 60;
+        QString etsiEventUrl(QString("dvb://%1.%2.%3;%4~%5Z--PT%6H%7M%8S")
+                                .arg(eit->OriginalNetworkID(),0,16)
+                                .arg(eit->TSID(),0,16)
+                                .arg(eit->ServiceID(),0,16)
+                                .arg(eit->EventID(i),0,16)
+                                .arg(starttime.toString(QString("yyyyMMdd'T'hhmmss")))
+                                .arg(duration_hours,2,10,QChar('0'))
+                                .arg(duration_mins,2,10,QChar('0'))
+                                .arg(duration_secs,2,10,QChar('0')));
+
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("DVB URL -- %1")
+            .arg(etsiEventUrl));
 
         DBEventEIT *event = new DBEventEIT(
             chanid,

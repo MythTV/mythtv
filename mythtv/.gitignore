@@ -6,3 +6,9 @@ Makefile.*.debug
 config.*
 version.cpp
 TMPMAK
+.project
+.cproject
+.settings
+logs
+errs
+src

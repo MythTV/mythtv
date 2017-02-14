@@ -666,7 +666,7 @@ class PrintDVBMainStreamListener :
         Output(nit);
     }
 
-    virtual void HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
+    virtual void HandleSDT(const ServiceDescriptionTable *sdt)
     {
         Output(sdt);
     }

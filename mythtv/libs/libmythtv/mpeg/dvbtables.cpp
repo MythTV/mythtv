@@ -213,6 +213,42 @@ QString BouquetAssociationTable::toString(void) const
     return str;
 }
 
+DVBEventInformationTable::DVBEventInformationTable(const PSIPTable& table) : PSIPTable(table)
+{
+    // table_id                 8   0.0       0xC7
+    assert(IsEIT(TableID()));
+    // section_syntax_indicator 1   1.0          1
+    // private_indicator        1   1.1          1
+    // reserved                 2   1.2          3
+    // section_length          12   1.4
+    // reserved                 2   5.0          3
+    // version_number           5   5.2
+    // current_next_indicator   1   5.7          1
+    // section_number           8   6.0
+    // last_section_number      8   7.0
+    Parse();
+    LOG(VB_EITDVBCACHE, LOG_DEBUG, QString(
+                        "Constructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
+                        .arg(OriginalNetworkID(),4,16)
+                        .arg(TSID(),4,16)
+                        .arg(ServiceID(),4,16)
+                        .arg(TableID(),2,16)
+                        .arg(Section())
+                        .arg(uint64_t(this),0,16));
+}
+
+DVBEventInformationTable::~DVBEventInformationTable()
+{
+    LOG(VB_EITDVBCACHE, LOG_DEBUG, QString(
+                        "Destructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
+                        .arg(OriginalNetworkID(),4,16)
+                        .arg(TSID(),4,16)
+                        .arg(ServiceID(),4,16)
+                        .arg(TableID(),2,16)
+                        .arg(Section())
+                        .arg(uint64_t(this),0,16));
+}
+
 void DVBEventInformationTable::Parse(void) const
 {
     _ptrs.clear();

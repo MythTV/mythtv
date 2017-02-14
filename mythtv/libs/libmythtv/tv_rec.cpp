@@ -1288,7 +1288,8 @@ void TVRec::run(void)
     {
         scanner = new EITScanner(inputid);
         eitScanStartTime = eitScanStartTime.addSecs(
-            eitCrawlIdleStart + eit_start_rand(inputid, eitTransportTimeout));
+                                eitCrawlIdleStart
+                                + eit_start_rand(inputid, eitTransportTimeout));
     }
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
