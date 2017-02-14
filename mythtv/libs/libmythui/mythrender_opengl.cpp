@@ -59,6 +59,21 @@ OpenGLLocker::~OpenGLLocker()
 MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
                                            QPaintDevice* device)
 {
+    QString display = getenv("DISPLAY");
+    // Determine if we are running a remote X11 session
+    // DISPLAY=:x or DISPLAY=unix:x are local
+    // DISPLAY=hostname:x is remote
+    // x can be numbers n or n.n
+    // Anything else including DISPLAY not set is assumed local,
+    // in that case we are probably not running under X11
+    if (!display.isEmpty()
+     && !display.startsWith(":")
+     && !display.startsWith("unix:")
+     && display.contains(':'))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is disabled for Remote X Session");
+        return 0;
+    }
 #ifdef USE_OPENGL_QT5
     MythRenderFormat format = QSurfaceFormat::defaultFormat();
     format.setDepthBufferSize(0);
