@@ -179,7 +179,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                 while (QTime::currentTime() < sleepTime)
                 {
                      QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents, 100);
-                     sleep(1); // Must not be longer than the X session manager save session timeout (usually 90 seconds).
+                     sleep(1); // Must not be longer than the X session manager save session timeout (on xfce 60 seconds).
                 }
                 connected = m_db.open();
             }
