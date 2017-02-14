@@ -40,13 +40,13 @@ const QString kNotification =
 "  <type>%type%</type>\n"
 "</mythnotification>";
 
-static int PrintMTemplate(const MythUtilCommandLineParser &cmdline)
+static int PrintMTemplate(const MythUtilCommandLineParser &/*cmdline*/)
 {
     cerr << kMessage.toLocal8Bit().constData() << endl;
     return GENERIC_EXIT_OK;
 }
 
-static int PrintNTemplate(const MythUtilCommandLineParser &cmdline)
+static int PrintNTemplate(const MythUtilCommandLineParser &/*cmdline*/)
 {
     cerr << kNotification.toLocal8Bit().constData() << endl;
     return GENERIC_EXIT_OK;
