@@ -309,7 +309,7 @@ static ISO3166ToNameMap createEnglishCountryMap(void)
     map["TR"] = QString::fromUtf8("Turkey");
     map["TT"] = QString::fromUtf8("Trinidad and Tobago");
     map["TV"] = QString::fromUtf8("Tuvalu");
-    map["TW"] = QString::fromUtf8("Taiwan, Province of China");
+    map["TW"] = QString::fromUtf8("Taiwan");
     map["TZ"] = QString::fromUtf8("Tanzania, United Republic of");
     map["UA"] = QString::fromUtf8("Ukraine");
     map["UG"] = QString::fromUtf8("Uganda");
