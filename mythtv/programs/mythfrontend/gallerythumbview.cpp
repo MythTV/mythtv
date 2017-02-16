@@ -5,6 +5,8 @@
 
 #include <QApplication>
 
+#include "compat.h"
+
 #include "mythuitext.h"
 #include "mythprogressdialog.h"
 #include "mythuiprogressbar.h"
