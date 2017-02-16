@@ -436,8 +436,8 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&m_lock);
 
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got a Program Map Table for %1")
-            .arg((*m_current).FriendlyName) + "\n" + pmt->toString());
+//    LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("Got a Program Map Table for %1")
+//            .arg((*m_current).FriendlyName) + "\n" + pmt->toString());
 
     if (!m_currentTestingDecryption &&
         pmt->IsEncrypted(GetDTVChannel()->GetSIStandard()))
