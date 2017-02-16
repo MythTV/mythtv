@@ -808,7 +808,7 @@
         </buttonlist>
 
         <textarea name="helptext" from="basetextarea">
-            <area>200,530,400,60</area>
+            <area>200,465,400,60</area>
             <align>allcenter</align>
             <multiline>true</multiline>
         </textarea>
@@ -948,14 +948,20 @@
             <helptext>Try again to establish connections.</helptext>
         </button>
 
+        <button name="search" from="retry">
+            <position>28%,88%</position>
+            <value>Search</value>
+            <helptext>Search the local network for the MythTV Backend.</helptext>
+        </button>
+
         <button name="setup" from="retry">
-            <position>39%,88%</position>
+            <position>52%,88%</position>
             <value>Setup</value>
             <helptext>Use Database setup to enter database parameters.</helptext>
         </button>
 
         <button name="exit" from="retry">
-            <position>76%,88%</position>
+            <position>75%,88%</position>
             <value>Exit</value>
             <helptext>Exit from MythTV.</helptext>
         </button>

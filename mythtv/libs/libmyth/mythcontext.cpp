@@ -12,6 +12,8 @@
 
 #include <queue>
 #include <algorithm>
+#include <thread>
+
 using namespace std;
 
 #include "config.h"
@@ -349,6 +351,7 @@ bool MythContextPrivate::CheckPort(QString &host, int port, int timeLimit) {
         if (m_guiStartup) {
             if (m_guiStartup->m_Exit
               || m_guiStartup->m_Setup
+              || m_guiStartup->m_Search
               || m_guiStartup->m_Retry)
                 break;
         }
@@ -473,8 +476,9 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
             goto DBfound;
         if (m_guiStartup && m_guiStartup->m_Exit)
             return false;
+        if (m_guiStartup && m_guiStartup->m_Search)
+            autoSelect=true;
     }
-
 
     // 3. Try to automatically find the single backend:
     if (autoSelect)
@@ -495,6 +499,9 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 
         // Multiple BEs, or needs PIN.
         manualSelect |= (count > 1 || count == -1);
+        // Search requested
+        if (m_guiStartup && m_guiStartup->m_Search)
+            manualSelect=true;
     }
 
     manualSelect &= m_gui;  // no interactive command-line chooser yet
@@ -524,12 +531,15 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
             if (!PromptForDatabaseParams(failure))
                 goto NoDBfound;
         }
-
         failure = TestDBconnection();
         if (!failure.isEmpty())
             LOG(VB_GENERAL, LOG_ALERT, failure);
         if (m_guiStartup && m_guiStartup->m_Exit)
             return false;
+        if (m_guiStartup && m_guiStartup->m_Search)
+            manualSelect=true;
+        if (m_guiStartup && m_guiStartup->m_Setup)
+            manualSelect=false;
     }
     while (!failure.isEmpty());
 
@@ -698,7 +708,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
     {
         DatabaseParams params = parent->GetDatabaseParams();
         QString        response;
-
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         // give user chance to skip config
         cout << endl << error.toLocal8Bit().constData() << endl << endl;
         response = getResponse("Would you like to configure the database "
@@ -795,12 +805,12 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         }
         else
             startupState = st_dbAwake;
-        if (attempts < 1)
-            attempts = 1;
+        if (attempts < 6)
+            attempts = 6;
         if (!prompt)
             attempts=1;
-        if (wakeupTime < 1)
-            wakeupTime = 1;
+        if (wakeupTime < 5)
+            wakeupTime = 5;
 
         int progressTotal = wakeupTime * attempts;
 
@@ -918,6 +928,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
             {
                 if (m_guiStartup->m_Exit
                   || m_guiStartup->m_Setup
+                  || m_guiStartup->m_Search
                   || m_guiStartup->m_Retry)
                     break;
             }
@@ -936,6 +947,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         if (m_guiStartup
           && !m_guiStartup->m_Exit
           && !m_guiStartup->m_Setup
+          && !m_guiStartup->m_Search
           && !m_guiStartup->m_Retry)
         {
             m_guiStartup->updateProgress(true);

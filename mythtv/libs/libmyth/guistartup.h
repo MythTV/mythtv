@@ -29,19 +29,20 @@ class MPUBLIC GUIStartup : public MythScreenType
     bool m_Exit;
     bool m_Setup;
     bool m_Retry;
+    bool m_Search;
 
     GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop);
    ~GUIStartup(void);
     bool Create(void);
     bool setStatusState(const QString &name);
     bool setMessageState(const QString &name);
-    void showButtons(bool visible);
     void setTotal(int total);
     bool updateProgress(bool finished = false);
 
 
   private slots:
     void Retry(void);
+    void Search(void);
     void Setup(void);
     void Close(void);
     void OnClosePromptReturn(bool submit);
@@ -50,6 +51,7 @@ class MPUBLIC GUIStartup : public MythScreenType
 
     MythUIButton *m_dummyButton;
     MythUIButton *m_retryButton;
+    MythUIButton *m_searchButton;
     MythUIButton *m_setupButton;
     MythUIButton *m_exitButton;
     MythUIStateType *m_statusState;

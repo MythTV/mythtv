@@ -33,8 +33,10 @@ GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                   m_Exit(false),
                   m_Setup(false),
                   m_Retry(false),
+                  m_Search(false),
                   m_dummyButton(0),
                   m_retryButton(0),
+                  m_searchButton(0),
                   m_setupButton(0),
                   m_exitButton(0),
                   m_statusState(0),
@@ -63,6 +65,8 @@ bool GUIStartup::Create(void)
     if (!err)
         UIUtilE::Assign(this, m_retryButton, "retry", &err);
     if (!err)
+        UIUtilE::Assign(this, m_searchButton, "search", &err);
+    if (!err)
         UIUtilE::Assign(this, m_setupButton, "setup", &err);
     if (!err)
         UIUtilE::Assign(this, m_exitButton, "exit", &err);
@@ -81,6 +85,7 @@ bool GUIStartup::Create(void)
     }
 
     connect(m_retryButton, SIGNAL(Clicked()), SLOT(Retry()));
+    connect(m_searchButton, SIGNAL(Clicked()), SLOT(Search()));
     connect(m_setupButton, SIGNAL(Clicked()), SLOT(Setup()));
     connect(m_exitButton, SIGNAL(Clicked()), SLOT(Close()));
 
@@ -94,6 +99,7 @@ bool GUIStartup::setStatusState(const QString &name)
     bool ret = m_statusState->DisplayState(name);
     m_Exit = false;
     m_Setup = false;
+    m_Search = false;
     m_Retry = false;
     return ret;
 }
@@ -103,6 +109,7 @@ bool GUIStartup::setMessageState(const QString &name)
     bool ret = m_messageState->DisplayState(name);
     m_Exit = false;
     m_Setup = false;
+    m_Search = false;
     m_Retry = false;
     return ret;
 }
@@ -119,14 +126,8 @@ void GUIStartup::setTotal(int total)
 
     m_Exit = false;
     m_Setup = false;
+    m_Search = false;
     m_Retry = false;
-}
-
-void GUIStartup::showButtons(bool visible)
-{
-    m_retryButton->SetVisible(visible);
-    m_setupButton->SetVisible(visible);
-    m_exitButton->SetVisible(visible);
 }
 
 // return = true if time is up
@@ -179,6 +180,13 @@ void GUIStartup::OnClosePromptReturn(bool submit)
 void GUIStartup::Retry(void)
 {
     m_Retry = true;
+    if (m_loop->isRunning())
+        m_loop->exit();
+}
+
+void GUIStartup::Search(void)
+{
+    m_Search = true;
     if (m_loop->isRunning())
         m_loop->exit();
 }
