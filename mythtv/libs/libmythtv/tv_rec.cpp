@@ -3989,6 +3989,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             "TuningSignalCheck: Hit pre-fail timeout");
         SendMythSystemRecEvent("REC_PREFAIL", curRecording);
         reachedPreFail = true;
+        return NULL;
     }
     else if (curRecording && !reachedRecordingDeadline &&
              current_time > startRecordingDeadline)
