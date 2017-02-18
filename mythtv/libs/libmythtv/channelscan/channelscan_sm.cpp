@@ -520,7 +520,12 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 
     // Copy table into my local cache
     if (!m_currentInfo)
+    {
         m_currentInfo = new ScannedChannelInfo();
+        LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+            QString("Allocated m_CurrentInfo 0x%1")
+                .arg(uint64_t(m_currentInfo), 0, 16));
+    }
     m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
 
     UpdateChannelInfo(true);
@@ -531,8 +536,9 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
     QMutexLocker locker(&m_lock);
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
-        QString("Got a Network Information Table for %1")
-            .arg((*m_current).FriendlyName) + "\n" + nit->toString());
+        QString("Got a Network Information Table for %1 at 0x%2")
+            .arg((*m_current).FriendlyName)
+            .arg(uint64_t(nit), 0, 16) + "\n" + nit->toString());
 
     UpdateChannelInfo(true);
 }
@@ -623,7 +629,12 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 
     // Copy table into my local cache
     if (!m_currentInfo)
+    {
         m_currentInfo = new ScannedChannelInfo();
+        LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+            QString("Allocated m_CurrentInfo 0x%1")
+            .arg(uint64_t(m_currentInfo), 0, 16));
+    }
     m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
 }
 
@@ -748,6 +759,9 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
 
 void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 {
+    LOG(VB_CHANSCAN, LOG_ERR, LOC +
+            QString("UpdateScanTransports - processing NIT at 0x%1")
+            .arg(uint64_t(nit), 0, 16));
     for (uint i = 0; i < nit->TransportStreamCount(); ++i)
     {
         uint32_t tsid  = nit->TSID(i);
@@ -837,7 +851,12 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     const ScanStreamData *sd = dtv_sm->GetScanStreamData();
 
     if (!m_currentInfo)
+    {
         m_currentInfo = new ScannedChannelInfo();
+        LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+            QString("Allocated m_currentInfo 0x%1")
+			.arg(uint64_t(m_currentInfo)));
+    }
 
     bool transport_tune_complete = true;
 
@@ -1010,11 +1029,17 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             }
 
             m_channelList << ChannelListItem(m_current, m_currentInfo);
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                QString("Copied m_currentInfo 0x%1 to m_channelList")
+				.arg(uint64_t(m_currentInfo), 0, 16));
             m_currentInfo = NULL;
         }
         else
         {
             delete m_currentInfo;
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
+                QString("Deleting m_currentInfo 0x%1")
+				.arg(uint64_t(m_currentInfo), 0, 16));
             m_currentInfo = NULL;
         }
 
