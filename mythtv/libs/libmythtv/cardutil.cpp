@@ -41,6 +41,7 @@
 
 #ifdef USING_VBOX
 #include "vboxutils.h"
+#include "mythmiscutil.h"
 #endif
 
 #ifdef USING_ASI
@@ -158,7 +159,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
 bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
 {
     if (rawtype == "DVB"     || rawtype == "HDHOMERUN" ||
-        rawtype == "FREEBOX" || rawtype == "CETON")
+        rawtype == "FREEBOX" || rawtype == "CETON" || rawtype == "VBOX")
         return true;
 
 #ifdef USING_V4L2
@@ -2006,7 +2007,8 @@ bool CardUtil::DeleteAllCards(void)
     return (query.exec("TRUNCATE TABLE inputgroup") &&
             query.exec("TRUNCATE TABLE diseqc_config") &&
             query.exec("TRUNCATE TABLE diseqc_tree") &&
-            query.exec("TRUNCATE TABLE capturecard"));
+            query.exec("TRUNCATE TABLE capturecard") &&
+            query.exec("TRUNCATE TABLE iptv_channel"));
 }
 
 vector<uint> CardUtil::GetInputList(void)
@@ -2412,4 +2414,70 @@ bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
         *error = "Not compiled with ASI support.";
     return false;
 #endif
+}
+
+/** \fn CardUtil::IsVBoxPresent(uint inputid)
+ *  \brief Returns true if the VBox responds to a ping
+ *  \param inputid  Inputid  as used in DB capturecard table
+ */
+bool CardUtil::IsVBoxPresent(uint inputid)
+{
+    // should only be called if inputtype == VBOX
+    if (!inputid )
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("VBOX inputid  (%1) not valid, redo mythtv-setup")
+                .arg(inputid));
+        return false;
+    }
+
+    // get sourceid and startchan from table capturecard for inputid
+    uint chanid = 0;
+    chanid = ChannelUtil::GetChannelValueInt("chanid",GetSourceID(inputid),GetStartingChannel(inputid));
+    if (!chanid)
+    {
+        // no chanid, presume bad setup
+        LOG(VB_GENERAL, LOG_ERR, QString("VBOX chanid  (%1) not found for inputid (%2) , redo mythtv-setup")
+                .arg(chanid).arg(inputid));
+        return false;
+    }
+
+    // get timeouts for inputid
+    uint signal_timeout = 0;
+    uint tuning_timeout = 0;
+    if (!GetTimeouts(inputid,signal_timeout,tuning_timeout))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to get timeouts for inputid (%1)")
+                .arg(inputid));
+        return false;
+    }
+
+    signal_timeout = signal_timeout/1000; //convert to seconds
+
+    // now get url from iptv_channel table
+    QUrl url;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT url "
+                  "FROM iptv_channel "
+                  "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+        MythDB::DBError("CardUtil::IsVBoxPresent url", query);
+    else if (query.next())
+        url = query.value(0).toString();
+
+    //now get just the IP address from the url
+    QString ip ="";
+    ip = url.host();
+    LOG(VB_GENERAL, LOG_INFO, QString("VBOX IP found (%1) for inputid (%2)")
+                .arg(ip).arg(inputid));
+
+    if (!ping(ip,signal_timeout))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("VBOX at IP  (%1) failed to respond to network ping for inputid (%2) timeout (%3)")
+                .arg(ip).arg(inputid).arg(signal_timeout));
+        return false;
+    }
+
+    return true;
 }

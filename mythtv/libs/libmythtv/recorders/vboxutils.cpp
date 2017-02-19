@@ -224,7 +224,7 @@ bool VBox::checkVersion(QString &version)
     QStringList sList = requiredVersion.split('.');
 
     // sanity check this looks like a VBox version string
-    if (sList.count() != 3 || !requiredVersion.startsWith("VB."))
+    if (sList.count() < 3 || !requiredVersion.startsWith("V"))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Failed to parse required version from %1").arg(requiredVersion));
         version = "UNKNOWN";
@@ -247,7 +247,7 @@ bool VBox::checkVersion(QString &version)
         sList = version.split('.');
 
         // sanity check this looks like a VBox version string
-        if (sList.count() != 3 || !(version.startsWith("VB.") || version.startsWith("VJ.")))
+        if (sList.count() < 3 || !(version.startsWith("VB.") || version.startsWith("VJ.")))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Failed to parse version from %1").arg(version));
             delete xmlDoc;
@@ -327,6 +327,9 @@ vbox_chan_map_t *VBox::getChannels(void)
 
         QString transType = "UNKNOWN";
         QStringList slist = triplet.split('-');
+        uint networkID = slist[2].left(4).toUInt(0, 16);
+        uint transportID = slist[2].mid(4, 4).toUInt(0, 16);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("NIT/TID/SID %1 %2 %3)").arg(networkID).arg(transportID).arg(serviceID));
 
         //sanity check - the triplet should look something like this: T-GER-111100020001
         // where T is the tuner type, GER is the country, and the numbers are the NIT/TID/SID
@@ -349,7 +352,7 @@ vbox_chan_map_t *VBox::getChannels(void)
             url = urlElem.attribute("src", "");
         }
 
-        VBoxChannelInfo chanInfo(name, xmltvid, url, fta, chanType, transType, serviceID);
+        VBoxChannelInfo chanInfo(name, xmltvid, url, fta, chanType, transType, serviceID, networkID, transportID);
         result->insert(lcn, chanInfo);
     }
 

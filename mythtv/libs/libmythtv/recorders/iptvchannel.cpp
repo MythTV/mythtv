@@ -123,7 +123,10 @@ void IPTVChannel::CloseStreamHandler(void)
     if (m_stream_handler)
     {
         if (m_stream_data)
+        {
             m_stream_handler->RemoveListener(m_stream_data);
+            m_stream_data = NULL; //see trac ticket #12773
+        }
 
         HLSStreamHandler* hsh = dynamic_cast<HLSStreamHandler*>(m_stream_handler);
         HTTPTSStreamHandler* httpsh = dynamic_cast<HTTPTSStreamHandler*>(m_stream_handler);

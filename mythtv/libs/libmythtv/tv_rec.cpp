@@ -39,6 +39,7 @@
 #include "tv_rec.h"
 #include "mythdate.h"
 #include "osd.h"
+#include "../vboxutils.h"
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 
@@ -135,6 +136,17 @@ bool TVRec::CreateChannel(const QString &startchannel,
     channel = ChannelBase::CreateChannel(
         this, genOpt, dvbOpt, fwOpt,
         startchannel, enter_power_save_mode, rbFileExt);
+
+    if (genOpt.inputtype == "VBOX")
+    {
+        if (!CardUtil::IsVBoxPresent(inputid))
+        {
+            // VBOX presence failed  recorder is marked errored
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("CreateChannel(%1) failed due to VBOX not responding "
+                                                   "to network check on inputid (%2)").arg(startchannel).arg(inputid));
+            channel = NULL;
+        }
+    }
 
     if (!channel)
     {
@@ -1903,7 +1915,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
 
     // Check if this is an DVB channel
     int progNum = dtvchan->GetProgramNumber();
-    if ((progNum >= 0) && (tuningmode == "dvb"))
+    if ((progNum >= 0) && (tuningmode == "dvb") && (genOpt.inputtype != "VBOX"))
     {
         int netid   = dtvchan->GetOriginalNetworkID();
         int tsid    = dtvchan->GetTransportID();
@@ -3545,6 +3557,8 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
                                    QString &channum,
                                    QString &inputname)
 {
+     LOG(VB_RECORD, LOG_INFO, LOC + QString("request (%1) channum (%2) inputname (%3)")
+                                            .arg(request.toString()).arg(channum).arg(inputname));
     if (!channel)
         return 0;
 
@@ -3568,6 +3582,8 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
 
     if (curInputID != newInputID || !CardUtil::IsChannelReusable(genOpt.inputtype))
     {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Inputtype HW Tuner newinputid channum curinputid: %1->%2 %3")
+                                               .arg(curInputID).arg(newInputID).arg(channum));
         if (channum.isEmpty())
             channum = GetStartChannel(newInputID);
         return newInputID;
