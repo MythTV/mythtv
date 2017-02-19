@@ -618,9 +618,9 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
             if (def_auth)
             {
                 DefaultAuthorityDescriptor authority(def_auth);
-                LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                    QString("found default authority(SDTo) for service %1 %2 %3")
-                        .arg(netid).arg(tsid).arg(serviceId));
+//                LOG(VB_CHANSCAN, LOG_INFO, LOC +
+//                    QString("found default authority(SDTo) for service %1 %2 %3")
+//                        .arg(netid).arg(tsid).arg(serviceId));
                 m_defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
                     authority.DefaultAuthority();
             }
@@ -759,7 +759,7 @@ DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
 
 void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 {
-    LOG(VB_CHANSCAN, LOG_ERR, LOC +
+    LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
             QString("UpdateScanTransports - processing NIT at 0x%1")
             .arg(uint64_t(nit), 0, 16));
     for (uint i = 0; i < nit->TransportStreamCount(); ++i)
@@ -807,8 +807,6 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     break;
                 }
                 default:
-                    LOG(VB_CHANSCAN, LOG_ERR, LOC +
-                        "unknown delivery system descriptor");
                     continue;
             }
 
