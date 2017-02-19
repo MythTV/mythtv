@@ -22,6 +22,7 @@
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "inputinfo.h"
+#include "mythmiscutil.h" // for ping()
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
