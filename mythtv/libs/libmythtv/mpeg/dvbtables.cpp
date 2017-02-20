@@ -18,7 +18,7 @@ void NetworkInformationTable::Parse(void) const
 
 QString NetworkInformationTable::toString(void) const
 {
-    QString str = QString("NIT: NetID(%1) tranports(%2)\n")
+    QString str = QString("NIT: NetID(%1) transports(%2)\n")
         .arg(NetworkID()).arg(TransportStreamCount());
     str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
         .arg(Section()).arg(LastSection()).arg(IsCurrent()));
