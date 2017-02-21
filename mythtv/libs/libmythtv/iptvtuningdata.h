@@ -227,6 +227,20 @@ class MTV_PUBLIC IPTVTuningData
         }
 
         QString url = m_data_url.toString();
+
+        // check url is valid for a playlist before downloading (see trac ticket #12856)
+        if(url.endsWith(".m3u8", Qt::CaseInsensitive) ||
+           url.endsWith(".m3u", Qt::CaseInsensitive))
+        {
+            LOG(VB_RECORD, LOG_INFO, QString("IsHLSPlaylist url ends with either .m3u8 or .m3u %1").arg(url));
+        }
+        else
+        {
+            // not a valid playlist so just return false
+            LOG(VB_RECORD, LOG_INFO, QString("IsHLSPlaylist url does not end with either .m3u8 or .m3u %1").arg(url));
+            return false;
+        }
+
         QByteArray buffer;
 
         MythSingleDownload downloader;

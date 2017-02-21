@@ -166,7 +166,7 @@ class MTV_PUBLIC CardUtil
             (rawtype == "DVB")       || (rawtype == "HDHOMERUN") ||
             (rawtype == "ASI")       || (rawtype == "FREEBOX")   ||
             (rawtype == "CETON")     || (rawtype == "EXTERNAL")  ||
-            (rawtype == "V4L2ENC");
+            (rawtype == "VBOX")      || (rawtype == "V4L2ENC");
     }
 
     static bool         HasTuner(const QString &rawtype, const QString & device);
@@ -209,7 +209,7 @@ class MTV_PUBLIC CardUtil
         return !(rawtype == "FREEBOX" || rawtype == "VBOX");
     }
 
-
+    static bool         IsVBoxPresent(uint inputid);
 
     // Card creation and deletion
 
