@@ -915,7 +915,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 			.arg(uint64_t(m_currentInfo)));
     }
 
-    bool transport_tune_complete = true;
+    DTVTunerType tuner_type = GuessDTVTunerType(DTVTunerType::kTunerTypeUnknown);
+
+    bool network_discovery_complete = true;
 
     // MPEG
 
@@ -941,9 +943,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             }
         }
         else
-            transport_tune_complete = false;
+            network_discovery_complete = false;
     }
-    transport_tune_complete &= !pattmp.empty();
+    network_discovery_complete &= !pattmp.empty();
     sd->ReturnCachedPATTables(pattmp);
 
     // Grab PMT tables
@@ -975,42 +977,60 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         m_currentInfo->nits = sd->GetCachedNIT();
     }
 
-    // Check if transport tuning is complete
-    if (transport_tune_complete)
+    // At this stage we may only have a PAT table
+    if (network_discovery_complete)
     {
-        transport_tune_complete &= !m_currentInfo->pmts.empty();
+    	// MPEG
+    	// Mark network_discovery_complete if I have seen a PMT
+        network_discovery_complete &= !m_currentInfo->pmts.empty();
+
+        // ATSC
+    	// Mark network_discovery_complete if I have seen an MGT
+        // and any TVCT or CVCT sections
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
         {
-            transport_tune_complete &= sd->HasCachedMGT();
-            transport_tune_complete &=
+            network_discovery_complete &= sd->HasCachedMGT();
+            network_discovery_complete &=
                 (!m_currentInfo->tvcts.empty() || !m_currentInfo->cvcts.empty());
         }
-        if (sd->HasCachedAnyNIT() || !m_currentInfo->serviceDescriptionTablesCache.empty())
-            transport_tune_complete &= !m_currentInfo->nits.empty();
 
-        if (transport_tune_complete)
+        // DVB
+    	// Mark network_discovery_complete if I have seen both the mandatory NIT and SDT tables
+        // For DVB assume network discovery is incomplete
+    	if (DTVTunerType::kTunerTypeDVBS1 == tuner_type ||
+    			DTVTunerType::kTunerTypeDVBS2 == tuner_type ||
+    			DTVTunerType::kTunerTypeDVBC == tuner_type ||
+    			DTVTunerType::kTunerTypeDVBT == tuner_type ||
+    			DTVTunerType::kTunerTypeDVBT2 == tuner_type)
+    			network_discovery_complete = false;
+        if (sd->HasCachedAllNIT() && !m_currentInfo->serviceDescriptionTablesCache.empty())
+            network_discovery_complete = !m_currentInfo->nits.empty();
+
+        if (network_discovery_complete)
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("transport_tune_complete: "
+                QString("network_discovery_complete: "
                         "\n\t\t\tcurrentInfo->pmts.empty():     %1"
-                        "\n\t\t\tsd->HasCachedAnyNIT():         %2"
-                        "\n\t\t\tHasSeenAnySDTables:        %3"
+                        "\n\t\t\tsd->HasCachedAllNIT():         %2"
+                        "\n\t\t\tHasSeenAnySDTables:            %3"
                         "\n\t\t\tcurrentInfo->nits.empty():     %4")
                     .arg(m_currentInfo->pmts.empty())
-                    .arg(sd->HasCachedAnyNIT())
+                    .arg(sd->HasCachedAllNIT())
                     .arg(!m_currentInfo->serviceDescriptionTablesCache.empty())
                     .arg(m_currentInfo->nits.empty()));
         }
     }
-    transport_tune_complete |= !wait_until_complete;
-    if (transport_tune_complete)
+
+    // Do not mark network_discovery_complete if I am waiting for optional tables
+    network_discovery_complete |= !wait_until_complete;
+    if (network_discovery_complete)
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("transport_tune_complete: wait_until_complete %1")
+            QString("network_discovery_complete: wait_until_complete %1")
                 .arg(wait_until_complete));
     }
 
-    if (transport_tune_complete &&
+    if (network_discovery_complete &&
         /*!ignoreEncryptedServices &&*/ m_currentEncryptionStatus.size())
     {
         //GetDTVSignalMonitor()->GetStreamData()->StopTestingDecryption();
@@ -1045,7 +1065,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
     // append transports from the NIT to the scan list
-    if (transport_tune_complete && m_extendScanList &&
+    if (network_discovery_complete && m_extendScanList &&
         !m_currentInfo->nits.empty())
     {
         // append delivery system descriptos to scan list
@@ -1058,13 +1078,13 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
     // Start scanning next transport if we are done with this one..
-    if (transport_tune_complete)
+    if (network_discovery_complete)
     {
         QString cchan, cchan_tr;
         uint cchan_cnt = GetCurrentTransportInfo(cchan, cchan_tr);
         m_channelsFound += cchan_cnt;
-        QString chan_tr = QObject::tr("%1 -- Timed out").arg(cchan_tr);
-        QString chan    = QString(    "%1 -- Timed out").arg(cchan);
+        QString chan_tr = QObject::tr("%1 -- Network Discovery Complete").arg(cchan_tr);
+        QString chan    = QString(    "%1 -- Network Discovery Complete").arg(cchan);
         QString msg_tr  = "";
         QString msg     = "";
 
