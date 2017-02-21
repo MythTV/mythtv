@@ -678,7 +678,7 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::PMT == table_id)
     {
-        return _pat_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
+        return _pmt_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
     }
 
     return false;
