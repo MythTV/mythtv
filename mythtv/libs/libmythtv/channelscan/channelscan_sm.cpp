@@ -66,6 +66,16 @@ using namespace std;
 #include "hdhrchannel.h"
 #include "v4lchannel.h"
 
+#define LOG_NO_CONTEXT(_MASK_, _LEVEL_, _STRING_)                                  \
+    do {                                                                \
+        if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
+        {                                                               \
+            LogPrintLine(_MASK_, (LogLevel_t)_LEVEL_,                   \
+                         "", 0, "", 1,           \
+                         QString(_STRING_).toLocal8Bit().constData());  \
+        }                                                               \
+    } while (false)
+
 typedef QMap<uint, sdt_section_const_vec_t> sdt_map_t;
 
 /// SDT's should be sent every 2 seconds and NIT's every
@@ -420,16 +430,11 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 {
     QMutexLocker locker(&m_lock);
 
-    QString LogMessage(LOC + QString("Got a Program Association Table for %1")
-            .arg((*m_current).FriendlyName) + "\n" + pat->toString());
+    QStringList LogMessage = QString(QString("Got a Program Association Table for %1")
+            .arg((*m_current).FriendlyName) + "\n" + pat->toString()).split("\n");
 
-    while (!LogMessage.isEmpty())
-    {
-    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-    	LogMessage.remove(0, LOGLINE_MAX);
-    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
-    }
-
+    for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     // Add pmts to list, so we can do MPEG scan properly.
     ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
@@ -444,15 +449,12 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&m_lock);
 
-//    QString LogMessage(LOC +
-//            "LOC + QString("Got a Program Map Table for %1")
-//            .arg((*m_current).FriendlyName) + "\n" + pmt->toString());
+//    QString LogMessage(
+//            "QString("Got a Program Map Table for %1")
+//            .arg((*m_current).FriendlyName) + "\n" + pmt->toString()).split("\n);
 //
-//    while (!LogMessage.isEmpty())
-//    {
-//    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-//    	LogMessage.remove(0, LOGLINE_MAX);
-//    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
+//    for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+//    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 //    }
 
 
@@ -465,16 +467,12 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
 {
     QMutexLocker locker(&m_lock);
 
-    QString LogMessage(LOC +
+    QStringList LogMessage = QString(
             QString("Got a Virtual Channel Table for %1")
-                .arg((*m_current).FriendlyName) + "\n" + vct->toString());
+                .arg((*m_current).FriendlyName) + "\n" + vct->toString()).split("\n");
 
-    while (!LogMessage.isEmpty())
-    {
-    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-    	LogMessage.remove(0, LOGLINE_MAX);
-    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
-    }
+    for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     for (uint i = 0; !m_currentTestingDecryption && i < vct->ChannelCount(); i++)
     {
@@ -491,15 +489,11 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 {
     QMutexLocker locker(&m_lock);
 
-    QString LogMessage(LOC + QString("Got the Master Guide for %1")
-            .arg((*m_current).FriendlyName) + "\n" + mgt->toString());
+    QStringList LogMessage = QString(QString("Got the Master Guide for %1")
+            .arg((*m_current).FriendlyName) + "\n" + mgt->toString()).split("\n");
 
-    while (!LogMessage.isEmpty())
-    {
-    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-    	LogMessage.remove(0, LOGLINE_MAX);
-    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
-    }
+    for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     UpdateChannelInfo(true);
 }
@@ -508,20 +502,9 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
     QMutexLocker locker(&m_lock);
 
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Service Description Table");
+
     sdt_sections_cache_const_t::const_iterator section = sections.begin();
-
-    QString LogMessage(LOC +
-            QString("Got a Service Description Table for %1")
-                .arg((*m_current).FriendlyName) + "\n" + (*section)->toString());
-
-    while (!LogMessage.isEmpty())
-    {
-    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-    	LogMessage.remove(0, LOGLINE_MAX);
-    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
-    }
-
-    // Process common fields
 
     // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
     if (!m_setOtherTables && ((*section)->OriginalNetworkID() == 2 ||
@@ -547,6 +530,15 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 
     for (; section != sections.end(); ++section)
     {
+        QStringList LogMessage  = QString(
+                QString("Processing Service Description Table Section for %1")
+                    .arg((*m_current).FriendlyName) + "\n" + (*section)->toString()).split("\n");
+
+        for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+        	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+
+        // Process common fields
+
         for (uint i = 0; !m_currentTestingDecryption && i < (*section)->ServiceCount(); i++)
         {
             if ((*section)->IsEncrypted(i))
@@ -573,17 +565,13 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
 {
     QMutexLocker locker(&m_lock);
 
-    QString LogMessage(LOC +
+    QStringList LogMessage = QString(
             QString("Got a Network Information Table for %1 at 0x%2")
                 .arg((*m_current).FriendlyName)
-                .arg(uint64_t(nit), 0, 16) + "\n" + nit->toString());
+                .arg(uint64_t(nit), 0, 16) + "\n" + nit->toString()).split("\n");
 
-    while (!LogMessage.isEmpty())
-    {
-    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-    	LogMessage.remove(0, LOGLINE_MAX);
-    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
-    }
+    for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     UpdateChannelInfo(true);
 }
@@ -592,15 +580,11 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 {
     QMutexLocker locker(&m_lock);
 
-    QString LogMessage(LOC + "Got a Bouquet Association Table\n" +
-            bat->toString());
+    QStringList LogMessage = QString("Got a Bouquet Association Table\n" +
+            bat->toString()).split("\n");
 
-    while (!LogMessage.isEmpty())
-    {
-    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-    	LogMessage.remove(0, LOGLINE_MAX);
-    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
-    }
+    for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
 
@@ -642,19 +626,9 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 {
     QMutexLocker locker(&m_lock);
 
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Service Description Table (other)");
+
     sdt_sections_cache_const_t::const_iterator section = sections.begin();
-
-    QString LogMessage(LOC +
-            "Got a Service Description Table (other)\n" + (*section)->toString());
-
-    while (!LogMessage.isEmpty())
-    {
-    	QString LogFragment(LogMessage.left(LOGLINE_MAX));
-    	LogMessage.remove(0, LOGLINE_MAX);
-    	LOG(VB_CHANSCAN, LOG_INFO, LogFragment);
-    }
-
-    m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
 
     // Process common fields
 
@@ -665,6 +639,14 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 
     for (; section != sections.end(); ++section)
     {
+        QStringList LogMessage = QString(
+                "Processing a Service Description Table (other) section\n"
+        		+ (*section)->toString()).split("\n");
+
+        for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+        	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+
+        m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
         for (uint i = 0; i < (*section)->ServiceCount(); i++)
         {
             uint serviceId = (*section)->ServiceID(i);
