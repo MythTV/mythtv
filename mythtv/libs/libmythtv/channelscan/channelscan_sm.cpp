@@ -1697,11 +1697,15 @@ bool ChannelScanSM::HasTimedOut(void)
         (m_timer.elapsed() > (int)kDecryptionTimeout))
     {
         m_currentTestingDecryption = false;
+        LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - decryption");
         return true;
     }
 
     if (!m_waitingForTables)
+    {
+        LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - not waiting for tables");
         return true;
+    }
 
 #ifdef USING_DVB
     // If the rotor is still moving, reset the timer and keep waiting
@@ -1732,14 +1736,32 @@ bool ChannelScanSM::HasTimedOut(void)
             sd = GetDTVSignalMonitor()->GetScanStreamData();
 
         if (!sd)
+        {
+        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - No signal monitor");
             return true;
+        }
 
         if (sd->HasCachedAnyNIT() || ((NULL != m_currentInfo) && !m_currentInfo->serviceDescriptionTablesCache.empty()))
-            return m_timer.elapsed() > (int) kDVBTableTimeout;
+        {
+            bool ret = m_timer.elapsed() > (int) kDVBTableTimeout;
+            if (ret)
+            	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - DVB tables");
+            return ret;
+        }
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
-            return m_timer.elapsed() > (int) kATSCTableTimeout;
+        {
+            bool ret = m_timer.elapsed() > (int) kATSCTableTimeout;
+            if (ret)
+            	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - ATSC tables");
+            return ret;
+        }
         if (sd->HasCachedAnyPAT() || sd->HasCachedAnyPMTs())
-            return m_timer.elapsed() > (int) kMPEGTableTimeout;
+        {
+            bool ret = m_timer.elapsed() > (int) kMPEGTableTimeout;
+            if (ret)
+            	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - MPEG tables");
+            return ret;
+        }
 
         return true;
     }
@@ -1754,15 +1776,19 @@ bool ChannelScanSM::HasTimedOut(void)
             sd = GetDTVSignalMonitor()->GetScanStreamData();
 
         if (!sd)
+        {
+        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - No signal monitor");
             return true;
+        }
 
         // Just is case we temporarily lose the signal after we've seen
         // tables...
         if (!sd->HasCachedAnyPAT() && !sd->HasCachedAnyPMTs() &&
             !sd->HasCachedMGT()    && !sd->HasCachedAnyVCTs() &&
             !sd->HasCachedAnyNIT() &&
-            (m_currentInfo == NULL || !m_currentInfo->serviceDescriptionTablesCache.empty()))
+            (m_currentInfo == NULL || m_currentInfo->serviceDescriptionTablesCache.empty()))
         {
+        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - Lost signal after tables received");
             return true;
         }
     }
