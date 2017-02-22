@@ -168,6 +168,11 @@ class ChannelScanSM : public MPEGStreamListener,
     void HandleBAT(const BouquetAssociationTable*);
 
   private:
+    // Typedefs
+    typedef enum {MPEG_TRANSPORT_STREAM,
+    	DVB_TRANSPORT_STREAM,
+		ATSC_TRANSPORT_STREAM } TransportStreamType;
+
     // some useful gets
     DTVChannel       *GetDTVChannel(void);
     const DTVChannel *GetDTVChannel(void) const;
@@ -200,7 +205,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     bool TestNextProgramEncryption(void);
     void UpdateScanTransports(const NetworkInformationTable *nit);
-    bool UpdateChannelInfo(bool wait_until_complete);
+    bool UpdateChannelInfo(bool wait_until_complete, TransportStreamType transport_stream_type);
 
     void HandleAllGood(void); // used for analog scanner
 

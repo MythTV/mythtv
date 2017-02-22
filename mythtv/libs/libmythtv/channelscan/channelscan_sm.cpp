@@ -32,6 +32,7 @@
 
 // C++ includes
 #include <algorithm>
+#include <iostream> // for cerr
 using namespace std;
 
 // Qt includes
@@ -482,7 +483,7 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
         }
     }
 
-    UpdateChannelInfo(true);
+    UpdateChannelInfo(true, ATSC_TRANSPORT_STREAM);
 }
 
 void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
@@ -495,7 +496,7 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
     for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
     	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
-    UpdateChannelInfo(true);
+    UpdateChannelInfo(true, ATSC_TRANSPORT_STREAM);
 }
 
 void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
@@ -558,12 +559,15 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
     }
     m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
 
-    UpdateChannelInfo(true);
+    UpdateChannelInfo(true, DVB_TRANSPORT_STREAM);
 }
 
 void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
 {
     QMutexLocker locker(&m_lock);
+
+
+    cerr << nit->toString().toStdString() << endl;
 
     QStringList LogMessage = QString(
             QString("Got a Network Information Table for %1 at 0x%2")
@@ -573,7 +577,7 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
     for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
     	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
-    UpdateChannelInfo(true);
+    UpdateChannelInfo(true, DVB_TRANSPORT_STREAM);
 }
 
 void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
@@ -688,7 +692,7 @@ void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
     if (kEncDecrypted == m_currentEncryptionStatus[pnum])
         m_currentTestingDecryption = false;
 
-    UpdateChannelInfo(true);
+    UpdateChannelInfo(true, MPEG_TRANSPORT_STREAM);
 }
 
 bool ChannelScanSM::TestNextProgramEncryption(void)
@@ -829,8 +833,17 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                 case DescriptorID::terrestrial_delivery_system:
                 {
                     const TerrestrialDeliverySystemDescriptor cd(desc);
-                    frequency = cd.FrequencyHz();
-                    tt = DTVTunerType::kTunerTypeDVBT;
+                    if (cd.OtherFrequencyInUse())
+                    {
+                    	// Other frequencies are in use
+                    	LOG(VB_CHANSCAN, LOG_INFO, LOC + "Other frequencies are in use");
+                    	continue;
+                    }
+                    else
+                    {
+                    	frequency = cd.FrequencyHz();
+                    	tt = DTVTunerType::kTunerTypeDVBT;
+                    }
                     break;
                 }
                 case DescriptorID::satellite_delivery_system:
@@ -873,7 +886,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
     }
 }
 
-bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
+bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamType transport_stream_type)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -897,11 +910,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 			.arg(uint64_t(m_currentInfo)));
     }
 
-    DTVTunerType tuner_type = GuessDTVTunerType(DTVTunerType::kTunerTypeUnknown);
-
-    bool network_discovery_complete = true;
-
     // MPEG
+
+    bool mpeg_discovery_complete = true;
 
     // Grab PAT tables
     pat_vec_t pattmp = sd->GetCachedPATs();
@@ -925,15 +936,16 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             }
         }
         else
-            network_discovery_complete = false;
+        	mpeg_discovery_complete = false;
     }
-    network_discovery_complete &= !pattmp.empty();
+    mpeg_discovery_complete &= !pattmp.empty();
     sd->ReturnCachedPATTables(pattmp);
 
     // Grab PMT tables
     if ((!wait_until_complete || sd->HasCachedAllPMTs()) &&
-        m_currentInfo->pmts.empty())
+    		m_currentInfo->pmts.empty())
         m_currentInfo->pmts = sd->GetCachedPMTs();
+    mpeg_discovery_complete &= !m_currentInfo->pmts.empty();
 
     // ATSC
     if (!m_currentInfo->mgt && sd->HasCachedMGT())
@@ -959,48 +971,52 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         m_currentInfo->nits = sd->GetCachedNIT();
     }
 
-    // At this stage we may only have a PAT table
-    if (network_discovery_complete)
+    bool network_discovery_complete = false;
+    if (mpeg_discovery_complete)
     {
-    	// MPEG
-    	// Mark network_discovery_complete if I have seen a PMT
-        network_discovery_complete &= !m_currentInfo->pmts.empty();
-
+    	if (MPEG_TRANSPORT_STREAM == transport_stream_type)
+    	{
+    		network_discovery_complete = true;
+			LOG(VB_CHANSCAN, LOG_INFO, LOC + "MPEG network_discovery_complete");
+    	}
+    	else if (ATSC_TRANSPORT_STREAM == transport_stream_type)
+    	{
         // ATSC
-    	// Mark network_discovery_complete if I have seen an MGT
-        // and any TVCT or CVCT sections
-        if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
-        {
-            network_discovery_complete &= sd->HasCachedMGT();
-            network_discovery_complete &=
-                (!m_currentInfo->tvcts.empty() || !m_currentInfo->cvcts.empty());
-        }
+			// Mark network_discovery_complete if I have seen an MGT
+			// and any TVCT or CVCT sections
+			if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
+			{
+				if (sd->HasCachedMGT() &&
+						(!m_currentInfo->tvcts.empty() || !m_currentInfo->cvcts.empty()))
+					network_discovery_complete = true;
+				if (network_discovery_complete)
+					LOG(VB_CHANSCAN, LOG_INFO, LOC + "ATSC network_discovery_complete");
+			}
+    	}
+    	else if (DVB_TRANSPORT_STREAM == transport_stream_type)
+    	{
 
-        // DVB
-    	// Mark network_discovery_complete if I have seen both the mandatory NIT and SDT tables
-        // For DVB assume network discovery is incomplete
-    	if (DTVTunerType::kTunerTypeDVBS1 == tuner_type ||
-    			DTVTunerType::kTunerTypeDVBS2 == tuner_type ||
-    			DTVTunerType::kTunerTypeDVBC == tuner_type ||
-    			DTVTunerType::kTunerTypeDVBT == tuner_type ||
-    			DTVTunerType::kTunerTypeDVBT2 == tuner_type)
-    			network_discovery_complete = false;
-        if (sd->HasCachedAllNIT() && !m_currentInfo->serviceDescriptionTablesCache.empty())
-            network_discovery_complete = !m_currentInfo->nits.empty();
+			// DVB
+			// Mark network_discovery_complete if I have seen both the mandatory NIT and SDT tables
+			if (sd->HasCachedAllNIT() &&
+					!m_currentInfo->serviceDescriptionTablesCache.empty() &&
+					!m_currentInfo->nits.empty())
+				network_discovery_complete = true;
 
-        if (network_discovery_complete)
-        {
-            LOG(VB_CHANSCAN, LOG_INFO, LOC +
-                QString("network_discovery_complete: "
-                        "\n\t\t\tcurrentInfo->pmts.empty():     %1"
-                        "\n\t\t\tsd->HasCachedAllNIT():         %2"
-                        "\n\t\t\tHasSeenAnySDTables:            %3"
-                        "\n\t\t\tcurrentInfo->nits.empty():     %4")
-                    .arg(m_currentInfo->pmts.empty())
-                    .arg(sd->HasCachedAllNIT())
-                    .arg(!m_currentInfo->serviceDescriptionTablesCache.empty())
-                    .arg(m_currentInfo->nits.empty()));
-        }
+			if (network_discovery_complete)
+			{
+				LOG(VB_CHANSCAN, LOG_INFO, LOC +
+					QString(" DVB network_discovery_complete: "
+							"\n\t\t\tcurrentInfo->pmts.empty():     %1"
+							"\n\t\t\tsd->HasCachedAllNIT():         %2"
+							"\n\t\t\tHasSeenAnySDTables:            %3"
+							"\n\t\t\tcurrentInfo->nits.empty():     %4")
+						.arg(m_currentInfo->pmts.empty())
+						.arg(sd->HasCachedAllNIT())
+						.arg(!m_currentInfo->serviceDescriptionTablesCache.empty())
+						.arg(m_currentInfo->nits.empty()));
+			}
+    	}
     }
 
     // Do not mark network_discovery_complete if I am waiting for optional tables
@@ -1826,7 +1842,7 @@ void ChannelScanSM::HandleActiveScan(void)
     if (0 == m_nextIt.offset() && m_nextIt != m_scanTransports.begin())
     {
         // Add channel to scanned list and potentially check decryption
-        if (do_post_insertion && !UpdateChannelInfo(false))
+        if (do_post_insertion && !UpdateChannelInfo(false, MPEG_TRANSPORT_STREAM))
             return;
 
         // Stop signal monitor for previous transport
