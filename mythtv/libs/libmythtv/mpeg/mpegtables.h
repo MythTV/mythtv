@@ -1129,7 +1129,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     // this comment with private or reserved commands.
 
     // descriptor_loop_length  16   0.0 + _epilog
-    uint SpliceDescriptorsLength(uint i) const
+    uint SpliceDescriptorsLength(uint /*i*/) const
     {
         return (_epilog[0] << 8) | _epilog[1];
     }

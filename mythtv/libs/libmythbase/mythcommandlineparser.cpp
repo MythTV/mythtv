@@ -777,7 +777,7 @@ void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
  *  This option is intended for internal use only, as part of reconciling
  *  dummy options with their matched real counterparts.
  */
-void CommandLineArg::SetRequires(CommandLineArg *other, bool forward)
+void CommandLineArg::SetRequires(CommandLineArg *other, bool /*forward*/)
 {
     int i;
     bool replaced = false;

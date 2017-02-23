@@ -24,8 +24,15 @@ void MythDVDPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
     SetScanType(kScan_Interlaced);
 }
 
+/** \fn MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)
+ *  \param buffer    Buffer
+ *  \param timecode  Timecode
+ *  \param wrap      Ignored. This function overrides the callers
+ *                   'wrap' indication and computes its own based on
+ *                   whether or not video is currently playing.
+ */
 void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
-                                          int64_t timecode, bool wrap)
+                                          int64_t timecode, bool /*wrap*/)
 {
     MythPlayer::ReleaseNextVideoFrame(buffer, timecode,
                         !player_ctx->buffer->IsInDiscMenuOrStillFrame());
@@ -81,7 +88,7 @@ void MythDVDPlayer::DecoderPauseCheck(void)
     MythPlayer::DecoderPauseCheck();
 }
 
-bool MythDVDPlayer::PrebufferEnoughFrames(int min_buffers)
+bool MythDVDPlayer::PrebufferEnoughFrames(int /*min_buffers*/)
 {
     return MythPlayer::PrebufferEnoughFrames(1);
 }
@@ -310,7 +317,7 @@ void MythDVDPlayer::InitialSeek(void)
     player_ctx->buffer->IgnoreWaitStates(false);
 }
 
-void MythDVDPlayer::ResetPlaying(bool resetframes)
+void MythDVDPlayer::ResetPlaying(bool /*resetframes*/)
 {
     MythPlayer::ResetPlaying(false);
 }
@@ -457,7 +464,7 @@ void MythDVDPlayer::ChangeSpeed(void)
     }
 }
 
-void MythDVDPlayer::AVSync(VideoFrame *frame, bool limit_delay)
+void MythDVDPlayer::AVSync(VideoFrame *frame, bool /*limit_delay*/)
 {
     MythPlayer::AVSync(frame, true);
 }
@@ -504,7 +511,7 @@ int64_t MythDVDPlayer::GetTotalSeconds(bool /*honorCutList*/, int divisor) const
 }
 
 void MythDVDPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
-                                      bool absolute)
+                                      bool /*absolute*/)
 {
     if (!player_ctx->buffer->IsDVD())
         return;

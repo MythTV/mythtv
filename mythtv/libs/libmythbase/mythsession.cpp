@@ -34,8 +34,8 @@ bool MythUserSession::IsValid(void) const
 /**
  * \public
  */
-bool MythUserSession::CheckPermission(const QString &context,
-                                      uint permission)
+bool MythUserSession::CheckPermission(const QString &/*context*/,
+                                      uint /*permission*/)
 {
     if (!gCoreContext->IsMasterBackend())
     {

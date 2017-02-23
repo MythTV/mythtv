@@ -666,7 +666,7 @@ bool DVBStreamData::HasCachedSDT(bool current) const
     return false;
 }
 
-bool DVBStreamData::HasCachedAnySDTs(bool current) const
+bool DVBStreamData::HasCachedAnySDTs(bool /*current*/) const
 {
     QMutexLocker locker(&_cache_lock);
     return !_cached_sdts.empty();

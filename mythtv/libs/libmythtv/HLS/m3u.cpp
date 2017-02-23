@@ -355,7 +355,7 @@ namespace M3U
     }
 
     bool ParseProgramDateTime(const QString& line, const QString& loc,
-                              QDateTime &date)
+                              QDateTime &/*date*/)
     {
         /*
          * #EXT-X-PROGRAM-DATE-TIME:<YYYY-MM-DDThh:mm:ssZ>

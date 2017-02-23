@@ -2058,7 +2058,7 @@ int HLSRingBuffer::ParseKey(HLSStream *hls, const QString &line)
     return err;
 }
 
-int HLSRingBuffer::ParseProgramDateTime(HLSStream *hls, const QString &line) const
+int HLSRingBuffer::ParseProgramDateTime(HLSStream */*hls*/, const QString &line) const
 {
     /*
      * #EXT-X-PROGRAM-DATE-TIME:<YYYY-MM-DDThh:mm:ssZ>
@@ -2136,7 +2136,7 @@ int HLSRingBuffer::ParseEndList(HLSStream *hls) const
     return RET_OK;
 }
 
-int HLSRingBuffer::ParseDiscontinuity(HLSStream *hls, const QString &line) const
+int HLSRingBuffer::ParseDiscontinuity(HLSStream */*hls*/, const QString &line) const
 {
     /* Not handled, never seen so far */
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("#EXT-X-DISCONTINUITY %1").arg(line));

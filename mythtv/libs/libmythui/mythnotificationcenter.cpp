@@ -1237,7 +1237,7 @@ int NCPrivate::RemoveScreen(MythNotificationScreen *screen)
 /**
  * Re-position screens on display.
  */
-void NCPrivate::RefreshScreenPosition(int from)
+void NCPrivate::RefreshScreenPosition(int /*from*/)
 {
     QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
     QList<MythNotificationScreen*>::iterator itend    = m_screens.end();

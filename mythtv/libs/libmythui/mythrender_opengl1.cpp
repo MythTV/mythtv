@@ -216,8 +216,10 @@ void MythRenderOpenGL1::EnableShaderObject(uint obj)
     doneCurrent();
 }
 
+// The API appears to be for compatability with OpenGL2. The uniform
+// argument is used there.
 void MythRenderOpenGL1::SetShaderParams(uint obj, const QMatrix4x4 &m,
-                                        const char* uniform)
+                                        const char* /*uniform*/)
 {
     GLMatrix4x4 v(m);
 

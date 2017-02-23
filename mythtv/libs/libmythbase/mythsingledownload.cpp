@@ -112,7 +112,7 @@ void MythSingleDownload::Cancel(void)
     }
 }
 
-void MythSingleDownload::Progress(qint64 bytesRead, qint64 totalBytes)
+void MythSingleDownload::Progress(qint64 bytesRead, qint64 /*totalBytes*/)
 {
     if (m_maxsize && bytesRead>=m_maxsize)
     {

@@ -87,7 +87,7 @@ class PaneATSC : public GroupSetting
         ResetTransportRange();
     }
 
-    void ModulationChanged(const QString &modulation)
+    void ModulationChanged(const QString &/*modulation*/)
     {
         ResetTransportRange();
     }
