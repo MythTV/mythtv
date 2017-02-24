@@ -823,7 +823,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
         for (uint j = 0; j < list.size(); ++j)
         {
             int mplexid = -1;
-            uint64_t frequency = 0;
+            QVector<uint64_t> frequencies;
             const MPEGDescriptor desc(list[j]);
             uint tag = desc.DescriptorTag();
             DTVTunerType tt = DTVTunerType::kTunerTypeUnknown;
@@ -837,11 +837,24 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     {
                     	// Other frequencies are in use
                     	LOG(VB_CHANSCAN, LOG_INFO, LOC + "Other frequencies are in use");
-                    	continue;
+                    	// See if I can find a FrequencyListDesciptor
+                    	desc_list_t::const_iterator it;
+                    	for (it = list.begin();
+                    		(it != list.end()) && (DescriptorID::frequency_list != MPEGDescriptor(*it).DescriptorTag());
+                    		++it);
+						if (it == list.end())
+							continue;
+						else
+						{
+							FrequencyListDescriptor frequency_list(*it);
+							for (i = 0; i < frequency_list.FrequencyCount(); i++)
+								frequencies.push_back(frequency_list.FrequencyHz(i));
+							break;
+						}
                     }
                     else
                     {
-                    	frequency = cd.FrequencyHz();
+                    	frequencies.push_back(cd.FrequencyHz());
                     	tt = DTVTunerType::kTunerTypeDVBT;
                     }
                     break;
@@ -849,14 +862,14 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                 case DescriptorID::satellite_delivery_system:
                 {
                     const SatelliteDeliverySystemDescriptor cd(desc);
-                    frequency = cd.FrequencyHz()/1000;
+                    frequencies.push_back(cd.FrequencyHz()/1000);
                     tt = DTVTunerType::kTunerTypeDVBS1;
                     break;
                 }
                 case DescriptorID::cable_delivery_system:
                 {
                     const CableDeliverySystemDescriptor cd(desc);
-                    frequency = cd.FrequencyHz();
+                    frequencies.push_back(cd.FrequencyHz());
                     tt = DTVTunerType::kTunerTypeDVBC;
                     break;
                 }
@@ -864,24 +877,35 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     continue;
             }
 
-            mplexid = ChannelUtil::GetMplexID(m_sourceID, frequency, tsid, netid);
-            mplexid = max(0, mplexid);
-
-            tt = GuessDTVTunerType(tt);
-
-            DTVMultiplex tuning;
-            if (mplexid)
+            for (QVector<uint64_t>::const_iterator it = frequencies.begin();
+            		it != frequencies.end();
+            		++it)
             {
-                if (!tuning.FillFromDB(tt, mplexid))
-                    continue;
-            }
-            else if (!tuning.FillFromDeliverySystemDesc(tt, desc))
-            {
-                continue;
-            }
+				mplexid = ChannelUtil::GetMplexID(m_sourceID, *it, tsid, netid);
+				mplexid = max(0, mplexid);
 
-            m_extendTransports[id] = tuning;
-            break;
+				tt = GuessDTVTunerType(tt);
+
+				DTVMultiplex tuning;
+				if (mplexid)
+				{
+					if (!tuning.FillFromDB(tt, mplexid))
+						continue;
+				}
+				else if (!tuning.FillFromDeliverySystemDesc(tt, desc))
+				{
+					continue;
+				}
+				if (tuning.frequency != *it)
+					// Use the delivery system descriptor as a best guess
+					// for the tuning parameters, but change the frequency
+					// to the one from the frequency list descriptor
+					// TODO add more checks
+					tuning.frequency = *it;
+
+				m_extendTransports[id] = tuning;
+				break;
+            }
         }
     }
 }
