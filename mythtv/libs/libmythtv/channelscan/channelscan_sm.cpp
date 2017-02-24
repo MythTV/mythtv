@@ -877,6 +877,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     continue;
             }
 
+            bool failedToGetMultiplexDetails = false;
             for (QVector<uint64_t>::const_iterator it = frequencies.begin();
             		it != frequencies.end();
             		++it)
@@ -890,22 +891,28 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 				if (mplexid)
 				{
 					if (!tuning.FillFromDB(tt, mplexid))
-						continue;
+					{
+						failedToGetMultiplexDetails = true;
+						break;
+					}
 				}
 				else if (!tuning.FillFromDeliverySystemDesc(tt, desc))
 				{
-					continue;
+					failedToGetMultiplexDetails = true;
+					break;
 				}
+
 				if (tuning.frequency != *it)
 					// Use the delivery system descriptor as a best guess
 					// for the tuning parameters, but change the frequency
 					// to the one from the frequency list descriptor
 					// TODO add more checks
 					tuning.frequency = *it;
-
 				m_extendTransports[id] = tuning;
-				break;
             }
+            if (failedToGetMultiplexDetails)
+            	continue;
+			break;
         }
     }
 }
