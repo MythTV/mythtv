@@ -2463,9 +2463,10 @@ void ProgramInfo::SetAvailableStatus(
     if (status != availableStatus)
     {
         LOG(VB_GUI, LOG_INFO,
-                 toString(kTitleSubtitle) + QString(": %1 -> %2")
-                     .arg(::toString((AvailableStatusType)availableStatus))
-                     .arg(::toString(status)));
+            toString(kTitleSubtitle) + QString(": %1 -> %2 in %3")
+            .arg(::toString((AvailableStatusType)availableStatus))
+            .arg(::toString(status))
+            .arg(where));
     }
     availableStatus = status;
 }
