@@ -2316,10 +2316,6 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     detect_letter_box->SwitchTo(frame);
 
-    FrameScanType ps = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
-        ps = kScan_Progressive;
-
     AVSync(frame, 0);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!player_ctx->IsPIP())
