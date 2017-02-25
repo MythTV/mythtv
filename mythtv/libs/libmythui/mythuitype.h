@@ -104,7 +104,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual void Pulse(void);
 
     void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255,
-              QRect clipRegion = QRect());
+              QRect clipRect = QRect());
 
     /// Convenience method, calls SetPosition(const MythPoint&)
     /// Override that instead to change functionality.
@@ -204,7 +204,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRegion);
+                          int alphaMod, QRect clipRect);
 
     void AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList);
     void HandleAlphaPulse();
