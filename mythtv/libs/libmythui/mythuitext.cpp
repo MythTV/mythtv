@@ -7,7 +7,6 @@
 #include <QFontMetrics>
 #include <QString>
 #include <QHash>
-#include <QRegularExpression>
 
 #include "mythlogging.h"
 
@@ -220,10 +219,10 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
             if (!map.value(key).isEmpty())
             {
                 replacement = QString("%1%2%3%4")
-                              .arg(regexp.cap(2))
-                              .arg(regexp.cap(3))
-                              .arg(map.value(key))
-                              .arg(regexp.cap(6));
+                .arg(regexp.cap(2))
+                .arg(regexp.cap(3))
+                .arg(map.value(key))
+                .arg(regexp.cap(6));
             }
 
             tempString.replace(regexp.cap(0), replacement);
@@ -234,14 +233,9 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
             SetText(tempString);
         }
     }
-    else
+    else if (map.contains(objectName()))
     {
-        // Match either whole name, or name ending with a '+'
-        // Allows themer to specify multiple versions of the same element
-        QRegularExpression re("^(\\w+)($|\\+)");
-        QRegularExpressionMatch match = re.match(objectName());
-        if (match.hasMatch() && map.contains(match.captured(1)))
-            SetText(map.value(match.captured(1)));
+        SetText(map.value(objectName()));
     }
 }
 

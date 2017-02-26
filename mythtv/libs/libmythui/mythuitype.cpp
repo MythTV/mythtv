@@ -6,7 +6,6 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QDomDocument>
-#include <QRegularExpression>
 
 // Mythbase headers
 #include "mythlogging.h"
@@ -156,17 +155,6 @@ MythUIType *MythUIType::GetChild(const QString &name) const
         return dynamic_cast<MythUIType *>(ret);
 
     return NULL;
-}
-
-MythUITypeList MythUIType::GetChildren(const QString &name) const
-{
-    // Match either whole name, or name ending with a '+'
-    // Allows themer to specify multiple versions of the same element
-    QRegularExpression re("^(" + name + ")($|\\+)");
-
-    MythUITypeList list = findChildren<MythUIType*>(re);
-
-    return list;
 }
 
 /**
