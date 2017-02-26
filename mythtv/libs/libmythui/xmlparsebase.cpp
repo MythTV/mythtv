@@ -396,8 +396,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
                      type == "editbar" ||
                      type == "video")
             {
-                ParseUIType(filename, info, type, parent, NULL, showWarnings,
-                            dependsMap);
+                ParseUIType(filename, info, type, parent, NULL, showWarnings, dependsMap);
             }
             else
             {
@@ -426,16 +425,6 @@ MythUIType *XMLParseBase::ParseUIType(
                     "This element requires a name");
         return NULL;
     }
-
-    QString dependee = element.attribute("depends", "");
-
-#if 0
-    // Doing this automatically can result in some unexpected
-    // inheritance issues if the theme is not expecting it.  So,
-    // make the themer manually do it, if they desire it.
-    if (!dependee.isEmpty())
-        name += "+" + dependee;
-#endif
 
     MythUIType *olduitype = NULL;
 
@@ -560,6 +549,7 @@ MythUIType *XMLParseBase::ParseUIType(
 
     }
 
+    QString dependee = element.attribute("depends", "");
     if (!dependee.isEmpty())
         parentDependsMap.insert(name, dependee);
 
