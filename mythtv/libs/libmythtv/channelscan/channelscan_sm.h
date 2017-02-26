@@ -160,12 +160,13 @@ class ChannelScanSM : public MPEGStreamListener,
     // DVB Main
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(const sdt_sections_cache_const_t&);
-    void HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_t& sections);
+    void HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm);
     void HandleTDT(const TimeDateTable*) {}
 
     // DVB Other
     void HandleNITo(const NetworkInformationTable*) {}
     void HandleSDTo(const sdt_sections_cache_const_t&);
+    void HandleSDToNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm);
     void HandleBAT(const BouquetAssociationTable*);
 
 

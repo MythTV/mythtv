@@ -117,7 +117,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     bool HasCurrentTSID(uint& onid, uint& tsid)
     {
-    	if ((_current_onid < 0) || (_current_tsid < 0))
+    	if (((int)_current_onid < 0) || ((int)_current_tsid < 0))
     		return false;
     	else
     	{
