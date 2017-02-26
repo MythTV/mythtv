@@ -238,7 +238,7 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     {
         // Match either whole name, or name ending with a '+'
         // Allows themer to specify multiple versions of the same element
-        QRegularExpression re("^([^\\+]+)($|\\+)");
+        QRegularExpression re("^(\\w+)($|\\+)");
         QRegularExpressionMatch match = re.match(objectName());
         if (match.hasMatch() && map.contains(match.captured(1)))
             SetText(map.value(match.captured(1)));

@@ -162,7 +162,7 @@ MythUITypeList MythUIType::GetChildren(const QString &name) const
 {
     // Match either whole name, or name ending with a '+'
     // Allows themer to specify multiple versions of the same element
-    QRegularExpression re("^(" + QRegularExpression::escape(name) + ")($|\\+)");
+    QRegularExpression re("^(" + name + ")($|\\+)");
 
     MythUITypeList list = findChildren<MythUIType*>(re);
 
