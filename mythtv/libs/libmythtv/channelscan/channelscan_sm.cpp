@@ -138,6 +138,8 @@ ServiceDescriptionTablesCache::~ServiceDescriptionTablesCache()
     clear();
 }
 
+SDT_tsn_cache_t ChannelScanSM::m_longTermSDTCache;
+
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 {
     if (siscan && siscan->m_channel)
@@ -159,7 +161,7 @@ class ScannedChannelInfo
         return pats.empty() && pmts.empty()        &&
                program_encryption_status.isEmpty() &&
                !mgt         && cvcts.empty()       && tvcts.empty() &&
-               nits.empty() && serviceDescriptionTablesCache.empty();
+               nits.empty();
     }
 
     // MPEG
@@ -174,8 +176,6 @@ class ScannedChannelInfo
 
     // DVB
     nit_const_vec_t   nits;
-    // Local Service Description Tables cache
-    SDT_tsn_cache_t serviceDescriptionTablesCache;
 };
 
 /** \class ChannelScanSM
@@ -501,9 +501,14 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 
 void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
-    QMutexLocker locker(&m_lock);
+    QMutexLocker locker(&m_longTermSDTCacheLock);
+    HandleSDTNoLongTermCacheLock(sections);
+}
 
+void ChannelScanSM::HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_t& sections)
+{
     LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Service Description Table");
+    QMutexLocker locker(&m_lock);
 
     sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
@@ -549,7 +554,7 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
         }
     }
 
-    // Copy table into my local cache
+    // Copy table into my short term (per channel scan) cache
     if (!m_currentInfo)
     {
         m_currentInfo = new ScannedChannelInfo();
@@ -557,7 +562,11 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
             QString("Allocated m_CurrentInfo 0x%1")
                 .arg(uint64_t(m_currentInfo), 0, 16));
     }
-    m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
+    m_serviceDescriptionTablesCache.CacheTable(sections);
+
+    // Copy table into my long term static cache
+
+    m_longTermSDTCache.CacheTable(sections);
 
     UpdateChannelInfo(true, DVB_TRANSPORT_STREAM);
 }
@@ -643,12 +652,12 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 
     for (; section != sections.end(); ++section)
     {
-        QStringList LogMessage = QString(
-                "Processing a Service Description Table (other) section\n"
-        		+ (*section)->toString()).split("\n");
+//        QStringList LogMessage = QString(
+//                "Processing a Service Description Table (other) section\n"
+//        		+ (*section)->toString()).split("\n");
 
-        for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
-        	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+//        for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
+//        	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
         m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
         for (uint i = 0; i < (*section)->ServiceCount(); i++)
@@ -680,7 +689,7 @@ void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
             QString("Allocated m_CurrentInfo 0x%1")
             .arg(uint64_t(m_currentInfo), 0, 16));
     }
-    m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
+    m_serviceDescriptionTablesCache.CacheTable(sections);
 }
 
 void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
@@ -1002,6 +1011,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         m_currentInfo->nits = sd->GetCachedNIT();
     }
 
+
     bool network_discovery_complete = false;
     if (mpeg_discovery_complete)
     {
@@ -1030,7 +1040,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
 			// DVB
 			// Mark network_discovery_complete if I have seen both the mandatory NIT and SDT tables
 			if (sd->HasCachedAllNIT() &&
-					!m_currentInfo->serviceDescriptionTablesCache.empty() &&
+					!m_serviceDescriptionTablesCache.empty() &&
 					!m_currentInfo->nits.empty())
 				network_discovery_complete = true;
 
@@ -1044,7 +1054,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
 							"\n\t\t\tcurrentInfo->nits.empty():     %4")
 						.arg(m_currentInfo->pmts.empty())
 						.arg(sd->HasCachedAllNIT())
-						.arg(!m_currentInfo->serviceDescriptionTablesCache.empty())
+						.arg(!m_serviceDescriptionTablesCache.empty())
 						.arg(m_currentInfo->nits.empty()));
 			}
     	}
@@ -1117,7 +1127,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         QString msg_tr  = "";
         QString msg     = "";
 
-        if (!m_currentInfo->IsEmpty())
+        if (!m_currentInfo->IsEmpty() && !m_serviceDescriptionTablesCache.empty())
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Adding %1, offset %2 to channelList.")
@@ -1471,17 +1481,17 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // SDTs
-    for (SDT_tsn_cache_t::iterator network = scan_info->serviceDescriptionTablesCache.begin();
-            network != scan_info->serviceDescriptionTablesCache.end(); ++network)
+    for (SDT_tsn_cache_t::const_iterator network = m_serviceDescriptionTablesCache.begin();
+            network != m_serviceDescriptionTablesCache.end(); ++network)
     {
-        for (SDT_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
+        for (SDT_ts_cache_t::const_iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
         {
             //for (SDT_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
             // For the time being only use SDT(actual) tables
             if ((*stream).contains(TableID::SDT))
             {
-                SDT_t_cache_t::iterator table = (*stream).find(TableID::SDT);
-                for (sdt_sections_cache_t::iterator section = (*table).begin();
+                SDT_t_cache_t::const_iterator table = (*stream).find(TableID::SDT);
+                for (sdt_sections_cache_t::const_iterator section = (*table).begin();
                         section != (*table).end(); ++section)
                 {
                     for (uint i = 0; i < (*section)->ServiceCount(); i++)
@@ -1788,7 +1798,7 @@ bool ChannelScanSM::HasTimedOut(void)
             return true;
         }
 
-        if (sd->HasCachedAnyNIT() || ((NULL != m_currentInfo) && !m_currentInfo->serviceDescriptionTablesCache.empty()))
+        if (sd->HasCachedAnyNIT() || !m_serviceDescriptionTablesCache.empty())
         {
             bool ret = m_timer.elapsed() > (int) kDVBTableTimeout;
             if (ret)
@@ -1833,9 +1843,9 @@ bool ChannelScanSM::HasTimedOut(void)
         if (!sd->HasCachedAnyPAT() && !sd->HasCachedAnyPMTs() &&
             !sd->HasCachedMGT()    && !sd->HasCachedAnyVCTs() &&
             !sd->HasCachedAnyNIT() &&
-            (m_currentInfo == NULL || m_currentInfo->serviceDescriptionTablesCache.empty()))
+            (m_serviceDescriptionTablesCache.empty()))
         {
-        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - Lost signal after tables received");
+        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - Lost signal - no tables received");
             return true;
         }
     }
@@ -1848,6 +1858,47 @@ bool ChannelScanSM::HasTimedOut(void)
  */
 void ChannelScanSM::HandleActiveScan(void)
 {
+    // If I have not seen any SD tables then see if I can pull one
+    // one from my long term cache
+    if (m_serviceDescriptionTablesCache.empty())
+    {
+    	// Check if streamdata knows the onid and tsid
+    	DTVSignalMonitor* sm;
+    	DVBStreamData* sd;
+    	uint onid;
+    	uint tsid;
+        if ((sm = GetDTVSignalMonitor()) &&
+        		(sd = sm->GetDVBStreamData()) &&
+				sd->HasCurrentTSID(onid, tsid))
+        {
+			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Got onid 0x%1 tsid 0x%2 from streamdata")
+					.arg(onid, 0, 16)
+					.arg(tsid, 0, 16));
+        	// Check if the long term cache has any for me
+            QMutexLocker locker(&m_longTermSDTCacheLock);
+        	if (!m_longTermSDTCache.empty())
+        	{
+    			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Long term cache not empty"));
+				SDT_tsn_cache_t::iterator network;
+				if ((network = m_longTermSDTCache.find(DVBStreamData::InternalOriginalNetworkID(onid, tsid))) != m_longTermSDTCache.end())
+				{
+	    			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Found onid 0x%1 in long term cache")
+	    					.arg(onid, 0, 16));
+					SDT_ts_cache_t::iterator stream;
+					if ((stream = (*network).find(tsid)) != (*network).end())
+					{
+		    			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Found tsid 0x%1 in long term cache")
+		    					.arg(tsid, 0, 16));
+						SDT_t_cache_t::iterator table;
+						if ((table = (*stream).find(TableID::SDT)) != (*stream).end())
+							HandleSDTNoLongTermCacheLock(*table);
+					}
+				}
+        	}
+    	}
+    }
+
+    // Now lock the shared data
     QMutexLocker locker(&m_lock);
 
     bool do_post_insertion = m_waitingForTables;

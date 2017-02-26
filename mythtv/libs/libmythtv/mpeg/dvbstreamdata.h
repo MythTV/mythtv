@@ -42,8 +42,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool HandleTables(uint pid, const PSIPTable&);
     void CheckStaleEIT(const DVBEventInformationTableSection& eit, uint onid, uint tsid, uint sid, uint tid) const;
     void CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uint onid, uint tsid, uint tid) const;
-    bool IsRedundant(uint pid, const PSIPTable&) const;
-    // RFJ SDT needs ONID as well
+    bool IsRedundant(uint pid, const PSIPTable&);
     void ProcessSDTSection(sdt_section_ptr_t);
 
     // NIT for broken providers
@@ -116,6 +115,18 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     void RemoveDVBEITListener(DVBEITStreamListener*);
     static void LogSICache();
 
+    bool HasCurrentTSID(uint& onid, uint& tsid)
+    {
+    	if ((_current_onid < 0) || (_current_tsid < 0))
+    		return false;
+    	else
+    	{
+    		onid = _current_onid;
+    		tsid = _current_tsid;
+    		return true;
+    	}
+    }
+
   private:
     // Caching
     void CacheNIT(nit_ptr_t);
@@ -131,6 +142,9 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     /// DVB table monitoring
     uint                      _desired_netid;
     uint                      _desired_tsid;
+
+    uint                      _current_onid;
+    uint                      _current_tsid;
 
     // Real network ID for broken providers
     int                       _dvb_real_network_id;

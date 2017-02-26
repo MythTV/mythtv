@@ -657,10 +657,10 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     return true;
 }
 
-/** \fn MPEGStreamData::IsRedundant(uint pid, const PSIPTable&) const
+/** \fn MPEGStreamData::IsRedundant(uint pid, const PSIPTable&)
  *  \brief Returns true if table already seen.
  */
-bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
+bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip)
 {
     (void) pid;
     const int table_id = psip.TableID();

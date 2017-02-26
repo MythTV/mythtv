@@ -153,6 +153,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
                              int desired_program, int cardnum, bool cacheTableSections)
     : MPEGStreamData(desired_program, cardnum, cacheTableSections),
       _desired_netid(desired_netid), _desired_tsid(desired_tsid),
+	  _current_onid(-1), _current_tsid(-1),
       _dvb_real_network_id(-1), _dvb_eit_dishnet_long(false)
 {
     LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("Constructing DvbStreamData %1")
@@ -272,10 +273,10 @@ void DVBStreamData::CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uin
     }
 }
 
-/** \fn DVBStreamData::IsRedundant(uint,const PSIPTable&) const
+/** \fn DVBStreamData::IsRedundant(uint,const PSIPTable&)
  *  \brief Returns true if table section already seen.
  */
-bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
+bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip)
 {
     if (MPEGStreamData::IsRedundant(pid, psip))
         return true;
@@ -285,6 +286,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::NIT == table_id)
     {
+    	NetworkInformationTable nit(psip);
         return _nit_status.IsSectionSeen(version, psip.Section());
     }
 
@@ -294,7 +296,11 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
         uint onid = sdt.OriginalNetworkID();
         uint tsid = sdt.TSID();
-
+        _current_onid = onid;
+        _current_tsid = tsid;
+        LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Setting _current_onid 0x%1 _current_tsid 0x%2 from SDT")
+        		.arg(_current_onid, 0, 16)
+				.arg(_current_tsid, 0, 16));
         CheckStaleSDT(sdt, onid, tsid, table_id);
 
         return SDTSectionSeen(sdt);
@@ -324,6 +330,11 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         uint onid = eit.OriginalNetworkID();
         uint tsid = eit.TSID();
         uint sid = eit.ServiceID();
+        _current_onid = onid;
+        _current_tsid = tsid;
+        LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Setting _current_onid 0x%1 _current_tsid 0x%2 from EIT")
+        		.arg(_current_onid, 0, 16)
+				.arg(_current_tsid, 0, 16));
 
         CheckStaleEIT(eit, onid, tsid, sid, table_id);
 
@@ -390,6 +401,9 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
                           int desired_serviceid)
 {
     MPEGStreamData::Reset(desired_serviceid);
+
+    _current_onid = -1;
+    _current_tsid = -1;
 
     _desired_netid = desired_netid;
     _desired_tsid  = desired_tsid;

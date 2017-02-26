@@ -151,14 +151,14 @@ void ATSCStreamData::Reset(int major, int minor)
     AddListeningPID(ATSC_PSIP_PID);
 }
 
-/** \fn ATSCStreamData::IsRedundant(uint pid, const PSIPTable&) const
+/** \fn ATSCStreamData::IsRedundant(uint pid, const PSIPTable&)
  *  \brief Returns true if table already seen.
  *  \todo All RRT tables are ignored
  *  \todo We don't check the start time of EIT and ETT tables
  *        in the version check, so many tables are improperly
  *        ignored.
  */
-bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
+bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip)
 {
     if (MPEGStreamData::IsRedundant(pid, psip))
         return true;

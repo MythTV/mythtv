@@ -16,7 +16,7 @@ class MTV_PUBLIC ScanStreamData :
     ScanStreamData(bool no_default_pid = false);
     virtual ~ScanStreamData();
 
-    bool IsRedundant(uint pid, const PSIPTable&) const;
+    bool IsRedundant(uint pid, const PSIPTable&);
     bool HandleTables(uint pid, const PSIPTable &psip);
 
     using DVBStreamData::Reset;
