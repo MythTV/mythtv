@@ -45,6 +45,7 @@ using namespace std;
 #include "mythmiscutil.h"
 
 #include "mythplugin.h"
+#include "portchecker.h"
 #include "guistartup.h"
 
 #include <unistd.h> // for usleep(), gethostname
@@ -89,8 +90,8 @@ class MythContextPrivate : public QObject
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    CheckPort(QString &host, int port, int wakeupTime);
-    bool    processEvents(void);
+    bool    checkPort(QString &host, int port, int wakeupTime);
+    void    processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void);
     void    clearSettingsCacheOverride(void);
@@ -322,50 +323,21 @@ void MythContextPrivate::EndTempWindow(void)
     EnableDBerrors();
 }
 
-// Check if a port is open
-// We cannot use the common routine telnet(host, port)
-// because that uses the database.
-bool MythContextPrivate::CheckPort(QString &host, int port, int timeLimit) {
-    LOG(VB_GENERAL, LOG_DEBUG, QString("host %1 port %2 timeLimit %3")
-        .arg(host).arg(port).arg(timeLimit));
-    int wakeupMillis = timeLimit * 1000;
-    MythTimer timer(MythTimer::kStartRunning);
-    m_socket = new QTcpSocket(this);
-    QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    int retryCount = 0;
-    while (state != QAbstractSocket::ConnectedState
-        && timer.elapsed() < wakeupMillis)
-    {
-        if (state == QAbstractSocket::UnconnectedState)
-        {
-            m_socket->connectToHost(host, port);
-            retryCount=0;
-        }
-        else
-            retryCount++;
-        if (retryCount > 6)
-            m_socket->abort();
-        if (processEvents())
-            break;
-        // Check if user got impatient and canceled
-        if (m_guiStartup) {
-            if (m_guiStartup->m_Exit
-              || m_guiStartup->m_Setup
-              || m_guiStartup->m_Search
-              || m_guiStartup->m_Retry)
-                break;
-        }
-        usleep(500000);
-        state = m_socket->state();
-        LOG(VB_GENERAL, LOG_DEBUG, QString("socket state %1")
-            .arg(state));
-    }
-    m_socket->abort();
-    processEvents();
-    delete m_socket;
-    m_socket = 0;
-    return (state == QAbstractSocket::ConnectedState);
+/**
+ * Check if a port is open and sort out the link-local scope.
+ *
+ * \param host Host or IP address. Will be updated with link-local
+ * scope if needed.
+*/
+
+bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit)
+{
+    PortChecker checker;
+    if (m_guiStartup)
+        QObject::connect(m_guiStartup,SIGNAL(cancelPortCheck()),&checker,SLOT(cancelPortCheck()));
+    return checker.checkPort(host, port, timeLimit*1000);
 }
+
 
 bool MythContextPrivate::Init(const bool gui,
                               const bool promptForBackend,
@@ -643,8 +615,19 @@ bool MythContextPrivate::SaveDatabaseParams(
 
         m_pConfig->SetValue(
             kDefaultDB + "PingHost", params.dbHostPing);
+
+        // If dbHostName is an IPV6 address with scope,
+        // remove the scope. Unescaped % signs are an
+        // xml violation
+        QString dbHostName(params.dbHostName);
+        QHostAddress addr;
+        if (addr.setAddress(dbHostName))
+        {
+            addr.setScopeId(QString());
+            dbHostName = addr.toString();
+        }
         m_pConfig->SetValue(
-            kDefaultDB + "Host", params.dbHostName);
+            kDefaultDB + "Host", dbHostName);
         m_pConfig->SetValue(
             kDefaultDB + "UserName", params.dbUserName);
         m_pConfig->SetValue(
@@ -859,26 +842,32 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 {
                     if (attempt > 0)
                         myth_system(m_DBparams.wolCommand);
-                    if (!CheckPort(host, port, useTimeout))
+                    if (!checkPort(host, port, useTimeout))
                         break;
                 }
                 startupState = st_dbAwake;
                 // Fall through to next case
             case st_dbAwake:
-                if (!CheckPort(host, port, useTimeout))
+                if (!checkPort(host, port, useTimeout))
                     break;
                 startupState = st_dbStarted;
                 // Fall through to next case
             case st_dbStarted:
+                // If the database is connecting with link-local
+                // address, it may have changed
+                if (m_DBparams.dbHostName != host)
+                {
+                    m_DBparams.dbHostName = host;
+                    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
+                }
                 EnableDBerrors();
                 ResetDatabase();
                 if (!MSqlQuery::testDBConnection())
                 {
                     for (int temp = 0; temp < useTimeout * 2 ; temp++)
                     {
-                        if (processEvents())
-                            break;
-                        usleep(500000);
+                        processEvents();
+                        std::this_thread::sleep_for(std::chrono::milliseconds(500));
                     }
                     break;
                 }
@@ -914,13 +903,13 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 if (!beWOLCmd.isEmpty()) {
                     if (attempt > 0)
                         myth_system(beWOLCmd);
-                    if (!CheckPort(backendIP, backendPort, useTimeout))
+                    if (!checkPort(backendIP, backendPort, useTimeout))
                         break;
                 }
                 startupState = st_beAwake;
                 // Fall through to next case
             case st_beAwake:
-                if (!CheckPort(backendIP, backendPort, useTimeout))
+                if (!checkPort(backendIP, backendPort, useTimeout))
                     break;
                 startupState = st_success;
             }
@@ -932,8 +921,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                   || m_guiStartup->m_Retry)
                     break;
             }
-            if (processEvents())
-                break;
+            processEvents();
         }
         if (startupState == st_success)
             break;
@@ -1378,14 +1366,14 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
 
 // Process Events while waiting for connection
 // return true if progress is 100%
-bool MythContextPrivate::processEvents(void)
+void MythContextPrivate::processEvents(void)
 {
-    bool ret = false;
-    if (m_guiStartup)
-        ret = m_guiStartup->updateProgress();
-    m_loop->processEvents(QEventLoop::AllEvents, 250);
-    m_loop->processEvents(QEventLoop::AllEvents, 250);
-    return ret;
+//    bool ret = false;
+//    if (m_guiStartup)
+//        ret = m_guiStartup->updateProgress();
+    qApp->processEvents(QEventLoop::AllEvents, 250);
+    qApp->processEvents(QEventLoop::AllEvents, 250);
+//    return ret;
 }
 
 // cache some settings in cache/contextcache.xml

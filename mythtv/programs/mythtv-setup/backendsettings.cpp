@@ -41,7 +41,12 @@ static HostComboBox *LocalServerIP6()
     for (it = list.begin(); it != list.end(); ++it)
     {
         if ((*it).protocol() == QAbstractSocket::IPv6Protocol)
+        {
+            // If it is a link-local IPV6 address with scope,
+            // remove the scope.
+            it->setScopeId(QString());
             gc->addSelection((*it).toString(), (*it).toString());
+        }
     }
 
 #if defined(QT_NO_IPV6)

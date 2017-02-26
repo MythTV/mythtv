@@ -31,6 +31,7 @@ using std::vector;
 #include "mythversion.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
+#include "portchecker.h"
 
 #define SLOC(a) QString("MythSocket(%1:%2): ") \
     .arg((intptr_t)(a), 0, 16)                 \
@@ -658,59 +659,19 @@ void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("attempting connect() to (%1:%2)")
         .arg(addr.toString()).arg(port));
 
-    bool ok = false;
+    bool ok = true;
 
-    if (!usingLoopback && (addr.protocol() == QAbstractSocket::IPv6Protocol) &&
-        addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")) &&
-        !gCoreContext->GetScopeForAddress(addr))
+    // Sort out link-local address scope if applicable
+    if (!usingLoopback)
     {
-        // Address is IPv6 link-local, we need to find the right scope id
-        QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
-
-        // try using all available cards
-        foreach (QNetworkInterface card, cards)
-        {
-            unsigned int flags = card.flags();
-            bool isLoopback = flags & QNetworkInterface::IsLoopBack;
-            bool isP2P = flags & QNetworkInterface::IsPointToPoint;
-            bool isRunning = flags & QNetworkInterface::IsRunning;
-
-            if (!isRunning || !card.isValid() || isLoopback || isP2P)
-            {
-                // this is a loopback interface, not up or a point to point interface
-                // no point checking
-                continue;
-            }
-
-            bool foundv6 = false;
-            // check that IPv6 is enabled on that interface
-            QList<QNetworkAddressEntry> addresses = card.addressEntries();
-            foreach (QNetworkAddressEntry ae, addresses)
-            {
-                if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                {
-                    foundv6 = true;
-                    break;
-                }
-            }
-            if (!foundv6)
-            {
-                // No IPv6 available on that interface, skip it
-                continue;
-            }
-
-            addr.setScopeId(QString::number(card.index()));
-            m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
-            ok = m_tcpSocket->waitForConnected(5000);
-            if (ok)
-            {
-                // Save it for future searches
-                gCoreContext->SetScopeForAddress(addr, card.index());
-                break;
-            }
-        }
+        QString host = addr.toString();
+        QString updatedHost(host);
+        ok = PortChecker::check(updatedHost, port, 30000, true);
+        if (ok && updatedHost != host)
+            addr.setAddress(updatedHost);
     }
-    else
+
+    if (ok)
     {
         m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
         ok = m_tcpSocket->waitForConnected();
