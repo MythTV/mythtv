@@ -722,7 +722,7 @@ void DBLoggerThread::run(void)
             if (!item)
                 continue;
 
-            if (item->message()[0] != '\0')
+            if (item->message()[0] != QChar('\0'))
             {
                 qLock.unlock();
                 bool logged = m_logger->logqmsg(*query, item);
