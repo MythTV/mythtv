@@ -278,8 +278,6 @@ class ChannelScanSM : public MPEGStreamListener,
     QMutex m_longTermSDTCacheLock;
     static SDT_tsn_cache_t m_longTermSDTCache;
 
-    // Short term caching
-    SDT_tsn_cache_t m_serviceDescriptionTablesCache;
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)

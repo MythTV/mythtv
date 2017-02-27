@@ -176,6 +176,7 @@ class ScannedChannelInfo
 
     // DVB
     nit_const_vec_t   nits;
+    SDT_tsn_cache_t   serviceDescriptionTablesCache;
 };
 
 /** \class ChannelScanSM
@@ -562,7 +563,7 @@ void ChannelScanSM::HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_
             QString("Allocated m_CurrentInfo 0x%1")
                 .arg(uint64_t(m_currentInfo), 0, 16));
     }
-    m_serviceDescriptionTablesCache.CacheTable(sections);
+    m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
 
     // Copy table into my long term static cache
     if (cache_longterm)
@@ -695,7 +696,7 @@ void ChannelScanSM::HandleSDToNoLongTermCacheLock(const sdt_sections_cache_const
             QString("Allocated m_CurrentInfo 0x%1")
             .arg(uint64_t(m_currentInfo), 0, 16));
     }
-    m_serviceDescriptionTablesCache.CacheTable(sections);
+    m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
 
     // Copy table into my long term static cache
     if (cache_longterm)
@@ -1051,7 +1052,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
 			// DVB
 			// Mark network_discovery_complete if I have seen both the mandatory NIT and SDT tables
 			if (sd->HasCachedAllNIT() &&
-					!m_serviceDescriptionTablesCache.empty() &&
+					m_currentInfo != NULL &&
+					!m_currentInfo->serviceDescriptionTablesCache.empty() &&
 					!m_currentInfo->nits.empty())
 				network_discovery_complete = true;
 
@@ -1065,7 +1067,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
 							"\n\t\t\tcurrentInfo->nits.empty():     %4")
 						.arg(m_currentInfo->pmts.empty())
 						.arg(sd->HasCachedAllNIT())
-						.arg(!m_serviceDescriptionTablesCache.empty())
+						.arg(!m_currentInfo->serviceDescriptionTablesCache.empty())
 						.arg(m_currentInfo->nits.empty()));
 			}
     	}
@@ -1138,7 +1140,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         QString msg_tr  = "";
         QString msg     = "";
 
-        if (!m_currentInfo->IsEmpty() && !m_serviceDescriptionTablesCache.empty())
+        if (!m_currentInfo->IsEmpty() && !m_currentInfo->serviceDescriptionTablesCache.empty())
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Adding %1, offset %2 to channelList.")
@@ -1492,8 +1494,8 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     }
 
     // SDTs
-    for (SDT_tsn_cache_t::const_iterator network = m_serviceDescriptionTablesCache.begin();
-            network != m_serviceDescriptionTablesCache.end(); ++network)
+    for (SDT_tsn_cache_t::const_iterator network = scan_info->serviceDescriptionTablesCache.begin();
+            network != scan_info->serviceDescriptionTablesCache.end(); ++network)
     {
         for (SDT_ts_cache_t::const_iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
         {
@@ -1809,7 +1811,7 @@ bool ChannelScanSM::HasTimedOut(void)
             return true;
         }
 
-        if (sd->HasCachedAnyNIT() || !m_serviceDescriptionTablesCache.empty())
+        if (sd->HasCachedAnyNIT() || (m_currentInfo != NULL && !m_currentInfo->serviceDescriptionTablesCache.empty()))
         {
             bool ret = m_timer.elapsed() > (int) kDVBTableTimeout;
             if (ret)
@@ -1854,7 +1856,7 @@ bool ChannelScanSM::HasTimedOut(void)
         if (!sd->HasCachedAnyPAT() && !sd->HasCachedAnyPMTs() &&
             !sd->HasCachedMGT()    && !sd->HasCachedAnyVCTs() &&
             !sd->HasCachedAnyNIT() &&
-            (m_serviceDescriptionTablesCache.empty()))
+            ((m_currentInfo == NULL) || m_currentInfo->serviceDescriptionTablesCache.empty()))
         {
         	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - Lost signal - no tables received");
             return true;
@@ -1871,7 +1873,7 @@ void ChannelScanSM::HandleActiveScan(void)
 {
     // If I have not seen any SD tables then see if I can pull one
     // one from my long term cache
-    if (m_serviceDescriptionTablesCache.empty())
+    if ((m_currentInfo == NULL) || m_currentInfo->serviceDescriptionTablesCache.empty())
     {
     	// Check if streamdata knows the onid and tsid
     	DTVSignalMonitor* sm;
