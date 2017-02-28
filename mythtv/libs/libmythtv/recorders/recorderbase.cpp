@@ -79,6 +79,7 @@ RecorderBase::~RecorderBase(void)
     SetRecording(NULL);
     if (nextRingBuffer)
     {
+        QMutexLocker locker(nextRingBufferLock);
         delete nextRingBuffer;
         nextRingBuffer = NULL;
     }
@@ -644,9 +645,9 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     // and if there is a problem with the input we may never see one
     // again, resulting in a wedged recording.
     if (ringBufferCheckTimer.isRunning() &&
-        ringBufferCheckTimer.elapsed() > 10000)
+        ringBufferCheckTimer.elapsed() > 60000)
     {
-        LOG(VB_RECORD, LOG_WARNING, LOC + "It is has been over 10 seconds "
+        LOG(VB_RECORD, LOG_WARNING, LOC + "It is has been over 60 seconds "
             "since we've checked for a ringbuffer switch.");
         CheckForRingBufferSwitch();
     }
