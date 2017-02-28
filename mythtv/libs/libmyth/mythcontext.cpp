@@ -797,7 +797,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
         int progressTotal = wakeupTime * attempts;
 
-        if (m_guiStartup)
+        if (m_guiStartup && !m_guiStartup->m_Exit)
             m_guiStartup->setTotal(progressTotal);
 
         QString beWOLCmd = QString();
@@ -829,7 +829,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         m_guiStartup->setTotal(progressTotal);
                 }
             }
-            if (m_guiStartup)
+            if (m_guiStartup && !m_guiStartup->m_Exit)
             {
                 if (attempt > 0)
                     m_guiStartup->setStatusState(guiStatuses[startupState]);
@@ -887,7 +887,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         if (m_gui && !m_guiStartup && attempt == 0)
                             useTimeout=1;
                         progressTotal = wakeupTime * attempts;
-                        if (m_guiStartup)
+                        if (m_guiStartup && !m_guiStartup->m_Exit)
                             m_guiStartup->setTotal(progressTotal);
                         startupState = st_beWOL;
                     }
