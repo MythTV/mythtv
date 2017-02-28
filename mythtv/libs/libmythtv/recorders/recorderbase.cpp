@@ -647,7 +647,7 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     if (ringBufferCheckTimer.isRunning() &&
         ringBufferCheckTimer.elapsed() > 60000)
     {
-        LOG(VB_RECORD, LOG_WARNING, LOC + "It is has been over 60 seconds "
+        LOG(VB_RECORD, LOG_WARNING, LOC + "It has been over 60 seconds "
             "since we've checked for a ringbuffer switch.");
         CheckForRingBufferSwitch();
     }
