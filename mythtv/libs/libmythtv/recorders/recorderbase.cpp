@@ -79,7 +79,7 @@ RecorderBase::~RecorderBase(void)
     SetRecording(NULL);
     if (nextRingBuffer)
     {
-        QMutexLocker locker(nextRingBufferLock);
+        QMutexLocker locker(&nextRingBufferLock);
         delete nextRingBuffer;
         nextRingBuffer = NULL;
     }
