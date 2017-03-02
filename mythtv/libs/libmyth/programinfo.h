@@ -834,6 +834,14 @@ MPUBLIC bool LoadFromOldRecorded(
     const QString      &sql,
     const MSqlBindings &bindings);
 
+MPUBLIC bool LoadFromOldRecorded(
+    ProgramList        &destination, 
+    const QString      &sql, 
+    const MSqlBindings &bindings,
+    const uint         &start, 
+    const uint         &limit,
+    uint               &count);
+
 MPUBLIC bool LoadFromRecorded(
     ProgramList        &destination,
     bool                possiblyInProgressRecordingsOnly,

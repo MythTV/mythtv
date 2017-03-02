@@ -50,6 +50,16 @@ class Dvr : public DvrServices
                                                 const QString   &RecGroup,
                                                 const QString   &StorageGroup );
 
+        DTC::ProgramList* GetOldRecordedList  ( bool             Descending,
+                                                int              StartIndex,
+                                                int              Count,
+                                                const QDateTime &StartTime,
+                                                const QDateTime &EndTime,
+                                                const QString   &Title,
+                                                const QString   &SeriesId,
+                                                int              RecordId,
+                                                const QString   &Sort);
+
         DTC::Program*     GetRecorded         ( int              RecordedId,
                                                 int              ChanId,
                                                 const QDateTime &StartTime  );
@@ -314,6 +324,23 @@ class ScriptableDvr : public QObject
                 return m_obj.GetRecordedList( Descending, StartIndex, Count,
                                               TitleRegEx, RecGroup,
                                               StorageGroup);
+            )
+        }
+
+        QObject* GetOldRecordedList  ( bool             Descending,
+                                       int              StartIndex,
+                                       int              Count,
+                                       const QDateTime &StartTime,
+                                       const QDateTime &EndTime,
+                                       const QString   &Title,
+                                       const QString   &SeriesId,
+                                       int              RecordId,
+                                       const QString   &Sort)
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetOldRecordedList( Descending, StartIndex, Count,
+                                                 StartTime, EndTime, Title,
+                                                 SeriesId, RecordId, Sort);
             )
         }
 
@@ -603,6 +630,6 @@ class ScriptableDvr : public QObject
         }
 };
 
-Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableDvr, QObject*);
+Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableDvr, QObject*)
 
 #endif
