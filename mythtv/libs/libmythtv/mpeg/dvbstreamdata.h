@@ -45,7 +45,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     bool HandleTables(uint pid, const PSIPTable&);
     void CheckStaleEIT(const DVBEventInformationTableSection& eit, uint onid, uint tsid, uint sid, uint tid) const;
     void CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uint onid, uint tsid, uint tid) const;
-    bool IsRedundant(uint pid, const PSIPTable&) const;
+    bool IsRedundant(uint pid, const PSIPTable&);
     void ProcessSDTSection(sdt_section_ptr_t);
 
     // NIT for broken providers
