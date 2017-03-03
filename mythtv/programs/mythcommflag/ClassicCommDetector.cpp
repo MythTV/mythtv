@@ -1,5 +1,4 @@
 // POSIX headers
-#include <unistd.h>
 #include <sys/time.h> // for gettimeofday
 
 // ANSI C headers
@@ -8,6 +7,9 @@
 // C++ headers
 #include <algorithm> // for min/max
 #include <iostream> // for cerr
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
 using namespace std;
 
 // Qt headers
@@ -319,7 +321,7 @@ bool ClassicCommDetector::go()
         if (m_bStop)
             return false;
 
-        sleep(2);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
         secsSince = recordingStartedAt.secsTo(MythDate::current());
     }
 
@@ -357,7 +359,7 @@ bool ClassicCommDetector::go()
             if (m_bStop)
                 return false;
 
-            sleep(2);
+            std::this_thread::sleep_for(std::chrono::seconds(2));
             secsSince = recordingStartedAt.secsTo(MythDate::current());
         }
     }
@@ -509,12 +511,12 @@ bool ClassicCommDetector::go()
         while (m_bPaused)
         {
             emit breathe();
-            sleep(1);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
         // sleep a little so we don't use all cpu even if we're niced
         if (!fullSpeed && !stillRecording)
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         if (((currentFrameNumber % 500) == 0) ||
             ((showProgress || stillRecording) &&
@@ -598,7 +600,7 @@ bool ClassicCommDetector::go()
                 usecSleep = (long)(usecPerFrame * 1.5);
 
             if (usecSleep > 0)
-                usleep(usecSleep);
+                std::this_thread::sleep_for(std::chrono::microseconds(usecSleep));
         }
 
         player->DiscardVideoFrame(currentFrame);

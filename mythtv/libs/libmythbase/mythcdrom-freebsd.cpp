@@ -88,7 +88,7 @@ MythMediaError MythCDROMFreeBSD::unlock()
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, "Failed to open device, CDROM try will "
+        LOG(VB_GENERAL, LOG_INFO, "Failed to open device, CDROM tray will "
                                   "remain locked.");
     }
 

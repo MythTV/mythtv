@@ -105,9 +105,12 @@ bool VideoOutputOpenGL::CreateCPUResources(void)
 bool VideoOutputOpenGL::CreateGPUResources(void)
 {
     bool result = SetupContext();
-    QSize size = window.GetActualVideoDim();
-    InitDisplayMeasurements(size.width(), size.height(), false);
-    CreatePainter();
+    if (result)
+    {
+        QSize size = window.GetActualVideoDim();
+        InitDisplayMeasurements(size.width(), size.height(), false);
+        CreatePainter();
+    }
     return result;
 }
 
@@ -336,6 +339,14 @@ bool VideoOutputOpenGL::SetupContext(void)
         return true;
     }
 
+    // This code does not work.
+    // Using OpenGL video renderer with QT Theme painter - the moment
+    // the code below calls gl_context->create() the main window disappears
+    // and after that the video renderer complains about rendering on a non
+    // visible window. The window never comes back and you have to kill
+    // the frontend.
+
+/*
     QWidget *device = QWidget::find(gl_parent_win);
     if (!device)
     {
@@ -355,6 +366,8 @@ bool VideoOutputOpenGL::SetupContext(void)
     if (gl_context)
         gl_context->DecrRef();
     gl_context = NULL;
+*/
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to use OpenGL when ThemePainter is set to QT.");
     return false;
 }
 

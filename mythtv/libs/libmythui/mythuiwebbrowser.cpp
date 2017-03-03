@@ -37,7 +37,8 @@
 #include <QNetworkCookieJar>
 #include <QNetworkConfiguration>
 
-#include <unistd.h> // for usleep()
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 struct MimeType
 {
@@ -193,7 +194,7 @@ int BrowserApi::GetVolume(void)
     while (timer.elapsed() < 2000  && !m_gotAnswer)
     {
         qApp->processEvents();
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     if (m_gotAnswer)
@@ -237,7 +238,7 @@ QString BrowserApi::GetMetadata(void)
     while (timer.elapsed() < 2000  && !m_gotAnswer)
     {
         qApp->processEvents();
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     if (m_gotAnswer)

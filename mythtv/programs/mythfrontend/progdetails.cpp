@@ -200,7 +200,7 @@ void ProgDetails::loadPage(void)
         {
             category_type = query.value(0).toString();
             year = query.value(1).toString();
-            stars = query.value(2).toDouble();
+            stars = query.value(2).toFloat();
             partnumber = query.value(3).toInt();
             parttotal = query.value(4).toInt();
             audioprop = query.value(5).toInt();
@@ -254,8 +254,11 @@ void ProgDetails::loadPage(void)
         if (!year.isEmpty())
             attr += year + ", ";
 
+    /* see #7810, was hardcoded to 4 star system, when every theme
+     * uses 10 stars / 5 stars with half stars
+     */
         if (stars > 0.0)
-            attr += tr("%n star(s)", "", (int) (stars * 4.0)) + ", ";
+            attr += tr("%n star(s)", "", roundf(stars * 10.0)) + ", ";
     }
     if (!colorcode.isEmpty())
         attr += colorcode + ", ";

@@ -19,6 +19,7 @@ class VBox
     static QStringList probeDevices(void);
     static QString getIPFromVideoDevice(const QString &dev);
 
+    bool isConnected(void);
     bool checkConnection(void);
     bool checkVersion(QString &version);
     QDomDocument *getBoardInfo(void);

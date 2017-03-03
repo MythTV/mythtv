@@ -1,3 +1,27 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 MythTV Developers <mythtv-dev@mythtv.org>
+//
+// This is part of MythTV (https://www.mythtv.org)
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//////////////////////////////////////////////////////////////////////////////
+
 
 #include "langsettings.h"
 
@@ -33,8 +57,10 @@ GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                   m_Exit(false),
                   m_Setup(false),
                   m_Retry(false),
+                  m_Search(false),
                   m_dummyButton(0),
                   m_retryButton(0),
+                  m_searchButton(0),
                   m_setupButton(0),
                   m_exitButton(0),
                   m_statusState(0),
@@ -63,6 +89,8 @@ bool GUIStartup::Create(void)
     if (!err)
         UIUtilE::Assign(this, m_retryButton, "retry", &err);
     if (!err)
+        UIUtilE::Assign(this, m_searchButton, "search", &err);
+    if (!err)
         UIUtilE::Assign(this, m_setupButton, "setup", &err);
     if (!err)
         UIUtilE::Assign(this, m_exitButton, "exit", &err);
@@ -81,8 +109,10 @@ bool GUIStartup::Create(void)
     }
 
     connect(m_retryButton, SIGNAL(Clicked()), SLOT(Retry()));
+    connect(m_searchButton, SIGNAL(Clicked()), SLOT(Search()));
     connect(m_setupButton, SIGNAL(Clicked()), SLOT(Setup()));
     connect(m_exitButton, SIGNAL(Clicked()), SLOT(Close()));
+    connect(&m_timer, SIGNAL(timeout()), SLOT(updateProgress()));
 
     BuildFocusList();
 
@@ -94,6 +124,7 @@ bool GUIStartup::setStatusState(const QString &name)
     bool ret = m_statusState->DisplayState(name);
     m_Exit = false;
     m_Setup = false;
+    m_Search = false;
     m_Retry = false;
     return ret;
 }
@@ -103,6 +134,7 @@ bool GUIStartup::setMessageState(const QString &name)
     bool ret = m_messageState->DisplayState(name);
     m_Exit = false;
     m_Setup = false;
+    m_Search = false;
     m_Retry = false;
     return ret;
 }
@@ -113,39 +145,50 @@ void GUIStartup::setTotal(int total)
     if (m_progressTimer)
         delete m_progressTimer;
     m_progressTimer = new MythTimer(MythTimer::kStartRunning);
+    m_timer.start(500);
     m_total = total*1000;
     m_progressBar->SetTotal(m_total);
     SetFocusWidget(m_dummyButton);
 
     m_Exit = false;
     m_Setup = false;
+    m_Search = false;
     m_Retry = false;
-}
-
-void GUIStartup::showButtons(bool visible)
-{
-    m_retryButton->SetVisible(visible);
-    m_setupButton->SetVisible(visible);
-    m_exitButton->SetVisible(visible);
 }
 
 // return = true if time is up
 bool GUIStartup::updateProgress(bool finished)
 {
-    if (m_progressTimer) {
+    if (m_progressTimer)
+    {
         int elapsed;
         if (finished)
             elapsed = m_total;
         else
             elapsed = m_progressTimer->elapsed();
         m_progressBar->SetUsed(elapsed);
+        if (elapsed >= m_total)
+        {
+            m_timer.stop();
+            emit cancelPortCheck();
+            delete m_progressTimer;
+            m_progressTimer = 0;
+        }
         return elapsed >= m_total;
     }
+    m_timer.stop();
     return false;
 }
 
 void GUIStartup::Close(void)
 {
+    int elapsed = 0;
+    if (m_progressTimer)
+    {
+        elapsed = m_progressTimer->elapsed();
+        m_progressTimer->stop();
+        m_timer.stop();
+    }
     QString message = tr("Do you really want to exit MythTV?");
     MythScreenStack *popupStack
       = GetMythMainWindow()->GetStack("popup stack");
@@ -160,6 +203,13 @@ void GUIStartup::Close(void)
             SLOT(OnClosePromptReturn(bool)));
 
     m_dlgLoop.exec();
+
+    if (m_progressTimer && !m_Exit)
+    {
+        m_progressTimer->start();
+        m_progressTimer->addMSecs(elapsed);
+        m_timer.start();
+    }
 }
 
 void GUIStartup::OnClosePromptReturn(bool submit)
@@ -169,9 +219,10 @@ void GUIStartup::OnClosePromptReturn(bool submit)
 
     if (submit)
     {
-    if (m_loop->isRunning())
-        m_loop->exit();
+        if (m_loop->isRunning())
+            m_loop->exit();
         m_Exit = true;
+        emit cancelPortCheck();
         MythScreenType::Close();
     }
 }
@@ -179,6 +230,15 @@ void GUIStartup::OnClosePromptReturn(bool submit)
 void GUIStartup::Retry(void)
 {
     m_Retry = true;
+    emit cancelPortCheck();
+    if (m_loop->isRunning())
+        m_loop->exit();
+}
+
+void GUIStartup::Search(void)
+{
+    m_Search = true;
+    emit cancelPortCheck();
     if (m_loop->isRunning())
         m_loop->exit();
 }
@@ -186,6 +246,7 @@ void GUIStartup::Retry(void)
 void GUIStartup::Setup(void)
 {
     m_Setup = true;
+    emit cancelPortCheck();
     if (m_loop->isRunning())
         m_loop->exit();
 }

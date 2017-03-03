@@ -5,6 +5,7 @@
 
 #include "mpegstreamdata.h"
 #include "mythtvexp.h"
+#include "tablestatus.h"
 
 typedef QMap<uint, uint_vec_t>          pid_tsid_vec_t;
 typedef TerrestrialVirtualChannelTable* tvct_ptr_t;

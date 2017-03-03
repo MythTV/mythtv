@@ -24,7 +24,8 @@
 # define GET_SOCKET_ERROR    errno
 #endif
 
-#include <unistd.h> // for usleep()
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt headers
 #include <QStringList>
@@ -116,7 +117,7 @@ qint64 MMulticastSocketDevice::writeBlock(
             LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("writeBlock on %1 %2")
                     .arg((*it).toString()).arg((retx==(int)len)?"ok":"err"));
 #endif
-            usleep(5000 + (random() % 5000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(5 + (random() % 5)));
         }
         return retx;
     }

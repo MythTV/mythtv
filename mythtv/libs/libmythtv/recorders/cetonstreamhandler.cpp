@@ -29,14 +29,16 @@
 #include "cardutil.h"
 #include "mythdownloadmanager.h"
 
-#define LOC QString("CetonSH(%1): ").arg(_device)
+#define LOC QString("CetonSH%1(%2): ").arg(_recorder_ids_string) \
+                                      .arg(_device)
 
 QMap<QString,CetonStreamHandler*> CetonStreamHandler::_handlers;
 QMap<QString,uint>                CetonStreamHandler::_handlers_refcnt;
 QMutex                            CetonStreamHandler::_handlers_lock;
 QMap<QString, bool>               CetonStreamHandler::_info_queried;
 
-CetonStreamHandler *CetonStreamHandler::Get(const QString &devname)
+CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
+                                            int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -65,10 +67,11 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname)
                 .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
+    _handlers[devkey]->AddRecorderId(recorder_id);
     return _handlers[devkey];
 }
 
-void CetonStreamHandler::Return(CetonStreamHandler * & ref)
+void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -78,6 +81,10 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref)
     if (rit == _handlers_refcnt.end())
         return;
 
+    QMap<QString,CetonStreamHandler*>::iterator it = _handlers.find(devname);
+    if (it != _handlers.end())
+        (*it)->DelRecorderId(recorder_id);
+
     if (*rit > 1)
     {
         ref = NULL;
@@ -85,7 +92,6 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref)
         return;
     }
 
-    QMap<QString,CetonStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("CetonSH: Closing handler for %1")

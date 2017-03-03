@@ -5,6 +5,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
+
 // MythTV includes
 #include "hdhrstreamhandler.h"
 #include "atscstreamdata.h"
@@ -32,7 +35,8 @@ bool HDHRRecorder::Open(void)
 
     ResetForNewFile();
 
-    _stream_handler = HDHRStreamHandler::Get(_channel->GetDevice());
+    _stream_handler = HDHRStreamHandler::Get(_channel->GetDevice(),
+                                     (tvrec ? tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "HDHR opened successfully");
 
@@ -44,7 +48,8 @@ void HDHRRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        HDHRStreamHandler::Return(_stream_handler);
+        HDHRStreamHandler::Return(_stream_handler,
+                                  (tvrec ? tvrec->GetInputId() : -1));
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
@@ -105,7 +110,7 @@ void HDHRRecorder::run(void)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
-            usleep(5000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             continue;
         }
 

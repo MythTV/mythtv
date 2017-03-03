@@ -2,8 +2,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <unistd.h>
 #include <sched.h> // for sched_yield
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // MythTV headers
 
@@ -38,6 +39,7 @@
 #include "tv_rec.h"
 #include "mythdate.h"
 #include "osd.h"
+#include "../vboxutils.h"
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to channel prefixing */
 
@@ -86,6 +88,7 @@ TVRec::TVRec(int _inputid)
       signalEventCmdSent(false),
       signalMonitorCheckCnt(0),
       reachedRecordingDeadline(false),
+      reachedPreFail(false),
       // Various threads
       eventThread(new MThread("TVRecEvent", this)),
       recorderThread(NULL),
@@ -133,6 +136,17 @@ bool TVRec::CreateChannel(const QString &startchannel,
     channel = ChannelBase::CreateChannel(
         this, genOpt, dvbOpt, fwOpt,
         startchannel, enter_power_save_mode, rbFileExt);
+
+    if (genOpt.inputtype == "VBOX")
+    {
+        if (!CardUtil::IsVBoxPresent(inputid))
+        {
+            // VBOX presence failed  recorder is marked errored
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("CreateChannel(%1) failed due to VBOX not responding "
+                                                   "to network check on inputid (%2)").arg(startchannel).arg(inputid));
+            channel = NULL;
+        }
+    }
 
     if (!channel)
     {
@@ -1545,7 +1559,7 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
 
         int te = t2.elapsed();
         if (!ok && te < 10)
-            usleep((10-te) * 1000);
+            std::this_thread::sleep_for(std::chrono::microseconds(10-te));
     }
     return ok;
 }
@@ -1902,7 +1916,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
 
     // Check if this is an DVB channel
     int progNum = dtvchan->GetProgramNumber();
-    if ((progNum >= 0) && (tuningmode == "dvb"))
+    if ((progNum >= 0) && (tuningmode == "dvb") && (genOpt.inputtype != "VBOX"))
     {
         int netid   = dtvchan->GetOriginalNetworkID();
         int tsid    = dtvchan->GetTransportID();
@@ -3544,6 +3558,8 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
                                    QString &channum,
                                    QString &inputname)
 {
+     LOG(VB_RECORD, LOG_INFO, LOC + QString("request (%1) channum (%2) inputname (%3)")
+                                            .arg(request.toString()).arg(channum).arg(inputname));
     if (!channel)
         return 0;
 
@@ -3567,6 +3583,8 @@ uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
 
     if (curInputID != newInputID || !CardUtil::IsChannelReusable(genOpt.inputtype))
     {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Inputtype HW Tuner newinputid channum curinputid: %1->%2 %3")
+                                               .arg(curInputID).arg(newInputID).arg(channum));
         if (channum.isEmpty())
             channum = GetStartChannel(newInputID);
         return newInputID;
@@ -3847,21 +3865,26 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                 SetFlags(kFlagWaitingForSignal, __FILE__, __LINE__);
                 if (curRecording)
                 {
-                    reachedRecordingDeadline = false;
+                    reachedRecordingDeadline = reachedPreFail = false;
                     // If startRecordingDeadline is passed, this
                     // recording is marked as failed, so the scheduler
                     // can try another showing.
                     startRecordingDeadline =
                         expire.addMSecs(genOpt.channel_timeout);
+                    preFailDeadline =
+                        expire.addMSecs(genOpt.channel_timeout * 2 / 3);
                     // Keep trying to record this showing (even if it
                     // has been marked as failed) until the scheduled
                     // end time.
                     signalMonitorDeadline =
                         curRecording->GetRecordingEndTime();
 
-                    LOG(VB_RECORD, LOG_DEBUG, LOC +
-                        QString("Start recording deadline: %1 "
-                                "Good signal deadline: %2")
+                    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+                        QString("Pre-fail start deadline: %1 "
+                                "Start recording deadline: %2 "
+                                "Good signal deadline: %3")
+                        .arg(preFailDeadline.toLocalTime()
+                             .toString("hh:mm:ss.zzz"))
                         .arg(startRecordingDeadline.toLocalTime()
                              .toString("hh:mm:ss.zzz"))
                         .arg(signalMonitorDeadline.toLocalTime()
@@ -3916,26 +3939,27 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
     RecStatus::Type newRecStatus;
     bool keep_trying  = false;
+    QDateTime current_time = MythDate::current();
 
-    if ((signalMonitor->IsErrored() ||
-         MythDate::current() > signalEventCmdTimeout) &&
+    if ((signalMonitor->IsErrored() || current_time > signalEventCmdTimeout) &&
          !signalEventCmdSent)
     {
-        gCoreContext->SendSystemEvent(QString("TUNING_SIGNAL_TIMEOUT CARDID %1").arg(inputid));
-        signalEventCmdSent=true;
+        gCoreContext->SendSystemEvent(QString("TUNING_SIGNAL_TIMEOUT CARDID %1")
+                                      .arg(inputid));
+        signalEventCmdSent = true;
     }
 
     if (signalMonitor->IsAllGood())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "TuningSignalCheck: Good signal");
-        if (curRecording && (MythDate::current() > startRecordingDeadline))
+        if (curRecording && (current_time > startRecordingDeadline))
         {
             newRecStatus = RecStatus::Failing;
             curRecording->SaveVideoProperties(VID_DAMAGED, VID_DAMAGED);
 
             QString desc = tr("Good signal seen after %1 ms")
                            .arg(genOpt.channel_timeout +
-                        startRecordingDeadline.msecsTo(MythDate::current()));
+                        startRecordingDeadline.msecsTo(current_time));
             QString title = curRecording->GetTitle();
             if (!curRecording->GetSubtitle().isEmpty())
                 title += " - " + curRecording->GetSubtitle();
@@ -3959,8 +3983,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
             newRecStatus = RecStatus::Recording;
         }
     }
-    else if (signalMonitor->IsErrored() ||
-             MythDate::current() > signalMonitorDeadline)
+    else if (signalMonitor->IsErrored() || current_time > signalMonitorDeadline)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "TuningSignalCheck: SignalMonitor " +
             (signalMonitor->IsErrored() ? "failed" : "timed out"));
@@ -3972,13 +3995,21 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
         {
             scanner->StopActiveScan();
             ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-            eitScanStartTime = MythDate::current();
+            eitScanStartTime = current_time;
             eitScanStartTime = eitScanStartTime.addSecs(eitCrawlIdleStart +
                                   eit_start_rand(inputid, eitTransportTimeout));
         }
     }
+    else if (curRecording && !reachedPreFail && current_time > preFailDeadline)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "TuningSignalCheck: Hit pre-fail timeout");
+        SendMythSystemRecEvent("REC_PREFAIL", curRecording);
+        reachedPreFail = true;
+        return NULL;
+    }
     else if (curRecording && !reachedRecordingDeadline &&
-             MythDate::current() > startRecordingDeadline)
+             current_time > startRecordingDeadline)
     {
         newRecStatus = RecStatus::Failing;
         reachedRecordingDeadline = true;
@@ -4312,7 +4343,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     // Wait for recorder to start.
     stateChangeLock.unlock();
     while (!recorder->IsRecording() && !recorder->IsErrored())
-        usleep(5 * 1000);
+        std::this_thread::sleep_for(std::chrono::microseconds(5));
     stateChangeLock.lock();
 
     if (GetV4LChannel())

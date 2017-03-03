@@ -6,6 +6,7 @@
 /// \file dvbstreamdata.h
 
 #include "mpegstreamdata.h"
+#include "mythtvexp.h"
 #include "tablestatus.h"
 #include "qdatetime.h"
 
@@ -37,13 +38,14 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     // DVB table monitoring
     void SetDesiredService(uint netid, uint tsid, int serviceid);
+    uint DesiredNetworkID(void)   const { return _desired_netid; }
+    uint DesiredTransportID(void) const { return _desired_tsid;  }
 
     // Table processing
     bool HandleTables(uint pid, const PSIPTable&);
     void CheckStaleEIT(const DVBEventInformationTableSection& eit, uint onid, uint tsid, uint sid, uint tid) const;
     void CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uint onid, uint tsid, uint tid) const;
     bool IsRedundant(uint pid, const PSIPTable&) const;
-    // RFJ SDT needs ONID as well
     void ProcessSDTSection(sdt_section_ptr_t);
 
     // NIT for broken providers

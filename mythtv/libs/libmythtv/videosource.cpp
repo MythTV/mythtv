@@ -2256,8 +2256,8 @@ VBoxExtra::VBoxExtra(VBoxConfigurationGroup &parent)
     rec->setLabel(QObject::tr("Recorder Options"));
     rec->setUseLabel(false);
 
-    rec->addChild(new SignalTimeout(parent.parent, 1000, 250));
-    rec->addChild(new ChannelTimeout(parent.parent, 3000, 1750));
+    rec->addChild(new SignalTimeout(parent.parent, 7000, 250));
+    rec->addChild(new ChannelTimeout(parent.parent, 10000, 1750));
 
     addChild(rec);
 }
@@ -2287,13 +2287,14 @@ VBoxConfigurationGroup::VBoxConfigurationGroup
     addChild(desc);
     addChild(cardip);
     addChild(cardtuner);
+    addChild(new SignalTimeout(parent, 7000, 1000));
+    addChild(new ChannelTimeout(parent, 10000, 1750));
+//    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
+//    buttonRecOpt->setLabel(tr("Recording Options"));
+//    addChild(buttonRecOpt);
 
-    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
-    buttonRecOpt->setLabel(tr("Recording Options"));
-    addChild(buttonRecOpt);
-
-    connect(buttonRecOpt, SIGNAL(pressed()),
-            this,         SLOT(  VBoxExtraPanel()));
+//    connect(buttonRecOpt, SIGNAL(pressed()),
+//            this,         SLOT(  VBoxExtraPanel()));
 
     connect(cardip,    SIGNAL(NewIP(const QString&)),
             deviceid,  SLOT(  SetIP(const QString&)));

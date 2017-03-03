@@ -30,7 +30,8 @@ bool CetonRecorder::Open(void)
 
     ResetForNewFile();
 
-    _stream_handler = CetonStreamHandler::Get(_channel->GetDevice());
+    _stream_handler = CetonStreamHandler::Get(_channel->GetDevice(),
+                                              tvrec ? tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Ceton opened successfully");
 
@@ -42,7 +43,8 @@ void CetonRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        CetonStreamHandler::Return(_stream_handler);
+        CetonStreamHandler::Return(_stream_handler,
+                                   tvrec ? tvrec->GetInputId() : -1);
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }

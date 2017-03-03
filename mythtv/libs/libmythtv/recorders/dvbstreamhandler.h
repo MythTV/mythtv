@@ -33,8 +33,9 @@ class DVBPIDInfo : public PIDInfo
 class DVBStreamHandler : public StreamHandler
 {
   public:
-    static DVBStreamHandler *Get(const QString &dvb_device);
-    static void Return(DVBStreamHandler * & ref);
+    static DVBStreamHandler *Get(const QString &dvb_device,
+                                 int recorder_id = -1);
+    static void Return(DVBStreamHandler * & ref, int recorder_id = -1);
 
     // DVB specific
 

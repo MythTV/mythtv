@@ -6,12 +6,11 @@
 
 // C++ headers
 #include <algorithm>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 // Qt headers
 #include <QMap>
-
-// for usleep
-#include <unistd.h>
 
 // MythTV headers
 #include "linuxfirewiredevice.h"
@@ -254,7 +253,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
             if (!SendAVCCommand(cmd, ret, -1))
                 return false;
 
-            usleep(500000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
 
         SetLastChannel(channel);

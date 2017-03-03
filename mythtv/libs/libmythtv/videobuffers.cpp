@@ -1,7 +1,8 @@
 // Copyright (c) 2005, Daniel Thor Kristjansson
 // based on earlier work in MythTV's videout_xvmc.cpp
 
-#include <unistd.h>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "mythconfig.h"
 
@@ -302,7 +303,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
                 QString("GetNextFreeFrame() TryLock has "
                         "spun %1 times, this is a lot.").arg(tries));
         }
-        usleep(TRY_LOCK_SPIN_WAIT);
+        std::this_thread::sleep_for(std::chrono::microseconds(TRY_LOCK_SPIN_WAIT));
     }
 
     return NULL;
@@ -663,8 +664,12 @@ void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
                 !pause.contains(At(i)) &&
                 !displayed.contains(At(i)))
             {
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("VideoBuffers::DiscardFrames(): ERROR, %1 (%2) not "
+                // This message is DEBUG because it does occur
+                // after Reset is called.
+                // That happens when failing over from OpenGL
+                // to another method, if QT painter is selected.
+                LOG(VB_GENERAL, LOG_DEBUG,
+                    QString("VideoBuffers::DiscardFrames(): %1 (%2) not "
                             "in available, pause, or displayed %3")
                         .arg(DebugString(At(i), true)).arg((long long)At(i))
                         .arg(GetStatus()));

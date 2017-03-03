@@ -155,8 +155,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
       _desired_netid(desired_netid), _desired_tsid(desired_tsid),
       _dvb_real_network_id(-1), _dvb_eit_dishnet_long(false)
 {
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("Constructing DvbStreamData %1")
-        .arg(reinterpret_cast<std::uintptr_t>(this),0,16));
+    _nit_status.SetVersion(-1,0);
     _nito_status.SetVersion(-1,0);
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
@@ -166,8 +165,6 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
 
 DVBStreamData::~DVBStreamData()
 {
-    LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("Destructing DvbStreamData %1")
-        .arg(reinterpret_cast<std::uintptr_t>(this),0,16));
     Reset(_desired_netid, _desired_tsid, _desired_program);
 
     QMutexLocker locker(&_listener_lock);
@@ -519,6 +516,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 delete nit;
                 return retval;
             }
+
             _nit_status.SetSectionSeen(psip.Version(), psip.Section(),
                                         psip.LastSection());
 
@@ -588,37 +586,12 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             return true;
         }
-/*
-        case TableID::SDTo:
-        {
-            ServiceDescriptionTableSection *sdtsection= new ServiceDescriptionTableSection(psip);
-          // some providers send the SDT for the current multiplex as SDTo
-            // this routine changes the TableID to SDT and recalculates the CRC
-            if (_desired_netid == sdt.OriginalNetworkID() &&
-                _desired_tsid  == tsid)
-            {
-                ServiceDescriptionTableSection *sdta =
-                    new ServiceDescriptionTableSection(psip);
-                if (!sdta->Mutate())
-                {
-                    delete sdta;
-                    return true;
-                }
-                SetSDTSectionSeen(*sdta);
-                ProcessSDT(sdta);
-                return true;
-            }
 
-            ProcessSDTSection(sdtsection);
-
-            return true;
-        }
-*/
         case TableID::BAT:
         {
             uint bid = psip.TableIDExtension();
             _bat_status.SetSectionSeen(bid, psip.Version(), psip.Section(),
-                                       psip.LastSection());
+                                        psip.LastSection());
             BouquetAssociationTable bat(psip);
 
             QMutexLocker locker(&_listener_lock);
@@ -906,7 +879,7 @@ bool DVBStreamData::HasAllNITSections(void) const
 
 bool DVBStreamData::HasAllNIToSections(void) const
 {
-    return _nit_status.HasAllSections();
+    return _nito_status.HasAllSections();
 }
 
 bool DVBStreamData::HasAllBATSections(uint bid) const

@@ -56,8 +56,9 @@ class ExternalStreamHandler : public StreamHandler
     enum constants {PACKET_SIZE = 188 * 32768, TOO_FAST_SIZE = 188 * 4196 };
 
   public:
-    static ExternalStreamHandler *Get(const QString &devicename);
-    static void Return(ExternalStreamHandler * & ref);
+    static ExternalStreamHandler *Get(const QString &devicename,
+                                      int recorder_id = -1);
+    static void Return(ExternalStreamHandler * & ref, int recorder_id = -1);
 
   public:
     explicit ExternalStreamHandler(const QString & path);

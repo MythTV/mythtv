@@ -11,6 +11,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include "mythtimer.h"
 #include "bufferedsocketdevice.h"
@@ -413,7 +415,8 @@ qulonglong BufferedSocketDevice::WaitForMore(
         {
             // give up control
 
-            usleep( 1000 );  // should be some multiple of msWait.
+            // should be some multiple of msWait.
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         }
     }

@@ -23,7 +23,9 @@
 
 // C++ headers
 #include <algorithm>
+#include <chrono> // for milliseconds
 #include <map>
+#include <thread> // for sleep_for
 using namespace std;
 
 // Qt headers
@@ -595,7 +597,7 @@ void LinuxFirewireDevice::run(void)
     m_priv->port_handler_wait.wakeAll();
     // we need to unlock & sleep to allow wakeAll to wake other threads.
     m_lock.unlock();
-    usleep(2500);
+    std::this_thread::sleep_for(std::chrono::microseconds(2500));
     m_lock.lock();
 
     m_priv->no_data_cnt = 0;

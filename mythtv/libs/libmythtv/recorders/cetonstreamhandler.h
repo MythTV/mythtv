@@ -29,8 +29,9 @@ class QUrlQuery;
 class CetonStreamHandler : public IPTVStreamHandler
 {
   public:
-    static CetonStreamHandler *Get(const QString &devicename);
-    static void Return(CetonStreamHandler * & ref);
+    static CetonStreamHandler *Get(const QString &devicename,
+                                   int recorder_id = -1);
+    static void Return(CetonStreamHandler * & ref, int recorder_id = -1);
 
     bool IsConnected(void) const;
     bool IsCableCardInstalled() const { return _using_cablecard; };
@@ -76,7 +77,7 @@ class CetonStreamHandler : public IPTVStreamHandler
     QString     _device_path;
     bool        _using_cablecard;
     bool        _connected;
-    bool	       _valid;
+    bool               _valid;
 
     uint        _last_frequency;
     QString     _last_modulation;

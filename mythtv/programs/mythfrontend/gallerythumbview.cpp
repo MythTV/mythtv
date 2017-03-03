@@ -1,8 +1,11 @@
 #include "gallerythumbview.h"
 
-#include <unistd.h> // for usleep
+#include <chrono> // for milliseconds
+#include <thread> // for sleep_for
 
 #include <QApplication>
+
+#include "compat.h"
 
 #include "mythuitext.h"
 #include "mythprogressdialog.h"
@@ -134,7 +137,7 @@ static void WaitUntilDone(MThread &worker)
     worker.start();
     while (!worker.isFinished())
     {
-        usleep(1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
         qApp->processEvents();
     }
 }
