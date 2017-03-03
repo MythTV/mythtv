@@ -160,14 +160,23 @@ class ChannelScanSM : public MPEGStreamListener,
     // DVB Main
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(const sdt_sections_cache_const_t&);
+    void HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm);
     void HandleTDT(const TimeDateTable*) {}
 
     // DVB Other
     void HandleNITo(const NetworkInformationTable*) {}
     void HandleSDTo(const sdt_sections_cache_const_t&);
+    void HandleSDToNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm);
     void HandleBAT(const BouquetAssociationTable*);
 
+
+
   private:
+    // Typedefs
+    typedef enum {MPEG_TRANSPORT_STREAM,
+    	DVB_TRANSPORT_STREAM,
+		ATSC_TRANSPORT_STREAM } TransportStreamType;
+
     // some useful gets
     DTVChannel       *GetDTVChannel(void);
     const DTVChannel *GetDTVChannel(void) const;
@@ -200,7 +209,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     bool TestNextProgramEncryption(void);
     void UpdateScanTransports(const NetworkInformationTable *nit);
-    bool UpdateChannelInfo(bool wait_until_complete);
+    bool UpdateChannelInfo(bool wait_until_complete, TransportStreamType transport_stream_type);
 
     void HandleAllGood(void); // used for analog scanner
 
@@ -264,6 +273,11 @@ class ChannelScanSM : public MPEGStreamListener,
     /// Scanner thread, runs ChannelScanSM::run()
     MThread          *m_scannerThread;
     QMutex           m_mutex;
+
+    // Long term caching
+    QMutex m_longTermSDTCacheLock;
+    static SDT_tsn_cache_t m_longTermSDTCache;
+
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)

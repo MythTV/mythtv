@@ -17,10 +17,10 @@ ScanStreamData::ScanStreamData(bool no_default_pid) :
 
 ScanStreamData::~ScanStreamData() { ; }
 
-/** \fn ScanStreamData::IsRedundant(uint,const PSIPTable&) const
+/** \fn ScanStreamData::IsRedundant(uint,const PSIPTable&)
  *  \brief Returns true if table already seen.
  */
-bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
+bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip)
 {
     // Treat BAT and SDTo as redundant unless they are on the FREESAT_SI_PID
     if (dvb_uk_freesat_si &&
