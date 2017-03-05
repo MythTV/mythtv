@@ -50,8 +50,8 @@ class MBASE_PUBLIC PortChecker : public QObject
     bool checkPort(QString &host, int port, int timeLimit=30000,
       bool linkLocalOnly=false);
 
-    static bool check(QString &host, int port, int timeLimit=30000,
-      bool linkLocalOnly=false);
+    static bool resolveLinkLocal(QString &host, int port,
+      int timeLimit=30000);
 
   public slots:
     void cancelPortCheck(void);

@@ -273,10 +273,9 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     {
         nErrCode = UPnPResult_MythTV_XmlParseError;
         LOG(VB_UPNP, LOG_ERR,
-            QString("SendSOAPRequest( %1 ) - Invalid response from %2")
-                .arg(sMethod).arg(url.toString()) + 
-            QString("%1: %2").arg(nErrCode).arg(sErrDesc));
-
+            QString("SendSOAPRequest(%1) - Invalid response from %2. Error %3: %4. Response: %5")
+                .arg(sMethod).arg(url.toString())
+                .arg(nErrCode).arg(sErrDesc).arg(sXml));
         return xmlResult;
     }
 
@@ -295,9 +294,9 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
         // --------------------------------------------------------------
 
         nErrCode = GetNodeValue(
-            doc, "Envelope/Body/Fault/detail/UPnPError/errorCode", 500);
+            doc, "Envelope/Body/Fault/detail/UPnPResult/errorCode", 500);
         sErrDesc = GetNodeValue(
-            doc, "Envelope/Body/Fault/detail/UPnPError/errorDescription", "");
+            doc, "Envelope/Body/Fault/detail/UPnPResult/errorDescription", "");
         if (sErrDesc.isEmpty())
             sErrDesc = QString("Unknown #%1").arg(nErrCode);
 
