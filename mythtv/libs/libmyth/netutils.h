@@ -50,7 +50,8 @@ MPUBLIC RSSSite* findByURL(const QString &url, ArticleType type);
 MPUBLIC RSSSite::rssList findAllDBRSS(void);
 MPUBLIC RSSSite::rssList findAllDBRSSByType(ArticleType type);
 MPUBLIC bool insertInDB(RSSSite *site);
-MPUBLIC bool insertInDB(const QString &name, const QString &thumbnail,
+MPUBLIC bool insertInDB(const QString &name, const QString &sortname,
+                const QString &thumbnail,
                 const QString &description, const QString &url,
                 const QString &author, const bool &download,
                 const QDateTime &updated, ArticleType type);

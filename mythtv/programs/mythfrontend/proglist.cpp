@@ -1056,8 +1056,10 @@ class plTitleSort : public plCompare
   public:
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
-        if (a->sortTitle != b->sortTitle)
-            return (a->sortTitle < b->sortTitle);
+        if (a->GetSortTitle() != b->GetSortTitle())
+            return (a->GetSortTitle() < b->GetSortTitle());
+        if (a->GetSortSubtitle() != b->GetSortSubtitle())
+            return (a->GetSortSubtitle() < b->GetSortSubtitle());
 
         if (a->GetRecordingStatus() == b->GetRecordingStatus())
             return a->GetScheduledStartTime() < b->GetScheduledStartTime();
@@ -1089,8 +1091,10 @@ class plPrevTitleSort : public plCompare
 
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
-        if (a->sortTitle != b->sortTitle)
-            return (a->sortTitle < b->sortTitle);
+        if (a->GetSortTitle() != b->GetSortTitle())
+            return (a->GetSortTitle() < b->GetSortTitle());
+        if (a->GetSortSubtitle() != b->GetSortSubtitle())
+            return (a->GetSortSubtitle() < b->GetSortSubtitle());
 
         if (a->GetProgramID() != b->GetProgramID())
             return a->GetProgramID() < b->GetProgramID();
@@ -1389,19 +1393,6 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         LoadFromProgram(m_itemList, where, bindings, m_schedList);
     }
 
-    const QRegExp prefixes(
-        tr("^(The |A |An )",
-           "Regular Expression for what to ignore when sorting"));
-    for (uint i = 0; i < m_itemList.size(); i++)
-    {
-        ProgramInfo *s = m_itemList[i];
-        if (s)
-        {
-            s->sortTitle = (m_type == plTitle) ? s->GetSubtitle() : s->GetTitle();
-            s->sortTitle.remove(prefixes);
-        }
-    }
-
     if (m_type == plNewListings || m_titleSort)
     {
         SortList(kTitleSort, m_reverseSort);
@@ -1412,9 +1403,9 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
             ProgramList::iterator it = m_itemList.begin();
             while (it != m_itemList.end())
             {
-                if ((*it)->sortTitle != curtitle)
+                if ((*it)->GetSortTitle() != curtitle)
                 {
-                    curtitle = (*it)->sortTitle;
+                    curtitle = (*it)->GetSortTitle();
                     ++it;
                 }
                 else

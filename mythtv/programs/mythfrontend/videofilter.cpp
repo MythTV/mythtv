@@ -389,29 +389,14 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
 
 /// Compares two VideoMetadata instances
 bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
-                                         const VideoMetadata &rhs,
-                                         bool sort_ignores_case) const
+                                         const VideoMetadata &rhs) const
 {
     bool ret = false;
     switch (orderby)
     {
         case kOrderByTitle:
         {
-            VideoMetadata::SortKey lhs_key;
-            VideoMetadata::SortKey rhs_key;
-            if (lhs.HasSortKey() && rhs.HasSortKey())
-            {
-                lhs_key = lhs.GetSortKey();
-                rhs_key = rhs.GetSortKey();
-            }
-            else
-            {
-                lhs_key = VideoMetadata::GenerateDefaultSortKey(lhs,
-                                                           sort_ignores_case);
-                rhs_key = VideoMetadata::GenerateDefaultSortKey(rhs,
-                                                           sort_ignores_case);
-            }
-            ret = lhs_key < rhs_key;
+            ret = lhs.sortBefore(rhs);
             break;
         }
         case kOrderBySeasonEp:
@@ -423,21 +408,7 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
                 && (lhs.GetEpisode() == 0)
                 && (rhs.GetEpisode() == 0))
             {
-                VideoMetadata::SortKey lhs_key;
-                VideoMetadata::SortKey rhs_key;
-                if (lhs.HasSortKey() && rhs.HasSortKey())
-                {
-                    lhs_key = lhs.GetSortKey();
-                    rhs_key = rhs.GetSortKey();
-                }
-                else
-                {
-                    lhs_key = VideoMetadata::GenerateDefaultSortKey(lhs,
-                                                               sort_ignores_case);
-                    rhs_key = VideoMetadata::GenerateDefaultSortKey(rhs,
-                                                               sort_ignores_case);
-                }
-                ret = lhs_key < rhs_key;
+                ret = lhs.sortBefore(rhs);
             }
             else if ((lhs.GetSeason() == rhs.GetSeason())
                      && (lhs.GetTitle() == rhs.GetTitle()))
@@ -463,10 +434,8 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
         }
         case kOrderByFilename:
         {
-            QString lhsfn(sort_ignores_case ?
-                          lhs.GetFilename().toLower() : lhs.GetFilename());
-            QString rhsfn(sort_ignores_case ?
-                          rhs.GetFilename().toLower() : rhs.GetFilename());
+            QString lhsfn = lhs.GetSortFilename();
+            QString rhsfn = rhs.GetSortFilename();
             ret = naturalCompare(lhsfn, rhsfn) < 0;
             break;
         }

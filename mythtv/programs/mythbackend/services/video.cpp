@@ -343,21 +343,19 @@ bool Video::AddVideo( const QString &sFileName,
         hash = "";
     }
 
-    VideoMetadata newFile(sFileName, hash,
+    VideoMetadata newFile(sFileName, QString(), hash,
                           VIDEO_TRAILER_DEFAULT,
                           VIDEO_COVERFILE_DEFAULT,
                           VIDEO_SCREENSHOT_DEFAULT,
                           VIDEO_BANNER_DEFAULT,
                           VIDEO_FANART_DEFAULT,
-                          VideoMetadata::FilenameToMeta(sFileName, 1),
-                          VideoMetadata::FilenameToMeta(sFileName, 4),
+                          QString(), QString(), QString(), QString(),
                           QString(), VIDEO_YEAR_DEFAULT,
                           QDate::fromString("0000-00-00","YYYY-MM-DD"),
                           VIDEO_INETREF_DEFAULT, 0, QString(),
                           VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
                           0.0, VIDEO_RATING_DEFAULT, 0, 0,
-                          VideoMetadata::FilenameToMeta(sFileName, 2).toInt(),
-                          VideoMetadata::FilenameToMeta(sFileName, 3).toInt(),
+                          0, 0,
                           MythDate::current().date(), 0,
                           ParentalLevel::plLowest);
 

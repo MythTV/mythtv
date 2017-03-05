@@ -39,6 +39,7 @@
 #include "mythuidefines.h"
 #include "langsettings.h"
 #include "mythcodeccontext.h"
+#include "mythsorthelper.h"
 
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
@@ -2825,6 +2826,51 @@ static HostCheckBoxSetting *BrowseChannelGroup()
     return gc;
 }
 
+#if 0
+static GlobalCheckBoxSetting *SortCaseSensitive()
+{
+    auto gc = new GlobalCheckBoxSetting("SortCaseSensitive");
+    gc->setLabel(GeneralSettings::tr("Case-sensitive sorting"));
+    gc->setValue(false);
+    gc->setHelpText(GeneralSettings::tr("If enabled, all sorting will be "
+                                        "case-sensitive.  This would mean "
+                                        "that \"bee movie\" would sort after "
+                                        "\"Sea World\" as lower case letters "
+                                        "sort after uppercase letters."));
+    return gc;
+}
+#endif
+
+static GlobalCheckBoxSetting *SortStripPrefixes()
+{
+    auto gc = new GlobalCheckBoxSetting("SortStripPrefixes");
+
+    gc->setLabel(GeneralSettings::tr("Remove prefixes when sorting"));
+    gc->setValue(true);
+    gc->setHelpText(GeneralSettings::tr(
+                        "If enabled, all sorting will remove the common "
+                        "prefixes (The, A, An) from a string prior to "
+                        "sorting.  For example, this would sort the titles "
+                        "\"Earth 2\", \"The Flash\", and \"Kings\" in that "
+                        "order.  If disabled, they would sort as \"Earth 2\", "
+                        "\"Kings\", \"The Flash\"."));
+    return gc;
+}
+
+static GlobalTextEditSetting *SortPrefixExceptions()
+{
+    auto gc = new GlobalTextEditSetting("SortPrefixExceptions");
+
+    gc->setLabel(MainGeneralSettings::tr("Names exempt from prefix removal"));
+    gc->setValue("");
+    gc->setHelpText(MainGeneralSettings::tr(
+                        "This list of names will be exempt from removing "
+                        "the common prefixes (The, A, An) from a title or "
+                        "filename.   Enter multiple names separated by "
+                        "semicolons."));
+    return gc;
+}
+
 // General RecPriorities settings
 
 static GlobalComboBoxSetting *GRSchedOpenEnd()
@@ -3951,6 +3997,19 @@ MainGeneralSettings::MainGeneralSettings()
     general->setLabel(tr("General"));
     general->addChild(UseVirtualKeyboard());
     general->addChild(ScreenShotPath());
+
+    auto sh = getMythSortHelper();
+    if (sh->hasPrefixes()) {
+#if 0
+        // Last minute change.  QStringRef::localeAwareCompare appears to
+        // always do case insensitive sorting, so there's no point in
+        // presenting this option to a user.
+        general->addChild(SortCaseSensitive());
+#endif
+        auto stripPrefixes = SortStripPrefixes();
+        general->addChild(stripPrefixes);
+        stripPrefixes->addTargetedChild("1", SortPrefixExceptions());
+    }
     addChild(general);
 
     addChild(EnableMediaMon());
@@ -4019,6 +4078,8 @@ void MainGeneralSettings::applyChange()
 {
     QStringList strlist( QString("REFRESH_BACKEND") );
     gCoreContext->SendReceiveStringList(strlist);
+    LOG(VB_GENERAL, LOG_ERR, QString("%1 called").arg(__FUNCTION__));
+    resetMythSortHelper();
 }
 
 

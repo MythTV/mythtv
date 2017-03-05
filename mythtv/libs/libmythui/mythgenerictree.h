@@ -25,6 +25,8 @@ class MUI_PUBLIC MythGenericTree
                     bool selectable_flag = false);
     virtual ~MythGenericTree();
 
+    void ensureSortFields(void);
+
     MythGenericTree *addNode(const QString &a_string, int an_int = 0,
                              bool selectable_flag = false, bool visible = true);
     MythGenericTree *addNode(const QString &a_string, const QString &sortText = "",

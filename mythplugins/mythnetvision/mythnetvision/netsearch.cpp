@@ -22,6 +22,7 @@
 #include <mythcoreutil.h>
 #include <mythuitext.h>
 #include <mythuiimage.h>
+#include <mythsorthelper.h>
 
 #include "netsearch.h"
 #include "netcommon.h"
@@ -507,8 +508,12 @@ void NetSearch::SlotItemChanged()
     else if (GetFocusWidget() == m_siteList)
     {
         MythUIButtonListItem *btn = m_siteList->GetItemCurrent();
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+        QString title = btn->GetText();
 
-        ResultItem res(btn->GetText(), QString(), QString(),
+        ResultItem res(title, sh->doTitle(title), // title, sortTitle
+                       QString(), QString(), // subtitle, sortSubtitle
+                       QString(), // description
                        QString(), QString(), QString(), QString(),
                        QDateTime(), nullptr, nullptr, -1, QString(), QStringList(),
                        QString(), QStringList(), 0, 0, QString(),

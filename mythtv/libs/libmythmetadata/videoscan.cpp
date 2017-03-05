@@ -340,22 +340,20 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
             if (id == -1)
             {
                 VideoMetadata newFile(
-                    p->first, hash,
+                    p->first, QString(), hash,
                     VIDEO_TRAILER_DEFAULT,
                     VIDEO_COVERFILE_DEFAULT,
                     VIDEO_SCREENSHOT_DEFAULT,
                     VIDEO_BANNER_DEFAULT,
                     VIDEO_FANART_DEFAULT,
-                    VideoMetadata::FilenameToMeta(p->first, 1),
-                    VideoMetadata::FilenameToMeta(p->first, 4),
+                    QString(), QString(), QString(), QString(),
                     QString(),
                     VIDEO_YEAR_DEFAULT,
                     QDate::fromString("0000-00-00","YYYY-MM-DD"),
                     VIDEO_INETREF_DEFAULT, 0, QString(),
                     VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
                     0.0, VIDEO_RATING_DEFAULT, 0, 0,
-                    VideoMetadata::FilenameToMeta(p->first, 2).toInt(),
-                    VideoMetadata::FilenameToMeta(p->first, 3).toInt(),
+                    0, 0,
                     MythDate::current().date(),
                     0, ParentalLevel::plLowest);
 

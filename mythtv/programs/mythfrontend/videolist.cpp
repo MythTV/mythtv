@@ -149,28 +149,25 @@ QString TreeNodeData::GetPrefix(void) const
 /// metadata sort function
 struct metadata_sort
 {
-    metadata_sort(const VideoFilterSettings &vfs, bool sort_ignores_case) :
-        m_vfs(vfs), m_sic(sort_ignores_case) {}
+    metadata_sort(const VideoFilterSettings &vfs) : m_vfs(vfs) {}
 
     bool operator()(const VideoMetadata *lhs, const VideoMetadata *rhs)
     {
-        return m_vfs.meta_less_than(*lhs, *rhs, m_sic);
+        return m_vfs.meta_less_than(*lhs, *rhs);
     }
 
     bool operator()(const smart_meta_node &lhs, const smart_meta_node &rhs)
     {
-        return m_vfs.meta_less_than(*(lhs->getData()), *(rhs->getData()),
-                                    m_sic);
+        return m_vfs.meta_less_than(*(lhs->getData()), *(rhs->getData()));
     }
 
   private:
     const VideoFilterSettings &m_vfs;
-    bool m_sic;
 };
 
 struct metadata_path_sort
 {
-    explicit metadata_path_sort(bool ignore_case) : m_ignore_case(ignore_case) {}
+    explicit metadata_path_sort(void) {}
 
     bool operator()(const VideoMetadata &lhs, const VideoMetadata &rhs)
     {
@@ -184,28 +181,19 @@ struct metadata_path_sort
 
     bool operator()(const smart_dir_node &lhs, const smart_dir_node &rhs)
     {
-        return sort(lhs->getPath(), rhs->getPath());
+        return sort(lhs->getSortPath(), rhs->getSortPath());
     }
 
   private:
     bool sort(const VideoMetadata *lhs, const VideoMetadata *rhs)
     {
-        return sort(lhs->GetFilename(), rhs->GetFilename());
+        return sort(lhs->GetSortFilename(), rhs->GetSortFilename());
     }
 
     bool sort(const QString &lhs, const QString &rhs)
     {
-        QString lhs_comp(lhs);
-        QString rhs_comp(rhs);
-        if (m_ignore_case)
-        {
-            lhs_comp = lhs_comp.toLower();
-            rhs_comp = rhs_comp.toLower();
-        }
-        return naturalCompare(lhs_comp, rhs_comp) < 0;
+        return naturalCompare(lhs, rhs) < 0;
     }
-
-    bool m_ignore_case;
 };
 
 static QString path_to_node_name(const QString &path)
@@ -750,13 +738,12 @@ void VideoListImp::sort_view_data(bool flat_list)
     if (flat_list)
     {
         sort(m_metadata_view_flat.begin(), m_metadata_view_flat.end(),
-             metadata_sort(m_video_filter, true));
+             metadata_sort(m_video_filter));
     }
     else
     {
-        m_metadata_view_tree.sort(metadata_path_sort(true),
-                                  metadata_sort(m_video_filter,
-                                                true));
+        m_metadata_view_tree.sort(metadata_path_sort(),
+                                  metadata_sort(m_video_filter));
     }
 }
 
@@ -810,7 +797,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
-    metadata_path_sort mps(true);
+    metadata_path_sort mps = metadata_path_sort();
     sort(mlist.begin(), mlist.end(), mps);
 
     typedef map<QString, meta_dir_node *> group_to_node_map;
@@ -943,7 +930,7 @@ void VideoListImp::buildTVList(void)
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
-    metadata_path_sort mps(true);
+    metadata_path_sort mps = metadata_path_sort();
     sort(mlist.begin(), mlist.end(), mps);
 
     meta_dir_node *video_root = &m_metadata_tree;
@@ -989,7 +976,7 @@ void VideoListImp::buildDbList()
 
 //    print_meta_list(mlist);
 
-    metadata_path_sort mps(true);
+    metadata_path_sort mps = metadata_path_sort();
     sort(mlist.begin(), mlist.end(), mps);
 
     // TODO: break out the prefix in the DB so this isn't needed
@@ -1143,20 +1130,6 @@ void VideoListImp::update_meta_view(bool flat_list)
     m_metadata_view_flat.reserve(m_metadata.getList().size());
 
     m_metadata_view_tree.clear();
-
-    // a big punt on setting the sort key
-    // TODO: put this in the DB, half the time in this function is spent
-    // doing this.
-    for (metadata_list::const_iterator si = m_metadata.getList().begin();
-         si != m_metadata.getList().end(); ++si)
-    {
-        if (!(*si)->HasSortKey())
-        {
-            VideoMetadata::SortKey skey =
-                VideoMetadata::GenerateDefaultSortKey(*(*si), true);
-            (*si)->SetSortKey(skey);
-        }
-    }
 
     if (flat_list)
     {

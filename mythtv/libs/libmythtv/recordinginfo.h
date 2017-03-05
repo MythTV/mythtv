@@ -110,7 +110,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     /// used in scheduler.cpp @ ~ 3296
     RecordingInfo(
         const QString &title,
+        const QString &sortTitle,
         const QString &subtitle,
+        const QString &sortSubtitle,
         const QString &description,
         uint season,
         uint episode,
@@ -178,7 +180,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     /// user in scheduler.cpp  @ ~ 3566 & ~ 3643
     RecordingInfo(
         const QString &title,
+        const QString &sortTitle,
         const QString &subtitle,
+        const QString &sortSubtitle,
         const QString &description,
         uint season,
         uint episode,

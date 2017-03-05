@@ -222,17 +222,15 @@ static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
 
 static QString construct_sort_title(
     QString title, PlaybackBox::ViewMask viewmask,
-    PlaybackBox::ViewTitleSort titleSort, int recpriority,
-    const QRegExp &prefixes)
+    PlaybackBox::ViewTitleSort sortType, int recpriority)
 {
     if (title.isEmpty())
         return title;
 
     QString sTitle = title;
 
-    sTitle.remove(prefixes);
     if (viewmask == PlaybackBox::VIEW_TITLES &&
-            titleSort == PlaybackBox::TitleSortRecPriority)
+            sortType == PlaybackBox::TitleSortRecPriority)
     {
         // Also incorporate recpriority (reverse numeric sort). In
         // case different episodes of a recording schedule somehow
@@ -393,7 +391,6 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
                          TV *player, bool /*showTV*/)
     : ScheduleCommon(parent, name),
-      m_prefixes(QObject::tr("^(The |A |An )")),
       m_titleChaff(" \\(.*\\)$"),
       // UI variables
       m_recgroupList(nullptr),
@@ -1774,8 +1771,8 @@ bool PlaybackBox::UpdateUILists(void)
             if ((m_viewMask & VIEW_TITLES) && (!isLiveTVProg || isLiveTvGroup))
             {
                 sTitle = construct_sort_title(
-                            p->GetTitle(), m_viewMask, titleSort,
-                            p->GetRecordingPriority(), m_prefixes);
+                            p->GetSortTitle(), m_viewMask, titleSort,
+                            p->GetRecordingPriority());
                 sTitle = sTitle.toLower();
 
                 if (!sortedList.contains(sTitle))

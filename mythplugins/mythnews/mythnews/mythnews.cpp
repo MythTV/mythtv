@@ -193,6 +193,7 @@ void MythNews::loadSites(void)
         bool podcast = query.value(4).toInt();
         m_NewsSites.push_back(new NewsSite(name, url, time, podcast));
     }
+    std::sort(m_NewsSites.begin(), m_NewsSites.end(), NewsSite::sortByName);
 
     NewsSite::List::iterator it = m_NewsSites.begin();
     for (; it != m_NewsSites.end(); ++it)

@@ -121,12 +121,20 @@ class TitleSort
     bool operator()(const ProgramRecPriorityInfo *a,
                     const ProgramRecPriorityInfo *b) const
     {
-        if (a->sortTitle != b->sortTitle)
+        if (a->GetSortTitle() != b->GetSortTitle())
         {
             if (m_reverse)
-                return (a->sortTitle > b->sortTitle);
+                return (a->GetSortTitle() > b->GetSortTitle());
             else
-                return (a->sortTitle < b->sortTitle);
+                return (a->GetSortTitle() < b->GetSortTitle());
+        }
+
+        if (a->GetSortSubtitle() != b->GetSortSubtitle())
+        {
+            if (m_reverse)
+                return (a->GetSortSubtitle() > b->GetSortSubtitle());
+            else
+                return (a->GetSortSubtitle() < b->GetSortSubtitle());
         }
 
         int finalA = a->GetRecordingPriority();
@@ -277,9 +285,17 @@ class ProgramCountSort
         }
 
         if (m_reverse)
-            return (a->sortTitle > b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() > b->GetSortTitle());
+            return (a->GetSortSubtitle() > b->GetSortSubtitle());
+        }
         else
-            return (a->sortTitle < b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() < b->GetSortTitle());
+            return (a->GetSortSubtitle() < b->GetSortSubtitle());
+        }
     }
 
   private:
@@ -316,9 +332,17 @@ class ProgramRecCountSort
         }
 
         if (m_reverse)
-            return (a->sortTitle > b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() > b->GetSortTitle());
+            return (a->GetSortSubtitle() > b->GetSortSubtitle());
+        }
         else
-            return (a->sortTitle < b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() < b->GetSortTitle());
+            return (a->GetSortSubtitle() < b->GetSortSubtitle());
+        }
     }
 
   private:
@@ -345,9 +369,17 @@ class ProgramLastRecordSort
         }
 
         if (m_reverse)
-            return (a->sortTitle > b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() > b->GetSortTitle());
+            return (a->GetSortSubtitle() > b->GetSortSubtitle());
+        }
         else
-            return (a->sortTitle < b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() < b->GetSortTitle());
+            return (a->GetSortSubtitle() < b->GetSortSubtitle());
+        }
     }
 
   private:
@@ -374,9 +406,17 @@ class ProgramAvgDelaySort
         }
 
         if (m_reverse)
-            return (a->sortTitle > b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() > b->GetSortTitle());
+            return (a->GetSortSubtitle() > b->GetSortSubtitle());
+        }
         else
-            return (a->sortTitle < b->sortTitle);
+        {
+            if (a->GetSortTitle() != b->GetSortTitle())
+                return (a->GetSortTitle() < b->GetSortTitle());
+            return (a->GetSortSubtitle() < b->GetSortSubtitle());
+        }
     }
 
   private:
@@ -918,11 +958,11 @@ void ProgramRecPriority::scheduleChanged(int recid)
         ProgramRecPriorityInfo progInfo;
         progInfo.SetRecordingRuleID(record.m_recordID);
         progInfo.SetRecordingRuleType(record.m_type);
-        progInfo.SetTitle(record.m_title);
+        progInfo.SetTitle(record.m_title, record.m_sortTitle);
+        progInfo.SetSubtitle(record.m_subtitle, record.m_sortSubtitle);
         progInfo.SetCategory(record.m_category);
         progInfo.SetRecordingPriority(record.m_recPriority);
         progInfo.recType = record.m_type;
-        progInfo.sortTitle = record.m_title;
         progInfo.recstatus = record.m_isInactive ?
             RecStatus::Inactive : RecStatus::Unknown;
         progInfo.profile = record.m_recProfile;
@@ -1190,9 +1230,6 @@ void ProgramRecPriority::FillList(void)
             if (it != m_programData.end())
             {
                 ProgramRecPriorityInfo *progInfo = &(*it);
-
-                progInfo->sortTitle = progInfo->title;
-                progInfo->sortTitle.remove(QRegExp(tr("^(The |A |An )")));
 
                 progInfo->recType = recType;
                 progInfo->matchCount =

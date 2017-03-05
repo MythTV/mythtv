@@ -13,10 +13,12 @@
 #include "mythdirs.h"
 #include "mythdate.h"
 #include "programinfo.h" // for format_season_and_episode()
+#include "mythsorthelper.h"
 
 using namespace std;
 
-ResultItem::ResultItem(const QString& title, const QString& subtitle,
+ResultItem::ResultItem(const QString& title, const QString& sortTitle,
+              const QString& subtitle, const QString& sortSubtitle,
               const QString& desc, const QString& URL,
               const QString& thumbnail, const QString& mediaURL,
               const QString& author, const QDateTime& date,
@@ -30,7 +32,9 @@ ResultItem::ResultItem(const QString& title, const QString& subtitle,
               const bool& customhtml)
 {
     m_title = title;
+    m_sorttitle = sortTitle;
     m_subtitle = subtitle;
+    m_sortsubtitle = sortSubtitle;
     m_desc = desc;
     m_URL = URL;
     m_thumbnail = thumbnail;
@@ -55,6 +59,8 @@ ResultItem::ResultItem(const QString& title, const QString& subtitle,
     m_season = season;
     m_episode = episode;
     m_customhtml = customhtml;
+
+    ensureSortFields();
 }
 
 ResultItem::ResultItem() :
@@ -63,10 +69,22 @@ ResultItem::ResultItem() :
 {
 }
 
+void ResultItem::ensureSortFields(void)
+{
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+
+    if (m_sorttitle.isEmpty() and not m_title.isEmpty())
+        m_sorttitle = sh->doTitle(m_title);
+    if (m_sortsubtitle.isEmpty() and not m_subtitle.isEmpty())
+        m_sortsubtitle = sh->doTitle(m_subtitle);
+}
+
 void ResultItem::toMap(InfoMap &metadataMap)
 {
     metadataMap["title"] = m_title;
+    metadataMap["sorttitle"] = m_sorttitle;
     metadataMap["subtitle"] = m_subtitle;
+    metadataMap["sortsubtitle"] = m_sortsubtitle;
     metadataMap["description"] = m_desc;
     metadataMap["url"] = m_URL;
     metadataMap["thumbnail"] = m_thumbnail;
@@ -916,7 +934,9 @@ ResultItem* Parse::ParseItem(const QDomElement& item) const
     if (mediaURL.isNull() || mediaURL == url)
         downloadable = false;
 
-    return(new ResultItem(title, subtitle, description,
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+    return(new ResultItem(title, sh->doTitle(title),
+              subtitle, sh->doTitle(subtitle), description,
               url, thumbnail, mediaURL, author, date, duration,
               rating, filesize, player, playerargs,
               download, downloadargs, width, height,

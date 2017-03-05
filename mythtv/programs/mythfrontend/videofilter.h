@@ -48,8 +48,7 @@ class VideoFilterSettings
     VideoFilterSettings &operator=(const VideoFilterSettings &rhs);
 
     bool matches_filter(const VideoMetadata &mdata) const;
-    bool meta_less_than(const VideoMetadata &lhs, const VideoMetadata &rhs,
-                        bool sort_ignores_case) const;
+    bool meta_less_than(const VideoMetadata &lhs, const VideoMetadata &rhs) const;
 
     void saveAsDefault();
 
@@ -189,7 +188,6 @@ class VideoFilterSettings
     QDate insertdate;
     const QRegExp re_season;
     const QRegExp re_date;
-
 
     unsigned int m_changed_state;
 };

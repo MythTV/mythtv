@@ -95,6 +95,7 @@ class META_PUBLIC meta_dir_node : public meta_node
                   const QVariant &data = QVariant());
     meta_dir_node() : meta_node(nullptr) { }
 
+    void ensureSortFields();
     void setName(const QString &name);
     const QString &getName() const override; // meta_node
     void SetHost(const QString &host);
@@ -102,7 +103,8 @@ class META_PUBLIC meta_dir_node : public meta_node
     void SetPrefix(const QString &prefix);
     const QString &GetPrefix() const;
     const QString &getPath() const override; // meta_node
-    void setPath(const QString &path);
+    const QString &getSortPath() const;
+    void setPath(const QString &path, const QString &sortPath = nullptr);
     void SetData(const QVariant &data);
     const QVariant &GetData() const;
     bool DataIsValid(void) const;
@@ -146,6 +148,7 @@ class META_PUBLIC meta_dir_node : public meta_node
 
   private:
     QString m_path;
+    QString m_sortPath;
     QString m_name;
     QString m_host;
     QString m_prefix;

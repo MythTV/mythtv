@@ -19,8 +19,6 @@ enum { VIDEO_YEAR_DEFAULT = 1895 };
 
 const QString VIDEO_SUBTITLE_DEFAULT = "";
 
-struct SortData;
-
 typedef QHash<QString,QString> MetadataMap;
 
 class META_PUBLIC VideoMetadata
@@ -36,24 +34,6 @@ class META_PUBLIC VideoMetadata
     typedef std::vector<cast_entry> cast_list;
 
   public:
-    class META_PUBLIC SortKey
-    {
-      public:
-        SortKey();
-        explicit SortKey(const SortData &data);
-        SortKey(const SortKey &other);
-        SortKey &operator=(const SortKey &rhs);
-        ~SortKey();
-
-        bool isSet() const;
-        void Clear();
-
-      public:
-        SortData *m_sd;
-    };
-
-  public:
-    static SortKey GenerateDefaultSortKey(const VideoMetadata &m, bool ignore_case);
     static int UpdateHashedDBRecord(const QString &hash, const QString &file_name,
                                     const QString &host);
     static QString VideoFileHash(const QString &file_name, const QString &host);
@@ -62,6 +42,7 @@ class META_PUBLIC VideoMetadata
 
   public:
     VideoMetadata(const QString &filename = QString(),
+             const QString &sortFilename = QString(),
              const QString &hash = QString(),
              const QString &trailer = QString(),
              const QString &coverfile = QString(),
@@ -69,7 +50,9 @@ class META_PUBLIC VideoMetadata
              const QString &banner = QString(),
              const QString &fanart = QString(),
              const QString &title = QString(),
+             const QString &sortTitle = QString(),
              const QString &subtitle = QString(),
+             const QString &sortSubtitle = QString(),
              const QString &tagline = QString(),
              int year = VIDEO_YEAR_DEFAULT,
              const QDate &releasedate = QDate(),
@@ -104,24 +87,22 @@ class META_PUBLIC VideoMetadata
     explicit VideoMetadata(MSqlQuery &query);
     VideoMetadata(const VideoMetadata &rhs);
     VideoMetadata &operator=(const VideoMetadata &rhs);
+    bool sortBefore(const VideoMetadata &rhs) const;
 
     void toMap(InfoMap &metadataMap);
     void GetStateMap(InfoMap &stateMap);
     void GetImageMap(InfoMap &imageMap);
 
-    // returns a string to use when sorting
-    bool HasSortKey() const;
-    const SortKey &GetSortKey() const;
-    void SetSortKey(const SortKey &sort_key);
-
     const QString &GetPrefix() const;
     void SetPrefix(const QString &prefix);
 
     const QString &GetTitle() const;
-    void SetTitle(const QString& title);
+    const QString &GetSortTitle() const;
+    void SetTitle(const QString& title, const QString& sortTitle = "");
 
     const QString &GetSubtitle() const;
-    void SetSubtitle(const QString &subtitle);
+    const QString &GetSortSubtitle() const;
+    void SetSubtitle(const QString &subtitle, const QString &sortSubtitle = "");
 
     const QString &GetTagline() const;
     void SetTagline(const QString &tagline);
@@ -199,7 +180,8 @@ class META_PUBLIC VideoMetadata
     void SetHost(const QString &host);
 
     const QString &GetFilename() const;
-    void SetFilename(const QString &filename);
+    const QString &GetSortFilename() const;
+    void SetFilename(const QString &filename, const QString &sortFilename = "");
 
     const QString &GetHash() const;
     void SetHash(const QString &hash);
@@ -257,8 +239,6 @@ META_PUBLIC void ClearMap(InfoMap &metadataMap);
 
 META_PUBLIC bool operator==(const VideoMetadata &a, const VideoMetadata &b);
 META_PUBLIC bool operator!=(const VideoMetadata &a, const VideoMetadata &b);
-
-META_PUBLIC bool operator<(const VideoMetadata::SortKey &lhs, const VideoMetadata::SortKey &rhs);
 
 Q_DECLARE_METATYPE(VideoMetadata*)
 

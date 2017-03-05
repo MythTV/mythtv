@@ -19,6 +19,7 @@
 #include <mythuitext.h>
 #include <mythscreenstack.h>
 #include <mythmainwindow.h>
+#include <mythsorthelper.h>
 
 // mythnetvision
 #include "treeeditor.h"
@@ -589,6 +590,7 @@ void NetTree::FillTree()
         m_siteGeneric->addNode(ret);
         SetSubfolderData(ret);
     }
+    m_siteGeneric->sortByString();
 }
 
 void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
@@ -713,7 +715,9 @@ void NetTree::UpdateResultItem(ResultItem *item)
 void NetTree::UpdateSiteItem(RSSSite *site)
 {
     ResultItem res =
-        ResultItem(site->GetTitle(), QString(), site->GetDescription(),
+        ResultItem(site->GetTitle(), site->GetSortTitle(),
+                   QString(), QString(), // no subtitle information
+                   site->GetDescription(),
                    site->GetURL(), site->GetImage(), QString(),
                    site->GetAuthor(), QDateTime(), nullptr, nullptr, -1, QString(),
                    QStringList(), QString(), QStringList(), 0, 0, QString(),
@@ -756,8 +760,12 @@ void NetTree::UpdateCurrentItem(void)
             thumb = node->GetData().toString();
     }
 
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
     ResultItem res =
-        ResultItem(title, QString(), QString(), QString(), thumb, QString(),
+        ResultItem(title, sh->doTitle(title), // title, sortTitle
+                   QString(), QString(), // no subtitle information
+                   QString(), // description
+                   QString(), thumb, QString(),
                    QString(), QDateTime(), nullptr, nullptr, -1, QString(),
                    QStringList(), QString(), QStringList(), 0, 0, QString(),
                    false, QStringList(), 0, 0, false);

@@ -7,6 +7,7 @@
 #include <mythdirs.h>
 #include <mythdownloadmanager.h>
 #include <mythevent.h>
+#include <mythsorthelper.h>
 
 // MythNews headers
 #include "newssite.h"
@@ -28,6 +29,8 @@ NewsSite::NewsSite(const QString   &name,
     m_imageURL(""),
     m_podcast(podcast)
 {
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+    m_sortName = sh->doTitle(m_name);
 }
 
 void NewsSite::deleteLater()
@@ -100,6 +103,12 @@ QString NewsSite::name(void) const
 {
     QMutexLocker locker(&m_lock);
     return m_name;
+}
+
+QString NewsSite::sortName(void) const
+{
+    QMutexLocker locker(&m_lock);
+    return m_sortName;
 }
 
 bool NewsSite::podcast(void) const

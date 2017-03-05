@@ -5,6 +5,7 @@
 
 // Myth headers
 #include "mythlogging.h"
+#include "mythsorthelper.h"
 
 // QT headers
 #include <algorithm>
@@ -68,7 +69,6 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
     m_selectedSubnode = nullptr;
 
     m_text = a_string;
-    m_sortText = a_string;
 
     m_int = an_int;
     m_data = 0;
@@ -76,12 +76,21 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
     m_selectable = selectable_flag;
     m_visible = true;
     m_visibleCount = 0;
+
+    ensureSortFields();
 }
 
 MythGenericTree::~MythGenericTree()
 {
     deleteAllChildren();
     delete m_subnodes;
+}
+
+void MythGenericTree::ensureSortFields(void)
+{
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+    if (m_sortText.isEmpty() and not m_text.isEmpty())
+        m_sortText = sh->doTitle(m_text);
 }
 
 MythGenericTree* MythGenericTree::addNode(const QString &a_string, int an_int,
@@ -528,7 +537,8 @@ void MythGenericTree::SetText(const QString &text, const QString &name,
     else
     {
         m_text = text;
-        m_sortText = text;
+        m_sortText = nullptr;
+        ensureSortFields();
     }
 }
 

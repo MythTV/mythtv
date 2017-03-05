@@ -988,6 +988,9 @@ bool DBEvent::MoveOutOfTheWayDB(
     return true;
 }
 
+/**
+ *  \brief Insert Callback function when Allow Re-record is pressed in Watch Recordings
+ */
 uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
 {
     query.prepare(
@@ -1128,6 +1131,18 @@ void ProgInfo::Squeeze(void)
     clumpmax.squeeze();
 }
 
+/**
+ *  \brief Insert a single entry into the "program" database.
+ *
+ *  This function is called from HandlePrograms, which is called from
+ *  mythfilldatabase. It inserts a single entry into the "program"
+ *  database. The data for this structure is taken from the 'this'
+ *  ProgInfo object.
+ *
+ *  \param query  Any mysql query structure. The contents is ignored
+ *                and the structure is repurposed for local queries.
+ *  \param chanid The channel number for this program.
+ */
 uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 {
     LOG(VB_XMLTV, LOG_INFO,
@@ -1373,6 +1388,14 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
     }
 }
 
+/**
+ *  \brief Called from mythfilldatabase to bulk insert data into the
+ *  program database.
+ *
+ *  \param sourceid The data source identifier
+ *  \param proglist A map of all program information keyed by channel
+ *                  identifier
+ */
 void ProgramData::HandlePrograms(
     uint sourceid, QMap<QString, QList<ProgInfo> > &proglist)
 {
@@ -1431,6 +1454,17 @@ void ProgramData::HandlePrograms(
                 .arg(updated) .arg(unchanged));
 }
 
+/**
+ *  \brief Called from HandlePrograms to bulk insert data into the
+ *  program database.
+ *
+ *  \param query A mysql query related to all channel ids for
+ *               a given source
+ *  \param chanid The specific channel id to process
+ *  \param sortlist A time sorted list of ProgInfo structures
+ *  \param unchanged Set to the number of unchanged programs
+ *  \param updated Set to the number of updated programs
+ */
 void ProgramData::HandlePrograms(MSqlQuery             &query,
                                  uint                   chanid,
                                  const QList<ProgInfo*> &sortlist,

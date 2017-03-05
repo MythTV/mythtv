@@ -22,6 +22,9 @@
 #include "mythsystem.h"
 #include "mythcoreutil.h"
 
+// mythbase
+#include "mythsorthelper.h"
+
 // libmythui
 #include "mythprogressdialog.h"
 #include "mythmainwindow.h"
@@ -104,6 +107,7 @@ MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QS
         m_urls[x] = lurls[x];
 
     setRepo(RT_Radio);
+    ensureSortFields();
 }
 
 MusicMetadata::~MusicMetadata()
@@ -125,9 +129,13 @@ MusicMetadata::~MusicMetadata()
 MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
 {
     m_artist = rhs.m_artist;
+    m_artist_sort = rhs.m_artist_sort;
     m_compilation_artist = rhs.m_compilation_artist;
+    m_compilation_artist_sort = rhs.m_compilation_artist_sort;
     m_album = rhs.m_album;
+    m_album_sort = rhs.m_album_sort;
     m_title = rhs.m_title;
+    m_title_sort = rhs.m_title_sort;
     m_formattedartist = rhs.m_formattedartist;
     m_formattedtitle = rhs.m_formattedtitle;
     m_genre = rhs.m_genre;
@@ -327,6 +335,7 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_disccount = query.value(18).toInt();
         mdata->m_filename = query.value(19).toString();
         mdata->m_hostname = query.value(20).toString();
+        mdata->ensureSortFields();
 
         if (!QHostAddress(mdata->m_hostname).isNull()) // A bug caused an IP to replace hostname, reset and it will fix itself
         {
@@ -879,7 +888,21 @@ void MusicMetadata::checkEmptyFields()
         m_title = m_filename;
     if (m_genre.isEmpty())
         m_genre = tr("Unknown Genre", "Default genre if no genre");
+    ensureSortFields();
+}
 
+void MusicMetadata::ensureSortFields()
+{
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+
+    if (m_artist_sort.isEmpty() and not m_artist.isEmpty())
+        m_artist_sort = sh->doTitle(m_artist);
+    if (m_compilation_artist_sort.isEmpty() and not m_compilation_artist.isEmpty())
+        m_compilation_artist_sort = sh->doTitle(m_compilation_artist);
+    if (m_album_sort.isEmpty() and not m_album.isEmpty())
+        m_album_sort = sh->doTitle(m_album);
+    if (m_title_sort.isEmpty() and not m_title.isEmpty())
+        m_title_sort = sh->doTitle(m_title);
 }
 
 inline void MusicMetadata::setCompilationFormatting(bool cd)
@@ -1044,12 +1067,12 @@ void MusicMetadata::setField(const QString &field, const QString &data)
         m_length = data.toInt();
     else if (field == "compilation")
         m_compilation = (data.toInt() > 0);
-
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Something asked me to set data "
                                          "for a field called %1").arg(field));
     }
+    ensureSortFields();
 }
 
 void MusicMetadata::getField(const QString &field, QString *data)

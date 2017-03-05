@@ -130,6 +130,7 @@ class META_PUBLIC MusicMetadata
 
     {
         checkEmptyFields();
+        ensureSortFields();
     }
 
     MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription, UrlList lurls, QString llogourl,
@@ -146,26 +147,47 @@ class META_PUBLIC MusicMetadata
     MusicMetadata& operator=(const MusicMetadata &other);
 
     QString Artist() const { return m_artist; }
-    void setArtist(const QString &lartist)
+    QString ArtistSort() const { return m_artist_sort; }
+    void setArtist(const QString &lartist,
+                   const QString &lartist_sort = nullptr)
     {
-        m_artist = lartist; m_formattedartist.clear(); m_formattedtitle.clear();
+        m_artist = lartist;
+        m_artist_sort = lartist_sort;
+        m_formattedartist.clear(); m_formattedtitle.clear();
+        ensureSortFields();
     }
 
     QString CompilationArtist() const { return m_compilation_artist; }
-    void setCompilationArtist(const QString &lcompilation_artist)
+    QString CompilationArtistSort() const { return m_compilation_artist_sort; }
+    void setCompilationArtist(const QString &lcompilation_artist,
+                              const QString &lcompilation_artist_sort = nullptr)
     {
         m_compilation_artist = lcompilation_artist;
+        m_compilation_artist_sort = lcompilation_artist_sort;
         m_formattedartist.clear(); m_formattedtitle.clear();
+        ensureSortFields();
     }
 
     QString Album() const { return m_album; }
-    void setAlbum(const QString &lalbum)
+    QString AlbumSort() const { return m_album_sort; }
+    void setAlbum(const QString &lalbum,
+                  const QString &lalbum_sort = nullptr)
     {
-        m_album = lalbum; m_formattedartist.clear(); m_formattedtitle.clear();
+        m_album = lalbum;
+        m_album_sort = lalbum_sort;
+        m_formattedartist.clear(); m_formattedtitle.clear();
+        ensureSortFields();
     }
 
     QString Title() const { return m_title; }
-    void setTitle(const QString &ltitle) { m_title = ltitle; }
+    QString TitleSort() const { return m_title_sort; }
+    void setTitle(const QString &ltitle,
+                  const QString &ltitle_sort = nullptr)
+    {
+        m_title = ltitle;
+        m_title_sort = ltitle_sort;
+        ensureSortFields();
+    }
 
     QString FormatArtist();
     QString FormatTitle();
@@ -311,15 +333,21 @@ class META_PUBLIC MusicMetadata
     void setCompilationFormatting(bool cd = false);
     QString formatReplaceSymbols(const QString &format);
     void checkEmptyFields(void);
+    void ensureSortFields(void);
     void saveHostname(void);
 
     QString m_artist;
+    QString m_artist_sort;
     QString m_compilation_artist;
+    QString m_compilation_artist_sort;
     QString m_album;
+    QString m_album_sort;
     QString m_title;
+    QString m_title_sort;
     QString m_formattedartist;
     QString m_formattedtitle;
     QString m_genre;
+    QString m_genre_sort;
     QString m_format;
     int m_year;
     int m_tracknum;

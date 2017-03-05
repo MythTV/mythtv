@@ -33,8 +33,6 @@ MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
     m_action = action;
     m_showArrow = showArrow;
 
-    SetSortText(name.toLower());
-
     if (!action.isEmpty() && !action.isNull())
         setSelectable(true);
 
@@ -1174,6 +1172,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         while (i != map.constEnd())
         {
             MusicGenericTree *newnode = new MusicGenericTree(node, i.key(), "genre");
+            newnode->SetSortText(i.key()); // No manipulation of prefixes on genres
             newnode->SetData(qVariantFromValue(i.value()));
             ++i;
         }

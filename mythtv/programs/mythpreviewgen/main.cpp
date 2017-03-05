@@ -102,9 +102,9 @@ int preview_helper(uint chanid, QDateTime starttime,
             return GENERIC_EXIT_NOT_OK;
         }
         pginfo = new ProgramInfo(
-            infile, ""/*plot*/, ""/*title*/, ""/*subtitle*/, ""/*director*/,
-            0/*season*/, 0/*episode*/, ""/*inetref*/, 120/*length_in_minutes*/,
-            1895/*year*/, ""/*id*/);
+            infile, ""/*plot*/, ""/*title*/, ""/*sortTitle*/, ""/*subtitle*/,
+            ""/*sortSubtitle*/, ""/*director*/, 0/*season*/, 0/*episode*/,
+            ""/*inetref*/, 120/*length_in_minutes*/, 1895/*year*/, ""/*id*/);
     }
     else
     {

@@ -19,6 +19,7 @@
 #include <netutils.h>
 #include <rssparse.h>
 #include <mythdownloadmanager.h>
+#include <mythsorthelper.h>
 
 // RSS headers
 #include "rsseditor.h"
@@ -168,7 +169,8 @@ void RSSEditPopup::ParseAndSave(void)
 
         removeFromDB(m_urlText, VIDEO_PODCAST);
 
-        RSSSite site(title, filename, VIDEO_PODCAST,
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+        RSSSite site(title, sh->doTitle(title), filename, VIDEO_PODCAST,
                      desc, link, author, download, MythDate::current());
         if (insertInDB(&site))
             emit Saving();
@@ -285,7 +287,8 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
 
         QString link = m_urlEdit->GetText();
 
-        RSSSite site(title, filename, VIDEO_PODCAST, description, link,
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+        RSSSite site(title, sh->doTitle(title), filename, VIDEO_PODCAST, description, link,
                      author, download, MythDate::current());
         if (insertInDB(&site))
             emit Saving();

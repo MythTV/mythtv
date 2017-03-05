@@ -4,6 +4,7 @@
 // myth
 #include <mythcontext.h>
 #include <mythdb.h>
+#include <mythsorthelper.h>
 
 // mythbrowser
 #include "browserdbutil.h"
@@ -263,16 +264,19 @@ int GetSiteList(QList<Bookmark*>  &siteList)
     }
     else
     {
+        std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
         while (query.next())
         {
             Bookmark *site = new Bookmark();
             site->category = query.value(0).toString();
             site->name = query.value(1).toString();
+            site->sortName = sh->doTitle(site->name);
             site->url = query.value(2).toString();
             site->isHomepage = query.value(3).toBool();
             site->selected = false;
             siteList.append(site);
         }
+        std::sort(siteList.begin(), siteList.end(), Bookmark::sortByName);
     }
 
     return siteList.size();

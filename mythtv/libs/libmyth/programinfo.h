@@ -81,7 +81,9 @@ class MPUBLIC ProgramInfo
     /// Constructs a ProgramInfo from data in 'recorded' table
     ProgramInfo(uint recordedid,
                 const QString &title,
+                const QString &sortTitle,
                 const QString &subtitle,
+                const QString &sortSubtitle,
                 const QString &description,
                 uint season,
                 uint episode,
@@ -144,7 +146,9 @@ class MPUBLIC ProgramInfo
 
     /// Constructs a ProgramInfo from data in 'oldrecorded' table
     ProgramInfo(const QString &title,
+                const QString &sortTitle,
                 const QString &subtitle,
+                const QString &sortSubtitle,
                 const QString &description,
                 uint season,
                 uint episode,
@@ -176,7 +180,9 @@ class MPUBLIC ProgramInfo
 
     /// Constructs a ProgramInfo from listings data in 'program' table
     ProgramInfo(const QString &title,
+                const QString &sortTitle,
                 const QString &subtitle,
+                const QString &sortSubtitle,
                 const QString &description,
                 const QString &syndicatedepisode,
                 const QString &category,
@@ -220,7 +226,9 @@ class MPUBLIC ProgramInfo
                 const ProgramList &schedList);
     /// Constructs a basic ProgramInfo (used by RecordingInfo)
     ProgramInfo(const QString &title,
+                const QString &sortTitle,
                 const QString &subtitle,
+                const QString &sortSubtitle,
                 const QString &description,
                 uint season,
                 uint episode,
@@ -251,7 +259,9 @@ class MPUBLIC ProgramInfo
     ProgramInfo(const QString &pathname,
                 const QString &plot,
                 const QString &title,
+                const QString &sortTitle,
                 const QString &subtitle,
+                const QString &sortSubtitle,
                 const QString &director,
                 int season, int episode,
                 const QString &inetref,
@@ -285,6 +295,7 @@ class MPUBLIC ProgramInfo
     ProgramInfo &operator=(const ProgramInfo &other);
     virtual void clone(const ProgramInfo &other,
                        bool ignore_non_serialized_data = false);
+    void ensureSortFields(void);
 
     virtual void clear(void);
 
@@ -342,7 +353,9 @@ class MPUBLIC ProgramInfo
     bool IsFileReadable(void) const;
 
     QString GetTitle(void)        const { return title; }
+    QString GetSortTitle(void)    const { return sortTitle; }
     QString GetSubtitle(void)     const { return subtitle; }
+    QString GetSortSubtitle(void) const { return sortSubtitle; }
     QString GetDescription(void)  const { return description; }
     uint    GetSeason(void)       const { return season; }
     uint    GetEpisode(void)      const { return episode; }
@@ -488,7 +501,8 @@ class MPUBLIC ProgramInfo
                      QString grp = "\"") const;
 
     // Quick sets
-    void SetTitle(const QString &t) { title = t; title.detach(); }
+    void SetTitle(const QString &t, const QString &st = nullptr);
+    void SetSubtitle(const QString &st, const QString &sst = nullptr);
     void SetProgramInfoType(ProgramInfoType t)
         { programflags &= ~FL_TYPEMASK; programflags |= ((uint32_t)t<<20); }
     void SetPathname(const QString&) const;
@@ -721,7 +735,9 @@ class MPUBLIC ProgramInfo
 
   protected:
     QString title;
+    QString sortTitle;
     QString subtitle;
+    QString sortSubtitle;
     QString description;
     uint    season;
     uint    episode;
@@ -795,7 +811,6 @@ class MPUBLIC ProgramInfo
         { return (AvailableStatusType) availableStatus; }
     int8_t spread;   // only used in guidegrid.cpp
     int8_t startCol; // only used in guidegrid.cpp
-    QString sortTitle; // only use for sorting in frontend
 
     static const QString kFromRecordedQuery;
 

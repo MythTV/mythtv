@@ -32,7 +32,9 @@ static const uint kUnknownProgramLength = 30;
 
 RecordingInfo::RecordingInfo(
     const QString &_title,
+    const QString &_sortTitle,
     const QString &_subtitle,
+    const QString &_sortSubtitle,
     const QString &_description,
     uint _season,
     uint _episode,
@@ -96,7 +98,8 @@ RecordingInfo::RecordingInfo(
     uint _sgroupid,
     const QString &_inputname) :
     ProgramInfo(
-        _title, _subtitle, _description, _season, _episode, _totalepisodes,
+        _title, _sortTitle, _subtitle, _sortSubtitle,
+        _description, _season, _episode, _totalepisodes,
         _category, _chanid, _chanstr, _chansign, _channame,
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
@@ -163,7 +166,9 @@ RecordingInfo::RecordingInfo(
 
 RecordingInfo::RecordingInfo(
     const QString &_title,
+    const QString &_sortTitle,
     const QString &_subtitle,
+    const QString &_sortSubtitle,
     const QString &_description,
     uint _season,
     uint _episode,
@@ -199,7 +204,8 @@ RecordingInfo::RecordingInfo(
 
     bool _commfree) :
     ProgramInfo(
-        _title, _subtitle, _description, _season, _episode, 0,
+        _title, _sortTitle, _subtitle, _sortSubtitle,
+        _description, _season, _episode, 0,
         _category, _chanid, _chanstr, _chansign, _channame,
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,

@@ -2,6 +2,7 @@
 
 #include "mythdb.h"
 #include "videometadatalistmanager.h"
+#include "mythsorthelper.h"
 
 class VideoMetadataListManagerImp
 {
@@ -120,6 +121,10 @@ VideoMetadataListManager::loadOneFromDatabase(uint id)
     return VideoMetadataPtr(new VideoMetadata());
 }
 
+/// Load videometadata database into memory
+///
+/// Query consumed in VideoMetadataImp::fromDBRow
+///
 void VideoMetadataListManager::loadAllFromDatabase(metadata_list &items,
                                                    const QString &sql)
 {
@@ -251,7 +256,16 @@ meta_dir_node::meta_dir_node(const QString &path, const QString &name,
 {
     if (!name.length())
         m_name = path;
+    ensureSortFields();
 }
+
+void meta_dir_node::ensureSortFields()
+{
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+
+    if (m_sortPath.isEmpty() and not m_path.isEmpty())
+        m_sortPath = sh->doPathname(m_path);
+ }
 
 void meta_dir_node::setName(const QString &name)
 {
@@ -288,9 +302,16 @@ const QString &meta_dir_node::getPath() const
     return m_path;
 }
 
-void meta_dir_node::setPath(const QString &path)
+const QString &meta_dir_node::getSortPath() const
+{
+    return m_sortPath;
+}
+
+void meta_dir_node::setPath(const QString &path, const QString &sortPath)
 {
     m_path = path;
+    m_sortPath = sortPath;
+    ensureSortFields();
 }
 
 void meta_dir_node::SetData(const QVariant &data)

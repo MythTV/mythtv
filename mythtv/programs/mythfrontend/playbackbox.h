@@ -337,7 +337,6 @@ class PlaybackBox : public ScheduleCommon
     QString extract_commflag_state(const ProgramInfo &pginfo);
 
 
-    QRegExp m_prefixes;   ///< prefixes to be ignored when sorting
     QRegExp m_titleChaff; ///< stuff to remove for search rules
 
     MythUIButtonList *m_recgroupList;

@@ -38,6 +38,7 @@ class MTV_PUBLIC RecordingRule
     RecordingRule();
    ~RecordingRule() = default;
 
+    void ensureSortFields(void);
     bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);
     bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
@@ -73,7 +74,9 @@ class MTV_PUBLIC RecordingRule
 
     // Recording metadata
     QString m_title;
+    QString m_sortTitle;
     QString m_subtitle;
+    QString m_sortSubtitle;
     QString m_description;
     uint m_season;
     uint m_episode;

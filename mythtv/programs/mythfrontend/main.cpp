@@ -1275,9 +1275,9 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     }
 
     ProgramInfo *pginfo = new ProgramInfo(
-        mrl, plot, title, subtitle, director, season, episode,
-        inetref, lenMins, (year.toUInt()) ? year.toUInt() : 1900,
-        id);
+        mrl, plot, title, QString(), subtitle, QString(),
+        director, season, episode, inetref, lenMins,
+        (year.toUInt()) ? year.toUInt() : 1900, id);
 
     pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
 

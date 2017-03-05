@@ -4479,7 +4479,7 @@ void Scheduler::AddNewRecords(void)
         "    oldrecstatus.future, capturecard.schedorder, " //46-47
         "    p.syndicatedepisodenumber, p.partnumber, p.parttotal, " //48-50
         "    c.mplexid, capturecard.displayname, ") +      //51-52
-        pwrpri + QString(
+        pwrpri + QString(                                  //53
         "FROM recordmatch "
         "INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
         "INNER JOIN program AS p "
@@ -4549,7 +4549,9 @@ void Scheduler::AddNewRecords(void)
 
         RecordingInfo *p = new RecordingInfo(
             title,
+            QString(),//sorttitle
             result.value(5).toString(),//subtitle
+            QString(),//sortsubtitle
             result.value(6).toString(),//description
             0, // season
             0, // episode
@@ -4815,7 +4817,9 @@ void Scheduler::AddNotListed(void) {
 
         RecordingInfo *p = new RecordingInfo(
             result.value(0).toString(), // Title
+            QString(), // Title Sort
             (sor) ? result.value(1).toString() : QString(), // Subtitle
+            QString(), // Subtitle Sort
             (sor) ? result.value(2).toString() : QString(), // Description
             result.value(3).toUInt(), // Season
             result.value(4).toUInt(), // Episode
@@ -4944,7 +4948,8 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
             endts = startts;
 
         proglist.push_back(new RecordingInfo(
-            result.value(0).toString(),  result.value(1).toString(),
+            result.value(0).toString(),  QString(),
+            result.value(1).toString(),  QString(),
             result.value(2).toString(),  result.value(3).toUInt(),
             result.value(4).toUInt(),    result.value(5).toString(),
 

@@ -12,6 +12,7 @@
 #include "playgroup.h" // For GetInitialName()
 #include "recordingprofile.h" // For constants
 #include "mythdate.h"
+#include "mythsorthelper.h"
 
 static inline QString null_to_empty(const QString &str)
 {
@@ -77,6 +78,21 @@ RecordingRule::RecordingRule()
     QDateTime dt = MythDate::current();
     m_enddate = m_startdate = dt.date();
     m_endtime = m_starttime = dt.time();
+
+    ensureSortFields();
+}
+
+/**
+ *  \brief Ensure that the sortTitle and sortSubtitle fields are set.
+ */
+void RecordingRule::ensureSortFields(void)
+{
+    std::shared_ptr<MythSortHelper>sh = getMythSortHelper();
+
+    if (m_sortTitle.isEmpty() and not m_title.isEmpty())
+        m_sortTitle = sh->doTitle(m_title);
+    if (m_sortSubtitle.isEmpty() and not m_subtitle.isEmpty())
+        m_sortSubtitle = sh->doTitle(m_subtitle);
 }
 
 /** Load a single rule from the recorded table.  Which rule is
@@ -195,6 +211,7 @@ bool RecordingRule::Load(bool asTemplate)
     if (!asTemplate)
         m_loaded = true;
 
+    ensureSortFields();
     return true;
 }
 
@@ -222,6 +239,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
             m_playGroup = PlayGroup::GetInitialName(proginfo);
     }
 
+    ensureSortFields();
     m_loaded = true;
     return true;
 }
@@ -282,7 +300,8 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
 
         QString ltitle = QString("%1 (%2)").arg(textname).arg(searchType);
         m_title = ltitle;
-        m_subtitle = joininfo;
+        m_sortTitle = nullptr;
+        m_subtitle = m_sortSubtitle = joininfo;
         m_description = forwhat;
 
         if (pginfo)
@@ -296,6 +315,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
         }
     }
 
+    ensureSortFields();
     m_loaded = true;
     return true;
 }
@@ -344,11 +364,13 @@ bool RecordingRule::MakeTemplate(QString category)
     {
         category = "Default";
         m_title = tr("Default (Template)");
+        m_sortTitle = m_title;
     }
     else
     {
         //: %1 is the category
         m_title = tr("%1 (Template)").arg(category);
+        m_sortTitle = m_title;
     }
 
     LoadTemplate(category);
@@ -374,9 +396,11 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
     QString ltitle = QString("%1 (%2)").arg(textname)
                                        .arg(tr("Power Search"));
     m_title = ltitle;
-    m_subtitle = joininfo;
+    m_sortTitle = nullptr;
+    m_subtitle = m_sortSubtitle = joininfo;
     m_description = forwhat;
 
+    ensureSortFields();
     m_loaded = true;
     return true;
 }
@@ -564,10 +588,17 @@ bool RecordingRule::Delete(bool sendSig)
 void RecordingRule::ToMap(InfoMap &infoMap) const
 {
     if (m_title == "Default (Template)")
+    {
         infoMap["title"] = tr("Default (Template)");
+        infoMap["sorttitle"] = tr("Default (Template)");
+    }
     else
+    {
         infoMap["title"] = m_title;
+        infoMap["sorttitle"] = m_sortTitle;
+    }
     infoMap["subtitle"] = m_subtitle;
+    infoMap["sortsubtitle"] = m_sortSubtitle;
     infoMap["description"] = m_description;
     infoMap["season"] = QString::number(m_season);
     infoMap["episode"] = QString::number(m_episode);
@@ -746,7 +777,9 @@ void RecordingRule::AssignProgramInfo()
         return;
 
     m_title       = m_progInfo->GetTitle();
+    m_sortTitle   = m_progInfo->GetSortTitle();
     m_subtitle    = m_progInfo->GetSubtitle();
+    m_sortSubtitle= m_progInfo->GetSortSubtitle();
     m_description = m_progInfo->GetDescription();
     m_channelid   = m_progInfo->GetChanID();
     m_station     = m_progInfo->GetChannelSchedulingID();
@@ -785,6 +818,7 @@ void RecordingRule::AssignProgramInfo()
         m_season  = m_progInfo->GetSeason();
         m_episode = m_progInfo->GetEpisode();
     }
+    ensureSortFields();
 }
 
 unsigned RecordingRule::GetDefaultFilter(void)

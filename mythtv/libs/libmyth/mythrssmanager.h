@@ -37,6 +37,7 @@ class MPUBLIC RSSSite : public QObject
     };
 
     RSSSite(const QString& title,
+                  const QString& sortTitle,
                   const QString& image,
                   const ArticleType& type,
                   const QString& description,
@@ -50,6 +51,7 @@ class MPUBLIC RSSSite : public QObject
     typedef QList<RSSSite *> rssList;
 
     const QString& GetTitle() const { return m_title; }
+    const QString& GetSortTitle() const { return m_sortTitle; }
     const QString& GetImage() const { return m_image; }
     const ArticleType& GetType() const { return m_type; }
     const QString& GetDescription() const { return m_description; }
@@ -75,6 +77,7 @@ class MPUBLIC RSSSite : public QObject
                      const QUrl& oldRedirectUrl) const;
 
     QString     m_title;
+    QString     m_sortTitle;
     QString     m_image;
     ArticleType m_type;
     QString     m_description;

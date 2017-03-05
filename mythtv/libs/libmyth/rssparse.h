@@ -114,7 +114,8 @@ class MPUBLIC ResultItem
     typedef QList<ResultItem *> resultList;
     typedef std::vector<ResultItem> List;
 
-    ResultItem(const QString& title, const QString& subtitle,
+    ResultItem(const QString& title, const QString& sortTitle,
+              const QString& subtitle, const QString& sortSubtitle,
               const QString& desc, const QString& URL,
               const QString& thumbnail, const QString& mediaURL,
               const QString& author, const QDateTime& date, const QString& time,
@@ -127,10 +128,13 @@ class MPUBLIC ResultItem
     ResultItem();
     ~ResultItem() = default;
 
+    void ensureSortFields(void);
     void toMap(InfoMap &infoMap);
 
     const QString& GetTitle() const { return m_title; }
+    const QString& GetSortTitle() const { return m_sorttitle; }
     const QString& GetSubtitle() const { return m_subtitle; }
+    const QString& GetSortSubtitle() const { return m_sortsubtitle; }
     const QString& GetDescription() const { return m_desc; }
     const QString& GetURL() const { return m_URL; }
     const QString& GetThumbnail() const { return m_thumbnail; }
@@ -155,7 +159,9 @@ class MPUBLIC ResultItem
 
   private:
     QString      m_title;
+    QString      m_sorttitle;
     QString      m_subtitle;
+    QString      m_sortsubtitle;
     QString      m_desc;
     QString      m_URL;
     QString      m_thumbnail;

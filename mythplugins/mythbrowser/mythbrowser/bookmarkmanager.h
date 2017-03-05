@@ -18,6 +18,7 @@ class Bookmark
 
     QString category;
     QString name;
+    QString sortName;
     QString url;
     bool    isHomepage;
     bool    selected;
@@ -26,6 +27,8 @@ class Bookmark
     {
         return category == b.category && name == b.name && url == b.url;
     }
+    static inline bool sortByName(Bookmark *a, Bookmark *b)
+        { return a->sortName < b->sortName; }
 };
 
 class BrowserConfig : public MythScreenType
