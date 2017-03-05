@@ -2671,7 +2671,7 @@ void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan)
     tvchain->SetInputType(genOpt.inputtype);
 
     ispip = pip;
-    LiveTVStartChannel = startchan;
+    LiveTVStartChannel = GetStartChannel(inputid);
 
     // Change to WatchingLiveTV
     ChangeState(kState_WatchingLiveTV);
