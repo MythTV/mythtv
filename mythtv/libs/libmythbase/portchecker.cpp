@@ -63,6 +63,9 @@ PortChecker::~PortChecker()
  * interfaces are checked, make sure enough time is allowed, up to 3
  * seconds for each interface checked.
  *
+ * For Windows build, link local address is not checked as windows
+ * does not require the scope id.
+ *
  * This routine does call event processor, so the GUI can be responsive
  * on the same thread.
  *
@@ -72,7 +75,8 @@ PortChecker::~PortChecker()
  * \param timeLimit limit in milliseconds for testing.
  * \param linkLocalOnly Only obtain Link-local address scope.
  * \return true if the port could be contacted. In the case
- * of linkLocalOnly, return true unless it was link local and unresolved.
+ * of linkLocalOnly, return true if it was link local and
+ * was changed, false in other cases.
 */
 bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLocalOnly)
 {
@@ -82,10 +86,14 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
     QHostAddress addr;
     bool isIPAddress = addr.setAddress(host);
     bool islinkLocal = false;
+// Windows does not need the scope on the ip address so we can skip
+// some processing
+#ifndef _WIN32
     if (isIPAddress
       && addr.protocol() == QAbstractSocket::IPv6Protocol
       && addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")))
         islinkLocal = true;
+#endif
     if (linkLocalOnly)
     {
         if (islinkLocal)
@@ -98,7 +106,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
             }
         }
         else
-            return true;
+            return false;
     }
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
     QListIterator<QNetworkInterface> iCard = cards;
@@ -113,6 +121,9 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
     {
         if (state == QAbstractSocket::UnconnectedState)
         {
+// Windows does not need the scope on the ip address so we can skip
+// some processing
+#ifndef _WIN32
             int iCardsEnd = 0;
             if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
             {
@@ -164,6 +175,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
                   .arg(host));
                 break;
             }
+#endif
             QString dest;
             if (isIPAddress)
                 dest=addr.toString();
@@ -203,19 +215,24 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
 }
 
 /**
- * Convenience method to perform one check.
+ * Convenience method to resolve link-local address.
  *
- * Creates an object, calls checkPort and returns the response.
- * You cannot use the cancelPortCheck signal in this case
- * because you do not have access to the object.
+ * Update a host id to include the correct scope if it
+ * is link-local. If this is called with anything that
+ * is not a link-local address, it remains unchanged.
  *
- * See checkPort() for more details.
+ * \param host [in,out] Host id or ip address (IPV4 or IPV6).
+ * This is updated with scope if the address is link-local IPV6.
+ * \param port Port number to check.
+ * \param timeLimit limit in milliseconds for testing.
+ * \return true if it was link local and was resolved,
+ * false in other cases.
 */
 // static method
-bool PortChecker::check(QString &host, int port, int timeLimit, bool linkLocalOnly)
+bool PortChecker::resolveLinkLocal(QString &host, int port, int timeLimit)
 {
     PortChecker checker;
-    return checker.checkPort(host,port,timeLimit,linkLocalOnly);
+    return checker.checkPort(host,port,timeLimit,true);
 }
 
 void PortChecker::processEvents(void)

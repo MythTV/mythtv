@@ -665,10 +665,8 @@ void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
     if (!usingLoopback)
     {
         QString host = addr.toString();
-        QString updatedHost(host);
-        ok = PortChecker::check(updatedHost, port, 30000, true);
-        if (ok && updatedHost != host)
-            addr.setAddress(updatedHost);
+        if (PortChecker::resolveLinkLocal(host, port))
+            addr.setAddress(host);
     }
 
     if (ok)
