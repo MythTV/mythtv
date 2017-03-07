@@ -695,7 +695,21 @@ bool XMLTVParser::parseFile(
             {
                 ProgInfo *pginfo = parseProgram(e);
 
-                if (pginfo->startts == pginfo->endts)
+                if (!(pginfo->starttime.isValid()))
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
+                                                        "invalid start time, "
+                                                        "skipping")
+                                                        .arg(pginfo->title));
+                }
+                else if (pginfo->channel.isEmpty())
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
+                                                        "missing channel, "
+                                                        "skipping")
+                                                        .arg(pginfo->title));
+                }
+                else if (pginfo->startts == pginfo->endts)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), "
                                                         "identical start and end "
