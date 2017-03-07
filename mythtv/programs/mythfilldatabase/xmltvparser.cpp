@@ -131,81 +131,106 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
         return;
     }
 
-    QStringList split = timestr.split(" ");
+    QStringList split = timestr.split(" ", QString::SkipEmptyParts);
     QString ts = split[0];
-    QDateTime tmpDT;
-    tmpDT.setTimeSpec(Qt::LocalTime);
+    QDate tmpDate;
+    QTime tmpTime;
+    QString tzoffset;
 
-    // UTC/GMT, just strip
-    if (ts.endsWith('Z'))
-        ts.truncate(ts.length()-1);
-
-    if (ts.length() == 14)
-    {
-        tmpDT = QDateTime::fromString(ts, "yyyyMMddHHmmss");
-    }
-    else if (ts.length() == 12)
-    {
-        tmpDT = QDateTime::fromString(ts, "yyyyMMddHHmm");
-    }
-    else if (ts.length() == 8)
-    {
-        tmpDT = QDateTime::fromString(ts, "yyyyMMdd");
-    }
-    else if (ts.length() == 6)
-    {
-        tmpDT = QDateTime::fromString(ts, "yyyyMM");
-    }
-    else if (ts.length() == 4)
-    {
-        tmpDT = QDateTime::fromString(ts, "yyyy");
-    }
-
-    if (!tmpDT.isValid())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Ignoring unknown timestamp format: %1")
-                .arg(ts));
-        return;
-    }
-
+    // Process the TZ offset (if any)
     if (split.size() > 1)
     {
-        QString tmp = split[1].trimmed();
-
+        tzoffset = split[1];
         // These shouldn't be required and they aren't ISO 8601 but the
         // xmltv spec mentions these and just these so handle them just in
         // case
-        if (tmp == "GMT" || tmp == "UTC")
-            tmp = "+0000";
-        else if (tmp == "BST")
-            tmp = "+0100";
-
-        // While this seems like a hack, it's better than what was done before
-        QString isoDateString = QString("%1 %2").arg(tmpDT.toString(Qt::ISODate))
-                                                .arg(tmp);
-        // Work around Qt bug where zero offset dates are flagged as LocalTime
-        tmpDT = QDateTime::fromString(isoDateString, Qt::ISODate);
-        if (tmpDT.timeSpec() == Qt::LocalTime)
-            tmpDT.setTimeSpec(Qt::UTC);
-        dt = tmpDT.toUTC();
+        if (tzoffset == "GMT" || tzoffset == "UTC")
+            tzoffset = "+0000";
+        else if (tzoffset == "BST")
+            tzoffset = "+0100";
     }
+    else
+    {
+        // We will accept a datetime with a trailing Z as being explicit
+        if (ts.endsWith('Z'))
+        {
+            tzoffset = "+0000";
+            ts.truncate(ts.length()-1);
+        }
+        else
+        {
+            tzoffset = "+0000";
+            static bool warned_once_on_implicit_utc = false;
+            if (!warned_once_on_implicit_utc)
+            {
+                LOG(VB_XMLTV, LOG_WARNING, "No explicit time zone found, "
+                    "guessing implicit UTC! Please consider enhancing "
+                    "the guide source to provide explicit UTC or local "
+                    "time instead.");
+                warned_once_on_implicit_utc = true;
+            }
+        }
+    }
+
+    // Process the date part
+    QString tsDate = ts.left(8);
+    if (tsDate.length() == 8)
+        tmpDate = QDate::fromString(tsDate, "yyyyMMdd");
+    else if (tsDate.length() == 6)
+        tmpDate = QDate::fromString(tsDate, "yyyyMM");
+    else if (tsDate.length() == 4)
+        tmpDate = QDate::fromString(tsDate, "yyyy");
+    if (!tmpDate.isValid())
+    {
+        LOG(VB_XMLTV, LOG_ERR,
+            QString("Invalid datetime (date) in XMLTV data, ignoring: %1")
+                .arg(timestr));
+        return;
+    }
+
+    // Process the time part (if any)
+    if (ts.length() > 8)
+    {
+        QString tsTime = ts.mid(8);
+        if (tsTime.length() == 6)
+            tmpTime = QTime::fromString(tsTime, "HHmmss");
+        else if (tsTime.length() == 4)
+            tmpTime = QTime::fromString(tsTime, "HHmm");
+        else if (tsTime.length() == 2)
+            tmpTime = QTime::fromString(tsTime, "HH");
+        if (!tmpTime.isValid())
+        {
+            // Time part exists, but is (somehow) invalid
+            LOG(VB_XMLTV, LOG_ERR,
+                QString("Invalid datetime (time) in XMLTV data, ignoring: %1")
+                    .arg(timestr));
+            return;
+        }
+    }
+
+    QDateTime tmpDT = QDateTime(tmpDate, tmpTime, Qt::UTC);
+    if (!tmpDT.isValid())
+        {
+            LOG(VB_XMLTV, LOG_ERR,
+                QString("Invalid datetime (combination of date/time) "
+                    "in XMLTV data, ignoring: %1").arg(timestr));
+            return;
+        }
+
+    // While this seems like a hack, it's better than what was done before
+    QString isoDateString = tmpDT.toString(Qt::ISODate);
+    if (isoDateString.endsWith('Z'))    // Should always be Z, but ...
+        isoDateString.truncate(isoDateString.length()-1);
+    isoDateString += tzoffset;
+    dt = QDateTime::fromString(isoDateString, Qt::ISODate).toUTC();
 
     if (!dt.isValid())
     {
-        static bool warned_once_on_implicit_utc = false;
-        if (!warned_once_on_implicit_utc)
-        {
-            LOG(VB_XMLTV, LOG_ERR, "No explicit time zone found, "
-                "guessing implicit UTC! Please consider enhancing "
-                "the guide source to provice explicit UTC or local "
-                "time instead.");
-            warned_once_on_implicit_utc = true;
-        }
-        dt = tmpDT;
+        LOG(VB_XMLTV, LOG_ERR,
+            QString("Invalid datetime (zone offset) in XMLTV data, "
+                "ignoring: %1").arg(timestr));
+        return;
     }
-
-    dt.setTimeSpec(Qt::UTC);
 
     timestr = MythDate::toString(dt, MythDate::kFilename);
 }
