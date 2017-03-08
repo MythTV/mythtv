@@ -349,6 +349,33 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+void FillGenreList(DTC::GenreList* pGenreList, int videoID)
+{
+    if (!pGenreList)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT genre from videogenre "
+                  "LEFT JOIN videometadatagenre ON videometadatagenre.idgenre = videogenre.intid "
+                  "WHERE idvideo = :ID;"
+                  "ORDER BY genre;");
+    query.bindValue(":ID",    videoID);
+
+    if (query.exec() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            DTC::Genre *pGenre = pGenreList->AddNewGenre();
+            QString genre = query.value(0).toString();
+            pGenre->setName(genre);
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void FillVideoMetadataInfo (
                       DTC::VideoMetadataInfo *pVideoMetadataInfo,
                       VideoMetadataListManager::VideoMetadataPtr pMetadata,
@@ -436,6 +463,8 @@ void FillVideoMetadataInfo (
                               .arg(pMetadata->GetScreenshot()));
         }
     }
+
+    FillGenreList(pVideoMetadataInfo->Genres(), pVideoMetadataInfo->Id());
 }
 
 /////////////////////////////////////////////////////////////////////////////

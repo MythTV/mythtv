@@ -34,6 +34,7 @@
 #include "datacontracts/input.h"
 #include "datacontracts/castMemberList.h"
 #include "datacontracts/cutList.h"
+#include "datacontracts/genreList.h"
 
 #include "programinfo.h"
 #include "recordingrule.h"
@@ -65,6 +66,8 @@ void FillRecRuleInfo( DTC::RecRule  *pRecRule,
 void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
                           const QString        &sInetref,
                           uint                  nSeason );
+
+void FillGenreList( DTC::GenreList *pGenreList, int videoID);
 
 void FillVideoMetadataInfo (
                       DTC::VideoMetadataInfo *pVideoMetadataInfo,

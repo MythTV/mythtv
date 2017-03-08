@@ -29,7 +29,7 @@ class SERVICE_PUBLIC ArtworkInfoList : public QObject
 
     // Q_CLASSINFO Used to augment Metadata for properties. 
     // See datacontracthelper.h for details
-    
+
     Q_CLASSINFO( "ArtworkInfos", "type=DTC::ArtworkInfo");
 
     Q_PROPERTY( QVariantList ArtworkInfos     READ ArtworkInfos DESIGNABLE true )
