@@ -1135,8 +1135,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         QString cchan, cchan_tr;
         uint cchan_cnt = GetCurrentTransportInfo(cchan, cchan_tr);
         m_channelsFound += cchan_cnt;
-        QString chan_tr = QObject::tr("%1 -- Network Discovery Complete").arg(cchan_tr);
-        QString chan    = QString(    "%1 -- Network Discovery Complete").arg(cchan);
+        QString chan_tr = QObject::tr("Finished with channel - %1").arg(cchan_tr);
+        QString chan    = QString("Finished with channel - %1").arg(cchan);
         QString msg_tr  = "";
         QString msg     = "";
 
@@ -1176,8 +1176,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         if ((m_timer.elapsed() > (int)m_channelTimeout))
         {
             msg_tr = (cchan_cnt) ?
-                QObject::tr("%1 possible channels").arg(cchan_cnt) :
-                QObject::tr("no channels");
+                QObject::tr("%1 possible channels (timed out waiting for optional tables)").arg(cchan_cnt) :
+                QObject::tr("no channels (timed out waiting for optional tables)");
             msg_tr = QString("%1, %2").arg(chan_tr).arg(msg_tr);
             msg = (cchan_cnt) ?
                 QString("%1 possible channels").arg(cchan_cnt) :
