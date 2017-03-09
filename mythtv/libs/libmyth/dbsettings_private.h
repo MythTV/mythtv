@@ -13,7 +13,7 @@ class MythDbSettings1: public VerticalConfigurationGroup {
     Q_OBJECT
 
 public:
-    MythDbSettings1(const QString &DBhostOverride = QString::null);
+    explicit MythDbSettings1(const QString &DBhostOverride = QString::null);
 
     void Load(void);
     void Save(void);

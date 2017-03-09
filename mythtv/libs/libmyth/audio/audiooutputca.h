@@ -13,7 +13,7 @@ class CoreAudioData;
 class AudioOutputCA : public AudioOutputBase
 {
 public:
-    AudioOutputCA(const AudioSettings &settings);
+    explicit AudioOutputCA(const AudioSettings &settings);
     virtual ~AudioOutputCA();
     
     AudioOutputSettings* GetOutputSettings(bool digital);

@@ -27,7 +27,7 @@
 class AudioOutputPulseAudio : public AudioOutputBase
 {
   public:
-    AudioOutputPulseAudio(const AudioSettings &settings);
+    explicit AudioOutputPulseAudio(const AudioSettings &settings);
    ~AudioOutputPulseAudio();
 
     int GetVolumeChannel(int channel) const;

@@ -18,7 +18,7 @@ class AudioOutputJACK : public AudioOutputBase
     Q_DECLARE_TR_FUNCTIONS(AudioOutputJACK)
 
   public:
-    AudioOutputJACK(const AudioSettings &settings);
+    explicit AudioOutputJACK(const AudioSettings &settings);
     virtual ~AudioOutputJACK();
 
     // Volume control
