@@ -340,10 +340,10 @@ int main(int argc, char **argv)
                             perror("recv");
                         }
 
-                        close(i);
-
                         // remove from master set
                         FD_CLR(i, &master);
+
+                        close(i);
 
                         // remove from server list
                         ZMServer *server = serverList[i];
