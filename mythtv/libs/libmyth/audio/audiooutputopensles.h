@@ -18,7 +18,7 @@ class AudioOutputOpenSLES : public AudioOutputBase
 {
   friend class AudioOutputOpenSLESPrivate;
   public:
-    AudioOutputOpenSLES(const AudioSettings &settings);
+    explicit AudioOutputOpenSLES(const AudioSettings &settings);
     virtual ~AudioOutputOpenSLES();
 
     // Volume control
