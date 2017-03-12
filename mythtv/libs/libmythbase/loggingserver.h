@@ -88,7 +88,7 @@ class SyslogLogger : public LoggerBase
 
   public:
     SyslogLogger();
-    SyslogLogger(bool open);
+    explicit SyslogLogger(bool open);
     ~SyslogLogger();
     bool logmsg(LoggingItem *item);
     /// \brief Unused for this logger.
