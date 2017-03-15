@@ -159,6 +159,8 @@ bool ThumbFinder::Create(void)
 
     connect(m_frameButton, SIGNAL(Clicked()), this, SLOT(updateThumb()));
 
+    m_seekAmountText->SetText(SeekAmounts[m_currentSeek].name);
+
     BuildFocusList();
 
     SetFocusWidget(m_imageGrid);
