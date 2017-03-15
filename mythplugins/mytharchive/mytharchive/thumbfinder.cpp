@@ -276,6 +276,12 @@ void ThumbFinder::loadCutList()
         delete progInfo;
     }
 
+    if (m_deleteMap.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ThumbFinder::loadCutList: Got an empty delete map");
+        return;
+    }
+
     // if the first mark is a end mark then add the start mark at the beginning
     frm_dir_map_t::const_iterator it = m_deleteMap.begin();
     if (it.value() == MARK_CUT_END)
