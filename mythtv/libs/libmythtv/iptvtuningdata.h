@@ -97,7 +97,7 @@ class MTV_PUBLIC IPTVTuningData
         const QUrl u = GetDataURL();
         if (IsHLS())
             return QString("%1(%2)").arg(u.toString()).arg(GetBitrate(0));
-        if (IsHTTPTS())
+        if (IsHTTPTS() || IsRTSP())
             return QString("%1").arg(u.toString());
         return QString("%1:%2:%3")
             .arg(u.host()).arg(u.userInfo()).arg(u.port()).toLower();
