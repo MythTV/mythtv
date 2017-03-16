@@ -45,7 +45,7 @@ class SERVICE_PUBLIC Service : public QObject
 
     public:
 
-        inline Service( QObject *parent = NULL );
+        explicit inline Service( QObject *parent = NULL );
 
     public:
 
