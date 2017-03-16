@@ -246,7 +246,7 @@ class ScanBandwidth: public ComboBoxSetting, public TransientStorage
 class ScanFecSetting: public ComboBoxSetting
 {
   public:
-    ScanFecSetting(Storage *_storage) : ComboBoxSetting(_storage)
+    explicit ScanFecSetting(Storage *_storage) : ComboBoxSetting(_storage)
     {
         addSelection(QObject::tr("Auto"),"auto",true);
         addSelection(QObject::tr("None"),"none");
@@ -378,7 +378,7 @@ class ScanRollOff: public ComboBoxSetting, public TransientStorage
 class PaneError : public HorizontalConfigurationGroup
 {
   public:
-    PaneError(const QString &error) :
+    explicit PaneError(const QString &error) :
         HorizontalConfigurationGroup(false, false, true, false)
     {
         TransLabelSetting* label = new TransLabelSetting();

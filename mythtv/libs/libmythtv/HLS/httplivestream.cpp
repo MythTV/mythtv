@@ -63,7 +63,7 @@ class HTTPLiveStreamThread : public QRunnable
      *  \param eventName Optional System Event name for this command
      */
 
-    HTTPLiveStreamThread(int streamid)
+    explicit HTTPLiveStreamThread(int streamid)
       : m_streamID(streamid) {}
 
     /** \fn HTTPLiveStreamThread::run()

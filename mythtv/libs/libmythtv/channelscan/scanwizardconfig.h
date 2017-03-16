@@ -111,7 +111,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     Q_OBJECT
 
   public:
-    ScanOptionalConfig(ScanTypeSetting *_scan_type);
+    explicit ScanOptionalConfig(ScanTypeSetting *_scan_type);
 
     QString GetFrequencyStandard(void)       const;
     QString GetModulation(void)              const;

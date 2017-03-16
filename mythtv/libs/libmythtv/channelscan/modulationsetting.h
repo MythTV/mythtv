@@ -66,7 +66,7 @@ class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
 class ScanModulationSetting: public ComboBoxSetting
 {
   public:
-    ScanModulationSetting(Storage *_storage) : ComboBoxSetting(_storage)
+    explicit ScanModulationSetting(Storage *_storage) : ComboBoxSetting(_storage)
     {
         addSelection(QCoreApplication::translate("(Common)",
                                                  "Auto",

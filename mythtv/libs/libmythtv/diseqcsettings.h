@@ -21,7 +21,7 @@ class SwitchConfig : public QObject, public ConfigurationWizard
     Q_OBJECT
 
   public:
-    SwitchConfig(DiSEqCDevSwitch &switch_dev);
+    explicit SwitchConfig(DiSEqCDevSwitch &switch_dev);
 
   public slots:
     void update(void);
@@ -37,7 +37,7 @@ class RotorPosMap : public ListBoxSetting, public Storage
     Q_OBJECT
 
   public:
-    RotorPosMap(DiSEqCDevRotor &rotor);
+    explicit RotorPosMap(DiSEqCDevRotor &rotor);
 
     virtual void Load(void);
     virtual void Save(void);
@@ -60,7 +60,7 @@ class RotorConfig : public QObject, public ConfigurationWizard
     Q_OBJECT
 
   public:
-    RotorConfig(DiSEqCDevRotor &rotor);
+    explicit RotorConfig(DiSEqCDevRotor &rotor);
 
   public slots:
     void SetType(const QString &type);
@@ -76,7 +76,7 @@ class SCRConfig : public QObject, public ConfigurationWizard
     Q_OBJECT
 
   public:
-    SCRConfig(DiSEqCDevSCR &scr);
+    explicit SCRConfig(DiSEqCDevSCR &scr);
 
   private:
     DiSEqCDevSCR &m_scr;
@@ -93,7 +93,7 @@ class LNBConfig : public QObject, public ConfigurationWizard
     Q_OBJECT
 
   public:
-    LNBConfig(DiSEqCDevLNB &lnb);
+    explicit LNBConfig(DiSEqCDevLNB &lnb);
 
   public slots:
     void SetPreset(const QString &value);
@@ -112,7 +112,7 @@ class DeviceTree : public ListBoxSetting, public Storage
     Q_OBJECT
 
   public:
-    DeviceTree(DiSEqCDevTree &tree);
+    explicit DeviceTree(DiSEqCDevTree &tree);
 
     virtual void Load(void);
     virtual void Save(void);
@@ -141,7 +141,7 @@ class DeviceTree : public ListBoxSetting, public Storage
 class DTVDeviceTreeWizard : public ConfigurationDialog
 {
   public:
-    DTVDeviceTreeWizard(DiSEqCDevTree &tree);
+    explicit DTVDeviceTreeWizard(DiSEqCDevTree &tree);
 
     virtual DialogCode exec(void);
     virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)

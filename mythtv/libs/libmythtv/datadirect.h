@@ -266,7 +266,7 @@ class DDStructureParser: public QXmlDefaultHandler
 {
 
 public:
-    DDStructureParser(DataDirectProcessor& _ddparent) :
+    explicit DDStructureParser(DataDirectProcessor& _ddparent) :
             parent(_ddparent) {}
 
     bool startElement(const QString &pnamespaceuri, const QString &plocalname,
