@@ -437,8 +437,8 @@ bool MythRenderD3D9::Test(bool &reset)
                 case D3DERR_DEVICENOTRESET:
                     LOG(VB_GENERAL, LOG_NOTICE, D3DLOC +
                         "The device was lost and needs to be reset.");
-                    result  = false;
-                    reset  |= true;
+                    result = false;
+                    reset  = true;
                     break;
 
                 case D3DERR_DEVICELOST:
