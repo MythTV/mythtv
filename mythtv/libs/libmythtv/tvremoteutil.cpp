@@ -412,7 +412,7 @@ bool RemoteGetRecordingStatus(
 
         if (kState_RecordingOnly == state || kState_WatchingRecording == state)
         {
-            isRecording |= true;
+            isRecording = true;
 
             if (!tunerList)
                 break;
