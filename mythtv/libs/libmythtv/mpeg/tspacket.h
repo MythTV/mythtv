@@ -31,7 +31,7 @@ class MTV_PUBLIC TSHeader
           packets which initialize the rest of the data differently.
         */
     }
-    TSHeader(int cc)
+    explicit TSHeader(int cc)
     {
         _tsdata[0] = SYNC_BYTE;
         SetContinuityCounter(cc);

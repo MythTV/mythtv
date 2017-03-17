@@ -18,7 +18,7 @@ typedef QMap<int, const unsigned char*> IntToBuf;
 class MultipleStringStructure
 {
   public:
-    MultipleStringStructure(const unsigned char *data) : _data(data)
+    explicit MultipleStringStructure(const unsigned char *data) : _data(data)
     {
         Parse();
     }

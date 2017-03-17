@@ -33,7 +33,7 @@ class MTV_PUBLIC PESPacket
 
   public:
     // does not create it's own data
-    PESPacket(const unsigned char *pesdata)
+    explicit PESPacket(const unsigned char *pesdata)
         : _pesdata(const_cast<unsigned char*>(pesdata)),
           _fullbuffer(const_cast<unsigned char*>(pesdata)),
           _psiOffset(0), _ccLast(255), _allocSize(0)
