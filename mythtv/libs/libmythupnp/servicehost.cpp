@@ -51,6 +51,13 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
         lowerParams[it.key().toLower()] = *it;
     }
 
+    // --------------------------------------------------------------
+    // Provide actual parameters received to method
+    // --------------------------------------------------------------
+
+    pService->m_parsedParams = lowerParams.keys();
+
+
     QList<QByteArray> paramNames = m_oMethod.parameterNames();
     QList<QByteArray> paramTypes = m_oMethod.parameterTypes();
 

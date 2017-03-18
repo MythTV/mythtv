@@ -62,6 +62,9 @@ class SERVICE_PUBLIC Service : public QObject
 
         static bool ToBool( const QString &sVal );
 
+    public:
+
+        QList<QString> m_parsedParams; // lowercased
 };
 
 //////////////////////////////////////////////////////////////////////////////
