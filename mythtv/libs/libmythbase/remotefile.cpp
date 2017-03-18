@@ -112,11 +112,11 @@ RemoteFile::~RemoteFile()
     }
 }
 
-bool RemoteFile::isLocal(const QString &path)
+bool RemoteFile::isLocal(const QString &lpath)
 {
-    bool is_local = !path.isEmpty() &&
-        !path.startsWith("myth:") &&
-        (path.startsWith("/") || QFile::exists(path));
+    bool is_local = !lpath.isEmpty() &&
+        !lpath.startsWith("myth:") &&
+        (lpath.startsWith("/") || QFile::exists(lpath));
     return is_local;
 }
 
