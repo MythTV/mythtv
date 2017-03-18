@@ -357,7 +357,7 @@ void FillGenreList(DTC::GenreList* pGenreList, int videoID)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT genre from videogenre "
                   "LEFT JOIN videometadatagenre ON videometadatagenre.idgenre = videogenre.intid "
-                  "WHERE idvideo = :ID;"
+                  "WHERE idvideo = :ID "
                   "ORDER BY genre;");
     query.bindValue(":ID",    videoID);
 
