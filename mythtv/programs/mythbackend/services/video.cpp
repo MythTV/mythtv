@@ -452,3 +452,337 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
+
+bool Video::UpdateVideoMetadata ( int           nId,
+                                  const QString &sTitle,
+                                  const QString &sSubTitle,
+                                  const QString &sTagLine,
+                                  const QString &sDirector,
+                                  const QString &sStudio,
+                                  const QString &sPlot,
+                                  const QString &sRating,
+                                  const QString &sInetref,
+                                  int           nCollectionRef,
+                                  const QString &sHomePage,
+                                  int           nYear,
+                                  const QDate   &sReleasedate,
+                                  float         fUserRating,
+                                  int           nLength,
+                                  int           nPlayCount,
+                                  int           nSeason,
+                                  int           nEpisode,
+                                  int           nShowLevel,
+                                  const QString &sFileName,
+                                  const QString &sHash,
+                                  const QString &sCoverFile,
+                                  int           nChildID,
+                                  bool          bBrowse,
+                                  bool          bWatched,
+                                  bool          bProcessed,
+                                  const QString &sPlayCommand,
+                                  int           nCategory,
+                                  const QString &sTrailer,
+                                  const QString &sHost,
+                                  const QString &sScreenshot,
+                                  const QString &sBanner,
+                                  const QString &sFanart,
+                                  const QDate   &sInsertDate,
+                                  const QString &sContentType,
+                                  const QString &sGenres,
+                                  const QString &sCast,
+                                  const QString &sCountries)
+{
+    bool update_required = false;
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(nId);
+
+    if (!metadata)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Id=%1 not found")
+            .arg(nId));
+        return false;
+    }
+
+    if (m_parsedParams.contains("title"))
+    {
+        metadata->SetTitle(sTitle);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("subtitle"))
+    {
+        metadata->SetSubtitle(sSubTitle);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("tagline"))
+    {
+        metadata->SetTagline(sTagLine);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("director"))
+    {
+        metadata->SetDirector(sDirector);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("studio"))
+    {
+        metadata->SetStudio(sStudio);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("plot"))
+    {
+        metadata->SetPlot(sPlot);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("userrating"))
+    {
+        metadata->SetUserRating(fUserRating);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("inetref"))
+    {
+        metadata->SetInetRef(sInetref);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("collectionref"))
+    {
+        metadata->SetCollectionRef(nCollectionRef);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("homepage"))
+    {
+        metadata->SetHomepage(sHomePage);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("year"))
+    {
+        metadata->SetYear(nYear);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("releasedate"))
+    {
+        metadata->SetReleaseDate(sReleasedate);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("rating"))
+    {
+        metadata->SetRating(sRating);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("length"))
+    {
+        metadata->SetLength(nLength);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("playcount"))
+    {
+        metadata->SetPlayCount(nPlayCount);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("season"))
+    {
+        metadata->SetSeason(nSeason);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("episode"))
+    {
+        metadata->SetEpisode(nEpisode);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("showlevel"))
+    {
+        metadata->SetShowLevel(ParentalLevel::Level(nShowLevel));
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("filename"))
+    {
+        metadata->SetFilename(sFileName);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("hash"))
+    {
+        metadata->SetHash(sHash);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("coverfile"))
+    {
+        metadata->SetCoverFile(sCoverFile);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("childid"))
+    {
+        metadata->SetChildID(nChildID);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("browse"))
+    {
+        metadata->SetBrowse(bBrowse);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("watched"))
+    {
+        metadata->SetWatched(bWatched);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("processed"))
+    {
+        metadata->SetProcessed(bProcessed);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("playcommand"))
+    {
+        metadata->SetPlayCommand(sPlayCommand);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("category"))
+    {
+        metadata->SetCategoryID(nCategory);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("trailer"))
+    {
+        metadata->SetTrailer(sTrailer);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("host"))
+    {
+        metadata->SetHost(sHost);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("screenshot"))
+    {
+        metadata->SetScreenshot(sScreenshot);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("banner"))
+    {
+        metadata->SetBanner(sBanner);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("fanart"))
+    {
+        metadata->SetFanart(sFanart);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("insertdate"))
+    {
+        metadata->SetInsertdate(sInsertDate);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("contenttype"))
+    {
+        // valid values for ContentType are 'MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO'
+        VideoContentType contentType = kContentUnknown;
+        if (sContentType == "MOVIE")
+            contentType = kContentMovie;
+
+        if (sContentType == "TELEVISION")
+            contentType = kContentTelevision;
+
+        if (sContentType == "ADULT")
+            contentType = kContentAdult;
+
+        if (sContentType == "MUSICVIDEO")
+            contentType = kContentMusicVideo;
+
+        if (sContentType == "HOMEVIDEO")
+            contentType = kContentHomeMovie;
+
+        if (contentType != kContentUnknown)
+        {
+            metadata->SetContentType(contentType);
+            update_required = true;
+        }
+        else
+            LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Ignoring unknown ContentType: %1").arg(sContentType));
+    }
+
+    if (m_parsedParams.contains("genres"))
+    {
+        VideoMetadata::genre_list genres;
+        QStringList genresList = sGenres.split(',', QString::SkipEmptyParts);
+
+        for (int x = 0; x < genresList.size(); x++)
+        {
+            QString genre = genresList.at(x).simplified();
+            genres.push_back(VideoMetadata::genre_list::value_type(-1, genre));
+        }
+
+        metadata->SetGenres(genres);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("cast"))
+    {
+        VideoMetadata::cast_list cast;
+        QStringList castList = sCast.split(',', QString::SkipEmptyParts);
+
+        for (int x = 0; x < castList.size(); x++)
+        {
+            QString castName = castList.at(x).simplified();
+            cast.push_back(VideoMetadata::cast_list::value_type(-1, castName));
+        }
+
+        metadata->SetCast(cast);
+        update_required = true;
+    }
+
+    if (m_parsedParams.contains("countries"))
+    {
+        VideoMetadata::country_list countries;
+        QStringList countryList = sCountries.split(',', QString::SkipEmptyParts);
+
+        for (int x = 0; x < countryList.size(); x++)
+        {
+            QString country = countryList.at(x).simplified();
+            countries.push_back(VideoMetadata::country_list::value_type(-1, country));
+        }
+
+        metadata->SetCountries(countries);
+        update_required = true;
+    }
+
+    if (update_required == true)
+        metadata->UpdateDatabase();
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
