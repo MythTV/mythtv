@@ -372,6 +372,8 @@ EOF
                                       $self->{'db_user'},
                                       $self->{'db_pass'})
             or die "Cannot connect to database: $!\n\n";
+        $self->{'dbh'}->do("SET SESSION sql_mode = ''")
+            or die "Can't set sql_mode: $!\n\n";
         $self->{'dbh'}->do("SET time_zone = 'Etc/UTC'")
             or die "Can't set timezone: $!\n\n";
 
