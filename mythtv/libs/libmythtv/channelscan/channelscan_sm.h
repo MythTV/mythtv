@@ -160,13 +160,11 @@ class ChannelScanSM : public MPEGStreamListener,
     // DVB Main
     void HandleNIT(const NetworkInformationTable*);
     void HandleSDT(const sdt_sections_cache_const_t&);
-    void HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm);
     void HandleTDT(const TimeDateTable*) {}
 
     // DVB Other
     void HandleNITo(const NetworkInformationTable*) {}
     void HandleSDTo(const sdt_sections_cache_const_t&);
-    void HandleSDToNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm);
     void HandleBAT(const BouquetAssociationTable*);
 
 
@@ -273,11 +271,6 @@ class ChannelScanSM : public MPEGStreamListener,
     /// Scanner thread, runs ChannelScanSM::run()
     MThread          *m_scannerThread;
     QMutex           m_mutex;
-
-    // Long term caching
-    QMutex m_longTermSDTCacheLock;
-    static SDT_tsn_cache_t m_longTermSDTCache;
-
 };
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)

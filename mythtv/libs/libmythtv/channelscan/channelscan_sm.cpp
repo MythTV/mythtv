@@ -138,8 +138,6 @@ ServiceDescriptionTablesCache::~ServiceDescriptionTablesCache()
     clear();
 }
 
-SDT_tsn_cache_t ChannelScanSM::m_longTermSDTCache;
-
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 {
     if (siscan && siscan->m_channel)
@@ -502,12 +500,6 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 
 void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
-    QMutexLocker locker(&m_longTermSDTCacheLock);
-    HandleSDTNoLongTermCacheLock(sections, true);
-}
-
-void ChannelScanSM::HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm)
-{
     LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Service Description Table");
     QMutexLocker locker(&m_lock);
 
@@ -564,10 +556,6 @@ void ChannelScanSM::HandleSDTNoLongTermCacheLock(const sdt_sections_cache_const_
                 .arg(uint64_t(m_currentInfo), 0, 16));
     }
     m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
-
-    // Copy table into my long term static cache
-    if (cache_longterm)
-    	m_longTermSDTCache.CacheTable(sections);
 
     UpdateChannelInfo(true, DVB_TRANSPORT_STREAM);
 }
@@ -638,12 +626,6 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 
 void ChannelScanSM::HandleSDTo(const sdt_sections_cache_const_t& sections)
 {
-    QMutexLocker locker(&m_longTermSDTCacheLock);
-    HandleSDToNoLongTermCacheLock(sections, true);
-}
-
-void ChannelScanSM::HandleSDToNoLongTermCacheLock(const sdt_sections_cache_const_t& sections, bool cache_longterm)
-{
     QMutexLocker locker(&m_lock);
 
     LOG(VB_CHANSCAN, LOG_INFO, LOC + "Got a Service Description Table (other)");
@@ -697,10 +679,6 @@ void ChannelScanSM::HandleSDToNoLongTermCacheLock(const sdt_sections_cache_const
             .arg(uint64_t(m_currentInfo), 0, 16));
     }
     m_currentInfo->serviceDescriptionTablesCache.CacheTable(sections);
-
-    // Copy table into my long term static cache
-    if (cache_longterm)
-    	m_longTermSDTCache.CacheTable(sections);
 
 }
 
@@ -1871,85 +1849,7 @@ bool ChannelScanSM::HasTimedOut(void)
  */
 void ChannelScanSM::HandleActiveScan(void)
 {
-    // If I have not seen any SD tables then see if I can pull one
-    // one from my long term cache
-    if ((m_currentInfo == NULL) || m_currentInfo->serviceDescriptionTablesCache.empty())
-    {
-    	// Check if streamdata knows the onid and tsid
-    	DTVSignalMonitor* sm;
-    	DVBStreamData* sd;
-    	uint onid;
-    	uint tsid;
-        if ((sm = GetDTVSignalMonitor()) &&
-        		(sd = sm->GetDVBStreamData()) &&
-				sd->HasCurrentTSID(onid, tsid))
-        {
-			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Got onid 0x%1 tsid 0x%2 from streamdata")
-					.arg(onid, 0, 16)
-					.arg(tsid, 0, 16));
-        	// Check if the long term cache has any for me
-            QMutexLocker locker(&m_longTermSDTCacheLock);
-        	if (!m_longTermSDTCache.empty())
-        	{
-        		// Generate local form of onid if needed
-        		uint local_onid_key = DVBStreamData::InternalOriginalNetworkID(onid, tsid);
-        		// Handle SDT
-    			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Long term cache not empty"));
-				SDT_tsn_cache_t::iterator network;
-				if ((network = m_longTermSDTCache.find(local_onid_key)) != m_longTermSDTCache.end())
-				{
-	    			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Found onid 0x%1 in long term cache")
-	    					.arg(onid, 0, 16));
-					SDT_ts_cache_t::iterator stream;
-					if ((stream = (*network).find(tsid)) != (*network).end())
-					{
-		    			LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Found tsid 0x%1 in long term cache")
-		    					.arg(tsid, 0, 16));
-						SDT_t_cache_t::iterator table;
-						if ((table = (*stream).find(TableID::SDT)) != (*stream).end())
-						{
-			    			LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
-			    					QString("Play back SDT table for onid 0x%1 tsid 0x%2")
-									.arg(onid, 0, 16).arg(tsid, 0, 16));
-							HandleSDTNoLongTermCacheLock(*table, false);
-						}
-					}
-				}
-				// Handle SDTo
-				//
-				// Play back any SDTo tables that are not for this current ONID
-				// This code will not be entered for system that are like the UK
-				// and use a single common ONID for all streams and encode a multiplex id
-				// into the tsid. For the UK this is handled by a call to
-				// DVBStreamData::InternalOriginalNetworkID this generates unique internal
-				// onid keys for each multiplex. Other systems could be handled in a similar way.
-				//
-				for (SDT_tsn_cache_t::iterator network = m_longTermSDTCache.begin();
-						network != m_longTermSDTCache.end();
-						++network)
-				{
-					if (local_onid_key != network.key())
-					{
-						for (SDT_ts_cache_t::iterator stream = (*network).begin();
-								stream != (*network).end();
-								++stream)
-						{
-							SDT_t_cache_t::iterator table;
-							if ((table = (*stream).find(TableID::SDTo)) != (*stream).end())
-							{
-								LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
-										QString("Play back SDTo table for onid 0x%1 tsid 0x%2")
-										.arg(onid, 0, 16).arg(tsid, 0, 16));
-								HandleSDTNoLongTermCacheLock(*table, false);
-							}
-						}
-					}
-				}
-        	}
-    	}
-    }
-
-    // Now lock the shared data
+    // Lock the shared data
     QMutexLocker locker(&m_lock);
 
     bool do_post_insertion = m_waitingForTables;

@@ -99,6 +99,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     void SetSDTSectionSeen(ServiceDescriptionTableSection& sdt_section);
     bool SDTSectionSeen(const ServiceDescriptionTableSection& sdt_section) const;
     bool HasAllSDTSections(const ServiceDescriptionTableSection& sdt_section) const;
+    void RequestReplayOfCachedSDTs();
 
 
     bool HasAllBATSections(uint bid) const;
@@ -133,6 +134,8 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
   private:
     // Caching
     void CacheNIT(nit_ptr_t);
+    void ReplayCachedSDTa();
+    void ReplayCachedSDTos();
 
   protected:
     /** \fn virtual bool DeleteCachedTableSection(PSIPTable *psip) const
@@ -175,6 +178,8 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     static sdt_tsn_cache_t    _cached_sdts; // SDT sections cached within transport stream ID
                                             // within original network ID
     static QMutex             _cached_sdts_lock;
+    bool _replay_cached_sdta;
+    bool _replay_cached_sdtos;
     static eit_tssn_cache_t   _cached_eits; // EIT sections cached within table ID within
                                             // service ID within transport stream ID within
                                             // original network ID
