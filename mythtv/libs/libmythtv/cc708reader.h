@@ -16,7 +16,7 @@ const uint k708MaxServices = 64;
 class CC708Reader
 {
   public:
-    CC708Reader(MythPlayer *owner);
+    explicit CC708Reader(MythPlayer *owner);
     virtual ~CC708Reader();
 
     void SetCurrentService(int service) { currentservice = service; }

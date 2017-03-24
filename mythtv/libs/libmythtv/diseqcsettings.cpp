@@ -39,7 +39,7 @@ static GlobalLineEdit *DiSEqCLongitude(void)
 class DeviceTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    DeviceTypeSetting(DiSEqCDevDevice &device) :
+    explicit DeviceTypeSetting(DiSEqCDevDevice &device) :
         ComboBoxSetting(this), m_device(device)
     {
         setLabel(DeviceTree::tr("Device Type"));
@@ -76,7 +76,7 @@ class DeviceTypeSetting : public ComboBoxSetting, public Storage
 class DeviceDescrSetting : public LineEditSetting, public Storage
 {
   public:
-    DeviceDescrSetting(DiSEqCDevDevice &device) :
+    explicit DeviceDescrSetting(DiSEqCDevDevice &device) :
         LineEditSetting(this), m_device(device)
     {
         setLabel(DeviceTree::tr("Description"));
@@ -108,7 +108,7 @@ class DeviceDescrSetting : public LineEditSetting, public Storage
 class DeviceRepeatSetting : public SpinBoxSetting, public Storage
 {
   public:
-    DeviceRepeatSetting(DiSEqCDevDevice &device) :
+    explicit DeviceRepeatSetting(DiSEqCDevDevice &device) :
         SpinBoxSetting(this, 0, 15, 1), m_device(device)
     {
         setLabel(DeviceTree::tr("Repeat Count"));
@@ -141,7 +141,7 @@ class DeviceRepeatSetting : public SpinBoxSetting, public Storage
 class SwitchTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) :
+    explicit SwitchTypeSetting(DiSEqCDevSwitch &switch_dev) :
         ComboBoxSetting(this), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Switch Type"));
@@ -189,7 +189,7 @@ class SwitchTypeSetting : public ComboBoxSetting, public Storage
 class SwitchAddressSetting : public LineEditSetting, public Storage
 {
   public:
-    SwitchAddressSetting(DiSEqCDevSwitch &switch_dev) :
+    explicit SwitchAddressSetting(DiSEqCDevSwitch &switch_dev) :
            LineEditSetting(this), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Address of switch"));
@@ -216,7 +216,7 @@ class SwitchAddressSetting : public LineEditSetting, public Storage
 class SwitchPortsSetting : public LineEditSetting, public Storage
 {
   public:
-    SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) :
+    explicit SwitchPortsSetting(DiSEqCDevSwitch &switch_dev) :
         LineEditSetting(this), m_switch(switch_dev)
     {
         setLabel(DeviceTree::tr("Number of ports"));
@@ -295,7 +295,7 @@ void SwitchConfig::update(void)
 class RotorTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    RotorTypeSetting(DiSEqCDevRotor &rotor) :
+    explicit RotorTypeSetting(DiSEqCDevRotor &rotor) :
         ComboBoxSetting(this), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Type"));
@@ -327,7 +327,7 @@ class RotorTypeSetting : public ComboBoxSetting, public Storage
 class RotorLoSpeedSetting : public LineEditSetting, public Storage
 {
   public:
-    RotorLoSpeedSetting(DiSEqCDevRotor &rotor) :
+    explicit RotorLoSpeedSetting(DiSEqCDevRotor &rotor) :
         LineEditSetting(this), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor Low Speed (deg/sec)"));
@@ -358,7 +358,7 @@ class RotorLoSpeedSetting : public LineEditSetting, public Storage
 class RotorHiSpeedSetting : public LineEditSetting, public Storage
 {
   public:
-    RotorHiSpeedSetting(DiSEqCDevRotor &rotor) :
+    explicit RotorHiSpeedSetting(DiSEqCDevRotor &rotor) :
         LineEditSetting(this), m_rotor(rotor)
     {
         setLabel(DeviceTree::tr("Rotor High Speed (deg/sec)"));
@@ -498,7 +498,7 @@ void RotorPosMap::PopulateList(void)
 class RotorPosConfig : public ConfigurationDialog
 {
   public:
-    RotorPosConfig(DiSEqCDevRotor &rotor)
+    explicit RotorPosConfig(DiSEqCDevRotor &rotor)
     {
         setLabel(DeviceTree::tr("Rotor Position Map"));
         addChild(new RotorPosMap(rotor));
@@ -568,7 +568,7 @@ void RotorConfig::RunRotorPositionsDialog(void)
 class SCRUserBandSetting : public SpinBoxSetting, public Storage
 {
   public:
-    SCRUserBandSetting(DiSEqCDevSCR &scr) :
+    explicit SCRUserBandSetting(DiSEqCDevSCR &scr) :
         SpinBoxSetting(this, 0, 8, 1), m_scr(scr)
     {
         setLabel(DeviceTree::tr("Userband"));
@@ -596,7 +596,7 @@ class SCRUserBandSetting : public SpinBoxSetting, public Storage
 class SCRFrequencySetting : public LineEditSetting, public Storage
 {
   public:
-    SCRFrequencySetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
+    explicit SCRFrequencySetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
     {
         setLabel(DeviceTree::tr("Frequency (MHz)"));
         setHelpText(DeviceTree::tr("Unicable userband frequency (usually 1210, 1420, 1680 and 2040 MHz)"));
@@ -623,7 +623,7 @@ class SCRFrequencySetting : public LineEditSetting, public Storage
 class SCRPINSetting : public LineEditSetting, public Storage
 {
   public:
-    SCRPINSetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
+    explicit SCRPINSetting(DiSEqCDevSCR &scr) : LineEditSetting(this), m_scr(scr)
     {
         setLabel(DeviceTree::tr("PIN code"));
         setHelpText(DeviceTree::tr("Unicable PIN code (-1 disabled, 0 - 255)"));
@@ -722,7 +722,7 @@ static uint FindPreset(const DiSEqCDevLNB &lnb)
 class LNBPresetSetting : public ComboBoxSetting, public Storage
 {
   public:
-    LNBPresetSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
+    explicit LNBPresetSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Preset"));
         QString help = DeviceTree::tr(
@@ -759,7 +759,7 @@ class LNBPresetSetting : public ComboBoxSetting, public Storage
 class LNBTypeSetting : public ComboBoxSetting, public Storage
 {
   public:
-    LNBTypeSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
+    explicit LNBTypeSetting(DiSEqCDevLNB &lnb) : ComboBoxSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Type"));
         setHelpText(DeviceTree::tr("Select the type of LNB from the list."));
@@ -796,7 +796,7 @@ class LNBTypeSetting : public ComboBoxSetting, public Storage
 class LNBLOFSwitchSetting : public LineEditSetting, public Storage
 {
   public:
-    LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
+    explicit LNBLOFSwitchSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Switch (MHz)"));
         QString help = DeviceTree::tr(
@@ -826,7 +826,7 @@ class LNBLOFSwitchSetting : public LineEditSetting, public Storage
 class LNBLOFLowSetting : public LineEditSetting, public Storage
 {
   public:
-    LNBLOFLowSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
+    explicit LNBLOFLowSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF Low (MHz)"));
         QString help = DeviceTree::tr(
@@ -857,7 +857,7 @@ class LNBLOFLowSetting : public LineEditSetting, public Storage
 class LNBLOFHighSetting : public LineEditSetting, public Storage
 {
   public:
-    LNBLOFHighSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
+    explicit LNBLOFHighSetting(DiSEqCDevLNB &lnb) : LineEditSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB LOF High (MHz)"));
         QString help = DeviceTree::tr(
@@ -886,7 +886,7 @@ class LNBLOFHighSetting : public LineEditSetting, public Storage
 class LNBPolarityInvertedSetting : public CheckBoxSetting, public Storage
 {
   public:
-    LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) :
+    explicit LNBPolarityInvertedSetting(DiSEqCDevLNB &lnb) :
         CheckBoxSetting(this), m_lnb(lnb)
     {
         setLabel(DeviceTree::tr("LNB Reversed"));

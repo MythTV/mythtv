@@ -159,6 +159,8 @@ bool ThumbFinder::Create(void)
 
     connect(m_frameButton, SIGNAL(Clicked()), this, SLOT(updateThumb()));
 
+    m_seekAmountText->SetText(SeekAmounts[m_currentSeek].name);
+
     BuildFocusList();
 
     SetFocusWidget(m_imageGrid);
@@ -272,6 +274,12 @@ void ThumbFinder::loadCutList()
     {
         progInfo->QueryCutList(m_deleteMap);
         delete progInfo;
+    }
+
+    if (m_deleteMap.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, "ThumbFinder::loadCutList: Got an empty delete map");
+        return;
     }
 
     // if the first mark is a end mark then add the start mark at the beginning

@@ -41,7 +41,7 @@ enum
 class CC608Decoder
 {
   public:
-    CC608Decoder(CC608Input *ccr);
+    explicit CC608Decoder(CC608Input *ccr);
     CC608Decoder(const CC608Decoder& rhs);
     ~CC608Decoder();
 

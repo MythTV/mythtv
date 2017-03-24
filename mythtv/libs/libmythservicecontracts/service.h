@@ -45,7 +45,7 @@ class SERVICE_PUBLIC Service : public QObject
 
     public:
 
-        inline Service( QObject *parent = NULL );
+        explicit inline Service( QObject *parent = NULL );
 
     public:
 
@@ -62,6 +62,9 @@ class SERVICE_PUBLIC Service : public QObject
 
         static bool ToBool( const QString &sVal );
 
+    public:
+
+        QList<QString> m_parsedParams; // lowercased
 };
 
 //////////////////////////////////////////////////////////////////////////////

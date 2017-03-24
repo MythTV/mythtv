@@ -10,7 +10,7 @@ class AudioOutputWin : public AudioOutputBase
 {
   friend class AudioOutputWinPrivate;
   public:
-    AudioOutputWin(const AudioSettings &settings);
+    explicit AudioOutputWin(const AudioSettings &settings);
     virtual ~AudioOutputWin();
 
     // Volume control

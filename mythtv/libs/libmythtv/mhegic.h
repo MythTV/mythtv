@@ -18,7 +18,7 @@ class MHInteractionChannel : public QObject
     Q_OBJECT
 
 public:
-    MHInteractionChannel(QObject* parent = 0);
+    explicit MHInteractionChannel(QObject* parent = 0);
     virtual ~MHInteractionChannel();
 
     // Properties

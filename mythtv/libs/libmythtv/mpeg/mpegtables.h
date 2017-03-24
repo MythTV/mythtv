@@ -426,7 +426,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
   public:
     /// Constructor for viewing a section, does not create it's own data
-    PSIPTable(const unsigned char *pesdata)
+    explicit PSIPTable(const unsigned char *pesdata)
         : PESPacket(pesdata)
     {
         // fixup wrong assumption about length for sections without CRC
@@ -438,13 +438,13 @@ class MTV_PUBLIC PSIPTable : public PESPacket
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
-    PSIPTable(const PESPacket& table) : PESPacket(table)
+    explicit PSIPTable(const PESPacket& table) : PESPacket(table)
     {
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
     // may be modified
-    PSIPTable(const TSPacket& table)
+    explicit PSIPTable(const TSPacket& table)
         : PESPacket()
     {
         // section_syntax_ind   1       1.0       8   should always be 1
@@ -589,7 +589,7 @@ class MTV_PUBLIC ProgramAssociationTable : public PSIPTable
         assert(TableID::PAT == TableID());
     }
 
-    ProgramAssociationTable(const PSIPTable &table) : PSIPTable(table)
+    explicit ProgramAssociationTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::PAT == TableID());
     }
@@ -667,7 +667,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         Parse();
     }
 
-    ProgramMapTable(const PSIPTable& table) : PSIPTable(table)
+    explicit ProgramMapTable(const PSIPTable& table) : PSIPTable(table)
     {
         assert(TableID::PMT == TableID());
         Parse();
@@ -822,7 +822,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
 class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
 {
   public:
-    ConditionalAccessTable(const PSIPTable &table) : PSIPTable(table)
+    explicit ConditionalAccessTable(const PSIPTable &table) : PSIPTable(table)
     {
     // Section            Bits   Start Byte sbit
     // -----------------------------------------
@@ -855,7 +855,7 @@ class MTV_PUBLIC ConditionalAccessTable : public PSIPTable
 class MTV_PUBLIC SpliceTimeView
 {
   public:
-    SpliceTimeView(const unsigned char *data) : _data(data) { }
+    explicit SpliceTimeView(const unsigned char *data) : _data(data) { }
     //   time_specified_flag    1  0.0
     bool IsTimeSpecified(void) const { return _data[0] & 0x80; }
     //   if (time_specified_flag == 1)
@@ -1000,7 +1000,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
         assert(TableID::SITscte == TableID());
         Parse();
     }
-    SpliceInformationTable(const PSIPTable &table) :
+    explicit SpliceInformationTable(const PSIPTable &table) :
         PSIPTable(table), _epilog(NULL)
     {
         assert(TableID::SITscte == TableID());
@@ -1178,7 +1178,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 class MTV_PUBLIC AdaptationFieldControl
 {
   public:
-    AdaptationFieldControl(const unsigned char* packet) : _data(packet) { ; }
+    explicit AdaptationFieldControl(const unsigned char* packet) : _data(packet) { ; }
 
     /** adaptation header length
      * (after which is payload data)         8   0.0

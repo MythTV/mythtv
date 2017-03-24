@@ -79,7 +79,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
         assert(TableID::MGT == TableID());
         Parse();
     }
-    MasterGuideTable(const PSIPTable& table) : PSIPTable(table)
+    explicit MasterGuideTable(const PSIPTable& table) : PSIPTable(table)
     {
         assert(TableID::MGT == TableID());
         Parse();
@@ -194,7 +194,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
         assert(TableID::TVCT == TableID() || TableID::CVCT == TableID());
         Parse();
     }
-    VirtualChannelTable(const PSIPTable &table) : PSIPTable(table)
+    explicit VirtualChannelTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::TVCT == TableID() || TableID::CVCT == TableID());
         Parse();
@@ -351,7 +351,7 @@ class MTV_PUBLIC TerrestrialVirtualChannelTable : public VirtualChannelTable
     {
         assert(TableID::TVCT == TableID());
     }
-    TerrestrialVirtualChannelTable(const PSIPTable &table)
+    explicit TerrestrialVirtualChannelTable(const PSIPTable &table)
         : VirtualChannelTable(table)
     {
         assert(TableID::TVCT == TableID());
@@ -420,7 +420,7 @@ class MTV_PUBLIC CableVirtualChannelTable : public VirtualChannelTable
     {
         assert(TableID::CVCT == TableID());
     }
-    CableVirtualChannelTable(const PSIPTable &table)
+    explicit CableVirtualChannelTable(const PSIPTable &table)
         : VirtualChannelTable(table)
     {
         assert(TableID::CVCT == TableID());
@@ -527,7 +527,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
         assert(TableID::EIT == TableID());
         Parse();
     }
-    EventInformationTable(const PSIPTable &table) : PSIPTable(table)
+    explicit EventInformationTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::EIT == TableID());
         Parse();
@@ -625,7 +625,7 @@ class MTV_PUBLIC ExtendedTextTable : public PSIPTable
     {
         assert(TableID::ETT == TableID());
     }
-    ExtendedTextTable(const PSIPTable &table) : PSIPTable(table)
+    explicit ExtendedTextTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::ETT == TableID());
     }
@@ -683,7 +683,7 @@ class MTV_PUBLIC SystemTimeTable : public PSIPTable
     {
         assert(TableID::STT == TableID());
     }
-    SystemTimeTable(const PSIPTable &table) : PSIPTable(table)
+    explicit SystemTimeTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::STT == TableID());
     }
@@ -744,7 +744,7 @@ class MTV_PUBLIC RatingRegionTable : public PSIPTable
     {
         assert(TableID::RRT == TableID());
     }
-    RatingRegionTable(const PSIPTable &table) : PSIPTable(table)
+    explicit RatingRegionTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::RRT == TableID());
     }
@@ -761,7 +761,7 @@ class MTV_PUBLIC DirectedChannelChangeTable : public PSIPTable
     {
         assert(TableID::DCCT == TableID());
     }
-    DirectedChannelChangeTable(const PSIPTable &table) : PSIPTable(table)
+    explicit DirectedChannelChangeTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::DCCT == TableID());
     }
@@ -779,7 +779,7 @@ class MTV_PUBLIC DirectedChannelChangeSelectionCodeTable : public PSIPTable
     {
         assert(TableID::DCCSCT == TableID());
     }
-    DirectedChannelChangeSelectionCodeTable(const PSIPTable &table)
+    explicit DirectedChannelChangeSelectionCodeTable(const PSIPTable &table)
         : PSIPTable(table)
     {
         assert(TableID::DCCSCT == TableID());
@@ -795,7 +795,7 @@ class MTV_PUBLIC AggregateEventInformationTable : public PSIPTable
     {
         assert(TableID::AEIT == TableID());
     }
-    AggregateEventInformationTable(const PSIPTable &table) : PSIPTable(table)
+    explicit AggregateEventInformationTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::AEIT == TableID());
     }
@@ -815,7 +815,7 @@ class MTV_PUBLIC AggregateExtendedTextTable : public PSIPTable
     {
         assert(TableID::AETT == TableID());
     }
-    AggregateExtendedTextTable(const PSIPTable &table) : PSIPTable(table)
+    explicit AggregateExtendedTextTable(const PSIPTable &table) : PSIPTable(table)
     {
         assert(TableID::AETT == TableID());
     }

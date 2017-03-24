@@ -60,6 +60,7 @@ HEADERS += datacontracts/frontend.h              datacontracts/frontendList.h
 HEADERS += datacontracts/cutting.h               datacontracts/cutList.h
 HEADERS += datacontracts/backendInfo.h           datacontracts/envInfo.h
 HEADERS += datacontracts/buildInfo.h             datacontracts/logInfo.h
+HEADERS += datacontracts/genre.h                 datacontracts/genreList.h
 
 HEADERS += enums/recStatus.h
 

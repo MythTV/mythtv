@@ -83,7 +83,7 @@ class MythPlayer;
 class MTV_PUBLIC CC608Reader : public CC608Input
 {
   public:
-    CC608Reader(MythPlayer *parent);
+    explicit CC608Reader(MythPlayer *parent);
    ~CC608Reader();
 
     void SetTTPageNum(int page)  { m_ccPageNum = page; }

@@ -13,7 +13,7 @@ class AudioOutputDX : public AudioOutputBase
 {
   friend class AudioOutputDXPrivate;
   public:
-    AudioOutputDX(const AudioSettings &settings);
+    explicit AudioOutputDX(const AudioSettings &settings);
     virtual ~AudioOutputDX();
 
     virtual int  GetVolumeChannel(int channel) const;

@@ -1444,7 +1444,7 @@ class ScramblingDescriptor : public MPEGDescriptor
 class ServiceDescriptorMapping
 {
   public:
-    ServiceDescriptorMapping(const uint serviceid) { m_serviceid = serviceid; }
+    explicit ServiceDescriptorMapping(const uint serviceid) { m_serviceid = serviceid; }
     enum
     {
         kServiceTypeDigitalTelevision        = 0x01,

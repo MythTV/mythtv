@@ -51,7 +51,7 @@ static const AudioFormat fmts[] = { FORMAT_U8,  FORMAT_S16, FORMAT_S24LSB,
 class MPUBLIC AudioOutputSettings
 {
     public:
-        AudioOutputSettings(bool invalid = false);
+        explicit AudioOutputSettings(bool invalid = false);
         ~AudioOutputSettings();
         AudioOutputSettings& operator=(const AudioOutputSettings&);
         AudioOutputSettings *GetCleaned(bool newcopy = false);

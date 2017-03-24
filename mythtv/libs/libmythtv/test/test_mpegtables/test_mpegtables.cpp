@@ -37,7 +37,7 @@ void TestMPEGTables::pat_test(void)
 
     QVERIFY  (si_table.IsGood());
 
-    ProgramAssociationTable pat = si_table;
+    ProgramAssociationTable pat(si_table);
 
     QVERIFY  (pat.HasCRC());
     QVERIFY  (pat.VerifyCRC());
@@ -115,7 +115,7 @@ void TestMPEGTables::pat_test(void)
     memset (&si_data4, 0, sizeof(si_data4));
     si_data4[1] = 1 << 7 & 0 << 6 & 3 << 4 & 0 << 2 & 0;
     si_data4[2] = 0x00;
-    ProgramAssociationTable* pat4 = new ProgramAssociationTable((unsigned char*)&si_data4);
+    ProgramAssociationTable* pat4 = new ProgramAssociationTable(PSIPTable((unsigned char*)&si_data4));
     QCOMPARE (pat4->CalcCRC(), (uint) 0xFFFFFFFF);
     QVERIFY (pat4->VerifyCRC());
 }
@@ -142,7 +142,7 @@ void TestMPEGTables::tdt_test(void)
     // QCOMPARE (si_table._pesdataSize, 8); // is protected, so use TSSizeInBuffer() instead
     QCOMPARE (si_table.TSSizeInBuffer(), (unsigned int) 8);
 
-    TimeDateTable tdt = si_table;
+    TimeDateTable tdt(si_table);
 
     QVERIFY  (tdt.IsGood());
 
@@ -325,7 +325,8 @@ void TestMPEGTables::OTAChannelName_test (void)
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  0x00, 0x00, 0x00, 0x00, 0x60, 0xc4, 0x82, 0xb9
     };
 
-    TerrestrialVirtualChannelTable table(tvct_data);
+    PSIPTable psip = PSIPTable(tvct_data);
+    TerrestrialVirtualChannelTable table(psip);
 
     QVERIFY (table.HasCRC());
     QCOMPARE (table.CalcCRC(), table.CRC());
@@ -337,7 +338,8 @@ void TestMPEGTables::OTAChannelName_test (void)
     QCOMPARE (table.ShortChannelName(0), QString("ABCDEF"));
     QCOMPARE (table.ShortChannelName(1), QString());
 
-    TerrestrialVirtualChannelTable tvct(tvct_data_0000);
+    PSIPTable psip2 = PSIPTable(tvct_data_0000);
+    TerrestrialVirtualChannelTable tvct(psip2);
     QVERIFY (tvct.VerifyCRC());
     QVERIFY (tvct.VerifyPSIP(false));
 

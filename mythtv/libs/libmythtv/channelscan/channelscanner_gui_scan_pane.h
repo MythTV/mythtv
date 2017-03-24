@@ -38,7 +38,7 @@ class LogList;
 class TransProgressSetting: public ProgressSetting, public TransientStorage
 {
   public:
-    TransProgressSetting(int steps = 65535): ProgressSetting(this, steps) {};
+    explicit TransProgressSetting(int steps = 65535): ProgressSetting(this, steps) {};
 };
 
 class ChannelScannerGUIScanPane : public VerticalConfigurationGroup

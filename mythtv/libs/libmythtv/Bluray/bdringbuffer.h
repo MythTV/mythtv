@@ -22,7 +22,7 @@ class MTV_PUBLIC BDInfo
     Q_DECLARE_TR_FUNCTIONS(BDInfo)
 
   public:
-    BDInfo(const QString &filename);
+    explicit BDInfo(const QString &filename);
    ~BDInfo(void);
     bool IsValid(void) const { return m_isValid; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
@@ -46,8 +46,8 @@ class BDOverlay
 {
   public:
     BDOverlay();
-    BDOverlay(const bd_overlay_s * const overlay);
-    BDOverlay(const bd_argb_overlay_s * const overlay);
+    explicit BDOverlay(const bd_overlay_s * const overlay);
+    explicit BDOverlay(const bd_argb_overlay_s * const overlay);
 
     void    setPalette(const BD_PG_PALETTE_ENTRY *palette);
     void    wipe();
@@ -69,7 +69,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     Q_DECLARE_TR_FUNCTIONS(BDRingBuffer)
 
   public:
-    BDRingBuffer(const QString &lfilename);
+    explicit BDRingBuffer(const QString &lfilename);
     virtual ~BDRingBuffer();
 
     virtual bool IsStreamed(void) { return true; }

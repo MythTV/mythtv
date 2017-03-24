@@ -453,7 +453,7 @@ int MPEG2fixup::cmp2x33(int64_t pts1, int64_t pts2)
 
     if (pts1 > pts2)
     {
-        if ((uint64_t)(pts1 - pts2) > MAX_PTS/2)
+        if ((uint64_t)(pts1 - pts2) > MAX_PTS/2ull)
             ret = -1;
         else 
             ret = 1;
@@ -462,7 +462,7 @@ int MPEG2fixup::cmp2x33(int64_t pts1, int64_t pts2)
         ret = 0; 
     else
     {
-        if ((uint64_t)(pts2 - pts1) > MAX_PTS/2)
+        if ((uint64_t)(pts2 - pts1) > MAX_PTS/2ull)
             ret = 2;
         else  
             ret = -2;

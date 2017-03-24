@@ -76,7 +76,7 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref)
         return;
 
     QMap<QString,ASIStreamHandler*>::iterator it = _handlers.find(devname);
-    if (it != _handler.end())
+    if (it != _handlers.end())
         (*it)->DelRecorderId(recorder_id);
 
     if (*rit > 1)

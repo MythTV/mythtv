@@ -11,7 +11,7 @@ class MPUBLIC StorageGroupEditor :
 {
     Q_OBJECT
   public:
-    StorageGroupEditor(QString group);
+    explicit StorageGroupEditor(QString group);
     virtual DialogCode exec(void);
     virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
         { return exec(); }

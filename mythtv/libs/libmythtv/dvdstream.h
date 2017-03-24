@@ -22,7 +22,7 @@ class MTV_PUBLIC DVDStream : public RingBuffer
     Q_DISABLE_COPY(DVDStream)
 
 public:
-    DVDStream(const QString&);
+    explicit DVDStream(const QString&);
     virtual ~DVDStream();
 
 public:

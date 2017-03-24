@@ -12,7 +12,7 @@ class MythBDPlayer : public MythPlayer
     Q_DECLARE_TR_FUNCTIONS(MythBDPlayer)
 
   public:
-    MythBDPlayer(PlayerFlags flags = kNoFlags);
+    explicit MythBDPlayer(PlayerFlags flags = kNoFlags);
     virtual bool    HasReachedEof(void) const;
     virtual bool    GoToMenu(QString str);
     virtual int     GetNumChapters(void);

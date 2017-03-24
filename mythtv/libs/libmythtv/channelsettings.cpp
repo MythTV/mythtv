@@ -44,7 +44,7 @@ QString ChannelDBStorage::GetSetClause(MSqlBindings &bindings) const
 class Name : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    Name(const ChannelID &id) :
+    explicit Name(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "name")
     {
         setLabel(QCoreApplication::translate("(Common)", "Channel Name"));
@@ -54,7 +54,7 @@ class Name : public LineEditSetting, public ChannelDBStorage
 class Channum : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    Channum(const ChannelID &id) :
+    explicit Channum(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "channum")
     {
         setLabel(QCoreApplication::translate("(Common)", "Channel Number"));
@@ -119,7 +119,7 @@ class Source : public ComboBoxSetting, public ChannelDBStorage
 class Callsign : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    Callsign(const ChannelID &id) :
+    explicit Callsign(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "callsign")
     {
         setLabel(QCoreApplication::translate("(Common)", "Callsign"));
@@ -166,7 +166,7 @@ QStringList ChannelTVFormat::GetFormats(void)
 class TimeOffset : public SpinBoxSetting, public ChannelDBStorage
 {
   public:
-    TimeOffset(const ChannelID &id) :
+    explicit TimeOffset(const ChannelID &id) :
         SpinBoxSetting(this, -1440, 1440, 1),
         ChannelDBStorage(this, id, "tmoffset")
     {
@@ -184,7 +184,7 @@ class TimeOffset : public SpinBoxSetting, public ChannelDBStorage
 class Priority : public SpinBoxSetting, public ChannelDBStorage
 {
   public:
-    Priority(const ChannelID &id) :
+    explicit Priority(const ChannelID &id) :
         SpinBoxSetting(this, -99, 99, 1),
         ChannelDBStorage(this, id, "recpriority")
     {
@@ -201,7 +201,7 @@ class Priority : public SpinBoxSetting, public ChannelDBStorage
 class Icon : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    Icon(const ChannelID &id) :
+    explicit Icon(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "icon")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Icon"));
@@ -215,7 +215,7 @@ class Icon : public LineEditSetting, public ChannelDBStorage
 class VideoFilters : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    VideoFilters(const ChannelID &id) :
+    explicit VideoFilters(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "videofilters")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -232,7 +232,7 @@ class VideoFilters : public LineEditSetting, public ChannelDBStorage
 class OutputFilters : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    OutputFilters(const ChannelID &id) :
+    explicit OutputFilters(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "outputfilters")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -305,7 +305,7 @@ class XmltvID : public ComboBoxSetting, public ChannelDBStorage
 class ServiceID : public SpinBoxSetting, public ChannelDBStorage
 {
   public:
-    ServiceID(const ChannelID &id)
+    explicit ServiceID(const ChannelID &id)
         : SpinBoxSetting(this, -1, UINT16_MAX, 1, true, "NULL"),
           ChannelDBStorage(this, id, "serviceid")
     {
@@ -339,7 +339,7 @@ class ServiceID : public SpinBoxSetting, public ChannelDBStorage
 class CommMethod : public ComboBoxSetting, public ChannelDBStorage
 {
   public:
-    CommMethod(const ChannelID &id) :
+    explicit CommMethod(const ChannelID &id) :
        ComboBoxSetting(this), ChannelDBStorage(this, id, "commmethod")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -362,7 +362,7 @@ class CommMethod : public ComboBoxSetting, public ChannelDBStorage
 class Visible : public CheckBoxSetting, public ChannelDBStorage
 {
   public:
-    Visible(const ChannelID &id) :
+    explicit Visible(const ChannelID &id) :
         CheckBoxSetting(this), ChannelDBStorage(this, id, "visible")
     {
         setValue(true);
@@ -377,7 +377,7 @@ class Visible : public CheckBoxSetting, public ChannelDBStorage
 class OnAirGuide : public CheckBoxSetting, public ChannelDBStorage
 {
   public:
-    OnAirGuide(const ChannelID &id) :
+    explicit OnAirGuide(const ChannelID &id) :
         CheckBoxSetting(this), ChannelDBStorage(this, id, "useonairguide")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -396,7 +396,7 @@ class OnAirGuide : public CheckBoxSetting, public ChannelDBStorage
 class Freqid : public LineEditSetting, public ChannelDBStorage
 {
   public:
-    Freqid(const ChannelID &id) :
+    explicit Freqid(const ChannelID &id) :
         LineEditSetting(this), ChannelDBStorage(this, id, "freqid")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -410,7 +410,7 @@ class Freqid : public LineEditSetting, public ChannelDBStorage
 class Finetune : public SliderSetting, public ChannelDBStorage
 {
   public:
-    Finetune(const ChannelID& id)
+    explicit Finetune(const ChannelID& id)
         : SliderSetting(this, -300, 300, 1),
         ChannelDBStorage(this, id, "finetune")
     {
@@ -426,7 +426,7 @@ class Finetune : public SliderSetting, public ChannelDBStorage
 class Contrast : public SliderSetting, public ChannelDBStorage
 {
   public:
-    Contrast(const ChannelID &id) :
+    explicit Contrast(const ChannelID &id) :
         SliderSetting(this, 0, 65535, 655),
         ChannelDBStorage(this, id, "contrast")
     {
@@ -437,7 +437,7 @@ class Contrast : public SliderSetting, public ChannelDBStorage
 class Brightness : public SliderSetting, public ChannelDBStorage
 {
   public:
-    Brightness(const ChannelID &id) :
+    explicit Brightness(const ChannelID &id) :
         SliderSetting(this, 0, 65535, 655),
         ChannelDBStorage(this, id, "brightness")
     {
@@ -448,7 +448,7 @@ class Brightness : public SliderSetting, public ChannelDBStorage
 class Colour : public SliderSetting, public ChannelDBStorage
 {
   public:
-    Colour(const ChannelID &id) :
+    explicit Colour(const ChannelID &id) :
         SliderSetting(this, 0, 65535, 655),
         ChannelDBStorage(this, id, "colour")
     {
@@ -459,7 +459,7 @@ class Colour : public SliderSetting, public ChannelDBStorage
 class Hue : public SliderSetting, public ChannelDBStorage
 {
   public:
-    Hue(const ChannelID &id) :
+    explicit Hue(const ChannelID &id) :
         SliderSetting(this, 0, 65535, 655), ChannelDBStorage(this, id, "hue")
     {
         setLabel(QCoreApplication::translate("(Common)", "Hue"));

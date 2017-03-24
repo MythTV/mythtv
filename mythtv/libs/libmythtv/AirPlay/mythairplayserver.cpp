@@ -205,7 +205,7 @@ QByteArray DigestMd5Response(QString response, QString option,
 class APHTTPRequest
 {
   public:
-    APHTTPRequest(QByteArray& data) : m_readPos(0), m_data(data), m_size(0),
+    explicit APHTTPRequest(QByteArray& data) : m_readPos(0), m_data(data), m_size(0),
                                       m_incomingPartial(false)
     {
         Process();

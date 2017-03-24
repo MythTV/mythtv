@@ -138,19 +138,19 @@ class MTV_PUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
 class MTV_PUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup
 {
   public:
-    ChannelOptionsFilters(const ChannelID& id);
+    explicit ChannelOptionsFilters(const ChannelID& id);
 };
 
 class MTV_PUBLIC ChannelOptionsV4L: public VerticalConfigurationGroup
 {
   public:
-    ChannelOptionsV4L(const ChannelID& id);
+    explicit ChannelOptionsV4L(const ChannelID& id);
 };
 
 class MTV_PUBLIC ChannelOptionsRawTS: public VerticalConfigurationGroup
 {
   public:
-    ChannelOptionsRawTS(const ChannelID &id);
+    explicit ChannelOptionsRawTS(const ChannelID &id);
 
     virtual void Load(void);
     virtual void Save(void);
@@ -170,7 +170,7 @@ class MTV_PUBLIC ChannelTVFormat :
     public ComboBoxSetting, public ChannelDBStorage
 {
   public:
-    ChannelTVFormat(const ChannelID &id);
+    explicit ChannelTVFormat(const ChannelID &id);
 
     static QStringList GetFormats(void);
 };

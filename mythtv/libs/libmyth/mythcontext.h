@@ -16,7 +16,7 @@ class MythContextSlotHandler : public QObject
     Q_OBJECT
 
   public:
-    MythContextSlotHandler(MythContextPrivate *x) : d(x) { }
+    explicit MythContextSlotHandler(MythContextPrivate *x) : d(x) { }
 
   private slots:
     void VersionMismatchPopupClosed(void);

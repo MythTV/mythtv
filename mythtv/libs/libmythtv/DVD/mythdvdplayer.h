@@ -10,7 +10,7 @@ class MythDVDPlayer : public MythPlayer
     Q_DECLARE_TR_FUNCTIONS(MythDVDPlayer)
 
   public:
-    MythDVDPlayer(PlayerFlags flags = kNoFlags);
+    explicit MythDVDPlayer(PlayerFlags flags = kNoFlags);
 
     // Decoder stuff..
     virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,

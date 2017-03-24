@@ -867,7 +867,6 @@ void ExternalStreamHandler::CloseApp(void)
 bool ExternalStreamHandler::RestartStream(void)
 {
     bool streaming = (StreamingCount() > 0);
-    int  idx;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Restarting stream.");
 

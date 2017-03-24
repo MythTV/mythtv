@@ -83,7 +83,7 @@ QString StreamDescriptionToString(AudioStreamBasicDescription desc)
  */
 class CoreAudioData {
 public:
-    CoreAudioData(AudioOutputCA *parent);
+    explicit CoreAudioData(AudioOutputCA *parent);
     CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID);
     CoreAudioData(AudioOutputCA *parent, QString deviceName);
     void Initialise();

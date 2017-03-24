@@ -9,7 +9,7 @@ class MythPlayer;
 class MTV_PUBLIC DetectLetterbox
 {
 public:
-    DetectLetterbox(MythPlayer* const player);
+    explicit DetectLetterbox(MythPlayer* const player);
     ~DetectLetterbox();
     void SetDetectLetterbox(bool detect);
     bool GetDetectLetterbox() const;

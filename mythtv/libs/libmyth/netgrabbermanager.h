@@ -112,7 +112,7 @@ class MPUBLIC GrabberDownloadThread : public QObject, public MThread
 
   public:
 
-    GrabberDownloadThread(QObject *parent);
+    explicit GrabberDownloadThread(QObject *parent);
     ~GrabberDownloadThread();
     
     void refreshAll();

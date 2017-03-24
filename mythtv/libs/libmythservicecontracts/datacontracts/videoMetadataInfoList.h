@@ -24,7 +24,7 @@ namespace DTC
 class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.01" );
+    Q_CLASSINFO( "version", "1.02" );
 
     // Q_CLASSINFO Used to augment Metadata for properties. 
     // See datacontracthelper.h for details

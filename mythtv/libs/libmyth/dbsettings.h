@@ -12,7 +12,7 @@ class MPUBLIC DatabaseSettings: public ConfigurationWizard {
     Q_DECLARE_TR_FUNCTIONS(DatabaseSettings)
 
 public:
-    DatabaseSettings(const QString &DBhostOverride = QString::null);
+    explicit DatabaseSettings(const QString &DBhostOverride = QString::null);
     
     // This routine calls wizard->addChild() for each of
     // the database configuration screens.  This allows

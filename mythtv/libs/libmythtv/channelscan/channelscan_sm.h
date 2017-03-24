@@ -82,7 +82,7 @@ class ChannelScanSM;
 class AnalogSignalHandler : public SignalMonitorListener
 {
   public:
-    AnalogSignalHandler(ChannelScanSM *_siscan) : siscan(_siscan) { }
+    explicit AnalogSignalHandler(ChannelScanSM *_siscan) : siscan(_siscan) { }
 
   public:
     virtual inline void AllGood(void);

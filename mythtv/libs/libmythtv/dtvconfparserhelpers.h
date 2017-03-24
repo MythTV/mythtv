@@ -50,7 +50,7 @@ struct DTVParamHelperStruct
 class DTVParamHelper
 {
   public:
-    DTVParamHelper(int _value) : value(_value) { }
+    explicit DTVParamHelper(int _value) : value(_value) { }
     DTVParamHelper &operator=(int _value) { value = _value; return *this; }
 
     operator int()                const { return value;          }
@@ -474,7 +474,7 @@ class DTVPolarity : public DTVParamHelper
         kPolarityLeft
     };
 
-    DTVPolarity(int _default = kPolarityVertical)
+    explicit DTVPolarity(int _default = kPolarityVertical)
         : DTVParamHelper(_default) { }
 
     bool ParseConf(const QString &_value)
@@ -558,7 +558,7 @@ class DTVRollOff : public DTVParamHelper
         kRollOff_Auto,
     };
 
-    DTVRollOff(int _default = kRollOff_35)
+    explicit DTVRollOff(int _default = kRollOff_35)
         : DTVParamHelper(_default) { }
 
     bool IsCompatible(const DTVRollOff &other) const

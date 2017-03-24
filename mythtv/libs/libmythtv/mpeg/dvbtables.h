@@ -27,7 +27,7 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
         assert(TableID::NIT == TableID() || TableID::NITo == TableID());
         Parse();
     }
-    NetworkInformationTable(const PSIPTable& table)
+    explicit NetworkInformationTable(const PSIPTable& table)
         : PSIPTable(table), _cached_network_name(QString::null)
     {
         assert(TableID::NIT == TableID() || TableID::NITo == TableID());
@@ -107,7 +107,8 @@ class MTV_PUBLIC ServiceDescriptionTableSection : public PSIPTable
         assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
     }
-    ServiceDescriptionTableSection(const PSIPTable& table) : PSIPTable(table)
+    
+    explicit ServiceDescriptionTableSection(const PSIPTable& table) : PSIPTable(table)
     {
         assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
@@ -179,7 +180,7 @@ class MTV_PUBLIC ServiceDescriptionTableSection : public PSIPTable
 class MTV_PUBLIC BouquetAssociationTable : public PSIPTable
 {
   public:
-    BouquetAssociationTable(const PSIPTable& table) : PSIPTable(table)
+    explicit BouquetAssociationTable(const PSIPTable& table) : PSIPTable(table)
     {
        assert(TableID::BAT == TableID());
        Parse();
@@ -242,7 +243,7 @@ class MTV_PUBLIC BouquetAssociationTable : public PSIPTable
 
 class MTV_PUBLIC DiscontinuityInformationTable : public PSIPTable
 {
-    DiscontinuityInformationTable(const PSIPTable& table) : PSIPTable(table)
+    explicit DiscontinuityInformationTable(const PSIPTable& table) : PSIPTable(table)
         { ; }
     // table_id 8
     // section_syntax_indicator 1
@@ -285,7 +286,7 @@ class MTV_PUBLIC SelectionInformationTable : public PSIPTable
 class MTV_PUBLIC DVBEventInformationTableSection : public PSIPTable
 {
   public:
-    DVBEventInformationTableSection(const PSIPTable& table);
+    explicit DVBEventInformationTableSection(const PSIPTable& table);
 
     ~DVBEventInformationTableSection();
 
@@ -361,7 +362,7 @@ class MTV_PUBLIC DVBEventInformationTableSection : public PSIPTable
 class MTV_PUBLIC TimeDateTable : public PSIPTable
 {
   public:
-    TimeDateTable(const PSIPTable& table)
+    explicit TimeDateTable(const PSIPTable& table)
         : PSIPTable(table)
     {
         assert(TableID::TDT == TableID());

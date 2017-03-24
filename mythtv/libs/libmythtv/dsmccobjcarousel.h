@@ -64,7 +64,7 @@ class DSMCCCacheModuleData
 class ObjCarousel
 {
   public:
-    ObjCarousel(Dsmcc*);
+    explicit ObjCarousel(Dsmcc*);
     ~ObjCarousel();
     void AddModuleInfo(DsmccDii *dii, Dsmcc *status, unsigned short streamTag);
     void AddModuleData(DsmccDb *ddb, const unsigned char *data);
