@@ -3,10 +3,10 @@
 // Created     : Oct. 24, 2005
 //
 // Purpose     : UPnp Task to send Notification messages
-//                                                                            
+//
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
-//                                          
-// Licensed under the GPL v2 or later, see COPYING for details                    
+//
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -26,6 +26,7 @@
 
 // MythTV headers
 #include "compat.h"
+#include "taskqueue.h"
 
 class MSocketDevice;
 class UPnpDevice;
@@ -34,7 +35,7 @@ class UPnpDevice;
 // Typedefs
 /////////////////////////////////////////////////////////////////////////////
 
-typedef enum 
+typedef enum
 {
     NTS_alive   = 0,
     NTS_byebye  = 1
@@ -51,13 +52,13 @@ typedef enum
 
 class UPnpNotifyTask : public Task
 {
-    protected: 
+    protected:
 
         QMutex          m_mutex;
 
         QString         m_sMasterIP;
         int             m_nServicePort;
-        int             m_nMaxAge;    
+        int             m_nMaxAge;
 
         UPnpNotifyNTS   m_eNTS;
 
@@ -86,7 +87,7 @@ class UPnpNotifyTask : public Task
             m_mutex.unlock();
 
             switch( nts )
-            {  
+            {
                 case NTS_alive : return( "ssdp:alive"  );
                 case NTS_byebye: return( "ssdp:byebye" );
             }
@@ -95,7 +96,7 @@ class UPnpNotifyTask : public Task
 
         // ------------------------------------------------------------------
 
-        UPnpNotifyNTS GetNTS() 
+        UPnpNotifyNTS GetNTS()
         {
             m_mutex.lock();
             UPnpNotifyNTS nts = m_eNTS;
@@ -105,8 +106,8 @@ class UPnpNotifyTask : public Task
         }
 
         // ------------------------------------------------------------------
-        
-        void SetNTS( UPnpNotifyNTS nts) 
+
+        void SetNTS( UPnpNotifyNTS nts)
         {
             m_mutex.lock();
             m_eNTS = nts;
