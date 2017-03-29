@@ -588,9 +588,6 @@ QString RegistrationDescriptor::GetDescription(const QString &fmt)
             ret = *it;
     }
 
-    if (!ret.isNull())
-        ret.detach();
-
     return ret;
 }
 

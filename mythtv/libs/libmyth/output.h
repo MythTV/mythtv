@@ -80,7 +80,6 @@ class MPUBLIC OutputEvent : public MythEvent
         if (o.error_msg)
         {
             error_msg = new QString(*o.error_msg);
-            error_msg->detach();
         }
     }
     OutputEvent &operator=(const OutputEvent&);

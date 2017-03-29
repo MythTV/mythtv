@@ -488,7 +488,7 @@ class MPUBLIC ProgramInfo
                      QString grp = "\"") const;
 
     // Quick sets
-    void SetTitle(const QString &t) { title = t; title.detach(); }
+    void SetTitle(const QString &t) { title = t; }
     void SetProgramInfoType(ProgramInfoType t)
         { programflags &= ~FL_TYPEMASK; programflags |= ((uint32_t)t<<20); }
     void SetPathname(const QString&) const;

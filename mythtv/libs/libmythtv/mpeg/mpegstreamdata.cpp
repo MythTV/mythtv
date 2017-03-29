@@ -121,17 +121,9 @@ void MPEGStreamData::SetDesiredProgram(int p)
 void MPEGStreamData::SetRecordingType(const QString &recording_type)
 {
     _recording_type = recording_type;
-    _recording_type.detach();
     uint neededAudio = (_recording_type == "audio") ? 1 : 0;
     SetVideoStreamsRequired(0);
     SetAudioStreamsRequired(neededAudio);
-}
-
-QString MPEGStreamData::GetRecordingType(void) const
-{
-    QString tmp = _recording_type;
-    tmp.detach();
-    return tmp;
 }
 
 void MPEGStreamData::SetEITHelper(EITHelper *eit_helper)

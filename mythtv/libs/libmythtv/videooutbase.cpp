@@ -728,13 +728,6 @@ void VideoOutput::GetDeinterlacers(QStringList &deinterlacers)
     deinterlacers = db_vdisp_profile->GetDeinterlacers(rend);
 }
 
-QString VideoOutput::GetDeinterlacer(void)
-{
-    QString res = m_deintfiltername;
-    res.detach();
-    return res;
-}
-
 /**
  * \fn VideoOutput::VideoAspectRatioChanged(float aspect)
  * \brief Calls SetVideoAspectRatio(float aspect),

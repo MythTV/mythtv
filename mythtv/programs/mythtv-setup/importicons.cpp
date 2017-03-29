@@ -34,7 +34,6 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_skipButton(NULL),            m_statusText(NULL),
     m_preview(NULL),               m_previewtitle(NULL)
 {
-    m_strChannelname.detach();
     if (!m_strChannelname.isEmpty())
         LOG(VB_GENERAL, LOG_INFO,
             QString("Fetching icon for channel %1").arg(m_strChannelname));

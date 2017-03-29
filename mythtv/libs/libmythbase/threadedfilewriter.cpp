@@ -73,7 +73,6 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     m_warned(false),                     m_blocking(false),
     m_registered(false)
 {
-    filename.detach();
 }
 
 /** \fn ThreadedFileWriter::ReOpen(QString)

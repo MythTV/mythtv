@@ -111,8 +111,6 @@ void RawSettingsEditor::Load(void)
 
         ++it;
     }
-    m_settingValues.detach();
-    m_origValues.detach();
 }
 
 /** \fn RawSettingsEditor::Init(void)

@@ -889,7 +889,7 @@ class HDHomeRunIP : public MythUITextEditSetting
 
     virtual void setEnabled(bool e);
     void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
+        { _oldValue = s; };
 
   signals:
     void NewIP(const QString&);
@@ -910,7 +910,7 @@ class HDHomeRunTunerIndex : public MythUITextEditSetting
 
     virtual void setEnabled(bool e);
     void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
+        { _oldValue = s; };
 
   signals:
     void NewTuner(const QString&);
@@ -986,7 +986,7 @@ class VBoxIP : public GroupSetting
 
     virtual void setEnabled(bool e);
     void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
+        { _oldValue = s; };
 
   signals:
     void NewIP(const QString&);
@@ -1007,7 +1007,7 @@ class VBoxTunerIndex : public GroupSetting
 
     virtual void setEnabled(bool e);
     void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
+        { _oldValue = s; };
 
   signals:
     void NewTuner(const QString&);

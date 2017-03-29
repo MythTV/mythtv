@@ -453,8 +453,6 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
         QString("SetVideoRenderer(%1)").arg(video_renderer));
 
     last_video_renderer = video_renderer;
-    last_video_renderer.detach();
-
     if (video_renderer == GetVideoRenderer())
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -532,7 +530,6 @@ QString VideoDisplayProfile::GetFilteredDeint(const QString &override)
         LOC + QString("GetFilteredDeint(%1) : %2 -> '%3'")
             .arg(override).arg(renderer).arg(deint));
 
-    deint.detach();
     return deint;
 }
 
@@ -547,9 +544,7 @@ QString VideoDisplayProfile::GetPreference(const QString &key) const
     if (it == pref.end())
         return QString::null;
 
-    QString pref = *it;
-    pref.detach();
-    return pref;
+    return *it;
 }
 
 void VideoDisplayProfile::SetPreference(
@@ -559,9 +554,7 @@ void VideoDisplayProfile::SetPreference(
 
     if (!key.isEmpty())
     {
-        QString tmp = value;
-        tmp.detach();
-        pref[key] = tmp;
+        pref[key] = value;
     }
 }
 
@@ -859,8 +852,6 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
     pref_map_t::const_iterator it = dec_name.find(decoder);
     if (it != dec_name.end())
         ret = *it;
-
-    ret.detach();
     return ret;
 }
 
@@ -1456,8 +1447,6 @@ QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
     QStringList tmp;
     if (it != safe_renderer.end())
         tmp = *it;
-
-    tmp.detach();
     return tmp;
 }
 
@@ -1544,8 +1533,6 @@ QStringList VideoDisplayProfile::GetDeinterlacers(
     QStringList tmp;
     if (it != safe_deint.end())
         tmp = *it;
-
-    tmp.detach();
     return tmp;
 }
 
@@ -1674,8 +1661,6 @@ QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
     QStringList tmp;
     if (it != safe_osd.end())
         tmp = *it;
-
-    tmp.detach();
     return tmp;
 }
 
@@ -1767,9 +1752,6 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
             top_renderer = *it;
         }
     }
-
-    if (!top_renderer.isNull())
-        top_renderer.detach();
 
     return top_renderer;
 }

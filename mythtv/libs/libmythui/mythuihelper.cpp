@@ -1897,14 +1897,11 @@ bool MythUIHelper::GetScreenIsAsleep(void)
 void MythUIHelper::SetX11Display(const QString &display)
 {
     x11_display = display;
-    x11_display.detach();
 }
 
 QString MythUIHelper::GetX11Display(void)
 {
-    QString ret = x11_display;
-    ret.detach();
-    return ret;
+    return x11_display;
 }
 
 void MythUIHelper::AddCurrentLocation(QString location)

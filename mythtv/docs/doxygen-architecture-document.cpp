@@ -44,14 +44,6 @@ the rare case when it is necessary, such as when we need a reverse
 iterator iterator, and because they are more efficient than the
 Java style iterators that Qt also supports.
 
-In Qt 3.x and Qt 4.0 assignment of one Qt copy-on-write was
-not yet thread-safe. Because of this you will see a number of
-\::detach() calls in %MythTV code. These calls force a deep copy
-to be made immediately and should either be removed or a comment
-should be added in the rare case where this is done as an
-optimization and not just a hold-over from when copy-on-write 
-wasn't yet thread-safe in Qt 4.0 and earlier.
-
 There are some special dangers when
 \ref qobject_dangers "using QObject" outside the Qt event thread.
 

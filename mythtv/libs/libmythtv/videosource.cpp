@@ -72,7 +72,6 @@ VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
     card_types(_card_types),
     must_have_mplexid(_must_have_mplexid)
 {
-    card_types.detach();
     setLabel(tr("Video Source"));
 }
 
@@ -1397,7 +1396,6 @@ void HDHomeRunIP::setEnabled(bool e)
     else
     {
         _oldValue = getValue();
-        _oldValue.detach();
     }
 }
 
@@ -1658,7 +1656,6 @@ void VBoxIP::setEnabled(bool e)
     else
     {
         _oldValue = getValue();
-        _oldValue.detach();
     }
 }
 

@@ -49,8 +49,6 @@ StorageGroup::StorageGroup(const QString &group, const QString &hostname,
                            bool allowFallback) :
     m_groupname(group), m_hostname(hostname), m_allowFallback(allowFallback)
 {
-    m_groupname.detach();
-    m_hostname.detach();
     m_dirlist.clear();
 
     if (getenv("MYTHTV_NOSGFALLBACK"))
@@ -107,8 +105,8 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
                         const bool allowFallback)
 {
     bool found = false;
-    m_groupname = group;    m_groupname.detach();
-    m_hostname  = hostname; m_hostname.detach();
+    m_groupname = group;
+    m_hostname  = hostname;
     m_allowFallback = allowFallback;
     m_dirlist.clear();
 
@@ -140,7 +138,6 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
         if (found)
         {
             m_hostname = "";
-            m_hostname.detach();
         }
     }
     if ((!found) && m_allowFallback && (group != "Default"))
@@ -152,7 +149,6 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
         if(found)
         {
             m_groupname = "Default";
-            m_groupname.detach();
         }
         else if (!hostname.isEmpty())
         {
@@ -165,8 +161,6 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
             {
                 m_groupname = "Default";
                 m_hostname = "";
-                m_groupname.detach();
-                m_hostname.detach();
             }
         }
     }
@@ -197,7 +191,6 @@ QString StorageGroup::GetFirstDir(bool appendSlash) const
         return QString();
 
     QString tmp = m_dirlist[0];
-    tmp.detach();
 
     if (appendSlash)
         tmp += "/";
@@ -641,11 +634,7 @@ QString StorageGroup::FindFileDir(const QString &filename)
                 .arg(m_dirlist[curDir]).arg(testFile));
         checkFile.setFile(testFile);
         if (checkFile.exists() || checkFile.isSymLink())
-        {
-            QString tmp = m_dirlist[curDir];
-            tmp.detach();
-            return tmp;
-        }
+            return m_dirlist[curDir];
 
         curDir++;
     }
@@ -674,7 +663,6 @@ QString StorageGroup::FindFileDir(const QString &filename)
         result = (tmpFile.isEmpty()) ? result : tmpFile;
     }
 
-    result.detach();
     return result;
 }
 
@@ -730,7 +718,6 @@ QString StorageGroup::FindNextDirMostFree(void)
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("FindNextDirMostFree: Using '%1'").arg(nextDir));
 
-    nextDir.detach();
     return nextDir;
 }
 
@@ -819,8 +806,6 @@ QStringList StorageGroup::getRecordingsGroups(void)
     }
 
     groups.sort();
-    groups.detach();
-
     return groups;
 }
 
@@ -865,8 +850,6 @@ QStringList StorageGroup::getGroupDirs(const QString &groupname,
     }
 
     groups.sort();
-    groups.detach();
-
     return groups;
 }
 

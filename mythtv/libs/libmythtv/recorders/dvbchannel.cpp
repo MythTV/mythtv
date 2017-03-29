@@ -905,13 +905,6 @@ bool DVBChannel::Retune(void)
     return Tune(desired_tuning, true, true);
 }
 
-QString DVBChannel::GetFrontendName(void) const
-{
-    QString tmp = frontend_name;
-    tmp.detach();
-    return tmp;
-}
-
 /** \fn DVBChannel::IsTuningParamsProbeSupported(void) const
  *  \brief Returns true iff tuning info probing is working.
  */
@@ -1005,7 +998,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     }
 
     uint    mplex      = tuning.mplex;
-    QString sistandard = tuning.sistandard; sistandard.detach();
+    QString sistandard = tuning.sistandard;
 
     tuning = dvbparams_to_dtvmultiplex(tunerType, params);
 

@@ -19,10 +19,10 @@ class MBASE_PUBLIC StorageGroup
                  const bool allowFallback = true);
 
     QString getName(void) const
-        { QString tmp = m_groupname; tmp.detach(); return tmp; }
+        { QString tmp = m_groupname; return tmp; }
 
     QStringList GetDirList(void) const
-        { QStringList tmp = m_dirlist; tmp.detach(); return tmp; }
+        { QStringList tmp = m_dirlist; return tmp; }
     QString GetFirstDir(bool appendSlash = false) const;
 
     QStringList GetDirFileList(const QString &dir, const QString &base,

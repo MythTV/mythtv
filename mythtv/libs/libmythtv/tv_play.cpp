@@ -7426,9 +7426,7 @@ void TV::ToggleChannelFavorite(PlayerContext *ctx, QString changroup_name)
 QString TV::GetQueuedInput(void) const
 {
     QMutexLocker locker(&timerIdLock);
-    QString ret = queuedInput;
-    ret.detach();
-    return ret;
+    return queuedInput;
 }
 
 int TV::GetQueuedInputAsInt(bool *ok, int base) const
@@ -7456,9 +7454,7 @@ QString TV::GetQueuedChanNum(void) const
     // strip whitespace at end of string
     queuedChanNum = queuedChanNum.trimmed();
 
-    QString ret = queuedChanNum;
-    ret.detach();
-    return ret;
+    return queuedChanNum;
 }
 
 /**
@@ -7593,7 +7589,6 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
 
     QMutexLocker locker(&timerIdLock);
     inputStr = queuedChanNum;
-    inputStr.detach();
     if (!queueInputTimerId)
         queueInputTimerId = StartTimer(10, __LINE__);
 
@@ -7912,8 +7907,8 @@ void TV::ChangeChannel(const PlayerContext *ctx, const ChannelInfoList &options)
             HideOSDWindow(ctx, "osd_input");
 
             QMutexLocker locker(&timerIdLock);
-            queuedInput   = channum; queuedInput.detach();
-            queuedChanNum = channum; queuedChanNum.detach();
+            queuedInput   = channum;
+            queuedChanNum = channum;
             queuedChanID  = chanid;
             if (!queueInputTimerId)
                 queueInputTimerId = StartTimer(10, __LINE__);
@@ -7953,8 +7948,8 @@ void TV::PopPreviousChannel(PlayerContext *ctx, bool immediate_change)
     if (cur_channum != prev_channum && !prev_channum.isEmpty())
     {
         QMutexLocker locker(&timerIdLock);
-        queuedInput   = prev_channum; queuedInput.detach();
-        queuedChanNum = prev_channum; queuedChanNum.detach();
+        queuedInput   = prev_channum;
+        queuedChanNum = prev_channum;
         queuedChanID  = 0;
         if (!queueInputTimerId)
             queueInputTimerId = StartTimer(10, __LINE__);
@@ -8200,10 +8195,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     if (!osd || browsehelper->IsBrowsing() || !queuedChanNum.isEmpty())
     {
         if (&ctx->lastSignalMsg != &strlist)
-        {
             ctx->lastSignalMsg = strlist;
-            ctx->lastSignalMsg.detach();
-        }
         ReturnOSDLock(ctx, osd);
 
         QMutexLocker locker(&timerIdLock);
@@ -9746,7 +9738,6 @@ void TV::customEvent(QEvent *e)
                 (tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
             {
                 QMutexLocker locker(&timerIdLock);
-                message.detach();
                 networkControlCommands.enqueue(message);
                 if (!networkControlTimerId)
                     networkControlTimerId = StartTimer(1, __LINE__);
@@ -10610,9 +10601,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
         InfoMap::const_iterator it_field = (*it_val).find(field);
         if (it_field != (*it_val).end())
         {
-            QString ret = *it_field;
-            ret.detach();
-            return ret;
+            return *it_field;
         }
     }
 
@@ -10642,9 +10631,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
         InfoMap::const_iterator it_field = (*best_match).find(field);
         if (it_field != (*best_match).end())
         {
-            QString ret = *it_field;
-            ret.detach();
-            return ret;
+            return *it_field;
         }
     }
 
@@ -10955,8 +10942,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 if (cur_channum != new_channum && !new_channum.isEmpty())
                 {
                     QMutexLocker locker(&timerIdLock);
-                    queuedInput   = new_channum; queuedInput.detach();
-                    queuedChanNum = new_channum; queuedChanNum.detach();
+                    queuedInput   = new_channum;
+                    queuedChanNum = new_channum;
                     queuedChanID  = 0;
                     if (!queueInputTimerId)
                         queueInputTimerId = StartTimer(10, __LINE__);

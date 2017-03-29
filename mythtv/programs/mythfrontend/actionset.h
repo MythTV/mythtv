@@ -61,8 +61,11 @@ class ActionSet
     QStringList GetContextKeys(const QString &context_name) const;
     QStringList GetAllKeys(void) const;
     QString     GetDescription(const ActionID &id) const;
-    ActionList  GetActions(const QString &key) const;
-    ActionList  GetModified(void) const;
+    /// \brief Returns the actions bound to the specified key.
+    ActionList  GetActions(const QString &key) const
+        { return m_keyToActionMap[key]; }
+    /// \brief Returns the appropriate container of modified actions
+    ActionList  GetModified(void) const { return m_modified; }
     /// \brief Returns true iff changes have been made.
     bool HasModified(void) const { return !m_modified.isEmpty(); }
     /// \brief Returns true iff the action is modified.

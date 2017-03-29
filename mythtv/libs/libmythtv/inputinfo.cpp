@@ -3,23 +3,6 @@
 // MythTV headers
 #include "inputinfo.h"
 
-InputInfo::InputInfo(
-    const QString &_name,
-    uint _sourceid, uint _inputid, uint _mplexid, uint _chanid,
-    uint _livetvorder) :
-    name(_name),
-    sourceid(_sourceid),
-    inputid(_inputid),
-    mplexid(_mplexid),
-    chanid(_chanid),
-    recPriority(0),
-    scheduleOrder(0),
-    livetvorder(_livetvorder),
-    quickTune(false)
-{
-    name.detach();
-}
-
 void InputInfo::Clear(void)
 {
     InputInfo blank;
@@ -34,7 +17,6 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
         return false;
 
     name     = *it;
-    name.detach();
     name     = (name == "<EMPTY>") ? QString::null : name;
     NEXT();
 
@@ -44,7 +26,6 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     livetvorder = (*it).toUInt(); NEXT();
 
     displayName = *it;
-    displayName.detach();
     displayName = (displayName == "<EMPTY>") ? QString::null : displayName;
     NEXT();
 

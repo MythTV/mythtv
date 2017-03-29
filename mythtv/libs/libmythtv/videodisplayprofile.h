@@ -186,7 +186,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static bool SaveDB(uint groupid, item_list_t&);
 
     QString GetActualVideoRenderer(void) const
-        { QString tmp = last_video_renderer; tmp.detach(); return tmp; }
+        { return last_video_renderer; }
 
   private:
     item_list_t::const_iterator FindMatch(const QSize &size,

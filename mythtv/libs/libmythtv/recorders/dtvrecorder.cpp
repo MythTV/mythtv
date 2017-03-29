@@ -128,10 +128,7 @@ DTVRecorder::~DTVRecorder(void)
 void DTVRecorder::SetOption(const QString &name, const QString &value)
 {
     if (name == "recordingtype")
-    {
         _recording_type = value;
-        _recording_type.detach();
-    }
     else
         RecorderBase::SetOption(name, value);
 }

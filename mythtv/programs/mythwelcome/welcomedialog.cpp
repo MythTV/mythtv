@@ -375,8 +375,6 @@ void WelcomeDialog::updateScreen(void)
         else
             status = tr("There are no recordings currently taking place");
 
-        status.detach();
-
         m_recording_text->SetText(status);
 
         // update scheduled

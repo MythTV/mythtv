@@ -1085,13 +1085,11 @@ void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext)
     VerboseDef *item = new VerboseDef;
 
     item->mask = mask;
-    name.detach();
     // VB_GENERAL -> general
     name.remove(0, 3);
     name = name.toLower();
     item->name = name;
     item->additive = additive;
-    helptext.detach();
     item->helpText = helptext;
 
     verboseMap.insert(name, item);
@@ -1107,7 +1105,6 @@ void loglevelAdd(int value, QString name, char shortname)
     LoglevelDef *item = new LoglevelDef;
 
     item->value = value;
-    name.detach();
     // LOG_CRIT -> crit
     name.remove(0, 4);
     name = name.toLower();

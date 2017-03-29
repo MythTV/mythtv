@@ -206,9 +206,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
         {
             // found a sub to display
             m_lastReturnedSubtitle = sub;
-            QStringList tmp = m_lastReturnedSubtitle.textLines;
-            tmp.detach();
-            return tmp;
+            return m_lastReturnedSubtitle.textLines;
         }
 
         // the subtitle time span has ended, let's display a blank sub

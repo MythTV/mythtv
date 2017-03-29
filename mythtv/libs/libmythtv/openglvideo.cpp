@@ -909,7 +909,6 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
     if (softwareDeinterlacer != filter)
         CheckResize(false, filter != "bobdeint");
     softwareDeinterlacer = filter;
-    softwareDeinterlacer.detach();
 }
 
 /**

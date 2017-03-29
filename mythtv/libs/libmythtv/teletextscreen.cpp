@@ -705,7 +705,6 @@ bool TeletextScreen::InitialiseFont()
     if (mythfont)
     {
         QFont newfont(font);
-        font.detach();
         mythfont->SetFace(newfont);
         gTTFont = mythfont;
     }

@@ -102,7 +102,6 @@ void CommBreakMap::GetMap(frm_dir_map_t &map) const
     QMutexLocker locker(&commBreakMapLock);
     map.clear();
     map = commBreakMap;
-    map.detach();
 }
 
 bool CommBreakMap::IsInCommBreak(uint64_t frameNumber) const
@@ -147,7 +146,6 @@ void CommBreakMap::SetMap(const frm_dir_map_t &newMap, uint64_t framesPlayed)
 
     commBreakMap.clear();
     commBreakMap = newMap;
-    commBreakMap.detach();
     hascommbreaktable = !commBreakMap.isEmpty();
     SetTracker(framesPlayed);
 }

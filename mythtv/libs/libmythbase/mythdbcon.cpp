@@ -74,7 +74,6 @@ bool TestDatabase(QString dbHostName,
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
-    m_name.detach();
 
     if (!QSqlDatabase::isDriverAvailable("QMYSQL"))
     {

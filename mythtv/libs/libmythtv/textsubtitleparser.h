@@ -25,10 +25,7 @@ class text_subtitle_t
     text_subtitle_t() : start(0), end(0) {}
     text_subtitle_t(const text_subtitle_t &other) :
         start(other.start), end(other.end),
-        textLines(other.textLines)
-    {
-        textLines.detach();
-    }
+        textLines(other.textLines) {}
 
   public:
     uint64_t    start;      ///< Starting time in msec or starting frame

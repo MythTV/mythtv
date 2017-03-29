@@ -75,8 +75,7 @@ void post_event(QObject *dest, QEvent::Type type, int val)
 void post_event(QObject *dest, QEvent::Type type, const QString &val)
 {
     ScannerEvent *e = new ScannerEvent(type);
-    QString tmp = val; tmp.detach();
-    e->strValue(tmp);
+    e->strValue(val);
     QCoreApplication::postEvent(dest, e);
 }
 

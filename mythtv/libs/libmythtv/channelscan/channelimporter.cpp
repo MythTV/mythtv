@@ -26,7 +26,6 @@ static QString map_str(QString str)
 {
     if (str.isEmpty())
         return "";
-    str.detach();
     return str;
 }
 

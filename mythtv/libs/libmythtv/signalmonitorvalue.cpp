@@ -45,9 +45,6 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
     minval(_min), maxval(_max), timeout(_timeout),
     high_threshold(_high_threshold), set(false)
 {
-    name.detach();
-    noSpaceName.detach();
-
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     LOG(VB_GENERAL, LOG_DEBUG,
@@ -71,9 +68,6 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
     minval(_min), maxval(_max), timeout(_timeout),
     high_threshold(_high_threshold), set(_set)
 {
-    name.detach();
-    noSpaceName.detach();
-
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     LOG(VB_GENERAL, LOG_DEBUG,
@@ -88,20 +82,14 @@ QString SignalMonitorValue::GetName(void) const
 {
     if (name.isNull())
         return QString::null;
-
-    QString ret = name;
-    ret.detach();
-    return ret;
+    return name;
 }
 
 QString SignalMonitorValue::GetShortName(void) const
 {
     if (noSpaceName.isNull())
         return QString::null;
-
-    QString ret = noSpaceName;
-    ret.detach();
-    return ret;
+    return noSpaceName;
 }
 
 bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
@@ -136,10 +124,6 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
     SetTimeout(vals[5].toInt());
 
     set = (bool) vals[7].toInt();
-
-    name.detach();
-    noSpaceName.detach();
-
     return true;
 }
 

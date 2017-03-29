@@ -67,12 +67,6 @@ class MythDownloadInfo
             m_reply->deleteLater();
     }
 
-    void detach(void)
-    {
-        m_url.detach();
-        m_outFile.detach();
-    }
-
     bool IsDone(void)
     {
         QMutexLocker lock(&m_lock);
@@ -133,10 +127,7 @@ class RemoteFileDownloadThread : public QRunnable
     RemoteFileDownloadThread(MythDownloadManager *parent,
                              MythDownloadInfo *dlInfo) :
         m_parent(parent),
-        m_dlInfo(dlInfo)
-    {
-        m_dlInfo->detach();
-    }
+        m_dlInfo(dlInfo) {}
 
     void run()
     {
@@ -382,8 +373,6 @@ void MythDownloadManager::queueItem(const QString &url, QNetworkRequest *req,
     dlInfo->m_caller  = caller;
     dlInfo->m_requestType = reqType;
     dlInfo->m_reload  = reload;
-
-    dlInfo->detach();
 
     QMutexLocker locker(m_infoLock);
     m_downloadQueue.push_back(dlInfo);

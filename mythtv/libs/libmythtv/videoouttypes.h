@@ -182,7 +182,6 @@ inline QString toString(FrameScanType scan, bool brief = false)
             break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -198,7 +197,6 @@ inline QString toString(PIPLocation location)
         case kPIP_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -216,7 +214,6 @@ inline QString toString(AspectOverrideMode aspectmode)
         case kAspect_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -231,7 +228,6 @@ inline QString toString(LetterBoxColour letterboxcolour)
         case kLetterBoxColour_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -246,7 +242,6 @@ inline QString toXString(LetterBoxColour letterboxcolour)
         case kLetterBoxColour_END: break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -292,7 +287,6 @@ inline QString toString(AdjustFillMode aspectmode)
             break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -318,7 +312,6 @@ inline QString toString(PictureAttribute pictureattribute)
           ret = "MAX";                        break;
     }
 
-    ret.detach();
     return ret;
 }
 
@@ -344,8 +337,6 @@ inline QString toDBString(PictureAttribute pictureattribute)
 
     if (ret.isEmpty())
         return QString::null;
-
-    ret.detach();
     return ret;
 }
 
@@ -372,8 +363,6 @@ inline QString toXVString(PictureAttribute pictureattribute)
 
     if (ret.isEmpty())
         return QString::null;
-
-    ret.detach();
     return ret;
 }
 
@@ -393,8 +382,6 @@ inline QString toString(PictureAttributeSupported supported)
         ret += "Studio Levels, ";
     if (kPictureAttributeSupported_Volume & supported)
         ret += "Volume, ";
-
-    ret.detach();
     return ret;
 }
 

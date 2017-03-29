@@ -370,14 +370,14 @@ class MTV_PUBLIC DataDirectProcessor
     RawLineup GetRawLineup(const QString &lineupid) const;
 
     // sets
-    void SetUserID(const QString &uid);
-    void SetPassword(const QString &pwd);
+    void SetUserID(const QString &uid) { m_userid = uid; }
+    void SetPassword(const QString &pwd) { m_password = pwd; }
     void SetListingsProvider(uint i)
     {
         m_listingsProvider = i % DD_PROVIDER_COUNT;
     }
 
-    void SetInputFile(const QString &file);
+    void SetInputFile(const QString &file) { m_inputFilename = file; }
     void SetCacheData(bool cd) { m_cacheData = cd; }
 
     // static commands (these update temp DB tables)

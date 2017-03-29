@@ -169,8 +169,6 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
       m_analogSignalHandler(new AnalogSignalHandler(this)),
       m_scannerThread(NULL)
 {
-    m_inputName.detach();
-
     m_current = m_scanTransports.end();
 
     // Create a stream data for digital signal monitors
@@ -2192,8 +2190,8 @@ bool ChannelScanSM::CheckImportedList(
             found = true;
             if (!channels[i].name.isEmpty())
             {
-                service_name = channels[i].name; service_name.detach();
-                callsign     = channels[i].name; callsign.detach();
+                service_name = channels[i].name;
+                callsign     = channels[i].name;
             }
         }
     }

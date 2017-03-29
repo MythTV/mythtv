@@ -240,15 +240,9 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
 {
     m_main_device = m_passthru_device = QString::null;
     if (!main_device.isEmpty())
-    {
         m_main_device = main_device;
-        m_main_device.detach();
-    }
     if (!passthru_device.isEmpty())
-    {
         m_passthru_device = passthru_device;
-        m_passthru_device.detach();
-    }
     m_samplerate = (int)samplerate;
     m_codec_profile    = codec_profile;
 }

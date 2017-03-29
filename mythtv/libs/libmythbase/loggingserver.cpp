@@ -1419,7 +1419,6 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
         // FileLogger from logFile
         QString logfile = item->logFile();
-        logfile.detach();
         if (!logfile.isEmpty())
         {
             logger = FileLogger::create(logfile, lock2.mutex());
