@@ -244,9 +244,10 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     {
         if (shear < 0)
             newpainter.drawImage(mirrorImage.width()-width(), 0,
-                                 copy(0,0,width(),height()));
+                                 *(static_cast<QImage*>(this)));
         else
-            newpainter.drawImage(0, 0, copy(0,0,width(),height()));
+            newpainter.drawImage(0, 0,
+                                 *(static_cast<QImage*>(this)));
 
         newpainter.drawImage(0, height()+spacing, mirrorImage);
     }
@@ -254,9 +255,9 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     {
         if (shear < 0)
             newpainter.drawImage(0, mirrorImage.height()-height(),
-                                 copy(0,0,width(),height()));
+                                 *(static_cast<QImage*>(this)));
         else
-            newpainter.drawImage(0, 0, copy(0,0,width(),height()));
+            newpainter.drawImage(0, 0, *(static_cast<QImage*>(this)));
 
         newpainter.drawImage(width()+spacing, 0, mirrorImage);
     }
