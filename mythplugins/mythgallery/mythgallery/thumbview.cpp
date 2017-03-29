@@ -12,16 +12,6 @@
 #include "thumbview.h"
 #include "galleryutil.h"
 
-ThumbItem::ThumbItem(const QString &name, const QString &path, bool isDir,
-                     MythMediaDevice *dev) :
-        m_name(name),
-        m_path(path), m_isDir(isDir),
-        m_pixmap(nullptr), m_mediaDevice(dev)
-{
-    m_name.detach();
-    m_path.detach();
-}
-
 ThumbItem::~ThumbItem()
 {
     if (m_pixmap)

@@ -1226,10 +1226,7 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
     QMap<uint,QString>::iterator it = channel_default_authority_map.find(chanid);
     QString ret;
     if (it != channel_default_authority_map.end())
-    {
         ret = *it;
-        ret.detach();
-    }
     channel_default_authority_map_lock.unlock();
 
     return ret;
@@ -1297,9 +1294,7 @@ QString ChannelUtil::GetIcon(uint chanid)
 
 QString ChannelUtil::GetUnknownCallsign(void)
 {
-    QString tmp = tr("UNKNOWN", "Synthesized callsign");
-    tmp.detach();
-    return tmp;
+    return tr("UNKNOWN", "Synthesized callsign");
 }
 
 int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,

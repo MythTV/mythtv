@@ -44,10 +44,6 @@ class SystemEventThread : public QRunnable
     void run(void) override // QRunnable
     {
         uint flags = kMSDontBlockInputDevs;
-
-        m_event.detach();
-        m_command.detach();
-
         uint result = myth_system(m_command, flags);
 
         LOG(VB_GENERAL,

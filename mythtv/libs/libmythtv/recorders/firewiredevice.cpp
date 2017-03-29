@@ -364,8 +364,6 @@ QString FirewireDevice::GetModelName(uint vendor_id, uint model_id)
 
     if (ret.isEmpty())
         return "MOTO GENERIC";
-
-    ret.detach();
     return ret;
 }
 

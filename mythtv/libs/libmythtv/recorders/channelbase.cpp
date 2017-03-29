@@ -119,10 +119,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
             if (ok)
             {
                 if (mplexid_restriction || chanid_restriction)
-                {
                     startchannel = (*cit).channum;
-                    startchannel.detach();
-                }
                 msg2 = QString("selected to '%1' instead.")
                     .arg(startchannel);
                 msg_error = false;

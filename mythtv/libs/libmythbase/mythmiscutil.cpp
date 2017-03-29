@@ -494,7 +494,7 @@ QString getSymlinkTarget(const QString &start_file,
 #endif
 
     QString   link;
-    QString   cur_file = start_file; cur_file.detach();
+    QString   cur_file = start_file;
     QFileInfo fi(cur_file);
 
     if (intermediaries)
@@ -515,9 +515,6 @@ QString getSymlinkTarget(const QString &start_file,
 
         fi = QFileInfo(cur_file);
     }
-
-    if (intermediaries)
-        intermediaries->detach();
 
 #if 0
     if (intermediaries)

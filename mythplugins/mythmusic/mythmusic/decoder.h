@@ -55,7 +55,6 @@ class DecoderEvent : public MythEvent
         if (o.error_msg)
         {
             error_msg = new QString(*o.error_msg);
-            error_msg->detach();
         }
     }
     DecoderEvent &operator=(const DecoderEvent&);

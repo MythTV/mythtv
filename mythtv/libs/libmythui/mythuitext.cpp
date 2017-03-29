@@ -168,7 +168,6 @@ void MythUIText::ResetMap(const InfoMap &map)
 void MythUIText::SetText(const QString &text)
 {
     QString newtext = text;
-    newtext.detach();
 
     if (!m_Layouts.isEmpty() && newtext == m_Message)
         return;
@@ -239,18 +238,6 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
     {
         SetText(map.value(objectName()));
     }
-}
-
-QString MythUIText::GetText(void) const
-{
-    QString ret = m_Message;
-    ret.detach();
-    return ret;
-}
-
-QString MythUIText::GetDefaultText(void) const
-{
-    return m_DefaultMessage;
 }
 
 void MythUIText::SetFontProperties(const MythFontProperties &fontProps)

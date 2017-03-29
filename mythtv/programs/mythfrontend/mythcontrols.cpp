@@ -311,8 +311,7 @@ void MythControls::SetListContents(
     QStringList::const_iterator it = contents.begin();
     for (; it != contents.end(); ++it)
     {
-        QString tmp = *it; tmp.detach();
-        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, tmp);
+        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, *it);
         item->setDrawArrow(arrows);
     }
 }
@@ -413,9 +412,7 @@ QString MythControls::GetCurrentAction(void)
     {
         if (m_leftList && m_leftList->GetItemCurrent())
         {
-            QString tmp = m_leftList->GetItemCurrent()->GetText();
-            tmp.detach();
-            return tmp;
+            return m_leftList->GetItemCurrent()->GetText();
         }
         return QString();
     }
@@ -430,7 +427,6 @@ QString MythControls::GetCurrentAction(void)
     if (kContextList == m_leftListType &&
         kActionList  == m_rightListType)
     {
-        desc.detach();
         return desc;
     }
 
@@ -536,7 +532,6 @@ void MythControls::LoadData(const QString &hostname)
     for (; it != m_sortedContexts.end(); ++it)
     {
         QString ctx_name = *it;
-        ctx_name.detach();
         QStringList actions = m_bindings->GetActions(ctx_name);
         actions.sort();
         m_contexts.insert(ctx_name, actions);

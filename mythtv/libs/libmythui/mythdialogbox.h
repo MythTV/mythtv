@@ -76,7 +76,7 @@ class MUI_PUBLIC MythMenuItem
     bool      UseSlot;
 
   private:
-    void Init(void) { Text.detach(); }
+    void Init(void) {}
 };
 
 class MUI_PUBLIC MythMenu
@@ -104,7 +104,7 @@ class MUI_PUBLIC MythMenu
     bool IsEmpty()  { return m_menuItems.isEmpty(); }
 
   private:
-    void Init(void);
+    void Init(void) {}
     void AddItem(MythMenuItem *, bool selected, MythMenu *subMenu);
 
     MythMenu *m_parentMenu;

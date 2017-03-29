@@ -39,7 +39,6 @@
 KeyBindings::KeyBindings(const QString &hostname)
     : m_hostname(hostname)
 {
-    m_hostname.detach();
     LoadMandatoryBindings();
     LoadContexts();
     LoadJumppoints();

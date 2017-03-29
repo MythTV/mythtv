@@ -24,7 +24,6 @@ void MythUIStateTracker::SetState(QVariantMap &newstate)
     MythUIStateTracker* uistate = MythUIStateTracker::GetMythUIStateTracker();
     gUIStateLock->lock();
     uistate->m_state = newstate;
-    uistate->m_state.detach();
     uistate->m_lastUpdated = QTime::currentTime();
     gUIStateLock->unlock();
 }
@@ -34,7 +33,6 @@ void MythUIStateTracker::GetState(QVariantMap &state)
     MythUIStateTracker* uistate = MythUIStateTracker::GetMythUIStateTracker();
     gUIStateLock->lock();
     state = uistate->m_state;
-    state.detach();
     gUIStateLock->unlock();
 }
 

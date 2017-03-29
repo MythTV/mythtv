@@ -56,7 +56,7 @@ class DVBChannel : public DTVChannel
     /// Returns DVB device number, used to construct filenames for DVB devices
     QString GetCardNum(void)            const { return device; };
     /// Returns frontend name as reported by driver
-    QString GetFrontendName(void)       const;
+    QString GetFrontendName(void)       const { return frontend_name; }
     bool IsMaster(void)                 const override; // DTVChannel
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }

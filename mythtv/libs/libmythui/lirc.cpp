@@ -87,9 +87,6 @@ LIRC::LIRC(QObject *main_window,
       retryCount(0),
       d(new LIRCPriv())
 {
-    lircdDevice.detach();
-    program.detach();
-    configFile.detach();
     buf.resize(0);
 }
 

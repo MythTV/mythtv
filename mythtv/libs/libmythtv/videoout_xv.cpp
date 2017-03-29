@@ -323,8 +323,7 @@ class XvAttributes
   public:
     XvAttributes() = default;
     XvAttributes(const QString &a, uint b, uint c) :
-        description(a), xv_flags(b), feature_flags(c)
-        { description.detach(); }
+        description(a), xv_flags(b), feature_flags(c) {}
 
   public:
     QString description;

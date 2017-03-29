@@ -95,9 +95,7 @@ QString DiSEqCDevDevice::TableToString(uint type, const TypeTable *table)
     {
         if (type == table->value)
         {
-            QString tmp = table->name;
-            tmp.detach();
-            return tmp;
+            return table->name;
         }
     }
     return QString();

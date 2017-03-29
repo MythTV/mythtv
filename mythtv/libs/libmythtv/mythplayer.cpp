@@ -1067,8 +1067,6 @@ void MythPlayer::SetFramesPlayed(uint64_t played)
 void MythPlayer::SetVideoFilters(const QString &override)
 {
     videoFiltersOverride = override;
-    videoFiltersOverride.detach();
-
     videoFiltersForProgram = player_ctx->GetFilters(
                              (FlagIsSet(kVideoIsNull)) ? "onefield" : "");
 }
@@ -1104,8 +1102,6 @@ void MythPlayer::InitFilters(void)
     AvFormatDecoder *afd = dynamic_cast<AvFormatDecoder *>(decoder);
     if (afd && afd->GetVideoInverted() && !filters.contains("vflip"))
         filters += ",vflip";
-
-    filters.detach();
 
     videofiltersLock.lock();
 
@@ -5714,7 +5710,6 @@ bool MythPlayer::SetStream(const QString &stream)
 
     QMutexLocker locker(&streamLock);
     m_newStream = stream;
-    m_newStream.detach();
     locker.unlock();
     // Stream will be changed by JumpToStream called from EventLoop
     // If successful will call interactiveTV->StreamStarted();
@@ -5898,7 +5893,6 @@ void MythPlayer::SetErrored(const QString &reason)
     if (errorMsg.isEmpty())
     {
         errorMsg = reason;
-        errorMsg.detach();
     }
     else
     {
@@ -5922,9 +5916,7 @@ bool MythPlayer::IsErrored(void) const
 QString MythPlayer::GetError(void) const
 {
     QMutexLocker locker(&errorLock);
-    QString tmp = errorMsg;
-    tmp.detach();
-    return tmp;
+    return errorMsg;
 }
 
 void MythPlayer::ToggleStudioLevels(void)

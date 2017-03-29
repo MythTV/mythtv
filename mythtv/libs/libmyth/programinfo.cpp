@@ -1175,32 +1175,6 @@ void ProgramInfo::clone(const ProgramInfo &other,
         inUseForWhat = other.inUseForWhat;
         positionMapDBReplacement = other.positionMapDBReplacement;
     }
-
-    title.detach();
-    sortTitle.detach();
-    subtitle.detach();
-    sortSubtitle.detach();
-    description.detach();
-    category.detach();
-
-    chanstr.detach();
-    chansign.detach();
-    channame.detach();
-    chanplaybackfilters.detach();
-
-    recgroup.detach();
-    playgroup.detach();
-
-    pathname.detach();
-    hostname.detach();
-    storagegroup.detach();
-
-    seriesid.detach();
-    programid.detach();
-    inetref.detach();
-
-    inUseForWhat.detach();
-    inputname.detach();
 }
 
 void ProgramInfo::clear(void)
@@ -2640,7 +2614,6 @@ static ProgramInfoType discover_program_info_type(
 void ProgramInfo::SetPathname(const QString &pn) const
 {
     pathname = pn;
-    pathname.detach();
 
     ProgramInfoType pit = discover_program_info_type(chanid, pathname, false);
     const_cast<ProgramInfo*>(this)->SetProgramInfoType(pit);

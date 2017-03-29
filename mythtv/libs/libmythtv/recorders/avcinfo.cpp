@@ -32,7 +32,6 @@ AVCInfo::AVCInfo(const AVCInfo &o) :
     firmware_revision(o.firmware_revision),
     product_name(o.product_name)
 {
-    product_name.detach();
     memcpy(unit_table, o.unit_table, sizeof(unit_table));
 }
 
@@ -46,7 +45,6 @@ AVCInfo &AVCInfo::operator=(const AVCInfo &o)
     modelid  = o.modelid;
     firmware_revision = o.firmware_revision;
     product_name = o.product_name;
-    product_name.detach();
     memcpy(unit_table, o.unit_table, sizeof(unit_table));
 
     return *this;

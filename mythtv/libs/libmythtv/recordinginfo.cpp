@@ -335,7 +335,6 @@ RecordingInfo::RecordingInfo(
         if (unknownTitle.isEmpty())
             unknownTitle = gCoreContext->GetSetting("UnknownTitle");
         title = unknownTitle;
-        title.detach();
     }
 
     if (!genUnknown)

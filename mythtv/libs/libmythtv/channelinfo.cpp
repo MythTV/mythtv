@@ -418,95 +418,26 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
     return true;
 }
 
-ChannelInsertInfo::ChannelInsertInfo(
-    uint    _db_mplexid,         uint    _source_id,
-    uint    _channel_id,         QString _callsign,
-    QString _service_name,       QString _chan_num,
-    uint    _service_id,
-    uint    _atsc_major_channel, uint    _atsc_minor_channel,
-    bool    _use_on_air_guide,   bool    _hidden,
-    bool    _hidden_in_guide,
-    QString _freqid,             QString _icon,
-    QString _format,             QString _xmltvid,
-    uint    _pat_tsid,           uint    _vct_tsid,
-    uint    _vct_chan_tsid,      uint    _sdt_tsid,
-    uint    _orig_netid,         uint    _netid,
-    QString _si_standard,
-    bool    _in_channels_conf,   bool    _in_pat,
-    bool    _in_pmt,             bool    _in_vct,
-    bool    _in_nit,             bool    _in_sdt,
-    bool    _is_encrypted,       bool    _is_data_service,
-    bool    _is_audio_service,   bool    _is_opencable,
-    bool    _could_be_opencable, int     _decryption_status,
-    QString _default_authority) :
-    db_mplexid(_db_mplexid),
-    source_id(_source_id),
-    channel_id(_channel_id),
-    callsign(_callsign),
-    service_name(_service_name),
-    chan_num(_chan_num),
-    service_id(_service_id),
-    atsc_major_channel(_atsc_major_channel),
-    atsc_minor_channel(_atsc_minor_channel),
-    use_on_air_guide(_use_on_air_guide),
-    hidden(_hidden),
-    hidden_in_guide(_hidden_in_guide),
-    freqid(_freqid),
-    icon(_icon),
-    format(_format),
-    xmltvid(_xmltvid),
-    default_authority(_default_authority),
-    pat_tsid(_pat_tsid),
-    vct_tsid(_vct_tsid),
-    vct_chan_tsid(_vct_chan_tsid),
-    sdt_tsid(_sdt_tsid),
-    orig_netid(_orig_netid),
-    netid(_netid),
-    si_standard(_si_standard),
-    in_channels_conf(_in_channels_conf),
-    in_pat(_in_pat),
-    in_pmt(_in_pmt),
-    in_vct(_in_vct),
-    in_nit(_in_nit),
-    in_sdt(_in_sdt),
-    is_encrypted(_is_encrypted),
-    is_data_service(_is_data_service),
-    is_audio_service(_is_audio_service),
-    is_opencable(_is_opencable),
-    could_be_opencable(_could_be_opencable),
-    decryption_status(_decryption_status)
-{
-    callsign.detach();
-    service_name.detach();
-    chan_num.detach();
-    freqid.detach();
-    icon.detach();
-    format.detach();
-    xmltvid.detach();
-    default_authority.detach();
-    si_standard.detach();
-}
-
 ChannelInsertInfo &ChannelInsertInfo::operator=(
     const ChannelInsertInfo &other)
 {
     db_mplexid         = other.db_mplexid;
     source_id          = other.source_id;
     channel_id         = other.channel_id;
-    callsign           = other.callsign;     callsign.detach();
-    service_name       = other.service_name; service_name.detach();
-    chan_num           = other.chan_num;     chan_num.detach();
+    callsign           = other.callsign;
+    service_name       = other.service_name;
+    chan_num           = other.chan_num;
     service_id         = other.service_id;
     atsc_major_channel = other.atsc_major_channel;
     atsc_minor_channel = other.atsc_minor_channel;
     use_on_air_guide   = other.use_on_air_guide;
     hidden             = other.hidden;
     hidden_in_guide    = other.hidden_in_guide;
-    freqid             = other.freqid;      freqid.detach();
-    icon               = other.icon;        icon.detach();
-    format             = other.format;      format.detach();
-    xmltvid            = other.xmltvid;     xmltvid.detach();
-    default_authority  = other.default_authority; default_authority.detach();
+    freqid             = other.freqid;
+    icon               = other.icon;
+    format             = other.format;
+    xmltvid            = other.xmltvid;
+    default_authority  = other.default_authority;
 
     // non-DB info
     pat_tsid           = other.pat_tsid;
@@ -515,7 +446,7 @@ ChannelInsertInfo &ChannelInsertInfo::operator=(
     sdt_tsid           = other.sdt_tsid;
     orig_netid         = other.orig_netid;
     netid              = other.netid;
-    si_standard        = other.si_standard; si_standard.detach();
+    si_standard        = other.si_standard;
     in_channels_conf   = other.in_channels_conf;
     in_pat             = other.in_pat;
     in_pmt             = other.in_pmt;
@@ -541,18 +472,12 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
     if (other.channel_id && !channel_id)
         channel_id         = other.channel_id;
     if (!other.callsign.isEmpty() && callsign.isEmpty())
-    {
-        callsign           = other.callsign;     callsign.detach();
-    }
+        callsign           = other.callsign;
     if (!other.service_name.isEmpty() && service_name.isEmpty())
-    {
-        service_name       = other.service_name; service_name.detach();
-    }
+        service_name       = other.service_name;
     if (!other.chan_num.isEmpty() &&
         ((chan_num.isEmpty() || chan_num == "0")))
-    {
-        chan_num           = other.chan_num;     chan_num.detach();
-    }
+        chan_num           = other.chan_num;
     if (other.service_id && !service_id)
         service_id         = other.service_id;
     if (other.atsc_major_channel && !atsc_major_channel)
@@ -563,25 +488,15 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
     //hidden             = other.hidden;
     //hidden_in_guide    = other.hidden_in_guide;
     if (!other.freqid.isEmpty() && freqid.isEmpty())
-    {
-        freqid             = other.freqid;      freqid.detach();
-    }
+        freqid             = other.freqid;
     if (!other.icon.isEmpty() && icon.isEmpty())
-    {
-        icon               = other.icon;        icon.detach();
-    }
+        icon               = other.icon;
     if (!other.format.isEmpty() && format.isEmpty())
-    {
-        format             = other.format;      format.detach();
-    }
+        format             = other.format;
     if (!other.xmltvid.isEmpty() && xmltvid.isEmpty())
-    {
-        xmltvid            = other.xmltvid;     xmltvid.detach();
-    }
+        xmltvid            = other.xmltvid;
     if (!other.default_authority.isEmpty() && default_authority.isEmpty())
-    {
-        default_authority  = other.default_authority; default_authority.detach();
-    }
+        default_authority  = other.default_authority;
     // non-DB info
     if (other.pat_tsid && !pat_tsid)
         pat_tsid           = other.pat_tsid;
@@ -597,9 +512,7 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
         netid              = other.netid;
     if (!other.si_standard.isEmpty() &&
         (si_standard.isEmpty() || ("mpeg" == si_standard)))
-    {
-        si_standard        = other.si_standard; si_standard.detach();
-    }
+        si_standard        = other.si_standard;
     if (other.in_channels_conf && !in_channels_conf)
         in_channels_conf   = other.in_channels_conf;
     if (other.in_pat && !in_pat)

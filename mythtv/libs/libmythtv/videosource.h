@@ -901,7 +901,7 @@ class VBoxIP : public MythUITextEditSetting
 
     void setEnabled(bool e) override; // StandardSetting
     void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
+        { _oldValue = s; };
 
   signals:
     void NewIP(const QString&);
@@ -922,7 +922,7 @@ class VBoxTunerIndex : public MythUITextEditSetting
 
     void setEnabled(bool e) override; // StandardSetting
     void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
+        { _oldValue = s; };
 
   signals:
     void NewTuner(const QString&);

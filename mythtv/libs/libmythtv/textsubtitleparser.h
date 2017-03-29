@@ -23,10 +23,7 @@ class text_subtitle_t
     text_subtitle_t() : start(0), end(0) {}
     text_subtitle_t(const text_subtitle_t &other) :
         start(other.start), end(other.end),
-        textLines(other.textLines)
-    {
-        textLines.detach();
-    }
+        textLines(other.textLines) {}
     text_subtitle_t& operator= (const text_subtitle_t &rhs)
     {
         start = rhs.start;

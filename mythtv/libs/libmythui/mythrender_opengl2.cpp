@@ -342,8 +342,6 @@ uint MythRenderOpenGL2::CreateShaderObject(const QString &vertex,
     uint result = 0;
     QString vert_shader = vertex.isEmpty() ? kDefaultVertexShader : vertex;
     QString frag_shader = fragment.isEmpty() ? kDefaultFragmentShader: fragment;
-    vert_shader.detach();
-    frag_shader.detach();
 
     OptimiseShaderSource(vert_shader);
     OptimiseShaderSource(frag_shader);

@@ -42,7 +42,6 @@ QString StateToString(TVState state)
             statestr = "ChangingState";
             break;
     }
-    statestr.detach();
     return statestr;
 }
 
@@ -56,10 +55,7 @@ QString toTypeString(PictureAdjustType type)
         QObject::tr("(REC)"),
     };
 
-    QString ret = kPicAdjType[(uint)type & 0x3];
-    ret.detach();
-
-    return ret;
+    return kPicAdjType[(uint)type & 0x3];
 }
 
 QString toTitleString(PictureAdjustType type)
@@ -72,10 +68,7 @@ QString toTitleString(PictureAdjustType type)
         QObject::tr("Adjust Recorder"),
     };
 
-    QString ret = kPicAdjTitles[(uint)type & 0x3];
-    ret.detach();
-
-    return ret;
+    return kPicAdjTitles[(uint)type & 0x3];
 }
 
 QString toString(CommSkipMode type)
@@ -87,8 +80,5 @@ QString toString(CommSkipMode type)
         QObject::tr("Auto-Skip Notify"),
     };
 
-    QString ret = kCommSkipTitles[(uint)(type) % kCommSkipCount];
-    ret.detach();
-
-    return ret;
+    return kCommSkipTitles[(uint)(type) % kCommSkipCount];
 }

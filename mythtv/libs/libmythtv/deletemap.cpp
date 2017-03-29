@@ -189,7 +189,6 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
     m_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (m_ctx->playingInfo)
         m_ctx->playingInfo->ToMap(infoMap);
-    infoMap.detach();
     m_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     QString cutmarker = " ";
@@ -732,7 +731,6 @@ void DeleteMap::SetMap(const frm_dir_map_t &map)
 
     Clear();
     m_deleteMap = map;
-    m_deleteMap.detach();
 }
 
 /// Loads the given commercial break map into the deleteMap.

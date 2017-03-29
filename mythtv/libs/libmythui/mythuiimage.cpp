@@ -83,7 +83,6 @@ void ImageProperties::Init()
 void ImageProperties::Copy(const ImageProperties &other)
 {
     filename = other.filename;
-    filename.detach();
 
     cropRect = other.cropRect;
     forceSize = other.forceSize;
@@ -1027,7 +1026,6 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
     m_Initiator = m_EnableInitiator;
 
     QString bFilename = m_imageProperties.filename;
-    bFilename.detach();
 
     d->m_UpdateLock.unlock();
 

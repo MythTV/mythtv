@@ -15,9 +15,18 @@ class MTV_PUBLIC InputInfo
     InputInfo() : sourceid(0), inputid(0), mplexid(0),
                   chanid(0), recPriority(0), scheduleOrder(0),
                   livetvorder(0), quickTune(false) {}
-    InputInfo(const QString &name,
-              uint sourceid, uint inputid, uint mplexid,
-              uint chanid, uint livetvorder);
+    InputInfo(const QString &_name,
+              uint _sourceid, uint _inputid, uint _mplexid,
+              uint _chanid, uint _livetvorder) :
+        name(_name),
+        sourceid(_sourceid),
+        inputid(_inputid),
+        mplexid(_mplexid),
+        chanid(_chanid),
+        recPriority(0),
+        scheduleOrder(0),
+        livetvorder(_livetvorder),
+        quickTune(false) {}
 
     InputInfo(const InputInfo &other) :
         name(other.name),
@@ -29,15 +38,11 @@ class MTV_PUBLIC InputInfo
         recPriority(other.recPriority),
         scheduleOrder(other.scheduleOrder),
         livetvorder(other.livetvorder),
-        quickTune(other.quickTune)
-    {
-        name.detach();
-    }
+        quickTune(other.quickTune) {}
 
     InputInfo &operator=(const InputInfo &other)
     {
         name     = other.name;
-        name.detach();
         sourceid = other.sourceid;
         inputid  = other.inputid;
         mplexid  = other.mplexid;

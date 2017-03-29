@@ -46,11 +46,7 @@ class ThemeExtractThread : public QRunnable
                        const QString &srcFile, const QString &destDir) :
         m_parent(parent),
         m_srcFile(srcFile),
-        m_destDir(destDir)
-    {
-        m_srcFile.detach();
-        m_destDir.detach();
-    }
+        m_destDir(destDir) {}
 
     void run() override // QRunnable
     {

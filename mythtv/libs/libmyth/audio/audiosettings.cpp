@@ -141,17 +141,3 @@ void AudioSettings::TrimDeviceType(void)
     if (passthru_device != "auto" && passthru_device.toLower() != "default")
         passthru_device.remove(0, 5);
 }
-
-QString AudioSettings::GetMainDevice(void) const
-{
-    QString ret = main_device;
-    ret.detach();
-    return ret;
-}
-
-QString AudioSettings::GetPassthruDevice(void) const
-{
-    QString ret = passthru_device;
-    ret.detach();
-    return ret;
-}

@@ -561,7 +561,6 @@ QString PlayerContext::PopPreviousChannel(void)
     // add the current channel back to the list, to allow easy flipping between
     // two channels using PREVCHAN
     PushPreviousChannel();
-    chan.detach();
     return chan;
 }
 
@@ -576,7 +575,6 @@ QString PlayerContext::GetPreviousChannel(void) const
         preChan = prevChan.back();
     else
         preChan = prevChan[prevChan.size()-2];
-    preChan.detach();
     return preChan;
 }
 
@@ -734,7 +732,6 @@ bool PlayerContext::GetPlayingInfoMap(InfoMap &infoMap) const
         if (player)
             player->GetCodecDescription(infoMap);
 
-        infoMap.detach();
         loaded = true;
     }
     UnlockPlayingInfo(__FILE__, __LINE__);
@@ -761,10 +758,7 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
 
     LockPlayingInfo(__FILE__, __LINE__);
     if (playingInfo) // Recordings have this info already.
-    {
         chanFilters = playingInfo->GetChannelPlaybackFilters();
-        chanFilters.detach();
-    }
     UnlockPlayingInfo(__FILE__, __LINE__);
 
     if (!chanFilters.isEmpty())
@@ -786,7 +780,6 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
         QString("Output filters for this channel are: '%1'")
                     .arg(filters));
 
-    filters.detach();
     return filters;
 }
 

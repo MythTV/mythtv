@@ -1860,24 +1860,6 @@ QString DataDirectProcessor::GetDDPFilename(bool &ok) const
     return m_tmpDDPFile;
 }
 
-void DataDirectProcessor::SetUserID(const QString &uid)
-{
-    m_userid = uid;
-    m_userid.detach();
-}
-
-void DataDirectProcessor::SetPassword(const QString &pwd)
-{
-    m_password = pwd;
-    m_password.detach();
-}
-
-void DataDirectProcessor::SetInputFile(const QString &file)
-{
-    m_inputFilename = file;
-    m_inputFilename.detach();
-}
-
 bool DataDirectProcessor::Post(QString url, const PostList &list,
                                QString documentFile,
                                QString inCookieFile, QString outCookieFile)
@@ -2335,14 +2317,10 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
 
     if (srcid)
     {
-        QString tmpid = lineupid;
-        tmpid.detach();
-        lineupid_to_srcid[tmpid] = srcid;
+        lineupid_to_srcid[lineupid] = srcid;
 
         // set type for source
-        QString tmptype = type;
-        tmptype.detach();
-        srcid_to_type[srcid] = tmptype;
+        srcid_to_type[srcid] = type;
 
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("sourceid %1 has lineup type: %2").arg(srcid).arg(type));
@@ -2352,9 +2330,7 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
 static QString get_lineup_type(uint sourceid)
 {
     QMutexLocker locker(&lineup_type_lock);
-    QString ret = srcid_to_type[sourceid];
-    ret.detach();
-    return ret;
+    return srcid_to_type[sourceid];
 }
 
 /*

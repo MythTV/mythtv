@@ -684,9 +684,8 @@ void ScreenSetup::customEvent(QEvent *event)
             }
             else
             {
-                QString txt = si->title; txt.detach();
                 MythUIButtonListItem *item = 
-                        new MythUIButtonListItem(m_activeList, txt);
+                        new MythUIButtonListItem(m_activeList, si->title);
                 item->SetData(qVariantFromValue(si));
             }
 
@@ -890,7 +889,6 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const QString &name,
     TypeListMap::iterator it = si->types.begin();
     for (; it != si->types.end(); ++it)
         m_types << (*it).name;
-    m_types.detach();
 }
 
 LocationDialog::~LocationDialog()
@@ -1051,7 +1049,6 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
         for (; it != m_screenListInfo->types.end(); ++it)
         {
             (*it).location = ri->idstr;
-            (*it).location.detach();
             (*it).src      = ri->src;
         }
     }

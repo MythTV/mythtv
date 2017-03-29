@@ -68,7 +68,6 @@ Eventing::Eventing(const QString &sExtensionName,
     m_nHoldCount(0),
     m_pInitializeSubscriber(nullptr)
 {
-    m_sEventMethodName.detach();
     m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
 }
 

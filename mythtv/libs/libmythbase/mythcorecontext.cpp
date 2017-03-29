@@ -817,10 +817,7 @@ QString MythCoreContext::GetMasterHostName(void)
         }
     }
 
-    QString ret = d->m_masterHostname;
-    ret.detach();
-
-    return ret;
+    return d->m_masterHostname;
 }
 
 void MythCoreContext::ClearSettingsCache(const QString &myKey)
@@ -836,9 +833,7 @@ void MythCoreContext::ActivateSettingsCache(bool activate)
 QString MythCoreContext::GetHostName(void)
 {
     QMutexLocker locker(&d->m_localHostLock);
-    QString tmp = d->m_localHostname;
-    tmp.detach();
-    return tmp;
+    return d->m_localHostname;
 }
 
 QString MythCoreContext::GetFilePrefix(void)

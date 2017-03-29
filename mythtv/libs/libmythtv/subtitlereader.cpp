@@ -112,7 +112,6 @@ QStringList SubtitleReader::GetRawTextSubtitles(uint64_t &duration)
 
     duration = m_RawTextSubtitles.duration;
     QStringList result = m_RawTextSubtitles.buffers;
-    result.detach();
     m_RawTextSubtitles.buffers.clear();
     return result;
 }

@@ -200,9 +200,7 @@ class VAAPIDisplay : ReferenceCounter
 
     QString GetDriver(void)
     {
-        QString ret = m_driver;
-        m_driver.detach();
-        return ret;
+        return m_driver;
     }
 
     static VAAPIDisplay *GetDisplay(VAAPIDisplayType display_type, bool noreuse)

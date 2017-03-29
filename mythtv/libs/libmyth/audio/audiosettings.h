@@ -54,8 +54,10 @@ class MPUBLIC AudioSettings
     void FixPassThrough(void);
     void TrimDeviceType(void);
 
-    QString GetMainDevice(void) const;
-    QString GetPassthruDevice(void) const;
+    QString GetMainDevice(void) const
+        { return main_device; }
+    QString GetPassthruDevice(void) const
+        { return passthru_device; }
 
   public:
     QString             main_device;

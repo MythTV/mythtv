@@ -280,20 +280,17 @@ bool AudioOutput::CanPassthrough(int /*samplerate*/,
 void AudioOutput::Error(const QString &msg)
 {
     lastError = msg;
-    lastError.detach();
     LOG(VB_GENERAL, LOG_ERR, "AudioOutput Error: " + lastError);
 }
 
 void AudioOutput::SilentError(const QString &msg)
 {
     lastError = msg;
-    lastError.detach();
 }
 
 void AudioOutput::Warn(const QString &msg)
 {
     lastWarn = msg;
-    lastWarn.detach();
     LOG(VB_GENERAL, LOG_WARNING, "AudioOutput Warning: " + lastWarn);
 }
 

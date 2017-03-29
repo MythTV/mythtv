@@ -52,13 +52,6 @@ MythMenu::~MythMenu(void)
     }
 }
 
-void MythMenu::Init()
-{
-    m_title.detach();
-    m_text.detach();
-    m_resultid.detach();
-}
-
 void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu, bool selected, bool checked)
 {
     MythMenuItem *item = new MythMenuItem(title, slot, checked, subMenu);

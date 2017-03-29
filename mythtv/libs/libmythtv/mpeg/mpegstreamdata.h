@@ -265,7 +265,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     // Single program stuff, gets
     int DesiredProgram(void) const          { return _desired_program; }
     uint VideoPIDSingleProgram(void) const  { return _pid_video_single_program; }
-    QString GetRecordingType(void) const;
+    QString GetRecordingType(void) const    { return _recording_type; }
 
     const ProgramAssociationTable* PATSingleProgram(void) const
         { return _pat_single_program; }

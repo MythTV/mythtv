@@ -38,8 +38,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void ResetMap(const InfoMap &map);
 
     virtual void SetText(const QString &text);
-    QString GetText(void) const;
-    QString GetDefaultText(void) const;
+    QString GetText(void) const { return m_Message; }
+    QString GetDefaultText(void) const { return m_DefaultMessage; }
 
     void SetTextFromMap(const InfoMap &map);
 

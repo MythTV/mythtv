@@ -2310,7 +2310,6 @@ bool TVRec::CheckChannel(QString name) const
 static QString add_spacer(const QString &channel, const QString &spacer)
 {
     QString chan = channel;
-    chan.detach();
     if ((chan.length() >= 2) && !spacer.isEmpty())
         return chan.left(chan.length()-1) + spacer + chan.right(1);
     return chan;

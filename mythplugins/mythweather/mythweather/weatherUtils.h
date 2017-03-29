@@ -27,30 +27,14 @@ class TypeListInfo
   public:
 
     TypeListInfo(const TypeListInfo& info)
-        : name(info.name), location(info.location), src(info.src)
-    {
-        name.detach();
-        location.detach();
-    }
-
+        : name(info.name), location(info.location), src(info.src) {}
     explicit TypeListInfo(const QString &_name)
-        : name(_name), src(nullptr)
-    {
-        name.detach();
-    }
+        : name(_name), src(nullptr) {}
     TypeListInfo(const QString &_name, const QString &_location)
-        : name(_name), location(_location), src(nullptr)
-    {
-        name.detach();
-        location.detach();
-    }
+        : name(_name), location(_location), src(nullptr) {}
     TypeListInfo(const QString &_name, const QString &_location,
                  ScriptInfo *_src)
-        : name(_name), location(_location), src(_src)
-    {
-        name.detach();
-        location.detach();
-    }
+        : name(_name), location(_location), src(_src) {}
 
   public:
     QString name;
@@ -80,10 +64,7 @@ class ScreenListInfo
         units(info.units),
         hasUnits(info.hasUnits),
         multiLoc(info.multiLoc),
-        updating(info.updating)
-    {
-      types.detach();
-    }
+        updating(info.updating) {}
 
     TypeListInfo GetCurrentTypeList(void) const;
 

@@ -37,7 +37,6 @@ InputSelector::InputSelector(
     sourceid(0), default_cardid(_default_cardid),
     default_inputname(_default_inputname)
 {
-    default_inputname.detach();
     setLabel(tr("Input"));
 }
 
