@@ -173,11 +173,10 @@ void ThumbGenerator::run()
                                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 image.save(cachePath, "JPEG", 95);
 
-                // deep copies all over
                 ThumbData *td = new ThumbData;
                 td->directory = dir;
                 td->fileName  = file;
-                td->thumb     = image.copy();
+                td->thumb     = image;
 
                 // inform parent we have thumbnail ready for it
                 QApplication::postEvent(m_parent, new ThumbGenEvent(td));
