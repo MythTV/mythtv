@@ -88,7 +88,7 @@ class MythAVCopyPrivate;
 class MTV_PUBLIC MythAVCopy
 {
 public:
-    MythAVCopy(bool USWC=true);
+    explicit MythAVCopy(bool USWC=true);
     virtual ~MythAVCopy();
 
     int Copy(VideoFrame *dst, const VideoFrame *src);
