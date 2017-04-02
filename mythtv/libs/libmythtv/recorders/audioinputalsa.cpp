@@ -271,9 +271,11 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
                     break;
                 case -EINTR:
                 case -EPIPE:
+#if ESTRPIPE != EPIPE
                 case -ESTRPIPE:
                     Recovery(nread);
                     break;
+#endif
                 default:
                     LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                         QString("weird return from snd_pcm_readi: %1")
@@ -306,8 +308,10 @@ bool AudioInputALSA::Recovery(int err)
         case -EINTR:
             isgood = true; // nothin' to see here
             break;
+#if ESTRPIPE != EPIPE
         case -ESTRPIPE:
             suspense = true;
+#endif
         case -EPIPE:
         {
             int ret = snd_pcm_prepare(pcm_handle);
