@@ -121,6 +121,8 @@ void VideoSourceSelector::Load(void)
             setValue(sel);
         setEnabled(false);
     }
+
+    TransMythUIComboBoxSetting::Load();
 }
 
 class InstanceCount : public MythUISpinBoxSetting

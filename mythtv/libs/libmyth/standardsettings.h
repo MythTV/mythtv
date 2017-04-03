@@ -125,7 +125,7 @@ class MPUBLIC AutoIncrementSetting : public StandardSetting
     virtual void edit(MythScreenType * /*screen*/) { }
     virtual void resultEdit(DialogCompletionEvent * /*dce*/) { }
 
-  private:
+  protected:
     QString m_table;
     QString m_column;
 };

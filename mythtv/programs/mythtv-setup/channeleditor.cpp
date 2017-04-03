@@ -529,11 +529,17 @@ void ChannelEditor::scan(void)
 
 void ChannelEditor::transportEditor(void)
 {
-    TransportListEditor *editor = new TransportListEditor(m_sourceFilter);
-    editor->exec();
-    editor->deleteLater();
-
-    fillList();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "transporteditor",
+                                  new TransportListEditor(m_sourceFilter));
+    if (ssd->Create())
+    {
+        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 }
 
 void ChannelEditor::channelIconImport(void)
