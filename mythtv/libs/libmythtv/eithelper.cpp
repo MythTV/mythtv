@@ -703,9 +703,6 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
 									.arg(duration_mins,2,10,QChar('0'))
 									.arg(duration_secs,2,10,QChar('0')));
 
-			LOG(VB_GENERAL, LOG_INFO, LOC + QString("DVB URL -- %1")
-				.arg(etsiEventUrl));
-
 			DBEventEIT *event = new DBEventEIT(
 				chanid,
 				title,     subtitle,      description,
