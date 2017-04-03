@@ -273,9 +273,9 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
                 case -EPIPE:
 #if ESTRPIPE != EPIPE
                 case -ESTRPIPE:
+#endif
                     Recovery(nread);
                     break;
-#endif
                 default:
                     LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                         QString("weird return from snd_pcm_readi: %1")
