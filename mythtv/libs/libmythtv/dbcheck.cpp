@@ -3338,6 +3338,60 @@ NULL
      * WatchTVGuide
      */
 
+    if (dbver == "1346")
+    {
+            QString master;
+            // Create new MasterServerName setting
+            if (gCoreContext->IsMasterHost())
+                master =
+                "insert into settings (value,data,hostname) "
+                "values('MasterServerName','"
+                   + gCoreContext->GetHostName() + "', null);";
+            else
+                master =
+                "insert into settings (value,data,hostname) "
+                "select 'MasterServerName', b.hostname, null "
+                "from settings a, settings b "
+                "where a.value = 'MasterServerIP' "
+                "and b.value in ('BackendServerIP','BackendServerIP6')"
+                "and a.data = b.data;";
+
+        const char *updates[] = {
+            // Create new MasterServerName setting
+            master.toUtf8(),
+            // Create new BackendServerAddr setting for each backend server
+            // Assume using IPV4 value.
+            "insert into settings (value,data,hostname) "
+                "select 'BackendServerAddr', data,hostname from settings "
+                "where value = 'BackendServerIP';",
+            // Update BackendServerAddr setting for cases where IPV6 is used
+            "update settings a, settings b "
+                "set b.data = a.data "
+                "where a.value = 'BackendServerIP6' "
+                "and b.hostname = a.hostname "
+                "and b.value = 'BackendServerAddr' "
+                "and b.data = '127.0.0.1' "
+                "and a.data != '::1' "
+                "and a.data is not null "
+                "and a.data != ''; ",
+            // Update BackendServerAddr setting for master backend to
+            // conform to MasterServerIP setting
+            "update settings a, settings b, settings c "
+                "set c.data = a.data "
+                "where a.value = 'MasterServerIP' "  // 1 row
+                "and b.value = 'MasterServerName' "  // 1 row
+                "and c.value = 'BackendServerAddr' " // 1 row per BE
+                "and c.hostname = b.data;",          // restrict to master
+            // Delete obsolete settings
+            "delete from settings "
+                "where value in ('WatchTVGuide');",
+            NULL
+        };
+
+        if (!performActualUpdate(&updates[0], "1347", dbver))
+            return false;
+    }
+
     return true;
 }
 

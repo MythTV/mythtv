@@ -21,6 +21,7 @@
 
 #include <QScriptEngine>
 #include <QNetworkProxy>
+#include <QNetworkInterface>
 
 #include "serviceHosts/mythServiceHost.h"
 #include "serviceHosts/guideServiceHost.h"
@@ -188,6 +189,13 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     }
 
     QList<QHostAddress> IPAddrList = ServerPool::DefaultListen();
+    if (IPAddrList.contains(QHostAddress(QHostAddress::AnyIPv4)))
+    {
+        IPAddrList.removeAll(QHostAddress(QHostAddress::AnyIPv4));
+        IPAddrList.removeAll(QHostAddress(QHostAddress::AnyIPv6));
+        IPAddrList.append(QNetworkInterface::allAddresses());
+    }
+
     if (IPAddrList.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR,

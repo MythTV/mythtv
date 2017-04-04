@@ -681,35 +681,9 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
             if (m_fsMap[hostname]->SendReceiveStringList(slist))
                 hash = slist[0];
         }
-        else
-        {
-            // looking for file on unknown host
-            // assume host is an IP address, and look for matching
-            // entry in database
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT hostname FROM settings "
-                           "WHERE value='BackendServerIP' "
-                             " OR value='BackendServerIP6' "
-                             "AND data=:HOSTNAME;");
-            query.bindValue(":HOSTNAME", hostname);
-
-            if (query.exec() && query.next())
-            {
-                // address matches an entry
-                hostname = query.value(0).toString();
-                if (m_fsMap.contains(hostname))
-                {
-                    // entry matches a connection
-                    slist.clear();
-                    slist << "QUERY_FILE_HASH"
-                          << filename
-                          << storageGroup;
-
-                    if (m_fsMap[hostname]->SendReceiveStringList(slist))
-                        hash = slist[0];
-                }
-            }
-        }
+        // I deleted the incorrect SQL select that was supposed to get
+        // host name from ip address. Since it cannot work and has
+        // been there 6 years I assume it is not important.
     }
 
 

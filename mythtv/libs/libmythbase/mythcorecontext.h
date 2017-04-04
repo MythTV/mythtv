@@ -184,6 +184,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString resolveAddress(const QString &host,
                            ResolveType = ResolveAny,
                            bool keepscope = false) const;
+    bool CheckSubnet(const QAbstractSocket *socket);
+    bool CheckSubnet(const QHostAddress &addr);
 
     void ClearSettingsCache(const QString &myKey = QString(""));
     void ActivateSettingsCache(bool activate = true);

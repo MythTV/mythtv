@@ -10,6 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QNetworkInterface>
+
 #include "upnptaskcache.h"
 #include "mythlogging.h"
 #include "serverpool.h"
@@ -85,7 +87,13 @@ Configuration *UPnp::GetConfiguration()
 
 bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 {
-    QList<QHostAddress> sList = ServerPool::DefaultListenIPv4();
+    QList<QHostAddress> sList = ServerPool::DefaultListen();
+    if (sList.contains(QHostAddress(QHostAddress::AnyIPv4)))
+    {
+        sList.removeAll(QHostAddress(QHostAddress::AnyIPv4));
+        sList.removeAll(QHostAddress(QHostAddress::AnyIPv6));
+        sList.append(QNetworkInterface::allAddresses());
+    }
     return Initialize( sList, nServicePort, pHttpServer );
 }
 

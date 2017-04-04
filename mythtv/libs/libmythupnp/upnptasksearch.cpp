@@ -113,7 +113,9 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
 
         // Avoid announcing the localhost address
         if (*it == QHostAddress::LocalHost ||
-            *it == QHostAddress::LocalHostIPv6)
+            *it == QHostAddress::LocalHostIPv6 ||
+            *it == QHostAddress::AnyIPv4 ||
+            *it == QHostAddress::AnyIPv6)
             continue;
 
         // Descope the Link Local address. The scope is only valid

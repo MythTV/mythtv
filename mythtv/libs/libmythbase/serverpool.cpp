@@ -23,10 +23,8 @@ static QReadWriteLock naLock;
 
 static QPair<QHostAddress, int> kLinkLocal  =
                             QHostAddress::parseSubnet("169.254.0.0/16");
-#if !defined(QT_NO_IPV6)
 static QPair<QHostAddress, int> kLinkLocal6 =
                             QHostAddress::parseSubnet("fe80::/10");
-#endif
 
 class PrivUdpSocket : public QUdpSocket
 {
@@ -44,14 +42,12 @@ public:
     };
     static bool contains(QNetworkAddressEntry host, QHostAddress addr)
     {
-#if !defined(QT_NO_IPV6)
         if (addr.protocol() == QAbstractSocket::IPv6Protocol &&
             addr.isInSubnet(kLinkLocal6) &&
             host.ip().scopeId() != addr.scopeId())
         {
             return false;
         }
-#endif
         return addr.isInSubnet(host.ip(), host.prefixLength());
     }
 private:
@@ -93,19 +89,27 @@ void ServerPool::SelectDefaultListen(bool force)
     naList_4.clear();
     naList_6.clear();
 
+    if (gCoreContext->GetNumSetting("ListenOnAllIps",1))
+    {
+        QNetworkAddressEntry entry;
+        entry.setIp(QHostAddress(QHostAddress::AnyIPv4));
+        naList_4.append(entry);
+        entry.setIp(QHostAddress(QHostAddress::AnyIPv6));
+        naList_6.append(entry);
+        return;
+    }
+
     // populate stored IPv4 and IPv6 addresses
     QHostAddress config_v4(gCoreContext->resolveSettingAddress(
                                            "BackendServerIP",
                                            QString(),
                                            gCoreContext->ResolveIPv4, true));
     bool v4IsSet = config_v4.isNull() ? true : false;
-#if !defined(QT_NO_IPV6)
     QHostAddress config_v6(gCoreContext->resolveSettingAddress(
                                            "BackendServerIP6",
                                            QString(),
                                            gCoreContext->ResolveIPv6, true));
     bool v6IsSet = config_v6.isNull() ? true : false;
-#endif
     bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal", true) > 0;
 
     // loop through all available interfaces
@@ -121,10 +125,8 @@ void ServerPool::SelectDefaultListen(bool force)
         for (qnai = IPs.begin(); qnai != IPs.end(); ++qnai)
         {
             QHostAddress ip = qnai->ip();
-#if !defined(QT_NO_IPV6)
             if (ip.protocol() == QAbstractSocket::IPv4Protocol)
             {
-#endif
                 if (naList_4.contains(*qnai))
                     // already defined, skip
                     continue;
@@ -194,7 +196,6 @@ void ServerPool::SelectDefaultListen(bool force)
                     LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
                                 .arg(PRETTYIP_(ip)));
 
-#if !defined(QT_NO_IPV6)
             }
             else
             {
@@ -257,7 +258,6 @@ void ServerPool::SelectDefaultListen(bool force)
                     LOG(VB_GENERAL, LOG_DEBUG, QString("Skipping address: %1")
                                 .arg(PRETTYIP_(ip)));
             }
-#endif
         }
     }
 
@@ -269,7 +269,6 @@ void ServerPool::SelectDefaultListen(bool force)
                 "interfaces.").arg(config_v4.toString()));
     }
 
-#if !defined(QT_NO_IPV6)
     if (!v6IsSet && (config_v6 != QHostAddress::LocalHostIPv6)
                  && !naList_6.isEmpty())
     {
@@ -277,7 +276,6 @@ void ServerPool::SelectDefaultListen(bool force)
                 "on %1, but address is not used on any local network "
                 "interfaces.").arg(PRETTYIP_(config_v6)));
     }
-#endif
 
     // NOTE: there is no warning for the case where both defined addresses
     //       are localhost, and neither are found. however this would also
@@ -333,7 +331,8 @@ QList<QHostAddress> ServerPool::DefaultListenIPv6(void)
 QList<QHostAddress> ServerPool::DefaultBroadcast(void)
 {
     QList<QHostAddress> blist;
-    blist << DefaultBroadcastIPv4();
+    if (!gCoreContext->GetNumSetting("ListenOnAllIps",1))
+        blist << DefaultBroadcastIPv4();
     return blist;
 }
 
@@ -473,7 +472,6 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
     {
         QNetworkAddressEntry host;
 
-#if !defined(QT_NO_IPV6)
         if (it->protocol() == QAbstractSocket::IPv6Protocol)
         {
             QList<QNetworkAddressEntry>::iterator iae;
@@ -487,7 +485,6 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
             }
         }
         else
-#endif
         {
             QList<QNetworkAddressEntry>::iterator iae;
             for (iae = naList_4.begin(); iae != naList_4.end(); ++iae)
@@ -610,7 +607,8 @@ void ServerPool::newTcpConnection(qt_socket_fd_t socket)
         return;
 
     QTcpSocket *qsock = new QTcpSocket(this);
-    if (qsock->setSocketDescriptor(socket))
+    if (qsock->setSocketDescriptor(socket)
+       && gCoreContext->CheckSubnet(qsock))
     {
         emit newConnection(qsock);
     }
@@ -632,7 +630,8 @@ void ServerPool::newUdpDatagram(void)
 
         socket->readDatagram(buffer.data(), buffer.size(),
                              &sender, &senderPort);
-        emit newDatagram(buffer, sender, senderPort);
+        if (gCoreContext->CheckSubnet(sender))
+            emit newDatagram(buffer, sender, senderPort);
     }
 }
 

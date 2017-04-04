@@ -803,6 +803,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         QString beWOLCmd = QString();
         QString backendIP = QString();
         int backendPort = 0;
+        QString masterserver;
 
         for (int attempt = 0;
             attempt < attempts && startupState != st_success;
@@ -896,8 +897,11 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     startupState = st_success;
                     break;
                 }
-                backendIP = gCoreContext->GetSetting("MasterServerIP", "");
-                backendPort = gCoreContext->GetNumSetting("MasterServerPort", 0);
+                masterserver = gCoreContext->GetSetting
+                    ("MasterServerName");
+                backendIP = gCoreContext->GetSettingOnHost
+                    ("BackendServerAddr", masterserver);
+                backendPort = gCoreContext->GetMasterServerPort();
                 // Fall through to next case
             case st_beWOL:
                 if (!beWOLCmd.isEmpty()) {
