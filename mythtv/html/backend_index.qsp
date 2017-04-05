@@ -18,6 +18,8 @@
 <script type="text/javascript" src="/3rdParty/jquery/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" src="/3rdParty/jquery/jqueryUI/js/jquery-ui-1.10.3.js"></script>
 <script type="text/javascript" src="/js/menu.js"></script>
+<script type="text/javascript" src="/js/keys.js"></script>
+
 
 <script type="text/javascript" nonce="<%=CSP_NONCE%>">
 
@@ -27,6 +29,19 @@ $(document).ready(function() {
     loadDiv("menu-bg", "/menu.qsp");
     $('.menu').initMenu();
     showHostName();
+
+    // If our little remote icon is pressed
+    $('#remote').click(function (){
+      // Get the cookie
+      var kbenabled = getCookie("kbenabled");
+      if(kbenabled){
+        setCookie("0");
+        kbenabled = 0;
+      } else {
+        setCookie("1");
+        kbenabled = 1;
+      }
+    });
 });
 
 $(document).keyup(function(e) {
