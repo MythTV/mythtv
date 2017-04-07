@@ -114,7 +114,7 @@ void IPTVChannelFetcher::run(void)
         _scan_monitor->ScanAppendTextToLog(tr("Downloading Playlist"));
     }
 
-    QString playlist = DownloadPlaylist(url, true);
+    QString playlist = DownloadPlaylist(url);
 
     if (_stop_now || playlist.isEmpty())
     {
@@ -232,8 +232,8 @@ void IPTVChannelFetcher::SetMessage(const QString &status)
         _scan_monitor->ScanAppendTextToLog(status);
 }
 
-QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
-                                             bool inQtThread)
+// This function is always called from a thread context.
+QString IPTVChannelFetcher::DownloadPlaylist(const QString &url)
 {
     if (url.startsWith("file", Qt::CaseInsensitive))
     {
