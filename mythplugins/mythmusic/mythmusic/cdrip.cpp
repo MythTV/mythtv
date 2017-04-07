@@ -219,7 +219,7 @@ void CDRipperThread::run(void)
 {
     RunProlog();
 
-    if (!m_tracks->size() > 0)
+    if (m_tracks->size() <= 0)
     {
         RunEpilog();
         return;
