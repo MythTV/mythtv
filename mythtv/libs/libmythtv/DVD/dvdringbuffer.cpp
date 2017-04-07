@@ -475,7 +475,15 @@ void DVDRingBuffer::GetDescForPos(QString &desc)
     }
 }
 
-bool DVDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
+/** \fn DVDRingBuffer::OpenFile(const QString &, uint)
+ *  \brief Opens a dvd device for reading.
+ *
+ *  \param lfilename   Path of the dvd device to read.
+ *  \param retry_ms    Ignored. This value is part of the API
+ *                     inherited from the parent class.
+ *  \return Returns true if the dvd was opened.
+ */
+bool DVDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
     QMutexLocker contextLocker(&m_contextLock);
     rwlock.lockForWrite();

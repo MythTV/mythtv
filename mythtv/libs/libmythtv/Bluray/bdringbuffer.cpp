@@ -526,7 +526,15 @@ void BDRingBuffer::ProgressUpdate(void)
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
-bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
+/** \fn BDRingBuffer::OpenFile(const QString &, uint)
+ *  \brief Opens a bluray device for reading.
+ *
+ *  \param lfilename   Path of the bluray device to read.
+ *  \param retry_ms    Ignored. This value is part of the API
+ *                     inherited from the parent class.
+ *  \return Returns true if the bluray was opened.
+ */
+bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
     safefilename = lfilename;
     filename = lfilename;

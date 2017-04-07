@@ -38,7 +38,15 @@ long long StreamingRingBuffer::GetReadPosition(void) const
     return 0;
 }
 
-bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
+/** \fn StreamingRingBuffer::OpenFile(const QString &, uint)
+ *  \brief Opens a network stream for reading.
+ *
+ *  \param lfilename   Url of the stream to read.
+ *  \param retry_ms    Ignored. This value is part of the API
+ *                     inherited from the parent class.
+ *  \return Returns true if the stream was opened.
+ */
+bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
     avcodeclock->lock();
     av_register_all();

@@ -2537,7 +2537,15 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
     }
 }
 
-bool HLSRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
+/** \fn HLSRingBuffer::OpenFile(const QString &, uint)
+ *  \brief Opens an HTTP Live Stream for reading.
+ *
+ *  \param lfilename   Url of the HTTP live stream to read.
+ *  \param retry_ms    Ignored. This value is part of the API
+ *                     inherited from the parent class.
+ *  \return Returns true if the live stream was opened.
+ */
+bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
     QWriteLocker lock(&rwlock);
 
