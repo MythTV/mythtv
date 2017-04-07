@@ -70,7 +70,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 
     void CreatePauseFrame(void);
     bool SetVideoRect(const QRect &disp_rect, const QRect &vid_rect);
-    bool CreateBuffers(const QSize&, const QSize&, WId = 0);
+    bool CreateBuffers(const QSize&, const QSize&);
     void DeleteBuffers();
     bool Start();
     OMX_ERRORTYPE SetImageFilter(OMX_IMAGEFILTERTYPE);

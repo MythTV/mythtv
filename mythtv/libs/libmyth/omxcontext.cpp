@@ -660,7 +660,7 @@ OMX_ERRORTYPE OMXComponent::FillBufferCB(
  * OMXComponentCtx
  */
 OMX_ERRORTYPE OMXComponentCtx::Event( OMXComponent &cmpnt,
-    OMX_EVENTTYPE eEvent, OMX_U32 nData1, OMX_U32 nData2, OMX_PTR pEventData)
+    OMX_EVENTTYPE eEvent, OMX_U32 nData1, OMX_U32 nData2, OMX_PTR /*pEventData*/)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOCB(cmpnt) + QString("%1 0x%2 0x%3")
         .arg(Event2String(eEvent)).arg(nData1,0,16).arg(nData2,0,16) );

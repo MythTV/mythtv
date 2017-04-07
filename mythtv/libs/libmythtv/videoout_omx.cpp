@@ -425,7 +425,7 @@ bool VideoOutputOMX::Init(          // Return true if successful
                   kKeepPrebuffer);
 
     // Allocate video buffers
-    if (!CreateBuffers(video_dim_buf, video_dim_disp, winid))
+    if (!CreateBuffers(video_dim_buf, video_dim_disp))
         return false;
 
     bool osdIsSet = false;
@@ -804,7 +804,7 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
 
 // tells show what frame to be show, do other last minute stuff
 // pure virtual
-void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *osd)
+void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType /*scan*/, OSD */*osd*/)
 {
     if (IsErrored())
     {
@@ -846,7 +846,7 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
 
 // BLT the last prepared frame to the screen as quickly as possible.
 // pure virtual
-void VideoOutputOMX::Show(FrameScanType scan)
+void VideoOutputOMX::Show(FrameScanType /*scan*/)
 {
     if (IsErrored())
     {
@@ -1071,8 +1071,7 @@ QStringList VideoOutputOMX::GetVisualiserList(void)
 
 bool VideoOutputOMX::CreateBuffers(
     const QSize &video_dim_buf,     // video buffer size
-    const QSize &video_dim_disp,    // video display size
-    WId winid )
+    const QSize &video_dim_disp)    // video display size
 {
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
 

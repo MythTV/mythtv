@@ -521,7 +521,7 @@ int AudioOutputOMX::GetBufferedOnSoundcard(void) const
 }
 
 // virtual
-AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool passthrough)
+AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
 {
     LOG(VB_AUDIO, LOG_INFO, LOC + __func__ + " begin");
 
@@ -643,6 +643,9 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool passthrough)
 // virtual // Returns 0-100
 int AudioOutputOMX::GetVolumeChannel(int channel) const
 {
+    if (channel > 0)
+        return -1;
+
     OMX_AUDIO_CONFIG_VOLUMETYPE v;
     OMX_DATA_INIT(v);
     v.nPortIndex = m_audiorender.Base();
@@ -717,7 +720,7 @@ OMX_ERRORTYPE AudioOutputOMX::EmptyBufferDone(
 
 // Shutdown OMX_StateIdle -> OMX_StateLoaded callback
 // virtual
-void AudioOutputOMX::ReleaseBuffers(OMXComponent &cmpnt)
+void AudioOutputOMX::ReleaseBuffers(OMXComponent &/*cmpnt*/)
 {
     FreeBuffersCB();
 }
