@@ -1426,7 +1426,7 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 
 #ifdef USING_VDPAU
 static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
-                                           const enum AVPixelFormat *fmt)
+                                           const enum AVPixelFormat *valid_fmts)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
@@ -1439,7 +1439,15 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                 render_wrapper_vdpau;
         }
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_VDPAU : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_VDPAU))
+            return AV_PIX_FMT_VDPAU;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -1449,10 +1457,8 @@ static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
                                            const enum AVPixelFormat *) MUNUSED;
 
 enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
-                                    const enum AVPixelFormat *fmt)
+                                    const enum AVPixelFormat *valid_fmts)
 {
-    if (!fmt)
-        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1460,7 +1466,15 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_DXVA2_VLD : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_DXVA2_VLD))
+            return AV_PIX_FMT_DXVA2_VLD;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -1477,10 +1491,8 @@ static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
                                          const enum AVPixelFormat *) MUNUSED;
 
 enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
-                                         const enum AVPixelFormat *fmt)
+                                         const enum AVPixelFormat *valid_fmts)
 {
-    if (!fmt)
-        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1488,7 +1500,15 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_VAAPI_VLD : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_VAAPI_VLD))
+            return AV_PIX_FMT_VAAPI_VLD;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
