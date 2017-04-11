@@ -58,6 +58,8 @@ class Channum : public LineEditSetting, public ChannelDBStorage
         LineEditSetting(this), ChannelDBStorage(this, id, "channum")
     {
         setLabel(QCoreApplication::translate("(Common)", "Channel Number"));
+        setHelpText(QCoreApplication::translate("(Common)",
+        "This is the number by which the channel is known to MythTV."));
     }
 };
 
@@ -400,10 +402,11 @@ class Freqid : public LineEditSetting, public ChannelDBStorage
         LineEditSetting(this), ChannelDBStorage(this, id, "freqid")
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
-                                             "Frequency or Channel"));
+                                             "Freq/Channel"));
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
-            "Specify either the exact frequency (in kHz) or a valid channel "
-            "for your 'TV Format'."));
+            "Depending on the tuner type, specify either the exact "
+            "frequency (in kHz) or a valid channel "
+            "number that will be understood by your tuners."));
     }
 };
 
@@ -467,7 +470,7 @@ class Hue : public SliderSetting, public ChannelDBStorage
 };
 
 ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
-                                           uint default_sourceid) :
+          uint default_sourceid, bool add_freqid) :
     VerticalConfigurationGroup(false, true, false, false)
 {
     setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -487,10 +490,21 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
         new VerticalConfigurationGroup(false, true);
     VerticalConfigurationGroup *right =
         new VerticalConfigurationGroup(false, true);
+    HorizontalConfigurationGroup *subgroup0 =
+        new HorizontalConfigurationGroup(false,false,true,true);
     HorizontalConfigurationGroup *subgroup1 =
         new HorizontalConfigurationGroup(false,false,true,true);
 
-    left->addChild(new Channum(id));
+    Channum *channum = new Channum(id);
+    subgroup0->addChild(channum);
+    if (add_freqid)
+    {
+        freqid = new Freqid(id);
+        subgroup0->addChild(freqid);
+    }
+    else
+        freqid=0;
+    left->addChild(subgroup0);
     left->addChild(new Callsign(id));
 
     subgroup1->addChild(new Visible(id));
@@ -517,6 +531,8 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
             this,       SLOT(  onAirGuideChanged(bool)));
     connect(source,     SIGNAL(valueChanged( const QString&)),
             this,       SLOT(  sourceChanged(const QString&)));
+    connect(channum,     SIGNAL(valueChanged( const QString&)),
+            this,       SLOT(  channumChanged(const QString&)));
 };
 
 void ChannelOptionsCommon::Load(void)
@@ -572,6 +588,12 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
     onairguide->setEnabled(supports_eit);
     xmltvID->setEnabled(!uses_eit_only);
     xmltvID->Load();
+}
+
+void ChannelOptionsCommon::channumChanged(const QString& channum)
+{
+    if (freqid)
+        freqid->setValue(channum);
 }
 
 ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id) :

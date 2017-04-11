@@ -117,22 +117,26 @@ class ChannelDBStorage : public SimpleDBStorage
 
 class OnAirGuide;
 class XmltvID;
+class Freqid;
 
 class MTV_PUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
 {
     Q_OBJECT
 
   public:
-    ChannelOptionsCommon(const ChannelID &id, uint default_sourceid);
+    ChannelOptionsCommon(const ChannelID &id,
+        uint default_sourceid,  bool add_freqid);
     void Load(void);
 
   public slots:
     void onAirGuideChanged(bool);
     void sourceChanged(const QString&);
+    void channumChanged(const QString&);
 
   protected:
     OnAirGuide *onairguide;
     XmltvID    *xmltvID;
+    Freqid     *freqid;
 };
 
 class MTV_PUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup

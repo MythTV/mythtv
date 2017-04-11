@@ -299,6 +299,36 @@ CardUtil::InputTypes CardUtil::GetInputTypes(void)
     return inputtypes;
 }
 
+/**
+ * Get a list of card input types for a source id.
+ *
+ * \param sourceid [in] source id.
+ * \return QStringList of card types for that source
+*/
+
+QStringList CardUtil::GetInputTypeNames(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardtype "
+                  "FROM capturecard "
+                  "WHERE capturecard.sourceid = :SOURCEID "
+                  "GROUP BY cardtype");
+    query.bindValue(":SOURCEID", sourceid);
+
+    QStringList list;
+    if (!query.exec())
+    {
+        MythDB::DBError("CardUtil::GetInputTypes", query);
+        return list;
+    }
+    while (query.next())
+        list.push_back(query.value(0).toString());
+    return list;
+}
+
+
+
+
 /** \fn CardUtil::GetVideoDevices(const QString&, QString)
  *  \brief Returns the videodevices of the matching inputs, duplicates removed
  *  \param rawtype  Input type as used in DB or empty string for all inputids

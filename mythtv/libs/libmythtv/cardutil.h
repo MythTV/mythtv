@@ -264,6 +264,7 @@ class MTV_PUBLIC CardUtil
     static bool         IsInputTypePresent(const QString &rawtype,
                                            QString hostname = QString::null);
     static InputTypes   GetInputTypes(void); // input types on ALL hosts
+    static QStringList  GetInputTypeNames(uint sourceid); // input types for a given source id
 
     static QStringList  GetVideoDevices(const QString &rawtype,
                                         QString hostname = QString::null);
