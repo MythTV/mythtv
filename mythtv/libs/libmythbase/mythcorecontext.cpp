@@ -1731,6 +1731,17 @@ void MythCoreContext::ResetLanguage(void)
     d->language.clear();
 }
 
+void MythCoreContext::ResetSockets(void)
+{
+    QMutexLocker locker(&d->m_sockLock);
+    LOG(VB_GENERAL, LOG_INFO, "Restarting Backend Connections");
+    if (d->m_serverSock)
+        d->m_serverSock->DisconnectFromHost();
+    if (d->m_eventSock)
+        d->m_eventSock->DisconnectFromHost();
+    dispatch(MythEvent("BACKEND_SOCKETS_CLOSED"));
+}
+
 void MythCoreContext::InitLocale(void )
 {
     if (!d->m_locale)

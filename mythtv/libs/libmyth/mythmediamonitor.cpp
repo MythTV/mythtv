@@ -44,6 +44,7 @@ MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
 {
     m_Monitor = pMon;
     m_Interval = interval;
+    m_lastCheckTime = QDateTime::currentDateTimeUtc();
 }
 
 // Nice and simple, as long as our monitor is valid and active,
@@ -57,6 +58,20 @@ void MonitorThread::run(void)
     {
         m_Monitor->CheckDevices();
         m_Monitor->m_wait.wait(&mtx, m_Interval);
+        QDateTime now(QDateTime::currentDateTimeUtc());
+        // if 10 seconds have elapsed instead of 5 seconds
+        // assume the system was suspended and reconnect
+        // sockets
+        if (m_lastCheckTime.secsTo(now) > 120)
+        {
+            gCoreContext->ResetSockets();
+            if (HasMythMainWindow())
+            {
+                LOG(VB_GENERAL, LOG_INFO, "Restarting LIRC handler");
+                GetMythMainWindow()->StartLIRC();
+            }
+        }
+        m_lastCheckTime = now;
     }
     mtx.unlock();
     RunEpilog();
