@@ -1867,7 +1867,12 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         LOG(VB_NETWORK, LOG_INFO, LOC +
             QString("adding: %1 as a remote file transfer") .arg(commands[2]));
         QStringList::const_iterator it = slist.begin();
-        QUrl qurl = QUrl::fromLocalFile(*(++it)); 
+        QUrl qurl;
+        QString s = *(++it)
+        if (QUrl(s).scheme() == "")
+            qurl = QUrl::fromLocalFile(s);
+        else
+            qurl = s
         QString wantgroup = *(++it);
         QString filename;
         QStringList checkfiles;
