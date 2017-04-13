@@ -388,6 +388,12 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
     {
+        // If IPV6 support is disabled and this is an IPV6 address,
+        // bypass this address
+        if (it->protocol() == QAbstractSocket::IPv6Protocol
+          && ! gCoreContext->GetNumSetting("IPv6Support",1))
+            continue;
+
         PrivTcpServer *server = new PrivTcpServer(this, servertype);
 #if (QT_VERSION >= 0x050000)
             connect(server, &PrivTcpServer::newConnection,
@@ -429,6 +435,15 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
                     QString("Address %1 no longer exists - ignoring")
                     .arg(PRETTYIP(it)));
                 continue;
+            }
+
+            if (server->serverError() == QAbstractSocket::UnsupportedSocketOperationError
+                 && it->protocol() == QAbstractSocket::IPv6Protocol)
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("No IPv6 support on this system. Disabling MythTV IPv6."));
+                 gCoreContext->OverrideSettingForSession("IPv6Support", "0");
+                 continue;
             }
 
             if (requireall)
