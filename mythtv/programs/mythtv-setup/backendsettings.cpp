@@ -1160,19 +1160,23 @@ void BackendSettings::Save(void)
         masterServerPort->setValue(localServerPort->getValue());
     }
 
-    // These two are included for backward compatibility - only used by python
-    // bindings. They should be removed later
-    QString bea = backendServerAddr->getValue();
-    // initialize them to localhost values
-    ipAddressSettings->localServerIP->setValue(0);
-    ipAddressSettings->localServerIP6->setValue(0);
-    QString ip4 = gCoreContext->resolveAddress
-      (bea,MythCoreContext::ResolveIPv4);
-    QString ip6 = gCoreContext->resolveAddress
-      (bea,MythCoreContext::ResolveIPv6);
-    // the setValue calls below only set the value if it is in the list.
-    ipAddressSettings->localServerIP->setValue(ip4);
-    ipAddressSettings->localServerIP6->setValue(ip6);
+    // If listen on all is specified, set up values for the
+    // specific IPV4 and IPV6 addresses for backward
+    // compatibilty with other things that may use them
+    if (ipAddressSettings->listenOnAllIps->boolValue())
+    {
+        QString bea = backendServerAddr->getValue();
+        // initialize them to localhost values
+        ipAddressSettings->localServerIP->setValue(0);
+        ipAddressSettings->localServerIP6->setValue(0);
+        QString ip4 = gCoreContext->resolveAddress
+            (bea,MythCoreContext::ResolveIPv4);
+        QString ip6 = gCoreContext->resolveAddress
+            (bea,MythCoreContext::ResolveIPv6);
+        // the setValue calls below only set the value if it is in the list.
+        ipAddressSettings->localServerIP->setValue(ip4);
+        ipAddressSettings->localServerIP6->setValue(ip6);
+    }
 
     ConfigurationWizard::Save();
 
