@@ -505,25 +505,33 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
 
     sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
-    // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
-    if (!m_setOtherTables && ((*section)->OriginalNetworkID() == 2 ||
-        (*section)->OriginalNetworkID() == 59))
+    if (section != sections.end())
     {
-        GetDTVSignalMonitor()->GetScanStreamData()->
-                               SetFreesatAdditionalSI(true);
-        m_setOtherTables = true;
-        // The whole BAT & SDTo group comes round in 10s
-        m_otherTableTimeout = 10000;
-        // Delay processing the SDT until we've seen BATs and SDTos
-        m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
+        // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
+        if (!m_setOtherTables && ((*section)->OriginalNetworkID() == 2 ||
+            (*section)->OriginalNetworkID() == 59))
+        {
+            GetDTVSignalMonitor()->GetScanStreamData()->
+                                   SetFreesatAdditionalSI(true);
+            m_setOtherTables = true;
+            // The whole BAT & SDTo group comes round in 10s
+            m_otherTableTimeout = 10000;
+            // Delay processing the SDT until we've seen BATs and SDTos
+            m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
 
-        LOG(VB_CHANSCAN, LOG_INFO, LOC +
-            QString("SDT has OriginalNetworkID %1, look for "
-                    "additional Freesat SI").arg((*section)->OriginalNetworkID()));
+            LOG(VB_CHANSCAN, LOG_INFO, LOC +
+                QString("SDT has OriginalNetworkID %1, look for "
+                        "additional Freesat SI").arg((*section)->OriginalNetworkID()));
+        }
+
+        uint id = (*section)->OriginalNetworkID() << 16 | (*section)->TSID();
+        m_tsScanned.insert(id);
     }
-
-    uint id = (*section)->OriginalNetworkID() << 16 | (*section)->TSID();
-    m_tsScanned.insert(id);
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, "SDTa with no sections encountered");
+        return;
+    }
 
     // Process per section fields
 

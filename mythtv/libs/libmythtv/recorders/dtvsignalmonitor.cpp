@@ -67,6 +67,7 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       programNumber(-1),
       ignore_encrypted(false)
 {
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + "Constructing a signal monitor");
 }
 
 DTVSignalMonitor::~DTVSignalMonitor()
@@ -253,11 +254,14 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
     networkID     = netid;
     programNumber = serviceid;
 
-    if (GetDVBStreamData())
+    DVBStreamData* streamdata = GetDVBStreamData();
+    if (streamdata)
     {
-        GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber);
+        streamdata->SetDesiredService(netid, tsid, programNumber);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
-        GetDVBStreamData()->AddListeningPID(DVB_SDT_PID);
+        streamdata->AddListeningPID(DVB_SDT_PID);
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+        streamdata->RequestReplayOfCachedSDTs();
         LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     }
 }
@@ -497,51 +501,61 @@ void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
     AddFlags(kDTVSigMon_SDTSeen);
     LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
 
-    sdt_section_const_ptr_t sdt = sections[0];
+    sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
-    detectedNetworkID = sdt->OriginalNetworkID();
-    detectedTransportID = sdt->TSID();
-
-    // if the multiplex is not properly configured with ONID and TSID then take
-    // whatever SDT we see first
-    if ((networkID == 0) && (transportID == 0))
+    if (section != sections.end())
     {
-        networkID = detectedNetworkID;
-        transportID = detectedTransportID;
-    }
+        detectedNetworkID = (*section)->OriginalNetworkID();
+        detectedTransportID = (*section)->TSID();
 
-    if (detectedNetworkID == networkID && detectedTransportID == transportID)
-    {
-        DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
-               .arg(detectedTransportID).arg(detectedNetworkID));
-        AddFlags(kDTVSigMon_SDTMatch);
-        RemoveFlags(kDVBSigMon_WaitForPos);
+        // if the multiplex is not properly configured with ONID and TSID then take
+        // whatever SDT we see first
+        if ((networkID == 0) && (transportID == 0))
+        {
+            networkID = detectedNetworkID;
+            transportID = detectedTransportID;
+        }
+
+        if (detectedNetworkID == networkID && detectedTransportID == transportID)
+        {
+            DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
+                   .arg(detectedTransportID).arg(detectedNetworkID));
+            AddFlags(kDTVSigMon_SDTMatch);
+            RemoveFlags(kDVBSigMon_WaitForPos);
+        }
+        else
+        {
+            DBG_SM("SetSDT()", QString("Looks like I am tuned to the wrong channel"
+                    " tsid = %1 orig_net_id = %2")
+                   .arg(detectedTransportID).arg(detectedNetworkID));
+        }
     }
     else
-    {
-        DBG_SM("SetSDT()", QString("Looks like I am tuned to the wrong channel"
-                " tsid = %1 orig_net_id = %2")
-               .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
-    }
+        LOG(VB_GENERAL, LOG_ERR, "SDTa with no sections encountered");
 }
 
 void DTVSignalMonitor::HandleSDTo(const sdt_sections_cache_const_t& sections)
 {
-    sdt_section_const_ptr_t sdt = sections[0];
+    sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
-    detectedNetworkID = sdt->OriginalNetworkID();
-    detectedTransportID = sdt->TSID();
-
-    if (detectedNetworkID == networkID && detectedTransportID == transportID)
+    if (section != sections.end())
     {
-        // Looks like I am on a non standard system that transmit SDT as SDTo
-        DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
-               .arg(detectedTransportID).arg(detectedNetworkID));
-        AddFlags(kDTVSigMon_SDTSeen);
-        AddFlags(kDTVSigMon_SDTMatch);
-        RemoveFlags(kDVBSigMon_WaitForPos);
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+        detectedNetworkID = (*section)->OriginalNetworkID();
+        detectedTransportID = (*section)->TSID();
+
+        if (detectedNetworkID == networkID && detectedTransportID == transportID)
+        {
+            // Looks like I am on a non standard system that transmit SDT as SDTo
+            DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
+                   .arg(detectedTransportID).arg(detectedNetworkID));
+            AddFlags(kDTVSigMon_SDTSeen);
+            AddFlags(kDTVSigMon_SDTMatch);
+            RemoveFlags(kDVBSigMon_WaitForPos);
+            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+        }
     }
+    else
+        LOG(VB_GENERAL, LOG_ERR, "SDTo with no sections encountered");
 }
 
 void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
