@@ -247,6 +247,7 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
     RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
                 kDTVSigMon_SDTSeen   | kDTVSigMon_SDTMatch |
                 kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
 
     transportID   = tsid;
     networkID     = netid;
@@ -257,6 +258,7 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
         GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
         GetDVBStreamData()->AddListeningPID(DVB_SDT_PID);
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     }
 }
 
@@ -493,6 +495,7 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
 void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
     AddFlags(kDTVSigMon_SDTSeen);
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
 
     sdt_section_const_ptr_t sdt = sections[0];
 
@@ -537,6 +540,7 @@ void DTVSignalMonitor::HandleSDTo(const sdt_sections_cache_const_t& sections)
         AddFlags(kDTVSigMon_SDTSeen);
         AddFlags(kDTVSigMon_SDTMatch);
         RemoveFlags(kDVBSigMon_WaitForPos);
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     }
 }
 
