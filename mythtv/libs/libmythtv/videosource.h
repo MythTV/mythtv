@@ -867,6 +867,7 @@ class CardInput : public GroupSetting
     void sourceFetch();
     void SetSourceID(const QString &sourceid);
     void UpdateSchedGroup(const QString &value);
+    void CreateNewInputGroupSlot(const QString &name);
 
   private:
     class ID: public IdSetting

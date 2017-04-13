@@ -3513,52 +3513,49 @@ QString CardInput::getSourceName(void) const
 
 void CardInput::CreateNewInputGroup(void)
 {
-    QString new_name = QString::null;
-    QString tmp_name = QString::null;
-
     inputgrp0->Save();
     inputgrp1->Save();
 
-    while (true)
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack, tr("Enter new group name"));
+
+    if (settingdialog->Create())
     {
-        tmp_name = "";
-        bool ok = MythPopupBox::showGetTextPopup(
-            GetMythMainWindow(), tr("Create Input Group"),
-            tr("Enter new group name"), tmp_name);
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewInputGroupSlot(const QString&)));
+        popupStack->AddScreen(settingdialog);
+    }
+    else
+        delete settingdialog;
+}
 
-        if (!ok)
-            return;
+void CardInput::CreateNewInputGroupSlot(const QString& name)
+{
+    if (name.isEmpty())
+    {
+        ShowOkPopup(tr("Sorry, this Input Group name cannot be blank."));
+        return;
+    }
 
-        if (tmp_name.isEmpty())
-        {
-            ShowOkPopup(
-                tr("Sorry, this Input Group name cannot be blank."));
-            continue;
-        }
+    QString new_name = QString("user:") + name;
 
-        new_name = QString("user:") + tmp_name;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT inputgroupname "
+                  "FROM inputgroup "
+                  "WHERE inputgroupname = :GROUPNAME");
+    query.bindValue(":GROUPNAME", new_name);
 
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-            "SELECT inputgroupname "
-            "FROM inputgroup "
-            "WHERE inputgroupname = :GROUPNAME");
-        query.bindValue(":GROUPNAME", new_name);
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateNewInputGroup 1", query);
+        return;
+    }
 
-        if (!query.exec())
-        {
-            MythDB::DBError("CreateNewInputGroup 1", query);
-            return;
-        }
-
-        if (query.next())
-        {
-            ShowOkPopup(
-                tr("Sorry, this Input Group name is already in use."));
-            continue;
-        }
-
-        break;
+    if (query.next())
+    {
+        ShowOkPopup(tr("Sorry, this Input Group name is already in use."));
+        return;
     }
 
     uint inputgroupid = CardUtil::CreateInputGroup(new_name);
