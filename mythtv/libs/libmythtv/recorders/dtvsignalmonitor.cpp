@@ -521,8 +521,8 @@ void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
 
         LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("onid(required/detected) 0x%1/0x%2 "
                 "tsid(required/detected) 0x%3/0x%4")
-                .arg(networkID).arg(detectedNetworkID)
-                .arg(transportID).arg(detectedTransportID));
+                .arg(networkID, 0, 16).arg(detectedNetworkID, 0, 16)
+                .arg(transportID, 0, 16).arg(detectedTransportID, 0, 16));
 
         if (detectedNetworkID == networkID && detectedTransportID == transportID)
         {
@@ -533,8 +533,8 @@ void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
         else
         {
             LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Looks like I am tuned to the wrong channel"
-                    " tsid = %1 orig_net_id = %2")
-                   .arg(detectedTransportID).arg(detectedNetworkID));
+                    " onid = 0x%1 tsid = 0x%2")
+                   .arg(detectedNetworkID, 0, 16).arg(detectedTransportID, 0, 16));
         }
     }
     else
@@ -555,8 +555,8 @@ void DTVSignalMonitor::HandleSDTo(const sdt_sections_cache_const_t& sections)
 
         LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("onid(required/detected) 0x%1/0x%2 "
                 "tsid(required/detected) 0x%3/0x%4")
-                .arg(networkID).arg(detectedNetworkID)
-                .arg(transportID).arg(detectedTransportID));
+                .arg(networkID, 0, 16).arg(detectedNetworkID, 0, 16)
+                .arg(transportID, 0, 16).arg(detectedTransportID, 0, 16));
 
         if (detectedNetworkID == networkID && detectedTransportID == transportID)
         {
