@@ -332,7 +332,10 @@ QList<QHostAddress> ServerPool::DefaultBroadcast(void)
 {
     QList<QHostAddress> blist;
     if (!gCoreContext->GetNumSetting("ListenOnAllIps",1))
+    {
         blist << DefaultBroadcastIPv4();
+        blist << DefaultBroadcastIPv6();
+    }
     return blist;
 }
 
@@ -351,10 +354,12 @@ QList<QHostAddress> ServerPool::DefaultBroadcastIPv4(void)
     return blist;
 }
 
-//QList<QHostAddress> ServerPool::DefaultBroadcastIPv6(void)
-//{
-//
-//}
+QList<QHostAddress> ServerPool::DefaultBroadcastIPv6(void)
+{
+    QList<QHostAddress> blist;
+    blist << QHostAddress("FF02::1");
+    return blist;
+}
 
 
 void ServerPool::close(void)
@@ -388,6 +393,11 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
     {
+        // If IPV4 support is disabled and this is an IPV4 address,
+        // bypass this address
+        if (it->protocol() == QAbstractSocket::IPv4Protocol
+          && ! gCoreContext->GetNumSetting("IPv4Support",1))
+            continue;
         // If IPV6 support is disabled and this is an IPV6 address,
         // bypass this address
         if (it->protocol() == QAbstractSocket::IPv6Protocol
@@ -438,6 +448,15 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
             }
 
             if (server->serverError() == QAbstractSocket::UnsupportedSocketOperationError
+                 && it->protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("No IPv4 support on this system. Disabling MythTV IPv4."));
+                 gCoreContext->OverrideSettingForSession("IPv4Support", "0");
+                 continue;
+            }
+
+            if (server->serverError() == QAbstractSocket::UnsupportedSocketOperationError
                  && it->protocol() == QAbstractSocket::IPv6Protocol)
             {
                 LOG(VB_GENERAL, LOG_INFO,
@@ -485,6 +504,17 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
     {
+        // If IPV4 support is disabled and this is an IPV4 address,
+        // bypass this address
+        if (it->protocol() == QAbstractSocket::IPv4Protocol
+          && ! gCoreContext->GetNumSetting("IPv4Support",1))
+            continue;
+        // If IPV6 support is disabled and this is an IPV6 address,
+        // bypass this address
+        if (it->protocol() == QAbstractSocket::IPv6Protocol
+          && ! gCoreContext->GetNumSetting("IPv6Support",1))
+            continue;
+
         QNetworkAddressEntry host;
 
         if (it->protocol() == QAbstractSocket::IPv6Protocol)

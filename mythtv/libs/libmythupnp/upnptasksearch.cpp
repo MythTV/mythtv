@@ -108,7 +108,6 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
     {
         QString ipaddress;
 
-
         // Avoid announcing the localhost address
         if (*it == QHostAddress::LocalHost ||
             *it == QHostAddress::LocalHostIPv6 ||
@@ -116,21 +115,17 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
             *it == QHostAddress::AnyIPv6)
             continue;
 
+        QHostAddress ip = *it;
         // Descope the Link Local address. The scope is only valid
         // on the server sending the announcement, not the clients
         // that receive it
-        // FIXME what happens for scopeId "4"? Do we remove all 4s from the address?
-        // http://doc.qt.io/qt-5/qhostaddress.html#scopeId
-        if ((*it).isInSubnet(kLinkLocal6))
-        {
-            ipaddress = "[" + (*it).toString()
-                        .remove('%').remove((*it).scopeId()) + "]";
-        }            
+        ip.setScopeId(QString());
+
         // If this looks like an IPv6 address, then enclose it in []'s
-        else if ((*it).protocol() == QAbstractSocket::IPv6Protocol)
-            ipaddress = "[" + (*it).toString() + "]";
+        if (ip.protocol() == QAbstractSocket::IPv6Protocol)
+            ipaddress = "[" + ip.toString() + "]";
         else
-            ipaddress = (*it).toString();
+            ipaddress = ip.toString();
 
         QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
                                     "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
