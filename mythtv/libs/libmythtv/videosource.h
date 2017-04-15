@@ -777,7 +777,7 @@ class MTV_PUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
     virtual void Load(void);
 
     virtual void Save(void) { }
-    virtual void Save(QString destination) { }
+    virtual void Save(QString /*destination*/) { }
 
   public slots:
     void menu(void);

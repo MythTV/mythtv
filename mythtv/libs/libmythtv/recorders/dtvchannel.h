@@ -52,12 +52,12 @@ class DTVChannel : public ChannelBase
     /// will need to implement this when adding support for new hardware.
     virtual bool Tune(const DTVMultiplex &tuning) = 0;
     /// \brief Performs IPTV Tuning. Only implemented by IPTVChannel.
-    virtual bool Tune(const IPTVTuningData&, bool scanning) { return false; }
+    virtual bool Tune(const IPTVTuningData&, bool /*scanning*/) { return false; }
     /// \brief Leave it up to the implementation to map the channnum
     /// appropriately.
     ///
     /// Used by the ExternalRecorder.
-    virtual bool Tune(const QString &channum) { return true; }
+    virtual bool Tune(const QString &/*channum*/) { return true; }
     /// \brief Enters power saving mode if the card supports it
     virtual bool EnterPowerSavingMode(void)
     {
@@ -150,7 +150,7 @@ class DTVChannel : public ChannelBase
                     uint mpeg_tsid, int mpeg_pnum);
     void ClearDTVInfo(void) { SetDTVInfo(0, 0, 0, 0, -1); }
     /// \brief Checks tuning for problems, and tries to fix them.
-    virtual void CheckOptions(DTVMultiplex &tuning) const {}
+    virtual void CheckOptions(DTVMultiplex &/*tuning*/) const {}
     virtual void HandleScriptEnd(bool ok);
 
   protected:

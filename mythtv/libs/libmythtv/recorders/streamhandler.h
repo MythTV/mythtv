@@ -32,9 +32,9 @@ class PIDInfo
         streamType(stream_type),         pesType(pes_type) {;}
     virtual ~PIDInfo() {;}
 
-    virtual bool Open(const QString &dev, bool use_section_reader)
+    virtual bool Open(const QString &/*dev*/, bool /*use_section_reader*/)
         { return false; }
-    virtual bool Close(const QString &dev) { return false; }
+    virtual bool Close(const QString &/*dev*/) { return false; }
     bool IsOpen(void) const { return filter_fd >= 0; }
 
     uint        _pid;

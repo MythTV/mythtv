@@ -38,10 +38,10 @@ class MythBDPlayer : public MythPlayer
 
     // Non-const gets
     // Disable screen grabs for Bluray
-    virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
-        int &buflen, int &vw, int &vh, float &ar) { return NULL; }
-    virtual char *GetScreenGrab(int secondsin, int &buflen,
-        int &vw, int &vh, float &ar) { return NULL; }
+    virtual char *GetScreenGrabAtFrame(uint64_t /*frameNum*/, bool /*absolute*/,
+        int &/*buflen*/, int &/*vw*/, int &/*vh*/, float &/*ar*/) { return NULL; }
+    virtual char *GetScreenGrab(int /*secondsin*/, int &/*buflen*/,
+        int &/*vw*/, int &/*vh*/, float &/*ar*/) { return NULL; }
 
   protected:
     // Playback
@@ -59,8 +59,8 @@ class MythBDPlayer : public MythPlayer
 
     // Non-const gets
     // Disable screen grabs for Bluray
-    virtual void SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
-                                   bool absolute) { return; }
+    virtual void SeekForScreenGrab(uint64_t &/*number*/, uint64_t /*frameNum*/,
+                                   bool /*absolute*/) { return; }
 
   private:
     void    DisplayMenu(void);

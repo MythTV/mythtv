@@ -241,12 +241,12 @@ class MTV_PUBLIC MythPlayer
     InteractiveTV *GetInteractiveTV(void);
 
     // Title stuff
-    virtual bool SwitchTitle(int title) { return false; }
+    virtual bool SwitchTitle(int /*title*/) { return false; }
     virtual bool NextTitle(void) { return false; }
     virtual bool PrevTitle(void) { return false; }
 
     // Angle stuff
-    virtual bool SwitchAngle(int title) { return false; }
+    virtual bool SwitchAngle(int /*title*/) { return false; }
     virtual bool NextAngle(void) { return false; }
     virtual bool PrevAngle(void) { return false; }
 
@@ -289,10 +289,10 @@ class MTV_PUBLIC MythPlayer
 
     // Public Closed caption and teletext stuff
     uint GetCaptionMode(void) const    { return textDisplayMode; }
-    virtual CC708Reader    *GetCC708Reader(uint id=0) { return &cc708; }
-    virtual CC608Reader    *GetCC608Reader(uint id=0) { return &cc608; }
-    virtual SubtitleReader *GetSubReader(uint id=0) { return &subReader; }
-    virtual TeletextReader *GetTeletextReader(uint id=0) { return &ttxReader; }
+    virtual CC708Reader    *GetCC708Reader(uint /*id*/=0) { return &cc708; }
+    virtual CC608Reader    *GetCC608Reader(uint /*id*/=0) { return &cc608; }
+    virtual SubtitleReader *GetSubReader(uint /*id*/=0) { return &subReader; }
+    virtual TeletextReader *GetTeletextReader(uint /*id*/=0) { return &ttxReader; }
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
     void TracksChanged(uint trackType);
@@ -329,16 +329,16 @@ class MTV_PUBLIC MythPlayer
     // Title public stuff
     virtual int GetNumTitles(void) const { return 0; }
     virtual int GetCurrentTitle(void) const { return 0; }
-    virtual int GetTitleDuration(int title) const { return 0; }
-    virtual QString GetTitleName(int title) const { return QString(); }
+    virtual int GetTitleDuration(int /*title*/) const { return 0; }
+    virtual QString GetTitleName(int /*title*/) const { return QString(); }
 
     // Angle public stuff
     virtual int GetNumAngles(void) const { return 0; }
     virtual int GetCurrentAngle(void) const { return 0; }
-    virtual QString GetAngleName(int title) const { return QString(); }
+    virtual QString GetAngleName(int /*title*/) const { return QString(); }
 
     // DVD public stuff
-    virtual bool GoToMenu(QString str)          { return false;     }
+    virtual bool GoToMenu(QString /*str*/)      { return false;     }
     virtual void GoToDVDProgram(bool direction) { (void) direction; }
     virtual bool IsInStillFrame() const         { return false;     }
 

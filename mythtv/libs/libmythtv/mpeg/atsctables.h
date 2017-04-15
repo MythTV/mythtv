@@ -802,7 +802,7 @@ class MTV_PUBLIC AggregateEventInformationTable : public PSIPTable
 
     QString toString(void) const
         { return "AggregateEventInformationTable\n"; }
-    QString toStringXML(uint indent_level) const
+    QString toStringXML(uint /*indent_level*/) const
         { return "<AggregateEventInformationTable />"; }
 };
 
@@ -822,7 +822,7 @@ class MTV_PUBLIC AggregateExtendedTextTable : public PSIPTable
 
     QString toString(void) const
         { return "AggregateExtendedTextTable\n"; }
-    QString toStringXML(uint indent_level) const
+    QString toStringXML(uint /*indent_level*/) const
         { return "<AggregateExtendedTextTable />"; }
 };
 

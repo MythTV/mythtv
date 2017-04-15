@@ -1339,7 +1339,7 @@ void VideoOutputVDPAU::SetVideoFlip(void)
     m_render->SetVideoFlip();
 }
 
-void* VideoOutputVDPAU::GetDecoderContext(unsigned char* buf, uint8_t*& id)
+void* VideoOutputVDPAU::GetDecoderContext(unsigned char* /*buf*/, uint8_t*& /*id*/)
 {
     return &m_context;
 }

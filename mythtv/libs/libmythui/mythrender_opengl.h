@@ -155,7 +155,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     virtual void  PopTransformation(void) = 0;
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
-    virtual void SetColor(int r, int g, int b, int a) { }
+    virtual void SetColor(int /*r*/, int /*g*/, int /*b*/, int /*a*/) { }
     void  SetBackground(int r, int g, int b, int a);
     void  SetFence(void);
 

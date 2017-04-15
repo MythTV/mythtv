@@ -202,5 +202,5 @@ static class VideoVisualSpectrumFactory : public VideoVisualFactory
         return new VideoVisualSpectrum(audio, render);
     }
 
-    virtual bool SupportedRenderer(RenderType type) { return true; }
+    virtual bool SupportedRenderer(RenderType /*type*/) { return true; }
 } VideoVisualSpectrumFactory;

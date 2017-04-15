@@ -43,7 +43,7 @@ class Guide : public GuideServices
 
     public:
 
-        Q_INVOKABLE explicit Guide( QObject *parent = 0 ) {}
+        Q_INVOKABLE explicit Guide( QObject */*parent*/ = 0 ) {}
 
     public:
 

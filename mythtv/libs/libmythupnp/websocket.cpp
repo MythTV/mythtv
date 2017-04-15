@@ -663,9 +663,8 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
     }
 }
 
-void WebSocketWorker::HandleControlFrame(const WebSocketFrame &frame)
+void WebSocketWorker::HandleControlFrame(const WebSocketFrame &/*frame*/)
 {
-
 }
 
 void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)

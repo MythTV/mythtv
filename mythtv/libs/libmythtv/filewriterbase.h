@@ -18,8 +18,8 @@ class MTV_PUBLIC FileWriterBase
 
     virtual int  WriteVideoFrame(VideoFrame *frame);
     virtual int  WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode);
-    virtual int  WriteTextFrame(int vbimode, unsigned char *buf, int len,
-                                long long timecode, int pagenr) { return 1; }
+    virtual int  WriteTextFrame(int /*vbimode*/, unsigned char */*buf*/, int /*len*/,
+                                long long /*timecode*/, int /*pagenr*/) { return 1; }
     virtual int  WriteSeekTable(void) { return 1; }
 
     virtual bool SwitchToNextFile(void) { return false; }

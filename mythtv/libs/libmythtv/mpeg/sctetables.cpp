@@ -573,7 +573,7 @@ QString AggregateDataEventTable::toString(void) const
     return "Aggregate Data Event Section\n";
 }
 
-QString AggregateDataEventTable::toStringXML(uint indent_level) const
+QString AggregateDataEventTable::toStringXML(uint /*indent_level*/) const
 {
     // TODO
     return "<AggregateDataEventSection />";

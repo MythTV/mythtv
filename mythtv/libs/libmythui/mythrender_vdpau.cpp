@@ -1597,7 +1597,7 @@ void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render,
     CHECK_ST
 }
 
-static const char* dummy_get_error_string(VdpStatus status)
+static const char* dummy_get_error_string(VdpStatus /*status*/)
 {
     static const char dummy[] = "Unknown";
     return &dummy[0];
