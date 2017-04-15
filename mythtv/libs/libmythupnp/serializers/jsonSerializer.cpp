@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-JSONSerializer::JSONSerializer( QIODevice *pDevice, const QString &sRequestName )
+JSONSerializer::JSONSerializer( QIODevice *pDevice, const QString &/*sRequestName*/ )
                : m_Stream( pDevice ), m_bCommaNeeded( false )
 {
 }
@@ -47,7 +47,7 @@ QString JSONSerializer::GetContentType()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void JSONSerializer::BeginSerialize( QString &sName )
+void JSONSerializer::BeginSerialize( QString &/*sName*/ )
 {
     m_bCommaNeeded = false;
 
@@ -72,7 +72,7 @@ void JSONSerializer::EndSerialize()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void JSONSerializer::BeginObject( const QString &sName, const QObject  *pObject )
+void JSONSerializer::BeginObject( const QString &sName, const QObject  */*pObject*/ )
 {
     m_bCommaNeeded = false;
     
@@ -83,7 +83,7 @@ void JSONSerializer::BeginObject( const QString &sName, const QObject  *pObject 
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void JSONSerializer::EndObject  ( const QString &sName, const QObject  *pObject )
+void JSONSerializer::EndObject  ( const QString &/*sName*/, const QObject  */*pObject*/ )
 {
     m_bCommaNeeded = false;
     
@@ -96,8 +96,8 @@ void JSONSerializer::EndObject  ( const QString &sName, const QObject  *pObject 
 
 void JSONSerializer::AddProperty( const QString       &sName, 
                                   const QVariant      &vValue,
-                                  const QMetaObject   *pMetaParent,
-                                  const QMetaProperty *pMetaProp )
+                                  const QMetaObject   */*pMetaParent*/,
+                                  const QMetaProperty */*pMetaProp*/ )
 {
     if (m_bCommaNeeded)
         m_Stream << ", ";

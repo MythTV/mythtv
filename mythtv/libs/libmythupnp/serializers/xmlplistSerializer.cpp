@@ -33,7 +33,7 @@ XmlPListSerializer::~XmlPListSerializer()
 {
 }
 
-void XmlPListSerializer::BeginSerialize(QString &sName)
+void XmlPListSerializer::BeginSerialize(QString &/*sName*/)
 {
     m_pXmlWriter->setAutoFormatting(true);
     m_pXmlWriter->setAutoFormattingIndent(4);
@@ -235,16 +235,16 @@ void XmlPListSerializer::BeginObject(const QString &sName,
     m_pXmlWriter->writeStartElement("dict");
 }
 
-void XmlPListSerializer::EndObject(const QString &sName,
-                                   const QObject *pObject)
+void XmlPListSerializer::EndObject(const QString &/*sName*/,
+                                   const QObject */*pObject*/)
 {
     m_pXmlWriter->writeEndElement(); // dict
 }
 
 void XmlPListSerializer::AddProperty(const QString &sName,
                                      const QVariant &vValue,
-                                     const QMetaObject *pMetaParent,
-                                     const QMetaProperty *pMetaProp)
+                                     const QMetaObject */*pMetaParent*/,
+                                     const QMetaProperty */*pMetaProp*/)
 {
     RenderValue(sName, vValue);
 }
