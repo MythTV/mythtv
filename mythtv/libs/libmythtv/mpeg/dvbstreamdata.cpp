@@ -148,10 +148,10 @@ SdtCache::~SdtCache()
 }
 
 // service_id is synonymous with the MPEG program number in the PMT.
-DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
+DVBStreamData::DVBStreamData(uint desired_onid,  uint desired_tsid,
                              int desired_program, int cardnum, bool cacheTableSections)
     : MPEGStreamData(desired_program, cardnum, cacheTableSections),
-    _desired_netid(desired_netid), _desired_tsid(desired_tsid),
+    _desired_onid(desired_onid), _desired_tsid(desired_tsid),
     _current_onid(-1), _current_tsid(-1),
     _dvb_real_network_id(-1), _dvb_eit_dishnet_long(false),
     _replay_cached_sdta(true),
@@ -167,7 +167,7 @@ DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
 
 DVBStreamData::~DVBStreamData()
 {
-    Reset(_desired_netid, _desired_tsid, _desired_program);
+    Reset(_desired_onid, _desired_tsid, _desired_program);
 
     QMutexLocker locker(&_listener_lock);
     _dvb_main_listeners.clear();
@@ -176,12 +176,12 @@ DVBStreamData::~DVBStreamData()
     _dvb_has_eit.clear();
 }
 
-void DVBStreamData::SetDesiredService(uint netid, uint tsid, int serviceid)
+void DVBStreamData::SetDesiredService(uint original_network_id, uint transport_id, int service_id)
 {
-    if ((_desired_netid == netid) && (_desired_tsid == tsid))
-        SetDesiredProgram(serviceid);
+    if ((_desired_onid == original_network_id) && (_desired_tsid == transport_id))
+        SetDesiredProgram(service_id);
     else
-        Reset(netid, tsid, serviceid);
+        Reset(original_network_id, transport_id, service_id);
 }
 
 void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, uint onid, uint tsid, uint sid, uint tid) const
@@ -291,11 +291,17 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip)
 
         uint onid = sdt.OriginalNetworkID();
         uint tsid = sdt.TSID();
-        _current_onid = onid;
-        _current_tsid = tsid;
-        LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Setting _current_onid 0x%1 _current_tsid 0x%2 from SDT")
-        		.arg(_current_onid, 0, 16)
-				.arg(_current_tsid, 0, 16));
+        if ((_current_onid != onid) || (_current_tsid != tsid))
+        {
+            // The currently tuned transport stream has changed
+            _current_onid = onid;
+            _current_tsid = tsid;
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Current transport stream changed "
+                    "to - 0x%1/0x%2 (onid/tsid) source SD actual table")
+                    .arg(_current_onid, 0, 16)
+                    .arg(_current_tsid, 0, 16));
+        }
+
         CheckStaleSDT(sdt, onid, tsid, table_id);
 
         if (SDTSectionSeen(sdt))
@@ -352,11 +358,16 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip)
         uint onid = eit.OriginalNetworkID();
         uint tsid = eit.TSID();
         uint sid = eit.ServiceID();
-        _current_onid = onid;
-        _current_tsid = tsid;
-        LOG(VB_CHANSCAN, LOG_DEBUG, LOC + QString("Setting _current_onid 0x%1 _current_tsid 0x%2 from EIT")
-        		.arg(_current_onid, 0, 16)
-				.arg(_current_tsid, 0, 16));
+        if ((_current_onid != onid) || (_current_tsid != tsid))
+        {
+            // The currently tuned transport stream has changed
+            _current_onid = onid;
+            _current_tsid = tsid;
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Current transport stream changed "
+                    "to - 0x%1/0x%2 (onid/tsid) source EI actual table")
+                    .arg(_current_onid, 0, 16)
+                    .arg(_current_tsid, 0, 16));
+        }
 
         CheckStaleEIT(eit, onid, tsid, sid, table_id);
 
@@ -431,16 +442,15 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip)
     return false;
 }
 
-void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
-                          int desired_serviceid)
+void DVBStreamData::Reset(uint original_network_id, uint transport_id, int service_id)
 {
-    MPEGStreamData::Reset(desired_serviceid);
+    MPEGStreamData::Reset(service_id);
 
     _current_onid = -1;
     _current_tsid = -1;
 
-    _desired_netid = desired_netid;
-    _desired_tsid  = desired_tsid;
+    _desired_onid = original_network_id;
+    _desired_tsid  = transport_id;
 
     _nit_status.SetVersion(-1,0);
     _cit_status.clear();
@@ -654,7 +664,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     }
 
     if ((DVB_EIT_PID == pid || DVB_DNLONG_EIT_PID == pid || FREESAT_EIT_PID == pid ||
-        ((MCA_ONID == _desired_netid) && (MCA_EIT_TSID == _desired_tsid) &&
+        ((MCA_ONID == _desired_onid) && (MCA_EIT_TSID == _desired_tsid) &&
         (MCA_EIT_PID == pid)) || DVB_BVLONG_EIT_PID == pid) &&
 
         DVBEventInformationTableSection::IsEIT(psip.TableID()))
@@ -731,7 +741,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         return true;
     }
 
-    if (_desired_netid == PREMIERE_ONID &&
+    if (_desired_onid == PREMIERE_ONID &&
         (PREMIERE_EIT_DIREKT_PID == pid || PREMIERE_EIT_SPORT_PID == pid) &&
         PremiereContentInformationTable::IsEIT(psip.TableID()))
     {
@@ -835,14 +845,14 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             add_pids.push_back(DVB_BVLONG_EIT_PID);
         }
 
-        if (_desired_netid == PREMIERE_ONID &&
+        if (_desired_onid == PREMIERE_ONID &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) PREMIERE_EIT_DIREKT_PID) == cur_pids.end())
         {
             add_pids.push_back(PREMIERE_EIT_DIREKT_PID);
         }
 
-        if (_desired_netid == PREMIERE_ONID &&
+        if (_desired_onid == PREMIERE_ONID &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) PREMIERE_EIT_SPORT_PID) == cur_pids.end())
         {
@@ -855,7 +865,7 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             add_pids.push_back(FREESAT_EIT_PID);
         }
 
-        if (MCA_ONID == _desired_netid && MCA_EIT_TSID == _desired_tsid &&
+        if (MCA_ONID == _desired_onid && MCA_EIT_TSID == _desired_tsid &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) MCA_EIT_PID) == cur_pids.end())
         {
@@ -885,14 +895,14 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             del_pids.push_back(DVB_BVLONG_EIT_PID);
         }
 
-        if (_desired_netid == PREMIERE_ONID &&
+        if (_desired_onid == PREMIERE_ONID &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) PREMIERE_EIT_DIREKT_PID) != cur_pids.end())
         {
             del_pids.push_back(PREMIERE_EIT_DIREKT_PID);
         }
 
-        if (_desired_netid == PREMIERE_ONID &&
+        if (_desired_onid == PREMIERE_ONID &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) PREMIERE_EIT_SPORT_PID) != cur_pids.end())
         {
@@ -905,7 +915,7 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             del_pids.push_back(FREESAT_EIT_PID);
         }
 
-        if (MCA_ONID == _desired_netid && MCA_EIT_TSID == _desired_tsid &&
+        if (MCA_ONID == _desired_onid && MCA_EIT_TSID == _desired_tsid &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) MCA_EIT_PID) != cur_pids.end())
         {

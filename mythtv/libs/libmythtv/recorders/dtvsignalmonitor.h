@@ -35,7 +35,7 @@ class DTVSignalMonitor : public SignalMonitor,
     void SetProgramNumber(int progNum);
     int  GetProgramNumber() const { return programNumber; }
 
-    void SetDVBService(uint network_id, uint transport_id, int service_id);
+    void SetDVBService(uint original_network_id, uint transport_id, int service_id);
     uint GetTransportID(void) const { return transportID;   }
     uint GetNetworkID(void)   const { return networkID;     }
     int  GetServiceID(void)   const { return programNumber; }

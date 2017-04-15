@@ -28,17 +28,17 @@ typedef QMap<uint, bool>                 dvb_has_eit_t;
 class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 {
   public:
-    DVBStreamData(uint desired_netid, uint desired_tsid,
+    DVBStreamData(uint desired_onid, uint desired_tsid,
                   int desired_program, int cardnum, bool cacheTableSections = false);
     virtual ~DVBStreamData();
 
     using MPEGStreamData::Reset;
     void Reset(void) { Reset(0, 0, -1); }
-    void Reset(uint desired_netid, uint desired_tsid, int desired_sid);
+    void Reset(uint original_network_id, uint transport_id, int service_id);
 
     // DVB table monitoring
-    void SetDesiredService(uint netid, uint tsid, int serviceid);
-    uint DesiredNetworkID(void)   const { return _desired_netid; }
+    void SetDesiredService(uint original_network_id, uint transport_id, int service_id);
+    uint DesiredNetworkID(void)   const { return _desired_onid; }
     uint DesiredTransportID(void) const { return _desired_tsid;  }
 
     // Table processing
@@ -146,7 +146,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
   private:
     /// DVB table monitoring
-    uint                      _desired_netid;
+    uint                      _desired_onid;
     uint                      _desired_tsid;
 
     uint                      _current_onid;
