@@ -1656,10 +1656,17 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
  *
  * \par        ANN Monitor  \e host \e wantevents
  * Register \e host as a client, and allow shutdown of the socket
+ *
  * \par        ANN SlaveBackend \e IPaddress
+ * Register \e host as a slave backend, and allow shutdown of the socket
+ *
  * \par        ANN MediaServer \e IPaddress
- * \par        ANN FileTransfer stringlist(\e hostname, \e filename)
- * \par        ANN FileTransfer stringlist(\e hostname, \e filename) \e useReadahead \e retries
+ * Register \e host as a media server
+ *
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup)
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup) \e writeMode
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup) \e writeMode \e useReadahead
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup) \e writeMode \e useReadahead \e retries
  */
 void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                 MythSocket *socket)
