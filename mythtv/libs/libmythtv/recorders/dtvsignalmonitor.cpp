@@ -574,6 +574,8 @@ void DTVSignalMonitor::HandleSDTo(const sdt_sections_cache_const_t& sections)
 
 void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
 {
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("HandleEncryptionStatus - enc_status %1")
+            .arg(enc_status));
     AddFlags(kDTVSigMon_CryptSeen);
     if (!enc_status)
         AddFlags(kDTVSigMon_CryptMatch);
