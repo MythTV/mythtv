@@ -262,7 +262,7 @@ class AvFormatDecoder : public DecoderBase
     virtual void UpdateFramesPlayed(void);
     virtual bool DoRewindSeek(long long desiredFrame);
     virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
-    virtual void StreamChangeCheck(void) { }
+    virtual void StreamChangeCheck(void);
     virtual void PostProcessTracks(void) { }
     virtual bool IsValidStream(int /*streamid*/) {return true;}
 
@@ -371,6 +371,7 @@ class AvFormatDecoder : public DecoderBase
     float m_fps;
     bool  codec_is_mpeg;
     bool  m_processFrames;
+    bool  m_streams_changed;
 };
 
 #endif
