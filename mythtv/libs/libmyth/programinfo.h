@@ -441,6 +441,7 @@ class MPUBLIC ProgramInfo
 
     uint    GetSourceID(void)             const { return sourceid;     }
     uint    GetInputID(void)              const { return inputid;      }
+    QString GetInputName(void)            const { return inputname;    }
 
     uint    GetFindID(void)               const { return findid;       }
 
