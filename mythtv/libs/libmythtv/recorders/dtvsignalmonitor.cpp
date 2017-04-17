@@ -582,11 +582,11 @@ void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
 {
     LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("HandleEncryptionStatus - enc_status %1")
             .arg(enc_status));
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     AddFlags(kDTVSigMon_CryptSeen);
     if (!enc_status)
         AddFlags(kDTVSigMon_CryptMatch);
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("HandleEncryptionStatus - enc_status %1")
-            .arg(enc_status));
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
 }
 
 ATSCStreamData *DTVSignalMonitor::GetATSCStreamData()
