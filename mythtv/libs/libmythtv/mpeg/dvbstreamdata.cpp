@@ -319,6 +319,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip)
                 _replay_cached_sdtos = false;
                 ReplayCachedSDTos();
             }
+            return true;
         }
         else
             return false;

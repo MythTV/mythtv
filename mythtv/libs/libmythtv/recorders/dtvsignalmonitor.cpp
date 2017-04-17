@@ -207,10 +207,12 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
     seen_table_crc.clear();
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         RemoveFlags(kDTVSigMon_PATSeen   | kDTVSigMon_PATMatch |
                     kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
                     kDTVSigMon_VCTSeen   | kDTVSigMon_VCTMatch |
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         majorChannel = major;
         minorChannel = minor;
         GetATSCStreamData()->SetDesiredChannel(major, minor);
@@ -224,12 +226,15 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
     seen_table_crc.clear();
     if (programNumber != progNum)
     {
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         programNumber = progNum;
         if (GetStreamData())
             GetStreamData()->SetDesiredProgram(programNumber);
         AddFlags(kDTVSigMon_WaitForPMT);
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     }
 }
 
@@ -245,6 +250,7 @@ void DTVSignalMonitor::SetDVBService(uint original_network_id, uint transport_id
         return;
     }
 
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
                 kDTVSigMon_SDTSeen   | kDTVSigMon_SDTMatch |
                 kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
