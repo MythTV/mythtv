@@ -145,6 +145,7 @@ class DTVSignalMonitor : public SignalMonitor,
     QList<uint64_t>    seen_table_crc;
 
     bool ignore_encrypted;
+    volatile mutable uint64_t old_flags;
 };
 
 #endif // DTVSIGNALMONITOR_H

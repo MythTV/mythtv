@@ -65,7 +65,8 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       networkID(0), transportID(0),
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
-      ignore_encrypted(false)
+      ignore_encrypted(false),
+      old_flags(0)
 {
     LOG(VB_TEMPDEBUG, LOG_INFO, LOC + "Constructing a signal monitor");
 }
@@ -622,6 +623,13 @@ const ScanStreamData *DTVSignalMonitor::GetScanStreamData() const
 bool DTVSignalMonitor::IsAllGood(void) const
 {
     QMutexLocker locker(&statusLock);
+
+    if (flags != old_flags)
+    {
+        old_flags = flags;
+        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+    }
+
     if (!SignalMonitor::IsAllGood())
         return false;
     if ((flags & kDTVSigMon_WaitForPAT) && !matchingPAT.IsGood())
