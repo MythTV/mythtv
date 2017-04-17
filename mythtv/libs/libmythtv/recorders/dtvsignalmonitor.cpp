@@ -585,6 +585,8 @@ void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
     AddFlags(kDTVSigMon_CryptSeen);
     if (!enc_status)
         AddFlags(kDTVSigMon_CryptMatch);
+    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("HandleEncryptionStatus - enc_status %1")
+            .arg(enc_status));
 }
 
 ATSCStreamData *DTVSignalMonitor::GetATSCStreamData()
