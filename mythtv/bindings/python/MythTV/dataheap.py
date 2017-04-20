@@ -283,7 +283,7 @@ class Recorded( CMPRecord, DBDataWrite ):
                  'commflagged':0,    'recgroup':'Default',   'seriesid':'',
                  'programid':'',     'lastmodified':'CURRENT_TIMESTAMP',
                  'filesize':0,       'stars':0,              'previouslyshown':0,
-                 'preserve':0,       'bookmarkupdate':0,
+                 'preserve':0,       'bookmarkupdate':None,
                  'findid':0,         'deletepending':0,      'transcoder':0,
                  'timestretch':1,    'recpriority':0,        'playgroup':'Default',
                  'profile':'No',     'duplicate':1,          'transcoded':0,
