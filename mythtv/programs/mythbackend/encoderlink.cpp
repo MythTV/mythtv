@@ -429,8 +429,7 @@ int EncoderLink::LockTuner()
 /** \fn EncoderLink::StartRecording(ProgramInfo*)
  *  \brief Tells TVRec to Start recording the program "rec" as soon as possible.
  *
- *  \return +1 if the recording started successfully,
- *          -1 if TVRec is busy doing something else, 0 otherwise.
+ *  \return a RecStatus::Type indicating the state of the recording.
  *  \sa RecordPending(const ProgramInfo*, int, bool), StopRecording()
  */
 RecStatus::Type EncoderLink::StartRecording(ProgramInfo *rec)
