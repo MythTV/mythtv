@@ -261,44 +261,40 @@ MainServer::MainServer(bool master, int port,
     mythserver = new MythServer();
     mythserver->setProxy(QNetworkProxy::NoProxy);
 
-    // test to make sure listen addresses are available
-    // no reason to run the backend if the mainserver is not active
-    QHostAddress config_v4(gCoreContext->resolveSettingAddress(
-                                           "BackendServerIP",
-                                           QString(),
-                                           gCoreContext->ResolveIPv4, true));
-    bool v4IsSet = config_v4.isNull() ? false : true;
-#if !defined(QT_NO_IPV6)
-    QHostAddress config_v6(gCoreContext->resolveSettingAddress(
-                                           "BackendServerIP6",
-                                           QString(),
-                                           gCoreContext->ResolveIPv6, true));
-    bool v6IsSet = config_v6.isNull() ? false : true;
-#endif
     QList<QHostAddress> listenAddrs = mythserver->DefaultListen();
-
-    #if !defined(QT_NO_IPV6)
-    if (v6IsSet && !listenAddrs.contains(config_v6))
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Unable to find IPv6 address to bind");
-    #endif
-
-    if (v4IsSet && !listenAddrs.contains(config_v4))
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Unable to find IPv4 address to bind");
-
-    if ((v4IsSet && !listenAddrs.contains(config_v4))
-#if !defined(QT_NO_IPV6)
-        && (v6IsSet && !listenAddrs.contains(config_v6))
-#endif
-       )
+    if (!gCoreContext->GetNumSetting("ListenOnAllIps",1))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to find either IPv4 or IPv6 "
-                                 "address we can bind to, exiting");
-        SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
-        return;
-    }
+        // test to make sure listen addresses are available
+        // no reason to run the backend if the mainserver is not active
+        QHostAddress config_v4(gCoreContext->resolveSettingAddress(
+                                            "BackendServerIP",
+                                            QString(),
+                                            gCoreContext->ResolveIPv4, true));
+        bool v4IsSet = config_v4.isNull() ? false : true;
+        QHostAddress config_v6(gCoreContext->resolveSettingAddress(
+                                            "BackendServerIP6",
+                                            QString(),
+                                            gCoreContext->ResolveIPv6, true));
+        bool v6IsSet = config_v6.isNull() ? false : true;
 
+        if (v6IsSet && !listenAddrs.contains(config_v6))
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Unable to find IPv6 address to bind");
+
+        if (v4IsSet && !listenAddrs.contains(config_v4))
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Unable to find IPv4 address to bind");
+
+        if ((v4IsSet && !listenAddrs.contains(config_v4))
+            && (v6IsSet && !listenAddrs.contains(config_v6))
+        )
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to find either IPv4 or IPv6 "
+                                    "address we can bind to, exiting");
+            SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
+            return;
+        }
+    }
     if (!mythserver->listen(port))
     {
         SetExitCode(GENERIC_EXIT_SOCKET_ERROR, false);
@@ -441,7 +437,11 @@ void MainServer::autoexpireUpdate(void)
 void MainServer::NewConnection(qt_socket_fd_t socketDescriptor)
 {
     QWriteLocker locker(&sockListLock);
-    controlSocketList.insert(new MythSocket(socketDescriptor, this));
+    MythSocket *ms =  new MythSocket(socketDescriptor, this);
+    if (ms->IsConnected())
+        controlSocketList.insert(ms);
+    else
+        ms-> DecrRef();
 }
 
 void MainServer::readyRead(MythSocket *sock)
@@ -1660,10 +1660,17 @@ void MainServer::HandleVersion(MythSocket *socket, const QStringList &slist)
  *
  * \par        ANN Monitor  \e host \e wantevents
  * Register \e host as a client, and allow shutdown of the socket
+ *
  * \par        ANN SlaveBackend \e IPaddress
+ * Register \e host as a slave backend, and allow shutdown of the socket
+ *
  * \par        ANN MediaServer \e IPaddress
- * \par        ANN FileTransfer stringlist(\e hostname, \e filename)
- * \par        ANN FileTransfer stringlist(\e hostname, \e filename) \e useReadahead \e retries
+ * Register \e host as a media server
+ *
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup)
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup) \e writeMode
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup) \e writeMode \e useReadahead
+ * \par        ANN FileTransfer stringlist(\e hostname, \e filename \e storageGroup) \e writeMode \e useReadahead \e retries
  */
 void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                 MythSocket *socket)
@@ -3487,26 +3494,9 @@ void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
             hash = slave->GetFileHash(filename, storageGroup);
             slave->DecrRef();
         }
-        else
-        {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT hostname FROM settings "
-                           "WHERE value='BackendServerIP' "
-                              "OR value='BackendServerIP6' "
-                             "AND data=:HOSTNAME;");
-            query.bindValue(":HOSTNAME", hostname);
-
-            if (query.exec() && query.next())
-            {
-                hostname = query.value(0).toString();
-                slave = GetMediaServerByHostname(hostname);
-                if (slave)
-                {
-                    hash = slave->GetFileHash(filename, storageGroup);
-                    slave->DecrRef();
-                }
-            }
-        }
+        // I deleted the incorrect SQL select that was supposed to get
+        // host name from ip address. Since it cannot work and has
+        // been there 6 years I assume it is not important.
     }
 
     res << hash;
@@ -3738,12 +3728,10 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
                 " path = %3 wanthost = %4")
             .arg(groupname).arg(host).arg(path).arg(wantHost));
 
-    QString addr4 = gCoreContext->GetBackendServerIP4();
-    QString addr6 = gCoreContext->GetBackendServerIP6();
+    QString addr = gCoreContext->GetBackendServerIP();
 
     if ((host.toLower() == wantHost.toLower()) ||
-        (!addr4.isEmpty() && addr4 == wantHostaddr.toString()) ||
-        (!addr6.isEmpty() && addr6 == wantHostaddr.toString()))
+        (!addr.isEmpty() && addr == wantHostaddr.toString()))
     {
         StorageGroup sg(groupname, host);
         LOG(VB_FILE, LOG_INFO, LOC + "HandleSGGetFileList: Getting local info");
@@ -4022,12 +4010,10 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
     LOG(VB_FILE, LOG_INFO, LOC + QString("HandleSGFileQuery: %1")
             .arg(gCoreContext->GenMythURL(wantHost, 0, filename, groupname)));
 
-    QString addr4 = gCoreContext->GetBackendServerIP4();
-    QString addr6 = gCoreContext->GetBackendServerIP6();
+    QString addr = gCoreContext->GetBackendServerIP();
 
     if ((host.toLower() == wantHost.toLower()) ||
-        (!addr4.isEmpty() && addr4 == wantHostaddr.toString()) ||
-        (!addr6.isEmpty() && addr6 == wantHostaddr.toString()))
+        (!addr.isEmpty() && addr == wantHostaddr.toString()))
     {
         LOG(VB_FILE, LOG_INFO, LOC + "HandleSGFileQuery: Getting local info");
         StorageGroup sg(groupname, gCoreContext->GetHostName(), allowFallback);

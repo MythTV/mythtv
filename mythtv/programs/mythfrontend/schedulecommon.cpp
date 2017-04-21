@@ -266,7 +266,7 @@ void ScheduleCommon::ShowPrevious(void) const
 *  \brief Creates a dialog for editing the recording status,
 *         blocking until user leaves dialog.
 */
-void ScheduleCommon::EditRecording(void)
+void ScheduleCommon::EditRecording(bool may_watch_now)
 {
     ProgramInfo *pginfo = GetCurrentProgram();
     if (!pginfo)
@@ -328,6 +328,9 @@ void ScheduleCommon::EditRecording(void)
     menuPopup->SetReturnEvent(this, "editrecording");
 
     QDateTime now = MythDate::current();
+
+    if(may_watch_now)
+        menuPopup->AddButton(tr("Watch This Channel"));
 
     if (recinfo.GetRecordingStatus() == RecStatus::Unknown)
     {

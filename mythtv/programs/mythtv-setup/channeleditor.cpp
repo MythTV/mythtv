@@ -33,15 +33,12 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
     addChild(cid = new ChannelID());
     cid->setValue(id);
 
-    ChannelOptionsCommon *common =
-        new ChannelOptionsCommon(*cid, default_sourceid);
-    addChild(common);
-
-    ChannelOptionsFilters *filters =
-        new ChannelOptionsFilters(*cid);
-    addChild(filters);
-
     QStringList cardtypes = ChannelUtil::GetInputTypes(cid->getValue().toUInt());
+
+    // For a new channel the list will be empty so get it this way.
+    if (cardtypes.empty())
+        cardtypes = CardUtil::GetInputTypeNames(default_sourceid);
+
     bool all_v4l = !cardtypes.empty();
     bool all_asi = !cardtypes.empty();
     for (uint i = 0; i < (uint) cardtypes.size(); i++)
@@ -49,6 +46,14 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
         all_v4l &= CardUtil::IsV4L(cardtypes[i]);
         all_asi &= cardtypes[i] == "ASI";
     }
+
+    ChannelOptionsCommon *common =
+        new ChannelOptionsCommon(*cid, default_sourceid,!all_v4l);
+    addChild(common);
+
+    ChannelOptionsFilters *filters =
+        new ChannelOptionsFilters(*cid);
+    addChild(filters);
 
     if (all_v4l)
         addChild(new ChannelOptionsV4L(*cid));

@@ -183,7 +183,7 @@ class MHRoot
     // Actions on Interactibles.
     virtual void SetInteractionStatus(bool /*newStatus*/, MHEngine *) { InvalidAction("SetInteractionStatus"); }
     virtual bool GetInteractionStatus(void) { InvalidAction("GetInteractionStatus"); return false; }
-    virtual void SetHighlightStatus(bool /*newStatus*/, MHEngine *engine) { InvalidAction("SetHighlightStatus"); }
+    virtual void SetHighlightStatus(bool /*newStatus*/, MHEngine */*engine*/) { InvalidAction("SetHighlightStatus"); }
     virtual bool GetHighlightStatus(void) { InvalidAction("GetHighlightStatus"); return false; }
 
     // Actions on Sliders.

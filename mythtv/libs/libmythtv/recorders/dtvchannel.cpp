@@ -389,7 +389,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     return ok;
 }
 
-void DTVChannel::HandleScriptEnd(bool ok)
+void DTVChannel::HandleScriptEnd(bool /*ok*/)
 {
     // MAYBE TODO? need to tell signal monitor to throw out any tables
     // it saw on the last mux...

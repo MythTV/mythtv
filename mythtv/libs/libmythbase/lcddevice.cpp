@@ -77,6 +77,7 @@ LCD::LCD()
 
     connect(m_retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
     connect(m_LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
+    connect(this, &LCD::sendToServer, this, &LCD::sendToServerSlot, Qt::QueuedConnection);
 }
 
 bool LCD::m_enabled = false;
@@ -204,12 +205,19 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     return m_connected;
 }
 
-void LCD::sendToServer(const QString &someText)
+void LCD::sendToServerSlot(const QString &someText)
 {
     QMutexLocker locker(&m_socketLock);
 
     if (!m_socket || !m_lcdReady)
         return;
+
+    if (m_socket->thread() != QThread::currentThread())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "Sending to LCDServer from wrong thread.");
+        return;
+    }
 
     // Check the socket, make sure the connection is still up
     if (QAbstractSocket::ConnectedState != m_socket->state())

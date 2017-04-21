@@ -500,7 +500,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
         }
     }
 
-    void HandleEncryptionStatus(uint program_number, bool)
+    void HandleEncryptionStatus(uint /*program_number*/, bool /*encrypted*/)
     {
     }
 
@@ -602,12 +602,12 @@ class PrintATSCAuxStreamListener :
         PrintOutput(out, use_xml) { }
 
     virtual void HandleTVCT(
-        uint pid, const TerrestrialVirtualChannelTable *tvct)
+        uint /*pid*/, const TerrestrialVirtualChannelTable */*tvct*/)
     {
         // already handled in HandleVCT
     }
 
-    virtual void HandleCVCT(uint pid, const CableVirtualChannelTable *cvct)
+    virtual void HandleCVCT(uint /*pid*/, const CableVirtualChannelTable */*cvct*/)
     {
         // already handled in HandleVCT
     }

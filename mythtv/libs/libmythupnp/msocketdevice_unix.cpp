@@ -95,7 +95,6 @@ static inline int qt_socket_socket(int domain, int type, int protocol)
 static inline void qt_socket_getportaddr(struct sockaddr *sa,
         quint16 *port, QHostAddress *addr)
 {
-#if !defined(QT_NO_IPV6)
 
     if (sa->sa_family == AF_INET6)
     {
@@ -109,7 +108,6 @@ static inline void qt_socket_getportaddr(struct sockaddr *sa,
         return;
     }
 
-#endif
 
     struct sockaddr_in *sa4 = (struct sockaddr_in *)sa;
 
@@ -132,16 +130,10 @@ MSocketDevice::Protocol MSocketDevice::getProtocol() const
 {
     if (isValid())
     {
-#if !defined (QT_NO_IPV6)
 
         struct sockaddr_storage sa;
-#else
-
-        struct sockaddr sa;
-#endif
         memset(&sa, 0, sizeof(sa));
         QT_SOCKLEN_T sz = sizeof(sa);
-#if !defined (QT_NO_IPV6)
 
         struct sockaddr *sap = reinterpret_cast<struct sockaddr *>(&sa);
 
@@ -161,21 +153,6 @@ MSocketDevice::Protocol MSocketDevice::getProtocol() const
             }
         }
 
-#else
-        if (!::getsockname(fd, &sa, &sz))
-        {
-            switch (sa.sa_family)
-            {
-
-                case AF_INET:
-                    return IPv4;
-
-                default:
-                    return Unknown;
-            }
-        }
-
-#endif
     }
 
     return Unknown;
@@ -190,12 +167,8 @@ MSocketDevice::Protocol MSocketDevice::getProtocol() const
 
 int MSocketDevice::createNewSocket()
 {
-#if !defined(QT_NO_IPV6)
     int s = qt_socket_socket(protocol() == IPv6 ? AF_INET6 : AF_INET,
                              t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
-#else
-    int s = qt_socket_socket(AF_INET, t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
-#endif
 
     if (s < 0)
     {
@@ -515,7 +488,6 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
 
     if (!isValid())
     {
-#if !defined(QT_NO_IPV6)
 
         if (addr.protocol() == QAbstractSocket::IPv6Protocol)
         {
@@ -524,7 +496,6 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
                 "MSocketDevice::connect: setting Protocol to IPv6");
         }
         else
-#endif
             if (addr.protocol() == QAbstractSocket::IPv4Protocol)
             {
                 setProtocol(IPv4);
@@ -552,7 +523,6 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
     struct sockaddr *aa;
     QT_SOCKLEN_T aalen;
 
-#if !defined(QT_NO_IPV6)
 
     struct sockaddr_in6 a6;
 
@@ -568,7 +538,6 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
         aa = (struct sockaddr *) & a6;
     }
     else
-#endif
         if (addr.protocol() == QAbstractSocket::IPv4Protocol)
         {
             memset(&a4, 0, sizeof(a4));
@@ -666,7 +635,6 @@ bool MSocketDevice::bind(const QHostAddress &address, quint16 port)
 
     struct sockaddr_in a4;
 
-#if !defined(QT_NO_IPV6)
 
     struct sockaddr_in6 a6;
 
@@ -681,7 +649,6 @@ bool MSocketDevice::bind(const QHostAddress &address, quint16 port)
         r = QT_SOCKET_BIND(fd, (struct sockaddr *) & a6, sizeof(a6));
     }
     else
-#endif
         if (address.protocol() == QAbstractSocket::IPv4Protocol)
         {
             memset(&a4, 0, sizeof(a4));
@@ -786,15 +753,8 @@ int MSocketDevice::accept()
     if (!isValid())
         return -1;
 
-#if !defined (QT_NO_IPV6)
-
     struct sockaddr_storage aa;
 
-#else
-
-    struct sockaddr aa;
-
-#endif
     QT_SOCKLEN_T l = sizeof(aa);
 
     bool done;
@@ -989,13 +949,8 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 */
 qint64 MSocketDevice::readData(char *data, qint64 maxlen)
 {
-#if !defined(QT_NO_IPV6)
 
     struct sockaddr_storage aa;
-#else
-
-    struct sockaddr_in aa;
-#endif
 
     if (maxlen == 0)
     {
@@ -1305,7 +1260,6 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
 
     QT_SOCKLEN_T slen;
 
-#if !defined(QT_NO_IPV6)
 
     struct sockaddr_in6 a6;
 
@@ -1321,7 +1275,6 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
         aa = (struct sockaddr *) & a6;
     }
     else
-#endif
         if (host.protocol() == QAbstractSocket::IPv4Protocol)
         {
             memset(&a4, 0, sizeof(a4));
@@ -1418,15 +1371,8 @@ void MSocketDevice::fetchConnectionParameters()
         return;
     }
 
-#if !defined(QT_NO_IPV6)
-
     struct sockaddr_storage sa;
 
-#else
-
-    struct sockaddr_in sa;
-
-#endif
     memset(&sa, 0, sizeof(sa));
 
     QT_SOCKLEN_T sz;

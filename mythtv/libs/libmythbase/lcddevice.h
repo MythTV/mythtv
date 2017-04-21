@@ -293,10 +293,13 @@ class MBASE_PUBLIC LCD : public QObject
     void restartConnection();      // Try to re-establish the connection to
                                    // LCDServer every 10 seconds
     void outputLEDs();
+    void sendToServerSlot(const QString &someText);
+
+signals:
+    void sendToServer(const QString &someText);
 
   private:
     bool startLCDServer(void);
-    void sendToServer(const QString &someText);
     void init();
     void handleKeyPress(const QString &keyPressed);
     QString quotedString(const QString &string);

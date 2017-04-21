@@ -488,7 +488,8 @@ void HttpWorker::run(void)
 
 #ifndef QT_NO_OPENSSL
         QSslSocket *pSslSocket = new QSslSocket();
-        if (pSslSocket->setSocketDescriptor(m_socket))
+        if (pSslSocket->setSocketDescriptor(m_socket)
+           && gCoreContext->CheckSubnet(pSslSocket))
         {
             pSslSocket->setSslConfiguration(m_sslConfig);
             pSslSocket->startServerEncryption();
@@ -523,6 +524,13 @@ void HttpWorker::run(void)
     {
         pSocket = new QTcpSocket();
         pSocket->setSocketDescriptor(m_socket);
+        if (!gCoreContext->CheckSubnet(pSocket))
+        {
+            delete pSocket;
+            pSocket = 0;
+            return;
+        }
+
     }
 
     pSocket->setSocketOption(QAbstractSocket::KeepAliveOption, QVariant(1));

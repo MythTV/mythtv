@@ -497,6 +497,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     totalepisodes = episode.section('/',1,1).trimmed();
                     episode = episode.section('/',0,0).trimmed();
                     season = episodenum.section('.',0,0).trimmed();
+                    season = season.section('/',0,0).trimmed();
                     QString part(episodenum.section('.',2,2));
                     QString partnumber(part.section('/',0,0).trimmed());
                     QString parttotal(part.section('/',1,1).trimmed());

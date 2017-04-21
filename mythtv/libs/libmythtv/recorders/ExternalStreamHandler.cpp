@@ -209,7 +209,7 @@ bool ExternIO::Run(void)
     return true;
 }
 
-void ExternIO::Term(bool force)
+void ExternIO::Term(bool /*force*/)
 {
     LOG(VB_RECORD, LOG_INFO, QString("ExternIO::Term()"));
 }
@@ -1127,7 +1127,7 @@ void ExternalStreamHandler::PurgeBuffer(void)
     }
 }
 
-void ExternalStreamHandler::PriorityEvent(int fd)
+void ExternalStreamHandler::PriorityEvent(int /*fd*/)
 {
     // TODO report on buffer overruns, etc.
 }

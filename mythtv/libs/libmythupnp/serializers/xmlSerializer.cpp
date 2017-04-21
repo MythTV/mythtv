@@ -59,7 +59,7 @@ QString XmlSerializer::GetContentType()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::BeginSerialize( QString &sName ) 
+void XmlSerializer::BeginSerialize( QString &/*sName*/ )
 {
     m_pXmlWriter->writeStartDocument( "1.0" );
 //    m_pXmlWriter->writeStartElement( m_sRequestName + "Response" );
@@ -107,7 +107,7 @@ void XmlSerializer::BeginObject( const QString &sName, const QObject  *pObject )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::EndObject  ( const QString &sName, const QObject  *pObject )
+void XmlSerializer::EndObject  ( const QString &/*sName*/, const QObject  */*pObject*/ )
 {
     m_pXmlWriter->writeEndElement();
 }

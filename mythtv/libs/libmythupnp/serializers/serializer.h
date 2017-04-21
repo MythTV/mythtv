@@ -34,7 +34,7 @@ class UPNP_PUBLIC Serializer
 
         QCryptographicHash  m_hash;
 
-        virtual void BeginSerialize( QString &sName ) {}
+        virtual void BeginSerialize( QString &/*sName*/ ) {}
         virtual void EndSerialize  () {}
 
         virtual void BeginObject( const QString &sName, const QObject  *pObject ) = 0;

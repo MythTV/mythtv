@@ -134,7 +134,7 @@ UPnpCDSTv::UPnpCDSTv()
           : UPnpCDSExtension( "Recordings", "Recordings",
                               "object.item.videoItem" )
 {
-    QString sServerIp   = gCoreContext->GetBackendServerIP4();
+    QString sServerIp   = gCoreContext->GetBackendServerIP();
     int sPort           = gCoreContext->GetBackendStatusPort();
     m_URIBase.setScheme("http");
     m_URIBase.setHost(sServerIp);
@@ -1049,7 +1049,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         // ----------------------------------------------------------------------
 
         if (!m_mapBackendIp.contains( sHostName ))
-            m_mapBackendIp[ sHostName ] = gCoreContext->GetBackendServerIP4(sHostName);
+            m_mapBackendIp[ sHostName ] = gCoreContext->GetBackendServerIP(sHostName);
 
         if (!m_mapBackendPort.contains( sHostName ))
             m_mapBackendPort[ sHostName ] = gCoreContext->GetBackendStatusPort(sHostName);

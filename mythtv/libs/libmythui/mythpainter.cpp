@@ -55,7 +55,7 @@ void MythPainter::SetClipRegion(const QRegion &)
 {
 }
 
-void MythPainter::Clear(QPaintDevice *device, const QRegion &region)
+void MythPainter::Clear(QPaintDevice */*device*/, const QRegion &/*region*/)
 {
 }
 

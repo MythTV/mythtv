@@ -142,8 +142,8 @@ class WebSocketExtension : public QObject
     WebSocketExtension() : QObject() { };
     virtual ~WebSocketExtension() {};
 
-    virtual bool HandleTextFrame(const WebSocketFrame &frame) { return false; }
-    virtual bool HandleBinaryFrame(const WebSocketFrame &frame) { return false; }
+    virtual bool HandleTextFrame(const WebSocketFrame &/*frame*/) { return false; }
+    virtual bool HandleBinaryFrame(const WebSocketFrame &/*frame*/) { return false; }
 
   signals:
     void SendTextMessage(const QString &);

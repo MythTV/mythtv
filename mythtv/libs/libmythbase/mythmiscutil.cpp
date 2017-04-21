@@ -236,11 +236,7 @@ bool ping(const QString &host, int timeout)
         gCoreContext->resolveAddress(host, gCoreContext->ResolveAny, true);
     QHostAddress addr = QHostAddress(addrstr);
     QString pingcmd =
-#if !defined(QT_NO_IPV6)
         addr.protocol() == QAbstractSocket::IPv6Protocol ? "ping6" : "ping";
-#else
-        "ping";
-#endif
     QString cmd = QString("%1 -t %2 -c 1  %3  >/dev/null 2>&1")
                   .arg(pingcmd).arg(timeout).arg(host);
 

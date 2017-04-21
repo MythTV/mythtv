@@ -159,12 +159,12 @@ class DecoderBase
     MythPlayer *GetPlayer() { return m_parent; }
 
     virtual int GetNumChapters(void)                      { return 0; }
-    virtual int GetCurrentChapter(long long framesPlayed) { return 0; }
-    virtual void GetChapterTimes(QList<long long> &times) { return;   }
-    virtual long long GetChapter(int chapter)             { return framesPlayed; }
+    virtual int GetCurrentChapter(long long /*framesPlayed*/) { return 0; }
+    virtual void GetChapterTimes(QList<long long> &/*times*/) { return;   }
+    virtual long long GetChapter(int /*chapter*/)             { return framesPlayed; }
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
-    virtual void SetIdrOnlyKeyframes(bool value) { }
+    virtual void SetIdrOnlyKeyframes(bool /*value*/) { }
 
     static uint64_t
         TranslatePositionAbsToRel(const frm_dir_map_t &deleteMap,
@@ -257,9 +257,9 @@ class DecoderBase
     virtual int  GetTeletextDecoderType(void) const { return -1; }
 
     virtual QString GetXDS(const QString&) const { return QString::null; }
-    virtual QByteArray GetSubHeader(uint trackNo) const { return QByteArray(); }
-    virtual void GetAttachmentData(uint trackNo, QByteArray &filename,
-                                   QByteArray &data) {}
+    virtual QByteArray GetSubHeader(uint /*trackNo*/) const { return QByteArray(); }
+    virtual void GetAttachmentData(uint /*trackNo*/, QByteArray &/*filename*/,
+                                   QByteArray &/*data*/) {}
 
     // MHEG/MHI stuff
     virtual bool SetAudioByComponentTag(int) { return false; }

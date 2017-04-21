@@ -77,7 +77,7 @@ int AVPictureFill(AVPicture *pic, const VideoFrame *frame, AVPixelFormat fmt)
 class MythAVCopyPrivate
 {
 public:
-    MythAVCopyPrivate(bool uswc)
+    explicit MythAVCopyPrivate(bool uswc)
     : swsctx(NULL), copyctx(new MythUSWCCopy(4096, !uswc)),
       width(0), height(0), size(0), format(AV_PIX_FMT_NONE)
     {

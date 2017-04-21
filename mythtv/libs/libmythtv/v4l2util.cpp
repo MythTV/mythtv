@@ -1225,7 +1225,7 @@ bool V4L2util::ResumeEncoding(void)
     return SetEncoderState(V4L2_ENC_CMD_RESUME, "Resume");
 }
 
-bool V4L2util::OpenVBI(const QString& vbi_dev_name)
+bool V4L2util::OpenVBI(const QString& /*vbi_dev_name*/)
 {
     return false;
 }

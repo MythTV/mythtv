@@ -625,7 +625,7 @@ class MTV_PUBLIC ProgramInformationMessageTable : public PSIPTable
 
     QString toString(void) const
         { return "Program Information Message\n"; }
-    QString toStringXML(uint indent_level) const
+    QString toStringXML(uint /*indent_level*/) const
         { return "<ProgramInformationMessage />"; }
 };
 
@@ -645,7 +645,7 @@ class MTV_PUBLIC ProgramNameMessageTable : public PSIPTable
 
     QString toString(void) const
         { return "Program Name Message\n"; }
-    QString toStringXML(uint indent_level) const
+    QString toStringXML(uint /*indent_level*/) const
         { return "<ProgramNameMessage />"; }
 };
 
