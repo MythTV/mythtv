@@ -65,10 +65,10 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       networkID(0), transportID(0),
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
-      ignore_encrypted(false),
-      old_flags(0)
+      ignore_encrypted(false)
+//      ,old_flags(0)
 {
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + "Constructing a signal monitor");
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + "Constructing a signal monitor");
 }
 
 DTVSignalMonitor::~DTVSignalMonitor()
@@ -208,12 +208,12 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
     seen_table_crc.clear();
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         RemoveFlags(kDTVSigMon_PATSeen   | kDTVSigMon_PATMatch |
                     kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
                     kDTVSigMon_VCTSeen   | kDTVSigMon_VCTMatch |
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         majorChannel = major;
         minorChannel = minor;
         GetATSCStreamData()->SetDesiredChannel(major, minor);
@@ -227,15 +227,15 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
     seen_table_crc.clear();
     if (programNumber != progNum)
     {
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
                     kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         programNumber = progNum;
         if (GetStreamData())
             GetStreamData()->SetDesiredProgram(programNumber);
         AddFlags(kDTVSigMon_WaitForPMT);
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     }
 }
 
@@ -251,11 +251,11 @@ void DTVSignalMonitor::SetDVBService(uint original_network_id, uint transport_id
         return;
     }
 
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     RemoveFlags(kDTVSigMon_PMTSeen   | kDTVSigMon_PMTMatch |
                 kDTVSigMon_SDTSeen   | kDTVSigMon_SDTMatch |
                 kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
 
     transportID   = transport_id;
     networkID     = original_network_id;
@@ -267,9 +267,9 @@ void DTVSignalMonitor::SetDVBService(uint original_network_id, uint transport_id
         streamdata->SetDesiredService(original_network_id, transport_id, service_id);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
         streamdata->AddListeningPID(DVB_SDT_PID);
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         streamdata->RequestReplayOfCachedSDTs();
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     }
 }
 
@@ -506,12 +506,12 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
 void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
     AddFlags(kDTVSigMon_SDTSeen);
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
 
     sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("SDa Table section count %1")
-            .arg(sections.size()));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("SDa Table section count %1")
+//            .arg(sections.size()));
     if (section != sections.end())
     {
         detectedNetworkID = (*section)->OriginalNetworkID();
@@ -521,73 +521,73 @@ void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
         // whatever SDT we see first
         if ((networkID == 0) && (transportID == 0))
         {
-            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Using detected values"));
+//            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Using detected values"));
             networkID = detectedNetworkID;
             transportID = detectedTransportID;
         }
 
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("onid(required/detected) 0x%1/0x%2 "
-                "tsid(required/detected) 0x%3/0x%4")
-                .arg(networkID, 0, 16).arg(detectedNetworkID, 0, 16)
-                .arg(transportID, 0, 16).arg(detectedTransportID, 0, 16));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("onid(required/detected) 0x%1/0x%2 "
+//                "tsid(required/detected) 0x%3/0x%4")
+//                .arg(networkID, 0, 16).arg(detectedNetworkID, 0, 16)
+//                .arg(transportID, 0, 16).arg(detectedTransportID, 0, 16));
 
         if (detectedNetworkID == networkID && detectedTransportID == transportID)
         {
-            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Setting SDT match flag"));
+//            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Setting SDT match flag"));
             AddFlags(kDTVSigMon_SDTMatch);
             RemoveFlags(kDVBSigMon_WaitForPos);
         }
         else
         {
-            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Looks like I am tuned to the wrong channel"
-                    " onid = 0x%1 tsid = 0x%2")
-                   .arg(detectedNetworkID, 0, 16).arg(detectedTransportID, 0, 16));
+//            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Looks like I am tuned to the wrong channel"
+//                    " onid = 0x%1 tsid = 0x%2")
+//                   .arg(detectedNetworkID, 0, 16).arg(detectedTransportID, 0, 16));
         }
     }
     else
-        LOG(VB_TEMPDEBUG, LOG_ERR, "SDTa with no sections encountered");
+        LOG(VB_GENERAL, LOG_ERR, "SDTa with no sections encountered");
 }
 
 void DTVSignalMonitor::HandleSDTo(const sdt_sections_cache_const_t& sections)
 {
     sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("SDo Table section count %1")
-            .arg(sections.size()));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("SDo Table section count %1")
+//            .arg(sections.size()));
 
     if (section != sections.end())
     {
         detectedNetworkID = (*section)->OriginalNetworkID();
         detectedTransportID = (*section)->TSID();
 
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("onid(required/detected) 0x%1/0x%2 "
-                "tsid(required/detected) 0x%3/0x%4")
-                .arg(networkID, 0, 16).arg(detectedNetworkID, 0, 16)
-                .arg(transportID, 0, 16).arg(detectedTransportID, 0, 16));
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("onid(required/detected) 0x%1/0x%2 "
+//                "tsid(required/detected) 0x%3/0x%4")
+//                .arg(networkID, 0, 16).arg(detectedNetworkID, 0, 16)
+//                .arg(transportID, 0, 16).arg(detectedTransportID, 0, 16));
 
         if (detectedNetworkID == networkID && detectedTransportID == transportID)
         {
             // Looks like I am on a non standard system that transmit SDT as SDTo
-            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Setting SDT match flag"));
+//            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Setting SDT match flag"));
             AddFlags(kDTVSigMon_SDTSeen);
             AddFlags(kDTVSigMon_SDTMatch);
             RemoveFlags(kDVBSigMon_WaitForPos);
-            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//            LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
         }
     }
     else
-        LOG(VB_TEMPDEBUG, LOG_ERR, "SDTo with no sections encountered");
+        LOG(VB_GENERAL, LOG_ERR, "SDTo with no sections encountered");
 }
 
 void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
 {
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("HandleEncryptionStatus - enc_status %1")
-            .arg(enc_status));
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("HandleEncryptionStatus - enc_status %1")
+//            .arg(enc_status));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
     AddFlags(kDTVSigMon_CryptSeen);
     if (!enc_status)
         AddFlags(kDTVSigMon_CryptMatch);
-    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
 }
 
 ATSCStreamData *DTVSignalMonitor::GetATSCStreamData()
@@ -624,11 +624,11 @@ bool DTVSignalMonitor::IsAllGood(void) const
 {
     QMutexLocker locker(&statusLock);
 
-    if (flags != old_flags)
-    {
-        old_flags = flags;
-        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
-    }
+//    if (flags != old_flags)
+//    {
+//        old_flags = flags;
+//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + sm_flags_to_string(flags));
+//    }
 
     if (!SignalMonitor::IsAllGood())
         return false;
