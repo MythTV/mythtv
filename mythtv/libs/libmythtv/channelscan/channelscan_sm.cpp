@@ -67,12 +67,12 @@ using namespace std;
 #include "hdhrchannel.h"
 #include "v4lchannel.h"
 
-#define LOG_NO_CONTEXT(_MASK_, _LEVEL_, _STRING_)                                  \
+#define LOG_NO_CONTEXT(_MASK_, _LEVEL_, _STRING_)                       \
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
         {                                                               \
             LogPrintLine(_MASK_, (LogLevel_t)_LEVEL_,                   \
-                         "", 0, "", 1,           \
+                         "", 0, "", 1,                                  \
                          QString(_STRING_).toLocal8Bit().constData());  \
         }                                                               \
     } while (false)
@@ -256,7 +256,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
         }
         else if (query.next())
         {
-            uint nitid = query.value(0).toInt();
+            int nitid = query.value(0).toInt();
             data->SetRealNetworkID(nitid);
             LOG(VB_CHANSCAN, LOG_INFO, LOC +
                 QString("Setting NIT-ID to %1").arg(nitid));
@@ -846,11 +846,11 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                     	LOG(VB_CHANSCAN, LOG_INFO, LOC + "Other frequencies are in use");
                     	// See if I can find a FrequencyListDesciptor
                     	desc_list_t::const_iterator it;
-                    	for (it = list.begin();
-                    		(it != list.end()) && (DescriptorID::frequency_list != MPEGDescriptor(*it).DescriptorTag());
-                    		++it);
-						if (it == list.end())
-							continue;
+                        for (it = list.begin();
+                            (it != list.end()) && (DescriptorID::frequency_list != MPEGDescriptor(*it).DescriptorTag());
+                            ++it);
+                        if (it == list.end())
+                            continue;
 						else
 						{
 							FrequencyListDescriptor frequency_list(*it);
@@ -1081,15 +1081,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         {
             m_currentInfo->program_encryption_status[it.key()] = *it;
 
-            QString msg_tr1 = QObject::tr("Program %1").arg(it.key());
-            QString msg_tr2 = QObject::tr("Unknown decryption status");
-            if (kEncEncrypted == *it)
-                msg_tr2 = QObject::tr("Encrypted");
-            else if (kEncDecrypted == *it)
-                msg_tr2 = QObject::tr("Decrypted");
-            QString msg_tr =QString("%1, %2").arg(msg_tr1).arg(msg_tr2);
-
-            QString msg = LOC + QString("Program %1").arg(it.key());
+            QString msg = QString("Program %1").arg(it.key());
             if (kEncEncrypted == *it)
                 msg = msg + " -- Encrypted";
             else if (kEncDecrypted == *it)
@@ -1097,16 +1089,15 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
             else if (kEncUnknown == *it)
                 msg = msg + " -- Unknown decryption status";
 
-            m_scanMonitor->ScanAppendTextToLog(msg_tr);
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
         }
     }
 
-    // append transports from the NIT to the scan list
+    // Append transports from the NIT to the scan list
     if (network_discovery_complete && m_extendScanList &&
         !m_currentInfo->nits.empty())
     {
-        // append delivery system descriptos to scan list
+        // Append delivery system descriptors to scan list
         nit_const_vec_t::const_iterator it = m_currentInfo->nits.begin();
         while (it != m_currentInfo->nits.end())
         {
@@ -1121,8 +1112,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         QString cchan, cchan_tr;
         uint cchan_cnt = GetCurrentTransportInfo(cchan, cchan_tr);
         m_channelsFound += cchan_cnt;
-        QString chan_tr = QObject::tr("Finished with channel - %1").arg(cchan_tr);
-        QString chan    = QString("Finished with channel - %1").arg(cchan);
+        QString chan_tr = QObject::tr("%1").arg(cchan_tr);
+        QString chan    = QString("%1").arg(cchan);
         QString msg_tr  = "";
         QString msg     = "";
 
@@ -1162,27 +1153,28 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
         if ((m_timer.elapsed() > (int)m_channelTimeout))
         {
             msg_tr = (cchan_cnt) ?
-                QObject::tr("%1 possible channels (timed out waiting for optional tables)").arg(cchan_cnt) :
-                QObject::tr("no channels (timed out waiting for optional tables)");
-            msg_tr = QString("%1, %2").arg(chan_tr).arg(msg_tr);
+                QObject::tr("Found %1 channels (timed out waiting for optional tables)").arg(cchan_cnt) :
+                QObject::tr("No channels found (timed out waiting for optional tables)");
+            msg_tr = QString("%1 -- %2").arg(chan_tr).arg(msg_tr);
+
             msg = (cchan_cnt) ?
-                QString("%1 possible channels").arg(cchan_cnt) :
-                QString("no channels");
-            msg = QString("%1, %2").arg(chan_tr).arg(msg);
+                QString("%1 channels").arg(cchan_cnt) :
+                QString("No channels");
+            msg = QString("%1 -- %2").arg(chan_tr).arg(msg);
         }
         else if ((m_current != m_scanTransports.end()) &&
                  (m_timer.elapsed() > (int)(*m_current).timeoutTune) &&
                  sm && !sm->HasSignalLock())
         {
-            msg_tr = QObject::tr("%1, no signal").arg(chan_tr);
-            msg = QString("%1, no signal").arg(chan);
+            msg_tr = QObject::tr("%1 -- No signal").arg(chan_tr);
+            msg = QString("%1 -- No signal").arg(chan);
         }
         else
         {
-            msg_tr = QObject::tr("%1 -- Found %2 probable channels")
+            msg_tr = QObject::tr("%1 -- Found %2 channels")
                 .arg(cchan_tr).arg(cchan_cnt);
 
-            msg = QString("%1 -- Found %2 probable channels")
+            msg = QString("%1 -- Found %2 channels")
                 .arg(cchan).arg(cchan_cnt);
         }
 
