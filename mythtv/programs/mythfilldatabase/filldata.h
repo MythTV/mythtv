@@ -52,7 +52,8 @@ class FillData
         refresh_tba(true),              dd_grab_all(false),
         dddataretrieved(false),
         need_post_grab_proc(true),      only_update_channels(false),
-        channel_update_run(false),      refresh_all(false)
+        channel_update_run(false),      no_allatonce(false),
+        refresh_all(false)
     {
         SetRefresh(1, true);
     }
@@ -95,6 +96,7 @@ class FillData
     bool    need_post_grab_proc;
     bool    only_update_channels;
     bool    channel_update_run;
+    bool    no_allatonce;
 
   private:
     QMap<uint,bool>     refresh_day;

@@ -177,6 +177,14 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
         ->SetBlocks("maxdays")
         ->SetGroup("Filtering");
 
+    add("--no-allatonce", "noallatonce", false,
+            "Do not use allatonce even if the grabber prefers it.",
+            "This option prevents mythfilldatabase from utlizing "
+            "the advertised grabber preference of 'allatonce'. "
+            "This may be necessary for grabbers that return a large "
+            "amount of data")
+        ->SetGroup("Filtering");
+
     add("--dd-grab-all", "ddgraball", false,
             "refresh full data using DataDirect",
             "This option is only valid for selected grabbers (DataDirect).\n"

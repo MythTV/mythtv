@@ -382,7 +382,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         .arg(xmltv_grabber).arg(configfile).arg(filename);
 
 
-    if (source.xmltvgrabber_prefmethod != "allatonce")
+    if (source.xmltvgrabber_prefmethod != "allatonce"  || no_allatonce)
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared
@@ -679,7 +679,7 @@ bool FillData::Run(SourceList &sourcelist)
                     ++failures;
             }
         }
-        else if ((*it).xmltvgrabber_prefmethod == "allatonce")
+        else if ((*it).xmltvgrabber_prefmethod == "allatonce" && !no_allatonce)
         {
             if (!GrabData(*it, 0))
                 ++failures;
