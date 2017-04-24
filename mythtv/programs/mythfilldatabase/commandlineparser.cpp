@@ -112,7 +112,8 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "    [not]tomorrow\n"
             "    [not]second\n"
             "    #[-#]\n"
-            "    all\n\n"
+            "    all\n"
+            "Note that if all is specified any others will be ingored.\n\n"
             "example:\n"
             "   --refresh today --refresh 4-8 --refresh nottomorrow")
         ->SetGroup("Filtering");
