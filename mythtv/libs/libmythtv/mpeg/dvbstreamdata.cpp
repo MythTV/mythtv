@@ -296,7 +296,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip)
             // The currently tuned transport stream has changed
             _current_onid = onid;
             _current_tsid = tsid;
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Current transport stream changed "
+            LOG(VB_DVBSICACHE, LOG_INFO, LOC + QString("Current transport stream changed "
                     "to - 0x%1/0x%2 (onid/tsid) source SD actual table")
                     .arg(_current_onid, 0, 16)
                     .arg(_current_tsid, 0, 16));
@@ -1181,7 +1181,7 @@ void DVBStreamData::ReplayCachedSDTa()
 
     uint onid = InternalOriginalNetworkID(_current_onid, _current_tsid);
 
-    LOG(VB_GENERAL, LOG_INFO, "ReplayCachedSDT");
+    LOG(VB_DVBSICACHE, LOG_INFO, "ReplayCachedSDT");
     if (_cached_sdts.contains(onid) &&
             _cached_sdts[onid].contains(_current_tsid) &&
             _cached_sdts[onid][_current_tsid].contains(TableID::SDT) &&
@@ -1197,7 +1197,7 @@ void DVBStreamData::ReplayCachedSDTa()
                if ((*section)->HasEITSchedule(i) || (*section)->HasEITPresentFollowing(i))
                     _dvb_has_eit[(*section)->ServiceID(i)] = true;
 
-        LOG(VB_GENERAL, LOG_INFO, QString("ReplayCachedSDT 0x%1 0x%2")
+        LOG(VB_DVBSICACHE, LOG_INFO, QString("ReplayCachedSDT 0x%1 0x%2")
                 .arg(_current_onid, 0, 16)
                 .arg(_current_tsid, 0, 16));
         for (uint i = 0; i < _dvb_main_listeners.size(); i++)
@@ -1212,7 +1212,7 @@ void DVBStreamData::ReplayCachedSDTos()
     // Replay any cached SDTos
     QMutexLocker locker(&_listener_lock);
 
-    LOG(VB_GENERAL, LOG_INFO, "ReplayCachedSDTo");
+    LOG(VB_DVBSICACHE, LOG_INFO, "ReplayCachedSDTo");
     for (sdt_tsn_cache_t::iterator network = _cached_sdts.begin();
             network != _cached_sdts.end(); ++network)
     {
@@ -1231,7 +1231,7 @@ void DVBStreamData::ReplayCachedSDTos()
                 //       if ((*section)->HasEITSchedule(i) || (*section)->HasEITPresentFollowing(i))
                 //            _dvb_has_eit[(*section)->ServiceID(i)] = true;
 
-                LOG(VB_GENERAL, LOG_INFO, QString("ReplayCachedSDTo 0x%1 0x%2")
+                LOG(VB_DVBSICACHE, LOG_INFO, QString("ReplayCachedSDTo 0x%1 0x%2")
                         .arg(network.key(), 0, 16)
                         .arg(stream.key(), 0, 16));
                 for (uint i = 0; i < _dvb_other_listeners.size(); i++)
