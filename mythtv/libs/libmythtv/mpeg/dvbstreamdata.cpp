@@ -186,6 +186,7 @@ void DVBStreamData::SetDesiredService(uint original_network_id, uint transport_i
 
 void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, uint onid, uint tsid, uint sid, uint tid) const
 {
+    QMutexLocker locker(&_cached_eits_lock);
     uint section = eit.Section();
 
     onid = InternalOriginalNetworkID(onid, tsid);
@@ -231,6 +232,7 @@ void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, ui
 
 void DVBStreamData::CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uint onid, uint tsid, uint tid) const
 {
+    QMutexLocker locker(&_cached_sdts_lock);
     uint section = sdt.Section();
 
     onid = InternalOriginalNetworkID(onid, tsid);
