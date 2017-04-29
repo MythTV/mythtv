@@ -1331,6 +1331,14 @@ bool DVBStreamData::DeleteCachedTableSection(PSIPTable *psip) const
     }
     else if ((TableID::SDT == tableID) || (TableID::SDTo == tableID))
     {
+        // Check that I can do this without a complete deadlock
+        if (_cached_sdts_lock.tryLock(10000))
+        {
+           LOG(VB_GENERAL, LOG_EMERG, LOC + QString("SDT LOCK DEADLOCK"));
+           LOG(VB_FLUSH, LOG_EMERG, "");
+           asm("int3"); // Houston we have a problem - bail out
+        }
+
         ServiceDescriptionTableSection* sdt = (ServiceDescriptionTableSection*)(psip);
         uint tsid = sdt->TSID();
         uint onid = InternalOriginalNetworkID(sdt->OriginalNetworkID(), tsid);
@@ -1343,9 +1351,18 @@ bool DVBStreamData::DeleteCachedTableSection(PSIPTable *psip) const
             sections[section] = NULL;
             delete psip;
         }
+        _cached_sdts_lock.unlock();
     }
     else if (DVBEventInformationTableSection::IsEIT(tableID))
     {
+        // Check that I can do this wwithout a complete deadlock
+        if (_cached_eits_lock.tryLock(10000))
+        {
+           LOG(VB_GENERAL, LOG_EMERG, LOC + QString("EIT LOCK DEADLOCK"));
+           LOG(VB_FLUSH, LOG_EMERG, "");
+           asm("int3"); // Houston we have a problem - bail out
+        }
+
         DVBEventInformationTableSection* eit = (DVBEventInformationTableSection*)(psip);
         uint tsid = eit->TSID();
         uint onid = InternalOriginalNetworkID(eit->OriginalNetworkID(), tsid);
@@ -1362,6 +1379,7 @@ bool DVBStreamData::DeleteCachedTableSection(PSIPTable *psip) const
             sections[section] = NULL;
             delete psip;
         }
+        _cached_eits_lock.unlock();
     }
     else
     {
@@ -1388,6 +1406,20 @@ void DVBStreamData::CacheNIT(nit_ptr_t nit)
 
 void DVBStreamData::LogSICache()
 {
+    // Check that I can do this wwithout a complete deadlock
+    if (_cached_eits_lock.tryLock(10000))
+    {
+       LOG(VB_GENERAL, LOG_EMERG, QString("EIT LOCK DEADLOCK in LogSICache"));
+       LOG(VB_FLUSH, LOG_EMERG, "");
+       asm("int3"); // Houston we have a problem - bail out
+    }
+    if (_cached_sdts_lock.tryLock(10000))
+    {
+       LOG(VB_GENERAL, LOG_EMERG, QString("SDT LOCK DEADLOCK in LogSICache"));
+       LOG(VB_FLUSH, LOG_EMERG, "");
+       asm("int3"); // Houston we have a problem - bail out
+    }
+
     uint approximate_cached_sections_size = 0;
     LOG(VB_GENERAL, LOG_INFO, QString(
             "SDT cache top level entries %1")
@@ -1485,6 +1517,8 @@ void DVBStreamData::LogSICache()
     LOG(VB_GENERAL, LOG_INFO, QString(
             "============================================="));
     LOG(VB_FLUSH, LOG_INFO, "");
+    _cached_eits_lock.unlock();
+    _cached_sdts_lock.unlock();
 }
 void DVBStreamData::AddDVBMainListener(DVBMainStreamListener *val)
 {
