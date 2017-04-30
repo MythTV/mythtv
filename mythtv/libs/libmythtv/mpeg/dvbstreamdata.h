@@ -133,6 +133,12 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
   private:
     // Caching
+    class RecursiveMutex : public QMutex
+    {
+    public:
+        RecursiveMutex() : QMutex(QMutex::Recursive) {}
+    };
+
     void CacheNIT(nit_ptr_t);
     void ReplayCachedSDTa();
     void ReplayCachedSDTos();
@@ -177,13 +183,13 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     // Static shared caches
     static sdt_tsn_cache_t    _cached_sdts; // SDT sections cached within transport stream ID
                                             // within original network ID
-    static QMutex             _cached_sdts_lock;
+    static RecursiveMutex     _cached_sdts_lock;
     bool _replay_cached_sdta;
     bool _replay_cached_sdtos;
     static eit_tssn_cache_t   _cached_eits; // EIT sections cached within table ID within
                                             // service ID within transport stream ID within
                                             // original network ID
-    static QMutex             _cached_eits_lock;
+    static RecursiveMutex      _cached_eits_lock;
 
     static qint64 EIT_STALE_TIME;
     static qint64 SDT_STALE_TIME;
