@@ -3,7 +3,6 @@
 # small shell script to generate version.h
 # it expects one parameter
 # first parameter is the root of the source directory
-
 if test $# -ne 1; then
     echo "Usage: version.sh GIT_TREE_DIR"
     exit 1
@@ -29,7 +28,27 @@ case "${SOURCE_VERSION}" in
     exported|Unknown)
         if ! grep -q Format $GITTREEDIR/EXPORTED_VERSION; then
             . $GITTREEDIR/EXPORTED_VERSION
+            # This file has SOURCE_VERSION and BRANCH
+            # example SOURCE_VERSION="30d8a96"
+            # BRANCH examples from github
+            # BRANCH=" (HEAD -> master)"
+            # BRANCH=" (fixes/0.28)"
+            # BRANCH=" (tag: v0.28.1)"
+            # From a checkout they can be as follows:
+            # " (origin/fixes/0.28, fixes/0.28)"
+            # " (HEAD -> master, origin/master, origin/HEAD)"
+            # " (tag: v0.28.1)"
+            hash="$SOURCE_VERSION"
+            # This extracts after the last comma inside the parens:
             BRANCH=$(echo "${BRANCH}" | sed 's/ (\(.*, \)\{0,1\}\(.*\))/\2/')
+            # Create a suitable version (hash is no good)
+            SOURCE_VERSION="$BRANCH"
+            SOURCE_VERSION=`echo "$SOURCE_VERSION" | sed "s/tag: *//"`
+            if ! echo "$SOURCE_VERSION" | grep "^v[0-9]" ; then
+                . $GITTREEDIR/VERSION
+            fi
+            SOURCE_VERSION="${SOURCE_VERSION}-${hash}"
+            echo "Source Version created as $SOURCE_VERSION"
         elif test -e $GITTREEDIR/VERSION ; then
             . $GITTREEDIR/VERSION
         fi
@@ -40,6 +59,23 @@ case "${SOURCE_VERSION}" in
         fi
     ;;
 esac
+
+if ! echo "${SOURCE_VERSION}" | egrep -i "v[0-9]+.*"   ; then
+    # Invalid version - use VERSION file
+    echo "WARNING: Invalid source version ${SOURCE_VERSION}, must start with v and a number, will use VERSION file instead"
+    . $GITTREEDIR/VERSION
+fi
+
+src_vn=`echo "${SOURCE_VERSION}" | sed "s/^[Vv]// ; s/-.*// ; s/\..*//"`
+MYTH_BINARY_VERSION=`grep "#define *MYTH_BINARY_VERSION" libs/libmythbase/mythversion.h \
+  | sed 's/#define// ; s/MYTH_BINARY_VERSION// ; s/ //g ; s/"//g'`
+
+bin_vn=`echo $MYTH_BINARY_VERSION | sed 's/\..*//'`
+
+if ! test $src_vn -eq $bin_vn ; then
+    echo "ERROR: High level of source version ${SOURCE_VERSION}, does not match high level of binary version $MYTH_BINARY_VERSION"
+    exit 2
+fi
 
 cat > .vers.new <<EOF
 #ifndef MYTH_SOURCE_VERSION
