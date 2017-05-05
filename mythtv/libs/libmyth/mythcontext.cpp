@@ -1419,6 +1419,9 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
         if (!value.isEmpty())
             gCoreContext->OverrideSettingForSession(settingsToSave[ix], value);
     }
+    // Prevent power off TV after temporary window
+    gCoreContext->OverrideSettingForSession("PowerOffTVAllowed", 0);
+
     QString language = gCoreContext->GetSetting("Language",QString());
     MythTranslation::load("mythfrontend");
 }
@@ -1431,6 +1434,9 @@ void MythContextPrivate::clearSettingsCacheOverride(void)
     {
         gCoreContext->ClearOverrideSettingForSession(settingsToSave[ix]);
     }
+    // Restore power off TV setting
+    gCoreContext->ClearOverrideSettingForSession("PowerOffTVAllowed");
+
     if (language != gCoreContext->GetSetting("Language",QString()))
         MythTranslation::load("mythfrontend");
 }
