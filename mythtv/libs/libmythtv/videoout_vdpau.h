@@ -69,9 +69,9 @@ class VideoOutputVDPAU : public VideoOutput
     virtual bool GetScreenShot(int width = 0, int height = 0,
                                QString filename = "");
 
-    virtual bool CanVisualise(AudioPlayer *audio, MythRender *render)
+    virtual bool CanVisualise(AudioPlayer *audio, MythRender */*render*/)
         { return VideoOutput::CanVisualise(audio, m_render);       }
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
+    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender */*render*/,
                                     const QString &name)
         { return VideoOutput::SetupVisualisation(audio, m_render, name); }
     virtual QStringList GetVisualiserList(void);

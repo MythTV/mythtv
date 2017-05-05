@@ -360,7 +360,7 @@ VideoOutput *VideoOutput::Create(
  *         // Get pointer to "Last Shown Frame"
  *         frame = vo->GetLastShownFrame();
  *         // add OSD, do any filtering, etc.
- *         vo->ProcessFrame(frame, osd, filters, pict-in-pict);
+ *         vo->ProcessFrame(frame, osd, filters, pict-in-pict, scan);
  *         // tells show what frame to be show, do other last minute stuff
  *         vo->PrepareFrame(frame, scan);
  *         // here you wait until it's time to show the frame
@@ -755,7 +755,7 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
                                float        aspect,
                                MythCodecID  myth_codec_id,
                                void        *codec_private,
-                               bool        &aspect_only)
+                               bool        &/*aspect_only*/)
 {
     window.InputChanged(video_dim_buf, video_dim_disp,
                         aspect, myth_codec_id, codec_private);

@@ -145,7 +145,7 @@ bool VideoOutputNullVAAPI::InputChanged(const QSize &video_dim_buf,
                                         const QSize &video_dim_disp,
                                         float aspect,
                                         MythCodecID av_codec_id,
-                                        void *codec_private,
+                                        void */*codec_private*/,
                                         bool &aspect_only)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +

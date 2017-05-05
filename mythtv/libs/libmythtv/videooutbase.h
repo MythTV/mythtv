@@ -79,12 +79,25 @@ class VideoOutput
 
     virtual void WindowResized(const QSize &) {}
 
+    /** \fn VideoOutput::InputChanged()
+     *
+     *  \param video_dim_buf  The size of the video buffer.
+     *  \param video_dim_disp The size of the video display.
+     *  \param aspect         The width/height of the presented video.
+     *  \param myth_codec_id  The video codec ID.
+     *  \param codec_private  Private data for the video codec.
+     *  \param aspect_changed An output parameter indicating that only
+     *                        the aspect ratio has changed. It must be
+     *                        initialized to false before calling this
+     *                        function.
+     */
     virtual bool InputChanged(const QSize &video_dim_buf,
                               const QSize &video_dim_disp,
                               float        aspect,
                               MythCodecID  myth_codec_id,
                               void        *codec_private,
                               bool        &aspect_changed);
+
     virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void ResizeDisplayWindow(const QRect&, bool);

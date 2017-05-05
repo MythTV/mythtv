@@ -359,7 +359,7 @@ void VideoOutputXv::UngrabXvPort(MythXDisplay *disp, int port)
  * \return port number if it succeeds, else -1.
  */
 int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
-                                      MythCodecID mcodecid,
+                                      MythCodecID /*mcodecid*/,
                                       uint width, uint height,
                                       bool &xvsetdefaults,
                                       QString *adaptor_name)
@@ -519,7 +519,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
  *
  * \sideeffect sets av_pause_frame.
  */
-void VideoOutputXv::CreatePauseFrame(VOSType subtype)
+void VideoOutputXv::CreatePauseFrame(VOSType /*subtype*/)
 {
     if (av_pause_frame.buf)
     {
