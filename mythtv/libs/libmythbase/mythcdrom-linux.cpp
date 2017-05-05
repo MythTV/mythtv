@@ -337,7 +337,7 @@ MythMediaError MythCDROMLinux::ejectCDROM(bool open_close)
 MythMediaError MythCDROMLinux::ejectSCSI()
 {
     int k;
-    sg_io_hdr_t io_hdr = { 'S' };
+    sg_io_hdr_t io_hdr;
     unsigned char allowRmBlk[6] = {ALLOW_MEDIUM_REMOVAL, 0, 0, 0, 0, 0};
     unsigned char startStop1Blk[6] = {START_STOP, 0, 0, 0, 1, 0}; // start
     unsigned char startStop2Blk[6] = {START_STOP, 0, 0, 0, 2, 0}; // load eject
@@ -354,13 +354,15 @@ MythMediaError MythCDROMLinux::ejectSCSI()
     } fd(qPrintable(m_DevicePath));
 
     LOG(VB_MEDIA, LOG_DEBUG, LOC + ":ejectSCSI");
-	if ((ioctl(fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000))
+    if ((ioctl(fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000))
     {
 	    // not an sg device, or old sg driver
         LOG(VB_MEDIA, LOG_DEBUG, "SG_GET_VERSION_NUM ioctl failed" + ENO);
         return MEDIAERR_FAILED;
-	}
+    }
 
+    memset(&io_hdr, 0, sizeof(sg_io_hdr_t));
+    io_hdr.interface_id = 'S';
     io_hdr.cmd_len = 6;
     io_hdr.mx_sb_len = sizeof(sense_buffer);
     io_hdr.dxfer_direction = SG_DXFER_NONE;
