@@ -93,7 +93,13 @@ class MTV_PUBLIC PESPacket
 
     void GetAsTSPackets(vector<TSPacket> &pkts, uint cc) const;
 
+    // PES Packet structure
+    // Start code 3 bytes
+    // ==================
     // _pesdata[-3] == 0, _pesdata[-2] == 0, _pesdata[-1] == 1
+
+    // PES Header  Fixed part  bytes
+    // ==============================
     uint StreamID()   const { return _pesdata[0]; }
     uint Length()     const
         { return (_pesdata[1] & 0x0f) << 8 | _pesdata[2]; }
@@ -129,7 +135,12 @@ class MTV_PUBLIC PESPacket
     virtual bool HasCRC()     const { return (_pesdata[4] & 0x2) >> 1; }
     /// 1 bit  Extension flags are present
     bool HasExtensionFlags()  const { return _pesdata[4] & 0x1; }
+    // Header fields length 1 byte
+    // _pesdata[5]
 
+    // PES Header Fields - variable length
+    // Ordered the same as the flag bits
+    // ===================================
     /// Presentation Time Stamp, present if HasPTS() is true
     uint64_t PTS(void) const
     {

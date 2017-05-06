@@ -39,43 +39,56 @@ EitCache::~EitCache()
 #ifdef PRINT_CACHE_DESTRUCTORS
 	unsigned long bytes = 0;
 	uint sections = 0;
+#endif
 
 	// Tidy up for heap debugging
     for (eit_tssn_cache_t::iterator network = begin();
             network != end(); ++network)
     {
+#ifdef PRINT_CACHE_DESTRUCTORS
         cerr << QString(
                 "ONID 0x%1")
                 .arg(network.key(),4,16).toStdString() << endl;
+#endif
         for (eit_tss_cache_t::iterator stream = (*network).begin();
                 stream != (*network).end(); ++stream)
         {
+#ifdef PRINT_CACHE_DESTRUCTORS
         	cerr << QString(
                     "TSID 0x%1")
                     .arg(stream.key(),4,16).toStdString() << endl;
+#endif
             for (eit_ts_cache_t::iterator service = (*stream).begin();
                     service != (*stream).end(); ++service)
             {
-            	cerr << QString(
+#ifdef PRINT_CACHE_DESTRUCTORS
+                cerr << QString(
                         "SID 0x%1")
                         .arg(service.key(),4,16).toStdString() << endl;
+#endif
                 for (eit_t_cache_t::iterator table = (*service).begin(); table != (*service).end(); ++table)
                 {
-                	cerr << QString(
+#ifdef PRINT_CACHE_DESTRUCTORS
+                    cerr << QString(
                             "TID 0x%1 Sections %2 Status %3")
                             .arg(table.key(),2,16)
-							.arg((*table).sections.size())
-							.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
-							.toStdString()
-							<< endl;                    for (eit_sections_cache_t::iterator section = (*table).sections.begin();
-                            section != (*table).sections.end(); ++section)
+                            .arg((*table).sections.size())
+                            .arg((*table).status.HasAllSections() ? "complete" : "incomplete")
+                            .toStdString()	<< endl;
+#endif
+                    for (eit_sections_cache_t::iterator section = (*table).sections.begin();
+                        section != (*table).sections.end(); ++section)
                     {
-                    	if (NULL != *section)
-                    	{
-                    		bytes += (*section)->SectionLength();
-                    		delete *section;
+                        if (NULL != *section)
+                        {
+#ifdef PRINT_CACHE_DESTRUCTORS
+                            bytes += (*section)->SectionLength();
+#endif
+                            delete *section;
                     	}
-                    	sections++;
+#ifdef PRINT_CACHE_DESTRUCTORS
+                        sections++;
+#endif
                     }
                     (*table).sections.clear();
                 }
@@ -86,12 +99,13 @@ EitCache::~EitCache()
         (*network).clear();
     }
     clear();
+#ifdef PRINT_CACHE_DESTRUCTORS
     cerr << "EIT cache deleted approximately "
-    		<< bytes
-			<<" bytes in "
-			<< sections
-			<< " sections"
-			<< endl;
+            << bytes
+            <<" bytes in "
+            << sections
+            << " sections"
+            << endl;
 #endif
 }
 
@@ -100,37 +114,49 @@ SdtCache::~SdtCache()
 #ifdef PRINT_CACHE_DESTRUCTORS
 	unsigned long bytes  = 0;
 	uint sections = 0;
+#endif
 
 	// Tidy up for heap debugging
     for (sdt_tsn_cache_t::iterator network = begin();
             network != end(); ++network)
     {
-        cerr << QString(
+#ifdef PRINT_CACHE_DESTRUCTORS
+       cerr << QString(
                 "ONID 0x%1")
                 .arg(network.key(),4,16).toStdString() << endl;
+#endif
         for (sdt_ts_cache_t::iterator stream = (*network).begin(); stream != (*network).end(); ++stream)
         {
+#ifdef PRINT_CACHE_DESTRUCTORS
         	cerr << QString(
                     "TSID 0x%1")
                     .arg(stream.key(),4,16).toStdString() << endl;
+#endif
             for (sdt_t_cache_t::iterator table = (*stream).begin(); table != (*stream).end(); ++table)
             {
-            	cerr << QString(
+#ifdef PRINT_CACHE_DESTRUCTORS
+                cerr << QString(
                         "TID 0x%1 Sections %2 Status %3")
                         .arg(table.key(),2,16)
-						.arg((*table).sections.size())
-						.arg((*table).status.HasAllSections() ? "complete" : "incomplete")
-						.toStdString() << endl;
-				for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
-						section != (*table).sections.end(); ++section)
-				{
-                	if (NULL != *section)
-                	{
-                		bytes += (*section)->SectionLength();
-                		delete *section;
-                	}
+                        .arg((*table).sections.size())
+                        .arg((*table).status.HasAllSections() ? "complete" : "incomplete")
+                        .toStdString() << endl;
+#endif
+                for (sdt_sections_cache_t::iterator section = (*table).sections.begin();
+                        section != (*table).sections.end(); ++section)
+                {
+
+                    if (NULL != *section)
+                    {
+#ifdef PRINT_CACHE_DESTRUCTORS
+                        bytes += (*section)->SectionLength();
+#endif
+                        delete *section;
+                    }
+#ifdef PRINT_CACHE_DESTRUCTORS
                    	sections++;
-				}
+#endif
+                }
                 (*table).sections.clear();
             }
             (*stream).clear();
@@ -138,12 +164,13 @@ SdtCache::~SdtCache()
         (*network).clear();
     }
     clear();
+#ifdef PRINT_CACHE_DESTRUCTORS
     cerr << "SDT cache deleted approximately "
-    		<< bytes
-			<<" bytes in "
-			<< sections
-			<< " entries"
-			<< endl;
+            << bytes
+            <<" bytes in "
+            << sections
+            << " entries"
+            << endl;
 #endif
 }
 
@@ -607,8 +634,11 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::SDT:
         case TableID::SDTo:
         {
-            ServiceDescriptionTableSection *sdtsection = new ServiceDescriptionTableSection(psip);
-            ProcessSDTSection(sdtsection);
+            //ServiceDescriptionTableSection *sdt_section = new ServiceDescriptionTableSection(psip);
+            ServiceDescriptionTableSection *sdt_section = new ServiceDescriptionTableSection();
+            sdt_section->CloneAndShrink(psip);
+            sdt_section->Parse();
+            ProcessSDTSection(sdt_section);
             return true;
         }
 
@@ -676,7 +706,10 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if (!_dvb_eit_listeners.size() && !_eit_helper)
             return true;
 
-        DVBEventInformationTableSection* eit_section = new DVBEventInformationTableSection(psip);
+        //DVBEventInformationTableSection* eit_section = new DVBEventInformationTableSection(psip);
+        DVBEventInformationTableSection* eit_section = new DVBEventInformationTableSection();
+        eit_section->CloneAndShrink(psip);
+        eit_section->Parse();
 
         uint onid = eit_section->OriginalNetworkID();
         uint tsid = eit_section->TSID();
@@ -794,7 +827,7 @@ void DVBStreamData::ProcessSDTSection(sdt_section_ptr_t sdtsection)
     if(HasAllSDTSections(*sdtsection))
     {
         // Complete table seen
-        // Grab the eit cache lock
+        // Grab the sdt cache lock
         QMutexLocker locker(&_cached_sdts_lock);
 
         // Build a vector of the cached table sections

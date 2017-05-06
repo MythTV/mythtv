@@ -393,6 +393,9 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     }
 
   protected:
+    // default
+    PSIPTable() {}
+
     // does not create it's own data
     PSIPTable(const TSPacket& tspacket, bool)
         : PESPacket()
@@ -555,6 +558,8 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
     virtual QString toString(void) const;
     virtual QString toStringXML(uint indent_level) const;
+
+    void CloneAndShrink(const PSIPTable& table);
 
     static const uint PSIP_OFFSET = 8; // general PSIP header offset
 

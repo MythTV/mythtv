@@ -327,6 +327,14 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
     return true;
 }
 
+void PSIPTable::CloneAndShrink(const PSIPTable& table)
+{
+    // Shrink the data down to just the PES data
+    _pesdataSize = _allocSize = table.Length();
+    _pesdata = _fullbuffer = pes_alloc(_allocSize);
+    memcpy(_fullbuffer, table.pesdata(), _allocSize);
+}
+
 ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool smallPacket)
 {
     (void) smallPacket; // currently always a small packet..

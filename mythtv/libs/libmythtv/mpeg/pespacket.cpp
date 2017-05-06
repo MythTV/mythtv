@@ -212,6 +212,7 @@ float SequenceHeader::aspect(bool mpeg1) const
 // Memory allocator to avoid malloc global lock and waste less memory. //
 /////////////////////////////////////////////////////////////////////////
 
+#define USING_VALGRIND // Kill the local allocator RFJ
 #ifndef USING_VALGRIND
 static vector<unsigned char*> mem188;
 static vector<unsigned char*> free188;

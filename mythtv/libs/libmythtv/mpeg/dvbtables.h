@@ -101,6 +101,7 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
 class MTV_PUBLIC ServiceDescriptionTableSection : public PSIPTable
 {
   public:
+    ServiceDescriptionTableSection() {}
     ServiceDescriptionTableSection(const ServiceDescriptionTableSection& table)
         : PSIPTable(table)
     {
@@ -286,6 +287,7 @@ class MTV_PUBLIC SelectionInformationTable : public PSIPTable
 class MTV_PUBLIC DVBEventInformationTableSection : public PSIPTable
 {
   public:
+    DVBEventInformationTableSection() {}
     explicit DVBEventInformationTableSection(const PSIPTable& table);
 
     ~DVBEventInformationTableSection();
