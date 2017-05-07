@@ -20,6 +20,7 @@ public:
     static void InitSections(sections_t &sect, uint32_t last_section);
 
     TableStatus() : m_version(-2) {}
+    ~TableStatus() { m_sections.clear(); }
     void SetVersion(int32_t version, uint32_t last_section);
     void SetSectionSeen(int32_t version, uint32_t section,
                         uint32_t last_section, uint32_t segment_last_section = 0xffff);
