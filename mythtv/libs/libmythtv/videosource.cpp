@@ -2886,6 +2886,7 @@ bool CaptureCard::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
 void CaptureCard::DeleteCard(bool doDelete)
 {
     if (doDelete)
@@ -3105,8 +3106,7 @@ class InputGroup : public TransMythUIComboBoxSetting
 {
   public:
     InputGroup(const CardInput &parent, uint group_num) :
-        // TODO
-        TransMythUIComboBoxSetting(/*false*/), cardinput(parent),
+        TransMythUIComboBoxSetting(), cardinput(parent),
         groupnum(group_num), groupid(0)
     {
         setLabel(QObject::tr("Input group") +
