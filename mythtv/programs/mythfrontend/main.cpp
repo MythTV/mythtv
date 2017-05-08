@@ -43,6 +43,7 @@ using namespace std;
 #include "globalsettings.h"
 #include "audiogeneralsettings.h"
 #include "grabbersettings.h"
+#include "playgroup.h"
 #include "networkcontrol.h"
 #include "scheduledrecording.h"
 #include "mythsystemevent.h"
@@ -947,7 +948,7 @@ static void TVMenuCallback(void *data, QString &selection)
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         StandardSettingDialog *ssd =
             new StandardSettingDialog(mainStack, "playbackgroupsetting",
-                                      new PlayBackGroupsSetting());
+                                      new PlayGroupEditor());
 
         if (ssd->Create())
         {

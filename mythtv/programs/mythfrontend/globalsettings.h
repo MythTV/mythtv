@@ -252,46 +252,6 @@ class PlaybackProfileConfig : public GroupSetting
     vector<TransMythUISpinBoxSetting*> priority;
 };
 
-class PlayBackGroupsSetting : public GroupSetting
-{
-    Q_OBJECT
-
-  public:
-    PlayBackGroupsSetting();
-    virtual void Load();
-
-  public slots:
-    void CreateNewPlayBackGroup();
-    void CreateNewPlayBackGroupSlot(const QString&);
-
-  private:
-    ButtonStandardSetting *m_addGroupButton;
-};
-
-class PlayGroupConfig : public GroupSetting
-{
-    Q_OBJECT
-
-  public:
-    PlayGroupConfig(const QString &label, const QString &name, bool isNew=false);
-    virtual void updateButton(MythUIButtonListItem *item);
-    virtual void Load();
-    virtual void Save();
-    virtual bool keyPressEvent(QKeyEvent *);
-
-  protected slots:
-    void DeletePlayBackGroup(bool doDelete);
-
-  private:
-    TransTextEditSetting       *m_groupName;
-    TransTextEditSetting       *m_titleMatch;
-    TransMythUISpinBoxSetting  *m_skipAhead;
-    TransMythUISpinBoxSetting  *m_skipBack;
-    TransMythUISpinBoxSetting  *m_jumpMinutes;
-    TransMythUISpinBoxSetting  *m_timeStrech;
-    bool                        m_isNew;
-};
-
 class ChannelGroupSetting : public GroupSetting
 {
   public:
