@@ -276,6 +276,7 @@ void SwitchConfig::Load(void)
     StandardSetting::Load();
     setValue(m_deviceDescr->getValue());
     update();
+    setChanged(false);
 }
 
 void SwitchConfig::update(void)

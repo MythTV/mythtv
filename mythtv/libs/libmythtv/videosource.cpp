@@ -3226,6 +3226,8 @@ void InputGroup::Load(void)
 
     if (!names.empty())
         setValue(index);
+
+    TransMythUIComboBoxSetting::Load();
 }
 
 class QuickTune : public CardInputComboBoxSetting
@@ -3952,6 +3954,8 @@ void CardInputEditor::Load(void)
         cardinput->setLabel(inputlabel);
         addChild(cardinput);
     }
+
+    GroupSetting::Load();
 }
 
 #ifdef USING_DVB
