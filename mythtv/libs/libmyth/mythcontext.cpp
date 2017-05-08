@@ -12,6 +12,8 @@
 
 #include <queue>
 #include <algorithm>
+#include <thread>
+
 using namespace std;
 
 #include "config.h"
@@ -43,6 +45,7 @@ using namespace std;
 #include "mythmiscutil.h"
 
 #include "mythplugin.h"
+#include "portchecker.h"
 #include "guistartup.h"
 
 #include <unistd.h> // for usleep(), gethostname
@@ -87,8 +90,8 @@ class MythContextPrivate : public QObject
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    CheckPort(QString &host, int port, int wakeupTime);
-    bool    processEvents(void);
+    bool    checkPort(QString &host, int port, int wakeupTime);
+    void    processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void);
     void    clearSettingsCacheOverride(void);
@@ -320,49 +323,21 @@ void MythContextPrivate::EndTempWindow(void)
     EnableDBerrors();
 }
 
-// Check if a port is open
-// We cannot use the common routine telnet(host, port)
-// because that uses the database.
-bool MythContextPrivate::CheckPort(QString &host, int port, int timeLimit) {
-    LOG(VB_GENERAL, LOG_DEBUG, QString("host %1 port %2 timeLimit %3")
-        .arg(host).arg(port).arg(timeLimit));
-    int wakeupMillis = timeLimit * 1000;
-    MythTimer timer(MythTimer::kStartRunning);
-    m_socket = new QTcpSocket(this);
-    QAbstractSocket::SocketState state = QAbstractSocket::UnconnectedState;
-    int retryCount = 0;
-    while (state != QAbstractSocket::ConnectedState
-        && timer.elapsed() < wakeupMillis)
-    {
-        if (state == QAbstractSocket::UnconnectedState)
-        {
-            m_socket->connectToHost(host, port);
-            retryCount=0;
-        }
-        else
-            retryCount++;
-        if (retryCount > 6)
-            m_socket->abort();
-        if (processEvents())
-            break;
-        // Check if user got impatient and canceled
-        if (m_guiStartup) {
-            if (m_guiStartup->m_Exit
-              || m_guiStartup->m_Setup
-              || m_guiStartup->m_Retry)
-                break;
-        }
-        usleep(500000);
-        state = m_socket->state();
-        LOG(VB_GENERAL, LOG_DEBUG, QString("socket state %1")
-            .arg(state));
-    }
-    m_socket->abort();
-    processEvents();
-    delete m_socket;
-    m_socket = 0;
-    return (state == QAbstractSocket::ConnectedState);
+/**
+ * Check if a port is open and sort out the link-local scope.
+ *
+ * \param host Host or IP address. Will be updated with link-local
+ * scope if needed.
+*/
+
+bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit)
+{
+    PortChecker checker;
+    if (m_guiStartup)
+        QObject::connect(m_guiStartup,SIGNAL(cancelPortCheck()),&checker,SLOT(cancelPortCheck()));
+    return checker.checkPort(host, port, timeLimit*1000);
 }
+
 
 bool MythContextPrivate::Init(const bool gui,
                               const bool promptForBackend,
@@ -473,8 +448,9 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
             goto DBfound;
         if (m_guiStartup && m_guiStartup->m_Exit)
             return false;
+        if (m_guiStartup && m_guiStartup->m_Search)
+            autoSelect=true;
     }
-
 
     // 3. Try to automatically find the single backend:
     if (autoSelect)
@@ -495,6 +471,9 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 
         // Multiple BEs, or needs PIN.
         manualSelect |= (count > 1 || count == -1);
+        // Search requested
+        if (m_guiStartup && m_guiStartup->m_Search)
+            manualSelect=true;
     }
 
     manualSelect &= m_gui;  // no interactive command-line chooser yet
@@ -524,12 +503,15 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
             if (!PromptForDatabaseParams(failure))
                 goto NoDBfound;
         }
-
         failure = TestDBconnection();
         if (!failure.isEmpty())
             LOG(VB_GENERAL, LOG_ALERT, failure);
         if (m_guiStartup && m_guiStartup->m_Exit)
             return false;
+        if (m_guiStartup && m_guiStartup->m_Search)
+            manualSelect=true;
+        if (m_guiStartup && m_guiStartup->m_Setup)
+            manualSelect=false;
     }
     while (!failure.isEmpty());
 
@@ -633,8 +615,19 @@ bool MythContextPrivate::SaveDatabaseParams(
 
         m_pConfig->SetValue(
             kDefaultDB + "PingHost", params.dbHostPing);
+
+        // If dbHostName is an IPV6 address with scope,
+        // remove the scope. Unescaped % signs are an
+        // xml violation
+        QString dbHostName(params.dbHostName);
+        QHostAddress addr;
+        if (addr.setAddress(dbHostName))
+        {
+            addr.setScopeId(QString());
+            dbHostName = addr.toString();
+        }
         m_pConfig->SetValue(
-            kDefaultDB + "Host", params.dbHostName);
+            kDefaultDB + "Host", dbHostName);
         m_pConfig->SetValue(
             kDefaultDB + "UserName", params.dbUserName);
         m_pConfig->SetValue(
@@ -698,7 +691,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
     {
         DatabaseParams params = parent->GetDatabaseParams();
         QString        response;
-
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         // give user chance to skip config
         cout << endl << error.toLocal8Bit().constData() << endl << endl;
         response = getResponse("Would you like to configure the database "
@@ -795,21 +788,22 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         }
         else
             startupState = st_dbAwake;
-        if (attempts < 1)
-            attempts = 1;
+        if (attempts < 6)
+            attempts = 6;
         if (!prompt)
             attempts=1;
-        if (wakeupTime < 1)
-            wakeupTime = 1;
+        if (wakeupTime < 5)
+            wakeupTime = 5;
 
         int progressTotal = wakeupTime * attempts;
 
-        if (m_guiStartup)
+        if (m_guiStartup && !m_guiStartup->m_Exit)
             m_guiStartup->setTotal(progressTotal);
 
         QString beWOLCmd = QString();
         QString backendIP = QString();
         int backendPort = 0;
+        QString masterserver;
 
         for (int attempt = 0;
             attempt < attempts && startupState != st_success;
@@ -836,7 +830,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         m_guiStartup->setTotal(progressTotal);
                 }
             }
-            if (m_guiStartup)
+            if (m_guiStartup && !m_guiStartup->m_Exit)
             {
                 if (attempt > 0)
                     m_guiStartup->setStatusState(guiStatuses[startupState]);
@@ -849,26 +843,32 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 {
                     if (attempt > 0)
                         myth_system(m_DBparams.wolCommand);
-                    if (!CheckPort(host, port, useTimeout))
+                    if (!checkPort(host, port, useTimeout))
                         break;
                 }
                 startupState = st_dbAwake;
                 // Fall through to next case
             case st_dbAwake:
-                if (!CheckPort(host, port, useTimeout))
+                if (!checkPort(host, port, useTimeout))
                     break;
                 startupState = st_dbStarted;
                 // Fall through to next case
             case st_dbStarted:
+                // If the database is connecting with link-local
+                // address, it may have changed
+                if (m_DBparams.dbHostName != host)
+                {
+                    m_DBparams.dbHostName = host;
+                    gCoreContext->GetDB()->SetDatabaseParams(m_DBparams);
+                }
                 EnableDBerrors();
                 ResetDatabase();
                 if (!MSqlQuery::testDBConnection())
                 {
                     for (int temp = 0; temp < useTimeout * 2 ; temp++)
                     {
-                        if (processEvents())
-                            break;
-                        usleep(500000);
+                        processEvents();
+                        std::this_thread::sleep_for(std::chrono::milliseconds(500));
                     }
                     break;
                 }
@@ -888,7 +888,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         if (m_gui && !m_guiStartup && attempt == 0)
                             useTimeout=1;
                         progressTotal = wakeupTime * attempts;
-                        if (m_guiStartup)
+                        if (m_guiStartup && !m_guiStartup->m_Exit)
                             m_guiStartup->setTotal(progressTotal);
                         startupState = st_beWOL;
                     }
@@ -897,20 +897,23 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     startupState = st_success;
                     break;
                 }
-                backendIP = gCoreContext->GetSetting("MasterServerIP", "");
-                backendPort = gCoreContext->GetNumSetting("MasterServerPort", 0);
+                masterserver = gCoreContext->GetSetting
+                    ("MasterServerName");
+                backendIP = gCoreContext->GetSettingOnHost
+                    ("BackendServerAddr", masterserver);
+                backendPort = gCoreContext->GetMasterServerPort();
                 // Fall through to next case
             case st_beWOL:
                 if (!beWOLCmd.isEmpty()) {
                     if (attempt > 0)
                         myth_system(beWOLCmd);
-                    if (!CheckPort(backendIP, backendPort, useTimeout))
+                    if (!checkPort(backendIP, backendPort, useTimeout))
                         break;
                 }
                 startupState = st_beAwake;
                 // Fall through to next case
             case st_beAwake:
-                if (!CheckPort(backendIP, backendPort, useTimeout))
+                if (!checkPort(backendIP, backendPort, useTimeout))
                     break;
                 startupState = st_success;
             }
@@ -918,11 +921,11 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
             {
                 if (m_guiStartup->m_Exit
                   || m_guiStartup->m_Setup
+                  || m_guiStartup->m_Search
                   || m_guiStartup->m_Retry)
                     break;
             }
-            if (processEvents())
-                break;
+            processEvents();
         }
         if (startupState == st_success)
             break;
@@ -936,6 +939,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         if (m_guiStartup
           && !m_guiStartup->m_Exit
           && !m_guiStartup->m_Setup
+          && !m_guiStartup->m_Search
           && !m_guiStartup->m_Retry)
         {
             m_guiStartup->updateProgress(true);
@@ -1366,14 +1370,14 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
 
 // Process Events while waiting for connection
 // return true if progress is 100%
-bool MythContextPrivate::processEvents(void)
+void MythContextPrivate::processEvents(void)
 {
-    bool ret = false;
-    if (m_guiStartup)
-        ret = m_guiStartup->updateProgress();
-    m_loop->processEvents(QEventLoop::AllEvents, 250);
-    m_loop->processEvents(QEventLoop::AllEvents, 250);
-    return ret;
+//    bool ret = false;
+//    if (m_guiStartup)
+//        ret = m_guiStartup->updateProgress();
+    qApp->processEvents(QEventLoop::AllEvents, 250);
+    qApp->processEvents(QEventLoop::AllEvents, 250);
+//    return ret;
 }
 
 // cache some settings in cache/contextcache.xml
@@ -1415,6 +1419,9 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
         if (!value.isEmpty())
             gCoreContext->OverrideSettingForSession(settingsToSave[ix], value);
     }
+    // Prevent power off TV after temporary window
+    gCoreContext->OverrideSettingForSession("PowerOffTVAllowed", 0);
+
     QString language = gCoreContext->GetSetting("Language",QString());
     MythTranslation::load("mythfrontend");
 }
@@ -1427,6 +1434,9 @@ void MythContextPrivate::clearSettingsCacheOverride(void)
     {
         gCoreContext->ClearOverrideSettingForSession(settingsToSave[ix]);
     }
+    // Restore power off TV setting
+    gCoreContext->ClearOverrideSettingForSession("PowerOffTVAllowed");
+
     if (language != gCoreContext->GetSetting("Language",QString()))
         MythTranslation::load("mythfrontend");
 }

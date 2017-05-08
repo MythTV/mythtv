@@ -119,7 +119,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
 
     friend class QueueProcessorThread;
   public:
-    JobQueue(bool master);
+    explicit JobQueue(bool master);
     ~JobQueue(void);
     void customEvent(QEvent *e);
 

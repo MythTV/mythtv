@@ -16,7 +16,7 @@ class MythContextSlotHandler : public QObject
     Q_OBJECT
 
   public:
-    MythContextSlotHandler(MythContextPrivate *x) : d(x) { }
+    explicit MythContextSlotHandler(MythContextPrivate *x) : d(x) { }
 
   private slots:
     void VersionMismatchPopupClosed(void);
@@ -28,14 +28,13 @@ class MythContextSlotHandler : public QObject
 };
 
 /** \class MythContext
- *  \brief This class contains the runtime context for MythTV.
+ *  \brief Startup context for MythTV.
  *
- *   This class can be used to query for and set global and host
- *   settings, and is used to communicate between the frontends
- *   and backends. It also contains helper functions for theming
- *   and for getting system defaults, parsing the command line, etc.
- *   It also contains support for database error printing, and
- *   database message logging.
+ *   This class has methods used during startup for setting
+ *   up database connections, checking for correct database
+ *   version, locating the backend.
+ *   After startup, context information is handled by
+ *   MythCoreContext.
  */
 class MPUBLIC MythContext
 {

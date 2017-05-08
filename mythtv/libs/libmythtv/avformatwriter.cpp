@@ -417,8 +417,8 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
     return 1;
 }
 
-int AVFormatWriter::WriteTextFrame(int vbimode, unsigned char *buf, int len,
-                                   long long timecode, int pagenr)
+int AVFormatWriter::WriteTextFrame(int /*vbimode*/, unsigned char */*buf*/, int /*len*/,
+                                   long long /*timecode*/, int /*pagenr*/)
 {
     return 1;
 }

@@ -273,6 +273,8 @@ int main(int argc, char *argv[])
     }
     if (cmdline.toBool("onlychannels"))
         fill_data.only_update_channels = true;
+    if (cmdline.toBool("noallatonce"))
+        fill_data.no_allatonce = true;
 
     mark_repeats = cmdline.toBool("markrepeats");
 

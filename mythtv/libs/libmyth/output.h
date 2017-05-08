@@ -29,7 +29,7 @@ class Visual;
 class MPUBLIC OutputEvent : public MythEvent
 {
   public:
-    OutputEvent(Type t) :
+    explicit OutputEvent(Type t) :
         MythEvent(t), error_msg(NULL), elasped_seconds(0), written_bytes(0),
         brate(0), freq(0), prec(0), chan(0)
     { ; }
@@ -39,7 +39,7 @@ class MPUBLIC OutputEvent : public MythEvent
         brate(b), freq(f), prec(p), chan(c)
     { ; }
 
-    OutputEvent(const QString &e) :
+    explicit OutputEvent(const QString &e) :
         MythEvent(Error), elasped_seconds(0), written_bytes(0),
         brate(0), freq(0), prec(0), chan(0)
     {

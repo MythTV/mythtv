@@ -50,7 +50,7 @@ class ScanMonitor :
     friend class QObject; // quiet OSX gcc warning
 
   public:
-    ScanMonitor(ChannelScanner *cs) : channelScanner(cs) { }
+    explicit ScanMonitor(ChannelScanner *cs) : channelScanner(cs) { }
     virtual void deleteLater(void);
 
     virtual void customEvent(QEvent*);
@@ -89,7 +89,7 @@ class ScannerEvent : public QEvent
 
   public:
 
-    ScannerEvent(QEvent::Type t) :
+    explicit ScannerEvent(QEvent::Type t) :
         QEvent(t), str(""), intvalue(0), cfg_ptr(NULL) { ; }
 
     QString strValue()              const { return str; }

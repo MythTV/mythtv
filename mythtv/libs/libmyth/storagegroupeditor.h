@@ -12,7 +12,7 @@ class MPUBLIC StorageGroupEditor :
 {
     Q_OBJECT
   public:
-    StorageGroupEditor(QString group);
+    explicit StorageGroupEditor(QString group);
     virtual void Load(void);
 
   protected slots:

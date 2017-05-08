@@ -40,14 +40,14 @@ FileWriterBase::~FileWriterBase()
 {
 }
 
-int FileWriterBase::WriteVideoFrame(VideoFrame *frame)
+int FileWriterBase::WriteVideoFrame(VideoFrame */*frame*/)
 {
     LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): Shouldn't be here!");
 
     return 1;
 }
 
-int FileWriterBase::WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode)
+int FileWriterBase::WriteAudioFrame(unsigned char */*buf*/, int /*fnum*/, long long &/*timecode*/)
 {
     LOG(VB_RECORD, LOG_ERR, LOC + "WriteAudioFrame(): Shouldn't be here!");
 

@@ -19,13 +19,15 @@
 #include "cardutil.h"
 #include "mythlogging.h"
 
-#define LOC      QString("HDHRSH(%1): ").arg(_device)
+#define LOC      QString("HDHRSH%1(%2): ").arg(_recorder_ids_string) \
+                                          .arg(_device)
 
 QMap<QString,HDHRStreamHandler*> HDHRStreamHandler::_handlers;
 QMap<QString,uint>               HDHRStreamHandler::_handlers_refcnt;
 QMutex                           HDHRStreamHandler::_handlers_lock;
 
-HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname)
+HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
+                                          int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -54,10 +56,11 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname)
                 .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
+    _handlers[devkey]->AddRecorderId(recorder_id);
     return _handlers[devkey];
 }
 
-void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
+void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -67,6 +70,10 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
     if (rit == _handlers_refcnt.end())
         return;
 
+    QMap<QString,HDHRStreamHandler*>::iterator it = _handlers.find(devname);
+    if (it != _handlers.end())
+        (*it)->DelRecorderId(recorder_id);
+
     if (*rit > 1)
     {
         ref = NULL;
@@ -74,7 +81,6 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
         return;
     }
 
-    QMap<QString,HDHRStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("HDHRSH: Closing handler for %1")
@@ -204,7 +210,7 @@ void HDHRStreamHandler::run(void)
         if (vs)
         {
             hdhomerun_video_get_stats(vs, &stats);
-            LOG(VB_RECORD, LOG_INFO, LOC + 
+            LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("stream stats: packet_count=%1 "
                         "network_errors=%2 "
                         "transport_errors=%3 "

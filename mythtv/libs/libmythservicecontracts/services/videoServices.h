@@ -41,10 +41,11 @@
 class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.4" );
+    Q_CLASSINFO( "version"    , "1.5" );
     Q_CLASSINFO( "AddVideo_Method",                    "POST" )
     Q_CLASSINFO( "RemoveVideoFromDB_Method",           "POST" )
     Q_CLASSINFO( "UpdateVideoWatchedStatus_Method",    "POST" )
+    Q_CLASSINFO( "UpdateVideoMetadata_Method",         "POST" )
 
     public:
 
@@ -90,6 +91,45 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
         virtual bool                        UpdateVideoWatchedStatus ( int  Id,
                                                                        bool Watched ) = 0;
+
+        virtual bool                        UpdateVideoMetadata      ( int           Id,
+                                                                       const QString &Title,
+                                                                       const QString &SubTitle,
+                                                                       const QString &TagLine,
+                                                                       const QString &Director,
+                                                                       const QString &Studio,
+                                                                       const QString &Plot,
+                                                                       const QString &Rating,
+                                                                       const QString &Inetref,
+                                                                       int           CollectionRef,
+                                                                       const QString &HomePage,
+                                                                       int           Year,
+                                                                       const QDate   &ReleaseDate,
+                                                                       float         UserRating,
+                                                                       int           Length,
+                                                                       int           PlayCount,
+                                                                       int           Season,
+                                                                       int           Episode,
+                                                                       int           ShowLevel,
+                                                                       const QString &FileName,
+                                                                       const QString &Hash,
+                                                                       const QString &CoverFile,
+                                                                       int           ChildID,
+                                                                       bool          Browse,
+                                                                       bool          Watched,
+                                                                       bool          Processed,
+                                                                       const QString &PlayCommand,
+                                                                       int           Category,
+                                                                       const QString &Trailer,
+                                                                       const QString &Host,
+                                                                       const QString &Screenshot,
+                                                                       const QString &Banner,
+                                                                       const QString &Fanart,
+                                                                       const QDate   &InsertDate,
+                                                                       const QString &ContentType,
+                                                                       const QString &Genres,
+                                                                       const QString &Cast,
+                                                                       const QString &Countries) = 0;
 };
 
 #endif

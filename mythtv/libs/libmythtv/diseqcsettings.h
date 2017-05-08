@@ -53,7 +53,7 @@ class RotorPosMap : public GroupSetting
     Q_OBJECT
 
   public:
-    RotorPosMap(DiSEqCDevRotor &rotor);
+    explicit RotorPosMap(DiSEqCDevRotor &rotor);
 
     virtual void Load(void);
     virtual void Save(void);
@@ -131,7 +131,7 @@ class DeviceTree : public GroupSetting
     Q_OBJECT
 
   public:
-    DeviceTree(DiSEqCDevTree &tree);
+    explicit DeviceTree(DiSEqCDevTree &tree);
     void DeleteDevice(DeviceTypeSetting *devtype);
 
     virtual void Load(void);

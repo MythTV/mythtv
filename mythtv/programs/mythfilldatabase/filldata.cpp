@@ -382,7 +382,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         .arg(xmltv_grabber).arg(configfile).arg(filename);
 
 
-    if (source.xmltvgrabber_prefmethod != "allatonce")
+    if (source.xmltvgrabber_prefmethod != "allatonce"  || no_allatonce)
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared
@@ -679,7 +679,7 @@ bool FillData::Run(SourceList &sourcelist)
                     ++failures;
             }
         }
-        else if ((*it).xmltvgrabber_prefmethod == "allatonce")
+        else if ((*it).xmltvgrabber_prefmethod == "allatonce" && !no_allatonce)
         {
             if (!GrabData(*it, 0))
                 ++failures;
@@ -700,8 +700,12 @@ bool FillData::Run(SourceList &sourcelist)
 
             vector<bool> refresh_request;
             refresh_request.resize(grabdays, refresh_all);
-            for (int i = 0; i < grabdays; i++)
-                refresh_request[i] = refresh_day[i];
+            if (!refresh_all)
+                // Set up days to grab if all is not specified
+                // If all was specified the vector was initialized
+                // with true in all occurrences.
+                for (int i = 0; i < grabdays; i++)
+                    refresh_request[i] = refresh_day[i];
 
             if (is_grabber_datadirect(xmltv_grabber) && only_update_channels)
             {

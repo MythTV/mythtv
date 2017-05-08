@@ -119,6 +119,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);
     bool downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo = true);
+#ifndef _WIN32
+    bool downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool deleteInfo);
+#endif
     void downloadCanceled(void);
 
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,

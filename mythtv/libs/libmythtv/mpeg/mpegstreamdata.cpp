@@ -22,34 +22,6 @@ using namespace std;
 //#define DEBUG_MPEG_RADIO // uncomment to strip video streams from TS stream
 #define LOC QString("MPEGStream[%1](0x%2): ").arg(_cardid).arg((intptr_t)this, QT_POINTER_SIZE, 16)
 
-void init_sections(sections_t &sect, uint last_section)
-{
-    static const unsigned char init_bits[8] =
-        { 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0x00, };
-
-    sect.clear();
-
-    uint endz = last_section >> 3;
-    if (endz)
-        sect.resize(endz, 0x00);
-    sect.resize(32, 0xff);
-    sect[endz] = init_bits[last_section & 0x7];
-
-#if 0
-    {
-        QString msg = QString("init_sections ls(%1): ").arg(last_section);
-        for (uint i = 0 ; i < 32; i++)
-            msg += QString("%1 ").arg((int)sect[i], 0, 16);
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + msg);
-    }
-#endif
-}
-
-const unsigned char MPEGStreamData::bit_sel[8] =
-{
-    0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80,
-};
-
 /** \class MPEGStreamData
  *  \brief Encapsulates data about MPEG stream and emits events for each table.
  */
@@ -196,11 +168,9 @@ void MPEGStreamData::Reset(int desiredProgram)
 
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
 
-    _pat_version.clear();
-    _pat_section_seen.clear();
+    _pat_status.clear();
 
-    _pmt_version.clear();
-    _pmt_section_seen.clear();
+    _pmt_status.clear();
 
     {
         QMutexLocker locker(&_cache_lock);
@@ -698,23 +668,17 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::PAT == table_id)
     {
-        if (VersionPAT(psip.TableIDExtension()) != version)
-            return false;
-        return PATSectionSeen(psip.TableIDExtension(), psip.Section());
+        return _pat_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
     }
 
     if (TableID::CAT == table_id)
     {
-        if (VersionCAT(psip.TableIDExtension()) != version)
-           return false;
-        return CATSectionSeen(psip.TableIDExtension(), psip.Section());
+        return _cat_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
     }
 
     if (TableID::PMT == table_id)
     {
-        if (VersionPMT(psip.TableIDExtension()) != version)
-            return false;
-        return PMTSectionSeen(psip.TableIDExtension(), psip.Section());
+        return _pmt_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
     }
 
     return false;
@@ -735,8 +699,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::PAT:
         {
             uint tsid = psip.TableIDExtension();
-            SetVersionPAT(tsid, version, psip.LastSection());
-            SetPATSectionSeen(tsid, psip.Section());
+            _pat_status.SetSectionSeen(tsid, version,  psip.Section(), psip.LastSection());
 
             ProgramAssociationTable pat(psip);
 
@@ -750,8 +713,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::CAT:
         {
             uint tsid = psip.TableIDExtension();
-            SetVersionCAT(tsid, version, psip.LastSection());
-            SetCATSectionSeen(tsid, psip.Section());
+            _cat_status.SetSectionSeen(tsid, version, psip.Section(), psip.LastSection());
 
             ConditionalAccessTable cat(psip);
 
@@ -765,8 +727,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::PMT:
         {
             uint prog_num = psip.TableIDExtension();
-            SetVersionPMT(prog_num, version, psip.LastSection());
-            SetPMTSectionSeen(prog_num, psip.Section());
+            _pmt_status.SetSectionSeen(prog_num, version, psip.Section(), psip.LastSection());
 
             ProgramMapTable pmt(psip);
 
@@ -1203,94 +1164,19 @@ void MPEGStreamData::SavePartialPSIP(uint pid, PSIPTable* packet)
     }
 }
 
-void MPEGStreamData::SetPATSectionSeen(uint tsid, uint section)
-{
-    sections_map_t::iterator it = _pat_section_seen.find(tsid);
-    if (it == _pat_section_seen.end())
-    {
-        _pat_section_seen[tsid].resize(32, 0);
-        it = _pat_section_seen.find(tsid);
-    }
-    (*it)[section>>3] |= bit_sel[section & 0x7];
-}
-
-bool MPEGStreamData::PATSectionSeen(uint tsid, uint section) const
-{
-    sections_map_t::const_iterator it = _pat_section_seen.find(tsid);
-    if (it == _pat_section_seen.end())
-        return false;
-    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
-}
-
 bool MPEGStreamData::HasAllPATSections(uint tsid) const
 {
-    sections_map_t::const_iterator it = _pat_section_seen.find(tsid);
-    if (it == _pat_section_seen.end())
-        return false;
-    for (uint i = 0; i < 32; i++)
-        if ((*it)[i] != 0xff)
-            return false;
-    return true;
-}
-
-void MPEGStreamData::SetCATSectionSeen(uint tsid, uint section)
-{
-    sections_map_t::iterator it = _cat_section_seen.find(tsid);
-    if (it == _cat_section_seen.end())
-    {
-        _cat_section_seen[tsid].resize(32, 0);
-        it = _cat_section_seen.find(tsid);
-    }
-    (*it)[section>>3] |= bit_sel[section & 0x7];
-}
-
-bool MPEGStreamData::CATSectionSeen(uint tsid, uint section) const
-{
-    sections_map_t::const_iterator it = _cat_section_seen.find(tsid);
-    if (it == _cat_section_seen.end())
-        return false;
-    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+    return _pat_status.HasAllSections(tsid);
 }
 
 bool MPEGStreamData::HasAllCATSections(uint tsid) const
 {
-    sections_map_t::const_iterator it = _cat_section_seen.find(tsid);
-    if (it == _cat_section_seen.end())
-        return false;
-    for (uint i = 0; i < 32; i++)
-        if ((*it)[i] != 0xff)
-            return false;
-    return true;
-}
-
-void MPEGStreamData::SetPMTSectionSeen(uint prog_num, uint section)
-{
-    sections_map_t::iterator it = _pmt_section_seen.find(prog_num);
-    if (it == _pmt_section_seen.end())
-    {
-        _pmt_section_seen[prog_num].resize(32, 0);
-        it = _pmt_section_seen.find(prog_num);
-    }
-    (*it)[section>>3] |= bit_sel[section & 0x7];
-}
-
-bool MPEGStreamData::PMTSectionSeen(uint prog_num, uint section) const
-{
-    sections_map_t::const_iterator it = _pmt_section_seen.find(prog_num);
-    if (it == _pmt_section_seen.end())
-        return false;
-    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+    return _cat_status.HasAllSections(tsid);
 }
 
 bool MPEGStreamData::HasAllPMTSections(uint prog_num) const
 {
-    sections_map_t::const_iterator it = _pmt_section_seen.find(prog_num);
-    if (it == _pmt_section_seen.end())
-        return false;
-    for (uint i = 0; i < 32; i++)
-        if ((*it)[i] != 0xff)
-            return false;
-    return true;
+    return _pmt_status.HasAllSections(prog_num);
 }
 
 bool MPEGStreamData::HasProgram(uint progNum) const

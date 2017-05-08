@@ -2291,8 +2291,8 @@ bool DiSEqCDevSCR::SendCommand(uint cmd, uint repeats, uint data_len,
     return ret;
 }
 
-uint DiSEqCDevSCR::GetVoltage(const DiSEqCDevSettings &settings,
-                              const DTVMultiplex      &tuning) const
+uint DiSEqCDevSCR::GetVoltage(const DiSEqCDevSettings &/*settings*/,
+                              const DTVMultiplex      &/*tuning*/) const
 {
     return SEC_VOLTAGE_13;
 }

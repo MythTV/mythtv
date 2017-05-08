@@ -610,7 +610,7 @@ bool VideoOutputNullVDPAU::BufferSizeCheck(void)
     return true;
 }
 
-void* VideoOutputNullVDPAU::GetDecoderContext(unsigned char* buf, uint8_t*& id)
+void* VideoOutputNullVDPAU::GetDecoderContext(unsigned char* /*buf*/, uint8_t*& /*id*/)
 {
     return &m_context;
 }

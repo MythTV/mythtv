@@ -409,7 +409,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       disable_passthru(false),
       m_fps(0.0f),
       codec_is_mpeg(false),
-      m_processFrames(true)
+      m_processFrames(true),
+      m_streams_changed(false)
 {
     memset(&readcontext, 0, sizeof(readcontext));
     memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
@@ -980,39 +981,7 @@ extern "C" void HandleStreamChange(void *data)
         QString("streams_changed 0x%1 -- stream count %2")
             .arg((uint64_t)data,0,16).arg(cnt));
 
-    decoder->SeekReset(0, 0, true, true);
-    QMutexLocker locker(avcodeclock);
-    decoder->ScanStreams(false);
-}
-
-extern "C" void HandleDVDStreamChange(void *data)
-{
-    AvFormatDecoder *decoder =
-        reinterpret_cast<AvFormatDecoder*>(data);
-
-    int cnt = decoder->ic->nb_streams;
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("streams_changed 0x%1 -- stream count %2")
-            .arg((uint64_t)data,0,16).arg(cnt));
-
-    //decoder->SeekReset(0, 0, true, true);
-    QMutexLocker locker(avcodeclock);
-    decoder->ScanStreams(true);
-}
-
-extern "C" void HandleBDStreamChange(void *data)
-{
-    AvFormatDecoder *decoder =
-        reinterpret_cast<AvFormatDecoder*>(data);
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
-
-    QMutexLocker locker(avcodeclock);
-    decoder->Reset(true, false, false);
-    decoder->CloseCodecs();
-    decoder->FindStreamInfo();
-    decoder->ScanStreams(false);
+    decoder->m_streams_changed = true;
 }
 
 int AvFormatDecoder::FindStreamInfo(void)
@@ -1227,11 +1196,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     ic->streams_changed = HandleStreamChange;
-    if (ringBuffer->IsDVD())
-        ic->streams_changed = HandleDVDStreamChange;
-    else if (ringBuffer->IsBD())
-        ic->streams_changed = HandleBDStreamChange;
-
     ic->stream_change_data = this;
 
     fmt->flags &= ~AVFMT_NOFILE;
@@ -1772,7 +1736,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         return;
     }
 
-    const ProgramMapTable pmt(ic->cur_pmt_sect);
+    const ProgramMapTable pmt(PSIPTable(ic->cur_pmt_sect));
 
     uint i;
     for (i = 0; i < pmt.StreamCount(); i++)
@@ -1897,7 +1861,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
     if (!ic->cur_pmt_sect || tracks[kTrackTypeTeletextCaptions].size())
         return;
 
-    const ProgramMapTable pmt(ic->cur_pmt_sect);
+    const ProgramMapTable pmt(PSIPTable(ic->cur_pmt_sect));
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1972,7 +1936,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
     if (!itv && ! (itv = m_parent->GetInteractiveTV()))
         return;
 
-    const ProgramMapTable pmt(ic->cur_pmt_sect);
+    const ProgramMapTable pmt(PSIPTable(ic->cur_pmt_sect));
 
     for (uint i = 0; i < pmt.StreamCount(); i++)
     {
@@ -2696,7 +2660,7 @@ AudioTrackType AvFormatDecoder::GetAudioTrackType(uint stream_index)
 
     if (ic->cur_pmt_sect) // mpeg-ts
     {
-        const ProgramMapTable pmt(ic->cur_pmt_sect);
+        const ProgramMapTable pmt(PSIPTable(ic->cur_pmt_sect));
         switch (pmt.GetAudioType(stream_index))
         {
             case 0x01 :
@@ -5051,6 +5015,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         .arg(ff_codec_type_string(codec_type))
                         .arg(ff_codec_id_string(curstream->codec->codec_id))
                         .arg(curstream->codec->codec_id));
+                // Process Stream Change in case we have no audio
+                if (codec_type == AVMEDIA_TYPE_AUDIO && !m_audio->HasAudioIn())
+                    m_streams_changed = true;
             }
             av_packet_unref(pkt);
             continue;
@@ -5125,6 +5092,16 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     return true;
 }
 
+void AvFormatDecoder::StreamChangeCheck() {
+    if (m_streams_changed)
+    {
+        SeekReset(0, 0, true, true);
+        QMutexLocker locker(avcodeclock);
+        ScanStreams(false);
+        m_streams_changed=false;
+    }
+}
+
 int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)
 {
     QMutexLocker locker(avcodeclock);
@@ -5136,7 +5113,7 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 {
     if (ic && ic->cur_pmt_sect)
     {
-        const ProgramMapTable pmt(ic->cur_pmt_sect);
+        const ProgramMapTable pmt(PSIPTable(ic->cur_pmt_sect));
 
         for (uint i = 0; i < pmt.StreamCount(); i++)
         {

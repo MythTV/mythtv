@@ -105,39 +105,43 @@ class ChannelDBStorage : public SimpleDBStorage
 
 class OnAirGuide;
 class XmltvID;
+class Freqid;
 
 class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
 {
     Q_OBJECT
 
   public:
-    ChannelOptionsCommon(const ChannelID &id, uint default_sourceid);
+    ChannelOptionsCommon(const ChannelID &id,
+        uint default_sourceid,  bool add_freqid);
 
   public slots:
     void onAirGuideChanged(bool);
     void sourceChanged(const QString&);
+    void channumChanged(const QString&);
 
   protected:
     OnAirGuide *onairguide;
     XmltvID    *xmltvID;
+    Freqid     *freqid;
 };
 
 class MTV_PUBLIC ChannelOptionsFilters: public GroupSetting
 {
   public:
-    ChannelOptionsFilters(const ChannelID& id);
+    explicit ChannelOptionsFilters(const ChannelID& id);
 };
 
 class MTV_PUBLIC ChannelOptionsV4L: public GroupSetting
 {
   public:
-    ChannelOptionsV4L(const ChannelID& id);
+    explicit ChannelOptionsV4L(const ChannelID& id);
 };
 
 class MTV_PUBLIC ChannelOptionsRawTS: public GroupSetting
 {
   public:
-    ChannelOptionsRawTS(const ChannelID &id);
+    explicit ChannelOptionsRawTS(const ChannelID &id);
 
     virtual void Load(void);
     virtual void Save(void);
@@ -157,7 +161,7 @@ class MTV_PUBLIC ChannelTVFormat :
     public MythUIComboBoxSetting
 {
   public:
-    ChannelTVFormat(const ChannelID &id);
+    explicit ChannelTVFormat(const ChannelID &id);
 
     static QStringList GetFormats(void);
 };

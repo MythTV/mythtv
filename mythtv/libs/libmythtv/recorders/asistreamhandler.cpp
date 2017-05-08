@@ -24,13 +24,15 @@
 #include <dveo/asi.h>
 #include <dveo/master.h>
 
-#define LOC      QString("ASISH(%1): ").arg(_device)
+#define LOC      QString("ASISH%1(%2): ").arg(_recorder_ids_string) \
+                                         .arg(_device)
 
 QMap<QString,ASIStreamHandler*> ASIStreamHandler::_handlers;
 QMap<QString,uint>              ASIStreamHandler::_handlers_refcnt;
 QMutex                          ASIStreamHandler::_handlers_lock;
 
-ASIStreamHandler *ASIStreamHandler::Get(const QString &devname)
+ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
+                                        int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -59,6 +61,7 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname)
                 .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
+    _handlers[devkey]->AddRecorderId(recorder_id);
     return _handlers[devkey];
 }
 
@@ -72,6 +75,10 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref)
     if (rit == _handlers_refcnt.end())
         return;
 
+    QMap<QString,ASIStreamHandler*>::iterator it = _handlers.find(devname);
+    if (it != _handlers.end())
+        (*it)->DelRecorderId(recorder_id);
+
     if (*rit > 1)
     {
         ref = NULL;
@@ -79,7 +86,6 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref)
         return;
     }
 
-    QMap<QString,ASIStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("ASISH: Closing handler for %1")

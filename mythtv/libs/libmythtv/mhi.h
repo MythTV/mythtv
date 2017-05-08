@@ -47,7 +47,7 @@ class QByteArray;
 class MHIContext : public MHContext, public QRunnable
 {
   public:
-    MHIContext(InteractiveTV *parent);
+    explicit MHIContext(InteractiveTV *parent);
     virtual ~MHIContext();
 
     void QueueDSMCCPacket(unsigned char *data, int length, int componentTag,
@@ -232,7 +232,7 @@ class MHIContext : public MHContext, public QRunnable
 class MHIText : public MHTextDisplay
 {
   public:
-    MHIText(MHIContext *parent);
+    explicit MHIText(MHIContext *parent);
     virtual ~MHIText() {}
 
     virtual void Draw(int x, int y);

@@ -303,7 +303,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
                 QString("GetNextFreeFrame() TryLock has "
                         "spun %1 times, this is a lot.").arg(tries));
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(TRY_LOCK_SPIN_WAIT));
+        std::this_thread::sleep_for(std::chrono::microseconds(TRY_LOCK_SPIN_WAIT));
     }
 
     return NULL;

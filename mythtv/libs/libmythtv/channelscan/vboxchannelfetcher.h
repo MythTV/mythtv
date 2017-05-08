@@ -22,17 +22,22 @@ class VBoxChannelInfo
     Q_DECLARE_TR_FUNCTIONS(VBoxChannelInfo)
 
   public:
-    VBoxChannelInfo() : m_serviceID(0), m_fta(false) {}
+    VBoxChannelInfo() : m_serviceID(0), m_fta(false), m_networkID(0),
+        m_transportID(0)
+    {
+    }
     VBoxChannelInfo(const QString &name,
                     const QString &xmltvid,
                     const QString &data_url,
                     bool fta,
                     const QString &chanType,
                     const QString &transType,
-                    uint serviceID) :
+                    uint serviceID,
+                    uint networkID,
+                    uint transportID):
         m_name(name), m_xmltvid(xmltvid), m_serviceID(serviceID),
         m_fta(fta), m_channelType(chanType), m_transType(transType),
-        m_tuning(data_url, IPTVTuningData::http_ts)
+        m_tuning(data_url, IPTVTuningData::http_ts), m_networkID(networkID), m_transportID(transportID)
     {
     }
 
@@ -49,6 +54,8 @@ class VBoxChannelInfo
     QString m_channelType; // TV/Radio
     QString m_transType;   // T/T2/S/S2/C/A
     IPTVTuningData m_tuning;
+    uint m_networkID;      // Network ID from triplet
+    uint m_transportID;    // Transport ID from triplet
 };
 typedef QMap<QString,VBoxChannelInfo> vbox_chan_map_t;
 

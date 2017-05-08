@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QList>
+#include <QDateTime>
 
 #include "mthread.h"
 #include "mythexp.h"
@@ -32,6 +33,7 @@ class MonitorThread : public MThread
   protected:
     QPointer<MediaMonitor> m_Monitor;
     unsigned long m_Interval;
+    QDateTime m_lastCheckTime;
 };
 
 class MPUBLIC MediaMonitor : public QObject

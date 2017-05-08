@@ -36,7 +36,7 @@ class Content : public ContentServices
 
     public:
 
-        Q_INVOKABLE explicit Content( QObject *parent = 0 ) {}
+        Q_INVOKABLE explicit Content( QObject */*parent*/ = 0 ) {}
 
     public:
 

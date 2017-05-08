@@ -970,9 +970,11 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
  */
 int DVBChannel::GetChanID() const
 {
+    int found = 0;
+    int id = -1;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT chanid "
+    query.prepare("SELECT chanid,visible "
                   "FROM channel, capturecard "
                   "WHERE capturecard.sourceid = channel.sourceid AND "
                   "      channel.channum = :CHANNUM AND "
@@ -987,10 +989,28 @@ int DVBChannel::GetChanID() const
         return -1;
     }
 
-    if (!query.next())
-        return -1;
+    while (query.next())
+    {
+        found += query.value(1).toInt();
+        if (id == -1 || found)
+            id = query.value(0).toInt();
+    }
 
-    return query.value(0).toInt();
+    if (!found)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("No visible channel ids for %1")
+            .arg(m_curchannelname));
+    }
+
+    if (found > 1)
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("Found multiple visible channel ids for %1")
+            .arg(m_curchannelname));
+    }
+
+    return id;
 }
 
 const DiSEqCDevRotor *DVBChannel::GetRotor(void) const

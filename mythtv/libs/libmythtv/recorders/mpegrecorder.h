@@ -44,8 +44,8 @@ class MpegRecorder : public V4LRecorder,
     bool ProcessTSPacket(const TSPacket &tspacket);
 
     // DeviceReaderCB
-    virtual void ReaderPaused(int fd) { pauseWait.wakeAll(); }
-    virtual void PriorityEvent(int fd) { }
+    virtual void ReaderPaused(int /*fd*/) { pauseWait.wakeAll(); }
+    virtual void PriorityEvent(int /*fd*/) { }
 
   private:
     virtual void InitStreamData(void);

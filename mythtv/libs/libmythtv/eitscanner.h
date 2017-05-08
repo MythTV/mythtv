@@ -30,7 +30,7 @@ class EITScanner;
 class EITScanner : public QRunnable
 {
   public:
-    EITScanner(uint cardnum);
+    explicit EITScanner(uint cardnum);
     ~EITScanner() { TeardownAll(); }
 
     void StartPassiveScan(ChannelBase*, EITSource*);

@@ -379,7 +379,7 @@ class ScanRollOff: public TransMythUIComboBoxSetting
 class PaneError : public GroupSetting
 {
   public:
-    PaneError(const QString &error)
+    explicit PaneError(const QString &error)
     {
         TransTextEditSetting* label = new TransTextEditSetting();
         label->setValue(error);

@@ -23,6 +23,7 @@
 #include "exitcodes.h"
 #include "mthread.h"
 #include "mythdate.h"
+#include "portchecker.h"
 
 #define DEBUG_RECONNECT 0
 #if DEBUG_RECONNECT
@@ -136,12 +137,20 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
         m_db.setDatabaseName(m_dbparms.dbName);
         m_db.setUserName(m_dbparms.dbUserName);
         m_db.setPassword(m_dbparms.dbPassword);
-        m_db.setHostName(m_dbparms.dbHostName);
 
         if (m_dbparms.dbHostName.isEmpty())  // Bootstrapping without a database?
         {
             connected = true;              // Pretend to be connected
             return true;                   // to reduce errors
+        }
+        else
+        {
+            // code to ensure that a link-local ip address has the scope
+            int port = 3306;
+            if (m_dbparms.dbPort)
+                port = m_dbparms.dbPort;
+            PortChecker::resolveLinkLocal(m_dbparms.dbHostName, port);
+            m_db.setHostName(m_dbparms.dbHostName);
         }
 
         if (m_dbparms.dbPort)

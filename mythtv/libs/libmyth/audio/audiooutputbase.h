@@ -51,7 +51,7 @@ class AudioOutputBase : public AudioOutput, public MThread
 {
  public:
     const char *quality_string(int q);
-    AudioOutputBase(const AudioSettings &settings);
+    explicit AudioOutputBase(const AudioSettings &settings);
     virtual ~AudioOutputBase();
 
     AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
@@ -76,7 +76,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     virtual bool IsUpmixing(void);
     virtual bool ToggleUpmix(void);
     virtual bool CanUpmix(void);
-    virtual bool CanProcess(AudioFormat fmt) { return true; }
+    virtual bool CanProcess(AudioFormat /*fmt*/) { return true; }
     virtual uint32_t CanProcess(void)
     {
         // we support all codec
@@ -136,7 +136,7 @@ class AudioOutputBase : public AudioOutput, public MThread
      */
     virtual int  GetBufferedOnSoundcard(void) const = 0;
     // Default implementation only supports 2ch s16le at 48kHz
-    virtual AudioOutputSettings* GetOutputSettings(bool digital)
+    virtual AudioOutputSettings* GetOutputSettings(bool /*digital*/)
         { return new AudioOutputSettings; }
     // You need to call this from any implementation in the dtor.
     void KillAudio(void);

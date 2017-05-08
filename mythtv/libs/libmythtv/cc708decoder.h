@@ -24,7 +24,7 @@ class CC708Reader;
 class CC708Decoder
 {
   public:
-    CC708Decoder(CC708Reader *ccr) : reader(ccr)
+    explicit CC708Decoder(CC708Reader *ccr) : reader(ccr)
     {
         memset(&partialPacket, 0, sizeof(CaptionPacket));
         memset(last_seen,      0, sizeof(last_seen));

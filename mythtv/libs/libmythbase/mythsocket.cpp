@@ -31,6 +31,7 @@ using std::vector;
 #include "mythversion.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
+#include "portchecker.h"
 
 #define SLOC(a) QString("MythSocket(%1:%2): ") \
     .arg((intptr_t)(a), 0, 16)                 \
@@ -96,6 +97,22 @@ MythSocket::MythSocket(
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("MythSocket(%1, 0x%2) ctor")
         .arg(socket).arg((intptr_t)(cb),0,16));
 
+    if (socket != -1)
+    {
+        m_tcpSocket->setSocketDescriptor(
+            socket, QAbstractSocket::ConnectedState,
+            QAbstractSocket::ReadWrite);
+        if (!gCoreContext->CheckSubnet(m_tcpSocket))
+        {
+            m_tcpSocket->abort();
+            m_connected = false;
+            m_useSharedThread = false;
+            return;
+        }
+        else
+            ConnectHandler(); // already called implicitly above?
+    }
+
     // Use direct connections so m_tcpSocket can be used
     // in the handlers safely since they will be running
     // in the same thread as all other m_tcpSocket users.
@@ -118,15 +135,6 @@ MythSocket::MythSocket(
     connect(this, SIGNAL(CallReadyRead()),
             this, SLOT(CallReadyReadHandler()),
             Qt::QueuedConnection);
-
-    if (socket != -1)
-    {
-        m_tcpSocket->setSocketDescriptor(
-            socket, QAbstractSocket::ConnectedState,
-            QAbstractSocket::ReadWrite);
-
-        ConnectHandler(); // already called implicitly above?
-    }
 
     if (!use_shared_thread)
     {
@@ -159,9 +167,12 @@ MythSocket::~MythSocket()
 
     if (!m_useSharedThread)
     {
-        m_thread->quit();
-        m_thread->wait();
-        delete m_thread;
+        if (m_thread)
+        {
+            m_thread->quit();
+            m_thread->wait();
+            delete m_thread;
+        }
     }
     else
     {
@@ -658,59 +669,17 @@ void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("attempting connect() to (%1:%2)")
         .arg(addr.toString()).arg(port));
 
-    bool ok = false;
+    bool ok = true;
 
-    if (!usingLoopback && (addr.protocol() == QAbstractSocket::IPv6Protocol) &&
-        addr.isInSubnet(QHostAddress::parseSubnet("fe80::/10")) &&
-        !gCoreContext->GetScopeForAddress(addr))
+    // Sort out link-local address scope if applicable
+    if (!usingLoopback)
     {
-        // Address is IPv6 link-local, we need to find the right scope id
-        QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
-
-        // try using all available cards
-        foreach (QNetworkInterface card, cards)
-        {
-            unsigned int flags = card.flags();
-            bool isLoopback = flags & QNetworkInterface::IsLoopBack;
-            bool isP2P = flags & QNetworkInterface::IsPointToPoint;
-            bool isRunning = flags & QNetworkInterface::IsRunning;
-
-            if (!isRunning || !card.isValid() || isLoopback || isP2P)
-            {
-                // this is a loopback interface, not up or a point to point interface
-                // no point checking
-                continue;
-            }
-
-            bool foundv6 = false;
-            // check that IPv6 is enabled on that interface
-            QList<QNetworkAddressEntry> addresses = card.addressEntries();
-            foreach (QNetworkAddressEntry ae, addresses)
-            {
-                if (ae.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                {
-                    foundv6 = true;
-                    break;
-                }
-            }
-            if (!foundv6)
-            {
-                // No IPv6 available on that interface, skip it
-                continue;
-            }
-
-            addr.setScopeId(QString::number(card.index()));
-            m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
-            ok = m_tcpSocket->waitForConnected(5000);
-            if (ok)
-            {
-                // Save it for future searches
-                gCoreContext->SetScopeForAddress(addr, card.index());
-                break;
-            }
-        }
+        QString host = addr.toString();
+        if (PortChecker::resolveLinkLocal(host, port))
+            addr.setAddress(host);
     }
-    else
+
+    if (ok)
     {
         m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
         ok = m_tcpSocket->waitForConnected();

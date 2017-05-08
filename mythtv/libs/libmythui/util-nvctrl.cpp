@@ -13,8 +13,8 @@
 
 #include "mythxdisplay.h"
 
-#include "libmythnvctrl/NVCtrl.h"
-#include "libmythnvctrl/NVCtrlLib.h"
+#include "NVCtrl.h"
+#include "NVCtrlLib.h"
 
 #ifdef USING_XRANDR
 #include "DisplayResX.h"

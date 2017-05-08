@@ -9,6 +9,46 @@
 #include <QNetworkInterface>
 
 
+static TransMythUICheckBoxSetting *IsMasterBackend()
+{
+    TransMythUICheckBoxSetting *gc = new TransMythUICheckBoxSetting();
+    gc->setLabel(QObject::tr("This server is the Master Backend"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr(
+                    "Enable this if this is the only backend or is the "
+                    "master backend server. If enabled, all frontend and "
+                    "non-master backend machines "
+                    "will connect to this server. To change to a new master "
+                    "backend, run setup on that server and select it as "
+                    "master backend."));
+    return gc;
+};
+
+static GlobalTextEditSetting *MasterServerName()
+{
+    GlobalTextEditSetting *gc = new GlobalTextEditSetting("MasterServerName");
+    gc->setLabel(QObject::tr("Master Backend Name"));
+    gc->setValue("");
+    // TODO
+    // gc->setRO();
+    gc->setHelpText(QObject::tr(
+                    "Host name of Master Backend. This is set by selecting "
+                    "\"This server is the Master Backend\" on that server."));
+    return gc;
+};
+
+static HostCheckBoxSetting *AllowConnFromAll()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AllowConnFromAll");
+    gc->setLabel(QObject::tr("Allow Connections from all Subnets"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr(
+                    "Allow this backend to receive connections from any IP "
+                    "address on the internet. NOT recommended for most users. "
+                    "Use this only if you have secure IPV4 and IPV6 " "firewalls."));
+    return gc;
+};
+
 static HostComboBoxSetting *LocalServerIP()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("BackendServerIP");
@@ -34,19 +74,20 @@ static HostComboBoxSetting *LocalServerIP()
 static HostComboBoxSetting *LocalServerIP6()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("BackendServerIP6");
-    gc->setLabel(QObject::tr("IPv6 address"));
+    gc->setLabel(QObject::tr("Listen on IPv6 address"));
     QList<QHostAddress> list = QNetworkInterface::allAddresses();
     QList<QHostAddress>::iterator it;
     for (it = list.begin(); it != list.end(); ++it)
     {
         if ((*it).protocol() == QAbstractSocket::IPv6Protocol)
+        {
+            // If it is a link-local IPV6 address with scope,
+            // remove the scope.
+            it->setScopeId(QString());
             gc->addSelection((*it).toString(), (*it).toString());
+        }
     }
 
-#if defined(QT_NO_IPV6)
-    gc->setEnabled(false);
-    gc->setValue("");
-#else
     if (list.isEmpty())
     {
         gc->setEnabled(false);
@@ -54,12 +95,9 @@ static HostComboBoxSetting *LocalServerIP6()
     }
     else
     {
-        // Allow ability to have no value set, this disable IPv6
-        gc->addSelection("");
         if (list.contains(QHostAddress("::1")))
             gc->setValue("::1");
     }
-#endif
 
     gc->setHelpText(QObject::tr("Enter the IPv6 address of this machine. "
                     "Use an externally accessible address (ie, not "
@@ -80,6 +118,31 @@ static HostCheckBoxSetting *UseLinkLocal()
                     "work."));
     return hc;
 };
+
+class IpAddressSettings : public HostCheckBoxSetting
+{
+  public:
+     HostComboBoxSetting *localServerIP;
+     HostComboBoxSetting *localServerIP6;
+     explicit IpAddressSettings(/*Setting* trigger*/) :
+         HostCheckBoxSetting("ListenOnAllIps")
+     {
+         setLabel(QObject::tr("Listen on All IP Addresses"));
+         setValue(true);
+         setHelpText(tr("Allow this backend to receive connections on any IP "
+                        "Address assigned to it. Recommended for most users "
+                        "for ease and reliability."));
+
+         localServerIP = LocalServerIP();
+         localServerIP6 = LocalServerIP6();
+         // show ip addresses if ListenOnAllIps is off
+         addTargetedChild("0", localServerIP);
+         addTargetedChild("0", localServerIP6);
+         addTargetedChild("0", UseLinkLocal());
+     };
+};
+
+
 
 static HostTextEditSetting *LocalServerPort()
 {
@@ -102,26 +165,37 @@ static HostTextEditSetting *LocalStatusPort()
     return gc;
 };
 
+static HostComboBoxSetting *BackendServerAddr()
+{
+    HostComboBoxSetting *gc = new HostComboBoxSetting("BackendServerAddr", true);
+    gc->setLabel(QObject::tr("Primary IP address / DNS name"));
+    gc->setValue("127.0.0.1");
+    gc->setHelpText(QObject::tr("The Primary IP address of this backend "
+                    "server. You can select an IP "
+                    "address from the list or type a DNS name "
+                    "or host name. Other systems will contact this "
+                    "server using this address. "
+                    "If you use a host name make sure it is assigned "
+                    "an ip address other than 127.0.0.1 in the hosts "
+                    "file."));
+    return gc;
+};
+
+// Deprecated
 static GlobalTextEditSetting *MasterServerIP()
 {
     GlobalTextEditSetting *gc = new GlobalTextEditSetting("MasterServerIP");
     gc->setLabel(QObject::tr("IP address"));
     gc->setValue("127.0.0.1");
-    gc->setHelpText(QObject::tr("The IP address of the master backend "
-                    "server. All frontend and non-master backend machines "
-                    "will connect to this server. If you only have one "
-                    "backend, this should be the same IP address as "
-                    "above."));
     return gc;
 };
 
+// Deprecated
 static GlobalTextEditSetting *MasterServerPort()
 {
     GlobalTextEditSetting *gc = new GlobalTextEditSetting("MasterServerPort");
     gc->setLabel(QObject::tr("Port"));
     gc->setValue("6543");
-    gc->setHelpText(QObject::tr("Unless you've got good reason, "
-                    "don't change this."));
     return gc;
 };
 
@@ -790,24 +864,52 @@ class MythFillSettings : public GroupSetting
      }
 };
 
-BackendSettings::BackendSettings() {
-    setLabel(QObject::tr("Host Address Backend Setup"));
-    GroupSetting* localServer = new GroupSetting();
-    localServer->setLabel(QObject::tr("Local Backend") + " (" +
-                          gCoreContext->GetHostName() + ")");
-    localServer->addChild(LocalServerIP());
-    localServer->addChild(LocalServerIP6());
-    localServer->addChild(UseLinkLocal());
-    localServer->addChild(LocalServerPort());
-    localServer->addChild(LocalStatusPort());
-    localServer->addChild(LocalSecurityPin());
-    GroupSetting* masterServer = new GroupSetting();
-    masterServer->setLabel(QObject::tr("Master Backend"));
-    masterServer->addChild(MasterServerIP());
-    masterServer->addChild(MasterServerPort());
-    addChild(localServer);
-    addChild(masterServer);
+BackendSettings::BackendSettings() :
+    isMasterBackend(0),
+    localServerPort(0),
+    backendServerAddr(0),
+    masterServerName(0),
+    ipAddressSettings(0),
+    isLoaded(false),
+    masterServerIP(0),
+    masterServerPort(0)
+{
+    // These two are included for backward compatibility -
+    // used by python bindings. They could be removed later
+    masterServerIP = MasterServerIP();
+    masterServerPort = MasterServerPort();
 
+    //++ Host Address Backend Setup ++
+    GroupSetting* server = new GroupSetting();
+    server->setLabel(tr("Host Address Backend Setup"));
+    localServerPort = LocalServerPort();
+    server->addChild(localServerPort);
+    server->addChild(LocalStatusPort());
+    server->addChild(LocalSecurityPin());
+    server->addChild(AllowConnFromAll());
+    //+++ IP Addresses +++
+    ipAddressSettings = new IpAddressSettings();
+    server->addChild(ipAddressSettings);
+    connect(ipAddressSettings, &HostCheckBoxSetting::valueChanged,
+            this, &BackendSettings::listenChanged);
+    connect(ipAddressSettings->localServerIP,
+            static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
+            this, &BackendSettings::listenChanged);
+    connect(ipAddressSettings->localServerIP6,
+            static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
+            this, &BackendSettings::listenChanged);
+    backendServerAddr = BackendServerAddr();
+    server->addChild(backendServerAddr);
+    //++ Master Backend ++
+    isMasterBackend = IsMasterBackend();
+    connect(isMasterBackend, &TransMythUICheckBoxSetting::valueChanged,
+            this, &BackendSettings::masterBackendChanged);
+    server->addChild(isMasterBackend);
+    masterServerName = MasterServerName();
+    server->addChild(masterServerName);
+    addChild(server);
+
+    //++ Locale Settings ++
     GroupSetting* locale = new GroupSetting();
     locale->setLabel(QObject::tr("Locale Settings"));
     locale->addChild(TVFormat());
@@ -919,4 +1021,134 @@ BackendSettings::BackendSettings() {
     MythFillSettings *mythfill = new MythFillSettings();
     addChild(mythfill);
 
+}
+
+void BackendSettings::masterBackendChanged()
+{
+    if (!isLoaded)
+        return;
+    bool ismasterchecked = isMasterBackend->boolValue();
+    if (ismasterchecked)
+        masterServerName->setValue(gCoreContext->GetHostName());
+    else
+        masterServerName->setValue(priorMasterName);
+}
+
+void BackendSettings::listenChanged()
+{
+    if (!isLoaded)
+        return;
+    QString currentsetting = backendServerAddr->getValue();
+    backendServerAddr->clearSelections();
+    if (ipAddressSettings->boolValue())
+    {
+        QList<QHostAddress> list = QNetworkInterface::allAddresses();
+        QList<QHostAddress>::iterator it;
+        for (it = list.begin(); it != list.end(); ++it)
+        {
+            it->setScopeId(QString());
+            backendServerAddr->addSelection((*it).toString(), (*it).toString());
+        }
+    }
+    else
+    {
+        backendServerAddr->addSelection(
+            ipAddressSettings->localServerIP->getValue());
+        backendServerAddr->addSelection(
+            ipAddressSettings->localServerIP6->getValue());
+    }
+    // Remove the blank entry that is caused by clearSelections
+    // TODO probably not needed anymore?
+    // backendServerAddr->removeSelection(QString());
+
+    QHostAddress addr;
+    if (addr.setAddress(currentsetting))
+    {
+        // if prior setting is an ip address
+        // it only if it is now in the list
+        if (backendServerAddr->getValueIndex(currentsetting)
+                > -1)
+            backendServerAddr->setValue(currentsetting);
+        else
+            backendServerAddr->setValue(0);
+    }
+    else if (! currentsetting.isEmpty())
+    {
+        // if prior setting was not an ip address, it must
+        // have been a dns name so add it back and select it.
+        backendServerAddr->addSelection(currentsetting);
+        backendServerAddr->setValue(currentsetting);
+    }
+    else
+        backendServerAddr->setValue(0);
+}
+
+
+void BackendSettings::Load(void)
+{
+    isLoaded=false;
+    GroupSetting::Load();
+
+    // These two are included for backward compatibility - only used by python
+    // bindings. They should be removed later
+    masterServerIP->Load();
+    masterServerPort->Load();
+
+    QString mastername = masterServerName->getValue();
+    // new installation - default to master
+    if (mastername.isEmpty())
+        mastername = gCoreContext->GetHostName();
+    bool ismaster = (mastername == gCoreContext->GetHostName());
+    isMasterBackend->setValue(ismaster);
+        priorMasterName = mastername;
+    isLoaded=true;
+    masterBackendChanged();
+    listenChanged();
+}
+
+void BackendSettings::Save(void)
+{
+    // Setup deprecated backward compatibility settings
+    if (isMasterBackend->boolValue())
+    {
+        QString addr = backendServerAddr->getValue();
+        QString ip = gCoreContext->resolveAddress(addr);
+        masterServerIP->setValue(ip);
+        masterServerPort->setValue(localServerPort->getValue());
+    }
+
+    // If listen on all is specified, set up values for the
+    // specific IPV4 and IPV6 addresses for backward
+    // compatibilty with other things that may use them
+    if (ipAddressSettings->boolValue())
+    {
+        QString bea = backendServerAddr->getValue();
+        // initialize them to localhost values
+        ipAddressSettings->localServerIP->setValue(0);
+        ipAddressSettings->localServerIP6->setValue(0);
+        QString ip4 = gCoreContext->resolveAddress
+            (bea,MythCoreContext::ResolveIPv4);
+        QString ip6 = gCoreContext->resolveAddress
+            (bea,MythCoreContext::ResolveIPv6);
+        // the setValue calls below only set the value if it is in the list.
+        ipAddressSettings->localServerIP->setValue(ip4);
+        ipAddressSettings->localServerIP6->setValue(ip6);
+    }
+
+    GroupSetting::Save();
+
+    // These two are included for backward compatibility - only used by python
+    // bindings. They should be removed later
+    masterServerIP->Save();
+    masterServerPort->Save();
+}
+
+BackendSettings::~BackendSettings()
+{
+    if (masterServerIP)
+        delete masterServerIP;
+    masterServerIP=0;
+    if (masterServerPort)
+        delete masterServerPort;
+    masterServerPort=0;
 }

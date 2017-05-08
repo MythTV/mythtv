@@ -71,7 +71,7 @@ class MTV_PUBLIC DVDInfo
     Q_DECLARE_TR_FUNCTIONS(DVDInfo)
 
   public:
-    DVDInfo(const QString &filename);
+    explicit DVDInfo(const QString &filename);
    ~DVDInfo(void);
     bool IsValid(void) const { return m_nav != NULL; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
@@ -96,7 +96,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     Q_DECLARE_TR_FUNCTIONS(DVDRingBuffer)
 
   public:
-    DVDRingBuffer(const QString &lfilename);
+    explicit DVDRingBuffer(const QString &lfilename);
     virtual ~DVDRingBuffer();
 
     // gets

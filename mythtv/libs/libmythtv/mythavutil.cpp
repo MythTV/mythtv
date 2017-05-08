@@ -9,6 +9,7 @@
 #include "mythframe.h"
 #include "mythavutil.h"
 #include "mythcorecontext.h"
+#include "mythconfig.h"
 extern "C" {
 #include "libswscale/swscale.h"
 #include "libavfilter/avfilter.h"
@@ -76,7 +77,7 @@ int AVPictureFill(AVPicture *pic, const VideoFrame *frame, AVPixelFormat fmt)
 class MythAVCopyPrivate
 {
 public:
-    MythAVCopyPrivate(bool uswc)
+    explicit MythAVCopyPrivate(bool uswc)
     : swsctx(NULL), copyctx(new MythUSWCCopy(4096, !uswc)),
       width(0), height(0), size(0), format(AV_PIX_FMT_NONE)
     {
@@ -161,8 +162,20 @@ int MythAVCopy::Copy(AVPicture *dst, AVPixelFormat dst_pix_fmt,
         return frameout.size;
     }
 
+    int new_width = width;
+#if ARCH_ARM
+    // The ARM build of FFMPEG has a bug that if sws_scale is
+    // called with source and dest sizes the same, and
+    // formats as shown below, it causes a bus error and the
+    // application core dumps. To avoid this I make a -1
+    // difference in the new width, causing it to bypass
+    // the code optimization which is failing.
+    if (pix_fmt == AV_PIX_FMT_YUV420P
+      && dst_pix_fmt == AV_PIX_FMT_BGRA)
+        new_width = width - 1;
+#endif
     d->swsctx = sws_getCachedContext(d->swsctx, width, height, pix_fmt,
-                                     width, height, dst_pix_fmt,
+                                     new_width, height, dst_pix_fmt,
                                      SWS_FAST_BILINEAR, NULL, NULL, NULL);
     if (d->swsctx == NULL)
     {

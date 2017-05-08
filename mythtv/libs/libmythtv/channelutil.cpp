@@ -1855,6 +1855,7 @@ bool ChannelUtil::GetChannelData(
     uint    &mplexid,
     bool    &commfree)
 {
+    chanid        = 0;
     tvformat      = modulation = freqtable = QString::null;
     freqid        = dtv_si_std = QString::null;
     finetune      = 0;
@@ -1864,11 +1865,14 @@ bool ChannelUtil::GetChannelData(
     dvb_networkid = dvb_transportid = 0;
     commfree      = false;
 
+    int found = 0;
+    int id = -1;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT finetune, freqid, tvformat, freqtable, "
         "       commmethod, mplexid, "
-        "       atsc_major_chan, atsc_minor_chan, serviceid, chanid "
+        "       atsc_major_chan, atsc_minor_chan, serviceid, "
+        "       chanid,  visible "
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
         "      channum              = :CHANNUM         AND "
@@ -1881,7 +1885,39 @@ bool ChannelUtil::GetChannelData(
         MythDB::DBError("GetChannelData", query);
         return false;
     }
-    else if (!query.next())
+
+    while (query.next())
+    {
+        found += query.value(10).toInt();
+        if (id == -1 || found)
+        {
+            finetune      = query.value(0).toInt();
+            freqid        = query.value(1).toString();
+            tvformat      = query.value(2).toString();
+            freqtable     = query.value(3).toString();
+            commfree      = (query.value(4).toInt() == -2);
+            mplexid       = query.value(5).toUInt();
+            atsc_major    = query.value(6).toUInt();
+            atsc_minor    = query.value(7).toUInt();
+            mpeg_prog_num = (query.value(8).isNull()) ? -1
+                            : query.value(8).toInt();
+            chanid        = query.value(9).toUInt();
+        }
+    }
+
+    if (!found)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("No visible channels for %1").arg(channum));
+    }
+
+    if (found > 1)
+    {
+        LOG(VB_GENERAL, LOG_WARNING,
+            QString("Found multiple visible channels for %1").arg(channum));
+    }
+
+    if (!chanid)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetChannelData() failed because it could not\n"
@@ -1889,17 +1925,6 @@ bool ChannelUtil::GetChannelData(
                 .arg(channum).arg(sourceid));
         return false;
     }
-
-    finetune      = query.value(0).toInt();
-    freqid        = query.value(1).toString();
-    tvformat      = query.value(2).toString();
-    freqtable     = query.value(3).toString();
-    commfree      = (query.value(4).toInt() == -2);
-    mplexid       = query.value(5).toUInt();
-    atsc_major    = query.value(6).toUInt();
-    atsc_minor    = query.value(7).toUInt();
-    mpeg_prog_num = (query.value(8).isNull()) ? -1 : query.value(8).toInt();
-    chanid        = query.value(9).toUInt();
 
     if (!mplexid || (mplexid == 32767)) /* 32767 deals with old lineups */
         return true;

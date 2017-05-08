@@ -43,7 +43,7 @@ typedef QList<HLSStream*> StreamsList;
 class HLSRingBuffer : public RingBuffer
 {
 public:
-    HLSRingBuffer(const QString &lfilename);
+    explicit HLSRingBuffer(const QString &lfilename);
     HLSRingBuffer(const QString &lfilename, bool open);
     virtual ~HLSRingBuffer();
 

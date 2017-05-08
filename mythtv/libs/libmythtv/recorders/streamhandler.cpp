@@ -8,7 +8,8 @@
 #define O_LARGEFILE 0
 #endif
 
-#define LOC      QString("SH(%1): ").arg(_device)
+#define LOC      QString("SH%1(%2): ").arg(_recorder_ids_string) \
+                                      .arg(_device)
 
 StreamHandler::StreamHandler(const QString &device) :
     MThread("StreamHandler"),
@@ -46,6 +47,27 @@ StreamHandler::~StreamHandler()
     // This should never be triggered.. just to be safe..
     if (_running)
         Stop();
+}
+
+void StreamHandler::AddRecorderId(int id)
+{
+    if (id < 0)
+        return;
+
+    _recorder_ids_string.clear();
+    _recorder_ids.insert(id);
+    foreach (const int &value, _recorder_ids)
+        _recorder_ids_string += QString("[%1]").arg(value);
+}
+
+void StreamHandler::DelRecorderId(int id)
+{
+    if (id < 0)
+        return;
+    _recorder_ids.remove(id);
+    _recorder_ids_string.clear();
+    foreach (const int &value, _recorder_ids)
+        _recorder_ids_string += QString("[%1]").arg(value);
 }
 
 void StreamHandler::AddListener(MPEGStreamData *data,

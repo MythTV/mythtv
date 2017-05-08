@@ -32,9 +32,9 @@ class PIDInfo
         streamType(stream_type),         pesType(pes_type) {;}
     virtual ~PIDInfo() {;}
 
-    virtual bool Open(const QString &dev, bool use_section_reader)
+    virtual bool Open(const QString &/*dev*/, bool /*use_section_reader*/)
         { return false; }
-    virtual bool Close(const QString &dev) { return false; }
+    virtual bool Close(const QString &/*dev*/) { return false; }
     bool IsOpen(void) const { return filter_fd >= 0; }
 
     uint        _pid;
@@ -72,6 +72,9 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     explicit StreamHandler(const QString &device);
     ~StreamHandler();
 
+    void AddRecorderId(int id);
+    void DelRecorderId(int id);
+
     void Start(void);
     void Stop(void);
 
@@ -107,6 +110,8 @@ class StreamHandler : protected MThread, public DeviceReaderCB
 
   protected:
     QString           _device;
+    QSet<int>         _recorder_ids;
+    QString           _recorder_ids_string;
     bool              _needs_buffering;
     bool              _allow_section_reader;
 

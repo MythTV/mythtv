@@ -347,12 +347,10 @@ void UPnpDeviceDesc::GetValidXML(
 
     BaseAddr = sBaseAddress;
 
-#if !defined(QT_NO_IPV6)
     // Basically if it appears to be an IPv6 IP surround the IP with []
     //  otherwise don't bother
     if (sBaseAddress.contains(":"))
         BaseAddr = "[" + sBaseAddress + "]";
-#endif
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
           "<root xmlns=\"urn:schemas-upnp-org:device-1-0\" "

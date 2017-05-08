@@ -56,8 +56,8 @@ class SERVICE_PUBLIC RecStatus : public QObject
 
         static inline void InitializeCustomTypes();
 
-        RecStatus(QObject *parent = 0) : QObject(parent) {}
-        RecStatus(const RecStatus & /* src */)					 {}
+        explicit RecStatus(QObject *parent = 0) : QObject(parent) {}
+        explicit RecStatus(const RecStatus & /* src */)					 {}
 };
 
 Q_DECLARE_METATYPE( RecStatus )

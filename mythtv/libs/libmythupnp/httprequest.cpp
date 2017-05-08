@@ -1155,8 +1155,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
             QString sValue = (*it).section( '=', 1 );
             sValue.replace("+"," ");
 
-            if (!sName.isEmpty() &&
-                !sValue.isEmpty())
+            if (!sName.isEmpty())
             {
                 sName  = QUrl::fromPercentEncoding(sName.toUtf8());
                 sValue = QUrl::fromPercentEncoding(sValue.toUtf8());

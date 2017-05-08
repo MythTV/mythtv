@@ -293,7 +293,6 @@ from the database automagically when used in %MythTV's window classes.
  */
 
 /** \defgroup recorder_subsystem    Recorder Subsystem
-This line is filler that is ignored by Doxygen.
 
 TVRec is the main class for handling recording.
 It is passed a ProgramInfo for the current and next recordings,
@@ -352,7 +351,6 @@ state changing commands should not be issued.
  */
 
 /** \defgroup av_player_subsystem   A/V Player Subsystem
-This line is filler that is ignored by Doxygen.
 
 TV is the main class for handling playback.
 It instantiates several important classes:
@@ -393,7 +391,6 @@ state changing commands should not be issued.
  */
 
 /** \defgroup plugin_arch   Plugin Architecture
-This line is filler that is ignored by Doxygen.
 
 MythPlugins are shared object files (<I>i.e.</I> libraries) which are loaded
 from a specific directory (<I>%e.g.</I> /usr/local/lib/mythtv/plugins).
@@ -419,7 +416,6 @@ Other plugin functions are listed in the file \link mythpluginapi.h \endlink
 */
 
 /** \defgroup mtd                   MTD (the MythTV Transcoding Daemon)
-This line is filler that is ignored by Doxygen.
 
 The %MTD is a simple program that is used by the MythVideo plugin.
 
@@ -498,7 +494,6 @@ no dvd PATH
  */
 
 /** \defgroup myth_media            MythTV Media Manager
-This line is filler that is ignored by Doxygen.
 
 The MythTV Media Manager is a thread in the frontend which looks for any
 changes to removable media, and sends events to any Frontend Plugins
@@ -537,7 +532,6 @@ NOTMOUNTED
  */
 
 /** \defgroup myth_network_protocol MythTV Network Protocol
-This line is filler that is ignored by Doxygen.
 
 The MythTV backend process currently opens sockets for three different types
 of commands; a custom protocol (by default at port 6543),
@@ -587,7 +581,6 @@ For a full understanding of all the commands, either read the source code
  */
 
 /** \defgroup myth_startup MythTV Startup Sequence
-This line is filler that is ignored by Doxygen.
 
 Most MythTV programs follow a common sequence:
 <ol>
@@ -655,7 +648,6 @@ to access these assets:
 
 /**
 \defgroup lang_supp MythTV Language Support
-This line is filler that is ignored by Doxygen.
 
 There are three sets of language translations in %MythTV;
 source code translation, menus, and %MythWeb.
@@ -706,7 +698,6 @@ See mythplugins/mythweb/modules/_shared/lang/translations.txt for more info.
  */
 
 /** \defgroup qobject_dangers QObject is dangerous for your health
-This line is filler that is ignored by Doxygen.
 
 QObject derived classes can be quite useful, they can send and receive
 signals, get keyboard events, translate strings into another language
@@ -824,7 +815,6 @@ wrong slots.
 */
 
 /** \defgroup profiling_mythtv    Profiling MythTV
-This line is filler that is ignored by Doxygen.
 
 You can use any sampling profiler to profile %MythTV, the most
 popular GPL one is OProfile and this section tells you how to
@@ -979,7 +969,6 @@ an annotated versions of the code, and saving results.
 */
 
 /** \defgroup testing    Testing hints and shortcuts
-This line is filler that is ignored by Doxygen.
 
 The internal video playback can be tested by the programs/mythavtest tool:
 
@@ -1008,13 +997,14 @@ currently supported, so the ImportRecorder is substituted for DEMO cards.
 */
 
 /** \defgroup db_schema    MythTV Database Schema
-This line is filler that is ignored by Doxygen.
+How everything is stored in the MySQL database.
 */
 
 /** \defgroup libraries    MythTV Libraries
-This line is filler that is ignored by Doxygen.
+The shared libraries that the code base is split up into.
 */
 
-/** \defgroup libmythbase    libmythbase - Core MythTV library
+/** \defgroup libmythbase    libmythbase
     \ingroup libraries
+Core MythTV library
 */

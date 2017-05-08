@@ -2272,13 +2272,14 @@ VBoxConfigurationGroup::VBoxConfigurationGroup
     a_cardtype.addTargetedChild("VBOX", desc);
     a_cardtype.addTargetedChild("VBOX", cardip);
     a_cardtype.addTargetedChild("VBOX", cardtuner);
+    a_cardtype.addTargetedChild("VBOX", new SignalTimeout(parent, 7000, 1000));
+    a_cardtype.addTargetedChild("VBOX", new ChannelTimeout(parent, 10000, 1750));
+//    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
+//    buttonRecOpt->setLabel(tr("Recording Options"));
+//    addChild(buttonRecOpt);
 
-    GroupSetting *rec = new GroupSetting();
-    rec->setLabel(tr("Recording Options"));
-    rec->addChild(new SignalTimeout(parent, 1000, 250));
-    rec->addChild(new ChannelTimeout(parent, 3000, 1750));
-
-    a_cardtype.addTargetedChild("VBOX", rec);
+//    connect(buttonRecOpt, SIGNAL(pressed()),
+//            this,         SLOT(  VBoxExtraPanel()));
 
     connect(cardip,    SIGNAL(NewIP(const QString&)),
             deviceid,  SLOT(  SetIP(const QString&)));

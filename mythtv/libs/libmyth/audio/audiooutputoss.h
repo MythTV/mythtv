@@ -6,7 +6,7 @@
 class AudioOutputOSS : public AudioOutputBase
 {
   public:
-    AudioOutputOSS(const AudioSettings &settings);
+    explicit AudioOutputOSS(const AudioSettings &settings);
     virtual ~AudioOutputOSS();
 
     // Volume control

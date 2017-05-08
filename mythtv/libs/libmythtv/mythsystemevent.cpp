@@ -49,10 +49,10 @@ class SystemEventThread : public QRunnable
 
         uint result = myth_system(m_command, flags);
 
-        if (result != GENERIC_EXIT_OK)
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
-                QString("Command '%1' returned %2")
-                    .arg(m_command).arg(result));
+        LOG(VB_GENERAL,
+            (result == GENERIC_EXIT_OK ? LOG_INFO : LOG_WARNING), LOC +
+            QString("Finished '%1' result %2")
+            .arg(m_command).arg(result));
 
         if (m_event.isEmpty())
             return;
@@ -304,6 +304,9 @@ void MythSystemEventHandler::customEvent(QEvent *e)
         {
             SubstituteMatches(tokens, cmd);
 
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Starting thread for command '%1'").arg(cmd));
+
             SystemEventThread *eventThread =
                 new SystemEventThread(cmd, tokens[1]);
             MThreadPool::globalInstance()->startReserved(
@@ -381,6 +384,8 @@ MythSystemEventEditor::MythSystemEventEditor(MythScreenStack *parent,
     // base, the event names are listed in comments.
     m_settings["EventCmdRecPending"]           = // REC_PENDING
         tr("Recording pending");
+    m_settings["EventCmdRecPreFail"]           = // REC_PREFAIL
+        tr("Recording about to fail");
     m_settings["EventCmdRecFailing"]           = // REC_FAILING
         tr("Recording failing");
     m_settings["EventCmdRecStarted"]           = // REC_STARTED

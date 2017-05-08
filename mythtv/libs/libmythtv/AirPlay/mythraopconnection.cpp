@@ -46,7 +46,7 @@ QString MythRAOPConnection::g_rsaLastError;
 class _NetStream : public QTextStream
 {
 public:
-    _NetStream(QIODevice *device) : QTextStream(device)
+    explicit _NetStream(QIODevice *device) : QTextStream(device)
     {
     };
     _NetStream &operator<<(const QString &str)

@@ -52,7 +52,7 @@ DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
 class AudioOutputDXPrivate
 {
     public:
-        AudioOutputDXPrivate(AudioOutputDX *in_parent) :
+        explicit AudioOutputDXPrivate(AudioOutputDX *in_parent) :
             parent(in_parent),
             dsound_dll(NULL),
             dsobject(NULL),

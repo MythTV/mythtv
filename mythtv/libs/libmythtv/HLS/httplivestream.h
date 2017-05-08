@@ -26,7 +26,7 @@ class MTV_PUBLIC HTTPLiveStream
                    uint32_t bitrate = 800000, uint32_t abitrate = 64000,
                    uint16_t maxSegments = 0, uint16_t segmentSize = 10,
                    uint32_t aobitrate = 32000, int32_t srate = -1);
-    HTTPLiveStream(int streamid);
+    explicit HTTPLiveStream(int streamid);
    ~HTTPLiveStream();
 
     bool InitForWrite(void);

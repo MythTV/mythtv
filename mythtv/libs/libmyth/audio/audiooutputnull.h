@@ -21,7 +21,7 @@
 class AudioOutputNULL : public AudioOutputBase
 {
   public:
-    AudioOutputNULL(const AudioSettings &settings);
+    explicit AudioOutputNULL(const AudioSettings &settings);
 
     virtual ~AudioOutputNULL();
 

@@ -62,7 +62,7 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
     virtual QDateTime UpdateLastRun(QDateTime last, bool successful=true);
     virtual void    SetLastRun(QDateTime last, bool successful=true);
 
-    virtual bool    DoCheckRun(QDateTime now)       { return false;         }
+    virtual bool    DoCheckRun(QDateTime /*now*/)   { return false;         }
     virtual bool    DoRun(void)                     { return false;         }
 
     virtual void    Terminate(void)                 {}

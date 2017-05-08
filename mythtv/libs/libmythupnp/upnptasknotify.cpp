@@ -108,7 +108,13 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
             continue;
         }
 
-        QString ipaddress = (*it).toString();
+        QHostAddress ip = *it;
+        // Descope the Link Local address. The scope is only valid
+        // on the server sending the announcement, not the clients
+        // that receive it
+        ip.setScopeId(QString());
+
+        QString ipaddress = ip.toString();
 
         // If this looks like an IPv6 address, then enclose it in []'s
         if (ipaddress.contains(":"))

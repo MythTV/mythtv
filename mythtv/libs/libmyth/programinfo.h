@@ -75,7 +75,7 @@ class MPUBLIC ProgramInfo
     /// Copy constructor
     ProgramInfo(const ProgramInfo &other);
     /// Constructs a ProgramInfo from data in 'recorded' table
-    ProgramInfo(uint recordedid);
+    explicit ProgramInfo(uint recordedid);
     /// Constructs a ProgramInfo from data in 'recorded' table
     ProgramInfo(uint chanid, const QDateTime &recstartts);
     /// Constructs a ProgramInfo from data in 'recorded' table
@@ -245,7 +245,7 @@ class MPUBLIC ProgramInfo
                 const QString &programid,
                 const QString &inetref);
     /// Constructs a ProgramInfo for a pathname.
-    ProgramInfo(const QString &pathname);
+    explicit ProgramInfo(const QString &pathname);
     /// Constructs a ProgramInfo for a video.
     ProgramInfo(const QString &pathname,
                 const QString &plot,
@@ -271,7 +271,7 @@ class MPUBLIC ProgramInfo
         if (!FromStringList(it, end))
             clear();
     }
-    ProgramInfo(const QStringList &list) :
+    explicit ProgramInfo(const QStringList &list) :
         chanid(0),
         positionMapDBReplacement(NULL)
     {

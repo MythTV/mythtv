@@ -106,7 +106,7 @@ class MHHyperText : public MHText, public MHInteractible
     virtual void SetHighlightStatus(bool newStatus, MHEngine *engine)
     { InteractSetHighlightStatus(newStatus, engine); }
     virtual bool GetHighlightStatus(void) { return InteractGetHighlightStatus(); }
-    virtual void Deactivation(MHEngine *engine) { InteractDeactivation(); }
+    virtual void Deactivation(MHEngine */*engine*/) { InteractDeactivation(); }
 };
 
 // Get Text Data - get the data out of a text object.

@@ -44,7 +44,7 @@ QString ChannelDBStorage::GetSetClause(MSqlBindings &bindings) const
 class Name : public MythUITextEditSetting
 {
   public:
-    Name(const ChannelID &id) :
+    explicit Name(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "name"))
     {
         setLabel(QCoreApplication::translate("(Common)", "Channel Name"));
@@ -54,10 +54,12 @@ class Name : public MythUITextEditSetting
 class Channum : public MythUITextEditSetting
 {
   public:
-    Channum(const ChannelID &id) :
+    explicit Channum(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "channum"))
     {
         setLabel(QCoreApplication::translate("(Common)", "Channel Number"));
+        setHelpText(QCoreApplication::translate("(Common)",
+        "This is the number by which the channel is known to MythTV."));
     }
 };
 
@@ -119,7 +121,7 @@ class Source : public MythUIComboBoxSetting
 class Callsign : public MythUITextEditSetting
 {
   public:
-    Callsign(const ChannelID &id) :
+    explicit Callsign(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "callsign"))
     {
         setLabel(QCoreApplication::translate("(Common)", "Callsign"));
@@ -166,7 +168,7 @@ QStringList ChannelTVFormat::GetFormats(void)
 class TimeOffset : public MythUISpinBoxSetting
 {
   public:
-    TimeOffset(const ChannelID &id) :
+    explicit TimeOffset(const ChannelID &id) :
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "tmoffset"),
                              -1440, 1440, 1)
     {
@@ -184,7 +186,7 @@ class TimeOffset : public MythUISpinBoxSetting
 class Priority : public MythUISpinBoxSetting
 {
   public:
-    Priority(const ChannelID &id) :
+    explicit Priority(const ChannelID &id) :
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "recpriority"),
                              -99, 99, 1)
     {
@@ -201,7 +203,7 @@ class Priority : public MythUISpinBoxSetting
 class Icon : public MythUITextEditSetting
 {
   public:
-    Icon(const ChannelID &id) :
+    explicit Icon(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "icon"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)", "Icon"));
@@ -215,7 +217,7 @@ class Icon : public MythUITextEditSetting
 class VideoFilters : public MythUITextEditSetting
 {
   public:
-    VideoFilters(const ChannelID &id) :
+    explicit VideoFilters(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "videofilters"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -232,7 +234,7 @@ class VideoFilters : public MythUITextEditSetting
 class OutputFilters : public MythUITextEditSetting
 {
   public:
-    OutputFilters(const ChannelID &id) :
+    explicit OutputFilters(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "outputfilters"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -305,7 +307,7 @@ class XmltvID : public MythUIComboBoxSetting
 class ServiceID : public MythUISpinBoxSetting
 {
   public:
-    ServiceID(const ChannelID &id)
+    explicit ServiceID(const ChannelID &id)
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "serviceid"),
                                -1, UINT16_MAX, 1, true, "NULL")
     {
@@ -336,7 +338,7 @@ class ServiceID : public MythUISpinBoxSetting
 class CommMethod : public MythUIComboBoxSetting
 {
   public:
-    CommMethod(const ChannelID &id) :
+    explicit CommMethod(const ChannelID &id) :
        MythUIComboBoxSetting(new ChannelDBStorage(this, id, "commmethod"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -359,7 +361,7 @@ class CommMethod : public MythUIComboBoxSetting
 class Visible : public MythUICheckBoxSetting
 {
   public:
-    Visible(const ChannelID &id) :
+    explicit Visible(const ChannelID &id) :
         MythUICheckBoxSetting(new ChannelDBStorage(this, id, "visible"))
     {
         setValue(true);
@@ -374,7 +376,7 @@ class Visible : public MythUICheckBoxSetting
 class OnAirGuide : public MythUICheckBoxSetting
 {
   public:
-    OnAirGuide(const ChannelID &id) :
+    explicit OnAirGuide(const ChannelID &id) :
         MythUICheckBoxSetting(new ChannelDBStorage(this, id, "useonairguide"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
@@ -393,21 +395,22 @@ class OnAirGuide : public MythUICheckBoxSetting
 class Freqid : public MythUITextEditSetting
 {
   public:
-    Freqid(const ChannelID &id) :
+    explicit Freqid(const ChannelID &id) :
         MythUITextEditSetting(new ChannelDBStorage(this, id, "freqid"))
     {
         setLabel(QCoreApplication::translate("(ChannelSettings)",
-                                             "Frequency or Channel"));
+                                             "Freq/Channel"));
         setHelpText(QCoreApplication::translate("(ChannelSettings)",
-            "Specify either the exact frequency (in kHz) or a valid channel "
-            "for your 'TV Format'."));
+            "Depending on the tuner type, specify either the exact "
+            "frequency (in kHz) or a valid channel "
+            "number that will be understood by your tuners."));
     }
 };
 
 class Finetune : public MythUISpinBoxSetting
 {
   public:
-    Finetune(const ChannelID& id)
+    explicit Finetune(const ChannelID& id)
         : MythUISpinBoxSetting(new ChannelDBStorage(this, id, "finetune"),
                                -300, 300, 1)
     {
@@ -425,7 +428,7 @@ class Finetune : public MythUISpinBoxSetting
 class Contrast : public MythUISpinBoxSetting
 {
   public:
-    Contrast(const ChannelID &id) :
+    explicit Contrast(const ChannelID &id) :
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "contrast"),
                              0, 65535, 655)
     {
@@ -436,7 +439,7 @@ class Contrast : public MythUISpinBoxSetting
 class Brightness : public MythUISpinBoxSetting
 {
   public:
-    Brightness(const ChannelID &id) :
+    explicit Brightness(const ChannelID &id) :
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "brightness"),
                              0, 65535, 655)
     {
@@ -447,7 +450,7 @@ class Brightness : public MythUISpinBoxSetting
 class Colour : public MythUISpinBoxSetting
 {
   public:
-    Colour(const ChannelID &id) :
+    explicit Colour(const ChannelID &id) :
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "colour"),
                              0, 65535, 655)
     {
@@ -458,7 +461,7 @@ class Colour : public MythUISpinBoxSetting
 class Hue : public MythUISpinBoxSetting
 {
   public:
-    Hue(const ChannelID &id) :
+    explicit Hue(const ChannelID &id) :
         MythUISpinBoxSetting(new ChannelDBStorage(this, id, "hue"),
                              0, 65535, 655)
     {
@@ -467,7 +470,7 @@ class Hue : public MythUISpinBoxSetting
 };
 
 ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
-                                           uint default_sourceid)
+          uint default_sourceid, bool add_freqid)
 {
     setLabel(QCoreApplication::translate("(ChannelSettings)",
                                          "Channel Options - Common"));
@@ -476,8 +479,18 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     Source *source = new Source(id, default_sourceid);
     source->Load();
 
-    addChild(new Channum(id));
+    Channum *channum = new Channum(id);
+    addChild(channum);
+    if (add_freqid)
+    {
+        freqid = new Freqid(id);
+        addChild(freqid);
+    }
+    else
+        freqid = 0;
     addChild(new Callsign(id));
+
+
 
     addChild(new Visible(id));
     addChild(new ServiceID(id));
@@ -497,6 +510,8 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
             this,       SLOT(  onAirGuideChanged(bool)));
     connect(source,     SIGNAL(valueChanged( const QString&)),
             this,       SLOT(  sourceChanged(const QString&)));
+    connect(channum,     SIGNAL(valueChanged( const QString&)),
+            this,       SLOT(  channumChanged(const QString&)));
 };
 
 void ChannelOptionsCommon::onAirGuideChanged(bool fValue)
@@ -547,6 +562,12 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
     onairguide->setEnabled(supports_eit);
     xmltvID->setEnabled(!uses_eit_only);
     xmltvID->Load();
+}
+
+void ChannelOptionsCommon::channumChanged(const QString& channum)
+{
+    if (freqid)
+        freqid->setValue(channum);
 }
 
 ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id)

@@ -14,7 +14,7 @@ class InteractiveTV
 #ifdef USING_MHEG
   public:
     // Interface to Myth
-    InteractiveTV(MythPlayer *nvp);
+    explicit InteractiveTV(MythPlayer *nvp);
     InteractiveTV(const InteractiveTV& rhs);
     virtual ~InteractiveTV();
 

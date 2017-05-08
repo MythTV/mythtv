@@ -10,6 +10,10 @@ ifdef CONFIG_HDHOMERUN
     SUBDIRS += libhdhomerun
 endif
 
+ifdef CONFIG_X11
+    SUBDIRS += libXNVCtrl
+endif
+
 SUBDIRS_ALL = $(addsuffix -all, ${SUBDIRS})
 SUBDIRS_INSTALL = $(addsuffix -install, ${SUBDIRS})
 SUBDIRS_UNINSTALL = $(addsuffix -uninstall, ${SUBDIRS})
@@ -64,3 +68,6 @@ minilzo-all minilzo-clean minilzo-distclean minilzo-install minilzo-uninstall:
 
 libmythsoundtouch-all libmythsoundtouch-clean libmythsoundtouch-distclean libmythsoundtouch-install libmythsoundtouch-uninstall:
 	${MAKE} -C libmythsoundtouch ${@:libmythsoundtouch-%=%}
+
+libXNVCtrl-all libXNVCtrl-install libXNVCtrl-uninstall libXNVCtrl-clean libXNVCtrl-distclean:
+	${MAKE} -C libXNVCtrl -f Makefile.lib ${@:libXNVCtrl-%=%}

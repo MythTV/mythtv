@@ -110,8 +110,9 @@ using_x11 {
     # Add nvidia XV-EXTENSION support
     HEADERS += util-nvctrl.h
     SOURCES += util-nvctrl.cpp
-    LIBS += -L../libmythnvctrl -lmythnvctrl-$${LIBVERSION}
-    POST_TARGETDEPS += ../libmythnvctrl/libmythnvctrl-$${MYTH_LIB_EXT}
+    INCLUDEPATH += ../../external/libXNVCtrl
+    LIBS += -L../../external/libXNVCtrl -lmythXNVCtrl-$${LIBVERSION}
+    POST_TARGETDEPS += ../../external/libXNVCtrl/libmythXNVCtrl-$${LIBVERSION}.$${QMAKE_EXTENSION_STATICLIB}
 }
 
 using_qtdbus {

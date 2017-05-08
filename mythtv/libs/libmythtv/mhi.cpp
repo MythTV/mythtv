@@ -1684,14 +1684,14 @@ void MHIDLA::DrawBorderedRectangle(int x, int y, int width, int height)
 }
 
 // Ovals (ellipses)
-void MHIDLA::DrawOval(int x, int y, int width, int height)
+void MHIDLA::DrawOval(int /*x*/, int /*y*/, int /*width*/, int /*height*/)
 {
     // Not implemented.  Not actually used in practice.
 }
 
 // Arcs and sectors
-void MHIDLA::DrawArcSector(int x, int y, int width, int height,
-                           int start, int arc, bool isSector)
+void MHIDLA::DrawArcSector(int /*x*/, int /*y*/, int /*width*/, int /*height*/,
+                           int /*start*/, int /*arc*/, bool /*isSector*/)
 {
     // Not implemented.  Not actually used in practice.
 }

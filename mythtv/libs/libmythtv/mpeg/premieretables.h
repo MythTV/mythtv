@@ -10,7 +10,7 @@
 class PremiereContentInformationTable : public PSIPTable
 {
   public:
-    PremiereContentInformationTable(const PSIPTable& table) : PSIPTable(table)
+    explicit PremiereContentInformationTable(const PSIPTable& table) : PSIPTable(table)
     {
         assert(IsEIT(TableID()));
     }
@@ -45,7 +45,7 @@ class PremiereContentInformationTable : public PSIPTable
 class PremiereContentPresentationTable : public PSIPTable
 {
   public:
-    PremiereContentPresentationTable(const PSIPTable& table) : PSIPTable(table)
+    explicit PremiereContentPresentationTable(const PSIPTable& table) : PSIPTable(table)
     {
     }
 };

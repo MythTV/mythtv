@@ -51,7 +51,7 @@ public:
     bool operator==(AudioConvert& rhs) const
     { return m_in == rhs.m_in && m_out == rhs.m_out; }
     bool operator!=(AudioConvert& rhs) const
-    { return m_in != m_out; }
+    { return m_in != rhs.m_in || m_out != rhs.m_out; }
 
     void DeinterleaveSamples(int channels,
                              uint8_t* output, const uint8_t* input,

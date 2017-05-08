@@ -64,6 +64,7 @@ QWaitCondition epgIsVisibleCond;
 const QString kUnknownTitle = "";
 //const QString kUnknownCategory = QObject::tr("Unknown");
 const unsigned long kUpdateMS = 60 * 1000UL; // Grid update interval (mS)
+static bool SelectionIsTunable(const ChannelInfoList &selection);
 
 JumpToChannel::JumpToChannel(
     JumpToChannelListener *parent, const QString &start_entry,
@@ -805,16 +806,16 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             Close();
         else if (action == ACTION_SELECT)
         {
+            ProgramInfo *pginfo =
+                m_programInfos[m_currentRow][m_currentCol];
+            int secsTillStart =
+                (pginfo) ? MythDate::current().secsTo(
+                    pginfo->GetScheduledStartTime()) : 0;
             if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
             {
                 // See if this show is far enough into the future that it's
                 // probable that the user wanted to schedule it to record
                 // instead of changing the channel.
-                ProgramInfo *pginfo =
-                    m_programInfos[m_currentRow][m_currentCol];
-                int secsTillStart =
-                    (pginfo) ? MythDate::current().secsTo(
-                        pginfo->GetScheduledStartTime()) : 0;
                 if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
                     ((secsTillStart / 60) >= m_selectRecThreshold))
                 {
@@ -826,7 +827,11 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 }
             }
             else
-                EditRecording();
+                // Edit Recording should include "Watch this channel"
+                // is we selected a show that is current.
+                EditRecording(!m_player
+                    && SelectionIsTunable(GetSelection())
+                    && (secsTillStart / 60) < m_selectRecThreshold);
         }
         else if (action == "EDIT")
             EditScheduled();
@@ -1003,7 +1008,7 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
             else
                 cursorUp();
             break;
-            
+
         case MythGestureEvent::Down:
             if (m_verticalLayout)
                 cursorRight();
@@ -1100,7 +1105,7 @@ void GuideGrid::ShowMenu(void)
 
         if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
             menuPopup->AddButton(tr("Change to Channel"));
-        else if (SelectionIsTunable(GetSelection()))
+        else if (!m_player && SelectionIsTunable(GetSelection()))
             menuPopup->AddButton(tr("Watch This Channel"));
 
         menuPopup->AddButton(tr("Record This"));
@@ -1380,9 +1385,12 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     m_channelInfoIdx.clear();
     m_currentStartChannel = 0;
 
-    ChannelInfoList channels = ChannelUtil::GetChannels(
-        0, true, "", (m_changrpid < 0) ? 0 : m_changrpid);
-    ChannelUtil::SortChannels(channels, m_channelOrdering, false);
+    uint avail = 0;
+    ChannelInfoList channels = ChannelUtil::LoadChannels(0, 0, avail, true,
+                                         ChannelUtil::kChanOrderByChanNum,
+                                         ChannelUtil::kChanGroupByChanid,
+                                         0,
+                                         (m_changrpid < 0) ? 0 : m_changrpid);
 
     typedef vector<uint> uint_list_t;
     QMap<QString,uint_list_t> channum_to_index_map;
@@ -1915,6 +1923,14 @@ void GuideGrid::customEvent(QEvent *event)
                 delete record;
             }
         }
+        // Test for this here because it can come from 
+        // different menus.
+        else if (resulttext == tr("Watch This Channel"))
+        {
+            ChannelInfoList selection = GetSelection();
+            if (SelectionIsTunable(selection))
+                TV::StartTV(NULL, kStartTVNoFlags, selection);
+        }
         else if (resultid == "guidemenu")
         {
             if (resulttext == tr("Record This"))
@@ -1924,12 +1940,6 @@ void GuideGrid::customEvent(QEvent *event)
             else if (resulttext == tr("Change to Channel"))
             {
                 enter();
-            }
-            else if (resulttext == tr("Watch This Channel"))
-            {
-                ChannelInfoList selection = GetSelection();
-                if (SelectionIsTunable(selection))
-                    TV::StartTV(NULL, kStartTVNoFlags, selection);
             }
             else if (resulttext == tr("Program Details"))
             {

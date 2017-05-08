@@ -71,13 +71,25 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     QString sServerIP = gCoreContext->GetBackendServerIP();
     //QString sPeerIP   = pRequest->GetPeerAddress();
 
-    if ((params.dbHostName == "localhost") &&
-        !sServerIP.isEmpty())  // &&
+    if ((params.dbHostName.compare("localhost",Qt::CaseInsensitive)==0
+      || params.dbHostName == "127.0.0.1"
+      || params.dbHostName == "::1")
+      && !sServerIP.isEmpty())  // &&
         //(sServerIP         != sPeerIP    ))
     {
         params.dbHostName = sServerIP;
     }
 
+    // If dbHostName is an IPV6 address with scope,
+    // remove the scope. Unescaped % signs are an
+    // xml violation
+    QString dbHostName(params.dbHostName);
+    QHostAddress addr;
+    if (addr.setAddress(dbHostName))
+    {
+        addr.setScopeId(QString());
+        dbHostName = addr.toString();
+    }
     // ----------------------------------------------------------------------
     // Create and populate a ConnectionInfo object
     // ----------------------------------------------------------------------
@@ -87,7 +99,7 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     DTC::WOLInfo        *pWOL      = pInfo->WOL();
     DTC::VersionInfo    *pVersion  = pInfo->Version();
 
-    pDatabase->setHost         ( params.dbHostName    );
+    pDatabase->setHost         ( dbHostName           );
     pDatabase->setPing         ( params.dbHostPing    );
     pDatabase->setPort         ( params.dbPort        );
     pDatabase->setUserName     ( params.dbUserName    );

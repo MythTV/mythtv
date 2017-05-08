@@ -674,7 +674,7 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
             if (p->GetRecordingStatus() != pginfo->GetRecordingStatus())
             {
                 LOG(VB_GENERAL, LOG_INFO,
-                    QString("Updating status for %1 on cardid %2 (%3 => %4)")
+                    QString("Updating status for %1 on cardid [%2] (%3 => %4)")
                         .arg(p->toString(ProgramInfo::kTitleSubtitle))
                         .arg(p->GetInputID())
                         .arg(RecStatus::toString(p->GetRecordingStatus(),
@@ -724,7 +724,7 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
             if (p->GetRecordingStatus() != recstatus)
             {
                 LOG(VB_GENERAL, LOG_INFO,
-                    QString("Updating status for %1 on cardid %2 (%3 => %4)")
+                    QString("Updating status for %1 on cardid [%2] (%3 => %4)")
                         .arg(p->toString(ProgramInfo::kTitleSubtitle))
                         .arg(p->GetInputID())
                         .arg(RecStatus::toString(p->GetRecordingStatus(),
@@ -1161,7 +1161,7 @@ bool Scheduler::FindNextConflict(
         {
             LOG(VB_SCHEDULE, LOG_INFO, msg);
             LOG(VB_SCHEDULE, LOG_INFO,
-                QString("  cardid's: %1, %2 Shared input group: %3 "
+                QString("  cardid's: [%1], [%2] Shared input group: %3 "
                         "mplexid's: %4, %5")
                      .arg(p->GetInputID()).arg(q->GetInputID())
                      .arg(igrp.GetSharedInputGroup(
@@ -2711,7 +2711,7 @@ bool Scheduler::HandleRecording(
     QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
     if (tvit == m_tvList->end())
     {
-        QString msg = QString("Invalid cardid (%1) for %2")
+        QString msg = QString("Invalid cardid [%1] for %2")
             .arg(ri.GetInputID()).arg(ri.GetTitle());
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
 
@@ -2726,7 +2726,7 @@ bool Scheduler::HandleRecording(
     if (nexttv->IsTunerLocked())
     {
         QString msg = QString("SUPPRESSED recording \"%1\" on channel: "
-                              "%2 on cardid: %3, sourceid %4. Tuner "
+                              "%2 on cardid: [%3], sourceid %4. Tuner "
                               "is locked by an external application.")
             .arg(ri.GetTitle())
             .arg(ri.GetChanID())
@@ -2859,7 +2859,7 @@ bool Scheduler::HandleRecording(
     ri.SetRecordingStartTime(recstartts);
     tempri.SetRecordingStartTime(recstartts);
 
-    QString details = QString("%1: channel %2 on cardid %3, sourceid %4")
+    QString details = QString("%1: channel %2 on cardid [%3], sourceid %4")
         .arg(ri.toString(ProgramInfo::kTitleSubtitle))
         .arg(ri.GetChanID())
         .arg(ri.GetInputID())
