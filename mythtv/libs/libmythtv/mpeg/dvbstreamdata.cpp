@@ -634,7 +634,9 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::SDT:
         case TableID::SDTo:
         {
-            //ServiceDescriptionTableSection *sdt_section = new ServiceDescriptionTableSection(psip);
+            // Grab the sdt cache lock until I have this new section safely stashed away
+            QMutexLocker locker(&_cached_sdts_lock);
+
             ServiceDescriptionTableSection *sdt_section = new ServiceDescriptionTableSection();
             sdt_section->CloneAndShrink(psip);
             sdt_section->Parse();
@@ -706,7 +708,9 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if (!_dvb_eit_listeners.size() && !_eit_helper)
             return true;
 
-        //DVBEventInformationTableSection* eit_section = new DVBEventInformationTableSection(psip);
+        // Grab the eit cache lock until I have this new section safely stashed away
+        QMutexLocker eit_locker(&_cached_eits_lock);
+
         DVBEventInformationTableSection* eit_section = new DVBEventInformationTableSection();
         eit_section->CloneAndShrink(psip);
         eit_section->Parse();
@@ -758,8 +762,6 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 .arg(version));
 
             // Complete table seen
-            // Grab the eit cache lock
-            QMutexLocker locker(&_cached_eits_lock);
 
             eit_sections_cache_t& sections = _cached_eits[onid][tsid][sid][tid].sections;
 
@@ -827,9 +829,6 @@ void DVBStreamData::ProcessSDTSection(sdt_section_ptr_t sdtsection)
     if(HasAllSDTSections(*sdtsection))
     {
         // Complete table seen
-        // Grab the sdt cache lock
-        QMutexLocker locker(&_cached_sdts_lock);
-
         // Build a vector of the cached table sections
         sdt_sections_cache_t& sections = _cached_sdts[onid]
 													  [tsid]
