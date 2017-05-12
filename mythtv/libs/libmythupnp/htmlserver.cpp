@@ -194,8 +194,9 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                                         "font-src 'self'; "
                                         "img-src 'self'; "
                                         "form-action 'self'; "
-                                        "frame-ancestors 'self'; "
-                                        "reflected-xss filter;";
+                                        "frame-ancestors 'self'; ";
+
+                    pRequest->SetResponseHeader("X-XSS-Protection", "1; mode=block");
 
                     // For standards compliant browsers
                     pRequest->SetResponseHeader("Content-Security-Policy",
