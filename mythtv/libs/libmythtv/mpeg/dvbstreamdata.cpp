@@ -22,11 +22,13 @@ using namespace std;
 //#define PRINT_CACHE_DESTRUCTORS // Print EIT and SDT cache destructors to STDERR
 
 /// \remarks The time in seconds after which an EIT table is
-// considered stale and the event hash needs to be checked.
+// considered stale and the cryptographic hash will be used to
+// check for table version wrap.
 qint64 DVBStreamData::EIT_STALE_TIME = 600;
 
 /// \remarks The time in seconds after which an SDT table is
-// considered stale.
+// considered stale and the cryptographic hash will be used to
+// check for table version wrap.
 qint64 DVBStreamData::SDT_STALE_TIME = 3 * 60 * 60;
 
 eit_tssn_cache_t  DVBStreamData::_cached_eits;
@@ -224,7 +226,9 @@ void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, ui
 			_cached_eits[onid][tsid][sid].contains(tid)))
     	return; // Table is not cached
 
-    // Check if table is stale
+    // If the stale time has elapsed then check the incoming section against
+    // the stored cryptographic hash
+
     eit_sections_cache_wrapper_t& wrapper = _cached_eits[onid][tsid][sid][tid];
 
     if (wrapper.timestamp.secsTo(QDateTime::currentDateTimeUtc())
@@ -238,8 +242,7 @@ void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, ui
                                      QCryptographicHash::Md5)
                 != wrapper.hashes[section])
         {
-            // Table is stale. Remove the sections and hashes from the table
-            // but leave the status information intact.
+            // Hashes differ the version number has probably wrapped. Treat this as a new table
             LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("Table 0x%1/0x%2/0x%3/0x%4 is stale - removing")
                 .arg(onid,0,16).arg(tsid,0,16).arg(sid,0,16).arg(tid,0,16));
             for (eit_sections_cache_t::iterator section = wrapper.sections.begin();
@@ -247,6 +250,13 @@ void DVBStreamData::CheckStaleEIT(const DVBEventInformationTableSection& eit, ui
                 DeleteCachedTableSection(*section);
             wrapper.sections.clear();
             wrapper.hashes.clear();
+            _cached_eits[onid][tsid][sid].remove(tid);
+            if (_cached_eits[onid][tsid][sid].isEmpty())
+                _cached_eits[onid][tsid].remove(sid);
+            if (_cached_eits[onid][tsid].isEmpty())
+                _cached_eits[onid].remove(tsid);
+            if (_cached_eits[onid].isEmpty())
+                _cached_eits.remove(onid);
         }
         else
         {
@@ -269,7 +279,9 @@ void DVBStreamData::CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uin
 			_cached_sdts[onid][tsid].contains(tid)))
     	return; // Table is not cached
 
-    // Check if table is stale
+    // If the stale time has elapsed then check the incoming section against
+    // the stored cryptographic hash
+
     sdt_sections_cache_wrapper_t& wrapper = _cached_sdts[onid][tsid][tid];
 
     if ((wrapper.timestamp.secsTo(QDateTime::currentDateTimeUtc()))
@@ -283,7 +295,7 @@ void DVBStreamData::CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uin
                                      QCryptographicHash::Md5)
                 != wrapper.hashes[section])
         {
-            // Table is stale. Remove it from the cache.
+            // Hashes differ the version number has probably wrapped. Treat this as a new table
             LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString("Table 0x%1/0x%2/0x%3 is stale - removing")
                 .arg(onid).arg(tsid).arg(tid));
             for (sdt_sections_cache_t::iterator section = wrapper.sections.begin();
@@ -291,11 +303,15 @@ void DVBStreamData::CheckStaleSDT(const ServiceDescriptionTableSection& sdt, uin
                 DeleteCachedTableSection(*section);
             wrapper.sections.clear();
             wrapper.hashes.clear();
-            _cached_sdts[onid][tsid].remove(tsid);
+            _cached_sdts[onid][tsid].remove(tid);
+            if (_cached_sdts[onid][tsid].isEmpty())
+                _cached_sdts[onid].remove(tsid);
+            if (_cached_sdts[onid].isEmpty())
+                _cached_sdts.remove(onid);
         }
         else
         {
-        	//  Table is not stale probable duplicate section
+        	// Duplicate section
         	// reset the time stamp
         	wrapper.timestamp = QDateTime::currentDateTimeUtc();
         }
@@ -774,7 +790,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 DeleteCachedTableSection(*i);
 
             sections.clear();
-        }
+         }
 
         return true;
     }
@@ -1363,7 +1379,6 @@ bool DVBStreamData::DeleteCachedTableSection(PSIPTable *psip) const
     }
     else if ((TableID::SDT == tableID) || (TableID::SDTo == tableID))
     {
-        // Check that I can do this without a complete deadlock
         QMutexLocker locker(&_cached_sdts_lock);
 
         ServiceDescriptionTableSection* sdt = (ServiceDescriptionTableSection*)(psip);
