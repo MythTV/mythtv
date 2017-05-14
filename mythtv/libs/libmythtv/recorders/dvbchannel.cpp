@@ -38,6 +38,7 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <iostream>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -114,7 +115,19 @@ DVBChannel::~DVBChannel()
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
+
+    DVBChannel *master = NULL;
+    
+    if (master_map.contains(key))
+    {
+        if (master_map[key].isEmpty())
+            cerr << "~DVBChannel master_map for " << key.toStdString() << " is empty" << endl << flush;
+        else
+            master = static_cast<DVBChannel*>(master_map[key].front());
+    }
+    else
+        cerr << "~DVBChannel master_map does not contain key " << key.toStdString() << endl << flush;
+
     if (master == this)
     {
         master_map[key].pop_front();
