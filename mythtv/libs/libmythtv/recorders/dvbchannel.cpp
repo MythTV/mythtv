@@ -89,6 +89,12 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
+    cerr << QString("DVBChannel(0x%1) parent 0x%2 key %3")
+            .arg(uint64_t(this), 0, 16)
+            .arg(uint64_t(m_pParent), 0, 16)
+            .arg(key).toStdString()
+            << endl << flush;
+            
     master_map[key].push_back(this); // == RegisterForMaster
     DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
     if (master == this)
@@ -108,28 +114,61 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
 
 DVBChannel::~DVBChannel()
 {
+    cerr << QString("~DVBChannel(0x%1)").arg(uint64_t(this), 0, 16).toStdString() << endl << flush;
+
     // set a new master if there are other instances and we're the master
     // whether we are the master or not remove us from the map..
     master_map_lock.lockForWrite();
     QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
+    QString key_base = key;
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
+    cerr << QString("~DVBChannel(0x%1) parent 0x%2 key %3")
+                    .arg(uint64_t(this), 0, 16)
+                    .arg(uint64_t(m_pParent), 0, 16)
+                    .arg(key).toStdString()
+                    << endl << flush;
 
     DVBChannel *master = NULL;
     
     if (master_map.contains(key))
     {
         if (master_map[key].isEmpty())
-            cerr << "~DVBChannel master_map for " << key.toStdString() << " is empty" << endl << flush;
+        {
+            cerr << QString("~DVBChannel(0x%1) master_map for %2 is empty").arg(uint64_t(this), 0, 16).arg(key).toStdString() << endl << flush;
+            return;
+        }
         else
             master = static_cast<DVBChannel*>(master_map[key].front());
     }
     else
-        cerr << "~DVBChannel master_map does not contain key " << key.toStdString() << endl << flush;
+    {
+        cerr << QString("~DVBChannel(0x%1) master_map does not contain key %2").arg(uint64_t(this), 0, 16).arg(key).toStdString() << endl << flush;
+        cerr << QString("~DVBChannel(0x%1) Map contains keys").arg(uint64_t(this), 0, 16).toStdString() << endl << flush;
+        for (MasterMap::const_iterator it = master_map.begin(); it != master_map.end(); it++)
+            cerr << QString("~DVBChannel(0x%1) %2").arg(uint64_t(this), 0, 16).arg(it.key()).toStdString() << endl << flush;
+        // Look for an entry for key_base
+        if (master_map.contains(key_base))
+        {
+            if (master_map[key_base].isEmpty())
+            {
+                cerr << QString("~DVBChannel(0x%1) master_map for %2 is empty").arg(uint64_t(this), 0, 16).arg(key_base).toStdString() << endl << flush;
+                return;
+            }
+            else
+                master = static_cast<DVBChannel*>(master_map[key_base].front());
+        }
+        else
+        {
+            cerr << QString("~DVBChannel(0x%1) master_map does not contain key %2").arg(uint64_t(this), 0, 16).arg(key_base).toStdString() << endl << flush;
+            return;
+        }
+    }
 
     if (master == this)
     {
+        cerr << QString("~DVBChannel(0x%1) popping this from master_map").arg(uint64_t(this), 0, 16).toStdString() << endl << flush;
         master_map[key].pop_front();
         DVBChannel *new_master = NULL;
         if (!master_map[key].empty())
@@ -139,6 +178,7 @@ DVBChannel::~DVBChannel()
     }
     else
     {
+        cerr << QString("~DVBChannel(0x%1) removing all instances of this from master_map").arg(uint64_t(this), 0, 16).toStdString() << endl << flush;
         master_map[key].removeAll(this);
     }
     master_map_lock.unlock();
