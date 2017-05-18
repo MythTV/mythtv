@@ -38,7 +38,6 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <iostream>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -113,7 +112,6 @@ DVBChannel::~DVBChannel()
     // whether we are the master or not remove us from the map..
     master_map_lock.lockForWrite();
     QString key = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    QString key_base = key;
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
