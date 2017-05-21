@@ -1518,6 +1518,7 @@ void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     QRect area = m_actualBrowserArea;
     area.translate(xoffset, yoffset);
 
+    p->SetClipRect(clipRect);
     p->DrawImage(area.x(), area.y(), m_image, alphaMod);
 }
 

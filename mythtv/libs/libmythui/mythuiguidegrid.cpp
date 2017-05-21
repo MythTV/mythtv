@@ -321,6 +321,7 @@ QColor MythUIGuideGrid::calcColor(const QColor &color, int alphaMod)
 void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                                int alphaMod, QRect clipRect)
 {
+    p->SetClipRect(clipRect);
     for (int i = 0; i < m_rowCount; i++)
     {
         QList<UIGTCon *>::iterator it = m_allData[i].begin();
