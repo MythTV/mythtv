@@ -409,7 +409,7 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
 
 MythSocket *MythCoreContext::ConnectCommandSocket(
     const QString &hostname, int port, const QString &announce,
-    bool *p_proto_mismatch, bool gui, int maxConnTry, int setup_timeout)
+    bool *p_proto_mismatch, int maxConnTry, int setup_timeout)
 {
     MythSocket *serverSock = NULL;
 
