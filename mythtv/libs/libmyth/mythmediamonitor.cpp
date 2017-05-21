@@ -617,9 +617,27 @@ QList<MythMediaDevice*> MediaMonitor::GetMedias(unsigned mediatypes)
     return medias;
 }
 
+/** \fn MediaMonitor::RegisterMediaHandler
+ *  \brief Register a handler for media related events.
+ *
+ *  This method registers a callback function for when media related
+ *  events occur. The call must specify the type of media supported by
+ *  the handler, and (if needed) a list of media file extensions that
+ *  are supported.
+ *
+ *  \param destination A name for this callback function. For example:
+ *                     "MythDVD DVD Media Handler".  This argument
+ *                     must be unique as it is also used as the key
+ *                     for creating the map of handler.
+ *  \param description Unused.
+ *  \param callback    The function to call when an event occurs.
+ *  \param mediaType   The type of media supported by this callback. The
+ *                     value must be an enum of type MythMediaType.
+ *  \param extensions A list of file name extensions supported by this
+ *  callback.
+ */
 void MediaMonitor::RegisterMediaHandler(const QString  &destination,
                                         const QString  &description,
-                                        const QString  &key,
                                         void          (*callback)
                                               (MythMediaDevice*),
                                         int             mediaType,
@@ -631,7 +649,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (extensions.length())
-            msg += QString(", ext(0x%1)").arg(extensions, 0, 16);
+            msg += QString(", ext(%1)").arg(extensions, 0, 16);
 
         LOG(VB_MEDIA, LOG_INFO,
                  "Registering '" + destination + "' as a media handler for " +
