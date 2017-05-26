@@ -29,8 +29,7 @@ static GlobalTextEditSetting *MasterServerName()
     GlobalTextEditSetting *gc = new GlobalTextEditSetting("MasterServerName");
     gc->setLabel(QObject::tr("Master Backend Name"));
     gc->setValue("");
-    // TODO
-    // gc->setRO();
+    gc->setEnabled(false);
     gc->setHelpText(QObject::tr(
                     "Host name of Master Backend. This is set by selecting "
                     "\"This server is the Master Backend\" on that server."));

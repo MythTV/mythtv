@@ -248,6 +248,8 @@ class VideoSource : public GroupSetting {
         if (name)
             GroupSetting::Save();
     }
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
   private:
     class ID: public IdSetting
@@ -688,9 +690,8 @@ public:
 
     virtual void Save(void);
 
-    virtual bool keyPressEvent(QKeyEvent *);
-
-    void DeleteCard(bool doDelete);
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
 private:
 
@@ -778,21 +779,6 @@ class MTV_PUBLIC CaptureCardEditor : public GroupSetting
     void DeleteAllCaptureCards(bool);
     void DeleteAllCaptureCardsOnHost(bool);
     void AddNewCard(void);
-};
-
-class MTV_PUBLIC VideoSourceDialog : public StandardSettingDialog
-{
-    Q_OBJECT
-
-    public:
-      VideoSourceDialog(MythScreenStack *parent);
-      void ShowMenu(void);
-
-    private slots:
-      void ShowDeleteSourceDialog(void);
-
-    private:
-      void DeleteSource(VideoSource *videosource);
 };
 
 class MTV_PUBLIC VideoSourceEditor : public GroupSetting

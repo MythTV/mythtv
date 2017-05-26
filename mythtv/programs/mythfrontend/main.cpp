@@ -68,7 +68,6 @@ using namespace std;
 #include "langsettings.h"
 #include "mythtranslation.h"
 #include "commandlineparser.h"
-#include "channelgroupsettings.h"
 #include "tvremoteutil.h"
 
 #include "myththemedmenu.h"

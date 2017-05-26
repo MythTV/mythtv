@@ -392,6 +392,8 @@ class MPUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
 
 class MPUBLIC GroupSetting : public StandardSetting
 {
+    Q_OBJECT
+
   public:
     GroupSetting();
 
@@ -400,6 +402,8 @@ class MPUBLIC GroupSetting : public StandardSetting
     virtual void applyChange() {}
     virtual void updateButton(MythUIButtonListItem *item);
     virtual StandardSetting* byName(const QString &name);
+    virtual bool canDelete(void) {return false;}
+    virtual void deleteEntry(void) {}
 };
 
 class MPUBLIC ButtonStandardSetting : public StandardSetting
@@ -432,10 +436,15 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
     bool Create(void);
     virtual void customEvent(QEvent *event);
     virtual bool keyPressEvent(QKeyEvent *);
+    virtual void ShowMenu(void);
+    void deleteEntry(void);
 
   public slots:
     void Close(void);
     void updateSettings(StandardSetting *selectedSetting = NULL);
+    void editEntry(void);
+    void deleteSelected(void);
+    void deleteEntryConfirmed(bool ok);
 
   protected:
     virtual void Load(void);

@@ -84,6 +84,8 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     virtual bool loadByGroup(const QString &name, const QString &group);
     virtual void CompleteLoad(int profileId, const QString &type,
                               const QString &name);
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
     // sets
     void setCodecTypes();

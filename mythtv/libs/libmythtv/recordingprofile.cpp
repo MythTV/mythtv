@@ -1893,4 +1893,25 @@ QString RecordingProfile::getName(int id)
     return QString::null;
 }
 
+bool RecordingProfile::canDelete(void)
+{
+    return true;
+}
+
+void RecordingProfile::deleteEntry(void)
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "DELETE "
+        "FROM recordingprofiles "
+        "WHERE id = :ID");
+
+    result.bindValue(":ID", id->getValue());
+
+    if (!result.exec())
+        MythDB::DBError("RecordingProfile::deleteEntry", result);
+
+}
+
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

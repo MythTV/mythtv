@@ -42,10 +42,8 @@ class MTV_PUBLIC PlayGroupConfig : public GroupSetting
     PlayGroupConfig(const QString &label, const QString &name, bool isNew=false);
     virtual void updateButton(MythUIButtonListItem *item);
     virtual void Save();
-    virtual bool keyPressEvent(QKeyEvent *);
-
-  protected slots:
-    void DeletePlayBackGroup(bool doDelete);
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
   private:
     StandardSetting            *m_titleMatch;

@@ -258,6 +258,8 @@ class ChannelGroupSetting : public GroupSetting
     ChannelGroupSetting(const QString &groupName, int groupId);
     virtual void Load();
     virtual void Close();
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
   private:
     int m_groupId;
@@ -268,9 +270,15 @@ class ChannelGroupSetting : public GroupSetting
 
 class ChannelGroupsSetting : public GroupSetting
 {
+    Q_OBJECT
+
   public:
     ChannelGroupsSetting();
     virtual void Load();
+
+  public slots:
+    void ShowNewGroupDialog(void);
+    void CreateNewGroup(QString name);
 
   private:
     ButtonStandardSetting *m_addGroupButton;

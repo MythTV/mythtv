@@ -14,6 +14,7 @@ class MPUBLIC StorageGroupEditor :
   public:
     explicit StorageGroupEditor(QString group);
     virtual void Load(void);
+    virtual bool canDelete(void);
 
   protected slots:
     void DoDeleteSlot(bool doDelete);
@@ -35,6 +36,10 @@ class MPUBLIC StorageGroupListEditor :
     StorageGroupListEditor(void);
     virtual void Load(void);
     void AddSelection(const QString &label, const QString &value);
+
+public slots:
+    void ShowNewGroupDialog(void);
+    void CreateNewGroup(QString name);
 };
 
 class StorageGroupDirStorage : public SimpleDBStorage

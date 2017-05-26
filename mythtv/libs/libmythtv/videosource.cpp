@@ -699,55 +699,14 @@ VideoSource::VideoSource()
     addChild(new DVBNetID(*this, -1, -1));
 }
 
-VideoSourceDialog::VideoSourceDialog(MythScreenStack *parent) :
-    StandardSettingDialog(parent, "videosourceeditor", new VideoSourceEditor())
+bool VideoSource::canDelete(void)
 {
+    return true;
 }
 
-void VideoSourceDialog::ShowDeleteSourceDialog(void)
+void VideoSource::deleteEntry(void)
 {
-    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
-    if (!item)
-        return;
-
-    VideoSource *videosource = item->GetData().value<VideoSource*>();
-    if (!videosource)
-        return;
-
-    QString message = tr("Do you want to delete the '%1' video source?")
-        .arg(videosource->getSourceName());
-    ShowOkPopup(message, this,
-                [videosource, this](bool result)
-                {
-                    if (result)
-                        DeleteSource(videosource);
-                },
-                true);
-}
-
-void VideoSourceDialog::ShowMenu()
-{
-    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
-    if (!item)
-        return;
-
-    VideoSource *videosource = item->GetData().value<VideoSource*>();
-    if (!videosource)
-        return;
-
-    MythMenu *menu = new MythMenu(tr("Video Source Menu"), this, "mainmenu");
-    menu->AddItem(tr("Delete"), SLOT(ShowDeleteSourceDialog()));
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
-                                                 "menudialog");
-    menuPopup->SetReturnEvent(this, "mainmenu");
-
-    if (menuPopup->Create())
-        popupStack->AddScreen(menuPopup);
-    else
-        delete menuPopup;
+    SourceUtil::DeleteSource(getSourceID());
 }
 
 bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
@@ -2863,39 +2822,16 @@ void CaptureCard::loadByID(int cardid)
     Load();
 }
 
-bool CaptureCard::keyPressEvent(QKeyEvent *event)
+bool CaptureCard::canDelete(void)
 {
-    QStringList actions;
-    bool handled =
-        GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
-
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-
-        if (action == "DELETE")
-        {
-            handled = true;
-            ShowOkPopup(
-                tr("Are you sure you want to delete this capture card?"),
-                this,
-                SLOT(DeleteCard(bool)),
-                true);
-        }
-    }
-
-    return handled;
+    return true;
 }
 
-void CaptureCard::DeleteCard(bool doDelete)
+void CaptureCard::deleteEntry(void)
 {
-    if (doDelete)
-    {
-        CardUtil::DeleteCard(getCardID());
-        getParent()->Load();
-        emit settingsChanged(getParent());
-    }
+    CardUtil::DeleteCard(getCardID());
 }
+
 
 void CaptureCard::Save(void)
 {
@@ -3891,12 +3827,6 @@ void VideoSourceEditor::DeleteAllSources(bool doDelete)
     SourceUtil::DeleteAllSources();
     Load();
     emit settingsChanged(this);
-}
-
-void VideoSourceDialog::DeleteSource(VideoSource *videosource)
-{
-    SourceUtil::DeleteSource(videosource->getSourceID());
-    GetGroupSettings()->removeChild(videosource);
 }
 
 void VideoSourceEditor::NewSource(void)

@@ -59,7 +59,15 @@ bool StorageGroupEditor::keyPressEvent(QKeyEvent *e)
             ShowDeleteDialog();
         }
     }
-    return handled;
+    if (handled)
+        return handled;
+    else
+        return GroupSetting::keyPressEvent(e);
+}
+
+bool StorageGroupEditor::canDelete(void)
+{
+    return true;
 }
 
 void StorageGroupEditor::ShowDeleteDialog()
@@ -235,8 +243,6 @@ void StorageGroupEditor::Load(void)
     connect(button, SIGNAL(clicked()), SLOT(ShowFileBrowser()));
     addChild(button);
 
-    if (!m_group.startsWith("__CREATE_NEW_STORAGE_GROUP__"))
-    {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT dirname, id FROM storagegroup "
                       "WHERE groupname = :NAME AND hostname = :HOSTNAME "
@@ -268,7 +274,6 @@ void StorageGroupEditor::Load(void)
             {
                 SetLabel();
             }
-        }
     }
 
     StandardSetting::Load();
@@ -435,8 +440,12 @@ void StorageGroupListEditor::Load(void)
     }
 
     if (isMaster)
-        AddSelection(tr("(Create new group)"),
-                        "__CREATE_NEW_STORAGE_GROUP__");
+    {
+        ButtonStandardSetting *newGroup =
+            new ButtonStandardSetting(tr("(Create new group)"));
+        connect(newGroup, SIGNAL(clicked()), SLOT(ShowNewGroupDialog()));
+        addChild(newGroup);
+    }
     else
     {
         curName = 0;
@@ -453,6 +462,35 @@ void StorageGroupListEditor::Load(void)
     }
 
     StandardSetting::Load();
+}
+
+
+void StorageGroupListEditor::ShowNewGroupDialog()
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack,
+                                tr("Enter the name of the new storage group"));
+
+    if (settingdialog->Create())
+    {
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewGroup(QString)));
+        popupStack->AddScreen(settingdialog);
+    }
+    else
+    {
+        delete settingdialog;
+    }
+}
+
+void StorageGroupListEditor::CreateNewGroup(QString name)
+{
+    StorageGroupEditor *button = new StorageGroupEditor(name);
+    button->setLabel(name + tr(" Storage Group Directories"));
+    button->Load();
+    addChild(button);
+    emit settingsChanged(this);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

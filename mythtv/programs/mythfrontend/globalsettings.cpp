@@ -4525,24 +4525,8 @@ ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
 void ChannelGroupSetting::Close()
 {
     //Change the name
-    if (m_markForDeletion && m_markForDeletion->boolValue() && m_groupId > 1)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        // Delete channels from this group
-        query.prepare("DELETE FROM channelgroup WHERE grpid = :GRPID;");
-        query.bindValue(":GRPID", m_groupId);
-        if (!query.exec())
-            MythDB::DBError("ChannelGroupSetting::Close", query);
-
-        // Now delete the group from channelgroupnames
-        query.prepare("DELETE FROM channelgroupnames WHERE grpid = :GRPID;");
-        query.bindValue(":GRPID", m_groupId);
-        if (!query.exec())
-            MythDB::DBError("ChannelGroupSetting::Close", query);
-        return;
-    }
-
-    if (m_groupName && m_groupName->haveChanged())
+    if ((m_groupName && m_groupName->haveChanged())
+      || m_groupId == -1)
     {
         if (m_groupId == -1)//create a new group
         {
@@ -4563,6 +4547,9 @@ void ChannelGroupSetting::Close()
                 query.bindValue(":NEWNAME", m_groupName->getValue());
                 if (!query.exec())
                     MythDB::DBError("ChannelGroupSetting::Close", query);
+                else
+                    if (query.next())
+                        m_groupId = query.value(0).toUInt();
             }
         }
         else
@@ -4577,7 +4564,8 @@ void ChannelGroupSetting::Close()
             if (!query.exec())
                 MythDB::DBError("ChannelGroupSetting::Close", query);
             else
-                m_groupId = query.value(0).toUInt();
+                if (query.next())
+                    m_groupId = query.value(0).toUInt();
         }
     }
 
@@ -4623,8 +4611,8 @@ void ChannelGroupSetting::Load()
     //{
         m_groupName = new TransTextEditSetting();
         m_groupName->setLabel(tr("Group name"));
-        if (m_groupId > -1)
-            m_groupName->setValue(getLabel());
+//        if (m_groupId > -1)
+        m_groupName->setValue(getLabel());
         m_groupName->setEnabled(m_groupId != 1);
         addChild(m_groupName);
     //}
@@ -4634,7 +4622,8 @@ void ChannelGroupSetting::Load()
     QString qstr =
         "SELECT channel.chanid, channum, name, grpid FROM channel "
         "LEFT JOIN channelgroup "
-        "ON (channel.chanid = channelgroup.chanid AND grpid = :GRPID) ;";
+        "ON (channel.chanid = channelgroup.chanid AND grpid = :GRPID) "
+        "ORDER BY channum+0; "; //to order by numeric value of channel number
 
     query.prepare(qstr);
 
@@ -4655,14 +4644,31 @@ void ChannelGroupSetting::Load()
         }
     }
 
-    //can not delete new group or Favorite
-    m_markForDeletion = new TransMythUICheckBoxSetting();
-    m_markForDeletion->setLabel(tr("Mark for deletion"));
-    addChild(m_markForDeletion);
-    m_markForDeletion->setEnabled(m_groupId > 1);
-
     GroupSetting::Load();
 }
+
+bool ChannelGroupSetting::canDelete(void)
+{
+    //can not delete new group or Favorite
+    return (m_groupId > 1);
+}
+
+void ChannelGroupSetting::deleteEntry(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    // Delete channels from this group
+    query.prepare("DELETE FROM channelgroup WHERE grpid = :GRPID;");
+    query.bindValue(":GRPID", m_groupId);
+    if (!query.exec())
+        MythDB::DBError("ChannelGroupSetting::deleteEntry", query);
+
+    // Now delete the group from channelgroupnames
+    query.prepare("DELETE FROM channelgroupnames WHERE grpid = :GRPID;");
+    query.bindValue(":GRPID", m_groupId);
+    if (!query.exec())
+        MythDB::DBError("ChannelGroupSetting::Close", query);
+}
+
 
 ChannelGroupsSetting::ChannelGroupsSetting()
     : GroupSetting(),
@@ -4674,7 +4680,11 @@ ChannelGroupsSetting::ChannelGroupsSetting()
 void ChannelGroupsSetting::Load()
 {
     clearSettings();
-    addChild(new ChannelGroupSetting(tr("Create New Channel Group")));
+    ButtonStandardSetting *newGroup =
+        new ButtonStandardSetting(tr("(Create New Channel Group)"));
+    connect(newGroup, SIGNAL(clicked()), SLOT(ShowNewGroupDialog()));
+    addChild(newGroup);
+
     addChild(new ChannelGroupSetting(tr("Favorites"), 1));
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -4701,5 +4711,35 @@ void ChannelGroupsSetting::Load()
     //TODO select the new one or the edited one
     emit settingsChanged(NULL);
 }
+
+
+void ChannelGroupsSetting::ShowNewGroupDialog()
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack,
+                                tr("Enter the name of the new channel group"));
+
+    if (settingdialog->Create())
+    {
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewGroup(QString)));
+        popupStack->AddScreen(settingdialog);
+    }
+    else
+    {
+        delete settingdialog;
+    }
+}
+
+void ChannelGroupsSetting::CreateNewGroup(QString name)
+{
+    ChannelGroupSetting *button = new ChannelGroupSetting(name,-1);
+    button->setLabel(name);
+    button->Load();
+    addChild(button);
+    emit settingsChanged(this);
+}
+
 
 // vim:set sw=4 ts=4 expandtab:

@@ -91,7 +91,6 @@ class ProfileGroup : public GroupSetting
 public:
     ProfileGroup();
 
-    virtual bool keyPressEvent(QKeyEvent *);
     virtual void loadByID(int id);
 
     static bool addMissingDynamicProfiles(void);
@@ -111,7 +110,6 @@ public:
     bool allowedGroupName(void);
 
 private:
-    void CallDelete(void);
 
     ID* id;
     Name* name;
@@ -125,13 +123,9 @@ class MTV_PUBLIC ProfileGroupEditor :
     Q_OBJECT
 
   public:
-    ProfileGroupEditor() { }
+    ProfileGroupEditor() { setLabel(tr("Profile Group")); }
 
     virtual void Load(void);
-
-  protected slots:
-    void ShowNewProfileDialog(void);
-    void CreateNewProfile(QString name);
 };
 
 #endif

@@ -1005,10 +1005,15 @@ void StandardSettingDialog::Close(void)
         MythScreenType::Close();
 }
 
+static QKeyEvent selectEvent
+    (QKeyEvent(QEvent::KeyPress,0,Qt::NoModifier,"SELECT"));
+static QKeyEvent deleteEvent
+    (QKeyEvent(QEvent::KeyPress,0,Qt::NoModifier,"DELETE"));
 
 bool StandardSettingDialog::keyPressEvent(QKeyEvent *e)
 {
     QStringList actions;
+
     bool handled = m_buttonList->keyPressEvent(e);
     if (handled)
         return true;
@@ -1041,6 +1046,12 @@ bool StandardSettingDialog::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "RIGHT")
             LevelDown();
+        else if (action == "EDIT")
+        {
+            keyPressEvent(&selectEvent);
+        }
+        else if (action == "DELETE")
+            deleteEntry();
         else
             handled = MythScreenType::keyPressEvent(e);
     }
@@ -1048,3 +1059,75 @@ bool StandardSettingDialog::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
+void StandardSettingDialog::ShowMenu()
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (!item)
+        return;
+
+    GroupSetting *source = item->GetData().value<GroupSetting*>();
+    if (!source)
+        return;
+    // m_title->GetText() for screen title
+    MythMenu *menu = new MythMenu(source->getLabel(), this, "mainmenu");
+    menu->AddItem(tr("Edit"), SLOT(editEntry()));
+    if (source->canDelete())
+        menu->AddItem(tr("Delete"), SLOT(deleteSelected()));
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
+                                                 "menudialog");
+    menuPopup->SetReturnEvent(this, "mainmenu");
+
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
+    else
+        delete menuPopup;
+}
+
+void StandardSettingDialog::editEntry()
+{
+    keyPressEvent(&selectEvent);
+}
+
+void StandardSettingDialog::deleteSelected()
+{
+    keyPressEvent(&deleteEvent);
+}
+
+void StandardSettingDialog::deleteEntry()
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (!item)
+        return;
+
+    GroupSetting *source = item->GetData().value<GroupSetting*>();
+    if (!source)
+        return;
+
+    if (source->canDelete())
+    {
+        QString message = tr("Do you want to delete the '%1' entry?")
+            .arg(source->getLabel());
+        ShowOkPopup(message, this, SLOT(deleteEntryConfirmed(bool)), true);
+    }
+}
+
+void StandardSettingDialog::deleteEntryConfirmed(bool ok)
+{
+    if (ok)
+    {
+        MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+        if (!item)
+            return;
+        GroupSetting *source = item->GetData().value<GroupSetting*>();
+        if (!source)
+            return;
+        source->deleteEntry();
+//        m_settingsTree->removeChild(source);
+        source->getParent()->removeChild(source);
+        m_buttonList->RemoveItem(item);
+    }
+
+}

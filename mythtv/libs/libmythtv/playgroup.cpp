@@ -135,6 +135,10 @@ PlayGroupConfig::PlayGroupConfig(const QString &label, const QString &name,
     addChild(m_skipBack = new SkipBack(*this));
     addChild(m_jumpMinutes = new JumpMinutes(*this));
     addChild(m_timeStrech = new TimeStretch(*this));
+
+    // Ensure new entries are saved on exit
+    if (isNew)
+        setChanged(true);
 }
 
 void PlayGroupConfig::updateButton(MythUIButtonListItem *item)
@@ -168,50 +172,20 @@ void PlayGroupConfig::Save()
         GroupSetting::Save();
 }
 
-bool PlayGroupConfig::keyPressEvent(QKeyEvent *event)
+bool PlayGroupConfig::canDelete(void)
 {
-    QStringList actions;
-    bool handled =
-        GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
-
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-
-        if (action == "DELETE")
-        {
-            handled = true;
-            if (getName() != "Default")
-            {
-                QString message = tr("Delete playback group:\n'%1'?")
-                    .arg(getName());
-                ShowOkPopup(message,
-                            this,
-                            SLOT(DeletePlayBackGroup(bool)),
-                            true);
-            }
-            else
-                ShowOkPopup(tr("Can't delete default group"));
-        }
-    }
-
-    return handled;
+    return (getName() != "Default");
 }
 
-void PlayGroupConfig::DeletePlayBackGroup(bool doDelete)
+void PlayGroupConfig::deleteEntry(void)
 {
-    if (doDelete)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM playgroup "
-                      "WHERE name = :NAME ;");
-        query.bindValue(":NAME", getName());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM playgroup "
+                    "WHERE name = :NAME ;");
+    query.bindValue(":NAME", getName());
 
-        if (query.exec())
-            getParent()->removeChild(this);
-        else
-            MythDB::DBError("PlayGroupConfig::Save", query);
-    }
+    if (!query.exec())
+        MythDB::DBError("PlayGroupConfig::deleteEntry", query);
 }
 
 int PlayGroup::GetCount(void)
