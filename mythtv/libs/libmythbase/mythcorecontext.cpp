@@ -1329,6 +1329,24 @@ bool MythCoreContext::IsUIThread(void)
     return is_current_thread(d->m_UIThread);
 }
 
+/**
+ *  \brief Send a message to the backend and wait for a response.
+ *
+ *  \param strlist      A QStringList used for both sending commands
+ *                      to the backend and receiving responses from
+ *                      the backend.
+ *  \param quickTimeout If true, the short timeout is used while
+ *                      waiting for a response. If false (the default)
+ *                      then the long timeout is used.
+ *  \param block        If true (the default) and the request sent to
+ *                      the backend times out, this function will
+ *                      attempt to reconnect and reissue the
+ *                      request. If false, this function will not
+ *                      attempt to reconnect to the backend.
+ *
+ *  \sa kShortTimeout
+ *  \sa kLongTimeout
+ */
 bool MythCoreContext::SendReceiveStringList(
     QStringList &strlist, bool quickTimeout, bool block)
 {
@@ -1377,12 +1395,15 @@ bool MythCoreContext::SendReceiveStringList(
                 d->m_eventSock = NULL;
             }
 
-            ConnectToMasterServer(d->m_blockingClient);
-
-            if (d->m_serverSock)
+            if (block)
             {
-                ok = d->m_serverSock->SendReceiveStringList(
-                    strlist, 0, timeout);
+                ConnectToMasterServer(d->m_blockingClient);
+
+                if (d->m_serverSock)
+                {
+                    ok = d->m_serverSock->SendReceiveStringList(
+                        strlist, 0, timeout);
+                }
             }
         }
 
