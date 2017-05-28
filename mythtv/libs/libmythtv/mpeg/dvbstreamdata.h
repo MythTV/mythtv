@@ -94,6 +94,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     void SetEITSectionSeen(DVBEventInformationTableSection& eit_section);
     bool EITSectionSeen(const DVBEventInformationTableSection& eit_section) const;
     bool HasAllEITSections(const DVBEventInformationTableSection& eit_section) const;
+    int MissingEITSections(const DVBEventInformationTableSection& eit_section) const;
 
 
     void SetSDTSectionSeen(ServiceDescriptionTableSection& sdt_section);

@@ -559,8 +559,8 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     virtual QString toString(void) const;
     virtual QString toStringXML(uint indent_level) const;
 
-    void CloneAndShrink(const PSIPTable& table);
-
+    void CloneAndShrink(const PSIPTable& table, uint pid = 0);
+    uint GetPID() { return *(uint*)(_fullbuffer + _allocSize); } // N.B. must only be used on CloneAndShrink tables
     static const uint PSIP_OFFSET = 8; // general PSIP header offset
 
   protected:

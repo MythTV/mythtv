@@ -26,6 +26,7 @@ public:
                         uint32_t last_section, uint32_t segment_last_section = 0xffff);
     bool IsSectionSeen(int32_t version, uint32_t section) const;
     bool HasAllSections() const;
+    int MissingSections() const;
 
     int32_t     m_version;
     sections_t  m_sections;
@@ -43,6 +44,7 @@ public:
                         uint32_t last_section, uint32_t segment_last_section = 0xffff);
     bool IsSectionSeen(uint32_t key, int32_t version, uint32_t section) const;
     bool HasAllSections(uint32_t key) const;
+    int MissingSections(uint32_t key) const;
 };
 
 #endif // TABLESTATUS_H_

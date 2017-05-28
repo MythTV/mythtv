@@ -364,14 +364,26 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
         {
             // EITa(ctive)
             chanid = GetChanID((*eit_section_ptr)->ServiceID());
+            LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("actual - chanid %1 serviceid %2 pid %3")
+												.arg(chanid)
+												.arg((*eit_section_ptr)->ServiceID())
+												.arg((*eit_section_ptr)->GetPID()));
         }
         else
         {
             // EITo(ther)
             chanid = GetChanID((*eit_section_ptr)->ServiceID(), (*eit_section_ptr)->OriginalNetworkID(), (*eit_section_ptr)->TSID());
-            // do not reschedule if its only present+following
-            if ((*eit_section_ptr)->TableID() != TableID::PF_EITo)
+            LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("other - chanid %1 serviceid %2 onid %3 tsid %4 pid %5")
+												.arg(chanid)
+												.arg((*eit_section_ptr)->ServiceID())
+												.arg((*eit_section_ptr)->OriginalNetworkID())
+												.arg((*eit_section_ptr)->TSID())
+												.arg((*eit_section_ptr)->GetPID()));
+												
+           // do not reschedule if its only present+following
+           if ((*eit_section_ptr)->TableID() != TableID::PF_EITo)
             {
+                LOG(VB_TEMPDEBUG, LOG_DEBUG, "other not PF set seenEITother");
                 seenEITother = true;
             }
         }
@@ -1016,7 +1028,7 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
     if (query.size() > 1)
     {
         LOG(VB_EIT, LOG_INFO,
-            LOC + QString("found %1 channels for networdid %2, "
+            LOC + QString("found %1 channels for networkid %2, "
                           "transportid %3, serviceid %4 but none "
                           "for current sourceid %5.")
                 .arg(query.size()).arg(networkid).arg(transportid)
