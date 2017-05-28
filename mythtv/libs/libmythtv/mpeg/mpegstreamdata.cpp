@@ -1909,13 +1909,6 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
     LOG(status != kEncDecrypted ? VB_GENERAL : VB_RECORD, LOG_DEBUG, LOC +
         QString("PID 0x%1 status: %2") .arg(pid,0,16).arg(toString(status)));
 
-//    LOG(VB_TEMPDEBUG, LOG_INFO, LOC +
-//        QString("PID 0x%1 status: %2 encrypted packets %3 decrypted packets %4")
-//        .arg(pid,0,16)
-//        .arg(toString(status))
-//        .arg(info.encrypted_packets)
-//        .arg(info.decrypted_packets));
-
     uint_vec_t pnum_del_list;
     const uint_vec_t &pnums = _encryption_pid_to_pnums[pid];
     for (uint i = 0; i < pnums.size(); i++)
@@ -1948,8 +1941,6 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
         if (status == _encryption_pnum_to_status[pnums[i]])
             continue; // program encryption status unchanged
 
-//        LOG(VB_TEMPDEBUG, LOG_INFO, LOC + QString("Program %1 status: %2")
-//                .arg(pnums[i]).arg(toString(status)));
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Program %1 status: %2")
                 .arg(pnums[i]).arg(toString(status)));
 

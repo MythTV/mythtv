@@ -731,7 +731,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         DVBEventInformationTableSection original(psip);
 
         DVBEventInformationTableSection* eit_section = new DVBEventInformationTableSection();
-        eit_section->CloneAndShrink(psip);
+        eit_section->CloneAndShrink(psip, pid);
         eit_section->Parse();
 
         uint onid = eit_section->OriginalNetworkID();
@@ -772,10 +772,6 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         	// Translate the onid
             onid = InternalOriginalNetworkID(onid, tsid);
 
-            LOG(VB_TEMPDEBUG, LOG_DEBUG, LOC + QString("New EIT section serviceid original %1 cloned %2")
-                .arg(original.ServiceID())
-                .arg(sid));
-                
             LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
                     "Subtable 0x%1/0x%2/0x%3/%4 complete version %5")
                 .arg(onid,0,16)

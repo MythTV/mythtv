@@ -327,12 +327,14 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
     return true;
 }
 
-void PSIPTable::CloneAndShrink(const PSIPTable& table)
+void PSIPTable::CloneAndShrink(const PSIPTable& table, uint pid)
 {
     // Shrink the data down to just the PES data
+    // plus enough space to save the current pid
     _pesdataSize = _allocSize = table.Length();
-    _pesdata = _fullbuffer = pes_alloc(_allocSize);
+    _pesdata = _fullbuffer = pes_alloc(_allocSize + sizeof(uint));
     memcpy(_fullbuffer, table.pesdata(), _allocSize);
+    *(uint*)(_fullbuffer + _allocSize) = pid;
 }
 
 ProgramAssociationTable* ProgramAssociationTable::CreateBlank(bool smallPacket)

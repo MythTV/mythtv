@@ -355,7 +355,6 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
 {
     uint chanid = 0;
 
-    LOG(VB_TEMPDEBUG, LOG_DEBUG, "Processing an EIT table");
     eit_sections_cache_const_t::const_iterator eit_section_ptr = EventInformationTable.begin();
 
     if (eit_section_ptr != EventInformationTable.end())
@@ -365,19 +364,21 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
         {
             // EITa(ctive)
             chanid = GetChanID((*eit_section_ptr)->ServiceID());
-            LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("actual - chanid %1 serviceid %2")
+            LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("actual - chanid %1 serviceid %2 pid %3")
 												.arg(chanid)
-												.arg((*eit_section_ptr)->ServiceID()));
+												.arg((*eit_section_ptr)->ServiceID())
+												.arg((*eit_section_ptr)->GetPID()));
         }
         else
         {
             // EITo(ther)
             chanid = GetChanID((*eit_section_ptr)->ServiceID(), (*eit_section_ptr)->OriginalNetworkID(), (*eit_section_ptr)->TSID());
-            LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("other - chanid %1 serviceid %2 onid %3 tsid %4")
+            LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("other - chanid %1 serviceid %2 onid %3 tsid %4 pid %5")
 												.arg(chanid)
 												.arg((*eit_section_ptr)->ServiceID())
 												.arg((*eit_section_ptr)->OriginalNetworkID())
-												.arg((*eit_section_ptr)->TSID()));
+												.arg((*eit_section_ptr)->TSID())
+												.arg((*eit_section_ptr)->GetPID()));
 												
            // do not reschedule if its only present+following
            if ((*eit_section_ptr)->TableID() != TableID::PF_EITo)
@@ -921,16 +922,10 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
     key |= ((uint64_t) networkid) << 32;
     key |= ((uint64_t) tsid)      << 48;
 
-    LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("GetChanID - sourceid %1 serviceid %2 networkid %3 tsid %4")
-                                        .arg(sourceid)
-                                        .arg(serviceid)
-                                        .arg(networkid)
-                                        .arg(tsid));
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
     if (it != srv_to_chanid.end())
         return max(*it, 0u);
 
-    LOG(VB_TEMPDEBUG, LOG_DEBUG, QString("GetChanID - trying the database"));
     uint chanid = get_chan_id_from_db_dvb(sourceid, serviceid, networkid, tsid);
     srv_to_chanid[key] = chanid;
 
