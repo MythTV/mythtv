@@ -5765,23 +5765,81 @@ ProgramInfo* LoadProgramFromProgram(const uint chanid,
 bool LoadFromOldRecorded(
     ProgramList &destination, const QString &sql, const MSqlBindings &bindings)
 {
+    uint count = 0;
+    return LoadFromOldRecorded(destination, sql, bindings, 0, 0, count);
+}
+
+bool LoadFromOldRecorded(ProgramList &destination, const QString &sql, 
+                         const MSqlBindings &bindings,
+                         const uint &start, const uint &limit, uint &count)
+{
     destination.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
+    query.setForwardOnly(true);
+
+    QString columns =
+        "oldrecorded.chanid, starttime, endtime, "
+        "title, subtitle, description, season, episode, category, seriesid, "
+        "programid, inetref, channel.channum, channel.callsign, "
+        "channel.name, findid, rectype, recstatus, recordid, duplicate ";
 
     QString querystr =
-        "SELECT oldrecorded.chanid, starttime, endtime, "
-        "       title, subtitle, description, season, episode, category, seriesid, "
-        "       programid, inetref, channel.channum, channel.callsign, "
-        "       channel.name, findid, rectype, recstatus, recordid, "
-        "       duplicate "
-        " FROM oldrecorded "
-        " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
-        " WHERE oldrecorded.future = 0 "
+        "SELECT %1 "
+        "FROM oldrecorded "
+        "LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
+        "WHERE oldrecorded.future = 0 "
         + sql;
 
-    query.prepare(querystr);
+    // If a limit arg was given then append the LIMIT, otherwise set a hard
+    // limit of 20000.
+    if (limit > 0)
+        querystr += QString("LIMIT %1 ").arg(limit);
+    else if (!querystr.contains(" LIMIT "))
+        querystr += " LIMIT 20000 "; // For performance reasons we have to have an upper limit
+
     MSqlBindings::const_iterator it;
+    // If count is non-zero then also return total number of matching records,
+    // irrespective of any LIMIT clause
+    //
+    // SQL_CALC_FOUND_ROWS is better than COUNT(*), as COUNT(*) won't work
+    // with any GROUP BY clauses. COUNT is marginally faster but not enough to
+    // matter
+    //
+    // It's considerably faster in my tests to do a separate query which returns
+    // no data using SQL_CALC_FOUND_ROWS than it is to use SQL_CALC_FOUND_ROWS
+    // with the full query. Unfortunate but true.
+    //
+    // e.g. Fetching all programs for the next 14 days with a LIMIT of 10 - 220ms
+    //      Same query with SQL_CALC_FOUND_ROWS - 1920ms
+    //      Same query but only one column and with SQL_CALC_FOUND_ROWS - 370ms
+    //      Total to fetch both the count and the data = 590ms vs 1920ms
+    //      Therefore two queries is 1.4 seconds faster than one query.
+    if (count > 0 && (start > 0 || limit > 0))
+    {
+        QString countStr = querystr.arg("SQL_CALC_FOUND_ROWS oldrecorded.chanid");
+        query.prepare(countStr);
+        for (it = bindings.begin(); it != bindings.end(); ++it)
+        {
+            if (countStr.contains(it.key()))
+                query.bindValue(it.key(), it.value());
+        }
+
+        if (!query.exec())
+        {
+            MythDB::DBError("LoadFromOldRecorded", query);
+            return false;
+        }
+
+        if (query.exec("SELECT FOUND_ROWS()") && query.next())
+            count = query.value(0).toUInt();
+    }
+
+    if (start > 0)
+        querystr += QString("OFFSET %1 ").arg(start);
+
+    querystr = querystr.arg(columns);
+    query.prepare(querystr);
     for (it = bindings.begin(); it != bindings.end(); ++it)
     {
         if (querystr.contains(it.key()))

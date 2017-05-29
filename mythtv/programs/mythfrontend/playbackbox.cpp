@@ -1675,6 +1675,7 @@ bool PlaybackBox::UpdateUILists(void)
         bool isUnknownCategory = (m_recGroup == tr("Unknown"));
         bool isAllProgsGroup   = (m_recGroup == "All Programs");
         bool isDeletedGroup    = (m_recGroup == "Deleted");
+        bool isLiveTvGroup     = (m_recGroup == "LiveTV");
 
         vector<ProgramInfo*> list;
         bool newest_first = (0==m_allOrder);
@@ -1689,6 +1690,7 @@ bool PlaybackBox::UpdateUILists(void)
             m_progsInDB++;
 
             const QString& pRecgroup(p->GetRecordingGroup());
+            const bool     isLiveTVProg(pRecgroup == "LiveTV");
 
             // Never show anything from unauthorised passworded groups
             QString password = getRecGroupPassword(pRecgroup);
@@ -1706,8 +1708,9 @@ bool PlaybackBox::UpdateUILists(void)
             {
                 continue;
             }
-            // Optionally ignore LiveTV
-            else if (!(m_viewMask & VIEW_LIVETVGRP) && pRecgroup == "LiveTV")
+            // Optionally ignore LiveTV programs if not viewing LiveTV group
+            else if (!(m_viewMask & VIEW_LIVETVGRP) &&
+                     !isLiveTvGroup && isLiveTVProg)
             {
                 continue;
             }
@@ -1730,8 +1733,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (p->GetTitle().isEmpty())
                 p->SetTitle(tr("_NO_TITLE_"));
 
-            if (m_viewMask != VIEW_NONE &&
-                    (pRecgroup != "LiveTV" || m_recGroup == "LiveTV"))
+            if (m_viewMask != VIEW_NONE && (!isLiveTVProg || isLiveTvGroup))
             {
                 m_progLists[""].push_front(p);
             }
@@ -1742,8 +1744,7 @@ bool PlaybackBox::UpdateUILists(void)
             else
                 p->SetAvailableStatus(asAvailable,  "UpdateUILists");
 
-            if (m_recGroup != "LiveTV" &&
-                    pRecgroup == "LiveTV" && (m_viewMask & VIEW_LIVETVGRP))
+            if (!isLiveTvGroup && isLiveTVProg && (m_viewMask & VIEW_LIVETVGRP))
             {
                 QString tmpTitle = tr("Live TV");
                 sortedList[tmpTitle.toLower()] = tmpTitle;
@@ -1753,8 +1754,7 @@ bool PlaybackBox::UpdateUILists(void)
             }
 
             // Show titles
-            if ((m_viewMask & VIEW_TITLES) &&
-                    (pRecgroup != "LiveTV" || m_recGroup == "LiveTV"))
+            if ((m_viewMask & VIEW_TITLES) && (!isLiveTVProg || isLiveTvGroup))
             {
                 sTitle = construct_sort_title(
                             p->GetTitle(), m_viewMask, titleSort,
@@ -1769,7 +1769,7 @@ bool PlaybackBox::UpdateUILists(void)
 
             // Show recording groups
             if ((m_viewMask & VIEW_RECGROUPS) &&
-                    !pRecgroup.isEmpty() && pRecgroup != "LiveTV")
+                !pRecgroup.isEmpty() && !isLiveTVProg)
             {
                 sortedList[pRecgroup.toLower()] = pRecgroup;
                 m_progLists[pRecgroup.toLower()].push_front(p);
@@ -1797,7 +1797,7 @@ bool PlaybackBox::UpdateUILists(void)
             }
 
             if ((m_viewMask & VIEW_WATCHLIST) &&
-                    pRecgroup != "LiveTV" && pRecgroup != "Deleted")
+                !isLiveTVProg && pRecgroup != "Deleted")
             {
                 if (m_watchListAutoExpire && !p->IsAutoExpirable())
                 {

@@ -489,7 +489,8 @@ void DeleteMap::NewCut(uint64_t frame)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC +
                         QString("Deleting bounded marker: %1").arg(otherframe));
-                    Delete(otherframe);
+                    it = m_deleteMap.erase(it);
+                    m_changed = true;
                 }
             }
         }

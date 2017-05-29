@@ -119,6 +119,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
             m_DupInType       = src.m_DupInType        ;
             m_DupMethod       = src.m_DupMethod        ;
             m_EncoderId       = src.m_EncoderId        ;
+            m_EncoderName     = src.m_EncoderName      ;
             m_Profile         = src.m_Profile          ;
             m_SerializeDetails= src.m_SerializeDetails ;
         }

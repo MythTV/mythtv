@@ -148,6 +148,7 @@ WebSocketWorker::~WebSocketWorker()
 
     m_eventLoop->deleteLater();
     m_eventLoop = NULL;
+    delete m_heartBeat;
 }
 
 void WebSocketWorker::Exec()
@@ -206,7 +207,7 @@ void WebSocketWorker::SetupSocket()
     {
         m_socket = new QTcpSocket();
         m_socket->setSocketDescriptor(m_socketFD);
-        if (gCoreContext->CheckSubnet(m_socket))
+        if (!gCoreContext->CheckSubnet(m_socket))
         {
             delete m_socket;
             m_socket = 0;

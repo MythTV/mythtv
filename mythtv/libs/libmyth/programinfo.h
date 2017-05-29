@@ -441,6 +441,7 @@ class MPUBLIC ProgramInfo
 
     uint    GetSourceID(void)             const { return sourceid;     }
     uint    GetInputID(void)              const { return inputid;      }
+    QString GetInputName(void)            const { return inputname;    }
 
     uint    GetFindID(void)               const { return findid;       }
 
@@ -833,6 +834,14 @@ MPUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings);
+
+MPUBLIC bool LoadFromOldRecorded(
+    ProgramList        &destination, 
+    const QString      &sql, 
+    const MSqlBindings &bindings,
+    const uint         &start, 
+    const uint         &limit,
+    uint               &count);
 
 MPUBLIC bool LoadFromRecorded(
     ProgramList        &destination,

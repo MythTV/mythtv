@@ -503,7 +503,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
     if (!sFormat.isEmpty()
         && !QImageWriter::supportedImageFormats().contains(sFormat.toLower().toLocal8Bit()))
     {
-        throw "GetPreviewImage: Specified 'Format' is not supported.";
+        throw QString("GetPreviewImage: Specified 'Format' is not supported.");
     }
 
     // ----------------------------------------------------------------------
@@ -1081,7 +1081,7 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
                                                   int nSampleRate )
 {
     if (nId < 0)
-        throw( "Id is invalid" );
+        throw QString( "Id is invalid" );
 
     VideoMetadataListManager::VideoMetadataPtr metadata =
                           VideoMetadataListManager::loadOneFromDatabase(nId);

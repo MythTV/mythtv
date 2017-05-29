@@ -112,7 +112,8 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "    [not]tomorrow\n"
             "    [not]second\n"
             "    #[-#]\n"
-            "    all\n\n"
+            "    all\n"
+            "Note that if all is specified any others will be ingored.\n\n"
             "example:\n"
             "   --refresh today --refresh 4-8 --refresh nottomorrow")
         ->SetGroup("Filtering");
@@ -175,6 +176,14 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
         ->SetBlocks("refreshsecond")
         ->SetBlocks("refreshday")
         ->SetBlocks("maxdays")
+        ->SetGroup("Filtering");
+
+    add("--no-allatonce", "noallatonce", false,
+            "Do not use allatonce even if the grabber prefers it.",
+            "This option prevents mythfilldatabase from utlizing "
+            "the advertised grabber preference of 'allatonce'. "
+            "This may be necessary for grabbers that return a large "
+            "amount of data")
         ->SetGroup("Filtering");
 
     add("--dd-grab-all", "ddgraball", false,

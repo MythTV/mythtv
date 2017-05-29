@@ -147,13 +147,8 @@ void FillProgramInfo( DTC::Program *pProgram,
             pRecording->setDupInType   ( pRecInfo.GetDuplicateCheckSource() );
             pRecording->setDupMethod   ( pRecInfo.GetDuplicateCheckMethod() );
             pRecording->setEncoderId   ( pRecInfo.GetInputID()              );
-            if (pProgram->Channel())
-            {
-                QString encoderName = CardUtil::GetDisplayName(pRecInfo.GetInputID());
-                pRecording->setEncoderName( encoderName );
-            }
-
-            pRecording->setProfile( pRecInfo.GetProgramRecordingProfile() );
+            pRecording->setEncoderName ( pRecInfo.GetInputName()            );
+            pRecording->setProfile     ( pRecInfo.GetProgramRecordingProfile() );
         }
     }
 

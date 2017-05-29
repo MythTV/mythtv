@@ -53,16 +53,16 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
                                            int              nCount)
 {
     if (!rawStartTime.isValid())
-        throw( "StartTime is invalid" );
+        throw QString( "StartTime is invalid" );
 
     if (!rawEndTime.isValid())
-        throw( "EndTime is invalid" );
+        throw QString( "EndTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime.toUTC();
     QDateTime dtEndTime = rawEndTime.toUTC();
 
     if (dtEndTime < dtStartTime)
-        throw( "EndTime is before StartTime");
+        throw QString( "EndTime is before StartTime");
 
     if (nStartIndex <= 0)
         nStartIndex = 0;
@@ -179,16 +179,16 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
                                         bool             bDescending)
 {
     if (!rawStartTime.isNull() && !rawStartTime.isValid())
-        throw( "StartTime is invalid" );
+        throw QString( "StartTime is invalid" );
 
     if (!rawEndTime.isNull() && !rawEndTime.isValid())
-        throw( "EndTime is invalid" );
+        throw QString( "EndTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime;
     QDateTime dtEndTime = rawEndTime;
 
     if (!rawEndTime.isNull() && dtEndTime < dtStartTime)
-        throw( "EndTime is before StartTime");
+        throw QString( "EndTime is before StartTime");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -215,7 +215,12 @@ DTC::ProgramList* Guide::GetProgramList(int              nStartIndex,
     else
         sSQL = "WHERE ";
 
-    sSQL +=    "visible != 0 AND program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
+    if (bOnlyNew)
+        sSQL = "LEFT JOIN oldprogram ON oldprogram.oldtitle = program.title "
+                + sSQL
+                + "oldprogram.oldtitle IS NULL AND ";
+
+    sSQL += "visible != 0 AND program.manualid = 0 "; // Exclude programmes created purely for 'manual' recording schedules
 
     if (nChanId < 0)
         nChanId = 0;
@@ -333,9 +338,9 @@ DTC::Program* Guide::GetProgramDetails( int              nChanId,
 
 {
     if (!(nChanId > 0))
-        throw( "Channel ID is invalid" );
+        throw QString( "Channel ID is invalid" );
     if (!rawStartTime.isValid())
-        throw( "StartTime is invalid" );
+        throw QString( "StartTime is invalid" );
 
     QDateTime dtStartTime = rawStartTime.toUTC();
 
@@ -506,7 +511,7 @@ QStringList Guide::GetStoredSearches( const QString& sType )
 
     if (iType == kNoSearch)
     {
-        //throw( "Invalid Type" );
+        //throw QString( "Invalid Type" );
         return keywordList;
     }
 
@@ -524,4 +529,38 @@ QStringList Guide::GetStoredSearches( const QString& sType )
     }
 
     return keywordList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Guide::AddToChannelGroup   ( int nChannelGroupId,
+                                  int nChanId )
+{
+    bool bResult = false;
+
+    if (!(nChanId > 0))
+        throw QString( "Channel ID is invalid" );
+
+    bResult = ChannelGroup::AddChannel(nChanId, nChannelGroupId);
+
+    return bResult;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Guide::RemoveFromChannelGroup ( int nChannelGroupId,
+                                     int nChanId )
+{
+    bool bResult = false;
+
+    if (!(nChanId > 0))
+        throw QString( "Channel ID is invalid" );
+
+    bResult = ChannelGroup::DeleteChannel(nChanId, nChannelGroupId);
+
+    return bResult;
 }

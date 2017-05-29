@@ -40,7 +40,7 @@
 class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.2" );
+    Q_CLASSINFO( "version"    , "2.3" )
 
     public:
 
@@ -91,6 +91,12 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
         virtual QStringList         GetCategoryList     ( ) = 0;
 
         virtual QStringList         GetStoredSearches   ( const QString &Type ) = 0;
+
+        virtual bool                AddToChannelGroup   ( int              ChannelGroupId,
+                                                          int              ChanId ) = 0;
+
+        virtual bool                RemoveFromChannelGroup ( int           ChannelGroupId,
+                                                             int           ChanId ) = 0;
 };
 
 #endif

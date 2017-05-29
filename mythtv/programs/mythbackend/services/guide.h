@@ -81,6 +81,12 @@ class Guide : public GuideServices
         QStringList         GetCategoryList     ( );
 
         QStringList         GetStoredSearches( const QString   &Type );
+
+        bool                AddToChannelGroup   ( int              ChannelGroupId,
+                                                  int              ChanId );
+
+        bool                RemoveFromChannelGroup ( int           ChannelGroupId,
+                                                     int           ChanId );
 };
 
 // --------------------------------------------------------------------------
@@ -183,6 +189,22 @@ class ScriptableGuide : public QObject
         {
             SCRIPT_CATCH_EXCEPTION( QStringList(),
                 return m_obj.GetStoredSearches( Type );
+            )
+        }
+
+        bool AddToChannelGroup( int ChannelGroupId,
+                                int ChanId )
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.AddToChannelGroup( ChannelGroupId, ChanId );
+            )
+        }
+
+        bool RemoveFromChannelGroup( int ChannelGroupId,
+                                     int ChanId )
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.RemoveFromChannelGroup( ChannelGroupId, ChanId );
             )
         }
 };

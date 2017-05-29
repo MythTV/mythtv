@@ -6,7 +6,7 @@
 //
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //
-// Licensed under the GPL v2 or later, see COPYING for details                    
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +42,10 @@ int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
 UPnpDeviceDesc::UPnpDeviceDesc()
 {
+    // Static initialisation order fiasco: Logging isn't available yet
+#if 0
     LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Constructor");
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -737,7 +740,7 @@ UPnpDevice::UPnpDevice() :
 
 // NOTE: The icons are defined here and not in devicemaster.xml because they
 //       are also used for the MediaRenderer device and other possible future
-//       devices too. 
+//       devices too.
 
     // Large PNG Icon
     UPnpIcon *pngIconLrg = new UPnpIcon();
