@@ -3296,6 +3296,7 @@ void TV::HandleLCDVolumeTimerEvent()
 
     QMutexLocker locker(&timerIdLock);
     KillTimer(lcdVolumeTimerId);
+    lcdVolumeTimerId = 0;
 }
 
 int TV::StartTimer(int interval, int line)
