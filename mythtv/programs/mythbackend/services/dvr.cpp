@@ -741,7 +741,7 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
         "SELECT title, inetref, count(title) as count "
         "    FROM recorded AS r "
         "    JOIN recgroups AS g ON r.recgroupid = g.recgroupid "
-        "    WHERE g.recgroup != 'LiveTV' "
+        "    WHERE g.recgroup NOT IN ('Deleted', 'LiveTV') "
         "    AND r.deletepending = 0 "
         "    GROUP BY title, inetref "
         "    ORDER BY title");
