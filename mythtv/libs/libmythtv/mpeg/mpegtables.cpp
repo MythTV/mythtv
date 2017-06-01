@@ -332,7 +332,8 @@ void PSIPTable::CloneAndShrink(const PSIPTable& table, uint pid)
     // Shrink the data down to just the PES data
     // plus enough space to save the current pid
     _pesdataSize = _allocSize = table.Length();
-    _pesdata = _fullbuffer = pes_alloc(_allocSize + sizeof(uint));
+    _pesdata = _fullbuffer = (unsigned char*)malloc(_allocSize + sizeof(uint));
+    _isLongTermCopy = true;
     memcpy(_fullbuffer, table.pesdata(), _allocSize);
     *(uint*)(_fullbuffer + _allocSize) = pid;
 }
