@@ -66,14 +66,17 @@ void MythSystemLegacy::initializePrivate(void)
 #endif
 }
 
-MythSystemLegacy::MythSystemLegacy()
+MythSystemLegacy::MythSystemLegacy(QObject *parent) :
+    QObject(parent)
 {
     setObjectName("MythSystemLegacy()");
     m_semReady.release(1);  // initialize
     initializePrivate();
 }
 
-MythSystemLegacy::MythSystemLegacy(const QString &command, uint flags)
+MythSystemLegacy::MythSystemLegacy(const QString &command, uint flags,
+                                   QObject *parent) :
+    QObject(parent)
 {
     setObjectName(QString("MythSystemLegacy(%1)").arg(command));
     m_semReady.release(1);  // initialize
@@ -116,7 +119,10 @@ void MythSystemLegacy::SetCommand(const QString &command, uint flags)
 
 
 MythSystemLegacy::MythSystemLegacy(const QString &command,
-                       const QStringList &args, uint flags)
+                                   const QStringList &args,
+                                   uint flags,
+                                   QObject *parent) :
+    QObject(parent)
 {
     m_semReady.release(1);  // initialize
     initializePrivate();
@@ -170,24 +176,6 @@ void MythSystemLegacy::SetCommand(const QString &command,
     }
 }
 
-
-MythSystemLegacy::MythSystemLegacy(const MythSystemLegacy &other) :
-    d(other.d),
-    m_status(other.m_status),
-
-    m_command(other.m_command),
-    m_logcmd(other.m_logcmd),
-    m_args(other.m_args),
-    m_directory(other.m_directory),
-
-    m_nice(other.m_nice),
-    m_ioprio(other.m_ioprio),
-
-    m_settings(other.m_settings)
-{
-    m_semReady.release(other.m_semReady.available());
-}
-
 // QBuffers may also need freeing
 MythSystemLegacy::~MythSystemLegacy(void)
 {
@@ -198,7 +186,6 @@ MythSystemLegacy::~MythSystemLegacy(void)
     }
     d->DecrRef();
 }
-
 
 void MythSystemLegacy::SetDirectory(const QString &directory)
 {
