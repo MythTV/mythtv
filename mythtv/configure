@@ -7618,19 +7618,10 @@ esac
 
 if enabled gxx; then
     if enabled symbol_visibility; then
-        # Don't check for patch levels in gcc4 series.
-        # See https://bugs.launchpad.net/ubuntu/+source/gcc-4.8/+bug/1360404
-        if expr "$gxx_version" : '4\.[2-9]' >/dev/null || expr "$gxx_version" : '[5-9]\..*\.' >/dev/null; then
-            check_cxxflags -fvisibility-inlines-hidden
-            append CCONFIG "use_hidesyms"
-        else
-            disable symbol_visibility
-            warn "--enable-symbol-visibility requires gcc 4.2 or higher"
-        fi
+        check_cxxflags -fvisibility-inlines-hidden
+        append CCONFIG "use_hidesyms"
     fi
-    if expr "$gxx_version" : '4\.[3-9]' >/dev/null || expr "$gxx_version" : '[5-9]\..*\.' >/dev/null; then
-        check_cxxflags -Wmissing-declarations
-    fi
+    check_cxxflags -Wmissing-declarations
     check_cxxflags -Wno-switch
     check_cxxflags -Woverloaded-virtual
     check_cxxflags -funit-at-a-time
