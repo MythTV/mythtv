@@ -89,10 +89,6 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
     public:
 
-        static void InitializeCustomTypes();
-
-    public:
-
         ChannelInfo(QObject *parent = 0) 
             : QObject           ( parent ),
               m_ChanId          ( 0      ),
@@ -109,31 +105,28 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
               m_SerializeDetails( true   )
         {
         }
-        
-        ChannelInfo( const ChannelInfo &src )
-        {
-            Copy( src );
-        }
 
-        void Copy( const ChannelInfo &src )
+        void Copy( const ChannelInfo *src )
         {
-            m_ChanId       = src.m_ChanId      ;
-            m_ChanNum      = src.m_ChanNum     ;
-            m_CallSign     = src.m_CallSign    ;
-            m_IconURL      = src.m_IconURL     ;
-            m_ChannelName  = src.m_ChannelName ;
-            m_ChanFilters  = src.m_ChanFilters ;
-            m_SourceId     = src.m_SourceId    ;
-            m_InputId      = src.m_InputId     ;
-            m_CommFree     = src.m_CommFree    ;
-            m_UseEIT       = src.m_UseEIT      ;
-            m_Visible      = src.m_Visible     ;
+            m_ChanId       = src->m_ChanId      ;
+            m_ChanNum      = src->m_ChanNum     ;
+            m_CallSign     = src->m_CallSign    ;
+            m_IconURL      = src->m_IconURL     ;
+            m_ChannelName  = src->m_ChannelName ;
+            m_ChanFilters  = src->m_ChanFilters ;
+            m_SourceId     = src->m_SourceId    ;
+            m_InputId      = src->m_InputId     ;
+            m_CommFree     = src->m_CommFree    ;
+            m_UseEIT       = src->m_UseEIT      ;
+            m_Visible      = src->m_Visible     ;
 
-            CopyListContents< Program >( this, m_Programs, src.m_Programs );
+            CopyListContents< Program >( this, m_Programs, src->m_Programs );
         }
 
         Program *AddNewProgram();
 
+    private:
+        Q_DISABLE_COPY(ChannelInfo);
 };
 
 class SERVICE_PUBLIC Program : public QObject
@@ -224,10 +217,6 @@ class SERVICE_PUBLIC Program : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         Program(QObject *parent = 0) 
             : QObject               ( parent ),
               m_Repeat              ( false  ),
@@ -252,56 +241,51 @@ class SERVICE_PUBLIC Program : public QObject
         {
         }
 
-        Program( const Program &src )
+        void Copy( const Program *src )
         {
-            Copy( src );
-        }
-
-        void Copy( const Program &src )
-        {
-            m_StartTime         = src.m_StartTime;
-            m_EndTime           = src.m_EndTime;
-            m_Title             = src.m_Title;
-            m_SubTitle          = src.m_SubTitle;
-            m_Category          = src.m_Category;
-            m_CatType           = src.m_CatType;
-            m_Repeat            = src.m_Repeat;
-            m_SeriesId          = src.m_SeriesId;
-            m_ProgramId         = src.m_ProgramId;
-            m_Stars             = src.m_Stars;
-            m_LastModified      = src.m_LastModified;
-            m_ProgramFlags      = src.m_ProgramFlags;
-            m_VideoProps        = src.m_VideoProps;
-            m_AudioProps        = src.m_AudioProps;
-            m_SubProps          = src.m_SubProps;
-            m_Airdate           = src.m_Airdate;
-            m_Description       = src.m_Description;
-            m_Inetref           = src.m_Inetref;
-            m_Season            = src.m_Season;
-            m_Episode           = src.m_Episode;
-            m_TotalEpisodes     = src.m_TotalEpisodes;
+            m_StartTime         = src->m_StartTime;
+            m_EndTime           = src->m_EndTime;
+            m_Title             = src->m_Title;
+            m_SubTitle          = src->m_SubTitle;
+            m_Category          = src->m_Category;
+            m_CatType           = src->m_CatType;
+            m_Repeat            = src->m_Repeat;
+            m_SeriesId          = src->m_SeriesId;
+            m_ProgramId         = src->m_ProgramId;
+            m_Stars             = src->m_Stars;
+            m_LastModified      = src->m_LastModified;
+            m_ProgramFlags      = src->m_ProgramFlags;
+            m_VideoProps        = src->m_VideoProps;
+            m_AudioProps        = src->m_AudioProps;
+            m_SubProps          = src->m_SubProps;
+            m_Airdate           = src->m_Airdate;
+            m_Description       = src->m_Description;
+            m_Inetref           = src->m_Inetref;
+            m_Season            = src->m_Season;
+            m_Episode           = src->m_Episode;
+            m_TotalEpisodes     = src->m_TotalEpisodes;
             // DEPRECATED
-            m_FileSize          = src.m_FileSize;
-            m_FileName          = src.m_FileName;
-            m_HostName          = src.m_HostName;
+            m_FileSize          = src->m_FileSize;
+            m_FileName          = src->m_FileName;
+            m_HostName          = src->m_HostName;
             // ----
-            m_SerializeDetails  = src.m_SerializeDetails;
-            m_SerializeChannel  = src.m_SerializeChannel;    
-            m_SerializeRecording= src.m_SerializeRecording;  
-            m_SerializeArtwork  = src.m_SerializeArtwork;
-            m_SerializeCast     = src.m_SerializeCast;
+            m_SerializeDetails  = src->m_SerializeDetails;
+            m_SerializeChannel  = src->m_SerializeChannel;
+            m_SerializeRecording= src->m_SerializeRecording;
+            m_SerializeArtwork  = src->m_SerializeArtwork;
+            m_SerializeCast     = src->m_SerializeCast;
 
-            if ( src.m_Channel != NULL)
-                Channel()->Copy( src.m_Channel );
+            if ( src->m_Channel != NULL)
+                Channel()->Copy( src->m_Channel );
 
-            if ( src.m_Recording != NULL)
-                Recording()->Copy( src.m_Recording );
+            if ( src->m_Recording != NULL)
+                Recording()->Copy( src->m_Recording );
 
-            if ( src.m_Artwork != NULL)
-                Artwork()->Copy( src.m_Artwork );
+            if ( src->m_Artwork != NULL)
+                Artwork()->Copy( src->m_Artwork );
 
-            if (src.m_Cast != NULL)
-                Cast()->Copy( src.m_Cast );
+            if (src->m_Cast != NULL)
+                Cast()->Copy( src->m_Cast );
         }
 
 };
@@ -318,41 +302,5 @@ inline Program *ChannelInfo::AddNewProgram()
 }
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::Program  )
-Q_DECLARE_METATYPE( DTC::Program* )
-
-Q_DECLARE_METATYPE( DTC::ChannelInfo  )
-Q_DECLARE_METATYPE( DTC::ChannelInfo* )
-
-namespace DTC
-{
-inline void ChannelInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< ChannelInfo  >();
-    qRegisterMetaType< ChannelInfo* >();
-
-    if (QMetaType::type( "DTC::Program" ) == 0)
-        Program::InitializeCustomTypes();
-}
-
-inline void Program::InitializeCustomTypes()
-{
-    qRegisterMetaType< Program  >();
-    qRegisterMetaType< Program* >();
-
-    if (QMetaType::type( "DTC::ChannelInfo" ) == 0)
-        ChannelInfo::InitializeCustomTypes();
-
-    if (QMetaType::type( "DTC::RecordingInfo" ) == 0)
-        RecordingInfo::InitializeCustomTypes();
-
-    if (QMetaType::type( "DTC::ArtworkInfoList" ) == 0)
-        ArtworkInfoList::InitializeCustomTypes();
-
-     if (QMetaType::type( "DTC::CastMemberList" ) == 0)
-        CastMemberList::InitializeCustomTypes();
-}
-}
 
 #endif

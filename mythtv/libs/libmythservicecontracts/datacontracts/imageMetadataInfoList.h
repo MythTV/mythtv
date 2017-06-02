@@ -38,10 +38,6 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         ImageMetadataInfoList(QObject *parent = 0)
             : QObject( parent ),
               m_Count         ( 0      ),
@@ -49,20 +45,15 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
         {
         }
 
-        ImageMetadataInfoList( const ImageMetadataInfoList &src )
+        void Copy( const ImageMetadataInfoList *src )
         {
-            Copy( src );
-        }
+            m_Count         = src->m_Count;
+            m_File          = src->m_File;
+            m_Path          = src->m_Path;
+            m_Size          = src->m_Size;
+            m_Extension     = src->m_Extension;
 
-        void Copy( const ImageMetadataInfoList &src )
-        {
-            m_Count         = src.m_Count;
-            m_File          = src.m_File;
-            m_Path          = src.m_Path;
-            m_Size          = src.m_Size;
-            m_Extension     = src.m_Extension;
-
-            CopyListContents< ImageMetadataInfo >( this, m_ImageMetadataInfos, src.m_ImageMetadataInfos );
+            CopyListContents< ImageMetadataInfo >( this, m_ImageMetadataInfos, src->m_ImageMetadataInfos );
         }
 
         ImageMetadataInfo *AddNewImageMetadataInfo()
@@ -75,22 +66,10 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(ImageMetadataInfoList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::ImageMetadataInfoList  )
-Q_DECLARE_METATYPE( DTC::ImageMetadataInfoList* )
-
-namespace DTC
-{
-inline void ImageMetadataInfoList::InitializeCustomTypes()
-{
-    qRegisterMetaType< ImageMetadataInfoList  >();
-    qRegisterMetaType< ImageMetadataInfoList* >();
-
-    ImageMetadataInfo::InitializeCustomTypes();
-}
-}
 
 #endif // IMAGEMETADATAINFOLIST_H

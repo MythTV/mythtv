@@ -42,29 +42,23 @@ class SERVICE_PUBLIC Lineup : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         Lineup(QObject *parent = 0)
             : QObject         ( parent )
         {
         }
 
-        Lineup( const Lineup &src )
+        void Copy( const Lineup *src )
         {
-            Copy( src );
+            m_LineupId     = src->m_LineupId      ;
+            m_Name         = src->m_Name          ;
+            m_DisplayName  = src->m_DisplayName   ;
+            m_Type         = src->m_Type          ;
+            m_Postal       = src->m_Postal        ;
+            m_Device       = src->m_Device        ;
         }
 
-        void Copy( const Lineup &src )
-        {
-            m_LineupId     = src.m_LineupId      ;
-            m_Name         = src.m_Name          ;
-            m_DisplayName  = src.m_DisplayName   ;
-            m_Type         = src.m_Type          ;
-            m_Postal       = src.m_Postal        ;
-            m_Device       = src.m_Device        ;
-        }
+    private:
+        Q_DISABLE_COPY(Lineup);
 };
 
 class SERVICE_PUBLIC LineupList : public QObject
@@ -83,23 +77,14 @@ class SERVICE_PUBLIC LineupList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         LineupList(QObject *parent = 0)
             : QObject( parent )
         {
         }
 
-        LineupList( const LineupList &src )
+        void Copy( const LineupList *src )
         {
-            Copy( src );
-        }
-
-        void Copy( const LineupList &src )
-        {
-            CopyListContents< Lineup >( this, m_Lineups, src.m_Lineups );
+            CopyListContents< Lineup >( this, m_Lineups, src->m_Lineups );
         }
 
         Lineup *AddNewLineup()
@@ -116,28 +101,5 @@ class SERVICE_PUBLIC LineupList : public QObject
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::LineupList  )
-Q_DECLARE_METATYPE( DTC::LineupList* )
-
-Q_DECLARE_METATYPE( DTC::Lineup  )
-Q_DECLARE_METATYPE( DTC::Lineup* )
-
-namespace DTC
-{
-inline void Lineup::InitializeCustomTypes()
-{
-    qRegisterMetaType< Lineup  >();
-    qRegisterMetaType< Lineup* >();
-}
-
-inline void LineupList::InitializeCustomTypes()
-{
-    qRegisterMetaType< LineupList  >();
-    qRegisterMetaType< LineupList* >();
-
-    Lineup::InitializeCustomTypes();
-}
-}
 
 #endif

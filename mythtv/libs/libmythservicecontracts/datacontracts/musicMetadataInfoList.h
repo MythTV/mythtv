@@ -56,10 +56,6 @@ class SERVICE_PUBLIC MusicMetadataInfoList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         MusicMetadataInfoList(QObject *parent = 0)
             : QObject( parent ),
               m_StartIndex    ( 0      ),
@@ -70,21 +66,16 @@ class SERVICE_PUBLIC MusicMetadataInfoList : public QObject
         {
         }
 
-        MusicMetadataInfoList( const MusicMetadataInfoList &src )
+        void Copy( const MusicMetadataInfoList *src )
         {
-            Copy( src );
-        }
+            m_StartIndex    = src->m_StartIndex     ;
+            m_Count         = src->m_Count          ;
+            m_TotalAvailable= src->m_TotalAvailable ;
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
 
-        void Copy( const MusicMetadataInfoList &src )
-        {
-            m_StartIndex    = src.m_StartIndex     ;
-            m_Count         = src.m_Count          ;
-            m_TotalAvailable= src.m_TotalAvailable ;
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
-
-            CopyListContents< MusicMetadataInfo >( this, m_MusicMetadataInfos, src.m_MusicMetadataInfos );
+            CopyListContents< MusicMetadataInfo >( this, m_MusicMetadataInfos, src->m_MusicMetadataInfos );
         }
 
         MusicMetadataInfo *AddNewMusicMetadataInfo()
@@ -101,19 +92,5 @@ class SERVICE_PUBLIC MusicMetadataInfoList : public QObject
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::MusicMetadataInfoList  )
-Q_DECLARE_METATYPE( DTC::MusicMetadataInfoList* )
-
-namespace DTC
-{
-inline void MusicMetadataInfoList::InitializeCustomTypes()
-{
-    qRegisterMetaType< MusicMetadataInfoList  >();
-    qRegisterMetaType< MusicMetadataInfoList* >();
-
-    MusicMetadataInfo::InitializeCustomTypes();
-}
-}
 
 #endif

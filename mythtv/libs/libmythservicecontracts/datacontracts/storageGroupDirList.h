@@ -27,23 +27,14 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         StorageGroupDirList(QObject *parent = 0) 
             : QObject( parent )               
         {
         }
-        
-        StorageGroupDirList( const StorageGroupDirList &src ) 
-        {
-            Copy( src );
-        }
 
-        void Copy( const StorageGroupDirList &src )
+        void Copy( const StorageGroupDirList *src )
         {
-            CopyListContents< StorageGroupDir >( this, m_StorageGroupDirs, src.m_StorageGroupDirs );
+            CopyListContents< StorageGroupDir >( this, m_StorageGroupDirs, src->m_StorageGroupDirs );
         }
 
         StorageGroupDir *AddNewStorageGroupDir()
@@ -57,22 +48,10 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(StorageGroupDirList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::StorageGroupDirList  )
-Q_DECLARE_METATYPE( DTC::StorageGroupDirList* )
-
-namespace DTC
-{
-inline void StorageGroupDirList::InitializeCustomTypes()
-{
-    qRegisterMetaType< StorageGroupDirList   >();
-    qRegisterMetaType< StorageGroupDirList*  >();
-
-    StorageGroupDir::InitializeCustomTypes();
-}
-}
 
 #endif

@@ -41,10 +41,6 @@ class SERVICE_PUBLIC ArtworkItem : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         ArtworkItem(QObject *parent = 0)
                         : QObject         ( parent )
         {
@@ -52,19 +48,17 @@ class SERVICE_PUBLIC ArtworkItem : public QObject
             m_Height           = 0                      ;
         }
 
-        ArtworkItem( const ArtworkItem &src )
+        void Copy( const ArtworkItem *src )
         {
-            Copy( src );
+            m_Type             = src->m_Type             ;
+            m_Url              = src->m_Url              ;
+            m_Thumbnail        = src->m_Thumbnail        ;
+            m_Width            = src->m_Width            ;
+            m_Height           = src->m_Height           ;
         }
 
-        void Copy( const ArtworkItem &src )
-        {
-            m_Type             = src.m_Type             ;
-            m_Url              = src.m_Url              ;
-            m_Thumbnail        = src.m_Thumbnail        ;
-            m_Width            = src.m_Width            ;
-            m_Height           = src.m_Height           ;
-        }
+    private:
+        Q_DISABLE_COPY(ArtworkItem);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -126,10 +120,6 @@ class SERVICE_PUBLIC VideoLookup : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         VideoLookup(QObject *parent = 0)
                         : QObject         ( parent )
         {
@@ -143,34 +133,29 @@ class SERVICE_PUBLIC VideoLookup : public QObject
             m_Revenue          = 0                      ;
         }
 
-        VideoLookup( const VideoLookup &src )
+        void Copy( const VideoLookup *src )
         {
-            Copy( src );
-        }
+            m_Title            = src->m_Title            ;
+            m_SubTitle         = src->m_SubTitle         ;
+            m_Season           = src->m_Season           ;
+            m_Episode          = src->m_Episode          ;
+            m_Year             = src->m_Year             ;
+            m_Tagline          = src->m_Tagline          ;
+            m_Description      = src->m_Description      ;
+            m_Certification    = src->m_Certification    ;
+            m_Inetref          = src->m_Inetref          ;
+            m_Collectionref    = src->m_Collectionref    ;
+            m_HomePage         = src->m_HomePage         ;
+            m_ReleaseDate      = src->m_ReleaseDate      ;
+            m_UserRating       = src->m_UserRating       ;
+            m_Length           = src->m_Length           ;
+            m_Popularity       = src->m_Popularity       ;
+            m_Budget           = src->m_Budget           ;
+            m_Revenue          = src->m_Revenue          ;
+            m_IMDB             = src->m_IMDB             ;
+            m_TMSRef           = src->m_TMSRef           ;
 
-        void Copy( const VideoLookup &src )
-        {
-            m_Title            = src.m_Title            ;
-            m_SubTitle         = src.m_SubTitle         ;
-            m_Season           = src.m_Season           ;
-            m_Episode          = src.m_Episode          ;
-            m_Year             = src.m_Year             ;
-            m_Tagline          = src.m_Tagline          ;
-            m_Description      = src.m_Description      ;
-            m_Certification    = src.m_Certification    ;
-            m_Inetref          = src.m_Inetref          ;
-            m_Collectionref    = src.m_Collectionref    ;
-            m_HomePage         = src.m_HomePage         ;
-            m_ReleaseDate      = src.m_ReleaseDate      ;
-            m_UserRating       = src.m_UserRating       ;
-            m_Length           = src.m_Length           ;
-            m_Popularity       = src.m_Popularity       ;
-            m_Budget           = src.m_Budget           ;
-            m_Revenue          = src.m_Revenue          ;
-            m_IMDB             = src.m_IMDB             ;
-            m_TMSRef           = src.m_TMSRef           ;
-
-            CopyListContents< ArtworkItem >( this, m_Artwork, src.m_Artwork );
+            CopyListContents< ArtworkItem >( this, m_Artwork, src->m_Artwork );
         }
 
         ArtworkItem *AddNewArtwork()
@@ -184,27 +169,5 @@ class SERVICE_PUBLIC VideoLookup : public QObject
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::VideoLookup  )
-Q_DECLARE_METATYPE( DTC::VideoLookup* )
-Q_DECLARE_METATYPE( DTC::ArtworkItem  )
-Q_DECLARE_METATYPE( DTC::ArtworkItem* )
-
-namespace DTC
-{
-inline void ArtworkItem::InitializeCustomTypes()
-{
-    qRegisterMetaType< ArtworkItem    >();
-    qRegisterMetaType< ArtworkItem*   >();
-}
-
-inline void VideoLookup::InitializeCustomTypes()
-{
-    qRegisterMetaType< VideoLookup  >();
-    qRegisterMetaType< VideoLookup* >();
-
-    ArtworkItem::InitializeCustomTypes();
-}
-}
 
 #endif

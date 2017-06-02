@@ -26,10 +26,6 @@ class SERVICE_PUBLIC ImageSyncInfo : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         ImageSyncInfo(QObject *parent = 0)
                         : QObject         ( parent ),
                           m_Running       ( false  ),
@@ -38,31 +34,17 @@ class SERVICE_PUBLIC ImageSyncInfo : public QObject
         {
         }
 
-        ImageSyncInfo( const ImageSyncInfo &src )
+        void Copy( const ImageSyncInfo *src )
         {
-            Copy( src );
+            m_Running       = src->m_Running;
+            m_Current       = src->m_Current;
+            m_Total         = src->m_Total;
         }
 
-        void Copy( const ImageSyncInfo &src )
-        {
-            m_Running       = src.m_Running;
-            m_Current       = src.m_Current;
-            m_Total         = src.m_Total;
-        }
+    private:
+        Q_DISABLE_COPY(ImageSyncInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::ImageSyncInfo  )
-Q_DECLARE_METATYPE( DTC::ImageSyncInfo* )
-
-namespace DTC
-{
-inline void ImageSyncInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< ImageSyncInfo  >();
-    qRegisterMetaType< ImageSyncInfo* >();
-}
-}
 
 #endif // IMAGESYNCINFO_H

@@ -54,10 +54,6 @@ class SERVICE_PUBLIC ProgramList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         ProgramList(QObject *parent = 0) 
             : QObject         ( parent ),
               m_StartIndex    ( 0      ),
@@ -65,22 +61,17 @@ class SERVICE_PUBLIC ProgramList : public QObject
               m_TotalAvailable( 0      )   
         {
         }
-        
-        ProgramList( const ProgramList &src ) 
-        {
-            Copy( src );
-        }
 
-        void Copy( const ProgramList &src )
+        void Copy( const ProgramList *src )
         {
-            m_StartIndex    = src.m_StartIndex     ;
-            m_Count         = src.m_Count          ;
-            m_TotalAvailable= src.m_TotalAvailable ;
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
+            m_StartIndex    = src->m_StartIndex     ;
+            m_Count         = src->m_Count          ;
+            m_TotalAvailable= src->m_TotalAvailable ;
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
         
-            CopyListContents< Program >( this, m_Programs, src.m_Programs );
+            CopyListContents< Program >( this, m_Programs, src->m_Programs );
         }
 
         Program *AddNewProgram()
@@ -94,22 +85,10 @@ class SERVICE_PUBLIC ProgramList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(ProgramList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::ProgramList  )
-Q_DECLARE_METATYPE( DTC::ProgramList* )
-
-namespace DTC
-{
-inline void ProgramList::InitializeCustomTypes()
-{
-    qRegisterMetaType< ProgramList  >();
-    qRegisterMetaType< ProgramList* >();
-
-    Program::InitializeCustomTypes();
-}
-}
 
 #endif

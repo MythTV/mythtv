@@ -37,23 +37,14 @@ class SERVICE_PUBLIC InputList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         InputList(QObject *parent = 0)
             : QObject( parent )
         {
         }
 
-        InputList( const InputList &src )
+        void Copy( const InputList *src )
         {
-            Copy( src );
-        }
-
-        void Copy( const InputList &src )
-        {
-            CopyListContents< Input >( this, m_Inputs, src.m_Inputs );
+            CopyListContents< Input >( this, m_Inputs, src->m_Inputs );
         }
 
         Input *AddNewInput()
@@ -67,22 +58,10 @@ class SERVICE_PUBLIC InputList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(InputList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::InputList  )
-Q_DECLARE_METATYPE( DTC::InputList* )
-
-namespace DTC
-{
-inline void InputList::InitializeCustomTypes()
-{
-    qRegisterMetaType< InputList  >();
-    qRegisterMetaType< InputList* >();
-
-    Input::InitializeCustomTypes();
-}
-}
 
 #endif

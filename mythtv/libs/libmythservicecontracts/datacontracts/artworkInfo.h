@@ -38,41 +38,23 @@ class SERVICE_PUBLIC ArtworkInfo : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         ArtworkInfo(QObject *parent = 0)
             : QObject         ( parent )
         {
         }
 
-        ArtworkInfo( const ArtworkInfo &src )
+        void Copy( const ArtworkInfo *src )
         {
-            Copy( src );
+            m_URL           = src->m_URL           ;
+            m_FileName      = src->m_FileName      ;
+            m_StorageGroup  = src->m_StorageGroup  ;
+            m_Type          = src->m_Type          ;
         }
 
-        void Copy( const ArtworkInfo &src )
-        {
-            m_URL           = src.m_URL           ;
-            m_FileName      = src.m_FileName      ;
-            m_StorageGroup  = src.m_StorageGroup  ;
-            m_Type          = src.m_Type          ;
-        }
+    private:
+        Q_DISABLE_COPY(ArtworkInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::ArtworkInfo  )
-Q_DECLARE_METATYPE( DTC::ArtworkInfo* )
-
-namespace DTC
-{
-inline void ArtworkInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< ArtworkInfo  >();
-    qRegisterMetaType< ArtworkInfo* >();
-}
-}
 
 #endif
