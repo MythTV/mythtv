@@ -83,7 +83,7 @@ options:
     Specify an alternate directory path for the symlink link source.
     Use case would be if you need to conform to specific path requirements. eg:
 
-    /../../recordings vs. /var/video/recordings
+    ../../recordings vs. /var/video/recordings
 
     default: Use full directory path
 
