@@ -1594,7 +1594,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["titlesubtitle"] = tempSubTitle;
 
-    progMap["description"] = description;
+    progMap["description"] = progMap["description0"] = description;
 
     if (season > 0 || episode > 0)
     {
@@ -5769,7 +5769,7 @@ bool LoadFromOldRecorded(
     return LoadFromOldRecorded(destination, sql, bindings, 0, 0, count);
 }
 
-bool LoadFromOldRecorded(ProgramList &destination, const QString &sql, 
+bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
                          const MSqlBindings &bindings,
                          const uint &start, const uint &limit, uint &count)
 {
