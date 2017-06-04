@@ -94,7 +94,7 @@ void MythUtilCommandLineParser::LoadArguments(void)
                 "master backend.",
                 "This command will connect to the master backend and trigger "
                 "a print of the current DVB SI cache to the log. The call "
-				"will return immediately.")
+                "will return immediately.")
                 ->SetGroup("Backend")
         << add("--resched", "resched", false,
                 "Trigger a run of the recording scheduler on the existing "

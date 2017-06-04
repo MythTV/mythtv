@@ -71,18 +71,18 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
         {
         case 0x233a:
         {
-			// Convert United Kingdom DTT id to temporary temporary local range
-			uint mux_id = (tsid & 0x3f000) >> 12;
-			if (mux_id > 0xb)
-				mux_id = 0;
-			if ((mux_id == 0x7) && ((tsid & 0xfff) < 0x3ff))
-				mux_id = 0xc;
-			// Shift id to private temporary use range
-			return 0xff01  + mux_id;
+            // Convert United Kingdom DTT id to temporary temporary local range
+            uint mux_id = (tsid & 0x3f000) >> 12;
+            if (mux_id > 0xb)
+                mux_id = 0;
+            if ((mux_id == 0x7) && ((tsid & 0xfff) < 0x3ff))
+                mux_id = 0xc;
+            // Shift id to private temporary use range
+            return 0xff01  + mux_id;
         }
 
         default:
-        	return onid;
+            return onid;
         }
     }
 
@@ -122,14 +122,14 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
 
     bool HasCurrentTSID(uint& onid, uint& tsid)
     {
-    	if (((int)_current_onid < 0) || ((int)_current_tsid < 0))
-    		return false;
-    	else
-    	{
-    		onid = _current_onid;
-    		tsid = _current_tsid;
-    		return true;
-    	}
+        if (((int)_current_onid < 0) || ((int)_current_tsid < 0))
+            return false;
+        else
+        {
+            onid = _current_onid;
+            tsid = _current_tsid;
+            return true;
+        }
     }
 
   private:

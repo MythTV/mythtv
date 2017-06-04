@@ -78,7 +78,7 @@ typedef QMap<uint16_t,sdt_t_cache_t>
 /// ID level.
 typedef struct SdtCache : public QMap<uint16_t,sdt_ts_cache_t>
 {
-	~SdtCache();
+    ~SdtCache();
 }        sdt_tsn_cache_t;
 
 // Event Information Table (EIT)
@@ -123,7 +123,7 @@ typedef QMap<uint16_t,eit_ts_cache_t> eit_tss_cache_t;
 /// ID within original network ID.
 typedef struct EitCache : public QMap<uint16_t,eit_tss_cache_t>
 {
-	~EitCache();
+    ~EitCache();
 } eit_tssn_cache_t;
 
 #endif // SICACHETYPES_H_

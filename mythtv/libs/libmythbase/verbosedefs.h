@@ -211,8 +211,8 @@ typedef struct {
 
 typedef struct VMap : public QMap<QString, VerboseDef *>
 {
-	// Tidy up for heap debugging
-	~VMap() { for (iterator i = begin(); i != end(); i++) delete *i; }
+    // Tidy up for heap debugging
+    ~VMap() { for (iterator i = begin(); i != end(); i++) delete *i; }
 } VerboseMap;
 
 typedef struct {
@@ -223,8 +223,8 @@ typedef struct {
 
 typedef struct LLMap : public QMap<int, LoglevelDef *>
 {
-	// Tidy up for heap debugging
-	~LLMap() { for (iterator i = begin(); i != end(); i++) delete *i; }
+    // Tidy up for heap debugging
+    ~LLMap() { for (iterator i = begin(); i != end(); i++) delete *i; }
 } LoglevelMap;
 
 typedef QMap<uint64_t, LogLevel_t> ComponentLogLevelMap;
