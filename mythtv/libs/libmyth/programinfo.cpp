@@ -1593,7 +1593,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     progMap["titlesubtitle"] = tempSubTitle;
 
-    progMap["description"] = description;
+    progMap["description"] = progMap["description0"] = description;
 
     if (season > 0 || episode > 0)
     {
