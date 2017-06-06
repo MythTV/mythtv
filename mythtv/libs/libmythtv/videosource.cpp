@@ -3,7 +3,11 @@
 // Standard UNIX C headers
 #include <unistd.h>
 #include <fcntl.h>
+#if defined(__FreeBSD__) || CONFIG_DARWIN || defined(__OpenBSD__)
 #include <sys/types.h>
+#else
+#include <sys/sysmacros.h>
+#endif
 #include <sys/stat.h>
 
 // C++ headers
