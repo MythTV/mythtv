@@ -63,7 +63,7 @@ class MTV_PUBLIC PESPacket
             _allocSize = pkt._pesdataSize + (pkt._pesdata - pkt._fullbuffer);
 
         if (_isLongTermCopy)
-            malloc(_allocSize);
+            _fullbuffer = (unsigned char *)malloc(_allocSize);
         else
             _fullbuffer = pes_alloc(_allocSize);
         memcpy(_fullbuffer, pkt._fullbuffer, _allocSize);
