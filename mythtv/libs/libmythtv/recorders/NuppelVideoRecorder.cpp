@@ -384,7 +384,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     SetOption("audiodevice", audiodev);
 
     QString setting = QString::null;
-    const Setting *tmp = profile->byName("videocodec");
+    const StandardSetting *tmp = profile->byName("videocodec");
     if (tmp)
         setting = tmp->getValue();
 

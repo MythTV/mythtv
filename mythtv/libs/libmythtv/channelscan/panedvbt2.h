@@ -34,28 +34,24 @@
 // MythTV headers
 #include "channelscanmiscsettings.h"
 
-class PaneDVBT2 : public HorizontalConfigurationGroup
+class PaneDVBT2 : public GroupSetting
 {
   public:
-    PaneDVBT2() : HorizontalConfigurationGroup(false, false, true, true)
+    PaneDVBT2(const QString &target, StandardSetting *setting)
     {
-        setUseFrame(false);
-        VerticalConfigurationGroup *left =
-            new VerticalConfigurationGroup(false,true,true,false);
-        VerticalConfigurationGroup *right =
-            new VerticalConfigurationGroup(false,true,true,false);
-        left->addChild(pfrequency       = new ScanFrequency());
-        left->addChild(pbandwidth       = new ScanBandwidth());
-        left->addChild(pinversion       = new ScanInversion());
-        left->addChild(pconstellation   = new ScanConstellation());
-        left->addChild(pmod_sys         = new ScanDVBTModSys());
-        right->addChild(pcoderate_lp    = new ScanCodeRateLP());
-        right->addChild(pcoderate_hp    = new ScanCodeRateHP());
-        right->addChild(ptrans_mode     = new ScanTransmissionMode());
-        right->addChild(pguard_interval = new ScanGuardInterval());
-        right->addChild(phierarchy      = new ScanHierarchy());
-        addChild(left);
-        addChild(right);
+        setVisible(false);
+        setting->addTargetedChildren(target,
+                                     {this,
+                                      pfrequency       = new ScanFrequency(),
+                                      pbandwidth       = new ScanBandwidth(),
+                                      pinversion       = new ScanInversion(),
+                                      pconstellation   = new ScanConstellation(),
+                                      pmod_sys         = new ScanDVBTModSys(),
+                                      pcoderate_lp    = new ScanCodeRateLP(),
+                                      pcoderate_hp    = new ScanCodeRateHP(),
+                                      ptrans_mode     = new ScanTransmissionMode(),
+                                      pguard_interval = new ScanGuardInterval(),
+                                      phierarchy      = new ScanHierarchy()});
     }
 
     QString frequency(void)      const { return pfrequency->getValue();     }

@@ -192,8 +192,17 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    GallerySettings settings;
-    settings.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "gallerysettings",
+                                  new GallerySettings());
+
+    if (ssd->Create())
+    {
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 
     return 0;
 }

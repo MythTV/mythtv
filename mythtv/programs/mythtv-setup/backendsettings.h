@@ -1,31 +1,30 @@
 #ifndef BACKENDSETTINGS_H
 #define BACKENDSETTINGS_H
 
-#include "settings.h"
+#include "standardsettings.h"
 
 class IpAddressSettings;
-class BackendSettings :  public QObject, public ConfigurationWizard
+class BackendSettings : public GroupSetting
 {
   Q_OBJECT
   public:
     BackendSettings();
     virtual void Load(void);
-    using ConfigurationDialog::Save;
     virtual void Save(void);
     ~BackendSettings();
 
   private:
-    TransCheckBoxSetting *isMasterBackend;
-    HostLineEdit *localServerPort;
-    HostComboBox *backendServerAddr;
-    GlobalLineEdit *masterServerName;
+    TransMythUICheckBoxSetting *isMasterBackend;
+    HostTextEditSetting *localServerPort;
+    HostComboBoxSetting *backendServerAddr;
+    GlobalTextEditSetting *masterServerName;
     IpAddressSettings *ipAddressSettings;
     bool isLoaded;
     QString priorMasterName;
 
     // Deprecated - still here to support bindings
-    GlobalLineEdit *masterServerIP;
-    GlobalLineEdit *masterServerPort;
+    GlobalTextEditSetting *masterServerIP;
+    GlobalTextEditSetting *masterServerPort;
 
   private slots:
     void masterBackendChanged(void);

@@ -213,8 +213,15 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    ZMSettings settings;
-    settings.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "zonemindersettings",
+                                  new ZMSettings());
+
+    if (ssd->Create())
+        mainStack->AddScreen(ssd);
+    else
+        delete ssd;
 
     return 0;
 }

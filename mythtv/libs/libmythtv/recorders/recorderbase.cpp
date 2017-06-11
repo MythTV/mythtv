@@ -214,7 +214,7 @@ void RecorderBase::SetOption(const QString &name, int value)
 
 void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         SetOption(name, setting->getValue().toInt());
     else
@@ -224,7 +224,7 @@ void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
 
 void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         SetOption(name, setting->getValue());
     else

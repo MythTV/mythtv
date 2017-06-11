@@ -32,6 +32,7 @@
 
 // MythTV headers
 #include "settings.h"
+#include "standardsettings.h"
 #include "inputselectorsetting.h"
 #include "channelscantypes.h"
 
@@ -57,7 +58,7 @@ class PaneSingle;
 class PaneDVBUtilsImport;
 class PaneExistingScanImport;
 
-class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
+class ScanTypeSetting : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
   public:
@@ -96,7 +97,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         VBoxImport,
     };
 
-    ScanTypeSetting() : ComboBoxSetting(this), hw_cardid(0)
+    ScanTypeSetting() : hw_cardid(0)
         { setLabel(QObject::tr("Scan Type")); }
 
   protected slots:
@@ -106,7 +107,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
     uint    hw_cardid;
 };
 
-class ScanOptionalConfig : public TriggeredConfigurationGroup
+class ScanOptionalConfig : public GroupSetting
 {
     Q_OBJECT
 
@@ -126,11 +127,11 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
 
   public slots:
     void SetSourceID(const QString&);
-    void triggerChanged(const QString&);
 
   private:
     ScanTypeSetting      *scanType;
-    ScanCountry          *country;
+    ScanCountry          *dvbTCountry;
+    ScanCountry          *dvbT2Country;
     ScanNetwork          *network;
     PaneDVBT             *paneDVBT;
     PaneDVBT2            *paneDVBT2;
@@ -145,7 +146,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     PaneExistingScanImport *paneExistingScanImport;
 };
 
-class ScanWizardConfig: public VerticalConfigurationGroup
+class ScanWizardConfig: public GroupSetting
 {
     Q_OBJECT
 

@@ -3,7 +3,7 @@
 
 #include "mythscreentype.h"
 
-#include "mythconfigdialogs.h"
+#include "standardsettings.h"
 
 class MythUIButton;
 class MythUIButtonList;
@@ -61,7 +61,7 @@ class ChannelEditor : public MythScreenType
 
 class ChannelID;
 
-class ChannelWizard : public QObject, public ConfigurationWizard
+class ChannelWizard : public GroupSetting
 {
     Q_OBJECT
   public:

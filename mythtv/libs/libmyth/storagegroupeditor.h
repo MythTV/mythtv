@@ -3,56 +3,76 @@
 
 #include "storagegroup.h"
 #include "settings.h"
+#include "standardsettings.h"
 #include "mythwidgets.h"
 #include "mythexp.h"
 
 class MPUBLIC StorageGroupEditor :
-    public QObject, public ConfigurationDialog
+    public GroupSetting
 {
     Q_OBJECT
   public:
     explicit StorageGroupEditor(QString group);
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
     virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString) { }
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetname=0);
+    virtual bool canDelete(void);
 
   protected slots:
-    void open(QString name);
-    void doDelete(void);
+    void DoDeleteSlot(bool doDelete);
+    void ShowFileBrowser(void);
 
   protected:
+    bool keyPressEvent(QKeyEvent *event);
+    void customEvent(QEvent *event);
+    void ShowDeleteDialog();
+    void SetLabel(void);
     QString         m_group;
-    ListBoxSetting *listbox;
-    QString         lastValue;
 };
 
 class MPUBLIC StorageGroupListEditor :
-    public QObject, public ConfigurationDialog
+    public GroupSetting
 {
     Q_OBJECT
   public:
     StorageGroupListEditor(void);
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
     virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString) { }
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetname=0);
+    void AddSelection(const QString &label, const QString &value);
 
-  protected slots:
-    void open(QString name);
-    void doDelete(void);
+public slots:
+    void ShowNewGroupDialog(void);
+    void CreateNewGroup(QString name);
+};
+
+class StorageGroupDirStorage : public SimpleDBStorage
+{
+  public:
+    StorageGroupDirStorage(StorageUser *_user, int id,
+                           const QString &group);
 
   protected:
-    ListBoxSetting *listbox;
-    QString         lastValue;
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+
+    int m_id;
+    QString m_group;
+};
+
+class StorageGroupDirSetting : public MythUIFileBrowserSetting
+{
+    Q_OBJECT
+
+  public:
+      StorageGroupDirSetting(int id, const QString &group);
+
+    bool keyPressEvent(QKeyEvent *event);
+
+    void ShowDeleteDialog();
+
+  protected slots:
+    void DoDeleteSlot(bool doDelete);
+
+  protected:
+    int m_id;
+    QString m_group;
 };
 
 #endif

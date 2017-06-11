@@ -5,21 +5,21 @@
 #define _FREQUENCY_TABLE_SETTING_H_
 
 // MythTV headers
-#include "settings.h"
+#include "standardsettings.h"
 
-class ScanFrequencyTable: public ComboBoxSetting, public TransientStorage
+class ScanFrequencyTable: public TransMythUIComboBoxSetting
 {
   public:
     ScanFrequencyTable();
 };
 
-class ScanCountry : public ComboBoxSetting, public TransientStorage
+class ScanCountry : public TransMythUIComboBoxSetting
 {
   public:
     ScanCountry();
 };
 
-class ScanNetwork : public ComboBoxSetting, public TransientStorage
+class ScanNetwork : public TransMythUIComboBoxSetting
 {
   public:
     ScanNetwork();

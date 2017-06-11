@@ -33,7 +33,7 @@
 #include "mythcorecontext.h"
 #include "mythlocale.h"
 
-ScanFrequencyTable::ScanFrequencyTable() : ComboBoxSetting(this)
+ScanFrequencyTable::ScanFrequencyTable()
 {
     addSelection(QObject::tr("Broadcast"),        "us",          true);
     addSelection(QObject::tr("Cable")     + " " +
@@ -54,7 +54,7 @@ ScanFrequencyTable::ScanFrequencyTable() : ComboBoxSetting(this)
                     "digital channels are on the higher frequencies."));
 }
 
-ScanCountry::ScanCountry() : ComboBoxSetting(this)
+ScanCountry::ScanCountry()
 {
     QString country = "au"; // Default to first in list
     country = gCoreContext->GetLocale()->GetCountryCode().toLower();
@@ -77,7 +77,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
 }
 
 
-ScanNetwork::ScanNetwork() : ComboBoxSetting(this)
+ScanNetwork::ScanNetwork()
 {
     QString country = "de"; // Default to first in list
     country = gCoreContext->GetLocale()->GetCountryCode().toLower();

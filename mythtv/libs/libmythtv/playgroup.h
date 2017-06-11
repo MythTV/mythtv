@@ -4,7 +4,7 @@
 #include <QStringList>
 
 #include "mythtvexp.h"
-#include "settings.h"
+#include "standardsettings.h"
 
 class ProgramInfo;
 
@@ -18,28 +18,40 @@ class MTV_PUBLIC PlayGroup
                           int defval);
 };
 
-class MTV_PUBLIC PlayGroupEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC PlayGroupEditor : public GroupSetting
 {
     Q_OBJECT
 
   public:
     PlayGroupEditor(void);
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
     virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString) { }
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetName=0);
 
-  protected slots:
-    void open(QString name);
-    void doDelete(void);
+  public slots:
+    void CreateNewPlayBackGroup();
+    void CreateNewPlayBackGroupSlot(const QString&);
 
-  protected:
-    ListBoxSetting *listbox;
-    QString         lastValue;
+  private:
+    ButtonStandardSetting *m_addGroupButton;
+};
+
+class MTV_PUBLIC PlayGroupConfig : public GroupSetting
+{
+    Q_OBJECT
+
+  public:
+    PlayGroupConfig(const QString &label, const QString &name, bool isNew=false);
+    virtual void updateButton(MythUIButtonListItem *item);
+    virtual void Save();
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
+
+  private:
+    StandardSetting            *m_titleMatch;
+    MythUISpinBoxSetting       *m_skipAhead;
+    MythUISpinBoxSetting       *m_skipBack;
+    MythUISpinBoxSetting       *m_jumpMinutes;
+    MythUISpinBoxSetting       *m_timeStrech;
+    bool                        m_isNew;
 };
 
 #endif

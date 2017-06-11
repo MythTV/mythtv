@@ -38,17 +38,17 @@
 #include "scaninfo.h"
 #include "mythdate.h"
 
-class PaneExistingScanImport : public VerticalConfigurationGroup
+class PaneExistingScanImport : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(PaneExistingScanImport)
 
   public:
-    PaneExistingScanImport() :
-        VerticalConfigurationGroup(false,false,true,false),
-        sourceid(0), scanSelect(new TransComboBoxSetting())
+    PaneExistingScanImport(const QString &target, StandardSetting *setting) :
+        sourceid(0), scanSelect(new TransMythUIComboBoxSetting())
     {
+        setVisible(false);
         scanSelect->setLabel(tr("Scan to Import"));
-        addChild(scanSelect);
+        setting->addTargetedChildren(target, {this, scanSelect});
     }
 
     virtual void load(void)
@@ -84,7 +84,7 @@ class PaneExistingScanImport : public VerticalConfigurationGroup
 
   private:
     uint                  sourceid;
-    TransComboBoxSetting *scanSelect;
+    TransMythUIComboBoxSetting *scanSelect;
 };
 
 #endif // _PANE_EXISTING_SCAN_IMPORT_H_

@@ -8,31 +8,47 @@
 #define _DISEQCSETTINGS_H_
 
 #include "diseqc.h"
-#include "settings.h"
+#include "standardsettings.h"
 
-typedef QMap<uint, Setting*> devid_to_setting_t;
+typedef QMap<uint, StandardSetting*> devid_to_setting_t;
 
 class SwitchTypeSetting;
 class SwitchPortsSetting;
 class SwitchAddressSetting;
+class DeviceDescrSetting;
 
-class SwitchConfig : public QObject, public ConfigurationWizard
+class DiseqcConfigBase : public GroupSetting
 {
     Q_OBJECT
 
   public:
-    explicit SwitchConfig(DiSEqCDevSwitch &switch_dev);
+    virtual bool keyPressEvent(QKeyEvent *);
+    static DiseqcConfigBase* CreateByType(DiSEqCDevDevice *dev,
+                                          StandardSetting *parent);
+
+  signals:
+    void DeleteClicked(void);
+};
+
+class SwitchConfig : public DiseqcConfigBase
+{
+    Q_OBJECT
+
+  public:
+    SwitchConfig(DiSEqCDevSwitch &switch_dev, StandardSetting *parent);
+    void Load(void);
 
   public slots:
     void update(void);
 
   private:
+    DeviceDescrSetting *m_deviceDescr;
     SwitchTypeSetting  *m_type;
     SwitchPortsSetting *m_ports;
     SwitchAddressSetting *m_address;
 };
 
-class RotorPosMap : public ListBoxSetting, public Storage
+class RotorPosMap : public GroupSetting
 {
     Q_OBJECT
 
@@ -41,42 +57,40 @@ class RotorPosMap : public ListBoxSetting, public Storage
 
     virtual void Load(void);
     virtual void Save(void);
-    virtual void Save(QString /*destination*/) {}
 
-  public slots:
-    void edit(void);
-    void del(void);
+  private slots:
+    void valueChanged(StandardSetting*);
 
   protected:
     void PopulateList(void);
-    
+
   private:
     DiSEqCDevRotor &m_rotor;
     uint_to_dbl_t   m_posmap;
 };
 
-class RotorConfig : public QObject, public ConfigurationWizard
+class RotorConfig : public DiseqcConfigBase
 {
     Q_OBJECT
 
   public:
-    explicit RotorConfig(DiSEqCDevRotor &rotor);
+    void Load();
+    RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent);
 
   public slots:
     void SetType(const QString &type);
-    void RunRotorPositionsDialog(void);
 
   private:
     DiSEqCDevRotor     &m_rotor;
-    TransButtonSetting *m_pos;
+    RotorPosMap        *m_pos;
 };
 
-class SCRConfig : public QObject, public ConfigurationWizard
+class SCRConfig : public DiseqcConfigBase
 {
     Q_OBJECT
 
   public:
-    explicit SCRConfig(DiSEqCDevSCR &scr);
+    SCRConfig(DiSEqCDevSCR &scr, StandardSetting* parent);
 
   private:
     DiSEqCDevSCR &m_scr;
@@ -87,19 +101,22 @@ class LNBLOFSwitchSetting;
 class LNBLOFLowSetting;
 class LNBLOFHighSetting;
 class LNBPolarityInvertedSetting;
+class LNBPresetSetting;
 
-class LNBConfig : public QObject, public ConfigurationWizard
+class LNBConfig : public DiseqcConfigBase
 {
     Q_OBJECT
 
   public:
-    explicit LNBConfig(DiSEqCDevLNB &lnb);
+    LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent);
+    void Load(void);
 
   public slots:
     void SetPreset(const QString &value);
     void UpdateType(void);
 
   private:
+    LNBPresetSetting    *m_preset;
     LNBTypeSetting      *m_type;
     LNBLOFSwitchSetting *m_lof_switch;
     LNBLOFLowSetting    *m_lof_lo;
@@ -107,61 +124,55 @@ class LNBConfig : public QObject, public ConfigurationWizard
     LNBPolarityInvertedSetting *m_pol_inv;
 };
 
-class DeviceTree : public ListBoxSetting, public Storage
+class DeviceTypeSetting;
+
+class DeviceTree : public GroupSetting
 {
     Q_OBJECT
 
   public:
     explicit DeviceTree(DiSEqCDevTree &tree);
+    void DeleteDevice(DeviceTypeSetting *devtype);
 
     virtual void Load(void);
-    virtual void Save(void);
-    virtual void Save(QString /*destination*/) { }
 
   protected:
-    bool EditNodeDialog(uint nodeid);
-    void CreateRootNodeDialog(void);
-    void CreateNewNodeDialog(uint parentid, uint child_num);
-
-    bool RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type);
     void PopulateTree(void);
     void PopulateTree(DiSEqCDevDevice *node,
                       DiSEqCDevDevice *parent   = NULL,
                       uint             childnum = 0,
-                      uint             depth    = 0);
+                      GroupSetting    *parentSetting = NULL);
+    void PopulateChildren(DiSEqCDevDevice *node, GroupSetting *parentSetting);
+    void AddDeviceTypeSetting(DeviceTypeSetting *devtype,
+                              DiSEqCDevDevice *parent,
+                              uint childnum,
+                              GroupSetting *parentSetting);
+    void ConnectToValueChanged(DeviceTypeSetting *devtype,
+                               DiSEqCDevDevice *parent,
+                               uint childnum);
+    void ValueChanged(const QString &value,
+                      DeviceTypeSetting *devtype,
+                      DiSEqCDevDevice *parent,
+                      uint childnum);
 
-  public slots:
-    void edit(void);
-    void del(void);
-    
   private:
     DiSEqCDevTree &m_tree;
 };
 
-class DTVDeviceTreeWizard : public ConfigurationDialog
-{
-  public:
-    explicit DTVDeviceTreeWizard(DiSEqCDevTree &tree);
-
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
-};
-
-class DTVDeviceConfigGroup : public VerticalConfigurationGroup
+class DTVDeviceConfigGroup : public GroupSetting
 {
   public:
     DTVDeviceConfigGroup(DiSEqCDevSettings &settings, uint cardid,
                          bool switches_enabled);
     ~DTVDeviceConfigGroup(void);
-    
+
   protected:
-    void AddNodes(ConfigurationGroup *group, const QString &trigger,
+    void AddNodes(StandardSetting *group, const QString &trigger,
                   DiSEqCDevDevice *node);
 
-    void AddChild(ConfigurationGroup *group, const QString &trigger,
-                  Setting *setting);
-    
+    void AddChild(StandardSetting *group, const QString &trigger,
+                  StandardSetting *setting);
+
   private:
     DiSEqCDevTree       m_tree;
     DiSEqCDevSettings  &m_settings;

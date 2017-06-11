@@ -28,112 +28,130 @@
  */
 
 #include "channelscanner_gui_scan_pane.h"
-#include "loglist.h"
+#include "mythlogging.h"
+#include "mythuiprogressbar.h"
+#include "mythuitext.h"
+#include "mythuibuttonlist.h"
+#include "mythuibutton.h"
 
 ChannelScannerGUIScanPane::ChannelScannerGUIScanPane(
     bool lock, bool strength,
     bool snr, bool rotorpos,
-    QObject *target, const char *slot) :
-    VerticalConfigurationGroup(false, false, true, true),
+    MythScreenStack *parent) :
+    MythScreenType(parent, "channelscanner"),
+    m_showSignalLock(lock), m_showSignalStrength(strength),
+    m_showSignalNoise(snr), m_showRotorPos(rotorpos),
+    log(NULL),
     ss(NULL), sn(NULL), pos(NULL),
-    progressBar(NULL), sl(NULL), sta(NULL)
+    progressBar(NULL), sl(NULL), sta(NULL),
+    m_scanProgressText(NULL)
 {
-    setLabel(tr("Scan Progress"));
+}
 
-    ConfigurationGroup *slg =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    slg->addChild(sta = new TransLabelSetting());
-    sta->setLabel(tr("Status"));
-    sta->setValue(tr("Tuning"));
-
-    if (lock)
+bool ChannelScannerGUIScanPane::Create()
+{
+    if (!XMLParseBase::LoadWindowFromXML("config-ui.xml", "channelscanner",
+                                         this))
     {
-        slg->addChild(sl = new TransLabelSetting());
-        sl->setValue("                                  "
-                     "                                  ");
+        LOG(VB_GENERAL, LOG_ERR, "Failed to load channelscanner screen");
+        return false;
     }
 
-    addChild(slg);
+    bool error = false;
+    UIUtilE::Assign(this, sta, "status", &error);
+    UIUtilE::Assign(this, log, "log", &error);
+    UIUtilE::Assign(this, progressBar, "scanprogress", &error);
 
-    if (rotorpos)
+    if (error)
+        return false;
+
+    UIUtilW::Assign(this, m_scanProgressText, "scanprogresstext");
+    UIUtilW::Assign(this, sl, "signallock");
+    if (sl)
+        sl->SetVisible(m_showSignalLock);
+
+    UIUtilW::Assign(this, pos, "rotorprogress");
+    if (pos)
     {
-        addChild(pos = new TransProgressSetting());
-        pos->setLabel(tr("Rotor Movement"));
+        pos->SetVisible(m_showRotorPos);
+        pos->SetTotal(65535);
     }
 
-    ConfigurationGroup *ssg = NULL;
-    if (strength || snr)
-        ssg = new HorizontalConfigurationGroup(false, false, true, true);
-
-    if (strength)
+    UIUtilW::Assign(this, ss, "signalstrength");
+    if (ss)
     {
-        ssg->addChild(ss = new TransProgressSetting());
-        ss->setLabel(tr("Signal Strength"));
+        ss->SetVisible(m_showSignalStrength);
+        ss->SetTotal(65535);
     }
 
-    if (snr)
+    UIUtilW::Assign(this, sn, "signalnoise");
+    if (sn)
     {
-        ssg->addChild(sn = new TransProgressSetting());
-        sn->setLabel(tr("Signal/Noise"));
+        sn->SetVisible(m_showSignalNoise);
+        sn->SetTotal(65535);
     }
 
-    if (strength || snr)
-        addChild(ssg);
+    sta->SetText(tr("Tuning"));
+    progressBar->SetTotal(65535);
 
-    addChild(progressBar = new TransProgressSetting());
-    progressBar->setValue(0);
-    progressBar->setLabel(tr("Scan"));
+    MythUIButton *exitButton = NULL;
+    UIUtilW::Assign(this, exitButton, "exit");
+    if (exitButton)
+        connect(exitButton, SIGNAL(Clicked()), SLOT(Close()));
 
-    addChild(log = new LogList());
+    BuildFocusList();
 
-    TransButtonSetting *cancel = new TransButtonSetting();
-    cancel->setLabel(tr("Stop Scan"));
-    addChild(cancel);
-
-    connect(cancel, SIGNAL(pressed(void)), target, slot);
-
-    //Seem to need to do this as the constructor doesn't seem enough
-    setUseLabel(false);
-    setUseFrame(false);
+    return true;
 }
 
 void ChannelScannerGUIScanPane::SetStatusRotorPosition(int value)
 {
     if (pos)
-        pos->setValue(value);
+        pos->SetUsed(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusSignalToNoise(int value)
 {
     if (sn)
-        sn->setValue(value);
+        sn->SetUsed(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusSignalStrength(int value)
 {
     if (ss)
-        ss->setValue(value);
+        ss->SetUsed(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusLock(int value)
 {
     if (sl)
-        sl->setValue((value) ? tr("Locked") : tr("No Lock"));
+        sl->SetText((value) ? tr("Locked") : tr("No Lock"));
 }
 
 void ChannelScannerGUIScanPane::SetStatusText(const QString &value)
 {
     if (sta)
-        sta->setValue(value);
+        sta->SetText(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusTitleText(const QString &value)
 {
     QString msg = tr("Scan Progress %1").arg(value);
-    setLabel(msg);
+    if (m_scanProgressText)
+        m_scanProgressText->SetText(msg);
 }
 
 void ChannelScannerGUIScanPane::AppendLine(const QString &text)
 {
-    log->AppendLine(text);
+    if (log)
+    {
+        MythUIButtonListItem *listItem = new MythUIButtonListItem(log, text);
+        log->SetItemCurrent(listItem);
+    }
+}
+
+void ChannelScannerGUIScanPane::SetScanProgress(double value)
+{
+    if (progressBar)
+        progressBar->SetUsed((uint)(value * 65535));
 }

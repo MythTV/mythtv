@@ -370,7 +370,7 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 // same as the base class, it just doesn't complain if an option is missing
 void MpegRecorder::SetIntOption(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         SetOption(name, setting->getValue().toInt());
 }
@@ -378,7 +378,7 @@ void MpegRecorder::SetIntOption(RecordingProfile *profile, const QString &name)
 // same as the base class, it just doesn't complain if an option is missing
 void MpegRecorder::SetStrOption(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         SetOption(name, setting->getValue());
 }

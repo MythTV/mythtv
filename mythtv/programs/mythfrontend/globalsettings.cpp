@@ -46,9 +46,12 @@
 #include "privatedecoder_vda.h"
 #endif
 
-static HostCheckBox *DecodeExtraAudio()
+//Use for playBackGroup, to be remove at one point
+#include "playgroup.h"
+
+static HostCheckBoxSetting *DecodeExtraAudio()
 {
-    HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("DecodeExtraAudio");
 
     gc->setLabel(PlaybackSettings::tr("Extra audio buffering"));
 
@@ -67,9 +70,9 @@ static HostCheckBox *DecodeExtraAudio()
 }
 
 #if CONFIG_DEBUGTYPE
-static HostCheckBox *FFmpegDemuxer()
+static HostCheckBoxSetting *FFmpegDemuxer()
 {
-    HostCheckBox *gc = new HostCheckBox("FFMPEGTS");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("FFMPEGTS");
 
     gc->setLabel(PlaybackSettings::tr("Use FFmpeg's original MPEG-TS demuxer"));
 
@@ -82,9 +85,9 @@ static HostCheckBox *FFmpegDemuxer()
 }
 #endif
 
-static HostComboBox *PIPLocationComboBox()
+static HostComboBoxSetting *PIPLocationComboBox()
 {
-    HostComboBox *gc = new HostComboBox("PIPLocation");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("PIPLocation");
 
     gc->setLabel(PlaybackSettings::tr("PIP video location"));
 
@@ -96,9 +99,9 @@ static HostComboBox *PIPLocationComboBox()
     return gc;
 }
 
-static HostComboBox *DisplayRecGroup()
+static HostComboBoxSetting *DisplayRecGroup()
 {
-    HostComboBox *gc = new HostComboBox("DisplayRecGroup");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("DisplayRecGroup");
 
     gc->setLabel(PlaybackSettings::tr("Default group filter to apply"));
 
@@ -138,9 +141,9 @@ static HostComboBox *DisplayRecGroup()
     return gc;
 }
 
-static HostCheckBox *QueryInitialFilter()
+static HostCheckBoxSetting *QueryInitialFilter()
 {
-    HostCheckBox *gc = new HostCheckBox("QueryInitialFilter");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("QueryInitialFilter");
 
     gc->setLabel(PlaybackSettings::tr("Always prompt for initial group "
                                       "filter"));
@@ -154,9 +157,9 @@ static HostCheckBox *QueryInitialFilter()
     return gc;
 }
 
-static HostCheckBox *RememberRecGroup()
+static HostCheckBoxSetting *RememberRecGroup()
 {
-    HostCheckBox *gc = new HostCheckBox("RememberRecGroup");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RememberRecGroup");
 
     gc->setLabel(PlaybackSettings::tr("Save current group filter when "
                                       "changed"));
@@ -171,9 +174,9 @@ static HostCheckBox *RememberRecGroup()
     return gc;
 }
 
-static HostCheckBox *PBBStartInTitle()
+static HostCheckBoxSetting *PBBStartInTitle()
 {
-    HostCheckBox *gc = new HostCheckBox("PlaybackBoxStartInTitle");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackBoxStartInTitle");
 
     gc->setLabel(PlaybackSettings::tr("Start in group list"));
 
@@ -185,9 +188,9 @@ static HostCheckBox *PBBStartInTitle()
     return gc;
 }
 
-static HostCheckBox *SmartForward()
+static HostCheckBoxSetting *SmartForward()
 {
-    HostCheckBox *gc = new HostCheckBox("SmartForward");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("SmartForward");
 
     gc->setLabel(PlaybackSettings::tr("Smart fast forwarding"));
 
@@ -199,9 +202,9 @@ static HostCheckBox *SmartForward()
     return gc;
 }
 
-static GlobalComboBox *CommercialSkipMethod()
+static GlobalComboBoxSetting *CommercialSkipMethod()
 {
-    GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
+    GlobalComboBoxSetting *bc = new GlobalComboBoxSetting("CommercialSkipMethod");
 
     bc->setLabel(GeneralSettings::tr("Commercial detection method"));
 
@@ -217,9 +220,9 @@ static GlobalComboBox *CommercialSkipMethod()
     return bc;
 }
 
-static GlobalCheckBox *CommFlagFast()
+static GlobalCheckBoxSetting *CommFlagFast()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("CommFlagFast");
+    GlobalCheckBoxSetting *gc = new GlobalCheckBoxSetting("CommFlagFast");
 
     gc->setLabel(GeneralSettings::tr("Enable experimental speedup of "
                                      "commercial detection"));
@@ -231,9 +234,9 @@ static GlobalCheckBox *CommFlagFast()
     return gc;
 }
 
-static HostComboBox *AutoCommercialSkip()
+static HostComboBoxSetting *AutoCommercialSkip()
 {
-    HostComboBox *gc = new HostComboBox("AutoCommercialSkip");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("AutoCommercialSkip");
 
     gc->setLabel(PlaybackSettings::tr("Automatically skip commercials"));
 
@@ -252,9 +255,9 @@ static HostComboBox *AutoCommercialSkip()
     return gc;
 }
 
-static GlobalSpinBox *DeferAutoTranscodeDays()
+static GlobalSpinBoxSetting *DeferAutoTranscodeDays()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("DeferAutoTranscodeDays", 0, 365, 1);
+    GlobalSpinBoxSetting *gs = new GlobalSpinBoxSetting("DeferAutoTranscodeDays", 0, 365, 1);
 
     gs->setLabel(GeneralSettings::tr("Deferral days for auto transcode jobs"));
 
@@ -268,9 +271,9 @@ static GlobalSpinBox *DeferAutoTranscodeDays()
     return gs;
 }
 
-static GlobalCheckBox *AggressiveCommDetect()
+static GlobalCheckBoxSetting *AggressiveCommDetect()
 {
-    GlobalCheckBox *bc = new GlobalCheckBox("AggressiveCommDetect");
+    GlobalCheckBoxSetting *bc = new GlobalCheckBoxSetting("AggressiveCommDetect");
 
     bc->setLabel(GeneralSettings::tr("Strict commercial detection"));
 
@@ -282,9 +285,9 @@ static GlobalCheckBox *AggressiveCommDetect()
     return bc;
 }
 
-static HostSpinBox *CommRewindAmount()
+static HostSpinBoxSetting *CommRewindAmount()
 {
-    HostSpinBox *gs = new HostSpinBox("CommRewindAmount", 0, 10, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("CommRewindAmount", 0, 10, 1);
 
     gs->setLabel(PlaybackSettings::tr("Commercial skip automatic rewind amount "
                                       "(secs)"));
@@ -298,9 +301,9 @@ static HostSpinBox *CommRewindAmount()
     return gs;
 }
 
-static HostSpinBox *CommNotifyAmount()
+static HostSpinBoxSetting *CommNotifyAmount()
 {
-    HostSpinBox *gs = new HostSpinBox("CommNotifyAmount", 0, 10, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("CommNotifyAmount", 0, 10, 1);
 
     gs->setLabel(PlaybackSettings::tr("Commercial skip notify amount (secs)"));
 
@@ -315,9 +318,9 @@ static HostSpinBox *CommNotifyAmount()
     return gs;
 }
 
-static GlobalSpinBox *MaximumCommercialSkip()
+static GlobalSpinBoxSetting *MaximumCommercialSkip()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("MaximumCommercialSkip", 0, 3600, 10);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("MaximumCommercialSkip", 0, 3600, 10);
 
     bs->setLabel(PlaybackSettings::tr("Maximum commercial skip (secs)"));
 
@@ -333,9 +336,9 @@ static GlobalSpinBox *MaximumCommercialSkip()
     return bs;
 }
 
-static GlobalSpinBox *MergeShortCommBreaks()
+static GlobalSpinBoxSetting *MergeShortCommBreaks()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("MergeShortCommBreaks", 0, 3600, 5);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("MergeShortCommBreaks", 0, 3600, 5);
 
     bs->setLabel(PlaybackSettings::tr("Merge short commercial breaks (secs)"));
 
@@ -351,9 +354,9 @@ static GlobalSpinBox *MergeShortCommBreaks()
     return bs;
 }
 
-static GlobalSpinBox *AutoExpireExtraSpace()
+static GlobalSpinBoxSetting *AutoExpireExtraSpace()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AutoExpireExtraSpace", 0, 200, 1);
 
     bs->setLabel(GeneralSettings::tr("Extra disk space (GB)"));
 
@@ -368,9 +371,9 @@ static GlobalSpinBox *AutoExpireExtraSpace()
 };
 
 #if 0
-static GlobalCheckBox *AutoExpireInsteadOfDelete()
+static GlobalCheckBoxSetting *AutoExpireInsteadOfDelete()
 {
-    GlobalCheckBox *cb = new GlobalCheckBox("AutoExpireInsteadOfDelete");
+    GlobalCheckBoxSetting *cb = new GlobalCheckBoxSetting("AutoExpireInsteadOfDelete");
 
     cb->setLabel(DeletedExpireOptions::tr("Auto-Expire instead of delete recording"));
 
@@ -383,9 +386,9 @@ static GlobalCheckBox *AutoExpireInsteadOfDelete()
 }
 #endif
 
-static GlobalSpinBox *DeletedMaxAge()
+static GlobalSpinBoxSetting *DeletedMaxAge()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("DeletedMaxAge", -1, 365, 1);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("DeletedMaxAge", -1, 365, 1);
 
     bs->setLabel(GeneralSettings::tr("Time to retain deleted recordings "
                                      "(days)"));
@@ -429,9 +432,9 @@ class DeletedExpireOptions : public TriggeredConfigurationGroup
 };
 #endif
 
-static GlobalComboBox *AutoExpireMethod()
+static GlobalComboBoxSetting *AutoExpireMethod()
 {
-    GlobalComboBox *bc = new GlobalComboBox("AutoExpireMethod");
+    GlobalComboBoxSetting *bc = new GlobalComboBoxSetting("AutoExpireMethod");
 
     bc->setLabel(GeneralSettings::tr("Auto-Expire method"));
 
@@ -449,9 +452,9 @@ static GlobalComboBox *AutoExpireMethod()
     return bc;
 }
 
-static GlobalCheckBox *AutoExpireWatchedPriority()
+static GlobalCheckBoxSetting *AutoExpireWatchedPriority()
 {
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireWatchedPriority");
+    GlobalCheckBoxSetting *bc = new GlobalCheckBoxSetting("AutoExpireWatchedPriority");
 
     bc->setLabel(GeneralSettings::tr("Watched before unwatched"));
 
@@ -464,9 +467,9 @@ static GlobalCheckBox *AutoExpireWatchedPriority()
     return bc;
 }
 
-static GlobalSpinBox *AutoExpireDayPriority()
+static GlobalSpinBoxSetting *AutoExpireDayPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireDayPriority", 1, 400, 1);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AutoExpireDayPriority", 1, 400, 1);
 
     bs->setLabel(GeneralSettings::tr("Priority weight"));
 
@@ -480,9 +483,9 @@ static GlobalSpinBox *AutoExpireDayPriority()
     return bs;
 };
 
-static GlobalSpinBox *AutoExpireLiveTVMaxAge()
+static GlobalSpinBoxSetting *AutoExpireLiveTVMaxAge()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireLiveTVMaxAge", 1, 365, 1);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AutoExpireLiveTVMaxAge", 1, 365, 1);
 
     bs->setLabel(GeneralSettings::tr("Live TV max age (days)"));
 
@@ -498,9 +501,9 @@ static GlobalSpinBox *AutoExpireLiveTVMaxAge()
 
 #if 0
 // Translations have been removed, please put back if reactivated...
-static GlobalSpinBox *MinRecordDiskThreshold()
+static GlobalSpinBoxSetting *MinRecordDiskThreshold()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("MinRecordDiskThreshold",
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("MinRecordDiskThreshold",
                                             0, 1000000, 100);
     bs->setLabel("New recording free disk space threshold "
                  "(MB)");
@@ -512,9 +515,9 @@ static GlobalSpinBox *MinRecordDiskThreshold()
 }
 #endif
 
-static GlobalCheckBox *RerecordWatched()
+static GlobalCheckBoxSetting *RerecordWatched()
 {
-    GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched");
+    GlobalCheckBoxSetting *bc = new GlobalCheckBoxSetting("RerecordWatched");
 
     bc->setLabel(GeneralSettings::tr("Re-record watched"));
 
@@ -527,9 +530,9 @@ static GlobalCheckBox *RerecordWatched()
     return bc;
 }
 
-static GlobalSpinBox *RecordPreRoll()
+static GlobalSpinBoxSetting *RecordPreRoll()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("RecordPreRoll", 0, 600, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordPreRoll", 0, 600, 60, true);
 
     bs->setLabel(GeneralSettings::tr("Time to record before start of show "
                                      "(secs)"));
@@ -545,9 +548,9 @@ static GlobalSpinBox *RecordPreRoll()
     return bs;
 }
 
-static GlobalSpinBox *RecordOverTime()
+static GlobalSpinBoxSetting *RecordOverTime()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("RecordOverTime", 0, 1800, 60, true);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("RecordOverTime", 0, 1800, 60, true);
 
     bs->setLabel(GeneralSettings::tr("Time to record past end of show (secs)"));
 
@@ -562,9 +565,9 @@ static GlobalSpinBox *RecordOverTime()
     return bs;
 }
 
-static GlobalComboBox *OverTimeCategory()
+static GlobalComboBoxSetting *OverTimeCategory()
 {
-    GlobalComboBox *gc = new GlobalComboBox("OverTimeCategory");
+    GlobalComboBoxSetting *gc = new GlobalComboBoxSetting("OverTimeCategory");
 
     gc->setLabel(GeneralSettings::tr("Category of shows to be extended"));
 
@@ -592,9 +595,9 @@ static GlobalComboBox *OverTimeCategory()
     return gc;
 }
 
-static GlobalSpinBox *CategoryOverTime()
+static GlobalSpinBoxSetting *CategoryOverTime()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("CategoryOverTime",
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("CategoryOverTime",
                                           0, 180, 60, true);
 
     bs->setLabel(GeneralSettings::tr("Record past end of show (mins)"));
@@ -610,14 +613,11 @@ static GlobalSpinBox *CategoryOverTime()
     return bs;
 }
 
-static VerticalConfigurationGroup *CategoryOverTimeSettings()
+static GroupSetting *CategoryOverTimeSettings()
 {
-    VerticalConfigurationGroup *vcg =
-        new VerticalConfigurationGroup(false, false);
+    GroupSetting *vcg = new GroupSetting();
 
     vcg->setLabel(GeneralSettings::tr("Category record over-time"));
-
-    vcg->setUseLabel(true);
 
     vcg->addChild(OverTimeCategory());
     vcg->addChild(CategoryOverTime());
@@ -625,50 +625,29 @@ static VerticalConfigurationGroup *CategoryOverTimeSettings()
     return vcg;
 }
 
-static QString trunc(const QString &str, int len)
+PlaybackProfileItemConfig::PlaybackProfileItemConfig(
+    PlaybackProfileConfig *parent, uint idx, ProfileItem &_item) :
+    item(_item), parentConfig(parent), index(idx)
 {
-    if (str.length() > len)
-        return str.mid(0, len - 5) + " . . . ";
-    return str;
-}
+    GroupSetting *row[2];
 
-static QString pad(const QString &str, int len)
-{
-    QString tmp = str;
-
-    while (tmp.length() + 4 < len)
-        tmp += "    ";
-
-    while (tmp.length() < len)
-        tmp += " ";
-
-    return tmp;
-}
-
-PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
-    item(_item)
-{
-    setLabel(tr("Profile Item"));
-
-    HorizontalConfigurationGroup *row[2];
-
-    row[0]    = new HorizontalConfigurationGroup(false, false, true, true);
-    cmp[0]    = new TransComboBoxSetting();
-    width[0]  = new TransSpinBoxSetting(0, 1920, 64, true);
-    height[0] = new TransSpinBoxSetting(0, 1088, 64, true);
-    row[1]    = new HorizontalConfigurationGroup(false, false, true, true);
-    cmp[1]    = new TransComboBoxSetting();
-    width[1]  = new TransSpinBoxSetting(0, 1920, 64, true);
-    height[1] = new TransSpinBoxSetting(0, 1088, 64, true);
-    decoder   = new TransComboBoxSetting();
-    max_cpus  = new TransSpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
-    skiploop  = new TransCheckBoxSetting();
-    vidrend   = new TransComboBoxSetting();
-    osdrend   = new TransComboBoxSetting();
-    osdfade   = new TransCheckBoxSetting();
-    deint0    = new TransComboBoxSetting();
-    deint1    = new TransComboBoxSetting();
-    filters   = new TransLineEditSetting(true);
+    row[0]    = new GroupSetting();
+    cmp[0]    = new TransMythUIComboBoxSetting();
+    width[0]  = new TransMythUISpinBoxSetting(0, 1920, 64, true);
+    height[0] = new TransMythUISpinBoxSetting(0, 1088, 64, true);
+    row[1]    = new GroupSetting();
+    cmp[1]    = new TransMythUIComboBoxSetting();
+    width[1]  = new TransMythUISpinBoxSetting(0, 1920, 64, true);
+    height[1] = new TransMythUISpinBoxSetting(0, 1088, 64, true);
+    decoder   = new TransMythUIComboBoxSetting();
+    max_cpus  = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
+    skiploop  = new TransMythUICheckBoxSetting();
+    vidrend   = new TransMythUIComboBoxSetting();
+    osdrend   = new TransMythUIComboBoxSetting();
+    osdfade   = new TransMythUICheckBoxSetting();
+    deint0    = new TransMythUIComboBoxSetting();
+    deint1    = new TransMythUIComboBoxSetting();
+    filters   = new TransTextEditSetting();
 
     for (uint i = 0; i < 2; ++i)
     {
@@ -677,20 +656,14 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
             cmp[i]->addSelection(kCMP[j]);
 
         cmp[i]->setLabel(tr("Match criteria"));
-        width[i]->setName(QString("w%1").arg(i));
-        width[i]->setLabel(tr("W", "Width"));
-        height[i]->setName(QString("h%1").arg(i));
-        height[i]->setLabel(tr("H", "Height"));
+        width[i]->setLabel(tr("Width"));
+        height[i]->setLabel(tr("Height"));
 
+        row[i]->setLabel(tr("Match criteria"));
         row[i]->addChild(cmp[i]);
         row[i]->addChild(width[i]);
         row[i]->addChild(height[i]);
     }
-
-    HorizontalConfigurationGroup *vid_row =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    HorizontalConfigurationGroup *osd_row =
-        new HorizontalConfigurationGroup(false, false, true, true);
 
     decoder->setLabel(tr("Decoder"));
     max_cpus->setLabel(tr("Max CPUs"));
@@ -723,30 +696,21 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
         tr("Uncheck this if the video studders while the OSD is "
            "fading away."));
 
-    vid_row->addChild(decoder);
-    vid_row->addChild(max_cpus);
-    vid_row->addChild(skiploop);
-    osd_row->addChild(vidrend);
-    osd_row->addChild(osdrend);
-    osd_row->addChild(osdfade);
+    addChild(row[0]);
+    addChild(row[1]);
+    addChild(decoder);
+    addChild(max_cpus);
+    addChild(skiploop);
+    addChild(vidrend);
+    addChild(osdrend);
+    addChild(osdfade);
 
-    VerticalConfigurationGroup *grp =
-        new VerticalConfigurationGroup(false, false, true, true);
-    grp->addChild(row[0]);
-    grp->addChild(row[1]);
-    grp->addChild(vid_row);
-    grp->addChild(osd_row);
-    addChild(grp);
-
-    VerticalConfigurationGroup *page2 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    page2->addChild(deint0);
-    page2->addChild(deint1);
-    page2->addChild(filters);
-    addChild(page2);
+    addChild(deint0);
+    addChild(deint1);
+    addChild(filters);
 
     connect(decoder, SIGNAL(valueChanged(const QString&)),
-            this,    SLOT(decoderChanged(const QString&)));\
+            this,    SLOT(decoderChanged(const QString&)));
     connect(vidrend, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(vrenderChanged(const QString&)));
     connect(osdrend, SIGNAL(valueChanged(const QString&)),
@@ -755,6 +719,21 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
             this,    SLOT(deint0Changed(const QString&)));
     connect(deint1, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(deint1Changed(const QString&)));
+
+    for (uint i = 0; i < 2; ++i)
+    {
+        connect(cmp[i], SIGNAL(valueChanged(const QString&)),
+                SLOT(InitLabel()));
+        connect(height[i], SIGNAL(valueChanged(const QString&)),
+                SLOT(InitLabel()));
+        connect(width[i], SIGNAL(valueChanged(const QString&)),
+                SLOT(InitLabel()));
+    }
+}
+
+uint PlaybackProfileItemConfig::GetIndex(void) const
+{
+    return index;
 }
 
 void PlaybackProfileItemConfig::Load(void)
@@ -772,8 +751,8 @@ void PlaybackProfileItemConfig::Load(void)
             clist<<"0";
 
         cmp[i]->setValue(clist[0]);
-        width[i]->setValue(clist[1].toInt());
-        height[i]->setValue(clist[2].toInt());
+        width[i]->setValue(clist[1]);
+        height[i]->setValue(clist[2]);
     }
 
     QString pdecoder  = item.Get("pref_decoder");
@@ -792,6 +771,7 @@ void PlaybackProfileItemConfig::Load(void)
     QStringList decn = VideoDisplayProfile::GetDecoderNames();
     QStringList::const_iterator itr = decr.begin();
     QStringList::const_iterator itn = decn.begin();
+    decoder->clearSelections();
     for (; (itr != decr.end()) && (itn != decn.end()); ++itr, ++itn)
     {
         decoder->addSelection(*itn, *itr, (*itr == pdecoder));
@@ -799,7 +779,7 @@ void PlaybackProfileItemConfig::Load(void)
     }
     if (!found && !pdecoder.isEmpty())
     {
-        decoder->SelectSetting::addSelection(
+        decoder->addSelection(
             VideoDisplayProfile::GetDecoderName(pdecoder), pdecoder, true);
     }
     decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
@@ -822,6 +802,8 @@ void PlaybackProfileItemConfig::Load(void)
         deint1->setValue(pdeint1);
     if (!pfilter.isEmpty())
         filters->setValue(pfilter);
+
+    GroupSetting::Load();
 }
 
 void PlaybackProfileItemConfig::Save(void)
@@ -908,6 +890,8 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 
     filters->setEnabled(VideoDisplayProfile::IsFilterAllowed(renderer));
     vidrend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
+
+    InitLabel();
 }
 
 void PlaybackProfileItemConfig::orenderChanged(const QString &renderer)
@@ -929,132 +913,142 @@ void PlaybackProfileItemConfig::deint1Changed(const QString &deint)
         .arg(VideoDisplayProfile::GetDeinterlacerHelp(deint)));
 }
 
-PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename) :
-    VerticalConfigurationGroup(false, false, true, true),
-    profile_name(profilename), needs_save(false),
-    groupid(0), last_main(NULL)
+bool PlaybackProfileItemConfig::keyPressEvent(QKeyEvent *e)
 {
+    QStringList actions;
+
+    if (GetMythMainWindow()->TranslateKeyPress("Global", e, actions))
+        return true;
+
+    foreach (const QString &action, actions)
+    {
+        if (action == "DELETE")
+        {
+            ShowDeleteDialog();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void PlaybackProfileItemConfig::ShowDeleteDialog()
+{
+    QString message = tr("Remove this profile item?");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *confirmDelete =
+        new MythConfirmationDialog(popupStack, message, true);
+
+    if (confirmDelete->Create())
+    {
+        connect(confirmDelete, SIGNAL(haveResult(bool)),
+                SLOT(DoDeleteSlot(bool)));
+        popupStack->AddScreen(confirmDelete);
+    }
+    else
+        delete confirmDelete;
+}
+
+void PlaybackProfileItemConfig::DoDeleteSlot(bool doDelete)
+{
+    if (doDelete)
+        parentConfig->DeleteProfileItem(this);
+}
+
+void PlaybackProfileItemConfig::DecreasePriority(void)
+{
+    parentConfig->swap(index, index + 1);
+}
+
+void PlaybackProfileItemConfig::IncreasePriority(void)
+{
+    parentConfig->swap(index, index - 1);
+}
+
+PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename,
+                                             StandardSetting *parent) :
+    profile_name(profilename),
+    groupid(0)
+{
+    setVisible(false);
     groupid = VideoDisplayProfile::GetProfileGroupID(
-        profilename, gCoreContext->GetHostName());
-
+        profile_name, gCoreContext->GetHostName());
     items = VideoDisplayProfile::LoadDB(groupid);
-
-    InitUI();
+    InitUI(parent);
 }
 
 PlaybackProfileConfig::~PlaybackProfileConfig()
 {
 }
 
-void PlaybackProfileConfig::InitLabel(uint i)
+void PlaybackProfileItemConfig::InitLabel(void)
 {
-    if (!labels[i])
-        return;
-
     QString andStr = tr("&", "and");
-    QString cmp0   = items[i].Get("pref_cmp0");
-    QString cmp1   = items[i].Get("pref_cmp1");
-    QString str    = tr("if rez") + ' ' + cmp0;
+    QString cmp0   = QString("%1 %2 %3").arg(cmp[0]->getValue())
+        .arg(width[0]->intValue())
+        .arg(height[0]->intValue());
+    QString cmp1   = QString("%1 %2 %3").arg(cmp[1]->getValue())
+        .arg(width[1]->intValue())
+        .arg(height[1]->intValue());
+    QString str    = PlaybackProfileConfig::tr("if rez") + ' ' + cmp0;
 
-    if (!cmp1.isEmpty())
+    if (!cmp[1]->getValue().isEmpty())
         str += " " + andStr + ' ' + cmp1;
 
     str += " -> ";
-    str += items[i].Get("pref_decoder");
+    str += decoder->getValue();
     str += " " + andStr + ' ';
-    str += items[i].Get("pref_videorenderer");
+    str += vidrend->getValue();
     str.replace("-blit", "");
     str.replace("ivtv " + andStr + " ivtv", "ivtv");
     str.replace("xvmc " + andStr + " xvmc", "xvmc");
     str.replace("xvmc", "XvMC");
     str.replace("xv", "XVideo");
 
-    labels[i]->setValue(pad(trunc(str, 48), 48));
+    setLabel(str);
 }
 
-void PlaybackProfileConfig::InitUI(void)
+void PlaybackProfileConfig::InitUI(StandardSetting *parent)
 {
-    VerticalConfigurationGroup *main =
-        new VerticalConfigurationGroup(false, false, true, true);
+    m_markForDeletion = new TransMythUICheckBoxSetting();
+    m_markForDeletion->setLabel(tr("Mark for deletion"));
+    m_addNewEntry = new ButtonStandardSetting(tr("Add New Entry"));
 
-    HorizontalConfigurationGroup *rows =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *column1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *column2 =
-        new VerticalConfigurationGroup(false, false, true, true);
+    parent->addTargetedChild(profile_name, m_markForDeletion);
+    parent->addTargetedChild(profile_name, m_addNewEntry);
 
-    labels.resize(items.size());
+    connect(m_addNewEntry, SIGNAL(clicked()), SLOT(AddNewEntry()));
 
     for (uint i = 0; i < items.size(); ++i)
-    {
-        labels[i] = new TransLabelSetting();
-        InitLabel(i);
-        column1->addChild(labels[i]);
-    }
-
-    editProf.resize(items.size());
-    delProf.resize(items.size());
-    priority.resize(items.size());
-
-    for (uint i = 0; i < items.size(); ++i)
-    {
-        HorizontalConfigurationGroup *grp =
-            new HorizontalConfigurationGroup(false, false, true, true);
-
-        editProf[i] = new TransButtonSetting(QString("edit%1").arg(i));
-        delProf[i]  = new TransButtonSetting(QString("del%1").arg(i));
-        priority[i] = new TransSpinBoxSetting(1, items.size(), 1);
-        priority[i]->setName(QString("pri%1").arg(i));
-
-        editProf[i]->setLabel(QCoreApplication::translate("(Common)", "Edit"));
-        delProf[i]->setLabel(QCoreApplication::translate("(Common)", "Delete"));
-        priority[i]->setValue(i + 1);
-        items[i].Set("pref_priority", QString::number(i + 1));
-
-        grp->addChild(editProf[i]);
-        grp->addChild(delProf[i]);
-        grp->addChild(priority[i]);
-
-        connect(editProf[i], SIGNAL(pressed(QString)),
-                this,        SLOT  (pressed(QString)));
-        connect(delProf[i],  SIGNAL(pressed(QString)),
-                this,        SLOT  (pressed(QString)));
-        connect(priority[i], SIGNAL(valueChanged(   const QString&, int)),
-                this,        SLOT(  priorityChanged(const QString&, int)));
-
-        column2->addChild(grp);
-    }
-
-    rows->addChild(column1);
-    rows->addChild(column2);
-
-    TransButtonSetting *addEntry = new TransButtonSetting("addentry");
-    addEntry->setLabel(tr("Add New Entry"));
-
-    main->addChild(rows);
-    main->addChild(addEntry);
-
-    connect(addEntry, SIGNAL(pressed(QString)),
-            this,     SLOT  (pressed(QString)));
-
-    if (last_main)
-        replaceChild(last_main, main);
-    else
-        addChild(main);
-
-    last_main = main;
+        InitProfileItem(i, parent);
 }
 
-void PlaybackProfileConfig::Load(void)
+StandardSetting * PlaybackProfileConfig::InitProfileItem(
+    uint i, StandardSetting *parent)
 {
-    // Already loaded data in constructor...
+    PlaybackProfileItemConfig* ppic =
+        new PlaybackProfileItemConfig(this, i, items[i]);
+
+    items[i].Set("pref_priority", QString::number(i + 1));
+
+    parent->addTargetedChild(profile_name, ppic);
+    m_profiles.push_back(ppic);
+    return ppic;
 }
 
 void PlaybackProfileConfig::Save(void)
 {
-    if (!needs_save)
-        return; // nothing to do..
+    if (m_markForDeletion->boolValue())
+    {
+        VideoDisplayProfile::DeleteProfileGroup(profile_name,
+                                                gCoreContext->GetHostName());
+        return;
+    }
+
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    {
+        profile->Save();
+    }
 
     bool ok = VideoDisplayProfile::DeleteDB(groupid, del_items);
     if (!ok)
@@ -1073,120 +1067,84 @@ void PlaybackProfileConfig::Save(void)
     }
 }
 
-void PlaybackProfileConfig::pressed(QString cmd)
+void PlaybackProfileConfig::DeleteProfileItem(
+    PlaybackProfileItemConfig *profileToDelete)
 {
-    if (cmd.startsWith("edit"))
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
-        uint i = cmd.mid(4).toUInt();
-        PlaybackProfileItemConfig itemcfg(items[i]);
-
-        if (itemcfg.exec() != kDialogCodeAccepted)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("edit #%1").arg(i) + " rejected");
-        }
-        else
-        {
-            InitLabel(i);
-            needs_save = true;
-        }
-    }
-    else if (cmd.startsWith("del"))
-    {
-        uint i = cmd.mid(3).toUInt();
-        del_items.push_back(items[i]);
-        items.erase(items.begin() + i);
-
-        InitUI();
-        needs_save = true;
-    }
-    else if (cmd == "addentry")
-    {
-        ProfileItem item;
-        PlaybackProfileItemConfig itemcfg(item);
-
-        if (itemcfg.exec() != kDialogCodeAccepted)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "addentry rejected");
-        }
-        else
-        {
-            items.push_back(item);
-            InitUI();
-            needs_save = true;
-        }
+        profile->Save();
     }
 
-    repaint();
+    uint i = profileToDelete->GetIndex();
+    del_items.push_back(items[i]);
+    items.erase(items.begin() + i);
+
+    ReloadSettings();
 }
 
-void PlaybackProfileConfig::priorityChanged(const QString &name, int val)
+void PlaybackProfileConfig::AddNewEntry(void)
 {
-    uint i = name.mid(3).toInt();
-    uint j = i;
-
-    priority[i]->SetRelayEnabled(false);
-
-    if (((int)items[i].GetPriority() < val) &&
-        (i + 1 < priority.size())           &&
-        ((int)items[i+1].GetPriority() == val))
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
     {
-        j++;
-        priority[j]->SetRelayEnabled(false);
-
-        swap(i, j);
-        priority[j]->setFocus();
-    }
-    else if (((int)items[i].GetPriority() > val) &&
-             (i > 0) &&
-             ((int)items[i-1].GetPriority() == val))
-    {
-        j--;
-        priority[j]->SetRelayEnabled(false);
-
-        swap(i, j);
-
-        priority[j]->setFocus();
-    }
-    else
-    {
-        priority[i]->setValue((int) items[i].GetPriority());
+        profile->Save();
     }
 
-    needs_save = true;
+    ProfileItem item;
 
-    repaint();
+    items.push_back(item);
 
-    priority[i]->SetRelayEnabled(true);
-    if (i != j)
-        priority[j]->SetRelayEnabled(true);
+    ReloadSettings();
+}
+
+void PlaybackProfileConfig::ReloadSettings(void)
+{
+    getParent()->removeTargetedChild(profile_name, m_markForDeletion);
+    getParent()->removeTargetedChild(profile_name, m_addNewEntry);
+
+    foreach (StandardSetting *setting, m_profiles)
+    {
+        getParent()->removeTargetedChild(profile_name, setting);
+    }
+    m_profiles.clear();
+
+    InitUI(getParent());
+
+    foreach (StandardSetting *setting, m_profiles)
+    {
+        setting->Load();
+    }
+
+    emit getParent()->settingsChanged();
+    setChanged(true);
 }
 
 void PlaybackProfileConfig::swap(int i, int j)
 {
-    int pri_i = items[i].GetPriority();
-    int pri_j = items[j].GetPriority();
+    foreach (PlaybackProfileItemConfig *profile, m_profiles)
+    {
+        profile->Save();
+    }
+
+    QString pri_i = QString::number(items[i].GetPriority());
+    QString pri_j = QString::number(items[j].GetPriority());
 
     ProfileItem item = items[j];
     items[j] = items[i];
     items[i] = item;
 
-    priority[i]->setValue(pri_i);
-    priority[j]->setValue(pri_j);
+    items[i].Set("pref_priority", pri_i);
+    items[j].Set("pref_priority", pri_j);
 
-    items[i].Set("pref_priority", QString::number(pri_i));
-    items[j].Set("pref_priority", QString::number(pri_j));
-
-    const QString label_i = labels[i]->getValue();
-    const QString label_j = labels[j]->getValue();
-    labels[i]->setValue(label_j);
-    labels[j]->setValue(label_i);
+    ReloadSettings();
 }
 
-PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
-    TriggeredConfigurationGroup(false, true,  true, true,
-                                false, false, true, true), grouptrigger(NULL)
+static HostComboBoxSetting * CurrentPlaybackProfile()
 {
-    setLabel(tr("Playback Profiles %1").arg(str));
+    HostComboBoxSetting *grouptrigger =
+        new HostComboBoxSetting("DefaultVideoPlaybackProfile");
+    grouptrigger->setLabel(
+        QCoreApplication::translate("PlaybackProfileConfigs",
+                                    "Current Video Playback Profile"));
 
     QString host = gCoreContext->GetHostName();
     QStringList profiles = VideoDisplayProfile::GetProfiles(host);
@@ -1196,7 +1154,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
     if (profiles.empty())
-        return;
+        return grouptrigger;
 
     if (!profiles.contains("Normal") &&
         !profiles.contains("High Quality") &&
@@ -1271,113 +1229,62 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         VideoDisplayProfile::SetDefaultProfileName(profile, host);
     }
 
-    grouptrigger = new HostComboBox("DefaultVideoPlaybackProfile");
-
-    grouptrigger->setLabel(tr("Current Video Playback Profile"));
-
     QStringList::const_iterator it;
     for (it = profiles.begin(); it != profiles.end(); ++it)
+    {
         grouptrigger->addSelection(ProgramInfo::i18n(*it), *it);
-
-    HorizontalConfigurationGroup *grp =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    TransButtonSetting *addProf = new TransButtonSetting("add");
-    TransButtonSetting *delProf = new TransButtonSetting("del");
-
-    addProf->setLabel(tr("Add New"));
-    delProf->setLabel(QCoreApplication::translate("(Common)", "Delete"));
-
-    grp->addChild(grouptrigger);
-    grp->addChild(addProf);
-    grp->addChild(delProf);
-
-    addChild(grp);
-
-    setTrigger(grouptrigger);
-    for (it = profiles.begin(); it != profiles.end(); ++it)
-        addTarget(*it, new PlaybackProfileConfig(*it));
-    setSaveAll(true);
-
-    connect(addProf, SIGNAL(pressed( QString)),
-            this,    SLOT  (btnPress(QString)));
-    connect(delProf, SIGNAL(pressed( QString)),
-            this,    SLOT  (btnPress(QString)));
-}
-
-PlaybackProfileConfigs::~PlaybackProfileConfigs()
-{
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, "~PlaybackProfileConfigs()");
-#endif
-}
-
-void PlaybackProfileConfigs::btnPress(QString cmd)
-{
-    if (cmd == "add")
-    {
-        QString name;
-
-        QString host = gCoreContext->GetHostName();
-        QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
-
-        bool ok = true;
-        while (ok)
-        {
-            QString msg = tr("Enter Playback Group Name");
-
-            ok = MythPopupBox::showGetTextPopup(
-                GetMythMainWindow(), msg, msg, name);
-
-            if (!ok)
-                return;
-
-            if (not_ok_list.contains(name) || name.isEmpty())
-            {
-                msg = (name.isEmpty()) ?
-                    tr("Sorry, playback group\nname cannot be blank.") :
-                    tr("Sorry, playback group name\n"
-                       "'%1' is already being used.").arg(name);
-
-                MythPopupBox::showOkPopup(
-                    GetMythMainWindow(), QCoreApplication::translate("(Common)",
-                        "Error"), msg);
-
-                continue;
-            }
-
-            break;
-        }
-
-        VideoDisplayProfile::CreateProfileGroup(name, gCoreContext->GetHostName());
-        addTarget(name, new PlaybackProfileConfig(name));
-
-        if (grouptrigger)
-            grouptrigger->addSelection(name, name, true);
-    }
-    else if ((cmd == "del") && grouptrigger)
-    {
-        const QString name = grouptrigger->getSelectionLabel();
-        if (!name.isEmpty())
-        {
-            removeTarget(name);
-            VideoDisplayProfile::DeleteProfileGroup(
-                name, gCoreContext->GetHostName());
-            // This would be better done in TriggeredConfigurationGroup::removeTarget
-            // however, as removeTarget is used elsewhere, limit the changes to this
-            // case only
-            grouptrigger->setValue(grouptrigger->getSelectionLabel());
-        }
+        grouptrigger->addTargetedChild(*it,
+            new PlaybackProfileConfig(*it, grouptrigger));
     }
 
-    repaint();
+    return grouptrigger;
 }
 
-void PlaybackProfileConfigs::triggerChanged(const QString &trig)
+void PlaybackSettings::NewPlaybackProfileSlot()
 {
-    TriggeredConfigurationGroup::triggerChanged(trig);
+    QString msg = tr("Enter Playback Profile Name");
+
+    MythScreenStack *popupStack =
+        GetMythMainWindow()->GetStack("popup stack");
+
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack, msg);
+
+    if (settingdialog->Create())
+    {
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewPlaybackProfileSlot(const QString&)));
+        popupStack->AddScreen(settingdialog);
+    }
+    else
+        delete settingdialog;
 }
 
-static HostComboBox *PlayBoxOrdering()
+void PlaybackSettings::CreateNewPlaybackProfileSlot(const QString &name)
+{
+    QString host = gCoreContext->GetHostName();
+    QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
+
+    if (not_ok_list.contains(name) || name.isEmpty())
+    {
+        QString msg = (name.isEmpty()) ?
+            tr("Sorry, playback group\nname cannot be blank.") :
+            tr("Sorry, playback group name\n"
+               "'%1' is already being used.").arg(name);
+
+        ShowOkPopup(msg);
+
+        return;
+    }
+
+    VideoDisplayProfile::CreateProfileGroup(name, gCoreContext->GetHostName());
+    m_playbackProfiles->addTargetedChild(name,
+        new PlaybackProfileConfig(name, m_playbackProfiles));
+
+    m_playbackProfiles->addSelection(name, name, true);
+}
+
+static HostComboBoxSetting *PlayBoxOrdering()
 {
     QString str[4] =
     {
@@ -1396,7 +1303,7 @@ static HostComboBox *PlayBoxOrdering()
                                         "titles. Sections in parentheses are "
                                         "not affected.");
 
-    HostComboBox *gc = new HostComboBox("PlayBoxOrdering");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("PlayBoxOrdering");
 
     gc->setLabel(PlaybackSettings::tr("Episode sort orderings"));
 
@@ -1409,9 +1316,9 @@ static HostComboBox *PlayBoxOrdering()
     return gc;
 }
 
-static HostComboBox *PlayBoxEpisodeSort()
+static HostComboBoxSetting *PlayBoxEpisodeSort()
 {
-    HostComboBox *gc = new HostComboBox("PlayBoxEpisodeSort");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("PlayBoxEpisodeSort");
 
     gc->setLabel(PlaybackSettings::tr("Sort episodes"));
 
@@ -1426,9 +1333,9 @@ static HostComboBox *PlayBoxEpisodeSort()
     return gc;
 }
 
-static HostSpinBox *FFRewReposTime()
+static HostSpinBoxSetting *FFRewReposTime()
 {
-    HostSpinBox *gs = new HostSpinBox("FFRewReposTime", 0, 200, 5);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("FFRewReposTime", 0, 200, 5);
 
     gs->setLabel(PlaybackSettings::tr("Fast forward/rewind reposition amount"));
 
@@ -1445,9 +1352,9 @@ static HostSpinBox *FFRewReposTime()
     return gs;
 }
 
-static HostCheckBox *FFRewReverse()
+static HostCheckBoxSetting *FFRewReverse()
 {
-    HostCheckBox *gc = new HostCheckBox("FFRewReverse");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("FFRewReverse");
 
     gc->setLabel(PlaybackSettings::tr("Reverse direction in fast "
                                       "forward/rewind"));
@@ -1464,9 +1371,9 @@ static HostCheckBox *FFRewReverse()
     return gc;
 }
 
-static HostComboBox *MenuTheme()
+static HostComboBoxSetting *MenuTheme()
 {
-    HostComboBox *gc = new HostComboBox("MenuTheme");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("MenuTheme");
 
     gc->setLabel(AppearanceSettings::tr("Menu theme"));
 
@@ -1482,13 +1389,13 @@ static HostComboBox *MenuTheme()
     return gc;
 }
 
-static HostComboBox MUNUSED *DecodeVBIFormat()
+static HostComboBoxSetting MUNUSED *DecodeVBIFormat()
 {
     QString beVBI = gCoreContext->GetSetting("VbiFormat");
     QString fmt = beVBI.toLower().left(4);
     int sel = (fmt == "pal ") ? 1 : ((fmt == "ntsc") ? 2 : 0);
 
-    HostComboBox *gc = new HostComboBox("DecodeVBIFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("DecodeVBIFormat");
 
     gc->setLabel(OSDSettings::tr("Decode VBI format"));
 
@@ -1506,9 +1413,9 @@ static HostComboBox MUNUSED *DecodeVBIFormat()
     return gc;
 }
 
-static HostComboBox *SubtitleCodec()
+static HostComboBoxSetting *SubtitleCodec()
 {
-    HostComboBox *gc = new HostComboBox("SubtitleCodec");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("SubtitleCodec");
 
     gc->setLabel(OSDSettings::tr("Subtitle Codec"));
 
@@ -1523,9 +1430,9 @@ static HostComboBox *SubtitleCodec()
     return gc;
 }
 
-static HostComboBox *ChannelOrdering()
+static HostComboBoxSetting *ChannelOrdering()
 {
-    HostComboBox *gc = new HostComboBox("ChannelOrdering");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("ChannelOrdering");
 
     gc->setLabel(GeneralSettings::tr("Channel ordering"));
 
@@ -1535,9 +1442,9 @@ static HostComboBox *ChannelOrdering()
     return gc;
 }
 
-static HostSpinBox *VertScanPercentage()
+static HostSpinBoxSetting *VertScanPercentage()
 {
-    HostSpinBox *gs = new HostSpinBox("VertScanPercentage", -100, 100, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("VertScanPercentage", -100, 100, 1);
 
     gs->setLabel(PlaybackSettings::tr("Vertical scaling"));
 
@@ -1549,9 +1456,9 @@ static HostSpinBox *VertScanPercentage()
     return gs;
 }
 
-static HostSpinBox *HorizScanPercentage()
+static HostSpinBoxSetting *HorizScanPercentage()
 {
-    HostSpinBox *gs = new HostSpinBox("HorizScanPercentage", -100, 100, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("HorizScanPercentage", -100, 100, 1);
 
     gs->setLabel(PlaybackSettings::tr("Horizontal scaling"));
 
@@ -1563,9 +1470,9 @@ static HostSpinBox *HorizScanPercentage()
     return gs;
 };
 
-static HostSpinBox *XScanDisplacement()
+static HostSpinBoxSetting *XScanDisplacement()
 {
-    HostSpinBox *gs = new HostSpinBox("XScanDisplacement", -50, 50, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("XScanDisplacement", -50, 50, 1);
 
     gs->setLabel(PlaybackSettings::tr("Scan displacement (X)"));
 
@@ -1577,9 +1484,9 @@ static HostSpinBox *XScanDisplacement()
     return gs;
 }
 
-static HostSpinBox *YScanDisplacement()
+static HostSpinBoxSetting *YScanDisplacement()
 {
-    HostSpinBox *gs = new HostSpinBox("YScanDisplacement", -50, 50, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("YScanDisplacement", -50, 50, 1);
 
     gs->setLabel(PlaybackSettings::tr("Scan displacement (Y)"));
 
@@ -1591,9 +1498,9 @@ static HostSpinBox *YScanDisplacement()
     return gs;
 };
 
-static HostCheckBox *DefaultCCMode()
+static HostCheckBoxSetting *DefaultCCMode()
 {
-    HostCheckBox *gc = new HostCheckBox("DefaultCCMode");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("DefaultCCMode");
 
     gc->setLabel(OSDSettings::tr("Always display closed captioning or "
                                  "subtitles"));
@@ -1608,9 +1515,9 @@ static HostCheckBox *DefaultCCMode()
     return gc;
 }
 
-static HostCheckBox *EnableMHEG()
+static HostCheckBoxSetting *EnableMHEG()
 {
-    HostCheckBox *gc = new HostCheckBox("EnableMHEG");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("EnableMHEG");
 
     gc->setLabel(OSDSettings::tr("Enable interactive TV"));
 
@@ -1623,9 +1530,9 @@ static HostCheckBox *EnableMHEG()
     return gc;
 }
 
-static HostCheckBox *EnableMHEGic()
+static HostCheckBoxSetting *EnableMHEGic()
 {
-    HostCheckBox *gc = new HostCheckBox("EnableMHEGic");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("EnableMHEGic");
     gc->setLabel(OSDSettings::tr("Enable network access for interactive TV"));
     gc->setValue(true);
     gc->setHelpText(OSDSettings::tr("If enabled, interactive TV applications "
@@ -1635,9 +1542,9 @@ static HostCheckBox *EnableMHEGic()
     return gc;
 }
 
-static HostCheckBox *PersistentBrowseMode()
+static HostCheckBoxSetting *PersistentBrowseMode()
 {
-    HostCheckBox *gc = new HostCheckBox("PersistentBrowseMode");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PersistentBrowseMode");
 
     gc->setLabel(OSDSettings::tr("Always use browse mode in Live TV"));
 
@@ -1650,9 +1557,9 @@ static HostCheckBox *PersistentBrowseMode()
     return gc;
 }
 
-static HostCheckBox *BrowseAllTuners()
+static HostCheckBoxSetting *BrowseAllTuners()
 {
-    HostCheckBox *gc = new HostCheckBox("BrowseAllTuners");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("BrowseAllTuners");
 
     gc->setLabel(OSDSettings::tr("Browse all channels"));
 
@@ -1665,9 +1572,9 @@ static HostCheckBox *BrowseAllTuners()
     return gc;
 }
 
-static HostCheckBox *ClearSavedPosition()
+static HostCheckBoxSetting *ClearSavedPosition()
 {
-    HostCheckBox *gc = new HostCheckBox("ClearSavedPosition");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ClearSavedPosition");
 
     gc->setLabel(PlaybackSettings::tr("Clear bookmark on playback"));
 
@@ -1682,9 +1589,9 @@ static HostCheckBox *ClearSavedPosition()
     return gc;
 }
 
-static HostCheckBox *AltClearSavedPosition()
+static HostCheckBoxSetting *AltClearSavedPosition()
 {
-    HostCheckBox *gc = new HostCheckBox("AltClearSavedPosition");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AltClearSavedPosition");
 
     gc->setLabel(PlaybackSettings::tr("Alternate clear and save bookmark"));
 
@@ -1699,9 +1606,9 @@ static HostCheckBox *AltClearSavedPosition()
     return gc;
 }
 
-static HostComboBox *PlaybackExitPrompt()
+static HostComboBoxSetting *PlaybackExitPrompt()
 {
-    HostComboBox *gc = new HostComboBox("PlaybackExitPrompt");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("PlaybackExitPrompt");
 
     gc->setLabel(PlaybackSettings::tr("Action on playback exit"));
 
@@ -1722,9 +1629,9 @@ static HostComboBox *PlaybackExitPrompt()
     return gc;
 }
 
-static HostCheckBox *EndOfRecordingExitPrompt()
+static HostCheckBoxSetting *EndOfRecordingExitPrompt()
 {
-    HostCheckBox *gc = new HostCheckBox("EndOfRecordingExitPrompt");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("EndOfRecordingExitPrompt");
 
     gc->setLabel(PlaybackSettings::tr("Prompt at end of recording"));
 
@@ -1736,9 +1643,9 @@ static HostCheckBox *EndOfRecordingExitPrompt()
     return gc;
 }
 
-static HostCheckBox *JumpToProgramOSD()
+static HostCheckBoxSetting *JumpToProgramOSD()
 {
-    HostCheckBox *gc = new HostCheckBox("JumpToProgramOSD");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("JumpToProgramOSD");
 
     gc->setLabel(PlaybackSettings::tr("Jump to program OSD"));
 
@@ -1753,9 +1660,9 @@ static HostCheckBox *JumpToProgramOSD()
     return gc;
 }
 
-static HostCheckBox *ContinueEmbeddedTVPlay()
+static HostCheckBoxSetting *ContinueEmbeddedTVPlay()
 {
-    HostCheckBox *gc = new HostCheckBox("ContinueEmbeddedTVPlay");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ContinueEmbeddedTVPlay");
 
     gc->setLabel(PlaybackSettings::tr("Continue playback when embedded"));
 
@@ -1770,9 +1677,9 @@ static HostCheckBox *ContinueEmbeddedTVPlay()
     return gc;
 }
 
-static HostCheckBox *AutomaticSetWatched()
+static HostCheckBoxSetting *AutomaticSetWatched()
 {
-    HostCheckBox *gc = new HostCheckBox("AutomaticSetWatched");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AutomaticSetWatched");
 
     gc->setLabel(PlaybackSettings::tr("Automatically mark a recording as "
                                       "watched"));
@@ -1789,9 +1696,9 @@ static HostCheckBox *AutomaticSetWatched()
     return gc;
 }
 
-static HostSpinBox *LiveTVIdleTimeout()
+static HostSpinBoxSetting *LiveTVIdleTimeout()
 {
-    HostSpinBox *gs = new HostSpinBox("LiveTVIdleTimeout", 0, 3600, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LiveTVIdleTimeout", 0, 3600, 1);
 
     gs->setLabel(PlaybackSettings::tr("Live TV idle timeout (mins)"));
 
@@ -1803,9 +1710,9 @@ static HostSpinBox *LiveTVIdleTimeout()
     return gs;
 }
 
-// static HostCheckBox *PlaybackPreview()
+// static HostCheckBoxSetting *PlaybackPreview()
 // {
-//     HostCheckBox *gc = new HostCheckBox("PlaybackPreview");
+//     HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackPreview");
 //
 //     gc->setLabel(PlaybackSettings::tr("Display live preview of recordings"));
 //
@@ -1818,9 +1725,9 @@ static HostSpinBox *LiveTVIdleTimeout()
 //     return gc;
 // }
 //
-// static HostCheckBox *HWAccelPlaybackPreview()
+// static HostCheckBoxSetting *HWAccelPlaybackPreview()
 // {
-//     HostCheckBox *gc = new HostCheckBox("HWAccelPlaybackPreview");
+//     HostCheckBoxSetting *gc = new HostCheckBoxSetting("HWAccelPlaybackPreview");
 //
 //     gc->setLabel(PlaybackSettings::tr("Use HW Acceleration for live recording preview"));
 //
@@ -1836,9 +1743,9 @@ static HostSpinBox *LiveTVIdleTimeout()
 //     return gc;
 // }
 
-static HostCheckBox *UseVirtualKeyboard()
+static HostCheckBoxSetting *UseVirtualKeyboard()
 {
-    HostCheckBox *gc = new HostCheckBox("UseVirtualKeyboard");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("UseVirtualKeyboard");
 
     gc->setLabel(MainGeneralSettings::tr("Use line edit virtual keyboards"));
 
@@ -1852,9 +1759,9 @@ static HostCheckBox *UseVirtualKeyboard()
     return gc;
 }
 
-static HostSpinBox *FrontendIdleTimeout()
+static HostSpinBoxSetting *FrontendIdleTimeout()
 {
-    HostSpinBox *gs = new HostSpinBox("FrontendIdleTimeout", 0, 360, 15);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("FrontendIdleTimeout", 0, 360, 15);
 
     gs->setLabel(MainGeneralSettings::tr("Idle time before entering standby "
                                          "mode (minutes)"));
@@ -1876,9 +1783,9 @@ static HostSpinBox *FrontendIdleTimeout()
     return gs;
 }
 
-static HostComboBox *OverrideExitMenu()
+static HostComboBoxSetting *OverrideExitMenu()
 {
-    HostComboBox *gc = new HostComboBox("OverrideExitMenu");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("OverrideExitMenu");
 
     gc->setLabel(MainGeneralSettings::tr("Customize exit menu options"));
 
@@ -1900,9 +1807,9 @@ static HostComboBox *OverrideExitMenu()
     return gc;
 }
 
-static HostLineEdit *RebootCommand()
+static HostTextEditSetting *RebootCommand()
 {
-    HostLineEdit *ge = new HostLineEdit("RebootCommand");
+    HostTextEditSetting *ge = new HostTextEditSetting("RebootCommand");
 
     ge->setLabel(MainGeneralSettings::tr("Reboot command"));
 
@@ -1917,9 +1824,9 @@ static HostLineEdit *RebootCommand()
     return ge;
 }
 
-static HostLineEdit *HaltCommand()
+static HostTextEditSetting *HaltCommand()
 {
-    HostLineEdit *ge = new HostLineEdit("HaltCommand");
+    HostTextEditSetting *ge = new HostTextEditSetting("HaltCommand");
 
     ge->setLabel(MainGeneralSettings::tr("Halt command"));
 
@@ -1934,9 +1841,9 @@ static HostLineEdit *HaltCommand()
     return ge;
 }
 
-static HostLineEdit *LircDaemonDevice()
+static HostTextEditSetting *LircDaemonDevice()
 {
-    HostLineEdit *ge = new HostLineEdit("LircSocket");
+    HostTextEditSetting *ge = new HostTextEditSetting("LircSocket");
 
     ge->setLabel(MainGeneralSettings::tr("LIRC daemon socket"));
 
@@ -1956,9 +1863,9 @@ static HostLineEdit *LircDaemonDevice()
     return ge;
 }
 
-static HostLineEdit *ScreenShotPath()
+static HostTextEditSetting *ScreenShotPath()
 {
-    HostLineEdit *ge = new HostLineEdit("ScreenShotPath");
+    HostTextEditSetting *ge = new HostTextEditSetting("ScreenShotPath");
 
     ge->setLabel(MainGeneralSettings::tr("Screen shot path"));
 
@@ -1971,9 +1878,9 @@ static HostLineEdit *ScreenShotPath()
     return ge;
 }
 
-static HostLineEdit *SetupPinCode()
+static HostTextEditSetting *SetupPinCode()
 {
-    HostLineEdit *ge = new HostLineEdit("SetupPinCode");
+    HostTextEditSetting *ge = new HostTextEditSetting("SetupPinCode");
 
     ge->setLabel(MainGeneralSettings::tr("Setup PIN code"));
 
@@ -1990,9 +1897,9 @@ static HostLineEdit *SetupPinCode()
     return ge;
 }
 
-static HostComboBox *XineramaScreen()
+static HostComboBoxSetting *XineramaScreen()
 {
-    HostComboBox *gc = new HostComboBox("XineramaScreen", false);
+    HostComboBoxSetting *gc = new HostComboBoxSetting("XineramaScreen", false);
     int num = MythDisplay::GetNumberXineramaScreens();
 
     for (int i=0; i<num; ++i)
@@ -2010,9 +1917,9 @@ static HostComboBox *XineramaScreen()
 }
 
 
-static HostComboBox *XineramaMonitorAspectRatio()
+static HostComboBoxSetting *XineramaMonitorAspectRatio()
 {
-    HostComboBox *gc = new HostComboBox("XineramaMonitorAspectRatio");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("XineramaMonitorAspectRatio");
 
     gc->setLabel(AppearanceSettings::tr("Monitor aspect ratio"));
 
@@ -2027,9 +1934,9 @@ static HostComboBox *XineramaMonitorAspectRatio()
     return gc;
 }
 
-static HostComboBox *LetterboxingColour()
+static HostComboBoxSetting *LetterboxingColour()
 {
-    HostComboBox *gc = new HostComboBox("LetterboxColour");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("LetterboxColour");
 
     gc->setLabel(PlaybackSettings::tr("Letterboxing color"));
 
@@ -2045,9 +1952,9 @@ static HostComboBox *LetterboxingColour()
     return gc;
 }
 
-static HostComboBox *AspectOverride()
+static HostComboBoxSetting *AspectOverride()
 {
-    HostComboBox *gc = new HostComboBox("AspectOverride");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("AspectOverride");
 
     gc->setLabel(PlaybackSettings::tr("Video aspect override"));
 
@@ -2060,9 +1967,9 @@ static HostComboBox *AspectOverride()
     return gc;
 }
 
-static HostComboBox *AdjustFill()
+static HostComboBoxSetting *AdjustFill()
 {
-    HostComboBox *gc = new HostComboBox("AdjustFill");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("AdjustFill");
 
     gc->setLabel(PlaybackSettings::tr("Zoom"));
 
@@ -2081,9 +1988,9 @@ static HostComboBox *AdjustFill()
 
 // Theme settings
 
-static HostSpinBox *GuiWidth()
+static HostSpinBoxSetting *GuiWidth()
 {
-    HostSpinBox *gs = new HostSpinBox("GuiWidth", 0, 1920, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 1920, 8, true);
 
     gs->setLabel(AppearanceSettings::tr("GUI width (pixels)"));
 
@@ -2097,9 +2004,9 @@ static HostSpinBox *GuiWidth()
     return gs;
 }
 
-static HostSpinBox *GuiHeight()
+static HostSpinBoxSetting *GuiHeight()
 {
-    HostSpinBox *gs = new HostSpinBox("GuiHeight", 0, 1600, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 1600, 8, true);
 
     gs->setLabel(AppearanceSettings::tr("GUI height (pixels)"));
 
@@ -2113,9 +2020,9 @@ static HostSpinBox *GuiHeight()
     return gs;
 }
 
-static HostSpinBox *GuiOffsetX()
+static HostSpinBoxSetting *GuiOffsetX()
 {
-    HostSpinBox *gs = new HostSpinBox("GuiOffsetX", -3840, 3840, 32, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetX", -3840, 3840, 32, true);
 
     gs->setLabel(AppearanceSettings::tr("GUI X offset"));
 
@@ -2127,9 +2034,9 @@ static HostSpinBox *GuiOffsetX()
     return gs;
 }
 
-static HostSpinBox *GuiOffsetY()
+static HostSpinBoxSetting *GuiOffsetY()
 {
-    HostSpinBox *gs = new HostSpinBox("GuiOffsetY", -1600, 1600, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiOffsetY", -1600, 1600, 8, true);
 
     gs->setLabel(AppearanceSettings::tr("GUI Y offset"));
 
@@ -2141,9 +2048,9 @@ static HostSpinBox *GuiOffsetY()
 }
 
 #if 0
-static HostSpinBox *DisplaySizeWidth()
+static HostSpinBoxSetting *DisplaySizeWidth()
 {
-    HostSpinBox *gs = new HostSpinBox("DisplaySizeWidth", 0, 10000, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("DisplaySizeWidth", 0, 10000, 1);
 
     gs->setLabel(AppearanceSettings::tr("Display size - width"));
 
@@ -2156,9 +2063,9 @@ static HostSpinBox *DisplaySizeWidth()
     return gs;
 }
 
-static HostSpinBox *DisplaySizeHeight()
+static HostSpinBoxSetting *DisplaySizeHeight()
 {
-    HostSpinBox *gs = new HostSpinBox("DisplaySizeHeight", 0, 10000, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("DisplaySizeHeight", 0, 10000, 1);
 
     gs->setLabel(AppearanceSettings::tr("Display size - height"));
 
@@ -2172,9 +2079,9 @@ static HostSpinBox *DisplaySizeHeight()
 }
 #endif
 
-static HostCheckBox *GuiSizeForTV()
+static HostCheckBoxSetting *GuiSizeForTV()
 {
-    HostCheckBox *gc = new HostCheckBox("GuiSizeForTV");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("GuiSizeForTV");
 
     gc->setLabel(AppearanceSettings::tr("Use GUI size for TV playback"));
 
@@ -2186,9 +2093,9 @@ static HostCheckBox *GuiSizeForTV()
 }
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-static HostCheckBox *UseVideoModes()
+static HostCheckBoxSetting *UseVideoModes()
 {
-    HostCheckBox *gc = new HostCheckBox("UseVideoModes");
+    HostCheckBoxSetting *gc = new VideoModeSettings("UseVideoModes");
 
     gc->setLabel(VideoModeSettings::tr("Separate video modes for GUI and "
                                        "TV playback"));
@@ -2200,15 +2107,13 @@ static HostCheckBox *UseVideoModes()
     return gc;
 }
 
-static HostSpinBox *VidModeWidth(int idx)
+static HostSpinBoxSetting *VidModeWidth(int idx)
 {
-    HostSpinBox *gs = new HostSpinBox(QString("VidModeWidth%1").arg(idx),
-                                            0, 1920, 16, true);
+    HostSpinBoxSetting *gs =
+        new HostSpinBoxSetting(QString("VidModeWidth%1").arg(idx),
+                               0, 1920, 16, true);
 
-    gs->setLabel((idx<1) ? VideoModeSettings::tr("In X", "Video mode width")
-                         : "");
-
-    gs->setLabelAboveWidget(idx<1);
+    gs->setLabel(VideoModeSettings::tr("In X", "Video mode width"));
 
     gs->setValue(0);
 
@@ -2218,15 +2123,13 @@ static HostSpinBox *VidModeWidth(int idx)
     return gs;
 }
 
-static HostSpinBox *VidModeHeight(int idx)
+static HostSpinBoxSetting *VidModeHeight(int idx)
 {
-    HostSpinBox *gs = new HostSpinBox(QString("VidModeHeight%1").arg(idx),
-                                            0, 1080, 16, true);
+    HostSpinBoxSetting *gs =
+        new HostSpinBoxSetting(QString("VidModeHeight%1").arg(idx),
+                               0, 1080, 16, true);
 
-    gs->setLabel((idx<1) ? VideoModeSettings::tr("In Y", "Video mode height")
-                         : "");
-
-    gs->setLabelAboveWidget(idx<1);
+    gs->setLabel(VideoModeSettings::tr("In Y", "Video mode height"));
 
     gs->setValue(0);
 
@@ -2236,13 +2139,11 @@ static HostSpinBox *VidModeHeight(int idx)
     return gs;
 }
 
-static HostComboBox *GuiVidModeResolution()
+static HostComboBoxSetting *GuiVidModeResolution()
 {
-    HostComboBox *gc = new HostComboBox("GuiVidModeResolution");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("GuiVidModeResolution");
 
     gc->setLabel(VideoModeSettings::tr("GUI"));
-
-    gc->setLabelAboveWidget(true);
 
     gc->setHelpText(VideoModeSettings::tr("Resolution of screen when not "
                                           "watching a video."));
@@ -2272,7 +2173,7 @@ static HostComboBox *GuiVidModeResolution()
     return gc;
 }
 
-static HostComboBox *TVVidModeResolution(int idx=-1)
+static HostComboBoxSetting *TVVidModeResolution(int idx=-1)
 {
     QString dhelp = VideoModeSettings::tr("Default screen resolution "
                                           "when watching a video.");
@@ -2281,14 +2182,13 @@ static HostComboBox *TVVidModeResolution(int idx=-1)
 
     QString qstr = (idx<0) ? "TVVidModeResolution" :
         QString("TVVidModeResolution%1").arg(idx);
-    HostComboBox *gc = new HostComboBox(qstr);
+    HostComboBoxSetting *gc = new HostComboBoxSetting(qstr);
     QString lstr = (idx<0) ? VideoModeSettings::tr("Video output") :
-        ((idx<1) ? VideoModeSettings::tr("Output") : "");
+        VideoModeSettings::tr("Output");
     QString hstr = (idx<0) ? dhelp : ohelp;
 
     gc->setLabel(lstr);
 
-    gc->setLabelAboveWidget(idx<1);
     gc->setHelpText(hstr);
 
     const vector<DisplayResScreen> scr = GetVideoModes();
@@ -2302,7 +2202,61 @@ static HostComboBox *TVVidModeResolution(int idx=-1)
     return gc;
 }
 
-static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
+void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
+{
+    const QString previousValue = getValue();
+    const bool wasUnchanged = !haveChanged();
+
+    clearSelections();
+    QString resolution = setting->getValue();
+    int hz50 = -1, hz60 = -1;
+    const vector<double> list = GetRefreshRates(resolution);
+    addSelection(QObject::tr("Auto"), "0");
+    for (uint i = 0; i < list.size(); ++i)
+    {
+        QString sel = QString::number((double) list[i], 'f', 3);
+        addSelection(sel + " Hz", sel, sel == previousValue);
+        hz50 = (fabs(50.0 - list[i]) < 0.01) ? i : hz50;
+        hz60 = (fabs(60.0 - list[i]) < 0.01) ? i : hz60;
+    }
+
+    // addSelection() will cause setValue() to be called, marking the setting as
+    // changed even though the previous value might still be available.  Mark it
+    // as unchanged in this case if it wasn't already changed.
+    if (wasUnchanged && previousValue == getValue())
+        setChanged(false);
+    else
+    {
+        if ("640x480" == resolution || "720x480" == resolution)
+            setValue(hz60+1);
+        if ("640x576" == resolution || "720x576" == resolution)
+            setValue(hz50+1);
+    }
+
+    setEnabled(list.size());
+}
+
+const vector<double> HostRefreshRateComboBoxSetting::GetRefreshRates(
+    const QString &res)
+{
+    QStringList slist = res.split("x");
+    int w = 0, h = 0;
+    bool ok0 = false, ok1 = false;
+    if (2 == slist.size())
+    {
+        w = slist[0].toInt(&ok0);
+        h = slist[1].toInt(&ok1);
+    }
+
+    DisplayRes *display_res = DisplayRes::GetDisplayRes();
+    if (display_res && ok0 && ok1)
+        return display_res->GetRefreshRates(w, h);
+
+    vector<double> list;
+    return list;
+}
+
+static HostRefreshRateComboBoxSetting *TVVidModeRefreshRate(int idx=-1)
 {
     QString dhelp = VideoModeSettings::tr("Default refresh rate when watching "
                                           "a video. Leave at \"Auto\" to "
@@ -2315,18 +2269,18 @@ static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
 
     QString qstr = (idx<0) ? "TVVidModeRefreshRate" :
         QString("TVVidModeRefreshRate%1").arg(idx);
-    HostRefreshRateComboBox *gc = new HostRefreshRateComboBox(qstr);
-    QString lstr = (idx<1) ? VideoModeSettings::tr("Rate") : "";
+    HostRefreshRateComboBoxSetting *gc =
+        new HostRefreshRateComboBoxSetting(qstr);
+    QString lstr = VideoModeSettings::tr("Rate");
     QString hstr = (idx<0) ? dhelp : ohelp;
 
     gc->setLabel(lstr);
-    gc->setLabelAboveWidget(idx<1);
     gc->setHelpText(hstr);
     gc->setEnabled(false);
     return gc;
 }
 
-static HostComboBox *TVVidModeForceAspect(int idx=-1)
+static HostComboBoxSetting *TVVidModeForceAspect(int idx=-1)
 {
     QString dhelp = VideoModeSettings::tr("Aspect ratio when watching a "
                                           "video. Leave at \"%1\" to "
@@ -2346,11 +2300,9 @@ static HostComboBox *TVVidModeForceAspect(int idx=-1)
     QString qstr = (idx<0) ? "TVVidModeForceAspect" :
         QString("TVVidModeForceAspect%1").arg(idx);
 
-    HostComboBox *gc = new HostComboBox(qstr);
+    HostComboBoxSetting *gc = new HostComboBoxSetting(qstr);
 
-    gc->setLabel( (idx<1) ? VideoModeSettings::tr("Aspect") : "" );
-
-    gc->setLabelAboveWidget(idx<1);
+    gc->setLabel(VideoModeSettings::tr("Aspect"));
 
     QString hstr = (idx<0) ? dhelp : ohelp;
 
@@ -2363,31 +2315,25 @@ static HostComboBox *TVVidModeForceAspect(int idx=-1)
     return gc;
 }
 
-VideoModeSettings::VideoModeSettings() :
-    TriggeredConfigurationGroup(false, true, false, false)
+void VideoModeSettings::updateButton(MythUIButtonListItem *item)
 {
-    setLabel(tr("Video Mode Settings"));
-    setUseLabel(false);
+    MythUICheckBoxSetting::updateButton(item);
+    item->setDrawArrow(getValue() == "1");
+}
 
-    Setting *videomode = UseVideoModes();
-    addChild(videomode);
-    setTrigger(videomode);
+VideoModeSettings::VideoModeSettings(const char *c) : HostCheckBoxSetting(c)
+{
+    HostComboBoxSetting *res = TVVidModeResolution();
+    HostRefreshRateComboBoxSetting *rate = TVVidModeRefreshRate();
 
-    ConfigurationGroup* defaultsettings =
-        new HorizontalConfigurationGroup(false, false);
+    addChild(GuiVidModeResolution());
+    addChild(res);
+    addChild(rate);
+    addChild(TVVidModeForceAspect());
+    connect(res, SIGNAL(valueChanged(StandardSetting *)),
+            rate, SLOT(ChangeResolution(StandardSetting *)));
 
-    HostComboBox *res = TVVidModeResolution();
-    HostRefreshRateComboBox *rate = TVVidModeRefreshRate();
-
-    defaultsettings->addChild(GuiVidModeResolution());
-    defaultsettings->addChild(res);
-    defaultsettings->addChild(rate);
-    defaultsettings->addChild(TVVidModeForceAspect());
-    connect(res, SIGNAL(valueChanged(const QString&)),
-            rate, SLOT(ChangeResolution(const QString&)));
-
-    ConfigurationGroup* overrides =
-        new GridConfigurationGroup(5, true, true, false, true);
+    GroupSetting* overrides = new GroupSetting();
 
     overrides->setLabel(tr("Overrides for specific video sizes"));
 
@@ -2401,24 +2347,17 @@ VideoModeSettings::VideoModeSettings() :
         overrides->addChild(rate = TVVidModeRefreshRate(idx));
         overrides->addChild(TVVidModeForceAspect(idx));
 
-        connect(res, SIGNAL(valueChanged(const QString&)),
-                rate, SLOT(ChangeResolution(const QString&)));
+        connect(res, SIGNAL(valueChanged(StandardSetting *)),
+                rate, SLOT(ChangeResolution(StandardSetting *)));
     }
 
-    ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-
-    settings->addChild(defaultsettings);
-    settings->addChild(overrides);
-
-    addTarget("1", settings);
-    addTarget("0", new VerticalConfigurationGroup(true));
-
+    addChild(overrides);
 };
 #endif
 
-static HostCheckBox *HideMouseCursor()
+static HostCheckBoxSetting *HideMouseCursor()
 {
-    HostCheckBox *gc = new HostCheckBox("HideMouseCursor");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("HideMouseCursor");
 
     gc->setLabel(AppearanceSettings::tr("Hide mouse cursor in MythTV"));
 
@@ -2434,9 +2373,9 @@ static HostCheckBox *HideMouseCursor()
 };
 
 
-static HostCheckBox *RunInWindow()
+static HostCheckBoxSetting *RunInWindow()
 {
-    HostCheckBox *gc = new HostCheckBox("RunFrontendInWindow");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RunFrontendInWindow");
 
     gc->setLabel(AppearanceSettings::tr("Use window border"));
 
@@ -2447,9 +2386,9 @@ static HostCheckBox *RunInWindow()
     return gc;
 }
 
-static HostCheckBox *UseFixedWindowSize()
+static HostCheckBoxSetting *UseFixedWindowSize()
 {
-    HostCheckBox *gc = new HostCheckBox("UseFixedWindowSize");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("UseFixedWindowSize");
 
     gc->setLabel(AppearanceSettings::tr("Use fixed window size"));
 
@@ -2460,9 +2399,9 @@ static HostCheckBox *UseFixedWindowSize()
     return gc;
 }
 
-static HostCheckBox *AlwaysOnTop()
+static HostCheckBoxSetting *AlwaysOnTop()
 {
-    HostCheckBox *gc = new HostCheckBox("AlwaysOnTop");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AlwaysOnTop");
 
     gc->setLabel(AppearanceSettings::tr("Always On Top"));
 
@@ -2473,9 +2412,9 @@ static HostCheckBox *AlwaysOnTop()
     return gc;
 }
 
-static HostComboBox *MythDateFormatCB()
+static HostComboBoxSetting *MythDateFormatCB()
 {
-    HostComboBox *gc = new HostComboBox("DateFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("DateFormat");
     gc->setLabel(AppearanceSettings::tr("Date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
@@ -2527,9 +2466,9 @@ static HostComboBox *MythDateFormatCB()
     return gc;
 }
 
-static HostComboBox *MythShortDateFormat()
+static HostComboBoxSetting *MythShortDateFormat()
 {
-    HostComboBox *gc = new HostComboBox("ShortDateFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("ShortDateFormat");
     gc->setLabel(AppearanceSettings::tr("Short date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
@@ -2580,9 +2519,9 @@ static HostComboBox *MythShortDateFormat()
     return gc;
 }
 
-static HostComboBox *MythTimeFormat()
+static HostComboBoxSetting *MythTimeFormat()
 {
-    HostComboBox *gc = new HostComboBox("TimeFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("TimeFormat");
 
     gc->setLabel(AppearanceSettings::tr("Time format"));
 
@@ -2608,9 +2547,9 @@ static HostComboBox *MythTimeFormat()
 }
 
 #if ! CONFIG_DARWIN
-static HostComboBox *ThemePainter()
+static HostComboBoxSetting *ThemePainter()
 {
-    HostComboBox *gc = new HostComboBox("ThemePainter");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("ThemePainter");
 
     gc->setLabel(AppearanceSettings::tr("Paint engine"));
 
@@ -2639,9 +2578,9 @@ static HostComboBox *ThemePainter()
 }
 #endif
 
-static HostComboBox *ChannelFormat()
+static HostComboBoxSetting *ChannelFormat()
 {
-    HostComboBox *gc = new HostComboBox("ChannelFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("ChannelFormat");
 
     gc->setLabel(GeneralSettings::tr("Channel format"));
 
@@ -2658,9 +2597,9 @@ static HostComboBox *ChannelFormat()
     return gc;
 }
 
-static HostComboBox *LongChannelFormat()
+static HostComboBoxSetting *LongChannelFormat()
 {
-    HostComboBox *gc = new HostComboBox("LongChannelFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("LongChannelFormat");
 
     gc->setLabel(GeneralSettings::tr("Long channel format"));
 
@@ -2677,9 +2616,9 @@ static HostComboBox *LongChannelFormat()
     return gc;
 }
 
-static HostCheckBox *ChannelGroupRememberLast()
+static HostCheckBoxSetting *ChannelGroupRememberLast()
 {
-    HostCheckBox *gc = new HostCheckBox("ChannelGroupRememberLast");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("ChannelGroupRememberLast");
 
     gc->setLabel(ChannelGroupSettings::tr("Remember last channel group"));
 
@@ -2694,9 +2633,9 @@ static HostCheckBox *ChannelGroupRememberLast()
     return gc;
 }
 
-static HostComboBox *ChannelGroupDefault()
+static HostComboBoxSetting *ChannelGroupDefault()
 {
-    HostComboBox *gc = new HostComboBox("ChannelGroupDefault");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("ChannelGroupDefault");
 
     gc->setLabel(ChannelGroupSettings::tr("Default channel group"));
 
@@ -2720,9 +2659,9 @@ static HostComboBox *ChannelGroupDefault()
     return gc;
 }
 
-static HostCheckBox *BrowseChannelGroup()
+static HostCheckBoxSetting *BrowseChannelGroup()
 {
-    HostCheckBox *gc = new HostCheckBox("BrowseChannelGroup");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("BrowseChannelGroup");
 
     gc->setLabel(GeneralSettings::tr("Browse/change channels from Channel "
                                      "Group"));
@@ -2737,30 +2676,11 @@ static HostCheckBox *BrowseChannelGroup()
     return gc;
 }
 
-// Channel Group Settings
-ChannelGroupSettings::ChannelGroupSettings() :
-    TriggeredConfigurationGroup(false, true, false, false)
-{
-    setLabel(tr("Remember last channel group"));
-    setUseLabel(false);
-
-    Setting* RememberChanGrpEnabled = ChannelGroupRememberLast();
-    addChild(RememberChanGrpEnabled);
-    setTrigger(RememberChanGrpEnabled);
-
-    ConfigurationGroup* settings = new VerticalConfigurationGroup(false,false);
-    settings->addChild(ChannelGroupDefault());
-    addTarget("0", settings);
-
-    // show nothing if RememberChanGrpEnabled is on
-    addTarget("1", new VerticalConfigurationGroup(true,false));
-};
-
 // General RecPriorities settings
 
-static GlobalComboBox *GRSchedOpenEnd()
+static GlobalComboBoxSetting *GRSchedOpenEnd()
 {
-    GlobalComboBox *bc = new GlobalComboBox("SchedOpenEnd");
+    GlobalComboBoxSetting *bc = new GlobalComboBoxSetting("SchedOpenEnd");
 
     bc->setLabel(GeneralRecPrioritiesSettings::tr("Avoid back to back "
                                                   "recordings"));
@@ -2783,9 +2703,9 @@ static GlobalComboBox *GRSchedOpenEnd()
     return bc;
 }
 
-static GlobalSpinBox *GRPrefInputRecPriority()
+static GlobalSpinBoxSetting *GRPrefInputRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("PrefInputPriority", 1, 99, 1);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("PrefInputPriority", 1, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Preferred input priority"));
 
@@ -2800,9 +2720,9 @@ static GlobalSpinBox *GRPrefInputRecPriority()
     return bs;
 }
 
-static GlobalSpinBox *GRHDTVRecPriority()
+static GlobalSpinBoxSetting *GRHDTVRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("HDTVRecPriority", -99, 99, 1);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("HDTVRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("HDTV recording priority"));
 
@@ -2816,9 +2736,9 @@ static GlobalSpinBox *GRHDTVRecPriority()
     return bs;
 }
 
-static GlobalSpinBox *GRWSRecPriority()
+static GlobalSpinBoxSetting *GRWSRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("WSRecPriority", -99, 99, 1);
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("WSRecPriority", -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Widescreen recording "
                                                   "priority"));
@@ -2833,9 +2753,9 @@ static GlobalSpinBox *GRWSRecPriority()
     return bs;
 }
 
-static GlobalSpinBox *GRSignLangRecPriority()
+static GlobalSpinBoxSetting *GRSignLangRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("SignLangRecPriority",
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("SignLangRecPriority",
                                             -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Sign language recording "
@@ -2852,9 +2772,9 @@ static GlobalSpinBox *GRSignLangRecPriority()
     return bs;
 }
 
-static GlobalSpinBox *GROnScrSubRecPriority()
+static GlobalSpinBoxSetting *GROnScrSubRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("OnScrSubRecPriority",
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("OnScrSubRecPriority",
                                             -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("In-vision Subtitles "
@@ -2870,9 +2790,9 @@ static GlobalSpinBox *GROnScrSubRecPriority()
     return bs;
 }
 
-static GlobalSpinBox *GRCCRecPriority()
+static GlobalSpinBoxSetting *GRCCRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("CCRecPriority",
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("CCRecPriority",
                                             -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Subtitles/CC recording "
@@ -2889,9 +2809,9 @@ static GlobalSpinBox *GRCCRecPriority()
     return bs;
 }
 
-static GlobalSpinBox *GRHardHearRecPriority()
+static GlobalSpinBoxSetting *GRHardHearRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("HardHearRecPriority",
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("HardHearRecPriority",
                                             -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Hard of hearing priority"));
@@ -2907,9 +2827,9 @@ static GlobalSpinBox *GRHardHearRecPriority()
     return bs;
 }
 
-static GlobalSpinBox *GRAudioDescRecPriority()
+static GlobalSpinBoxSetting *GRAudioDescRecPriority()
 {
-    GlobalSpinBox *bs = new GlobalSpinBox("AudioDescRecPriority",
+    GlobalSpinBoxSetting *bs = new GlobalSpinBoxSetting("AudioDescRecPriority",
                                             -99, 99, 1);
 
     bs->setLabel(GeneralRecPrioritiesSettings::tr("Audio described priority"));
@@ -2923,9 +2843,9 @@ static GlobalSpinBox *GRAudioDescRecPriority()
     return bs;
 }
 
-static HostLineEdit *DefaultTVChannel()
+static HostTextEditSetting *DefaultTVChannel()
 {
-    HostLineEdit *ge = new HostLineEdit("DefaultTVChannel");
+    HostTextEditSetting *ge = new HostTextEditSetting("DefaultTVChannel");
 
     ge->setLabel(EPGSettings::tr("Guide starts at channel"));
 
@@ -2939,9 +2859,9 @@ static HostLineEdit *DefaultTVChannel()
     return ge;
 }
 
-static HostSpinBox *EPGRecThreshold()
+static HostSpinBoxSetting *EPGRecThreshold()
 {
-    HostSpinBox *gs = new HostSpinBox("SelChangeRecThreshold", 1, 600, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("SelChangeRecThreshold", 1, 600, 1);
 
     gs->setLabel(EPGSettings::tr("Record threshold"));
 
@@ -2953,9 +2873,9 @@ static HostSpinBox *EPGRecThreshold()
     return gs;
 }
 
-static GlobalComboBox *MythLanguage()
+static GlobalComboBoxSetting *MythLanguage()
 {
-    GlobalComboBox *gc = new GlobalComboBox("Language");
+    GlobalComboBoxSetting *gc = new GlobalComboBoxSetting("Language");
 
     gc->setLabel(AppearanceSettings::tr("Language"));
 
@@ -2981,7 +2901,7 @@ static GlobalComboBox *MythLanguage()
     return gc;
 }
 
-static void ISO639_fill_selections(SelectSetting *widget, uint i)
+static void ISO639_fill_selections(MythUIComboBoxSetting *widget, uint i)
 {
     widget->clearSelections();
     QString q = QString("ISO639Language%1").arg(i);
@@ -3008,9 +2928,9 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
     }
 }
 
-static GlobalComboBox *ISO639PreferredLanguage(uint i)
+static GlobalComboBoxSetting *ISO639PreferredLanguage(uint i)
 {
-    GlobalComboBox *gc = new GlobalComboBox(QString("ISO639Language%1").arg(i));
+    GlobalComboBoxSetting *gc = new GlobalComboBoxSetting(QString("ISO639Language%1").arg(i));
 
     gc->setLabel(AppearanceSettings::tr("Guide language #%1").arg(i+1));
 
@@ -3024,9 +2944,9 @@ static GlobalComboBox *ISO639PreferredLanguage(uint i)
     return gc;
 }
 
-static HostCheckBox *NetworkControlEnabled()
+static HostCheckBoxSetting *NetworkControlEnabled()
 {
-    HostCheckBox *gc = new HostCheckBox("NetworkControlEnabled");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("NetworkControlEnabled");
 
     gc->setLabel(MainGeneralSettings::tr("Enable Network Remote Control "
                                          "interface"));
@@ -3040,9 +2960,9 @@ static HostCheckBox *NetworkControlEnabled()
     return gc;
 }
 
-static HostSpinBox *NetworkControlPort()
+static HostSpinBoxSetting *NetworkControlPort()
 {
-    HostSpinBox *gs = new HostSpinBox("NetworkControlPort", 1025, 65535, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("NetworkControlPort", 1025, 65535, 1);
 
     gs->setLabel(MainGeneralSettings::tr("Network Remote Control port"));
 
@@ -3055,9 +2975,9 @@ static HostSpinBox *NetworkControlPort()
     return gs;
 }
 
-static HostLineEdit *UDPNotifyPort()
+static HostTextEditSetting *UDPNotifyPort()
 {
-    HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
+    HostTextEditSetting *ge = new HostTextEditSetting("UDPNotifyPort");
 
     ge->setLabel(MainGeneralSettings::tr("UDP notify port"));
 
@@ -3072,9 +2992,9 @@ static HostLineEdit *UDPNotifyPort()
 
 #ifdef USING_AIRPLAY
 // AirPlay Settings
-static HostCheckBox *AirPlayEnabled()
+static HostCheckBoxSetting *AirPlayEnabled()
 {
-    HostCheckBox *gc = new HostCheckBox("AirPlayEnabled");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayEnabled");
 
     gc->setLabel(MainGeneralSettings::tr("Enable AirPlay"));
 
@@ -3088,9 +3008,9 @@ static HostCheckBox *AirPlayEnabled()
     return gc;
 }
 
-static HostCheckBox *AirPlayAudioOnly()
+static HostCheckBoxSetting *AirPlayAudioOnly()
 {
-    HostCheckBox *gc = new HostCheckBox("AirPlayAudioOnly");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayAudioOnly");
 
     gc->setLabel(MainGeneralSettings::tr("Only support AirTunes (no video)"));
 
@@ -3103,9 +3023,9 @@ static HostCheckBox *AirPlayAudioOnly()
     return gc;
 }
 
-static HostCheckBox *AirPlayPasswordEnabled()
+static HostCheckBoxSetting *AirPlayPasswordEnabled()
 {
-    HostCheckBox *gc = new HostCheckBox("AirPlayPasswordEnabled");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayPasswordEnabled");
 
     gc->setLabel(MainGeneralSettings::tr("Require password"));
 
@@ -3118,9 +3038,11 @@ static HostCheckBox *AirPlayPasswordEnabled()
     return gc;
 }
 
-static HostLineEdit *AirPlayPassword()
+static HostTextEditSetting *AirPlayPassword()
 {
-    HostLineEdit *ge = new HostLineEdit("AirPlayPassword");
+    HostTextEditSetting *ge = new HostTextEditSetting("AirPlayPassword");
+
+    ge->setLabel(MainGeneralSettings::tr("Password"));
 
     ge->setValue("0000");
 
@@ -3131,20 +3053,20 @@ static HostLineEdit *AirPlayPassword()
     return ge;
 }
 
-static HorizontalConfigurationGroup *AirPlayPasswordSettings()
+static GroupSetting *AirPlayPasswordSettings()
 {
-    HorizontalConfigurationGroup *hc =
-        new HorizontalConfigurationGroup(false, false, false, false);
+    GroupSetting *hc = new GroupSetting();
 
+    hc->setLabel(MainGeneralSettings::tr("AirPlay - Password"));
     hc->addChild(AirPlayPasswordEnabled());
     hc->addChild(AirPlayPassword());
 
     return hc;
 }
 
-static HostCheckBox *AirPlayFullScreen()
+static HostCheckBoxSetting *AirPlayFullScreen()
 {
-    HostCheckBox *gc = new HostCheckBox("AirPlayFullScreen");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AirPlayFullScreen");
 
     gc->setLabel(MainGeneralSettings::tr("AirPlay full screen playback"));
 
@@ -3156,39 +3078,39 @@ static HostCheckBox *AirPlayFullScreen()
     return gc;
 }
 
-static TransLabelSetting *AirPlayInfo()
-{
-    TransLabelSetting *ts = new TransLabelSetting();
+//static TransLabelSetting *AirPlayInfo()
+//{
+//    TransLabelSetting *ts = new TransLabelSetting();
+//
+//    ts->setValue(MainGeneralSettings::tr("All AirPlay settings take effect "
+//                                         "when you restart MythFrontend."));
+//    return ts;
+//}
 
-    ts->setValue(MainGeneralSettings::tr("All AirPlay settings take effect "
-                                         "when you restart MythFrontend."));
-    return ts;
-}
-
-static TransLabelSetting *AirPlayRSAInfo()
-{
-    TransLabelSetting *ts = new TransLabelSetting();
-
-    if (MythRAOPConnection::LoadKey() == NULL)
-    {
-        ts->setValue(MainGeneralSettings::tr("AirTunes RSA key couldn't be "
-            "loaded. Check http://www.mythtv.org/wiki/AirTunes/AirPlay. "
-            "Last Error: %1")
-            .arg(MythRAOPConnection::RSALastError()));
-    }
-    else
-    {
-        ts->setValue(MainGeneralSettings::tr("AirTunes RSA key successfully "
-                                             "loaded."));
-    }
-
-    return ts;
-}
+//static TransLabelSetting *AirPlayRSAInfo()
+//{
+//    TransLabelSetting *ts = new TransLabelSetting();
+//
+//    if (MythRAOPConnection::LoadKey() == NULL)
+//    {
+//        ts->setValue(MainGeneralSettings::tr("AirTunes RSA key couldn't be "
+//            "loaded. Check http://www.mythtv.org/wiki/AirTunes/AirPlay. "
+//            "Last Error: %1")
+//            .arg(MythRAOPConnection::RSALastError()));
+//    }
+//    else
+//    {
+//        ts->setValue(MainGeneralSettings::tr("AirTunes RSA key successfully "
+//                                             "loaded."));
+//    }
+//
+//    return ts;
+//}
 #endif
 
-static HostCheckBox *RealtimePriority()
+static HostCheckBoxSetting *RealtimePriority()
 {
-    HostCheckBox *gc = new HostCheckBox("RealtimePriority");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RealtimePriority");
 
     gc->setLabel(PlaybackSettings::tr("Enable realtime priority threads"));
 
@@ -3202,9 +3124,9 @@ static HostCheckBox *RealtimePriority()
     return gc;
 }
 
-static HostLineEdit *IgnoreMedia()
+static HostTextEditSetting *IgnoreMedia()
 {
-    HostLineEdit *ge = new HostLineEdit("IgnoreDevices");
+    HostTextEditSetting *ge = new HostTextEditSetting("IgnoreDevices");
 
     ge->setLabel(MainGeneralSettings::tr("Ignore devices"));
 
@@ -3218,9 +3140,9 @@ static HostLineEdit *IgnoreMedia()
     return ge;
 }
 
-static HostComboBox *DisplayGroupTitleSort()
+static HostComboBoxSetting *DisplayGroupTitleSort()
 {
-    HostComboBox *gc = new HostComboBox("DisplayGroupTitleSort");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("DisplayGroupTitleSort");
 
     gc->setLabel(PlaybackSettings::tr("Sort titles"));
 
@@ -3234,9 +3156,9 @@ static HostComboBox *DisplayGroupTitleSort()
     return gc;
 }
 
-static HostCheckBox *PlaybackWatchList()
+static HostCheckBoxSetting *PlaybackWatchList()
 {
-    HostCheckBox *gc = new HostCheckBox("PlaybackWatchList");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackWatchList");
 
     gc->setLabel(WatchListSettings::tr("Include the 'Watch List' group"));
 
@@ -3250,9 +3172,9 @@ static HostCheckBox *PlaybackWatchList()
     return gc;
 }
 
-static HostCheckBox *PlaybackWLStart()
+static HostCheckBoxSetting *PlaybackWLStart()
 {
-    HostCheckBox *gc = new HostCheckBox("PlaybackWLStart");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackWLStart");
 
     gc->setLabel(WatchListSettings::tr("Start from the Watch List view"));
 
@@ -3264,9 +3186,9 @@ static HostCheckBox *PlaybackWLStart()
     return gc;
 }
 
-static HostCheckBox *PlaybackWLAutoExpire()
+static HostCheckBoxSetting *PlaybackWLAutoExpire()
 {
-    HostCheckBox *gc = new HostCheckBox("PlaybackWLAutoExpire");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackWLAutoExpire");
 
     gc->setLabel(WatchListSettings::tr("Exclude recordings not set for "
                                        "Auto-Expire"));
@@ -3282,9 +3204,9 @@ static HostCheckBox *PlaybackWLAutoExpire()
     return gc;
 }
 
-static HostSpinBox *PlaybackWLMaxAge()
+static HostSpinBoxSetting *PlaybackWLMaxAge()
 {
-    HostSpinBox *gs = new HostSpinBox("PlaybackWLMaxAge", 30, 180, 10);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("PlaybackWLMaxAge", 30, 180, 10);
 
     gs->setLabel(WatchListSettings::tr("Maximum days counted in the score"));
 
@@ -3298,9 +3220,9 @@ static HostSpinBox *PlaybackWLMaxAge()
     return gs;
 }
 
-static HostSpinBox *PlaybackWLBlackOut()
+static HostSpinBoxSetting *PlaybackWLBlackOut()
 {
-    HostSpinBox *gs = new HostSpinBox("PlaybackWLBlackOut", 0, 5, 1);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("PlaybackWLBlackOut", 0, 5, 1);
 
     gs->setLabel(WatchListSettings::tr("Days to exclude weekly episodes after "
                                        "delete"));
@@ -3317,29 +3239,28 @@ static HostSpinBox *PlaybackWLBlackOut()
     return gs;
 }
 
-WatchListSettings::WatchListSettings() :
-    TriggeredConfigurationGroup(false, false, true, true)
+static HostCheckBoxSetting *EnableMediaMon()
 {
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MonitorDrives");
 
-     Setting* watchList = PlaybackWatchList();
-     addChild(watchList);
-     setTrigger(watchList);
+    gc->setLabel(MainGeneralSettings::tr("Media Monitor"));
 
-     ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+    gc->setHelpText(MainGeneralSettings::tr("This enables support for "
+                                            "monitoring your CD/DVD drives for "
+                                            "new disks and launching the "
+                                            "proper plugin to handle them. "
+                                            "Requires restart."));
 
-     settings->addChild(PlaybackWLStart());
-     settings->addChild(PlaybackWLAutoExpire());
-     settings->addChild(PlaybackWLMaxAge());
-     settings->addChild(PlaybackWLBlackOut());
+    gc->setValue(false);
 
-     addTarget("1", settings);
+    gc->addTargetedChild("1", IgnoreMedia());
 
-     addTarget("0", new VerticalConfigurationGroup(true));
-};
+    return gc;
+}
 
-static HostCheckBox *LCDShowTime()
+static HostCheckBoxSetting *LCDShowTime()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDShowTime");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowTime");
 
     gc->setLabel(LcdSettings::tr("Display time"));
 
@@ -3351,9 +3272,9 @@ static HostCheckBox *LCDShowTime()
     return gc;
 }
 
-static HostCheckBox *LCDShowRecStatus()
+static HostCheckBoxSetting *LCDShowRecStatus()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDShowRecStatus");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowRecStatus");
 
     gc->setLabel(LcdSettings::tr("Display recording status"));
 
@@ -3365,9 +3286,9 @@ static HostCheckBox *LCDShowRecStatus()
     return gc;
 }
 
-static HostCheckBox *LCDShowMenu()
+static HostCheckBoxSetting *LCDShowMenu()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDShowMenu");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowMenu");
 
     gc->setLabel(LcdSettings::tr("Display menus"));
 
@@ -3378,9 +3299,9 @@ static HostCheckBox *LCDShowMenu()
     return gc;
 }
 
-static HostSpinBox *LCDPopupTime()
+static HostSpinBoxSetting *LCDPopupTime()
 {
-    HostSpinBox *gs = new HostSpinBox("LCDPopupTime", 1, 300, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("LCDPopupTime", 1, 300, 1, true);
 
     gs->setLabel(LcdSettings::tr("Menu pop-up time"));
 
@@ -3392,9 +3313,9 @@ static HostSpinBox *LCDPopupTime()
     return gs;
 }
 
-static HostCheckBox *LCDShowMusic()
+static HostCheckBoxSetting *LCDShowMusic()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDShowMusic");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowMusic");
 
     gc->setLabel(LcdSettings::tr("Display music artist and title"));
 
@@ -3406,9 +3327,9 @@ static HostCheckBox *LCDShowMusic()
     return gc;
 }
 
-static HostComboBox *LCDShowMusicItems()
+static HostComboBoxSetting *LCDShowMusicItems()
 {
-    HostComboBox *gc = new HostComboBox("LCDShowMusicItems");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("LCDShowMusicItems");
 
     gc->setLabel(LcdSettings::tr("Items"));
 
@@ -3421,9 +3342,9 @@ static HostComboBox *LCDShowMusicItems()
     return gc;
 }
 
-static HostCheckBox *LCDShowChannel()
+static HostCheckBoxSetting *LCDShowChannel()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDShowChannel");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowChannel");
 
     gc->setLabel(LcdSettings::tr("Display channel information"));
 
@@ -3435,9 +3356,9 @@ static HostCheckBox *LCDShowChannel()
     return gc;
 }
 
-static HostCheckBox *LCDShowVolume()
+static HostCheckBoxSetting *LCDShowVolume()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDShowVolume");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowVolume");
 
     gc->setLabel(LcdSettings::tr("Display volume information"));
 
@@ -3449,9 +3370,9 @@ static HostCheckBox *LCDShowVolume()
     return gc;
 }
 
-static HostCheckBox *LCDShowGeneric()
+static HostCheckBoxSetting *LCDShowGeneric()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDShowGeneric");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDShowGeneric");
 
     gc->setLabel(LcdSettings::tr("Display generic information"));
 
@@ -3462,9 +3383,9 @@ static HostCheckBox *LCDShowGeneric()
     return gc;
 }
 
-static HostCheckBox *LCDBacklightOn()
+static HostCheckBoxSetting *LCDBacklightOn()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDBacklightOn");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDBacklightOn");
 
     gc->setLabel(LcdSettings::tr("Backlight always on"));
 
@@ -3475,9 +3396,9 @@ static HostCheckBox *LCDBacklightOn()
     return gc;
 }
 
-static HostCheckBox *LCDHeartBeatOn()
+static HostCheckBoxSetting *LCDHeartBeatOn()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDHeartBeatOn");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDHeartBeatOn");
 
     gc->setLabel(LcdSettings::tr("Heartbeat always on"));
 
@@ -3488,9 +3409,9 @@ static HostCheckBox *LCDHeartBeatOn()
     return gc;
 }
 
-static HostCheckBox *LCDBigClock()
+static HostCheckBoxSetting *LCDBigClock()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDBigClock");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDBigClock");
 
     gc->setLabel(LcdSettings::tr("Display large clock"));
 
@@ -3502,9 +3423,9 @@ static HostCheckBox *LCDBigClock()
     return gc;
 }
 
-static HostLineEdit *LCDKeyString()
+static HostTextEditSetting *LCDKeyString()
 {
-    HostLineEdit *ge = new HostLineEdit("LCDKeyString");
+    HostTextEditSetting *ge = new HostTextEditSetting("LCDKeyString");
 
     ge->setLabel(LcdSettings::tr("LCD key order"));
 
@@ -3519,9 +3440,9 @@ static HostLineEdit *LCDKeyString()
     return ge;
 }
 
-static HostCheckBox *LCDEnable()
+static HostCheckBoxSetting *LCDEnable()
 {
-    HostCheckBox *gc = new HostCheckBox("LCDEnable");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("LCDEnable");
 
     gc->setLabel(LcdSettings::tr("Enable LCD device"));
 
@@ -3529,59 +3450,27 @@ static HostCheckBox *LCDEnable()
                                     "information."));
 
     gc->setValue(false);
-
+    gc->addTargetedChild("1", LCDShowTime());
+    gc->addTargetedChild("1", LCDShowMenu());
+    gc->addTargetedChild("1", LCDShowMusic());
+    gc->addTargetedChild("1", LCDShowMusicItems());
+    gc->addTargetedChild("1", LCDShowChannel());
+    gc->addTargetedChild("1", LCDShowRecStatus());
+    gc->addTargetedChild("1", LCDShowVolume());
+    gc->addTargetedChild("1", LCDShowGeneric());
+    gc->addTargetedChild("1", LCDBacklightOn());
+    gc->addTargetedChild("1", LCDHeartBeatOn());
+    gc->addTargetedChild("1", LCDBigClock());
+    gc->addTargetedChild("1", LCDKeyString());
+    gc->addTargetedChild("1", LCDPopupTime());
     return gc;
 }
 
-LcdSettings::LcdSettings() : TriggeredConfigurationGroup(false, false,
-                                                         false, false,
-                                                         false, false,
-                                                         false, false)
-{
-     setLabel(tr("LCD device display"));
-     setUseLabel(false);
-
-     Setting* lcd_enable = LCDEnable();
-     addChild(lcd_enable);
-     setTrigger(lcd_enable);
-
-     ConfigurationGroup *settings =
-         new VerticalConfigurationGroup(false, true, false, false);
-     ConfigurationGroup *setHoriz =
-         new HorizontalConfigurationGroup(false, false, false, false);
-
-     ConfigurationGroup* setLeft  =
-         new VerticalConfigurationGroup(false, false, false, false);
-     ConfigurationGroup* setRight =
-         new VerticalConfigurationGroup(false, false, false, false);
-
-     setLeft->addChild(LCDShowTime());
-     setLeft->addChild(LCDShowMenu());
-     setLeft->addChild(LCDShowMusic());
-     setLeft->addChild(LCDShowMusicItems());
-     setLeft->addChild(LCDShowChannel());
-     setLeft->addChild(LCDShowRecStatus());
-     setRight->addChild(LCDShowVolume());
-     setRight->addChild(LCDShowGeneric());
-     setRight->addChild(LCDBacklightOn());
-     setRight->addChild(LCDHeartBeatOn());
-     setRight->addChild(LCDBigClock());
-     setRight->addChild(LCDKeyString());
-     setHoriz->addChild(setLeft);
-     setHoriz->addChild(setRight);
-     settings->addChild(setHoriz);
-     settings->addChild(LCDPopupTime());
-
-     addTarget("1", settings);
-
-     addTarget("0", new VerticalConfigurationGroup(true));
-};
-
 
 #if CONFIG_DARWIN
-static HostCheckBox *MacGammaCorrect()
+static HostCheckBoxSetting *MacGammaCorrect()
 {
-    HostCheckBox *gc = new HostCheckBox("MacGammaCorrect");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacGammaCorrect");
 
     gc->setLabel(PlaybackSettings::tr("Enable gamma correction for video"));
 
@@ -3594,9 +3483,9 @@ static HostCheckBox *MacGammaCorrect()
     return gc;
 }
 
-static HostCheckBox *MacScaleUp()
+static HostCheckBoxSetting *MacScaleUp()
 {
-    HostCheckBox *gc = new HostCheckBox("MacScaleUp");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacScaleUp");
 
     gc->setLabel(PlaybackSettings::tr("Scale video as necessary"));
 
@@ -3609,9 +3498,9 @@ static HostCheckBox *MacScaleUp()
     return gc;
 }
 
-static HostSpinBox *MacFullSkip()
+static HostSpinBoxSetting *MacFullSkip()
 {
-    HostSpinBox *gs = new HostSpinBox("MacFullSkip", 0, 30, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacFullSkip", 0, 30, 1, true);
 
     gs->setLabel(PlaybackSettings::tr("Frames to skip in fullscreen mode"));
 
@@ -3627,9 +3516,9 @@ static HostSpinBox *MacFullSkip()
     return gs;
 }
 
-static HostCheckBox *MacMainEnabled()
+static HostCheckBoxSetting *MacMainEnabled()
 {
-    HostCheckBox *gc = new HostCheckBox("MacMainEnabled");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacMainEnabled");
 
     gc->setLabel(MacMainSettings::tr("Video in main window"));
 
@@ -3645,9 +3534,9 @@ static HostCheckBox *MacMainEnabled()
     return gc;
 }
 
-static HostSpinBox *MacMainSkip()
+static HostSpinBoxSetting *MacMainSkip()
 {
-    HostSpinBox *gs = new HostSpinBox("MacMainSkip", 0, 30, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacMainSkip", 0, 30, 1, true);
 
     gs->setLabel(MacMainSettings::tr("Frames to skip"));
 
@@ -3660,9 +3549,9 @@ static HostSpinBox *MacMainSkip()
     return gs;
 }
 
-static HostSpinBox *MacMainOpacity()
+static HostSpinBoxSetting *MacMainOpacity()
 {
-    HostSpinBox *gs = new HostSpinBox("MacMainOpacity", 0, 100, 5, false);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacMainOpacity", 0, 100, 5, false);
 
     gs->setLabel(MacMainSettings::tr("Opacity"));
 
@@ -3674,27 +3563,9 @@ static HostSpinBox *MacMainOpacity()
     return gs;
 }
 
-MacMainSettings::MacMainSettings() : TriggeredConfigurationGroup(false)
+static HostCheckBoxSetting *MacFloatEnabled()
 {
-    setLabel(tr("Video in main window"));
-    setUseLabel(false);
-    Setting *gc = MacMainEnabled();
-    addChild(gc);
-    setTrigger(gc);
-
-    VerticalConfigurationGroup *opts =
-        new VerticalConfigurationGroup(false, false);
-    opts->addChild(MacMainSkip());
-    opts->addChild(MacMainOpacity());
-
-    addTarget("1", opts);
-    addTarget("0", new VerticalConfigurationGroup(false, false));
-
-};
-
-static HostCheckBox *MacFloatEnabled()
-{
-    HostCheckBox *gc = new HostCheckBox("MacFloatEnabled");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacFloatEnabled");
 
     gc->setLabel(MacFloatSettings::tr("Video in floating window"));
 
@@ -3708,9 +3579,9 @@ static HostCheckBox *MacFloatEnabled()
     return gc;
 }
 
-static HostSpinBox *MacFloatSkip()
+static HostSpinBoxSetting *MacFloatSkip()
 {
-    HostSpinBox *gs = new HostSpinBox("MacFloatSkip", 0, 30, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacFloatSkip", 0, 30, 1, true);
 
     gs->setLabel(MacFloatSettings::tr("Frames to skip"));
 
@@ -3723,9 +3594,9 @@ static HostSpinBox *MacFloatSkip()
     return gs;
 }
 
-static HostSpinBox *MacFloatOpacity()
+static HostSpinBoxSetting *MacFloatOpacity()
 {
-    HostSpinBox *gs = new HostSpinBox("MacFloatOpacity", 0, 100, 5, false);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacFloatOpacity", 0, 100, 5, false);
 
     gs->setLabel(MacFloatSettings::tr("Opacity"));
 
@@ -3738,28 +3609,9 @@ static HostSpinBox *MacFloatOpacity()
     return gs;
 }
 
-MacFloatSettings::MacFloatSettings() : TriggeredConfigurationGroup(false)
+static HostCheckBoxSetting *MacDockEnabled()
 {
-    setLabel(tr("Video in floating window"));
-
-    setUseLabel(false);
-    Setting *gc = MacFloatEnabled();
-    addChild(gc);
-    setTrigger(gc);
-
-    VerticalConfigurationGroup *opts =
-        new VerticalConfigurationGroup(false, false);
-    opts->addChild(MacFloatSkip());
-    opts->addChild(MacFloatOpacity());
-
-    addTarget("1", opts);
-    addTarget("0", new VerticalConfigurationGroup(false, false));
-
-};
-
-static HostCheckBox *MacDockEnabled()
-{
-    HostCheckBox *gc = new HostCheckBox("MacDockEnabled");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacDockEnabled");
 
     gc->setLabel(MacDockSettings::tr("Video in the dock"));
 
@@ -3773,9 +3625,9 @@ static HostCheckBox *MacDockEnabled()
     return gc;
 }
 
-static HostSpinBox *MacDockSkip()
+static HostSpinBoxSetting *MacDockSkip()
 {
-    HostSpinBox *gs = new HostSpinBox("MacDockSkip", 0, 30, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacDockSkip", 0, 30, 1, true);
 
     gs->setLabel(MacDockSettings::tr("Frames to skip"));
 
@@ -3787,23 +3639,9 @@ static HostSpinBox *MacDockSkip()
     return gs;
 }
 
-MacDockSettings::MacDockSettings() : TriggeredConfigurationGroup(false)
+static HostCheckBoxSetting *MacDesktopEnabled()
 {
-    setLabel(tr("Video in the dock"));
-    setUseLabel(false);
-    Setting *gc = MacDockEnabled();
-    addChild(gc);
-    setTrigger(gc);
-
-    Setting *skip = MacDockSkip();
-    addTarget("1", skip);
-    addTarget("0", new HorizontalConfigurationGroup(false, false));
-
-};
-
-static HostCheckBox *MacDesktopEnabled()
-{
-    HostCheckBox *gc = new HostCheckBox("MacDesktopEnabled");
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacDesktopEnabled");
 
     gc->setLabel(MacDesktopSettings::tr("Video on the desktop"));
 
@@ -3819,9 +3657,9 @@ static HostCheckBox *MacDesktopEnabled()
     return gc;
 }
 
-static HostSpinBox *MacDesktopSkip()
+static HostSpinBoxSetting *MacDesktopSkip()
 {
-    HostSpinBox *gs = new HostSpinBox("MacDesktopSkip", 0, 30, 1, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacDesktopSkip", 0, 30, 1, true);
 
     gs->setLabel(MacDesktopSettings::tr("Frames to skip"));
 
@@ -3833,46 +3671,303 @@ static HostSpinBox *MacDesktopSkip()
                                            "frame."));
     return gs;
 }
-
-MacDesktopSettings::MacDesktopSettings() : TriggeredConfigurationGroup(false)
-{
-    setLabel(tr("Video on the desktop"));
-    setUseLabel(false);
-    Setting *gc = MacDesktopEnabled();
-    addChild(gc);
-    setTrigger(gc);
-    Setting *skip = MacDesktopSkip();
-    addTarget("1", skip);
-    addTarget("0", new HorizontalConfigurationGroup(false, false));
-
-};
 #endif
+
+/* This code is a duplication the class DatabaseSettings. As it it also use
+ * by mythbackend I rewrote here for the time being */
+
+class DatabaseGroupSetting : public GroupSetting
+{
+  public:
+    DatabaseGroupSetting(const QString &DBhostOverride = QString::null)
+        : GroupSetting()
+    {
+        m_DBhostOverride = DBhostOverride;
+
+        setLabel(DatabaseSettings::tr("Database Configuration"));
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        if (query.isConnected())
+            setHelpText(
+                DatabaseSettings::tr("All database settings take effect when "
+                                     "you restart this program."));
+        else
+            setHelpText(
+                DatabaseSettings::tr("MythTV could not connect to the database. "
+                                     "Please verify your database settings "
+                                     "below."));
+
+        dbHostName = new TransTextEditSetting();
+        dbHostName->setLabel(DatabaseSettings::tr("Hostname"));
+        dbHostName->setHelpText(
+            DatabaseSettings::tr("The host name or IP address of "
+                                 "the machine hosting the database. "
+                                 "This information is required."));
+        addChild(dbHostName);
+
+        dbHostPing = new TransMythUICheckBoxSetting();
+        dbHostPing->setLabel(DatabaseSettings::tr("Ping test server?"));
+        dbHostPing->setHelpText(
+            DatabaseSettings::tr("Test basic host connectivity using "
+                                 "the ping command. Turn off if your "
+                                 "host or network don't support ping "
+                                 "(ICMP ECHO) packets"));
+        addChild(dbHostPing);
+
+        dbPort = new TransTextEditSetting();
+        dbPort->setLabel(DatabaseSettings::tr("Port"));
+        dbPort->setHelpText(
+            DatabaseSettings::tr("The port number the database is running "
+                                 "on.  Leave blank if using the default "
+                                 "port (3306)."));
+        addChild(dbPort);
+
+        dbName = new TransTextEditSetting();
+        dbName->setLabel(QCoreApplication::translate("(Common)",
+                                                     "Database name"));
+        dbName->setHelpText(
+            DatabaseSettings::tr("The name of the database. "
+                                 "This information is required."));
+        addChild(dbName);
+
+        dbUserName = new TransTextEditSetting();
+        dbUserName->setLabel(QCoreApplication::translate("(Common)", "User"));
+        dbUserName->setHelpText(
+            DatabaseSettings::tr("The user name to use while "
+                                 "connecting to the database. "
+                                 "This information is required."));
+        addChild(dbUserName);
+
+        dbPassword = new TransTextEditSetting();
+        dbPassword->setLabel(DatabaseSettings::tr("Password"));
+        dbPassword->setHelpText(
+            DatabaseSettings::tr("The password to use while "
+                                 "connecting to the database. "
+                                 "This information is required."));
+        addChild(dbPassword);
+
+        localEnabled = new TransMythUICheckBoxSetting();
+        localEnabled->setLabel(
+            DatabaseSettings::tr("Use custom identifier for frontend "
+                                 "preferences"));
+        localEnabled->setHelpText(
+            DatabaseSettings::tr("If this frontend's host name "
+                                 "changes often, check this box "
+                                 "and provide a network-unique "
+                                 "name to identify it. "
+                                 "If unchecked, the frontend "
+                                 "machine's local host name will "
+                                 "be used to save preferences in "
+                                 "the database."));
+        addChild(localEnabled);
+
+        localHostName = new TransTextEditSetting();
+        localHostName->setLabel(DatabaseSettings::tr("Custom identifier"));
+        localHostName->setHelpText(
+            DatabaseSettings::tr("An identifier to use while "
+                                 "saving the settings for this "
+                                 "frontend."));
+        localEnabled->addTargetedChild("1", localHostName);
+
+        wolEnabled = new TransMythUICheckBoxSetting();
+        wolEnabled->setLabel(
+            DatabaseSettings::tr("Enable database server wakeup"));
+        wolEnabled->setHelpText(
+            DatabaseSettings::tr("If enabled, the frontend will use "
+                                 "database wakeup parameters to "
+                                 "reconnect to the database server."));
+        addChild(wolEnabled);
+
+        wolReconnect = new TransMythUISpinBoxSetting(0, 60, 1, true);
+        wolReconnect->setLabel(DatabaseSettings::tr("Reconnect time"));
+        wolReconnect->setHelpText(
+            DatabaseSettings::tr("The time in seconds to wait for "
+                                 "the server to wake up."));
+        wolEnabled->addTargetedChild("1", wolReconnect);
+
+        wolRetry = new TransMythUISpinBoxSetting(1, 10, 1, true);
+        wolRetry->setLabel(DatabaseSettings::tr("Retry attempts"));
+        wolRetry->setHelpText(
+            DatabaseSettings::tr("The number of retries to wake the "
+                                 "server before the frontend gives "
+                                 "up."));
+        wolEnabled->addTargetedChild("1", wolRetry);
+
+        wolCommand = new TransTextEditSetting();
+        wolCommand->setLabel(DatabaseSettings::tr("Wake command"));
+        wolCommand->setHelpText(
+            DatabaseSettings::tr("The command executed on this "
+                                 "frontend to wake up the database "
+                                 "server (eg. sudo /etc/init.d/mysql "
+                                 "restart)."));
+        wolEnabled->addTargetedChild("1", wolCommand);
+    }
+
+    void Load(void)
+    {
+        DatabaseParams params = gContext->GetDatabaseParams();
+
+        if (params.dbHostName.isEmpty() ||
+            params.dbUserName.isEmpty() ||
+            params.dbPassword.isEmpty() ||
+            params.dbName.isEmpty())
+            setHelpText(getHelpText() + "\n" +
+                        DatabaseSettings::tr("Required fields are"
+                                             " marked with an asterisk (*)."));
+
+        if (params.dbHostName.isEmpty())
+        {
+            dbHostName->setLabel("* " + dbHostName->getLabel());
+            dbHostName->setValue(m_DBhostOverride);
+        }
+        else
+            dbHostName->setValue(params.dbHostName);
+
+        dbHostPing->setValue(params.dbHostPing);
+
+        if (params.dbPort)
+            dbPort->setValue(QString::number(params.dbPort));
+
+        dbUserName->setValue(params.dbUserName);
+        if (params.dbUserName.isEmpty())
+            dbUserName->setLabel("* " + dbUserName->getLabel());
+        dbPassword->setValue(params.dbPassword);
+        if (params.dbPassword.isEmpty())
+            dbPassword->setLabel("* " + dbPassword->getLabel());
+        dbName->setValue(params.dbName);
+        if (params.dbName.isEmpty())
+            dbName->setLabel("* " + dbName->getLabel());
+
+        localEnabled->setValue(params.localEnabled);
+        localHostName->setValue(params.localHostName);
+
+        wolEnabled->setValue(params.wolEnabled);
+        wolReconnect->setValue(params.wolReconnect);
+        wolRetry->setValue(params.wolRetry);
+        wolCommand->setValue(params.wolCommand);
+        //set all the children's m_haveChanged to false
+        GroupSetting::Load();
+    }
+    void Save(QString) {}
+    void Save(void)
+    {
+        DatabaseParams params = gContext->GetDatabaseParams();
+
+        params.dbHostName    = dbHostName->getValue();
+        params.dbHostPing    = dbHostPing->boolValue();
+        params.dbPort        = dbPort->getValue().toInt();
+        params.dbUserName    = dbUserName->getValue();
+        params.dbPassword    = dbPassword->getValue();
+        params.dbName        = dbName->getValue();
+        params.dbType        = "QMYSQL";
+
+        params.localEnabled  = localEnabled->boolValue();
+        params.localHostName = localHostName->getValue();
+
+        params.wolEnabled    = wolEnabled->boolValue();
+        params.wolReconnect  = wolReconnect->intValue();
+        params.wolRetry      = wolRetry->intValue();
+        params.wolCommand    = wolCommand->getValue();
+
+        gContext->SaveDatabaseParams(params);
+        //set all the children's m_haveChanged to false
+        GroupSetting::Save();
+    }
+
+  protected:
+    TransTextEditSetting       *dbHostName;
+    TransMythUICheckBoxSetting *dbHostPing;
+    TransTextEditSetting       *dbPort;
+    TransTextEditSetting       *dbName;
+    TransTextEditSetting       *dbUserName;
+    TransTextEditSetting       *dbPassword;
+    TransMythUICheckBoxSetting *localEnabled;
+    TransTextEditSetting       *localHostName;
+    TransMythUICheckBoxSetting *wolEnabled;
+    TransMythUISpinBoxSetting  *wolReconnect;
+    TransMythUISpinBoxSetting  *wolRetry;
+    TransTextEditSetting       *wolCommand;
+
+    QString              m_DBhostOverride;
+};
+
+/* end of duplicated code form DatabaseSettings */
+
+
+class ShutDownRebootSetting : public GroupSetting
+{
+  public:
+    ShutDownRebootSetting();
+  private slots:
+    void childChanged(StandardSetting *);
+  private:
+    StandardSetting * m_overrideExitMenu;
+    StandardSetting * m_haltCommand;
+    StandardSetting * m_rebootCommand;
+};
+
+ShutDownRebootSetting::ShutDownRebootSetting()
+    : GroupSetting()
+{
+    setLabel(MainGeneralSettings::tr("Shutdown/Reboot Settings"));
+    addChild(FrontendIdleTimeout());
+    addChild(m_overrideExitMenu = OverrideExitMenu());
+    addChild(m_haltCommand      = HaltCommand());
+    addChild(m_rebootCommand    = RebootCommand());
+    connect(m_overrideExitMenu,SIGNAL(valueChanged(StandardSetting *)),
+            SLOT(childChanged(StandardSetting *)));
+}
+
+void ShutDownRebootSetting::childChanged(StandardSetting *)
+{
+    switch (m_overrideExitMenu->getValue().toInt())
+    {
+        case 2:
+        case 4:
+            m_haltCommand->setEnabled(true);
+            m_rebootCommand->setEnabled(false);
+            break;
+        case 3:
+        case 6:
+            m_haltCommand->setEnabled(true);
+            m_rebootCommand->setEnabled(true);
+            break;
+        case 5:
+            m_haltCommand->setEnabled(false);
+            m_rebootCommand->setEnabled(true);
+            break;
+        case 0:
+        case 1:
+        default:
+            m_haltCommand->setEnabled(false);
+            m_rebootCommand->setEnabled(false);
+            break;
+    }
+}
 
 MainGeneralSettings::MainGeneralSettings()
 {
-    DatabaseSettings::addDatabaseSettings(this);
+//    DatabaseSettings::addDatabaseSettings(this);
+    setLabel(tr("Main Settings"));
 
-    VerticalConfigurationGroup *pin =
-        new VerticalConfigurationGroup(false, true, false, false);
+    addChild(new DatabaseGroupSetting());
+
+    GroupSetting *pin = new GroupSetting();
     pin->setLabel(tr("Settings Access"));
     pin->addChild(SetupPinCode());
     addChild(pin);
 
-    VerticalConfigurationGroup *general =
-        new VerticalConfigurationGroup(false, true, false, false);
+    GroupSetting *general = new GroupSetting();
     general->setLabel(tr("General"));
     general->addChild(UseVirtualKeyboard());
     general->addChild(ScreenShotPath());
     addChild(general);
 
-    VerticalConfigurationGroup *media =
-        new VerticalConfigurationGroup(false, true, false, false);
-    media->setLabel(tr("Media Monitor"));
-    media->addChild(IgnoreMedia());
-    addChild(media);
+    addChild(EnableMediaMon());
 
-    VerticalConfigurationGroup *remotecontrol =
-    new VerticalConfigurationGroup(false, true, false, false);
+    addChild(new ShutDownRebootSetting());
+
+    GroupSetting *remotecontrol = new GroupSetting();
     remotecontrol->setLabel(tr("Remote Control"));
     remotecontrol->addChild(LircDaemonDevice());
     remotecontrol->addChild(NetworkControlEnabled());
@@ -3881,154 +3976,248 @@ MainGeneralSettings::MainGeneralSettings()
     addChild(remotecontrol);
 
 #ifdef USING_AIRPLAY
-    VerticalConfigurationGroup *airplay =
-    new VerticalConfigurationGroup(false, true, false, false);
+    GroupSetting *airplay = new GroupSetting();
     airplay->setLabel(tr("AirPlay Settings"));
     airplay->addChild(AirPlayEnabled());
     airplay->addChild(AirPlayFullScreen());
     airplay->addChild(AirPlayAudioOnly());
     airplay->addChild(AirPlayPasswordSettings());
-    airplay->addChild(AirPlayInfo());
-    airplay->addChild(AirPlayRSAInfo());
+//    airplay->addChild(AirPlayInfo());
+//    airplay->addChild(AirPlayRSAInfo());
     addChild(airplay);
 #endif
+}
 
-    VerticalConfigurationGroup *shutdownSettings =
-        new VerticalConfigurationGroup(true, true, false, false);
-    shutdownSettings->setLabel(tr("Shutdown/Reboot Settings"));
-    shutdownSettings->addChild(FrontendIdleTimeout());
-    shutdownSettings->addChild(OverrideExitMenu());
-    shutdownSettings->addChild(HaltCommand());
-    shutdownSettings->addChild(RebootCommand());
-    addChild(shutdownSettings);
+void MainGeneralSettings::applyChange()
+{
+    QStringList strlist( QString("REFRESH_BACKEND") );
+    gCoreContext->SendReceiveStringList(strlist);
+}
+
+
+class PlayBackScaling : public GroupSetting
+{
+  public:
+    PlayBackScaling();
+    virtual void updateButton(MythUIButtonListItem *item);
+
+  private slots:
+    virtual void childChanged(StandardSetting *);
+
+  private:
+    StandardSetting * m_VertScan;
+    StandardSetting * m_HorizScan;
+    StandardSetting * m_XScan;
+    StandardSetting * m_YScan;
+};
+
+PlayBackScaling::PlayBackScaling()
+    :GroupSetting()
+{
+    setLabel(tr("Scaling"));
+    addChild(m_VertScan = VertScanPercentage());
+    addChild(m_YScan = YScanDisplacement());
+    addChild(m_HorizScan = HorizScanPercentage());
+    addChild(m_XScan = XScanDisplacement());
+    connect(m_VertScan, SIGNAL(valueChanged(StandardSetting *)),
+            this, SLOT(childChanged(StandardSetting *)));
+    connect(m_YScan, SIGNAL(valueChanged(StandardSetting *)),
+            this, SLOT(childChanged(StandardSetting *)));
+    connect(m_HorizScan, SIGNAL(valueChanged(StandardSetting *)),
+            this, SLOT(childChanged(StandardSetting *)));
+    connect(m_XScan,SIGNAL(valueChanged(StandardSetting *)),
+            this, SLOT(childChanged(StandardSetting *)));
+}
+
+
+void PlayBackScaling::updateButton(MythUIButtonListItem *item)
+{
+    GroupSetting::updateButton(item);
+    if (m_VertScan->getValue() == "0" &&
+        m_HorizScan->getValue() == "0" &&
+        m_YScan->getValue() == "0" &&
+        m_XScan->getValue() == "0")
+        item->SetText(tr("No scaling"),"value");
+    else
+        item->SetText(QString("%1%x%2%+%3%+%4%")
+                .arg(m_HorizScan->getValue())
+                .arg(m_VertScan->getValue())
+                .arg(m_XScan->getValue())
+                .arg(m_YScan->getValue()), "value");
+}
+
+void PlayBackScaling::childChanged(StandardSetting *)
+{
+    emit ShouldRedraw(this);
+}
+
+PlaybackSettingsDialog::PlaybackSettingsDialog(MythScreenStack *stack)
+    : StandardSettingDialog(stack, "playbacksettings", new PlaybackSettings())
+{
+}
+
+void PlaybackSettingsDialog::ShowMenu(void)
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (item)
+    {
+        PlaybackProfileItemConfig *config =
+            item->GetData().value<PlaybackProfileItemConfig*>();
+        if (config)
+            ShowPlaybackProfileMenu(item);
+    }
+}
+
+
+void PlaybackSettingsDialog::ShowPlaybackProfileMenu(MythUIButtonListItem *item)
+{
+    MythMenu *menu = new MythMenu(tr("Playback Profile Menu"), this,
+                                  "mainmenu");
+
+    if (m_buttonList->GetItemPos(item) > 2)
+        menu->AddItem(tr("Move Up"), SLOT(MoveProfileItemUp()));
+    if (m_buttonList->GetItemPos(item) + 1 < m_buttonList->GetCount())
+        menu->AddItem(tr("Move Down"), SLOT(MoveProfileItemDown()));
+
+    menu->AddItem(tr("Delete"), SLOT(DeleteProfileItem()));
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack,
+                                                 "menudialog");
+    menuPopup->SetReturnEvent(this, "mainmenu");
+
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
+    else
+        delete menuPopup;
+}
+
+void PlaybackSettingsDialog::MoveProfileItemDown(void)
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (item)
+    {
+        PlaybackProfileItemConfig *config =
+            item->GetData().value<PlaybackProfileItemConfig*>();
+        if (config)
+        {
+            const int currentPos = m_buttonList->GetCurrentPos();
+
+            config->DecreasePriority();
+
+            m_buttonList->SetItemCurrent(currentPos + 1);
+        }
+    }
+}
+
+void PlaybackSettingsDialog::MoveProfileItemUp(void)
+{
+    MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+    if (item)
+    {
+        PlaybackProfileItemConfig *config =
+            item->GetData().value<PlaybackProfileItemConfig*>();
+        if (config)
+        {
+            const int currentPos = m_buttonList->GetCurrentPos();
+
+            config->IncreasePriority();
+
+            m_buttonList->SetItemCurrent(currentPos - 1);
+        }
+    }
+}
+
+void PlaybackSettingsDialog::DeleteProfileItem(void)
+{
+    PlaybackProfileItemConfig *config =
+        m_buttonList->GetDataValue().value<PlaybackProfileItemConfig*>();
+    if (config)
+        config->ShowDeleteDialog();
 }
 
 PlaybackSettings::PlaybackSettings()
+    : m_newPlaybackProfileButton(NULL),
+      m_playbackProfiles(NULL)
 {
-    uint i = 0, total = 8;
-#if CONFIG_DARWIN
-    total += 2;
-#endif // USING_DARWIN
+    setLabel(tr("Playback settings"));
+}
 
+void PlaybackSettings::Load(void)
+{
+    GroupSetting* general = new GroupSetting();
+    general->setLabel(tr("General Playback"));
+    general->addChild(RealtimePriority());
+    general->addChild(DecodeExtraAudio());
+    general->addChild(JumpToProgramOSD());
+    general->addChild(ClearSavedPosition());
+    general->addChild(AltClearSavedPosition());
+    general->addChild(AutomaticSetWatched());
+    general->addChild(ContinueEmbeddedTVPlay());
+    general->addChild(LiveTVIdleTimeout());
 
-    VerticalConfigurationGroup* general1 =
-        new VerticalConfigurationGroup(false);
-
-    //: %2 is the position, %2 is the total
-    general1->setLabel(tr("General Playback (%1/%2)")
-        .arg(++i).arg(total));
-
-    HorizontalConfigurationGroup *columns =
-        new HorizontalConfigurationGroup(false, false, true, true);
-
-    VerticalConfigurationGroup *column1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    column1->addChild(RealtimePriority());
-    column1->addChild(DecodeExtraAudio());
-    column1->addChild(JumpToProgramOSD());
 #if CONFIG_DEBUGTYPE
-    column1->addChild(FFmpegDemuxer());
+    general->addChild(FFmpegDemuxer());
 #endif
-    columns->addChild(column1);
 
-    VerticalConfigurationGroup *column2 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    column2->addChild(ClearSavedPosition());
-    column2->addChild(AltClearSavedPosition());
-    column2->addChild(AutomaticSetWatched());
-    column2->addChild(ContinueEmbeddedTVPlay());
-    columns->addChild(column2);
+    general->addChild(new PlayBackScaling());
 
-    general1->addChild(columns);
-    general1->addChild(LiveTVIdleTimeout());
-    addChild(general1);
+    general->addChild(AspectOverride());
+    general->addChild(AdjustFill());
 
-    VerticalConfigurationGroup* general2 =
-        new VerticalConfigurationGroup(false);
+    general->addChild(LetterboxingColour());
+    general->addChild(PIPLocationComboBox());
+    general->addChild(PlaybackExitPrompt());
+    general->addChild(EndOfRecordingExitPrompt());
+    addChild(general);
 
-    //" %1 is the position, %2 is the total
-    general2->setLabel(tr("General Playback (%1/%2)")
-        .arg(++i).arg(total));
+    m_playbackProfiles = CurrentPlaybackProfile();
+    addChild(m_playbackProfiles);
 
-    HorizontalConfigurationGroup* oscan =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *ocol1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *ocol2 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    ocol1->addChild(VertScanPercentage());
-    ocol1->addChild(YScanDisplacement());
-    ocol2->addChild(HorizScanPercentage());
-    ocol2->addChild(XScanDisplacement());
-    oscan->addChild(ocol1);
-    oscan->addChild(ocol2);
+    m_newPlaybackProfileButton =
+        new ButtonStandardSetting(tr("Add a new playback profile"));
+    addChild(m_newPlaybackProfileButton);
+    connect(m_newPlaybackProfileButton, SIGNAL(clicked()),
+            SLOT(NewPlaybackProfileSlot()));
 
-    HorizontalConfigurationGroup* aspect_fill =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    aspect_fill->addChild(AspectOverride());
-    aspect_fill->addChild(AdjustFill());
-
-    general2->addChild(oscan);
-    general2->addChild(aspect_fill);
-    general2->addChild(LetterboxingColour());
-    general2->addChild(PIPLocationComboBox());
-    general2->addChild(PlaybackExitPrompt());
-    general2->addChild(EndOfRecordingExitPrompt());
-    addChild(general2);
-
-    QString tmp = QString(" (%1/%2)").arg(++i).arg(total);
-    addChild(new PlaybackProfileConfigs(tmp));
-
-    VerticalConfigurationGroup* pbox = new VerticalConfigurationGroup(false);
-
-    //: %1 is the position, %2 is the total
-    pbox->setLabel(tr("View Recordings (%1/%2)").arg(++i).arg(total));
-
+    GroupSetting* pbox = new GroupSetting();
+    pbox->setLabel(tr("View Recordings"));
     pbox->addChild(PlayBoxOrdering());
     pbox->addChild(PlayBoxEpisodeSort());
     // Disabled until we re-enable live previews
     // pbox->addChild(PlaybackPreview());
     // pbox->addChild(HWAccelPlaybackPreview());
     pbox->addChild(PBBStartInTitle());
-    addChild(pbox);
 
-    VerticalConfigurationGroup* pbox2 = new VerticalConfigurationGroup(false);
-
-    //: %1 is the position, %2 is the total
-    pbox2->setLabel(tr("Recording Groups (%1/%2)").arg(++i).arg(total));
-
+    GroupSetting* pbox2 = new GroupSetting();
+    pbox2->setLabel(tr("Recording Groups"));
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
 
-    addChild(pbox2);
+    pbox->addChild(pbox2);
 
-    VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
+    pbox->addChild(DisplayGroupTitleSort());
 
-    //: %1 is the position, %2 is the total
-    pbox3->setLabel(tr("View Recordings (%1/%2)").arg(++i).arg(total));
+    StandardSetting *playbackWatchList = PlaybackWatchList();
+    playbackWatchList->addTargetedChild("1", PlaybackWLStart());
+    playbackWatchList->addTargetedChild("1", PlaybackWLAutoExpire());
+    playbackWatchList->addTargetedChild("1", PlaybackWLMaxAge());
+    playbackWatchList->addTargetedChild("1", PlaybackWLBlackOut());
+    pbox->addChild(playbackWatchList);
+    addChild(pbox);
 
-    pbox3->addChild(DisplayGroupTitleSort());
-    pbox3->addChild(new WatchListSettings());
-
-    addChild(pbox3);
-
-    VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
-
-    //: %1 is the position, %2 is the total
-    seek->setLabel(tr("Seeking (%1/%2)").arg(++i).arg(total));
-
+    GroupSetting* seek = new GroupSetting();
+    seek->setLabel(tr("Seeking"));
     seek->addChild(SmartForward());
     seek->addChild(FFRewReposTime());
     seek->addChild(FFRewReverse());
 
     addChild(seek);
 
-    VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
-
-    //: %1 is the position, %2 is the total
-    comms->setLabel(tr("Commercial Skip (%1/%2)").arg(++i).arg(total));
-
+    GroupSetting* comms = new GroupSetting();
+    comms->setLabel(tr("Commercial Skip"));
     comms->addChild(AutoCommercialSkip());
     comms->addChild(CommRewindAmount());
     comms->addChild(CommNotifyAmount());
@@ -4038,51 +4227,48 @@ PlaybackSettings::PlaybackSettings()
     addChild(comms);
 
 #if CONFIG_DARWIN
-    VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);
+    GroupSetting* mac = new GroupSetting();
+    mac->setLabel(tr("Mac OS X Video Settings"));
+    mac->addChild(MacGammaCorrect());
+    mac->addChild(MacScaleUp());
+    mac->addChild(MacFullSkip());
 
-    //: %1 is the position, %2 is the total
-    mac1->setLabel(tr("Mac OS X Video Setting (%1/%2)").arg(++i).arg(total));
+    StandardSetting *floatEnabled = MacFloatEnabled();
+    floatEnabled->addTargetedChild("1", MacFloatSkip());
+    floatEnabled->addTargetedChild("1", MacFloatOpacity());
+    mac->addChild(floatEnabled);
 
-    mac1->addChild(MacGammaCorrect());
-    mac1->addChild(MacScaleUp());
-    mac1->addChild(MacFullSkip());
+    StandardSetting *macMainEnabled = MacMainEnabled();
+    macMainEnabled->addTargetedChild("1", MacMainSkip());
+    macMainEnabled->addTargetedChild("1", MacMainOpacity());
+    mac->addChild(macMainEnabled);
 
-    addChild(mac1);
+    StandardSetting *dockEnabled = MacDockEnabled();
+    dockEnabled->addTargetedChild("1", MacDockSkip());
+    mac->addChild(dockEnabled);
 
-    VerticalConfigurationGroup* mac2 = new VerticalConfigurationGroup(false);
+    StandardSetting* desktopEnabled = MacDesktopEnabled();
+    desktopEnabled->addTargetedChild("1", MacDesktopSkip());
+    mac->addChild(desktopEnabled);
 
-    //: %1 is the position, %2 is the total
-    mac2->setLabel(tr("Mac OS X Video Settings (%1/%2)").arg(++i).arg(total));
-
-    mac2->addChild(new MacMainSettings());
-    mac2->addChild(new MacFloatSettings());
-
-    HorizontalConfigurationGroup *row =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    row->addChild(new MacDockSettings());
-    row->addChild(new MacDesktopSettings());
-    mac2->addChild(row);
-
-    addChild(mac2);
+    addChild(mac);
 #endif
+
+    GroupSetting::Load();
 }
 
 OSDSettings::OSDSettings()
 {
-    VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
+    setLabel(tr("On-screen Display"));
 
-    osd->setLabel(tr("On-screen Display"));
+    addChild(EnableMHEG());
+    addChild(EnableMHEGic());
+    addChild(PersistentBrowseMode());
+    addChild(BrowseAllTuners());
+    addChild(DefaultCCMode());
+    addChild(SubtitleCodec());
 
-    osd->addChild(EnableMHEG());
-    osd->addChild(EnableMHEGic());
-    osd->addChild(PersistentBrowseMode());
-    osd->addChild(BrowseAllTuners());
-    osd->addChild(DefaultCCMode());
-    osd->addChild(SubtitleCodec());
-
-    addChild(osd);
-
-    //VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
+    //GroupSetting *cc = new GroupSetting();
     //cc->setLabel(tr("Closed Captions"));
     //cc->addChild(DecodeVBIFormat());
     //addChild(cc);
@@ -4094,8 +4280,8 @@ OSDSettings::OSDSettings()
 
 GeneralSettings::GeneralSettings()
 {
-    VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-
+    setLabel(tr("General (Basic)"));
+    GroupSetting* general = new GroupSetting();
     general->setLabel(tr("General (Basic)"));
     general->addChild(ChannelOrdering());
     general->addChild(ChannelFormat());
@@ -4103,38 +4289,25 @@ GeneralSettings::GeneralSettings()
 
     addChild(general);
 
-    VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
+    GroupSetting* autoexp = new GroupSetting();
 
     autoexp->setLabel(tr("General (Auto-Expire)"));
 
     autoexp->addChild(AutoExpireMethod());
 
-    VerticalConfigurationGroup *expgrp0 =
-        new VerticalConfigurationGroup(false, false, true, true);
+    autoexp->addChild(RerecordWatched());
+    autoexp->addChild(AutoExpireWatchedPriority());
 
-    expgrp0->addChild(RerecordWatched());
-    expgrp0->addChild(AutoExpireWatchedPriority());
+    autoexp->addChild(AutoExpireLiveTVMaxAge());
+    autoexp->addChild(AutoExpireDayPriority());
+    autoexp->addChild(AutoExpireExtraSpace());
 
-    VerticalConfigurationGroup *expgrp1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-
-    expgrp1->addChild(AutoExpireLiveTVMaxAge());
-    expgrp1->addChild(AutoExpireDayPriority());
-    expgrp1->addChild(AutoExpireExtraSpace());
-
-    HorizontalConfigurationGroup *expgrp =
-        new HorizontalConfigurationGroup(false, false, true, true);
-
-    expgrp->addChild(expgrp0);
-    expgrp->addChild(expgrp1);
-
-    autoexp->addChild(expgrp);
 //    autoexp->addChild(new DeletedExpireOptions());
     autoexp->addChild(DeletedMaxAge());
 
     addChild(autoexp);
 
-    VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
+    GroupSetting* jobs = new GroupSetting();
 
     jobs->setLabel(tr("General (Jobs)"));
 
@@ -4145,7 +4318,7 @@ GeneralSettings::GeneralSettings()
 
     addChild(jobs);
 
-    VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
+    GroupSetting* general2 = new GroupSetting();
 
     general2->setLabel(tr("General (Advanced)"));
 
@@ -4154,12 +4327,12 @@ GeneralSettings::GeneralSettings()
     general2->addChild(CategoryOverTimeSettings());
     addChild(general2);
 
-    VerticalConfigurationGroup* changrp = new VerticalConfigurationGroup(false);
+    GroupSetting* changrp = new GroupSetting();
 
     changrp->setLabel(tr("General (Channel Groups)"));
 
-    ChannelGroupSettings *changroupsettings = new ChannelGroupSettings();
-    changrp->addChild(changroupsettings);
+    changrp->addChild(ChannelGroupRememberLast());
+    changrp->addChild(ChannelGroupDefault());
     changrp->addChild(BrowseChannelGroup());
 
     addChild(changrp);
@@ -4167,19 +4340,15 @@ GeneralSettings::GeneralSettings()
 
 EPGSettings::EPGSettings()
 {
-    VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
+    setLabel(tr("Program Guide"));
 
-    epg->setLabel(tr("Program Guide %1/%2").arg("1").arg("1"));
-
-    epg->addChild(DefaultTVChannel());
-    epg->addChild(EPGRecThreshold());
-
-    addChild(epg);
+    addChild(DefaultTVChannel());
+    addChild(EPGRecThreshold());
 }
 
 GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 {
-    VerticalConfigurationGroup* sched = new VerticalConfigurationGroup(false);
+    GroupSetting* sched = new GroupSetting();
 
     sched->setLabel(tr("Scheduler Options"));
 
@@ -4190,7 +4359,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
 
     addChild(sched);
 
-    VerticalConfigurationGroup* access = new VerticalConfigurationGroup(false);
+    GroupSetting* access = new GroupSetting();
 
     access->setLabel(tr("Accessibility Options"));
 
@@ -4203,10 +4372,72 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     addChild(access);
 }
 
+class GuiDimension : public GroupSetting
+{
+    public:
+        GuiDimension();
+        //virtual QString getValue();
+        virtual void updateButton(MythUIButtonListItem *item);
+
+    private slots:
+        virtual void childChanged(StandardSetting *);
+    private:
+        StandardSetting *m_width;
+        StandardSetting *m_height;
+        StandardSetting *m_offsetX;
+        StandardSetting *m_offsetY;
+};
+
+GuiDimension::GuiDimension()
+    :GroupSetting()
+{
+    setLabel(AppearanceSettings::tr("GUI dimension"));
+    addChild(m_width   = GuiWidth());
+    addChild(m_height  = GuiHeight());
+    addChild(m_offsetX = GuiOffsetX());
+    addChild(m_offsetY = GuiOffsetY());
+    connect(m_width, SIGNAL(valueChanged(StandardSetting *)),
+            SLOT(childChanged(StandardSetting *)));
+    connect(m_height, SIGNAL(valueChanged(StandardSetting *)),
+            SLOT(childChanged(StandardSetting *)));
+    connect(m_offsetX, SIGNAL(valueChanged(StandardSetting *)),
+            SLOT(childChanged(StandardSetting *)));
+    connect(m_offsetY, SIGNAL(valueChanged(StandardSetting *)),
+            SLOT(childChanged(StandardSetting *)));
+}
+
+void GuiDimension::updateButton(MythUIButtonListItem *item)
+{
+    GroupSetting::updateButton(item);
+    if ((m_width->getValue() == "0" ||
+         m_height->getValue() == "0") &&
+        m_offsetX->getValue() == "0" &&
+        m_offsetY->getValue() == "0")
+        item->SetText(AppearanceSettings::tr("Fullscreen"), "value");
+    else
+        item->SetText(QString("%1x%2+%3+%4")
+                      .arg(m_width->getValue())
+                      .arg(m_height->getValue())
+                      .arg(m_offsetX->getValue())
+                      .arg(m_offsetY->getValue()), "value");
+}
+
+void GuiDimension::childChanged(StandardSetting *)
+{
+    emit ShouldRedraw(this);
+}
+
+void AppearanceSettings::applyChange()
+{
+    qApp->processEvents();
+    GetMythMainWindow()->JumpTo("Reload Theme");
+}
+
 AppearanceSettings::AppearanceSettings()
 {
-    VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
+    GroupSetting* screen = new GroupSetting();
     screen->setLabel(tr("Theme / Screen Settings"));
+    addChild(screen);
 
 #if ! CONFIG_DARWIN
     screen->addChild(ThemePainter());
@@ -4222,42 +4453,23 @@ AppearanceSettings::AppearanceSettings()
 //    screen->addChild(DisplaySizeHeight());
 //    screen->addChild(DisplaySizeWidth());
 
-    VerticalConfigurationGroup *column1 =
-        new VerticalConfigurationGroup(false, false, false, false);
+    screen->addChild(new GuiDimension());
 
-    column1->addChild(GuiWidth());
-    column1->addChild(GuiHeight());
-    column1->addChild(GuiOffsetX());
-    column1->addChild(GuiOffsetY());
-
-    VerticalConfigurationGroup *column2 =
-        new VerticalConfigurationGroup(false, false, false, false);
-
-    column2->addChild(GuiSizeForTV());
-    column2->addChild(HideMouseCursor());
-    column2->addChild(RunInWindow());
-    column2->addChild(UseFixedWindowSize());
-    column2->addChild(AlwaysOnTop());
+    screen->addChild(GuiSizeForTV());
+    screen->addChild(HideMouseCursor());
+    screen->addChild(RunInWindow());
+    screen->addChild(UseFixedWindowSize());
+    screen->addChild(AlwaysOnTop());
 #ifdef USING_AIRPLAY
-    column2->addChild(AirPlayFullScreen());
+    screen->addChild(AirPlayFullScreen());
 #endif
-
-    HorizontalConfigurationGroup *columns =
-        new HorizontalConfigurationGroup(false, false, false, false);
-
-    columns->addChild(column1);
-    columns->addChild(column2);
-
-    screen->addChild(columns);
-
-    addChild(screen);
 
 #if defined(USING_XRANDR) || CONFIG_DARWIN
     const vector<DisplayResScreen> scr = GetVideoModes();
     if (!scr.empty())
-        addChild(new VideoModeSettings());
+        addChild(UseVideoModes());
 #endif
-    VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
+    GroupSetting* dates = new GroupSetting();
 
     dates->setLabel(tr("Localization"));
 
@@ -4270,7 +4482,264 @@ AppearanceSettings::AppearanceSettings()
 
     addChild(dates);
 
-    addChild(new LcdSettings());
+    addChild(LCDEnable());
 }
+
+/*******************************************************************************
+*                                Channel Groups                                *
+*******************************************************************************/
+
+class ChannelCheckBoxSetting : public TransMythUICheckBoxSetting
+{
+  public:
+    ChannelCheckBoxSetting(uint chanid,
+        const QString &channum, const QString &name);
+    uint getChannelId(){return m_channelId;};
+  private:
+    uint m_channelId;
+
+};
+
+ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
+        const QString &channum, const QString &channame)
+    :TransMythUICheckBoxSetting(),
+    m_channelId(chanid)
+{
+    setLabel(QString("%1 %2").arg(channum).arg(channame));
+    setHelpText(tr("Select/Unselect channels for this channel group"));
+}
+
+ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
+                                         int groupId = -1)
+    :GroupSetting(),
+    m_groupId(groupId),
+    m_groupName(NULL),
+    m_markForDeletion(NULL)
+{
+    setLabel(groupName);//TODO this should be the translated name if Favorite
+    setValue(groupName);
+    m_groupName = new TransTextEditSetting();
+    m_groupName->setLabel(groupName);
+}
+
+void ChannelGroupSetting::Close()
+{
+    //Change the name
+    if ((m_groupName && m_groupName->haveChanged())
+      || m_groupId == -1)
+    {
+        if (m_groupId == -1)//create a new group
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            QString qstr =
+                "INSERT INTO channelgroupnames (name) VALUE (:NEWNAME);";
+            query.prepare(qstr);
+            query.bindValue(":NEWNAME", m_groupName->getValue());
+
+            if (!query.exec())
+                MythDB::DBError("ChannelGroupSetting::Close", query);
+            else
+            {
+                //update m_groupId
+                QString qstr = "SELECT grpid FROM channelgroupnames "
+                                "WHERE name = :NEWNAME;";
+                query.prepare(qstr);
+                query.bindValue(":NEWNAME", m_groupName->getValue());
+                if (!query.exec())
+                    MythDB::DBError("ChannelGroupSetting::Close", query);
+                else
+                    if (query.next())
+                        m_groupId = query.value(0).toUInt();
+            }
+        }
+        else
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            QString qstr = "UPDATE channelgroupnames set name = :NEWNAME "
+                            " WHERE name = :OLDNAME ;";
+            query.prepare(qstr);
+            query.bindValue(":NEWNAME", m_groupName->getValue());
+            query.bindValue(":OLDNAME", getValue());
+
+            if (!query.exec())
+                MythDB::DBError("ChannelGroupSetting::Close", query);
+            else
+                if (query.next())
+                    m_groupId = query.value(0).toUInt();
+        }
+    }
+
+    if (m_groupId == -1)
+        return;
+
+    QList<StandardSetting *> *children = getSubSettings();
+    if (!children)
+        return;
+
+    QList<StandardSetting *>::const_iterator i;
+    for (i = children->constBegin(); i != children->constEnd(); ++i)
+    {
+        if ((*i)->haveChanged())
+        {
+            if ((*i) != m_groupName)
+            {
+                ChannelCheckBoxSetting *channel =
+                    dynamic_cast<ChannelCheckBoxSetting *>(*i);
+                if (channel)
+                {
+                    if (channel->boolValue())
+                    {
+                        ChannelGroup::AddChannel(channel->getChannelId(),
+                                                 m_groupId);
+                    }
+                    else
+                    {
+                        ChannelGroup::DeleteChannel(channel->getChannelId(),
+                                                    m_groupId);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void ChannelGroupSetting::Load()
+{
+    clearSettings();
+    //We can not rename the Favorite group
+    //if (m_groupId!=1)
+    //{
+        m_groupName = new TransTextEditSetting();
+        m_groupName->setLabel(tr("Group name"));
+//        if (m_groupId > -1)
+        m_groupName->setValue(getLabel());
+        m_groupName->setEnabled(m_groupId != 1);
+        addChild(m_groupName);
+    //}
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString qstr =
+        "SELECT channel.chanid, channum, name, grpid FROM channel "
+        "LEFT JOIN channelgroup "
+        "ON (channel.chanid = channelgroup.chanid AND grpid = :GRPID) "
+        "ORDER BY channum+0; "; //to order by numeric value of channel number
+
+    query.prepare(qstr);
+
+    query.bindValue(":GRPID",  m_groupId);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("ChannelGroupSetting::Load", query);
+    else
+    {
+        while (query.next())
+        {
+            ChannelCheckBoxSetting *channelCheckBox =
+                    new ChannelCheckBoxSetting(query.value(0).toUInt(),
+                                               query.value(1).toString(),
+                                               query.value(2).toString());
+            channelCheckBox->setValue(!query.value(3).isNull());
+            addChild(channelCheckBox);
+        }
+    }
+
+    GroupSetting::Load();
+}
+
+bool ChannelGroupSetting::canDelete(void)
+{
+    //can not delete new group or Favorite
+    return (m_groupId > 1);
+}
+
+void ChannelGroupSetting::deleteEntry(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    // Delete channels from this group
+    query.prepare("DELETE FROM channelgroup WHERE grpid = :GRPID;");
+    query.bindValue(":GRPID", m_groupId);
+    if (!query.exec())
+        MythDB::DBError("ChannelGroupSetting::deleteEntry", query);
+
+    // Now delete the group from channelgroupnames
+    query.prepare("DELETE FROM channelgroupnames WHERE grpid = :GRPID;");
+    query.bindValue(":GRPID", m_groupId);
+    if (!query.exec())
+        MythDB::DBError("ChannelGroupSetting::Close", query);
+}
+
+
+ChannelGroupsSetting::ChannelGroupsSetting()
+    : GroupSetting(),
+      m_addGroupButton(NULL)
+{
+    setLabel(tr("Channel Groups"));
+}
+
+void ChannelGroupsSetting::Load()
+{
+    clearSettings();
+    ButtonStandardSetting *newGroup =
+        new ButtonStandardSetting(tr("(Create New Channel Group)"));
+    connect(newGroup, SIGNAL(clicked()), SLOT(ShowNewGroupDialog()));
+    addChild(newGroup);
+
+    addChild(new ChannelGroupSetting(tr("Favorites"), 1));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString qstr = "SELECT grpid, name FROM channelgroupnames "
+                        " WHERE grpid <> 1 "
+                        " ORDER BY name ; ";
+
+    query.prepare(qstr);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("ChannelGroupsSetting::Load", query);
+    else
+    {
+        while(query.next())
+        {
+            addChild(new ChannelGroupSetting(query.value(1).toString(),
+                                             query.value(0).toUInt()));
+        }
+    }
+
+    //Load all the groups
+    GroupSetting::Load();
+    //TODO select the new one or the edited one
+    emit settingsChanged(NULL);
+}
+
+
+void ChannelGroupsSetting::ShowNewGroupDialog()
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack,
+                                tr("Enter the name of the new channel group"));
+
+    if (settingdialog->Create())
+    {
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewGroup(QString)));
+        popupStack->AddScreen(settingdialog);
+    }
+    else
+    {
+        delete settingdialog;
+    }
+}
+
+void ChannelGroupsSetting::CreateNewGroup(QString name)
+{
+    ChannelGroupSetting *button = new ChannelGroupSetting(name,-1);
+    button->setLabel(name);
+    button->Load();
+    addChild(button);
+    emit settingsChanged(this);
+}
+
 
 // vim:set sw=4 ts=4 expandtab:

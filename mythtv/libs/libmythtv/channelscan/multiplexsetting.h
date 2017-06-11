@@ -6,14 +6,14 @@
 #define _MULTIPLEX_SETTING_H_
 
 // MythTV headers
-#include "settings.h"
+#include "standardsettings.h"
 
-class MultiplexSetting : public ComboBoxSetting, public TransientStorage
+class MultiplexSetting : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
 
   public:
-    MultiplexSetting() : ComboBoxSetting(this), sourceid(0)
+    MultiplexSetting() : sourceid(0)
         { setLabel(tr("Transport")); }
 
     virtual void Load(void);
