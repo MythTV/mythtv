@@ -364,20 +364,38 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
         {
             // EITa(ctive)
             chanid = GetChanID((*eit_section_ptr)->ServiceID());
-            LOG(VB_DVBSICACHE, LOG_DEBUG, QString("actual - chanid %1 serviceid %2 pid %3")
+            LOG(VB_DVBSICACHE, LOG_DEBUG, QString("actual - tableid 0x%1(%2) chanid 0x%3(%4) serviceid 0x%5(%6)"
+                                                "onid 0x%7(%8) tsid 0x%9(%10) pid 0x%11(%12)")
+                                                .arg((*eit_section_ptr)->TableID(), 0, 16)
+                                                .arg((*eit_section_ptr)->TableID())
+                                                .arg(chanid, 0, 16)
                                                 .arg(chanid)
+                                                .arg((*eit_section_ptr)->ServiceID(), 0, 16)
                                                 .arg((*eit_section_ptr)->ServiceID())
+                                                .arg((*eit_section_ptr)->OriginalNetworkID(), 0, 16)
+                                                .arg((*eit_section_ptr)->OriginalNetworkID())
+                                                .arg((*eit_section_ptr)->TSID(), 0, 16)
+                                                .arg((*eit_section_ptr)->TSID())
+                                                .arg((*eit_section_ptr)->GetPID(), 0, 16)
                                                 .arg((*eit_section_ptr)->GetPID()));
         }
         else
         {
             // EITo(ther)
             chanid = GetChanID((*eit_section_ptr)->ServiceID(), (*eit_section_ptr)->OriginalNetworkID(), (*eit_section_ptr)->TSID());
-            LOG(VB_DVBSICACHE, LOG_DEBUG, QString("other - chanid %1 serviceid %2 onid %3 tsid %4 pid %5")
+            LOG(VB_DVBSICACHE, LOG_DEBUG, QString("other - tableid 0x%1(%2) chanid 0x%3(%4) serviceid 0x%5(%6)"
+                                                "onid 0x%7(%8) tsid 0x%9(%10) pid 0x%11(%12)")
+                                                .arg((*eit_section_ptr)->TableID(), 0, 16)
+                                                .arg((*eit_section_ptr)->TableID())
+                                                .arg(chanid, 0, 16)
                                                 .arg(chanid)
+                                                .arg((*eit_section_ptr)->ServiceID(), 0, 16)
                                                 .arg((*eit_section_ptr)->ServiceID())
+                                                .arg((*eit_section_ptr)->OriginalNetworkID(), 0, 16)
                                                 .arg((*eit_section_ptr)->OriginalNetworkID())
+                                                .arg((*eit_section_ptr)->TSID(), 0, 16)
                                                 .arg((*eit_section_ptr)->TSID())
+                                                .arg((*eit_section_ptr)->GetPID(), 0, 16)
                                                 .arg((*eit_section_ptr)->GetPID()));
            // do not reschedule if its only present+following
            if ((*eit_section_ptr)->TableID() != TableID::PF_EITo)
@@ -387,7 +405,10 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
             }
         }
         if (!chanid)
+        {
+            LOG(VB_DVBSICACHE, LOG_DEBUG, "Ditching an eit section chanid not found");
             return;
+        }
 
         for(; eit_section_ptr != EventInformationTable.end(); ++eit_section_ptr)
         {
@@ -732,7 +753,7 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
         }
     }
     else
-        LOG(VB_GENERAL, LOG_ERR, "EIT table with no sections encountered");
+        LOG(VB_DVBSICACHE, LOG_DEBUG, "EIT table with no sections encountered");
 }
 
 // This function gets special EIT data from the German provider Premiere
