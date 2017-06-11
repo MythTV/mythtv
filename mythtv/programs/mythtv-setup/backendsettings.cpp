@@ -1037,6 +1037,7 @@ void BackendSettings::listenChanged()
 {
     if (!isLoaded)
         return;
+    bool addrChanged = backendServerAddr->haveChanged();
     QString currentsetting = backendServerAddr->getValue();
     backendServerAddr->clearSelections();
     if (ipAddressSettings->boolValue())
@@ -1080,6 +1081,7 @@ void BackendSettings::listenChanged()
     }
     else
         backendServerAddr->setValue(0);
+    backendServerAddr->setChanged(addrChanged);
 }
 
 
