@@ -1430,7 +1430,7 @@ void MainServer::customEvent(QEvent *e)
             gCoreContext->ClearSettingsCache();
 
         if (me->Message() == "LOG_SI_CACHE")
-        	DVBStreamData::LogSICache();
+            DVBStreamData::LogSICache();
 
         if (me->Message().startsWith("RESET_IDLETIME") && m_sched)
             m_sched->ResetIdleTime();

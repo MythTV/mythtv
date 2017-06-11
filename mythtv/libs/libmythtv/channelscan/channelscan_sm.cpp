@@ -434,7 +434,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
             .arg((*m_current).FriendlyName) + "\n" + pat->toString()).split("\n");
 
     for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
-    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+        LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     // Add pmts to list, so we can do MPEG scan properly.
     ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
@@ -454,7 +454,7 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 //            .arg((*m_current).FriendlyName) + "\n" + pmt->toString()).split("\n);
 //
 //    for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
-//    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+//      LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 //    }
 
 
@@ -472,7 +472,7 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
                 .arg((*m_current).FriendlyName) + "\n" + vct->toString()).split("\n");
 
     for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
-    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+        LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     for (uint i = 0; !m_currentTestingDecryption && i < vct->ChannelCount(); i++)
     {
@@ -493,7 +493,7 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
             .arg((*m_current).FriendlyName) + "\n" + mgt->toString()).split("\n");
 
     for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
-    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+        LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     UpdateChannelInfo(true, ATSC_TRANSPORT_STREAM);
 }
@@ -542,7 +542,7 @@ void ChannelScanSM::HandleSDT(const sdt_sections_cache_const_t& sections)
                     .arg((*m_current).FriendlyName) + "\n" + (*section)->toString()).split("\n");
 
         for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
-        	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+            LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
         // Process common fields
 
@@ -581,7 +581,7 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
                 .arg(uint64_t(nit), 0, 16) + "\n" + nit->toString()).split("\n");
 
     for (QStringList::iterator it = LogMessage.begin(); it != LogMessage.end(); ++it)
-    	LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
+        LOG_NO_CONTEXT(VB_CHANSCAN, LOG_INFO, *it);
 
     UpdateChannelInfo(true, DVB_TRANSPORT_STREAM);
 }
@@ -918,8 +918,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
                 m_extendTransports[id] = tuning;
             }
             if (failedToGetMultiplexDetails)
-            	continue;
-			break;
+                continue;
+            break;
         }
     }
 }
@@ -974,14 +974,14 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
             }
         }
         else
-        	mpeg_discovery_complete = false;
+            mpeg_discovery_complete = false;
     }
     mpeg_discovery_complete &= !pattmp.empty();
     sd->ReturnCachedPATTables(pattmp);
 
     // Grab PMT tables
     if ((!wait_until_complete || sd->HasCachedAllPMTs()) &&
-    		m_currentInfo->pmts.empty())
+            m_currentInfo->pmts.empty())
         m_currentInfo->pmts = sd->GetCachedPMTs();
     mpeg_discovery_complete &= !m_currentInfo->pmts.empty();
 
@@ -1137,7 +1137,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete, TransportStreamT
             m_channelList << ChannelListItem(m_current, m_currentInfo);
             LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
                 QString("Copied m_currentInfo 0x%1 to m_channelList")
-				.arg(uint64_t(m_currentInfo), 0, 16));
+                .arg(uint64_t(m_currentInfo), 0, 16));
             m_currentInfo = NULL;
         }
         else
@@ -1785,7 +1785,7 @@ bool ChannelScanSM::HasTimedOut(void)
 
         if (!sd)
         {
-        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - No signal monitor");
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - No signal monitor");
             return true;
         }
 
@@ -1793,21 +1793,21 @@ bool ChannelScanSM::HasTimedOut(void)
         {
             bool ret = m_timer.elapsed() > (int) kDVBTableTimeout;
             if (ret)
-            	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - DVB tables");
+                LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - DVB tables");
             return ret;
         }
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
         {
             bool ret = m_timer.elapsed() > (int) kATSCTableTimeout;
             if (ret)
-            	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - ATSC tables");
+                LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - ATSC tables");
             return ret;
         }
         if (sd->HasCachedAnyPAT() || sd->HasCachedAnyPMTs())
         {
             bool ret = m_timer.elapsed() > (int) kMPEGTableTimeout;
             if (ret)
-            	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - MPEG tables");
+                LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - MPEG tables");
             return ret;
         }
 
@@ -1825,7 +1825,7 @@ bool ChannelScanSM::HasTimedOut(void)
 
         if (!sd)
         {
-        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - No signal monitor");
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - No signal monitor");
             return true;
         }
 
@@ -1836,7 +1836,7 @@ bool ChannelScanSM::HasTimedOut(void)
             !sd->HasCachedAnyNIT() &&
             ((m_currentInfo == NULL) || m_currentInfo->serviceDescriptionTablesCache.empty()))
         {
-        	LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - Lost signal - no tables received");
+            LOG(VB_CHANSCAN, LOG_DEBUG, LOC + "Timed out - Lost signal - no tables received");
             return true;
         }
     }

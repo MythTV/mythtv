@@ -2,16 +2,16 @@
 // Copyright (c) 2001 Tom Barry.  All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 //
-//	This file is subject to the terms of the GNU General Public License as
-//	published by the Free Software Foundation.  A copy of this license is
-//	included with this software distribution in the file COPYING.  If you
-//	do not have a copy, you may obtain a copy by writing to the Free
-//	Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+// This file is subject to the terms of the GNU General Public License as
+// published by the Free Software Foundation.  A copy of this license is
+// included with this software distribution in the file COPYING.  If you
+// do not have a copy, you may obtain a copy by writing to the Free
+// Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 //
-//	This software is distributed in the hope that it will be useful,
-//	but WITHOUT ANY WARRANTY; without even the implied warranty of
-//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//	GNU General Public License for more details
+// This software is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -27,12 +27,12 @@
 //      V_PAVGB(mmr1, mmr2, mmr work register, smask) mmr2 may = mmrw if you can trash it
 
 #define V_PAVGB_MMXT(mmr1, mmr2, mmrw, smask) \
-	"movq    "mmr2",  "mmrw"\n\t"            \
-	"pand    "smask", "mmrw"\n\t"            \
-	"psrlw   $1,      "mmrw"\n\t"            \
-	"pand    "smask", "mmr1"\n\t"            \
-	"psrlw   $1,      "mmr1"\n\t"            \
-	"paddusb "mmrw",  "mmr1"\n\t"
+    "movq    "mmr2",  "mmrw"\n\t"            \
+    "pand    "smask", "mmrw"\n\t"            \
+    "psrlw   $1,      "mmrw"\n\t"            \
+    "pand    "smask", "mmr1"\n\t"            \
+    "psrlw   $1,      "mmr1"\n\t"            \
+    "paddusb "mmrw",  "mmr1"\n\t"
 #define V_PAVGB_SSE(mmr1, mmr2, mmrw, smask)      "pavgb   "mmr2", "mmr1"\n\t"
 #define V_PAVGB_3DNOW(mmr1, mmr2, mmrw, smask)    "pavgusb "mmr2", "mmr1"\n\t"
 #define V_PAVGB(mmr1, mmr2, mmrw, smask)          V_PAVGB2(mmr1, mmr2, mmrw, smask, SSE_TYPE) 

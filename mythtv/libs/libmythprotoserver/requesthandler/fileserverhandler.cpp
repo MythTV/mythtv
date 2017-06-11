@@ -159,8 +159,8 @@ void FileServerHandler::RunDeleteThread(void)
 {
     if (deletethread != NULL)
     {
-		if (deletethread->isRunning())
-			return;
+        if (deletethread->isRunning())
+            return;
 
         delete deletethread;
         deletethread = NULL;
