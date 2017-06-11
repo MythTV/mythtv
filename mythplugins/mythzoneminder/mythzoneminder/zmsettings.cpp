@@ -12,9 +12,9 @@
 #include "zmsettings.h"
 
 
-static HostLineEdit *ZMServerIP()
+static HostTextEditSetting *ZMServerIP()
 {
-    HostLineEdit *gc = new HostLineEdit("ZoneMinderServerIP");
+    HostTextEditSetting *gc = new HostTextEditSetting("ZoneMinderServerIP");
     gc->setLabel(ZMSettings::tr("IP address of the MythZoneMinder server"));
     gc->setValue("127.0.0.1");
     gc->setHelpText(ZMSettings::tr("Enter the IP address of the MythZoneMinder "
@@ -23,9 +23,9 @@ static HostLineEdit *ZMServerIP()
     return gc;
 };
 
-static HostLineEdit *ZMServerPort()
+static HostTextEditSetting *ZMServerPort()
 {
-    HostLineEdit *gc = new HostLineEdit("ZoneMinderServerPort");
+    HostTextEditSetting *gc = new HostTextEditSetting("ZoneMinderServerPort");
     gc->setLabel(ZMSettings::tr("Port the server runs on"));
     gc->setValue("6548");
     gc->setHelpText(ZMSettings::tr("Unless you've got good reason to, don't "
@@ -33,9 +33,9 @@ static HostLineEdit *ZMServerPort()
     return gc;
 };
 
-static HostComboBox *ZMDateFormat()
+static HostComboBoxSetting *ZMDateFormat()
 {
-    HostComboBox *gc = new HostComboBox("ZoneMinderDateFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("ZoneMinderDateFormat");
     gc->setLabel(ZMSettings::tr("Date format"));
 
     QDate sampdate = MythDate::current().toLocalTime().date();
@@ -69,9 +69,9 @@ static HostComboBox *ZMDateFormat()
     return gc;
 }
 
-static HostComboBox *ZMTimeFormat()
+static HostComboBoxSetting *ZMTimeFormat()
 {
-    HostComboBox *gc = new HostComboBox("ZoneMinderTimeFormat");
+    HostComboBoxSetting *gc = new HostComboBoxSetting("ZoneMinderTimeFormat");
     gc->setLabel(ZMSettings::tr("Time format"));
 
     QTime samptime = QTime::currentTime();
@@ -87,11 +87,9 @@ static HostComboBox *ZMTimeFormat()
 
 ZMSettings::ZMSettings()
 {
-    VerticalConfigurationGroup* vcg1 = new VerticalConfigurationGroup(false);
-    vcg1->setLabel(tr("MythZoneMinder Settings"));
-    vcg1->addChild(ZMServerIP());
-    vcg1->addChild(ZMServerPort());
-    vcg1->addChild(ZMDateFormat());
-    vcg1->addChild(ZMTimeFormat());
-    addChild(vcg1);
+    setLabel(tr("MythZoneMinder Settings"));
+    addChild(ZMServerIP());
+    addChild(ZMServerPort());
+    addChild(ZMDateFormat());
+    addChild(ZMTimeFormat());
 }

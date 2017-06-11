@@ -185,7 +185,7 @@ class MTV_PUBLIC ChannelImporter
         const ScanDTVTransport          &transport,
         const ChannelInsertInfo         &chan);
 
-    static OkCancelType ShowManualChannelPopup(
+    OkCancelType ShowManualChannelPopup(
         MythMainWindow *parent, QString title,
         QString message, QString &text);
 
@@ -237,6 +237,8 @@ class MTV_PUBLIC ChannelImporter
     bool m_success;
     /// Services desired post scan
     ServiceRequirements m_service_requirements;
+
+    QEventLoop m_eventLoop;
 };
 
 #endif // _CHANNEL_IMPORTER_H_

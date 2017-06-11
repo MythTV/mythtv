@@ -34,18 +34,20 @@
 #include "channelscanmiscsettings.h"
 #include "multiplexsetting.h"
 
-class PaneSingle : public VerticalConfigurationGroup
+class PaneSingle : public GroupSetting
 {
   public:
-    PaneSingle() :
-        VerticalConfigurationGroup(false, false, true, false),
+    PaneSingle(const QString &target, StandardSetting *setting) :
         transport_setting(new MultiplexSetting()),
         ignore_signal_timeout(new IgnoreSignalTimeout()),
         follow_nit(new FollowNITSetting())
     {
-        addChild(transport_setting);
-        addChild(ignore_signal_timeout);
-        addChild(follow_nit);
+        setVisible(false);
+        setting->addTargetedChildren(target,
+                                     {this,
+                                      transport_setting,
+                                      ignore_signal_timeout,
+                                      follow_nit});
     }
 
     int  GetMultiplex(void) const

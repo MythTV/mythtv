@@ -35,7 +35,7 @@
 #include <QObject>
 
 #include "mythtvexp.h"
-#include "settings.h"
+#include "standardsettings.h"
 
 class VideoSourceSelector;
 class MultiplexID;
@@ -43,54 +43,50 @@ class MultiplexID;
 /*
  *  Objects added for Transport Editing section
  */
-
-class TransportList : public ListBoxSetting, public TransientStorage
+class TransportSetting : public GroupSetting
 {
     Q_OBJECT
 
   public:
-    TransportList() : ListBoxSetting(this), sourceid(0), cardtype(0) { }
+    TransportSetting(const QString &label, uint mplexid, uint sourceid,
+                     uint cardtype);
 
-    virtual void Load(void) { fillSelections(); }
-    virtual void fillSelections(void);
+    bool keyPressEvent(QKeyEvent *event);
 
-    void SetSourceID(uint _sourceid);
+    uint getMplexId() const;
 
-  public slots:
-    void SetSourceID(const QString &_sourceid)
-        { SetSourceID(_sourceid.toUInt()); }
-
-  private:
-    ~TransportList() { }
+  signals:
+    void deletePressed();
+    void openMenu();
 
   private:
-    uint sourceid;
-    uint cardtype;
+    MultiplexID *m_mplexid;
 };
 
 // Page for selecting a transport to be created/edited
-class MTV_PUBLIC TransportListEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC TransportListEditor : public GroupSetting
 {
     Q_OBJECT
 
   public:
     explicit TransportListEditor(uint initial_sourceid);
+    virtual void Load(void);
 
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
+    void SetSourceID(uint _sourceid);
 
   public slots:
-    void Menu(void);
-    void Delete(void);
-    void Edit(void);
+    void SetSourceID(const QString &_sourceid);
+    void Menu(TransportSetting *transport);
 
   private:
     ~TransportListEditor() { }
+    void Delete(TransportSetting *transport);
 
   private:
     VideoSourceSelector *m_videosource;
-    TransportList       *m_list;
+    QVector<StandardSetting*> m_list;
+    uint m_sourceid;
+    uint m_cardtype;
 };
 
 #endif // _TRANSPORT_EDITOR_H_

@@ -44,16 +44,14 @@ ProfileGroup::ProfileGroup()
     addChild(id = new ID());
     addChild(is_default = new Is_default(*this));
 
-    ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
-    profile->setLabel(tr("ProfileGroup"));
-    profile->addChild(name = new Name(*this));
+    setLabel(tr("Profile Group"));
+    addChild(name = new Name(*this));
     CardInfo *cardInfo = new CardInfo(*this);
-    profile->addChild(cardInfo);
+    addChild(cardInfo);
     CardType::fillSelections(cardInfo);
     host = new HostName(*this);
-    profile->addChild(host);
+    addChild(host);
     host->fillSelections();
-    addChild(profile);
 };
 
 void ProfileGroup::loadByID(int profileId) {
@@ -124,7 +122,7 @@ bool ProfileGroup::addMissingDynamicProfiles(void)
     return true;
 }
 
-void ProfileGroup::fillSelections(SelectSetting* setting)
+void ProfileGroup::fillSelections(GroupSetting* setting)
 {
     CardUtil::InputTypes cardtypes = CardUtil::GetInputTypes();
     QString     tid       = QString::null;
@@ -160,12 +158,27 @@ void ProfileGroup::fillSelections(SelectSetting* setting)
             if (!hostname.isEmpty())
                 name += QString(" (%1)").arg(result.value(2).toString());
 
-            setting->addSelection(name, id);
+            if (is_default)
+            {
+                setting->addChild(new RecordingProfileEditor(id.toInt(), name));
+            }
+            else
+            {
+                ProfileGroup *profileGroup = new ProfileGroup();
+                profileGroup->loadByID(id.toInt());
+                profileGroup->setLabel(name);
+                profileGroup->addChild(
+                    new RecordingProfileEditor(id.toInt(), tr("Profiles")));
+                setting->addChild(profileGroup);
+            }
         }
     }
 
     if (!tid.isEmpty())
-        setting->addSelection(tr("Transcoders"), tid);
+    {
+        setting->addChild(new RecordingProfileEditor(tid.toInt(),
+                                                     tr("Transcoders")));
+    }
 }
 
 QString ProfileGroup::getName(int group)
@@ -209,186 +222,10 @@ void ProfileGroup::getHostNames(QStringList *hostnames)
     }
 }
 
-void ProfileGroupEditor::open(int id) {
-
-    ProfileGroup* profilegroup = new ProfileGroup();
-
-    bool isdefault = false;
-    bool show_profiles = true;
-    bool newgroup = false;
-    int profileID;
-    QString pgName;
-
-    if (id != 0)
-    {
-        profilegroup->loadByID(id);
-        pgName = profilegroup->getName();
-        if (profilegroup->isDefault())
-          isdefault = true;
-    }
-    else
-    {
-        pgName = tr("New Profile Group Name");
-        profilegroup->setName(pgName);
-        newgroup = true;
-    }
-
-    if (! isdefault)
-    {
-        if (profilegroup->exec(false) == QDialog::Accepted &&
-            profilegroup->allowedGroupName())
-        {
-            profilegroup->Save();
-            profileID = profilegroup->getProfileNum();
-            vector<int> found;
-
-            MSqlQuery result(MSqlQuery::InitCon());
-            result.prepare("SELECT name FROM recordingprofiles WHERE "
-                           "profilegroup = :PROFILE_ID");
-
-            result.bindValue(":PROFILE_ID", profileID);
-
-            if (result.exec())
-            {
-                while (result.next())
-                {
-                    for (int i = 0; availProfiles[i] != ""; i++)
-                      if (result.value(0).toString() == availProfiles[i])
-                          found.push_back(i);
-                }
-            }
-
-            for(int i = 0; availProfiles[i] != ""; i++)
-            {
-                bool skip = false;
-
-                for (vector<int>::iterator j = found.begin();
-                     j != found.end(); ++j)
-                {
-                    if (i == *j)
-                        skip = true;
-                }
-                if (! skip)
-                {
-                    result.prepare("INSERT INTO recordingprofiles "
-                                   "(name, profilegroup) VALUES (:NAME, :PROFID);");
-                    result.bindValue(":NAME", availProfiles[i]);
-                    result.bindValue(":PROFID", profileID);
-                    if (!result.exec())
-                        MythDB::DBError("ProfileGroup::getHostNames", result);
-                }
-            }
-        }
-        else if (newgroup)
-            show_profiles = false;
-    }
-
-    if (show_profiles)
-    {
-        pgName = profilegroup->getName();
-        profileID = profilegroup->getProfileNum();
-        RecordingProfileEditor editor(profileID, pgName);
-        editor.exec();
-    }
-    delete profilegroup;
-};
-
 void ProfileGroupEditor::Load(void)
 {
-    listbox->clearSelections();
+    clearSettings();
     ProfileGroup::addMissingDynamicProfiles();
-    ProfileGroup::fillSelections(listbox);
-    listbox->addSelection(tr("(Create new profile group)"), "0");
-}
-
-DialogCode ProfileGroupEditor::exec(void)
-{
-    DialogCode ret = kDialogCodeAccepted;
-    redraw = true;
-
-    while ((QDialog::Accepted == ret) || redraw)
-    {
-        redraw = false;
-
-        Load();
-
-        dialog = new ConfigurationDialogWidget(GetMythMainWindow(),
-                                               "ProfileGroupEditor");
-
-        connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(callDelete()));
-
-        int   width = 0,    height = 0;
-        float wmult = 0.0f, hmult  = 0.0f;
-        GetMythUI()->GetScreenSettings(width, wmult, height, hmult);
-
-        QVBoxLayout *layout = new QVBoxLayout(dialog);
-        layout->setMargin((int)(20 * hmult));
-        layout->addWidget(listbox->configWidget(NULL, dialog));
-
-        dialog->Show();
-
-        ret = dialog->exec();
-
-        dialog->deleteLater();
-        dialog = NULL;
-
-        if (ret == QDialog::Accepted)
-            open(listbox->getValue().toInt());
-    }
-
-    return kDialogCodeRejected;
-}
-
-void ProfileGroupEditor::callDelete(void)
-{
-    int id = listbox->getValue().toInt();
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT id FROM profilegroups WHERE "
-                   "id = :PROFILE_ID AND is_default = 0;");
-
-    result.bindValue(":PROFILE_ID", id);
-
-    if (result.exec() && result.next())
-    {
-        QString message = tr("Delete profile group:\n'%1'?")
-                              .arg(ProfileGroup::getName(id));
-
-        DialogCode value = MythPopupBox::Show2ButtonPopup(
-            GetMythMainWindow(),
-            "", message,
-            tr("Yes, delete group"),
-            tr("No, Don't delete group"), kDialogCodeButton1);
-
-        if (kDialogCodeButton0 == value)
-        {
-            result.prepare("DELETE codecparams FROM codecparams, "
-                            "recordingprofiles WHERE "
-                            "codecparams.profile = recordingprofiles.id "
-                            "AND recordingprofiles.profilegroup = :PROFILE_ID;");
-            result.bindValue(":PROFILE_ID", id);
-            if (!result.exec())
-                MythDB::DBError("ProfileGroupEditor::callDelete -- "
-                                "delete codecparams", result);
-
-            result.prepare("DELETE FROM recordingprofiles WHERE "
-                           "profilegroup = :PROFILE_ID;");
-            result.bindValue(":PROFILE_ID", id);
-            if (!result.exec())
-                MythDB::DBError("ProfileGroupEditor::callDelete -- "
-                                "delete recordingprofiles", result);
-
-            result.prepare("DELETE FROM profilegroups WHERE id = :PROFILE_ID;");
-            result.bindValue(":PROFILE_ID", id);
-            if (!result.exec())
-                MythDB::DBError("ProfileGroupEditor::callDelete -- "
-                                "delete profilegroups", result);
-
-            redraw = true;
-
-            if (dialog)
-                dialog->done(QDialog::Rejected);
-        }
-    }
-
+    ProfileGroup::fillSelections(this);
+    StandardSetting::Load();
 }

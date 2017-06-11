@@ -14,6 +14,7 @@ using namespace std;
 // MythTV headers
 #include "channelimporter.h"
 #include "mythdialogs.h"
+#include "mythdialogbox.h"
 #include "mythwidgets.h"
 #include "mythdb.h"
 #include "mpegstreamdata.h" // for kEncDecrypted
@@ -43,8 +44,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
                                               "No new channels to process") :
                                              "No channels to process.."));
 
-            MythPopupBox::showOkPopup(
-                GetMythMainWindow(), tr("Channel Importer"),
+            ShowOkPopup(
                 channels ?
                 (m_success ? tr("Found %n channel(s)", "", channels) :
                              tr("Failed to find any new channels!"))
@@ -1306,28 +1306,37 @@ ChannelImporter::QueryUserDelete(const QString &msg)
     DeleteAction action = kDeleteAll;
     if (use_gui)
     {
-        QStringList buttons;
-        buttons.push_back(tr("Delete all"));
-        buttons.push_back(tr("Set all invisible"));
-//        buttons.push_back(tr("Handle manually"));
-        buttons.push_back(tr("Ignore all"));
-
-        DialogCode ret;
+        int ret = -1;
         do
         {
-            ret = MythPopupBox::ShowButtonPopup(
-                GetMythMainWindow(), tr("Channel Importer"),
-                msg, buttons, kDialogCodeButton0);
+            MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+            MythDialogBox *deleteDialog =
+                new MythDialogBox(msg, popupStack, "deletechannels");
 
-            ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
+            if (deleteDialog->Create())
+            {
+                deleteDialog->AddButton(tr("Delete all"));
+                deleteDialog->AddButton(tr("Set all invisible"));
+//                  deleteDialog->AddButton(tr("Handle manually"));
+                deleteDialog->AddButton(tr("Ignore all"));
+                QObject::connect(deleteDialog, &MythDialogBox::Closed,
+                                 [&](const QString &, int result)
+                                 {
+                                     ret = result;
+                                     m_eventLoop.quit();
+                                 });
+                popupStack->AddScreen(deleteDialog);
 
-        } while (!(kDialogCodeButton0 <= ret && ret <= kDialogCodeButton3));
+                m_eventLoop.exec();
+            }
+        } while (ret < 0);
 
-        action = (kDialogCodeButton0 == ret) ? kDeleteAll       : action;
-        action = (kDialogCodeButton1 == ret) ? kDeleteInvisibleAll : action;
-        action = (kDialogCodeButton2 == ret) ? kDeleteIgnoreAll   : action;
-//        action = (kDialogCodeButton2 == ret) ? kDeleteManual    : action;
-//        action = (kDialogCodeButton3 == ret) ? kDeleteIgnoreAll : action;
+        action = (0 == ret) ? kDeleteAll       : action;
+        action = (1 == ret) ? kDeleteInvisibleAll : action;
+        action = (2 == ret) ? kDeleteIgnoreAll   : action;
+//        action = (2 == m_deleteChannelResult) ? kDeleteManual    : action;
+//        action = (3 == m_deleteChannelResult) ? kDeleteIgnoreAll : action;
     }
     else if (is_interactive)
     {
@@ -1374,25 +1383,34 @@ ChannelImporter::QueryUserInsert(const QString &msg)
     InsertAction action = kInsertAll;
     if (use_gui)
     {
-        QStringList buttons;
-        buttons.push_back(tr("Insert all"));
-        buttons.push_back(tr("Insert manually"));
-        buttons.push_back(tr("Ignore all"));
-
-        DialogCode ret;
+        int ret = -1;
         do
         {
-            ret = MythPopupBox::ShowButtonPopup(
-                GetMythMainWindow(), tr("Channel Importer"),
-                msg, buttons, kDialogCodeButton0);
+            MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+            MythDialogBox *insertDialog =
+                new MythDialogBox(msg, popupStack, "insertchannels");
 
-            ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
+            if (insertDialog->Create())
+            {
+                insertDialog->AddButton(tr("Insert all"));
+                insertDialog->AddButton(tr("Insert manually"));
+                insertDialog->AddButton(tr("Ignore all"));
+                QObject::connect(insertDialog, &MythDialogBox::Closed,
+                                 [&](const QString &, int result)
+                                 {
+                                     ret = result;
+                                     m_eventLoop.quit();
+                                 });
 
-        } while (!(kDialogCodeButton0 <= ret && ret <= kDialogCodeButton2));
+                popupStack->AddScreen(insertDialog);
+                m_eventLoop.exec();
+            }
+        } while (ret < 0);
 
-        action = (kDialogCodeButton0 == ret) ? kInsertAll       : action;
-        action = (kDialogCodeButton1 == ret) ? kInsertManual    : action;
-        action = (kDialogCodeButton2 == ret) ? kInsertIgnoreAll : action;
+        action = (0 == ret) ? kInsertAll       : action;
+        action = (1 == ret) ? kInsertManual    : action;
+        action = (2 == ret) ? kInsertIgnoreAll : action;
     }
     else if (is_interactive)
     {
@@ -1437,25 +1455,34 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
 
     if (use_gui)
     {
-        QStringList buttons;
-        buttons.push_back(tr("Update all"));
-        buttons.push_back(tr("Update manually"));
-        buttons.push_back(tr("Ignore all"));
-
-        DialogCode ret;
+        int ret = -1;
         do
         {
-            ret = MythPopupBox::ShowButtonPopup(
-                GetMythMainWindow(), tr("Channel Importer"),
-                msg, buttons, kDialogCodeButton0);
+            MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+            MythDialogBox *updateDialog =
+                new MythDialogBox(msg, popupStack, "updatechannels");
 
-            ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
+            if (updateDialog->Create())
+            {
+                updateDialog->AddButton(tr("Update all"));
+                updateDialog->AddButton(tr("Update manually"));
+                updateDialog->AddButton(tr("Ignore all"));
+                QObject::connect(updateDialog, &MythDialogBox::Closed,
+                                 [&](QString, int result)
+                                 {
+                                     ret = result;
+                                     m_eventLoop.quit();
+                                 });
 
-        } while (!(kDialogCodeButton0 <= ret && ret <= kDialogCodeButton2));
+                popupStack->AddScreen(updateDialog);
+                m_eventLoop.exec();
+            }
+        } while (ret < 0);
 
-        action = (kDialogCodeButton0 == ret) ? kUpdateAll       : action;
-        action = (kDialogCodeButton1 == ret) ? kUpdateManual    : action;
-        action = (kDialogCodeButton2 == ret) ? kUpdateIgnoreAll : action;
+        action = (0 == ret) ? kUpdateAll       : action;
+        action = (1 == ret) ? kUpdateManual    : action;
+        action = (2 == ret) ? kUpdateIgnoreAll : action;
     }
     else if (is_interactive)
     {
@@ -1497,59 +1524,65 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     MythMainWindow *parent, QString title,
     QString message, QString &text)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title.toLatin1().constData());
+    int dc = -1;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *popup = new MythDialogBox(message, popupStack,
+                                             "manualchannelpopup");
 
-    popup->addLabel(message, MythPopupBox::Medium, true);
-
-    MythLineEdit *textEdit = new MythLineEdit(popup);
-
-    QString orig_text = text;
-    text = "";
-    textEdit->setText(text);
-    popup->addWidget(textEdit);
-
-    popup->addButton(QCoreApplication::translate("(Common)", "OK"),
-                     popup, SLOT(accept()));
-    popup->addButton(tr("Suggest"));
-    popup->addButton(QCoreApplication::translate("(Common)", "Cancel"),
-                     popup, SLOT(reject()));
-    popup->addButton(QCoreApplication::translate("(Common)", "Cancel All"));
-
-    textEdit->setFocus();
-
-    DialogCode dc = popup->ExecPopup();
-    if (kDialogCodeButton1 == dc)
+    if (popup->Create())
     {
-        popup->hide();
-        popup->deleteLater();
-
-        popup = new MythPopupBox(parent, title.toLatin1().constData());
-        popup->addLabel(message, MythPopupBox::Medium, true);
-
-        textEdit = new MythLineEdit(popup);
-
-        text = orig_text;
-        textEdit->setText(text);
-        popup->addWidget(textEdit);
-
-        popup->addButton(QCoreApplication::translate("(Common)", "OK"),
-                         popup, SLOT(accept()))->setFocus();
-        popup->addButton(QCoreApplication::translate("(Common)", "Cancel"),
-                         popup, SLOT(reject()));
-        popup->addButton(QCoreApplication::translate("(Common)", "Cancel All"));
-
-        dc = popup->ExecPopup();
+        popup->AddButton(QCoreApplication::translate("(Common)", "OK"));
+        popup->AddButton(tr("Edit"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
+        QObject::connect(popup, &MythDialogBox::Closed,
+                         [&](const QString &, int result)
+                         {
+                             dc = result;
+                             m_eventLoop.quit();
+                         });
+        popupStack->AddScreen(popup);
+        m_eventLoop.exec();
+    }
+    else
+    {
+        delete popup;
+        popup = NULL;
     }
 
-    bool ok = (kDialogCodeAccepted == dc);
-    if (ok)
-        text = textEdit->text();
+    if (1 == dc)
+    {
+        MythTextInputDialog *textEdit =
+            new MythTextInputDialog(popupStack,
+                                    tr("Please enter a unique channel number."),
+                                    FilterNone, false, text);
+        if (textEdit->Create())
+        {
+            QObject::connect(textEdit, &MythTextInputDialog::haveResult,
+                             [&](QString result)
+                             {
+                                 dc = 0;
+                                 text = result;
+                             });
+            QObject::connect(textEdit, &MythTextInputDialog::Exiting,
+                             [&]()
+                             {
+                                 m_eventLoop.quit();
+                             });
 
-    popup->hide();
-    popup->deleteLater();
+            popupStack->AddScreen(textEdit);
+            m_eventLoop.exec();
+        }
+        else
+            delete textEdit;
+        delete popup;
+        popup = NULL;
+    }
+
+    bool ok = (0 == dc);
 
     return (ok) ? kOCTOk :
-        ((kDialogCodeRejected == dc) ? kOCTCancel : kOCTCancelAll);
+        ((1 == dc) ? kOCTCancel : kOCTCancelAll);
 }
 
 OkCancelType ChannelImporter::QueryUserResolve(
@@ -1571,6 +1604,8 @@ OkCancelType ChannelImporter::QueryUserResolve(
             msg2 += tr("Please enter a unique channel number.");
 
             QString val = ComputeSuggestedChannelNum(info, transport, chan);
+            msg2 += " ";
+            msg2 += tr("Default value is %1").arg(val);
             ret = ShowManualChannelPopup(
                 GetMythMainWindow(), tr("Channel Importer"),
                 msg2, val);
@@ -1653,6 +1688,8 @@ OkCancelType ChannelImporter::QueryUserInsert(
             msg2 += tr("Please enter a unique channel number.");
 
             QString val = ComputeSuggestedChannelNum(info, transport, chan);
+            msg2 += " ";
+            msg2 += tr("Default value is %1").arg(val);
             ret = ShowManualChannelPopup(
                 GetMythMainWindow(), tr("Channel Importer"),
                 msg2, val);

@@ -9,26 +9,22 @@
 #include "channelscanmiscsettings.h"
 #include "modulationsetting.h"
 
-class PaneDVBS2 : public HorizontalConfigurationGroup
+class PaneDVBS2 : public GroupSetting
 {
   public:
-    PaneDVBS2() : HorizontalConfigurationGroup(false,false,true,false)
+    PaneDVBS2(const QString &target, StandardSetting *setting)
     {
-        setUseFrame(false);
-        VerticalConfigurationGroup *left =
-            new VerticalConfigurationGroup(false,true);
-        VerticalConfigurationGroup *right =
-            new VerticalConfigurationGroup(false,true);
-        left->addChild( pfrequency  = new ScanFrequencykHz());
-        left->addChild( ppolarity   = new ScanPolarity());
-        left->addChild( psymbolrate = new ScanSymbolRateDVBS());
-        left->addChild( pmod_sys    = new ScanModSys());
-        right->addChild(pfec        = new ScanFec());
-        right->addChild(pmodulation = new ScanDVBSModulation());
-        right->addChild(pinversion  = new ScanInversion());
-        right->addChild(prolloff    = new ScanRollOff());
-        addChild(left);
-        addChild(right);
+        setVisible(false);
+        setting->addTargetedChildren(target,
+                                     {this,
+                                      pfrequency  = new ScanFrequencykHz(),
+                                      ppolarity   = new ScanPolarity(),
+                                      psymbolrate = new ScanSymbolRateDVBS(),
+                                      pmod_sys    = new ScanModSys(),
+                                      pfec        = new ScanFec(),
+                                      pmodulation = new ScanDVBSModulation(),
+                                      pinversion  = new ScanInversion(),
+                                      prolloff    = new ScanRollOff()});
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }

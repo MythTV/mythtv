@@ -51,29 +51,14 @@ ScanWizard::ScanWizard(uint    default_sourceid,
     scannerPane(new ChannelScannerGUI())
 {
     addChild(configPane);
-    addChild(scannerPane);
+
+    ButtonStandardSetting *scanButton = new ButtonStandardSetting(tr("Scan"));
+    connect(scanButton, SIGNAL(clicked()), SLOT(Scan()));
+    addChild(scanButton);
 }
 
-MythDialog *ScanWizard::dialogWidget(MythMainWindow *parent, const char*)
+void ScanWizard::Scan()
 {
-    MythWizard *wizard = (MythWizard*)
-        ConfigurationWizard::dialogWidget(parent, "ScanWizard");
-
-    connect(wizard, SIGNAL(selected(const QString&)),
-            this,   SLOT(  SetPage( const QString&)));
-
-    return wizard;
-}
-
-void ScanWizard::SetPage(const QString &pageTitle)
-{
-    LOG(VB_CHANSCAN, LOG_INFO, QString("SetPage(%1)").arg(pageTitle));
-    if (pageTitle != ChannelScannerGUI::kTitle)
-    {
-        scannerPane->quitScanning();
-        return;
-    }
-
     QMap<QString,QString> start_chan;
     DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;
 
@@ -83,7 +68,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
     int     scantype  = configPane->GetScanType();
     bool    do_scan   = true;
 
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + "SetPage(): " +
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Scan(): " +
         QString("type(%1) cardid(%2) inputname(%3)")
             .arg(scantype).arg(cardid).arg(inputname));
 
@@ -161,9 +146,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
             QString("type(%1) src(%2) cardid(%3) not handled")
                 .arg(scantype).arg(sourceid).arg(cardid));
 
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), tr("ScanWizard"),
-            tr("Programmer Error, see console"));
+        ShowOkPopup(tr("Programmer Error, see console"));
     }
 
     // Just verify what we get from the UI...
@@ -180,9 +163,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
             start_chan["modulation"],     start_chan["bandwidth"],
             start_chan["mod_sys"],        start_chan["rolloff"]))
     {
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), tr("ScanWizard"),
-            tr("Error parsing parameters"));
+        ShowOkPopup(tr("Error parsing parameters"));
 
         do_scan = false;
     }

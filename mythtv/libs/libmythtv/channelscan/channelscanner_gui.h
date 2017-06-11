@@ -37,7 +37,6 @@
 #include "settings.h"
 #include "channelscanner.h"
 
-class ScanWizard;
 class LogList;
 class ChannelScannerGUIScanPane;
 class DeleteStage;
@@ -48,7 +47,7 @@ class DVBChannel;
 class SignalMonitorValue;
 
 class ChannelScannerGUI :
-    public StackedConfigurationGroup,
+    public QObject,
     public ChannelScanner
 {
     Q_OBJECT
@@ -58,7 +57,7 @@ class ChannelScannerGUI :
   public:
     ChannelScannerGUI(void);
     virtual void deleteLater(void)
-        { Teardown(); StackedConfigurationGroup::deleteLater(); }
+        { Teardown(); }
 
     virtual void HandleEvent(const ScannerEvent *scanEvent);
 
@@ -71,9 +70,6 @@ class ChannelScannerGUI :
 
     virtual void MonitorProgress(bool lock, bool strength,
                                  bool snr, bool rotor);
-
-  public:
-    static QString kTitle;
 
   public slots:
     void quitScanning(void);

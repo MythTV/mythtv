@@ -33,23 +33,19 @@
 // MythTV headers
 #include "channelscanmiscsettings.h"
 
-class PaneDVBS : public HorizontalConfigurationGroup
+class PaneDVBS : public GroupSetting
 {
   public:
-    PaneDVBS() : HorizontalConfigurationGroup(false, false, true, false)
+    PaneDVBS(const QString &target, StandardSetting *setting)
     {
-        setUseFrame(false);
-        VerticalConfigurationGroup *left =
-            new VerticalConfigurationGroup(false,true);
-        VerticalConfigurationGroup *right =
-            new VerticalConfigurationGroup(false,true);
-        left->addChild(pfrequency  = new ScanFrequencykHz());
-        left->addChild(ppolarity   = new ScanPolarity());
-        left->addChild(psymbolrate = new ScanSymbolRateDVBS());
-        right->addChild(pfec       = new ScanFec());
-        right->addChild(pinversion = new ScanInversion());
-        addChild(left);
-        addChild(right);
+        setVisible(false);
+        setting->addTargetedChildren(target,
+                                     {this,
+                                      pfrequency  = new ScanFrequencykHz(),
+                                      ppolarity   = new ScanPolarity(),
+                                      psymbolrate = new ScanSymbolRateDVBS(),
+                                      pfec       = new ScanFec(),
+                                      pinversion = new ScanInversion()});
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }

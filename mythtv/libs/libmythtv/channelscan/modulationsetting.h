@@ -36,11 +36,11 @@
 // MythTV headers
 #include "settings.h"
 
-class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
+class ScanATSCModulation: public TransMythUIComboBoxSetting
 {
 
   public:
-    ScanATSCModulation() : ComboBoxSetting(this)
+    ScanATSCModulation()
     {
         //: %1 is the modulation (QAM-64, QAM-128. etc...)
         addSelection(QCoreApplication::translate("(ModulationSettings)",
@@ -63,10 +63,10 @@ class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
     }
 };
 
-class ScanModulationSetting: public ComboBoxSetting
+class ScanModulationSetting: public TransMythUIComboBoxSetting
 {
   public:
-    explicit ScanModulationSetting(Storage *_storage) : ComboBoxSetting(_storage)
+    ScanModulationSetting()
     {
         addSelection(QCoreApplication::translate("(Common)",
                                                  "Auto",
@@ -81,10 +81,10 @@ class ScanModulationSetting: public ComboBoxSetting
     };
 };
 
-class ScanModulation: public ScanModulationSetting, public TransientStorage
+class ScanModulation: public ScanModulationSetting
 {
   public:
-    ScanModulation() : ScanModulationSetting(this)
+    ScanModulation() : ScanModulationSetting()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Modulation"));
@@ -94,11 +94,10 @@ class ScanModulation: public ScanModulationSetting, public TransientStorage
     };
 };
 
-class ScanConstellation: public ScanModulationSetting,
-                         public TransientStorage
+class ScanConstellation: public ScanModulationSetting
 {
   public:
-    ScanConstellation() : ScanModulationSetting(this)
+    ScanConstellation() : ScanModulationSetting()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Constellation"));
@@ -108,10 +107,10 @@ class ScanConstellation: public ScanModulationSetting,
     };
 };
 
-class ScanDVBSModulation: public ComboBoxSetting, public TransientStorage
+class ScanDVBSModulation: public TransMythUIComboBoxSetting
 {
   public:
-    ScanDVBSModulation() : ComboBoxSetting(this)
+    ScanDVBSModulation()
     {
 
         addSelection("QPSK",  "qpsk", true);

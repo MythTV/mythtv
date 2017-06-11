@@ -12,33 +12,25 @@
 
 // MythTV
 #include "mythtvexp.h"
-#include "settings.h"
+#include "standardsettings.h"
 #include "mythwidgets.h"
-#include "mythwizard.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 
 class QWidget;
 
-class ChannelID : public IntegerSetting, public TransientStorage
+class ChannelID : public GroupSetting
 {
   public:
     ChannelID(QString _field = "chanid", QString _table = "channel") :
-        IntegerSetting(this), field(_field), table(_table)
+        field(_field), table(_table)
     {
         setVisible(false);
     }
 
-    QWidget* configWidget(ConfigurationGroup* cg, QWidget* widget,
-                          const char* widgetName = 0) {
-        (void)cg; (void)widget; (void)widgetName;
-        return NULL;
-    };
-
-    void Load() { };
-    void Save(QString table)
+    void Save(void)
     {
-        if (intValue() == 0) {
+        if (getValue().toInt() == 0) {
             setValue(findHighest());
 
             MSqlQuery query(MSqlQuery::InitCon());
@@ -66,10 +58,6 @@ class ChannelID : public IntegerSetting, public TransientStorage
                         QString("Failed to insert into: %1").arg(table));
             }
         }
-    }
-    void Save(void)
-    {
-        Save(table);
     }
 
     int findHighest(int floor = 1000)
@@ -105,7 +93,7 @@ protected:
 
 class ChannelDBStorage : public SimpleDBStorage
 {
-  protected:
+  public:
     ChannelDBStorage(StorageUser *_user, const ChannelID &_id, QString _name) :
         SimpleDBStorage(_user, "channel", _name), id(_id) { }
 
@@ -119,14 +107,13 @@ class OnAirGuide;
 class XmltvID;
 class Freqid;
 
-class MTV_PUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
+class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
 {
     Q_OBJECT
 
   public:
     ChannelOptionsCommon(const ChannelID &id,
         uint default_sourceid,  bool add_freqid);
-    void Load(void);
 
   public slots:
     void onAirGuideChanged(bool);
@@ -139,19 +126,19 @@ class MTV_PUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
     Freqid     *freqid;
 };
 
-class MTV_PUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup
+class MTV_PUBLIC ChannelOptionsFilters: public GroupSetting
 {
   public:
     explicit ChannelOptionsFilters(const ChannelID& id);
 };
 
-class MTV_PUBLIC ChannelOptionsV4L: public VerticalConfigurationGroup
+class MTV_PUBLIC ChannelOptionsV4L: public GroupSetting
 {
   public:
     explicit ChannelOptionsV4L(const ChannelID& id);
 };
 
-class MTV_PUBLIC ChannelOptionsRawTS: public VerticalConfigurationGroup
+class MTV_PUBLIC ChannelOptionsRawTS: public GroupSetting
 {
   public:
     explicit ChannelOptionsRawTS(const ChannelID &id);
@@ -163,15 +150,15 @@ class MTV_PUBLIC ChannelOptionsRawTS: public VerticalConfigurationGroup
   private:
     const ChannelID &cid;
 
-    std::vector<TransLineEditSetting*> pids;
-    std::vector<TransComboBoxSetting*> sids;
-    std::vector<TransCheckBoxSetting*> pcrs;
+    std::vector<TransTextEditSetting*> pids;
+    std::vector<TransMythUIComboBoxSetting*> sids;
+    std::vector<TransMythUICheckBoxSetting*> pcrs;
 
     static const uint kMaxPIDs = 10;
 };
 
 class MTV_PUBLIC ChannelTVFormat :
-    public ComboBoxSetting, public ChannelDBStorage
+    public MythUIComboBoxSetting
 {
   public:
     explicit ChannelTVFormat(const ChannelID &id);

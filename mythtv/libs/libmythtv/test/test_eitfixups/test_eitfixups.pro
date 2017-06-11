@@ -23,11 +23,20 @@ LIBS += ../../iso6937tables.o
 LIBS += ../../freesat_huffman.o
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
-#LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
-#LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
-#LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
+LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
+LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
+LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
 LIBS += -L../.. -lmythtv-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
+LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
+LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
+LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale
+LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
+LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
+LIBS += -L../../../../external/FFmpeg/libpostproc -lmythpostproc
+using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
+using_hdhomerun:LIBS += -L../../../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage

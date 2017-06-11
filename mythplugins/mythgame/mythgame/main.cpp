@@ -36,8 +36,15 @@ static void GameCallback(void *data, QString &selection)
 
     if (sel == "game_settings")
     {
-        MythGameGeneralSettings settings;
-        settings.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "gamesettings",
+                                      new MythGameGeneralSettings());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
 
     if (sel == "game_players")

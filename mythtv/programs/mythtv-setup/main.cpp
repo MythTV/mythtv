@@ -75,28 +75,62 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
 
     if (sel == "general")
     {
-        BackendSettings be;
-        be.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "generalsettings",
+                                      new BackendSettings());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "capture cards")
     {
-        CaptureCardEditor cce;
-        cce.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "capturecardeditor",
+                                      new CaptureCardEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "video sources")
     {
-        VideoSourceEditor vse;
-        vse.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "videosourceeditor",
+               new VideoSourceEditor());
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "card inputs")
     {
-        CardInputEditor cie;
-        cie.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "cardinputeditor",
+                                      new CardInputEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "recording profile")
     {
-        ProfileGroupEditor editor;
-        editor.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "recordingprofileeditor",
+                                      new ProfileGroupEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "channel editor")
     {
@@ -111,8 +145,15 @@ static void SetupMenuCallback(void* /* data */, QString& selection)
     }
     else if (sel == "storage groups")
     {
-        StorageGroupListEditor sge;
-        sge.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "storagegroupeditor",
+                                      new StorageGroupListEditor());
+
+        if (ssd->Create())
+            mainStack->AddScreen(ssd);
+        else
+            delete ssd;
     }
     else if (sel == "systemeventeditor")
     {

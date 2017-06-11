@@ -32,16 +32,13 @@
 
 // MythTV headers
 #include "settings.h"
+#include "mythscreentype.h"
+#include "mythuiprogressbar.h"
 
-class LogList;
+class MythUIText;
+class MythUIButtonList;
 
-class TransProgressSetting: public ProgressSetting, public TransientStorage
-{
-  public:
-    explicit TransProgressSetting(int steps = 65535): ProgressSetting(this, steps) {};
-};
-
-class ChannelScannerGUIScanPane : public VerticalConfigurationGroup
+class ChannelScannerGUIScanPane : public MythScreenType
 {
     Q_OBJECT
 
@@ -50,30 +47,35 @@ class ChannelScannerGUIScanPane : public VerticalConfigurationGroup
   public:
     ChannelScannerGUIScanPane(
         bool lock, bool strength, bool snr, bool rotorpos,
-        QObject *target, const char *slot);
+        MythScreenStack *parent);
+
+    bool Create();
 
     void SetStatusRotorPosition(int value);
     void SetStatusSignalToNoise(int value);
     void SetStatusSignalStrength(int value);
     void SetStatusLock(int value);
-    void SetScanProgress(double value)
-        { progressBar->setValue((uint)(value * 65535));}
+    void SetScanProgress(double value);
 
     void SetStatusText(const QString &value);
     void SetStatusTitleText(const QString &value);
 
     void AppendLine(const QString &text);
 
-    LogList              *log;
-
   private:
-    TransProgressSetting *ss;
-    TransProgressSetting *sn;
-    TransProgressSetting *pos;
-    TransProgressSetting *progressBar;
+    bool m_showSignalLock;
+    bool m_showSignalStrength;
+    bool m_showSignalNoise;
+    bool m_showRotorPos;
+    MythUIButtonList  *log;
+    MythUIProgressBar *ss;
+    MythUIProgressBar *sn;
+    MythUIProgressBar *pos;
+    MythUIProgressBar *progressBar;
 
-    TransLabelSetting *sl;
-    TransLabelSetting *sta;
+    MythUIText *sl;
+    MythUIText *sta;
+    MythUIText *m_scanProgressText;
 };
 
 #endif // _CHANNEL_SCANNER_GUI_SCAN_PANE_H_

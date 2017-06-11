@@ -31,6 +31,7 @@
 #define _MISC_SETTINGS_H_
 
 #include "settings.h"
+#include "standardsettings.h"
 #include "channelscantypes.h"
 
 class TransLabelSetting;
@@ -49,10 +50,10 @@ class DVBUtilsImportPane;
 // Settings Below Here
 // ///////////////////////////////
 
-class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
+class IgnoreSignalTimeout : public TransMythUICheckBoxSetting
 {
   public:
-    IgnoreSignalTimeout() : CheckBoxSetting(this)
+    IgnoreSignalTimeout()
     {
         setLabel(QObject::tr("Ignore Signal Timeout"));
         setHelpText(
@@ -62,10 +63,10 @@ class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
     }
 };
 
-class FollowNITSetting : public CheckBoxSetting, public TransientStorage
+class FollowNITSetting : public TransMythUICheckBoxSetting
 {
   public:
-    FollowNITSetting() : CheckBoxSetting(this)
+    FollowNITSetting()
     {
         setLabel(QObject::tr("Search new Transports"));
         setHelpText(
@@ -76,10 +77,10 @@ class FollowNITSetting : public CheckBoxSetting, public TransientStorage
     }
 };
 
-class DesiredServices : public ComboBoxSetting, public TransientStorage
+class DesiredServices : public TransMythUIComboBoxSetting
 {
   public:
-    DesiredServices() : ComboBoxSetting(this)
+    DesiredServices()
     {
         setLabel(QObject::tr("Desired Services"));
         setHelpText(QObject::tr(
@@ -106,10 +107,10 @@ class DesiredServices : public ComboBoxSetting, public TransientStorage
     }
 };
 
-class FreeToAirOnly : public CheckBoxSetting, public TransientStorage
+class FreeToAirOnly : public TransMythUICheckBoxSetting
 {
   public:
-    FreeToAirOnly() : CheckBoxSetting(this)
+    FreeToAirOnly()
     {
         setValue(true);
         setLabel(QObject::tr("Unencrypted Only"));
@@ -120,10 +121,10 @@ class FreeToAirOnly : public CheckBoxSetting, public TransientStorage
     };
 };
 
-class TrustEncSISetting : public CheckBoxSetting, public TransientStorage
+class TrustEncSISetting : public TransMythUICheckBoxSetting
 {
   public:
-    TrustEncSISetting() : CheckBoxSetting(this)
+    TrustEncSISetting()
     {
         setLabel(QObject::tr("Test Decryptability"));
         setHelpText(
@@ -135,10 +136,10 @@ class TrustEncSISetting : public CheckBoxSetting, public TransientStorage
     }
 };
 
-class ScanFrequencykHz: public LineEditSetting, public TransientStorage
+class ScanFrequencykHz: public TransTextEditSetting
 {
   public:
-    ScanFrequencykHz() : LineEditSetting(this)
+    ScanFrequencykHz()
     {
         setLabel(QObject::tr("Frequency"));
         setHelpText(QObject::tr("Frequency (Option has no default)\n"
@@ -146,10 +147,10 @@ class ScanFrequencykHz: public LineEditSetting, public TransientStorage
     };
 };
 
-class ScanFrequency: public LineEditSetting, public TransientStorage
+class ScanFrequency: public TransTextEditSetting
 {
   public:
-    ScanFrequency() : LineEditSetting(this)
+    ScanFrequency()
     {
         setLabel(QObject::tr("Frequency"));
         setHelpText(QObject::tr("Frequency (Option has no default)\n"
@@ -157,10 +158,10 @@ class ScanFrequency: public LineEditSetting, public TransientStorage
     };
 };
 
-class ScanSymbolRateDVBS: public ComboBoxSetting, public TransientStorage
+class ScanSymbolRateDVBS: public TransMythUIComboBoxSetting
 {
   public:
-    ScanSymbolRateDVBS() : ComboBoxSetting(this, true)
+    ScanSymbolRateDVBS()
     {
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(
@@ -179,10 +180,10 @@ class ScanSymbolRateDVBS: public ComboBoxSetting, public TransientStorage
     }
 };
 
-class ScanSymbolRateDVBC: public ComboBoxSetting, public TransientStorage
+class ScanSymbolRateDVBC: public TransMythUIComboBoxSetting
 {
   public:
-    ScanSymbolRateDVBC() : ComboBoxSetting(this, true)
+    ScanSymbolRateDVBC()
     {
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(
@@ -199,10 +200,10 @@ class ScanSymbolRateDVBC: public ComboBoxSetting, public TransientStorage
     }
 };
 
-class ScanPolarity: public ComboBoxSetting, public TransientStorage
+class ScanPolarity: public TransMythUIComboBoxSetting
 {
   public:
-    ScanPolarity() : ComboBoxSetting(this)
+    ScanPolarity()
     {
         setLabel(QObject::tr("Polarity"));
         setHelpText(QObject::tr("Polarity (Option has no default)"));
@@ -213,10 +214,10 @@ class ScanPolarity: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanInversion: public ComboBoxSetting, public TransientStorage
+class ScanInversion: public TransMythUIComboBoxSetting
 {
   public:
-    ScanInversion() : ComboBoxSetting(this)
+    ScanInversion()
     {
         setLabel(QObject::tr("Inversion"));
         setHelpText(QObject::tr(
@@ -229,10 +230,10 @@ class ScanInversion: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanBandwidth: public ComboBoxSetting, public TransientStorage
+class ScanBandwidth: public TransMythUIComboBoxSetting
 {
   public:
-    ScanBandwidth() : ComboBoxSetting(this)
+    ScanBandwidth()
     {
         setLabel(QObject::tr("Bandwidth"));
         setHelpText(QObject::tr("Bandwidth (Default: Auto)\n"));
@@ -243,10 +244,10 @@ class ScanBandwidth: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanFecSetting: public ComboBoxSetting
+class ScanFecSetting: public TransMythUIComboBoxSetting
 {
   public:
-    explicit ScanFecSetting(Storage *_storage) : ComboBoxSetting(_storage)
+    ScanFecSetting()
     {
         addSelection(QObject::tr("Auto"),"auto",true);
         addSelection(QObject::tr("None"),"none");
@@ -263,10 +264,10 @@ class ScanFecSetting: public ComboBoxSetting
     }
 };
 
-class ScanFec: public ScanFecSetting, public TransientStorage
+class ScanFec: public ScanFecSetting
 {
   public:
-    ScanFec() : ScanFecSetting(this)
+    ScanFec()
     {
         setLabel(QObject::tr("FEC"));
         setHelpText(QObject::tr(
@@ -274,30 +275,30 @@ class ScanFec: public ScanFecSetting, public TransientStorage
     }
 };
 
-class ScanCodeRateLP: public ScanFecSetting, public TransientStorage
+class ScanCodeRateLP: public ScanFecSetting
 {
   public:
-    ScanCodeRateLP() : ScanFecSetting(this)
+    ScanCodeRateLP()
     {
         setLabel(QObject::tr("LP Coderate"));
         setHelpText(QObject::tr("Low Priority Code Rate (Default: Auto)"));
     }
 };
 
-class ScanCodeRateHP: public ScanFecSetting, public TransientStorage
+class ScanCodeRateHP: public ScanFecSetting
 {
   public:
-    ScanCodeRateHP() : ScanFecSetting(this)
+    ScanCodeRateHP()
     {
         setLabel(QObject::tr("HP Coderate"));
         setHelpText(QObject::tr("High Priority Code Rate (Default: Auto)"));
     };
 };
 
-class ScanGuardInterval: public ComboBoxSetting, public TransientStorage
+class ScanGuardInterval: public TransMythUIComboBoxSetting
 {
   public:
-    ScanGuardInterval() : ComboBoxSetting(this)
+    ScanGuardInterval()
     {
         setLabel(QObject::tr("Guard Interval"));
         setHelpText(QObject::tr("Guard Interval (Default: Auto)"));
@@ -309,10 +310,10 @@ class ScanGuardInterval: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanTransmissionMode: public ComboBoxSetting, public TransientStorage
+class ScanTransmissionMode: public TransMythUIComboBoxSetting
 {
   public:
-    ScanTransmissionMode() : ComboBoxSetting(this)
+    ScanTransmissionMode()
     {
         setLabel(QObject::tr("Trans. Mode"));
         setHelpText(QObject::tr("Transmission Mode (Default: Auto)"));
@@ -322,10 +323,10 @@ class ScanTransmissionMode: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanHierarchy: public ComboBoxSetting, public TransientStorage
+class ScanHierarchy: public TransMythUIComboBoxSetting
 {
     public:
-    ScanHierarchy() : ComboBoxSetting(this)
+    ScanHierarchy()
     {
         setLabel(QObject::tr("Hierarchy"));
         setHelpText(QObject::tr("Hierarchy (Default: Auto)"));
@@ -337,10 +338,10 @@ class ScanHierarchy: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanModSys: public ComboBoxSetting, public TransientStorage
+class ScanModSys: public TransMythUIComboBoxSetting
 {
     public:
-    ScanModSys() : ComboBoxSetting(this)
+    ScanModSys()
     {
         setLabel(QObject::tr("Mod Sys"));
         setHelpText(QObject::tr("Modulation system (Default: DVB-S)"));
@@ -349,10 +350,10 @@ class ScanModSys: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanDVBTModSys: public ComboBoxSetting, public TransientStorage
+class ScanDVBTModSys: public TransMythUIComboBoxSetting
 {
     public:
-    ScanDVBTModSys() : ComboBoxSetting(this)
+    ScanDVBTModSys()
     {
         setLabel(QObject::tr("Mod Sys"));
         setHelpText(QObject::tr("Modulation system (Default: DVB-T)"));
@@ -361,10 +362,10 @@ class ScanDVBTModSys: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class ScanRollOff: public ComboBoxSetting, public TransientStorage
+class ScanRollOff: public TransMythUIComboBoxSetting
 {
     public:
-    ScanRollOff() : ComboBoxSetting(this)
+    ScanRollOff()
     {
         setLabel(QObject::tr("Roll-off"));
         setHelpText(QObject::tr("Roll-off factor (Default: 0.35)"));
@@ -375,24 +376,14 @@ class ScanRollOff: public ComboBoxSetting, public TransientStorage
     };
 };
 
-class PaneError : public HorizontalConfigurationGroup
+class PaneError : public GroupSetting
 {
   public:
-    explicit PaneError(const QString &error) :
-        HorizontalConfigurationGroup(false, false, true, false)
+    explicit PaneError(const QString &error)
     {
-        TransLabelSetting* label = new TransLabelSetting();
+        TransTextEditSetting* label = new TransTextEditSetting();
         label->setValue(error);
         addChild(label);
-    }
-};
-
-class BlankSetting: public TransLabelSetting
-{
-  public:
-    BlankSetting() : TransLabelSetting()
-    {
-        setLabel("");
     }
 };
 

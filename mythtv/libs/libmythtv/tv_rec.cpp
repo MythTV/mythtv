@@ -1876,7 +1876,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
     RecordingInfo *rec = lastTuningRequest.program;
     RecordingProfile profile;
     recProfileName = LoadProfile(tvchain, rec, profile);
-    const Setting *setting = profile.byName("recordingtype");
+    const StandardSetting *setting = profile.byName("recordingtype");
     if (setting)
         recording_type = setting->getValue();
 
@@ -4116,7 +4116,7 @@ static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
         JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, jobs);
 
     // disable transcoding if the profile does not allow auto transcoding
-    const Setting *autoTrans = profile.byName("autotranscode");
+    const StandardSetting *autoTrans = profile.byName("autotranscode");
     if ((!autoTrans) || (autoTrans->getValue().toInt() == 0))
         JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, jobs);
 
@@ -4315,7 +4315,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 
     if (GetDTVRecorder() && streamData)
     {
-        const Setting *setting = profile.byName("recordingtype");
+        const StandardSetting *setting = profile.byName("recordingtype");
         if (setting)
             streamData->SetRecordingType(setting->getValue());
         GetDTVRecorder()->SetStreamData(streamData);

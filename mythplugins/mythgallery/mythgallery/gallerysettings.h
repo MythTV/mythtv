@@ -3,10 +3,10 @@
 
 #include <QCoreApplication>
 
-#include "mythtv/settings.h"
+#include "mythtv/standardsettings.h"
 #include "mythtv/mythcontext.h"
 
-class GallerySettings : public ConfigurationWizard
+class GallerySettings : public GroupSetting
 {
     Q_DECLARE_TR_FUNCTIONS(GallerySettings)
 

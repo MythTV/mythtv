@@ -36,14 +36,13 @@
 // MythTV headers
 #include "channelscanmiscsettings.h"
 
-class PaneDVBUtilsImport : public VerticalConfigurationGroup
+class PaneDVBUtilsImport : public GroupSetting
 {
     Q_OBJECT
 
   public:
     PaneDVBUtilsImport() :
-        VerticalConfigurationGroup(false,false,true,false),
-        filename(new TransLineEditSetting()),
+        filename(new TransTextEditSetting()),
         ignore_signal_timeout(new IgnoreSignalTimeout())
     {
         filename->setLabel(tr("File location"));
@@ -57,7 +56,7 @@ class PaneDVBUtilsImport : public VerticalConfigurationGroup
         { return ignore_signal_timeout->getValue().toInt(); }
 
   private:
-    TransLineEditSetting    *filename;
+    TransTextEditSetting    *filename;
     IgnoreSignalTimeout     *ignore_signal_timeout;
 };
 
