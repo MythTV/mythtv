@@ -42,6 +42,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     bool isVisible(void) const { return m_visible; };
     bool isEnabled() const { return m_enabled; }
     bool haveChanged();
+    void setChanged(bool changed);
     StandardSetting *getParent() const {return m_parent;}
 
     // Gets
@@ -100,7 +101,6 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     StandardSetting(Storage *_storage = NULL);
     virtual ~StandardSetting();
     void setParent(StandardSetting *parent);
-    void setChanged(bool changed);
     QString m_settingValue;
     bool m_enabled;
     QString m_label;

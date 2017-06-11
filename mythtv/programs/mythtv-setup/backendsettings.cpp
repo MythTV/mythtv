@@ -1095,14 +1095,24 @@ void BackendSettings::Load(void)
 
     QString mastername = masterServerName->getValue();
     // new installation - default to master
+    bool newInstall=false;
     if (mastername.isEmpty())
+    {
         mastername = gCoreContext->GetHostName();
+        newInstall=true;
+    }
     bool ismaster = (mastername == gCoreContext->GetHostName());
     isMasterBackend->setValue(ismaster);
-        priorMasterName = mastername;
+    priorMasterName = mastername;
     isLoaded=true;
     masterBackendChanged();
     listenChanged();
+    if (!newInstall)
+    {
+        backendServerAddr->setChanged(false);
+        isMasterBackend->setChanged(false);
+        masterServerName->setChanged(false);
+    }
 }
 
 void BackendSettings::Save(void)
