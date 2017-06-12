@@ -1465,7 +1465,7 @@ void IconView::DoRename(QString folderName)
         else
             msg = tr("Failed to rename file");
 
-        ShowOkPopup(msg, NULL, NULL);
+        ShowOkPopup(msg);
 
         return;
     }
