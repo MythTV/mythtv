@@ -668,6 +668,22 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         if(HasAllEITSections(*eit_section))
         {
             // Complete table seen
+            LOG(VB_DVBSICACHE, LOG_DEBUG, QString("Complete EIT table seen "
+                                        "pid 0x%1(%2) "
+                                        "onid 0x%3(%4) "
+                                        "tsid 0x%5(%6) "
+                                        "sid 0x%7(%8) "
+                                        "tid 0x%9(%10)")
+                                        .arg(pid, 0, 16)
+                                        .arg(pid)
+                                        .arg(onid, 0, 16)
+                                        .arg(onid)
+                                        .arg(tsid, 0, 16)
+                                        .arg(tsid)
+                                        .arg(sid, 0, 16)
+                                        .arg(sid)
+                                        .arg(tid, 0, 16)
+                                        .arg(tid));
 
             // Translate the onid
             uint internal_onid = InternalOriginalNetworkID(onid, tsid);
