@@ -105,6 +105,9 @@ class MythContextPrivate : public QObject
 
     void ShowVersionMismatchPopup(uint remoteVersion);
 
+  public slots:
+    void OnCloseDialog();
+
   public:
     MythContext *parent;
 
@@ -667,6 +670,14 @@ bool MythContextPrivate::SaveDatabaseParams(
     return ret;
 }
 
+void MythContextSlotHandler::OnCloseDialog(void)
+{
+    if (d && d->m_loop 
+      && d->m_loop->isRunning())
+        d->m_loop->exit();
+}
+
+
 bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 {
     bool accepted = false;
@@ -679,13 +690,26 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
             ShowOkPopup(error);
 
         // ask user for database parameters
-        DatabaseSettings settings(m_DBhostCp);
-        accepted = (settings.exec() == QDialog::Accepted);
-        if (!accepted)
-            LOG(VB_GENERAL, LOG_ALERT,
-                     "User cancelled database configuration");
 
+        EnableDBerrors();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        DatabaseSettings *dbsetting = new DatabaseSettings();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "databasesettings",
+                                      dbsetting);
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+            connect(dbsetting, &DatabaseSettings::isClosing,
+                m_sh, &MythContextSlotHandler::OnCloseDialog);
+            if (!m_loop->isRunning())
+                m_loop->exec();
+        }
+        else
+            delete ssd;
+        SilenceDBerrors();
         EndTempWindow();
+        accepted = true;
     }
     else
     {
@@ -750,14 +774,12 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 QString MythContextPrivate::TestDBconnection(bool prompt)
 {
     QString err    = QString::null;
-    QString host   = m_DBparams.dbHostName;
+    QString host;
 
     // Jan 20, 2017
     // Changed to use port check instead of ping
 
-    int port = m_DBparams.dbPort;
-    if (port == 0)
-        port = 3306;
+    int port;
 
     // 1 = db awake, 2 = db listening, 3 = db connects,
     // 4 = backend awake, 5 = backend listening
@@ -779,8 +801,12 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
     do
     {
+        host = m_DBparams.dbHostName;
+        port = m_DBparams.dbPort;
+        if (port == 0)
+            port = 3306;
         int wakeupTime = 3;
-        int attempts = 21;
+        int attempts = 11;
         if (m_DBparams.wolEnabled) {
             wakeupTime = m_DBparams.wolReconnect;
             attempts = m_DBparams.wolRetry + 1;

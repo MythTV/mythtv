@@ -6,18 +6,38 @@
 
 // MythTV headers
 #include "mythconfigdialogs.h"
+#include "standardsettings.h"
 
-class MPUBLIC DatabaseSettings: public ConfigurationWizard {
+class MPUBLIC DatabaseSettings : public GroupSetting
+{
+    Q_OBJECT
 
-    Q_DECLARE_TR_FUNCTIONS(DatabaseSettings)
+  public:
+    DatabaseSettings(const QString &DBhostOverride = QString::null);
+    ~DatabaseSettings();
 
-public:
-    explicit DatabaseSettings(const QString &DBhostOverride = QString::null);
-    
-    // This routine calls wizard->addChild() for each of
-    // the database configuration screens.  This allows
-    // the number of DB config screens to change.
-    static void addDatabaseSettings(ConfigurationWizard *wizard);
+    void Load(void);
+    void Save(QString) {}
+    void Save(void);
+
+  signals:
+    void isClosing(void);
+
+  protected:
+    TransTextEditSetting       *dbHostName;
+    TransMythUICheckBoxSetting *dbHostPing;
+    TransTextEditSetting       *dbPort;
+    TransTextEditSetting       *dbName;
+    TransTextEditSetting       *dbUserName;
+    TransTextEditSetting       *dbPassword;
+    TransMythUICheckBoxSetting *localEnabled;
+    TransTextEditSetting       *localHostName;
+    TransMythUICheckBoxSetting *wolEnabled;
+    TransMythUISpinBoxSetting  *wolReconnect;
+    TransMythUISpinBoxSetting  *wolRetry;
+    TransTextEditSetting       *wolCommand;
+    QString              m_DBhostOverride;
 };
+
 
 #endif
