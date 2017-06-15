@@ -626,71 +626,25 @@ uint DBEvent::UpdateDB(
     QString  linetref   = inetref;
     QDate loriginalairdate = originalairdate;
 
-    if (match.title.length() >= ltitle.length())
-        ltitle = match.title;
-
-    if (match.subtitle.length() >= lsubtitle.length())
-        lsubtitle = match.subtitle;
-
-    if (match.description.length() >= ldesc.length())
-        ldesc = match.description;
-
-    if (lcategory.isEmpty() && !match.category.isEmpty())
-        lcategory = match.category;
-
-    if (!lairdate && !match.airdate)
-        lairdate = match.airdate;
-
-    if (!loriginalairdate.isValid() && match.originalairdate.isValid())
-        loriginalairdate = match.originalairdate;
-
-    if (lprogramId.isEmpty() && !match.programId.isEmpty())
-        lprogramId = match.programId;
-
-    if (lseriesId.isEmpty() && !match.seriesId.isEmpty())
-        lseriesId = match.seriesId;
-
-    if (linetref.isEmpty() && !match.inetref.isEmpty())
-        linetref= match.inetref;
-
     ProgramInfo::CategoryType tmp = categoryType;
-    if (!categoryType && match.categoryType)
-        tmp = match.categoryType;
-
     QString lcattype = myth_category_type_to_string(tmp);
 
-    unsigned char lsubtype = subtitleType | match.subtitleType;
-    unsigned char laudio   = audioProps   | match.audioProps;
-    unsigned char lvideo   = videoProps   | match.videoProps;
+    unsigned char lsubtype = subtitleType;
+    unsigned char laudio   = audioProps;
+    unsigned char lvideo   = videoProps;
 
-    uint lseason = match.season;
-    uint lepisode = match.episode;
-    uint lepisodeTotal = match.totalepisodes;
+    uint lseason = season;
+    uint lepisode = episode;
+    uint lepisodeTotal = totalepisodes;
 
-    if (season || episode || totalepisodes)
-    {
-        lseason = season;
-        lepisode = episode;
-        lepisodeTotal = totalepisodes;
-    }
+    uint lpartnumber = partnumber;
+    uint lparttotal  = parttotal;
 
-    uint lpartnumber = match.partnumber;
-    uint lparttotal = match.parttotal;
+    bool lpreviouslyshown = previouslyshown;
 
-    if (partnumber || parttotal)
-    {
-        lpartnumber = partnumber;
-        lparttotal  = parttotal;
-    }
-
-    bool lpreviouslyshown = previouslyshown | match.previouslyshown;
-
-    uint32_t llistingsource = listingsource | match.listingsource;
+    uint32_t llistingsource = listingsource;
 
     QString lsyndicatedepisodenumber = syndicatedepisodenumber;
-    if (lsyndicatedepisodenumber.isEmpty() &&
-        !match.syndicatedepisodenumber.isEmpty())
-        lsyndicatedepisodenumber = match.syndicatedepisodenumber;
 
     query.prepare(
         "UPDATE program "
