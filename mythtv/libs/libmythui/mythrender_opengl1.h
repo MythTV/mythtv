@@ -3,6 +3,7 @@
 
 #include "mythrender_opengl.h"
 #include "mythrender_opengl_defs1.h"
+#include <GL/gl.h>
 
 class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 {
