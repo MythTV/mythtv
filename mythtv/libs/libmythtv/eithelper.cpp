@@ -365,7 +365,7 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
             // EITa(ctive)
             chanid = GetChanID((*eit_section_ptr)->ServiceID());
             LOG(VB_DVBSICACHE, LOG_DEBUG, QString("actual - tableid 0x%1(%2) chanid 0x%3(%4) serviceid 0x%5(%6)"
-                                                "onid 0x%7(%8) tsid 0x%9(%10) pid 0x%11(%12)")
+                                                "onid 0x%7(%8) tsid 0x%9(%10) pid 0x%11(%12) sourceid %13")
                                                 .arg((*eit_section_ptr)->TableID(), 0, 16)
                                                 .arg((*eit_section_ptr)->TableID())
                                                 .arg(chanid, 0, 16)
@@ -377,7 +377,8 @@ void EITHelper::AddEIT(eit_sections_cache_const_t& EventInformationTable)
                                                 .arg((*eit_section_ptr)->TSID(), 0, 16)
                                                 .arg((*eit_section_ptr)->TSID())
                                                 .arg((*eit_section_ptr)->GetPID(), 0, 16)
-                                                .arg((*eit_section_ptr)->GetPID()));
+                                                .arg((*eit_section_ptr)->GetPID())
+                                                .arg(sourceid));
         }
         else
         {
