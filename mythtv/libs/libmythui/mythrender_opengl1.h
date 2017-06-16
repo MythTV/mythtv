@@ -3,6 +3,9 @@
 
 #include "mythrender_opengl.h"
 #include "mythrender_opengl_defs1.h"
+#if !defined(Q_OS_MAC)
+#include <GL/gl.h>
+#endif
 
 class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 {
