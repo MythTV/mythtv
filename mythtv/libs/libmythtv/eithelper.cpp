@@ -1018,7 +1018,7 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
     query.bindValue(":NETWORKID",   networkid);
     query.bindValue(":TRANSPORTID", transportid);
 
-    LOG(VB_TEMPDEBUG, LOG_INFO, QString("get_chan_id_from_db_dvb serviceid 0x%1(%4) networkid 0x%2(%5) transportid 0x3(%6)")
+    LOG(VB_TEMPDEBUG, LOG_INFO, QString("get_chan_id_from_db_dvb serviceid 0x%1(%4) networkid 0x%2(%5) transportid 0x%3(%6)")
                         .arg(serviceid, 0, 16)
                         .arg(networkid, 0, 16)
                         .arg(transportid, 0, 16)
