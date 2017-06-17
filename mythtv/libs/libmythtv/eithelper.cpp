@@ -1018,6 +1018,14 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
     query.bindValue(":NETWORKID",   networkid);
     query.bindValue(":TRANSPORTID", transportid);
 
+    LOG(VB_TEMPDEBUG, LOG_INFO, QString("get_chan_id_from_db_dvb serviceid 0x%1(%4) networkid 0x%2(%5) transportid 0x3(%6)")
+                        .arg(serviceid, 0, 16)
+                        .arg(networkid, 0, 16)
+                        .arg(transportid, 0, 16)
+                        .arg(serviceid)
+                        .arg(networkid)
+                        .arg(transportid));
+
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Looking up chanID", query);
 
@@ -1038,9 +1046,21 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
             MythDB::DBError("Looking up chanID in fuzzy mode", query);
     }
 
+    LOG(VB_TEMPDEBUG, LOG_INFO, QString("get_chan_id_from_db_dvb fuzzy serviceid 0x%1(%3) networkid 0x%2(%4)")
+                        .arg(serviceid, 0, 16)
+                        .arg(networkid, 0, 16)
+                        .arg(serviceid)
+                        .arg(networkid));
+
     while (query.next())
     {
         // Check to see if we are interested in this channel
+        LOG(VB_TEMPDEBUG, LOG_INFO, QString("get_chan_id_from_db_dvb fuzzy sourceid %1 query.chanid %2 query.useOnAirGuide %3 query.sourceid %4")
+                        .arg(sourceid)
+                        .arg(query.value(0).toUInt())
+                        .arg(query.value(1).toBool())
+                        .arg(query.value(2).toUInt()));
+
         chanid        = query.value(0).toUInt();
         useOnAirGuide = query.value(1).toBool();
         if (sourceid == query.value(2).toUInt())
@@ -1049,7 +1069,7 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
 
     if (query.size() > 1)
     {
-        LOG(VB_EIT, LOG_INFO,
+        LOG(VB_TEMPDEBUG, LOG_INFO,
             LOC + QString("found %1 channels for networkid %2, "
                           "transportid %3, serviceid %4 but none "
                           "for current sourceid %5.")
