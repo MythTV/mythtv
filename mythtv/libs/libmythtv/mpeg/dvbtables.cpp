@@ -6,6 +6,10 @@
 #include "dvbtables.h"
 #include "dvbdescriptors.h"
 
+// Uncomment this for extra low level debug of the
+// DVB SI cache
+//#define DVBSICACHE_EXTRA_DEBUG
+
 void NetworkInformationTable::Parse(void) const
 {
     _tsc_ptr = pesdata() + 10 + NetworkDescriptorsLength();
@@ -227,6 +231,7 @@ DVBEventInformationTableSection::DVBEventInformationTableSection(const PSIPTable
     // section_number           8   6.0
     // last_section_number      8   7.0
     Parse();
+#ifdef DVBSICACHE_EXTRA_DEBUG
     LOG(VB_DVBSICACHE, LOG_DEBUG, QString(
                         "Constructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
                         .arg(OriginalNetworkID(),4,16)
@@ -235,10 +240,12 @@ DVBEventInformationTableSection::DVBEventInformationTableSection(const PSIPTable
                         .arg(TableID(),2,16)
                         .arg(Section())
                         .arg(uint64_t(this),0,16));
+#endif // DVBSICACHE_EXTRA_DEBUG
 }
 
 DVBEventInformationTableSection::~DVBEventInformationTableSection()
 {
+#ifdef DVBSICACHE_EXTRA_DEBUG
     LOG(VB_DVBSICACHE, LOG_DEBUG, QString(
                         "Destructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
                         .arg(OriginalNetworkID(),4,16)
@@ -248,6 +255,7 @@ DVBEventInformationTableSection::~DVBEventInformationTableSection()
                         .arg(Section())
                         .arg(uint64_t(this),0,16));
 
+#endif // DVBSICACHE_EXTRA_DEBUG
 }
 
 void DVBEventInformationTableSection::Parse(void) const

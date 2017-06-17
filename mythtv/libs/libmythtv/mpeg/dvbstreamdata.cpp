@@ -655,10 +655,6 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         uint tsid = eit_section->TSID();
         uint sid = eit_section->ServiceID();
         uint tid = eit_section->TableID();
-        uint version = eit_section->Version();
-        uint section_number = eit_section->Section();
-        uint segment_last_section = eit_section->SegmentLastSectionNumber();
-        uint last_section = eit_section->LastSection();
         
         SetEITSectionSeen(*eit_section);
 
@@ -915,11 +911,16 @@ void DVBStreamData::SetEITSectionSeen(DVBEventInformationTableSection& eit_secti
     QMutexLocker locker(&_cached_eits_lock);
 
     // This will create the index entries if needed
-    eit_sections_cache_wrapper_t& wrapper = _cached_eits[original_network_id][transport_stream_id]
-                                                            [serviceid][tableid];
+    eit_sections_cache_wrapper_t& wrapper =
+        _cached_eits[original_network_id]
+                    [transport_stream_id]
+                    [serviceid]
+                    [tableid];
+
     TableStatus& status = wrapper.status;
     eit_sections_cache_t& sections = wrapper.sections;
 
+#ifdef DVBSICACHE_EXTRA_DEBUG
     QString bitmap;
     uint count = 1;
     for (TableStatus::sections_t::const_iterator iTr
@@ -952,9 +953,11 @@ void DVBStreamData::SetEITSectionSeen(DVBEventInformationTableSection& eit_secti
         .arg(last_section >> 3)
         .arg(last_section % 8)
         .arg(bitmap));
+#endif // DVBSICACHE_EXTRA_DEBUG
 
     status.SetSectionSeen(version, section_number, last_section, segment_last_section);
 
+#ifdef DVBSICACHE_EXTRA_DEBUG
     for (TableStatus::sections_t::const_iterator iTr
                 = status.m_sections.begin();
             iTr != status.m_sections.end();
@@ -985,6 +988,7 @@ void DVBStreamData::SetEITSectionSeen(DVBEventInformationTableSection& eit_secti
         .arg(last_section >> 3)
         .arg(last_section % 8)
         .arg(bitmap));
+#endif // DVBSICACHE_EXTRA_DEBUG
 
     eit_sections_cache_t::iterator it = sections.find(section_number);
 
@@ -997,6 +1001,7 @@ void DVBStreamData::SetEITSectionSeen(DVBEventInformationTableSection& eit_secti
             QByteArray((const char*)(eit_section.psipdata()), eit_section.Length() - 4),
             QCryptographicHash::Md5); // Hash the events loop
 
+#ifdef DVBSICACHE_EXTRA_DEBUG
     LOG(VB_DVBSICACHE, LOG_DEBUG, LOC + QString(
                         "Added eit cache entry 0x%1/0x%2/0x%3/0x%4/%5 count %6")
                         .arg(original_network_id,4,16)
@@ -1005,6 +1010,7 @@ void DVBStreamData::SetEITSectionSeen(DVBEventInformationTableSection& eit_secti
                         .arg(tableid,2,16)
                         .arg(section_number)
                         .arg(sections.size()));
+#endif // DVBSICACHE_EXTRA_DEBUG
 }
 
 bool DVBStreamData::EITSectionSeen(const DVBEventInformationTableSection& eit_section) const
