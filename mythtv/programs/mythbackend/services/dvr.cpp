@@ -208,7 +208,7 @@ DTC::ProgramList* Dvr::GetOldRecordedList( bool             bDescending,
     {
         sSQL += QString(" AND (%1) ").arg(clause.join(" OR "));
     }
-    
+
     if (sSort == "starttime")
         sSQL += "ORDER BY starttime ";
     else if (sSort == "title")
@@ -361,7 +361,7 @@ bool Dvr::UnDeleteRecording(int RecordedId,
 bool Dvr::StopRecording(int RecordedId)
 {
     if (RecordedId <= 0)
-        throw QString("Recorded ID is invalid.");
+        throw QString("RecordedId param is invalid.");
 
     RecordingInfo ri = RecordingInfo(RecordedId);
 
@@ -376,7 +376,7 @@ bool Dvr::StopRecording(int RecordedId)
         return true;
     }
     else
-        throw QString("RecordID %1 not found").arg(RecordedId);
+        throw QString("RecordedId %1 not found").arg(RecordedId);
 
     return false;
 }
@@ -388,7 +388,7 @@ bool Dvr::StopRecording(int RecordedId)
 bool Dvr::ReactivateRecording(int RecordedId)
 {
     if (RecordedId <= 0)
-        throw QString("Recorded ID is invalid.");
+        throw QString("RecordedId param is invalid.");
 
     RecordingInfo ri = RecordingInfo(RecordedId);
 
@@ -923,6 +923,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
 
         if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&
                            ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Recorded) ||
                           ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))
         {
