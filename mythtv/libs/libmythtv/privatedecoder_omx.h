@@ -70,10 +70,6 @@ class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
     OMXComponent m_videc;
     AVBitStreamFilterContext *m_filter;
     bool m_bStartTime;
-#ifdef USING_BROADCOM
-    OMX_INTERLACETYPE m_eMode;
-    bool m_bRepeatFirstField;
-#endif
     AVCodecContext *m_avctx;
 
     QMutex mutable m_lock;      // Protects data following
