@@ -90,14 +90,20 @@ void MythThemedMenuState::CopyFrom(MythUIType *base)
 
 /** \brief Creates a themed menu.
  *
+ *  \note
+ *  The two ignore variables were used before commit c34f2a10 in
+ *  2008. Removing them would have a ripple effect into the callers.
+ *
+ *  \param cdir         The directory containing the theme. (Ignored)
  *  \param menufile     file name of menu definition file
  *  \param parent       the screen stack that owns this UI type
  *  \param name         the name of this UI type
+ *  \param allowreorder Allow reordering of the menu items. (Ignored)
  *  \param state        theme state associated with this menu
  */
-MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
+MythThemedMenu::MythThemedMenu(const QString &/*cdir*/, const QString &menufile,
                                MythScreenStack *parent, const QString &name,
-                               bool allowreorder, MythThemedMenuState *state)
+                               bool /*allowreorder*/, MythThemedMenuState *state)
     : MythThemedMenuState(parent, name),
       m_state(state), m_allocedstate(false), m_foundtheme(false),
       m_ignorekeys(false), m_wantpop(false), m_menuPopup(NULL)
