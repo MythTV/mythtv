@@ -695,6 +695,7 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
     newbutton.type = type;
     newbutton.action = action;
     newbutton.text = text;
+    newbutton.alttext = alttext;
     newbutton.description = description;
     newbutton.password = password;
 

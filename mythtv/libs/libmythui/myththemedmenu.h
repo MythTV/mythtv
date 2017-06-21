@@ -16,6 +16,7 @@ struct ThemedButton
     QString type;
     QStringList action;
     QString text;
+    QString alttext;
     QString description;
     MythImage *icon;
     bool active;
