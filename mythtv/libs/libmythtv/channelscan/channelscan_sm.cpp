@@ -420,7 +420,14 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
     UpdateChannelInfo(true);
 }
 
-void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
+/**
+ * \fn ChannelScanSM::HandleSDT
+ *
+ * \param tsid Unused. Present so that the HandleSDT and HandleSDTo
+ *             functions have the same type signature.
+ * \param sdt  A pointer to the service description table.
+ */
+void ChannelScanSM::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
 {
     QMutexLocker locker(&m_lock);
 
