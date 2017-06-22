@@ -381,8 +381,8 @@ class MTV_PUBLIC MythPlayer
 
     // Non-public sets
     virtual void SetBookmark(bool clear = false);
-    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
-    bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
+    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc);
+    bool RemovePIPPlayer(MythPlayer *pip);
     void NextScanType(void)
         { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
     void SetScanType(FrameScanType);

@@ -3532,7 +3532,7 @@ void MythPlayer::SetTranscoding(bool value)
         decoder->SetTranscoding(value);
 }
 
-bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
+bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc)
 {
     if (!is_current_thread(playerThread))
     {
@@ -3557,7 +3557,7 @@ bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
     return true;
 }
 
-bool MythPlayer::RemovePIPPlayer(MythPlayer *pip, uint timeout)
+bool MythPlayer::RemovePIPPlayer(MythPlayer *pip)
 {
     if (!is_current_thread(playerThread))
         return false;

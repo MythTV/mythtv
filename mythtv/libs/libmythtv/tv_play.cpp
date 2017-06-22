@@ -5900,7 +5900,7 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
             {
                 PIPLocation loc = mctx->player->GetNextPIPLocation();
                 if (loc != kPIP_END)
-                    ok = mctx->player->AddPIPPlayer(pipctx->player, loc, 4000);
+                    ok = mctx->player->AddPIPPlayer(pipctx->player, loc);
             }
             mctx->deletePlayerLock.unlock();
             pipctx->deletePlayerLock.unlock();
@@ -5930,7 +5930,7 @@ bool TV::PIPRemovePlayer(PlayerContext *mctx, PlayerContext *pipctx)
     bool ok = false;
     multi_lock(&mctx->deletePlayerLock, &pipctx->deletePlayerLock, NULL);
     if (mctx->player && pipctx->player)
-        ok = mctx->player->RemovePIPPlayer(pipctx->player, 4000);
+        ok = mctx->player->RemovePIPPlayer(pipctx->player);
     mctx->deletePlayerLock.unlock();
     pipctx->deletePlayerLock.unlock();
 
