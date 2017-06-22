@@ -742,7 +742,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool HandleOSDVideoExit(PlayerContext *ctx, QString action);
 
     // Menu dialog
-    void ShowOSDMenu(const PlayerContext*, bool isCompact = false);
+    void ShowOSDMenu(bool isCompact = false);
 
     void FillOSDMenuJumpRec  (PlayerContext* ctx, const QString &category = "",
                               int level = 0, const QString &selected = "");
