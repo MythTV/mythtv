@@ -424,8 +424,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool StartEmbedding(const QRect&);
     void StopEmbedding(void);
     bool IsTunable(const PlayerContext*, uint chanid);
-    QSet<uint> IsTunableOn(const PlayerContext*, uint chanid);
-    static QSet<uint> IsTunableOn(TV *tv, const PlayerContext*, uint chanid);
+    static QSet<uint> IsTunableOn(const PlayerContext*, uint chanid);
     void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
     void DrawUnusedRects(void);
     void DoEditSchedule(int editType = kScheduleProgramGuide);

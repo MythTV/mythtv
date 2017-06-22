@@ -8502,12 +8502,12 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 
 bool TV::IsTunable(const PlayerContext *ctx, uint chanid)
 {
-    return !IsTunableOn(this, ctx, chanid).empty();
+    return !IsTunableOn(ctx, chanid).empty();
 }
 
 bool TV::IsTunable(uint chanid)
 {
-    return !IsTunableOn(NULL, NULL, chanid).empty();
+    return !IsTunableOn(NULL, chanid).empty();
 }
 
 static QString toCommaList(const QSet<uint> &list)
@@ -8523,12 +8523,6 @@ static QString toCommaList(const QSet<uint> &list)
 }
 
 QSet<uint> TV::IsTunableOn(
-    const PlayerContext *ctx, uint chanid)
-{
-    return IsTunableOn(this, ctx, chanid);
-}
-
-QSet<uint> TV::IsTunableOn(TV *tv,
     const PlayerContext *ctx, uint chanid)
 {
     QSet<uint> tunable_cards;
