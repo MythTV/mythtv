@@ -206,7 +206,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     QString     GetInput(void) const;
     uint        GetSourceID(void) const;
-    QString     SetInput(QString input, uint requestType = kFlagDetect);
+    QString     SetInput(QString input);
 
     /// Changes to a channel in the 'dir' channel change direction.
     void ChangeChannel(ChannelChangeDirection dir)
