@@ -2356,7 +2356,7 @@ int HLSRingBuffer::Prefetch(int count)
     return RET_OK;
 }
 
-void HLSRingBuffer::SanityCheck(const HLSStream *hls, const HLSSegment *segment) const
+void HLSRingBuffer::SanityCheck(const HLSStream *hls) const
 {
     bool live = hls->Live();
     /* sanity check */
@@ -2414,7 +2414,7 @@ HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("GetSegment %1 [%2] stream[%3] (bitrate:%4)")
         .arg(segnum).arg(segment->Id()).arg(stream).arg(hls->Bitrate()));
-    SanityCheck(hls, segment);
+    SanityCheck(hls);
     return segment;
 }
 
