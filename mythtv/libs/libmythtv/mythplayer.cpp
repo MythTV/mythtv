@@ -4787,7 +4787,6 @@ void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
 }
 
 bool MythPlayer::TranscodeGetNextFrame(
-    frm_dir_map_t::iterator &dm_iter,
     int &did_ff, bool &is_key, bool honorCutList)
 {
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);

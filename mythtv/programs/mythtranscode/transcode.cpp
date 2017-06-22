@@ -972,8 +972,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             bool is_key;
             int did_ff;
-            frm_dir_map_t::iterator dm_iter;
-            GetPlayer()->TranscodeGetNextFrame(dm_iter, did_ff, is_key, true);
+            GetPlayer()->TranscodeGetNextFrame(did_ff, is_key, true);
 
             QSize buf_size = GetPlayer()->GetVideoBufferSize();
             video_width = buf_size.width();

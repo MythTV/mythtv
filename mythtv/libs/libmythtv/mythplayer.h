@@ -252,8 +252,7 @@ class MTV_PUBLIC MythPlayer
 
     // Transcode stuff
     void InitForTranscode(bool copyaudio, bool copyvideo);
-    bool TranscodeGetNextFrame(frm_dir_map_t::iterator &dm_iter,
-                               int &did_ff, bool &is_key, bool honorCutList);
+    bool TranscodeGetNextFrame(int &did_ff, bool &is_key, bool honorCutList);
     bool WriteStoredData(
         RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
