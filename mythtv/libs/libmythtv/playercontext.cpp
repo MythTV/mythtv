@@ -267,7 +267,7 @@ void PlayerContext::ResizePIPWindow(const QRect &rect)
     pipRect = QRect(rect);
 }
 
-bool PlayerContext::StartEmbedding(WId wid, const QRect &embedRect)
+bool PlayerContext::StartEmbedding(const QRect &embedRect)
 {
     bool ret = false;
     LockDeletePlayer(__FILE__, __LINE__);
