@@ -4567,8 +4567,7 @@ void TVRec::SetNextLiveTVDir(QString dir)
 
 bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
                                           RingBuffer **rb,
-                                          const QString & channum,
-                                          int inputID)
+                                          const QString & channum)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "GetProgramRingBufferForLiveTV()");
     if (!channel || !tvchain || !pginfo || !rb)
@@ -4672,7 +4671,6 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
     RecordingInfo *pginfo = NULL;
     RingBuffer    *rb = NULL;
     QString        inputName;
-    int            inputID = -1;
 
     if (!channel ||
         !channel->CheckChannel(channum))
@@ -4681,9 +4679,7 @@ bool TVRec::CreateLiveTVRingBuffer(const QString & channum)
         return false;
     }
 
-    inputID = channel->GetInputID();
-
-    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
+    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum))
     {
         ClearFlags(kFlagPendingActions, __FILE__, __LINE__);
         ChangeState(kState_None);
@@ -4731,7 +4727,6 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
     RecordingInfo *pginfo = NULL;
     RingBuffer    *rb = NULL;
     QString        inputName;
-    int            inputID = -1;
 
     if (!channel ||
         !channel->CheckChannel(channum))
@@ -4740,9 +4735,7 @@ bool TVRec::SwitchLiveTVRingBuffer(const QString & channum,
         return false;
     }
 
-    inputID = channel->GetInputID();
-
-    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum, inputID))
+    if (!GetProgramRingBufferForLiveTV(&pginfo, &rb, channum))
     {
         ChangeState(kState_None);
         return false;

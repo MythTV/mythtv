@@ -315,7 +315,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     bool WaitForNextLiveTVDir(void);
     bool GetProgramRingBufferForLiveTV(RecordingInfo **pginfo, RingBuffer **rb,
-                                       const QString &channum, int inputID);
+                                       const QString &channum);
     bool CreateLiveTVRingBuffer(const QString & channum);
     bool SwitchLiveTVRingBuffer(const QString & channum,
                                 bool discont, bool set_rec);
