@@ -2987,7 +2987,7 @@ class InputName : public MythUIComboBoxSetting
         QString type = CardUtil::GetRawInputType(cardid);
         QString device = CardUtil::GetVideoDevice(cardid);
         QStringList inputs;
-        CardUtil::GetDeviceInputNames(cardid, device, type, inputs);
+        CardUtil::GetDeviceInputNames(device, type, inputs);
         while (!inputs.isEmpty())
         {
             addSelection(inputs.front());

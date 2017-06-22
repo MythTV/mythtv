@@ -343,8 +343,7 @@ class MTV_PUBLIC CardUtil
                                          QString inputtype = QString::null);
     static QStringList  ProbeAudioInputs(QString device,
                                          QString inputtype = QString::null);
-    static void         GetDeviceInputNames(uint               inputid,
-                                            const QString      &device,
+    static void         GetDeviceInputNames(const QString      &device,
                                             const QString      &inputtype,
                                             QStringList        &inputs);
 
