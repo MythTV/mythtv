@@ -41,7 +41,7 @@ static QString get_lineup_type(uint sourceid);
 static QString get_setting(QString line, QString key);
 static bool    has_setting(QString line, QString key);
 static QString html_escape(QString str);
-static void    get_atsc_stuff(QString channum, int sourceid, int freqid,
+static void    get_atsc_stuff(QString channum, int freqid,
                               int &major, int &minor, long long &freq);
 static QString process_dd_station(uint sourceid,
                                   QString  chan_major, QString  chan_minor,
@@ -2151,7 +2151,7 @@ static bool has_setting(QString line, QString key)
     return (line.toLower().indexOf(key) >= 0);
 }
 
-static void get_atsc_stuff(QString channum, int sourceid, int freqid,
+static void get_atsc_stuff(QString channum, int freqid,
                            int &major, int &minor, long long &freq)
 {
     major = freqid;
@@ -2281,8 +2281,7 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
     // The channel doesn't exist in the DB, insert it...
     int mplexid = -1, majorC, minorC, chanid = 0;
     long long freq = -1;
-    get_atsc_stuff(channum, sourceid, freqid,
-                   majorC, minorC, freq);
+    get_atsc_stuff(channum, freqid, majorC, minorC, freq);
 
     if (minorC > 0 && freq >= 0)
         mplexid = ChannelUtil::CreateMultiplex(sourceid, "atsc", freq, "8vsb");
