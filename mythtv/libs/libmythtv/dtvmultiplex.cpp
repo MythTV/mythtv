@@ -477,7 +477,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                 }
 
                 return ParseDVB_S_and_C(
-                    QString::number(cd.FrequencyHz()),  "a",
+                    QString::number(cd.FrequencyKHz()),  "a",
                     QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
                     cd.ModulationString(),
                     cd.PolarizationString());
@@ -486,7 +486,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
             if (type == DTVTunerType::kTunerTypeDVBS2)
             {
                 return ParseDVB_S2(
-                    QString::number(cd.FrequencyHz()),  "a",
+                    QString::number(cd.FrequencyKHz()),  "a",
                     QString::number(cd.SymbolRateHz()), cd.FECInnerString(),
                     cd.ModulationString(),
                     cd.PolarizationString(),
