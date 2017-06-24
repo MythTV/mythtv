@@ -1673,6 +1673,13 @@ void MythMainWindow::ExitToMainMenu(void)
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
                                                Qt::NoModifier);
                 QCoreApplication::postEvent(this, key);
+                MythNotificationCenter *nc =  MythNotificationCenter::GetInstance();
+                // Notifications have their own stack. We need to continue
+                // the propagation of the escape here if there are notifications.
+                int num = nc->DisplayedNotifications();
+                if (num > 0)
+                    QCoreApplication::postEvent(
+                        this, new QEvent(MythEvent::kExitToMainMenuEventType));
             }
             return;
         }
