@@ -520,6 +520,13 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 
 DBfound:
     LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
+    // If we got the database from UPNP then the wakeup settings are lost.
+    // Restore them.
+    m_DBparams.wolEnabled = dbParamsFromFile.wolEnabled;
+    m_DBparams.wolReconnect = dbParamsFromFile.wolReconnect;
+    m_DBparams.wolRetry = dbParamsFromFile.wolRetry;
+    m_DBparams.wolCommand = dbParamsFromFile.wolCommand;
+
     SaveDatabaseParams(m_DBparams,
                        !loaded || m_DBparams.forceSave ||
                        dbParamsFromFile != m_DBparams);
