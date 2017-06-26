@@ -469,7 +469,7 @@ void RingBuffer::CalcReadAheadThresh(void)
             .arg(fill_min/1024).arg(readblocksize/1024));
 }
 
-bool RingBuffer::IsNearEnd(double fps, uint vvf) const
+bool RingBuffer::IsNearEnd(double /*fps*/, uint vvf) const
 {
     QReadLocker lock(&rwlock);
 
