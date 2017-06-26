@@ -845,8 +845,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     TVRec                  *tvrec,
     ChannelBase            *channel,
     const RecordingProfile &profile,
-    const GeneralDBOptions &genOpt,
-    const DVBDBOptions     &dvbOpt)
+    const GeneralDBOptions &genOpt)
 {
     if (!channel)
         return NULL;

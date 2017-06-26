@@ -4277,8 +4277,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         channel->Close(); // Needed because of NVR::MJPEGInit()
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "TuningNewRecorder - CreateRecorder()");
-    recorder = RecorderBase::CreateRecorder(
-        this, channel, profile, genOpt, dvbOpt);
+    recorder = RecorderBase::CreateRecorder(this, channel, profile, genOpt);
 
     if (recorder)
     {
