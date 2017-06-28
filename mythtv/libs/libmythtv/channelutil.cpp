@@ -329,7 +329,7 @@ static void handle_transport_desc(vector<uint> &muxes,
 
         uint mux = ChannelUtil::CreateMultiplex(
             sourceid,             "dvb",
-            cd.FrequencyKHz(),     cd.ModulationString(),
+            cd.FrequencyHz(),     cd.ModulationString(),
             // DVB specific
             tsid,                 netid,
             cd.SymbolRateHz(),    -1,

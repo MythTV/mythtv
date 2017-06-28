@@ -354,12 +354,12 @@ MythMediaError MythCDROMLinux::ejectSCSI()
     } fd(qPrintable(m_DevicePath));
 
     LOG(VB_MEDIA, LOG_DEBUG, LOC + ":ejectSCSI");
-	if ((ioctl(fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000))
+    if ((ioctl(fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000))
     {
-	    // not an sg device, or old sg driver
+        // not an sg device, or old sg driver
         LOG(VB_MEDIA, LOG_DEBUG, "SG_GET_VERSION_NUM ioctl failed" + ENO);
         return MEDIAERR_FAILED;
-	}
+    }
 
     io_hdr.cmd_len = 6;
     io_hdr.mx_sb_len = sizeof(sense_buffer);
@@ -371,36 +371,36 @@ MythMediaError MythCDROMLinux::ejectSCSI()
     if (ioctl(fd, SG_IO, &io_hdr) < 0)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO allowRmBlk ioctl failed" + ENO);
-	    return MEDIAERR_FAILED;
+        return MEDIAERR_FAILED;
     }
     else if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO allowRmBlk failed");
-	    return MEDIAERR_FAILED;
+        return MEDIAERR_FAILED;
     }
 
     io_hdr.cmdp = startStop1Blk;
     if (ioctl(fd, SG_IO, &io_hdr) < 0)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(start) ioctl failed" + ENO);
-	    return MEDIAERR_FAILED;
+        return MEDIAERR_FAILED;
     }
     else if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(start) failed");
-	    return MEDIAERR_FAILED;
+        return MEDIAERR_FAILED;
     }
 
     io_hdr.cmdp = startStop2Blk;
     if (ioctl(fd, SG_IO, &io_hdr) < 0)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(eject) ioctl failed" + ENO);
-	    return MEDIAERR_FAILED;
+        return MEDIAERR_FAILED;
     }
     else if (io_hdr.host_status != DID_OK || io_hdr.driver_status != DRIVER_OK)
     {
         LOG(VB_MEDIA, LOG_DEBUG, "SG_IO START_STOP(eject) failed");
-	    return MEDIAERR_FAILED;
+        return MEDIAERR_FAILED;
     }
 
     /* force kernel to reread partition table when new disc inserted */

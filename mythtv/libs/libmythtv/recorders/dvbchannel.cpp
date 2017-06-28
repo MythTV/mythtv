@@ -88,6 +88,7 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
+            
     master_map[key].push_back(this); // == RegisterForMaster
     DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
     if (master == this)
@@ -114,7 +115,15 @@ DVBChannel::~DVBChannel()
     if (m_pParent)
         key += QString(":%1")
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
-    DVBChannel *master = static_cast<DVBChannel*>(master_map[key].front());
+
+    DVBChannel *master = NULL;
+
+    // If the database has gone away the key string may be incorrect    
+    if ((!master_map.contains(key)) || (master_map[key].isEmpty()))
+          return;
+
+    master = static_cast<DVBChannel*>(master_map[key].front());
+
     if (master == this)
     {
         master_map[key].pop_front();
@@ -125,9 +134,8 @@ DVBChannel::~DVBChannel()
             new_master->is_open = master->is_open;
     }
     else
-    {
         master_map[key].removeAll(this);
-    }
+
     master_map_lock.unlock();
 
     Close();

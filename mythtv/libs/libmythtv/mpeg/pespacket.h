@@ -28,7 +28,8 @@ class MTV_PUBLIC PESPacket
     /** noop constructor, only for use by derived classes */
     PESPacket()
         : _pesdata(NULL), _fullbuffer(NULL),  _psiOffset(0),
-          _ccLast(255), _pesdataSize(0), _allocSize(0), _badPacket(false)
+          _ccLast(255), _pesdataSize(0), _allocSize(0),
+          _badPacket(false), _isLongTermCopy(false)
     { ; }
 
   public:
@@ -36,7 +37,8 @@ class MTV_PUBLIC PESPacket
     explicit PESPacket(const unsigned char *pesdata)
         : _pesdata(const_cast<unsigned char*>(pesdata)),
           _fullbuffer(const_cast<unsigned char*>(pesdata)),
-          _psiOffset(0), _ccLast(255), _allocSize(0)
+          _psiOffset(0), _ccLast(255), _allocSize(0),
+          _isLongTermCopy(false)
     {
         _badPacket = !VerifyCRC();
         _pesdataSize = max(((int)Length())-1 + (HasCRC() ? 4 : 0), (int)0);
@@ -54,12 +56,16 @@ class MTV_PUBLIC PESPacket
           _ccLast(pkt._ccLast),
           _pesdataSize(pkt._pesdataSize),
           _allocSize(pkt._allocSize),
-          _badPacket(pkt._badPacket)
+          _badPacket(pkt._badPacket),
+          _isLongTermCopy(pkt._isLongTermCopy)
     { // clone
         if (!_allocSize)
             _allocSize = pkt._pesdataSize + (pkt._pesdata - pkt._fullbuffer);
 
-        _fullbuffer = pes_alloc(_allocSize);
+        if (_isLongTermCopy)
+            _fullbuffer = (unsigned char *)malloc(_allocSize);
+        else
+            _fullbuffer = pes_alloc(_allocSize);
         memcpy(_fullbuffer, pkt._fullbuffer, _allocSize);
         _pesdata = _fullbuffer + (pkt._pesdata - pkt._fullbuffer);
     }
@@ -72,8 +78,11 @@ class MTV_PUBLIC PESPacket
 
     virtual ~PESPacket()
     {
-        if (IsClone())
-            pes_free(_fullbuffer);
+        if (_isLongTermCopy)
+            free(_fullbuffer);
+        else
+            if (IsClone())
+                pes_free(_fullbuffer);
 
         _fullbuffer = NULL;
         _pesdata    = NULL;
@@ -93,7 +102,13 @@ class MTV_PUBLIC PESPacket
 
     void GetAsTSPackets(vector<TSPacket> &pkts, uint cc) const;
 
+    // PES Packet structure
+    // Start code 3 bytes
+    // ==================
     // _pesdata[-3] == 0, _pesdata[-2] == 0, _pesdata[-1] == 1
+
+    // PES Header  Fixed part  bytes
+    // ==============================
     uint StreamID()   const { return _pesdata[0]; }
     uint Length()     const
         { return (_pesdata[1] & 0x0f) << 8 | _pesdata[2]; }
@@ -129,7 +144,12 @@ class MTV_PUBLIC PESPacket
     virtual bool HasCRC()     const { return (_pesdata[4] & 0x2) >> 1; }
     /// 1 bit  Extension flags are present
     bool HasExtensionFlags()  const { return _pesdata[4] & 0x1; }
+    // Header fields length 1 byte
+    // _pesdata[5]
 
+    // PES Header Fields - variable length
+    // Ordered the same as the flag bits
+    // ===================================
     /// Presentation Time Stamp, present if HasPTS() is true
     uint64_t PTS(void) const
     {
@@ -226,6 +246,9 @@ class MTV_PUBLIC PESPacket
     // FIXME re-read the specs and follow all negations to find out the
     // initial value of the CRC function when its being returned
     static const uint kTheMagicNoCRCCRC = 0xFFFFFFFF;
+
+    // This is a long term copy that is allocated via malloc
+    bool _isLongTermCopy;
 };
 
 class SequenceHeader

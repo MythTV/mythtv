@@ -54,6 +54,16 @@ bool TableStatus::HasAllSections() const
     return true;
 }
 
+int TableStatus::MissingSections() const
+{
+    // Let the compiler optimise this :-)
+    int missing = 0;
+    for (uint32_t i = 0; i < 32; i++)
+        for (uint j = 0; j < 8; j++)
+            if (0 == (m_sections[i] & (1 << j)))
+                missing++;
+    return missing;
+}
 
 void TableStatusMap::SetVersion(uint32_t key, int32_t version, uint32_t last_section)
 {
@@ -85,5 +95,14 @@ bool TableStatusMap::HasAllSections(uint32_t key) const
         return false;
 
     return it->HasAllSections();
+}
+
+int TableStatusMap::MissingSections(uint32_t key) const
+{
+    const_iterator it = this->find(key);
+    if (it == this->end())
+        return -1;
+
+    return it->MissingSections();
 }
 

@@ -83,7 +83,7 @@ bool MMembuf::consumeBytes(quint64 nbytes, char *sink)
             }
             nbytes -= len;
             buf.removeFirst();
-	    delete a;
+            delete a;
             _index = 0;
             if (nbytes == 0)
                 break;

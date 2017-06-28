@@ -393,6 +393,9 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     }
 
   protected:
+    // default
+    PSIPTable() {}
+
     // does not create it's own data
     PSIPTable(const TSPacket& tspacket, bool)
         : PESPacket()
@@ -506,6 +509,10 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     // if 0 this table is not yet valid, but will be the next psip
     // table with the same sectionNumber(), tableIDExtension() and
     // tableID() to become valid.
+    // For DVB usage see ETSI ETR 211 section 4.1.9. The value of this
+    // field in transmitted (broadcast) sections shall always have the
+    // value 1.
+    
     bool IsCurrent(void) const { return bool(pesdata()[5]&1); }
 
     // section_number       8       6.0      48
@@ -552,6 +559,8 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     virtual QString toString(void) const;
     virtual QString toStringXML(uint indent_level) const;
 
+    void CloneAndShrink(const PSIPTable& table, uint pid = 0);
+    uint GetPID() { return *(uint*)(_fullbuffer + _allocSize); } // N.B. must only be used on CloneAndShrink tables
     static const uint PSIP_OFFSET = 8; // general PSIP header offset
 
   protected:

@@ -27,12 +27,12 @@ using namespace std;
  *                             channel set this to a value greater than zero.
  *  \param desiredMinorChannel If you want rewritten PAT and PMTs for a desired
  *                             channel set this to a value greater than zero.
- *  \param cacheTables         If true important tables will be cached.
+ *  \param cacheTableSections  If true the psip sections of important tables will be cached.
  */
 ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
                                int desiredMinorChannel,
-                               int cardnum, bool cacheTables)
-    : MPEGStreamData(-1, cardnum, cacheTables),
+                               int cardnum, bool cacheTableSections)
+    : MPEGStreamData(-1, cardnum, cacheTableSections),
       _GPS_UTC_offset(GPS_LEAP_SECONDS),
       _atsc_eit_reset(false),
       _mgt_version(-1),
@@ -134,31 +134,31 @@ void ATSCStreamData::Reset(int major, int minor)
     {
         QMutexLocker locker(&_cache_lock);
 
-        DeleteCachedTable(_cached_mgt);
+        DeleteCachedTableSection(_cached_mgt);
         _cached_mgt = NULL;
 
         tvct_cache_t::iterator tit = _cached_tvcts.begin();
         for (; tit != _cached_tvcts.end(); ++tit)
-            DeleteCachedTable(*tit);
+            DeleteCachedTableSection(*tit);
         _cached_tvcts.clear();
 
         cvct_cache_t::iterator cit = _cached_cvcts.begin();
         for (; cit != _cached_cvcts.end(); ++cit)
-            DeleteCachedTable(*cit);
+            DeleteCachedTableSection(*cit);
         _cached_cvcts.clear();
     }
 
     AddListeningPID(ATSC_PSIP_PID);
 }
 
-/** \fn ATSCStreamData::IsRedundant(uint pid, const PSIPTable&) const
+/** \fn ATSCStreamData::IsRedundant(uint pid, const PSIPTable&)
  *  \brief Returns true if table already seen.
  *  \todo All RRT tables are ignored
  *  \todo We don't check the start time of EIT and ETT tables
  *        in the version check, so many tables are improperly
  *        ignored.
  */
-bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
+bool ATSCStreamData::IsRedundant(uint pid, const PSIPTable &psip)
 {
     if (MPEGStreamData::IsRedundant(pid, psip))
         return true;
@@ -838,7 +838,7 @@ void ATSCStreamData::CacheMGT(MasterGuideTable *mgt)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_mgt);
+    DeleteCachedTableSection(_cached_mgt);
     _cached_mgt = mgt;
 }
 
@@ -846,7 +846,7 @@ void ATSCStreamData::CacheTVCT(uint pid, TerrestrialVirtualChannelTable* tvct)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_tvcts[pid]);
+    DeleteCachedTableSection(_cached_tvcts[pid]);
     _cached_tvcts[pid] = tvct;
 }
 
@@ -854,11 +854,11 @@ void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
 {
     QMutexLocker locker(&_cache_lock);
 
-    DeleteCachedTable(_cached_cvcts[pid]);
+    DeleteCachedTableSection(_cached_cvcts[pid]);
     _cached_cvcts[pid] = cvct;
 }
 
-bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool ATSCStreamData::DeleteCachedTableSection(PSIPTable *psip) const
 {
     if (!psip)
         return false;
@@ -889,7 +889,7 @@ bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
     }
     else
     {
-        return MPEGStreamData::DeleteCachedTable(psip);
+        return MPEGStreamData::DeleteCachedTableSection(psip);
     }
     psip_refcnt_map_t::iterator it;
     it = _cached_slated_for_deletion.find(psip);

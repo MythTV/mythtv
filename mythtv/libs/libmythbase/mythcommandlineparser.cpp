@@ -2603,8 +2603,8 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     if (journal)
     {
         if (facility >= 0)
-	    return GENERIC_EXIT_INVALID_CMDLINE;
-	facility = SYSTEMD_JOURNAL_FACILITY;
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    facility = SYSTEMD_JOURNAL_FACILITY;
     }
 #endif
     bool dblog = toBool("enabledblog");

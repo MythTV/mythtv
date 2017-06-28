@@ -330,7 +330,7 @@ void MHText::Preparation(MHEngine *engine)
 
     if (m_pDisplay == NULL)
     {
-	    m_pDisplay = engine->GetContext()->CreateText();
+        m_pDisplay = engine->GetContext()->CreateText();
     }
 
     m_pDisplay->SetSize(m_nBoxWidth, m_nBoxHeight);

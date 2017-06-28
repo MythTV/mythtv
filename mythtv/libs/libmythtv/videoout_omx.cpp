@@ -877,10 +877,6 @@ void VideoOutputOMX::Show(FrameScanType scan)
 
     hdr->nFilledLen = frame->offsets[2] + (frame->offsets[1] >> 2);
     hdr->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-    if (frame->interlaced_frame)
-        hdr->nFlags |= OMX_BUFFERFLAG_INTERLACED;
-    if (frame->top_field_first)
-        hdr->nFlags |= OMX_BUFFERFLAG_TOP_FIELD_FIRST;
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
     OMX_ERRORTYPE e = OMX_EmptyThisBuffer(cmpnt.Handle(), hdr);
     if (e != OMX_ErrorNone)

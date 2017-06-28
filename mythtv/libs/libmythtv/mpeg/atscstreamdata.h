@@ -30,7 +30,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
   public:
     ATSCStreamData(int desiredMajorChannel,
                    int desiredMinorChannel,
-                   int cardnum, bool cacheTables = false);
+                   int cardnum, bool cacheTableSections = false);
     virtual ~ATSCStreamData();
 
     void Reset(void) { Reset(-1, -1); }
@@ -40,7 +40,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
 
     // Table processing
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
-    virtual bool IsRedundant(uint, const PSIPTable&) const;
+    virtual bool IsRedundant(uint, const PSIPTable&);
 
     /// Current UTC to GPS time offset in seconds
     uint GPSOffset(void) const { return _GPS_UTC_offset; }
@@ -121,7 +121,7 @@ class MTV_PUBLIC ATSCStreamData : virtual public MPEGStreamData
     void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
     void CacheCVCT(uint pid, CableVirtualChannelTable*);
   protected:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
 
   private:
     uint                      _GPS_UTC_offset;
