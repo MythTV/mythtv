@@ -34,7 +34,6 @@ using namespace std;
 #include "iptvchannelfetcher.h"
 #include "dvbsignalmonitor.h"
 #include "scanwizardconfig.h"
-#include "channelscan_sm.h"
 #include "channelscanner.h"
 #include "hdhrchannel.h"
 #include "scanmonitor.h"

@@ -66,6 +66,7 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
       ignore_encrypted(false)
+//      ,old_flags(0)
 {
 }
 
@@ -232,14 +233,14 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
     }
 }
 
-void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
+void DTVSignalMonitor::SetDVBService(uint original_network_id, uint transport_id, int service_id)
 {
-    DBG_SM(QString("SetDVBService(transport_id: %1, network_id: %2, "
-                   "service_id: %3)").arg(tsid).arg(netid).arg(serviceid), "");
+    DBG_SM(QString("SetDVBService(transport_id: %1, original_network_id: %2, "
+                   "service_id: %3)").arg(transport_id).arg(original_network_id).arg(service_id), "");
     seen_table_crc.clear();
 
-    if (netid == networkID && tsid == transportID &&
-        serviceid == programNumber)
+    if (original_network_id == networkID && transport_id == transportID &&
+        service_id == programNumber)
     {
         return;
     }
@@ -248,15 +249,17 @@ void DTVSignalMonitor::SetDVBService(uint netid, uint tsid, int serviceid)
                 kDTVSigMon_SDTSeen   | kDTVSigMon_SDTMatch |
                 kDTVSigMon_CryptSeen | kDTVSigMon_CryptMatch);
 
-    transportID   = tsid;
-    networkID     = netid;
-    programNumber = serviceid;
+    transportID   = transport_id;
+    networkID     = original_network_id;
+    programNumber = service_id;
 
-    if (GetDVBStreamData())
+    DVBStreamData* streamdata = GetDVBStreamData();
+    if (streamdata)
     {
-        GetDVBStreamData()->SetDesiredService(netid, tsid, programNumber);
+        streamdata->SetDesiredService(original_network_id, transport_id, service_id);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
-        GetDVBStreamData()->AddListeningPID(DVB_SDT_PID);
+        streamdata->AddListeningPID(DVB_SDT_PID);
+        streamdata->RequestReplayOfCachedSDTs();
     }
 }
 
@@ -490,34 +493,57 @@ void DTVSignalMonitor::HandleNIT(const NetworkInformationTable *nit)
         return;
 }
 
-void DTVSignalMonitor::HandleSDT(uint, const ServiceDescriptionTable *sdt)
+void DTVSignalMonitor::HandleSDT(const sdt_sections_cache_const_t& sections)
 {
     AddFlags(kDTVSigMon_SDTSeen);
 
-    detectedNetworkID = sdt->OriginalNetworkID();
-    detectedTransportID = sdt->TSID();
+    sdt_sections_cache_const_t::const_iterator section = sections.begin();
 
-    // if the multiplex is not properly configured with ONID and TSID then take
-    // whatever SDT we see first
-    if ((networkID == 0) && (transportID == 0))
+    if (section != sections.end())
     {
-        networkID = detectedNetworkID;
-        transportID = detectedTransportID;
+        detectedNetworkID = (*section)->OriginalNetworkID();
+        detectedTransportID = (*section)->TSID();
 
-        // FIXME assert if TableID == SDTo
-    }
+        // if the multiplex is not properly configured with ONID and TSID then take
+        // whatever SDT we see first
+        if ((networkID == 0) && (transportID == 0))
+        {
+            networkID = detectedNetworkID;
+            transportID = detectedTransportID;
+        }
 
-    if (sdt->OriginalNetworkID() != networkID || sdt->TSID() != transportID)
-    {
-        GetDVBStreamData()->SetVersionSDT(sdt->TSID(), -1, 0);
+        if (detectedNetworkID == networkID && detectedTransportID == transportID)
+        {
+            AddFlags(kDTVSigMon_SDTMatch);
+            RemoveFlags(kDVBSigMon_WaitForPos);
+        }
+        else
+        {
+        }
     }
     else
+        LOG(VB_GENERAL, LOG_ERR, "SDTa with no sections encountered");
+}
+
+void DTVSignalMonitor::HandleSDTo(const sdt_sections_cache_const_t& sections)
+{
+    sdt_sections_cache_const_t::const_iterator section = sections.begin();
+
+    if (section != sections.end())
     {
-        DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
-               .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
-        AddFlags(kDTVSigMon_SDTMatch);
-        RemoveFlags(kDVBSigMon_WaitForPos);
+        detectedNetworkID = (*section)->OriginalNetworkID();
+        detectedTransportID = (*section)->TSID();
+
+        if (detectedNetworkID == networkID && detectedTransportID == transportID)
+        {
+            // Looks like I am on a non standard system that transmit SDT as SDTo
+            AddFlags(kDTVSigMon_SDTSeen);
+            AddFlags(kDTVSigMon_SDTMatch);
+            RemoveFlags(kDVBSigMon_WaitForPos);
+        }
     }
+    else
+        LOG(VB_GENERAL, LOG_ERR, "SDTo with no sections encountered");
 }
 
 void DTVSignalMonitor::HandleEncryptionStatus(uint, bool enc_status)
@@ -560,6 +586,7 @@ const ScanStreamData *DTVSignalMonitor::GetScanStreamData() const
 bool DTVSignalMonitor::IsAllGood(void) const
 {
     QMutexLocker locker(&statusLock);
+
     if (!SignalMonitor::IsAllGood())
         return false;
     if ((flags & kDTVSigMon_WaitForPAT) && !matchingPAT.IsGood())

@@ -262,7 +262,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         // ------------------------------------------------------------------
         // Create all needed includes
         //
-        //	<xs:import schemaLocation="<path to dependant schema" namespace="http://mythtv.org"/>
+        // <xs:import schemaLocation="<path to dependant schema" namespace="http://mythtv.org"/>
         // ------------------------------------------------------------------
 
         QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + pRequest->m_sBaseUrl + "/xsd";

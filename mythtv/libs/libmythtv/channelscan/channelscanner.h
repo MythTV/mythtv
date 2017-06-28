@@ -39,6 +39,7 @@
 #include "iptvchannelfetcher.h"
 #include "scanmonitor.h"
 #include "channelscantypes.h"
+#include "channelscan_sm.h"
 
 #ifdef USING_VBOX
 #include "vboxchannelfetcher.h"
@@ -126,6 +127,7 @@ class MTV_PUBLIC ChannelScanner
 
     /// Services desired post scan
     ServiceRequirements serviceRequirements;
+
 };
 
 #endif // _CHANNEL_SCANNER_H_

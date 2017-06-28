@@ -16,7 +16,8 @@ class DTVSignalMonitor : public SignalMonitor,
                          public MPEGStreamListener,
                          public ATSCMainStreamListener,
                          public ATSCAuxStreamListener,
-                         public DVBMainStreamListener
+                         public DVBMainStreamListener,
+                         public DVBOtherStreamListener
 {
   public:
     DTVSignalMonitor(int db_cardnum,
@@ -34,7 +35,7 @@ class DTVSignalMonitor : public SignalMonitor,
     void SetProgramNumber(int progNum);
     int  GetProgramNumber() const { return programNumber; }
 
-    void SetDVBService(uint network_id, uint transport_id, int service_id);
+    void SetDVBService(uint original_network_id, uint transport_id, int service_id);
     uint GetTransportID(void) const { return transportID;   }
     uint GetNetworkID(void)   const { return networkID;     }
     int  GetServiceID(void)   const { return programNumber; }
@@ -97,7 +98,12 @@ class DTVSignalMonitor : public SignalMonitor,
     // DVB Main
     void HandleTDT(const TimeDateTable*);
     void HandleNIT(const NetworkInformationTable*);
-    void HandleSDT(uint, const ServiceDescriptionTable*);
+    void HandleSDT(const sdt_sections_cache_const_t&);
+
+    // DVB Other
+    void HandleNITo(const NetworkInformationTable*) {}
+    void HandleSDTo(const sdt_sections_cache_const_t&);
+    void HandleBAT(const BouquetAssociationTable*) {}
 
     void IgnoreEncrypted(bool ignore) { ignore_encrypted = ignore; }
 
@@ -139,6 +145,7 @@ class DTVSignalMonitor : public SignalMonitor,
     QList<uint64_t>    seen_table_crc;
 
     bool ignore_encrypted;
+//    volatile mutable uint64_t old_flags;
 };
 
 #endif // DTVSIGNALMONITOR_H
