@@ -3140,7 +3140,33 @@ void MainServer::DoHandleUndeleteRecording(
     SendResponse(pbssock, outputlist);
 }
 
-void MainServer::HandleRescheduleRecordings(const QStringList &request,
+/**
+ * \fn MainServer::HandleRescheduleRecordings
+ *
+ * This function processes the received network protocol message to
+ * reschedule recordings. It ignores the parameters supplied by the
+ * caller and always asks the scheduling system to reschedule all
+ * recordings.
+ *
+ * The network message should look like this:
+ *
+ * RESCHEDULE_RECORDINGS[]:[]MATCH 0 0 0 - MythUtilCommand
+ *
+ * The five values after the 'MATCH' keyword control which recordings
+ * should be rescheduled. They are described in the BuildMatchRequest
+ * function.
+ *
+ * \sa ScheduledRecording::BuildMatchRequest
+ *
+ * \param request Ignored. This function doesn't parse any additional
+ *                parameters.
+ * \param pbs     The socket used to send the response.
+ *
+ * \addtogroup myth_network_protocol
+ * \par        RESCHEDULE_RECORDINGS
+ * Requests that all recordings after the current time be rescheduled.
+ */
+void MainServer::HandleRescheduleRecordings(const QStringList &/*request*/,
                                             PlaybackSock *pbs)
 {
      ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
@@ -3172,7 +3198,7 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
     }
 }
 
-/*
+/**
  * \addtogroup myth_network_protocol
  * \par        GO_TO_SLEEP
  * Commands a slave to go to sleep
@@ -6702,7 +6728,25 @@ void MainServer::HandleMusicFindLyrics(const QStringList &slist, PlaybackSock *p
         SendResponse(pbssock, strlist);
 }
 
-void MainServer::HandleMusicGetLyricGrabbers(const QStringList &slist, PlaybackSock *pbs)
+/**
+ * \fn MainServer::HandleMusicGetLyricGrabbers
+ *
+ * This function processes the received network protocol message to
+ * get the names of all scripts the grab music lyrics. It will check
+ * for the existence of the script directory and of scripts.  All
+ * scripts found are parsed for version numbers. The names and version
+ * numbers of all found scripts are returned to the caller.
+ *
+ * \param slist   Ignored. This function doesn't parse any additional
+ *                parameters.
+ * \param pbs     The socket used to send the response.
+ *
+ * \addtogroup myth_network_protocol
+ * \par        MUSIC_LYRICS_GETGRABBERS
+ * Get the names and version numbers of all scripts to grab music
+ * lyrics.
+ */
+void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, PlaybackSock *pbs)
 {
     QStringList strlist;
 
