@@ -88,6 +88,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     MythScreenType *m_backgroundscreen;
     GlOsdThread *m_glOsdThread;
     bool m_changed;
+    bool m_videoPaused;
 };
 
 #endif // ndef VIDEOOUT_OMX_H
