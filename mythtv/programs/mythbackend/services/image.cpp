@@ -37,7 +37,7 @@
  *  \param  tag The exif tag
  *  \return QString The exif tag value if successful, otherwise empty
  */
-QString Image::GetImageInfo( int id, const QString &tag )
+QString Image::GetImageInfo( int /*id*/, const QString &/*tag*/ )
 {
 //    ImageManagerBe *mgr = ImageManagerBe::getInstance();
 
