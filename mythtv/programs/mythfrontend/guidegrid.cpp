@@ -294,7 +294,7 @@ public:
             if (!m_proglists[i])
                 m_proglists[i] =
                     m_guide->getProgramListFromProgram(m_channums[i]);
-            fillProgramRowInfosWith(row, m_channums[i],
+            fillProgramRowInfosWith(row,
                                     m_currentStartTime,
                                     m_proglists[i]);
         }
@@ -308,7 +308,7 @@ public:
     }
 
 private:
-    void fillProgramRowInfosWith(int row, int chanNum, QDateTime start,
+    void fillProgramRowInfosWith(int row, QDateTime start,
                                  ProgramList *proglist);
 
     const unsigned int m_firstRow;
@@ -1648,7 +1648,7 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
     m_threadPool.start(new GuideHelper(this, updater), "GuideHelper");
 }
 
-void GuideUpdateProgramRow::fillProgramRowInfosWith(int row, int chanNum,
+void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
                                                     QDateTime start,
                                                     ProgramList *proglist)
 {
