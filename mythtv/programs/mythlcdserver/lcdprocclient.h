@@ -68,7 +68,7 @@ class LCDProcClient : public QObject
     void checkConnections();       // check connections to LCDd and mythbackend
                                    // every 10 seconds
 
-    void dobigclock(bool);         // Large display
+    void dobigclock(void);         // Large display
     void dostdclock();             // Small display
     void outputTime();             // Fire from a timer
     void outputMusic();            // Short timer (equalizer)

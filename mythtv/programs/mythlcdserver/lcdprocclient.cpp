@@ -1823,7 +1823,7 @@ void LCDProcClient::reset()
     init();
 }
 
-void LCDProcClient::dobigclock (bool init)
+void LCDProcClient::dobigclock (void)
 {
     QString aString;
     QString time = QTime::currentTime().toString( m_timeFormat );
@@ -1919,7 +1919,7 @@ void LCDProcClient::dobigclock (bool init)
 void LCDProcClient::outputTime()
 {
     if ( m_lcdBigClock )
-        dobigclock(0);
+        dobigclock();
     else
         dostdclock();
 }
