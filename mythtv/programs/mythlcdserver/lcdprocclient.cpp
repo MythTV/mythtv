@@ -784,7 +784,7 @@ void LCDProcClient::describeServer()
     }
 }
 
-void LCDProcClient::veryBadThings(QAbstractSocket::SocketError error)
+void LCDProcClient::veryBadThings(QAbstractSocket::SocketError /*error*/)
 {
     // Deal with failures to connect and inabilities to communicate
     LOG(VB_GENERAL, LOG_ERR, QString("Could not connect to LCDd: %1")
