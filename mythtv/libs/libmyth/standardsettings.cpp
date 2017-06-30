@@ -321,7 +321,7 @@ ButtonStandardSetting::ButtonStandardSetting(const QString &label)
     setLabel(label);
 }
 
-void ButtonStandardSetting::edit(MythScreenType *screen)
+void ButtonStandardSetting::edit(MythScreenType */*screen*/)
 {
     emit clicked();
 }
@@ -776,7 +776,7 @@ void MythUICheckBoxSetting::edit(MythScreenType * screen)
     QCoreApplication::postEvent(screen, dce);
 }
 
-void MythUICheckBoxSetting::resultEdit(DialogCompletionEvent *dce)
+void MythUICheckBoxSetting::resultEdit(DialogCompletionEvent */*dce*/)
 {
     setValue(!boolValue());
 }
