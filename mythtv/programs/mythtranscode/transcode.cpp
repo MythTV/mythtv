@@ -228,6 +228,10 @@ int Transcode::TranscodeFile(const QString &inputname,
     int hlsSegmentSize = 0;
     int hlsSegmentFrames = 0;
 
+#if !CONFIG_LIBMP3LAME
+    (void)profileName;
+#endif
+
     if (jobID >= 0)
         JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
 
