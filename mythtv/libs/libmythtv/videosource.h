@@ -836,7 +836,7 @@ class CardInput : public GroupSetting
     Q_OBJECT
   public:
     CardInput(const QString & cardtype, const QString & device,
-              bool is_new_input, int cardid);
+              int cardid);
     ~CardInput();
 
     int getInputID(void) const { return id->intValue(); };
