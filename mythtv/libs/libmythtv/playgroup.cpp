@@ -121,7 +121,7 @@ class TimeStretch : public MythUISpinBoxSetting
     }
 };
 
-PlayGroupConfig::PlayGroupConfig(const QString &label, const QString &name,
+PlayGroupConfig::PlayGroupConfig(const QString &/*label*/, const QString &name,
                                  bool isNew)
     : m_isNew(isNew)
 {
