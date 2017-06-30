@@ -391,7 +391,7 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 }
 
 PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
-                            TV *player, bool showTV)
+                         TV *player, bool /*showTV*/)
     : ScheduleCommon(parent, name),
       m_prefixes(QObject::tr("^(The |A |An )")),
       m_titleChaff(" \\(.*\\)$"),
