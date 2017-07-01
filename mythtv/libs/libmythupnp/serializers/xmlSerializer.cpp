@@ -138,7 +138,7 @@ void XmlSerializer::AddProperty( const QString       &sName,
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::RenderEnum( const QString       &sName ,
+void XmlSerializer::RenderEnum( const QString       &/*sName*/ ,
                                 const QVariant      &vValue,
                                 const QMetaProperty *pMetaProp )
 {
