@@ -667,6 +667,11 @@
         </imagetype>
     </progressbar>
 
+    <!-- small progressbar half screen width at 800 -->
+    <progressbar name="smallprogressbar" from="baseprogressbar">
+        <area>0,0,335,24</area>
+    </progressbar>
+
     <!-- Base definition of a state used for ratings 0 to 10 -->
     <statetype name="baseratingstate">
         <position>0,0</position>
