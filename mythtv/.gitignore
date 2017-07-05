@@ -6,3 +6,4 @@ Makefile.*.debug
 config.*
 version.cpp
 TMPMAK
+/src
