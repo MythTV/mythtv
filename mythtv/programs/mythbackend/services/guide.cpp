@@ -373,7 +373,12 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     QString sFileName = ChannelUtil::GetIcon( nChanId );
 
     if (sFileName.isEmpty())
+    {
+        LOG(VB_UPNP, LOG_ERR,
+            QString("GetImageFile - ChanId %1 doesn't exist or isn't visible")
+                    .arg(nChanId));
         return QFileInfo();
+    }
 
     // ------------------------------------------------------------------
     // Search for the filename
@@ -424,18 +429,32 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     // We need to create it...
     // ----------------------------------------------------------------------
 
+    QString sChannelsDirectory = QFileInfo( sNewFileName ).absolutePath();
+
+    if (!QFileInfo( sChannelsDirectory ).isWritable())
+    {
+        LOG(VB_UPNP, LOG_ERR, QString("GetImageFile - no write access to: %1")
+            .arg( sChannelsDirectory ));
+        return QFileInfo();
+    }
+
     float fAspect = 0.0;
 
     QImage *pImage = new QImage( sFullFileName );
 
     if (!pImage)
+    {
+        LOG(VB_UPNP, LOG_ERR, QString("GetImageFile - can't create image: %1")
+            .arg( sFullFileName ));
         return QFileInfo();
+    }
 
     if (fAspect <= 0)
            fAspect = (float)(pImage->width()) / pImage->height();
 
     if (fAspect == 0)
     {
+        LOG(VB_UPNP, LOG_ERR, QString("GetImageFile - zero aspect"));
         delete pImage;
         return QFileInfo();
     }
@@ -449,7 +468,21 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
     QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation);
 
-    img.save( sNewFileName, "PNG" );
+    if (img.isNull())
+    {
+        LOG(VB_UPNP, LOG_ERR, QString("SaveImageFile - unable to scale. "
+            "See if %1 is really an image.").arg( sFullFileName ));
+        delete pImage;
+        return QFileInfo();
+    }
+
+    if (!img.save( sNewFileName, "PNG" ))
+    {
+        LOG(VB_UPNP, LOG_ERR, QString("SaveImageFile - failed, %1")
+            .arg( sNewFileName ));
+        delete pImage;
+        return QFileInfo();
+    }
 
     delete pImage;
 
