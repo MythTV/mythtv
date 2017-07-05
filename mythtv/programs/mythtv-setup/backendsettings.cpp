@@ -418,7 +418,7 @@ static GlobalTextEditSetting *WOLbackendCommand()
     gc->setLabel(QObject::tr("Wake command"));
     gc->setValue("");
     gc->setHelpText(QObject::tr("The command used to wake up your master "
-            "backend server (e.g. sudo /etc/init.d/mythtv-backend restart)."));
+            "backend server (e.g. wakeonlan 00:00:00:00:00:00)."));
     return gc;
 };
 

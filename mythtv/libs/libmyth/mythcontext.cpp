@@ -1341,6 +1341,11 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
     if (m_lastCheck.isValid() && now < m_lastCheck)
         return;
 
+    // When WOL is disallowed, standy mode,
+    // we should not show connection failures.
+    if (!gCoreContext->IsWOLAllowed())
+        return;
+
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s
 
     QString description = (persistent) ?

@@ -1761,7 +1761,7 @@ static HostCheckBoxSetting *UseVirtualKeyboard()
 
 static HostSpinBoxSetting *FrontendIdleTimeout()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("FrontendIdleTimeout", 0, 360, 15);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("FrontendIdleTimeout", 0, 360, 5);
 
     gs->setLabel(MainGeneralSettings::tr("Idle time before entering standby "
                                          "mode (minutes)"));
