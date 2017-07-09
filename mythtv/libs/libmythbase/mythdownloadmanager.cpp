@@ -119,7 +119,7 @@ class MythCookieJar : public QNetworkCookieJar
 {
   public:
     MythCookieJar();
-    MythCookieJar(MythCookieJar &old);
+    void copyAllCookies(MythCookieJar &old);
     void load(const QString &filename);
     void save(const QString &filename);
 };
@@ -1712,7 +1712,8 @@ QNetworkCookieJar *MythDownloadManager::copyCookieJar(void)
         return NULL;
 
     MythCookieJar *inJar = static_cast<MythCookieJar *>(m_manager->cookieJar());
-    MythCookieJar *outJar = new MythCookieJar(*inJar);
+    MythCookieJar *outJar = new MythCookieJar;
+    outJar->copyAllCookies(*inJar);
 
     return static_cast<QNetworkCookieJar *>(outJar);
 }
@@ -1727,7 +1728,8 @@ void MythDownloadManager::refreshCookieJar(QNetworkCookieJar *jar)
         delete m_inCookieJar;
 
     MythCookieJar *inJar = static_cast<MythCookieJar *>(jar);
-    MythCookieJar *outJar = new MythCookieJar(*inJar);
+    MythCookieJar *outJar = new MythCookieJar;
+    outJar->copyAllCookies(*inJar);
     m_inCookieJar = static_cast<QNetworkCookieJar *>(outJar);
 
     QMutexLocker locker2(&m_queueWaitLock);
@@ -1741,7 +1743,8 @@ void MythDownloadManager::updateCookieJar(void)
     QMutexLocker locker(&m_cookieLock);
 
     MythCookieJar *inJar = static_cast<MythCookieJar *>(m_inCookieJar);
-    MythCookieJar *outJar = new MythCookieJar(*inJar);
+    MythCookieJar *outJar = new MythCookieJar;
+    outJar->copyAllCookies(*inJar);
     m_manager->setCookieJar(static_cast<QNetworkCookieJar *>(outJar));
 
     delete m_inCookieJar;
@@ -1784,10 +1787,10 @@ QString MythDownloadManager::getHeader(const QNetworkCacheMetaData &cacheData,
 }
 
 
-/** \brief Creates a MythCookieJar from another MythCookieJar
+/** \brief Copies all cookies from one MythCookieJar to another
  *  \param old the MythCookieJar to copy
  */
-MythCookieJar::MythCookieJar(MythCookieJar &old)
+void MythCookieJar::copyAllCookies(MythCookieJar &old)
 {
     const QList<QNetworkCookie> cookieList = old.allCookies();
     setAllCookies(cookieList);
