@@ -93,6 +93,12 @@ VideoOutWindow::VideoOutWindow() :
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
     db_use_gui_size = gCoreContext->GetNumSetting("GuiSizeForTV", 0);
 
+    populateGeometry();
+}
+
+void VideoOutWindow::populateGeometry(void)
+{
+    qApp->processEvents();
     QDesktopWidget *desktop = NULL;
     if (qobject_cast<QApplication*>(qApp))
         desktop = QApplication::desktop();
@@ -489,6 +495,8 @@ bool VideoOutWindow::Init(const QSize &new_video_dim_buf,
                           AspectOverrideMode new_aspectoverride,
                           AdjustFillMode new_adjustfill)
 {
+    // Refresh the geometry in case the video mode has changed
+    populateGeometry();
     display_visible_rect = db_use_gui_size ? new_display_visible_rect :
                                              screen_geom;
 

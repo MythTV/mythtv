@@ -2603,15 +2603,21 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     {
         if (!ctx->IsPIP())
             GetMythUI()->DisableScreensaver();
-        MythMainWindow *mainWindow = GetMythMainWindow();
-        mainWindow->setBaseSize(player_bounds.size());
-        mainWindow->setMinimumSize(
-            (db_use_fixed_size) ? player_bounds.size() : QSize(16, 16));
-        mainWindow->setMaximumSize(
-            (db_use_fixed_size) ? player_bounds.size() :
-            QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-        mainWindow->setGeometry(player_bounds);
-        mainWindow->ResizePainterWindow(player_bounds.size());
+        bool switchMode = gCoreContext->GetNumSetting("UseVideoModes", 0);
+        // player_bounds is not applicable when switching modes so
+        // skip this logic in that case.
+        if (!switchMode)
+        {
+            MythMainWindow *mainWindow = GetMythMainWindow();
+            mainWindow->setBaseSize(player_bounds.size());
+            mainWindow->setMinimumSize(
+                (db_use_fixed_size) ? player_bounds.size() : QSize(16, 16));
+            mainWindow->setMaximumSize(
+                (db_use_fixed_size) ? player_bounds.size() :
+                QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+            mainWindow->setGeometry(player_bounds);
+            mainWindow->ResizePainterWindow(player_bounds.size());
+        }
         // PGB Do not disable the GUI when using openmax renderer,
         // to ensure that space next to letterbox pictures
         // is painted.
@@ -9785,7 +9791,11 @@ void TV::customEvent(QEvent *e)
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         ReturnPlayerLock(mctx);
 
-        if (!db_use_gui_size_for_tv || !db_use_fixed_size)
+        // player_bounds is not applicable when switching modes so
+        // skip this logic in that case.
+        bool switchMode = gCoreContext->GetNumSetting("UseVideoModes", 0);
+        if (!switchMode
+            && (!db_use_gui_size_for_tv || !db_use_fixed_size))
         {
             mwnd->setMinimumSize(QSize(16, 16));
             mwnd->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
