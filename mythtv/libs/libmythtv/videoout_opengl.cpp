@@ -363,7 +363,24 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
     if (!gl_context)
         return false;
 
-    const QRect dvr = window.GetDisplayVisibleRect();
+    QRect dvr = window.GetDisplayVisibleRect();
+
+    MythMainWindow *mainWin = GetMythMainWindow();
+    QSize mainSize = mainWin->size();
+
+    // If the Video screen mode has vertically less pixels
+    // than the GUI screen mode - OpenGL coordinate adjustments
+    // must be made to put the video at the top of the display 
+    // area instead of at the bottom.
+    if (dvr.height() < mainSize.height())
+        dvr.setTop(dvr.top()-mainSize.height()+dvr.height());
+
+    // If the Video screen mode has horizontally less pixels
+    // than the GUI screen mode - OpenGL width must be set
+    // as the higher GUI width so that the Program Guide
+    // invoked from playback is not cut off.
+    if (dvr.width() < mainSize.width())
+        dvr.setWidth(mainSize.width());
 
     if (video_codec_id == kCodec_NONE)
     {
