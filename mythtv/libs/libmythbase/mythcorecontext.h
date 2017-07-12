@@ -115,6 +115,9 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void AllowShutdown(void);
     bool IsBlockingClient(void) const; ///< is this client blocking shutdown
 
+    void SetWOLAllowed(bool allow);
+    bool IsWOLAllowed() const;
+
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
                                bool block = true);
     void SendMessage(const QString &message);

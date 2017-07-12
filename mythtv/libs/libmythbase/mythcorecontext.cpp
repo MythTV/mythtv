@@ -82,6 +82,7 @@ class MythCoreContextPrivate : public QObject
     QMutex         m_WOLInProgressLock;
     QWaitCondition m_WOLInProgressWaitCondition;
     bool           m_WOLInProgress;
+    bool           m_IsWOLAllowed;
 
     bool m_backend;
     bool m_frontend;
@@ -128,6 +129,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_sockLock(QMutex::NonRecursive),
       m_serverSock(NULL), m_eventSock(NULL),
       m_WOLInProgress(false),
+      m_IsWOLAllowed(true),
       m_backend(false),
       m_frontend(false),
       m_database(GetMythDB()),
@@ -416,7 +418,9 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
         d->WaitForWOL();
     }
 
-    QString WOLcmd = GetSetting("WOLbackendCommand", "");
+    QString WOLcmd;
+    if (IsWOLAllowed())
+        WOLcmd = GetSetting("WOLbackendCommand", "");
 
     if (maxConnTry < 1)
         maxConnTry = max(GetNumSetting("BackendConnectRetry", 1), 1);
@@ -602,6 +606,16 @@ void MythCoreContext::AllowShutdown(void)
 bool MythCoreContext::IsBlockingClient(void) const
 {
     return d->m_blockingClient;
+}
+
+void MythCoreContext::SetWOLAllowed(bool allow)
+{
+    d->m_IsWOLAllowed = allow;
+}
+
+bool MythCoreContext::IsWOLAllowed() const
+{
+    return d->m_IsWOLAllowed;
 }
 
 void MythCoreContext::SetAsBackend(bool backend)

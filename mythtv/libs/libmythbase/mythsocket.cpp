@@ -682,7 +682,7 @@ void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
     if (ok)
     {
         m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
-        ok = m_tcpSocket->waitForConnected();
+        ok = m_tcpSocket->waitForConnected(5000);
     }
 
     if (ok)

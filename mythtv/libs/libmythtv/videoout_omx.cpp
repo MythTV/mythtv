@@ -286,7 +286,8 @@ VideoOutputOMX::VideoOutputOMX() :
     m_render(gCoreContext->GetSetting("OMXVideoRender", VIDEO_RENDER), *this),
     m_imagefx(gCoreContext->GetSetting("OMXVideoFilter", IMAGE_FX), *this),
     m_context(0),   
-    m_backgroundscreen(0), m_glOsdThread(0), m_changed(false)
+    m_backgroundscreen(0), m_glOsdThread(0), m_changed(false),
+    m_videoPaused(false)
 {
 #ifdef OSD_EGL
       m_osdpainter = 0;
@@ -755,6 +756,10 @@ void VideoOutputOMX::UpdatePauseFrame(int64_t &disp_timecode)
         CopyFrame(&av_pause_frame, used_frame);
     }
 
+    // Suppress deinterlace while paused to prevent the jiggles.
+    av_pause_frame.interlaced_frame = 0;
+    av_pause_frame.top_field_first = 0;
+
     disp_timecode = av_pause_frame.disp_timecode;
 }
 
@@ -773,9 +778,11 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
+    m_videoPaused = false;
     if (!frame)
     {
         // Rotate pause frames
+        m_videoPaused = true;
         vbuffers.Enqueue(kVideoBuffer_pause, vbuffers.Dequeue(kVideoBuffer_pause));
         frame = vbuffers.GetScratchFrame();
         CopyFrame(frame, &av_pause_frame);
@@ -878,6 +885,13 @@ void VideoOutputOMX::Show(FrameScanType scan)
     hdr->nFilledLen = frame->offsets[2] + (frame->offsets[1] >> 2);
     hdr->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
+    // Paused - do not display anything unless softblend set
+    if (m_videoPaused && GetOSDRenderer() != "softblend")
+    {
+        // fake out that the buffer was already emptied
+        EmptyBufferDone(cmpnt, hdr);
+        return;
+    }
     OMX_ERRORTYPE e = OMX_EmptyThisBuffer(cmpnt.Handle(), hdr);
     if (e != OMX_ErrorNone)
     {

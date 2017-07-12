@@ -20,20 +20,18 @@
 #include "panedvbutilsimport.h"
 #include "paneexistingscanimport.h"
 
-ScanWizardConfig::ScanWizardConfig(
-    ScanWizard *_parent,
+void ScanWizard::SetupConfig(
     uint    default_sourceid,  uint default_cardid,
-    QString default_inputname) :
-    videoSource(new VideoSourceSelector(
-                    default_sourceid, CardUtil::GetScanableInputTypes(), false)),
-    input(new InputSelector(default_cardid, default_inputname)),
-    scanType(new ScanTypeSetting()),
-    scanConfig(new ScanOptionalConfig(scanType)),
-    services(new DesiredServices()),
-    ftaOnly(new FreeToAirOnly()),
-    trustEncSI(new TrustEncSISetting())
+    QString default_inputname)
 {
-    setLabel(tr("Scan Configuration"));
+    videoSource = new VideoSourceSelector(
+                    default_sourceid, CardUtil::GetScanableInputTypes(), false);
+    input = new InputSelector(default_cardid, default_inputname);
+    scanType = new ScanTypeSetting(),
+    scanConfig = new ScanOptionalConfig(scanType);
+    services = new DesiredServices();
+    ftaOnly = new FreeToAirOnly();
+    trustEncSI = new TrustEncSISetting();
 
     addChild(services);
     addChild(ftaOnly);
@@ -54,25 +52,25 @@ ScanWizardConfig::ScanWizardConfig(
             scanType,    SLOT(  SetInput(    const QString&)));
 
     connect(input,       SIGNAL(valueChanged(const QString&)),
-            _parent,     SLOT(  SetInput(    const QString&)));
+            this,     SLOT(  SetInput(    const QString&)));
 }
 
-uint ScanWizardConfig::GetSourceID(void) const
+uint ScanWizard::GetSourceID(void) const
 {
     return videoSource->getValue().toUInt();
 }
 
-ServiceRequirements ScanWizardConfig::GetServiceRequirements(void) const
+ServiceRequirements ScanWizard::GetServiceRequirements(void) const
 {
     return services->GetServiceRequirements();
 }
 
-bool ScanWizardConfig::DoFreeToAirOnly(void) const
+bool ScanWizard::DoFreeToAirOnly(void) const
 {
     return ftaOnly->getValue().toInt();
 }
 
-bool ScanWizardConfig::DoTestDecryption(void) const
+bool ScanWizard::DoTestDecryption(void) const
 {
     return trustEncSI->getValue().toInt();
 }

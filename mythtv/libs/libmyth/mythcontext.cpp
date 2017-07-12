@@ -520,6 +520,13 @@ bool MythContextPrivate::FindDatabase(bool prompt, bool noAutodetect)
 
 DBfound:
     LOG(VB_GENERAL, LOG_DEBUG, "FindDatabase() - Success!");
+    // If we got the database from UPNP then the wakeup settings are lost.
+    // Restore them.
+    m_DBparams.wolEnabled = dbParamsFromFile.wolEnabled;
+    m_DBparams.wolReconnect = dbParamsFromFile.wolReconnect;
+    m_DBparams.wolRetry = dbParamsFromFile.wolRetry;
+    m_DBparams.wolCommand = dbParamsFromFile.wolCommand;
+
     SaveDatabaseParams(m_DBparams,
                        !loaded || m_DBparams.forceSave ||
                        dbParamsFromFile != m_DBparams);
@@ -1332,6 +1339,11 @@ void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
         return;
 
     if (m_lastCheck.isValid() && now < m_lastCheck)
+        return;
+
+    // When WOL is disallowed, standy mode,
+    // we should not show connection failures.
+    if (!gCoreContext->IsWOLAllowed())
         return;
 
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s

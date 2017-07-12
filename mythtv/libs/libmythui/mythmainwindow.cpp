@@ -1673,6 +1673,13 @@ void MythMainWindow::ExitToMainMenu(void)
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
                                                Qt::NoModifier);
                 QCoreApplication::postEvent(this, key);
+                MythNotificationCenter *nc =  MythNotificationCenter::GetInstance();
+                // Notifications have their own stack. We need to continue
+                // the propagation of the escape here if there are notifications.
+                int num = nc->DisplayedNotifications();
+                if (num > 0)
+                    QCoreApplication::postEvent(
+                        this, new QEvent(MythEvent::kExitToMainMenuEventType));
             }
             return;
         }
@@ -3006,6 +3013,17 @@ void MythMainWindow::EnterStandby(bool manual)
         GetMythDB()->GetSetting("menutheme", "defaultmenu"));
     state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
     MythUIStateTracker::SetState(state);
+
+    // Cache WOL settings in case DB goes down
+    QString masterserver = gCoreContext->GetSetting
+                    ("MasterServerName");
+    gCoreContext->GetSettingOnHost
+                    ("BackendServerAddr", masterserver);
+    gCoreContext->GetMasterServerPort();
+    gCoreContext->GetSetting("WOLbackendCommand", "");
+
+    // While in standby do not attempt to wake the backend
+    gCoreContext->SetWOLAllowed(false);
 }
 
 void MythMainWindow::ExitStandby(bool manual)
@@ -3024,6 +3042,10 @@ void MythMainWindow::ExitStandby(bool manual)
     LOG(VB_GENERAL, LOG_NOTICE, "Leaving standby mode");
 
     d->standby = false;
+
+    // We may attempt to wake the backend
+    gCoreContext->SetWOLAllowed(true);
+
     gCoreContext->BlockShutdown();
 
     QVariantMap state;
