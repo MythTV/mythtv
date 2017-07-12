@@ -474,7 +474,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
             Output(cat);
     }
 
-    void HandlePMT(uint program_num, const ProgramMapTable *pmt)
+    void HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
     {
         if (pmt && (!m_autopts || m_use_pid[pmt->tsheader()->PID()]))
             Output(pmt);
