@@ -1549,8 +1549,8 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     QString message, QString &text)
 {
     int dc = -1;
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *popup = new MythDialogBox(message, popupStack,
+    MythScreenStack *popupStack = parent->GetStack("popup stack");
+    MythDialogBox *popup = new MythDialogBox(title, message, popupStack,
                                              "manualchannelpopup");
 
     if (popup->Create())
