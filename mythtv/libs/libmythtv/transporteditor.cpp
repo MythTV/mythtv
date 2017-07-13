@@ -183,13 +183,15 @@ void TransportListEditor::SetSourceID(uint _sourceid)
 }
 
 TransportListEditor::TransportListEditor(uint sourceid) :
-    m_videosource(new VideoSourceSelector(sourceid, QString::null, false))
+    m_videosource(new VideoSourceSelector(sourceid, QString::null, false)), isLoading(false)
 {
     setLabel(tr("Multiplex Editor"));
 
     addChild(m_videosource);
     ButtonStandardSetting *newTransport =
         new ButtonStandardSetting("(" + tr("New Transport") + ")");
+    connect(newTransport, SIGNAL(clicked()), SLOT(NewTransport(void)));
+
     addChild(newTransport);
 
     connect(m_videosource, SIGNAL(valueChanged(const QString&)),
@@ -200,12 +202,17 @@ TransportListEditor::TransportListEditor(uint sourceid) :
 
 void TransportListEditor::SetSourceID(const QString& sourceid)
 {
+    if (isLoading)
+        return;
     SetSourceID(sourceid.toUInt());
     Load();
 }
 
 void TransportListEditor::Load()
 {
+    if (isLoading)
+        return;
+    isLoading = true;
     if (m_sourceid)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -222,6 +229,7 @@ void TransportListEditor::Load()
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("TransportList::fillSelections", query);
+            isLoading = false;
             return;
         }
 
@@ -273,10 +281,25 @@ void TransportListEditor::Load()
     }
 
     GroupSetting::Load();
+    isLoading = false;
 }
+
+void TransportListEditor::NewTransport()
+{
+    TransportSetting *transport =
+        new TransportSetting(QString("New Transport"), 0,
+           m_sourceid, m_cardtype);
+    addChild(transport);
+    m_list.push_back(transport);
+    emit settingsChanged(this);
+}
+
 
 void TransportListEditor::Delete(TransportSetting *transport)
 {
+    if (isLoading)
+        return;
+
     ShowOkPopup(
         tr("Are you sure you would like to delete this transport?"),
         this,
@@ -317,6 +340,9 @@ void TransportListEditor::Delete(TransportSetting *transport)
 
 void TransportListEditor::Menu(TransportSetting *transport)
 {
+    if (isLoading)
+        return;
+
     MythMenu *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");
     menu->AddItem(tr("Delete..."), [transport, this] () { Delete(transport); });
 

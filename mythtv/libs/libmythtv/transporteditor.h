@@ -77,6 +77,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
   public slots:
     void SetSourceID(const QString &_sourceid);
     void Menu(TransportSetting *transport);
+    void NewTransport(void);
 
   private:
     ~TransportListEditor() { }
@@ -87,6 +88,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     QVector<StandardSetting*> m_list;
     uint m_sourceid;
     uint m_cardtype;
+    bool isLoading;
 };
 
 #endif // _TRANSPORT_EDITOR_H_
