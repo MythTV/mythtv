@@ -199,7 +199,11 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
     {
         QString tsTime = ts.mid(8);
         if (tsTime.length() == 6)
+        {
+            if (tsTime == "235960")
+                tsTime = "235959";
             tmpTime = QTime::fromString(tsTime, "HHmmss");
+        }
         else if (tsTime.length() == 4)
             tmpTime = QTime::fromString(tsTime, "HHmm");
         else if (tsTime.length() == 2)
