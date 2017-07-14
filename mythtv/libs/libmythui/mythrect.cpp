@@ -112,7 +112,10 @@ void MythRect::NormRect(void)
 
     QRect::moveTopLeft(QPoint(X,Y));
 
-    normalized();
+    //  This would apply the result of normalized to the rect but causes
+    //  problems with theme display
+    //    QRect tr = normalized();
+    //    setRect(tr.x(), tr.y(), tr.width(), tr.height());
 }
 
 void MythRect::setRect(const QString &sX, const QString &sY,
