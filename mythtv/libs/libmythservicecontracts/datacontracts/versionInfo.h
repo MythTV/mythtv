@@ -36,7 +36,7 @@ class SERVICE_PUBLIC VersionInfo : public QObject
     PROPERTYIMP( QString,  Branch    )
     PROPERTYIMP( QString,  Protocol  )
     PROPERTYIMP( QString,  Binary    )
-    PROPERTYIMP( QString,  Schema    )
+    PROPERTYIMP( QString,  Schema    );
 
     public:
 

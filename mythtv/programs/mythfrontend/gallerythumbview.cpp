@@ -52,7 +52,7 @@ private:
 //! Worker thread for copying/moving files
 class TransferThread : public MThread
 {
-    Q_DECLARE_TR_FUNCTIONS(FileTransferWorker)
+    Q_DECLARE_TR_FUNCTIONS(FileTransferWorker);
 public:
     typedef QMap<ImagePtrK, QString> TransferMap;
     typedef QSet<ImagePtrK> ImageSet;

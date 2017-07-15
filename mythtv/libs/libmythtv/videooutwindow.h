@@ -22,7 +22,7 @@ class MythPlayer;
 
 class VideoOutWindow
 {
-    Q_DECLARE_TR_FUNCTIONS(VideoOutWindow)
+    Q_DECLARE_TR_FUNCTIONS(VideoOutWindow);
 
   public:
     VideoOutWindow();

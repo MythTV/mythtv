@@ -31,7 +31,7 @@ class TVRec;
 
 class SignalMonitor : protected MThread
 {
-    Q_DECLARE_TR_FUNCTIONS(SignalMonitor)
+    Q_DECLARE_TR_FUNCTIONS(SignalMonitor);
 
   public:
     /// Returns true iff the card type supports signal monitoring.

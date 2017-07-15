@@ -23,7 +23,7 @@ class SERVICE_PUBLIC LiveStreamInfoList : public QObject
 
     Q_PROPERTY( QVariantList LiveStreamInfos READ LiveStreamInfos DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, LiveStreamInfos )
+    PROPERTYIMP_RO_REF( QVariantList, LiveStreamInfos );
 
     public:
 

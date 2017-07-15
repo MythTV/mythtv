@@ -9,7 +9,7 @@
 
 class MythBDPlayer : public MythPlayer
 {
-    Q_DECLARE_TR_FUNCTIONS(MythBDPlayer)
+    Q_DECLARE_TR_FUNCTIONS(MythBDPlayer);
 
   public:
     explicit MythBDPlayer(PlayerFlags flags = kNoFlags);

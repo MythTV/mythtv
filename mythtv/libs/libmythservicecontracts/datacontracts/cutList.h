@@ -34,7 +34,7 @@ class SERVICE_PUBLIC CutList : public QObject
 
     Q_PROPERTY( QVariantList Cuttings READ Cuttings DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Cuttings )
+    PROPERTYIMP_RO_REF( QVariantList, Cuttings );
 
     public:
 

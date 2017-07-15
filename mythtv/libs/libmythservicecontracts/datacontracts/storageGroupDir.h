@@ -30,7 +30,7 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
     PROPERTYIMP    ( QString    , DirName        )
     PROPERTYIMP    ( bool       , DirRead        )
     PROPERTYIMP    ( bool       , DirWrite       )
-    PROPERTYIMP    ( uint       , KiBFree        )
+    PROPERTYIMP    ( uint       , KiBFree        );
 
     public:
 

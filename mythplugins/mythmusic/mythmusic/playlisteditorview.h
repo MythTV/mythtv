@@ -57,7 +57,7 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
     //bool     m_active;
 };
 
-Q_DECLARE_METATYPE(MusicGenericTree*)
+Q_DECLARE_METATYPE(MusicGenericTree*);
 
 class PlaylistEditorView : public MusicCommon
 {

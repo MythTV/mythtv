@@ -485,7 +485,7 @@ protected:
 */
 class META_PUBLIC ImageManagerFe : protected QObject, public ImageDbReader
 {
-    Q_DECLARE_TR_FUNCTIONS(ImageManagerFe)
+    Q_DECLARE_TR_FUNCTIONS(ImageManagerFe);
 public:
     static ImageManagerFe &getInstance();
 

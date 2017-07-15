@@ -25,7 +25,7 @@ class SERVICE_PUBLIC ChannelGroupList : public QObject
 
     Q_PROPERTY( QVariantList ChannelGroups READ ChannelGroups DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, ChannelGroups )
+    PROPERTYIMP_RO_REF( QVariantList, ChannelGroups );
 
     public:
 

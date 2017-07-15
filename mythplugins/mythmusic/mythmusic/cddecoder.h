@@ -19,7 +19,7 @@ class MusicMetadata;
 
 class CdDecoder : public Decoder
 {
-     Q_DECLARE_TR_FUNCTIONS(CdDecoder)
+     Q_DECLARE_TR_FUNCTIONS(CdDecoder);
 
   public:
     CdDecoder(const QString &file, DecoderFactory *, AudioOutput *);

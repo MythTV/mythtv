@@ -33,7 +33,7 @@ class SERVICE_PUBLIC BackendInfo : public QObject
 
     PROPERTYIMP_PTR( BuildInfo, Build )
     PROPERTYIMP_PTR( EnvInfo,   Env   )
-    PROPERTYIMP_PTR( LogInfo,   Log   )
+    PROPERTYIMP_PTR( LogInfo,   Log   );
 
     public:
 

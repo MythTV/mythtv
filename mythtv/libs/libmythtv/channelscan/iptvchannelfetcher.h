@@ -58,7 +58,7 @@ typedef QMap<QString,IPTVChannelInfo> fbox_chan_map_t;
 
 class IPTVChannelFetcher : public QRunnable
 {
-    Q_DECLARE_TR_FUNCTIONS(IPTVChannelFetcher)
+    Q_DECLARE_TR_FUNCTIONS(IPTVChannelFetcher);
 
   public:
     IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid,

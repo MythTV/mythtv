@@ -25,7 +25,7 @@ typedef QHash<QString,QString> MetadataMap;
 
 class META_PUBLIC VideoMetadata
 {
-    Q_DECLARE_TR_FUNCTIONS(VideoMetadata)
+    Q_DECLARE_TR_FUNCTIONS(VideoMetadata);
 
   public:
     typedef std::pair<int, QString> genre_entry;

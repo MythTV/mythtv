@@ -72,7 +72,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     PROPERTYIMP     ( QString                , Profile     )
 
     // Used only by Serializer
-    PROPERTYIMP( bool, SerializeDetails )
+    PROPERTYIMP( bool, SerializeDetails );
 
     public:
 

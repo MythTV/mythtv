@@ -15,7 +15,7 @@ namespace DTC
 
         Q_PROPERTY(QVariantMap ActionList READ ActionList DESIGNABLE true)
 
-        PROPERTYIMP_RO_REF(QVariantMap, ActionList)
+        PROPERTYIMP_RO_REF(QVariantMap, ActionList);
 
       public:
         static inline void InitializeCustomTypes();

@@ -28,7 +28,7 @@ class SERVICE_PUBLIC EnumItem : public QObject
 
     PROPERTYIMP    ( QString    , Key       )
     PROPERTYIMP    ( int        , Value     )
-    PROPERTYIMP    ( QString    , Desc      )
+    PROPERTYIMP    ( QString    , Desc      );
 
     public:
 

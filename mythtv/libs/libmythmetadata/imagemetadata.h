@@ -94,7 +94,7 @@ private:
 //! Abstract class for image metadata
 class META_PUBLIC ImageMetaData
 {
-    Q_DECLARE_TR_FUNCTIONS(ImageMetaData)
+    Q_DECLARE_TR_FUNCTIONS(ImageMetaData);
 public:
     static ImageMetaData* FromPicture(const QString &filePath);
     static ImageMetaData* FromVideo(const QString &filePath);

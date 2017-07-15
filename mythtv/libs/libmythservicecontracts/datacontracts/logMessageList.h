@@ -30,7 +30,7 @@ class SERVICE_PUBLIC LogMessageList : public QObject
 
     PROPERTYIMP_RO_REF( QVariantList, HostNames    )
     PROPERTYIMP_RO_REF( QVariantList, Applications )
-    PROPERTYIMP_RO_REF( QVariantList, LogMessages  )
+    PROPERTYIMP_RO_REF( QVariantList, LogMessages  );
 
     public:
 

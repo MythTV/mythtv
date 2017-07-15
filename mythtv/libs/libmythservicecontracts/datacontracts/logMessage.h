@@ -55,7 +55,7 @@ class SERVICE_PUBLIC LogMessage : public QObject
     PROPERTYIMP( QString  , Function    )
     PROPERTYIMP( QDateTime, Time        )
     PROPERTYIMP( QString  , Level       )
-    PROPERTYIMP( QString  , Message     )
+    PROPERTYIMP( QString  , Message     );
 
     public:
 

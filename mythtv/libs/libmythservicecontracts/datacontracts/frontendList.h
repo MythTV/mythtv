@@ -33,7 +33,7 @@ class SERVICE_PUBLIC FrontendList : public QObject
 
     Q_PROPERTY( QVariantList Frontends READ Frontends DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Frontends )
+    PROPERTYIMP_RO_REF( QVariantList, Frontends );
 
     public:
 

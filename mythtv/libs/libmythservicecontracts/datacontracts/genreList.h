@@ -34,7 +34,7 @@ class SERVICE_PUBLIC GenreList : public QObject
 
     Q_PROPERTY( QVariantList GenreList     READ Genres DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Genres )
+    PROPERTYIMP_RO_REF( QVariantList, Genres );
 
     public:
 

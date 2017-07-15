@@ -19,7 +19,7 @@
 class MTV_PUBLIC BDInfo
 {
     friend class BDRingBuffer;
-    Q_DECLARE_TR_FUNCTIONS(BDInfo)
+    Q_DECLARE_TR_FUNCTIONS(BDInfo);
 
   public:
     explicit BDInfo(const QString &filename);
@@ -66,7 +66,7 @@ class BDOverlay
  */
 class MTV_PUBLIC BDRingBuffer : public RingBuffer
 {
-    Q_DECLARE_TR_FUNCTIONS(BDRingBuffer)
+    Q_DECLARE_TR_FUNCTIONS(BDRingBuffer);
 
   public:
     explicit BDRingBuffer(const QString &lfilename);

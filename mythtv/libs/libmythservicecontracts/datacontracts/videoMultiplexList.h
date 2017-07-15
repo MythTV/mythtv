@@ -43,7 +43,7 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, VideoMultiplexes )
+    PROPERTYIMP_RO_REF( QVariantList, VideoMultiplexes );
 
     public:
 

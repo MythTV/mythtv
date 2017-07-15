@@ -46,7 +46,7 @@ class SERVICE_PUBLIC Input : public QObject
     PROPERTYIMP    ( bool       , QuickTune      )
     PROPERTYIMP    ( uint       , RecPriority    )
     PROPERTYIMP    ( uint       , ScheduleOrder  )
-    PROPERTYIMP    ( uint       , LiveTVOrder    )
+    PROPERTYIMP    ( uint       , LiveTVOrder    );
 
     public:
 

@@ -57,7 +57,7 @@ class RipStatus;
 
 class CDRipperThread: public MThread
 {
-    Q_DECLARE_TR_FUNCTIONS(CDRipperThread)
+    Q_DECLARE_TR_FUNCTIONS(CDRipperThread);
 
     public:
         CDRipperThread(RipStatus *parent,  QString device,

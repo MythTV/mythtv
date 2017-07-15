@@ -31,7 +31,7 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
 
     PROPERTYIMP( QString  , TimeZoneID      )
     PROPERTYIMP( int      , UTCOffset       )
-    PROPERTYIMP( QDateTime, CurrentDateTime )
+    PROPERTYIMP( QDateTime, CurrentDateTime );
 
     public:
 

@@ -25,7 +25,7 @@ class SERVICE_PUBLIC CastMemberList : public QObject
 
     Q_PROPERTY( QVariantList CastMembers READ CastMembers DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, CastMembers )
+    PROPERTYIMP_RO_REF( QVariantList, CastMembers );
 
     public:
 

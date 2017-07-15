@@ -21,7 +21,7 @@ struct AVFrame;
 
 class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
-    Q_DECLARE_TR_FUNCTIONS(AudioOutput)
+    Q_DECLARE_TR_FUNCTIONS(AudioOutput);
 
  public:
     class AudioDeviceConfig

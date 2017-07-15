@@ -19,7 +19,7 @@ class VideoList;
 
 class VideoFilterSettings
 {
-     Q_DECLARE_TR_FUNCTIONS(VideoFilterSettings)
+     Q_DECLARE_TR_FUNCTIONS(VideoFilterSettings);
 
   public:
     static const unsigned int FILTER_MASK = 0xFFFE;

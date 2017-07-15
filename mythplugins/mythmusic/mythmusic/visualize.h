@@ -276,7 +276,7 @@ typedef struct piano_key_data {
 
 class AlbumArt : public VisualBase
 {
-    Q_DECLARE_TR_FUNCTIONS(AlbumArt)
+    Q_DECLARE_TR_FUNCTIONS(AlbumArt);
 
   public:
     AlbumArt(void);

@@ -24,7 +24,7 @@ class SERVICE_PUBLIC ImageMetadataInfo : public QObject
     PROPERTYIMP    ( int        , Number       )
     PROPERTYIMP    ( QString    , Tag          )
     PROPERTYIMP    ( QString    , Label        )
-    PROPERTYIMP    ( QString    , Value        )
+    PROPERTYIMP    ( QString    , Value        );
 
     public:
 

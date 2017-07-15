@@ -23,7 +23,7 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
 
     Q_PROPERTY( QVariantList StorageGroupDirs READ StorageGroupDirs DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, StorageGroupDirs )
+    PROPERTYIMP_RO_REF( QVariantList, StorageGroupDirs );
 
     public:
 

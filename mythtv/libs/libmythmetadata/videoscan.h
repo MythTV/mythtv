@@ -56,7 +56,7 @@ class META_PUBLIC VideoScanChanges : public QEvent
 
 class META_PUBLIC VideoScannerThread : public MThread
 {
-    Q_DECLARE_TR_FUNCTIONS(VideoScannerThread)
+    Q_DECLARE_TR_FUNCTIONS(VideoScannerThread);
 
   public:
     explicit VideoScannerThread(QObject *parent);

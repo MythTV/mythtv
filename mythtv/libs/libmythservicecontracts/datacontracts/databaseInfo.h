@@ -42,7 +42,7 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
     PROPERTYIMP( QString, Name          )
     PROPERTYIMP( QString, Type          )
     PROPERTYIMP( bool   , LocalEnabled  )
-    PROPERTYIMP( QString, LocalHostName )
+    PROPERTYIMP( QString, LocalHostName );
 
     public:
 

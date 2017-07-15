@@ -33,7 +33,7 @@ class SERVICE_PUBLIC EncoderList : public QObject
 
     Q_PROPERTY( QVariantList Encoders READ Encoders DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Encoders )
+    PROPERTYIMP_RO_REF( QVariantList, Encoders );
 
     public:
 

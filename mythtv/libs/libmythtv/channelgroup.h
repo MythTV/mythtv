@@ -35,7 +35,7 @@ typedef vector<ChannelGroupItem> ChannelGroupList;
 */
 class MTV_PUBLIC ChannelGroup
 {
-    Q_DECLARE_TR_FUNCTIONS(ChannelGroup)
+    Q_DECLARE_TR_FUNCTIONS(ChannelGroup);
 
   public:
     // ChannelGroup 

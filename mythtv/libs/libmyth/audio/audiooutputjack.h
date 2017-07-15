@@ -15,7 +15,7 @@
 
 class AudioOutputJACK : public AudioOutputBase
 {
-    Q_DECLARE_TR_FUNCTIONS(AudioOutputJACK)
+    Q_DECLARE_TR_FUNCTIONS(AudioOutputJACK);
 
   public:
     explicit AudioOutputJACK(const AudioSettings &settings);
