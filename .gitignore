@@ -35,6 +35,8 @@ release
 *.vcxproj.filters
 *.manifest
 bin
+moc
+obj
 *.ipch
 .directory
 .vscode
