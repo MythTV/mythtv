@@ -37,14 +37,16 @@
 ChannelScannerGUIScanPane::ChannelScannerGUIScanPane(
     bool lock, bool strength,
     bool snr, bool rotorpos,
-    MythScreenStack *parent) :
-    MythScreenType(parent, "channelscanner"),
-    m_showSignalLock(lock), m_showSignalStrength(strength),
-    m_showSignalNoise(snr), m_showRotorPos(rotorpos),
-    log(NULL),
-    ss(NULL), sn(NULL), pos(NULL),
-    progressBar(NULL), sl(NULL), sta(NULL),
-    m_scanProgressText(NULL)
+    MythScreenStack *parent)
+    : MythScreenType(parent, "channelscanner"),
+      m_showSignalLock(lock),      m_showSignalStrength(strength),
+      m_showSignalNoise(snr),      m_showRotorPos(rotorpos),
+      m_signalStrengthBar(NULL),   m_signalNoiseBar(NULL),
+      m_rotatorPositionBar(NULL),  m_progressBar(NULL),
+      m_statusText(NULL),          m_scanProgressText(NULL),
+      m_signalLockedText(NULL),    m_signalStrengthText(NULL),
+      m_signalNoiseText(NULL),     m_rotatorPositionText(NULL),
+      m_progressText(NULL),        m_log(NULL)
 {
 }
 
@@ -58,41 +60,57 @@ bool ChannelScannerGUIScanPane::Create()
     }
 
     bool error = false;
-    UIUtilE::Assign(this, sta, "status", &error);
-    UIUtilE::Assign(this, log, "log", &error);
-    UIUtilE::Assign(this, progressBar, "scanprogress", &error);
+    UIUtilE::Assign(this, m_statusText, "status", &error);
+    UIUtilE::Assign(this, m_log, "log", &error);
 
+    UIUtilE::Assign(this, m_progressBar, "scanprogress", &error);
     if (error)
         return false;
 
+    // Percent done
+    UIUtilW::Assign(this, m_progressText, "progresstext");
+    // Found status
     UIUtilW::Assign(this, m_scanProgressText, "scanprogresstext");
-    UIUtilW::Assign(this, sl, "signallock");
-    if (sl)
-        sl->SetVisible(m_showSignalLock);
 
-    UIUtilW::Assign(this, pos, "rotorprogress");
-    if (pos)
+    UIUtilW::Assign(this, m_signalLockedText, "signallock");
+    if (m_signalLockedText)
+        m_signalLockedText->SetVisible(m_showSignalLock);
+
+    UIUtilW::Assign(this, m_rotatorPositionText, "rotorprogresstext");
+    if (m_rotatorPositionText)
+        m_rotatorPositionText->SetVisible(m_showRotorPos);
+
+    UIUtilW::Assign(this, m_rotatorPositionBar,  "rotorprogressbar");
+    if (m_rotatorPositionBar)
     {
-        pos->SetVisible(m_showRotorPos);
-        pos->SetTotal(65535);
+        m_rotatorPositionBar->SetVisible(m_showRotorPos);
+        m_rotatorPositionBar->SetTotal(65535);
     }
 
-    UIUtilW::Assign(this, ss, "signalstrength");
-    if (ss)
+    UIUtilW::Assign(this, m_signalStrengthText, "signalstrengthtext");
+    if (m_signalStrengthText)
+        m_signalStrengthText->SetVisible(m_showSignalStrength);
+
+    UIUtilW::Assign(this, m_signalStrengthBar,  "signalstrength");
+    if (m_signalStrengthBar)
     {
-        ss->SetVisible(m_showSignalStrength);
-        ss->SetTotal(65535);
+        m_signalStrengthBar->SetVisible(m_showSignalStrength);
+        m_signalStrengthBar->SetTotal(65535);
     }
 
-    UIUtilW::Assign(this, sn, "signalnoise");
-    if (sn)
+    UIUtilW::Assign(this, m_signalNoiseText, "signalnoisetext");
+    if (m_signalNoiseText)
+        m_signalNoiseText->SetVisible(m_showSignalNoise);
+
+    UIUtilW::Assign(this, m_signalNoiseBar,  "signalnoise");
+    if (m_signalNoiseBar)
     {
-        sn->SetVisible(m_showSignalNoise);
-        sn->SetTotal(65535);
+        m_signalNoiseBar->SetVisible(m_showSignalNoise);
+        m_signalNoiseBar->SetTotal(65535);
     }
 
-    sta->SetText(tr("Tuning"));
-    progressBar->SetTotal(65535);
+    m_statusText->SetText(tr("Tuning"));
+    m_progressBar->SetTotal(65535);
 
     MythUIButton *exitButton = NULL;
     UIUtilW::Assign(this, exitButton, "exit");
@@ -106,52 +124,63 @@ bool ChannelScannerGUIScanPane::Create()
 
 void ChannelScannerGUIScanPane::SetStatusRotorPosition(int value)
 {
-    if (pos)
-        pos->SetUsed(value);
+    if (m_rotatorPositionText)
+        m_rotatorPositionText->SetText(tr("%1%")
+                               .arg(static_cast<uint>(value * 100 / 65535)));
+    if (m_rotatorPositionBar)
+        m_rotatorPositionBar->SetUsed(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusSignalToNoise(int value)
 {
-    if (sn)
-        sn->SetUsed(value);
+    if (m_signalNoiseText)
+        m_signalNoiseText->SetText(tr("%1%")
+                               .arg(static_cast<uint>(value * 100 / 65535)));
+    if (m_signalNoiseBar)
+        m_signalNoiseBar->SetUsed(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusSignalStrength(int value)
 {
-    if (ss)
-        ss->SetUsed(value);
+    if (m_signalStrengthText)
+        m_signalStrengthText->SetText(tr("%1%")
+                               .arg(static_cast<uint>(value * 100 / 65535)));
+    if (m_signalStrengthBar)
+        m_signalStrengthBar->SetUsed(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusLock(int value)
 {
-    if (sl)
-        sl->SetText((value) ? tr("Locked") : tr("No Lock"));
+    if (m_signalLockedText)
+        m_signalLockedText->SetText((value) ? tr("Locked") : tr("No Lock"));
 }
 
 void ChannelScannerGUIScanPane::SetStatusText(const QString &value)
 {
-    if (sta)
-        sta->SetText(value);
+    if (m_statusText)
+        m_statusText->SetText(value);
 }
 
 void ChannelScannerGUIScanPane::SetStatusTitleText(const QString &value)
 {
-    QString msg = tr("Scan Progress %1").arg(value);
     if (m_scanProgressText)
-        m_scanProgressText->SetText(msg);
+        m_scanProgressText->SetText(tr("%1").arg(value));
 }
 
 void ChannelScannerGUIScanPane::AppendLine(const QString &text)
 {
-    if (log)
+    if (m_log)
     {
-        MythUIButtonListItem *listItem = new MythUIButtonListItem(log, text);
-        log->SetItemCurrent(listItem);
+        MythUIButtonListItem *listItem = new MythUIButtonListItem(m_log, text);
+        m_log->SetItemCurrent(listItem);
     }
 }
 
 void ChannelScannerGUIScanPane::SetScanProgress(double value)
 {
-    if (progressBar)
-        progressBar->SetUsed((uint)(value * 65535));
+    if (m_progressText)
+        m_progressText->SetText(tr("%1%")
+                               .arg(static_cast<uint>(value * 100)));
+    if (m_progressBar)
+        m_progressBar->SetUsed(static_cast<uint>(value * 65535));
 }

@@ -970,7 +970,7 @@
 
     <window name="channelscanner">
         <textarea name="title" from="basetextarea">
-            <area>0,0,100%,5%</area>
+            <area>0,30,100%,50</area>
             <font>baselarge</font>
             <align>allcenter</align>
             <case>upper</case>
@@ -978,57 +978,98 @@
         </textarea>
 
         <shape name="background">
-            <area>1%,14%,99%,87%</area>
+            <area>20,70,-20,-20</area>
             <type>roundbox</type>
             <cornerradius>10</cornerradius>
             <fill color="#000000" alpha="30" />
         </shape>
 
         <textarea name="status">
-            <area>3%,15%,40%,7%</area>
+            <area>25,80,40%,40</area>
             <font>basesmall</font>
             <align>left,vcenter</align>
             <template>Status: %1</template>
         </textarea>
 
+        <textarea name="scanprogresstext">
+            <area>50%,80,92%,30</area>
+            <font>basesmall</font>
+            <align>right,vcenter</align>
+        </textarea>
+
         <textarea name="signallock" from="status">
-            <area>3%,20%,32%,7%</area>
+            <area>25,120,32%,40</area>
             <template>Lock: %1</template>
         </textarea>
 
-        <textarea name="scanprogresstext">
-            <area>3%,27%,40%,8%</area>
+        <textarea name="progress_label">
+            <area>25,190,200,30</area>
             <font>basesmall</font>
             <align>left,vcenter</align>
             <value>Scan Progress</value>
         </textarea>
+        <textarea name="progresstext">
+            <area>230,190,49%,30</area>
+            <font>basesmall</font>
+            <align>left,vcenter</align>
+        </textarea>
         <progressbar name="scanprogress" from="smallprogressbar">
-            <position>3%,33%</position>
+            <position>30,225</position>
         </progressbar>
 
-        <textarea name="signalnoise_label" from="scanprogresstext" depends="signalnoise">
-            <area>3%,43%,40%,10%</area>
-            <value>Signal/Noise</value>
-        </textarea>
-        <progressbar name="signalnoise" from="scanprogress">
-            <position>3%,49%</position>
-        </progressbar>
+        <group name="noisegroup" depends="signalnoise">
+            <area>25,300,49%,200</area>
+            <textarea name="signalnoise_label">
+                <area>0,0,100%,30</area>
+                <align>left,vcenter</align>
+                <font>basesmall</font>
+                <value>Signal/Noise</value>
+            </textarea>
+            <textarea name="signalnoisetext">
+                <area>205,0,100%,30</area>
+                <font>basesmall</font>
+                <align>left,vcenter</align>
+            </textarea>
+            <progressbar name="signalnoise" from="smallprogressbar">
+                <position>5,35</position>
+            </progressbar>
+        </group>
 
-        <textarea name="signalstrength_label" from="signalnoise_label" depends="signalstrength">
-            <area>3%,59%,40%,14%</area>
-            <value>Signal Strength</value>
-        </textarea>
-        <progressbar name="signalstrength" from="scanprogress">
-            <position>3%,64%</position>
-        </progressbar>
+        <group name="strengthgroup" depends="signalstrength">
+            <area>25,400,49%,200</area>
+            <textarea name="signalstrength_label">
+                <area>0,0,100%,30</area>
+                <align>left,vcenter</align>
+                <font>basesmall</font>
+                <value>Signal Strength</value>
+            </textarea>
+            <textarea name="signalstrengthtext">
+                <area>205,0,100%,30</area>
+                <font>basesmall</font>
+                <align>left,vcenter</align>
+            </textarea>
+            <progressbar name="signalstrength" from="smallprogressbar">
+                <position>5,35</position>
+            </progressbar>
+        </group>
 
-        <textarea name="rotorprogress_label" from="signalnoise_label" depends="rotorprogress">
-            <area>3%,73%,40%,21%</area>
-            <value>Rotor Movement</value>
-        </textarea>
-        <progressbar name="rotorprogress" from="scanprogress">
-            <position>3%,79%</position>
-        </progressbar>
+        <group name="rotatorgroup" depends="rotorprogress">
+            <area>25,500,49%,200</area>
+            <textarea name="rotorprogress_label">
+                <area>0,0,100%,30</area>
+                <align>left,vcenter</align>
+                <font>basesmall</font>
+                <value>Rotor Movement</value>
+            </textarea>
+            <textarea name="rotatorprogresstext">
+                <area>205,0,100%,30</area>
+                <font>basesmall</font>
+                <align>left,vcenter</align>
+            </textarea>
+            <progressbar name="rotorprogress" from="smallprogressbar">
+                <position>5,35</position>
+            </progressbar>
+        </group>
 
         <buttonlist name="log" from="basebuttonlist">
             <area>50%,19%,92%,79%</area>

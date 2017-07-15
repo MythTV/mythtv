@@ -67,15 +67,21 @@ class ChannelScannerGUIScanPane : public MythScreenType
     bool m_showSignalStrength;
     bool m_showSignalNoise;
     bool m_showRotorPos;
-    MythUIButtonList  *log;
-    MythUIProgressBar *ss;
-    MythUIProgressBar *sn;
-    MythUIProgressBar *pos;
-    MythUIProgressBar *progressBar;
 
-    MythUIText *sl;
-    MythUIText *sta;
+    MythUIProgressBar *m_signalStrengthBar;
+    MythUIProgressBar *m_signalNoiseBar;
+    MythUIProgressBar *m_rotatorPositionBar;
+    MythUIProgressBar *m_progressBar;
+
+    MythUIText *m_statusText;
     MythUIText *m_scanProgressText;
+    MythUIText *m_signalLockedText;
+    MythUIText *m_signalStrengthText;
+    MythUIText *m_signalNoiseText;
+    MythUIText *m_rotatorPositionText;
+    MythUIText *m_progressText;
+
+    MythUIButtonList  *m_log;
 };
 
 #endif // _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
