@@ -46,7 +46,7 @@ Java style iterators that Qt also supports.
 
 In Qt 3.x and Qt 4.0 assignment of one Qt copy-on-write was
 not yet thread-safe. Because of this you will see a number of
-::detach() calls in MythTV code. These calls force a deep copy
+\::detach() calls in MythTV code. These calls force a deep copy
 to be made immediately and should either be removed or a comment
 should be added in the rare case where this is done as an
 optimization and not just a hold-over from when copy-on-write 
@@ -65,49 +65,53 @@ There are also a few simple \ref testing "testing shortcuts".
 %MythTV is divided up into over 20 libraries:
 <dl>
   <dt>\ref libmythbase "libmythbase"
-  <dd>Lowest-level %MythTV library. Used by the Plugins.
+      <dd>Lowest-level %MythTV library. Used by the Plugins.
 
       Contains the \ref database_subsystem "database",
       and network support code (used by the
       \ref myth_network_protocol "MythTV network protocol" and
       \ref lcd_subsystem "LCDproc interface").
 
-      This also contains some other basic functionality and classes which
-      are used by one or more of libmyth, libmythui and libmythtv.
+      This also contains some other basic functionality and classes
+      which are used by one or more of \ref libmyth "libmyth", \ref
+      libmythui "libmythui" and \ref libmythtv "libmythtv".
 
       Any changes to this library's ABI may trigger a MythTV binary version
       change because the plugins depend on it.
 
-  <dt>libmythui
-  <dd>Main user interface rendering library. Used by the Plugins.
+  <dt>\ref libmythui "libmythui"
+      <dd>Main user interface rendering library. Used by the Plugins.
 
       The mouse/touchscreen gesture, remote control
       (\ref lirc_subsystem "LIRC" and AppleRemote)
       and screen saver control code are also contained in this library.
 
-      This library depends on libmyth. Any changes to this library's ABI
-      may trigger a MythTV binary version change because the plugins depend on
-      it.
+      This library depends on \ref libmyth "libmyth". Any changes to
+      this library's ABI may trigger a MythTV binary version change
+      because the plugins depend on it.
 
-  <dt>libmythupnp            <dd>Simple uPnP (universal Plug and Play) support.
+  <dt>\ref libmythupnp "libmythupnp"
+      <dd>Simple uPnP (universal Plug and Play) support.
 
-      This library depends on libmythbase.
+      This library depends on \ref libmythbase "libmythbase".
 
-  <dt>libmyth                <dd>Core %MythTV library. Used by the Plugins.
+  <dt>\ref libmyth "libmyth"
+      <dd>Core %MythTV library. Used by the Plugins.
       The
       \ref audio_subsystem "audio",
-      language support,
+      \ref lang_supp language support,
       \ref plugin_arch "plugin manager",
       \ref myth_media "media manager",
       and some old UI widgets are implemented by libmyth.
 
-      This library depends on libav*, libmythbase, libmythui, libmythupnp,
+      This library depends on libav*, \ref libmythbase "libmythbase",
+      \ref libmythui "libmythui", \ref libmythupnp "libmythupnp",
       libsamplerate, libmythsoundtouch and libmythfreesurround.
 
       Any changes to this library's ABI may trigger a MythTV binary version
       change because the plugins depend on it.
 
-  <dt>libmythtv
+  <dt>\ref libmythtv "libmythtv"
       <dd>%MythTV %TV functionality library. Used by some Plugins.
       The
       \ref osd_subsystem "OSD",
@@ -135,7 +139,8 @@ There are also a few simple \ref testing "testing shortcuts".
 
       These libraries do not depend on any of our libraries.
 
-  <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
+  <dt>libmythmpeg2
+      <dd>Alternate MPEG-1/2 A/V decoding library.
       <a href="http://libmpeg2.sourceforge.net/">Documented externally</a>.
       This is offered as
       an option for software decoding of MPEG-1 and MPEG-2 files.
@@ -144,14 +149,16 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libsamplerate      <dd>Audio resampling library.
+  <dt>libsamplerate
+      <dd>Audio resampling library.
       <a href="http://www.mega-nerd.com/SRC/api.html">Documented Externally</a>.
       We use this to support different output sample rates than the sample
       rate used in the audio streams we play.
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythsoundtouch      <dd>Pitch preserving audio resampling library.
+  <dt>libmythsoundtouch
+      <dd>Pitch preserving audio resampling library.
       <a href="http://www.surina.net/soundtouch/">External Website</a>.
       We use this for the time-stretch feature.
 
@@ -163,16 +170,18 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library should not depend on any of our libraries.
 
-  <dt>libmythfreemheg        <dd>UK interactive %TV viewer.
+  <dt>libmythfreemheg
+      <dd>UK interactive %TV viewer.
 
       This library does not depend on any of our libraries.
 
   <dt>libmythfreesurround
-  <dd>Support for some multi-channel audio transforms.
+      <dd>Support for some multi-channel audio transforms.
 
       This library does not depend on any of our libraries.
 
-  <dt>libmythnvctrl          <dd>Interface between X-windows and NVidia drivers.
+  <dt>libmythnvctrl
+      <dd>Interface between X-windows and NVidia drivers.
 
       This library does not depend on any of our libraries.
 
@@ -294,6 +303,8 @@ from the database automagically when used in %MythTV's window classes.
 
 /** \defgroup recorder_subsystem    Recorder Subsystem
 
+\ingroup libmythtv
+
 TVRec is the main class for handling recording.
 It is passed a ProgramInfo for the current and next recordings,
 and in turn creates three main worker classes:
@@ -352,6 +363,8 @@ state changing commands should not be issued.
 
 /** \defgroup av_player_subsystem   A/V Player Subsystem
 
+\ingroup libmythtv
+
 TV is the main class for handling playback.
 It instantiates several important classes:
 <dl>
@@ -390,13 +403,39 @@ state changing commands should not be issued.
 
  */
 
+/** \defgroup audio_subsystem    Audio Subsystem
+    \ingroup libmyth
+    \todo No one is working on documenting the audio subsystem.
+*/
+
+/** \defgroup video_subsystem    Video Subsystem
+    \ingroup libmythtv
+    \todo No one is working on documenting the video subsystem.
+*/
+
+/** \defgroup osd_subsystem    OSD Subsystem
+    \ingroup libmythtv
+    \todo No one is working on documenting the osd subsystem.
+*/
+
+/** \defgroup lcd_subsystem    LCD Subsystem
+    \todo No one is working on documenting the lcd subsystem.
+*/
+
+/** \defgroup lirc_subsystem    LIRC Subsystem
+    \ingroup libmythui
+    \todo No one is working on documenting the lirc subsystem.
+*/
+
 /** \defgroup plugin_arch   Plugin Architecture
 
-MythPlugins are shared object files (<I>i.e.</I> libraries) which are loaded
-from a specific directory (<I>%e.g.</I> /usr/local/lib/mythtv/plugins).
+\ingroup libmyth
+
+MythPlugins are shared object files (_i.e._libraries) which are loaded
+from a specific directory (_%e.g._ /usr/local/lib/mythtv/plugins).
 Currently, all plugins are written in the C++ language, but there is nothing
 preventing other languages being used (the functions are in the C name space).
-
+c
 int mythplugin_init(const char *libversion); is invoked whenever mythfrontend
 is started. This typically handles upgrading any database records - it will be
 the first method called after a new version of the plugin has been installed.
@@ -494,6 +533,8 @@ no dvd PATH
  */
 
 /** \defgroup myth_media            MythTV Media Manager
+
+\ingroup libmyth
 
 The MythTV Media Manager is a thread in the frontend which looks for any
 changes to removable media, and sends events to any Frontend Plugins
@@ -639,7 +680,7 @@ to access these assets:
   <li>The new config.xml has replaced the old mysql.txt, and is loaded from
       GetConfDir() only. If not found, MythTV will attempt to discover the
       database credentials over UPnP from the master backend, falling back to
-      the compiled-in defaults of mythtv:mythtv@localhost/mythconverg. If no
+      the compiled-in defaults of mythtv:mythtv\@localhost/mythconverg. If no
       connection can be established, the necessary information is queried from
       the user.</li>
 </ol>
@@ -1006,5 +1047,25 @@ The shared libraries that the code base is split up into.
 
 /** \defgroup libmythbase    libmythbase
     \ingroup libraries
-Core MythTV library
+Core %MythTV library
+*/
+
+/** \defgroup libmythui    libmythui
+    \ingroup libraries
+%MythTV User Interface library
+*/
+
+/** \defgroup libmyth    libmyth
+    \ingroup libraries
+Core %MythTV library
+*/
+
+/** \defgroup libmythupnp    libmythupnp
+    \ingroup libraries
+%MythTV Universal Plug-n-Play library
+*/
+
+/** \defgroup libmythtv    libmythtv
+    \ingroup libraries
+%MythTV $TV functionality library
 */
