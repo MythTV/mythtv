@@ -68,7 +68,7 @@ class LyricsFetcher:
             return False
 
         req.close()
-        matchcode = re.search('div class="lyrics".*?">(.*?)</div', response, flags=re.DOTALL)
+        matchcode = re.search('<div class="lyrics">(.*?)</div>', response, flags=re.DOTALL)
 
         try:
             lyricscode = (matchcode.group(1))
