@@ -25,7 +25,7 @@ else:
 __author__      = "Paul Harrison and ronie'"
 __title__       = "Genius"
 __description__ = "Search http://www.genius.com for lyrics"
-__priority__    = "210"
+__priority__    = "160"
 __version__     = "0.1"
 __syncronized__ = False
 

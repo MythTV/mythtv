@@ -247,6 +247,8 @@ def buildVersion():
     sys.exit(0)
 
 def main():
+    global debug
+
     parser = OptionParser()
 
     parser.add_option('-v', "--version", action="store_true", default=False,

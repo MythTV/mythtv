@@ -87,16 +87,18 @@ Options:
 
 
 
-Current Grabbers And Their Priority
-===================================
+Current Grabbers, Their Priority And Whether Synchronized
+=========================================================
 
-EmbeddedLyrics 100
-FileLyrics     105
-TTPlayer       110
-Baidu          120
-GomAudio       135
-Lyrdb          150
-LyricsWiki     200
-Genius         210
-LyricsMode     220
-DarkLyrics     230
+EmbeddedLyrics 100  Yes/No
+FileLyrics     105  Yes/No
+TTPlayer       110  Yes
+Alsong         120  Yes
+LetsSingIt     130  No
+LyricsCom      140  No
+LyricsWiki     150  No
+Genius         160  No
+LyricsMode     170  No
+DarkLyrics     180  No
+GomAudio       200  Yes
+Baidu          210  Yes
