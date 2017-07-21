@@ -30,6 +30,7 @@
 #include "datacontracts/recRule.h"
 #include "datacontracts/artworkInfoList.h"
 #include "datacontracts/videoMetadataInfo.h"
+#include "datacontracts/musicMetadataInfo.h"
 #include "datacontracts/channelGroup.h"
 #include "datacontracts/input.h"
 #include "datacontracts/castMemberList.h"
@@ -43,6 +44,7 @@
 #include "inputinfo.h"
 #include "channelinfo.h"
 #include "recordinginfo.h"
+#include "musicmetadata.h"
 
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
@@ -73,6 +75,9 @@ void FillVideoMetadataInfo (
                       DTC::VideoMetadataInfo *pVideoMetadataInfo,
                       VideoMetadataListManager::VideoMetadataPtr pMetadata,
                       bool          bDetails);
+
+void FillMusicMetadataInfo (DTC::MusicMetadataInfo *pVideoMetadataInfo,
+                            MusicMetadata *pMetadata, bool bDetails);
 
 void FillInputInfo( DTC::Input *input, InputInfo inputInfo);
 

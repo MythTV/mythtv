@@ -466,6 +466,35 @@ void FillVideoMetadataInfo (
 //
 /////////////////////////////////////////////////////////////////////////////
 
+void FillMusicMetadataInfo (DTC::MusicMetadataInfo *pVideoMetadataInfo,
+                            MusicMetadata *pMetadata, bool bDetails)
+{
+    pVideoMetadataInfo->setId(pMetadata->ID());
+    pVideoMetadataInfo->setArtist(pMetadata->Artist());
+    pVideoMetadataInfo->setCompilationArtist(pMetadata->CompilationArtist());
+    pVideoMetadataInfo->setAlbum(pMetadata->Album());
+    pVideoMetadataInfo->setTitle(pMetadata->Title());
+    pVideoMetadataInfo->setTrackNo(pMetadata->Track());
+    pVideoMetadataInfo->setGenre(pMetadata->Genre());
+    pVideoMetadataInfo->setYear(pMetadata->Year());
+    pVideoMetadataInfo->setPlayCount(pMetadata->PlayCount());
+    pVideoMetadataInfo->setLength(pMetadata->Length());
+    pVideoMetadataInfo->setRating(pMetadata->Rating());
+    pVideoMetadataInfo->setFileName(pMetadata->Filename());
+    pVideoMetadataInfo->setHostName(pMetadata->Hostname());
+    pVideoMetadataInfo->setLastPlayed(pMetadata->LastPlay());
+    pVideoMetadataInfo->setCompilation(pMetadata->Compilation());
+
+    if (bDetails)
+    {
+        //TODO add coverart here
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 void FillInputInfo(DTC::Input* input, InputInfo inputInfo)
 {
     input->setId(inputInfo.inputid);
