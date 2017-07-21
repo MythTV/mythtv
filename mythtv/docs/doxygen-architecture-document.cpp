@@ -1,5 +1,5 @@
 /**
-\mainpage MythTV Architecture
+\mainpage %MythTV Architecture
 
 \section intro Introduction
 
@@ -36,7 +36,7 @@ a modifiable reference into the container an actual copy is
 made. This means you can return one of these containers efficiently
 from a function without needing C++11 support. This also means
 these containers are a bit less efficient than their STL equivalents
-most of the time. We still prefer them in MythTV code, especially
+most of the time. We still prefer them in %MythTV code, especially
 QString due to the extensive i18n support in Qt. QList is actually
 equivalent to an STL deque. We also use the STL style iterators. This
 is both because it makes it easier to switch to an STL container in
@@ -46,7 +46,7 @@ Java style iterators that Qt also supports.
 
 In Qt 3.x and Qt 4.0 assignment of one Qt copy-on-write was
 not yet thread-safe. Because of this you will see a number of
-\::detach() calls in MythTV code. These calls force a deep copy
+\::detach() calls in %MythTV code. These calls force a deep copy
 to be made immediately and should either be removed or a comment
 should be added in the rare case where this is done as an
 optimization and not just a hold-over from when copy-on-write 
@@ -76,7 +76,7 @@ There are also a few simple \ref testing "testing shortcuts".
       which are used by one or more of \ref libmyth "libmyth", \ref
       libmythui "libmythui" and \ref libmythtv "libmythtv".
 
-      Any changes to this library's ABI may trigger a MythTV binary version
+      Any changes to this library's ABI may trigger a %MythTV binary version
       change because the plugins depend on it.
 
   <dt>\ref libmythui "libmythui"
@@ -87,7 +87,7 @@ There are also a few simple \ref testing "testing shortcuts".
       and screen saver control code are also contained in this library.
 
       This library depends on \ref libmyth "libmyth". Any changes to
-      this library's ABI may trigger a MythTV binary version change
+      this library's ABI may trigger a %MythTV binary version change
       because the plugins depend on it.
 
   <dt>\ref libmythupnp "libmythupnp"
@@ -108,7 +108,7 @@ There are also a few simple \ref testing "testing shortcuts".
       \ref libmythui "libmythui", \ref libmythupnp "libmythupnp",
       libsamplerate, libmythsoundtouch and libmythfreesurround.
 
-      Any changes to this library's ABI may trigger a MythTV binary version
+      Any changes to this library's ABI may trigger a %MythTV binary version
       change because the plugins depend on it.
 
   <dt>\ref libmythtv "libmythtv"
@@ -121,7 +121,7 @@ There are also a few simple \ref testing "testing shortcuts".
       This library basically depends on all the other libraries!
 
       This library is used by some plugins so changes to it's ABI may
-      require a MythTV binary version change.
+      require a %MythTV binary version change.
 
       Any changes to classes that are serialized by the
       \ref myth_network_protocol "MythTV network protocol" (for example
@@ -247,10 +247,10 @@ The database schema is documented \ref db_schema "here".
   <dt>mythcommflag     <dd>This is used internally by mythfrontend to flag
                            commercials. It can also be used to repair keyframe
                            maps for recordings.
-  <dt>mythlcdserver    <dd>This is an interface between a number of Myth
+  <dt>mythlcdserver    <dd>This is an interface between a number of %Myth
                            clients and a small text display (LCDProc server).
   <dt>mythwelcome/mythshutdown
-      <dd>These programs manage Power Saving (shutdown/wakeup) on your MythTV
+      <dd>These programs manage Power Saving (shutdown/wakeup) on your %MythTV
           PCs.
   <dt>mythlogserver
       <dd>A tool that records log messages from a number of other myth
@@ -268,7 +268,7 @@ The database schema is documented \ref db_schema "here".
   <dt>mythmusic   <dd>A simple music player for your %TV.
   <dt>mythnews    <dd>Browses RSS news feeds.
   <dt>mythweather <dd>Presents your local weather report.
-  <dt>mythzoneminder<dd>Video surveilance system interface.
+  <dt>mythzoneminder<dd>%Video surveilance system interface.
 </dl>
 
 \section assoc_applications Associated Applications
@@ -536,7 +536,7 @@ no dvd PATH
 
 \ingroup libmyth
 
-The MythTV Media Manager is a thread in the frontend which looks for any
+The %MythTV Media Manager is a thread in the frontend which looks for any
 changes to removable media, and sends events to any Frontend Plugins
 which are interested in that media.
 
@@ -574,7 +574,7 @@ NOTMOUNTED
 
 /** \defgroup myth_network_protocol MythTV Network Protocol
 
-The MythTV backend process currently opens sockets for three different types
+The %MythTV backend process currently opens sockets for three different types
 of commands; a custom protocol (by default at port 6543),
 an HTML server (by default <A HREF="http://127.0.0.1:6544/Status">
 http://127.0.0.1:6544/Status
@@ -605,7 +605,7 @@ Any 64 bit numbers are represented as a stringlist of two 32bit words
 
 \section commands Commands
 
-There are three main types of networking interactions in MythTV;
+There are three main types of networking interactions in %MythTV;
 identification commands (which tell the backend about this client),
 query commands that are sent to the master backend
 (<I>%e.g.</I> listing recordings or viewing guide data), and
@@ -623,7 +623,7 @@ For a full understanding of all the commands, either read the source code
 
 /** \defgroup myth_startup MythTV Startup Sequence
 
-Most MythTV programs follow a common sequence:
+Most %MythTV programs follow a common sequence:
 <ol>
   <li>Process (parse) command-line arguments</li>
   <li>Create a MythContext object (which contains a MythCoreContext object
@@ -678,7 +678,7 @@ to access these assets:
       or $HOME/.mythtv</li>
 
   <li>The new config.xml has replaced the old mysql.txt, and is loaded from
-      GetConfDir() only. If not found, MythTV will attempt to discover the
+      GetConfDir() only. If not found, %MythTV will attempt to discover the
       database credentials over UPnP from the master backend, falling back to
       the compiled-in defaults of mythtv:mythtv\@localhost/mythconverg. If no
       connection can be established, the necessary information is queried from
@@ -721,7 +721,7 @@ the files in i18n/i18n.pro
 
 \section lang_menu Menus
 
-The XML files that define the menus in MythTV also
+The XML files that define the menus in %MythTV also
 have translations of the menu button labels. See:
 \verbatim
 mythtv/programs/*/*.xml
