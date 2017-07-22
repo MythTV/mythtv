@@ -633,12 +633,12 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
 
     row[0]    = new GroupSetting();
     cmp[0]    = new TransMythUIComboBoxSetting();
-    width[0]  = new TransMythUISpinBoxSetting(0, 1920, 64, true);
-    height[0] = new TransMythUISpinBoxSetting(0, 1088, 64, true);
+    width[0]  = new TransMythUISpinBoxSetting(0, 1920, 8, 8);
+    height[0] = new TransMythUISpinBoxSetting(0, 1080, 8, 8);
     row[1]    = new GroupSetting();
     cmp[1]    = new TransMythUIComboBoxSetting();
-    width[1]  = new TransMythUISpinBoxSetting(0, 1920, 64, true);
-    height[1] = new TransMythUISpinBoxSetting(0, 1088, 64, true);
+    width[1]  = new TransMythUISpinBoxSetting(0, 1920, 8, 8);
+    height[1] = new TransMythUISpinBoxSetting(0, 1080, 8, 8);
     decoder   = new TransMythUIComboBoxSetting();
     max_cpus  = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
     skiploop  = new TransMythUICheckBoxSetting();

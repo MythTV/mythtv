@@ -296,14 +296,18 @@ class MPUBLIC MythUISpinBoxSetting : public StandardSetting
     virtual void updateButton(MythUIButtonListItem *item);
 
   protected:
+    // MythUISpinBoxSetting(Storage *_storage, int min, int max, int step,
+    //                      bool allow_single_step = false,
+    //                      const QString &special_value_text = QString());
+
     MythUISpinBoxSetting(Storage *_storage, int min, int max, int step,
-                         bool allow_single_step = false,
+                         int pageMultiple = 8,
                          const QString &special_value_text = QString());
   private:
     int m_min;
     int m_max;
     int m_step;
-    bool m_allow_single_step;
+    int m_pageMultiple;
     QString m_special_value_text;
 };
 
@@ -311,9 +315,9 @@ class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     TransMythUISpinBoxSetting(int min, int max, int step,
-                              bool allow_single_step = false,
+                              int pageMultiple = 5,
                               const QString &special_value_text = QString()) :
-        MythUISpinBoxSetting(NULL, min, max, step, allow_single_step,
+        MythUISpinBoxSetting(NULL, min, max, step, pageMultiple,
                              special_value_text)
     { }
 };
@@ -322,10 +326,10 @@ class MPUBLIC HostSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     HostSpinBoxSetting(const QString &name, int min, int max, int step,
-                       bool allow_single_step = false,
+                       int pageMultiple = 8,
                        const QString &special_value_text = QString()) :
         MythUISpinBoxSetting(new HostDBStorage(this, name), min, max, step,
-                             allow_single_step, special_value_text)
+                             pageMultiple, special_value_text)
     { }
 };
 
@@ -333,10 +337,10 @@ class MPUBLIC GlobalSpinBoxSetting: public MythUISpinBoxSetting
 {
   public:
     GlobalSpinBoxSetting(const QString &name, int min, int max, int step,
-                         bool allow_single_step = false,
+                         int pageMultiple = 8,
                          const QString &special_value_text = QString()) :
         MythUISpinBoxSetting(new GlobalDBStorage(this, name), min, max, step,
-                             allow_single_step, special_value_text)
+                             pageMultiple, special_value_text)
     { }
 };
 
