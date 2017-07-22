@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pl_PL">
+<TS version="2.0" language="pl_PL">
 <context>
     <name>(ArchiveUtils)</name>
     <message>
@@ -14,19 +14,19 @@ Czy wprowadziłeś poprawną ścieżkę ?</translation>
 <context>
     <name>(MythArchiveMain)</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="93"/>
+        <location filename="../mytharchive/main.cpp" line="94"/>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
         <translation>Znaleziono zablokowany plik ale nie znaleziono procesu który go zablokował.
 Usuwam blokadę.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="212"/>
+        <location filename="../mytharchive/main.cpp" line="213"/>
         <source>Last run did not create a playable DVD.</source>
         <translation>Poprzednie uruchomienie nie utworzyło poprawnej płyty DVD.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="219"/>
+        <location filename="../mytharchive/main.cpp" line="220"/>
         <source>Last run failed to create a DVD.</source>
         <translation>Podczas poprzedniego uruchomienia nie udało się utworzyć płyty DVD.</translation>
     </message>
@@ -57,333 +57,335 @@ Usuwam blokadę.</translation>
         <translation>Lokalizacja gdzie dędą tworzone pliki tymczasowe. Wymagana duża ilość wolnego miejsca.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="33"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="35"/>
         <source>MythArchive Share Directory</source>
         <translation>Katalog współdzielony dla MythArchive</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="36"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="38"/>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
         <translation>Miejsce gdzie MythArchive będzie składował skrypty, pliki intro dla filmów oraz skórki archiwum</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="46"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="50"/>
         <source>Video format</source>
         <translation>Format video</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="51"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="55"/>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
         <translation>Format video do zapisu na DVD: PAL lub NTSC.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="60"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="64"/>
         <source>File Selector Filter</source>
         <translation>Wybór plików</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="63"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="67"/>
         <source>The file name filter to use in the file selector.</source>
         <translation>Filtr używany podczas wybierania plików.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="72"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="76"/>
         <source>Location of DVD</source>
         <translation>Lokalizacja DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="75"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="79"/>
         <source>Which DVD drive to use when burning discs.</source>
         <translation>Który napęd DVD będzie nagrywał.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="84"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="89"/>
         <source>DVD Drive Write Speed</source>
         <translation>Prędkość nagrywania DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="87"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="92"/>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
         <translation>Prędkość nagrywania DVD. Ustaw 0 aby growisofs wybierało automatycznie największą możliwą szybkość. </translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="98"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="103"/>
         <source>Command to play DVD</source>
         <translation>Komenda dla odtwarzania DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="101"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="106"/>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
         <translation>Rozkaz używany podczas testowego odtwarzania nagranej płyty DVD. &apos;internal&quot; będzie wykorzystywało wewnętrzny odtwarzacz MythTV. %f zostanie zastąpione ścieżką do wygenerowanej struktury DVD n.p. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="114"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="119"/>
         <source>Copy remote files</source>
         <translation>Kopiuj sieciowe pliki</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="117"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="122"/>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
         <translation>Jeśli ustawione, pliki na sieciowych systemach plików będą nadpisywały pliki z lokalnych systemów plików. Przyśpiesza generowanie płyt DVD oraz redukuje pasmo sieciowe </translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="129"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="134"/>
         <source>Always Use Mythtranscode</source>
         <translation>Zawsze używaj Mythtranscode </translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="132"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="137"/>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
         <translation>Jeśli zaznaczone, pliki MPEG2 będą zawsze przetwarzane przez mythtranscode. Pozwala to na usunięcie potencjalnych błędów w plikach MPEG2 i audio. Ustawienie ignorowane gdy ustawienie &apos;Wykorzystuj ProjectX&apos; jest ustawione.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="144"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="149"/>
         <source>Use ProjectX</source>
         <translation>Wykorzystuj ProjectX </translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="147"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="152"/>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
         <translation>Jeśli zaznaczone, wycinanie reklam oraz dzielenie plików MPEG2 będzie bazowało na ProjectX zamais na mythtranscode/mythreplex.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="158"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="163"/>
         <source>Use FIFOs</source>
         <translation>Używaj kolejek FIFO </translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="161"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="166"/>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
         <translation>Skrypt będzie używał kolejek FIFO do przekazywania danych z mplex do dvdauthor. Skraca to czas oraz zmniejsza wymagania na przestrzeń dyskową ale nie jest wspierane na platfomie Windows</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="174"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="179"/>
         <source>Add Subtitles</source>
         <translation>Dodawaj Napisy</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="177"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="182"/>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
         <translation>Jeśli napisy są dostępne, opcja doda je do płyty DVD. Funkcja wynaga włączonej opcji &apos;Używaj ProjectX&apos;.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="187"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="192"/>
         <source>Main Menu Aspect Ratio</source>
         <translation>Proporcje dla Main Menu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="189"/>
-        <location filename="../mytharchive/archivesettings.cpp" line="205"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="194"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="210"/>
         <source>4:3</source>
         <comment>Aspect ratio</comment>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="190"/>
-        <location filename="../mytharchive/archivesettings.cpp" line="206"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="195"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="211"/>
         <source>16:9</source>
         <comment>Aspect ratio</comment>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="194"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="199"/>
         <source>Aspect ratio to use when creating the main menu.</source>
         <translation>Proporcje obrazu dla Main Menu.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="203"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="208"/>
         <source>Chapter Menu Aspect Ratio</source>
         <translation>Proporcje obrazu dla Menu Rozdziałów</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="207"/>
-        <location filename="../mytharchive/archivesettings.cpp" line="216"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="212"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="221"/>
         <source>Video</source>
         <translation>Video</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="212"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="217"/>
         <source>Aspect ratio to use when creating the chapter menu. &apos;%1&apos; means use the same aspect ratio as the associated video.</source>
         <extracomment>%1 is the translation of the &quot;Video&quot; combo box choice</extracomment>
         <translation>Proporcje dla menu rozdziałów. &apos;%1&apos; oznacza użycie tych samych proporcji jakie ma video.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="223"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="228"/>
         <source>Date format</source>
         <translation>Format daty</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="226"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="231"/>
         <source>Samples are shown using today&apos;s date.</source>
         <translation>Przykłady używają dzisiejszej daty.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="232"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="237"/>
         <source>Samples are shown using tomorrow&apos;s date.</source>
         <translation>Przykłady używają jutrzejszej daty.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="250"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="255"/>
         <source>Your preferred date format to use on DVD menus. %1</source>
         <extracomment>%1 gives additional info on the date used</extracomment>
         <translation>Preferowany format daty w Menu DVD. %1</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="259"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="264"/>
         <source>Time format</source>
         <translation>Format czasu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="266"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="271"/>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
         <translation>Preferowany format czasu wyświetlany na Menu DVD. Jeśli nie wybierzesz &apos;AM lub &apos;PM&apos; - będzie wyświetlany format 24-godzinny.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="277"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="282"/>
         <source>Default Encoder Profile</source>
         <translation>Domyślny Profil Enkodera</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="279"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="284"/>
         <source>HQ</source>
         <comment>Encoder profile</comment>
         <translation>HQ</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="280"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="285"/>
         <source>SP</source>
         <comment>Encoder profile</comment>
         <translation>SP</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="281"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="286"/>
         <source>LP</source>
         <comment>Encoder profile</comment>
         <translation>LP</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="282"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="287"/>
         <source>EP</source>
         <comment>Encoder profile</comment>
         <translation>EP</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="286"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="291"/>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
         <translation>Domyślny profil używany w sytuacji gdy plik wymaga re-enkodowania.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="295"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="300"/>
         <source>mplex Command</source>
         <translation>Komenda uruchaamiająca mplex</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="299"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="304"/>
         <source>Command to run mplex</source>
         <translation>Komenda uruchamiająca program &apos;mplex&apos;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="308"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="313"/>
         <source>dvdauthor command</source>
         <translation>Komenda dvdauthor</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="312"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="317"/>
         <source>Command to run dvdauthor.</source>
         <translation>Rozkaz który uruchamia program dvdauthor.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="321"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="326"/>
         <source>mkisofs command</source>
         <translation>Komenda mkisofs</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="325"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="330"/>
         <source>Command to run mkisofs. (Used to create ISO images)</source>
         <translation>Rozkaz uruchamiający &apos;mkisofs&apos;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="334"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="339"/>
         <source>growisofs command</source>
         <translation>Komenda growisofs</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="338"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="343"/>
         <source>Command to run growisofs. (Used to burn DVDs)</source>
         <translation>Rozkaz uruchamiający growisofs. (Wypalanie płyty DVD)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="347"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="352"/>
         <source>M2VRequantiser command</source>
         <translation>Komenda M2VRequantise</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="351"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="356"/>
         <source>Command to run M2VRequantiser. Optional - leave blank if you don&apos;t have M2VRequantiser installed.</source>
         <translation>Rozkaz uruchamiający &apos;M2VRequantise&apos;. Jest opcjonalny. Pozostaw puste jeśli nie używasz M2VRequantise.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="361"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="366"/>
         <source>jpeg2yuv command</source>
         <translation>Komenda jpeg2yuv</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="365"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="370"/>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
         <translation>Rozkaz uruchamiający &apos;jpeg2yuv&apos;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="374"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="379"/>
         <source>spumux command</source>
         <translation>Komenda spumux</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="378"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="383"/>
         <source>Command to run spumux. Part of dvdauthor package</source>
         <translation>Rozkaz uruchamiający &apos;spumux&apos;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="387"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="392"/>
         <source>mpeg2enc command</source>
         <translation>Komenda mpeg2enc</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="391"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="396"/>
         <source>Command to run mpeg2enc. Part of mjpegtools package</source>
         <translation>Rozkaz uruchamiający mpeg2enc&apos;</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="400"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="405"/>
         <source>projectx command</source>
         <translation>Komenda projectx</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="404"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="409"/>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
         <translation>Rozkaz uruchamiający ProjectX. ProjectX będzie używany do wycinana reklam, dzielenia plików MPEG2. Zastępuje &apos;mythtranscode&apos; and &apos;mythreplex&apos;.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="414"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="418"/>
         <source>MythArchive Settings</source>
         <translation>Ustawienia MythArchive 1/2</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="425"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="442"/>
+        <source>MythArchive External Commands</source>
+        <translation>Polecenia dla zewnętrznych programóiw MythArchive</translation>
+    </message>
+    <message>
         <source>MythArchive Settings (2)</source>
         <translation>Ustawienia MythArchive 2/2</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="435"/>
+        <location filename="../mytharchive/archivesettings.cpp" line="434"/>
         <source>DVD Menu Settings</source>
         <translation>Ustawienia DVD Menu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="443"/>
         <source>MythArchive External Commands (1)</source>
         <translation>Polecenia dla zewnętrznych programóiw MythArchive 1/2</translation>
     </message>
     <message>
-        <location filename="../mytharchive/archivesettings.cpp" line="451"/>
         <source>MythArchive External Commands (2)</source>
         <translation>Polecenia dla zewnętrznych programóiw MythArchive 2/2</translation>
     </message>
@@ -744,37 +746,37 @@ To może potrwać trochę czasu.</translation>
 <context>
     <name>MythControls</name>
     <message>
-        <location filename="../mytharchive/main.cpp" line="336"/>
+        <location filename="../mytharchive/main.cpp" line="337"/>
         <source>Toggle use cut list state for selected program</source>
         <translation>Wł/Wył używanie listy edycji dla tego programu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="339"/>
+        <location filename="../mytharchive/main.cpp" line="340"/>
         <source>Create DVD</source>
         <translation>Utwórz DVD </translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="341"/>
+        <location filename="../mytharchive/main.cpp" line="342"/>
         <source>Create Archive</source>
         <translation>Utwórz Archiwum</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="343"/>
+        <location filename="../mytharchive/main.cpp" line="344"/>
         <source>Import Archive</source>
         <translation>Importuj Archiwum</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="345"/>
+        <location filename="../mytharchive/main.cpp" line="346"/>
         <source>View Archive Log</source>
         <translation>Zobacz Dziennik Zdarzeń</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="347"/>
+        <location filename="../mytharchive/main.cpp" line="348"/>
         <source>Play Created DVD</source>
         <translation>Odtwarzaj Utworzony DVD</translation>
     </message>
     <message>
-        <location filename="../mytharchive/main.cpp" line="349"/>
+        <location filename="../mytharchive/main.cpp" line="350"/>
         <source>Burn DVD</source>
         <translation>Nagraj DVD</translation>
     </message>
@@ -1821,17 +1823,17 @@ Proszę Czekać...</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="882"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="891"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="889"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="898"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Wyjdź, zapisz miniatury</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="890"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="899"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Wyjdź, nie zapisuj miniatur</translation>
     </message>
