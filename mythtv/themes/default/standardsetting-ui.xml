@@ -234,4 +234,35 @@
             <scroll direction="vertical" timeout="0"/>
         </textarea>
     </window>
+    <window name="terminal">
+        <buttonlist name="output" from="basebuttonlist">
+            <area>0,0,100%,90%</area>
+            <arrange>stack</arrange>
+            <align>left</align>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext">
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive">
+                    <textarea name="buttontext">
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedinactive">
+                    <textarea name="buttontext">
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+        <textedit name="textedit" from="basetextedit">
+            <position>0,90%</position>
+        </textedit>
+        <button name="enter" from="basebutton">
+            <position>80%,90%</position>
+            <value>Enter</value>
+        </button>
+    </window>
 </mythuitheme>
