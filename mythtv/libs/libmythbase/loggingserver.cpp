@@ -1009,15 +1009,15 @@ void LogServerThread::stop(void)
 /// \return TRUE on success, FALSE on failure
 ///
 /// \todo   Implement the following parameters to customise behaviour?...
-/// \param  logfile Filename of the logfile to create.  Empty if no file.
-/// \param  progress    non-zero if progress output will be sent to the console.
+/// \\param  logfile Filename of the logfile to create.  Empty if no file.
+/// \\param  progress    non-zero if progress output will be sent to the console.
 ///                     This squelches all messages less important than LOG_ERR
 ///                     on the console
-/// \param  quiet       quiet level requested (squelches all console output)
-/// \param  facility    Syslog facility to use.  -1 to disable syslog output
-/// \param  level       Minimum logging level to put into the logs
-/// \param  dblog       true if database logging is requested
-/// \param  propagate   true if the logfile path needs to be propagated to child
+/// \\param  quiet       quiet level requested (squelches all console output)
+/// \\param  facility    Syslog facility to use.  -1 to disable syslog output
+/// \\param  level       Minimum logging level to put into the logs
+/// \\param  dblog       true if database logging is requested
+/// \\param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
 bool logServerStart(void)
 {
