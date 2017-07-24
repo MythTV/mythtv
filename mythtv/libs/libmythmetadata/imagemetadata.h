@@ -104,7 +104,7 @@ public:
     //! Unique separator to delimit fields within a string
     static const QString kSeparator;
 
-    //! Encodes metadata into a string as <tag name><tag label><tag value>
+    //! Encodes metadata into a string as \<tag name\>\<tag label\>\<tag value\>
     static QString ToString(const QString &name, const QString &label, const QString &value)
     { return name % kSeparator % label % kSeparator % value; }
 

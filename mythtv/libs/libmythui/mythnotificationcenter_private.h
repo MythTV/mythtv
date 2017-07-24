@@ -81,7 +81,7 @@ public:
      */
     QDateTime ScreenExpiryTime(const MythScreenType *screen);
     /**
-     * Return true if ::Create() has been called on screen.
+     * Return true if \::Create() has been called on screen.
      * will always return true should screen not be a MythNotificationScreen
      */
     bool ScreenCreated(const MythScreenType *screen);
@@ -92,8 +92,8 @@ public:
      */
     void GetNotificationScreens(QList<MythScreenType*> &screens);
     /**
-     * Will call ::doInit() if the screen is a MythNotificationScreen and
-     * ::Create() has been called for it already
+     * Will call \::doInit() if the screen is a MythNotificationScreen and
+     * \::Create() has been called for it already
      */
     void UpdateScreen(MythScreenType *screen);
     /**

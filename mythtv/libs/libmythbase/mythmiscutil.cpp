@@ -831,7 +831,7 @@ bool MythRemoveDirectory(QDir &aDir)
  * \brief Get network proxy settings from OS, and use for [Q]Http[Comms]
  *
  * The HTTP_PROXY environment var. is parsed for values like; "proxy-host",
- * "proxy-host:8080", "http://host:8080" and "http"//user:password@host:1080",
+ * "proxy-host:8080", "http://host:8080" and "http"//user:password\@host:1080",
  * and that is used for any Qt-based Http fetches.
  * We also test connectivity here with ping and telnet, and warn if it fails.
  *
