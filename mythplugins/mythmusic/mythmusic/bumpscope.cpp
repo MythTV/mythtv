@@ -103,8 +103,8 @@ void BumpScope::blur_8(unsigned char *ptr, int w, int h, int bpl)
 {
     (void)w;
 
-    register unsigned int i, sum;
-    register unsigned char *iptr;
+    unsigned int i, sum;
+    unsigned char *iptr;
 
     iptr = ptr + bpl + 1;
     i = bpl * h;
