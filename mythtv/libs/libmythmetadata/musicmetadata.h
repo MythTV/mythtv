@@ -449,7 +449,6 @@ class META_PUBLIC AllMusic
 
     MetadataLoadingThread   *m_metadata_loader;
     bool                     m_done_loading;
-    int                      m_last_listed;
 
     int                      m_playcountMin;
     int                      m_playcountMax;
