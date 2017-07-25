@@ -52,7 +52,9 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     m_proginfo(pginfo),
     m_recProfile(new RecordingProfile("Transcoders")),
     keyframedist(30),
+#if CONFIG_LIBMP3LAME
     nvr(NULL),
+#endif
     ctx(NULL),
     outRingBuffer(NULL),
     fifow(NULL),
