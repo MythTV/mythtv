@@ -126,7 +126,7 @@ void FirewireSignalMonitor::HandlePMT(uint pnum, const ProgramMapTable *pmt)
 
     if (!HasFlags(kDTVSigMon_PATMatch))
     {
-        GetStreamData()->SetVersionPMT(pnum, -1,0);
+        GetStreamData()->SetVersionPMT(pnum, -1, 0);
         LOG(VB_CHANNEL, LOG_INFO, LOC + "HandlePMT() ignoring PMT");
         return;
     }

@@ -11,7 +11,7 @@
 using namespace std;
 
 // Qt
-#include <QMap>
+#include "qmap.h"
 
 #include "tspacket.h"
 #include "mythtimer.h"
@@ -92,10 +92,10 @@ typedef QMap<uint, PIDPriority> pid_map_t;
 class MTV_PUBLIC MPEGStreamData : public EITSource
 {
   public:
-    MPEGStreamData(int desiredProgram, int cardnum, bool cacheTables);
+    MPEGStreamData(int desiredProgram, int cardnum, bool cacheTableSections);
     virtual ~MPEGStreamData();
 
-    void SetCaching(bool cacheTables) { _cache_tables = cacheTables; }
+    void SetCaching(bool cacheTableSections) { _cache_tables = cacheTableSections; }
     void SetListeningDisabled(bool lt) { _listening_disabled = lt; }
 
     virtual void Reset(void) { Reset(-1); }
@@ -116,7 +116,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Table processin
     void SetIgnoreCRC(bool haveCRCbug) { _have_CRC_bug = haveCRCbug; }
-    virtual bool IsRedundant(uint pid, const PSIPTable&) const;
+    virtual bool IsRedundant(uint pid, const PSIPTable&);
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
@@ -166,6 +166,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     {
         _pat_status.SetVersion(tsid, version, last_section);
     }
+
     void SetVersionPMT(uint pnum, int version, uint last_section)
     {
         _pmt_status.SetVersion(pnum, version, last_section);
@@ -307,7 +308,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTableSection(PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
     void CacheCAT(const ConditionalAccessTable *pat);
     void CachePMT(const ProgramMapTable *pmt);

@@ -178,6 +178,10 @@ VERBOSE_MAP(VB_REFCOUNT,  0x20000000000ULL, true,
             "Reference Count messages")
 VERBOSE_MAP(VB_HTTP,  0x40000000000ULL, true,
             "HTTP Server messages")
+VERBOSE_MAP(VB_DVBSICACHE, 0x80000000000ULL, true,
+            "DVB SI table section cache related messages")
+VERBOSE_MAP(VB_TEMPDEBUG, 0x100000000000ULL, true,
+            "Temporary debugging")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE
@@ -204,14 +208,25 @@ typedef struct {
     bool        additive;
     QString     helpText;
 } VerboseDef;
-typedef QMap<QString, VerboseDef *> VerboseMap;
+
+typedef struct VMap : public QMap<QString, VerboseDef *>
+{
+    // Tidy up for heap debugging
+    ~VMap() { for (iterator i = begin(); i != end(); i++) delete *i; }
+} VerboseMap;
 
 typedef struct {
     int         value;
     QString     name;
     char        shortname;
 } LoglevelDef;
-typedef QMap<int, LoglevelDef *> LoglevelMap;
+
+typedef struct LLMap : public QMap<int, LoglevelDef *>
+{
+    // Tidy up for heap debugging
+    ~LLMap() { for (iterator i = begin(); i != end(); i++) delete *i; }
+} LoglevelMap;
+
 typedef QMap<uint64_t, LogLevel_t> ComponentLogLevelMap;
 
 extern VerboseMap verboseMap;

@@ -6,6 +6,10 @@
 #include "dvbtables.h"
 #include "dvbdescriptors.h"
 
+// Uncomment this for extra low level debug of the
+// DVB SI cache
+//#define DVBSICACHE_EXTRA_DEBUG
+
 void NetworkInformationTable::Parse(void) const
 {
     _tsc_ptr = pesdata() + 10 + NetworkDescriptorsLength();
@@ -18,7 +22,7 @@ void NetworkInformationTable::Parse(void) const
 
 QString NetworkInformationTable::toString(void) const
 {
-    QString str = QString("NIT: NetID(%1) tranports(%2)\n")
+    QString str = QString("NIT: NetID(%1) transports(%2)\n")
         .arg(NetworkID()).arg(TransportStreamCount());
     str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
         .arg(Section()).arg(LastSection()).arg(IsCurrent()));
@@ -90,7 +94,7 @@ bool NetworkInformationTable::Mutate(void)
         return false;
 }
 
-void ServiceDescriptionTable::Parse(void) const
+void ServiceDescriptionTableSection::Parse(void) const
 {
     _ptrs.clear();
     _ptrs.push_back(pesdata() + 11);
@@ -102,7 +106,7 @@ void ServiceDescriptionTable::Parse(void) const
     }
 }
 
-QString ServiceDescriptionTable::toString(void) const
+QString ServiceDescriptionTableSection::toString(void) const
 {
     QString str =
         QString("SDT: TSID(0x%1) original_network_id(0x%2) services(%3)\n")
@@ -135,7 +139,7 @@ QString ServiceDescriptionTable::toString(void) const
     return str;
 }
 
-ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
+ServiceDescriptor *ServiceDescriptionTableSection::GetServiceDescriptor(uint i) const
 {
     desc_list_t parsed =
         MPEGDescriptor::Parse(ServiceDescriptors(i),
@@ -150,7 +154,7 @@ ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
     return NULL;
 }
 
-bool ServiceDescriptionTable::Mutate(void)
+bool ServiceDescriptionTableSection::Mutate(void)
 {
     if (VerifyCRC())
     {
@@ -213,7 +217,48 @@ QString BouquetAssociationTable::toString(void) const
     return str;
 }
 
-void DVBEventInformationTable::Parse(void) const
+DVBEventInformationTableSection::DVBEventInformationTableSection(const PSIPTable& table) : PSIPTable(table)
+{
+    // table_id                 8   0.0       0xC7
+    assert(IsEIT(TableID()));
+    // section_syntax_indicator 1   1.0          1
+    // private_indicator        1   1.1          1
+    // reserved                 2   1.2          3
+    // section_length          12   1.4
+    // reserved                 2   5.0          3
+    // version_number           5   5.2
+    // current_next_indicator   1   5.7          1
+    // section_number           8   6.0
+    // last_section_number      8   7.0
+    Parse();
+#ifdef DVBSICACHE_EXTRA_DEBUG
+    LOG(VB_DVBSICACHE, LOG_DEBUG, QString(
+                        "Constructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
+                        .arg(OriginalNetworkID(),4,16)
+                        .arg(TSID(),4,16)
+                        .arg(ServiceID(),4,16)
+                        .arg(TableID(),2,16)
+                        .arg(Section())
+                        .arg(uint64_t(this),0,16));
+#endif // DVBSICACHE_EXTRA_DEBUG
+}
+
+DVBEventInformationTableSection::~DVBEventInformationTableSection()
+{
+#ifdef DVBSICACHE_EXTRA_DEBUG
+    LOG(VB_DVBSICACHE, LOG_DEBUG, QString(
+                        "Destructing eit section 0x%1/0x%2/0x%3/0x%4/%5 0x%6")
+                        .arg(OriginalNetworkID(),4,16)
+                        .arg(TSID(),4,16)
+                        .arg(ServiceID(),4,16)
+                        .arg(TableID(),2,16)
+                        .arg(Section())
+                        .arg(uint64_t(this),0,16));
+
+#endif // DVBSICACHE_EXTRA_DEBUG
+}
+
+void DVBEventInformationTableSection::Parse(void) const
 {
     _ptrs.clear();
     _ptrs.push_back(psipdata() + 6);
@@ -225,7 +270,7 @@ void DVBEventInformationTable::Parse(void) const
     }
 }
 
-bool DVBEventInformationTable::IsEIT(uint table_id)
+bool DVBEventInformationTableSection::IsEIT(uint table_id)
 {
     bool is_eit = false;
 

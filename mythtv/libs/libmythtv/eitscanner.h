@@ -46,7 +46,8 @@ class EITScanner : public QRunnable
   private:
     void TeardownAll(void);
     static void *SpawnEventLoop(void*);
-           void  RescheduleRecordings(void);
+    void  RescheduleRecordings(void);
+    bool HasIncompleteEITTables();
 
     QMutex           lock;
     ChannelBase     *channel;
@@ -65,14 +66,18 @@ class EITScanner : public QRunnable
     uint             activeScanTrigTime;
     QStringList      activeScanChannels;
     QStringList::iterator activeScanNextChan;
+    uint             secondsWaitedForIncompleteEITScheduleTables;
 
     uint             cardnum;
 
     static QMutex    resched_lock;
     static QDateTime resched_next_time;
 
-    /// Minumum number of seconds between reschedules.
-    static const uint kMinRescheduleInterval;
+    /// Incremental extra time to wait if any EIT Schedule tables are incomplete
+    /// after the normal per channel scan period has expired in an active scan.
+    static const uint kExtraSecondsToWaitForIncompleteEITScheduleTables;
+    /// Maximum extra time to wait if any EIT Schedule tables are incomplete.
+    static const uint kMaxExtraSecondsToWaitForIncompleteEITScheduleTables;
 };
 
 #endif // EITSCANNER_H

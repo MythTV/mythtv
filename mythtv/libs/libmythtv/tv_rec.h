@@ -249,6 +249,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     static TVRec *GetTVRec(uint inputid);
 
+    DTVSignalMonitor *GetDTVSignalMonitor(void);
+
     virtual void AllGood(void) { WakeEventLoop(); }
     virtual void StatusChannelTuned(const SignalMonitorValue&) { }
     virtual void StatusSignalLock(const SignalMonitorValue&) { }
@@ -284,7 +286,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
         bool enable_table_monitoring, bool EITscan, bool notify);
     bool SetupDTVSignalMonitor(bool EITscan);
     void TeardownSignalMonitor(void);
-    DTVSignalMonitor *GetDTVSignalMonitor(void);
 
     bool HasFlags(uint f) const { return (stateFlags & f) == f; }
     void SetFlags(uint f, const QString & file, int line);

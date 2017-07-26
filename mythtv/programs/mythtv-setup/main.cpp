@@ -312,7 +312,12 @@ int main(int argc, char *argv[])
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
 #endif
-    new QApplication(argc, argv, use_display);
+
+    if (use_display)
+        new QApplication(argc, argv);
+    else
+        new QCoreApplication(argc, argv);
+
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHTV_SETUP);
 
 #ifndef _WIN32

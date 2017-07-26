@@ -8,7 +8,7 @@ using namespace std;
 #include <sys/time.h> // for gettimeofday
 
 // Qt headers
-#include <QString>
+#include "qstring.h"
 
 // MythTV headers
 #include "mpegstreamdata.h"
@@ -33,10 +33,10 @@ using namespace std;
  *
  *  \param desiredProgram If you want rewritten PAT and PMTs, for
  *                        a desired program set this to a value > -1
- *  \param cacheTables    If true PAT and PMT tables will be cached
+ *  \param cacheTableSections If true psip sections PAT and PMT tables will be cached
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
-                               bool cacheTables)
+                               bool cacheTableSections)
     : _cardid(cardnum),
       _sistandard("mpeg"),
       _have_CRC_bug(false),
@@ -45,7 +45,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
       _eit_helper(NULL), _eit_rate(0.0f),
       _listening_disabled(false),
       _encryption_lock(QMutex::Recursive), _listener_lock(QMutex::Recursive),
-      _cache_tables(cacheTables), _cache_lock(QMutex::Recursive),
+      _cache_tables(cacheTableSections), _cache_lock(QMutex::Recursive),
       // Single program stuff
       _desired_program(desiredProgram),
       _recording_type("all"),
@@ -177,17 +177,17 @@ void MPEGStreamData::Reset(int desiredProgram)
 
         pat_cache_t::iterator it1 = _cached_pats.begin();
         for (; it1 != _cached_pats.end(); ++it1)
-            DeleteCachedTable(*it1);
+            DeleteCachedTableSection(*it1);
         _cached_pats.clear();
 
         pmt_cache_t::iterator it2 = _cached_pmts.begin();
         for (; it2 != _cached_pmts.end(); ++it2)
-            DeleteCachedTable(*it2);
+            DeleteCachedTableSection(*it2);
         _cached_pmts.clear();
 
         cat_cache_t::iterator it3 = _cached_cats.begin();
         for (; it3 != _cached_cats.end(); ++it3)
-            DeleteCachedTable(*it3);
+            DeleteCachedTableSection(*it3);
         _cached_cats.clear();
     }
 
@@ -657,10 +657,10 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     return true;
 }
 
-/** \fn MPEGStreamData::IsRedundant(uint pid, const PSIPTable&) const
+/** \fn MPEGStreamData::IsRedundant(uint pid, const PSIPTable&)
  *  \brief Returns true if table already seen.
  */
-bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
+bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip)
 {
     (void) pid;
     const int table_id = psip.TableID();
@@ -668,17 +668,20 @@ bool MPEGStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 
     if (TableID::PAT == table_id)
     {
-        return _pat_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
+        return _pat_status.IsSectionSeen(psip.TableIDExtension(),
+                                        version, psip.Section());
     }
 
     if (TableID::CAT == table_id)
     {
-        return _cat_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
+        return _cat_status.IsSectionSeen(psip.TableIDExtension(),
+                                        version, psip.Section());
     }
 
     if (TableID::PMT == table_id)
     {
-        return _pmt_status.IsSectionSeen(psip.TableIDExtension(), version, psip.Section());
+        return _pmt_status.IsSectionSeen(psip.TableIDExtension(),
+                                        version, psip.Section());
     }
 
     return false;
@@ -699,7 +702,8 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::PAT:
         {
             uint tsid = psip.TableIDExtension();
-            _pat_status.SetSectionSeen(tsid, version,  psip.Section(), psip.LastSection());
+            _pat_status.SetSectionSeen(tsid, version,  psip.Section(),
+                                       psip.LastSection());
 
             ProgramAssociationTable pat(psip);
 
@@ -713,7 +717,8 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::CAT:
         {
             uint tsid = psip.TableIDExtension();
-            _cat_status.SetSectionSeen(tsid, version, psip.Section(), psip.LastSection());
+            _cat_status.SetSectionSeen(tsid, version, psip.Section(),
+                                       psip.LastSection());
 
             ConditionalAccessTable cat(psip);
 
@@ -727,7 +732,8 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         case TableID::PMT:
         {
             uint prog_num = psip.TableIDExtension();
-            _pmt_status.SetSectionSeen(prog_num, version, psip.Section(), psip.LastSection());
+            _pmt_status.SetSectionSeen(prog_num, version, psip.Section(),
+                                       psip.LastSection());
 
             ProgramMapTable pmt(psip);
 
@@ -1465,7 +1471,7 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
         psip_refcnt_map_t::iterator it;
         it = _cached_slated_for_deletion.find(psip);
         if (it != _cached_slated_for_deletion.end())
-            DeleteCachedTable(const_cast<PSIPTable*>(psip));
+            DeleteCachedTableSection(const_cast<PSIPTable*>(psip));
     }
 }
 
@@ -1517,7 +1523,7 @@ void MPEGStreamData::IncrementRefCnt(const PSIPTable *psip) const
     _cached_ref_cnt[psip] = _cached_ref_cnt[psip] + 1;
 }
 
-bool MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool MPEGStreamData::DeleteCachedTableSection(PSIPTable *psip) const
 {
     if (!psip)
         return false;
@@ -1570,7 +1576,7 @@ void MPEGStreamData::CachePAT(const ProgramAssociationTable *_pat)
 
     pat_cache_t::iterator it = _cached_pats.find(key);
     if (it != _cached_pats.end())
-        DeleteCachedTable(*it);
+        DeleteCachedTableSection(*it);
 
     _cached_pats[key] = pat;
 }
@@ -1584,7 +1590,7 @@ void MPEGStreamData::CacheCAT(const ConditionalAccessTable *_cat)
 
     cat_cache_t::iterator it = _cached_cats.find(key);
     if (it != _cached_cats.end())
-        DeleteCachedTable(*it);
+        DeleteCachedTableSection(*it);
 
     _cached_cats[key] = cat;
 }
@@ -1598,7 +1604,7 @@ void MPEGStreamData::CachePMT(const ProgramMapTable *_pmt)
 
     pmt_cache_t::iterator it = _cached_pmts.find(key);
     if (it != _cached_pmts.end())
-        DeleteCachedTable(*it);
+        DeleteCachedTableSection(*it);
 
     _cached_pmts[key] = pmt;
 }

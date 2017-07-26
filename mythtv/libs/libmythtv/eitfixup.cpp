@@ -864,7 +864,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     event.description = event.description.remove(m_ukAllNew);
 
     // Removal of 'Also in HD' text
- 	event.description = event.description.remove(m_ukAlsoInHD);
+    event.description = event.description.remove(m_ukAlsoInHD);
 
     // Remove [AD,S] etc.
     bool    ccMatched = false;
@@ -947,8 +947,8 @@ void EITFixUp::FixUK(DBEventEIT &event) const
                 .arg(event.title, event.description));
 
             if (position2 == 0)
-     		    // Remove from the start of the description.
-		        // Otherwise it ends up in the subtitle.
+                // Remove from the start of the description.
+                // Otherwise it ends up in the subtitle.
                 event.description.remove(tmpSeries.cap(form));
         }
     }
@@ -1878,7 +1878,7 @@ void EITFixUp::FixDisneyChannel(DBEventEIT &event) const
         {
             event.airdate = tmp.cap(3).toUInt();
         }
-	event.subtitle.replace(tmp, "");
+    event.subtitle.replace(tmp, "");
     }
     tmp = QRegExp("\\s[^\\s]+-(Serie)");
     pos = tmp.indexIn(event.subtitle);

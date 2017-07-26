@@ -3392,19 +3392,6 @@ NULL
             return false;
     }
 
-    if (dbver == "1347")
-    {
-        const char *updates[] = {
-            "ALTER TABLE record MODIFY COLUMN startdate DATE DEFAULT NULL",
-            "ALTER TABLE record MODIFY COLUMN enddate DATE DEFAULT NULL",
-            "ALTER TABLE record MODIFY COLUMN starttime TIME DEFAULT NULL",
-            "ALTER TABLE record MODIFY COLUMN endtime TIME DEFAULT NULL",
-            NULL
-        };
-        if (!performActualUpdate(updates, "1348", dbver))
-            return false;
-    }
-
     return true;
 }
 

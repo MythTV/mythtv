@@ -360,7 +360,7 @@ bool SyslogLogger::logmsg(LoggingItem *item)
             "SYSLOG_IDENTIFIER=%s", item->rawAppName(),
             "SYSLOG_PID=%d", item->pid(),
             "MYTH_THREAD=%s", item->rawThreadName(),
-	    NULL
+        NULL
         );
         return true;
     }

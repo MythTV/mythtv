@@ -367,7 +367,10 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
     {
         if (extract_table_id(*it) > tableid)
         {
-            // EIT from lower (ie. better) table number
+            // EIT from lower table number. The event is getting
+            // nearer to the present time.
+            // If the event is for the current day it might
+            // Already be in the past
             tblChgCnt++;
         }
         else if ((extract_table_id(*it) == tableid) &&

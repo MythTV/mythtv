@@ -208,6 +208,7 @@ HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
 HEADERS += mpeg/H264Parser.h
 HEADERS += mpeg/tablestatus.h
+HEADERS += mepg/sicachetypes.h
 
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp

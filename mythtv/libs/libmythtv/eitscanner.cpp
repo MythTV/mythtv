@@ -18,9 +18,13 @@
 #include "iso639.h"
 #include "mythdb.h"
 #include "tv_rec.h"
+#include "dtvsignalmonitor.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
+
+const uint EITScanner::kExtraSecondsToWaitForIncompleteEITScheduleTables = 5 * 60;
+const uint EITScanner::kMaxExtraSecondsToWaitForIncompleteEITScheduleTables = 45 * 60;
 
 /** \class EITScanner
  *  \brief Acts as glue between ChannelBase, EITSource, and EITHelper.
@@ -35,6 +39,7 @@ EITScanner::EITScanner(uint _cardnum)
       exitThread(false),
       rec(NULL),                  activeScan(false),
       activeScanStopped(true),    activeScanTrigTime(0),
+      secondsWaitedForIncompleteEITScheduleTables(0),
       cardnum(_cardnum)
 {
     QStringList langPref = iso639_get_language_list();
@@ -118,38 +123,54 @@ void EITScanner::run(void)
         // Is it time to move to the next transport in active scan?
         if (activeScan && (MythDate::current() > activeScanNextTrig))
         {
-            // if there have been any new events, tell scheduler to run.
-            if (eitCount)
+            // If there are still incomplete schedule tables then
+            // give the scanner a little more time on this channel
+            if ((secondsWaitedForIncompleteEITScheduleTables < kMaxExtraSecondsToWaitForIncompleteEITScheduleTables) && 
+                HasIncompleteEITTables())
             {
-                LOG(VB_EIT, LOG_INFO,
-                    LOC_ID + QString("Added %1 EIT Events").arg(eitCount));
-                eitCount = 0;
-                RescheduleRecordings();
+                secondsWaitedForIncompleteEITScheduleTables += kExtraSecondsToWaitForIncompleteEITScheduleTables;
+                activeScanNextTrig = MythDate::current()
+                    .addSecs(kExtraSecondsToWaitForIncompleteEITScheduleTables);
             }
-
-            if (activeScanNextChan == activeScanChannels.end())
-                activeScanNextChan = activeScanChannels.begin();
-
-            if (!(*activeScanNextChan).isEmpty())
+            else
             {
-                eitHelper->WriteEITCache();
-                if (rec->QueueEITChannelChange(*activeScanNextChan))
+                // If tables still incomplete warn user
+                if (HasIncompleteEITTables())
+                    LOG(VB_GENERAL, LOG_WARNING, "Incomplete tables at end of EIT scan - check setup");
+                // if there have been any new events, tell scheduler to run.
+                if (eitCount)
                 {
-                    eitHelper->SetChannelID(ChannelUtil::GetChanID(
-                        rec->GetSourceID(), *activeScanNextChan));
                     LOG(VB_EIT, LOG_INFO,
-                        LOC_ID + QString("Now looking for EIT data on "
-                                         "multiplex of channel %1")
-                        .arg(*activeScanNextChan));
+                        LOC_ID + QString("Added %1 EIT Events").arg(eitCount));
+                    eitCount = 0;
+                    RescheduleRecordings();
                 }
+
+                if (activeScanNextChan == activeScanChannels.end())
+                    activeScanNextChan = activeScanChannels.begin();
+
+                if (!(*activeScanNextChan).isEmpty())
+                {
+                    eitHelper->WriteEITCache();
+                    if (rec->QueueEITChannelChange(*activeScanNextChan))
+                    {
+                        eitHelper->SetChannelID(ChannelUtil::GetChanID(
+                            rec->GetSourceID(), *activeScanNextChan));
+                        LOG(VB_EIT, LOG_INFO,
+                            LOC_ID + QString("Now looking for EIT data on "
+                                             "multiplex of channel %1")
+                            .arg(*activeScanNextChan));
+                    }
+                }
+
+                secondsWaitedForIncompleteEITScheduleTables = 0;
+                activeScanNextTrig = MythDate::current()
+                    .addSecs(activeScanTrigTime);
+                ++activeScanNextChan;
+
+                // 24 hours ago
+                eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);
             }
-
-            activeScanNextTrig = MythDate::current()
-                .addSecs(activeScanTrigTime);
-            ++activeScanNextChan;
-
-            // 24 hours ago
-            eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);
         }
 
         lock.lock();
@@ -297,4 +318,30 @@ void EITScanner::StopActiveScan(void)
         activeScanCond.wait(&lock, 100);
 
     rec = NULL;
+}
+
+bool EITScanner::HasIncompleteEITTables()
+{
+    uint onid;
+    uint tsid;
+    bool bRet;
+    
+    DTVSignalMonitor *signalmonitor = rec->GetDTVSignalMonitor();
+    if (NULL != signalmonitor)
+    {
+        DVBStreamData* streamdata = dynamic_cast<DVBStreamData*>(signalmonitor->GetStreamData());
+        if (NULL != streamdata)
+        {
+            if (streamdata->HasCurrentTSID(onid, tsid))
+                bRet = streamdata->HasIncompleteEITTables(onid, tsid);
+            else
+                bRet = false;
+        }
+        else
+            bRet = false;
+    }
+    else
+        bRet = false;
+        
+    return bRet;
 }

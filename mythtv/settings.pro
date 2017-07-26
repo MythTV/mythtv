@@ -270,15 +270,17 @@ win32 {
 # Globals in static libraries need special treatment on OS X
 macx:QMAKE_CFLAGS_STATIC_LIB += -fno-common
 
-# figure out compile flags based on qmake info
+# figure out compile and link flags based on qmake info
 # qmake 4.8.2 & 4.8.3 messes up OSX "-arch i386 -arch x86_64"
 # clang 3.0 on Linux does not like duplicate arguments.
 macx {
     QMAKE_CFLAGS   += $$CPPFLAGS   $$CFLAGS
     QMAKE_CXXFLAGS += $$CXXPPFLAGS $$ECXXFLAGS
+    QMAKE_LFLAGS += $$LDFLAGS
 } else {
     QMAKE_CFLAGS   *= $$CPPFLAGS   $$CFLAGS
     QMAKE_CXXFLAGS *= $$CXXPPFLAGS $$ECXXFLAGS
+    QMAKE_LFLAGS *= $$LDFLAGS
 }
 
 profile:!win32:!macx:CONFIG += debug
