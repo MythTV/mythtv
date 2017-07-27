@@ -1757,7 +1757,8 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
             if (osd)
             {
                 BDOverlay* newOverlay = new BDOverlay(*osd);
-                newOverlay->image.convertToFormat(QImage::Format_ARGB32);
+                newOverlay->image =
+                    osd->image.convertToFormat(QImage::Format_ARGB32);
                 newOverlay->pts = overlay->pts;
 
                 QMutexLocker lock(&m_overlayLock);
