@@ -97,6 +97,7 @@ static void vbi_event(struct VBIData *data, struct vt_event *ev)
                 memcpy(&(data->teletextpage), vtp, sizeof(vt_page));
             }
        }
+       break;
 
        case EV_HEADER:
        case EV_XPACKET:

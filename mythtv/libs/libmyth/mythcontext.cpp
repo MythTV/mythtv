@@ -880,12 +880,12 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         break;
                 }
                 startupState = st_dbAwake;
-                // Fall through to next case
+                [[clang::fallthrough]];
             case st_dbAwake:
                 if (!checkPort(host, port, useTimeout))
                     break;
                 startupState = st_dbStarted;
-                // Fall through to next case
+                [[clang::fallthrough]];
             case st_dbStarted:
                 // If the database is connecting with link-local
                 // address, it may have changed
@@ -906,7 +906,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     break;
                 }
                 startupState = st_dbConnects;
-                // Fall through to next case
+                [[clang::fallthrough]];
             case st_dbConnects:
                 if (needsBackend)
                 {
@@ -935,7 +935,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 backendIP = gCoreContext->GetSettingOnHost
                     ("BackendServerAddr", masterserver);
                 backendPort = gCoreContext->GetMasterServerPort();
-                // Fall through to next case
+                [[clang::fallthrough]];
             case st_beWOL:
                 if (!beWOLCmd.isEmpty()) {
                     if (attempt > 0)
@@ -944,7 +944,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         break;
                 }
                 startupState = st_beAwake;
-                // Fall through to next case
+                [[clang::fallthrough]];
             case st_beAwake:
                 if (!checkPort(backendIP, backendPort, useTimeout))
                     break;

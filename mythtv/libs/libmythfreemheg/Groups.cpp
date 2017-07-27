@@ -942,7 +942,8 @@ void MHSetTimer::Perform(MHEngine *engine)
             newTime = -1;
             break; // We treat an absolute time of -1 as "cancel"
         case ST_TimerAbsolute:
-            fAbsolute = m_AbsFlag.GetValue(engine); // And drop to the next
+            fAbsolute = m_AbsFlag.GetValue(engine);
+            [[clang::fallthrough]];
         case ST_TimerRelative:
             newTime = m_TimerValue.GetValue(engine);
     }

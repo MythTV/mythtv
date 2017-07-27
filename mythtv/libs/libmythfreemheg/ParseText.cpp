@@ -388,7 +388,8 @@ void MHParseText::NextSym()
         switch (m_ch)
         {
             case '\n':
-                m_lineCount++; // And drop to next
+                m_lineCount++;
+                [[clang::fallthrough]];
             case ' ':
             case '\r':
             case '\t':
@@ -446,6 +447,7 @@ void MHParseText::NextSym()
 
                 // Unrecognised tag.
                 Error("Unrecognised tag");
+                break;
             }
 
             case '"': // Start of a string

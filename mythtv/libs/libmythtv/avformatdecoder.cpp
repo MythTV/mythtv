@@ -219,6 +219,7 @@ static int has_codec_parameters(AVStream *st)
             break;
         case AVMEDIA_TYPE_DATA:
             if(avctx->codec_id == AV_CODEC_ID_NONE) return 1;
+            [[clang::fallthrough]];
         default:
             break;
     }
@@ -246,6 +247,7 @@ static bool force_sw_decode(AVCodecContext *avctx)
                 default:
                     break;
             }
+            break;
         default:
             break;
     }

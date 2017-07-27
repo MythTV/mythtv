@@ -335,8 +335,8 @@ qint64 HTTPRequest::SendResponse( void )
         case ResponseTypeXML:
         case ResponseTypeHTML:
             // If the reponse isn't already in the buffer, then load it
-            if (!m_sFileName.isEmpty() &&
-                m_response.buffer().isEmpty())
+            if (m_sFileName.isEmpty() || !m_response.buffer().isEmpty())
+                break;
             {
                 QByteArray fileBuffer;
                 QFile file(m_sFileName);
@@ -350,8 +350,7 @@ qint64 HTTPRequest::SendResponse( void )
                 // Let SendResponseFile try or send a 404
                 m_eResponseType = ResponseTypeFile;
             }
-            else
-                break;
+            [[clang::fallthrough]];
         case ResponseTypeFile: // Binary files
             LOG(VB_HTTP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")

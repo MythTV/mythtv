@@ -105,16 +105,22 @@ static inline void SetupChannels(T &t)
       default:
       case 8:
         t.eChannelMapping[7] = OMX_AUDIO_ChannelRS;
+        [[clang::fallthrough]];
       case 7:
         t.eChannelMapping[6] = OMX_AUDIO_ChannelLS;
+        [[clang::fallthrough]];
       case 6:
         t.eChannelMapping[5] = OMX_AUDIO_ChannelRR;
+        [[clang::fallthrough]];
       case 5:
         t.eChannelMapping[4] = OMX_AUDIO_ChannelLR;
+        [[clang::fallthrough]];
       case 4:
         t.eChannelMapping[3] = OMX_AUDIO_ChannelLFE;
+        [[clang::fallthrough]];
       case 3:
         t.eChannelMapping[2] = OMX_AUDIO_ChannelCF;
+        [[clang::fallthrough]];
       case 2:
         t.eChannelMapping[1] = OMX_AUDIO_ChannelRF;
         t.eChannelMapping[0] = OMX_AUDIO_ChannelLF;
