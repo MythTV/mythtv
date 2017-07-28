@@ -164,8 +164,8 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
             m_dbparms.dbHostName == "127.0.0.1")
             m_db.setHostName("localhost");
 
-        // Default read timeout is 10 mins - set a better value 30 seconds
-        m_db.setConnectOptions(QString("MYSQL_OPT_READ_TIMEOUT=30"));
+        // Default read timeout is 10 mins - set a better value 300 seconds
+        m_db.setConnectOptions(QString("MYSQL_OPT_READ_TIMEOUT=300"));
 
         connected = m_db.open();
 
