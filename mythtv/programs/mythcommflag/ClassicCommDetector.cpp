@@ -344,7 +344,7 @@ bool ClassicCommDetector::go()
         int logoDetectBorder =
             gCoreContext->GetNumSetting("CommDetectLogoBorder", 16);
         logoDetector = new ClassicLogoDetector(this, width, height,
-            logoDetectBorder, horizSpacing, vertSpacing);
+            logoDetectBorder);
 
         requiredHeadStart += max(
             int64_t(0), int64_t(recordingStartedAt.secsTo(startedAt)));
