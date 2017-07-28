@@ -150,8 +150,10 @@ static QString StaticPage =
     "</HTML>";
 
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
-static const int g_on          = 1;
-static const int g_off         = 0;
+#ifdef USE_SETSOCKOPT
+//static const int g_on          = 1;
+//static const int g_off         = 0;
+#endif
 
 const char *HTTPRequest::m_szServerHeaders = "Accept-Ranges: bytes\r\n";
 
