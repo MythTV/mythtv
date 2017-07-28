@@ -57,14 +57,11 @@ class LameEncoder : public Encoder
 
     int bits;
     int channels;
-    int samplerate;
     int bytes_per_sample;
     int samples_per_channel; 
 
     int mp3buf_size;
     char *mp3buf;
-
-    int mp3bytes;
 
     lame_global_flags *gf;
 };
