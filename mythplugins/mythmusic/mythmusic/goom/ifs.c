@@ -1,10 +1,6 @@
 /* -*- Mode: C; tab-width: 4 -*- */
 /* ifs --- modified iterated functions system */
 
-#if !defined( lint ) && !defined( SABER )
-static const char sccsid[] = "@(#)ifs.c	5.00 2002/04/11 baffe";
-#endif
-
 /*-
  * Copyright (c) 1997 by Massimino Pascal <Pascal.Massimon@ens.fr>
  *
