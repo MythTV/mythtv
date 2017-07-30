@@ -121,7 +121,7 @@ VideoOutput *VideoOutput::Create(
     PIPState pipState,      const QSize &video_dim_buf,
     const QSize &video_dim_disp, float video_aspect,
     QWidget *parentwidget,  const QRect &embed_rect, float video_prate,
-    uint playerFlags)
+    uint playerFlags, QString &codecName)
 {
     (void) codec_priv;
     QStringList renderers;
@@ -188,13 +188,14 @@ VideoOutput *VideoOutput::Create(
             "): " + to_comma_list(renderers));
 
     QString renderer = QString::null;
+
+    VideoDisplayProfile *vprof = new VideoDisplayProfile();
+
     if (renderers.size() > 0)
     {
-        VideoDisplayProfile vprof;
-        vprof.SetInput(video_dim_disp);
-
-        QString tmp = vprof.GetVideoRenderer();
-        if (vprof.IsDecoderCompatible(decoder) && renderers.contains(tmp))
+        vprof->SetInput(video_dim_disp, video_prate, codecName);
+        QString tmp = vprof->GetVideoRenderer();
+        if (vprof->IsDecoderCompatible(decoder) && renderers.contains(tmp))
         {
             renderer = tmp;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preferred renderer: " + renderer);
@@ -256,6 +257,10 @@ VideoOutput *VideoOutput::Create(
         else if (xvlist.contains(renderer))
             vo = new VideoOutputXv();
 #endif // USING_XV
+        if (vo)
+            vo->db_vdisp_profile = vprof;
+        else
+            delete vprof;
 
         if (vo && !(playerFlags & kVideoIsNull))
         {
@@ -446,8 +451,7 @@ VideoOutput::VideoOutput() :
     db_letterbox_colour = (LetterBoxColour)
         gCoreContext->GetNumSetting("LetterboxColour",     0);
 
-    if (!gCoreContext->IsDatabaseIgnored())
-        db_vdisp_profile = new VideoDisplayProfile();
+    db_vdisp_profile = 0;
 }
 
 /**
@@ -527,20 +531,6 @@ QString VideoOutput::GetFilters(void) const
     if (db_vdisp_profile)
         return db_vdisp_profile->GetFilters();
     return QString::null;
-}
-
-bool VideoOutput::IsPreferredRenderer(QSize video_size)
-{
-    if (!db_vdisp_profile || (video_size == window.GetVideoDispDim()))
-        return true;
-
-    VideoDisplayProfile vdisp;
-    vdisp.SetInput(video_size);
-    QString new_rend = vdisp.GetVideoRenderer();
-    if (new_rend.isEmpty())
-        return true;
-
-    return db_vdisp_profile->CheckVideoRendererGroup(new_rend);
 }
 
 void VideoOutput::SetVideoFrameRate(float playback_fps)
@@ -769,8 +759,13 @@ bool VideoOutput::InputChanged(const QSize &video_dim_buf,
     window.InputChanged(video_dim_buf, video_dim_disp,
                         aspect, myth_codec_id, codec_private);
 
+    AVCodecID avCodecId = (AVCodecID) myth2av_codecid(myth_codec_id);
+    AVCodec *codec = avcodec_find_decoder(avCodecId);
+    QString codecName;
+    if (codec)
+        codecName = codec->name;
     if (db_vdisp_profile)
-        db_vdisp_profile->SetInput(window.GetVideoDim());
+        db_vdisp_profile->SetInput(window.GetVideoDim(),0,codecName);
     video_codec_id = myth_codec_id;
     BestDeint();
 

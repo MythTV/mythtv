@@ -639,6 +639,11 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     cmp[1]    = new TransMythUIComboBoxSetting();
     width[1]  = new TransMythUISpinBoxSetting(0, 1920, 8, 8);
     height[1] = new TransMythUISpinBoxSetting(0, 1080, 8, 8);
+//    Possible future replacement for above
+//    width_range = new TransTextEditSetting();
+//    height_range = new TransTextEditSetting();
+    codecs    = new TransMythUIComboBoxSetting(true);
+    framerate = new TransTextEditSetting();
     decoder   = new TransMythUIComboBoxSetting();
     max_cpus  = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
     skiploop  = new TransMythUICheckBoxSetting();
@@ -660,11 +665,30 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         height[i]->setLabel(tr("Height"));
 
         row[i]->setLabel(tr("Match criteria"));
+        row[i]->setHelpText(tr("Optional setting to restrict this profile "
+            "to a selected picture size range. If both match criteria are used "
+            "then both must be satisfied for the entry to be selected."));
         row[i]->addChild(cmp[i]);
         row[i]->addChild(width[i]);
         row[i]->addChild(height[i]);
     }
-
+    codecs->setLabel(tr("Video Formats"));
+    codecs->addSelection("","",true);
+    codecs->addSelection("mpeg2video");
+    codecs->addSelection("mpeg4");
+    codecs->addSelection("h264");
+    codecs->addSelection("hevc");
+    codecs->setHelpText(tr("Optional setting to restrict this profile "
+        "to a video format or formats. You can also type in a format "
+        "or several formats separated by space. "
+        "To find the format for a video use ffprobe and look at the "
+        "word after \"Video:\". Also you can get a complete list "
+        "of available formats with ffmpeg -codecs."));
+    framerate->setLabel(tr("Frame Rate Range"));
+    framerate->setHelpText(tr("Optional setting to restrict this profile "
+        "to a range of frame rates. Valid formats for the setting are "
+        "[nn.nnn - nn.nnn], [> nn.nnn], [>= nn.nnn], [< nn.nnn], "
+        "[<= nn.nnn]. Also [nn.nnn] for an exact match."));
     decoder->setLabel(tr("Decoder"));
     max_cpus->setLabel(tr("Max CPUs"));
     skiploop->setLabel(tr("Deblocking filter"));
@@ -698,6 +722,8 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
 
     addChild(row[0]);
     addChild(row[1]);
+    addChild(codecs);
+    addChild(framerate);
     addChild(decoder);
     addChild(max_cpus);
     addChild(skiploop);
@@ -709,6 +735,8 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(deint1);
     addChild(filters);
 
+    connect(framerate, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(framerateChanged(const QString&)));
     connect(decoder, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(decoderChanged(const QString&)));
     connect(vidrend, SIGNAL(valueChanged(const QString&)),
@@ -754,6 +782,9 @@ void PlaybackProfileItemConfig::Load(void)
         width[i]->setValue(clist[1]);
         height[i]->setValue(clist[2]);
     }
+
+    codecs->setValue(item.Get("cond_codecs"));
+    framerate->setValue(item.Get("cond_framerate"));
 
     QString pdecoder  = item.Get("pref_decoder");
     QString pmax_cpus = item.Get("pref_max_cpus");
@@ -822,6 +853,8 @@ void PlaybackProfileItemConfig::Save(void)
         item.Set(val, data);
     }
 
+    item.Set("cond_codecs",        codecs->getValue());
+    item.Set("cond_framerate",     framerate->getValue());
     item.Set("pref_decoder",       decoder->getValue());
     item.Set("pref_max_cpus",      max_cpus->getValue());
     item.Set("pref_skiploop",       (skiploop->boolValue()) ? "1" : "0");
@@ -835,6 +868,19 @@ void PlaybackProfileItemConfig::Save(void)
     QString tmp1 = vidrend->getValue();
     QString tmp3 = VideoDisplayProfile::IsFilterAllowed(tmp1) ? tmp0 : "";
     item.Set("pref_filters", tmp3);
+}
+
+void PlaybackProfileItemConfig::framerateChanged(const QString &val)
+{
+    bool ok = true;
+    QString oldvalue = item.Get("cond_framerate");
+    item.Set("cond_framerate",val);
+    item.checkRange("cond_framerate", 25.0f, &ok);
+    if (!ok)
+    {
+        ShowOkPopup(tr("Invalid frame rate specification(%1), discarded").arg(val));
+        framerate->setValue(oldvalue);
+    }
 }
 
 void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
@@ -857,6 +903,8 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
     }
 
     decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
+
+    InitLabel();
 }
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
@@ -990,10 +1038,22 @@ void PlaybackProfileItemConfig::InitLabel(void)
     QString cmp1   = QString("%1 %2 %3").arg(cmp[1]->getValue())
         .arg(width[1]->intValue())
         .arg(height[1]->intValue());
-    QString str    = PlaybackProfileConfig::tr("if rez") + ' ' + cmp0;
 
-    if (!cmp[1]->getValue().isEmpty())
-        str += " " + andStr + ' ' + cmp1;
+    QString str;
+    if (!cmp[0]->getValue().isEmpty()
+       || !cmp[1]->getValue().isEmpty())
+    {
+        str = PlaybackProfileConfig::tr("if rez") + ' ' + cmp0;
+        if (!cmp[1]->getValue().isEmpty())
+            str += " " + andStr + ' ' + cmp1;
+    }
+
+    QString codecsval = codecs->getValue();
+    if (!codecsval.isEmpty())
+        str += " " + tr("formats","video formats") + " " + codecsval;
+    QString framerateval = framerate->getValue();
+    if (!framerateval.isEmpty())
+        str += " " + tr("framerate") + " " + framerateval;
 
     str += " -> ";
     str += decoder->getValue();

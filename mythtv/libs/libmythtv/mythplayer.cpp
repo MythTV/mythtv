@@ -497,7 +497,7 @@ bool MythPlayer::InitVideo(void)
                     decoder->GetVideoCodecPrivate(),
                     pipState, video_dim, video_disp_dim, video_aspect,
                     parentWidget, embedRect,
-                    video_frame_rate, (uint)playerFlags);
+                    video_frame_rate, (uint)playerFlags, m_codecName);
 
     if (!videoOutput)
     {
@@ -588,13 +588,6 @@ void MythPlayer::ReinitOSD(void)
 
 void MythPlayer::ReinitVideo(void)
 {
-    if (!videoOutput->IsPreferredRenderer(video_disp_dim))
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Need to switch video renderer.");
-        SetErrored(tr("Need to switch video renderer"));
-        errorType |= kError_Switch_Renderer;
-        return;
-    }
 
     bool aspect_only = false;
     {
@@ -824,7 +817,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
 }
 
 void MythPlayer::SetVideoParams(int width, int height, double fps,
-                                FrameScanType scan)
+                                FrameScanType scan, QString codecName)
 {
     bool paramsChanged = false;
 
@@ -852,6 +845,12 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
             SetFrameInterval(kScan_Progressive,
                              1.0 / (video_frame_rate * temp_speed));
         }
+    }
+
+    if (!codecName.isEmpty())
+    {
+        m_codecName = codecName;
+        paramsChanged    = true;
     }
 
     if (!paramsChanged)

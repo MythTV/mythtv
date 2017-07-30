@@ -1636,7 +1636,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         }
 
         m_parent->SetKeyframeDistance(keyframedist);
-        m_parent->SetVideoParams(width, height, fps, kScan_Detect);
+        AVCodec *codec = avcodec_find_decoder(enc->codec_id);
+        QString codecName;
+        if (codec)
+            codecName = codec->name;
+        m_parent->SetVideoParams(width, height, fps, kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
         {
             LCDVideoFormatSet video_format;
@@ -2335,11 +2339,18 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             uint height = max(dim.height(), 16);
             QString dec = "ffmpeg";
             uint thread_count = 1;
-
+            AVCodec *codec1 = avcodec_find_decoder(enc->codec_id);
+            QString codecName;
+            if (codec1)
+                codecName = codec1->name;
+            if (enc->framerate.den && enc->framerate.num)
+                fps = float(enc->framerate.num) / float(enc->framerate.den);
+            else
+                fps = 0;
             if (!is_db_ignored)
             {
                 VideoDisplayProfile vdp;
-                vdp.SetInput(QSize(width, height));
+                vdp.SetInput(QSize(width, height),fps,codecName);
                 dec = vdp.GetDecoder();
                 thread_count = vdp.GetMaxCPUs();
                 bool skip_loop_filter = vdp.IsSkipLoopEnabled();

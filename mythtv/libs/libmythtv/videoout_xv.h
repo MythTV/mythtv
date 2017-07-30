@@ -83,7 +83,7 @@ class VideoOutputXv : public VideoOutput
 
     static MythCodecID GetBestSupportedCodec(uint stream_type);
 
-    static int GrabSuitableXvPort(MythXDisplay* disp, Window root,
+    int GrabSuitableXvPort(MythXDisplay* disp, Window root,
                                   MythCodecID type,
                                   uint width, uint height,
                                   bool &xvsetdefaults,
