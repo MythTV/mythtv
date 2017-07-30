@@ -383,9 +383,8 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     }
 
     // figure out if we want chromakeying..
-    VideoDisplayProfile vdp;
-    vdp.SetInput(QSize(width, height));
-    if (vdp.GetOSDRenderer() == "chromakey")
+    db_vdisp_profile->SetInput(QSize(width, height));
+    if (db_vdisp_profile->GetOSDRenderer() == "chromakey")
     {
         uint end = req.size();
         for (uint i = 0; i < end; i++)

@@ -253,8 +253,8 @@ class MPUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
-    TransMythUIComboBoxSetting() :
-        MythUIComboBoxSetting() { }
+    TransMythUIComboBoxSetting(bool rw = false) :
+        MythUIComboBoxSetting(NULL, rw) { }
 };
 
 class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting

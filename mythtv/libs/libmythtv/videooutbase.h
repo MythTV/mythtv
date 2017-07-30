@@ -52,7 +52,7 @@ class VideoOutput
         PIPState pipState,      const QSize &video_dim_buf,
         const QSize &video_dim_disp, float video_aspect,
         QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
-        uint playerFlags);
+        uint playerFlags, QString &codecName);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -63,7 +63,6 @@ class VideoOutput
                       WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
-    virtual bool IsPreferredRenderer(QSize video_size);
     virtual bool SetDeinterlacingEnabled(bool);
     virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
     virtual void FallbackDeint(void);

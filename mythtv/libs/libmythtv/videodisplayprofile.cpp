@@ -9,14 +9,132 @@ using namespace std;
 #include "videooutbase.h"
 #include "avformatdecoder.h"
 
-bool ProfileItem::IsMatch(const QSize &size, float rate) const
+
+// options are NNN NNN-MMM 0-MMM -MMM NNN-99999 NNN- >NNN >=NNN <MMM <=MMM or blank
+// If string is blank then assumes a match.
+// If value is 0 or negative assume a match (i.e. value unknown assumes a match)
+// float values assumed to be no more than 3 decimals.
+
+bool ProfileItem::checkRange(QString key, float fvalue, bool *ok) const
 {
-    (void) rate; // we don't use the video output rate yet
+    return checkRange(key, fvalue, 0, true, ok);
+}
 
+bool ProfileItem::checkRange(QString key, int ivalue, bool *ok) const
+{
+    return checkRange(key, 0.0f, ivalue, false, ok);
+}
+
+bool ProfileItem::checkRange(QString key,
+    float fvalue, int ivalue, bool isFloat, bool *ok) const
+{
+    bool match = true;
+    bool isOK = true;
+    if (isFloat)
+        ivalue = int(fvalue * 1000.0f);
+    QString cmp = Get(QString(key));
+    if (!cmp.isEmpty())
+        cmp.replace(QLatin1String(" "),QLatin1String(""));
+    if (!cmp.isEmpty() && ivalue > 0)
+    {
+        QRegularExpression regex("^([0-9.]*)([^0-9.]*)([0-9.]*)$");
+        QRegularExpressionMatch rmatch = regex.match(cmp);
+
+        int value1 = 0;
+        int value2 = 0;
+        QString oper;
+        QString capture1 = rmatch.captured(1);
+        QString capture3;
+        if (!capture1.isEmpty())
+        {
+            if (isFloat)
+                value1 = int(capture1.toFloat(&isOK) * 1000.0f);
+            else
+                value1 = capture1.toInt(&isOK);
+        }
+        if (isOK)
+        {
+            oper = rmatch.captured(2);
+            capture3 = rmatch.captured(3);
+            if (!capture3.isEmpty())
+            {
+                if (isFloat)
+                    value2 = int(capture3.toFloat(&isOK) * 1000.0f);
+                else
+                    value2 = capture3.toInt(&isOK);
+            }
+        }
+        if (isOK)
+        {
+            // Invalid string
+            if (value1 == 0 && value2 == 0 && oper.isEmpty())
+                isOK=false;
+        }
+        if (isOK)
+        {
+            // Case NNN
+            if (value1 != 0 && oper.isEmpty() && value2 == 0)
+            {
+                value2 = value1;
+                oper = "-";
+            }
+            // NNN-MMM 0-MMM NNN-99999 NNN- -MMM
+            else if (oper == "-")
+            {
+                // NNN-
+                if (capture3.isEmpty())
+                    value2 = 99999999;
+                // NNN-MMM
+                if (value2 < value1)
+                    isOK = false;
+            }
+            else if (capture1.isEmpty())
+            {
+                // Other operators == > < >= <=
+                // Convert to a range
+                if (oper == "==")
+                    value1 = value2;
+                else if (oper == ">")
+                {
+                    value1 = value2 + 1;
+                    value2 = 99999999;
+                }
+                else if (oper == ">=")
+                {
+                    value1 = value2;
+                    value2 = 99999999;
+                }
+                else if (oper == "<")
+                    value2 = value2 - 1;
+                else if (oper == "<=")
+                    ;
+                else isOK = false;
+                oper = "-";
+            }
+        }
+        if (isOK)
+        {
+            if (oper == "-")
+               match = (ivalue >= value1 && ivalue <= value2);
+            else isOK = false;
+        }
+    }
+    if (ok != Q_NULLPTR)
+        *ok = isOK;
+    if (!isOK)
+        match=false;
+    return match;
+}
+
+bool ProfileItem::IsMatch(const QSize &size,
+    float framerate, const QString &codecName) const
+{
     bool    match = true;
-    QString cmp   = QString::null;
 
-    for (uint i = 0; (i < 1000) && match; i++)
+    QString cmp;
+
+    // Format is  "OPER width height" where OPER is == != > < >= <=
+    for (uint i = 0; (i < 2) && match; i++)
     {
         cmp = Get(QString("pref_cmp%1").arg(i));
         if (cmp.isEmpty())
@@ -45,9 +163,25 @@ bool ProfileItem::IsMatch(const QSize &size, float rate) const
         else
             match = false;
     }
+    // New Style
+    // cond_width, cond_height, cond_codecs, cond_framerate.
+    // cind_width and cond_height are not used yet
+    match &= checkRange("cond_width",size.width());
+    match &= checkRange("cond_height",size.height());
+    match &= checkRange("cond_framerate",framerate);
+    // codec
+    cmp = Get(QString("cond_codecs"));
+    if (!cmp.isEmpty())
+        cmp.replace(QLatin1String(" "),QLatin1String(""));
+    if (!cmp.isEmpty())
+    {
+        QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
+        match &= clist.contains(codecName,Qt::CaseInsensitive);
+    }
 
     return match;
 }
+
 
 static QString toCommaList(const QStringList &list)
 {
@@ -63,6 +197,30 @@ static QString toCommaList(const QStringList &list)
 
 bool ProfileItem::IsValid(QString *reason) const
 {
+
+    bool isOK = true;
+    checkRange("cond_width",1,&isOK);
+    if (!isOK)
+    {
+        if (reason)
+            *reason = QString("Invalid width condition");
+        return false;
+    }
+    checkRange("cond_height",1,&isOK);
+    if (!isOK)
+    {
+        if (reason)
+            *reason = QString("Invalid height condition");
+        return false;
+    }
+    checkRange("cond_framerate",1.0f,&isOK);
+    if (!isOK)
+    {
+        if (reason)
+            *reason = QString("Invalid framerate condition");
+        return false;
+    }
+
     QString     decoder   = Get("pref_decoder");
     QString     renderer  = Get("pref_videorenderer");
     if (decoder.isEmpty() || renderer.isEmpty())
@@ -175,6 +333,10 @@ QString ProfileItem::toString(void) const
 {
     QString cmp0      = Get("pref_cmp0");
     QString cmp1      = Get("pref_cmp1");
+    QString width     = Get("cond_width");
+    QString height    = Get("cond_height");
+    QString framerate = Get("cond_framerate");
+    QString codecs    = Get("cond_codecs");
     QString decoder   = Get("pref_decoder");
     uint    max_cpus  = Get("pref_max_cpus").toUInt();
     bool    skiploop  = Get("pref_skiploop").toInt();
@@ -185,9 +347,12 @@ QString ProfileItem::toString(void) const
     QString filter    = Get("pref_filters");
     bool    osdfade   = Get("pref_osdfade").toInt();
 
-    QString str =  QString("cmp(%1%2) dec(%3) cpus(%4) skiploop(%5) rend(%6) ")
+    QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
+        .arg(width).arg(height).arg(framerate).arg(codecs);
+    QString str =  QString("cmp(%1%2) %7 dec(%3) cpus(%4) skiploop(%5) rend(%6) ")
         .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
-        .arg(decoder).arg(max_cpus).arg((skiploop) ? "enabled" : "disabled").arg(renderer);
+        .arg(decoder).arg(max_cpus).arg((skiploop) ? "enabled" : "disabled").arg(renderer)
+        .arg(cond);
     str += QString("osd(%1) osdfade(%2) deint(%3,%4) filt(%5)")
         .arg(osd).arg((osdfade) ? "enabled" : "disabled")
         .arg(deint0).arg(deint1).arg(filter);
@@ -229,7 +394,7 @@ VideoDisplayProfile::VideoDisplayProfile()
         QString err;
         if (!(*it).IsValid(&err))
         {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Rejecting: " + (*it).toString() +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Rejecting: " + (*it).toString() +
                     "\n\t\t\t" + err);
 
             continue;
@@ -237,23 +402,35 @@ VideoDisplayProfile::VideoDisplayProfile()
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Accepting: " + (*it).toString());
         all_pref.push_back(*it);
     }
-
-    SetInput(QSize(2048, 2048));
-    SetOutput(60.0f);
 }
 
 VideoDisplayProfile::~VideoDisplayProfile()
 {
 }
 
-void VideoDisplayProfile::SetInput(const QSize &size)
+void VideoDisplayProfile::SetInput(const QSize &size,
+    float framerate, const QString &codecName)
 {
     QMutexLocker locker(&lock);
+    bool change = false;
+
     if (size != last_size)
     {
         last_size = size;
-        LoadBestPreferences(last_size, last_rate);
+        change = true;
     }
+    if (framerate > 0.0f && framerate != last_rate)
+    {
+        last_rate = framerate;
+        change = true;
+    }
+    if (!codecName.isEmpty() && codecName != last_codecName)
+    {
+        last_codecName = codecName;
+        change = true;
+    }
+    if (change)
+        LoadBestPreferences(last_size, last_rate, last_codecName);
 }
 
 void VideoDisplayProfile::SetOutput(float framerate)
@@ -262,7 +439,7 @@ void VideoDisplayProfile::SetOutput(float framerate)
     if (framerate != last_rate)
     {
         last_rate = framerate;
-        LoadBestPreferences(last_size, last_rate);
+        LoadBestPreferences(last_size, last_rate, last_codecName);
     }
 }
 
@@ -386,29 +563,39 @@ void VideoDisplayProfile::SetPreference(
     }
 }
 
-item_list_t::const_iterator VideoDisplayProfile::FindMatch(
-    const QSize &size, float rate)
+item_list_t::const_iterator VideoDisplayProfile::FindMatch
+    (const QSize &size, float framerate, const QString &codecName)
 {
     item_list_t::const_iterator it = all_pref.begin();
     for (; it != all_pref.end(); ++it)
     {
-        if ((*it).IsMatch(size, rate))
+        if ((*it).IsMatch(size, framerate, codecName))
             return it;
     }
 
     return all_pref.end();
 }
 
-void VideoDisplayProfile::LoadBestPreferences(const QSize &size,
-                                              float framerate)
+void VideoDisplayProfile::LoadBestPreferences
+    (const QSize &size, float framerate, const QString &codecName)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences(%1x%2, %3)")
-            .arg(size.width()).arg(size.height()).arg(framerate));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences(%1x%2, %3, %4)")
+            .arg(size.width()).arg(size.height()).arg(framerate,0,'f',3).arg(codecName));
 
     pref.clear();
-    item_list_t::const_iterator it = FindMatch(size, framerate);
+    item_list_t::const_iterator it = FindMatch(size, framerate, codecName);
     if (it != all_pref.end())
         pref = (*it).GetAll();
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences Result "
+            "cmp0:%1, cmp1:%2, prio:%3, w:%4, h:%5, fps:%6,"
+            " codecs:%7, decoder:%8, renderer:%9, deint:%10")
+            .arg(GetPreference("pref_cmp0")).arg(GetPreference("pref_cmp1"))
+            .arg(GetPreference("pref_priority")).arg(GetPreference("cond_width"))
+            .arg(GetPreference("cond_height")).arg(GetPreference("cond_framerate"))
+            .arg(GetPreference("cond_codecs")).arg(GetPreference("pref_decoder"))
+            .arg(GetPreference("pref_videorenderer")).arg(GetPreference("pref_deint0"))
+            );
 }
 
 ////////////////////////////////////////////////////////////////////////////

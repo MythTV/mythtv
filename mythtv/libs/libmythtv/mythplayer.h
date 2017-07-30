@@ -160,7 +160,7 @@ class MTV_PUBLIC MythPlayer
     void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
     void SetVideoParams(int w, int h, double fps,
-                        FrameScanType scan = kScan_Ignore);
+           FrameScanType scan = kScan_Ignore, QString codecName = QString());
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
@@ -725,6 +725,8 @@ class MTV_PUBLIC MythPlayer
     bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
     uint     keyframedist;
+    /// Codec Name - used by playback profile
+    QString  m_codecName;
 
     // Buffering
     bool     buffering;

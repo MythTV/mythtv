@@ -620,12 +620,7 @@ bool VideoOutWindow::InputChanged(const QSize &input_size_buf,
     video_disp_dim = input_size_disp;
     video_dim = input_size_buf;
 
-    /*    if (db_vdisp_profile)
-          db_vdisp_profile->SetInput(video_dim);*///done in videooutput
-
     SetVideoAspectRatio(aspect);
-
-    //    DiscardFrames(true);
 
     return true;
 }

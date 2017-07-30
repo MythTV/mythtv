@@ -192,6 +192,7 @@ class PlaybackProfileItemConfig : public GroupSetting
     void IncreasePriority(void);
 
   private slots:
+    void framerateChanged(const QString &dec);
     void decoderChanged(const QString &dec);
     void vrenderChanged(const QString &renderer);
     void orenderChanged(const QString &renderer);
@@ -205,6 +206,10 @@ class PlaybackProfileItemConfig : public GroupSetting
     TransMythUIComboBoxSetting *cmp[2];
     TransMythUISpinBoxSetting  *width[2];
     TransMythUISpinBoxSetting  *height[2];
+    TransTextEditSetting      *width_range;
+    TransTextEditSetting      *height_range;
+    MythUIComboBoxSetting      *codecs;
+    TransTextEditSetting      *framerate;
     TransMythUIComboBoxSetting *decoder;
     TransMythUISpinBoxSetting  *max_cpus;
     TransMythUICheckBoxSetting *skiploop;
