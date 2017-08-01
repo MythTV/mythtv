@@ -32,7 +32,7 @@ void PlaylistLoadingThread::run()
 
 PlaylistContainer::PlaylistContainer(AllMusic *all_music) :
     m_activePlaylist(NULL), m_streamPlaylist(NULL),
-    m_allPlaylists(NULL),   m_allMusic(all_music),
+    m_allPlaylists(NULL),
 
     m_playlistsLoader(new PlaylistLoadingThread(this, all_music)),
     m_doneLoading(false), m_myHost(gCoreContext->GetHostName()),
