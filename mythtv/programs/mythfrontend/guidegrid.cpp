@@ -196,7 +196,6 @@ class GuideStatus
 public:
     GuideStatus(unsigned int firstRow, unsigned int numRows,
                 const QVector<int> &channums,
-                int channelInfos_size,
                 const MythRect &gg_programRect,
                 int gg_channelCount,
                 const QDateTime &currentStartTime,
@@ -207,7 +206,6 @@ public:
                 bool verticalLayout,
                 const QDateTime &firstTime, const QDateTime &lastTime)
         : m_firstRow(firstRow), m_numRows(numRows), m_channums(channums),
-          m_channelInfos_size(channelInfos_size),
           m_gg_programRect(gg_programRect), m_gg_channelCount(gg_channelCount),
           m_currentStartTime(currentStartTime),
           m_currentEndTime(currentEndTime),
@@ -217,7 +215,6 @@ public:
           m_firstTime(firstTime), m_lastTime(lastTime) {}
     const unsigned int m_firstRow, m_numRows;
     const QVector<int> m_channums;
-    const int m_channelInfos_size;
     const MythRect m_gg_programRect;
     const int m_gg_channelCount;
     const QDateTime m_currentStartTime, m_currentEndTime;
@@ -255,7 +252,6 @@ public:
           m_firstRow(gs.m_firstRow),
           m_numRows(gs.m_numRows),
           m_channums(gs.m_channums),
-          m_channelInfos_size(gs.m_channelInfos_size),
           m_gg_programRect(gs.m_gg_programRect),
           m_gg_channelCount(gs.m_gg_channelCount),
           m_currentStartTime(gs.m_currentStartTime),
@@ -314,7 +310,6 @@ private:
     const unsigned int m_firstRow;
     const unsigned int m_numRows;
     const QVector<int> m_channums;
-    const int m_channelInfos_size;
     const MythRect m_gg_programRect;
     const int m_gg_channelCount;
     const QDateTime m_currentStartTime;
@@ -1638,7 +1633,7 @@ void GuideGrid::fillProgramRowInfos(int firstRow, bool useExistingData)
 
     m_channelList->SetItemCurrent(m_currentRow);
 
-    GuideStatus gs(firstRow, chanNums.size(), chanNums, m_channelInfos.size(),
+    GuideStatus gs(firstRow, chanNums.size(), chanNums,
                    m_guideGrid->GetArea(), m_guideGrid->getChannelCount(),
                    m_currentStartTime, m_currentEndTime, m_currentStartChannel,
                    m_currentRow, m_currentCol, m_channelCount, m_timeCount,
