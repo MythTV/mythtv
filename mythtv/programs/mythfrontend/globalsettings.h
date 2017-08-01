@@ -269,8 +269,6 @@ class ChannelGroupSetting : public GroupSetting
   private:
     int m_groupId;
     TransTextEditSetting       *m_groupName;
-    TransMythUICheckBoxSetting *m_markForDeletion;
-
 };
 
 class ChannelGroupsSetting : public GroupSetting
