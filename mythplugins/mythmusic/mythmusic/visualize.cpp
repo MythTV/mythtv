@@ -831,7 +831,7 @@ static class SpectrumFactory : public VisFactory
 // NOTE: This visualiser requires mythplugins to be compiled with --enable-fftw
 
 Squares::Squares() :
-    actualSize(0,0), pParent(NULL), fake_height(0), number_of_squares(16)
+    actualSize(0,0), fake_height(0), number_of_squares(16)
 {
     fake_height = number_of_squares * analyzerBarWidth;
 }

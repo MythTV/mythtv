@@ -204,7 +204,6 @@ class Squares : public Spectrum
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
     QSize actualSize;
-    MainVisual *pParent;
     int fake_height;
     int number_of_squares;
 };
