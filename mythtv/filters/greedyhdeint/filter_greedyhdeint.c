@@ -239,6 +239,8 @@ static VideoFilter* GreedyHDeintFilter(VideoFrameType inpixfmt,
                                        int threads)
 {
     ThisFilter *filter;
+    (void) inpixfmt;
+    (void) outpixfmt;
     (void) height;
     (void) options;
     (void) threads;

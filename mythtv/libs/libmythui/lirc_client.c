@@ -438,7 +438,9 @@ static void lirc_parse_include(char *s,const char *name,int line)
 {
 	char last;
 	size_t len;
-	
+
+        (void)name;
+        (void)line;
 	len=strlen(s);
 	if(len<2)
 	{

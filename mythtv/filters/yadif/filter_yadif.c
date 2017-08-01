@@ -395,6 +395,7 @@ static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
                           uint8_t *prev, uint8_t *cur, uint8_t *next,
                           int w, int refs, int parity)
 {
+    (void) p;
     int x;
     uint8_t *prev2= parity ? prev : cur ;
     uint8_t *next2= parity ? cur  : next;

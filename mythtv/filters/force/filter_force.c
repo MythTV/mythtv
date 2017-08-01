@@ -33,6 +33,7 @@ new_force_yv12 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
     (void) width;
     (void) height;
     (void) options;
+    (void) threads;
 
     return new_force_template (inpixfmt, outpixfmt, FMT_YV12);
 }
@@ -44,6 +45,7 @@ new_force_yuv422p (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width
     (void) width;
     (void) height;
     (void) options;
+    (void) threads;
 
     return new_force_template (inpixfmt, outpixfmt, FMT_YUV422P);
 }
@@ -55,6 +57,7 @@ new_force_rgb24 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
     (void) width;
     (void) height;
     (void) options;
+    (void) threads;
 
     return new_force_template (inpixfmt, outpixfmt, FMT_RGB24);
 }
