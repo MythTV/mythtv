@@ -19,8 +19,8 @@
 
 class MythUIProgressDialog;
 
-GameScannerThread::GameScannerThread(QObject *parent) :
-    MThread("GameScanner"), m_parent(parent),
+GameScannerThread::GameScannerThread(void) :
+    MThread("GameScanner"),
     m_HasGUI(gCoreContext->HasGUI()),
     m_dialog(NULL), m_DBDataChanged(false)
 {
@@ -194,7 +194,7 @@ void GameScannerThread::SendProgressEvent(uint progress, uint total,
 
 GameScanner::GameScanner()
 {
-    m_scanThread = new GameScannerThread(this);
+    m_scanThread = new GameScannerThread();
 }
 
 GameScanner::~GameScanner()

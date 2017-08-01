@@ -31,7 +31,7 @@ typedef QList< RomFileInfo > RomFileInfoList;
 class GameScannerThread : public MThread
 {
   public:
-    explicit GameScannerThread(QObject *parent);
+    explicit GameScannerThread(void);
     ~GameScannerThread();
 
     virtual void run(void); // MThread
@@ -53,7 +53,6 @@ class GameScannerThread : public MThread
     void SendProgressEvent(uint progress, uint total = 0,
                            QString message = QString());
 
-    QObject *m_parent;
     bool m_HasGUI;
 
     QList<GameHandler*> m_handlers;
