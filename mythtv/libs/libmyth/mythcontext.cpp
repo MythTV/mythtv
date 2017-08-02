@@ -949,6 +949,10 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 if (!checkPort(backendIP, backendPort, useTimeout))
                     break;
                 startupState = st_success;
+                [[clang::fallthrough]];
+            case st_success:
+                // Quiet compiler warning.
+                break;
             }
             if (m_guiStartup)
             {
