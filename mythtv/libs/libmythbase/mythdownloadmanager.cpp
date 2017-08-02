@@ -12,6 +12,7 @@
 #include <QNetworkProxy>
 #include <QMutexLocker>
 #include <QUrl>
+#include <QTcpSocket>
 
 #include "stdlib.h"
 
