@@ -115,6 +115,10 @@ static QString determineURLType(const QString& url)
                 case MythCDROM::kDVD:
                     result = "dvd:" + url;
                     break;
+
+                case MythCDROM::kUnknown:
+                    // Quiet compiler warning.
+                    break;
             }
         }
         else
