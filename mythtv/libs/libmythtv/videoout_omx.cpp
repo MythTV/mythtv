@@ -283,13 +283,14 @@ QStringList VideoOutputOMX::GetAllowedRenderers(
 VideoOutputOMX::VideoOutputOMX() :
     m_render(gCoreContext->GetSetting("OMXVideoRender", VIDEO_RENDER), *this),
     m_imagefx(gCoreContext->GetSetting("OMXVideoFilter", IMAGE_FX), *this),
-    m_context(0),   
-    m_backgroundscreen(0), m_glOsdThread(0), m_changed(false),
-    m_videoPaused(false)
+    m_backgroundscreen(0), m_videoPaused(false)
 {
 #ifdef OSD_EGL
-      m_osdpainter = 0;
-      m_threaded_osdpainter = 0;
+    m_context = 0;
+    m_osdpainter = 0;
+    m_threaded_osdpainter = 0;
+    m_glOsdThread = 0;
+    m_changed = false;
 #endif
     init(&av_pause_frame, FMT_YV12, NULL, 0, 0, 0);
 
