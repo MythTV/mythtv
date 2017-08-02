@@ -410,15 +410,6 @@ void TVBrowseHelper::GetNextProgramDB(
     infoMap["dbstarttime"] = prog->GetScheduledStartTime(MythDate::ISODate);
 }
 
-inline static QString toString(const InfoMap &infoMap, const QString &sep="\n")
-{
-    QString str("");
-    InfoMap::const_iterator it = infoMap.begin();
-    for (; it != infoMap.end() ; ++it)
-        str += QString("[%1]:%2%3").arg(it.key()).arg(*it).arg(sep);
-    return str;
-}
-
 void TVBrowseHelper::run()
 {
     RunProlog();
