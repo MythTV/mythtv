@@ -652,7 +652,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
 
     // line 21 data (608/708 captions)
     // this appears to be unimplemented in the driver
-    if (out->UserData && out->UserDataSz)
+    if (out->UserDataSz)
     {
         int size = out->UserDataSz > 1024 ? 1024 : out->UserDataSz;
         m_frame->priv[0] = (unsigned char*)av_malloc(size);
