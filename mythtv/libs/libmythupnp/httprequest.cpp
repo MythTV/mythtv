@@ -2229,6 +2229,9 @@ QString HTTPRequest::GetRequestType( ) const
     QString type;
     switch ( m_eType )
     {
+        case RequestTypeUnknown :
+            type = "UNKNOWN";
+            break;
         case RequestTypeGet :
             type = "GET";
             break;
@@ -2252,6 +2255,9 @@ QString HTTPRequest::GetRequestType( ) const
             break;
         case RequestTypeUnsubscribe :
             type = "UNSUBSCRIBE";
+            break;
+        case RequestTypeResponse :
+            type = "RESPONSE";
             break;
     }
 

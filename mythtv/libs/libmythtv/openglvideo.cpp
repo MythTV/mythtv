@@ -436,6 +436,10 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 
     switch (filter)
     {
+      case kGLFilterNone:
+          // Nothing to do. Prevents compiler warning.
+          break;
+
       case kGLFilterResize:
         if (!(gl_features & kGLExtFBufObj) && !filters.empty())
         {

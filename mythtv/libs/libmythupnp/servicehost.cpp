@@ -401,6 +401,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                         sMethodName = "Put" + sMethodName;
                         break;
                     case RequestTypeUnknown:
+                    case RequestTypeOptions:
                     case RequestTypeMSearch:
                     case RequestTypeSubscribe:
                     case RequestTypeUnsubscribe:
