@@ -703,6 +703,8 @@ void WebSocketWorker::HandleDataFrame(const WebSocketFrame &frame)
                         break;
                 }
                 break;
+            default:
+                break;
         }
         m_readFrame.reset();
     }

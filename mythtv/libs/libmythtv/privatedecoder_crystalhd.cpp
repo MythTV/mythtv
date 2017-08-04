@@ -239,6 +239,8 @@ bool PrivateDecoderCrystalHD::Init(const QString &decoder,
                     sub_type = BC_MSUBTYPE_H264;
             }
             break;
+        default:
+            break;
     }
 
     if (sub_type == BC_MSUBTYPE_INVALID)
@@ -861,6 +863,7 @@ QString bcmerr_to_string(BC_STATUS err)
         case BC_STS_DEC_EXIST_OPEN:    return "Decoder exist open (?)";
         case BC_STS_PENDING:           return "Pending";
         case BC_STS_ERROR:             return "Unknown";
+        default: break;
     }
     return "Unknown error";
 }
@@ -872,6 +875,7 @@ QString bcmpixfmt_to_string(BC_OUTPUT_FORMAT fmt)
         case OUTPUT_MODE420:      return "YUV420P";
         case OUTPUT_MODE422_YUY2: return "YUYV422";
         case OUTPUT_MODE422_UYVY: return "UYVY422";
+        default: break;
     }
     return "Unknown";
 }
@@ -934,6 +938,7 @@ AVPixelFormat bcmpixfmt_to_pixfmt(BC_OUTPUT_FORMAT fmt)
         case OUTPUT_MODE420:      return AV_PIX_FMT_YUV420P;
         case OUTPUT_MODE422_YUY2: return AV_PIX_FMT_YUYV422;
         case OUTPUT_MODE422_UYVY: return AV_PIX_FMT_UYVY422;
+        default: break;
     }
     return AV_PIX_FMT_YUV420P;
 }
