@@ -23,6 +23,7 @@ SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 	distclean $(addsuffix _distclean,$(SUBDIRS))  \
 	install   $(addsuffix _install,  $(SUBDIRS))  \
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
+	global \
 	libs/libmythbase/version.h force
 
 all: libs/libmythbase/version.h subdirs
@@ -88,6 +89,7 @@ distclean: $(addsuffix _distclean,$(SUBDIRS))
 	-rm -f external/FFmpeg/libavutil/avconfig.h
 	-rm -f config.ep
 	-rm -f $(addsuffix /Makefile,$(QT_SUBDIRS))
+	-rm -f ../GPATH ../GRTAGS ../GTAGS
 
 install: $(addsuffix _install,$(SUBDIRS))
 
@@ -98,3 +100,8 @@ uninstall: $(addsuffix _uninstall,$(SUBDIRS))
 
 test: libs/libmythbase/version.h subdirs
 	cd libs ; $(MAKE) test
+
+global GPATH GRTAGS GTAGS:
+	@echo "Making global tags..."
+	@cd .. ; rm -f GPATH GRTAGS GTAGS
+	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | gtags -f -
