@@ -3,22 +3,32 @@
 #author:dbr/Ben
 #project:tvdb_api
 #repository:http://github.com/dbr/tvdb_api
-#license:Creative Commons GNU GPL v2
-# (http://creativecommons.org/licenses/GPL/2.0/)
+#license:unlicense (http://unlicense.org/)
 
 """
 urllib2 caching handler
 Modified from http://code.activestate.com/recipes/491261/
 """
+from __future__ import with_statement
+
 __author__ = "dbr/Ben"
-__version__ = "1.2.1"
+__version__ = "1.11"
 
 import os
 import time
 import errno
-import httplib
-import urllib2
-import StringIO
+try:
+    import httplib
+except ImportError:
+    import http.client as httplib
+try:
+    import urllib2
+except ImportError:
+    import urllib as urllib2
+try:
+    import StringIO
+except ImportError:
+    import io as StringIO
 from hashlib import md5
 from threading import RLock
 
@@ -74,14 +84,28 @@ def store_in_cache(cache_location, url, response):
     """Tries to store response in cache."""
     hpath, bpath = calculate_cache_path(cache_location, url)
     try:
-        outf = open(hpath, "w")
+        outf = open(hpath, "wb")
         headers = str(response.info())
         outf.write(headers)
         outf.close()
 
-        outf = open(bpath, "w")
+        outf = open(bpath, "wb")
         outf.write(response.read())
         outf.close()
+    except IOError:
+        return True
+    else:
+        return False
+
+@locked_function
+def delete_from_cache(cache_location, url):
+    """Deletes a response in cache."""
+    hpath, bpath = calculate_cache_path(cache_location, url)
+    try:
+        if os.path.exists(hpath):
+            os.remove(hpath)
+        if os.path.exists(bpath):
+            os.remove(bpath)
     except IOError:
         return True
     else:
@@ -101,7 +125,7 @@ class CacheHandler(urllib2.BaseHandler):
         if not os.path.exists(self.cache_location):
             try:
                 os.mkdir(self.cache_location)
-            except OSError, e:
+            except OSError as e:
                 if e.errno == errno.EEXIST and os.path.isdir(self.cache_location):
                     # File exists, and it's a directory,
                     # another process beat us to creating this dir, that's OK.
@@ -109,7 +133,7 @@ class CacheHandler(urllib2.BaseHandler):
                 else:
                     # Our target dir is already a file, or different error,
                     # relay the error!
-                    raise OSError(e)
+                    raise
 
     def default_open(self, request):
         """Handles GET requests, if the response is cached it returns it
@@ -144,7 +168,6 @@ class CacheHandler(urllib2.BaseHandler):
                 )
             else:
                 set_cache_header = True
-            #end if x-cache in response
 
             return CachedResponse(
                 self.cache_location,
@@ -166,12 +189,12 @@ class CachedResponse(StringIO.StringIO):
         self.cache_location = cache_location
         hpath, bpath = calculate_cache_path(cache_location, url)
 
-        StringIO.StringIO.__init__(self, file(bpath).read())
+        StringIO.StringIO.__init__(self, file(bpath, "rb").read())
 
         self.url     = url
         self.code    = 200
         self.msg     = "OK"
-        headerbuf = file(hpath).read()
+        headerbuf = file(hpath, "rb").read()
         if set_cache_header:
             headerbuf += "x-local-cache: %s\r\n" % (bpath)
         self.headers = httplib.HTTPMessage(StringIO.StringIO(headerbuf))
@@ -196,18 +219,25 @@ class CachedResponse(StringIO.StringIO):
         )
         CachedResponse.__init__(self, self.cache_location, self.url, True)
 
+    @locked_function
+    def delete_cache(self):
+        delete_from_cache(
+            self.cache_location,
+            self.url
+        )
+
 
 if __name__ == "__main__":
     def main():
         """Quick test/example of CacheHandler"""
         opener = urllib2.build_opener(CacheHandler("/tmp/"))
         response = opener.open("http://google.com")
-        print response.headers
-        print "Response:", response.read()
+        print(response.headers)
+        print("Response:", response.read())
 
         response.recache()
-        print response.headers
-        print "After recache:", response.read()
+        print(response.headers)
+        print("After recache:", response.read())
 
         # Test usage in threads
         from threading import Thread
@@ -221,10 +251,10 @@ if __name__ == "__main__":
                 assert self.lastdata == newdata, "Data was not consistent, uhoh"
                 req.recache()
         threads = [CacheThreadTest() for x in range(50)]
-        print "Starting threads"
+        print("Starting threads")
         [t.start() for t in threads]
-        print "..done"
-        print "Joining threads"
+        print("..done")
+        print("Joining threads")
         [t.join() for t in threads]
-        print "..done"
+        print("..done")
     main()
