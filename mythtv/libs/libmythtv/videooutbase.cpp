@@ -259,8 +259,6 @@ VideoOutput *VideoOutput::Create(
 #endif // USING_XV
         if (vo)
             vo->db_vdisp_profile = vprof;
-        else
-            delete vprof;
 
         if (vo && !(playerFlags & kVideoIsNull))
         {
@@ -301,6 +299,7 @@ VideoOutput *VideoOutput::Create(
                 return vo;
             }
 
+            vo->db_vdisp_profile = NULL;
             delete vo;
             vo = NULL;
         }
@@ -312,6 +311,7 @@ VideoOutput *VideoOutput::Create(
                 return vo;
             }
 
+            vo->db_vdisp_profile = NULL;
             delete vo;
             vo = NULL;
         }
@@ -321,6 +321,7 @@ VideoOutput *VideoOutput::Create(
 
     LOG(VB_GENERAL, LOG_ERR, LOC +
         "Not compiled with any useable video output method.");
+    delete vprof;
 
     return NULL;
 }
