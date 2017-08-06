@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.12';
+    $VERSION        = '1.0.13';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -700,12 +700,20 @@ EOF
         {
             my $have_database_libs = check_database_libs;
             return 0 if ($have_database_libs < 2);
+            my $temp_host = $mysql_conf{'db_host'};
+            if ($temp_host =~ /:/)
+            {
+              if ($temp_host =~ /^(?!\[).*(?!\])$/)
+              {
+                $temp_host = "[$temp_host]";
+              }
+            }
             $dbh = DBI->connect("dbi:mysql:".
-                                "database=$mysql_conf{'db_name'}:".
-                                "host=$mysql_conf{'db_host'}",
+                                "host=$temp_host:".
+                                "database=$mysql_conf{'db_name'}",
                                 "$mysql_conf{'db_user'}",
                                 "$mysql_conf{'db_pass'}",
-                                { PrintError => 0 });
+                                { PrintError => 1 });
         }
         return 1;
     }
