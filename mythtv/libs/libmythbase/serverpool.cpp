@@ -390,6 +390,12 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
 {
     m_port = port;
     QList<QHostAddress>::const_iterator it;
+    // These values will keep track of whether there was any support
+    bool ipv4support = false;
+    bool ipv6support = false;
+    int ipv4errs = 0;
+    int ipv6errs = 0;
+    #define ERRLIMIT 2
 
     for (it = addrs.begin(); it != addrs.end(); ++it)
     {
@@ -422,10 +428,12 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
                     .arg(PRETTYIP(it)).arg(port));
             if (servertype == kTCPServer)
                 m_tcpServers.append(server);
-            else
-
             if (m_port == 0)
                 m_port = server->serverPort();
+            if (it->protocol() == QAbstractSocket::IPv4Protocol)
+                ipv4support = true;
+            else if (it->protocol() == QAbstractSocket::IPv6Protocol)
+                ipv6support = true;
         }
         else
         {
@@ -448,21 +456,27 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
             }
 
             if (server->serverError() == QAbstractSocket::UnsupportedSocketOperationError
-                 && it->protocol() == QAbstractSocket::IPv4Protocol)
+                 && it->protocol() == QAbstractSocket::IPv4Protocol && !ipv4support)
             {
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("No IPv4 support on this system. Disabling MythTV IPv4."));
-                 gCoreContext->OverrideSettingForSession("IPv4Support", "0");
-                 continue;
+                if (++ipv4errs > ERRLIMIT)
+                {
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("No IPv4 support on this system. Disabling MythTV IPv4."));
+                    gCoreContext->OverrideSettingForSession("IPv4Support", "0");
+                    continue;
+                }
             }
 
             if (server->serverError() == QAbstractSocket::UnsupportedSocketOperationError
-                 && it->protocol() == QAbstractSocket::IPv6Protocol)
+                 && it->protocol() == QAbstractSocket::IPv6Protocol && !ipv6support)
             {
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("No IPv6 support on this system. Disabling MythTV IPv6."));
-                 gCoreContext->OverrideSettingForSession("IPv6Support", "0");
-                 continue;
+                if (++ipv6errs > ERRLIMIT)
+                {
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("No IPv6 support on this system. Disabling MythTV IPv6."));
+                    gCoreContext->OverrideSettingForSession("IPv6Support", "0");
+                    continue;
+                }
             }
 
             if (requireall)
