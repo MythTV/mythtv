@@ -659,10 +659,12 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int /* x */, int /* y */, in
             case kCodec_VC1_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
                 break;
+#ifdef VDP_DECODER_PROFILE_HEVC_MAIN
             case kCodec_HEVC_VDPAU:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_HEVC_MAIN;
                 max_refs = 16;
                 break;
+#endif
             default:
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Codec is not supported.");
