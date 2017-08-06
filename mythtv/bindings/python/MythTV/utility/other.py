@@ -3,15 +3,19 @@
 
 from MythTV.logging import MythLog
 from MythTV.exceptions import MythDBError, MythError
-from dt import datetime
+from .dt import datetime
 
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import BytesIO as StringIO
 from select import select
 from time import time
-from itertools import imap
+from builtins import map
 import weakref
 import socket
 import re
+from builtins import range
 
 def _donothing(*args, **kwargs):
     pass
@@ -40,7 +44,7 @@ class SchemaUpdate( object ):
         schema = origschema
         try:
             while True:
-                
+
                 newschema = getattr(self, 'up%d' % schema)()
                 self.log(MythLog.GENERAL, MythLog.INFO,
                          'successfully updated from %d to %d' %\
@@ -48,7 +52,7 @@ class SchemaUpdate( object ):
                 schema = newschema
                 self.db.settings.NULL[self._schema_name] = schema
 
-        except AttributeError, e:
+        except AttributeError as e:
             self.log(MythLog.GENERAL, MythLog.CRIT,
                      'failed at %d' % schema, 'no handler method')
             raise MythDBError('Schema update failed, ' 
@@ -60,7 +64,7 @@ class SchemaUpdate( object ):
                          '%s update complete' % self._schema_name)
             pass
 
-        except Exception, e:
+        except Exception as e:
             raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
 
     def create(self):
@@ -77,7 +81,7 @@ class databaseSearch( object ):
                 of the following format
                     (<table name>,   -- Primary table to pull data from.
                      <data class>,   -- Data handling class to use to process
-                                        data. Ideally a subclass of DBData, 
+                                        data. Ideally a subclass of DBData,
                                         this class must provide a 'fromRaw'
                                         classmethod.
                      <required keywords>, -- Tuple of keywords that must be
@@ -231,7 +235,7 @@ class databaseSearch( object ):
                         res[2]),
                     len(lval)))
                 fields += lval
-                            
+
         for key in self.require:
             if key not in kwargs:
                 res = self.func(self.inst, key=key)
@@ -330,7 +334,7 @@ class deadlinesocket( socket.socket ):
             p = buff.tell()
             try:
                 buff.write(self.recv(bufsize-buff.tell(), flags))
-            except socket.error, e:
+            except socket.error as e:
                 raise MythError(MythError.SOCKET, e.args)
             if buff.tell() == p:
                # no data read from a 'ready' socket, connection terminated
@@ -362,7 +366,7 @@ class deadlinesocket( socket.socket ):
             p = buff.tell()
             try:
                 buff.write(self.recv(100, flags))
-            except socket.error, e:
+            except socket.error as e:
                 raise MythError(MythError.SOCKET, e.args)
             if buff.tell() == p:
                 # no data read from a 'ready' socket, connection terminated
@@ -390,7 +394,7 @@ class deadlinesocket( socket.socket ):
                                 'write --> %d' % len(data), data)
             data = '%-8d%s' % (len(data), data)
             self.send(data, flags)
-        except socket.error, e:
+        except socket.error as e:
             raise MythError(MythError.SOCKET, e.args)
 
 class MARKUPLIST( object ):
@@ -428,8 +432,8 @@ def levenshtein(s1, s2):
         return levenshtein(s2, s1)
     if not s1:
         return len(s2)
- 
-    previous_row = xrange(len(s2) + 1)
+
+    previous_row = range(len(s2) + 1)
     for i, c1 in enumerate(s1):
         current_row = [i + 1]
         for j, c2 in enumerate(s2):
@@ -438,12 +442,12 @@ def levenshtein(s1, s2):
             substitutions = previous_row[j] + (c1 != c2)
             current_row.append(min(insertions, deletions, substitutions))
         previous_row = current_row
- 
+
     return previous_row[-1]
 
 class ParseEnum( object ):
     _static = None
-    def __str__(self): 
+    def __str__(self):
         return str([k for k,v in self.iteritems() if v==True])
     def __repr__(self): return str(self)
     def __init__(self, parent, field_name, enum, editable=True):
@@ -470,7 +474,7 @@ class ParseEnum( object ):
 
     def __setitem__(self, key, value):
         if self._static:
-            raise KeyError("'%s' cannot be edited." % name)
+            raise KeyError("'%s' cannot be edited." % key)
         val = getattr(self._enum, key)
         if value:
             self._parent[self._field] |= val
@@ -493,7 +497,7 @@ class ParseEnum( object ):
         return iter(self.keys())
 
     def itervalues(self):
-        return imap(self.__getitem__, self.keys())
+        return map(self.__getitem__, self.keys())
 
     def iteritems(self):
         for key in self.keys():
@@ -529,7 +533,7 @@ class ParseSet( ParseEnum ):
 
     def __setitem__(self, key, value):
         if self._static:
-            raise KeyError("'%s' cannot be edited." % name)
+            raise KeyError("'%s' cannot be edited." % key)
         if self[key] == value:
             return
         tmp = self._parent[self._field].split(',')

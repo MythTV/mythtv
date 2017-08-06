@@ -10,8 +10,14 @@ import codecs
 
 from sys import version_info, stdout, argv
 from datetime import datetime
-from thread import allocate_lock
-from StringIO import StringIO
+try:
+    from thread import allocate_lock
+except:
+    from _thread import allocate_lock
+try:
+    from StringIO import StringIO
+except:
+    from io import StringIO
 from traceback import format_exc
 
 def _donothing(*args, **kwargs):
@@ -213,7 +219,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
 
     def __repr__(self):
         return "<%s '%s','%s' at %s>" % \
-                (str(self.__class__).split("'")[1].split(".")[-1], 
+                (str(self.__class__).split("'")[1].split(".")[-1],
                  self.module, bin(self._MASK), hex(id(self)))
 
     def __new__(cls, *args, **kwargs):

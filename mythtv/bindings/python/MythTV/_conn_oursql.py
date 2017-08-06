@@ -54,7 +54,7 @@ class LoggedCursor( oursql.Cursor ):
             if args:
                 return super(LoggedCursor, self).execute(query, args)
             return super(LoggedCursor, self).execute(query)
-        except Exception, e:
+        except Exception as e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def executemany(self, query, args):
@@ -74,7 +74,7 @@ class LoggedCursor( oursql.Cursor ):
         self.log_query(query, args)
         try:
             return super(LoggedCursor, self).executemany(query, args)
-        except Exception, e:
+        except Exception as e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def commit(self): self.connection.commit()

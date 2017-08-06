@@ -8,7 +8,7 @@ from MythTV.static import MythSchema
 from MythTV.altdict import OrdDict, DictData
 from MythTV.logging import MythLog
 from MythTV.msearch import MSearch
-from MythTV.utility import datetime, _donothing, QuickProperty
+from MythTV.utility import datetime, dt, _donothing, QuickProperty
 from MythTV.exceptions import MythError, MythDBError, MythTZError
 from MythTV.connections import DBConnection, LoggedCursor, XMLConnection
 
@@ -19,6 +19,7 @@ import datetime as _pydt
 import time as _pyt
 import weakref
 import os
+from builtins import int, str
 
 
 class DBData( DictData, MythSchema ):
@@ -118,7 +119,7 @@ class DBData( DictData, MythSchema ):
             for row in cursor:
                 try:
                     yield cls.fromRaw(row, db)
-                except MythDBError, e:
+                except MythDBError as e:
                     if e.ecode == MythError.DB_RESTRICT:
                         pass
 
@@ -507,7 +508,7 @@ class DBDataRef( list ):
             if dat not in self:
                 data.append(dat)
         return self.fromCopy(data, self._db)
-        
+
     def __and__(self, other):
         data = []
         for dat in self:
@@ -566,7 +567,7 @@ class DBDataRef( list ):
         c = cls('', db=db, bypass=True)
         c._populated = True
         for dat in data:
-            list.append(c, c.SubData(zip(self._datfields, row)))
+            list.append(c, c.SubData(zip(cls._datfields, dat)))
         return c
 
     @classmethod
@@ -1147,7 +1148,7 @@ class DBCache( MythSchema ):
                     # pull field list from database
                     try:
                         cursor.execute("DESC %s" % (key,))
-                    except Exception, e:
+                    except Exception as e:
                         raise MythDBError(MythDBError.DB_RAW, e.args)
                     self[key] = self._FieldData(cursor.fetchall())
 
@@ -1280,7 +1281,7 @@ class DBCache( MythSchema ):
 
         # apply the rest of object init if not already done
         self._testconfig(self.dbconfig)
-                    
+
     def _testconfig(self, dbconfig):
         self.dbconfig = dbconfig
         if dbconfig in self.shared:
@@ -1393,9 +1394,7 @@ class DBCache( MythSchema ):
         """
         conv = {int: str,
                 str: lambda x: '"%s"'%x,
-                long: str,
                 float: str,
-                unicode: lambda x: '"%s"'%x,
                 bool: str,
                 type(None): lambda x: 'NULL',
                 _pydt.datetime: lambda x: x.strftime('"%Y-%m-%d %H:%M:%S"'),
@@ -1407,7 +1406,7 @@ class DBCache( MythSchema ):
                                                  x.seconds%60),
                 _pyt.struct_time: lambda x: _pyt.\
                                         strftime('"%Y-%m-%d %H:%M:%S"',x)}
-        
+
         if args is None:
             return query
 
