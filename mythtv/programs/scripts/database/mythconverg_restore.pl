@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.18';
+    $VERSION        = '1.0.19';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -915,17 +915,25 @@ EOF
         my $use_db = shift;
         my $show_errors = shift;
         my $result = 1;
-        my $connect_string = 'dbi:mysql:database=';
+        my $connect_string = 'dbi:mysql';
+        my $temp_host = $mysql_conf{'db_host'};
+        if ($temp_host =~ /:/)
+        {
+            if ($temp_host =~ /^(?!\[).*(?!\])$/)
+            {
+            $temp_host = "[$temp_host]";
+            }
+        }
+        $connect_string .= ":host=$temp_host";
         if ($use_db)
         {
-            $connect_string .= $mysql_conf{'db_name'};
+            $connect_string .= ":database=$mysql_conf{'db_name'}";
         }
-        $connect_string .= ":host=$mysql_conf{'db_host'}";
         $dbh->disconnect if (defined($dbh));
         $dbh = DBI->connect($connect_string,
                             "$mysql_conf{'db_user'}",
                             "$mysql_conf{'db_pass'}",
-                            { PrintError => 0 });
+                            { PrintError => 1 });
         $result = 0 if (!defined($dbh));
         if ($show_errors && !defined($dbh))
         {
