@@ -2195,9 +2195,9 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                         QCoreApplication::postEvent(this, key);
                     else
                         QCoreApplication::postEvent(key_target, key);
-                }
 
-                return true;
+                    return true;
+                }
             }
 #endif
 
