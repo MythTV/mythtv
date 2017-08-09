@@ -1093,12 +1093,6 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
     resize(d->screenwidth, d->screenheight);
 
-    GetMythUI()->ThemeWidget(this);
-#ifdef Q_OS_MAC
-    // QPalette inheritance appears broken on mac, so there's no point setting the palette
-    // to the top widget each time. Instead we apply the default palette to the whole application
-    qApp->setPalette(palette());
-#endif
     Show();
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))

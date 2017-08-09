@@ -18,7 +18,6 @@ class MythPainter;
 class MythImage;
 class QImage;
 class QWidget;
-class Settings;
 class QPixmap;
 class QSize;
 
@@ -64,8 +63,6 @@ class MUI_PUBLIC MythUIHelper
     void IncludeInCacheSize(MythImage *im);
     void ExcludeFromCacheSize(MythImage *im);
 
-    Settings *qtconfig(void);
-
     bool IsScreenSetup(void);
     bool IsTopScreenInitialized(void);
 
@@ -90,8 +87,6 @@ class MUI_PUBLIC MythUIHelper
     MythImage *LoadCacheImage(QString srcfile, QString label,
                               MythPainter *painter,
                               ImageCacheMode cacheMode = kCacheNormal);
-
-    void ThemeWidget(QWidget *widget);
 
     QString FindThemeDir(const QString &themename, bool doFallback = true);
     QString FindMenuThemeDir(const QString &menuname);
@@ -148,7 +143,6 @@ class MUI_PUBLIC MythUIHelper
    ~MythUIHelper();
 
   private:
-    void SetPalette(QWidget *widget);
     void InitializeScreenSettings(void);
 
     void ClearOldImageCache(void);

@@ -24,7 +24,6 @@
 #include "mythdirs.h"
 #include "mythlogging.h"
 #include "mythdownloadmanager.h"
-#include "oldsettings.h"
 #include "mythdb.h"
 #include "remotefile.h"
 #include "mythcorecontext.h"
@@ -104,8 +103,6 @@ public:
     double GetPixelAspectRatio(void);
     void WaitForScreenChange(void) const;
 
-    Settings *m_qtThemeSettings;   ///< Text/button/background colours, etc
-
     bool      m_themeloaded;       ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
     QString   m_themepathname;
@@ -177,8 +174,7 @@ int MythUIHelperPrivate::w_override = -1;
 int MythUIHelperPrivate::h_override = -1;
 
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
-    : m_qtThemeSettings(new Settings()),
-      m_themeloaded(false),
+    : m_themeloaded(false),
       m_wmult(1.0), m_hmult(1.0), m_pixelAspectRatio(-1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
@@ -212,7 +208,6 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
     delete m_cacheLock;
     delete m_imageThreadPool;
-    delete m_qtThemeSettings;
     delete screensaver;
 
     if (display_res)
@@ -505,10 +500,6 @@ void MythUIHelper::LoadQtConfig(void)
     // Note the possibly changed screen settings
     d->GetScreenBounds();
 
-    delete d->m_qtThemeSettings;
-
-    d->m_qtThemeSettings = new Settings;
-
     qApp->setStyle("Windows");
 
     QString themename = GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME);
@@ -534,11 +525,6 @@ void MythUIHelper::LoadQtConfig(void)
     d->m_themepathname = themedir + '/';
     d->m_searchPaths.clear();
 
-    QString qtlook = "qtlook.txt";
-    if (!FindThemeFile(qtlook))
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find any qtlook.txt in the theme search path");
-
-    d->m_qtThemeSettings->ReadSettings(qtlook);
     d->m_themeloaded = false;
 
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
@@ -547,11 +533,6 @@ void MythUIHelper::LoadQtConfig(void)
         themename = "defaultmenu";
 
     d->m_menuthemepathname = FindMenuThemeDir(themename);
-}
-
-Settings *MythUIHelper::qtconfig(void)
-{
-    return d->m_qtThemeSettings;
 }
 
 void MythUIHelper::UpdateImageCache(void)
@@ -1381,114 +1362,6 @@ QList<ThemeInfo> MythUIHelper::GetThemes(ThemeType type)
     }
 
     return themeList;
-}
-
-void MythUIHelper::SetPalette(QWidget *widget)
-{
-    QPalette pal = widget->palette();
-
-    const QString names[] = { "Foreground", "Button", "Light", "Midlight",
-                              "Dark", "Mid", "Text", "BrightText", "ButtonText",
-                              "Base", "Background", "Shadow", "Highlight",
-                              "HighlightedText"
-                            };
-
-    QString type = "Active";
-
-    for (int i = 0; i < 13; i++)
-    {
-        QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-
-        if (!color.isEmpty())
-            pal.setColor(QPalette::Active, (QPalette::ColorRole) i,
-                         createColor(color));
-    }
-
-    type = "Disabled";
-
-    for (int i = 0; i < 13; i++)
-    {
-        QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-
-        if (!color.isEmpty())
-            pal.setColor(QPalette::Disabled, (QPalette::ColorRole) i,
-                         createColor(color));
-    }
-
-    type = "Inactive";
-
-    for (int i = 0; i < 13; i++)
-    {
-        QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-
-        if (!color.isEmpty())
-            pal.setColor(QPalette::Inactive, (QPalette::ColorRole) i,
-                         createColor(color));
-    }
-
-    widget->setPalette(pal);
-}
-
-void MythUIHelper::ThemeWidget(QWidget *widget)
-{
-    if (d->m_themeloaded)
-    {
-        widget->setPalette(d->m_palette);
-        return;
-    }
-
-    SetPalette(widget);
-    d->m_palette = widget->palette();
-
-    QPixmap *bgpixmap = NULL;
-
-    if (!d->m_qtThemeSettings->GetSetting("BackgroundPixmap").isEmpty())
-    {
-        QString pmapname = d->m_qtThemeSettings->GetSetting("BackgroundPixmap");
-        if (!FindThemeFile(pmapname))
-            LOG(VB_GENERAL, LOG_ERR, QString(LOC + "Failed to find '%1' in the theme search path")
-                .arg(d->m_qtThemeSettings->GetSetting("BackgroundPixmap")));
-
-        bgpixmap = LoadScalePixmap(pmapname);
-
-        if (bgpixmap)
-        {
-            d->m_palette.setBrush(widget->backgroundRole(), QBrush(*bgpixmap));
-            widget->setPalette(d->m_palette);
-        }
-    }
-    else if (!d->m_qtThemeSettings
-             ->GetSetting("TiledBackgroundPixmap").isEmpty())
-    {
-        QString pmapname = d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
-
-        if (!FindThemeFile(pmapname))
-            LOG(VB_GENERAL, LOG_ERR, QString(LOC + "Failed to find '%1' in the theme search path")
-                .arg(d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap")));
-
-        int width, height;
-        float wmult, hmult;
-
-        GetScreenSettings(width, wmult, height, hmult);
-
-        bgpixmap = LoadScalePixmap(pmapname);
-
-        if (bgpixmap)
-        {
-            QPixmap background(width, height);
-            QPainter tmp(&background);
-
-            tmp.drawTiledPixmap(0, 0, width, height, *bgpixmap);
-            tmp.end();
-
-            d->m_palette.setBrush(widget->backgroundRole(), QBrush(background));
-            widget->setPalette(d->m_palette);
-        }
-    }
-
-    d->m_themeloaded = true;
-
-    delete bgpixmap;
 }
 
 bool MythUIHelper::FindThemeFile(QString &path)

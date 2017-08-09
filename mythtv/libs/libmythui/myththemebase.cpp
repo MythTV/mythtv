@@ -9,8 +9,6 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 
-#include "oldsettings.h" // Deprecated
-
 class MythThemeBasePrivate
 {
   public:
@@ -39,9 +37,6 @@ MythThemeBase::~MythThemeBase()
 
 void MythThemeBase::Reload(void)
 {
-    MythMainWindow *mainWindow = GetMythMainWindow();
-    QRect uiSize = mainWindow->GetUIScreenRect();
-
     GetGlobalFontMap()->Clear();
     XMLParseBase::ClearGlobalObjectStore();
     GetGlobalFontManager()->ReleaseFonts("UI");
@@ -55,14 +50,7 @@ void MythThemeBase::Reload(void)
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
                                           d->backgroundscreen))
     {
-        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap");
-        backgroundname = GetMythUI()->GetThemeDir() + backgroundname;
-
-        d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
-                                     "backimg");
-        d->backimg->SetPosition(mainWindow->NormPoint(QPoint(0, 0)));
-        d->backimg->SetSize(uiSize.width(), uiSize.height());
-        d->backimg->Load();
+        // Nada. All themes should use the MythUI code now.
     }
 
     d->background->AddScreen(d->backgroundscreen, false);
@@ -71,7 +59,6 @@ void MythThemeBase::Reload(void)
 void MythThemeBase::Init(void)
 {
     MythMainWindow *mainWindow = GetMythMainWindow();
-    QRect uiSize = mainWindow->GetUIScreenRect();
 
     d->background = new MythScreenStack(mainWindow, "background");
     d->background->DisableEffects();
@@ -84,14 +71,7 @@ void MythThemeBase::Init(void)
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
                                           d->backgroundscreen))
     {
-        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap");
-        backgroundname = GetMythUI()->GetThemeDir() + backgroundname;
-
-        d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
-                                     "backimg");
-        d->backimg->SetPosition(mainWindow->NormPoint(QPoint(0, 0)));
-        d->backimg->SetSize(uiSize.width(), uiSize.height());
-        d->backimg->Load();
+        // Nada. All themes should use the MythUI code now.
     }
 
     d->background->AddScreen(d->backgroundscreen, false);

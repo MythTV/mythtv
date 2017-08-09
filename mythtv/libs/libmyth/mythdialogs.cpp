@@ -72,7 +72,6 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     {
         move(0, 0);
         setFixedSize(QSize(screenwidth, screenheight));
-        GetMythUI()->ThemeWidget(this);
     }
 
     setAutoFillBackground(true);
@@ -314,8 +313,6 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
         palette.setColor(backgroundRole(), popupBackground);
         setPalette(palette);
     }
-    else
-        GetMythUI()->ThemeWidget(this);
 
     QPalette palette;
     palette.setColor(foregroundRole(), popupHighlight);
@@ -807,8 +804,6 @@ MythProgressDialog::MythProgressDialog(
     GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setFont(GetMythUI()->GetMediumFont());
-
-    GetMythUI()->ThemeWidget(this);
 
     int yoff = screenheight / 3;
     int xoff = screenwidth / 10;
