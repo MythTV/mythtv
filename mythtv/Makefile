@@ -23,7 +23,7 @@ SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 	distclean $(addsuffix _distclean,$(SUBDIRS))  \
 	install   $(addsuffix _install,  $(SUBDIRS))  \
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
-	global \
+	global tags TAGS \
 	libs/libmythbase/version.h force
 
 all: libs/libmythbase/version.h subdirs
@@ -90,6 +90,7 @@ distclean: $(addsuffix _distclean,$(SUBDIRS))
 	-rm -f config.ep
 	-rm -f $(addsuffix /Makefile,$(QT_SUBDIRS))
 	-rm -f ../GPATH ../GRTAGS ../GTAGS
+	-rm -f ../TAGS ../tags
 
 install: $(addsuffix _install,$(SUBDIRS))
 
@@ -100,6 +101,16 @@ uninstall: $(addsuffix _uninstall,$(SUBDIRS))
 
 test: libs/libmythbase/version.h subdirs
 	cd libs ; $(MAKE) test
+
+ctags tags:
+	@echo "Making tags..."
+	@cd .. ; rm -f tags
+	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs ctags -a
+
+etags TAGS:
+	@echo "Making TAGS..."
+	@cd .. ; rm -f TAGS
+	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs etags -a
 
 global GPATH GRTAGS GTAGS:
 	@echo "Making global tags..."

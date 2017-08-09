@@ -39,6 +39,8 @@ bin
 .directory
 .vscode
 .qmake.stash
+tags
+TAGS
 GPATH
 GRTAGS
 GTAGS
