@@ -1993,7 +1993,7 @@ void Scheduler::run(void)
     bool      blockShutdown   =
         gCoreContext->GetNumSetting("blockSDWUwithoutClient", 1);
     bool      firstRun        = true;
-    QDateTime lastSleepCheck  = MythDate::current().addDays(-1);
+    QDateTime nextSleepCheck  = MythDate::current();
     RecIter   startIter       = reclist.begin();
     QDateTime idleSince       = QDateTime();
     int       schedRunTime    = 0; // max scheduler run time in seconds
@@ -2021,7 +2021,7 @@ void Scheduler::run(void)
             sched_sleep = min(sched_sleep, 15000);
         bool haveRequests = HaveQueuedRequests();
         int const kSleepCheck = 300;
-        bool checkSlaves = lastSleepCheck.secsTo(curtime) >= kSleepCheck;
+        bool checkSlaves = curtime >= nextSleepCheck;
 
         // If we're about to start a recording don't do any reschedules...
         // instead sleep for a bit
@@ -2082,12 +2082,18 @@ void Scheduler::run(void)
             {
                 // Check for slaves that can be put to sleep.
                 PutInactiveSlavesToSleep();
-                lastSleepCheck = MythDate::current();
+                nextSleepCheck = MythDate::current().addSecs(kSleepCheck);
+                checkSlaves = false;
             }
         }
 
         nextStartTime = MythDate::current().addDays(14);
-        nextWakeTime = lastSleepCheck.addSecs(kSleepCheck);
+        // If checkSlaves is still set, choose a reasonable wake time
+        // in the future instead of one that we know is in the past.
+        if (checkSlaves)
+            nextWakeTime = MythDate::current().addSecs(kSleepCheck);
+        else
+            nextWakeTime = nextSleepCheck;
 
         // Skip past recordings that are already history
         // (i.e. AddHistory() has been called setting oldrecstatus)
