@@ -8,6 +8,7 @@
 #include "mythsystemlegacy.h"
 #include "mythsystemevent.h"
 #include "programinfo.h"
+#include "cardutil.h"
 #include "remoteutil.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
@@ -135,7 +136,9 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
             (*it == "HOSTNAME") ||
             (*it == "SECS") ||
             (*it == "SENDER") ||
-            (*it == "PATH"))
+            (*it == "PATH") ||
+            (*it == "VIDEODEVICE") ||
+            (*it == "VBIDEVICE"))
         {
             QString token = *it;
 
@@ -327,12 +330,16 @@ void SendMythSystemRecEvent(const QString &msg, const RecordingInfo *pginfo)
 {
     if (pginfo)
     {
+        uint cardid = pginfo->GetInputID();
         gCoreContext->SendSystemEvent(
-            QString("%1 CARDID %2 CHANID %3 STARTTIME %4 RECSTATUS %5")
-            .arg(msg).arg(pginfo->GetInputID())
+            QString("%1 CARDID %2 CHANID %3 STARTTIME %4 RECSTATUS %5 "
+                    "VIDEODEVICE %6 VBIDEVICE %7")
+            .arg(msg).arg(cardid)
             .arg(pginfo->GetChanID())
             .arg(pginfo->GetRecordingStartTime(MythDate::ISODate))
-            .arg(pginfo->GetRecordingStatus()));
+            .arg(pginfo->GetRecordingStatus())
+            .arg(CardUtil::GetVideoDevice(cardid))
+            .arg(CardUtil::GetVBIDevice(cardid)));
     }
     else
     {
