@@ -1031,6 +1031,9 @@ bool MythUIHelper::IsGeometryOverridden(void)
  *   If the theme cannot be found falls back to the DEFAULT_UI_THEME.
  *   If the DEFAULT_UI_THEME doesn't exist then returns an empty string.
  *  \param themename The theme name.
+ *  \param doFallback If true and the theme isn't found, allow
+ *                    fallback to the default theme.  If false and the
+ *                    theme isn't found, then return an empty string.
  *  \return Path to theme or empty string.
  */
 QString MythUIHelper::FindThemeDir(const QString &themename, bool doFallback)

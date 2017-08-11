@@ -66,13 +66,16 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
 
     /**
      * @brief Create a gradient image.
+     * @param painter The painter on which the gradient should be draw.
      * @param size The size of the image.
      * @param begin The beginning colour.
      * @param end The ending colour.
+     * @param alpha The opacity of the gradient.
+     * @param direction Whether the gradient should be left-to-right or top-to-bottom.
      * @return A reference counted image, call DecrRef() to delete.
      */
     static MythImage *Gradient(MythPainter *painter,
-                               const QSize & size, const QColor &beg,
+                               const QSize & size, const QColor &begin,
                                const QColor &end, uint alpha,
                                FillDirection direction = FillTopToBottom);
 

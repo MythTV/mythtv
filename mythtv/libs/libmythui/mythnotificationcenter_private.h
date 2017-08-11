@@ -87,7 +87,7 @@ public:
     bool ScreenCreated(const MythScreenType *screen);
     /**
      * Return the list of notification screens being currently displayed.
-     * The list contains pointer of existing screen's copies, with ::Create()
+     * The list contains pointer of existing screen's copies, with \::Create()
      * not called yet.
      */
     void GetNotificationScreens(QList<MythScreenType*> &screens);

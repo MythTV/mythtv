@@ -144,7 +144,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
 /**
  *  \brief Get a named child of this UIType
  *
- *  \param Name of child
+ *  \param name Name of child
  *  \return Pointer to child if found, or NULL
  */
 MythUIType *MythUIType::GetChild(const QString &name) const
@@ -160,7 +160,7 @@ MythUIType *MythUIType::GetChild(const QString &name) const
 /**
  *  \brief Delete a named child of this UIType
  *
- *  \param Name of child
+ *  \param name Name of child
  */
 void MythUIType::DeleteChild(const QString &name)
 {
@@ -230,11 +230,11 @@ void MythUIType::DeleteAllChildren(void)
     m_ChildrenList.clear();
 }
 
-/** \brief Return the first MythUIType which accepts focus found at the given
- *         coordinates
+/** \brief Return the first MythUIType at the given coordinates
  *
  *  \param p QPoint coordinates
  *  \param recursive Whether to perform a recursive search
+ *  \param focusable Only consider widgets that are focusable.
  *
  *  \return The widget at these coordinates
  */

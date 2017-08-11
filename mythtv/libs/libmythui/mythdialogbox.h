@@ -331,7 +331,7 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
 
   public:
     MythUISearchDialog(MythScreenStack *parent,
-                     const QString &message,
+                     const QString &title,
                      const QStringList &list,
                      bool  matchAnywhere = false,
                      const QString &defaultValue = "");
