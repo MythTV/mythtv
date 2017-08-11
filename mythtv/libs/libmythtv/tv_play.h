@@ -273,8 +273,8 @@ private:
  * \class TV
  *
  * \brief Control TV playback
- * \qmlsignal TVPlaybackAborted(void)
  *
+ * \qmlsignal TVPlaybackAborted(void)
  * TV playback failed to start (typically, TV playback was started when another playback is currently going)
  * \qmlsignal TVPlaybackStarted(void)
  * TV playback has started, video is now playing
