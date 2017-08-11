@@ -37,8 +37,12 @@ class MBASE_PUBLIC MythUserSession
     const QDateTime GetSessionExpires() const { return m_sessionExpires; }
 
     /**
-     * \brief Check if the user hash the given permission in a context
-     * \param username
+     * \brief Check if the user has the given permission in a context
+     *
+     * This function is currently unimplemented.
+     *
+     * \param context
+     * \param permission
      */
     bool CheckPermission( const QString &context, uint permission);
 
@@ -100,7 +104,7 @@ class MBASE_PUBLIC MythSessionManager
 
     /**
      * \brief Check if the session token is valid
-     * \param username
+     * \param sessionToken
      */
     bool IsValidSession(const QString &sessionToken);
 

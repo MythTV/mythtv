@@ -100,6 +100,8 @@ void StorageGroup::StaticInit(void)
  *
  *  \param group    The name of the Storage Group
  *  \param hostname The host whose Storage Group definition is desired
+ *  \param allowFallback allow the storage group search code to fall back if
+ *                  no dirs exist for the specified group/host
  */
 void StorageGroup::Init(const QString &group, const QString &hostname,
                         const bool allowFallback)

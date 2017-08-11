@@ -81,7 +81,7 @@ MythSystemLegacy::MythSystemLegacy(const QString &command, uint flags)
     SetCommand(command, flags);
 }
 
-/** \fn MythSystemLegacy::setCommand(const QString &command)
+/**
  *  \brief Resets an existing MythSystemLegacy object to a new command
  */
 void MythSystemLegacy::SetCommand(const QString &command, uint flags)
@@ -123,8 +123,7 @@ MythSystemLegacy::MythSystemLegacy(const QString &command,
     SetCommand(command, args, flags);
 }
 
-/** \fn MythSystemLegacy::setCommand(const QString &command,
-                               const QStringList &args)
+/**
  *  \brief Resets an existing MythSystemLegacy object to a new command
  */
 void MythSystemLegacy::SetCommand(const QString &command,

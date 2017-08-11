@@ -39,7 +39,7 @@
 #include <QtDebug>
 
 /*!
-	\class UnZip unzip.h
+	\class UnZip
 
 	\brief PKZip 2.0 file decompression.
 	Compatibility with later versions is not ensured as they may use
@@ -48,31 +48,72 @@
 	completely incompatible.
 */
 
-/*! \enum UnZip::ErrorCode The result of a decompression operation.
-	\value UnZip::Ok No error occurred.
-	\value UnZip::ZlibInit Failed to init or load the zlib library.
-	\value UnZip::ZlibError The zlib library returned some error.
-	\value UnZip::OpenFailed Unable to create or open a device.
-	\value UnZip::PartiallyCorrupted Corrupted zip archive - some files could be extracted.
-	\value UnZip::Corrupted Corrupted or invalid zip archive.
-	\value UnZip::WrongPassword Unable to decrypt a password protected file.
-	\value UnZip::NoOpenArchive No archive has been opened yet.
-	\value UnZip::FileNotFound Unable to find the requested file in the archive.
-	\value UnZip::ReadFailed Reading of a file failed.
-	\value UnZip::WriteFailed Writing of a file failed.
-	\value UnZip::SeekFailed Seek failed.
-	\value UnZip::CreateDirFailed Could not create a directory.
-	\value UnZip::InvalidDevice A null device has been passed as parameter.
-	\value UnZip::InvalidArchive This is not a valid (or supported) ZIP archive.
-	\value UnZip::HeaderConsistencyError Local header record info does not match with the central directory record info. The archive may be corrupted.
+/*!	\enum UnZip::ErrorCode
+	The result of a decompression operation.
 
-	\value UnZip::Skip Internal use only.
-	\value UnZip::SkipAll Internal use only.
+	\var UnZip::Ok
+	No error occurred.
+
+	\var UnZip::ZlibInit
+	Failed to init or load the zlib library.
+
+	\var UnZip::ZlibError
+	The zlib library returned some error.
+
+	\var UnZip::OpenFailed
+	Unable to create or open a device.
+
+	\var UnZip::PartiallyCorrupted
+	Corrupted zip archive - some files could be extracted.
+
+	\var UnZip::Corrupted
+	Corrupted or invalid zip archive.
+
+	\var UnZip::WrongPassword
+	Unable to decrypt a password protected file.
+
+	\var UnZip::NoOpenArchive
+	No archive has been opened yet.
+
+	\var UnZip::FileNotFound
+	Unable to find the requested file in the archive.
+
+	\var UnZip::ReadFailed
+	Reading of a file failed.
+
+	\var UnZip::WriteFailed
+	Writing of a file failed.
+
+	\var UnZip::SeekFailed
+	Seek failed.
+
+	\var UnZip::CreateDirFailed
+	Could not create a directory.
+
+	\var UnZip::InvalidDevice
+	A null device has been passed as parameter.
+
+	\var UnZip::InvalidArchive
+	This is not a valid (or supported) ZIP archive.
+
+	\var UnZip::HeaderConsistencyError
+	Local header record info does not match with the central directory record info. The archive may be corrupted.
+
+	\var UnZip::Skip
+	Internal use only.
+
+	\var UnZip::SkipAll
+	Internal use only.
 */
 
-/*! \enum UnZip::ExtractionOptions Some options for the file extraction methods.
-	\value UnZip::ExtractPaths Default. Does not ignore the path of the zipped files.
-	\value UnZip::SkipPaths Default. Ignores the path of the zipped files and extracts them all to the same root directory.
+/*! \enum UnZip::ExtractionOption
+	Some options for the file extraction methods.
+
+	\var UnZip::ExtractPaths
+	Default. Does not ignore the path of the zipped files.
+
+	\var UnZip::SkipPaths
+	Default. Ignores the path of the zipped files and extracts them all to the same root directory.
 */
 
 //! Local header size (excluding signature, excluding variable length fields)

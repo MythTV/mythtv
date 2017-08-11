@@ -1203,29 +1203,32 @@ MythCommandLineParser::~MythCommandLineParser()
  *  are several overloaded convenience methods that tie into this, allowing
  *  it to be called with fewer inputs.
  *
- *  arglist  - list of arguments to allow use of on the command line
- *  name     - internal name to be used when pulling processed data out
- *  type     - type of variable to be processed
- *  def      - default value to provide if one is not supplied or option is
- *             not used
- *  help     - short help text, displayed when printing all available options
- *             with '--help'
- *             if this is empty, the argument will not be shown
- *  longhelp - extended help text, displayed when help about a specific option
- *             is requested using '--help <option>'
+ *  \param arglist  list of arguments to allow use of on the command line
+ *  \param name     internal name to be used when pulling processed data out
+ *  \param type     type of variable to be processed.  The allowed types are
+ *                  listed below.
+ *  \param def      default value to provide if one is not supplied or option
+ *                  is not used
+ *  \param help     short help text, displayed when printing all available
+ *                  options with '--help'.  If this is empty, the argument
+ *                  will not be shown
+ *  \param longhelp Extended help text, displayed when help about a specific
+ *                  option is requested using '--help \<option\>'
  *
- *  Allowed types are:
- *    Bool          - set to value, or default if value is not provided
- *    String        - set to value, or default if value is not provided
- *    Int           - set to value, or behaves as counter for multiple uses if
- *                    value is not provided
- *    UInt
- *    LongLong
- *    Double
- *    DateTime      - accepts ISO8601 and Myth's flattened version
- *    StringList    - accepts multiple uses, appended as individual strings
- *    Map           - accepts multiple pairs, in the syntax "key=value"
- *    Size          - accepts size in the syntax "XxY"
+ * <table>
+ *   <tr><th> Type <th> Description
+ *   <tr><td> Bool <td> set to value, or default if value is not provided
+ *   <tr><td> String      <td> set to value, or default if value is not provided
+ *   <tr><td> Int         <td> set to value, or behaves as counter for multiple uses if
+ *                             value is not provided
+ *   <tr><td> UInt        <td>
+ *   <tr><td> LongLong    <td>
+ *   <tr><td> Double      <td>
+ *   <tr><td> DateTime    <td> accepts ISO8601 and %Myth's flattened version
+ *   <tr><td> StringList  <td> accepts multiple uses, appended as individual strings
+ *   <tr><td> Map         <td> accepts multiple pairs, in the syntax "key=value"
+ *   <tr><td> Size        <td> accepts size in the syntax "XxY"
+ * </table>
  */
 CommandLineArg* MythCommandLineParser::add(QStringList arglist,
         QString name, QVariant::Type type, QVariant def,
