@@ -138,9 +138,9 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetAlpha(int newalpha);
     int GetAlpha(void) const;
 
-    virtual bool keyPressEvent(QKeyEvent *);
-    virtual bool gestureEvent(MythGestureEvent *);
-    virtual void mediaEvent(MythMediaEvent *);
+    virtual bool keyPressEvent(QKeyEvent *event);
+    virtual bool gestureEvent(MythGestureEvent *event);
+    virtual void mediaEvent(MythMediaEvent *event);
 
     MythFontProperties *GetFont(const QString &text) const;
     bool AddFont(const QString &text, MythFontProperties *fontProp);
@@ -176,7 +176,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   protected:
     virtual ~MythUIType();
-    virtual void customEvent(QEvent *);
+    virtual void customEvent(QEvent *event);
 
   public slots:
     void LoseFocus();

@@ -985,13 +985,13 @@ void MythUIType::SetAngle(float angle)
  *
  *  \param event Keypress event
  */
-bool MythUIType::keyPressEvent(QKeyEvent *)
+bool MythUIType::keyPressEvent(QKeyEvent * /*event*/)
 {
     return false;
 }
 
 
-void MythUIType::customEvent(QEvent *)
+void MythUIType::customEvent(QEvent * /*event*/)
 {
     return;
 }
@@ -1001,7 +1001,7 @@ void MythUIType::customEvent(QEvent *)
  *
  *  \param event Mouse event
  */
-bool MythUIType::gestureEvent(MythGestureEvent *)
+bool MythUIType::gestureEvent(MythGestureEvent * /*event*/)
 {
     return false;
 }
@@ -1010,7 +1010,7 @@ bool MythUIType::gestureEvent(MythGestureEvent *)
  *
  *  \param event Media event
  */
-void MythUIType::mediaEvent(MythMediaEvent *)
+void MythUIType::mediaEvent(MythMediaEvent * /*event*/)
 {
     return;
 }
