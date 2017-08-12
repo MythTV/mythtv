@@ -884,10 +884,14 @@ void VideoOutputOMX::Show(FrameScanType scan)
 
     hdr->nFilledLen = frame->offsets[2] + (frame->offsets[1] >> 2);
     hdr->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
+#ifdef OMX_BUFFERFLAG_INTERLACED
     if (frame->interlaced_frame)
         hdr->nFlags |= OMX_BUFFERFLAG_INTERLACED;
+#endif
+#ifdef OMX_BUFFERFLAG_TOP_FIELD_FIRST
     if (frame->top_field_first)
         hdr->nFlags |= OMX_BUFFERFLAG_TOP_FIELD_FIRST;
+#endif
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
     // Paused - do not display anything unless softblend set
     if (m_videoPaused && GetOSDRenderer() != "softblend")
