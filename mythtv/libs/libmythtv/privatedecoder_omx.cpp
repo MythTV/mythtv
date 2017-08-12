@@ -1016,18 +1016,19 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
 
         if (ret)
         {
-#ifdef USING_BROADCOM
+#ifdef OMX_BUFFERFLAG_INTERLACED
             if (nFlags & OMX_BUFFERFLAG_INTERLACED)
                 picture->interlaced_frame = 1;
             else
+#endif
                 picture->interlaced_frame = 0;
+#ifdef OMX_BUFFERFLAG_TOP_FIELD_FIRST
             if (nFlags & OMX_BUFFERFLAG_TOP_FIELD_FIRST)
                 picture->top_field_first = 1;
             else
+#endif
                 picture->top_field_first = 0;
             picture->repeat_pict = 0;
-#endif // USING_BROADCOM
-
             if (!frame)
             {
                 // Copy OMX buffer to the frame provided
