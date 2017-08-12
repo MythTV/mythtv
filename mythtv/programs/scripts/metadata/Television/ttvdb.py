@@ -747,21 +747,19 @@ class tvdb_account:
     account_identifier = "D31CB9C54523C723"
     apikey = "3D70C53F62E90DE7"
 
-# Verify that tvdb_api.py, tvdb_ui.py and tvdb_exceptions.py are available
+# Verify that tvdb_api.py are available
 try:
     # thetvdb.com specific modules
-    import MythTV.ttvdb.tvdb_ui as tvdb_ui
-    # from tvdb_api import Tvdb
     import MythTV.ttvdb.tvdb_api as tvdb_api
-    from MythTV.ttvdb.tvdb_exceptions import (tvdb_error, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_episodenotfound, tvdb_attributenotfound, tvdb_userabort)
+    from MythTV.ttvdb.tvdb_api import (tvdb_error, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_episodenotfound, tvdb_attributenotfound, tvdb_userabort)
 
     # verify version of tvdbapi to make sure it is at least 1.0
-    if tvdb_api.__version__ < '1.0':
+    if tvdb_api.__version__ < '2.0':
         print("\nYour current installed tvdb_api.py version is (%s)\n" % tvdb_api.__version__)
         raise
 except Exception as e:
     print('''
-The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py.
+The modules tvdb_api.py (v2.0 or greater).
 They should have been installed along with the MythTV python bindings.
 Error:(%s)
 ''') %  e
@@ -1389,7 +1387,7 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
 # end Getseries_episode_numbers
 
 # Set up a custom interface to get all series matching a partial series name
-class returnAllSeriesUI(tvdb_ui.BaseUI):
+class returnAllSeriesUI(tvdb_api.BaseUI):
     def __init__(self, config, log=None):
         self.config = config
         self.log = log
