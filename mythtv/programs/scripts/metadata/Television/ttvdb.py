@@ -762,7 +762,7 @@ except Exception as e:
 The modules tvdb_api.py (v2.0 or greater).
 They should have been installed along with the MythTV python bindings.
 Error:(%s)
-''') %  e
+''' % e)
     sys.exit(1)
 finally:
     pass
@@ -772,7 +772,7 @@ try:
 except Exception as e:
     print("""Could not import levenshtein string distance method from MythTV Python Bindings
 Error:(%s)
-""") % e
+""" % e)
     sys.exit(1)
 
 try:
