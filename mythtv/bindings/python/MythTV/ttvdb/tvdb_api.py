@@ -531,9 +531,12 @@ import hashlib
 from requests_cache.backends.base import _to_bytes, _DEFAULT_HEADERS
 import types
 def create_key(self, request):
-    if self._ignored_parameters:
-        url, body = self._remove_ignored_parameters(request)
-    else:
+    try:
+        if self._ignored_parameters:
+            url, body = self._remove_ignored_parameters(request)
+        else:
+            url, body = request.url, request.body
+    except AttributeError:
         url, body = request.url, request.body
     key = hashlib.sha256()
     key.update(_to_bytes(request.method.upper()))
@@ -815,8 +818,13 @@ class Tvdb:
             # don't have the url in the cache
             fake_session_for_key = requests.Session()
             fake_session_for_key.headers['Accept-Language'] = language
-            cache_key = self.session.cache.create_key(fake_session_for_key.prepare_request(requests.Request('GET', url)))
-            if not self.session.cache.has_key(cache_key):
+            cache_key = None
+            try:
+                # in case the session class has no cache object, fail gracefully
+                cache_key = self.session.cache.create_key(fake_session_for_key.prepare_request(requests.Request('GET', url)))
+            except:
+                pass
+            if not cache_key or not self.session.cache.has_key(cache_key):
                 self.authorize()
 
         response = self.session.get(url, headers=self.headers)
@@ -831,12 +839,17 @@ class Tvdb:
 
         if error:
             if error == u'Resource not found':
-                raise(tvdb_resourcenotfound)
+                # raise(tvdb_resourcenotfound)
+                # handle no data at a different level so it is more specific
+                pass
             if error == u'Not Authorized':
                 raise(tvdb_notauthorized)
         if errors:
             if u'invalidLanguage' in errors:
-                raise(tvdb_invalidlanguage(errors[u'invalidLanguage']))
+                # raise(tvdb_invalidlanguage(errors[u'invalidLanguage']))
+                # invalidLanguage does not mean there is no data
+                # there is just less data
+                pass
 
         if data and isinstance(data, list):
             data.extend(r_data)

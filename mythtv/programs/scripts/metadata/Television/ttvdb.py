@@ -371,7 +371,7 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
     <ratingcount>168</ratingcount>
     <year>2007</year>
     <releasedate>2007-03-14</releasedate>
-    <lastupdated>Sat, 29 Jul 2017 07:24:53 GMT</lastupdated>
+    <lastupdated>...</lastupdated>
     <status>Ended</status>
     <images>
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-11.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-11.jpg"/>
@@ -743,8 +743,12 @@ else:
     import configparser as ConfigParser
 
 class tvdb_account:
-    username = "mythtv"
-    account_identifier = "D31CB9C54523C723"
+    # explicit username and account id are not required
+    # but leave just in case its useful in the future
+    # username = "mythtv"
+    # account_identifier = "D31CB9C54523C723"
+    username = ""
+    account_identifier = ""
     apikey = "3D70C53F62E90DE7"
 
 # Verify that tvdb_api.py are available
@@ -1953,7 +1957,7 @@ def main():
     # Return the season numbers for a series
     if opts.num_seasons == True:
         season_numbers=''
-        for x in seriesfound.keys():
+        for x in sorted(seriesfound.keys()):
             season_numbers+='%d,' % x
         print(season_numbers[:-1])
         return 0 # Option (-n) is the only option honoured when used
