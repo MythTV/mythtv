@@ -59,10 +59,8 @@ class HTTPLiveStreamThread : public QRunnable
   public:
     /** \fn HTTPLiveStreamThread::HTTPLiveStreamThread(int)
      *  \brief Constructor for creating a SystemEventThread
-     *  \param cmd       Command line to run for this System Event
-     *  \param eventName Optional System Event name for this command
+     *  \param streamid The stream identifier.
      */
-
     explicit HTTPLiveStreamThread(int streamid)
       : m_streamID(streamid) {}
 

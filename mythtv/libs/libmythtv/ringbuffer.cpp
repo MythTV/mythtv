@@ -98,9 +98,9 @@ bool        RingBuffer::gAVformat_net_initialised = false;
  *   You can explicitly disable the readahead thread by setting
  *   readahead to false, or by just not calling Start(void).
  *
- *  \param lfilename    Name of file to read or write.
+ *  \param xfilename    Name of file to read or write.
  *  \param write        If true an encapsulated writer is created
- *  \param readahead    If false a call to Start(void) will not
+ *  \param usereadahead If false a call to Start(void) will not
  *                      a pre-buffering thread, otherwise Start(void)
  *                      will start a pre-buffering thread.
  *  \param timeout_ms   if < 0, then we will not open the file.
@@ -272,7 +272,7 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
 #include <cassert>
 
 /** \brief Deletes
- *  \Note Classes inheriting from RingBuffer must implement
+ *  \note Classes inheriting from RingBuffer must implement
  *        a destructor that calls KillReadAheadThread().
  *        We can not do that here because this would leave
  *        pure virtual functions without implementations
@@ -334,7 +334,7 @@ void RingBuffer::Reset(bool full, bool toAdjust, bool resetInternal)
     rwlock.unlock();
 }
 
-/** \fn RingBuffer::UpdateRawBitrate(uint)
+/**
  *  \brief Set the raw bit rate, to allow RingBuffer adjust effective bitrate.
  *  \param raw_bitrate Streams average number of kilobits per second when
  *                     playspeed is 1.0

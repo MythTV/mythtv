@@ -124,7 +124,7 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
 
     // commands
     virtual bool HandleAction(const QStringList &actions, int64_t pts);
-    virtual bool OpenFile(const QString &filename,
+    virtual bool OpenFile(const QString &lfilename,
                           uint retry_ms = kDefaultOpenTimeout);
     void close(void);
 

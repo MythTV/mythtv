@@ -329,7 +329,7 @@ bool VideoOutputVDPAU::SetDeinterlacingEnabled(bool interlaced)
 }
 
 bool VideoOutputVDPAU::SetupDeinterlace(bool interlaced,
-                                        const QString &override)
+                                        const QString &overridefilter)
 {
     m_lock.lock();
     if (!m_render)
@@ -345,7 +345,7 @@ bool VideoOutputVDPAU::SetupDeinterlace(bool interlaced,
 
     if (enable)
     {
-        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(override);
+        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
         if (m_deintfiltername.contains("vdpau"))
         {
             uint features = kVDPFeatNone;

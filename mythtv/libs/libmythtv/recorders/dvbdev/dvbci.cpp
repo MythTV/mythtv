@@ -92,7 +92,14 @@ static ssize_t safe_read(int filedes, void *buffer, size_t size)
 }
 
 static const uint8_t *GetLength(const uint8_t *Data, int &Length)
-///< Gets the length field from the beginning of Data.
+///< Gets the length field from the beginning of Data.  This number is
+///  encoded into the output buffer. If the high order bit of the
+///  first byte is zero, then the remaining seven bits hold the actual
+///  length.  If the high order bit is set then the remaining bits of
+///  that byte indicate how many bytes are used to hold the length.
+///  The subsequent bytes hold the actual length value.
+///< \param Data A pointer to current location for reading data.
+///< \param Length Used to store the length from the data stream.
 ///< \return Returns a pointer to the first byte after the length and
 ///< stores the length value in Length.
 {
@@ -107,7 +114,14 @@ static const uint8_t *GetLength(const uint8_t *Data, int &Length)
 }
 
 static uint8_t *SetLength(uint8_t *Data, int Length)
-///< Sets the length field at the beginning of Data.
+///< Sets the length field at the beginning of Data.  This number is
+///  encoded into the output buffer. If the length is less than 128,
+///  it is written directly into the first byte.  If 128 or more, the
+///  high order bit of the first byte is set and the remaining bits
+///  indicate how many bytes are needed to hold the length.  The
+///  subsequent bytes hold the actual length.
+///< \param Data A pointer to current location for writing data.
+///< \param Length A number to encode into the data stream.
 ///< \return Returns a pointer to the first byte after the length.
 {
   uint8_t *p = Data;
@@ -128,6 +142,8 @@ static uint8_t *SetLength(uint8_t *Data, int Length)
 
 static char *CopyString(int Length, const uint8_t *Data)
 ///< Copies the string at Data.
+///< \param Length The number of bytes to copy from Data.
+///< \param Data A pointer to current location for reading data.
 ///< \return Returns a pointer to a newly allocated string.
 {
   char *s = MALLOC(char, Length + 1);
@@ -138,8 +154,12 @@ static char *CopyString(int Length, const uint8_t *Data)
 
 static char *GetString(int &Length, const uint8_t **Data)
 ///< Gets the string at Data.
+///< Upon return Length and Data represent the remaining data after the string has been copied off.
+///< \param[in,out] Length The number of bytes to copy from Data. Updated for
+///                 the size of the string read.
+///< \param[in,out] Data A pointer to current location for reading data.
+///                 Updated for the size of the string read.
 ///< \return Returns a pointer to a newly allocated string, or NULL in case of error.
-///< Upon return Length and Data represent the remaining data after the string has been skipped.
 {
   if (Length > 0 && Data && *Data) {
      int l = 0;
@@ -779,6 +799,10 @@ cCiSession::~cCiSession()
 
 int cCiSession::GetTag(int &Length, const uint8_t **Data)
 ///< Gets the tag at Data.
+///< \param[in,out] Length The number of bytes to copy from Data. Updated for
+///                 the size of the string read.
+///< \param[in,out] Data A pointer to current location for reading data.
+///                 Updated for the size of the string read.
 ///< \return Returns the actual tag, or AOT_NONE in case of error.
 ///< Upon return Length and Data represent the remaining data after the tag has been skipped.
 {
@@ -1233,6 +1257,10 @@ cCiMMI::~cCiMMI()
 
 char *cCiMMI::GetText(int &Length, const uint8_t **Data)
 ///< Gets the text at Data.
+///< \param[in,out] Length The number of bytes to copy from Data. Updated for
+///                 the size of the string read.
+///< \param[in,out] Data A pointer to current location for reading data.
+///                 Updated for the size of the string read.
 ///< \return Returns a pointer to a newly allocated string, or NULL in case of error.
 ///< Upon return Length and Data represent the remaining data after the text has been skipped.
 {

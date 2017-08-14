@@ -204,12 +204,11 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *   Start() must be called to actually begin continuous
  *   signal monitoring.
  *
- *  \param db_cardnum Recorder number to monitor,
- *         if this is less than 0, SIGNAL events will not be
- *         sent to the frontend even if SetNotifyFrontend(true)
- *         is called.
- *  \param _channel      ChannelBase class for our monitoring
- *  \param wait_for_mask SignalMonitorFlags to start with.
+ *  \param _capturecardnum Recorder number to monitor, if this is less than 0,
+ *                         SIGNAL events will not be sent to the frontend even
+ *                         if SetNotifyFrontend(true) is called.
+ *  \param _channel        ChannelBase class for our monitoring
+ *  \param wait_for_mask   SignalMonitorFlags to start with.
  */
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                              uint64_t wait_for_mask)

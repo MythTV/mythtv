@@ -488,7 +488,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     bool StartRecorder(PlayerContext *ctx, int maxWait=-1);
     void StopStuff(PlayerContext *mctx, PlayerContext *ctx,
-                   bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
+                   bool stopRingBuffer, bool stopPlayer, bool stopRecorder);
     void TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx);
 
 

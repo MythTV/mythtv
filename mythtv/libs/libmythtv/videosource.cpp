@@ -806,8 +806,15 @@ class VideoDevice : public CaptureCardComboBoxSetting
                               card, driver, false);
     };
 
+    /**
+     *  \param dir      The directory to open and search for devices.
+     *  \param absPath  Ignored. The function always uses absolute paths.
+     */
     void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
     {
+        // Needed to make both compiler and doxygen happy.
+        (void) absPath;
+
         fillSelectionsFromDir(dir, 0, 255, QString::null, QString::null, false);
     }
 
@@ -916,8 +923,15 @@ class VBIDevice : public CaptureCardComboBoxSetting
         return count;
     }
 
+    /**
+     *  \param dir      The directory to open and search for devices.
+     *  \param absPath  Ignored. The function always uses absolute paths.
+     */
     void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
     {
+        // Needed to make both compiler and doxygen happy.
+        (void) absPath;
+
         fillSelectionsFromDir(dir, QString::null, QString::null);
     }
 

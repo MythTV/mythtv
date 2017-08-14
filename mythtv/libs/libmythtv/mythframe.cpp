@@ -741,7 +741,6 @@ void MythUSWCCopy::copy(VideoFrame *dst, const VideoFrame *src)
 }
 
 /**
- * \fn resetUSWCDetection
  * reset USWC detection. USWC detection will be made during the next copy
  */
 void MythUSWCCopy::resetUSWCDetection(void)
@@ -757,7 +756,6 @@ void MythUSWCCopy::allocateCache(int width)
 }
 
 /**
- * \fn setUSWC
  * disable USWC detection. If true: USWC code will always be used, otherwise
  * will use generic SSE code (faster with non-USWC memory
  */
@@ -767,7 +765,6 @@ void MythUSWCCopy::setUSWC(bool uswc)
 }
 
 /**
- * \fn reset
  * Will reset the cache for a frame with "width" and reset USWC detection.
  */
 void MythUSWCCopy::reset(int width)

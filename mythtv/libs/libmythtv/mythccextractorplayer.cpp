@@ -254,6 +254,7 @@ void MythCCExtractorPlayer::IngestSubtitle(
 /**
  * Adds new subtitle, finishes last if needed.
  * This is a version for DVB graphical subtitles only.
+ * @param list Queue of subtitles we modify.
  * @param content Content of the new subtitle (may be empty).
  * We're going to use it's img & start_time fields.
  */

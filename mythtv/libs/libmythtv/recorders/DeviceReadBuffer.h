@@ -70,8 +70,8 @@ class DeviceReadBuffer : protected MThread
     bool HandlePausing(void);
     bool Poll(void) const;
     void WakePoll(void) const;
-    uint WaitForUnused(uint bytes_needed) const;
-    uint WaitForUsed  (uint bytes_needed, uint max_wait /*ms*/) const;
+    uint WaitForUnused(uint needed) const;
+    uint WaitForUsed  (uint needed, uint max_wait /*ms*/) const;
 
     bool IsPauseRequested(void) const;
     bool IsOpen(void) const { return _stream_fd >= 0; }

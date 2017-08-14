@@ -47,7 +47,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     friend class ICRingBuffer;
 
   public:
-    static RingBuffer *Create(const QString &lfilename, bool write,
+    static RingBuffer *Create(const QString &xfilename, bool write,
                               bool usereadahead = true,
                               int timeout_ms = kDefaultOpenTimeout,
                               bool stream_only = false);
@@ -57,8 +57,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
     void SetWriteBufferSize(int newSize);
     void SetWriteBufferMinWriteSize(int newMinSize);
     void SetOldFile(bool is_old);
-    void UpdateRawBitrate(uint rawbitrate);
-    void UpdatePlaySpeed(float playspeed);
+    void UpdateRawBitrate(uint raw_bitrate);
+    void UpdatePlaySpeed(float play_speed);
     void EnableBitrateMonitor(bool enable) { bitrateMonitorEnabled = enable; }
     void SetBufferSizeFactors(bool estbitrate, bool matroska);
     void SetWaitForWrite(void) { waitforwrite = true; }

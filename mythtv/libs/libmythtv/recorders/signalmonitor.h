@@ -89,6 +89,8 @@ class SignalMonitor : protected MThread
     void SetNotifyFrontend(bool notify) { notify_frontend = notify; }
 
     /** \brief Indicate if table monitoring is needed
+     *  \param parent The TVRec* that this signal monitor is attached to.
+     *  \param EITscan Unused
      *  \param monitor if true parent->SetupDTVSignalMonitor is called
      *         after the channel is tuned.
      */
@@ -114,7 +116,7 @@ class SignalMonitor : protected MThread
     virtual void EmitStatus(void);
 
   protected:
-    SignalMonitor(int db_cardnum, ChannelBase *_channel,
+    SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                   uint64_t wait_for_mask);
 
     virtual void run(void);

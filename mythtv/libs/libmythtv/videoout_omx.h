@@ -35,7 +35,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual void StopEmbedding(void);
     virtual bool ApproveDeintFilter(const QString&) const;
     virtual bool SetDeinterlacingEnabled(bool interlaced);
-    virtual bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
+    virtual bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
     virtual QString GetName(void) const { return kName; } // = "openmax"
     virtual bool IsPIPSupported(void) const { return true; }
     virtual bool IsPBPSupported(void) const { return true; }

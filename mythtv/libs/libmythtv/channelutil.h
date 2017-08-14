@@ -315,7 +315,7 @@ class MTV_PUBLIC ChannelUtil
                                    int            chanid);
 
     static bool    SaveCachedPids(uint chanid,
-                                  const pid_cache_t &pid_cache,
+                                  const pid_cache_t &_pid_cache,
                                   bool delete_all = false);
 
     static const QString kATSCSeparators;

@@ -61,7 +61,7 @@ class MTV_PUBLIC RemoteEncoder
     void ChangeDeinterlacer(int deint_mode);
     void ToggleChannelFavorite(QString);
     void SetChannel(QString channel);
-    int  SetSignalMonitoringRate(int msec, bool notifyFrontend = true);
+    int  SetSignalMonitoringRate(int rate, bool notifyFrontend = true);
     uint GetSignalLockTimeout(QString input);
     bool CheckChannel(QString channel);
     bool ShouldSwitchToAnotherCard(QString channelid);

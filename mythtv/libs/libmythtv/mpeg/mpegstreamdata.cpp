@@ -33,6 +33,9 @@ using namespace std;
  *
  *  \param desiredProgram If you want rewritten PAT and PMTs, for
  *                        a desired program set this to a value > -1
+ *  \param cardnum        The card number that this stream is on.
+ *                        Currently only used for differentiating streams
+ *                        in log messages.
  *  \param cacheTables    If true PAT and PMT tables will be cached
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
@@ -208,7 +211,7 @@ void MPEGStreamData::DeletePartialPSIP(uint pid)
     }
 }
 
-/** \fn MPEGStreamData::AssemblePSIP(const TSPacket*,bool&)
+/**
  *  \brief PSIP packet assembler.
  *
  *   This is not a general purpose TS->PSIP packet converter,
@@ -227,6 +230,7 @@ void MPEGStreamData::DeletePartialPSIP(uint pid)
  *  \note This method makes the assumption that AddTSPacket
  *        correctly handles duplicate packets.
  *
+ *  \param tspacket Pointer the the TS packet data.
  *  \param moreTablePackets returns true if we need more packets
  */
 PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
