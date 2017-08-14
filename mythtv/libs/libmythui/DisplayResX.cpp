@@ -12,7 +12,11 @@
 
 #include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
 
-static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display);
+static XRRScreenResources *GetScreenResources(MythXDisplay*& display);
+static XRROutputInfo *GetOutputInfo(MythXDisplay*& display, XRRScreenResources*& rsc);
+RRCrtc crtc;
+/* Width x Height x Resolution = X mode ID. */
+std::map<std::tuple<int, int, double>, RRMode> modeIdMatch;
 
 DisplayResX::DisplayResX(void)
 {
@@ -49,47 +53,46 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
 
     if (idx >= 0)
     {
-        short finalrate;
-        MythXDisplay *display = NULL;
-        XRRScreenConfiguration *cfg = GetScreenConfig(display);
-
-        if (!cfg)
-            return false;
-
-        Rotation rot;
-
-        XRRConfigCurrentConfiguration(cfg, &rot);
-
-        // Search real xrandr rate for desired_rate
-        finalrate = (short) rate;
-
-        for (uint i = 0; i < m_videoModes.size(); i++)
+        RRMode desiredMode;
+        std::tuple<int, int, double> widthHeightRate = std::make_tuple(
+            m_videoModesUnsorted[idx].Width(),
+            m_videoModesUnsorted[idx].Height(),
+            rate);
+        std::map<std::tuple<int, int, double>, RRMode>::iterator modeIdIter = modeIdMatch.find(widthHeightRate);
+        if (modeIdIter != modeIdMatch.end())
         {
-            if ((m_videoModes[i].Width() == width) &&
-                    (m_videoModes[i].Height() == height))
-            {
-                if (m_videoModes[i].Custom())
-                {
-                    finalrate = m_videoModes[i].realRates[rate];
-                    LOG(VB_PLAYBACK, LOG_INFO,
-                        QString("Dynamic TwinView rate found, set %1Hz as "
-                                "XRandR %2") .arg(rate) .arg(finalrate));
-                }
-
-                break;
-            }
+            desiredMode = modeIdIter->second;
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Desired modeline for Resolution and FrameRate not found.");
+            return false;
         }
 
-        Window root = display->GetRoot();
+        MythXDisplay *display = NULL;
 
-        Status status = XRRSetScreenConfigAndRate(display->GetDisplay(), cfg,
-                        root, idx, rot, finalrate,
-                        CurrentTime);
+        XRRScreenResources *rsc = GetScreenResources(display);
+        if (!rsc)
+            return false;
 
-        XRRFreeScreenConfigInfo(cfg);
+        XRRCrtcInfo *origCrtcInfo = XRRGetCrtcInfo(display->GetDisplay(), rsc, crtc);
+        Status status = XRRSetCrtcConfig(
+            display->GetDisplay(),
+            rsc,
+            crtc,
+            CurrentTime,
+            origCrtcInfo->x,
+            origCrtcInfo->y,
+            desiredMode,
+            origCrtcInfo->rotation,
+            origCrtcInfo->outputs,
+            origCrtcInfo->noutput);
+
+        XRRFreeCrtcInfo(origCrtcInfo);
+        XRRFreeScreenResources(rsc);
 
         // Force refresh of xf86VidMode current modeline
-        cfg = XRRGetScreenInfo(display->GetDisplay(), root);
+        XRRScreenConfiguration *cfg = XRRGetScreenInfo(display->GetDisplay(), display->GetRoot());
         if (cfg)
         {
             XRRFreeScreenConfigInfo(cfg);
@@ -99,7 +102,7 @@ bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
 
         if (RRSetConfigSuccess != status)
             LOG(VB_GENERAL, LOG_ERR,
-                "XRRSetScreenConfigAndRate() call failed.");
+                "XRRSetCrtcConfig() call failed.");
 
         return RRSetConfigSuccess == status;
     }
@@ -116,111 +119,134 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
 
     MythXDisplay *display = NULL;
 
-    XRRScreenConfiguration *cfg = GetScreenConfig(display);
-
-    if (!cfg)
+    /* All screen resources for all monitors. */
+    XRRScreenResources *rsc = GetScreenResources(display);
+    if (!rsc)
         return m_videoModes;
 
-    int num_sizes, num_rates;
+    /* The primary monitor alone. */
+    XRROutputInfo *output = GetOutputInfo(display, rsc);
+    /* Needed to set the modeline later. */
+    crtc = output->crtc;
+    modeIdMatch.clear();
 
-    XRRScreenSize *sizes = NULL;
-
-    sizes = XRRConfigSizes(cfg, &num_sizes);
-
-    for (int i = 0; i < num_sizes; ++i)
+    /* Sort these out by screen size */
+    std::map<std::pair<int, int>, std::vector<XRRModeInfo>> modesBySize;
+    for (int i = 0; i < output->nmode; i++)
     {
-        short *rates = NULL;
-        rates = XRRRates(display->GetDisplay(), display->GetScreen(),
-                         i, &num_rates);
-        DisplayResScreen scr(sizes[i].width, sizes[i].height,
-                             sizes[i].mwidth, sizes[i].mheight,
-                             rates, num_rates);
-        m_videoModes.push_back(scr);
-    }
-
-    t_screenrate screenmap;
-
-    int nvidiarate = GetNvidiaRates(screenmap);
-
-    if (nvidiarate > 0)
-    {
-        // Update existing DisplayResScreen vector, and update it with
-        // new frequencies
-        for (uint i = 0; i < m_videoModes.size(); i++)
+        /* ID of a valid mode for this monitor. */
+        RRMode id = output->modes[i];
+        XRRModeInfo mode;
+        bool found = false;
+        for (int j=0; j < rsc->nmode; j++)
         {
-            DisplayResScreen scr = m_videoModes[i];
-            int w = scr.Width();
-            int h = scr.Height();
-            int mw = scr.Width_mm();
-            int mh = scr.Height_mm();
-            std::vector<double> newrates;
-            std::map<double, short> realRates;
-            const std::vector<double>& rates = scr.RefreshRates();
-            bool found = false;
-
-            for (std::vector<double>::const_iterator it = rates.begin();
-                    it !=  rates.end(); ++it)
+            mode = rsc->modes[j];
+            if(id == mode.id)
             {
-                uint64_t key = DisplayResScreen::CalcKey(w, h, *it);
-
-                if (screenmap.find(key) != screenmap.end())
-                {
-                    // Rate is defined in NV-CONTROL extension, use it
-                    newrates.push_back(screenmap[key]);
-                    realRates[screenmap[key]] = (int) round(*it);
-                    found = true;
-#if 1
-                    LOG(VB_PLAYBACK, LOG_DEBUG,
-                        QString("CustomRate Found, set %1x%2@%3 as %4Hz")
-                        .arg(w) .arg(h) .arg(*it) .arg(screenmap[key]));
-#endif
-                }
-            }
-
-            if (found)
-            {
-                m_videoModes.erase(m_videoModes.begin() + i);
-                std::sort(newrates.begin(), newrates.end());
-                m_videoModes.insert(m_videoModes.begin() + i,
-                                    DisplayResScreen(w, h, mw, mh, newrates,
-                                                     realRates));
+                found = true;
+                break;
             }
         }
+
+        /* Shouldn't happen if XRandr is consistent. */
+        if (!found)
+        {
+            continue;
+        }
+
+        std::pair<int, int> widthHeight = std::make_pair(mode.width, mode.height);
+        std::map<std::pair<int, int>, std::vector<XRRModeInfo>>::iterator heightWidthIter = modesBySize.find(widthHeight);
+        if (heightWidthIter == modesBySize.end())
+        {
+            std::vector<XRRModeInfo> modesForSize;
+            modesForSize.push_back(mode);
+            modesBySize[widthHeight] = modesForSize;
+        }
+        else
+        {
+            heightWidthIter->second.push_back(mode);
+        }
+    }
+
+    /* Generate the screen sizes with a list of refresh rates for each. */
+    map<std::pair<int, int>, std::vector<XRRModeInfo>>::iterator screenSizesIter = modesBySize.begin();
+    for (screenSizesIter = modesBySize.begin(); screenSizesIter != modesBySize.end(); ++screenSizesIter)
+    {
+        std::pair<int, int> widthHeight = screenSizesIter->first;
+        std::vector<XRRModeInfo> widthHeightModes = screenSizesIter->second;
+        std::vector<double> rates;
+        for (uint i = 0; i < widthHeightModes.size(); i++)
+        {
+            XRRModeInfo widthHeightMode = widthHeightModes[i];
+            double vTotal = widthHeightMode.vTotal;
+            if (widthHeightMode.modeFlags & RR_DoubleScan)
+            {
+                vTotal *= 2;
+            }
+
+            if (widthHeightMode.modeFlags & RR_Interlace)
+            {
+                vTotal /= 2;
+            }
+
+            /* Some "auto" modes may not have such info. */
+            if (widthHeightMode.hTotal && vTotal)
+            {
+                double rate = ((double) widthHeightMode.dotClock /
+                    ((double) widthHeightMode.hTotal * (double) vTotal));
+                rates.push_back(rate);
+                std::tuple<int, int, double> widthHeightRate = std::make_tuple(widthHeight.first, widthHeight.second, rate);
+                modeIdMatch[widthHeightRate] = widthHeightMode.id;
+            }
+        }
+
+        DisplayResScreen scr(widthHeight.first, widthHeight.second,
+                             output->mm_width, output->mm_height,
+                             rates);
+        m_videoModes.push_back(scr);
     }
 
     m_videoModesUnsorted = m_videoModes;
 
     std::sort(m_videoModes.begin(), m_videoModes.end());
-    XRRFreeScreenConfigInfo(cfg);
+    XRRFreeOutputInfo(output);
+    XRRFreeScreenResources(rsc);
     delete display;
 
     return m_videoModes;
 }
 
-static XRRScreenConfiguration *GetScreenConfig(MythXDisplay*& display)
+static XRRScreenResources *GetScreenResources(MythXDisplay*& display)
 {
     display = OpenMythXDisplay();
 
     if (!display)
     {
-        LOG(VB_GENERAL, LOG_ERR, "DisplaResX: MythXOpenDisplay call failed");
+        LOG(VB_GENERAL, LOG_ERR, "DisplayResX: MythXOpenDisplay call failed");
         return NULL;
     }
 
     Window root = RootWindow(display->GetDisplay(), display->GetScreen());
 
-    XRRScreenConfiguration *cfg = NULL;
+    XRRScreenResources *rsc = NULL;
     int event_basep = 0, error_basep = 0;
 
     if (XRRQueryExtension(display->GetDisplay(), &event_basep, &error_basep))
-        cfg = XRRGetScreenInfo(display->GetDisplay(), root);
+        rsc = XRRGetScreenResourcesCurrent(display->GetDisplay(), root);
 
-    if (!cfg)
+    if (!rsc)
     {
         delete display;
         display = NULL;
-        LOG(VB_GENERAL, LOG_ERR, "DisplaResX: Unable to XRRgetScreenInfo");
+        LOG(VB_GENERAL, LOG_ERR, "DisplayResX: Unable to XRRGetScreenResourcesCurrent");
     }
 
-    return cfg;
+    return rsc;
+}
+
+static XRROutputInfo *GetOutputInfo(MythXDisplay*& display, XRRScreenResources*& rsc)
+{
+    Window root = RootWindow(display->GetDisplay(), display->GetScreen());
+    RROutput primary = XRRGetOutputPrimary(display->GetDisplay(), root);
+    return XRRGetOutputInfo(display->GetDisplay(), rsc, primary);
 }
