@@ -30,7 +30,6 @@
                 <xsl:if test="tvdbXpath:getValue(//requestDetails, //data, 'subtitle') != ''">
                     <subtitle><xsl:value-of select="normalize-space(tvdbXpath:getResult())"/></subtitle>
                 </xsl:if>
-                <language><xsl:value-of select="normalize-space(Language)"/></language>
                 <xsl:if test="tvdbXpath:getValue(//requestDetails, //data/series, 'description') != ''">
                     <description><xsl:value-of select="normalize-space(tvdbXpath:htmlToString(tvdbXpath:getResult()))"/></description>
                 </xsl:if>
@@ -82,6 +81,9 @@
                     </xsl:if>
                     <xsl:if test="./rating/text() != ''">
                         <userrating><xsl:value-of select="normalize-space(./rating)"/></userrating>
+                    </xsl:if>
+                    <xsl:if test="./language/overview/text() != ''">
+                        <language><xsl:value-of select="normalize-space(./language/overview)"/></language>
                     </xsl:if>
                     <xsl:if test="./firstAired/text() != ''">
                         <year><xsl:value-of select="normalize-space(substring(string(./firstAired), 1, 4))"/></year>

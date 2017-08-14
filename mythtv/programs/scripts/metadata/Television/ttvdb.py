@@ -381,6 +381,42 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
 </metadata>
 0
 
+# test match is loose due ordering differences between py2 and 3
+# i.e. dict key ordering
+# key ordering is not sorted so that Title is first for existing client
+# compatability
+>>> sys.argv = "ttvdb -l en -a US -D 281053".split(' ')
+>>> main()
+Title:Fixer Upper
+Season:0
+Episode:1
+Subtitle:The Waco Way of Life
+Year:2014
+ReleaseDate:2014-07-16
+Director:
+Plot:Chip and Joanna Gaines tell why they love raising a family in Waco, Texas.
+UserRating:
+Writers:
+Screenshot:
+Language:en
+Airedseasonid:583817
+Id:5463514
+Lastupdated:1451954464
+Cast:Chip Gaines, Joanna Gaines
+Runtime:45
+Title:Fixer Upper
+Season:0
+Episode:2
+Subtitle:Bloopers, Outtakes and More
+Year:2016
+...
+Cast:Chip Gaines, Joanna Gaines
+Runtime:45
+Coverart:http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-2.jpg
+Fanart:http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg
+Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg
+0
+
 """
 from __future__ import print_function
 
@@ -846,7 +882,7 @@ name_parse=[
 # Episode meta data that is massaged
 massage={'writer':'|','director':'|', 'overview':'&', 'gueststars':'|' }
 # Keys and titles used for episode data (option '-D')
-data_keys =['seasonnumber','episodenumber','episodename','firstaired','director','overview','rating','writer','filename','language' ]
+data_keys =['airedSeason','airedEpisodeNumber','episodeName','firstAired','director','overview','rating','writer','filename','language' ]
 data_titles=['Season:','Episode:','Subtitle:','ReleaseDate:','Director:','Plot:','UserRating:','Writers:','Screenshot:','Language:' ]
 # High level dictionay keys for select graphics URL(s)
 fanart_key='fanart'
@@ -1191,8 +1227,11 @@ def change_to_commas(meta_data):
 # Change &amp; values to ascii equivalents
 def change_amp(text):
     if not text: return text
-    text = text.replace("&quot;", "'").replace("\r\n", " ")
-    text = text.replace(r"\'", "'")
+    try:
+        text = text.replace("&quot;", "'").replace("\r\n", " ")
+        text = text.replace(r"\'", "'")
+    except Exception as e:
+        pass
     return text
 # end change_amp
 
@@ -1254,12 +1293,12 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
         genres = change_amp(genres_string)
         genres = change_to_commas(genres)
 
-    seasons=series_data.keys() # Get the seasons for this series
+    seasons=sorted(series_data.keys()) # Get the seasons for this series
     for season in seasons:
         if args > 1: # If a season was specified skip other seasons
             if season != int(series_season_ep[1]):
                 continue
-        episodes=series_data[season].keys() # Get the episodes for this season
+        episodes=sorted(series_data[season].keys()) # Get the episodes for this season
         for episode in episodes: # If an episode was specified skip other episodes
             if args > 2:
                 if episode != int(series_season_ep[2]):
@@ -1274,16 +1313,21 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                     return
                 else:
                     return
+            # key ordering is not sorted so that Title is first for existing client
+            # compatability
             key_values=[]
             for values in data_keys: # Initialize an array for each possible data element for
                 key_values.append('') # each episode within a season
-            for key in available_keys:
+            for key in sorted(available_keys):
                 try:
                     i = data_keys.index(key) # Include only specific episode data
                 except ValueError:
                     if series_data[season][episode][key] != None:
                         text = series_data[season][episode][key]
-                        text = change_amp(text)
+                        if isinstance(text, dict):
+                            # handle language tuple
+                            text = list(text.values())[0]
+                        text = change_amp(unicode(text))
                         text = change_to_commas(text)
                         if text == 'None' and key.title() == 'Director':
                             text = u"Unknown"
@@ -1299,7 +1343,11 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                 if text == None or text == 'None':
                     continue
                 else:
-                    text = change_amp(text)
+                    # handle language tuple
+                    if isinstance(text, dict):
+                        # handle language tuple
+                        text = list(text.values())[0]
+                    text = change_amp(unicode(text))
                     value = change_to_commas(text)
                     value = value.replace(u'\n', u' ')
                 key_values[i]=value
@@ -1669,6 +1717,10 @@ def doc_test(opts):
     return doctest.testmod(verbose=opts.debug, optionflags=doctest.ELLIPSIS, )
 
 def main():
+    global season_and_episode_num, screenshot_request
+    # reset some globals for doctest mode
+    screenshot_request = False
+
     parser = OptionParser(usage=u"%prog usage: ttvdb -hdruviomMPFBDS [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using ttvdb with Mythvideo see the ttvdb wiki page at:\nhttp://www.mythtv.org/wiki/Ttvdb.py")
 
     parser.add_option(  "--doctest", action="store_true", default=False, dest="doctest",
@@ -1754,7 +1806,6 @@ def main():
         return 1
 
     # Default output format of season and episode numbers
-    global season_and_episode_num, screenshot_request
     season_and_episode_num='S%02dE%02d' # Format output example "S04E12"
 
     if opts.numbers == False:
