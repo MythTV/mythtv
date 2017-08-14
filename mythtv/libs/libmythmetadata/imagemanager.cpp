@@ -548,8 +548,8 @@ ImageItem *ImageDb<FS>::CreateImage(const MSqlQuery &query) const
 /*!
  * \brief Read database images/dirs by id
  * \param[in] ids Comma-separated list of ids
- * \param[in out] files List of files
- * \param[in out] files List of dirs
+ * \param[in,out] files List of files
+ * \param[in,out] dirs List of dirs
  * \param[in] refine SQL clause to refine selection & apply ordering
  * \return int Number of items matching query, -1 on SQL error
  */
@@ -567,8 +567,8 @@ int ImageDb<FS>::GetImages(const QString &ids, ImageList &files, ImageList &dirs
 
 /*!
  \brief Read immediate children of a dir
- \param[in out] dirs List of child subdirs
- \param[in out] files List of child files
+ \param[in,out] dirs List of child subdirs
+ \param[in,out] files List of child files
  \param[in] ids Comma-separated list of dir ids
  \param[in] refine SQL clause to refine selection & apply ordering
  \return int Number of items matching query, -1 on SQL error
@@ -585,14 +585,14 @@ int ImageDb<FS>::GetChildren(QString ids, ImageList &files, ImageList &dirs,
 /*!
  \brief Read a dir and its immediate children from Db
  \param[out] parent Dir item
- \param[in out] dirs List of child subdirs
- \param[in out] files List of child files
+ \param[in,out] dirs List of child subdirs
+ \param[in,out] files List of child files
  \param[in] ids Comma-separated list of dir ids
  \param[in] refine SQL clause to refine selection & apply ordering
  \return int Number of items matching query, -1 on SQL error
 
- \param[in out] subdirs Ordered/filtered child subdirs
- \param[in out] files Ordered/filtered child files
+ \param[in,out] subdirs Ordered/filtered child subdirs
+ \param[in,out] files Ordered/filtered child files
  \param[in] id Dir id
  \param[in] refine SQL clause for filtering/ordering child images
  \return int Number of items matching query.
@@ -635,10 +635,10 @@ int ImageDb<FS>::GetDirectory(int id, ImagePtr &parent,
 /*!
  \brief Return images and all of their descendants.
 
- \param[in out] files Ordered/filtered files
- \param[in out] dirs  Ordered/filtered dirs
  \param[in] ids Image ids
  \param[in] refine SQL clause for filtering/ordering child images
+ \param[in,out] files Ordered/filtered files
+ \param[in,out] dirs  Ordered/filtered dirs
 */
 template <class FS>
 bool ImageDb<FS>::GetDescendants(const QString &ids,
@@ -684,7 +684,7 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
 
 /*!
  \brief Returns all files in the sub-tree of a dir.
- \param[in out] files List of images within sub-tree. Direct children first, then
+ \param[in,out] files List of images within sub-tree. Direct children first, then
   depth-first traversal of peer sub-dirs. Each level ordered as per refine criteria
  \param id Dir id
  \param refine SQL clause defining filter & ordering criteria
@@ -706,8 +706,8 @@ bool ImageDb<FS>::GetImageTree(int id, ImageList &files, const QString &refine) 
 
 /*!
  * \brief Read all database images and dirs as map. No filters or ordering applied.
- * \param[in out] files Map <filepath, image>
- * \param[in out] dirs Map <filepath, dir>
+ * \param[in,out] files Map <filepath, image>
+ * \param[in,out] dirs Map <filepath, dir>
  */
 template <class FS>
 bool ImageDb<FS>::ReadAllImages(ImageHash &files, ImageHash &dirs) const
@@ -1013,10 +1013,10 @@ int ImageDb<FS>::ReadImages(ImageList &dirs, ImageList &files,
  \brief Return counts of dirs, pics, videos and size in the subtree of a dir.
  \param[in] id Dir id
  \param[in] all Sum whole table (without filtering on dir path)
- \param[in out] dirs Number of dirs in parent sub-tree
- \param[in out] pics Number of pictures in parent sub-tree
- \param[in out] videos Number of videos in parent sub-tree
- \param[in out] sizeKb Size in KiB of parent sub-tree
+ \param[in,out] dirs Number of dirs in parent sub-tree
+ \param[in,out] pics Number of pictures in parent sub-tree
+ \param[in,out] videos Number of videos in parent sub-tree
+ \param[in,out] sizeKb Size in KiB of parent sub-tree
 */
 template <class FS>
 void ImageDb<FS>::GetDescendantCount(int id, bool all, int &dirs,
@@ -1789,8 +1789,8 @@ QString ImageDbReader::OrderSelector(int order)
  \brief Return images (local and/or remote) for a dir and its direct children
  \param[in] id Dir id
  \param[out] parent Parent image
- \param[in out] subdirs Child dirs, filtered & ordered iaw current settings.
- \param[in out] files Child files, filtered & ordered iaw current settings.
+ \param[in,out] subdirs Child dirs, filtered & ordered iaw current settings.
+ \param[in,out] files Child files, filtered & ordered iaw current settings.
  \return int Number of images, including parent
 */
 int ImageDbReader::GetDirectory(int id, ImagePtr &parent,
@@ -1821,7 +1821,7 @@ int ImageDbReader::GetDirectory(int id, ImagePtr &parent,
 /*!
  \brief Returns images (local or remote but not a combination)
  \param[in] ids Image ids
- \param[in out] images List of images, filtered & ordered iaw current settings.
+ \param[in,out] images List of images, filtered & ordered iaw current settings.
  \return int Number of images
 */
 int ImageDbReader::GetImages(ImageIdList ids,
@@ -1841,8 +1841,8 @@ int ImageDbReader::GetImages(ImageIdList ids,
 /*!
  \brief Return (local or remote) images that are direct children of a dir
  \param[in] id Directory id
- \param[in out] files List of files, filtered & ordered iaw current settings.
- \param[in out] dirs List of dirs, filtered & ordered iaw current settings.
+ \param[in,out] files List of files, filtered & ordered iaw current settings.
+ \param[in,out] dirs List of dirs, filtered & ordered iaw current settings.
  \return int Number of Images
 */
 int ImageDbReader::GetChildren(int id, ImageList &files, ImageList &dirs) const
@@ -1861,8 +1861,8 @@ int ImageDbReader::GetChildren(int id, ImageList &files, ImageList &dirs) const
 /*!
  \brief Return all (local or remote) images that are direct children of a dir
  \param[in] id Directory id, GALLERY_DB_ID not valid
- \param[in out] files List of files, unfiltered & unordered
- \param[in out] dirs List of dirs, unfiltered & unordered
+ \param[in,out] files List of files, unfiltered & unordered
+ \param[in,out] dirs List of dirs, unfiltered & unordered
 */
 void ImageDbReader::GetDescendants(const ImageIdList &ids,
                                    ImageList &files, ImageList &dirs) const
@@ -1880,7 +1880,7 @@ void ImageDbReader::GetDescendants(const ImageIdList &ids,
 /*!
  \brief Return all files (local or remote) in the sub-trees of a dir
  \param[in] id Dir id
- \param[in out] files List of images within sub-tree. Ordered & filtered iaw current
+ \param[in,out] files List of images within sub-tree. Ordered & filtered iaw current
  settings
 */
 void ImageDbReader::GetImageTree(int id, ImageList &files) const
@@ -1895,10 +1895,10 @@ void ImageDbReader::GetImageTree(int id, ImageList &files) const
 /*!
  \brief Return counts of dirs, pics and videos in the subtree of a dir. Also dir size
  \param[in] id Dir id
- \param[in out] dirs Number of dirs in parent sub-tree
- \param[in out] pics Number of pictures in parent sub-tree
- \param[in out] videos Number of videos in parent sub-tree
- \param[in out] sizeKb Size in KiB of parent sub-tree
+ \param[in,out] dirs Number of dirs in parent sub-tree
+ \param[in,out] pics Number of pictures in parent sub-tree
+ \param[in,out] videos Number of videos in parent sub-tree
+ \param[in,out] sizeKb Size in KiB of parent sub-tree
 */
 void ImageDbReader::GetDescendantCount(int id, int &dirs, int &pics,
                                        int &videos, int &sizeKb) const
