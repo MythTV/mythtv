@@ -126,6 +126,9 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
 
     /* The primary monitor alone. */
     XRROutputInfo *output = GetOutputInfo(display, rsc);
+    if (!output)
+        return m_videoModes;
+
     /* Needed to set the modeline later. */
     crtc = output->crtc;
     modeIdMatch.clear();
@@ -248,5 +251,11 @@ static XRROutputInfo *GetOutputInfo(MythXDisplay*& display, XRRScreenResources*&
 {
     Window root = RootWindow(display->GetDisplay(), display->GetScreen());
     RROutput primary = XRRGetOutputPrimary(display->GetDisplay(), root);
+    if (primary == 0 && rsc->noutput > 0) {
+        /* If primary is not set (and it usually is not for single displays),
+         * pick the first monitor. */
+        primary = rsc->outputs[0];
+    }
+
     return XRRGetOutputInfo(display->GetDisplay(), rsc, primary);
 }
