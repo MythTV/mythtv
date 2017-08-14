@@ -1263,6 +1263,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 
     # Get Cast members
     cast_members=''
+    tmp_cast = ''
     try:
         series_data = search_for_series(t, series_name, opts.language)
         tmp_cast = series_data['_actors']
