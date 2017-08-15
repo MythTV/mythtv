@@ -139,6 +139,8 @@ void TransitionNone::Start(Slide &from, Slide &to,
 /*!
  \brief Create group transition
  \param animation Group animation
+ \param name The name for this transition. This string will be used in
+             log messages.
 */
 GroupTransition::GroupTransition(GroupAnimation *animation, QString name)
     : Transition(name), m_animation(animation)

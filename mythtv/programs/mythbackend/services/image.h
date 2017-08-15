@@ -35,20 +35,20 @@ public:
     Q_INVOKABLE explicit Image( QObject */*parent*/ = 0 ) {}
 
 public:
-    QString                     GetImageInfo                ( int   Id,
-                                                              const QString &Tag );
+    QString                     GetImageInfo                ( int   id,
+                                                              const QString &tag );
 
-    DTC::ImageMetadataInfoList* GetImageInfoList            ( int   Id );
+    DTC::ImageMetadataInfoList* GetImageInfoList            ( int   id );
 
-    bool                        RemoveImage        ( int   Id );
-    bool                        RenameImage        ( int   Id,
-                                                     const QString &NewName );
+    bool                        RemoveImage        ( int   id );
+    bool                        RenameImage        ( int   id,
+                                                     const QString &newName );
 
     bool                        StartSync          ( void );
     bool                        StopSync           ( void );
     DTC::ImageSyncInfo*         GetSyncStatus      ( void );
 
-    bool                        CreateThumbnail    (int   Id);
+    bool                        CreateThumbnail    (int   id);
 
 };
 

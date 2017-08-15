@@ -242,7 +242,6 @@ void UPNPScanner::GetInitialMetadata(VideoMetadataListManager::metadata_list* li
 }
 
 /**
- * \fn UPNPScanner::GetMetadata
  *  Fill the given metadata_list and meta_dir_node with the metadata
  *  of content retrieved from known media servers. A full scan is triggered.
  */
@@ -645,7 +644,6 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
 }
 
 /**
- * \fn UPNPScanner::CustomEvent(QEvent*)
  *  Processes subscription and SSDP cache update events.
  */
 void UPNPScanner::customEvent(QEvent *event)
