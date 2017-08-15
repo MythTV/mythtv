@@ -329,9 +329,11 @@ void MythContextPrivate::EndTempWindow(void)
 /**
  * Check if a port is open and sort out the link-local scope.
  *
- * \param host Host or IP address. Will be updated with link-local
- * scope if needed.
-*/
+ * \param host      Host or IP address. Will be updated with link-local
+ *                  scope if needed.
+ * \param port      Port number to check.
+ * \param timeLimit Limit in seconds for testing.
+ */
 
 bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit)
 {

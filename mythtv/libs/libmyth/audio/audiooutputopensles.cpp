@@ -81,7 +81,7 @@ int GetNativeOutputFramesPerBuffer(void)
 }
 #endif
 
-bool AudioOutputOpenSLES::AudioOutputOpenSLES::CreateEngine()
+bool AudioOutputOpenSLES::CreateEngine()
 {
     SLresult result;
 

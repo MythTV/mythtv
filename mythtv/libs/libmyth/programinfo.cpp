@@ -1470,7 +1470,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
 /** \fn ProgramInfo::FromStringList(QStringList::const_iterator&,
                                     QStringList::const_iterator)
  *  \brief Uses a QStringList to initialize this ProgramInfo instance.
- *  \param beg    Iterator pointing to first item in list to treat as
+ *  \param it     Iterator pointing to first item in list to treat as
  *                beginning of serialized ProgramInfo.
  *  \param end    Iterator that will stop parsing of the ProgramInfo
  *  \return true if it succeeds, false if it fails.
@@ -3239,7 +3239,7 @@ TranscodingStatus ProgramInfo::QueryTranscodeStatus(void) const
 /** \brief Set "transcoded" field in "recorded" table to "trans".
  *  \note Also sets the FL_TRANSCODED flag if the status is
  *        TRASCODING_COMPLETE and clears it otherwise.
- *  \param transFlag value to set transcoded field to.
+ *  \param trans value to set transcoded field to.
  */
 void ProgramInfo::SaveTranscodeStatus(TranscodingStatus trans)
 {
