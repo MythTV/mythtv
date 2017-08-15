@@ -33,6 +33,7 @@ MetaIOID3::~MetaIOID3(void)
 * \brief Open the file to read the tag
 *
 * \param filename The filename
+* \param forWriting Need write permission on the file.
 * \returns A taglib file object for this format
 */
 bool MetaIOID3::OpenFile(const QString &filename, bool forWriting)
@@ -612,7 +613,7 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
  * \param albumart The Album Art image to write
  * \returns True if successful
  *
- * \Note We always save the image in JPEG format
+ * \note We always save the image in JPEG format
  */
 bool MetaIOID3::writeAlbumArt(const QString &filename,
                               const AlbumArtImage *albumart)

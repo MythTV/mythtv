@@ -241,7 +241,7 @@ void ThumbThread<DBFS>::run()
 /*!
  \brief Generate thumbnail for an image
  \param im Image
- \param int priority
+ \param thumbPriority 
  */
 template <class DBFS>
 QString ThumbThread<DBFS>::CreateThumbnail(ImagePtrK im, int thumbPriority)
@@ -364,7 +364,7 @@ ImageThumb<DBFS>::~ImageThumb()
 /*!
  \brief Clears thumbnails for a device
  \param devId Device identity
- \param deleteFiles If true, the device thumbnails will be deleted
+ \param action [DEVICE] (CLOSE | CLEAR)
  \warning May block for several seconds
 */
 template <class DBFS>
@@ -460,7 +460,6 @@ void ImageThumb<DBFS>::CreateThumbnail(const ImagePtrK &im, int priority,
 /*!
  \brief Renames a thumbnail
  \param im Image
- \param priority Request priority
 */
 template <class DBFS>
 void ImageThumb<DBFS>::MoveThumbnail(const ImagePtrK &im)

@@ -97,6 +97,7 @@ void ImageScanThread<DBFS>::ChangeState(bool scan)
  \details If scanner is already running, any scan will be aborted to process the
 clear.
  \param devId Device id
+ \param action [DEVICE] (CLOSE | CLEAR)
 */
 template <class DBFS>
 void ImageScanThread<DBFS>::EnqueueClear(int devId, const QString &action)
@@ -111,7 +112,7 @@ void ImageScanThread<DBFS>::EnqueueClear(int devId, const QString &action)
 
 /*!
  \brief Returns number of images scanned & total number to scan
- \return QStringList (scanner id, #done, #total)
+ \return QStringList (scanner id, \#done, \#total)
 */
 template <class DBFS>
 QStringList ImageScanThread<DBFS>::GetProgress()
@@ -121,7 +122,6 @@ QStringList ImageScanThread<DBFS>::GetProgress()
                          << QString::number(m_progressCount)
                          << QString::number(m_progressTotalCount);
 }
-
 
 /*!
  \brief Synchronises database to the storage group

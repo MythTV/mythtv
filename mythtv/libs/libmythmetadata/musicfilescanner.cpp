@@ -72,6 +72,7 @@ MusicFileScanner::~MusicFileScanner ()
  *
  * \param directory Directory to begin search
  * \param music_files A pointer to the MusicLoadedMap to store the results
+ * \param art_files   A pointer to the MusicLoadedMap to store the results
  * \param parentid The id of the parent directory in the music_directories
  *                 table. The root directory should have an id of 0
  *
@@ -260,6 +261,9 @@ bool MusicFileScanner::HasFileChanged(
  *        type.
  *
  * \param filename Full path to file.
+ * \param startDir The starting directory fir the search. This will be
+ *                 removed making the stored name relative to the
+ *                 storage directory where it was found.
  *
  * \returns Nothing.
  */
@@ -505,6 +509,9 @@ void MusicFileScanner::cleanDB()
  * \brief Removes a file from the database.
  *
  * \param filename Full path to file.
+ * \param startDir The starting directory fir the search. This will be
+ *                 removed making the stored name relative to the
+ *                 storage directory where it was found.
  *
  * \returns Nothing.
  */
@@ -553,6 +560,9 @@ void MusicFileScanner::RemoveFileFromDB(const QString &filename, const QString &
  * \brief Updates a file in the database.
  *
  * \param filename Full path to file.
+ * \param startDir The starting directory fir the search. This will be
+ *                 removed making the stored name relative to the
+ *                 storage directory where it was found.
  *
  * \returns Nothing.
  */
