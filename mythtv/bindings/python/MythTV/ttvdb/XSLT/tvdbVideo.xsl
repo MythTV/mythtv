@@ -114,19 +114,19 @@
                                     </xsl:if>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:stringToList(string(./guestStars))">
+                            <xsl:for-each select="./guestStars/item">
                                 <xsl:element name="person">
                                     <xsl:attribute name="job">Guest Star</xsl:attribute>
                                     <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:stringToList(string(./director))">
+                            <xsl:for-each select="./directors/item">
                                 <xsl:element name="person">
                                     <xsl:attribute name="job">Director</xsl:attribute>
                                     <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:stringToList(string(./writer))">
+                            <xsl:for-each select="./writers/item">
                                 <xsl:element name="person">
                                     <xsl:attribute name="job">Author</xsl:attribute>
                                     <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
@@ -139,11 +139,12 @@
                             <xsl:if test="./filename/text() != ''">
                                 <xsl:element name="image">
                                     <xsl:attribute name="type">screenshot</xsl:attribute>
-                                    <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com/banners/', normalize-space(filename))"/></xsl:attribute>
-                                    <xsl:attribute name="thumb"><xsl:value-of select="concat('http://www.thetvdb.com/banners/_cache/', normalize-space(filename))"/></xsl:attribute>
+                                    <xsl:attribute name="url"><xsl:value-of select="normalize-space(filename)"/></xsl:attribute>
+                                    <xsl:attribute name="thumb"><xsl:value-of select="normalize-space(tvdbXpath:replace(string(filename), 'banners', 'banners/_cache'))"/></xsl:attribute>
                                 </xsl:element>
                             </xsl:if>
                             <xsl:for-each select="tvdbXpath:imageElements(//data/series/_banners/poster/raw, 'poster', //requestDetails)">
+                                <xsl:sort select="@rating" data-type="number" order="descending"/>
                                 <xsl:element name="image">
                                     <xsl:attribute name="type"><xsl:value-of select="normalize-space(@type)"/></xsl:attribute>
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(@url)"/></xsl:attribute>
@@ -157,6 +158,7 @@
                                 </xsl:element>
                             </xsl:for-each>
                             <xsl:for-each select="tvdbXpath:imageElements(//data/series/_banners/fanart/raw, 'fanart', //requestDetails)">
+                                <xsl:sort select="@rating" data-type="number" order="descending"/>
                                 <xsl:element name="image">
                                     <xsl:attribute name="type"><xsl:value-of select="normalize-space(@type)"/></xsl:attribute>
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(@url)"/></xsl:attribute>
@@ -170,6 +172,7 @@
                                 </xsl:element>
                             </xsl:for-each>
                             <xsl:for-each select="tvdbXpath:imageElements(//data/series/_banners/banner/raw, 'banner', //requestDetails)">
+                                <xsl:sort select="@rating" data-type="number" order="descending"/>
                                 <xsl:element name="image">
                                     <xsl:attribute name="type"><xsl:value-of select="normalize-space(@type)"/></xsl:attribute>
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(@url)"/></xsl:attribute>

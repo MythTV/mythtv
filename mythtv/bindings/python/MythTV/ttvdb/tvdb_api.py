@@ -772,6 +772,7 @@ class Tvdb:
         self.config['url_getSeries'] = u"%(api_url)s/search/series?name=%%s" % self.config
 
         self.config['url_epInfo'] = u"%(api_url)s/series/%%s/episodes" % self.config
+        self.config['url_epDetail'] = u"%(api_url)s/episodes/%%s" % self.config
 
         self.config['url_seriesInfo'] = u"%(api_url)s/series/%%s" % self.config
         self.config['url_actorsInfo'] = u"%(api_url)s/series/%%s/actors" % self.config
@@ -1077,7 +1078,9 @@ class Tvdb:
 
             self._setShowData(sid, tag, value)
         # set language
-        self._setShowData(sid, u'language', self.config['language'])
+        if language == None:
+            language = self.config['language']
+        self._setShowData(sid, u'language', language)
 
         # Parse banners
         if self.config['banners_enabled']:
@@ -1091,42 +1094,58 @@ class Tvdb:
         log().debug('Getting all episodes of %s' % (sid))
 
         url = self.config['url_epInfo'] % sid
-
-        epsEt = self._getetsrc(url, language=language)
-
+        epsEt = self._getetsrc(url, language=self.shows[sid].data[u'language'])
         for cur_ep in epsEt:
+            self._parseEpisodeInfo(sid, cur_ep)
 
-            if self.config['dvdorder']:
-                log().debug('Using DVD ordering.')
-                use_dvd = cur_ep.get('dvdSeason') is not None and cur_ep.get('dvdEpisodeNumber') is not None
+    def _parseEpisodeInfo(self, sid, cur_ep):
+        if self.config['dvdorder']:
+            log().debug('Using DVD ordering.')
+            use_dvd = cur_ep.get('dvdSeason') is not None and cur_ep.get('dvdEpisodeNumber') is not None
+        else:
+            use_dvd = False
+
+        if use_dvd:
+            elem_seasnum, elem_epno = cur_ep.get('dvdSeason'), cur_ep.get('dvdEpisodeNumber')
+        else:
+            elem_seasnum, elem_epno = cur_ep['airedSeason'], cur_ep['airedEpisodeNumber']
+
+        if elem_seasnum is None or elem_epno is None:
+            log().warning("An episode has incomplete season/episode number (season: %r, episode: %r)" % (
+                elem_seasnum, elem_epno))
+            #log().debug(
+            #    " ".join(
+            #         "%r is %r" % (child.tag, child.text) for child in cur_ep.getchildren()))
+            # TODO: Should this happen?
+            return  # Skip to next episode
+
+        # float() is because https://github.com/dbr/tvnamer/issues/95 - should probably be fixed in TVDB data
+        seas_no = elem_seasnum
+        ep_no = elem_epno
+
+        for cur_item in cur_ep.keys():
+            tag = cur_item
+            value = cur_ep[cur_item]
+            if value is not None:
+                if tag == 'filename' and value:
+                    value = self.config['url_artworkPrefix'] % (value)
+            self._setItem(sid, seas_no, ep_no, tag, value)
+
+    def getDetailedEpisodeInfo(self, sid, season, episode):
+        """Get detailed episode info"""
+        try:
+            if isinstance(episode, Episode):
+                url = self.config['url_epDetail'] % episode[u'id']
             else:
-                use_dvd = False
-
-            if use_dvd:
-                elem_seasnum, elem_epno = cur_ep.get('dvdSeason'), cur_ep.get('dvdEpisodeNumber')
-            else:
-                elem_seasnum, elem_epno = cur_ep['airedSeason'], cur_ep['airedEpisodeNumber']
-
-            if elem_seasnum is None or elem_epno is None:
-                log().warning("An episode has incomplete season/episode number (season: %r, episode: %r)" % (
-                    elem_seasnum, elem_epno))
-                #log().debug(
-                #    " ".join(
-                #         "%r is %r" % (child.tag, child.text) for child in cur_ep.getchildren()))
-                # TODO: Should this happen?
-                continue  # Skip to next episode
-
-            # float() is because https://github.com/dbr/tvnamer/issues/95 - should probably be fixed in TVDB data
-            seas_no = elem_seasnum
-            ep_no = elem_epno
-
-            for cur_item in cur_ep.keys():
-                tag = cur_item
-                value = cur_ep[cur_item]
-                if value is not None:
-                    if tag == 'filename':
-                        value = self.config['url_artworkPrefix'] % (value)
-                self._setItem(sid, seas_no, ep_no, tag, value)
+                season = int(season)
+                episode = int(episode)
+                url = self.config['url_epDetail'] % self.shows[sid][season][episode][u'id']
+            epInfo = self._getetsrc(url, language=self.shows[sid].data[u'language'])
+            self._parseEpisodeInfo(sid, epInfo)
+        except KeyError:
+            import traceback
+            traceback.print_exc()
+            raise tvdb_episodenotfound()
 
     def _nameToSid(self, name):
         """Takes show name, returns the correct series ID (if the show has

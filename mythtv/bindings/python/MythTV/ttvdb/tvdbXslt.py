@@ -109,9 +109,9 @@ class xpathFunctions(object):
     """
     def __init__(self):
         self.filters = {
-            'fanart': [u'//_banners/%(type)s/raw'],
+            'fanart': [u'//_banners/%(type)s/raw/item'],
             'poster': [u'//_banners/season/raw/item[subKey/text()="%(season)s"]',
-                       u'//_banners/%(type)s/raw'],
+                       u'//_banners/%(type)s/raw/item'],
             'banner': [u'//_banners/seasonwide/raw/item[subKey/text()="%(season)s"]',
                        u'//_banners/series/raw/item[subKey/text()="graphical"]'],
             }
@@ -229,6 +229,7 @@ class xpathFunctions(object):
                     tmpElement.attrib['type'] = args[1]
                 tmpElement.attrib['url'] = u'http://www.thetvdb.com/banners/%s' % image.find('fileName').text
                 tmpElement.attrib['thumb'] = u'http://www.thetvdb.com/banners/%s' % image.find('thumbnail').text
+                tmpElement.attrib['rating'] = image.find('ratingsInfo').find('average').text
                 tmpImageSize = image.find('resolution').text
                 if tmpImageSize:
                     index = tmpImageSize.find('x')

@@ -49,7 +49,6 @@ Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/bann
   <item>
     <title>Stargate SG-1</title>
     <subtitle>Thor's Hammer</subtitle>
-    <language/>
     <description>Teal'c and O'Neill are transported to an underground cage designed by the Asgard to protect an alien world from the Goa'uld.</description>
     <season>1</season>
     <episode>10</episode>
@@ -64,6 +63,7 @@ Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/bann
     <collectionref>72449</collectionref>
     <imdb>0118480</imdb>
     <tmsref>EP00225421</tmsref>
+    <language>en</language>
     <year>1997</year>
     <releasedate>1997-09-26</releasedate>
     <people>
@@ -74,29 +74,26 @@ Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/bann
       <person job="Actor" name="Christopher Judge" character="Teal'c" url="http://thetvdb.com/banners/actors/17726.jpg" thumb="http://thetvdb.com/banners/actors/17726.jpg"/>
       <person job="Actor" name="Beau Bridges" character="Henry &quot;Hank&quot; Landry" url="http://thetvdb.com/banners/actors/17719.jpg" thumb="http://thetvdb.com/banners/actors/17719.jpg"/>
       <person job="Actor" name="Don S. Davis" character="George S. Hammond" url="http://thetvdb.com/banners/actors/17721.jpg" thumb="http://thetvdb.com/banners/actors/17721.jpg"/>
-      <person job="Actor" name="Corin Nemec" character="Jonas Quinn" url="http://thetvdb.com/banners/actors/17724.jpg" thumb="http://thetvdb.com/banners/actors/17724.jpg"/>
-      <person job="Actor" name="Carmen Argenziano" character="Jacob Carter|Selmac" url="http://thetvdb.com/banners/actors/218241.jpg" thumb="http://thetvdb.com/banners/actors/218241.jpg"/>
-      <person job="Actor" name="Tony Amendola" character="Master Bra'tac" url="http://thetvdb.com/banners/actors/218251.jpg" thumb="http://thetvdb.com/banners/actors/218251.jpg"/>
-      <person job="Actor" name="Claudia Black" character="Vala Mal Doran" url="http://thetvdb.com/banners/actors/77720.jpg" thumb="http://thetvdb.com/banners/actors/77720.jpg"/>
-      <person job="Actor" name="Teryl Rothery" character="Janet Fraiser" url="http://thetvdb.com/banners/actors/77847.jpg" thumb="http://thetvdb.com/banners/actors/77847.jpg"/>
-      <person job="Actor" name="Gary Jones" character="Walter Harriman" url="http://thetvdb.com/banners/actors/77848.jpg" thumb="http://thetvdb.com/banners/actors/77848.jpg"/>
-      <person job="Actor" name="Robert Picardo" character="Richard Woolsey" url="http://thetvdb.com/banners/actors/293427.jpg" thumb="http://thetvdb.com/banners/actors/293427.jpg"/>
-      <person job="Actor" name="David Hewlett" character="Dr. Rodney McKay" url="http://thetvdb.com/banners/actors/293429.jpg" thumb="http://thetvdb.com/banners/actors/293429.jpg"/>
-      <person job="Actor" name="Cliff Simon" character="Ba'al" url="http://thetvdb.com/banners/actors/309670.jpg" thumb="http://thetvdb.com/banners/actors/309670.jpg"/>
-      <person job="Actor" name="Peter Williams" character="Apophis" url="http://thetvdb.com/banners/actors/309671.jpg" thumb="http://thetvdb.com/banners/actors/309671.jpg"/>
-      <person job="Actor" name="Vince Crestejo" character="Yu-huang Shang Ti" url="http://thetvdb.com/banners/actors/309672.jpg" thumb="http://thetvdb.com/banners/actors/309672.jpg"/>
-      <person job="Actor" name="Anna-Louise Plowman" character="Sarah Gardner &amp; Osiris" url="http://thetvdb.com/banners/actors/309673.jpg" thumb="http://thetvdb.com/banners/actors/309673.jpg"/>
-      <person job="Actor" name="Tim Guinee" character="Tomin" url="http://thetvdb.com/banners/actors/309674.jpg" thumb="http://thetvdb.com/banners/actors/309674.jpg"/>
-      <person job="Actor" name="Julian Sands" character="The Doci" url="http://thetvdb.com/banners/actors/309677.jpg" thumb="http://thetvdb.com/banners/actors/309677.jpg"/>
-      <person job="Actor" name="Morena Baccarin" character="Adria, the Orici" url="http://thetvdb.com/banners/actors/309676.jpg" thumb="http://thetvdb.com/banners/actors/309676.jpg"/>
-      <person job="Actor" name="Colin Cunningham" character="Paul Davis" url="http://thetvdb.com/banners/actors/309804.jpg" thumb="http://thetvdb.com/banners/actors/309804.jpg"/>
+...
+      <person job="Guest Star" name="James Earl Jones"/>
+      <person job="Guest Star" name="Galyn Gorg"/>
+      <person job="Guest Star" name="Tamsin Kelsey"/>
+      <person job="Guest Star" name="Vincent Hammond"/>
+      <person job="Guest Star" name="Mark Gibbon"/>
+      <person job="Director" name="Brad Turner"/>
+      <person job="Author" name="Katharyn Michaelian Powers"/>
     </people>
     <images>
-      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/185-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/185-1.jpg"/>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/72449/85759.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/72449/85759.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1-9.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1-9.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1-2.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1-8.jpg"/>
-      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1-9.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1-9.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/185-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/185-1.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72449-55.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72449-55.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72449-34.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72449-34.jpg" width="1280" height="720"/>
+...
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72449-75.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72449-75.jpg" width="1280" height="720"/>
     </images>
   </item>
 </metadata>
@@ -131,13 +128,42 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
   <item>
     <title>Eleventh Hour (US)</title>
     <subtitle>H2O</subtitle>
-    <language/>
     <description>An epidemic of sudden, violent outbursts by law-abiding citizens draws Dr. Jacob Hood to a quiet Texas community to investigate - but he soon succumbs to the same erratic behavior.</description>
     <season>1</season>
     <episode>10</episode>
-...
-      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/83066-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/83066-1.jpg"/>
+    <certifications>
+      <certification locale="us" name="TV-14"/>
+    </certifications>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <runtime/>
+    <inetref>83066</inetref>
+    <collectionref>83066</collectionref>
+    <imdb>1118697</imdb>
+    <language>en</language>
+    <year>2009</year>
+    <releasedate>2009-01-15</releasedate>
+    <people>
+      <person job="Actor" name="Rufus Sewell" character="Jacob Hood" url="http://thetvdb.com/banners/actors/78899.jpg" thumb="http://thetvdb.com/banners/actors/78899.jpg"/>
+      <person job="Actor" name="Marley Shelton" character="Rachel Young" url="http://thetvdb.com/banners/actors/78898.jpg" thumb="http://thetvdb.com/banners/actors/78898.jpg"/>
+      <person job="Actor" name="Omar Benson Miller" character="Felix Lee" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Chris Krauser" character="EMT" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Erica Frene" character="Receptionist" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Lei'lah Star" character="Sick Kid" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Mark C. Baldwin" character="Infomercial Announcer" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Director" name="McDonough"/>
+      <person job="Author" name="Kim Newton"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/83066/416216.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/83066/416216.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/83066-1-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/83066-1-2.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/83066-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/83066-1.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-1.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-3.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-3.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-5.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-5.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-2.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-4.jpg" width="1280" height="720"/>
     </images>
   </item>
 </metadata>
@@ -148,21 +174,20 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
 # <image type="banner" url="http://www.thetvdb.com/banners/graphical/83066-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/83066-g.jpg"/>
 (Return the season numbers for a series)
 > ttvdb --configure="./tvdb_test.conf" -n "SG-1"
->>> sys.argv = ["ttvdb", "--configure=./tvdb_test.conf", "-n", "SG-1"]
+>>> sys.argv = "ttvdb --configure=./tvdb_test.conf -n SG-1".split(' ')
 >>> main()
 0,1,2,3,4,5,6,7,8,9,10
 0
 
 (Return the meta data for a specific series/season/episode)
 > ttvdb.py -D 80159 2 2
->>> sys.argv = ["ttvdb", "-D", "80159", "2", "2"]
+>>> sys.argv = "ttvdb -D 80159 2 2".split(' ')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
   <item>
     <title>Sanctuary</title>
     <subtitle>End of Nights (2)</subtitle>
-    <language/>
     <description>Furious at being duped into a trap, Magnus takes on Kate, demanding information and complete access to her Cabal contacts. The Cabal’s true agenda is revealed and Magnus realizes that they are not only holding Ashley as ransom to obtain complete control of the Sanctuary Network, but turning her into the ultimate weapon. Now transformed into a Super Abnormal with devastating powers, Ashley and her newly cloned fighters begin their onslaught, destroying Sanctuaries in cities around the world. Tesla and Henry attempt to create a weapon that can stop the attacks…without killing Ashley. As the team prepares to defend the Sanctuary with Tesla’s new weapon, Magnus must come to the realization that they may not be able to stop the Cabal’s attacks without harming Ashley. She realizes she might have to choose between saving her only daughter, or losing the Sanctuary and all the lives and secrets within it.</description>
     <season>2</season>
     <episode>2</episode>
@@ -177,6 +202,7 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
     <collectionref>80159</collectionref>
     <imdb>0965394</imdb>
     <tmsref>EP01085421</tmsref>
+    <language>en</language>
     <year>2009</year>
     <releasedate>2009-10-16</releasedate>
     <people>
@@ -198,11 +224,39 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
       <person job="Actor" name="Lynda Boyd" character="Dana Whitcomb" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
       <person job="Actor" name="Shekhar Paleja" character="Ravi" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
       <person job="Actor" name="Chuck Campbell" character="Two Faced Guy" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Guest Star" name="Jonathon Young"/>
+      <person job="Guest Star" name="Christine Chatelain"/>
+      <person job="Guest Star" name="Robert Lawrenson"/>
+      <person job="Guest Star" name="Maiko Yamamoto"/>
+      <person job="Guest Star" name="Stanley Tsang"/>
+      <person job="Guest Star" name="Darren A. Hebert"/>
+      <person job="Guest Star" name="Lynda Boyd"/>
+      <person job="Director" name="Martin Wood"/>
+      <person job="Author" name="Damian Kindler"/>
     </people>
     <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/80159/998441.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/80159/998441.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/80159-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/80159-2.jpg"/>
-      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/80159-2-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/80159-2-2.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/80159-2-3.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/80159-2-3.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/80159-2-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/80159-2-2.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-10.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-10.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-6.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-6.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-3.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-3.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-9.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-9.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-7.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-7.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-8.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-2.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-4.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-5.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-5.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-21.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-21.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-16.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-16.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-1.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-15.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-15.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-17.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-17.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-18.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-18.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-19.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-19.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-20.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-20.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-22.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-22.jpg" width="1920" height="1080"/>
     </images>
   </item>
 </metadata>
@@ -400,21 +454,104 @@ Writers:
 Screenshot:
 Language:en
 Airedseasonid:583817
+Dvddiscid:
 Id:5463514
+Imdbid:
 Lastupdated:1451954464
+Lastupdatedby:447800
+Productioncode:
+Seriesid:281053
+Showurl:
+Siterating:0
+Siteratingcount:0
+Thumbadded:
+Thumbauthor:1
 Cast:Chip Gaines, Joanna Gaines
 Runtime:45
 Title:Fixer Upper
-Season:0
-Episode:2
-Subtitle:Bloopers, Outtakes and More
-Year:2016
 ...
-Cast:Chip Gaines, Joanna Gaines
-Runtime:45
-Coverart:http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-2.jpg
-Fanart:http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg
-Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg
+Coverart:http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-2.jpg,http://thetvdb.com/banners/posters/281053-2.jpg
+Fanart:http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg
+Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg
+0
+
+>>> sys.argv = "ttvdb.py -l en -a US -N 72108 Pyramid".split(' ')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>NCIS</title>
+    <subtitle>Pyramid</subtitle>
+    <description>The lives of NCIS members are in jeopardy when they come face-to-face with the infamous Port-to-Port killer, on the eighth season finale of NCIS.</description>
+    <season>8</season>
+    <episode>24</episode>
+    <certifications>
+      <certification locale="us" name="TV-14"/>
+    </certifications>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <runtime/>
+    <inetref>72108</inetref>
+    <collectionref>72108</collectionref>
+    <tmsref>EP00681911</tmsref>
+    <imdb/>
+    <language>en</language>
+    <year>2011</year>
+    <releasedate>2011-05-17</releasedate>
+    <people>
+      <person job="Actor" name="Mark Harmon" character="Leroy Jethro Gibbs" url="http://thetvdb.com/banners/actors/70164.jpg" thumb="http://thetvdb.com/banners/actors/70164.jpg"/>
+      <person job="Actor" name="Sean Murray" character="Timothy &quot;Tim&quot; McGee" url="http://thetvdb.com/banners/actors/70163.jpg" thumb="http://thetvdb.com/banners/actors/70163.jpg"/>
+      <person job="Actor" name="Emily Wickersham" character="Eleanor “Ellie” Bishop" url="http://thetvdb.com/banners/actors/321201.jpg" thumb="http://thetvdb.com/banners/actors/321201.jpg"/>
+      <person job="Actor" name="David McCallum" character="Donald &quot;Ducky&quot; Mallard" url="http://thetvdb.com/banners/actors/70159.jpg" thumb="http://thetvdb.com/banners/actors/70159.jpg"/>
+      <person job="Actor" name="Pauley Perrette" character="Abigail &quot;Abby&quot; Sciuto" url="http://thetvdb.com/banners/actors/70161.jpg" thumb="http://thetvdb.com/banners/actors/70161.jpg"/>
+      <person job="Actor" name="Rocky Carroll" character="Leon Vance" url="http://thetvdb.com/banners/actors/127861.jpg" thumb="http://thetvdb.com/banners/actors/127861.jpg"/>
+      <person job="Actor" name="Brian Dietzen" character="Jimmy Palmer" url="http://thetvdb.com/banners/actors/219761.jpg" thumb="http://thetvdb.com/banners/actors/219761.jpg"/>
+      <person job="Actor" name="Wilmer Valderrama" character="Nicholas &quot;Nick&quot; Torres" url="http://thetvdb.com/banners/actors/394895.jpg" thumb="http://thetvdb.com/banners/actors/394895.jpg"/>
+      <person job="Actor" name="Michael Weatherly" character="Anthony &quot;Tony&quot; DiNozzo" url="http://thetvdb.com/banners/actors/70160.jpg" thumb="http://thetvdb.com/banners/actors/70160.jpg"/>
+      <person job="Actor" name="Sasha Alexander" character="Caitlin &quot;Kate&quot; Todd" url="http://thetvdb.com/banners/actors/70162.jpg" thumb="http://thetvdb.com/banners/actors/70162.jpg"/>
+      <person job="Actor" name="Cote de Pablo" character="Ziva David" url="http://thetvdb.com/banners/actors/70165.jpg" thumb="http://thetvdb.com/banners/actors/70165.jpg"/>
+      <person job="Actor" name="Lauren Holly" character="Jennifer &quot;Jenny&quot; Shepard" url="http://thetvdb.com/banners/actors/77850.jpg" thumb="http://thetvdb.com/banners/actors/77850.jpg"/>
+      <person job="Actor" name="Jennifer Espósito" character="Alex Quinn" url="http://thetvdb.com/banners/actors/402126.jpg" thumb="http://thetvdb.com/banners/actors/402126.jpg"/>
+      <person job="Actor" name="Duane Henry" character="Clayton Reeves" url="http://thetvdb.com/banners/actors/418530.jpg" thumb="http://thetvdb.com/banners/actors/418530.jpg"/>
+      <person job="Guest Star" name="Kerr Smith"/>
+      <person job="Guest Star" name="Sarah Jane Morris"/>
+      <person job="Guest Star" name="Matt Craven"/>
+      <person job="Guest Star" name="David Dayan Fisher"/>
+      <person job="Guest Star" name="Muse Watson"/>
+      <person job="Guest Star" name="Alimi Ballard"/>
+      <person job="Guest Star" name="Matthew Willig"/>
+      <person job="Guest Star" name="Tehmina Sunny"/>
+      <person job="Guest Star" name="Enrique Murciano"/>
+      <person job="Guest Star" name="Jude Ciccolella"/>
+      <person job="Guest Star" name="Vera Miao"/>
+      <person job="Director" name="Dennis Smith"/>
+      <person job="Author" name="Gary Glasberg"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/72108/4078484.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/72108/4078484.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8-2.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8-7.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8-7.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-31.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-31.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-28.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-28.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-30.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-30.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-29.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-29.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-4.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-26.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-26.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-32.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-32.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-1.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-10.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-10.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-8.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-6.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-6.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-9.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-9.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-5.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-5.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-18.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-18.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-17.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-17.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-33.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-33.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
 0
 
 """
@@ -882,7 +1019,7 @@ name_parse=[
 # Episode meta data that is massaged
 massage={'writer':'|','director':'|', 'overview':'&', 'gueststars':'|' }
 # Keys and titles used for episode data (option '-D')
-data_keys =['airedSeason','airedEpisodeNumber','episodeName','firstAired','director','overview','rating','writer','filename','language' ]
+data_keys =['airedSeason','airedEpisodeNumber','episodeName','firstAired','directors','overview','rating','writers','filename','language' ]
 data_titles=['Season:','Episode:','Subtitle:','ReleaseDate:','Director:','Plot:','UserRating:','Writers:','Screenshot:','Language:' ]
 # High level dictionay keys for select graphics URL(s)
 fanart_key='fanart'
@@ -1022,6 +1159,7 @@ class Tvdb( tvdb_api.Tvdb ):
     def series_by_sid(self, sid, language):
         "Lookup a series via it's sid"
         seriesid = 'sid:' + sid
+        sid = int(sid)
         if not seriesid in self.corrections:
             self._getShowData(sid, language=language)
             self.corrections[seriesid] = sid
@@ -1304,6 +1442,8 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
             if args > 2:
                 if episode != int(series_season_ep[2]):
                     continue
+            # get more detailed episode info
+            t.getDetailedEpisodeInfo(int(series_data['id']), season, episode)
             extra_ep_data=[]
             available_keys=series_data[season][episode].keys()
             if screenshot_request:
@@ -1321,6 +1461,9 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                 key_values.append('') # each episode within a season
             for key in sorted(available_keys):
                 try:
+                    # skip deprecated keys
+                    if key in ['director']:
+                        continue
                     i = data_keys.index(key) # Include only specific episode data
                 except ValueError:
                     if series_data[season][episode][key] != None:
@@ -1328,6 +1471,9 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                         if isinstance(text, dict):
                             # handle language tuple
                             text = list(text.values())[0]
+                        elif isinstance(text, list):
+                            # handle guest stars lists
+                            text = ', '.join(text)
                         text = change_amp(unicode(text))
                         text = change_to_commas(text)
                         if text == 'None' and key.title() == 'Director':
@@ -1341,6 +1487,8 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 
                 if text == None and key.title() == 'Director':
                     text = u"Unknown"
+                if isinstance(text, list):
+                    text = ', '.join(text)
                 if text == None or text == 'None':
                     continue
                 else:
@@ -1369,6 +1517,8 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
             for extra_data in extra_ep_data:
                 if extra_data[:extra_data.index(':')] == u'Gueststars':
                     extra_cast = extra_data[extra_data.index(':')+1:]
+                    if not extra_cast:
+                        continue
                     if (len(extra_cast)>128) and not extra_cast.count(','):
                         continue
                     if cast_members:
@@ -1419,11 +1569,14 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
         series_name=series_season_ep[0] # Leave the series name alone
         ep_name=series_season_ep[1] # Leave the episode name alone
 
-    season_ep_num=search_for_series(t, series_name, opts.language).fuzzysearch(ep_name, 'episodename')
+    series = search_for_series(t, series_name, opts.language)
+    season_ep_num = series.fuzzysearch(ep_name, 'episodename')
     if len(season_ep_num) != 0:
         for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
 #            if episode.distance == 0: # exact match
                 if xmlFlag:
+                    # get more detailed episode info
+                    t.getDetailedEpisodeInfo(series['id'], episode['airedSeason'], episode)
                     convert_series_to_xml(t, series_season_ep, season_ep_num)
                     displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
                     return 0
@@ -1575,17 +1728,17 @@ def convert_series_to_xml(t, series_season_ep, ep_info):
         if parent == "root":
             return "images"
         return "Banner"
-    for ep_id in t.shows.keys():
+    for show_id in t.shows.keys():
         break
     # sort the cast into sort order
-    t.shows[ep_id].data['_actors'] = sorted(t.shows[ep_id].data['_actors'], key=lambda k: k['sortOrder'])
+    t.shows[show_id].data['_actors'] = sorted(t.shows[show_id].data['_actors'], key=lambda k: k['sortOrder'])
     t.searchTree = None
     t.seriesInfoTree = None
     t.epInfoTree = None
     t.actorsInfoTree = None
     t.imagesInfoTree = None
-    sxml = dicttoxml(t.shows[ep_id].data, custom_root='series', item_func=series_ep_item_func, attr_type=False)
-    exml = dicttoxml(t.shows[ep_id], custom_root='data', item_func=series_ep_item_func, attr_type=False)
+    sxml = dicttoxml(t.shows[show_id].data, custom_root='series', item_func=series_ep_item_func, attr_type=False)
+    exml = dicttoxml(t.shows[show_id], custom_root='data', item_func=series_ep_item_func, attr_type=False)
     t.seriesInfoTree = eTree.XML(exml)
     t.seriesInfoTree.append(eTree.XML(sxml))
     t.baseXsltDir = xslt.baseXsltPath
@@ -2058,12 +2211,14 @@ def main():
                 print(u"Season and Episode numbers required.")
             else:
                 if opts.xml:
+                    t.getDetailedEpisodeInfo(seriesfound[u'id'], series_season_ep[1], series_season_ep[2])
                     convert_series_to_xml(t, series_season_ep, seriesfound)
                     displaySeriesXML(t, series_season_ep)
                     return 0
                 Getseries_episode_data(t, opts, series_season_ep, language=opts.language)
         else:
             if opts.xml and len(series_season_ep) == 3:
+                t.getDetailedEpisodeInfo(list(t.shows.values())[0].data['id'], series_season_ep[1], series_season_ep[2])
                 convert_series_to_xml(t, series_season_ep, seriesfound)
                 displaySeriesXML(t, series_season_ep)
                 return 0
