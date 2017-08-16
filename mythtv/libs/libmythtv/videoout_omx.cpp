@@ -83,9 +83,7 @@ using namespace omxcontext;
  * Types
  */
 #ifdef OSD_EGL
-typedef MythRenderOpenGL2ES MythRenderBase;
-
-class MythRenderEGL : public MythRenderBase
+class MythRenderEGL : public MythRenderOpenGL2ES
 {
     // No copying
     MythRenderEGL(MythRenderEGL&);
@@ -104,7 +102,7 @@ class MythRenderEGL : public MythRenderBase
 #endif
 
   protected:
-    virtual ~MythRenderEGL(); // Use MythRenderBase::DecrRef to delete
+    virtual ~MythRenderEGL(); // Use MythRenderOpenGL2ES::DecrRef to delete
 
     EGLNativeWindowType createNativeWindow();
     void destroyNativeWindow();
@@ -1435,7 +1433,7 @@ OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
 
 #ifdef OSD_EGL
 MythRenderEGL::MythRenderEGL() :
-    MythRenderBase(MythRenderFormat()),
+    MythRenderOpenGL2ES(MythRenderFormat()),
     m_display(EGL_NO_DISPLAY),
     m_context(EGL_NO_CONTEXT),
     m_window(0),
