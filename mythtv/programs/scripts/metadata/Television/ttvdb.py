@@ -38,11 +38,11 @@
 """
 Doctests
 
->>> sys.argv = "./ttvdb.py -B Sanctuary".split(' ')
+>>> sys.argv = shlex.split('./ttvdb.py -B Sanctuary')
 >>> main()
 Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/banners/graphical/80159-g5.jpg,http://thetvdb.com/banners/graphical/80159-g3.jpg,http://thetvdb.com/banners/graphical/80159-g6.jpg,http://thetvdb.com/banners/graphical/80159-g2.jpg,http://thetvdb.com/banners/graphical/80159-g.jpg,http://thetvdb.com/banners/graphical/80159-g8.jpg
 0
->>> sys.argv = "./ttvdb.py -S SG-1 1 10".split(' ')
+>>> sys.argv = shlex.split('./ttvdb.py -S SG-1 1 10')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
@@ -98,7 +98,7 @@ Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/bann
   </item>
 </metadata>
 0
->>> sys.argv = ["ttvdb", "-PFB", "Stargate SG-1"]
+>>> sys.argv = shlex.split('ttvdb -PFB "Stargate SG-1"')
 >>> main()
 Coverart:http://thetvdb.com/banners/posters/72449-4.jpg,http://thetvdb.com/banners/posters/72449-5.jpg,http://thetvdb.com/banners/posters/72449-9.jpg,http://thetvdb.com/banners/posters/72449-6.jpg,http://thetvdb.com/banners/posters/72449-7.jpg,http://thetvdb.com/banners/posters/72449-8.jpg,http://thetvdb.com/banners/posters/72449-1.jpg,http://thetvdb.com/banners/posters/72449-3.jpg,http://thetvdb.com/banners/posters/72449-2.jpg
 Fanart:http://thetvdb.com/banners/fanart/original/72449-55.jpg,http://thetvdb.com/banners/fanart/original/72449-34.jpg,http://thetvdb.com/banners/fanart/original/72449-23.jpg,http://thetvdb.com/banners/fanart/original/72449-24.jpg,http://thetvdb.com/banners/fanart/original/72449-29.jpg,http://thetvdb.com/banners/fanart/original/72449-6.jpg,http://thetvdb.com/banners/fanart/original/72449-26.jpg,http://thetvdb.com/banners/fanart/original/72449-36.jpg,http://thetvdb.com/banners/fanart/original/72449-38.jpg,http://thetvdb.com/banners/fanart/original/72449-50.jpg,http://thetvdb.com/banners/fanart/original/72449-27.jpg,http://thetvdb.com/banners/fanart/original/72449-31.jpg,http://thetvdb.com/banners/fanart/original/72449-32.jpg,http://thetvdb.com/banners/fanart/original/72449-35.jpg,http://thetvdb.com/banners/fanart/original/72449-42.jpg,http://thetvdb.com/banners/fanart/original/72449-44.jpg,http://thetvdb.com/banners/fanart/original/72449-25.jpg,http://thetvdb.com/banners/fanart/original/72449-28.jpg,http://thetvdb.com/banners/fanart/original/72449-47.jpg,http://thetvdb.com/banners/fanart/original/72449-33.jpg,http://thetvdb.com/banners/fanart/original/72449-39.jpg,http://thetvdb.com/banners/fanart/original/72449-43.jpg,http://thetvdb.com/banners/fanart/original/72449-22.jpg,http://thetvdb.com/banners/fanart/original/72449-30.jpg,http://thetvdb.com/banners/fanart/original/72449-40.jpg,http://thetvdb.com/banners/fanart/original/72449-41.jpg,http://thetvdb.com/banners/fanart/original/72449-49.jpg,http://thetvdb.com/banners/fanart/original/72449-51.jpg,http://thetvdb.com/banners/fanart/original/72449-21.jpg,http://thetvdb.com/banners/fanart/original/72449-20.jpg,http://thetvdb.com/banners/fanart/original/72449-45.jpg,http://thetvdb.com/banners/fanart/original/72449-67.jpg,http://thetvdb.com/banners/fanart/original/72449-9.jpg,http://thetvdb.com/banners/fanart/original/72449-46.jpg,http://thetvdb.com/banners/fanart/original/72449-48.jpg,http://thetvdb.com/banners/fanart/original/72449-4.jpg,http://thetvdb.com/banners/fanart/original/72449-1.jpg,http://thetvdb.com/banners/fanart/original/72449-65.jpg,http://thetvdb.com/banners/fanart/original/72449-37.jpg,http://thetvdb.com/banners/fanart/original/72449-16.jpg,http://thetvdb.com/banners/fanart/original/72449-17.jpg,http://thetvdb.com/banners/fanart/original/72449-3.jpg,http://thetvdb.com/banners/fanart/original/72449-7.jpg,http://thetvdb.com/banners/fanart/original/72449-10.jpg,http://thetvdb.com/banners/fanart/original/72449-8.jpg,http://thetvdb.com/banners/fanart/original/72449-5.jpg,http://thetvdb.com/banners/fanart/original/72449-64.jpg,http://thetvdb.com/banners/fanart/original/72449-2.jpg,http://thetvdb.com/banners/fanart/original/72449-61.jpg,http://thetvdb.com/banners/fanart/original/72449-12.jpg,http://thetvdb.com/banners/fanart/original/72449-13.jpg,http://thetvdb.com/banners/fanart/original/72449-14.jpg,http://thetvdb.com/banners/fanart/original/72449-15.jpg,http://thetvdb.com/banners/fanart/original/72449-18.jpg,http://thetvdb.com/banners/fanart/original/72449-63.jpg,http://thetvdb.com/banners/fanart/original/72449-11.jpg,http://thetvdb.com/banners/fanart/original/72449-19.jpg,http://thetvdb.com/banners/fanart/original/72449-52.jpg,http://thetvdb.com/banners/fanart/original/72449-53.jpg,http://thetvdb.com/banners/fanart/original/72449-54.jpg,http://thetvdb.com/banners/fanart/original/72449-56.jpg,http://thetvdb.com/banners/fanart/original/72449-57.jpg,http://thetvdb.com/banners/fanart/original/72449-58.jpg,http://thetvdb.com/banners/fanart/original/72449-59.jpg,http://thetvdb.com/banners/fanart/original/72449-60.jpg,http://thetvdb.com/banners/fanart/original/72449-62.jpg,http://thetvdb.com/banners/fanart/original/72449-73.jpg,http://thetvdb.com/banners/fanart/original/72449-74.jpg,http://thetvdb.com/banners/fanart/original/72449-75.jpg
@@ -108,20 +108,20 @@ Banner:http://thetvdb.com/banners/graphical/72449-g6.jpg,http://thetvdb.com/bann
 # Coverart:http://www.thetvdb.com/banners/posters/72449-1.jpg
 # Fanart:http://www.thetvdb.com/banners/fanart/original/72449-1.jpg
 # Banner:http://www.thetvdb.com/banners/graphical/185-g3.jpg
->>> sys.argv = ["ttvdb", "-B", "Night Gallery"]
+>>> sys.argv = shlex.split('ttvdb -B "Night Gallery"')
 >>> main()
 Banner:http://thetvdb.com/banners/graphical/70382-g4.jpg,http://thetvdb.com/banners/graphical/1013-g.jpg,http://thetvdb.com/banners/blank/70382.jpg,http://thetvdb.com/banners/graphical/70382-g.jpg,http://thetvdb.com/banners/graphical/70382-g2.jpg,http://thetvdb.com/banners/graphical/70382-g3.jpg
 0
 
 # http://www.thetvdb.com/banners/blank/70382.jpg
->>> sys.argv = ["ttvdb", "-Bl", "en", "Lost"]
+>>> sys.argv = shlex.split('ttvdb -Bl en Lost')
 >>> main()
 Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/banners/graphical/73739-g13.jpg,http://thetvdb.com/banners/graphical/73739-g18.jpg,http://thetvdb.com/banners/graphical/73739-g6.jpg,http://thetvdb.com/banners/graphical/73739-g12.jpg,http://thetvdb.com/banners/graphical/73739-g3.jpg,http://thetvdb.com/banners/graphical/24313-g2.jpg,http://thetvdb.com/banners/graphical/73739-g8.jpg,http://thetvdb.com/banners/graphical/73739-g.jpg,http://thetvdb.com/banners/graphical/73739-g5.jpg,http://thetvdb.com/banners/graphical/73739-g7.jpg,http://thetvdb.com/banners/graphical/73739-g10.jpg,http://thetvdb.com/banners/graphical/73739-g11.jpg,http://thetvdb.com/banners/graphical/24313-g.jpg,http://thetvdb.com/banners/graphical/73739-g2.jpg,http://thetvdb.com/banners/blank/73739.jpg
 0
 
 # Banner:http://www.thetvdb.com/banners/graphical/73739-g4.jpg,http://www.thetvdb.com/banners/graphical/73739-g.jpg,http://www.thetvdb.com/banners/graphical/73739-g6.jpg,http://www.thetvdb.com/banners/graphical/73739-g8.jpg,http://www.thetvdb.com/banners/graphical/73739-g3.jpg,http://www.thetvdb.com/banners/graphical/73739-g7.jpg,http://www.thetvdb.com/banners/graphical/73739-g5.jpg,http://www.thetvdb.com/banners/graphical/24313-g2.jpg,http://www.thetvdb.com/banners/graphical/24313-g.jpg,http://www.thetvdb.com/banners/graphical/73739-g10.jpg,http://www.thetvdb.com/banners/graphical/73739-g2.jpg
 > ttvdb -N --configure="/home/user/.tvdb/tvdb.conf" "Eleventh Hour" "H2O"
->>> sys.argv = ["ttvdb", "-N", "--configure=./tvdb_test.conf", "Eleventh Hour", "H2O"]
+>>> sys.argv = shlex.split('ttvdb -N --configure=./tvdb_test.conf "Eleventh Hour" H2O')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
@@ -174,14 +174,14 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
 # <image type="banner" url="http://www.thetvdb.com/banners/graphical/83066-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/83066-g.jpg"/>
 (Return the season numbers for a series)
 > ttvdb --configure="./tvdb_test.conf" -n "SG-1"
->>> sys.argv = "ttvdb --configure=./tvdb_test.conf -n SG-1".split(' ')
+>>> sys.argv = shlex.split('ttvdb --configure=./tvdb_test.conf -n SG-1')
 >>> main()
 0,1,2,3,4,5,6,7,8,9,10
 0
 
 (Return the meta data for a specific series/season/episode)
 > ttvdb.py -D 80159 2 2
->>> sys.argv = "ttvdb -D 80159 2 2".split(' ')
+>>> sys.argv = shlex.split('ttvdb -D 80159 2 2')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
@@ -265,7 +265,7 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
 (Return a list of "thetv.com series id and series name" that contain specific search word(s) )
 (!! Be careful with this option as poorly defined search words can result in large lists being returned !!)
 > ttvdb.py -M "night a"
->>> sys.argv = ["ttvdb", "-M", "night a"]
+>>> sys.argv = shlex.split('ttvdb -M "night a"')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
@@ -400,8 +400,7 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
 0
 
 (Return TV series collection data of "thetv.com series id" for a specified language)
-> ttvdb.py -l de -C 80159
->>> sys.argv = ["ttvdb", "-l", "de", "-C", "80159"]
+>>> sys.argv = shlex.split('ttvdb -l de -C 80159')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
@@ -439,7 +438,7 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
 # i.e. dict key ordering
 # key ordering is not sorted so that Title is first for existing client
 # compatability
->>> sys.argv = "ttvdb -l en -a US -D 281053".split(' ')
+>>> sys.argv = shlex.split('ttvdb -l en -a US -D 281053')
 >>> main()
 Title:Fixer Upper
 Season:0
@@ -475,7 +474,7 @@ Fanart:http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.co
 Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg
 0
 
->>> sys.argv = "ttvdb.py -l en -a US -N 72108 Pyramid".split(' ')
+>>> sys.argv = shlex.split('ttvdb.py -l en -a US -N 72108 Pyramid')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
@@ -549,6 +548,39 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-18.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-18.jpg" width="1920" height="1080"/>
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-17.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-17.jpg" width="1280" height="720"/>
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-33.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-33.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
+0
+
+>>> sys.argv = shlex.split('ttvdb.py -l en -a US -N 283661 "Egg Hunt"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Jack Hanna's Wild Countdown</title>
+    <subtitle>Egg Hunt</subtitle>
+    <description>Jungle Jack takes off on a very special Egg Hunt, looking for creatures big and small that hatch from eggs! Crocodiles, Bald Eagles, Sea Turtles, Ostriches, Penguins, and more!</description>
+    <season>6</season>
+    <episode>17</episode>
+    <certifications>
+      <certification locale="us" name="TV-G"/>
+    </certifications>
+    <studios>
+      <studio name="ABC (US)"/>
+    </studios>
+    <runtime/>
+    <inetref>283661</inetref>
+    <collectionref>283661</collectionref>
+    <imdb>3062384</imdb>
+    <tmsref>EP01441760</tmsref>
+    <language>en</language>
+    <year>2017</year>
+    <releasedate>2017-04-15</releasedate>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/283661/6050716.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/283661/6050716.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/posters/283661-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/posters/283661-1.jpg" width="680" height="1000"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/283661-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/283661-1.jpg" width="1920" height="1080"/>
     </images>
   </item>
 </metadata>
@@ -897,6 +929,8 @@ Banner:http://www.thetvdb.com/banners/graphical/73739-g4.jpg,http://www.thetvdb.
 import sys, os, re
 from optparse import OptionParser
 from copy import deepcopy
+# shlex for doctest
+import shlex
 
 # import logging
 # logger = logging.getLogger()

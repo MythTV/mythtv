@@ -1033,16 +1033,18 @@ class Tvdb:
         actorsEt = self._getetsrc(self.config['url_actorsInfo'] % (sid))
 
         cur_actors = Actors()
-        for curActorItem in actorsEt:
-            curActor = Actor()
-            for curInfo in curActorItem.keys():
-                tag = curInfo
-                value = curActorItem[curInfo]
-                if value is not None:
-                    if tag == "image":
-                        value = self.config['url_artworkPrefix'] % (value)
-                curActor[tag] = value
-            cur_actors.append(curActor)
+
+        if actorsEt is not None:
+            for curActorItem in actorsEt:
+                curActor = Actor()
+                for curInfo in curActorItem.keys():
+                    tag = curInfo
+                    value = curActorItem[curInfo]
+                    if value is not None:
+                        if tag == "image":
+                            value = self.config['url_artworkPrefix'] % (value)
+                    curActor[tag] = value
+                cur_actors.append(curActor)
         self._setShowData(sid, '_actors', cur_actors)
 
     def _getShowData(self, sid, language):
