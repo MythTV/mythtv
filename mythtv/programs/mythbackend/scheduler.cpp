@@ -4624,7 +4624,9 @@ void Scheduler::AddNewRecords(void)
             (!cardMap.contains(p->GetInputID()) || !p->schedorder))
         {
             newrecstatus = RecStatus::Offline;
-            if (p->schedorder == 0)
+            if (p->schedorder == 0 &&
+                m_schedorder_warned.find(p->GetInputID()) ==
+                                            m_schedorder_warned.end())
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Channel %1, Title %2 %3 cardinput.schedorder = %4, "
@@ -4632,6 +4634,7 @@ void Scheduler::AddNewRecords(void)
                     .arg(p->GetChannelName()).arg(p->GetTitle())
                     .arg(p->GetScheduledStartTime().toString())
                     .arg(p->schedorder));
+                m_schedorder_warned.insert(p->GetInputID());
             }
         }
 

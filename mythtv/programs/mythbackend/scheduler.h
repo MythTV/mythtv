@@ -259,6 +259,8 @@ class Scheduler : public MThread, public MythScheduler
     QMap<int, EncoderLink *> *m_tvList;
     AutoExpire *m_expirer;
 
+    QSet<uint> m_schedorder_warned;
+
     bool doRun;
 
     MainServer *m_mainServer;
