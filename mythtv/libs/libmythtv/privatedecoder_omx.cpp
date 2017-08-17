@@ -886,9 +886,9 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
     m_lock.unlock();
 
     OMX_U32 nFlags = hdr->nFlags;
-    if (hdr->nFlags & ~OMX_BUFFERFLAG_ENDOFFRAME)
+    if (nFlags & ~OMX_BUFFERFLAG_ENDOFFRAME)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("Decoded frame flags=%1").arg(HeaderFlags(hdr->nFlags)) );
+            QString("Decoded frame flags=%1").arg(HeaderFlags(nFlags)) );
 
     if (avctx->pix_fmt < 0)
         avctx->pix_fmt = AV_PIX_FMT_YUV420P; // == FMT_YV12
