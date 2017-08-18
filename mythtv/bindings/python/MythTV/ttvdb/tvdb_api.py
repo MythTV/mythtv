@@ -7,6 +7,8 @@
 import sys
 import os
 import time
+import requests_cache_compatability
+import tvdb_create_key
 import requests
 import requests_cache
 import getpass
@@ -14,7 +16,6 @@ import tempfile
 import warnings
 import logging
 import datetime
-
 
 """Simple-to-use Python interface to The TVDB's API (thetvdb.com)
 
@@ -527,30 +528,6 @@ class Actor(dict):
     def __repr__(self):
         return "<Actor %r>" % self.get("name")
 
-import hashlib
-from requests_cache.backends.base import _to_bytes, _DEFAULT_HEADERS
-import types
-def create_key(self, request):
-    try:
-        if self._ignored_parameters:
-            url, body = self._remove_ignored_parameters(request)
-        else:
-            url, body = request.url, request.body
-    except AttributeError:
-        url, body = request.url, request.body
-    key = hashlib.sha256()
-    key.update(_to_bytes(request.method.upper()))
-    key.update(_to_bytes(url))
-    if request.body:
-        key.update(_to_bytes(body))
-    else:
-        if self._include_get_headers and request.headers != _DEFAULT_HEADERS:
-            for name, value in sorted(request.headers.items()):
-                # include only Accept-Language as it is important for context
-                if name in ['Accept-Language']:
-                    key.update(_to_bytes(name))
-                    key.update(_to_bytes(value))
-    return key.hexdigest()
 
 class Tvdb:
     """Create easy-to-use interface to name of season/episode name
@@ -700,7 +677,6 @@ class Tvdb:
                 cache_name=self._getTempDir(),
                 include_get_headers=True
                 )
-            self.session.cache.create_key = types.MethodType(create_key, self.session.cache)
             self.session.remove_expired_responses()
             self.config['cache_enabled'] = True
         elif cache is False:
@@ -714,7 +690,6 @@ class Tvdb:
                 cache_name=os.path.join(cache, "tvdb_api"),
                 include_get_headers=True
                 )
-            self.session.cache.create_key = types.MethodType(create_key, self.session.cache)
             self.session.remove_expired_responses()
         else:
             self.session = cache
