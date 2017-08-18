@@ -64,6 +64,7 @@ GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                   m_setupButton(0),
                   m_exitButton(0),
                   m_statusState(0),
+                  m_messageState(0),
                   m_progressBar(0),
                   m_progressTimer(0),
                   m_loop(eventLoop),

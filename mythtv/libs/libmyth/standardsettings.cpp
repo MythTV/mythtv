@@ -795,7 +795,8 @@ StandardSettingDialog::StandardSettingDialog(MythScreenStack *parent,
     m_selectedSettingHelp(0),
     m_menuPopup(0),
     m_settingsTree(groupSettings),
-    m_currentGroupSetting(0)
+    m_currentGroupSetting(0),
+    m_loaded(false)
 {
 }
 
