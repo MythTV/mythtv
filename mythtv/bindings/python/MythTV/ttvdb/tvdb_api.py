@@ -7,8 +7,8 @@
 import sys
 import os
 import time
-import requests_cache_compatability
-import tvdb_create_key
+from . import requests_cache_compatability
+from . import tvdb_create_key
 import requests
 import requests_cache
 import getpass
