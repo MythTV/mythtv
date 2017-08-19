@@ -951,12 +951,10 @@ else:
 
 class tvdb_account:
     # explicit username and account id are not required
-    # but leave just in case its useful in the future
-    # username = "mythtv"
-    # account_identifier = "D31CB9C54523C723"
+    # to use the API. API documentation is unclear in this regard
     username = ""
     account_identifier = ""
-    apikey = "3D70C53F62E90DE7"
+    apikey = '0BB856A59C51D607'
 
 # Verify that tvdb_api.py are available
 try:
