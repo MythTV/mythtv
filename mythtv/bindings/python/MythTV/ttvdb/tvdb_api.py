@@ -757,7 +757,11 @@ class Tvdb:
         self.config['url_artworkPrefix'] = u"%(base_url)s/banners/%%s" % self.config
 
         self.__authorized = False
-        self.headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Accept-Language': self.config['language']}
+        self.headers = {'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Accept-Language': self.config['language'],
+                        'User-Agent': 'tvdb/2.0'
+                        }
 
     def _getTempDir(self):
         """Returns the [system temp dir]/tvdb_api-u501 (or
