@@ -3729,6 +3729,7 @@ void CaptureCardEditor::AddNewCard()
 {
     CaptureCard *card = new CaptureCard();
     card->setLabel(tr("New capture card"));
+    card->Load();
     addChild(card);
     emit settingsChanged(this);
 }
