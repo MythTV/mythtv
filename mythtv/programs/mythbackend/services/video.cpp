@@ -158,7 +158,7 @@ DTC::VideoMetadataInfo* Video::GetVideoByFileName( const QString &FileName )
 {
     VideoMetadataListManager::metadata_list videolist;
     VideoMetadataListManager::loadAllFromDatabase(videolist);
-    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+    QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
     mlm->setList(videolist);
     VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byFilename(FileName);
 
@@ -168,8 +168,6 @@ DTC::VideoMetadataInfo* Video::GetVideoByFileName( const QString &FileName )
     DTC::VideoMetadataInfo *pVideoMetadataInfo = new DTC::VideoMetadataInfo();
 
     FillVideoMetadataInfo ( pVideoMetadataInfo, metadata, true );
-
-    delete mlm;
 
     return pVideoMetadataInfo;
 }
@@ -301,14 +299,12 @@ bool Video::RemoveVideoFromDB( int Id )
 
     VideoMetadataListManager::metadata_list videolist;
     VideoMetadataListManager::loadAllFromDatabase(videolist);
-    VideoMetadataListManager *mlm = new VideoMetadataListManager();
+    QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
     mlm->setList(videolist);
     VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(Id);
 
     if (metadata)
         bResult = metadata->DeleteFromDatabase();
-
-    delete mlm;
 
     return bResult;
 }
