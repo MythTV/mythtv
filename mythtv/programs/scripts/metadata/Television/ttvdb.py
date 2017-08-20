@@ -1033,8 +1033,6 @@ if version < '2.7.2':
 http_find="http://www.thetvdb.com"
 http_replace="http://www.thetvdb.com" #Keep replace code "just in case"
 
-logfile="/tmp/ttvdb.log"
-
 name_parse=[
             # foo_[s01]_[e01]
             re.compile('''^(.+?)[ \._\-]\[[Ss]([0-9]+?)\]_\[[Ee]([0-9]+?)\]?[^\\/]*$'''),
@@ -1102,14 +1100,6 @@ def _can_int(x):
     else:
         return True
 # end _can_int
-
-def debuglog(message):
-    message+='\n'
-    target_socket = open(logfile, "a")
-    target_socket.write(message)
-    target_socket.close()
-    return
-# end debuglog
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -2119,7 +2109,7 @@ def main():
         if os.path.exists(opts.configure) == 1: # Do overrides exist?
             initialize_override_dictionary(opts.configure, opts.language)
         else:
-            debuglog("! The specified override file (%s) does not exist" % opts.configure)
+            sys.stderr.write("! The specified override file (%s) does not exist\n" % opts.configure)
             return 1
     else: # Check if there is a default configuration file
         default_config = u"%s/%s" % (os.path.expanduser(u"~"), u".mythtv/ttvdb.conf")
