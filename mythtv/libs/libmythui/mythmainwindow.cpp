@@ -1015,6 +1015,11 @@ bool MythMainWindow::event(QEvent *e)
 
 void MythMainWindow::Init(QString forcedpainter)
 {
+    d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
+
+    if (!d->firstinit)
+        return;
+
     GetMythUI()->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
                                    d->ybase, d->screenheight, d->hmult);
 

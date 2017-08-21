@@ -127,6 +127,7 @@ class MythContextPrivate : public QObject
     GUIStartup *m_guiStartup;
     QEventLoop *m_loop;
     bool needsBackend;
+    bool m_settingsCacheDirty;
 
   private:
     MythConfirmationDialog *MBEversionPopup;
@@ -241,6 +242,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_sh(new MythContextSlotHandler(this)),
       m_guiStartup(0),
       needsBackend(false),
+      m_settingsCacheDirty(false),
       MBEversionPopup(NULL),
       m_registration(-1),
       m_socket(0)
@@ -287,7 +289,6 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     SilenceDBerrors();
 
     loadSettingsCacheOverride();
-    parent->SetDisableEventPopup(true);
 
 #ifdef Q_OS_MAC
     // Qt 4.4 has window-focus problems
@@ -319,10 +320,7 @@ void MythContextPrivate::EndTempWindow(void)
                 m_guiStartup = 0;
             }
         }
-        DestroyMythMainWindow();
     }
-    clearSettingsCacheOverride();
-    parent->SetDisableEventPopup(false);
     EnableDBerrors();
 }
 
@@ -1007,7 +1005,6 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
     // Current DB connection may have been silenced (invalid):
     EnableDBerrors();
     ResetDatabase();
-    saveSettingsCache();
 
     return QString::null;
 }
@@ -1423,32 +1420,38 @@ void MythContextPrivate::processEvents(void)
 
 const QString MythContextPrivate::settingsToSave[] =
 { "Theme", "Language", "Country", "GuiHeight",
-  "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow" };
+  "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow",
+  "AlwaysOnTop", "HideMouseCursor", "ThemePainter" };
 
 
 bool MythContextPrivate::saveSettingsCache(void)
 {
+    if (!m_gui)
+        return true;
     QString cacheDirName = GetConfDir() + "/cache/";
     QDir dir(cacheDirName);
     dir.mkpath(cacheDirName);
-    // remove prior cache in case it was corrupt
-    QFile::remove(cacheDirName+"contextcache.xml");
     XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
-
-    clearSettingsCacheOverride();
-
     static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
     for (int ix = 0; ix < arraySize; ix++)
     {
+        QString cacheValue = config.GetValue("Settings/"+settingsToSave[ix],QString());
+        gCoreContext->ClearOverrideSettingForSession(settingsToSave[ix]);
         QString value = gCoreContext->GetSetting(settingsToSave[ix],QString());
-        if (!value.isEmpty())
+        if (value != cacheValue)
+        {
             config.SetValue("Settings/"+settingsToSave[ix],value);
+            m_settingsCacheDirty = true;
+        }
     }
+    clearSettingsCacheOverride();
     return config.Save();
 }
 
 void MythContextPrivate::loadSettingsCacheOverride(void)
 {
+    if (!m_gui)
+        return;
     XmlConfiguration config = XmlConfiguration("cache/contextcache.xml");
     static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
     for (int ix = 0; ix < arraySize; ix++)
@@ -1516,6 +1519,8 @@ bool MythContext::Init(const bool gui,
                        const bool disableAutoDiscovery,
                        const bool ignoreDB)
 {
+    SetDisableEventPopup(true);
+
     if (!d)
     {
         LOG(VB_GENERAL, LOG_EMERG, LOC + "Init() Out-of-memory");
@@ -1582,6 +1587,13 @@ bool MythContext::Init(const bool gui,
         return false;
     }
 
+    SetDisableEventPopup(false);
+    saveSettingsCache();
+    if (d->m_settingsCacheDirty)
+    {
+        DestroyMythMainWindow();
+        d->m_settingsCacheDirty = false;
+    }
     gCoreContext->ActivateSettingsCache(true);
 
     return true;
