@@ -533,20 +533,7 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8-7.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8-7.jpg"/>
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-31.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-31.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-28.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-28.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-30.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-30.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-29.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-29.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-4.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-26.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-26.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-32.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-32.jpg" width="1280" height="720"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-1.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-10.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-10.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-8.jpg" width="1280" height="720"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-6.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-6.jpg" width="1280" height="720"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-9.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-9.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-5.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-5.jpg" width="1280" height="720"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-18.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-18.jpg" width="1920" height="1080"/>
-      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-17.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-17.jpg" width="1280" height="720"/>
+...
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-33.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-33.jpg" width="1920" height="1080"/>
     </images>
   </item>
