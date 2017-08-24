@@ -218,9 +218,16 @@ bool hasUtf8(const char *str)
 /**
  * \brief Can we ping host within timeout seconds?
  *
- * Some unixes don't like the -t argument. To make sure a ping failure
- * is actually caused by a defunct server, we might have to do a ping
- * without the -t, which will cause a long timeout.
+ * Different operating systems use different parameters to specify a
+ * timeout to the ping command.  FreeBSD and derivatives use '-t';
+ * Linux and derivatives use '-w'.  Using the right parameter also
+ * eliminates the need for the old behavior of falling back to pinging
+ * the localhost with and without a timeout, in order to characterize
+ * whether the right parameter was used in the first place.
+ *
+ * \note If ping fails to timeout on another supported platform,
+ * determine what parameter that platform's ping requires to specify
+ * the timeout and add another case to the \#ifdef statement.
  */
 bool ping(const QString &host, int timeout)
 {
@@ -235,34 +242,20 @@ bool ping(const QString &host, int timeout)
     QString addrstr =
         gCoreContext->resolveAddress(host, gCoreContext->ResolveAny, true);
     QHostAddress addr = QHostAddress(addrstr);
+#if defined(__FreeBSD__) || CONFIG_DARWIN
+    QString timeoutparam("-t");
+#else
+    // Linux, NetBSD, OpenBSD
+    QString timeoutparam("-w");
+#endif
     QString pingcmd =
         addr.protocol() == QAbstractSocket::IPv6Protocol ? "ping6" : "ping";
-    QString cmd = QString("%1 -t %2 -c 1  %3  >/dev/null 2>&1")
-                  .arg(pingcmd).arg(timeout).arg(host);
+    QString cmd = QString("%1 %2 %3 -c 1  %4  >/dev/null 2>&1")
+                  .arg(pingcmd).arg(timeoutparam).arg(timeout).arg(host);
 
     if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) != GENERIC_EXIT_OK)
-    {
-        // ping command may not like -t argument, or the host might not
-        // be listening. Try to narrow down with a quick ping to localhost:
-
-        cmd = pingcmd + " -t 1 -c 1 localhost >/dev/null 2>&1";
-
-        if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                             kMSProcessEvents) != GENERIC_EXIT_OK)
-        {
-            // Assume -t is bad - do a ping that might cause a timeout:
-            cmd = QString("%1 -c 1 %2 >/dev/null 2>&1").arg(pingcmd).arg(host);
-
-            if (myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
-                                 kMSProcessEvents) != GENERIC_EXIT_OK)
-                return false;  // it failed with or without the -t
-
-            return true;
-        }
-        else  // Pinging localhost worked, so targeted host wasn't listening
-            return false;
-    }
+      return false;
 #endif
 
     return true;
