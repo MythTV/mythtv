@@ -179,6 +179,8 @@ bool PreviewGenerator::RunReal(void)
     QMutexLocker locker(&m_previewLock);
     if (m_listener)
     {
+        // keep in sync with default filename in
+        // PreviewGeneratorQueue::GeneratePreviewImage
         QString output_fn = m_outFileName.isEmpty() ?
             (m_programInfo.GetPathname()+".png") : m_outFileName;
 

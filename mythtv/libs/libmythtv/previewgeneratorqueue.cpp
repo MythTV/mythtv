@@ -26,6 +26,20 @@ using std::max;
 
 PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = NULL;
 
+/**
+ * Create the singleton queue of preview generators.  This should be
+ * called once at program start-up.  All generation requests on this
+ * queue will will be created with the maxAttempts and minBlockSeconds
+ * parameters supplied here.
+ *
+ * \param[in] mode Local or Remote (or both)
+ * \param[in] maxAttempts How many times total will the code attempt
+ * 	      to generate a preview for a specific file, before giving
+ * 	      up and ignoring all future requests.
+ * \param[in] minBlockSeconds How long after a failed preview
+ *            generation attempt will the code ignore subsequent
+ *            requests.
+ */
 void PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
     PreviewGenerator::Mode mode,
     uint maxAttempts, uint minBlockSeconds)
@@ -33,6 +47,12 @@ void PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
     s_pgq = new PreviewGeneratorQueue(mode, maxAttempts, minBlockSeconds);
 }
 
+/**
+ * Destroy the singleton queue of preview generators.  This should be
+ * called once at program shutdown.  It handles stopping all the
+ * running threads before deleting the actual PreviewGeneratorQueue
+ * object.
+ */
 void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
 {
     s_pgq->exit(0);
@@ -41,6 +61,25 @@ void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
     s_pgq = NULL;
 }
 
+/*
+ * Create the queue object for holding preview generators.
+ *
+ * Create the singleton queue of preview generators.  This should be
+ * called once at program start-up.  All generation requests on this
+ * queue will will be created with the maxAttempts and minBlockSeconds
+ * parameters supplied here.
+ *
+ * \param[in] mode Local or Remote (or both)
+ * \param[in] maxAttempts How many times total will the code attempt
+ * 	      to generate a preview for a specific file, before giving
+ * 	      up and ignoring all future requests.
+ * \param[in] minBlockSeconds How long after a failed preview
+ *            generation attempt will the code ignore subsequent
+ *            requests.
+ *
+ * \note Never call this routine directly. Call the
+ * CreatePreviewGeneratorQueue function instead.
+ */
 PreviewGeneratorQueue::PreviewGeneratorQueue(
     PreviewGenerator::Mode mode,
     uint maxAttempts, uint minBlockSeconds) :
@@ -59,6 +98,14 @@ PreviewGeneratorQueue::PreviewGeneratorQueue(
     start();
 }
 
+/**
+ * Destroy the preview generation queue.  This function doesn't
+ * directly destroy the PreviewGenState objects, but marks them for
+ * later destruction by the thread(s) that created them.
+ *
+ * \note Never directly destroy this object. Call the
+ * TeardownPreviewGeneratorQueue function instead.
+ */
 PreviewGeneratorQueue::~PreviewGeneratorQueue()
 {
     // disconnect preview generators
@@ -74,6 +121,27 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
     wait();
 }
 
+/**
+ * Submit a request for the generation of a preview image.  This
+ * information will be packaged up into an event and sent over to the
+ * worker thread that generates previews.
+ *
+ * \param[in] pginfo Generate the image for this program.
+ * \param[in] outputsize Generate a preview image of these dimensions.  If this
+ * 	      is not specified the generated image will be the same size
+ * 	      as the program.
+ * \param[in] outputfile Use this specific filename for the preview
+ * 	      image. If empty, a default name will be created based on the
+ * 	      program information.
+ * \param[in] time An offset from the start of the program. This can be
+ *            seconds or frames. (See the next argument.)
+ * \param[in] in_seconds If true, the 'time' offset is in seconds. If
+ *            false, the offset is in frames.
+ * \param[in] token A user specified value used to match up this
+ *            request with the response from the backend, and as a key for
+ *            some indexing.  A token isn't required, but is strongly
+ *            suggested.
+ */
 void PreviewGeneratorQueue::GetPreviewImage(
     const ProgramInfo &pginfo,
     const QSize &outputsize,
@@ -102,6 +170,13 @@ void PreviewGeneratorQueue::GetPreviewImage(
     QCoreApplication::postEvent(s_pgq, e);
 }
 
+/**
+ * Request notifications when a preview event is generated.  These
+ * will be MythEvent messages, and will be one of PREVIEW_QUEUED,
+ * PREVIEW_FAILED or PREVIEW_SUCCESS.
+ *
+ * \param[in] listener The object to receive events.
+ */
 void PreviewGeneratorQueue::AddListener(QObject *listener)
 {
     if (!s_pgq)
@@ -111,6 +186,13 @@ void PreviewGeneratorQueue::AddListener(QObject *listener)
     s_pgq->m_listeners.insert(listener);
 }
 
+/**
+ * Stop receiving notifications when a preview event is generated.
+ * This object will no longer receive PREVIEW_QUEUED, PREVIEW_FAILED,
+ * or PREVIEW_SUCCESS events.
+ *
+ * \param[in] listener The object that should no longer receive events.
+ */
 void PreviewGeneratorQueue::RemoveListener(QObject *listener)
 {
     if (!s_pgq)
@@ -120,6 +202,22 @@ void PreviewGeneratorQueue::RemoveListener(QObject *listener)
     s_pgq->m_listeners.remove(listener);
 }
 
+/**
+ * The event handler running on the preview generation thread.
+ *
+ * \param[in] e The received message.  This should be one of the
+ * messages GET_PREVIEW, PREVIEW_SUCCESS, or PREVIEW_FAILED.
+ *
+ * \warning This function should only be called from the preview
+ * generation thread.
+
+ * \bug This function appears to incorrectly compute the value of
+ * lastBlockTime.  The call to max() will correctly ensure that if the
+ * old value of lastBlockTime is zero, that the new time for the first
+ * "retry" will be two.  The problem is that all subsequent "retries"
+ * will also be limited to two, so there is no increasing back off
+ * interval like it appears was intended.
+ */
 bool PreviewGeneratorQueue::event(QEvent *e)
 {
     if (e->type() != (QEvent::Type) MythEvent::MythEventMessage)
@@ -234,15 +332,36 @@ bool PreviewGeneratorQueue::event(QEvent *e)
     return false;
 }
 
+/**
+ * Send a message back to all objects that have requested creation of
+ * a specific preview.
+ *
+ * \param[in] pginfo The program info structure from which the preview
+ *            was generated.
+ * \param[in] eventname The name of the event being sent to all
+ * 	      listeners.  This will always be one of PREVIEW_FAILED,
+ * 	      PREVIEW_QUEUED, or PREVIEW_SUCCESS.
+ * \param[in] filename For a SUCCESS message, this is the name of the
+ * 	      newly generated preview file. For a QUEUED message, this
+ * 	      is an empty string. For a FAILED message, this will be
+ * 	      the internal key value.
+ * \param[in] token The token specified by the listener when it
+ * 	      requested the preview generation.
+ * \param[in] msg A text string giving more information about the
+ *            processing of the event.
+ * \param[in] dt For a PREVIEW_SUCCESS message, this is the the last
+ * 	      modified time of the preview file.  For the other
+ * 	      messages, this is a null datetime.
+ */
 void PreviewGeneratorQueue::SendEvent(
     const ProgramInfo &pginfo,
     const QString &eventname,
-    const QString &fn, const QString &token, const QString &msg,
+    const QString &filename, const QString &token, const QString &msg,
     const QDateTime &dt)
 {
     QStringList list;
     list.push_back(QString::number(pginfo.GetRecordingID()));
-    list.push_back(fn);
+    list.push_back(filename);
     list.push_back(msg);
     list.push_back(dt.toUTC().toString(Qt::ISODate));
     list.push_back(token);
@@ -256,6 +375,41 @@ void PreviewGeneratorQueue::SendEvent(
     }
 }
 
+/** \brief Generate a preview image for the specified program.
+ *
+ * This function will find an existing preview image for a program, or
+ * schedules the generation of a preview image if it doesn't exist.
+ * If any of the arguments that could affect the generated image
+ * (size, outputfile, time offset) have been specified, then a new
+ * image will always be generated.
+ *
+ * \param pginfo Generate the image for this program.
+ * \param size Generate a preview image of these dimensions.  If this
+ * 	  is not specified the generated image will be the same size
+ * 	  as the program.
+ * \param outputfile Use this specific filename for the preview
+ * 	  image. If empty, a default name will be created based on the
+ * 	  program information.
+ * \param time An offset from the start of the program. This can be
+ *        seconds or frames. (See the next argument.)
+ * \param in_seconds If true, the 'time' offset is in seconds. If
+ *        false, the offset is in frames.
+ * \param token An arbitrary string value used to match up this
+ *        request with the response from the backend, and as a key for
+ *        some indexing.  A token isn't required, but is strongly
+ *        suggested.
+ * \return The filename of the preview images. This will be null if
+ *         the preview does not yet or will never exist.
+ *
+ * \note This function will always send one of three events.  If the
+ * program has been marked for deletion, this function will send a
+ * PREVIEW_FAILED event.  If a preview already exists, the function
+ * sends a PREVIEW_SUCCESS event.  Otherwise it sends a PREVIEW_QUEUED
+ * event.
+ *
+ * \warning This function should only be called from the preview
+ * generation thread.
+ */
 QString PreviewGeneratorQueue::GeneratePreviewImage(
     ProgramInfo &pginfo,
     const QSize &size,
@@ -274,6 +428,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         return QString();
     }
 
+    // keep in sync with default filename in PreviewGenerator::RunReal
     QString filename = (outputfile.isEmpty()) ?
         pginfo.GetPathname() + ".png" : outputfile;
     QString ret_file = filename;
@@ -430,6 +585,18 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     return ret;
 }
 
+/**
+ * \param[in] key The name of the specific preview being
+ * 	      generated. Keys are generated internally to this file
+ * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *
+ * \param[out] queue_depth The total number of items in the queue to
+ * 	       be processed.  This number does not include previews
+ * 	       that are currently in process of being generated.
+ *
+ * \param[out] token_cnt The number of listeners that are waiting for
+ *             this preview to be generated.
+ */
 void PreviewGeneratorQueue::GetInfo(
     const QString &key, uint &queue_depth, uint &token_cnt)
 {
@@ -439,6 +606,13 @@ void PreviewGeneratorQueue::GetInfo(
     token_cnt = (pit == m_previewMap.end()) ? 0 : (*pit).tokens.size();
 }
 
+/**
+ * \param[in] key The name of the specific preview being
+ * 	      generated. Keys are generated internally to this file
+ * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *
+ * \param[in] token
+ */
 void PreviewGeneratorQueue::IncPreviewGeneratorPriority(
     const QString &key, QString token)
 {
@@ -459,6 +633,10 @@ void PreviewGeneratorQueue::IncPreviewGeneratorPriority(
     }
 }
 
+/**
+ * As long as there are items in the queue, make sure we're running
+ * the maximum allowed number of preview generators.
+ */
 void PreviewGeneratorQueue::UpdatePreviewGeneratorThreads(void)
 {
     QMutexLocker locker(&m_lock);
@@ -478,7 +656,12 @@ void PreviewGeneratorQueue::UpdatePreviewGeneratorThreads(void)
 }
 
 /** \brief Sets the PreviewGenerator for a specific file.
- *  \return true iff call succeeded.
+ *
+ * \param[in] key The name of the specific preview being
+ * 	      generated. Keys are generated internally to this file
+ * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *
+ * \param[in] g
  */
 void PreviewGeneratorQueue::SetPreviewGenerator(
     const QString &key, PreviewGenerator *g)
@@ -513,8 +696,19 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
     IncPreviewGeneratorPriority(key, "");
 }
 
-/** \brief Returns true if we have already started a
- *         PreviewGenerator to create this file.
+/**
+ * Is a preview currently being generated for this key.  This returns
+ * true if a PreviewGenerator has been started to create this preview.
+ * It also returns true if the previous generation attempt failed, and
+ * we're still in the blocking interval before another attempt is
+ * allowed.
+ *
+ * \param[in] key The name of the specific preview being
+ * 	      generated. Keys are generated internally to this file
+ * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *
+ * \return True if generating a preview or blocked. False if a new
+ * attempt is allowed.
  */
 bool PreviewGeneratorQueue::IsGeneratingPreview(const QString &key) const
 {
@@ -530,9 +724,13 @@ bool PreviewGeneratorQueue::IsGeneratingPreview(const QString &key) const
     return (*it).gen;
 }
 
-/** \fn PreviewGeneratorQueue::IncPreviewGeneratorAttempts(const QString&)
- *  \brief Increments and returns number of times we have
- *         started a PreviewGenerator to create this file.
+/**
+ * \brief Increments and returns number of times we have
+ *        started a PreviewGenerator to create this file.
+ *
+ * \param[in] key The name of the specific preview being
+ * 	      generated. Keys are generated internally to this file
+ * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  */
 uint PreviewGeneratorQueue::IncPreviewGeneratorAttempts(const QString &key)
 {
@@ -540,9 +738,14 @@ uint PreviewGeneratorQueue::IncPreviewGeneratorAttempts(const QString &key)
     return m_previewMap[key].attempts++;
 }
 
-/** \fn PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString&)
- *  \brief Clears the number of times we have
- *         started a PreviewGenerator to create this file.
+/**
+ * Clears the number of times we have started a PreviewGenerator to
+ * create this file.  This also resets the the blocking information so
+ * that the next preview request for this file may run immediately.
+ *
+ * \param[in] key The name of the specific preview being
+ * 	      generated. Keys are generated internally to this file
+ * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  */
 void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
 {
@@ -552,3 +755,21 @@ void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
     m_previewMap[key].blockRetryUntil =
         MythDate::current().addSecs(-60);
 }
+
+
+/**
+ * \addtogroup myth_network_protocol
+ * \par GET_PREVIEW \<programinfo\> \e token \e width \e height \e outputfile \e time \e time_fmt
+ */
+/**
+ * \addtogroup myth_network_protocol
+ * \par PREVIEW_SUCCESS \e recordingId \e outFileName \e msg \e datetime \e token
+ */
+/**
+ * \addtogroup myth_network_protocol
+ * \par PREVIEW_QUEUED \e recordingId \e outFileName \e msg \e datetime \e token
+ */
+/**
+ * \addtogroup myth_network_protocol
+ * \par PREVIEW_FAILED \e recordingId \e outFileName \e msg \e datetime \e token
+ */
