@@ -25,7 +25,7 @@ class MSearch( object ):
                 self.sock.bind(('', port))
                 self.addr = (addr, port)
                 listening = True
-            except socket.error, e:
+            except socket.error as e:
                 if port < 1910:
                     port += 1
                 else:

@@ -14,7 +14,7 @@
         within a single Xslt file
     -->
     <xsl:template match="/">
-        <xsl:if test="//Series">
+        <xsl:if test="//series">
             <metadata>
                 <xsl:call-template name='tvdbQuery'/>
             </metadata>
@@ -22,10 +22,10 @@
     </xsl:template>
 
     <xsl:template name="tvdbQuery">
-        <xsl:for-each select="//Series">
+        <xsl:for-each select="//series">
             <item>
                 <language><xsl:value-of select="normalize-space(language)"/></language>
-                <title><xsl:value-of select="normalize-space(SeriesName)"/></title>
+                <title><xsl:value-of select="normalize-space(seriesName)"/></title>
                 <inetref><xsl:value-of select="normalize-space(id)"/></inetref>
                 <collectionref><xsl:value-of select="normalize-space(id)"/></collectionref>
                 <xsl:if test="./IMDB_ID/text() != ''">
@@ -34,14 +34,14 @@
                 <xsl:if test="./zap2it_id/text() != ''">
                     <tmsref><xsl:value-of select="normalize-space(zap2it_id)"/></tmsref>
                 </xsl:if>
-                <xsl:if test="./Rating/text() != ''">
-                    <userrating><xsl:value-of select="normalize-space(Rating)"/></userrating>
+                <xsl:if test="./rating/text() != ''">
+                    <userrating><xsl:value-of select="normalize-space(rating)"/></userrating>
                 </xsl:if>
-                <xsl:if test="./Overview/text() != ''">
-                    <description><xsl:value-of select="normalize-space(Overview)"/></description>
+                <xsl:if test="./overview/text() != ''">
+                    <description><xsl:value-of select="normalize-space(overview)"/></description>
                 </xsl:if>
-                <xsl:if test="./FirstAired/text() != ''">
-                    <releasedate><xsl:value-of select="normalize-space(FirstAired)"/></releasedate>
+                <xsl:if test="./firstAired/text() != ''">
+                    <releasedate><xsl:value-of select="normalize-space(firstAired)"/></releasedate>
                 </xsl:if>
                 <xsl:if test=".//poster/text() != '' or .//fanart/text() != '' or .//banner/text() != ''">
                     <images>

@@ -16,7 +16,10 @@ from MythTV.utility import CMPRecord, datetime, \
 
 from datetime import date
 from time import sleep
-from thread import allocate_lock
+try:
+    from thread import allocate_lock
+except ImportError:
+    from _thread import allocate_lock
 from random import randint
 import socket
 import weakref

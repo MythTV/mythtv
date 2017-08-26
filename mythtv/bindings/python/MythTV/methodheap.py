@@ -16,7 +16,11 @@ from MythTV.dataheap import *
 
 from datetime import timedelta
 from weakref import proxy
-from urllib import urlopen
+try:
+    from urllib import urlopen
+except ImportError:
+    from urllib.request import urlopen
+
 import re
 
 class CaptureCard( DBData ):
@@ -526,7 +530,7 @@ class Frontend( FEConnection ):
                     273:'f9',       274:'f10',      275:'f11',
                     276:'f12',      330:'delete',   331:'insert',
                     338:'pagedown', 339:'pageup'}
-        _alnum = [chr(i) for i in range(48,58)+range(65,91)+range(97,123)]
+        _alnum = [chr(i) for i in list(range(48,58))+list(range(65,91))+list(range(97,123))]
 
         def __str__(self):  return str(self.list())
         def __repr__(self): return str(self)
@@ -890,7 +894,7 @@ class MythDB( DBCache ):
             return ('program.endtime>?', datetime.duck(value), 0)
         return None
 
-    def makePowerRule(self, ruletitle='unnamed (Power Search', 
+    def makePowerRule(self, ruletitle='unnamed (Power Search',
                             type=RECTYPE.kAllRecord, **kwargs):
         where, args, join = self.searchGuide.parseInp(kwargs)
         where = ' AND '.join(where)
@@ -1111,7 +1115,7 @@ class MythXML( XMLConnection ):
                 self.host = backend.split('.')[0]
                 self.port = int(self.db.setting[self.host].BackendStatusPort)
                 if not self.port:
-                    raise MythDBError(MythError.DB_SETTING, 
+                    raise MythDBError(MythError.DB_SETTING,
                                         backend+': BackendStatusPort')
 
     def getHosts(self):
@@ -1141,7 +1145,7 @@ class MythXML( XMLConnection ):
         starttime = datetime.duck(starttime)
         endtime = datetime.duck(endtime)
         args = {'StartTime':starttime.utcisoformat().rsplit('.',1)[0],
-                'EndTime':endtime.utcisoformat().rsplit('.',1)[0], 
+                'EndTime':endtime.utcisoformat().rsplit('.',1)[0],
                 'StartChanId':startchan, 'Details':1}
         if numchan:
             args['NumOfChannels'] = numchan

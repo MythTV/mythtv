@@ -19,7 +19,14 @@ from datetime import date, time
 
 _default_datetime = datetime(1900,1,1, tzinfo=datetime.UTCTZ())
 
-from UserString import MutableString
+# from builtins import str
+try:
+    from UserString import MutableString
+except ImportError:
+    from collections import UserString as MutableString
+    unicode = str
+    MutableString = str
+
 class Artwork( MutableString ):
     _types = {'coverart':   'Coverart',
               'coverfile':  'Coverart',
@@ -58,15 +65,18 @@ class Artwork( MutableString ):
         if (imagetype is None) and (attr not in cls._types):
             # usage appears to be export from immutable UserString methods
             # return a dumb string
-            return unicode.__new__(unicode, attr)
+            return str.__new__(str, attr)
         else:
-            return super(Artwork, cls).__new__(cls, attr, parent, imagetype)
+            try:
+                return super(Artwork, cls).__new__(cls, attr, parent, imagetype)
+            except TypeError:
+                return super(Artwork, cls).__new__(cls, attr)
 
     def __init__(self, attr, parent=None, imagetype=None):
         # replace standard MutableString init to not overwrite self.data
-        from warnings import warnpy3k
-        warnpy3k('the class UserString.MutableString has been removed in '
-                    'Python 3.0', stacklevel=2)
+        # from warnings import warnpy3k
+        # warnpy3k('the class UserString.MutableString has been removed in '
+        #             'Python 3.0', stacklevel=2)
 
         self.attr = attr
         if imagetype is None:
@@ -94,7 +104,7 @@ class Artwork( MutableString ):
     @property
     def exists(self):
         be = FileOps(self.hostname, db = self.parent._db)
-        return be.fileExists(unicode(self), self.imagetype)
+        return be.fileExists(str(self), self.imagetype)
 
     def downloadFrom(self, url):
         if self.parent is None:
@@ -246,8 +256,8 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
         return rec.create(wait=wait)
 
     @classmethod
-    def fromPowerRule(cls, title='unnamed (Power Search)', where='', args=None, 
-                           join='', db=None, type=RECTYPE.kAllRecord, 
+    def fromPowerRule(cls, title='unnamed (Power Search)', where='', args=None,
+                           join='', db=None, type=RECTYPE.kAllRecord,
                            searchtype=RECSEARCHTYPE.kPowerSearch, wait=False):
 
         if type not in (RECTYPE.kAllRecord,           RECTYPE.kDailyRecord,
@@ -315,7 +325,7 @@ class Recorded( CMPRecord, DBDataWrite ):
     class _Rating( DBDataRef ):
         _table = 'recordedrating'
         _ref = ['chanid','starttime']
-        
+
     def __str__(self):
         if self._wheredat is None:
             return u"<Uninitialized Recorded at %s>" % hex(id(self))
@@ -554,7 +564,7 @@ class RecordedProgram( CMPRecord, DBDataWrite ):
                  'colorcode':'', 'syndicatedepisodenumber':'',
                  'programid':'', 'manualid':0,           'generic':0,
                  'first':0,      'listingsource':0,      'last':0,
-                 'audioprop':u'','videoprop':u'',        
+                 'audioprop':u'','videoprop':u'',
                  'subtitletypes':u'', 'inputname':u''}
 
     def __str__(self):
@@ -588,7 +598,7 @@ class OldRecorded( CMPRecord, DBDataWrite, RECSTATUS ):
     """
 
     _key   = ['chanid','starttime']
-    _defaults = {'title':'',     'subtitle':'',      
+    _defaults = {'title':'',     'subtitle':'',
                  'category':'',  'seriesid':'',      'programid':'',
                  'findid':0,     'recordid':0,       'station':'',
                  'rectype':0,    'duplicate':0,      'recstatus':-3,
@@ -747,7 +757,7 @@ class Guide( CMPRecord, DBData ):
     """
     _table = 'program'
     _key   = ['chanid','starttime']
-    
+
     def __str__(self):
         if self._wheredat is None:
             return u"<Uninitialized Guide at %s>" % hex(id(self))
@@ -1145,7 +1155,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
         return vid
 
     def _playOnFe(self, fe):
-        return fe.send('play','file myth://Videos@%s/%s' % 
+        return fe.send('play','file myth://Videos@%s/%s' %
                     (self.host, self.filename))
 
     #### LEGACY ####
@@ -1303,7 +1313,7 @@ class Artist( MusicSchema, DBDataWrite ):
             artist = cls(db=db)
             artist.artist_name = name
             return artist.create()
-   
+
     @classmethod
     def fromSong(cls, song, db=None):
         """Returns the artist for the given song."""

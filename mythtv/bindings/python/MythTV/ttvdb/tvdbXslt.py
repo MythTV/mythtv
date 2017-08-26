@@ -37,6 +37,12 @@ __xsltExtentionList__ = []
 import os, sys, re, time, datetime, shutil, urllib, string
 from copy import deepcopy
 
+IS_PY2 = sys.version_info[0] == 2
+if not IS_PY2:
+    unicode = str
+    long = int
+
+baseXsltDir = u'%s/XSLT/' % os.path.dirname(os.path.realpath(__file__))
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -50,26 +56,35 @@ class OutStreamEncoder(object):
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
         if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
+            obj.encode(self.encoding)
+        try:
+            if IS_PY2:
                 self.out.write(obj)
-            except IOError:
-                pass
+            else:
+                self.out.buffer.write(obj)
+        except IOError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+if IS_PY2:
+    stdio_type = file
+else:
+    import io
+    stdio_type = io.TextIOWrapper
+    unicode = str
+if isinstance(sys.stdout, stdio_type):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
     from lxml import etree
-except Exception, e:
+except Exception as e:
     sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
@@ -94,15 +109,21 @@ class xpathFunctions(object):
     """
     def __init__(self):
         self.filters = {
-            'fanart': [u'//Banner[BannerType/text()="%(type)s" and Language/text()="%(language)s"]', u'//Banner[BannerType/text()="%(type)s" and Language/text()="en"]', u'//Banner[BannerType/text()="%(type)s"]'],
-            'poster': [u'//Banner[BannerType/text()="season" and Language/text()="%(language)s" and Season/text()="%(season)s" and BannerType2/text()="season"]', u'//Banner[BannerType/text()="%(type)s" and Language/text()="%(language)s"]', u'//Banner[BannerType/text()="season" and Language/text()="en" and Season/text()="%(season)s" and BannerType2/text()="season"]', u'//Banner[BannerType/text()="season" and Season/text()="%(season)s" and BannerType2/text()="season"]', u'//Banner[BannerType/text()="%(type)s" and Language/text()="en"]', u'//Banner[BannerType/text()="%(type)s"]'],
-            'banner': ['//Banner[BannerType/text()="season" and Language/text()="%(language)s" and Season/text()="%(season)s" and BannerType2/text()="seasonwide"]', u'//Banner[BannerType/text()="series" and Language/text()="%(language)s" and BannerType2/text()="graphical"]', '//Banner[BannerType/text()="season" and Language/text()="en" and Season/text()="%(season)s" and BannerType2/text()="seasonwide"]', '//Banner[BannerType/text()="season" and Season/text()="%(season)s" and BannerType2/text()="seasonwide"]', u'//Banner[BannerType/text()="series" and Language/text()="en" and BannerType2/text()="graphical"]', '//Banner[BannerType/text()="series" and BannerType2/text()="graphical"]'],
+            'fanart': [u'//_banners/%(type)s/raw/item'],
+            'poster': [u'//_banners/season/raw/item[subKey/text()="%(season)s"]',
+                       u'//_banners/%(type)s/raw/item'],
+            'banner': [u'//_banners/seasonwide/raw/item[subKey/text()="%(season)s"]',
+                       u'//_banners/series/raw/item[subKey/text()="graphical"]'],
             }
         self.dataFilters = {
-            'subtitle': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/EpisodeName/text()',
-            'description': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/Overview/text()',
-            'IMDB': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/IMDB_ID/text()',
-            'allEpisodes': u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]',
+            'subtitle': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/EpisodeName/text()',
+                         u'//data/n%(season)s/n%(episode)s/episodeName/text()'],
+            'description': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/Overview/text()',
+                            u'//data/n%(season)s/n%(episode)s/overview/text()'],
+            'IMDB': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/IMDB_ID/text()',
+                     u'//data/n%(season)s/n%(episode)s/imdbId/text()'],
+            'allEpisodes': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]',
+                            u'//data/n%(season)s/n%(episode)s'],
             }
         self.persistentResult = ''
     # end __init__()
@@ -119,6 +140,7 @@ class xpathFunctions(object):
         """
         self.FuncDict = {
             'lastUpdated': self.lastUpdated,
+            'replace': self.replace,
             'htmlToString': self.htmlToString,
             'stringToList': self.stringToList,
             'imageElements': self.imageElements,
@@ -187,26 +209,33 @@ class xpathFunctions(object):
             'episode': args[2][0].attrib['episode'],
             }
         filters = []
-        for index in range(len(self.filters[args[1]])):
-           filters.append(etree.XPath(self.filters[args[1]][index] % parmDict))
+        # print("image filter on %s" % args[1])
+        for filter in self.filters[args[1]]:
+           filters.append(etree.XPath(filter % parmDict))
 
         # Get the preferred images
         for xpathFilter in filters:
+            # print("xpf %r %r" % (args[0][0], xpathFilter))
             for image in xpathFilter(args[0][0]):
-                if image.find('BannerPath') == None:
+                # print("im %r" % image)
+                # print(etree.tostring(image, method="xml", xml_declaration=False, pretty_print=True, ))
+                if image.find('fileName') == None:
                     continue
+                # print("im2 %r" % image)
                 tmpElement = etree.XML(u'<image></image>')
                 if args[1] == 'poster':
                     tmpElement.attrib['type'] = 'coverart'
                 else:
                     tmpElement.attrib['type'] = args[1]
-                tmpElement.attrib['url'] = u'http://www.thetvdb.com/banners/%s' % image.find('BannerPath').text
-                tmpElement.attrib['thumb'] = u'http://www.thetvdb.com/banners/_cache/%s' % image.find('BannerPath').text
-                tmpImageSize = image.find('BannerType2').text
-                index = tmpImageSize.find('x')
-                if index != -1:
-                    tmpElement.attrib['width'] = tmpImageSize[:index]
-                    tmpElement.attrib['height'] = tmpImageSize[index+1:]
+                tmpElement.attrib['url'] = u'http://www.thetvdb.com/banners/%s' % image.find('fileName').text
+                tmpElement.attrib['thumb'] = u'http://www.thetvdb.com/banners/%s' % image.find('thumbnail').text
+                tmpElement.attrib['rating'] = image.find('ratingsInfo').find('average').text
+                tmpImageSize = image.find('resolution').text
+                if tmpImageSize:
+                    index = tmpImageSize.find('x')
+                    if index != -1:
+                        tmpElement.attrib['width'] = tmpImageSize[:index]
+                        tmpElement.attrib['height'] = tmpImageSize[index+1:]
                 elementList.append(tmpElement)
             if len(elementList):
                 break
@@ -223,6 +252,13 @@ class xpathFunctions(object):
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
+
+    def replace(self, context, text, search_text, replace_text):
+        '''Replace search with replace
+        '''
+        text = self.textUtf8(text)
+        return text.replace(self.textUtf8(search_text), self.textUtf8(replace_text))
+    # end ampReplace()
 
     def ampReplace(self, text):
         '''Replace all "&" characters with "&amp;"
@@ -279,8 +315,18 @@ class xpathFunctions(object):
             'season': args[0][0].attrib['season'],
             'episode': args[0][0].attrib['episode'],
             }
-        xpathFilter = etree.XPath(self.dataFilters[args[2]] % parmDict)
-        results = xpathFilter(args[1][0])
+
+        # print("filter on list %r" % args[2])
+        filters = self.dataFilters[args[2]]
+        if isinstance(filters, list):
+            for filter in filters:
+                xpathFilter = etree.XPath(filter % parmDict)
+                results = xpathFilter(args[1][0])
+                if len(results):
+                    break
+        else:
+            xpathFilter = etree.XPath(filters % parmDict)
+            results = xpathFilter(args[1][0])
 
         # Sometimes all the results are required
         if allValues == True:

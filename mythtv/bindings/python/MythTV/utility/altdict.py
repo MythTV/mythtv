@@ -4,7 +4,7 @@
 # Description: Provides various custom dict-like classes
 #------------------------------
 
-from itertools import imap, izip
+from builtins import map, zip
 
 class OrdDict( dict ):
     """
@@ -64,13 +64,13 @@ class OrdDict( dict ):
         return list(self.itervalues())
 
     def itervalues(self):
-        return imap(self.get, self.iterkeys())
+        return map(self.get, self.iterkeys())
 
     def items(self):
         return list(self.iteritems())
 
     def iteritems(self):
-        return izip(self.iterkeys(), self.itervalues())
+        return zip(self.iterkeys(), self.itervalues())
 
     def copy(self):
         c = self.__class__(self.iteritems())
