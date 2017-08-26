@@ -34,10 +34,552 @@
 #
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
-#-------------------------------------
+# -------------------------------------
+"""
+Doctests
+
+>>> sys.argv = shlex.split('./ttvdb.py -B Sanctuary')
+>>> main()
+Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/banners/graphical/80159-g5.jpg,http://thetvdb.com/banners/graphical/80159-g3.jpg,http://thetvdb.com/banners/graphical/80159-g6.jpg,http://thetvdb.com/banners/graphical/80159-g2.jpg,http://thetvdb.com/banners/graphical/80159-g.jpg,http://thetvdb.com/banners/graphical/80159-g8.jpg
+0
+>>> sys.argv = shlex.split('./ttvdb.py -S SG-1 1 10')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Stargate SG-1</title>
+    <subtitle>Thor's Hammer</subtitle>
+    <description>Teal'c and O'Neill are transported to an underground cage designed by the Asgard to protect an alien world from the Goa'uld.</description>
+    <season>1</season>
+    <episode>10</episode>
+    <certifications>
+      <certification locale="us" name="TV-PG"/>
+    </certifications>
+    <studios>
+      <studio name="Syfy"/>
+    </studios>
+    <runtime/>
+    <inetref>72449</inetref>
+    <collectionref>72449</collectionref>
+    <imdb>0118480</imdb>
+    <tmsref>EP00225421</tmsref>
+    <language>en</language>
+    <year>1997</year>
+    <releasedate>1997-09-26</releasedate>
+    <people>
+      <person job="Actor" name="Richard Dean Anderson" character="Jack O'Neill" url="http://thetvdb.com/banners/actors/17720.jpg" thumb="http://thetvdb.com/banners/actors/17720.jpg"/>
+      <person job="Actor" name="Amanda Tapping" character="Samantha Carter" url="http://thetvdb.com/banners/actors/17722.jpg" thumb="http://thetvdb.com/banners/actors/17722.jpg"/>
+      <person job="Actor" name="Michael Shanks" character="Dr. Daniel Jackson" url="http://thetvdb.com/banners/actors/17723.jpg" thumb="http://thetvdb.com/banners/actors/17723.jpg"/>
+      <person job="Actor" name="Ben Browder" character="Cameron Mitchell" url="http://thetvdb.com/banners/actors/17725.jpg" thumb="http://thetvdb.com/banners/actors/17725.jpg"/>
+      <person job="Actor" name="Christopher Judge" character="Teal'c" url="http://thetvdb.com/banners/actors/17726.jpg" thumb="http://thetvdb.com/banners/actors/17726.jpg"/>
+      <person job="Actor" name="Beau Bridges" character="Henry &quot;Hank&quot; Landry" url="http://thetvdb.com/banners/actors/17719.jpg" thumb="http://thetvdb.com/banners/actors/17719.jpg"/>
+      <person job="Actor" name="Don S. Davis" character="George S. Hammond" url="http://thetvdb.com/banners/actors/17721.jpg" thumb="http://thetvdb.com/banners/actors/17721.jpg"/>
+...
+      <person job="Guest Star" name="James Earl Jones"/>
+      <person job="Guest Star" name="Galyn Gorg"/>
+      <person job="Guest Star" name="Tamsin Kelsey"/>
+      <person job="Guest Star" name="Vincent Hammond"/>
+      <person job="Guest Star" name="Mark Gibbon"/>
+      <person job="Director" name="Brad Turner"/>
+      <person job="Author" name="Katharyn Michaelian Powers"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/72449/85759.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/72449/85759.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1-9.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1-9.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1-2.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72449-1-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72449-1-8.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/185-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/185-1.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72449-55.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72449-55.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72449-34.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72449-34.jpg" width="1280" height="720"/>
+...
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72449-75.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72449-75.jpg" width="1280" height="720"/>
+    </images>
+  </item>
+</metadata>
+0
+>>> sys.argv = shlex.split('ttvdb -PFB "Stargate SG-1"')
+>>> main()
+Coverart:http://thetvdb.com/banners/posters/72449-4.jpg,http://thetvdb.com/banners/posters/72449-5.jpg,http://thetvdb.com/banners/posters/72449-9.jpg,http://thetvdb.com/banners/posters/72449-6.jpg,http://thetvdb.com/banners/posters/72449-7.jpg,http://thetvdb.com/banners/posters/72449-8.jpg,http://thetvdb.com/banners/posters/72449-1.jpg,http://thetvdb.com/banners/posters/72449-3.jpg,http://thetvdb.com/banners/posters/72449-2.jpg
+Fanart:http://thetvdb.com/banners/fanart/original/72449-55.jpg,http://thetvdb.com/banners/fanart/original/72449-34.jpg,http://thetvdb.com/banners/fanart/original/72449-23.jpg,http://thetvdb.com/banners/fanart/original/72449-24.jpg,http://thetvdb.com/banners/fanart/original/72449-29.jpg,http://thetvdb.com/banners/fanart/original/72449-6.jpg,http://thetvdb.com/banners/fanart/original/72449-26.jpg,http://thetvdb.com/banners/fanart/original/72449-36.jpg,http://thetvdb.com/banners/fanart/original/72449-38.jpg,http://thetvdb.com/banners/fanart/original/72449-50.jpg,http://thetvdb.com/banners/fanart/original/72449-27.jpg,http://thetvdb.com/banners/fanart/original/72449-31.jpg,http://thetvdb.com/banners/fanart/original/72449-32.jpg,http://thetvdb.com/banners/fanart/original/72449-35.jpg,http://thetvdb.com/banners/fanart/original/72449-42.jpg,http://thetvdb.com/banners/fanart/original/72449-44.jpg,http://thetvdb.com/banners/fanart/original/72449-25.jpg,http://thetvdb.com/banners/fanart/original/72449-28.jpg,http://thetvdb.com/banners/fanart/original/72449-47.jpg,http://thetvdb.com/banners/fanart/original/72449-33.jpg,http://thetvdb.com/banners/fanart/original/72449-39.jpg,http://thetvdb.com/banners/fanart/original/72449-43.jpg,http://thetvdb.com/banners/fanart/original/72449-22.jpg,http://thetvdb.com/banners/fanart/original/72449-30.jpg,http://thetvdb.com/banners/fanart/original/72449-40.jpg,http://thetvdb.com/banners/fanart/original/72449-41.jpg,http://thetvdb.com/banners/fanart/original/72449-49.jpg,http://thetvdb.com/banners/fanart/original/72449-51.jpg,http://thetvdb.com/banners/fanart/original/72449-21.jpg,http://thetvdb.com/banners/fanart/original/72449-20.jpg,http://thetvdb.com/banners/fanart/original/72449-45.jpg,http://thetvdb.com/banners/fanart/original/72449-67.jpg,http://thetvdb.com/banners/fanart/original/72449-9.jpg,http://thetvdb.com/banners/fanart/original/72449-46.jpg,http://thetvdb.com/banners/fanart/original/72449-48.jpg,http://thetvdb.com/banners/fanart/original/72449-4.jpg,http://thetvdb.com/banners/fanart/original/72449-1.jpg,http://thetvdb.com/banners/fanart/original/72449-65.jpg,http://thetvdb.com/banners/fanart/original/72449-37.jpg,http://thetvdb.com/banners/fanart/original/72449-16.jpg,http://thetvdb.com/banners/fanart/original/72449-17.jpg,http://thetvdb.com/banners/fanart/original/72449-3.jpg,http://thetvdb.com/banners/fanart/original/72449-7.jpg,http://thetvdb.com/banners/fanart/original/72449-10.jpg,http://thetvdb.com/banners/fanart/original/72449-8.jpg,http://thetvdb.com/banners/fanart/original/72449-5.jpg,http://thetvdb.com/banners/fanart/original/72449-64.jpg,http://thetvdb.com/banners/fanart/original/72449-2.jpg,http://thetvdb.com/banners/fanart/original/72449-61.jpg,http://thetvdb.com/banners/fanart/original/72449-12.jpg,http://thetvdb.com/banners/fanart/original/72449-13.jpg,http://thetvdb.com/banners/fanart/original/72449-14.jpg,http://thetvdb.com/banners/fanart/original/72449-15.jpg,http://thetvdb.com/banners/fanart/original/72449-18.jpg,http://thetvdb.com/banners/fanart/original/72449-63.jpg,http://thetvdb.com/banners/fanart/original/72449-11.jpg,http://thetvdb.com/banners/fanart/original/72449-19.jpg,http://thetvdb.com/banners/fanart/original/72449-52.jpg,http://thetvdb.com/banners/fanart/original/72449-53.jpg,http://thetvdb.com/banners/fanart/original/72449-54.jpg,http://thetvdb.com/banners/fanart/original/72449-56.jpg,http://thetvdb.com/banners/fanart/original/72449-57.jpg,http://thetvdb.com/banners/fanart/original/72449-58.jpg,http://thetvdb.com/banners/fanart/original/72449-59.jpg,http://thetvdb.com/banners/fanart/original/72449-60.jpg,http://thetvdb.com/banners/fanart/original/72449-62.jpg,http://thetvdb.com/banners/fanart/original/72449-73.jpg,http://thetvdb.com/banners/fanart/original/72449-74.jpg,http://thetvdb.com/banners/fanart/original/72449-75.jpg
+Banner:http://thetvdb.com/banners/graphical/72449-g6.jpg,http://thetvdb.com/banners/graphical/72449-g7.jpg,http://thetvdb.com/banners/graphical/185-g3.jpg,http://thetvdb.com/banners/graphical/185-g2.jpg,http://thetvdb.com/banners/graphical/72449-g2.jpg,http://thetvdb.com/banners/graphical/72449-g9.jpg,http://thetvdb.com/banners/blank/72449.jpg,http://thetvdb.com/banners/graphical/72449-g3.jpg,http://thetvdb.com/banners/graphical/72449-g4.jpg,http://thetvdb.com/banners/graphical/185-g.jpg,http://thetvdb.com/banners/graphical/72449-g.jpg,http://thetvdb.com/banners/text/185.jpg,http://thetvdb.com/banners/graphical/72449-g5.jpg,http://thetvdb.com/banners/graphical/72449-g8.jpg
+0
+
+# Coverart:http://www.thetvdb.com/banners/posters/72449-1.jpg
+# Fanart:http://www.thetvdb.com/banners/fanart/original/72449-1.jpg
+# Banner:http://www.thetvdb.com/banners/graphical/185-g3.jpg
+>>> sys.argv = shlex.split('ttvdb -B "Night Gallery"')
+>>> main()
+Banner:http://thetvdb.com/banners/graphical/70382-g4.jpg,http://thetvdb.com/banners/graphical/1013-g.jpg,http://thetvdb.com/banners/blank/70382.jpg,http://thetvdb.com/banners/graphical/70382-g.jpg,http://thetvdb.com/banners/graphical/70382-g2.jpg,http://thetvdb.com/banners/graphical/70382-g3.jpg
+0
+
+# http://www.thetvdb.com/banners/blank/70382.jpg
+>>> sys.argv = shlex.split('ttvdb -Bl en Lost')
+>>> main()
+Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/banners/graphical/73739-g13.jpg,http://thetvdb.com/banners/graphical/73739-g18.jpg,http://thetvdb.com/banners/graphical/73739-g6.jpg,http://thetvdb.com/banners/graphical/73739-g12.jpg,http://thetvdb.com/banners/graphical/73739-g3.jpg,http://thetvdb.com/banners/graphical/24313-g2.jpg,http://thetvdb.com/banners/graphical/73739-g8.jpg,http://thetvdb.com/banners/graphical/73739-g.jpg,http://thetvdb.com/banners/graphical/73739-g5.jpg,http://thetvdb.com/banners/graphical/73739-g7.jpg,http://thetvdb.com/banners/graphical/73739-g10.jpg,http://thetvdb.com/banners/graphical/73739-g11.jpg,http://thetvdb.com/banners/graphical/24313-g.jpg,http://thetvdb.com/banners/graphical/73739-g2.jpg,http://thetvdb.com/banners/blank/73739.jpg
+0
+
+# Banner:http://www.thetvdb.com/banners/graphical/73739-g4.jpg,http://www.thetvdb.com/banners/graphical/73739-g.jpg,http://www.thetvdb.com/banners/graphical/73739-g6.jpg,http://www.thetvdb.com/banners/graphical/73739-g8.jpg,http://www.thetvdb.com/banners/graphical/73739-g3.jpg,http://www.thetvdb.com/banners/graphical/73739-g7.jpg,http://www.thetvdb.com/banners/graphical/73739-g5.jpg,http://www.thetvdb.com/banners/graphical/24313-g2.jpg,http://www.thetvdb.com/banners/graphical/24313-g.jpg,http://www.thetvdb.com/banners/graphical/73739-g10.jpg,http://www.thetvdb.com/banners/graphical/73739-g2.jpg
+> ttvdb -N --configure="/home/user/.tvdb/tvdb.conf" "Eleventh Hour" "H2O"
+>>> sys.argv = shlex.split('ttvdb -N --configure=./tvdb_test.conf "Eleventh Hour" H2O')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Eleventh Hour (US)</title>
+    <subtitle>H2O</subtitle>
+    <description>An epidemic of sudden, violent outbursts by law-abiding citizens draws Dr. Jacob Hood to a quiet Texas community to investigate - but he soon succumbs to the same erratic behavior.</description>
+    <season>1</season>
+    <episode>10</episode>
+    <certifications>
+      <certification locale="us" name="TV-14"/>
+    </certifications>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <runtime/>
+    <inetref>83066</inetref>
+    <collectionref>83066</collectionref>
+    <imdb>1118697</imdb>
+    <language>en</language>
+    <year>2009</year>
+    <releasedate>2009-01-15</releasedate>
+    <people>
+      <person job="Actor" name="Rufus Sewell" character="Jacob Hood" url="http://thetvdb.com/banners/actors/78899.jpg" thumb="http://thetvdb.com/banners/actors/78899.jpg"/>
+      <person job="Actor" name="Marley Shelton" character="Rachel Young" url="http://thetvdb.com/banners/actors/78898.jpg" thumb="http://thetvdb.com/banners/actors/78898.jpg"/>
+      <person job="Actor" name="Omar Benson Miller" character="Felix Lee" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Chris Krauser" character="EMT" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Erica Frene" character="Receptionist" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Lei'lah Star" character="Sick Kid" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Mark C. Baldwin" character="Infomercial Announcer" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Director" name="McDonough"/>
+      <person job="Author" name="Kim Newton"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/83066/416216.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/83066/416216.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/83066-1-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/83066-1-2.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/83066-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/83066-1.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-1.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-3.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-3.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-5.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-5.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-2.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-4.jpg" width="1280" height="720"/>
+    </images>
+  </item>
+</metadata>
+0
+
+#    <language>en</language>
+# <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/83066-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/83066-4.jpg" width="1280" height="720"/>
+# <image type="banner" url="http://www.thetvdb.com/banners/graphical/83066-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/83066-g.jpg"/>
+(Return the season numbers for a series)
+> ttvdb --configure="./tvdb_test.conf" -n "SG-1"
+>>> sys.argv = shlex.split('ttvdb --configure=./tvdb_test.conf -n SG-1')
+>>> main()
+0,1,2,3,4,5,6,7,8,9,10
+0
+
+(Return the meta data for a specific series/season/episode)
+> ttvdb.py -D 80159 2 2
+>>> sys.argv = shlex.split('ttvdb -D 80159 2 2')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Sanctuary</title>
+    <subtitle>End of Nights (2)</subtitle>
+    <description>Furious at being duped into a trap, Magnus takes on Kate, demanding information and complete access to her Cabal contacts. The Cabal’s true agenda is revealed and Magnus realizes that they are not only holding Ashley as ransom to obtain complete control of the Sanctuary Network, but turning her into the ultimate weapon. Now transformed into a Super Abnormal with devastating powers, Ashley and her newly cloned fighters begin their onslaught, destroying Sanctuaries in cities around the world. Tesla and Henry attempt to create a weapon that can stop the attacks…without killing Ashley. As the team prepares to defend the Sanctuary with Tesla’s new weapon, Magnus must come to the realization that they may not be able to stop the Cabal’s attacks without harming Ashley. She realizes she might have to choose between saving her only daughter, or losing the Sanctuary and all the lives and secrets within it.</description>
+    <season>2</season>
+    <episode>2</episode>
+    <certifications>
+      <certification locale="us" name="TV-PG"/>
+    </certifications>
+    <studios>
+      <studio name="Space"/>
+    </studios>
+    <runtime/>
+    <inetref>80159</inetref>
+    <collectionref>80159</collectionref>
+    <imdb>0965394</imdb>
+    <tmsref>EP01085421</tmsref>
+    <language>en</language>
+    <year>2009</year>
+    <releasedate>2009-10-16</releasedate>
+    <people>
+      <person job="Actor" name="Amanda Tapping" character="Dr. Helen Magnus" url="http://thetvdb.com/banners/actors/73053.jpg" thumb="http://thetvdb.com/banners/actors/73053.jpg"/>
+      <person job="Actor" name="Robin Dunne" character="Will Zimmerman" url="http://thetvdb.com/banners/actors/73054.jpg" thumb="http://thetvdb.com/banners/actors/73054.jpg"/>
+      <person job="Actor" name="Emilie Ullerup" character="Ashley Magnus" url="http://thetvdb.com/banners/actors/73055.jpg" thumb="http://thetvdb.com/banners/actors/73055.jpg"/>
+      <person job="Actor" name="Christopher Heyerdahl" character="John Druitt" url="http://thetvdb.com/banners/actors/73056.jpg" thumb="http://thetvdb.com/banners/actors/73056.jpg"/>
+      <person job="Actor" name="Christopher Heyerdahl" character="Bigfoot" url="http://thetvdb.com/banners/actors/309797.jpg" thumb="http://thetvdb.com/banners/actors/309797.jpg"/>
+      <person job="Actor" name="Ryan Robbins" character="Henry Foss" url="http://thetvdb.com/banners/actors/80072.jpg" thumb="http://thetvdb.com/banners/actors/80072.jpg"/>
+      <person job="Actor" name="Agam Darshi" character="Kate Freelander" url="http://thetvdb.com/banners/actors/118211.jpg" thumb="http://thetvdb.com/banners/actors/118211.jpg"/>
+      <person job="Actor" name="Vincent Gale" character="Nigel Griffin" url="http://thetvdb.com/banners/actors/372548.jpg" thumb="http://thetvdb.com/banners/actors/372548.jpg"/>
+      <person job="Actor" name="Peter Wingfield" character="James Watson" url="http://thetvdb.com/banners/actors/372549.jpg" thumb="http://thetvdb.com/banners/actors/372549.jpg"/>
+      <person job="Actor" name="Jonathon Young" character="Nikola Tesla" url="http://thetvdb.com/banners/actors/372550.jpg" thumb="http://thetvdb.com/banners/actors/372550.jpg"/>
+      <person job="Actor" name="Ian Tracey" character="Adam Worth" url="http://thetvdb.com/banners/actors/372551.jpg" thumb="http://thetvdb.com/banners/actors/372551.jpg"/>
+      <person job="Actor" name="Jim Byrnes" character="Gregory Magnus" url="http://thetvdb.com/banners/actors/372552.jpg" thumb="http://thetvdb.com/banners/actors/372552.jpg"/>
+      <person job="Actor" name="Polly Walker" character="Ranna Seneschal" url="http://thetvdb.com/banners/actors/372553.jpg" thumb="http://thetvdb.com/banners/actors/372553.jpg"/>
+      <person job="Actor" name="Robert Lawrenson" character="Declan Macrae" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Pascale Hutton" character="Abby Corrigan" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Lynda Boyd" character="Dana Whitcomb" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Shekhar Paleja" character="Ravi" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Chuck Campbell" character="Two Faced Guy" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Guest Star" name="Jonathon Young"/>
+      <person job="Guest Star" name="Christine Chatelain"/>
+      <person job="Guest Star" name="Robert Lawrenson"/>
+      <person job="Guest Star" name="Maiko Yamamoto"/>
+      <person job="Guest Star" name="Stanley Tsang"/>
+      <person job="Guest Star" name="Darren A. Hebert"/>
+      <person job="Guest Star" name="Lynda Boyd"/>
+      <person job="Director" name="Martin Wood"/>
+      <person job="Author" name="Damian Kindler"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/80159/998441.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/80159/998441.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/80159-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/80159-2.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/80159-2-3.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/80159-2-3.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/80159-2-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/80159-2-2.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-10.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-10.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-6.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-6.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-3.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-3.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-9.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-9.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-7.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-7.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-8.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-2.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-4.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-4.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-5.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-5.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-21.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-21.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-16.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-16.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-1.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-15.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-15.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-17.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-17.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-18.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-18.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-19.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-19.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-20.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-20.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-22.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-22.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
+0
+
+(Return a list of "thetv.com series id and series name" that contain specific search word(s) )
+(!! Be careful with this option as poorly defined search words can result in large lists being returned !!)
+> ttvdb.py -M "night a"
+>>> sys.argv = shlex.split('ttvdb -M "night a"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <language>en</language>
+    <title>A Night of Numbers</title>
+    <inetref>249306</inetref>
+    <collectionref>249306</collectionref>
+    <description>BBC FOUR celebrates mathematics and the beauty of numbers with a series of programmes about this most precise and exacting of all intellectual disciplines. Throughout the night, the channel will show films that offer insights into the minds of great mathematicians, and reveal the stories behind some of the great mathematical breakthroughs.</description>
+    <releasedate>2005-12-06</releasedate>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/249306-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/249306-g.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A night at The Classic</title>
+    <inetref>224951</inetref>
+    <collectionref>224951</collectionref>
+    <description>Each episode of A Night at The Classic follows MC Brendhan Lovegrove and guest comedians as they perform for a different crowd on a different "night" at The Classic. Along with stand-up comedy recorded in front of a live audience, viewers are given a glimpse of what the comedians are like backstage, providing a rare insight into the rivalries and rituals of stand-up comedians.</description>
+    <releasedate>2010-11-03</releasedate>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/224951-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/224951-g.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night at the Rijksmuseum</title>
+    <inetref>268908</inetref>
+    <collectionref>268908</collectionref>
+    <releasedate>2013-04-18</releasedate>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night of Heroes: The Sun Military Awards</title>
+    <inetref>270984</inetref>
+    <collectionref>270984</collectionref>
+    <description>Annual celebration, A Night of Heroes: Also known as The Millies, the awards recognize the excellence and sacrifice made by Britain's Armed Forces</description>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/270984-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/270984-g.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night of Exploration</title>
+    <inetref>271528</inetref>
+    <collectionref>271528</collectionref>
+    <description>For well over a century the National Geographic Society has been synonymous with pioneering expeditions, groundbreaking discoveries and breathtaking imagery of world cultures and exotic locations. In celebration of the iconic yellow border’s 125th anniversary, National Geographic Channel pays tribute to the hotshots, the mavericks and the best in their field who have devoted their lives to exploring the world around us and the groundbreaking discoveries that are making a difference.</description>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/271528-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/271528-g.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night at the Office</title>
+    <inetref>118511</inetref>
+    <collectionref>118511</collectionref>
+    <description>On August 11th 2009, it was announced that the cast of The Office would be reuniting for a special, called "A Night at The Office", available at BBC2 and online, it was the entire first series of the seminal BBC comedy 'The Office' with new comments from the writers and celebrity fans shown between each episode.</description>
+    <releasedate>2009-08-17</releasedate>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/118511-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/118511-g.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night With The Stars</title>
+    <inetref>256045</inetref>
+    <collectionref>256045</collectionref>
+    <description>For one night only, Professor Brian Cox goes unplugged in a specially recorded programme from the lecture theatre of the Royal Institution of Great Britain. In his own inimitable style, Brian takes an audience of famous faces, scientists and members of the public on a journey through some of the most challenging concepts in physics. With the help of Jonathan Ross, Simon Pegg, Sarah Millican and James May, Brian shows how diamonds - the hardest material in nature - are made up of nothingness; how things can be in an infinite number of places at once; why everything we see or touch in the universe exists; and how a diamond in the heart of London is in communication with the largest diamond in the cosmos.</description>
+    <releasedate>2011-12-18</releasedate>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/256045-g.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/256045-g.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night at the Festival Club</title>
+    <inetref>268969</inetref>
+    <collectionref>268969</collectionref>
+    <description>A Night at the Festival Club is an Australian stand-up comedy television event created and executive produced by the Comedy Channel programming director Darren Chau, produced by Ted Robinson and GNW TV Productions for the Comedy Channel as part of the Melbourne International Comedy Festival. The series centres around bottling the unique comedic live performances and moments that occur late night in the Festival Club during the Melbourne International Comedy Festival.</description>
+    <releasedate>2008-05-02</releasedate>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Clear Midsummer Night</title>
+    <inetref>286538</inetref>
+    <collectionref>286538</collectionref>
+    <description>The daughter of a real estate mogul Xia Wan Qing, has seemingly no way of retreating after a friend's betrayal and her boyfriend backing out of their wedding. Fortunately, she's saved by business genius Qiao Jin Fan. Jin Fan is a "playboy" and the future successor for Qiao corporation. He extends an offering hand and together they embark on a path of revenge. Each for reasons of their own, begin a love with "uncertain motives." After enduring circumstances because of their families' competing interests and a number of conspiracies the two find true love.</description>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Christmas Night with the Stars</title>
+    <inetref>248911</inetref>
+    <collectionref>248911</collectionref>
+    <description>Christmas Night with the Stars was a television show broadcast each Christmas night by the BBC from 1958 to 1972 (with the exception of 1961, 1965 and 1966) and also revived in 1994. The show was hosted each year by a leading star of BBC TV and featured specially made short seasonal editions (typically about 10 minutes long) of the previous year's most popular BBC sitcoms and light entertainment programs. The show was voted 24th in the Channel 4 100 Greatest Christmas Moments. Most of the variety segments no longer exist.</description>
+    <releasedate>1958-12-25</releasedate>
+    <images>
+      <image type="banner" url="http://www.thetvdb.com/banners/graphical/248911-g2.jpg" thumb="http://www.thetvdb.com/banners/_cache/graphical/248911-g2.jpg"/>
+    </images>
+  </item>
+  <item>
+    <language>en</language>
+    <title>A Night With My Ex</title>
+    <inetref>331751</inetref>
+    <collectionref>331751</collectionref>
+    <description>Do you have unfinished business with a partner from a previous relationship? All of the onetime couples featured on ``A Night With My Ex'' do, and the show is letting them tie up loose ends from the past. In each episode, a pair of exes spend a night together in a one-bedroom apartment complete with a multiple-camera setup. They are left to their own devices -- with no producers and no interruptions -- to try to hash things out. The participants get things off their chests, ask hard-hitting questions and face accusations of infidelity with the ultimate goal of achieving closure on the relationship. Sometimes that closure means a clean break, and other times it leads to renewing the spark and rekindling the romance. Regardless of the outcome, anything goes on the road to reaching that point as the couples confront their pasts -- and their futures.</description>
+    <releasedate>2017-07-18</releasedate>
+  </item>
+  <item>
+    <language>en</language>
+    <title>On a Lustful Night Mingling with a Priest...</title>
+    <inetref>325375</inetref>
+    <collectionref>325375</collectionref>
+    <description>The reunion of Kujo with his old female classmate. He has inherited his parents' temple and became a priest. However, after the two became drunk, he does something unexpected of him to her!</description>
+    <releasedate>2017-04-03</releasedate>
+  </item>
+  <item>
+    <language>en</language>
+    <title>Love on a Saturday Night</title>
+    <inetref>74382</inetref>
+    <collectionref>74382</collectionref>
+    <releasedate>2004-02-01</releasedate>
+  </item>
+  <item>
+    <language>en</language>
+    <title>Britain's Tudor Treasure A Night At Hampton Court</title>
+    <inetref>332440</inetref>
+    <collectionref>332440</collectionref>
+    <description>Lucy Worsley and David Starkey celebrate the 500th anniversary of Britain's finest surviving Tudor building, Hampton Court. As Henry VIII's pleasure palace, Hampton Court was a showcase for royal magnificence and ceremony - and the most important event of all was the christening of Henry's long-awaited son, Prince Edward, on October 15th, 1537. Lucy and David explore how Tudor art, architecture and ritual came together for this momentous occasion. Drawing on historical records and with the help of a team of experts, they recreate key elements of the christening ceremony - including a magnificent set-piece procession through Hampton Court involving nearly 100 people in full Tudor costume.</description>
+  </item>
+</metadata>
+0
+
+(Return TV series collection data of "thetv.com series id" for a specified language)
+>>> sys.argv = shlex.split('ttvdb -l de -C 80159')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <language>de</language>
+    <title>Sanctuary</title>
+    <network>Space</network>
+    <airday>Friday</airday>
+    <airtime>10:00 PM</airtime>
+    <description>Dr. Helen Magnus ist eine so brillante wie geheimnisvolle Wissenschaftlerin die sich mit den Kreaturen der Nacht beschäftigt. In ihrem Unterschlupf - genannt "Sanctuary" - hat sie ein Team versammelt, das seltsame und furchteinflößende Ungeheuer untersucht, die mit den Menschen auf der Erde leben. Konfrontiert mit ihren düstersten Ängsten und ihren schlimmsten Alpträumen versucht das Sanctuary-Team, die Welt vor den Monstern - und die Monster vor der Welt zu schützen.</description>
+    <certifications>
+      <certification locale="us" name="TV-PG"/>
+    </certifications>
+    <studios>
+      <studio name="Space"/>
+    </studios>
+    <runtime>60</runtime>
+    <inetref>80159</inetref>
+    <imdb>0965394</imdb>
+    <userrating>8.1</userrating>
+    <ratingcount>168</ratingcount>
+    <year>2007</year>
+    <releasedate>2007-03-14</releasedate>
+    <lastupdated>...</lastupdated>
+    <status>Ended</status>
+    <images>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/80159-11.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/80159-11.jpg"/>
+      <image type="banner" url="http://thetvdb.com/banners/graphical/80159-g4.jpg" thumb="http://thetvdb.com/banners/_cache/graphical/80159-g4.jpg"/>
+    </images>
+  </item>
+</metadata>
+0
+
+# test match is loose due ordering differences between py2 and 3
+# i.e. dict key ordering
+# key ordering is not sorted so that Title is first for existing client
+# compatability
+>>> sys.argv = shlex.split('ttvdb -l en -a US -D 281053')
+>>> main()
+Title:Fixer Upper
+Season:0
+Episode:1
+Subtitle:The Waco Way of Life
+Year:2014
+ReleaseDate:2014-07-16
+Director:
+Plot:Chip and Joanna Gaines tell why they love raising a family in Waco, Texas.
+UserRating:
+Writers:
+Screenshot:
+Language:en
+Airedseasonid:583817
+Dvddiscid:
+Id:5463514
+Imdbid:
+Lastupdated:1451954464
+Lastupdatedby:447800
+Productioncode:
+Seriesid:281053
+Showurl:
+Siterating:0
+Siteratingcount:0
+Thumbadded:
+Thumbauthor:1
+Cast:Chip Gaines, Joanna Gaines
+Runtime:45
+Title:Fixer Upper
+...
+Coverart:http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-2.jpg,http://thetvdb.com/banners/posters/281053-2.jpg
+Fanart:http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg
+Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg
+0
+
+>>> sys.argv = shlex.split('ttvdb.py -l en -a US -N 72108 Pyramid')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>NCIS</title>
+    <subtitle>Pyramid</subtitle>
+    <description>The lives of NCIS members are in jeopardy when they come face-to-face with the infamous Port-to-Port killer, on the eighth season finale of NCIS.</description>
+    <season>8</season>
+    <episode>24</episode>
+    <certifications>
+      <certification locale="us" name="TV-14"/>
+    </certifications>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <runtime/>
+    <inetref>72108</inetref>
+    <collectionref>72108</collectionref>
+    <tmsref>EP00681911</tmsref>
+    <imdb/>
+    <language>en</language>
+    <year>2011</year>
+    <releasedate>2011-05-17</releasedate>
+    <people>
+      <person job="Actor" name="Mark Harmon" character="Leroy Jethro Gibbs" url="http://thetvdb.com/banners/actors/70164.jpg" thumb="http://thetvdb.com/banners/actors/70164.jpg"/>
+      <person job="Actor" name="Sean Murray" character="Timothy &quot;Tim&quot; McGee" url="http://thetvdb.com/banners/actors/70163.jpg" thumb="http://thetvdb.com/banners/actors/70163.jpg"/>
+      <person job="Actor" name="Emily Wickersham" character="Eleanor “Ellie” Bishop" url="http://thetvdb.com/banners/actors/321201.jpg" thumb="http://thetvdb.com/banners/actors/321201.jpg"/>
+      <person job="Actor" name="David McCallum" character="Donald &quot;Ducky&quot; Mallard" url="http://thetvdb.com/banners/actors/70159.jpg" thumb="http://thetvdb.com/banners/actors/70159.jpg"/>
+      <person job="Actor" name="Pauley Perrette" character="Abigail &quot;Abby&quot; Sciuto" url="http://thetvdb.com/banners/actors/70161.jpg" thumb="http://thetvdb.com/banners/actors/70161.jpg"/>
+      <person job="Actor" name="Rocky Carroll" character="Leon Vance" url="http://thetvdb.com/banners/actors/127861.jpg" thumb="http://thetvdb.com/banners/actors/127861.jpg"/>
+      <person job="Actor" name="Brian Dietzen" character="Jimmy Palmer" url="http://thetvdb.com/banners/actors/219761.jpg" thumb="http://thetvdb.com/banners/actors/219761.jpg"/>
+      <person job="Actor" name="Wilmer Valderrama" character="Nicholas &quot;Nick&quot; Torres" url="http://thetvdb.com/banners/actors/394895.jpg" thumb="http://thetvdb.com/banners/actors/394895.jpg"/>
+      <person job="Actor" name="Michael Weatherly" character="Anthony &quot;Tony&quot; DiNozzo" url="http://thetvdb.com/banners/actors/70160.jpg" thumb="http://thetvdb.com/banners/actors/70160.jpg"/>
+      <person job="Actor" name="Sasha Alexander" character="Caitlin &quot;Kate&quot; Todd" url="http://thetvdb.com/banners/actors/70162.jpg" thumb="http://thetvdb.com/banners/actors/70162.jpg"/>
+      <person job="Actor" name="Cote de Pablo" character="Ziva David" url="http://thetvdb.com/banners/actors/70165.jpg" thumb="http://thetvdb.com/banners/actors/70165.jpg"/>
+      <person job="Actor" name="Lauren Holly" character="Jennifer &quot;Jenny&quot; Shepard" url="http://thetvdb.com/banners/actors/77850.jpg" thumb="http://thetvdb.com/banners/actors/77850.jpg"/>
+      <person job="Actor" name="Jennifer Espósito" character="Alex Quinn" url="http://thetvdb.com/banners/actors/402126.jpg" thumb="http://thetvdb.com/banners/actors/402126.jpg"/>
+      <person job="Actor" name="Duane Henry" character="Clayton Reeves" url="http://thetvdb.com/banners/actors/418530.jpg" thumb="http://thetvdb.com/banners/actors/418530.jpg"/>
+      <person job="Guest Star" name="Kerr Smith"/>
+      <person job="Guest Star" name="Sarah Jane Morris"/>
+      <person job="Guest Star" name="Matt Craven"/>
+      <person job="Guest Star" name="David Dayan Fisher"/>
+      <person job="Guest Star" name="Muse Watson"/>
+      <person job="Guest Star" name="Alimi Ballard"/>
+      <person job="Guest Star" name="Matthew Willig"/>
+      <person job="Guest Star" name="Tehmina Sunny"/>
+      <person job="Guest Star" name="Enrique Murciano"/>
+      <person job="Guest Star" name="Jude Ciccolella"/>
+      <person job="Guest Star" name="Vera Miao"/>
+      <person job="Director" name="Dennis Smith"/>
+      <person job="Author" name="Gary Glasberg"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/72108/4078484.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/72108/4078484.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8-2.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8-7.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8-7.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-31.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-31.jpg" width="1920" height="1080"/>
+...
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-33.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-33.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
+0
+
+>>> sys.argv = shlex.split('ttvdb.py -l en -a US -N 283661 "Egg Hunt"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Jack Hanna's Wild Countdown</title>
+    <subtitle>Egg Hunt</subtitle>
+    <description>Jungle Jack takes off on a very special Egg Hunt, looking for creatures big and small that hatch from eggs! Crocodiles, Bald Eagles, Sea Turtles, Ostriches, Penguins, and more!</description>
+    <season>6</season>
+    <episode>17</episode>
+    <certifications>
+      <certification locale="us" name="TV-G"/>
+    </certifications>
+    <studios>
+      <studio name="ABC (US)"/>
+    </studios>
+    <runtime/>
+    <inetref>283661</inetref>
+    <collectionref>283661</collectionref>
+    <imdb>3062384</imdb>
+    <tmsref>EP01441760</tmsref>
+    <language>en</language>
+    <year>2017</year>
+    <releasedate>2017-04-15</releasedate>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/283661/6050716.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/283661/6050716.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/posters/283661-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/posters/283661-1.jpg" width="680" height="1000"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/283661-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/283661-1.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
+0
+
+"""
+from __future__ import print_function
+
 __title__ ="TheTVDB.com";
 __author__="R.D.Vaughan"
-__version__="1.1.5"
+__version__="2.0.0"
+
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
 # Version .3    Cleaned up the documentation and added a usage display option
@@ -137,6 +679,7 @@ __version__="1.1.5"
 # Version 1.1.5 Add the -C (collection option) with corresponding XML output
 #               and add a <collectionref> XML tag to Search and Query XML output
 # Version 1.1.6 Honor series name overrides during TV series search
+# Version 2.0.0 Update to API V2
 
 usage_txt='''
 Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDSC [parameters]
@@ -338,6 +881,7 @@ Banner:http://www.thetvdb.com/banners/graphical/73739-g4.jpg,http://www.thetvdb.
   </item>
 </metadata>
 '''
+
 # Episode keys that can be used in a episode data/information search.
 # All keys are currently being used.
 '''
@@ -368,46 +912,93 @@ Banner:http://www.thetvdb.com/banners/graphical/73739-g4.jpg,http://www.thetvdb.
 'episodename'
 '''
 
-
 # System modules
-import sys, os, re, locale, ConfigParser
+import sys, os, re
 from optparse import OptionParser
 from copy import deepcopy
+# shlex for doctest
+import shlex
 
-# Verify that tvdb_api.py, tvdb_ui.py and tvdb_exceptions.py are available
+# import logging
+# logger = logging.getLogger()
+# ch = logging.StreamHandler()
+# fh = logging.FileHandler("ttvdb.log")
+# #ch.setLevel(logging.DEBUG)
+# fh.setLevel(logging.DEBUG)
+# logging.getLogger("dicttoxml").setLevel(logging.WARN)
+# logging.getLogger("tvdb_api").setLevel(logging.DEBUG)
+# logger.addHandler(ch)
+# logger.addHandler(fh)
+
+IS_PY2 = sys.version_info[0] == 2
+if IS_PY2:
+    import ConfigParser
+else:
+    import configparser as ConfigParser
+
+class tvdb_account:
+    # explicit username and account id are not required
+    # to use the API. API documentation is unclear in this regard
+    username = ""
+    account_identifier = ""
+    apikey = '0BB856A59C51D607'
+
+# Verify that tvdb_api.py are available
 try:
     # thetvdb.com specific modules
-    import MythTV.ttvdb.tvdb_ui as tvdb_ui
-    # from tvdb_api import Tvdb
     import MythTV.ttvdb.tvdb_api as tvdb_api
-    from MythTV.ttvdb.tvdb_exceptions import (tvdb_error, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_episodenotfound, tvdb_attributenotfound, tvdb_userabort)
+    from MythTV.ttvdb.tvdb_api import (tvdb_error, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_episodenotfound, tvdb_attributenotfound, tvdb_userabort)
 
     # verify version of tvdbapi to make sure it is at least 1.0
-    if tvdb_api.__version__ < '1.0':
-        print "\nYour current installed tvdb_api.py version is (%s)\n" % tvdb_api.__version__
+    if tvdb_api.__version__ < '2.0':
+        print("\nYour current installed tvdb_api.py version is (%s)\n" % tvdb_api.__version__)
         raise
-except Exception, e:
-    print '''
-The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py.
+except Exception as e:
+    print('''
+The modules tvdb_api.py (v2.0 or greater).
 They should have been installed along with the MythTV python bindings.
 Error:(%s)
-''' %  e
+''' % e)
     sys.exit(1)
+finally:
+    pass
 
 try:
     from MythTV.utility import levenshtein
-except Exception, e:
-    print """Could not import levenshtein string distance method from MythTV Python Bindings
+except Exception as e:
+    print("""Could not import levenshtein string distance method from MythTV Python Bindings
 Error:(%s)
-""" % e
+""" % e)
     sys.exit(1)
 
 try:
-    from StringIO import StringIO
+    if IS_PY2:
+        from StringIO import StringIO
+    else:
+        from io import StringIO
     from lxml import etree as etree
-except Exception, e:
+except Exception as e:
     sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
+
+from MythTV.utility.dicttoxml import dicttoxml
+try:
+    import json
+    from lxml import etree as eTree
+except Exception as e:
+    sys.stderr.write(u'\n! Error - Importing the "lxml" python library failed on error(%s)\n' % e)
+    sys.exit(1)
+
+if IS_PY2:
+    stdio_type = file
+else:
+    import io
+    stdio_type = io.TextIOWrapper
+    unicode = str
+
+# disable the insecure request warning that we know we are going to get
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Check that the lxml library is current enough
 # From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
@@ -429,8 +1020,6 @@ if version < '2.7.2':
 http_find="http://www.thetvdb.com"
 http_replace="http://www.thetvdb.com" #Keep replace code "just in case"
 
-logfile="/tmp/ttvdb.log"
-
 name_parse=[
             # foo_[s01]_[e01]
             re.compile('''^(.+?)[ \._\-]\[[Ss]([0-9]+?)\]_\[[Ee]([0-9]+?)\]?[^\\/]*$'''),
@@ -447,7 +1036,7 @@ name_parse=[
 # Episode meta data that is massaged
 massage={'writer':'|','director':'|', 'overview':'&', 'gueststars':'|' }
 # Keys and titles used for episode data (option '-D')
-data_keys =['seasonnumber','episodenumber','episodename','firstaired','director','overview','rating','writer','filename','language' ]
+data_keys =['airedSeason','airedEpisodeNumber','episodeName','firstAired','directors','overview','rating','writers','filename','language' ]
 data_titles=['Season:','Episode:','Subtitle:','ReleaseDate:','Director:','Plot:','UserRating:','Writers:','Screenshot:','Language:' ]
 # High level dictionay keys for select graphics URL(s)
 fanart_key='fanart'
@@ -472,10 +1061,17 @@ confdir = os.environ.get('MYTHCONFDIR', '')
 if (not confdir) or (confdir == '/'):
     confdir = os.environ.get('HOME', '')
     if (not confdir) or (confdir == '/'):
-        print "Unable to find MythTV directory for metadata cache."
+        print("Unable to find MythTV directory for metadata cache.")
         sys.exit(1)
     confdir = os.path.join(confdir, '.mythtv')
-cache_dir=os.path.join(confdir, "cache/tvdb_api/")
+# different cache dirs due to different pickle protocols
+# TODO massage pickle so python3 generates python2 compatible pickles
+if IS_PY2:
+    cache_dir=os.path.join(confdir, "cache/tvdb_api/")
+else:
+    cache_dir=os.path.join(confdir, "cache/tvdb_api3/")
+if not os.path.exists(cache_dir):
+    os.mkdir(cache_dir)
 
 def _can_int(x):
     """Takes a string, checks if it is numeric.
@@ -492,14 +1088,6 @@ def _can_int(x):
         return True
 # end _can_int
 
-def debuglog(message):
-    message+='\n'
-    target_socket = open(logfile, "a")
-    target_socket.write(message)
-    target_socket.close()
-    return
-# end debuglog
-
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
@@ -512,15 +1100,18 @@ class OutStreamEncoder(object):
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
         if isinstance(obj, unicode):
-            self.out.write(obj.encode(self.encoding))
-        else:
+            obj = obj.encode(self.encoding)
+        if IS_PY2:
             self.out.write(obj)
+        else:
+            self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+if isinstance(sys.stdout, stdio_type):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 # modified Show class implementing a fuzzy search
 class Show( tvdb_api.Show ):
@@ -574,11 +1165,12 @@ class Episode( tvdb_api.Episode ):
 
 # modified Tvdb API class using modified show classes
 class Tvdb( tvdb_api.Tvdb ):
-    def series_by_sid(self, sid):
+    def series_by_sid(self, sid, language):
         "Lookup a series via it's sid"
         seriesid = 'sid:' + sid
-        if not self.corrections.has_key(seriesid):
-            self._getShowData(sid)
+        sid = int(sid)
+        if not seriesid in self.corrections:
+            self._getShowData(sid, language=language)
             self.corrections[seriesid] = sid
         return self.shows[sid]
     #end series_by_sid
@@ -603,10 +1195,10 @@ class Tvdb( tvdb_api.Tvdb ):
 #end Tvdb
 
 # Search for a series by SID or Series name
-def search_for_series(tvdb, sid_or_name):
+def search_for_series(tvdb, sid_or_name, language):
     "Get series data by sid or series name of the Tv show"
     if SID == True:
-        return tvdb.series_by_sid(sid_or_name)
+        return tvdb.series_by_sid(sid_or_name, language)
     else:
         return tvdb[sid_or_name]
 # end search_for_series
@@ -615,19 +1207,21 @@ def search_for_series(tvdb, sid_or_name):
 def searchseries(t, opts, series_season_ep):
     global SID
     series_name=''
-    if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-        series_name=override[series_season_ep[0].lower()][0] # Override series name
+    key = series_season_ep[0].lower()
+    if opts.configure != "" and key in override:
+        series_name=override[key][0] # Override series name
     else:
         series_name=series_season_ep[0] # Leave the series name alone
     try:
         # Search for the series or series & season or series & season & episode
+        series_data = search_for_series(t, series_name, opts.language)
         if len(series_season_ep)>1:
             if len(series_season_ep)>2: # series & season & episode
-                seriesfound=search_for_series(t, series_name)[ int(series_season_ep[1]) ][ int(series_season_ep[2]) ]
+                seriesfound=series_data[ int(series_season_ep[1]) ][ int(series_season_ep[2]) ]
             else:
-                seriesfound=search_for_series(t, series_name)[ int(series_season_ep[1]) ] # series & season
+                seriesfound=series_data[ int(series_season_ep[1]) ] # series & season
         else:
-            seriesfound=search_for_series(t, series_name) # Series only
+            seriesfound=series_data # Series only
     except tvdb_shownotfound:
         # No such show found.
         # Use the show-name from the files name, and None as the ep name
@@ -636,25 +1230,25 @@ def searchseries(t, opts, series_season_ep):
         # The season, episode or name wasn't found, but the show was.
         # Use the corrected show-name, but no episode name.
         sys.exit(0)
-    except tvdb_error, errormsg:
+    except tvdb_error as errormsg:
         # Error communicating with thetvdb.com
         if SID == True: # Maybe the digits were a series name (e.g. 90210)
             SID = False
             return searchseries(t, opts, series_season_ep)
         sys.exit(0)
-    except tvdb_userabort, errormsg:
+    except tvdb_userabort as errormsg:
         # User aborted selection (q or ^c)
-        print "\n", errormsg
+        print("\n", errormsg)
         sys.exit(0)
     else:
         if opts.raw==True:
-            print "="*20
-            print "Raw Series Data:\n"
+            print("="*20)
+            print("Raw Series Data:\n")
             if len(series_season_ep)>1:
-                print t[ series_name ][ int(series_season_ep[1]) ]
+                print(t[ series_name ][ int(series_season_ep[1]) ])
             else:
-                print t[ series_name ]
-            print "="*20
+                print(t[ series_name ])
+            print("="*20)
         return(seriesfound)
 # end searchseries
 
@@ -663,15 +1257,28 @@ def get_graphics(t, opts, series_season_ep, graphics_type, single_option, langua
     banners='_banners'
     series_name=''
     graphics=[]
-    if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-        series_name=override[series_season_ep[0].lower()][0] # Override series name
+    key = series_season_ep[0].lower()
+    if opts.configure != "" and key in override:
+        series_name=override[key][0] # Override series name
     else:
         series_name=series_season_ep[0] # Leave the series name alone
 
     if SID == True:
-        URLs = t.ttvdb_parseBanners(series_name)
+        t._parseBanners(series_name)
     else:
-        URLs = t.ttvdb_parseBanners(t._nameToSid(series_name))
+        t._parseBanners(t._nameToSid(series_name))
+    bid_order = {'fanart': [], 'poster': [], 'series': [], 'season': [], 'seasonwide': []}
+    URLs = {'fanart': [], 'poster': [], 'series': [], 'season': [], 'seasonwide': []}
+
+    # get the urls in presented order
+    for key in t.shows.keys():
+        banner = t.shows[key].data['_banners']
+        for graphic_type_items in bid_order.keys():
+            if graphic_type_items in banner:
+                for graphic_item in banner[graphic_type_items]['raw']:
+                    url = banner[graphic_type_items][graphic_item['resolution']][graphic_item['id']]
+                    url['rating'] =  graphic_item['ratingsInfo']['average']
+                    URLs[graphic_type_items].append(url)
 
     if graphics_type == fanart_type: # Series fanart graphics
         if not len(URLs[u'fanart']):
@@ -692,16 +1299,18 @@ def get_graphics(t, opts, series_season_ep, graphics_type, single_option, langua
             return []
         if graphics_type == banner_type: # Season Banners
             season_banners=[]
-            for url in URLs[u'season']:
-                if url[u'bannertype2'] == u'seasonwide' and url[u'season'] == series_season_ep[1]:
+            # seasonwide has blank resolution
+            for url in URLs[u'seasonwide']:
+                if url[u'resolution'] == u'' and url[u'subKey'] == series_season_ep[1]:
                     season_banners.append(url)
             if not len(season_banners):
                 return []
             graphics = season_banners
         else: # Season Posters
+            # season has blank resolution
             season_posters=[]
             for url in URLs[u'season']:
-                if url[u'bannertype2'] == u'season' and url[u'season'] == series_season_ep[1]:
+                if url[u'resolution'] == u'' and url[u'subKey'] == series_season_ep[1]:
                     season_posters.append(url)
             if not len(season_posters):
                 return []
@@ -715,11 +1324,12 @@ def get_graphics(t, opts, series_season_ep, graphics_type, single_option, langua
     wasanythingadded = 0
     anyotherlanguagegraphics=[]
     englishlanguagegraphics=[]
+    graphics = sorted(graphics, key=lambda k: k['rating'], reverse=True)
     for URL in graphics:
         if graphics_type == 'filename':
             if URL[graphics_type] == None:
                 continue
-        if language:        # Is there a language to filter URLs on?
+        if language and 'language' in URL:        # Is there a language to filter URLs on?
             if language == URL['language']:
                 graphicsURLs.append((URL['_bannerpath']).replace(http_find, http_replace))
             else: # Check for fall back graphics in case there are no selected language graphics
@@ -740,7 +1350,7 @@ def get_graphics(t, opts, series_season_ep, graphics_type, single_option, langua
             graphicsURLs = anyotherlanguagegraphics
 
     if opts.debug == True:
-        print u"\nGraphics:\n", graphicsURLs
+        print(u"\nGraphics:\n", graphicsURLs)
 
     if len(graphicsURLs) == 1 and graphicsURLs[0] == graphics_type+':':
         return [] # Due to the language filter there may not be any URLs
@@ -764,8 +1374,11 @@ def change_to_commas(meta_data):
 # Change &amp; values to ascii equivalents
 def change_amp(text):
     if not text: return text
-    text = text.replace("&quot;", "'").replace("\r\n", " ")
-    text = text.replace(r"\'", "'")
+    try:
+        text = text.replace("&quot;", "'").replace("\r\n", " ")
+        text = text.replace(r"\'", "'")
+    except Exception as e:
+        pass
     return text
 # end change_amp
 
@@ -789,26 +1402,30 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 
     args = len(series_season_ep)
     series_name=''
-    if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-        series_name=override[series_season_ep[0].lower()][0] # Override series name
+    key = series_season_ep[0].lower()
+    if opts.configure != "" and key in override:
+        series_name=override[key][0] # Override series name
     else:
         series_name=series_season_ep[0] # Leave the series name alone
 
     # Get Cast members
     cast_members=''
+    tmp_cast = ''
     try:
-        tmp_cast = search_for_series(t, series_name)['_actors']
+        series_data = search_for_series(t, series_name, opts.language)
+        tmp_cast = series_data['_actors']
+        tmp_cast = sorted(tmp_cast, key=lambda k: k['sortOrder'])
     except:
         cast_members=''
     if len(tmp_cast):
-        cast_members=''
+        cast_members=''.encode('utf8')
         for cast in tmp_cast:
             if cast['name']:
-                cast_members+=(cast['name']+u', ').encode('utf8')
+                cast_members+=(cast['name']+', ').encode('utf8')
         if cast_members != '':
             try:
                 cast_members = cast_members[:-2].encode('utf8')
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, AttributeError):
                 cast_members = unicode(cast_members[:-2],'utf8')
             cast_members = change_amp(cast_members)
             cast_members = change_to_commas(cast_members)
@@ -817,43 +1434,56 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
     # Get genre(s)
     genres=''
     try:
-        genres_string = search_for_series(t, series_name)[u'genre'].encode('utf-8')
+        genres_string = series_data[u'genre'].encode('utf-8')
     except:
         genres_string=''
     if genres_string != None and genres_string != '':
         genres = change_amp(genres_string)
         genres = change_to_commas(genres)
 
-    seasons=search_for_series(t, series_name).keys() # Get the seasons for this series
+    seasons=sorted(series_data.keys()) # Get the seasons for this series
     for season in seasons:
         if args > 1: # If a season was specified skip other seasons
             if season != int(series_season_ep[1]):
                 continue
-        episodes=search_for_series(t, series_name)[season].keys() # Get the episodes for this season
+        episodes=sorted(series_data[season].keys()) # Get the episodes for this season
         for episode in episodes: # If an episode was specified skip other episodes
             if args > 2:
                 if episode != int(series_season_ep[2]):
                     continue
+            # get more detailed episode info
+            t.getDetailedEpisodeInfo(int(series_data['id']), season, episode)
             extra_ep_data=[]
-            available_keys=search_for_series(t, series_name)[season][episode].keys()
+            available_keys=series_data[season][episode].keys()
             if screenshot_request:
                 if u'filename' in available_keys:
-                    screenshot = search_for_series(t, series_name)[season][episode][u'filename']
+                    screenshot = series_data[season][episode][u'filename']
                     if screenshot:
-                        print screenshot.replace(http_find, http_replace)
+                        print(screenshot.replace(http_find, http_replace))
                     return
                 else:
                     return
+            # key ordering is not sorted so that Title is first for existing client
+            # compatability
             key_values=[]
             for values in data_keys: # Initialize an array for each possible data element for
                 key_values.append('') # each episode within a season
-            for key in available_keys:
+            for key in sorted(available_keys):
                 try:
+                    # skip deprecated keys
+                    if key in ['director']:
+                        continue
                     i = data_keys.index(key) # Include only specific episode data
                 except ValueError:
-                    if search_for_series(t, series_name)[season][episode][key] != None:
-                        text = search_for_series(t, series_name)[season][episode][key]
-                        text = change_amp(text)
+                    if series_data[season][episode][key] != None:
+                        text = series_data[season][episode][key]
+                        if isinstance(text, dict):
+                            # handle language tuple
+                            text = list(text.values())[0]
+                        elif isinstance(text, list):
+                            # handle guest stars lists
+                            text = ', '.join(text)
+                        text = change_amp(unicode(text))
                         text = change_to_commas(text)
                         if text == 'None' and key.title() == 'Director':
                             text = u"Unknown"
@@ -862,34 +1492,42 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                         except UnicodeDecodeError:
                             extra_ep_data.append(u"%s:%s" % (key.title(), unicode(text, "utf8")))
                     continue
-                text = search_for_series(t, series_name)[season][episode][key]
+                text = series_data[season][episode][key]
 
                 if text == None and key.title() == 'Director':
                     text = u"Unknown"
+                if isinstance(text, list):
+                    text = ', '.join(text)
                 if text == None or text == 'None':
                     continue
                 else:
-                    text = change_amp(text)
+                    # handle language tuple
+                    if isinstance(text, dict):
+                        # handle language tuple
+                        text = list(text.values())[0]
+                    text = change_amp(unicode(text))
                     value = change_to_commas(text)
                     value = value.replace(u'\n', u' ')
                 key_values[i]=value
             index = 0
             if SID == False:
-                print u"Title:%s" % series_name # Ouput the full series name
+                print(u"Title:%s" % series_name)    # Ouput the full series name
             else:
-                print u"Title:%s" % search_for_series(t, series_name)[u'seriesname']
+                print(u"Title:%s" % series_data[u'seriesname'])
 
             for key in data_titles:
                 if key_values[index] != None:
                     if data_titles[index] == u'ReleaseDate:' and len(key_values[index]) > 4:
-                        print u'%s%s'% (u'Year:', key_values[index][:4])
+                        print(u'%s%s'% (u'Year:', key_values[index][:4]))
                     if key_values[index] != 'None':
-                        print u'%s%s' % (data_titles[index], key_values[index])
+                        print(u'%s%s' % (data_titles[index], key_values[index]))
                 index+=1
             cast_print=False
             for extra_data in extra_ep_data:
                 if extra_data[:extra_data.index(':')] == u'Gueststars':
                     extra_cast = extra_data[extra_data.index(':')+1:]
+                    if not extra_cast:
+                        continue
                     if (len(extra_cast)>128) and not extra_cast.count(','):
                         continue
                     if cast_members:
@@ -897,19 +1535,23 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                     else:
                         extra_data=u"Cast:%s" % extra_cast
                     cast_print=True
-                print extra_data
+                print(extra_data)
             if cast_print == False:
-                print u"Cast:%s" % cast_members
+                print(u"Cast:%s" % cast_members)
             if genres != '':
-                print u"Genres:%s" % genres
-            print u"Runtime:%s" % search_for_series(t, series_name)[u'runtime']
+                print(u"Genres:%s" % genres)
+            print(u"Runtime:%s" % series_data[u'runtime'])
 
             # URL to TVDB web site episode web page for this series
             for url_data in [u'seriesid', u'seasonid', u'id']:
                 if not url_data in available_keys:
                     break
             else:
-                print u'URL:http://www.thetvdb.com/?tab=episode&seriesid=%s&seasonid=%s&id=%s' % (search_for_series(t, series_name)[season][episode][u'seriesid'], search_for_series(t, series_name)[season][episode][u'seasonid'],search_for_series(t, series_name)[season][episode][u'id'])
+                results = series_data
+                print(u'URL:http://www.thetvdb.com/?tab=episode&seriesid=%s&seasonid=%s&id=%s' %
+                      (results[season][episode][u'seriesid'],
+                       results[season][episode][u'seasonid'],
+                       results[season][episode][u'id']))
 # end Getseries_episode_data
 
 # Get Series Season and Episode numbers
@@ -926,8 +1568,9 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
     global xmlFlag
     series_name=''
     ep_name=''
-    if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-        series_name=override[series_season_ep[0].lower()][0] # Override series name
+    key = series_season_ep[0].lower()
+    if opts.configure != "" and key in override:
+        series_name=override[key][0] # Override series name
         ep_name=series_season_ep[1]
         if len(override[series_season_ep[0].lower()][1]) != 0: # Are there search-replace strings?
             ep_name=massageEpisode_name(ep_name, series_season_ep)
@@ -935,14 +1578,19 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
         series_name=series_season_ep[0] # Leave the series name alone
         ep_name=series_season_ep[1] # Leave the episode name alone
 
-    season_ep_num=search_for_series(t, series_name).fuzzysearch(ep_name, 'episodename')
+    series = search_for_series(t, series_name, opts.language)
+    season_ep_num = series.fuzzysearch(ep_name, 'episodename')
     if len(season_ep_num) != 0:
         for episode in sorted(season_ep_num, key=lambda ep: _episode_sort(ep), reverse=True):
 #            if episode.distance == 0: # exact match
                 if xmlFlag:
+                    # get more detailed episode info
+                    t.getDetailedEpisodeInfo(series['id'], episode['airedSeason'], episode)
+                    convert_series_to_xml(t, series_season_ep, season_ep_num)
                     displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
-                    sys.exit(0)
-                print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
+                    return 0
+                print(season_and_episode_num.replace('\\n', '\n') %
+                      (int(episode['seasonnumber']), int(episode['episodenumber'])))
 #            elif (episode['episodename'].lower()).startswith(ep_name.lower()):
 #                if len(episode['episodename']) > (len(ep_name)+1):
 #                    if episode['episodename'][len(ep_name):len(ep_name)+2] != ' (':
@@ -950,12 +1598,12 @@ def Getseries_episode_numbers(t, opts, series_season_ep):
 #                    if xmlFlag:
 #                        displaySeriesXML(t, [series_name, episode['seasonnumber'], episode['episodenumber']])
 #                        sys.exit(0)
-#                    print season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber']))
+#                    print(season_and_episode_num.replace('\\n', '\n') % (int(episode['seasonnumber']), int(episode['episodenumber'])))
 # end Getseries_episode_numbers
 
 # Set up a custom interface to get all series matching a partial series name
-class returnAllSeriesUI(tvdb_ui.BaseUI):
-    def __init__(self, config, log):
+class returnAllSeriesUI(tvdb_api.BaseUI):
+    def __init__(self, config, log=None):
         self.config = config
         self.log = log
 
@@ -963,7 +1611,7 @@ class returnAllSeriesUI(tvdb_ui.BaseUI):
         return allSeries
 # ends returnAllSeriesUI
 
-def initialize_override_dictionary(useroptions):
+def initialize_override_dictionary(useroptions, language):
     """ Change variables through a user supplied configuration file
     return False and exit the script if there are issues with the configuration file values
     """
@@ -1001,7 +1649,15 @@ def initialize_override_dictionary(useroptions):
         if section =='series_name_override':
             for option in cfg.options(section):
                 overrides[option] = cfg.get(section, option)
-            tvdb = Tvdb(banners=False, debug = False, interactive = False, cache = cache_dir, custom_ui=returnAllSeriesUI, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
+            tvdb = Tvdb(banners=False,
+                        debug = False,
+                        interactive = False,
+                        cache = cache_dir,
+                        custom_ui=returnAllSeriesUI,
+                        apikey=tvdb_account.apikey,  # thetvdb.com API key requested by MythTV
+                        username=tvdb_account.username,
+                        userkey=tvdb_account.account_identifier)
+            tvdb.session.verify = False
             for key in overrides.keys():
                 sid = overrides[key]
                 if len(sid) == 0:
@@ -1014,27 +1670,87 @@ def initialize_override_dictionary(useroptions):
                 # Make sure that the series name is not empty or all blanks
                 if len(key.replace(' ','')) == 0:
                     sys.stdout.write("! Invalid Series name (must have some non-blank characters) [%s] in config file\n" % key)
-                    print parts
+                    print(overrides.keys())
                     sys.exit(1)
 
                 try:
-                    series_name_sid=tvdb.series_by_sid(sid)
+                    series_name_sid=tvdb.series_by_sid(sid, language)
                 except:
                     sys.stdout.write("! Invalid Series (no matches found in thetvdb,com) (%s) sid (%s) in config file\n" % (key, sid))
                     sys.exit(1)
-                overrides[key]=series_name_sid[u'seriesname'].encode('utf-8')
+                overrides[key]=unicode(series_name_sid.data[u'seriesName'])   #.encode('utf-8')
             continue
 
     for key in overrides.keys():
         override[key] = [overrides[key],[]]
 
     for key in massage.keys():
-        if override.has_key(key):
+        if key in override:
             override[key][1]=massage[key]
         else:
             override[key]=[key, massage[key]]
     return
 # END initialize_override_dictionary
+
+def convert_search_to_xml(t, allSeries):
+    """
+    Convert json to xml and set up tvdb_api object as other stuff expects
+    :param t:   tvdb_api object
+    :param allSeries: json array of series
+    :return: xml version of allseries
+    """
+    # Initialize XML display value to off
+    t.xml = False
+    def series_item_func(parent):
+        if parent == "root":
+            return "series"
+        return "alias"
+    xml = dicttoxml(allSeries, item_func=series_item_func, attr_type=False)
+    t.searchTree = eTree.XML(xml)
+    t.seriesInfoTree = None
+    t.epInfoTree = None
+    t.actorsInfoTree = None
+    t.imagesInfoTree = None
+    t.baseXsltDir = xslt.baseXsltPath
+
+def convert_series_to_xml(t, series_season_ep, ep_info):
+    """
+    Convert json to xml and set up tvdb_api object as other stuff expects
+    :param t:   tvdb_api object
+    :param ep_info: json array of series
+    """
+    # Initialize XML display value to off
+    t.xml = False
+    def series_ep_item_func(parent):
+        if parent == "data":
+            return "series"
+        if parent == "_banners_raw":
+            return "banner"
+        if parent == "_actors":
+            return "actor"
+        return "item"
+    def series_people_item_func(parent):
+        if parent == "Actors":
+            return "Actor"
+        return "item"
+    def series_images_item_func(parent):
+        if parent == "root":
+            return "images"
+        return "Banner"
+    for show_id in t.shows.keys():
+        break
+    # sort the cast into sort order
+    t.shows[show_id].data['_actors'] = sorted(t.shows[show_id].data['_actors'], key=lambda k: k['sortOrder'])
+    t.searchTree = None
+    t.seriesInfoTree = None
+    t.epInfoTree = None
+    t.actorsInfoTree = None
+    t.imagesInfoTree = None
+    sxml = dicttoxml(t.shows[show_id].data, custom_root='series', item_func=series_ep_item_func, attr_type=False)
+    exml = dicttoxml(t.shows[show_id], custom_root='data', item_func=series_ep_item_func, attr_type=False)
+    t.seriesInfoTree = eTree.XML(exml)
+    t.seriesInfoTree.append(eTree.XML(sxml))
+    t.baseXsltDir = xslt.baseXsltPath
 
 def initializeXslt(language):
     ''' Initalize all data and functions for XSLT stylesheet processing
@@ -1043,13 +1759,14 @@ def initializeXslt(language):
     global xslt, tvdbXpath
     try:
         import MythTV.ttvdb.tvdbXslt as tvdbXslt
-    except Exception, errmsg:
+    except Exception as errmsg:
         sys.stderr.write('! Error: Importing tvdbXslt error(%s)\n' % errmsg)
         sys.exit(1)
 
     xslt = tvdbXslt.xpathFunctions()
     xslt.language = language
     xslt.buildFuncDict()
+    xslt.baseXsltPath = tvdbXslt.baseXsltDir
     tvdbXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
     tvdbXpath.prefix = 'tvdbXpath'
     for key in xslt.FuncDict.keys():
@@ -1079,7 +1796,7 @@ def displaySearchXML(tvdb_api):
     if items.getroot() != None:
         if len(items.xpath('//item')):
             sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
-    sys.exit(0)
+    return 0
 # end displaySearchXML()
 
 def displaySeriesXML(tvdb_api, series_season_ep):
@@ -1097,25 +1814,14 @@ def displaySeriesXML(tvdb_api, series_season_ep):
     allDataElement.append(requestDetails)
 
     # Combine the various XML inputs into a single XML element and send to the XSLT stylesheet
-    if tvdb_api.epInfoTree != None:
-        allDataElement.append(tvdb_api.epInfoTree)
-    else:
-        sys.exit(0)
-    if tvdb_api.actorsInfoTree != None:
-        allDataElement.append(tvdb_api.actorsInfoTree)
-    else:
-        allDataElement.append(etree.XML(u'<Actors></Actors>'))
-    if tvdb_api.imagesInfoTree != None:
-        allDataElement.append(tvdb_api.imagesInfoTree)
-    else:
-        allDataElement.append(etree.XML(u'<Banners></Banners>'))
+    allDataElement.append(tvdb_api.seriesInfoTree)
 
     tvdbQueryXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbVideo.xsl')))
     items = tvdbQueryXslt(allDataElement)
     if items.getroot() != None:
         if len(items.xpath('//item')):
             sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
-    sys.exit(0)
+    return 0
 # end displaySeriesXML()
 
 def displayCollectionXML(tvdb_api):
@@ -1140,12 +1846,48 @@ def displayCollectionXML(tvdb_api):
     if items.getroot() != None:
         if len(items.xpath('//item')):
             sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
-    sys.exit(0)
+    return 0
 # end displayCollectionXML()
 
+
+def doc_test(opts):
+    import doctest
+
+    if not IS_PY2:
+        # python 3 doctest capture when teh output is utf8 (bytes)
+        # convert it back to str
+        if isinstance(sys.stdout, OutStreamEncoder):
+            sys.stdout = sys.stdout.out
+            sys.stderr = sys.stderr.out
+
+            class SpoofDocTestWriter(doctest._SpoofOut):
+                """Wraps a stream with an decoder"""
+                def __init__(self, *cwargs, **kwargs):
+                    super(SpoofDocTestWriter, self).__init__(*cwargs, **kwargs)
+
+                def write(self, obj):
+                    """Wraps the output stream, encoding Unicode strings with the specified encoding"""
+                    if isinstance(obj, bytes):
+                        obj = obj.decode('utf-8')
+                    return super(SpoofDocTestWriter, self).write(obj)
+
+                def __getattr__(self, attr):
+                    """Delegate everything but write to the stream"""
+                    return getattr(self.out, attr)
+
+            # replace _SpoofOut with our massager
+            doctest._SpoofOut = SpoofDocTestWriter
+    return doctest.testmod(verbose=opts.debug, optionflags=doctest.ELLIPSIS, )
+
 def main():
+    global season_and_episode_num, screenshot_request
+    # reset some globals for doctest mode
+    screenshot_request = False
+
     parser = OptionParser(usage=u"%prog usage: ttvdb -hdruviomMPFBDS [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using ttvdb with Mythvideo see the ttvdb wiki page at:\nhttp://www.mythtv.org/wiki/Ttvdb.py")
 
+    parser.add_option(  "--doctest", action="store_true", default=False, dest="doctest",
+                        help=u"Run doctests")
     parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
                         help=u"Show debugging info")
     parser.add_option(  "-r", "--raw", action="store_true",default=False, dest="raw",
@@ -1187,19 +1929,22 @@ def main():
 
     opts, series_season_ep = parser.parse_args()
 
+    if opts.doctest:
+        return doc_test(opts)
 
     # Test mode, if we've made it here, everything is ok
     if opts.test:
-        print "Everything appears to be in order"
-        sys.exit(0)
+        print("Everything appears to be in order")
+        return 0
 
     # Make everything unicode utf8
-    for index in range(len(series_season_ep)):
-        series_season_ep[index] = unicode(series_season_ep[index], 'utf8')
+    if IS_PY2:
+        for index in range(len(series_season_ep)):
+            series_season_ep[index] = unicode(series_season_ep[index], 'utf8')
 
     if opts.debug == True:
-        print "opts", opts
-        print "\nargs", series_season_ep
+        print("opts", opts)
+        print("\nargs", series_season_ep)
 
     # Process version command line requests
     if opts.version == True:
@@ -1212,34 +1957,33 @@ def main():
         etree.SubElement(version, "description").text = 'Search and metadata downloads for thetvdb.com'
         etree.SubElement(version, "version").text = __version__
         sys.stdout.write(etree.tostring(version, encoding='UTF-8', pretty_print=True))
-        sys.exit(0)
+        return 0
 
     # Process usage command line requests
     if opts.usage == True:
         sys.stdout.write(usage_txt)
-        sys.exit(0)
+        return 0
 
     if len(series_season_ep) == 0:
         parser.error("! No series or series season episode supplied")
-        sys.exit(1)
+        return 1
 
     # Default output format of season and episode numbers
-    global season_and_episode_num, screenshot_request
     season_and_episode_num='S%02dE%02d' # Format output example "S04E12"
 
     if opts.numbers == False:
         if len(series_season_ep) > 1:
             if not _can_int(series_season_ep[1]):
                 parser.error("! Season is not numeric")
-                sys.exit(1)
+                return 1
         if len(series_season_ep) > 2:
             if not _can_int(series_season_ep[2]):
                 parser.error("! Episode is not numeric")
-                sys.exit(1)
+                return 1
     else:
         if len(series_season_ep) < 2:
             parser.error("! An Episode name must be included")
-            sys.exit(1)
+            return 1
         if len(series_season_ep) == 3:
             season_and_episode_num = series_season_ep[2] # Override default output format
 
@@ -1247,27 +1991,27 @@ def main():
         if len(series_season_ep) > 1:
             if not _can_int(series_season_ep[1]):
                 parser.error("! Season is not numeric")
-                sys.exit(1)
+                return 1
         if len(series_season_ep) > 2:
             if not _can_int(series_season_ep[2]):
                 parser.error("! Episode is not numeric")
-                sys.exit(1)
+                return 1
         if not len(series_season_ep) > 2:
             parser.error("! Option (-S), episode screenshot search requires Season and Episode numbers")
-            sys.exit(1)
+            return 1
         screenshot_request = True
 
     if opts.debug == True:
-        print series_season_ep
+        print(series_season_ep)
 
     if opts.debug == True:
-        print "#"*20
-        print "# series_season_ep array(",series_season_ep,")"
+        print("#"*20)
+        print("# series_season_ep array(",series_season_ep,")")
 
     if opts.debug == True:
-        print "#"*20
-        print "# Starting tvtvb"
-        print "# Processing (%s) Series" % ( series_season_ep[0] )
+        print("#"*20)
+        print("# Starting tvtvb")
+        print("# Processing (%s) Series" % ( series_season_ep[0] ))
 
     # List of language from http://www.thetvdb.com/api/0629B785CE550C8D/languages.xml
     # Hard-coded here as it is realtively static, and saves another HTTP request, as
@@ -1284,17 +2028,43 @@ def main():
 
     # Access thetvdb.com API with banners (Posters, Fanart, banners, screenshots) data retrieval enabled
     if opts.list ==True:
-        t = Tvdb(banners=False, debug = opts.debug, cache = cache_dir, custom_ui=returnAllSeriesUI, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
+        t = Tvdb(banners=False,
+                 debug = opts.debug,
+                 cache = cache_dir,
+                 custom_ui=returnAllSeriesUI,
+                 language = opts.language,
+                 apikey=tvdb_account.apikey,    # thetvdb.com API key requested by MythTV
+                 username=tvdb_account.username,
+                 userkey=tvdb_account.account_identifier)
         if opts.xml:
             t.xml = True
     elif opts.interactive == True:
-        t = Tvdb(banners=True, debug=opts.debug, interactive=True,  select_first=False, cache=cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
+        t = Tvdb(banners=True,
+                 debug=opts.debug,
+                 interactive=True,
+                 select_first=False,
+                 cache=cache_dir,
+                 actors = True,
+                 language = opts.language,
+                 apikey=tvdb_account.apikey,    # thetvdb.com API key requested by MythTV
+                 username=tvdb_account.username,
+                 userkey=tvdb_account.account_identifier)
         if opts.xml:
             t.xml = True
     else:
-        t = Tvdb(banners=True, debug = opts.debug, cache = cache_dir, actors = True, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV
+        t = Tvdb(banners=True,
+                 debug = opts.debug,
+                 cache = cache_dir,
+                 actors = True,
+                 language = opts.language,
+                 apikey=tvdb_account.apikey,    # thetvdb.com API key requested by MythTV
+                 username=tvdb_account.username,
+                 userkey=tvdb_account.account_identifier)
         if opts.xml:
             t.xml = True
+
+    # disable certificate check
+    t.session.verify = False
 
     # Determine if there is a SID or a series name to search with
     global SID
@@ -1310,12 +2080,12 @@ def main():
             pass
         else:
             parser.error("! Option (-C), collection requires an inetref number")
-            sys.exit(1)
+            return 1
 
     if opts.debug == True:
-        print "# ..got tvdb mirrors"
-        print "# Start to process series or series_season_ep"
-        print "#"*20
+        print("# ..got tvdb mirrors")
+        print("# Start to process series or series_season_ep")
+        print("#"*20)
 
     global override
     override={} # Initialize series name override dictionary
@@ -1324,15 +2094,15 @@ def main():
         if opts.configure[0]=='~':
             opts.configure=os.path.expanduser("~")+opts.configure[1:]
         if os.path.exists(opts.configure) == 1: # Do overrides exist?
-            initialize_override_dictionary(opts.configure)
+            initialize_override_dictionary(opts.configure, opts.language)
         else:
-            debuglog("! The specified override file (%s) does not exist" % opts.configure)
-            sys.exit(1)
+            sys.stderr.write("! The specified override file (%s) does not exist\n" % opts.configure)
+            return 1
     else: # Check if there is a default configuration file
         default_config = u"%s/%s" % (os.path.expanduser(u"~"), u".mythtv/ttvdb.conf")
         if os.path.isfile(default_config):
             opts.configure = default_config
-            initialize_override_dictionary(opts.configure)
+            initialize_override_dictionary(opts.configure, opts.language)
 
     if len(override) == 0:
         opts.configure = False # Turn off the override option as there is nothing to override
@@ -1351,37 +2121,42 @@ def main():
     # Fetch a list of matching series names
     if opts.list ==True:
         try:
-            if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-                allSeries = t._getSeries(override[series_season_ep[0].lower()][0])
+            key = series_season_ep[0].lower()
+            if opts.configure != "" and key in override:
+                allSeries = t._getSeries(override[key][0])
             else:
                 allSeries=t._getSeries(series_season_ep[0])
         except tvdb_shownotfound:
-            sys.exit(0) # No matching series
-        except Exception, e:
+            return 0 # No matching series
+        except Exception as e:
             sys.stderr.write("! Error: %s\n" % (e))
-            sys.exit(1) # Most likely a communications error
+            raise
+            return 1 # Most likely a communications error
         if opts.xml:
+            convert_search_to_xml(t, allSeries)
             displaySearchXML(t)
-            sys.exit(0)
+            return 0
         match_list = []
         for series_name_sid in allSeries: # list search results
             key_value = u"%s:%s" % (series_name_sid['sid'], series_name_sid['name'])
             if not key_value in match_list: # Do not add duplicates
                 match_list.append(key_value)
-                print key_value
-        sys.exit(0) # The Series list option (-M) is the only option honoured when used
+                print(key_value)
+        return 0 # The Series list option (-M) is the only option honoured when used
 
     # Fetch TV series collection information
     if opts.collection:
         try:
-            t._getShowData(series_season_ep[0])
+            t._getShowData(series_season_ep[0], opts.language)
         except tvdb_shownotfound:
-            sys.exit(0) # No matching series
-        except Exception, e:
+            return 0 # No matching series
+        except Exception as e:
             sys.stderr.write("! Error: %s\n" % (e))
-            sys.exit(1) # Most likely a communications error
+            raise
+            return 1 # Most likely a communications error
+        convert_series_to_xml(t, series_season_ep, None)
         displayCollectionXML(t)
-        sys.exit(0) # The TV Series collection option (-C) is the only option honoured when used
+        return 0 # The TV Series collection option (-C) is the only option honoured when used
 
     # Verify that thetvdb.com has the desired series_season_ep.
     # Exit this module if series_season_ep is not found
@@ -1396,38 +2171,38 @@ def main():
     # Return the season numbers for a series
     if opts.num_seasons == True:
         season_numbers=''
-        for x in seriesfound.keys():
+        for x in sorted(seriesfound.keys()):
             season_numbers+='%d,' % x
-        print season_numbers[:-1]
-        sys.exit(0) # Option (-n) is the only option honoured when used
+        print(season_numbers[:-1])
+        return 0 # Option (-n) is the only option honoured when used
 
     # Dump information accessible for a Series and ONLY first season of episoded data
     if opts.debug == True:
-        print "#"*20
-        print "# Starting Raw keys call"
-        print "Lvl #1:" # Seasons for series
+        print("#"*20)
+        print("# Starting Raw keys call")
+        print("Lvl #1:")    # Seasons for series
         x = t[series_season_ep[0]].keys()
-        print t[series_season_ep[0]].keys()
-        print "#"*20
-        print "Lvl #2:" # Episodes for each season
+        print(t[series_season_ep[0]].keys())
+        print("#"*20)
+        print("Lvl #2:")    # Episodes for each season
         for y in x:
-            print t[series_season_ep[0]][y].keys()
-        print "#"*20
-        print "Lvl #3:" # Keys for each episode within the 1st season
+            print(t[series_season_ep[0]][y].keys())
+        print("#"*20)
+        print("Lvl #3:")    # Keys for each episode within the 1st season
         z = t[series_season_ep[0]][1].keys()
         for aa in z:
-            print t[series_season_ep[0]][1][aa].keys()
-        print "#"*20
-        print "Lvl #4:" # Available data for each episode in 1st season
+            print(t[series_season_ep[0]][1][aa].keys())
+        print("#"*20)
+        print("Lvl #4:")    # Available data for each episode in 1st season
         for aa in z:
             codes = t[series_season_ep[0]][1][aa].keys()
-            print "\n\nStart:"
+            print("\n\nStart:")
             for c in codes:
-                print "="*50
-                print 'Key Name=('+c+'):'
-                print t[series_season_ep[0]][1][aa][c]
-                print "="*50
-        print "#"*20
+                print("="*50)
+                print('Key Name=('+c+'):')
+                print(t[series_season_ep[0]][1][aa][c])
+                print("="*50)
+        print("#"*20)
         sys.exit (True)
 
     if opts.numbers == True: # Fetch and output season and episode numbers
@@ -1437,33 +2212,38 @@ def main():
         else:
             xmlFlag = False
         Getseries_episode_numbers(t, opts, series_season_ep)
-        sys.exit(0) # The Numbers option (-N) is the only option honoured when used
+        return 0 # The Numbers option (-N) is the only option honoured when used
 
     if opts.data or screenshot_request: # Fetch and output episode data
         if opts.mythvideo:
             if len(series_season_ep) != 3:
-                print u"Season and Episode numbers required."
+                print(u"Season and Episode numbers required.")
             else:
                 if opts.xml:
+                    t.getDetailedEpisodeInfo(seriesfound[u'id'], series_season_ep[1], series_season_ep[2])
+                    convert_series_to_xml(t, series_season_ep, seriesfound)
                     displaySeriesXML(t, series_season_ep)
-                    sys.exit(0)
+                    return 0
                 Getseries_episode_data(t, opts, series_season_ep, language=opts.language)
         else:
             if opts.xml and len(series_season_ep) == 3:
+                t.getDetailedEpisodeInfo(list(t.shows.values())[0].data['id'], series_season_ep[1], series_season_ep[2])
+                convert_series_to_xml(t, series_season_ep, seriesfound)
                 displaySeriesXML(t, series_season_ep)
-                sys.exit(0)
+                return 0
             Getseries_episode_data(t, opts, series_season_ep, language=opts.language)
 
     # Fetch the requested graphics URL(s)
     if opts.debug == True:
-        print "#"*20
-        print "# Checking if Posters, Fanart or Banners are available"
-        print "#"*20
+        print("#"*20)
+        print("# Checking if Posters, Fanart or Banners are available")
+        print("#"*20)
 
-    if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-        banners_keys = search_for_series(t, override[series_season_ep[0].lower()][0])['_banners'].keys()
+    key = series_season_ep[0].lower()
+    if opts.configure != "" and key in override:
+        banners_keys = search_for_series(t, override[key][0], opts.language)['_banners'].keys()
     else:
-        banners_keys = search_for_series(t, series_season_ep[0])['_banners'].keys()
+        banners_keys = search_for_series(t, series_season_ep[0], opts.language)['_banners'].keys()
 
     banner= False
     poster= False
@@ -1479,12 +2259,12 @@ def main():
 
     # Make sure that some graphics URL(s) (Posters, FanArt or Banners) are available
     if ( fanart!=True and poster!=True and banner!=True ):
-        sys.exit(0)
+        return 0
 
     if opts.debug == True:
-        print "#"*20
-        print "# One or more of Posters, Fanart or Banners are available"
-        print "#"*20
+        print("#"*20)
+        print("# One or more of Posters, Fanart or Banners are available")
+        print("#"*20)
 
     # Determine if graphic URL identification output is required
     if opts.data:    # Along with episode data get all graphics
@@ -1507,8 +2287,8 @@ def main():
         season_poster_found = False
         if opts.mythvideo:
             if len(series_season_ep) < 2:
-                print u"Season and Episode numbers required."
-                sys.exit(0)
+                print(u"Season and Episode numbers required.")
+                return 0
         all_posters = u'Coverart:'
         all_empty = len(all_posters)
         for p in get_graphics(t, opts, series_season_ep, poster_type, single_option, opts.language):
@@ -1516,17 +2296,18 @@ def main():
             season_poster_found = True
         if season_poster_found == False: # If there were no season posters get the series top poster
             series_name=''
-            if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-                series_name=override[series_season_ep[0].lower()][0] # Override series name
+            key = series_season_ep[0].lower()
+            if opts.configure != "" and key in override:
+                series_name=override[key][0] # Override series name
             else:
                 series_name=series_season_ep[0] # Leave the series name alone
             for p in get_graphics(t, opts, [series_name], poster_type, single_option, opts.language):
                 all_posters = all_posters+p+u','
         if len(all_posters) > all_empty:
             if all_posters[-1] == u',':
-                print all_posters[:-1]
+                print(all_posters[:-1])
             else:
-                print all_posters
+                print(all_posters)
 
     if (fanart==True and opts.fanart==True and opts.raw!=True): # Get Fan Art and send to stdout
         all_fanart = u'Fanart:'
@@ -1535,16 +2316,16 @@ def main():
             all_fanart = all_fanart+f+u','
         if len(all_fanart) > all_empty:
             if all_fanart[-1] == u',':
-                print all_fanart[:-1]
+                print(all_fanart[:-1])
             else:
-                print all_fanart
+                print(all_fanart)
 
     if (banner==True and opts.banner==True and opts.raw!=True): # Also change to get ALL Series graphics
         season_banner_found = False
         if opts.mythvideo:
             if len(series_season_ep) < 2:
-                print u"Season and Episode numbers required."
-                sys.exit(0)
+                print(u"Season and Episode numbers required.")
+                return 0
         all_banners = u'Banner:'
         all_empty = len(all_banners)
         for b in get_graphics(t, opts, series_season_ep, banner_type, single_option, opts.language):
@@ -1552,24 +2333,25 @@ def main():
             season_banner_found = True
         if not season_banner_found: # If there were no season banner get the series top banner
             series_name=''
-            if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
-                series_name=override[series_season_ep[0].lower()][0] # Override series name
+            key = series_season_ep[0].lower()
+            if opts.configure != "" and key in override:
+                series_name=override[key][0] # Override series name
             else:
                 series_name=series_season_ep[0] # Leave the series name alone
             for b in get_graphics(t, opts, [series_name], banner_type, single_option, opts.language):
                 all_banners = all_banners+b+u','
         if len(all_banners) > all_empty:
             if all_banners[-1] == u',':
-                print all_banners[:-1]
+                print(all_banners[:-1])
             else:
-                print all_banners
+                print(all_banners)
 
     if opts.debug == True:
-        print "#"*20
-        print "# Processing complete"
-        print "#"*20
-    sys.exit(0)
+        print("#"*20)
+        print("# Processing complete")
+        print("#"*20)
+    return 0
 #end main
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

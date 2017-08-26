@@ -6,11 +6,7 @@
 #              operation.
 #------------------------------
 
-from abc import ABCMeta
-class number( object ):
-    __metaclass__ = ABCMeta
-number.register(int)
-number.register(long)
+from builtins import int
 
 class EnumValue( object ):
     _next = 0
@@ -37,7 +33,7 @@ class EnumValue( object ):
 class EnumType( type ):
     def __new__(mcs, name, bases, attrs):
         for k,v in attrs.items():
-            if isinstance(v, number):
+            if isinstance(v, int):
                 EnumValue(k, v)
                 del attrs[k]
         values = {}

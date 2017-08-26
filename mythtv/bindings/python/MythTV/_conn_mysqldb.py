@@ -44,7 +44,7 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     def _sanitize(self, query): return query.replace('?', '%s')
 
     def log_query(self, query, args):
-        self.log(self.log.DATABASE, MythLog.DEBUG, 
+        self.log(self.log.DATABASE, MythLog.DEBUG,
                  ' '.join(query.split()), str(args))
 
     def execute(self, query, args=None):
@@ -67,7 +67,7 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
             if args is None:
                 return super(LoggedCursor, self).execute(query)
             return super(LoggedCursor, self).execute(query, args)
-        except Exception, e:
+        except Exception as e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def executemany(self, query, args):
@@ -92,7 +92,7 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
         self.log_query(query, args)
         try:
             return super(LoggedCursor, self).executemany(query, args)
-        except Exception, e:
+        except Exception as e:
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def commit(self): self._get_db().commit()

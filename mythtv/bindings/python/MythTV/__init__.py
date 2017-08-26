@@ -29,17 +29,17 @@ __all__             = ['static', 'MSearch', 'MythLog', 'StorageGroup']\
                         +__all_data__\
                         +__all_method__
 
-import static
-from exceptions import *
-from logging import *
-from msearch import *
-from utility import *
-from connections import dbmodule
-from database import *
-from system import *
-from mythproto import *
-from dataheap import *
-from methodheap import *
+from . import static
+from .exceptions import *
+from .logging import *
+from .msearch import *
+from .utility import *
+from .connections import dbmodule
+from .database import *
+from .system import *
+from .mythproto import *
+from .dataheap import *
+from .methodheap import *
 
 
 __version__ = OWN_VERSION

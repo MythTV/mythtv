@@ -4,7 +4,8 @@
 from MythTV.exceptions import MythError
 from MythTV.utility import datetime
 
-from itertools import imap, izip
+from builtins import map as imap
+from builtins import zip as izip
 from datetime import date
 import locale
 
@@ -182,7 +183,7 @@ class DictData( OrdDict ):
         field_order = self._field_order
         dict.update(self, zip(field_order, [None]*len(field_order)))
 
-    def copy(self): 
+    def copy(self):
         """Returns a deep copy of itself."""
         return self.__class__(zip(self.iteritems()), _process=False)
 
@@ -192,7 +193,7 @@ class DictData( OrdDict ):
     def __setstate__(self, state):
         for k,v in state.iteritems():
             self[k] = v
-        
+
 
 class DictInvert(dict):
     """
@@ -204,7 +205,7 @@ class DictInvert(dict):
     def __init__(self, other, mine=None):
         self.other = other
         if mine is None:
-            mine = dict(zip(*reversed(zip(*other.items()))))
+            mine = dict(zip(*reversed(list(zip(*other.items())))))
         dict.__init__(self, mine)
 
     @classmethod
