@@ -16,7 +16,7 @@
         within a single Xslt file
     -->
     <xsl:template match="/">
-        <xsl:if test="//Data/Series">
+        <xsl:if test="//data/series">
             <metadata>
                 <xsl:call-template name='tvdbVideoData'/>
             </metadata>
@@ -24,21 +24,20 @@
     </xsl:template>
 
     <xsl:template name="tvdbVideoData">
-        <xsl:for-each select="//Data/Series">
+        <xsl:for-each select="//data/series">
             <item>
-                <title><xsl:value-of select="normalize-space(SeriesName)"/></title>
-                <xsl:if test="tvdbXpath:getValue(//requestDetails, //Data, 'subtitle') != ''">
+                <title><xsl:value-of select="normalize-space(seriesName)"/></title>
+                <xsl:if test="tvdbXpath:getValue(//requestDetails, //data, 'subtitle') != ''">
                     <subtitle><xsl:value-of select="normalize-space(tvdbXpath:getResult())"/></subtitle>
                 </xsl:if>
-                <language><xsl:value-of select="normalize-space(Language)"/></language>
-                <xsl:if test="tvdbXpath:getValue(//requestDetails, //Data, 'description') != ''">
+                <xsl:if test="tvdbXpath:getValue(//requestDetails, //data/series, 'description') != ''">
                     <description><xsl:value-of select="normalize-space(tvdbXpath:htmlToString(tvdbXpath:getResult()))"/></description>
                 </xsl:if>
                 <season><xsl:value-of select="normalize-space(//requestDetails/@season)"/></season>
                 <episode><xsl:value-of select="normalize-space(//requestDetails/@episode)"/></episode>
-                <xsl:if test="./ContentRating/text() != ''">
+                <xsl:if test="./rating/text() != ''">
                     <certifications>
-                        <xsl:for-each select=".//ContentRating">
+                        <xsl:for-each select=".//rating">
                             <xsl:element name="certification">
                                 <xsl:attribute name="locale">us</xsl:attribute>
                                 <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
@@ -46,9 +45,9 @@
                         </xsl:for-each>
                     </certifications>
                 </xsl:if>
-                <xsl:if test="./Genre/text() != ''">
+                <xsl:if test="./genre/text() != ''">
                     <categories>
-                        <xsl:for-each select="tvdbXpath:stringToList(string(./Genre))">
+                        <xsl:for-each select="tvdbXpath:stringToList(string(./genre))">
                             <xsl:element name="category">
                                 <xsl:attribute name="type">genre</xsl:attribute>
                                 <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
@@ -56,36 +55,39 @@
                         </xsl:for-each>
                     </categories>
                 </xsl:if>
-                <xsl:if test="./Network/text() != ''">
+                <xsl:if test="./network/text() != ''">
                     <studios>
-                        <xsl:for-each select="./Network">
+                        <xsl:for-each select="./network">
                             <xsl:element name="studio">
                                 <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
                             </xsl:element>
                         </xsl:for-each>
                     </studios>
                 </xsl:if>
-                <xsl:if test="./Runtime/text() != ''">
+                <xsl:if test="./runtime/text() != ''">
                     <runtime><xsl:value-of select="normalize-space(Runtime)"/></runtime>
                 </xsl:if>
                 <inetref><xsl:value-of select="normalize-space(id)"/></inetref>
                 <collectionref><xsl:value-of select="normalize-space(id)"/></collectionref>
-                <xsl:if test="./IMDB_ID/text() != '' and tvdbXpath:getValue(//requestDetails, //Data, 'IMDB') = ''">
-                    <imdb><xsl:value-of select="normalize-space(substring-after(string(IMDB_ID), 'tt'))"/></imdb>
+                <xsl:if test="./imdbId/text() != '' and tvdbXpath:getValue(//requestDetails, //data, 'IMDB') = ''">
+                    <imdb><xsl:value-of select="normalize-space(substring-after(string(imdbId), 'tt'))"/></imdb>
                 </xsl:if>
-                <xsl:if test="./zap2it_id/text() != ''">
-                    <tmsref><xsl:value-of select="normalize-space(zap2it_id)"/></tmsref>
+                <xsl:if test="./zap2itId/text() != ''">
+                    <tmsref><xsl:value-of select="normalize-space(zap2itId)"/></tmsref>
                 </xsl:if>
-                <xsl:for-each select="tvdbXpath:getValue(//requestDetails, //Data, 'allEpisodes', 'allresults')">
-                    <xsl:if test="./IMDB_ID/text() != ''">
-                        <imdb><xsl:value-of select="normalize-space(substring-after(string(IMDB_ID), 'tt'))"/></imdb>
+                <xsl:for-each select="tvdbXpath:getValue(//requestDetails, //data, 'allEpisodes', 'allresults')">
+                    <xsl:if test="./imdbId/text() != ''">
+                        <imdb><xsl:value-of select="normalize-space(substring-after(string(zap2itId), 'tt'))"/></imdb>
                     </xsl:if>
-                    <xsl:if test="./Rating/text() != ''">
-                        <userrating><xsl:value-of select="normalize-space(./Rating)"/></userrating>
+                    <xsl:if test="./rating/text() != ''">
+                        <userrating><xsl:value-of select="normalize-space(./rating)"/></userrating>
                     </xsl:if>
-                    <xsl:if test="./FirstAired/text() != ''">
-                        <year><xsl:value-of select="normalize-space(substring(string(./FirstAired), 1, 4))"/></year>
-                        <releasedate><xsl:value-of select="normalize-space(./FirstAired)"/></releasedate>
+                    <xsl:if test="./language/overview/text() != ''">
+                        <language><xsl:value-of select="normalize-space(./language/overview)"/></language>
+                    </xsl:if>
+                    <xsl:if test="./firstAired/text() != ''">
+                        <year><xsl:value-of select="normalize-space(substring(string(./firstAired), 1, 4))"/></year>
+                        <releasedate><xsl:value-of select="normalize-space(./firstAired)"/></releasedate>
                     </xsl:if>
                     <xsl:if test="./lastupdated/text() != ''">
                         <lastupdated><xsl:value-of select="tvdbXpath:lastUpdated(string(./lastupdated))"/></lastupdated>
@@ -99,32 +101,32 @@
                     <xsl:if test="./seriesid/text() != '' and ./seasonid/text() != ''">
                         <homepage><xsl:value-of select="normalize-space(concat('http://thetvdb.com/?tab=episode&amp;seriesid=', string(./seriesid), '&amp;seasonid=', string(./seasonid), '&amp;id=', string(./id)))"/></homepage>
                     </xsl:if>
-                    <xsl:if test="//Actors/Actor or .//GuestStars/text() != '' or .//Director/text() != '' or .//Writer/text() != ''">
+                    <xsl:if test="//data/series/_actors/actor or .//guestStars/text() != '' or .//director/text() != '' or .//writer/text() != ''">
                         <people>
-                            <xsl:for-each select="//Actors/Actor">
+                            <xsl:for-each select="//data/series/_actors/actor">
                                 <xsl:element name="person">
                                     <xsl:attribute name="job">Actor</xsl:attribute>
-                                    <xsl:attribute name="name"><xsl:value-of select="normalize-space(Name)"/></xsl:attribute>
-                                    <xsl:attribute name="character"><xsl:value-of select="normalize-space(Role)"/></xsl:attribute>
-                                    <xsl:if test="./Image/text() != ''">
-                                        <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com/banners/', normalize-space(Image))"/></xsl:attribute>
-                                        <xsl:attribute name="thumb"><xsl:value-of select="concat('http://www.thetvdb.com/banners/_cache/', normalize-space(Image))"/></xsl:attribute>
+                                    <xsl:attribute name="name"><xsl:value-of select="normalize-space(name)"/></xsl:attribute>
+                                    <xsl:attribute name="character"><xsl:value-of select="normalize-space(role)"/></xsl:attribute>
+                                    <xsl:if test="./image/text() != ''">
+                                        <xsl:attribute name="url"><xsl:value-of select="normalize-space(image)"/></xsl:attribute>
+                                        <xsl:attribute name="thumb"><xsl:value-of select="normalize-space(image)"/></xsl:attribute>
                                     </xsl:if>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:stringToList(string(./GuestStars))">
+                            <xsl:for-each select="./guestStars/item">
                                 <xsl:element name="person">
                                     <xsl:attribute name="job">Guest Star</xsl:attribute>
                                     <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:stringToList(string(./Director))">
+                            <xsl:for-each select="./directors/item">
                                 <xsl:element name="person">
                                     <xsl:attribute name="job">Director</xsl:attribute>
                                     <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:stringToList(string(./Writer))">
+                            <xsl:for-each select="./writers/item">
                                 <xsl:element name="person">
                                     <xsl:attribute name="job">Author</xsl:attribute>
                                     <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
@@ -132,16 +134,17 @@
                             </xsl:for-each>
                         </people>
                     </xsl:if>
-                    <xsl:if test="./filename/text() != '' or //Banners/Banner">
+                    <xsl:if test="./filename/text() != '' or //data/series/_banners/*/raw/item">
                         <images>
                             <xsl:if test="./filename/text() != ''">
                                 <xsl:element name="image">
                                     <xsl:attribute name="type">screenshot</xsl:attribute>
-                                    <xsl:attribute name="url"><xsl:value-of select="concat('http://www.thetvdb.com/banners/', normalize-space(filename))"/></xsl:attribute>
-                                    <xsl:attribute name="thumb"><xsl:value-of select="concat('http://www.thetvdb.com/banners/_cache/', normalize-space(filename))"/></xsl:attribute>
+                                    <xsl:attribute name="url"><xsl:value-of select="normalize-space(filename)"/></xsl:attribute>
+                                    <xsl:attribute name="thumb"><xsl:value-of select="normalize-space(tvdbXpath:replace(string(filename), 'banners', 'banners/_cache'))"/></xsl:attribute>
                                 </xsl:element>
                             </xsl:if>
-                            <xsl:for-each select="tvdbXpath:imageElements(//Banners, 'poster', //requestDetails)">
+                            <xsl:for-each select="tvdbXpath:imageElements(//data/series/_banners/poster/raw, 'poster', //requestDetails)">
+                                <xsl:sort select="@rating" data-type="number" order="descending"/>
                                 <xsl:element name="image">
                                     <xsl:attribute name="type"><xsl:value-of select="normalize-space(@type)"/></xsl:attribute>
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(@url)"/></xsl:attribute>
@@ -154,7 +157,8 @@
                                     </xsl:if>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:imageElements(//Banners, 'fanart', //requestDetails)">
+                            <xsl:for-each select="tvdbXpath:imageElements(//data/series/_banners/fanart/raw, 'fanart', //requestDetails)">
+                                <xsl:sort select="@rating" data-type="number" order="descending"/>
                                 <xsl:element name="image">
                                     <xsl:attribute name="type"><xsl:value-of select="normalize-space(@type)"/></xsl:attribute>
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(@url)"/></xsl:attribute>
@@ -167,7 +171,8 @@
                                     </xsl:if>
                                 </xsl:element>
                             </xsl:for-each>
-                            <xsl:for-each select="tvdbXpath:imageElements(//Banners, 'banner', //requestDetails)">
+                            <xsl:for-each select="tvdbXpath:imageElements(//data/series/_banners/banner/raw, 'banner', //requestDetails)">
+                                <xsl:sort select="@rating" data-type="number" order="descending"/>
                                 <xsl:element name="image">
                                     <xsl:attribute name="type"><xsl:value-of select="normalize-space(@type)"/></xsl:attribute>
                                     <xsl:attribute name="url"><xsl:value-of select="normalize-space(@url)"/></xsl:attribute>

@@ -14,7 +14,7 @@ from collections import namedtuple
 import os
 import re
 import time
-import singleton
+from . import singleton
 time.tzset()
 
 class basetzinfo( _pytzinfo ):
@@ -69,7 +69,7 @@ class basetzinfo( _pytzinfo ):
                 break
             elif index < 0:
                 # out of bounds past, undefined time frame
-                raise MythTZError(MythTZError.TZ_CONVERSION_ERROR, 
+                raise MythTZError(MythTZError.TZ_CONVERSION_ERROR,
                                   self.tzname(), dt)
 
         self.__last = index
@@ -436,7 +436,7 @@ class datetime( _pydatetime ):
 
     def __new__(cls, year, month, day, hour=None, minute=None, second=None,
                       microsecond=None, tzinfo=None):
-        
+
         if tzinfo is None:
             kwargs = {'tzinfo':cls.localTZ()}
         else:
