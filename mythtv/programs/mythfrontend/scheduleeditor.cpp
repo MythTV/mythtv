@@ -605,7 +605,8 @@ void ScheduleEditor::customEvent(QEvent *event)
             else if (resulttext == tr("Upcoming Recordings"))
                 showUpcomingByRule();
             else if (resulttext == tr("Previously Recorded"))
-                ShowPrevious();
+                ShowPrevious(m_recordingRule->m_recordID,
+                             m_recordingRule->m_title);
         }
         else if (resultid == "newrecgroup")
         {

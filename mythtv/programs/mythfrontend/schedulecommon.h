@@ -36,6 +36,7 @@ class ScheduleCommon : public MythScreenType
     virtual void EditRecording(void);
     virtual void QuickRecord(void);
     virtual void ShowPrevious(void) const;
+    virtual void ShowPrevious(uint ruleid, const QString &title) const;
     virtual void ShowUpcoming(void) const;
     virtual void ShowUpcomingScheduled(void) const;
     virtual void ShowChannelSearch(void) const;
