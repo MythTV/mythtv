@@ -116,14 +116,16 @@ class ScanDVBSModulation: public TransMythUIComboBoxSetting
         addSelection("QPSK",  "qpsk", true);
         addSelection("8PSK",  "8psk");
         addSelection("QAM 16","qam_16");
+        addSelection("16APSK","16apsk");
+        addSelection("32APSK","32apsk");
 
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Modulation"));
 
         setHelpText(QCoreApplication::translate("(ModulationSettings)",
-            "Modulation, QPSK, 8PSK, QAM-16. Most DVB-S transponders use QPSK, "
-            "while DVB-S2 use 8PSK. QAM-16 is not available for DVB-S2 "
-            "transports."));
+            "Modulation, QPSK, 8PSK, QAM-16, 16APSK, 32APSK. Most DVB-S "
+            "transponders use QPSK, while DVB-S2 use 8PSK, 16APSK, or 32APSK. "
+            "QAM-16 is not available for DVB-S2 transports."));
     }
 };
 
