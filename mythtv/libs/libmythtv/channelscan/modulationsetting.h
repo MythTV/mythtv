@@ -73,11 +73,11 @@ class ScanModulationSetting: public TransMythUIComboBoxSetting
                                                  "Automatic"),
                                                  "auto", true);
         addSelection("QPSK","qpsk");
-        addSelection("QAM 16","qam_16");
-        addSelection("QAM 32","qam_32");
-        addSelection("QAM 64","qam_64");
-        addSelection("QAM 128","qam_128");
-        addSelection("QAM 256","qam_256");
+        addSelection("QAM-16","qam_16");
+        addSelection("QAM-32","qam_32");
+        addSelection("QAM-64","qam_64");
+        addSelection("QAM-128","qam_128");
+        addSelection("QAM-256","qam_256");
     };
 };
 
@@ -115,7 +115,7 @@ class ScanDVBSModulation: public TransMythUIComboBoxSetting
 
         addSelection("QPSK",  "qpsk", true);
         addSelection("8PSK",  "8psk");
-        addSelection("QAM 16","qam_16");
+        addSelection("QAM-16","qam_16");
         addSelection("16APSK","16apsk");
         addSelection("32APSK","32apsk");
 
