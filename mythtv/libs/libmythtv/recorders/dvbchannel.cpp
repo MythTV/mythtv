@@ -485,6 +485,8 @@ bool DVBChannel::CheckModulation(DTVModulation modulation) const
         ((DTVModulation::kModulationQPSK    == m) && (c & FE_CAN_QPSK))     ||
 #if HAVE_FE_CAN_2G_MODULATION
         ((DTVModulation::kModulation8PSK    == m) && (c & FE_CAN_2G_MODULATION)) ||
+        ((DTVModulation::kModulation16APSK  == m) && (c & FE_CAN_2G_MODULATION)) ||
+        ((DTVModulation::kModulation32APSK  == m) && (c & FE_CAN_2G_MODULATION)) ||
 #endif //HAVE_FE_CAN_2G_MODULATION
         ((DTVModulation::kModulationQAM16   == m) && (c & FE_CAN_QAM_16))   ||
         ((DTVModulation::kModulationQAM32   == m) && (c & FE_CAN_QAM_32))   ||

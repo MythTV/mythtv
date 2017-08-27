@@ -116,6 +116,8 @@ class ScanDVBSModulation: public TransMythUIComboBoxSetting
         addSelection("QPSK",  "qpsk", true);
         addSelection("8PSK",  "8psk");
         addSelection("QAM 16","qam_16");
+        addSelection("16APSK","16apsk");
+        addSelection("32APSK","32apsk");
 
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Modulation"));

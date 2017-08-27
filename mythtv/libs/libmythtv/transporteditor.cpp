@@ -507,6 +507,13 @@ Modulation::Modulation(const MultiplexID *id,  uint nType) :
         // no modulation options
         setVisible(false);
     }
+    else if (CardUtil::DVBS2 == nType)
+    {
+        addSelection("QPSK",   "qpsk");
+        addSelection("8PSK",   "8psk");
+        addSelection("16APSK", "16apsk");
+        addSelection("32APSK", "32apsk");
+    }
     else if ((CardUtil::QAM == nType) || (CardUtil::OFDM == nType) ||
              (CardUtil::DVBT2 == nType))
     {
@@ -684,6 +691,34 @@ class DVBTModulationSystem : public MythUIComboBoxSetting, public MuxDBStorage
     };
 };
 
+class DVBSModulationSystem : public MythUIComboBoxSetting, public MuxDBStorage
+{
+  public:
+    explicit DVBSModulationSystem(const MultiplexID *id) :
+        MythUIComboBoxSetting(this), MuxDBStorage(this, id, "mod_sys")
+    {
+        setLabel(QObject::tr("Modulation System"));
+        setHelpText(QObject::tr("Modulation system (Default: DVB-S)"));
+        addSelection(QObject::tr("DVB-S"),  "DVB-S");
+        addSelection(QObject::tr("DVB-S2"), "DVB-S2");
+    }
+};
+
+class RollOff : public MythUIComboBoxSetting, public MuxDBStorage
+{
+  public:
+    explicit RollOff(const MultiplexID *id) :
+        MythUIComboBoxSetting(this), MuxDBStorage(this, id, "rolloff")
+    {
+        setLabel(QObject::tr("Roll-off"));
+        setHelpText(QObject::tr("Roll-off factor (Default: 0.35)"));
+        addSelection("0.35");
+        addSelection("0.20");
+        addSelection("0.25");
+        addSelection(QObject::tr("Auto"), "auto");
+    }
+};
+
 TransportSetting::TransportSetting(const QString &label, uint mplexid,
                                    uint sourceid, uint cardtype)
     : m_mplexid(new MultiplexID())
@@ -724,15 +759,21 @@ TransportSetting::TransportSetting(const QString &label, uint mplexid,
         addChild(new DVBTGuardInterval(m_mplexid));
         addChild(new DVBTHierarchy(m_mplexid));
     }
-    else if (CardUtil::QPSK == cardtype)
+    else if (CardUtil::QPSK == cardtype ||
+             CardUtil::DVBS2 == cardtype)
     {
         addChild(new DTVStandard(m_mplexid, true, false));
         addChild(new Frequency(m_mplexid, true));
         addChild(new DVBSymbolRate(m_mplexid));
 
         addChild(new DVBInversion(m_mplexid));
+        addChild(new Modulation(m_mplexid, cardtype));
+        addChild(new DVBSModulationSystem(m_mplexid));
         addChild(new DVBForwardErrorCorrection(m_mplexid));
         addChild(new SignalPolarity(m_mplexid));
+
+        if (CardUtil::DVBS2 == cardtype)
+            addChild(new RollOff(m_mplexid));
     }
     else if (CardUtil::QAM == cardtype)
     {
