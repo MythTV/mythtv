@@ -184,7 +184,7 @@ class Scheduler : public MThread, public MythScheduler
     bool ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp);
 
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
-                             bool &blockShutdown);
+                             bool &blockShutdown, int logmask);
     void ShutdownServer(int prerollseconds, QDateTime &idleSince);
     void PutInactiveSlavesToSleep(void);
     bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);
@@ -287,6 +287,7 @@ class Scheduler : public MThread, public MythScheduler
     typedef pair<const RecordingInfo*,const RecordingInfo*> IsSameKey;
     typedef QMap<IsSameKey,bool> IsSameCacheType;
     mutable IsSameCacheType cache_is_same_program;
+    int tmLastLog;
 };
 
 #endif
