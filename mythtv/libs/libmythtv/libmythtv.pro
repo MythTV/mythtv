@@ -930,6 +930,17 @@ using_backend:using_mp3lame: LIBS += -lmp3lame
 using_backend: LIBS += -L../../external/minilzo -lmythminilzo-$$LIBVERSION
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
+using_openmax {
+    contains( HAVE_OPENMAX_BROADCOM, yes ) {
+        using_opengl {
+            # For raspberry Pi Raspbian
+            exists(/opt/vc/lib/libbrcmEGL.so) {
+                LIBS += -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL
+            }
+        }
+    }
+}
+
 !win32-msvc* {
     POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
