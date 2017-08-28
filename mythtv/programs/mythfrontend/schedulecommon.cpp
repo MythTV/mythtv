@@ -248,9 +248,16 @@ void ScheduleCommon::ShowPrevious(void) const
     if (!pginfo)
         return;
 
+    ShowPrevious(pginfo->GetRecordingRuleID(), pginfo->GetTitle());
+}
+
+/**
+*  \brief Show the previous recordings for this recording rule
+*/
+void ScheduleCommon::ShowPrevious(uint ruleid, const QString &title) const
+{
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, pginfo->GetRecordingRuleID(),
-                                    pginfo->GetTitle());
+    ProgLister *pl = new ProgLister(mainStack, ruleid, title);
     if (pl->Create())
         mainStack->AddScreen(pl);
     else
