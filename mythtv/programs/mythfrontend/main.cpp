@@ -1767,6 +1767,10 @@ int main(int argc, char **argv)
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
 
+#ifdef CONFIG_OMX_RPI
+    setenv("QT_XCB_GL_INTEGRATION","none",0);
+#endif
+
 #ifdef Q_OS_ANDROID
     // extra for 0 termination
     char *newargv[argc+4+1];

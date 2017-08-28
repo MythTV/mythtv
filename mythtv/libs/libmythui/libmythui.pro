@@ -189,6 +189,7 @@ using_opengl {
     using_opengles {
         DEFINES += USING_OPENGLES
         HEADERS += mythrender_opengl2es.h
+        LIBS += -L/opt/vc/include -lbrcmGLESv2 -lbrcmEGL
     }
     !using_opengles {
         SOURCES += mythrender_opengl1.cpp
@@ -199,6 +200,18 @@ using_opengl {
 
     mingw|win32-msvc*:LIBS += -lopengl32
 }
+
+using_openmax {
+    contains( HAVE_OPENMAX_BROADCOM, yes ) {
+        using_opengl {
+            # For raspberry Pi Raspbian
+            exists(/opt/vc/lib/libbrcmEGL.so) {
+                LIBS += -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL
+            }
+        }
+    }
+}
+
 
 DEFINES += USING_QTWEBKIT
 DEFINES += MUI_API
