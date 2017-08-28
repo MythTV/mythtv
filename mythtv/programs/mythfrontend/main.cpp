@@ -1973,9 +1973,9 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
 #if CONFIG_DARWIN
-    mainWindow->Init(QT_PAINTER);
+    mainWindow->Init(QT_PAINTER, false);
 #else
-    mainWindow->Init();
+    mainWindow->Init(QString(), false);
 #endif
     mainWindow->setWindowTitle(qApp->translate("(MythFrontendMain)",
                                                "MythTV Frontend",
