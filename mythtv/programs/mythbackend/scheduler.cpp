@@ -74,6 +74,8 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     lastPrepareTime(QDateTime()),
     m_openEnd(openEndNever)
 {
+
+    tmLastLog = 0;
     char *debug = getenv("DEBUG_CONFLICTS");
     debugConflicts = (debug != NULL);
 
@@ -3085,6 +3087,15 @@ void Scheduler::HandleIdleShutdown(
     int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime,
     bool &statuschanged)
 {
+    // To ensure that one idle message is logged per 15 minutes
+    int logmask = VB_IDLE;
+    int tm = QTime::currentTime().msecsSinceStartOfDay() / 900000;
+    if (tm != tmLastLog)
+    {
+        logmask = VB_GENERAL;
+        tmLastLog = tm;
+    }
+
     if ((idleTimeoutSecs <= 0) || (m_mainServer == NULL))
         return;
 
@@ -3152,7 +3163,7 @@ void Scheduler::HandleIdleShutdown(
                         prerollseconds) <
                         ((idleWaitForRecordingTime * 60) + idleTimeoutSecs))
                     {
-                        LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
+                        LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
                                                  "a recording is due to "
                                                  "start soon.");
                         idleSince = QDateTime();
@@ -3171,7 +3182,7 @@ void Scheduler::HandleIdleShutdown(
                         (curtime.secsTo(guideRunTime) <
                         (idleWaitForRecordingTime * 60)))
                     {
-                        LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
+                        LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
                                                  "mythfilldatabase is due to "
                                                  "run soon.");
                         idleSince = QDateTime();
@@ -3180,7 +3191,7 @@ void Scheduler::HandleIdleShutdown(
 
                 // Before starting countdown check shutdown is OK
                 if (idleSince.isValid())
-                    CheckShutdownServer(prerollseconds, idleSince, blockShutdown);
+                    CheckShutdownServer(prerollseconds, idleSince, blockShutdown, logmask);
 
                 if (wasValid && !idleSince.isValid())
                 {
@@ -3212,7 +3223,7 @@ void Scheduler::HandleIdleShutdown(
                     }
                     else if (CheckShutdownServer(prerollseconds,
                                                  idleSince,
-                                                 blockShutdown))
+                                                 blockShutdown, logmask))
                     {
                         ShutdownServer(prerollseconds, idleSince);
                     }
@@ -3240,7 +3251,7 @@ void Scheduler::HandleIdleShutdown(
                     {
                         msg = QString("%1 secs left to system shutdown!")
                             .arg(idleTimeoutSecs - itime);
-                        LOG(VB_IDLE, LOG_NOTICE, msg);
+                        LOG(logmask, LOG_NOTICE, msg);
                         MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
                                      .arg(idleTimeoutSecs - itime));
                         gCoreContext->dispatch(me);
@@ -3250,12 +3261,12 @@ void Scheduler::HandleIdleShutdown(
         }
         else
         {
-            if (blocking)
-                LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
-                                         "of a connected client");
-            else if (recording)
-                LOG(VB_IDLE, LOG_NOTICE, "Blocking shutdown because "
+            if (recording)
+                LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
                                          "of an active encoder");
+            if (blocking)
+                LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
+                                         "of a connected client");
 
             // not idle, make the time invalid
             if (idleSince.isValid())
@@ -3270,7 +3281,7 @@ void Scheduler::HandleIdleShutdown(
 
 //returns true, if the shutdown is not blocked
 bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
-                                    bool &blockShutdown)
+                                    bool &blockShutdown, int logmask)
 {
     (void)prerollseconds;
     bool retval = false;
@@ -3283,18 +3294,18 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
         switch(state)
         {
             case 0:
-                LOG(VB_IDLE, LOG_INFO,
+                LOG(logmask, LOG_INFO,
                     "CheckShutdownServer returned - OK to shutdown");
                 retval = true;
                 break;
             case 1:
-                LOG(VB_IDLE, LOG_NOTICE,
+                LOG(logmask, LOG_NOTICE,
                     "CheckShutdownServer returned - Not OK to shutdown");
                 // just reset idle'ing on retval == 1
                 idleSince = QDateTime();
                 break;
             case 2:
-                LOG(VB_IDLE, LOG_NOTICE,
+                LOG(logmask, LOG_NOTICE,
                     "CheckShutdownServer returned - Not OK to shutdown, "
                     "need reconnect");
                 // reset shutdown status on retval = 2
