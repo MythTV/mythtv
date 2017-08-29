@@ -46,6 +46,10 @@ int main(int argc, char **argv)
 {
     bool bShowSettings = false;
 
+#ifdef HAVE_OPENMAX_BROADCOM
+    setenv("QT_XCB_GL_INTEGRATION","none",0);
+#endif
+
     MythWelcomeCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
