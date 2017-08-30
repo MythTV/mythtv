@@ -761,9 +761,7 @@ bool MythUIHelper::IsImageInCache(const QString &url)
 
 QString MythUIHelper::GetThemeCacheDir(void)
 {
-    QString cachedirname = GetConfDir() + "/cache/themecache/";
-
-    QString tmpcachedir = cachedirname +
+    QString tmpcachedir = GetThemeBaseCacheDir() + "/" +
                           GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME) +
                           "." + QString::number(d->m_screenwidth) +
                           "." + QString::number(d->m_screenheight);
@@ -773,7 +771,7 @@ QString MythUIHelper::GetThemeCacheDir(void)
 
 void MythUIHelper::ClearOldImageCache(void)
 {
-    QString cachedirname = GetConfDir() + "/cache/themecache/";
+    QString cachedirname = GetThemeBaseCacheDir();
 
     d->themecachedir = GetThemeCacheDir();
 
@@ -837,7 +835,7 @@ void MythUIHelper::ClearOldImageCache(void)
 
 void MythUIHelper::RemoveCacheDir(const QString &dirname)
 {
-    QString cachedirname = GetConfDir() + "/cache/themecache/";
+    QString cachedirname = GetThemeBaseCacheDir();
 
     if (!dirname.startsWith(cachedirname))
         return;

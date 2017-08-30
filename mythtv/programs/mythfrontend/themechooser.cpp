@@ -242,7 +242,7 @@ void ThemeChooser::LoadVersion(const QString &version,
     QString themeSite = QString("%1/%2")
         .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
              "http://themes.mythtv.org/themes/repository")).arg(version);
-    QString destdir = GetConfDir().append("/cache/themechooser/");
+    QString destdir = GetCacheDir().append("/themechooser/");
     QString versiondir = QString("%1/%2").arg(destdir).arg(version);
     QDir remoteThemesDir(versiondir);
 
