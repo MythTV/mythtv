@@ -63,12 +63,16 @@ MythUIHelper *MythUIHelper::getMythUI(void)
     // there's no harm in trying to create an existing directory.
     QDir dir;
     dir.mkdir(GetThemeBaseCacheDir());
+    dir.mkdir(GetRemoteCacheDir());
+    dir.mkdir(GetThumbnailDir());
 
     return mythui;
 }
 
 void MythUIHelper::destroyMythUI(void)
 {
+    mythui->PruneCacheDir(GetRemoteCacheDir());
+    mythui->PruneCacheDir(GetThumbnailDir());
     uiLock.lock();
     delete mythui;
     mythui = NULL;
@@ -559,6 +563,8 @@ void MythUIHelper::UpdateImageCache(void)
     d->m_cacheSize.fetchAndStoreOrdered(0);
 
     ClearOldImageCache();
+    PruneCacheDir(GetRemoteCacheDir());
+    PruneCacheDir(GetThumbnailDir());
 }
 
 MythImage *MythUIHelper::GetImageFromCache(const QString &url)
@@ -604,7 +610,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     if (!nodisk)
     {
-        QString dstfile = GetMythUI()->GetThemeCacheDir() + '/' + url;
+        QString dstfile = GetCacheDirByUrl(url) + '/' + url;
 
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("Saved to Cache (%1)").arg(dstfile));
@@ -698,7 +704,7 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 
     QString dstfile;
 
-    dstfile = GetThemeCacheDir() + '/' + url;
+    dstfile = GetCacheDirByUrl(url) + '/' + url;
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("RemoveFromCacheByURL removed :%1: from cache").arg(dstfile));
     QFile::remove(dstfile);
@@ -774,6 +780,20 @@ QString MythUIHelper::GetThemeCacheDir(void)
         oldcachedir = tmpcachedir;
     }
     return tmpcachedir;
+}
+
+/**
+ * Look at the url being read and decide whether the cached version
+ * should go into the theme cache or the thumbnail cache.
+ *
+ * \param url The resource being read.
+ * \returns The path name of the appropriate cache directory.
+ */
+QString MythUIHelper::GetCacheDirByUrl(QString url)
+{
+    if (url.startsWith("myth:") || url.startsWith("-"))
+        return GetThumbnailDir();
+    return GetThemeCacheDir();
 }
 
 void MythUIHelper::ClearOldImageCache(void)
@@ -863,6 +883,49 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
     }
 
     dir.rmdir(dirname);
+}
+
+/**
+ * Remove all files in the cache that haven't been accessed in a user
+ * configurable number of days.  The default number of days is seven.
+ *
+ * \param dirname The directory to prune.
+ */
+void MythUIHelper::PruneCacheDir(QString dirname)
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Pruning cache directory: %1").arg(dirname));
+
+    int days = GetMythDB()->GetNumSetting("UIDiskCacheDays", 7);
+    QDateTime cutoff = MythDate::current().addDays(-days);
+    LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+        QString("Removing files not accessed since %1")
+        .arg(cutoff.toLocalTime().toString(Qt::ISODate)));
+
+    int kept = 0, deleted = 0;
+    QDir dir(dirname);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    foreach (const QFileInfo &fi, dir.entryInfoList())
+    {
+        if (fi.lastRead() >= cutoff) {
+            kept += 1;
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
+                QString("%1 Keep   %2")
+                .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate))
+                .arg(fi.fileName()));
+            continue;
+        }
+        deleted += 1;
+        LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
+            QString("%1 Delete %2")
+            .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate))
+            .arg(fi.fileName()));
+        QFile file(fi.absoluteFilePath());
+        file.remove();
+    }
+
+    LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+        QString("Kept %1 files, deleted %2 files").arg(kept).arg(deleted));
 }
 
 void MythUIHelper::GetScreenBounds(int &xbase, int &ybase,
@@ -1609,7 +1672,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
     if (ret || !(cacheMode & kCacheIgnoreDisk))
     {
         // Create url to image in disk cache
-        QString cachefilepath = GetThemeCacheDir() + '/' + label;
+        QString cachefilepath;
+        cachefilepath = GetCacheDirByUrl(label) + '/' + label;
         QFileInfo cacheFileInfo(cachefilepath);
 
         // If the file isn't in the disk cache, then we don't want to bother
