@@ -1041,7 +1041,9 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         cerr << "Rebuild started at " << qPrintable(time) << endl;
     }
 
+    gCoreContext->RegisterFileForWrite(filename); //FIXME hack to make cfp wait for writes?
     cfp->RebuildSeekTable(progress);
+    gCoreContext->UnregisterFileForWrite(filename); //FIXME hack to make cfp wait for writes?
 
     if (progress)
     {

@@ -111,6 +111,11 @@ bool MythCommFlagPlayer::RebuildSeekTable(
 
     int prevperc = -1;
     bool usingIframes = false;
+
+    //allow this on by default to handle hdpvr-2 output with biasidr false
+    decoder->SetIdrOnlyKeyframes(false);
+    usingIframes = true;
+
     while (GetEof() == kEofStateNone)
     {
         if (inuse_timer.elapsed() > 2534)
@@ -164,7 +169,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                 else if (percentage % 10 == 0 && prevperc != percentage)
                 {
                     prevperc = percentage;
-                    LOG(VB_GENERAL, LOG_INFO, QString("Progress %1% @ %2fps")
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Progress %1% @ %2fps") //was LOG_INFO but too much logging at reg log level
                         .arg(percentage,3).arg(flagFPS,5));
                 }
             }
@@ -177,7 +182,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                 }
                 else if (myFramesPlayed % 1000 == 0)
                 {
-                    LOG(VB_GENERAL, LOG_INFO, QString("Frames processed %1")
+                    LOG(VB_GENERAL, LOG_DEBUG, QString("Frames processed %1") //was LOG_INFO but too much logging at reg log level
                         .arg(myFramesPlayed));
                 }
             }
