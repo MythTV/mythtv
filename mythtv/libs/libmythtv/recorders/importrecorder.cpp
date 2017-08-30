@@ -84,18 +84,9 @@ void UpdateFS(int pc, void* ir)
 void ImportRecorder::UpdateRecSize()
 {
     curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
-/*   int     GetLength(void) const             { return totalLength; }
-    uint64_t GetTotalFrameCount(void) const   { return totalFrames; }
-    uint64_t GetCurrentFrameCount(void) const;
-    uint64_t GetFramesPlayed(void) const      { return framesPlayed; }*/
 
     if(m_cfp)
-    {
         m_nfc=m_cfp->GetDecoder()->GetFramesRead();
-/*    LOG(VB_RECORD, LOG_INFO, LOC + "update -- " +
-        QString("FS: %1 Len: %2 TFC: %3 CFC: %4 FP: %5 FR: %6")
-            .arg(ringBuffer->GetRealFileSize()).arg(m_cfp->GetLength()).arg(m_cfp->GetTotalFrameCount()).arg(m_cfp->GetCurrentFrameCount()).arg(m_cfp->GetFramesPlayed()).arg(m_nfc));*/
-    }
 }
 
 long long ImportRecorder::GetFramesWritten(void)
@@ -124,7 +115,7 @@ void ImportRecorder::run(void)
         // is called, just to avoid running this loop too often.
         QMutexLocker locker(&pauseLock);
         if (request_recording)
-            unpauseWait.wait(&pauseLock, 15000);//reduce logging with longer timeout
+            unpauseWait.wait(&pauseLock, 15000);
     }
 
     curRecording->SaveFilesize(ringBuffer->GetRealFileSize());
@@ -135,10 +126,10 @@ void ImportRecorder::run(void)
         MythCommFlagPlayer *cfp =
             new MythCommFlagPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV));
         RingBuffer *rb = RingBuffer::Create(
-            ringBuffer->GetFilename(), false, true, 6000); //Do not set p2 (write) true will error with attempting to read from a write only file
-
-//	curRecording->SetRecordingStatus(RecStatus::Recording); //setting this here prevents status update???
-	SetRecordingStatus(RecStatus::Recording, __FILE__, __LINE__); //Updates status to recording FIXME is this the correct way to do this
+            ringBuffer->GetFilename(), false, true, 6000);
+        //This does update the status but does not set the ultimate 
+        //recorded / failure status for the relevant recording
+        SetRecordingStatus(RecStatus::Recording, __FILE__, __LINE__);
 
         PlayerContext *ctx = new PlayerContext(kImportRecorderInUseID);
         ctx->SetPlayingInfo(curRecording);
@@ -147,10 +138,9 @@ void ImportRecorder::run(void)
         cfp->SetPlayerInfo(NULL, NULL, ctx);
 
         m_cfp=cfp;
-	//make cfp wait while writing rather immediate exit on eof
-        gCoreContext->RegisterFileForWrite(ringBuffer->GetFilename()); //FIXME is this safe here any locking reqd etc
+        gCoreContext->RegisterFileForWrite(ringBuffer->GetFilename());
         cfp->RebuildSeekTable(false,UpdateFS,this);
-        gCoreContext->UnregisterFileForWrite(ringBuffer->GetFilename()); //FIXME is this safe here any locking reqd etc
+        gCoreContext->UnregisterFileForWrite(ringBuffer->GetFilename());
         m_cfp=NULL;
 
         delete ctx;

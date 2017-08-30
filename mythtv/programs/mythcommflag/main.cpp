@@ -993,7 +993,7 @@ static int FlagCommercials(QString filename, int jobid,
     return FlagCommercials(&pginfo, jobid, outputfilename, useDB, fullSpeed);
 }
 
-static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
+static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = false)
 {
     QString filename = get_filename(pginfo);
 
@@ -1041,9 +1041,11 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         cerr << "Rebuild started at " << qPrintable(time) << endl;
     }
 
-    gCoreContext->RegisterFileForWrite(filename); //FIXME hack to make cfp wait for writes?
+    if (writefile)
+        gCoreContext->RegisterFileForWrite(filename);
     cfp->RebuildSeekTable(progress);
-    gCoreContext->UnregisterFileForWrite(filename); //FIXME hack to make cfp wait for writes?
+    if (writefile)
+        gCoreContext->UnregisterFileForWrite(filename);
 
     if (progress)
     {
@@ -1056,7 +1058,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
     return GENERIC_EXIT_OK;
 }
 
-static int RebuildSeekTable(QString filename, int jobid)
+static int RebuildSeekTable(QString filename, int jobid, bool writefile = false)
 {
     if (progress)
     {
@@ -1064,10 +1066,10 @@ static int RebuildSeekTable(QString filename, int jobid)
              << "    " << filename.toLatin1().constData() << endl;
     }
     ProgramInfo pginfo(filename);
-    return RebuildSeekTable(&pginfo, jobid);
+    return RebuildSeekTable(&pginfo, jobid, writefile);
 }
 
-static int RebuildSeekTable(uint chanid, QDateTime starttime, int jobid)
+static int RebuildSeekTable(uint chanid, QDateTime starttime, int jobid, bool writefile = false)
 {
     ProgramInfo pginfo(chanid, starttime);
     if (progress)
@@ -1079,7 +1081,7 @@ static int RebuildSeekTable(uint chanid, QDateTime starttime, int jobid)
             cerr << "    " << pginfo.GetTitle().toLocal8Bit().constData() << " - "
                  << pginfo.GetSubtitle().toLocal8Bit().constData() << endl;
     }
-    return RebuildSeekTable(&pginfo, jobid);
+    return RebuildSeekTable(&pginfo, jobid, writefile);
 }
 
 int main(int argc, char *argv[])
@@ -1263,7 +1265,7 @@ int main(int argc, char *argv[])
             if (cmdline.toBool("rebuild"))
                 result = RebuildSeekTable(pginfo.GetChanID(),
                                           pginfo.GetRecordingStartTime(),
-                                          -1);
+                                          -1, cmdline.toBool("writefile"));
             else
                 result = FlagCommercials(pginfo.GetChanID(),
                                          pginfo.GetRecordingStartTime(),
