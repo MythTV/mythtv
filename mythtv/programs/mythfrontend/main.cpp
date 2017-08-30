@@ -2127,6 +2127,7 @@ int main(int argc, char **argv)
     if (ret==0)
         gContext-> saveSettingsCache();
 
+    DestroyMythUI();
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
     delete housekeeping;
