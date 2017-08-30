@@ -59,6 +59,11 @@ MythUIHelper *MythUIHelper::getMythUI(void)
 
     uiLock.unlock();
 
+    // These directories should always exist.  Don't test first as
+    // there's no harm in trying to create an existing directory.
+    QDir dir;
+    dir.mkdir(GetThemeBaseCacheDir());
+
     return mythui;
 }
 
@@ -604,13 +609,6 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("Saved to Cache (%1)").arg(dstfile));
 
-        // This would probably be better off somewhere else before any
-        // Load() calls at all.
-        QDir themedir(GetMythUI()->GetThemeCacheDir());
-
-        if (!themedir.exists())
-            themedir.mkdir(GetMythUI()->GetThemeCacheDir());
-
         // Save to disk cache
         im->save(dstfile, "PNG");
     }
@@ -761,36 +759,32 @@ bool MythUIHelper::IsImageInCache(const QString &url)
 
 QString MythUIHelper::GetThemeCacheDir(void)
 {
+    static QString oldcachedir = QString::null;
     QString tmpcachedir = GetThemeBaseCacheDir() + "/" +
                           GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME) +
                           "." + QString::number(d->m_screenwidth) +
                           "." + QString::number(d->m_screenheight);
 
+    if (tmpcachedir != oldcachedir)
+    {
+        LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+            QString("Creating cache dir: %1").arg(tmpcachedir));
+        QDir dir;
+        dir.mkdir(tmpcachedir);
+        oldcachedir = tmpcachedir;
+    }
     return tmpcachedir;
 }
 
 void MythUIHelper::ClearOldImageCache(void)
 {
-    QString cachedirname = GetThemeBaseCacheDir();
-
     d->themecachedir = GetThemeCacheDir();
-
-    QDir dir(cachedirname);
-
-    if (!dir.exists())
-        dir.mkdir(cachedirname);
 
     QString themecachedir = d->themecachedir;
 
     d->themecachedir += '/';
 
-    dir.setPath(themecachedir);
-
-    if (!dir.exists())
-        dir.mkdir(themecachedir);
-
-    dir.setPath(cachedirname);
-
+    QDir dir(GetThemeBaseCacheDir());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
 
