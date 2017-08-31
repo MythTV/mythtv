@@ -1675,7 +1675,7 @@ int main(int argc, char **argv)
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
 
-#ifdef HAVE_OPENMAX_BROADCOM
+#if HAVE_OPENMAX_BROADCOM
     setenv("QT_XCB_GL_INTEGRATION","none",0);
 #endif
 

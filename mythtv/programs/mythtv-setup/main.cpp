@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
     QString scanTableName = "atsc-vsb8-us";
     QString scanInputName = "";
 
-#ifdef HAVE_OPENMAX_BROADCOM
+#if HAVE_OPENMAX_BROADCOM
     setenv("QT_XCB_GL_INTEGRATION","none",0);
 #endif
 

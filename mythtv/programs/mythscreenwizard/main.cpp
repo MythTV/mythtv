@@ -112,7 +112,7 @@ static void startAppearWiz(int _x, int _y, int _w, int _h)
 int main(int argc, char **argv)
 {
 
-#ifdef HAVE_OPENMAX_BROADCOM
+#if HAVE_OPENMAX_BROADCOM
     setenv("QT_XCB_GL_INTEGRATION","none",0);
 #endif
 
