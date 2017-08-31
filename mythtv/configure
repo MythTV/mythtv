@@ -2408,6 +2408,7 @@ MYTHTV_CONFIG_LIST='
     opengl
     opengl_video
     opengl_themepainter
+    openmax
     qtwebkit
     qtscript
     qtdbus
