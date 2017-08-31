@@ -147,7 +147,7 @@ class VideoPerformanceTest
 int main(int argc, char *argv[])
 {
 
-#ifdef CONFIG_OMX_RPI
+#if CONFIG_OMX_RPI
     setenv("QT_XCB_GL_INTEGRATION","none",0);
 #endif
 
