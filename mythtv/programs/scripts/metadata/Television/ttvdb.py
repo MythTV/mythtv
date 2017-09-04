@@ -55,10 +55,16 @@ Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/bann
     <certifications>
       <certification locale="us" name="TV-PG"/>
     </certifications>
+    <categories>
+      <category type="genre" name="Action"/>
+      <category type="genre" name="Adventure"/>
+      <category type="genre" name="Fantasy"/>
+      <category type="genre" name="Science-Fiction"/>
+    </categories>
     <studios>
       <studio name="Syfy"/>
     </studios>
-    <runtime/>
+    <runtime>45</runtime>
     <inetref>72449</inetref>
     <collectionref>72449</collectionref>
     <imdb>0118480</imdb>
@@ -134,10 +140,15 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
     <certifications>
       <certification locale="us" name="TV-14"/>
     </certifications>
+    <categories>
+      <category type="genre" name="Drama"/>
+      <category type="genre" name="Science-Fiction"/>
+      <category type="genre" name="Thriller"/>
+    </categories>
     <studios>
       <studio name="CBS"/>
     </studios>
-    <runtime/>
+    <runtime>45</runtime>
     <inetref>83066</inetref>
     <collectionref>83066</collectionref>
     <imdb>1118697</imdb>
@@ -194,10 +205,17 @@ Banner:http://thetvdb.com/banners/graphical/73739-g4.jpg,http://thetvdb.com/bann
     <certifications>
       <certification locale="us" name="TV-PG"/>
     </certifications>
+    <categories>
+      <category type="genre" name="Action"/>
+      <category type="genre" name="Adventure"/>
+      <category type="genre" name="Crime"/>
+      <category type="genre" name="Mystery"/>
+      <category type="genre" name="Science-Fiction"/>
+    </categories>
     <studios>
       <studio name="Space"/>
     </studios>
-    <runtime/>
+    <runtime>60</runtime>
     <inetref>80159</inetref>
     <collectionref>80159</collectionref>
     <imdb>0965394</imdb>
@@ -487,10 +505,16 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
     <certifications>
       <certification locale="us" name="TV-14"/>
     </certifications>
+    <categories>
+      <category type="genre" name="Action"/>
+      <category type="genre" name="Adventure"/>
+      <category type="genre" name="Crime"/>
+      <category type="genre" name="Drama"/>
+    </categories>
     <studios>
       <studio name="CBS"/>
     </studios>
-    <runtime/>
+    <runtime>45</runtime>
     <inetref>72108</inetref>
     <collectionref>72108</collectionref>
     <tmsref>EP00681911</tmsref>
@@ -553,10 +577,14 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
     <certifications>
       <certification locale="us" name="TV-G"/>
     </certifications>
+    <categories>
+      <category type="genre" name="Family"/>
+      <category type="genre" name="Special Interest"/>
+    </categories>
     <studios>
       <studio name="ABC (US)"/>
     </studios>
-    <runtime/>
+    <runtime>30</runtime>
     <inetref>283661</inetref>
     <collectionref>283661</collectionref>
     <imdb>3062384</imdb>
@@ -568,6 +596,45 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
       <image type="screenshot" url="http://thetvdb.com/banners/episodes/283661/6050716.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/283661/6050716.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/posters/283661-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/posters/283661-1.jpg" width="680" height="1000"/>
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/283661-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/283661-1.jpg" width="1920" height="1080"/>
+    </images>
+  </item>
+</metadata>
+0
+
+>>> sys.argv = shlex.split('ttvdb.py -l en -a US -N 76119 "Eclipse Over America"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>NOVA</title>
+    <subtitle>Eclipse Over America</subtitle>
+    <description>On August 21, 2017, millions of Americans will witness the first total solar eclipse to cross the continental United States in 99 years. As in all total solar eclipses, the moon will block the sun, revealing its ethereal outer atmosphere—its corona—in a wondrous celestial spectacle. While hordes of citizens prepare to flock to the eclipse’s path of totality,</description>
+    <season>44</season>
+    <episode>18</episode>
+    <certifications>
+      <certification locale="us" name="TV-PG"/>
+    </certifications>
+    <categories>
+      <category type="genre" name="Documentary"/>
+    </categories>
+    <studios>
+      <studio name="PBS"/>
+    </studios>
+    <runtime>60</runtime>
+    <inetref>76119</inetref>
+    <collectionref>76119</collectionref>
+    <imdb>0206501</imdb>
+    <tmsref>EP00003163</tmsref>
+    <language>en</language>
+    <year>2017</year>
+    <releasedate>2017-08-21</releasedate>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/76119/6240639.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/76119/6240639.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/76119-44.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/76119-44.jpg"/>
+      <image type="coverart" url="http://www.thetvdb.com/banners/seasons/76119-44-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/76119-44-2.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/76119-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/76119-1.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/76119-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/76119-2.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/76119-3.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/76119-3.jpg" width="1280" height="720"/>
     </images>
   </item>
 </metadata>
