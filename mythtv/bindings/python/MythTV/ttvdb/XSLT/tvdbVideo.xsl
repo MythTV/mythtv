@@ -45,9 +45,9 @@
                         </xsl:for-each>
                     </certifications>
                 </xsl:if>
-                <xsl:if test="./genre/text() != ''">
+                <xsl:if test="./genre/item != ''">
                     <categories>
-                        <xsl:for-each select="tvdbXpath:stringToList(string(./genre))">
+                        <xsl:for-each select="./genre/item">
                             <xsl:element name="category">
                                 <xsl:attribute name="type">genre</xsl:attribute>
                                 <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
@@ -65,7 +65,7 @@
                     </studios>
                 </xsl:if>
                 <xsl:if test="./runtime/text() != ''">
-                    <runtime><xsl:value-of select="normalize-space(Runtime)"/></runtime>
+                    <runtime><xsl:value-of select="normalize-space(runtime)"/></runtime>
                 </xsl:if>
                 <inetref><xsl:value-of select="normalize-space(id)"/></inetref>
                 <collectionref><xsl:value-of select="normalize-space(id)"/></collectionref>
