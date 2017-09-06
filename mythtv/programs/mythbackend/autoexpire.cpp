@@ -522,7 +522,8 @@ void AutoExpire::ExpireRecordings(void)
                 {
                     LOG(VB_FILE, LOG_INFO, QString("        %1:%2")
                             .arg(fsit2->getHostname()).arg(fsit2->getPath()));
-                    dirList[fsit2->getHostname() + ":" + fsit2->getPath()] = 1;
+                    dirList[fsit2->getHostname() + ":" +
+                            fsit2->getPath().toLower()] = 1;
                 }
             }
 
@@ -585,7 +586,8 @@ void AutoExpire::ExpireRecordings(void)
                 }
 
                 QFileInfo vidFile(p->GetPathname());
-                if (dirList.contains(p->GetHostname() + ':' + vidFile.path()))
+                if (dirList.contains(p->GetHostname() + ':' +
+                                     vidFile.path().toLower()))
                 {
                     fsit->setUsedSpace(fsit->getUsedSpace()
                                                 - (p->GetFilesize() / 1024));
@@ -772,6 +774,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
  */
 void AutoExpire::FillExpireList(pginfolist_t &expireList)
 {
+    LOG(VB_FILE, LOG_INFO, LOC + QString("FillExpireList()"));
     int expMethod = gCoreContext->GetNumSetting("AutoExpireMethod", 1);
 
     ClearExpireList(expireList);
