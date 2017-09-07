@@ -111,7 +111,7 @@ sub doParse {
                 $results{'weather_icon'} = getIcon($1);
             }
             $results{'temp'}     = sprintf("%.0f", $1) 
-                if ($item->{summary}->{content} =~ /Temperature:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
+                if ($item->{summary}->{content} =~ /Temperature:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;C\s*\<br\/\>/s);
             $results{'pressure'} = sprintf("%d", $1 * 10)
                 if ($item->{summary}->{content} =~ /Pressure.*:\<\/b\>\s*(\d*\.?\d*) kPa\s*.*\<br\/\>/s);
             $results{'visibility'} = sprintf("%.1f", $1)
@@ -123,7 +123,7 @@ sub doParse {
                 $results{'windchill'} = $1; 
             }
             $results{'dewpoint'} = sprintf("%.0f", $1)
-                if ($item->{summary}->{content} =~ /Dewpoint:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;\C\s*\<br\/\>/s);
+                if ($item->{summary}->{content} =~ /Dewpoint:\<\/b\>\s*(-?\d*\.?\d*)\&deg\;C\s*\<br\/\>/s);
             if ($item->{summary}->{content} =~ /(\d*\:\d*[\w ]*\d*[\w *]\d*)\s*\<br\/\>/s) {
                 $results{'observation_time'} = "Last updated at ". $1;
                 $results{'updatetime'} = "Last updated at ". $1;
