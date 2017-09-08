@@ -3190,11 +3190,11 @@ class QuickTune : public CardInputComboBoxSetting
     };
 };
 
-class ExternalChannelCommand : public CardInputComboBoxSetting
+class ExternalChannelCommand : public MythUITextEditSetting
 {
   public:
     explicit ExternalChannelCommand(const CardInput &parent) :
-        CardInputComboBoxSetting(parent, "externalcommand")
+        MythUITextEditSetting(new CardInputDBStorage(this, parent, "externalcommand"))
     {
         setLabel(QObject::tr("External channel change command"));
         setValue("");
@@ -3205,11 +3205,11 @@ class ExternalChannelCommand : public CardInputComboBoxSetting
     };
 };
 
-class PresetTuner : public CardInputComboBoxSetting
+class PresetTuner : public MythUITextEditSetting
 {
   public:
     explicit PresetTuner(const CardInput &parent) :
-        CardInputComboBoxSetting(parent, "tunechan")
+        MythUITextEditSetting(new CardInputDBStorage(this, parent, "tunechan"))
     {
         setLabel(QObject::tr("Preset tuner to channel"));
         setValue("");
