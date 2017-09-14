@@ -49,6 +49,7 @@ class SERVICE_PUBLIC RecStatus : public QObject
 
     static QString toUIState(Type);
     static QString toString(Type, uint id);
+    static QString toString(Type, const QString &name);
     static QString toString(Type, RecordingType type = kNotRecording);
     static QString toDescription(Type, RecordingType,
                                  const QDateTime &recstartts);
