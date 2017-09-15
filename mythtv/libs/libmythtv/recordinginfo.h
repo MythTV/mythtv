@@ -171,7 +171,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         bool future,
         int schedorder,
         uint mplexid,
-        uint sgroupid);
+        uint sgroupid,
+        const QString &inputname);
 
     /// Create RecordingInfo from 'record'+'channel' tables,
     /// user in scheduler.cpp  @ ~ 3566 & ~ 3643

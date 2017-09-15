@@ -93,13 +93,14 @@ RecordingInfo::RecordingInfo(
     bool _future,
     int _schedorder,
     uint _mplexid,
-    uint _sgroupid) :
+    uint _sgroupid,
+    const QString &_inputname) :
     ProgramInfo(
         _title, _subtitle, _description, _season, _episode, _totalepisodes,
         _category, _chanid, _chanstr, _chansign, _channame,
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
-        _seriesid, _programid, _inetref),
+        _seriesid, _programid, _inetref, _inputname),
     oldrecstatus(_oldrecstatus),
     savedrecstatus(RecStatus::Unknown),
     future(_future),
@@ -202,7 +203,7 @@ RecordingInfo::RecordingInfo(
         _category, _chanid, _chanstr, _chansign, _channame,
         QString(), _recgroup, _playgroup,
         _startts, _endts, _recstartts, _recendts,
-        _seriesid, _programid, _inetref),
+        _seriesid, _programid, _inetref, ""),
     oldrecstatus(RecStatus::Unknown),
     savedrecstatus(RecStatus::Unknown),
     future(false),
@@ -1001,7 +1002,7 @@ void RecordingInfo::StartedRecording(QString ext)
 bool RecordingInfo::InsertProgram(RecordingInfo *pg,
                                   const RecordingRule *rule)
 {
-    QString inputname = pg->QueryInputDisplayName();
+    QString inputname = pg->GetInputName();
     int recgroupid = GetRecgroupID(pg->recgroup);
 
     MSqlQuery query(MSqlQuery::InitCon());

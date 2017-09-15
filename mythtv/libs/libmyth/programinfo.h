@@ -243,7 +243,8 @@ class MPUBLIC ProgramInfo
 
                 const QString &seriesid,
                 const QString &programid,
-                const QString &inetref);
+                const QString &inetref,
+                const QString &inputname);
     /// Constructs a ProgramInfo for a pathname.
     explicit ProgramInfo(const QString &pathname);
     /// Constructs a ProgramInfo for a video.

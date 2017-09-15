@@ -645,7 +645,7 @@ void ProgDetails::loadPage(void)
     QString recordingProfile;
 
     recordingHost = m_progInfo.GetHostname();
-    recordingInput = m_progInfo.QueryInputDisplayName();
+    recordingInput = m_progInfo.GetInputName();
 
     if (recorded)
     {
