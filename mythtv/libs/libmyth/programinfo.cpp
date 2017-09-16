@@ -1746,7 +1746,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["rectypestatus"] = tmp_rec;
 
     progMap["card"] = RecStatus::toString(GetRecordingStatus(), inputid);
-    progMap["input"] = RecStatus::toString(GetRecordingStatus(), inputid);
+    progMap["input"] = RecStatus::toString(GetRecordingStatus(),
+                                           inputname.isRightToLeft() ?
+                                           inputname.left(2) :
+                                           inputname.right(2));
     progMap["inputname"] = inputname;
     // Don't add bookmarkupdate to progMap, for now.
 
