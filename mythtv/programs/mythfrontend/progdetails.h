@@ -26,6 +26,7 @@ class ProgDetails : public MythScreenType
     void updatePage(void);
     void addItem(const QString &title, const QString &value,
                  ProgInfoList::VisibleLevel level);
+    void PowerPriorities(const QString & ptable);
     void loadPage(void);
 
     ProgramInfo        m_progInfo;
