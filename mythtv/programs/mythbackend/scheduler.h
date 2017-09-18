@@ -247,7 +247,6 @@ class Scheduler : public MThread, public MythScheduler
     vector<RecList *> conflictlists;
     QMap<uint, RecList> recordidlistmap;
     QMap<QString, RecList> titlelistmap;
-    InputGroupMap igrp;
 
     QDateTime schedTime;
     bool reclist_changed;

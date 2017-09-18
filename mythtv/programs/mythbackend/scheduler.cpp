@@ -1120,12 +1120,17 @@ bool Scheduler::FindNextConflict(
         if (debugConflicts)
             msg = QString("comparing with '%1' ").arg(q->GetTitle());
 
-        if (p->GetInputID() != q->GetInputID() &&
-            !igrp.GetSharedInputGroup(p->GetInputID(), q->GetInputID()))
+        if (p->GetInputID() != q->GetInputID())
         {
-            if (debugConflicts)
-                msg += "  cardid== ";
-            continue;
+            const vector <uint> &conflicting_inputs =
+                sinputinfomap[p->GetInputID()].conflicting_inputs;
+            if (find(conflicting_inputs.begin(), conflicting_inputs.end(),
+                     q->GetInputID()) == conflicting_inputs.end())
+            {
+                if (debugConflicts)
+                    msg += "  cardid== ";
+                continue;
+            }
         }
 
         if (p->GetRecordingEndTime() < q->GetRecordingStartTime() ||
@@ -1163,11 +1168,9 @@ bool Scheduler::FindNextConflict(
         {
             LOG(VB_SCHEDULE, LOG_INFO, msg);
             LOG(VB_SCHEDULE, LOG_INFO,
-                QString("  cardid's: [%1], [%2] Shared input group: %3 "
-                        "mplexid's: %4, %5")
+                QString("  cardid's: [%1], [%2] Share an input group"
+                        "mplexid's: %3, %4")
                      .arg(p->GetInputID()).arg(q->GetInputID())
-                     .arg(igrp.GetSharedInputGroup(
-                              p->GetInputID(), q->GetInputID()))
                      .arg(p->mplexid).arg(q->mplexid));
         }
 
