@@ -242,8 +242,9 @@ void ThemeChooser::LoadVersion(const QString &version,
     QString themeSite = QString("%1/%2")
         .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
              "http://themes.mythtv.org/themes/repository")).arg(version);
-    QDir remoteThemesDir(GetMythUI()->GetThemeCacheDir()
-                             .append("/themechooser/").append(version));
+    QString destdir = GetCacheDir().append("/themechooser/");
+    QString versiondir = QString("%1/%2").arg(destdir).arg(version);
+    QDir remoteThemesDir(versiondir);
 
     int downloadFailures =
         gCoreContext->GetNumSetting("ThemeInfoDownloadFailures", 0);
@@ -285,9 +286,6 @@ void ThemeChooser::LoadVersion(const QString &version,
 
         QString url = themeSite;
         url.append("/themes.zip");
-        QString destdir = GetMythUI()->GetThemeCacheDir();
-        destdir.append("/themechooser");
-        QString versiondir = QString("%1/%2").arg(destdir).arg(version);
         if (!removeThemeDir(versiondir))
             ShowOkPopup(tr("Unable to remove '%1'").arg(versiondir));
         QDir dir;

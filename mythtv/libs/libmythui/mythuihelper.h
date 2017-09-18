@@ -59,6 +59,7 @@ class MUI_PUBLIC MythUIHelper
     void RemoveFromCacheByFile(const QString &fname);
     bool IsImageInCache(const QString &url);
     QString GetThemeCacheDir(void);
+    QString GetCacheDirByUrl(QString url);
 
     void IncludeInCacheSize(MythImage *im);
     void ExcludeFromCacheSize(MythImage *im);
@@ -152,6 +153,7 @@ class MUI_PUBLIC MythUIHelper
 
     void ClearOldImageCache(void);
     void RemoveCacheDir(const QString &dirname);
+    void PruneCacheDir(QString dirname);
 
     MythUIHelperPrivate *d;
 
