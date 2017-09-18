@@ -5791,12 +5791,26 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
         "WHERE oldrecorded.future = 0 "
         + sql;
 
+    bool hasLimit = querystr.contains(" LIMIT ",Qt::CaseInsensitive);
+
+    // make sure the most recent rows are retrieved first in case
+    // there are more than the limit to be set below
+    if (!hasLimit && !querystr.contains(" ORDER ",Qt::CaseInsensitive))
+        querystr += " ORDER BY starttime DESC ";
+
     // If a limit arg was given then append the LIMIT, otherwise set a hard
-    // limit of 20000.
+    // limit of 20000, which can be overridden by a setting
     if (limit > 0)
         querystr += QString("LIMIT %1 ").arg(limit);
-    else if (!querystr.contains(" LIMIT "))
-        querystr += " LIMIT 20000 "; // For performance reasons we have to have an upper limit
+    else if (!hasLimit)
+    {
+        // For performance reasons we have to have an upper limit
+        int nLimit = gCoreContext->GetNumSetting("PrevRecLimit", 20000);
+        // For sanity sake at least 100
+        if (nLimit < 100)
+            nLimit = 100;
+        querystr += QString("LIMIT %1 ").arg(nLimit);
+    }
 
     MSqlBindings::const_iterator it;
     // If count is non-zero then also return total number of matching records,
