@@ -377,16 +377,25 @@ QStringList CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
     return list;
 }
 
+QMap <QString,QStringList> CardUtil::videoDeviceCache;
+
+void CardUtil::ClearVideoDeviceCache()
+{
+    videoDeviceCache.clear();
+}
+
+
 QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 {
+    if (videoDeviceCache.contains(rawtype))
+        return videoDeviceCache[rawtype];
+
     QStringList devs;
 
     if (rawtype.toUpper() == "DVB")
     {
         QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::Dirs);
         const QFileInfoList il = dir.entryInfoList();
-        if (il.isEmpty())
-            return devs;
 
         QFileInfoList::const_iterator it = il.begin();
 
@@ -406,8 +415,6 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
     {
         QDir dir("/dev/", "asirx*", QDir::Name, QDir::System);
         const QFileInfoList il = dir.entryInfoList();
-        if (il.isEmpty())
-            return devs;
 
         QFileInfoList::const_iterator it = il.begin();
         for (; it != il.end(); ++it)
@@ -435,7 +442,6 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         if (result == -1)
         {
             LOG(VB_GENERAL, LOG_ERR, "Error finding HDHomerun devices");
-            return devs;
         }
 
         if (result >= max_count)
@@ -483,6 +489,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
                                      .arg(rawtype));
     }
 
+    videoDeviceCache.insert(rawtype,devs);
     return devs;
 }
 

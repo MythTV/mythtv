@@ -350,6 +350,7 @@ class MTV_PUBLIC CardUtil
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);
+    static void ClearVideoDeviceCache();
 
     // Other
     static bool         CloneCard(uint src_inputid, uint dst_inputid);
@@ -412,6 +413,7 @@ class MTV_PUBLIC CardUtil
     static QStringList  ProbeV4LVideoInputs(QString device);
     static QStringList  ProbeV4LAudioInputs(QString device);
     static QStringList  ProbeDVBInputs(QString device);
+    static QMap <QString,QStringList> videoDeviceCache;
 };
 
 #endif //_CARDUTIL_H_

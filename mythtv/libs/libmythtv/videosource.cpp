@@ -2806,6 +2806,8 @@ void CaptureCard::fillSelections(GroupSetting *setting)
         return;
     }
 
+    CardUtil::ClearVideoDeviceCache();
+
     while (query.next())
     {
         uint    cardid      = query.value(0).toUInt();
