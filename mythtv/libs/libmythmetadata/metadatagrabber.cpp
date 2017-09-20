@@ -123,7 +123,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
             for (it = grabberTypes.begin(); it != grabberTypes.end(); ++it)
             {
                 QString path = (it->path).arg(GetShareDir());
-                QStringList scripts = QDir(path).entryList(QDir::Files);
+                QStringList scripts = QDir(path).entryList(QDir::Executable | QDir::Files);
                 if (scripts.count() == 0)
                     // no scripts found
                     continue;
@@ -132,7 +132,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                 QStringList::const_iterator it2 = scripts.begin();
                 for (; it2 != scripts.end(); ++it2)
                 {
-                    QString cmd = QString("%1%2").arg(path).arg(*it2);
+                    QString cmd = QDir(path).filePath(*it2);
                     MetaGrabberScript script(cmd);
 
                     if (script.IsValid())
@@ -453,7 +453,7 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
         .arg(m_fullcommand).arg(args.join(" ")));
 
     grabber.Run();
-    if (grabber.Wait() != GENERIC_EXIT_OK)
+    if (grabber.Wait(60) != GENERIC_EXIT_OK)
         return list;
 
     QByteArray result = grabber.ReadAll();
