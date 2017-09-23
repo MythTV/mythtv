@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (!gContext->Init(use_display)) // No Upnp, Prompt for db
+    if (!gContext->Init(use_display,false,true)) // No Upnp, Prompt for db
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
