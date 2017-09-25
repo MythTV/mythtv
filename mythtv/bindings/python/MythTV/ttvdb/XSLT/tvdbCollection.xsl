@@ -53,9 +53,9 @@
                         </xsl:for-each>
                     </certifications>
                 </xsl:if>
-                <xsl:if test="./genre/text() != ''">
+                <xsl:if test="./genre">
                     <categories>
-                        <xsl:for-each select="tvdbXpath:stringToList(string(./genre))">
+                        <xsl:for-each select="./genre/item">
                             <xsl:element name="category">
                                 <xsl:attribute name="type">genre</xsl:attribute>
                                 <xsl:attribute name="name"><xsl:value-of select="normalize-space(.)"/></xsl:attribute>
@@ -82,7 +82,7 @@
                 <xsl:if test="./zap2it_id/text() != ''">
                     <tmsref><xsl:value-of select="normalize-space(zap2it_id)"/></tmsref>
                 </xsl:if>
-                <xsl:if test="./siteRating/text() != ''">
+                <xsl:if test="./siteRating/text() != '0'">
                     <userrating><xsl:value-of select="normalize-space(siteRating)"/></userrating>
                 </xsl:if>
                 <xsl:if test="./siteRatingCount/text() != ''">
@@ -139,7 +139,7 @@
                                 </xsl:element>
                             </xsl:when>
                         </xsl:choose>
-                        <xsl:if test="./banner/text() != ''">
+                        <xsl:if test="./banner/text() != '' and ./banner/text() != 'http://thetvdb.com/banners/'">
                             <xsl:element name="image">
                                 <xsl:attribute name="type">banner</xsl:attribute>
                                 <xsl:attribute name="url"><xsl:value-of select="normalize-space(banner)"/></xsl:attribute>
