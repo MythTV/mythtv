@@ -7,7 +7,7 @@ Contains any static and global variables for MythTV Python Bindings
 OWN_VERSION = (29,0,-1,0)
 SCHEMA_VERSION = 1348
 NVSCHEMA_VERSION = 1007
-MUSICSCHEMA_VERSION = 1018
+MUSICSCHEMA_VERSION = 1024
 PROTO_VERSION = '91'
 PROTO_TOKEN = 'BuzzOff'
 BACKEND_SEP = '[]:[]'
