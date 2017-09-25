@@ -1235,7 +1235,7 @@ class MythMusic( MusicSchema, DBCache ):
                                     fields=('genre_id',)))
 
         if key in ('name','track','disc_number','rating',
-                        'format','sample_rate','bitrate'):
+                        'format','sample_rate','bitrate', 'hostname'):
             return ('music_songs.%s=%%s' % key, value, 0)
         if key == 'artist':
             return ('music_artists.artist_name=%s', value, 1)
