@@ -144,8 +144,8 @@ RecordingInfo::RecordingInfo(
 
     findid = _findid;
 
-    properties = ((_subtitleType    << 11) |
-                  (_videoproperties << 6)  |
+    properties = ((_subtitleType    << kSubtitlePropertyOffset) |
+                  (_videoproperties << kVideoPropertyOffset)  |
                   _audioproperties);
 
     if (recstartts >= recendts)
