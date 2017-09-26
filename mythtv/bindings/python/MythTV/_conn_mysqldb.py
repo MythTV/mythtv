@@ -44,6 +44,9 @@ class LoggedCursor( MySQLdb.cursors.Cursor ):
     def _sanitize(self, query): return query.replace('?', '%s')
 
     def log_query(self, query, args):
+        if isinstance(query, bytearray):
+            encoding = self._get_db().encoding
+            query = query.decode(encoding)
         self.log(self.log.DATABASE, MythLog.DEBUG,
                  ' '.join(query.split()), str(args))
 
