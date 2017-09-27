@@ -118,7 +118,6 @@ class MTV_PUBLIC ChannelOptionsCommon: public GroupSetting
   public slots:
     void onAirGuideChanged(bool);
     void sourceChanged(const QString&);
-    void channumChanged(const QString&);
 
   protected:
     OnAirGuide *onairguide;
