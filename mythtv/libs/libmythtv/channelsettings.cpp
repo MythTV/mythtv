@@ -510,8 +510,6 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
             this,       SLOT(  onAirGuideChanged(bool)));
     connect(source,     SIGNAL(valueChanged( const QString&)),
             this,       SLOT(  sourceChanged(const QString&)));
-    connect(channum,     SIGNAL(valueChanged( const QString&)),
-            this,       SLOT(  channumChanged(const QString&)));
 };
 
 void ChannelOptionsCommon::onAirGuideChanged(bool fValue)
@@ -562,12 +560,6 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
     onairguide->setEnabled(supports_eit);
     xmltvID->setEnabled(!uses_eit_only);
     xmltvID->Load();
-}
-
-void ChannelOptionsCommon::channumChanged(const QString& channum)
-{
-    if (freqid)
-        freqid->setValue(channum);
 }
 
 ChannelOptionsFilters::ChannelOptionsFilters(const ChannelID& id)
