@@ -87,6 +87,7 @@ enum tag_identifier {
     /* ECMA 167, 3/7.2.1) */
     ECMA_PrimaryVolumeDescriptor              = 1,
     ECMA_AnchorVolumeDescriptorPointer        = 2,
+    ECMA_VolumeDescriptorPointer              = 3,
     ECMA_PartitionDescriptor                  = 5,
     ECMA_LogicalVolumeDescriptor              = 6,
     ECMA_TerminatingDescriptor                = 8,
@@ -94,6 +95,7 @@ enum tag_identifier {
     /* ECMA 167, 4/7.2.1 */
     ECMA_FileSetDescriptor                    = 256,
     ECMA_FileIdentifierDescriptor             = 257,
+    ECMA_AllocationExtentDescriptor           = 258,
     ECMA_FileEntry                            = 261,
     ECMA_ExtendedFileEntry                    = 266,
 
@@ -120,6 +122,14 @@ struct anchor_volume_descriptor {
 };
 
 void decode_avdp(const uint8_t *p, struct anchor_volume_descriptor *avdp);
+
+/* Volume Descriptor Pointer (ECMA 167, 3/10.3) */
+
+struct volume_descriptor_pointer {
+    struct extent_ad next_extent; /* Next Volume Descriptor Sequence Extent */
+};
+
+void decode_vdp(const uint8_t *p, struct volume_descriptor_pointer *vdp);
 
 /* Partition Descriptor (ECMA 167, 3/10.5) */
 
@@ -192,7 +202,7 @@ struct file_identifier {
     uint8_t        filename[256];
 };
 
-size_t decode_file_identifier(const uint8_t *p, struct file_identifier *fi);
+size_t decode_file_identifier(const uint8_t *p, size_t size, struct file_identifier *fi);
 
 /* File Entry (ECMA 167, 4/14.9) */
 /* Extended File Entry (ECMA 167, 4/14.17) */
@@ -211,17 +221,27 @@ struct file_entry {
     uint64_t       length;         /* in bytes */
     uint8_t        file_type;      /* ECMA_FT_* */
     uint8_t        content_inline; /* 1 if file data is embedded in file entry */
+    uint8_t        ad_type;        /* from icb_flags; used when parsing allocation extents */
 
-    uint32_t       num_ad;
     union {
-        struct long_ad ad[1];      /* Most files have only single extent, files in 3D BDs can have 100+. */
-        uint8_t        content[1]; /* content of small files is embedded here */
-    } data;
+        /* "normal" file */
+        struct {
+            uint32_t       num_ad;
+            struct long_ad ad[1];      /* Most files have only single extent, files in 3D BDs can have 100+. */
+        } ads;
+
+        /* inline file */
+        struct {
+            uint32_t       information_length; /* recorded information length, may be different than file length */
+            uint8_t        content[1]; /* content of small files is embedded here */
+        } data;
+    } u;
 };
 
 struct file_entry *decode_file_entry    (const uint8_t *p, size_t size, uint16_t partition);
 struct file_entry *decode_ext_file_entry(const uint8_t *p, size_t size, uint16_t partition);
 void               free_file_entry      (struct file_entry **p_fe);
 
+int decode_allocation_extent(struct file_entry **p_fe, const uint8_t *p, size_t size, uint16_t partition);
 
 #endif /* UDFREAD_ECMA167_H_ */

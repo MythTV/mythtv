@@ -27,7 +27,7 @@
      ((minor) *   100) +                         \
      ((micro) *     1))
 
-#define UDFREAD_VERSION_MAJOR 0
+#define UDFREAD_VERSION_MAJOR 1
 #define UDFREAD_VERSION_MINOR 0
 #define UDFREAD_VERSION_MICRO 0
 
