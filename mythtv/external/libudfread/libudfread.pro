@@ -19,7 +19,7 @@ win32-msvc* {
 
 QMAKE_CLEAN += $(TARGET)
 
-HEADERS += blockinput.h default_blockinput.h ecma167.h udfread.h
+HEADERS += blockinput.h default_blockinput.h ecma167.h udfread.h udfread-version.h
 SOURCES += default_blockinput.c ecma167.c udfread.c udfread-version.c
 DEFINES += HAVE_CONFIG_H
 
