@@ -508,7 +508,9 @@ MPEG2replex::MPEG2replex() :
     memset(exttype, 0, sizeof(exttype));
     memset(exttypcnt, 0, sizeof(exttypcnt));
     memset(extframe, 0, sizeof(extframe));
-    memset(&seq_head, 0, sizeof(seq_head)); 
+    memset(&seq_head, 0, sizeof(seq_head));
+    pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&cond, NULL);
 }
 
 MPEG2replex::~MPEG2replex()
