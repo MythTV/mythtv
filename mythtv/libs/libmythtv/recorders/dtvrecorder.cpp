@@ -475,7 +475,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
             else if (PESStreamID::GOPStartCode == stream_id)
             {
                 _last_gop_seen  = _frames_seen_count;
-                hasKeyFrame    |= true;
+                hasKeyFrame     = true;
             }
             else if (PESStreamID::SequenceStartCode == stream_id)
             {
@@ -1134,7 +1134,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             { // pes_packet_length is meaningless
                 pes_packet_length = -1;
                 _last_gop_seen  = _frames_seen_count;
-                hasKeyFrame    |= true;
+                hasKeyFrame     = true;
             }
             else if (PESStreamID::SequenceStartCode == stream_id)
             { // pes_packet_length is meaningless
