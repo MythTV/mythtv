@@ -75,6 +75,7 @@ class DFDPriv
 {
   public:
     DFDPriv() :
+        controller_thread(0),
         controller_thread_cf_ref(NULL), controller_thread_running(false),
         notify_port(NULL), notify_source(NULL), deviter(NULL),
         actual_fwchan(-1), is_streaming(false), avstream(NULL), logger(NULL),
