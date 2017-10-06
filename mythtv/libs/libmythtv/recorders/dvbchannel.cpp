@@ -282,6 +282,53 @@ bool DVBChannel::Open(DVBChannel *who)
     symbol_rate_minimum = info.symbol_rate_min;
     symbol_rate_maximum = info.symbol_rate_max;
 
+#if DVB_API_VERSION >=5
+    unsigned int i;
+    struct dtv_property prop;
+    struct dtv_properties cmd;
+
+    memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_API_VERSION;
+    cmd.num = 1;
+    cmd.props = &prop;
+    if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("dvb api version %1.%2").arg((prop.u.data>>8)&0xff).arg((prop.u.data)&0xff));
+    }
+
+    memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_ENUM_DELSYS;
+    cmd.num = 1;
+    cmd.props = &prop;
+
+    if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
+    {
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("num props %1").arg(prop.u.buffer.len));
+        for (i = 0; i < prop.u.buffer.len; i++)
+        {
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("delsys %1: %2 %3")
+                    .arg(i).arg(prop.u.buffer.data[i])
+                    .arg(DTVModulationSystem::toString(prop.u.buffer.data[i])));
+            switch (prop.u.buffer.data[i])
+            {
+                // TODO: not supported. you can have DVBC and DVBT on the same card
+                // The following are backwards compatible so its ok
+                case SYS_DVBS2:
+                    tunerType = DTVTunerType::kTunerTypeDVBS2;
+                    break;
+                case SYS_DVBT2:
+                    tunerType = DTVTunerType::kTunerTypeDVBT2;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+#endif
+
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("Using DVB card %1, with frontend '%2'.")
             .arg(device).arg(frontend_name));
@@ -549,11 +596,13 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         return NULL;
     }
 
+    LOG(VB_CHANNEL, LOG_DEBUG, "DVBChan: modsys " + tuning.mod_sys.toString());
+
     cmdseq = (struct dtv_properties*) calloc(1, sizeof(*cmdseq));
     if (!cmdseq)
         return NULL;
 
-    cmdseq->props = (struct dtv_property*) calloc(12, sizeof(*(cmdseq->props)));
+    cmdseq->props = (struct dtv_property*) calloc(20, sizeof(*(cmdseq->props)));
     if (!(cmdseq->props))
     {
         free(cmdseq);
@@ -566,6 +615,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         can_fec_auto = false;
 
     if (tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
+        tuner_type == DTVTunerType::kTunerTypeDVBT ||
         tuner_type == DTVTunerType::kTunerTypeDVBT2)
     {
         cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
@@ -838,7 +888,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         if (tuning_delay)
             usleep(tuning_delay * 1000);
 
-        wait_for_backend(fd_frontend, 5 /* msec */);
+        wait_for_backend(fd_frontend, 50 /* msec */);
 
         prev_tuning = tuning;
         first_tune = false;
@@ -1051,6 +1101,57 @@ bool DVBChannel::HasLock(bool *ok) const
     return status & FE_HAS_LOCK;
 }
 
+#if DVB_API_VERSION >=5
+// documented in dvbchannel.h
+double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
+{
+    struct dtv_property prop;
+    struct dtv_properties cmd;
+
+    memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_STAT_SIGNAL_STRENGTH;
+    cmd.num = 1;
+    cmd.props = &prop;
+    int ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("FE DTV signal strength ret=%1 res=%2 len=%3 scale=%4 val=%5")
+        .arg(ret)
+        .arg(cmd.props->result)
+        .arg(cmd.props->u.st.len)
+        .arg(cmd.props->u.st.stat[0].scale)
+        .arg(cmd.props->u.st.stat[0].svalue)
+        );
+    bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
+    if (ok)
+        *ok = tmpOk;
+    double value = 0;
+    if (tmpOk)
+    {
+        if (cmd.props->u.st.stat[0].scale == FE_SCALE_DECIBEL)
+        {
+            // -20dB is a great signal so make that 100%
+            // svalue is in 0.001 dB
+            value = cmd.props->u.st.stat[0].svalue + 20000.0;
+            if (value > 0)
+                value = 0;
+            // 10000 is 0.001 conversion to Bel (power not voltage)
+            value = exp10(value / 10000.0);
+        }
+        else
+        {
+            // returned as 16 bit unsigned
+            value = cmd.props->u.st.stat[0].svalue / 65535.0;
+        }
+    }
+    else
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            "Getting V5 Frontend signal strength failed." + ENO);
+    }
+    return value;
+}
+#endif
+
 // documented in dvbchannel.h
 double DVBChannel::GetSignalStrength(bool *ok) const
 {
@@ -1070,6 +1171,12 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     int ret = ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &sig);
     if (ret < 0)
     {
+#if DVB_API_VERSION >=5
+        if (errno == EOPNOTSUPP)
+        {
+            return GetSignalStrengthDVBv5(ok);
+        }
+#endif
         LOG(VB_RECORD, LOG_ERR, LOC +
             "Getting Frontend signal strength failed." + ENO);
     }
@@ -1079,6 +1186,50 @@ double DVBChannel::GetSignalStrength(bool *ok) const
 
     return sig * (1.0 / 65535.0);
 }
+
+#if DVB_API_VERSION >=5
+// documented in dvbchannel.h
+double DVBChannel::GetSNRDVBv5(bool *ok) const
+{
+    struct dtv_property prop;
+    struct dtv_properties cmd;
+
+    memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_STAT_CNR;
+    cmd.num = 1;
+    cmd.props = &prop;
+    int ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
+    bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
+    if (ok)
+        *ok = tmpOk;
+    double value = 0;
+    if (tmpOk)
+    {
+        if (cmd.props->u.st.stat[0].scale == FE_SCALE_DECIBEL)
+        {
+            // svalue is in 0.001 dB
+            value = cmd.props->u.st.stat[0].svalue;
+            // let 10dB+ CNR be 100% quality
+            value -= 10000;
+            if (value > 0)
+                value = 0;
+            // 10000 is 0.001 conversion to Bel (power not voltage)
+            value = exp10(value / 10000.0);
+        }
+        else if (cmd.props->u.st.stat[0].scale == FE_SCALE_RELATIVE)
+        {
+            // returned as 16 bit unsigned
+            value = cmd.props->u.st.stat[0].svalue / 65535.0;
+        }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Getting V5 Frontend signal/noise ratio failed." + ENO);
+    }
+    return value;
+}
+#endif
 
 // documented in dvbchannel.h
 double DVBChannel::GetSNR(bool *ok) const
@@ -1099,6 +1250,12 @@ double DVBChannel::GetSNR(bool *ok) const
     int ret = ioctl(fd_frontend, FE_READ_SNR, &snr);
     if (ret < 0)
     {
+#if DVB_API_VERSION >=5
+        if (errno == EOPNOTSUPP)
+        {
+            return GetSNRDVBv5(ok);
+        }
+#endif
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend signal/noise ratio failed." + ENO);
     }
@@ -1108,6 +1265,45 @@ double DVBChannel::GetSNR(bool *ok) const
 
     return snr * (1.0 / 65535.0);
 }
+
+#if DVB_API_VERSION >=5
+// documented in dvbchannel.h
+double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
+{
+    struct dtv_property prop[2];
+    struct dtv_properties cmd;
+
+    memset(&prop, 0, sizeof(prop));
+    prop[0].cmd = DTV_STAT_POST_ERROR_BIT_COUNT;
+    prop[1].cmd = DTV_STAT_POST_TOTAL_BIT_COUNT;
+    cmd.num = 2;
+    cmd.props = prop;
+    int ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
+    bool tmpOk = (ret == 0) &&
+            (cmd.props[0].u.st.len > 0) &&
+            (cmd.props[1].u.st.len > 0);
+    if (ok)
+        *ok = tmpOk;
+    double value = 0;
+    if (tmpOk)
+    {
+        if ((cmd.props[0].u.st.stat[0].scale == FE_SCALE_COUNTER) &&
+            (cmd.props[1].u.st.stat[1].scale == FE_SCALE_COUNTER) &&
+            (cmd.props[1].u.st.stat[0].uvalue != 0))
+        {
+            value = static_cast<double>(
+                    static_cast<long double>(cmd.props[0].u.st.stat[0].uvalue) /
+                    cmd.props[1].u.st.stat[0].uvalue);
+        }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Getting V5 Frontend signal error rate failed." + ENO);
+    }
+    return value;
+}
+#endif
 
 // documented in dvbchannel.h
 double DVBChannel::GetBitErrorRate(bool *ok) const
@@ -1125,6 +1321,12 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
     int ret = ioctl(fd_frontend, FE_READ_BER, &ber);
     if (ret < 0)
     {
+#if DVB_API_VERSION >=5
+        if (errno == EOPNOTSUPP)
+        {
+            return GetBitErrorRateDVBv5(ok);
+        }
+#endif
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend signal error rate failed." + ENO);
     }
@@ -1134,6 +1336,38 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
 
     return (double) ber;
 }
+
+#if DVB_API_VERSION >=5
+// documented in dvbchannel.h
+double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
+{
+    struct dtv_property prop;
+    struct dtv_properties cmd;
+
+    memset(&prop, 0, sizeof(prop));
+    prop.cmd = DTV_STAT_ERROR_BLOCK_COUNT;
+    cmd.num = 1;
+    cmd.props = &prop;
+    int ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
+    bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
+    if (ok)
+        *ok = tmpOk;
+    double value = 0;
+    if (tmpOk)
+    {
+        if (cmd.props->u.st.stat[0].scale == FE_SCALE_COUNTER)
+            value = cmd.props->u.st.stat[0].svalue;
+        else
+            value = 0;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Getting V5 Frontend uncorrected block count failed." + ENO);
+    }
+    return value;
+}
+#endif
 
 // documented in dvbchannel.h
 double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
@@ -1151,6 +1385,12 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
     int ret = ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &ublocks);
     if (ret < 0)
     {
+#if DVB_API_VERSION >=5
+        if (errno == EOPNOTSUPP)
+        {
+            return GetUncorrectedBlockCountDVBv5(ok);
+        }
+#endif
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend uncorrected block count failed." + ENO);
     }

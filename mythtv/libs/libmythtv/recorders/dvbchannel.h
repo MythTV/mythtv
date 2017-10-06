@@ -106,6 +106,25 @@ class DVBChannel : public DTVChannel
     const DVBChannel *GetMasterLock(void) const;
     static void ReturnMasterLock(DVBChannelCP &dvbm);
 
+    /// \brief Get Signal strength from the DVBv5 interface [0-1.0]
+    /// It is transformed to a linear relative scale if provided in dB
+    /// \param ok   set to true if provided and value exists
+    /// \return linear signal strength in [0.0-1.0]
+    double GetSignalStrengthDVBv5(bool *ok) const;
+    /// \brief Get SNR from the DVBv5 interface [0-1.0]
+    /// It is transformed to a linear relative scale if provided in dB
+    /// \param ok   set to true if provided and value exists
+    /// \return linear SNR in [0.0-1.0]
+    double GetSNRDVBv5(bool *ok) const;
+    /// \brief Get Bit Error Rate from the DVBv5 interface
+    /// \param ok   set to true if provided and value exists
+    /// \return bit error rate
+    double GetBitErrorRateDVBv5(bool *ok) const;
+    /// \brief Get Uncorrected Block Count from the DVBv5 interface
+    /// \param ok   set to true if provided and value exists
+    /// \return     block count
+    double GetUncorrectedBlockCountDVBv5(bool *ok) const;
+
   private:
     IsOpenMap         is_open;
 
