@@ -183,7 +183,8 @@ void connectToDatabase(void)
         exit(mysql_errno(&g_dbConn));
     }
 
-    g_dbConn.reconnect = 1;
+    my_bool reconnect = 1;
+    mysql_options(&g_dbConn, MYSQL_OPT_RECONNECT, &reconnect);
 
     if (!mysql_real_connect(&g_dbConn, g_server.c_str(), g_user.c_str(),
          g_password.c_str(), 0, 0, 0, 0))
