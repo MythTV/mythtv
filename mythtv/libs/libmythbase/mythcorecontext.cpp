@@ -349,6 +349,8 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
                 "to itself!");
         return false;
     }
+    if (IsExiting())
+        return false;
 
     QString server = GetMasterServerIP();
     if (server.isEmpty())
