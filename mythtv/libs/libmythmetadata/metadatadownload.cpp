@@ -148,7 +148,7 @@ void MetadataDownload::run()
             if (list[0]->GetAutomatic() && list.count() > 1
                 && list[0]->GetStep() == kLookupSearch)
             {
-                MetadataLookup *bestLookup = findBestMatch(list, lookup->GetTitle());
+                MetadataLookup *bestLookup = findBestMatch(list, lookup->GetBaseTitle());
                 if (bestLookup)
                 {
                     MetadataLookup *newlookup = bestLookup;
@@ -172,7 +172,7 @@ void MetadataDownload::run()
 
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Returning Metadata Results: %1 %2 %3")
-                    .arg(lookup->GetTitle()).arg(lookup->GetSeason())
+                    .arg(lookup->GetBaseTitle()).arg(lookup->GetSeason())
                     .arg(lookup->GetEpisode()));
             QCoreApplication::postEvent(m_parent,
                 new MetadataLookupEvent(list));
@@ -183,7 +183,7 @@ void MetadataDownload::run()
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Metadata Lookup Failed: No Results %1 %2 %3")
-                        .arg(lookup->GetTitle()).arg(lookup->GetSeason())
+                        .arg(lookup->GetBaseTitle()).arg(lookup->GetSeason())
                         .arg(lookup->GetEpisode()));
             }
             if (m_parent)
@@ -210,7 +210,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     for (MetadataLookupList::const_iterator i = list.begin();
             i != list.end(); ++i)
     {
-        QString title = (*i)->GetTitle();
+        QString title = (*i)->GetBaseTitle();
         if (title == originaltitle)
         {
             ret = (*i);
@@ -260,7 +260,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     MetadataLookupList::const_iterator i = list.begin();
     for (; i != list.end(); ++i)
     {
-        if ((*i)->GetTitle() == bestTitle)
+        if ((*i)->GetBaseTitle() == bestTitle)
         {
             ret = (*i);
             break;
@@ -526,12 +526,12 @@ MetadataLookupList MetadataDownload::handleMovie(MetadataLookup *lookup)
     }
     else if (lookup->GetStep() == kLookupSearch)
     {
-        if (lookup->GetTitle().isEmpty())
+        if (lookup->GetBaseTitle().isEmpty())
         {
             // no point searching on nothing...
             return list;
         }
-        list = grabber.Search(lookup->GetTitle(), lookup);
+        list = grabber.Search(lookup->GetBaseTitle(), lookup);
     }
 
     return list;
@@ -582,7 +582,7 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
         if (!lookup->GetSubtitle().isEmpty())
         {
             list = grabber.SearchSubtitle(lookup->GetInetref(),
-                                          lookup->GetTitle() /* unused */,
+                                          lookup->GetBaseTitle() /* unused */,
                                           lookup->GetSubtitle(), lookup, false);
         }
 
@@ -608,19 +608,19 @@ MetadataLookupList MetadataDownload::handleTelevision(MetadataLookup *lookup)
     }
     else if (lookup->GetStep() == kLookupSearch)
     {
-        if (lookup->GetTitle().isEmpty())
+        if (lookup->GetBaseTitle().isEmpty())
         {
             // no point searching on nothing...
             return list;
         }
         if (!lookup->GetSubtitle().isEmpty())
         {
-            list = grabber.SearchSubtitle(lookup->GetTitle(),
+            list = grabber.SearchSubtitle(lookup->GetBaseTitle(),
                                           lookup->GetSubtitle(), lookup, false);
         }
         if (list.isEmpty())
         {
-            list = grabber.Search(lookup->GetTitle(), lookup);
+            list = grabber.Search(lookup->GetBaseTitle(), lookup);
         }
     }
     else if (lookup->GetStep() == kLookupCollection)
@@ -685,7 +685,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(MetadataLookup *look
 
     MetadataLookupList list;
 
-    if (lookup->GetTitle().isEmpty())
+    if (lookup->GetBaseTitle().isEmpty())
     {
         // no point searching on nothing...
         return list;
@@ -705,7 +705,7 @@ MetadataLookupList MetadataDownload::handleRecordingGeneric(MetadataLookup *look
         lookup->SetEpisode(1);
     }
 
-    list = grabber.Search(lookup->GetTitle(), lookup);
+    list = grabber.Search(lookup->GetBaseTitle(), lookup);
 
     if (list.count() == 1)
     {

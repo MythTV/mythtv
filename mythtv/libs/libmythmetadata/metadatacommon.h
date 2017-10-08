@@ -249,7 +249,13 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetDownloads(ArtworkMap map) { m_downloads = map; };
 
     // General Sets
-    void SetTitle(const QString &title) { m_title = title; };
+    void SetTitle(const QString &title)
+    {
+        m_title = title;
+        QString manRecSuffix = QString(" (%1)").arg(QObject::tr("Manual Record"));
+        m_base_title = title;  // m_title with " (Manual Record)" stripped.
+        m_base_title.replace(manRecSuffix,"");
+    };
     void SetFilename(const QString &filename) { m_filename = filename; };
 
     // General Sets - Video
@@ -287,6 +293,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     // General
     QString GetFilename() const { return m_filename; };
     QString GetTitle() const { return m_title; };
+    QString GetBaseTitle() const { return m_base_title; };
     QStringList GetCategories() const { return m_categories; };
     float GetUserRating() const { return m_userrating; };
     uint GetRatingCount() const { return m_ratingcount; };
@@ -375,6 +382,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 
     QString m_filename;
     QString m_title;
+    QString m_base_title;  // m_title with " (Manual Record)" stripped.
     QString m_network;
     QString m_status;
     const QStringList m_categories;
