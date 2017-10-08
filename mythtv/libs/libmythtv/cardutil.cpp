@@ -534,7 +534,6 @@ QString CardUtil::ProbeDVBType(const QString &device)
     }
 #endif // HAVE_FE_CAN_2G_MODULATION
     ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
-#endif // USING_DVB
 
 #if DVB_API_VERSION >=5
     unsigned int i;
@@ -569,6 +568,8 @@ QString CardUtil::ProbeDVBType(const QString &device)
 #endif
 
     close(fd_frontend);
+
+#endif // USING_DVB
 
     return ret;
 }
