@@ -1290,7 +1290,7 @@ bool MythUIType::ParseElement(
         MythUIAnimation::ParseElement(element, this);
     }
     else {
-        if (showWarnings) {
+        if (false && showWarnings) {
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                         QString("Unknown tag '%1'").arg(element.tagName()));
         }
