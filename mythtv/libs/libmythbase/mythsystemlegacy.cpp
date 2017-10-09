@@ -319,6 +319,8 @@ void MythSystemLegacy::Signal(MythSignal sig)
     int posix_signal = SIGTRAP;
     switch (sig)
     {
+        case kSignalNone: break;
+        case kSignalUnknown: break;
         case kSignalHangup: posix_signal = SIGHUP; break;
         case kSignalInterrupt: posix_signal = SIGINT; break;
         case kSignalContinue: posix_signal = SIGCONT; break;
@@ -336,7 +338,8 @@ void MythSystemLegacy::Signal(MythSignal sig)
     // case that is missed print out a message.
     if (SIGTRAP == posix_signal)
     {
-        LOG(VB_SYSTEM, LOG_ERR, "Programmer error: Unknown signal");
+        LOG(VB_SYSTEM, LOG_ERR,
+            QString("Programmer error: Unknown signal %1").arg(sig));
         return;
     }
 

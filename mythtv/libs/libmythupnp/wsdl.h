@@ -52,8 +52,7 @@ class UPNP_PUBLIC Wsdl : public QDomDocument
         QDomElement CreateBindingOperation( MethodInfo    &oInfo,
                                             const QString &sClassName );
 
-        QDomElement CreateMessage         ( MethodInfo   &oInfo,
-                                            QString       sMsgName, 
+        QDomElement CreateMessage         ( QString       sMsgName, 
                                             QString       sTypeName );
 
         QDomElement CreateMethodType      ( MethodInfo   &oInfo,

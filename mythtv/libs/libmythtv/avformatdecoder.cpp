@@ -219,6 +219,7 @@ static int has_codec_parameters(AVStream *st)
             break;
         case AVMEDIA_TYPE_DATA:
             if(avctx->codec_id == AV_CODEC_ID_NONE) return 1;
+            [[clang::fallthrough]];
         default:
             break;
     }
@@ -246,6 +247,7 @@ static bool force_sw_decode(AVCodecContext *avctx)
                 default:
                     break;
             }
+            break;
         default:
             break;
     }
@@ -1426,7 +1428,7 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 
 #ifdef USING_VDPAU
 static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
-                                           const enum AVPixelFormat *fmt)
+                                           const enum AVPixelFormat *valid_fmts)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
@@ -1439,7 +1441,15 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                 render_wrapper_vdpau;
         }
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_VDPAU : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_VDPAU))
+            return AV_PIX_FMT_VDPAU;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -1449,10 +1459,8 @@ static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
                                            const enum AVPixelFormat *) MUNUSED;
 
 enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
-                                    const enum AVPixelFormat *fmt)
+                                    const enum AVPixelFormat *valid_fmts)
 {
-    if (!fmt)
-        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1460,7 +1468,15 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_DXVA2_VLD : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_DXVA2_VLD))
+            return AV_PIX_FMT_DXVA2_VLD;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -1477,10 +1493,8 @@ static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
                                          const enum AVPixelFormat *) MUNUSED;
 
 enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
-                                         const enum AVPixelFormat *fmt)
+                                         const enum AVPixelFormat *valid_fmts)
 {
-    if (!fmt)
-        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1488,7 +1502,15 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_VAAPI_VLD : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_VAAPI_VLD))
+            return AV_PIX_FMT_VAAPI_VLD;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -2837,7 +2859,7 @@ void release_avf_buffer(void *opaque, uint8_t *data)
 }
 
 #ifdef USING_VDPAU
-int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags)
+int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame   = nd->GetPlayer()->GetNextVideoFrame();
@@ -2910,7 +2932,7 @@ int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
 #endif // USING_VDPAU
 
 #ifdef USING_DXVA2
-int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags)
+int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
@@ -2936,7 +2958,7 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags)
 #endif
 
 #ifdef USING_VAAPI
-int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
+int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();

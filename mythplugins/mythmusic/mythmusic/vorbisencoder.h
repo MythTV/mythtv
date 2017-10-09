@@ -18,7 +18,6 @@ class VorbisEncoder : public Encoder
     ogg_page og;
     ogg_packet op;
     long packetsdone;
-    int eos;
     long bytes_written;
     vorbis_comment vc;
     ogg_stream_state os;

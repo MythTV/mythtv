@@ -17,8 +17,10 @@ class PlaybackBoxListItem : public MythUIButtonListItem
 //    virtual void SetToRealButton(MythUIStateType *button, bool selected);
 
   private:
+#ifdef INCLUDE_UNFINISHED
     PlaybackBox *pbbox;
     bool         needs_update;
+#endif
 };
 
 #endif // _PLAYBACKBOXLISTITEM_H_

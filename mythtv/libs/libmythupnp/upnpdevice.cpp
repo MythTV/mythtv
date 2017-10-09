@@ -338,23 +338,12 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpDeviceDesc::GetValidXML(
-    const QString &sBaseAddress, int nPort,
+    const QString &/*sBaseAddress*/, int /*nPort*/,
     QTextStream &os, const QString &sUserAgent )
 {
 #if 0
     os.setEncoding( QTextStream::UnicodeUTF8 );
 #endif
-
-    QString BaseAddr;
-    QHostAddress addr(sBaseAddress);
-
-    BaseAddr = sBaseAddress;
-
-    // Basically if it appears to be an IPv6 IP surround the IP with []
-    //  otherwise don't bother
-    if (sBaseAddress.contains(":"))
-        BaseAddr = "[" + sBaseAddress + "]";
-
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
           "<root xmlns=\"urn:schemas-upnp-org:device-1-0\" "
           " xmlns:mythtv=\"mythtv.org\">\n"

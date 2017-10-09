@@ -38,7 +38,6 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
                              MusicMetadata *metadata) :
     Encoder(outfile, qualitylevel, metadata),
     packetsdone(0),
-    eos(0),
     bytes_written(0L)
 {
     vorbis_comment_init(&vc);

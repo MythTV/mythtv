@@ -11,8 +11,7 @@ class ClassicLogoDetector : public LogoDetectorBase
 {
   public:
     ClassicLogoDetector(ClassicCommDetector* commDetector,unsigned int width,
-        unsigned int height, unsigned int commdetectborder,
-        unsigned int xspacing, unsigned int yspacing);
+        unsigned int height, unsigned int commdetectborder);
     virtual void deleteLater(void);
 
     bool searchForLogo(MythPlayer* player);
@@ -31,8 +30,6 @@ class ClassicLogoDetector : public LogoDetectorBase
 
     ClassicCommDetector* commDetector;
     unsigned int frameNumber;
-    bool previousFrameWasSceneChange;
-    unsigned int xspacing, yspacing;
     unsigned int commDetectBorder;
 
     int commDetectLogoSamplesNeeded;
@@ -51,7 +48,6 @@ class ClassicLogoDetector : public LogoDetectorBase
     unsigned char *tmpBuf;
 
     int logoEdgeDiff;
-    unsigned int logoFrameCount;
     unsigned int logoMinX;
     unsigned int logoMaxX;
     unsigned int logoMinY;

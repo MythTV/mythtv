@@ -116,6 +116,7 @@ void Animation::updateCurrentValue(const QVariant &value)
 
         switch (m_type)
         {
+        case None:           break;
         case Position:       m_parent->SetPosition(value.toPoint()); break;
         case Alpha:          m_parent->SetAlpha(value.toInt()); break;
         case Zoom:           m_parent->SetZoom(value.toFloat()); break;

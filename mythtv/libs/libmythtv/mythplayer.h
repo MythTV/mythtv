@@ -252,8 +252,7 @@ class MTV_PUBLIC MythPlayer
 
     // Transcode stuff
     void InitForTranscode(bool copyaudio, bool copyvideo);
-    bool TranscodeGetNextFrame(frm_dir_map_t::iterator &dm_iter,
-                               int &did_ff, bool &is_key, bool honorCutList);
+    bool TranscodeGetNextFrame(int &did_ff, bool &is_key, bool honorCutList);
     bool WriteStoredData(
         RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
     long UpdateStoredFrameNum(long curFrameNum);
@@ -381,8 +380,8 @@ class MTV_PUBLIC MythPlayer
 
     // Non-public sets
     virtual void SetBookmark(bool clear = false);
-    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout);
-    bool RemovePIPPlayer(MythPlayer *pip, uint timeout);
+    bool AddPIPPlayer(MythPlayer *pip, PIPLocation loc);
+    bool RemovePIPPlayer(MythPlayer *pip);
     void NextScanType(void)
         { SetScanType((FrameScanType)(((int)m_scan + 1) & 0x3)); }
     void SetScanType(FrameScanType);

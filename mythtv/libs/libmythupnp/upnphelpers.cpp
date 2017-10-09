@@ -109,7 +109,7 @@ namespace DLNA
 {
 
 QString DLNAProfileName(const QString &mimeType, const QSize &resolution,
-                        const double videoFrameRate, const QString &container,
+                        const double /*videoFrameRate*/, const QString &container,
                         const QString &vidCodec, const QString &audioCodec)
 {
     QString sProfileName;

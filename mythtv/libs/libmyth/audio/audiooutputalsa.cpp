@@ -261,6 +261,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
     snd_ctl_elem_id_set_interface(id, SND_CTL_ELEM_IFACE_PCM);
     snd_ctl_elem_id_set_name(id, "ELD");
     snd_ctl_elem_id_set_device(id, device);
+    snd_ctl_elem_id_set_subdevice(id, subdevice);
     if ((err = snd_hctl_open(&hctl,
                              QString("hw:%1").arg(card).toLatin1().constData(),
                              0)) < 0)

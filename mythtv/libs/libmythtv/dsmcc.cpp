@@ -630,7 +630,7 @@ static unsigned long crc_table[256] =
 
 static uint32_t crc32(const unsigned char *data, int len)
 {
-    register int i;
+    int i;
     uint32_t crc = 0xffffffff;
 
     for (i = 0; i < len; i++)

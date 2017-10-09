@@ -4819,9 +4819,9 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     else if (has_action("STRETCHDEC", actions))
         ChangeTimeStretch(ctx, -1);
     else if (has_action("MENU", actions))
-        ShowOSDMenu(ctx);
+        ShowOSDMenu();
     else if (has_action(ACTION_MENUCOMPACT, actions))
-        ShowOSDMenu(ctx, true);
+        ShowOSDMenu(true);
     else if (has_action("INFO", actions) ||
              has_action("INFOWITHCUTLIST", actions))
     {
@@ -4933,7 +4933,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         if (islivetv)
             browsehelper->BrowseStart(ctx);
         else if (!isDVD)
-            ShowOSDMenu(ctx);
+            ShowOSDMenu();
         else
             handled = false;
     }
@@ -5900,7 +5900,7 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
             {
                 PIPLocation loc = mctx->player->GetNextPIPLocation();
                 if (loc != kPIP_END)
-                    ok = mctx->player->AddPIPPlayer(pipctx->player, loc, 4000);
+                    ok = mctx->player->AddPIPPlayer(pipctx->player, loc);
             }
             mctx->deletePlayerLock.unlock();
             pipctx->deletePlayerLock.unlock();
@@ -5930,7 +5930,7 @@ bool TV::PIPRemovePlayer(PlayerContext *mctx, PlayerContext *pipctx)
     bool ok = false;
     multi_lock(&mctx->deletePlayerLock, &pipctx->deletePlayerLock, NULL);
     if (mctx->player && pipctx->player)
-        ok = mctx->player->RemovePIPPlayer(pipctx->player, 4000);
+        ok = mctx->player->RemovePIPPlayer(pipctx->player);
     mctx->deletePlayerLock.unlock();
     pipctx->deletePlayerLock.unlock();
 
@@ -7402,7 +7402,7 @@ void TV::SwitchInputs(PlayerContext *ctx,
     ITVRestart(ctx, true);
 }
 
-void TV::ToggleChannelFavorite(PlayerContext *ctx)
+void TV::ToggleChannelFavorite(PlayerContext */*ctx*/)
 {
     // TOGGLEFAV was broken in [20523], this just prints something
     // out so as not to cause further confusion. See #8948.
@@ -8502,12 +8502,12 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 
 bool TV::IsTunable(const PlayerContext *ctx, uint chanid)
 {
-    return !IsTunableOn(this, ctx, chanid).empty();
+    return !IsTunableOn(ctx, chanid).empty();
 }
 
 bool TV::IsTunable(uint chanid)
 {
-    return !IsTunableOn(NULL, NULL, chanid).empty();
+    return !IsTunableOn(NULL, chanid).empty();
 }
 
 static QString toCommaList(const QSet<uint> &list)
@@ -8523,12 +8523,6 @@ static QString toCommaList(const QSet<uint> &list)
 }
 
 QSet<uint> TV::IsTunableOn(
-    const PlayerContext *ctx, uint chanid)
-{
-    return IsTunableOn(this, ctx, chanid);
-}
-
-QSet<uint> TV::IsTunableOn(TV *tv,
     const PlayerContext *ctx, uint chanid)
 {
     QSet<uint> tunable_cards;
@@ -8588,18 +8582,8 @@ bool TV::StartEmbedding(const QRect &embedRect)
     if (!ctx)
         return false;
 
-    WId wid;
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    // BUG: With Qt5.4/EGLFS, winId() causes a SEGV when using OpenMAX video.
-    // PlayerContext::StartEmbedding ignores wid so set it to 0.
-    if (qApp->platformName().contains("egl"))
-        wid = 0;
-    else
-#endif
-    wid = GetMythMainWindow()->GetPaintWindow()->winId();
-
     if (!ctx->IsNullVideoDesired())
-        ctx->StartEmbedding(wid, embedRect);
+        ctx->StartEmbedding(embedRect);
     else
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -8843,7 +8827,7 @@ void TV::DoEditSchedule(int editType)
     }
 }
 
-void TV::EditSchedule(const PlayerContext *ctx, int editType)
+void TV::EditSchedule(const PlayerContext */*ctx*/, int editType)
 {
     // post the request so the guide will be created in the UI thread
     QString message = QString("START_EPG %1").arg(editType);
@@ -11184,6 +11168,9 @@ bool MenuBase::LoadStringHelper(const QString &text,
                                 int includeLevel)
 {
     bool result = false;
+
+    m_translationContext = translationContext;
+    m_keyBindingContext = keyBindingContext;
     m_document = new QDomDocument();
     if (m_document->setContent(text))
     {
@@ -12376,7 +12363,7 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-void TV::PlaybackMenuDeinit(const MenuBase &menu)
+void TV::PlaybackMenuDeinit(const MenuBase &/*menu*/)
 {
     ReturnOSDLock(m_tvmCtx, m_tvmOsd);
     ReturnPlayerLock(m_tvmCtx);
@@ -12466,7 +12453,7 @@ void TV::MenuStrings(void) const
     tr("Cut List Options");
 }
 
-void TV::ShowOSDMenu(const PlayerContext *ctx, bool isCompact)
+void TV::ShowOSDMenu(bool isCompact)
 {
     if (!m_playbackMenu.IsLoaded())
     {

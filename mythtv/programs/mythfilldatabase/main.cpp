@@ -230,20 +230,20 @@ int main(int argc, char *argv[])
                 if (!ok)
                 {
                     cerr << warn.toLocal8Bit().constData() << endl;
-                    return false;
+                    return 0;
                 }
 
                 uint upper = r[1].toUInt(&ok);
                 if (!ok)
                 {
                     cerr << warn.toLocal8Bit().constData() << endl;
-                    return false;
+                    return 0;
                 }
 
                 if (lower > upper)
                 {
                     cerr << warn.toLocal8Bit().constData() << endl;
-                    return false;
+                    return 0;
                 }
 
                 for (uint j = lower; j <= upper; ++j)
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
                 if (!ok)
                 {
                     cerr << warn.toLocal8Bit().constData() << endl;
-                    return false;
+                    return 0;
                 }
 
                 fill_data.SetRefresh(day, true);

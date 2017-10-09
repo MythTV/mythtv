@@ -494,6 +494,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         canvas.setHeight(canvas.height() + shadow.y());
     }
 
+    p->SetClipRect(clipRect);
     p->DrawTextLayout(canvas, m_Layouts, formats,
                       *GetFontProperties(), alpha, drawrect);
 }

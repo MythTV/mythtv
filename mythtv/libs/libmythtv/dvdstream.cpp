@@ -66,6 +66,14 @@ DVDStream::~DVDStream()
     rwlock.unlock();
 }
 
+/** \fn DVDStream::OpenFile(const QString &, uint)
+ *  \brief Opens a dvd device for streaming.
+ *
+ *  \param lfilename   Path of the dvd device to read.
+ *  \param retry_ms    Ignored. This value is part of the API
+ *                     inherited from the parent class.
+ *  \return Returns true if the dvd was opened.
+ */
 bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
 {
     rwlock.lockForWrite();

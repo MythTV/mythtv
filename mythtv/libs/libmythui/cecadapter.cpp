@@ -254,6 +254,7 @@ class CECAdapterPriv
             case CEC_LOG_WARNING: lvl = LOG_WARNING; break;
             case CEC_LOG_NOTICE:  lvl = LOG_INFO;    break;
             case CEC_LOG_DEBUG:   lvl = LOG_DEBUG;   break;
+            default: break;
         }
         LOG(VB_GENERAL, lvl, LOC + QString("%1").arg(msg));
         return 1;
@@ -269,6 +270,7 @@ class CECAdapterPriv
             case CEC_LOG_WARNING: lvl = LOG_WARNING; break;
             case CEC_LOG_NOTICE:  lvl = LOG_INFO;    break;
             case CEC_LOG_DEBUG:   lvl = LOG_DEBUG;   break;
+            default: break;
         }
         LOG(VB_GENERAL, lvl, LOC + QString("%1").arg(msg));
     }
@@ -652,6 +654,10 @@ class CECAdapterPriv
             case CEC_USER_CONTROL_CODE_POWER_OFF_FUNCTION:
                 code = "POWER_OFF_FUNCTION";
                 break;
+
+            default:
+                code = QString("UNKNOWN_FUNCTION_%1").arg(key.keycode);
+                break;
         }
 
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Keypress %1 %2")
@@ -982,6 +988,10 @@ class CECAdapterPriv
                 break;
             case CEC_USER_CONTROL_CODE_POWER_OFF_FUNCTION:
                 code = "POWER_OFF_FUNCTION";
+                break;
+
+            default:
+                code = QString("UNKNOWN_FUNCTION_%1").arg(key->keycode);
                 break;
         }
 

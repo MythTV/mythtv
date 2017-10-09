@@ -14,4 +14,6 @@
 
 typedef QHash<QString,QString> InfoMap;
 
+QString InfoMapToString(const InfoMap &infoMap, const QString &sep="\n");
+
 #endif /* defined(__MythTV__mythtypes__) */

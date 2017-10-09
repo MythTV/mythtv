@@ -869,13 +869,13 @@ static void setupKeys(void)
         "Switch to the radio stream view"), "");
 
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythMusic Media Handler 1/2"), "", "", handleCDMedia,
+        "MythMusic Media Handler 1/2"), "", handleCDMedia,
         MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
     QString filt = MetaIO::ValidFileExtensions;
     filt.replace('|',',');
     filt.remove('.');
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythMusic Media Handler 2/2"), "", "", handleMedia,
+        "MythMusic Media Handler 2/2"), "", handleMedia,
         MEDIATYPE_MMUSIC, filt);
 }
 

@@ -1446,7 +1446,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     return foundit;
 }
 
-QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
+QImage *MythUIHelper::LoadScaleImage(QString filename)
 {
     LOG(VB_GUI | VB_FILE, LOG_INFO,  LOC +
         QString("LoadScaleImage(%1)").arg(filename));
@@ -1546,7 +1546,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     return ret;
 }
 
-QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
+QPixmap *MythUIHelper::LoadScalePixmap(QString filename)
 {
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("LoadScalePixmap(%1)").arg(filename));

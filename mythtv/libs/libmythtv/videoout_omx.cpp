@@ -280,13 +280,14 @@ QStringList VideoOutputOMX::GetAllowedRenderers(
 VideoOutputOMX::VideoOutputOMX() :
     m_render(gCoreContext->GetSetting("OMXVideoRender", VIDEO_RENDER), *this),
     m_imagefx(gCoreContext->GetSetting("OMXVideoFilter", IMAGE_FX), *this),
-    m_context(0),   
-    m_backgroundscreen(0), m_glOsdThread(0), m_changed(false),
-    m_videoPaused(false)
+    m_backgroundscreen(0), m_videoPaused(false)
 {
 #ifdef OSD_EGL
-      m_osdpainter = 0;
-      m_threaded_osdpainter = 0;
+    m_context = 0;
+    m_osdpainter = 0;
+    m_threaded_osdpainter = 0;
+    m_glOsdThread = 0;
+    m_changed = false;
 #endif
     init(&av_pause_frame, FMT_YV12, NULL, 0, 0, 0);
 
@@ -422,7 +423,7 @@ bool VideoOutputOMX::Init(          // Return true if successful
                   kKeepPrebuffer);
 
     // Allocate video buffers
-    if (!CreateBuffers(video_dim_buf, video_dim_disp, winid))
+    if (!CreateBuffers(video_dim_buf, video_dim_disp))
         return false;
 
     bool osdIsSet = false;
@@ -801,7 +802,7 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
 
 // tells show what frame to be show, do other last minute stuff
 // pure virtual
-void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *osd)
+void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType /*scan*/, OSD */*osd*/)
 {
     if (IsErrored())
     {
@@ -843,7 +844,7 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
 
 // BLT the last prepared frame to the screen as quickly as possible.
 // pure virtual
-void VideoOutputOMX::Show(FrameScanType scan)
+void VideoOutputOMX::Show(FrameScanType /*scan*/)
 {
     if (IsErrored())
     {
@@ -1068,8 +1069,7 @@ QStringList VideoOutputOMX::GetVisualiserList(void)
 
 bool VideoOutputOMX::CreateBuffers(
     const QSize &video_dim_buf,     // video buffer size
-    const QSize &video_dim_disp,    // video display size
-    WId winid )
+    const QSize &video_dim_disp)    // video display size
 {
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
 
@@ -1402,8 +1402,10 @@ OMX_ERRORTYPE VideoOutputOMX::UseBuffersCB()
 OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
 {
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
+#ifndef NDEBUG
     const OMX_PARAM_PORTDEFINITIONTYPE &def = cmpnt.PortDef();
     assert(vbuffers.Size() >= def.nBufferCountActual);
+#endif
 
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {

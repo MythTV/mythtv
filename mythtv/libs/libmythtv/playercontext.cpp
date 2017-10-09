@@ -267,7 +267,7 @@ void PlayerContext::ResizePIPWindow(const QRect &rect)
     pipRect = QRect(rect);
 }
 
-bool PlayerContext::StartEmbedding(WId wid, const QRect &embedRect)
+bool PlayerContext::StartEmbedding(const QRect &embedRect)
 {
     bool ret = false;
     LockDeletePlayer(__FILE__, __LINE__);
@@ -360,7 +360,7 @@ bool PlayerContext::CalcPlayerSliderPosition(osdInfo &info,
     QMutexLocker locker(&deletePlayerLock);
     if (player)
     {
-        player->calcSliderPos(info);
+        player->calcSliderPos(info, paddedFields);
         return true;
     }
     return false;
@@ -585,6 +585,9 @@ void PlayerContext::LockPlayingInfo(const char *file, int line) const
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("LockPlayingInfo(%1,%2)")
             .arg(file).arg(line));
+#else
+    Q_UNUSED(file);
+    Q_UNUSED(line);
 #endif
     playingInfoLock.lock();
 }
@@ -594,6 +597,9 @@ void PlayerContext::UnlockPlayingInfo(const char *file, int line) const
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("UnlockPlayingInfo(%1,%2)")
             .arg(file).arg(line));
+#else
+    Q_UNUSED(file);
+    Q_UNUSED(line);
 #endif
     playingInfoLock.unlock();
 }
@@ -608,6 +614,9 @@ void PlayerContext::LockDeletePlayer(const char *file, int line) const
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("LockDeletePlayer(%1,%2)")
             .arg(file).arg(line));
+#else
+    Q_UNUSED(file);
+    Q_UNUSED(line);
 #endif
     deletePlayerLock.lock();
 }
@@ -620,6 +629,9 @@ void PlayerContext::UnlockDeletePlayer(const char *file, int line) const
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("UnlockDeletePlayer(%1,%2)")
             .arg(file).arg(line));
+#else
+    Q_UNUSED(file);
+    Q_UNUSED(line);
 #endif
     deletePlayerLock.unlock();
 }

@@ -1403,7 +1403,6 @@ AllMusic::AllMusic(void) :
     m_numLoaded(0),
     m_metadata_loader(NULL),
     m_done_loading(false),
-    m_last_listed(-1),
 
     m_playcountMin(0),
     m_playcountMax(0),

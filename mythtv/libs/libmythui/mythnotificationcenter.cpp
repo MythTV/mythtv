@@ -1237,7 +1237,7 @@ int NCPrivate::RemoveScreen(MythNotificationScreen *screen)
 /**
  * Re-position screens on display.
  */
-void NCPrivate::RefreshScreenPosition(int from)
+void NCPrivate::RefreshScreenPosition(int /*from*/)
 {
     QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
     QList<MythNotificationScreen*>::iterator itend    = m_screens.end();
@@ -1485,7 +1485,9 @@ void ShowNotificationError(const QString &msg,
                            const VNMask visibility,
                            const MythNotification::Priority priority)
 {
-    ShowNotification(true, msg, from, detail);
+    ShowNotification(true, msg, from, detail,
+                     QString(), QString(), QString(), -1, -1, false,
+                     visibility, priority);
 }
 
 void ShowNotification(const QString &msg,
@@ -1585,6 +1587,7 @@ void ShowNotification(MythNotification::Type type,
     n->SetFullScreen(fullscreen);
     n->SetPriority(priority);
     n->SetVisibility(visibility);
+    n->SetStyle(style);
 
     MythNotificationCenter::GetInstance()->Queue(*n);
     delete n;

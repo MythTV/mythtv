@@ -806,8 +806,15 @@ class VideoDevice : public CaptureCardComboBoxSetting
                               card, driver, false);
     };
 
+    /**
+     *  \param dir      The directory to open and search for devices.
+     *  \param absPath  Ignored. The function always uses absolute paths.
+     */
     void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
     {
+        // Needed to make both compiler and doxygen happy.
+        (void) absPath;
+
         fillSelectionsFromDir(dir, 0, 255, QString::null, QString::null, false);
     }
 
@@ -916,8 +923,15 @@ class VBIDevice : public CaptureCardComboBoxSetting
         return count;
     }
 
+    /**
+     *  \param dir      The directory to open and search for devices.
+     *  \param absPath  Ignored. The function always uses absolute paths.
+     */
     void fillSelectionsFromDir(const QDir &dir, bool absPath = true)
     {
+        // Needed to make both compiler and doxygen happy.
+        (void) absPath;
+
         fillSelectionsFromDir(dir, QString::null, QString::null);
     }
 
@@ -1972,6 +1986,7 @@ void ASIConfigurationGroup::probeCard(const QString &device)
     }
     cardinfo->setValue(tr("Valid DVEO ASI card"));
 #else
+    Q_UNUSED(device);
     cardinfo->setValue(QString("Not compiled with ASI support"));
 #endif
 }
@@ -2988,7 +3003,7 @@ class InputName : public MythUIComboBoxSetting
         QString type = CardUtil::GetRawInputType(cardid);
         QString device = CardUtil::GetVideoDevice(cardid);
         QStringList inputs;
-        CardUtil::GetDeviceInputNames(cardid, device, type, inputs);
+        CardUtil::GetDeviceInputNames(device, type, inputs);
         while (!inputs.isEmpty())
         {
             addSelection(inputs.front());
@@ -3330,7 +3345,7 @@ class DishNetEIT : public MythUICheckBoxSetting
 };
 
 CardInput::CardInput(const QString & cardtype, const QString & device,
-                     bool isNewInput, int _cardid) :
+                     int _cardid) :
     id(new ID()),
     inputname(new InputName(*this)),
     sourceid(new SourceID(*this)),
@@ -3348,7 +3363,7 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     if (CardUtil::IsInNeedOfExternalInputConf(_cardid))
     {
         addChild(new DTVDeviceConfigGroup(*externalInputSettings,
-                                          _cardid, true /*isNewInput*/));
+                                          _cardid, true));
     }
 
     addChild(inputname);
@@ -3882,7 +3897,7 @@ void CardInputEditor::Load(void)
         QString inputname   = query.value(3).toString();
 
         CardInput *cardinput = new CardInput(cardtype, videodevice,
-                                             true, cardid);
+                                             cardid);
         cardinput->loadByID(cardid);
         QString inputlabel = QString("%1 (%2) -> %3")
             .arg(CardUtil::GetDeviceLabel(cardtype, videodevice))

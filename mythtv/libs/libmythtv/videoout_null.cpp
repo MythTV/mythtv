@@ -237,14 +237,9 @@ void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
     disp_timecode = av_pause_frame.disp_timecode;
 }
 
-void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                   FilterChain *filterList,
-                                   const PIPMap &pipPlayers,
-                                   FrameScanType scan)
+void VideoOutputNull::ProcessFrame(VideoFrame */*frame*/, OSD */*osd*/,
+                                   FilterChain */*filterList*/,
+                                   const PIPMap &/*pipPlayers*/,
+                                   FrameScanType /*scan*/)
 {
-    (void)frame;
-    (void)osd;
-    (void)filterList;
-    (void)pipPlayers;
-    (void)scan;
 }

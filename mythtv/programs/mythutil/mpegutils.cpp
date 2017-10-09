@@ -474,7 +474,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
             Output(cat);
     }
 
-    void HandlePMT(uint program_num, const ProgramMapTable *pmt)
+    void HandlePMT(uint /*program_num*/, const ProgramMapTable *pmt)
     {
         if (pmt && (!m_autopts || m_use_pid[pmt->tsheader()->PID()]))
             Output(pmt);
@@ -545,7 +545,7 @@ class PrintATSCMainStreamListener :
         Output(mgt);
     }
 
-    void HandleVCT(uint pid, const VirtualChannelTable *vct)
+    void HandleVCT(uint /*pid*/, const VirtualChannelTable *vct)
     {
         Output(vct);
     }
@@ -666,7 +666,7 @@ class PrintDVBMainStreamListener :
         Output(nit);
     }
 
-    virtual void HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
+    virtual void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
     {
         Output(sdt);
     }
@@ -685,7 +685,7 @@ class PrintDVBOtherStreamListener :
         Output(nit);
     }
 
-    virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
+    virtual void HandleSDTo(uint /*tsid*/, const ServiceDescriptionTable *sdt)
     {
         Output(sdt);
     }

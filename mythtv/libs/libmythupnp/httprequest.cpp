@@ -150,8 +150,10 @@ static QString StaticPage =
     "</HTML>";
 
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
-static const int g_on          = 1;
-static const int g_off         = 0;
+#ifdef USE_SETSOCKOPT
+//static const int g_on          = 1;
+//static const int g_off         = 0;
+#endif
 
 const char *HTTPRequest::m_szServerHeaders = "Accept-Ranges: bytes\r\n";
 
@@ -335,8 +337,8 @@ qint64 HTTPRequest::SendResponse( void )
         case ResponseTypeXML:
         case ResponseTypeHTML:
             // If the reponse isn't already in the buffer, then load it
-            if (!m_sFileName.isEmpty() &&
-                m_response.buffer().isEmpty())
+            if (m_sFileName.isEmpty() || !m_response.buffer().isEmpty())
+                break;
             {
                 QByteArray fileBuffer;
                 QFile file(m_sFileName);
@@ -350,8 +352,7 @@ qint64 HTTPRequest::SendResponse( void )
                 // Let SendResponseFile try or send a 404
                 m_eResponseType = ResponseTypeFile;
             }
-            else
-                break;
+            [[clang::fallthrough]];
         case ResponseTypeFile: // Binary files
             LOG(VB_HTTP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")
@@ -2230,6 +2231,9 @@ QString HTTPRequest::GetRequestType( ) const
     QString type;
     switch ( m_eType )
     {
+        case RequestTypeUnknown :
+            type = "UNKNOWN";
+            break;
         case RequestTypeGet :
             type = "GET";
             break;
@@ -2253,6 +2257,9 @@ QString HTTPRequest::GetRequestType( ) const
             break;
         case RequestTypeUnsubscribe :
             type = "UNSUBSCRIBE";
+            break;
+        case RequestTypeResponse :
+            type = "RESPONSE";
             break;
     }
 

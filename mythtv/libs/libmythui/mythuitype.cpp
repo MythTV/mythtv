@@ -7,6 +7,9 @@
 #include <QKeyEvent>
 #include <QDomDocument>
 
+// XML headers
+#include "xmlparsebase.h"
+
 // Mythbase headers
 #include "mythlogging.h"
 #include "mythmedia.h"
@@ -31,6 +34,8 @@
 #ifdef _MSC_VER
 #  include "compat.h"   // random
 #endif
+
+#define LOC      QString("MythUIType: ")
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
     : QObject(parent)
@@ -1284,8 +1289,13 @@ bool MythUIType::ParseElement(
     {
         MythUIAnimation::ParseElement(element, this);
     }
-    else
+    else {
+        if (showWarnings) {
+            VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
+                        QString("Unknown tag '%1'").arg(element.tagName()));
+        }
         return false;
+    }
 
     return true;
 }

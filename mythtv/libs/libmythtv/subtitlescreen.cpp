@@ -2338,7 +2338,7 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
 }
 
 #ifdef USING_LIBASS
-static void myth_libass_log(int level, const char *fmt, va_list vl, void *ctx)
+static void myth_libass_log(int level, const char *fmt, va_list vl, void */*ctx*/)
 {
     static QString full_line("libass:");
     static const int msg_len = 255;

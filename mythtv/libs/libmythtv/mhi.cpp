@@ -51,11 +51,11 @@ const unsigned kTuneQuietly   = 1U<<0; // b0 tune quietly
 const unsigned kTuneKeepApp   = 1U<<1; // b1 keep app running
 const unsigned kTuneCarId     = 1U<<2; // b2 carousel id in bits 8..16
 const unsigned kTuneCarReset  = 1U<<3; // b3 get carousel id from gateway info
-const unsigned kTuneBcastDisa = 1U<<4; // b4 broadcaster_interrupt disable
+//const unsigned kTuneBcastDisa = 1U<<4; // b4 broadcaster_interrupt disable
 // b5..7 reserverd
 // b8..15 carousel id
-// b16..31 reserved
 const unsigned kTuneKeepChnl  = 1U<<16; // Keep current channel
+// b17..31 reserved
 
 /** \class MHIImageData
  *  \brief Data for items in the interactive television display stack.

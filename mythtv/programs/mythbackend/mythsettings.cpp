@@ -724,7 +724,7 @@ bool load_settings(MythSettingList &settings, const QString &hostname)
     return true;
 }
 
-bool check_settings(MythSettingList &database_settings,
+bool check_settings(MythSettingList &/*database_settings*/,
                     const QMap<QString,QString> &params,
                     QString &result)
 {

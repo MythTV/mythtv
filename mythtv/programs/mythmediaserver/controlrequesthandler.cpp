@@ -22,8 +22,21 @@ bool ControlRequestHandler::AnnounceSocket(void)
     return true;
 }
 
-bool ControlRequestHandler::HandleQuery(SocketHandler *socket,
-                                    QStringList &commands, QStringList &slist)
+/**
+ * \fn ControlRequestHandler::HandleQuery
+ * \brief Dispatch query messages received from a client.
+ *
+ * \param socket   The socket on which the message arrived. This is
+ *                 used to communicate the response back to the sender
+ *                 of the query.
+ * \param commands The command to execute.
+ * \param slist    Additional list arguments to the query. None of the
+ *                 supported queries have any additional arguments, so
+ *                 this variable is never used.
+ */
+bool ControlRequestHandler::HandleQuery(SocketHandler */*socket*/,
+                                        QStringList &commands,
+                                        QStringList &/*slist*/)
 {
     bool handled = false;
     QString command = commands[0];

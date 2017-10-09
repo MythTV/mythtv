@@ -70,7 +70,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 
     void CreatePauseFrame(void);
     bool SetVideoRect(const QRect &disp_rect, const QRect &vid_rect);
-    bool CreateBuffers(const QSize&, const QSize&, WId = 0);
+    bool CreateBuffers(const QSize&, const QSize&);
     void DeleteBuffers();
     bool Start();
     OMX_ERRORTYPE SetImageFilter(OMX_IMAGEFILTERTYPE);
@@ -80,14 +80,14 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     VideoFrame av_pause_frame;
     QRect m_disp_rect, m_vid_rect;
     QVector<void*> m_bufs;
+#ifdef OSD_EGL
     MythRenderEGL *m_context;
-#ifdef OSD_EGL   
     MythOpenGLPainter *m_osdpainter;
     MythPainter *m_threaded_osdpainter;
-#endif
-    MythScreenType *m_backgroundscreen;
     GlOsdThread *m_glOsdThread;
     bool m_changed;
+#endif
+    MythScreenType *m_backgroundscreen;
     bool m_videoPaused;
 };
 

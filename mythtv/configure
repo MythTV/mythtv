@@ -7917,6 +7917,8 @@ elif enabled clangxx; then
     check_cxxflags -Wno-unused-value
     # clang complains about every unused -I unless you pass it this.
     check_cxxflags -Qunused-arguments
+    # Flag implicit fallthrough in case statements
+    check_cxxflags -Wimplicit-fallthrough
 fi
 
 # Check for python dependencies

@@ -457,14 +457,14 @@ void MythRAOPConnection::SendResendRequest(uint64_t timestamp,
         QString("Missed %1 packet(s): expected %2 got %3 ts:%4")
         .arg(missed).arg(expected).arg(got).arg(timestamp));
 
-    char req[8];
+    unsigned char req[8];
     req[0] = 0x80;
     req[1] = RANGE_RESEND | 0x80;
     *(uint16_t *)(req + 2) = qToBigEndian(m_seqNum++);
     *(uint16_t *)(req + 4) = qToBigEndian(expected);   // missed seqnum
     *(uint16_t *)(req + 6) = qToBigEndian(missed);     // count
 
-    if (m_clientControlSocket->writeDatagram(req, sizeof(req),
+    if (m_clientControlSocket->writeDatagram((char *)req, sizeof(req),
                                              m_peerAddress, m_clientControlPort)
         == sizeof(req))
     {
@@ -514,7 +514,7 @@ void MythRAOPConnection::SendTimeRequest(void)
     timeval t;
     gettimeofday(&t, NULL);
 
-    char req[32];
+    unsigned char req[32];
     req[0] = 0x80;
     req[1] = TIMING_REQUEST | 0x80;
     // this is always 0x00 0x07 according to http://blog.technologeek.org/airtunes-v2
@@ -527,7 +527,8 @@ void MythRAOPConnection::SendTimeRequest(void)
     *(uint32_t *)(req + 24) = qToBigEndian((uint32_t)t.tv_sec);
     *(uint32_t *)(req + 28) = qToBigEndian((uint32_t)t.tv_usec);
 
-    if (m_clientTimingSocket->writeDatagram(req, sizeof(req), m_peerAddress, m_clientTimingPort) != sizeof(req))
+    if (m_clientTimingSocket->writeDatagram((char *)req, sizeof(req), m_peerAddress,
+                                            m_clientTimingPort) != sizeof(req))
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "Failed to send resend time request.");
         return;

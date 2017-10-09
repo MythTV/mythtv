@@ -166,7 +166,7 @@ bool HTTPReader::DownloadStream(const QUrl url)
         m_timer.stop();
 
     QMutexLocker  replylock(&m_replylock);
-    if (!m_reply->error() == QNetworkReply::NoError)
+    if (m_reply->error() != QNetworkReply::NoError)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "DownloadStream exited with " + m_reply->errorString());
     }

@@ -1331,6 +1331,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         else
             srcRect = currentImageArea;
 
+        p->SetClipRect(clipRect);
         p->DrawImage(area, currentImage, srcRect, alpha);
         currentImage->DecrRef();
         d->m_UpdateLock.unlock();

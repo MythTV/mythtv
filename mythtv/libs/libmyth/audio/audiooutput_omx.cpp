@@ -105,16 +105,22 @@ static inline void SetupChannels(T &t)
       default:
       case 8:
         t.eChannelMapping[7] = OMX_AUDIO_ChannelRS;
+        [[clang::fallthrough]];
       case 7:
         t.eChannelMapping[6] = OMX_AUDIO_ChannelLS;
+        [[clang::fallthrough]];
       case 6:
         t.eChannelMapping[5] = OMX_AUDIO_ChannelRR;
+        [[clang::fallthrough]];
       case 5:
         t.eChannelMapping[4] = OMX_AUDIO_ChannelLR;
+        [[clang::fallthrough]];
       case 4:
         t.eChannelMapping[3] = OMX_AUDIO_ChannelLFE;
+        [[clang::fallthrough]];
       case 3:
         t.eChannelMapping[2] = OMX_AUDIO_ChannelCF;
+        [[clang::fallthrough]];
       case 2:
         t.eChannelMapping[1] = OMX_AUDIO_ChannelRF;
         t.eChannelMapping[0] = OMX_AUDIO_ChannelLF;
@@ -521,7 +527,7 @@ int AudioOutputOMX::GetBufferedOnSoundcard(void) const
 }
 
 // virtual
-AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool passthrough)
+AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
 {
     LOG(VB_AUDIO, LOG_INFO, LOC + __func__ + " begin");
 
@@ -643,6 +649,9 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool passthrough)
 // virtual // Returns 0-100
 int AudioOutputOMX::GetVolumeChannel(int channel) const
 {
+    if (channel > 0)
+        return -1;
+
     OMX_AUDIO_CONFIG_VOLUMETYPE v;
     OMX_DATA_INIT(v);
     v.nPortIndex = m_audiorender.Base();
@@ -717,7 +726,7 @@ OMX_ERRORTYPE AudioOutputOMX::EmptyBufferDone(
 
 // Shutdown OMX_StateIdle -> OMX_StateLoaded callback
 // virtual
-void AudioOutputOMX::ReleaseBuffers(OMXComponent &cmpnt)
+void AudioOutputOMX::ReleaseBuffers(OMXComponent &/*cmpnt*/)
 {
     FreeBuffersCB();
 }

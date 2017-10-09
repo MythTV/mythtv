@@ -4353,8 +4353,7 @@ ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
     :GroupSetting(),
     m_groupId(groupId),
-    m_groupName(NULL),
-    m_markForDeletion(NULL)
+    m_groupName(NULL)
 {
     setLabel(groupName);//TODO this should be the translated name if Favorite
     setValue(groupName);

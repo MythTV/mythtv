@@ -35,7 +35,15 @@ bool ICRingBuffer::IsOpen(void) const
     return m_stream ? m_stream->IsOpen() : false;
 }
 
-bool ICRingBuffer::OpenFile(const QString &url, uint retry_ms)
+/** \fn ICRingBuffer::OpenFile(const QString &, uint)
+ *  \brief Opens a BBC NetStream for reading.
+ *
+ *  \param url         Url of the stream to read.
+ *  \param retry_ms    Ignored. This value is part of the API
+ *                     inherited from the parent class.
+ *  \return Returns true if the stream was opened.
+ */
+bool ICRingBuffer::OpenFile(const QString &url, uint /*retry_ms*/)
 {
     if (!NetStream::IsSupported(url))
     {

@@ -2316,10 +2316,6 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     detect_letter_box->SwitchTo(frame);
 
-    FrameScanType ps = m_scan;
-    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
-        ps = kScan_Progressive;
-
     AVSync(frame, 0);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!player_ctx->IsPIP())
@@ -3536,7 +3532,7 @@ void MythPlayer::SetTranscoding(bool value)
         decoder->SetTranscoding(value);
 }
 
-bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
+bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc)
 {
     if (!is_current_thread(playerThread))
     {
@@ -3561,7 +3557,7 @@ bool MythPlayer::AddPIPPlayer(MythPlayer *pip, PIPLocation loc, uint timeout)
     return true;
 }
 
-bool MythPlayer::RemovePIPPlayer(MythPlayer *pip, uint timeout)
+bool MythPlayer::RemovePIPPlayer(MythPlayer *pip)
 {
     if (!is_current_thread(playerThread))
         return false;
@@ -4791,7 +4787,6 @@ void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
 }
 
 bool MythPlayer::TranscodeGetNextFrame(
-    frm_dir_map_t::iterator &dm_iter,
     int &did_ff, bool &is_key, bool honorCutList)
 {
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);

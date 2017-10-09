@@ -614,7 +614,7 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
         // Reduce to fit (but never enlarge)
         if (scaleWidth <= dest.width() && scaleHeight <= dest.height())
             break;
-        // Fall through
+        [[clang::fallthrough]];
 
     case kScaleToFit:
         // scale-min to dest height for most images

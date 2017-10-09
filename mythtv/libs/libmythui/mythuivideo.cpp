@@ -85,8 +85,10 @@ void MythUIVideo::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     if (!m_image || m_image->isNull())
         return;
 
-    if (m_image)
+    if (m_image) {
+        p->SetClipRect(clipRect);
         p->DrawImage(area.x(), area.y(), m_image, alphaMod);
+    }
 }
 
 /**

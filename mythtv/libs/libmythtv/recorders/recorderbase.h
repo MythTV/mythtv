@@ -239,8 +239,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
         TVRec                  *tvrec,
         ChannelBase            *channel,
         const RecordingProfile &profile,
-        const GeneralDBOptions &genOpt,
-        const DVBDBOptions     &dvbOpt);
+        const GeneralDBOptions &genOpt);
 
   protected:
     /** \brief Convenience function used to set integer options from a profile.

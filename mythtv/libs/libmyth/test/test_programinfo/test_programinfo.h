@@ -36,41 +36,68 @@ class TestProgramInfo : public QObject
     ProgramInfo mockMovie (QString const &inetref, QString const &programid, QString const &title, unsigned int year)
     {
         return ProgramInfo (
+            (uint) 0, /* recordedid */
             title,          /* title */
             "",              /* subtitle */
             "Its a movie.", /* description */
+            (uint) 0, /* season */
+            (uint) 0, /* episode */
+            (uint) 0, /* total episodes */
             "", /* syndicated episode */
             "", /* category */
+
             (uint) -1, /* chanid */
             "", /* channum */
             "", /* chansign */
             "", /* channame */
             "", /* chan playback filters */
+
+            "", /* recgroup */
+            "", /* playgroup */
+
+            "", /* pathname */
+
+            "", /* hostname */
+            "", /* storagegroup */
+
+            "", /* series id */
+            programid, /* program id */
+            inetref, /* inetref */
+            ProgramInfo::kCategoryMovie, /* cat type */
+
+            (int) 0, /* rec priority */
+
+            (uint64_t) 0, /* filesize */
+
             MythDate::fromString ("2000-01-01 00:00:00"), /* start ts */
             MythDate::fromString ("2000-01-01 01:30:00"), /* end ts */
             MythDate::fromString ("2000-01-01 00:00:00"), /* rec start ts */
             MythDate::fromString ("2000-01-01 01:30:00"), /* rec end ts */
-            "", /* series id */
-            programid, /* program id */
-            ProgramInfo::kCategoryMovie, /* cat type */
+
             0.0f, /* stars */
+
             year, /* year */
             (uint) 0, /* part number */
             (uint) 0, /* part total */
+
             QDate(), /* original air date */
+            QDateTime(), /* last modified */
+
             RecStatus::Unknown, /* rec status */
+
             (uint) -1, /* record id */
-            kNotRecording, /* rec type */
+
+            RecordingDupInTypes::kDupsUnset, /* dupin */
+            RecordingDupMethodType::kDupCheckUnset, /* dupmethod */
+
             (uint) -1, /* find id */
-            true, /* comm free */
-            false, /* repeat */
-            (uint) 0, /* video props */
+
+            (uint) 0, /* programflags */
             (uint) 0, /* audio props */
+            (uint) 0, /* video props */
             (uint) 0, /* subtitle type */
-            (uint) 0, /* season */
-            (uint) 0, /* episode */
-            (uint) 0, /* total episodes */
-            ProgramList() /* sched List */
+            "", /* inputname */
+            QDateTime() /* bookmark update */
         );
     }
 

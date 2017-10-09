@@ -104,6 +104,10 @@ static QString determineURLType(const QString& url)
                 case MythCDROM::kDVD:
                     result = "dvd:" + url;
                     break;
+
+                case MythCDROM::kUnknown:
+                    // Quiet compiler warning.
+                    break;
             }
         }
         else
@@ -2456,9 +2460,10 @@ void ProgramInfo::SetAvailableStatus(
     if (status != availableStatus)
     {
         LOG(VB_GUI, LOG_INFO,
-                 toString(kTitleSubtitle) + QString(": %1 -> %2")
-                     .arg(::toString((AvailableStatusType)availableStatus))
-                     .arg(::toString(status)));
+            toString(kTitleSubtitle) + QString(": %1 -> %2 in %3")
+            .arg(::toString((AvailableStatusType)availableStatus))
+            .arg(::toString(status))
+            .arg(where));
     }
     availableStatus = status;
 }

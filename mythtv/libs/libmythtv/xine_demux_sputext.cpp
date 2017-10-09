@@ -884,6 +884,9 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                             - strlen(line2));
                     break;
                 }
+                // Checked xine-lib-1.2.8. No fix there. Seems like it
+                // should be a break.
+                break;
             default:
                 if (!comment) {
                     *q = *p;

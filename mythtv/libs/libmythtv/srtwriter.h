@@ -27,7 +27,7 @@ class MTV_PUBLIC SRTWriter
 {
   public:
     SRTWriter(const QString &fileName) :
-        m_outFile(fileName), m_outStream(&m_outFile), m_srtCounter(0)
+        m_outFile(fileName), m_outStream(&m_outFile)
     {
         m_outStream.setCodec("UTF-8");
         if (!m_outFile.open(QFile::WriteOnly))
@@ -58,8 +58,6 @@ class MTV_PUBLIC SRTWriter
     QFile m_outFile;
     /// Output stream associated with m_outFile.
     QTextStream m_outStream;
-    /// Count of subtitles we already have written.
-    int m_srtCounter;
 };
 
 #endif /* SRTWRITER_H_ */

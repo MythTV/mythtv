@@ -138,7 +138,7 @@ void XmlSerializer::AddProperty( const QString       &sName,
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlSerializer::RenderEnum( const QString       &sName ,
+void XmlSerializer::RenderEnum( const QString       &/*sName*/ ,
                                 const QVariant      &vValue,
                                 const QMetaProperty *pMetaProp )
 {
@@ -323,7 +323,7 @@ QString XmlSerializer::GetItemName( const QString &sName )
 
 QString XmlSerializer::GetContentName( const QString        &sName, 
                                        const QMetaObject   *pMetaObject,
-                                       const QMetaProperty *pMetaProp )
+                                       const QMetaProperty */*pMetaProp*/ )
 {
     // Try to read Name or TypeName from classinfo metadata.
 

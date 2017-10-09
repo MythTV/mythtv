@@ -179,7 +179,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         // Create Messages
         // ------------------------------------------------------------------
 
-        QDomElement oMsg = CreateMessage( oInfo, sInputMsgName, sRequestTypeName );
+        QDomElement oMsg = CreateMessage( sInputMsgName, sRequestTypeName );
 
         m_oRoot.insertAfter( oMsg, m_oLastMsg );
         m_oLastMsg = oMsg;
@@ -194,7 +194,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
         // Create Response message 
         // ------------------------------------------------------------------
 
-        oMsg = CreateMessage( oInfo, sOutputMsgName, sResponseTypeName );
+        oMsg = CreateMessage( sOutputMsgName, sResponseTypeName );
 
         m_oRoot.insertAfter( oMsg, m_oLastMsg );
         m_oLastMsg = oMsg;
@@ -359,8 +359,7 @@ QDomElement Wsdl::CreateBindingOperation( MethodInfo    &oInfo,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDomElement Wsdl::CreateMessage( MethodInfo   &oInfo,
-                                 QString       sMsgName, 
+QDomElement Wsdl::CreateMessage( QString       sMsgName, 
                                  QString       sTypeName )
 {
     QDomElement oMsg = createElement( "message" );

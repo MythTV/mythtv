@@ -36,8 +36,6 @@ void VideoDecodeBuffer::stop(void)
 
 void VideoDecodeBuffer::run()
 {
-    frm_dir_map_t::iterator dm_iter;
-
     m_isRunning = true;
     while (m_runThread)
     {
@@ -52,7 +50,7 @@ void VideoDecodeBuffer::run()
             tfInfo.didFF = 0;
             tfInfo.isKey = false;
 
-            if (m_player->TranscodeGetNextFrame(dm_iter, tfInfo.didFF,
+            if (m_player->TranscodeGetNextFrame(tfInfo.didFF,
                 tfInfo.isKey, m_honorCutlist))
             {
                 tfInfo.frame = m_videoOutput->GetLastDecodedFrame();

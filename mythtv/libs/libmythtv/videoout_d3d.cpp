@@ -571,7 +571,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
     }
 }
 
-void VideoOutputD3D::ShowPIP(VideoFrame        *frame,
+void VideoOutputD3D::ShowPIP(VideoFrame */*frame*/,
                              MythPlayer *pipplayer,
                              PIPLocation        loc)
 {

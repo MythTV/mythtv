@@ -198,8 +198,11 @@ static VideoFilter *FieldorderDeintFilter(VideoFrameType inpixfmt,
                                           char *options, int threads)
 {
     ThisFilter *filter;
+    (void) inpixfmt;
+    (void) outpixfmt;
     (void) height;
     (void) options;
+    (void) threads;
 
     filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)

@@ -247,7 +247,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
                                      const QSize &video_dim_disp,
                                      float        aspect,
                                      MythCodecID  av_codec_id,
-                                     void        *codec_private,
+                                     void        */*codec_private*/,
                                      bool        &aspect_only)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputChanged(%1,%2,%3) %4->%5")
@@ -500,7 +500,7 @@ bool VideoOutputOpenGL::CreatePauseFrame(void)
     return true;
 }
 
-void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
+void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
                                      FilterChain *filterList,
                                      const PIPMap &pipPlayers,
                                      FrameScanType scan)
@@ -711,7 +711,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         vbuffers.SetLastShownFrameToScratch();
 }
 
-void VideoOutputOpenGL::Show(FrameScanType scan)
+void VideoOutputOpenGL::Show(FrameScanType /*scan*/)
 {
     OpenGLLocker ctx_lock(gl_context);
     if (IsErrored())
@@ -890,7 +890,7 @@ bool VideoOutputOpenGL::SetDeinterlacingEnabled(bool enable)
     return m_deinterlacing;
 }
 
-void VideoOutputOpenGL::ShowPIP(VideoFrame  *frame,
+void VideoOutputOpenGL::ShowPIP(VideoFrame  */*frame*/,
                                 MythPlayer  *pipplayer,
                                 PIPLocation  loc)
 {
@@ -1046,14 +1046,14 @@ MythPainter *VideoOutputOpenGL::GetOSDPainter(void)
 }
 
 // virtual
-bool VideoOutputOpenGL::CanVisualise(AudioPlayer *audio, MythRender *render)
+bool VideoOutputOpenGL::CanVisualise(AudioPlayer *audio, MythRender */*render*/)
 {
     return VideoOutput::CanVisualise(audio, gl_context);
 }
 
 // virtual
 bool VideoOutputOpenGL::SetupVisualisation(AudioPlayer *audio,
-                                MythRender *render, const QString &name)
+                                MythRender */*render*/, const QString &name)
 {
     return VideoOutput::SetupVisualisation(audio, gl_context, name);
 }

@@ -660,7 +660,7 @@ OMX_ERRORTYPE OMXComponent::FillBufferCB(
  * OMXComponentCtx
  */
 OMX_ERRORTYPE OMXComponentCtx::Event( OMXComponent &cmpnt,
-    OMX_EVENTTYPE eEvent, OMX_U32 nData1, OMX_U32 nData2, OMX_PTR pEventData)
+    OMX_EVENTTYPE eEvent, OMX_U32 nData1, OMX_U32 nData2, OMX_PTR /*pEventData*/)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOCB(cmpnt) + QString("%1 0x%2 0x%3")
         .arg(Event2String(eEvent)).arg(nData1,0,16).arg(nData2,0,16) );
@@ -811,6 +811,9 @@ const char *Coding2String(OMX_VIDEO_CODINGTYPE eCompressionFormat)
         CASE2STR(OMX_VIDEO_CodingTheora);
         CASE2STR(OMX_VIDEO_CodingMVC);
 #endif
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("VIDEO_Coding 0x%1")
@@ -835,6 +838,9 @@ const char *Coding2String(OMX_IMAGE_CODINGTYPE eCompressionFormat)
         CASE2STR(OMX_IMAGE_CodingTGA);
         CASE2STR(OMX_IMAGE_CodingPPM);
 #endif
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("IMAGE_Coding 0x%1")
@@ -882,6 +888,9 @@ const char *Coding2String(OMX_AUDIO_CODINGTYPE eEncoding)
         CASE2STR(OMX_AUDIO_CodingATRACX);
         CASE2STR(OMX_AUDIO_CodingATRACAAL);
 #endif
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("AUDIO_Coding 0x%1")
@@ -901,6 +910,9 @@ const char *Other2String(OMX_OTHER_FORMATTYPE eFormat)
         CASE2STR(OMX_OTHER_FormatTextSKM2);
         CASE2STR(OMX_OTHER_FormatText3GP5);
 #endif
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Other format 0x%1")
@@ -967,6 +979,9 @@ const char *Format2String(OMX_COLOR_FORMATTYPE eColorFormat)
         CASE2STR(OMX_COLOR_FormatYVU420PackedPlanar);
         CASE2STR(OMX_COLOR_FormatYVU420PackedSemiPlanar);
 #endif
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("COLOR_Format 0x%1")
@@ -989,6 +1004,9 @@ const char *Event2String(OMX_EVENTTYPE eEvent)
 #ifdef USING_BROADCOM
         CASE2STR(OMX_EventParamOrConfigChanged);
 #endif
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Event 0x%1").arg(eEvent,0,16)));
@@ -1043,6 +1061,9 @@ const char *Error2String(OMX_ERRORTYPE eError)
         CASE2STR(OMX_ErrorDrmExpired);
         CASE2STR(OMX_ErrorDrmGeneral);
 #endif
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Error 0x%1").arg(eError,0,16)));
@@ -1058,6 +1079,9 @@ const char *State2String(OMX_STATETYPE eState)
         CASE2STR(OMX_StateExecuting);
         CASE2STR(OMX_StatePause);
         CASE2STR(OMX_StateWaitForResources);
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("State 0x%1").arg(eState,0,16)));
@@ -1072,6 +1096,9 @@ const char *Command2String(OMX_COMMANDTYPE cmd)
         CASE2STR(OMX_CommandPortDisable);
         CASE2STR(OMX_CommandPortEnable);
         CASE2STR(OMX_CommandMarkBuffer);
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Command 0x%1").arg(cmd,0,16)));
@@ -1115,6 +1142,9 @@ const char *Interlace2String(OMX_INTERLACETYPE eMode)
         CASE2STR(OMX_InterlaceFieldsInterleavedUpperFirst);
         CASE2STR(OMX_InterlaceFieldsInterleavedLowerFirst);
         CASE2STR(OMX_InterlaceMixed);
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("Interlace 0x%1").arg(eMode,0,16)));
@@ -1154,6 +1184,9 @@ const char *Filter2String(OMX_IMAGEFILTERTYPE eType)
         CASE2STR(OMX_ImageFilterAnaglyph);
         CASE2STR(OMX_ImageFilterDeInterlaceFast);
 #endif //def USING_BROADCOM
+        default:
+            // Quiet compiler warning.
+            break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("FilterType 0x%1").arg(eType,0,16)));

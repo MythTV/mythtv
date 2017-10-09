@@ -48,6 +48,7 @@ void MythUISimpleText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     int alpha = CalcAlpha(alphaMod);
 
+    p->SetClipRect(clipRect);
     p->DrawText(area, m_Message, m_Justification, m_Font, alpha, area);
 }
 

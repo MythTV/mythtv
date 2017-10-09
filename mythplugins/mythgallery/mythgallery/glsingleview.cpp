@@ -1541,7 +1541,6 @@ KenBurnsImageLoader::KenBurnsImageLoader(GLSingleView *singleView,
                                          QSize texSize, QSize screenSize) :
     MThread("KenBurnsImageLoader"),
     m_singleView(singleView),
-    m_tex1First(false),
     m_screenSize(screenSize),
     m_texSize(texSize)
 {

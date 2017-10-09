@@ -130,7 +130,7 @@ void ImportIconsWizard::Init()
     }
 }
 
-void ImportIconsWizard::enableControls(dialogState state, bool selectEnabled)
+void ImportIconsWizard::enableControls(dialogState state)
 {
     switch (state)
     {
@@ -710,7 +710,7 @@ bool ImportIconsWizard::search(const QString& strParam)
 
         retVal = true;
     }
-    enableControls(STATE_NORMAL, retVal);
+    enableControls(STATE_NORMAL);
     CloseBusyPopup();
     return retVal;
 }

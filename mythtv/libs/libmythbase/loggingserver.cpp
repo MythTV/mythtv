@@ -942,6 +942,8 @@ void LogServerThread::pingClient(QString clientId)
     QByteArray clientBa = QByteArray::fromHex(clientId.toLocal8Bit());
     msg << clientBa << QByteArray("");
     m_zmqInSock->sendMessage(msg);
+#else
+    Q_UNUSED(clientId)
 #endif
 }
 

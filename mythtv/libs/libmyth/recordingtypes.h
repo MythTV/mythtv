@@ -41,6 +41,7 @@ MPUBLIC int RecTypePrecedence(RecordingType rectype);
 
 typedef enum RecordingDupInTypes
 {
+    kDupsUnset          = 0x00,
     kDupsInRecorded     = 0x01,
     kDupsInOldRecorded  = 0x02,
     kDupsInAll          = 0x0F,
@@ -53,6 +54,7 @@ MPUBLIC RecordingDupInType dupInFromString(QString);
 
 typedef enum RecordingDupMethodType
 {
+    kDupCheckUnset    = 0x00,
     kDupCheckNone     = 0x01,
     kDupCheckSub      = 0x02,
     kDupCheckDesc     = 0x04,

@@ -1083,8 +1083,19 @@ QString ChannelImporter::FormatChannel(
     return msg;
 }
 
+/**
+ * \fn ChannelImporter::SimpleFormatChannel
+ *
+ * Format channel information into a simple string. The format of this
+ * string will depend on the type of standard used for the channels
+ * (atsc/scte/opencable/dvb).
+ *
+ * \param transport  Unused.
+ * \param chan       Info describing a channel
+ * \return Returns a simple name for the channel.
+ */
 QString ChannelImporter::SimpleFormatChannel(
-    const ScanDTVTransport          &transport,
+    const ScanDTVTransport          &/*transport*/,
     const ChannelInsertInfo         &chan)
 {
     QString msg;
@@ -1250,9 +1261,22 @@ void ChannelImporter::CountChannels(
     }
 }
 
+/**
+ * \fn ChannelImporter::ComputeSuggestedChannelNum
+ *
+ * Compute a suggested channel number based on various aspects of the
+ * channel information. Check to see if this channel number conflicts
+ * with an existing channel number. If so, fall back to incrementing a
+ * per-source number to fund an unused value.
+ *
+ * \param info       Unused.
+ * \param transport  Unused.
+ * \param chan       Info describing a channel
+ * \return Returns a simple name for the channel.
+ */
 QString ChannelImporter::ComputeSuggestedChannelNum(
-    const ChannelImporterBasicStats &info,
-    const ScanDTVTransport          &transport,
+    const ChannelImporterBasicStats &/*info*/,
+    const ScanDTVTransport          &/*transport*/,
     const ChannelInsertInfo         &chan)
 {
     static QMutex          last_free_lock;
@@ -1525,8 +1549,8 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     QString message, QString &text)
 {
     int dc = -1;
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *popup = new MythDialogBox(message, popupStack,
+    MythScreenStack *popupStack = parent->GetStack("popup stack");
+    MythDialogBox *popup = new MythDialogBox(title, message, popupStack,
                                              "manualchannelpopup");
 
     if (popup->Create())

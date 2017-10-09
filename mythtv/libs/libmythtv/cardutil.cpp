@@ -1180,13 +1180,16 @@ uint CardUtil::GetSourceID(uint inputid)
     return 0;
 }
 
+// Is this intentionally leaving out the hostname when updating the
+// capturecard table? The hostname value does get set when inserting
+// into the capturecard table. (Code written in 2011.)
 int CardUtil::CreateCardInput(const uint inputid,
                               const uint sourceid,
                               const QString &inputname,
                               const QString &externalcommand,
                               const QString &changer_device,
                               const QString &changer_model,
-                              const QString &hostname,
+                              const QString &/*hostname*/,
                               const QString &tunechan,
                               const QString &startchan,
                               const QString &displayname,
@@ -1889,7 +1892,6 @@ QString CardUtil::GetDeviceLabel(uint inputid)
 }
 
 void CardUtil::GetDeviceInputNames(
-    uint                inputid,
     const QString      &device,
     const QString      &inputtype,
     QStringList        &inputs)
@@ -2481,7 +2483,8 @@ bool CardUtil::SetASIMode(uint device_num, uint mode, QString *error)
     }
     return ok;
 #else
-    (void) device_num;
+    Q_UNUSED(device_num);
+    Q_UNUSED(mode);
     if (error)
         *error = "Not compiled with ASI support.";
     return false;

@@ -785,7 +785,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
 
 /// Non-Audio/Video data. For streams which contain no audio/video,
 /// write just 1 key-frame at the start.
-bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
+bool DTVRecorder::FindOtherKeyframes(const TSPacket */*tspacket*/)
 {
     if (!ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
         return true;

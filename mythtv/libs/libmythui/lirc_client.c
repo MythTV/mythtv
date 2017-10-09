@@ -104,7 +104,7 @@ static char *lirc_execute(const struct lirc_state *state,
 			  struct lirc_config *config,
 			  struct lirc_config_entry *scan);
 static int lirc_iscode(struct lirc_config_entry *scan, char *remote,
-		       char *button,int rep);
+		       char *button,unsigned int rep);
 static int lirc_code2char_internal(const struct lirc_state *state,
 				   struct lirc_config *config,char *code,
 				   char **string, char **prog);
@@ -438,7 +438,9 @@ static void lirc_parse_include(char *s,const char *name,int line)
 {
 	char last;
 	size_t len;
-	
+
+        (void)name;
+        (void)line;
 	len=strlen(s);
 	if(len<2)
 	{
@@ -1552,7 +1554,7 @@ static char *lirc_execute(const struct lirc_state *state,
 }
 
 static int lirc_iscode(struct lirc_config_entry *scan, char *remote,
-		       char *button,int rep)
+		       char *button,unsigned int rep)
 {
 	struct lirc_code *codes;
 	
@@ -1727,7 +1729,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 								   struct lirc_config *config,char *code,
 								   char **string, char **prog)
 {
-	int rep;
+	unsigned int rep;
 	char *backup, *strtok_state = NULL;
 	char *remote,*button;
 	char *s=NULL;
@@ -1962,7 +1964,7 @@ static const char *lirc_read_string(const struct lirc_state *state, int fd)
 {
 	static char buffer[LIRC_PACKET_SIZE+1]="";
 	char *end;
-	static int head=0, tail=0;
+	static size_t head=0, tail=0;
 	int ret;
 	ssize_t n;
 	fd_set fds;
@@ -2042,8 +2044,8 @@ int lirc_send_command(const struct lirc_state *lstate, int sockfd, const char *c
 	const char *string,*data;
 	char *endptr;
 	enum packet_state state;
-	int status,n;
-	unsigned long data_n=0;
+	int status;
+	unsigned long n, data_n=0;
 	size_t written=0, max=0, len;
 
 	if(buf_len!=NULL)

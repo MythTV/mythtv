@@ -68,7 +68,7 @@ class MTV_PUBLIC PlayerContext
     bool StartPIPPlayer(TV *tv, TVState desiredState);
     void PIPTeardown(void);
     void SetNullVideo(bool setting) { useNullVideo = setting; }
-    bool StartEmbedding(WId wid, const QRect&);
+    bool StartEmbedding(const QRect&);
     void StopEmbedding(void);
     void    PushPreviousChannel(void);
     QString PopPreviousChannel(void);

@@ -985,7 +985,8 @@ bool RecordingRule::IsValid(QString &msg)
         return false;
     }
 
-    if (m_filter & (~0 << kNumFilters))
+    unsigned valid_mask = (1 << kNumFilters) - 1;
+    if ((m_filter & valid_mask) != m_filter)
     {
         msg = QString("Invalid filter value.");
         return false;

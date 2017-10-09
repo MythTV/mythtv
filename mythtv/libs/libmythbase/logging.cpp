@@ -539,7 +539,7 @@ void LoggerThread::launchLogServer(void)
 ///         when it hasn't heard from us within a second.  After no responses
 ///         from us for 5s, the logs will be closed.
 /// \param  msg    The message received (can be multi-part)
-void LoggerThread::messageReceived(const QList<QByteArray> &msg)
+void LoggerThread::messageReceived(const QList<QByteArray> &/*msg*/)
 {
     m_initialWaiting = false;
     // cout << "ping" << endl;

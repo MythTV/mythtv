@@ -1510,7 +1510,7 @@ void MythUIWebBrowser::Pulse(void)
  *  \copydoc MythUIType::DrawSelf()
  */
 void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                                int alphaMod, QRect clipRegion)
+                                int alphaMod, QRect clipRect)
 {
     if (!m_image || m_image->isNull() || !m_browser || m_browser->hasFocus())
         return;
@@ -1518,6 +1518,7 @@ void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     QRect area = m_actualBrowserArea;
     area.translate(xoffset, yoffset);
 
+    p->SetClipRect(clipRect);
     p->DrawImage(area.x(), area.y(), m_image, alphaMod);
 }
 

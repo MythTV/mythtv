@@ -109,7 +109,7 @@ int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
     return iso639_str3_to_key("und");
 }
 
-int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket)
+int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& /*storePacket*/)
 {
     QMutexLocker locker(avcodeclock);
 

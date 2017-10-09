@@ -143,7 +143,6 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     MythUIButtonList(MythUIType *parent, const QString &name);
     MythUIButtonList(MythUIType *parent, const QString &name,
                    const QRect &area, bool showArrow = true,
-                   bool showScrollArrows = false,
                    bool showScrollBar = false);
     ~MythUIButtonList();
 
