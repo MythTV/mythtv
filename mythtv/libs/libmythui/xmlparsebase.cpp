@@ -366,10 +366,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
         if (!info.isNull())
         {
             QString type = info.tagName();
-            if (parent->ParseElement(filename, info, showWarnings))
-            {
-            }
-            else if (type == "font" || type == "fontdef")
+            if (type == "fontdef")
             {
                 bool global = (GetGlobalObjectStore() == parent);
                 MythFontProperties *font = MythFontProperties::ParseFromXml(
@@ -407,8 +404,8 @@ void XMLParseBase::ParseChildren(const QString &filename,
             }
             else
             {
-                VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, info,
-                            "Unknown widget type");
+                // This will print an error if there is no match.
+                parent->ParseElement(filename, info, showWarnings);
             }
         }
     }
@@ -575,10 +572,7 @@ MythUIType *XMLParseBase::ParseUIType(
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
-            if (uitype->ParseElement(filename, info, showWarnings))
-            {
-            }
-            else if (info.tagName() == "font" || info.tagName() == "fontdef")
+            if (info.tagName() == "fontdef")
             {
                 bool global = (GetGlobalObjectStore() == parent);
                 MythFontProperties *font = MythFontProperties::ParseFromXml(
@@ -617,8 +611,8 @@ MythUIType *XMLParseBase::ParseUIType(
             }
             else
             {
-                VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, info,
-                            "Unknown widget type.");
+                // This will print an error if there is no match.
+                uitype->ParseElement(filename, info, showWarnings);
             }
         }
     }
