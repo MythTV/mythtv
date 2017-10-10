@@ -1290,9 +1290,9 @@ bool MythUIType::ParseElement(
         MythUIAnimation::ParseElement(element, this);
     }
     else {
-        if (false && showWarnings) {
+        if (showWarnings) {
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
-                        QString("Unknown tag '%1'").arg(element.tagName()));
+                        QString("Unknown widget type '%1'").arg(element.tagName()));
         }
         return false;
     }
