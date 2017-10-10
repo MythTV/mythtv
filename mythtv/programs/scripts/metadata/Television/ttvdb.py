@@ -1178,7 +1178,7 @@ if IS_PY2:
 else:
     cache_dir=os.path.join(confdir, "cache/tvdb_api3/")
 if not os.path.exists(cache_dir):
-    os.mkdir(cache_dir)
+    os.makedirs(cache_dir)
 
 def _can_int(x):
     """Takes a string, checks if it is numeric.

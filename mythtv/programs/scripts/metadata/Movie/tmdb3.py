@@ -297,8 +297,11 @@ def main():
                 print "Unable to find MythTV directory for metadata cache."
                 sys.exit(1)
             confdir = os.path.join(confdir, '.mythtv')
-        confpath = os.path.join(confdir, 'cache', 'pytmdb3.cache')
-        set_cache(engine='file', filename=confpath)
+        cachedir = os.path.join(confdir, 'cache')
+        if not os.path.exists(cachedir):
+            os.makedirs(cachedir)
+        cachepath = os.path.join(cachedir, 'pytmdb3.cache')
+        set_cache(engine='file', filename=cachepath)
 
     if opts.language:
         set_locale(language=opts.language, fallthrough=True)
