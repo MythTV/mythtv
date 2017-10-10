@@ -10,10 +10,10 @@ using namespace std;
 #include "avformatdecoder.h"
 
 
-// options are NNN NNN-MMM 0-MMM -MMM NNN-99999 NNN- >NNN >=NNN <MMM <=MMM or blank
+// options are NNN NNN-MMM 0-MMM NNN-99999 >NNN >=NNN <MMM <=MMM or blank
 // If string is blank then assumes a match.
 // If value is 0 or negative assume a match (i.e. value unknown assumes a match)
-// float values assumed to be no more than 3 decimals.
+// float values must be no more than 3 decimals.
 
 bool ProfileItem::checkRange(QString key, float fvalue, bool *ok) const
 {
@@ -22,7 +22,7 @@ bool ProfileItem::checkRange(QString key, float fvalue, bool *ok) const
 
 bool ProfileItem::checkRange(QString key, int ivalue, bool *ok) const
 {
-    return checkRange(key, 0.0f, ivalue, false, ok);
+    return checkRange(key, 0.0, ivalue, false, ok);
 }
 
 bool ProfileItem::checkRange(QString key,
@@ -34,89 +34,122 @@ bool ProfileItem::checkRange(QString key,
         ivalue = int(fvalue * 1000.0f);
     QString cmp = Get(QString(key));
     if (!cmp.isEmpty())
-        cmp.replace(QLatin1String(" "),QLatin1String(""));
-    if (!cmp.isEmpty() && ivalue > 0)
     {
-        QRegularExpression regex("^([0-9.]*)([^0-9.]*)([0-9.]*)$");
-        QRegularExpressionMatch rmatch = regex.match(cmp);
+        cmp.replace(QLatin1String(" "),QLatin1String(""));
+        QStringList expr = cmp.split("&");
+        for (int ix = 0; ix < expr.size(); ++ix)
+        {
+            if (expr[ix].isEmpty())
+            {
+                isOK = false;
+                continue;
+            }
+            if (ivalue > 0)
+            {
+                QRegularExpression regex("^([0-9.]*)([^0-9.]*)([0-9.]*)$");
+                QRegularExpressionMatch rmatch = regex.match(expr[ix]);
 
-        int value1 = 0;
-        int value2 = 0;
-        QString oper;
-        QString capture1 = rmatch.captured(1);
-        QString capture3;
-        if (!capture1.isEmpty())
-        {
-            if (isFloat)
-                value1 = int(capture1.toFloat(&isOK) * 1000.0f);
-            else
-                value1 = capture1.toInt(&isOK);
-        }
-        if (isOK)
-        {
-            oper = rmatch.captured(2);
-            capture3 = rmatch.captured(3);
-            if (!capture3.isEmpty())
-            {
-                if (isFloat)
-                    value2 = int(capture3.toFloat(&isOK) * 1000.0f);
-                else
-                    value2 = capture3.toInt(&isOK);
-            }
-        }
-        if (isOK)
-        {
-            // Invalid string
-            if (value1 == 0 && value2 == 0 && oper.isEmpty())
-                isOK=false;
-        }
-        if (isOK)
-        {
-            // Case NNN
-            if (value1 != 0 && oper.isEmpty() && value2 == 0)
-            {
-                value2 = value1;
-                oper = "-";
-            }
-            // NNN-MMM 0-MMM NNN-99999 NNN- -MMM
-            else if (oper == "-")
-            {
-                // NNN-
-                if (capture3.isEmpty())
-                    value2 = 99999999;
-                // NNN-MMM
-                if (value2 < value1)
-                    isOK = false;
-            }
-            else if (capture1.isEmpty())
-            {
-                // Other operators == > < >= <=
-                // Convert to a range
-                if (oper == "==")
-                    value1 = value2;
-                else if (oper == ">")
+                int value1 = 0;
+                int value2 = 0;
+                QString oper;
+                QString capture1 = rmatch.captured(1);
+                QString capture3;
+                if (!capture1.isEmpty())
                 {
-                    value1 = value2 + 1;
-                    value2 = 99999999;
+                    if (isFloat)
+                    {
+                        int dec=capture1.indexOf('.');
+                        if (dec > -1 && (capture1.length()-dec) > 4)
+                            isOK = false;
+                        if (isOK)
+                        {
+                            double double1 = capture1.toDouble(&isOK);
+                            if (double1 > 2000000.0 || double1 < 0.0)
+                                isOK = false;
+                            value1 = int(double1 * 1000.0);
+                        }
+                    }
+                    else
+                        value1 = capture1.toInt(&isOK);
                 }
-                else if (oper == ">=")
+                if (isOK)
                 {
-                    value1 = value2;
-                    value2 = 99999999;
+                    oper = rmatch.captured(2);
+                    capture3 = rmatch.captured(3);
+                    if (!capture3.isEmpty())
+                    {
+                        if (isFloat)
+                        {
+                            int dec=capture3.indexOf('.');
+                            if (dec > -1 && (capture3.length()-dec) > 4)
+                                isOK = false;
+                            if (isOK)
+                            {
+                                double double1 = capture3.toDouble(&isOK);
+                                if (double1 > 2000000.0 || double1 < 0.0)
+                                    isOK = false;
+                                value2 = int(double1 * 1000.0);
+                            }
+                        }
+                        else
+                            value2 = capture3.toInt(&isOK);
+                    }
                 }
-                else if (oper == "<")
-                    value2 = value2 - 1;
-                else if (oper == "<=")
-                    ;
-                else isOK = false;
-                oper = "-";
+                if (isOK)
+                {
+                    // Invalid string
+                    if (value1 == 0 && value2 == 0 && oper.isEmpty())
+                        isOK=false;
+                }
+                if (isOK)
+                {
+                    // Case NNN
+                    if (value1 != 0 && oper.isEmpty() && value2 == 0)
+                    {
+                        value2 = value1;
+                        oper = "-";
+                    }
+                    // NNN-MMM 0-MMM NNN-99999 NNN- -MMM
+                    else if (oper == "-")
+                    {
+                        // NNN- or -NNN
+                        if (capture1.isEmpty() || capture3.isEmpty())
+                            isOK = false;
+                        // NNN-MMM
+                        if (value2 < value1)
+                            isOK = false;
+                    }
+                    else if (capture1.isEmpty())
+                    {
+                        // Other operators == > < >= <=
+                        // Convert to a range
+                        if (oper == "==")
+                            value1 = value2;
+                        else if (oper == ">")
+                        {
+                            value1 = value2 + 1;
+                            value2 = 99999999;
+                        }
+                        else if (oper == ">=")
+                        {
+                            value1 = value2;
+                            value2 = 99999999;
+                        }
+                        else if (oper == "<")
+                            value2 = value2 - 1;
+                        else if (oper == "<=")
+                            ;
+                        else isOK = false;
+                        oper = "-";
+                    }
+                }
+                if (isOK)
+                {
+                    if (oper == "-")
+                        match = match && (ivalue >= value1 && ivalue <= value2);
+                    else isOK = false;
+                }
             }
-        }
-        if (isOK)
-        {
-            if (oper == "-")
-               match = (ivalue >= value1 && ivalue <= value2);
-            else isOK = false;
         }
     }
     if (ok != Q_NULLPTR)
@@ -133,39 +166,8 @@ bool ProfileItem::IsMatch(const QSize &size,
 
     QString cmp;
 
-    // Format is  "OPER width height" where OPER is == != > < >= <=
-    for (uint i = 0; (i < 2) && match; i++)
-    {
-        cmp = Get(QString("pref_cmp%1").arg(i));
-        if (cmp.isEmpty())
-            break;
-
-        QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
-        if (clist.size() != 3)
-            break;
-
-        int width  = clist[1].toInt();
-        int height = clist[2].toInt();
-        cmp = clist[0];
-
-        if (cmp == "==")
-            match &= (size.width() == width) && (size.height() == height);
-        else if (cmp == "!=")
-            match &= (size.width() != width) && (size.height() != height);
-        else if (cmp == "<=")
-            match &= (size.width() <= width) && (size.height() <= height);
-        else if (cmp == "<")
-            match &= (size.width() <  width) && (size.height() <  height);
-        else if (cmp == ">=")
-            match &= (size.width() >= width) && (size.height() >= height);
-        else if (cmp == ">")
-            match &= (size.width() >  width) || (size.height() >  height);
-        else
-            match = false;
-    }
-    // New Style
     // cond_width, cond_height, cond_codecs, cond_framerate.
-    // cind_width and cond_height are not used yet
+    // These replace old settings pref_cmp0 and pref_cmp1
     match &= checkRange("cond_width",size.width());
     match &= checkRange("cond_height",size.height());
     match &= checkRange("cond_framerate",framerate);
@@ -588,9 +590,8 @@ void VideoDisplayProfile::LoadBestPreferences
         pref = (*it).GetAll();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences Result "
-            "cmp0:%1, cmp1:%2, prio:%3, w:%4, h:%5, fps:%6,"
-            " codecs:%7, decoder:%8, renderer:%9, deint:%10")
-            .arg(GetPreference("pref_cmp0")).arg(GetPreference("pref_cmp1"))
+            "prio:%1, w:%2, h:%3, fps:%4,"
+            " codecs:%5, decoder:%6, renderer:%7, deint:%8")
             .arg(GetPreference("pref_priority")).arg(GetPreference("cond_width"))
             .arg(GetPreference("cond_height")).arg(GetPreference("cond_framerate"))
             .arg(GetPreference("cond_codecs")).arg(GetPreference("pref_decoder"))
@@ -704,6 +705,12 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
         "VALUES "
         " (:GROUPID,        :PROFILEID, :VALUE, :DATA) ");
 
+    MSqlQuery sqldelete(MSqlQuery::InitCon());
+    sqldelete.prepare(
+        "DELETE FROM displayprofiles "
+        "WHERE profilegroupid = :GROUPID   AND "
+        "      profileid      = :PROFILEID AND "
+        "      value          = :VALUE");
 
     bool ok = true;
     item_list_t::iterator it = items.begin();
@@ -768,15 +775,30 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
             }
             else if (query.next() && (1 == query.value(0).toUInt()))
             {
-                update.bindValue(":GROUPID",   groupid);
-                update.bindValue(":PROFILEID", (*it).GetProfileID());
-                update.bindValue(":VALUE",     lit.key());
-                update.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
-                if (!update.exec())
+                if (lit->isEmpty())
                 {
-                    MythDB::DBError("save_profile 5", update);
-                    ok = false;
-                    continue;
+                    sqldelete.bindValue(":GROUPID",   groupid);
+                    sqldelete.bindValue(":PROFILEID", (*it).GetProfileID());
+                    sqldelete.bindValue(":VALUE",     lit.key());
+                    if (!sqldelete.exec())
+                    {
+                        MythDB::DBError("save_profile 5a", update);
+                        ok = false;
+                        continue;
+                    }
+                }
+                else
+                {
+                    update.bindValue(":GROUPID",   groupid);
+                    update.bindValue(":PROFILEID", (*it).GetProfileID());
+                    update.bindValue(":VALUE",     lit.key());
+                    update.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
+                    if (!update.exec())
+                    {
+                        MythDB::DBError("save_profile 5b", update);
+                        ok = false;
+                        continue;
+                    }
                 }
             }
             else
@@ -1060,6 +1082,7 @@ void VideoDisplayProfile::DeleteProfiles(const QString &hostname)
 //displayprofilegroups pk(name, hostname), uk(profilegroupid)
 //displayprofiles      k(profilegroupid), k(profileid), value, data
 
+// Old style
 void VideoDisplayProfile::CreateProfile(
     uint groupid, uint priority,
     QString cmp0, uint width0, uint height0,
@@ -1068,10 +1091,42 @@ void VideoDisplayProfile::CreateProfile(
     QString osdrenderer, bool osdfade,
     QString deint0, QString deint1, QString filters)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    QString width;
+    QString height;
+    if (!cmp0.isEmpty()
+         && ! (cmp0 == ">" && width0 == 0 && height0 == 0))
+    {
+        width.append(QString("%1%2").arg(cmp0).arg(width0));
+        height.append(QString("%1%2").arg(cmp0).arg(height0));
+        if (!cmp1.isEmpty())
+        {
+            width.append("&");
+            height.append("&");
+        }
+    }
+    if (!cmp1.isEmpty()
+         && ! (cmp1 == ">" && width1 == 0 && height1 == 0))
+    {
+        width.append(QString("%1%2").arg(cmp1).arg(width1));
+        height.append(QString("%1%2").arg(cmp1).arg(height1));
+    }
+    CreateProfile(
+        groupid, priority,
+        width, height, QString(),
+        decoder, max_cpus, skiploop, videorenderer,
+        osdrenderer, osdfade,
+        deint0, deint1, filters);
+}
 
-    if (cmp0.isEmpty() && cmp1.isEmpty())
-        return;
+// New Style
+void VideoDisplayProfile::CreateProfile(
+    uint groupid, uint priority,
+    QString width, QString height, QString codecs,
+    QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
+    QString osdrenderer, bool osdfade,
+    QString deint0, QString deint1, QString filters)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
 
     // create new profileid
     uint profileid = 1;
@@ -1092,17 +1147,14 @@ void VideoDisplayProfile::CreateProfile(
     QStringList queryValue;
     QStringList queryData;
 
-    if (!cmp0.isEmpty())
-    {
-        queryValue += "pref_cmp0";
-        queryData  += QString("%1 %2 %3").arg(cmp0).arg(width0).arg(height0);
-    }
+    queryValue += "cond_width";
+    queryData  += width;
 
-    if (!cmp1.isEmpty())
-    {
-        queryValue += QString("pref_cmp%1").arg(cmp0.isEmpty() ? 0 : 1);
-        queryData  += QString("%1 %2 %3").arg(cmp1).arg(width1).arg(height1);
-    }
+    queryValue += "cond_height";
+    queryData  += height;
+
+    queryValue += "cond_codecs";
+    queryData  += codecs;
 
     queryValue += "pref_decoder";
     queryData  += decoder;
@@ -1135,13 +1187,15 @@ void VideoDisplayProfile::CreateProfile(
     QStringList::const_iterator itD = queryData.begin();
     for (; itV != queryValue.end() && itD != queryData.end(); ++itV,++itD)
     {
+        if (itD->isEmpty())
+            continue;
         query.prepare(
             "INSERT INTO displayprofiles "
             "VALUES (:GRPID, :PROFID, :VALUE, :DATA)");
         query.bindValue(":GRPID",  groupid);
         query.bindValue(":PROFID", profileid);
         query.bindValue(":VALUE",  *itV);
-        query.bindValue(":DATA",   ((*itD).isNull()) ? "" : (*itD));
+        query.bindValue(":DATA",   *itD);
         if (!query.exec())
             MythDB::DBError("create_profile 3", query);
     }

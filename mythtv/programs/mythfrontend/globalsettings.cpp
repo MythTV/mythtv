@@ -629,19 +629,8 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     PlaybackProfileConfig *parent, uint idx, ProfileItem &_item) :
     item(_item), parentConfig(parent), index(idx)
 {
-    GroupSetting *row[2];
-
-    row[0]    = new GroupSetting();
-    cmp[0]    = new TransMythUIComboBoxSetting();
-    width[0]  = new TransMythUISpinBoxSetting(0, 1920, 8, 8);
-    height[0] = new TransMythUISpinBoxSetting(0, 1080, 8, 8);
-    row[1]    = new GroupSetting();
-    cmp[1]    = new TransMythUIComboBoxSetting();
-    width[1]  = new TransMythUISpinBoxSetting(0, 1920, 8, 8);
-    height[1] = new TransMythUISpinBoxSetting(0, 1080, 8, 8);
-//    Possible future replacement for above
-//    width_range = new TransTextEditSetting();
-//    height_range = new TransTextEditSetting();
+    width_range = new TransTextEditSetting();
+    height_range = new TransTextEditSetting();
     codecs    = new TransMythUIComboBoxSetting(true);
     framerate = new TransTextEditSetting();
     decoder   = new TransMythUIComboBoxSetting();
@@ -654,24 +643,17 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     deint1    = new TransMythUIComboBoxSetting();
     filters   = new TransTextEditSetting();
 
-    for (uint i = 0; i < 2; ++i)
-    {
-        const QString kCMP[6] = { "", "<", "<=", "==", ">=", ">" };
-        for (uint j = 0; j < 6; ++j)
-            cmp[i]->addSelection(kCMP[j]);
-
-        cmp[i]->setLabel(tr("Match criteria"));
-        width[i]->setLabel(tr("Width"));
-        height[i]->setLabel(tr("Height"));
-
-        row[i]->setLabel(tr("Match criteria"));
-        row[i]->setHelpText(tr("Optional setting to restrict this profile "
-            "to a selected picture size range. If both match criteria are used "
-            "then both must be satisfied for the entry to be selected."));
-        row[i]->addChild(cmp[i]);
-        row[i]->addChild(width[i]);
-        row[i]->addChild(height[i]);
-    }
+    const QString rangeHelp(tr(" Valid formats for the setting are "
+        "[nnnn - nnnn], [> nnnn], [>= nnnn], [< nnnn], "
+        "[<= nnnn]. Also [nnnn] for an exact match. "
+        "You can also use more than 1 expression with & between."));
+    const QString rangeHelpDec(tr("Numbers can have up to 3 decimal places."));
+    width_range->setLabel(tr("Width Range"));
+    width_range->setHelpText(tr("Optional setting to restrict this profile "
+        "to videos with a selected width range. ") + rangeHelp);
+    height_range->setLabel(tr("Height Range"));
+    height_range->setHelpText(tr("Optional setting to restrict this profile "
+        "to videos with a selected height range. ") + rangeHelp);
     codecs->setLabel(tr("Video Formats"));
     codecs->addSelection("","",true);
     codecs->addSelection("mpeg2video");
@@ -686,9 +668,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         "of available formats with ffmpeg -codecs."));
     framerate->setLabel(tr("Frame Rate Range"));
     framerate->setHelpText(tr("Optional setting to restrict this profile "
-        "to a range of frame rates. Valid formats for the setting are "
-        "[nn.nnn - nn.nnn], [> nn.nnn], [>= nn.nnn], [< nn.nnn], "
-        "[<= nn.nnn]. Also [nn.nnn] for an exact match."));
+        "to a range of frame rates. ") + rangeHelp +" "+rangeHelpDec);
     decoder->setLabel(tr("Decoder"));
     max_cpus->setLabel(tr("Max CPUs"));
     skiploop->setLabel(tr("Deblocking filter"));
@@ -720,8 +700,8 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         tr("Uncheck this if the video studders while the OSD is "
            "fading away."));
 
-    addChild(row[0]);
-    addChild(row[1]);
+    addChild(width_range);
+    addChild(height_range);
     addChild(codecs);
     addChild(framerate);
     addChild(decoder);
@@ -735,6 +715,12 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(deint1);
     addChild(filters);
 
+    connect(width_range, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(widthChanged(const QString&)));
+    connect(height_range, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(heightChanged(const QString&)));
+    connect(codecs, SIGNAL(valueChanged(const QString&)),
+            this,    SLOT(InitLabel()));
     connect(framerate, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(framerateChanged(const QString&)));
     connect(decoder, SIGNAL(valueChanged(const QString&)),
@@ -747,16 +733,6 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
             this,    SLOT(deint0Changed(const QString&)));
     connect(deint1, SIGNAL(valueChanged(const QString&)),
             this,    SLOT(deint1Changed(const QString&)));
-
-    for (uint i = 0; i < 2; ++i)
-    {
-        connect(cmp[i], SIGNAL(valueChanged(const QString&)),
-                SLOT(InitLabel()));
-        connect(height[i], SIGNAL(valueChanged(const QString&)),
-                SLOT(InitLabel()));
-        connect(width[i], SIGNAL(valueChanged(const QString&)),
-                SLOT(InitLabel()));
-    }
 }
 
 uint PlaybackProfileItemConfig::GetIndex(void) const
@@ -766,23 +742,46 @@ uint PlaybackProfileItemConfig::GetIndex(void) const
 
 void PlaybackProfileItemConfig::Load(void)
 {
+    QString width_value;
+    QString height_value;
+    // pref_cmp0 and pref_cmp1 are no longer used. This code
+    // is here to convery them to the new settings cond_width
+    // and cond_height
     for (uint i = 0; i < 2; ++i)
     {
         QString     pcmp  = item.Get(QString("pref_cmp%1").arg(i));
+        if (pcmp == "> 0 0")
+            continue;
         QStringList clist = pcmp.split(" ");
 
-        if (clist.size() == 0)
-            clist<<((i) ? "" : ">");
-        if (clist.size() == 1)
-            clist<<"0";
-        if (clist.size() == 2)
-            clist<<"0";
-
-        cmp[i]->setValue(clist[0]);
-        width[i]->setValue(clist[1]);
-        height[i]->setValue(clist[2]);
+        if (clist.size() < 3)
+            continue;
+        if (!width_value.isEmpty())
+        {
+            width_value.append("&");
+            height_value.append("&");
+        }
+        width_value.append(clist[0]+clist[1]);
+        height_value.append(clist[0]+clist[2]);
     }
 
+    QString tmp = item.Get("cond_width").trimmed();
+    if (!tmp.isEmpty())
+    {
+        if (!width_value.isEmpty())
+            width_value.append("&");
+        width_value.append(tmp);
+    }
+    tmp = item.Get("cond_height").trimmed();
+    if (!tmp.isEmpty())
+    {
+        if (!height_value.isEmpty())
+            height_value.append("&");
+        height_value.append(tmp);
+    }
+
+    width_range->setValue(width_value);
+    height_range->setValue(height_value);
     codecs->setValue(item.Get("cond_codecs"));
     framerate->setValue(item.Get("cond_framerate"));
 
@@ -839,20 +838,10 @@ void PlaybackProfileItemConfig::Load(void)
 
 void PlaybackProfileItemConfig::Save(void)
 {
-    for (uint i = 0; i < 2; ++i)
-    {
-        QString val = QString("pref_cmp%1").arg(i);
-        QString data;
-        if (!cmp[i]->getValue().isEmpty())
-        {
-            data = QString("%1 %2 %3")
-                .arg(cmp[i]->getValue())
-                .arg(width[i]->intValue())
-                .arg(height[i]->intValue());
-        }
-        item.Set(val, data);
-    }
-
+    item.Set("pref_cmp0",          QString());
+    item.Set("pref_cmp1",          QString());
+    item.Set("cond_width",         width_range->getValue());
+    item.Set("cond_height",        height_range->getValue());
     item.Set("cond_codecs",        codecs->getValue());
     item.Set("cond_framerate",     framerate->getValue());
     item.Set("pref_decoder",       decoder->getValue());
@@ -870,6 +859,34 @@ void PlaybackProfileItemConfig::Save(void)
     item.Set("pref_filters", tmp3);
 }
 
+void PlaybackProfileItemConfig::widthChanged(const QString &val)
+{
+    bool ok = true;
+    QString oldvalue = item.Get("cond_width");
+    item.Set("cond_width",val);
+    item.checkRange("cond_width", 640, &ok);
+    if (!ok)
+    {
+        ShowOkPopup(tr("Invalid width specification(%1), discarded").arg(val));
+        width_range->setValue(oldvalue);
+    }
+    InitLabel();
+}
+
+void PlaybackProfileItemConfig::heightChanged(const QString &val)
+{
+    bool ok = true;
+    QString oldvalue = item.Get("cond_height");
+    item.Set("cond_height",val);
+    item.checkRange("cond_height", 480, &ok);
+    if (!ok)
+    {
+        ShowOkPopup(tr("Invalid height specification(%1), discarded").arg(val));
+        height_range->setValue(oldvalue);
+    }
+    InitLabel();
+}
+
 void PlaybackProfileItemConfig::framerateChanged(const QString &val)
 {
     bool ok = true;
@@ -881,6 +898,7 @@ void PlaybackProfileItemConfig::framerateChanged(const QString &val)
         ShowOkPopup(tr("Invalid frame rate specification(%1), discarded").arg(val));
         framerate->setValue(oldvalue);
     }
+    InitLabel();
 }
 
 void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
@@ -1032,21 +1050,14 @@ PlaybackProfileConfig::~PlaybackProfileConfig()
 void PlaybackProfileItemConfig::InitLabel(void)
 {
     QString andStr = tr("&", "and");
-    QString cmp0   = QString("%1 %2 %3").arg(cmp[0]->getValue())
-        .arg(width[0]->intValue())
-        .arg(height[0]->intValue());
-    QString cmp1   = QString("%1 %2 %3").arg(cmp[1]->getValue())
-        .arg(width[1]->intValue())
-        .arg(height[1]->intValue());
-
     QString str;
-    if (!cmp[0]->getValue().isEmpty()
-       || !cmp[1]->getValue().isEmpty())
-    {
-        str = PlaybackProfileConfig::tr("if rez") + ' ' + cmp0;
-        if (!cmp[1]->getValue().isEmpty())
-            str += " " + andStr + ' ' + cmp1;
-    }
+
+    QString width = width_range->getValue();
+    if (!width.isEmpty())
+        str += " " + tr("width","video formats") + " " + width;
+    QString height = height_range->getValue();
+    if (!height.isEmpty())
+        str += " " + tr("height","video formats") + " " + height;
 
     QString codecsval = codecs->getValue();
     if (!codecsval.isEmpty())

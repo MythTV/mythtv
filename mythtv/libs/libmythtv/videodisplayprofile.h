@@ -151,6 +151,13 @@ class MTV_PUBLIC VideoDisplayProfile
         QString osdrenderer, bool osdfade,
         QString deint0, QString deint1, QString filters);
 
+    static void CreateProfile(
+        uint groupid, uint priority,
+        QString width, QString height, QString codecs,
+        QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
+        QString osdrenderer, bool osdfade,
+        QString deint0, QString deint1, QString filters);
+
     static void        DeleteProfiles(const QString &hostname);
     static void        CreateProfiles(const QString &hostname);
     static void        CreateNewProfiles(const QString &hostname);
