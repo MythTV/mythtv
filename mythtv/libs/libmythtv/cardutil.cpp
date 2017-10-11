@@ -507,7 +507,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
     int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
     if (fd_frontend < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Can't open DVB frontend (%1) for %2.")
+        LOG(VB_GENERAL, LOG_ERR, QString("Can't open DVB frontend (%1) for %2." + ENO)
                 .arg(dvbdev).arg(device));
         return ret;
     }
@@ -533,7 +533,6 @@ QString CardUtil::ProbeDVBType(const QString &device)
             type = DTVTunerType::kTunerTypeDVBT2;
     }
 #endif // HAVE_FE_CAN_2G_MODULATION
-    ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
 
 #if DVB_API_VERSION >=5
     unsigned int i;
@@ -545,8 +544,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
     cmd.num = 1;
     cmd.props = &prop;
 
-    ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
-    if (ret == 0)
+    if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
     {
         for (i = 0; i < prop.u.buffer.len; i++)
         {
@@ -566,9 +564,9 @@ QString CardUtil::ProbeDVBType(const QString &device)
         }
     }
 #endif
-
     close(fd_frontend);
 
+    ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
 #endif // USING_DVB
 
     return ret;
