@@ -1113,7 +1113,7 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_GENERAL, LOG_INFO, LOC +
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("FE DTV signal strength ret=%1 res=%2 len=%3 scale=%4 val=%5")
         .arg(ret)
         .arg(cmd.props->result)
@@ -1131,11 +1131,13 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
         {
             // -20dB is a great signal so make that 100%
             // svalue is in 0.001 dB
-            value = cmd.props->u.st.stat[0].svalue + 20000.0;
-            if (value > 0)
-                value = 0;
-            // 10000 is 0.001 conversion to Bel (power not voltage)
-            value = exp10(value / 10000.0);
+            value = cmd.props->u.st.stat[0].svalue + 100000.0;
+            // convert 0.001 dB -100dB to 0dB to a 0-1 range
+            value = value / 100000.0;
+            if (value > 1.0)
+                value = 1.0;
+            else if (value < 0)
+                value = 0.0;
         }
         else
         {
@@ -1199,6 +1201,14 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(fd_frontend, FE_GET_PROPERTY, &cmd);
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
+        QString("FE DTV cnr ret=%1 res=%2 len=%3 scale=%4 val=%5")
+        .arg(ret)
+        .arg(cmd.props->result)
+        .arg(cmd.props->u.st.len)
+        .arg(cmd.props->u.st.stat[0].scale)
+        .arg(cmd.props->u.st.stat[0].svalue)
+        );
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
     if (ok)
         *ok = tmpOk;
@@ -1209,12 +1219,13 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
         {
             // svalue is in 0.001 dB
             value = cmd.props->u.st.stat[0].svalue;
-            // let 10dB+ CNR be 100% quality
-            value -= 10000;
-            if (value > 0)
-                value = 0;
-            // 10000 is 0.001 conversion to Bel (power not voltage)
-            value = exp10(value / 10000.0);
+            // let 50dB+ CNR be 100% quality and 0dB be 0%
+            // convert 0.001 dB from 0-50000 to a 0-1 range
+            value = value / 50000.0;
+            if (value > 1.0)
+                value = 1.0;
+            else if (value < 0)
+                value = 0.0;
         }
         else if (cmd.props->u.st.stat[0].scale == FE_SCALE_RELATIVE)
         {
