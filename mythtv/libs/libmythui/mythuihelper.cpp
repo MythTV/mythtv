@@ -924,7 +924,7 @@ void MythUIHelper::PruneCacheDir(QString dirname)
         file.remove();
     }
 
-    LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+    LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Kept %1 files, deleted %2 files").arg(kept).arg(deleted));
 }
 
