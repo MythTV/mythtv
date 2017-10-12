@@ -9,7 +9,7 @@
 
 class MythBDPlayer : public MythPlayer
 {
-    Q_DECLARE_TR_FUNCTIONS(MythBDPlayer)
+    Q_DECLARE_TR_FUNCTIONS(MythBDPlayer);
 
   public:
     explicit MythBDPlayer(PlayerFlags flags = kNoFlags);
@@ -40,7 +40,7 @@ class MythBDPlayer : public MythPlayer
     // Disable screen grabs for Bluray
     virtual char *GetScreenGrabAtFrame(uint64_t /*frameNum*/, bool /*absolute*/,
         int &/*buflen*/, int &/*vw*/, int &/*vh*/, float &/*ar*/) { return NULL; }
-    virtual char *GetScreenGrab(int /*secondsin*/, int &/*buflen*/,
+    virtual char *GetScreenGrab(int /*secondsin*/, int &/*bufflen*/,
         int &/*vw*/, int &/*vh*/, float &/*ar*/) { return NULL; }
 
   protected:

@@ -126,11 +126,11 @@ void MythUIButton::SetState(QString state)
 /**
  *  \copydoc MythUIType::keyPressEvent()
  */
-bool MythUIButton::keyPressEvent(QKeyEvent *e)
+bool MythUIButton::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
     bool handled = false;
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

@@ -7,7 +7,7 @@
 
 class MythDVDPlayer : public MythPlayer
 {
-    Q_DECLARE_TR_FUNCTIONS(MythDVDPlayer)
+    Q_DECLARE_TR_FUNCTIONS(MythDVDPlayer);
 
   public:
     explicit MythDVDPlayer(PlayerFlags flags = kNoFlags);

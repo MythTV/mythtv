@@ -44,7 +44,7 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, VideoLookups )
+    PROPERTYIMP_RO_REF( QVariantList, VideoLookups );
 
     public:
 

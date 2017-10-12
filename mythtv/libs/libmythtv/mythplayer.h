@@ -150,7 +150,7 @@ class MTV_PUBLIC MythPlayer
     void SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx);
     void SetLength(int len)                   { totalLength = len; }
     void SetFramesPlayed(uint64_t played);
-    void SetVideoFilters(const QString &override);
+    void SetVideoFilters(const QString &overridefilter);
     void SetEof(EofState eof);
     void SetPIPActive(bool is_active)         { pip_active = is_active; }
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
@@ -235,8 +235,8 @@ class MTV_PUBLIC MythPlayer
 
     // Non-const gets
     virtual char *GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
-                                       int &buflen, int &vw, int &vh, float &ar);
-    virtual char *GetScreenGrab(int secondsin, int &buflen,
+                                       int &bufflen, int &vw, int &vh, float &ar);
+    virtual char *GetScreenGrab(int secondsin, int &bufflen,
                                 int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
 

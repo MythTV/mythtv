@@ -50,7 +50,7 @@ class SERVICE_PUBLIC ProgramList : public QObject
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, Programs      )
+    PROPERTYIMP_RO_REF( QVariantList, Programs      );
 
     public:
 

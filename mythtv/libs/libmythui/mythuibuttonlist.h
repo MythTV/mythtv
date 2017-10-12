@@ -146,7 +146,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                    bool showScrollBar = false);
     ~MythUIButtonList();
 
-    virtual bool keyPressEvent(QKeyEvent *);
+    virtual bool keyPressEvent(QKeyEvent *event);
     virtual bool gestureEvent(MythGestureEvent *event);
     virtual void customEvent(QEvent *);
 

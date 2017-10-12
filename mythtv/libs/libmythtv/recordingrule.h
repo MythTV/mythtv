@@ -30,7 +30,7 @@
 
 class MTV_PUBLIC RecordingRule
 {
-    Q_DECLARE_TR_FUNCTIONS(RecordingRule)
+    Q_DECLARE_TR_FUNCTIONS(RecordingRule);
 
   public:
     static const int kNumFilters = 12;

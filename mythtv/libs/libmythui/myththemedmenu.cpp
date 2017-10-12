@@ -686,10 +686,17 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
  *         m_state and the type, text, alt-text and action provided in
  *         the parameters.
  *
- *  \param type    type of button to be created
- *  \param text    text to appear on the button
- *  \param alttext alternate text to appear when required
- *  \param action  actions to be associated with button
+ *  Buttons (or the action of a button) can be locked and requie a
+ *  password to be used.  This is indicated by setting the password
+ *  parameter.
+ *
+ *  \param type        type of button to be created
+ *  \param text        text to appear on the button
+ *  \param alttext     alternate text to appear when required
+ *  \param action      actions to be associated with button
+ *  \param description XXX
+ *  \param password    The name of the setting that stores the
+ *                     password.
  */
 void MythThemedMenu::addButton(const QString &type, const QString &text,
                                 const QString &alttext,
@@ -787,6 +794,7 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
 /** \brief Handle a MythTV action for the Menus.
  *
  *  \param action single action to be handled
+ *  \param password  password setting to be checked
  *  \return true if the action is not to EXEC another program
  */
 bool MythThemedMenu::handleAction(const QString &action, const QString &password)
@@ -910,9 +918,7 @@ bool MythThemedMenu::findDependsExec(const QString &filename)
 /** \brief Queries the user for a password to enter a part of MythTV
  *         restricted by a password.
  *
- *  \param timestamp_setting time settings to be checked
  *  \param password_setting  password to be checked
- *  \param text              the message text to be displayed
  *  \return true if password checks out or is not needed.
  */
 bool MythThemedMenu::checkPinCode(const QString &password_setting)

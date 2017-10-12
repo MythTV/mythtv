@@ -11,7 +11,7 @@
 
 class VideoGeneralSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(VideoGeneralSettings)
+    Q_DECLARE_TR_FUNCTIONS(VideoGeneralSettings);
 
   public:
     VideoGeneralSettings();

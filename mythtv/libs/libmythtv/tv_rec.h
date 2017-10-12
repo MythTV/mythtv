@@ -214,7 +214,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void SetChannel(QString name, uint requestType = kFlagDetect);
     bool QueueEITChannelChange(const QString &name);
 
-    int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
+    int SetSignalMonitoringRate(int rate, int notifyFrontend = 1);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);
@@ -281,7 +281,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     V4LChannel *GetV4LChannel(void);
 
     bool SetupSignalMonitor(
-        bool enable_table_monitoring, bool EITscan, bool notify);
+        bool tablemon, bool EITscan, bool notify);
     bool SetupDTVSignalMonitor(bool EITscan);
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);

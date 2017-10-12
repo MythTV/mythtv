@@ -36,7 +36,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
                        FrameScanType scan);
     bool  ApproveDeintFilter(const QString& filtername) const;
     bool  SetDeinterlacingEnabled(bool enable);
-    bool  SetupDeinterlace(bool i, const QString& ovrf="");
+    bool  SetupDeinterlace(bool interlaced, const QString& overridefilter="");
     virtual void InitPictureAttributes(void);
     virtual int  SetPictureAttribute(PictureAttribute attribute, int newValue);
 

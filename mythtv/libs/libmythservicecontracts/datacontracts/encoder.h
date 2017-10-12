@@ -52,7 +52,7 @@ class SERVICE_PUBLIC Encoder : public QObject
 
     PROPERTYIMP_PTR( Program    , Recording      )
 
-    PROPERTYIMP_RO_REF( QVariantList, Inputs     )
+    PROPERTYIMP_RO_REF( QVariantList, Inputs     );
 
     public:
 

@@ -264,7 +264,6 @@ uint TVBrowseHelper::GetChanId(
 
 /**
  *  \brief Fetches information on the desired program from the backend.
- *  \param enc RemoteEncoder to query, if null query the actx->recorder.
  *  \param direction BrowseDirection to get information on.
  *  \param infoMap InfoMap to fill in with returned data
  */

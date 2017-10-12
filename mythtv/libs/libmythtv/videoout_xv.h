@@ -39,7 +39,7 @@ class VideoOutputXv : public VideoOutput
               WId winid, const QRect &win_rect, MythCodecID codec_id);
 
     bool SetDeinterlacingEnabled(bool);
-    bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
+    bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
     bool ApproveDeintFilter(const QString& filtername) const;
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,

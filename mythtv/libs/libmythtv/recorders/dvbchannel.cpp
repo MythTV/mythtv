@@ -693,7 +693,6 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
  *   This is used by DVB Channel Scanner, the EIT Parser, and by TVRec.
  *
  *  \param tuning      Info on transport to tune to
- *  \param inputid     Optional, forces specific input (for DiSEqC)
  *  \param force_reset If true, frequency tuning is done
  *                     even if it should not be needed.
  *  \param same_input  Optional, doesn't change input (for retuning).

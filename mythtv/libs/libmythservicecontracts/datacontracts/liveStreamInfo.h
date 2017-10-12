@@ -63,7 +63,7 @@ class SERVICE_PUBLIC LiveStreamInfo : public QObject
     PROPERTYIMP    ( QString    , SourceHost       )
     PROPERTYIMP    ( int        , SourceWidth      )
     PROPERTYIMP    ( int        , SourceHeight     )
-    PROPERTYIMP    ( int        , AudioOnlyBitrate )
+    PROPERTYIMP    ( int        , AudioOnlyBitrate );
 
     public:
 

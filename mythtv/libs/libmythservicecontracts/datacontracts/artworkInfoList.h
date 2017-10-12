@@ -34,7 +34,7 @@ class SERVICE_PUBLIC ArtworkInfoList : public QObject
 
     Q_PROPERTY( QVariantList ArtworkInfos     READ ArtworkInfos DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, ArtworkInfos )
+    PROPERTYIMP_RO_REF( QVariantList, ArtworkInfos );
 
     public:
 

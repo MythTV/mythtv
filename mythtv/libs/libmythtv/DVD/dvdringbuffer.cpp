@@ -1973,7 +1973,8 @@ uint DVDRingBuffer::GetAudioLanguage(int idx)
 
 /** \brief get the logical track index (into PGC_AST_CTL) of
   *        the element that maps the given physical stream id.
-  * \param key stream_id
+  * \param stream_id The physical stream id.
+  * \return The logical stream id,, or -1 if the stream can't be found.
 */
 int DVDRingBuffer::GetAudioTrackNum(uint stream_id)
 {

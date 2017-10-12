@@ -109,7 +109,7 @@ class MacDesktopSettings : public GroupSetting
 
 class OSDSettings: public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(OSDSettings)
+    Q_DECLARE_TR_FUNCTIONS(OSDSettings);
 
   public:
     OSDSettings();
@@ -117,7 +117,7 @@ class OSDSettings: public GroupSetting
 
 class GeneralSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(GeneralSettings)
+    Q_DECLARE_TR_FUNCTIONS(GeneralSettings);
 
   public:
     GeneralSettings();
@@ -125,7 +125,7 @@ class GeneralSettings : public GroupSetting
 
 class EPGSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(EPGSettings)
+    Q_DECLARE_TR_FUNCTIONS(EPGSettings);
 
   public:
     EPGSettings();
@@ -133,7 +133,7 @@ class EPGSettings : public GroupSetting
 
 class AppearanceSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(AppearanceSettings)
+    Q_DECLARE_TR_FUNCTIONS(AppearanceSettings);
 
   public:
     AppearanceSettings();
@@ -158,7 +158,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
 
 class MainGeneralSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MainGeneralSettings)
+    Q_DECLARE_TR_FUNCTIONS(MainGeneralSettings);
 
   public:
     MainGeneralSettings();
@@ -167,7 +167,7 @@ class MainGeneralSettings : public GroupSetting
 
 class GeneralRecPrioritiesSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(GeneralRecPrioritiesSettings)
+    Q_DECLARE_TR_FUNCTIONS(GeneralRecPrioritiesSettings);
 
   public:
     GeneralRecPrioritiesSettings();

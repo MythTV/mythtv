@@ -37,7 +37,7 @@ class SERVICE_PUBLIC ArtworkItem : public QObject
     PROPERTYIMP    ( QString    , Url            )
     PROPERTYIMP    ( QString    , Thumbnail      )
     PROPERTYIMP    ( int        , Width          )
-    PROPERTYIMP    ( int        , Height          )
+    PROPERTYIMP    ( int        , Height          );
 
     public:
 

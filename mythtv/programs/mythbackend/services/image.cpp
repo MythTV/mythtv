@@ -142,7 +142,7 @@ bool Image::RemoveImage( int id )
 /**
  *  \brief  Renames the file to the new name.
  *  \param  id The database id of the file
- *  \param  sNewName  The new name of the file (only the name, no path)
+ *  \param  newName  The new name of the file (only the name, no path)
  *  \return bool True if renaming was successful, otherwise false
  */
 bool Image::RenameImage( int id, const QString &newName)

@@ -44,6 +44,9 @@ namespace
 }
 
 /** \brief Creates a new RSS Edit Popup
+ *  \param url The web page for which an entry is being created.
+ *  \param edit If true, then editing an existing entry instead of
+ *              creating a new entry.
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window
  */

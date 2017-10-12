@@ -62,7 +62,6 @@ void TvPlayWindow::UpdateProgress(void)
 /** \brief Mouse click/movement handler, recieves mouse gesture events
  *         from event loop. Should not be used directly.
  *
- *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event
  */
 bool TvPlayWindow::gestureEvent(MythGestureEvent *event)

@@ -139,7 +139,7 @@ class ChannelChangedEvent : public QEvent
 
 class AudioTestThread : public MThread
 {
-    Q_DECLARE_TR_FUNCTIONS(AudioTestThread)
+    Q_DECLARE_TR_FUNCTIONS(AudioTestThread);
 
   public:
 

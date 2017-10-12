@@ -563,7 +563,7 @@ bool DBUtil::CreateTemporaryDBConf(
     return ok;
 }
 
-/** \fn DBUtil::DoBackup(const QString&, QString&)
+/**
  *  \brief Creates a backup of the database by executing the backupScript.
  *
  *   This function executes the specified backup script to create a database
@@ -873,7 +873,7 @@ void DBUtil::UnlockSchema(MSqlQuery &query)
     }
 }
 
-/** \fn CheckTimeZoneSupport(void)
+/**
  *  \brief Check if MySQL has working timz zone support.
  */
 bool DBUtil::CheckTimeZoneSupport(void)

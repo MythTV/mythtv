@@ -130,7 +130,7 @@ class MythOSDWindow : public MythScreenType
 
 class OSD
 {
-    Q_DECLARE_TR_FUNCTIONS(OSD)
+    Q_DECLARE_TR_FUNCTIONS(OSD);
 
   public:
     OSD(MythPlayer *player, QObject *parent, MythPainter *painter);

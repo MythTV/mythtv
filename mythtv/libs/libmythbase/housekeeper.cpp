@@ -419,7 +419,7 @@ bool PeriodicHouseKeeperTask::PastWindow(QDateTime now)
  *  the same behavior as the PeriodicHouseKeeperTask, but will restrict the
  *  run window to prevent a task from running a second time on the same day,
  *  and forces a task to at least thirty minutes before midnight if it has not
- *  yet run that day. This class supports a <i>minhour</i> and <i>maxhour<i>
+ *  yet run that day. This class supports a <i>minhour</i> and <i>maxhour</i>
  *  integer inputs to the constructer to allow further limiting of the window
  *  in which the task is allowed to run.
  *

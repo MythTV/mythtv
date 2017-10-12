@@ -61,7 +61,7 @@ class GameDBStorage : public SimpleDBStorage
 
 class MythGameGeneralSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MythGameGeneralSettings)
+    Q_DECLARE_TR_FUNCTIONS(MythGameGeneralSettings);
 
   public:
     MythGameGeneralSettings();

@@ -205,7 +205,7 @@ class WebSocketWorker : public QObject
      * \param webSocketServer The parent server of this request
      * \param sock       The socket
      * \param type       The type of connection - Plain TCP or TLS?
-     * \param tlsConfig  The TLS (ssl) configuration (for TLS sockets)
+     * \param sslConfig  The TLS (ssl) configuration (for TLS sockets)
      */
     WebSocketWorker(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
                     PoolServerType type

@@ -2151,7 +2151,7 @@ bool ChannelScanSM::ScanCurrentTransport(const QString &sistandard)
 }
 
 /** \fn ChannelScanSM::CheckImportedList(const DTVChannelInfoList&,uint,QString&,QString&,QString&)
- *  \brief If we are scanning a dvb-utils import verify channel is in list..
+ *  \brief If we are scanning a dvb-utils import verify channel is in list.
  */
 bool ChannelScanSM::CheckImportedList(
     const DTVChannelInfoList &channels,

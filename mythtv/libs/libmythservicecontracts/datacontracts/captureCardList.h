@@ -33,7 +33,7 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
 
     Q_PROPERTY( QVariantList CaptureCards READ CaptureCards DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, CaptureCards )
+    PROPERTYIMP_RO_REF( QVariantList, CaptureCards );
 
     public:
 

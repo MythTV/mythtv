@@ -79,7 +79,7 @@ class SERVICE_PUBLIC LineupList : public QObject
 
     Q_PROPERTY( QVariantList Lineups READ Lineups DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Lineups )
+    PROPERTYIMP_RO_REF( QVariantList, Lineups );
 
     public:
 

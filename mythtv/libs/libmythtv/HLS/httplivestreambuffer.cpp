@@ -1809,8 +1809,8 @@ QString HLSRingBuffer::ParseAttributes(const QString &line, const char *attr) co
 }
 
 /**
- * Return the decimal argument in a line of type: blah:<decimal>
- * presence of valud <decimal> is compulsory or it will return RET_ERROR
+ * Return the decimal argument in a line of type: blah:\<decimal\>
+ * presence of value \<decimal\> is compulsory or it will return RET_ERROR
  */
 int HLSRingBuffer::ParseDecimalValue(const QString &line, int &target) const
 {

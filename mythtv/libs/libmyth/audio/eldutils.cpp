@@ -346,8 +346,8 @@ QString ELD::print_pcm_rates(int pcm)
 }
 
 /**
- * print_pcm_bits - Print the supported PCM fmt bits to the string buffer
- * @pcm: PCM caps bits
+ * Print the supported PCM fmt bits to the string buffer
+ * \param pcm PCM caps bits
  */
 QString ELD::print_pcm_bits(int pcm)
 {

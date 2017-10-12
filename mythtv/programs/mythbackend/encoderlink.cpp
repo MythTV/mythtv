@@ -85,7 +85,7 @@ EncoderLink::~EncoderLink(void)
     SetSocket(NULL);
 }
 
-/** \fn Encoder::HasSockAndIncrRef()
+/**
  *  \brief Atomicly checks if sock is not null and increases its refcount.
  */
 bool EncoderLink::HasSockAndIncrRef()
@@ -99,7 +99,7 @@ bool EncoderLink::HasSockAndIncrRef()
     return false;
 }
 
-/** \fn Encoder::HasSockAndDecrRef()
+/**
  *  \brief Atomicly checks if sock is not null and decreases its refcount.
  */
 bool EncoderLink::HasSockAndDecrRef()

@@ -4,8 +4,12 @@
 /** \fn MythHDD::Get(QObject*, const char*, bool, bool)
  *  \brief Helper function used to create a new instance
  *         of a hard disk device.
+ *  \param par        The parent object of this hdd object.
  *  \param devicePath path to the device special file
  *                    representing the device.
+ *  \param SuperMount True if this is a 'supermount' device.
+                      \sa MythMediaDevice::m_SuperMount
+ *  \param AllowEject True if the user is allowed to eject the media.
  *  \return new MythHDD instance.
  */
 MythHDD *MythHDD::Get(QObject* par, const char* devicePath, bool SuperMount,
@@ -16,7 +20,11 @@ MythHDD *MythHDD::Get(QObject* par, const char* devicePath, bool SuperMount,
 
 /** \fn MythHDD::MythHDD(QObject *, const char *, bool, bool)
  *  \brief Creates a new instance of a hard disc device.
+ *  \param par        The parent object of this hdd object.
  *  \param DevicePath path to the device special file representing the device.
+ *  \param SuperMount True if this is a 'supermount' device.
+                      \sa MythMediaDevice::m_SuperMount
+ *  \param AllowEject True if the user is allowed to eject the media.
  *  \return new MythHDD instance.
  */
 MythHDD::MythHDD(QObject *par, const char *DevicePath,

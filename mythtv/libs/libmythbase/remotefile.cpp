@@ -272,10 +272,9 @@ bool RemoteFile::Open(void)
     return OpenInternal();
 }
 
-/** \fn RemoteFile::OpenInternal(void)
+/**
  *  \brief Attempts to resume from a disconnected step. Must have lock
  *  \return True if reconnection succeeded
- *  \param bool indicating we own the lock
  */
 bool RemoteFile::OpenInternal()
 {
@@ -1262,7 +1261,7 @@ QDateTime RemoteFile::LastModified(void) const
     return LastModified(path);
 }
 
-/** \fn RemoteFile::FindFile(const QString& filename, const QString& host, const QString& storageGroup, bool useRegex, bool allowFallback)
+/**
  *  \brief Search all BE's for a file in the give storage group
  *  \param filename the partial path and filename to look for
  *  \param host search this host first if given or default to the master BE if empty
@@ -1283,7 +1282,7 @@ QString RemoteFile::FindFile(const QString& filename, const QString& host,
     return QString();
 }
 
-/** \fn RemoteFile::FindFileList(const QString& filename, const QString& host, const QString& storageGroup, bool useRegex, bool allowFallback)
+/**
  *  \brief Search all BE's for files in the give storage group
  *  \param filename the partial path and filename to look for or regex
  *  \param host search this host first if given or default to the master BE if empty
@@ -1371,10 +1370,10 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
     return QStringList();
 }
 
-/** \fn RemoteFile::SetBlocking(void)
+/**
  *  \brief Set write blocking mode for the ThreadedFileWriter instance
+ *  \param block false if not blocking, true if blocking
  *  \return old mode value
- *  \param false if not blocking, true if blocking
  */
 bool RemoteFile::SetBlocking(bool block)
 {
@@ -1385,10 +1384,11 @@ bool RemoteFile::SetBlocking(bool block)
     return true;
 }
 
-/** \fn RemoteFile::CheckConnection(void)
+/**
  *  \brief Check current connection and re-establish it if lost
  *  \return True if connection is working
- *  \param bool indicating if we are to reposition to the last known location if reconnection is required
+ *  \param repos Bool indicating if we are to reposition to the last known
+ *               location if reconnection is required
  */
 bool RemoteFile::CheckConnection(bool repos)
 {
@@ -1403,10 +1403,9 @@ bool RemoteFile::CheckConnection(bool repos)
     return Resume(repos);
 }
 
-/** \fn RemoteFile::IsConnected(void)
+/**
  *  \brief Check if both the control and data sockets are currently connected
  *  \return True if both sockets are connected
- *  \param none
  */
 bool RemoteFile::IsConnected(void)
 {
@@ -1414,10 +1413,10 @@ bool RemoteFile::IsConnected(void)
            sock->IsConnected() && controlSock->IsConnected();
 }
 
-/** \fn RemoteFile::Resume(void)
+/**
  *  \brief Attempts to resume from a disconnected step. Must have lock
  *  \return True if reconnection succeeded
- *  \param bool indicating if we are to reposition to the last known location
+ *  \param repos Bool indicating if we are to reposition to the last known location
  */
 bool RemoteFile::Resume(bool repos)
 {

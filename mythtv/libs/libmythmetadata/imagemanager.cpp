@@ -164,7 +164,10 @@ QString DeviceManager::ThumbDir(int fs) const
 /*!
  \brief Define a new device and assign it a unique id. If the device is already
  known, its existing id is returned.
- \param device Device
+ \param name  Device model/volume/id
+ \param mount Device mountpoint
+ \param media Set for MediaMonitor devices only
+ \param dir   Dir path of images: import devices only
  \return int A unique id for this device.
 */
 int DeviceManager::OpenDevice(const QString &name, const QString &mount,
@@ -194,9 +197,9 @@ int DeviceManager::OpenDevice(const QString &name, const QString &mount,
 
 
 /*!
- \brief Remove a device
+ \brief Remove a device (or all devices)
  \param devId Id of device to remove
- \param removeImport If false, the Import device will not be discarded
+ \param action What action to take.
  \return bool True if device is recognized
 */
 QStringList DeviceManager::CloseDevices(int devId, const QString &action)
@@ -238,7 +241,7 @@ QStringList DeviceManager::CloseDevices(int devId, const QString &action)
 
 /*!
  \brief Find the id of a device
- \param device Device
+ \param mount Device mountpoint
  \return int Id (positive) if found, 0 if unknown
 */
 int DeviceManager::LocateMount(const QString &mount) const
@@ -284,7 +287,6 @@ QList<int> DeviceManager::GetAbsentees()
 
 /*!
  \brief Constructor
- \param thumbPath Absolute path of dir where thumbnails will be stored
 */
 ImageAdapterBase::ImageAdapterBase() : DeviceManager(),
     m_imageFileExt(SupportedImages()),
@@ -341,7 +343,7 @@ QStringList ImageAdapterBase::SupportedVideos()
 
 /*!
  \brief Construct a local image from a file
- \param fileInfo File
+ \param fi File
  \param parentId Id of the parent dir
  \param devId Id of device containing the file
  \param base Unused but required for adapter interface
@@ -406,7 +408,7 @@ void ImageAdapterLocal::Notify(const QString &mesg,
 
 /*!
  \brief Construct a remote image from a file
- \param fileInfo File
+ \param fi File
  \param parentId Id of the parent dir
  \param devId Unused
  \param base SG dir path
@@ -548,8 +550,8 @@ ImageItem *ImageDb<FS>::CreateImage(const MSqlQuery &query) const
 /*!
  * \brief Read database images/dirs by id
  * \param[in] ids Comma-separated list of ids
- * \param[in out] files List of files
- * \param[in out] files List of dirs
+ * \param[in,out] files List of files
+ * \param[in,out] dirs List of dirs
  * \param[in] refine SQL clause to refine selection & apply ordering
  * \return int Number of items matching query, -1 on SQL error
  */
@@ -567,8 +569,8 @@ int ImageDb<FS>::GetImages(const QString &ids, ImageList &files, ImageList &dirs
 
 /*!
  \brief Read immediate children of a dir
- \param[in out] dirs List of child subdirs
- \param[in out] files List of child files
+ \param[in,out] dirs List of child subdirs
+ \param[in,out] files List of child files
  \param[in] ids Comma-separated list of dir ids
  \param[in] refine SQL clause to refine selection & apply ordering
  \return int Number of items matching query, -1 on SQL error
@@ -584,16 +586,10 @@ int ImageDb<FS>::GetChildren(QString ids, ImageList &files, ImageList &dirs,
 
 /*!
  \brief Read a dir and its immediate children from Db
- \param[out] parent Dir item
- \param[in out] dirs List of child subdirs
- \param[in out] files List of child files
- \param[in] ids Comma-separated list of dir ids
- \param[in] refine SQL clause to refine selection & apply ordering
- \return int Number of items matching query, -1 on SQL error
-
- \param[in out] subdirs Ordered/filtered child subdirs
- \param[in out] files Ordered/filtered child files
  \param[in] id Dir id
+ \param[out] parent Dir item
+ \param[in,out] dirs Ordered/filtered child subdirs
+ \param[in,out] files Ordered/filtered child files
  \param[in] refine SQL clause for filtering/ordering child images
  \return int Number of items matching query.
 */
@@ -635,10 +631,9 @@ int ImageDb<FS>::GetDirectory(int id, ImagePtr &parent,
 /*!
  \brief Return images and all of their descendants.
 
- \param[in out] files Ordered/filtered files
- \param[in out] dirs  Ordered/filtered dirs
  \param[in] ids Image ids
- \param[in] refine SQL clause for filtering/ordering child images
+ \param[in,out] files Ordered/filtered files
+ \param[in,out] dirs  Ordered/filtered dirs
 */
 template <class FS>
 bool ImageDb<FS>::GetDescendants(const QString &ids,
@@ -684,7 +679,7 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
 
 /*!
  \brief Returns all files in the sub-tree of a dir.
- \param[in out] files List of images within sub-tree. Direct children first, then
+ \param[in,out] files List of images within sub-tree. Direct children first, then
   depth-first traversal of peer sub-dirs. Each level ordered as per refine criteria
  \param id Dir id
  \param refine SQL clause defining filter & ordering criteria
@@ -706,8 +701,8 @@ bool ImageDb<FS>::GetImageTree(int id, ImageList &files, const QString &refine) 
 
 /*!
  * \brief Read all database images and dirs as map. No filters or ordering applied.
- * \param[in out] files Map <filepath, image>
- * \param[in out] dirs Map <filepath, dir>
+ * \param[in,out] files Map <filepath, image>
+ * \param[in,out] dirs Map <filepath, dir>
  */
 template <class FS>
 bool ImageDb<FS>::ReadAllImages(ImageHash &files, ImageHash &dirs) const
@@ -736,7 +731,7 @@ bool ImageDb<FS>::ReadAllImages(ImageHash &files, ImageHash &dirs) const
 /*!
  \brief Clear Db for device & remove device
  \param devId Device id, 0 to clear all devices
- \param removeImport If false, the Import device will not be removed
+ \param action The myth protocol message. Determines whether/how much information is removed from the database.
  \return Either list of ids that have been deleted or "ALL" with list of
  filepath prefixes that will remove device images from the UI image cache
 */
@@ -1013,10 +1008,10 @@ int ImageDb<FS>::ReadImages(ImageList &dirs, ImageList &files,
  \brief Return counts of dirs, pics, videos and size in the subtree of a dir.
  \param[in] id Dir id
  \param[in] all Sum whole table (without filtering on dir path)
- \param[in out] dirs Number of dirs in parent sub-tree
- \param[in out] pics Number of pictures in parent sub-tree
- \param[in out] videos Number of videos in parent sub-tree
- \param[in out] sizeKb Size in KiB of parent sub-tree
+ \param[in,out] dirs Number of dirs in parent sub-tree
+ \param[in,out] pics Number of pictures in parent sub-tree
+ \param[in,out] videos Number of videos in parent sub-tree
+ \param[in,out] sizeKb Size in KiB of parent sub-tree
 */
 template <class FS>
 void ImageDb<FS>::GetDescendantCount(int id, bool all, int &dirs,
@@ -1180,7 +1175,7 @@ private:
  \details Reads exif tags from a picture or FFMPEG video tags
  \param id Image id
  \return QStringList Error message or "OK", seperator token,
- list of <tag name><seperator><tag value>.
+ list of \<tag name\>\<seperator\><tag value\>.
  Clients must use the embedded seperator to split the tags.
 */
 template <class DBFS>
@@ -1324,8 +1319,9 @@ QStringList ImageHandler<DBFS>::HandleDelete(const QString &ids) const
  to retain state of the copied images. Initiates a scan to populate them fully
  and generate thumbnails. This retains
  \param defs A list of image definitions in the form
- <id><sep><type><sep><filepath><sep><hidden><sep><orientation><sep><cover id>
- where <sep> is the first list item
+ \<id\>\<sep\>\<type\>\<sep\>\<filepath\>\<sep\>\<hidden\>
+ \<sep\>\<orientation\>\<sep\>\<cover id\>
+ where \<sep\> is the first list item.
  Dirs must follow their children (files & subdirs)
  \return QStringList Error message or "OK"
 */
@@ -1450,7 +1446,7 @@ QStringList ImageHandler<DBFS>::HandleDbMove(const QString &ids,
  \brief Hides/unhides images/dirs
  \details Updates hidden status in db and updates clients
  \param hide hide flag: 0 = Show, 1 = Hide
- \param fids Csv list of file/dir ids
+ \param ids Csv list of file/dir ids
  \return QStringList Error message or "OK"
 */
 template <class DBFS>
@@ -1789,8 +1785,8 @@ QString ImageDbReader::OrderSelector(int order)
  \brief Return images (local and/or remote) for a dir and its direct children
  \param[in] id Dir id
  \param[out] parent Parent image
- \param[in out] subdirs Child dirs, filtered & ordered iaw current settings.
- \param[in out] files Child files, filtered & ordered iaw current settings.
+ \param[in,out] files Child files, filtered & ordered iaw current settings.
+ \param[in,out] dirs Child dirs, filtered & ordered iaw current settings.
  \return int Number of images, including parent
 */
 int ImageDbReader::GetDirectory(int id, ImagePtr &parent,
@@ -1821,7 +1817,8 @@ int ImageDbReader::GetDirectory(int id, ImagePtr &parent,
 /*!
  \brief Returns images (local or remote but not a combination)
  \param[in] ids Image ids
- \param[in out] images List of images, filtered & ordered iaw current settings.
+ \param[in,out] files List of files, filtered & ordered iaw current settings.
+ \param[in,out] dirs List of dirs, filtered & ordered iaw current settings.
  \return int Number of images
 */
 int ImageDbReader::GetImages(ImageIdList ids,
@@ -1841,8 +1838,8 @@ int ImageDbReader::GetImages(ImageIdList ids,
 /*!
  \brief Return (local or remote) images that are direct children of a dir
  \param[in] id Directory id
- \param[in out] files List of files, filtered & ordered iaw current settings.
- \param[in out] dirs List of dirs, filtered & ordered iaw current settings.
+ \param[in,out] files List of files, filtered & ordered iaw current settings.
+ \param[in,out] dirs List of dirs, filtered & ordered iaw current settings.
  \return int Number of Images
 */
 int ImageDbReader::GetChildren(int id, ImageList &files, ImageList &dirs) const
@@ -1860,9 +1857,9 @@ int ImageDbReader::GetChildren(int id, ImageList &files, ImageList &dirs) const
 
 /*!
  \brief Return all (local or remote) images that are direct children of a dir
- \param[in] id Directory id, GALLERY_DB_ID not valid
- \param[in out] files List of files, unfiltered & unordered
- \param[in out] dirs List of dirs, unfiltered & unordered
+ \param[in] ids Directory ids, GALLERY_DB_ID not valid
+ \param[in,out] files List of files, unfiltered & unordered
+ \param[in,out] dirs List of dirs, unfiltered & unordered
 */
 void ImageDbReader::GetDescendants(const ImageIdList &ids,
                                    ImageList &files, ImageList &dirs) const
@@ -1880,7 +1877,7 @@ void ImageDbReader::GetDescendants(const ImageIdList &ids,
 /*!
  \brief Return all files (local or remote) in the sub-trees of a dir
  \param[in] id Dir id
- \param[in out] files List of images within sub-tree. Ordered & filtered iaw current
+ \param[in,out] files List of images within sub-tree. Ordered & filtered iaw current
  settings
 */
 void ImageDbReader::GetImageTree(int id, ImageList &files) const
@@ -1895,10 +1892,10 @@ void ImageDbReader::GetImageTree(int id, ImageList &files) const
 /*!
  \brief Return counts of dirs, pics and videos in the subtree of a dir. Also dir size
  \param[in] id Dir id
- \param[in out] dirs Number of dirs in parent sub-tree
- \param[in out] pics Number of pictures in parent sub-tree
- \param[in out] videos Number of videos in parent sub-tree
- \param[in out] sizeKb Size in KiB of parent sub-tree
+ \param[in,out] dirs Number of dirs in parent sub-tree
+ \param[in,out] pics Number of pictures in parent sub-tree
+ \param[in,out] videos Number of videos in parent sub-tree
+ \param[in,out] sizeKb Size in KiB of parent sub-tree
 */
 void ImageDbReader::GetDescendantCount(int id, int &dirs, int &pics,
                                        int &videos, int &sizeKb) const
@@ -2169,7 +2166,7 @@ QString ImageManagerFe::IgnoreDirs(const QString &excludes)
  \brief Create directories
  \param parent Dir in which to create new dirs
  \param names List of dir names
- \param Whether to scan after creating dirs
+ \param rescan Whether to scan after creating dirs
  \return QString Error message, if not empty
 */
 QString ImageManagerFe::MakeDir(int parent, const QStringList &names, bool rescan)
@@ -2372,7 +2369,7 @@ QString ImageManagerFe::DeviceCaption(ImageItemK &im) const
  \brief Return a displayable name (with optional path) for an image.
  \details Uses device name rather than mount path for local devices
  \param im Image
- \param path If true, name will include path. Otherwise only the basename
+ \param getPath If true, name will include path. Otherwise only the basename
  \return QString Filepath for display
 */
 QString ImageManagerFe::CrumbName(ImageItemK &im, bool getPath) const

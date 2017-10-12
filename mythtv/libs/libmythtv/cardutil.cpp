@@ -703,6 +703,7 @@ bool set_on_input(const QString &to_set, uint inputid, const QString &value)
  *         hostname. The result is ordered from smallest to largest.
  *  \param videodevice Video device we want input ids for
  *  \param rawtype     Input type as used in DB or empty string for any type
+ *  \param inputname   The name of the input card.
  *  \param hostname    Host on which device resides, only
  *                     required if said host is not the localhost
  */

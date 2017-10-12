@@ -273,8 +273,8 @@ private:
  * \class TV
  *
  * \brief Control TV playback
- * \qmlsignal TVPlaybackAborted(void)
  *
+ * \qmlsignal TVPlaybackAborted(void)
  * TV playback failed to start (typically, TV playback was started when another playback is currently going)
  * \qmlsignal TVPlaybackStarted(void)
  * TV playback has started, video is now playing
@@ -487,7 +487,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     bool StartRecorder(PlayerContext *ctx, int maxWait=-1);
     void StopStuff(PlayerContext *mctx, PlayerContext *ctx,
-                   bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
+                   bool stopRingBuffer, bool stopPlayer, bool stopRecorder);
     void TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx);
 
 

@@ -33,7 +33,7 @@ class SERVICE_PUBLIC InputList : public QObject
 
     Q_PROPERTY( QVariantList Inputs READ Inputs DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Inputs )
+    PROPERTYIMP_RO_REF( QVariantList, Inputs );
 
     public:
 

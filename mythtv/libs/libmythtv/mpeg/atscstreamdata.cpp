@@ -27,6 +27,9 @@ using namespace std;
  *                             channel set this to a value greater than zero.
  *  \param desiredMinorChannel If you want rewritten PAT and PMTs for a desired
  *                             channel set this to a value greater than zero.
+ *  \param cardnum             The card number that this stream is on.
+ *                             Currently only used for differentiating streams
+ *                             in log messages.
  *  \param cacheTables         If true important tables will be cached.
  */
 ATSCStreamData::ATSCStreamData(int desiredMajorChannel,

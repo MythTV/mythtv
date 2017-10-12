@@ -52,7 +52,7 @@ private:
 //! Worker thread for copying/moving files
 class TransferThread : public MThread
 {
-    Q_DECLARE_TR_FUNCTIONS(FileTransferWorker)
+    Q_DECLARE_TR_FUNCTIONS(FileTransferWorker);
 public:
     typedef QMap<ImagePtrK, QString> TransferMap;
     typedef QSet<ImagePtrK> ImageSet;
@@ -559,7 +559,8 @@ void GalleryThumbView::customEvent(QEvent *event)
 
 /*!
  \brief Cleanup UI & image caches when a device is removed
- \param prefixes List of url prefixes to remove from image cache
+ \param ids List of ids to remove from image cache
+ \param deleted If true, images are also deleted from view
 */
 void GalleryThumbView::RemoveImages(const QStringList &ids, bool deleted)
 {

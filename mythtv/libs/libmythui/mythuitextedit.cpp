@@ -573,7 +573,6 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
 /** \brief Mouse click/movement handler, receives mouse gesture events from the
  *         QCoreApplication event loop. Should not be used directly.
  *
- *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event
  */
 bool MythUITextEdit::gestureEvent(MythGestureEvent *event)

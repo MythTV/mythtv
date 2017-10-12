@@ -32,7 +32,7 @@ class SERVICE_PUBLIC TitleInfo : public QObject
 
     PROPERTYIMP    ( QString    , Title            )
     PROPERTYIMP    ( QString    , Inetref          )
-    PROPERTYIMP    ( int        , Count            )
+    PROPERTYIMP    ( int        , Count            );
 
     public:
 

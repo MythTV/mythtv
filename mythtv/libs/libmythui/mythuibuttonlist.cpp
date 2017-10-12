@@ -2510,11 +2510,11 @@ uint MythUIButtonList::ItemHeight(void)
 /**
  *  \copydoc MythUIType::keyPressEvent()
  */
-bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
+bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
     bool handled = false;
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     // Handle action remappings
     for (int i = 0; i < actions.size(); ++i)

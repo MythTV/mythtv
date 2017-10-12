@@ -153,7 +153,7 @@ void MythFontManager::LoadFontsFromDirectory(const QString &directory,
 /**
  *  \brief Loads fonts from the file specified in fontPath.
  *
- *  \param directory      The directory to scan
+ *  \param fontPath       The absolute path to the font file
  *  \param registeredFor  The user of the font.
  */
 void MythFontManager::LoadFontFile(const QString &fontPath,
@@ -209,8 +209,10 @@ void MythFontManager::LoadFontFile(const QString &fontPath,
 /**
  *  \brief Registers the font as being used by registeredFor
  *
- *  \param directory      The directory to scan
+ *  \param fontPath       The absolute path to the font file
  *  \param registeredFor  The user of the font.
+ *  \param fontID         The number provided by Qt when the font was
+ *                        registered.
  */
 bool MythFontManager::RegisterFont(const QString &fontPath,
                                    const QString &registeredFor,

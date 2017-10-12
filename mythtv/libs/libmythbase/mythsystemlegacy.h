@@ -68,7 +68,7 @@ void MBASE_PUBLIC ShutdownMythSystemLegacy(void);
 class MythSystemLegacyPrivate;
 class MBASE_PUBLIC MythSystemLegacy : public QObject
 {
-    Q_OBJECT
+    Q_OBJECT;
 
   public:
     MythSystemLegacy();

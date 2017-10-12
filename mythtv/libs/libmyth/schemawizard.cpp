@@ -186,6 +186,9 @@ MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
  * \param upgradeAllowed  In not true, and DBSchemaAutoUpgrade isn't set for
  *                        expert mode, this is just a few information messages
  * \param upgradeIfNoUI   Default for non-interactive shells
+ * \param minDBMSmajor    Required minimum major version of mysql/mariadb.
+ * \param minDBMSminor    Required minimum minor version of mysql/mariadb.
+ * \param minDBMSpoint    Required minimum point version of mysql/mariadb.
  *
  * \todo Clarify whether the minDBMS stuff is just for upgrading,
  *       or if it is a runtime requirement too. If the latter,

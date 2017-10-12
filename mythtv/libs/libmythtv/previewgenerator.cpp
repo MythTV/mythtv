@@ -58,23 +58,26 @@
  *
  *   ProgramInfo::pathname must include recording prefix, so that
  *   the file can be found on the file system for local preview
- *   generation. When called by the backend 'local_only' should be set
- *   to true, otherwise the backend may deadlock if the PreviewGenerator
+ *   generation. When called by the backend 'mode' should be set to
+ *   kLocal, otherwise the backend may deadlock if the PreviewGenerator
  *   cannot find the file.
  *
  *  \param pginfo     ProgramInfo for the recording we want a preview of.
- *  \param local_only If set to true, the preview will only be generated
- *                    if the file is local.
+ *  \param token      A token value used to match up this request with
+ *                    the response from the backend. If a token isn't
+ *                    provided, the code will generate one.
+ *  \param mode       Specify the location where the file must exist
+ *                    in order to be processed.
  */
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
-                                   const QString     &_token,
-                                   PreviewGenerator::Mode _mode)
+                                   const QString     &token,
+                                   PreviewGenerator::Mode mode)
     : MThread("PreviewGenerator"),
-      m_programInfo(*pginfo), m_mode(_mode), m_listener(NULL),
+      m_programInfo(*pginfo), m_mode(mode), m_listener(NULL),
       m_pathname(pginfo->GetPathname()),
       m_timeInSeconds(true),  m_captureTime(-1),
       m_outSize(0,0),  m_outFormat("PNG"),
-      m_token(_token), m_gotReply(false), m_pixmapOk(false)
+      m_token(token), m_gotReply(false), m_pixmapOk(false)
 {
     // Qt requires that a receiver have the same thread affinity as the QThread
     // sending the event, which is used to dispatch MythEvents sent by

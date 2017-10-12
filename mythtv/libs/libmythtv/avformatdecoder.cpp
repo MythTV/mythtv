@@ -1013,7 +1013,9 @@ int AvFormatDecoder::FindStreamInfo(void)
  *
  *  \param rbuffer pointer to a valid ringuffer.
  *  \param novideo if true then no video is sought in ScanSreams.
- *  \param testbuf this parameter is not used by AvFormatDecoder.
+ *  \param testbuf Temporary buffer for probing the input.
+ *  \param testbufsize The size of the test buffer. The minimum of this value
+ *                     or kDecoderProbeBufferSize will be used.
  */
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                               char testbuf[kDecoderProbeBufferSize],

@@ -14,7 +14,7 @@
 
 class ArchiveSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(ArchiveSettings)
+    Q_DECLARE_TR_FUNCTIONS(ArchiveSettings);
 
   public:
     ArchiveSettings();

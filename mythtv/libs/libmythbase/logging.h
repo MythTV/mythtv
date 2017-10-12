@@ -228,7 +228,7 @@ class LoggerThread : public QObject, public MThread
     void pingLogServer(void);
 
   protected slots:
-    void messageReceived(const QList<QByteArray>&);
+    void messageReceived(const QList<QByteArray> &msg);
     void checkHeartBeat(void);
     void initialTimeout(void);
 };

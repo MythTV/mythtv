@@ -75,11 +75,11 @@ static int eit_start_rand(int eitTransportTimeout);
  *  current input.
  */
 
-/** \fn TVRec::TVRec(int)
+/**
  *  \brief Performs instance initialiation not requiring access to database.
  *
  *  \sa Init()
- *  \param inputid
+ *  \param _inputid
  */
 TVRec::TVRec(int _inputid)
        // Various components TVRec coordinates
@@ -843,6 +843,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
  *         is removed.
  *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
  *  \param curRec RecordingInfo or recording to mark as done
+ *  \param recq   Information on the quality if the recording.
  */
 void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 {
@@ -2019,7 +2020,7 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
     return ok;
 }
 
-/** \fn TVRec::SetupSignalMonitor(bool,bool)
+/**
  *  \brief This creates a SignalMonitor instance and
  *         begins signal monitoring.
  *
@@ -2028,6 +2029,8 @@ bool TVRec::SetupDTVSignalMonitor(bool EITscan)
  *   is called to start the signal monitoring thread.
  *
  *  \param tablemon If set we enable table monitoring
+ *  \param EITscan if set we never look for video streams and we
+ *         lock on encrypted streams even if we can't decode them.
  *  \param notify   If set we notify the frontend of the signal values
  *  \return true on success, false on failure
  */
@@ -3041,7 +3044,7 @@ uint TVRec::GetSourceID(void) const
     return 0;
 }
 
-/** \fn TVRec::SetInput(QString, uint)
+/**
  *  \brief Changes to the specified input.
  *
  *   You must call PauseRecorder(void) before calling this.

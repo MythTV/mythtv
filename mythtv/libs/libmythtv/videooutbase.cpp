@@ -559,10 +559,11 @@ bool VideoOutput::SetDeinterlacingEnabled(bool enable)
 }
 
 /**
- * \fn VideoOutput::SetupDeinterlace(bool,const QString&)
  * \brief Attempts to enable or disable deinterlacing.
  * \return true if successful, false otherwise.
- * \param overridefilter optional, explicitly use this nondefault deint filter
+ * \param interlaced Desired state of interlacing.
+ * \param overridefilter optional, explicitly use this nondefault
+ *                       deinterlacing filter
  */
 bool VideoOutput::SetupDeinterlace(bool interlaced,
                                    const QString& overridefilter)
@@ -825,10 +826,10 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
 }
 
 /**
- * \fn VideoOutput::GetVisibleOSDBounds(float&,float&,float) const
  * \brief Returns visible portions of total OSD bounds
  * \param visible_aspect physical aspect ratio of bounds returned
  * \param font_scaling   scaling to apply to fonts
+ * \param themeaspect    aspect ration of the theme
  */
 QRect VideoOutput::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling, float themeaspect) const

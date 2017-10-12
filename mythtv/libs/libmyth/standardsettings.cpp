@@ -479,6 +479,9 @@ void MythUIFileBrowserSetting::updateButton(MythUIButtonListItem *item)
 *******************************************************************************/
 /**
  * Create a Setting Widget to select the value from a list
+ * \param _storage An object that knows how to get/set the value for
+ *                 this item from/to a database.  This should be
+ *                 created with a call to XXXStorage.
  * \param rw if set to true, the user can input it's own value
  */
 MythUIComboBoxSetting::MythUIComboBoxSetting(Storage *_storage, bool rw):

@@ -33,7 +33,7 @@ class SERVICE_PUBLIC TitleInfoList : public QObject
 
     Q_PROPERTY( QVariantList TitleInfos READ TitleInfos DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, TitleInfos )
+    PROPERTYIMP_RO_REF( QVariantList, TitleInfos );
 
     public:
 

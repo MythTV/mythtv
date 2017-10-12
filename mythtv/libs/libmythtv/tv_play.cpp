@@ -1729,9 +1729,10 @@ TVState TV::GetState(const PlayerContext *actx) const
     return ret;
 }
 
-/** \fn TV::LiveTV(bool,bool)
+/**
  *  \brief Starts LiveTV
  *  \param showDialogs if true error dialogs are shown, if false they are not
+ *  \param selection What channel to tune.
  */
 bool TV::LiveTV(bool showDialogs, const ChannelInfoList &selection)
 {
@@ -2648,9 +2649,11 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 #undef SET_NEXT
 #undef SET_LAST
 
-/** \fn TV::StartRecorder(PlayerContext*, int)
+/**
  *  \brief Starts recorder, must be called before StartPlayer().
- *  \param maxWait How long to wait for RecorderBase to start recording.
+ *  \param ctx The player context requesting recording. 
+ *  \param maxWait How long to wait for RecorderBase to start recording. If
+ *                 not provided, this defaults to 40 seconds.
  *  \return true when successful, false otherwise.
  */
 bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
@@ -2692,7 +2695,7 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
     return true;
 }
 
-/** \fn TV::StopStuff(PlayerContext*,PlayerContext*, bool, bool, bool)
+/**
  *  \brief Can shut down the ringbuffers, the players, and in LiveTV it can
  *         shut down the recorders.
  *
@@ -2701,6 +2704,8 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
  *   from within the same method. Also, shutting down things in the right
  *   order avoids spewing error messages...
  *
+ *  \param mctx           Master player context
+ *  \param ctx            Current player context
  *  \param stopRingBuffer Set to true if ringbuffer must be shut down.
  *  \param stopPlayer     Set to true if player must be shut down.
  *  \param stopRecorder   Set to true if recorder must be shut down.
@@ -5672,6 +5677,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 
 /**
  * \brief Setup Picture by Picture. right side will be the current video.
+ * \param ctx  Current player context
  * \param info programinfo for PBP to use for left Picture. is NULL for Live TV
  */
 bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
@@ -5758,6 +5764,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
 
 /**
  * \brief create PIP.
+ * \param ctx  Current player context
  * \param info programinfo for PIP to create. is NULL for LiveTV PIP
  */
 bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
@@ -7454,8 +7461,9 @@ QString TV::GetQueuedChanNum(void) const
     return ret;
 }
 
-/** \fn TV::ClearInputQueues(const PlayerContext*,bool)
+/**
  *  \brief Clear channel key buffer of input keys.
+ *  \param ctx     Current player context
  *  \param hideosd if true, hides "channel_number" OSDSet.
  */
 void TV::ClearInputQueues(const PlayerContext *ctx, bool hideosd)
@@ -10398,7 +10406,7 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     }
 }
 
-/** \fn TV::ChannelEditKey(const PlayerContext*, const QKeyEvent *e)
+/**
  *  \brief Processes channel editing key.
  */
 bool TV::HandleOSDChannelEdit(PlayerContext *ctx, QString action)

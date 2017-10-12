@@ -64,7 +64,7 @@ class VideoOutput
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
     virtual bool SetDeinterlacingEnabled(bool);
-    virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
+    virtual bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
     virtual void FallbackDeint(void);
     virtual void BestDeint(void);
     virtual bool NeedsDoubleFramerate(void) const;

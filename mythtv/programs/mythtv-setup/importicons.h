@@ -91,7 +91,7 @@ class ImportIconsWizard : public MythScreenType
     QString escape_csv(const QString& str);
 
     /*! \brief extracts the csv values out of a string
-     * \param str the string to work on
+     * \param strLine the string to work on
      * \return the actual QStringList
      */
     QStringList extract_csv(const QString& strLine);
@@ -104,13 +104,13 @@ class ImportIconsWizard : public MythScreenType
     QString wget(QUrl& url,const QString& strParam);
 
     /*! \brief looks up the string to determine the caller/xmltvid
-     * \param str the string to work on
+     * \param strParam the string to work on
      * \return true/false
      */
     bool lookup(const QString& strParam);
 
     /*! \brief search the remote db for icons etc
-     * \param str the string to work on
+     * \param strParam the string to work on
      * \return true/false
      */
     bool search(const QString& strParam);
@@ -121,7 +121,7 @@ class ImportIconsWizard : public MythScreenType
     bool submit();
 
     /*! \brief retrieve the actual logo for the TV channel
-     * \param str the string to work on
+     * \param strParam str the string to work on
      * \return true/false
      */
     bool findmissing(const QString& strParam);

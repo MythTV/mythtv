@@ -76,7 +76,7 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     PROPERTYIMP( uint       ,     Colour            )
     PROPERTYIMP( uint       ,     Hue               )
     PROPERTYIMP( uint       ,     DiSEqCId          )
-    PROPERTYIMP( bool       ,     DVBEITScan        )
+    PROPERTYIMP( bool       ,     DVBEITScan        );
 
     public:
 

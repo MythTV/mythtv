@@ -563,20 +563,20 @@ bool VideoOutputOMX::SetDeinterlacingEnabled(bool interlaced)
 }
 
 // virtual
-bool VideoOutputOMX::SetupDeinterlace(bool interlaced, const QString &ovrf)
+bool VideoOutputOMX::SetupDeinterlace(bool interlaced, const QString &overridefilter)
 {
     if (!m_imagefx.IsValid())
-        return VideoOutput::SetupDeinterlace(interlaced, ovrf);
+        return VideoOutput::SetupDeinterlace(interlaced, overridefilter);
 
     QString deintfiltername;
     if (db_vdisp_profile)
-        deintfiltername = db_vdisp_profile->GetFilteredDeint(ovrf);
+        deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
 
     if (!deintfiltername.contains(kName))
     {
         if (m_deinterlacing && m_deintfiltername.contains(kName))
             SetImageFilter(OMX_ImageFilterNone);
-        return VideoOutput::SetupDeinterlace(interlaced, ovrf);
+        return VideoOutput::SetupDeinterlace(interlaced, overridefilter);
     }
 
     if (m_deinterlacing == interlaced && deintfiltername == m_deintfiltername)

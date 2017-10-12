@@ -39,7 +39,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, RecRules )
+    PROPERTYIMP_RO_REF( QVariantList, RecRules );
 
     public:
 

@@ -34,7 +34,7 @@ class SERVICE_PUBLIC ChannelGroup : public QObject
 
     PROPERTYIMP       ( uint        , GroupId        )
     PROPERTYIMP       ( QString     , Name           )
-    PROPERTYIMP       ( QString     , Password       )
+    PROPERTYIMP       ( QString     , Password       );
 
     public:
 

@@ -234,11 +234,11 @@ RecordingInfo::RecordingInfo(
 
 /** \brief Fills RecordingInfo for the program that airs at
  *         "desiredts" on "chanid".
- *  \param chanid  %Channel ID on which to search for program.
+ *  \param _chanid  %Channel ID on which to search for program.
  *  \param desiredts Date and Time for which we desire the program.
  *  \param genUnknown Generate a full entry for live-tv if unknown
  *  \param maxHours Clamp the maximum time to X hours from dtime.
- *  \return LoadStatus describing what happened.
+ *  \param[out] status LoadStatus describing what happened.
  */
 RecordingInfo::RecordingInfo(
     uint _chanid, const QDateTime &desiredts,
@@ -575,9 +575,12 @@ void RecordingInfo::ApplyRecordRecID(void)
 /**
  *  \brief Sets RecordingType of "record", creating "record" if it
  *         does not exist.
- *  \param newstate State to apply to "record" RecordingType.
+ *  \param newstate State to apply to "record" RecordingType. This
+ *                  uses same values as return of GetProgramRecordingState
+ *  \param save     If true, save the new state of the recording into the
+ *                  database. Note: If the new state is kNotRecording this
+ *                  means that the recording will be deleted.
  */
-// newstate uses same values as return of GetProgramRecordingState
 void RecordingInfo::ApplyRecordStateChange(RecordingType newstate, bool save)
 {
     GetProgramRecordingStatus();
@@ -1145,10 +1148,13 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     return ok;
 }
 
-/** \fn RecordingInfo::FinishedRecording(bool allowReRecord)
+/**
  *  \brief If not a premature stop, adds program to history of recorded
  *         programs.
- *  \param prematurestop If true, we only fetch the recording status.
+ *  \param allowReRecord This flag goes into the entry in the recorded
+ *                       programs. It also determines whether the
+ *                       recordedmarkup database table is updated with the
+ *                       program length.
  */
 void RecordingInfo::FinishedRecording(bool allowReRecord)
 {

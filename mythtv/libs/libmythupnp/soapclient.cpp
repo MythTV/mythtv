@@ -170,7 +170,7 @@ QString SOAPClient::GetNodeValue(
  *
  * \param nErrCode set to zero on success, non-zero in case of error.
  *
- * \param sErrCode returns error description from device, when applicable.
+ * \param sErrDesc returns error description from device, when applicable.
  *
  * \return Returns a QDomDocument containing output parameters on success.
  */

@@ -8,7 +8,7 @@
 
 class GallerySettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(GallerySettings)
+    Q_DECLARE_TR_FUNCTIONS(GallerySettings);
 
   public:  
     GallerySettings();

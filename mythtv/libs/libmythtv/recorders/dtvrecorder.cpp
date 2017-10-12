@@ -848,7 +848,7 @@ void DTVRecorder::HandleKeyframe(int64_t extra)
 
 /** \fn DTVRecorder::FindH264Keyframes(const TSPacket*)
  *  \brief This searches the TS packet to identify keyframes.
- *  \param TSPacket Pointer the the TS packet data.
+ *  \param tspacket Pointer the the TS packet data.
  *  \return Returns true if a keyframe has been found.
  */
 bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)

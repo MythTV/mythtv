@@ -725,10 +725,10 @@ void VideoOutWindow::StopEmbedding(void)
 }
 
 /**
- * \fn VideoOutWindow::GetVisibleOSDBounds(float&,float&,float) const
  * \brief Returns visible portions of total OSD bounds
  * \param visible_aspect physical aspect ratio of bounds returned
  * \param font_scaling   scaling to apply to fonts
+ * \param themeaspect    aspect ration of the theme
  */
 QRect VideoOutWindow::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling, float themeaspect) const

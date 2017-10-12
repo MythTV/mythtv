@@ -95,7 +95,7 @@ void ProgInfoList::CreateButton(QString name, QString value)
 
 /*!
  * \brief Build list of key:value buttons
- * \param key/value list
+ * \param data key/value list
  */
 void ProgInfoList::Display(const DataList& data)
 {

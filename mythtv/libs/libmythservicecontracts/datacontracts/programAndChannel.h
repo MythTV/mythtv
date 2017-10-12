@@ -220,7 +220,7 @@ class SERVICE_PUBLIC Program : public QObject
     PROPERTYIMP( bool, SerializeChannel )
     PROPERTYIMP( bool, SerializeRecording )
     PROPERTYIMP( bool, SerializeArtwork )
-    PROPERTYIMP( bool, SerializeCast )
+    PROPERTYIMP( bool, SerializeCast );
 
     public:
 

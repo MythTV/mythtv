@@ -36,7 +36,7 @@ class SERVICE_PUBLIC LabelValue : public QObject
     PROPERTYIMP( QString  , Value       )
     PROPERTYIMP( QString  , Description )
     PROPERTYIMP( bool     , Active      )
-    PROPERTYIMP( bool     , Selected    )
+    PROPERTYIMP( bool     , Selected    );
 
     public:
 

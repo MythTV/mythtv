@@ -501,7 +501,7 @@ void ProgramMapTable::AppendStream(
     SetTotalLength(_ptrs[StreamCount()] - pesdata());
 }
 
-/** \fn ProgramMapTable::IsVideo(uint,QString) const
+/**
  *  \brief Returns true iff the stream at index i is a video stream.
  *
  *   This of course returns true if StreamID::IsVideo() is true.
@@ -509,6 +509,7 @@ void ProgramMapTable::AppendStream(
  *   StreamID::Normalize() is used on the stream type.
  *
  *  \param i index of stream
+ *  \param sistandard standard to use in determining if this is a A/V stream
  */
 bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
 {
@@ -522,7 +523,7 @@ bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
     return StreamID::IsVideo(stream_id);
 }
 
-/** \fn ProgramMapTable::IsAudio(uint,QString) const
+/**
  *  \brief Returns true iff the stream at index i is an audio stream.
  *
  *   This of course returns true if StreamID::IsAudio() is true.
@@ -530,6 +531,7 @@ bool ProgramMapTable::IsVideo(uint i, QString sistandard) const
  *   StreamID::Normalize() is used on the stream type.
  *
  *  \param i index of stream
+ *  \param sistandard standard to use in determining if this is a A/V stream
  */
 bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
 {
@@ -543,8 +545,9 @@ bool ProgramMapTable::IsAudio(uint i, QString sistandard) const
     return StreamID::IsAudio(stream_id);
 }
 
-/** \fn ProgramMapTable::IsEncrypted(QString sistandard) const
+/**
  *  \brief Returns true iff PMT contains CA descriptor for a vid/aud stream.
+ *  \param sistandard standard to use in determining if this is a A/V stream
  */
 bool ProgramMapTable::IsEncrypted(QString sistandard) const
 {

@@ -35,7 +35,7 @@ class SERVICE_PUBLIC EnvInfo : public QObject
     PROPERTYIMP( QString, LCALL       )
     PROPERTYIMP( QString, LCCTYPE     )
     PROPERTYIMP( QString, HOME        )
-    PROPERTYIMP( QString, MYTHCONFDIR )
+    PROPERTYIMP( QString, MYTHCONFDIR );
 
     public:
 

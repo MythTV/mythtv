@@ -13,6 +13,8 @@
  *  \brief  Constructor
  *  \param  parent The screen parent
  *  \param  name The name of the screen
+ *  \param  editsAllowed Are edits allowed. Affects what menu items are
+ *                       presented to the user.
  */
 GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
                                    bool editsAllowed)
@@ -346,9 +348,11 @@ void GallerySlideView::MenuTransforms(MythMenu &mainMenu)
 
 /*!
  \brief  Start slideshow
- \param type Browsing, Normal or Recursive
- \param view View to initialise slideshow from.
- \param newScreen True if starting from Thumbview, False otherwise
+ \param type       Browsing, Normal or Recursive
+ \param parentId   The dir id, if positive. Otherwise the view is refreshed
+                   using the existing parent dir
+ \param selectedId Currently selected item. If not set, will default to the
+                   first item.
 */
 void GallerySlideView::Start(ImageSlideShowType type, int parentId, int selectedId)
 {
@@ -422,6 +426,7 @@ void GallerySlideView::Stop()
 
 /**
  *  \brief Start a slideshow
+ *  \param useTransition if false, slide will be updated instantly
  */
 void GallerySlideView::Play(bool useTransition)
 {
@@ -676,6 +681,7 @@ void GallerySlideView::ShowPrevSlide(int inc)
 
 /*!
  \brief Display the next slide in the sequence
+ \param inc How many slides to move forward.
  \param useTransition if false, slide will be updated instantly
 */
 void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
@@ -726,6 +732,7 @@ void GallerySlideView::PlayVideo()
 /*!
  \brief Displays status text (Loading, Paused etc.)
  \param msg Text to show
+ \param delay It true, delay showing the status.
 */
 void GallerySlideView::SetStatus(QString msg, bool delay)
 {

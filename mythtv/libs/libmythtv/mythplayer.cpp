@@ -1132,7 +1132,7 @@ int MythPlayer::GetFreeVideoFrames(void) const
     return 0;
 }
 
-/** \fn MythPlayer::GetNextVideoFrame(bool)
+/**
  *  \brief Removes a frame from the available queue for decoding onto.
  *
  *   This places the frame in the limbo queue, from which frames are
@@ -1140,10 +1140,6 @@ int MythPlayer::GetFreeVideoFrames(void) const
  *   freed from limbo either by a ReleaseNextVideoFrame() or
  *   DiscardVideoFrame() call; but limboed frames are also freed
  *   during a seek reset.
- *
- *  \param allow_unsafe if true then a frame will be taken from the queue
- *         of frames ready for display if we can't find a frame in the
- *         available queue.
  */
 VideoFrame *MythPlayer::GetNextVideoFrame(void)
 {
@@ -2363,7 +2359,7 @@ void MythPlayer::EnableFrameRateMonitor(bool enable)
     output_jmeter->SetNumCycles(rate);
 }
 
-void MythPlayer::ForceDeinterlacer(const QString &override)
+void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
 {
     if (!videoOutput)
         return;
@@ -2372,7 +2368,7 @@ void MythPlayer::ForceDeinterlacer(const QString &override)
     videofiltersLock.lock();
 
     m_double_framerate =
-         videoOutput->SetupDeinterlace(true, override) &&
+         videoOutput->SetupDeinterlace(true, overridefilter) &&
          videoOutput->NeedsDoubleFramerate();
     m_double_process = videoOutput->IsExtraProcessingRequired();
 

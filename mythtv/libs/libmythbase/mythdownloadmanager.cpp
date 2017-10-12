@@ -907,6 +907,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     return success;
 }
 
+#ifndef _WIN32
 /** \brief Download blocking methods with link-local address.
  *
  * Special processing for IPV6 link-local addresses, which
@@ -927,7 +928,6 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
  * \param dlInfo     Information on URI to download.
  * \return true if download was successful, false otherwise.
  */
- #ifndef _WIN32
 bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool deleteInfo)
 {
     bool isOK = true;
@@ -1050,7 +1050,8 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
 #endif
 
 /** \brief Cancel a queued or current download.
- *  \param url for download to cancel
+ *  \param url URL for download to cancel
+ *  \param block If true, wait until all the cancellations have finished.
  */
 void MythDownloadManager::cancelDownload(const QString &url, bool block)
 {
@@ -1058,7 +1059,8 @@ void MythDownloadManager::cancelDownload(const QString &url, bool block)
 }
 
 /** \brief Cancel a queued or current download.
- *  \param list of urls for download to cancel
+ *  \param urls List of URLs for download to cancel
+ *  \param block If true, wait until all the cancellations have finished.
  */
 void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 {

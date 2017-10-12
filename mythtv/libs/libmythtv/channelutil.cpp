@@ -881,9 +881,9 @@ bool ChannelUtil::GetCachedPids(uint chanid,
 
 /** \brief Saves PIDs for PSIP tables to database.
  *
- *  \param chanid     Channel ID to fetch cached pids for.
- *  \param pid_cache  List of PIDs with their TableID types to be saved.
- *  \param delete_all If true delete both permanent and transient pids first.
+ *  \param chanid      Channel ID to fetch cached pids for.
+ *  \param _pid_cache  List of PIDs with their TableID types to be saved.
+ *  \param delete_all  If true delete both permanent and transient pids first.
  */
 bool ChannelUtil::SaveCachedPids(uint chanid,
                                  const pid_cache_t &_pid_cache,
@@ -1076,7 +1076,7 @@ static QStringList get_valid_recorder_list(const QString &channum)
     return reclist;
 }
 
-/** \fn TV::GetValidRecorderList(uint, const QString&)
+/**
  *  \brief Returns list of the recorders that have chanid or channum
  *         in their sources.
  *  \param chanid   Channel ID of channel we are querying recorders for.

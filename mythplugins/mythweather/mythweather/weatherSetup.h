@@ -32,7 +32,7 @@ struct SourceListInfo
     uint id;
 };
 
-Q_DECLARE_METATYPE(SourceListInfo *)
+Q_DECLARE_METATYPE(SourceListInfo *);
 
 /** \class GlobalSetup
  *  \brief Screen for mythweather global settings

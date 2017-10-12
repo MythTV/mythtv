@@ -777,7 +777,7 @@ ushort CCtableG2[0x60] =
     0,                  0x2026,/* elipsis */
     0,                  0,                     /* 0x24-0x27 */
     0,                  0,
-    0x160,/*S under \/*/0,                     /* 0x28-0x2b */
+    0x160,/*S under \/ */0,                    /* 0x28-0x2b */
     0x152, /* CE */     0,
     0,                  0,                     /* 0x2c-0x2f */
     0x2588,/*block*/    0x2018,/* open ' */
@@ -785,7 +785,7 @@ ushort CCtableG2[0x60] =
     0x201d,/*close " */ 0xB7,/* dot */
     0,                  0,                     /* 0x34-0x37 */
     0,                  0x2122,/* super TM */
-    0x161,/*s under \/*/0,                     /* 0x38-0x3b */
+    0x161,/*s under \/ */0,                    /* 0x38-0x3b */
     0x153, /* ce */     0x2120,/* super SM */
     0,                  0x178,/*Y w/umlout*/   /* 0x3c-0x3f */
 

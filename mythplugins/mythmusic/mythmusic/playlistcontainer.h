@@ -29,7 +29,7 @@ class PlaylistLoadingThread : public MThread
 
 class PlaylistContainer
 {
-    Q_DECLARE_TR_FUNCTIONS(PlaylistContainer)
+    Q_DECLARE_TR_FUNCTIONS(PlaylistContainer);
 
   public:
     explicit PlaylistContainer(AllMusic *all_music);

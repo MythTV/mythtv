@@ -42,7 +42,7 @@ QString formattedFieldValue(const QVariant &value);
 
 class SmartPLCriteriaRow
 {
-    Q_DECLARE_TR_FUNCTIONS(SmartPLCriteriaRow)
+    Q_DECLARE_TR_FUNCTIONS(SmartPLCriteriaRow);
 
   public:
 
@@ -65,7 +65,7 @@ class SmartPLCriteriaRow
     QString Value2;
 };
 
-Q_DECLARE_METATYPE(SmartPLCriteriaRow *)
+Q_DECLARE_METATYPE(SmartPLCriteriaRow *);
 
 class SmartPlaylistEditor : public MythScreenType
 {

@@ -47,8 +47,8 @@ namespace M3U
     }
 
     /**
-     * Return the decimal argument in a line of type: blah:<decimal>
-     * presence of valud <decimal> is compulsory or it will return RET_ERROR
+     * Return the decimal argument in a line of type: blah:\<decimal\>
+     * presence of value \<decimal\> is compulsory or it will return RET_ERROR
      */
     bool ParseDecimalValue(const QString& line, int &target)
     {
@@ -64,8 +64,8 @@ namespace M3U
     }
 
     /**
-     * Return the decimal argument in a line of type: blah:<decimal>
-     * presence of valud <decimal> is compulsory or it will return RET_ERROR
+     * Return the decimal argument in a line of type: blah:\<decimal\>
+     * presence of value \<decimal\> is compulsory or it will return RET_ERROR
      */
     bool ParseDecimalValue(const QString& line, int64_t &target)
     {

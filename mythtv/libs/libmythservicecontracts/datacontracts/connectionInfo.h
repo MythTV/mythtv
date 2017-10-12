@@ -33,7 +33,7 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 
     PROPERTYIMP_PTR( VersionInfo , Version    )
     PROPERTYIMP_PTR( DatabaseInfo, Database   )
-    PROPERTYIMP_PTR( WOLInfo     , WOL        )
+    PROPERTYIMP_PTR( WOLInfo     , WOL        );
 
     public:
 

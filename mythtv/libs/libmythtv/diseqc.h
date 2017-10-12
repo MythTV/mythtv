@@ -117,7 +117,7 @@ class DiSEqCDevTree
     uint CreateFakeDiSEqCID(void)       { return m_previous_fake_diseqcid++; }
 
     static bool IsFakeDiSEqCID(uint id) { return id >= kFirstFakeDiSEqCID; }
-    static bool Exists(int id);
+    static bool Exists(int cardid);
 
   protected:
     bool ApplyVoltage(const DiSEqCDevSettings &settings,
@@ -461,8 +461,8 @@ class DiSEqCDevLNB : public DiSEqCDevDevice
     bool         IsPolarityInverted(void) const { return m_pol_inv;    }
     bool         IsHighBand(const DTVMultiplex&) const;
     bool         IsHorizontal(const DTVMultiplex&) const;
-    uint32_t     GetIntermediateFrequency(const DiSEqCDevSettings&,
-                                          const DTVMultiplex&) const;
+    uint32_t     GetIntermediateFrequency(const DiSEqCDevSettings& settings,
+                                          const DTVMultiplex &tuning) const;
     virtual uint GetVoltage(const DiSEqCDevSettings&,
                             const DTVMultiplex&) const;
 

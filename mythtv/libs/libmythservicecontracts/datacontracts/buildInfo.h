@@ -31,7 +31,7 @@ class SERVICE_PUBLIC BuildInfo : public QObject
 
     PROPERTYIMP( QString , Version   )
     PROPERTYIMP( bool    , LibX264   )
-    PROPERTYIMP( bool    , LibDNS_SD )
+    PROPERTYIMP( bool    , LibDNS_SD );
 
     public:
 

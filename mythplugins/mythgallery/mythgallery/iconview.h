@@ -46,7 +46,7 @@ class ThumbGenerator;
 class MediaMonitor;
 class ChildCountThread;
 
-Q_DECLARE_METATYPE(ThumbItem*)
+Q_DECLARE_METATYPE(ThumbItem*);
 
 class IconView : public MythScreenType
 {

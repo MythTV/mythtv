@@ -9,7 +9,7 @@
 
 class MythWelcomeSettings : public ConfigurationWizard
 {
-    Q_DECLARE_TR_FUNCTIONS(MythWelcomeSettings)
+    Q_DECLARE_TR_FUNCTIONS(MythWelcomeSettings);
 
   public:
     MythWelcomeSettings();
@@ -17,7 +17,7 @@ class MythWelcomeSettings : public ConfigurationWizard
 
 class MythShutdownSettings : public ConfigurationWizard
 {
-    Q_DECLARE_TR_FUNCTIONS(MythShutdownSettings)
+    Q_DECLARE_TR_FUNCTIONS(MythShutdownSettings);
 
   public:
     MythShutdownSettings();

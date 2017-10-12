@@ -51,7 +51,7 @@ private slots:
 
 class ImageView
 {
-     Q_DECLARE_TR_FUNCTIONS(ImageView)
+     Q_DECLARE_TR_FUNCTIONS(ImageView);
 
   public:
     ImageView(const ThumbList &itemList,
