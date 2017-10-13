@@ -1076,8 +1076,9 @@ class Tvdb:
 
         url = self.config['url_epInfo'] % sid
         epsEt = self._getetsrc(url, language=self.shows[sid].data[u'language'])
-        for cur_ep in epsEt:
-            self._parseEpisodeInfo(sid, cur_ep)
+        if epsEt:
+            for cur_ep in epsEt:
+                self._parseEpisodeInfo(sid, cur_ep)
 
     def _parseEpisodeInfo(self, sid, cur_ep):
         if self.config['dvdorder']:
