@@ -636,7 +636,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
         .arg(p->GetChannelSchedulingID().leftJustified(7, ' ', true))
         .arg(p->GetRecordingStartTime().toLocalTime().toString("dd hh:mm"))
         .arg(p->GetRecordingEndTime().toLocalTime().toString("hh:mm"))
-        .arg(QString::number(p->sgroupid).rightJustified(2, ' '))
+        .arg(p->GetShortInputName().rightJustified(2, ' '))
         .arg(QString::number(p->GetInputID()).rightJustified(2, ' '));
     outstr += QString("%1 %2 %3")
         .arg(toQChar(p->GetRecordingRuleType()))
@@ -1643,6 +1643,7 @@ void Scheduler::PruneRedundants(void)
         {
             p->SetInputID(0);
             p->SetSourceID(0);
+            p->ClearInputName();
             p->sgroupid = 0;
         }
 
