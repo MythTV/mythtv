@@ -443,6 +443,10 @@ class MPUBLIC ProgramInfo
     uint    GetSourceID(void)             const { return sourceid;     }
     uint    GetInputID(void)              const { return inputid;      }
     QString GetInputName(void)            const { return inputname;    }
+    QString GetShortInputName(void) const
+        { return inputname.isRightToLeft() ?
+                 inputname.left(2) : inputname.right(2); }
+    void    ClearInputName(void)          { inputname.clear(); }
 
     uint    GetFindID(void)               const { return findid;       }
 
