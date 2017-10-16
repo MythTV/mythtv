@@ -1,6 +1,7 @@
 #include "mythuihelper.h"
 
 #include <cmath>
+#include <unistd.h>
 
 #include <QImage>
 #include <QPixmap>
@@ -893,21 +894,50 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
  */
 void MythUIHelper::PruneCacheDir(QString dirname)
 {
+    int days = GetMythDB()->GetNumSetting("UIDiskCacheDays", 7);
+    if (days == -1) {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Pruning cache directory: %1 is disabled").arg(dirname));
+        return;
+    }
+
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Pruning cache directory: %1").arg(dirname));
-
-    int days = GetMythDB()->GetNumSetting("UIDiskCacheDays", 7);
     QDateTime cutoff = MythDate::current().addDays(-days);
+    /// todo: Use toSecsSinceEpoch() once Qt 5.8 is min version
+    qint64 cutoffsecs = cutoff.toMSecsSinceEpoch()/1000;
+
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("Removing files not accessed since %1")
         .arg(cutoff.toLocalTime().toString(Qt::ISODate)));
 
-    int kept = 0, deleted = 0;
+    int kept = 0, deleted = 0, errcnt = 0;
     QDir dir(dirname);
     dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    dir.setSorting(QDir::NoSort);
+
+    // Trying to save every cycle possible within this loop.  The
+    // stat() call seems significantly faster than the fi.fileRead()
+    // method.  The documentation for QFileInfo says that the
+    // fi.absoluteFilePath() method has to query the file system, so
+    // use fi.filePath() method here and then add the directory if
+    // needed.  Using dir.entryList() and adding the dirname each time
+    // is also slower just using dir.entryInfoList().
     foreach (const QFileInfo &fi, dir.entryInfoList())
     {
-        if (fi.lastRead() >= cutoff) {
+        struct stat buf;
+        QString fullname = fi.filePath();
+        if (not fullname.startsWith('/'))
+            fullname = dirname + "/" + fullname;
+        QByteArray fullname8 = fullname.toLocal8Bit();
+        int rc = stat(fullname8, &buf);
+        if (rc == -1)
+        {
+            errcnt += 1;
+            continue;
+        }
+        if (buf.st_atime >= cutoffsecs)
+        {
             kept += 1;
             LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("%1 Keep   %2")
@@ -920,12 +950,12 @@ void MythUIHelper::PruneCacheDir(QString dirname)
             QString("%1 Delete %2")
             .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate))
             .arg(fi.fileName()));
-        QFile file(fi.absoluteFilePath());
-        file.remove();
+        unlink(fullname8);
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
-        QString("Kept %1 files, deleted %2 files").arg(kept).arg(deleted));
+        QString("Kept %1 files, deleted %2 files, stat error on %3 files")
+        .arg(kept).arg(deleted).arg(errcnt));
 }
 
 void MythUIHelper::GetScreenBounds(int &xbase, int &ybase,
