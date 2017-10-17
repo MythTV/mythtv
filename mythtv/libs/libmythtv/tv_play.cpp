@@ -11820,11 +11820,15 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             uint inputid  = ctx->GetCardID();
             vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
             vector<InputInfo>::iterator it = inputs.begin();
+            QSet <QString> addednames;
+            addednames += CardUtil::GetDisplayName(inputid);
             for (; it != inputs.end(); ++it)
             {
-                if ((*it).inputid == inputid)
+                if ((*it).inputid == inputid ||
+                    addednames.contains((*it).displayName))
                     continue;
                 active = false;
+                addednames += (*it).displayName;
                 QString action = QString("SWITCHTOINPUT_") +
                     QString::number((*it).inputid);
                 BUTTON(action, (*it).displayName);
