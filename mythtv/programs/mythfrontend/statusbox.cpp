@@ -670,6 +670,8 @@ void StatusBox::doScheduleStatus()
     QMap<int, QString> sourceText;
     QMap<int, int> cardMatch;
     QMap<int, QString> cardText;
+    QMap<int, int> cardParent;
+    QMap<int, bool> cardSchedGroup;
     QString tmpstr;
     int maxSource = 0;
     int maxCard = 0;
@@ -697,16 +699,19 @@ void StatusBox::doScheduleStatus()
             maxCard = query.value(0).toInt();
     }
 
-    query.prepare("SELECT cardid,inputname,displayname "
+    query.prepare("SELECT cardid, inputname, displayname, parentid, "
+                  "       schedgroup "
                   "FROM capturecard");
     if (query.exec())
     {
         while (query.next())
         {
-            if (!query.value(2).toString().isEmpty())
-                cardText[query.value(0).toInt()] = query.value(2).toString();
-            else
-                cardText[query.value(0).toInt()] = query.value(1).toString();
+            int inputid = query.value(0).toInt();
+            cardText[inputid] = query.value(2).toString();
+            if (cardText[inputid].isEmpty())
+                cardText[inputid] = QString::number(query.value(1).toInt());
+            cardParent[inputid] = query.value(3).toInt();
+            cardSchedGroup[inputid] = query.value(4).toBool();
         }
     }
 
@@ -737,7 +742,12 @@ void StatusBox::doScheduleStatus()
             recstatus == RecStatus::Failing)
         {
             ++sourceMatch[s->GetSourceID()];
-            ++cardMatch[s->GetInputID()];
+            int inputid = s->GetInputID();
+            // When schedgroup is used, always attribute recordings to
+            // the parent inputs.
+            if (cardParent[inputid] && cardSchedGroup[cardParent[inputid]])
+                inputid = cardParent[inputid];
+            ++cardMatch[inputid];
             if (s->GetRecordingPriority2() < 0)
                 ++lowerpriority;
             if (s->GetVideoProperties() & VID_HDTV)
@@ -796,7 +806,7 @@ void StatusBox::doScheduleStatus()
         {
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
                              .arg(cardMatch[i]).arg(willrec)
-                             .arg(tr("on card")).arg(i).arg(cardText[i]);
+                             .arg(tr("on input")).arg(i).arg(cardText[i]);
             AddLogLine(tmpstr, helpmsg);
         }
     }
