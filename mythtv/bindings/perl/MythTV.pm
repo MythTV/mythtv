@@ -318,7 +318,9 @@ EOF
     # Hostname override.  Not sure if this is still valid or not
         elsif ($line =~ m#<LocalHostName>(.*?)</LocalHostName>#) {
             $profileoverride = $1;
-            if ($profileoverride ne "my-unique-identifier-goes-here") {
+            if ($profileoverride =~ /^\s*$/) {
+                print STDERR "Warning: LocalHostName tag is empty. Ignoring.\n";
+            } elsif ($profileoverride ne "my-unique-identifier-goes-here") {
                 $mysql_conf{'hostname'} = $profileoverride;
             }
         }
