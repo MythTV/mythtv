@@ -3340,25 +3340,25 @@ NULL
 
     if (dbver == "1346")
     {
-            QString master;
-            // Create new MasterServerName setting
-            if (gCoreContext->IsMasterHost())
-                master =
-                "insert into settings (value,data,hostname) "
-                "values('MasterServerName','"
-                   + gCoreContext->GetHostName() + "', null);";
-            else
-                master =
-                "insert into settings (value,data,hostname) "
-                "select 'MasterServerName', b.hostname, null "
-                "from settings a, settings b "
-                "where a.value = 'MasterServerIP' "
-                "and b.value in ('BackendServerIP','BackendServerIP6')"
-                "and a.data = b.data;";
+        QString master;
+        // Create new MasterServerName setting
+        if (gCoreContext->IsMasterHost())
+            master =
+            "insert into settings (value,data,hostname) "
+            "values('MasterServerName','"
+                + gCoreContext->GetHostName() + "', null);";
+        else
+            master =
+            "insert into settings (value,data,hostname) "
+            "select 'MasterServerName', b.hostname, null "
+            "from settings a, settings b "
+            "where a.value = 'MasterServerIP' "
+            "and b.value in ('BackendServerIP','BackendServerIP6')"
+            "and a.data = b.data;";
 
         const char *updates[] = {
             // Create new MasterServerName setting
-            master.toUtf8(),
+            master.toLocal8Bit().constData(),
             // Create new BackendServerAddr setting for each backend server
             // Assume using IPV4 value.
             "insert into settings (value,data,hostname) "
