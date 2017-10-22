@@ -222,7 +222,13 @@ bool ImportRecorder::Open(void)
             QString("'%1' is not readable").arg(fn));
         return false;
     }
-
+    else if (!f.size())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("'%1' is empty").arg(fn));
+        return false;
+    }
+    
     _import_fd = open(fn.toLocal8Bit().constData(), O_RDONLY);
     if (_import_fd < 0)
     {
