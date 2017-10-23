@@ -3,6 +3,7 @@
 
 #include "mythrect.h"
 #include "mythmainwindow.h"
+#include "mythuihelper.h"
 
 MythRect::MythRect()
          : QRect()
@@ -17,11 +18,11 @@ MythRect::MythRect(int x, int y, int width, int height)
 }
 
 MythRect::MythRect(const QString &sX, const QString &sY, const QString &sWidth,
-                   const QString &sHeight)
+                   const QString &sHeight, const QString &baseRes)
          : QRect()
 {
     Init();
-    setRect(sX,sY,sWidth,sHeight);
+    setRect(sX,sY,sWidth,sHeight,baseRes);
 }
 
 MythRect::MythRect(QRect rect)
@@ -119,12 +120,58 @@ void MythRect::NormRect(void)
 }
 
 void MythRect::setRect(const QString &sX, const QString &sY,
-                       const QString &sWidth, const QString &sHeight)
+                       const QString &sWidth, const QString &sHeight,
+                       const QString &rectBaseRes)
 {
-    setX(sX);
-    setY(sY);
-    setWidth(sWidth);
-    setHeight(sHeight);
+
+    // cater for an extra paramater on area and similar tags
+    // for base resolution.
+
+    QString vX = sX;
+    QString vY = sY;
+    QString vWidth = sWidth;
+    QString vHeight = sHeight;
+    if (!rectBaseRes.isEmpty())
+    {
+        QStringList res = rectBaseRes.split('x');
+        if (res.size() == 2)
+        {
+            QSize themeBaseSize = GetMythUI()->GetBaseSize();
+            int rectBaseWidth = res[0].toInt();
+            int rectBaseHeight = res[1].toInt();
+            if (rectBaseWidth > 0 && rectBaseHeight > 0)
+            {
+                int iX = sX.toInt();
+                if (iX > 0)
+                {
+                    iX = iX * themeBaseSize.width() / rectBaseWidth;
+                    vX = QString::number(iX);
+                }
+                int iY = sY.toInt();
+                if (iY > 0)
+                {
+                    iY = iY * themeBaseSize.height() / rectBaseHeight;
+                    vY = QString::number(iY);
+                }
+                int iWidth = sWidth.toInt();
+                if (iWidth > 0)
+                {
+                    iWidth = iWidth * themeBaseSize.width() / rectBaseWidth;
+                    vWidth = QString::number(iWidth);
+                }
+                int iHeight = sHeight.toInt();
+                if (iHeight > 0)
+                {
+                    iHeight = iHeight * themeBaseSize.height() / rectBaseHeight;
+                    vHeight = QString::number(iHeight);
+                }
+            }
+        }
+    }
+    setX(vX);
+    setY(vY);
+    setWidth(vWidth);
+    setHeight(vHeight);
 }
 
 /**

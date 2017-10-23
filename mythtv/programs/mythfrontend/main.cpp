@@ -28,6 +28,7 @@ using namespace std;
 #include "mythsystemlegacy.h"
 #include "tv.h"
 #include "proglist.h"
+#include "prevreclist.h"
 #include "progfind.h"
 #include "scheduleeditor.h"
 #include "manualschedule.h"
@@ -546,6 +547,16 @@ static void startPlayback(void)
 static void startPrevious(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    PrevRecordedList *pl = new PrevRecordedList(mainStack);
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
+}
+
+static void startPreviousOld(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack);
     if (pl->Create())
         mainStack->AddScreen(pl);
@@ -890,6 +901,8 @@ static void TVMenuCallback(void *data, QString &selection)
         startSearchTime();
     else if (sel == "tv_previous")
         startPrevious();
+    else if (sel == "tv_previous_old")
+        startPreviousOld();
     else if (sel == "settings appearance")
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

@@ -134,6 +134,9 @@ MythRect XMLParseBase::parseRect(const QString &text, bool normalize)
     QStringList values = text.split(',', QString::SkipEmptyParts);
     if (values.size() == 4)
         retval = MythRect(values[0], values[1], values[2], values[3]);
+    if (values.size() == 5)
+        retval = MythRect(values[0], values[1], values[2], values[3],
+            values[4]);
 
      if (normalize)
          retval.NormRect();

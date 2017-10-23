@@ -204,7 +204,10 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 
     m_recordID = proginfo->GetRecordingRuleID();
     if (m_recordID)
-        Load();
+    {
+        if (!Load())
+            return false;
+    }
     else
         LoadTemplate(proginfo->GetCategory(), proginfo->GetCategoryTypeString());
 

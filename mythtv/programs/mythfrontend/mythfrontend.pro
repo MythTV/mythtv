@@ -55,7 +55,7 @@ HEADERS += commandlineparser.h          idlescreen.h
 HEADERS += gallerythumbview.h           galleryslideview.h
 HEADERS += galleryconfig.h              galleryviews.h
 HEADERS += galleryslide.h               gallerytransitions.h
-HEADERS += galleryinfo.h
+HEADERS += galleryinfo.h                prevreclist.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -80,7 +80,7 @@ SOURCES += commandlineparser.cpp        idlescreen.cpp
 SOURCES += gallerythumbview.cpp         galleryslideview.cpp
 SOURCES += galleryconfig.cpp            galleryviews.cpp
 SOURCES += galleryslide.cpp             gallerytransitions.cpp
-SOURCES += galleryinfo.cpp
+SOURCES += galleryinfo.cpp              prevreclist.cpp
 
 HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h

@@ -1,0 +1,788 @@
+/*
+ * Copyright (c) 2017 Peter G Bennett <pbennett@mythtv.org>
+ *
+ * This file is part of MythTV.
+ *
+ * MythTV is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Public License as
+ * published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * MythTV is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MythTV. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "prevreclist.h"
+
+// C/C++
+#include <algorithm>
+#include <deque>                        // for _Deque_iterator, operator-, etc
+#include <iterator>                     // for reverse_iterator
+using namespace std;
+
+// QT
+#include <QString>
+#include <QDateTime>
+
+//MythTV
+#include "mythcorecontext.h"
+#include "mythdb.h"
+#include "xmlparsebase.h"
+#include "recordinginfo.h"
+#include "recordingrule.h"
+#include "scheduledrecording.h"
+
+// MythUI
+#include "mythuitext.h"
+#include "mythuibuttonlist.h"
+#include "mythuibutton.h"
+#include "mythscreenstack.h"
+#include "mythmainwindow.h"
+#include "mythuiutils.h"                // for UIUtilE, UIUtilW
+#include "mythdialogbox.h"
+
+#define LOC      QString("PrevRecordedList: ")
+
+// flags for PrevRecSortFlags setting
+static const int fTitleGroup = 1;
+static const int fReverseSort = 2;
+static const int fDefault = fReverseSort;
+
+PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
+    const QString &title) :
+    ScheduleCommon(parent,"PrevRecordedList"),
+    m_curviewText(NULL),
+    m_help1Text(NULL),
+    m_help2Text(NULL),
+    m_titleGroup(true),
+    m_reverseSort(false),
+    m_allowEvents(true),
+    m_recid(recid),
+    m_title(title)
+{
+
+    if (m_recid && !m_title.isEmpty())
+    {
+        m_where = QString(" AND ( recordid = %1 OR title = :MTITLE )")
+            .arg(m_recid);
+    }
+    else if (!m_title.isEmpty())
+    {
+        m_where = QString("AND title = :MTITLE ");
+    }
+    else if (m_recid)
+    {
+        m_where = QString("AND recordid = %1 ").arg(m_recid);
+    }
+    else
+    {
+        // Get sort options if this is not a filtered list
+        int flags = gCoreContext->GetNumSetting("PrevRecSortFlags",fDefault);
+        m_titleGroup = flags & fTitleGroup;
+        m_reverseSort = flags & fReverseSort;
+
+    }
+}
+
+PrevRecordedList::~PrevRecordedList()
+{
+    if (m_where.isEmpty())
+    {
+        // Save sort setting if this is not a filtered list
+        int flags = 0;
+        if (m_titleGroup)
+            flags |= fTitleGroup;
+        if (m_reverseSort)
+            flags |= fReverseSort;
+        gCoreContext->SaveSetting("PrevRecSortFlags", flags);
+    }
+    m_titleData.clear();
+    m_showData.clear();
+    gCoreContext->removeListener(this);
+}
+
+bool PrevRecordedList::Create(void)
+{
+    if (!LoadWindowFromXML("schedule-ui.xml", "prevreclist", this))
+        return false;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_titleList, "titles", &err);
+    UIUtilE::Assign(this, m_showList, "shows", &err);
+    UIUtilW::Assign(this, m_help1Text, "help1text");
+    UIUtilW::Assign(this, m_help2Text, "help2text");
+    UIUtilW::Assign(this, m_curviewText, "curview");
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'prevreclist'");
+        return false;
+    }
+
+    m_titleList->SetLCDTitles(tr("Programs"), "title");
+    m_showList->SetLCDTitles(tr("Episodes"), "startdate|parttitle");
+
+    BuildFocusList();
+    gCoreContext->addListener(this);
+    LoadInBackground();
+
+    return true;
+}
+
+void PrevRecordedList::Init(void)
+{
+    gCoreContext->addListener(this);
+    connect(m_showList, &MythUIButtonList::itemSelected,
+            this, &PrevRecordedList::updateInfo);
+    connect(m_showList, &MythUIButtonList::LosingFocus,
+            this, &PrevRecordedList::showListLoseFocus);
+    connect(m_showList, &MythUIButtonList::TakingFocus,
+            this, &PrevRecordedList::showListTakeFocus);
+    connect(m_showList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+                this,  SLOT(ShowItemMenu()));
+
+    UpdateTitleList();
+    updateInfo();
+}
+
+void PrevRecordedList::Load(void)
+{
+    if (m_titleGroup)
+        LoadTitles();
+    else
+        LoadDates();
+
+    ScreenLoadCompletionEvent *slce =
+        new ScreenLoadCompletionEvent(objectName());
+    QCoreApplication::postEvent(this, slce);
+}
+
+static bool comp_sorttitle_lt(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return a->sortTitle.compare(b->sortTitle,Qt::CaseInsensitive) < 0;
+}
+
+static bool comp_sorttitle_lt_rev(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return b->sortTitle.compare(a->sortTitle,Qt::CaseInsensitive) < 0;
+}
+
+static bool comp_sortdate_lt(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return a->GetRecordingStartTime() < b->GetRecordingStartTime();
+}
+
+static bool comp_sortdate_lt_rev(
+    const ProgramInfo *a, const ProgramInfo *b)
+{
+    return b->GetRecordingStartTime() < a->GetRecordingStartTime();
+}
+
+// Load a list of titles without subtitle or other info.
+// each title can represent multiple recordings.
+bool PrevRecordedList::LoadTitles(void)
+{
+    QString querystr = "SELECT DISTINCT title FROM oldrecorded "
+        "WHERE oldrecorded.future = 0 " + m_where;
+
+    m_titleData.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(querystr);
+
+    if (!m_title.isEmpty())
+        query.bindValue(":MTITLE", m_title);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("PrevRecordedList::LoadTitles", query);
+        return false;
+    }
+
+    const QRegExp prefixes(
+        tr("^(The |A |An )",
+           "Regular Expression for what to ignore when sorting"));
+
+    while (query.next())
+    {
+        QString title(query.value(0).toString());
+        ProgramInfo *program = new ProgramInfo();
+        program->SetTitle(title);
+        program->sortTitle = title;
+        program->sortTitle.remove(prefixes);
+        m_titleData.push_back(program);
+    }
+    if (m_reverseSort)
+        std::stable_sort(m_titleData.begin(), m_titleData.end(),
+            comp_sorttitle_lt_rev);
+    else
+        std::stable_sort(m_titleData.begin(), m_titleData.end(),
+            comp_sorttitle_lt);
+    return true;
+}
+
+bool PrevRecordedList::LoadDates(void)
+{
+    QString querystr = "SELECT DISTINCT YEAR(starttime), MONTH(starttime) "
+        "FROM oldrecorded "
+        "WHERE oldrecorded.future = 0 " + m_where;
+
+    m_titleData.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(querystr);
+
+    if (!m_title.isEmpty())
+        query.bindValue(":MTITLE", m_title);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("PrevRecordedList::LoadDates", query);
+        return false;
+    }
+
+    // Create "Last two weeks" entry
+    // It is identified by bogus date of 0000/00
+
+    ProgramInfo *program = new ProgramInfo();
+    program->SetRecordingStartTime(QDateTime::currentDateTime());
+    program->SetTitle(tr("Last two weeks"));
+    program->sortTitle = "0000/00";
+    m_titleData.push_back(program);
+
+    while (query.next())
+    {
+        int year(query.value(0).toInt());
+        int month(query.value(1).toInt());
+        ProgramInfo *program = new ProgramInfo();
+        QDate startdate(year,month,1);
+        QDateTime starttime(startdate);
+        program->SetRecordingStartTime(starttime);
+        QString date(QString::asprintf("%4.4d/%2.2d",year,month));
+        QLocale locale = gCoreContext->GetLocale()->ToQLocale();
+        QString title = QString("%1 %2").
+            arg(locale.monthName(month)).arg(year);
+        program->SetTitle(title);
+        program->sortTitle = date;
+        m_titleData.push_back(program);
+    }
+    if (m_reverseSort)
+        std::stable_sort(m_titleData.begin(), m_titleData.end(),
+            comp_sortdate_lt_rev);
+    else
+        std::stable_sort(m_titleData.begin(), m_titleData.end(),
+            comp_sortdate_lt);
+    return true;
+}
+
+void PrevRecordedList::UpdateTitleList(void)
+{
+    UpdateList(m_titleList, &m_titleData, false);
+}
+
+void PrevRecordedList::UpdateShowList(void)
+{
+    UpdateList(m_showList, &m_showData, true);
+}
+
+void PrevRecordedList::UpdateList(MythUIButtonList *bnList,
+    ProgramList *progData, bool isShows)
+{
+    bnList->Reset();
+    for (uint i = 0; i < progData->size(); ++i)
+    {
+        MythUIButtonListItem *item =
+            new MythUIButtonListItem(bnList, "", QVariant::fromValue((*progData)[i]));
+        InfoMap infoMap;
+        (*progData)[i]->ToMap(infoMap,true);
+        QString state;
+        if (isShows)
+        {
+            QString partTitle;
+            if (m_titleGroup)
+                partTitle = infoMap["subtitle"];
+            else
+                partTitle = infoMap["titlesubtitle"];
+            infoMap["parttitle"] = partTitle;
+            state = RecStatus::toUIState((*progData)[i]->GetRecordingStatus());
+            if ((state == "warning"))
+                state = "disabled";
+        }
+        else
+            infoMap["buttontext"] = infoMap["title"];
+
+        item->SetTextFromMap(infoMap, state);
+    }
+}
+
+void PrevRecordedList::updateInfo(void)
+{
+    if (m_help1Text)
+        m_help1Text->Reset();
+    if (m_help2Text)
+        m_help2Text->Reset();
+
+    if (m_showData.size() > 0)
+    {
+        InfoMap infoMap;
+        m_showData[m_showList->GetCurrentPos()]->ToMap(infoMap,true);
+        SetTextFromMap(infoMap);
+        m_infoMap = infoMap;
+    }
+    else
+    {
+        ResetMap(m_infoMap);
+
+        if (m_titleGroup)
+        {
+            m_titleList->SetLCDTitles(tr("Programs"), "title");
+            m_showList->SetLCDTitles(tr("Episodes"), "startdate|parttitle");
+            if (m_help1Text)
+                m_help1Text->SetText(tr("Select a program..."));
+            if (m_help2Text)
+                m_help2Text->SetText(tr(
+                "Select the title of the program you wish to find. "
+                "When finished return with the left arrow key. "
+                "To search by date press 1."));
+            if (m_curviewText)
+            {
+                if (m_reverseSort)
+                    m_curviewText->SetText(tr("Reverse Title","Sort sequence"));
+                else
+                    m_curviewText->SetText(tr("Title","Sort sequence"));
+            }
+        }
+        else
+        {
+            m_titleList->SetLCDTitles(tr("Dates"), "title");
+            m_showList->SetLCDTitles(tr("Programs"), "startdate|parttitle");
+            if (m_help1Text)
+                m_help1Text->SetText(tr("Select a month ..."));
+            if (m_help2Text)
+                m_help2Text->SetText(tr(
+                "Select a month to search. "
+                "When finished return with the left arrow key. "
+                "To search by title press 2."));
+            if (m_curviewText)
+            {
+                if (m_reverseSort)
+                    m_curviewText->SetText(tr("Reverse Time","Sort sequence"));
+                else
+                    m_curviewText->SetText(tr("Time","Sort sequence"));
+            }
+        }
+    }
+}
+
+void PrevRecordedList::showListLoseFocus(void)
+{
+    m_showData.clear();
+    m_showList->Reset();
+    updateInfo();
+}
+
+void PrevRecordedList::showListTakeFocus(void)
+{
+    if (m_titleGroup)
+        LoadShowsByTitle();
+    else
+        LoadShowsByDate();
+    UpdateShowList();
+}
+
+void PrevRecordedList::LoadShowsByTitle(void)
+{
+    MSqlBindings bindings;
+    QString sql = " AND oldrecorded.title = :TITLE " + m_where;
+    int selected = m_titleList->GetCurrentPos();
+    bindings[":TITLE"] = m_titleData[selected]->GetTitle();
+    if (!m_title.isEmpty())
+        bindings[":MTITLE"] = m_title;
+    m_showData.clear();
+    LoadFromOldRecorded(m_showData, sql, bindings);
+}
+
+void PrevRecordedList::LoadShowsByDate(void)
+{
+    MSqlBindings bindings;
+    int selected = m_titleList->GetCurrentPos();
+    QString sortTitle = m_titleData[selected]->sortTitle;
+    QStringList dateParts = sortTitle.split('/');
+    if (dateParts.size() != 2)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Invalid sort Date: %1").arg(sortTitle));
+        return;
+    }
+    QString sortorder;
+    if (m_reverseSort)
+        sortorder = "DESC";
+    QString sql;
+    if (dateParts[0] == "0000")
+        sql = "AND TIMESTAMPDIFF(DAY, starttime, NOW()) < 14 ";
+    else
+    {
+        sql =
+        " AND YEAR(CONVERT_TZ(starttime,'UTC','SYSTEM')) = :YEAR "
+        " AND MONTH(CONVERT_TZ(starttime,'UTC','SYSTEM')) = :MONTH ";
+        bindings[":YEAR"] = dateParts[0];
+        bindings[":MONTH"] = dateParts[1];
+    }
+    sql = QString(sql + m_where + QString(
+        " ORDER BY starttime %1 ").arg(sortorder));
+    if (!m_title.isEmpty())
+        bindings[":MTITLE"] = m_title;
+    m_showData.clear();
+    LoadFromOldRecorded(m_showData, sql, bindings);
+}
+
+bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
+{
+    if (!m_allowEvents)
+        return true;
+
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(e))
+    {
+        m_allowEvents = true;
+        return true;
+    }
+
+    m_allowEvents = false;
+
+    QStringList actions;
+    bool handled = GetMythMainWindow()->TranslateKeyPress(
+        "TV Frontend", e, actions);
+
+    bool needUpdate = false;
+    for (uint i = 0; i < uint(actions.size()) && !handled; ++i)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "CUSTOMEDIT")
+             EditCustom();
+        else if (action == "EDIT")
+             EditScheduled();
+        else if (action == "DELETE")
+             deleteMenu(true);
+        else if (action == "DETAILS" || action == "INFO")
+             ShowDetails();
+        else if (action == "GUIDE")
+             ShowGuide();
+        else if (action == "UPCOMING")
+            ShowUpcoming();
+        else if (action == "1")
+        {
+            if (m_titleGroup == true)
+            {
+                m_titleGroup = false;
+                m_reverseSort = true;
+            }
+            else
+            {
+                m_reverseSort = !m_reverseSort;
+            }
+            needUpdate = true;
+        }
+        else if (action == "2")
+        {
+            if (m_titleGroup == false)
+            {
+                m_titleGroup = true;
+                m_reverseSort = false;
+            }
+            else
+            {
+                m_reverseSort = !m_reverseSort;
+            }
+            needUpdate = true;
+        }
+        else
+        {
+            handled = false;
+        }
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(e))
+        handled = true;
+
+    if (needUpdate)
+        LoadInBackground();
+
+    m_allowEvents = true;
+
+    return handled;
+}
+
+void PrevRecordedList::ShowMenu(void)
+{
+    MythMenu *sortMenu = new MythMenu(tr("Sort Options"), this, "sortmenu");
+    sortMenu->AddItem(tr("Reverse Sort Order"));
+    sortMenu->AddItem(tr("Sort By Title"));
+    sortMenu->AddItem(tr("Sort By Time"));
+
+    MythMenu *menu = new MythMenu(tr("List Options"), this, "menu");
+
+    menu->AddItem(tr("Sort"), NULL, sortMenu);
+
+    ProgramInfo *pi = GetCurrentProgram();
+    if (pi)
+    {
+        menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
+        menu->AddItem(tr("Custom Edit"),     SLOT(EditCustom()));
+        menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
+        menu->AddItem(tr("Upcoming"), SLOT(ShowUpcoming()));
+        menu->AddItem(tr("Channel Search"), SLOT(ShowChannelSearch()));
+    }
+    menu->AddItem(tr("Program Guide"),   SLOT(ShowGuide()));
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
+
+    if (!menuPopup->Create())
+    {
+        delete menuPopup;
+        return;
+    }
+
+    popupStack->AddScreen(menuPopup);
+}
+
+void PrevRecordedList::ShowItemMenu(void)
+{
+    MythMenu *menu = new MythMenu(tr("Recording Options"), this, "menu");
+
+    ProgramInfo *pi = GetCurrentProgram();
+    if (pi)
+    {
+        if (pi->IsDuplicate())
+            menu->AddItem(tr("Allow this episode to re-record"),   SLOT(AllowRecord()));
+        else
+            menu->AddItem(tr("Never record this episode"), SLOT(PreventRecord()));
+        menu->AddItem(tr("Remove this episode from the list"),
+            SLOT(ShowDeleteOldEpisodeMenu()));
+        menu->AddItem(tr("Remove all episodes for this title"),
+            SLOT(ShowDeleteOldSeriesMenu()));
+    }
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
+
+    if (!menuPopup->Create())
+    {
+        delete menuPopup;
+        return;
+    }
+
+    popupStack->AddScreen(menuPopup);
+}
+
+
+
+MythMenu *PrevRecordedList::deleteMenu(bool bShow)
+{
+    ProgramInfo *pi = GetCurrentProgram();
+    if (!pi)
+        return 0;
+    MythMenu *dmenu = new MythMenu(tr("Delete Options"), this, "deletemenu");
+    if (pi->GetRecordingStatus() == RecStatus::Recorded)
+    {
+        if (pi->IsDuplicate())
+            dmenu->AddItem(tr("Allow to Rerecord"),   SLOT(AllowRecord()));
+        else
+            dmenu->AddItem(tr("Prevent From Rerecording"), SLOT(PreventRecord()));
+    }
+    dmenu->AddItem(tr("Remove this episode from the list"),
+        SLOT(ShowDeleteOldEpisodeMenu()));
+    dmenu->AddItem(tr("Remove all episodes for this title"),
+        SLOT(ShowDeleteOldSeriesMenu()));
+    if (!bShow)
+        return dmenu;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(dmenu, popupStack, "menuPopup");
+    if (!menuPopup->Create())
+    {
+        delete menuPopup;
+        return 0;
+    }
+    popupStack->AddScreen(menuPopup);
+    return 0;
+}
+
+void PrevRecordedList::customEvent(QEvent *event)
+{
+    bool needUpdate = false;
+
+    if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+
+        QString resultid   = dce->GetId();
+        QString resulttext = dce->GetResultText();
+        int     buttonnum  = dce->GetResult();
+
+        if (resultid == "sortmenu")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    m_reverseSort = !m_reverseSort;
+                    needUpdate    = true;
+                    break;
+                case 1:
+                    m_titleGroup   = true;
+                    m_reverseSort = false;
+                    needUpdate    = true;
+                    break;
+                case 2:
+                    m_titleGroup   = false;
+                    m_reverseSort = true;
+                    needUpdate    = true;
+                    break;
+            }
+        }
+        else if (resultid == "deleterule")
+        {
+            RecordingRule *record =
+                dce->GetData().value<RecordingRule *>();
+            if (record && buttonnum > 0 && !record->Delete())
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "Failed to delete recording rule");
+            }
+            if (record)
+                delete record;
+        }
+        else
+        {
+            ScheduleCommon::customEvent(event);
+        }
+    }
+    else if (event->type() == ScreenLoadCompletionEvent::kEventType)
+    {
+        ScreenLoadCompletionEvent *slce = (ScreenLoadCompletionEvent*)(event);
+        QString id = slce->GetId();
+
+        if (id == objectName())
+        {
+            CloseBusyPopup(); // opened by LoadInBackground()
+            UpdateTitleList();
+            m_showData.clear();
+            m_showList->Reset();
+            updateInfo();
+            SetFocusWidget(m_titleList);
+        }
+    }
+
+    if (needUpdate)
+        LoadInBackground();
+}
+
+void PrevRecordedList::AllowRecord(void)
+{
+    ProgramInfo *pi = GetCurrentProgram();
+    if (pi)
+    {
+        int pos = m_showList->GetCurrentPos();
+        RecordingInfo ri(*pi);
+        ri.ForgetHistory();
+        showListTakeFocus();
+        updateInfo();
+        m_showList->SetItemCurrent(pos);
+    }
+}
+
+void PrevRecordedList::PreventRecord(void)
+{
+    ProgramInfo *pi = GetCurrentProgram();
+    if (pi)
+    {
+        int pos = m_showList->GetCurrentPos();
+        RecordingInfo ri(*pi);
+        ri.SetDupHistory();
+        showListTakeFocus();
+        updateInfo();
+        m_showList->SetItemCurrent(pos);
+    }
+}
+
+
+ProgramInfo *PrevRecordedList::GetCurrentProgram(void) const
+{
+    int pos = m_showList->GetCurrentPos();
+    if (pos >= 0 && pos < (int) m_showData.size())
+        return m_showData[pos];
+    return NULL;
+}
+
+void PrevRecordedList::ShowDeleteOldEpisodeMenu(void)
+{
+    ProgramInfo *pi = GetCurrentProgram();
+
+    if (!pi)
+        return;
+
+    QString message = tr("Delete this episode of '%1' from the previously recorded history?").arg(pi->GetTitle());
+
+    ShowOkPopup(message, this, SLOT(DeleteOldEpisode(bool)), true);
+}
+
+void PrevRecordedList::DeleteOldEpisode(bool ok)
+{
+    ProgramInfo *pi = GetCurrentProgram();
+    if (!ok || !pi)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "DELETE FROM oldrecorded "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+    query.bindValue(":CHANID",    pi->GetChanID());
+    query.bindValue(":STARTTIME", pi->GetScheduledStartTime());
+
+    if (!query.exec())
+        MythDB::DBError("ProgLister::DeleteOldEpisode", query);
+
+    ScheduledRecording::RescheduleCheck(*pi, "DeleteOldEpisode");
+    showListTakeFocus();
+}
+
+void PrevRecordedList::ShowDeleteOldSeriesMenu(void)
+{
+    ProgramInfo *pi = GetCurrentProgram();
+
+    if (!pi)
+        return;
+
+    QString message = tr("Delete all episodes of '%1' from the previously recorded history?").arg(pi->GetTitle());
+
+    ShowOkPopup(message, this, SLOT(DeleteOldSeries(bool)), true);
+}
+
+void PrevRecordedList::DeleteOldSeries(bool ok)
+{
+    ProgramInfo *pi = GetCurrentProgram();
+    if (!ok || !pi)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM oldrecorded "
+                  "WHERE title = :TITLE AND future = 0");
+    query.bindValue(":TITLE", pi->GetTitle());
+    if (!query.exec())
+        MythDB::DBError("ProgLister::DeleteOldSeries -- delete", query);
+
+    // Set the programid to the special value of "**any**" which the
+    // scheduler recognizes to mean the entire series was deleted.
+    RecordingInfo tempri(*pi);
+    tempri.SetProgramID("**any**");
+    ScheduledRecording::RescheduleCheck(tempri, "DeleteOldSeries");
+    showListTakeFocus();
+}
