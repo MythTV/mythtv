@@ -266,7 +266,8 @@ bool PrevRecordedList::LoadDates(void)
         QDate startdate(year,month,1);
         QDateTime starttime(startdate);
         program->SetRecordingStartTime(starttime);
-        QString date(QString::asprintf("%4.4d/%2.2d",year,month));
+        QString date = QString("%1/%2")
+            .arg(year,4,10,QChar('0')).arg(month,2,10,QChar('0'));
         QLocale locale = gCoreContext->GetLocale()->ToQLocale();
         QString title = QString("%1 %2").
             arg(locale.monthName(month)).arg(year);
