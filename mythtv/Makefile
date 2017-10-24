@@ -23,7 +23,7 @@ SUBDIRS += $(MAKE_SUBDIRS) $(QT_SUBDIRS)
 	distclean $(addsuffix _distclean,$(SUBDIRS))  \
 	install   $(addsuffix _install,  $(SUBDIRS))  \
 	uninstall $(addsuffix _uninstall,$(SUBDIRS))  \
-	global tags TAGS \
+	global tags TAGS cleanold \
 	libs/libmythbase/version.h force
 
 all: libs/libmythbase/version.h subdirs
@@ -116,3 +116,7 @@ global GPATH GRTAGS GTAGS:
 	@echo "Making global tags..."
 	@cd .. ; rm -f GPATH GRTAGS GTAGS
 	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | gtags -f -
+
+cleanall: clean
+	@echo "Removing old moc and .o files missed by 'clean'..."
+	@find .. -name moc_* -o -name *.o | xargs rm
