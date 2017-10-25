@@ -83,3 +83,19 @@ contains(CONFIG_MYTHLOGSERVER, "yes") {
 LIRC_LIBS = $$CONFIG_LIRC_LIBS
 
 macx:using_firewire:using_backend:EXTRA_LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
+
+#
+# Stash generated objects in a subdirectory
+#
+win32 {
+    CONFIG(debug, debug|release) {
+        MOC_DIR         = debug/moc
+        OBJECTS_DIR     = debug/obj
+    } else {
+        MOC_DIR         = release/moc
+        OBJECTS_DIR     = release/obj
+    }
+} else {
+    MOC_DIR         = moc
+    OBJECTS_DIR     = obj
+}

@@ -15,12 +15,12 @@ DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 
-LIBS += ../../eitfixup.o
-LIBS += ../../dishdescriptors.o
-LIBS += ../../atsc_huffman.o
-LIBS += ../../dvbdescriptors.o
-LIBS += ../../iso6937tables.o
-LIBS += ../../freesat_huffman.o
+LIBS += ../../$(OBJECTS_DIR)/eitfixup.o
+LIBS += ../../$(OBJECTS_DIR)/dishdescriptors.o
+LIBS += ../../$(OBJECTS_DIR)/atsc_huffman.o
+LIBS += ../../$(OBJECTS_DIR)/dvbdescriptors.o
+LIBS += ../../$(OBJECTS_DIR)/iso6937tables.o
+LIBS += ../../$(OBJECTS_DIR)/freesat_huffman.o
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
