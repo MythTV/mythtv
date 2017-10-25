@@ -1,6 +1,10 @@
 #ifndef VIDEOOUT_OMX_H
 #define VIDEOOUT_OMX_H
 
+#ifdef USING_OPENGLES
+#define OSD_EGL // OSD with EGL
+#endif
+
 #include <OMX_Types.h>
 #include <OMX_Core.h>
 
@@ -16,6 +20,7 @@ class GlOsdThread;
 #ifdef OSD_EGL
 class MythOpenGLPainter;
 #endif
+class MythScreenType;
 
 class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 {
