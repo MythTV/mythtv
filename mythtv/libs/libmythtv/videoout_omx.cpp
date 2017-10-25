@@ -1,6 +1,5 @@
-#ifdef USING_OPENGLES
-#define OSD_EGL // OSD with EGL
-#endif
+
+#include "videoout_omx.h"
 
 #ifdef OSD_EGL /* includes QJson with enum value named Bool, must go before EGL/egl.h */
 # include "mythpainter_ogl.h"
@@ -9,8 +8,6 @@
 
 /* must go before X11/X.h due to #define None 0L */
 #include "privatedecoder_omx.h" // For PrivateDecoderOMX::s_name
-
-#include "videoout_omx.h"
 
 #include <cstddef>
 #include <cassert>
