@@ -782,7 +782,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                     sqldelete.bindValue(":VALUE",     lit.key());
                     if (!sqldelete.exec())
                     {
-                        MythDB::DBError("save_profile 5a", update);
+                        MythDB::DBError("save_profile 5a", sqldelete);
                         ok = false;
                         continue;
                     }
