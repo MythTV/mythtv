@@ -274,9 +274,12 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     int realmax_speakers = 8;
 
     bool invalid = false;
+    QString out;
 
-    QString out = m_OutputDevice->getValue();
-    if (out.length() > 0)
+    if (m_OutputDevice)
+        out = m_OutputDevice->getValue();
+
+    if (!out.isEmpty())
     {
         restore = out != m_lastAudioDevice;
         m_lastAudioDevice = out;
