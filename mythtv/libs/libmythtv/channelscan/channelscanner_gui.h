@@ -75,9 +75,8 @@ class ChannelScannerGUI :
     void quitScanning(void);
 
   private:
-    ChannelScannerGUIScanPane *scanStage;
-    LogList                   *doneStage;
-    QStringList                messageList;
+    ChannelScannerGUIScanPane *m_scanStage;
+    QStringList                m_messageList;
 };
 
 #endif // _CHANNEL_SCANNER_GUI_H_
