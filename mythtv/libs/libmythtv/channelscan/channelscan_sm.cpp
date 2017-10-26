@@ -878,7 +878,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                     .arg(m_currentInfo->sdts.empty()));
         }
     }
-    transport_tune_complete |= !wait_until_complete;
+    if (!wait_until_complete)
+        transport_tune_complete = true;
     if (transport_tune_complete)
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
