@@ -493,10 +493,12 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
         if (free_buf)
             av_freep(&buf);
 
-        free_buffer(buffer);
         if (!ok)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to send packet to decoder.");
+
         result = buffer->size;
+
+        free_buffer(buffer);
     }
     return result;
 }
