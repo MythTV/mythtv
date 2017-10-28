@@ -86,6 +86,7 @@ class PrevRecordedList : public ScheduleCommon
     uint              m_recid;
     QString           m_title;
     QString           m_where;
+    bool              m_loadShows;
 };
 
 #endif
