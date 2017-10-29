@@ -345,6 +345,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
         // an error occurred, ask for the audio packet once again.
         LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Error decoding audio"));
         SendResendRequest(timestamp, seq, seq+1);
+        delete decoded;
         return;
     }
     AudioPacket frames;
