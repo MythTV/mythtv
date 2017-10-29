@@ -746,7 +746,7 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     const float fps = player->GetFrameRate();
 
     frameInterval = (int)roundf(sampleTime * fps / samplesNeeded);
-    endFrame = 0 + frameInterval * samplesNeeded - 1;
+    endFrame = 0 + (long long)frameInterval * samplesNeeded - 1;
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateFinder: sampleTime=%1s, samplesNeeded=%2, endFrame=%3")
