@@ -699,7 +699,7 @@ void MythRAOPConnection::ProcessAudio()
 
     // Also make sure m_audioQueue never goes to less than 1/3 of the RDP stream
     // total latency, this should gives us enough time to receive missed packets
-    int64_t queue = framesToMs(m_audioQueue.size() * m_framesPerPacket);
+    int64_t queue = framesToMs((uint64_t)m_audioQueue.size() * m_framesPerPacket);
     if (queue < m_bufferLength / 3)
         return;
 
