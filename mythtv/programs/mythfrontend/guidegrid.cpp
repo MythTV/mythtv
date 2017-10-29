@@ -1689,9 +1689,11 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
         {
             if (unknown)
             {
-                proginfo->spread++;
-                proginfo->SetScheduledEndTime(
-                    proginfo->GetScheduledEndTime().addSecs(5 * 60));
+                if (proginfo)
+                {
+                    proginfo->spread++;
+                    proginfo->SetScheduledEndTime(proginfo->GetScheduledEndTime().addSecs(5 * 60));
+                }
             }
             else
             {
