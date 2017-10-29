@@ -220,7 +220,7 @@ class GlOsdThread : public MThread
 /*
  * Constants
  */
-const int kNumBuffers = 11; // +1 if extra_for_pause
+const int kNumBuffers = 15; // +1 if extra_for_pause
 const int kMinBuffers = 5;
 const int kNeedFreeFrames = 1;
 const int kPrebufferFramesNormal = 1;
@@ -412,16 +412,31 @@ bool VideoOutputOMX::Init(          // Return true if successful
         return false;
 
     // Setup video buffers
-    static const int kBuffers = std::max(
+    int kBuffers = std::max(
         gCoreContext->GetNumSetting("OmxVideoBuffers", kNumBuffers), kMinBuffers);
-    vbuffers.Init(std::max(kBuffers, int(m_render.PortDef().nBufferCountMin)),
-                  true, kNeedFreeFrames,
-                  kPrebufferFramesNormal, kPrebufferFramesSmall,
-                  kKeepPrebuffer);
+    bool success(false);
+    while (!success)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO,
+            QString("Init vbuffers: numdecode=%1, need_free=%2, needpre_normal=%3, needpre_small=%4, keeppre=%5")
+            .arg(std::max(kBuffers, int(m_render.PortDef().nBufferCountMin)))
+            .arg(kMinBuffers).arg(kNeedFreeFrames).arg(kPrebufferFramesNormal).arg(kPrebufferFramesSmall));
+        vbuffers.Init(std::max(kBuffers, int(m_render.PortDef().nBufferCountMin)),
+                      true, kNeedFreeFrames,
+                      kPrebufferFramesNormal, kPrebufferFramesSmall,
+                      kKeepPrebuffer);
 
-    // Allocate video buffers
-    if (!CreateBuffers(video_dim_buf, video_dim_disp))
-        return false;
+        // Allocate video buffers
+        success = CreateBuffers(video_dim_buf, video_dim_disp, winid);
+        if (!success)
+        {
+            --kBuffers;
+            if (kBuffers < kMinBuffers)
+              {
+                  return false;
+              }
+        }
+    }
 
     bool osdIsSet = false;
 #ifdef OSD_EGL
