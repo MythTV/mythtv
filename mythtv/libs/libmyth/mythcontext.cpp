@@ -1525,13 +1525,13 @@ bool MythContext::Init(const bool gui,
                        const bool disableAutoDiscovery,
                        const bool ignoreDB)
 {
-    SetDisableEventPopup(true);
-
     if (!d)
     {
         LOG(VB_GENERAL, LOG_EMERG, LOC + "Init() Out-of-memory");
         return false;
     }
+
+    SetDisableEventPopup(true);
 
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
