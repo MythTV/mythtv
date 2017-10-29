@@ -924,8 +924,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
     // process RTP-info field
     bool gotRTP = false;
-    uint16_t RTPseq;
-    uint64_t RTPtimestamp;
+    uint16_t RTPseq = 0;
+    uint64_t RTPtimestamp = 0;
     if (tags.contains("RTP-Info"))
     {
         gotRTP = true;
