@@ -68,7 +68,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_dataSocket(NULL),                              m_dataPort(port),
     m_clientControlSocket(NULL),                     m_clientControlPort(0),
     m_clientTimingSocket(NULL),                      m_clientTimingPort(0),
-    m_eventServer(NULL),
+    m_eventServer(NULL),                             m_eventPort(-1),
     m_audio(NULL),         m_codec(NULL),            m_codeccontext(NULL),
     m_channels(2),         m_sampleSize(16),         m_frameRate(44100),
     m_framesPerPacket(352),m_dequeueAudioTimer(NULL),
@@ -88,6 +88,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     m_firstsend(false),    m_playbackStarted(false)
 {
     m_id = GetNotificationCenter()->Register(this);
+    memset(&m_aesKey, 0, sizeof(m_aesKey));
 }
 
 MythRAOPConnection::~MythRAOPConnection()
