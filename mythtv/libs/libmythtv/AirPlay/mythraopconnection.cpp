@@ -390,7 +390,7 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("SYNC: cur:%1 next:%2 time:%3")
         .arg(m_currentTimestamp).arg(m_nextTimestamp).arg(m_timeLastSync));
 
-    int64_t delay = framesToMs(m_audioQueue.size() * m_framesPerPacket);
+    int64_t delay = framesToMs((uint64_t)m_audioQueue.size() * m_framesPerPacket);
     int64_t audiots = m_audio->GetAudiotime();
     int64_t currentLatency = 0LL;
 
