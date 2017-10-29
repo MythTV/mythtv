@@ -511,7 +511,7 @@ static void handleMedia(MythMediaDevice *cd)
         }
 
         // device is not usable so remove any existing CD tracks
-        if (gMusicData->all_music)
+        if (gMusicData->initialized)
         {
             gMusicData->all_music->clearCDData();
             gMusicData->all_playlists->getActive()->removeAllCDTracks();
@@ -536,11 +536,8 @@ static void handleMedia(MythMediaDevice *cd)
         gMusicData->loadMusic();
 
     // remove any existing CD tracks
-    if (gMusicData->all_music)
-    {
-        gMusicData->all_music->clearCDData();
-        gMusicData->all_playlists->getActive()->removeAllCDTracks();
-    }
+    gMusicData->all_music->clearCDData();
+    gMusicData->all_playlists->getActive()->removeAllCDTracks();
 
     gPlayer->sendCDChangedEvent();
 
