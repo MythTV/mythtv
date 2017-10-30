@@ -178,6 +178,9 @@ QString BouquetAssociationTable::toString(void) const
         QString("BAT: BouquetID(0x%1) transports(%2)\n")
         .arg(BouquetID(), 0, 16).arg(TransportStreamCount());
 
+    str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
+        .arg(Section()).arg(LastSection()).arg(IsCurrent()));
+
     if (0 != BouquetDescriptorsLength())
     {
         str.append(QString("Bouquet descriptors length: %1\n")
