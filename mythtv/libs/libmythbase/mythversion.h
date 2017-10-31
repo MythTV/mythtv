@@ -1,7 +1,7 @@
 #ifndef MYTHVERSION_H_
 #define MYTHVERSION_H_
 
-#include "qglobal.h"
+#include <qglobal.h>
 #include "mythbaseexp.h"
 #include "version.h"
 
