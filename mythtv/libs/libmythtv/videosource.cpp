@@ -1373,7 +1373,7 @@ HDHomeRunIP::HDHomeRunIP()
 
 void HDHomeRunIP::setEnabled(bool e)
 {
-    GroupSetting::setEnabled(e);
+    MythUITextEditSetting::setEnabled(e);
     if (e)
     {
         if (!_oldValue.isEmpty())
@@ -1409,7 +1409,7 @@ HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 
 void HDHomeRunTunerIndex::setEnabled(bool e)
 {
-    GroupSetting::setEnabled(e);
+    MythUITextEditSetting::setEnabled(e);
     if (e) {
         if (!_oldValue.isEmpty())
             setValue(_oldValue);
@@ -1440,6 +1440,7 @@ HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent) :
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of HDHomeRun device"));
+    setEnabled(false);
 }
 
 void HDHomeRunDeviceID::SetIP(const QString &ip)
@@ -1487,12 +1488,14 @@ HDHomeRunDeviceIDList::HDHomeRunDeviceIDList(
     StandardSetting     *desc,
     HDHomeRunIP         *cardip,
     HDHomeRunTunerIndex *cardtuner,
-    HDHomeRunDeviceList *devicelist) :
+    HDHomeRunDeviceList *devicelist,
+    const CaptureCard &parent) :
     _deviceid(deviceid),
     _desc(desc),
     _cardip(cardip),
     _cardtuner(cardtuner),
-    _devicelist(devicelist)
+    _devicelist(devicelist),
+    m_parent(parent)
 {
     setLabel(QObject::tr("Available devices"));
     setHelpText(
@@ -1580,7 +1583,9 @@ void HDHomeRunDeviceIDList::Load(void)
 {
     clearSelections();
 
-    fillSelections(_deviceid->getValue());
+    int cardid = m_parent.getCardID();
+    QString device = CardUtil::GetVideoDevice(cardid);
+    fillSelections(device);
 }
 
 void HDHomeRunDeviceIDList::UpdateDevices(const QString &v)
@@ -2065,7 +2070,7 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
     cardip       = new HDHomeRunIP();
     cardtuner    = new HDHomeRunTunerIndex();
     deviceidlist = new HDHomeRunDeviceIDList(
-        deviceid, desc, cardip, cardtuner, &devicelist);
+        deviceid, desc, cardip, cardtuner, &devicelist, parent);
 
     a_cardtype.addTargetedChild("HDHOMERUN", deviceidlist);
     a_cardtype.addTargetedChild("HDHOMERUN", new EmptyAudioDevice(parent));

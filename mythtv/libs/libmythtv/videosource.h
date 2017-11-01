@@ -880,7 +880,7 @@ class CardInput : public GroupSetting
 class HDHomeRunDeviceID;
 class HDHomeRunTunerIndex;
 
-class HDHomeRunIP : public GroupSetting
+class HDHomeRunIP : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -901,7 +901,7 @@ class HDHomeRunIP : public GroupSetting
     QString _oldValue;
 };
 
-class HDHomeRunTunerIndex : public GroupSetting
+class HDHomeRunTunerIndex : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -932,7 +932,8 @@ class HDHomeRunDeviceIDList : public TransMythUIComboBoxSetting
                           StandardSetting *desc,
                           HDHomeRunIP       *cardip,
                           HDHomeRunTunerIndex *cardtuner,
-                          HDHomeRunDeviceList *devicelist);
+                          HDHomeRunDeviceList *devicelist,
+                          const CaptureCard &parent);
 
     void fillSelections(const QString &current);
 
@@ -947,6 +948,7 @@ class HDHomeRunDeviceIDList : public TransMythUIComboBoxSetting
     HDHomeRunIP         *_cardip;
     HDHomeRunTunerIndex *_cardtuner;
     HDHomeRunDeviceList *_devicelist;
+    const CaptureCard &m_parent;
 
     QString              _oldValue;
 };
