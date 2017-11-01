@@ -348,7 +348,7 @@ MythMediaError MythCDROMLinux::ejectSCSI()
     // ALLOW_MEDIUM_REMOVAL requires r/w access so re-open the device
     struct StHandle {
         const int m_fd;
-        StHandle(const char *dev) : m_fd(open(dev, O_RDWR | O_NONBLOCK)) { }
+        explicit StHandle(const char *dev) : m_fd(open(dev, O_RDWR | O_NONBLOCK)) { }
         ~StHandle() { close(m_fd); }
         operator int() const { return m_fd; }
     } fd(qPrintable(m_DevicePath));

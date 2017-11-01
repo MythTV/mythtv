@@ -45,7 +45,7 @@ class ProfileGroup : public GroupSetting
     class Is_default : public StandardSetting
     {
       public:
-        Is_default(const ProfileGroup &parent) :
+        explicit Is_default(const ProfileGroup &parent) :
             StandardSetting(new ProfileGroupStorage(this, parent, "is_default"))
         {
             setVisible(false);
@@ -58,7 +58,7 @@ class ProfileGroup : public GroupSetting
     class Name : public MythUITextEditSetting
     {
       public:
-        Name(const ProfileGroup &parent) :
+        explicit Name(const ProfileGroup &parent) :
             MythUITextEditSetting(new ProfileGroupStorage(this, parent, "name"))
         {
             setLabel(QObject::tr("Profile Group Name"));
@@ -68,7 +68,7 @@ class ProfileGroup : public GroupSetting
     class HostName : public MythUIComboBoxSetting
     {
       public:
-        HostName(const ProfileGroup &parent) :
+        explicit HostName(const ProfileGroup &parent) :
             MythUIComboBoxSetting(new ProfileGroupStorage(this, parent,
                                                           "hostname"))
         {
@@ -80,7 +80,7 @@ class ProfileGroup : public GroupSetting
     class CardInfo : public MythUIComboBoxSetting
     {
       public:
-        CardInfo(const ProfileGroup &parent) :
+        explicit CardInfo(const ProfileGroup &parent) :
             MythUIComboBoxSetting(new ProfileGroupStorage(this, parent,
                                                           "cardtype"))
         {

@@ -34,7 +34,7 @@ namespace DTC
         static inline void InitializeCustomTypes();
 
       public:
-        FrontendStatus(QObject *parent = 0) : QObject(parent)
+        explicit FrontendStatus(QObject *parent = 0) : QObject(parent)
         {
         }
 

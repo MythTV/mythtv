@@ -36,7 +36,7 @@ QString PlayGroupDBStorage::GetWhereClause(MSqlBindings &bindings) const
 class TitleMatch : public MythUITextEditSetting
 {
   public:
-    TitleMatch(const PlayGroupConfig& _parent):
+    explicit TitleMatch(const PlayGroupConfig& _parent):
         MythUITextEditSetting(new PlayGroupDBStorage(this, _parent, "titlematch"))
     {
         setLabel(PlayGroupConfig::tr("Title match (regex)"));
@@ -52,7 +52,7 @@ class TitleMatch : public MythUITextEditSetting
 class SkipAhead : public MythUISpinBoxSetting
 {
   public:
-    SkipAhead(const PlayGroupConfig& _parent):
+    explicit SkipAhead(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipahead"),
                              0, 600, 5, true, PlayGroupConfig::tr("(default)"))
 
@@ -66,7 +66,7 @@ class SkipAhead : public MythUISpinBoxSetting
 class SkipBack : public MythUISpinBoxSetting
 {
   public:
-    SkipBack(const PlayGroupConfig& _parent):
+    explicit SkipBack(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipback"),
                              0, 600, 5, true, PlayGroupConfig::tr("(default)"))
     {
@@ -79,7 +79,7 @@ class SkipBack : public MythUISpinBoxSetting
 class JumpMinutes : public MythUISpinBoxSetting
 {
   public:
-    JumpMinutes(const PlayGroupConfig& _parent):
+    explicit JumpMinutes(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "jump"),
                              0, 30, 10, true, PlayGroupConfig::tr("(default)"))
     {
@@ -93,7 +93,7 @@ class JumpMinutes : public MythUISpinBoxSetting
 class TimeStretch : public MythUISpinBoxSetting
 {
   public:
-    TimeStretch(const PlayGroupConfig& _parent):
+    explicit TimeStretch(const PlayGroupConfig& _parent):
         MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "timestretch"),
                              45, 200, 5, false,
                              PlayGroupConfig::tr("(default)"))

@@ -255,7 +255,7 @@ class MTV_PUBLIC DiscontinuityInformationTable : public PSIPTable
 
 class MTV_PUBLIC SelectionInformationTable : public PSIPTable
 {
-    SelectionInformationTable(const PSIPTable& table) : PSIPTable(table)
+    explicit SelectionInformationTable(const PSIPTable& table) : PSIPTable(table)
         { ; }
     // table_id 8
     // section_syntax_indicator 1

@@ -98,7 +98,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void settingsChanged(StandardSetting *selectedSetting = NULL);
 
   protected:
-    StandardSetting(Storage *_storage = NULL);
+    explicit StandardSetting(Storage *_storage = NULL);
     virtual ~StandardSetting();
     void setParent(StandardSetting *parent);
     QString m_settingValue;
@@ -144,7 +144,7 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
     void SetPasswordEcho(bool b);
 
   protected:
-    MythUITextEditSetting(Storage *_storage = NULL);
+    explicit MythUITextEditSetting(Storage *_storage = NULL);
     bool m_passwordEcho;
 };
 
@@ -160,14 +160,14 @@ class MPUBLIC TransTextEditSetting: public MythUITextEditSetting
 class MPUBLIC HostTextEditSetting: public MythUITextEditSetting
 {
   public:
-    HostTextEditSetting(const QString &name) :
+    explicit HostTextEditSetting(const QString &name) :
         MythUITextEditSetting(new HostDBStorage(this, name)) { }
 };
 
 class MPUBLIC GlobalTextEditSetting: public MythUITextEditSetting
 {
   public:
-    GlobalTextEditSetting(const QString &name) :
+    explicit GlobalTextEditSetting(const QString &name) :
         MythUITextEditSetting(new GlobalDBStorage(this, name)) { }
 };
 
@@ -186,7 +186,7 @@ class MPUBLIC MythUIFileBrowserSetting : public StandardSetting
     void SetNameFilter(QStringList filter) { m_nameFilter = filter; };
 
   protected:
-    MythUIFileBrowserSetting(Storage *_storage);
+    explicit MythUIFileBrowserSetting(Storage *_storage);
     QDir::Filters      m_typeFilter;
     QStringList        m_nameFilter;
 };
@@ -195,7 +195,7 @@ class MPUBLIC MythUIFileBrowserSetting : public StandardSetting
 class MPUBLIC HostFileBrowserSetting: public MythUIFileBrowserSetting
 {
   public:
-    HostFileBrowserSetting(const QString &name) :
+    explicit HostFileBrowserSetting(const QString &name) :
         MythUIFileBrowserSetting(new HostDBStorage(this, name)) { }
 };
 
@@ -253,7 +253,7 @@ class MPUBLIC GlobalComboBoxSetting: public MythUIComboBoxSetting
 class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
-    TransMythUIComboBoxSetting(bool rw = false) :
+    explicit TransMythUIComboBoxSetting(bool rw = false) :
         MythUIComboBoxSetting(NULL, rw) { }
 };
 
@@ -365,7 +365,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
     void valueChanged(bool);
 
   protected:
-    MythUICheckBoxSetting(Storage *_storage = NULL);
+    explicit MythUICheckBoxSetting(Storage *_storage = NULL);
 
 };
 
@@ -379,14 +379,14 @@ class MPUBLIC TransMythUICheckBoxSetting: public MythUICheckBoxSetting
 class MPUBLIC HostCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
-    HostCheckBoxSetting(const QString &name) :
+    explicit HostCheckBoxSetting(const QString &name) :
         MythUICheckBoxSetting(new HostDBStorage(this, name)) { }
 };
 
 class MPUBLIC GlobalCheckBoxSetting: public MythUICheckBoxSetting
 {
   public:
-    GlobalCheckBoxSetting(const QString &name) :
+    explicit GlobalCheckBoxSetting(const QString &name) :
         MythUICheckBoxSetting(new GlobalDBStorage(this, name)) { }
 };
 
@@ -415,7 +415,7 @@ class MPUBLIC ButtonStandardSetting : public StandardSetting
     Q_OBJECT
 
   public:
-    ButtonStandardSetting(const QString &label);
+    explicit ButtonStandardSetting(const QString &label);
 
     virtual void edit(MythScreenType *screen);
     virtual void resultEdit(DialogCompletionEvent *){};

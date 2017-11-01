@@ -73,7 +73,7 @@ class MTV_PUBLIC EventRating
 class MTV_PUBLIC DBEvent
 {
   public:
-    DBEvent(uint _listingsource) :
+    explicit DBEvent(uint _listingsource) :
         title(),
         subtitle(),
         description(),

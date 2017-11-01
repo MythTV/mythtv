@@ -104,7 +104,7 @@ class FireWireDBOptions
 class TuningRequest
 {
   public:
-    TuningRequest(uint f) :
+    explicit TuningRequest(uint f) :
         flags(f), program(NULL), channel(QString::null),
         input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
     TuningRequest(uint f, RecordingInfo *p) :
@@ -153,7 +153,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     friend class TVRecRecordThread;
 
   public:
-    TVRec(int _inputid);
+    explicit TVRec(int _inputid);
    ~TVRec(void);
 
     bool Init(void);

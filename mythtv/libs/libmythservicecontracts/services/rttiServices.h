@@ -42,7 +42,7 @@ class SERVICE_PUBLIC RttiServices : public Service  //, public QScriptable ???
         // Must call InitializeCustomTypes for each unique Custom Type used
         // in public slots below.
 
-        RttiServices( QObject *parent = 0 ) : Service( parent )
+        explicit RttiServices( QObject *parent = 0 ) : Service( parent )
         {
             DTC::Enum     ::InitializeCustomTypes();
         }

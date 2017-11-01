@@ -31,7 +31,7 @@ class SERVICE_PUBLIC LiveStreamInfoList : public QObject
 
     public:
 
-        LiveStreamInfoList(QObject *parent = 0) 
+        explicit LiveStreamInfoList(QObject *parent = 0)
             : QObject( parent )               
         {
         }

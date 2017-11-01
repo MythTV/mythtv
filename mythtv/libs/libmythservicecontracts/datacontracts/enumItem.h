@@ -36,7 +36,7 @@ class SERVICE_PUBLIC EnumItem : public QObject
 
     public:
 
-        EnumItem( QObject *parent = 0)
+        explicit EnumItem( QObject *parent = 0)
           : QObject ( parent ),
             m_Value ( 0      )
         {

@@ -71,7 +71,7 @@ class SERVICE_PUBLIC LiveStreamInfo : public QObject
 
     public:
 
-        LiveStreamInfo(QObject *parent = 0) 
+        explicit LiveStreamInfo(QObject *parent = 0)
             : QObject            ( parent ),
               m_Id               ( 0      ),
               m_Width            ( 0      ),

@@ -49,7 +49,7 @@ typedef deque<QString>         StringDeque;
 class MTV_PUBLIC PlayerContext
 {
   public:
-    PlayerContext(const QString &inUseID = QString("Unknown"));
+    explicit PlayerContext(const QString &inUseID = QString("Unknown"));
     ~PlayerContext();
 
     // Actions

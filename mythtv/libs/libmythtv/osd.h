@@ -67,7 +67,7 @@ enum OSDTimeout
 class MTV_PUBLIC OSDHideEvent : public QEvent
 {
   public:
-    OSDHideEvent(enum OSDFunctionalType osdFunctionalType)
+    explicit OSDHideEvent(enum OSDFunctionalType osdFunctionalType)
         : QEvent(kEventType), m_osdFunctionalType(osdFunctionalType) { }
 
     int GetFunctionalType() { return m_osdFunctionalType; }
