@@ -502,7 +502,7 @@ QString MPEGDescriptor::hexdump(void) const
     {
         ch = _data[i+2];
         hex.append(QString(" %1").arg(ch, 2, 16, QChar('0')));
-        prt.append(QString("%1").arg(isalnum(ch) ? QChar(ch) : '.'));
+        prt.append(QString("%1").arg(isprint(ch) ? QChar(ch) : '.'));
         if (((i+1) % 8) == 0)
             hex.append(" ");
         if (((i+1) % 16) == 0)
