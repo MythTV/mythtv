@@ -43,6 +43,15 @@ class DSMCCCacheReference
         m_nCarouselId(r.m_nCarouselId), m_nModuleId(r.m_nModuleId),
         m_nStreamTag(r.m_nStreamTag),   m_Key(r.m_Key) {}
 
+    DSMCCCacheReference& operator=(const DSMCCCacheReference &rhs)
+    {
+        m_nCarouselId = rhs.m_nCarouselId;
+        m_nModuleId = rhs.m_nModuleId;
+        m_nStreamTag = rhs.m_nStreamTag;
+        m_Key = rhs.m_Key;
+        return *this;
+    }
+
     bool Equal(const DSMCCCacheReference &r) const;
     bool Equal(const DSMCCCacheReference *p) const;
 
