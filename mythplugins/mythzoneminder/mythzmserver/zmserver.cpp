@@ -236,7 +236,7 @@ MONITOR::MONITOR(void) :
 {
 }
 
-void MONITOR::initMonitor(bool debug, string mmapPath, int shmKey)
+void MONITOR::initMonitor(bool debug, const string &mmapPath, int shmKey)
 {
     int shared_data_size;
     int frame_size = width * height * bytes_per_pixel;
@@ -657,7 +657,7 @@ bool ZMServer::send(const string &s, const unsigned char *buffer, int dataLen) c
     return true;
 }
 
-void ZMServer::sendError(string error)
+void ZMServer::sendError(const string &error)
 {
     string outStr("");
     ADD_STR(outStr, string("ERROR - ") + error);
@@ -1031,9 +1031,11 @@ string ZMServer::runCommand(string command)
     return outStr;
 }
 
-void ZMServer::getMonitorStatus(string id, string type, string device, string host, string channel,
-                                string function, string &zmcStatus, string &zmaStatus,
-                                string enabled)
+void ZMServer::getMonitorStatus(const string &id, const string &type,
+                                const string &device, const string &host,
+                                const string &channel, const string &function,
+                                string &zmcStatus, string &zmaStatus,
+                                const string &enabled)
 {
     zmaStatus = "";
     zmcStatus = "";
