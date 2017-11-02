@@ -116,6 +116,13 @@ class ActionID
         m_action.detach();
     }
 
+    ActionID& operator=(const ActionID &rhs)
+    {
+        m_context = rhs.m_context;
+        m_action = rhs.m_action;
+        return *this;
+    }
+
     /// \brief Returns the context name.
     QString GetContext(void) const
     {
