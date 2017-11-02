@@ -953,6 +953,8 @@ class Tvdb:
         """
         log().debug('Getting season banners for %s' % (sid))
         bannersEt = self._getetsrc(self.config['url_seriesBanner'] % sid)
+        if not bannersEt:
+            return
         banners = {}
         for cur_banner in bannersEt.keys():
             banners_info = self._getetsrc(self.config['url_seriesBannerInfo'] % (sid, cur_banner))
