@@ -667,13 +667,14 @@ vbi_close(struct vbi *vbi)
 struct vt_page *
 vbi_query_page(struct vbi *vbi, int pgno, int subno)
 {
+#ifdef IMPLEMENTED
     struct vt_page *vtp = 0;
 
     (void)pgno;
     (void)subno;
 
-//    if (vbi->cache)
-//     vtp = vbi->cache->op->get(vbi->cache, pgno, subno);
+    if (vbi->cache)
+        vtp = vbi->cache->op->get(vbi->cache, pgno, subno);
     if (vtp == 0)
     {
        // EV_PAGE will come later...
@@ -682,6 +683,12 @@ vbi_query_page(struct vbi *vbi, int pgno, int subno)
 
     vbi_send(vbi, EV_PAGE, 1, 0, 0, vtp);
     return vtp;
+#else
+    (void)vbi;
+    (void)pgno;
+    (void)subno;
+    return NULL;
+#endif
 }
 
 void
