@@ -85,7 +85,7 @@ QMap<TextSubtitles*,uint> SubtitleLoadHelper::s_loading;
 class RemoteFileWrapper
 {
 public:
-    RemoteFileWrapper(const QString &filename) {
+    explicit RemoteFileWrapper(const QString &filename) {
         // This test stolen from FileRingBuffer::OpenFile()
         bool is_local =
             (!filename.startsWith("/dev")) &&

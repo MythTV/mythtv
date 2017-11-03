@@ -171,7 +171,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     static void AVFormatInitNetwork(void);
 
   protected:
-    RingBuffer(RingBufferType rbtype);
+    explicit RingBuffer(RingBufferType rbtype);
 
     void run(void); // MThread
     void CreateReadAheadBuffer(void);
