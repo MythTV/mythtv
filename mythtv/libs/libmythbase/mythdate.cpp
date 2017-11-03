@@ -101,7 +101,7 @@ QString toString(const QDateTime &raw_dt, uint format)
     if (format & kScreenShotFilename)
         return datetime.toString("yyyy-MM-ddThh-mm-ss.zzz");
 
-    if (format & (kDateFull | kDateShort))
+    if (format & kDateEither)
         result += toString(datetime.date(), format);
 
     if (format & kTime)
@@ -128,7 +128,7 @@ QString toString(const QDate &date, uint format)
     if (!date.isValid())
         return result;
 
-    if (format & (kDateFull | kDateShort))
+    if (format & kDateEither)
     {
         QString stringformat;
         if (format & kDateShort)
