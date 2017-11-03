@@ -1398,6 +1398,8 @@ SubtitleScreen::~SubtitleScreen(void)
 
 void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
 {
+    m_subtitleType = type;
+
     if (forced_only)
     {
         SetElementDeleted();
@@ -1406,7 +1408,6 @@ void SubtitleScreen::EnableSubtitles(int type, bool forced_only)
         return;
     }
 
-    m_subtitleType = type;
     if (m_subreader)
     {
         m_subreader->EnableAVSubtitles(kDisplayAVSubtitle == m_subtitleType);
