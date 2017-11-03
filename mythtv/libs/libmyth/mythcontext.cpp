@@ -784,7 +784,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
     // Jan 20, 2017
     // Changed to use port check instead of ping
 
-    int port;
+    int port = 0;
 
     // 1 = db awake, 2 = db listening, 3 = db connects,
     // 4 = backend awake, 5 = backend listening
@@ -806,7 +806,10 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
     do
     {
-        host = m_DBparams.dbHostName;
+        if (m_DBparams.dbHostName.isNull() && m_DBhostCp.length())
+            host = m_DBhostCp;
+        else
+            host = m_DBparams.dbHostName;
         port = m_DBparams.dbPort;
         if (port == 0)
             port = 3306;
