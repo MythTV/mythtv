@@ -29,6 +29,13 @@ class text_subtitle_t
     {
         textLines.detach();
     }
+    text_subtitle_t& operator= (const text_subtitle_t &rhs)
+    {
+        start = rhs.start;
+        end = rhs.end;
+        textLines = rhs.textLines;
+        return *this;
+    }
 
   public:
     uint64_t    start;      ///< Starting time in msec or starting frame
