@@ -245,8 +245,8 @@ bool MythRAOPConnection::Init(void)
  * Socket incoming data signal handler
  * use for audio, control and timing socket
  */
-void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress peer,
-                                      quint16 port)
+void MythRAOPConnection::udpDataReady(QByteArray buf, QHostAddress /*peer*/,
+                                      quint16 /*port*/)
 {
     // restart the idle timer
     if (m_watchdogTimer)
