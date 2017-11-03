@@ -201,6 +201,8 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
 
     fileprefix += "/";
 
+    bool insertChan = insert_chan(id);  // unscannable source
+
     ChannelInfoList::iterator i = chanlist->begin();
     for (; i != chanlist->end(); ++i)
     {
@@ -390,7 +392,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
 
             }
         }
-        else if (insert_chan(id)) // Only insert channels for non-scannable sources
+        else if (insertChan) // Only insert channels for non-scannable sources
         {
             int major, minor = 0;
             long long freq = 0;
