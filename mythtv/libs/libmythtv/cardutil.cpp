@@ -23,6 +23,7 @@
 #include "mythlogging.h"
 #include "inputinfo.h"
 #include "mythmiscutil.h" // for ping()
+#include "mythdownloadmanager.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -146,9 +147,82 @@ bool CardUtil::IsCableCardPresent(uint inputid,
     else if (inputType == "CETON")
     {
 #ifdef USING_CETON
-        // TODO FIXME implement detection of Cablecard presence
-        LOG(VB_GENERAL, LOG_INFO, "Cardutil: TODO Ceton Is Cablecard Present?");
-        return true;
+        QString device = GetVideoDevice(inputid);
+
+        QStringList parts = device.split("-");
+        if (parts.size() != 2)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("CardUtil: Ceton invalid device id %1").arg(device));
+            return false;
+        }
+
+        QString ip_address = parts.at(0);
+
+        QStringList tuner_parts = parts.at(1).split(".");
+        if (tuner_parts.size() != 2)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("CardUtil: Ceton invalid device id %1").arg(device));
+            return false;
+        }
+
+        uint tuner = tuner_parts.at(1).toUInt();
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        QUrl params;
+#else
+        QUrlQuery params;
+#endif
+        params.addQueryItem("i", QString::number(tuner));
+        params.addQueryItem("s", "cas");
+        params.addQueryItem("v", "CardStatus");
+
+        QUrl url;
+        url.setScheme("http");
+        url.setHost(ip_address);
+        url.setPath("/get_var.json");
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        url.setEncodedQuery(params.encodedQuery());
+#else
+        url.setQuery(params);
+#endif
+
+        QNetworkRequest *request = new QNetworkRequest();
+        request->setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                              QNetworkRequest::AlwaysNetwork);
+        request->setUrl(url);
+
+        QByteArray data;
+        MythDownloadManager *manager = GetMythDownloadManager();
+
+        if (!manager->download(request, &data))
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("CardUtil: Ceton http request failed %1").arg(device));
+            return false;
+        }
+
+        QString response = QString(data);
+
+        QRegExp regex("^\\{ \"?result\"?: \"(.*)\" \\}$");
+        if (regex.indexIn(response) == -1)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("CardUtil: Ceton unexpected http response: %1").arg(response));
+            return false;
+        }
+
+        QString result = regex.cap(1);
+
+        if (result == "Inserted")
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, "Cardutil: Ceton CableCARD present.");
+            return true;
+        }
+
+        LOG(VB_GENERAL, LOG_DEBUG, "Cardutil: Ceton CableCARD not present.");
+        return false;
 #else
         return false;
 #endif
