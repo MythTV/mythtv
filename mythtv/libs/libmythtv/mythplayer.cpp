@@ -54,8 +54,8 @@ using namespace std;
 #include "ringbuffer.h"                 // for RingBuffer, etc
 #include "tv_actions.h"                 // for ACTION_BIGJUMPFWD, etc
 
-extern "C" {
 #include "vsync.h"
+extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
@@ -1834,7 +1834,21 @@ void MythPlayer::InitAVSync(void)
         SetFrameInterval(m_scan, 1.0 / (video_frame_rate * play_speed));
 
         // try to get preferential scheduling, but ignore if we fail to.
-        myth_nice(-19);
+        if (gCoreContext->GetNumSetting("RealtimePriority", 1))
+        {
+           if (myth_realtime(1))
+           {
+               LOG(VB_GENERAL, LOG_INFO, "Using realtime priority for video timing thread");
+           }
+           else
+           {
+               LOG(VB_GENERAL, LOG_WARNING, "Failed to set realtime priority for video timing thread");
+           }
+        }
+        else
+        {
+            myth_nice(-19);
+        }
     }
 }
 
@@ -2201,12 +2215,15 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (!videoOutput)
         return false;
 
-    if (!(min_buffers ? (videoOutput->ValidVideoFrames() >= min_buffers) :
+    uint valid_video_frames = videoOutput->ValidVideoFrames();
+    if (!(min_buffers ? (valid_video_frames >= min_buffers) :
                         (GetEof() != kEofStateNone) ||
                         (videoOutput->hasHWAcceleration() ?
                             videoOutput->EnoughPrebufferedFrames() :
                             videoOutput->EnoughDecodedFrames())))
     {
+        LOG(VB_PLAYBACK, LOG_NOTICE, QString("Buffering: ValidVideoFrames: %1")
+            .arg(valid_video_frames));
         SetBuffering(true);
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
