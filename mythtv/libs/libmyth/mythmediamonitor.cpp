@@ -447,6 +447,10 @@ void MediaMonitor::StartMonitoring(void)
     // Sanity check
     if (m_Active)
         return;
+    if (!gCoreContext->GetNumSetting("MonitorDrives", 0)) {
+        LOG(VB_MEDIA, LOG_NOTICE, "MediaMonitor diasabled by user setting.");
+        return;
+    }
 
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
