@@ -4320,6 +4320,16 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     SetFlags(kFlagRecorderRunning | kFlagRingBufferReady, __FILE__, __LINE__);
 
     ClearFlags(kFlagNeedToStartRecorder, __FILE__, __LINE__);
+
+    //workaround for failed import recordings, no signal monitor means we never
+    //go to recording state and the status here seems to override the status 
+    //set in the importrecorder and backend via setrecordingstatus
+    if (genOpt.inputtype == "IMPORT")
+    {
+        SetRecordingStatus(RecStatus::Recording, __LINE__);
+        if (curRecording)
+            curRecording->SetRecordingStatus(RecStatus::Recording);
+    }
     return;
 
   err_ret:
