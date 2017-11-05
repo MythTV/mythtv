@@ -172,11 +172,10 @@ bool ProfileItem::IsMatch(const QSize &size,
     // codec
     cmp = Get(QString("cond_codecs"));
     if (!cmp.isEmpty())
-        cmp.replace(QLatin1String(" "),QLatin1String(""));
-    if (!cmp.isEmpty())
     {
         QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
-        match &= clist.contains(codecName,Qt::CaseInsensitive);
+        if (clist.size() > 0)
+            match &= clist.contains(codecName,Qt::CaseInsensitive);
     }
 
     return match;
