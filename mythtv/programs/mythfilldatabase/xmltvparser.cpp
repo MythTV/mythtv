@@ -89,18 +89,21 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                QString path = info.attribute("src", "");
-                if (!path.isEmpty() && !path.contains("://"))
+                if (chaninfo->icon.isEmpty())
                 {
-                    QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                    chaninfo->icon = base +
-                        ((path.startsWith("/")) ? path : QString("/") + path);
-                }
-                else if (!path.isEmpty())
-                {
-                    QUrl url(path);
-                    if (url.isValid())
-                        chaninfo->icon = url.toString();
+                    QString path = info.attribute("src", "");
+                    if (!path.isEmpty() && !path.contains("://"))
+                    {
+                        QString base = baseUrl.toString(QUrl::StripTrailingSlash);
+                        chaninfo->icon = base +
+                            ((path.startsWith("/")) ? path : QString("/") + path);
+                    }
+                    else if (!path.isEmpty())
+                    {
+                        QUrl url(path);
+                        if (url.isValid())
+                            chaninfo->icon = url.toString();
+                    }
                 }
             }
             else if (info.tagName() == "display-name")
