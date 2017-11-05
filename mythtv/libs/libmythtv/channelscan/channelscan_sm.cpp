@@ -858,7 +858,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             continue;
 
         if (!wait_until_complete || sd->HasCachedAllSDT(tsid))
-            m_currentInfo->sdts[tsid] = sd->GetCachedSDTs(tsid);
+            m_currentInfo->sdts[tsid] = sd->GetCachedSDTSections(tsid);
     }
     sd->ReturnCachedSDTTables(sdttmp);
 
