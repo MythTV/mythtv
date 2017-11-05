@@ -977,7 +977,7 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
 class VBoxDeviceID;
 class VBoxTunerIndex;
 
-class VBoxIP : public GroupSetting
+class VBoxIP : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -998,7 +998,7 @@ class VBoxIP : public GroupSetting
     QString _oldValue;
 };
 
-class VBoxTunerIndex : public GroupSetting
+class VBoxTunerIndex : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -1028,7 +1028,8 @@ class VBoxDeviceIDList : public TransMythUIComboBoxSetting
                      StandardSetting *desc,
                      VBoxIP *cardip,
                      VBoxTunerIndex *cardtuner,
-                     VBoxDeviceList *devicelist);
+                     VBoxDeviceList *devicelist,
+                     const CaptureCard &parent);
 
     void fillSelections(const QString &current);
 
@@ -1043,6 +1044,7 @@ class VBoxDeviceIDList : public TransMythUIComboBoxSetting
     VBoxIP            *_cardip;
     VBoxTunerIndex    *_cardtuner;
     VBoxDeviceList    *_devicelist;
+    const CaptureCard &m_parent;
 
     QString            _oldValue;
 };
