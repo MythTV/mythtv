@@ -728,7 +728,7 @@ void MythDB::GetResolutionSetting(const QString &type,
             w = slist[0].toInt(&ok0);
             h = slist[1].toInt(&ok1);
         }
-        bool ok = ok0 && ok1;
+        ok = ok0 && ok1;
         if (ok)
         {
             width = w;
@@ -737,7 +737,6 @@ void MythDB::GetResolutionSetting(const QString &type,
             forced_aspect = GetFloatSetting(sAspect);
         }
     }
-    else
 
     if (!ok)
     {
