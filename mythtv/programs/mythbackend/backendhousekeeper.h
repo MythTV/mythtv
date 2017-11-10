@@ -45,6 +45,7 @@ class ThemeUpdateTask : public DailyHouseKeeperTask
                                             kHKGlobal, kHKRunOnStartup),
                             m_running(false) {};
     bool DoRun(void);
+    bool DoCheckRun(QDateTime now);
     virtual void Terminate(void);
   private:
     bool LoadVersion(const QString &version, int download_log_level);
