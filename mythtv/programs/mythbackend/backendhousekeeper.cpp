@@ -364,6 +364,15 @@ void CleanupTask::CleanupProgramListings(void)
         MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 }
 
+bool ThemeUpdateTask::DoCheckRun(QDateTime now)
+{
+    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1) &&
+            PeriodicHouseKeeperTask::DoCheckRun(now))
+        return true;
+
+    return false;
+}
+
 bool ThemeUpdateTask::DoRun(void)
 {
     bool    result = false;
