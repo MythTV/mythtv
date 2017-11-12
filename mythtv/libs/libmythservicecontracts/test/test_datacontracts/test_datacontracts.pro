@@ -29,6 +29,16 @@ contains(QMAKE_CXX, "g++") {
   QMAKE_LFLAGS += -fprofile-arcs
 }
 
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavcodec
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavformat
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythbase
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythupnp
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmyth
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
+
 # Input
 HEADERS += test_datacontracts.h
 SOURCES += test_datacontracts.cpp
