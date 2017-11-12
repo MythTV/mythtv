@@ -13,7 +13,9 @@ TEMPLATE = app
 TARGET = test_datacontracts
 DEPENDPATH += . ../.. ../../../libmyth ../../../libmythbase
 INCLUDEPATH += . ../.. ../../../libmyth ../../../libmythbase
-LIBS += -L../.. -lmythbase-$$LIBVERSION -lmyth-$$LIBVERSION -lmythservicecontracts-$$LIBVERSION
+LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
+LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
+LIBS += -L../.. -lmythservicecontracts-$$LIBVERSION
 LIBS += -Wl,$$_RPATH_$${PWD}/../..
 
 contains(QMAKE_CXX, "g++") {
