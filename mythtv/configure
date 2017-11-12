@@ -7346,11 +7346,11 @@ enabled debug && add_cxxflags -g"$debuglevel"
 # add some useful compiler flags if supported
 #check_cflags -Wdeclaration-after-statement
 check_cflags -Wall
+check_cflags -Wextra
 ! disabled optimizations && check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
 disabled icc && check_cflags -Wredundant-decls
 check_cflags -Wwrite-strings
-check_cflags -Wtype-limits
 check_cflags -Wundef
 #-Wmissing-prototypes breaks zeromq compilation in universal mode
 if [ "$target_os" != "darwin" ]; then
@@ -7358,7 +7358,6 @@ if [ "$target_os" != "darwin" ]; then
 fi
 check_cflags -Wno-pointer-to-int-cast
 check_cflags -Wstrict-prototypes
-check_cflags -Wempty-body
 enabled extra_warnings && check_cflags -Winline
 enabled extra_warnings && check_cflags -Wcast-qual
 
@@ -7375,6 +7374,7 @@ check_disable_warning -Wno-unused-const-variable
 
 # C++ Flags
 check_cxxflags -Wall
+check_cxxflags -Wextra
 check_cxxflags -Wpointer-arith
 #needed for INT64_C in libs/libavformat under g++
 check_cxxflags -D__STDC_CONSTANT_MACROS
