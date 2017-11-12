@@ -43,10 +43,6 @@ class SERVICE_PUBLIC RecRuleList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         RecRuleList(QObject *parent = 0)
             : QObject          ( parent ),
               m_StartIndex     ( 0      ),
@@ -55,18 +51,13 @@ class SERVICE_PUBLIC RecRuleList : public QObject
         {
         }
 
-        RecRuleList( const RecRuleList &src )
+        void Copy( const RecRuleList *src )
         {
-            Copy( src );
-        }
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
 
-        void Copy( const RecRuleList &src )
-        {
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
-
-            CopyListContents< RecRule >( this, m_RecRules, src.m_RecRules );
+            CopyListContents< RecRule >( this, m_RecRules, src->m_RecRules );
         }
 
         RecRule *AddNewRecRule()
@@ -80,22 +71,10 @@ class SERVICE_PUBLIC RecRuleList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(RecRuleList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::RecRuleList  )
-Q_DECLARE_METATYPE( DTC::RecRuleList* )
-
-namespace DTC
-{
-inline void RecRuleList::InitializeCustomTypes()
-{
-    qRegisterMetaType< RecRuleList   >();
-    qRegisterMetaType< RecRuleList*  >();
-
-    RecRule::InitializeCustomTypes();
-}
-}
 
 #endif

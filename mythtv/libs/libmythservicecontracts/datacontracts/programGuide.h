@@ -71,10 +71,6 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         ProgramGuide(QObject *parent = 0) 
             : QObject           ( parent ),
               m_Details         ( false  ),
@@ -83,25 +79,20 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
               m_TotalAvailable  ( 0      )
         {
         }
-        
-        ProgramGuide( const ProgramGuide &src )
-        {
-            Copy( src );
-        }
 
-        void Copy( const ProgramGuide &src )
+        void Copy( const ProgramGuide *src )
         {                                       
-            m_StartTime      = src.m_StartTime      ;
-            m_EndTime        = src.m_EndTime        ;
-            m_Details        = src.m_Details        ;
-            m_StartIndex     = src.m_StartIndex     ;
-            m_Count          = src.m_Count          ;
-            m_TotalAvailable = src.m_TotalAvailable ;
-            m_AsOf           = src.m_AsOf           ;
-            m_Version        = src.m_Version        ;
-            m_ProtoVer       = src.m_ProtoVer       ;
+            m_StartTime      = src->m_StartTime      ;
+            m_EndTime        = src->m_EndTime        ;
+            m_Details        = src->m_Details        ;
+            m_StartIndex     = src->m_StartIndex     ;
+            m_Count          = src->m_Count          ;
+            m_TotalAvailable = src->m_TotalAvailable ;
+            m_AsOf           = src->m_AsOf           ;
+            m_Version        = src->m_Version        ;
+            m_ProtoVer       = src->m_ProtoVer       ;
         
-            CopyListContents< ChannelInfo >( this, m_Channels, src.m_Channels );
+            CopyListContents< ChannelInfo >( this, m_Channels, src->m_Channels );
         }
 
         ChannelInfo *AddNewChannel()
@@ -115,22 +106,10 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(ProgramGuide);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::ProgramGuide  )
-Q_DECLARE_METATYPE( DTC::ProgramGuide* )
-
-namespace DTC
-{
-inline void ProgramGuide::InitializeCustomTypes()
-{
-    qRegisterMetaType< ProgramGuide  >();
-    qRegisterMetaType< ProgramGuide* >();
-
-    ChannelInfo::InitializeCustomTypes();
-}
-}
 
 #endif

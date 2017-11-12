@@ -31,26 +31,18 @@ namespace DTC
         PROPERTYIMP_RO_REF(QVariantMap, AudioTracks)
 
       public:
-        static inline void InitializeCustomTypes();
-
-      public:
         explicit FrontendStatus(QObject *parent = 0) : QObject(parent)
         {
         }
 
-        FrontendStatus(const FrontendStatus &src)
+        void Copy( const FrontendStatus *src)
         {
-            Copy(src);
-        }
-
-        void Copy(const FrontendStatus &src)
-        {
-            m_Name           = src.m_Name;
-            m_Version        = src.m_Version;
-            m_State          = src.m_State;
-            m_ChapterTimes   = src.m_ChapterTimes;
-            m_SubtitleTracks = src.m_SubtitleTracks;
-            m_AudioTracks    = src.m_AudioTracks;
+            m_Name           = src->m_Name;
+            m_Version        = src->m_Version;
+            m_State          = src->m_State;
+            m_ChapterTimes   = src->m_ChapterTimes;
+            m_SubtitleTracks = src->m_SubtitleTracks;
+            m_AudioTracks    = src->m_AudioTracks;
         }
 
         void Process(void)
@@ -76,19 +68,10 @@ namespace DTC
                 m_State.remove("audiotracks");
             }
         }
+
+    private:
+        Q_DISABLE_COPY(FrontendStatus);
     };
 };
-
-Q_DECLARE_METATYPE(DTC::FrontendStatus)
-Q_DECLARE_METATYPE(DTC::FrontendStatus*)
-
-namespace DTC
-{
-inline void FrontendStatus::InitializeCustomTypes()
-{
-    qRegisterMetaType<FrontendStatus>();
-    qRegisterMetaType<FrontendStatus*>();
-}
-}
 
 #endif // FRONTENDSTATUS_H

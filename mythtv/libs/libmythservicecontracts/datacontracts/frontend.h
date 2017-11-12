@@ -37,9 +37,6 @@ class SERVICE_PUBLIC Frontend : public QObject
     PROPERTYIMP    ( bool       , OnLine          )
 
     public:
-        static inline void InitializeCustomTypes();
-
-    public:
 
         Frontend(QObject *parent = 0)
             : QObject         ( parent ),
@@ -47,32 +44,18 @@ class SERVICE_PUBLIC Frontend : public QObject
         {
         }
 
-        Frontend( const Frontend &src )
+        void Copy( const Frontend *src )
         {
-            Copy( src );
+            m_Name            = src->m_Name;
+            m_IP              = src->m_IP;
+            m_Port            = src->m_Port;
+            m_OnLine          = src->m_OnLine;
         }
 
-        void Copy( const Frontend &src )
-        {
-            m_Name            = src.m_Name;
-            m_IP              = src.m_IP;
-            m_Port            = src.m_Port;
-            m_OnLine          = src.m_OnLine;
-        }
+    private:
+        Q_DISABLE_COPY(Frontend);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::Frontend  )
-Q_DECLARE_METATYPE( DTC::Frontend* )
-
-namespace DTC
-{
-inline void Frontend::InitializeCustomTypes()
-{
-    qRegisterMetaType< Frontend  >();
-    qRegisterMetaType< Frontend* >();
-}
-}
 
 #endif

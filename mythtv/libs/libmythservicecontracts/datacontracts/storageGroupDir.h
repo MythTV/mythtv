@@ -34,48 +34,30 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         StorageGroupDir(QObject *parent = 0) 
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_DirRead       ( false  ),
               m_DirWrite      ( false  ),
               m_KiBFree       ( 0      )
-        { 
-        }
-        
-        StorageGroupDir( const StorageGroupDir &src )
         {
-            Copy( src );
         }
 
-        void Copy( const StorageGroupDir &src )
+        void Copy( const StorageGroupDir *src )
         {
-            m_Id            = src.m_Id            ;
-            m_GroupName     = src.m_GroupName     ;
-            m_HostName      = src.m_HostName      ;
-            m_DirName       = src.m_DirName       ;
-            m_DirRead       = src.m_DirRead       ;
-            m_DirWrite      = src.m_DirWrite      ;
-            m_KiBFree       = src.m_KiBFree       ;
+            m_Id            = src->m_Id            ;
+            m_GroupName     = src->m_GroupName     ;
+            m_HostName      = src->m_HostName      ;
+            m_DirName       = src->m_DirName       ;
+            m_DirRead       = src->m_DirRead       ;
+            m_DirWrite      = src->m_DirWrite      ;
+            m_KiBFree       = src->m_KiBFree       ;
         }
+
+    private:
+        Q_DISABLE_COPY(StorageGroupDir);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::StorageGroupDir  )
-Q_DECLARE_METATYPE( DTC::StorageGroupDir* )
-
-namespace DTC
-{
-inline void StorageGroupDir::InitializeCustomTypes()
-{
-    qRegisterMetaType< StorageGroupDir   >();
-    qRegisterMetaType< StorageGroupDir*  >();
-}
-}
 
 #endif

@@ -48,29 +48,20 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         VideoLookupList(QObject *parent = 0)
             : QObject( parent ),
               m_Count         ( 0      )
         {
         }
 
-        VideoLookupList( const VideoLookupList &src )
+        void Copy( const VideoLookupList *src )
         {
-            Copy( src );
-        }
+            m_Count         = src->m_Count          ;
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
 
-        void Copy( const VideoLookupList &src )
-        {
-            m_Count         = src.m_Count          ;
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
-
-            CopyListContents< VideoLookup >( this, m_VideoLookups, src.m_VideoLookups );
+            CopyListContents< VideoLookup >( this, m_VideoLookups, src->m_VideoLookups );
         }
 
         VideoLookup *AddNewVideoLookup()
@@ -84,22 +75,10 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(VideoLookupList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::VideoLookupList  )
-Q_DECLARE_METATYPE( DTC::VideoLookupList* )
-
-namespace DTC
-{
-inline void VideoLookupList::InitializeCustomTypes()
-{
-    qRegisterMetaType< VideoLookupList  >();
-    qRegisterMetaType< VideoLookupList* >();
-
-    VideoLookup::InitializeCustomTypes();
-}
-}
 
 #endif

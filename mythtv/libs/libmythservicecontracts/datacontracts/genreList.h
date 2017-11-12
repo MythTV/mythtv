@@ -38,23 +38,14 @@ class SERVICE_PUBLIC GenreList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         GenreList(QObject *parent = 0)
             : QObject         ( parent )
         {
         }
 
-        GenreList( const GenreList &src )
+        void Copy( const GenreList *src )
         {
-            Copy( src );
-        }
-
-        void Copy( const GenreList &src )
-        {
-            CopyListContents< Genre >( this, m_Genres, src.m_Genres );
+            CopyListContents< Genre >( this, m_Genres, src->m_Genres );
         }
 
         Genre *AddNewGenre()
@@ -68,22 +59,10 @@ class SERVICE_PUBLIC GenreList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(GenreList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::GenreList  )
-Q_DECLARE_METATYPE( DTC::GenreList* )
-
-namespace DTC
-{
-inline void GenreList::InitializeCustomTypes()
-{
-    qRegisterMetaType< GenreList  >();
-    qRegisterMetaType< GenreList* >();
-
-    Genre::InitializeCustomTypes();
-}
-}
 
 #endif

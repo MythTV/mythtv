@@ -22,14 +22,8 @@ class SERVICE_PUBLIC ImageServices : public Service
 
     public:
 
-        // Must call InitializeCustomTypes for each unique
-        // Custom Type used in public slots below.
         ImageServices( QObject *parent = 0 ) : Service( parent )
         {
-            // Must call InitializeCustomTypes for each
-            // unique Custom Type used in public slots below.
-            DTC::ImageMetadataInfoList::InitializeCustomTypes();
-            DTC::ImageSyncInfo::InitializeCustomTypes();
         }
 
     public slots:

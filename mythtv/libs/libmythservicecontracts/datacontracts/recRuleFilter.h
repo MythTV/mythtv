@@ -25,42 +25,23 @@ class SERVICE_PUBLIC RecRuleFilter : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         RecRuleFilter(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      )
         {
         }
 
-        RecRuleFilter( const RecRuleFilter &src )
+        void Copy( const RecRuleFilter *src )
         {
-            Copy( src );
+            m_Id            = src->m_Id            ;
+            m_Description   = src->m_Description   ;
         }
 
-        void Copy( const RecRuleFilter &src )
-        {
-            m_Id            = src.m_Id            ;
-            m_Description   = src.m_Description   ;
-        }
-
+    private:
+        Q_DISABLE_COPY(RecRuleFilter);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::RecRuleFilter  )
-Q_DECLARE_METATYPE( DTC::RecRuleFilter* )
-
-namespace DTC
-{
-inline void RecRuleFilter::InitializeCustomTypes()
-{
-    qRegisterMetaType< RecRuleFilter   >();
-    qRegisterMetaType< RecRuleFilter*  >();
-}
-}
 
 #endif
 

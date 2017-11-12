@@ -40,10 +40,6 @@ class SERVICE_PUBLIC VideoSource : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         VideoSource(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      ),
@@ -52,38 +48,24 @@ class SERVICE_PUBLIC VideoSource : public QObject
         {
         }
 
-        VideoSource( const VideoSource &src )
+        void Copy( const VideoSource *src )
         {
-            Copy( src );
+            m_Id            = src->m_Id            ;
+            m_SourceName    = src->m_SourceName    ;
+            m_Grabber       = src->m_Grabber       ;
+            m_UserId        = src->m_UserId        ;
+            m_FreqTable     = src->m_FreqTable     ;
+            m_LineupId      = src->m_LineupId      ;
+            m_Password      = src->m_Password      ;
+            m_UseEIT        = src->m_UseEIT        ;
+            m_ConfigPath    = src->m_ConfigPath    ;
+            m_NITId         = src->m_NITId         ;
         }
 
-        void Copy( const VideoSource &src )
-        {
-            m_Id            = src.m_Id            ;
-            m_SourceName    = src.m_SourceName    ;
-            m_Grabber       = src.m_Grabber       ;
-            m_UserId        = src.m_UserId        ;
-            m_FreqTable     = src.m_FreqTable     ;
-            m_LineupId      = src.m_LineupId      ;
-            m_Password      = src.m_Password      ;
-            m_UseEIT        = src.m_UseEIT        ;
-            m_ConfigPath    = src.m_ConfigPath    ;
-            m_NITId         = src.m_NITId         ;
-        }
+    private:
+        Q_DISABLE_COPY(VideoSource);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::VideoSource  )
-Q_DECLARE_METATYPE( DTC::VideoSource* )
-
-namespace DTC
-{
-inline void VideoSource::InitializeCustomTypes()
-{
-    qRegisterMetaType< VideoSource   >();
-    qRegisterMetaType< VideoSource*  >();
-}
-}
 
 #endif

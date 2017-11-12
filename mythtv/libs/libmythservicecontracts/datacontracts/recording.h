@@ -76,10 +76,6 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         RecordingInfo(QObject *parent = 0) 
             : QObject           ( parent             ),
               m_RecordedId      ( 0                  ),
@@ -95,50 +91,34 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
         {
         }
 
-        RecordingInfo( const RecordingInfo &src )
+        void Copy( const RecordingInfo *src )
         {
-            Copy( src );
+            m_RecordedId      = src->m_RecordedId       ;
+            m_Status          = src->m_Status           ;
+            m_Priority        = src->m_Priority         ;
+            m_StartTs         = src->m_StartTs          ;
+            m_EndTs           = src->m_EndTs            ;
+            m_FileSize        = src->m_FileSize         ;
+            m_FileName        = src->m_FileName         ;
+            m_HostName        = src->m_HostName         ;
+            m_LastModified    = src->m_LastModified     ;
+            m_RecordId        = src->m_RecordId         ;
+            m_RecGroup        = src->m_RecGroup         ;
+            m_StorageGroup    = src->m_StorageGroup     ;
+            m_PlayGroup       = src->m_PlayGroup        ;
+            m_RecType         = src->m_RecType          ;
+            m_DupInType       = src->m_DupInType        ;
+            m_DupMethod       = src->m_DupMethod        ;
+            m_EncoderId       = src->m_EncoderId        ;
+            m_EncoderName     = src->m_EncoderName      ;
+            m_Profile         = src->m_Profile          ;
+            m_SerializeDetails= src->m_SerializeDetails ;
         }
 
-        void Copy( const RecordingInfo &src )
-        {
-            m_RecordedId      = src.m_RecordedId       ;
-            m_Status          = src.m_Status           ;
-            m_Priority        = src.m_Priority         ;
-            m_StartTs         = src.m_StartTs          ;
-            m_EndTs           = src.m_EndTs            ;
-            m_FileSize        = src.m_FileSize         ;
-            m_FileName        = src.m_FileName         ;
-            m_HostName        = src.m_HostName         ;
-            m_LastModified    = src.m_LastModified     ;
-            m_RecordId        = src.m_RecordId         ;
-            m_RecGroup        = src.m_RecGroup         ;
-            m_StorageGroup    = src.m_StorageGroup     ;
-            m_PlayGroup       = src.m_PlayGroup        ;
-            m_RecType         = src.m_RecType          ;
-            m_DupInType       = src.m_DupInType        ;
-            m_DupMethod       = src.m_DupMethod        ;
-            m_EncoderId       = src.m_EncoderId        ;
-            m_EncoderName     = src.m_EncoderName      ;
-            m_Profile         = src.m_Profile          ;
-            m_SerializeDetails= src.m_SerializeDetails ;
-        }
+    private:
+        Q_DISABLE_COPY(RecordingInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::RecordingInfo  )
-Q_DECLARE_METATYPE( DTC::RecordingInfo* )
-
-namespace DTC
-{
-inline void RecordingInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< RecordingInfo  >();
-    qRegisterMetaType< RecordingInfo* >();
-
-    RecStatus::InitializeCustomTypes();
-}
-}
 
 #endif

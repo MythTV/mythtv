@@ -80,10 +80,6 @@ class SERVICE_PUBLIC CaptureCard : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         CaptureCard(QObject *parent = 0)
             : QObject         ( parent ), m_CardId(0),
             m_AudioRateLimit(0), m_DVBSWFilter(0),
@@ -97,52 +93,38 @@ class SERVICE_PUBLIC CaptureCard : public QObject
         {
         }
 
-        CaptureCard( const CaptureCard &src )
+        void Copy( const CaptureCard *src )
         {
-            Copy( src );
+            m_CardId             = src->m_CardId;
+            m_VideoDevice        = src->m_VideoDevice;
+            m_AudioDevice        = src->m_AudioDevice;
+            m_CardType           = src->m_CardType;
+            m_AudioRateLimit     = src->m_AudioRateLimit;
+            m_HostName           = src->m_HostName;
+            m_DVBSWFilter        = src->m_DVBSWFilter;
+            m_DVBSatType         = src->m_DVBSatType;
+            m_DVBWaitForSeqStart = src->m_DVBWaitForSeqStart;
+            m_SkipBTAudio        = src->m_SkipBTAudio;
+            m_DVBOnDemand        = src->m_DVBOnDemand;
+            m_DVBDiSEqCType      = src->m_DVBDiSEqCType;
+            m_FirewireSpeed      = src->m_FirewireSpeed;
+            m_FirewireModel      = src->m_FirewireModel;
+            m_FirewireConnection = src->m_FirewireConnection;
+            m_SignalTimeout      = src->m_SignalTimeout;
+            m_ChannelTimeout     = src->m_ChannelTimeout;
+            m_DVBTuningDelay     = src->m_DVBTuningDelay;
+            m_Contrast           = src->m_Contrast;
+            m_Brightness         = src->m_Brightness;
+            m_Colour             = src->m_Colour;
+            m_Hue                = src->m_Hue;
+            m_DiSEqCId           = src->m_DiSEqCId;
+            m_DVBEITScan         = src->m_DVBEITScan;
         }
 
-        void Copy( const CaptureCard &src )
-        {
-            m_CardId             = src.m_CardId;
-            m_VideoDevice        = src.m_VideoDevice;
-            m_AudioDevice        = src.m_AudioDevice;
-            m_CardType           = src.m_CardType;
-            m_AudioRateLimit     = src.m_AudioRateLimit;
-            m_HostName           = src.m_HostName;
-            m_DVBSWFilter        = src.m_DVBSWFilter;
-            m_DVBSatType         = src.m_DVBSatType;
-            m_DVBWaitForSeqStart = src.m_DVBWaitForSeqStart;
-            m_SkipBTAudio        = src.m_SkipBTAudio;
-            m_DVBOnDemand        = src.m_DVBOnDemand;
-            m_DVBDiSEqCType      = src.m_DVBDiSEqCType;
-            m_FirewireSpeed      = src.m_FirewireSpeed;
-            m_FirewireModel      = src.m_FirewireModel;
-            m_FirewireConnection = src.m_FirewireConnection;
-            m_SignalTimeout      = src.m_SignalTimeout;
-            m_ChannelTimeout     = src.m_ChannelTimeout;
-            m_DVBTuningDelay     = src.m_DVBTuningDelay;
-            m_Contrast           = src.m_Contrast;
-            m_Brightness         = src.m_Brightness;
-            m_Colour             = src.m_Colour;
-            m_Hue                = src.m_Hue;
-            m_DiSEqCId           = src.m_DiSEqCId;
-            m_DVBEITScan         = src.m_DVBEITScan;
-        }
+    private:
+        Q_DISABLE_COPY(CaptureCard);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::CaptureCard  )
-Q_DECLARE_METATYPE( DTC::CaptureCard* )
-
-namespace DTC
-{
-inline void CaptureCard::InitializeCustomTypes()
-{
-    qRegisterMetaType< CaptureCard  >();
-    qRegisterMetaType< CaptureCard* >();
-}
-}
 
 #endif

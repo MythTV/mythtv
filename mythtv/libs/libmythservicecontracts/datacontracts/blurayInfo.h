@@ -70,10 +70,6 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         BlurayInfo(QObject *parent = 0)
                  : QObject                ( parent    ),
                    m_Path                 ( QString() ),
@@ -99,48 +95,34 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
         {
         }
 
-        BlurayInfo( const BlurayInfo &src )
+        void Copy( const BlurayInfo *src )
         {
-            Copy( src );
+            m_Path                 = src->m_Path                 ;
+            m_Title                = src->m_Title                ;
+            m_AltTitle             = src->m_AltTitle             ;
+            m_DiscLang             = src->m_DiscLang             ;
+            m_DiscNum              = src->m_DiscNum              ;
+            m_TotalDiscNum         = src->m_TotalDiscNum         ;
+            m_TitleCount           = src->m_TitleCount           ;
+            m_ThumbCount           = src->m_ThumbCount           ;
+            m_ThumbPath            = src->m_ThumbPath            ;
+            m_TopMenuSupported     = src->m_TopMenuSupported     ;
+            m_FirstPlaySupported   = src->m_FirstPlaySupported   ;
+            m_NumHDMVTitles        = src->m_NumHDMVTitles        ;
+            m_NumBDJTitles         = src->m_NumBDJTitles         ;
+            m_NumUnsupportedTitles = src->m_NumUnsupportedTitles ;
+            m_AACSDetected         = src->m_AACSDetected         ;
+            m_LibAACSDetected      = src->m_LibAACSDetected      ;
+            m_AACSHandled          = src->m_AACSHandled          ;
+            m_BDPlusDetected       = src->m_BDPlusDetected       ;
+            m_LibBDPlusDetected    = src->m_LibBDPlusDetected    ;
+            m_BDPlusHandled        = src->m_BDPlusHandled        ;
         }
 
-        void Copy( const BlurayInfo &src )
-        {
-            m_Path                 = src.m_Path                 ;
-            m_Title                = src.m_Title                ;
-            m_AltTitle             = src.m_AltTitle             ;
-            m_DiscLang             = src.m_DiscLang             ;
-            m_DiscNum              = src.m_DiscNum              ;
-            m_TotalDiscNum         = src.m_TotalDiscNum         ;
-            m_TitleCount           = src.m_TitleCount           ;
-            m_ThumbCount           = src.m_ThumbCount           ;
-            m_ThumbPath            = src.m_ThumbPath            ;
-            m_TopMenuSupported     = src.m_TopMenuSupported     ;
-            m_FirstPlaySupported   = src.m_FirstPlaySupported   ;
-            m_NumHDMVTitles        = src.m_NumHDMVTitles        ;
-            m_NumBDJTitles         = src.m_NumBDJTitles         ;
-            m_NumUnsupportedTitles = src.m_NumUnsupportedTitles ;
-            m_AACSDetected         = src.m_AACSDetected         ;
-            m_LibAACSDetected      = src.m_LibAACSDetected      ;
-            m_AACSHandled          = src.m_AACSHandled          ;
-            m_BDPlusDetected       = src.m_BDPlusDetected       ;
-            m_LibBDPlusDetected    = src.m_LibBDPlusDetected    ;
-            m_BDPlusHandled        = src.m_BDPlusHandled        ;
-        }
+    private:
+        Q_DISABLE_COPY(BlurayInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::BlurayInfo  )
-Q_DECLARE_METATYPE( DTC::BlurayInfo* )
-
-namespace DTC
-{
-inline void BlurayInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< BlurayInfo  >();
-    qRegisterMetaType< BlurayInfo* >();
-}
-}
 
 #endif
