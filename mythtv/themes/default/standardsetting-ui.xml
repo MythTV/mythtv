@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+
+<!-- theme.xml for the MythCenter theme - by Jeroen Brosens -->
+<mythuitheme>
+    <window name="settingssetup">
+        <textarea name="title" from="basetextarea">
+            <area>30,15,100%-30,40</area>
+            <font>baselarge</font>
+            <align>allcenter</align>
+        </textarea>
+
+        <shape name="GroupHelpBackground" depends="grouphelp">
+            <area>15,80,100%-15,80</area> 
+            <type>roundbox</type> 
+            <cornerradius>10</cornerradius>
+            <fill color="#FFFFFF" alpha="30" />
+        </shape>
+
+        <!-- optional, display the help for the current group of settings -->
+        <textarea name="grouphelp" from="basetextarea">
+            <area>30,90-120,100%-30,60</area>
+            <font>basesmall</font>
+            <align>lefthcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <buttonlist name="settingslist">
+            <area>15,200,-15,100%-160</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <arrange>stack</arrange>
+            <spacing>4</spacing>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,100%,90</area>
+                <state name="active">
+                    <area>0,0,100%,40</area>
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="100" direction="vertical"  />
+                        </fill>
+                    </shape>
+                    <group name="labels">
+                        <area>0,0,50%-1,100%</area>
+                        <textarea name="buttontext">
+                            <area>10,0,100%-10,100%</area>
+                            <font>basesmall</font>
+                            <cutdown>yes</cutdown>
+                            <align>left,vcenter</align>
+                        </textarea>
+                    </group>
+                    <group name="widgets">
+                        <area>50%+1,0,100%,100%</area>
+                        <statetype name="widgettype">
+                            <area>0,0,100%-24,100%</area>
+                            <state name="standard">
+                                <area>0,0,100%,100%</area> 
+                            </state>
+                            <state name="group">
+                                <area>0,0,100%,100%</area> 
+                            </state>
+                            <state name="checkbox">
+                                <area>0,0,100%,100%</area> 
+                            </state>
+                            <state name="textedit">
+                                <area>0,0,100%,100%</area> 
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,100%-4</area>
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                            </state>
+                            <state name="filebrowser">
+                                <area>0,0,100%,100%</area> 
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,100%-4</area>
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                                <imagetype name="filebrowserimage">
+                                    <area>100%,50%-10,20,20</area>
+                                    <!-- todo find a good icon -->
+                                    <filename>shared/directory.png</filename>
+                                </imagetype>
+                            </state>
+                            <state name="spinbox">
+                                <area>0,0,100%,100%</area> 
+                                <imagetype name="spinboximage2">
+                                    <area>0,50%-10,20,20</area>
+                                    <filename>lb-ltarrow-sel.png</filename>
+                                </imagetype>
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,100%-4</area>
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                                <imagetype name="spinboximage">
+                                    <area>100%,50%-10,20,20</area>
+                                    <filename>lb-rtarrow-sel.png</filename>
+                                </imagetype>
+                            </state>
+                            <state name="combobox">
+                                <area>0,0,100%,100%</area> 
+                                <shape name="texteditshape"> 
+                                    <area>20,2,100%,100%-4</area>
+                                    <type>roundbox</type> 
+                                    <cornerradius>5</cornerradius>
+                                    <line color="#000000" alpha="255" width="1" />
+                                    <fill color="#FFFFFF" alpha="50" />
+                                </shape> 
+                                <imagetype name="comboboximage">
+                                    <area>0,50%-10,20,20</area>
+                                    <filename>lb-dnarrow-sel.png</filename>
+                                </imagetype>
+                            </state>
+                            <state name="button">
+                                <area>0,0,100%,100%</area> 
+                                <imagetype name="comboboximage">
+                                    <area>100%-20,50%-10,20,20</area>
+                                    <filename>button_selected_background.png</filename>
+                                </imagetype>
+                            </state>
+                        </statetype>
+                        <!-- we can not put more than one textarea with the same name
+                            The textarea can no be in a custom state 
+                            We can not put the textarea in a state from statetype neither
+                            Which mean we can not theme them differently according to the statetype
+                        -->
+                        <textarea name="value">
+                            <area>5,0,100%-35,100%</area>
+                            <font>basesmall</font>
+                            <cutdown>yes</cutdown>
+                            <align>right,vcenter</align>
+                        </textarea>
+                    </group>
+                    <statetype name="buttoncheck">
+                        <position>100%-50,50%-10</position>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <imagetype name="buttonarrow">
+                        <position>100%-20,50%-8</position>
+                        <filename>lb-arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selectedactive" from="active">
+                    <area>0,0,100%,60</area>
+                    <shape name="buttonbackground">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
+                    <group name="labels">
+                        <textarea name="buttontext">
+                            <multiline>yes</multiline>
+                        </textarea>
+                    </group>
+                </state>
+                <state name="disabledactive" from="active">
+                    <shape name="buttonbackgroundselection">
+                        <fill style="gradient">
+                            <gradient start="#888888" end="#777777" alpha="255" />
+                        </fill>
+                    </shape>
+                </state>
+                <state name="disabledinactive" from="disabledactive">
+                </state>
+                <state name="selectedinactive" from="active">
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>0,96%</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>30,96%</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <shape name="HelpBackground"> 
+            <area>15,100%-120,100%-15,100</area> 
+            <type>roundbox</type> 
+            <cornerradius>10</cornerradius>
+            <fill color="#000000" alpha="30" />
+        </shape> 
+
+        <!-- optional, display the help for the currently selected setting -->
+        <textarea name="selectedsettinghelp" from="basetextarea">
+            <area>30,100%-110,100%-30,80</area>
+            <font>basesmall</font>
+            <multiline>yes</multiline>
+            <cutdown>no</cutdown>
+            <scroll direction="vertical" timeout="0"/>
+        </textarea>
+    </window>
+    <window name="terminal">
+        <buttonlist name="output" from="basebuttonlist">
+            <area>0,0,100%,90%</area>
+            <arrange>stack</arrange>
+            <align>left</align>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext">
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive">
+                    <textarea name="buttontext">
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedinactive">
+                    <textarea name="buttontext">
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+        <textedit name="textedit" from="basetextedit">
+            <position>0,90%</position>
+        </textedit>
+        <button name="enter" from="basebutton">
+            <position>80%,90%</position>
+            <value>Enter</value>
+        </button>
+    </window>
+</mythuitheme>

@@ -15,6 +15,7 @@ typedef enum Formats
     kFilename      = 0x000100,      ///< Default UTC, "yyyyMMddhhmmss"
     kDateFull      = 0x000200,      ///< Default local time
     kDateShort     = 0x000400,      ///< Default local time
+    kDateEither    = kDateFull  | kDateShort,    ///< Default local time
     kTime          = 0x000800,      ///< Default local time
     kDateTimeFull  = kDateFull  | kTime, ///< Default local time
     kDateTimeShort = kDateShort | kTime, ///< Default local time

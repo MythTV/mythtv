@@ -193,10 +193,23 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
         if (inputs[i].inputid == (uint)inputid)
             break;
 
-    if (i < inputs.size())
-        i = ((i + 1) % inputs.size());
-    else
+    if (i >= inputs.size())
+    {
+        // We should always find the referenced input.  If we don't,
+        // just return the first one.
         i = 0;
+    }
+    else
+    {
+        // Try to find the next input with a different name.  If one
+        // doesn't exist, just return the current one.
+        uint j = i;
+        do
+        {
+            i = (i + 1) % inputs.size();
+        }
+        while (i != j && inputs[i].displayName == inputs[j].displayName);
+    }
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("RemoteRequestNextFreeRecorder got input %1")

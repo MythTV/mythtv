@@ -47,7 +47,8 @@ MHParseText::MHParseText(QByteArray &program)
                 m_ch(0),            m_nTag(0),
                 m_nInt(0),          m_fBool(false),
                 m_String((unsigned char *)malloc(100)),
-                m_nStringLength(0), m_p(0)
+                m_nStringLength(0), m_p(0),
+                m_data(program)
 
 {
 }
@@ -387,7 +388,8 @@ void MHParseText::NextSym()
         switch (m_ch)
         {
             case '\n':
-                m_lineCount++; // And drop to next
+                m_lineCount++;
+                [[clang::fallthrough]];
             case ' ':
             case '\r':
             case '\t':
@@ -445,6 +447,7 @@ void MHParseText::NextSym()
 
                 // Unrecognised tag.
                 Error("Unrecognised tag");
+                break;
             }
 
             case '"': // Start of a string

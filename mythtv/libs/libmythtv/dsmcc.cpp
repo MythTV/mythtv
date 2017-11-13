@@ -244,6 +244,7 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     if (userInfoLength)
     {
         LOG(VB_DSMCC, LOG_WARNING, "[dsmcc] DSI unexpected userInfo");
+        // cppcheck-suppress unreadVariable
         off += userInfoLength;
     }
 }
@@ -630,7 +631,7 @@ static unsigned long crc_table[256] =
 
 static uint32_t crc32(const unsigned char *data, int len)
 {
-    register int i;
+    int i;
     uint32_t crc = 0xffffffff;
 
     for (i = 0; i < len; i++)

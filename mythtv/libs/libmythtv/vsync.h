@@ -220,6 +220,6 @@ class DummyVideoSync : public VideoSync
 
     QString getName(void) const { return QString("Dummy"); }
     bool TryInit(void) { return true; }
-    int WaitForFrame(int sync_delay) { return 0; }
+    int WaitForFrame(int /*sync_delay*/) { return 0; }
 };
 #endif /* VSYNC_H_INCLUDED */

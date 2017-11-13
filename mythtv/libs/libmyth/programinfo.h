@@ -243,7 +243,8 @@ class MPUBLIC ProgramInfo
 
                 const QString &seriesid,
                 const QString &programid,
-                const QString &inetref);
+                const QString &inetref,
+                const QString &inputname);
     /// Constructs a ProgramInfo for a pathname.
     explicit ProgramInfo(const QString &pathname);
     /// Constructs a ProgramInfo for a video.
@@ -441,6 +442,11 @@ class MPUBLIC ProgramInfo
 
     uint    GetSourceID(void)             const { return sourceid;     }
     uint    GetInputID(void)              const { return inputid;      }
+    QString GetInputName(void)            const { return inputname;    }
+    QString GetShortInputName(void) const
+        { return inputname.isRightToLeft() ?
+                 inputname.left(2) : inputname.right(2); }
+    void    ClearInputName(void)          { inputname.clear(); }
 
     uint    GetFindID(void)               const { return findid;       }
 
@@ -585,7 +591,7 @@ class MPUBLIC ProgramInfo
     void SaveDVDBookmark(const QStringList &fields) const;
     void SaveBDBookmark(const QStringList &fields) const;
     void SaveEditing(bool edit);
-    void SaveTranscodeStatus(TranscodingStatus transFlag);
+    void SaveTranscodeStatus(TranscodingStatus trans);
     void SaveWatched(bool watchedFlag);
     void SaveDeletePendingFlag(bool deleteFlag);
     void SaveCommFlagged(CommFlagStatus flag); // 1 = flagged, 2 = processing
@@ -833,6 +839,14 @@ MPUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings);
+
+MPUBLIC bool LoadFromOldRecorded(
+    ProgramList        &destination, 
+    const QString      &sql, 
+    const MSqlBindings &bindings,
+    const uint         &start, 
+    const uint         &limit,
+    uint               &count);
 
 MPUBLIC bool LoadFromRecorded(
     ProgramList        &destination,

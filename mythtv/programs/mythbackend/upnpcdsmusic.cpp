@@ -59,7 +59,7 @@ UPnpCDSMusic::UPnpCDSMusic()
              : UPnpCDSExtension( "Music", "Music",
                                  "object.item.audioItem.musicTrack" )
 {
-    QString sServerIp   = gCoreContext->GetBackendServerIP4();
+    QString sServerIp   = gCoreContext->GetBackendServerIP();
     int sPort           = gCoreContext->GetBackendStatusPort();
     m_URIBase.setScheme("http");
     m_URIBase.setHost(sServerIp);

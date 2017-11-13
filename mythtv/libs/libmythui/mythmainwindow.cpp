@@ -317,12 +317,17 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
         // if modifiers have been pressed, rebuild keynum
         if ((modifiers = e->modifiers()) != Qt::NoModifier)
         {
-            int modnum = (((modifiers & Qt::ShiftModifier) &&
-                            (keynum > 0x7f) &&
-                            (keynum != Qt::Key_Backtab)) ? Qt::SHIFT : 0) |
-                         ((modifiers & Qt::ControlModifier) ? Qt::CTRL : 0) |
-                         ((modifiers & Qt::MetaModifier) ? Qt::META : 0) |
-                         ((modifiers & Qt::AltModifier) ? Qt::ALT : 0);
+            int modnum = Qt::NoModifier;
+            if ((modifiers & Qt::ShiftModifier) &&
+                (keynum > 0x7f) &&
+                (keynum != Qt::Key_Backtab))
+                modnum |= Qt::SHIFT;
+            if (modifiers & Qt::ControlModifier)
+                modnum |= Qt::CTRL;
+            if (modifiers & Qt::MetaModifier)
+                modnum |= Qt::META;
+            if (modifiers & Qt::AltModifier)
+                modnum |= Qt::ALT;
             modnum &= ~Qt::UNICODE_ACCEL;
             return (keynum |= modnum);
         }
@@ -1013,8 +1018,13 @@ bool MythMainWindow::event(QEvent *e)
     return QWidget::event(e);
 }
 
-void MythMainWindow::Init(QString forcedpainter)
+void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
 {
+    d->m_useDB = ! gCoreContext->GetDB()->SuppressDBMessages();
+
+    if ( !(mayReInit || d->firstinit) )
+        return;
+
     GetMythUI()->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
                                    d->ybase, d->screenheight, d->hmult);
 
@@ -1673,6 +1683,13 @@ void MythMainWindow::ExitToMainMenu(void)
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
                                                Qt::NoModifier);
                 QCoreApplication::postEvent(this, key);
+                MythNotificationCenter *nc =  MythNotificationCenter::GetInstance();
+                // Notifications have their own stack. We need to continue
+                // the propagation of the escape here if there are notifications.
+                int num = nc->DisplayedNotifications();
+                if (num > 0)
+                    QCoreApplication::postEvent(
+                        this, new QEvent(MythEvent::kExitToMainMenuEventType));
             }
             return;
         }
@@ -2195,9 +2212,9 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                         QCoreApplication::postEvent(this, key);
                     else
                         QCoreApplication::postEvent(key_target, key);
-                }
 
-                return true;
+                    return true;
+                }
             }
 #endif
 
@@ -3006,6 +3023,17 @@ void MythMainWindow::EnterStandby(bool manual)
         GetMythDB()->GetSetting("menutheme", "defaultmenu"));
     state.insert("currentlocation", GetMythUI()->GetCurrentLocation());
     MythUIStateTracker::SetState(state);
+
+    // Cache WOL settings in case DB goes down
+    QString masterserver = gCoreContext->GetSetting
+                    ("MasterServerName");
+    gCoreContext->GetSettingOnHost
+                    ("BackendServerAddr", masterserver);
+    gCoreContext->GetMasterServerPort();
+    gCoreContext->GetSetting("WOLbackendCommand", "");
+
+    // While in standby do not attempt to wake the backend
+    gCoreContext->SetWOLAllowed(false);
 }
 
 void MythMainWindow::ExitStandby(bool manual)
@@ -3024,6 +3052,10 @@ void MythMainWindow::ExitStandby(bool manual)
     LOG(VB_GENERAL, LOG_NOTICE, "Leaving standby mode");
 
     d->standby = false;
+
+    // We may attempt to wake the backend
+    gCoreContext->SetWOLAllowed(true);
+
     gCoreContext->BlockShutdown();
 
     QVariantMap state;

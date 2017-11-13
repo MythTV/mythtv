@@ -32,7 +32,7 @@ typedef enum VideoCStd
 class VideoColourSpace
 {
   public:
-    VideoColourSpace(VideoCStd colour_std = kCSTD_ITUR_BT_601);
+    explicit VideoColourSpace(VideoCStd colour_std = kCSTD_ITUR_BT_601);
    ~VideoColourSpace() { }
 
     PictureAttributeSupported SupportedAttributes(void) const

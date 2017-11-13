@@ -338,7 +338,7 @@ AlbumArtList MetaIOFLACVorbis::getAlbumArtList(const QString &filename)
  * \param albumart The Album Art image to write
  * \returns True if successful
  *
- * \Note We always save the image in JPEG format
+ * \note We always save the image in JPEG format
  */
 bool MetaIOFLACVorbis::writeAlbumArt(const QString &filename,
                               const AlbumArtImage *albumart)

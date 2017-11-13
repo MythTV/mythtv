@@ -1242,9 +1242,6 @@ VideoMetadata &VideoMetadata::operator=(const VideoMetadata &rhs)
 
 void VideoMetadata::toMap(InfoMap &metadataMap)
 {
-    if (this == NULL)
-        return;
-
     GetImageMap(metadataMap);
 
     metadataMap["filename"] = GetFilename();

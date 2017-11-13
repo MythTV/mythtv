@@ -16,7 +16,7 @@ class DVBSignalMonitorListener;
 
 class DVBSignalMonitor: public DTVSignalMonitor
 {
-    Q_DECLARE_TR_FUNCTIONS(DVBSignalMonitor)
+    Q_DECLARE_TR_FUNCTIONS(DVBSignalMonitor);
 
   public:
     DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,

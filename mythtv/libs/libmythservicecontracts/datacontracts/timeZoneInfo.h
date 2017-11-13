@@ -31,11 +31,7 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
 
     PROPERTYIMP( QString  , TimeZoneID      )
     PROPERTYIMP( int      , UTCOffset       )
-    PROPERTYIMP( QDateTime, CurrentDateTime )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP( QDateTime, CurrentDateTime );
 
     public:
 
@@ -47,31 +43,17 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
         {
         }
 
-        TimeZoneInfo( const TimeZoneInfo &src )
+        void Copy( const TimeZoneInfo *src )
         {
-            Copy( src );
+            m_TimeZoneID      = src->m_TimeZoneID     ;
+            m_UTCOffset       = src->m_UTCOffset      ;
+            m_CurrentDateTime = src->m_CurrentDateTime;
         }
 
-        void Copy( const TimeZoneInfo &src )
-        {
-            m_TimeZoneID      = src.m_TimeZoneID     ;
-            m_UTCOffset       = src.m_UTCOffset      ;
-            m_CurrentDateTime = src.m_CurrentDateTime;
-        }
+    private:
+        Q_DISABLE_COPY(TimeZoneInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::TimeZoneInfo )
-Q_DECLARE_METATYPE( DTC::TimeZoneInfo* )
-
-namespace DTC
-{
-inline void TimeZoneInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< TimeZoneInfo  >();
-    qRegisterMetaType< TimeZoneInfo* >();
-}
-}
 
 #endif

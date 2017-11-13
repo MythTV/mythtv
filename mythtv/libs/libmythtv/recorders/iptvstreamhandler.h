@@ -83,10 +83,11 @@ class IPTVStreamHandler : public StreamHandler
     static void Return(IPTVStreamHandler * & ref);
 
     virtual void AddListener(MPEGStreamData *data,
-                             bool allow_section_reader = false,
-                             bool needs_drb            = false,
-                             QString output_file       = QString())
+                             bool /*allow_section_reader*/ = false,
+                             bool /*needs_drb*/            = false,
+                             QString output_file           = QString())
     {
+        // Force allow_section_reader and needs_buffering to false;
         StreamHandler::AddListener(data, false, false, output_file);
     } // StreamHandler
 

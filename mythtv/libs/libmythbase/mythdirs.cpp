@@ -22,6 +22,10 @@ static QString themedir = QString::null;
 static QString pluginsdir = QString::null;
 static QString translationsdir = QString::null;
 static QString filtersdir = QString::null;
+static QString cachedir = QString::null;
+static QString remotecachedir = QString::null;
+static QString themebasecachedir = QString::null;
+static QString thumbnaildir = QString::null;
 
 void InitializeMythDirs(void)
 {
@@ -179,6 +183,10 @@ void InitializeMythDirs(void)
 
     if (confdir.length() == 0)
         confdir = QDir::homePath() + "/.mythtv";
+    cachedir = confdir + "/cache";
+    remotecachedir = cachedir + "/remotecache";
+    themebasecachedir = cachedir + "/themecache";
+    thumbnaildir = cachedir + "/thumbnails";
 
 #if defined(Q_OS_ANDROID)
     themedir        = sharedir + "themes/";
@@ -196,13 +204,17 @@ void InitializeMythDirs(void)
     LOG(VB_GENERAL, LOG_NOTICE, QString("Using configuration directory = %1")
                                    .arg(confdir));
 
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "appbindir      = "+ appbindir      ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "sharedir       = "+ sharedir       ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "libdir         = "+ libdir         ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "themedir       = "+ themedir       ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "pluginsdir     = "+ pluginsdir     ));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "translationsdir= "+ translationsdir));
-    LOG(VB_GENERAL, LOG_DEBUG, QString( "filtersdir     = "+ filtersdir     ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "appbindir         = "+ appbindir        ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "sharedir          = "+ sharedir         ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "libdir            = "+ libdir           ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "themedir          = "+ themedir         ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "pluginsdir        = "+ pluginsdir       ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "translationsdir   = "+ translationsdir  ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "filtersdir        = "+ filtersdir       ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "cachedir          = "+ cachedir         ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "remotecachedir    = "+ remotecachedir   ));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "themebasecachedir = "+ themebasecachedir));
+    LOG(VB_GENERAL, LOG_DEBUG, QString( "thumbnaildir      = "+ thumbnaildir));
 }
 
 QString GetInstallPrefix(void) { return installprefix; }
@@ -214,6 +226,35 @@ QString GetThemesParentDir(void) { return themedir; }
 QString GetPluginsDir(void) { return pluginsdir; }
 QString GetTranslationsDir(void) { return translationsdir; }
 QString GetFiltersDir(void) { return filtersdir; }
+
+/**
+ * Returns the base directory for all cached files.  On linux this
+ * will default to ~/.mythtv/cache.
+ */
+QString GetCacheDir(void) { return cachedir; }
+
+/**
+ * Returns the directory for all files cached from the backend.  On
+ * linux this will default to ~/.mythtv/cache/remotecache.  Items in
+ * this directory will be expired after a certain amount of time.
+ */
+QString GetRemoteCacheDir(void) { return remotecachedir; }
+
+/**
+ * Returns the directory where all non-theme thumbnail files should be
+ * cached.  On linux this will default to ~/.mythtv/cache/thumbnails.
+ * Items in this directory will be expired after a certain amount of
+ * time.
+ */
+QString GetThumbnailDir(void) { return thumbnaildir; }
+
+/**
+ * Returns the base directory where all theme related files should be
+ * cached.  On linux this will default to ~/.mythtv/cache/themecache.
+ * Within this directory, a sub-directory will be created for each
+ * theme used.
+ */
+QString GetThemeBaseCacheDir(void) { return themebasecachedir; }
 
 // These defines provide portability for different
 // plugin file names.

@@ -37,7 +37,8 @@
 
 #define LOC QString("PortChecker::%1(): ").arg(__func__)
 
-PortChecker::PortChecker()
+PortChecker::PortChecker() :
+    cancelCheck(false)
 {
 }
 

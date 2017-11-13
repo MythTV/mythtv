@@ -527,6 +527,12 @@ uint MythRenderOpenGL::CreateTexture(QSize act_size, bool use_pbo,
                                      uint data_fmt, uint internal_fmt,
                                      uint filter, uint wrap)
 {
+#ifdef USING_OPENGLES
+    //OPENGLES requires same formats for internal and external.
+    internal_fmt = data_fmt;
+    glCheck();
+#endif
+
     if (!type)
         type = m_default_texture_type;
 

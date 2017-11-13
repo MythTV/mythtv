@@ -89,8 +89,8 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
 
     /**
      * \brief Create a MythGesture
-     * \param type The gesture type, as per the Type enumeration.
-     * \sa Type
+     * \param gesture What type of gesture was performed.
+     * \param button The button (if any) that was pressed during the gesture.
      */
     MythGestureEvent(Gesture gesture, Button button = LeftButton) :
         QEvent(kEventType), m_gesture(Unknown)

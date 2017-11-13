@@ -16,16 +16,13 @@
 #include "mythlogging.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
-#include "mythwizard.h"
 #include "scanwizard.h"
 #include "sourceutil.h"
 #include "cardutil.h"
-#include "settings.h"
 #include "mythdirs.h"
 #include "mythdb.h"
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
-    : ConfigurationWizard()
 {
     setLabel(tr("Channel Options"));
 
@@ -33,15 +30,12 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
     addChild(cid = new ChannelID());
     cid->setValue(id);
 
-    ChannelOptionsCommon *common =
-        new ChannelOptionsCommon(*cid, default_sourceid);
-    addChild(common);
-
-    ChannelOptionsFilters *filters =
-        new ChannelOptionsFilters(*cid);
-    addChild(filters);
-
     QStringList cardtypes = ChannelUtil::GetInputTypes(cid->getValue().toUInt());
+
+    // For a new channel the list will be empty so get it this way.
+    if (cardtypes.empty())
+        cardtypes = CardUtil::GetInputTypeNames(default_sourceid);
+
     bool all_v4l = !cardtypes.empty();
     bool all_asi = !cardtypes.empty();
     for (uint i = 0; i < (uint) cardtypes.size(); i++)
@@ -49,6 +43,14 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
         all_v4l &= CardUtil::IsV4L(cardtypes[i]);
         all_asi &= cardtypes[i] == "ASI";
     }
+
+    ChannelOptionsCommon *common =
+        new ChannelOptionsCommon(*cid, default_sourceid,!all_v4l);
+    addChild(common);
+
+    ChannelOptionsFilters *filters =
+        new ChannelOptionsFilters(*cid);
+    addChild(filters);
 
     if (all_v4l)
         addChild(new ChannelOptionsV4L(*cid));
@@ -450,11 +452,19 @@ void ChannelEditor::edit(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    int chanid = item->GetData().toInt();
-    ChannelWizard cw(chanid, m_sourceFilter);
-    cw.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    fillList();
+    int chanid = item->GetData().toInt();
+    ChannelWizard *cw = new ChannelWizard(chanid, m_sourceFilter);
+    StandardSettingDialog *ssd = new StandardSettingDialog(mainStack,
+                                                           "channelwizard", cw);
+    if (ssd->Create())
+    {
+        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 }
 
 void ChannelEditor::menu()
@@ -499,11 +509,18 @@ void ChannelEditor::menu()
 void ChannelEditor::scan(void)
 {
 #ifdef USING_BACKEND
-    ScanWizard *scanwizard = new ScanWizard(m_sourceFilter);
-    scanwizard->exec(false, true);
-    scanwizard->deleteLater();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "scanwizard",
+                                  new ScanWizard(m_sourceFilter));
+    if (ssd->Create())
+    {
+        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 
-    fillList();
 #else
     LOG(VB_GENERAL, LOG_ERR,
         "You must compile the backend to be able to scan for channels");
@@ -512,11 +529,17 @@ void ChannelEditor::scan(void)
 
 void ChannelEditor::transportEditor(void)
 {
-    TransportListEditor *editor = new TransportListEditor(m_sourceFilter);
-    editor->exec();
-    editor->deleteLater();
-
-    fillList();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "transporteditor",
+                                  new TransportListEditor(m_sourceFilter));
+    if (ssd->Create())
+    {
+        connect(ssd, SIGNAL(Exiting()), SLOT(fillList()));
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 }
 
 void ChannelEditor::channelIconImport(void)

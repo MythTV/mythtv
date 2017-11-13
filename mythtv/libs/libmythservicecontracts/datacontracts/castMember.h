@@ -40,40 +40,23 @@ class SERVICE_PUBLIC CastMember : public QObject
 
     public:
 
-        static void InitializeCustomTypes();
-
         CastMember(QObject *parent = 0)
             : QObject           ( parent )
         {
         }
 
-        CastMember( const CastMember &src )
+        void Copy( const CastMember *src )
         {
-            Copy( src );
+            m_Name           = src->m_Name          ;
+            m_CharacterName  = src->m_CharacterName ;
+            m_Role           = src->m_Role          ;
+            m_TranslatedRole = src->m_TranslatedRole;
         }
 
-        void Copy( const CastMember &src )
-        {
-            m_Name           = src.m_Name          ;
-            m_CharacterName  = src.m_CharacterName ;
-            m_Role           = src.m_Role          ;
-            m_TranslatedRole = src.m_TranslatedRole;
-        }
-
+    private:
+        Q_DISABLE_COPY(CastMember);
 };
 
-}
-
-Q_DECLARE_METATYPE( DTC::CastMember  )
-Q_DECLARE_METATYPE( DTC::CastMember* )
-
-namespace DTC
-{
-inline void CastMember::InitializeCustomTypes()
-{
-    qRegisterMetaType< CastMember   >();
-    qRegisterMetaType< CastMember*  >();
-}
 }
 
 #endif

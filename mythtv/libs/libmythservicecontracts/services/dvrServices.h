@@ -45,7 +45,7 @@
 class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "6.3" );
+    Q_CLASSINFO( "version"    , "6.4" )
     Q_CLASSINFO( "RemoveRecorded_Method",                       "POST" )
     Q_CLASSINFO( "DeleteRecording_Method",                      "POST" )
     Q_CLASSINFO( "UnDeleteRecording",                           "POST" )
@@ -61,18 +61,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
     public:
 
-        // Must call InitializeCustomTypes for each unique Custom Type used
-        // in public slots below.
-
         DvrServices( QObject *parent = 0 ) : Service( parent )
         {
-            DTC::ProgramList::InitializeCustomTypes();
-            DTC::EncoderList::InitializeCustomTypes();
-            DTC::InputList::InitializeCustomTypes();
-            DTC::RecRuleList::InitializeCustomTypes();
-            DTC::TitleInfoList::InitializeCustomTypes();
-            DTC::RecRuleFilterList::InitializeCustomTypes();
-            DTC::CutList::InitializeCustomTypes();
         }
 
     public slots:
@@ -86,6 +76,16 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            const QString   &TitleRegEx,
                                                            const QString   &RecGroup,
                                                            const QString   &StorageGroup ) = 0;
+
+        virtual DTC::ProgramList* GetOldRecordedList     ( bool             Descending,
+                                                           int              StartIndex,
+                                                           int              Count,
+                                                           const QDateTime &StartTime,
+                                                           const QDateTime &EndTime,
+                                                           const QString   &Title,
+                                                           const QString   &SeriesId,
+                                                           int              RecordId,
+                                                           const QString   &Sort) = 0;
 
         virtual DTC::Program*      GetRecorded           ( int              RecordedId,
                                                            int              ChanId,

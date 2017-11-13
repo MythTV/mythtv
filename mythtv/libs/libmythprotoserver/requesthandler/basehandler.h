@@ -16,7 +16,7 @@ class PROTOSERVER_PUBLIC BaseRequestHandler : public SocketRequestHandler
   public:
     bool HandleAnnounce(MythSocket *socket, QStringList &commands,
                         QStringList &slist);
-    bool HandleQuery(SocketHandler *socket, QStringList &commands,
+    bool HandleQuery(SocketHandler *sock, QStringList &commands,
                      QStringList &slist);
     QString GetHandlerName(void)                    { return "BASIC"; }
 

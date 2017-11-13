@@ -47,7 +47,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     friend class ICRingBuffer;
 
   public:
-    static RingBuffer *Create(const QString &lfilename, bool write,
+    static RingBuffer *Create(const QString &xfilename, bool write,
                               bool usereadahead = true,
                               int timeout_ms = kDefaultOpenTimeout,
                               bool stream_only = false);
@@ -57,8 +57,8 @@ class MTV_PUBLIC RingBuffer : protected MThread
     void SetWriteBufferSize(int newSize);
     void SetWriteBufferMinWriteSize(int newMinSize);
     void SetOldFile(bool is_old);
-    void UpdateRawBitrate(uint rawbitrate);
-    void UpdatePlaySpeed(float playspeed);
+    void UpdateRawBitrate(uint raw_bitrate);
+    void UpdatePlaySpeed(float play_speed);
     void EnableBitrateMonitor(bool enable) { bitrateMonitorEnabled = enable; }
     void SetBufferSizeFactors(bool estbitrate, bool matroska);
     void SetWaitForWrite(void) { waitforwrite = true; }
@@ -109,7 +109,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     DVDRingBuffer *DVD(void);
     BDRingBuffer  *BD(void);
     virtual bool StartFromBeginning(void)                   { return true;  }
-    virtual void IgnoreWaitStates(bool ignore)              { }
+    virtual void IgnoreWaitStates(bool /*ignore*/)          { }
     virtual bool IsInMenu(void) const                       { return false; }
     virtual bool IsInStillFrame(void) const                 { return false; }
     virtual bool IsInDiscMenuOrStillFrame(void) const       { return IsInMenu() || IsInStillFrame(); }
@@ -125,7 +125,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
      */
     virtual bool OpenFile(const QString &lfilename,
                           uint retry_ms = kDefaultOpenTimeout) = 0;
-    virtual bool ReOpen(QString newFilename = "") { return false; }
+    virtual bool ReOpen(QString /*newFilename*/ = "") { return false; }
 
     int  Read(void *buf, int count);
     int  Peek(void *buf, int count); // only works with readahead
@@ -171,7 +171,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
     static void AVFormatInitNetwork(void);
 
   protected:
-    RingBuffer(RingBufferType rbtype);
+    explicit RingBuffer(RingBufferType rbtype);
 
     void run(void); // MThread
     void CreateReadAheadBuffer(void);

@@ -177,7 +177,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
-static int ScanMusic(const MythUtilCommandLineParser &cmdline)
+static int ScanMusic(const MythUtilCommandLineParser &/*cmdline*/)
 {
     MusicFileScanner *fscan = new MusicFileScanner();
     QStringList dirList;
@@ -195,7 +195,7 @@ static int ScanMusic(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_OK;
 }
 
-static int UpdateRadioStreams(const MythUtilCommandLineParser &cmdline)
+static int UpdateRadioStreams(const MythUtilCommandLineParser &/*cmdline*/)
 {
     // check we have the correct Music Schema Version (maybe the FE hasn't been run yet)
     if (gCoreContext->GetNumSetting("MusicDBSchemaVer", 0) < 1024)

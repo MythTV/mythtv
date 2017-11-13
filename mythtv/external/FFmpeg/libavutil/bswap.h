@@ -76,21 +76,6 @@ static inline uint64_t av_const av_bswap64(uint64_t x)
 }
 #endif
 
-#ifndef av_bswap_dbl
-static inline double bswap_dbl(double x)
-{
-    union {
-        uint32_t l[2];
-        double   d;
-    } w, r;
-    w.d = x;
-    r.l[0] = av_bswap32(w.l[1]);
-    r.l[1] = av_bswap32(w.l[0]);
-    return r.d;
-}
-#endif
-
-
 // be2ne ... big-endian to native-endian
 // le2ne ... little-endian to native-endian
 

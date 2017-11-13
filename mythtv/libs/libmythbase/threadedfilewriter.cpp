@@ -624,12 +624,12 @@ void ThreadedFileWriter::TrimEmptyBuffers(void)
     }
 }
 
-/** \fn ThreadedFileWriter::SetBlocking(void)
+/**
  *  \brief Set write blocking mode
  *  While in blocking mode, ThreadedFileWriter::Write will wait for buffers
  *  to be freed as required, so there's never any data loss
  *  \return old mode value
- *  \param false if not blocking, true if blocking
+ *  \param block False if not blocking, true if blocking
  */
 bool ThreadedFileWriter::SetBlocking(bool block)
 {

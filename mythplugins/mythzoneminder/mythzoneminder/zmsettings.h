@@ -7,11 +7,11 @@
 
 #include <QCoreApplication>
 
-#include <settings.h>
+#include <standardsettings.h>
 
-class ZMSettings : public ConfigurationWizard
+class ZMSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(ZMSettings)
+    Q_DECLARE_TR_FUNCTIONS(ZMSettings);
 
   public:
     ZMSettings();

@@ -219,6 +219,7 @@ static int has_codec_parameters(AVStream *st)
             break;
         case AVMEDIA_TYPE_DATA:
             if(avctx->codec_id == AV_CODEC_ID_NONE) return 1;
+            [[clang::fallthrough]];
         default:
             break;
     }
@@ -246,6 +247,7 @@ static bool force_sw_decode(AVCodecContext *avctx)
                 default:
                     break;
             }
+            break;
         default:
             break;
     }
@@ -409,7 +411,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       disable_passthru(false),
       m_fps(0.0f),
       codec_is_mpeg(false),
-      m_processFrames(true)
+      m_processFrames(true),
+      m_streams_changed(false)
 {
     memset(&readcontext, 0, sizeof(readcontext));
     memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
@@ -980,39 +983,7 @@ extern "C" void HandleStreamChange(void *data)
         QString("streams_changed 0x%1 -- stream count %2")
             .arg((uint64_t)data,0,16).arg(cnt));
 
-    decoder->SeekReset(0, 0, true, true);
-    QMutexLocker locker(avcodeclock);
-    decoder->ScanStreams(false);
-}
-
-extern "C" void HandleDVDStreamChange(void *data)
-{
-    AvFormatDecoder *decoder =
-        reinterpret_cast<AvFormatDecoder*>(data);
-
-    int cnt = decoder->ic->nb_streams;
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("streams_changed 0x%1 -- stream count %2")
-            .arg((uint64_t)data,0,16).arg(cnt));
-
-    //decoder->SeekReset(0, 0, true, true);
-    QMutexLocker locker(avcodeclock);
-    decoder->ScanStreams(true);
-}
-
-extern "C" void HandleBDStreamChange(void *data)
-{
-    AvFormatDecoder *decoder =
-        reinterpret_cast<AvFormatDecoder*>(data);
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
-
-    QMutexLocker locker(avcodeclock);
-    decoder->Reset(true, false, false);
-    decoder->CloseCodecs();
-    decoder->FindStreamInfo();
-    decoder->ScanStreams(false);
+    decoder->m_streams_changed = true;
 }
 
 int AvFormatDecoder::FindStreamInfo(void)
@@ -1042,7 +1013,9 @@ int AvFormatDecoder::FindStreamInfo(void)
  *
  *  \param rbuffer pointer to a valid ringuffer.
  *  \param novideo if true then no video is sought in ScanSreams.
- *  \param testbuf this parameter is not used by AvFormatDecoder.
+ *  \param testbuf Temporary buffer for probing the input.
+ *  \param testbufsize The size of the test buffer. The minimum of this value
+ *                     or kDecoderProbeBufferSize will be used.
  */
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                               char testbuf[kDecoderProbeBufferSize],
@@ -1227,11 +1200,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     ic->streams_changed = HandleStreamChange;
-    if (ringBuffer->IsDVD())
-        ic->streams_changed = HandleDVDStreamChange;
-    else if (ringBuffer->IsBD())
-        ic->streams_changed = HandleBDStreamChange;
-
     ic->stream_change_data = this;
 
     fmt->flags &= ~AVFMT_NOFILE;
@@ -1462,7 +1430,7 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
 
 #ifdef USING_VDPAU
 static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
-                                           const enum AVPixelFormat *fmt)
+                                           const enum AVPixelFormat *valid_fmts)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
@@ -1475,7 +1443,15 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                 render_wrapper_vdpau;
         }
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_VDPAU : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_VDPAU))
+            return AV_PIX_FMT_VDPAU;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -1485,10 +1461,8 @@ static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
                                            const enum AVPixelFormat *) MUNUSED;
 
 enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
-                                    const enum AVPixelFormat *fmt)
+                                    const enum AVPixelFormat *valid_fmts)
 {
-    if (!fmt)
-        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1496,7 +1470,15 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_DXVA2_VLD : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_DXVA2_VLD))
+            return AV_PIX_FMT_DXVA2_VLD;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -1513,10 +1495,8 @@ static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
                                          const enum AVPixelFormat *) MUNUSED;
 
 enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
-                                         const enum AVPixelFormat *fmt)
+                                         const enum AVPixelFormat *valid_fmts)
 {
-    if (!fmt)
-        return AV_PIX_FMT_NONE;
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
@@ -1524,7 +1504,15 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
         avctx->hwaccel_context =
             (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
     }
-    return avctx->hwaccel_context ? AV_PIX_FMT_VAAPI_VLD : AV_PIX_FMT_YUV420P;
+
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_VAAPI_VLD))
+            return AV_PIX_FMT_VAAPI_VLD;
+        if (not avctx->hwaccel_context and (*valid_fmts == AV_PIX_FMT_YUV420P))
+            return AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return AV_PIX_FMT_NONE;
 }
 #endif
 
@@ -1672,7 +1660,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         }
 
         m_parent->SetKeyframeDistance(keyframedist);
-        m_parent->SetVideoParams(width, height, fps, kScan_Detect);
+        AVCodec *codec = avcodec_find_decoder(enc->codec_id);
+        QString codecName;
+        if (codec)
+            codecName = codec->name;
+        m_parent->SetVideoParams(width, height, fps, kScan_Detect, codecName);
         if (LCD *lcd = LCD::Get())
         {
             LCDVideoFormatSet video_format;
@@ -2371,11 +2363,18 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             uint height = max(dim.height(), 16);
             QString dec = "ffmpeg";
             uint thread_count = 1;
-
+            AVCodec *codec1 = avcodec_find_decoder(enc->codec_id);
+            QString codecName;
+            if (codec1)
+                codecName = codec1->name;
+            if (enc->framerate.den && enc->framerate.num)
+                fps = float(enc->framerate.num) / float(enc->framerate.den);
+            else
+                fps = 0;
             if (!is_db_ignored)
             {
                 VideoDisplayProfile vdp;
-                vdp.SetInput(QSize(width, height));
+                vdp.SetInput(QSize(width, height),fps,codecName);
                 dec = vdp.GetDecoder();
                 thread_count = vdp.GetMaxCPUs();
                 bool skip_loop_filter = vdp.IsSkipLoopEnabled();
@@ -2862,7 +2861,7 @@ void release_avf_buffer(void *opaque, uint8_t *data)
 }
 
 #ifdef USING_VDPAU
-int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int flags)
+int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame   = nd->GetPlayer()->GetNextVideoFrame();
@@ -2935,7 +2934,7 @@ int render_wrapper_vdpau(struct AVCodecContext *s, AVFrame *src,
 #endif // USING_VDPAU
 
 #ifdef USING_DXVA2
-int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags)
+int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
@@ -2961,7 +2960,7 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags)
 #endif
 
 #ifdef USING_VAAPI
-int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags)
+int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame = nd->GetPlayer()->GetNextVideoFrame();
@@ -5051,6 +5050,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         .arg(ff_codec_type_string(codec_type))
                         .arg(ff_codec_id_string(curstream->codec->codec_id))
                         .arg(curstream->codec->codec_id));
+                // Process Stream Change in case we have no audio
+                if (codec_type == AVMEDIA_TYPE_AUDIO && !m_audio->HasAudioIn())
+                    m_streams_changed = true;
             }
             av_packet_unref(pkt);
             continue;
@@ -5123,6 +5125,16 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         delete pkt;
 
     return true;
+}
+
+void AvFormatDecoder::StreamChangeCheck() {
+    if (m_streams_changed)
+    {
+        SeekReset(0, 0, true, true);
+        QMutexLocker locker(avcodeclock);
+        ScanStreams(false);
+        m_streams_changed=false;
+    }
 }
 
 int AvFormatDecoder::ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &/*storePacket*/)

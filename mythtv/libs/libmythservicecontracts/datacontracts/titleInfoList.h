@@ -33,25 +33,18 @@ class SERVICE_PUBLIC TitleInfoList : public QObject
 
     Q_PROPERTY( QVariantList TitleInfos READ TitleInfos DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, TitleInfos )
+    PROPERTYIMP_RO_REF( QVariantList, TitleInfos );
 
     public:
-
-        static inline void InitializeCustomTypes();
 
         TitleInfoList(QObject *parent = 0) 
             : QObject( parent )               
         {
         }
-        
-        TitleInfoList( const TitleInfoList &src ) 
-        {
-            Copy( src );
-        }
 
-        void Copy( const TitleInfoList &src )
+        void Copy( const TitleInfoList *src )
         {
-            CopyListContents< TitleInfo >( this, m_TitleInfos, src.m_TitleInfos );
+            CopyListContents< TitleInfo >( this, m_TitleInfos, src->m_TitleInfos );
         }
 
         TitleInfo *AddNewTitleInfo()
@@ -65,22 +58,10 @@ class SERVICE_PUBLIC TitleInfoList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(TitleInfoList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::TitleInfoList  )
-Q_DECLARE_METATYPE( DTC::TitleInfoList* )
-
-namespace DTC
-{
-inline void TitleInfoList::InitializeCustomTypes()
-{
-    qRegisterMetaType< TitleInfoList   >();
-    qRegisterMetaType< TitleInfoList*  >();
-
-    TitleInfo::InitializeCustomTypes();
-}
-}
 
 #endif

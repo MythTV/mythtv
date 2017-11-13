@@ -22,7 +22,7 @@ class MythPlayer;
 
 class VideoOutWindow
 {
-    Q_DECLARE_TR_FUNCTIONS(VideoOutWindow)
+    Q_DECLARE_TR_FUNCTIONS(VideoOutWindow);
 
   public:
     VideoOutWindow();
@@ -68,6 +68,7 @@ class VideoOutWindow
     void SetNeedRepaint(bool needRepaint)
         { needrepaint = needRepaint; }
 
+    void populateGeometry(void);
     // Gets
     bool     IsVideoScalingAllowed(void) const { return db_scaling_allowed; }
     /// \brief Returns if videooutput is embedding

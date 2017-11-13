@@ -146,6 +146,11 @@ class VideoPerformanceTest
 
 int main(int argc, char *argv[])
 {
+
+#if CONFIG_OMX_RPI
+    setenv("QT_XCB_GL_INTEGRATION","none",0);
+#endif
+
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {

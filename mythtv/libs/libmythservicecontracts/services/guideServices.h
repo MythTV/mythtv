@@ -40,20 +40,12 @@
 class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.2" );
+    Q_CLASSINFO( "version"    , "2.3" )
 
     public:
 
-        // Must call InitializeCustomTypes for each unique Custom Type used
-        // in public slots below.
-
         GuideServices( QObject *parent = 0 ) : Service( parent )
         {
-            DTC::ProgramGuide::InitializeCustomTypes();
-            DTC::ProgramList ::InitializeCustomTypes();
-            DTC::Program     ::InitializeCustomTypes();
-            DTC::ChannelGroup::InitializeCustomTypes();
-            DTC::ChannelGroupList::InitializeCustomTypes();
         }
 
     public slots:
@@ -91,6 +83,12 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
         virtual QStringList         GetCategoryList     ( ) = 0;
 
         virtual QStringList         GetStoredSearches   ( const QString &Type ) = 0;
+
+        virtual bool                AddToChannelGroup   ( int              ChannelGroupId,
+                                                          int              ChanId ) = 0;
+
+        virtual bool                RemoveFromChannelGroup ( int           ChannelGroupId,
+                                                             int           ChanId ) = 0;
 };
 
 #endif

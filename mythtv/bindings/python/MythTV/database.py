@@ -8,7 +8,7 @@ from MythTV.static import MythSchema
 from MythTV.altdict import OrdDict, DictData
 from MythTV.logging import MythLog
 from MythTV.msearch import MSearch
-from MythTV.utility import datetime, _donothing, QuickProperty
+from MythTV.utility import datetime, dt, _donothing, QuickProperty
 from MythTV.exceptions import MythError, MythDBError, MythTZError
 from MythTV.connections import DBConnection, LoggedCursor, XMLConnection
 
@@ -19,6 +19,7 @@ import datetime as _pydt
 import time as _pyt
 import weakref
 import os
+from builtins import int, str
 
 
 class DBData( DictData, MythSchema ):
@@ -118,7 +119,7 @@ class DBData( DictData, MythSchema ):
             for row in cursor:
                 try:
                     yield cls.fromRaw(row, db)
-                except MythDBError, e:
+                except MythDBError as e:
                     if e.ecode == MythError.DB_RESTRICT:
                         pass
 
@@ -507,7 +508,7 @@ class DBDataRef( list ):
             if dat not in self:
                 data.append(dat)
         return self.fromCopy(data, self._db)
-        
+
     def __and__(self, other):
         data = []
         for dat in self:
@@ -566,7 +567,7 @@ class DBDataRef( list ):
         c = cls('', db=db, bypass=True)
         c._populated = True
         for dat in data:
-            list.append(c, c.SubData(zip(self._datfields, row)))
+            list.append(c, c.SubData(zip(cls._datfields, dat)))
         return c
 
     @classmethod
@@ -1147,7 +1148,7 @@ class DBCache( MythSchema ):
                     # pull field list from database
                     try:
                         cursor.execute("DESC %s" % (key,))
-                    except Exception, e:
+                    except Exception as e:
                         raise MythDBError(MythDBError.DB_RAW, e.args)
                     self[key] = self._FieldData(cursor.fetchall())
 
@@ -1280,7 +1281,7 @@ class DBCache( MythSchema ):
 
         # apply the rest of object init if not already done
         self._testconfig(self.dbconfig)
-                    
+
     def _testconfig(self, dbconfig):
         self.dbconfig = dbconfig
         if dbconfig in self.shared:
@@ -1337,14 +1338,14 @@ class DBCache( MythSchema ):
 
     def _gethostfromaddr(self, addr, value=None):
         if value is None:
-            for value in ['BackendServerIP','BackendServerIP6']:
+            for value in ['BackendServerAddr']:
                 try:
                     return self._gethostfromaddr(addr, value)
                 except MythDBError:
                     pass
             else:
                 raise MythDBError(MythError.DB_SETTING,
-                                    'BackendServerIP[6]', addr)
+                                    'BackendServerAddr', addr)
 
         with self as cursor:
             if cursor.execute("""SELECT hostname FROM settings
@@ -1353,16 +1354,7 @@ class DBCache( MythSchema ):
             return cursor.fetchone()[0]
 
     def _getpreferredaddr(self, host):
-        ip6 = self.settings[host].BackendServerIP6
-        ip4 = self.settings[host].BackendServerIP
-        if ip6 is None:
-            if ip4 is None:
-                raise MythDBError(MythError.DB_SETTING,
-                                    'BackendServerIP[6]', host)
-            return ip4
-        elif (ip6 in ['::1', '0:0:0;0:0:0:0:1']) and (ip4 != '127.0.0.1'):
-            return ip4
-        return ip6
+        return self.settings[host].BackendServerAddr
 
     def gethostname(self):
         return self.dbconfig.profile
@@ -1402,9 +1394,7 @@ class DBCache( MythSchema ):
         """
         conv = {int: str,
                 str: lambda x: '"%s"'%x,
-                long: str,
                 float: str,
-                unicode: lambda x: '"%s"'%x,
                 bool: str,
                 type(None): lambda x: 'NULL',
                 _pydt.datetime: lambda x: x.strftime('"%Y-%m-%d %H:%M:%S"'),
@@ -1416,7 +1406,7 @@ class DBCache( MythSchema ):
                                                  x.seconds%60),
                 _pyt.struct_time: lambda x: _pyt.\
                                         strftime('"%Y-%m-%d %H:%M:%S"',x)}
-        
+
         if args is None:
             return query
 

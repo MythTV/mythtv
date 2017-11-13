@@ -52,7 +52,7 @@ class VideoOutput
         PIPState pipState,      const QSize &video_dim_buf,
         const QSize &video_dim_disp, float video_aspect,
         QWidget *parentwidget,  const QRect &embed_rect,   float video_prate,
-        uint playerFlags);
+        uint playerFlags, QString &codecName);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -63,9 +63,8 @@ class VideoOutput
                       WId winid, const QRect &win_rect, MythCodecID codec_id);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
-    virtual bool IsPreferredRenderer(QSize video_size);
     virtual bool SetDeinterlacingEnabled(bool);
-    virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
+    virtual bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
     virtual void FallbackDeint(void);
     virtual void BestDeint(void);
     virtual bool NeedsDoubleFramerate(void) const;
@@ -78,14 +77,27 @@ class VideoOutput
                               OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
 
-    virtual void WindowResized(const QSize &new_size) {}
+    virtual void WindowResized(const QSize &) {}
 
+    /** \fn VideoOutput::InputChanged()
+     *
+     *  \param video_dim_buf  The size of the video buffer.
+     *  \param video_dim_disp The size of the video display.
+     *  \param aspect         The width/height of the presented video.
+     *  \param myth_codec_id  The video codec ID.
+     *  \param codec_private  Private data for the video codec.
+     *  \param aspect_changed An output parameter indicating that only
+     *                        the aspect ratio has changed. It must be
+     *                        initialized to false before calling this
+     *                        function.
+     */
     virtual bool InputChanged(const QSize &video_dim_buf,
                               const QSize &video_dim_disp,
                               float        aspect,
                               MythCodecID  myth_codec_id,
                               void        *codec_private,
                               bool        &aspect_changed);
+
     virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void ResizeDisplayWindow(const QRect&, bool);
@@ -152,7 +164,7 @@ class VideoOutput
 
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
-    virtual void* GetDecoderContext(unsigned char* buf, uint8_t*& id) { return NULL; }
+    virtual void* GetDecoderContext(unsigned char*, uint8_t*&) { return NULL; }
 
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
@@ -244,14 +256,13 @@ class VideoOutput
     virtual QRect GetPIPRect(PIPLocation location,
                              MythPlayer *pipplayer = NULL,
                              bool do_pixel_adj = true) const;
-    virtual void RemovePIP(MythPlayer *pipplayer) { }
+    virtual void RemovePIP(MythPlayer *) { }
 
     virtual void SetPIPState(PIPState setting);
 
     virtual QString GetOSDRenderer(void) const;
     virtual MythPainter *GetOSDPainter(void) { return (MythPainter*)osd_painter; }
-    virtual bool GetScreenShot(int width = 0, int height = 0,
-                               QString filename = "") { return false; }
+    virtual bool GetScreenShot(int = 0, int = 0, QString = "") { return false; }
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space

@@ -37,27 +37,18 @@ class SERVICE_PUBLIC VideoSourceList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         VideoSourceList(QObject *parent = 0)
             : QObject( parent )
         {
         }
 
-        VideoSourceList( const VideoSourceList &src )
+        void Copy( const VideoSourceList *src )
         {
-            Copy( src );
-        }
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
 
-        void Copy( const VideoSourceList &src )
-        {
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
-
-            CopyListContents< VideoSource >( this, m_VideoSources, src.m_VideoSources );
+            CopyListContents< VideoSource >( this, m_VideoSources, src->m_VideoSources );
         }
 
         VideoSource *AddNewVideoSource()
@@ -71,22 +62,10 @@ class SERVICE_PUBLIC VideoSourceList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(VideoSourceList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::VideoSourceList  )
-Q_DECLARE_METATYPE( DTC::VideoSourceList* )
-
-namespace DTC
-{
-inline void VideoSourceList::InitializeCustomTypes()
-{
-    qRegisterMetaType< VideoSourceList   >();
-    qRegisterMetaType< VideoSourceList*  >();
-
-    VideoSource::InitializeCustomTypes();
-}
-}
 
 #endif

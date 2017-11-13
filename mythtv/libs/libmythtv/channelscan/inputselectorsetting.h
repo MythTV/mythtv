@@ -30,9 +30,9 @@
 #ifndef _INPUT_SELECTOR_SETTING_H_
 #define _INPUT_SELECTOR_SETTING_H_
 
-#include "settings.h"
+#include "standardsettings.h"
 
-class InputSelector : public ComboBoxSetting, public TransientStorage
+class InputSelector : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
 

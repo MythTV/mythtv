@@ -61,7 +61,7 @@ QString FlatView::GetPosition() const
 
 /*!
  \brief Updates view with images that have been updated.
- \param idList List of image ids that have been updated
+ \param id Image id to update
  \return bool True if the current selection has been updated
 */
 bool FlatView::Update(int id)
@@ -546,7 +546,9 @@ void DirectoryView::LoadDirThumbs(ImageItem &parent, int thumbsNeeded, int level
 Use user cover, if assigned. Otherwise derive 4 thumbnails from: first 4 images,
 then 1st thumbnail from first 4 sub-dirs, then 2nd thumbnail from sub-dirs etc
  \param parent The parent dir
- \param limit Number of thumbnails required
+ \param thumbsNeeded Number of thumbnails required
+ \param files A list of files to process
+ \param dirs A list of directories to process
  \param level Recursion level (to detect recursion deadlocks)
 */
 void DirectoryView::PopulateThumbs(ImageItem &parent, int thumbsNeeded,
@@ -848,7 +850,7 @@ void DirectoryView::ClearCache()
  \brief Clear file/dir and all its ancestors from UI cache so that ancestor
  thumbnails are recalculated. Optionally deletes file/dir from view.
  \param id Image id
- \param remove If true, file is also deleted from view
+ \param deleted If true, file is also deleted from view
  \return QStringList Url of image & thumbnail to remove from image cache
 */
 QStringList DirectoryView::RemoveImage(int id, bool deleted)

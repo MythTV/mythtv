@@ -36,11 +36,11 @@
 // MythTV headers
 #include "settings.h"
 
-class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
+class ScanATSCModulation: public TransMythUIComboBoxSetting
 {
 
   public:
-    ScanATSCModulation() : ComboBoxSetting(this)
+    ScanATSCModulation()
     {
         //: %1 is the modulation (QAM-64, QAM-128. etc...)
         addSelection(QCoreApplication::translate("(ModulationSettings)",
@@ -63,28 +63,28 @@ class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
     }
 };
 
-class ScanModulationSetting: public ComboBoxSetting
+class ScanModulationSetting: public TransMythUIComboBoxSetting
 {
   public:
-    explicit ScanModulationSetting(Storage *_storage) : ComboBoxSetting(_storage)
+    ScanModulationSetting()
     {
         addSelection(QCoreApplication::translate("(Common)",
                                                  "Auto",
                                                  "Automatic"),
                                                  "auto", true);
         addSelection("QPSK","qpsk");
-        addSelection("QAM 16","qam_16");
-        addSelection("QAM 32","qam_32");
-        addSelection("QAM 64","qam_64");
-        addSelection("QAM 128","qam_128");
-        addSelection("QAM 256","qam_256");
+        addSelection("QAM-16","qam_16");
+        addSelection("QAM-32","qam_32");
+        addSelection("QAM-64","qam_64");
+        addSelection("QAM-128","qam_128");
+        addSelection("QAM-256","qam_256");
     };
 };
 
-class ScanModulation: public ScanModulationSetting, public TransientStorage
+class ScanModulation: public ScanModulationSetting
 {
   public:
-    ScanModulation() : ScanModulationSetting(this)
+    ScanModulation() : ScanModulationSetting()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Modulation"));
@@ -94,11 +94,10 @@ class ScanModulation: public ScanModulationSetting, public TransientStorage
     };
 };
 
-class ScanConstellation: public ScanModulationSetting,
-                         public TransientStorage
+class ScanConstellation: public ScanModulationSetting
 {
   public:
-    ScanConstellation() : ScanModulationSetting(this)
+    ScanConstellation() : ScanModulationSetting()
     {
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Constellation"));
@@ -108,23 +107,25 @@ class ScanConstellation: public ScanModulationSetting,
     };
 };
 
-class ScanDVBSModulation: public ComboBoxSetting, public TransientStorage
+class ScanDVBSModulation: public TransMythUIComboBoxSetting
 {
   public:
-    ScanDVBSModulation() : ComboBoxSetting(this)
+    ScanDVBSModulation()
     {
 
         addSelection("QPSK",  "qpsk", true);
         addSelection("8PSK",  "8psk");
-        addSelection("QAM 16","qam_16");
+        addSelection("QAM-16","qam_16");
+        addSelection("16APSK","16apsk");
+        addSelection("32APSK","32apsk");
 
         setLabel(QCoreApplication::translate("(ModulationSettings)",
                                              "Modulation"));
 
         setHelpText(QCoreApplication::translate("(ModulationSettings)",
-            "Modulation, QPSK, 8PSK, QAM-16. Most DVB-S transponders use QPSK, "
-            "while DVB-S2 use 8PSK. QAM-16 is not available for DVB-S2 "
-            "transports."));
+            "Modulation, QPSK, 8PSK, QAM-16, 16APSK, 32APSK. Most DVB-S "
+            "transponders use QPSK, while DVB-S2 use 8PSK, 16APSK, or 32APSK. "
+            "QAM-16 is not available for DVB-S2 transports."));
     }
 };
 

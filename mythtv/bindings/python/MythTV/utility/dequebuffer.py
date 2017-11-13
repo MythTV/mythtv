@@ -4,11 +4,18 @@
 # Description: A rolling buffer class that discards handled information.
 #------------------------------
 
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except:
+    from io import BytesIO as StringIO
+
 from time import time, sleep
 from threading import Thread, Lock
 from collections import deque
-from Queue import Queue
+try:
+    from Queue import Queue
+except:
+    from queue import Queue
 import weakref
 
 try:
@@ -239,7 +246,7 @@ class DequeBuffer( object ):
 
     def read(self, nbytes=None):
         """
-        Read up to specified amount from buffer, or whatever is available. 
+        Read up to specified amount from buffer, or whatever is available.
         """
         # flush existing buffer
         self._rollback_pool = []

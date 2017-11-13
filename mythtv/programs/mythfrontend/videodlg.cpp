@@ -1564,7 +1564,7 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
 }
 
 /** \fn VideoDialog::GetCoverImage(MythGenericTree *node)
- *  \brief A "hunt" for cover art to apply for a folder item..
+ *  \brief A "hunt" for cover art to apply for a folder item.
  *  \return QString local or myth:// for the first found cover file.
  */
 QString VideoDialog::GetCoverImage(MythGenericTree *node)
@@ -2893,7 +2893,7 @@ void VideoDialog::SwitchVideoYearGroup()
    SwitchLayout(m_d->m_type, BRS_YEAR);
 }
 
-/** \fn VideoDialog::SwitchVideoDirectoryGroup()
+/** \fn VideoDialog::SwitchVideoDirectorGroup()
  *  \brief Switch to Director browse mode.
  *  \return void.
  */
@@ -2911,7 +2911,7 @@ void VideoDialog::SwitchVideoStudioGroup()
    SwitchLayout(m_d->m_type, BRS_STUDIO);
 }
 
-/** \fn VideoDialog::SwitchVideoCastGroup()
+/**
  *  \brief Switch to Cast browse mode.
  *  \return void.
  */

@@ -47,8 +47,8 @@ namespace M3U
     }
 
     /**
-     * Return the decimal argument in a line of type: blah:<decimal>
-     * presence of valud <decimal> is compulsory or it will return RET_ERROR
+     * Return the decimal argument in a line of type: blah:\<decimal\>
+     * presence of value \<decimal\> is compulsory or it will return RET_ERROR
      */
     bool ParseDecimalValue(const QString& line, int &target)
     {
@@ -64,8 +64,8 @@ namespace M3U
     }
 
     /**
-     * Return the decimal argument in a line of type: blah:<decimal>
-     * presence of valud <decimal> is compulsory or it will return RET_ERROR
+     * Return the decimal argument in a line of type: blah:\<decimal\>
+     * presence of value \<decimal\> is compulsory or it will return RET_ERROR
      */
     bool ParseDecimalValue(const QString& line, int64_t &target)
     {
@@ -118,6 +118,9 @@ namespace M3U
                                 const QString& loc,
                                 int& id, uint64_t& bandwidth)
     {
+        LOG(VB_RECORD, LOG_INFO, loc +
+            QString("Parsing stream from %1").arg(url));
+
         /*
          * #EXT-X-STREAM-INF:[attribute=value][,attribute=value]*
          *  <URI>
@@ -355,7 +358,7 @@ namespace M3U
     }
 
     bool ParseProgramDateTime(const QString& line, const QString& loc,
-                              QDateTime &date)
+                              QDateTime &/*date*/)
     {
         /*
          * #EXT-X-PROGRAM-DATE-TIME:<YYYY-MM-DDThh:mm:ssZ>

@@ -36,7 +36,7 @@ static int RawSendEvent(const QStringList &eventStringList)
     return GENERIC_EXIT_CONNECT_ERROR;
 }
 
-static int ClearSettingsCache(const MythUtilCommandLineParser &cmdline)
+static int ClearSettingsCache(const MythUtilCommandLineParser &/*cmdline*/)
 {
     if (gCoreContext->ConnectToMasterServer(false, false))
     {
@@ -62,7 +62,7 @@ static int SendSystemEvent(const MythUtilCommandLineParser &cmdline)
                                     .arg(gCoreContext->GetHostName())));
 }
 
-static int Reschedule(const MythUtilCommandLineParser &cmdline)
+static int Reschedule(const MythUtilCommandLineParser &/*cmdline*/)
 {
     if (gCoreContext->ConnectToMasterServer(false, false))
     {
@@ -76,7 +76,7 @@ static int Reschedule(const MythUtilCommandLineParser &cmdline)
     return GENERIC_EXIT_CONNECT_ERROR;
 }
 
-static int ScanVideos(const MythUtilCommandLineParser &cmdline)
+static int ScanVideos(const MythUtilCommandLineParser &/*cmdline*/)
 {
     if (gCoreContext->ConnectToMasterServer(false, false))
     {

@@ -176,7 +176,7 @@ bool V4L2encSignalMonitor::HasLock(void)
     return m_strength > 50;
 }
 
-/** \fn V4L2encSignalMonitor::HandleHDPVR(void)
+/**
  *  \brief Wait for a stable signal
  *
  *  The HD-PVR will produce garbage if the resolution or audio type

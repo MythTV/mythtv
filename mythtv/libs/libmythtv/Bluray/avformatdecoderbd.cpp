@@ -61,6 +61,19 @@ void AvFormatDecoderBD::StreamChangeCheck(void)
     if (!ringBuffer->IsBD())
         return;
 
+    if (m_streams_changed)
+    {
+        // This was originally in HandleBDStreamChange
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "resetting");
+        QMutexLocker locker(avcodeclock);
+        Reset(true, false, false);
+        CloseCodecs();
+        FindStreamInfo();
+        ScanStreams(false);
+        avcodeclock->unlock();
+        m_streams_changed=false;
+    }
+
     if (m_parent->AtNormalSpeed() && ringBuffer->BD()->TitleChanged())
     {
         ResetPosMap();
@@ -96,7 +109,7 @@ int AvFormatDecoderBD::GetAudioLanguage(uint audio_index, uint stream_index)
     return iso639_str3_to_key("und");
 }
 
-int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket)
+int AvFormatDecoderBD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& /*storePacket*/)
 {
     QMutexLocker locker(avcodeclock);
 

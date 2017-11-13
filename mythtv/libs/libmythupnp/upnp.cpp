@@ -10,6 +10,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QNetworkInterface>
+
+#include "mythcorecontext.h"
 #include "upnptaskcache.h"
 #include "mythlogging.h"
 #include "serverpool.h"
@@ -85,7 +88,13 @@ Configuration *UPnp::GetConfiguration()
 
 bool UPnp::Initialize( int nServicePort, HttpServer *pHttpServer )
 {
-    QList<QHostAddress> sList = ServerPool::DefaultListenIPv4();
+    QList<QHostAddress> sList = ServerPool::DefaultListen();
+    if (sList.contains(QHostAddress(QHostAddress::AnyIPv4)))
+    {
+        sList.removeAll(QHostAddress(QHostAddress::AnyIPv4));
+        sList.removeAll(QHostAddress(QHostAddress::AnyIPv6));
+        sList.append(QNetworkInterface::allAddresses());
+    }
     return Initialize( sList, nServicePort, pHttpServer );
 }
 
@@ -119,6 +128,23 @@ bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpS
     }
 
     g_IPAddrList   = sIPAddrList;
+    int it;
+    bool ipv4 = gCoreContext->GetNumSetting("IPv4Support",1);
+    bool ipv6 = gCoreContext->GetNumSetting("IPv6Support",1);
+
+    for (it = 0; it < g_IPAddrList.size(); ++it)
+    {
+        // If IPV4 support is disabled and this is an IPV4 address,
+        // remove this address
+        // If IPV6 support is disabled and this is an IPV6 address,
+        // remove this address
+        if ((g_IPAddrList[it].protocol() == QAbstractSocket::IPv4Protocol
+                && ! ipv4)
+          ||(g_IPAddrList[it].protocol() == QAbstractSocket::IPv6Protocol
+                && ! ipv6))
+            g_IPAddrList.removeAt(it--);
+    }
+
     m_nServicePort = nServicePort;
 
     // ----------------------------------------------------------------------
@@ -231,7 +257,8 @@ QString UPnp::GetResultDesc( UPnPResultCode eCode )
         //case UPnPResult_CMGR_AccessDenied             = 705,
         //case UPnPResult_CMGR_InvalidConnectionRef     = 706,
         case UPnPResult_CMGR_NotInNetwork           : return "Not In Network";
-        case UPnPResult_MythTV_NoNamespaceGiven:      return "Unknown";
+        case UPnPResult_MythTV_NoNamespaceGiven:      return "No Namespace Given";
+        case UPnPResult_MythTV_XmlParseError        : return "XML Parse Error";
     }
 
     return "Unknown";

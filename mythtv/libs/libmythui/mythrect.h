@@ -21,7 +21,7 @@ class MUI_PUBLIC MythRect : public QRect
     MythRect();
     MythRect(int x, int y, int width, int height);
     MythRect(const QString &sX, const QString &sY, const QString &sWidth,
-             const QString &sHeight);
+             const QString &sHeight, const QString &baseRes = QString());
     MythRect(QRect rect);
     bool operator== (const MythRect &other) const;
 
@@ -32,7 +32,7 @@ class MUI_PUBLIC MythRect : public QRect
     void NormRect(void);
 
     void setRect(const QString &sX, const QString &sY, const QString &sWidth,
-                 const QString &sHeight);
+                 const QString &sHeight, const QString &baseRes = QString());
     void setRect(int X, int Y, int w,int h) { QRect::setRect(X,Y,w,h); }
     void setX(const QString &sX);
     void setX(int X) { QRect::setX(X); }

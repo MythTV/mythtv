@@ -140,7 +140,7 @@ void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &
             {
                 QObject *pNew = new T( pParent );
 
-                ((T *)pNew)->Copy( (const T &)(*pObject) );
+                ((T *)pNew)->Copy( (const T *)pObject );
 
                 dst.append( QVariant::fromValue<QObject *>( pNew ));
             }

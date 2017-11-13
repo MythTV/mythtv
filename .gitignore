@@ -35,7 +35,14 @@ release
 *.vcxproj.filters
 *.manifest
 bin
+moc
+obj
 *.ipch
 .directory
 .vscode
 .qmake.stash
+tags
+TAGS
+GPATH
+GRTAGS
+GTAGS

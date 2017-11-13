@@ -21,6 +21,7 @@
 
 #include <QScriptEngine>
 #include <QNetworkProxy>
+#include <QNetworkInterface>
 
 #include "serviceHosts/mythServiceHost.h"
 #include "serviceHosts/guideServiceHost.h"
@@ -28,6 +29,7 @@
 #include "serviceHosts/dvrServiceHost.h"
 #include "serviceHosts/channelServiceHost.h"
 #include "serviceHosts/videoServiceHost.h"
+#include "serviceHosts/musicServiceHost.h"
 #include "serviceHosts/captureServiceHost.h"
 #include "serviceHosts/imageServiceHost.h"
 
@@ -145,6 +147,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     pHttpServer->RegisterExtension( new DvrServiceHost    ( m_sSharePath ));
     pHttpServer->RegisterExtension( new ChannelServiceHost( m_sSharePath ));
     pHttpServer->RegisterExtension( new VideoServiceHost  ( m_sSharePath ));
+    pHttpServer->RegisterExtension( new MusicServiceHost  ( m_sSharePath ));
     pHttpServer->RegisterExtension( new CaptureServiceHost( m_sSharePath ));
     pHttpServer->RegisterExtension( new ImageServiceHost  ( m_sSharePath ));
 
@@ -172,6 +175,8 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
          pEngine->scriptValueFromQMetaObject< ScriptableChannel >() );
      pEngine->globalObject().setProperty("Video"  ,
          pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
+     pEngine->globalObject().setProperty("Music"  ,
+         pEngine->scriptValueFromQMetaObject< ScriptableVideo   >() );
      pEngine->globalObject().setProperty("Capture"  ,
          pEngine->scriptValueFromQMetaObject< ScriptableCapture  >() );
      pEngine->globalObject().setProperty("Image"  ,
@@ -188,6 +193,13 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
     }
 
     QList<QHostAddress> IPAddrList = ServerPool::DefaultListen();
+    if (IPAddrList.contains(QHostAddress(QHostAddress::AnyIPv4)))
+    {
+        IPAddrList.removeAll(QHostAddress(QHostAddress::AnyIPv4));
+        IPAddrList.removeAll(QHostAddress(QHostAddress::AnyIPv6));
+        IPAddrList.append(QNetworkInterface::allAddresses());
+    }
+
     if (IPAddrList.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR,

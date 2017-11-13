@@ -218,7 +218,9 @@ int main(int argc, char *argv[])
     fdataout << QString("// Do not edit\n\n");
     fdataout << QString("void strings_null() {\n");
 
+#if 0
     int lineCount = 2;
+#endif
     QStringList::const_iterator strit;
     for (strit = strings.begin(); strit != strings.end(); ++strit)
     {
@@ -265,8 +267,8 @@ int main(int argc, char *argv[])
                         << "    <message>\n";
             }
         }
-#endif
         ++lineCount;
+#endif
     }
 
     fdataout << QString("}\n");

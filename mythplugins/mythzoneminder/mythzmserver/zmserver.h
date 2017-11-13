@@ -154,7 +154,7 @@ class MONITOR
   public:
     MONITOR();
 
-    void initMonitor(bool debug, string mmapPath, int shmKey);
+    void initMonitor(bool debug, const string &mmapPath, int shmKey);
 
     bool isValid(void);
 
@@ -201,16 +201,18 @@ class ZMServer
     string getZMSetting(const string &setting);
     bool send(const string &s) const;
     bool send(const string &s, const unsigned char *buffer, int dataLen) const;
-    void sendError(string error);
+    void sendError(const string &error);
     void getMonitorList(void);
     int  getFrame(unsigned char *buffer, int bufferSize, MONITOR *monitor);
     long long getDiskSpace(const string &filename, long long &total, long long &used);
     void tokenize(const string &command, vector<string> &tokens);
     void handleHello(void);
     string runCommand(string command);
-    void getMonitorStatus(string id, string type, string device, string host, string channel,
-                          string function, string &zmcStatus, string &zmaStatus,
-                          string enabled);
+    void getMonitorStatus(const string &id, const string &type,
+                          const string &device, const string &host,
+                          const string &channel, const string &function,
+                          string &zmcStatus, string &zmaStatus,
+                          const string &enabled);
     void handleGetServerStatus(void);
     void handleGetMonitorStatus(void);
     void handleGetAlarmStates(void);

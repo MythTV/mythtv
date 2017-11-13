@@ -881,9 +881,9 @@ bool ChannelUtil::GetCachedPids(uint chanid,
 
 /** \brief Saves PIDs for PSIP tables to database.
  *
- *  \param chanid     Channel ID to fetch cached pids for.
- *  \param pid_cache  List of PIDs with their TableID types to be saved.
- *  \param delete_all If true delete both permanent and transient pids first.
+ *  \param chanid      Channel ID to fetch cached pids for.
+ *  \param _pid_cache  List of PIDs with their TableID types to be saved.
+ *  \param delete_all  If true delete both permanent and transient pids first.
  */
 bool ChannelUtil::SaveCachedPids(uint chanid,
                                  const pid_cache_t &_pid_cache,
@@ -1076,7 +1076,7 @@ static QStringList get_valid_recorder_list(const QString &channum)
     return reclist;
 }
 
-/** \fn TV::GetValidRecorderList(uint, const QString&)
+/**
  *  \brief Returns list of the recorders that have chanid or channum
  *         in their sources.
  *  \param chanid   Channel ID of channel we are querying recorders for.
@@ -1866,7 +1866,6 @@ bool ChannelUtil::GetChannelData(
     commfree      = false;
 
     int found = 0;
-    int id = -1;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT finetune, freqid, tvformat, freqtable, "
@@ -1889,7 +1888,7 @@ bool ChannelUtil::GetChannelData(
     while (query.next())
     {
         found += query.value(10).toInt();
-        if (id == -1 || found)
+        if (found)
         {
             finetune      = query.value(0).toInt();
             freqid        = query.value(1).toString();

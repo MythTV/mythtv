@@ -7,9 +7,11 @@
 // MythTV headers
 #include "settings.h"
 
-class VideoGeneralSettings : public ConfigurationWizard
+#include "standardsettings.h"
+
+class VideoGeneralSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(VideoGeneralSettings)
+    Q_DECLARE_TR_FUNCTIONS(VideoGeneralSettings);
 
   public:
     VideoGeneralSettings();

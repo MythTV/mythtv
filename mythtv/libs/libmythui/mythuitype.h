@@ -35,10 +35,6 @@ class MythUISpinBox;
 class MythUITextEdit;
 class MythUIProgressBar;
 
-#ifdef CONFIG_QTWEBKIT
-class MythUIWebBrowser;
-#endif
-
 /**
  * \defgroup MythUI MythTV User Interface Library
  *
@@ -108,7 +104,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual void Pulse(void);
 
     void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255,
-              QRect clipRegion = QRect());
+              QRect clipRect = QRect());
 
     /// Convenience method, calls SetPosition(const MythPoint&)
     /// Override that instead to change functionality.
@@ -142,9 +138,9 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetAlpha(int newalpha);
     int GetAlpha(void) const;
 
-    virtual bool keyPressEvent(QKeyEvent *);
-    virtual bool gestureEvent(MythGestureEvent *);
-    virtual void mediaEvent(MythMediaEvent *);
+    virtual bool keyPressEvent(QKeyEvent *event);
+    virtual bool gestureEvent(MythGestureEvent *event);
+    virtual void mediaEvent(MythMediaEvent *event);
 
     MythFontProperties *GetFont(const QString &text) const;
     bool AddFont(const QString &text, MythFontProperties *fontProp);
@@ -180,7 +176,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   protected:
     virtual ~MythUIType();
-    virtual void customEvent(QEvent *);
+    virtual void customEvent(QEvent *event);
 
   public slots:
     void LoseFocus();
@@ -208,7 +204,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRegion);
+                          int alphaMod, QRect clipRect);
 
     void AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList);
     void HandleAlphaPulse();

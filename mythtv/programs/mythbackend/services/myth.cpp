@@ -71,8 +71,10 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     QString sServerIP = gCoreContext->GetBackendServerIP();
     //QString sPeerIP   = pRequest->GetPeerAddress();
 
-    if ((params.dbHostName == "localhost") &&
-        !sServerIP.isEmpty())  // &&
+    if ((params.dbHostName.compare("localhost",Qt::CaseInsensitive)==0
+      || params.dbHostName == "127.0.0.1"
+      || params.dbHostName == "::1")
+      && !sServerIP.isEmpty())  // &&
         //(sServerIP         != sPeerIP    ))
     {
         params.dbHostName = sServerIP;
@@ -447,7 +449,7 @@ QDateTime Myth::ParseISODateString(const QString& DateTimeString)
     QDateTime dateTime = QDateTime().fromString(DateTimeString, Qt::ISODate);
 
     if (!dateTime.isValid())
-        throw( "Unable to parse DateTimeString" );
+        throw QString( "Unable to parse DateTimeString" );
 
     return dateTime;
 }

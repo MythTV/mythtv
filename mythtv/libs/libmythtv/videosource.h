@@ -5,8 +5,9 @@
 using namespace std;
 
 #include "mthread.h"
-#include "settings.h"
+#include "standardsettings.h"
 #include "datadirect.h"
+#include "mythcontext.h"
 
 class SignalTimeout;
 class ChannelTimeout;
@@ -18,6 +19,7 @@ class CardInput;
 class CardID;
 class InputName;
 class SourceID;
+class DeviceTree;
 class DiSEqCDevTree;
 class DiSEqCDevSettings;
 class InputGroup;
@@ -52,7 +54,7 @@ static inline bool is_grabber_labs(const QString &grabber)
 
 class VideoSourceDBStorage : public SimpleDBStorage
 {
-  protected:
+  public:
     VideoSourceDBStorage(StorageUser       *_user,
                          const VideoSource &_parent,
                          const QString     &name) :
@@ -60,13 +62,14 @@ class VideoSourceDBStorage : public SimpleDBStorage
     {
     }
 
+  protected:
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const VideoSource& m_parent;
 };
 
-class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
+class VideoSourceSelector : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
 
@@ -86,7 +89,7 @@ class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
 };
 
 class FreqTableSelector :
-    public ComboBoxSetting, public VideoSourceDBStorage
+    public MythUIComboBoxSetting
 {
     Q_OBJECT
 public:
@@ -95,7 +98,7 @@ protected:
     QString freq;
 };
 
-class TransFreqTableSelector : public ComboBoxSetting, public TransientStorage
+class TransFreqTableSelector : public TransMythUIComboBoxSetting
 {
   public:
     explicit TransFreqTableSelector(uint _sourceid);
@@ -113,12 +116,12 @@ class TransFreqTableSelector : public ComboBoxSetting, public TransientStorage
 };
 
 class DataDirectLineupSelector :
-    public ComboBoxSetting, public VideoSourceDBStorage
+    public MythUIComboBoxSetting
 {
    Q_OBJECT
 public:
    explicit DataDirectLineupSelector(const VideoSource& parent) :
-       ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "lineupid")
+       MythUIComboBoxSetting(new VideoSourceDBStorage(this, parent, "lineupid"))
    {
        setLabel(QObject::tr("Data Direct lineup"));
    };
@@ -127,20 +130,22 @@ public:
     void fillSelections(const QString& uid, const QString& pwd, int source);
 };
 
-class DataDirectButton : public TransButtonSetting
+class DataDirectButton : public ButtonStandardSetting
 {
   public:
-    DataDirectButton() { setLabel(QObject::tr("Retrieve Lineups")); }
+    DataDirectButton() : ButtonStandardSetting(QObject::tr("Retrieve Lineups"))
+    {
+    }
 };
 
 class DataDirectUserID;
 class DataDirectPassword;
 
-class DataDirect_config: public VerticalConfigurationGroup
+class DataDirect_config: public GroupSetting
 {
     Q_OBJECT
   public:
-    DataDirect_config(const VideoSource& _parent, int _ddsource);
+    DataDirect_config(const VideoSource& _parent, int _ddsource, StandardSetting *_setting);
 
     virtual void Load(void);
 
@@ -160,12 +165,13 @@ class DataDirect_config: public VerticalConfigurationGroup
     int source;
 };
 
-class XMLTV_generic_config: public VerticalConfigurationGroup
+class XMLTV_generic_config: public GroupSetting
 {
     Q_OBJECT
 
   public:
-    XMLTV_generic_config(const VideoSource& _parent, QString _grabber);
+    XMLTV_generic_config(const VideoSource& _parent, QString _grabber,
+                         StandardSetting *_setting);
 
     virtual void Save(void);
     virtual void Save(QString) { Save(); }
@@ -179,10 +185,10 @@ class XMLTV_generic_config: public VerticalConfigurationGroup
     QStringList        grabberArgs;
 };
 
-class EITOnly_config: public VerticalConfigurationGroup
+class EITOnly_config: public GroupSetting
 {
 public:
-    explicit EITOnly_config(const VideoSource& _parent);
+    EITOnly_config(const VideoSource& _parent, StandardSetting *_setting);
 
     virtual void Save();
     virtual void Save(QString) { Save(); }
@@ -191,7 +197,7 @@ protected:
     UseEIT *useeit;
 };
 
-class NoGrabber_config: public VerticalConfigurationGroup
+class NoGrabber_config: public GroupSetting
 {
 public:
     explicit NoGrabber_config(const VideoSource& _parent);
@@ -203,67 +209,62 @@ protected:
     UseEIT *useeit;
 };
 
+class IdSetting : public AutoIncrementSetting {
+public:
+    IdSetting(const QString &table, const QString &setting):
+        AutoIncrementSetting(table, setting)
+    {
+        setVisible(false);
+    }
 
-class XMLTVGrabber;
-class XMLTVConfig : public TriggeredConfigurationGroup
-{
+    int intValue() { return getValue().toInt(); }
+    void setValue(int value) { setValue(QString::number(value)); }
+    using StandardSetting::setValue;
+};
+
+class VideoSource : public GroupSetting {
     Q_OBJECT
 
   public:
-    explicit XMLTVConfig(const VideoSource &aparent);
-
-    virtual void Load(void);
-    virtual void Save(void);
-    virtual void Save(QString /*destination*/) { Save(); }
-
-  private:
-    const VideoSource &parent;
-    XMLTVGrabber      *grabber;
-
-    void LoadXMLTVGrabbers(QStringList name_list, QStringList prog_list);
-};
-
-class VideoSource : public ConfigurationWizard {
-public:
     VideoSource();
 
     int getSourceID(void) const { return id->intValue(); };
 
     void loadByID(int id);
 
-    static void fillSelections(SelectSetting* setting);
+    static void fillSelections(GroupSetting* setting);
+    static void fillSelections(MythUIComboBoxSetting* setting);
     static QString idToName(int id);
 
     QString getSourceName(void) const { return name->getValue(); };
 
+    virtual void Load(void)
+    {
+        GroupSetting::Load();
+    }
+
     virtual void Save(void)
     {
         if (name)
-            ConfigurationWizard::Save();
+            GroupSetting::Save();
     }
-
-    virtual void Save(QString destination)
-    {
-        if (name)
-            ConfigurationWizard::Save(destination);
-    }
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
   private:
-    class ID: public AutoIncrementDBSetting
+    class ID: public IdSetting
     {
       public:
-        ID() : AutoIncrementDBSetting("videosource", "sourceid")
+        ID() : IdSetting("videosource", "sourceid")
         {
-            setName("VideoSourceName");
-            setVisible(false);
         };
     };
 
-    class Name : public LineEditSetting, public VideoSourceDBStorage
+    class Name : public MythUITextEditSetting
     {
       public:
         explicit Name(const VideoSource &parent) :
-            LineEditSetting(this), VideoSourceDBStorage(this, parent, "name")
+            MythUITextEditSetting(new VideoSourceDBStorage(this, parent, "name"))
         {
             setLabel(QObject::tr("Video source name"));
         }
@@ -272,12 +273,11 @@ public:
 private:
     ID   *id;
     Name *name;
-    XMLTVConfig *xmltv;
 };
 
 class CaptureCardDBStorage : public SimpleDBStorage
 {
-  protected:
+  public:
     CaptureCardDBStorage(StorageUser       *_user,
                          const CaptureCard &_parent,
                          const QString     &_name) :
@@ -285,16 +285,28 @@ class CaptureCardDBStorage : public SimpleDBStorage
     {
     }
 
-    int getCardID(void) const;
 
 protected:
+    int getCardID(void) const;
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 private:
     const CaptureCard& m_parent;
 };
 
-class TunerCardAudioInput : public ComboBoxSetting, public CaptureCardDBStorage
+class CaptureCardComboBoxSetting : public MythUIComboBoxSetting
+{
+  public:
+    CaptureCardComboBoxSetting(const CaptureCard &parent,
+                               bool rw,
+                               const QString &setting) :
+        MythUIComboBoxSetting(new CaptureCardDBStorage(this, parent, setting),
+                              rw)
+    {
+    }
+};
+
+class TunerCardAudioInput : public CaptureCardComboBoxSetting
 {
     Q_OBJECT
   public:
@@ -303,69 +315,68 @@ class TunerCardAudioInput : public ComboBoxSetting, public CaptureCardDBStorage
                         QString type = QString::null);
 
   public slots:
-    void fillSelections(const QString &device);
+    int fillSelections(const QString &device);
 
   private:
     QString last_device;
     QString last_cardtype;
 };
 
-class EmptyAudioDevice : public LineEditSetting, public CaptureCardDBStorage
+class EmptyAudioDevice : public MythUITextEditSetting
 {
     Q_OBJECT
   public:
     explicit EmptyAudioDevice(const CaptureCard &parent) :
-        LineEditSetting(this),
-        CaptureCardDBStorage(this, parent, "audiodevice")
+        MythUITextEditSetting(new CaptureCardDBStorage(this, parent,
+                                                       "audiodevice"))
     {
         setVisible(false);
     }
 
     void Save(void)
     {
-        SetSaveRequired();
-        settingValue = "";
-        SimpleDBStorage::Save();
+        GetStorage()->SetSaveRequired();
+        setValue("");
+        GetStorage()->Save();
     }
     void Save(QString destination)
     {
-        SetSaveRequired();
-        settingValue = "";
-        SimpleDBStorage::Save(destination);
+        GetStorage()->SetSaveRequired();
+        setValue("");
+        GetStorage()->Save(destination);
     }
 };
 
-class EmptyVBIDevice : public LineEditSetting, public CaptureCardDBStorage
+class EmptyVBIDevice : public MythUITextEditSetting
 {
     Q_OBJECT
 
   public:
     explicit EmptyVBIDevice(const CaptureCard &parent) :
-        LineEditSetting(this),
-        CaptureCardDBStorage(this, parent, "vbidevice")
+        MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "vbidevice"))
     {
         setVisible(false);
     };
 
     void Save(void)
     {
-        SetSaveRequired();
-        settingValue = "";
-        SimpleDBStorage::Save();
+        GetStorage()->SetSaveRequired();
+        setValue("");
+        GetStorage()->Save();
     }
     void Save(QString destination)
     {
-        SetSaveRequired();
-        settingValue = "";
-        SimpleDBStorage::Save(destination);
+        GetStorage()->SetSaveRequired();
+        setValue("");
+        GetStorage()->Save(destination);
     }
 };
 
-class CardType : public ComboBoxSetting, public CaptureCardDBStorage
+class CardType : public CaptureCardComboBoxSetting
 {
 public:
     explicit CardType(const CaptureCard& parent);
-    static void fillSelections(SelectSetting* setting);
+    static void fillSelections(MythUIComboBoxSetting* setting);
 };
 
 class HDHomeRunDevice
@@ -386,17 +397,14 @@ class HDHomeRunDeviceIDList;
 class HDHomeRunDeviceID;
 class HDHomeRunIP;
 class HDHomeRunTunerIndex;
-class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
+class HDHomeRunConfigurationGroup : public GroupSetting
 {
     Q_OBJECT
 
     friend class HDHomeRunExtra;
 
   public:
-    explicit HDHomeRunConfigurationGroup(CaptureCard &parent);
-
-  public slots:
-    void HDHomeRunExtraPanel(void);
+    HDHomeRunConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   private:
     void FillDeviceList(void);
@@ -404,7 +412,7 @@ class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
 
   private:
     CaptureCard           &parent;
-    TransLabelSetting     *desc;
+    StandardSetting       *desc;
     HDHomeRunDeviceIDList *deviceidlist;
     HDHomeRunDeviceID     *deviceid;
     HDHomeRunIP           *cardip;
@@ -431,24 +439,19 @@ class VBoxDeviceIDList;
 class VBoxDeviceID;
 class VBoxIP;
 class VBoxTunerIndex;
-class VBoxConfigurationGroup : public VerticalConfigurationGroup
+class VBoxConfigurationGroup : public GroupSetting
 {
     Q_OBJECT
 
-    friend class VBoxExtra;
-
   public:
-    explicit VBoxConfigurationGroup(CaptureCard &parent);
-
-  public slots:
-    void VBoxExtraPanel(void);
+    VBoxConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   private:
     void FillDeviceList(void);
 
   private:
     CaptureCard       &parent;
-    TransLabelSetting *desc;
+    StandardSetting   *desc;
     VBoxDeviceIDList  *deviceidlist;
     VBoxDeviceID      *deviceid;
     VBoxIP            *cardip;
@@ -456,55 +459,31 @@ class VBoxConfigurationGroup : public VerticalConfigurationGroup
     VBoxDeviceList    devicelist;
 };
 
-class CetonDeviceID;
-class CetonSetting;
-class CetonConfigurationGroup : public VerticalConfigurationGroup
-{
-    Q_OBJECT
-
-    friend class CetonExtra;
-
-  public:
-    explicit CetonConfigurationGroup(CaptureCard &parent);
-
-  public slots:
-    void CetonExtraPanel(void);
-
-  private:
-    CaptureCard         &parent;
-    TransLabelSetting   *desc;
-    CetonDeviceID       *deviceid;
-    CetonSetting        *ip;
-    CetonSetting        *tuner;
-};
-
-
-
-class V4LConfigurationGroup : public VerticalConfigurationGroup
+class V4LConfigurationGroup : public GroupSetting
 {
     Q_OBJECT
 
   public:
-    V4LConfigurationGroup(CaptureCard &parent);
+    V4LConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   public slots:
     void probeCard(const QString &device);
 
   private:
     CaptureCard       &parent;
-    TransLabelSetting *cardinfo;
+    TransTextEditSetting *cardinfo;
     VBIDevice         *vbidev;
 };
 
 class VideoDevice;
 class VBIDevice;
 
-class MPEGConfigurationGroup: public VerticalConfigurationGroup
+class MPEGConfigurationGroup: public GroupSetting
 {
    Q_OBJECT
 
   public:
-    explicit MPEGConfigurationGroup(CaptureCard &parent);
+    MPEGConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   public slots:
     void probeCard(const QString &device);
@@ -513,52 +492,52 @@ class MPEGConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard       &parent;
     VideoDevice       *device;
     VBIDevice         *vbidevice;
-    TransLabelSetting *cardinfo;
+    TransTextEditSetting *cardinfo;
 };
 
-class HDPVRConfigurationGroup: public VerticalConfigurationGroup
+class HDPVRConfigurationGroup: public GroupSetting
 {
    Q_OBJECT
 
   public:
-    explicit HDPVRConfigurationGroup(CaptureCard &parent);
+    HDPVRConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   public slots:
     void probeCard(const QString &device);
 
   private:
     CaptureCard         &parent;
-    TransLabelSetting   *cardinfo;
+    GroupSetting        *cardinfo;
     TunerCardAudioInput *audioinput;
     VBIDevice           *vbidevice;
 };
 
 class ASIDevice;
 
-class V4L2encGroup: public TriggeredConfigurationGroup
+class V4L2encGroup: public GroupSetting
 {
     Q_OBJECT
 
   public:
-    explicit V4L2encGroup(CaptureCard& parent);
+    V4L2encGroup(CaptureCard& parent, CardType& cardType);
 
   private:
-    CaptureCard         &m_parent;
-    TransLabelSetting   *m_cardinfo;
+    CaptureCard          &m_parent;
+    TransTextEditSetting *m_cardinfo;
+    VideoDevice          *m_device;
 
     QString m_DriverName;
 
   protected slots:
-    virtual void triggerChanged(const QString& value);
     void probeCard(const QString &device);
 };
 
-class ASIConfigurationGroup: public VerticalConfigurationGroup
+class ASIConfigurationGroup: public GroupSetting
 {
    Q_OBJECT
 
   public:
-    explicit ASIConfigurationGroup(CaptureCard &parent);
+    ASIConfigurationGroup(CaptureCard &parent, CardType &cardType);
 
   public slots:
     void probeCard(const QString &device);
@@ -566,55 +545,55 @@ class ASIConfigurationGroup: public VerticalConfigurationGroup
   private:
     CaptureCard       &parent;
     ASIDevice         *device;
-    TransLabelSetting *cardinfo;
+    TransTextEditSetting *cardinfo;
 };
 
-class ImportConfigurationGroup: public VerticalConfigurationGroup
+class ImportConfigurationGroup: public GroupSetting
 {
    Q_OBJECT
 
   public:
-    explicit ImportConfigurationGroup(CaptureCard &parent);
+    ImportConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   public slots:
     void probeCard(const QString &device);
 
   private:
     CaptureCard       &parent;
-    TransLabelSetting *info;
-    TransLabelSetting *size;
+    TransTextEditSetting *info;
+    TransTextEditSetting *size;
 };
 
-class DemoConfigurationGroup: public VerticalConfigurationGroup
+class DemoConfigurationGroup: public GroupSetting
 {
    Q_OBJECT
 
   public:
-    explicit DemoConfigurationGroup(CaptureCard &parent);
+    DemoConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   public slots:
     void probeCard(const QString &device);
 
   private:
     CaptureCard       &parent;
-    TransLabelSetting *info;
-    TransLabelSetting *size;
+    TransTextEditSetting *info;
+    TransTextEditSetting *size;
 };
 
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
-class ExternalConfigurationGroup: public VerticalConfigurationGroup
+class ExternalConfigurationGroup: public GroupSetting
 {
    Q_OBJECT
 
   public:
-    ExternalConfigurationGroup(CaptureCard &parent);
+    ExternalConfigurationGroup(CaptureCard &parent, CardType &cardtype);
 
   public slots:
     void probeApp(const QString & path);
 
   private:
     CaptureCard       &parent;
-    TransLabelSetting *info;
+    TransTextEditSetting *info;
 };
 #endif
 
@@ -623,26 +602,23 @@ class DVBCardName;
 class DVBCardType;
 class DVBTuningDelay;
 
-class DVBConfigurationGroup : public VerticalConfigurationGroup
+class DVBConfigurationGroup : public GroupSetting
 {
     Q_OBJECT
 
     friend class DVBExtra;
 
   public:
-    explicit DVBConfigurationGroup(CaptureCard& a_parent);
+    DVBConfigurationGroup(CaptureCard& a_parent, CardType& cardType);
     ~DVBConfigurationGroup();
 
     virtual void Load(void);
 
     virtual void Save(void);
-    virtual void Save(QString /*destination*/) { Save(); }
 
   public slots:
     void probeCard(const QString& cardNumber);
     void reloadDiseqcTree(const QString &device);
-    void DiSEqCPanel(void);
-    void DVBExtraPanel(void);
 
   private:
     CaptureCard                  &parent;
@@ -657,11 +633,11 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
 #endif
     DVBTuningDelay               *tuning_delay;
     DiSEqCDevTree                *diseqc_tree;
-    TransButtonSetting           *diseqc_btn;
+    DeviceTree                   *diseqc_btn;
 };
 
 class FirewireGUID;
-class FirewireModel : public ComboBoxSetting, public CaptureCardDBStorage
+class FirewireModel : public CaptureCardComboBoxSetting
 {
     Q_OBJECT
 
@@ -675,13 +651,13 @@ class FirewireModel : public ComboBoxSetting, public CaptureCardDBStorage
     const FirewireGUID *guid;
 };
 
-class FirewireDesc : public TransLabelSetting
+class FirewireDesc : public GroupSetting
 {
     Q_OBJECT
 
   public:
     explicit FirewireDesc(const FirewireGUID *_guid) :
-        TransLabelSetting(), guid(_guid) { }
+        GroupSetting(), guid(_guid) { }
 
   public slots:
     void SetGUID(const QString&);
@@ -690,17 +666,14 @@ class FirewireDesc : public TransLabelSetting
     const FirewireGUID *guid;
 };
 
-class CaptureCardGroup : public TriggeredConfigurationGroup
+class CaptureCardGroup : public GroupSetting
 {
     Q_OBJECT
 public:
     explicit CaptureCardGroup(CaptureCard& parent);
-
-protected slots:
-    virtual void triggerChanged(const QString& value);
 };
 
-class CaptureCard : public QObject, public ConfigurationWizard
+class CaptureCard : public GroupSetting
 {
     Q_OBJECT
 public:
@@ -711,30 +684,36 @@ public:
 
     void loadByID(int id);
 
-    static void fillSelections(SelectSetting* setting);
+    static void fillSelections(GroupSetting* setting);
 
     void reload(void);
 
     virtual void Save(void);
-    virtual void Save(QString /*destination*/) { Save(); }
+
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
 private:
 
-    class ID: public AutoIncrementDBSetting {
+    class ID: public IdSetting {
     public:
         ID():
-            AutoIncrementDBSetting("capturecard", "cardid") {
-            setVisible(false);
-            setName("ID");
-        };
+            IdSetting("capturecard", "cardid")
+        {
+        }
     };
 
-    class Hostname : public HostnameSetting, public CaptureCardDBStorage
+    class Hostname : public StandardSetting
     {
       public:
         explicit Hostname(const CaptureCard &parent) :
-            HostnameSetting(this),
-            CaptureCardDBStorage(this, parent, "hostname") { }
+            StandardSetting(new CaptureCardDBStorage(this, parent, "hostname"))
+        {
+            setVisible(false);
+            setValue(gCoreContext->GetHostName());
+        }
+        void edit(MythScreenType *) {}
+        void resultEdit(DialogCompletionEvent *) {}
     };
 
 private:
@@ -743,7 +722,7 @@ private:
 
 class CardInputDBStorage : public SimpleDBStorage
 {
-  protected:
+  public:
     CardInputDBStorage(StorageUser     *_user,
                        const CardInput &_parent,
                        QString          _name) :
@@ -753,96 +732,94 @@ class CardInputDBStorage : public SimpleDBStorage
 
     int getInputID(void) const;
 
+  protected:
     void fillSelections();
 
-protected:
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
-private:
+
+  private:
     const CardInput& m_parent;
 };
 
-class MTV_PUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
+class CaptureCardButton : public ButtonStandardSetting
+{
+    Q_OBJECT
+
+  public:
+     CaptureCardButton(const QString &label, const QString &value)
+         : ButtonStandardSetting(label),
+         m_value(value)
+    {
+    }
+
+    virtual void edit(MythScreenType *screen);
+
+  signals:
+    void Clicked(const QString &choice);
+
+  private:
+    QString m_value;
+};
+
+class MTV_PUBLIC CaptureCardEditor : public GroupSetting
 {
     Q_OBJECT
 
   public:
     CaptureCardEditor();
 
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetName=0);
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
     virtual void Load(void);
 
-    virtual void Save(void) { }
-    virtual void Save(QString destination) { }
+    void AddSelection(const QString &label, const char *slot);
 
   public slots:
-    void menu(void);
-    void edit(void);
-    void del(void);
-
-  private:
-    ListBoxSetting *listbox;
+    void ShowDeleteAllCaptureCardsDialog(void);
+    void ShowDeleteAllCaptureCardsDialogOnHost(void);
+    void DeleteAllCaptureCards(bool);
+    void DeleteAllCaptureCardsOnHost(bool);
+    void AddNewCard(void);
 };
 
-class MTV_PUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC VideoSourceEditor : public GroupSetting
 {
     Q_OBJECT
 
   public:
     VideoSourceEditor();
 
-    virtual MythDialog* dialogWidget(MythMainWindow* parent,
-                                     const char* widgetName=0);
-
     bool cardTypesInclude(const int& SourceID,
                           const QString& thecardtype);
 
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
     virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString /*destination*/) { }
+    void AddSelection(const QString &label, const char *slot);
 
   public slots:
-    void menu(void);
-    void edit(void);
-    void del(void);
-
-  private:
-    ListBoxSetting *listbox;
+    void NewSource(void);
+    void ShowDeleteAllSourcesDialog(void);
+    void DeleteAllSources(bool);
 };
 
-class MTV_PUBLIC CardInputEditor : public QObject, public ConfigurationDialog
+class MTV_PUBLIC CardInputEditor : public GroupSetting
 {
     Q_OBJECT
 
   public:
     CardInputEditor();
 
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
     virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString /*destination*/) { }
 
   private:
     vector<CardInput*>  cardinputs;
-    ListBoxSetting     *listbox;
 };
 
-class StartingChannel : public ComboBoxSetting, public CardInputDBStorage
+class StartingChannel : public MythUIComboBoxSetting
 {
     Q_OBJECT
   public:
     explicit StartingChannel(const CardInput &parent) :
-        ComboBoxSetting(this, false, 1),
-        CardInputDBStorage(this, parent, "startchan")
+        MythUIComboBoxSetting(new CardInputDBStorage(this, parent, "startchan"),
+                              false)
     {
         setLabel(QObject::tr("Starting channel"));
         setHelpText(QObject::tr("Starting Live TV channel.") + " " +
@@ -854,12 +831,12 @@ class StartingChannel : public ComboBoxSetting, public CardInputDBStorage
     void SetSourceID(const QString &sourceid);
 };
 
-class CardInput : public QObject, public ConfigurationWizard
+class CardInput : public GroupSetting
 {
     Q_OBJECT
   public:
     CardInput(const QString & cardtype, const QString & device,
-              bool is_new_input, int cardid);
+              int cardid);
     ~CardInput();
 
     int getInputID(void) const { return id->intValue(); };
@@ -869,23 +846,21 @@ class CardInput : public QObject, public ConfigurationWizard
     QString getSourceName(void) const;
 
     virtual void Save(void);
-    virtual void Save(QString /*destination*/) { Save(); }
 
   public slots:
     void CreateNewInputGroup();
     void channelScanner();
     void sourceFetch();
     void SetSourceID(const QString &sourceid);
-    void UpdateSchedGroup(int value);
+    void UpdateSchedGroup(const QString &value);
+    void CreateNewInputGroupSlot(const QString &name);
 
   private:
-    class ID: public AutoIncrementDBSetting
+    class ID: public IdSetting
     {
       public:
-        ID() : AutoIncrementDBSetting("capturecard", "cardid")
+        ID() : IdSetting("capturecard", "cardid")
         {
-            setVisible(false);
-            setName("CardInputID");
         }
     };
 
@@ -893,19 +868,19 @@ class CardInput : public QObject, public ConfigurationWizard
     InputName       *inputname;
     SourceID        *sourceid;
     StartingChannel *startchan;
-    TransButtonSetting *scan;
-    TransButtonSetting *srcfetch;
+    ButtonStandardSetting *scan;
+    ButtonStandardSetting *srcfetch;
     DiSEqCDevSettings  *externalInputSettings;
     InputGroup         *inputgrp0;
     InputGroup         *inputgrp1;
-    SpinBoxSetting  *instancecount;
-    CheckBoxSetting *schedgroup;
+    MythUISpinBoxSetting  *instancecount;
+    MythUICheckBoxSetting *schedgroup;
 };
 
 class HDHomeRunDeviceID;
 class HDHomeRunTunerIndex;
 
-class HDHomeRunIP : public TransLineEditSetting
+class HDHomeRunIP : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -926,7 +901,7 @@ class HDHomeRunIP : public TransLineEditSetting
     QString _oldValue;
 };
 
-class HDHomeRunTunerIndex : public TransLineEditSetting
+class HDHomeRunTunerIndex : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -948,16 +923,17 @@ class HDHomeRunTunerIndex : public TransLineEditSetting
 };
 
 
-class HDHomeRunDeviceIDList : public TransComboBoxSetting
+class HDHomeRunDeviceIDList : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
 
   public:
     HDHomeRunDeviceIDList(HDHomeRunDeviceID *deviceid,
-                          TransLabelSetting *desc,
+                          StandardSetting *desc,
                           HDHomeRunIP       *cardip,
                           HDHomeRunTunerIndex *cardtuner,
-                          HDHomeRunDeviceList *devicelist);
+                          HDHomeRunDeviceList *devicelist,
+                          const CaptureCard &parent);
 
     void fillSelections(const QString &current);
 
@@ -968,15 +944,16 @@ class HDHomeRunDeviceIDList : public TransComboBoxSetting
 
   private:
     HDHomeRunDeviceID   *_deviceid;
-    TransLabelSetting   *_desc;
+    StandardSetting     *_desc;
     HDHomeRunIP         *_cardip;
     HDHomeRunTunerIndex *_cardtuner;
     HDHomeRunDeviceList *_devicelist;
+    const CaptureCard &m_parent;
 
     QString              _oldValue;
 };
 
-class HDHomeRunDeviceID : public LabelSetting, public CaptureCardDBStorage
+class HDHomeRunDeviceID : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -1000,7 +977,7 @@ class HDHomeRunDeviceID : public LabelSetting, public CaptureCardDBStorage
 class VBoxDeviceID;
 class VBoxTunerIndex;
 
-class VBoxIP : public TransLineEditSetting
+class VBoxIP : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -1021,7 +998,7 @@ class VBoxIP : public TransLineEditSetting
     QString _oldValue;
 };
 
-class VBoxTunerIndex : public TransLineEditSetting
+class VBoxTunerIndex : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -1042,16 +1019,17 @@ class VBoxTunerIndex : public TransLineEditSetting
     QString _oldValue;
 };
 
-class VBoxDeviceIDList : public TransComboBoxSetting
+class VBoxDeviceIDList : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
 
   public:
     VBoxDeviceIDList(VBoxDeviceID *deviceid,
-                     TransLabelSetting *desc,
+                     StandardSetting *desc,
                      VBoxIP *cardip,
                      VBoxTunerIndex *cardtuner,
-                     VBoxDeviceList *devicelist);
+                     VBoxDeviceList *devicelist,
+                     const CaptureCard &parent);
 
     void fillSelections(const QString &current);
 
@@ -1062,15 +1040,16 @@ class VBoxDeviceIDList : public TransComboBoxSetting
 
   private:
     VBoxDeviceID      *_deviceid;
-    TransLabelSetting *_desc;
+    StandardSetting *_desc;
     VBoxIP            *_cardip;
     VBoxTunerIndex    *_cardtuner;
     VBoxDeviceList    *_devicelist;
+    const CaptureCard &m_parent;
 
     QString            _oldValue;
 };
 
-class VBoxDeviceID : public LabelSetting, public CaptureCardDBStorage
+class VBoxDeviceID : public MythUITextEditSetting
 {
     Q_OBJECT
 
@@ -1090,7 +1069,7 @@ class VBoxDeviceID : public LabelSetting, public CaptureCardDBStorage
     QString _overridedeviceid;
 };
 
-class CetonSetting : public TransLineEditSetting
+class CetonSetting : public TransTextEditSetting
 {
     Q_OBJECT
 
@@ -1105,7 +1084,7 @@ class CetonSetting : public TransLineEditSetting
     void LoadValue(const QString&);
 };
 
-class CetonDeviceID : public LabelSetting, public CaptureCardDBStorage
+class CetonDeviceID : public MythUITextEditSetting
 {
     Q_OBJECT
 

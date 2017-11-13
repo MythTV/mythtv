@@ -142,6 +142,123 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::ProgramList* Dvr::GetOldRecordedList( bool             bDescending,
+                                           int              nStartIndex,
+                                           int              nCount,
+                                           const QDateTime &sStartTime,
+                                           const QDateTime &sEndTime,
+                                           const QString   &sTitle,
+                                           const QString   &sSeriesId,
+                                           int              nRecordId,
+                                           const QString   &sSort)
+{
+    if (!sStartTime.isNull() && !sStartTime.isValid())
+        throw QString("StartTime is invalid");
+
+    if (!sEndTime.isNull() && !sEndTime.isValid())
+        throw QString("EndTime is invalid");
+
+    QDateTime dtStartTime = sStartTime;
+    QDateTime dtEndTime   = sEndTime;
+
+    if (!sEndTime.isNull() && dtEndTime < dtStartTime)
+        throw QString("EndTime is before StartTime");
+
+    // ----------------------------------------------------------------------
+    // Build SQL statement for Program Listing
+    // ----------------------------------------------------------------------
+
+    ProgramList  progList;
+    MSqlBindings bindings;
+    QString      sSQL;
+
+    if (!dtStartTime.isNull())
+    {
+        sSQL += " AND endtime >= :StartDate ";
+        bindings[":StartDate"] = dtStartTime;
+    }
+
+    if (!dtEndTime.isNull())
+    {
+        sSQL += " AND starttime <= :EndDate ";
+        bindings[":EndDate"] = dtEndTime;
+    }
+
+    QStringList clause;
+
+    if (nRecordId > 0)
+    {
+        clause << "recordid = :RecordId";
+        bindings[":RecordId"] = nRecordId;
+    }
+
+    if (!sTitle.isEmpty())
+    {
+        clause << "title = :Title";
+        bindings[":Title"] = sTitle;
+    }
+
+    if (!sSeriesId.isEmpty())
+    {
+        clause << "seriesid = :SeriesId";
+        bindings[":SeriesId"] = sSeriesId;
+    }
+
+    if (!clause.isEmpty())
+    {
+        sSQL += QString(" AND (%1) ").arg(clause.join(" OR "));
+    }
+
+    if (sSort == "starttime")
+        sSQL += "ORDER BY starttime ";
+    else if (sSort == "title")
+        sSQL += "ORDER BY title ";
+    else
+        sSQL += "ORDER BY starttime ";
+
+    if (bDescending)
+        sSQL += "DESC ";
+    else
+        sSQL += "ASC ";
+
+    uint nTotalAvailable = (nStartIndex == 0) ? 1 : 0;
+    LoadFromOldRecorded( progList, sSQL, bindings,
+                         (uint)nStartIndex, (uint)nCount, nTotalAvailable );
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    DTC::ProgramList *pPrograms = new DTC::ProgramList();
+
+    nCount        = (int)progList.size();
+    int nEndIndex = (int)progList.size();
+
+    for( int n = 0; n < nEndIndex; n++)
+    {
+        ProgramInfo *pInfo = progList[ n ];
+
+        DTC::Program *pProgram = pPrograms->AddNewProgram();
+
+        FillProgramInfo( pProgram, pInfo, true );
+    }
+
+    // ----------------------------------------------------------------------
+
+    pPrograms->setStartIndex    ( nStartIndex     );
+    pPrograms->setCount         ( nCount          );
+    pPrograms->setTotalAvailable( nTotalAvailable );
+    pPrograms->setAsOf          ( MythDate::current() );
+    pPrograms->setVersion       ( MYTH_BINARY_VERSION );
+    pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pPrograms;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::Program* Dvr::GetRecorded(int RecordedId,
                                int chanid, const QDateTime &recstarttsRaw)
 {
@@ -244,7 +361,7 @@ bool Dvr::UnDeleteRecording(int RecordedId,
 bool Dvr::StopRecording(int RecordedId)
 {
     if (RecordedId <= 0)
-        throw QString("Recorded ID is invalid.");
+        throw QString("RecordedId param is invalid.");
 
     RecordingInfo ri = RecordingInfo(RecordedId);
 
@@ -259,7 +376,7 @@ bool Dvr::StopRecording(int RecordedId)
         return true;
     }
     else
-        throw QString("RecordID %1 not found").arg(RecordedId);
+        throw QString("RecordedId %1 not found").arg(RecordedId);
 
     return false;
 }
@@ -271,7 +388,7 @@ bool Dvr::StopRecording(int RecordedId)
 bool Dvr::ReactivateRecording(int RecordedId)
 {
     if (RecordedId <= 0)
-        throw QString("Recorded ID is invalid.");
+        throw QString("RecordedId param is invalid.");
 
     RecordingInfo ri = RecordingInfo(RecordedId);
 
@@ -744,7 +861,7 @@ DTC::TitleInfoList* Dvr::GetTitleInfoList()
         "SELECT title, inetref, count(title) as count "
         "    FROM recorded AS r "
         "    JOIN recgroups AS g ON r.recgroupid = g.recgroupid "
-        "    WHERE g.recgroup != 'LiveTV' "
+        "    WHERE g.recgroup NOT IN ('Deleted', 'LiveTV') "
         "    AND r.deletepending = 0 "
         "    GROUP BY title, inetref "
         "    ORDER BY title");
@@ -806,6 +923,7 @@ DTC::ProgramList* Dvr::GetUpcomingList( int  nStartIndex,
 
         if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&
                            ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Recorded) ||
                           ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
             ((*it)->GetRecordingEndTime() > MythDate::current()))
         {

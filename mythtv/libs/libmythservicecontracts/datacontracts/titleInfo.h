@@ -32,43 +32,27 @@ class SERVICE_PUBLIC TitleInfo : public QObject
 
     PROPERTYIMP    ( QString    , Title            )
     PROPERTYIMP    ( QString    , Inetref          )
-    PROPERTYIMP    ( int        , Count            )
+    PROPERTYIMP    ( int        , Count            );
 
     public:
-
-        static inline void InitializeCustomTypes();
 
         TitleInfo(QObject *parent = 0) 
             : QObject            ( parent ),
               m_Count(0)
         { 
         }
-        
-        TitleInfo( const TitleInfo &src )
+
+        void Copy( const TitleInfo *src )
         {
-            Copy( src );
+            m_Title             = src->m_Title             ;
+            m_Inetref           = src->m_Inetref           ;
+            m_Count             = src->m_Count             ;
         }
 
-        void Copy( const TitleInfo &src )
-        {
-            m_Title             = src.m_Title             ;
-            m_Inetref           = src.m_Inetref           ;
-            m_Count             = src.m_Count             ;
-        }
+    private:
+        Q_DISABLE_COPY(TitleInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::TitleInfo  )
-Q_DECLARE_METATYPE( DTC::TitleInfo* )
-
-namespace DTC
-{
-inline void TitleInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< TitleInfo   >();
-    qRegisterMetaType< TitleInfo*  >();
-}
-}
 
 #endif

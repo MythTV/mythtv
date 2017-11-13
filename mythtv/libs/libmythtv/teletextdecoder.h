@@ -8,7 +8,7 @@ class TeletextReader;
 class TeletextDecoder
 {
   public:
-    TeletextDecoder(TeletextReader *reader)
+    explicit TeletextDecoder(TeletextReader *reader)
       : m_teletext_reader(reader), m_decodertype(-1) {}
     virtual ~TeletextDecoder() {}
 

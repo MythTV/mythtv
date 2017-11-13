@@ -61,7 +61,7 @@ typedef QMap<QString,VBoxChannelInfo> vbox_chan_map_t;
 
 class VBoxChannelFetcher : public QRunnable
 {
-    Q_DECLARE_TR_FUNCTIONS(VBoxChannelFetcher)
+    Q_DECLARE_TR_FUNCTIONS(VBoxChannelFetcher);
 
   public:
     VBoxChannelFetcher(uint cardid, const QString &inputname, uint sourceid,

@@ -199,7 +199,7 @@ public:
 protected:
     void         SetDirectory(int);
     void         LoadDirThumbs(ImageItem &, int limit, int level = 0);
-    void         PopulateThumbs(ImageItem &, int limit,
+    void         PopulateThumbs(ImageItem &, int thumbsNeeded,
                                 const ImageList &files, const ImageList &dirs,
                                 int level = 0);
     ImageIdList  GetChildren() const  { return m_sequence.mid(1); }

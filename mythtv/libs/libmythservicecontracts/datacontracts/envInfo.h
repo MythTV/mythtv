@@ -35,11 +35,7 @@ class SERVICE_PUBLIC EnvInfo : public QObject
     PROPERTYIMP( QString, LCALL       )
     PROPERTYIMP( QString, LCCTYPE     )
     PROPERTYIMP( QString, HOME        )
-    PROPERTYIMP( QString, MYTHCONFDIR )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP( QString, MYTHCONFDIR );
 
     public:
 
@@ -53,35 +49,21 @@ class SERVICE_PUBLIC EnvInfo : public QObject
         {
         }
 
-        EnvInfo( const EnvInfo &src )
+        void Copy( const EnvInfo *src )
         {
-            Copy( src );
+            m_LANG        = src->m_LANG;
+            m_LCALL       = src->m_LCALL;
+            m_LCCTYPE     = src->m_LCCTYPE;
+            m_HOME        = src->m_HOME;
+            m_MYTHCONFDIR = src->m_MYTHCONFDIR;
         }
 
-        void Copy( const EnvInfo &src )
-        {
-            m_LANG        = src.m_LANG;
-            m_LCALL       = src.m_LCALL;
-            m_LCCTYPE     = src.m_LCCTYPE;
-            m_HOME        = src.m_HOME;
-            m_MYTHCONFDIR = src.m_MYTHCONFDIR;
-        }
+    private:
+        Q_DISABLE_COPY(EnvInfo);
 };
 
 typedef EnvInfo* EnvInfoPtr;
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::EnvInfo  )
-Q_DECLARE_METATYPE( DTC::EnvInfo* )
-
-namespace DTC
-{
-inline void EnvInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< EnvInfo  >();
-    qRegisterMetaType< EnvInfo* >();
-}
-}
 
 #endif

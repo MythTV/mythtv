@@ -1009,7 +1009,8 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid)
         if (!DoesFileExist(pginfo))
         {
             LOG(VB_GENERAL, LOG_ERR,
-                "Unable to find file in defined storage paths.");
+                QString("Unable to find file in defined storage "
+                        "paths for JobQueue ID# %1.").arg(jobid));
             return GENERIC_EXIT_PERMISSIONS_ERROR;
         }
     }

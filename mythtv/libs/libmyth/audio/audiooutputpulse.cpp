@@ -664,13 +664,13 @@ void AudioOutputPulseAudio::StreamStateCallback(pa_stream *s, void *arg)
     }
 }
 
-void AudioOutputPulseAudio::WriteCallback(pa_stream *s, size_t size, void *arg)
+void AudioOutputPulseAudio::WriteCallback(pa_stream */*s*/, size_t /*size*/, void *arg)
 {
     AudioOutputPulseAudio *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
     pa_threaded_mainloop_signal(audoutP->mainloop, 0);
 }
 
-void AudioOutputPulseAudio::BufferFlowCallback(pa_stream *s, void *tag)
+void AudioOutputPulseAudio::BufferFlowCallback(pa_stream */*s*/, void *tag)
 {
     VBERROR(QString("stream buffer %1 flow").arg((char*)tag));
 }
@@ -689,7 +689,7 @@ void AudioOutputPulseAudio::OpCompletionCallback(
 }
 
 void AudioOutputPulseAudio::ServerInfoCallback(
-    pa_context *context, const pa_server_info *inf, void *arg)
+    pa_context */*context*/, const pa_server_info *inf, void */*arg*/)
 {
     QString fn_log_tag = "ServerInfoCallback, ";
 
@@ -701,7 +701,7 @@ void AudioOutputPulseAudio::ServerInfoCallback(
 }
 
 void AudioOutputPulseAudio::SinkInfoCallback(
-    pa_context *c, const pa_sink_info *info, int eol, void *arg)
+    pa_context */*c*/, const pa_sink_info *info, int /*eol*/, void *arg)
 {
     AudioOutputPulseAudio *audoutP = static_cast<AudioOutputPulseAudio*>(arg);
 

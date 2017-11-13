@@ -208,7 +208,7 @@ class MUI_PUBLIC MythUIWebBrowser : public MythUIType
     bool IsOnTopScreen(void);
 
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRegion);
+                          int alphaMod, QRect clipRect);
 
     virtual bool ParseElement(
         const QString &filename, QDomElement &element, bool showWarnings);

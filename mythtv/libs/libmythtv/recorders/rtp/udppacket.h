@@ -25,6 +25,13 @@ class UDPPacket
     UDPPacket(void) : m_key(0ULL) { }
     virtual ~UDPPacket() {}
 
+    UDPPacket& operator=(const UDPPacket &rhs)
+    {
+        m_key = rhs.m_key;
+        m_data = rhs.m_data;
+        return *this;
+    }
+
     /// IsValid() must return true before any data access methods are called,
     /// other than GetDataReference() and GetData()
     virtual bool IsValid(void) const { return true; }

@@ -21,6 +21,9 @@ class MythContextSlotHandler : public QObject
   private slots:
     void VersionMismatchPopupClosed(void);
 
+  public slots:
+    void OnCloseDialog(void);
+
   private:
     ~MythContextSlotHandler() {}
 

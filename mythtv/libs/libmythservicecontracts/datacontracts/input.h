@@ -46,11 +46,7 @@ class SERVICE_PUBLIC Input : public QObject
     PROPERTYIMP    ( bool       , QuickTune      )
     PROPERTYIMP    ( uint       , RecPriority    )
     PROPERTYIMP    ( uint       , ScheduleOrder  )
-    PROPERTYIMP    ( uint       , LiveTVOrder    )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP    ( uint       , LiveTVOrder    );
 
     public:
 
@@ -66,38 +62,24 @@ class SERVICE_PUBLIC Input : public QObject
         {
         }
 
-        Input( const Input &src )
+        void Copy( const Input *src )
         {
-            Copy( src );
+            m_Id            = src->m_Id;
+            m_CardId        = src->m_CardId;
+            m_SourceId      = src->m_SourceId;
+            m_InputName     = src->m_InputName;
+            m_DisplayName   = src->m_DisplayName;
+//            m_StartChan     = src->m_StartChan;
+            m_QuickTune     = src->m_QuickTune;
+            m_RecPriority   = src->m_RecPriority;
+            m_ScheduleOrder = src->m_ScheduleOrder;
+            m_LiveTVOrder   = src->m_LiveTVOrder;
         }
 
-        void Copy( const Input &src )
-        {
-            m_Id            = src.m_Id;
-            m_CardId        = src.m_CardId;
-            m_SourceId      = src.m_SourceId;
-            m_InputName     = src.m_InputName;
-            m_DisplayName   = src.m_DisplayName;
-//            m_StartChan     = src.m_StartChan;
-            m_QuickTune     = src.m_QuickTune;
-            m_RecPriority   = src.m_RecPriority;
-            m_ScheduleOrder = src.m_ScheduleOrder;
-            m_LiveTVOrder   = src.m_LiveTVOrder;
-        }
+    private:
+        Q_DISABLE_COPY(Input);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::Input  )
-Q_DECLARE_METATYPE( DTC::Input* )
-
-namespace DTC
-{
-inline void Input::InitializeCustomTypes()
-{
-    qRegisterMetaType< Input  >();
-    qRegisterMetaType< Input* >();
-}
-}
 
 #endif

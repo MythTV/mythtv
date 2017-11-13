@@ -10,6 +10,9 @@ SOURCES += hdhomerun_channels.c  hdhomerun_channelscan.c  hdhomerun_control.c
 SOURCES += hdhomerun_debug.c     hdhomerun_device.c       hdhomerun_device_selector.c
 SOURCES += hdhomerun_discover.c  hdhomerun_pkt.c          hdhomerun_video.c
 
+QMAKE_CFLAGS += "-Wno-unused-parameter"
+QMAKE_CXXFLAGS += "-Wno-unused-parameter"
+
 unix {
 
     HEADERS += hdhomerun_os_posix.h

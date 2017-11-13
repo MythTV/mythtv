@@ -273,8 +273,8 @@ private:
  * \class TV
  *
  * \brief Control TV playback
- * \qmlsignal TVPlaybackAborted(void)
  *
+ * \qmlsignal TVPlaybackAborted(void)
  * TV playback failed to start (typically, TV playback was started when another playback is currently going)
  * \qmlsignal TVPlaybackStarted(void)
  * TV playback has started, video is now playing
@@ -424,8 +424,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool StartEmbedding(const QRect&);
     void StopEmbedding(void);
     bool IsTunable(const PlayerContext*, uint chanid);
-    QSet<uint> IsTunableOn(const PlayerContext*, uint chanid);
-    static QSet<uint> IsTunableOn(TV *tv, const PlayerContext*, uint chanid);
+    static QSet<uint> IsTunableOn(const PlayerContext*, uint chanid);
     void ChangeChannel(const PlayerContext*, const ChannelInfoList &options);
     void DrawUnusedRects(void);
     void DoEditSchedule(int editType = kScheduleProgramGuide);
@@ -488,7 +487,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     bool StartRecorder(PlayerContext *ctx, int maxWait=-1);
     void StopStuff(PlayerContext *mctx, PlayerContext *ctx,
-                   bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
+                   bool stopRingBuffer, bool stopPlayer, bool stopRecorder);
     void TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx);
 
 
@@ -743,7 +742,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool HandleOSDVideoExit(PlayerContext *ctx, QString action);
 
     // Menu dialog
-    void ShowOSDMenu(const PlayerContext*, bool isCompact = false);
+    void ShowOSDMenu(bool isCompact = false);
 
     void FillOSDMenuJumpRec  (PlayerContext* ctx, const QString &category = "",
                               int level = 0, const QString &selected = "");

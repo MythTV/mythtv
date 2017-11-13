@@ -21,7 +21,7 @@ struct AVFrame;
 
 class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 {
-    Q_DECLARE_TR_FUNCTIONS(AudioOutput)
+    Q_DECLARE_TR_FUNCTIONS(AudioOutput);
 
  public:
     class AudioDeviceConfig
@@ -86,32 +86,41 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     virtual void Reset(void) = 0;
 
-    virtual bool AddFrames(void *buffer, int frames, int64_t timecode) = 0;
         /**
-         * AddData:
+         * Add frames to the audiobuffer for playback
+         *
+         * \param[in] buffer pointer to audio data
+         * \param[in] frames number of frames added.
+         * \param[in] timecode timecode of the first sample added (in msec)
+         *
+         * \return false if there wasn't enough space in audio buffer to
+         *     process all the data
+         */
+    virtual bool AddFrames(void *buffer, int frames, int64_t timecode) = 0;
+
+        /**
          * Add data to the audiobuffer for playback
          *
-         * in:
-         *     buffer  : pointer to audio data
-         *     len     : length of audio data added
-         *     timecode: timecode of the first sample added
-         *     frames  : number of frames added.
-         * out:
-         *     return false if there wasn't enough space in audio buffer to
+         * \param[in] buffer pointer to audio data
+         * \param[in] len length of audio data added
+         * \param[in] timecode timecode of the first sample added (in msec)
+         * \param[in] frames number of frames added.
+         *
+         * \return false if there wasn't enough space in audio buffer to
          *     process all the data
          */
     virtual bool AddData(void *buffer, int len,
                          int64_t timecode, int frames) = 0;
+
         /**
-         * NeedDecodingBeforePassthrough:
-         * returns true if AudioOutput class can determine the length in
+         * \return true if AudioOutput class can determine the length in
          * millisecond of native audio frames bitstreamed passed to AddData.
          * If false, LengthLastData method must be implemented
          */
     virtual bool NeedDecodingBeforePassthrough(void) const { return true; };
+
         /**
-         * LengthLastData:
-         * returns the length of the last data added in millisecond.
+         * \return the length of the last data added in millisecond.
          * This function must be implemented if NeedDecodingBeforePassthrough
          * returned false
          */
@@ -147,22 +156,21 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     virtual bool ToggleUpmix(void)  { return false; }
     virtual bool CanUpmix(void)     { return false; }
     bool PulseStatus(void) { return pulsewassuspended; }
+
     /**
-     * CanProcess
-     * argument: AudioFormat
+     * \param fmt The audio format in question.
      * return true if class can handle AudioFormat
      * All AudioOutput derivative must be able to handle S16
      */
     virtual bool CanProcess(AudioFormat fmt) { return fmt == FORMAT_S16; }
+
     /**
-     * CanProcess
-     * return bitmask of all AudioFormat handled
+     * \return bitmask of all AudioFormat handled
      * All AudioOutput derivative must be able to handle S16
      */
     virtual uint32_t CanProcess(void) { return 1 << FORMAT_S16; }
 
     /**
-     * DecodeAudio
      * Utility routine.
      * Decode an audio packet, and compact it if data is planar
      * Return negative error code if an error occurred during decoding
@@ -170,6 +178,11 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
      * data_size contains the size of decoded data copied into buffer
      * data decoded will be S16 samples if class instance can't handle HD audio
      * or S16 and above otherwise. No U8 PCM format can be returned
+     *
+     * \param[in] ctx The current audio context information.
+     * \param[in] buffer Destination for the copy
+     * \param[out] data_size The number of bytes copied.
+     * \param[in] pkt The source data packet
      */
     virtual int DecodeAudio(AVCodecContext *ctx,
                     uint8_t *buffer, int &data_size,

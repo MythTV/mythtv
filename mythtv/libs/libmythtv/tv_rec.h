@@ -104,7 +104,7 @@ class FireWireDBOptions
 class TuningRequest
 {
   public:
-    TuningRequest(uint f) :
+    explicit TuningRequest(uint f) :
         flags(f), program(NULL), channel(QString::null),
         input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
     TuningRequest(uint f, RecordingInfo *p) :
@@ -153,7 +153,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     friend class TVRecRecordThread;
 
   public:
-    TVRec(int _inputid);
+    explicit TVRec(int _inputid);
    ~TVRec(void);
 
     bool Init(void);
@@ -206,7 +206,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     QString     GetInput(void) const;
     uint        GetSourceID(void) const;
-    QString     SetInput(QString input, uint requestType = kFlagDetect);
+    QString     SetInput(QString input);
 
     /// Changes to a channel in the 'dir' channel change direction.
     void ChangeChannel(ChannelChangeDirection dir)
@@ -214,7 +214,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void SetChannel(QString name, uint requestType = kFlagDetect);
     bool QueueEITChannelChange(const QString &name);
 
-    int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
+    int SetSignalMonitoringRate(int rate, int notifyFrontend = 1);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);
@@ -281,7 +281,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     V4LChannel *GetV4LChannel(void);
 
     bool SetupSignalMonitor(
-        bool enable_table_monitoring, bool EITscan, bool notify);
+        bool tablemon, bool EITscan, bool notify);
     bool SetupDTVSignalMonitor(bool EITscan);
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);
@@ -315,7 +315,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     bool WaitForNextLiveTVDir(void);
     bool GetProgramRingBufferForLiveTV(RecordingInfo **pginfo, RingBuffer **rb,
-                                       const QString &channum, int inputID);
+                                       const QString &channum);
     bool CreateLiveTVRingBuffer(const QString & channum);
     bool SwitchLiveTVRingBuffer(const QString & channum,
                                 bool discont, bool set_rec);

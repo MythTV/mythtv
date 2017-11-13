@@ -211,6 +211,7 @@ bool DTVMultiplex::ParseDVB_T(
         ok = true;
     }
 
+    ok &= mod_sys.Parse("DVB-T");
     ok &= bandwidth.Parse(_bandwidth);
     ok &= hp_code_rate.Parse(_coderate_hp);
     ok &= lp_code_rate.Parse(_coderate_lp);
@@ -309,10 +310,23 @@ bool DTVMultiplex::ParseDVB_T2(
                          _coderate_hp, _coderate_lp, _modulation,
                          _trans_mode, _guard_interval, _hierarchy);
 
-    if (!mod_sys.Parse(_mod_sys))
+    QString l_mod_sys = _mod_sys;
+    if (_mod_sys == "1")
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid T2 modulation system " +
-                QString("parameter '%1', aborting.").arg(_mod_sys));
+                QString("parameter '%1', using DVB-T2.").arg(_mod_sys));
+        l_mod_sys = "DVB-T";
+    }
+    else if (_mod_sys == "0")
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid T2 modulation system " +
+                QString("parameter '%1', using DVB-T.").arg(_mod_sys));
+        l_mod_sys = "DVB-T";
+    }
+    if (!mod_sys.Parse(l_mod_sys))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "Invalid T2 modulation system " +
+                QString("parameter '%1', aborting.").arg(l_mod_sys));
         return false;
     }
 
@@ -323,7 +337,7 @@ bool DTVMultiplex::ParseDVB_T2(
         (DTVModulationSystem::kModulationSystem_DVBT2 != mod_sys))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported T2 modulation system " +
-            QString("parameter '%1', aborting.").arg(_mod_sys));
+            QString("parameter '%1', aborting.").arg(l_mod_sys));
         return false;
     }
 

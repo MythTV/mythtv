@@ -77,7 +77,7 @@ typedef QString UrlList[STREAMURLCOUNT];
 
 class META_PUBLIC MusicMetadata
 {
-    Q_DECLARE_TR_FUNCTIONS(MusicMetadata)
+    Q_DECLARE_TR_FUNCTIONS(MusicMetadata);
 
   public:
 
@@ -381,7 +381,7 @@ Q_DECLARE_METATYPE(MusicMetadata)
 
 typedef QList<MusicMetadata*> MetadataPtrList;
 Q_DECLARE_METATYPE(MetadataPtrList *)
-Q_DECLARE_METATYPE(ImageType)
+Q_DECLARE_METATYPE(ImageType);
 
 //---------------------------------------------------------------------------
 
@@ -402,7 +402,7 @@ class META_PUBLIC MetadataLoadingThread : public MThread
 
 class META_PUBLIC AllMusic
 {
-    Q_DECLARE_TR_FUNCTIONS(AllMusic)
+    Q_DECLARE_TR_FUNCTIONS(AllMusic);
 
   public:
 
@@ -449,7 +449,6 @@ class META_PUBLIC AllMusic
 
     MetadataLoadingThread   *m_metadata_loader;
     bool                     m_done_loading;
-    int                      m_last_listed;
 
     int                      m_playcountMin;
     int                      m_playcountMax;
@@ -505,7 +504,7 @@ class AlbumArtScannerThread: public MThread
 
 class META_PUBLIC AlbumArtImages
 {
-    Q_DECLARE_TR_FUNCTIONS(AlbumArtImages)
+    Q_DECLARE_TR_FUNCTIONS(AlbumArtImages);
 
   public:
     AlbumArtImages(MusicMetadata *metadata, bool loadFromDB = true);

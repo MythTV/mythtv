@@ -1,7 +1,7 @@
 #ifndef MYTHVERSION_H_
 #define MYTHVERSION_H_
 
-#include "qglobal.h"
+#include <qglobal.h>
 #include "mythbaseexp.h"
 #include "version.h"
 
@@ -12,7 +12,7 @@
 /// Update this whenever the plug-in ABI changes.
 /// Including changes in the libmythbase, libmyth, libmythtv, libmythav* and
 /// libmythui class methods in exported headers.
-#define MYTH_BINARY_VERSION "29.20170212-1"
+#define MYTH_BINARY_VERSION "30.20171015-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *   Note that the token currently cannot contain spaces.
@@ -64,7 +64,7 @@
  *      mythtv/bindings/php/MythBackend.php
  */
 
-#define MYTH_DATABASE_VERSION "1346"
+#define MYTH_DATABASE_VERSION "1348"
 
 
  MBASE_PUBLIC  const char *GetMythSourceVersion();

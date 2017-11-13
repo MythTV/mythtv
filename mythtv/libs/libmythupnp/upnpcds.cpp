@@ -964,9 +964,9 @@ QString UPnpCDSExtension::RemoveToken( const QString &sToken,
  *  \return true if we could load the metadata
  *
  */
-bool UPnpCDSExtension::LoadMetadata(const UPnpCDSRequest* pRequest,
-                                     UPnpCDSExtensionResults* pResults,
-                                     IDTokenMap tokens, QString currentToken)
+bool UPnpCDSExtension::LoadMetadata(const UPnpCDSRequest* /*pRequest*/,
+                                     UPnpCDSExtensionResults* /*pResults*/,
+                                     IDTokenMap /*tokens*/, QString /*currentToken*/)
 {
     return false;
 }
@@ -985,9 +985,9 @@ bool UPnpCDSExtension::LoadMetadata(const UPnpCDSRequest* pRequest,
  *  \return true if we could load the children
  *
  */
-bool UPnpCDSExtension::LoadChildren(const UPnpCDSRequest* pRequest,
-                                    UPnpCDSExtensionResults* pResults,
-                                    IDTokenMap tokens, QString currentToken)
+bool UPnpCDSExtension::LoadChildren(const UPnpCDSRequest* /*pRequest*/,
+                                    UPnpCDSExtensionResults* /*pResults*/,
+                                    IDTokenMap /*tokens*/, QString /*currentToken*/)
 {
     return false;
 }

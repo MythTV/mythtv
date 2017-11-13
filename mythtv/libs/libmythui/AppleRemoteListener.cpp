@@ -60,10 +60,9 @@ void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
             break;
     }
     QKeySequence a(code);
-    int keycode = 0;
     for (unsigned int i = 0; i < a.count(); i++)
     {
-        keycode = a[i];
+        int keycode = a[i];
 
         if (pressedDown)
             QCoreApplication::postEvent(mainWindow, new LircKeycodeEvent(

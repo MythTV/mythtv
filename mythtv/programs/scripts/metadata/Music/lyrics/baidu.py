@@ -2,7 +2,7 @@
 """
 Scraper for http://www.baidu.com
 
-taxigps
+ronie
 """
 
 import sys
@@ -14,11 +14,11 @@ import difflib
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and 'taxigps'"
+__author__      = "Paul Harrison and 'ronie'"
 __title__       = "Baidu"
 __description__ = "Search http://www.baidu.com for lyrics"
 __version__     = "0.1"
-__priority__    = "120"
+__priority__    = "210"
 __syncronized__ = True
 
 debug = False
@@ -27,28 +27,27 @@ socket.setdefaulttimeout(10)
 
 class LyricsFetcher:
     def __init__( self ):
-        self.BASE_URL = 'http://box.zhangmen.baidu.com/x?op=12&count=1&title=%s$$%s$$$$'
-        self.LRC_URL = 'http://box.zhangmen.baidu.com/bdlrc/%d/%d.lrc'
+        self.BASE_URL = 'http://music.baidu.com/search/lrc?key=%s-%s'
+        self.LRC_URL = 'http://music.baidu.com%s'
 
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
         try:
-            url = self.BASE_URL % (urllib.quote(lyrics.title), urllib.quote((lyrics.artist)))
-            xml_str = urllib.urlopen(url).read()
-            lrcid_pattern = re.compile(r'<lrcid>(.+?)</lrcid>')
-            lrcid = int(re.search(lrcid_pattern, xml_str).group(1))
-            if lrcid == 0:
+            url = self.BASE_URL % (lyrics.title, lyrics.artist)
+            utilities.log(debug, "%s: searching url %s" % (__title__, url))
+            data = urllib.urlopen(url).read()
+            songmatch = re.search('song-title.*?<em>(.*?)</em>', data, flags=re.DOTALL)
+            track = songmatch.group(1)
+            artistmatch = re.search('artist-title.*?<em>(.*?)</em>', data, flags=re.DOTALL)
+            name = artistmatch.group(1)
+            urlmatch = re.search("down-lrc-btn.*?':'(.*?)'", data, flags=re.DOTALL)
+            found_url = urlmatch.group(1)
+            if (difflib.SequenceMatcher(None, lyrics.artist.lower(), name.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, lyrics.title.lower(), track.lower()).ratio() > 0.8):
+                lyr = urllib.urlopen(self.LRC_URL % found_url).read()
+            else:
                 return False
-            lrc_url = self.LRC_URL % (lrcid/100, lrcid)
-            lyr = urllib.urlopen(lrc_url).read()
         except:
-            utilities.log(True, "%s: %s::%s (%d) [%s]" % (
-                   __title__, self.__class__.__name__,
-                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
-                   sys.exc_info()[ 2 ].tb_lineno,
-                   sys.exc_info()[ 1 ]
-                   ))
             return False
 
         enc = chardet.detect(lyr)

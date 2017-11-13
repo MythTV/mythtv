@@ -77,7 +77,7 @@ QStringList KeyBindings::GetActions(const QString &context) const
 /** \fn KeyBindings::GetKeyActions(const QString&, ActionList&) const
  *  \brief Get a list of the actions in a context.
  *  \param key The name of the context.
- *  \return A list of action (names) for the target context.
+ *  \param list A list of action (names) for the target context.
  *  \note Store this instead of calling repeatedly.  Every time you
  *        do, ActionSet has to iterate over all contexts and actions.
  */

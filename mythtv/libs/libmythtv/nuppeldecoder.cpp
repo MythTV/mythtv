@@ -639,7 +639,7 @@ void release_nuppel_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
-int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
+int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
     NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
 

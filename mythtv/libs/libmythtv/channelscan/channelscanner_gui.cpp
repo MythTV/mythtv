@@ -35,7 +35,7 @@
 using namespace std;
 
 // MythTV headers
-#include "scanwizard.h"
+#include "mythdialogbox.h"
 #include "channelscanner_gui.h"
 #include "channelscanner_gui_scan_pane.h"
 #include "channelimporter.h"
@@ -49,30 +49,9 @@ using namespace std;
 
 #define LOC QString("ChScanGUI: ")
 
-QString ChannelScannerGUI::kTitle = QString::null;
-
-// kTitle must be initialized after the Qt translation system is initialized...
-static void init_statics(void)
-{
-    static QMutex lock;
-    static bool do_init = true;
-    QMutexLocker locker(&lock);
-    if (do_init)
-    {
-        ChannelScannerGUI::kTitle = ChannelScannerGUI::tr("Scanning");
-        do_init = false;
-    }
-}
-
 ChannelScannerGUI::ChannelScannerGUI(void)
-    : StackedConfigurationGroup(false, true, false, false),
-      scanStage(NULL), doneStage(new LogList())
+    : m_scanStage(NULL)
 {
-    init_statics();
-
-    setLabel(kTitle);
-
-    addChild(doneStage);
 }
 
 ChannelScannerGUI::~ChannelScannerGUI()
@@ -89,9 +68,10 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 {
     if (scanEvent->type() == ScannerEvent::ScanComplete)
     {
-        if (scanStage)
-            scanStage->SetScanProgress(1.0);
-        raise(doneStage);
+        if (m_scanStage)
+            m_scanStage->SetScanProgress(1.0);
+
+        InformUser(tr("Scan complete"));
 
         // HACK: make channel insertion work after [21644]
         post_event(scanMonitor, ScannerEvent::ScanShutdown,
@@ -100,12 +80,6 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
     else if (scanEvent->type() == ScannerEvent::ScanShutdown ||
              scanEvent->type() == ScannerEvent::ScanErrored)
     {
-        if (scanEvent->ConfigurableValue())
-        {
-            setLabel(scanEvent->ConfigurableValue()->getLabel());
-            raise(scanEvent->ConfigurableValue());
-        }
-
         ScanDTVTransportList transports;
         if (sigmonScanner)
         {
@@ -138,29 +112,28 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
     }
     else if (scanEvent->type() ==  ScannerEvent::AppendTextToLog)
     {
-        if (scanStage)
-            scanStage->AppendLine(scanEvent->strValue());
-        doneStage->AppendLine(scanEvent->strValue());
-        messageList += scanEvent->strValue();
+        if (m_scanStage)
+            m_scanStage->AppendLine(scanEvent->strValue());
+        m_messageList += scanEvent->strValue();
     }
 
-    if (!scanStage)
+    if (!m_scanStage)
         return;
 
     if (scanEvent->type() == ScannerEvent::SetStatusText)
-        scanStage->SetStatusText(scanEvent->strValue());
+        m_scanStage->SetStatusText(scanEvent->strValue());
     else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
-        scanStage->SetStatusTitleText(scanEvent->strValue());
+        m_scanStage->SetStatusTitleText(scanEvent->strValue());
     else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
-        scanStage->SetScanProgress(scanEvent->intValue() * 0.01);
+        m_scanStage->SetScanProgress(scanEvent->intValue() * 0.01);
     else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
-        scanStage->SetStatusRotorPosition(scanEvent->intValue());
+        m_scanStage->SetStatusRotorPosition(scanEvent->intValue());
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
-        scanStage->SetStatusLock(scanEvent->intValue());
+        m_scanStage->SetStatusLock(scanEvent->intValue());
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
-        scanStage->SetStatusSignalToNoise(scanEvent->intValue());
+        m_scanStage->SetStatusSignalToNoise(scanEvent->intValue());
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalStrength)
-        scanStage->SetStatusSignalStrength(scanEvent->intValue());
+        m_scanStage->SetStatusSignalStrength(scanEvent->intValue());
 }
 
 void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports, bool success)
@@ -172,27 +145,38 @@ void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports, bool su
 
 void ChannelScannerGUI::InformUser(const QString &error)
 {
-    MythPopupBox::showOkPopup(GetMythMainWindow(),
-                              tr("ScanWizard"), error);
+    ShowOkPopup(error);
 }
 
 void ChannelScannerGUI::quitScanning(void)
 {
+    m_scanStage = NULL;
+
     if (scanMonitor)
     {
         post_event(scanMonitor, ScannerEvent::ScanShutdown,
-                   MythDialog::Rejected, doneStage);
+                   MythDialog::Rejected);
     }
 }
 
 void ChannelScannerGUI::MonitorProgress(bool lock, bool strength,
                                         bool snr,  bool rotor)
 {
-    scanStage = new ChannelScannerGUIScanPane(
-        lock, strength, snr, rotor, this,SLOT(quitScanning(void)));
-    for (uint i = 0; i < (uint) messageList.size(); i++)
-        scanStage->AppendLine(messageList[i]);
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    addChild(scanStage);
-    raise(scanStage);
+    m_scanStage = new ChannelScannerGUIScanPane(lock, strength, snr, rotor, mainStack);
+
+    if (m_scanStage->Create())
+    {
+        connect(m_scanStage, SIGNAL(Exiting()), SLOT(quitScanning()));
+
+        for (uint i = 0; i < (uint) m_messageList.size(); i++)
+            m_scanStage->AppendLine(m_messageList[i]);
+        mainStack->AddScreen(m_scanStage);
+    }
+    else
+    {
+        delete m_scanStage;
+        m_scanStage = NULL;
+    }
 }

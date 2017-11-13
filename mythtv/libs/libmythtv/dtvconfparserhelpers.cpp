@@ -464,6 +464,8 @@ const DTVParamHelperStruct DTVModulationSystem::confTable[] =
     { "SYS_DMBTH",         kModulationSystem_DMBTH         },
     { "SYS_CMMB",          kModulationSystem_CMMB          },
     { "SYS_DAB",           kModulationSystem_DAB           },
+    { "SYS_TURBO",         kModulationSystem_TURBO         },
+    { "SYS_DVBC_ANNEX_C",  kModulationSystem_DVBC_ANNEX_C  },
     { NULL,                kModulationSystem_UNDEFINED     },
 };
 
@@ -493,7 +495,9 @@ const DTVParamHelperStruct DTVModulationSystem::parseTable[] =
     { "DMBTH",     kModulationSystem_DMBTH         },
     { "CMMB",      kModulationSystem_CMMB          },
     { "DAB",       kModulationSystem_DAB           },
-    { NULL,        kModulationSystem_UNDEFINED    },
+    { "TURBO",     kModulationSystem_TURBO         },
+    { "DVBC_C",    kModulationSystem_DVBC_ANNEX_C  },
+    { NULL,        kModulationSystem_UNDEFINED     },
 };
 
 const char *DTVModulationSystem::dbStr[DTVModulationSystem::kDBStrCnt] =
@@ -515,6 +519,8 @@ const char *DTVModulationSystem::dbStr[DTVModulationSystem::kDBStrCnt] =
     "CMMB",      ///< kModulationSystem_CMMB
     "DAB",       ///< kModulationSystem_DAB
     "DVB-T2",    ///< kModulationSystem_DVBT2
+    "TURBO",     ///< kModulationSystem_TURBO
+    "DVBC-C",    ///< kModulationSystem_DVBC_ANNEX_C
 };
 
 const DTVParamHelperStruct DTVRollOff::confTable[] =

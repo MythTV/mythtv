@@ -92,6 +92,7 @@ class MTV_PUBLIC DVBStreamData : virtual public MPEGStreamData
     nit_vec_t GetCachedNIT(bool current = true) const;
     sdt_const_ptr_t GetCachedSDT(uint tsid, uint section_num,
                            bool current = true) const;
+    sdt_vec_t GetCachedSDTSections(uint tsid, bool current = true) const;
     sdt_vec_t GetCachedSDTs(bool current = true) const;
 
     void ReturnCachedSDTTables(sdt_vec_t&) const;

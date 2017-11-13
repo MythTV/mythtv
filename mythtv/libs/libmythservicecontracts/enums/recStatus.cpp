@@ -38,6 +38,12 @@ QString RecStatus::toUIState(RecStatus::Type recstatus)
 /// \brief Converts "recstatus" into a short (unreadable) string.
 QString RecStatus::toString(RecStatus::Type recstatus, uint id)
 {
+    return toString(recstatus, QString::number(id));
+}
+
+/// \brief Converts "recstatus" into a short (unreadable) string.
+QString RecStatus::toString(RecStatus::Type recstatus, const QString &name)
+{
     QString ret = "-";
     switch (recstatus)
     {
@@ -48,19 +54,19 @@ QString RecStatus::toString(RecStatus::Type recstatus, uint id)
             ret = QObject::tr("R", "RecStatusChar RecStatus::Recorded");
             break;
         case RecStatus::Recording:
-            ret = QString::number(id);
+            ret = name;
             break;
         case RecStatus::Tuning:
-            ret = QString::number(id);
+            ret = name;
             break;
         case RecStatus::Failing:
-            ret = QString::number(id);
+            ret = name;
             break;
         case RecStatus::WillRecord:
-            ret = QString::number(id);
+            ret = name;
             break;
         case RecStatus::Pending:
-            ret = QString::number(id);
+            ret = name;
             break;
         case RecStatus::DontRecord:
             ret = QObject::tr("X", "RecStatusChar RecStatus::DontRecord");

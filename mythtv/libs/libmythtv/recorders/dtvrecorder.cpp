@@ -475,7 +475,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
             else if (PESStreamID::GOPStartCode == stream_id)
             {
                 _last_gop_seen  = _frames_seen_count;
-                hasKeyFrame    |= true;
+                hasKeyFrame     = true;
             }
             else if (PESStreamID::SequenceStartCode == stream_id)
             {
@@ -785,7 +785,7 @@ bool DTVRecorder::FindAudioKeyframes(const TSPacket*)
 
 /// Non-Audio/Video data. For streams which contain no audio/video,
 /// write just 1 key-frame at the start.
-bool DTVRecorder::FindOtherKeyframes(const TSPacket *tspacket)
+bool DTVRecorder::FindOtherKeyframes(const TSPacket */*tspacket*/)
 {
     if (!ringBuffer || (GetStreamData()->VideoPIDSingleProgram() <= 0x1fff))
         return true;
@@ -848,7 +848,7 @@ void DTVRecorder::HandleKeyframe(int64_t extra)
 
 /** \fn DTVRecorder::FindH264Keyframes(const TSPacket*)
  *  \brief This searches the TS packet to identify keyframes.
- *  \param TSPacket Pointer the the TS packet data.
+ *  \param tspacket Pointer the the TS packet data.
  *  \return Returns true if a keyframe has been found.
  */
 bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
@@ -1134,7 +1134,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             { // pes_packet_length is meaningless
                 pes_packet_length = -1;
                 _last_gop_seen  = _frames_seen_count;
-                hasKeyFrame    |= true;
+                hasKeyFrame     = true;
             }
             else if (PESStreamID::SequenceStartCode == stream_id)
             { // pes_packet_length is meaningless

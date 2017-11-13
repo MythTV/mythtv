@@ -147,13 +147,8 @@ void FillProgramInfo( DTC::Program *pProgram,
             pRecording->setDupInType   ( pRecInfo.GetDuplicateCheckSource() );
             pRecording->setDupMethod   ( pRecInfo.GetDuplicateCheckMethod() );
             pRecording->setEncoderId   ( pRecInfo.GetInputID()              );
-            if (pProgram->Channel())
-            {
-                QString encoderName = CardUtil::GetDisplayName(pRecInfo.GetInputID());
-                pRecording->setEncoderName( encoderName );
-            }
-
-            pRecording->setProfile( pRecInfo.GetProgramRecordingProfile() );
+            pRecording->setEncoderName ( pRecInfo.GetInputName()            );
+            pRecording->setProfile     ( pRecInfo.GetProgramRecordingProfile() );
         }
     }
 
@@ -465,6 +460,35 @@ void FillVideoMetadataInfo (
     }
 
     FillGenreList(pVideoMetadataInfo->Genres(), pVideoMetadataInfo->Id());
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void FillMusicMetadataInfo (DTC::MusicMetadataInfo *pVideoMetadataInfo,
+                            MusicMetadata *pMetadata, bool bDetails)
+{
+    pVideoMetadataInfo->setId(pMetadata->ID());
+    pVideoMetadataInfo->setArtist(pMetadata->Artist());
+    pVideoMetadataInfo->setCompilationArtist(pMetadata->CompilationArtist());
+    pVideoMetadataInfo->setAlbum(pMetadata->Album());
+    pVideoMetadataInfo->setTitle(pMetadata->Title());
+    pVideoMetadataInfo->setTrackNo(pMetadata->Track());
+    pVideoMetadataInfo->setGenre(pMetadata->Genre());
+    pVideoMetadataInfo->setYear(pMetadata->Year());
+    pVideoMetadataInfo->setPlayCount(pMetadata->PlayCount());
+    pVideoMetadataInfo->setLength(pMetadata->Length());
+    pVideoMetadataInfo->setRating(pMetadata->Rating());
+    pVideoMetadataInfo->setFileName(pMetadata->Filename());
+    pVideoMetadataInfo->setHostName(pMetadata->Hostname());
+    pVideoMetadataInfo->setLastPlayed(pMetadata->LastPlay());
+    pVideoMetadataInfo->setCompilation(pMetadata->Compilation());
+
+    if (bDetails)
+    {
+        //TODO add coverart here
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////

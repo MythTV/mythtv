@@ -214,7 +214,7 @@ void RecorderBase::SetOption(const QString &name, int value)
 
 void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         SetOption(name, setting->getValue().toInt());
     else
@@ -224,7 +224,7 @@ void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
 
 void RecorderBase::SetStrOption(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         SetOption(name, setting->getValue());
     else
@@ -580,12 +580,13 @@ bool RecorderBase::GetKeyframeDurations(
     return true;
 }
 
-/** \fn RecorderBase::SavePositionMap(bool)
+/**
  *  \brief This saves the postition map delta to the database if force
  *         is true or there are 30 frames in the map or there are five
  *         frames in the map with less than 30 frames in the non-delta
  *         position map.
  *  \param force If true this forces a DB sync.
+ *  \param finished Is this a finished recording?
  */
 void RecorderBase::SavePositionMap(bool force, bool finished)
 {
@@ -845,8 +846,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     TVRec                  *tvrec,
     ChannelBase            *channel,
     const RecordingProfile &profile,
-    const GeneralDBOptions &genOpt,
-    const DVBDBOptions     &dvbOpt)
+    const GeneralDBOptions &genOpt)
 {
     if (!channel)
         return NULL;
@@ -867,62 +867,72 @@ RecorderBase *RecorderBase::CreateRecorder(
     else if (genOpt.inputtype == "V4L2ENC")
     {
 #ifdef USING_V4L2
-        recorder = new V4L2encRecorder(tvrec,
-                                    dynamic_cast<V4LChannel*>(channel));
+        if (dynamic_cast<V4LChannel*>(channel))
+            recorder = new V4L2encRecorder(tvrec, dynamic_cast<V4LChannel*>(channel));
 #endif
     }
     else if (genOpt.inputtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-        recorder = new FirewireRecorder(
-            tvrec, dynamic_cast<FirewireChannel*>(channel));
+        if (dynamic_cast<FirewireChannel*>(channel))
+            recorder = new FirewireRecorder(tvrec, dynamic_cast<FirewireChannel*>(channel));
 #endif // USING_FIREWIRE
     }
     else if (genOpt.inputtype == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
-        recorder = new HDHRRecorder(
-            tvrec, dynamic_cast<HDHRChannel*>(channel));
-        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        if (dynamic_cast<HDHRChannel*>(channel))
+        {
+            recorder = new HDHRRecorder(tvrec, dynamic_cast<HDHRChannel*>(channel));
+            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        }
 #endif // USING_HDHOMERUN
     }
     else if (genOpt.inputtype == "CETON")
     {
 #ifdef USING_CETON
-        recorder = new CetonRecorder(
-            tvrec, dynamic_cast<CetonChannel*>(channel));
-        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        if (dynamic_cast<CetonChannel*>(channel))
+        {
+            recorder = new CetonRecorder(tvrec, dynamic_cast<CetonChannel*>(channel));
+            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        }
 #endif // USING_CETON
     }
     else if (genOpt.inputtype == "DVB")
     {
 #ifdef USING_DVB
-        recorder = new DVBRecorder(
-            tvrec, dynamic_cast<DVBChannel*>(channel));
-        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        if (dynamic_cast<DVBChannel*>(channel))
+        {
+            recorder = new DVBRecorder(tvrec, dynamic_cast<DVBChannel*>(channel));
+            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        }
 #endif // USING_DVB
     }
     else if (genOpt.inputtype == "FREEBOX")
     {
 #ifdef USING_IPTV
-        recorder = new IPTVRecorder(
-            tvrec, dynamic_cast<IPTVChannel*>(channel));
-        recorder->SetOption("mrl", genOpt.videodev);
+        if (dynamic_cast<IPTVChannel*>(channel))
+        {
+            recorder = new IPTVRecorder(tvrec, dynamic_cast<IPTVChannel*>(channel));
+            recorder->SetOption("mrl", genOpt.videodev);
+        }
 #endif // USING_IPTV
     }
     else if (genOpt.inputtype == "VBOX")
     {
 #ifdef USING_VBOX
-        recorder = new IPTVRecorder(
-            tvrec, dynamic_cast<IPTVChannel*>(channel));
+        if (dynamic_cast<IPTVChannel*>(channel))
+            recorder = new IPTVRecorder(tvrec, dynamic_cast<IPTVChannel*>(channel));
 #endif // USING_VBOX
     }
     else if (genOpt.inputtype == "ASI")
     {
 #ifdef USING_ASI
-        recorder = new ASIRecorder(
-            tvrec, dynamic_cast<ASIChannel*>(channel));
-        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        if (dynamic_cast<ASIChannel*>(channel))
+        {
+            recorder = new ASIRecorder(tvrec, dynamic_cast<ASIChannel*>(channel));
+            recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        }
 #endif // USING_ASI
     }
     else if (genOpt.inputtype == "IMPORT")
@@ -947,8 +957,8 @@ RecorderBase *RecorderBase::CreateRecorder(
     }
     else if (genOpt.inputtype == "EXTERNAL")
     {
-        recorder = new ExternalRecorder(tvrec,
-                                dynamic_cast<ExternalChannel*>(channel));
+        if (dynamic_cast<ExternalChannel*>(channel))
+            recorder = new ExternalRecorder(tvrec, dynamic_cast<ExternalChannel*>(channel));
     }
 
     if (recorder)

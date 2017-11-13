@@ -43,6 +43,10 @@ inline void ScanStreamData::SetFreesatAdditionalSI(bool freesat_si)
 {
     QMutexLocker locker(&_listener_lock);
     dvb_uk_freesat_si = freesat_si;
+    if (freesat_si)
+        AddListeningPID(FREESAT_SI_PID);
+    else
+        RemoveListeningPID(FREESAT_SI_PID);
 }
 
 #endif // SCANSTREAMDATA_H_

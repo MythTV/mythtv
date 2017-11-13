@@ -49,14 +49,8 @@ class SERVICE_PUBLIC VideoServices : public Service  //, public QScriptable ???
 
     public:
 
-        // Must call InitializeCustomTypes for each unique Custom Type used
-        // in public slots below.
-
         VideoServices( QObject *parent = 0 ) : Service( parent )
         {
-            DTC::VideoMetadataInfoList::InitializeCustomTypes();
-            DTC::VideoLookupList::InitializeCustomTypes();
-            DTC::BlurayInfo::InitializeCustomTypes();
         }
 
     public slots:

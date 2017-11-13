@@ -70,7 +70,7 @@ class MBASE_PUBLIC ServerPool : public QObject
     static QList<QHostAddress> DefaultListenIPv6(void);
     static QList<QHostAddress> DefaultBroadcast(void);
     static QList<QHostAddress> DefaultBroadcastIPv4(void);
-//    static QList<QHostAddress> DefaultBroadcastIPv6(void);
+    static QList<QHostAddress> DefaultBroadcastIPv6(void);
 
     bool listen(QList<QHostAddress> addrs, quint16 port, bool requireall=true,
                 PoolServerType type = kTCPServer);

@@ -208,7 +208,8 @@ QByteArray gzipCompress(const QByteArray& data)
         switch (ret)
         {
             case Z_NEED_DICT:
-                ret = Z_DATA_ERROR;     // and fall through
+                ret = Z_DATA_ERROR;
+                [[ clang::fallthrough ]];
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 (void)deflateEnd(&strm);
@@ -261,7 +262,8 @@ QByteArray gzipUncompress(const QByteArray &data)
         switch (ret)
         {
             case Z_NEED_DICT:
-                ret = Z_DATA_ERROR;     // and fall through
+                ret = Z_DATA_ERROR;
+                [[ clang::fallthrough ]];
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 (void) deflateEnd(&strm);

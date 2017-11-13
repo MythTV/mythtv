@@ -67,6 +67,7 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     area.translate(xoffset, yoffset);
 
+    p->SetClipRect(clipRect);
     if (m_type == "box")
         p->DrawRect(area, m_fillBrush, m_linePen, alpha);
     else if (m_type == "roundbox")

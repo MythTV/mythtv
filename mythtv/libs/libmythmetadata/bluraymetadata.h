@@ -16,7 +16,7 @@ typedef QList< QPair < uint,QString > > BlurayTitles;
 struct meta_dl;
 class META_PUBLIC BlurayMetadata : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(BlurayMetadata)
+    Q_DECLARE_TR_FUNCTIONS(BlurayMetadata);
 
   public:
     explicit BlurayMetadata(const QString &path);

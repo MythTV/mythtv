@@ -20,31 +20,25 @@
 #include "panedvbutilsimport.h"
 #include "paneexistingscanimport.h"
 
-ScanWizardConfig::ScanWizardConfig(
-    ScanWizard *_parent,
+void ScanWizard::SetupConfig(
     uint    default_sourceid,  uint default_cardid,
-    QString default_inputname) :
-    VerticalConfigurationGroup(false, true, false, false),
-    videoSource(new VideoSourceSelector(
-                    default_sourceid, CardUtil::GetScanableInputTypes(), false)),
-    input(new InputSelector(default_cardid, default_inputname)),
-    scanType(new ScanTypeSetting()),
-    scanConfig(new ScanOptionalConfig(scanType)),
-    services(new DesiredServices()),
-    ftaOnly(new FreeToAirOnly()),
-    trustEncSI(new TrustEncSISetting())
+    QString default_inputname)
 {
-    setLabel(tr("Scan Configuration"));
+    videoSource = new VideoSourceSelector(
+                    default_sourceid, CardUtil::GetScanableInputTypes(), false);
+    input = new InputSelector(default_cardid, default_inputname);
+    scanType = new ScanTypeSetting(),
+    scanConfig = new ScanOptionalConfig(scanType);
+    services = new DesiredServices();
+    ftaOnly = new FreeToAirOnly();
+    trustEncSI = new TrustEncSISetting();
 
-    ConfigurationGroup *cfg =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    cfg->addChild(services);
-    cfg->addChild(ftaOnly);
-    cfg->addChild(trustEncSI);
+    addChild(services);
+    addChild(ftaOnly);
+    addChild(trustEncSI);
 
     addChild(videoSource);
     addChild(input);
-    addChild(cfg);
     addChild(scanType);
     addChild(scanConfig);
 
@@ -58,25 +52,25 @@ ScanWizardConfig::ScanWizardConfig(
             scanType,    SLOT(  SetInput(    const QString&)));
 
     connect(input,       SIGNAL(valueChanged(const QString&)),
-            _parent,     SLOT(  SetInput(    const QString&)));
+            this,     SLOT(  SetInput(    const QString&)));
 }
 
-uint ScanWizardConfig::GetSourceID(void) const
+uint ScanWizard::GetSourceID(void) const
 {
     return videoSource->getValue().toUInt();
 }
 
-ServiceRequirements ScanWizardConfig::GetServiceRequirements(void) const
+ServiceRequirements ScanWizard::GetServiceRequirements(void) const
 {
     return services->GetServiceRequirements();
 }
 
-bool ScanWizardConfig::DoFreeToAirOnly(void) const
+bool ScanWizard::DoFreeToAirOnly(void) const
 {
     return ftaOnly->getValue().toInt();
 }
 
-bool ScanWizardConfig::DoTestDecryption(void) const
+bool ScanWizard::DoTestDecryption(void) const
 {
     return trustEncSI->getValue().toInt();
 }
@@ -219,68 +213,37 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 ////////////////////////////////////////////////////////////////////////////
 
 ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
-    TriggeredConfigurationGroup(false, false, true, true,
-                                false, false, true, true),
     scanType(_scan_type),
-    country(new ScanCountry()),
+    dvbTCountry(new ScanCountry()),
+    dvbT2Country(new ScanCountry()),
     network(new ScanNetwork()),
-    paneDVBT(new PaneDVBT()),     paneDVBT2(new PaneDVBT2()),
-    paneDVBS(new PaneDVBS()),     paneDVBS2(new PaneDVBS2()),
-    paneATSC(new PaneATSC()),
-    paneDVBC(new PaneDVBC()),     paneAnalog(new PaneAnalog()),
-    paneSingle(new PaneSingle()), paneAll(new PaneAll()),
+    paneDVBT(new PaneDVBT(QString::number(ScanTypeSetting::NITAddScan_DVBT), scanType)),
+    paneDVBT2(new PaneDVBT2(QString::number(ScanTypeSetting::NITAddScan_DVBT2), scanType)),
+    paneDVBS(new PaneDVBS(QString::number(ScanTypeSetting::NITAddScan_DVBS), scanType)),
+    paneDVBS2(new PaneDVBS2(QString::number(ScanTypeSetting::NITAddScan_DVBS2), scanType)),
+    paneATSC(new PaneATSC(QString::number(ScanTypeSetting::FullScan_ATSC), scanType)),
+    paneDVBC(new PaneDVBC(QString::number(ScanTypeSetting::NITAddScan_DVBC), scanType)),
+    paneAnalog(new PaneAnalog(QString::number(ScanTypeSetting::FullScan_Analog), scanType)),
+    paneSingle(new PaneSingle(QString::number(ScanTypeSetting::TransportScan), scanType)),
+    paneAll(new PaneAll(QString::number(ScanTypeSetting::FullTransportScan), scanType)),
     paneDVBUtilsImport(new PaneDVBUtilsImport()),
-    paneExistingScanImport(new PaneExistingScanImport())
+    paneExistingScanImport(new PaneExistingScanImport(QString::number(ScanTypeSetting::ExistingScanImport), scanType))
 
 {
-    setTrigger(scanType);
+    setVisible(false);
 
-    // only save settings for the selected pane
-    setSaveAll(false);
-
-    addTarget(QString::number(ScanTypeSetting::Error_Open),
+    scanType->addTargetedChild(QString::number(ScanTypeSetting::Error_Open),
               new PaneError(tr("Failed to open the card")));
-    addTarget(QString::number(ScanTypeSetting::Error_Probe),
+    scanType->addTargetedChild(QString::number(ScanTypeSetting::Error_Probe),
               new PaneError(tr("Failed to probe the card")));
-    addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBC),
-              paneDVBC);
-    addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBS),
-              paneDVBS);
-    addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBS2),
-              paneDVBS2);
-    addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBT),
-              paneDVBT);
-    addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBT2),
-              paneDVBT2);
-    addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),
-              paneATSC);
-    addTarget(QString::number(ScanTypeSetting::FullScan_DVBC),
+    scanType->addTargetedChild(QString::number(ScanTypeSetting::FullScan_DVBC),
               network);
-    addTarget(QString::number(ScanTypeSetting::FullScan_DVBT),
-              country);
-    addTarget(QString::number(ScanTypeSetting::FullScan_DVBT2),
-              country);
-    addTarget(QString::number(ScanTypeSetting::FullScan_Analog),
-              paneAnalog);
-    addTarget(QString::number(ScanTypeSetting::TransportScan),
-              paneSingle);
-    addTarget(QString::number(ScanTypeSetting::FullTransportScan),
-              paneAll);
-    addTarget(QString::number(ScanTypeSetting::CurrentTransportScan),
-              new BlankSetting());
-    addTarget(QString::number(ScanTypeSetting::IPTVImport),
-              new BlankSetting());
-    addTarget(QString::number(ScanTypeSetting::VBoxImport),
-              new BlankSetting());
-//     addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
+    scanType->addTargetedChild(QString::number(ScanTypeSetting::FullScan_DVBT),
+              dvbTCountry);
+    scanType->addTargetedChild(QString::number(ScanTypeSetting::FullScan_DVBT2),
+              dvbT2Country);
+//     scanType->addTargetedChild(QString::number(ScanTypeSetting::DVBUtilsImport),
 //               paneDVBUtilsImport);
-    addTarget(QString::number(ScanTypeSetting::ExistingScanImport),
-              paneExistingScanImport);
-}
-
-void ScanOptionalConfig::triggerChanged(const QString& value)
-{
-    TriggeredConfigurationGroup::triggerChanged(value);
 }
 
 void ScanOptionalConfig::SetSourceID(const QString &sourceid)
@@ -341,8 +304,9 @@ QString ScanOptionalConfig::GetFrequencyTable(void) const
         case ScanTypeSetting::FullScan_DVBC:
             return network->getValue();
         case ScanTypeSetting::FullScan_DVBT:
+            return dvbTCountry->getValue();
         case ScanTypeSetting::FullScan_DVBT2:
-            return country->getValue();
+            return dvbT2Country->getValue();
         case ScanTypeSetting::FullScan_Analog:
             return paneAnalog->GetFrequencyTable();
         default:

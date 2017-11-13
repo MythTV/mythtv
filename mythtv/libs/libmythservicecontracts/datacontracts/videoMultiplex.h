@@ -69,10 +69,6 @@ class SERVICE_PUBLIC VideoMultiplex : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         VideoMultiplex(QObject *parent = 0)
             : QObject         ( parent ),
               m_MplexId       ( 0      ),
@@ -86,52 +82,38 @@ class SERVICE_PUBLIC VideoMultiplex : public QObject
         {
         }
 
-        VideoMultiplex( const VideoMultiplex &src )
+        void Copy( const VideoMultiplex *src )
         {
-            Copy( src );
+            m_MplexId          = src->m_MplexId          ;
+            m_SourceId         = src->m_SourceId         ;
+            m_TransportId      = src->m_TransportId      ;
+            m_NetworkId        = src->m_NetworkId        ;
+            m_Frequency        = src->m_Frequency        ;
+            m_Inversion        = src->m_Inversion        ;
+            m_SymbolRate       = src->m_SymbolRate       ;
+            m_FEC              = src->m_FEC              ;
+            m_Polarity         = src->m_Polarity         ;
+            m_Modulation       = src->m_Modulation       ;
+            m_Bandwidth        = src->m_Bandwidth        ;
+            m_LPCodeRate       = src->m_LPCodeRate       ;
+            m_HPCodeRate       = src->m_HPCodeRate       ;
+            m_TransmissionMode = src->m_TransmissionMode ;
+            m_GuardInterval    = src->m_GuardInterval    ;
+            m_Visible          = src->m_Visible          ;
+            m_Constellation    = src->m_Constellation    ;
+            m_Hierarchy        = src->m_Hierarchy        ;
+            m_ModulationSystem = src->m_ModulationSystem ;
+            m_RollOff          = src->m_RollOff          ;
+            m_SIStandard       = src->m_SIStandard       ;
+            m_ServiceVersion   = src->m_ServiceVersion   ;
+            m_UpdateTimeStamp  = src->m_UpdateTimeStamp  ;
+            m_DefaultAuthority = src->m_DefaultAuthority ;
         }
 
-        void Copy( const VideoMultiplex &src )
-        {
-            m_MplexId          = src.m_MplexId          ;
-            m_SourceId         = src.m_SourceId         ;
-            m_TransportId      = src.m_TransportId      ;
-            m_NetworkId        = src.m_NetworkId        ;
-            m_Frequency        = src.m_Frequency        ;
-            m_Inversion        = src.m_Inversion        ;
-            m_SymbolRate       = src.m_SymbolRate       ;
-            m_FEC              = src.m_FEC              ;
-            m_Polarity         = src.m_Polarity         ;
-            m_Modulation       = src.m_Modulation       ;
-            m_Bandwidth        = src.m_Bandwidth        ;
-            m_LPCodeRate       = src.m_LPCodeRate       ;
-            m_HPCodeRate       = src.m_HPCodeRate       ;
-            m_TransmissionMode = src.m_TransmissionMode ;
-            m_GuardInterval    = src.m_GuardInterval    ;
-            m_Visible          = src.m_Visible          ;
-            m_Constellation    = src.m_Constellation    ;
-            m_Hierarchy        = src.m_Hierarchy        ;
-            m_ModulationSystem = src.m_ModulationSystem ;
-            m_RollOff          = src.m_RollOff          ;
-            m_SIStandard       = src.m_SIStandard       ;
-            m_ServiceVersion   = src.m_ServiceVersion   ;
-            m_UpdateTimeStamp  = src.m_UpdateTimeStamp  ;
-            m_DefaultAuthority = src.m_DefaultAuthority ;
-        }
+    private:
+        Q_DISABLE_COPY(VideoMultiplex);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::VideoMultiplex  )
-Q_DECLARE_METATYPE( DTC::VideoMultiplex* )
-
-namespace DTC
-{
-inline void VideoMultiplex::InitializeCustomTypes()
-{
-    qRegisterMetaType< VideoMultiplex   >();
-    qRegisterMetaType< VideoMultiplex*  >();
-}
-}
 
 #endif

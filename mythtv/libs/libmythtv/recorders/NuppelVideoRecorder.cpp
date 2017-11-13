@@ -204,8 +204,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
 
     m_containerFormat = formatNUV;
 
-    stm = (struct timeval){0};
-    tzone = (struct timezone){0};
+    memset(&stm, 0, sizeof(struct timeval));
+    memset(&tzone, 0, sizeof(struct timezone));
 
     lastPositionMapPos = 0;
     framesWritten = 0;
@@ -384,7 +384,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     SetOption("audiodevice", audiodev);
 
     QString setting = QString::null;
-    const Setting *tmp = profile->byName("videocodec");
+    const StandardSetting *tmp = profile->byName("videocodec");
     if (tmp)
         setting = tmp->getValue();
 
@@ -2519,7 +2519,8 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
     unsigned char *inpos = vbidata->teletextpage.data[0];
     unsigned char *outpos = textbuffer[act]->buffer;
     *outpos = 0;
-    struct teletextsubtitle st = { 0 };
+    struct teletextsubtitle st;
+    memset(&st, 0, sizeof(struct teletextsubtitle));
     unsigned char linebuf[VT_WIDTH + 1];
     unsigned char *linebufpos = linebuf;
 

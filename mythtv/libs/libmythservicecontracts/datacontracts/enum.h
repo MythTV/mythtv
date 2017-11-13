@@ -40,25 +40,16 @@ class SERVICE_PUBLIC Enum : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
-        Enum(QObject *parent = 0)
+        explicit Enum(QObject *parent = 0)
             : QObject( parent )
         {
         }
 
-        Enum( const Enum &src )
+        void Copy( const Enum *src )
         {
-            Copy( src );
-        }
+            m_Type = src->m_Type;
 
-        void Copy( const Enum &src )
-        {
-            m_Type = src.m_Type;
-
-            CopyListContents< EnumItem >( this, m_EnumItems, src.m_EnumItems );
+            CopyListContents< EnumItem >( this, m_EnumItems, src->m_EnumItems );
         }
 
         EnumItem *AddNewEnum()
@@ -72,22 +63,10 @@ class SERVICE_PUBLIC Enum : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(Enum);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::Enum  )
-Q_DECLARE_METATYPE( DTC::Enum* )
-
-namespace DTC
-{
-inline void Enum::InitializeCustomTypes()
-{
-    qRegisterMetaType< Enum  >();
-    qRegisterMetaType< Enum* >();
-
-    EnumItem::InitializeCustomTypes();
-}
-}
 
 #endif

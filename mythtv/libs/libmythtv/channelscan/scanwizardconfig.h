@@ -32,6 +32,7 @@
 
 // MythTV headers
 #include "settings.h"
+#include "standardsettings.h"
 #include "inputselectorsetting.h"
 #include "channelscantypes.h"
 
@@ -57,7 +58,7 @@ class PaneSingle;
 class PaneDVBUtilsImport;
 class PaneExistingScanImport;
 
-class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
+class ScanTypeSetting : public TransMythUIComboBoxSetting
 {
     Q_OBJECT
   public:
@@ -96,7 +97,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         VBoxImport,
     };
 
-    ScanTypeSetting() : ComboBoxSetting(this), hw_cardid(0)
+    ScanTypeSetting() : hw_cardid(0)
         { setLabel(QObject::tr("Scan Type")); }
 
   protected slots:
@@ -106,7 +107,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
     uint    hw_cardid;
 };
 
-class ScanOptionalConfig : public TriggeredConfigurationGroup
+class ScanOptionalConfig : public GroupSetting
 {
     Q_OBJECT
 
@@ -126,11 +127,11 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
 
   public slots:
     void SetSourceID(const QString&);
-    void triggerChanged(const QString&);
 
   private:
     ScanTypeSetting      *scanType;
-    ScanCountry          *country;
+    ScanCountry          *dvbTCountry;
+    ScanCountry          *dvbT2Country;
     ScanNetwork          *network;
     PaneDVBT             *paneDVBT;
     PaneDVBT2            *paneDVBT2;
@@ -143,50 +144,6 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     PaneAll              *paneAll;
     PaneDVBUtilsImport   *paneDVBUtilsImport;
     PaneExistingScanImport *paneExistingScanImport;
-};
-
-class ScanWizardConfig: public VerticalConfigurationGroup
-{
-    Q_OBJECT
-
-  public:
-    ScanWizardConfig(ScanWizard *_parent,
-                     uint        default_sourceid,
-                     uint        default_cardid,
-                     QString     default_inputname);
-
-    uint    GetSourceID(void)     const;
-    uint    GetScanID(void)       const { return scanConfig->GetScanID();     }
-    QString GetModulation(void)   const { return scanConfig->GetModulation(); }
-    int     GetScanType(void)     const { return scanType->getValue().toInt();}
-    uint    GetCardID(void)       const { return input->GetCardID();          }
-    QString GetInputName(void)    const { return input->GetInputName();       }
-    QString GetFilename(void)     const { return scanConfig->GetFilename();   }
-    uint    GetMultiplex(void)    const { return scanConfig->GetMultiplex();  }
-    bool    GetFrequencyTableRange(QString &start, QString &end) const
-        { return scanConfig->GetFrequencyTableRange(start, end); }
-    QString GetFrequencyStandard(void) const
-        { return scanConfig->GetFrequencyStandard(); }
-    QString GetFrequencyTable(void) const
-        { return scanConfig->GetFrequencyTable(); }
-    QMap<QString,QString> GetStartChan(void) const
-        { return scanConfig->GetStartChan(); }
-    ServiceRequirements GetServiceRequirements(void) const;
-    bool    DoIgnoreSignalTimeout(void) const
-        { return scanConfig->DoIgnoreSignalTimeout(); }
-    bool    DoFollowNIT(void) const
-        { return scanConfig->DoFollowNIT(); }
-    bool    DoFreeToAirOnly(void)  const;
-    bool    DoTestDecryption(void) const;
-
-  protected:
-    VideoSourceSelector *videoSource;
-    InputSelector       *input;
-    ScanTypeSetting     *scanType;
-    ScanOptionalConfig  *scanConfig;
-    DesiredServices     *services;
-    FreeToAirOnly       *ftaOnly;
-    TrustEncSISetting   *trustEncSI;
 };
 
 #endif // _SCAN_WIZARD_CONFIG_H_

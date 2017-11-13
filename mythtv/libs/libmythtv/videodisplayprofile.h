@@ -31,7 +31,7 @@ struct render_opts
     safe_map_t     *equiv_decoders;
 };
 
-class ProfileItem
+class MTV_PUBLIC ProfileItem
 {
   public:
     ProfileItem() : profileid(0) {}
@@ -53,7 +53,7 @@ class ProfileItem
         pref_map_t::const_iterator it = pref.find(value);
         if (it != pref.end())
             return *it;
-        return QString::null;
+        return QString();
     }
 
     uint GetPriority(void) const
@@ -65,8 +65,12 @@ class ProfileItem
     pref_map_t GetAll(void) const { return pref; }
 
     // Other
-    bool    IsMatch(const QSize &size, float rate) const;
-    bool    IsValid(QString *reason = NULL) const;
+    bool checkRange(QString key, float fvalue, bool *ok = Q_NULLPTR) const;
+    bool checkRange(QString key, int ivalue, bool *ok = Q_NULLPTR) const;
+    bool checkRange(QString key,
+        float fvalue, int ivalue, bool isFloat, bool *ok = Q_NULLPTR) const;
+    bool IsMatch(const QSize &size, float framerate, const QString &codecName) const;
+    bool IsValid(QString *reason = NULL) const;
 
     bool    operator<(const ProfileItem &other) const;
 
@@ -84,7 +88,8 @@ class MTV_PUBLIC VideoDisplayProfile
     VideoDisplayProfile();
     ~VideoDisplayProfile();
 
-    void SetInput(const QSize &size);
+    void SetInput(const QSize &size,
+        float framerate = 0, const QString &codecName = QString());
     void SetOutput(float framerate);
     float GetOutput(void) const { return last_rate; }
 
@@ -146,6 +151,13 @@ class MTV_PUBLIC VideoDisplayProfile
         QString osdrenderer, bool osdfade,
         QString deint0, QString deint1, QString filters);
 
+    static void CreateProfile(
+        uint groupid, uint priority,
+        QString width, QString height, QString codecs,
+        QString decoder, uint max_cpus, bool skiploop, QString videorenderer,
+        QString osdrenderer, bool osdfade,
+        QString deint0, QString deint1, QString filters);
+
     static void        DeleteProfiles(const QString &hostname);
     static void        CreateProfiles(const QString &hostname);
     static void        CreateNewProfiles(const QString &hostname);
@@ -177,8 +189,9 @@ class MTV_PUBLIC VideoDisplayProfile
         { QString tmp = last_video_renderer; tmp.detach(); return tmp; }
 
   private:
-    item_list_t::const_iterator FindMatch(const QSize &size, float framerate);
-    void LoadBestPreferences(const QSize &size, float framerate);
+    item_list_t::const_iterator FindMatch(const QSize &size,
+            float framerate, const QString &codecName);
+    void LoadBestPreferences(const QSize &size, float framerate, const QString &codecName);
 
     QString GetPreference(const QString &key) const;
     void    SetPreference(const QString &key, const QString &value);
@@ -189,6 +202,7 @@ class MTV_PUBLIC VideoDisplayProfile
     mutable QMutex      lock;
     QSize               last_size;
     float               last_rate;
+    QString             last_codecName;
     QString             last_video_renderer;
     pref_map_t          pref;
     item_list_t         all_pref;

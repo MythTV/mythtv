@@ -94,7 +94,7 @@ bool ViewScheduleDiff::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
+void ViewScheduleDiff::showStatus(MythUIButtonListItem */*item*/)
 {
     ProgramInfo *pi = CurrentProgram();
     if (!pi)

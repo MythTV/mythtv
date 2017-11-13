@@ -389,7 +389,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     return ok;
 }
 
-void DTVChannel::HandleScriptEnd(bool ok)
+void DTVChannel::HandleScriptEnd(bool /*ok*/)
 {
     // MAYBE TODO? need to tell signal monitor to throw out any tables
     // it saw on the last mux...
@@ -398,7 +398,7 @@ void DTVChannel::HandleScriptEnd(bool ok)
     // will save the current channel to (*it)->startChanNum
 }
 
-bool DTVChannel::TuneMultiplex(uint mplexid, QString inputname)
+bool DTVChannel::TuneMultiplex(uint mplexid, QString /*inputname*/)
 {
     DTVMultiplex tuning;
     if (!tuning.FillFromDB(tunerType, mplexid))

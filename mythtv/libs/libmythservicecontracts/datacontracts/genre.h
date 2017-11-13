@@ -28,11 +28,7 @@ class SERVICE_PUBLIC Genre : public QObject
 
     Q_PROPERTY( QString Name         READ Name         WRITE setName         )
 
-    PROPERTYIMP    ( QString    , Name           )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP    ( QString    , Name           );
 
     public:
 
@@ -41,29 +37,15 @@ class SERVICE_PUBLIC Genre : public QObject
         {
         }
 
-        Genre( const Genre &src )
+        void Copy( const Genre *src )
         {
-            Copy( src );
+            m_Name          = src->m_Name          ;
         }
 
-        void Copy( const Genre &src )
-        {
-            m_Name          = src.m_Name          ;
-        }
+    private:
+        Q_DISABLE_COPY(Genre);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::Genre  )
-Q_DECLARE_METATYPE( DTC::Genre* )
-
-namespace DTC
-{
-inline void Genre::InitializeCustomTypes()
-{
-    qRegisterMetaType< Genre  >();
-    qRegisterMetaType< Genre* >();
-}
-}
 
 #endif

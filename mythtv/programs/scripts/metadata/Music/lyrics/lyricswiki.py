@@ -12,8 +12,8 @@ from common import *
 __author__      = "Paul Harrison and ronie'"
 __title__       = "LyricsWiki"
 __description__ = "Search http://lyrics.wikia.com for lyrics"
-__priority__    = "200"
-__version__     = "0.1"
+__priority__    = "150"
+__version__     = "0.2"
 __syncronized__ = False
 
 
@@ -52,7 +52,7 @@ class LyricsFetcher:
                 else:
                     return False
             req.close()
-            matchcode = re.search('lyricbox.*?</script>(.*?)<!--', response)
+            matchcode = re.search("lyricbox'>.*?(&#.*?)<div", response)
             try:
                 lyricscode = (matchcode.group(1))
                 htmlparser = HTMLParser.HTMLParser()

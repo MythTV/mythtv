@@ -29,23 +29,22 @@ const int SECS_PER_MIN = 60;
 static const char URL[] = "http://freedb.musicbrainz.org/~cddb/cddb.cgi?cmd=";
 static const QString& helloID();
 
-namespace {
 /*
  * Local cddb database
  */
 struct Dbase
 {
-    static bool Search(Cddb::Matches&, Cddb::discid_t);
-    static bool Search(Cddb::Album&, const QString& genre, Cddb::discid_t);
-    static bool Write(const Cddb::Album&);
+    static bool Search(Cddb::Matches& res, const Cddb::discid_t discID);
+    static bool Search(Cddb::Album& a, const QString& genre, const Cddb::discid_t discID);
+    static bool Write(const Cddb::Album& album);
 
-    static void New(Cddb::discid_t, const Cddb::Toc&);
-    static void MakeAlias(const Cddb::Album&, const Cddb::discid_t);
+    static void New(const Cddb::discid_t discID, const Cddb::Toc& toc);
+    static void MakeAlias(const Cddb::Album& album, const Cddb::discid_t discID);
 
 private:
-    static bool CacheGet(Cddb::Matches&, Cddb::discid_t);
-    static bool CacheGet(Cddb::Album&, const QString& genre, Cddb::discid_t);
-    static void CachePut(const Cddb::Album&);
+    static bool CacheGet(Cddb::Matches& res, const Cddb::discid_t discID);
+    static bool CacheGet(Cddb::Album& album, const QString& genre, const Cddb::discid_t discID);
+    static void CachePut(const Cddb::Album& album);
 
     // DiscID to album info cache
     typedef QMap< Cddb::discid_t, Cddb::Album > cache_t; 
@@ -54,7 +53,6 @@ private:
     static const QString& GetDB();
 };
 QMap< Cddb::discid_t, Cddb::Album > Dbase::s_cache;
-}
 
 
 /*

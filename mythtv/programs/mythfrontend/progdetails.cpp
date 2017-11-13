@@ -160,6 +160,174 @@ bool ProgDetails::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
+void ProgDetails::PowerPriorities(const QString & ptable)
+{
+    int      recordid = m_progInfo.GetRecordingRuleID();
+
+    // If not a scheduled recording, abort .... ?
+    if (!recordid)
+        return;
+
+    using string_pair = QPair<QString, QString>;
+    QList<string_pair > tests;
+    QList<string_pair >::iterator Itest;
+    QString  recmatch;
+    QString  pwrpri;
+    QString  desc;
+    QString  adjustmsg;
+    int      adj;
+    int      total = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    int prefinputpri    = gCoreContext->GetNumSetting("PrefInputPriority", 2);
+    int hdtvpriority    = gCoreContext->GetNumSetting("HDTVRecPriority", 0);
+    int wspriority      = gCoreContext->GetNumSetting("WSRecPriority", 0);
+    int slpriority      = gCoreContext->GetNumSetting("SignLangRecPriority", 0);
+    int onscrpriority   = gCoreContext->GetNumSetting("OnScrSubRecPriority", 0);
+    int ccpriority      = gCoreContext->GetNumSetting("CCRecPriority", 0);
+    int hhpriority      = gCoreContext->GetNumSetting("HardHearRecPriority", 0);
+    int adpriority      = gCoreContext->GetNumSetting("AudioDescRecPriority", 0);
+
+    tests.append(qMakePair(QString("channel.recpriority"),
+                           QString("channel.recpriority")));
+    tests.append(qMakePair(QString("capturecard.recpriority"),
+                           QString("capturecard.recpriority")));
+
+    if (recordid && prefinputpri)
+    {
+        pwrpri = QString("(capturecard.cardid = record.prefinput) * %1")
+              .arg(prefinputpri);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+    if (hdtvpriority)
+    {
+        pwrpri = QString("(program.hdtv > 0 OR "
+                      "FIND_IN_SET('HDTV', program.videoprop) > 0) * %1")
+              .arg(hdtvpriority);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+    if (wspriority)
+    {
+        pwrpri = QString
+                 ("(FIND_IN_SET('WIDESCREEN', program.videoprop) > 0) * %1")
+                 .arg(wspriority);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+    if (slpriority)
+    {
+        pwrpri = QString
+                 ("(FIND_IN_SET('SIGNED', program.subtitletypes) > 0) * %1")
+                 .arg(slpriority);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+    if (onscrpriority)
+    {
+        pwrpri = QString
+              ("(FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0) * %1")
+              .arg(onscrpriority);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+    if (ccpriority)
+    {
+        pwrpri = QString
+              ("(FIND_IN_SET('NORMAL', program.subtitletypes) > 0 OR "
+               "program.closecaptioned > 0 OR program.subtitled > 0) * %1")
+              .arg(ccpriority);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+    if (hhpriority)
+    {
+        pwrpri = QString
+                 ("(FIND_IN_SET('HARDHEAR', program.subtitletypes) > 0 OR "
+                  "FIND_IN_SET('HARDHEAR', program.audioprop) > 0) * %1")
+                 .arg(hhpriority);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+    if (adpriority)
+    {
+        pwrpri = QString
+              ("(FIND_IN_SET('VISUALIMPAIR', program.audioprop) > 0) * %1")
+              .arg(adpriority);
+        tests.append(qMakePair(pwrpri, pwrpri));
+    }
+
+    query.prepare("SELECT recpriority, selectclause FROM powerpriority;");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Power Priority", query);
+        return;
+    }
+
+    while (query.next())
+    {
+        adj = query.value(0).toInt();
+        if (adj)
+        {
+            QString sclause = query.value(1).toString();
+            sclause.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
+            sclause.remove(';');
+            pwrpri = QString("(%1) * %2").arg(sclause)
+                                            .arg(query.value(0).toInt());
+            if (!recordid && pwrpri.indexOf("RECTABLE") != -1)
+                continue;
+            pwrpri.replace("RECTABLE", "record");
+
+            desc = pwrpri;
+            pwrpri += QString(" AS powerpriority ");
+
+            tests.append(qMakePair(desc, pwrpri));
+        }
+    }
+
+    if (recordid)
+        recmatch = QString("INNER JOIN record "
+                           "      ON ( record.recordid = %1 ) ")
+                   .arg(recordid);
+
+    for (Itest = tests.begin(); Itest != tests.end(); ++Itest)
+    {
+        query.prepare("SELECT " + (*Itest).second.replace("program.", "p.")
+                      + QString
+                      (" FROM %1 as p "
+                       "INNER JOIN channel "
+                       "      ON ( channel.chanid = p.chanid ) "
+                       "INNER JOIN capturecard "
+                       "      ON ( channel.sourceid = capturecard.sourceid AND "
+                       "           ( capturecard.schedorder <> 0 OR "
+                       "             capturecard.parentid = 0 ) ) "
+                       + recmatch +
+                       "WHERE  p.chanid = :CHANID AND"
+                       " p.starttime = :STARTTIME ;").arg(ptable));
+
+        query.bindValue(":CHANID",    m_progInfo.GetChanID());
+        query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
+
+        adjustmsg = QString("%1 : ").arg((*Itest).first);
+        if (query.exec() && query.next())
+        {
+            adj = query.value(0).toInt();
+            if (adj)
+            {
+                adjustmsg += tr(" MATCHED, adding %1").arg(adj);
+                total += adj;
+            }
+            else
+                adjustmsg += tr(" not matched");
+        }
+        else
+            adjustmsg += tr(" Query FAILED");
+
+        addItem(tr("Recording Priority Adjustment"), adjustmsg,
+                ProgInfoList::kLevel2);
+    }
+
+    if (!tests.isEmpty())
+        addItem(tr("Priority Adjustment Total"), QString::number(total),
+                ProgInfoList::kLevel2);
+}
+
 void ProgDetails::loadPage(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -180,12 +348,10 @@ void ProgDetails::loadPage(void)
     if (m_progInfo.GetFilesize())
         recorded = true;
 
+    QString ptable = recorded ? "recordedprogram" : "program";
+
     if (m_progInfo.GetScheduledEndTime() != m_progInfo.GetScheduledStartTime())
     {
-        QString ptable = "program";
-        if (recorded)
-            ptable = "recordedprogram";
-
         query.prepare(QString("SELECT category_type, airdate, stars,"
                       " partnumber, parttotal, audioprop+0, videoprop+0,"
                       " subtitletypes+0, syndicatedepisodenumber, generic,"
@@ -645,7 +811,7 @@ void ProgDetails::loadPage(void)
     QString recordingProfile;
 
     recordingHost = m_progInfo.GetHostname();
-    recordingInput = m_progInfo.QueryInputDisplayName();
+    recordingInput = m_progInfo.GetInputName();
 
     if (recorded)
     {
@@ -680,6 +846,8 @@ void ProgDetails::loadPage(void)
     addItem(tr("Recording Group"), recordingGroup, ProgInfoList::kLevel1);
     addItem(tr("Storage Group"), storageGroup, ProgInfoList::kLevel2);
     addItem(tr("Playback Group"),  playbackGroup, ProgInfoList::kLevel2);
+
+    PowerPriorities(ptable);
 
     delete record;
 }

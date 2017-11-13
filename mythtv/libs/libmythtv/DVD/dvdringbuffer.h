@@ -68,7 +68,7 @@ class MythDVDPlayer;
 class MTV_PUBLIC DVDInfo
 {
     friend class DVDRingBuffer;
-    Q_DECLARE_TR_FUNCTIONS(DVDInfo)
+    Q_DECLARE_TR_FUNCTIONS(DVDInfo);
 
   public:
     explicit DVDInfo(const QString &filename);
@@ -93,7 +93,7 @@ class MTV_PUBLIC DVDInfo
 
 class MTV_PUBLIC DVDRingBuffer : public RingBuffer
 {
-    Q_DECLARE_TR_FUNCTIONS(DVDRingBuffer)
+    Q_DECLARE_TR_FUNCTIONS(DVDRingBuffer);
 
   public:
     explicit DVDRingBuffer(const QString &lfilename);

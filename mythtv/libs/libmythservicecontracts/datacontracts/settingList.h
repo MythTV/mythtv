@@ -38,34 +38,21 @@ class SERVICE_PUBLIC SettingList : public QObject
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
         SettingList(QObject *parent = 0) 
             : QObject( parent )               
         {
         }
         
-        SettingList( const SettingList &src ) 
-            : m_HostName( src.m_HostName ),
-              m_Settings( src.m_Settings )    
+        void Copy( const SettingList *src )
         {
+            m_HostName = src->m_HostName;
+            m_Settings = src->m_Settings;
         }
+
+    private:
+        Q_DISABLE_COPY(SettingList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::SettingList  )
-Q_DECLARE_METATYPE( DTC::SettingList* )
-
-namespace DTC
-{
-inline void SettingList::InitializeCustomTypes()
-{
-    qRegisterMetaType< SettingList  >();
-    qRegisterMetaType< SettingList* >();
-}
-}
 
 #endif

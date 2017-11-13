@@ -15,19 +15,28 @@ DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 
-LIBS += ../../eitfixup.o
-LIBS += ../../dishdescriptors.o
-LIBS += ../../atsc_huffman.o
-LIBS += ../../dvbdescriptors.o
-LIBS += ../../iso6937tables.o
-LIBS += ../../freesat_huffman.o
+LIBS += ../../$(OBJECTS_DIR)/eitfixup.o
+LIBS += ../../$(OBJECTS_DIR)/dishdescriptors.o
+LIBS += ../../$(OBJECTS_DIR)/atsc_huffman.o
+LIBS += ../../$(OBJECTS_DIR)/dvbdescriptors.o
+LIBS += ../../$(OBJECTS_DIR)/iso6937tables.o
+LIBS += ../../$(OBJECTS_DIR)/freesat_huffman.o
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
-#LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
-#LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
-#LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
+LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
+LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
+LIBS += -L../../../libmythservicecontracts -lmythservicecontracts-$$LIBVERSION
 LIBS += -L../../../libmyth -lmyth-$$LIBVERSION
 LIBS += -L../.. -lmythtv-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
+LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
+LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
+LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale
+LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
+LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
+LIBS += -L../../../../external/FFmpeg/libpostproc -lmythpostproc
+using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
+using_hdhomerun:LIBS += -L../../../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
   QMAKE_CXXFLAGS += -O0 -fprofile-arcs -ftest-coverage

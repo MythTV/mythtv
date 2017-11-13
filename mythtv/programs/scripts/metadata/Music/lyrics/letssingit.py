@@ -1,82 +1,72 @@
-# -*- Mode: python; coding: utf-8; tab-width: 8; indent-tabs-mode: t; -*-
+#-*- coding: UTF-8 -*-
 """
-Scraper for http://www.lyrdb.com/
+Scraper for https://www.letssingit.com/
 
-taxigps
+ronnie
 """
 
-import os
 import sys
-import urllib
-import socket
 import re
+import urllib
+import urllib2
+import socket
 import difflib
+import chardet
 from optparse import OptionParser
 from common import utilities
 
-__author__      = "Paul Harrison and taxigps'"
-__title__       = "Lyrdb"
-__description__ = "Search http://www.lyrdb.com for lyrics"
-__priority__    = "150"
-__version__     = "0.12"
-__syncronized__ = True
+__author__      = "Paul Harrison and 'ronie'"
+__title__       = "LetsSingIt"
+__description__ = "Search https://www.letssingit.com/ for lyrics"
+__version__     = "0.1"
+__priority__    = "120"
+__syncronized__ = False
 
 debug = False
 
-socket.setdefaulttimeout(30)
+socket.setdefaulttimeout(10)
 
 class LyricsFetcher:
-    def __init__( self ):
-        self.base_url = "http://www.lyrdb.com/karaoke/"
+
+    def __init__(self):
+        self.url = 'https://search.letssingit.com/?a=search&l=song&s=%s'
 
     def get_lyrics(self, lyrics):
-        utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
-
+        utilities.log(debug, '%s: searching lyrics for %s - %s' % (__title__, lyrics.artist, lyrics.title))
+        query = '%s+%s' % (urllib.quote_plus(lyrics.artist), urllib.quote_plus(lyrics.title))
         try:
-            url = 'http://www.lyrdb.com/karaoke/?q=%s+%s&action=search' %(lyrics.artist.replace(' ','+').lower(), lyrics.title.replace(' ','+').lower())
-            f = urllib.urlopen(url)
-            Page = f.read()
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0', 'Referer': 'https://www.letssingit.com/'}
+            request = urllib2.Request(self.url % query, None, headers)
+            req = urllib2.urlopen(request)
+            response = req.read()
+            utilities.log(False, response)
         except:
-            utilities.log(True, "%s: %s::%s (%d) [%s]" % (
-                   __title__, self.__class__.__name__,
-                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
-                   sys.exc_info()[ 2 ].tb_lineno,
-                   sys.exc_info()[ 1 ]
-                   ))
             return False
-
-        links_query = re.compile('<tr><td class="tresults"><a href="/karaoke/([0-9]+).htm">(.*?)</td><td class="tresults">(.*?)</td>')
-        urls = re.findall(links_query, Page)
-        links = []
-        for x in urls:
-            if (difflib.SequenceMatcher(None, song.artist.lower(), x[2].lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, song.title.lower(), x[1].lower()).ratio() > 0.8):
-                links.append( ( x[2] + ' - ' + x[1], x[0], x[2], x[1] ) )
-        if len(links) == 0:
-            return False
-        elif len(links) > 1:
-            lyrics.list = links
-        lyr = self.get_lyrics_from_list(links[0])
-        if not lyr:
-            return False
-        lyrics.lyrics = lyr
+        req.close()
+        matchcode = re.search('</TD><TD><A href="(.*?)"', response)
+        if matchcode:
+            lyricscode = (matchcode.group(1))
+            clean = lyricscode.lstrip('http://www.letssingit.com/').rsplit('-',1)[0]
+            result = clean.replace('-lyrics-', ' ')
+            if (difflib.SequenceMatcher(None, query.lower().replace('+', ''), result.lower().replace('-', '')).ratio() > 0.8):
+                try:
+                    request = urllib2.Request(lyricscode)
+                    request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0')
+                    req = urllib2.urlopen(request)
+                    resp = req.read()
+                except:
+                    return False
+                req.close()
+                # remove addslots
+                resp = re.sub(r'<div id=adslot.*?</div>', '', resp)
+                # find all class=lyrics_part_name and class=lyrics_part_text parts
+                match = re.findall('<P class=lyrics_part_.*?>(.*?)</P>', resp, flags=re.DOTALL)
+                if len(match):
+                    for line in match:
+                        lyrics.lyrics += line.replace('<br>', '') + '\n'
+                else:
+                    return False
         return True
-
-    def get_lyrics_from_list(self, link):
-        title, Id, artist, song = link
-        utilities.log(debug, '%s %s %s' %(Id, artist, song))
-        try:
-            url = 'http://www.lyrdb.com/karaoke/downloadlrc.php?q=%s' %(Id)
-            f = urllib.urlopen(url)
-            Page = f.read()
-        except:
-            utilities.log(True, "%s: %s::%s (%d) [%s]" % (
-                   __title__, self.__class__.__name__,
-                   sys.exc_info()[ 2 ].tb_frame.f_code.co_name,
-                   sys.exc_info()[ 2 ].tb_lineno,
-                   sys.exc_info()[ 1 ]
-                   ))
-            return None
-        return Page
 
 def performSelfTest():
     found = False
@@ -119,7 +109,7 @@ def buildVersion():
     version = etree.XML(u'<grabber></grabber>')
     etree.SubElement(version, "name").text = __title__
     etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "command").text = 'lyrdb.py'
+    etree.SubElement(version, "command").text = 'letssingit.py'
     etree.SubElement(version, "type").text = 'lyrics'
     etree.SubElement(version, "description").text = __description__
     etree.SubElement(version, "version").text = __version__
@@ -131,12 +121,14 @@ def buildVersion():
     sys.exit(0)
 
 def main():
+    global debug
+
     parser = OptionParser()
 
     parser.add_option('-v', "--version", action="store_true", default=False,
                       dest="version", help="Display version and author")
     parser.add_option('-t', "--test", action="store_true", default=False,
-                      dest="test", help="Test grabber with a know good search")
+                      dest="test", help="Perform self-test for dependencies.")
     parser.add_option('-s', "--search", action="store_true", default=False,
                       dest="search", help="Search for lyrics.")
     parser.add_option('-a', "--artist", metavar="ARTIST", default=None,
@@ -173,6 +165,10 @@ def main():
         lyrics.title = opts.title
     if opts.filename:
         lyrics.filename = opts.filename
+
+    if (len(args) > 0):
+        utilities.log('ERROR: invalid arguments found')
+        sys.exit(1)
 
     fetcher = LyricsFetcher()
     if fetcher.get_lyrics(lyrics):

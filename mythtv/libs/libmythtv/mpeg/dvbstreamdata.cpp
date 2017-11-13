@@ -666,7 +666,7 @@ bool DVBStreamData::HasCachedSDT(bool current) const
     return false;
 }
 
-bool DVBStreamData::HasCachedAnySDTs(bool current) const
+bool DVBStreamData::HasCachedAnySDTs(bool /*current*/) const
 {
     QMutexLocker locker(&_cache_lock);
     return !_cached_sdts.empty();
@@ -744,6 +744,35 @@ sdt_const_ptr_t DVBStreamData::GetCachedSDT(
         IncrementRefCnt(sdt = *it);
 
     return sdt;
+}
+
+sdt_vec_t DVBStreamData::GetCachedSDTSections(uint tsid, bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (!current)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            "Currently we ignore \'current\' param");
+
+    sdt_vec_t sdts;
+    sdt_const_ptr_t sdt = GetCachedSDT(tsid, 0);
+
+    if (sdt)
+    {
+        uint lastSection = sdt->LastSection();
+
+        sdts.push_back(sdt);
+
+        for (uint section = 1; section <= lastSection; section++)
+        {
+            sdt = GetCachedSDT(tsid, section);
+
+            if (sdt)
+                sdts.push_back(sdt);
+        }
+    }
+
+    return sdts;
 }
 
 sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const

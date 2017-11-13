@@ -264,6 +264,7 @@ class MTV_PUBLIC CardUtil
     static bool         IsInputTypePresent(const QString &rawtype,
                                            QString hostname = QString::null);
     static InputTypes   GetInputTypes(void); // input types on ALL hosts
+    static QStringList  GetInputTypeNames(uint sourceid); // input types for a given source id
 
     static QStringList  GetVideoDevices(const QString &rawtype,
                                         QString hostname = QString::null);
@@ -342,13 +343,13 @@ class MTV_PUBLIC CardUtil
                                          QString inputtype = QString::null);
     static QStringList  ProbeAudioInputs(QString device,
                                          QString inputtype = QString::null);
-    static void         GetDeviceInputNames(uint               inputid,
-                                            const QString      &device,
+    static void         GetDeviceInputNames(const QString      &device,
                                             const QString      &inputtype,
                                             QStringList        &inputs);
 
     // General info from OS
     static QStringList  ProbeVideoDevices(const QString &rawtype);
+    static void ClearVideoDeviceCache();
 
     // Other
     static bool         CloneCard(uint src_inputid, uint dst_inputid);
@@ -411,6 +412,7 @@ class MTV_PUBLIC CardUtil
     static QStringList  ProbeV4LVideoInputs(QString device);
     static QStringList  ProbeV4LAudioInputs(QString device);
     static QStringList  ProbeDVBInputs(QString device);
+    static QMap <QString,QStringList> videoDeviceCache;
 };
 
 #endif //_CARDUTIL_H_

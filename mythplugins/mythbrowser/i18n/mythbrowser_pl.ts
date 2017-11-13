@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pl_PL">
+<TS version="2.0" language="pl_PL">
 <context>
     <name>BookmarkEditor</name>
     <message>
@@ -223,57 +223,57 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="24"/>
         <source>%DATE%, %TIME%</source>
         <translation>%DATE%, %TIME%</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Web Bookmarks</source>
         <translation>Zakładki</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Browse your favorite web sites.</source>
         <translation>Oglądaj Twoje ulubione strony WWW.</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="26"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Browser:</source>
         <translation>Przeglądarka:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Text Size:</source>
         <translation>Rozmiar Tekstu:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="28"/>
         <source>Enable browser plugins (Flash, etc):</source>
         <translation>Odblokuj wtyczki przegladarki (Flash i inne):</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Cancel</source>
         <translation>Rezygnuj</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="23"/>
         <source>Rating Settings</source>
         <translation>Ustawienia Ocen</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="15"/>
+        <location filename="themestrings.h" line="16"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="29"/>
         <source>Configure Web Browser</source>
         <translation>Konfiguruj przeglądarkę WEB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="29"/>
+        <location filename="themestrings.h" line="30"/>
         <source>You can edit the name, URL, and category for the selected Web Site on this screen.
 
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
@@ -297,17 +297,15 @@ Gdy skończysz, naciśnij OK lub Cancel by zrezygnować.</translation>
         <translation>URL:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Genre:</source>
         <translation>Rodzaj:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
         <source>Channel:</source>
         <translation>Kanał:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Click to choose from existing categories...</source>
         <translation>Kliknij aby wybrać z istniejących kategorii...</translation>
     </message>
@@ -317,7 +315,7 @@ Gdy skończysz, naciśnij OK lub Cancel by zrezygnować.</translation>
         <translation>Organizator zakładek</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Web Page</source>
         <translation>Strona WEB</translation>
     </message>
@@ -342,7 +340,7 @@ Gdy skończysz, naciśnij OK lub Cancel by zrezygnować.</translation>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="17"/>
         <source>Browser Command:</source>
         <translation>Komenda uruchamiająca przegladarkę:</translation>
     </message>
@@ -352,62 +350,62 @@ Gdy skończysz, naciśnij OK lub Cancel by zrezygnować.</translation>
         <translation>Znajdź...</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="20"/>
         <source>Find</source>
         <translation>Znajdź</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Webbrowser</source>
         <translation>Przeglądarka WEB</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Bookmarks</source>
         <translation>Zakładki</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="34"/>
         <source>Url</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="35"/>
         <source>Homepage</source>
         <translation>Strona Domowa</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="36"/>
         <source>Edit Bookmark</source>
         <translation>Edytuj Zakładkę</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Homepage:</source>
         <translation>Strona Domowa:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="37"/>
         <source>Save</source>
         <translation>Zapisz</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="38"/>
         <source>Browser Settings</source>
         <translation>Ustawienia Przeglądarki</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="39"/>
         <source>Enable browser plugins (Flash, etc)</source>
         <translation>Odblokuj wtyczki (Flsah, etc)</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Enable plugins</source>
         <translation>Odblokuj wtyczki</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Enable plugins:</source>
         <translation>Odblokuj wtyczki:</translation>
     </message>

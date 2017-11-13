@@ -859,7 +859,7 @@ void MusicPlayer::customEvent(QEvent *event)
 
         m_errorCount++;
 
-        if (m_errorCount <= 5)
+        if (m_playMode != PLAYMODE_RADIO && m_errorCount <= 5)
             nextAuto();
         else
         {

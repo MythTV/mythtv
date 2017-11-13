@@ -89,18 +89,21 @@ ChannelInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                QString path = info.attribute("src", "");
-                if (!path.isEmpty() && !path.contains("://"))
+                if (chaninfo->icon.isEmpty())
                 {
-                    QString base = baseUrl.toString(QUrl::StripTrailingSlash);
-                    chaninfo->icon = base +
-                        ((path.startsWith("/")) ? path : QString("/") + path);
-                }
-                else if (!path.isEmpty())
-                {
-                    QUrl url(path);
-                    if (url.isValid())
-                        chaninfo->icon = url.toString();
+                    QString path = info.attribute("src", "");
+                    if (!path.isEmpty() && !path.contains("://"))
+                    {
+                        QString base = baseUrl.toString(QUrl::StripTrailingSlash);
+                        chaninfo->icon = base +
+                            ((path.startsWith("/")) ? path : QString("/") + path);
+                    }
+                    else if (!path.isEmpty())
+                    {
+                        QUrl url(path);
+                        if (url.isValid())
+                            chaninfo->icon = url.toString();
+                    }
                 }
             }
             else if (info.tagName() == "display-name")
@@ -199,7 +202,11 @@ static void fromXMLTVDate(QString &timestr, QDateTime &dt)
     {
         QString tsTime = ts.mid(8);
         if (tsTime.length() == 6)
+        {
+            if (tsTime == "235960")
+                tsTime = "235959";
             tmpTime = QTime::fromString(tsTime, "HHmmss");
+        }
         else if (tsTime.length() == 4)
             tmpTime = QTime::fromString(tsTime, "HHmm");
         else if (tsTime.length() == 2)
@@ -497,6 +504,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     totalepisodes = episode.section('/',1,1).trimmed();
                     episode = episode.section('/',0,0).trimmed();
                     season = episodenum.section('.',0,0).trimmed();
+                    season = season.section('/',0,0).trimmed();
                     QString part(episodenum.section('.',2,2));
                     QString partnumber(part.section('/',0,0).trimmed());
                     QString parttotal(part.section('/',1,1).trimmed());

@@ -2,7 +2,7 @@
 #define RECORDINGPROFILE_H
 
 #include "mythtvexp.h"
-#include "settings.h"
+#include "standardsettings.h"
 #include "mythdbcon.h"
 
 const QString availProfiles[] =
@@ -16,16 +16,16 @@ class V4L2util;
 // A parameter associated with the profile itself
 class RecordingProfileStorage : public SimpleDBStorage
 {
-  protected:
-    RecordingProfileStorage(Setting *_setting,
+  public:
+    RecordingProfileStorage(StandardSetting *_setting,
                             const RecordingProfile &parentProfile,
                             QString name) :
         SimpleDBStorage(_setting, "recordingprofiles", name),
         m_parent(parentProfile)
     {
-        _setting->setName(name);
     }
 
+  protected:
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const RecordingProfile &m_parent;
@@ -36,35 +36,28 @@ class TranscodeResize;
 class TranscodeLossless;
 class TranscodeFilters;
 
-class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
+class MTV_PUBLIC RecordingProfile : public GroupSetting
 {
   Q_OBJECT
   protected:
-    class ID : public AutoIncrementDBSetting {
+    class ID : public AutoIncrementSetting {
       public:
         ID():
-            AutoIncrementDBSetting("recordingprofiles", "id") {
+            AutoIncrementSetting("recordingprofiles", "id") {
             setVisible(false);
-        };
-
-        // Should never be called because this setting is not visible
-        virtual QWidget* configWidget(ConfigurationGroup *cg,
-                                      QWidget* parent = NULL,
-                                      const char* widgetName = NULL) {
-            (void)cg; (void)parent; (void)widgetName;
-            return NULL;
         };
     };
 
-    class Name: public LineEditSetting, public RecordingProfileStorage
+    class Name: public MythUITextEditSetting
     {
       public:
         explicit Name(const RecordingProfile &parent):
-            LineEditSetting(this, false),
-            RecordingProfileStorage(this, parent, "name")
+            MythUITextEditSetting(
+                new RecordingProfileStorage(this, parent, "name"))
         {
             setEnabled(false);
             setLabel(QObject::tr("Profile name"));
+            setName("name");
         }
 
       // -=>TODO: Qt4 can't have nested classes with slots/signals
@@ -74,11 +67,11 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
         virtual void setValue(const QString &newValue)
         {
             bool editable = (newValue != "Default") && (newValue != "Live TV");
-            setRW(editable);
             setEnabled(editable);
 
-            LineEditSetting::setValue(newValue);
+            MythUITextEditSetting::setValue(newValue);
         }
+        using StandardSetting::setValue;
     };
 
   public:
@@ -91,9 +84,8 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     virtual bool loadByGroup(const QString &name, const QString &group);
     virtual void CompleteLoad(int profileId, const QString &type,
                               const QString &name);
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
+    virtual bool canDelete(void);
+    virtual void deleteEntry(void);
 
     // sets
     void setCodecTypes();
@@ -102,7 +94,7 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 
     // gets
     const ImageSize& getImageSize(void) const { return *imageSize;       }
-    int     getProfileNum(void)         const { return id->intValue();   }
+    int     getProfileNum(void)         const { return id->getValue().toInt(); }
     QString getName(void)               const { return name->getValue(); }
     QString groupType(void)             const;
 
@@ -131,15 +123,15 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 
     static QMap<int, QString> GetProfiles(RecProfileGroup group = AllGroups);
     static QMap<int, QString> GetTranscodingProfiles();
-    static void fillSelections(SelectSetting* setting,
+    static void fillSelections(GroupSetting* setting,
                                int group, bool foldautodetect = false);
 
     // constants
     static const uint TranscoderAutodetect = 0; ///< sentinel value
 
   private slots:
-    void ResizeTranscode(bool resize);
-    void SetLosslessTranscode(bool lossless);
+    void ResizeTranscode(const QString &val);
+    void SetLosslessTranscode(const QString &val);
     void FiltersChanged(const QString &val);
 
   private:
@@ -158,7 +150,7 @@ class MTV_PUBLIC RecordingProfile : public QObject, public ConfigurationWizard
 };
 
 class RecordingProfileEditor :
-    public QObject, public ConfigurationDialog
+    public GroupSetting
 {
     Q_OBJECT
 
@@ -166,18 +158,13 @@ class RecordingProfileEditor :
     RecordingProfileEditor(int id, QString profName);
     virtual ~RecordingProfileEditor() {}
 
-    virtual DialogCode exec(void);
-    virtual DialogCode exec(bool /*saveOnExec*/, bool /*doLoad*/)
-        { return exec(); }
     virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString /*destination*/) { }
 
-  protected slots:
-    void open(int id);
+  public slots:
+    void ShowNewProfileDialog();
+    void CreateNewProfile(QString);
 
   protected:
-    ListBoxSetting *listbox;
     int             group;
     QString         labelName;
 };

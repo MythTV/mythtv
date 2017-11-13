@@ -15,9 +15,9 @@ DEPENDPATH += . ../..
 INCLUDEPATH += . ../.. ../../mpeg ../../../libmythui ../../../libmyth ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 
-LIBS += ../../dvbdescriptors.o
-LIBS += ../../iso6937tables.o
-LIBS += ../../freesat_huffman.o
+LIBS += ../../$(OBJECTS_DIR)/dvbdescriptors.o
+LIBS += ../../$(OBJECTS_DIR)/iso6937tables.o
+LIBS += ../../$(OBJECTS_DIR)/freesat_huffman.o
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
@@ -29,6 +29,8 @@ LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
 LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale
 LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
+LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
+LIBS += -L../../../../external/FFmpeg/libpostproc -lmythpostproc
 using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -L../../../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
 LIBS += -L../.. -lmythtv-$$LIBVERSION

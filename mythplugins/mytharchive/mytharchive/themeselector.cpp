@@ -149,7 +149,6 @@ void DVDThemeSelector::getThemeList(void)
         filters << "*";
         QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
 
-        int count = 0;
         for (int x = 0; x < list.size(); x++)
         {
             QFileInfo fi = list.at(x);
@@ -158,7 +157,6 @@ void DVDThemeSelector::getThemeList(void)
                 theme_list.append(fi.fileName());
                 QString filename = fi.fileName().replace(QString("_"), QString(" "));
                 new MythUIButtonListItem(theme_selector, filename);
-                ++count;
             }
         }
     }

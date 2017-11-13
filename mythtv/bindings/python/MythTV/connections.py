@@ -10,22 +10,32 @@ from MythTV.utility import deadlinesocket
 
 from time import sleep, time
 from select import select
-from thread import start_new_thread, allocate_lock, get_ident
+try:
+    from thread import start_new_thread, allocate_lock, get_ident
+except ImportError:
+    from _thread import start_new_thread, allocate_lock, get_ident
 import lxml.etree as etree
 import weakref
-import urllib2
+try:
+    import urllib2
+except ImportError:
+    import urllib.request as urllib2
 import socket
-import Queue
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 import json
 import re
+from builtins import str
 
 try:
-    import _conn_oursql as dbmodule
-    from   _conn_oursql import LoggedCursor
+    from . import _conn_oursql as dbmodule
+    from ._conn_oursql import LoggedCursor
 except:
     try:
-        import _conn_mysqldb as dbmodule
-        from   _conn_mysqldb import LoggedCursor
+        from . import _conn_mysqldb as dbmodule
+        from ._conn_mysqldb import LoggedCursor
     except:
         raise MythError("No viable database module found.")
 
@@ -198,7 +208,7 @@ class BEConnection( object ):
 
         try:
             self.connect()
-        except socket.error, e:
+        except socket.error as e:
             self.log.logTB(MythLog.SOCKET)
             self.connected = False
             self.log(MythLog.GENERAL, MythLog.CRIT,
@@ -273,7 +283,7 @@ class BEConnection( object ):
         obj.backendCommand(data=None, timeout=None) -> response string
 
         Sends a formatted command via a socket to the mythbackend. 'timeout'
-            will override the default timeout given when the object was 
+            will override the default timeout given when the object was
             created. If 'data' is None, the method will return any events
             in the receive buffer.
         """
@@ -303,12 +313,12 @@ class BEConnection( object ):
 
                 # convert to unicode
                 try:
-                    res = unicode(''.join([res]), 'utf8')
+                    res = str(''.join([res]), 'utf8')
                 except:
                     res = u''.join([res])
 
                 return res
-        except MythError, e:
+        except MythError as e:
             if e.sockcode == 54:
                 # remote has closed connection, attempt reconnect
                 self.reconnect(True)
@@ -342,7 +352,7 @@ class BEEventConnection( BEConnection ):
         self.threadrunning = False
         self.eventqueue = Queue.Queue()
 
-        super(BEEventConnection, self).__init__(backend, port, localname, 
+        super(BEEventConnection, self).__init__(backend, port, localname,
                                                 False, deadline)
 
     def connect(self):
@@ -386,7 +396,7 @@ class BEEventConnection( BEConnection ):
                     event = self.socket.recvheader(deadline=0.0)
 
                     try:
-                        event = unicode(''.join([event]), 'utf8')
+                        event = str(''.join([event]), 'utf8')
                     except:
                         event = u''.join([event])
 
@@ -394,14 +404,14 @@ class BEEventConnection( BEConnection ):
                         self.eventqueue.put(event)
                     # else discard
 
-        except MythError, e:
+        except MythError as e:
             if e.sockcode == 54:
                 # remote has closed connection, attempt reconnect
                 self.reconnect(True, True)
-                return self.backendCommand(data, deadline)
+                return self.backendCommand(event, self.socket.getdeadline())
             else:
                 raise
- 
+
     def registeruser(self, uuid, opts):
         self._regusers[uuid] = opts
 
@@ -482,7 +492,7 @@ class FEConnection( object ):
             try:
                 t = time()
                 fe._test(t + 2.0)
-            except MythError, e:
+            except MythError as e:
                 continue
             yield fe
 
@@ -582,7 +592,7 @@ class XMLConnection( object ):
 
     def __repr__(self):
         return "<%s 'http://%s:%d/' at %s>" % \
-                (str(self.__class__).split("'")[1].split(".")[-1], 
+                (str(self.__class__).split("'")[1].split(".")[-1],
                  self.host, self.port, hex(id(self)))
 
     def __init__(self, host, port):
@@ -605,7 +615,7 @@ class XMLConnection( object ):
         'keyvars' are a series of optional variables to specify on the URL.
 
         The request object supports open() and read(), as well as supports
-            editing of HTTP headers and POST data. 
+            editing of HTTP headers and POST data.
         """
         url = 'http://{0.host}:{0.port}/{1}'.format(self, path)
         if keyvars:

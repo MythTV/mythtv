@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_GB">
-<defaultcodec>UTF-8</defaultcodec>
+<TS version="2.1" language="en_GB">
 <context>
     <name>(MythGalleryMain)</name>
     <message>
@@ -293,251 +292,256 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>When a new CD, DVD or removable storage device containing pictures is detected then load MythGallery to display the content.</translation>
     </message>
     <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="146"/>
+        <source>Transition mode</source>
+        <translation>Transition mode</translation>
+    </message>
+    <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="147"/>
-        <source>Use OpenGL transitions</source>
-        <translation>Use OpenGL transitions</translation>
+        <source>Select which kind of slideshow transition to use.</source>
+        <translation>Select which kind of slideshow transition to use.</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="149"/>
-        <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation>Check this to enable OpenGL based slideshow transitions</translation>
+        <source>Standard</source>
+        <translation>Standard</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="157"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="151"/>
+        <source>OpenGL</source>
+        <translation>OpenGL</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/gallerysettings.cpp" line="161"/>
         <source>Type of OpenGL transition</source>
         <translation>Type of OpenGL transition</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="160"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="164"/>
         <source>none</source>
         <extracomment>No OpenGL transition</extracomment>
         <translation>none</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="162"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="166"/>
         <source>blend (gl)</source>
         <extracomment>Blend OpenGL transition</extracomment>
         <translation>blend (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="164"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="168"/>
         <source>zoom blend (gl)</source>
         <extracomment>Room blend OpenGL transition</extracomment>
         <translation>zoom blend (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="166"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="170"/>
         <source>fade (gl)</source>
         <extracomment>Fade OpenGL transition</extracomment>
         <translation>fade (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="168"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="172"/>
         <source>rotate (gl)</source>
         <extracomment>Rotate OpenGL transition</extracomment>
         <translation>rotate (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="170"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
         <source>bend (gl)</source>
         <extracomment>Bend OpenGL transition</extracomment>
         <translation>bend (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="172"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="176"/>
         <source>inout (gl)</source>
         <extracomment>Inout OpenGL transition</extracomment>
         <translation>inout (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="178"/>
         <source>slide (gl)</source>
         <extracomment>Slide OpenGL transition</extracomment>
         <translation>slide (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="176"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="180"/>
         <source>flutter (gl)</source>
         <extracomment>Flutter OpenGL transition</extracomment>
         <translation>flutter (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="178"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="182"/>
         <source>cube (gl)</source>
         <extracomment>Cube OpenGL transition</extracomment>
         <translation>cube (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="180"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="184"/>
         <source>Ken Burns (gl)</source>
         <extracomment>Ken Burns OpenGL transition</extracomment>
         <translation>Ken Burns (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="182"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="186"/>
         <source>random (gl)</source>
         <extracomment>Random OpenGL transition</extracomment>
         <translation>random (gl)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="184"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="188"/>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
         <translation>This is the type of OpenGL transition used between pictures in slideshow mode.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="194"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="198"/>
         <source>Duration of OpenGL Transition (milliseconds)</source>
         <translation>Duration of OpenGL Transition (ms)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="205"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="209"/>
         <source>Type of transition</source>
         <translation>Type of transition</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="207"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="211"/>
         <source>none</source>
         <comment>Slideshow transition</comment>
         <translation>none</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="210"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="214"/>
         <source>chess board</source>
         <comment>Slideshow transition</comment>
         <translation>chess board</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="213"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="217"/>
         <source>melt down</source>
         <comment>Slideshow transition</comment>
         <translation>melt down</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="216"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="220"/>
         <source>sweep</source>
         <comment>Slideshow transition</comment>
         <translation>sweep</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="219"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="223"/>
         <source>noise</source>
         <comment>Slideshow transition</comment>
         <translation>noise</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="222"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="226"/>
         <source>growing</source>
         <comment>Slideshow transition</comment>
         <translation>growing</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="225"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="229"/>
         <source>incoming edges</source>
         <comment>Slideshow transition</comment>
         <translation>incoming edges</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="228"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="232"/>
         <source>horizontal lines</source>
         <comment>Slideshow transition</comment>
         <translation>horizontal lines</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="231"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="235"/>
         <source>vertical lines</source>
         <comment>Slideshow transition</comment>
         <translation>vertical lines</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="234"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="238"/>
         <source>circle out</source>
         <comment>Slideshow transition</comment>
         <translation>circle out</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="236"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="240"/>
         <source>multicircle out</source>
         <comment>Slideshow transition</comment>
         <translation>multicircle out</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="239"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="243"/>
         <source>spiral in</source>
         <comment>Slideshow transition</comment>
         <translation>spiral in</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="242"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="246"/>
         <source>blobs</source>
         <comment>Slideshow transition</comment>
         <translation>blobs</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="245"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="249"/>
         <source>random</source>
         <comment>Slideshow transition</comment>
         <translation>random</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="249"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="253"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>This is the type of transition used between pictures in slideshow mode.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="257"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="261"/>
         <source>Type of background</source>
         <translation>Type of background</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="259"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="263"/>
         <source>theme</source>
         <comment>Slideshow background</comment>
         <translation>theme</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="262"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="266"/>
         <source>black</source>
         <comment>Slideshow background</comment>
         <translation>black</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="265"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="269"/>
         <source>white</source>
         <comment>Slideshow background</comment>
         <translation>white</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="268"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="272"/>
         <source>This is the type of background for each picture in single view mode.</source>
         <translation>This is the type of background for each picture in single view mode.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="276"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="280"/>
         <source>Slideshow Delay</source>
         <translation>Slideshow Delay</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="278"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="282"/>
         <source>This is the number of seconds to display each picture.</source>
         <translation>This is the number of seconds to display each picture.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="286"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="290"/>
         <source>Recurse into directories</source>
         <translation>Recurse into directories</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="287"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="291"/>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation>Check this to let the slideshow recurse into sub-directories.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="298"/>
-        <source>MythGallery Settings (Slideshow)</source>
-        <translation>MythGallery Settings (Slideshow)</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="328"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="299"/>
         <source>MythGallery Settings (General)</source>
         <translation>MythGallery Settings (General)</translation>
     </message>
@@ -693,7 +697,7 @@ Check the directory exists, is readable and the setting is correct on MythGaller
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="1017"/>
-        <location filename="../mythgallery/iconview.cpp" line="1413"/>
+        <location filename="../mythgallery/iconview.cpp" line="1428"/>
         <source>Rename</source>
         <translation>Rename</translation>
     </message>
@@ -713,22 +717,22 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Deleting 1 image.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1168"/>
+        <location filename="../mythgallery/iconview.cpp" line="1183"/>
         <source>Importing images from camera. Please wait...</source>
         <translation>Importing images from camera. Please wait...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1198"/>
+        <location filename="../mythgallery/iconview.cpp" line="1213"/>
         <source>Found an import script (%1) but running them has been disabled in the settings!</source>
         <translation>Found an import script (%1) but running them has been disabled in the settings!</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1209"/>
+        <location filename="../mythgallery/iconview.cpp" line="1224"/>
         <source>Could not read or execute %1</source>
         <translation>Could not read or execute %1</translation>
     </message>
     <message numerus="yes">
-        <location filename="../mythgallery/iconview.cpp" line="1222"/>
+        <location filename="../mythgallery/iconview.cpp" line="1237"/>
         <source>Found %n image(s)</source>
         <translation>
             <numerusform>Found %n image</numerusform>
@@ -736,42 +740,42 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         </translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1217"/>
+        <location filename="../mythgallery/iconview.cpp" line="1232"/>
         <source>Nothing found to import</source>
         <translation>Nothing found to import</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1319"/>
+        <location filename="../mythgallery/iconview.cpp" line="1334"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Deleting %1 images and folders, including any subfolders and files.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1382"/>
+        <location filename="../mythgallery/iconview.cpp" line="1397"/>
         <source>New Folder</source>
         <translation>New Folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1384"/>
+        <location filename="../mythgallery/iconview.cpp" line="1399"/>
         <source>Create New Folder</source>
         <translation>Create New Folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1449"/>
+        <location filename="../mythgallery/iconview.cpp" line="1464"/>
         <source>Failed to rename folder</source>
         <translation>Failed to rename folder</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1451"/>
+        <location filename="../mythgallery/iconview.cpp" line="1466"/>
         <source>Failed to rename file</source>
         <translation>Failed to rename file</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1511"/>
+        <location filename="../mythgallery/iconview.cpp" line="1526"/>
         <source>Moving marked images...</source>
         <translation>Moving marked images...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1511"/>
+        <location filename="../mythgallery/iconview.cpp" line="1526"/>
         <source>Copying marked images...</source>
         <translation>Copying marked images...</translation>
     </message>
@@ -907,34 +911,19 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>Toggle scale to fullscreen/scale to fit</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="141"/>
+        <location filename="../mythgallery/main.cpp" line="140"/>
         <source>MythGallery Media Handler 1/3</source>
         <translation>MythGallery Media Handler (1/3)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="142"/>
-        <source>MythGallery mixed data</source>
-        <translation>MythGallery mixed data</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="154"/>
+        <location filename="../mythgallery/main.cpp" line="152"/>
         <source>MythGallery Media Handler 2/3</source>
         <translation>MythGallery Media Handler (2/3)</translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="155"/>
-        <source>MythGallery images</source>
-        <translation>MythGallery images</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="167"/>
+        <location filename="../mythgallery/main.cpp" line="164"/>
         <source>MythGallery Media Handler 3/3</source>
         <translation>MythGallery Media Handler (3/3)</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/main.cpp" line="168"/>
-        <source>MythGallery movies</source>
-        <translation>MythGallery movies</translation>
     </message>
 </context>
 <context>

@@ -104,7 +104,7 @@ class SignalMonitorValue
     static void Init();
     static SignalMonitorValue*
         Create(const QString& _name, const QString& _longString);
-    static SignalMonitorList Parse(const QStringList& list);
+    static SignalMonitorList Parse(const QStringList& slist);
     static bool AllGood(const SignalMonitorList& slist);
     static int MaxWait(const SignalMonitorList& slist);
 

@@ -183,7 +183,7 @@ class MHSlider : public MHVisible, public MHInteractible
     virtual void SetHighlightStatus(bool newStatus, MHEngine *engine)
     { InteractSetHighlightStatus(newStatus, engine); }
     virtual bool GetHighlightStatus(void) { return InteractGetHighlightStatus(); }
-    virtual void Deactivation(MHEngine *engine) { InteractDeactivation(); }
+    virtual void Deactivation(MHEngine */*engine*/) { InteractDeactivation(); }
 
     // Actions
     virtual void Step(int nbSteps, MHEngine *engine);
@@ -236,7 +236,7 @@ class MHEntryField : public MHVisible, public MHInteractible
     virtual void SetHighlightStatus(bool newStatus, MHEngine *engine)
     { InteractSetHighlightStatus(newStatus, engine); }
     virtual bool GetHighlightStatus(void) { return InteractGetHighlightStatus(); }
-    virtual void Deactivation(MHEngine *engine) { InteractDeactivation(); }
+    virtual void Deactivation(MHEngine */*engine*/) { InteractDeactivation(); }
 };
 
 // Button - not needed for UK MHEG.
@@ -399,7 +399,7 @@ class MHSetInteractionStatus: public MHActionBool
 {
   public:
     MHSetInteractionStatus(): MHActionBool("SetInteractionStatus") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool newStatus)
+    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, bool newStatus)
     { Target(engine)->SetInteractionStatus(newStatus, engine); }
 };
 
@@ -415,7 +415,7 @@ class MHSetHighlightStatus: public MHActionBool
 {
   public:
     MHSetHighlightStatus(): MHActionBool("SetHighlightStatus") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool newStatus)
+    virtual void CallAction(MHEngine *engine, MHRoot */*pTarget*/, bool newStatus)
     { Target(engine)->SetHighlightStatus(newStatus, engine); }
 };
 

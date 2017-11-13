@@ -94,7 +94,7 @@ QString resDurationFormat(uint32_t msec)
     // M = Minutes (2 digits, 0 prefix)
     // S = Seconds (2 digits, 0 prefix)
     // FS = Fractional Seconds (milliseconds)
-    resDurationStr.sprintf("%01d:%02d:%02d.%01d",
+    resDurationStr.sprintf("%01u:%02u:%02u.%01u",
                 (msec / (1000 * 60 * 60)) % 24, // Hours
                 (msec / (1000 * 60)) % 60,      // Minutes
                 (msec / 1000) % 60,             // Seconds
@@ -109,7 +109,7 @@ namespace DLNA
 {
 
 QString DLNAProfileName(const QString &mimeType, const QSize &resolution,
-                        const double videoFrameRate, const QString &container,
+                        const double /*videoFrameRate*/, const QString &container,
                         const QString &vidCodec, const QString &audioCodec)
 {
     QString sProfileName;

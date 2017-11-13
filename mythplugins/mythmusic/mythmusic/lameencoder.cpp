@@ -103,12 +103,10 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
     Encoder(outfile, qualitylevel, metadata),
     bits(16),
     channels(2),
-    samplerate(44100),
     bytes_per_sample(channels * bits / 8),
     samples_per_channel(0),
     mp3buf_size((int)(1.25 * 16384 + 7200)), // worst-case estimate
     mp3buf(new char[mp3buf_size]),
-    mp3bytes(0),
     gf(lame_init())
 {
     init_id3tags(gf);

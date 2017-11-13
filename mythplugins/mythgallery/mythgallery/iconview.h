@@ -46,7 +46,7 @@ class ThumbGenerator;
 class MediaMonitor;
 class ChildCountThread;
 
-Q_DECLARE_METATYPE(ThumbItem*)
+Q_DECLARE_METATYPE(ThumbItem*);
 
 class IconView : public MythScreenType
 {
@@ -89,6 +89,7 @@ class IconView : public MythScreenType
     void HandleDeleteCurrent(void);
     void HandleSlideShow(void);
     void HandleSettings(void);
+    void ReloadSettings(void);
     void HandleEject(void);
     void HandleImport(void);
     void HandleShowDevices(void);

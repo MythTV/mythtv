@@ -335,6 +335,7 @@ static qlonglong inline ContentRange(const QNetworkReply *reply,
     return len;
 }
 
+#if 0
 static bool inline RequestRange(const QNetworkRequest &request,
     qlonglong &first, qlonglong &last)
 {
@@ -353,6 +354,7 @@ static bool inline RequestRange(const QNetworkRequest &request,
 
     return true;
 }
+#endif
 
 // signal from QNetworkReply
 void NetStream::slotReadyRead()

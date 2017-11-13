@@ -25,25 +25,18 @@ class SERVICE_PUBLIC CastMemberList : public QObject
 
     Q_PROPERTY( QVariantList CastMembers READ CastMembers DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, CastMembers )
+    PROPERTYIMP_RO_REF( QVariantList, CastMembers );
 
     public:
-
-        static inline void InitializeCustomTypes();
 
         CastMemberList(QObject *parent = 0)
             : QObject( parent )
         {
         }
 
-        CastMemberList( const CastMemberList &src )
+        void Copy( const CastMemberList *src )
         {
-            Copy( src );
-        }
-
-        void Copy( const CastMemberList &src )
-        {
-            CopyListContents< CastMember >( this, m_CastMembers, src.m_CastMembers );
+            CopyListContents< CastMember >( this, m_CastMembers, src->m_CastMembers );
         }
 
         CastMember *AddNewCastMember()
@@ -57,22 +50,10 @@ class SERVICE_PUBLIC CastMemberList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(CastMemberList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::CastMemberList  )
-Q_DECLARE_METATYPE( DTC::CastMemberList* )
-
-namespace DTC
-{
-inline void CastMemberList::InitializeCustomTypes()
-{
-    qRegisterMetaType< CastMemberList   >();
-    qRegisterMetaType< CastMemberList*  >();
-
-    CastMember::InitializeCustomTypes();
-}
-}
 
 #endif

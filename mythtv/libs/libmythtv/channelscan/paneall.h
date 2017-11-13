@@ -33,16 +33,18 @@
 // MythTV headers
 #include "channelscanmiscsettings.h"
 
-class PaneAll : public VerticalConfigurationGroup
+class PaneAll : public GroupSetting
 {
   public:
-    PaneAll() :
-        VerticalConfigurationGroup(false, false, true, false),
+    PaneAll(const QString &target, StandardSetting *setting) :
         ignore_signal_timeout(new IgnoreSignalTimeout()),
         follow_nit(new FollowNITSetting())
     {
-        addChild(ignore_signal_timeout);
-        addChild(follow_nit);
+        setVisible(false);
+        setting->addTargetedChildren(target,
+                                     {this,
+                                      ignore_signal_timeout,
+                                      follow_nit});
     }
 
     bool ignoreSignalTimeout(void) const

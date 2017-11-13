@@ -138,8 +138,8 @@ EITFixUp::EITFixUp()
       m_PRO7CrewOne("^(.*):\\s+(.*)$"),
       m_PRO7Cast("\n\nDarsteller:\n(.*)$"),
       m_PRO7CastOne("^([^\\(]*)\\((.*)\\)$"),
-      m_DisneyChannelSubtitle(",([^,]+)\\s{0,1}(\\d{4})$"),
       m_ATVSubtitle(",{0,1}\\sFolge\\s(\\d{1,3})$"),
+      m_DisneyChannelSubtitle(",([^,]+)\\s{0,1}(\\d{4})$"),
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
@@ -392,8 +392,8 @@ void EITFixUp::Fix(DBEventEIT &event) const
  *  If there is no authority on the ID, add the default one.
  *  If there is no default, return an empty id.
  *
+ *  \param chanid The channel whose data should be updated.
  *  \param id The ID string to add the authority to.
- *  \param query Object to use for SQL queries.
  *
  *  \return ID with the authority added or empty string if not a valid CRID.
  */
@@ -423,7 +423,6 @@ QString EITFixUp::AddDVBEITAuthority(uint chanid, const QString &id)
 /**
  *  \brief Use this for the Canadian BellExpressVu to standardize DVB-S guide.
  *  \todo  deal with events that don't have eventype at the begining?
- *  \TODO
  */
 void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 {

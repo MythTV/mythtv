@@ -869,7 +869,7 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
 
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
     if (it != srv_to_chanid.end())
-        return max(*it, 0u);
+        return *it;
 
     uint chanid = get_chan_id_from_db_atsc(sourceid, atsc_major, atsc_minor);
     srv_to_chanid[key] = chanid;
@@ -887,7 +887,7 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
 
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
     if (it != srv_to_chanid.end())
-        return max(*it, 0u);
+        return *it;
 
     uint chanid = get_chan_id_from_db_dvb(sourceid, serviceid, networkid, tsid);
     srv_to_chanid[key] = chanid;
@@ -904,7 +904,7 @@ uint EITHelper::GetChanID(uint program_number)
 
     ServiceToChanID::const_iterator it = srv_to_chanid.find(key);
     if (it != srv_to_chanid.end())
-        return max(*it, 0u);
+        return *it;
 
     uint chanid = get_chan_id_from_db_dtv(sourceid, program_number, channelid);
     srv_to_chanid[key] = chanid;

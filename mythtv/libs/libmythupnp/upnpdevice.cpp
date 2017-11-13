@@ -6,7 +6,7 @@
 //
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //
-// Licensed under the GPL v2 or later, see COPYING for details                    
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +42,10 @@ int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
 UPnpDeviceDesc::UPnpDeviceDesc()
 {
+    // Static initialisation order fiasco: Logging isn't available yet
+#if 0
     LOG(VB_UPNP, LOG_INFO, "UPnpDeviceDesc - Constructor");
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -335,25 +338,12 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 /////////////////////////////////////////////////////////////////////////////
 
 void UPnpDeviceDesc::GetValidXML(
-    const QString &sBaseAddress, int nPort,
+    const QString &/*sBaseAddress*/, int /*nPort*/,
     QTextStream &os, const QString &sUserAgent )
 {
 #if 0
     os.setEncoding( QTextStream::UnicodeUTF8 );
 #endif
-
-    QString BaseAddr;
-    QHostAddress addr(sBaseAddress);
-
-    BaseAddr = sBaseAddress;
-
-#if !defined(QT_NO_IPV6)
-    // Basically if it appears to be an IPv6 IP surround the IP with []
-    //  otherwise don't bother
-    if (sBaseAddress.contains(":"))
-        BaseAddr = "[" + sBaseAddress + "]";
-#endif
-
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
           "<root xmlns=\"urn:schemas-upnp-org:device-1-0\" "
           " xmlns:mythtv=\"mythtv.org\">\n"
@@ -739,7 +729,7 @@ UPnpDevice::UPnpDevice() :
 
 // NOTE: The icons are defined here and not in devicemaster.xml because they
 //       are also used for the MediaRenderer device and other possible future
-//       devices too. 
+//       devices too.
 
     // Large PNG Icon
     UPnpIcon *pngIconLrg = new UPnpIcon();

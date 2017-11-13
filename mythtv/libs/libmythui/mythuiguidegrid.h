@@ -93,11 +93,16 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
         int m_recStat;
     };
 
-    void drawBackground(MythPainter *p, UIGTCon *data, int alpaMod);
-    void drawBox(MythPainter *p, UIGTCon *data, const QColor &color, int alpaMod);
-    void drawText(MythPainter *p, UIGTCon *data, int alpaMod);
-    void drawRecType(MythPainter *p, UIGTCon *data, int alpaMod);
-    void drawCurrent(MythPainter *p, UIGTCon *data, int alpaMod);
+    void drawBackground(MythPainter *p, int xoffset, int yoffset,
+                        UIGTCon *data, int alphaMod);
+    void drawBox(MythPainter *p, int xoffset, int yoffset, UIGTCon *data,
+                 const QColor &color, int alphaMod);
+    void drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon *data,
+                  int alphaMod);
+    void drawRecDecoration(MythPainter *p, int xoffset, int yoffset,
+                           UIGTCon *data, int alphaMod);
+    void drawCurrent(MythPainter *p, int xoffset, int yoffset, UIGTCon *data,
+                     int alphaMod);
 
     QColor calcColor(const QColor &color, int alpha);
 

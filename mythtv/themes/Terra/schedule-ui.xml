@@ -985,6 +985,150 @@
 
     </window>
 
+    <window name="prevreclist">
+
+        <imagetype name="backdrop" from="basebackdrop" />
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Previously Recorded</value>
+        </textarea>
+
+        <shape name="details_background" from="basebackground">
+            <area>38,50,1203,238</area>
+        </shape>
+
+        <shape name="titles_background" from="basebackground">
+            <area>38,302,376,374</area>
+        </shape>
+
+        <shape name="shows_background" from="basebackground">
+            <area>434,302,808,374</area>
+        </shape>
+
+        <buttonlist name="titles" from="basebuttonlist2">
+            <area>54,307,344,370</area>
+            <spacing>0</spacing>
+            <buttonarea>0,0,344,370</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,344,38</area>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>8,0,328,38</area>
+                        <font>basesmallgrey</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                    <shape name="selectbar">
+                        <area>0,0,344,38</area>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="selectedactive">
+                    <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                    <shape name="selectbar">
+                        <area>0,0,344,38</area>
+                    </shape>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <buttonlist name="shows" from="titles">
+            <area>450,307,776,370</area>
+            <buttonarea>0,0,776,370</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,776,38</area>
+                <state name="active">
+                    <textarea name="startdate" from="basetextarea">
+                        <area>8,0,216,38</area>
+                        <font>basesmall</font>
+                        <align>left,vcenter</align>
+                        <cutdown>no</cutdown>
+                    </textarea>
+                    <textarea name="parttitle" from="startdate">
+                        <area>232,0,512,38</area>
+                        <cutdown>yes</cutdown>
+                    </textarea>
+                    <textarea name="card" from="startdate">
+                        <area>744,0,24,38</area>
+                        <font state="disabled">basesmallpurple</font>
+                        <font state="error">basesmallred</font>
+                        <font state="warning">basesmallyellow</font>
+                        <font state="normal">basesmallblue</font>
+                        <font state="running">basesmallgreen</font>
+                        <cutdown>no</cutdown>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,776,38</area>
+                    </shape>
+                </state>
+                <state name="selectedinactive" from="selectedactive" />
+                <state name="inactive" from="active" />
+            </statetype>
+        </buttonlist>
+
+        <textarea name="title" from="basetextarea">
+            <area>80,63,1120,54</area>
+            <font>baselarge</font>
+        </textarea>
+        <textarea name="timedate" from="basetextarea">
+            <area>80,216,704,32</area>
+        </textarea>
+        <textarea name="channel" from="basetextarea">
+            <area>880,216,320,42</area>
+            <align>right</align>
+        </textarea>
+        <textarea name="rectypestatus" from="basetextarea">
+            <area>80,246,960,42</area>
+            <font>basesmallyellow</font>
+        </textarea>
+        <textarea name="description" from="basetextarea">
+            <area>80,105,1120,144</area>
+            <multiline>yes</multiline>
+            <template>%"|SUBTITLE|"\n%%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
+        </textarea>
+
+        <textarea name="help1text" from="basetextarea">
+            <area>72,75,1120,36</area>
+        </textarea>
+        <textarea name="help2text" from="basetextarea">
+            <area>72,120,1120,144</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
     <window name="programguide">
 
         <imagetype name="backdrop" from="basebackdrop" />

@@ -38,13 +38,13 @@ HEADERS += httpconfig.h mythsettings.h commandlineparser.h
 HEADERS += serviceHosts/mythServiceHost.h    serviceHosts/guideServiceHost.h
 HEADERS += serviceHosts/contentServiceHost.h serviceHosts/dvrServiceHost.h
 HEADERS += serviceHosts/channelServiceHost.h serviceHosts/videoServiceHost.h
-HEADERS += serviceHosts/captureServiceHost.h
-HEADERS += serviceHosts/imageServiceHost.h
+HEADERS += serviceHosts/captureServiceHost.h serviceHosts/imageServiceHost.h
+HEADERS += serviceHosts/musicServiceHost.h
 
 HEADERS += services/myth.h services/guide.h services/content.h services/dvr.h
 HEADERS += services/serviceUtil.h services/channel.h services/video.h
-HEADERS += services/capture.h
-HEADERS += services/image.h
+HEADERS += services/capture.h services/image.h services/music.h
+
 
 SOURCES += autoexpire.cpp encoderlink.cpp filetransfer.cpp httpstatus.cpp
 SOURCES += main.cpp mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp
@@ -56,7 +56,7 @@ SOURCES += httpconfig.cpp mythsettings.cpp commandlineparser.cpp
 SOURCES += services/myth.cpp services/guide.cpp services/content.cpp 
 SOURCES += services/dvr.cpp services/channel.cpp services/video.cpp
 SOURCES += services/serviceUtil.cpp services/capture.cpp
-SOURCES += services/image.cpp
+SOURCES += services/image.cpp services/music.cpp
 
 using_oss:DEFINES += USING_OSS
 

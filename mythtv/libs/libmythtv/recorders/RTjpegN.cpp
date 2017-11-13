@@ -109,10 +109,10 @@ static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
 
 int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t /*bt8*/)
 {
- register int ci, co=1;
- register int16_t ZZvalue;
- register unsigned char bitten;
- register unsigned char bitoff;
+ int ci, co=1;
+ int16_t ZZvalue;
+ unsigned char bitten;
+ unsigned char bitoff;
 
  uint8_t *ustrm = (uint8_t *)strm;
 #ifdef SHOWBLOCK
@@ -282,10 +282,10 @@ int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t /*bt8*/, int32_t *qtbla)
 {
  uint32_t *qtbl = (uint32_t *)qtbla;
  int ci;
- register int co;
- register int i;
- register unsigned char bitten;
- register unsigned char bitoff;
+ int co;
+ int i;
+ unsigned char bitten;
+ unsigned char bitoff;
 
  /* first byte always read */
  i=RTjpeg_ZZ[0];
@@ -709,7 +709,7 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
   }
 #else
   volatile mmx_t tmp6, tmp7;
-  register mmx_t *dataptr = (mmx_t *)block;
+  mmx_t *dataptr = (mmx_t *)block;
   mmx_t *idata2 = (mmx_t *)idata;
 
 
@@ -1546,7 +1546,7 @@ static mmx_t fix_n184;       fix_n184.q = (long long)0x896f896f896f896fLL;
 static mmx_t fix_108n184; fix_108n184.q = (long long)0xcf04cf04cf04cf04LL;
 
   mmx_t *wsptr = (mmx_t *)ws;
-  register mmx_t *dataptr = (mmx_t *)odata;
+  mmx_t *dataptr = (mmx_t *)odata;
   mmx_t *idata = (mmx_t *)data;
 
   rskip = rskip>>3;
@@ -2827,11 +2827,11 @@ RTjpeg::~RTjpeg(void)
 inline int RTjpeg::compressYUV420(int8_t *sp, uint8_t **planes)
 {
  int8_t * sb;
- register uint8_t * bp = planes[0];
- register uint8_t * bp1 = bp + (width<<3);
- register uint8_t * bp2 = planes[1];
- register uint8_t * bp3 = planes[2];
- register int i, j, k;
+ uint8_t * bp = planes[0];
+ uint8_t * bp1 = bp + (width<<3);
+ uint8_t * bp2 = planes[1];
+ uint8_t * bp3 = planes[2];
+ int i, j, k;
 
 #ifdef MMX
  emms();
@@ -2880,10 +2880,10 @@ inline int RTjpeg::compressYUV420(int8_t *sp, uint8_t **planes)
 inline int RTjpeg::compressYUV422(int8_t *sp, uint8_t **planes)
 {
  int8_t * sb;
- register uint8_t * bp = planes[0];
- register uint8_t * bp2 = planes[1];
- register uint8_t * bp3 = planes[2];
- register int i, j, k;
+ uint8_t * bp = planes[0];
+ uint8_t * bp2 = planes[1];
+ uint8_t * bp3 = planes[2];
+ int i, j, k;
 
 #ifdef MMX
  emms();
@@ -2925,7 +2925,7 @@ inline int RTjpeg::compressYUV422(int8_t *sp, uint8_t **planes)
 inline int RTjpeg::compress8(int8_t *sp, uint8_t **planes)
 {
  int8_t * sb;
- register uint8_t * bp = planes[0];
+ uint8_t * bp = planes[0];
  int i, j;
 
 #ifdef MMX
@@ -2953,9 +2953,9 @@ inline int RTjpeg::compress8(int8_t *sp, uint8_t **planes)
 
 inline void RTjpeg::decompressYUV422(int8_t *sp, uint8_t **planes)
 {
- register uint8_t * bp = planes[0];
- register uint8_t * bp2 = planes[1];
- register uint8_t * bp3 = planes[2];
+ uint8_t * bp = planes[0];
+ uint8_t * bp2 = planes[1];
+ uint8_t * bp3 = planes[2];
  int i, j,k;
 
 #ifdef MMX
@@ -3002,10 +3002,10 @@ inline void RTjpeg::decompressYUV422(int8_t *sp, uint8_t **planes)
 
 inline void RTjpeg::decompressYUV420(int8_t *sp, uint8_t **planes)
 {
- register uint8_t * bp = planes[0];
- register uint8_t * bp1 = bp + (width<<3);
- register uint8_t * bp2 = planes[1];
- register uint8_t * bp3 = planes[2];
+ uint8_t * bp = planes[0];
+ uint8_t * bp1 = bp + (width<<3);
+ uint8_t * bp2 = planes[1];
+ uint8_t * bp3 = planes[2];
  int i, j,k;
 
 #ifdef MMX
@@ -3065,7 +3065,7 @@ inline void RTjpeg::decompressYUV420(int8_t *sp, uint8_t **planes)
 
 inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
 {
- register uint8_t * bp = planes[0];
+ uint8_t * bp = planes[0];
  int i, j;
 
 #ifdef MMX
@@ -3150,11 +3150,11 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 {
  int8_t * sb;
  int16_t * lblock;
- register uint8_t * bp = planes[0];
- register uint8_t * bp1 = bp + (width<<3);
- register uint8_t * bp2 = planes[1];
- register uint8_t * bp3 = planes[2];
- register int i, j, k;
+ uint8_t * bp = planes[0];
+ uint8_t * bp1 = bp + (width<<3);
+ uint8_t * bp2 = planes[1];
+ uint8_t * bp3 = planes[2];
+ int i, j, k;
 
  sb = sp;
  lblock = old;
@@ -3233,10 +3233,10 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
 {
  int8_t * sb;
  int16_t *lblock;
- register uint8_t * bp = planes[0];
- register uint8_t * bp2 = planes[1];
- register uint8_t * bp3 = planes[2];
- register int i, j, k;
+ uint8_t * bp = planes[0];
+ uint8_t * bp2 = planes[1];
+ uint8_t * bp3 = planes[2];
+ int i, j, k;
 
  sb=sp;
  lblock = old;
@@ -3293,7 +3293,7 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
 
 inline int RTjpeg::mcompress8(int8_t *sp, uint8_t **planes)
 {
- register uint8_t * bp = planes[0];
+ uint8_t * bp = planes[0];
  int8_t * sb;
  int16_t *lblock;
  int i, j;

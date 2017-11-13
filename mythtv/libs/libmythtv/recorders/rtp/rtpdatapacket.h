@@ -35,6 +35,13 @@ class RTPDataPacket : public UDPPacket
     explicit RTPDataPacket(uint64_t key) : UDPPacket(key), m_off(0) { }
     RTPDataPacket(void) : UDPPacket(0ULL), m_off(0) { }
 
+    RTPDataPacket& operator=(const RTPDataPacket &rhs)
+    {
+        UDPPacket::operator=(rhs);
+        m_off = rhs.m_off;
+        return *this;
+    }
+
     bool IsValid(void) const
     {
         if (m_data.size() < 12)

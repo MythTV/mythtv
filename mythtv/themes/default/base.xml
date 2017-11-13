@@ -667,6 +667,11 @@
         </imagetype>
     </progressbar>
 
+    <!-- small progressbar half screen width at 800 -->
+    <progressbar name="smallprogressbar" from="baseprogressbar">
+        <area>0,0,335,24</area>
+    </progressbar>
+
     <!-- Base definition of a state used for ratings 0 to 10 -->
     <statetype name="baseratingstate">
         <position>0,0</position>
@@ -1109,6 +1114,28 @@
         <textedit name="input" from="basetextedit">
             <position>102,50</position>
         </textedit>
+
+        <button name="ok" from="basebutton">
+            <position>109,110</position>
+            <value>OK</value>
+        </button>
+    </window>
+
+    <window name="MythSpinBoxDialog">
+        <area>-1,-1,580,165</area>
+
+        <imagetype name="backimg">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>20,20,540,30</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <spinbox name="input" from="basespinbox">
+            <position>245,50</position>
+        </spinbox>
 
         <button name="ok" from="basebutton">
             <position>109,110</position>

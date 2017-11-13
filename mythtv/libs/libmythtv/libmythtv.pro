@@ -133,7 +133,7 @@ HEADERS += livetvchain.h            playgroup.h
 HEADERS += channelsettings.h
 HEADERS += previewgenerator.h       previewgeneratorqueue.h
 HEADERS += transporteditor.h        listingsources.h
-HEADERS += channelgroup.h           channelgroupsettings.h
+HEADERS += channelgroup.h
 HEADERS += recordingrule.h
 HEADERS += mythsystemevent.h
 HEADERS += avfringbuffer.h
@@ -163,7 +163,7 @@ SOURCES += livetvchain.cpp          playgroup.cpp
 SOURCES += channelsettings.cpp
 SOURCES += previewgenerator.cpp     previewgeneratorqueue.cpp
 SOURCES += transporteditor.cpp
-SOURCES += channelgroup.cpp         channelgroupsettings.cpp
+SOURCES += channelgroup.cpp
 SOURCES += recordingrule.cpp
 SOURCES += mythsystemevent.cpp
 SOURCES += avfringbuffer.cpp
@@ -929,6 +929,17 @@ using_hdhomerun: LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERS
 using_backend:using_mp3lame: LIBS += -lmp3lame
 using_backend: LIBS += -L../../external/minilzo -lmythminilzo-$$LIBVERSION
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
+
+using_openmax {
+    contains( HAVE_OPENMAX_BROADCOM, yes ) {
+        using_opengl {
+            # For raspberry Pi Raspbian
+            exists(/opt/vc/lib/libbrcmEGL.so) {
+                LIBS += -L/opt/vc/lib/ -lbrcmGLESv2 -lbrcmEGL
+            }
+        }
+    }
+}
 
 !win32-msvc* {
     POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}

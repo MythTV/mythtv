@@ -56,8 +56,21 @@ bool BaseRequestHandler::HandleAnnounce(MythSocket *socket,
     return true;
 }
 
+/**
+ * \fn BaseRequestHandler::HandleQuery
+ * \brief Dispatch query messages received from a client.
+ *
+ * \param sock     The socket on which the message arrived. This is
+ *                 used to communicate the response back to the sender
+ *                 of the query.
+ * \param commands The command to execute.
+ * \param slist    Additional list arguments to the query. None of the
+ *                 supported queries have any additional arguments, so
+ *                 this variable is never used.
+ */
 bool BaseRequestHandler::HandleQuery(SocketHandler *sock,
-                                QStringList &commands, QStringList &slist)
+                                     QStringList &commands,
+                                     QStringList &/*slist*/)
 {
     QString command = commands[0];
     bool res = false;

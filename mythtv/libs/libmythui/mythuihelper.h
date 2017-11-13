@@ -59,6 +59,7 @@ class MUI_PUBLIC MythUIHelper
     void RemoveFromCacheByFile(const QString &fname);
     bool IsImageInCache(const QString &url);
     QString GetThemeCacheDir(void);
+    QString GetCacheDirByUrl(QString url);
 
     void IncludeInCacheSize(MythImage *im);
     void ExcludeFromCacheSize(MythImage *im);
@@ -82,8 +83,8 @@ class MUI_PUBLIC MythUIHelper
     static void ParseGeometryOverride(const QString &geometry);
     bool IsGeometryOverridden(void);
 
-    QPixmap *LoadScalePixmap(QString filename, bool fromcache = true) MDEPRECATED;
-    QImage *LoadScaleImage(QString filename, bool fromcache = true) MDEPRECATED;
+    QPixmap *LoadScalePixmap(QString filename) MDEPRECATED;
+    QImage *LoadScaleImage(QString filename) MDEPRECATED;
     /// Returns a reference counted image from the cache.
     /// \note The reference count is set for one use call DecrRef() to delete.
     MythImage *LoadCacheImage(QString srcfile, QString label,
@@ -152,6 +153,7 @@ class MUI_PUBLIC MythUIHelper
 
     void ClearOldImageCache(void);
     void RemoveCacheDir(const QString &dirname);
+    void PruneCacheDir(QString dirname);
 
     MythUIHelperPrivate *d;
 

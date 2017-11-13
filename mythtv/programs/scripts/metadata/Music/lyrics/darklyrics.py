@@ -16,7 +16,7 @@ from common import utilities
 __author__      = "Paul Harrison and smory'"
 __title__       = "DarkLyrics"
 __description__ = "Search http://www.darklyrics.com/ - the largest metal lyrics archive on the Web"
-__priority__    = "230";
+__priority__    = "180";
 __version__     = "0.1"
 __syncronized__ = False;
 

@@ -4,12 +4,18 @@
 #include <stdint.h>
 
 #include <QtGlobal>
-#if defined USING_OPENGLES && QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-#define USE_OPENGL_QT5
-#include <QOpenGLContext>
-#else
+// The below is commented because it causes raspberry Pi with OpenMAX
+// to fail. If commenting it out causes problems with other
+// platforms we can add it back with additional conditions that
+// will exclude it for Raspberry Pi. With this commented, all
+// code that depends on USE_OPENGL_QT5 will be bypassed and maybe can
+// be removed later.
+//#if defined USING_OPENGLES && QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
+//#define USE_OPENGL_QT5
+//#include <QOpenGLContext>
+//#else
 #include <QGLContext>
-#endif
+//#endif
 #include <QHash>
 #include <QMutex>
 #include <QMatrix4x4>
@@ -19,9 +25,6 @@
 #ifdef USING_X11
 #define GLX_GLXEXT_PROTOTYPES
 #define XMD_H 1
-#ifndef GL_ES_VERSION_2_0
-#include <GL/gl.h>
-#endif
 #undef GLX_ARB_get_proc_address
 #endif // USING_X11
 
@@ -155,7 +158,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     virtual void  PopTransformation(void) = 0;
     void  Flush(bool use_fence);
     void  SetBlend(bool enable);
-    virtual void SetColor(int r, int g, int b, int a) { }
+    virtual void SetColor(int /*r*/, int /*g*/, int /*b*/, int /*a*/) { }
     void  SetBackground(int r, int g, int b, int a);
     void  SetFence(void);
 

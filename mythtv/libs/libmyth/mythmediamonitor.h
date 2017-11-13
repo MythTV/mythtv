@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QList>
+#include <QDateTime>
 
 #include "mthread.h"
 #include "mythexp.h"
@@ -32,6 +33,7 @@ class MonitorThread : public MThread
   protected:
     QPointer<MediaMonitor> m_Monitor;
     unsigned long m_Interval;
+    QDateTime m_lastCheckTime;
 };
 
 class MPUBLIC MediaMonitor : public QObject
@@ -66,7 +68,6 @@ class MPUBLIC MediaMonitor : public QObject
 
     void RegisterMediaHandler(const QString  &destination,
                               const QString  &description,
-                              const QString  &key,
                               void          (*callback) (MythMediaDevice*),
                               int             mediaType,
                               const QString  &extensions);
@@ -127,7 +128,7 @@ class MPUBLIC MediaMonitor : public QObject
     static MediaMonitor         *c_monitor;
 };
 
-#define REG_MEDIA_HANDLER(a, b, c, d, e, f) \
-        MediaMonitor::GetMediaMonitor()->RegisterMediaHandler(a, b, c, d, e, f)
+#define REG_MEDIA_HANDLER(a, b, c, d, e) \
+    MediaMonitor::GetMediaMonitor()->RegisterMediaHandler(a, b, c, d, e)
 
 #endif // MYTH_MEDIA_MONITOR_H

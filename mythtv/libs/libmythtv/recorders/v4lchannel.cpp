@@ -404,8 +404,6 @@ bool V4LChannel::Tune(const DTVMultiplex &tuning)
  *
  *  \param frequency Frequency in Hz, this is divided by 62.5 kHz or 62.5 Hz
  *                   depending on the modulator and sent to the hardware.
- *  \param inputname Name of the input (Television, Antenna 1, etc.)
- *  \param modulation "radio", "analog", or "digital"
  */
 bool V4LChannel::Tune(uint64_t frequency)
 {

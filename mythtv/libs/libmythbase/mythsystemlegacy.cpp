@@ -66,14 +66,17 @@ void MythSystemLegacy::initializePrivate(void)
 #endif
 }
 
-MythSystemLegacy::MythSystemLegacy()
+MythSystemLegacy::MythSystemLegacy(QObject *parent) :
+    QObject(parent)
 {
     setObjectName("MythSystemLegacy()");
     m_semReady.release(1);  // initialize
     initializePrivate();
 }
 
-MythSystemLegacy::MythSystemLegacy(const QString &command, uint flags)
+MythSystemLegacy::MythSystemLegacy(const QString &command, uint flags,
+                                   QObject *parent) :
+    QObject(parent)
 {
     setObjectName(QString("MythSystemLegacy(%1)").arg(command));
     m_semReady.release(1);  // initialize
@@ -81,7 +84,7 @@ MythSystemLegacy::MythSystemLegacy(const QString &command, uint flags)
     SetCommand(command, flags);
 }
 
-/** \fn MythSystemLegacy::setCommand(const QString &command)
+/**
  *  \brief Resets an existing MythSystemLegacy object to a new command
  */
 void MythSystemLegacy::SetCommand(const QString &command, uint flags)
@@ -116,15 +119,17 @@ void MythSystemLegacy::SetCommand(const QString &command, uint flags)
 
 
 MythSystemLegacy::MythSystemLegacy(const QString &command,
-                       const QStringList &args, uint flags)
+                                   const QStringList &args,
+                                   uint flags,
+                                   QObject *parent) :
+    QObject(parent)
 {
     m_semReady.release(1);  // initialize
     initializePrivate();
     SetCommand(command, args, flags);
 }
 
-/** \fn MythSystemLegacy::setCommand(const QString &command,
-                               const QStringList &args)
+/**
  *  \brief Resets an existing MythSystemLegacy object to a new command
  */
 void MythSystemLegacy::SetCommand(const QString &command,
@@ -171,24 +176,6 @@ void MythSystemLegacy::SetCommand(const QString &command,
     }
 }
 
-
-MythSystemLegacy::MythSystemLegacy(const MythSystemLegacy &other) :
-    d(other.d),
-    m_status(other.m_status),
-
-    m_command(other.m_command),
-    m_logcmd(other.m_logcmd),
-    m_args(other.m_args),
-    m_directory(other.m_directory),
-
-    m_nice(other.m_nice),
-    m_ioprio(other.m_ioprio),
-
-    m_settings(other.m_settings)
-{
-    m_semReady.release(other.m_semReady.available());
-}
-
 // QBuffers may also need freeing
 MythSystemLegacy::~MythSystemLegacy(void)
 {
@@ -199,7 +186,6 @@ MythSystemLegacy::~MythSystemLegacy(void)
     }
     d->DecrRef();
 }
-
 
 void MythSystemLegacy::SetDirectory(const QString &directory)
 {
@@ -319,6 +305,8 @@ void MythSystemLegacy::Signal(MythSignal sig)
     int posix_signal = SIGTRAP;
     switch (sig)
     {
+        case kSignalNone: break;
+        case kSignalUnknown: break;
         case kSignalHangup: posix_signal = SIGHUP; break;
         case kSignalInterrupt: posix_signal = SIGINT; break;
         case kSignalContinue: posix_signal = SIGCONT; break;
@@ -336,7 +324,8 @@ void MythSystemLegacy::Signal(MythSignal sig)
     // case that is missed print out a message.
     if (SIGTRAP == posix_signal)
     {
-        LOG(VB_SYSTEM, LOG_ERR, "Programmer error: Unknown signal");
+        LOG(VB_SYSTEM, LOG_ERR,
+            QString("Programmer error: Unknown signal %1").arg(sig));
         return;
     }
 

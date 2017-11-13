@@ -67,7 +67,7 @@ enum OSDTimeout
 class MTV_PUBLIC OSDHideEvent : public QEvent
 {
   public:
-    OSDHideEvent(enum OSDFunctionalType osdFunctionalType)
+    explicit OSDHideEvent(enum OSDFunctionalType osdFunctionalType)
         : QEvent(kEventType), m_osdFunctionalType(osdFunctionalType) { }
 
     int GetFunctionalType() { return m_osdFunctionalType; }
@@ -130,7 +130,7 @@ class MythOSDWindow : public MythScreenType
 
 class OSD
 {
-    Q_DECLARE_TR_FUNCTIONS(OSD)
+    Q_DECLARE_TR_FUNCTIONS(OSD);
 
   public:
     OSD(MythPlayer *player, QObject *parent, MythPainter *painter);

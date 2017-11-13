@@ -48,8 +48,8 @@ class MythSystemLegacyWrapper : public MythSystem
         const QStringList &args,
         uint flags,
         QString startPath,
-        Priority cpuPriority,
-        Priority diskPriority)
+        Priority /*cpuPriority*/,
+        Priority /*diskPriority*/)
     {
         if (args.empty())
             return NULL;

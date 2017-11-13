@@ -204,7 +204,6 @@ class Squares : public Spectrum
   private:
     void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
     QSize actualSize;
-    MainVisual *pParent;
     int fake_height;
     int number_of_squares;
 };
@@ -276,7 +275,7 @@ typedef struct piano_key_data {
 
 class AlbumArt : public VisualBase
 {
-    Q_DECLARE_TR_FUNCTIONS(AlbumArt)
+    Q_DECLARE_TR_FUNCTIONS(AlbumArt);
 
   public:
     AlbumArt(void);

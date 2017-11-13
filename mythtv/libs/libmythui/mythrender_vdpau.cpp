@@ -68,6 +68,8 @@
   if (m_reset_video_surfaces) \
       return arg1;
 
+#define COLOR_BLACK {0.0, 0.0, 0.0, 0.0}
+
 static const VdpOutputSurfaceRenderBlendState VDPBlends[3] = {
 {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
@@ -77,6 +79,7 @@ static const VdpOutputSurfaceRenderBlendState VDPBlends[3] = {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+    COLOR_BLACK
 },
 {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
@@ -86,6 +89,7 @@ static const VdpOutputSurfaceRenderBlendState VDPBlends[3] = {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+    COLOR_BLACK
 },
 {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
@@ -95,6 +99,7 @@ static const VdpOutputSurfaceRenderBlendState VDPBlends[3] = {
     VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
     VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+    COLOR_BLACK
 }};
 
 class VDPAUColor
@@ -1597,7 +1602,7 @@ void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render,
     CHECK_ST
 }
 
-static const char* dummy_get_error_string(VdpStatus status)
+static const char* dummy_get_error_string(VdpStatus /*status*/)
 {
     static const char dummy[] = "Unknown";
     return &dummy[0];

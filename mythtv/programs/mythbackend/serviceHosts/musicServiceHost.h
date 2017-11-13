@@ -1,0 +1,42 @@
+//////////////////////////////////////////////////////////////////////////////
+// Program Name: musicServiceHost.h
+// Created     : July 20, 2017
+//
+// Copyright (c) 2017 Paul Harrison <pharrison@mythtv.org>
+//
+// Licensed under the GPL v2 or later, see COPYING for details
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#ifndef MUSICSERVICEHOST_H_
+#define MUSICSERVICEHOST_H_
+
+#include "servicehost.h"
+#include "services/music.h"
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+class MusicServiceHost : public ServiceHost
+{
+    public:
+
+        explicit MusicServiceHost( const QString &sSharePath )
+                : ServiceHost( Music::staticMetaObject,
+                               "Music",
+                               "/Music",
+                               sSharePath )
+        {
+        }
+
+        virtual ~MusicServiceHost()
+        {
+        }
+};
+
+#endif

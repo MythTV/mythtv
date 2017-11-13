@@ -1,6 +1,10 @@
 #ifndef VIDEOOUT_OMX_H
 #define VIDEOOUT_OMX_H
 
+#ifdef USING_OPENGLES
+#define OSD_EGL // OSD with EGL
+#endif
+
 #include <OMX_Types.h>
 #include <OMX_Core.h>
 
@@ -16,6 +20,7 @@ class GlOsdThread;
 #ifdef OSD_EGL
 class MythOpenGLPainter;
 #endif
+class MythScreenType;
 
 class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 {
@@ -35,7 +40,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual void StopEmbedding(void);
     virtual bool ApproveDeintFilter(const QString&) const;
     virtual bool SetDeinterlacingEnabled(bool interlaced);
-    virtual bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
+    virtual bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
     virtual QString GetName(void) const { return kName; } // = "openmax"
     virtual bool IsPIPSupported(void) const { return true; }
     virtual bool IsPBPSupported(void) const { return true; }
@@ -70,7 +75,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
 
     void CreatePauseFrame(void);
     bool SetVideoRect(const QRect &disp_rect, const QRect &vid_rect);
-    bool CreateBuffers(const QSize&, const QSize&, WId = 0);
+    bool CreateBuffers(const QSize&, const QSize&);
     void DeleteBuffers();
     bool Start();
     OMX_ERRORTYPE SetImageFilter(OMX_IMAGEFILTERTYPE);
@@ -80,14 +85,15 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     VideoFrame av_pause_frame;
     QRect m_disp_rect, m_vid_rect;
     QVector<void*> m_bufs;
+#ifdef OSD_EGL
     MythRenderEGL *m_context;
-#ifdef OSD_EGL   
     MythOpenGLPainter *m_osdpainter;
     MythPainter *m_threaded_osdpainter;
-#endif
-    MythScreenType *m_backgroundscreen;
     GlOsdThread *m_glOsdThread;
     bool m_changed;
+#endif
+    MythScreenType *m_backgroundscreen;
+    bool m_videoPaused;
 };
 
 #endif // ndef VIDEOOUT_OMX_H

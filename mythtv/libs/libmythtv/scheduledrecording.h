@@ -2,7 +2,7 @@
 #define SCHEDULEDRECORDING_H
 
 #include "mythtvexp.h"
-#include "qdatetime.h"
+#include <QDateTime>
 #include "recordinginfo.h"
 
 class MTV_PUBLIC ScheduledRecording

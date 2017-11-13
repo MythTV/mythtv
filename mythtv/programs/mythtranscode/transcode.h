@@ -50,7 +50,9 @@ class Transcode : public QObject
     ProgramInfo            *m_proginfo;
     RecordingProfile       *m_recProfile;
     int                     keyframedist;
+#if CONFIG_LIBMP3LAME
     NuppelVideoRecorder    *nvr;
+#endif
     PlayerContext          *ctx;
     RingBuffer             *outRingBuffer;
     FIFOWriter             *fifow;

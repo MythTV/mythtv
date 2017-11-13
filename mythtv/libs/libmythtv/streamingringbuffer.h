@@ -11,7 +11,7 @@ extern "C" {
 class StreamingRingBuffer : public RingBuffer
 {
   public:
-    StreamingRingBuffer(const QString &lfilename);
+    explicit StreamingRingBuffer(const QString &lfilename);
     virtual ~StreamingRingBuffer();
 
     virtual bool IsOpen(void) const;

@@ -40,11 +40,7 @@ class SERVICE_PUBLIC RecRuleFilterList : public QObject
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, RecRuleFilters )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP_RO_REF( QVariantList, RecRuleFilters );
 
     public:
 
@@ -56,18 +52,13 @@ class SERVICE_PUBLIC RecRuleFilterList : public QObject
         {
         }
 
-        RecRuleFilterList( const RecRuleFilterList &src )
+        void Copy( const RecRuleFilterList *src )
         {
-            Copy( src );
-        }
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
 
-        void Copy( const RecRuleFilterList &src )
-        {
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
-
-            CopyListContents< RecRuleFilter >( this, m_RecRuleFilters, src.m_RecRuleFilters );
+            CopyListContents< RecRuleFilter >( this, m_RecRuleFilters, src->m_RecRuleFilters );
         }
 
         RecRuleFilter *AddNewRecRuleFilter()
@@ -81,22 +72,10 @@ class SERVICE_PUBLIC RecRuleFilterList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(RecRuleFilterList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::RecRuleFilterList  )
-Q_DECLARE_METATYPE( DTC::RecRuleFilterList* )
-
-namespace DTC
-{
-inline void RecRuleFilterList::InitializeCustomTypes()
-{
-    qRegisterMetaType< RecRuleFilterList   >();
-    qRegisterMetaType< RecRuleFilterList*  >();
-
-    RecRuleFilter::InitializeCustomTypes();
-}
-}
 
 #endif

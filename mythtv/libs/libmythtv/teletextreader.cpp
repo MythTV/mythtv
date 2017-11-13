@@ -304,36 +304,60 @@ void TeletextReader::Reset(void)
 void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
                                    int vbimode, int lang, int flags)
 {
-    //LOG(VB_GENERAL, LOG_ERR, QString("AddPageHeader(p %1, sp %2, lang %3)")
-    //    .arg(page).arg(subpage).arg(lang));
-
     int magazine = MAGAZINE(page);
     if (magazine < 1 || magazine > 8)
         return;
-    int lastPage = m_magazines[magazine - 1].current_page;
-    int lastSubPage = m_magazines[magazine - 1].current_subpage;
 
-    // update the last fetched page if the magazine is the same
-    // and the page no. is different
-
-    if ((page != lastPage || subpage != lastSubPage) &&
-        m_magazines[magazine - 1].loadingpage.active)
+    for(int m = 1; m <= 8; m++)
     {
-        TeletextSubPage *ttpage = FindSubPage(lastPage, lastSubPage);
-        if (!ttpage)
+        // ETS 300 706, chapter 7.2.1:
+        // The transmission of a given page begins with, and includes, its page
+        // header packet. It is terminated by and excludes the next page header
+        // packet having the same magazine address in parallel transmission
+        // mode, or any magazine address in serial transmission mode.
+        // ETS 300 706, chapter 9.3.1.3:
+        // When set to '1' the service is designated to be in Serial mode and
+        // the transmission of a page is terminated by the next page header with
+        // a different page number.
+        // When set to '0' the service is designated to be in Parallel mode and
+        // the transmission of a page is terminated by the next page header with
+        // a different page number but the same magazine number.  The same
+        // setting shall be used for all page headers in the service.
+
+        bool isMagazineSerialMode = flags & TP_MAGAZINE_SERIAL;
+        if (!(isMagazineSerialMode) && m != magazine)
         {
-            ttpage = &(m_magazines[magazine - 1]
-                       .pages[lastPage].subpages[lastSubPage]);
-            m_magazines[magazine - 1].pages[lastPage].pagenum = lastPage;
-            ttpage->subpagenum = lastSubPage;
+            continue;   // in parallel mode only process magazine
         }
 
-        memcpy(ttpage, &m_magazines[magazine - 1].loadingpage,
-               sizeof(TeletextSubPage));
+        int lastPage = m_magazines[m - 1].current_page;
+        int lastSubPage = m_magazines[m - 1].current_subpage;
 
-        m_magazines[magazine - 1].loadingpage.active = false;
+        LOG(VB_VBI, LOG_DEBUG,
+            QString("AddPageHeader(p %1, sp %2, lang %3, mag %4, lp %5, lsp %6"
+                    " sm %7)")
+            .arg(page).arg(subpage).arg(lang).arg(m).arg(lastPage)
+            .arg(lastSubPage).arg(isMagazineSerialMode));
 
-        PageUpdated(lastPage, lastSubPage);
+        if ((page != lastPage || subpage != lastSubPage) &&
+            m_magazines[m - 1].loadingpage.active)
+        {
+            TeletextSubPage *ttpage = FindSubPage(lastPage, lastSubPage);
+            if (!ttpage)
+            {
+                ttpage = &(m_magazines[m - 1]
+                           .pages[lastPage].subpages[lastSubPage]);
+                m_magazines[m - 1].pages[lastPage].pagenum = lastPage;
+                ttpage->subpagenum = lastSubPage;
+            }
+
+            memcpy(ttpage, &m_magazines[m - 1].loadingpage,
+                   sizeof(TeletextSubPage));
+
+            m_magazines[m - 1].loadingpage.active = false;
+
+            PageUpdated(lastPage, lastSubPage);
+        }
     }
 
     m_fetchpage = page;

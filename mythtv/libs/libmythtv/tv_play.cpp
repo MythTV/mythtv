@@ -1729,9 +1729,10 @@ TVState TV::GetState(const PlayerContext *actx) const
     return ret;
 }
 
-/** \fn TV::LiveTV(bool,bool)
+/**
  *  \brief Starts LiveTV
  *  \param showDialogs if true error dialogs are shown, if false they are not
+ *  \param selection What channel to tune.
  */
 bool TV::LiveTV(bool showDialogs, const ChannelInfoList &selection)
 {
@@ -2603,15 +2604,21 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
     {
         if (!ctx->IsPIP())
             GetMythUI()->DisableScreensaver();
-        MythMainWindow *mainWindow = GetMythMainWindow();
-        mainWindow->setBaseSize(player_bounds.size());
-        mainWindow->setMinimumSize(
-            (db_use_fixed_size) ? player_bounds.size() : QSize(16, 16));
-        mainWindow->setMaximumSize(
-            (db_use_fixed_size) ? player_bounds.size() :
-            QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-        mainWindow->setGeometry(player_bounds);
-        mainWindow->ResizePainterWindow(player_bounds.size());
+        bool switchMode = gCoreContext->GetNumSetting("UseVideoModes", 0);
+        // player_bounds is not applicable when switching modes so
+        // skip this logic in that case.
+        if (!switchMode)
+        {
+            MythMainWindow *mainWindow = GetMythMainWindow();
+            mainWindow->setBaseSize(player_bounds.size());
+            mainWindow->setMinimumSize(
+                (db_use_fixed_size) ? player_bounds.size() : QSize(16, 16));
+            mainWindow->setMaximumSize(
+                (db_use_fixed_size) ? player_bounds.size() :
+                QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+            mainWindow->setGeometry(player_bounds);
+            mainWindow->ResizePainterWindow(player_bounds.size());
+        }
         // PGB Do not disable the GUI when using openmax renderer,
         // to ensure that space next to letterbox pictures
         // is painted.
@@ -2642,9 +2649,11 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 #undef SET_NEXT
 #undef SET_LAST
 
-/** \fn TV::StartRecorder(PlayerContext*, int)
+/**
  *  \brief Starts recorder, must be called before StartPlayer().
- *  \param maxWait How long to wait for RecorderBase to start recording.
+ *  \param ctx The player context requesting recording. 
+ *  \param maxWait How long to wait for RecorderBase to start recording. If
+ *                 not provided, this defaults to 40 seconds.
  *  \return true when successful, false otherwise.
  */
 bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
@@ -2686,7 +2695,7 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
     return true;
 }
 
-/** \fn TV::StopStuff(PlayerContext*,PlayerContext*, bool, bool, bool)
+/**
  *  \brief Can shut down the ringbuffers, the players, and in LiveTV it can
  *         shut down the recorders.
  *
@@ -2695,6 +2704,8 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
  *   from within the same method. Also, shutting down things in the right
  *   order avoids spewing error messages...
  *
+ *  \param mctx           Master player context
+ *  \param ctx            Current player context
  *  \param stopRingBuffer Set to true if ringbuffer must be shut down.
  *  \param stopPlayer     Set to true if player must be shut down.
  *  \param stopRecorder   Set to true if recorder must be shut down.
@@ -3298,6 +3309,7 @@ void TV::HandleLCDVolumeTimerEvent()
 
     QMutexLocker locker(&timerIdLock);
     KillTimer(lcdVolumeTimerId);
+    lcdVolumeTimerId = 0;
 }
 
 int TV::StartTimer(int interval, int line)
@@ -4812,9 +4824,9 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     else if (has_action("STRETCHDEC", actions))
         ChangeTimeStretch(ctx, -1);
     else if (has_action("MENU", actions))
-        ShowOSDMenu(ctx);
+        ShowOSDMenu();
     else if (has_action(ACTION_MENUCOMPACT, actions))
-        ShowOSDMenu(ctx, true);
+        ShowOSDMenu(true);
     else if (has_action("INFO", actions) ||
              has_action("INFOWITHCUTLIST", actions))
     {
@@ -4926,7 +4938,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         if (islivetv)
             browsehelper->BrowseStart(ctx);
         else if (!isDVD)
-            ShowOSDMenu(ctx);
+            ShowOSDMenu();
         else
             handled = false;
     }
@@ -5665,6 +5677,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
 
 /**
  * \brief Setup Picture by Picture. right side will be the current video.
+ * \param ctx  Current player context
  * \param info programinfo for PBP to use for left Picture. is NULL for Live TV
  */
 bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
@@ -5751,6 +5764,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
 
 /**
  * \brief create PIP.
+ * \param ctx  Current player context
  * \param info programinfo for PIP to create. is NULL for LiveTV PIP
  */
 bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
@@ -5893,7 +5907,7 @@ bool TV::PIPAddPlayer(PlayerContext *mctx, PlayerContext *pipctx)
             {
                 PIPLocation loc = mctx->player->GetNextPIPLocation();
                 if (loc != kPIP_END)
-                    ok = mctx->player->AddPIPPlayer(pipctx->player, loc, 4000);
+                    ok = mctx->player->AddPIPPlayer(pipctx->player, loc);
             }
             mctx->deletePlayerLock.unlock();
             pipctx->deletePlayerLock.unlock();
@@ -5923,7 +5937,7 @@ bool TV::PIPRemovePlayer(PlayerContext *mctx, PlayerContext *pipctx)
     bool ok = false;
     multi_lock(&mctx->deletePlayerLock, &pipctx->deletePlayerLock, NULL);
     if (mctx->player && pipctx->player)
-        ok = mctx->player->RemovePIPPlayer(pipctx->player, 4000);
+        ok = mctx->player->RemovePIPPlayer(pipctx->player);
     mctx->deletePlayerLock.unlock();
     pipctx->deletePlayerLock.unlock();
 
@@ -7395,7 +7409,7 @@ void TV::SwitchInputs(PlayerContext *ctx,
     ITVRestart(ctx, true);
 }
 
-void TV::ToggleChannelFavorite(PlayerContext *ctx)
+void TV::ToggleChannelFavorite(PlayerContext */*ctx*/)
 {
     // TOGGLEFAV was broken in [20523], this just prints something
     // out so as not to cause further confusion. See #8948.
@@ -7447,8 +7461,9 @@ QString TV::GetQueuedChanNum(void) const
     return ret;
 }
 
-/** \fn TV::ClearInputQueues(const PlayerContext*,bool)
+/**
  *  \brief Clear channel key buffer of input keys.
+ *  \param ctx     Current player context
  *  \param hideosd if true, hides "channel_number" OSDSet.
  */
 void TV::ClearInputQueues(const PlayerContext *ctx, bool hideosd)
@@ -8495,12 +8510,12 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 
 bool TV::IsTunable(const PlayerContext *ctx, uint chanid)
 {
-    return !IsTunableOn(this, ctx, chanid).empty();
+    return !IsTunableOn(ctx, chanid).empty();
 }
 
 bool TV::IsTunable(uint chanid)
 {
-    return !IsTunableOn(NULL, NULL, chanid).empty();
+    return !IsTunableOn(NULL, chanid).empty();
 }
 
 static QString toCommaList(const QSet<uint> &list)
@@ -8516,12 +8531,6 @@ static QString toCommaList(const QSet<uint> &list)
 }
 
 QSet<uint> TV::IsTunableOn(
-    const PlayerContext *ctx, uint chanid)
-{
-    return IsTunableOn(this, ctx, chanid);
-}
-
-QSet<uint> TV::IsTunableOn(TV *tv,
     const PlayerContext *ctx, uint chanid)
 {
     QSet<uint> tunable_cards;
@@ -8581,18 +8590,8 @@ bool TV::StartEmbedding(const QRect &embedRect)
     if (!ctx)
         return false;
 
-    WId wid;
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    // BUG: With Qt5.4/EGLFS, winId() causes a SEGV when using OpenMAX video.
-    // PlayerContext::StartEmbedding ignores wid so set it to 0.
-    if (qApp->platformName().contains("egl"))
-        wid = 0;
-    else
-#endif
-    wid = GetMythMainWindow()->GetPaintWindow()->winId();
-
     if (!ctx->IsNullVideoDesired())
-        ctx->StartEmbedding(wid, embedRect);
+        ctx->StartEmbedding(embedRect);
     else
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -8836,7 +8835,7 @@ void TV::DoEditSchedule(int editType)
     }
 }
 
-void TV::EditSchedule(const PlayerContext *ctx, int editType)
+void TV::EditSchedule(const PlayerContext */*ctx*/, int editType)
 {
     // post the request so the guide will be created in the UI thread
     QString message = QString("START_EPG %1").arg(editType);
@@ -9784,7 +9783,11 @@ void TV::customEvent(QEvent *e)
         mctx->UnlockDeletePlayer(__FILE__, __LINE__);
         ReturnPlayerLock(mctx);
 
-        if (!db_use_gui_size_for_tv || !db_use_fixed_size)
+        // player_bounds is not applicable when switching modes so
+        // skip this logic in that case.
+        bool switchMode = gCoreContext->GetNumSetting("UseVideoModes", 0);
+        if (!switchMode
+            && (!db_use_gui_size_for_tv || !db_use_fixed_size))
         {
             mwnd->setMinimumSize(QSize(16, 16));
             mwnd->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
@@ -10403,7 +10406,7 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     }
 }
 
-/** \fn TV::ChannelEditKey(const PlayerContext*, const QKeyEvent *e)
+/**
  *  \brief Processes channel editing key.
  */
 bool TV::HandleOSDChannelEdit(PlayerContext *ctx, QString action)
@@ -11173,6 +11176,9 @@ bool MenuBase::LoadStringHelper(const QString &text,
                                 int includeLevel)
 {
     bool result = false;
+
+    m_translationContext = translationContext;
+    m_keyBindingContext = keyBindingContext;
     m_document = new QDomDocument();
     if (m_document->setContent(text))
     {
@@ -11809,11 +11815,15 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
             uint inputid  = ctx->GetCardID();
             vector<InputInfo> inputs = RemoteRequestFreeInputInfo(inputid);
             vector<InputInfo>::iterator it = inputs.begin();
+            QSet <QString> addednames;
+            addednames += CardUtil::GetDisplayName(inputid);
             for (; it != inputs.end(); ++it)
             {
-                if ((*it).inputid == inputid)
+                if ((*it).inputid == inputid ||
+                    addednames.contains((*it).displayName))
                     continue;
                 active = false;
+                addednames += (*it).displayName;
                 QString action = QString("SWITCHTOINPUT_") +
                     QString::number((*it).inputid);
                 BUTTON(action, (*it).displayName);
@@ -12365,7 +12375,7 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-void TV::PlaybackMenuDeinit(const MenuBase &menu)
+void TV::PlaybackMenuDeinit(const MenuBase &/*menu*/)
 {
     ReturnOSDLock(m_tvmCtx, m_tvmOsd);
     ReturnPlayerLock(m_tvmCtx);
@@ -12455,7 +12465,7 @@ void TV::MenuStrings(void) const
     tr("Cut List Options");
 }
 
-void TV::ShowOSDMenu(const PlayerContext *ctx, bool isCompact)
+void TV::ShowOSDMenu(bool isCompact)
 {
     if (!m_playbackMenu.IsLoaded())
     {

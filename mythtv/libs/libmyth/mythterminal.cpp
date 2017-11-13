@@ -21,58 +21,46 @@
 #include <inttypes.h>
 
 // MythTV headers
+#include "mythlogging.h"
 #include "mythterminal.h"
+#include "mythuibutton.h"
+#include "mythuibuttonlist.h"
+#include "mythuitextedit.h"
 
-MythTerminal::MythTerminal(QString _program, QStringList _arguments) :
-    lock(QMutex::Recursive), running(false),
-    process(new QProcess()), program(_program), arguments(_arguments),
-    curLabel(""), curValue(0), filter(new MythTerminalKeyFilter())
+MythTerminal::MythTerminal(MythScreenStack *parent, QString _program,
+                           QStringList _arguments) :
+    MythScreenType(parent, "terminal"), m_lock(QMutex::Recursive),
+    m_running(false), m_process(new QProcess()), m_program(_program),
+    m_arguments(_arguments), m_currentLine(NULL), m_output(NULL),
+    m_textEdit(NULL), m_enterButton(NULL)
 {
-    addSelection(curLabel, QString::number(curValue));
+    m_process->setProcessChannelMode(QProcess::MergedChannels);
+    connect(m_process, SIGNAL(readyRead()),
+            this,      SLOT(ProcessHasText()));
 
-    process->setProcessChannelMode(QProcess::MergedChannels);
-    connect(process, SIGNAL(readyRead()),
-            this,    SLOT(  ProcessHasText()));
-
-    connect(process, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this,    SLOT(  ProcessFinished(int, QProcess::ExitStatus)));
-
-    connect(filter,  SIGNAL(KeyPressd(QKeyEvent*)),
-            this,    SLOT(  ProcessSendKeyPress(QKeyEvent*)));
-    SetEventFilter(filter);
+    connect(m_process, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this,      SLOT(  ProcessFinished(int, QProcess::ExitStatus)));
 }
 
 void MythTerminal::TeardownAll(void)
 {
-    if (process)
+    if (m_process)
     {
-        QMutexLocker locker(&lock);
-        if (running)
-            Kill();
-        process->disconnect();
-    }
-
-    if (filter)
-    {
-        filter->disconnect();
-    }
-
-    if (process)
-    {
-        process->deleteLater();
-        process = NULL;
-    }
-
-    if (filter)
-    {
-        filter->deleteLater();
-        filter = NULL;
+        QMutexLocker locker(&m_lock);
+        if (m_process)
+        {
+            if (m_running)
+                Kill();
+            m_process->disconnect();
+            m_process->deleteLater();
+            m_process = NULL;
+        }
     }
 }
 
 void MythTerminal::AddText(const QString &_str)
 {
-    QMutexLocker locker(&lock);
+    QMutexLocker locker(&m_lock);
     QString str = _str;
     while (str.length())
     {
@@ -83,13 +71,16 @@ void MythTerminal::AddText(const QString &_str)
         QString curStr = (nlf >= 0) ? str.left(nlf) : str;
         if (curStr.length())
         {
-            curLabel += curStr;
-            ReplaceLabel(curLabel, QString::number(curValue));
+            if (!m_currentLine)
+                m_currentLine = new MythUIButtonListItem(m_output, curStr);
+            else
+                m_currentLine->SetText(m_currentLine->GetText() + curStr);
         }
 
         if (nlf >= 0)
         {
-            addSelection(curLabel = "", QString::number(++curValue));
+            m_currentLine = new MythUIButtonListItem(m_output, QString());
+            m_output->SetItemCurrent(m_currentLine);
             str = str.mid(nlf + 1);
         }
         else
@@ -97,103 +88,95 @@ void MythTerminal::AddText(const QString &_str)
             str = "";
         }
     }
-    if (lbwidget)
-    {
-        lbwidget->setEnabled(true);
-        lbwidget->setFocus();
-        lbwidget->setCurrentRow(lbwidget->count() - 1);
-    }
 }
 
 void MythTerminal::Start(void)
 {
-    QMutexLocker locker(&lock);
-    process->start(program, arguments);
-    running = true;
+    QMutexLocker locker(&m_lock);
+    m_process->start(m_program, m_arguments);
+    m_running = true;
 }
 
 void MythTerminal::Kill(void)
 {
-    QMutexLocker locker(&lock);
-    process->kill();
-    running = false;
+    QMutexLocker locker(&m_lock);
+    m_process->kill();
+    m_running = false;
 }
 
 bool MythTerminal::IsDone(void) const
 {
-    QMutexLocker locker(&lock);
-    return QProcess::NotRunning == process->state();
+    QMutexLocker locker(&m_lock);
+    return QProcess::NotRunning == m_process->state();
 }
 
 void MythTerminal::ProcessHasText(void)
 {
-    QMutexLocker locker(&lock);
-    int64_t len = process->bytesAvailable();
+    QMutexLocker locker(&m_lock);
+    int64_t len = m_process->bytesAvailable();
 
     if (len <= 0)
         return;
 
-    QByteArray buf = process->read(len);
+    QByteArray buf = m_process->read(len);
     AddText(QString(buf));
 }
 
-void MythTerminal::ProcessSendKeyPress(QKeyEvent *e)
+void MythTerminal::Init(void)
 {
-    QMutexLocker locker(&lock);
-    if (running && process && e->text().length())
-    {
-        QByteArray text = e->text().toLocal8Bit();
-        AddText(text.constData());
-        if (e->text()=="\n" || e->text()=="\r")
-            process->write("\r\n");
-        else
-            process->write(text.constData());
-    }
+    Start();
 }
 
 void MythTerminal::ProcessFinished(
     int exitCode, QProcess::ExitStatus exitStatus)
 {
-    QMutexLocker locker(&lock);
-    AddText(tr("*** Exited with status: %1 ***").arg(exitCode));
-    setEnabled(false);
-    running = false;
+    QMutexLocker locker(&m_lock);
+    if (exitStatus == QProcess::CrashExit) {
+        AddText(tr("*** Crashed with status: %1 ***").arg(exitCode));
+    } else {
+        AddText(tr("*** Exited with status: %1 ***").arg(exitCode));
+    }
+    m_running = false;
+    m_enterButton->SetEnabled(false);
+    m_textEdit->SetEnabled(false);
 }
 
-////////////////////////////////////////////////////////////////////////
-
-bool MythTerminalKeyFilter::eventFilter(QObject *obj, QEvent *event)
+bool MythTerminal::Create(void)
 {
-    if (event->type() == QEvent::KeyPress)
+    if (!LoadWindowFromXML("standardsetting-ui.xml", "terminal", this))
+        return false;
+
+    bool error = false;
+    UIUtilE::Assign(this, m_output, "output", &error);
+    UIUtilE::Assign(this, m_textEdit, "textedit", &error);
+    UIUtilE::Assign(this, m_enterButton, "enter", &error);
+
+    if (error)
     {
-        QKeyEvent *e = (QKeyEvent*)(event);
-        QStringList actions;
-        bool handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions,
-                                                              false);
-        if (!handled && !actions.isEmpty())
-        {
-            if (actions.contains("LEFT") || actions.contains("RIGHT") ||
-                actions.contains("UP") || actions.contains("DOWN") ||
-                actions.contains("ESCAPE"))
-            {
-                return QObject::eventFilter(obj, event);
-            }
-            else
-            {
-                emit KeyPressd(e);
-                e->accept();
-                return true;
-            }
-        }
-        else
-        {
-            emit KeyPressd(e);
-            e->accept();
-            return true;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Theme elements missing.");
+        return false;
     }
-    else
-    {
-        return QObject::eventFilter(obj, event);
-    }
+
+    BuildFocusList();
+
+    MythUIButton *close = NULL;
+    UIUtilW::Assign(this, close, "close");
+    if (close)
+        connect(close, SIGNAL(Clicked()), this, SLOT(Close()));
+
+    connect(m_enterButton, &MythUIButton::Clicked,
+            this,
+            [this]()
+            {
+                QMutexLocker locker(&m_lock);
+                if (m_running)
+                {
+                    QString text = m_textEdit->GetText() + "\r\n";
+                    AddText(text);
+
+                    m_process->write(text.toLocal8Bit().constData());
+                }
+            });
+
+    return true;
 }

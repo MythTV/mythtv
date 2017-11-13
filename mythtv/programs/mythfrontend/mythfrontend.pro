@@ -55,7 +55,7 @@ HEADERS += commandlineparser.h          idlescreen.h
 HEADERS += gallerythumbview.h           galleryslideview.h
 HEADERS += galleryconfig.h              galleryviews.h
 HEADERS += galleryslide.h               gallerytransitions.h
-HEADERS += galleryinfo.h
+HEADERS += galleryinfo.h                prevreclist.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp audiogeneralsettings.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -80,7 +80,7 @@ SOURCES += commandlineparser.cpp        idlescreen.cpp
 SOURCES += gallerythumbview.cpp         galleryslideview.cpp
 SOURCES += galleryconfig.cpp            galleryviews.cpp
 SOURCES += galleryslide.cpp             gallerytransitions.cpp
-SOURCES += galleryinfo.cpp
+SOURCES += galleryinfo.cpp              prevreclist.cpp
 
 HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
@@ -161,17 +161,30 @@ android {
 using_openmax {
     contains( HAVE_OPENMAX_BROADCOM, yes ) {
         using_opengl {
-            # For raspberry Pi Raspbian
-            exists(/opt/vc/lib/libEGL.so) {
+            # For raspberry Pi Raspbian Stretch
+            exists(/opt/vc/lib/libbrcmEGL.so) {
                 DEFINES += USING_OPENGLES
                 # For raspberry pi raspbian
                 QMAKE_RPATHDIR += $${RUNPREFIX}/share/mythtv/lib
                 createlinks.path = $${PREFIX}/share/mythtv/lib
-                createlinks.extra = ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1.0.0 ;
-                createlinks.extra += ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1 ;
-                createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2.0.0 ;
-                createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2 ;
+                createlinks.extra = ln -fs /opt/vc/lib/libbrcmEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1.0.0 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libbrcmEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libbrcmGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2.0.0 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libbrcmGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2 ;
                 INSTALLS += createlinks
+            } else {
+                # For raspberry Pi Raspbian pre-stretch
+                exists(/opt/vc/lib/libEGL.so) {
+                    DEFINES += USING_OPENGLES
+                    # For raspberry pi raspbian
+                    QMAKE_RPATHDIR += $${RUNPREFIX}/share/mythtv/lib
+                    createlinks.path = $${PREFIX}/share/mythtv/lib
+                    createlinks.extra = ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1.0.0 ;
+                    createlinks.extra += ln -fs /opt/vc/lib/libEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1 ;
+                    createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2.0.0 ;
+                    createlinks.extra += ln -fs /opt/vc/lib/libGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2 ;
+                    INSTALLS += createlinks
+                }
             }
         } else {
             # For raspberry pi ubuntu

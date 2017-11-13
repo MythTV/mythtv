@@ -30,23 +30,19 @@
 #ifndef _PANE_DVBC_H_
 #define _PANE_DVBC_H_
 
-class PaneDVBC : public HorizontalConfigurationGroup
+class PaneDVBC : public GroupSetting
 {
   public:
-    PaneDVBC() : HorizontalConfigurationGroup(false, false, true, false)
+    PaneDVBC(const QString &target, StandardSetting *setting)
     {
-        setUseFrame(false);
-        VerticalConfigurationGroup *left =
-            new VerticalConfigurationGroup(false,true);
-        VerticalConfigurationGroup *right =
-            new VerticalConfigurationGroup(false,true);
-        left->addChild(pfrequency   = new ScanFrequency());
-        left->addChild(psymbolrate  = new ScanSymbolRateDVBC());
-        left->addChild(pinversion   = new ScanInversion());
-        right->addChild(pmodulation = new ScanModulation());
-        right->addChild(pfec        = new ScanFec());
-        addChild(left);
-        addChild(right);
+        setVisible(false);
+        setting->addTargetedChildren(target,
+                                     {this,
+                                      pfrequency   = new ScanFrequency(),
+                                      psymbolrate  = new ScanSymbolRateDVBC(),
+                                      pinversion   = new ScanInversion(),
+                                      pmodulation = new ScanModulation(),
+                                      pfec        = new ScanFec()});
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }

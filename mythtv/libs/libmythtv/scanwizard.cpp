@@ -46,75 +46,57 @@ ScanWizard::ScanWizard(uint    default_sourceid,
                        QString default_inputname) :
     lastHWCardID(0),
     lastHWCardType(CardUtil::ERROR_PROBE),
-    configPane(new ScanWizardConfig(
-                   this, default_sourceid, default_cardid, default_inputname)),
     scannerPane(new ChannelScannerGUI())
 {
-    addChild(configPane);
-    addChild(scannerPane);
+    SetupConfig(default_sourceid, default_cardid, default_inputname);
+    ButtonStandardSetting *scanButton = new ButtonStandardSetting(tr("Scan"));
+    connect(scanButton, SIGNAL(clicked()), SLOT(Scan()));
+    addChild(scanButton);
 }
 
-MythDialog *ScanWizard::dialogWidget(MythMainWindow *parent, const char*)
+void ScanWizard::Scan()
 {
-    MythWizard *wizard = (MythWizard*)
-        ConfigurationWizard::dialogWidget(parent, "ScanWizard");
-
-    connect(wizard, SIGNAL(selected(const QString&)),
-            this,   SLOT(  SetPage( const QString&)));
-
-    return wizard;
-}
-
-void ScanWizard::SetPage(const QString &pageTitle)
-{
-    LOG(VB_CHANSCAN, LOG_INFO, QString("SetPage(%1)").arg(pageTitle));
-    if (pageTitle != ChannelScannerGUI::kTitle)
-    {
-        scannerPane->quitScanning();
-        return;
-    }
-
     QMap<QString,QString> start_chan;
     DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;
 
-    uint    cardid    = configPane->GetCardID();
-    QString inputname = configPane->GetInputName();
-    uint    sourceid  = configPane->GetSourceID();
-    int     scantype  = configPane->GetScanType();
+    uint    cardid    = GetCardID();
+    QString inputname = GetInputName();
+    uint    sourceid  = GetSourceID();
+    int     scantype  = GetScanType();
     bool    do_scan   = true;
 
-    LOG(VB_CHANSCAN, LOG_INFO, LOC + "SetPage(): " +
+    LOG(VB_CHANSCAN, LOG_INFO, LOC + "Scan(): " +
         QString("type(%1) cardid(%2) inputname(%3)")
             .arg(scantype).arg(cardid).arg(inputname));
 
     if (scantype == ScanTypeSetting::DVBUtilsImport)
     {
         scannerPane->ImportDVBUtils(sourceid, lastHWCardType,
-                                    configPane->GetFilename());
+                                    GetFilename());
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBT)
     {
-        start_chan = configPane->GetStartChan();
+        start_chan = GetStartChan();
         parse_type = DTVTunerType::kTunerTypeDVBT;
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBT2)
     {
-        start_chan = configPane->GetStartChan();
+        start_chan = GetStartChan();
         parse_type = DTVTunerType::kTunerTypeDVBT2;
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBS)
     {
-        start_chan = configPane->GetStartChan();
+        start_chan = GetStartChan();
         parse_type = DTVTunerType::kTunerTypeDVBS1;
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBS2)
     {
-        start_chan = configPane->GetStartChan();
+        start_chan = GetStartChan();
         parse_type = DTVTunerType::kTunerTypeDVBS2;
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBC)
     {
-        start_chan = configPane->GetStartChan();
+        start_chan = GetStartChan();
         parse_type = DTVTunerType::kTunerTypeDVBC;
     }
     else if (scantype == ScanTypeSetting::IPTVImport)
@@ -126,8 +108,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
     {
         do_scan = false;
         scannerPane->ImportVBox(cardid, inputname, sourceid,
-                                configPane->DoFreeToAirOnly(),
-                                configPane->GetServiceRequirements());
+                                DoFreeToAirOnly(),
+                                GetServiceRequirements());
     }
     else if (scantype == ScanTypeSetting::IPTVImportMPTS)
     {
@@ -147,11 +129,11 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::ExistingScanImport)
     {
         do_scan = false;
-        uint scanid = configPane->GetScanID();
+        uint scanid = GetScanID();
         ScanDTVTransportList transports = LoadScan(scanid);
         ChannelImporter ci(true, true, true, true, false,
-                           configPane->DoFreeToAirOnly(),
-                           configPane->GetServiceRequirements());
+                           DoFreeToAirOnly(),
+                           GetServiceRequirements());
         ci.Process(transports);
     }
     else
@@ -161,9 +143,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
             QString("type(%1) src(%2) cardid(%3) not handled")
                 .arg(scantype).arg(sourceid).arg(cardid));
 
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), tr("ScanWizard"),
-            tr("Programmer Error, see console"));
+        ShowOkPopup(tr("Programmer Error, see console"));
     }
 
     // Just verify what we get from the UI...
@@ -180,9 +160,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
             start_chan["modulation"],     start_chan["bandwidth"],
             start_chan["mod_sys"],        start_chan["rolloff"]))
     {
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), tr("ScanWizard"),
-            tr("Error parsing parameters"));
+        ShowOkPopup(tr("Error parsing parameters"));
 
         do_scan = false;
     }
@@ -190,18 +168,18 @@ void ScanWizard::SetPage(const QString &pageTitle)
     if (do_scan)
     {
         QString table_start, table_end;
-        configPane->GetFrequencyTableRange(table_start, table_end);
+        GetFrequencyTableRange(table_start, table_end);
 
         scannerPane->Scan(
-            configPane->GetScanType(),            configPane->GetCardID(),
-            configPane->GetInputName(),           configPane->GetSourceID(),
-            configPane->DoIgnoreSignalTimeout(),  configPane->DoFollowNIT(),
-            configPane->DoTestDecryption(),       configPane->DoFreeToAirOnly(),
-            configPane->GetServiceRequirements(),
+            GetScanType(),            GetCardID(),
+            GetInputName(),           GetSourceID(),
+            DoIgnoreSignalTimeout(),  DoFollowNIT(),
+            DoTestDecryption(),       DoFreeToAirOnly(),
+            GetServiceRequirements(),
             // stuff needed for particular scans
-            configPane->GetMultiplex(),         start_chan,
-            configPane->GetFrequencyStandard(), configPane->GetModulation(),
-            configPane->GetFrequencyTable(),
+            GetMultiplex(),         start_chan,
+            GetFrequencyStandard(), GetModulation(),
+            GetFrequencyTable(),
             table_start, table_end);
     }
 }

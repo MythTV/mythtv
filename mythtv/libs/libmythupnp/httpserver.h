@@ -181,7 +181,6 @@ class HttpWorker : public QRunnable
     /**
      * \param httpServer The parent server of this request
      * \param sock       The socket
-     * \param socketTimeout The time in seconds to wait after the connection goes idle before closing the socket
      * \param type       The type of connection - Plain TCP, SSL or other?
      * \param sslConfig  The SSL configuration (for SSL sockets)
      */

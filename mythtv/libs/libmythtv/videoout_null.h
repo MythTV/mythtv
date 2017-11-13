@@ -16,8 +16,8 @@ class VideoOutputNull : public VideoOutput
               const QSize &video_dim_disp,
               float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id);
-    bool SetupDeinterlace(bool, const QString &ovrf = "")
-        { (void)ovrf; return false; } // we don't deinterlace in null output..
+    bool SetupDeinterlace(bool, const QString &overridefilter = "")
+        { (void)overridefilter; return false; } // we don't deinterlace in null output..
     void PrepareFrame(VideoFrame *buffer, FrameScanType, OSD *osd);
     void Show(FrameScanType );
     void CreatePauseFrame(void);
@@ -39,8 +39,8 @@ class VideoOutputNull : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     void MoveResizeWindow(QRect ) {;}
-    virtual bool SetupVisualisation(AudioPlayer *audio, MythRender *render,
-                                    const QString &name) { return false; }
+    virtual bool SetupVisualisation(AudioPlayer *, MythRender *,
+                                    const QString &) { return false; }
 
   private:
     QMutex     global_lock;

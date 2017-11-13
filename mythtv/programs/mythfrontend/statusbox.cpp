@@ -119,7 +119,7 @@ void StatusBox::Init()
                             qVariantFromValue((void*)SLOT(doScheduleStatus())));
     item->DisplayState("schedule", "icon");
 
-    item = new MythUIButtonListItem(m_categoryList, tr("Tuner Status"),
+    item = new MythUIButtonListItem(m_categoryList, tr("Input Status"),
                             qVariantFromValue((void*)SLOT(doTunerStatus())));
     item->DisplayState("tuner", "icon");
 
@@ -670,6 +670,8 @@ void StatusBox::doScheduleStatus()
     QMap<int, QString> sourceText;
     QMap<int, int> cardMatch;
     QMap<int, QString> cardText;
+    QMap<int, int> cardParent;
+    QMap<int, bool> cardSchedGroup;
     QString tmpstr;
     int maxSource = 0;
     int maxCard = 0;
@@ -697,16 +699,19 @@ void StatusBox::doScheduleStatus()
             maxCard = query.value(0).toInt();
     }
 
-    query.prepare("SELECT cardid,inputname,displayname "
+    query.prepare("SELECT cardid, inputname, displayname, parentid, "
+                  "       schedgroup "
                   "FROM capturecard");
     if (query.exec())
     {
         while (query.next())
         {
-            if (!query.value(2).toString().isEmpty())
-                cardText[query.value(0).toInt()] = query.value(2).toString();
-            else
-                cardText[query.value(0).toInt()] = query.value(1).toString();
+            int inputid = query.value(0).toInt();
+            cardText[inputid] = query.value(2).toString();
+            if (cardText[inputid].isEmpty())
+                cardText[inputid] = QString::number(query.value(1).toInt());
+            cardParent[inputid] = query.value(3).toInt();
+            cardSchedGroup[inputid] = query.value(4).toBool();
         }
     }
 
@@ -737,7 +742,12 @@ void StatusBox::doScheduleStatus()
             recstatus == RecStatus::Failing)
         {
             ++sourceMatch[s->GetSourceID()];
-            ++cardMatch[s->GetInputID()];
+            int inputid = s->GetInputID();
+            // When schedgroup is used, always attribute recordings to
+            // the parent inputs.
+            if (cardParent[inputid] && cardSchedGroup[cardParent[inputid]])
+                inputid = cardParent[inputid];
+            ++cardMatch[inputid];
             if (s->GetRecordingPriority2() < 0)
                 ++lowerpriority;
             if (s->GetVideoProperties() & VID_HDTV)
@@ -796,7 +806,7 @@ void StatusBox::doScheduleStatus()
         {
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
                              .arg(cardMatch[i]).arg(willrec)
-                             .arg(tr("on card")).arg(i).arg(cardText[i]);
+                             .arg(tr("on input")).arg(i).arg(cardText[i]);
             AddLogLine(tmpstr, helpmsg);
         }
     }
@@ -804,12 +814,28 @@ void StatusBox::doScheduleStatus()
 
 void StatusBox::doTunerStatus()
 {
+    struct info
+    {
+        int inputid;
+        bool schedgroup;
+        QString displayname;
+        int errored;
+        int unavailable;
+        int sleeping;
+        int recording;
+        int livetv;
+        int available;
+        QStringList recordings;
+    };
+    QMap<int, struct info> info;
+    QList<int> inputids;
+        
     if (m_iconState)
         m_iconState->DisplayState("tuner");
     m_logList->Reset();
 
-    QString helpmsg(tr("Tuner Status shows the current information "
-                       "about the state of backend tuner cards"));
+    QString helpmsg(tr("Input Status shows the current information "
+                       "about the state of backend inputs"));
     if (m_helpText)
         m_helpText->SetText(helpmsg);
     if (m_justHelpText)
@@ -817,7 +843,7 @@ void StatusBox::doTunerStatus()
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardid, cardtype, videodevice "
+        "SELECT cardid, parentid, schedgroup, displayname "
         "FROM capturecard ORDER BY cardid");
 
     if (!query.exec() || !query.isActive())
@@ -828,9 +854,23 @@ void StatusBox::doTunerStatus()
 
     while (query.next())
     {
-        int cardid = query.value(0).toInt();
+        int inputid = query.value(0).toInt();
+        int parentid = query.value(1).toInt();
 
-        QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+        // If this is a schedgroup child, attribute all status to the
+        // parent.
+        int infoid = inputid;
+        if (parentid && info[parentid].schedgroup)
+            infoid = parentid;
+        else
+        {
+            info[infoid].inputid = inputid;
+            info[infoid].schedgroup = query.value(2).toBool();
+            info[infoid].displayname = query.value(3).toString();
+            inputids.append(inputid);
+        }
+
+        QString cmd = QString("QUERY_REMOTEENCODER %1").arg(inputid);
         QStringList strlist( cmd );
         strlist << "GET_STATE";
 
@@ -842,53 +882,77 @@ void StatusBox::doTunerStatus()
         if (state == kState_Error)
         {
             strlist.clear();
-            strlist << QString("QUERY_REMOTEENCODER %1").arg(cardid);
+            strlist << QString("QUERY_REMOTEENCODER %1").arg(inputid);
             strlist << "GET_SLEEPSTATUS";
 
             gCoreContext->SendReceiveStringList(strlist);
             int sleepState = strlist[0].toInt();
 
             if (sleepState == -1)
-                status = tr("has an error");
+                info[infoid].errored += 1;
             else if (sleepState == sStatus_Undefined)
-                status = tr("is unavailable");
+                info[infoid].unavailable += 1;
             else
-                status = tr("is asleep");
-
-            fontstate = "warning";
+                info[infoid].sleeping += 1;
         }
-        else if (state == kState_WatchingLiveTV)
-            status = tr("is watching Live TV");
         else if (state == kState_RecordingOnly ||
                  state == kState_WatchingRecording)
-            status = tr("is recording");
+            info[infoid].recording += 1;
+        else if (state == kState_WatchingLiveTV)
+            info[infoid].livetv += 1;
         else
-            status = tr("is not recording");
-
-        QString tun = tr("Tuner %1 %2 %3");
-        QString devlabel = CardUtil::GetDeviceLabel(
-            query.value(1).toString(), query.value(2).toString());
-
-        QString shorttuner = tun.arg(cardid).arg("").arg(status);
-        QString longtuner = tun.arg(cardid).arg(devlabel).arg(status);
+            info[infoid].available += 1;
 
         if (state == kState_RecordingOnly ||
-            state == kState_WatchingRecording)
+            state == kState_WatchingRecording ||
+            state == kState_WatchingLiveTV)
         {
-            strlist = QStringList( QString("QUERY_RECORDER %1").arg(cardid));
+            strlist = QStringList( QString("QUERY_RECORDER %1").arg(inputid));
             strlist << "GET_RECORDING";
             gCoreContext->SendReceiveStringList(strlist);
             ProgramInfo pginfo(strlist);
             if (pginfo.GetChanID())
             {
-                status += ' ' + pginfo.GetTitle();
-                status += "\n";
-                status += pginfo.GetSubtitle();
-                longtuner = tun.arg(cardid).arg(devlabel).arg(status);
+                QString titlesub = pginfo.GetTitle();
+                if (!pginfo.GetSubtitle().isEmpty())
+                    titlesub += QString(" - ") + pginfo.GetSubtitle();
+                info[infoid].recordings += titlesub;
             }
         }
+    }
 
-        AddLogLine(shorttuner, helpmsg, longtuner, longtuner, fontstate);
+    QList<int>::iterator it = inputids.begin();
+    for ( ; it != inputids.end(); ++it)
+    {
+        int inputid = *it;
+
+        QStringList statuslist;
+        if (info[inputid].errored)
+            statuslist << tr("%1 errored").arg(info[inputid].errored);
+        if (info[inputid].unavailable)
+            statuslist << tr("%1 unavailable").arg(info[inputid].unavailable);
+        if (info[inputid].sleeping)
+            statuslist << tr("%1 sleeping").arg(info[inputid].sleeping);
+        if (info[inputid].recording)
+            statuslist << tr("%1 recording").arg(info[inputid].recording);
+        if (info[inputid].livetv)
+            statuslist << tr("%1 live television").arg(info[inputid].livetv);
+        if (info[inputid].available)
+            statuslist << tr("%1 available").arg(info[inputid].available);
+
+        QString fontstate;
+        if (info[inputid].errored)
+            fontstate = "error";
+        else if (info[inputid].unavailable || info[inputid].sleeping)
+            fontstate = "warning";
+
+        QString shortstatus = tr("Input %1 %2: %3")
+            .arg(inputid).arg(info[inputid].displayname)
+            .arg(statuslist.join(tr(", ")));
+        QString longstatus = shortstatus + "\n" +
+            info[inputid].recordings.join("\n");
+
+        AddLogLine(shortstatus, helpmsg, longstatus, longstatus, fontstate);
     }
 }
 

@@ -216,10 +216,13 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     {
       case 6:
         timeout_ms      = commands[5].toInt();
+        [[clang::fallthrough]];
       case 5:
         usereadahead    = commands[4].toInt();
+        [[clang::fallthrough]];
       case 4:
         writemode       = commands[3].toInt();
+        [[clang::fallthrough]];
       default:
         hostname        = commands[2];
     }
@@ -557,8 +560,7 @@ QList<FileSystemInfo> FileServerHandler::QueryAllFileSystems(void)
 
 /**
  * \addtogroup myth_network_protocol
- * \par
- * QUERY_FILE_EXISTS \e filename \e storagegroup
+ * \par QUERY_FILE_EXISTS \e filename \e storagegroup
  */
 bool FileServerHandler::HandleQueryFileExists(SocketHandler *socket,
                                               QStringList &slist)
@@ -642,9 +644,11 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
       case 4:
         if (!slist[3].isEmpty())
             hostname = slist[3];
+        [[clang::fallthrough]];
       case 3:
         if (!slist[2].isEmpty())
             storageGroup = slist[2];
+        [[clang::fallthrough]];
       case 2:
         filename = slist[1];
         if (filename.isEmpty() ||
@@ -681,35 +685,9 @@ bool FileServerHandler::HandleQueryFileHash(SocketHandler *socket,
             if (m_fsMap[hostname]->SendReceiveStringList(slist))
                 hash = slist[0];
         }
-        else
-        {
-            // looking for file on unknown host
-            // assume host is an IP address, and look for matching
-            // entry in database
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT hostname FROM settings "
-                           "WHERE value='BackendServerIP' "
-                             " OR value='BackendServerIP6' "
-                             "AND data=:HOSTNAME;");
-            query.bindValue(":HOSTNAME", hostname);
-
-            if (query.exec() && query.next())
-            {
-                // address matches an entry
-                hostname = query.value(0).toString();
-                if (m_fsMap.contains(hostname))
-                {
-                    // entry matches a connection
-                    slist.clear();
-                    slist << "QUERY_FILE_HASH"
-                          << filename
-                          << storageGroup;
-
-                    if (m_fsMap[hostname]->SendReceiveStringList(slist))
-                        hash = slist[0];
-                }
-            }
-        }
+        // I deleted the incorrect SQL select that was supposed to get
+        // host name from ip address. Since it cannot work and has
+        // been there 6 years I assume it is not important.
     }
 
 

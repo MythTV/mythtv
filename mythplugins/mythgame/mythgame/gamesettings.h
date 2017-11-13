@@ -6,8 +6,9 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include <settings.h>
+#include <standardsettings.h>
 #include <mythcontext.h>
+#include <settings.h>
 
 // The real work.
 
@@ -58,9 +59,9 @@ class GameDBStorage : public SimpleDBStorage
     const MythGamePlayerSettings &parent;
 };
 
-class MythGameGeneralSettings : public ConfigurationWizard
+class MythGameGeneralSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MythGameGeneralSettings)
+    Q_DECLARE_TR_FUNCTIONS(MythGameGeneralSettings);
 
   public:
     MythGameGeneralSettings();
@@ -143,6 +144,5 @@ public slots:
   private:
     ListBoxSetting *listbox;
 };
-
 
 #endif

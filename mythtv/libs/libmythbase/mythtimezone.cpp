@@ -313,7 +313,7 @@ bool checkTimeZone(void)
 
 /// This overloaded version allows for the use of an existing (not managed by
 /// MythContext) connection to the backend.
-bool checkTimeZone(const QStringList &master_settings)
+bool checkTimeZone(const QStringList &/*master_settings*/)
 {
     return true;
 }

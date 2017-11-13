@@ -499,12 +499,13 @@ class DTVModulationSystem : public DTVParamHelper
     static const DTVParamHelperStruct confTable[];
     static const DTVParamHelperStruct vdrTable[];
     static const DTVParamHelperStruct parseTable[];
-    static const uint kDBStrCnt = 17;
+    static const uint kDBStrCnt = 19;
     static const char *dbStr[kDBStrCnt];
 
   public:
     enum
     {
+        // see fe_delivery_system in frontend.h
         kModulationSystem_UNDEFINED,
         kModulationSystem_DVBC_ANNEX_AC,
         kModulationSystem_DVBC_ANNEX_B,
@@ -522,6 +523,8 @@ class DTVModulationSystem : public DTVParamHelper
         kModulationSystem_CMMB,
         kModulationSystem_DAB,
         kModulationSystem_DVBT2,
+        kModulationSystem_TURBO,
+        kModulationSystem_DVBC_ANNEX_C
     };
 
     DTVModulationSystem(int _default = kModulationSystem_UNDEFINED)

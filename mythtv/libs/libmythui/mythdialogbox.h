@@ -8,6 +8,10 @@
 
 #include "mythscreentype.h"
 #include "mythuitextedit.h"
+#include "mythmainwindow.h"
+#include "mythlogging.h"
+
+#include <functional>
 
 class QTimer;
 
@@ -15,6 +19,7 @@ class MythUIButtonListItem;
 class MythUIButtonList;
 class MythUIButton;
 class MythUITextEdit;
+class MythUISpinBox;
 class MythUIImage;
 class MythUIStateType;
 class MythMenu;
@@ -52,12 +57,16 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
 };
 
 
+using MythUIButtonCallback = std::function<void(void)>;
+
 class MUI_PUBLIC MythMenuItem
 {
   public:
     MythMenuItem(const QString &text, QVariant data = 0, bool checked = false, MythMenu *subMenu = NULL) :
         Text(text), Data(data), Checked(checked), SubMenu(subMenu), UseSlot(false) { Init(); }
     MythMenuItem(const QString &text, const char *slot, bool checked = false, MythMenu *subMenu = NULL) :
+        Text(text), Data(qVariantFromValue(slot)), Checked(checked), SubMenu(subMenu), UseSlot(true) { Init(); }
+    MythMenuItem(const QString &text, const MythUIButtonCallback &slot, bool checked = false, MythMenu *subMenu = NULL) :
         Text(text), Data(qVariantFromValue(slot)), Checked(checked), SubMenu(subMenu), UseSlot(true) { Init(); }
 
     QString   Text;
@@ -83,6 +92,10 @@ class MUI_PUBLIC MythMenu
                  bool selected = false, bool checked = false);
     void AddItem(const QString &title, const char *slot, MythMenu *subMenu = NULL,
                  bool selected = false, bool checked = false);
+    void AddItem(const QString &title, const MythUIButtonCallback &slot,
+                 MythMenu *subMenu = NULL, bool selected = false,
+                 bool checked = false);
+
     void SetSelectedByTitle(const QString &title);
     void SetSelectedByData(QVariant data);
 
@@ -92,6 +105,7 @@ class MUI_PUBLIC MythMenu
 
   private:
     void Init(void);
+    void AddItem(MythMenuItem *, bool selected, MythMenu *subMenu);
 
     MythMenu *m_parentMenu;
     QString   m_title;
@@ -138,6 +152,12 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
                    bool newMenu = false, bool setCurrent = false);
     void AddButton(const QString &title, const char *slot,
                    bool newMenu = false, bool setCurrent = false);
+    void AddButton(const QString &title, const MythUIButtonCallback &slot,
+                   bool newMenu = false, bool setCurrent = false)
+    {
+        AddButton(title, QVariant::fromValue(slot), newMenu, setCurrent);
+        m_useSlots = true;
+    }
 
     virtual bool keyPressEvent(QKeyEvent *event);
     virtual bool gestureEvent(MythGestureEvent *event);
@@ -254,6 +274,44 @@ class MUI_PUBLIC MythTextInputDialog : public MythScreenType
 
 
 /**
+ *  \class MythSpinBoxDialog
+ *
+ *  \brief Dialog prompting the user to enter a number using a spin box
+ *
+ *  Sends out a DialogCompletionEvent event and the haveResult() signal
+ *  containing the result when the user selects the Ok button.
+ */
+class MUI_PUBLIC MythSpinBoxDialog : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    MythSpinBoxDialog(MythScreenStack *parent, const QString &message);
+
+    bool Create(void);
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
+
+    void SetRange(int low, int high, int step, uint pageMultiple=5);
+    void AddSelection(QString label, int value);
+    void SetValue(const QString & value);
+    void SetValue(int value);
+
+  signals:
+     void haveResult(QString);
+
+  protected:
+    MythUISpinBox *m_spinBox;
+    QString m_message;
+    QString m_defaultValue;
+    QObject *m_retObject;
+    QString m_id;
+
+  protected slots:
+    void sendResult();
+};
+
+
+/**
  * \class MythUISearchDialog
  * \brief Provide a dialog to quickly find an entry in a list
  *
@@ -273,7 +331,7 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
 
   public:
     MythUISearchDialog(MythScreenStack *parent,
-                     const QString &message,
+                     const QString &title,
                      const QStringList &list,
                      bool  matchAnywhere = false,
                      const QString &defaultValue = "");
@@ -366,9 +424,52 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
 
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
+template <typename Func>
+MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
+                                             Func slot, bool showCancel = false)
+{
+    QString                  LOC = "ShowOkPopup('" + message + "') - ";
+    MythConfirmationDialog  *pop;
+    MythScreenStack         *stk = NULL;
+
+    MythMainWindow *win = GetMythMainWindow();
+
+    if (win)
+        stk = win->GetStack("popup stack");
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
+        return NULL;
+    }
+
+    if (!stk)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
+                                       "Is there a MythThemeBase?");
+        return NULL;
+    }
+
+    pop = new MythConfirmationDialog(stk, message, showCancel);
+    if (pop->Create())
+    {
+        stk->AddScreen(pop);
+        if (parent)
+            QObject::connect(pop, &MythConfirmationDialog::haveResult, parent, slot,
+                             Qt::QueuedConnection);
+    }
+    else
+    {
+        delete pop;
+        pop = NULL;
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't Create() Dialog");
+    }
+
+    return pop;
+}
 
 Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
+Q_DECLARE_METATYPE(MythUIButtonCallback)
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_DECLARE_METATYPE(QFileInfo)

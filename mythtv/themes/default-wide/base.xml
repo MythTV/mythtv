@@ -635,6 +635,10 @@
         </imagetype>
     </progressbar>
 
+    <!-- Small Progress bar, half screen width at 1280 -->
+    <progressbar name="smallprogressbar" from="baseprogressbar">
+    </progressbar>
+
     <!-- Base definition of a vertical scrollbar -->
     <scrollbar name="basevertscrollbar">
         <area>1114,0,14,970</area>

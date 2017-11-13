@@ -1,6 +1,5 @@
-#ifdef USING_OPENGLES
-#define OSD_EGL // OSD with EGL
-#endif
+
+#include "videoout_omx.h"
 
 #ifdef OSD_EGL /* includes QJson with enum value named Bool, must go before EGL/egl.h */
 # include "mythpainter_ogl.h"
@@ -9,8 +8,6 @@
 
 /* must go before X11/X.h due to #define None 0L */
 #include "privatedecoder_omx.h" // For PrivateDecoderOMX::s_name
-
-#include "videoout_omx.h"
 
 #include <cstddef>
 #include <cassert>
@@ -29,9 +26,6 @@
 #ifdef OSD_EGL
 #include <EGL/egl.h>
 #include <QtGlobal>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-#include <QtPlatformHeaders/QEGLNativeContext>
-#endif
 #endif
 
 // MythTV
@@ -83,9 +77,7 @@ using namespace omxcontext;
  * Types
  */
 #ifdef OSD_EGL
-typedef MythRenderOpenGL2ES MythRenderBase;
-
-class MythRenderEGL : public MythRenderBase
+class MythRenderEGL : public MythRenderOpenGL2ES
 {
     // No copying
     MythRenderEGL(MythRenderEGL&);
@@ -104,7 +96,7 @@ class MythRenderEGL : public MythRenderBase
 #endif
 
   protected:
-    virtual ~MythRenderEGL(); // Use MythRenderBase::DecrRef to delete
+    virtual ~MythRenderEGL(); // Use MythRenderOpenGL2ES::DecrRef to delete
 
     EGLNativeWindowType createNativeWindow();
     void destroyNativeWindow();
@@ -285,12 +277,14 @@ QStringList VideoOutputOMX::GetAllowedRenderers(
 VideoOutputOMX::VideoOutputOMX() :
     m_render(gCoreContext->GetSetting("OMXVideoRender", VIDEO_RENDER), *this),
     m_imagefx(gCoreContext->GetSetting("OMXVideoFilter", IMAGE_FX), *this),
-    m_context(0),   
-    m_backgroundscreen(0), m_glOsdThread(0), m_changed(false)
+    m_backgroundscreen(0), m_videoPaused(false)
 {
 #ifdef OSD_EGL
-      m_osdpainter = 0;
-      m_threaded_osdpainter = 0;
+    m_context = 0;
+    m_osdpainter = 0;
+    m_threaded_osdpainter = 0;
+    m_glOsdThread = 0;
+    m_changed = false;
 #endif
     init(&av_pause_frame, FMT_YV12, NULL, 0, 0, 0);
 
@@ -426,7 +420,7 @@ bool VideoOutputOMX::Init(          // Return true if successful
                   kKeepPrebuffer);
 
     // Allocate video buffers
-    if (!CreateBuffers(video_dim_buf, video_dim_disp, winid))
+    if (!CreateBuffers(video_dim_buf, video_dim_disp))
         return false;
 
     bool osdIsSet = false;
@@ -566,20 +560,20 @@ bool VideoOutputOMX::SetDeinterlacingEnabled(bool interlaced)
 }
 
 // virtual
-bool VideoOutputOMX::SetupDeinterlace(bool interlaced, const QString &ovrf)
+bool VideoOutputOMX::SetupDeinterlace(bool interlaced, const QString &overridefilter)
 {
     if (!m_imagefx.IsValid())
-        return VideoOutput::SetupDeinterlace(interlaced, ovrf);
+        return VideoOutput::SetupDeinterlace(interlaced, overridefilter);
 
     QString deintfiltername;
     if (db_vdisp_profile)
-        deintfiltername = db_vdisp_profile->GetFilteredDeint(ovrf);
+        deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
 
     if (!deintfiltername.contains(kName))
     {
         if (m_deinterlacing && m_deintfiltername.contains(kName))
             SetImageFilter(OMX_ImageFilterNone);
-        return VideoOutput::SetupDeinterlace(interlaced, ovrf);
+        return VideoOutput::SetupDeinterlace(interlaced, overridefilter);
     }
 
     if (m_deinterlacing == interlaced && deintfiltername == m_deintfiltername)
@@ -755,6 +749,10 @@ void VideoOutputOMX::UpdatePauseFrame(int64_t &disp_timecode)
         CopyFrame(&av_pause_frame, used_frame);
     }
 
+    // Suppress deinterlace while paused to prevent the jiggles.
+    av_pause_frame.interlaced_frame = 0;
+    av_pause_frame.top_field_first = 0;
+
     disp_timecode = av_pause_frame.disp_timecode;
 }
 
@@ -773,9 +771,11 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
+    m_videoPaused = false;
     if (!frame)
     {
         // Rotate pause frames
+        m_videoPaused = true;
         vbuffers.Enqueue(kVideoBuffer_pause, vbuffers.Dequeue(kVideoBuffer_pause));
         frame = vbuffers.GetScratchFrame();
         CopyFrame(frame, &av_pause_frame);
@@ -799,7 +799,7 @@ void VideoOutputOMX::ProcessFrame(VideoFrame *frame, OSD *osd,
 
 // tells show what frame to be show, do other last minute stuff
 // pure virtual
-void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *osd)
+void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType /*scan*/, OSD */*osd*/)
 {
     if (IsErrored())
     {
@@ -841,7 +841,7 @@ void VideoOutputOMX::PrepareFrame(VideoFrame *buffer, FrameScanType scan, OSD *o
 
 // BLT the last prepared frame to the screen as quickly as possible.
 // pure virtual
-void VideoOutputOMX::Show(FrameScanType scan)
+void VideoOutputOMX::Show(FrameScanType /*scan*/)
 {
     if (IsErrored())
     {
@@ -877,7 +877,22 @@ void VideoOutputOMX::Show(FrameScanType scan)
 
     hdr->nFilledLen = frame->offsets[2] + (frame->offsets[1] >> 2);
     hdr->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
+#ifdef OMX_BUFFERFLAG_INTERLACED
+    if (frame->interlaced_frame)
+        hdr->nFlags |= OMX_BUFFERFLAG_INTERLACED;
+#endif
+#ifdef OMX_BUFFERFLAG_TOP_FIELD_FIRST
+    if (frame->top_field_first)
+        hdr->nFlags |= OMX_BUFFERFLAG_TOP_FIELD_FIRST;
+#endif
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
+    // Paused - do not display anything unless softblend set
+    if (m_videoPaused && GetOSDRenderer() != "softblend")
+    {
+        // fake out that the buffer was already emptied
+        EmptyBufferDone(cmpnt, hdr);
+        return;
+    }
     OMX_ERRORTYPE e = OMX_EmptyThisBuffer(cmpnt.Handle(), hdr);
     if (e != OMX_ErrorNone)
     {
@@ -1051,8 +1066,7 @@ QStringList VideoOutputOMX::GetVisualiserList(void)
 
 bool VideoOutputOMX::CreateBuffers(
     const QSize &video_dim_buf,     // video buffer size
-    const QSize &video_dim_disp,    // video display size
-    WId winid )
+    const QSize &video_dim_disp)    // video display size
 {
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
 
@@ -1385,8 +1399,10 @@ OMX_ERRORTYPE VideoOutputOMX::UseBuffersCB()
 OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
 {
     OMXComponent &cmpnt = m_imagefx.IsValid() ? m_imagefx : m_render;
+#ifndef NDEBUG
     const OMX_PARAM_PORTDEFINITIONTYPE &def = cmpnt.PortDef();
     assert(vbuffers.Size() >= def.nBufferCountActual);
+#endif
 
     for (uint i = 0; i < vbuffers.Size(); ++i)
     {
@@ -1413,7 +1429,7 @@ OMX_ERRORTYPE VideoOutputOMX::FreeBuffersCB()
 
 #ifdef OSD_EGL
 MythRenderEGL::MythRenderEGL() :
-    MythRenderBase(MythRenderFormat()),
+    MythRenderOpenGL2ES(MythRenderFormat()),
     m_display(EGL_NO_DISPLAY),
     m_context(EGL_NO_CONTEXT),
     m_window(0),

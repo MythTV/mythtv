@@ -1100,8 +1100,23 @@ void IconView::DoDeleteCurrent(bool doDelete)
 
 void IconView::HandleSettings(void)
 {
-    GallerySettings settings;
-    settings.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "gallerysettings",
+                                  new GallerySettings());
+
+    if (ssd->Create())
+    {
+        mainStack->AddScreen(ssd);
+//        connect(ssd, SIGNAL(Close()), this, SLOT(ReloadSettings()));
+    }
+    else
+        delete ssd;
+
+}
+
+void IconView::ReloadSettings(void)
+{
     gCoreContext->ClearSettingsCache();
 
     // reload settings
@@ -1450,7 +1465,7 @@ void IconView::DoRename(QString folderName)
         else
             msg = tr("Failed to rename file");
 
-        ShowOkPopup(msg, NULL, NULL);
+        ShowOkPopup(msg);
 
         return;
     }

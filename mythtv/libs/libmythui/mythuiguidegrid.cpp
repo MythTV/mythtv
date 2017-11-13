@@ -294,9 +294,34 @@ QColor MythUIGuideGrid::calcColor(const QColor &color, int alphaMod)
     return newColor;
 }
 
+/** \fn MythUIGuideGrid::DrawSelf(MythPainter *, int, int, int, QRect)
+ *  \brief Draws an entire GuideGrid.
+ *
+ *  Draw the complete contents of a GuideGrid. This function iterates
+ *  over all the rows and columns in a guide grid, and calls the
+ *  appropriate functions to draw the grid items. This is accomplished
+ *  in three stages. First all the item backgrounds are drawn in
+ *  appropriate colors for their genre and recoding state, then the
+ *  background/decorations for the selected item are drawn, and
+ *  finally all the item texts and recording decorators are drawn on
+ *  top.
+ *
+ *  @note This function does not translate local->global offsets. All
+ *  of the drawing functions it calls must perform this translation.
+ *
+ *  \param p           A pointer to the MythPainter structure that
+ *                     will be used to render this object onto the screen.
+ *  \param xoffset     The X offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param yoffset     The Y offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param alphaMod    The alpha (transparency) value for this widget.
+ *  \param clipRect    Ignored.
+ */
 void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                                int alphaMod, QRect clipRect)
 {
+    p->SetClipRect(clipRect);
     for (int i = 0; i < m_rowCount; i++)
     {
         QList<UIGTCon *>::iterator it = m_allData[i].begin();
@@ -306,15 +331,15 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             UIGTCon *data = *it;
 
             if (data->m_recStat == 0)
-                drawBackground(p, data, alphaMod);
+                drawBackground(p, xoffset, yoffset, data, alphaMod);
             else if (data->m_recStat == 1)
-                drawBox(p, data, m_recordingColor, alphaMod);
+                drawBox(p, xoffset, yoffset, data, m_recordingColor, alphaMod);
             else
-                drawBox(p, data, m_conflictingColor, alphaMod);
+                drawBox(p, xoffset, yoffset, data, m_conflictingColor, alphaMod);
         }
     }
 
-    drawCurrent(p, &m_selectedItem, alphaMod);
+    drawCurrent(p, xoffset, yoffset, &m_selectedItem, alphaMod);
 
     for (int i = 0; i < m_rowCount; i++)
     {
@@ -323,19 +348,38 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         for (; it != m_allData[i].end(); ++it)
         {
             UIGTCon *data = *it;
-            drawText(p, data, alphaMod);
+            drawText(p, xoffset, yoffset, data, alphaMod);
 
             if (data->m_recType != 0 || data->m_arrow != 0)
-                drawRecType(p, data, alphaMod);
+                drawRecDecoration(p, xoffset, yoffset, data, alphaMod);
         }
     }
 }
 
-void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
+/** \fn MythUIGuideGrid::drawCurrent(MythPainter *, int, int, UIGTCon *, int)
+ *  \brief Draws selection indication for a GuideGrid item.
+ *
+ *  This function is responsible for drawing decoration items that are
+ *  unique to the currently selected entry. This may be a highlight
+ *  rectangle around the entry, or special colors to indicate the
+ *  currently selected entry. The type of decoration drawn depends
+ *  upon the setting on the local m_SelType variable.
+ *
+ *  \param p           A pointer to the MythPainter structure that
+ *                     will be used to render this object onto the screen.
+ *  \param xoffset     The X offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param yoffset     The Y offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param data        A pointer to the GuideGrid object to be drawn.
+ *  \param alphaMod    The alpha (transparency) value for this widget.
+ */
+void MythUIGuideGrid::drawCurrent(MythPainter *p, int xoffset, int yoffset, UIGTCon *data, int alphaMod)
 {
     int breakin = 2;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());
+    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(breakin, breakin, -breakin, -breakin);
     int status = data->m_recStat;
 
@@ -382,11 +426,30 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
     }
 }
 
-void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
+/** \fn MythUIGuideGrid::drawRecDecoration(MythPainter *, int, int, UIGTCon *, int)
+ *  \brief Draws decoration items for a GuideGrid item.
+ *
+ *  This function is responsible for drawing the decoration items onto
+ *  an entry in the GuideGrid. It draws left/right (or up/down) arrows
+ *  if the program time extends before or after what's visible in the
+ *  window. If a show is scheduled to record, it also draws the badges
+ *  that indicates the type of recording.
+ *
+ *  \param p           A pointer to the MythPainter structure that
+ *                     will be used to render this object onto the screen.
+ *  \param xoffset     The X offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param yoffset     The Y offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param data        A pointer to the GuideGrid object to be drawn.
+ *  \param alphaMod    The alpha (transparency) value for this widget.
+ */
+void MythUIGuideGrid::drawRecDecoration(MythPainter *p, int xoffset, int yoffset, UIGTCon *data, int alphaMod)
 {
     int breakin = 1;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());
+    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(breakin, breakin, -breakin, -breakin);
 
     // draw arrows
@@ -435,25 +498,62 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
     }
 }
 
-void MythUIGuideGrid::drawBox(MythPainter *p, UIGTCon *data, const QColor &color, int alphaMod)
+/** \fn MythUIGuideGrid::drawBox(MythPainter *, int, int, UIGTCon *, int)
+ *  \brief Draws the background for a GuideGrid item to be recorded.
+ *
+ *  This function is responsible for drawing the background behind all
+ *  GuideGrid entries that are marked as being part of a recording
+ *  rule. It draws a simple filled in box with no past/future
+ *  demarcation.
+ *
+ *  \param p           A pointer to the MythPainter structure that
+ *                     will be used to render this object onto the screen.
+ *  \param xoffset     The X offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param yoffset     The Y offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param data        A pointer to the GuideGrid object to be drawn.
+ *  \param color       The color to draw the box.
+ *  \param alphaMod    The alpha (transparency) value for this widget.
+ */
+void MythUIGuideGrid::drawBox(MythPainter *p, int xoffset, int yoffset, UIGTCon *data, const QColor &color, int alphaMod)
 {
     int breakin = 1;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());
+    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(breakin, breakin, -breakin, -breakin);
 
     static const QPen nopen(Qt::NoPen);
     p->DrawRect(area, QBrush(calcColor(color, m_categoryAlpha)), nopen, alphaMod);
 }
 
-void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod)
+/** \fn MythUIGuideGrid::drawBackground(MythPainter *, int, int, UIGTCon *, int)
+ *  \brief Draws the background for a GuideGrid item that will not be recorded.
+ *
+ *  This function is responsible for drawing the background behind all
+ *  GuideGrid entries that are not marked as being part of a recording
+ *  rule. It is responsible for drawing the demarcation line in the
+ *  grid between past and future times. It also chooses the background
+ *  color appropriate to the genre of the show.
+ *
+ *  \param p           A pointer to the MythPainter structure that
+ *                     will be used to render this object onto the screen.
+ *  \param xoffset     The X offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param yoffset     The Y offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param data        A pointer to the GuideGrid object to be drawn.
+ *  \param alphaMod    The alpha (transparency) value for this widget.
+ */
+void MythUIGuideGrid::drawBackground(MythPainter *p, int xoffset, int yoffset, UIGTCon *data, int alphaMod)
 {
     QColor overColor;
     QRect overArea;
 
     int breakin = 1;
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());
+    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
     QColor fillColor;
 
     if (m_drawCategoryColors && data->m_categoryColor.isValid())
@@ -461,6 +561,7 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod
     else
         fillColor = calcColor(m_solidColor, m_categoryAlpha);
 
+    // These calculations are in the parents local coordinates
     if (m_verticalLayout)
     {
         if (m_progPastCol && area.top() < m_progPastCol)
@@ -521,13 +622,32 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod
         area.setHeight(2);
 
     static const QPen nopen(Qt::NoPen);
+    area.translate(xoffset, yoffset);		// Convert to global coordinates
     p->DrawRect(area, QBrush(fillColor), nopen, alphaMod);
 
-    if (overArea.width() > 0)
+    if (overArea.width() > 0) {
+        overArea.translate(xoffset, yoffset);	// Convert to global coordinates
         p->DrawRect(overArea, QBrush(overColor), nopen, alphaMod);
+    }
 }
 
-void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
+/** \fn MythUIGuideGrid::drawText(MythPainter *, int, int, UIGTCon *, int)
+ *  \brief Draws text strings for a GuideGrid item.
+ *
+ *  This function is responsible for drawing the text onto an entry in
+ *  the GuideGrid. It is smart enough to leave space for the guide
+ *  item continuation arrow to be drawn.
+ *
+ *  \param p           A pointer to the MythPainter structure that
+ *                     will be used to render this object onto the screen.
+ *  \param xoffset     The X offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param yoffset     The Y offset of the parent. Used to convert local
+ *                     coordinates to global coordinates.
+ *  \param data        A pointer to the GuideGrid object to be drawn.
+ *  \param alphaMod    The alpha (transparency) value for this widget.
+ */
+void MythUIGuideGrid::drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon *data, int alphaMod)
 {
     QString msg = data->m_title;
 
@@ -535,7 +655,8 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
         msg += QString(" (%1)").arg(data->m_category);
 
     QRect area = data->m_drawArea;
-    area.translate(m_Area.x(), m_Area.y());
+    area.translate(m_Area.x(), m_Area.y());	// Adjust within parent
+    area.translate(xoffset, yoffset);		// Convert to global coordinates
     area.adjust(m_textOffset.x(), m_textOffset.y(),
                 -m_textOffset.x(), -m_textOffset.y());
 

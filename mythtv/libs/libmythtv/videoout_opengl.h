@@ -44,7 +44,7 @@ class VideoOutputOpenGL : public VideoOutput
     void EmbedInWidget(const QRect &rect);
     void StopEmbedding(void);
     virtual bool SetDeinterlacingEnabled(bool);
-    virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
+    virtual bool SetupDeinterlace(bool interlaced, const QString& overridefilter="");
     void ShowPIP(VideoFrame  *frame,
                  MythPlayer  *pipplayer,
                  PIPLocation  loc);

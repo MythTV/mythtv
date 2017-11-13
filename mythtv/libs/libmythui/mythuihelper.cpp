@@ -1,6 +1,7 @@
 #include "mythuihelper.h"
 
 #include <cmath>
+#include <unistd.h>
 
 #include <QImage>
 #include <QPixmap>
@@ -59,11 +60,20 @@ MythUIHelper *MythUIHelper::getMythUI(void)
 
     uiLock.unlock();
 
+    // These directories should always exist.  Don't test first as
+    // there's no harm in trying to create an existing directory.
+    QDir dir;
+    dir.mkdir(GetThemeBaseCacheDir());
+    dir.mkdir(GetRemoteCacheDir());
+    dir.mkdir(GetThumbnailDir());
+
     return mythui;
 }
 
 void MythUIHelper::destroyMythUI(void)
 {
+    mythui->PruneCacheDir(GetRemoteCacheDir());
+    mythui->PruneCacheDir(GetThumbnailDir());
     uiLock.lock();
     delete mythui;
     mythui = NULL;
@@ -554,6 +564,8 @@ void MythUIHelper::UpdateImageCache(void)
     d->m_cacheSize.fetchAndStoreOrdered(0);
 
     ClearOldImageCache();
+    PruneCacheDir(GetRemoteCacheDir());
+    PruneCacheDir(GetThumbnailDir());
 }
 
 MythImage *MythUIHelper::GetImageFromCache(const QString &url)
@@ -599,17 +611,10 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     if (!nodisk)
     {
-        QString dstfile = GetMythUI()->GetThemeCacheDir() + '/' + url;
+        QString dstfile = GetCacheDirByUrl(url) + '/' + url;
 
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("Saved to Cache (%1)").arg(dstfile));
-
-        // This would probably be better off somewhere else before any
-        // Load() calls at all.
-        QDir themedir(GetMythUI()->GetThemeCacheDir());
-
-        if (!themedir.exists())
-            themedir.mkdir(GetMythUI()->GetThemeCacheDir());
 
         // Save to disk cache
         im->save(dstfile, "PNG");
@@ -700,7 +705,7 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 
     QString dstfile;
 
-    dstfile = GetThemeCacheDir() + '/' + url;
+    dstfile = GetCacheDirByUrl(url) + '/' + url;
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("RemoveFromCacheByURL removed :%1: from cache").arg(dstfile));
     QFile::remove(dstfile);
@@ -761,38 +766,46 @@ bool MythUIHelper::IsImageInCache(const QString &url)
 
 QString MythUIHelper::GetThemeCacheDir(void)
 {
-    QString cachedirname = GetConfDir() + "/cache/themecache/";
-
-    QString tmpcachedir = cachedirname +
+    static QString oldcachedir = QString::null;
+    QString tmpcachedir = GetThemeBaseCacheDir() + "/" +
                           GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME) +
                           "." + QString::number(d->m_screenwidth) +
                           "." + QString::number(d->m_screenheight);
 
+    if (tmpcachedir != oldcachedir)
+    {
+        LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+            QString("Creating cache dir: %1").arg(tmpcachedir));
+        QDir dir;
+        dir.mkdir(tmpcachedir);
+        oldcachedir = tmpcachedir;
+    }
     return tmpcachedir;
+}
+
+/**
+ * Look at the url being read and decide whether the cached version
+ * should go into the theme cache or the thumbnail cache.
+ *
+ * \param url The resource being read.
+ * \returns The path name of the appropriate cache directory.
+ */
+QString MythUIHelper::GetCacheDirByUrl(QString url)
+{
+    if (url.startsWith("myth:") || url.startsWith("-"))
+        return GetThumbnailDir();
+    return GetThemeCacheDir();
 }
 
 void MythUIHelper::ClearOldImageCache(void)
 {
-    QString cachedirname = GetConfDir() + "/cache/themecache/";
-
     d->themecachedir = GetThemeCacheDir();
-
-    QDir dir(cachedirname);
-
-    if (!dir.exists())
-        dir.mkdir(cachedirname);
 
     QString themecachedir = d->themecachedir;
 
     d->themecachedir += '/';
 
-    dir.setPath(themecachedir);
-
-    if (!dir.exists())
-        dir.mkdir(themecachedir);
-
-    dir.setPath(cachedirname);
-
+    QDir dir(GetThemeBaseCacheDir());
     dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileInfoList list = dir.entryInfoList();
 
@@ -837,7 +850,7 @@ void MythUIHelper::ClearOldImageCache(void)
 
 void MythUIHelper::RemoveCacheDir(const QString &dirname)
 {
-    QString cachedirname = GetConfDir() + "/cache/themecache/";
+    QString cachedirname = GetThemeBaseCacheDir();
 
     if (!dirname.startsWith(cachedirname))
         return;
@@ -871,6 +884,78 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
     }
 
     dir.rmdir(dirname);
+}
+
+/**
+ * Remove all files in the cache that haven't been accessed in a user
+ * configurable number of days.  The default number of days is seven.
+ *
+ * \param dirname The directory to prune.
+ */
+void MythUIHelper::PruneCacheDir(QString dirname)
+{
+    int days = GetMythDB()->GetNumSetting("UIDiskCacheDays", 7);
+    if (days == -1) {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Pruning cache directory: %1 is disabled").arg(dirname));
+        return;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Pruning cache directory: %1").arg(dirname));
+    QDateTime cutoff = MythDate::current().addDays(-days);
+    /// todo: Use toSecsSinceEpoch() once Qt 5.8 is min version
+    qint64 cutoffsecs = cutoff.toMSecsSinceEpoch()/1000;
+
+    LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
+        QString("Removing files not accessed since %1")
+        .arg(cutoff.toLocalTime().toString(Qt::ISODate)));
+
+    int kept = 0, deleted = 0, errcnt = 0;
+    QDir dir(dirname);
+    dir.setFilter(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    dir.setSorting(QDir::NoSort);
+
+    // Trying to save every cycle possible within this loop.  The
+    // stat() call seems significantly faster than the fi.fileRead()
+    // method.  The documentation for QFileInfo says that the
+    // fi.absoluteFilePath() method has to query the file system, so
+    // use fi.filePath() method here and then add the directory if
+    // needed.  Using dir.entryList() and adding the dirname each time
+    // is also slower just using dir.entryInfoList().
+    foreach (const QFileInfo &fi, dir.entryInfoList())
+    {
+        struct stat buf;
+        QString fullname = fi.filePath();
+        if (not fullname.startsWith('/'))
+            fullname = dirname + "/" + fullname;
+        QByteArray fullname8 = fullname.toLocal8Bit();
+        int rc = stat(fullname8, &buf);
+        if (rc == -1)
+        {
+            errcnt += 1;
+            continue;
+        }
+        if (buf.st_atime >= cutoffsecs)
+        {
+            kept += 1;
+            LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
+                QString("%1 Keep   %2")
+                .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate))
+                .arg(fi.fileName()));
+            continue;
+        }
+        deleted += 1;
+        LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
+            QString("%1 Delete %2")
+            .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate))
+            .arg(fi.fileName()));
+        unlink(fullname8);
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Kept %1 files, deleted %2 files, stat error on %3 files")
+        .arg(kept).arg(deleted).arg(errcnt));
 }
 
 void MythUIHelper::GetScreenBounds(int &xbase, int &ybase,
@@ -1031,6 +1116,9 @@ bool MythUIHelper::IsGeometryOverridden(void)
  *   If the theme cannot be found falls back to the DEFAULT_UI_THEME.
  *   If the DEFAULT_UI_THEME doesn't exist then returns an empty string.
  *  \param themename The theme name.
+ *  \param doFallback If true and the theme isn't found, allow
+ *                    fallback to the default theme.  If false and the
+ *                    theme isn't found, then return an empty string.
  *  \return Path to theme or empty string.
  */
 QString MythUIHelper::FindThemeDir(const QString &themename, bool doFallback)
@@ -1391,7 +1479,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     return foundit;
 }
 
-QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
+QImage *MythUIHelper::LoadScaleImage(QString filename)
 {
     LOG(VB_GUI | VB_FILE, LOG_INFO,  LOC +
         QString("LoadScaleImage(%1)").arg(filename));
@@ -1491,7 +1579,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     return ret;
 }
 
-QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
+QPixmap *MythUIHelper::LoadScalePixmap(QString filename)
 {
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("LoadScalePixmap(%1)").arg(filename));
@@ -1617,7 +1705,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
     if (ret || !(cacheMode & kCacheIgnoreDisk))
     {
         // Create url to image in disk cache
-        QString cachefilepath = GetThemeCacheDir() + '/' + label;
+        QString cachefilepath;
+        cachefilepath = GetCacheDirByUrl(label) + '/' + label;
         QFileInfo cacheFileInfo(cachefilepath);
 
         // If the file isn't in the disk cache, then we don't want to bother

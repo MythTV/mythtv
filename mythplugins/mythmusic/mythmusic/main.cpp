@@ -511,7 +511,7 @@ static void handleMedia(MythMediaDevice *cd)
         }
 
         // device is not usable so remove any existing CD tracks
-        if (gMusicData->all_music)
+        if (gMusicData->initialized)
         {
             gMusicData->all_music->clearCDData();
             gMusicData->all_playlists->getActive()->removeAllCDTracks();
@@ -536,11 +536,8 @@ static void handleMedia(MythMediaDevice *cd)
         gMusicData->loadMusic();
 
     // remove any existing CD tracks
-    if (gMusicData->all_music)
-    {
-        gMusicData->all_music->clearCDData();
-        gMusicData->all_playlists->getActive()->removeAllCDTracks();
-    }
+    gMusicData->all_music->clearCDData();
+    gMusicData->all_playlists->getActive()->removeAllCDTracks();
 
     gPlayer->sendCDChangedEvent();
 
@@ -869,13 +866,13 @@ static void setupKeys(void)
         "Switch to the radio stream view"), "");
 
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythMusic Media Handler 1/2"), "", "", handleCDMedia,
+        "MythMusic Media Handler 1/2"), "", handleCDMedia,
         MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
     QString filt = MetaIO::ValidFileExtensions;
     filt.replace('|',',');
     filt.remove('.');
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythMusic Media Handler 2/2"), "", "", handleMedia,
+        "MythMusic Media Handler 2/2"), "", handleMedia,
         MEDIATYPE_MMUSIC, filt);
 }
 

@@ -115,7 +115,14 @@ void AudioReencodeBuffer::Reset(void)
 }
 
 /**
- * \param timecode is in milliseconds.
+ * Add frames to the audiobuffer for playback
+ *
+ * \param[in] buffer pointer to audio data
+ * \param[in] frames number of frames added.
+ * \param[in] timecode timecode of the first sample added (in msec)
+ *
+ * \return false if there wasn't enough space in audio buffer to
+ *     process all the data
  */
 bool AudioReencodeBuffer::AddFrames(void *buffer, int frames, int64_t timecode)
 {
@@ -123,8 +130,16 @@ bool AudioReencodeBuffer::AddFrames(void *buffer, int frames, int64_t timecode)
 }
 
 /**
-  * \param timecode is in milliseconds.
-  */
+ * Add data to the audiobuffer for playback
+ *
+ * \param[in] buffer pointer to audio data
+ * \param[in] len length of audio data added
+ * \param[in] timecode timecode of the first sample added (in msec)
+ * \param[in] frames number of frames added.
+ *
+ * \return false if there wasn't enough space in audio buffer to
+ *     process all the data
+ */
 bool AudioReencodeBuffer::AddData(void *buffer, int len, int64_t timecode,
                                   int frames)
 {

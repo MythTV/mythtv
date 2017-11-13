@@ -59,19 +59,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
     public:
 
-        // Must call InitializeCustomTypes for each unique Custom Type used
-        // in public slots below.
-
         MythServices( QObject *parent = 0 ) : Service( parent )
         {
-            DTC::ConnectionInfo     ::InitializeCustomTypes();
-            DTC::SettingList        ::InitializeCustomTypes();
-            DTC::StorageGroupDirList::InitializeCustomTypes();
-            DTC::TimeZoneInfo       ::InitializeCustomTypes();
-            DTC::LogMessage         ::InitializeCustomTypes();
-            DTC::LogMessageList     ::InitializeCustomTypes();
-            DTC::FrontendList       ::InitializeCustomTypes();
-            DTC::BackendInfo        ::InitializeCustomTypes();
         }
 
     public slots:

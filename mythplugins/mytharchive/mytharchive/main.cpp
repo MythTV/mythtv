@@ -26,6 +26,7 @@ using namespace std;
 #include <myththemedmenu.h>
 #include <mythuihelper.h>
 #include <mythdialogbox.h>
+#include <mythmainwindow.h>
 
 // mytharchive
 #include "archivesettings.h"
@@ -384,8 +385,17 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    ArchiveSettings settings;
-    settings.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd =
+        new StandardSettingDialog(mainStack, "archivesettings",
+                                  new ArchiveSettings());
+
+    if (ssd->Create())
+    {
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
 
     return 0;
 }

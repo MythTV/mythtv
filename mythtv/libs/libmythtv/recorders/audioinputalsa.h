@@ -33,7 +33,7 @@ typedef int snd_pcm_uframes_t;
 class AudioInputALSA : public AudioInput
 {
   public:
-    AudioInputALSA(const QString &device);
+    explicit AudioInputALSA(const QString &device);
     ~AudioInputALSA() { Close(); };
 
     bool Open(uint sample_bits, uint sample_rate, uint channels);

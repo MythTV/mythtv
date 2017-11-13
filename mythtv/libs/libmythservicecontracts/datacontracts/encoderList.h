@@ -33,11 +33,7 @@ class SERVICE_PUBLIC EncoderList : public QObject
 
     Q_PROPERTY( QVariantList Encoders READ Encoders DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Encoders )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP_RO_REF( QVariantList, Encoders );
 
     public:
 
@@ -45,15 +41,10 @@ class SERVICE_PUBLIC EncoderList : public QObject
             : QObject( parent )               
         {
         }
-        
-        EncoderList( const EncoderList &src ) 
-        {
-            Copy( src );
-        }
 
-        void Copy( const EncoderList &src )
+        void Copy( const EncoderList *src )
         {
-            CopyListContents< Encoder >( this, m_Encoders, src.m_Encoders );
+            CopyListContents< Encoder >( this, m_Encoders, src->m_Encoders );
         }
 
         Encoder *AddNewEncoder()
@@ -67,22 +58,10 @@ class SERVICE_PUBLIC EncoderList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(EncoderList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::EncoderList  )
-Q_DECLARE_METATYPE( DTC::EncoderList* )
-
-namespace DTC
-{
-inline void EncoderList::InitializeCustomTypes()
-{
-    qRegisterMetaType< EncoderList  >();
-    qRegisterMetaType< EncoderList* >();
-
-    Encoder::InitializeCustomTypes();
-}
-}
 
 #endif

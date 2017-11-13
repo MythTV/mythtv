@@ -59,10 +59,8 @@ class HTTPLiveStreamThread : public QRunnable
   public:
     /** \fn HTTPLiveStreamThread::HTTPLiveStreamThread(int)
      *  \brief Constructor for creating a SystemEventThread
-     *  \param cmd       Command line to run for this System Event
-     *  \param eventName Optional System Event name for this command
+     *  \param streamid The stream identifier.
      */
-
     explicit HTTPLiveStreamThread(int streamid)
       : m_streamID(streamid) {}
 
@@ -589,12 +587,17 @@ bool HTTPLiveStream::UpdateStatus(HTTPLiveStreamStatus status)
     if ((m_status == kHLSStatusStopping) &&
         (status == kHLSStatusRunning))
     {
-        LOG(VB_RECORD, LOG_DEBUG, LOC + "Attempted to switch from "
-            "Stopping to Running State");
+        LOG(VB_RECORD, LOG_DEBUG, LOC +
+            QString("Attempted to switch streamid %1 from "
+                    "Stopping to Running State").arg(m_streamid));
         return false;
     }
 
+    QString mStatusStr = StatusToString(m_status);
     QString statusStr = StatusToString(status);
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
+        QString("Switch streamid %1 from %2 to %3")
+        .arg(m_streamid).arg(mStatusStr).arg(statusStr));
 
     m_status = status;
 
@@ -666,7 +669,7 @@ bool HTTPLiveStream::UpdatePercentComplete(int percent)
 
 QString HTTPLiveStream::StatusToString(HTTPLiveStreamStatus status)
 {
-    switch (m_status) {
+    switch (status) {
         case kHLSStatusUndefined : return QString("Undefined");
         case kHLSStatusQueued    : return QString("Queued");
         case kHLSStatusStarting  : return QString("Starting");

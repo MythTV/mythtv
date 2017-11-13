@@ -13,6 +13,16 @@
         <source>Internet Television Client - Site/Tree View</source>
         <translation>Internetowe Video - Widok Strony/Drzewa</translation>
     </message>
+    <message>
+        <location filename="../mythnetvision/main.cpp" line="82"/>
+        <source>Previous Page</source>
+        <translation>Poprzednia Strona</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/main.cpp" line="84"/>
+        <source>Next Page</source>
+        <translation>Następna Strona</translation>
+    </message>
 </context>
 <context>
     <name>NetBase</name>
@@ -55,63 +65,73 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="157"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="177"/>
         <source>Search Options</source>
         <translation>Wszukiwanie</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="174"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
         <source>Stream Video</source>
         <translation>Strumieniowe Wideo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="176"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="196"/>
         <source>Open Web Link</source>
         <translation>Otwórz Link</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="191"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="211"/>
         <source>Play</source>
         <translation>Odtwarzaj</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
         <source>Save This Video</source>
         <translation>Zpisz Wideo</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="202"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="222"/>
         <source>Delete</source>
         <translation>Skasuj</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="207"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="228"/>
         <source>Previous Page</source>
         <translation>Poprzednia Strona</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="210"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
         <source>Next Page</source>
         <translation>Następna Strona</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="212"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <source>Skip 10 Pages Back</source>
+        <translation>10 Stron do Tyłu</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="236"/>
+        <source>Skip 10 Pages Forward</source>
+        <translation>10 Stron do Przodu</translation>
+    </message>
+    <message>
+        <location filename="../mythnetvision/netsearch.cpp" line="239"/>
         <source>Manage Search Scripts</source>
         <translation>Zarządzaj Skryptami</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="262"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="289"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translation>Wyszukuję %1 dla &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="284"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="303"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="313"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Przechodzę do %1 z wyszukanych &quot;%2&quot; ...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="363"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Przekroczono czas oczekiwania na odpowiedź. API strony moze być chwilowo niedostępne.</translation>
     </message>
@@ -609,11 +629,16 @@ To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; th
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
+        <source>%1</source>
+        <translation>%1</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="65"/>
         <source>Search Internet Video</source>
         <translation>Wyszukuj Internetowe Video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
+        <location filename="themestrings.h" line="66"/>
         <source>Select to change image</source>
         <translation>Wybierz aby zmienić ikonę</translation>
     </message>
@@ -626,7 +651,7 @@ For new subscriptions,you can simply enter the URL and click &quot;Save.&quot;</
 Dla nowych subskrypcji poprostu wprowadź URL i naciśnij &apos;Zachowaj&apos;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
+        <location filename="themestrings.h" line="67"/>
         <source>Internet Video List</source>
         <translation>Lista z Internet.Wideo</translation>
     </message>
@@ -635,32 +660,45 @@ Dla nowych subskrypcji poprostu wprowadź URL i naciśnij &apos;Zachowaj&apos;</
         <translation type="obsolete">Nie wprowadziłeś jeszcze żadnych kanałów RSS. Aby dodać, naciśnij &apos;MENU&apos; i następnie wybierz &apos;Szuka/Edytuj subskrypcje&apos; an następnie &apos;Zarządzaj subskrypcjami&apos;</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
+        <location filename="themestrings.h" line="68"/>
         <source>User Rating: %1</source>
         <translation>Ocena: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="68"/>
+        <location filename="themestrings.h" line="69"/>
         <source>By: %1</source>
         <translation>Przez: %1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
+        <location filename="themestrings.h" line="70"/>
         <source>Internet Video Gallery</source>
         <translation>Galeria Internet Wideo</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
+        <location filename="themestrings.h" line="71"/>
+        <source>%|RATING| %%|(STARS|) %%DESCRIPTION%%
+
+Part |PARTNUMBER| of %%PARTTOTAL%%
+
+Author: |AUTHOR%</source>
+        <translation>%|RATING| %%|(STARS|) %%DESCRIPTION%%
+
+Część |PARTNUMBER| z %%PARTTOTAL%%
+
+Autor: |AUTHOR%</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="72"/>
         <source>Search popular video sites</source>
         <translation>Wyszukuj popularne portale z Internetowym Video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
+        <location filename="themestrings.h" line="73"/>
         <source>Browse Internet Video</source>
         <translation>Przeglądaj Internetowe Video</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
+        <location filename="themestrings.h" line="74"/>
         <source>Browse highlights and entire sites</source>
         <translation>Przeglądaj wyróżnienia i całe portale</translation>
     </message>

@@ -446,7 +446,7 @@ bool V4L2encStreamHandler::Configure(void)
     if (m_aspect_ratio >= 0)
         m_v4l2.SetVideoAspect(m_aspect_ratio);
 
-    if (m_bitrate_mode < 0 && m_high_bitrate_mode >= 0)
+    if (m_bitrate_mode < 0)
         m_bitrate_mode = m_high_bitrate_mode;
     if (m_max_bitrate < 0 && m_high_peak_bitrate > 0)
         m_max_bitrate = m_high_peak_bitrate;

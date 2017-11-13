@@ -162,7 +162,13 @@ class MBASE_PUBLIC MythMediaDevice : public QObject
 
     bool m_AllowEject;       ///< Allow the user to eject the media?. Read only
     bool m_Locked;           ///< Is this media locked?.              Read only
+
     bool m_SuperMount;       ///< Is this a supermount device?.       Read only
+                             ///  The OS handles mounting/unmounting of
+                             ///  'supermount' devices.  Myth only need to give
+                             ///  derived classes a chance to perform their
+                             ///  mount/unmount logic.
+
 
     int  m_DeviceHandle;     ///< A file handle for opening and closing
                              ///  the device, ioctls(), et c. This should

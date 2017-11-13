@@ -317,7 +317,7 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 }
 #endif
 
-int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode)
+int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long &timecode)
 {
 #if HAVE_BIGENDIAN
     bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
@@ -417,8 +417,8 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int fnum, long long &tim
     return 1;
 }
 
-int AVFormatWriter::WriteTextFrame(int vbimode, unsigned char *buf, int len,
-                                   long long timecode, int pagenr)
+int AVFormatWriter::WriteTextFrame(int /*vbimode*/, unsigned char */*buf*/, int /*len*/,
+                                   long long /*timecode*/, int /*pagenr*/)
 {
     return 1;
 }

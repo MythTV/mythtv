@@ -28,11 +28,7 @@ class SERVICE_PUBLIC LogInfo : public QObject
 
     Q_PROPERTY( QString  LogArgs      READ LogArgs   WRITE setLogArgs   )
 
-    PROPERTYIMP( QString,  LogArgs   )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP( QString,  LogArgs   );
 
     public:
 
@@ -42,31 +38,17 @@ class SERVICE_PUBLIC LogInfo : public QObject
         {
         }
 
-        LogInfo( const LogInfo &src )
+        void Copy( const LogInfo *src )
         {
-            Copy( src );
+            m_LogArgs   = src->m_LogArgs  ;
         }
 
-        void Copy( const LogInfo &src )
-        {
-            m_LogArgs   = src.m_LogArgs  ;
-        }
+    private:
+        Q_DISABLE_COPY(LogInfo);
 };
 
 typedef LogInfo* LogInfoPtr;
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::LogInfo  )
-Q_DECLARE_METATYPE( DTC::LogInfo* )
-
-namespace DTC
-{
-inline void LogInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< LogInfo  >();
-    qRegisterMetaType< LogInfo* >();
-}
-}
 
 #endif

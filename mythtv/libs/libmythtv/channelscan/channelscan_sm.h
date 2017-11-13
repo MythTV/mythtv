@@ -171,6 +171,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool Tune(const transport_scan_items_it_t &transport);
     void ScanTransport(const transport_scan_items_it_t &transport);
     DTVTunerType GuessDTVTunerType(DTVTunerType) const;
+    void LogLines(const QString& string) const;
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);

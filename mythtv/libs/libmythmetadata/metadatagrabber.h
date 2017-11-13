@@ -26,7 +26,7 @@ enum GrabberType {
     kGrabberInvalid
 };
 
-class META_PUBLIC MetaGrabberScript : public QObject
+class META_PUBLIC MetaGrabberScript
 {
   public:
     MetaGrabberScript();

@@ -5,14 +5,14 @@
 #ifndef _PANE_ANALOG_H_
 #define _PANE_ANALOG_H_
 
-#include "settings.h"
+#include "standardsettings.h"
 
 class TransFreqTableSelector;
 
-class PaneAnalog : public VerticalConfigurationGroup
+class PaneAnalog : public GroupSetting
 {
   public:
-    PaneAnalog();
+    PaneAnalog(const QString &target, StandardSetting *setting);
 
     void SetSourceID(uint sourceid);
 

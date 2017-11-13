@@ -52,11 +52,7 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, VideoMetadataInfos )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP_RO_REF( QVariantList, VideoMetadataInfos );
 
     public:
 
@@ -70,21 +66,16 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
         {
         }
 
-        VideoMetadataInfoList( const VideoMetadataInfoList &src )
+        void Copy( const VideoMetadataInfoList *src )
         {
-            Copy( src );
-        }
+            m_StartIndex    = src->m_StartIndex     ;
+            m_Count         = src->m_Count          ;
+            m_TotalAvailable= src->m_TotalAvailable ;
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
 
-        void Copy( const VideoMetadataInfoList &src )
-        {
-            m_StartIndex    = src.m_StartIndex     ;
-            m_Count         = src.m_Count          ;
-            m_TotalAvailable= src.m_TotalAvailable ;
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
-
-            CopyListContents< VideoMetadataInfo >( this, m_VideoMetadataInfos, src.m_VideoMetadataInfos );
+            CopyListContents< VideoMetadataInfo >( this, m_VideoMetadataInfos, src->m_VideoMetadataInfos );
         }
 
         VideoMetadataInfo *AddNewVideoMetadataInfo()
@@ -98,22 +89,10 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(VideoMetadataInfoList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::VideoMetadataInfoList  )
-Q_DECLARE_METATYPE( DTC::VideoMetadataInfoList* )
-
-namespace DTC
-{
-inline void VideoMetadataInfoList::InitializeCustomTypes()
-{
-    qRegisterMetaType< VideoMetadataInfoList  >();
-    qRegisterMetaType< VideoMetadataInfoList* >();
-
-    VideoMetadataInfo::InitializeCustomTypes();
-}
-}
 
 #endif

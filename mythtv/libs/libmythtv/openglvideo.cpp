@@ -436,6 +436,10 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 
     switch (filter)
     {
+      case kGLFilterNone:
+          // Nothing to do. Prevents compiler warning.
+          break;
+
       case kGLFilterResize:
         if (!(gl_features & kGLExtFBufObj) && !filters.empty())
         {
@@ -911,12 +915,13 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 /**
  *  Render the contents of the current input texture to the framebuffer
  *  using the currently enabled filters.
- *  \param topfieldfirst        the frame is interlaced and top_field_first
- *   is set
- *  \param scan                 interlaced or progressive?
- *  \param softwareDeinerlacing the frame has been deinterlaced in software
- *  \param frame                the frame number
- *  \param draw_border          if true, draw a red border around the frame
+ *  \param topfieldfirst         the frame is interlaced and top_field_first
+ *                               is set
+ *  \param scan                  interlaced or progressive?
+ *  \param softwareDeinterlacing the frame has been deinterlaced in software
+ *  \param frame                 the frame number
+ *  \param stereo                Whether/how to drop stereo video information
+ *  \param draw_border           if true, draw a red border around the frame
  *  \warning This function is a finely tuned, sensitive beast. Tinker at
  *   your own risk.
  */

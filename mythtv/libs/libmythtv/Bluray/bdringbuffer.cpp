@@ -526,7 +526,15 @@ void BDRingBuffer::ProgressUpdate(void)
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
-bool BDRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
+/** \fn BDRingBuffer::OpenFile(const QString &, uint)
+ *  \brief Opens a bluray device for reading.
+ *
+ *  \param lfilename   Path of the bluray device to read.
+ *  \param retry_ms    Ignored. This value is part of the API
+ *                     inherited from the parent class.
+ *  \return Returns true if the bluray was opened.
+ */
+bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 {
     safefilename = lfilename;
     filename = lfilename;
@@ -1675,7 +1683,7 @@ BDOverlay* BDRingBuffer::GetOverlay(void)
 
 void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
 {
-    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
+    if (!overlay || overlay->plane > m_overlayPlanes.size())
         return;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));
@@ -1749,7 +1757,8 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
             if (osd)
             {
                 BDOverlay* newOverlay = new BDOverlay(*osd);
-                newOverlay->image.convertToFormat(QImage::Format_ARGB32);
+                newOverlay->image =
+                    osd->image.convertToFormat(QImage::Format_ARGB32);
                 newOverlay->pts = overlay->pts;
 
                 QMutexLocker lock(&m_overlayLock);
@@ -1764,7 +1773,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
 
 void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
 {
-    if (!overlay || overlay->plane < 0 || overlay->plane > m_overlayPlanes.size())
+    if (!overlay || overlay->plane > m_overlayPlanes.size())
         return;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("--------------------"));

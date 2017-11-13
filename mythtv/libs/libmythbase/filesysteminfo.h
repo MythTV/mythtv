@@ -12,9 +12,8 @@
 #include "mythsocket.h"
 #include "mythcorecontext.h"
 
-class MBASE_PUBLIC FileSystemInfo : public QObject
+class MBASE_PUBLIC FileSystemInfo
 {
-    Q_OBJECT
   public:
     FileSystemInfo();
     FileSystemInfo(const FileSystemInfo &other);

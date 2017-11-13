@@ -440,12 +440,13 @@ bool FileRingBuffer::IsOpen(void) const
  *   This will re-read the file forever until the
  *   end-of-file is reached or the buffer is full.
  *
- *  \param fd   File descriptor to read from
+ *  \param fd Ignored. The File descriptor to read is now stored
+ *            as part of the RingBuffer parent structure.
  *  \param data Pointer to where data will be written
  *  \param sz   Number of bytes to read
  *  \return Returns number of bytes read
  */
-int FileRingBuffer::safe_read(int fd, void *data, uint sz)
+int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
 {
     int ret;
     unsigned tot = 0;

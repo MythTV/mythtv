@@ -5,30 +5,17 @@
 #include "mythdb.h"
 #include "playgroup.h"
 #include "programinfo.h"
-#include "mythwidgets.h"
-
-class PlayGroupConfig: public ConfigurationWizard
-{
-    Q_DECLARE_TR_FUNCTIONS(PlayGroupConfig)
-
- public:
-    PlayGroupConfig(QString _name);
-    QString getName(void) const { return name; }
-
- private:
-    QString name;
-};
+#include "standardsettings.h"
 
 // A parameter associated with the profile itself
 class PlayGroupDBStorage : public SimpleDBStorage
 {
-  protected:
-    PlayGroupDBStorage(Setting         *_setting,
+  public:
+    PlayGroupDBStorage(StandardSetting *_setting,
                        const PlayGroupConfig &_parent,
                        QString          _name) :
         SimpleDBStorage(_setting, "playgroup", _name), parent(_parent)
     {
-        _setting->setName(_name);
     }
 
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
@@ -46,11 +33,11 @@ QString PlayGroupDBStorage::GetWhereClause(MSqlBindings &bindings) const
     return query;
 }
 
-class TitleMatch : public LineEditSetting, public PlayGroupDBStorage
+class TitleMatch : public MythUITextEditSetting
 {
   public:
-    TitleMatch(const PlayGroupConfig& _parent):
-        LineEditSetting(this), PlayGroupDBStorage(this, _parent, "titlematch")
+    explicit TitleMatch(const PlayGroupConfig& _parent):
+        MythUITextEditSetting(new PlayGroupDBStorage(this, _parent, "titlematch"))
     {
         setLabel(PlayGroupConfig::tr("Title match (regex)"));
         setHelpText(PlayGroupConfig::tr("Automatically set new recording rules "
@@ -62,12 +49,13 @@ class TitleMatch : public LineEditSetting, public PlayGroupDBStorage
     };
 };
 
-class SkipAhead : public SpinBoxSetting, public PlayGroupDBStorage
+class SkipAhead : public MythUISpinBoxSetting
 {
   public:
-    SkipAhead(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 0, 600, 5, true, PlayGroupConfig::tr("(default)")),
-        PlayGroupDBStorage(this, _parent, "skipahead")
+    explicit SkipAhead(const PlayGroupConfig& _parent):
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipahead"),
+                             0, 600, 5, true, PlayGroupConfig::tr("(default)"))
+
     {
         setLabel(PlayGroupConfig::tr("Skip ahead (seconds)"));
         setHelpText(PlayGroupConfig::tr("How many seconds to skip forward on "
@@ -75,12 +63,12 @@ class SkipAhead : public SpinBoxSetting, public PlayGroupDBStorage
     };
 };
 
-class SkipBack : public SpinBoxSetting, public PlayGroupDBStorage
+class SkipBack : public MythUISpinBoxSetting
 {
   public:
-    SkipBack(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 0, 600, 5, true, PlayGroupConfig::tr("(default)")),
-        PlayGroupDBStorage(this, _parent, "skipback")
+    explicit SkipBack(const PlayGroupConfig& _parent):
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "skipback"),
+                             0, 600, 5, true, PlayGroupConfig::tr("(default)"))
     {
         setLabel(PlayGroupConfig::tr("Skip back (seconds)"));
         setHelpText(PlayGroupConfig::tr("How many seconds to skip backward on "
@@ -88,12 +76,12 @@ class SkipBack : public SpinBoxSetting, public PlayGroupDBStorage
     };
 };
 
-class JumpMinutes : public SpinBoxSetting, public PlayGroupDBStorage
+class JumpMinutes : public MythUISpinBoxSetting
 {
   public:
-    JumpMinutes(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 0, 30, 10, true, PlayGroupConfig::tr("(default)")),
-        PlayGroupDBStorage(this, _parent, "jump")
+    explicit JumpMinutes(const PlayGroupConfig& _parent):
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "jump"),
+                             0, 30, 10, true, PlayGroupConfig::tr("(default)"))
     {
         setLabel(PlayGroupConfig::tr("Jump amount (minutes)"));
         setHelpText(PlayGroupConfig::tr("How many minutes to jump forward or "
@@ -102,13 +90,13 @@ class JumpMinutes : public SpinBoxSetting, public PlayGroupDBStorage
     };
 };
 
-class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
+class TimeStretch : public MythUISpinBoxSetting
 {
   public:
-    TimeStretch(const PlayGroupConfig& _parent):
-        SpinBoxSetting(this, 45, 200, 5, false,
-            PlayGroupConfig::tr("(default)")),
-        PlayGroupDBStorage(this, _parent, "timestretch")
+    explicit TimeStretch(const PlayGroupConfig& _parent):
+        MythUISpinBoxSetting(new PlayGroupDBStorage(this, _parent, "timestretch"),
+                             45, 200, 5, false,
+                             PlayGroupConfig::tr("(default)"))
     {
         setValue(45);
         setLabel(PlayGroupConfig::tr("Time stretch (speed x 100)"));
@@ -120,7 +108,7 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
 
     virtual void Load(void)
     {
-        PlayGroupDBStorage::Load();
+        StandardSetting::Load();
         if (intValue() < 50 || intValue() > 200)
             setValue(45);
     }
@@ -128,32 +116,77 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
     virtual void Save(void)
     {
         if (intValue() < 50 || intValue() > 200)
-        {
-            // We need to bypass the bounds checking that would
-            // normally occur in order to get the special value of 0
-            // into the database
-            IntegerSetting::setValue(0);
-        }
-        PlayGroupDBStorage::Save();
+            setValue(0);
+        StandardSetting::Save();
     }
-
-    virtual void Save(QString destination) { PlayGroupDBStorage::Save(destination); }
 };
 
-PlayGroupConfig::PlayGroupConfig(QString _name) : name(_name)
+PlayGroupConfig::PlayGroupConfig(const QString &/*label*/, const QString &name,
+                                 bool isNew)
+    : m_isNew(isNew)
 {
-    ConfigurationGroup* cgroup = new VerticalConfigurationGroup(false);
+    setName(name);
+
     //: %1 is the name of the playgroup
-    cgroup->setLabel(tr("%1 Group", "Play Group").arg(getName()));
+    setLabel(tr("%1 Group", "Play Group").arg(getName()));
 
-    cgroup->addChild(new TitleMatch(*this));
-    cgroup->addChild(new SkipAhead(*this));
-    cgroup->addChild(new SkipBack(*this));
-    cgroup->addChild(new JumpMinutes(*this));
-    cgroup->addChild(new TimeStretch(*this));
+    addChild(m_titleMatch = new TitleMatch(*this));
+    addChild(m_skipAhead = new SkipAhead(*this));
+    addChild(m_skipBack = new SkipBack(*this));
+    addChild(m_jumpMinutes = new JumpMinutes(*this));
+    addChild(m_timeStrech = new TimeStretch(*this));
 
-    addChild(cgroup);
-};
+    // Ensure new entries are saved on exit
+    if (isNew)
+        setChanged(true);
+}
+
+void PlayGroupConfig::updateButton(MythUIButtonListItem *item)
+{
+    GroupSetting::updateButton(item);
+    item->SetText("", "value");
+}
+
+void PlayGroupConfig::Save()
+{
+    if (m_isNew)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("INSERT playgroup "
+                        "(name, titlematch, skipahead, skipback, jump, timestretch) "
+                        "VALUES "
+                        "(:NEWNAME, :TITLEMATCH, :SKIPAHEAD, :SKIPBACK, :JUMP, :TIMESTRETCH);");
+
+        query.bindValue(":NEWNAME",     getName());
+        query.bindValue(":TITLEMATCH",  m_titleMatch->getValue());
+        query.bindValue(":SKIPAHEAD",   m_skipAhead->intValue());
+        query.bindValue(":SKIPBACK",    m_skipBack->intValue());
+        query.bindValue(":JUMP",        m_jumpMinutes->intValue());
+        query.bindValue(":TIMESTRETCH", m_timeStrech->intValue());
+
+        if (!query.exec())
+            MythDB::DBError("PlayGroupConfig::Save", query);
+    }
+    else
+        GroupSetting::Save();
+}
+
+bool PlayGroupConfig::canDelete(void)
+{
+    return (getName() != "Default");
+}
+
+void PlayGroupConfig::deleteEntry(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM playgroup "
+                    "WHERE name = :NAME ;");
+    query.bindValue(":NAME", getName());
+
+    if (!query.exec())
+        MythDB::DBError("PlayGroupConfig::deleteEntry", query);
+}
 
 int PlayGroup::GetCount(void)
 {
@@ -230,112 +263,78 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
     return res;
 }
 
-PlayGroupEditor::PlayGroupEditor(void) :
-    listbox(new ListBoxSetting(this)), lastValue("Default")
+
+PlayGroupEditor::PlayGroupEditor()
+    : m_addGroupButton(NULL)
 {
-    listbox->setLabel(tr("Playback Groups"));
-    addChild(listbox);
+    setLabel(tr("Playback Groups"));
+    m_addGroupButton = new ButtonStandardSetting(tr("Create New Playback Group"));
+    addChild(m_addGroupButton);
+    connect(m_addGroupButton, SIGNAL(clicked()),
+            this, SLOT(CreateNewPlayBackGroup()));
 }
 
-void PlayGroupEditor::open(QString name)
+void PlayGroupEditor::CreateNewPlayBackGroup()
 {
-    lastValue = name;
-    bool created = false;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack, tr("Enter new group name"));
 
-    if (name == "__CREATE_NEW_GROUP__")
+    if (settingdialog->Create())
     {
-        name = "";
-        bool ok = MythPopupBox::showGetTextPopup(GetMythMainWindow(),
-            tr("Create New Playback Group"),
-            tr("Enter group name or press SELECT to enter text via the "
-               "On Screen Keyboard"), name);
-        if (!ok)
-            return;
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("INSERT INTO playgroup (name) VALUES (:NAME);");
-        query.bindValue(":NAME", name);
-        if (!query.exec())
-            MythDB::DBError("PlayGroupEditor::open", query);
-        else
-            created = true;
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewPlayBackGroupSlot(const QString&)));
+        popupStack->AddScreen(settingdialog);
     }
-
-    PlayGroupConfig group(name);
-    if (group.exec() == QDialog::Accepted || !created)
-        lastValue = name;
     else
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM playgroup WHERE name = :NAME;");
-        query.bindValue(":NAME", name);
-        if (!query.exec())
-            MythDB::DBError("PlayGroupEditor::open", query);
-    }
-};
-
-void PlayGroupEditor::doDelete(void)
-{
-    QString name = listbox->getValue();
-    if (name == "__CREATE_NEW_GROUP__" || name == "Default")
-        return;
-
-    QString message = tr("Delete playback group:\n'%1'?").arg(name);
-
-    DialogCode value = MythPopupBox::Show2ButtonPopup(
-        GetMythMainWindow(),
-        "", message,
-        tr("Yes, delete group"),
-        tr("No, Don't delete group"), kDialogCodeButton1);
-
-    if (kDialogCodeButton0 == value)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM playgroup WHERE name = :NAME;");
-        query.bindValue(":NAME", name);
-        if (!query.exec())
-            MythDB::DBError("PlayGroupEditor::doDelete", query);
-
-        int lastIndex = listbox->getValueIndex(name);
-        lastValue = "";
-        Load();
-        listbox->setValue(lastIndex);
-    }
-
-    listbox->setFocus();
+        delete settingdialog;
 }
 
-void PlayGroupEditor::Load(void)
+void PlayGroupEditor::CreateNewPlayBackGroupSlot(const QString& name)
 {
-    listbox->clearSelections();
+    if (name.isEmpty())
+    {
+        ShowOkPopup(tr("Sorry, this Playback Group name cannot be blank."));
+        return;
+    }
 
-    listbox->addSelection(tr("Default"), "Default");
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT name "
+                  "FROM playgroup "
+                  "WHERE name = :NAME");
+    query.bindValue(":NAME", name);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateNewPlayBackGroup", query);
+        return;
+    }
+
+    if (query.next())
+    {
+        ShowOkPopup(tr("Sorry, this Playback Group name is already in use."));
+        return;
+    }
+
+    addChild(new PlayGroupConfig(name, name, true));
+
+    emit settingsChanged(NULL);
+}
+
+void PlayGroupEditor::Load()
+{
+    addChild(new PlayGroupConfig(tr("Default"), "Default"));
 
     QStringList names = PlayGroup::GetNames();
     while (!names.isEmpty())
     {
-        listbox->addSelection(names.front());
+        addChild(new PlayGroupConfig(names.front(), names.front()));
         names.pop_front();
     }
 
-    listbox->addSelection(tr("(Create new group)"), "__CREATE_NEW_GROUP__");
+    //Load all the groups
+    GroupSetting::Load();
 
-    listbox->setValue(lastValue);
-}
-
-DialogCode PlayGroupEditor::exec(void)
-{
-    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
-        open(listbox->getValue());
-
-    return kDialogCodeRejected;
-}
-
-MythDialog* PlayGroupEditor::dialogWidget(MythMainWindow* parent,
-                                          const char* widgetName)
-{
-    dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
-    connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(doDelete()));
-    connect(dialog, SIGNAL(deleteButtonPressed()), this, SLOT(doDelete()));
-    return dialog;
+    //TODO select the new one or the edited one
+    emit settingsChanged(NULL);
 }

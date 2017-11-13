@@ -222,11 +222,12 @@ bool VideoOutputOpenGLVAAPI::SetDeinterlacingEnabled(bool enable)
     return m_deinterlacing;
 }
 
-bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool i, const QString& ovrf)
+bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool interlaced,
+                                              const QString& /*overridefilter*/)
 {
     //m_deintfiltername = !db_vdisp_profile ? "" :
     //                     db_vdisp_profile->GetFilteredDeint(ovrf);
-    m_deinterlacing = i;
+    m_deinterlacing = interlaced;
     return m_deinterlacing;
 }
 

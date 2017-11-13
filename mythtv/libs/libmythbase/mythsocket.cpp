@@ -97,6 +97,22 @@ MythSocket::MythSocket(
     LOG(VB_SOCKET, LOG_INFO, LOC + QString("MythSocket(%1, 0x%2) ctor")
         .arg(socket).arg((intptr_t)(cb),0,16));
 
+    if (socket != -1)
+    {
+        m_tcpSocket->setSocketDescriptor(
+            socket, QAbstractSocket::ConnectedState,
+            QAbstractSocket::ReadWrite);
+        if (!gCoreContext->CheckSubnet(m_tcpSocket))
+        {
+            m_tcpSocket->abort();
+            m_connected = false;
+            m_useSharedThread = false;
+            return;
+        }
+        else
+            ConnectHandler(); // already called implicitly above?
+    }
+
     // Use direct connections so m_tcpSocket can be used
     // in the handlers safely since they will be running
     // in the same thread as all other m_tcpSocket users.
@@ -119,15 +135,6 @@ MythSocket::MythSocket(
     connect(this, SIGNAL(CallReadyRead()),
             this, SLOT(CallReadyReadHandler()),
             Qt::QueuedConnection);
-
-    if (socket != -1)
-    {
-        m_tcpSocket->setSocketDescriptor(
-            socket, QAbstractSocket::ConnectedState,
-            QAbstractSocket::ReadWrite);
-
-        ConnectHandler(); // already called implicitly above?
-    }
 
     if (!use_shared_thread)
     {
@@ -160,9 +167,12 @@ MythSocket::~MythSocket()
 
     if (!m_useSharedThread)
     {
-        m_thread->quit();
-        m_thread->wait();
-        delete m_thread;
+        if (m_thread)
+        {
+            m_thread->quit();
+            m_thread->wait();
+            delete m_thread;
+        }
     }
     else
     {
@@ -672,7 +682,7 @@ void MythSocket::ConnectToHostReal(QHostAddress _addr, quint16 port, bool *ret)
     if (ok)
     {
         m_tcpSocket->connectToHost(addr, port, QAbstractSocket::ReadWrite);
-        ok = m_tcpSocket->waitForConnected();
+        ok = m_tcpSocket->waitForConnected(5000);
     }
 
     if (ok)

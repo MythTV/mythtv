@@ -6,6 +6,18 @@
 
 #define LOC QString("OpenGL2: ")
 
+static inline int __glCheck__(const QString &loc, const char* fileName, int n)
+{
+    int error = glGetError();
+    if (error)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("%1: %2 @ %3, %4")
+            .arg(loc).arg(error).arg(fileName).arg(n));
+    }
+    return error;
+}
+#define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
+
 #define VERTEX_INDEX  0
 #define COLOR_INDEX   1
 #define TEXTURE_INDEX 2
@@ -456,6 +468,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
                             (const void *) kTextureOffset);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glCheck();
 
     m_glDisableVertexAttribArray(TEXTURE_INDEX);
     m_glDisableVertexAttribArray(VERTEX_INDEX);

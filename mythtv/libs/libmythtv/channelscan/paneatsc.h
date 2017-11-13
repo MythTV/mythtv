@@ -14,18 +14,16 @@ using namespace std;
 #include "modulationsetting.h"
 #include "frequencytables.h"
 
-class PaneATSC : public VerticalConfigurationGroup
+class PaneATSC : public GroupSetting
 {
     Q_OBJECT
 
   public:
-    PaneATSC() :
-        VerticalConfigurationGroup(false, false, true, false),
+    PaneATSC(const QString &target, StandardSetting *setting) :
         atsc_table(new ScanFrequencyTable()),
         atsc_modulation(new ScanATSCModulation())
     {
-        addChild(atsc_table);
-        addChild(atsc_modulation);
+        setVisible(false);
 
         connect(atsc_table, SIGNAL(valueChanged(    const QString&)),
                 this,       SLOT(  FreqTableChanged(const QString&)));
@@ -33,18 +31,17 @@ class PaneATSC : public VerticalConfigurationGroup
         connect(atsc_modulation, SIGNAL(valueChanged(     const QString&)),
                 this,            SLOT(  ModulationChanged(const QString&)));
 
-        HorizontalConfigurationGroup *range =
-            new HorizontalConfigurationGroup(false,false,true,true);
-        transport_start = new TransComboBoxSetting();
-        transport_end   = new TransComboBoxSetting();
-        transport_count = new TransLabelSetting();
-        TransLabelSetting *label = new TransLabelSetting();
-        label->setLabel(tr("Scanning Range"));
-        range->addChild(label);
+        GroupSetting *range = new GroupSetting();
+        transport_start = new TransMythUIComboBoxSetting();
+        transport_end   = new TransMythUIComboBoxSetting();
+        transport_count = new TransTextEditSetting();
+        range->setLabel(tr("Scanning Range"));
         range->addChild(transport_start);
         range->addChild(transport_end);
         range->addChild(transport_count);
-        addChild(range);
+
+        setting->addTargetedChildren(target,
+                                     {this, atsc_table, atsc_modulation, range});
 
         connect(transport_start, SIGNAL(valueChanged(         const QString&)),
                 this,            SLOT(  TransportRangeChanged(const QString&)));
@@ -90,7 +87,7 @@ class PaneATSC : public VerticalConfigurationGroup
         ResetTransportRange();
     }
 
-    void ModulationChanged(const QString &modulation)
+    void ModulationChanged(const QString &/*modulation*/)
     {
         ResetTransportRange();
     }
@@ -175,9 +172,9 @@ class PaneATSC : public VerticalConfigurationGroup
   protected:
     ScanFrequencyTable      *atsc_table;
     ScanATSCModulation      *atsc_modulation;
-    TransComboBoxSetting    *transport_start;
-    TransComboBoxSetting    *transport_end;
-    TransLabelSetting       *transport_count;
+    TransMythUIComboBoxSetting    *transport_start;
+    TransMythUIComboBoxSetting    *transport_end;
+    TransTextEditSetting       *transport_count;
     QString                  old_freq_table;
     QString                  tables_sig;
     freq_table_list_t        tables;

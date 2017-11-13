@@ -28,7 +28,7 @@ UPnpCDSVideo::UPnpCDSVideo()
              : UPnpCDSExtension( "Videos", "Videos",
                                  "object.item.videoItem" )
 {
-    QString sServerIp   = gCoreContext->GetBackendServerIP4();
+    QString sServerIp   = gCoreContext->GetBackendServerIP();
     int sPort           = gCoreContext->GetBackendStatusPort();
     m_URIBase.setScheme("http");
     m_URIBase.setHost(sServerIp);
@@ -687,12 +687,12 @@ bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
             if (sHostName.isEmpty())
             {
                 m_mapBackendIp[sHostName] =
-                    gCoreContext->GetBackendServerIP4();
+                    gCoreContext->GetBackendServerIP();
             }
             else
             {
                 m_mapBackendIp[sHostName] =
-                    gCoreContext->GetBackendServerIP4(sHostName);
+                    gCoreContext->GetBackendServerIP(sHostName);
             }
         }
 

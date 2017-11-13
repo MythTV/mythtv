@@ -21,7 +21,7 @@ QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
 class CodecParamStorage : public SimpleDBStorage
 {
   protected:
-    CodecParamStorage(Setting *_setting,
+    CodecParamStorage(StandardSetting *_setting,
                       const RecordingProfile &parentProfile,
                       QString name) :
         SimpleDBStorage(_setting, "codecparams", "value"),
@@ -66,22 +66,23 @@ QString CodecParamStorage::GetWhereClause(MSqlBindings &bindings) const
     return query;
 }
 
-class AudioCodecName: public ComboBoxSetting, public RecordingProfileStorage
+class AudioCodecName: public MythUIComboBoxSetting
 {
   public:
     explicit AudioCodecName(const RecordingProfile &parent) :
-        ComboBoxSetting(this),
-        RecordingProfileStorage(this, parent, "audiocodec")
+        MythUIComboBoxSetting(
+            new RecordingProfileStorage(this, parent, "audiocodec"))
     {
         setLabel(QObject::tr("Codec"));
+        setName("audiocodec");
     }
 };
 
-class MP3Quality : public SliderSetting, public CodecParamStorage
+class MP3Quality : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit MP3Quality(const RecordingProfile &parent) :
-        SliderSetting(this, 1, 9, 1),
+        MythUISpinBoxSetting(this, 1, 9, 1),
         CodecParamStorage(this, parent, "mp3quality")
     {
         setLabel(QObject::tr("MP3 quality"));
@@ -92,11 +93,11 @@ class MP3Quality : public SliderSetting, public CodecParamStorage
     };
 };
 
-class BTTVVolume : public SliderSetting, public CodecParamStorage
+class BTTVVolume : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit BTTVVolume(const RecordingProfile& parent) :
-        SliderSetting(this, 0, 100, 1),
+        MythUISpinBoxSetting(this, 0, 100, 1),
         CodecParamStorage(this, parent, "volume")
     {
        setLabel(QObject::tr("Volume (%)"));
@@ -105,11 +106,11 @@ class BTTVVolume : public SliderSetting, public CodecParamStorage
     };
 };
 
-class SampleRate : public ComboBoxSetting, public CodecParamStorage
+class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     SampleRate(const RecordingProfile &parent, bool analog = true) :
-        ComboBoxSetting(this), CodecParamStorage(this, parent, "samplerate")
+        MythUIComboBoxSetting(this), CodecParamStorage(this, parent, "samplerate")
     {
         setLabel(QObject::tr("Sampling rate"));
         setHelpText(QObject::tr("Sets the audio sampling rate for your DSP. "
@@ -153,7 +154,7 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
         uint rate = val.toUInt();
         if (allowed_rate[rate])
         {
-            ComboBoxSetting::addSelection(label, value, select);
+            MythUIComboBoxSetting::addSelection(label, value, select);
         }
         else
         {
@@ -167,12 +168,12 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
     QMap<uint,bool> allowed_rate;
 };
 
-class MPEG2audType : public ComboBoxSetting, public CodecParamStorage
+class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     MPEG2audType(const RecordingProfile &parent,
                  bool layer1, bool layer2, bool layer3) :
-        ComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2audtype"),
+        MythUIComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2audtype"),
         allow_layer1(layer1), allow_layer2(layer2), allow_layer3(layer3)
     {
         setLabel(QObject::tr("Type"));
@@ -232,11 +233,11 @@ class MPEG2audType : public ComboBoxSetting, public CodecParamStorage
     bool allow_layer3;
 };
 
-class MPEG2audBitrateL1 : public ComboBoxSetting, public CodecParamStorage
+class MPEG2audBitrateL1 : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG2audBitrateL1(const RecordingProfile &parent) :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2audbitratel1")
     {
         setLabel(QObject::tr("Bitrate"));
@@ -260,11 +261,11 @@ class MPEG2audBitrateL1 : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG2audBitrateL2 : public ComboBoxSetting, public CodecParamStorage
+class MPEG2audBitrateL2 : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG2audBitrateL2(const RecordingProfile &parent) :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2audbitratel2")
     {
         setLabel(QObject::tr("Bitrate"));
@@ -288,11 +289,11 @@ class MPEG2audBitrateL2 : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG2audBitrateL3 : public ComboBoxSetting, public CodecParamStorage
+class MPEG2audBitrateL3 : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG2audBitrateL3(const RecordingProfile &parent) :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2audbitratel3")
     {
         setLabel(QObject::tr("Bitrate"));
@@ -316,11 +317,11 @@ class MPEG2audBitrateL3 : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG2audVolume : public SliderSetting, public CodecParamStorage
+class MPEG2audVolume : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG2audVolume(const RecordingProfile &parent) :
-        SliderSetting(this, 0, 100, 1),
+        MythUISpinBoxSetting(this, 0, 100, 1),
         CodecParamStorage(this, parent, "mpeg2audvolume")
     {
 
@@ -330,28 +331,25 @@ class MPEG2audVolume : public SliderSetting, public CodecParamStorage
     };
 };
 
-class MPEG2AudioBitrateSettings : public TriggeredConfigurationGroup
+class MPEG2AudioBitrateSettings : public GroupSetting
 {
   public:
     MPEG2AudioBitrateSettings(const RecordingProfile &parent,
                               bool layer1, bool layer2, bool layer3,
-                              uint default_layer) :
-        TriggeredConfigurationGroup(false, true, true, true)
+                              uint default_layer)
     {
         const QString layers[3] = { "Layer I", "Layer II", "Layer III", };
 
-        SetVertical(false);
         setLabel(QObject::tr("Bitrate Settings"));
 
         MPEG2audType *audType = new MPEG2audType(
             parent, layer1, layer2, layer3);
 
         addChild(audType);
-        setTrigger(audType);
 
-        addTarget(layers[0], new MPEG2audBitrateL1(parent));
-        addTarget(layers[1], new MPEG2audBitrateL2(parent));
-        addTarget(layers[2], new MPEG2audBitrateL3(parent));
+        addTargetedChild(layers[0], new MPEG2audBitrateL1(parent));
+        addTargetedChild(layers[1], new MPEG2audBitrateL2(parent));
+        addTargetedChild(layers[2], new MPEG2audBitrateL3(parent));
 
         uint desired_layer = max(min(3U, default_layer), 1U) - 1;
         int which = audType->getValueIndex(layers[desired_layer]);
@@ -360,11 +358,11 @@ class MPEG2AudioBitrateSettings : public TriggeredConfigurationGroup
     };
 };
 
-class MPEG2Language : public ComboBoxSetting, public CodecParamStorage
+class MPEG2Language : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG2Language(const RecordingProfile &parent) :
-        ComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2language")
+        MythUIComboBoxSetting(this), CodecParamStorage(this, parent, "mpeg2language")
     {
         setLabel(QObject::tr("SAP/Bilingual"));
 
@@ -381,12 +379,12 @@ class MPEG2Language : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class BitrateMode : public ComboBoxSetting, public CodecParamStorage
+class BitrateMode : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     BitrateMode(const RecordingProfile& parent,
                 QString setting = "mpeg2bitratemode") :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, setting)
     {
         setLabel(QObject::tr("Bitrate Mode"));
@@ -398,54 +396,38 @@ class BitrateMode : public ComboBoxSetting, public CodecParamStorage
     }
 };
 
-class AudioCompressionSettings : public TriggeredConfigurationGroup
+class AudioCompressionSettings : public GroupSetting
 {
   public:
     AudioCompressionSettings(const RecordingProfile &parentProfile,
-                             QString profName, V4L2util* v4l2) :
-        TriggeredConfigurationGroup(false, true, false, false),
+                             V4L2util* v4l2) :
         m_parent(parentProfile)
     {
-        QString labelName;
-        if (profName.isNull())
-            labelName = QObject::tr("Audio Quality");
-        else
-            labelName = profName + "->" + QObject::tr("Audio Quality");
-        setName(labelName);
+        setName(QObject::tr("Audio Quality"));
 
         m_codecName = new AudioCodecName(m_parent);
         addChild(m_codecName);
-        setTrigger(m_codecName);
 
-        ConfigurationGroup* params = new VerticalConfigurationGroup(false);
-        params->setLabel("MP3");
-        params->addChild(new SampleRate(m_parent));
-        params->addChild(new MP3Quality(m_parent));
-        params->addChild(new BTTVVolume(m_parent));
-        addTarget("MP3", params);
+        QString label("MP3");
+        addTargetedChild(label, new SampleRate(m_parent));
+        addTargetedChild(label, new MP3Quality(m_parent));
+        addTargetedChild(label, new BTTVVolume(m_parent));
 
-        params = new VerticalConfigurationGroup(false, false, true, true);
-        params->setLabel("MPEG-2 Hardware Encoder");
-        params->addChild(new SampleRate(m_parent, false));
-        params->addChild(new MPEG2AudioBitrateSettings(
+        label = "MPEG-2 Hardware Encoder";
+        addTargetedChild(label, new SampleRate(m_parent, false));
+        addTargetedChild(label,
+                         new MPEG2AudioBitrateSettings(
                              m_parent, false, true, false, 2));
-        params->addChild(new MPEG2Language(m_parent));
-        params->addChild(new MPEG2audVolume(m_parent));
-        addTarget("MPEG-2 Hardware Encoder", params);
+        addTargetedChild(label, new MPEG2Language(m_parent));
+        addTargetedChild(label, new MPEG2audVolume(m_parent));
 
-        params = new VerticalConfigurationGroup(false);
-        params->setLabel("Uncompressed");
-        params->addChild(new SampleRate(m_parent));
-        params->addChild(new BTTVVolume(m_parent));
-        addTarget("Uncompressed", params);
+        label = "Uncompressed";
+        addTargetedChild(label, new SampleRate(m_parent));
+        addTargetedChild(label, new BTTVVolume(m_parent));
 
-        params = new VerticalConfigurationGroup(false);
-        params->setLabel("AC3 Hardware Encoder");
-        addTarget("AC3 Hardware Encoder", params);
+        addTargetedChild("AC3 Hardware Encoder", new GroupSetting());
 
-        params = new VerticalConfigurationGroup(false);
-        params->setLabel("AAC Hardware Encoder");
-        addTarget("AAC Hardware Encoder", params);
+        addTargetedChild("AAC Hardware Encoder", new GroupSetting());
 
 #ifdef USING_V4L2
         if (v4l2)
@@ -457,8 +439,8 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
 
             if (v4l2->GetOptions(options))
             {
-                VerticalConfigurationGroup* grp =
-                    new VerticalConfigurationGroup(false);
+                GroupSetting* grp =
+                    new GroupSetting();
 
                 DriverOption::Options::iterator Iopt = options.begin();
                 for ( ; Iopt != options.end(); ++Iopt)
@@ -516,7 +498,7 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
 
                 QStringList::iterator Icodec = m_v4l2codecs.begin();
                 for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
-                    addTarget(*Icodec, grp);
+                    addTargetedChild(*Icodec, grp);
             }
         }
 #endif //  USING_V4L2
@@ -559,22 +541,23 @@ private:
     QStringList             m_v4l2codecs;
 };
 
-class VideoCodecName : public ComboBoxSetting, public RecordingProfileStorage
+class VideoCodecName : public MythUIComboBoxSetting
 {
   public:
     explicit VideoCodecName(const RecordingProfile &parent) :
-        ComboBoxSetting(this),
-        RecordingProfileStorage(this, parent, "videocodec")
+        MythUIComboBoxSetting(
+            new RecordingProfileStorage(this, parent, "videocodec"))
     {
         setLabel(QObject::tr("Codec"));
+        setName("videocodec");
     }
 };
 
-class RTjpegQuality : public SliderSetting, public CodecParamStorage
+class RTjpegQuality : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit RTjpegQuality(const RecordingProfile &parent) :
-        SliderSetting(this, 1, 255, 1),
+        MythUISpinBoxSetting(this, 1, 255, 1),
         CodecParamStorage(this, parent, "rtjpegquality")
     {
         setLabel(QObject::tr("RTjpeg Quality"));
@@ -583,11 +566,11 @@ class RTjpegQuality : public SliderSetting, public CodecParamStorage
     };
 };
 
-class RTjpegLumaFilter : public SpinBoxSetting, public CodecParamStorage
+class RTjpegLumaFilter : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit RTjpegLumaFilter(const RecordingProfile &parent) :
-        SpinBoxSetting(this, 0, 31, 1),
+        MythUISpinBoxSetting(this, 0, 31, 1),
         CodecParamStorage(this, parent, "rtjpeglumafilter")
     {
         setLabel(QObject::tr("Luma filter"));
@@ -596,11 +579,11 @@ class RTjpegLumaFilter : public SpinBoxSetting, public CodecParamStorage
     };
 };
 
-class RTjpegChromaFilter : public SpinBoxSetting, public CodecParamStorage
+class RTjpegChromaFilter : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit RTjpegChromaFilter(const RecordingProfile &parent) :
-        SpinBoxSetting(this, 0, 31, 1),
+        MythUISpinBoxSetting(this, 0, 31, 1),
         CodecParamStorage(this, parent, "rtjpegchromafilter")
     {
         setLabel(QObject::tr("Chroma filter"));
@@ -609,11 +592,11 @@ class RTjpegChromaFilter : public SpinBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG4bitrate : public SliderSetting, public CodecParamStorage
+class MPEG4bitrate : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
-    MPEG4bitrate(const RecordingProfile &parent) :
-        SliderSetting(this, 100, 8000, 100),
+    explicit MPEG4bitrate(const RecordingProfile &parent) :
+        MythUISpinBoxSetting(this, 100, 8000, 100),
         CodecParamStorage(this, parent, "mpeg4bitrate")
     {
         setLabel(QObject::tr("Bitrate (kb/s)"));
@@ -623,11 +606,11 @@ class MPEG4bitrate : public SliderSetting, public CodecParamStorage
     };
 };
 
-class ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
+class ScaleBitrate : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit ScaleBitrate(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "scalebitrate")
     {
         setLabel(QObject::tr("Scale bitrate for frame size"));
@@ -638,11 +621,11 @@ class ScaleBitrate : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG4MinQuality : public SliderSetting, public CodecParamStorage
+class MPEG4MinQuality : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG4MinQuality(const RecordingProfile &parent) :
-        SliderSetting(this, 1, 31, 1),
+        MythUISpinBoxSetting(this, 1, 31, 1),
         CodecParamStorage(this, parent, "mpeg4minquality")
     {
         setLabel(QObject::tr("Minimum quality"));
@@ -652,11 +635,11 @@ class MPEG4MinQuality : public SliderSetting, public CodecParamStorage
     };
 };
 
-class MPEG4MaxQuality : public SliderSetting, public CodecParamStorage
+class MPEG4MaxQuality : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG4MaxQuality(const RecordingProfile &parent) :
-        SliderSetting(this, 1, 31, 1),
+        MythUISpinBoxSetting(this, 1, 31, 1),
         CodecParamStorage(this, parent, "mpeg4maxquality")
     {
         setLabel(QObject::tr("Maximum quality"));
@@ -666,11 +649,11 @@ class MPEG4MaxQuality : public SliderSetting, public CodecParamStorage
     };
 };
 
-class MPEG4QualDiff : public SliderSetting, public CodecParamStorage
+class MPEG4QualDiff : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG4QualDiff(const RecordingProfile &parent) :
-        SliderSetting(this, 1, 31, 1),
+        MythUISpinBoxSetting(this, 1, 31, 1),
         CodecParamStorage(this, parent, "mpeg4qualdiff")
     {
 
@@ -681,11 +664,11 @@ class MPEG4QualDiff : public SliderSetting, public CodecParamStorage
     };
 };
 
-class MPEG4OptionIDCT : public CheckBoxSetting, public CodecParamStorage
+class MPEG4OptionIDCT : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG4OptionIDCT(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4optionidct")
     {
         setLabel(QObject::tr("Enable interlaced DCT encoding"));
@@ -697,11 +680,11 @@ class MPEG4OptionIDCT : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG4OptionIME : public CheckBoxSetting, public CodecParamStorage
+class MPEG4OptionIME : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG4OptionIME(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4optionime")
     {
         setLabel(QObject::tr("Enable interlaced motion estimation"));
@@ -713,11 +696,11 @@ class MPEG4OptionIME : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG4OptionVHQ : public CheckBoxSetting, public CodecParamStorage
+class MPEG4OptionVHQ : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG4OptionVHQ(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4optionvhq")
     {
         setLabel(QObject::tr("Enable high-quality encoding"));
@@ -728,11 +711,11 @@ class MPEG4OptionVHQ : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG4Option4MV : public CheckBoxSetting, public CodecParamStorage
+class MPEG4Option4MV : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit MPEG4Option4MV(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg4option4mv")
     {
         setLabel(QObject::tr("Enable 4MV encoding"));
@@ -745,11 +728,11 @@ class MPEG4Option4MV : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class EncodingThreadCount : public SliderSetting, public CodecParamStorage
+class EncodingThreadCount : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit EncodingThreadCount(const RecordingProfile &parent) :
-        SliderSetting(this, 1, 8, 1),
+        MythUISpinBoxSetting(this, 1, 8, 1),
         CodecParamStorage(this, parent, "encodingthreadcount")
     {
 
@@ -763,7 +746,7 @@ class EncodingThreadCount : public SliderSetting, public CodecParamStorage
     };
 };
 
-class AverageBitrate : public SliderSetting, public CodecParamStorage
+class AverageBitrate : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     AverageBitrate(const RecordingProfile &parent,
@@ -771,7 +754,7 @@ class AverageBitrate : public SliderSetting, public CodecParamStorage
                    uint min_br = 1000, uint max_br = 16000,
                    uint default_br = 4500, uint increment = 100,
                    QString label = QString::null) :
-        SliderSetting(this, min_br, max_br, increment),
+        MythUISpinBoxSetting(this, min_br, max_br, increment),
         CodecParamStorage(this, parent, setting)
     {
         if (label.isEmpty())
@@ -784,7 +767,7 @@ class AverageBitrate : public SliderSetting, public CodecParamStorage
     };
 };
 
-class PeakBitrate : public SliderSetting, public CodecParamStorage
+class PeakBitrate : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     PeakBitrate(const RecordingProfile &parent,
@@ -792,7 +775,7 @@ class PeakBitrate : public SliderSetting, public CodecParamStorage
                 uint min_br = 1000, uint max_br = 16000,
                 uint default_br = 6000, uint increment = 100,
                 QString label = QString::null) :
-        SliderSetting(this, min_br, max_br, increment),
+        MythUISpinBoxSetting(this, min_br, max_br, increment),
         CodecParamStorage(this, parent, setting)
     {
         if (label.isEmpty())
@@ -804,12 +787,12 @@ class PeakBitrate : public SliderSetting, public CodecParamStorage
     };
 };
 
-class MPEG2streamType : public ComboBoxSetting, public CodecParamStorage
+class MPEG2streamType : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     MPEG2streamType(const RecordingProfile &parent,
                     uint minopt = 0, uint maxopt = 8, uint defopt = 0) :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2streamtype")
     {
         if (maxopt > 8) maxopt = 8;
@@ -830,12 +813,12 @@ class MPEG2streamType : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class MPEG2aspectRatio : public ComboBoxSetting, public CodecParamStorage
+class MPEG2aspectRatio : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     MPEG2aspectRatio(const RecordingProfile &parent,
                      uint minopt = 0, uint maxopt = 8, uint defopt = 0) :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "mpeg2aspectratio")
     {
         if (maxopt > 3) maxopt = 3;
@@ -854,24 +837,24 @@ class MPEG2aspectRatio : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class HardwareMJPEGQuality : public SliderSetting, public CodecParamStorage
+class HardwareMJPEGQuality : public MythUISpinBoxSetting, public CodecParamStorage
 {
   public:
     explicit HardwareMJPEGQuality(const RecordingProfile &parent) :
-        SliderSetting(this, 0, 100, 1),
+        MythUISpinBoxSetting(this, 0, 100, 1),
         CodecParamStorage(this, parent, "hardwaremjpegquality")
     {
         setLabel(QObject::tr("Quality"));
-        setValue(100);
+        setValue("100");
     };
 };
 
-class HardwareMJPEGHDecimation : public ComboBoxSetting,
+class HardwareMJPEGHDecimation : public MythUIComboBoxSetting,
                                  public CodecParamStorage
 {
   public:
     explicit HardwareMJPEGHDecimation(const RecordingProfile &parent) :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "hardwaremjpeghdecimation")
     {
         setLabel(QObject::tr("Horizontal Decimation"));
@@ -882,12 +865,12 @@ class HardwareMJPEGHDecimation : public ComboBoxSetting,
     };
 };
 
-class HardwareMJPEGVDecimation : public ComboBoxSetting,
+class HardwareMJPEGVDecimation : public MythUIComboBoxSetting,
                                  public CodecParamStorage
 {
   public:
     explicit HardwareMJPEGVDecimation(const RecordingProfile &parent) :
-        ComboBoxSetting(this),
+        MythUIComboBoxSetting(this),
         CodecParamStorage(this, parent, "hardwaremjpegvdecimation") {
         setLabel(QObject::tr("Vertical Decimation"));
         addSelection("1");
@@ -897,115 +880,86 @@ class HardwareMJPEGVDecimation : public ComboBoxSetting,
     };
 };
 
-class VideoCompressionSettings : public TriggeredConfigurationGroup
+class VideoCompressionSettings : public GroupSetting
 {
   public:
     VideoCompressionSettings(const RecordingProfile &parentProfile,
-                             QString profName, V4L2util* v4l2) :
-        TriggeredConfigurationGroup(false, true, false, false),
+                             V4L2util* v4l2) :
         m_parent(parentProfile)
     {
-        QString labelName;
-        if (profName.isNull())
-            labelName = QObject::tr("Video Compression");
-        else
-            labelName = profName + "->" + QObject::tr("Video Compression");
-        setName(labelName);
+        setName(QObject::tr("Video Compression"));
 
         m_codecName = new VideoCodecName(m_parent);
         addChild(m_codecName);
-        setTrigger(m_codecName);
 
-        ConfigurationGroup* params = new VerticalConfigurationGroup();
-        params->setLabel(QObject::tr("RTjpeg Parameters"));
-        params->addChild(new RTjpegQuality(m_parent));
-        params->addChild(new RTjpegLumaFilter(m_parent));
-        params->addChild(new RTjpegChromaFilter(m_parent));
+        QString label("RTjpeg");
+        m_codecName->addTargetedChild(label, new RTjpegQuality(m_parent));
+        m_codecName->addTargetedChild(label, new RTjpegLumaFilter(m_parent));
+        m_codecName->addTargetedChild(label, new RTjpegChromaFilter(m_parent));
 
-        addTarget("RTjpeg", params);
+        label = "MPEG-4";
+        m_codecName->addTargetedChild(label, new MPEG4bitrate(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG4MaxQuality(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG4MinQuality(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG4QualDiff(m_parent));
+        m_codecName->addTargetedChild(label, new ScaleBitrate(m_parent));
 
-        params = new VerticalConfigurationGroup(false);
-        params->setLabel(QObject::tr("MPEG-4 Parameters"));
-        params->addChild(new MPEG4bitrate(m_parent));
-        params->addChild(new MPEG4MaxQuality(m_parent));
-        params->addChild(new MPEG4MinQuality(m_parent));
-        params->addChild(new MPEG4QualDiff(m_parent));
-        params->addChild(new ScaleBitrate(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG4OptionVHQ(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG4Option4MV(m_parent));
 
-        HorizontalConfigurationGroup *hq;
-        hq = new HorizontalConfigurationGroup(false, false);
-        hq->addChild(new MPEG4OptionVHQ(m_parent));
-        hq->addChild(new MPEG4Option4MV(m_parent));
-        params->addChild(hq);
-
-        HorizontalConfigurationGroup *inter;
-        inter = new HorizontalConfigurationGroup(false, false);
-        inter->addChild(new MPEG4OptionIDCT(m_parent));
-        inter->addChild(new MPEG4OptionIME(m_parent));
-        params->addChild(inter);
+        m_codecName->addTargetedChild(label, new MPEG4OptionIDCT(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG4OptionIME(m_parent));
 #ifdef USING_FFMPEG_THREADS
-        params->addChild(new EncodingThreadCount(m_parent));
+        m_codecName->addTargetedChild(label, new EncodingThreadCount(m_parent));
 #endif
-        addTarget("MPEG-4", params);
 
-        params = new VerticalConfigurationGroup(false);
-        params->setLabel(QObject::tr("MPEG-2 Parameters"));
-        params->addChild(new AverageBitrate(m_parent));
-        params->addChild(new ScaleBitrate(m_parent));
-        //params->addChild(new MPEG4MaxQuality(m_parent));
-        //params->addChild(new MPEG4MinQuality(m_parent));
-        //params->addChild(new MPEG4QualDiff(m_parent));
-        //params->addChild(new MPEG4OptionVHQ(m_parent));
-        //params->addChild(new MPEG4Option4MV(m_parent));
+        label = "MPEG-2";
+        m_codecName->addTargetedChild(label, new AverageBitrate(m_parent));
+        m_codecName->addTargetedChild(label, new ScaleBitrate(m_parent));
+        //m_codecName->addTargetedChild(label, new MPEG4MaxQuality(m_parent));
+        //m_codecName->addTargetedChild(label, new MPEG4MinQuality(m_parent));
+        //m_codecName->addTargetedChild(label, new MPEG4QualDiff(m_parent));
+        //m_codecName->addTargetedChild(label, new MPEG4OptionVHQ(m_parent));
+        //m_codecName->addTargetedChild(label, new MPEG4Option4MV(m_parent));
 #ifdef USING_FFMPEG_THREADS
-        params->addChild(new EncodingThreadCount(m_parent));
+        addTargetedChild(label, new EncodingThreadCount(m_parent));
 #endif
-        addTarget("MPEG-2", params);
 
-        params = new VerticalConfigurationGroup();
-        params->setLabel(QObject::tr("Hardware MJPEG Parameters"));
-        params->addChild(new HardwareMJPEGQuality(m_parent));
-        params->addChild(new HardwareMJPEGHDecimation(m_parent));
-        params->addChild(new HardwareMJPEGVDecimation(m_parent));
+        label = "Hardware MJPEG";
+        m_codecName->addTargetedChild(label, new HardwareMJPEGQuality(m_parent));
+        m_codecName->addTargetedChild(label, new HardwareMJPEGHDecimation(m_parent));
+        m_codecName->addTargetedChild(label, new HardwareMJPEGVDecimation(m_parent));
 
-        addTarget("Hardware MJPEG", params);
+        label = "MPEG-2 Hardware Encoder";
+        m_codecName->addTargetedChild(label, new MPEG2streamType(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG2aspectRatio(m_parent));
+        m_codecName->addTargetedChild(label, new AverageBitrate(m_parent));
+        m_codecName->addTargetedChild(label, new PeakBitrate(m_parent));
 
-        params = new VerticalConfigurationGroup(false);
-        params->setLabel(QObject::tr("MPEG-2 Hardware Encoder"));
-        params->addChild(new MPEG2streamType(m_parent));
-        params->addChild(new MPEG2aspectRatio(m_parent));
-        params->addChild(new AverageBitrate(m_parent));
-        params->addChild(new PeakBitrate(m_parent));
-
-        addTarget("MPEG-2 Hardware Encoder", params);
-
-        params = new VerticalConfigurationGroup(false);
-        params->setLabel(QObject::tr("MPEG-4 AVC Hardware Encoder"));
-        ConfigurationGroup *h0 = new HorizontalConfigurationGroup(
-                                                                  true, false, true, true);
+        label = "MPEG-4 AVC Hardware Encoder";
+        GroupSetting *h0 = new GroupSetting();
         h0->setLabel(QObject::tr("Low Resolution"));
         h0->addChild(new AverageBitrate(m_parent, "low_mpeg4avgbitrate",
                                         1000, 13500, 4500, 500));
         h0->addChild(new PeakBitrate(m_parent, "low_mpeg4peakbitrate",
                                      1100, 20200, 6000, 500));
-        params->addChild(h0);
-        ConfigurationGroup *h1 = new HorizontalConfigurationGroup(
-                                                                  true, false, true, true);
+        m_codecName->addTargetedChild(label, h0);
+
+        GroupSetting *h1 = new GroupSetting();
         h1->setLabel(QObject::tr("Medium Resolution"));
         h1->addChild(new AverageBitrate(m_parent, "medium_mpeg4avgbitrate",
                                         1000, 13500, 9000, 500));
         h1->addChild(new PeakBitrate(m_parent, "medium_mpeg4peakbitrate",
                                      1100, 20200, 11000, 500));
-        params->addChild(h1);
-        ConfigurationGroup *h2 = new HorizontalConfigurationGroup(
-                                                                  true, false, true, true);
+        m_codecName->addTargetedChild(label, h1);
+
+        GroupSetting *h2 = new GroupSetting();
         h2->setLabel(QObject::tr("High Resolution"));
         h2->addChild(new AverageBitrate(m_parent, "high_mpeg4avgbitrate",
-                                        1000, 13500, 13500, 500));
+                                            1000, 13500, 13500, 500));
         h2->addChild(new PeakBitrate(m_parent, "high_mpeg4peakbitrate",
-                                     1100, 20200, 20200, 500));
-        params->addChild(h2);
-        addTarget("MPEG-4 AVC Hardware Encoder", params);
+                                         1100, 20200, 20200, 500));
+        m_codecName->addTargetedChild(label, h2);
 
 #ifdef USING_V4L2
         if (v4l2)
@@ -1014,15 +968,15 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
 
             if (v4l2->GetOptions(options))
             {
-                VerticalConfigurationGroup* grp =
-                    new VerticalConfigurationGroup(false);
+                GroupSetting* grp =
+                    new GroupSetting();
 
-                VerticalConfigurationGroup* bit_low =
-                    new VerticalConfigurationGroup(true);
-                VerticalConfigurationGroup* bit_medium =
-                    new VerticalConfigurationGroup(true);
-                VerticalConfigurationGroup* bit_high =
-                    new VerticalConfigurationGroup(true);
+                GroupSetting* bit_low =
+                    new GroupSetting();
+                GroupSetting* bit_medium =
+                    new GroupSetting();
+                GroupSetting* bit_high =
+                    new GroupSetting();
                 bool dynamic_res = !v4l2->UserAdjustableResolution();
 
                 DriverOption::Options::iterator Iopt = options.begin();
@@ -1152,7 +1106,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
 
                 QStringList::iterator Icodec = m_v4l2codecs.begin();
                 for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
-                    addTarget(*Icodec, grp);
+                    addTargetedChild(*Icodec, grp);
             }
         }
 #endif // USING_V4L2
@@ -1201,11 +1155,11 @@ private:
     QStringList             m_v4l2codecs;
 };
 
-class AutoTranscode : public CheckBoxSetting, public CodecParamStorage
+class AutoTranscode : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit AutoTranscode(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "autotranscode")
     {
         setLabel(QObject::tr("Enable auto-transcode after recording"));
@@ -1216,11 +1170,11 @@ class AutoTranscode : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class TranscodeResize : public CheckBoxSetting, public CodecParamStorage
+class TranscodeResize : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit TranscodeResize(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "transcoderesize")
     {
         setLabel(QObject::tr("Resize video while transcoding"));
@@ -1230,11 +1184,11 @@ class TranscodeResize : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class TranscodeLossless : public CheckBoxSetting, public CodecParamStorage
+class TranscodeLossless : public MythUICheckBoxSetting, public CodecParamStorage
 {
   public:
     explicit TranscodeLossless(const RecordingProfile &parent) :
-        CheckBoxSetting(this),
+        MythUICheckBoxSetting(this),
         CodecParamStorage(this, parent, "transcodelossless")
     {
         setLabel(QObject::tr("Lossless transcoding"));
@@ -1248,11 +1202,11 @@ class TranscodeLossless : public CheckBoxSetting, public CodecParamStorage
     };
 };
 
-class RecordingType : public ComboBoxSetting, public CodecParamStorage
+class RecordingType : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     explicit RecordingType(const RecordingProfile &parent) :
-        ComboBoxSetting(this), CodecParamStorage(this, parent, "recordingtype")
+        MythUIComboBoxSetting(this), CodecParamStorage(this, parent, "recordingtype")
     {
         setLabel(QObject::tr("Recording Type"));
 
@@ -1270,11 +1224,11 @@ class RecordingType : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class RecordFullTSStream : public ComboBoxSetting, public CodecParamStorage
+class RecordFullTSStream : public MythUIComboBoxSetting, public CodecParamStorage
 {
   public:
     explicit RecordFullTSStream(const RecordingProfile &parent) :
-        ComboBoxSetting(this), CodecParamStorage(this, parent, "recordmpts")
+        MythUIComboBoxSetting(this), CodecParamStorage(this, parent, "recordmpts")
     {
         setLabel(QObject::tr("Record Full TS?"));
 
@@ -1291,11 +1245,11 @@ class RecordFullTSStream : public ComboBoxSetting, public CodecParamStorage
     };
 };
 
-class TranscodeFilters : public LineEditSetting, public CodecParamStorage
+class TranscodeFilters : public MythUITextEditSetting, public CodecParamStorage
 {
   public:
     explicit TranscodeFilters(const RecordingProfile &parent) :
-        LineEditSetting(this),
+        MythUITextEditSetting(this),
         CodecParamStorage(this, parent, "transcodefilters")
     {
         setLabel(QObject::tr("Custom filters"));
@@ -1307,16 +1261,16 @@ class TranscodeFilters : public LineEditSetting, public CodecParamStorage
     };
 };
 
-class ImageSize : public VerticalConfigurationGroup
+class ImageSize : public GroupSetting
 {
   public:
-    class Width : public SpinBoxSetting, public CodecParamStorage
+    class Width : public MythUISpinBoxSetting, public CodecParamStorage
     {
       public:
         Width(const RecordingProfile &parent,
               uint defaultwidth, uint maxwidth,
               bool transcoding = false) :
-            SpinBoxSetting(this, transcoding ? 0 : 160,
+            MythUISpinBoxSetting(this, transcoding ? 0 : 160,
                            maxwidth, 16, false,
                            transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "width")
@@ -1337,13 +1291,13 @@ class ImageSize : public VerticalConfigurationGroup
         };
     };
 
-    class Height: public SpinBoxSetting, public CodecParamStorage
+    class Height: public MythUISpinBoxSetting, public CodecParamStorage
     {
       public:
         Height(const RecordingProfile &parent,
                uint defaultheight, uint maxheight,
                bool transcoding = false):
-            SpinBoxSetting(this, transcoding ? 0 : 160,
+            MythUISpinBoxSetting(this, transcoding ? 0 : 160,
                            maxheight, 16, false,
                            transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "height")
@@ -1365,16 +1319,9 @@ class ImageSize : public VerticalConfigurationGroup
     };
 
     ImageSize(const RecordingProfile &parent,
-              QString tvFormat, QString profName) :
-        VerticalConfigurationGroup(false, true, false, false)
+              QString tvFormat, QString profName)
     {
-        ConfigurationGroup* imgSize = new HorizontalConfigurationGroup(false);
-        QString labelName;
-        if (profName.isNull())
-            labelName = QObject::tr("Image size");
-        else
-            labelName = profName + "->" + QObject::tr("Image size");
-        setLabel(labelName);
+        setLabel(QObject::tr("Image size"));
 
         QSize defaultsize(768, 576), maxsize(768, 576);
         bool transcoding = profName.startsWith("Transcoders");
@@ -1404,49 +1351,11 @@ class ImageSize : public VerticalConfigurationGroup
             defaultsize = (ivtv) ? QSize(720, 576) : QSize(480, 576);
         }
 
-        imgSize->addChild(new Width(parent, defaultsize.width(),
+        addChild(new Width(parent, defaultsize.width(),
                                     maxsize.width(), transcoding));
-        imgSize->addChild(new Height(parent, defaultsize.height(),
+        addChild(new Height(parent, defaultsize.height(),
                                      maxsize.height(), transcoding));
-
-        addChild(imgSize);
     };
-};
-
-typedef enum {
-    RPPopup_OK = 0,
-    RPPopup_CANCEL,
-    RPPopup_DELETE
-} RPPopupResult;
-
-class RecordingProfilePopup
-{
-  public:
-    static RPPopupResult showPopup(MythMainWindow *parent, QString title,
-                                   QString message, QString& text)
-    {
-        MythPopupBox *popup = new MythPopupBox(
-            parent, title.toLatin1().constData());
-        popup->addLabel(message);
-
-        MythLineEdit *textEdit = new MythLineEdit(popup, "chooseEdit");
-        textEdit->setText(text);
-        popup->addWidget(textEdit);
-
-        popup->addButton(QObject::tr("OK"),     popup, SLOT(accept()));
-        popup->addButton(QObject::tr("Cancel"), popup, SLOT(reject()));
-
-        textEdit->setFocus();
-
-        bool ok = (MythDialog::Accepted == popup->ExecPopup());
-        if (ok)
-            text = textEdit->text();
-
-        popup->hide();
-        popup->deleteLater();
-
-        return (ok) ? RPPopup_OK : RPPopup_CANCEL;
-    }
 };
 
 // id and name will be deleted by ConfigurationGroup's destructor
@@ -1459,14 +1368,8 @@ RecordingProfile::RecordingProfile(QString profName)
     // This must be first because it is needed to load/save the other settings
     addChild(id);
 
-    ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
-    QString labelName;
-    if (profName.isNull())
-        labelName = QObject::tr("Profile");
-    else
-        labelName = profName + "->" + QObject::tr("Profile");
-    profile->setLabel(labelName);
-    profile->addChild(name);
+    setLabel(profName);
+    addChild(name);
 
     tr_filters = NULL;
     tr_lossless = NULL;
@@ -1479,25 +1382,23 @@ RecordingProfile::RecordingProfile(QString profName)
             tr_filters = new TranscodeFilters(*this);
             tr_lossless = new TranscodeLossless(*this);
             tr_resize = new TranscodeResize(*this);
-            profile->addChild(tr_filters);
-            profile->addChild(tr_lossless);
-            profile->addChild(tr_resize);
+            addChild(tr_filters);
+            addChild(tr_lossless);
+            addChild(tr_resize);
         }
         else
-            profile->addChild(new AutoTranscode(*this));
+            addChild(new AutoTranscode(*this));
     }
     else
     {
         tr_filters = new TranscodeFilters(*this);
         tr_lossless = new TranscodeLossless(*this);
         tr_resize = new TranscodeResize(*this);
-        profile->addChild(tr_filters);
-        profile->addChild(tr_lossless);
-        profile->addChild(tr_resize);
-        profile->addChild(new AutoTranscode(*this));
+        addChild(tr_filters);
+        addChild(tr_lossless);
+        addChild(tr_resize);
+        addChild(new AutoTranscode(*this));
     }
-
-    addChild(profile);
 };
 
 RecordingProfile::~RecordingProfile(void)
@@ -1508,32 +1409,22 @@ RecordingProfile::~RecordingProfile(void)
 #endif
 }
 
-void RecordingProfile::ResizeTranscode(bool resize)
+void RecordingProfile::ResizeTranscode(const QString &)
 {
-    MythWizard *wizard = (MythWizard *)dialog;
-    if (!wizard)
-        return;
-    //page '1' is the Image Size page
-    QWidget *size_page = wizard->page(1);
-    wizard->setAppropriate(size_page, resize);
+    if (imageSize)
+        imageSize->setEnabled(tr_resize->boolValue());
 }
 
-void RecordingProfile::SetLosslessTranscode(bool lossless)
+void RecordingProfile::SetLosslessTranscode(const QString &)
 {
-    MythWizard *wizard = (MythWizard *)dialog;
-    if (!wizard)
-        return;
-
+    bool lossless = tr_lossless->boolValue();
     bool show_size = (lossless) ? false : tr_resize->boolValue();
-    wizard->setAppropriate(wizard->page(1), show_size);
-    wizard->setAppropriate(wizard->page(2), ! lossless);
-    wizard->setAppropriate(wizard->page(3), ! lossless);
+    if (imageSize)
+        imageSize->setEnabled(show_size);
+    videoSettings->setEnabled(! lossless);
+    audioSettings->setEnabled(! lossless);
     tr_resize->setEnabled(! lossless);
-    wizard->setNextEnabled(wizard->page(0), ! lossless);
-    wizard->setFinishEnabled(wizard->page(0), lossless);
-
-    if (tr_filters)
-        tr_filters->setEnabled(!lossless);
+    tr_filters->setEnabled(! lossless);
 }
 
 void RecordingProfile::loadByID(int profileId)
@@ -1563,9 +1454,6 @@ void RecordingProfile::loadByID(int profileId)
 
 void RecordingProfile::FiltersChanged(const QString &val)
 {
-    if (!tr_filters || !tr_lossless)
-      return;
-
     // If there are filters, we cannot do lossless transcoding
     if (!val.trimmed().isEmpty())
     {
@@ -1706,20 +1594,20 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
         {
             addChild(new ImageSize(*this, tvFormat, profileName));
         }
-        videoSettings = new VideoCompressionSettings(*this, profileName,
+        videoSettings = new VideoCompressionSettings(*this,
                                                      v4l2util);
         addChild(videoSettings);
 
-        audioSettings = new AudioCompressionSettings(*this, profileName,
+        audioSettings = new AudioCompressionSettings(*this,
                                                      v4l2util);
         addChild(audioSettings);
 
         if (!profileName.isEmpty() && profileName.startsWith("Transcoders"))
         {
-            connect(tr_resize,   SIGNAL(valueChanged   (bool)),
-                    this,        SLOT(  ResizeTranscode(bool)));
-            connect(tr_lossless, SIGNAL(valueChanged        (bool)),
-                    this,        SLOT(  SetLosslessTranscode(bool)));
+            connect(tr_resize,   SIGNAL(valueChanged   (const QString &)),
+                    this,        SLOT(  ResizeTranscode(const QString &)));
+            connect(tr_lossless, SIGNAL(valueChanged        (const QString &)),
+                    this,        SLOT(  SetLosslessTranscode(const QString &)));
             connect(tr_filters,  SIGNAL(valueChanged(const QString&)),
                     this,        SLOT(FiltersChanged(const QString&)));
         }
@@ -1746,120 +1634,97 @@ void RecordingProfile::setCodecTypes()
         audioSettings->selectCodecs(groupType());
 }
 
-DialogCode RecordingProfile::exec(void)
-{
-    MythDialog *dialog = dialogWidget(
-        GetMythMainWindow(), "Recording Profile");
-
-    dialog->Show();
-    if (tr_lossless)
-        SetLosslessTranscode(tr_lossless->boolValue());
-    if (tr_resize)
-        ResizeTranscode(tr_resize->boolValue());
-    // Filters should be set last because it might disable lossless
-    if (tr_filters)
-        FiltersChanged(tr_filters->getValue());
-
-    DialogCode ret = dialog->exec();
-
-    dialog->deleteLater();
-
-    return ret;
-}
-
-void RecordingProfileEditor::open(int id)
-{
-    if (id)
-    {
-        QString profName = RecordingProfile::getName(id);
-        if (profName.isNull())
-            profName = labelName;
-        else
-            profName = labelName + "->" + profName;
-        RecordingProfile* profile = new RecordingProfile(profName);
-
-        profile->loadByID(id);
-        profile->setCodecTypes();
-
-        if (profile->exec() == QDialog::Accepted)
-            profile->Save();
-        delete profile;
-    }
-    else
-    {
-        QString profName;
-        RPPopupResult result = RecordingProfilePopup::showPopup(
-            GetMythMainWindow(),
-            tr("Add Recording Profile"),
-            tr("Enter the name of the new profile"), profName);
-        if (result == RPPopup_CANCEL)
-            return;
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-            "INSERT INTO recordingprofiles "
-                "(name, videocodec, audiocodec, profilegroup) "
-              "VALUES "
-                "(:NAME, :VIDEOCODEC, :AUDIOCODEC, :PROFILEGROUP);");
-        query.bindValue(":NAME", profName);
-        query.bindValue(":VIDEOCODEC", "MPEG-4");
-        query.bindValue(":AUDIOCODEC", "MP3");
-        query.bindValue(":PROFILEGROUP", group);
-        if (!query.exec())
-        {
-            MythDB::DBError("RecordingProfileEditor::open", query);
-        }
-        else
-        {
-            query.prepare(
-                "SELECT id "
-                  "FROM recordingprofiles "
-                  "WHERE name = :NAME AND profilegroup = :PROFILEGROUP;");
-            query.bindValue(":NAME", profName);
-            query.bindValue(":PROFILEGROUP", group);
-            if (!query.exec())
-            {
-                MythDB::DBError("RecordingProfileEditor::open", query);
-            }
-            else
-            {
-                if (query.next())
-                    open(query.value(0).toInt());
-            }
-        }
-    }
-}
-
 RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
-    listbox(new ListBoxSetting(this)), group(id), labelName(profName)
+    group(id), labelName(profName)
 {
     if (!labelName.isEmpty())
-        listbox->setLabel(labelName);
-    addChild(listbox);
+        setLabel(labelName);
 }
 
 void RecordingProfileEditor::Load(void)
 {
-    listbox->clearSelections();
-    listbox->addSelection("(Create new profile)", "0");
-    RecordingProfile::fillSelections(listbox, group);
+    clearSettings();
+    ButtonStandardSetting *newProfile =
+        new ButtonStandardSetting(tr("(Create new profile)"));
+    connect(newProfile, SIGNAL(clicked()), SLOT(ShowNewProfileDialog()));
+    addChild(newProfile);
+    RecordingProfile::fillSelections(this, group);
+    StandardSetting::Load();
 }
 
-DialogCode RecordingProfileEditor::exec(void)
+void RecordingProfileEditor::ShowNewProfileDialog()
 {
-    while (ConfigurationDialog::exec() == kDialogCodeAccepted)
-        open(listbox->getValue().toInt());
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *settingdialog =
+        new MythTextInputDialog(popupStack,
+                                tr("Enter the name of the new profile"));
 
-    return kDialogCodeRejected;
+    if (settingdialog->Create())
+    {
+        connect(settingdialog, SIGNAL(haveResult(QString)),
+                SLOT(CreateNewProfile(QString)));
+        popupStack->AddScreen(settingdialog);
+    }
+    else
+    {
+        delete settingdialog;
+    }
 }
 
-void RecordingProfile::fillSelections(SelectSetting *setting, int group,
+void RecordingProfileEditor::CreateNewProfile(QString profName)
+{
+   MSqlQuery query(MSqlQuery::InitCon());
+   query.prepare(
+       "INSERT INTO recordingprofiles "
+           "(name, videocodec, audiocodec, profilegroup) "
+         "VALUES "
+           "(:NAME, :VIDEOCODEC, :AUDIOCODEC, :PROFILEGROUP);");
+   query.bindValue(":NAME", profName);
+   query.bindValue(":VIDEOCODEC", "MPEG-4");
+   query.bindValue(":AUDIOCODEC", "MP3");
+   query.bindValue(":PROFILEGROUP", group);
+   if (!query.exec())
+   {
+       MythDB::DBError("RecordingProfileEditor::open", query);
+   }
+   else
+   {
+       query.prepare(
+           "SELECT id "
+             "FROM recordingprofiles "
+             "WHERE name = :NAME AND profilegroup = :PROFILEGROUP;");
+       query.bindValue(":NAME", profName);
+       query.bindValue(":PROFILEGROUP", group);
+       if (!query.exec())
+       {
+           MythDB::DBError("RecordingProfileEditor::open", query);
+       }
+       else
+       {
+           if (query.next())
+           {
+               RecordingProfile* profile = new RecordingProfile(profName);
+
+               profile->loadByID(query.value(0).toInt());
+               profile->setCodecTypes();
+               addChild(profile);
+               emit settingsChanged(this);
+           }
+       }
+   }
+}
+
+void RecordingProfile::fillSelections(GroupSetting *setting, int group,
                                       bool foldautodetect)
 {
     if (!group)
     {
        for (uint i = 0; !availProfiles[i].isEmpty(); i++)
-           setting->addSelection(availProfiles[i], availProfiles[i]);
+       {
+           GroupSetting *profile = new GroupSetting();
+           profile->setLabel(availProfiles[i]);
+           setting->addChild(profile);
+       }
        return;
     }
 
@@ -1884,7 +1749,9 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
     if (group == RecordingProfile::TranscoderGroup && foldautodetect)
     {
         QString id = QString::number(RecordingProfile::TranscoderAutodetect);
-        setting->addSelection(QObject::tr("Autodetect"), id);
+        GroupSetting *profile = new GroupSetting();
+        profile->setLabel(QObject::tr("Autodetect"));
+        setting->addChild(profile);
     }
 
     do
@@ -1898,18 +1765,28 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
             {
                 if (!foldautodetect)
                 {
-                    setting->addSelection(
-                        QObject::tr("Autodetect from %1").arg(name), id);
+                    RecordingProfile *profile =
+                        new RecordingProfile(QObject::tr("Autodetect from %1")
+                                             .arg(name));
+                    profile->loadByID(id.toInt());
+                    profile->setCodecTypes();
+                    setting->addChild(profile);
                 }
             }
             else
             {
-                setting->addSelection(name, id);
+                RecordingProfile *profile = new RecordingProfile(name);
+                profile->loadByID(id.toInt());
+                profile->setCodecTypes();
+                setting->addChild(profile);
             }
             continue;
         }
 
-        setting->addSelection(name, id);
+        RecordingProfile *profile = new RecordingProfile(name);
+        profile->loadByID(id.toInt());
+        profile->setCodecTypes();
+        setting->addChild(profile);
     }
     while (result.next());
 }
@@ -2015,5 +1892,26 @@ QString RecordingProfile::getName(int id)
 
     return QString::null;
 }
+
+bool RecordingProfile::canDelete(void)
+{
+    return true;
+}
+
+void RecordingProfile::deleteEntry(void)
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "DELETE "
+        "FROM recordingprofiles "
+        "WHERE id = :ID");
+
+    result.bindValue(":ID", id->getValue());
+
+    if (!result.exec())
+        MythDB::DBError("RecordingProfile::deleteEntry", result);
+
+}
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -81,7 +81,7 @@ void AvFormatDecoderDVD::UpdateFramesPlayed(void)
     m_parent->SetFramesPlayed(currentpos + 1);
 }
 
-bool AvFormatDecoderDVD::GetFrame(DecodeType decodetype)
+bool AvFormatDecoderDVD::GetFrame(DecodeType /*decodetype*/)
 {
     // Always try to decode audio and video for DVDs
     return AvFormatDecoder::GetFrame( kDecodeAV );
@@ -594,6 +594,15 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
 {
     if (!ringBuffer->IsDVD())
         return;
+
+    if (m_streams_changed)
+    {
+        // This was originally in HandleDVDStreamChange
+        QMutexLocker locker(avcodeclock);
+        ScanStreams(true);
+        avcodeclock->unlock();
+        m_streams_changed=false;
+    }
 
     // Update the title length
     if (m_parent->AtNormalSpeed() &&

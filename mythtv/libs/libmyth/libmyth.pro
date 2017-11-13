@@ -38,7 +38,7 @@ HEADERS += audio/audiooutputdigitalencoder.h audio/spdifencoder.h
 HEADERS += audio/audiosettings.h audio/audiooutputsettings.h audio/pink.h
 HEADERS += audio/volumebase.h audio/eldutils.h
 HEADERS += audio/audiooutputgraph.h
-HEADERS += backendselect.h dbsettings.h dbsettings_private.h dialogbox.h
+HEADERS += backendselect.h dbsettings.h dialogbox.h
 HEADERS += langsettings.h
 HEADERS += mythconfigdialogs.h mythconfiggroups.h
 HEADERS += mythcontext.h mythdialogs.h
@@ -46,6 +46,7 @@ HEADERS += mythexp.h mythmediamonitor.h
 HEADERS += mythwidgets.h mythwizard.h schemawizard.h
 HEADERS += output.h
 HEADERS += settings.h
+HEADERS += standardsettings.h
 HEADERS += visual.h
 HEADERS += storagegroupeditor.h
 HEADERS += mythterminal.h
@@ -72,6 +73,7 @@ SOURCES += mythmediamonitor.cpp
 SOURCES += mythwidgets.cpp mythwizard.cpp schemawizard.cpp
 SOURCES += output.cpp
 SOURCES += settings.cpp
+SOURCES += standardsettings.cpp
 SOURCES += storagegroupeditor.cpp
 SOURCES += mythterminal.cpp
 SOURCES += remoteutil.cpp
@@ -143,6 +145,7 @@ inc.files += mythterminal.h       remoteutil.h
 inc.files += programinfo.h
 inc.files += programtypes.h       recordingtypes.h
 inc.files += rssparse.h
+inc.files += standardsettings.h
 
 # This stuff is not Qt5 compatible..
 # Really? It builds under Qt5, so lets let it

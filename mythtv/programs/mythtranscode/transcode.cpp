@@ -52,7 +52,9 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     m_proginfo(pginfo),
     m_recProfile(new RecordingProfile("Transcoders")),
     keyframedist(30),
+#if CONFIG_LIBMP3LAME
     nvr(NULL),
+#endif
     ctx(NULL),
     outRingBuffer(NULL),
     fifow(NULL),
@@ -172,7 +174,7 @@ void Transcode::SetPlayerContext(PlayerContext *player_ctx)
 #if CONFIG_LIBMP3LAME
 static QString get_str_option(RecordingProfile *profile, const QString &name)
 {
-    const Setting *setting = profile->byName(name);
+    const StandardSetting *setting = profile->byName(name);
     if (setting)
         return setting->getValue();
 
@@ -227,6 +229,10 @@ int Transcode::TranscodeFile(const QString &inputname,
     HTTPLiveStream *hls = NULL;
     int hlsSegmentSize = 0;
     int hlsSegmentFrames = 0;
+
+#if !CONFIG_LIBMP3LAME
+    (void)profileName;
+#endif
 
     if (jobID >= 0)
         JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
@@ -972,8 +978,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             bool is_key;
             int did_ff;
-            frm_dir_map_t::iterator dm_iter;
-            GetPlayer()->TranscodeGetNextFrame(dm_iter, did_ff, is_key, true);
+            GetPlayer()->TranscodeGetNextFrame(did_ff, is_key, true);
 
             QSize buf_size = GetPlayer()->GetVideoBufferSize();
             video_width = buf_size.width();

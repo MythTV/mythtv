@@ -28,47 +28,27 @@ class SERVICE_PUBLIC EnumItem : public QObject
 
     PROPERTYIMP    ( QString    , Key       )
     PROPERTYIMP    ( int        , Value     )
-    PROPERTYIMP    ( QString    , Desc      )
+    PROPERTYIMP    ( QString    , Desc      );
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
-        EnumItem( QObject *parent = 0)
+        explicit EnumItem( QObject *parent = 0)
           : QObject ( parent ),
             m_Value ( 0      )
         {
         }
 
-        EnumItem( const EnumItem &src )
+        void Copy( const EnumItem *src )
         {
-            Copy( src );
+            m_Key           = src->m_Key  ;
+            m_Value         = src->m_Value;
+            m_Desc          = src->m_Desc ;
         }
 
-        void Copy( const EnumItem &src )
-        {
-            m_Key           = src.m_Key  ;
-            m_Value         = src.m_Value;
-            m_Desc          = src.m_Desc ;
-        }
+    private:
+        Q_DISABLE_COPY(EnumItem);
 };
 
 }  // namespace
-
-Q_DECLARE_METATYPE( DTC::EnumItem  )
-Q_DECLARE_METATYPE( DTC::EnumItem* )
-
-namespace DTC
-{
-inline void EnumItem::InitializeCustomTypes()
-{
-    qRegisterMetaType< EnumItem  >();
-    qRegisterMetaType< EnumItem* >();
-}
-}  // namespace
-
-
 
 #endif

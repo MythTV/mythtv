@@ -406,7 +406,7 @@ class VideoListImp
         return m_video_filter.getChangedState();
     }
 
-    bool Delete(unsigned int video_id, VideoList &dummy)
+    bool Delete(unsigned int video_id, VideoList &/*dummy*/)
     {
         bool ret = false;
         MetadataPtr mp = m_metadata.byID(video_id);

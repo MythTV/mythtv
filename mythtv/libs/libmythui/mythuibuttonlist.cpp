@@ -38,7 +38,7 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
                                    const QRect &area, bool showArrow,
-                                   bool showScrollArrows, bool showScrollBar)
+                                   bool showScrollBar)
     : MythUIType(parent, name)
 {
     m_Area      = area;
@@ -1608,6 +1608,9 @@ void MythUIButtonList::SetItemCurrent(int current, int topPosition)
     if (current == -1 || current >= m_itemList.size())
         return;
 
+    if (!m_itemList.at(current)->isEnabled())
+        return;
+
     if (current == m_selPosition &&
         (topPosition == -1 || topPosition == m_topPosition))
         return;
@@ -1999,6 +2002,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             else if (m_wrapStyle == WrapCaptive)
                 return true;
 
+            FindEnabledUp(unit);
+
             break;
 
         case MoveColumn:
@@ -2013,6 +2018,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
                 m_selPosition = pos + (m_columns - 1);
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
+            FindEnabledUp(unit);
 
             break;
 
@@ -2042,6 +2049,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             else if (m_wrapStyle == WrapCaptive)
                 return true;
 
+            FindEnabledUp(unit);
+
             break;
 
         case MovePage:
@@ -2050,14 +2059,18 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             else
                 m_selPosition = PageUp();
 
+            FindEnabledUp(unit);
+
             break;
 
         case MoveMid:
             m_selPosition = (int)(m_itemList.size() / 2);
+            FindEnabledUp(unit);
             break;
 
         case MoveMax:
             m_selPosition = 0;
+            FindEnabledUp(unit);
             break;
 
         case MoveByAmount:
@@ -2068,6 +2081,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
                 else if (m_wrapStyle > WrapNone)
                     m_selPosition = m_itemList.size() - 1;
             }
+
+            FindEnabledUp(unit);
 
             break;
     }
@@ -2084,6 +2099,101 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
 
     return true;
 }
+
+
+/**
+ * If the current item is not enabled, find the next enabled one
+ */
+void MythUIButtonList::FindEnabledDown(MovementUnit unit)
+{
+    if (m_selPosition < 0 || m_selPosition >= m_itemList.size() ||
+        m_itemList.at(m_selPosition)->isEnabled())
+        return;
+
+    int step = (unit == MoveRow) ? m_columns : 1;
+    if (unit == MoveRow && m_wrapStyle == WrapFlowing)
+        unit = MoveItem;
+    if (unit == MoveColumn)
+    {
+        while (m_selPosition < m_itemList.size() &&
+               (m_selPosition + 1) % m_columns > 0 &&
+               !m_itemList.at(m_selPosition)->isEnabled())
+            ++m_selPosition;
+
+        if (m_itemList.at(m_selPosition)->isEnabled())
+            return;
+
+        if (m_wrapStyle > WrapNone)
+        {
+            m_selPosition = m_selPosition - (m_columns - 1);
+            while ((m_selPosition + 1) % m_columns > 0 &&
+                   !m_itemList.at(m_selPosition)->isEnabled())
+                ++m_selPosition;
+        }
+    }
+    else
+    {
+        while (!m_itemList.at(m_selPosition)->isEnabled() &&
+               (m_selPosition < m_itemList.size() - step))
+            m_selPosition += step;
+
+        if (!m_itemList.at(m_selPosition)->isEnabled() &&
+            m_wrapStyle > WrapNone)
+        {
+            m_selPosition = (m_selPosition + step) % m_itemList.size();
+
+            while (!m_itemList.at(m_selPosition)->isEnabled() &&
+                   (m_selPosition < m_itemList.size() - step))
+                m_selPosition += step;
+        }
+    }
+}
+
+void MythUIButtonList::FindEnabledUp(MovementUnit unit)
+{
+    if (m_selPosition < 0 || m_selPosition >= m_itemList.size() ||
+        m_itemList.at(m_selPosition)->isEnabled())
+        return;
+
+    int step = (unit == MoveRow) ? m_columns : 1;
+    if (unit == MoveRow && m_wrapStyle == WrapFlowing)
+        unit = MoveItem;
+    if (unit == MoveColumn)
+    {
+        while (m_selPosition > 0 && (m_selPosition - 1) % m_columns > 0 &&
+               !m_itemList.at(m_selPosition)->isEnabled())
+            --m_selPosition;
+
+        if (m_itemList.at(m_selPosition)->isEnabled())
+            return;
+
+        if (m_wrapStyle > WrapNone)
+        {
+            m_selPosition = m_selPosition + (m_columns - 1);
+            while ((m_selPosition - 1) % m_columns > 0 &&
+                   !m_itemList.at(m_selPosition)->isEnabled())
+                --m_selPosition;
+        }
+    }
+    else
+    {
+        while (!m_itemList.at(m_selPosition)->isEnabled() &&
+               (m_selPosition - step >= 0))
+            m_selPosition -= step;
+
+        if (!m_itemList.at(m_selPosition)->isEnabled() &&
+            m_wrapStyle > WrapNone)
+        {
+            m_selPosition = m_itemList.size() - 1;
+
+            while (m_selPosition > 0 &&
+                   !m_itemList.at(m_selPosition)->isEnabled() &&
+                   (m_selPosition - step >= 0))
+                m_selPosition -= step;
+        }
+    }
+}
+
 
 bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
 {
@@ -2102,6 +2212,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
             else if (m_wrapStyle == WrapCaptive)
                 return true;
 
+            FindEnabledDown(unit);
+
             break;
 
         case MoveColumn:
@@ -2116,6 +2228,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 m_selPosition = pos - (m_columns - 1);
             else if (m_wrapStyle == WrapCaptive)
                 return true;
+
+            FindEnabledDown(unit);
 
             break;
 
@@ -2139,6 +2253,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
             else if (m_wrapStyle == WrapCaptive)
                 return true;
 
+            FindEnabledDown(unit);
+
             break;
 
         case MovePage:
@@ -2148,10 +2264,13 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
             else
                 m_selPosition = PageDown();
 
+            FindEnabledDown(unit);
+
             break;
 
         case MoveMax:
             m_selPosition = m_itemCount - 1;
+            FindEnabledDown(unit);
             break;
 
         case MoveByAmount:
@@ -2162,6 +2281,7 @@ bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
                 else if (m_wrapStyle > WrapNone)
                     m_selPosition = 0;
             }
+            FindEnabledDown(unit);
             break;
 
         case MoveMid:
@@ -2390,11 +2510,11 @@ uint MythUIButtonList::ItemHeight(void)
 /**
  *  \copydoc MythUIType::keyPressEvent()
  */
-bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
+bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
     bool handled = false;
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     // Handle action remappings
     for (int i = 0; i < actions.size(); ++i)
@@ -2507,7 +2627,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         {
             MythUIButtonListItem *item = GetItemCurrent();
 
-            if (item)
+            if (item && item->isEnabled())
                 emit itemClicked(item);
         }
         else if (action == "SEARCH")
@@ -3134,6 +3254,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
     m_showArrow = showArrow;
     m_data      = 0;
     m_isVisible = false;
+    m_enabled   = true;
 
     if (state >= NotChecked)
         m_checkable = true;
@@ -3159,6 +3280,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
     m_state     = CantCheck;
     m_showArrow = false;
     m_isVisible = false;
+    m_enabled   = true;
 
     if (m_parent)
         m_parent->InsertItem(this, listPosition);
@@ -3480,6 +3602,16 @@ void MythUIButtonListItem::setDrawArrow(bool flag)
     m_showArrow = flag;
 }
 
+bool MythUIButtonListItem::isEnabled() const
+{
+    return m_enabled;
+}
+
+void MythUIButtonListItem::setEnabled(bool flag)
+{
+    m_enabled = flag;
+}
+
 void MythUIButtonListItem::SetData(QVariant data)
 {
     m_data = data;
@@ -3510,6 +3642,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     if (!m_parent->IsEnabled())
         state = "disabled";
+    else if (!m_enabled)
+    {
+        state = m_parent->m_active ? "disabledactive" : "disabledinactive";
+    }
     else if (selected)
     {
         button->MoveToTop();

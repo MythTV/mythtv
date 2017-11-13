@@ -68,15 +68,13 @@ void MBASE_PUBLIC ShutdownMythSystemLegacy(void);
 class MythSystemLegacyPrivate;
 class MBASE_PUBLIC MythSystemLegacy : public QObject
 {
-    Q_OBJECT
+    Q_OBJECT;
 
   public:
-    MythSystemLegacy();
-    MythSystemLegacy(const QString &, uint);
-    MythSystemLegacy(const QString &, const QStringList &, uint);
-    // FIXME: Do we really need to expose a public copy-constructor?
-    // FIXME: Should operator=() also be provided or banned?
-    MythSystemLegacy(const MythSystemLegacy &other);
+    explicit MythSystemLegacy(QObject * = Q_NULLPTR);
+    MythSystemLegacy(const QString &, uint, QObject * = Q_NULLPTR);
+    MythSystemLegacy(const QString &, const QStringList &, uint,
+                     QObject * = Q_NULLPTR);
     ~MythSystemLegacy(void);
 
     // FIXME: We should not allow a MythSystemLegacy to be reused for a new command.
@@ -174,6 +172,7 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     void readDataReady(int fd);
 
   private:
+    Q_DISABLE_COPY(MythSystemLegacy)
     void initializePrivate(void);
     MythSystemLegacyPrivate *d; // FIXME we generally call this m_priv in MythTV
 

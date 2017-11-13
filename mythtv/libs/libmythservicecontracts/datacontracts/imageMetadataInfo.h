@@ -24,11 +24,7 @@ class SERVICE_PUBLIC ImageMetadataInfo : public QObject
     PROPERTYIMP    ( int        , Number       )
     PROPERTYIMP    ( QString    , Tag          )
     PROPERTYIMP    ( QString    , Label        )
-    PROPERTYIMP    ( QString    , Value        )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP    ( QString    , Value        );
 
     public:
 
@@ -38,32 +34,18 @@ class SERVICE_PUBLIC ImageMetadataInfo : public QObject
         {
         }
 
-        ImageMetadataInfo( const ImageMetadataInfo &src )
+        void Copy( const ImageMetadataInfo *src )
         {
-            Copy( src );
+            m_Number    = src->m_Number;
+            m_Tag       = src->m_Tag;
+            m_Label     = src->m_Label;
+            m_Value     = src->m_Value;
         }
 
-        void Copy( const ImageMetadataInfo &src )
-        {
-            m_Number    = src.m_Number;
-            m_Tag       = src.m_Tag;
-            m_Label     = src.m_Label;
-            m_Value     = src.m_Value;
-        }
+    private:
+        Q_DISABLE_COPY(ImageMetadataInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::ImageMetadataInfo  )
-Q_DECLARE_METATYPE( DTC::ImageMetadataInfo* )
-
-namespace DTC
-{
-inline void ImageMetadataInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< ImageMetadataInfo  >();
-    qRegisterMetaType< ImageMetadataInfo* >();
-}
-}
 
 #endif // IMAGEMETADATAINFO_H

@@ -92,9 +92,6 @@ void PrivateDecoderOMX::GetDecoders(render_opts &opts)
 PrivateDecoderOMX::PrivateDecoderOMX() :
     m_videc(gCoreContext->GetSetting("OMXVideoDecode", VIDEO_DECODE), *this),
     m_filter(0), m_bStartTime(false),
-#ifdef USING_BROADCOM
-    m_eMode(OMX_InterlaceFieldsInterleavedUpperFirst), m_bRepeatFirstField(false),
-#endif
     m_avctx(0),
     m_lock(QMutex::Recursive), m_bSettingsChanged(false),
     m_bSettingsHaveChanged(false)
@@ -888,9 +885,10 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
     OMX_BUFFERHEADERTYPE *hdr = m_obufs.takeFirst();
     m_lock.unlock();
 
-    if (hdr->nFlags & ~OMX_BUFFERFLAG_ENDOFFRAME)
+    OMX_U32 nFlags = hdr->nFlags;
+    if (nFlags & ~OMX_BUFFERFLAG_ENDOFFRAME)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-            QString("Decoded frame flags=%1").arg(HeaderFlags(hdr->nFlags)) );
+            QString("Decoded frame flags=%1").arg(HeaderFlags(nFlags)) );
 
     if (avctx->pix_fmt < 0)
         avctx->pix_fmt = AV_PIX_FMT_YUV420P; // == FMT_YV12
@@ -1018,42 +1016,19 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
 
         if (ret)
         {
-#ifdef USING_BROADCOM
-            switch (m_eMode)
-            {
-              case OMX_InterlaceProgressive:
+#ifdef OMX_BUFFERFLAG_INTERLACED
+            if (nFlags & OMX_BUFFERFLAG_INTERLACED)
+                picture->interlaced_frame = 1;
+            else
+#endif
                 picture->interlaced_frame = 0;
-                picture->top_field_first = 0;
-                break;
-              case OMX_InterlaceFieldSingleUpperFirst:
-                /* The data is interlaced, fields sent
-                 * separately in temporal order, with upper field first */
-                picture->interlaced_frame = 1;
+#ifdef OMX_BUFFERFLAG_TOP_FIELD_FIRST
+            if (nFlags & OMX_BUFFERFLAG_TOP_FIELD_FIRST)
                 picture->top_field_first = 1;
-                break;
-              case OMX_InterlaceFieldSingleLowerFirst:
-                picture->interlaced_frame = 1;
+            else
+#endif
                 picture->top_field_first = 0;
-                break;
-              case OMX_InterlaceFieldsInterleavedUpperFirst:
-                /* The data is interlaced, two fields sent together line
-                 * interleaved, with the upper field temporally earlier */
-                picture->interlaced_frame = 1;
-                picture->top_field_first = 1;
-                break;
-              case OMX_InterlaceFieldsInterleavedLowerFirst:
-                picture->interlaced_frame = 1;
-                picture->top_field_first = 0;
-                break;
-              case OMX_InterlaceMixed:
-                /* The stream may contain a mixture of progressive
-                 * and interlaced frames */
-                picture->interlaced_frame = 1;
-                break;
-            }
-            picture->repeat_pict = m_bRepeatFirstField;
-#endif // USING_BROADCOM
-
+            picture->repeat_pict = 0;
             if (!frame)
             {
                 // Copy OMX buffer to the frame provided
@@ -1126,55 +1101,6 @@ OMX_ERRORTYPE PrivateDecoderOMX::SettingsChanged(AVCodecContext *avctx)
         LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
                 "SetParameter IndexParamVideoPortFormat error %1")
             .arg(Error2String(e)));
-
-#ifdef USING_BROADCOM
-    OMX_CONFIG_INTERLACETYPE inter;
-    e = GetInterlace(inter, index);
-    if (e == OMX_ErrorNone)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1%2")
-            .arg(Interlace2String(inter.eMode))
-            .arg(inter.bRepeatFirstField ? " rpt 1st" : "") );
-
-        m_bRepeatFirstField = inter.bRepeatFirstField;
-        m_eMode = inter.eMode;
-#if 0 // Can't change interlacing setting, at least not on RPi
-        switch (inter.eMode)
-        {
-          case OMX_InterlaceProgressive:
-            break;
-
-          case OMX_InterlaceFieldSingleUpperFirst:
-          case OMX_InterlaceFieldSingleLowerFirst:
-            break;
-
-          case OMX_InterlaceFieldsInterleavedUpperFirst:
-            /* The data is interlaced, two fields sent together line
-             * interleaved, with the upper field temporally earlier */
-            inter.eMode = OMX_InterlaceFieldSingleUpperFirst;
-            break;
-          case OMX_InterlaceFieldsInterleavedLowerFirst:
-            inter.eMode = OMX_InterlaceFieldSingleLowerFirst;
-            break;
-
-          case OMX_InterlaceMixed:
-            inter.eMode = OMX_InterlaceFieldSingleUpperFirst;
-            break;
-        }
-
-        if (m_eMode != inter.eMode)
-        {
-            e = m_videc.SetConfig(OMX_IndexConfigCommonInterlace, &inter);
-            if (e == OMX_ErrorNone)
-                m_eMode = inter.eMode;
-            else
-                LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
-                        "Set ConfigCommonInterlace error %1")
-                    .arg(Error2String(e)));
-        }
-#endif
-    }
-#endif // USING_BROADCOM
 
 #ifdef USING_BROADCOM
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))

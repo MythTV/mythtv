@@ -25,18 +25,14 @@ EdgeMaskEntry;
 
 ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
                                          unsigned int w, unsigned int h,
-                                         unsigned int commdetectborder_in,
-                                         unsigned int xspacing_in,
-                                         unsigned int yspacing_in)
+                                         unsigned int commdetectborder_in)
     : LogoDetectorBase(w,h),
       commDetector(commdetector),                       frameNumber(0),
-      previousFrameWasSceneChange(false),
-      xspacing(xspacing_in),                            yspacing(yspacing_in),
       commDetectBorder(commdetectborder_in),            edgeMask(new EdgeMaskEntry[width * height]),
       logoMaxValues(new unsigned char[width * height]), logoMinValues(new unsigned char[width * height]),
       logoFrame(new unsigned char[width * height]),     logoMask(new unsigned char[width * height]),
       logoCheckMask(new unsigned char[width * height]), tmpBuf(new unsigned char[width * height]),
-      logoEdgeDiff(0),                                  logoFrameCount(0),
+      logoEdgeDiff(0),
       logoMinX(0),                                      logoMaxX(0),
       logoMinY(0),                                      logoMaxY(0),
       logoInfoAvailable(false)

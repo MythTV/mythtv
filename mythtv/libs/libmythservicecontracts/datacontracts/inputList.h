@@ -33,11 +33,7 @@ class SERVICE_PUBLIC InputList : public QObject
 
     Q_PROPERTY( QVariantList Inputs READ Inputs DESIGNABLE true )
 
-    PROPERTYIMP_RO_REF( QVariantList, Inputs )
-
-    public:
-
-        static inline void InitializeCustomTypes();
+    PROPERTYIMP_RO_REF( QVariantList, Inputs );
 
     public:
 
@@ -46,14 +42,9 @@ class SERVICE_PUBLIC InputList : public QObject
         {
         }
 
-        InputList( const InputList &src )
+        void Copy( const InputList *src )
         {
-            Copy( src );
-        }
-
-        void Copy( const InputList &src )
-        {
-            CopyListContents< Input >( this, m_Inputs, src.m_Inputs );
+            CopyListContents< Input >( this, m_Inputs, src->m_Inputs );
         }
 
         Input *AddNewInput()
@@ -67,22 +58,10 @@ class SERVICE_PUBLIC InputList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(InputList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::InputList  )
-Q_DECLARE_METATYPE( DTC::InputList* )
-
-namespace DTC
-{
-inline void InputList::InitializeCustomTypes()
-{
-    qRegisterMetaType< InputList  >();
-    qRegisterMetaType< InputList* >();
-
-    Input::InitializeCustomTypes();
-}
-}
 
 #endif

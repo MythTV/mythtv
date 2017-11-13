@@ -219,7 +219,7 @@ void CDRipperThread::run(void)
 {
     RunProlog();
 
-    if (!m_tracks->size() > 0)
+    if (m_tracks->size() <= 0)
     {
         RunEpilog();
         return;
@@ -1600,7 +1600,8 @@ bool RipStatus::keyPressEvent(QKeyEvent *event)
             m_ripperThread && m_ripperThread->isRunning())
         {
             MythConfirmationDialog *dialog =
-                ShowOkPopup(tr("Cancel ripping the CD?"), this, NULL, true);
+                ShowOkPopup(tr("Cancel ripping the CD?"), this,
+                            static_cast<const char*>(NULL), true);
             if (dialog)
                 dialog->SetReturnEvent(this, "stop_ripping");
         }

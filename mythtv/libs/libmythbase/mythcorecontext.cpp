@@ -82,6 +82,7 @@ class MythCoreContextPrivate : public QObject
     QMutex         m_WOLInProgressLock;
     QWaitCondition m_WOLInProgressWaitCondition;
     bool           m_WOLInProgress;
+    bool           m_IsWOLAllowed;
 
     bool m_backend;
     bool m_frontend;
@@ -112,6 +113,9 @@ class MythCoreContextPrivate : public QObject
     QMutex m_fileslock;
 
     MythSessionManager *m_sessionManager;
+
+    QList<QHostAddress> m_approvedIps;
+    QList<QHostAddress> m_deniedIps;
 };
 
 MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
@@ -125,6 +129,7 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_sockLock(QMutex::NonRecursive),
       m_serverSock(NULL), m_eventSock(NULL),
       m_WOLInProgress(false),
+      m_IsWOLAllowed(true),
       m_backend(false),
       m_frontend(false),
       m_database(GetMythDB()),
@@ -344,6 +349,8 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
                 "to itself!");
         return false;
     }
+    if (IsExiting())
+        return false;
 
     QString server = GetMasterServerIP();
     if (server.isEmpty())
@@ -404,7 +411,7 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
 
 MythSocket *MythCoreContext::ConnectCommandSocket(
     const QString &hostname, int port, const QString &announce,
-    bool *p_proto_mismatch, bool gui, int maxConnTry, int setup_timeout)
+    bool *p_proto_mismatch, int maxConnTry, int setup_timeout)
 {
     MythSocket *serverSock = NULL;
 
@@ -413,7 +420,9 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
         d->WaitForWOL();
     }
 
-    QString WOLcmd = GetSetting("WOLbackendCommand", "");
+    QString WOLcmd;
+    if (IsWOLAllowed())
+        WOLcmd = GetSetting("WOLbackendCommand", "");
 
     if (maxConnTry < 1)
         maxConnTry = max(GetNumSetting("BackendConnectRetry", 1), 1);
@@ -601,6 +610,16 @@ bool MythCoreContext::IsBlockingClient(void) const
     return d->m_blockingClient;
 }
 
+void MythCoreContext::SetWOLAllowed(bool allow)
+{
+    d->m_IsWOLAllowed = allow;
+}
+
+bool MythCoreContext::IsWOLAllowed() const
+{
+    return d->m_IsWOLAllowed;
+}
+
 void MythCoreContext::SetAsBackend(bool backend)
 {
     d->m_backend = backend;
@@ -629,7 +648,32 @@ bool MythCoreContext::IsMasterHost(void)
 
 bool MythCoreContext::IsMasterHost(const QString &host)
 {
-    return IsThisHost(GetMasterServerIP(), host);
+    // Temporary code here only to facilitate the upgrade
+    // from 1346 or earlier. The way of determining master host is
+    // changing, and the new way of determning master host
+    // will not work with earlier databases.
+    // This code can be removed when updating from prior to
+    // 1347 is no longer allowed.
+    // Note that we are deprecating some settings including
+    // MasterServerIP, and can remove them at a future time.
+    if (GetNumSetting("DBSchemaVer") < 1347)
+    {
+        // Temporary copy of code from old version of
+        // IsThisHost(Qstring&,QString&)
+        QString addr(resolveSettingAddress("MasterServerIP"));
+        if (addr.toLower() == host.toLower())
+            return true;
+        QHostAddress addrfix(addr);
+        addrfix.setScopeId(QString());
+        QString addrstr = addrfix.toString();
+        if (addrfix.isNull())
+            addrstr = resolveAddress(addr);
+        QString thisip  = GetBackendServerIP4(host);
+        QString thisip6 = GetBackendServerIP6(host);
+        return !addrstr.isEmpty()
+                && ((addrstr == thisip) || (addrstr == thisip6));
+    }
+    return GetSetting("MasterServerName") ==  host;
 }
 
 bool MythCoreContext::IsMasterBackend(void)
@@ -677,10 +721,9 @@ bool MythCoreContext::IsThisHost(const QString &addr, const QString &host)
         addrstr = resolveAddress(addr);
     }
 
-    QString thisip  = GetBackendServerIP4(host);
-    QString thisip6 = GetBackendServerIP6(host);
+    QString thisip  = GetBackendServerIP(host);
 
-    return !addrstr.isEmpty() && ((addrstr == thisip) || (addrstr == thisip6));
+    return !addrstr.isEmpty() && ((addrstr == thisip));
 }
 
 bool MythCoreContext::IsFrontendOnly(void)
@@ -728,11 +771,9 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
 
     m_host = host;
 
-#if !defined(QT_NO_IPV6)
     // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
     if (!addr.isNull() && addr.protocol() == QAbstractSocket::IPv6Protocol)
         m_host = "[" + addr.toString().toLower() + "]";
-#endif
 
     if (port > 0 && port != 6543)
         m_port = QString(":%1").arg(port);
@@ -898,32 +939,33 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
 }
 
 /**
- * \fn QString GetMasterServerIP(void)
  * Returns the Master Backend IP address
  * If the address is an IPv6 address, the scope Id is removed.
  * If no master server address has been defined in the database, return localhost
  */
 QString MythCoreContext::GetMasterServerIP(void)
 {
-    QString master = resolveSettingAddress("MasterServerIP");
+    QString masterserver = gCoreContext->GetSetting("MasterServerName");
+    QString masterip = resolveSettingAddress("BackendServerAddr",masterserver);
     // Even if empty, return it here if we were to assume that localhost
     // should be used it just causes a lot of unnecessary error messages.
-    return master;
+    return masterip;
 }
 
 /**
- * \fn int GetMasterServerPort(void)
  * Returns the Master Backend control port
  * If no master server port has been defined in the database, return the default
  * 6543
  */
 int MythCoreContext::GetMasterServerPort(void)
 {
-    return GetNumSetting("MasterServerPort", 6543);
+    QString masterserver = gCoreContext->GetSetting
+        ("MasterServerName");
+    return gCoreContext->GetNumSettingOnHost
+        ("BackendServerPort", masterserver, 6543);
 }
 
 /**
- * \fn int GetMasterServerStatusPort(void)
  * Returns the Master Backend status port
  * If no master server status port has been defined in the database,
  * return the default 65434
@@ -936,7 +978,6 @@ int MythCoreContext::GetMasterServerStatusPort(void)
 }
 
 /**
- * \fn QString GetBackendServerIP(void)
  * Returns the IP address of the locally defined backend IP.
  * See GetBackendServerIP(host)
  */
@@ -946,7 +987,6 @@ QString MythCoreContext::GetBackendServerIP(void)
 }
 
 /**
- * \fn QString GetBackendServerIP(const QString &host)
  * Returns the IP address of backend "host"
  * If an IPv6 address has been defined, will use it whenever possible, unless
  * the IPv6 address is a localhost address, in which case the IPv4 address will
@@ -957,47 +997,10 @@ QString MythCoreContext::GetBackendServerIP(void)
  */
 QString MythCoreContext::GetBackendServerIP(const QString &host)
 {
-    if (!QHostAddress(host).isNull())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("(%1): Given "
-                                         "IP address instead of hostname "
-                                         "(ID)").arg(host));
-        return host;
-    }
-
-    QString addr4, addr6;
-#if !defined(QT_NO_IPV6)
-    if (!ServerPool::DefaultListenIPv6().isEmpty())
-    {
-        // we have IPv6 addresses, assume we can connect to them
-        addr6 = GetBackendServerIP6(host);
-    }
-#endif
-    if (!ServerPool::DefaultListenIPv4().isEmpty())
-        addr4 = GetBackendServerIP4(host);
-
-    if (addr6.isEmpty())
-    {
-        if (addr4.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "No address defined for host: " + host);
-            return QString();
-        }
-
-        // IPv6 is empty, so return this regardless
-        return addr4;
-    }
-    else if ((QHostAddress(addr6) == QHostAddress::LocalHostIPv6) &&
-              !addr4.isEmpty() &&
-             (QHostAddress(addr4) != QHostAddress::LocalHost))
-        // IPv6 set to localhost, but IPv4 address if network accessible
-        return addr4;
-    else
-        return addr6;
+    return resolveSettingAddress("BackendServerAddr",host);
 }
 
 /**
- * \fn QStringGetBackendServerIP4(void)
  * Returns the IPv4 address defined for the current host
  * see GetBackendServerIP4(host)
  */
@@ -1007,9 +1010,9 @@ QString MythCoreContext::GetBackendServerIP4(void)
 }
 
 /**
- * \fn QString GetBackendServerIP4(const QString &host)
  * Returns the IPv4 address defined for the backend "host".
- * returns an empty string if the defined IP is invalid
+ * \param host The name of the host to lookup
+ * \return An empty string if the defined IP is invalid
  */
 QString MythCoreContext::GetBackendServerIP4(const QString &host)
 {
@@ -1017,7 +1020,6 @@ QString MythCoreContext::GetBackendServerIP4(const QString &host)
 }
 
 /**
- * \fn QString GetBackendServerIP6(void)
  * Returns the IPv6 address defined for the current host
  * see GetBackendServerIP6(host)
  */
@@ -1027,7 +1029,6 @@ QString MythCoreContext::GetBackendServerIP6(void)
 }
 
 /**
- * \fn QString GetBackendServerIP6(const QString &host)
  * Returns the IPv6 address defined for the backend "host".
  * returns an empty string if the defined IP is invalid.
  * The IP address returned doesn't contain a scope Id
@@ -1038,7 +1039,6 @@ QString MythCoreContext::GetBackendServerIP6(const QString &host)
 }
 
 /**
- * \fn int GetBackendServerPort(void)
  * Returns the locally defined backend control port
  */
 int MythCoreContext::GetBackendServerPort(void)
@@ -1047,7 +1047,6 @@ int MythCoreContext::GetBackendServerPort(void)
 }
 
 /**
- * \fn vint GetBackendServerPort(const QString &host)
  * Returns the backend "hosts"'s control port
  */
 int MythCoreContext::GetBackendServerPort(const QString &host)
@@ -1056,7 +1055,6 @@ int MythCoreContext::GetBackendServerPort(const QString &host)
 }
 
 /**
- * \fn int GetBackendStatusPort(void)
  * Returns the locally defined backend status port
  */
 int MythCoreContext::GetBackendStatusPort(void)
@@ -1065,7 +1063,6 @@ int MythCoreContext::GetBackendStatusPort(void)
 }
 
 /**
- * \fn int GetBackendStatusPort(const QString &host)
  * Returns the backend "hosts"'s status port
  */
 int MythCoreContext::GetBackendStatusPort(const QString &host)
@@ -1074,7 +1071,6 @@ int MythCoreContext::GetBackendStatusPort(const QString &host)
 }
 
 /**
- * \fn void GetScopeForAddress(QHostAddress &addr)
  * Return the cached scope Id for the given address.
  * If unknown returns false, else returns true and set scope Id to given address
  */
@@ -1093,8 +1089,10 @@ bool MythCoreContext::GetScopeForAddress(QHostAddress &addr) const
 }
 
 /**
- * \fn void SetScopeForAddress(QHostAddress &addr)
- * Record the scope Id of the given IP address
+ * Record the scope Id of the given IP address.
+ *
+ * \param addr A QHostAddress that contains both the host address and
+ *        the scope to record.
  */
 void MythCoreContext::SetScopeForAddress(const QHostAddress &addr)
 {
@@ -1106,8 +1104,9 @@ void MythCoreContext::SetScopeForAddress(const QHostAddress &addr)
 }
 
 /**
- * \fn void SetScopeForAddress(QHostAddress &addr, int scope)
- * This is an overloaded function.
+ * Record the scope Id of the given IP address
+ * \param addr A QHostAddress containing the host address to record.
+ * \param scope The scope value to record.
  */
 void MythCoreContext::SetScopeForAddress(const QHostAddress &addr, int scope)
 {
@@ -1119,7 +1118,6 @@ void MythCoreContext::SetScopeForAddress(const QHostAddress &addr, int scope)
 }
 
 /**
- * \fn QString resolveSettingAddress(const QString &name, const QString &host, int type)
  * Retrieve IP setting "name" for "host". If host is empty retrieve for local machine.
  * The value returned for the given setting name, will be returned if it's an IP address
  * or resolved otherwise.
@@ -1149,7 +1147,6 @@ QString MythCoreContext::resolveSettingAddress(const QString &name,
 }
 
 /**
- * \fn QString resolveAddress(const QString &host, int type)
  * if host is an IP address, it will be returned
  * or resolved otherwise.
  * If host is empty, an empty string will be returned,
@@ -1175,11 +1172,7 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("Can't resolve hostname:'%1', using localhost").arg(host));
-#if defined(QT_NO_IPV6)
-            return "127.0.0.1";
-#else
             return type == ResolveIPv4 ? "127.0.0.1" : "::1";
-#endif
         }
         QHostAddress v4, v6;
 
@@ -1195,25 +1188,21 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
                 if (type == 0)
                     break;
             }
-#if !defined(QT_NO_IPV6)
             else if (prot == QAbstractSocket::IPv6Protocol)
             {
                 v6 = addr;
                 if (type != 0)
                     break;
             }
-#endif
         }
         switch (type)
         {
             case ResolveIPv4:
                 addr = v4.isNull() ? QHostAddress::LocalHost : v4;
                 break;
-#if !defined(QT_NO_IPV6)
             case ResolveIPv6:
                 addr = v6.isNull() ? QHostAddress::LocalHostIPv6 : v6;
                 break;
-#endif
             default:
                 addr = v6.isNull() ?
                     (v4.isNull() ? QHostAddress::LocalHostIPv6 : v4) : v6;
@@ -1232,6 +1221,88 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
     return addr.toString();
 }
 
+/**
+ * Check if a socket is connected to an approved peer.
+ *
+ * There is a setting called AllowConnFromAll. If it is
+ * true, then no check needs to be done. If false, check that
+ * the connection comes from a subnet to which I am connected.
+ *
+ * \param socket in Socket to check.
+ * \return true if the connection is allowed, false if not.
+*/
+
+bool MythCoreContext::CheckSubnet(const QAbstractSocket *socket)
+{
+    QHostAddress peer = socket->peerAddress();
+    return CheckSubnet(peer);
+}
+
+/**
+ * Check if aa ip address is approved.
+ *
+ * There is a setting called AllowConnFromAll. If it is
+ * true, then no check needs to be done. If false, check that
+ * the connection comes from a subnet to which I am connected.
+ *
+ * \param peer in Host Address to check.
+ * \return true if the connection is allowed, false if not.
+*/
+
+bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
+{
+    static const QHostAddress linklocal("fe80::");
+    if (GetNumSetting("AllowConnFromAll",0))
+        return true;
+    if (d->m_approvedIps.contains(peer))
+        return true;
+    if (d->m_deniedIps.contains(peer))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+          QString("Repeat denied connection from ip address: %1")
+          .arg(peer.toString()));
+        return false;
+    }
+
+    // allow all link-local
+    if (peer.isInSubnet(linklocal,10))
+    {
+        d->m_approvedIps.append(peer);
+        return true;
+    }
+
+    // loop through all available interfaces
+    QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
+    QList<QNetworkInterface>::const_iterator qni;
+    for (qni = IFs.begin(); qni != IFs.end(); ++qni)
+    {
+        if ((qni->flags() & QNetworkInterface::IsRunning) == 0)
+            continue;
+
+        QList<QNetworkAddressEntry> IPs = qni->addressEntries();
+        QList<QNetworkAddressEntry>::iterator qnai;
+        for (qnai = IPs.begin(); qnai != IPs.end(); ++qnai)
+        {
+            int pfxlen = qnai->prefixLength();
+            // Set this to test rejection without having an extra
+            // network.
+            if (GetNumSetting("DebugSubnet"))
+                pfxlen += 4;
+            if (peer.isInSubnet(qnai->ip(),pfxlen))
+            {
+                d->m_approvedIps.append(peer);
+                return true;
+            }
+        }
+    }
+    d->m_deniedIps.append(peer);
+    LOG(VB_GENERAL, LOG_WARNING, LOC +
+        QString("Denied connection from ip address: %1")
+        .arg(peer.toString()));
+    return false;
+}
+
+
 void MythCoreContext::OverrideSettingForSession(const QString &key,
                                                 const QString &value)
 {
@@ -1248,6 +1319,24 @@ bool MythCoreContext::IsUIThread(void)
     return is_current_thread(d->m_UIThread);
 }
 
+/**
+ *  \brief Send a message to the backend and wait for a response.
+ *
+ *  \param strlist      A QStringList used for both sending commands
+ *                      to the backend and receiving responses from
+ *                      the backend.
+ *  \param quickTimeout If true, the short timeout is used while
+ *                      waiting for a response. If false (the default)
+ *                      then the long timeout is used.
+ *  \param block        If true (the default) and the request sent to
+ *                      the backend times out, this function will
+ *                      attempt to reconnect and reissue the
+ *                      request. If false, this function will not
+ *                      attempt to reconnect to the backend.
+ *
+ *  \sa kShortTimeout
+ *  \sa kLongTimeout
+ */
 bool MythCoreContext::SendReceiveStringList(
     QStringList &strlist, bool quickTimeout, bool block)
 {
@@ -1296,12 +1385,15 @@ bool MythCoreContext::SendReceiveStringList(
                 d->m_eventSock = NULL;
             }
 
-            ConnectToMasterServer(d->m_blockingClient);
-
-            if (d->m_serverSock)
+            if (block)
             {
-                ok = d->m_serverSock->SendReceiveStringList(
-                    strlist, 0, timeout);
+                ConnectToMasterServer(d->m_blockingClient);
+
+                if (d->m_serverSock)
+                {
+                    ok = d->m_serverSock->SendReceiveStringList(
+                        strlist, 0, timeout);
+                }
             }
         }
 
@@ -1662,6 +1754,17 @@ QString MythCoreContext::GetLanguageAndVariant(void)
 void MythCoreContext::ResetLanguage(void)
 {
     d->language.clear();
+}
+
+void MythCoreContext::ResetSockets(void)
+{
+    QMutexLocker locker(&d->m_sockLock);
+    LOG(VB_GENERAL, LOG_INFO, "Restarting Backend Connections");
+    if (d->m_serverSock)
+        d->m_serverSock->DisconnectFromHost();
+    if (d->m_eventSock)
+        d->m_eventSock->DisconnectFromHost();
+    dispatch(MythEvent("BACKEND_SOCKETS_CLOSED"));
 }
 
 void MythCoreContext::InitLocale(void )

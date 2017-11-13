@@ -42,11 +42,7 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
     PROPERTYIMP       ( QString     , Version         )
     PROPERTYIMP       ( QString     , ProtoVer        )
 
-    PROPERTYIMP_RO_REF( QVariantList, ChannelInfos )
-
-    public:
-
-        static void InitializeCustomTypes();
+    PROPERTYIMP_RO_REF( QVariantList, ChannelInfos );
 
     public:
 
@@ -60,21 +56,16 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
         {
         }
 
-        ChannelInfoList( const ChannelInfoList &src )
+        void Copy( const ChannelInfoList *src )
         {
-            Copy( src );
-        }
+            m_StartIndex    = src->m_StartIndex     ;
+            m_Count         = src->m_Count          ;
+            m_TotalAvailable= src->m_TotalAvailable ;
+            m_AsOf          = src->m_AsOf           ;
+            m_Version       = src->m_Version        ;
+            m_ProtoVer      = src->m_ProtoVer       ;
 
-        void Copy( const ChannelInfoList &src )
-        {
-            m_StartIndex    = src.m_StartIndex     ;
-            m_Count         = src.m_Count          ;
-            m_TotalAvailable= src.m_TotalAvailable ;
-            m_AsOf          = src.m_AsOf           ;
-            m_Version       = src.m_Version        ;
-            m_ProtoVer      = src.m_ProtoVer       ;
-
-            CopyListContents< ChannelInfo >( this, m_ChannelInfos, src.m_ChannelInfos );
+            CopyListContents< ChannelInfo >( this, m_ChannelInfos, src->m_ChannelInfos );
         }
 
         ChannelInfo *AddNewChannelInfo()
@@ -88,22 +79,10 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(ChannelInfoList);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::ChannelInfoList  )
-Q_DECLARE_METATYPE( DTC::ChannelInfoList* )
-
-namespace DTC
-{
-inline void ChannelInfoList::InitializeCustomTypes()
-{
-    qRegisterMetaType< ChannelInfoList   >();
-    qRegisterMetaType< ChannelInfoList*  >();
-
-    ChannelInfo::InitializeCustomTypes();
-}
-}
 
 #endif

@@ -8,12 +8,12 @@ Scraper for embedded lyrics
 import sys, os, re, chardet
 import xml.dom.minidom as xml
 from optparse import OptionParser
-from common import *
+from common import utilities
 
 __author__      = "Paul Harrison and 'ronin'"
 __title__       = "EmbeddedLyrics"
 __description__ = "Search tracks tag for embedded lyrics"
-__version__     = "0.1"
+__version__     = "0.2"
 __priority__    = "100"
 __syncronized__ = True
 

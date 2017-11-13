@@ -441,8 +441,7 @@ void AudioSetupWizard::toggleSpeakers(void)
     if (!m_testThread->result().isEmpty())
     {
         QString msg = QObject::tr("Audio device is invalid or not useable.");
-        MythPopupBox::showOkPopup(
-            GetMythMainWindow(), QObject::tr("Warning"), msg);
+        ShowOkPopup(msg);
         delete m_testThread;
         m_testThread = NULL;
     }

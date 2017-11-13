@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <cerrno>
@@ -29,6 +28,7 @@ using namespace std;
 #include "mythsystemlegacy.h"
 #include "tv.h"
 #include "proglist.h"
+#include "prevreclist.h"
 #include "progfind.h"
 #include "scheduleeditor.h"
 #include "manualschedule.h"
@@ -69,7 +69,6 @@ using namespace std;
 #include "langsettings.h"
 #include "mythtranslation.h"
 #include "commandlineparser.h"
-#include "channelgroupsettings.h"
 #include "tvremoteutil.h"
 
 #include "myththemedmenu.h"
@@ -84,6 +83,7 @@ using namespace std;
 #include "mythversion.h"
 #include "taskqueue.h"
 #include "cleanupguard.h"
+#include "standardsettings.h"
 
 // Video
 #include "cleanup.h"
@@ -171,8 +171,17 @@ namespace
 
             if (passwordValid)
             {
-                VideoGeneralSettings settings;
-                settings.exec();
+                MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+                StandardSettingDialog *ssd =
+                    new StandardSettingDialog(mainStack, "videogeneralsettings",
+                                              new VideoGeneralSettings());
+
+                if (ssd->Create())
+                {
+                    mainStack->AddScreen(ssd);
+                }
+                else
+                    delete ssd;
             }
             else
             {
@@ -538,6 +547,16 @@ static void startPlayback(void)
 static void startPrevious(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    PrevRecordedList *pl = new PrevRecordedList(mainStack);
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
+}
+
+static void startPreviousOld(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgLister *pl = new ProgLister(mainStack);
     if (pl->Create())
         mainStack->AddScreen(pl);
@@ -882,17 +901,21 @@ static void TVMenuCallback(void *data, QString &selection)
         startSearchTime();
     else if (sel == "tv_previous")
         startPrevious();
+    else if (sel == "tv_previous_old")
+        startPreviousOld();
     else if (sel == "settings appearance")
     {
-        AppearanceSettings *settings = new AppearanceSettings();
-        DialogCode res = settings->exec();
-        delete settings;
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "videogeneralsettings",
+                                      new AppearanceSettings());
 
-        if (kDialogCodeRejected != res)
+        if (ssd->Create())
         {
-            qApp->processEvents();
-            GetMythMainWindow()->JumpTo("Reload Theme");
+            mainStack->AddScreen(ssd);
         }
+        else
+            delete ssd;
     }
     else if (sel == "settings themechooser")
     {
@@ -934,50 +957,129 @@ static void TVMenuCallback(void *data, QString &selection)
     }
     else if (sel == "settings playgroup")
     {
-        PlayGroupEditor editor;
-        editor.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "playbackgroupsetting",
+                                      new PlayGroupEditor());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings general")
     {
-        GeneralSettings settings;
-        settings.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "videogeneralsettings",
+                                      new GeneralSettings());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings audiogeneral")
     {
-        AudioGeneralSettings audiosettings;
-        audiosettings.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new AudioConfigScreen(mainStack, "audiogeneralsettings",
+                                  new AudioConfigSettings());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings maingeneral")
     {
-        MainGeneralSettings mainsettings;
-        mainsettings.exec();
-        QStringList strlist( QString("REFRESH_BACKEND") );
-        gCoreContext->SendReceiveStringList(strlist);
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "maingeneralsettings",
+                                      new MainGeneralSettings());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings playback")
     {
-        PlaybackSettings settings;
-        settings.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new PlaybackSettingsDialog(mainStack);
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings osd")
     {
-        OSDSettings settings;
-        settings.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "osdsettings",
+                                      new OSDSettings());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings epg")
     {
-        EPGSettings settings;
-        settings.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "epgsettings",
+                                      new EPGSettings());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings channelgroups")
     {
-        ChannelGroupEditor editor;
-        editor.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack, "channelgroupssettings",
+                                      new ChannelGroupsSetting());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings generalrecpriorities")
     {
-        GeneralRecPrioritiesSettings settings;
-        settings.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        StandardSettingDialog *ssd =
+            new StandardSettingDialog(mainStack,
+                                      "generalrecprioritiessettings",
+                                      new GeneralRecPrioritiesSettings());
+
+        if (ssd->Create())
+        {
+            mainStack->AddScreen(ssd);
+        }
+        else
+            delete ssd;
     }
     else if (sel == "settings channelrecpriorities")
     {
@@ -1140,6 +1242,8 @@ static void WriteDefaults()
     VideoGeneralSettings vgs;
     vgs.Load();
     vgs.Save();
+    //TODo Playback group not loaded?
+    //TODo Channel group not loaded?
 }
 
 static int internal_play_media(const QString &mrl, const QString &plot,
@@ -1533,17 +1637,17 @@ static int internal_media_init()
     REG_MEDIAPLAYER("Internal", QT_TRANSLATE_NOOP("MythControls",
         "MythTV's native media player."), internal_play_media);
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
+        "MythDVD DVD Media Handler"), "", handleDVDMedia,
         MEDIATYPE_DVD, QString::null);
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythImage Media Handler 1/2"), "", "", handleGalleryMedia,
+        "MythImage Media Handler 1/2"), "", handleGalleryMedia,
         MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
 
     QStringList extensions(ImageAdapterBase::SupportedImages()
                            + ImageAdapterBase::SupportedVideos());
 
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
-        "MythImage Media Handler 2/2"), "", "", handleGalleryMedia,
+        "MythImage Media Handler 2/2"), "", handleGalleryMedia,
         MEDIATYPE_MGALLERY | MEDIATYPE_MVIDEO, extensions.join(","));
     return 0;
 }
@@ -1676,6 +1780,10 @@ int main(int argc, char **argv)
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
 
+#if CONFIG_OMX_RPI
+    setenv("QT_XCB_GL_INTEGRATION","none",0);
+#endif
+
 #ifdef Q_OS_ANDROID
     // extra for 0 termination
     char *newargv[argc+4+1];
@@ -1780,6 +1888,7 @@ int main(int argc, char **argv)
     if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
+        gCoreContext->SetExiting(true);
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -1882,9 +1991,9 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = GetMythMainWindow();
 #if CONFIG_DARWIN
-    mainWindow->Init(QT_PAINTER);
+    mainWindow->Init(QT_PAINTER, false);
 #else
-    mainWindow->Init();
+    mainWindow->Init(QString(), false);
 #endif
     mainWindow->setWindowTitle(qApp->translate("(MythFrontendMain)",
                                                "MythTV Frontend",
@@ -2036,6 +2145,7 @@ int main(int argc, char **argv)
     if (ret==0)
         gContext-> saveSettingsCache();
 
+    DestroyMythUI();
     PreviewGeneratorQueue::TeardownPreviewGeneratorQueue();
 
     delete housekeeping;

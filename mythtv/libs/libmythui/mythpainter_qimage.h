@@ -47,7 +47,7 @@ class MUI_PUBLIC MythQImagePainter : public MythPainter
 
   protected:
     virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
-    virtual void DeleteFormatImagePriv(MythImage *im) { }
+    virtual void DeleteFormatImagePriv(MythImage */*im*/) { }
 
     void CheckPaintMode(const QRect &area);
 

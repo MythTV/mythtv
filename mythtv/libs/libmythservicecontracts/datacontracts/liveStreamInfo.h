@@ -63,15 +63,11 @@ class SERVICE_PUBLIC LiveStreamInfo : public QObject
     PROPERTYIMP    ( QString    , SourceHost       )
     PROPERTYIMP    ( int        , SourceWidth      )
     PROPERTYIMP    ( int        , SourceHeight     )
-    PROPERTYIMP    ( int        , AudioOnlyBitrate )
+    PROPERTYIMP    ( int        , AudioOnlyBitrate );
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-    public:
-
-        LiveStreamInfo(QObject *parent = 0) 
+        explicit LiveStreamInfo(QObject *parent = 0)
             : QObject            ( parent ),
               m_Id               ( 0      ),
               m_Width            ( 0      ),
@@ -90,52 +86,38 @@ class SERVICE_PUBLIC LiveStreamInfo : public QObject
               m_AudioOnlyBitrate ( 0      )
         { 
         }
-        
-        LiveStreamInfo( const LiveStreamInfo &src )
+
+        void Copy( const LiveStreamInfo *src )
         {
-            Copy( src );
+            m_Id                = src->m_Id                ;
+            m_Width             = src->m_Width             ;
+            m_Height            = src->m_Height            ;
+            m_Bitrate           = src->m_Bitrate           ;
+            m_AudioBitrate      = src->m_AudioBitrate      ;
+            m_SegmentSize       = src->m_SegmentSize       ;
+            m_MaxSegments       = src->m_MaxSegments       ;
+            m_StartSegment      = src->m_StartSegment      ;
+            m_CurrentSegment    = src->m_CurrentSegment    ;
+            m_SegmentCount      = src->m_SegmentCount      ;
+            m_PercentComplete   = src->m_PercentComplete   ;
+            m_Created           = src->m_Created           ;
+            m_LastModified      = src->m_LastModified      ;
+            m_RelativeURL       = src->m_RelativeURL       ;
+            m_FullURL           = src->m_FullURL           ;
+            m_StatusStr         = src->m_StatusStr         ;
+            m_StatusInt         = src->m_StatusInt         ;
+            m_StatusMessage     = src->m_StatusMessage     ;
+            m_SourceFile        = src->m_SourceFile        ;
+            m_SourceHost        = src->m_SourceHost        ;
+            m_SourceWidth       = src->m_SourceWidth       ;
+            m_SourceHeight      = src->m_SourceHeight      ;
+            m_AudioOnlyBitrate  = src->m_AudioOnlyBitrate  ;
         }
 
-        void Copy( const LiveStreamInfo &src )
-        {
-            m_Id                = src.m_Id                ;
-            m_Width             = src.m_Width             ;
-            m_Height            = src.m_Height            ;
-            m_Bitrate           = src.m_Bitrate           ;
-            m_AudioBitrate      = src.m_AudioBitrate      ;
-            m_SegmentSize       = src.m_SegmentSize       ;
-            m_MaxSegments       = src.m_MaxSegments       ;
-            m_StartSegment      = src.m_StartSegment      ;
-            m_CurrentSegment    = src.m_CurrentSegment    ;
-            m_SegmentCount      = src.m_SegmentCount      ;
-            m_PercentComplete   = src.m_PercentComplete   ;
-            m_Created           = src.m_Created           ;
-            m_LastModified      = src.m_LastModified      ;
-            m_RelativeURL       = src.m_RelativeURL       ;
-            m_FullURL           = src.m_FullURL           ;
-            m_StatusStr         = src.m_StatusStr         ;
-            m_StatusInt         = src.m_StatusInt         ;
-            m_StatusMessage     = src.m_StatusMessage     ;
-            m_SourceFile        = src.m_SourceFile        ;
-            m_SourceHost        = src.m_SourceHost        ;
-            m_SourceWidth       = src.m_SourceWidth       ;
-            m_SourceHeight      = src.m_SourceHeight      ;
-            m_AudioOnlyBitrate  = src.m_AudioOnlyBitrate  ;
-        }
+    private:
+        Q_DISABLE_COPY(LiveStreamInfo);
 };
 
 } // namespace DTC
-
-Q_DECLARE_METATYPE( DTC::LiveStreamInfo  )
-Q_DECLARE_METATYPE( DTC::LiveStreamInfo* )
-
-namespace DTC
-{
-inline void LiveStreamInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< LiveStreamInfo   >();
-    qRegisterMetaType< LiveStreamInfo*  >();
-}
-}
 
 #endif

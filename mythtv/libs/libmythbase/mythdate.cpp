@@ -66,7 +66,7 @@ MBASE_PUBLIC QDateTime fromTime_t(uint seconds)
 /** \fn toString(const QDateTime&,uint)
  *  \brief Returns a formatted QString based on the supplied QDateTime
  *
- *  \param datetime The QDateTime object to use
+ *  \param raw_dt    The QDateTime object to use
  *  \param format   The format of the string to return
  */
 QString toString(const QDateTime &raw_dt, uint format)
@@ -101,7 +101,7 @@ QString toString(const QDateTime &raw_dt, uint format)
     if (format & kScreenShotFilename)
         return datetime.toString("yyyy-MM-ddThh-mm-ss.zzz");
 
-    if (format & (kDateFull | kDateShort))
+    if (format & kDateEither)
         result += toString(datetime.date(), format);
 
     if (format & kTime)
@@ -128,7 +128,7 @@ QString toString(const QDate &date, uint format)
     if (!date.isValid())
         return result;
 
-    if (format & (kDateFull | kDateShort))
+    if (format & kDateEither)
     {
         QString stringformat;
         if (format & kDateShort)
@@ -169,8 +169,7 @@ QString toString(const QDate &date, uint format)
 
 /** \brief Returns the total number of seconds since midnight of the supplied QTime
  *
- *  \param date     The QDate object to use
- *  \param format   The format of the string to return
+ *  \param time     The QTime object to use
  */
 int toSeconds( const QTime &time )
 {

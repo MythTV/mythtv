@@ -165,7 +165,6 @@ public:
     void run();
 private:
     GLSingleView *m_singleView;
-    bool          m_tex1First;
     QSize         m_screenSize;
     QSize         m_texSize;
 
