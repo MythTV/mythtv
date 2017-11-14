@@ -281,6 +281,28 @@ bool PrivateDecoderOMX::Init(const QString &decoder, PlayerFlags flags,
     }
     avctx->pix_fmt = AV_PIX_FMT_YUV420P; // == FMT_YV12
 
+    // Update input buffers (default is 20 preset in OMX)
+    m_videc.GetPortDef(0);
+    OMX_PARAM_PORTDEFINITIONTYPE &indef = m_videc.PortDef(0);
+    OMX_U32 inputBuffers
+        = OMX_U32(gCoreContext->GetNumSetting("OmxInputBuffers", 30));
+    if (inputBuffers > 0U
+        && inputBuffers != indef.nBufferCountActual
+        && inputBuffers > indef.nBufferCountMin)
+    {
+        indef.nBufferCountActual = inputBuffers;
+        e = m_videc.SetParameter(OMX_IndexParamPortDefinition, &indef);
+        if (e != OMX_ErrorNone)
+        {
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + QString(
+                    "Set input IndexParamPortDefinition error %1")
+                .arg(Error2String(e)));
+            return false;
+        }
+    }
+    m_videc.GetPortDef(0);
+    m_videc.ShowPortDef(0, LOG_INFO);
+
     // Ensure at least 2 output buffers
     OMX_PARAM_PORTDEFINITIONTYPE &def = m_videc.PortDef(1);
     if (def.nBufferCountActual < 2U ||
@@ -296,6 +318,8 @@ bool PrivateDecoderOMX::Init(const QString &decoder, PlayerFlags flags,
             return false;
         }
     }
+    m_videc.GetPortDef(0);
+    m_videc.ShowPortDef(1, LOG_INFO);
 
     // Goto OMX_StateIdle & allocate all buffers
     // This generates an error if fmt.eCompressionFormat is not supported
@@ -812,14 +836,22 @@ int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
         }
     }
 
+    // size is typically 50000 - 70000 but occasionally as low as 2500
+    // or as high as 360000
     while (size > 0)
     {
-        if (!m_ibufs_sema.tryAcquire(1, 10000))
+        if (!m_ibufs_sema.tryAcquire(1, 100))
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " - no input buffers");
+            LOG(VB_GENERAL, LOG_ERR, LOC + __func__ +
+                " Ran out of OMX input buffers, see OmxInputBuffers setting.");
             ret = 0;
             break;
         }
+        int freebuffers = m_ibufs_sema.available();
+        if (freebuffers < 2)
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC + __func__ +
+                QString(" Free OMX input buffers = %1, see OmxInputBuffers setting.")
+                .arg(freebuffers));
         m_lock.lock();
         assert(!m_ibufs.isEmpty());
         OMX_BUFFERHEADERTYPE *hdr = m_ibufs.takeFirst();
