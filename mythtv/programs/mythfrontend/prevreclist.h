@@ -64,7 +64,6 @@ class PrevRecordedList : public ScheduleCommon
     void LoadShowsByDate(void);
 
     ProgramInfo *GetCurrentProgram(void) const;
-    MythMenu *deleteMenu(bool bShow=true);
 
     // Left hand list - titles or dates
     ProgramList m_titleData;

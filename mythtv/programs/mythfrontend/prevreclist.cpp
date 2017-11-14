@@ -485,7 +485,7 @@ bool PrevRecordedList::keyPressEvent(QKeyEvent *e)
         else if (action == "EDIT")
              EditScheduled();
         else if (action == "DELETE")
-             deleteMenu(true);
+             ShowDeleteOldEpisodeMenu();
         else if (action == "DETAILS" || action == "INFO")
              ShowDetails();
         else if (action == "GUIDE")
@@ -597,38 +597,6 @@ void PrevRecordedList::ShowItemMenu(void)
     }
 
     popupStack->AddScreen(menuPopup);
-}
-
-
-
-MythMenu *PrevRecordedList::deleteMenu(bool bShow)
-{
-    ProgramInfo *pi = GetCurrentProgram();
-    if (!pi)
-        return 0;
-    MythMenu *dmenu = new MythMenu(tr("Delete Options"), this, "deletemenu");
-    if (pi->GetRecordingStatus() == RecStatus::Recorded)
-    {
-        if (pi->IsDuplicate())
-            dmenu->AddItem(tr("Allow to Rerecord"),   SLOT(AllowRecord()));
-        else
-            dmenu->AddItem(tr("Prevent From Rerecording"), SLOT(PreventRecord()));
-    }
-    dmenu->AddItem(tr("Remove this episode from the list"),
-        SLOT(ShowDeleteOldEpisodeMenu()));
-    dmenu->AddItem(tr("Remove all episodes for this title"),
-        SLOT(ShowDeleteOldSeriesMenu()));
-    if (!bShow)
-        return dmenu;
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythDialogBox *menuPopup = new MythDialogBox(dmenu, popupStack, "menuPopup");
-    if (!menuPopup->Create())
-    {
-        delete menuPopup;
-        return 0;
-    }
-    popupStack->AddScreen(menuPopup);
-    return 0;
 }
 
 void PrevRecordedList::customEvent(QEvent *event)
