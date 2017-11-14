@@ -1885,6 +1885,7 @@ int main(int argc, char **argv)
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
     gCoreContext->SetAsFrontend(true);
 
+    cmdline.ApplySettingsOverride();
     if (!gContext->Init(true, bPromptForBackend, bBypassAutoDiscovery))
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to init MythContext, exiting.");
