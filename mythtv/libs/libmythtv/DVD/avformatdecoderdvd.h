@@ -15,7 +15,6 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
     virtual void UpdateFramesPlayed(void);
     virtual bool GetFrame(DecodeType decodetype); // DecoderBase
-    virtual void SetLowBuffers(bool low);
 
   protected:
     virtual int  ReadPacket(AVFormatContext *ctx, AVPacket *pkt, bool &storePacket);
@@ -44,7 +43,6 @@ class AvFormatDecoderDVD : public AvFormatDecoder
     uint32_t               m_lbaLastVideoPkt;
     int                    m_framesReq;
     MythDVDContext*        m_returnContext;
-    bool                   m_oldLowBuffers;
 };
 
 #endif // AVFORMATDECODERDVD_H

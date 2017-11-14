@@ -147,7 +147,6 @@ class DecoderBase
     // Must be done while player is paused.
     void SetProgramInfo(const ProgramInfo &pginfo);
 
-    virtual void SetLowBuffers(bool low) { lowbuffers = low; }
     /// Disables AC3/DTS pass through
     virtual void SetDisablePassThrough(bool disable) { (void)disable; }
     // Reconfigure audio as necessary, following configuration change
@@ -338,8 +337,6 @@ class DecoderBase
     bool watchingrecording;
 
     bool hasKeyFrameAdjustTable;
-
-    bool lowbuffers;
 
     bool getrawframes;
     bool getrawvideo;

@@ -616,7 +616,6 @@ class MTV_PUBLIC MythPlayer
     int64_t AVSyncGetAudiotime(void);
     void  SetFrameInterval(FrameScanType scan, double speed);
     void  FallbackDeint(void);
-    void  CheckExtraAudioDecode(void);
 
     // Private LiveTV stuff
     void  SwitchToProgram(void);

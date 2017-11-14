@@ -372,6 +372,8 @@ class AvFormatDecoder : public DecoderBase
     bool  codec_is_mpeg;
     bool  m_processFrames;
     bool  m_streams_changed;
+    // Value in milliseconds, from setting AudioReadAhead
+    int m_audioReadAhead;
 };
 
 #endif

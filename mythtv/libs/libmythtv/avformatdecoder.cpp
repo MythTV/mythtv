@@ -431,9 +431,10 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     cc608_build_parity_table(cc608_parity_table);
 
     SetIdrOnlyKeyframes(true);
+    m_audioReadAhead = gCoreContext->GetNumSetting("AudioReadAhead", 100);
 
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("PlayerFlags: 0x%1")
-        .arg(playerFlags, 0, 16));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PlayerFlags: 0x%1, AudioReadAhead: %2 msec")
+        .arg(playerFlags, 0, 16).arg(m_audioReadAhead));
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -1556,11 +1557,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     if (selectedStream)
     {
         directrendering = true;
-        if (!gCoreContext->GetNumSetting("DecodeExtraAudio", 0) &&
-            !(CODEC_IS_HWACCEL(codec, enc) || codec_is_vdpau(video_codec_id)))
-        {
-            SetLowBuffers(false);
-        }
     }
 
     AVDictionaryEntry *metatag =
@@ -4913,7 +4909,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
             else if ((decodetype & kDecodeAV) == kDecodeAV &&
                      (storedPackets.count() < max_video_queue_size) &&
-                     lastapts < (lowbuffers ? lastvpts + 100 : lastvpts) &&
+                     // buffer audio to prevent audio buffer
+                     // underruns in case you are setting negative values
+                     // in Adjust Audio Sync.
+                     lastapts < lastvpts + m_audioReadAhead &&
                      !ringBuffer->IsInStillFrame())
             {
                 storevideoframes = true;

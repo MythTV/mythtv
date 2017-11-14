@@ -22,7 +22,6 @@ AvFormatDecoderDVD::AvFormatDecoderDVD(
   , m_lbaLastVideoPkt(INVALID_LBA)
   , m_framesReq(0)
   , m_returnContext(NULL)
-  , m_oldLowBuffers(lowbuffers)
 {
 }
 
@@ -63,13 +62,6 @@ void AvFormatDecoderDVD::Reset(bool reset_video_data, bool seek_reset, bool rese
     SyncPositionMap();
 }
 
-void AvFormatDecoderDVD::SetLowBuffers(bool low)
-{
-    if (lowbuffers == m_oldLowBuffers)
-        DecoderBase::SetLowBuffers(low);
-
-    m_oldLowBuffers = low;
-}
 
 void AvFormatDecoderDVD::UpdateFramesPlayed(void)
 {
@@ -151,8 +143,6 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                                 // Make sure no more frames will be buffered
                                 // for the time being and start emptying our
                                 // buffer.
-                                m_oldLowBuffers = lowbuffers;
-                                lowbuffers = false;
 
                                 // Force AvFormatDecoder to stop buffering frames
                                 storePacket = false;
@@ -163,12 +153,6 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
                                 delete storedPkt;
 
                                 return 0;
-                            }
-                            else
-                            {
-                                // Our buffers are empty, frames may be
-                                // buffered again if necessary.
-                                lowbuffers = m_oldLowBuffers;
                             }
                             break;
 

@@ -49,23 +49,20 @@
 //Use for playBackGroup, to be remove at one point
 #include "playgroup.h"
 
-static HostCheckBoxSetting *DecodeExtraAudio()
+static HostSpinBoxSetting *AudioReadAhead()
+// was previously *DecodeExtraAudio()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("DecodeExtraAudio");
+    HostSpinBoxSetting *gc = new HostSpinBoxSetting("AudioReadAhead",0,5000,10,10);
 
-    gc->setLabel(PlaybackSettings::tr("Extra audio buffering"));
+    gc->setLabel(PlaybackSettings::tr("Audio read ahead (ms)"));
 
-    gc->setValue(true);
+    gc->setValue(100);
 
-    gc->setHelpText(PlaybackSettings::tr("Enable this setting if MythTV is "
-                                         "playing \"crackly\" audio. This "
-                                         "setting affects digital tuners "
-                                         "(QAM/DVB/ATSC) and hardware "
-                                         "encoders. It will have no effect on "
-                                         "framegrabbers (MPEG-4/RTJPEG). "
-                                         "MythTV will keep extra audio data in "
-                                         "its internal buffers to workaround "
-                                         "this bug."));
+    gc->setHelpText(PlaybackSettings::tr(
+        "Increase this value if audio cuts out frequently. This is more "
+        "likely to occur when adjusting audio sync to a negative value. "
+        "If using high negative audio sync values you may need to set a large "
+        "value here. Default is 100."));
     return gc;
 }
 
@@ -4000,7 +3997,7 @@ void PlaybackSettings::Load(void)
     GroupSetting* general = new GroupSetting();
     general->setLabel(tr("General Playback"));
     general->addChild(RealtimePriority());
-    general->addChild(DecodeExtraAudio());
+    general->addChild(AudioReadAhead());
     general->addChild(JumpToProgramOSD());
     general->addChild(ClearSavedPosition());
     general->addChild(AltClearSavedPosition());

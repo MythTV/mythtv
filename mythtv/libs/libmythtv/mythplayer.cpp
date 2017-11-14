@@ -507,8 +507,6 @@ bool MythPlayer::InitVideo(void)
         return false;
     }
 
-    CheckExtraAudioDecode();
-
     if (embedding && pipState == kPIPOff)
         videoOutput->EmbedInWidget(embedRect);
 
@@ -518,23 +516,6 @@ bool MythPlayer::InitVideo(void)
     InitFilters();
 
     return true;
-}
-
-void MythPlayer::CheckExtraAudioDecode(void)
-{
-    if (FlagIsSet(kVideoIsNull))
-        return;
-
-    bool force = false;
-    if (videoOutput && videoOutput->NeedExtraAudioDecode())
-    {
-        LOG(VB_GENERAL, LOG_NOTICE, LOC +
-            "Forcing decode extra audio option on (Video method requires it).");
-        force = true;
-    }
-
-    if (decoder)
-        decoder->SetLowBuffers(decode_extra_audio || force);
 }
 
 void MythPlayer::ReinitOSD(void)
@@ -630,7 +611,6 @@ void MythPlayer::ReinitVideo(void)
 
     if (!aspect_only)
     {
-        CheckExtraAudioDecode();
         ClearAfterSeek();
         InitFilters();
     }
@@ -996,7 +976,6 @@ int MythPlayer::OpenFile(uint retries)
     decoder->SetLiveTVMode(livetv);
     decoder->SetWatchingRecording(watchingrecording);
     decoder->SetTranscoding(transcoding);
-    CheckExtraAudioDecode();
 
     // Set 'no_video_decode' to true for audio only decodeing
     bool no_video_decode = false;
@@ -4778,7 +4757,6 @@ void MythPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     if (decoder)
     {
         decoder->SetSeekSnap(0);
-        decoder->SetLowBuffers(true);
     }
 }
 

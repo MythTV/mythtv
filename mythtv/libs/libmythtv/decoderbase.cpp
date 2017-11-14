@@ -37,7 +37,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
 
       seeksnap(UINT64_MAX), livetv(false), watchingrecording(false),
 
-      hasKeyFrameAdjustTable(false), lowbuffers(false),
+      hasKeyFrameAdjustTable(false),
       getrawframes(false), getrawvideo(false),
       errored(false), waitingForChange(false), readAdjust(0),
       justAfterChange(false),
