@@ -1424,7 +1424,7 @@ void MythContextPrivate::processEvents(void)
 const QString MythContextPrivate::settingsToSave[] =
 { "Theme", "Language", "Country", "GuiHeight",
   "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow",
-  "AlwaysOnTop", "HideMouseCursor", "ThemePainter" };
+  "AlwaysOnTop", "HideMouseCursor", "ThemePainter", "libCECEnabled" };
 
 
 bool MythContextPrivate::saveSettingsCache(void)
@@ -1459,6 +1459,8 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
     static const int arraySize = sizeof(settingsToSave)/sizeof(settingsToSave[0]);
     for (int ix = 0; ix < arraySize; ix++)
     {
+        if (!gCoreContext->GetSetting(settingsToSave[ix],QString()).isEmpty())
+            continue;
         QString value = config.GetValue("Settings/"+settingsToSave[ix],QString());
         if (!value.isEmpty())
             gCoreContext->OverrideSettingForSession(settingsToSave[ix], value);
