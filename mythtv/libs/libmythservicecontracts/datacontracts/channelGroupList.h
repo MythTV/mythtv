@@ -29,6 +29,8 @@ class SERVICE_PUBLIC ChannelGroupList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ChannelGroupList(QObject *parent = 0)
             : QObject( parent )
         {
@@ -53,6 +55,13 @@ class SERVICE_PUBLIC ChannelGroupList : public QObject
     private:
         Q_DISABLE_COPY(ChannelGroupList);
 };
+
+inline void ChannelGroupList::InitializeCustomTypes()
+{
+    qRegisterMetaType< ChannelGroupList*  >();
+
+    ChannelGroup::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

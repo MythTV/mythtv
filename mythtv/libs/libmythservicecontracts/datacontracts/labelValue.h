@@ -40,6 +40,8 @@ class SERVICE_PUBLIC LabelValue : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         LabelValue(QObject *parent = 0)
             : QObject       ( parent ),
               m_Label       (       ),
@@ -62,6 +64,11 @@ class SERVICE_PUBLIC LabelValue : public QObject
     private:
         Q_DISABLE_COPY(LabelValue);
 };
+
+inline void LabelValue::InitializeCustomTypes()
+{
+    qRegisterMetaType< LabelValue* >();
+}
 
 } // namespace DTC
 

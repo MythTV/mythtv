@@ -38,6 +38,8 @@ class SERVICE_PUBLIC GenreList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         GenreList(QObject *parent = 0)
             : QObject         ( parent )
         {
@@ -62,6 +64,13 @@ class SERVICE_PUBLIC GenreList : public QObject
     private:
         Q_DISABLE_COPY(GenreList);
 };
+
+inline void GenreList::InitializeCustomTypes()
+{
+    qRegisterMetaType< GenreList* >();
+
+    Genre::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

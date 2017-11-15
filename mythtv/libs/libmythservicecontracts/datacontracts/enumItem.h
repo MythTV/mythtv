@@ -32,6 +32,8 @@ class SERVICE_PUBLIC EnumItem : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         explicit EnumItem( QObject *parent = 0)
           : QObject ( parent ),
             m_Value ( 0      )
@@ -48,6 +50,11 @@ class SERVICE_PUBLIC EnumItem : public QObject
     private:
         Q_DISABLE_COPY(EnumItem);
 };
+
+inline void EnumItem::InitializeCustomTypes()
+{
+    qRegisterMetaType< EnumItem* >();
+}
 
 }  // namespace
 

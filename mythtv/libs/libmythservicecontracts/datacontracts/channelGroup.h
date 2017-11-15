@@ -38,6 +38,8 @@ class SERVICE_PUBLIC ChannelGroup : public QObject
 
     public:
 
+        static void InitializeCustomTypes();
+
         ChannelGroup(QObject *parent = 0)
             : QObject           ( parent ),
               m_GroupId         ( 0      )
@@ -54,6 +56,11 @@ class SERVICE_PUBLIC ChannelGroup : public QObject
     private:
         Q_DISABLE_COPY(ChannelGroup);
 };
+
+inline void ChannelGroup::InitializeCustomTypes()
+{
+    qRegisterMetaType< ChannelGroup*  >();
+}
 
 }
 

@@ -37,6 +37,8 @@ class SERVICE_PUBLIC InputList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         InputList(QObject *parent = 0)
             : QObject( parent )
         {
@@ -61,6 +63,13 @@ class SERVICE_PUBLIC InputList : public QObject
     private:
         Q_DISABLE_COPY(InputList);
 };
+
+inline void InputList::InitializeCustomTypes()
+{
+    qRegisterMetaType< InputList* >();
+
+    Input::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

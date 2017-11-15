@@ -37,6 +37,8 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ConnectionInfo(QObject *parent = 0) 
             : QObject        ( parent ),
               m_Version      ( NULL   ),
@@ -65,6 +67,15 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 };
 
 typedef ConnectionInfo* ConnectionInfoPtr;
+
+inline void ConnectionInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ConnectionInfo*  >();
+
+    VersionInfo ::InitializeCustomTypes();
+    DatabaseInfo::InitializeCustomTypes();
+    WOLInfo     ::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

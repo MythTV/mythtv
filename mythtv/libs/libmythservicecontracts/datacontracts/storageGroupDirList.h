@@ -27,6 +27,8 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         StorageGroupDirList(QObject *parent = 0) 
             : QObject( parent )               
         {
@@ -51,6 +53,13 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
     private:
         Q_DISABLE_COPY(StorageGroupDirList);
 };
+
+inline void StorageGroupDirList::InitializeCustomTypes()
+{
+    qRegisterMetaType< StorageGroupDirList*  >();
+
+    StorageGroupDir::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

@@ -48,6 +48,8 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         VideoLookupList(QObject *parent = 0)
             : QObject( parent ),
               m_Count         ( 0      )
@@ -78,6 +80,13 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
     private:
         Q_DISABLE_COPY(VideoLookupList);
 };
+
+inline void VideoLookupList::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoLookupList* >();
+
+    VideoLookup::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

@@ -18,6 +18,9 @@ namespace DTC
         PROPERTYIMP_RO_REF(QVariantMap, ActionList);
 
       public:
+
+        static inline void InitializeCustomTypes();
+
         explicit FrontendActionList(QObject *parent = 0) : QObject(parent)
         {
         }
@@ -30,6 +33,11 @@ namespace DTC
         private:
         Q_DISABLE_COPY(FrontendActionList);
     };
+inline void FrontendActionList::InitializeCustomTypes()
+{
+    qRegisterMetaType<FrontendActionList*>();
+}
+
 };
 
 #endif // FRONTENDACTIONLIST_H

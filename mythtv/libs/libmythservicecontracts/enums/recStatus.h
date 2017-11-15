@@ -55,10 +55,17 @@ class SERVICE_PUBLIC RecStatus : public QObject
                                  const QDateTime &recstartts);
     public:
 
+        static inline void InitializeCustomTypes();
+
         explicit RecStatus(QObject *parent = 0) : QObject(parent) {}
 
     private:
         Q_DISABLE_COPY(RecStatus)
 };
+
+inline void RecStatus::InitializeCustomTypes()
+{
+    qRegisterMetaType< RecStatus* >();
+}
 
 #endif

@@ -56,6 +56,8 @@ class SERVICE_PUBLIC Encoder : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         Encoder(QObject *parent = 0) 
             : QObject         ( parent ),
               m_Id            ( 0      ),
@@ -99,6 +101,13 @@ class SERVICE_PUBLIC Encoder : public QObject
     private:
         Q_DISABLE_COPY(Encoder);
 };
+
+inline void Encoder::InitializeCustomTypes()
+{
+    qRegisterMetaType< Encoder* >();
+
+    Program::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

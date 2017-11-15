@@ -71,6 +71,8 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ProgramGuide(QObject *parent = 0) 
             : QObject           ( parent ),
               m_Details         ( false  ),
@@ -109,6 +111,13 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
     private:
         Q_DISABLE_COPY(ProgramGuide);
 };
+
+inline void ProgramGuide::InitializeCustomTypes()
+{
+    qRegisterMetaType< ProgramGuide* >();
+
+    ChannelInfo::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

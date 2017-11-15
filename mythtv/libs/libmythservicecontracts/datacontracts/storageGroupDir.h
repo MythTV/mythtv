@@ -34,6 +34,8 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         StorageGroupDir(QObject *parent = 0) 
             : QObject         ( parent ),
               m_Id            ( 0      ),
@@ -57,6 +59,11 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
     private:
         Q_DISABLE_COPY(StorageGroupDir);
 };
+
+inline void StorageGroupDir::InitializeCustomTypes()
+{
+    qRegisterMetaType< StorageGroupDir*  >();
+}
 
 } // namespace DTC
 

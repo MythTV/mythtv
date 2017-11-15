@@ -61,6 +61,8 @@ class SERVICE_PUBLIC MusicMetadataInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         MusicMetadataInfo(QObject *parent = 0)
                         : QObject         ( parent ),
                           m_Id            ( 0      ),
@@ -92,6 +94,11 @@ class SERVICE_PUBLIC MusicMetadataInfo : public QObject
             m_Compilation        = src->m_Compilation;
         }
 };
+
+inline void MusicMetadataInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< MusicMetadataInfo* >();
+}
 
 } // namespace DTC
 

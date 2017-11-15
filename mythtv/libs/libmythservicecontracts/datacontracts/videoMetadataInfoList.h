@@ -56,6 +56,8 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         VideoMetadataInfoList(QObject *parent = 0)
             : QObject( parent ),
               m_StartIndex    ( 0      ),
@@ -92,6 +94,13 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
     private:
         Q_DISABLE_COPY(VideoMetadataInfoList);
 };
+
+inline void VideoMetadataInfoList::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoMetadataInfoList* >();
+
+    VideoMetadataInfo::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

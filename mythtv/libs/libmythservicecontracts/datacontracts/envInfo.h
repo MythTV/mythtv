@@ -39,6 +39,8 @@ class SERVICE_PUBLIC EnvInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         EnvInfo(QObject *parent = 0)
             : QObject       ( parent ),
               m_LANG        ( ""     ),
@@ -63,6 +65,11 @@ class SERVICE_PUBLIC EnvInfo : public QObject
 };
 
 typedef EnvInfo* EnvInfoPtr;
+
+inline void EnvInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< EnvInfo* >();
+}
 
 } // namespace DTC
 

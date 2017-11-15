@@ -40,6 +40,8 @@ class SERVICE_PUBLIC VersionInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         VersionInfo(QObject *parent = 0)
             : QObject   ( parent ),
               m_Version ( ""     ),
@@ -64,6 +66,11 @@ class SERVICE_PUBLIC VersionInfo : public QObject
 };
 
 typedef VersionInfo* VersionInfoPtr;
+
+inline void VersionInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< VersionInfo*  >();
+}
 
 } // namespace DTC
 

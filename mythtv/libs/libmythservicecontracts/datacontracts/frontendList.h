@@ -37,6 +37,8 @@ class SERVICE_PUBLIC FrontendList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         FrontendList(QObject *parent = 0)
             : QObject( parent )
         {
@@ -61,6 +63,13 @@ class SERVICE_PUBLIC FrontendList : public QObject
     private:
         Q_DISABLE_COPY(FrontendList);
 };
+
+inline void FrontendList::InitializeCustomTypes()
+{
+    qRegisterMetaType< FrontendList* >();
+
+    Frontend::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

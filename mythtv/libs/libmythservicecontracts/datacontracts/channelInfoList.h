@@ -46,6 +46,8 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
 
     public:
 
+        static void InitializeCustomTypes();
+
         ChannelInfoList(QObject *parent = 0)
             : QObject( parent ),
               m_StartIndex    ( 0      ),
@@ -82,6 +84,13 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
     private:
         Q_DISABLE_COPY(ChannelInfoList);
 };
+
+inline void ChannelInfoList::InitializeCustomTypes()
+{
+    qRegisterMetaType< ChannelInfoList*  >();
+
+    ChannelInfo::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

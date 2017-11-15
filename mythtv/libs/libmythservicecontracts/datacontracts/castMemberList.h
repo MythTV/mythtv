@@ -29,6 +29,8 @@ class SERVICE_PUBLIC CastMemberList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         CastMemberList(QObject *parent = 0)
             : QObject( parent )
         {
@@ -53,6 +55,13 @@ class SERVICE_PUBLIC CastMemberList : public QObject
     private:
         Q_DISABLE_COPY(CastMemberList);
 };
+
+inline void CastMemberList::InitializeCustomTypes()
+{
+    qRegisterMetaType< CastMemberList*  >();
+
+    CastMember::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

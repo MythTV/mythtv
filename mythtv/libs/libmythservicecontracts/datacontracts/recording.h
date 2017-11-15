@@ -76,6 +76,8 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         RecordingInfo(QObject *parent = 0) 
             : QObject           ( parent             ),
               m_RecordedId      ( 0                  ),
@@ -118,6 +120,13 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     private:
         Q_DISABLE_COPY(RecordingInfo);
 };
+
+inline void RecordingInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< RecordingInfo* >();
+
+    RecStatus::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

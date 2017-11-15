@@ -38,6 +38,8 @@ class SERVICE_PUBLIC CutList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         CutList(QObject *parent = 0)
             : QObject         ( parent )
         {
@@ -62,6 +64,13 @@ class SERVICE_PUBLIC CutList : public QObject
     private:
         Q_DISABLE_COPY(CutList);
 };
+
+inline void CutList::InitializeCustomTypes()
+{
+    qRegisterMetaType< CutList* >();
+
+    Cutting::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

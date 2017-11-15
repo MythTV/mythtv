@@ -40,6 +40,8 @@ class SERVICE_PUBLIC Enum : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         explicit Enum(QObject *parent = 0)
             : QObject( parent )
         {
@@ -66,6 +68,13 @@ class SERVICE_PUBLIC Enum : public QObject
     private:
         Q_DISABLE_COPY(Enum);
 };
+
+inline void Enum::InitializeCustomTypes()
+{
+    qRegisterMetaType< Enum* >();
+
+    EnumItem::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

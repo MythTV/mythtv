@@ -51,8 +51,18 @@ class SERVICE_PUBLIC ChannelServices : public Service
 
     public:
 
+        // Must call InitializeCustomTypes for each unique Custom Type used
+        // in public slots below.
+
         ChannelServices( QObject *parent = 0 ) : Service( parent )
         {
+            DTC::ChannelInfoList::InitializeCustomTypes();
+            DTC::VideoSource::InitializeCustomTypes();
+            DTC::VideoSourceList::InitializeCustomTypes();
+            DTC::VideoMultiplex::InitializeCustomTypes();
+            DTC::VideoMultiplexList::InitializeCustomTypes();
+            DTC::Lineup::InitializeCustomTypes();
+            DTC::LineupList::InitializeCustomTypes();
         }
 
     public slots:

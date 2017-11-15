@@ -43,6 +43,8 @@ class SERVICE_PUBLIC RecRuleList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         RecRuleList(QObject *parent = 0)
             : QObject          ( parent ),
               m_StartIndex     ( 0      ),
@@ -74,6 +76,13 @@ class SERVICE_PUBLIC RecRuleList : public QObject
     private:
         Q_DISABLE_COPY(RecRuleList);
 };
+
+inline void RecRuleList::InitializeCustomTypes()
+{
+    qRegisterMetaType< RecRuleList*  >();
+
+    RecRule::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

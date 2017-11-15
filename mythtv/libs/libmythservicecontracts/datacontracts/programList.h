@@ -54,6 +54,8 @@ class SERVICE_PUBLIC ProgramList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ProgramList(QObject *parent = 0) 
             : QObject         ( parent ),
               m_StartIndex    ( 0      ),
@@ -88,6 +90,13 @@ class SERVICE_PUBLIC ProgramList : public QObject
     private:
         Q_DISABLE_COPY(ProgramList);
 };
+
+inline void ProgramList::InitializeCustomTypes()
+{
+    qRegisterMetaType< ProgramList* >();
+
+    Program::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

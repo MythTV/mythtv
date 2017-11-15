@@ -50,6 +50,8 @@ class SERVICE_PUBLIC Input : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         Input(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      ),
@@ -79,6 +81,11 @@ class SERVICE_PUBLIC Input : public QObject
     private:
         Q_DISABLE_COPY(Input);
 };
+
+inline void Input::InitializeCustomTypes()
+{
+    qRegisterMetaType< Input* >();
+}
 
 } // namespace DTC
 

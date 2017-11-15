@@ -37,6 +37,8 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         CaptureCardList(QObject *parent = 0)
             : QObject( parent )
         {
@@ -61,6 +63,12 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
     private:
         Q_DISABLE_COPY(CaptureCardList);
 };
+
+inline void CaptureCardList::InitializeCustomTypes()
+{
+    qRegisterMetaType< CaptureCardList* >();
+    CaptureCard::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

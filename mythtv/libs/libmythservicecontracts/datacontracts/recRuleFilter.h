@@ -25,6 +25,8 @@ class SERVICE_PUBLIC RecRuleFilter : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         RecRuleFilter(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      )
@@ -40,6 +42,11 @@ class SERVICE_PUBLIC RecRuleFilter : public QObject
     private:
         Q_DISABLE_COPY(RecRuleFilter);
 };
+
+inline void RecRuleFilter::InitializeCustomTypes()
+{
+    qRegisterMetaType< RecRuleFilter*  >();
+}
 
 } // namespace DTC
 

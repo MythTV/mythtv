@@ -34,6 +34,8 @@ class SERVICE_PUBLIC LogMessageList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         LogMessageList(QObject *parent = 0)
             : QObject( parent )
         {
@@ -85,6 +87,13 @@ class SERVICE_PUBLIC LogMessageList : public QObject
     private:
         Q_DISABLE_COPY(LogMessageList);
 };
+
+inline void LogMessageList::InitializeCustomTypes()
+{
+    qRegisterMetaType< LogMessageList*  >();
+
+    LogMessage::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

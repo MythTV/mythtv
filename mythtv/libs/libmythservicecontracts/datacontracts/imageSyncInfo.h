@@ -26,6 +26,8 @@ class SERVICE_PUBLIC ImageSyncInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ImageSyncInfo(QObject *parent = 0)
                         : QObject         ( parent ),
                           m_Running       ( false  ),
@@ -44,6 +46,11 @@ class SERVICE_PUBLIC ImageSyncInfo : public QObject
     private:
         Q_DISABLE_COPY(ImageSyncInfo);
 };
+
+inline void ImageSyncInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ImageSyncInfo* >();
+}
 
 } // namespace DTC
 

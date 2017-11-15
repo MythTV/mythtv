@@ -35,6 +35,8 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         TimeZoneInfo(QObject *parent = 0)
             : QObject             ( parent ),
               m_TimeZoneID        (        ),
@@ -53,6 +55,11 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
     private:
         Q_DISABLE_COPY(TimeZoneInfo);
 };
+
+inline void TimeZoneInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< TimeZoneInfo* >();
+}
 
 } // namespace DTC
 

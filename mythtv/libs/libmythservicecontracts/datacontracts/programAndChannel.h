@@ -89,6 +89,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
     public:
 
+        static void InitializeCustomTypes();
+
         ChannelInfo(QObject *parent = 0) 
             : QObject           ( parent ),
               m_ChanId          ( 0      ),
@@ -217,6 +219,8 @@ class SERVICE_PUBLIC Program : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         Program(QObject *parent = 0) 
             : QObject               ( parent ),
               m_Repeat              ( false  ),
@@ -299,6 +303,31 @@ inline Program *ChannelInfo::AddNewProgram()
     m_Programs.append( QVariant::fromValue<QObject *>( pObject ));
 
     return pObject;
+}
+
+inline void ChannelInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ChannelInfo* >();
+
+    if (QMetaType::type( "DTC::Program*" ) == 0)
+        Program::InitializeCustomTypes();
+}
+
+inline void Program::InitializeCustomTypes()
+{
+    qRegisterMetaType< Program* >();
+
+    if (QMetaType::type( "DTC::ChannelInfo*" ) == 0)
+        ChannelInfo::InitializeCustomTypes();
+
+    if (QMetaType::type( "DTC::RecordingInfo*" ) == 0)
+        RecordingInfo::InitializeCustomTypes();
+
+    if (QMetaType::type( "DTC::ArtworkInfoList*" ) == 0)
+        ArtworkInfoList::InitializeCustomTypes();
+
+     if (QMetaType::type( "DTC::CastMemberList*" ) == 0)
+        CastMemberList::InitializeCustomTypes();
 }
 
 } // namespace DTC

@@ -47,6 +47,8 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         VideoMultiplexList(QObject *parent = 0)
             : QObject( parent ),
               m_StartIndex      ( 0       ),
@@ -80,6 +82,13 @@ class SERVICE_PUBLIC VideoMultiplexList : public QObject
     private:
         Q_DISABLE_COPY(VideoMultiplexList);
 };
+
+inline void VideoMultiplexList::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoMultiplexList*  >();
+
+    VideoMultiplex::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

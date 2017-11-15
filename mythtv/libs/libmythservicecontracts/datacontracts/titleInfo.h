@@ -36,6 +36,8 @@ class SERVICE_PUBLIC TitleInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         TitleInfo(QObject *parent = 0) 
             : QObject            ( parent ),
               m_Count(0)
@@ -52,6 +54,11 @@ class SERVICE_PUBLIC TitleInfo : public QObject
     private:
         Q_DISABLE_COPY(TitleInfo);
 };
+
+inline void TitleInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< TitleInfo*  >();
+}
 
 } // namespace DTC
 

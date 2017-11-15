@@ -38,6 +38,8 @@ class SERVICE_PUBLIC WOLInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         WOLInfo(QObject *parent = 0) 
             : QObject    ( parent ),
               m_Enabled  ( false  ),
@@ -59,6 +61,11 @@ class SERVICE_PUBLIC WOLInfo : public QObject
 };
 
 typedef WOLInfo* WOLInfoPtr;
+
+inline void WOLInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< WOLInfo*  >();
+}
 
 } // namespace DTC
 

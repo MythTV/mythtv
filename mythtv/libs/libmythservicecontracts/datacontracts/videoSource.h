@@ -40,6 +40,8 @@ class SERVICE_PUBLIC VideoSource : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         VideoSource(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      ),
@@ -65,6 +67,11 @@ class SERVICE_PUBLIC VideoSource : public QObject
     private:
         Q_DISABLE_COPY(VideoSource);
 };
+
+inline void VideoSource::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoSource*  >();
+}
 
 } // namespace DTC
 

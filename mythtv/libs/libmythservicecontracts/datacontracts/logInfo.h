@@ -32,6 +32,8 @@ class SERVICE_PUBLIC LogInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         LogInfo(QObject *parent = 0)
             : QObject    ( parent ),
               m_LogArgs  ( ""     )
@@ -48,6 +50,11 @@ class SERVICE_PUBLIC LogInfo : public QObject
 };
 
 typedef LogInfo* LogInfoPtr;
+
+inline void LogInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< LogInfo* >();
+}
 
 } // namespace DTC
 

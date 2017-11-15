@@ -70,6 +70,8 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         BlurayInfo(QObject *parent = 0)
                  : QObject                ( parent    ),
                    m_Path                 ( QString() ),
@@ -122,6 +124,11 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
     private:
         Q_DISABLE_COPY(BlurayInfo);
 };
+
+inline void BlurayInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< BlurayInfo* >();
+}
 
 } // namespace DTC
 

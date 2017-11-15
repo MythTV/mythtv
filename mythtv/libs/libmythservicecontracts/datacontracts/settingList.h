@@ -38,6 +38,8 @@ class SERVICE_PUBLIC SettingList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         SettingList(QObject *parent = 0) 
             : QObject( parent )               
         {
@@ -52,6 +54,11 @@ class SERVICE_PUBLIC SettingList : public QObject
     private:
         Q_DISABLE_COPY(SettingList);
 };
+
+inline void SettingList::InitializeCustomTypes()
+{
+    qRegisterMetaType< SettingList* >();
+}
 
 } // namespace DTC
 

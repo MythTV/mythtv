@@ -35,6 +35,8 @@ class SERVICE_PUBLIC BuildInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         BuildInfo(QObject *parent = 0)
             : QObject    ( parent ),
               m_Version  ( ""     ),
@@ -55,6 +57,11 @@ class SERVICE_PUBLIC BuildInfo : public QObject
 };
 
 typedef BuildInfo* BuildInfoPtr;
+
+inline void BuildInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< BuildInfo* >();
+}
 
 } // namespace DTC
 

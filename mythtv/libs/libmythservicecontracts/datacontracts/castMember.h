@@ -40,6 +40,8 @@ class SERVICE_PUBLIC CastMember : public QObject
 
     public:
 
+        static void InitializeCustomTypes();
+
         CastMember(QObject *parent = 0)
             : QObject           ( parent )
         {
@@ -56,6 +58,11 @@ class SERVICE_PUBLIC CastMember : public QObject
     private:
         Q_DISABLE_COPY(CastMember);
 };
+
+inline void CastMember::InitializeCustomTypes()
+{
+    qRegisterMetaType< CastMember*  >();
+}
 
 }
 

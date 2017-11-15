@@ -38,6 +38,8 @@ class SERVICE_PUBLIC ArtworkInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ArtworkInfo(QObject *parent = 0)
             : QObject         ( parent )
         {
@@ -54,6 +56,11 @@ class SERVICE_PUBLIC ArtworkInfo : public QObject
     private:
         Q_DISABLE_COPY(ArtworkInfo);
 };
+
+inline void ArtworkInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< ArtworkInfo* >();
+}
 
 } // namespace DTC
 

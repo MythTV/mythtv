@@ -41,6 +41,8 @@ class SERVICE_PUBLIC ArtworkItem : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ArtworkItem(QObject *parent = 0)
                         : QObject         ( parent )
         {
@@ -120,6 +122,8 @@ class SERVICE_PUBLIC VideoLookup : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         VideoLookup(QObject *parent = 0)
                         : QObject         ( parent )
         {
@@ -167,6 +171,18 @@ class SERVICE_PUBLIC VideoLookup : public QObject
         }
 
 };
+
+inline void ArtworkItem::InitializeCustomTypes()
+{
+    qRegisterMetaType< ArtworkItem*   >();
+}
+
+inline void VideoLookup::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoLookup* >();
+
+    ArtworkItem::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

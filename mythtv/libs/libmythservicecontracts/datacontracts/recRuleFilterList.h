@@ -44,6 +44,8 @@ class SERVICE_PUBLIC RecRuleFilterList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         RecRuleFilterList(QObject *parent = 0)
             : QObject          ( parent ),
               m_StartIndex     ( 0      ),
@@ -75,6 +77,13 @@ class SERVICE_PUBLIC RecRuleFilterList : public QObject
     private:
         Q_DISABLE_COPY(RecRuleFilterList);
 };
+
+inline void RecRuleFilterList::InitializeCustomTypes()
+{
+    qRegisterMetaType< RecRuleFilterList*  >();
+
+    RecRuleFilter::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

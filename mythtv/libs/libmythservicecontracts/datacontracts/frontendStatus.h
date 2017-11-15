@@ -31,6 +31,9 @@ namespace DTC
         PROPERTYIMP_RO_REF(QVariantMap, AudioTracks)
 
       public:
+
+        static inline void InitializeCustomTypes();
+
         explicit FrontendStatus(QObject *parent = 0) : QObject(parent)
         {
         }
@@ -72,6 +75,11 @@ namespace DTC
     private:
         Q_DISABLE_COPY(FrontendStatus);
     };
+inline void FrontendStatus::InitializeCustomTypes()
+{
+    qRegisterMetaType<FrontendStatus*>();
+}
+
 };
 
 #endif // FRONTENDSTATUS_H

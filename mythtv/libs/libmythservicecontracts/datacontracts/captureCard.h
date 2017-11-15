@@ -80,6 +80,8 @@ class SERVICE_PUBLIC CaptureCard : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         CaptureCard(QObject *parent = 0)
             : QObject         ( parent ), m_CardId(0),
             m_AudioRateLimit(0), m_DVBSWFilter(0),
@@ -124,6 +126,11 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     private:
         Q_DISABLE_COPY(CaptureCard);
 };
+
+inline void CaptureCard::InitializeCustomTypes()
+{
+    qRegisterMetaType< CaptureCard* >();
+}
 
 } // namespace DTC
 

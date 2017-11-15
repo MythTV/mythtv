@@ -33,6 +33,8 @@ class SERVICE_PUBLIC Cutting : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         Cutting(QObject *parent = 0)
             : QObject( parent ), m_Mark(0), m_Offset(0)
         {
@@ -47,6 +49,11 @@ class SERVICE_PUBLIC Cutting : public QObject
     private:
         Q_DISABLE_COPY(Cutting);
 };
+
+inline void Cutting::InitializeCustomTypes()
+{
+    qRegisterMetaType< Cutting* >();
+}
 
 } // namespace DTC
 

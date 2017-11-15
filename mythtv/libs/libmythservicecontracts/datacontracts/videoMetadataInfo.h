@@ -111,6 +111,8 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         VideoMetadataInfo(QObject *parent = 0)
                         : QObject         ( parent ),
                           m_Id            ( 0      ),
@@ -155,6 +157,20 @@ class SERVICE_PUBLIC VideoMetadataInfo : public QObject
     private:
         Q_DISABLE_COPY(VideoMetadataInfo);
 };
+
+inline void VideoMetadataInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< VideoMetadataInfo* >();
+
+    if (QMetaType::type( "DTC::ArtworkInfoList*" ) == 0)
+        ArtworkInfoList::InitializeCustomTypes();
+
+    if (QMetaType::type( "DTC::CastMemberList*" ) == 0)
+        CastMemberList::InitializeCustomTypes();
+
+    if (QMetaType::type( "DTC::GenreMemberList*" ) == 0)
+        GenreList::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

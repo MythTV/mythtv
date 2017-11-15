@@ -27,6 +27,8 @@ class SERVICE_PUBLIC LiveStreamInfoList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         explicit LiveStreamInfoList(QObject *parent = 0)
             : QObject( parent )               
         {
@@ -51,6 +53,13 @@ class SERVICE_PUBLIC LiveStreamInfoList : public QObject
     private:
         Q_DISABLE_COPY(LiveStreamInfoList);
 };
+
+inline void LiveStreamInfoList::InitializeCustomTypes()
+{
+    qRegisterMetaType< LiveStreamInfoList*  >();
+
+    LiveStreamInfo::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

@@ -46,6 +46,8 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         DatabaseInfo(QObject *parent = 0) 
             : QObject       ( parent ),
               m_Ping        ( false  ),
@@ -72,6 +74,11 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
 };
 
 typedef DatabaseInfo * DatabaseInfoPtr;
+
+inline void DatabaseInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< DatabaseInfo*  >();
+}
 
 } // namespace DTC
 

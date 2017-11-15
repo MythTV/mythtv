@@ -38,6 +38,8 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         ImageMetadataInfoList(QObject *parent = 0)
             : QObject( parent ),
               m_Count         ( 0      ),
@@ -69,6 +71,13 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
     private:
         Q_DISABLE_COPY(ImageMetadataInfoList);
 };
+
+inline void ImageMetadataInfoList::InitializeCustomTypes()
+{
+    qRegisterMetaType< ImageMetadataInfoList* >();
+
+    ImageMetadataInfo::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

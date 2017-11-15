@@ -43,8 +43,12 @@ class SERVICE_PUBLIC MusicServices : public Service  //, public QScriptable ???
 
     public:
 
+        // Must call InitializeCustomTypes for each unique Custom Type used
+        // in public slots below.
+
         MusicServices( QObject *parent = 0 ) : Service( parent )
         {
+            DTC::MusicMetadataInfoList::InitializeCustomTypes();
         }
 
     public slots:

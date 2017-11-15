@@ -37,6 +37,8 @@ class SERVICE_PUBLIC BackendInfo : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         BackendInfo(QObject *parent = 0)
             : QObject   ( parent ),
               m_Build   ( NULL   ),
@@ -66,6 +68,15 @@ class SERVICE_PUBLIC BackendInfo : public QObject
 };
 
 typedef BackendInfo* BackendInfoPtr;
+
+inline void BackendInfo::InitializeCustomTypes()
+{
+    qRegisterMetaType< BackendInfo* >();
+
+    BuildInfo::InitializeCustomTypes();
+    EnvInfo  ::InitializeCustomTypes();
+    LogInfo  ::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

@@ -42,6 +42,8 @@ class SERVICE_PUBLIC Lineup : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         Lineup(QObject *parent = 0)
             : QObject         ( parent )
         {
@@ -77,6 +79,8 @@ class SERVICE_PUBLIC LineupList : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         LineupList(QObject *parent = 0)
             : QObject( parent )
         {
@@ -99,6 +103,18 @@ class SERVICE_PUBLIC LineupList : public QObject
         }
 
 };
+
+inline void Lineup::InitializeCustomTypes()
+{
+    qRegisterMetaType< Lineup* >();
+}
+
+inline void LineupList::InitializeCustomTypes()
+{
+    qRegisterMetaType< LineupList* >();
+
+    Lineup::InitializeCustomTypes();
+}
 
 } // namespace DTC
 

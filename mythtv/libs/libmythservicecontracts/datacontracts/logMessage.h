@@ -59,6 +59,8 @@ class SERVICE_PUBLIC LogMessage : public QObject
 
     public:
 
+        static inline void InitializeCustomTypes();
+
         LogMessage(QObject *parent = 0)
             : QObject       ( parent ),
               m_HostName    (        ),
@@ -93,6 +95,11 @@ class SERVICE_PUBLIC LogMessage : public QObject
     private:
         Q_DISABLE_COPY(LogMessage);
 };
+
+inline void LogMessage::InitializeCustomTypes()
+{
+    qRegisterMetaType< LogMessage* >();
+}
 
 } // namespace DTC
 
