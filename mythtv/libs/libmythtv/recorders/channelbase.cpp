@@ -400,6 +400,8 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
     device = NULL;
     return true;
 #else
+    Q_UNUSED(freqid);
+    Q_UNUSED(inputid);
     return false;
 #endif
 }
@@ -701,6 +703,8 @@ ChannelBase *ChannelBase::CreateChannel(
     {
 #ifdef USING_FIREWIRE
         channel = new FirewireChannel(tvrec, genOpt.videodev, fwOpt);
+#else
+        Q_UNUSED(fwOpt);
 #endif
     }
     else if (genOpt.inputtype == "HDHOMERUN")
