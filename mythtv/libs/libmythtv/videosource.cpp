@@ -1345,6 +1345,7 @@ class FirewireSpeed : public MythUIComboBoxSetting
     }
 };
 
+#ifdef USING_FIREWIRE
 static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 {
     FirewireGUID  *dev(new FirewireGUID(parent));
@@ -1371,6 +1372,7 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
     QObject::connect(dev,   SIGNAL(valueChanged(const QString&)),
                      desc,  SLOT(  SetGUID(     const QString&)));
 }
+#endif
 
 // -----------------------
 // HDHomeRun Configuration
