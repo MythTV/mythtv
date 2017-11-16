@@ -184,7 +184,7 @@ class Scheduler : public MThread, public MythScheduler
     bool ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp);
 
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
-                             bool &blockShutdown, int logmask);
+                             bool &blockShutdown, uint logmask);
     void ShutdownServer(int prerollseconds, QDateTime &idleSince);
     void PutInactiveSlavesToSleep(void);
     bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);

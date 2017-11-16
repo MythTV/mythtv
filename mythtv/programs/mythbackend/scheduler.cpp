@@ -3092,7 +3092,7 @@ void Scheduler::HandleIdleShutdown(
     bool &statuschanged)
 {
     // To ensure that one idle message is logged per 15 minutes
-    int logmask = VB_IDLE;
+    uint logmask = VB_IDLE;
     int tm = QTime::currentTime().msecsSinceStartOfDay() / 900000;
     if (tm != tmLastLog)
     {
@@ -3285,7 +3285,7 @@ void Scheduler::HandleIdleShutdown(
 
 //returns true, if the shutdown is not blocked
 bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
-                                    bool &blockShutdown, int logmask)
+                                    bool &blockShutdown, uint logmask)
 {
     (void)prerollseconds;
     bool retval = false;
