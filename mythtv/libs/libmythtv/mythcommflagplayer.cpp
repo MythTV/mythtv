@@ -164,7 +164,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                 else if (percentage % 10 == 0 && prevperc != percentage)
                 {
                     prevperc = percentage;
-                    LOG(VB_GENERAL, LOG_INFO, QString("Progress %1% @ %2fps")
+                    LOG(VB_COMMFLAG, LOG_INFO, QString("Progress %1% @ %2fps")
                         .arg(percentage,3).arg(flagFPS,5));
                 }
             }
@@ -177,7 +177,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(
                 }
                 else if (myFramesPlayed % 1000 == 0)
                 {
-                    LOG(VB_GENERAL, LOG_INFO, QString("Frames processed %1")
+                    LOG(VB_COMMFLAG, LOG_INFO, QString("Frames processed %1")
                         .arg(myFramesPlayed));
                 }
             }
