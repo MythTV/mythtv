@@ -156,8 +156,7 @@ MythGenericTree* MythGenericTree::findLeaf()
     return this;
 }
 
-MythGenericTree* MythGenericTree::findNode(QList<int> route_of_branches,
-                                           int depth)
+MythGenericTree* MythGenericTree::findNode(QList<int> route_of_branches)
 {
     // Starting from *this* node (which will often be root) find a set of
     // branches that have id's that match the collection passed in

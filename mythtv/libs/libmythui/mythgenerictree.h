@@ -39,7 +39,7 @@ class MUI_PUBLIC MythGenericTree
     void deleteNode(MythGenericTree *child);
 
     MythGenericTree *findLeaf();
-    MythGenericTree* findNode(QList<int> route_of_branches, int depth=-1);
+    MythGenericTree* findNode(QList<int> route_of_branches);
 
     MythGenericTree *nextSibling(int number_down);
     MythGenericTree *prevSibling(int number_up);
