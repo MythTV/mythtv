@@ -237,6 +237,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     /// \brief Returns the inputid
     uint GetInputId(void) { return inputid; }
+    uint GetParentId(void) { return parentid; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
@@ -265,6 +266,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void WakeEventLoop(void);
 
     static bool GetDevices(uint inputid,
+                           uint &parentid,
                            GeneralDBOptions   &general_opts,
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
@@ -373,6 +375,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     // Configuration variables from setup routines
     uint              inputid;
+    uint              parentid;
     bool              ispip;
 
     // Configuration variables from database, based on inputid

@@ -107,7 +107,8 @@ class ChannelBase
         const FireWireDBOptions  &fwOpt,
         const QString            &startchannel,
         bool                      enter_power_save_mode,
-        QString                  &rbFileExt);
+        QString                  &rbFileExt,
+        bool                      setchan);
 
   protected:
     /// \brief Switches to another input on hardware,

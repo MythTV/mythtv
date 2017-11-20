@@ -100,7 +100,7 @@ TVRec::TVRec(int _inputid)
       overRecordSecNrml(0),         overRecordSecCat(0),
       overRecordCategory(""),
       // Configuration variables from setup rutines
-      inputid(_inputid), ispip(false),
+      inputid(_inputid), parentid(0), ispip(false),
       // State variables
       stateChangeLock(QMutex::Recursive),
       pendingRecLock(QMutex::Recursive),
@@ -133,9 +133,18 @@ bool TVRec::CreateChannel(const QString &startchannel,
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("CreateChannel(%1)")
         .arg(startchannel));
+    // If this recorder is a child and its parent is not in error, we
+    // do not need nor want to set the channel.
+    bool setchan = true;
+    if (parentid)
+    {
+        TVRec *parentTV = GetTVRec(parentid);
+        if (parentTV && parentTV->GetState() == kState_Error)
+            setchan = false;
+    }
     channel = ChannelBase::CreateChannel(
         this, genOpt, dvbOpt, fwOpt,
-        startchannel, enter_power_save_mode, rbFileExt);
+        startchannel, enter_power_save_mode, rbFileExt, setchan);
 
     if (genOpt.inputtype == "VBOX")
     {
@@ -166,7 +175,7 @@ bool TVRec::Init(void)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (!GetDevices(inputid, genOpt, dvbOpt, fwOpt))
+    if (!GetDevices(inputid, parentid, genOpt, dvbOpt, fwOpt))
         return false;
 
     SetRecordingStatus(RecStatus::Unknown, __LINE__);
@@ -1635,6 +1644,7 @@ void TVRec::HandlePendingRecordings(void)
 }
 
 bool TVRec::GetDevices(uint inputid,
+                       uint &parentid,
                        GeneralDBOptions   &gen_opts,
                        DVBDBOptions       &dvb_opts,
                        FireWireDBOptions  &firewire_opts)
@@ -1651,7 +1661,8 @@ bool TVRec::GetDevices(uint inputid,
         ""
         "       dvb_on_demand,    dvb_tuning_delay,    dvb_eitscan,"
         ""
-        "       firewire_speed,   firewire_model,      firewire_connection "
+        "       firewire_speed,   firewire_model,      firewire_connection, "
+        "       parentid "
         ""
         "FROM capturecard "
         "WHERE cardid = :INPUTID");
@@ -1713,6 +1724,8 @@ bool TVRec::GetDevices(uint inputid,
         firewire_opts.model = test;
 
     firewire_opts.connection  = query.value(fireoff + 2).toUInt();
+
+    parentid = query.value(15).toUInt();
 
     return true;
 }
@@ -3606,6 +3619,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
     QString channum, inputname;
     uint newInputID = TuningCheckForHWChange(request, channum, inputname);
+    uint dummyParentID;
 
     if (scanner && !(request.flags & kFlagEITScan) &&
         HasFlags(kFlagEITScannerRunning))
@@ -3670,7 +3684,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         delete channel;
         channel = NULL;
 
-        GetDevices(newInputID, genOpt, dvbOpt, fwOpt);
+        GetDevices(newInputID, dummyParentID, genOpt, dvbOpt, fwOpt);
         CreateChannel(channum, false);
     }
 

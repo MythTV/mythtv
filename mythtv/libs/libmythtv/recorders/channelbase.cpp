@@ -686,7 +686,8 @@ ChannelBase *ChannelBase::CreateChannel(
     const FireWireDBOptions  &fwOpt,
     const QString            &startchannel,
     bool                      enter_power_save_mode,
-    QString                  &rbFileExt)
+    QString                  &rbFileExt,
+    bool                      setchan)
 {
     rbFileExt = "ts";
 
@@ -796,7 +797,7 @@ ChannelBase *ChannelBase::CreateChannel(
 
     QString input = CardUtil::GetInputName(tvrec->GetInputId());
     QString channum = startchannel;
-    channel->Init(channum, true);
+    channel->Init(channum, setchan);
 
     if (enter_power_save_mode)
     {
@@ -806,7 +807,7 @@ ChannelBase *ChannelBase::CreateChannel(
         {
             channel->Close();
         }
-        else
+        else if (setchan)
         {
             DTVChannel *dtvchannel = dynamic_cast<DTVChannel*>(channel);
             if (dtvchannel)
