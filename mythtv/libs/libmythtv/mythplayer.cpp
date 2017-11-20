@@ -2194,12 +2194,15 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (!videoOutput)
         return false;
 
-    if (!(min_buffers ? (videoOutput->ValidVideoFrames() >= min_buffers) :
+    uint valid_video_frames = videoOutput->ValidVideoFrames();
+    if (!(min_buffers ? (valid_video_frames >= min_buffers) :
                         (GetEof() != kEofStateNone) ||
                         (videoOutput->hasHWAcceleration() ?
                             videoOutput->EnoughPrebufferedFrames() :
                             videoOutput->EnoughDecodedFrames())))
     {
+        LOG(VB_PLAYBACK, LOG_NOTICE, QString("Buffering: ValidVideoFrames: %1")
+            .arg(valid_video_frames));
         SetBuffering(true);
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
