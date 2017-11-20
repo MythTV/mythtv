@@ -585,7 +585,7 @@ MythMediaStatus MythCDROMLinux::checkMedia()
                     m_VolumeID = QString(buf.volume_id).trimmed();
                     m_KeyID = QString("%1%2")
                         .arg(m_VolumeID)
-                        .arg(QString(buf.creation_date).left(16));
+                        .arg(QString(reinterpret_cast<char*>(buf.creation_date)).left(16));
                 }
                 else
                 {
