@@ -54,8 +54,8 @@ using namespace std;
 #include "ringbuffer.h"                 // for RingBuffer, etc
 #include "tv_actions.h"                 // for ACTION_BIGJUMPFWD, etc
 
-extern "C" {
 #include "vsync.h"
+extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
@@ -1813,7 +1813,21 @@ void MythPlayer::InitAVSync(void)
         SetFrameInterval(m_scan, 1.0 / (video_frame_rate * play_speed));
 
         // try to get preferential scheduling, but ignore if we fail to.
-        myth_nice(-19);
+        if (gCoreContext->GetNumSetting("RealtimePriority", 1))
+        {
+           if (myth_realtime(1))
+           {
+               LOG(VB_GENERAL, LOG_INFO, "Using realtime priority for video timing thread");
+           }
+           else
+           {
+               LOG(VB_GENERAL, LOG_WARNING, "Failed to set realtime priority for video timing thread");
+           }
+        }
+        else
+        {
+            myth_nice(-19);
+        }
     }
 }
 

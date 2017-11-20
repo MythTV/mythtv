@@ -695,6 +695,18 @@ bool myth_nice(int val)
     return true;
 }
 
+bool myth_realtime(int val)
+{
+    errno = 0;
+    struct sched_param param;
+    param.sched_priority = val;
+    int ret = pthread_setschedparam(pthread_self(), SCHED_FIFO, &param);
+    if (ret !=0) {
+      LOG(VB_GENERAL, LOG_ERR, "Failed to set RT thread");
+    }
+    return ret == 0;
+}
+
 void myth_yield(void)
 {
 #ifdef _POSIX_PRIORITY_SCHEDULING

@@ -72,6 +72,7 @@ MBASE_PUBLIC QString FileHash(QString filename);
 MBASE_PUBLIC bool IsPulseAudioRunning(void);
 
 MBASE_PUBLIC bool myth_nice(int val);
+MBASE_PUBLIC bool myth_realtime(int val);
 MBASE_PUBLIC void myth_yield(void);
 /// range -1..8, smaller is higher priority
 MBASE_PUBLIC bool myth_ioprio(int val);
