@@ -46,7 +46,7 @@ class VideoSync
 // virtual base class
 {
   public:
-    VideoSync(VideoOutput*, int fi, int ri, bool intr);
+    VideoSync(VideoOutput*, int ri);
     virtual ~VideoSync() {}
 
     /// \brief Returns name of instanciated VSync method.
@@ -69,17 +69,16 @@ class VideoSync
      *   always be called from same thread, to prevent bad
      *   interactions with threads.
      *
-     *  \param sync_delay time until the desired frame or field
-     *  \sa CalcDelay(void), KeepPhase(void)
+     *  \param nominal_frame_interval the frame interval normally expected
+     *  \param extra_delay extra time beyond nominal until the desired frame or field
+     *  \sa CalcDelay(int), KeepPhase(void)
      */
-    virtual int WaitForFrame(int sync_delay) = 0;
+    virtual int WaitForFrame(int nominal_frame_interval, int extra_delay) = 0;
 
     /// \brief Returns the (minimum) refresh interval of the output device.
     int getRefreshInterval(void) const { return m_refresh_interval; }
     /// \brief Sets the refresh interval of the output device.
     void setRefreshInterval(int ri) { m_refresh_interval = ri; }
-
-    virtual void setFrameInterval(int fi) { m_frame_interval = fi; };
 
     /** \brief Stops VSync; must be called from main thread.
      *
@@ -90,18 +89,15 @@ class VideoSync
     virtual void Stop(void) {}
 
     // documented in vsync.cpp
-    static VideoSync *BestMethod(VideoOutput*,
-                                 uint frame_interval, uint refresh_interval,
-                                 bool interlaced);
+    static VideoSync *BestMethod(VideoOutput *, uint refresh_interval);
+
   protected:
     int64_t GetTime(void);
-    int CalcDelay(void);
+    int CalcDelay(int nominal_frame_interval);
     void KeepPhase(void) MDEPRECATED;
 
     VideoOutput *m_video_output;
-    int m_frame_interval; // of video
     int m_refresh_interval; // of display
-    bool m_interlaced;
     int64_t m_nexttrigger;
     int m_delay;
     
@@ -118,14 +114,13 @@ class VideoSync
 class DRMVideoSync : public VideoSync
 {
   public:
-    DRMVideoSync(VideoOutput*,
-                 int frame_interval, int refresh_interval, bool interlaced);
+    DRMVideoSync(VideoOutput *, int refresh_interval);
     ~DRMVideoSync();
 
     QString getName(void) const { return QString("DRM"); }
     bool TryInit(void);
     void Start(void);
-    int WaitForFrame(int sync_delay);
+    int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 
   private:
     int m_dri_fd;
@@ -148,13 +143,12 @@ class DRMVideoSync : public VideoSync
 class RTCVideoSync : public VideoSync
 {
   public:
-    RTCVideoSync(VideoOutput*,
-                 int frame_interval, int refresh_interval, bool interlaced);
+    RTCVideoSync(VideoOutput *, int refresh_interval);
     ~RTCVideoSync();
 
     QString getName(void) const { return QString("RTC"); }
     bool TryInit(void);
-    int WaitForFrame(int sync_delay);
+    int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 
   private:
     int m_rtcfd;
@@ -174,14 +168,12 @@ class RTCVideoSync : public VideoSync
 class BusyWaitVideoSync : public VideoSync
 {
   public:
-    BusyWaitVideoSync(VideoOutput*,
-                      int frame_interval, int refresh_interval, 
-                      bool interlaced);
+    BusyWaitVideoSync(VideoOutput *, int refresh_interval);
     ~BusyWaitVideoSync();
 
     QString getName(void) const { return QString("USleep with busy wait"); }
     bool TryInit(void);
-    int WaitForFrame(int sync_delay);
+    int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 
   private:
     int m_cheat;
@@ -201,25 +193,22 @@ class BusyWaitVideoSync : public VideoSync
 class USleepVideoSync : public VideoSync
 {
   public:
-    USleepVideoSync(VideoOutput*,
-                    int frame_interval, int refresh_interval, 
-                    bool interlaced);
+    USleepVideoSync(VideoOutput *, int refresh_interval);
     ~USleepVideoSync();
 
     QString getName(void) const { return QString("USleep"); }
     bool TryInit(void);
-    int WaitForFrame(int sync_delay);
+    int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 };
 
 class DummyVideoSync : public VideoSync
 {
   public:
-    DummyVideoSync(VideoOutput* vo, int fr, int ri, bool intl)
-     : VideoSync(vo, fr, ri, intl) { }
+    DummyVideoSync(VideoOutput* vo, int ri) : VideoSync(vo, ri) { }
     ~DummyVideoSync() { }
 
     QString getName(void) const { return QString("Dummy"); }
     bool TryInit(void) { return true; }
-    int WaitForFrame(int /*sync_delay*/) { return 0; }
+    int WaitForFrame(int nominal_frame_interval, int extra_delay) override { return 0; }
 };
 #endif /* VSYNC_H_INCLUDED */

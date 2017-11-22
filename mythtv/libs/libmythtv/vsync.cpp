@@ -59,8 +59,7 @@ int VideoSync::m_forceskip = 0;
 #define TESTVIDEOSYNC(NAME) \
     do { if (++m_forceskip > skip) \
     { \
-        trial = new NAME (video_output,     frame_interval, \
-                          refresh_interval, halve_frame_interval); \
+        trial = new NAME (video_output, refresh_interval); \
         if (trial->TryInit()) \
         { \
             m_forceskip = skip; \
@@ -72,12 +71,11 @@ int VideoSync::m_forceskip = 0;
 
 #define LOC QString("VSYNC: ")
 
-/** \fn VideoSync::BestMethod(VideoOutput*,uint,uint,bool)
+/** \fn VideoSync::BestMethod(VideoOutput*,uint)
  *  \brief Returns the most sophisticated video sync method available.
  */
 VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
-                                 uint frame_interval, uint refresh_interval,
-                                 bool halve_frame_interval)
+                                 uint refresh_interval)
 {
     VideoSync *trial = NULL;
     tryingVideoSync  = true;
@@ -110,15 +108,12 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
     return NULL;
 }
 
-/** \fn VideoSync::VideoSync(VideoOutput*,int,int,bool)
- *  \brief Used by BestMethod(VideoOutput*,uint,uint,bool) to initialize
+/** \fn VideoSync::VideoSync(VideoOutput*,int)
+ *  \brief Used by BestMethod(VideoOutput*,uint) to initialize
  *         video synchronization method.
  */
-VideoSync::VideoSync(VideoOutput *video_output,
-                     int frameint, int refreshint,
-                     bool halve_frame_interval) :
-    m_video_output(video_output),   m_frame_interval(frameint),
-    m_refresh_interval(refreshint), m_interlaced(halve_frame_interval),
+VideoSync::VideoSync(VideoOutput *video_output, int refreshint) :
+    m_video_output(video_output), m_refresh_interval(refreshint),
     m_nexttrigger(0), m_delay(-1)
 {
 }
@@ -135,7 +130,7 @@ void VideoSync::Start(void)
     m_nexttrigger = GetTime();
 }
 
-/** \fn VideoSync::CalcDelay()
+/** \fn VideoSync::CalcDelay(int)
  *  \brief Calculates the delay to the next frame.
  *
  *   Regardless of the timing method, if delay is greater than four full
@@ -146,7 +141,7 @@ void VideoSync::Start(void)
  *   Also prevent the nexttrigger from falling too far in the past in case
  *   we are trying to speed up video output faster than possible.
  */
-int VideoSync::CalcDelay()
+int VideoSync::CalcDelay(int nominal_frame_interval)
 {
     int64_t now = GetTime();
 #if 0
@@ -160,20 +155,17 @@ int VideoSync::CalcDelay()
     LOG(VB_GENERAL, LOG_DEBUG, QString("delay %1").arg(ret_val));
 #endif
 
-    if (ret_val > m_frame_interval * 4)
+    if (ret_val > nominal_frame_interval * 4)
     {
-        if (m_interlaced)
-            ret_val = (m_frame_interval / 2) * 4;
-        else
-            ret_val = m_frame_interval * 4;
+        ret_val = nominal_frame_interval * 4;
 
         // set nexttrigger to our new target time
         m_nexttrigger = now + ret_val;
     }
 
-    if (ret_val < -m_frame_interval && m_frame_interval >= m_refresh_interval)
+    if (ret_val < -nominal_frame_interval && nominal_frame_interval >= m_refresh_interval)
     {
-        ret_val = -m_frame_interval;
+        ret_val = -nominal_frame_interval;
 
         // set nexttrigger to our new target time
         m_nexttrigger = now + ret_val;
@@ -242,8 +234,8 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 
 const char *DRMVideoSync::sm_dri_dev = "/dev/dri/card0";
 
-DRMVideoSync::DRMVideoSync(VideoOutput *vo, int fr, int ri, bool intl) :
-    VideoSync(vo, fr, ri, intl)
+DRMVideoSync::DRMVideoSync(VideoOutput *vo, int ri) :
+    VideoSync(vo, ri)
 {
     m_dri_fd = -1;
 }
@@ -291,12 +283,12 @@ void DRMVideoSync::Start(void)
     VideoSync::Start();
 }
 
-int DRMVideoSync::WaitForFrame(int sync_delay)
+int DRMVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 {
     // Offset for externally-provided A/V sync delay
-    m_nexttrigger += sync_delay;
+    m_nexttrigger += nominal_frame_interval + extra_delay;
 
-    m_delay = CalcDelay();
+    m_delay = CalcDelay(nominal_frame_interval);
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, QString("WaitForFrame at : %1").arg(m_delay));
 #endif
@@ -308,7 +300,7 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         blank.request.type = DRM_VBLANK_RELATIVE;
         blank.request.sequence = 1;
         drmWaitVBlank(m_dri_fd, &blank);
-        m_delay = CalcDelay();
+        m_delay = CalcDelay(nominal_frame_interval);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("Delay at sync: %1").arg(m_delay));
 #endif
@@ -323,7 +315,7 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
         blank.request.type = DRM_VBLANK_RELATIVE;
         blank.request.sequence = n;
         drmWaitVBlank(m_dri_fd, &blank);
-        m_delay = CalcDelay();
+        m_delay = CalcDelay(nominal_frame_interval);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("Wait %1 intervals. Count %2 Delay %3")
@@ -337,8 +329,8 @@ int DRMVideoSync::WaitForFrame(int sync_delay)
 
 #ifdef __linux__
 #define RTCRATE 1024
-RTCVideoSync::RTCVideoSync(VideoOutput *vo, int fi, int ri, bool intr) :
-    VideoSync(vo, fi, ri, intr)
+RTCVideoSync::RTCVideoSync(VideoOutput *vo, int ri) :
+    VideoSync(vo, ri)
 {
     m_rtcfd = -1;
 }
@@ -377,17 +369,17 @@ bool RTCVideoSync::TryInit(void)
     return true;
 }
 
-int RTCVideoSync::WaitForFrame(int sync_delay)
+int RTCVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 {
-    m_nexttrigger += sync_delay;
+    m_nexttrigger += nominal_frame_interval + extra_delay;
 
-    m_delay = CalcDelay();
+    m_delay = CalcDelay(nominal_frame_interval);
 
     unsigned long rtcdata;
     while (m_delay > 0)
     {
         ssize_t val = read(m_rtcfd, &rtcdata, sizeof(rtcdata));
-        m_delay = CalcDelay();
+        m_delay = CalcDelay(nominal_frame_interval);
 
         if ((val < 0) && (m_delay > 0))
             std::this_thread::sleep_for(std::chrono::microseconds(m_delay));
@@ -396,9 +388,8 @@ int RTCVideoSync::WaitForFrame(int sync_delay)
 }
 #endif /* __linux__ */
 
-BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo,
-                                     int fr, int ri, bool intl) :
-    VideoSync(vo, fr, ri, intl)
+BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo, int ri) :
+    VideoSync(vo, ri)
 {
     m_cheat = 5000;
     m_fudge = 0;
@@ -413,12 +404,12 @@ bool BusyWaitVideoSync::TryInit(void)
     return true;
 }
 
-int BusyWaitVideoSync::WaitForFrame(int sync_delay)
+int BusyWaitVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 {
     // Offset for externally-provided A/V sync delay
-    m_nexttrigger += sync_delay;
+    m_nexttrigger += nominal_frame_interval + extra_delay;
 
-    m_delay = CalcDelay();
+    m_delay = CalcDelay(nominal_frame_interval);
 
     if (m_delay > 0)
     {
@@ -431,11 +422,11 @@ int BusyWaitVideoSync::WaitForFrame(int sync_delay)
 
         // If late, draw the frame ASAP.  If early, hold the CPU until
         // half as late as the previous frame (fudge).
-        m_delay = CalcDelay();
-        m_fudge = min(m_fudge, m_frame_interval);
+        m_delay = CalcDelay(nominal_frame_interval);
+        m_fudge = min(m_fudge, nominal_frame_interval);
         while (m_delay + m_fudge > 0)
         {
-            m_delay = CalcDelay();
+            m_delay = CalcDelay(nominal_frame_interval);
             cnt++;
         }
         m_fudge = abs(m_delay / 2);
@@ -445,9 +436,8 @@ int BusyWaitVideoSync::WaitForFrame(int sync_delay)
     return 0;
 }
 
-USleepVideoSync::USleepVideoSync(VideoOutput *vo,
-                                 int fr, int ri, bool intl) :
-    VideoSync(vo, fr, ri, intl)
+USleepVideoSync::USleepVideoSync(VideoOutput *vo, int ri) :
+    VideoSync(vo, ri)
 {
 }
 
@@ -460,12 +450,12 @@ bool USleepVideoSync::TryInit(void)
     return true;
 }
 
-int USleepVideoSync::WaitForFrame(int sync_delay)
+int USleepVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 {
     // Offset for externally-provided A/V sync delay
-    m_nexttrigger += sync_delay;
+    m_nexttrigger += nominal_frame_interval + extra_delay;
 
-    m_delay = CalcDelay();
+    m_delay = CalcDelay(nominal_frame_interval);
     if (m_delay > 0)
         std::this_thread::sleep_for(std::chrono::microseconds(m_delay));
     return 0;
