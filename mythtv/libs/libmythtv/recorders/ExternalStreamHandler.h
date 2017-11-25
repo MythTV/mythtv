@@ -45,8 +45,11 @@ class ExternIO
     pid_t   m_pid;
     QString m_error;
 
-    int     m_bufsize;
-    char   *m_buffer;
+    int         m_bufsize;
+    char       *m_buffer;
+
+    QString     m_status_buf;
+    QTextStream m_status;
 };
 
 // Note : This class always uses a TS reader.
