@@ -632,13 +632,9 @@ void ExternalStreamHandler::run(void)
             if (read_len > 0)
                 empty_cnt = 0;
 
-            if (!_listener_lock.tryLock())
-                continue;
-
             if (_stream_data_list.empty())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "_stream_data_list is empty");
-                _listener_lock.unlock();
                 continue;
             }
 
@@ -677,6 +673,9 @@ void ExternalStreamHandler::run(void)
                     xon = false;
                 }
             }
+
+            if (!_listener_lock.tryLock())
+                continue;
 
             StreamDataList::const_iterator sit = _stream_data_list.begin();
             for (; sit != _stream_data_list.end(); ++sit)
