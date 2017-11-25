@@ -84,9 +84,6 @@ class ExternalStreamHandler : public StreamHandler
 
     void PurgeBuffer(void);
 
-    QString ErrorString(void) const { return m_error; }
-    void ClearError(void) { m_error.clear(); _error = false; }
-
     bool ProcessCommand(const QString & cmd, uint timeout,
                         QString & result);
 
@@ -99,7 +96,6 @@ class ExternalStreamHandler : public StreamHandler
     ExternIO      *m_IO;
     QStringList    m_args;
     QString        m_app;
-    QString        m_error;
     bool           m_tsopen;
     int            m_io_errcnt;
     bool           m_poll_mode;
