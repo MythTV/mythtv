@@ -143,9 +143,6 @@ bool ExternalRecorder::Open(void)
             LOG(VB_RECORD, LOG_INFO, LOC + "Opened successfully");
         else
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
-                QString("Failed to open recorder: %1")
-                .arg(m_stream_handler->ErrorString()));
             ExternalStreamHandler::Return(m_stream_handler,
                                           (tvrec ? tvrec->GetInputId() : -1));
 
