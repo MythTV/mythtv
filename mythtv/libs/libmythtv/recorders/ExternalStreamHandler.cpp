@@ -33,7 +33,8 @@ ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
     : m_appin(-1), m_appout(-1), m_apperr(-1),
       m_pid(-1), m_bufsize(0), m_buffer(NULL),
-      m_status(&m_status_buf, QIODevice::ReadWrite)
+      m_status(&m_status_buf, QIODevice::ReadWrite),
+      m_errorcnt(0)
 {
     m_app  = (app);
 
@@ -130,13 +131,31 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
 
     if (len < 0)
     {
-        m_error = "Failed to read from External Recorder: " + ENO;
-        LOG(VB_RECORD, LOG_ERR, m_error);
+        QString err;
+        if (errno == EAGAIN)
+        {
+            m_errorcnt++;
+            err = "Failed to read from External Recorder. Incrementing Counter. " + ENO;
+            LOG(VB_RECORD, LOG_WARNING, err);
+        }
+        else
+        {
+            m_error = "Failed to read from External Recorder: " + ENO;
+            err = m_error;
+            LOG(VB_RECORD, LOG_ERR, err);
+        }
+        if (m_errorcnt > kMaxErrorCnt)
+        {
+            m_error = QString("Failed to read from External Recorder 5 times: ").arg(kMaxErrorCnt) + ENO;
+            err = m_error;
+            LOG(VB_RECORD, LOG_ERR, err);
+        }
         return 0;
     }
     if (len == 0)
         return 0;
 
+    m_errorcnt = 0;
     buffer.append(m_buffer, len);
 
     LOG(VB_RECORD, LOG_DEBUG,
