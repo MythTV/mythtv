@@ -42,6 +42,7 @@ class ExternIO
     int     m_appin;
     int     m_appout;
     int     m_apperr;
+    int     m_errorcnt;
     pid_t   m_pid;
     QString m_error;
 
@@ -50,6 +51,8 @@ class ExternIO
 
     QString     m_status_buf;
     QTextStream m_status;
+
+    static const int kMaxErrorCnt = 5;
 };
 
 // Note : This class always uses a TS reader.
