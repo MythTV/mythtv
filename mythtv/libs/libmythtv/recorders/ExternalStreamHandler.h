@@ -19,6 +19,8 @@ class ExternalChannel;
 
 class ExternIO
 {
+    enum constants { kMaxErrorCnt = 5 };
+
   public:
     ExternIO(const QString & app, const QStringList & args);
     ~ExternIO(void);
@@ -50,6 +52,7 @@ class ExternIO
 
     QString     m_status_buf;
     QTextStream m_status;
+    int         m_errcnt;
 };
 
 // Note : This class always uses a TS reader.

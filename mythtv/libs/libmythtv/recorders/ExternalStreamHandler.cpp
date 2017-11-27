@@ -33,7 +33,9 @@ ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
     : m_appin(-1), m_appout(-1), m_apperr(-1),
       m_pid(-1), m_bufsize(0), m_buffer(NULL),
-      m_status(&m_status_buf, QIODevice::ReadWrite)
+      m_status(&m_status_buf, QIODevice::ReadWrite),
+      m_errcnt(0)
+
 {
     m_app  = (app);
 
@@ -130,10 +132,28 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
 
     if (len < 0)
     {
-        m_error = "Failed to read from External Recorder: " + ENO;
-        LOG(VB_RECORD, LOG_ERR, m_error);
-        return 0;
+        if (errno == EAGAIN)
+        {
+            if (++m_errcnt > kMaxErrorCnt)
+            {
+                m_error = "Failed to read from External Recorder: " + ENO;
+                LOG(VB_RECORD, LOG_WARNING,
+                    "External Recorder not ready. Giving up.");
+            }
+            else
+                LOG(VB_RECORD, LOG_WARNING,
+                    QString("External Recorder not ready. Will retry (%1/%2).")
+                    .arg(m_errcnt).arg(kMaxErrorCnt));
+        }
+        else
+        {
+            m_error = "Failed to read from External Recorder: " + ENO;
+            LOG(VB_RECORD, LOG_ERR, m_error);
+        }
     }
+    else
+        m_errcnt = 0;
+
     if (len == 0)
         return 0;
 
@@ -819,7 +839,7 @@ bool ExternalStreamHandler::IsAppOpen(void)
     }
 
     QString result;
-    return ProcessCommand("Version?", 2500, result);
+    return ProcessCommand("Version?", 5000, result);
 }
 
 bool ExternalStreamHandler::IsTSOpen(void)
