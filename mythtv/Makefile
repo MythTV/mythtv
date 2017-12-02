@@ -105,12 +105,12 @@ test: libs/libmythbase/version.h subdirs
 ctags tags:
 	@echo "Making tags..."
 	@cd .. ; rm -f tags
-	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs ctags -a
+	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs -r ctags -a
 
 etags TAGS:
 	@echo "Making TAGS..."
 	@cd .. ; rm -f TAGS
-	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs etags -a
+	@cd .. ; find . -name \*.h -o -name \*.c -o -name \*.cpp | grep -v moc_ | xargs -r etags -a
 
 global GPATH GRTAGS GTAGS:
 	@echo "Making global tags..."
@@ -119,4 +119,4 @@ global GPATH GRTAGS GTAGS:
 
 cleanall: clean
 	@echo "Removing old moc and .o files missed by 'clean'..."
-	@find .. -name moc_* -o -name *.o | xargs rm
+	@find .. -name moc_* -o -name *.o | xargs -r rm
