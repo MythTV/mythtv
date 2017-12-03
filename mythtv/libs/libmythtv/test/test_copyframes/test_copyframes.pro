@@ -70,4 +70,4 @@ QMAKE_CLEAN += ; rm -f *.gcov *.gcda *.gcno
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
 
 # Fix runtime linking on Ubuntu 17.10.
-QMAKE_LFLAGS += -Wl,--disable-new-dtags
+linux:QMAKE_LFLAGS += -Wl,--disable-new-dtags
