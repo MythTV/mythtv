@@ -245,7 +245,7 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
                                  const AVPacket *pkt)
 {
     MythAVFrame frame;
-    int got_frame = 0;
+    bool got_frame = false;
     int ret;
     char error[AV_ERROR_MAX_STRING_SIZE];
 
@@ -255,8 +255,22 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
         return AVERROR(ENOMEM);
     }
 
-    ret = avcodec_decode_audio4(ctx, frame, &got_frame, pkt);
-    if (ret < 0)
+//  SUGGESTION
+//  Now that avcodec_decode_audio4 is deprecated and replaced
+//  by 2 calls (receive frame and send packet), this could be optimized
+//  into separate routines or separate threads.
+//  Also now that it always consumes a whole buffer some code
+//  in the caller may be able to be optimized.
+    ret = avcodec_receive_frame(ctx,frame);
+    if (ret == 0)
+        got_frame = true;
+    if (ret == AVERROR(EAGAIN))
+        ret = 0;
+    if (ret == 0)
+        ret = avcodec_send_packet(ctx, pkt);
+    if (ret == AVERROR(EAGAIN))
+        ret = 0;
+    else if (ret < 0)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC +
             QString("audio decode error: %1 (%2)")
@@ -264,6 +278,8 @@ int AudioOutputUtil::DecodeAudio(AVCodecContext *ctx,
             .arg(got_frame));
         return ret;
     }
+    else
+        ret = pkt->size;
 
     if (!got_frame)
     {
