@@ -8,7 +8,7 @@
 #define __PGMCONVERTER_H__
 
 extern "C" {
-#include "libavcodec/avcodec.h"    /* AVPicture */
+#include "libavcodec/avcodec.h"    /* AVFrame */
 }
 
 typedef struct VideoFrame_ VideoFrame;
@@ -35,14 +35,14 @@ public:
     ~PGMConverter(void);
 
     int MythPlayerInited(const MythPlayer *player);
-    const AVPicture *getImage(const VideoFrame *frame, long long frameno,
+    const AVFrame *getImage(const VideoFrame *frame, long long frameno,
             int *pwidth, int *pheight);
     int reportTime(void);
 
 private:
     long long       frameno;            /* frame number */
     int             width, height;      /* frame dimensions */
-    AVPicture       pgm;                /* grayscale frame */
+    AVFrame       pgm;                /* grayscale frame */
 #ifdef PGM_CONVERT_GREYSCALE
     struct timeval  convert_time;
     bool            time_reported;

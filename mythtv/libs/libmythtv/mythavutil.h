@@ -66,14 +66,6 @@ public:
     {
         return m_frame;
     }
-    operator AVPicture*() const
-    {
-        return reinterpret_cast<AVPicture*>(m_frame);
-    }
-    operator const AVPicture*() const
-    {
-        return reinterpret_cast<AVPicture*>(m_frame);
-    }
 
 private:
     AVFrame *m_frame;
@@ -83,7 +75,7 @@ class MythAVCopyPrivate;
 
 /**
  * MythAVCopy
- * Copy AVPicture<->frame, performing the required conversion if any
+ * Copy AVFrame<->frame, performing the required conversion if any
  */
 class MTV_PUBLIC MythAVCopy
 {
@@ -94,37 +86,37 @@ public:
     int Copy(VideoFrame *dst, const VideoFrame *src);
     /**
      * Copy
-     * Initialise AVPicture pic, create buffer if required and copy content of
+     * Initialise AVFrame pic, create buffer if required and copy content of
      * VideoFrame frame into it, performing the required conversion if any
      * Returns size of buffer allocated
      * Data would have to be deleted once finished with object with:
      * av_freep(pic->data[0])
      */
-    int Copy(AVPicture *pic, const VideoFrame *frame,
+    int Copy(AVFrame *pic, const VideoFrame *frame,
              unsigned char *buffer = NULL,
              AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
     /**
      * Copy
-     * Copy AVPicture pic into VideoFrame frame, performing the required conversion
+     * Copy AVFrame pic into VideoFrame frame, performing the required conversion
      * Returns size of frame data
      */
-    int Copy(VideoFrame *frame, const AVPicture *pic,
+    int Copy(VideoFrame *frame, const AVFrame *pic,
              AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
-    int Copy(AVPicture *dst, AVPixelFormat dst_pix_fmt,
-             const AVPicture *src, AVPixelFormat pix_fmt,
+    int Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
+             const AVFrame *src, AVPixelFormat pix_fmt,
              int width, int height);
 
 private:
-    void FillFrame(VideoFrame *frame, const AVPicture *pic, int pitch,
+    void FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
                    int width, int height, AVPixelFormat pix_fmt);
     MythAVCopyPrivate *d;
 };
 
 /**
  * AVPictureFill
- * Initialise AVPicture pic with content from VideoFrame frame
+ * Initialise AVFrame pic with content from VideoFrame frame
  */
-int MTV_PUBLIC AVPictureFill(AVPicture *pic, const VideoFrame *frame,
+int MTV_PUBLIC AVPictureFill(AVFrame *pic, const VideoFrame *frame,
                              AVPixelFormat fmt = AV_PIX_FMT_NONE);
 
 /**
@@ -149,8 +141,8 @@ public:
     // To drain the deinterlacer, call Deinterlace with src = NULL until you
     // get no more frames. Once drained, you must call Flush() to start
     // deinterlacing again.
-    int Deinterlace(AVPicture *dst, const AVPicture *src);
-    int DeinterlaceSingle(AVPicture *dst, const AVPicture *src);
+    int Deinterlace(AVFrame *dst, const AVFrame *src);
+    int DeinterlaceSingle(AVFrame *dst, const AVFrame *src);
     // Flush and reset the deinterlacer.
     int Flush();
 private:

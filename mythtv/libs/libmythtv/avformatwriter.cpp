@@ -31,6 +31,7 @@ extern "C" {
 #endif
 #include "libavutil/opt.h"
 #include "libavutil/samplefmt.h"
+#include "libavutil/imgutils.h"
 }
 
 #define LOC QString("AVFW(%1): ").arg(m_filename)
@@ -237,7 +238,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     int framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
     av_frame_unref(m_picture);
-    AVPictureFill(reinterpret_cast<AVPicture*>(m_picture), frame);
+    AVPictureFill(reinterpret_cast<AVFrame*>(m_picture), frame);
     m_picture->pts = framesEncoded + 1;
 
     if ((framesEncoded % m_keyFrameDist) == 0)
@@ -721,8 +722,8 @@ AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat pix_fmt)
         av_frame_free(&picture);
         return NULL;
     }
-    avpicture_fill((AVPicture *)picture, picture_buf,
-                   pix_fmt, m_width, m_height);
+    av_image_fill_arrays(picture->data, picture->linesize,
+        picture_buf, pix_fmt, m_width, m_height, IMAGE_ALIGN);
     return picture;
 }
 

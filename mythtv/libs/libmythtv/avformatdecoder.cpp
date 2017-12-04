@@ -73,6 +73,7 @@ extern "C" {
 #include "libswscale/swscale.h"
 #include "libavformat/isom.h"
 #include "ivtv_myth.h"
+#include "libavutil/imgutils.h"
 }
 
 #ifdef _MSC_VER
@@ -3711,14 +3712,15 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
     else if (!directrendering)
     {
-        AVPicture tmppicture;
+        AVFrame tmppicture;
 
         VideoFrame *xf = picframe;
         picframe = m_parent->GetNextVideoFrame();
 
         unsigned char *buf = picframe->buf;
-        avpicture_fill(&tmppicture, buf, AV_PIX_FMT_YUV420P, context->width,
-                       context->height);
+        av_image_fill_arrays(tmppicture.data, tmppicture.linesize,
+            buf, AV_PIX_FMT_YUV420P, context->width,
+                       context->height, IMAGE_ALIGN);
         tmppicture.data[0] = buf + picframe->offsets[0];
         tmppicture.data[1] = buf + picframe->offsets[1];
         tmppicture.data[2] = buf + picframe->offsets[2];

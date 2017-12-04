@@ -12,7 +12,7 @@
 #ifndef __BORDERDETECTOR_H__
 #define __BORDERDETECTOR_H__
 
-typedef struct AVPicture AVPicture;
+typedef struct AVFrame AVFrame;
 class MythPlayer;
 class TemplateFinder;
 
@@ -26,14 +26,14 @@ public:
     void setLogoState(TemplateFinder *finder);
 
     static const long long UNCACHED = -1;
-    int getDimensions(const AVPicture *pgm, int pgmheight, long long frameno,
+    int getDimensions(const AVFrame *pgm, int pgmheight, long long frameno,
             int *prow, int *pcol, int *pwidth, int *pheight);
 
     int reportTime(void);
 
 private:
     TemplateFinder          *logoFinder;
-    const struct AVPicture  *logo;
+    const struct AVFrame  *logo;
     int                     logorow, logocol;
     int                     logowidth, logoheight;
 

@@ -14,6 +14,7 @@
 extern "C" {
 #include "libavutil/pixdesc.h"
 #include "libavcodec/avcodec.h"
+#include "libavutil/imgutils.h"
 }
 
 #include "avformatdecoder.h"
@@ -1031,10 +1032,12 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
             buf = (unsigned char*)av_malloc(size);
             init(&vf, frametype, buf, out_width, out_height, size);
 
-            AVPicture img_in, img_out;
-            avpicture_fill(&img_out, (uint8_t *)vf.buf, out_fmt, out_width,
-                out_height);
-            avpicture_fill(&img_in, src, in_fmt, in_width, in_height);
+            AVFrame img_in, img_out;
+            av_image_fill_arrays(img_out.data, img_out.linesize,
+                (uint8_t *)vf.buf, out_fmt, out_width,
+                out_height, IMAGE_ALIGN);
+            av_image_fill_arrays(img_in.data, img_in.linesize,
+                src, in_fmt, in_width, in_height, IMAGE_ALIGN);
 
             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Converting %1 to %2")
                 .arg(av_pix_fmt_desc_get(in_fmt)->name)

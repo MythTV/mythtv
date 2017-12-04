@@ -19,7 +19,7 @@
 #define __TEMPLATEFINDER_H__
 
 extern "C" {
-#include "libavcodec/avcodec.h"    /* AVPicture */
+#include "libavcodec/avcodec.h"    /* AVFrame */
 }
 #include "FrameAnalyzer.h"
 
@@ -46,7 +46,7 @@ public:
     FrameMap GetMap(unsigned int) const { FrameMap map; return map; }
 
     /* TemplateFinder implementation. */
-    const struct AVPicture *getTemplate(int *prow, int *pcol,
+    const struct AVFrame *getTemplate(int *prow, int *pcol,
             int *pwidth, int *pheight) const;
 
 private:
@@ -69,11 +69,11 @@ private:
     int             maxcontentrow1;     /* minrow + height ("maxrow + 1") */
     int             maxcontentcol1;     /* mincol + width ("maxcol + 1") */
 
-    AVPicture       tmpl;               /* logo-matching template */
+    AVFrame       tmpl;               /* logo-matching template */
     int             tmplrow, tmplcol;
     int             tmplwidth, tmplheight;
 
-    AVPicture       cropped;            /* cropped version of frame */
+    AVFrame       cropped;            /* cropped version of frame */
     int             cwidth, cheight;    /* cropped height */
 
     /* Debugging. */

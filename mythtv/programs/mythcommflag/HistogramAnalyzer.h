@@ -9,7 +9,7 @@
 
 #include "FrameAnalyzer.h"
 
-typedef struct AVPicture AVPicture;
+typedef struct AVFrame AVFrame;
 class PGMConverter;
 class BorderDetector;
 class TemplateFinder;
@@ -45,7 +45,7 @@ private:
     BorderDetector          *borderDetector;
 
     TemplateFinder          *logoFinder;
-    const struct AVPicture  *logo;
+    const struct AVFrame  *logo;
     int                     logowidth, logoheight;
     int                     logorr1, logocc1, logorr2, logocc2;
 

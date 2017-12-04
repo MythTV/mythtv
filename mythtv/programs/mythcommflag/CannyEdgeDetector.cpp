@@ -10,6 +10,10 @@
 #include "pgm.h"
 #include "CannyEdgeDetector.h"
 
+extern "C" {
+#include "libavutil/imgutils.h"
+}
+
 using namespace edgeDetector;
 
 CannyEdgeDetector::CannyEdgeDetector(void)
@@ -59,10 +63,10 @@ CannyEdgeDetector::CannyEdgeDetector(void)
 
 CannyEdgeDetector::~CannyEdgeDetector(void)
 {
-    avpicture_free(&edges);
-    avpicture_free(&convolved);
-    avpicture_free(&s2);
-    avpicture_free(&s1);
+    av_freep(&edges.data[0]);
+    av_freep(&convolved.data[0]);
+    av_freep(&s2.data[0]);
+    av_freep(&s1.data[0]);
     if (sgmsorted)
         delete []sgmsorted;
     if (sgm)
@@ -82,10 +86,10 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
          * Sentinel value to determine whether or not stuff has already been
          * allocated.
          */
-        avpicture_free(&s1);
-        avpicture_free(&s2);
-        avpicture_free(&convolved);
-        avpicture_free(&edges);
+        av_freep(&s1.data[0]);
+        av_freep(&s2.data[0]);
+        av_freep(&convolved.data[0]);
+        av_freep(&edges.data[0]);
         delete []sgm;
         delete []sgmsorted;
         sgm = NULL;
@@ -94,31 +98,35 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     const int   padded_width = newwidth + 2 * mask_radius;
     const int   padded_height = newheight + 2 * mask_radius;
 
-    if (avpicture_alloc(&s1, AV_PIX_FMT_GRAY8, padded_width, padded_height))
+    if (av_image_alloc(s1.data, s1.linesize,
+        padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
-                                  "avpicture_alloc s1 failed");
+                                  "av_image_alloc s1 failed");
         return -1;
     }
 
-    if (avpicture_alloc(&s2, AV_PIX_FMT_GRAY8, padded_width, padded_height))
+    if (av_image_alloc(s2.data, s2.linesize,
+        padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
-                                  "avpicture_alloc s2 failed");
+                                  "av_image_alloc s2 failed");
         goto free_s1;
     }
 
-    if (avpicture_alloc(&convolved, AV_PIX_FMT_GRAY8, padded_width, padded_height))
+    if (av_image_alloc(convolved.data, convolved.linesize,
+        padded_width, padded_height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
-                                  "avpicture_alloc convolved failed");
+                                  "av_image_alloc convolved failed");
         goto free_s2;
     }
 
-    if (avpicture_alloc(&edges, AV_PIX_FMT_GRAY8, newwidth, newheight))
+    if (av_image_alloc(edges.data, edges.linesize,
+        newwidth, newheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CannyEdgeDetector::resetBuffers "
-                                  "avpicture_alloc edges failed");
+                                  "av_image_alloc edges failed");
         goto free_convolved;
     }
 
@@ -131,11 +139,11 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
     return 0;
 
 free_convolved:
-    avpicture_free(&convolved);
+    av_freep(&convolved.data[0]);
 free_s2:
-    avpicture_free(&s2);
+    av_freep(&s2.data[0]);
 free_s1:
-    avpicture_free(&s1);
+    av_freep(&s1.data[0]);
     return -1;
 }
 
@@ -149,8 +157,8 @@ CannyEdgeDetector::setExcludeArea(int row, int col, int width, int height)
     return 0;
 }
 
-const AVPicture *
-CannyEdgeDetector::detectEdges(const AVPicture *pgm, int pgmheight,
+const AVFrame *
+CannyEdgeDetector::detectEdges(const AVFrame *pgm, int pgmheight,
         int percentile)
 {
     /*

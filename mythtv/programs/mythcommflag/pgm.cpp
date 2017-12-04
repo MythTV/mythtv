@@ -4,6 +4,7 @@
 
 extern "C" {
 #include "libavcodec/avcodec.h"
+#include "libavutil/imgutils.h"
 }
 #include "mythframe.h"
 #include "mythlogging.h"
@@ -108,7 +109,7 @@ error:
     return -1;
 }
 
-static int pgm_expand(AVPicture *dst, const AVPicture *src, int srcheight,
+static int pgm_expand(AVFrame *dst, const AVFrame *src, int srcheight,
                       int extratop, int extraright, int extrabottom,
                       int extraleft)
 {
@@ -150,14 +151,14 @@ static int pgm_expand(AVPicture *dst, const AVPicture *src, int srcheight,
     return 0;
 }
 
-static int pgm_expand_uniform(AVPicture *dst, const AVPicture *src,
+static int pgm_expand_uniform(AVFrame *dst, const AVFrame *src,
                               int srcheight, int extramargin)
 {
     return pgm_expand(dst, src, srcheight,
             extramargin, extramargin, extramargin, extramargin);
 }
 
-int pgm_crop(AVPicture *dst, const AVPicture *src, int srcheight,
+int pgm_crop(AVFrame *dst, const AVFrame *src, int srcheight,
              int srcrow, int srccol, int cropwidth, int cropheight)
 {
     const int   srcwidth = src->linesize[0];
@@ -179,8 +180,8 @@ int pgm_crop(AVPicture *dst, const AVPicture *src, int srcheight,
     return 0;
 }
 
-int pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
-                int s1row, int s1col, const AVPicture *s2, int s2height)
+int pgm_overlay(AVFrame *dst, const AVFrame *s1, int s1height,
+                int s1row, int s1col, const AVFrame *s2, int s2height)
 {
     const int   dstwidth = dst->linesize[0];
     const int   s1width = s1->linesize[0];
@@ -194,7 +195,13 @@ int pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
         return -1;
     }
 
-    av_picture_copy(dst, s1, AV_PIX_FMT_GRAY8, s1width, s1height);
+    // av_image_copy is badly designed to require writeable
+    // pointers to the read-only data, so copy the pointers here
+    const uint8_t *src_data[4]
+      =  {s1->data[0], s1->data[1], s1->data[2], s1->data[3]};
+
+    av_image_copy(dst->data, dst->linesize, src_data, s1->linesize,
+        AV_PIX_FMT_GRAY8, s1width, s1height);
 
     /* Overwrite overlay area of "dst" with "s2". */
     for (rr = 0; rr < s2height; rr++)
@@ -205,8 +212,8 @@ int pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
     return 0;
 }
 
-int pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
-                        const AVPicture *src, int srcheight,
+int pgm_convolve_radial(AVFrame *dst, AVFrame *s1, AVFrame *s2,
+                        const AVFrame *src, int srcheight,
                         const double *mask, int mask_radius)
 {
     /*
@@ -233,8 +240,16 @@ int pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
         return -1;
 
     /* copy s1 to s2 and dst */
-    av_picture_copy(s2, s1, AV_PIX_FMT_GRAY8, newwidth, newheight);
-    av_picture_copy(dst, s1, AV_PIX_FMT_GRAY8, newwidth, newheight);
+
+    // av_image_copy is badly designed to require writeable
+    // pointers to the read-only data, so copy the pointers here
+    const uint8_t *src_data[4]
+    =  {s1->data[0], s1->data[1], s1->data[2], s1->data[3]};
+
+    av_image_copy(s2->data, s2->linesize, src_data, s1->linesize,
+        AV_PIX_FMT_GRAY8, newwidth, newheight);
+    av_image_copy(dst->data, dst->linesize, src_data, s1->linesize,
+        AV_PIX_FMT_GRAY8, newwidth, newheight);
 
     /* "s1" convolve with column vector => "s2" */
     rr2 = mask_radius + srcheight;

@@ -3,6 +3,10 @@
 #include "fourcc.h"
 #include "unistd.h"
 
+extern "C" {
+#include "libavutil/imgutils.h"
+}
+
 #define LOC  QString("CrystalHD: ")
 #define ERR  QString("CrystalHD Err: ")
 #define WARN QString("CrystalHD Warn: ")
@@ -664,9 +668,10 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
 
     AVPixelFormat out_fmt = AV_PIX_FMT_YUV420P;
     AVPixelFormat in_fmt  = bcmpixfmt_to_pixfmt(m_pix_fmt);
-    AVPicture img_in;
+    AVFrame img_in;
 
-    avpicture_fill(&img_in, src, in_fmt, in_width, in_height);
+    av_image_fill_arrays(img_in.data, img_in.linesize,
+        src, in_fmt, in_width, in_height, IMAGE_ALIGN);
 
     if (!(out->PicInfo.flags & VDEC_FLAG_INTERLACED_SRC))
     {
@@ -676,7 +681,7 @@ void PrivateDecoderCrystalHD::FillFrame(BC_DTS_PROC_OUT *out)
     }
     else
     {
-        AVPicture img_out;
+        AVFrame img_out;
 
         AVPictureFill(&img_out, m_frame);
         img_out.linesize[0] *= 2;

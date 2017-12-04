@@ -3,7 +3,7 @@
 #include "mythconfig.h"
 
 extern "C" {
-#include "libavcodec/avcodec.h"        /* AVPicture */
+#include "libavcodec/avcodec.h"        /* AVFrame */
 }
 #include "mythcorecontext.h"    /* gContext */
 #include "compat.h"
@@ -62,7 +62,7 @@ BorderDetector::setLogoState(TemplateFinder *finder)
 }
 
 int
-BorderDetector::getDimensions(const AVPicture *pgm, int pgmheight,
+BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
         long long _frameno, int *prow, int *pcol, int *pwidth, int *pheight)
 {
     /*

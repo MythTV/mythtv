@@ -9,7 +9,6 @@
 
 #include "FrameAnalyzer.h"
 
-typedef struct AVPicture AVPicture;
 class HistogramAnalyzer;
 class TemplateMatcher;
 

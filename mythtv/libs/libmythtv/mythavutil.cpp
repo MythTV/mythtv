@@ -16,6 +16,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavfilter/buffersrc.h"
 #include "libavfilter/buffersink.h"
+#include "libavutil/imgutils.h"
 }
 
 AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
@@ -58,14 +59,15 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
     }
 }
 
-int AVPictureFill(AVPicture *pic, const VideoFrame *frame, AVPixelFormat fmt)
+int AVPictureFill(AVFrame *pic, const VideoFrame *frame, AVPixelFormat fmt)
 {
     if (fmt == AV_PIX_FMT_NONE)
     {
         fmt = FrameTypeToPixelFormat(frame->codec);
     }
 
-    avpicture_fill(pic, frame->buf, fmt, frame->width, frame->height);
+    av_image_fill_arrays(pic->data, pic->linesize, frame->buf,
+        fmt, frame->width, frame->height, IMAGE_ALIGN);
     pic->data[1] = frame->buf + frame->offsets[1];
     pic->data[2] = frame->buf + frame->offsets[2];
     pic->linesize[0] = frame->pitches[0];
@@ -98,7 +100,7 @@ public:
         {
             return size;
         }
-        size    = avpicture_get_size(_fmt, _width, _height);
+        size    = av_image_get_buffer_size(_fmt, _width, _height, IMAGE_ALIGN);
         width   = _width;
         height  = _height;
         format  = _fmt;
@@ -120,10 +122,10 @@ MythAVCopy::~MythAVCopy()
     delete d;
 }
 
-void MythAVCopy::FillFrame(VideoFrame *frame, const AVPicture *pic, int pitch,
+void MythAVCopy::FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
                            int width, int height, AVPixelFormat pix_fmt)
 {
-    int size = avpicture_get_size(pix_fmt, width, height);
+    int size = av_image_get_buffer_size(pix_fmt, width, height, IMAGE_ALIGN);
 
     if (pix_fmt == AV_PIX_FMT_YUV420P)
     {
@@ -146,8 +148,8 @@ void MythAVCopy::FillFrame(VideoFrame *frame, const AVPicture *pic, int pitch,
     }
 }
 
-int MythAVCopy::Copy(AVPicture *dst, AVPixelFormat dst_pix_fmt,
-                 const AVPicture *src, AVPixelFormat pix_fmt,
+int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
+                 const AVFrame *src, AVPixelFormat pix_fmt,
                  int width, int height)
 {
     if ((pix_fmt == AV_PIX_FMT_YUV420P || pix_fmt == AV_PIX_FMT_NV12) &&
@@ -197,7 +199,7 @@ int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
         return dst->size;
     }
 
-    AVPicture srcpic, dstpic;
+    AVFrame srcpic, dstpic;
 
     AVPictureFill(&srcpic, src);
     AVPictureFill(&dstpic, dst);
@@ -207,7 +209,7 @@ int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
                 src->width, src->height);
 }
 
-int MythAVCopy::Copy(AVPicture *pic, const VideoFrame *frame,
+int MythAVCopy::Copy(AVFrame *pic, const VideoFrame *frame,
                  unsigned char *buffer, AVPixelFormat fmt)
 {
     VideoFrameType type = PixelFormatToFrameType(fmt);
@@ -219,15 +221,15 @@ int MythAVCopy::Copy(AVPicture *pic, const VideoFrame *frame,
         return 0;
     }
 
-    AVPicture pic_in;
+    AVFrame pic_in;
     AVPixelFormat fmt_in = FrameTypeToPixelFormat(frame->codec);
 
     AVPictureFill(&pic_in, frame, fmt_in);
-    avpicture_fill(pic, sbuf, fmt, frame->width, frame->height);
+    av_image_fill_arrays(pic->data, pic->linesize, sbuf, fmt, frame->width, frame->height, IMAGE_ALIGN);
     return Copy(pic, fmt, &pic_in, fmt_in, frame->width, frame->height);
 }
 
-int MythAVCopy::Copy(VideoFrame *frame, const AVPicture *pic, AVPixelFormat fmt)
+int MythAVCopy::Copy(VideoFrame *frame, const AVFrame *pic, AVPixelFormat fmt)
 {
     if (fmt == AV_PIX_FMT_NV12 || AV_PIX_FMT_YUV420P)
     {
@@ -236,7 +238,7 @@ int MythAVCopy::Copy(VideoFrame *frame, const AVPicture *pic, AVPixelFormat fmt)
         return Copy(frame, &framein);
     }
 
-    AVPicture frame_out;
+    AVFrame frame_out;
     AVPixelFormat fmt_out = FrameTypeToPixelFormat(frame->codec);
 
     AVPictureFill(&frame_out, frame, fmt_out);
@@ -260,7 +262,7 @@ MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
     }
 }
 
-int MythPictureDeinterlacer::Deinterlace(AVPicture *dst, const AVPicture *src)
+int MythPictureDeinterlacer::Deinterlace(AVFrame *dst, const AVFrame *src)
 {
     if (m_errored)
     {
@@ -284,13 +286,18 @@ int MythPictureDeinterlacer::Deinterlace(AVPicture *dst, const AVPicture *src)
     {
         return res;
     }
-    av_picture_copy(dst, (const AVPicture*)m_filter_frame, m_pixfmt, m_width, m_height);
+
+    av_image_copy(dst->data, dst->linesize,
+        (const uint8_t **)((AVFrame*)m_filter_frame)->data,
+        (const int*)((AVFrame*)m_filter_frame)->linesize,
+        m_pixfmt, m_width, m_height);
+
     av_frame_unref(m_filter_frame);
 
     return 0;
 }
 
-int MythPictureDeinterlacer::DeinterlaceSingle(AVPicture *dst, const AVPicture *src)
+int MythPictureDeinterlacer::DeinterlaceSingle(AVFrame *dst, const AVFrame *src)
 {
     if (m_errored)
     {

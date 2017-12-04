@@ -18,6 +18,10 @@ using namespace std;
 #include "mmsystem.h"
 #include "tv.h"
 
+extern "C" {
+#include "libavutil/imgutils.h"
+}
+
 #undef UNICODE
 
 const int kNumBuffers = 31;
@@ -473,9 +477,10 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
     }
     else if (buf && !hardware_conv)
     {
-        AVPicture image_out;
-        avpicture_fill(&image_out, (uint8_t*)buf,
-                       AV_PIX_FMT_RGB32, frame->width, frame->height);
+        AVFrame image_out;
+        av_image_fill_arrays(image_out.data, image_out.linesize,
+            (uint8_t*)buf,
+            AV_PIX_FMT_RGB32, frame->width, frame->height, IMAGE_ALIGN);
         image_out.linesize[0] = pitch;
         m_copyFrame.Copy(&image_out, frame,(uint8_t*)buf, AV_PIX_FMT_RGB32);
     }

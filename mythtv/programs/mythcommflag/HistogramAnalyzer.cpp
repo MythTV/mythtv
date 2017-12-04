@@ -308,7 +308,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     static const int    CINC = 4;
 #define ROUNDUP(a,b)    (((a) + (b) - 1) / (b) * (b))
 
-    const AVPicture     *pgm;
+    const AVFrame     *pgm;
     int                 pgmwidth, pgmheight;
     bool                ismonochromatic;
     int                 croprow, cropcol, cropwidth, cropheight;

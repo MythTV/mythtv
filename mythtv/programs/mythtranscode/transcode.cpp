@@ -1075,7 +1075,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     VideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
-    AVPicture imageIn, imageOut;
+    AVFrame imageIn, imageOut;
     struct SwsContext  *scontext = NULL;
 
     if (fifow)

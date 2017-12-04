@@ -15,6 +15,10 @@
 #include "pgm.h"
 #include "PGMConverter.h"
 
+extern "C" {
+#include "libavutil/imgutils.h"
+}
+
 using namespace commDetector2;
 
 PGMConverter::PGMConverter(void)
@@ -34,7 +38,7 @@ PGMConverter::~PGMConverter(void)
 {
     width = -1;
 #ifdef PGM_CONVERT_GREYSCALE
-    avpicture_free(&pgm);
+    av_freep(&pgm.data[0]);
     memset(&pgm, 0, sizeof(pgm));
     delete m_copy;
 #endif /* PGM_CONVERT_GREYSCALE */
@@ -56,10 +60,11 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
     height = buf_dim.height();
 
 #ifdef PGM_CONVERT_GREYSCALE
-    if (avpicture_alloc(&pgm, AV_PIX_FMT_GRAY8, width, height))
+    if (av_image_alloc(pgm.data, pgm.linesize,
+        width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("PGMConverter::MythPlayerInited "
-                                          "avpicture_alloc pgm (%1x%2) failed")
+                                          "av_image_alloc pgm (%1x%2) failed")
                 .arg(width).arg(height));
         return -1;
     }
@@ -78,7 +83,7 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
     return 0;
 }
 
-const AVPicture *
+const AVFrame *
 PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
         int *pwidth, int *pheight)
 {
@@ -103,7 +108,8 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
     timersub(&end, &start, &elapsed);
     timeradd(&convert_time, &elapsed, &convert_time);
 #else  /* !PGM_CONVERT_GREYSCALE */
-    if (avpicture_fill(&pgm, frame->buf, AV_PIX_FMT_GRAY8, width, height) == -1)
+    if (av_image_fill_arrays(pgm.data, pgm.linesize,
+        frame->buf, AV_PIX_FMT_GRAY8, width, height,IMAGE_ALIGN) < 0)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("PGMConverter::getImage error at frame %1 (%2x%3)")

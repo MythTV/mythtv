@@ -28,12 +28,16 @@ using namespace std;
 #include "TemplateFinder.h"
 #include "TemplateMatcher.h"
 
+extern "C" {
+#include "libavutil/imgutils.h"
+}
+
 using namespace commDetector2;
 using namespace frameAnalyzer;
 
 namespace {
 
-int pgm_set(const AVPicture *pict, int height)
+int pgm_set(const AVFrame *pict, int height)
 {
     const int   width = pict->linesize[0];
     const int   size = height * width;
@@ -46,7 +50,7 @@ int pgm_set(const AVPicture *pict, int height)
     return score;
 }
 
-int pgm_match(const AVPicture *tmpl, const AVPicture *test, int height,
+int pgm_match(const AVFrame *tmpl, const AVFrame *test, int height,
               int radius, unsigned short *pscore)
 {
     /* Return the number of matching "edge" and non-edge pixels. */
@@ -370,7 +374,7 @@ TemplateMatcher::~TemplateMatcher(void)
         delete []matches;
     if (match)
         delete []match;
-    avpicture_free(&cropped);
+    av_freep(&cropped.data[0]);
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -388,11 +392,12 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
         return ANALYZE_FATAL;
     }
 
-    if (avpicture_alloc(&cropped, AV_PIX_FMT_GRAY8, tmplwidth, tmplheight))
+    if (av_image_alloc(cropped.data, cropped.linesize,
+        tmplwidth, tmplheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::MythPlayerInited "
-                    "avpicture_alloc cropped (%1x%2) failed")
+                    "av_image_alloc cropped (%1x%2) failed")
                 .arg(tmplwidth).arg(tmplheight));
         return ANALYZE_FATAL;
     }
@@ -422,7 +427,7 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
     return ANALYZE_OK;
 
 free_cropped:
-    avpicture_free(&cropped);
+    av_freep(&cropped.data[0]);
     return ANALYZE_FATAL;
 }
 
@@ -465,8 +470,8 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
      */
     const int           JITTER_RADIUS = 0;
 
-    const AVPicture     *pgm;
-    const AVPicture     *edges;
+    const AVFrame     *pgm;
+    const AVFrame     *edges;
     int                 pgmwidth, pgmheight;
     struct timeval      start, end, elapsed;
 

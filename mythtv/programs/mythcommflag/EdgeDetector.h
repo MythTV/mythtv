@@ -8,17 +8,17 @@
 #ifndef __EDGEDETECTOR_H__
 #define __EDGEDETECTOR_H__
 
-typedef struct AVPicture AVPicture;
+typedef struct AVFrame AVFrame;
 
 namespace edgeDetector {
 
 /* Pass all zeroes to not exclude any areas from examination. */
 
 unsigned int *sgm_init_exclude(unsigned int *sgm,
-        const AVPicture *src, int srcheight,
+        const AVFrame *src, int srcheight,
         int excluderow, int excludecol, int excludewidth, int excludeheight);
 
-int edge_mark_uniform_exclude(AVPicture *dst, int dstheight, int extramargin,
+int edge_mark_uniform_exclude(AVFrame *dst, int dstheight, int extramargin,
         const unsigned int *sgm, unsigned int *sgmsorted, int percentile,
         int excluderow, int excludecol, int excludewidth, int excludeheight);
 
@@ -33,7 +33,7 @@ public:
     virtual int setExcludeArea(int row, int col, int width, int height);
 
     /* Detect edges in "pgm" image. */
-    virtual const AVPicture *detectEdges(const AVPicture *pgm, int pgmheight,
+    virtual const AVFrame *detectEdges(const AVFrame *pgm, int pgmheight,
             int percentile) = 0;
 };
 

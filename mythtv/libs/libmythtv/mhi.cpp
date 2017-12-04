@@ -38,6 +38,10 @@
 #include "mythuiactions.h"              // for ACTION_0, ACTION_1, etc
 #include "tv_actions.h"                 // for ACTION_MENUTEXT, etc
 
+extern "C" {
+#include "libavutil/imgutils.h"
+}
+
 static bool       ft_loaded = false;
 static FT_Library ft_library;
 
@@ -1920,17 +1924,18 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         m_image = QImage(nContentWidth, nContentHeight, QImage::Format_ARGB32);
         m_opaque = true; // MPEG images are always opaque.
 
-        AVPicture retbuf;
-        memset(&retbuf, 0, sizeof(AVPicture));
+        AVFrame retbuf;
+        memset(&retbuf, 0, sizeof(AVFrame));
 
         int bufflen = nContentWidth * nContentHeight * 3;
         unsigned char *outputbuf = (unsigned char*)av_malloc(bufflen);
 
-        avpicture_fill(&retbuf, outputbuf, AV_PIX_FMT_RGB24,
-                       nContentWidth, nContentHeight);
+        av_image_fill_arrays(retbuf.data, retbuf.linesize,
+            outputbuf, AV_PIX_FMT_RGB24,
+            nContentWidth, nContentHeight,IMAGE_ALIGN);
 
         AVFrame *tmp = picture;
-        m_copyCtx->Copy(&retbuf, AV_PIX_FMT_RGB24, (AVPicture*)tmp, c->pix_fmt,
+        m_copyCtx->Copy(&retbuf, AV_PIX_FMT_RGB24, (AVFrame*)tmp, c->pix_fmt,
                      nContentWidth, nContentHeight);
 
         uint8_t * buf = outputbuf;

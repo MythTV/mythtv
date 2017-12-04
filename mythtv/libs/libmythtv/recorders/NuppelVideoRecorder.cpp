@@ -43,6 +43,7 @@ extern "C" {
 
 extern "C" {
 #include "libswscale/swscale.h"
+#include "libavutil/imgutils.h"
 }
 
 #ifdef USING_V4L2
@@ -1613,7 +1614,7 @@ void NuppelVideoRecorder::DoV4L2(void)
     // setup pixel format conversions for YUYV and UYVY
     uint8_t *output_buffer = NULL;
     struct SwsContext *convert_ctx = NULL;
-    AVPicture img_out;
+    AVFrame img_out;
     if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV ||
         v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
     {
@@ -1640,7 +1641,8 @@ void NuppelVideoRecorder::DoV4L2(void)
             return;
         }
 
-        avpicture_fill(&img_out, output_buffer, AV_PIX_FMT_YUV420P, width, height);
+        av_image_fill_arrays(img_out.data, img_out.linesize,
+            output_buffer, AV_PIX_FMT_YUV420P, width, height, IMAGE_ALIGN);
     }
 
     while (IsRecordingRequested() && !IsErrored())
@@ -1743,16 +1745,20 @@ again:
         {
             if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV)
             {
-                AVPicture img_in;
-                avpicture_fill(&img_in, buffers[frame], AV_PIX_FMT_YUYV422, width, height);
+                AVFrame img_in;
+                av_image_fill_arrays(img_in.data, img_in.linesize,
+                    buffers[frame], AV_PIX_FMT_YUYV422, width, height,
+                    IMAGE_ALIGN);
                 sws_scale(convert_ctx, img_in.data, img_in.linesize,
                           0, height, img_out.data, img_out.linesize);
                 BufferIt(output_buffer, video_buffer_size);
             }
             else if (v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
             {
-                AVPicture img_in;
-                avpicture_fill(&img_in, buffers[frame], AV_PIX_FMT_UYVY422, width, height);
+                AVFrame img_in;
+                av_image_fill_arrays(img_in.data, img_in.linesize,
+                    buffers[frame], AV_PIX_FMT_UYVY422, width, height,
+                    IMAGE_ALIGN);
                 sws_scale(convert_ctx, img_in.data, img_in.linesize,
                           0, height, img_out.data, img_out.linesize);
                 BufferIt(output_buffer, video_buffer_size);

@@ -19,11 +19,11 @@
 #define __TEMPLATEMATCHER_H__
 
 extern "C" {
-#include "libavcodec/avcodec.h"    /* AVPicture */
+#include "libavcodec/avcodec.h"    /* AVFrame */
 }
 #include "FrameAnalyzer.h"
 
-typedef struct AVPicture AVPicture;
+typedef struct AVFrame AVFrame;
 class PGMConverter;
 class EdgeDetector;
 class TemplateFinder;
@@ -56,7 +56,7 @@ private:
     PGMConverter            *pgmConverter;
     EdgeDetector            *edgeDetector;
     TemplateFinder          *templateFinder;
-    const struct AVPicture  *tmpl;                  /* template image */
+    const struct AVFrame  *tmpl;                  /* template image */
     int                     tmplrow, tmplcol;       /* template location */
     int                     tmplwidth, tmplheight;  /* template dimensions */
 
@@ -65,7 +65,7 @@ private:
     unsigned char           *match;                 /* boolean result: 1/0 */
 
     float                   fps;
-    AVPicture               cropped;                /* pre-allocated buffer */
+    AVFrame               cropped;                /* pre-allocated buffer */
     FrameAnalyzer::FrameMap breakMap;               /* frameno => nframes */
 
     /* Debugging */

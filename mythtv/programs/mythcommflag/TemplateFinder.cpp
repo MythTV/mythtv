@@ -26,11 +26,15 @@
 #include "EdgeDetector.h"
 #include "TemplateFinder.h"
 
+extern "C" {
+    #include "libavutil/imgutils.h"
+    }
+
 using namespace commDetector2;
 
 namespace {
 
-int writeJPG(QString prefix, const AVPicture *img, int imgheight)
+int writeJPG(QString prefix, const AVFrame *img, int imgheight)
 {
     const int imgwidth = img->linesize[0];
     QFileInfo jpgfi(prefix + ".jpg");
@@ -65,7 +69,7 @@ int writeJPG(QString prefix, const AVPicture *img, int imgheight)
 
 int
 pgm_scorepixels(unsigned int *scores, int width, int row, int col,
-        const AVPicture *src, int srcheight)
+        const AVFrame *src, int srcheight)
 {
     /* Every time a pixel is an edge, give it a point. */
     const int   srcwidth = src->linesize[0];
@@ -90,7 +94,7 @@ sort_ascending(const void *aa, const void *bb)
 }
 
 float
-bounding_score(const AVPicture *img, int row, int col, int width, int height)
+bounding_score(const AVFrame *img, int row, int col, int width, int height)
 {
     /* Return a value between [0..1] */
     const int       imgwidth = img->linesize[0];
@@ -112,7 +116,7 @@ bounding_score(const AVPicture *img, int row, int col, int width, int height)
 }
 
 bool
-rowisempty(const AVPicture *img, int row, int col, int width)
+rowisempty(const AVFrame *img, int row, int col, int width)
 {
     const int   imgwidth = img->linesize[0];
     for (int cc = col; cc < col + width; cc++)
@@ -122,7 +126,7 @@ rowisempty(const AVPicture *img, int row, int col, int width)
 }
 
 bool
-colisempty(const AVPicture *img, int col, int row, int height)
+colisempty(const AVFrame *img, int col, int row, int height)
 {
     const int   imgwidth = img->linesize[0];
     for (int rr = row; rr < row + height; rr++)
@@ -132,7 +136,7 @@ colisempty(const AVPicture *img, int col, int row, int height)
 }
 
 int
-bounding_box(const AVPicture *img, int imgheight,
+bounding_box(const AVFrame *img, int imgheight,
         int minrow, int mincol, int maxrow1, int maxcol1,
         int *prow, int *pcol, int *pwidth, int *pheight)
 {
@@ -440,7 +444,7 @@ bounding_box(const AVPicture *img, int imgheight,
 
 int
 template_alloc(const unsigned int *scores, int width, int height,
-        int minrow, int mincol, int maxrow1, int maxcol1, AVPicture *tmpl,
+        int minrow, int mincol, int maxrow1, int maxcol1, AVFrame *tmpl,
         int *ptmplrow, int *ptmplcol, int *ptmplwidth, int *ptmplheight,
         bool debug_edgecounts, QString debugdir)
 {
@@ -458,12 +462,13 @@ template_alloc(const unsigned int *scores, int width, int height,
     const int               nn = width * height;
     int                     ii, first, last;
     unsigned int            *sortedscores, threshscore;
-    AVPicture               thresh;
+    AVFrame               thresh;
 
-    if (avpicture_alloc(&thresh, AV_PIX_FMT_GRAY8, width, height))
+    if (av_image_alloc(thresh.data, thresh.linesize,
+        width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
-            QString("template_alloc avpicture_alloc thresh (%1x%2) failed")
+            QString("template_alloc av_image_alloc thresh (%1x%2) failed")
                 .arg(width).arg(height));
         return -1;
     }
@@ -505,11 +510,12 @@ template_alloc(const unsigned int *scores, int width, int height,
     if (debug_edgecounts)
     {
         /* Scores, rescaled to [0..UCHAR_MAX]. */
-        AVPicture scored;
-        if (avpicture_alloc(&scored, AV_PIX_FMT_GRAY8, width, height))
+        AVFrame scored;
+        if (av_image_alloc(scored.data, scored.linesize,
+            width, height, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
         {
             LOG(VB_COMMFLAG, LOG_ERR,
-                QString("template_alloc avpicture_alloc scored (%1x%2) failed")
+                QString("template_alloc av_image_alloc scored (%1x%2) failed")
                     .arg(width).arg(height));
             goto free_thresh;
         }
@@ -518,7 +524,7 @@ template_alloc(const unsigned int *scores, int width, int height,
             scored.data[0][ii] = scores[ii] * UCHAR_MAX / maxscore;
         int error = writeJPG(debugdir + "/TemplateFinder-scores", &scored,
                 height);
-        avpicture_free(&scored);
+        av_freep(&scored.data[0]);
         if (error)
             goto free_thresh;
 
@@ -542,10 +548,11 @@ template_alloc(const unsigned int *scores, int width, int height,
         goto free_thresh;
     }
 
-    if (avpicture_alloc(tmpl, AV_PIX_FMT_GRAY8, *ptmplwidth, *ptmplheight))
+    if (av_image_alloc(tmpl->data, tmpl->linesize,
+        *ptmplwidth, *ptmplheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
-            QString("template_alloc avpicture_alloc tmpl (%1x%2) failed")
+            QString("template_alloc av_image_alloc tmpl (%1x%2) failed")
                 .arg(*ptmplwidth).arg(*ptmplheight));
         goto free_thresh;
     }
@@ -555,18 +562,19 @@ template_alloc(const unsigned int *scores, int width, int height,
         goto free_thresh;
 
     delete []sortedscores;
-    avpicture_free(&thresh);
+    av_freep(&thresh.data[0]);
+
     return 0;
 
 free_thresh:
     delete []sortedscores;
-    avpicture_free(&thresh);
+    av_freep(&thresh.data[0]);
     return -1;
 }
 
 int
-analyzeFrameDebug(long long frameno, const AVPicture *pgm, int pgmheight,
-        const AVPicture *cropped, const AVPicture *edges, int cropheight,
+analyzeFrameDebug(long long frameno, const AVFrame *pgm, int pgmheight,
+        const AVFrame *cropped, const AVFrame *edges, int cropheight,
         int croprow, int cropcol, bool debug_frames, QString debugdir)
 {
     static const int    delta = 24;
@@ -619,7 +627,7 @@ error:
 
 bool
 readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
-        QString tmplfile, AVPicture *tmpl, bool *pvalid)
+        QString tmplfile, AVFrame *tmpl, bool *pvalid)
 {
     QFile dfile(datafile);
     QFileInfo dfileinfo(dfile);
@@ -638,10 +646,11 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
     stream >> *prow >> *pcol >> *pwidth >> *pheight;
     dfile.close();
 
-    if (avpicture_alloc(tmpl, AV_PIX_FMT_GRAY8, *pwidth, *pheight))
+    if (av_image_alloc(tmpl->data, tmpl->linesize,
+        *pwidth, *pheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
-            QString("readTemplate avpicture_alloc %1 (%2x%3) failed")
+            QString("readTemplate av_image_alloc %1 (%2x%3) failed")
                 .arg(tmplfile).arg(*pwidth).arg(*pheight));
         return false;
     }
@@ -649,7 +658,7 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
     QByteArray tmfile = tmplfile.toLatin1();
     if (pgm_read(tmpl->data[0], *pwidth, *pheight, tmfile.constData()))
     {
-        avpicture_free(tmpl);
+        av_freep(&tmpl->data[0]);
         return false;
     }
 
@@ -669,7 +678,7 @@ writeDummyTemplate(QString datafile)
 }
 
 bool
-writeTemplate(QString tmplfile, const AVPicture *tmpl, QString datafile,
+writeTemplate(QString tmplfile, const AVFrame *tmpl, QString datafile,
         int row, int col, int width, int height)
 {
     QFile tfile(tmplfile);
@@ -782,8 +791,8 @@ TemplateFinder::~TemplateFinder(void)
 {
     if (scores)
         delete []scores;
-    avpicture_free(&tmpl);
-    avpicture_free(&cropped);
+    av_freep(&tmpl.data[0]);
+    av_freep(&cropped.data[0]);
 }
 
 enum FrameAnalyzer::analyzeFrameResult
@@ -848,7 +857,7 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
     return ANALYZE_OK;
 
 free_tmpl:
-    avpicture_free(&tmpl);
+    av_freep(&tmpl.data[0]);
     return ANALYZE_FATAL;
 }
 
@@ -858,13 +867,14 @@ TemplateFinder::resetBuffers(int newwidth, int newheight)
     if (cwidth == newwidth && cheight == newheight)
         return 0;
 
-    avpicture_free(&cropped);
+        av_freep(&cropped.data[0]);
 
-    if (avpicture_alloc(&cropped, AV_PIX_FMT_GRAY8, newwidth, newheight))
+    if (av_image_alloc(cropped.data, cropped.linesize,
+        newwidth, newheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateFinder::resetBuffers "
-                    "avpicture_alloc cropped (%1x%2) failed")
+                    "av_image_alloc cropped (%1x%2) failed")
                 .arg(newwidth).arg(newheight));
         return -1;
     }
@@ -908,7 +918,7 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     static const float  EXCLUDEWIDTH = 0.5;
     static const float  EXCLUDEHEIGHT = 0.5;
 
-    const AVPicture     *pgm, *edges;
+    const AVFrame     *pgm, *edges;
     int                 pgmwidth, pgmheight;
     int                 croprow, cropcol, cropwidth, cropheight;
     int                 excluderow, excludecol, excludewidth, excludeheight;
@@ -1037,7 +1047,7 @@ TemplateFinder::finished(long long nframes, bool final)
     return 0;
 
 free_tmpl:
-    avpicture_free(&tmpl);
+    av_freep(&tmpl.data[0]);
     return -1;
 }
 
@@ -1055,7 +1065,7 @@ TemplateFinder::reportTime(void) const
     return 0;
 }
 
-const struct AVPicture *
+const struct AVFrame *
 TemplateFinder::getTemplate(int *prow, int *pcol, int *pwidth, int *pheight)
     const
 {

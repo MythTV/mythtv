@@ -4509,11 +4509,11 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     unsigned char *data      = NULL;
     unsigned char *outputbuf = NULL;
     VideoFrame    *frame     = NULL;
-    AVPicture      orig;
-    AVPicture      retbuf;
+    AVFrame      orig;
+    AVFrame      retbuf;
     MythAVCopy     copyCtx;
-    memset(&orig,   0, sizeof(AVPicture));
-    memset(&retbuf, 0, sizeof(AVPicture));
+    memset(&orig,   0, sizeof(AVFrame));
+    memset(&retbuf, 0, sizeof(AVFrame));
 
     bufflen = 0;
     vw = vh = 0;

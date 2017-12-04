@@ -872,7 +872,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
         MYTHTV_UYVY == videoTextureType)
     {
         // software conversion
-        AVPicture img_out;
+        AVFrame img_out;
         AVPixelFormat out_fmt = AV_PIX_FMT_BGRA;
         if ((GL_YCBCR_MESA == videoTextureType) ||
             (GL_YCBCR_422_APPLE == videoTextureType) ||
