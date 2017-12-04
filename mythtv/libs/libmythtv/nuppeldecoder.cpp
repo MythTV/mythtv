@@ -923,17 +923,35 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         {
             QMutexLocker locker(avcodeclock);
             // if directrendering, writes into buf
-            int gotpicture = 0;
-            int ret = avcodec_decode_video2(mpa_vidctx, mpa_pic, &gotpicture,
-                                            &pkt);
+            bool gotpicture = false;
+            //  SUGGESTION
+            //  Now that avcodec_decode_video2 is deprecated and replaced
+            //  by 2 calls (receive frame and send packet), this could be optimized
+            //  into separate routines or separate threads.
+            //  Also now that it always consumes a whole buffer some code
+            //  in the caller may be able to be optimized.
+            int ret = avcodec_receive_frame(mpa_vidctx, mpa_pic);
+            if (ret == 0)
+                gotpicture = true;
+            if (ret == AVERROR(EAGAIN))
+                ret = 0;
+            if (ret == 0)
+                ret = avcodec_send_packet(mpa_vidctx, &pkt);
             directframe = NULL;
+            // The code assumes that there is always space to add a new
+            // packet. This seems risky but has always worked.
+            // It should actually check if (ret == AVERROR(EAGAIN)) and then keep
+            // the packet around and try it again after processing the frame
+            // received here.
             if (ret < 0)
             {
-                LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                    QString("avcodec_decode_video returned: %1").arg(ret));
-                return false;
+                char error[AV_ERROR_MAX_STRING_SIZE];
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("video decode error: %1 (%2)")
+                    .arg(av_make_error_string(error, sizeof(error), ret))
+                    .arg(gotpicture));
             }
-            else if (!gotpicture)
+            if (!gotpicture)
             {
                 return false;
             }

@@ -3582,13 +3582,34 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     else
     {
         context->reordered_opaque = pkt->pts;
-        ret = avcodec_decode_video2(context, mpa_pic, &gotpicture, pkt);
+        //  SUGGESTION
+        //  Now that avcodec_decode_video2 is deprecated and replaced
+        //  by 2 calls (receive frame and send packet), this could be optimized
+        //  into separate routines or separate threads.
+        //  Also now that it always consumes a whole buffer some code
+        //  in the caller may be able to be optimized.
+        ret = avcodec_receive_frame(context, mpa_pic);
+        if (ret == 0)
+            gotpicture = 1;
+        if (ret == AVERROR(EAGAIN))
+            ret = 0;
+        if (ret == 0)
+            ret = avcodec_send_packet(context, pkt);
+        // The code assumes that there is always space to add a new
+        // packet. This seems risky but has always worked.
+        // It should actually check if (ret == AVERROR(EAGAIN)) and then keep
+        // the packet around and try it again after processing the frame
+        // received here.
     }
     avcodeclock->unlock();
 
     if (ret < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown decoding error");
+        char error[AV_ERROR_MAX_STRING_SIZE];
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("video decode error: %1 (%2)")
+            .arg(av_make_error_string(error, sizeof(error), ret))
+            .arg(gotpicture));
         return false;
     }
 

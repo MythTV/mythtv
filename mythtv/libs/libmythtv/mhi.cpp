@@ -1877,7 +1877,8 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     MythAVFrame picture;
     AVPacket pkt;
     uint8_t *buff = NULL;
-    int gotPicture = 0, len;
+    bool gotPicture = false;
+    int len;
     m_image = QImage();
 
     // Find the mpeg2 video decoder.
@@ -1899,22 +1900,33 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     memcpy(pkt.data, data, length);
     buff = pkt.data;
 
-    while (pkt.size > 0 && ! gotPicture)
+    // Get a picture from the packet. Allow 9 loops for
+    // packet to be decoded. It should take only 2-3 loops
+    for (int limit=0; limit<10 && !gotPicture; limit++)
     {
-        len = avcodec_decode_video2(c, picture, &gotPicture, &pkt);
-        if (len < 0) // Error
+        len = avcodec_receive_frame(c, picture);
+        if (len == 0)
+            gotPicture = true;
+        if (len == AVERROR(EAGAIN))
+            len = 0;
+        if (len == 0)
+            len = avcodec_send_packet(c, &pkt);
+        if (len == AVERROR(EAGAIN) || len == AVERROR_EOF)
+            len = 0;
+        else if (len < 0) // Error
+        {
+            char error[AV_ERROR_MAX_STRING_SIZE];
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("[mhi] video decode error: %1 (%2)")
+                .arg(av_make_error_string(error, sizeof(error), len))
+                .arg(gotPicture));
             goto Close;
-        pkt.data += len;
-        pkt.size -= len;
-    }
-
-    if (!gotPicture)
-    {
-        pkt.data = NULL;
-        pkt.size = 0;
-        // Process any buffered data
-        if (avcodec_decode_video2(c, picture, &gotPicture, &pkt) < 0)
-            goto Close;
+        }
+        else
+        {
+            pkt.data = NULL;
+            pkt.size = 0;
+        }
     }
 
     if (gotPicture)
