@@ -239,7 +239,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         av_init_packet(&pkt);
         pkt.data          = NULL;
         pkt.size          = 0;
-        int got_packet    = 0;
+        bool got_packet   = false;
 
         AudioOutputUtil::DeinterleaveSamples(
             FORMAT_S16, channels,
@@ -247,12 +247,28 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             (uint8_t*)(in + i * samples_per_frame),
             size_channel * channels);
 
-        int ret           = avcodec_encode_audio2(av_context, &pkt, m_frame,
-                                                  &got_packet);
+        //  SUGGESTION
+        //  Now that avcodec_encode_audio2 is deprecated and replaced
+        //  by 2 calls, this could be optimized
+        //  into separate routines or separate threads.
+        int ret = avcodec_receive_packet(av_context, &pkt);
+        if (ret == 0)
+            got_packet = true;
+        if (ret == AVERROR(EAGAIN))
+            ret = 0;
+        if (ret == 0)
+            ret = avcodec_send_frame(av_context, m_frame);
+        // if ret from avcodec_send_frame is AVERROR(EAGAIN) then
+        // there are 2 packets to be received while only 1 frame to be
+        // sent. The code does not cater for this. Hopefully it will not happen.
 
         if (ret < 0)
         {
-            LOG(VB_AUDIO, LOG_ERR, LOC + "AC-3 encode error");
+            char error[AV_ERROR_MAX_STRING_SIZE];
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("audio encode error: %1 (%2)")
+                .arg(av_make_error_string(error, sizeof(error), ret))
+                .arg(got_packet));
             return ret;
         }
         i++;
