@@ -10,7 +10,7 @@ explicitly or implicitly
 '''
 
 import requests_cache
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # patch if required if older versions of
 try:
@@ -37,7 +37,7 @@ except Exception as e:
         """
         if not self._cache_expire_after:
             return
-        self.cache.remove_old_entries(datetime.utcnow() - self._cache_expire_after)
+        self.cache.remove_old_entries(datetime.utcnow() - timedelta(self._cache_expire_after))
 
 
     requests_cache.backends.base.BaseCache.remove_old_entries = remove_old_entries
