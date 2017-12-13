@@ -21,6 +21,8 @@ extern "C" {
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "omxcontext.h"
+#include "mythavutil.h"
+
 using namespace omxcontext;
 
 
@@ -782,7 +784,8 @@ int PrivateDecoderOMX::GetFrame(
         *got_picture_ptr = 1;
 
     // Check for OMX_EventPortSettingsChanged notification
-    if (SettingsChanged(stream->codec) != OMX_ErrorNone)
+    AVCodecContext *avctx = gCodecMap->getCodecContext(stream);
+    if (SettingsChanged(avctx) != OMX_ErrorNone)
     {
         // PGB If there was an error, discard this packet
         *got_picture_ptr = 0;
@@ -815,7 +818,7 @@ int PrivateDecoderOMX::ProcessPacket(AVStream *stream, AVPacket *pkt)
     // Convert h264_mp4toannexb
     if (m_filter)
     {
-        AVCodecContext *avctx = stream->codec;
+        AVCodecContext *avctx = gCodecMap->getCodecContext(stream);
         int outbuf_size = 0;
         uint8_t *outbuf = NULL;
         int res = av_bitstream_filter_filter(m_filter, avctx, NULL, &outbuf,
@@ -906,7 +909,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
     if (!picture)
         return -1;
 
-    AVCodecContext *avctx = stream->codec;
+    AVCodecContext *avctx = gCodecMap->getCodecContext(stream);
     if (!avctx)
         return -1;
 

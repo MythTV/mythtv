@@ -196,8 +196,8 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
 
                     AVStream *curstream = ic->streams[pkt->stream_index];
 
-                    if ((curstream->codec->codec_type == AVMEDIA_TYPE_VIDEO) ||
-                        (curstream->codec->codec_id == AV_CODEC_ID_DVD_NAV))
+                    if ((curstream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) ||
+                        (curstream->codecpar->codec_id == AV_CODEC_ID_DVD_NAV))
                     {
                         // Allow video or NAV packets through
                         gotPacket = true;
@@ -371,7 +371,7 @@ bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 {
     bool ret = true;
 
-    if (curstream->codec->codec_id == AV_CODEC_ID_DVD_NAV)
+    if (curstream->codecpar->codec_id == AV_CODEC_ID_DVD_NAV)
     {
         MythDVDContext* context = ringBuffer->DVD()->GetDVDContext();
 

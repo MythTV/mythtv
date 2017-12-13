@@ -15,8 +15,13 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+#include <QMap>
+#include <QMutex>
+
 struct AVFilterGraph;
 struct AVFilterContext;
+struct AVStream;
+struct AVCodecContext;
 
 /** MythAVFrame
  * little utility class that act as a safe way to allocate an AVFrame
@@ -70,6 +75,35 @@ public:
 private:
     AVFrame *m_frame;
 };
+
+/**
+ * MythCodecMap
+ * Utility class that keeps pointers to
+ * an AVStream and its AVCodecContext. The codec member
+ * of AVStream was previously used for this but is now
+ * deprecated.
+ *
+ * This is a singeton class - only 1 instance gets created.
+ */
+
+class MythCodecMap
+{
+  public:
+    MythCodecMap();
+    ~MythCodecMap();
+    static MythCodecMap *getInstance();
+    AVCodecContext *getCodecContext(const AVStream*,  const AVCodec *pCodec = NULL);
+    AVCodecContext *hasCodecContext(const AVStream*);
+    void freeCodecContext(const AVStream*);
+    void freeAllCodecContexts();
+  protected:
+    QMap<const AVStream*, AVCodecContext*> streamMap;
+    QMutex mapLock;
+};
+
+/// This global variable contains the MythCodecMap instance for the app
+extern MythCodecMap *gCodecMap;
+
 
 class MythAVCopyPrivate;
 

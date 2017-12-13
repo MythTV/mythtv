@@ -17,7 +17,9 @@ extern "C" {
 #include "libavfilter/buffersrc.h"
 #include "libavfilter/buffersink.h"
 #include "libavutil/imgutils.h"
+#include "libavformat/avformat.h"
 }
+#include <QMutexLocker>
 
 AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
 {
@@ -372,5 +374,69 @@ MythPictureDeinterlacer::~MythPictureDeinterlacer()
     if (m_filter_graph)
     {
         avfilter_graph_free(&m_filter_graph);
+    }
+}
+
+
+MythCodecMap *gCodecMap = new MythCodecMap();
+
+MythCodecMap::MythCodecMap() : mapLock(QMutex::Recursive)
+{
+}
+
+MythCodecMap::~MythCodecMap()
+{
+    freeAllCodecContexts();
+}
+
+AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream, const AVCodec *pCodec)
+{
+    QMutexLocker lock(&mapLock);
+    AVCodecContext *avctx = streamMap.value(stream, NULL);
+    if (!avctx)
+    {
+        if (stream == NULL || stream->codecpar == NULL)
+            return NULL;
+        if (!pCodec)
+            pCodec = avcodec_find_decoder(stream->codecpar->codec_id);
+        if (!pCodec)
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("avcodec_find_decoder fail for %1").arg(stream->codecpar->codec_id));
+            return NULL;
+        }
+        avctx = avcodec_alloc_context3(pCodec);
+        if (avcodec_parameters_to_context(avctx, stream->codecpar) != NULL)
+            avcodec_free_context(&avctx);
+        if (avctx)
+        {
+            av_codec_set_pkt_timebase(avctx, stream->time_base);
+            streamMap.insert(stream, avctx);
+        }
+    }
+    return avctx;
+}
+
+AVCodecContext *MythCodecMap::hasCodecContext(const AVStream *stream)
+{
+    return streamMap.value(stream, NULL);
+}
+
+void MythCodecMap::freeCodecContext(const AVStream *stream)
+{
+    QMutexLocker lock(&mapLock);
+    AVCodecContext *avctx = streamMap.take(stream);
+    if (avctx)
+        avcodec_free_context(&avctx);
+}
+
+void MythCodecMap::freeAllCodecContexts()
+{
+    QMutexLocker lock(&mapLock);
+    QMap<const AVStream*, AVCodecContext*>::iterator i = streamMap.begin();
+    while (i != streamMap.end()) {
+        const AVStream *stream = i.key();
+        ++i;
+        freeCodecContext(stream);
     }
 }
