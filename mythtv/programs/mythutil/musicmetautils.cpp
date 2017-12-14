@@ -275,9 +275,20 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         AVStream *st = inputFC->streams[i];
         char buf[256];
 
-        avcodec_string(buf, sizeof(buf), st->codec, false);
+        const AVCodec *pCodec = avcodec_find_decoder(st->codecpar->codec_id);
+        if (!pCodec)
+        {
+            LOG(VB_GENERAL, LOG_WARNING,
+                QString("avcodec_find_decoder fail for %1").arg(st->codecpar->codec_id));
+            continue;
+        }
+        AVCodecContext *avctx = avcodec_alloc_context3(pCodec);
+        avcodec_parameters_to_context(avctx, st->codecpar);
+        av_codec_set_pkt_timebase(avctx, st->time_base);
 
-        switch (inputFC->streams[i]->codec->codec_type)
+        avcodec_string(buf, sizeof(buf), avctx, false);
+
+        switch (inputFC->streams[i]->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_AUDIO:
             {
@@ -299,9 +310,10 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
             default:
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Skipping unsupported codec %1 on stream %2")
-                        .arg(inputFC->streams[i]->codec->codec_type).arg(i));
+                        .arg(inputFC->streams[i]->codecpar->codec_type).arg(i));
                 break;
         }
+        avcodec_free_context(&avctx);
     }
 
     // Close input file

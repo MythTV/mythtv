@@ -702,7 +702,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
         directrendering = true;
 
     if (mpa_vidctx)
-        av_free(mpa_vidctx);
+        avcodec_free_context(&mpa_vidctx);
 
     mpa_vidctx = avcodec_alloc_context3(NULL);
 
@@ -742,16 +742,8 @@ void NuppelDecoder::CloseAVCodecVideo(void)
 {
     QMutexLocker locker(avcodeclock);
 
-    if (mpa_vidcodec)
-    {
-        avcodec_close(mpa_vidctx);
-
-        if (mpa_vidctx)
-        {
-            av_free(mpa_vidctx);
-            mpa_vidctx = NULL;
-        }
-    }
+    if (mpa_vidcodec && mpa_vidctx)
+        avcodec_free_context(&mpa_vidctx);
 }
 
 bool NuppelDecoder::InitAVCodecAudio(int codec)
@@ -781,7 +773,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     }
 
     if (mpa_audctx)
-        av_free(mpa_audctx);
+        avcodec_free_context(&mpa_audctx);
 
     mpa_audctx = avcodec_alloc_context3(NULL);
 
@@ -802,16 +794,8 @@ void NuppelDecoder::CloseAVCodecAudio(void)
 {
     QMutexLocker locker(avcodeclock);
 
-    if (mpa_audcodec)
-    {
-        avcodec_close(mpa_audctx);
-
-        if (mpa_audctx)
-        {
-            av_free(mpa_audctx);
-            mpa_audctx = NULL;
-        }
-    }
+    if (mpa_audcodec && mpa_audctx)
+        avcodec_free_context(&mpa_audctx);
 }
 
 static void CopyToVideo(unsigned char *buf, int video_width,

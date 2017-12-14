@@ -389,7 +389,8 @@ MythCodecMap::~MythCodecMap()
     freeAllCodecContexts();
 }
 
-AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream, const AVCodec *pCodec)
+AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
+    const AVCodec *pCodec, bool nullCodec)
 {
     QMutexLocker lock(&mapLock);
     AVCodecContext *avctx = streamMap.value(stream, NULL);
@@ -397,16 +398,21 @@ AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream, const AVCo
     {
         if (stream == NULL || stream->codecpar == NULL)
             return NULL;
-        if (!pCodec)
-            pCodec = avcodec_find_decoder(stream->codecpar->codec_id);
-        if (!pCodec)
+        if (nullCodec)
+            pCodec = NULL;
+        else
         {
-            LOG(VB_GENERAL, LOG_WARNING,
-                QString("avcodec_find_decoder fail for %1").arg(stream->codecpar->codec_id));
-            return NULL;
+            if (!pCodec)
+                pCodec = avcodec_find_decoder(stream->codecpar->codec_id);
+            if (!pCodec)
+            {
+                LOG(VB_GENERAL, LOG_WARNING,
+                    QString("avcodec_find_decoder fail for %1").arg(stream->codecpar->codec_id));
+                return NULL;
+            }
         }
         avctx = avcodec_alloc_context3(pCodec);
-        if (avcodec_parameters_to_context(avctx, stream->codecpar) != NULL)
+        if (avcodec_parameters_to_context(avctx, stream->codecpar) < 0)
             avcodec_free_context(&avctx);
         if (avctx)
         {

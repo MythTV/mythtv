@@ -874,7 +874,7 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
 
     for (unsigned int i = 0; i < inputFC->nb_streams; i++)
     {
-        switch (inputFC->streams[i]->codec->codec_type)
+        switch (inputFC->streams[i]->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
                 if (vid_id == -1)
@@ -883,16 +883,16 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
 
             case AVMEDIA_TYPE_AUDIO:
                 if (!allaudio && ext_count > 0 &&
-                    inputFC->streams[i]->codec->channels < 2 &&
-                    inputFC->streams[i]->codec->sample_rate < 100000)
+                    inputFC->streams[i]->codecpar->channels < 2 &&
+                    inputFC->streams[i]->codecpar->sample_rate < 100000)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Skipping audio stream: %1").arg(i));
                     break;
                 }
-                if (inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_AC3 ||
-                    inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_MP3 ||
-                    inputFC->streams[i]->codec->codec_id == AV_CODEC_ID_MP2)
+                if (inputFC->streams[i]->codecpar->codec_id == AV_CODEC_ID_AC3 ||
+                    inputFC->streams[i]->codecpar->codec_id == AV_CODEC_ID_MP3 ||
+                    inputFC->streams[i]->codecpar->codec_id == AV_CODEC_ID_MP2)
                 {
                     aud_map[i] = ext_count++;
                     aFrame[i] = new FrameList();
@@ -900,12 +900,12 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
                 else
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Skipping unsupported audio stream: %1")
-                            .arg(inputFC->streams[i]->codec->codec_id));
+                            .arg(inputFC->streams[i]->codecpar->codec_id));
                 break;
             default:
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("Skipping unsupported codec %1 on stream %2")
-                        .arg(inputFC->streams[i]->codec->codec_type).arg(i));
+                        .arg(inputFC->streams[i]->codecpar->codec_type).arg(i));
                 break;
         }
     }
@@ -1328,8 +1328,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     SetRepeat(pkt->data, pkt->size, info->display_picture->nb_fields,
               !!(info->display_picture->flags & PIC_FLAG_TOP_FIELD_FIRST));
 
-    avcodec_close(c);
-    av_freep(&c);
+    avcodec_free_context(&c);
 
     return false;
 }
@@ -1458,7 +1457,7 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
             return 1;
         }
 
-        switch (inputFC->streams[pkt->stream_index]->codec->codec_type)
+        switch (inputFC->streams[pkt->stream_index]->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
                 vFrame.append(tmpFrame);

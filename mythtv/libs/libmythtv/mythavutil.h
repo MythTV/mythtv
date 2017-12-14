@@ -92,7 +92,8 @@ class MythCodecMap
     MythCodecMap();
     ~MythCodecMap();
     static MythCodecMap *getInstance();
-    AVCodecContext *getCodecContext(const AVStream*,  const AVCodec *pCodec = NULL);
+    AVCodecContext *getCodecContext(const AVStream*,
+        const AVCodec *pCodec = NULL, bool nullCodec = false);
     AVCodecContext *hasCodecContext(const AVStream*);
     void freeCodecContext(const AVStream*);
     void freeAllCodecContexts();

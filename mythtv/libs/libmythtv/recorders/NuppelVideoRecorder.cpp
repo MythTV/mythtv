@@ -270,12 +270,8 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     if (mpa_vidcodec)
     {
         QMutexLocker locker(avcodeclock);
-        avcodec_close(mpa_vidctx);
+        avcodec_free_context(&mpa_vidctx);
     }
-
-    if (mpa_vidctx)
-        av_free(mpa_vidctx);
-    mpa_vidctx = NULL;
 
     if (videoFilters)
         delete videoFilters;
@@ -525,12 +521,8 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     if (mpa_vidcodec)
     {
         QMutexLocker locker(avcodeclock);
-        avcodec_close(mpa_vidctx);
+        avcodec_free_context(&mpa_vidctx);
     }
-
-    if (mpa_vidctx)
-        av_free(mpa_vidctx);
-    mpa_vidctx = NULL;
 
     QByteArray vcodec = videocodec.toLatin1();
     mpa_vidcodec = avcodec_find_encoder_by_name(vcodec.constData());

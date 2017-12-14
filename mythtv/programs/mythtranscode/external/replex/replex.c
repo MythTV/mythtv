@@ -218,14 +218,12 @@ static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)
 		    "frame size (%d) does not equal required size (%d)?",
 			out_size, bufsize);
 		free(samples);
-		avcodec_close(c);
-		av_free(c);
+		avcodec_free_context(&c);
 		return 1;
 	}
 
 	free(samples);
-	avcodec_close(c);
-	av_free(c);
+	avcodec_free_context(&c);
 	
 	return 0;
 }

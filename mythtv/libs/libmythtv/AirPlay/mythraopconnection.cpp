@@ -1686,11 +1686,9 @@ void MythRAOPConnection::DestroyDecoder(void)
 {
     if (m_codeccontext)
     {
-        avcodec_close(m_codeccontext);
-        av_free(m_codeccontext);
+        avcodec_free_context(&m_codeccontext);
     }
     m_codec = NULL;
-    m_codeccontext = NULL;
 }
 
 bool MythRAOPConnection::OpenAudioDevice(void)

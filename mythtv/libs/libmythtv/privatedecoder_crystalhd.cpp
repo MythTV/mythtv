@@ -1,5 +1,6 @@
 #include "privatedecoder_crystalhd.h"
 #include "mythlogging.h"
+#include "mythavutil.h"
 #include "fourcc.h"
 #include "unistd.h"
 
@@ -424,7 +425,7 @@ bool PrivateDecoderCrystalHD::HasBufferedFrames(void)
 int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
 {
     int result = -1;
-    AVCodecContext *avctx = stream->codec;
+    AVCodecContext *avctx = gCodecMap->getCodecContext(stream);
     if (!avctx)
         return result;
 
@@ -516,7 +517,8 @@ int PrivateDecoderCrystalHD::GetFrame(AVStream *stream,
     if (!stream || !m_device || !picture)
         return result;
 
-    AVCodecContext *avctx = stream->codec;
+    AVCodecContext *avctx = gCodecMap->getCodecContext(stream);
+
     if (!avctx || !StartFetcherThread())
         return result;
 

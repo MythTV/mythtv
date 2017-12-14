@@ -1970,8 +1970,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
 Close:
     pkt.data = buff;
     av_packet_unref(&pkt);
-    avcodec_close(c);
-    av_free(c);
+    avcodec_free_context(&c);
 }
 
 // Scale the bitmap.  Only used for image derived from MPEG I-frames.

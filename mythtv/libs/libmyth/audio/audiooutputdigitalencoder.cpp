@@ -63,10 +63,8 @@ AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
 void AudioOutputDigitalEncoder::Reset(void)
 {
     if (av_context)
-    {
-        avcodec_close(av_context);
-        av_freep(&av_context);
-    }
+        avcodec_free_context(&av_context);
+
     av_frame_free(&m_frame);
 
     delete m_spdifenc;
@@ -125,7 +123,6 @@ bool AudioOutputDigitalEncoder::Init(
     }
 
     av_context                 = avcodec_alloc_context3(codec);
-    avcodec_get_context_defaults3(av_context, codec);
 
     av_context->bit_rate       = bitrate;
     av_context->sample_rate    = samplerate;

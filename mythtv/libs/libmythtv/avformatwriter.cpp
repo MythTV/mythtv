@@ -256,9 +256,10 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     av_init_packet(&pkt);
     pkt.data = NULL;
     pkt.size = 0;
+    AVCodecContext *avctx = gCodecMap->getCodecContext(m_videoStream);
     {
         QMutexLocker locker(avcodeclock);
-        ret = avcodec_encode_video2(m_videoStream->codec, &pkt,
+        ret = avcodec_encode_video2(avctx, &pkt,
                                     m_picture, &got_pkt);
     }
 
@@ -326,10 +327,11 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     bool got_packet = false;
     int ret = 0;
+    AVCodecContext *avctx = gCodecMap->getCodecContext(m_audioStream);
     int samples_per_avframe  = m_audioFrameSize * m_audioChannels;
     int sampleSizeIn   = AudioOutputSettings::SampleSize(FORMAT_S16);
     AudioFormat format =
-        AudioOutputSettings::AVSampleFormatToFormat(m_audioStream->codec->sample_fmt);
+        AudioOutputSettings::AVSampleFormatToFormat(avctx->sample_fmt);
     int sampleSizeOut  = AudioOutputSettings::SampleSize(format);
 
     AVPacket pkt;
@@ -337,13 +339,13 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
     pkt.data          = NULL;
     pkt.size          = 0;
 
-    if (av_get_packed_sample_fmt(m_audioStream->codec->sample_fmt) == AV_SAMPLE_FMT_FLT)
+    if (av_get_packed_sample_fmt(avctx->sample_fmt) == AV_SAMPLE_FMT_FLT)
     {
         AudioOutputUtil::toFloat(FORMAT_S16, (void *)m_audioInBuf, (void *)buf,
                                  samples_per_avframe * sampleSizeIn);
         buf = m_audioInBuf;
     }
-    if (av_sample_fmt_is_planar(m_audioStream->codec->sample_fmt))
+    if (av_sample_fmt_is_planar(avctx->sample_fmt))
     {
         AudioOutputUtil::DeinterleaveSamples(format,
                                              m_audioChannels,
@@ -364,7 +366,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     m_audPicture->linesize[0] = m_audioFrameSize;
     m_audPicture->nb_samples = m_audioFrameSize;
-    m_audPicture->format = m_audioStream->codec->sample_fmt;
+    m_audPicture->format = avctx->sample_fmt;
     m_audPicture->extended_data = m_audPicture->data;
 
     m_bufferedAudioFrameTimes.push_back(timecode);
@@ -376,13 +378,13 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
         //  by 2 calls, this could be optimized
         //  into separate routines or separate threads.
         got_packet = false;
-        ret = avcodec_receive_packet(m_audioStream->codec, &pkt);
+        ret = avcodec_receive_packet(avctx, &pkt);
         if (ret == 0)
             got_packet = true;
         if (ret == AVERROR(EAGAIN))
             ret = 0;
         if (ret == 0)
-            ret = avcodec_send_frame(m_audioStream->codec, m_audPicture);
+            ret = avcodec_send_frame(avctx, m_audPicture);
         // if ret from avcodec_send_frame is AVERROR(EAGAIN) then
         // there are 2 packets to be received while only 1 frame to be
         // sent. The code does not cater for this. Hopefully it will not happen.
@@ -466,7 +468,6 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     }
     st->id = 0;
 
-    c = st->codec;
 
     codec = avcodec_find_encoder(m_ctx->oformat->video_codec);
     if (!codec)
@@ -476,7 +477,8 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         return NULL;
     }
 
-    avcodec_get_context_defaults3(c, codec);
+    gCodecMap->freeCodecContext(st);
+    c = gCodecMap->getCodecContext(st, codec);
 
     c->codec                      = codec;
     c->codec_id                   = m_ctx->oformat->video_codec;
@@ -576,7 +578,7 @@ bool AVFormatWriter::OpenVideo(void)
 {
     AVCodecContext *c;
 
-    c = m_videoStream->codec;
+    c = gCodecMap->getCodecContext(m_videoStream);
 
     if (!m_width || !m_height)
         return false;
@@ -620,7 +622,8 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     }
     st->id = 1;
 
-    c = st->codec;
+    c = gCodecMap->getCodecContext(st, NULL, true);
+
     c->codec_id     = m_ctx->oformat->audio_codec;
     c->codec_type   = AVMEDIA_TYPE_AUDIO;
     c->bit_rate     = m_audioBitrate;
@@ -664,7 +667,7 @@ bool AVFormatWriter::OpenAudio(void)
     AVCodecContext *c;
     AVCodec *codec;
 
-    c = m_audioStream->codec;
+    c = gCodecMap->getCodecContext(m_audioStream);
 
     c->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
 

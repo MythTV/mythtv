@@ -6,6 +6,7 @@
 #define ERR QString("VDADec error: ")
 
 #include "mythframe.h"
+#include "mythavutil.h"
 #include "util-osx-cocoa.h"
 #include "privatedecoder_vda.h"
 #include "util-osx.h"
@@ -550,7 +551,7 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
     if (!m_lib || !stream)
         return result;
 
-    AVCodecContext *avctx = stream->codec;
+    AVCodecContext *avctx = gCodecMap->getCodecContext(stream);
     if (!avctx)
         return result;
 
