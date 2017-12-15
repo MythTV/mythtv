@@ -56,6 +56,10 @@
 #include <mythimage.h>
 #include <mythconfig.h>
 
+extern "C" {
+#include "libavutil/imgutils.h"
+}
+
 #ifndef INT64_C    // Used in FFmpeg headers to define some constants
 #define INT64_C(v)   (v ## LL)
 #endif
@@ -788,10 +792,10 @@ bool ThumbFinder::seekBackward()
 bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 {
     AVPacket pkt;
-    AVPicture orig;
-    AVPicture retbuf;
-    memset(&orig, 0, sizeof(AVPicture));
-    memset(&retbuf, 0, sizeof(AVPicture));
+    AVFrame orig;
+    AVFrame retbuf;
+    memset(&orig, 0, sizeof(AVFrame));
+    memset(&retbuf, 0, sizeof(AVFrame));
 
     av_init_packet(&pkt);
 
@@ -840,8 +844,9 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
     if (frameFinished)
     {
-        avpicture_fill(&retbuf, m_outputbuf, AV_PIX_FMT_RGB32, m_frameWidth, m_frameHeight);
-        AVPicture *tmp = m_frame;
+        av_image_fill_arrays(retbuf.data, retbuf.linesize, m_outputbuf,
+            AV_PIX_FMT_RGB32, m_frameWidth, m_frameHeight, IMAGE_ALIGN);
+        AVFrame *tmp = m_frame;
 
         m_deinterlacer->DeinterlaceSingle(tmp, tmp);
 

@@ -71,6 +71,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include "external/pxsup2dast.h"
+#include "libavutil/imgutils.h"
 }
 
 // mytharchive headers
@@ -1634,10 +1635,10 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
         return 1;
     }
     AVPacket pkt;
-    AVPicture orig;
-    AVPicture retbuf;
-    memset(&orig, 0, sizeof(AVPicture));
-    memset(&retbuf, 0, sizeof(AVPicture));
+    AVFrame orig;
+    AVFrame retbuf;
+    memset(&orig, 0, sizeof(AVFrame));
+    memset(&retbuf, 0, sizeof(AVFrame));
     MythAVCopy copyframe;
     MythPictureDeinterlacer deinterlacer(codecCtx->pix_fmt, width, height);
 
@@ -1693,15 +1694,15 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                         else if (filename.contains("%1"))
                             filename = filename.arg(thumbCount);
 
-                        avpicture_fill(&retbuf, outputbuf,
-                                       AV_PIX_FMT_RGB32, width, height);
+                        av_image_fill_arrays(retbuf.data, retbuf.linesize, outputbuf,
+                            AV_PIX_FMT_RGB32, width, height, IMAGE_ALIGN);
 
                         AVFrame *tmp = frame;
-                        deinterlacer.DeinterlaceSingle((AVPicture*)tmp,
-                                                       (AVPicture*)tmp);
+                        deinterlacer.DeinterlaceSingle((AVFrame*)tmp,
+                                                       (AVFrame*)tmp);
 
                         copyframe.Copy(&retbuf, AV_PIX_FMT_RGB32,
-                                       (AVPicture*) tmp,
+                                       (AVFrame*) tmp,
                                        codecCtx->pix_fmt, width, height);
 
                         QImage img(outputbuf, width, height,
