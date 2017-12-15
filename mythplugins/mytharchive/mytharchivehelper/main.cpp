@@ -1660,7 +1660,12 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
 
                 avcodec_flush_buffers(codecCtx);
                 av_frame_unref(frame);
-                avcodec_decode_video2(codecCtx, frame, &frameFinished, &pkt);
+                frameFinished = 0;
+                ret = avcodec_receive_frame(codecCtx, frame);
+                if (ret == 0)
+                    frameFinished = 1;
+                if (ret == 0 || ret == AVERROR(EAGAIN))
+                    ret = avcodec_send_packet(codecCtx, &pkt);
                 keyFrame = frame->key_frame;
 
                 while (!frameFinished || !keyFrame)
@@ -1673,7 +1678,11 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                     {
                         frameNo++;
                         av_frame_unref(frame);
-                        avcodec_decode_video2(codecCtx, frame, &frameFinished, &pkt);
+                        ret = avcodec_receive_frame(codecCtx, frame);
+                        if (ret == 0)
+                            frameFinished = 1;
+                        if (ret == 0 || ret == AVERROR(EAGAIN))
+                            ret = avcodec_send_packet(codecCtx, &pkt);
                         keyFrame = frame->key_frame;
                     }
                 }
@@ -1730,9 +1739,11 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                                 if (pkt.stream_index == videostream)
                                 {
                                     frameNo++;
-                                    avcodec_decode_video2(codecCtx, frame,
-                                                         &frameFinished,
-                                                         &pkt);
+                                    ret = avcodec_receive_frame(codecCtx, frame);
+                                    if (ret == 0)
+                                        frameFinished = 1;
+                                    if (ret == 0 || ret == AVERROR(EAGAIN))
+                                        ret = avcodec_send_packet(codecCtx, &pkt);
                                 }
                             }
                         }
