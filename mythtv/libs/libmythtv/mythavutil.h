@@ -86,7 +86,7 @@ private:
  * This is a singeton class - only 1 instance gets created.
  */
 
-class MythCodecMap
+class MTV_PUBLIC MythCodecMap
 {
   public:
     MythCodecMap();
@@ -103,7 +103,7 @@ class MythCodecMap
 };
 
 /// This global variable contains the MythCodecMap instance for the app
-extern MythCodecMap *gCodecMap;
+extern MTV_PUBLIC MythCodecMap *gCodecMap;
 
 
 class MythAVCopyPrivate;

@@ -588,7 +588,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     for (uint i = 0; i < m_inputFC->nb_streams; i++)
     {
         AVStream *st = m_inputFC->streams[i];
-        if (m_inputFC->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+        if (m_inputFC->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             m_startTime = -1;
             if (m_inputFC->streams[i]->start_time != (int) AV_NOPTS_VALUE)
@@ -601,8 +601,8 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
             }
 
             m_videostream = i;
-            m_frameWidth = st->codec->width;
-            m_frameHeight = st->codec->height;
+            m_frameWidth = st->codecpar->width;
+            m_frameHeight = st->codecpar->height;
             if (st->r_frame_rate.den && st->r_frame_rate.num)
                 m_fps = av_q2d(st->r_frame_rate);
             else
@@ -618,7 +618,8 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     }
 
     // get the codec context for the video stream
-    m_codecCtx = m_inputFC->streams[m_videostream]->codec;
+    m_codecCtx = gCodecMap->getCodecContext
+        (m_inputFC->streams[m_videostream]);
     m_codecCtx->debug_mv = 0;
     m_codecCtx->debug = 0;
     m_codecCtx->workaround_bugs = 1;
@@ -887,8 +888,8 @@ void ThumbFinder::closeAVCodec()
         delete[] m_outputbuf;
 
     // close the codec
-    if (m_codecCtx)
-        avcodec_close(m_codecCtx);
+    gCodecMap->freeCodecContext
+        (m_inputFC->streams[m_videostream]);
 
     // close the video file
     m_inputFC.Close();

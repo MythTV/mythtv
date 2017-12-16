@@ -1589,11 +1589,11 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     for (uint i = 0; i < inputFC->nb_streams; i++)
     {
         AVStream *st = inputFC->streams[i];
-        if (inputFC->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+        if (inputFC->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             videostream = i;
-            width = st->codec->width;
-            height = st->codec->height;
+            width = st->codecpar->width;
+            height = st->codecpar->height;
             if (st->r_frame_rate.den && st->r_frame_rate.num)
                 fps = av_q2d(st->r_frame_rate);
             else
@@ -1609,7 +1609,8 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
     }
 
     // get the codec context for the video stream
-    AVCodecContext *codecCtx = inputFC->streams[videostream]->codec;
+    AVCodecContext *codecCtx = gCodecMap->getCodecContext
+        (inputFC->streams[videostream]);
 
     // get decoder for video stream
     AVCodec * codec = avcodec_find_decoder(codecCtx->codec_id);
@@ -1670,7 +1671,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
 
                 while (!frameFinished || !keyFrame)
                 {
-                    av_free_packet(&pkt);
+                    av_packet_unref(&pkt);
                     int res = av_read_frame(inputFC, &pkt);
                     if (res < 0)
                         break;
@@ -1755,14 +1756,15 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
             }
         }
 
-        av_free_packet(&pkt);
+        av_packet_unref(&pkt);
     }
 
     if (outputbuf)
         delete[] outputbuf;
 
     // close the codec
-    avcodec_close(codecCtx);
+    gCodecMap->freeCodecContext
+        (inputFC->streams[videostream]);
 
     return 0;
 }
@@ -1782,7 +1784,7 @@ static int64_t getFrameCount(AVFormatContext *inputFC, int vid_id)
         {
             count++;
         }
-        av_free_packet(&pkt);
+        av_packet_unref(&pkt);
     }
 
     return count;
@@ -1950,10 +1952,14 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
     {
         AVStream *st = inputFC->streams[i];
         char buf[256];
+        AVCodecContext *avctx = gCodecMap->getCodecContext(st);
+        AVCodecParameters *par = st->codecpar;
 
-        avcodec_string(buf, sizeof(buf), st->codec, false);
+        buf[0]=0;
+        if (avctx)
+            avcodec_string(buf, sizeof(buf), avctx, false);
 
-        switch (inputFC->streams[i]->codec->codec_type)
+        switch (st->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
             {
@@ -1963,9 +1969,9 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 stream.setAttribute("streamindex", i);
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
                 stream.setAttribute("codec", codec.trimmed());
-                stream.setAttribute("width", st->codec->width);
-                stream.setAttribute("height", st->codec->height);
-                stream.setAttribute("bitrate", (qlonglong)st->codec->bit_rate);
+                stream.setAttribute("width", par->width);
+                stream.setAttribute("height", par->height);
+                stream.setAttribute("bitrate", (qlonglong)par->bit_rate);
 
                 float fps;
                 if (st->r_frame_rate.den && st->r_frame_rate.num)
@@ -1975,11 +1981,12 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 stream.setAttribute("fps", fps);
 
-                if (st->codec->sample_aspect_ratio.den && st->codec->sample_aspect_ratio.num)
+                if (par->sample_aspect_ratio.den && par->sample_aspect_ratio.num)
                 {
-                    float aspect_ratio = av_q2d(st->codec->sample_aspect_ratio);
+                    float aspect_ratio = av_q2d(par->sample_aspect_ratio);
                     if (QString(inputFC->iformat->name) != "nuv")
-                        aspect_ratio = ((float)st->codec->width / st->codec->height) * aspect_ratio;
+                        aspect_ratio = ((float)par->width
+                        / par->height) * aspect_ratio;
 
                     stream.setAttribute("aspectratio", aspect_ratio);
                 }
@@ -2098,7 +2105,7 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
                 else
                     stream.setAttribute("codec", codec.trimmed());
 
-                stream.setAttribute("channels", st->codec->channels);
+                stream.setAttribute("channels", par->channels);
 
                 AVDictionaryEntry *metatag =
                     av_dict_get(st->metadata, "language", NULL, 0);
@@ -2109,8 +2116,8 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 stream.setAttribute("id", st->id);
 
-                stream.setAttribute("samplerate", st->codec->sample_rate);
-                stream.setAttribute("bitrate", (qlonglong)st->codec->bit_rate);
+                stream.setAttribute("samplerate", par->sample_rate);
+                stream.setAttribute("bitrate", (qlonglong)par->bit_rate);
 
                 if (st->start_time != (int) AV_NOPTS_VALUE)
                 {
@@ -2165,9 +2172,10 @@ static int getFileInfo(QString inFile, QString outFile, int lenMethod)
             default:
                 LOG(VB_JOBQUEUE, LOG_ERR,
                     QString("Skipping unsupported codec %1 on stream %2")
-                        .arg(inputFC->streams[i]->codec->codec_type).arg(i));
+                        .arg(inputFC->streams[i]->codecpar->codec_type).arg(i));
                 break;
         }
+        gCodecMap->freeCodecContext(st);
     }
 
     // finally save the xml to the file
