@@ -808,7 +808,10 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         for (uint i = 0; i < ic->nb_streams; i++)
         {
             AVCodecContext *enc = gCodecMap->hasCodecContext(ic->streams[i]);
-            if (enc)
+            // note that contexts that have not been opened have
+            // enc->internal = NULL and cause a segfault in
+            // avcodec_flush_buffers
+            if (enc && enc->internal)
                 avcodec_flush_buffers(enc);
         }
         if (private_dec)
@@ -2093,7 +2096,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case AVMEDIA_TYPE_AUDIO:
             {
                 enc = gCodecMap->hasCodecContext(ic->streams[i]);
-                if (enc)
+                if (enc && enc->internal)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Warning, audio codec 0x%1 id(%2) "
