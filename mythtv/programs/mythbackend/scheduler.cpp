@@ -4235,6 +4235,8 @@ void Scheduler::AddNewRecords(void)
 
     while (result.next())
     {
+        if (result.value(52).toInt() <= -999999)
+	    continue;
         // If this is the same program we saw in the last pass and it
         // wasn't a viable candidate, then neither is this one so
         // don't bother with it.  This is essentially an early call to
