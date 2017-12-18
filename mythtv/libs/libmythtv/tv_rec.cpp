@@ -521,15 +521,6 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
             InputInfo busy_input;
             bool is_busy = RemoteIsBusy(inputids[i], busy_input);
 
-            // if the other recorder is busy, but the input is
-            // not in a shared input group, then as far as we're
-            // concerned here it isn't busy.
-            if (is_busy)
-            {
-                is_busy = (bool) igrp.GetSharedInputGroup(
-                    busy_input.inputid, rcinfo->GetInputID());
-            }
-
             if (is_busy && !sourceid)
             {
                 mplexid  = pendinfo.info->QueryMplexID();

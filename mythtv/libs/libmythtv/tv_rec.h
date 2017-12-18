@@ -19,7 +19,6 @@
 #include "mythtimer.h"
 #include "mthread.h"
 #include "inputinfo.h"
-#include "inputgroupmap.h"
 #include "mythdeque.h"
 #include "recordinginfo.h"
 #include "tv.h"
@@ -372,7 +371,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     int     overRecordSecNrml;
     int     overRecordSecCat;
     QString overRecordCategory;
-    InputGroupMap igrp;
 
     // Configuration variables from setup routines
     uint              inputid;

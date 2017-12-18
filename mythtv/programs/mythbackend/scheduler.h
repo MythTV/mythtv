@@ -18,7 +18,6 @@ using namespace std;
 #include "filesysteminfo.h"
 #include "recordinginfo.h"
 #include "remoteutil.h"
-#include "inputgroupmap.h"
 #include "mythdeque.h"
 #include "mythscheduler.h"
 #include "mthread.h"

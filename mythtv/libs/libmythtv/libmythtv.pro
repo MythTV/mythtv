@@ -540,8 +540,8 @@ using_backend {
     SOURCES += recorders/signalmonitor.cpp
     SOURCES += recorders/dtvsignalmonitor.cpp
 
-    HEADERS += inputinfo.h                 inputgroupmap.h
-    SOURCES += inputinfo.cpp               inputgroupmap.cpp
+    HEADERS += inputinfo.h
+    SOURCES += inputinfo.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h
