@@ -9,6 +9,7 @@
 #include <QString>
 #include <QMap>
 #include <QMutex>                       // for QMutex
+#include <QReadWriteLock>
 #include <QHash>                        // for QHash
 
 // C++ headers
@@ -430,7 +431,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QString      rbFileExt;
 
   public:
-    static QMutex            inputsLock;
+    static QReadWriteLock    inputsLock;
     static QMap<uint,TVRec*> inputs;
 
   public:

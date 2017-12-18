@@ -153,6 +153,8 @@ bool setupTVs(bool ismaster, bool &error)
         hosts.push_back(host);
     }
 
+    QWriteLocker(&TVRec::inputsLock);
+
     for (uint i = 0; i < cardids.size(); i++)
     {
         if (hosts[i] == localhostname)

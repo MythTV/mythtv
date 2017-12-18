@@ -40,6 +40,7 @@ using namespace std;
 #include "mainserver.h"
 #include "compat.h"
 #include "mythlogging.h"
+#include "tv_rec.h"
 
 #define LOC     QString("AutoExpire: ")
 #define LOC_ERR QString("AutoExpire Error: ")
@@ -286,6 +287,8 @@ void AutoExpire::RunExpirer(void)
 
     while (expire_thread_run)
     {
+        TVRec::inputsLock.lockForRead();
+
         curTime = MythDate::current();
         // recalculate auto expire parameters
         if (curTime >= next_expire)
@@ -332,6 +335,8 @@ void AutoExpire::RunExpirer(void)
 
             ExpireRecordings();
         }
+
+        TVRec::inputsLock.unlock();
 
         Sleep(60 * 1000 - timer.elapsed());
     }

@@ -48,7 +48,7 @@
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
-QMutex            TVRec::inputsLock;
+QReadWriteLock    TVRec::inputsLock;
 QMap<uint,TVRec*> TVRec::inputs;
 
 static bool is_dishnet_eit(uint inputid);
@@ -124,7 +124,6 @@ TVRec::TVRec(int _inputid)
       // RingBuffer info
       ringBuffer(NULL), rbFileExt("ts")
 {
-    QMutexLocker locker(&inputsLock);
     inputs[inputid] = this;
 }
 
@@ -210,7 +209,6 @@ bool TVRec::Init(void)
  */
 TVRec::~TVRec()
 {
-    QMutexLocker locker(&inputsLock);
     inputs.remove(inputid);
 
     if (HasFlags(kFlagRunMainLoop))
@@ -1336,8 +1334,16 @@ void TVRec::run(void)
             return;
         }
 
-        // Handle any tuning events..
-        HandleTuning();
+        // Handle any tuning events..  Blindly grabbing the lock here
+        // can sometimes cause a deadlock with Init() while it waits
+        // to make sure this thread starts.  Until a better solution
+        // is found, don't run HandleTuning unless we can safely get
+        // the lock.
+        if (inputsLock.tryLockForRead())
+        {
+            HandleTuning();
+            inputsLock.unlock();
+        }
 
         // Tell frontends about pending recordings
         HandlePendingRecordings();
@@ -1465,6 +1471,7 @@ void TVRec::run(void)
                 // Check if another card in the same input group is
                 // busy.  This could be either virtual DVB-devices or
                 // a second tuner on a single card
+                inputsLock.lockForRead();
                 bool allow_eit = true;
                 vector<uint> inputids =
                     CardUtil::GetConflictingInputs(inputid);
@@ -1486,6 +1493,7 @@ void TVRec::run(void)
                         .arg(inputid).arg(busy_input.inputid));
                     eitScanStartTime = eitScanStartTime.addSecs(300);
                 }
+                inputsLock.unlock();
             }
         }
 
@@ -4883,7 +4891,6 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
 
 TVRec* TVRec::GetTVRec(uint inputid)
 {
-    QMutexLocker locker(&inputsLock);
     QMap<uint,TVRec*>::const_iterator it = inputs.find(inputid);
     if (it == inputs.end())
         return NULL;

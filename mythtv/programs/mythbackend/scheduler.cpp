@@ -47,6 +47,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
+#include "tv_rec.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")
@@ -444,6 +445,8 @@ static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
 
 bool Scheduler::FillRecordList(void)
 {
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     schedTime = MythDate::current();
 
     LOG(VB_SCHEDULE, LOG_INFO, "BuildWorkList...");
@@ -840,6 +843,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
 void Scheduler::SlaveConnected(RecordingList &slavelist)
 {
     QMutexLocker lockit(&schedLock);
+    QReadLocker tvlocker(&TVRec::inputsLock);
 
     RecordingList::iterator it = slavelist.begin();
     for (; it != slavelist.end(); ++it)
@@ -1761,6 +1765,7 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, QStringList &strlist)
 void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
 {
     QMutexLocker lockit(&schedLock);
+    QReadLocker tvlocker(&TVRec::inputsLock);
 
     RecConstIter i = reclist.begin();
     for (; FindNextConflict(reclist, pginfo, i); ++i)
@@ -2563,6 +2568,8 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
     QDateTime nextrectime = ri.GetRecordingStartTime();
     int secsleft = curtime.secsTo(nextrectime);
 
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
     if (tvit == m_tvList->end())
         return;
@@ -2719,6 +2726,8 @@ bool Scheduler::HandleRecording(
                             nextrectime.addSecs(-prerollseconds - 35));
         return false;
     }
+
+    QReadLocker tvlocker(&TVRec::inputsLock);
 
     QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
     if (tvit == m_tvList->end())
@@ -3120,6 +3129,7 @@ void Scheduler::HandleIdleShutdown(
 
         // find out, if we are currently recording (or LiveTV)
         bool recording = false;
+        TVRec::inputsLock.lockForRead();
         QMap<int, EncoderLink *>::Iterator it;
         for (it = m_tvList->begin(); (it != m_tvList->end()) &&
                  !recording; ++it)
@@ -3127,6 +3137,7 @@ void Scheduler::HandleIdleShutdown(
             if ((*it)->IsBusy())
                 recording = true;
         }
+        TVRec::inputsLock.unlock();
 
         // If there are BLOCKING clients, then we're not idle
         bool blocking = m_mainServer->isClientConnected(true);
@@ -3453,6 +3464,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     int secsleft = 0;
     EncoderLink *enc = NULL;
 
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     bool someSlavesCanSleep = false;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
@@ -3653,6 +3666,8 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
 
 void Scheduler::WakeUpSlaves(void)
 {
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     QStringList SlavesThatCanWake;
     QString thisSlave;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
@@ -5043,6 +5058,7 @@ static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
 void Scheduler::GetNextLiveTVDir(uint cardid)
 {
     QMutexLocker lockit(&schedLock);
+    QReadLocker tvlocker(&TVRec::inputsLock);
 
     if (!m_tvList->contains(cardid))
         return;
