@@ -7669,6 +7669,16 @@ void MainServer::connectionClosed(MythSocket *socket)
             // delay handling the disconnect until a little later. #9885
             if (!disconnectedSlaves.isEmpty())
                 SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
+            else
+            {
+                // During idle periods customEvent() might never be called,
+                // leading to an increasing number of closed sockets in
+                // decrRefSocketList.  Sending an event here makes sure that
+                // customEvent() is called and that the closed sockets are
+                // deleted.
+                MythEvent me("LOCAL_CONNECTION_CLOSED");
+                gCoreContext->dispatch(me);
+            }
 
             return;
         }
