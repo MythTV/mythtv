@@ -295,7 +295,11 @@ void MythSystemLegacyManager::run(void)
                 QString("Structure for child handle %1 already deleted!")
                 .arg((long long)child));
             if (ms)
-                ms->DecrRef();
+            {
+                listLock.lock();
+                msList.append(ms);
+                listLock.unlock();
+            }
             continue;
         }
 
