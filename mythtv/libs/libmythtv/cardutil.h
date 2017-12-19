@@ -278,6 +278,9 @@ class MTV_PUBLIC CardUtil
     static QString      GetVBIDevice(uint inputid)
         { return get_on_input("vbidevice", inputid); }
 
+    static QString      GetHostname(uint inputid)
+        { return get_on_input("hostname", inputid); }
+
     static int          GetValueInt(const QString &col, uint inputid)
         { return get_on_input(col, inputid).toInt(); }
     static bool         SetValue(const QString &col, uint inputid,
@@ -352,7 +355,8 @@ class MTV_PUBLIC CardUtil
     static void ClearVideoDeviceCache();
 
     // Other
-    static bool         CloneCard(uint src_inputid, uint dst_inputid);
+    static uint         CloneCard(uint src_inputid, uint dst_inputid);
+    static uint         AddChildInput(uint parentid);
     static QString      GetFirewireChangerNode(uint inputid);
     static QString      GetFirewireChangerModel(uint inputid);
 

@@ -1026,17 +1026,42 @@ static uint clone_capturecard(uint src_inputid, uint orig_dst_inputid)
     return dst_inputid;
 }
 
-bool CardUtil::CloneCard(uint src_inputid, uint orig_dst_inputid)
+uint CardUtil::CloneCard(uint src_inputid, uint orig_dst_inputid)
 {
     QString type = CardUtil::GetRawInputType(src_inputid);
     if (!IsTunerSharingCapable(type))
-        return false;
+        return 0;
 
     uint dst_inputid = clone_capturecard(src_inputid, orig_dst_inputid);
-    if (!dst_inputid)
-        return false;
+    return dst_inputid;
+}
 
-    return true;
+uint CardUtil::AddChildInput(uint parentid)
+{
+    uint inputid = CloneCard(parentid, 0);
+
+    // Update the reclimit for the parent and all children so the new
+    // child doesn't get removed the next time mythtv-setup is run.
+    if (inputid)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Added child input %1 to parent %2")
+            .arg(inputid).arg(parentid));
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("UPDATE capturecard "
+                      "SET reclimit = reclimit + 1 "
+                      "WHERE cardid = :PARENTID");
+        query.bindValue(":PARENTID", parentid);
+        if (!query.exec())
+            MythDB::DBError("CardUtil::AddChildInput", query);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to add child input to parent %1").arg(parentid));
+    }
+
+    return inputid;
 }
 
 QString CardUtil::GetFirewireChangerNode(uint inputid)
