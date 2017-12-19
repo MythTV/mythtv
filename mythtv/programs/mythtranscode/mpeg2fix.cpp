@@ -1293,20 +1293,31 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     int got_packet = 0;
     int ret;
 
-    // Need to call this repeatedly as it seems to be pipelined.  The first
-    // call will return no packet, then the second one will flush it.  In case
-    // it becomes more pipelined, just loop until it creates a packet or errors
-    // out.
-    while (got_packet <= 0)
-    {
-        ret = avcodec_encode_video2(c, pkt, picture, &got_packet);
+    ret = avcodec_send_frame(c, picture);
 
+    bool flushed = false;
+    while (ret >= 0)
+    {
+        // ret = avcodec_encode_video2(c, pkt, picture, &got_packet);
+        ret = avcodec_receive_packet(c, pkt);
+        if (ret == 0)
+            got_packet = 1;
+        if (ret == AVERROR(EAGAIN))
+            ret = 0;
         if (ret < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("avcodec_encode_video2 failed (%1)").arg(ret));
-            return true;
-        }
+            break;
+        if (flushed)
+            break;
+        // flush
+        ret = avcodec_send_frame(c, NULL);
+        flushed = true;
+    }
+
+    if (ret < 0 || !got_packet)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("avcodec_encode_video2 failed (%1)").arg(ret));
+        return true;
     }
 
     if (!fname.isEmpty())
