@@ -5791,9 +5791,12 @@ void Scheduler::InitInputInfoMap(void)
     while (query.next())
     {
         uint inputid = query.value(0).toUInt();
+        uint parentid = query.value(1).toUInt();
+
+        // This code should stay substantially similar to that below
+        // in AddChildInput().
         SchedInputInfo &siinfo = sinputinfomap[inputid];
         siinfo.inputid = inputid;
-        uint parentid = query.value(1).toUInt();
         if (parentid && sinputinfomap[parentid].schedgroup)
             siinfo.sgroupid = parentid;
         else
@@ -5811,6 +5814,35 @@ void Scheduler::InitInputInfoMap(void)
     }
 
     CreateConflictLists();
+}
+
+void Scheduler::AddChildInput(uint parentid, uint inputid)
+{
+    LOG(VB_SCHEDULE, LOG_INFO, LOC +
+        QString("AddChildInput: Handling parent = %1, input = %2")
+        .arg(parentid).arg(inputid));
+
+    // This code should stay substantially similar to that above in
+    // InitInputInfoMap().
+    SchedInputInfo &siinfo = sinputinfomap[inputid];
+    siinfo.inputid = inputid;
+    if (sinputinfomap[parentid].schedgroup)
+        siinfo.sgroupid = parentid;
+    else
+        siinfo.sgroupid = inputid;
+    siinfo.schedgroup = false;
+    siinfo.conflicting_inputs = CardUtil::GetConflictingInputs(inputid);
+
+    siinfo.conflictlist = sinputinfomap[parentid].conflictlist;
+
+    // Now, fixup the infos for the parent and conflicting inputs.
+    sinputinfomap[parentid].group_inputs.push_back(inputid);
+    vector<uint>::iterator it = siinfo.conflicting_inputs.begin();
+    for ( ; it != siinfo.conflicting_inputs.end(); ++it)
+    {
+        uint otherid = *it;
+        sinputinfomap[otherid].conflicting_inputs.push_back(inputid);
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

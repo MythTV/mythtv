@@ -119,6 +119,8 @@ class Scheduler : public MThread, public MythScheduler
 
     int GetError(void) const { return error; }
 
+    void AddChildInput(uint parentid, uint childid);
+
   protected:
     virtual void run(void); // MThread
 
