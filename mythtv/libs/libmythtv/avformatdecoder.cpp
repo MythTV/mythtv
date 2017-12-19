@@ -1559,7 +1559,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
     enc->idct_algo = FF_IDCT_AUTO;
     enc->debug = 0;
-    enc->error_rate = 0;
+    // enc->error_rate = 0;
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
 
@@ -4085,7 +4085,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
     delete dec;
 
     m_parent->GetSubReader(pkt->stream_index+0x2000)->
-        AddRawTextSubtitle(list, pkt->convergence_duration);
+        AddRawTextSubtitle(list, pkt->duration);
 
     return true;
 }
@@ -5030,7 +5030,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         if (storevideoframes && codec_type == AVMEDIA_TYPE_VIDEO)
         {
-            av_dup_packet(pkt);
+            // av_dup_packet(pkt);
             storedPackets.append(pkt);
             pkt = NULL;
             continue;

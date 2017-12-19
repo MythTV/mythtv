@@ -35,6 +35,7 @@ extern "C"
 // MythTV
 #include "transcodedefs.h"
 #include "programtypes.h"
+#include "mythavutil.h"
 
 enum MPFListType {
     MPF_TYPE_CUTLIST = 0,
@@ -191,14 +192,14 @@ class MPEG2fixup
     }
     int GetStreamType(int id) const
     {
-        return (inputFC->streams[id]->codec->codec_id == AV_CODEC_ID_AC3) ?
+        return (inputFC->streams[id]->codecpar->codec_id == AV_CODEC_ID_AC3) ?
                AV_CODEC_ID_AC3 : AV_CODEC_ID_MP2;
     }
     AVCodecContext *getCodecContext(uint id)
     {
         if (id >= inputFC->nb_streams)
             return NULL;
-        return inputFC->streams[id]->codec;
+        return gCodecMap->getCodecContext(inputFC->streams[id]);
     }
     AVCodecParserContext *getCodecParserContext(uint id)
     {

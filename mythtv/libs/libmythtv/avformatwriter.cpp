@@ -520,33 +520,41 @@ AVStream* AVFormatWriter::AddVideoStream(void)
             (c->bit_rate > 1000000)) // 14,000 Kbps aka 14Mbps maximum permissable rate for Baseline 3.1
         {
             c->level = 40;
+            // AVCodecContext AVOptions:
             av_opt_set(c->priv_data, "profile", "main", 0);
         }
         else if ((c->height > 576) || // Approximate highest resolution supported by Baseline 3.0
             (c->bit_rate > 1000000))  // 10,000 Kbps aka 10Mbps maximum permissable rate for Baseline 3.0
         {
             c->level = 31;
+            // AVCodecContext AVOptions:
             av_opt_set(c->priv_data, "profile", "baseline", 0);
         }
         else
         {
             c->level = 30; // Baseline 3.0 is the most widely supported, but it's limited to SD
+            // AVCodecContext AVOptions:
             av_opt_set(c->priv_data, "profile", "baseline", 0);
         }
 
-        c->coder_type            = 0;
+        // AVCodecContext AVOptions:
+        // c->coder_type            = 0;
+        av_opt_set_int(c, "coder", FF_CODER_TYPE_VLC, 0);
         c->max_b_frames          = 0;
         c->slices                = 8;
 
         c->flags                |= CODEC_FLAG_LOOP_FILTER;
         c->me_cmp               |= 1;
-        c->me_method             = ME_HEX;
+        // c->me_method             = ME_HEX;
+        av_opt_set_int(c, "me_method", ME_HEX, 0);
         c->me_subpel_quality     = 6;
         c->me_range              = 16;
         c->keyint_min            = 25;
-        c->scenechange_threshold = 40;
+        // c->scenechange_threshold = 40;
+        av_opt_set_int(c, "sc_threshold", 40, 0);
         c->i_quant_factor        = 0.71;
-        c->b_frame_strategy      = 1;
+        // c->b_frame_strategy      = 1;
+        av_opt_set_int(c, "b_strategy", 1, 0);
         c->qcompress             = 0.6;
         c->qmin                  = 10;
         c->qmax                  = 51;
@@ -554,6 +562,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         c->refs                  = 3;
         c->trellis               = 0;
 
+        // libx264 AVOptions:
         av_opt_set(c, "partitions", "i8x8,i4x4,p8x8,b8x8", 0);
         av_opt_set_int(c, "direct-pred", 1, 0);
         av_opt_set_int(c, "rc-lookahead", 0, 0);
@@ -562,6 +571,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         av_opt_set_int(c, "8x8dct", 0, 0);
         av_opt_set_int(c, "weightb", 0, 0);
 
+        // libx264 AVOptions:
         av_opt_set(c->priv_data, "preset",
                    m_encodingPreset.toLatin1().constData(), 0);
         av_opt_set(c->priv_data, "tune",
@@ -734,7 +744,7 @@ AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat pix_fmt)
             LOC + "AllocPicture(): avcodec_alloc_frame() failed");
         return NULL;
     }
-    size = avpicture_get_size(pix_fmt, m_width, m_height);
+    size = av_image_get_buffer_size(pix_fmt, m_width, m_height, IMAGE_ALIGN);
     picture_buf = (unsigned char *)av_malloc(size);
     if (!picture_buf)
     {

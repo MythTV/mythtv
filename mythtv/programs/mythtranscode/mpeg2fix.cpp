@@ -1265,7 +1265,9 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     c->pix_fmt = AV_PIX_FMT_YUV420P;
     c->max_b_frames = 0;
     c->has_b_frames = 0;
-    c->rc_buffer_aggressivity = 1;
+    // c->rc_buffer_aggressivity = 1;
+    // rc_buf_aggressivity is now "currently useless"
+
     //  c->profile = vidCC->profile;
     //  c->level = vidCC->level;
     c->rc_buffer_size = 0;

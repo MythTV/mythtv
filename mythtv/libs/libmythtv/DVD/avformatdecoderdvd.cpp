@@ -606,7 +606,7 @@ void AvFormatDecoderDVD::StreamChangeCheck(void)
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st = ic->streams[i];
-        if (st && st->codec->codec_type == AVMEDIA_TYPE_VIDEO)
+        if (st && st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             selectedTrack[kTrackTypeVideo].av_stream_index = i;
             break;

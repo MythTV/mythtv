@@ -582,6 +582,8 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
                    break;
     }
 
+    AVDictionary *opts = NULL;
+
     mpa_vidctx->bit_rate = usebitrate;
     mpa_vidctx->bit_rate_tolerance = usebitrate * 100;
     mpa_vidctx->qmin = maxquality;
@@ -593,25 +595,26 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     mpa_vidctx->qblur = 0.5;
     mpa_vidctx->max_b_frames = 0;
     mpa_vidctx->b_quant_factor = 0;
-    mpa_vidctx->rc_strategy = 2;
-    mpa_vidctx->b_frame_strategy = 0;
+    av_dict_set(&opts, "rc_strategy", "2", 0);
+    av_dict_set(&opts, "b_strategy", "0", 0);
     mpa_vidctx->gop_size = 30;
     mpa_vidctx->rc_max_rate = 0;
     mpa_vidctx->rc_min_rate = 0;
     mpa_vidctx->rc_buffer_size = 0;
-    mpa_vidctx->rc_buffer_aggressivity = 1.0;
+    // mpa_vidctx->rc_buffer_aggressivity = 1.0;
+    // rc_buf_aggressivity is now "currently useless"
     mpa_vidctx->rc_override_count = 0;
-    mpa_vidctx->rc_initial_cplx = 0;
+    av_dict_set(&opts, "rc_init_cplx", "0", 0);
     mpa_vidctx->dct_algo = FF_DCT_AUTO;
     mpa_vidctx->idct_algo = FF_IDCT_AUTO;
-    mpa_vidctx->prediction_method = FF_PRED_LEFT;
+    av_dict_set_int(&opts, "pred", FF_PRED_LEFT, 0);
     if (videocodec.toLower() == "huffyuv" || videocodec.toLower() == "mjpeg")
         mpa_vidctx->strict_std_compliance = FF_COMPLIANCE_UNOFFICIAL;
     mpa_vidctx->thread_count = encoding_thread_count;
 
     QMutexLocker locker(avcodeclock);
 
-    if (avcodec_open2(mpa_vidctx, mpa_vidcodec, NULL) < 0)
+    if (avcodec_open2(mpa_vidctx, mpa_vidcodec, &opts) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to open FFMPEG/%1 codec")
                 .arg(videocodec));
