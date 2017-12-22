@@ -321,7 +321,7 @@ void MythSystemLegacyManager::run(void)
                     QString("Structure for child PID %1 already deleted!")
                     .arg(pid));
                 if (ms)
-                    ms->DecrRef();
+                    msList.append(ms);
                 continue;
             }
 
