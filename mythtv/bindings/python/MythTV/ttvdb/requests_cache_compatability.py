@@ -10,7 +10,7 @@ explicitly or implicitly
 '''
 
 import requests_cache
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # patch if required if older versions of
 try:
@@ -37,6 +37,11 @@ except Exception as e:
         """
         if not self._cache_expire_after:
             return
+        # just in case expire_after is not converted in the
+        #  original constructor, convert it to a timedelta
+        if not isinstance(self._cache_expire_after, timedelta):
+            self._cache_expire_after = timedelta(seconds=self._cache_expire_after)
+
         self.cache.remove_old_entries(datetime.utcnow() - self._cache_expire_after)
 
 
