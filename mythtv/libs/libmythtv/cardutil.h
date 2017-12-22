@@ -238,8 +238,8 @@ class MTV_PUBLIC CardUtil
                                           const uint diseqcid,
                                           bool       dvb_eitscan);
 
-    static bool         DeleteCard(uint inputid);
-    static bool         DeleteAllCards(void);
+    static bool         DeleteInput(uint inputid);
+    static bool         DeleteAllInputs(void);
     static vector<uint> GetInputList(void);
     static vector<uint> GetSchedInputList(void);
     static vector<uint> GetLiveTVInputList(void);
@@ -309,8 +309,6 @@ class MTV_PUBLIC CardUtil
                                          const uint quicktune,
                                          const uint schedorder,
                                          const uint livetvorder);
-
-    static bool         DeleteInput(uint inputid);
 
     // Other input functions
 

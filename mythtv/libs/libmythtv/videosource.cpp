@@ -2862,7 +2862,7 @@ bool CaptureCard::canDelete(void)
 
 void CaptureCard::deleteEntry(void)
 {
-    CardUtil::DeleteCard(getCardID());
+    CardUtil::DeleteInput(getCardID());
 }
 
 
@@ -3692,7 +3692,7 @@ void CardInput::Save(void)
     for (uint i = cardids.size() + 1;
          (i > icount) && !cardids.empty(); --i)
     {
-        CardUtil::DeleteCard(cardids.back());
+        CardUtil::DeleteInput(cardids.back());
         cardids.pop_back();
     }
 
@@ -3768,7 +3768,7 @@ void CaptureCardEditor::DeleteAllCaptureCards(bool doDelete)
     if (!doDelete)
         return;
 
-    CardUtil::DeleteAllCards();
+    CardUtil::DeleteAllInputs();
     Load();
     emit settingsChanged(this);
 }
@@ -3798,7 +3798,7 @@ void CaptureCardEditor::DeleteAllCaptureCardsOnHost(bool doDelete)
     }
 
     while (cards.next())
-        CardUtil::DeleteCard(cards.value(0).toUInt());
+        CardUtil::DeleteInput(cards.value(0).toUInt());
 
     Load();
     emit settingsChanged(this);
