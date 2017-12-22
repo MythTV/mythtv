@@ -1079,7 +1079,12 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "compilationartist"] = m_compilation_artist;
 
     if (m_album.isEmpty() && ID_TO_REPO(m_id) == RT_Radio)
-        metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_broadcaster).arg(m_channel);
+    {
+        if (m_broadcaster.isEmpty())
+            metadataMap[prefix + "album"] = m_channel;
+        else
+            metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_broadcaster).arg(m_channel);
+    }
     else
         metadataMap[prefix + "album"] = m_album;
 
