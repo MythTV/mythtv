@@ -140,6 +140,8 @@ class EncoderLink
                         QString callsign, QString channum,
                         QString channame, QString xmltv);
 
+    bool AddChildInput(uint childid);
+
   private:
     bool HasSockAndIncrRef();
     bool HasSockAndDecrRef();

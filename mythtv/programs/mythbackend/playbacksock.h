@@ -106,6 +106,8 @@ class PlaybackSock : public ReferenceCounter
 
     bool ReadStringList(QStringList &list);
 
+    bool AddChildInput(uint childid);
+
     // Enforce reference counting
   protected:
     virtual ~PlaybackSock();

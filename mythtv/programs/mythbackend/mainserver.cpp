@@ -245,7 +245,8 @@ MainServer::MainServer(bool master, int port,
     masterServerReconnect(NULL),
     masterServer(NULL), ismaster(master), threadPool("ProcessRequestPool"),
     masterBackendOverride(false),
-    m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
+    m_sched(sched), m_expirer(expirer), m_addChildInputLock(),
+    deferredDeleteTimer(NULL),
     autoexpireUpdateTimer(NULL), m_exitCode(GENERIC_EXIT_OK),
     m_stopped(false)
 {
@@ -653,6 +654,23 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "UNDELETE_RECORDING")
     {
         HandleUndeleteRecording(listline, pbs);
+    }
+    else if (command == "ADD_CHILD_INPUT")
+    {
+        QStringList reslist;
+        if (ismaster)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "ADD_CHILD_INPUT command received in master context");
+            reslist << QString("ERROR: Called in master context");
+        }
+        else if (tokens.size() != 2)
+            reslist << "ERROR: Bad ADD_CHILD_INPUT request";
+        else if (HandleAddChildInput(tokens[1].toUInt()))
+            reslist << "OK";
+        else
+            reslist << QString("ERROR: Failed to add child input");
+        SendResponse(pbs->getSocket(), reslist);
     }
     else if (command == "RESCHEDULE_RECORDINGS")
     {
@@ -1370,6 +1388,20 @@ void MainServer::customEvent(QEvent *e)
                             "attempting to undelete.").arg(me->Message()));
             }
 
+            return;
+        }
+
+        if (me->Message().startsWith("ADD_CHILD_INPUT"))
+        {
+            QStringList tokens = me->Message()
+                .split(" ", QString::SkipEmptyParts);
+            if (!ismaster)
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    "ADD_CHILD_INPUT event received in slave context");
+            else if (tokens.size() != 2)
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Bad ADD_CHILD_INPUT message");
+            else
+                HandleAddChildInput(tokens[1].toUInt());
             return;
         }
 
@@ -3188,6 +3220,108 @@ void MainServer::HandleRescheduleRecordings(const QStringList &/*request*/,
         if (pbssock)
             SendResponse(pbssock, result);
     }
+}
+
+bool MainServer::HandleAddChildInput(uint inputid)
+{
+    // If we're already trying to add a child input, ignore this
+    // attempt.  The scheduler will keep asking until it gets added.
+    // This makes the whole operation asynchronous and allows the
+    // scheduler to continue servicing other recordings.
+    if (!m_addChildInputLock.tryLock())
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "HandleAddChildInput: Already locked");
+        return false;
+    }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("HandleAddChildInput: Handling input %1").arg(inputid));
+
+    TVRec::inputsLock.lockForWrite();
+
+    if (ismaster)
+    {
+        // First, add the new input to the database.
+        uint childid = CardUtil::AddChildInput(inputid);
+        if (!childid)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("HandleAddChildInput: "
+                        "Failed to add child to input %1").arg(inputid));
+            TVRec::inputsLock.unlock();
+            m_addChildInputLock.unlock();
+            return false;
+        }
+
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("HandleAddChildInput: Added child input %1").arg(childid));
+
+        // Next, create the master TVRec and/or EncoderLink.
+        QString localhostname = gCoreContext->GetHostName();
+        QString hostname = CardUtil::GetHostname(childid);
+
+        if (hostname == localhostname)
+        {
+            TVRec *tv = new TVRec(childid);
+            if (!tv || !tv->Init())
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("HandleAddChildInput: "
+                            "Failed to initialize input %1").arg(childid));
+                delete tv;
+                CardUtil::DeleteInput(childid);
+                return false;
+            }
+
+            EncoderLink *enc = new EncoderLink(childid, tv);
+            (*encoderList)[childid] = enc;
+        }
+        else
+        {
+            EncoderLink *enc = (*encoderList)[inputid];
+            if (!enc->AddChildInput(childid))
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("HandleAddChildInput: "
+                            "Failed to add remote input %1").arg(childid));
+                CardUtil::DeleteInput(childid);
+                return false;
+            }
+
+            PlaybackSock *pbs = enc->GetSocket();
+            enc = new EncoderLink(childid, NULL, hostname);
+            enc->SetSocket(pbs);
+            (*encoderList)[childid] = enc;
+        }
+
+        // Finally, add the new input to the Scheduler.
+        m_sched->AddChildInput(inputid, childid);
+    }
+    else
+    {
+        // Create the slave TVRec and EncoderLink.
+        TVRec *tv = new TVRec(inputid);
+        if (!tv || !tv->Init())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("HandleAddChildInput: "
+                        "Failed to initialize input %1").arg(inputid));
+            delete tv;
+            return false;
+        }
+
+        EncoderLink *enc = new EncoderLink(inputid, tv);
+        (*encoderList)[inputid] = enc;
+    }
+
+    TVRec::inputsLock.unlock();
+    m_addChildInputLock.unlock();
+
+    LOG(VB_GENERAL, LOG_ERR, LOC +
+        QString("HandleAddChildInput: "
+                "Succesffuly handled input %1").arg(inputid));
+
+    return true;
 }
 
 void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
