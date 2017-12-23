@@ -2850,7 +2850,15 @@ bool Scheduler::HandleRecording(
         if (sinputinfomap[ri.GetInputID()].schedgroup)
         {
             if (!AssignGroupInput(tempri))
+            {
+                // We failed to assign an input.  Keep asking the main
+                // server to add one until we get one.
+                MythEvent me(QString("ADD_CHILD_INPUT %1")
+                             .arg(tempri.GetInputID()));
+                gCoreContext->dispatch(me);
+                nextWakeTime = min(nextWakeTime, curtime.addSecs(1));
                 return reclist_changed;
+            }
             ri.SetInputID(tempri.GetInputID());
             nexttv = (*m_tvList)[ri.GetInputID()];
         }
@@ -3088,8 +3096,6 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
             QString("Failed to assign input for %1/%2/\"%3\"")
             .arg(ri.GetInputID()).arg(ri.GetChannelSchedulingID())
             .arg(ri.GetTitle()));
-        ri.SetRecordingStatus(RecStatus::TunerBusy);
-        ri.AddHistory(true);
     }
 
     return bestid;
