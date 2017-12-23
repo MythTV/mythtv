@@ -867,7 +867,7 @@ TemplateFinder::resetBuffers(int newwidth, int newheight)
     if (cwidth == newwidth && cheight == newheight)
         return 0;
 
-        av_freep(&cropped.data[0]);
+    av_freep(&cropped.data[0]);
 
     if (av_image_alloc(cropped.data, cropped.linesize,
         newwidth, newheight, AV_PIX_FMT_GRAY8, IMAGE_ALIGN))
