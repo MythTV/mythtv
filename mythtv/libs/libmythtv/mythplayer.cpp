@@ -2359,7 +2359,14 @@ bool MythPlayer::CanSupportDoubleRate(void)
 {
     if (!videosync)
         return false;
-    return (frame_interval / 2.0 > videosync->getRefreshInterval() * 0.995);
+    // At this point we may not have the correct frame rate.
+    // Since interlaced is always at 25 or 30 fps, if the interval
+    // is less than 30000 (33fps) it must be representing one
+    // field and not one frame, so multiply by 2.
+    int realfi = frame_interval;
+    if (frame_interval < 30000)
+        realfi = frame_interval * 2;
+    return (realfi / 2.0 > videosync->getRefreshInterval() * 0.995);
 }
 
 void MythPlayer::EnableFrameRateMonitor(bool enable)
