@@ -2969,7 +2969,6 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
 
     uint bestid = 0;
     uint betterid = 0;
-    uint goodid = 0;
     QDateTime now = MythDate::current();
 
     // Check each child input to find the best one to use.
@@ -3069,18 +3068,10 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
                 .arg(inputid));
             bestid = inputid;
         }
-        else
-        {
-            LOG(VB_SCHEDULE, LOG_DEBUG,
-                QString("Input %1 is on livetv but could be free")
-                .arg(inputid));
-            if (!goodid)
-                goodid = inputid;
-        }
     }
 
     if (!bestid)
-        bestid = (betterid ? betterid : goodid);
+        bestid;
 
     if (bestid)
     {
