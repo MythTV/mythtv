@@ -161,10 +161,9 @@ class SchedGroup : public MythUICheckBoxSetting
             QObject::tr(
                 "Schedule all virtual inputs on this device as a group.  "
                 "This is more efficient than scheduling each input "
-                "individually, but can result in scheduling more "
-                "simultaneous recordings than is allowed.  Be sure to set "
-                "the maximum number of simultaneous recordings above "
-                "high enough to handle all expected cases."
+                "individually.  Additional, virtual inputs will be "
+                "automatically added as needed to fulfill the recording "
+                "load."
                 ));
     };
 };
