@@ -246,10 +246,39 @@ void LookerUpper::customEvent(QEvent *levent)
         if (list.count() > 1)
         {
             int yearindex = -1;
+            MetadataLookup *exactTitleMeta = NULL;
+            QDate exactTitleDate;
+            float exactTitlePopularity = 0.0;
+            bool foundMatchWithArt = false;
 
             for (int p = 0; p != list.size(); ++p)
             {
                 ProgramInfo *pginfo = list[p]->GetData().value<ProgramInfo *>();
+
+                if (pginfo && (QString::compare(pginfo->GetTitle(), list[p]->GetBaseTitle(), Qt::CaseInsensitive)) == 0)
+                {
+                    bool hasArtwork = (((list[p]->GetArtwork(kArtworkFanart)).size() != 0) ||
+                                       ((list[p]->GetArtwork(kArtworkCoverart)).size() != 0) ||
+                                       ((list[p]->GetArtwork(kArtworkBanner)).size() != 0));
+
+                    // After the first exact match, prefer any more popular one.
+                    // Most of the Movie database entries have Popularity fields.
+                    // The TV series database generally has no Popularity values specified,
+                    // so if none are found so far in the search, pick the most recently
+                    // released entry with artwork. Also, if the first exact match had
+                    // no artwork, prefer any later exact match with artwork.
+                    if ((exactTitleMeta == NULL) ||
+                        (hasArtwork &&
+                         ((!foundMatchWithArt) ||
+                          ((list[p]->GetPopularity() > exactTitlePopularity)) ||
+                          ((exactTitlePopularity == 0.0) && (list[p]->GetReleaseDate() > exactTitleDate)))))
+                    {
+                        // remember the most popular or most recently released exact match
+                        exactTitleDate = list[p]->GetReleaseDate();
+                        exactTitlePopularity = list[p]->GetPopularity();
+                        exactTitleMeta = list[p];
+                    }
+                }
 
                 if (pginfo && !pginfo->GetSeriesID().isEmpty() &&
                     pginfo->GetSeriesID() == (list[p])->GetTMSref())
@@ -284,6 +313,18 @@ void LookerUpper::customEvent(QEvent *levent)
             {
                 MetadataLookup *lookup = list[yearindex];
                 ProgramInfo *pginfo = lookup->GetData().value<ProgramInfo *>();
+                if (lookup->GetSubtype() != kProbableGenericTelevision)
+                    pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
+                pginfo->SaveInetRef(lookup->GetInetref());
+                m_busyRecList.removeAll(pginfo);
+                return;
+            }
+
+            if (exactTitleMeta != NULL)
+            {
+                LOG(VB_GENERAL, LOG_INFO, QString("Best match released %1").arg(exactTitleDate.toString()));
+                MetadataLookup *lookup = exactTitleMeta;
+                ProgramInfo *pginfo = exactTitleMeta->GetData().value<ProgramInfo *>();
                 if (lookup->GetSubtype() != kProbableGenericTelevision)
                     pginfo->SaveSeasonEpisode(lookup->GetSeason(), lookup->GetEpisode());
                 pginfo->SaveInetRef(lookup->GetInetref());

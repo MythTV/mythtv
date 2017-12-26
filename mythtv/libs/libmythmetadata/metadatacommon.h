@@ -130,7 +130,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         const uint subtitletype,
         const QString &certification,
         const QStringList &countries,
-        const uint popularity,
+        const float popularity,
         const uint budget,
         const uint revenue,
         const QString &album,
@@ -330,7 +330,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 
     QString GetCertification() const { return m_certification; };
     QStringList GetCountries() const { return m_countries; };
-    uint GetPopularity() const { return m_popularity; };
+    float GetPopularity() const { return m_popularity; };
     uint GetBudget() const { return m_budget; };
     uint GetRevenue() const { return m_revenue; };
 
@@ -417,7 +417,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
 
     const QString m_certification;
     const QStringList m_countries;
-    uint m_popularity;
+    float m_popularity;
     uint m_budget;
     uint m_revenue;
 

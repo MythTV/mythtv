@@ -88,7 +88,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
     Q_PROPERTY( int             Length          READ Length           WRITE setLength         )
     Q_PROPERTY( QString         Language        READ Language         WRITE setLanguage       )
     Q_PROPERTY( QStringList     Countries       READ Countries        WRITE setCountries      )
-    Q_PROPERTY( int             Popularity      READ Popularity       WRITE setPopularity     )
+    Q_PROPERTY( float           Popularity      READ Popularity       WRITE setPopularity     )
     Q_PROPERTY( int             Budget          READ Budget           WRITE setBudget         )
     Q_PROPERTY( int             Revenue         READ Revenue          WRITE setRevenue        )
     Q_PROPERTY( QString         IMDB            READ IMDB             WRITE setIMDB           )
@@ -112,7 +112,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
     PROPERTYIMP    ( int        , Length         )
     PROPERTYIMP    ( QString    , Language       )
     PROPERTYIMP    ( QStringList, Countries      )
-    PROPERTYIMP    ( int        , Popularity     )
+    PROPERTYIMP    ( float      , Popularity     )
     PROPERTYIMP    ( int        , Budget         )
     PROPERTYIMP    ( int        , Revenue        )
     PROPERTYIMP    ( QString    , IMDB           )
@@ -132,7 +132,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
             m_Year             = 0                      ;
             m_UserRating       = 0.0                    ;
             m_Length           = 0.0                    ;
-            m_Popularity       = 0                      ;
+            m_Popularity       = 0.0                    ;
             m_Budget           = 0                      ;
             m_Revenue          = 0                      ;
         }

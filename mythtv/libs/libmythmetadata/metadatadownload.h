@@ -67,6 +67,9 @@ class META_PUBLIC MetadataDownload : public MThread
 
     MetadataLookupList  handleGame(MetadataLookup* lookup);
 
+    unsigned int        findExactMatchCount(MetadataLookupList list,
+                                      const QString &originaltitle,
+                                      bool withArt) const;
     MetadataLookup*     findBestMatch(MetadataLookupList list,
                                       const QString &originaltitle) const;
     MetadataLookupList  runGrabber(QString cmd, QStringList args,

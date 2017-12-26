@@ -97,9 +97,25 @@ void MetadataDownload::run()
             lookup->GetType() == kMetadataRecording)
         {
             if (lookup->GetSubtype() == kProbableTelevision)
+            {
                 list = handleTelevision(lookup);
+                if (findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0)
+                {
+                    // There are no exact match prospects with artwork from TV search,
+                    // so add in movies, where we might find a better match.
+                    list.append(handleMovie(lookup));
+                }
+            }
             else if (lookup->GetSubtype() == kProbableMovie)
+            {
                 list = handleMovie(lookup);
+                if (findExactMatchCount(list, lookup->GetBaseTitle(), true) == 0)
+                {
+                    // There are no exact match prospects with artwork from Movie search
+                    // so add in television, where we might find a better match.
+                    list.append(handleTelevision(lookup));
+                }
+            }
             else
             {
                 // will try both movie and TV
@@ -199,26 +215,99 @@ void MetadataDownload::run()
     RunEpilog();
 }
 
+unsigned int MetadataDownload::findExactMatchCount(MetadataLookupList list,
+                                                   const QString &originaltitle,
+                                                   bool withArt) const
+{
+    unsigned int exactMatches = 0;
+    unsigned int exactMatchesWithArt = 0;
+
+    for (MetadataLookupList::const_iterator i = list.begin();
+            i != list.end(); ++i)
+    {
+        // Consider exact title matches (ignoring case)
+        if ((QString::compare((*i)->GetTitle(), originaltitle, Qt::CaseInsensitive) == 0))
+        {
+            // In lookup by name, the television database tends to only include Banner artwork.
+            // In lookup by name, the movie database tends to include only Fan and Cover artwork.
+            if ((((*i)->GetArtwork(kArtworkFanart)).size() != 0) ||
+                (((*i)->GetArtwork(kArtworkCoverart)).size() != 0) ||
+                (((*i)->GetArtwork(kArtworkBanner)).size() != 0))
+            {
+                exactMatchesWithArt++;
+            }
+            exactMatches++;
+        }
+    }
+
+    if (withArt)
+        return exactMatchesWithArt;
+    else
+        return exactMatches;
+}
+
 MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                                             const QString &originaltitle) const
 {
     QStringList titles;
     MetadataLookup *ret = NULL;
+    QDate exactTitleDate;
+    float exactTitlePopularity;
+    int exactMatches = 0;
+    int exactMatchesWithArt = 0;
+    bool foundMatchWithArt = false;
 
     // Build a list of all the titles
-    int exactMatches = 0;
     for (MetadataLookupList::const_iterator i = list.begin();
             i != list.end(); ++i)
     {
-        QString title = (*i)->GetBaseTitle();
-        if (title == originaltitle)
+        QString title = (*i)->GetTitle();
+        LOG(VB_GENERAL, LOG_INFO, QString("Comparing metadata title '%1' [%2] to recording title '%3'")
+                .arg(title)
+                .arg((*i)->GetReleaseDate().toString())
+                .arg(originaltitle));
+        // Consider exact title matches (ignoring case), which have some artwork available.
+        if (QString::compare(title, originaltitle, Qt::CaseInsensitive) == 0)
         {
-            ret = (*i);
+            bool hasArtwork = ((((*i)->GetArtwork(kArtworkFanart)).size() != 0) ||
+                               (((*i)->GetArtwork(kArtworkCoverart)).size() != 0) ||
+                               (((*i)->GetArtwork(kArtworkBanner)).size() != 0));
+
+            LOG(VB_GENERAL, LOG_INFO, QString("'%1', popularity = %2, ReleaseDate = %3")
+                    .arg(title)
+                    .arg((*i)->GetPopularity())
+                    .arg((*i)->GetReleaseDate().toString()));
+
+            // After the first exact match, prefer any more popular one.
+            // Most of the Movie database entries have Popularity fields.
+            // The TV series database generally has no Popularity values specified,
+            // so if none are found so far in the search, pick the most recently
+            // released entry with artwork. Also, if the first exact match had
+            // no artwork, prefer any later exact match with artwork.
+            if ((ret == NULL) ||
+                (hasArtwork &&
+                 ((!foundMatchWithArt) ||
+                  (((*i)->GetPopularity() > exactTitlePopularity)) ||
+                  ((exactTitlePopularity == 0.0) && ((*i)->GetReleaseDate() > exactTitleDate)))))
+            {
+                exactTitleDate = (*i)->GetReleaseDate();
+                exactTitlePopularity = (*i)->GetPopularity();
+                ret = (*i);
+            }
             exactMatches++;
+            if (hasArtwork)
+            {
+                foundMatchWithArt = true;
+                exactMatchesWithArt++;
+            }
         }
 
         titles.append(title);
     }
+
+    LOG(VB_GENERAL, LOG_DEBUG, QString("exactMatches = %1, exactMatchesWithArt = %2")
+            .arg(exactMatches)
+            .arg(exactMatchesWithArt));
 
     // If there was one or more exact matches then we can skip a more intensive
     // and time consuming search
@@ -226,18 +315,18 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     {
         if (exactMatches == 1)
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("Single Exact Title Match For %1")
+            LOG(VB_GENERAL, LOG_INFO, QString("Single exact title match for '%1'")
                     .arg(originaltitle));
-            return ret;
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("Multiple exact title matches found for %1. "
-                        "Need to match on other criteria.")
-                    .arg(originaltitle));
-            return NULL;
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Multiple exact title matches found for '%1'. "
+                        "Selecting most popular or most recent [%2]")
+                    .arg(originaltitle)
+                    .arg(exactTitleDate.toString()));
         }
+        return ret;
     }
 
     // Apply Levenshtein distance algorithm to determine closest match
@@ -260,7 +349,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     MetadataLookupList::const_iterator i = list.begin();
     for (; i != list.end(); ++i)
     {
-        if ((*i)->GetBaseTitle() == bestTitle)
+        if ((*i)->GetTitle() == bestTitle)
         {
             ret = (*i);
             break;
