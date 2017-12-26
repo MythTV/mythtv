@@ -161,7 +161,7 @@ class ScanFrequency: public TransTextEditSetting
 class ScanSymbolRateDVBS: public TransMythUIComboBoxSetting
 {
   public:
-    ScanSymbolRateDVBS()
+    ScanSymbolRateDVBS() : TransMythUIComboBoxSetting(true)
     {
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(
@@ -184,7 +184,7 @@ class ScanSymbolRateDVBS: public TransMythUIComboBoxSetting
 class ScanSymbolRateDVBC: public TransMythUIComboBoxSetting
 {
   public:
-    ScanSymbolRateDVBC()
+    ScanSymbolRateDVBC() : TransMythUIComboBoxSetting(true)
     {
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(
