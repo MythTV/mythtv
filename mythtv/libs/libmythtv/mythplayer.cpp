@@ -154,6 +154,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       fftime(0),
       // Playback misc.
       videobuf_retries(0),          framesPlayed(0),
+      prebufferFramesPlayed(0),
       framesPlayedExtra(0),
       totalFrames(0),               totalLength(0),
       totalDuration(0),
@@ -2198,6 +2199,28 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                             videoOutput->EnoughDecodedFrames())))
     {
         SetBuffering(true);
+        // This piece of code is to address the problem, when starting
+        // Live TV, of jerking and stuttering. Without this code
+        // that could go on forever, but is cured by a pause and play.
+        // This code inserts a brief pause and play when the potential
+        // for the jerking is detected.
+        if (prebufferFramesPlayed != framesPlayed)
+        {
+            float current   = ComputeSecs(framesPlayed, true);
+            float length    = ComputeSecs(totalFrames, true);
+            if (length > current && length - current < 1.5)
+            {
+                LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
+                    QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
+                    .arg(current).arg(length));
+                if (!audio.IsPaused())
+                {
+                    audio.Pause(true);
+                    avsync_audiopaused = true;
+                }
+                prebufferFramesPlayed = framesPlayed;
+            }
+        }
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
         int last_msg = buffering_last_msg.msecsTo(QTime::currentTime());
