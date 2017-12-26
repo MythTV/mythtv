@@ -114,6 +114,12 @@
             <multiline>yes</multiline>
             <template>%"|SUBTITLE|" %%LONGREPEAT%%(|STARS|) %%DESCRIPTION%</template>
         </textarea>
+        <textarea name="callsign" depends="!iconpath">
+            <area>1030,500,130,80</area>
+            <font>small</font>
+            <align>allcenter</align>
+            <multiline>true</multiline>
+        </textarea>
         <imagetype name="iconpath">
             <area>1030,500,130,100</area>
         </imagetype>
@@ -219,10 +225,11 @@
             <align>hcenter,vcenter</align>
             <value>%CHANNUM%</value>
         </textarea>
-        <textarea name="callsign">
-            <area>925,10,300,80</area>
-            <font>large</font>
+        <textarea name="callsign" depends="!iconpath">
+            <area>1000,10,155,80</area>
+            <font>medium</font>
             <align>allcenter</align>
+            <multiline>true</multiline>
         </textarea>
         <imagetype name="iconpath">
             <area>1015,10,125,80</area>
