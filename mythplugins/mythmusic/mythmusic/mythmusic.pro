@@ -25,6 +25,7 @@ LIBS += -lmythavcodec
 LIBS += -lmythavutil
 LIBS += -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
 LIBS += -lmythmetadata-$$LIBVERSION
+LIBS += -lmythtv-$$LIBVERSION
 
 # Input
 HEADERS += constants.h
