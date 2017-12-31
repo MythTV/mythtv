@@ -344,6 +344,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
             if (( pRequest->m_eType   == RequestTypeGet ) &&
                 ( pRequest->m_sMethod == "xsd"          ))
             {
+                bool bHandled = false;
                 if ( pRequest->m_mapParams.count() > 0)
                 {
                     pService =  qobject_cast<Service*>(m_oMetaObject.newInstance());
@@ -351,12 +352,16 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                     Xsd xsd;
 
                     if (pRequest->m_mapParams.contains( "type" ))
-                        xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
+                        bHandled = xsd.GetXSD( pRequest, pRequest->m_mapParams[ "type" ] );
                     else
-
-                        xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
+                        bHandled = xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
                     delete pService;
+                    pService = NULL;
                 }
+
+                if (!bHandled)
+                    throw QString("Invalid arguments to xsd query: %1")
+                        .arg(pRequest->m_sRequestUrl.section('?', 1));
 
                 return true;
             }
