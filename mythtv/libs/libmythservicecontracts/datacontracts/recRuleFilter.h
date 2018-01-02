@@ -27,7 +27,7 @@ class SERVICE_PUBLIC RecRuleFilter : public QObject
 
         static inline void InitializeCustomTypes();
 
-        RecRuleFilter(QObject *parent = 0)
+        Q_INVOKABLE RecRuleFilter(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      )
         {

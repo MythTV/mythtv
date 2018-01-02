@@ -34,7 +34,7 @@ class SERVICE_PUBLIC Genre : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Genre(QObject *parent = 0)
+        Q_INVOKABLE Genre(QObject *parent = 0)
             : QObject         ( parent )
         {
         }

@@ -40,7 +40,7 @@ class SERVICE_PUBLIC WOLInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        WOLInfo(QObject *parent = 0) 
+        Q_INVOKABLE WOLInfo(QObject *parent = 0)
             : QObject    ( parent ),
               m_Enabled  ( false  ),
               m_Reconnect( 0      ),

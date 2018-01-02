@@ -78,7 +78,7 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        RecordingInfo(QObject *parent = 0) 
+        Q_INVOKABLE RecordingInfo(QObject *parent = 0)
             : QObject           ( parent             ),
               m_RecordedId      ( 0                  ),
               m_Status          ( RecStatus::Unknown ),

@@ -39,7 +39,7 @@ class SERVICE_PUBLIC ConnectionInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        ConnectionInfo(QObject *parent = 0) 
+        Q_INVOKABLE ConnectionInfo(QObject *parent = 0)
             : QObject        ( parent ),
               m_Version      ( NULL   ),
               m_Database     ( NULL   ),

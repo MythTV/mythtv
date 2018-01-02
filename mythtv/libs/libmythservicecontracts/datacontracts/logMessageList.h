@@ -36,7 +36,7 @@ class SERVICE_PUBLIC LogMessageList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        LogMessageList(QObject *parent = 0)
+        Q_INVOKABLE LogMessageList(QObject *parent = 0)
             : QObject( parent )
         {
         }

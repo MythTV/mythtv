@@ -38,7 +38,7 @@ class SERVICE_PUBLIC TitleInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        TitleInfo(QObject *parent = 0) 
+        Q_INVOKABLE TitleInfo(QObject *parent = 0)
             : QObject            ( parent ),
               m_Count(0)
         { 

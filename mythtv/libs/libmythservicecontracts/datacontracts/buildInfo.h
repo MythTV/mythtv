@@ -37,7 +37,7 @@ class SERVICE_PUBLIC BuildInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        BuildInfo(QObject *parent = 0)
+        Q_INVOKABLE BuildInfo(QObject *parent = 0)
             : QObject    ( parent ),
               m_Version  ( ""     ),
               m_LibX264  ( false  ),

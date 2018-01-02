@@ -30,7 +30,7 @@ class SERVICE_PUBLIC ImageMetadataInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        ImageMetadataInfo(QObject *parent = 0)
+        Q_INVOKABLE ImageMetadataInfo(QObject *parent = 0)
                         : QObject         ( parent ),
                           m_Number        ( 0      )
         {

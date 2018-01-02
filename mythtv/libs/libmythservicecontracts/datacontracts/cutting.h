@@ -35,7 +35,7 @@ class SERVICE_PUBLIC Cutting : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Cutting(QObject *parent = 0)
+        Q_INVOKABLE Cutting(QObject *parent = 0)
             : QObject( parent ), m_Mark(0), m_Offset(0)
         {
         }

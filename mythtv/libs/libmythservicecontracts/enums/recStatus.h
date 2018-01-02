@@ -57,7 +57,7 @@ class SERVICE_PUBLIC RecStatus : public QObject
 
         static inline void InitializeCustomTypes();
 
-        explicit RecStatus(QObject *parent = 0) : QObject(parent) {}
+        Q_INVOKABLE explicit RecStatus(QObject *parent = 0) : QObject(parent) {}
 
     private:
         Q_DISABLE_COPY(RecStatus)

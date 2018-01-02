@@ -39,7 +39,7 @@ class SERVICE_PUBLIC CaptureCardList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        CaptureCardList(QObject *parent = 0)
+        Q_INVOKABLE CaptureCardList(QObject *parent = 0)
             : QObject( parent )
         {
         }

@@ -91,7 +91,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
         static void InitializeCustomTypes();
 
-        ChannelInfo(QObject *parent = 0) 
+        Q_INVOKABLE ChannelInfo(QObject *parent = 0)
             : QObject           ( parent ),
               m_ChanId          ( 0      ),
               m_MplexId         ( 0      ),
@@ -221,7 +221,7 @@ class SERVICE_PUBLIC Program : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Program(QObject *parent = 0) 
+        Q_INVOKABLE Program(QObject *parent = 0)
             : QObject               ( parent ),
               m_Repeat              ( false  ),
               m_Stars               ( 0      ),

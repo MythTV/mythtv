@@ -52,7 +52,7 @@ class SERVICE_PUBLIC Input : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Input(QObject *parent = 0)
+        Q_INVOKABLE Input(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_CardId        ( 0      ),

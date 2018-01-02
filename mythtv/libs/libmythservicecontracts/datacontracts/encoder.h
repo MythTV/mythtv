@@ -58,7 +58,7 @@ class SERVICE_PUBLIC Encoder : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Encoder(QObject *parent = 0) 
+        Q_INVOKABLE Encoder(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_Local         ( true   ),

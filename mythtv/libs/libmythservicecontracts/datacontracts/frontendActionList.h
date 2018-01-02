@@ -21,7 +21,7 @@ namespace DTC
 
         static inline void InitializeCustomTypes();
 
-        explicit FrontendActionList(QObject *parent = 0) : QObject(parent)
+        Q_INVOKABLE explicit FrontendActionList(QObject *parent = 0) : QObject(parent)
         {
         }
 

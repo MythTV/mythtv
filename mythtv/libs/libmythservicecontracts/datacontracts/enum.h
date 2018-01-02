@@ -42,7 +42,7 @@ class SERVICE_PUBLIC Enum : public QObject
 
         static inline void InitializeCustomTypes();
 
-        explicit Enum(QObject *parent = 0)
+        Q_INVOKABLE explicit Enum(QObject *parent = 0)
             : QObject( parent )
         {
         }

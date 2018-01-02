@@ -42,7 +42,7 @@ class SERVICE_PUBLIC LabelValue : public QObject
 
         static inline void InitializeCustomTypes();
 
-        LabelValue(QObject *parent = 0)
+        Q_INVOKABLE LabelValue(QObject *parent = 0)
             : QObject       ( parent ),
               m_Label       (       ),
               m_Value       (       ),

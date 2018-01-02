@@ -58,7 +58,7 @@ class SERVICE_PUBLIC VideoMetadataInfoList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        VideoMetadataInfoList(QObject *parent = 0)
+        Q_INVOKABLE VideoMetadataInfoList(QObject *parent = 0)
             : QObject( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),

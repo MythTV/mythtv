@@ -36,7 +36,7 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
 
         static inline void InitializeCustomTypes();
 
-        StorageGroupDir(QObject *parent = 0) 
+        Q_INVOKABLE StorageGroupDir(QObject *parent = 0)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_DirRead       ( false  ),

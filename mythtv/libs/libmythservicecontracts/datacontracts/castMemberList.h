@@ -31,7 +31,7 @@ class SERVICE_PUBLIC CastMemberList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        CastMemberList(QObject *parent = 0)
+        Q_INVOKABLE CastMemberList(QObject *parent = 0)
             : QObject( parent )
         {
         }

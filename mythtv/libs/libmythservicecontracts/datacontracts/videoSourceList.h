@@ -39,7 +39,7 @@ class SERVICE_PUBLIC VideoSourceList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        VideoSourceList(QObject *parent = 0)
+        Q_INVOKABLE VideoSourceList(QObject *parent = 0)
             : QObject( parent )
         {
         }
