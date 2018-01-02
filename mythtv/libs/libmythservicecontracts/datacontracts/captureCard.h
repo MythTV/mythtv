@@ -24,13 +24,15 @@ namespace DTC
 class SERVICE_PUBLIC CaptureCard : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.1" );
+    Q_CLASSINFO( "version"    , "1.2" );
 
     Q_PROPERTY( uint            CardId              READ CardId             WRITE setCardId             )
+    Q_PROPERTY( uint            ParentId            READ ParentId           WRITE setParentId           )
     Q_PROPERTY( QString         VideoDevice         READ VideoDevice        WRITE setVideoDevice        )
     Q_PROPERTY( QString         AudioDevice         READ AudioDevice        WRITE setAudioDevice        )
     Q_PROPERTY( QString         VBIDevice           READ VBIDevice          WRITE setVBIDevice          )
     Q_PROPERTY( QString         CardType            READ CardType           WRITE setCardType           )
+    Q_PROPERTY( QString         DefaultInput        READ DefaultInput       WRITE setDefaultInput       )
     Q_PROPERTY( uint            AudioRateLimit      READ AudioRateLimit     WRITE setAudioRateLimit     )
     Q_PROPERTY( QString         HostName            READ HostName           WRITE setHostName           )
     Q_PROPERTY( uint            DVBSWFilter         READ DVBSWFilter        WRITE setDVBSWFilter        )
@@ -51,12 +53,29 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     Q_PROPERTY( uint            Hue                 READ Hue                WRITE setHue                )
     Q_PROPERTY( uint            DiSEqCId            READ DiSEqCId           WRITE setDiSEqCId           )
     Q_PROPERTY( bool            DVBEITScan          READ DVBEITScan         WRITE setDVBEITScan         )
+    Q_PROPERTY( QString         InputName           READ InputName          WRITE setInputName          )
+    Q_PROPERTY( uint            SourceId            READ SourceId           WRITE setSourceId           )
+    Q_PROPERTY( QString         ExternalCommand     READ ExternalCommand    WRITE setExternalCommand    )
+    Q_PROPERTY( QString         ChangerDevice       READ ChangerDevice      WRITE setChangerDevice      )
+    Q_PROPERTY( QString         ChangerModel        READ ChangerModel       WRITE setChangerModel       )
+    Q_PROPERTY( QString         TuneChannel         READ TuneChannel        WRITE setTuneChannel        )
+    Q_PROPERTY( QString         StartChannel        READ StartChannel       WRITE setStartChannel       )
+    Q_PROPERTY( QString         DisplayName         READ DisplayName        WRITE setDisplayName        )
+    Q_PROPERTY( bool            DishnetEit          READ DishnetEit         WRITE setDishnetEit         )
+    Q_PROPERTY( int             RecPriority         READ RecPriority        WRITE setRecPriority        )
+    Q_PROPERTY( bool            QuickTune           READ QuickTune          WRITE setQuickTune          )
+    Q_PROPERTY( uint            SchedOrder          READ SchedOrder         WRITE setSchedOrder         )
+    Q_PROPERTY( uint            LiveTVOrder         READ LiveTVOrder        WRITE setLiveTVOrder        )
+    Q_PROPERTY( uint            RecLimit            READ RecLimit           WRITE setRecLimit           )
+    Q_PROPERTY( bool            SchedGroup          READ SchedGroup         WRITE setSchedGroup         )
 
     PROPERTYIMP( uint       ,     CardId            )
+    PROPERTYIMP( uint       ,     ParentId          )
     PROPERTYIMP( QString    ,     VideoDevice       )
     PROPERTYIMP( QString    ,     AudioDevice       )
     PROPERTYIMP( QString    ,     VBIDevice         )
     PROPERTYIMP( QString    ,     CardType          )
+    PROPERTYIMP( QString    ,     DefaultInput      )
     PROPERTYIMP( uint       ,     AudioRateLimit    )
     PROPERTYIMP( QString    ,     HostName          )
     PROPERTYIMP( uint       ,     DVBSWFilter       )
@@ -76,14 +95,29 @@ class SERVICE_PUBLIC CaptureCard : public QObject
     PROPERTYIMP( uint       ,     Colour            )
     PROPERTYIMP( uint       ,     Hue               )
     PROPERTYIMP( uint       ,     DiSEqCId          )
-    PROPERTYIMP( bool       ,     DVBEITScan        );
+    PROPERTYIMP( bool       ,     DVBEITScan        )
+    PROPERTYIMP( QString    ,     InputName         )
+    PROPERTYIMP( uint       ,     SourceId          )
+    PROPERTYIMP( QString    ,     ExternalCommand   )
+    PROPERTYIMP( QString    ,     ChangerDevice     )
+    PROPERTYIMP( QString    ,     ChangerModel      )
+    PROPERTYIMP( QString    ,     TuneChannel       )
+    PROPERTYIMP( QString    ,     StartChannel      )
+    PROPERTYIMP( QString    ,     DisplayName       )
+    PROPERTYIMP( bool       ,     DishnetEit        )
+    PROPERTYIMP( int        ,     RecPriority       )
+    PROPERTYIMP( bool       ,     QuickTune         )
+    PROPERTYIMP( uint       ,     SchedOrder        )
+    PROPERTYIMP( uint       ,     LiveTVOrder       )
+    PROPERTYIMP( uint       ,     RecLimit          )
+    PROPERTYIMP( bool       ,     SchedGroup        );
 
     public:
 
         static inline void InitializeCustomTypes();
 
         CaptureCard(QObject *parent = 0)
-            : QObject         ( parent ), m_CardId(0),
+            : QObject         ( parent ), m_CardId(0), m_ParentId(0),
             m_AudioRateLimit(0), m_DVBSWFilter(0),
             m_DVBSatType(0), m_DVBWaitForSeqStart(false),
             m_SkipBTAudio(false), m_DVBOnDemand(false),
@@ -91,16 +125,21 @@ class SERVICE_PUBLIC CaptureCard : public QObject
             m_FirewireConnection(0), m_SignalTimeout(1000),
             m_ChannelTimeout(3000), m_DVBTuningDelay(0),
             m_Contrast(0), m_Brightness(0), m_Colour(0),
-            m_Hue(0), m_DiSEqCId(0), m_DVBEITScan(1)
+            m_Hue(0), m_DiSEqCId(0), m_DVBEITScan(1),
+            m_SourceId(0), m_DishnetEit(false), m_RecPriority(0),
+            m_QuickTune(false), m_SchedOrder(0), m_LiveTVOrder(0),
+            m_RecLimit(0), m_SchedGroup(false)
         {
         }
 
         void Copy( const CaptureCard *src )
         {
             m_CardId             = src->m_CardId;
+            m_ParentId           = src->m_ParentId;
             m_VideoDevice        = src->m_VideoDevice;
             m_AudioDevice        = src->m_AudioDevice;
             m_CardType           = src->m_CardType;
+            m_DefaultInput       = src->m_DefaultInput;
             m_AudioRateLimit     = src->m_AudioRateLimit;
             m_HostName           = src->m_HostName;
             m_DVBSWFilter        = src->m_DVBSWFilter;
@@ -121,6 +160,21 @@ class SERVICE_PUBLIC CaptureCard : public QObject
             m_Hue                = src->m_Hue;
             m_DiSEqCId           = src->m_DiSEqCId;
             m_DVBEITScan         = src->m_DVBEITScan;
+            m_InputName          = src->m_InputName;
+            m_SourceId           = src->m_SourceId;
+            m_ExternalCommand    = src->m_ExternalCommand;
+            m_ChangerDevice      = src->m_ChangerDevice;
+            m_ChangerModel       = src->m_ChangerModel;
+            m_TuneChannel        = src->m_TuneChannel;
+            m_StartChannel       = src->m_StartChannel;
+            m_DisplayName        = src->m_DisplayName;
+            m_DishnetEit         = src->m_DishnetEit;
+            m_RecPriority        = src->m_RecPriority;
+            m_QuickTune          = src->m_QuickTune;
+            m_SchedOrder         = src->m_SchedOrder;
+            m_LiveTVOrder        = src->m_LiveTVOrder;
+            m_RecLimit           = src->m_RecLimit;
+            m_SchedGroup         = src->m_SchedGroup;
         }
 
     private:
