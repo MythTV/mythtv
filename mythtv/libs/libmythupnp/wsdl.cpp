@@ -404,8 +404,6 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
         QString sType = oInfo.m_oMethod.typeName();
 
-        sType.remove( QChar('*') );
-
         sTypeName.remove( "Response" );
 
         oNode.setAttribute( "minOccurs", 0       );
@@ -472,8 +470,6 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
 bool Wsdl::IsCustomType( QString &sTypeName )
 {
-    sTypeName.remove( QChar('*') );
-
     int id = QMetaType::type( sTypeName.toUtf8() );
 
     switch( id )
