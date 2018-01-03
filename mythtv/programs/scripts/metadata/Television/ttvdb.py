@@ -74,12 +74,6 @@ Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/bann
     <releasedate>1997-09-26</releasedate>
     <people>
       <person job="Actor" name="Richard Dean Anderson" character="Jack O'Neill" url="http://thetvdb.com/banners/actors/17720.jpg" thumb="http://thetvdb.com/banners/actors/17720.jpg"/>
-      <person job="Actor" name="Amanda Tapping" character="Samantha Carter" url="http://thetvdb.com/banners/actors/17722.jpg" thumb="http://thetvdb.com/banners/actors/17722.jpg"/>
-      <person job="Actor" name="Michael Shanks" character="Dr. Daniel Jackson" url="http://thetvdb.com/banners/actors/17723.jpg" thumb="http://thetvdb.com/banners/actors/17723.jpg"/>
-      <person job="Actor" name="Ben Browder" character="Cameron Mitchell" url="http://thetvdb.com/banners/actors/17725.jpg" thumb="http://thetvdb.com/banners/actors/17725.jpg"/>
-      <person job="Actor" name="Christopher Judge" character="Teal'c" url="http://thetvdb.com/banners/actors/17726.jpg" thumb="http://thetvdb.com/banners/actors/17726.jpg"/>
-      <person job="Actor" name="Beau Bridges" character="Henry &quot;Hank&quot; Landry" url="http://thetvdb.com/banners/actors/17719.jpg" thumb="http://thetvdb.com/banners/actors/17719.jpg"/>
-      <person job="Actor" name="Don S. Davis" character="George S. Hammond" url="http://thetvdb.com/banners/actors/17721.jpg" thumb="http://thetvdb.com/banners/actors/17721.jpg"/>
 ...
       <person job="Guest Star" name="James Earl Jones"/>
       <person job="Guest Star" name="Galyn Gorg"/>
@@ -532,7 +526,6 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
     <people>
       <person job="Actor" name="Mark Harmon" character="Leroy Jethro Gibbs" url="http://thetvdb.com/banners/actors/70164.jpg" thumb="http://thetvdb.com/banners/actors/70164.jpg"/>
       <person job="Actor" name="Sean Murray" character="Timothy &quot;Tim&quot; McGee" url="http://thetvdb.com/banners/actors/70163.jpg" thumb="http://thetvdb.com/banners/actors/70163.jpg"/>
-      <person job="Actor" name="Emily Wickersham" character="Eleanor “Ellie” Bishop" url="http://thetvdb.com/banners/actors/321201.jpg" thumb="http://thetvdb.com/banners/actors/321201.jpg"/>
       <person job="Actor" name="David McCallum" character="Donald &quot;Ducky&quot; Mallard" url="http://thetvdb.com/banners/actors/70159.jpg" thumb="http://thetvdb.com/banners/actors/70159.jpg"/>
       <person job="Actor" name="Pauley Perrette" character="Abigail &quot;Abby&quot; Sciuto" url="http://thetvdb.com/banners/actors/70161.jpg" thumb="http://thetvdb.com/banners/actors/70161.jpg"/>
       <person job="Actor" name="Rocky Carroll" character="Leon Vance" url="http://thetvdb.com/banners/actors/127861.jpg" thumb="http://thetvdb.com/banners/actors/127861.jpg"/>
@@ -542,8 +535,10 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
       <person job="Actor" name="Sasha Alexander" character="Caitlin &quot;Kate&quot; Todd" url="http://thetvdb.com/banners/actors/70162.jpg" thumb="http://thetvdb.com/banners/actors/70162.jpg"/>
       <person job="Actor" name="Cote de Pablo" character="Ziva David" url="http://thetvdb.com/banners/actors/70165.jpg" thumb="http://thetvdb.com/banners/actors/70165.jpg"/>
       <person job="Actor" name="Lauren Holly" character="Jennifer &quot;Jenny&quot; Shepard" url="http://thetvdb.com/banners/actors/77850.jpg" thumb="http://thetvdb.com/banners/actors/77850.jpg"/>
-      <person job="Actor" name="Jennifer Espósito" character="Alex Quinn" url="http://thetvdb.com/banners/actors/402126.jpg" thumb="http://thetvdb.com/banners/actors/402126.jpg"/>
+      <person job="Actor" name="Jennifer Esposito" character="Alex Quinn" url="http://thetvdb.com/banners/actors/402126.jpg" thumb="http://thetvdb.com/banners/actors/402126.jpg"/>
+      <person job="Actor" name="Emily Wickersham" character="Eleanor “Ellie” Bishop" url="http://thetvdb.com/banners/actors/321201.jpg" thumb="http://thetvdb.com/banners/actors/321201.jpg"/>
       <person job="Actor" name="Duane Henry" character="Clayton Reeves" url="http://thetvdb.com/banners/actors/418530.jpg" thumb="http://thetvdb.com/banners/actors/418530.jpg"/>
+      <person job="Actor" name="Maria Bello" character="Jacqueline “Jack” Sloane" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
       <person job="Guest Star" name="Kerr Smith"/>
       <person job="Guest Star" name="Sarah Jane Morris"/>
       <person job="Guest Star" name="Matt Craven"/>
@@ -563,6 +558,9 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8-2.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/72108-8-7.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/72108-8-7.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-20.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-20.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-28.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-28.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-29.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-29.jpg" width="1920" height="1080"/>
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-31.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-31.jpg" width="1920" height="1080"/>
 ...
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/72108-33.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/72108-33.jpg" width="1920" height="1080"/>
@@ -615,7 +613,7 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
   <item>
     <title>NOVA</title>
     <subtitle>Eclipse Over America</subtitle>
-    <description>On August 21, 2017, millions of Americans witnessed the first total solar eclipse to cross the continental United States in 99 years. As in all total solar eclipses, the moon blocked the sun and revealed its ethereal outer atmosphere – its corona – in a wondrous celestial spectacle. While hordes of citizens flocked to the eclipse’s path of totality, scientists, too, staked out spots for a very different reason: to investigate the secrets of the sun’s elusive atmosphere. During the eclipse’s precious seconds of darkness, they gathered new clues on how our sun works, how it can produce deadly solar storms, and why its atmosphere is so hot. NOVA investigates the storied history of solar eclipse science, and joins both seasoned and citizen-scientists alike as they don their eclipse glasses, tune their telescopes, and behold the Eclipse Over America.</description>
+    <description>...</description>
     <season>44</season>
     <episode>11</episode>
     <certifications>
@@ -635,12 +633,8 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
     <language>en</language>
     <year>2017</year>
     <releasedate>2017-08-21</releasedate>
-    <people>
-      <person job="Guest Star" name="Craig Sechler"/>
-      <person job="Director" name="Martin Gorst"/>
-    </people>
     <images>
-      <image type="screenshot" url="http://thetvdb.com/banners/episodes/76119/6286436.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/76119/6286436.jpg"/>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/76119/....jpg" thumb="http://thetvdb.com/banners/_cache/episodes/76119/....jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/76119-44.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/76119-44.jpg"/>
       <image type="coverart" url="http://www.thetvdb.com/banners/seasons/76119-44-2.jpg" thumb="http://www.thetvdb.com/banners/_cache/seasons/76119-44-2.jpg"/>
       <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/76119-1.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/76119-1.jpg" width="1920" height="1080"/>
@@ -678,6 +672,121 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
     </images>
   </item>
 </metadata>
+0
+
+>>> sys.argv = shlex.split('ttvdb.py -l de -a DE -D 282022 1 1')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Wilder Westen</title>
+    <subtitle>Gebirge</subtitle>
+    <description>Der Wilde Westen. ...</description>
+    <season>1</season>
+    <episode>1</episode>
+    <categories>
+      <category type="genre" name="Documentary"/>
+    </categories>
+    <studios>
+      <studio name="BBC Four"/>
+    </studios>
+    <runtime>60</runtime>
+    <inetref>282022</inetref>
+    <collectionref>282022</collectionref>
+    <language>de</language>
+    <year>2014</year>
+    <releasedate>2014-05-22</releasedate>
+    <people>
+      <person job="Actor" name="Ray Mears" character="Presenter" url="http://thetvdb.com/banners/actors/330506.jpg" thumb="http://thetvdb.com/banners/actors/330506.jpg"/>
+      <person job="Director" name="Phil Coles"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/282022/4890147.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/282022/4890147.jpg"/>
+    </images>
+  </item>
+</metadata>
+0
+
+>>> sys.argv = shlex.split('ttvdb.py -l de -a DE -D 282022')
+>>> main()
+Title:Wilder Westen
+Season:1
+Episode:1
+Subtitle:Gebirge
+Year:2014
+ReleaseDate:2014-05-22
+Director:Phil Coles
+Plot:Der Wilde Westen. Die Vorstellung ...
+UserRating:
+Writers:
+Screenshot:http://thetvdb.com/banners/episodes/282022/4890147.jpg
+Language:de
+Absolutenumber:1
+Airedseasonid:586419
+Dvddiscid:
+Id:4890147
+Imdbid:
+...
+Productioncode:b044jl70
+Seriesid:282022
+Showurl:
+Siterating:0
+Siteratingcount:0
+...
+Cast:Ray Mears
+Runtime:60
+Title:Wilder Westen
+Season:1
+Episode:2
+Subtitle:Great Plains
+Year:2014
+ReleaseDate:2014-05-29
+Director:Phil Coles
+Plot:Die Great Plains,...
+UserRating:
+Writers:
+Screenshot:http://thetvdb.com/banners/episodes/282022/4890148.jpg
+Language:de
+Absolutenumber:2
+Airedseasonid:586419
+Dvddiscid:
+Id:4890148
+Imdbid:
+...
+Productioncode:b044z1k0
+Seriesid:282022
+Showurl:
+Siterating:0
+Siteratingcount:0
+...
+Cast:Ray Mears
+Runtime:60
+Title:Wilder Westen
+Season:1
+Episode:3
+Subtitle:W...
+Year:2014
+ReleaseDate:2014-06-05
+Director:
+Plot:
+UserRating:
+Writers:
+Screenshot:http://thetvdb.com/banners/episodes/282022/4890149.jpg
+Language:de
+Absolutenumber:3
+Airedseasonid:586419
+Dvddiscid:
+Id:4890149
+Imdbid:
+...
+Productioncode:b045nz9q
+Seriesid:282022
+Showurl:
+Siterating:0
+Siteratingcount:0
+...
+Cast:Ray Mears
+Runtime:60
 0
 
 """
@@ -2348,21 +2457,26 @@ def main():
 
     key = series_season_ep[0].lower()
     if opts.configure != "" and key in override:
-        banners_keys = search_for_series(t, override[key][0], opts.language)['_banners'].keys()
+        series_info = search_for_series(t, override[key][0], opts.language)
     else:
-        banners_keys = search_for_series(t, series_season_ep[0], opts.language)['_banners'].keys()
+        series_info = search_for_series(t, series_season_ep[0], opts.language)
+    try:
+        banners_keys = series_info['_banners'].keys()
+    except:
+        banners_keys = None
 
     banner= False
     poster= False
     fanart= False
 
-    for x in banners_keys: # Determine what type of graphics is available
-        if x == fanart_key:
-            fanart=True
-        elif x== poster_key:
-            poster=True
-        elif x==season_key or x==banner_key:
-            banner=True
+    if banners_keys:
+        for x in banners_keys: # Determine what type of graphics is available
+            if x == fanart_key:
+                fanart=True
+            elif x == poster_key:
+                poster=True
+            elif x == season_key or x == banner_key:
+                banner=True
 
     # Make sure that some graphics URL(s) (Posters, FanArt or Banners) are available
     if ( fanart!=True and poster!=True and banner!=True ):
