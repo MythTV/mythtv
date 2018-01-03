@@ -39,30 +39,32 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
     // Create Parent object so we can get to its metaObject
     // ----------------------------------------------------------------------
 
-    QString sParentFQN = "DTC::" + lstTypeParts[0];
-
+    QString sParentFQN = lstTypeParts[0];
     int nParentId = QMetaType::type( sParentFQN.toUtf8() );
 
-    if (nParentId == 0)
+    // ----------------------------------------------------------------------
+    // Check for things that were formerly registered as both 'Foo' and 'Foo*'
+    // ----------------------------------------------------------------------
+    if (nParentId == QMetaType::UnknownType)
     {
-        // Try it without the DTC Namespace
-
-        sParentFQN = lstTypeParts[0];
-        nParentId  = QMetaType::type(sParentFQN.toUtf8());
+        QString sFQN = sParentFQN + "*";
+        nParentId = QMetaType::type( sFQN.toUtf8() );
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QObject *pParentClass = (QObject *)QMetaType::construct( nParentId );
-#else
-    QObject *pParentClass = (QObject *)QMetaType::create( nParentId );
-#endif
+    // ----------------------------------------------------------------------
+    // if a DataContract type, we need to prefix name with DTC::
+    // These types are all pointers to objects, so we also need to add "*"
+    // ----------------------------------------------------------------------
 
-    if (pParentClass == NULL)
+    if (nParentId == QMetaType::UnknownType)
+    {
+        QString sFQN = "DTC::" + sParentFQN + "*";
+        nParentId = QMetaType::type( sFQN.toUtf8() );
+    }
+
+    const QMetaObject *pMetaObject = QMetaType::metaObjectForType(nParentId);
+    if (pMetaObject == NULL)
         return false;
-
-    const QMetaObject *pMetaObject = pParentClass->metaObject();
-
-    QMetaType::destroy( nParentId, pParentClass );
 
     // ----------------------------------------------------------------------
     // Now look up enum
@@ -217,13 +219,22 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
     int id = QMetaType::type( sTypeName.toUtf8() );
 
     // ----------------------------------------------------------------------
+    // Check for things that were formerly registered as both 'Foo' and 'Foo*'
+    // ----------------------------------------------------------------------
+    if (id == QMetaType::UnknownType)
+    {
+        QString sFQN = sTypeName + "*";
+        id = QMetaType::type( sFQN.toUtf8() );
+    }
+
+    // ----------------------------------------------------------------------
     // if a DataContract type, we need to prefix name with DTC::
+    // These types are all pointers to objects, so we also need to add "*"
     // ----------------------------------------------------------------------
 
-    if (id == 0)
+    if (id == QMetaType::UnknownType)
     {
-        QString sFQN = "DTC::" + sTypeName;
-
+        QString sFQN = "DTC::" + sTypeName + "*";
         id = QMetaType::type( sFQN.toUtf8() );
     }
 
@@ -262,16 +273,14 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
     }
     else
     {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        QObject *pClass = (QObject *)QMetaType::construct( id );
-#else
-        QObject *pClass = (QObject *)QMetaType::create( id );
-#endif
-
-        if (pClass != NULL)
-            bHandled = RenderXSD( pRequest, pClass );
-
-        QMetaType::destroy( id, pClass );
+        const QMetaObject *pMetaObject = QMetaType::metaObjectForType(id);
+        if (pMetaObject)
+        {
+            QObject* pClass = pMetaObject->newInstance();
+            if (pClass != NULL)
+                bHandled = RenderXSD( pRequest, pClass );
+            delete pClass;
+        }
     }
 
     return bHandled;
