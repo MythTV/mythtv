@@ -409,25 +409,27 @@ class AudioCompressionSettings : public GroupSetting
         addChild(m_codecName);
 
         QString label("MP3");
-        addTargetedChild(label, new SampleRate(m_parent));
-        addTargetedChild(label, new MP3Quality(m_parent));
-        addTargetedChild(label, new BTTVVolume(m_parent));
+        m_codecName->addTargetedChild(label, new SampleRate(m_parent));
+        m_codecName->addTargetedChild(label, new MP3Quality(m_parent));
+        m_codecName->addTargetedChild(label, new BTTVVolume(m_parent));
 
         label = "MPEG-2 Hardware Encoder";
-        addTargetedChild(label, new SampleRate(m_parent, false));
-        addTargetedChild(label,
-                         new MPEG2AudioBitrateSettings(
-                             m_parent, false, true, false, 2));
-        addTargetedChild(label, new MPEG2Language(m_parent));
-        addTargetedChild(label, new MPEG2audVolume(m_parent));
+        m_codecName->addTargetedChild(label, new SampleRate(m_parent, false));
+        m_codecName->addTargetedChild(label,
+                                      new MPEG2AudioBitrateSettings
+                                      (m_parent, false, true, false, 2));
+        m_codecName->addTargetedChild(label, new MPEG2Language(m_parent));
+        m_codecName->addTargetedChild(label, new MPEG2audVolume(m_parent));
 
         label = "Uncompressed";
-        addTargetedChild(label, new SampleRate(m_parent));
-        addTargetedChild(label, new BTTVVolume(m_parent));
+        m_codecName->addTargetedChild(label, new SampleRate(m_parent));
+        m_codecName->addTargetedChild(label, new BTTVVolume(m_parent));
 
-        addTargetedChild("AC3 Hardware Encoder", new GroupSetting());
+        m_codecName->addTargetedChild("AC3 Hardware Encoder",
+                                      new GroupSetting());
 
-        addTargetedChild("AAC Hardware Encoder", new GroupSetting());
+        m_codecName->addTargetedChild("AAC Hardware Encoder",
+                                      new GroupSetting());
 
 #ifdef USING_V4L2
         if (v4l2)
@@ -439,22 +441,14 @@ class AudioCompressionSettings : public GroupSetting
 
             if (v4l2->GetOptions(options))
             {
-                GroupSetting* grp =
-                    new GroupSetting();
+                /* StandardSetting cannot handle multiple 'targets' pointing
+                 * to the same setting configuration, so we need to do
+                 * this in two passes. */
 
                 DriverOption::Options::iterator Iopt = options.begin();
                 for ( ; Iopt != options.end(); ++Iopt)
                 {
-                    if ((*Iopt).category == DriverOption::AUDIO_BITRATE_MODE)
-                    {
-                        grp->addChild(new BitrateMode
-                                      (m_parent, "audbitratemode"));
-                    }
-                    else if ((*Iopt).category == DriverOption::AUDIO_SAMPLERATE)
-                    {
-                        grp->addChild(new SampleRate(m_parent, false));
-                    }
-                    else if ((*Iopt).category == DriverOption::AUDIO_ENCODING)
+                    if ((*Iopt).category == DriverOption::AUDIO_ENCODING)
                     {
                         DriverOption::menu_t::iterator Imenu =
                             (*Iopt).menu.begin();
@@ -464,41 +458,62 @@ class AudioCompressionSettings : public GroupSetting
                                 m_v4l2codecs << "V4L2:" + *Imenu;
                         }
                     }
-                    else if ((*Iopt).category == DriverOption::AUDIO_LANGUAGE)
-                    {
-                        grp->addChild(new MPEG2Language(m_parent));
-                    }
-                    else if ((*Iopt).category == DriverOption::AUDIO_BITRATE)
-                    {
-                        bool layer1, layer2, layer3;
-                        layer1 = layer2 = layer3 = false;
-
-                        DriverOption::menu_t::iterator Imenu =
-                            (*Iopt).menu.begin();
-                        for ( ; Imenu != (*Iopt).menu.end(); ++Imenu)
-                        {
-                            if ((*Imenu).indexOf("Layer III") >= 0)
-                                layer3 = true;
-                            else if ((*Imenu).indexOf("Layer II") >= 0)
-                                layer2 = true;
-                            else if ((*Imenu).indexOf("Layer I") >= 0)
-                                layer1 = true;
-                        }
-
-                        if (layer1 || layer2 || layer3)
-                            grp->addChild(new MPEG2AudioBitrateSettings
-                                          (m_parent, layer1, layer2,
-                                           layer3, 2));
-                    }
-                    else if ((*Iopt).category == DriverOption::VOLUME)
-                    {
-                        grp->addChild(new MPEG2audVolume(m_parent));
-                    }
                 }
 
                 QStringList::iterator Icodec = m_v4l2codecs.begin();
                 for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
-                    addTargetedChild(*Icodec, grp);
+                {
+                    DriverOption::Options::iterator Iopt = options.begin();
+                    for ( ; Iopt != options.end(); ++Iopt)
+                    {
+                        if ((*Iopt).category == DriverOption::AUDIO_BITRATE_MODE)
+                        {
+                            m_codecName->addTargetedChild(*Icodec,
+                                 new BitrateMode(m_parent, "audbitratemode"));
+                        }
+                        else if ((*Iopt).category ==
+                                 DriverOption::AUDIO_SAMPLERATE)
+                        {
+                            m_codecName->addTargetedChild(*Icodec,
+                                             new SampleRate(m_parent, false));
+                        }
+                        else if ((*Iopt).category ==
+                                 DriverOption::AUDIO_LANGUAGE)
+                        {
+                            m_codecName->addTargetedChild(*Icodec,
+                                             new MPEG2Language(m_parent));
+                        }
+                        else if ((*Iopt).category == DriverOption::AUDIO_BITRATE)
+                        {
+                            bool layer1, layer2, layer3;
+                            layer1 = layer2 = layer3 = false;
+
+                            DriverOption::menu_t::iterator Imenu =
+                                (*Iopt).menu.begin();
+                            for ( ; Imenu != (*Iopt).menu.end(); ++Imenu)
+                            {
+                                if ((*Imenu).indexOf("Layer III") >= 0)
+                                    layer3 = true;
+                                else if ((*Imenu).indexOf("Layer II") >= 0)
+                                    layer2 = true;
+                                else if ((*Imenu).indexOf("Layer I") >= 0)
+                                    layer1 = true;
+                            }
+
+                            if (layer1 || layer2 || layer3)
+                                m_codecName->addTargetedChild(*Icodec,
+                                       new MPEG2AudioBitrateSettings(m_parent,
+                                                                     layer1,
+                                                                     layer2,
+                                                                     layer3, 2));
+                        }
+                        else if ((*Iopt).category == DriverOption::VOLUME)
+                        {
+                            m_codecName->addTargetedChild(*Icodec,
+                                                new MPEG2audVolume(m_parent));
+                        }
+                    }
+                }
             }
         }
 #endif //  USING_V4L2
@@ -968,30 +983,14 @@ class VideoCompressionSettings : public GroupSetting
 
             if (v4l2->GetOptions(options))
             {
-                GroupSetting* grp =
-                    new GroupSetting();
-
-                GroupSetting* bit_low =
-                    new GroupSetting();
-                GroupSetting* bit_medium =
-                    new GroupSetting();
-                GroupSetting* bit_high =
-                    new GroupSetting();
-                bool dynamic_res = !v4l2->UserAdjustableResolution();
+                /* StandardSetting cannot handle multiple 'targets' pointing
+                 * to the same setting configuration, so we need to do
+                 * this in two passes. */
 
                 DriverOption::Options::iterator Iopt = options.begin();
                 for ( ; Iopt != options.end(); ++Iopt)
                 {
-                    if ((*Iopt).category == DriverOption::STREAM_TYPE)
-                    {
-                        grp->addChild
-                            (new MPEG2streamType(m_parent,
-                                                 (*Iopt).minimum,
-                                                 (*Iopt).maximum,
-                                                 (*Iopt).default_value));
-                    }
-                    else if ((*Iopt).category ==
-                             DriverOption::VIDEO_ENCODING)
+                    if ((*Iopt).category == DriverOption::VIDEO_ENCODING)
                     {
                         DriverOption::menu_t::iterator Imenu =
                             (*Iopt).menu.begin();
@@ -1001,112 +1000,132 @@ class VideoCompressionSettings : public GroupSetting
                                 m_v4l2codecs << "V4L2:" + *Imenu;
                         }
                     }
-                    else if ((*Iopt).category ==
-                             DriverOption::VIDEO_ASPECT)
-                    {
-                        grp->addChild(new MPEG2aspectRatio(m_parent,
-                                                           (*Iopt).minimum,
-                                                           (*Iopt).maximum,
-                                                           (*Iopt).default_value));
-                    }
-                    else if ((*Iopt).category ==
-                             DriverOption::VIDEO_BITRATE_MODE)
-                    {
-                        if (dynamic_res)
-                        {
-                            bit_low->addChild(new BitrateMode(m_parent,
-                                                      "low_mpegbitratemode"));
-                            bit_medium->addChild(new BitrateMode(m_parent,
-                                                   "medium_mpegbitratemode"));
-                            bit_high->addChild(new BitrateMode(m_parent,
-                                                   "medium_mpegbitratemode"));
-                        }
-                        else
-                            bit_low->addChild(new BitrateMode(m_parent));
-                    }
-                    else if ((*Iopt).category == DriverOption::VIDEO_BITRATE)
-                    {
-                        if (dynamic_res)
-                        {
-                            bit_low->setLabel(QObject::tr("Low Resolution"));
-                            bit_low->addChild(new AverageBitrate(m_parent,
-                                                        "low_mpegavgbitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-
-                            bit_medium->setLabel(QObject::tr("Medium Resolution"));
-                            bit_medium->addChild(new AverageBitrate(m_parent,
-                                                        "medium_mpegavgbitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-
-                            bit_high->setLabel(QObject::tr("High Resolution"));
-                            bit_high->addChild(new AverageBitrate(m_parent,
-                                                        "high_mpegavgbitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-                        }
-                        else
-                        {
-                            bit_low->setLabel(QObject::tr("Bitrate"));
-                            bit_low->addChild(new AverageBitrate(m_parent,
-                                                        "mpeg2bitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-                        }
-                    }
-                    else if ((*Iopt).category ==
-                             DriverOption::VIDEO_BITRATE_PEAK)
-                    {
-                        if (dynamic_res)
-                        {
-                            bit_low->addChild(new PeakBitrate(m_parent,
-                                                      "low_mpegpeakbitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-                            bit_medium->addChild(new PeakBitrate(m_parent,
-                                                      "medium_mpegpeakbitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-                            bit_high->addChild(new PeakBitrate(m_parent,
-                                                      "high_mpegpeakbitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-                        }
-                        else
-                            bit_low->addChild(new PeakBitrate(m_parent,
-                                                      "mpeg2maxbitrate",
-                                                         (*Iopt).minimum / 1000,
-                                                         (*Iopt).maximum / 1000,
-                                                   (*Iopt).default_value / 1000,
-                                                         (*Iopt).step / 1000));
-                    }
-                }
-
-                grp->addChild(bit_low);
-                if (dynamic_res)
-                {
-                    grp->addChild(bit_medium);
-                    grp->addChild(bit_high);
                 }
 
                 QStringList::iterator Icodec = m_v4l2codecs.begin();
                 for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
-                    addTargetedChild(*Icodec, grp);
+                {
+                    GroupSetting* bit_low    = new GroupSetting();
+                    GroupSetting* bit_medium = new GroupSetting();
+                    GroupSetting* bit_high   = new GroupSetting();
+                    bool dynamic_res = !v4l2->UserAdjustableResolution();
+
+                    DriverOption::Options::iterator Iopt = options.begin();
+                    for ( ; Iopt != options.end(); ++Iopt)
+                    {
+                        if ((*Iopt).category == DriverOption::STREAM_TYPE)
+                        {
+                            m_codecName->addTargetedChild(*Icodec,
+                                             new MPEG2streamType(m_parent,
+                                                     (*Iopt).minimum,
+                                                     (*Iopt).maximum,
+                                                     (*Iopt).default_value));
+                        }
+                        else if ((*Iopt).category == DriverOption::VIDEO_ASPECT)
+                        {
+                            m_codecName->addTargetedChild(*Icodec,
+                                             new MPEG2aspectRatio(m_parent,
+                                             (*Iopt).minimum,
+                                             (*Iopt).maximum,
+                                             (*Iopt).default_value));
+                        }
+                        else if ((*Iopt).category ==
+                                 DriverOption::VIDEO_BITRATE_MODE)
+                        {
+                            if (dynamic_res)
+                            {
+                                bit_low->addChild(new BitrateMode(m_parent,
+                                             "low_mpegbitratemode"));
+                                bit_medium->addChild(new BitrateMode(m_parent,
+                                             "medium_mpegbitratemode"));
+                                bit_high->addChild(new BitrateMode(m_parent,
+                                             "medium_mpegbitratemode"));
+                            }
+                            else
+                                bit_low->addChild(new BitrateMode(m_parent));
+                        }
+                        else if ((*Iopt).category == DriverOption::VIDEO_BITRATE)
+                        {
+                            if (dynamic_res)
+                            {
+                                bit_low->setLabel(QObject::tr("Low Resolution"));
+                                bit_low->addChild(new AverageBitrate(m_parent,
+                                             "low_mpegavgbitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+
+                                bit_medium->setLabel(QObject::
+                                                     tr("Medium Resolution"));
+                                bit_medium->addChild(new AverageBitrate(m_parent,
+                                             "medium_mpegavgbitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+
+                                bit_high->setLabel(QObject::
+                                                   tr("High Resolution"));
+                                bit_high->addChild(new AverageBitrate(m_parent,
+                                             "high_mpegavgbitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+                            }
+                            else
+                            {
+                                bit_low->setLabel(QObject::tr("Bitrate"));
+                                bit_low->addChild(new AverageBitrate(m_parent,
+                                             "mpeg2bitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+                            }
+                        }
+                        else if ((*Iopt).category ==
+                                 DriverOption::VIDEO_BITRATE_PEAK)
+                        {
+                            if (dynamic_res)
+                            {
+                                bit_low->addChild(new PeakBitrate(m_parent,
+                                             "low_mpegpeakbitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+                                bit_medium->addChild(new PeakBitrate(m_parent,
+                                             "medium_mpegpeakbitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+                                bit_high->addChild(new PeakBitrate(m_parent,
+                                             "high_mpegpeakbitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+                            }
+                            else
+                                bit_low->addChild(new PeakBitrate(m_parent,
+                                             "mpeg2maxbitrate",
+                                             (*Iopt).minimum / 1000,
+                                             (*Iopt).maximum / 1000,
+                                             (*Iopt).default_value / 1000,
+                                             (*Iopt).step / 1000));
+                        }
+                    }
+
+                    m_codecName->addTargetedChild(*Icodec, bit_low);
+                    if (dynamic_res)
+                    {
+                        m_codecName->addTargetedChild(*Icodec, bit_medium);
+                        m_codecName->addTargetedChild(*Icodec, bit_high);
+                    }
+                }
             }
         }
 #endif // USING_V4L2
