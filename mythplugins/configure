@@ -528,7 +528,7 @@ EOF
 fi
 
 is_qmake5(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
+    $1 --version 2>&1 | egrep -q -e "Qt version 5\.([0-9])+\.([0-9])+"
 }
 
 is_qmake4(){
