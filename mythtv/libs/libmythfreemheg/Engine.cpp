@@ -488,23 +488,12 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
 
     // Remove any events from the asynch event queue unless they derive from
     // the application itself or a shared ingredient.
-    MHAsynchEvent *pEvent;
-    QQueue<MHAsynchEvent *>::iterator it = m_EventQueue.begin();
 
-    while (it != m_EventQueue.end())
-    {
-        pEvent = *it;
+    // This was causing crashes with leftover events being invalid.
+    // Changed to clear all events at this point.
 
-        if (!pEvent->pEventSource->IsShared())
-        {
-            delete pEvent;
-            it = m_EventQueue.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    while (!m_EventQueue.isEmpty())
+        delete m_EventQueue.dequeue();
 
     // Can now actually delete the old scene.
     if (pApp->m_pCurrentScene)
