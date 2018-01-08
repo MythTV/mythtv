@@ -111,6 +111,9 @@ class ScreenSaverDBusPrivate
     QDBusConnection *m_bus;
     QDBusInterface  *m_interface;
   private:
+    // Disable copying and assignment
+    ScreenSaverDBusPrivate(const ScreenSaverDBusPrivate &);
+    ScreenSaverDBusPrivate &operator=(const ScreenSaverDBusPrivate &);
     QString         m_unInhibit;
     QString         m_serviceUsed;
 };
