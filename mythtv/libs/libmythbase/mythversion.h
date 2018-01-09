@@ -3,10 +3,11 @@
 
 #include "qglobal.h"
 #include "mythbaseexp.h"
+#include "mythconfig.h"
 #include "version.h"
 
-#if ( QT_VERSION < 0x050200 )
-#error You need Qt version >= 5.2.0 to compile MythTV.
+#if ( QT_VERSION < QT_MIN_VERSION )
+#error "You need a newer version of Qt to compile MythTV. Please re-run 'configure'."
 #endif
 
 /// Update this whenever the plug-in ABI changes.
