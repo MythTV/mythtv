@@ -5912,9 +5912,9 @@ is_qmake5(){
 
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 if [ x"$qmake" = "xqmake" ]; then
-    CHECK_QMAKE=`which qmake-qt5 2>&1`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake `which $qmake 2>&1`"
+    CHECK_QMAKE=`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake `which $qmake 2>/dev/null`"
 else
-    CHECK_QMAKE=`which $qmake 2>&1`" "`which qmake-qt5 2>&1`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake"
+    CHECK_QMAKE=`which $qmake 2>/dev/null`" "`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake"
 fi
 # try to find a qt5 qmake to use
 found_qmake=''
