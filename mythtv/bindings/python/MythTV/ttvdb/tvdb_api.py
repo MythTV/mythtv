@@ -839,7 +839,7 @@ class Tvdb:
         if links and links['next']:
             url = url.split('?')[0]
             _url = url + "?page=%s" % links['next']
-            self._loadUrl(_url, data)
+            self._loadUrl(_url, data, language=language)
 
         return data
 
@@ -860,7 +860,31 @@ class Tvdb:
         """
         src = self._loadUrl(url, language=language)
 
+        if not language:
+            language = self.config['language']
+        if language != 'en':
+            fill_src = self._loadUrl(url, language='en')
+            if fill_src:
+                if not src:
+                    src = fill_src
+                elif isinstance(src, list):
+                    tmp = {item['id']: item for item in src}
+                    for fill_item in fill_src:
+                        if fill_item['id'] in tmp:
+                            main_item = tmp[fill_item['id']]
+                            self._mergeDict(main_item, fill_item)
+                        else:
+                            src.append(fill_item)
+                elif isinstance(src, dict):
+                    self._mergeDict(src, fill_src)
+
         return src
+
+    def _mergeDict(self, main_item, fill_item):
+        for key in fill_item:
+            if key not in main_item or not main_item[key]:
+                if fill_item[key]:
+                    main_item[key] = fill_item[key]
 
     def _setItem(self, sid, seas, ep, attrib, value):
         """Creates a new episode, creating Show(), Season() and
