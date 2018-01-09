@@ -7,15 +7,10 @@ mingw | win32-msvc* {
    # script debugger currently only enabled for WIN32 builds
    QT += scripttools
 }
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-QT += webkit
-using_qtdbus: CONFIG += qdbus
-}
-contains(QT_VERSION, ^5\\.[0-9]\\..*):using_qtwebkit {
-QT += widgets
-QT += webkitwidgets
-using_qtdbus: QT += dbus
-android: QT += androidextras
+using_qtwebkit {
+    QT += widgets webkitwidgets
+    using_qtdbus: QT += dbus
+    android: QT += androidextras
 }
 
 TEMPLATE = app

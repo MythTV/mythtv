@@ -1,11 +1,6 @@
 include ( ../../../../settings.pro )
 
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-CONFIG += qtestlib
-}
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += testlib
-}
 
 TEMPLATE = app
 TARGET = test_mythtimer
