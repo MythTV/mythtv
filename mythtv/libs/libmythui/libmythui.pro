@@ -1,10 +1,6 @@
 include ( ../../settings.pro )
 
 QT += xml sql network opengl
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-QT += webkit
-}
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
 QT += widgets
 QT += webkitwidgets
 android: QT += androidextras

@@ -2,10 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-QT += network
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
-QT += widgets
-}
+QT += network widgets
 
 TEMPLATE = lib
 CONFIG += plugin thread

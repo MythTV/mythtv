@@ -2,10 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-QT += network sql xml
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
-QT += widgets
-}
+QT += network sql xml widgets
 
 TEMPLATE = lib
 CONFIG += plugin thread warn_on debug

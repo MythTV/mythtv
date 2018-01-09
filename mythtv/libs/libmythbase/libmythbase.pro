@@ -152,11 +152,7 @@ win32-msvc* {
     QMAKE_EXTRA_TARGETS += versionTarget
 }
 
-QT += xml sql network
-
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
-QT += widgets
-}
+QT += xml sql network widgets
 
 include ( ../libs-targetfix.pro )
 

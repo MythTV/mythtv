@@ -1,13 +1,6 @@
 include ( ../../../../settings.pro )
 
-QT += xml sql network
-
-contains(QT_VERSION, ^4\\.[0-9]\\..*) {
-CONFIG += qtestlib
-}
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
-QT += testlib
-}
+QT += xml sql network testlib
 
 TEMPLATE = app
 TARGET = test_videometadata
