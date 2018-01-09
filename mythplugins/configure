@@ -527,14 +527,6 @@ EOF
     die "Sanity test failed."
 fi
 
-is_qmake5(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 5\.[0-9]\.[0-9]"
-}
-
-is_qmake4(){
-    $1 --version 2>&1 | egrep -q -e "Qt version 4\.[8-9]\.[0-9]"
-}
-
 # bring in mythtv config
 if [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
     rm mythconfig.mak 2> /dev/null
@@ -570,6 +562,19 @@ OPENGLES=$(cat mythconfig.mak | grep -e "^HAVE_GLES2_GL2_H=yes")
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
 EXTRALIBS=${EXTRALIBS#EXTRALIBS=}
 
+QT_MIN_VERSION=$(cat mythconfig.mak | grep -e "^QT_MIN_VERSION=")
+QT_MIN_VERSION=${QT_MIN_VERSION#QT_MIN_VERSION=}
+QT_MIN_VERSION_STR=$(cat mythconfig.mak | grep -e "^QT_MIN_VERSION_STR=")
+QT_MIN_VERSION_STR=${QT_MIN_VERSION_STR#QT_MIN_VERSION_STR=}
+if [ x"$QT_MIN_VERSION" = "x" ]; then
+    die "Unknown minimum Qt version. Please make AND install MythTV first."
+fi
+
+version2num(){
+    # accepts version as in 1.10.4 and turns it into 0x010A04 which can be compared as a number
+    echo $1 | awk -F. '{ print ( ( $1 * 256 ) + $2 ) * 256 + $3; };'
+}
+
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 if [ x"$qmake" = "xqmake" ]; then
     CHECK_QMAKE=`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake `which $qmake 2>/dev/null`"
@@ -579,20 +584,22 @@ fi
 # try to find a qt5 qmake to use
 found_qmake=''
 for i in $CHECK_QMAKE; do
-    if is_qmake5 $i; then
-        found_qmake=$i
-        break;
-    elif is_qmake4 $i; then
-        found_qmake=$i
-        break;
+    if test -e $i ; then
+        qmake_version=`$i -query QT_VERSION`
+        if [ $(version2num $qmake_version) -ge $QT_MIN_VERSION ]; then
+            found_qmake=$i
+            break;
+        else
+            echo "found qmake at $i but version failed"
+            echo "got version: $qmake_version"
+        fi
     fi
 done
 if [ x"$found_qmake" = "x" ]; then
-    die "qmake for Qt4.8 or newer not found.\nPlease specify the correct qmake with --qmake="
+    die "qmake for Qt $QT_MIN_VERSION_STR or newer not found.  Please specify the correct qmake with --qmake="
 else
     qmake=$found_qmake
 fi
-
 
 # rely on what was discover during MythTV configure
 if enabled opengl && test "$OPENGLV" != "CONFIG_OPENGL_VIDEO=yes"; then
@@ -724,6 +731,8 @@ fi
 echo ""
 echo "Configuration settings: "
 echo " "
+echo "        Qt minimum     $QT_MIN_VERSION_STR"
+echo "        Qt installed   `$qmake -query QT_VERSION`"
 echo "        qmake          $(which $qmake)"
 echo " "
 
