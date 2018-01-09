@@ -2,10 +2,7 @@ include (../../settings.pro)
 include (../../version.pro)
 include (../programs-libs.pro)
 
-QT += xml sql network
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
-QT += widgets
-}
+QT += xml sql network widgets
 
 TEMPLATE = app
 CONFIG += thread

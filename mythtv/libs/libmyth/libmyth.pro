@@ -1,10 +1,7 @@
 include ( ../../settings.pro )
 
-QT += network xml sql script
-contains(QT_VERSION, ^5\\.[0-9]\\..*) {
-QT += widgets
+QT += network xml sql script widgets
 android: QT += androidextras
-}
 
 TEMPLATE = lib
 TARGET = myth-$$LIBVERSION
@@ -177,11 +174,7 @@ unix:!cygwin {
     SOURCES += mediamonitor-unix.cpp
     HEADERS += mediamonitor-unix.h
     !android {
-    contains(QT_VERSION, ^5\\.[0-9]\\..*) {
         using_qtdbus: QT += dbus
-    } else {
-        using_qtdbus: CONFIG += qdbus
-    }
     }
 }
 
