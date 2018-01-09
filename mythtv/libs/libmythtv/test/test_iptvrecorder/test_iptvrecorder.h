@@ -25,12 +25,6 @@
 #include "recorders/rtp/rtpdatapacket.h"
 #include "recorders/rtp/rtptsdatapacket.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 class TestIPTVRecorder: public QObject
 {
     Q_OBJECT
@@ -80,7 +74,7 @@ class TestIPTVRecorder: public QObject
      */
     void TuningDataVLCStyle(void)
     {
-        MSKIP ("Do we want to support non-conformant urls that happen to work with VLC?");
+        QSKIP ("Do we want to support non-conformant urls that happen to work with VLC?");
         IPTVTuningData tuning;
 
         /* test url from http://www.tldp.org/HOWTO/VideoLAN-HOWTO/x549.html */

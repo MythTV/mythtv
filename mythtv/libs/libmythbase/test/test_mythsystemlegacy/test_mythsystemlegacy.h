@@ -36,12 +36,6 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsystemlegacy.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 #ifdef NEW_LOGGING
 static DebugLogHandler *console_dbg(void)
 {
@@ -189,7 +183,7 @@ class TestMythSystemLegacy: public QObject
         QVERIFY(!l.entry().GetMessage().contains(__FUNCTION__));
         QVERIFY(!cmd.GetLogCmd().contains(__FUNCTION__));
 #else
-        MSKIP("Log inspection not supported in old logging.");
+        QSKIP("Log inspection not supported in old logging.");
 #endif
     }
 

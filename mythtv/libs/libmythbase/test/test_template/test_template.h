@@ -20,12 +20,6 @@
 
 #include <QtTest/QtTest>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 class TestTemplate: public QObject
 {
     Q_OBJECT
@@ -71,7 +65,7 @@ class TestTemplate: public QObject
     // example skipped test
     void example_skipped_test(void)
     {
-        MSKIP("this test should pass, but doesn't yet");
+        QSKIP("this test should pass, but doesn't yet");
         QVERIFY(true); // yes this really would pass, but this is an example
     }
 };

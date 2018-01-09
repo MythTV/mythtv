@@ -3,10 +3,6 @@
 
 #include <limits.h>
 
-#if QT_VERSION < 0x050000
-#include <QTextDocument> // for escape (note escape misses &apos; TODO fix upstream)
-#endif
-
 #include "sctedescriptors.h"
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
@@ -481,13 +477,7 @@ QString MPEGDescriptor::toStringXML(uint level) const
     }
 
     str += "\n" + indent_1 + "</Data>\n";
-
-#if QT_VERSION >= 0x050000
     str += indent_1 + "<Decoded>" + toString().toHtmlEscaped() + "</Decoded>\n";
-#else
-    str += indent_1 + "<Decoded>" + Qt::escape (toString()) + "</Decoded>\n";
-#endif
-
     str += indent_0 + "</Descriptor>";
 
     return str;

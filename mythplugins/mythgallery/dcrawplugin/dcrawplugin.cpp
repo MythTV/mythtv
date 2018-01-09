@@ -37,10 +37,3 @@ QImageIOHandler *DcrawPlugin::create(QIODevice *device, const QByteArray &format
     handler->setFormat(format);
     return handler;
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    // This shouldn't be necessary, but it shuts up the dang compiler warning.
-    QObject* qt_plugin_instance_dcrawplugin();
-
-    Q_EXPORT_PLUGIN2(dcrawplugin, DcrawPlugin)
-#endif

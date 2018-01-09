@@ -471,8 +471,4 @@ Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
 Q_DECLARE_METATYPE(MythUIButtonCallback)
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_DECLARE_METATYPE(QFileInfo)
-#endif
-
 #endif

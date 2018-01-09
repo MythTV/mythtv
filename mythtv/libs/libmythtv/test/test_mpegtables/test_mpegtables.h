@@ -20,12 +20,6 @@
 
 #include <QtTest/QtTest>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 /* test data */
 extern unsigned char eit_data_0000[];
 extern unsigned char tvct_data_0000[];

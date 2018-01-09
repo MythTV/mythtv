@@ -136,12 +136,8 @@ MythSocket *RemoteFile::openSocket(bool control)
     dir = qurl.path();
 
     if (qurl.hasQuery())
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         dir += "?" + QUrl::fromPercentEncoding(
             qurl.query(QUrl::FullyEncoded).toLocal8Bit());
-#else
-        dir += "?" + QUrl::fromPercentEncoding(qurl.encodedQuery());
-#endif
 
     if (qurl.hasFragment())
         dir += "#" + qurl.fragment();

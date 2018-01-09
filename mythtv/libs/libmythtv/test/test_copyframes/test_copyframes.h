@@ -24,12 +24,6 @@
 #include "mythframe.h"
 #include "mythavutil.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 #define ITER    48*30
 #define WIDTH   720
 #define HEIGHT  576

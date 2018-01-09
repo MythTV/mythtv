@@ -187,11 +187,7 @@ void HttpServer::LoadSSLConfig()
 #ifndef QT_NO_OPENSSL
     m_sslConfig = QSslConfiguration::defaultConfiguration();
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     m_sslConfig.setProtocol(QSsl::SecureProtocols); // Includes SSLv3 which is insecure, but can't be helped
-#else
-    m_sslConfig.setProtocol(QSsl::TlsV1); // SSL v1, v2, v3 are insecure
-#endif
     m_sslConfig.setSslOption(QSsl::SslOptionDisableLegacyRenegotiation, true); // Potential DoS multiplier
     m_sslConfig.setSslOption(QSsl::SslOptionDisableCompression, true); // CRIME attack
 

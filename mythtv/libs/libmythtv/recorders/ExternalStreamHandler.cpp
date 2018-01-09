@@ -560,11 +560,7 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path) :
 
 int ExternalStreamHandler::StreamingCount(void) const
 {
-#if QT_VERSION >= 0x050000
     return m_streaming_cnt.loadAcquire();
-#else
-    return m_streaming_cnt;
-#endif
 }
 
 void ExternalStreamHandler::run(void)

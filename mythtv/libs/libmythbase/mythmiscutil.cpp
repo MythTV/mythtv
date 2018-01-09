@@ -1102,7 +1102,7 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
 
 // QStringRef::localeAwareCompare is buggy on Qt < 5.3, taking significant time
 // to complete. So we use compare instead with those versions of Qt.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)) && (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+#if (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
         const int cmp = QStringRef::compare(subA, subB);
 #else
         const int cmp = QStringRef::localeAwareCompare(subA, subB);

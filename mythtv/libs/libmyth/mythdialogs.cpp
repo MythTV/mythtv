@@ -37,11 +37,7 @@ using namespace std;
 
 static bool inline IsEGLFS()
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
   return qApp->platformName().contains("egl");
-#else
-  return false;
-#endif
 }
 
 /** \class MythDialog

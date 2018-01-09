@@ -82,11 +82,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 
         if (nRetIdx != 0)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-            param[ 0 ] = QMetaType::construct( nRetIdx );    
-#else
             param[ 0 ] = QMetaType::create( nRetIdx );
-#endif
             types[ 0 ] = nRetIdx;
         }
         else
@@ -109,11 +105,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 
             if (nId != 0)
             {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-                pParam = QMetaType::construct( nId );
-#else
                 pParam = QMetaType::create( nId );
-#endif
             }
             else
             {
@@ -232,11 +224,7 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
         if ((method.methodType() == QMetaMethod::Slot   ) &&
             (method.access()     == QMetaMethod::Public ))
         {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-            QString sName( method.signature() );
-#else
             QString sName( method.methodSignature() );      
-#endif
 
             // --------------------------------------------------------------
             // Ignore the following methods...

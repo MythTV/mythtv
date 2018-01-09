@@ -405,13 +405,8 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
             continue;
 
         PrivTcpServer *server = new PrivTcpServer(this, servertype);
-#if (QT_VERSION >= 0x050000)
             connect(server, &PrivTcpServer::newConnection,
                 this,   &ServerPool::newTcpConnection);
-#else
-            connect(server, SIGNAL(newConnection(qt_socket_fd_t)),
-                this,   SLOT(newTcpConnection(qt_socket_fd_t)));
-#endif
 
         server->setProxy(m_proxy);
         server->setMaxPendingConnections(m_maxPendingConn);

@@ -169,11 +169,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
 
         uint tuner = tuner_parts.at(1).toUInt();
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        QUrl params;
-#else
         QUrlQuery params;
-#endif
         params.addQueryItem("i", QString::number(tuner));
         params.addQueryItem("s", "cas");
         params.addQueryItem("v", "CardStatus");
@@ -182,11 +178,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
         url.setScheme("http");
         url.setHost(ip_address);
         url.setPath("/get_var.json");
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        url.setEncodedQuery(params.encodedQuery());
-#else
         url.setQuery(params);
-#endif
 
         QNetworkRequest *request = new QNetworkRequest();
         request->setAttribute(QNetworkRequest::CacheLoadControlAttribute,

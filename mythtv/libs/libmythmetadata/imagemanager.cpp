@@ -87,23 +87,7 @@ public:
     */
     void RemoveDirContents(QString path)
     {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
         QDir(path).removeRecursively();
-#else
-        // Delete all files
-        QDir dir = QDir(path);
-        foreach(const QFileInfo &info,
-                dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot))
-        {
-            if (info.isDir())
-            {
-                RemoveDirContents(info.absoluteFilePath());
-                dir.rmdir(info.absoluteFilePath());
-            }
-            else
-                QFile::remove(info.absoluteFilePath());
-        }
-#endif
     }
 
 

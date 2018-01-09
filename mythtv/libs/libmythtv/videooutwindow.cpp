@@ -110,13 +110,8 @@ void VideoOutWindow::populateGeometry(void)
         if (using_xinerama)
         {
             screen_num = gCoreContext->GetNumSetting("XineramaScreen", screen_num);
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-            if (screen_num >= desktop->numScreens())
-                screen_num = 0;
-#else
             if (screen_num >= desktop->screenCount())
                 screen_num = 0;
-#endif
         }
 
         screen_geom = desktop->geometry();

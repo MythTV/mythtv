@@ -23,12 +23,6 @@
 #include "programinfo.h"
 #include "programtypes.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 class TestProgramInfo : public QObject
 {
     Q_OBJECT
@@ -149,7 +143,7 @@ class TestProgramInfo : public QObject
         /* both movies have the same name, but are not the same movie */
         QVERIFY (!programA.IsSameProgram (programB));
 
-//        MSKIP ("tests that still fail");
+//        QSKIP ("tests that still fail");
 
         /* german theatrical title */
         ProgramInfo programC (mockMovie ("79548", "tt1838544", "Gone", 2012));

@@ -16,15 +16,9 @@
 #include <QDir>
 #include <QElapsedTimer>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    #include <QRegularExpression>
-    #define REGEXP QRegularExpression
-    #define MATCHES(RE, SUBJECT) RE.match(SUBJECT).hasMatch()
-#else
-    #include <QRegExp>
-    #define REGEXP QRegExp
-    #define MATCHES(RE, SUBJECT) RE.exactMatch(SUBJECT)
-#endif
+#include <QRegularExpression>
+#define REGEXP QRegularExpression
+#define MATCHES(RE, SUBJECT) RE.match(SUBJECT).hasMatch()
 
 #include "imagethumbs.h"
 

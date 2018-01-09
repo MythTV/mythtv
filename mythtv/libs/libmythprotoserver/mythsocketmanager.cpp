@@ -97,13 +97,8 @@ bool MythSocketManager::Listen(int port)
         return false;
     }
 
-#if (QT_VERSION >= 0x050000)
     connect(m_server, &MythServer::newConnection,
             this,     &MythSocketManager::newConnection);
-#else
-    connect(m_server, SIGNAL(newConnection(qt_socket_fd_t)),
-            this,     SLOT(newConnection(qt_socket_fd_t)));
-#endif
     return true;
 }
 

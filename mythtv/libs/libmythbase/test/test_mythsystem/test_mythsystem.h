@@ -36,12 +36,6 @@ using namespace std;
 #include "mythcorecontext.h"
 #include "mythsystem.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 #ifdef NEW_LOGGING
 static DebugLogHandler *console_dbg(void)
 {
@@ -101,7 +95,7 @@ class TestMythSystem: public QObject
     // tests kMSRunBackground      -- run child in the background
     void run_in_background_works(void)
     {
-        MSKIP("MythSystemLegacyPrivate calls MythSystem::Unlock"
+        QSKIP("MythSystemLegacyPrivate calls MythSystem::Unlock"
               "after the instance is deleted");
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create("sleep 0.5", kMSRunBackground));
@@ -114,7 +108,7 @@ class TestMythSystem: public QObject
     // kMSStdIn              -- allow access to stdin
     void stdin_works(void)
     {
-        MSKIP("stdin_works -- currently blocks forever");
+        QSKIP("stdin_works -- currently blocks forever");
         QTemporaryFile tempfile;
         tempfile.open();
         QByteArray in = QString(__FUNCTION__).toLatin1();
@@ -191,7 +185,7 @@ class TestMythSystem: public QObject
         DebugLogHandlerEntry l = console_dbg()->LastEntry(kHandleLog);
         QVERIFY(!l.entry().GetMessage().contains(__FUNCTION__));
 #else
-        MSKIP("Log inspection not supported in old logging.");
+        QSKIP("Log inspection not supported in old logging.");
 #endif
     }
 
@@ -223,7 +217,7 @@ class TestMythSystem: public QObject
 
     void get_starting_path_returns_a_path_when_none_sent(void)
     {
-        MSKIP("Not working yet");
+        QSKIP("Not working yet");
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create("exit 5", kMSNone));
         QVERIFY(!cmd->GetStartingPath().isEmpty());
@@ -231,7 +225,7 @@ class TestMythSystem: public QObject
 
     void get_cpu_priority_returns_priority_sent(void)
     {
-        MSKIP("Not working yet");
+        QSKIP("Not working yet");
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create(
                 "exit 5", kMSNone, QString(), MythSystem::kLowPriority));
@@ -240,7 +234,7 @@ class TestMythSystem: public QObject
 
     void get_disk_priority_returns_priority_sent(void)
     {
-        MSKIP("Not working yet");
+        QSKIP("Not working yet");
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create(
                 "exit 5", kMSNone, QString(),

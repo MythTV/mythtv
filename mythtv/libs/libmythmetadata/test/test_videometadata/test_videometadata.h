@@ -25,12 +25,6 @@
 #include <recordinginfo.h>
 #include <metadatafactory.h>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#define MSKIP(MSG) QSKIP(MSG, SkipSingle)
-#else
-#define MSKIP(MSG) QSKIP(MSG)
-#endif
-
 class Testvideometadata: public QObject
 {
     Q_OBJECT
@@ -212,7 +206,7 @@ class Testvideometadata: public QObject
 
     void MovieWithMinus ()
     {
-        MSKIP ("Minus is handled between parts of the title, but not as part of the title itself.");
+        QSKIP ("Minus is handled between parts of the title, but not as part of the title itself.");
         TestMetadata (QString ("A-Movie-Title.ts"),
                       QString ("A Movie Title"),
                       QString (""),
@@ -344,7 +338,7 @@ class Testvideometadata: public QObject
     /* TODO move into own test folder */
     void ProgramWithInetref ()
     {
-        MSKIP ("Might connect to the database or call the installed metadata grabbers.");
+        QSKIP ("Might connect to the database or call the installed metadata grabbers.");
         ProgramInfo proginfo = ProgramInfo ("", "", "Test Movie", "", "", 0, 0, "tmdb3.py_1234", 0, 0, "");
         RecordingInfo recinfo = proginfo;
         QCOMPARE (recinfo.GetInetRef(), QString("tmdb3.py_1234"));

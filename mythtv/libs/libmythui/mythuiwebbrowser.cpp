@@ -1137,7 +1137,6 @@ void MythUIWebBrowser::SetActive(bool active)
         m_browser->setFocus();
         m_browser->show();
         m_browser->raise();
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         if (qApp->platformName().contains("egl"))
         {
             m_browser->setParent(0);
@@ -1145,17 +1144,14 @@ void MythUIWebBrowser::SetActive(bool active)
             m_browser->show();
             m_browser->raise();
         }
-#endif
         m_browser->setUpdatesEnabled(true);
     }
     else
     {
         m_browser->clearFocus();
         m_browser->hide();
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
         if (qApp->platformName().contains("egl"))
             m_browser->setParent(GetMythMainWindow());
-#endif
         UpdateBuffer();
     }
 }

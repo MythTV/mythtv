@@ -520,62 +520,9 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
     return true;
 }
 
-bool Xsd::IsEnum( const QMetaProperty &metaProperty, const QString &sType )
+bool Xsd::IsEnum( const QMetaProperty &metaProperty, const QString &/*sType*/ )
 {
-    if (metaProperty.isEnumType() || metaProperty.isFlagType() )
-        return true;
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-
-    int nLastIdx = sType.lastIndexOf( "::" );
-
-    if ( nLastIdx >=0 )
-    {
-        // ----------------------------------------------------------
-        // Qt 4 doesn't handle Enums correctly when they are defined
-        // in a seperate class, so we need to use an alternate check
-        // to see if this property is really a enum.
-        // ----------------------------------------------------------
-
-        // ----------------------------------------------------------
-        // We need to construct the type to verify this is an enum
-        // ----------------------------------------------------------
-
-        QString sParentFQN = sType.mid( 0, nLastIdx );
-        QString sEnumName  = sType.mid( nLastIdx+2  );
-
-        // ----------------------------------------------------------
-        // Create Parent object so we can get to its metaObject
-        // ----------------------------------------------------------
-
-        int nParentId = QMetaType::type( sParentFQN.toUtf8() );
-
-        QObject *pParentClass = (QObject *)QMetaType::construct( nParentId );
-
-        if (pParentClass == NULL)
-            return false;
-
-        const QMetaObject *pMetaObject = pParentClass->metaObject();
-
-        QMetaType::destroy( nParentId, pParentClass );
-
-        // ----------------------------------------------------------
-        // Now look up enum
-        // ----------------------------------------------------------
-
-        int nEnumIdx = pMetaObject->indexOfEnumerator( sEnumName.toUtf8());
-
-        if (nEnumIdx < 0 )
-            return false;
-
-        return true;
-    }
-
-#else
-    Q_UNUSED(sType);
-#endif
-
-    return false;
+    return (metaProperty.isEnumType() || metaProperty.isFlagType() );
 }
 
 /////////////////////////////////////////////////////////////////////////////

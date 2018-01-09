@@ -1145,7 +1145,7 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
                 "OpenGL not available. Falling back to Qt painter.");
     }
     else
-# if !defined USE_OPENGL_QT5 && QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+# if !defined USE_OPENGL_QT5
     // On an EGLFS platform can't mix QWidget based MythMainWindow with a
     // QGLWidget based paintwin - MythPainterWindowGL ctor aborts:
     //   EGLFS: OpenGL windows cannot be mixed with others.
@@ -1215,12 +1215,10 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     d->paintwin->raise();
     ShowPainterWindow();
 
-# if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     // Redraw the window now to avoid race conditions in EGLFS (Qt5.4) if a
     // 2nd window (e.g. TVPlayback) is created before this is redrawn.
     if (qApp->platformName().contains("egl"))
         qApp->processEvents();
-#endif
 
     if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
         d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
