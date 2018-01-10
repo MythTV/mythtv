@@ -218,6 +218,28 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
         pChannel->setUseEIT(channelInfo.useonairguide);
         pChannel->setXMLTVID(channelInfo.xmltvid);
         pChannel->setDefaultAuth(channelInfo.default_authority);
+
+        QList<uint> groupIds = channelInfo.GetGroupIds();
+        QString sGroupIds;
+        for (int x = 0; x < groupIds.size(); x++)
+        {
+            if (x > 0)
+                sGroupIds += ",";
+
+            sGroupIds += QString::number(groupIds.at(x));
+        }
+        pChannel->setChannelGroups(sGroupIds);
+
+        QList<uint> inputIds = channelInfo.GetInputIds();
+        QString sInputIds;
+        for (int x = 0; x < inputIds.size(); x++)
+        {
+            if (x > 0)
+                sInputIds += ",";
+
+            sInputIds += QString::number(inputIds.at(x));
+        }
+        pChannel->setInputs(sInputIds);
     }
 
     return true;

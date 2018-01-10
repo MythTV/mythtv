@@ -43,10 +43,13 @@ class Channel : public ChannelServices
         /* Channel Methods */
 
         DTC::ChannelInfoList*  GetChannelInfoList  ( uint      SourceID,
+                                                     uint      ChannelGroupID,
                                                      uint      StartIndex,
                                                      uint      Count,
                                                      bool      OnlyVisible,
-                                                     bool      Details );
+                                                     bool      Details,
+                                                     bool      OrderByName,
+                                                     bool      GroupByCallsign);
 
         DTC::ChannelInfo*      GetChannelInfo      ( uint     ChanID     );
 
@@ -169,13 +172,17 @@ class ScriptableChannel : public QObject
     public slots:
 
         QObject* GetChannelInfoList  ( int      SourceID = 0,
+                                       int      ChannelGroupID = 0,
                                        int      StartIndex = 0,
                                        int      Count = 0,
                                        bool     OnlyVisible = false,
-                                       bool     Details = false )
+                                       bool     Details = false,
+                                       bool     OrderByName = false,
+                                       bool     GroupByCallsign = false
+                                     )
         {
             SCRIPT_CATCH_EXCEPTION( NULL,
-                return m_obj.GetChannelInfoList( SourceID, StartIndex, Count, OnlyVisible, Details );
+                return m_obj.GetChannelInfoList( SourceID, ChannelGroupID, StartIndex, Count, OnlyVisible, Details, OrderByName, GroupByCallsign );
             )
         }
 

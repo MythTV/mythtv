@@ -30,7 +30,7 @@ class Program;
 class SERVICE_PUBLIC ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "2.0" );
+    Q_CLASSINFO( "version", "2.1" );
 
     // Q_CLASSINFO Used to augment Metadata for properties. 
     // See datacontracthelper.h for details
@@ -58,6 +58,8 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     Q_PROPERTY( bool      Visible         READ Visible        WRITE setVisible        DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   XMLTVID         READ XMLTVID        WRITE setXMLTVID        DESIGNABLE SerializeDetails )
     Q_PROPERTY( QString   DefaultAuth     READ DefaultAuth    WRITE setDefaultAuth    DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   ChannelGroups   READ ChannelGroups  WRITE setChannelGroups  DESIGNABLE SerializeDetails )
+    Q_PROPERTY( QString   Inputs          READ Inputs         WRITE setInputs         DESIGNABLE SerializeDetails )
 
     Q_PROPERTY( QVariantList Programs    READ Programs DESIGNABLE true )
 
@@ -81,8 +83,10 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
     PROPERTYIMP       ( bool        , Visible        )
     PROPERTYIMP       ( QString     , XMLTVID        )
     PROPERTYIMP       ( QString     , DefaultAuth    )
+    PROPERTYIMP       ( QString     , ChannelGroups  )
+    PROPERTYIMP       ( QString     , Inputs         )
 
-    PROPERTYIMP_RO_REF( QVariantList, Programs      )
+    PROPERTYIMP_RO_REF( QVariantList, Programs       )
 
     // Used only by Serializer
     PROPERTYIMP( bool, SerializeDetails )
@@ -110,17 +114,19 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
         void Copy( const ChannelInfo *src )
         {
-            m_ChanId       = src->m_ChanId      ;
-            m_ChanNum      = src->m_ChanNum     ;
-            m_CallSign     = src->m_CallSign    ;
-            m_IconURL      = src->m_IconURL     ;
-            m_ChannelName  = src->m_ChannelName ;
-            m_ChanFilters  = src->m_ChanFilters ;
-            m_SourceId     = src->m_SourceId    ;
-            m_InputId      = src->m_InputId     ;
-            m_CommFree     = src->m_CommFree    ;
-            m_UseEIT       = src->m_UseEIT      ;
-            m_Visible      = src->m_Visible     ;
+            m_ChanId        = src->m_ChanId      ;
+            m_ChanNum       = src->m_ChanNum     ;
+            m_CallSign      = src->m_CallSign    ;
+            m_IconURL       = src->m_IconURL     ;
+            m_ChannelName   = src->m_ChannelName ;
+            m_ChanFilters   = src->m_ChanFilters ;
+            m_SourceId      = src->m_SourceId    ;
+            m_InputId       = src->m_InputId     ;
+            m_CommFree      = src->m_CommFree    ;
+            m_UseEIT        = src->m_UseEIT      ;
+            m_Visible       = src->m_Visible     ;
+            m_ChannelGroups = src->m_ChannelGroups;
+            m_Inputs        = src->m_Inputs;
 
             CopyListContents< Program >( this, m_Programs, src->m_Programs );
         }
