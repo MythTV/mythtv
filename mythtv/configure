@@ -7932,6 +7932,8 @@ elif enabled clangxx; then
     check_cxxflags -Qunused-arguments
     # Flag implicit fallthrough in case statements
     check_cxxflags -Wimplicit-fallthrough
+    # Clang needs this to link on Fedora
+    add_extralibs -lstdc++
 fi
 
 # Check for python dependencies

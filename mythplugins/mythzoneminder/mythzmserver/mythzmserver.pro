@@ -27,3 +27,9 @@ linux: DEFINES += linux
 HEADERS += zmserver.h
 
 SOURCES += main.cpp zmserver.cpp
+
+# Clang needs this to link on Fedora
+contains(CC, clang)
+{
+    LIBS += -lstdc++
+}
