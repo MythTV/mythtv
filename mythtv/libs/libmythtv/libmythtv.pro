@@ -960,3 +960,7 @@ include ( ../libs-targetfix.pro )
 
 LIBS += $$LATE_LIBS
 DEFINES += MTV_API
+
+test_clean.commands = cd test/ && $(MAKE) -f Makefile clean
+clean.depends = test_clean
+QMAKE_EXTRA_TARGETS += test_clean clean
