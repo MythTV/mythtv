@@ -4,7 +4,6 @@ QT += xml sql network opengl
 QT += widgets
 QT += webkitwidgets
 android: QT += androidextras
-}
 
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
