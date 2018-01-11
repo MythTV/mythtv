@@ -60,7 +60,7 @@ HEADERS += test_iptvrecorder.h
 SOURCES += test_iptvrecorder.cpp
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
-QMAKE_CLEAN += ; rm -f *.gcov *.gcda *.gcno
+QMAKE_CLEAN += ; ( cd $(OBJECTS_DIR) && rm -f *.gcov *.gcda *.gcno )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
 
