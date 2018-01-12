@@ -29,7 +29,7 @@ uint64_t string_to_guid(const QString &guid)
 AVCInfo::AVCInfo() :
     port(-1), node(-1),
     guid(0), specid(0), vendorid(0), modelid(0),
-    firmware_revision(0), product_name(QString::null)
+    firmware_revision(0)
 {
     memset(unit_table, 0xff, sizeof(unit_table));
 }

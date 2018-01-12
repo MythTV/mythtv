@@ -20,8 +20,7 @@ class ThumbItem
 
   public:
     ThumbItem() :
-        m_name(QString::null), m_caption(QString::null),
-        m_path(QString::null), m_isDir(false),
+        m_isDir(false),
         m_pixmap(NULL),        m_mediaDevice(NULL) { }
     ThumbItem(const QString &name, const QString &path, bool isDir,
               MythMediaDevice *dev = NULL);

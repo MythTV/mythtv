@@ -145,7 +145,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       watchingrecording(false),
       transcoding(false),
       hasFullPositionMap(false),    limitKeyRepeat(false),
-      errorMsg(QString::null),      errorType(kError_None),
+                                    errorType(kError_None),
       // Chapter stuff
       jumpchapter(0),
       // Bookmark stuff

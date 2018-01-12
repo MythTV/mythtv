@@ -59,10 +59,7 @@ class GameHandler : public QObject
   public:
     GameHandler() : QObject(),
         rebuild(false),             spandisks(0),
-        systemname(QString::null),  rompath(QString::null),
-        commandline(QString::null), workingpath(QString::null),
-        screenshots(QString::null), gameplayerid(0),
-        gametype(QString::null),
+                                    gameplayerid(0),
         m_RemoveAll(false),         m_KeepAll(false),
         m_progressDlg(NULL) {}
 

@@ -100,7 +100,6 @@ ImageView::ImageView(const ThumbList &itemList,
       // Common effect state variables
       m_effect_running(false),
       m_effect_current_frame(0),
-      m_effect_method(QString::null),
       m_effect_random(false),
 
       m_loaderRunnable(NULL),

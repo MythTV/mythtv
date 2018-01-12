@@ -28,7 +28,6 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
       xds_cur_service(-1),
       xds_crc_passed(0),            xds_crc_failed(0),
       xds_lock(QMutex::Recursive),
-      xds_net_call(QString::null),  xds_net_name(QString::null),
       xds_tsid(0)
 {
     memset(last_seen, 0, sizeof(last_seen));

@@ -17,7 +17,7 @@ MasterMap DTVChannel::master_map;
 DTVChannel::DTVChannel(TVRec *parent)
     : ChannelBase(parent),
       tunerType(DTVTunerType::kTunerTypeUnknown),
-      sistandard("mpeg"),         tuningMode(QString::null),
+      sistandard("mpeg"),
       currentProgramNum(-1),
       currentATSCMajorChannel(0), currentATSCMinorChannel(0),
       currentTransportID(0),      currentOriginalNetworkID(0),

@@ -12,8 +12,7 @@
 class MTV_PUBLIC InputInfo
 {
   public:
-    InputInfo() : name(QString::null),
-                  sourceid(0), inputid(0), mplexid(0),
+    InputInfo() : sourceid(0), inputid(0), mplexid(0),
                   chanid(0), recPriority(0), scheduleOrder(0),
                   livetvorder(0), quickTune(false) {}
     InputInfo(const QString &name,

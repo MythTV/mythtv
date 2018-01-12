@@ -9,8 +9,6 @@
 
 // startup_upmixer
 AudioSettings::AudioSettings() :
-    main_device(QString::null),
-    passthru_device(QString::null),
     format(FORMAT_NONE),
     channels(-1),
     codec(0),
@@ -92,8 +90,6 @@ AudioSettings::AudioSettings(
     bool        use_passthru,
     int         upmixer_startup,
     int         codec_profile) :
-    main_device(QString::null),
-    passthru_device(QString::null),
     format(format),
     channels(channels),
     codec(codec),

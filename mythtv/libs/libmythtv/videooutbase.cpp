@@ -401,7 +401,6 @@ VideoOutput::VideoOutput() :
     db_display_dim(0,0),
     db_aspectoverride(kAspect_Off), db_adjustfill(kAdjustFill_Off),
     db_letterbox_colour(kLetterBoxColour_Black),
-    db_deint_filtername(QString::null),
 
     // Video parameters
     video_codec_id(kCodec_NONE),        db_vdisp_profile(NULL),

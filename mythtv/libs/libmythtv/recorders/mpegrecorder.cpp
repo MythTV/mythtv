@@ -84,7 +84,6 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     // Debugging variables
     deviceIsMpegFile(false),      bufferSize(0),
     // Driver info
-    card(QString::null),          driver(QString::null),
     version(0),
     supports_sliced_vbi(false),
     // State

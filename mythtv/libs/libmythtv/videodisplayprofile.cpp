@@ -378,8 +378,7 @@ pref_map_t  VideoDisplayProfile::dec_name;
 safe_list_t VideoDisplayProfile::safe_decoders;
 
 VideoDisplayProfile::VideoDisplayProfile()
-    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f),
-      last_video_renderer(QString::null)
+    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f)
 {
     QMutexLocker locker(&safe_lock);
     init_statics();

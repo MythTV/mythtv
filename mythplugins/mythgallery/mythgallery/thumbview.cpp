@@ -14,7 +14,7 @@
 
 ThumbItem::ThumbItem(const QString &name, const QString &path, bool isDir,
                      MythMediaDevice *dev) :
-        m_name(name), m_caption(QString::null),
+        m_name(name),
         m_path(path), m_isDir(isDir),
         m_pixmap(NULL), m_mediaDevice(dev)
 {

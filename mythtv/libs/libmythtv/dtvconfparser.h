@@ -52,7 +52,7 @@ class DTVChannelInfo
 {
   public:
     DTVChannelInfo() :
-        name(QString::null), serviceid(0), lcn(-1) {}
+        serviceid(0), lcn(-1) {}
 
     QString toString() const;
 

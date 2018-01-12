@@ -31,7 +31,7 @@ const int DBUtil::kUnknownVersionNumber = INT_MIN;
  *  \brief Constructs the DBUtil object.
  */
 DBUtil::DBUtil(void)
-    : m_versionString(QString::null), m_versionMajor(-1), m_versionMinor(-1),
+    : m_versionMajor(-1), m_versionMinor(-1),
       m_versionPoint(-1)
 {
 }

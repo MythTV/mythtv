@@ -889,7 +889,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[5] =
  */
 DiSEqCDevDevice::DiSEqCDevDevice(DiSEqCDevTree &tree, uint devid)
     : m_devid(devid),           m_dev_type(kTypeLNB),
-      m_desc(QString::null),    m_tree(tree),
+                                m_tree(tree),
       m_parent(NULL),           m_ordinal(0),
       m_repeat(1)
 {

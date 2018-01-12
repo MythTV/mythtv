@@ -22,13 +22,13 @@ class MTV_PUBLIC NetworkInformationTable : public PSIPTable
 {
   public:
     NetworkInformationTable(const NetworkInformationTable& table)
-        : PSIPTable(table), _cached_network_name(QString::null)
+        : PSIPTable(table)
     {
         assert(TableID::NIT == TableID() || TableID::NITo == TableID());
         Parse();
     }
     explicit NetworkInformationTable(const PSIPTable& table)
-        : PSIPTable(table), _cached_network_name(QString::null)
+        : PSIPTable(table)
     {
         assert(TableID::NIT == TableID() || TableID::NITo == TableID());
         Parse();

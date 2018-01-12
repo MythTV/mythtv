@@ -25,7 +25,7 @@ class MTV_PUBLIC DTVMultiplex
 {
   public:
     DTVMultiplex()
-        : frequency(0), symbolrate(0), mplex(0), sistandard(QString::null) { }
+        : frequency(0), symbolrate(0), mplex(0) { }
     DTVMultiplex(const DTVMultiplex &other);
     DTVMultiplex &operator=(const DTVMultiplex &other);
     virtual ~DTVMultiplex() { }

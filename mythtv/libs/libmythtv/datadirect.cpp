@@ -527,9 +527,7 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     m_listingsProvider(lp % DD_PROVIDER_COUNT),
     m_userid(user),                   m_password(pass),
     m_tmpDir("/tmp"),                 m_cacheData(false),
-    m_inputFilename(""),              m_tmpPostFile(QString::null),
-    m_tmpResultFile(QString::null),   m_tmpDDPFile(QString::null),
-    m_cookieFile(QString::null),      m_cookieFileDT()
+    m_inputFilename(""),              m_cookieFileDT()
 {
     {
         QMutexLocker locker(&user_agent_lock);

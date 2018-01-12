@@ -207,9 +207,7 @@ class RawLineupChannel
 
 public:
     RawLineupChannel() :
-            chk_name(QString::null),  chk_id(QString::null),
-            chk_value(QString::null), chk_checked(false),
-            lbl_ch(QString::null),    lbl_callsign(QString::null) {}
+            chk_checked(false) {}
 
     RawLineupChannel(QString name,  QString id,
                      QString value, bool    checked,
@@ -232,12 +230,10 @@ class RawLineup
 {
 
 public:
-    RawLineup() :
-            get_action(QString::null), set_action(QString::null),
-            udl_id(QString::null),     zipcode(QString::null) {}
+    RawLineup() {}
 
     RawLineup(QString a, QString b, QString c) :
-            get_action(a), set_action(QString::null), udl_id(b), zipcode(c) {}
+            get_action(a), udl_id(b), zipcode(c) {}
 
 public:
     QString get_action;

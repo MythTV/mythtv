@@ -105,11 +105,11 @@ class TuningRequest
 {
   public:
     explicit TuningRequest(uint f) :
-        flags(f), program(NULL), channel(QString::null),
-        input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
+        flags(f), program(NULL),
+        majorChan(0), minorChan(0), progNum(-1) {;}
     TuningRequest(uint f, RecordingInfo *p) :
-        flags(f), program(p), channel(QString::null),
-        input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
+        flags(f), program(p),
+        majorChan(0), minorChan(0), progNum(-1) {;}
     TuningRequest(uint f, QString ch, QString in = QString::null) :
         flags(f), program(NULL), channel(ch),
         input(in), majorChan(0), minorChan(0), progNum(-1) {;}

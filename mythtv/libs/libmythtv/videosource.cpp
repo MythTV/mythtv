@@ -391,8 +391,7 @@ FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
 }
 
 TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
-    sourceid(_sourceid),
-    loaded_freq_table(QString::null)
+    sourceid(_sourceid)
 {
     setLabel(QObject::tr("Channel frequency table"));
 
@@ -1449,10 +1448,7 @@ void HDHomeRunTunerIndex::UpdateDevices(const QString &v)
 }
 
 HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent) :
-    MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice")),
-    _ip(QString::null),
-    _tuner(QString::null),
-    _overridedeviceid(QString::null)
+    MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice"))
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of HDHomeRun device"));
@@ -1701,10 +1697,7 @@ void VBoxTunerIndex::UpdateDevices(const QString &v)
 }
 
 VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
-    MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice")),
-    _ip(QString::null),
-    _tuner(QString::null),
-    _overridedeviceid(QString::null)
+    MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice"))
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of VBox device"));

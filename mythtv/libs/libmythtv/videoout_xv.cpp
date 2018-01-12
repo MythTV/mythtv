@@ -322,7 +322,7 @@ class XvAttributes
 {
   public:
     XvAttributes() :
-        description(QString::null), xv_flags(0), feature_flags(0) {}
+        xv_flags(0), feature_flags(0) {}
     XvAttributes(const QString &a, uint b, uint c) :
         description(a), xv_flags(b), feature_flags(c)
         { description.detach(); }

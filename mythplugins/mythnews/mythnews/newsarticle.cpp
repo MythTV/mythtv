@@ -18,29 +18,15 @@ NewsArticle::NewsArticle(const QString &title, const QString &desc,
                          const QString &articleURL) :
     m_title(title),
     m_desc(desc),
-    m_articleURL(articleURL),
-    m_thumbnail(QString::null),
-    m_mediaURL(QString::null),
-    m_enclosure(QString::null)
+    m_articleURL(articleURL)
 {
 }
 
 NewsArticle::NewsArticle(const QString &title) :
-    m_title(title),
-    m_desc(QString::null),
-    m_articleURL(QString::null),
-    m_thumbnail(QString::null),
-    m_mediaURL(QString::null),
-    m_enclosure(QString::null)
+    m_title(title)
 {
 }
 
-NewsArticle::NewsArticle() :
-    m_title(QString::null),
-    m_desc(QString::null),
-    m_articleURL(QString::null),
-    m_thumbnail(QString::null),
-    m_mediaURL(QString::null),
-    m_enclosure(QString::null)
+NewsArticle::NewsArticle()
 {
 }

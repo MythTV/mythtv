@@ -18,7 +18,7 @@
 
 MythComboBox::MythComboBox(bool rw, QWidget *parent, const char *name) :
     QComboBox(parent),
-    helptext(QString::null), AcceptOnSelect(false), step(1)
+    AcceptOnSelect(false), step(1)
 {
     setObjectName(name);
     setEditable(rw);
@@ -419,16 +419,14 @@ void MythSlider::focusOutEvent(QFocusEvent *e)
 }
 
 MythLineEdit::MythLineEdit(QWidget *parent, const char *name) :
-    QLineEdit(parent),
-    helptext(QString::null), rw(true)
+    QLineEdit(parent), rw(true)
 {
     setObjectName(name);
 }
 
 MythLineEdit::MythLineEdit(
     const QString &contents, QWidget *parent, const char *name) :
-    QLineEdit(contents, parent),
-    helptext(QString::null), rw(true)
+    QLineEdit(contents, parent), rw(true)
 {
     setObjectName(name);
 }

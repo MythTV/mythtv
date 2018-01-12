@@ -22,11 +22,9 @@ NewsSite::NewsSite(const QString   &name,
     QObject(),
     m_lock(QMutex::Recursive),
     m_name(name),  m_url(url), m_urlReq(url),
-    m_desc(QString::null), m_updated(updated),
+    m_updated(updated),
     m_destDir(GetConfDir()+"/MythNews"),
     m_state(NewsSite::Success),
-    m_errorString(QString::null),
-    m_updateErrorString(QString::null),
     m_imageURL(""),
     m_podcast(podcast)
 {
