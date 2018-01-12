@@ -844,7 +844,7 @@ void PathSetting::addSelection(const QString& label,
                                QString value,
                                bool select) {
     QString pathname = label;
-    if (value != QString::null)
+    if (!value.isEmpty())
         pathname = value;
 
     if (mustexist && !QFile(pathname).exists())

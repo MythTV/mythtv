@@ -60,7 +60,7 @@ QString NetworkInformationTable::toString(void) const
 
 QString NetworkInformationTable::NetworkName() const
 {
-    if (_cached_network_name == QString::null)
+    if (_cached_network_name.isEmpty())
     {
         desc_list_t parsed =
             MPEGDescriptor::Parse(NetworkDescriptors(),

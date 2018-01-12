@@ -524,7 +524,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
         QString RomName = query.value(0).toString();
         QString RomPath = query.value(1).toString();
         QString GameName = query.value(2).toString();
-        if (RomName != QString::null)
+        if (!RomName.isEmpty())
         {
             if ((iter = m_GameMap.find(RomName)) != m_GameMap.end())
             {

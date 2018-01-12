@@ -109,7 +109,7 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
     name = _name;
     QString longString = _longString;
 
-    if (QString::null == name || QString::null == longString)
+    if (name.isEmpty() || longString.isEmpty())
         return false;
 
     if (("message" == name) || ("error" == name))

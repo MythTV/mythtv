@@ -264,7 +264,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
     {
         QString lname = (*p)->GetFilename();
         QString lhost = (*p)->GetHost().toLower();
-        if (lname != QString::null)
+        if (!lname.isEmpty())
         {
             iter = files.find(lname);
             if (iter != files.end())

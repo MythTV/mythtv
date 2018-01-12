@@ -32,7 +32,7 @@ class SignalMonitorValue
     /// \brief Returns a signal monitor value as one long string.
     QString GetStatus() const
     {
-        QString str = (QString::null == noSpaceName) ? "(null)" : noSpaceName;
+        QString str = noSpaceName.isNull() ? "(null)" : noSpaceName;
         return QString("%1 %2 %3 %4 %5 %6 %7 %8")
             .arg(str).arg(value).arg(threshold).arg(minval).arg(maxval)
             .arg(timeout).arg((int)high_threshold).arg((int)set);
@@ -120,7 +120,7 @@ class SignalMonitorValue
 
     QString toString() const
     {
-        QString str = (QString::null == noSpaceName) ? "(null)" : noSpaceName;
+        QString str = noSpaceName.isNull() ? "(null)" : noSpaceName;
         return QString("Name(%1) Val(%2) thr(%3%4) range(%5,%6) "
                        "timeout(%7 ms) %8 set. %9 good.")
             .arg(str).arg(value).arg( (high_threshold) ? ">=" : "<=" )

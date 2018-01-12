@@ -1679,21 +1679,21 @@ bool TVRec::GetDevices(uint inputid,
 
     // General options
     test = query.value(0).toString();
-    if (test != QString::null)
+    if (!test.isEmpty())
         gen_opts.videodev = test;
 
     test = query.value(1).toString();
-    if (test != QString::null)
+    if (!test.isEmpty())
         gen_opts.vbidev = test;
 
     test = query.value(2).toString();
-    if (test != QString::null)
+    if (!test.isEmpty())
         gen_opts.audiodev = test;
 
     gen_opts.audiosamplerate = max(testnum, query.value(3).toInt());
 
     test = query.value(4).toString();
-    if (test != QString::null)
+    if (!test.isEmpty())
         gen_opts.inputtype = test;
 
     gen_opts.skip_btaudio = query.value(5).toUInt();
@@ -1720,7 +1720,7 @@ bool TVRec::GetDevices(uint inputid,
     firewire_opts.speed       = query.value(fireoff + 0).toUInt();
 
     test = query.value(fireoff + 1).toString();
-    if (test != QString::null)
+    if (!test.isEmpty())
         firewire_opts.model = test;
 
     firewire_opts.connection  = query.value(fireoff + 2).toUInt();

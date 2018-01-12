@@ -81,7 +81,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
         delete[] buffer;
 
     videodevice   = streamName;
-    videodevice   = (videodevice == QString::null) ? "" : videodevice;
+    videodevice   = videodevice.isNull() ? "" : videodevice;
     _stream_fd    = streamfd;
 
     // Setup device ringbuffer
@@ -161,7 +161,7 @@ void DeviceReadBuffer::Reset(const QString &streamName, int streamfd)
     QMutexLocker locker(&lock);
 
     videodevice   = streamName;
-    videodevice   = (videodevice == QString::null) ? "" : videodevice;
+    videodevice   = videodevice.isNull() ? "" : videodevice;
     _stream_fd    = streamfd;
 
     used          = 0;
