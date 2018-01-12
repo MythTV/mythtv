@@ -363,10 +363,10 @@ QString get_encoding_type(MythCodecID codecid)
         case kCodec_VDPAU_END:
         case kCodec_VAAPI_END:
         case kCodec_DXVA2_END:
-            return QString::null;
+            return QString();
     }
 
-    return QString::null;
+    return QString();
 }
 
 QString get_decoder_name(MythCodecID codec_id)

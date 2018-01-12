@@ -10595,14 +10595,14 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
 
     uint sourceid = chanEditMap["sourceid"].toUInt();
     if (!sourceid)
-        return QString::null;
+        return QString();
 
     if (sourceid != ddMapSourceId)
-        return QString::null;
+        return QString();
 
     DDKeyMap::const_iterator it_key = ddMap.find(key);
     if (it_key == ddMap.end())
-        return QString::null;
+        return QString();
 
     DDValueMap::const_iterator it_val = (*it_key).find(value);
     if (it_val != (*it_key).end())
@@ -10617,7 +10617,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
     }
 
     if (!allow_partial_match || value.isEmpty())
-        return QString::null;
+        return QString();
 
     // Check for partial matches.. prefer early match, then short string
     DDValueMap::const_iterator best_match = (*it_key).end();
@@ -10648,7 +10648,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
         }
     }
 
-    return QString::null;
+    return QString();
 }
 
 void TV::RunLoadDDMap(uint sourceid)

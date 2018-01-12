@@ -12,7 +12,7 @@
 QString DishEventNameDescriptor::Name(uint compression_type) const
 {
     if (!HasName())
-        return QString::null;
+        return QString();
 
     return atsc_huffman2_to_string(
         _data + 3, DescriptorLength() - 1, compression_type);
@@ -45,7 +45,7 @@ QString DishEventDescriptionDescriptor::Description(
     if (raw && len)
         return atsc_huffman2_to_string(raw, len, compression_type);
 
-    return QString::null;
+    return QString();
 }
 
 bool DishEventPropertiesDescriptor::decompressed = false;
@@ -89,7 +89,7 @@ QString DishEventTagsDescriptor::programid(void) const
     QString prefix = QString("");
 
     if (DescriptorLength() != 8)
-        return QString::null;
+        return QString();
 
     QString series = seriesid();
     series.remove(0, 2);
@@ -119,7 +119,7 @@ QString DishEventTagsDescriptor::seriesid(void) const
     QString prefix = QString("");
 
     if (DescriptorLength() != 8)
-        return QString::null;
+        return QString();
 
     if (_data[2] == 0x7c)
         prefix = "MV";

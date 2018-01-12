@@ -255,7 +255,7 @@ class DecoderBase
 
     virtual int  GetTeletextDecoderType(void) const { return -1; }
 
-    virtual QString GetXDS(const QString&) const { return QString::null; }
+    virtual QString GetXDS(const QString&) const { return QString(); }
     virtual QByteArray GetSubHeader(uint /*trackNo*/) const { return QByteArray(); }
     virtual void GetAttachmentData(uint /*trackNo*/, QByteArray &/*filename*/,
                                    QByteArray &/*data*/) {}

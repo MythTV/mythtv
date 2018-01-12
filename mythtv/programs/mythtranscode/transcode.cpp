@@ -181,7 +181,7 @@ static QString get_str_option(RecordingProfile *profile, const QString &name)
     LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("get_str_option(...%1): Option not in profile.").arg(name));
 
-    return QString::null;
+    return QString();
 }
 
 static int get_int_option(RecordingProfile *profile, const QString &name)

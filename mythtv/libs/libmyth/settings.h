@@ -285,9 +285,9 @@ class MPUBLIC SelectSetting : public Setting
     virtual uint size(void) const { return labels.size(); }
 
     virtual QString GetLabel(uint i) const
-        { return (i < labels.size()) ? labels[i] : QString::null; }
+        { return (i < labels.size()) ? labels[i] : QString(); }
     virtual QString GetValue(uint i) const
-        { return (i < values.size()) ? values[i] : QString::null; }
+        { return (i < values.size()) ? values[i] : QString(); }
 
   signals:
     void selectionAdded(const QString &label, QString value);

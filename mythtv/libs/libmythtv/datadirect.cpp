@@ -1769,7 +1769,7 @@ QString DataDirectProcessor::GetRawUDLID(const QString &lineupid) const
 {
     RawLineupMap::const_iterator it = m_rawLineups.find(lineupid);
     if (it == m_rawLineups.end())
-        return QString::null;
+        return QString();
     return (*it).udl_id;
 }
 
@@ -1777,7 +1777,7 @@ QString DataDirectProcessor::GetRawZipCode(const QString &lineupid) const
 {
     RawLineupMap::const_iterator it = m_rawLineups.find(lineupid);
     if (it == m_rawLineups.end())
-        return QString::null;
+        return QString();
     return (*it).zipcode;
 }
 
@@ -2134,7 +2134,7 @@ static QString get_setting(QString line, QString key)
     kfind = key + "=";
     beg = llow.indexOf(kfind);
     if (beg < 0)
-        return QString::null;
+        return QString();
 
     int i = beg + kfind.length();
     while (i < line.length() && !line[i].isSpace() && line[i] != '>')
@@ -2143,7 +2143,7 @@ static QString get_setting(QString line, QString key)
     if (i < line.length() && (line[i].isSpace() || line[i] == '>'))
         return line.mid(beg + kfind.length(), i - beg - kfind.length());
 
-    return QString::null;
+    return QString();
 }
 
 static bool has_setting(QString line, QString key)

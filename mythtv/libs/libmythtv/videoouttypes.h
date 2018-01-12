@@ -343,7 +343,7 @@ inline QString toDBString(PictureAttribute pictureattribute)
     }
 
     if (ret.isEmpty())
-        return QString::null;
+        return QString();
 
     ret.detach();
     return ret;
@@ -371,7 +371,7 @@ inline QString toXVString(PictureAttribute pictureattribute)
     }
 
     if (ret.isEmpty())
-        return QString::null;
+        return QString();
 
     ret.detach();
     return ret;

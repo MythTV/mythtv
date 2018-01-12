@@ -547,14 +547,14 @@ void PlayerContext::PushPreviousChannel(void)
 QString PlayerContext::PopPreviousChannel(void)
 {
     if (prevChan.empty())
-        return QString::null;
+        return QString();
 
     QString curChan = tvchain->GetChannelName(-1);
     if ((curChan == prevChan.back()) && !prevChan.empty())
         prevChan.pop_back();
 
     if (prevChan.empty())
-        return QString::null;
+        return QString();
 
     QString chan = prevChan.back();
     prevChan.pop_back();
@@ -568,7 +568,7 @@ QString PlayerContext::PopPreviousChannel(void)
 QString PlayerContext::GetPreviousChannel(void) const
 {
     if (prevChan.empty())
-        return QString::null;
+        return QString();
 
     QString curChan = tvchain->GetChannelName(-1);
     QString preChan = QString::null;

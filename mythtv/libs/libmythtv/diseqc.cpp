@@ -100,7 +100,7 @@ QString DiSEqCDevDevice::TableToString(uint type, const TypeTable *table)
             return tmp;
         }
     }
-    return QString::null;
+    return QString();
 }
 
 uint DiSEqCDevDevice::TableFromString(const QString   &type,

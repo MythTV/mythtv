@@ -740,7 +740,7 @@ QString get_on_input(const QString &to_get, uint inputid)
     else if (query.next())
         return query.value(0).toString();
 
-    return QString::null;
+    return QString();
 }
 
 bool set_on_input(const QString &to_set, uint inputid, const QString &value)
@@ -1201,13 +1201,13 @@ QString CardUtil::GetStartingChannel(uint inputid)
     else if (query.next())
         return query.value(0).toString();
 
-    return QString::null;
+    return QString();
 }
 
 QString CardUtil::GetDisplayName(uint inputid)
 {
     if (!inputid)
-        return QString::null;
+        return QString();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT displayname, cardid, cardtype, inputname "
@@ -1226,7 +1226,7 @@ QString CardUtil::GetDisplayName(uint inputid)
         return result;
     }
 
-    return QString::null;
+    return QString();
 }
 
 uint CardUtil::GetSourceID(uint inputid)

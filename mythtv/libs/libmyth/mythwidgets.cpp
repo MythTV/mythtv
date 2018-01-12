@@ -1461,7 +1461,7 @@ int MythListBox::getIndex(const QList<QListWidgetItem*> &list)
 QString MythListBox::text(uint row) const
 {
     QListWidgetItem *widget = item(row);
-    return (widget) ? widget->text() : QString::null;
+    return (widget) ? widget->text() : QString();
 }
 
 bool MythListBox::itemVisible(uint row) const

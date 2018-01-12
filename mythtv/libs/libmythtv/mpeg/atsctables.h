@@ -225,7 +225,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     const QString ShortChannelName(uint i) const
     {
         if (i >= ChannelCount())
-            return QString::null;
+            return QString();
 
         QString str;
         const unsigned short* ustr =

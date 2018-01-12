@@ -1891,7 +1891,7 @@ QString RecordingProfile::groupType(void) const
     else if (result.next())
         return result.value(0).toString();
 
-    return QString::null;
+    return QString();
 }
 
 QString RecordingProfile::getName(int id)
@@ -1909,7 +1909,7 @@ QString RecordingProfile::getName(int id)
     else if (result.next())
         return result.value(0).toString();
 
-    return QString::null;
+    return QString();
 }
 
 bool RecordingProfile::canDelete(void)

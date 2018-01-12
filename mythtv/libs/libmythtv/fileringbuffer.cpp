@@ -176,7 +176,7 @@ static QString local_sub_filename(QFileInfo &fileInfo)
             return fi.absoluteFilePath();
     }
 
-    return QString::null;
+    return QString();
 }
 
 bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)

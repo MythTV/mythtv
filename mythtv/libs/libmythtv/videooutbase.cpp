@@ -532,7 +532,7 @@ QString VideoOutput::GetFilters(void) const
 {
     if (db_vdisp_profile)
         return db_vdisp_profile->GetFilters();
-    return QString::null;
+    return QString();
 }
 
 void VideoOutput::SetVideoFrameRate(float playback_fps)

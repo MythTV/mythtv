@@ -213,7 +213,7 @@ void SelectSetting::setValue(int which)
 QString SelectSetting::getSelectionLabel(void) const
 {
     if (!isSet || (current >= values.size()))
-        return QString::null;
+        return QString();
 
     return labels[current];
 }

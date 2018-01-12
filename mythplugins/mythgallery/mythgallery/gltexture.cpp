@@ -113,5 +113,5 @@ QString GLTexture::GetDescription(const QString &status) const
     if (item)
         return item->GetDescription(status, GetSize(), angle);
 
-    return QString::null;
+    return QString();
 }

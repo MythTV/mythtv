@@ -1015,7 +1015,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
     EnableDBerrors();
     ResetDatabase();
 
-    return QString::null;
+    return QString();
 }
 
 // Show the Gui Startup window.

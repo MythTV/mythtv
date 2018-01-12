@@ -419,7 +419,7 @@ QString HDHRStreamHandler::TunerGet(
     if (!_hdhomerun_device)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed (not connected)");
-        return QString::null;
+        return QString();
     }
 
     QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
@@ -430,7 +430,7 @@ QString HDHRStreamHandler::TunerGet(
             &value, &error) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Get request failed" + ENO);
-        return QString::null;
+        return QString();
     }
 
     if (report_error_return && error)
@@ -441,7 +441,7 @@ QString HDHRStreamHandler::TunerGet(
                     .arg(name).arg(error));
         }
 
-        return QString::null;
+        return QString();
     }
 
     return QString(value);
@@ -456,7 +456,7 @@ QString HDHRStreamHandler::TunerSet(
     if (!_hdhomerun_device)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed (not connected)");
-        return QString::null;
+        return QString();
     }
 
 
@@ -470,7 +470,7 @@ QString HDHRStreamHandler::TunerSet(
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Set request failed" + ENO);
 
-        return QString::null;
+        return QString();
     }
 
     if (report_error_return && error)
@@ -481,7 +481,7 @@ QString HDHRStreamHandler::TunerSet(
                     .arg(name).arg(val).arg(error));
         }
 
-        return QString::null;
+        return QString();
     }
 
     return QString(value);

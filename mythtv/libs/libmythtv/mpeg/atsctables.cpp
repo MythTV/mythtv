@@ -509,7 +509,7 @@ int VirtualChannelTable::Find(int major, int minor) const
 QString VirtualChannelTable::GetExtendedChannelName(uint i) const
 {
     if ((i >= ChannelCount()) || DescriptorsLength(i) == 0)
-        return QString::null;
+        return QString();
 
     vector<const unsigned char*> parsed =
         MPEGDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
@@ -518,7 +518,7 @@ QString VirtualChannelTable::GetExtendedChannelName(uint i) const
         MPEGDescriptor::Find(parsed, DescriptorID::extended_channel_name);
 
     if (!desc)
-        return QString::null;
+        return QString();
 
     return ExtendedChannelNameDescriptor(desc).LongChannelNameString();
 }

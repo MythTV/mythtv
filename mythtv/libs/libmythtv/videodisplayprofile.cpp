@@ -540,11 +540,11 @@ QString VideoDisplayProfile::GetPreference(const QString &key) const
     QMutexLocker locker(&lock);
 
     if (key.isEmpty())
-        return QString::null;
+        return QString();
 
     pref_map_t::const_iterator it = pref.find(key);
     if (it == pref.end())
-        return QString::null;
+        return QString();
 
     QString pref = *it;
     pref.detach();

@@ -37,7 +37,7 @@ DBUtil::DBUtil(void)
 }
 
 /** \fn DBUtil::GetDBMSVersion(void)
- *  \brief Returns the QString version name of the DBMS or QString::null in
+ *  \brief Returns the QString version name of the DBMS or QString() in
  *         the event of an error.
  */
 QString DBUtil::GetDBMSVersion(void)
@@ -752,7 +752,7 @@ bool DBUtil::DoBackup(QString &filename)
 
 /** \fn DBUtil::QueryDBMSVersion(void)
  *  \brief Reads and returns the QString version name from the DBMS or
- *         returns QString::null in the event of an error.
+ *         returns QString() in the event of an error.
  */
 bool DBUtil::QueryDBMSVersion(void)
 {

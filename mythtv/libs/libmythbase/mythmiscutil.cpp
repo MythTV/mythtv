@@ -532,7 +532,7 @@ QString getSymlinkTarget(const QString &start_file,
             .arg((!fi.isSymLink()) ? cur_file : QString::null));
 #endif
 
-    return (!fi.isSymLink()) ? cur_file : QString::null;
+    return (!fi.isSymLink()) ? cur_file : QString();
 }
 
 bool IsMACAddress(QString MAC)

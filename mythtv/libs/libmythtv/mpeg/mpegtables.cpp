@@ -1118,7 +1118,7 @@ QString ProgramMapTable::GetLanguage(uint i) const
         list, DescriptorID::iso_639_language);
 
     if (!lang_desc)
-        return QString::null;
+        return QString();
 
     ISO639LanguageDescriptor iso_lang(lang_desc);
     return iso_lang.CanonicalLanguageString();

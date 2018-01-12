@@ -378,7 +378,7 @@ QWidget * MythWizard::currentPage() const
 QString MythWizard::title( QWidget * page ) const
 {
     MythWizardPrivate::Page * p = d->page( page );
-    return p ? p->t : QString::null;
+    return p ? p->t : QString();
 }
 
 void MythWizard::setTitle( QWidget *page, const QString &title )

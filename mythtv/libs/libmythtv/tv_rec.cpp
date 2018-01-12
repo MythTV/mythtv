@@ -3044,7 +3044,7 @@ QString TVRec::GetInput(void) const
 {
     if (channel)
         return channel->GetInputName();
-    return QString::null;
+    return QString();
 }
 
 /** \fn TVRec::GetSourceID(void) const
@@ -3074,7 +3074,7 @@ QString TVRec::SetInput(QString input)
     if (!channel)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "SetInput() -- end  no channel class");
-        return QString::null;
+        return QString();
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + "SetInput(" + origIn + ":" + input +

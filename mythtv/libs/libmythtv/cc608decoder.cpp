@@ -1177,7 +1177,7 @@ QString CC608Decoder::GetXDS(const QString &key) const
     else if (key == "tsid")
         return QString::number(xds_tsid);
 
-    return QString::null;
+    return QString();
 }
 
 static int b1_to_service[16] =

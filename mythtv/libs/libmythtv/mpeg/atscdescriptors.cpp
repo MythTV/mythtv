@@ -96,7 +96,7 @@ QString MultipleStringStructure::GetBestMatch(QMap<uint,uint> &langPrefs) const
 {
     if (StringCount())
         return GetFullString(GetIndexOfBestMatch(langPrefs));
-    return QString::null;
+    return QString();
 }
 
 QString MultipleStringStructure::GetSegment(uint i, uint j) const

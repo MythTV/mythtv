@@ -309,7 +309,7 @@ SmartPLCriteriaRow::~SmartPLCriteriaRow()
 QString SmartPLCriteriaRow::getSQL(void)
 {
     if (Field.isEmpty())
-        return QString::null;
+        return QString();
 
     QString result;
 
