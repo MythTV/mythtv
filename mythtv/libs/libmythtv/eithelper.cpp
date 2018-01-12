@@ -158,7 +158,7 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
 
         // Look to see if there has been a recent ett message with the same event id.
         EventIDToETT::iterator it = etts.find(eit->EventID(i));
-        QString ett_text = QString::null;
+        QString ett_text;
         bool found_matching_ett = false;
         if (it != etts.end())
         {

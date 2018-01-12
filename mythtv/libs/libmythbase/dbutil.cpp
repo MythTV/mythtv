@@ -595,7 +595,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
         .arg(dbParams.dbUserName).arg(dbParams.dbPassword)
         .arg(dbParams.dbName).arg(dbSchemaVer)
         .arg(backupDirectory).arg(backupFilename).arg(rotate);
-    QString tempDatabaseConfFile = QString::null;
+    QString tempDatabaseConfFile;
     bool hastemp = CreateTemporaryDBConf(privateinfo, tempDatabaseConfFile);
     if (!hastemp)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Attempting backup, anyway.");
@@ -689,7 +689,7 @@ bool DBUtil::DoBackup(QString &filename)
     QString privateinfo = QString(
         "[client]\npassword=%1\n[mysqldump]\npassword=%2\n")
         .arg(dbParams.dbPassword).arg(dbParams.dbPassword);
-    QString tempExtraConfFile = QString::null;
+    QString tempExtraConfFile;
     if (!CreateTemporaryDBConf(privateinfo, tempExtraConfFile))
         return false;
 

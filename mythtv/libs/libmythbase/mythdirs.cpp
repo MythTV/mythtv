@@ -13,19 +13,19 @@
 #include <sys/statfs.h>
 #endif
 
-static QString installprefix = QString::null;
-static QString appbindir = QString::null;
-static QString sharedir = QString::null;
-static QString libdir = QString::null;
-static QString confdir = QString::null;
-static QString themedir = QString::null;
-static QString pluginsdir = QString::null;
-static QString translationsdir = QString::null;
-static QString filtersdir = QString::null;
-static QString cachedir = QString::null;
-static QString remotecachedir = QString::null;
-static QString themebasecachedir = QString::null;
-static QString thumbnaildir = QString::null;
+static QString installprefix;
+static QString appbindir;
+static QString sharedir;
+static QString libdir;
+static QString confdir;
+static QString themedir;
+static QString pluginsdir;
+static QString translationsdir;
+static QString filtersdir;
+static QString cachedir;
+static QString remotecachedir;
+static QString themebasecachedir;
+static QString thumbnaildir;
 
 void InitializeMythDirs(void)
 {

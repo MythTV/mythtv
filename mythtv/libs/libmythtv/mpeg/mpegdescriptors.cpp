@@ -570,7 +570,7 @@ QString RegistrationDescriptor::GetDescription(const QString &fmt)
 {
     InitializeDescriptionMap();
 
-    QString ret = QString::null;
+    QString ret;
     {
         QMutexLocker locker(&description_map_lock);
         QMap<QString,QString>::const_iterator it = description_map.find(fmt);

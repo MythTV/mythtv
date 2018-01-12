@@ -328,7 +328,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
                                         .toElement().text().simplified());
 
         QDomNode descNode = itemNode.namedItem("description");
-        QString description = QString::null;
+        QString description;
         if (!descNode.isNull())
         {
             description = descNode.toElement().text().simplified();
@@ -336,14 +336,14 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         }
 
         QDomNode linkNode = itemNode.namedItem("link");
-        QString url = QString::null;
+        QString url;
         if (!linkNode.isNull())
             url = linkNode.toElement().text().simplified();
 
         QDomNode enclosureNode = itemNode.namedItem("enclosure");
-        QString enclosure = QString::null;
-        QString enclosure_type = QString::null;
-        QString thumbnail = QString::null;
+        QString enclosure;
+        QString enclosure_type;
+        QString thumbnail;
         if (!enclosureNode.isNull())
         {
             QDomAttr enclosureURL = enclosureNode.toElement()
@@ -408,7 +408,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         }
 
         QDomNode playerNode = itemNode.namedItem("media:player");
-        QString mediaurl = QString::null;
+        QString mediaurl;
         if (!playerNode.isNull())
         {
             QDomAttr mediaURL = playerNode.toElement().attributeNode("url");
@@ -473,7 +473,7 @@ void NewsSite::parseAtom(QDomDocument domDoc)
                                          .text().simplified());
 
         QDomNode summNode = itemNode.namedItem("summary");
-        QString description = QString::null;
+        QString description;
         if (!summNode.isNull())
         {
             description = ReplaceHtmlChar(
@@ -481,7 +481,7 @@ void NewsSite::parseAtom(QDomDocument domDoc)
         }
 
         QDomNode linkNode = itemNode.namedItem("link");
-        QString url = QString::null;
+        QString url;
         if (!linkNode.isNull())
         {
             QDomAttr linkHref = linkNode.toElement().attributeNode("href");

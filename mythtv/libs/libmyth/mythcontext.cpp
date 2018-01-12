@@ -780,7 +780,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
  */
 QString MythContextPrivate::TestDBconnection(bool prompt)
 {
-    QString err    = QString::null;
+    QString err;
     QString host;
 
     // Jan 20, 2017

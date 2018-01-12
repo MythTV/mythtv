@@ -125,7 +125,7 @@ bool ProfileGroup::addMissingDynamicProfiles(void)
 void ProfileGroup::fillSelections(GroupSetting* setting)
 {
     CardUtil::InputTypes cardtypes = CardUtil::GetInputTypes();
-    QString     tid       = QString::null;
+    QString     tid;
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(

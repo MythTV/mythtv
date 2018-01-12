@@ -262,7 +262,7 @@ void VideoColourSpace::SetSaturation(int value)
 
 void VideoColourSpace::SaveValue(PictureAttribute attributeType, int value)
 {
-    QString dbName = QString::null;
+    QString dbName;
     if (kPictureAttribute_Brightness == attributeType)
         dbName = "PlaybackBrightness";
     else if (kPictureAttribute_Contrast == attributeType)

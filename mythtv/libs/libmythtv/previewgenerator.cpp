@@ -725,7 +725,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
     QFileInfo fi(outname);
     if (outname == fi.fileName())
     {
-        QString dir = QString::null;
+        QString dir;
         if (pathname.contains(':'))
         {
             QUrl uinfo(pathname);

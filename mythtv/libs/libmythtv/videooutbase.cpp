@@ -188,7 +188,7 @@ VideoOutput *VideoOutput::Create(
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Allowed renderers (filt: " + decoder +
             "): " + to_comma_list(renderers));
 
-    QString renderer = QString::null;
+    QString renderer;
 
     VideoDisplayProfile *vprof = new VideoDisplayProfile();
 

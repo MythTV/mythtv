@@ -506,7 +506,7 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
     query.bindValue(":INPUTNAME", inputname);
     query.bindValue(":INPUTID",    m_inputid);
 
-    QString fmt = QString::null;
+    QString fmt;
     if (!query.exec() || !query.isActive())
         MythDB::DBError("GetFormatForChannel:find format", query);
     else if (query.next())

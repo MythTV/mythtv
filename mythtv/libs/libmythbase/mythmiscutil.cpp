@@ -491,7 +491,7 @@ QString getSymlinkTarget(const QString &start_file,
             .arg(maxLinks));
 #endif
 
-    QString   link     = QString::null;
+    QString   link;
     QString   cur_file = start_file; cur_file.detach();
     QFileInfo fi(cur_file);
 

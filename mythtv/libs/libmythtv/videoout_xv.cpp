@@ -409,7 +409,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
         return -1;
     }
 
-    QString lastAdaptorName = QString::null;
+    QString lastAdaptorName;
     int port = -1;
 
     // find an Xv port
@@ -601,7 +601,7 @@ bool VideoOutputXv::InitXVideo()
 {
     MythXLocker lock(disp);
     disp->StartLog();
-    QString adaptor_name = QString::null;
+    QString adaptor_name;
     const QSize video_dim = window.GetVideoDim();
     xv_port = GrabSuitableXvPort(disp, disp->GetRoot(), kCodec_MPEG2,
                                  video_dim.width(), video_dim.height(),
@@ -819,7 +819,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     db_vdisp_profile->SetInput(window.GetVideoDim());
     QStringList renderers = allowed_video_renderers(
                                 video_codec_id, disp, XJ_curwin);
-    QString     renderer  = QString::null;
+    QString     renderer;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "InitSetupBuffers() " +

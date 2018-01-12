@@ -308,7 +308,7 @@ void SingleView::paintEvent(QPaintEvent *)
                 QPainter p(&pix);
                 p.initFrom(this);
                 ThumbItem *item = getCurrentItem();
-                QString info = QString::null;
+                QString info;
                 if (item)
                 {
                     info = item->GetDescription(GetDescriptionStatus(),

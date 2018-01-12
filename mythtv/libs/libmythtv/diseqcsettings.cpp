@@ -422,7 +422,7 @@ class RotorHiSpeedSetting : public TransTextEditSetting
 
 static QString AngleToString(double angle)
 {
-    QString str = QString::null;
+    QString str;
     if (angle >= 0.0)
         str = QString::number(angle) +
             DeviceTree::tr("E", "Eastern Hemisphere");
@@ -1303,7 +1303,7 @@ class USALSRotorSetting : public GroupSetting
     virtual void Load(void)
     {
         double  val  = m_settings.GetValue(m_node.GetDeviceID());
-        QString hemi = QString::null;
+        QString hemi;
         double  eval = AngleToEdit(val, hemi);
         numeric->setValue(QString::number(eval));
         hemisphere->setValue(hemisphere->getValueIndex(hemi));

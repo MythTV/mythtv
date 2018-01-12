@@ -571,7 +571,7 @@ QString PlayerContext::GetPreviousChannel(void) const
         return QString();
 
     QString curChan = tvchain->GetChannelName(-1);
-    QString preChan = QString::null;
+    QString preChan;
     if (curChan != prevChan.back() || prevChan.size() < 2)
         preChan = prevChan.back();
     else
@@ -754,7 +754,7 @@ bool PlayerContext::IsSameProgram(const ProgramInfo &p) const
 QString PlayerContext::GetFilters(const QString &baseFilters) const
 {
     QString filters     = baseFilters;
-    QString chanFilters = QString::null;
+    QString chanFilters;
 
     if (gCoreContext->IsDatabaseIgnored())
         return baseFilters;

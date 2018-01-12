@@ -947,7 +947,7 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
                                         uint           sourceid,
                                         const QString &channum)
 {
-    QString retval = QString::null;
+    QString retval;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1225,7 +1225,7 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
     }
 
     QMap<uint,QString>::iterator it = channel_default_authority_map.find(chanid);
-    QString ret = QString::null;
+    QString ret;
     if (it != channel_default_authority_map.end())
     {
         ret = *it;

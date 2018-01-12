@@ -1754,7 +1754,7 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
     init_statics();
 
     uint    top_priority = 0;
-    QString top_renderer = QString::null;
+    QString top_renderer;
 
     QStringList::const_iterator it = renderers.begin();
     for (; it != renderers.end(); ++it)

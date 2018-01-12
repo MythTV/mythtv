@@ -794,7 +794,7 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(
         uint    freqid     = dd_station_info.value(3).toUInt();
         QString chan_major = dd_station_info.value(4).toString();
         QString chan_minor = dd_station_info.value(5).toString();
-        QString tvformat   = QString::null;
+        QString tvformat;
         QString channum    = process_dd_station(
             sourceid, chan_major, chan_minor, tvformat, freqid);
 
@@ -1174,7 +1174,7 @@ bool DataDirectProcessor::GrabData(const QDateTime &pstartDate,
     QString err = "";
     QString ddurl = m_providers[m_listingsProvider].webServiceURL;
     QString inputfile = m_inputFilename;
-    QString cache_dd_data = QString::null;
+    QString cache_dd_data;
 
     if (m_cacheData)
     {
@@ -1928,7 +1928,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
 
     QTextStream stream(&file);
     bool in_form = false;
-    QString get_action = QString::null;
+    QString get_action;
     QMap<QString,QString> name_value;
 
     m_rawLineups.clear();

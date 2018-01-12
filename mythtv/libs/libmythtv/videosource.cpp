@@ -2449,7 +2449,7 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
 
 void V4LConfigurationGroup::probeCard(const QString &device)
 {
-    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
+    QString cn = tr("Failed to open"), ci = cn, dn;
 
     QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
@@ -2494,7 +2494,7 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
 
 void MPEGConfigurationGroup::probeCard(const QString &device)
 {
-    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
+    QString cn = tr("Failed to open"), ci = cn, dn;
 
     QByteArray adevice = device.toLatin1();
     int videofd = open(adevice.constData(), O_RDWR);
@@ -2640,7 +2640,7 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
 
 void HDPVRConfigurationGroup::probeCard(const QString &device)
 {
-    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
+    QString cn = tr("Failed to open"), ci = cn, dn;
 
     int videofd = open(device.toLocal8Bit().constData(), O_RDWR);
     if (videofd >= 0)

@@ -265,8 +265,8 @@ static int reloadTheme(void)
 
 int main(int argc, char *argv[])
 {
-    QString geometry = QString::null;
-    QString display  = QString::null;
+    QString geometry;
+    QString display;
     bool    doScan   = false;
     bool    doScanList = false;
     bool    doScanSaveOnly = false;

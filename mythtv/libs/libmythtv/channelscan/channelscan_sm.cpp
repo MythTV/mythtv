@@ -1107,8 +1107,8 @@ static void update_info(ChannelInsertInfo &info,
 
     // Figure out best service name and callsign...
     ServiceDescriptor *desc = sdt->GetServiceDescriptor(i);
-    QString callsign = QString::null;
-    QString service_name = QString::null;
+    QString callsign;
+    QString service_name;
     if (desc)
     {
         callsign = desc->ServiceShortName();

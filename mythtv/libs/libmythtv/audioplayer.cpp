@@ -109,7 +109,7 @@ void AudioPlayer::DeleteOutput(void)
 QString AudioPlayer::ReinitAudio(void)
 {
     bool want_audio = m_parent->IsAudioNeeded();
-    QString errMsg = QString::null;
+    QString errMsg;
     QMutexLocker lock(&m_lock);
 
     if ((m_format == FORMAT_NONE) ||

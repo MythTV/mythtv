@@ -81,7 +81,7 @@ bool ScanWizard::DoTestDecryption(void) const
 void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 {
     uint    cardid    = 0;
-    QString inputname = QString::null;
+    QString inputname;
     if (!InputSelector::Parse(cardids_inputname, cardid, inputname))
         return;
 

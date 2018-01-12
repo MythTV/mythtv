@@ -1732,7 +1732,7 @@ bool TVRec::GetDevices(uint inputid,
 
 QString TVRec::GetStartChannel(uint inputid)
 {
-    QString startchan = QString::null;
+    QString startchan;
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("GetStartChannel(%1)")
         .arg(inputid));
@@ -2533,7 +2533,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
 
         if (timeLeft <= time_buffer)
         {
-            QString channum = QString::null, input = QString::null;
+            QString channum, input;
             if (pendinfo.info->QueryTuningInfo(channum, input))
             {
                 busy_input->inputid = channel->GetInputID();
@@ -3411,7 +3411,7 @@ void TVRec::RingBufferChanged(
 QString TVRec::TuningGetChanNum(const TuningRequest &request,
                                 QString &input) const
 {
-    QString channum = QString::null;
+    QString channum;
 
     if (request.program)
     {

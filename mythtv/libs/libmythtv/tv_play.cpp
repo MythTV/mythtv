@@ -372,7 +372,7 @@ bool TV::StartTV(ProgramInfo *tvrec, uint flags,
     // Notify others that we are about to play
     gCoreContext->WantingPlayback(tv);
 
-    QString playerError = QString::null;
+    QString playerError;
     while (!quitAll)
     {
         if (curProgram)
@@ -1921,7 +1921,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         it = next;
     }
     int          timeuntil = 0;
-    QString      message   = QString::null;
+    QString      message;
     uint conflict_count = askAllowPrograms.size();
 
     it = askAllowPrograms.begin();
@@ -2920,7 +2920,7 @@ void TV::timerEvent(QTimerEvent *te)
         return;
 
     // Check if it matches networkControlTimerId
-    QString netCmd = QString::null;
+    QString netCmd;
     {
         QMutexLocker locker(&timerIdLock);
         if (timer_id == networkControlTimerId)
@@ -3204,7 +3204,7 @@ void TV::timerEvent(QTimerEvent *te)
 
 bool TV::HandlePxPTimerEvent(void)
 {
-    QString cmd = QString::null;
+    QString cmd;
 
     {
         QMutexLocker locker(&timerIdLock);
@@ -4605,7 +4605,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         SetAutoCommercialSkip(ctx, kCommSkipIncr);
     else if (has_action("NEXTSCAN", actions))
     {
-        QString msg = QString::null;
+        QString msg;
         ctx->LockDeletePlayer(__FILE__, __LINE__);
         if (ctx->player)
         {
@@ -5968,7 +5968,7 @@ void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
     if (!actx)
         return;
 
-    QString err_msg = QString::null;
+    QString err_msg;
     if ((player.size() > kMaxPBPCount) && (wantPBP || actx->IsPBP()))
     {
         err_msg = tr("Sorry, PBP only supports %n video stream(s)", "",
@@ -8243,7 +8243,7 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     int   pos  = -1;
     int   tuned = -1;
     QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt(""), crypt("");
-    QString err = QString::null, msg = QString::null;
+    QString err, msg;
     for (it = slist.begin(); it != slist.end(); ++it)
     {
         if ("error" == it->GetShortName())
@@ -9679,7 +9679,7 @@ void TV::customEvent(QEvent *e)
 
     if (message.startsWith("LIVETV_CHAIN"))
     {
-        QString id = QString::null;
+        QString id;
         if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
             id = tokens[2];
 
@@ -10850,7 +10850,7 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     }
     else if (action.startsWith("SELECTSCAN_"))
     {
-        QString msg = QString::null;
+        QString msg;
         actx->LockDeletePlayer(__FILE__, __LINE__);
         actx->player->SetScanType((FrameScanType) action.right(1).toInt());
         actx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -12623,7 +12623,7 @@ void TV::HandleDeinterlacer(PlayerContext *ctx, const QString &action)
 
 void TV::ToggleAutoExpire(PlayerContext *ctx)
 {
-    QString desc = QString::null;
+    QString desc;
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
 
@@ -12647,7 +12647,7 @@ void TV::ToggleAutoExpire(PlayerContext *ctx)
 void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
                                CommSkipMode skipMode)
 {
-    QString desc = QString::null;
+    QString desc;
 
     ctx->LockDeletePlayer(__FILE__, __LINE__);
     if (ctx->player)
@@ -13159,7 +13159,7 @@ void TV::ShowOSDStopWatchingRecording(PlayerContext *ctx)
         DoTogglePause(ctx, false);
 
     QString message;
-    QString videotype = QString::null;
+    QString videotype;
 
     if (StateIsLiveTV(GetState(ctx)))
         videotype = tr("Live TV");
@@ -13440,7 +13440,7 @@ ProgramInfo *TV::GetLastProgram(void) const
 
 QString TV::GetRecordingGroup(int player_idx) const
 {
-    QString ret = QString::null;
+    QString ret;
 
     const PlayerContext *ctx = GetPlayerReadLock(player_idx, __FILE__, __LINE__);
     if (ctx)

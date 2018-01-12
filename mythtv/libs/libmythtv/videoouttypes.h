@@ -188,7 +188,7 @@ inline QString toString(FrameScanType scan, bool brief = false)
 
 inline QString toString(PIPLocation location)
 {
-    QString ret = QString::null;
+    QString ret;
     switch (location)
     {
         case kPIPTopLeft:     ret = QObject::tr("Top Left");     break;
@@ -324,7 +324,7 @@ inline QString toString(PictureAttribute pictureattribute)
 
 inline QString toDBString(PictureAttribute pictureattribute)
 {
-    QString ret = QString::null;
+    QString ret;
     switch (pictureattribute)
     {
       case kPictureAttribute_None: break;
@@ -351,7 +351,7 @@ inline QString toDBString(PictureAttribute pictureattribute)
 
 inline QString toXVString(PictureAttribute pictureattribute)
 {
-    QString ret = QString::null;
+    QString ret;
     switch (pictureattribute)
     {
       case kPictureAttribute_None: break;
