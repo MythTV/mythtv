@@ -13,7 +13,7 @@ class MPUBLIC DatabaseSettings : public GroupSetting
     Q_OBJECT
 
   public:
-    explicit DatabaseSettings(const QString &DBhostOverride = QString::null);
+    explicit DatabaseSettings(const QString &DBhostOverride = QString());
     ~DatabaseSettings();
 
     void Load(void);

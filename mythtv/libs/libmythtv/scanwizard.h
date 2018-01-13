@@ -49,7 +49,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
   public:
     ScanWizard(uint    default_sourceid  = 0,
                uint    default_cardid    = 0,
-               QString default_inputname = QString::null);
+               QString default_inputname = QString());
 
     ~ScanWizard() { }
 

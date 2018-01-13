@@ -271,12 +271,12 @@ class MPUBLIC SelectSetting : public Setting
 
   public:
     virtual int  findSelection(  const QString &label,
-                                 QString        value  = QString::null) const;
+                                 QString        value  = QString()) const;
     virtual void addSelection(   const QString &label,
-                                 QString        value  = QString::null,
+                                 QString        value  = QString(),
                                  bool           select = false);
     virtual bool removeSelection(const QString &label,
-                                 QString        value  = QString::null);
+                                 QString        value  = QString());
 
     virtual void clearSelections(void);
 
@@ -352,10 +352,10 @@ class MPUBLIC ComboBoxSetting: public SelectSetting
     virtual void setValue(int which);
 
     void addSelection(const QString &label,
-                      QString value = QString::null,
+                      QString value = QString(),
                       bool select = false);
     bool removeSelection(const QString &label,
-                         QString value = QString::null);
+                         QString value = QString());
     void editTextChanged(const QString &newText);
 
   private:
@@ -409,7 +409,7 @@ class MPUBLIC ListBoxSetting: public SelectSetting
 
   public slots:
     void addSelection(const QString &label,
-                      QString        value  = QString::null,
+                      QString        value  = QString(),
                       bool           select = false);
 
     void setValueByIndex(int index);
@@ -484,7 +484,7 @@ class MPUBLIC PathSetting : public ComboBoxSetting
 
     // TODO: this should support globbing of some sort
     virtual void addSelection(const QString &label,
-                              QString value=QString::null,
+                              QString value=QString(),
                               bool select=false);
 
     // Use a combobox for now, maybe a modified file dialog later

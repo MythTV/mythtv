@@ -129,7 +129,7 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetDecoders(void);
     static QStringList GetDecoderNames(void);
     static QString     GetDecoderName(const QString &decoder);
-    static QString     GetDecoderHelp(QString decoder = QString::null);
+    static QString     GetDecoderHelp(QString decoder = QString());
 
     static QString     GetDefaultProfileName(const QString &hostname);
     static void        SetDefaultProfileName(const QString &profilename,

@@ -78,15 +78,15 @@ class OpenGLVideo
     bool OptimiseFilters(void);
     bool AddFrameBuffer(uint &framebuffer, uint &texture, QSize vid_size);
     uint AddFragmentProgram(OpenGLFilterType name,
-                            QString deint = QString::null,
+                            QString deint = QString(),
                             FrameScanType field = kScan_Progressive);
     uint CreateVideoTexture(QSize size, QSize &tex_size);
     QString GetProgramString(OpenGLFilterType filter,
-                             QString deint = QString::null,
+                             QString deint = QString(),
                              FrameScanType field = kScan_Progressive);
     void GetProgramStrings(QString &vertex, QString &fragment,
                            OpenGLFilterType filter,
-                           QString deint = QString::null,
+                           QString deint = QString(),
                            FrameScanType field = kScan_Progressive);
     void CustomiseProgramString(QString &string);
     static QString FilterToString(OpenGLFilterType filter);

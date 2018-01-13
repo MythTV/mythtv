@@ -777,8 +777,8 @@ class VideoDevice : public CaptureCardComboBoxSetting
     VideoDevice(const CaptureCard &parent,
                 uint    minor_min = 0,
                 uint    minor_max = UINT_MAX,
-                QString card      = QString::null,
-                QString driver    = QString::null) :
+                QString card      = QString(),
+                QString driver    = QString()) :
         CaptureCardComboBoxSetting(parent, true, "videodevice")
     {
         setLabel(QObject::tr("Video device"));

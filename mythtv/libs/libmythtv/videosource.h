@@ -311,8 +311,8 @@ class TunerCardAudioInput : public CaptureCardComboBoxSetting
     Q_OBJECT
   public:
     TunerCardAudioInput(const CaptureCard &parent,
-                        QString dev  = QString::null,
-                        QString type = QString::null);
+                        QString dev  = QString(),
+                        QString type = QString());
 
   public slots:
     int fillSelections(const QString &device);

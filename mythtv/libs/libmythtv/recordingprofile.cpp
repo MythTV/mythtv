@@ -147,7 +147,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
     }
 
     void addSelection(const QString &label,
-                      QString        value  = QString::null,
+                      QString        value  = QString(),
                       bool           select = false)
     {
         QString val = value.isEmpty() ? label : value;
@@ -768,7 +768,7 @@ class AverageBitrate : public MythUISpinBoxSetting, public CodecParamStorage
                    QString setting = "mpeg2bitrate",
                    uint min_br = 1000, uint max_br = 16000,
                    uint default_br = 4500, uint increment = 100,
-                   QString label = QString::null) :
+                   QString label = QString()) :
         MythUISpinBoxSetting(this, min_br, max_br, increment),
         CodecParamStorage(this, parent, setting)
     {
@@ -789,7 +789,7 @@ class PeakBitrate : public MythUISpinBoxSetting, public CodecParamStorage
                 QString setting = "mpeg2maxbitrate",
                 uint min_br = 1000, uint max_br = 16000,
                 uint default_br = 6000, uint increment = 100,
-                QString label = QString::null) :
+                QString label = QString()) :
         MythUISpinBoxSetting(this, min_br, max_br, increment),
         CodecParamStorage(this, parent, setting)
     {

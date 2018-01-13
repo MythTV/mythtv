@@ -31,7 +31,7 @@ class MTV_PUBLIC SourceUtil
     static bool    IsCableCardPresent(uint sourceid);
     static bool    IsAnySourceScanable(void);
     static bool    UpdateChannelsFromListings(
-        uint sourceid, QString inputtype = QString::null, bool wait = false);
+        uint sourceid, QString inputtype = QString(), bool wait = false);
 
     static bool    UpdateSource( uint sourceid, QString sourcename,
                                  QString grabber, QString userid,

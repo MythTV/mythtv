@@ -56,7 +56,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
                                   bool willsuspendpa = true);
     static AudioOutput *OpenAudio(
         const QString &main_device,
-        const QString &passthru_device = QString::null,
+        const QString &passthru_device = QString(),
         bool willsuspendpa = true);
 
     AudioOutput() :

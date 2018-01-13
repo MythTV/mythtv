@@ -48,7 +48,7 @@ class MPUBLIC AudioSettings
                   int           codec_profile = 0);
 
     AudioSettings(const QString    &main_device,
-                  const QString    &passthru_device = QString::null);
+                  const QString    &passthru_device = QString());
 
     ~AudioSettings();
     void FixPassThrough(void);

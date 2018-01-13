@@ -213,7 +213,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
     QString getValueLabel(void) const;
     virtual void resultEdit(DialogCompletionEvent *dce);
     virtual void edit(MythScreenType *screen);
-    void addSelection(const QString &label, QString value = QString::null,
+    void addSelection(const QString &label, QString value = QString(),
                       bool select = false);
     void clearSelections();
     void fillSelectionsFromDir(const QDir &dir, bool absPath = true);

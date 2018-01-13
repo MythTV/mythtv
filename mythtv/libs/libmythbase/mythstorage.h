@@ -75,7 +75,7 @@ class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
   public:
     GenericDBStorage(StorageUser *_user,
                      QString _table, QString _column,
-                     QString _keycolumn, QString _keyvalue = QString::null) :
+                     QString _keycolumn, QString _keyvalue = QString()) :
         SimpleDBStorage(_user, _table, _column),
         keycolumn(_keycolumn), keyvalue(_keyvalue) {}
     virtual ~GenericDBStorage() { }
