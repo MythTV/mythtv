@@ -35,7 +35,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 
     name     = *it;
     name.detach();
-    name     = (name == "<EMPTY>") ? QString::null : name;
+    name     = (name == "<EMPTY>") ? QString() : name;
     NEXT();
 
     sourceid = (*it).toUInt(); NEXT();
@@ -45,7 +45,7 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
 
     displayName = *it;
     displayName.detach();
-    displayName = (displayName == "<EMPTY>") ? QString::null : displayName;
+    displayName = (displayName == "<EMPTY>") ? QString() : displayName;
     NEXT();
 
     recPriority = (*it).toInt(); NEXT();

@@ -578,7 +578,7 @@ void AudioConfigSettings::UpdateAudioTest()
     QString out = m_OutputDevice->getValue();
     QString passthrough =
         m_PassThroughOverride->boolValue() ?
-        m_PassThroughDeviceOverride->getValue(): QString::null;
+        m_PassThroughDeviceOverride->getValue(): QString();
     int channels = m_MaxAudioChannels->getValue().toInt();
 
     m_audioTest->UpdateCapabilities(out, passthrough, channels, settings);

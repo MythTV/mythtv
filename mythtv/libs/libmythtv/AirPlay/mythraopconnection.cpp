@@ -1696,7 +1696,7 @@ bool MythRAOPConnection::OpenAudioDevice(void)
     CloseAudioDevice();
 
     QString passthru = gCoreContext->GetNumSetting("PassThruDeviceOverride", false)
-                        ? gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
+                        ? gCoreContext->GetSetting("PassThruOutputDevice") : QString();
     QString device = gCoreContext->GetSetting("AudioOutputDevice");
 
     m_audio = AudioOutput::OpenAudio(device, passthru, FORMAT_S16, m_channels,

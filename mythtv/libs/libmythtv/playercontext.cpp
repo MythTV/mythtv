@@ -398,7 +398,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
 
     QString passthru_device =
         gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
-        gCoreContext->GetSetting("PassThruOutputDevice") : QString::null;
+        gCoreContext->GetSetting("PassThruOutputDevice") : QString();
 
     player->SetPlayerInfo(tv, widget, this);
     AudioPlayer *audio = player->GetAudio();

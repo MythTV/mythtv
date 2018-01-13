@@ -7260,7 +7260,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         (time = (*it).toLongLong()), ++it;
     if (it != slist.end())
         (outputfile = *it), ++it;
-    outputfile = (outputfile == "<EMPTY>") ? QString::null : outputfile;
+    outputfile = (outputfile == "<EMPTY>") ? QString() : outputfile;
     if (it != slist.end())
     {
         width = (*it).toInt(&ok); ++it;
