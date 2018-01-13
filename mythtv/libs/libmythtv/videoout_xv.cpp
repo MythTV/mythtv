@@ -366,7 +366,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                                       QString *adaptor_name)
 {
     if (adaptor_name)
-        *adaptor_name = QString::null;
+        *adaptor_name = QString();
 
     // create list of requirements to check in order..
     vector<XvAttributes> req;

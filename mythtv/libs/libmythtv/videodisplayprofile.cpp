@@ -320,7 +320,7 @@ bool ProfileItem::IsValid(QString *reason) const
     }
 
     if (reason)
-        *reason = QString::null;
+        *reason = QString();
 
     return true;
 }
