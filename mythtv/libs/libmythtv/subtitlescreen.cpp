@@ -1166,7 +1166,7 @@ static QString extract_cc608(QString &text, int &color,
     if (nextControl < 0)
     {
         result = text;
-        text = QString::null;
+        text.clear();
     }
     else
     {

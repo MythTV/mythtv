@@ -342,7 +342,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
                 .arg(info.m_tuning.GetDataURL().toString());
             LOG(VB_CHANNEL, LOG_INFO, LOC + msg);
 
-            msg = QString::null; // don't tell fetcher
+            msg.clear(); // don't tell fetcher
         }
 
         if (fetcher)

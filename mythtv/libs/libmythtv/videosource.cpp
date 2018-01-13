@@ -421,7 +421,7 @@ void TransFreqTableSelector::Load(void)
         return;
     }
 
-    loaded_freq_table = QString::null;
+    loaded_freq_table.clear();
 
     if (query.next())
     {
@@ -1491,7 +1491,7 @@ void HDHomeRunDeviceID::Load(void)
     if (!_overridedeviceid.isEmpty())
     {
         setValue(_overridedeviceid);
-        _overridedeviceid = QString::null;
+        _overridedeviceid.clear();
     }
 }
 
@@ -1728,7 +1728,7 @@ void VBoxDeviceID::Load(void)
     if (!_overridedeviceid.isEmpty())
     {
         setValue(_overridedeviceid);
-        _overridedeviceid = QString::null;
+        _overridedeviceid.clear();
     }
 }
 

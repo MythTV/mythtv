@@ -5179,7 +5179,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     if (tokens.size() == 3 && tokens[1] == "CHANID")
     {
         queuedChanID = tokens[2].toUInt();
-        queuedChanNum = QString::null;
+        queuedChanNum.clear();
         CommitQueuedInput(ctx);
     }
     else if (tokens.size() == 3 && tokens[1] == "CHANNEL")

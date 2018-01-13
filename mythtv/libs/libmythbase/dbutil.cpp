@@ -231,7 +231,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
     {
         LOG(VB_GENERAL, LOG_CRIT, QString("Database backup script does "
                                           "not exist: %1").arg(backupScript));
-        backupScript = QString::null;
+        backupScript.clear();
     }
 
     bool result = false;
@@ -502,7 +502,7 @@ QString DBUtil::GetBackupDirectory()
         {
             LOG(VB_FILE, LOG_INFO, "GetBackupDirectory() - ignoring " +
                                    directory + ", using /tmp");
-            directory = QString::null;
+            directory.clear();
         }
     }
 
@@ -770,7 +770,7 @@ bool DBUtil::QueryDBMSVersion(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Unable to determine MySQL version.");
             MythDB::DBError("DBUtil Querying DBMS version", query);
-            dbmsVersion = QString::null;
+            dbmsVersion.clear();
         }
         else
             dbmsVersion = query.value(0).toString();

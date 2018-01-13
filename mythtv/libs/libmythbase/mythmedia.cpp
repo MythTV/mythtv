@@ -514,8 +514,8 @@ MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus,
 
 void MythMediaDevice::clearData()
 {
-    m_VolumeID = QString::null;
-    m_KeyID = QString::null;
+    m_VolumeID.clear();
+    m_KeyID.clear();
     m_MediaType = MEDIATYPE_UNKNOWN;
 }
 

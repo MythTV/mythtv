@@ -317,7 +317,8 @@ QString ScanOptionalConfig::GetFrequencyTable(void) const
 bool ScanOptionalConfig::GetFrequencyTableRange(
     QString &start, QString &end) const
 {
-    start = end  = QString::null;
+    start.clear();
+    end.clear();
 
     int st = scanType->getValue().toInt();
     if (ScanTypeSetting::FullScan_ATSC == st)

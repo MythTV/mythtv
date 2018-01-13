@@ -619,7 +619,7 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
                     QString("Failed to approve '%1' deinterlacer "
                             "as a software deinterlacer")
                         .arg(m_deintfiltername));
-                m_deintfiltername = QString::null;
+                m_deintfiltername.clear();
             }
             else
             {

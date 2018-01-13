@@ -1701,7 +1701,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
         }
         else
         {
-            m_sNameSpace = QString::null;
+            m_sNameSpace.clear();
             m_sMethod    = sSOAPAction;
             m_sMethod.remove( QChar( '\"' ) );
         }

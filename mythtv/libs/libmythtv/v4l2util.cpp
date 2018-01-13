@@ -65,7 +65,8 @@ bool V4L2util::Open(const QString& dev_name, const QString& vbi_dev_name)
     qc.id = V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND;
     m_have_query_ext_ctrl = (v4l2_ioctl(m_fd, VIDIOC_QUERY_EXT_CTRL, &qc) == 0);
 
-    m_card_name = m_driver_name = QString::null;
+    m_card_name.clear();
+    m_driver_name.clear();
     m_version = 0;
     m_capabilities = 0;
 

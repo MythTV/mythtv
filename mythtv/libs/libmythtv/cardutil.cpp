@@ -1664,7 +1664,8 @@ bool CardUtil::GetV4LInfo(
     int videofd, QString &input, QString &driver, uint32_t &version,
     uint32_t &capabilities)
 {
-    input = driver = QString::null;
+    input.clear();
+    driver.clear();
     version = 0;
     capabilities = 0;
 

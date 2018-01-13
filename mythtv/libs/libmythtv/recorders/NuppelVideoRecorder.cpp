@@ -443,7 +443,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetIntOption(profile, "rtjpeglumafilter");
     }
 
-    setting = QString::null;
+    setting.clear();
     if ((tmp = profile->byName("audiocodec")))
         setting = tmp->getValue();
 

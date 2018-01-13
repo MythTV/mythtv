@@ -121,7 +121,7 @@ bool InputSelector::Parse(const QString &cardid_inputname,
                           QString       &inputname)
 {
     cardid    = 0;
-    inputname = QString::null;
+    inputname.clear();
 
     int sep0 = cardid_inputname.indexOf(':');
     if (sep0 < 1)

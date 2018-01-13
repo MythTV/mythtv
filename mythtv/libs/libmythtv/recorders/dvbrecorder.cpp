@@ -36,7 +36,7 @@
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel *channel)
     : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)
 {
-    videodevice = QString::null;
+    videodevice.clear();
 }
 
 bool DVBRecorder::Open(void)

@@ -85,7 +85,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
     for (uint i = 0; i < 2; i++)
     {
         xds_rating_systems[i] = 0;
-        xds_program_name[i]   = QString::null;
+        xds_program_name[i].clear();
     }
 
     init_xds_program_type(xds_program_type_string);

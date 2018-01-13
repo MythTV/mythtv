@@ -1856,8 +1856,11 @@ bool ChannelUtil::GetChannelData(
     bool    &commfree)
 {
     chanid        = 0;
-    tvformat      = modulation = freqtable = QString::null;
-    freqid        = dtv_si_std = QString::null;
+    tvformat.clear();
+    modulation.clear();
+    freqtable.clear();;
+    freqid.clear();
+    dtv_si_std.clear();
     finetune      = 0;
     frequency     = 0;
     mpeg_prog_num = -1;

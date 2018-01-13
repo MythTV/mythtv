@@ -491,7 +491,7 @@ void TVBrowseHelper::run()
 
                 m_lock.lock();
                 m_chanid  = chanid;
-                m_channum = QString::null;
+                m_channum.clear();
                 m_lock.unlock();
             }
             else

@@ -810,7 +810,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
             strEnd = "!";
         }
         else
-            strEnd = QString::null;
+            strEnd.clear();
     }
 
     if (!strListEnd.empty())
@@ -1129,7 +1129,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
     if (event.description.isEmpty() && !event.subtitle.isEmpty())
     {
         event.description=event.subtitle;
-        event.subtitle=QString::null;
+        event.subtitle.clear();
     }
 }
 
@@ -1421,7 +1421,7 @@ void EITFixUp::FixAUDescription(DBEventEIT &event) const
     if (event.description.isEmpty() && !event.subtitle.isEmpty())//due to ten's copyright info, this won't be caught before
     {
         event.description = event.subtitle;
-        event.subtitle = QString::null;
+        event.subtitle.clear();
     }
     if (event.description.startsWith(event.title+" - "))
         event.description.remove(0,event.title.length()+3);
@@ -1456,7 +1456,7 @@ void EITFixUp::FixAUNine(DBEventEIT &event) const
     }
     if (event.subtitle == "Movie")
     {
-        event.subtitle = QString::null;
+        event.subtitle.clear();
         event.categoryType = ProgramInfo::kCategoryMovie;
     }
     if (event.description.startsWith(event.title))

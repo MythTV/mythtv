@@ -296,12 +296,12 @@ void AudioOutput::Warn(const QString &msg)
 
 void AudioOutput::ClearError(void)
 {
-    lastError = QString::null;
+    lastError.clear();
 }
 
 void AudioOutput::ClearWarning(void)
 {
-    lastWarn = QString::null;
+    lastWarn.clear();
 }
 
 AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(

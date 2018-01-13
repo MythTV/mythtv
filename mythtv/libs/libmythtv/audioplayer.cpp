@@ -237,7 +237,8 @@ void AudioPlayer::SetAudioInfo(const QString &main_device,
                                uint           samplerate,
                                int            codec_profile)
 {
-    m_main_device = m_passthru_device = QString::null;
+    m_main_device.clear();
+    m_passthru_device.clear();
     if (!main_device.isEmpty())
     {
         m_main_device = main_device;

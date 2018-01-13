@@ -1065,7 +1065,7 @@ static void update_info(ChannelInsertInfo &info,
     if (info.service_name.isEmpty())
         info.service_name = vct->ShortChannelName(i);
 
-    info.chan_num           = QString::null;
+    info.chan_num.clear();
 
     info.service_id         = vct->ProgramNumber(i);
     info.atsc_major_channel = vct->MajorChannel(i);
@@ -1119,7 +1119,7 @@ static void update_info(ChannelInsertInfo &info,
 
         service_name = desc->ServiceName();
         if (service_name.trimmed().isEmpty())
-            service_name = QString::null;
+            service_name.clear();
     }
 
     if (info.callsign.isEmpty())
@@ -1173,7 +1173,8 @@ uint ChannelScanSM::GetCurrentTransportInfo(
 {
     if (m_current.iter() == m_scanTransports.end())
     {
-        cur_chan = cur_chan_tr = QString::null;
+        cur_chan.clear();
+        cur_chan_tr.clear();
         return 0;
     }
 
@@ -1883,7 +1884,7 @@ bool ChannelScanSM::ScanTransports(
 
             if (start.isEmpty() || name == start)
             {
-                start = QString::null;
+                start.clear();
 
                 TransportScanItem item(SourceID, std, name, name_num,
                                        freq, ft, m_signalTimeout);
