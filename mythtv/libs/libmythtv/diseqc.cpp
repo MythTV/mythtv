@@ -879,7 +879,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[5] =
     { "rotor",       kTypeRotor  },
     { "scr",         kTypeSCR    },
     { "lnb",         kTypeLNB    },
-    { QString::null, kTypeLNB    },
+    { QString(),     kTypeLNB    },
 };
 
 
@@ -1086,7 +1086,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSwitch::SwitchTypeTable[9] =
     { "diseqc_uncom", kTypeDiSEqCUncommitted },
     { "voltage",      kTypeVoltage           },
     { "mini_diseqc",  kTypeMiniDiSEqC        },
-    { QString::null,  kTypeTone              },
+    { QString(),      kTypeTone              },
 };
 
 DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
@@ -2157,7 +2157,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSCR::SCRPositionTable[3] =
 {
     { "A",            kTypeScrPosA },
     { "B",            kTypeScrPosB },
-    { QString::null,  kTypeScrPosA },
+    { QString(),      kTypeScrPosA },
 };
 
 DiSEqCDevSCR::DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
@@ -2453,7 +2453,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevLNB::LNBTypeTable[5] =
     { "voltage",      kTypeVoltageControl        },
     { "voltage_tone", kTypeVoltageAndToneControl },
     { "bandstacked",  kTypeBandstacked           },
-    { QString::null,  kTypeVoltageAndToneControl },
+    { QString(),      kTypeVoltageAndToneControl },
 };
 
 DiSEqCDevLNB::DiSEqCDevLNB(DiSEqCDevTree &tree, uint devid)
