@@ -2579,7 +2579,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     /* HLS standard doesn't provide any guaranty about streams
      being sorted by bitrate, so we sort them, higher bitrate being first */
-    qSort(m_streams.begin(), m_streams.end(), HLSStream::IsGreater);
+    std::sort(m_streams.begin(), m_streams.end(), HLSStream::IsGreater);
 
     // if we want as close to live. We should be selecting a further segment
     // m_live ? ChooseSegment(0) : 0;
