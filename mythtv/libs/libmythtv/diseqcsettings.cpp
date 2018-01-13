@@ -705,7 +705,7 @@ static lnb_preset lnb_presets[] =
                DiSEqCDevLNB::kTypeVoltageControl,       0,  5150000),
     lnb_preset(QT_TRANSLATE_NOOP("DeviceTree", "DishPro Bandstacked"),
                DiSEqCDevLNB::kTypeBandstacked,          0, 11250000, 14350000),
-    lnb_preset(QString::null, DiSEqCDevLNB::kTypeVoltageControl),
+    lnb_preset(QString(), DiSEqCDevLNB::kTypeVoltageControl),
 };
 
 static uint FindPreset(const DiSEqCDevLNB &lnb)
@@ -1369,7 +1369,7 @@ DTVDeviceConfigGroup::DTVDeviceConfigGroup(
     m_tree.Load(cardid);
 
     // initial UI setup
-    AddNodes(this, QString::null, m_tree.Root());
+    AddNodes(this, QString(), m_tree.Root());
 }
 
 DTVDeviceConfigGroup::~DTVDeviceConfigGroup(void)

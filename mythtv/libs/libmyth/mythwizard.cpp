@@ -234,7 +234,7 @@ void MythWizard::showPage( QWidget * page )
 
     layOut();
     updateButtons();
-    emit selected( p ? p->t : QString::null );
+    emit selected( p ? p->t : QString() );
 
     if (indexOf(page) == pageCount()-1) {
         // last page
@@ -495,7 +495,7 @@ void MythWizard::layOut()
     l = new QHBoxLayout();
     l->setMargin(6);
     d->v->addLayout( l, 0 );
-    layOutTitleRow( l, d->current ? d->current->t : QString::null );
+    layOutTitleRow( l, d->current ? d->current->t : QString() );
 
     if ( ! d->hbar1 ) {
         d->hbar1 = new QFrame(this, 0);

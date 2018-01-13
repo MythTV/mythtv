@@ -526,7 +526,7 @@ static void InitMSqlQueryInfo(MSqlQueryInfo &qi)
 
 
 MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
-         : QSqlQuery(QString::null, qi.qsqldb)
+         : QSqlQuery(QString(), qi.qsqldb)
 {
     m_isConnected = false;
     m_db = qi.db;

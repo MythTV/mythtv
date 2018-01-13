@@ -183,7 +183,7 @@ void TransportListEditor::SetSourceID(uint _sourceid)
 }
 
 TransportListEditor::TransportListEditor(uint sourceid) :
-    m_videosource(new VideoSourceSelector(sourceid, QString::null, false)), isLoading(false)
+    m_videosource(new VideoSourceSelector(sourceid, QString(), false)), isLoading(false)
 {
     setLabel(tr("Multiplex Editor"));
 

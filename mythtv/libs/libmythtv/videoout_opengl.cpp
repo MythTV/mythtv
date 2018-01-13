@@ -805,7 +805,7 @@ bool VideoOutputOpenGL::SetupDeinterlace(
     if (!m_deintfiltername.contains("opengl"))
     {
         gl_videochain->SetDeinterlacing(false);
-        gl_videochain->SetSoftwareDeinterlacer(QString::null);
+        gl_videochain->SetSoftwareDeinterlacer(QString());
         VideoOutput::SetupDeinterlace(interlaced, overridefilter);
         if (m_deinterlacing)
             gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);

@@ -529,7 +529,7 @@ QString getSymlinkTarget(const QString &start_file,
 
     LOG(VB_GENERAL, LOG_DEBUG,
             QString("getSymlinkTarget() -> '%1'")
-            .arg((!fi.isSymLink()) ? cur_file : QString::null));
+            .arg((!fi.isSymLink()) ? cur_file : QString()));
 #endif
 
     return (!fi.isSymLink()) ? cur_file : QString();

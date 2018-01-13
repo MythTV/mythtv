@@ -814,7 +814,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
         // Needed to make both compiler and doxygen happy.
         (void) absPath;
 
-        fillSelectionsFromDir(dir, 0, 255, QString::null, QString::null, false);
+        fillSelectionsFromDir(dir, 0, 255, QString(), QString(), false);
     }
 
     uint fillSelectionsFromDir(const QDir& dir,
@@ -900,7 +900,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
                                    "vbidevice")
     {
         setLabel(QObject::tr("VBI device"));
-        setFilter(QString::null, QString::null);
+        setFilter(QString(), QString());
         setHelpText(QObject::tr("Device to read VBI (captions) from."));
     };
 
@@ -931,7 +931,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
         // Needed to make both compiler and doxygen happy.
         (void) absPath;
 
-        fillSelectionsFromDir(dir, QString::null, QString::null);
+        fillSelectionsFromDir(dir, QString(), QString());
     }
 
     uint fillSelectionsFromDir(const QDir &dir, const QString &card,
@@ -1092,7 +1092,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
                         "should change to the name and type of your card. "
                         "If the card cannot be opened, an error message "
                         "will be displayed."));
-        fillSelections(QString::null);
+        fillSelections(QString());
     };
 
     /// \brief Adds all available cards to list
@@ -1142,7 +1142,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
     virtual void Load(void)
     {
         clearSelections();
-        addSelection(QString::null);
+        addSelection(QString());
 
         StandardSetting::Load();
 
@@ -1874,7 +1874,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         CaptureCardComboBoxSetting(parent, true, "videodevice")
     {
         setLabel(QObject::tr("ASI device"));
-        fillSelections(QString::null);
+        fillSelections(QString());
     };
 
     /// \brief Adds all available cards to list
@@ -1940,7 +1940,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
     virtual void Load(void)
     {
         clearSelections();
-        addSelection(QString::null);
+        addSelection(QString());
         GetStorage()->Load();
         fillSelections(getValue());
     }
@@ -2422,7 +2422,7 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
 {
     setVisible(false);
     QString drv = "(?!ivtv|hdpvr|(saa7164(.*))).*";
-    VideoDevice *device = new VideoDevice(parent, 0, 15, QString::null, drv);
+    VideoDevice *device = new VideoDevice(parent, 0, 15, QString(), drv);
 
     cardinfo->setLabel(tr("Probed info"));
     cardinfo->setEnabled(false);
@@ -2467,7 +2467,7 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
 {
     setVisible(false);
     QString drv = "ivtv|(saa7164(.*))";
-    device    = new VideoDevice(parent, 0, 15, QString::null, drv);
+    device    = new VideoDevice(parent, 0, 15, QString(), drv);
     vbidevice = new VBIDevice(parent);
     vbidevice->setVisible(false);
 
@@ -2607,13 +2607,13 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
                                                  CardType &a_cardtype) :
     parent(a_parent), cardinfo(new GroupSetting()),
-    audioinput(new TunerCardAudioInput(parent, QString::null, "HDPVR")),
+    audioinput(new TunerCardAudioInput(parent, QString(), "HDPVR")),
     vbidevice(NULL)
 {
     setVisible(false);
 
     VideoDevice *device =
-        new VideoDevice(parent, 0, 15, QString::null, "hdpvr");
+        new VideoDevice(parent, 0, 15, QString(), "hdpvr");
 
     cardinfo->setLabel(tr("Probed info"));
     cardinfo->setEnabled(false);
@@ -2691,7 +2691,7 @@ void V4L2encGroup::probeCard(const QString &device_name)
     if (m_device->getSubSettings()->size() == 0)
     {
         TunerCardAudioInput* audioinput =
-            new TunerCardAudioInput(m_parent, QString::null, "V4L2");
+            new TunerCardAudioInput(m_parent, QString(), "V4L2");
         if (audioinput->fillSelections(device_name) > 1)
         {
             audioinput->setName("AudioInput");

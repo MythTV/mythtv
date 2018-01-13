@@ -359,10 +359,10 @@ static void handle_transport_desc(vector<uint> &muxes,
             cd.SymbolRateHz(),    -1,
             -1,                   'a',
             -1,
-            cd.FECInnerString(),  QString::null,
-            -1,                   QString::null,
-            QString::null,        QString::null,
-            QString::null,        QString::null);
+            cd.FECInnerString(),  QString(),
+            -1,                   QString(),
+            QString(),            QString(),
+            QString(),            QString());
 
         if (mux)
             muxes.push_back(mux);
@@ -380,10 +380,10 @@ uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
         -1,                 -1,
         -1,                 -1,
         -1,
-        QString::null,      QString::null,
-        -1,                 QString::null,
-        QString::null,      QString::null,
-        QString::null,      QString::null);
+        QString(),          QString(),
+        -1,                 QString(),
+        QString(),          QString(),
+        QString(),          QString());
 }
 
 uint ChannelUtil::CreateMultiplex(

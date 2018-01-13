@@ -539,9 +539,9 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         chan.use_on_air_guide,
                         chan.hidden, chan.hidden_in_guide,
                         chan.freqid,
-                        QString::null,
-                        QString::null,
-                        QString::null,
+                        QString(),
+                        QString(),
+                        QString(),
                         chan.default_authority);
 
                     if (!transports[i].iptv_tuning.GetDataURL().isEmpty())
@@ -700,9 +700,9 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     chan.use_on_air_guide,
                     chan.hidden, chan.hidden_in_guide,
                     chan.freqid,
-                    QString::null,
-                    QString::null,
-                    QString::null,
+                    QString(),
+                    QString(),
+                    QString(),
                     chan.default_authority);
             }
 

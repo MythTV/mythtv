@@ -224,14 +224,14 @@ void VBoxChannelFetcher::run(void)
                 // mplexID will be created if necessary
                 // inversion, bandwidth, transmission_mode, polarity, hierarchy, mod_sys and roll_off are given values, but not used
                 // this is to ensure services API Channel/GetVideoMultiplexList returns a valid list
-                mplexID = ChannelUtil::CreateMultiplex(_sourceid, "dvb", 0, QString::null, transportID, networkID, 0,
-                                                       'a', 'v', 'a', 'a', QString::null, QString::null, 'a', QString::null,
-                                                       QString::null, QString::null, "UNDEFINED", "0.35");
+                mplexID = ChannelUtil::CreateMultiplex(_sourceid, "dvb", 0, QString(), transportID, networkID, 0,
+                                                       'a', 'v', 'a', 'a', QString(), QString(), 'a', QString(),
+                                                       QString(), QString(), "UNDEFINED", "0.35");
 
                 ChannelUtil::CreateChannel(mplexID, _sourceid, chanid, name, name,
                                             channum, serviceID, 0, 0,
-                                            false, false, false, QString::null,
-                                            QString::null, "Default", xmltvid);
+                                            false, false, false, QString(),
+                                            QString(), "Default", xmltvid);
 
                 ChannelUtil::CreateIPTVTuningData(chanid, (*it).m_tuning);
             }
@@ -243,15 +243,15 @@ void VBoxChannelFetcher::run(void)
                 }
 
                 // mplexID will be created if necessary
-                mplexID = ChannelUtil::CreateMultiplex(_sourceid, "dvb", 0, QString::null, transportID, networkID, 0,
-                                                       'a', 'v', 'a', 'a', QString::null, QString::null, 'a', QString::null,
-                                                       QString::null, QString::null, "UNDEFINED", "0.35");
+                mplexID = ChannelUtil::CreateMultiplex(_sourceid, "dvb", 0, QString(), transportID, networkID, 0,
+                                                       'a', 'v', 'a', 'a', QString(), QString(), 'a', QString(),
+                                                       QString(), QString(), "UNDEFINED", "0.35");
 
                 // xmltvid parameter is set to null, user may have changed it, so do not overwrite as we are only updating
                 ChannelUtil::UpdateChannel(mplexID, _sourceid, chanid, name, name,
                                            channum, serviceID, 0, 0,
-                                           false, false, false, QString::null,
-                                           QString::null, "Default", QString::null);
+                                           false, false, false, QString(),
+                                           QString(), "Default", QString());
 
                 ChannelUtil::UpdateIPTVTuningData(chanid, (*it).m_tuning);
             }

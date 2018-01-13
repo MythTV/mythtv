@@ -3011,7 +3011,7 @@ void TV::timerEvent(QTimerEvent *te)
         {
             uint tmp = switchToInputId;
             switchToInputId = 0;
-            SwitchInputs(actx, 0, QString::null, tmp);
+            SwitchInputs(actx, 0, QString(), tmp);
         }
         ReturnPlayerLock(actx);
 

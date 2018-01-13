@@ -576,7 +576,7 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
             0, 0, 0,
             query.value(15).toUInt(),    query.value(16).toUInt(),
             0,
-            QString::null,
+            QString(),
             false, false, false, false,
             false, false, false, false,
             false, false, false, 0,

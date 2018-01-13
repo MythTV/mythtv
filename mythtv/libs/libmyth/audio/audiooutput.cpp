@@ -310,7 +310,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     AudioOutputSettings aosettings(true);
     AudioOutput::AudioDeviceConfig *adc;
 
-    AudioOutput *ao = OpenAudio(name, QString::null, willsuspendpa);
+    AudioOutput *ao = OpenAudio(name, QString(), willsuspendpa);
     if (ao)
     {
         aosettings = *(ao->GetOutputSettingsCleaned());

@@ -1638,10 +1638,10 @@ static int internal_media_init()
         "MythTV's native media player."), internal_play_media);
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythDVD DVD Media Handler"), "", handleDVDMedia,
-        MEDIATYPE_DVD, QString::null);
+        MEDIATYPE_DVD, QString());
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythImage Media Handler 1/2"), "", handleGalleryMedia,
-        MEDIATYPE_DATA | MEDIATYPE_MIXED, QString::null);
+        MEDIATYPE_DATA | MEDIATYPE_MIXED, QString());
 
     QStringList extensions(ImageAdapterBase::SupportedImages()
                            + ImageAdapterBase::SupportedVideos());

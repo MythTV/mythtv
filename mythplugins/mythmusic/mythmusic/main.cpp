@@ -867,7 +867,7 @@ static void setupKeys(void)
 
     REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
         "MythMusic Media Handler 1/2"), "", handleCDMedia,
-        MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
+        MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString());
     QString filt = MetaIO::ValidFileExtensions;
     filt.replace('|',',');
     filt.remove('.');
