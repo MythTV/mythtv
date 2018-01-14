@@ -40,7 +40,9 @@
 class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.3" )
+    Q_CLASSINFO( "version"    , "2.4" )
+    Q_CLASSINFO( "AddToChannelGroup_Method",                     "POST" )
+    Q_CLASSINFO( "RemoveFromChannelGroup_Method",                "POST" )
 
     public:
 
