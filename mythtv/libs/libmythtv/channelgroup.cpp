@@ -69,8 +69,50 @@ bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
 
 bool ChannelGroup::AddChannel(uint chanid, int changrpid)
 {
-    // Check if it already exists for that chanid...
+    // Make sure the channel group exists
     MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT grpid, name FROM channelgroupnames "
+        "WHERE grpid = :GRPID");
+    query.bindValue(":GRPID", changrpid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelGroup::AddChannel", query);
+        return false;
+    }
+    else if (query.size() == 0)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("AddChannel failed to find channel group %1.").arg(changrpid));
+        return false;
+    }
+
+    query.first();
+    QString groupName = query.value(1).toString();
+
+    // Make sure the channel exists
+    query.prepare(
+        "SELECT chanid, name FROM channel "
+        "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelGroup::AddChannel", query);
+        return false;
+    }
+    else if (query.size() == 0)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("AddChannel failed to find channel %1.").arg(chanid));
+        return false;
+    }
+
+    query.first();
+    QString chanName = query.value(1).toString();
+
+    // Check if it already exists for that chanid...
     query.prepare(
         "SELECT channelgroup.id "
         "FROM channelgroup "
@@ -96,7 +138,7 @@ bool ChannelGroup::AddChannel(uint chanid, int changrpid)
             MythDB::DBError("ChannelGroup::AddChannel -- insert", query);
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Adding channel %1 to group %2.")
-                 .arg(chanid).arg(changrpid));
+                 .arg(chanName).arg(groupName));
     }
 
     return true;
