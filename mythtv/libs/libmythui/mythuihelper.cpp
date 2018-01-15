@@ -537,7 +537,7 @@ void MythUIHelper::LoadQtConfig(void)
     if (themename == "default")
         themename = "defaultmenu";
 
-    d->m_menuthemepathname = FindMenuThemeDir(themename) + '/';
+    d->m_menuthemepathname = FindMenuThemeDir(themename);
 }
 
 Settings *MythUIHelper::qtconfig(void)
