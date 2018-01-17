@@ -64,6 +64,7 @@ extern "C" {
 
 extern "C" {
 #include "libavutil/avutil.h"
+#include "libavutil/error.h"
 #include "libavutil/log.h"
 #include "libavcodec/avcodec.h"
 #include "libavcodec/mpegvideo.h"
@@ -4991,8 +4992,15 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
                 SetEof(true);
                 delete pkt;
-                errno = -retval;
-                LOG(VB_GENERAL, LOG_ERR, QString("decoding error") + ENO);
+                char errbuf[256];
+                QString errmsg;
+                if (av_strerror(retval, errbuf, sizeof errbuf) == 0)
+                    errmsg = QString(errbuf);
+                else
+                    errmsg = "UNKNOWN";
+
+                LOG(VB_GENERAL, LOG_ERR, QString("decoding error %1 (%2)")
+                    .arg(errmsg).arg(retval));
                 return false;
             }
 
