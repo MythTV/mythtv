@@ -180,7 +180,8 @@ int DVDStream::safe_read(void *data, uint size)
     int ret = 0;
 
     // Are any blocks in the range encrypted?
-    list_t::const_iterator it = qBinaryFind(m_list, BlockRange(m_pos, lb, -1)); // FIXME: qBinaryFind is deprecated
+    list_t::const_iterator it;
+    it = std::lower_bound(m_list.begin(), m_list.end(), BlockRange(m_pos, lb, -1));
     uint32_t b = it == m_list.end() ? lb : m_pos < it->Start() ? it->Start() - m_pos : 0;
     if (b)
     {
