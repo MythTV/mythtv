@@ -57,7 +57,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecendts(other.desiredrecendts),
         record(NULL),
         m_recordingFile(NULL)  { LoadRecordingFile(); }
-    RecordingInfo(const ProgramInfo &other) :
+    explicit RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
         oldrecstatus(RecStatus::Unknown),
         savedrecstatus(RecStatus::Unknown),

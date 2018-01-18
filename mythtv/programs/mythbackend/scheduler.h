@@ -73,6 +73,8 @@ class Scheduler : public MThread, public MythScheduler
     { Reschedule(ScheduledRecording::BuildPlaceRequest(why)); };
 
     void AddRecording(const RecordingInfo&);
+    void AddRecording(const ProgramInfo& prog)
+    { AddRecording(RecordingInfo(prog)); };
     void FillRecordListFromDB(uint recordid = 0);
     void FillRecordListFromMaster(void);
 

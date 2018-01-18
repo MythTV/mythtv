@@ -23,6 +23,10 @@ class MTV_PUBLIC ScheduledRecording
     static void RescheduleCheck(const RecordingInfo &recinfo, 
                                 const QString &why)
         { SendReschedule(BuildCheckRequest(recinfo, why)); };
+    // Alternate function for calling with a ProgramInfo structure
+    static void RescheduleCheck(const ProgramInfo &proginfo,
+                                const QString &why)
+        { SendReschedule(BuildCheckRequest(RecordingInfo(proginfo), why)); };
 
     // Use when none of recording rule, program data or duplicate
     // status changes.
