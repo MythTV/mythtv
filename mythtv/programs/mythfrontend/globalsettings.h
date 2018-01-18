@@ -19,7 +19,7 @@ class PlaybackSettingsDialog : public StandardSettingDialog
     Q_OBJECT
 
   public:
-    PlaybackSettingsDialog(MythScreenStack *stack);
+    explicit PlaybackSettingsDialog(MythScreenStack *stack);
     void ShowMenu(void);
 
   protected slots:
@@ -51,7 +51,7 @@ class VideoModeSettings : public HostCheckBoxSetting
     Q_OBJECT
 
   public:
-    VideoModeSettings(const char *c);
+    explicit VideoModeSettings(const char *c);
 #if defined(USING_XRANDR) || CONFIG_DARWIN
     virtual void updateButton(MythUIButtonListItem *item);
 #endif
@@ -147,7 +147,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
     Q_OBJECT
 
   public:
-    HostRefreshRateComboBoxSetting(const QString &name) :
+    explicit HostRefreshRateComboBoxSetting(const QString &name) :
         HostComboBoxSetting(name) { }
     virtual ~HostRefreshRateComboBoxSetting() { }
 

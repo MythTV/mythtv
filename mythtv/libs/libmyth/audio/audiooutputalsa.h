@@ -12,7 +12,7 @@
 class AudioOutputALSA : public AudioOutputBase
 {
   public:
-    AudioOutputALSA(const AudioSettings &settings);
+    explicit AudioOutputALSA(const AudioSettings &settings);
     virtual ~AudioOutputALSA();
 
     // Volume control

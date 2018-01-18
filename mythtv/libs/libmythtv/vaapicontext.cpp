@@ -95,7 +95,7 @@ VAProfile preferredProfile(MythCodecID codec)
 class VAAPIDisplay : ReferenceCounter
 {
   protected:
-    VAAPIDisplay(VAAPIDisplayType display_type) :
+    explicit VAAPIDisplay(VAAPIDisplayType display_type) :
         ReferenceCounter("VAAPIDisplay"),
         m_va_disp_type(display_type),
         m_va_disp(NULL), m_x_disp(NULL),

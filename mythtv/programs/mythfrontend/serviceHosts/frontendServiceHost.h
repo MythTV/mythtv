@@ -7,7 +7,7 @@
 class FrontendServiceHost : public ServiceHost
 {
   public:
-    FrontendServiceHost(const QString &sSharePath)
+    explicit FrontendServiceHost(const QString &sSharePath)
       : ServiceHost(Frontend::staticMetaObject, "Frontend", "/Frontend", sSharePath)
     {
     }

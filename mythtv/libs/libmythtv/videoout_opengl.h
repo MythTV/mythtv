@@ -12,7 +12,7 @@ class VideoOutputOpenGL : public VideoOutput
 {
   public:
     static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
-    VideoOutputOpenGL(const QString &profile = QString());
+    explicit VideoOutputOpenGL(const QString &profile = QString());
     virtual ~VideoOutputOpenGL();
 
     virtual bool Init(const QSize &video_dim_buf,

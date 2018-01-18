@@ -138,7 +138,7 @@ class MTV_PUBLIC MythPlayer
     friend class Transcode;
 
   public:
-    MythPlayer(PlayerFlags flags = kNoFlags);
+    explicit MythPlayer(PlayerFlags flags = kNoFlags);
     MythPlayer(const MythPlayer& rhs);
     virtual ~MythPlayer();
 

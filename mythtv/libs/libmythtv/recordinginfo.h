@@ -69,7 +69,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         desiredrecendts(endts),
         record(NULL),
         m_recordingFile(NULL)  { LoadRecordingFile(); }
-    RecordingInfo(uint _recordedid) :
+    explicit RecordingInfo(uint _recordedid) :
         ProgramInfo(_recordedid),
         oldrecstatus(RecStatus::Unknown),
         savedrecstatus(RecStatus::Unknown),

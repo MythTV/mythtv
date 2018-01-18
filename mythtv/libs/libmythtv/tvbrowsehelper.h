@@ -20,7 +20,7 @@ class TV;
 class BrowseInfo
 {
   public:
-    BrowseInfo(BrowseDirection dir) :
+    explicit BrowseInfo(BrowseDirection dir) :
         m_dir(dir), m_chanid(0), m_sourceid(0)
     {
     }

@@ -11,7 +11,7 @@
 class ChromaKeyOSD
 {
   public:
-    ChromaKeyOSD(VideoOutputXv *vo) :
+    explicit ChromaKeyOSD(VideoOutputXv *vo) :
         current_size(QSize()), current_rect(QRect()),
         videoOutput(vo), img(NULL), image(NULL), painter(NULL), visible(false)
     {

@@ -176,7 +176,7 @@ EMBEDRETURNVOIDFINDER TV::RunProgramFinderPtr = NULL;
 class DDLoader : public QRunnable
 {
   public:
-    DDLoader(TV *parent) : m_parent(parent), m_sourceid(0)
+    explicit DDLoader(TV *parent) : m_parent(parent), m_sourceid(0)
     {
         setAutoDelete(false);
     }
