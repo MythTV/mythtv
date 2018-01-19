@@ -522,13 +522,13 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *demuxstr,subtitle_t *curre
   do {
     if (!read_line_from_input(demuxstr, line, LINE_LEN)) return NULL;
   } while (sscanf (line, "Dialogue: Marked=%d,%d:%d:%d.%d,%d:%d:%d.%d,"
-                   "%[^\n\r]", &nothing,
+                   "%" LINE_LEN_QUOT "[^\n\r]", &nothing,
                    &hour1, &min1, &sec1, &hunsec1,
                    &hour2, &min2, &sec2, &hunsec2,
                    line3) < 9
            &&
            sscanf (line, "Dialogue: %d,%d:%d:%d.%d,%d:%d:%d.%d,"
-                   "%[^\n\r]", &nothing,
+                   "%" LINE_LEN_QUOT "[^\n\r]", &nothing,
                    &hour1, &min1, &sec1, &hunsec1,
                    &hour2, &min2, &sec2, &hunsec2,
                    line3) < 9       );
@@ -700,15 +700,15 @@ static subtitle_t *sub_read_line_aqt (demux_sputext_t *demuxstr, subtitle_t *cur
 }
 
 static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t *current) {
-    char line1[LINE_LEN], line2[LINE_LEN], directive[LINE_LEN], *p, *q;
+    char line1[LINE_LEN+1], line2[LINE_LEN+1], directive[LINE_LEN+1], *p, *q;
     unsigned a1, a2, a3, a4, b1, b2, b3, b4, comment = 0;
     static unsigned jacoTimeres = 30;
     static int jacoShift = 0;
 
     memset(current, 0, sizeof(subtitle_t));
-    memset(line1, 0, LINE_LEN);
-    memset(line2, 0, LINE_LEN);
-    memset(directive, 0, LINE_LEN);
+    memset(line1, 0, LINE_LEN+1);
+    memset(line2, 0, LINE_LEN+1);
+    memset(directive, 0, LINE_LEN+1);
     while (!current->text[0]) {
         if (!read_line_from_input(demuxstr, line1, LINE_LEN)) {
             return NULL;
@@ -794,7 +794,7 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
         if (isalpha(*p)||*p == '[') {
             int cont, jLength;
 
-            if (sscanf(p, "%s %" LINE_LEN_QUOT "[^\n\r]", directive, line1) < 2)
+            if (sscanf(p, "%" LINE_LEN_QUOT "s %" LINE_LEN_QUOT "[^\n\r]", directive, line1) < 2)
                 return (subtitle_t *)ERR;
             jLength = strlen(directive);
             for (cont = 0; cont < jLength; ++cont) {
@@ -983,7 +983,7 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
   do {
      if (!read_line_from_input (demuxstr, line, LINE_LEN)) return NULL;
   } while ((sscanf (line,
-                      "[%ld][%ld]%[^\r\n]",
+                      "[%ld][%ld]%" LINE_LEN_QUOT "[^\r\n]",
                       &(current->start), &(current->end), line2) < 3));
   current->start *= 10;
   current->end *= 10;
