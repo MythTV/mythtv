@@ -1148,7 +1148,12 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
     if(demuxstr->num>=n_max){
       n_max+=16;
-      first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
+      subtitle_t *new_first=(subtitle_t *)realloc(first,n_max*sizeof(subtitle_t));
+      if (new_first == NULL) {
+          free(first);
+          return NULL;
+      }
+      first = new_first;
     }
 
     sub = func[demuxstr->format] (demuxstr, &first[demuxstr->num]);
