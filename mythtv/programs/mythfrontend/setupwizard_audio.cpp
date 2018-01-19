@@ -413,7 +413,7 @@ bool AudioSetupWizard::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
 
-    if (!handled && MythScreenType::keyPressEvent(event))
+    if (MythScreenType::keyPressEvent(event))
         handled = true;
 
     return handled;
