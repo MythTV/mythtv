@@ -94,7 +94,7 @@ static QString PtsTime(int64_t pts)
         is_neg = true;
     }
     QString msg;
-    return(msg.sprintf("%s%02d:%02d:%02d.%03d", (is_neg) ? "-" : "",
+    return(msg.sprintf("%s%02u:%02u:%02u.%03u", (is_neg) ? "-" : "",
                 (unsigned int)(pts / 90000.) / 3600,
                 ((unsigned int)(pts / 90000.) % 3600) / 60,
                 ((unsigned int)(pts / 90000.) % 3600) % 60,

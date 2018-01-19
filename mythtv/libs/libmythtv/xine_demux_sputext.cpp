@@ -737,17 +737,17 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
                                 if (sscanf
                                     (&line1[delta], "%*d:%*d:%d",
                                      &seconds)) {
-                                    sscanf(&line1[delta], "%*d:%*d:%*d.%d",
+                                    sscanf(&line1[delta], "%*d:%*d:%*d.%u",
                                            &units);
                                 } else {
                                     hours = 0;
-                                    sscanf(&line1[delta], "%d:%d.%d",
+                                    sscanf(&line1[delta], "%d:%d.%u",
                                            &minutes, &seconds, &units);
                                     minutes *= inverter;
                                 }
                             } else {
                                 hours = minutes = 0;
-                                sscanf(&line1[delta], "%d.%d", &seconds,
+                                sscanf(&line1[delta], "%d.%u", &seconds,
                                        &units);
                                 seconds *= inverter;
                             }

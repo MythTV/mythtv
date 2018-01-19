@@ -258,9 +258,9 @@ static QString construct_sort_title(
 
         QString sortprefix;
         if (recpriority > 0)
-            sortprefix.sprintf("+%03u", 1000 - recpriority);
+            sortprefix.sprintf("+%03d", 1000 - recpriority);
         else
-            sortprefix.sprintf("-%03u", -recpriority);
+            sortprefix.sprintf("-%03d", -recpriority);
 
         sTitle = sortprefix + '-' + sTitle;
     }
