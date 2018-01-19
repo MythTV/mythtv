@@ -31,7 +31,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
 {
     FILE            *fp;
     long long       frameno;
-    int             counter[UCHAR_MAX + 1];
+    quint32         counter[UCHAR_MAX + 1];
 
     QByteArray fname = filename.toLocal8Bit();
     if (!(fp = fopen(fname.constData(), "r")))
@@ -69,7 +69,7 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
                         .arg(filename).arg(frameno));
                 goto error;
             }
-            if (counter[ii] < 0 || (uint)(counter[ii]) > UCHAR_MAX)
+            if (counter[ii] > UCHAR_MAX)
             {
                 LOG(VB_COMMFLAG, LOG_ERR,
                     QString("Data out of range in %1: frame %2")
