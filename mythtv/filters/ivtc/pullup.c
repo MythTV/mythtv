@@ -630,7 +630,10 @@ static void print_aff_and_breaks(struct pullup_context *c, struct pullup_field *
 	f = f0;
 	printf("\nbreaks:   ");
 	for (i=0; i<4; i++) {
-		printf("%c%d%c", f->breaks & BREAK_LEFT ? '|' : '.', i, f->breaks & BREAK_RIGHT ? '|' : '.');
+		printf("%c%d%c",
+                       (f->breaks & BREAK_LEFT) ? '|' : '.',
+                       i,
+                       (f->breaks & BREAK_RIGHT) ? '|' : '.');
 		f = f->next;
 	}
 	printf("\n");
