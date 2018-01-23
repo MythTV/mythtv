@@ -29,11 +29,4 @@
         <action>TV_PREVIOUS</action>
     </button>
 
-    <button>
-        <type>TV_PREVIOUS</type>
-        <text>Prev Rec (Deprecated)</text>
-        <description>Old version of Previously Recorded</description>
-        <action>TV_PREVIOUS_OLD</action>
-    </button>
-
 </mythmenu>
