@@ -742,7 +742,7 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 {
     ScanDTVTransportList no_dups;
 
-    DTVTunerType tuner_type = DTVTunerType::kTunerTypeATSC;
+    DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     if (!transports.empty())
         tuner_type = transports[0].tuner_type;
 
@@ -834,7 +834,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 {
     ScanDTVTransportList not_in_scan;
 
-    DTVTunerType tuner_type = DTVTunerType::kTunerTypeATSC;
+    DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     if (!transports.empty())
         tuner_type = transports[0].tuner_type;
 

@@ -57,7 +57,7 @@ ScanWizard::ScanWizard(uint    default_sourceid,
 void ScanWizard::Scan()
 {
     QMap<QString,QString> start_chan;
-    DTVTunerType parse_type = DTVTunerType::kTunerTypeUnknown;
+    DTVTunerType parse_type(DTVTunerType::kTunerTypeUnknown);
 
     uint    cardid    = GetCardID();
     QString inputname = GetInputName();

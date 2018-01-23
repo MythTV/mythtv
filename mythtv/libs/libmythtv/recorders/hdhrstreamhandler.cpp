@@ -338,22 +338,22 @@ bool HDHRStreamHandler::Open(void)
             if (status_channel ==  "none")
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is not present");
-                _tuner_types.push_back(DTVTunerType::kTunerTypeATSC);
+                _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
             }
             else
             {
                 LOG(VB_RECORD, LOG_INFO, LOC + "Cable card is present");
-                _tuner_types.push_back(DTVTunerType::kTunerTypeOCUR);
+                _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeOCUR));
             }
         }
         else if (QString(model).toLower().contains("dvb"))
         {
-            _tuner_types.push_back(DTVTunerType::kTunerTypeDVBT);
-            _tuner_types.push_back(DTVTunerType::kTunerTypeDVBC);
+            _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBT));
+            _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeDVBC));
         }
         else
         {
-            _tuner_types.push_back(DTVTunerType::kTunerTypeATSC);
+            _tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeATSC));
         }
 
         return true;

@@ -66,7 +66,7 @@ typedef vector<DTVChannelInfo> DTVChannelInfoList;
 class DTVTransport : public DTVMultiplex
 {
   public:
-    DTVTransport(const DTVMultiplex &other) : DTVMultiplex(other) { }
+    explicit DTVTransport(const DTVMultiplex &other) : DTVMultiplex(other) { }
 
   public:
     DTVChannelInfoList channels;

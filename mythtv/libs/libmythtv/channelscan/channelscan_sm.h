@@ -120,6 +120,7 @@ class ChannelScanSM : public MPEGStreamListener,
     void SetSignalTimeout(uint val)    { m_signalTimeout = val; }
     void SetChannelTimeout(uint val)   { m_channelTimeout = val; }
     void SetScanDTVTunerType(DTVTunerType t) { m_scanDTVTunerType = t; }
+    void SetScanDTVTunerType(int t) { m_scanDTVTunerType = DTVTunerType(t); }
 
     uint GetSignalTimeout(void)  const { return m_signalTimeout; }
     uint GetChannelTimeout(void) const { return m_channelTimeout; }

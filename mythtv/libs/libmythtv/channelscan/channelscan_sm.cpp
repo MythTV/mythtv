@@ -714,7 +714,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             uint64_t frequency = 0;
             const MPEGDescriptor desc(list[j]);
             uint tag = desc.DescriptorTag();
-            DTVTunerType tt = DTVTunerType::kTunerTypeUnknown;
+            DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
 
             switch (tag)
             {
@@ -1443,7 +1443,8 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(void) const
 
     uint cardid = m_channel->GetInputID();
 
-    DTVTunerType tuner_type = GuessDTVTunerType(DTVTunerType::kTunerTypeATSC);
+    DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
+    tuner_type = GuessDTVTunerType(tuner_type);
 
     ChannelList::const_iterator it = m_channelList.begin();
     for (; it != m_channelList.end(); ++it)
@@ -2088,7 +2089,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
     uint    sourceid   = query.value(0).toUInt();
     QString sistandard = query.value(1).toString();
     uint    tsid       = query.value(2).toUInt();
-    DTVTunerType tt = DTVTunerType::kTunerTypeUnknown;
+    DTVTunerType tt(DTVTunerType::kTunerTypeUnknown);
 
     QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
         QString("Multiplex #%1").arg(mplexid);
