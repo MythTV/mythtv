@@ -640,7 +640,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (tuner_type.IsFECVariable())
     {
         cmdseq->props[c].cmd      = DTV_INNER_FEC;
-        cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO : tuning.fec;
+        cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO
+            : (fe_code_rate_t) (int) tuning.fec;
     }
 
     if (tuner_type == DTVTunerType::kTunerTypeDVBT ||
