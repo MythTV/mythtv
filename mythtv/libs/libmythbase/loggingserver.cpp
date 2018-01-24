@@ -616,7 +616,13 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
         // and suppress additional errors for one second after the
         // previous error (to avoid spamming the log).
         QSqlError err = query.lastError();
-        if ((err.type() != 1 || err.number() != -1) &&
+        if ((err.type() != 1
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
+             || err.number() != -1
+#else
+             || !err.nativeErrorCode().isEmpty()
+#endif
+                ) &&
             (!m_errorLoggingTime.isValid() ||
              (m_errorLoggingTime.elapsed() > 1000)))
         {
