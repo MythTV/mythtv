@@ -560,32 +560,60 @@ QString ImportIconsWizard::wget(QUrl& url, const QString& strParam )
     return QString();
 }
 
+#include <QTemporaryFile>
 bool ImportIconsWizard::checkAndDownload(const QString& url, const QString& localChanId)
 {
-    QString iconUrl = url;
     QString filename = url.section('/', -1);
-    QFileInfo file(m_strChannelDir+filename);
+    QString filePath = m_strChannelDir + filename;
 
     // If we get to this point we've already checked whether the icon already
     // exist locally, we want to download anyway to fix a broken image or
     // get the latest version of the icon
-    bool fRet = GetMythDownloadManager()->download(iconUrl, file.absoluteFilePath());
 
-    if (fRet)
+    QTemporaryFile tmpFile(filePath);
+    if (!tmpFile.open())
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        QString  qstr = "UPDATE channel SET icon = :ICON "
-                        "WHERE chanid = :CHANID";
+        LOG(VB_GENERAL, LOG_INFO, "Icon Download: Couldn't create temporary file");
+        return false;
+    }
 
-        query.prepare(qstr);
-        query.bindValue(":ICON", filename);
-        query.bindValue(":CHANID", localChanId);
+    bool fRet = GetMythDownloadManager()->download(url, tmpFile.fileName());
 
-        if (!query.exec())
-        {
-            MythDB::DBError("Error inserting channel icon", query);
-            return false;
-        }
+    if (!fRet)
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Download for icon %1 failed").arg(filename));
+        return false;
+    }
+
+    QImage icon(tmpFile.fileName());
+    if (icon.isNull())
+    {
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Downloaded icon for %1 isn't a valid image").arg(filename));
+        return false;
+    }
+
+    // Remove any existing icon
+    QFile file(filePath);
+    file.remove();
+
+    // Rename temporary file & prevent it being cleaned up
+    tmpFile.rename(filePath);
+    tmpFile.setAutoRemove(false);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString  qstr = "UPDATE channel SET icon = :ICON "
+                    "WHERE chanid = :CHANID";
+
+    query.prepare(qstr);
+    query.bindValue(":ICON", filename);
+    query.bindValue(":CHANID", localChanId);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Error inserting channel icon", query);
+        return false;
     }
 
     return fRet;
