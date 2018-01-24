@@ -33,7 +33,9 @@
 #define _DTVCONFPARSERHELPERS_H_
 
 #include <QString>
+#ifdef USING_DVB
 #include <linux/dvb/frontend.h>
+#endif
 
 // The following are a set of helper classes to allow easy translation
 // between the different string representations of various tuning params.
@@ -165,17 +167,24 @@ class DTVInversion : public DTVParamHelper
   public:
     enum Types
     {
-        kInversionOff = INVERSION_OFF,
+        kInversionOff,
         kInversionOn,
         kInversionAuto,
     };
+#ifdef USING_DVB
+    static_assert((kInversionOff == (Types)INVERSION_OFF)
+                  && (kInversionAuto == (Types)INVERSION_AUTO),
+                  "Inversion types don't match DVB includes.");
+#endif
 
     explicit DTVInversion(Types _default = kInversionAuto)
         : DTVParamHelper(_default) { }
     DTVInversion& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVInversion& operator=(const fe_spectral_inversion_t type)
         { value = type; return *this; }
+#endif
 
     bool IsCompatible(const DTVInversion &other) const
         { return value == other.value || value == kInversionAuto ||
@@ -210,18 +219,25 @@ class DTVBandwidth : public DTVParamHelper
   public:
     enum Types
     {
-        kBandwidth8MHz = BANDWIDTH_8_MHZ,
+        kBandwidth8MHz,
         kBandwidth7MHz,
         kBandwidth6MHz,
         kBandwidthAuto,
     };
+#ifdef USING_DVB
+    static_assert((kBandwidth8MHz == (Types)BANDWIDTH_8_MHZ)
+                  && (kBandwidthAuto == (Types)BANDWIDTH_AUTO),
+                  "Bandwidth types don't match DVB includes.");
+#endif
 
     explicit DTVBandwidth(Types _default = kBandwidthAuto)
         : DTVParamHelper(_default) { }
     DTVBandwidth& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVBandwidth& operator=(const fe_bandwidth_t bwidth)
         { value = bwidth; return *this; }
+#endif
 
     bool IsCompatible(const DTVBandwidth &other) const
         { return value == other.value || value == kBandwidthAuto ||
@@ -256,7 +272,7 @@ class DTVCodeRate : public DTVParamHelper
   public:
     enum Types
     {
-        kFECNone = FEC_NONE,
+        kFECNone,
         kFEC_1_2,
         kFEC_2_3,
         kFEC_3_4,
@@ -269,13 +285,20 @@ class DTVCodeRate : public DTVParamHelper
         kFEC_3_5,
         kFEC_9_10,
     };
+#ifdef USING_DVB
+    static_assert((kFECNone == (Types)FEC_NONE)
+                  && (kFEC_9_10 == (Types)FEC_9_10),
+                  "FEC types don't match DVB includes.");
+#endif
 
     explicit DTVCodeRate(Types _default = kFECAuto)
         : DTVParamHelper(_default) { }
     DTVCodeRate& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVCodeRate& operator=(const fe_code_rate_t rate)
         { value = rate; return *this; }
+#endif
 
     bool IsCompatible(const DTVCodeRate &other) const
         { return value == other.value || value == kFECAuto ||
@@ -307,7 +330,7 @@ class DTVModulation : public DTVParamHelper
   public:
     enum Types
     {
-        kModulationQPSK = QPSK,
+        kModulationQPSK,
         kModulationQAM16,
         kModulationQAM32,
         kModulationQAM64,
@@ -323,13 +346,20 @@ class DTVModulation : public DTVParamHelper
         kModulationInvalid = 0x100, /* for removed modulations */
         kModulationAnalog  = 0x200, /* for analog channel scanner */
     };
+#ifdef USING_DVB
+    static_assert((kModulationQPSK == (Types)QPSK)
+                  && (kModulationDQPSK == (Types)DQPSK),
+                  "Modulation types don't match DVB includes.");
+#endif
 
     explicit DTVModulation(Types _default = kModulationQAMAuto)
         : DTVParamHelper(_default) { }
     DTVModulation& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVModulation& operator=(const fe_modulation_t modulation)
         { value = modulation; return *this; }
+#endif
 
     bool IsCompatible(const DTVModulation &other) const
         { return value == other.value || value == kModulationQAMAuto ||
@@ -367,17 +397,24 @@ class DTVTransmitMode : public DTVParamHelper
   public:
     enum Types
     {
-        kTransmissionMode2K = TRANSMISSION_MODE_2K,
+        kTransmissionMode2K,
         kTransmissionMode8K,
         kTransmissionModeAuto,
     };
+#ifdef USING_DVB
+    static_assert((kTransmissionMode2K == (Types)TRANSMISSION_MODE_2K)
+                  && (kTransmissionModeAuto == (Types)TRANSMISSION_MODE_AUTO),
+                  "Transmission types don't match DVB includes.");
+#endif
 
     explicit DTVTransmitMode(Types _default = kTransmissionModeAuto)
         : DTVParamHelper(_default) { }
     DTVTransmitMode& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVTransmitMode& operator=(const fe_transmit_mode_t mode)
         { value = mode; return *this; }
+#endif
 
     bool IsCompatible(const DTVTransmitMode &other) const
         { return value == other.value || value == kTransmissionModeAuto ||
@@ -412,19 +449,26 @@ class DTVGuardInterval : public DTVParamHelper
   public:
     enum Types
     {
-        kGuardInterval_1_32 = GUARD_INTERVAL_1_32,
+        kGuardInterval_1_32,
         kGuardInterval_1_16,
         kGuardInterval_1_8,
         kGuardInterval_1_4,
         kGuardIntervalAuto,
     };
+#ifdef USING_DVB
+    static_assert((kGuardInterval_1_32 == (Types)GUARD_INTERVAL_1_32)
+                  && (kGuardIntervalAuto == (Types)GUARD_INTERVAL_AUTO),
+                  "Guard Interval types don't match DVB includes.");
+#endif
 
     explicit DTVGuardInterval(Types _default = kGuardIntervalAuto)
         : DTVParamHelper(_default) { }
     DTVGuardInterval& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVGuardInterval& operator=(const fe_guard_interval_t interval)
         { value = interval; return *this; }
+#endif
 
     bool IsCompatible(const DTVGuardInterval &other) const
         { return value == other.value || value == kGuardIntervalAuto ||
@@ -456,19 +500,26 @@ class DTVHierarchy : public DTVParamHelper
   public:
     enum Types
     {
-        kHierarchyNone = HIERARCHY_NONE,
+        kHierarchyNone,
         kHierarchy1,
         kHierarchy2,
         kHierarchy4,
         kHierarchyAuto,
     };
+#ifdef USING_DVB
+    static_assert((kHierarchyNone == (Types)HIERARCHY_NONE)
+                  && (kHierarchyAuto == (Types)HIERARCHY_AUTO),
+                  "Hierarchy types don't match DVB includes.");
+#endif
 
     explicit DTVHierarchy(Types _default = kHierarchyAuto)
         : DTVParamHelper(_default) { }
     DTVHierarchy& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVHierarchy& operator=(const fe_hierarchy_t hierarchy)
         { value = hierarchy; return *this; }
+#endif
 
     bool IsCompatible(const DTVHierarchy &other) const
         { return value == other.value || value == kHierarchyAuto ||
@@ -541,7 +592,7 @@ class DTVModulationSystem : public DTVParamHelper
     enum Types
     {
         // see fe_delivery_system in frontend.h
-        kModulationSystem_UNDEFINED = SYS_UNDEFINED,
+        kModulationSystem_UNDEFINED,
         kModulationSystem_DVBC_ANNEX_AC,
         kModulationSystem_DVBC_ANNEX_B,
         kModulationSystem_DVBT,
@@ -561,13 +612,20 @@ class DTVModulationSystem : public DTVParamHelper
         kModulationSystem_TURBO,
         kModulationSystem_DVBC_ANNEX_C
     };
+#ifdef USING_DVB
+    static_assert((kModulationSystem_UNDEFINED == (Types)SYS_UNDEFINED)
+                  && (kModulationSystem_DVBC_ANNEX_C == (Types)SYS_DVBC_ANNEX_C),
+                  "Modulation System types don't match DVB includes.");
+#endif
 
     explicit DTVModulationSystem(Types _default = kModulationSystem_UNDEFINED)
         : DTVParamHelper(_default) { }
     DTVModulationSystem& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVModulationSystem& operator=(fe_delivery_system_t type)
         { value = type; return *this; }
+#endif
 
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
@@ -594,18 +652,25 @@ class DTVRollOff : public DTVParamHelper
   public:
     enum Types
     {
-        kRollOff_35 = ROLLOFF_35,
+        kRollOff_35,
         kRollOff_20,
         kRollOff_25,
         kRollOff_Auto,
     };
+#ifdef USING_DVB
+    static_assert((kRollOff_35 == (Types)ROLLOFF_35)
+                  && (kRollOff_Auto == (Types)ROLLOFF_AUTO),
+                  "Rolloff types don't match DVB includes.");
+#endif
 
     explicit DTVRollOff(Types _default = kRollOff_35)
         : DTVParamHelper(_default) { }
     DTVRollOff& operator=(const Types _value)
         { value = _value; return *this; }
+#ifdef USING_DVB
     DTVRollOff& operator=(fe_rolloff_t type)
         { value = type; return *this; }
+#endif
 
     bool IsCompatible(const DTVRollOff &other) const
         { return value == other.value || value == kRollOff_Auto ||
