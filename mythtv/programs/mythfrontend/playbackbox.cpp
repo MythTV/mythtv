@@ -2528,6 +2528,9 @@ bool PlaybackBox::Play(
     m_playingSomething = true;
     int initIndex = m_recordingList->StopLoad();
 
+    if (!gCoreContext->GetNumSetting("UseProgStartMark", 0))
+        ignoreProgStart = true;
+
     uint flags =
         (inPlaylist          ? kStartTVInPlayList       : kStartTVNoFlags) |
         (underNetworkControl ? kStartTVByNetworkCommand : kStartTVNoFlags) |

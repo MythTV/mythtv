@@ -1666,6 +1666,23 @@ static HostCheckBoxSetting *AltClearSavedPosition()
     return gc;
 }
 
+static HostCheckBoxSetting *UseProgStartMark()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("UseProgStartMark");
+
+    gc->setLabel(PlaybackSettings::tr("Playback from start of program"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(PlaybackSettings::tr("If enabled and no bookmark is set, "
+                                         "playback starts at the program "
+                                         "scheduled start time rather than "
+                                         "the beginning of the recording. "
+                                         "Useful for automatically skipping "
+                                         "'start early' parts of a recording."));
+    return gc;
+}
+
 static HostComboBoxSetting *PlaybackExitPrompt()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("PlaybackExitPrompt");
@@ -3993,6 +4010,7 @@ void PlaybackSettings::Load(void)
     general->addChild(JumpToProgramOSD());
     general->addChild(ClearSavedPosition());
     general->addChild(AltClearSavedPosition());
+    general->addChild(UseProgStartMark());
     general->addChild(AutomaticSetWatched());
     general->addChild(ContinueEmbeddedTVPlay());
     general->addChild(LiveTVIdleTimeout());
