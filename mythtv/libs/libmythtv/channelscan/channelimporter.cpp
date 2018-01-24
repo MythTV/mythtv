@@ -1599,8 +1599,6 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         }
         else
             delete textEdit;
-        delete popup;
-        popup = NULL;
     }
 
     bool ok = (0 == dc);
