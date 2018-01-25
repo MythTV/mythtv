@@ -2076,8 +2076,8 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             }
 
             st->component_tag = item->dvbci.component_tag;
-            st->codec->flags  = item->dvbci.data_id;
-            st->codec->sub_id = item->dvbci.carousel_id;
+            st->data_id  = item->dvbci.data_id;
+            st->carousel_id = item->dvbci.carousel_id;
 
             ts->pmt_pids[ts->pid_cnt] = item->pid;
             ts->pid_cnt++;
@@ -2140,7 +2140,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                 av_dict_set(&st->metadata, "language", item->dvbci.language, 0);
 
             if (item->dvbci.sub_id && (item->codec_id == AV_CODEC_ID_DVB_SUBTITLE))
-                st->codec->sub_id = item->dvbci.sub_id;
+                st->carousel_id = item->dvbci.sub_id;
 
             st->component_tag = item->dvbci.component_tag;
 

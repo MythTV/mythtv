@@ -3982,9 +3982,8 @@ void AvFormatDecoder::ProcessDSMCCPacket(
     {
         QMutexLocker locker(avcodeclock);
         componentTag    = str->component_tag;
-        // DEPRECATED need to get rid of str->codec
-        dataBroadcastId = str->codec->flags;
-        carouselId      = (unsigned) str->codec->sub_id;
+        dataBroadcastId = str->data_id;
+        carouselId  = (unsigned) str->carousel_id;
     }
     while (length > 3)
     {
