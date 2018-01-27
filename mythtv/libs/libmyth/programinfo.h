@@ -426,7 +426,6 @@ class MPUBLIC ProgramInfo
     uint    GetRecordingID(void)              const { return recordedid; }
     RecStatus::Type GetRecordingStatus(void)    const
         { return (RecStatus::Type)recstatus; }
-    uint    GetPreferedInputID(void)          const { return prefinput; }
     uint    GetRecordingRuleID(void)          const { return recordid;  }
     uint    GetParentRecordingRuleID(void)    const { return parentid;  }
     RecordingType GetRecordingRuleType(void)  const
@@ -763,7 +762,6 @@ class MPUBLIC ProgramInfo
     QDateTime lastmodified;
     QDateTime lastInUseTime;
 
-    uint32_t prefinput;
     int32_t recpriority2;
 
     uint32_t recordid;

@@ -196,7 +196,6 @@ ProgramInfo::ProgramInfo(void) :
     lastmodified(startts),
     lastInUseTime(startts.addSecs(-4 * 60 * 60)),
 
-    prefinput(0),
     recpriority2(0),
     recordid(0),
     parentid(0),
@@ -281,7 +280,6 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     lastmodified(other.lastmodified),
     lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
-    prefinput(other.prefinput),
     recpriority2(other.recpriority2),
     recordid(other.recordid),
     parentid(other.parentid),
@@ -466,7 +464,6 @@ ProgramInfo::ProgramInfo(
     lastmodified(_lastmodified),
     lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
-    prefinput(0),
     recpriority2(0),
     recordid(_recordid),
     parentid(0),
@@ -586,7 +583,6 @@ ProgramInfo::ProgramInfo(
     lastmodified(startts),
     lastInUseTime(MythDate::current().addSecs(-4 * 60 * 60)),
 
-    prefinput(0),
     recpriority2(0),
     recordid(_recordid),
     parentid(0),
@@ -715,7 +711,6 @@ ProgramInfo::ProgramInfo(
     lastmodified(startts),
     lastInUseTime(startts.addSecs(-4 * 60 * 60)),
 
-    prefinput(0),
     recpriority2(0),
     recordid(_recordid),
     parentid(0),
@@ -874,7 +869,6 @@ ProgramInfo::ProgramInfo(
     lastmodified(MythDate::current()),
     lastInUseTime(lastmodified.addSecs(-4 * 60 * 60)),
 
-    prefinput(0),
     recpriority2(0),
     recordid(0),
     parentid(0),
@@ -1119,7 +1113,6 @@ void ProgramInfo::clone(const ProgramInfo &other,
 
     recstatus = other.recstatus;
 
-    prefinput = other.prefinput;
     recpriority2 = other.recpriority2;
     recordid = other.recordid;
     parentid = other.parentid;
@@ -1230,7 +1223,6 @@ void ProgramInfo::clear(void)
 
     recstatus = RecStatus::Unknown;
 
-    prefinput = 0;
     recpriority2 = 0;
     recordid = 0;
     parentid = 0;
@@ -2007,7 +1999,6 @@ bool ProgramInfo::LoadProgramFromRecorded(
         catType = kCategoryNone;
         lastInUseTime = MythDate::current().addSecs(-4 * 60 * 60);
         rectype = kNotRecording;
-        prefinput = 0;
         recpriority2 = 0;
         parentid = 0;
         sourceid = 0;
@@ -2094,7 +2085,6 @@ bool ProgramInfo::LoadProgramFromRecorded(
 
     recstatus    = RecStatus::Recorded;
 
-    /**///prefinput;
     /**///recpriority2;
 
     recordid     = query.value(29).toUInt();
