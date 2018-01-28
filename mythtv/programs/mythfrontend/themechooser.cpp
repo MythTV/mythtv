@@ -231,7 +231,7 @@ void ThemeChooser::Load(void)
 
     ResetBusyPopup();
 
-    qSort(m_infoList.begin(), m_infoList.end(), sortThemeNames);
+    std::sort(m_infoList.begin(), m_infoList.end(), sortThemeNames);
 }
 
 void ThemeChooser::LoadVersion(const QString &version,
