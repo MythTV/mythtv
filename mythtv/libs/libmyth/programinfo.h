@@ -281,6 +281,7 @@ class MPUBLIC ProgramInfo
             clear();
     }
 
+    bool operator==(const ProgramInfo& rhs);
     ProgramInfo &operator=(const ProgramInfo &other);
     virtual void clone(const ProgramInfo &other,
                        bool ignore_non_serialized_data = false);

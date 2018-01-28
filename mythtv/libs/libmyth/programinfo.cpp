@@ -1253,6 +1253,126 @@ void ProgramInfo::clear(void)
     positionMapDBReplacement = NULL;
 }
 
+/*!
+ *  Compare two QStrings when they can either be initialized to
+ *  "Default" or to the empty string.
+ */
+bool qstringEqualOrDefault(const QString a, const QString b);
+bool qstringEqualOrDefault(const QString a, const QString b)
+{
+    if (a == b)
+        return true;
+    if (a.isEmpty() and (b == "Default"))
+        return true;
+    if ((a == "Default") and b.isEmpty())
+        return true;
+    return false;
+}
+
+/*!
+ *  Compare two ProgramInfo instances to see if they are equal.  Equal
+ *  is defined as all parameters that are serialized and passed across
+ *  the myth protocol are the same.
+ *
+ *  \param rhs The ProgramInfo instance to compare to the current
+ *  instance.
+ *
+ *  \return True if all the serialized fields match, False otherwise.
+ */
+bool ProgramInfo::operator==(const ProgramInfo& rhs)
+{
+    if ((title != rhs.title) ||
+        (subtitle != rhs.subtitle) ||
+        (description != rhs.description) ||
+        (season != rhs.season) ||
+        (episode != rhs.episode) ||
+        (totalepisodes != rhs.totalepisodes) ||
+        (syndicatedepisode != rhs.syndicatedepisode) ||
+        (category != rhs.category)
+#if 0
+        || (director != rhs.director)
+#endif
+        )
+        return false;
+
+    if (recpriority != rhs.recpriority)
+        return false;
+
+    if ((chanid != rhs.chanid) ||
+        (chanstr != rhs.chanstr) ||
+        (chansign != rhs.chansign) ||
+        (channame != rhs.channame) ||
+        (chanplaybackfilters != rhs.chanplaybackfilters))
+        return false;
+
+    if (!qstringEqualOrDefault(recgroup, rhs.recgroup) ||
+        !qstringEqualOrDefault(playgroup, rhs.playgroup))
+        return false;
+
+    if (pathname != rhs.pathname)
+        return false;
+
+    if ((hostname != rhs.hostname) ||
+        !qstringEqualOrDefault(storagegroup, rhs.storagegroup))
+        return false;
+
+    if ((seriesid != rhs.seriesid) ||
+        (programid != rhs.programid) ||
+        (inetref != rhs.inetref) ||
+        (catType != rhs.catType))
+        return false;
+
+    if (filesize != rhs.filesize)
+        return false;
+
+    if ((startts != rhs.startts) ||
+        (endts != rhs.endts) ||
+        (recstartts != rhs.recstartts) ||
+        (recendts != rhs.recendts))
+        return false;
+
+    if ((stars != rhs.stars) ||
+        (originalAirDate != rhs.originalAirDate) ||
+        (lastmodified != rhs.lastmodified)
+#if 0
+        || (lastInUseTime != rhs.lastInUseTime)
+#endif
+        )
+        return false;
+
+    if (recpriority2 != rhs.recpriority2)
+        return false;
+
+    if ((recordid != rhs.recordid) ||
+        (parentid != rhs.parentid))
+        return false;
+
+    if ((sourceid != rhs.sourceid) ||
+        (inputid != rhs.inputid) ||
+        (findid != rhs.findid))
+        return false;
+
+    if ((programflags != rhs.programflags) ||
+        (properties != rhs.properties) ||
+        (year != rhs.year) ||
+        (partnumber != rhs.partnumber) ||
+        (parttotal != rhs.parttotal))
+        return false;
+
+    if ((recstatus != rhs.recstatus) ||
+        (rectype != rhs.rectype) ||
+        (dupin != rhs.dupin) ||
+        (dupmethod != rhs.dupmethod))
+        return false;
+
+    if ((recordedid != rhs.recordedid) ||
+        (inputname != rhs.inputname) ||
+        (bookmarkupdate != rhs.bookmarkupdate))
+        return false;
+
+    return true;
+}
+
 /** \fn ProgramInfo::~ProgramInfo()
  *  \brief Destructor deletes "record" if it exists.
  */
