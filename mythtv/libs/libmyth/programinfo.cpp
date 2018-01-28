@@ -5857,6 +5857,7 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
  *  \param recMap          recording map
  *  \param sort            sort order, negative for descending, 0 for
  *                         unsorted, positive for ascending
+ *  \param sortBy          comma separated list of fields to sort by
  *  \return true if it succeeds, false if it fails.
  *  \sa QueryInUseMap(void)
  *      QueryJobsRunning(int)
@@ -5868,7 +5869,8 @@ bool LoadFromRecorded(
     const QMap<QString,uint32_t> &inUseMap,
     const QMap<QString,bool> &isJobRunning,
     const QMap<QString, ProgramInfo*> &recMap,
-    int sort)
+    int sort,
+    const QString &sortBy)
 {
     destination.clear();
 
@@ -5882,10 +5884,66 @@ bool LoadFromRecorded(
     if (possiblyInProgressRecordingsOnly)
         thequery += "WHERE r.endtime >= NOW() AND r.starttime <= NOW() ";
 
-    if (sort)
-        thequery += "ORDER BY r.starttime ";
-    if (sort < 0)
-        thequery += "DESC ";
+    if (sortBy.isEmpty())
+    {
+        if (sort)
+            thequery += "ORDER BY r.starttime ";
+        if (sort < 0)
+            thequery += "DESC ";
+    }
+    else
+    {
+        QStringList sortByFields;
+        sortByFields << "starttime" <<  "title" <<  "subtitle" << "season" << "episode" << "category"
+                     <<  "watched" << "stars" << "originalairdate" << "recgroup" << "storagegroup"
+                     <<  "channum" << "callsign" << "name";
+
+        // sanity check the fields are one of the above fields
+        QString sSortBy;
+        QStringList fields = sortBy.split(",");
+        for (int x = 0; x < fields.size(); x++)
+        {
+            bool ascending = true;
+            QString field = fields.at(x).simplified().toLower();
+
+            if (field.endsWith("desc"))
+            {
+                ascending = false;
+                field = field.remove("desc");
+            }
+
+            if (field.endsWith("asc"))
+            {
+                ascending = true;
+                field = field.remove("asc");
+            }
+
+            field = field.simplified();
+
+            if (field == "channelname")
+                field = "name";
+
+            if (sortByFields.contains(field))
+            {
+                QString table;
+                if (field == "channum" || field == "callsign" || field == "name")
+                    table = "c";
+                else
+                    table = "r";
+
+                if (sSortBy.isEmpty())
+                    sSortBy = QString("%1.%2 %3").arg(table).arg(field).arg(ascending ? "ASC" : "DESC");
+                else
+                    sSortBy += QString(",%1.%2 %3").arg(table).arg(field).arg(ascending ? "ASC" : "DESC");
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("ProgramInfo::LoadFromRecorded() got an unknown sort field '%1' - ignoring").arg(fields.at(x)));
+            }
+        }
+
+        thequery += "ORDER BY " + sSortBy;
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(thequery);

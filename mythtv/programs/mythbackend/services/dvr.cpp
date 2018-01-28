@@ -64,7 +64,9 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
                                         int            nCount,
                                         const QString &sTitleRegEx,
                                         const QString &sRecGroup,
-                                        const QString &sStorageGroup )
+                                        const QString &sStorageGroup,
+                                        const QString &sSort
+                                      )
 {
     QMap< QString, ProgramInfo* > recMap;
 
@@ -80,7 +82,7 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
     if (bDescending)
         desc = -1;
 
-    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, desc );
+    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, desc, sSort );
 
     QMap< QString, ProgramInfo* >::iterator mit = recMap.begin();
 
