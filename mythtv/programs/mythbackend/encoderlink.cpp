@@ -1007,4 +1007,16 @@ bool EncoderLink::SetChannelInfo(uint chanid, uint sourceid,
                               callsign, channum, channame, xmltv);
 }
 
+bool EncoderLink::AddChildInput(uint childid)
+{
+    if (local)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Called on local recorder");
+        return false;
+    }
+
+    bool retval = sock->AddChildInput(childid);
+    return retval;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

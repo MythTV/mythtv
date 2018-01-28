@@ -239,7 +239,7 @@ bool Capture::RemoveCaptureCard( int nCardId )
     if ( nCardId < 1 )
         throw( QString( "The Card ID is invalid."));
 
-    bool bResult = CardUtil::DeleteCard(nCardId);
+    bool bResult = CardUtil::DeleteInput(nCardId);
 
     return bResult;
 }

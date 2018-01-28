@@ -51,6 +51,7 @@
 #include "recordingprofile.h"
 
 #include "scheduler.h"
+#include "tv_rec.h"
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;
@@ -662,9 +663,9 @@ DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
 
 DTC::EncoderList* Dvr::GetEncoderList()
 {
-
     DTC::EncoderList* pList = new DTC::EncoderList();
 
+    QReadLocker tvlocker(&TVRec::inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
     QMap<int, EncoderLink *>::Iterator iter = tvList.begin();
 

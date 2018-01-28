@@ -161,10 +161,9 @@ class SchedGroup : public MythUICheckBoxSetting
             QObject::tr(
                 "Schedule all virtual inputs on this device as a group.  "
                 "This is more efficient than scheduling each input "
-                "individually, but can result in scheduling more "
-                "simultaneous recordings than is allowed.  Be sure to set "
-                "the maximum number of simultaneous recordings above "
-                "high enough to handle all expected cases."
+                "individually.  Additional, virtual inputs will be "
+                "automatically added as needed to fulfill the recording "
+                "load."
                 ));
     };
 };
@@ -2855,7 +2854,7 @@ bool CaptureCard::canDelete(void)
 
 void CaptureCard::deleteEntry(void)
 {
-    CardUtil::DeleteCard(getCardID());
+    CardUtil::DeleteInput(getCardID());
 }
 
 
@@ -3685,7 +3684,7 @@ void CardInput::Save(void)
     for (uint i = cardids.size() + 1;
          (i > icount) && !cardids.empty(); --i)
     {
-        CardUtil::DeleteCard(cardids.back());
+        CardUtil::DeleteInput(cardids.back());
         cardids.pop_back();
     }
 
@@ -3761,7 +3760,7 @@ void CaptureCardEditor::DeleteAllCaptureCards(bool doDelete)
     if (!doDelete)
         return;
 
-    CardUtil::DeleteAllCards();
+    CardUtil::DeleteAllInputs();
     Load();
     emit settingsChanged(this);
 }
@@ -3791,7 +3790,7 @@ void CaptureCardEditor::DeleteAllCaptureCardsOnHost(bool doDelete)
     }
 
     while (cards.next())
-        CardUtil::DeleteCard(cards.value(0).toUInt());
+        CardUtil::DeleteInput(cards.value(0).toUInt());
 
     Load();
     emit settingsChanged(this);

@@ -185,6 +185,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(const QStringList &request, 
                                     PlaybackSock *pbs);
+    bool HandleAddChildInput(uint inputid);
     void HandleGoToSleep(PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
     void HandleQueryFreeSpaceSummary(PlaybackSock *pbs);
@@ -330,6 +331,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     Scheduler *m_sched;
     AutoExpire *m_expirer;
+    QMutex m_addChildInputLock;
 
     struct DeferredDeleteStruct
     {

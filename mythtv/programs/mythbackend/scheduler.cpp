@@ -47,6 +47,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythsystemevent.h"
 #include "mythlogging.h"
+#include "tv_rec.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")
@@ -444,6 +445,8 @@ static bool comp_retry(RecordingInfo *a, RecordingInfo *b)
 
 bool Scheduler::FillRecordList(void)
 {
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     schedTime = MythDate::current();
 
     LOG(VB_SCHEDULE, LOG_INFO, "BuildWorkList...");
@@ -840,6 +843,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
 void Scheduler::SlaveConnected(RecordingList &slavelist)
 {
     QMutexLocker lockit(&schedLock);
+    QReadLocker tvlocker(&TVRec::inputsLock);
 
     RecordingList::iterator it = slavelist.begin();
     for (; it != slavelist.end(); ++it)
@@ -1761,6 +1765,7 @@ void Scheduler::getConflicting(RecordingInfo *pginfo, QStringList &strlist)
 void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
 {
     QMutexLocker lockit(&schedLock);
+    QReadLocker tvlocker(&TVRec::inputsLock);
 
     RecConstIter i = reclist.begin();
     for (; FindNextConflict(reclist, pginfo, i); ++i)
@@ -2563,6 +2568,8 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
     QDateTime nextrectime = ri.GetRecordingStartTime();
     int secsleft = curtime.secsTo(nextrectime);
 
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
     if (tvit == m_tvList->end())
         return;
@@ -2720,6 +2727,8 @@ bool Scheduler::HandleRecording(
         return false;
     }
 
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     QMap<int, EncoderLink*>::iterator tvit = m_tvList->find(ri.GetInputID());
     if (tvit == m_tvList->end())
     {
@@ -2841,7 +2850,15 @@ bool Scheduler::HandleRecording(
         if (sinputinfomap[ri.GetInputID()].schedgroup)
         {
             if (!AssignGroupInput(tempri))
+            {
+                // We failed to assign an input.  Keep asking the main
+                // server to add one until we get one.
+                MythEvent me(QString("ADD_CHILD_INPUT %1")
+                             .arg(tempri.GetInputID()));
+                gCoreContext->dispatch(me);
+                nextWakeTime = min(nextWakeTime, curtime.addSecs(1));
                 return reclist_changed;
+            }
             ri.SetInputID(tempri.GetInputID());
             nexttv = (*m_tvList)[ri.GetInputID()];
         }
@@ -2952,7 +2969,6 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
 
     uint bestid = 0;
     uint betterid = 0;
-    uint goodid = 0;
     QDateTime now = MythDate::current();
 
     // Check each child input to find the best one to use.
@@ -3052,18 +3068,10 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
                 .arg(inputid));
             bestid = inputid;
         }
-        else
-        {
-            LOG(VB_SCHEDULE, LOG_DEBUG,
-                QString("Input %1 is on livetv but could be free")
-                .arg(inputid));
-            if (!goodid)
-                goodid = inputid;
-        }
     }
 
     if (!bestid)
-        bestid = (betterid ? betterid : goodid);
+        bestid;
 
     if (bestid)
     {
@@ -3079,8 +3087,6 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
             QString("Failed to assign input for %1/%2/\"%3\"")
             .arg(ri.GetInputID()).arg(ri.GetChannelSchedulingID())
             .arg(ri.GetTitle()));
-        ri.SetRecordingStatus(RecStatus::TunerBusy);
-        ri.AddHistory(true);
     }
 
     return bestid;
@@ -3120,6 +3126,7 @@ void Scheduler::HandleIdleShutdown(
 
         // find out, if we are currently recording (or LiveTV)
         bool recording = false;
+        TVRec::inputsLock.lockForRead();
         QMap<int, EncoderLink *>::Iterator it;
         for (it = m_tvList->begin(); (it != m_tvList->end()) &&
                  !recording; ++it)
@@ -3127,6 +3134,7 @@ void Scheduler::HandleIdleShutdown(
             if ((*it)->IsBusy())
                 recording = true;
         }
+        TVRec::inputsLock.unlock();
 
         // If there are BLOCKING clients, then we're not idle
         bool blocking = m_mainServer->isClientConnected(true);
@@ -3453,6 +3461,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     int secsleft = 0;
     EncoderLink *enc = NULL;
 
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     bool someSlavesCanSleep = false;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
@@ -3653,6 +3663,8 @@ bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
 
 void Scheduler::WakeUpSlaves(void)
 {
+    QReadLocker tvlocker(&TVRec::inputsLock);
+
     QStringList SlavesThatCanWake;
     QString thisSlave;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
@@ -5043,6 +5055,7 @@ static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
 void Scheduler::GetNextLiveTVDir(uint cardid)
 {
     QMutexLocker lockit(&schedLock);
+    QReadLocker tvlocker(&TVRec::inputsLock);
 
     if (!m_tvList->contains(cardid))
         return;
@@ -5775,9 +5788,12 @@ void Scheduler::InitInputInfoMap(void)
     while (query.next())
     {
         uint inputid = query.value(0).toUInt();
+        uint parentid = query.value(1).toUInt();
+
+        // This code should stay substantially similar to that below
+        // in AddChildInput().
         SchedInputInfo &siinfo = sinputinfomap[inputid];
         siinfo.inputid = inputid;
-        uint parentid = query.value(1).toUInt();
         if (parentid && sinputinfomap[parentid].schedgroup)
             siinfo.sgroupid = parentid;
         else
@@ -5795,6 +5811,35 @@ void Scheduler::InitInputInfoMap(void)
     }
 
     CreateConflictLists();
+}
+
+void Scheduler::AddChildInput(uint parentid, uint inputid)
+{
+    LOG(VB_SCHEDULE, LOG_INFO, LOC +
+        QString("AddChildInput: Handling parent = %1, input = %2")
+        .arg(parentid).arg(inputid));
+
+    // This code should stay substantially similar to that above in
+    // InitInputInfoMap().
+    SchedInputInfo &siinfo = sinputinfomap[inputid];
+    siinfo.inputid = inputid;
+    if (sinputinfomap[parentid].schedgroup)
+        siinfo.sgroupid = parentid;
+    else
+        siinfo.sgroupid = inputid;
+    siinfo.schedgroup = false;
+    siinfo.conflicting_inputs = CardUtil::GetConflictingInputs(inputid);
+
+    siinfo.conflictlist = sinputinfomap[parentid].conflictlist;
+
+    // Now, fixup the infos for the parent and conflicting inputs.
+    sinputinfomap[parentid].group_inputs.push_back(inputid);
+    vector<uint>::iterator it = siinfo.conflicting_inputs.begin();
+    for ( ; it != siinfo.conflicting_inputs.end(); ++it)
+    {
+        uint otherid = *it;
+        sinputinfomap[otherid].conflicting_inputs.push_back(inputid);
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

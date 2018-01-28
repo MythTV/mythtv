@@ -238,8 +238,8 @@ class MTV_PUBLIC CardUtil
                                           const uint diseqcid,
                                           bool       dvb_eitscan);
 
-    static bool         DeleteCard(uint inputid);
-    static bool         DeleteAllCards(void);
+    static bool         DeleteInput(uint inputid);
+    static bool         DeleteAllInputs(void);
     static vector<uint> GetInputList(void);
     static vector<uint> GetSchedInputList(void);
     static vector<uint> GetLiveTVInputList(void);
@@ -278,6 +278,9 @@ class MTV_PUBLIC CardUtil
     static QString      GetVBIDevice(uint inputid)
         { return get_on_input("vbidevice", inputid); }
 
+    static QString      GetHostname(uint inputid)
+        { return get_on_input("hostname", inputid); }
+
     static int          GetValueInt(const QString &col, uint inputid)
         { return get_on_input(col, inputid).toInt(); }
     static bool         SetValue(const QString &col, uint inputid,
@@ -306,8 +309,6 @@ class MTV_PUBLIC CardUtil
                                          const uint quicktune,
                                          const uint schedorder,
                                          const uint livetvorder);
-
-    static bool         DeleteInput(uint inputid);
 
     // Other input functions
 
@@ -352,7 +353,8 @@ class MTV_PUBLIC CardUtil
     static void ClearVideoDeviceCache();
 
     // Other
-    static bool         CloneCard(uint src_inputid, uint dst_inputid);
+    static uint         CloneCard(uint src_inputid, uint dst_inputid);
+    static uint         AddChildInput(uint parentid);
     static QString      GetFirewireChangerNode(uint inputid);
     static QString      GetFirewireChangerModel(uint inputid);
 

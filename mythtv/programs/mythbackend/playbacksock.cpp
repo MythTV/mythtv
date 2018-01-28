@@ -538,4 +538,12 @@ QStringList PlaybackSock::ForwardRequest(const QStringList &slist)
     return QStringList();
 }
 
+/** \brief Tells a slave to add a child input.
+ */
+bool PlaybackSock::AddChildInput(uint childid)
+{
+    QStringList strlist(QString("ADD_CHILD_INPUT %1").arg(childid));
+    return SendReceiveStringList(strlist, 1) && (strlist[0] == "OK");
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
