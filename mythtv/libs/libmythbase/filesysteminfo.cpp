@@ -27,7 +27,6 @@ using namespace std;
 
 // for serialization
 #define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
-#define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
 #define STR_TO_LIST(x)       do { list << (x); } while (0)
 
 // for deserialization
@@ -40,8 +39,6 @@ using namespace std;
                                ts = *it++; } while (0)
 #define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (0)
 #define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
-#define DATETIME_FROM_LIST(x) \
-    do { NEXT_STR(); x = fromTime_t(ts.toUInt()); } while (0)
 #define STR_FROM_LIST(x)     do { NEXT_STR(); (x) = ts; } while (0)
 
 #define LOC QString("FileSystemInfo: ")
