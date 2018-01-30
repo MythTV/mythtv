@@ -22,7 +22,6 @@ OBJS = allformats.o         \
        protocols.o          \
        riff.o               \
        sdp.o                \
-       seek.o               \
        url.o                \
        utils.o              \
        utils-mythtv.o       \

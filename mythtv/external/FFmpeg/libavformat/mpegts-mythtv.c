@@ -34,7 +34,6 @@
 #include "mpegts-mythtv.h"
 #include "internal.h"
 #include "avio_internal.h"
-#include "seek.h"
 #include "mpeg.h"
 #include "isom.h"
 #include "internal.h"
