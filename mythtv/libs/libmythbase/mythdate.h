@@ -43,6 +43,9 @@ MBASE_PUBLIC QDateTime fromString(const QString&);
 /// Converts dy in format to QDateTime
 MBASE_PUBLIC QDateTime fromString(const QString &dt, const QString &format);
 MBASE_PUBLIC QDateTime fromTime_t(uint seconds);
+#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
+MBASE_PUBLIC QDateTime fromSecsSinceEpoch(uint seconds);
+#endif
 /// Returns formatted string representing the time.
 MBASE_PUBLIC QString toString(
     const QDateTime &datetime, uint format = MythDate::kDateTimeFull);
