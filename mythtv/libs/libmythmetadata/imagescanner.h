@@ -48,8 +48,13 @@ private:
                      const QString &base);
     int  SyncDirectory(const QFileInfo &dirInfo, int devId,
                        const QString &base, int parentId);
-    void PopulateMetadata(const QString &path, int type,
-                          QString &comment, uint &time, int &orientation);
+    void PopulateMetadata(const QString &path, int type, QString &comment,
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+                          uint &time,
+#else
+                          qint64 &time,
+#endif
+                          int &orientation);
     void SyncFile(const QFileInfo &fileInfo, int devId,
                   const QString &base, int parentId);
     void CountTree(QDir &dir);

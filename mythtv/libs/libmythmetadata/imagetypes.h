@@ -102,9 +102,17 @@ public:
     int              m_device;      //!< Id of media device. Always 0 (SG) for remotes, 1+ for local devices
     int              m_parentId;    //!< Id of parent dir
     int              m_type;        //!< Type of node: dir, video etc
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     uint             m_modTime;     //!< Filesystem modified datestamp
+#else
+    qint64           m_modTime;     //!< Filesystem modified datestamp
+#endif
     int              m_size;        //!< Filesize (files only)
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     uint             m_date;        //!< Image creation date, from Exif metadata
+#else
+    qint64           m_date;        //!< Image creation date, from Exif metadata
+#endif
     int              m_orientation; //!< Image orientation
     QString          m_comment;     //!< User comment, from Exif metadata
 

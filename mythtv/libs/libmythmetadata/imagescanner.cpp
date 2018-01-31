@@ -405,8 +405,14 @@ template <class DBFS>
   \param[out] orientation Exif orientation code
  */
 template <class DBFS>
-void ImageScanThread<DBFS>::PopulateMetadata
-(const QString &path, int type, QString &comment, uint &time, int &orientation)
+void ImageScanThread<DBFS>::PopulateMetadata(
+    const QString &path, int type, QString &comment,
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+    uint &time,
+#else
+    qint64 &time,
+#endif
+    int &orientation)
 {
     // Set orientation, date, comment from file meta data
     ImageMetaData *metadata = (type == kImageFile)
@@ -416,7 +422,11 @@ void ImageScanThread<DBFS>::PopulateMetadata
     orientation  = metadata->GetOrientation();
     comment      = metadata->GetComment().simplified();
     QDateTime dt = metadata->GetOriginalDateTime();
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     time         = (dt.isValid()) ? dt.toTime_t() : 0;
+#else
+    time         = (dt.isValid()) ? dt.toSecsSinceEpoch() : 0;
+#endif
 
     delete metadata;
 }

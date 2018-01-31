@@ -241,7 +241,11 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
 
     if (im.IsDevice())
         CreateButton(tr("Last scan"),
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
                      MythDate::toString(QDateTime::fromTime_t(im.m_date),
+#else
+                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_date),
+#endif
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
 
     if (im.IsDirectory())
@@ -249,7 +253,11 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
 
     if (!im.IsDevice())
         CreateButton(tr("Modified"),
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
                      MythDate::toString(QDateTime::fromTime_t(im.m_modTime),
+#else
+                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_modTime),
+#endif
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
 
     if (im.IsFile())
