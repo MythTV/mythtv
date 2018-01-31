@@ -1405,7 +1405,7 @@ QStringList ImageHandler<DBFS>::HandleDbMove(const QString &ids,
     if (!ok || images.isEmpty())
         RESULT_ERR("Image not found", QString("Images %1 not in Db").arg(ids))
 
-    if (!destPath.isEmpty() && !destPath.endsWith("/"))
+    if (!destPath.isEmpty() && !destPath.endsWith(QChar('/')))
         destPath.append("/");
 
     // Update path of images only. Scanner will repair parentId
@@ -1543,7 +1543,7 @@ QStringList ImageHandler<DBFS>::HandleDirs(const QString &destId,
     foreach (const QString &relPath, relPaths)
     {
         // Validate dir name
-        if (relPath.isEmpty() || relPath.contains("..") || relPath.startsWith('/'))
+        if (relPath.isEmpty() || relPath.contains("..") || relPath.startsWith(QChar('/')))
             continue;
 
         QString newPath = DBFS::ConstructPath(destDir.absolutePath(), relPath);
@@ -1648,7 +1648,7 @@ QStringList ImageHandler<DBFS>::HandleScanRequest(const QString &command,
     {
         return QStringList("OK") << m_scanner->GetProgress();
     }
-    else if (command.startsWith("DEVICE"))
+    else if (command.startsWith(QString("DEVICE")))
     {
         m_scanner->EnqueueClear(devId, command);
         RESULT_OK(QString("Clearing device %1 %2").arg(command).arg(devId))
