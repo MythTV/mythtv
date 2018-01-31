@@ -66,6 +66,7 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
                                         const QString &sTitleRegEx,
                                         const QString &sRecGroup,
                                         const QString &sStorageGroup,
+                                        const QString &sCategory,
                                         const QString &sSort
                                       )
 {
@@ -111,7 +112,8 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
         if (pInfo->IsDeletePending() ||
             (!sTitleRegEx.isEmpty() && !pInfo->GetTitle().contains(rTitleRegEx)) ||
             (!sRecGroup.isEmpty() && sRecGroup != pInfo->GetRecordingGroup()) ||
-            (!sStorageGroup.isEmpty() && sStorageGroup != pInfo->GetStorageGroup()))
+            (!sStorageGroup.isEmpty() && sStorageGroup != pInfo->GetStorageGroup()) ||
+            (!sCategory.isEmpty() && sCategory != pInfo->GetCategory()))
             continue;
 
         if ((nAvailable < nStartIndex) ||
@@ -762,6 +764,32 @@ QStringList Dvr::GetRecGroupList()
     if (!query.exec())
     {
         MythDB::DBError("GetRecGroupList", query);
+        return result;
+    }
+
+    while (query.next())
+        result << query.value(0).toString();
+
+    return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList Dvr::GetProgramCategories( bool OnlyRecorded )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (OnlyRecorded)
+        query.prepare("SELECT DISTINCT category FROM recorded ORDER BY category");
+    else
+        query.prepare("SELECT DISTINCT category FROM program ORDER BY category");
+
+    QStringList result;
+    if (!query.exec())
+    {
+        MythDB::DBError("GetProgramCategories", query);
         return result;
     }
 
