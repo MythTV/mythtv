@@ -126,6 +126,9 @@ include ( ../libs-targetfix.pro )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS -lexiv2
 
-test_clean.commands = cd test/ && $(MAKE) -f Makefile clean
+test_clean.commands = -cd test/ && $(MAKE) -f Makefile clean
 clean.depends = test_clean
 QMAKE_EXTRA_TARGETS += test_clean clean
+test_distclean.commands = -cd test/ && $(MAKE) -f Makefile distclean
+distclean.depends = test_distclean
+QMAKE_EXTRA_TARGETS += test_distclean distclean
