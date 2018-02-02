@@ -11,7 +11,11 @@
 static inline void clear(LiveTVChainEntry &entry)
 {
     entry.chanid = 0;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     entry.starttime.setTime_t(0);
+#else
+    entry.starttime.setSecsSinceEpoch(0);
+#endif
     entry.endtime = QDateTime();
     entry.discontinuity = true;
     entry.hostprefix = QString();
