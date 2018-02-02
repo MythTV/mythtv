@@ -125,7 +125,11 @@ public:
     bool m_isWide;
 
     QMap<QString, MythImage *> imageCache;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     QMap<QString, uint> CacheTrack;
+#else
+    QMap<QString, qint64> CacheTrack;
+#endif
     QMutex *m_cacheLock;
 
     QAtomicInt m_cacheSize;
@@ -574,7 +578,11 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 
     if (d->imageCache.contains(url))
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         d->CacheTrack[url] = MythDate::current().toTime_t();
+#else
+        d->CacheTrack[url] = MythDate::current().toSecsSinceEpoch();
+#endif
         d->imageCache[url]->IncrRef();
         return d->imageCache[url];
     }
@@ -628,7 +636,11 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
            d->imageCache.size())
     {
         QMap<QString, MythImage *>::iterator it = d->imageCache.begin();
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         uint oldestTime = MythDate::current().toTime_t();
+#else
+        qint64 oldestTime = MythDate::current().toSecsSinceEpoch();
+#endif
         QString oldestKey = it.key();
 
         int count = 0;
@@ -674,7 +686,11 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     {
         im->IncrRef();
         d->imageCache[url] = im;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         d->CacheTrack[url] = MythDate::current().toTime_t();
+#else
+        d->CacheTrack[url] = MythDate::current().toSecsSinceEpoch();
+#endif
 
         im->SetIsInCache(true);
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
@@ -904,8 +920,11 @@ void MythUIHelper::PruneCacheDir(QString dirname)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Pruning cache directory: %1").arg(dirname));
     QDateTime cutoff = MythDate::current().addDays(-days);
-    /// todo: Use toSecsSinceEpoch() once Qt 5.8 is min version
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     qint64 cutoffsecs = cutoff.toMSecsSinceEpoch()/1000;
+#else
+    qint64 cutoffsecs = cutoff.toSecsSinceEpoch();
+#endif
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("Removing files not accessed since %1")
@@ -1682,7 +1701,11 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 
         // This only applies to the MEMORY cache
         const uint kImageCacheTimeout = 60;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         uint now = MythDate::current().toTime_t();
+#else
+        qint64 now = MythDate::current().toSecsSinceEpoch();
+#endif
 
         QMutexLocker locker(d->m_cacheLock);
 
