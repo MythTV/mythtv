@@ -23,7 +23,11 @@ EITCache::EITCache()
       entryCnt(0), pruneCnt(0), prunedHitCnt(0), futureHitCnt(0), wrongChannelHitCnt(0)
 {
     // 24 hours ago
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     lastPruneTime = MythDate::current().toUTC().toTime_t() - 86400;
+#else
+    lastPruneTime = MythDate::current().toUTC().toSecsSinceEpoch() - 86400;
+#endif
 }
 
 EITCache::~EITCache()
@@ -59,6 +63,11 @@ QString EITCache::GetStatistics(void) const
         .arg((hitCnt+prunedHitCnt+futureHitCnt+wrongChannelHitCnt)/(double)accessCnt);
 }
 
+/*
+ * FIXME: This code has a builtin assumption that all timestamps will
+ * fit into a 32bit integer.  Qt5.8 has switched to using a 64bit
+ * integer for timestamps.
+ */
 static inline uint64_t construct_sig(uint tableid, uint version,
                                      uint endtime, bool modified)
 {
@@ -151,7 +160,11 @@ static bool lock_channel(uint chanid, uint endtime)
     }
     else
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         uint now = MythDate::current().toTime_t();
+#else
+        uint now = MythDate::current().toSecsSinceEpoch();
+#endif
         qstr = "INSERT INTO eit_cache "
                "       ( chanid,  endtime,  status) "
                "VALUES (:CHANID, :ENDTIME, :STATUS)";
@@ -188,7 +201,11 @@ static void unlock_channel(uint chanid, uint updated)
         MythDB::DBError("Error deleting channel lock", query);
 
     // inserting statistics
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     uint now = MythDate::current().toTime_t();
+#else
+    uint now = MythDate::current().toSecsSinceEpoch();
+#endif
     qstr = "REPLACE INTO eit_cache "
            "       ( chanid,  eventid,  endtime,  status) "
            "VALUES (:CHANID, :EVENTID, :ENDTIME, :STATUS)";
@@ -405,7 +422,11 @@ uint EITCache::PruneOldEntries(uint timestamp)
 {
     if (VERBOSE_LEVEL_CHECK(VB_EIT, LOG_INFO))
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         QDateTime tmptime = MythDate::fromTime_t(timestamp);
+#else
+        QDateTime tmptime = MythDate::fromSecsSinceEpoch(timestamp);
+#endif
         LOG(VB_EIT, LOG_INFO,
             LOC + "Pruning all entries that ended before UTC " +
             tmptime.toString(Qt::ISODate));
