@@ -96,9 +96,16 @@
 HouseKeeperTask::HouseKeeperTask(const QString &dbTag, HouseKeeperScope scope,
                                  HouseKeeperStartup startup):
     ReferenceCounter(dbTag), m_dbTag(dbTag), m_confirm(false), m_scope(scope),
-    m_startup(startup), m_running(false), m_lastRun(MythDate::fromTime_t(0)),
+    m_startup(startup), m_running(false),
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+    m_lastRun(MythDate::fromTime_t(0)),
     m_lastSuccess(MythDate::fromTime_t(0)),
     m_lastUpdate(MythDate::fromTime_t(0))
+#else
+    m_lastRun(MythDate::fromSecsSinceEpoch(0)),
+    m_lastSuccess(MythDate::fromSecsSinceEpoch(0)),
+    m_lastUpdate(MythDate::fromSecsSinceEpoch(0))
+#endif
 {
 }
 
@@ -176,8 +183,13 @@ void HouseKeeperTask::QueryLast(void)
 
         MSqlQuery query(MSqlQuery::InitCon());
 
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         m_lastRun = MythDate::fromTime_t(0);
         m_lastSuccess = MythDate::fromTime_t(0);
+#else
+        m_lastRun = MythDate::fromSecsSinceEpoch(0);
+        m_lastSuccess = MythDate::fromSecsSinceEpoch(0);
+#endif
 
         if (m_scope == kHKGlobal)
         {
@@ -218,7 +230,11 @@ QDateTime HouseKeeperTask::UpdateLastRun(QDateTime last, bool successful)
         if (!query.isConnected())
             return last;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         if (m_lastRun == MythDate::fromTime_t(0))
+#else
+        if (m_lastRun == MythDate::fromSecsSinceEpoch(0))
+#endif
         {
             // not previously set, perform insert
 
