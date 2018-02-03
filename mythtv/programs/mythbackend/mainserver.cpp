@@ -7537,7 +7537,11 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
              slave->DecrRef();
 
              strlist = (slavetime.isValid()) ?
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
                  QStringList(QString::number(slavetime.toTime_t())) :
+#else
+                 QStringList(QString::number(slavetime.toSecsSinceEpoch())) :
+#endif
                  QStringList("BAD");
 
              SendResponse(pbssock, strlist);
@@ -7569,7 +7573,14 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     if (finfo.exists())
     {
         QDateTime lastmodified = finfo.lastModified();
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         strlist = QStringList(QString::number(lastmodified.toTime_t()));
+#else
+        if (lastmodified.isValid())
+            strlist = QStringList(QString::number(lastmodified.toSecsSinceEpoch()));
+        else
+            strlist = QStringList(QString::number((uint)-1));
+#endif
     }
     else
         strlist = QStringList( "BAD" );
@@ -7592,8 +7603,12 @@ void MainServer::HandlePixmapGetIfModified(
     }
 
     QDateTime cachemodified;
-    if (slist[1].toInt() != -1)
+    if (!slist[1].isEmpty() && (slist[1].toInt() != -1))
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         cachemodified = MythDate::fromTime_t(slist[1].toInt());
+#else
+        cachemodified = MythDate::fromSecsSinceEpoch(slist[1].toLongLong());
+#endif
 
     int max_file_size = slist[2].toInt();
 
@@ -7632,7 +7647,14 @@ void MainServer::HandlePixmapGetIfModified(
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Read preview file '%1'")
                             .arg(pginfo.GetPathname()));
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
                     strlist += QString::number(lastmodified.toTime_t());
+#else
+                    if (lastmodified.isValid())
+                        strlist += QString::number(lastmodified.toSecsSinceEpoch());
+                    else
+                        strlist += QString::number((uint)-1);
+#endif
                     strlist += QString::number(data.size());
                     strlist += QString::number(qChecksum(data.constData(),
                                                data.size()));
@@ -7667,7 +7689,14 @@ void MainServer::HandlePixmapGetIfModified(
             }
             else
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
                 strlist += QString::number(lastmodified.toTime_t());
+#else
+                if (lastmodified.isValid())
+                    strlist += QString::number(lastmodified.toSecsSinceEpoch());
+                else
+                    strlist += QString::number((uint)-1);
+#endif
             }
 
             SendResponse(pbssock, strlist);
