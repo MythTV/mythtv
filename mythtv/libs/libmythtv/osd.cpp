@@ -519,9 +519,15 @@ void OSD::SetText(const QString &window, const InfoMap &map,
         dynamic_cast<MythUIProgressBar *>(win->GetChild("elapsedpercent"));
     if (bar)
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         int startts = map["startts"].toInt();
         int endts   = map["endts"].toInt();
         int nowts   = MythDate::current().toTime_t();
+#else
+        qint64 startts = map["startts"].toLongLong();
+        qint64 endts   = map["endts"].toLongLong();
+        qint64 nowts   = MythDate::current().toSecsSinceEpoch();
+#endif
         if (startts > nowts)
         {
             bar->SetUsed(0);
@@ -532,7 +538,11 @@ void OSD::SetText(const QString &window, const InfoMap &map,
         }
         else
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
             int duration = endts - startts;
+#else
+            qint64 duration = endts - startts;
+#endif
             if (duration > 0)
                 bar->SetUsed(1000 * (nowts - startts) / duration);
             else

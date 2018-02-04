@@ -1765,8 +1765,13 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["recstartdate"] = MythDate::toString(recstartts, kDateShort);
         progMap["recendtime"] = MythDate::toString(recendts, kTime);
         progMap["recenddate"] = MythDate::toString(recendts, kDateShort);
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         progMap["startts"] = QString::number(startts.toTime_t());
         progMap["endts"]   = QString::number(endts.toTime_t());
+#else
+        progMap["startts"] = QString::number(startts.toSecsSinceEpoch());
+        progMap["endts"]   = QString::number(endts.toSecsSinceEpoch());
+#endif
         if (timeNow.toLocalTime().date().year() !=
             startts.toLocalTime().date().year())
             progMap["startyear"] = startts.toLocalTime().toString("yyyy");
