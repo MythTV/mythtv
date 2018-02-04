@@ -42,8 +42,9 @@ MBASE_PUBLIC QDateTime as_utc(const QDateTime &dt);
 MBASE_PUBLIC QDateTime fromString(const QString&);
 /// Converts dy in format to QDateTime
 MBASE_PUBLIC QDateTime fromString(const QString &dt, const QString &format);
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 MBASE_PUBLIC QDateTime fromTime_t(uint seconds);
-#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
+#else
 MBASE_PUBLIC QDateTime fromSecsSinceEpoch(uint seconds);
 #endif
 /// Returns formatted string representing the time.

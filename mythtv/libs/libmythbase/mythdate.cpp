@@ -53,6 +53,7 @@ MBASE_PUBLIC QDateTime fromString(const QString &str, const QString &format)
     return dt;
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 /**
  *  This function takes the number of seconds since the start of the
  *  epoch and returns a QDateTime with the equivalent value.
@@ -66,15 +67,12 @@ MBASE_PUBLIC QDateTime fromString(const QString &str, const QString &format)
  */
 MBASE_PUBLIC QDateTime fromTime_t(uint seconds)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     QDateTime dt = QDateTime::fromTime_t(seconds);
-#else
-    QDateTime dt = QDateTime::fromSecsSinceEpoch(seconds);
-#endif
     return dt.toUTC();
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
+#else
+
 /**
  *  This function takes the number of seconds since the start of the
  *  epoch and returns a QDateTime with the equivalent value.
