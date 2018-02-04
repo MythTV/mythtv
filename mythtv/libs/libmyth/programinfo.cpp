@@ -46,7 +46,7 @@ ProgramInfoUpdater *ProgramInfo::updater;
 int dummy = pginfo_init_statics();
 bool ProgramInfo::usingProgIDAuth = true;
 
-const static uint kInvalidDateTime = QDateTime().toTime_t();
+const static uint kInvalidDateTime = (uint)-1;
 
 
 const QString ProgramInfo::kFromRecordedQuery =
@@ -1470,7 +1470,17 @@ bool ProgramInfo::QueryRecordedIdFromPathname(const QString &pathname,
 
 #define INT_TO_LIST(x)       do { list << QString::number(x); } while (0)
 
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
+#else
+#define DATETIME_TO_LIST(x)  do {                                         \
+                                 if ((x).isValid()) {                     \
+                                     INT_TO_LIST((x).toSecsSinceEpoch()); \
+                                 } else {                                 \
+                                     INT_TO_LIST(kInvalidDateTime);       \
+                                 }                                        \
+                             } while (0)
+#endif
 
 #define LONGLONG_TO_LIST(x)  do { list << QString::number(x); } while (0)
 
@@ -1560,11 +1570,22 @@ void ProgramInfo::ToStringList(QStringList &list) const
 #define INT_FROM_LIST(x)     do { NEXT_STR(); (x) = ts.toLongLong(); } while (0)
 #define ENUM_FROM_LIST(x, y) do { NEXT_STR(); (x) = ((y)ts.toInt()); } while (0)
 
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
          x = (ts.toUInt() == kInvalidDateTime ?                         \
               QDateTime() : MythDate::fromTime_t(ts.toUInt()));         \
     } while (0)
+#else
+#define DATETIME_FROM_LIST(x) \
+    do { NEXT_STR();                                                    \
+         if (ts.isEmpty() or (ts.toUInt() == kInvalidDateTime)) {       \
+              x = QDateTime();                                          \
+         } else {                                                       \
+              x = MythDate::fromSecsSinceEpoch(ts.toLongLong());        \
+         }                                                              \
+    } while (0)
+#endif
 #define DATE_FROM_LIST(x) \
     do { NEXT_STR(); (x) = ((ts.isEmpty()) || (ts == "0000-00-00")) ? \
                          QDate() : QDate::fromString(ts, Qt::ISODate); \
