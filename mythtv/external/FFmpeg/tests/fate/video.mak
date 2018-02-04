@@ -14,7 +14,7 @@ FATE_VIDEO-$(call DEMDEC, AVI, AASC) += fate-aasc
 fate-aasc: CMD = framecrc -i $(TARGET_SAMPLES)/aasc/AASC-1.5MB.AVI -pix_fmt rgb24
 
 FATE_VIDEO-$(call DEMDEC, MOV, AIC) += fate-aic
-fate-aic: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/aic/small_apple_intermediate_codec.mov -an -vframes 15
+fate-aic: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/aic/small_apple_intermediate_codec.mov -an -frames:v 15
 
 FATE_VIDEO-$(call DEMDEC, MOV, AIC) += fate-aic-oddsize
 fate-aic-oddsize: CMD = framecrc -idct simple -i $(TARGET_SAMPLES)/aic/aic_odd_dimensions.mov
@@ -108,6 +108,9 @@ fate-deluxepaint-anm: CMD = framecrc -i $(TARGET_SAMPLES)/deluxepaint-anm/INTRO1
 FATE_VIDEO-$(call DEMDEC, DIRAC, DIRAC) += fate-dirac
 fate-dirac: CMD = framecrc -i $(TARGET_SAMPLES)/dirac/vts.profile-main.drc
 
+FATE_VIDEO-$(call DEMDEC, DIRAC, DIRAC) += fate-dirac-low-delay
+fate-dirac-low-delay: CMD = framecrc -i $(TARGET_SAMPLES)/dirac/vts.profile-vc2-low-delay.drc
+
 FATE_DXA += fate-dxa-feeble
 fate-dxa-feeble: CMD = framecrc -i $(TARGET_SAMPLES)/dxa/meetsquid.dxa -t 2 -pix_fmt rgb24 -an
 
@@ -154,7 +157,7 @@ FATE_VIDEO-$(call DEMDEC, IDCIN, IDCIN) += fate-id-cin-video
 fate-id-cin-video: CMD = framecrc -i $(TARGET_SAMPLES)/idcin/idlog-2MB.cin -pix_fmt rgb24
 
 FATE_VIDEO-$(call ENCDEC, ROQ PGMYUV, ROQ IMAGE2) += fate-idroq-video-encode
-fate-idroq-video-encode: CMD = md5 -f image2 -vcodec pgmyuv -i $(TARGET_SAMPLES)/ffmpeg-synthetic/vsynth1/%02d.pgm -r 30 -sws_flags +bitexact -vf pad=512:512:80:112 -f roq -t 0.2
+fate-idroq-video-encode: CMD = md5 -f image2 -c:v pgmyuv -i $(TARGET_SAMPLES)/ffmpeg-synthetic/vsynth1/%02d.pgm -r 30 -sws_flags +bitexact -vf pad=512:512:80:112 -f roq -t 0.2
 
 FATE_HAP += fate-hap1
 fate-hap1: CMD = framecrc -i $(TARGET_SAMPLES)/hap/hap1.mov
@@ -190,7 +193,7 @@ FATE_VIDEO-$(call DEMDEC, IPMOVIE, INTERPLAY_VIDEO) += fate-interplay-mve-16bit
 fate-interplay-mve-16bit: CMD = framecrc -i $(TARGET_SAMPLES)/interplay-mve/descent3-level5-16bit-partial.mve -pix_fmt rgb24 -an
 
 FATE_VIDEO-$(call DEMDEC, MXF, JPEG2000) += fate-jpeg2000-dcinema
-fate-jpeg2000-dcinema: CMD = framecrc -flags +bitexact -vcodec jpeg2000 -i $(TARGET_SAMPLES)/jpeg2000/chiens_dcinema2K.mxf -pix_fmt xyz12le
+fate-jpeg2000-dcinema: CMD = framecrc -flags +bitexact -c:v jpeg2000 -i $(TARGET_SAMPLES)/jpeg2000/chiens_dcinema2K.mxf -pix_fmt xyz12le
 
 FATE_VIDEO-$(call DEMDEC, JV, JV) += fate-jv
 fate-jv: CMD = framecrc -i $(TARGET_SAMPLES)/jv/intro.jv -an -pix_fmt rgb24
@@ -233,11 +236,14 @@ FATE_VIDEO-$(call DEMDEC, MOV, MJPEGB) += fate-mjpegb
 fate-mjpegb: CMD = framecrc -idct simple -fflags +bitexact -i $(TARGET_SAMPLES)/mjpegb/mjpegb_part.mov -an
 
 FATE_VIDEO-$(call DEMDEC, MVI, MOTIONPIXELS) += fate-motionpixels
-fate-motionpixels: CMD = framecrc -i $(TARGET_SAMPLES)/motion-pixels/INTRO-partial.MVI -an -pix_fmt rgb24 -vframes 111
+fate-motionpixels: CMD = framecrc -i $(TARGET_SAMPLES)/motion-pixels/INTRO-partial.MVI -an -pix_fmt rgb24 -frames:v 111
 
 FATE_VIDEO-$(call DEMDEC, MPEGTS, MPEG2VIDEO) += fate-mpeg2-field-enc fate-mpeg2-ticket186
-fate-mpeg2-field-enc: CMD = framecrc -flags +bitexact -idct simple -i $(TARGET_SAMPLES)/mpeg2/mpeg2_field_encoding.ts -an -vframes 30
+fate-mpeg2-field-enc: CMD = framecrc -flags +bitexact -idct simple -i $(TARGET_SAMPLES)/mpeg2/mpeg2_field_encoding.ts -an -frames:v 30
 fate-mpeg2-ticket186: CMD = framecrc -flags +bitexact -idct simple -i $(TARGET_SAMPLES)/mpeg2/t.mpg -an
+
+FATE_VIDEO-$(call DEMDEC, MPEGPS, MPEG2VIDEO) += fate-mpeg2-ticket6024
+fate-mpeg2-ticket6024: CMD = framecrc -flags +bitexact -idct simple -flags +truncated -i $(TARGET_SAMPLES)/mpeg2/matrixbench_mpeg2.lq1.mpg -an
 
 FATE_VIDEO-$(call DEMDEC, MV, MVC1) += fate-mv-mvc1
 fate-mv-mvc1: CMD = framecrc -i $(TARGET_SAMPLES)/mv/posture.mv -an -frames 25 -pix_fmt rgb555le
@@ -323,7 +329,7 @@ fate-v410dec: CMD = framecrc -i $(TARGET_SAMPLES)/v410/lenav410.mov -pix_fmt yuv
 
 FATE_VIDEO-$(call ENCDEC, V410 PGMYUV, AVI IMAGE2) += fate-v410enc
 fate-v410enc: $(VREF)
-fate-v410enc: CMD = md5 -f image2 -vcodec pgmyuv -i $(TARGET_PATH)/tests/vsynth1/%02d.pgm -fflags +bitexact -vcodec v410 -f avi
+fate-v410enc: CMD = md5 -f image2 -c:v pgmyuv -i $(TARGET_PATH)/tests/vsynth1/%02d.pgm -fflags +bitexact -c:v v410 -f avi
 
 FATE_VIDEO-$(call DEMDEC, SIFF, VB) += fate-vb
 fate-vb: CMD = framecrc -i $(TARGET_SAMPLES)/SIFF/INTRO_B.VB -t 3 -pix_fmt rgb24 -an

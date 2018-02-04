@@ -35,6 +35,10 @@
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
 
+#ifndef GNUTLS_VERSION_NUMBER
+#define GNUTLS_VERSION_NUMBER LIBGNUTLS_VERSION_NUMBER
+#endif
+
 #if HAVE_THREADS && GNUTLS_VERSION_NUMBER <= 0x020b00
 #include <gcrypt.h>
 #include "libavutil/thread.h"
@@ -72,6 +76,9 @@ static int print_tls_error(URLContext *h, int ret)
     switch (ret) {
     case GNUTLS_E_AGAIN:
     case GNUTLS_E_INTERRUPTED:
+#ifdef GNUTLS_E_PREMATURE_TERMINATION
+    case GNUTLS_E_PREMATURE_TERMINATION:
+#endif
         break;
     case GNUTLS_E_WARNING_ALERT_RECEIVED:
         av_log(h, AV_LOG_WARNING, "%s\n", gnutls_strerror(ret));
@@ -235,6 +242,12 @@ static int tls_write(URLContext *h, const uint8_t *buf, int size)
     return print_tls_error(h, ret);
 }
 
+static int tls_get_file_handle(URLContext *h)
+{
+    TLSContext *c = h->priv_data;
+    return ffurl_get_file_handle(c->tls_shared.tcp);
+}
+
 static const AVOption options[] = {
     TLS_COMMON_OPTIONS(TLSContext, tls_shared),
     { NULL }
@@ -253,6 +266,7 @@ const URLProtocol ff_tls_gnutls_protocol = {
     .url_read       = tls_read,
     .url_write      = tls_write,
     .url_close      = tls_close,
+    .url_get_file_handle = tls_get_file_handle,
     .priv_data_size = sizeof(TLSContext),
     .flags          = URL_PROTOCOL_FLAG_NETWORK,
     .priv_data_class = &tls_class,

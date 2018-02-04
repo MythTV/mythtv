@@ -1,6 +1,5 @@
-include $(SUBDIR)../config.mak
-
 NAME = postproc
+DESC = FFmpeg postprocessing library
 FFLIBS = avutil
 
 # x86_32 needs -O1 -fomit-frame-pointer to compile inline asm

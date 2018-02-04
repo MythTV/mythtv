@@ -18,8 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFSERVER_CONFIG_H
-#define FFSERVER_CONFIG_H
+#ifndef FFTOOLS_FFSERVER_CONFIG_H
+#define FFTOOLS_FFSERVER_CONFIG_H
+
+#define FFM_PACKET_SIZE 4096
 
 #include "libavutil/dict.h"
 #include "libavformat/avformat.h"
@@ -47,6 +49,24 @@ typedef struct FFServerIPAddressACL {
     struct in_addr last;
 } FFServerIPAddressACL;
 
+/**
+ * This holds the stream parameters for an AVStream, it cannot be a AVStream
+ * because AVStreams cannot be instanciated without a AVFormatContext, especially
+ * not outside libavformat.
+ *
+ * The fields of this struct have the same semantics as the fields of an AVStream.
+ */
+typedef struct LayeredAVStream {
+    int index;
+    int id;
+    AVCodecParameters *codecpar;
+    AVCodecContext *codec;
+    AVRational time_base;
+    int pts_wrap_bits;
+    AVRational sample_aspect_ratio;
+    char *recommended_encoder_configuration;
+} LayeredAVStream;
+
 /* description of each stream of the ffserver.conf file */
 typedef struct FFServerStream {
     enum FFServerStreamType stream_type;
@@ -62,7 +82,7 @@ typedef struct FFServerStream {
     int prebuffer;                /* Number of milliseconds early to start */
     int64_t max_time;             /* Number of milliseconds to run */
     int send_on_key;
-    AVStream *streams[FFSERVER_MAX_STREAMS];
+    LayeredAVStream *streams[FFSERVER_MAX_STREAMS];
     int feed_streams[FFSERVER_MAX_STREAMS]; /* index of streams in the feed */
     char feed_filename[1024];     /* file name of the feed storage, or
                                      input file name for a stream */
@@ -102,6 +122,7 @@ typedef struct FFServerConfig {
     unsigned int nb_max_connections;
     uint64_t max_bandwidth;
     int debug;
+    int bitexact;
     char logfilename[1024];
     struct sockaddr_in http_addr;
     struct sockaddr_in rtsp_addr;
@@ -131,4 +152,4 @@ int ffserver_parse_ffconfig(const char *filename, FFServerConfig *config);
 
 void ffserver_free_child_args(void *argsp);
 
-#endif /* FFSERVER_CONFIG_H */
+#endif /* FFTOOLS_FFSERVER_CONFIG_H */

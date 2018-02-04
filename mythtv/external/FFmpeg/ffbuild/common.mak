@@ -2,15 +2,12 @@
 # common bits used by all libraries
 #
 
-# first so "all" becomes default target
-all: all-yes
-
-DEFAULT_YASMD=.dbg
+DEFAULT_X86ASMD=.dbg
 
 ifeq ($(DBG),1)
-YASMD=$(DEFAULT_YASMD)
+X86ASMD=$(DEFAULT_X86ASMD)
 else
-YASMD=
+X86ASMD=
 endif
 
 ifndef SUBDIR
@@ -18,8 +15,8 @@ ifndef SUBDIR
 ifndef V
 Q      = @
 ECHO   = printf "$(1)\t%s\n" $(2)
-BRIEF  = CC CXX OBJCC HOSTCC HOSTLD AS YASM AR LD STRIP CP WINDRES
-SILENT = DEPCC DEPHOSTCC DEPAS DEPYASM RANLIB RM
+BRIEF  = CC CXX OBJCC HOSTCC HOSTLD AS X86ASM AR LD STRIP CP WINDRES NVCC
+SILENT = DEPCC DEPHOSTCC DEPAS DEPX86ASM RANLIB RM
 
 MSG    = $@
 M      = @$(call ECHO,$(TAG),$@);
@@ -40,7 +37,8 @@ OBJCFLAGS  += $(EOBJCFLAGS)
 OBJCCFLAGS  = $(CPPFLAGS) $(CFLAGS) $(OBJCFLAGS)
 ASFLAGS    := $(CPPFLAGS) $(ASFLAGS)
 CXXFLAGS   := $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS)
-YASMFLAGS  += $(IFLAGS:%=%/) -Pconfig.asm
+X86ASMFLAGS += $(IFLAGS:%=%/) -I$(<D)/ -Pconfig.asm
+NVCCFLAGS  += -ptx
 
 HOSTCCFLAGS = $(IFLAGS) $(HOSTCPPFLAGS) $(HOSTCFLAGS)
 LDFLAGS    := $(ALLFFLIBS:%=$(LD_PATH)lib%) $(LDFLAGS)
@@ -54,7 +52,9 @@ COMPILE_C = $(call COMPILE,CC)
 COMPILE_CXX = $(call COMPILE,CXX)
 COMPILE_S = $(call COMPILE,AS)
 COMPILE_M = $(call COMPILE,OBJCC)
+COMPILE_X86ASM = $(call COMPILE,X86ASM)
 COMPILE_HOSTC = $(call COMPILE,HOSTCC)
+COMPILE_NVCC = $(call COMPILE,NVCC)
 
 %.o: %.c
 	$(COMPILE_C)
@@ -74,6 +74,14 @@ COMPILE_HOSTC = $(call COMPILE,HOSTCC)
 %_host.o: %.c
 	$(COMPILE_HOSTC)
 
+%$(DEFAULT_X86ASMD).asm: %.asm
+	$(DEPX86ASM) $(X86ASMFLAGS) -M -o $@ $< > $(@:.asm=.d)
+	$(X86ASM) $(X86ASMFLAGS) -e $< | sed '/^%/d;/^$$/d;' > $@
+
+%.o: %.asm
+	$(COMPILE_X86ASM)
+	-$(if $(ASMSTRIPFLAGS), $(STRIP) $(ASMSTRIPFLAGS) $@)
+
 %.o: %.rc
 	$(WINDRES) $(IFLAGS) --preprocessor "$(DEPWINDRES) -E -xc-header -DRC_INVOKED $(CC_DEPFLAGS)" -o $@ $<
 
@@ -83,7 +91,13 @@ COMPILE_HOSTC = $(call COMPILE,HOSTCC)
 %.h.c:
 	$(Q)echo '#include "$*.h"' >$@
 
-%.c %.h %.ver: TAG = GEN
+%.ptx: %.cu
+	$(COMPILE_NVCC)
+
+%.ptx.c: %.ptx
+	$(Q)sh $(SRC_PATH)/compat/cuda/ptx2c.sh $@ $(patsubst $(SRC_PATH)/%,$(SRC_LINK)/%,$<)
+
+%.c %.h %.pc %.ver %.version: TAG = GEN
 
 # Dummy rule to stop make trying to rebuild removed or renamed headers
 %.h:
@@ -97,7 +111,7 @@ COMPILE_HOSTC = $(call COMPILE,HOSTCC)
 $(OBJS):
 endif
 
-include $(SRC_PATH)/arch.mak
+include $(SRC_PATH)/ffbuild/arch.mak
 
 OBJS      += $(OBJS-yes)
 SLIBOBJS  += $(SLIBOBJS-yes)
@@ -105,7 +119,7 @@ FFLIBS    := $($(NAME)_FFLIBS) $(FFLIBS-yes) $(FFLIBS)
 TESTPROGS += $(TESTPROGS-yes)
 
 LDLIBS       = $(FFLIBS:%=%$(BUILDSUF))
-FFEXTRALIBS := $(LDLIBS:%=$(LD_MYTH_LIB)) $(EXTRALIBS)
+FFEXTRALIBS := $(LDLIBS:%=$(LD_LIB)) $(EXTRALIBS)
 
 OBJS      := $(sort $(OBJS:%=$(SUBDIR)%))
 SLIBOBJS  := $(sort $(SLIBOBJS:%=$(SUBDIR)%))
@@ -127,8 +141,10 @@ ALLHEADERS := $(subst $(SRC_DIR)/,$(SUBDIR),$(wildcard $(SRC_DIR)/*.h $(SRC_DIR)
 SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
 SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
 HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
+PTXOBJS      = $(filter %.ptx.o,$(OBJS))
+$(HOBJS):     CCFLAGS += $(CFLAGS_HEADERS)
 checkheaders: $(HOBJS)
-.SECONDARY:   $(HOBJS:.o=.c)
+.SECONDARY:   $(HOBJS:.o=.c) $(PTXOBJS:.o=.c) $(PTXOBJS:.o=)
 
 alltools: $(TOOLS)
 
@@ -136,7 +152,7 @@ $(HOSTOBJS): %.o: %.c
 	$(COMPILE_HOSTC)
 
 $(HOSTPROGS): %$(HOSTEXESUF): %.o
-	$(HOSTLD) $(HOSTLDFLAGS) $(HOSTLD_O) $^ $(HOSTLIBS)
+	$(HOSTLD) $(HOSTLDFLAGS) $(HOSTLD_O) $^ $(HOSTEXTRALIBS)
 
 $(OBJS):     | $(sort $(dir $(OBJS)))
 $(HOBJS):    | $(sort $(dir $(HOBJS)))
@@ -147,7 +163,7 @@ $(TOOLOBJS): | tools
 
 OBJDIRS := $(OBJDIRS) $(dir $(OBJS) $(HOBJS) $(HOSTOBJS) $(SLIBOBJS) $(TESTOBJS))
 
-CLEANSUFFIXES     = *.d *.o *~ *.h.c *.gcda *.gcno *.map *.ver *.ho *$(DEFAULT_YASMD).asm
+CLEANSUFFIXES     = *.d *.o *~ *.h.c *.gcda *.gcno *.map *.ver *.version *.ho *$(DEFAULT_X86ASMD).asm *.ptx *.ptx.c
 DISTCLEANSUFFIXES = *.pc
 LIBSUFFIXES       = *.a *.lib *.so *.so.* *.dylib *.dll *.def *.dll.a
 
@@ -158,4 +174,4 @@ endef
 
 $(eval $(RULES))
 
--include $(wildcard $(OBJS:.o=.d) $(HOSTOBJS:.o=.d) $(TESTOBJS:.o=.d) $(HOBJS:.o=.d) $(SLIBOBJS:.o=.d)) $(OBJS:.o=$(DEFAULT_YASMD).d)
+-include $(wildcard $(OBJS:.o=.d) $(HOSTOBJS:.o=.d) $(TESTOBJS:.o=.d) $(HOBJS:.o=.d) $(SLIBOBJS:.o=.d)) $(OBJS:.o=$(DEFAULT_X86ASMD).d)

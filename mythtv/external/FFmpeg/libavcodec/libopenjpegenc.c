@@ -32,7 +32,11 @@
 #include "avcodec.h"
 #include "internal.h"
 
-#if HAVE_OPENJPEG_2_1_OPENJPEG_H
+#if HAVE_OPENJPEG_2_3_OPENJPEG_H
+#  include <openjpeg-2.3/openjpeg.h>
+#elif HAVE_OPENJPEG_2_2_OPENJPEG_H
+#  include <openjpeg-2.2/openjpeg.h>
+#elif HAVE_OPENJPEG_2_1_OPENJPEG_H
 #  include <openjpeg-2.1/openjpeg.h>
 #elif HAVE_OPENJPEG_2_0_OPENJPEG_H
 #  include <openjpeg-2.0/openjpeg.h>
@@ -42,7 +46,7 @@
 #  include <openjpeg.h>
 #endif
 
-#if HAVE_OPENJPEG_2_1_OPENJPEG_H || HAVE_OPENJPEG_2_0_OPENJPEG_H
+#if HAVE_OPENJPEG_2_3_OPENJPEG_H || HAVE_OPENJPEG_2_2_OPENJPEG_H || HAVE_OPENJPEG_2_1_OPENJPEG_H || HAVE_OPENJPEG_2_0_OPENJPEG_H
 #  define OPENJPEG_MAJOR_VERSION 2
 #  define OPJ(x) OPJ_##x
 #else
@@ -64,9 +68,8 @@ typedef struct LibOpenJPEGContext {
     int prog_order;
     int cinema_mode;
     int numresolution;
-    int numlayers;
+    int irreversible;
     int disto_alloc;
-    int fixed_alloc;
     int fixed_quality;
 } LibOpenJPEGContext;
 
@@ -306,7 +309,7 @@ static av_cold int libopenjpeg_encode_init(AVCodecContext *avctx)
 
     opj_set_default_encoder_parameters(&ctx->enc_params);
 
-#if HAVE_OPENJPEG_2_1_OPENJPEG_H
+#if HAVE_OPENJPEG_2_3_OPENJPEG_H || HAVE_OPENJPEG_2_2_OPENJPEG_H || HAVE_OPENJPEG_2_1_OPENJPEG_H
     switch (ctx->cinema_mode) {
     case OPJ_CINEMA2K_24:
         ctx->enc_params.rsiz = OPJ_PROFILE_CINEMA_2K;
@@ -358,13 +361,12 @@ static av_cold int libopenjpeg_encode_init(AVCodecContext *avctx)
             ctx->numresolution --;
     }
 
-    ctx->enc_params.mode = !!avctx->global_quality;
     ctx->enc_params.prog_order = ctx->prog_order;
     ctx->enc_params.numresolution = ctx->numresolution;
+    ctx->enc_params.irreversible = ctx->irreversible;
     ctx->enc_params.cp_disto_alloc = ctx->disto_alloc;
-    ctx->enc_params.cp_fixed_alloc = ctx->fixed_alloc;
     ctx->enc_params.cp_fixed_quality = ctx->fixed_quality;
-    ctx->enc_params.tcp_numlayers = ctx->numlayers;
+    ctx->enc_params.tcp_numlayers = 1;
     ctx->enc_params.tcp_rates[0] = FFMAX(avctx->compression_level, 0) * 2;
 
     if (ctx->cinema_mode > 0) {
@@ -771,7 +773,7 @@ static int libopenjpeg_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     opj_stream_set_write_function(stream, stream_write);
     opj_stream_set_skip_function(stream, stream_skip);
     opj_stream_set_seek_function(stream, stream_seek);
-#if HAVE_OPENJPEG_2_1_OPENJPEG_H
+#if HAVE_OPENJPEG_2_3_OPENJPEG_H || HAVE_OPENJPEG_2_2_OPENJPEG_H || HAVE_OPENJPEG_2_1_OPENJPEG_H
     opj_stream_set_user_data(stream, &writer, NULL);
 #elif HAVE_OPENJPEG_2_0_OPENJPEG_H
     opj_stream_set_user_data(stream, &writer);
@@ -838,11 +840,10 @@ static const AVOption options[] = {
     { "rpcl",          NULL,                0,                     AV_OPT_TYPE_CONST, { .i64 = OPJ(RPCL)    }, 0,         0,           VE, "prog_order"  },
     { "pcrl",          NULL,                0,                     AV_OPT_TYPE_CONST, { .i64 = OPJ(PCRL)    }, 0,         0,           VE, "prog_order"  },
     { "cprl",          NULL,                0,                     AV_OPT_TYPE_CONST, { .i64 = OPJ(CPRL)    }, 0,         0,           VE, "prog_order"  },
-    { "numresolution", NULL,                OFFSET(numresolution), AV_OPT_TYPE_INT,   { .i64 = 0           }, 0,         INT_MAX,     VE                },
-    { "numlayers",     NULL,                OFFSET(numlayers),     AV_OPT_TYPE_INT,   { .i64 = 1           }, 1,         10,          VE                },
-    { "disto_alloc",   NULL,                OFFSET(disto_alloc),   AV_OPT_TYPE_INT,   { .i64 = 1           }, 0,         1,           VE                },
-    { "fixed_alloc",   NULL,                OFFSET(fixed_alloc),   AV_OPT_TYPE_INT,   { .i64 = 0           }, 0,         1,           VE                },
-    { "fixed_quality", NULL,                OFFSET(fixed_quality), AV_OPT_TYPE_INT,   { .i64 = 0           }, 0,         1,           VE                },
+    { "numresolution", NULL,                OFFSET(numresolution), AV_OPT_TYPE_INT,   { .i64 = 6            }, 0,         33,          VE                },
+    { "irreversible",  NULL,                OFFSET(irreversible),  AV_OPT_TYPE_INT,   { .i64 = 0            }, 0,         1,           VE                },
+    { "disto_alloc",   NULL,                OFFSET(disto_alloc),   AV_OPT_TYPE_INT,   { .i64 = 1            }, 0,         1,           VE                },
+    { "fixed_quality", NULL,                OFFSET(fixed_quality), AV_OPT_TYPE_INT,   { .i64 = 0            }, 0,         1,           VE                },
     { NULL },
 };
 

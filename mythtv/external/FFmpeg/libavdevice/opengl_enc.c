@@ -49,7 +49,7 @@
 #include <GL/glx.h>
 #endif
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
 #include <SDL.h>
 #endif
 
@@ -68,7 +68,7 @@
 #define APIENTRY
 #endif
 
-/* FF_GL_RED_COMPONENT is used for plannar pixel types.
+/* FF_GL_RED_COMPONENT is used for planar pixel types.
  * Only red component is sampled in shaders.
  * On some platforms GL_RED is not available and GL_LUMINANCE have to be used,
  * but since OpenGL 3.0 GL_LUMINANCE is deprecated.
@@ -177,7 +177,7 @@ static const GLushort g_index[6] =
 typedef struct OpenGLContext {
     AVClass *class;                    ///< class for private options
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
     SDL_Window *window;
     SDL_GLContext glcontext;
 #endif
@@ -264,6 +264,7 @@ static const struct OpenGLFormatDesc {
     { AV_PIX_FMT_RGB8,       &FF_OPENGL_FRAGMENT_SHADER_RGB_PACKET,  GL_RGB, FF_GL_UNSIGNED_BYTE_3_3_2 },
     { AV_PIX_FMT_BGR8,       &FF_OPENGL_FRAGMENT_SHADER_RGB_PACKET,  GL_RGB, FF_GL_UNSIGNED_BYTE_2_3_3_REV },
     { AV_PIX_FMT_RGB48,      &FF_OPENGL_FRAGMENT_SHADER_RGB_PACKET,  GL_RGB, GL_UNSIGNED_SHORT },
+    { AV_PIX_FMT_BGR48,      &FF_OPENGL_FRAGMENT_SHADER_RGB_PACKET,  GL_RGB, GL_UNSIGNED_SHORT },
     { AV_PIX_FMT_ARGB,       &FF_OPENGL_FRAGMENT_SHADER_RGBA_PACKET, GL_RGBA, GL_UNSIGNED_BYTE },
     { AV_PIX_FMT_RGBA,       &FF_OPENGL_FRAGMENT_SHADER_RGBA_PACKET, GL_RGBA, GL_UNSIGNED_BYTE },
     { AV_PIX_FMT_ABGR,       &FF_OPENGL_FRAGMENT_SHADER_RGBA_PACKET, GL_RGBA, GL_UNSIGNED_BYTE },
@@ -345,7 +346,7 @@ static int opengl_control_message(AVFormatContext *h, int type, void *data, size
     return AVERROR(ENOSYS);
 }
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
 static int opengl_sdl_process_events(AVFormatContext *h)
 {
     OpenGLContext *opengl = h->priv_data;
@@ -450,14 +451,14 @@ static int av_cold opengl_sdl_load_procedures(OpenGLContext *opengl)
 
 #undef LOAD_OPENGL_FUN
 }
-#endif /* HAVE_SDL2 */
+#endif /* CONFIG_SDL2 */
 
 #if defined(__APPLE__)
 static int av_cold opengl_load_procedures(OpenGLContext *opengl)
 {
     FFOpenGLFunctions *procs = &opengl->glprocs;
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
     if (!opengl->no_window)
         return opengl_sdl_load_procedures(opengl);
 #endif
@@ -509,7 +510,7 @@ static int av_cold opengl_load_procedures(OpenGLContext *opengl)
         return AVERROR(ENOSYS); \
     }
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
     if (!opengl->no_window)
         return opengl_sdl_load_procedures(opengl);
 #endif
@@ -935,7 +936,7 @@ static int opengl_create_window(AVFormatContext *h)
     int ret;
 
     if (!opengl->no_window) {
-#if HAVE_SDL2
+#if CONFIG_SDL2
         if ((ret = opengl_sdl_create_window(h)) < 0) {
             av_log(opengl, AV_LOG_ERROR, "Cannot create default SDL window.\n");
             return ret;
@@ -967,7 +968,7 @@ static int opengl_release_window(AVFormatContext *h)
     int ret;
     OpenGLContext *opengl = h->priv_data;
     if (!opengl->no_window) {
-#if HAVE_SDL2
+#if CONFIG_SDL2
         SDL_GL_DeleteContext(opengl->glcontext);
         SDL_DestroyWindow(opengl->window);
         SDL_Quit();
@@ -1103,7 +1104,7 @@ static av_cold int opengl_write_header(AVFormatContext *h)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
     if (!opengl->no_window)
         SDL_GL_SwapWindow(opengl->window);
 #endif
@@ -1198,7 +1199,7 @@ static int opengl_draw(AVFormatContext *h, void *input, int repaint, int is_pkt)
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
     int ret;
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
     if (!opengl->no_window && (ret = opengl_sdl_process_events(h)) < 0)
         goto fail;
 #endif
@@ -1239,7 +1240,7 @@ static int opengl_draw(AVFormatContext *h, void *input, int repaint, int is_pkt)
     ret = AVERROR_EXTERNAL;
     OPENGL_ERROR_CHECK(opengl);
 
-#if HAVE_SDL2
+#if CONFIG_SDL2
     if (!opengl->no_window)
         SDL_GL_SwapWindow(opengl->window);
 #endif
