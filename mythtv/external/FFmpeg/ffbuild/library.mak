@@ -1,4 +1,4 @@
-#DO WE NEED THIS PGB #SRC_DIR := $(SRC_PATH_BARE)/lib$(NAME)
+SRC_DIR := $(SRC_PATH_BARE)/lib$(NAME)
 
 include $(SRC_PATH_BARE)/external/FFmpeg/ffbuild/common.mak
 

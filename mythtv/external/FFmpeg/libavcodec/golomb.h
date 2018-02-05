@@ -327,7 +327,7 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit,
     } else {
         int i;
         for (i = 0; i < limit && SHOW_UBITS(re, gb, 1) == 0; i++) {
-            if (gb->size_in_bits <= (int)re_index)
+            if (gb->size_in_bits <= (int)re_index) {
                 CLOSE_READER(re, gb);
                 return -1;
             }

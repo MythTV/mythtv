@@ -7,6 +7,7 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavcodec/mpegvideo.h"
+#include "libavutil/internal.h"
 #include "libavcodec/golomb.h"
 }
 

@@ -12,6 +12,7 @@
 
 extern "C" {
 #include "libavcodec/vdpau.h"
+#include "vdpau/vdpau_x11.h"
 }
 
 #define MIN_OUTPUT_SURFACES  2 // UI
