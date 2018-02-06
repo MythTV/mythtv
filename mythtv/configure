@@ -6126,7 +6126,7 @@ for i in $CHECK_QMAKE; do
         qmake_version=`$i -query QT_VERSION`
         if [ $(version2num $qmake_version) -ge $QT_MIN_VERSION ]; then
             found_qmake=$i
-#            check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=$QT_MIN_VERSION_HEX
+            check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=$QT_MIN_VERSION_HEX
             break;
         else
             echo "found qmake at $i but version failed"
