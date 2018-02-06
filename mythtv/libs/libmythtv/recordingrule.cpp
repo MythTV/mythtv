@@ -621,8 +621,9 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
         if (m_type == kWeeklyRecord)
         {
             int daynum = (m_findday + 5) % 7 + 1;
-            findfrom = QString("%1, %2").arg(QDate::shortDayName(daynum))
-                                        .arg(findfrom);
+            findfrom = QString("%1, %2")
+		 .arg(gCoreContext->GetQLocale().dayName(daynum, QLocale::ShortFormat))
+		 .arg(findfrom);
         }
         infoMap["subtitle"] = tr("(%1 or later) %3",
                                  "e.g. (Sunday or later) program "
