@@ -132,7 +132,11 @@ QString ThumbItem::GetDescription(const QString &status,
 
     info += "\n\n" + tr("Folder: %1").arg(fi.dir().dirName());
     //: %1 is the creation date
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     info += "\n" + tr("Created: %1").arg(fi.created().toString());
+#else
+    info += "\n" + tr("Created: %1").arg(fi.birthTime().toString());
+#endif
     //: %1 is the modification date
     info += "\n" + tr("Modified: %1").arg(fi.lastModified().toString());
     info += "\n" + tr("Size: %n byte(s)", "", fi.size());
