@@ -132,8 +132,13 @@ public:
 #endif
     QMutex *m_cacheLock;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     QAtomicInt m_cacheSize;
     QAtomicInt m_maxCacheSize;
+#else
+    QAtomicInteger<qint64> m_cacheSize;
+    QAtomicInteger<qint64> m_maxCacheSize;
+#endif
 
     // The part of the screen(s) allocated for the GUI. Unless
     // overridden by the user, defaults to drawable area above.
@@ -602,13 +607,21 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 void MythUIHelper::IncludeInCacheSize(MythImage *im)
 {
     if (im)
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         d->m_cacheSize.fetchAndAddOrdered(im->byteCount());
+#else
+        d->m_cacheSize.fetchAndAddOrdered(im->sizeInBytes());
+#endif
 }
 
 void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
 {
     if (im)
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         d->m_cacheSize.fetchAndAddOrdered(-im->byteCount());
+#else
+        d->m_cacheSize.fetchAndAddOrdered(-im->sizeInBytes());
+#endif
 }
 
 MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
@@ -631,7 +644,13 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     // delete the oldest cached images until we fall below threshold.
     QMutexLocker locker(d->m_cacheLock);
 
-    while (d->m_cacheSize.fetchAndAddOrdered(0) + im->byteCount() >=
+    while ((d->m_cacheSize.fetchAndAddOrdered(0) +
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+	   im->byteCount()
+#else
+	   im->sizeInBytes()
+#endif
+	    ) >=
            d->m_maxCacheSize.fetchAndAddOrdered(0) &&
            d->imageCache.size())
     {
@@ -666,7 +685,13 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         {
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
                 QString("Cache too big (%1), removing :%2:")
-                .arg(d->m_cacheSize.fetchAndAddOrdered(0) + im->byteCount())
+                .arg(d->m_cacheSize.fetchAndAddOrdered(0) +
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+		     im->byteCount()
+#else
+		     im->sizeInBytes()
+#endif
+		     )
                 .arg(oldestKey));
 
             d->imageCache[oldestKey]->SetIsInCache(false);
@@ -695,7 +720,13 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         im->SetIsInCache(true);
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("NOT IN RAM CACHE, Adding, and adding to size :%1: :%2:")
-            .arg(url).arg(im->byteCount()));
+            .arg(url)
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+	    .arg(im->byteCount())
+#else
+	    .arg(im->sizeInBytes())
+#endif
+	    );
     }
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
