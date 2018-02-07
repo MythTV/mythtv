@@ -55,6 +55,7 @@ libavformat/utils.c             // fix to make Myth mpegts demux higher priority
 libavformat/wtvdec.c <- header change
 libavutil/frame.c               // CEA-708/608 AVFrame members addition
 libavutil/frame.h
+libavutil/timer.h               // Fix C++11 compile error on osx
 libpostproc/Makefile
 libpostproc/postprocess.c
 
