@@ -7143,7 +7143,7 @@ enabled gnutls            && require_pkg_config gnutls gnutls gnutls/gnutls.h gn
 enabled jni               && { [ $target_os = "android" ] && check_header jni.h && enabled pthreads || die "ERROR: jni not found"; }
 enabled ladspa            && require_header ladspa.h
 enabled libiec61883       && require libiec61883 libiec61883/iec61883.h iec61883_cmp_connect -lraw1394 -lavc1394 -lrom1394 -liec61883
-enabled libass            && require_pkg_config libass libass ass/ass.h ass_library_init
+#enabled libass            && require_pkg_config libass libass ass/ass.h ass_library_init
 enabled libbluray         && require_pkg_config libbluray libbluray libbluray/bluray.h bd_open -lbluray
 enabled libbs2b           && require_pkg_config libbs2b libbs2b bs2b.h bs2b_open
 enabled libcelt           && require libcelt celt/celt.h celt_decode -lcelt0 &&
@@ -7925,7 +7925,7 @@ enabled libfftw3 && check_lib fftw3_threads fftw3.h fftw_init_threads  -lfftw3f 
     disable libfftw3
 
 # ass_flush_events was added in 0.9.10
-enabled libass && check_lib ass ass/ass.h ass_flush_events  || disable libass
+enabled libass && check_lib ass ass/ass.h ass_flush_events -lass  || disable libass
 
 if enabled libcec ; then
     if pkg-config --exists libcec; then
