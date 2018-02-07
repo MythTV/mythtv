@@ -40,7 +40,9 @@ QString profileToString(VAProfile profile)
     if (VAProfileMPEG4Simple == profile)                return "MPEG4Simple";
     if (VAProfileMPEG4AdvancedSimple == profile)        return "MPEG4AdvSimple";
     if (VAProfileMPEG4Main == profile)                  return "MPEG4Main";
+#if not VA_CHECK_VERSION(1,0,0) // VAProfileH264Baseline is deprecated
     if (VAProfileH264Baseline == profile)               return "H264Base";
+#endif
     if (VAProfileH264ConstrainedBaseline == profile)    return "H264ConstrainedBase";
     if (VAProfileH264Main == profile)                   return "H264Main";
     if (VAProfileH264High == profile)                   return "H264High";

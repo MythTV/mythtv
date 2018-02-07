@@ -86,6 +86,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            const QString   &TitleRegEx,
                                                            const QString   &RecGroup,
                                                            const QString   &StorageGroup,
+                                                           const QString   &Category,
                                                            const QString   &Sort) = 0;
 
         virtual DTC::ProgramList* GetOldRecordedList     ( bool             Descending,
@@ -168,6 +169,8 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         virtual DTC::InputList*    GetInputList          ( ) = 0;
 
         virtual QStringList        GetRecGroupList       ( ) = 0;
+
+        virtual QStringList        GetProgramCategories  ( bool OnlyRecorded ) = 0;
 
         virtual QStringList        GetRecStorageGroupList ( ) = 0;
 

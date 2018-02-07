@@ -49,6 +49,7 @@ class Dvr : public DvrServices
                                                 const QString   &TitleRegEx,
                                                 const QString   &RecGroup,
                                                 const QString   &StorageGroup,
+                                                const QString   &Category,
                                                 const QString   &Sort);
 
         DTC::ProgramList* GetOldRecordedList  ( bool             Descending,
@@ -132,6 +133,8 @@ class Dvr : public DvrServices
         DTC::InputList*   GetInputList        ( );
 
         QStringList       GetRecGroupList     ( );
+
+        QStringList       GetProgramCategories   ( bool OnlyRecorded );
 
         QStringList       GetRecStorageGroupList ( );
 
@@ -320,13 +323,14 @@ class ScriptableDvr : public QObject
                                        const QString   &TitleRegEx,
                                        const QString   &RecGroup,
                                        const QString   &StorageGroup,
+                                       const QString   &Category,
                                        const QString   &Sort
                                      )
         {
             SCRIPT_CATCH_EXCEPTION( NULL,
                 return m_obj.GetRecordedList( Descending, StartIndex, Count,
                                               TitleRegEx, RecGroup,
-                                              StorageGroup, Sort);
+                                              StorageGroup, Category, Sort);
             )
         }
 
