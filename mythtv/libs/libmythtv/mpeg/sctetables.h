@@ -373,7 +373,11 @@ class VirtualChannelMapSubtable
     QDateTime ActivationTimeUTC(uint offset = 0) const
     {
         QDateTime dt;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         dt.setTime_t(GPS_EPOCH + offset + ActivationTimeRaw());
+#else
+        dt.setSecsSinceEpoch(GPS_EPOCH + offset + ActivationTimeRaw());
+#endif
         return dt;
     }
     //   number_of_VC_records   8 13.0
@@ -589,9 +593,25 @@ class MTV_PUBLIC SCTESystemTimeTable : public PSIPTable
                 (pesdata()[7]<< 8) |  pesdata()[8]);
     }
     QDateTime SystemTimeGPS(void) const
-        { QDateTime dt; dt.setTime_t(GPSUnix()); return dt; }
+    {
+        QDateTime dt;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+        dt.setTime_t(GPSUnix());
+#else
+        dt.setSecsSinceEpoch(GPSUnix());
+#endif
+        return dt;
+    }
     QDateTime SystemTimeUTC(void) const
-        { QDateTime dt; dt.setTime_t(UTCUnix()); return dt; }
+    {
+        QDateTime dt;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
+        dt.setTime_t(UTCUnix());
+#else
+        dt.setSecsSinceEpoch(UTCUnix());
+#endif
+        return dt;
+    }
     time_t GPSUnix(void) const
         { return GPS_EPOCH + SystemTimeRaw(); }
     time_t UTCUnix(void) const

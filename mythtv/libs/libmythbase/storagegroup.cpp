@@ -385,7 +385,7 @@ bool StorageGroup::FileExists(const QString &filename)
 
 
 // Returns a string list of details about the file
-// in the order EXISTS, DATE, SIZE
+// in the order FILENAME, DATE, SIZE
 QStringList StorageGroup::GetFileInfo(const QString &lfilename)
 {
     QString filename = lfilename;
@@ -407,7 +407,15 @@ QStringList StorageGroup::GetFileInfo(const QString &lfilename)
         QFileInfo fInfo(filename);
 
         details << filename;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         details << QString("%1").arg(fInfo.lastModified().toTime_t());
+#else
+        if (fInfo.lastModified().isValid()) {
+            details << QString("%1").arg(fInfo.lastModified().toSecsSinceEpoch());
+        } else {
+            details << QString((uint)-1);
+        }
+#endif
         details << QString("%1").arg(fInfo.size());
     }
 

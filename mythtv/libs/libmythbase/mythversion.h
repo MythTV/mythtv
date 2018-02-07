@@ -47,6 +47,16 @@
  */
 #define MYTH_PROTO_VERSION "91"
 #define MYTH_PROTO_TOKEN "BuzzOff"
+/*
+ *  Protocol cleanups needed:
+ *
+ *  Inconsistent handling of invalid QDateTime objects:
+ *    QUERY_PIXMAP_GET_IF_MODIFIED -> QString("-1")
+ *    QUERY_PIXMAP_LASTMODIFIED    -> "BAD"
+ *    QUERY_SG_FILEQUERY           -> QString((uint)-1) -> "4294967295"
+ *    Everything that serializes ProgramInfo
+ *                                 -> QString((uint)-1) -> "4294967295"
+ */
 
 /** \brief Increment this whenever the MythTV core database schema changes.
  *

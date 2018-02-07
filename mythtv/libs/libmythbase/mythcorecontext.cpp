@@ -143,7 +143,11 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_sessionManager(NULL)
 {
     MThread::ThreadSetup("CoreContext");
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     srandom(MythDate::current().toTime_t() ^ QTime::currentTime().msec());
+#else
+    srandom(MythDate::current().toSecsSinceEpoch() ^ QTime::currentTime().msec());
+#endif
 }
 
 static void delete_sock(QMutexLocker &locker, MythSocket **s)

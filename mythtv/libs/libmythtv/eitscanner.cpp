@@ -149,7 +149,11 @@ void EITScanner::run(void)
             ++activeScanNextChan;
 
             // 24 hours ago
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
             eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);
+#else
+            eitHelper->PruneEITCache(activeScanNextTrig.toSecsSinceEpoch() - 86400);
+#endif
         }
 
         lock.lock();

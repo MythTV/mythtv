@@ -6123,14 +6123,17 @@ fi
 found_qmake=''
 for i in $CHECK_QMAKE; do
     if test -e $i ; then
-        qmake_version=`$i -query QT_VERSION`
-        if [ $(version2num $qmake_version) -ge $QT_MIN_VERSION ]; then
+        qt_version_str=`$i -query QT_VERSION`
+        qt_version=$(version2num $qt_version_str)
+        qt_version_hex=$(printf "0x%06x" $QT_VERSION)
+        if [ $qt_version -ge $QT_MIN_VERSION ]; then
             found_qmake=$i
             check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=$QT_MIN_VERSION_HEX
+#            check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=$qt_version_hex
             break;
         else
             echo "found qmake at $i but version failed"
-            echo "got version: $qmake_version"
+            echo "got version: $qt_version_str"
         fi
     fi
 done

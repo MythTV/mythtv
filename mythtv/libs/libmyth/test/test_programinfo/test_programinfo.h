@@ -95,7 +95,63 @@ class TestProgramInfo : public QObject
         );
     }
 
+    QString draculalist = "Dracula||Its a movie.|0|0|0|||4294967295|||||0|946684800|946690200|4294967295||0|0|0|0|0|4294967295|0|0|0|946684800|946690200|0|Default|||tt0051554|11868|4294967295|0||Default|0|0|Default|0|0|0|1958|0|0|1|0||4294967295";
+    QString flash34list = "The Flash (2014)|The New Rogues|Barry continues to train Jesse ...|3|4|23|syndicatedepisode|Drama|1514|514|WNUVDT|WNUBDT (WNUV-DT)|/recordings/1514_20161025235800.ts|6056109800|1477439880|1477443720|0|localhost|0|0|0|0|0|0|0|15|8|1477439880|1477443720|0|Default||EP01922936|EP019229360055|ttvdb.py_279121|1477458754|0|2016-10-25|Default|0|0|Default|0|0|0|2016|0|0|4|715|Prime A-1|4294967295";
+    QString supergirl23list = "Supergirl|Welcome to Earth|An attack is made on the President as hot-button...|2|3|23|syndicatedepisode|Drama|1514|514|WNUVDT|WNUBDT (WNUV-DT)|/recordings/1514_20161024235800.ts|6056109670|1477353480|1477357320|0|localhost|0|0|0|0|0|0|0|15|8|1477353480|1477357320|0|Default||EP02185451|EP021854510025|ttvdb.py_295759|1477458754|0|2016-10-24|Default|0|0|Default|0|0|0|2016|0|0|4|711|Prime A-0|4294967295";
+    ProgramInfo dracula;
+    ProgramInfo flash34;
+    ProgramInfo supergirl23;
+
   private slots:
+    void initTestCase()
+    {
+        dracula = ProgramInfo(mockMovie ("11868", "tt0051554", "Dracula", 1958));
+        flash34 = ProgramInfo
+            (715,
+             "The Flash (2014)",
+             "The New Rogues",
+             "Barry continues to train Jesse ...",
+             3, 4, 23, "syndicatedepisode", "Drama",
+             1514, "514", "WNUVDT", "WNUBDT (WNUV-DT)", "",
+             QString("Default"), QString("Default"),
+             "/recordings/1514_20161025235800.ts",
+             "localhost", "Default",
+             "EP01922936", "EP019229360055", "ttvdb.py_279121",
+             ProgramInfo::kCategoryTVShow, 0, 6056109800,
+             MythDate::fromString("2016-10-25 23:58:00"),
+             MythDate::fromString("2016-10-26 01:02:00"),
+             MythDate::fromString("2016-10-25 23:58:00"),
+             MythDate::fromString("2016-10-26 01:02:00"),
+             0.0, 2016, 0, 0, QDate(2016,10,25),
+             QDateTime(QDate(2016,10,26),QTime(1,12,34)),
+             RecStatus::Unknown, 0,
+             kDupsInAll, kDupCheckSubThenDesc,
+             0, 0, 0, 0, 0, "Prime A-1",
+             QDateTime());
+        supergirl23 = ProgramInfo
+            (711,
+             "Supergirl",
+             "Welcome to Earth",
+             "An attack is made on the President as hot-button...",
+             2, 3, 23, "syndicatedepisode", "Drama",
+             1514, "514", "WNUVDT", "WNUBDT (WNUV-DT)", "",
+             "Default", "Default",
+             "/recordings/1514_20161024235800.ts",
+             "localhost", "Default",
+             "EP02185451", "EP021854510025", "ttvdb.py_295759",
+             ProgramInfo::kCategoryTVShow, 0, 6056109670,
+             MythDate::fromString("2016-10-24 23:58:00"),
+             MythDate::fromString("2016-10-25 01:02:00"),
+             MythDate::fromString("2016-10-24 23:58:00"),
+             MythDate::fromString("2016-10-25 01:02:00"),
+             0.0, 2016, 0, 0, QDate(2016,10,24),
+             QDateTime(QDate(2016,10,26),QTime(1,12,34)),
+             RecStatus::Unknown, 0,
+             kDupsInAll, kDupCheckSubThenDesc,
+             0, 0, 0, 0, 0, "Prime A-0",
+             QDateTime());
+    }
+
     /**
      * test for https://code.mythtv.org/trac/ticket/12049
      */
@@ -162,5 +218,41 @@ class TestProgramInfo : public QObject
         ProgramInfo programG (mockMovie ("", "", "Gone", 2012));
         ProgramInfo programH (mockMovie ("", "", "Gone", 2012));
         QVERIFY (programG.IsSameProgram (programH));
+    }
+
+    void programToStringList_test(void)
+    {
+        QStringList program_list;
+        dracula.ToStringList(program_list);
+        QVERIFY(program_list.join('|') == draculalist);
+        ProgramInfo alucard(program_list);
+        QVERIFY(dracula == alucard);
+
+        program_list.clear();
+        flash34.ToStringList(program_list);
+        QVERIFY(program_list.join('|') == flash34list);
+        ProgramInfo hsalf34(program_list);
+        QVERIFY(flash34 == hsalf34);
+
+        program_list.clear();
+        supergirl23.ToStringList(program_list);
+        QVERIFY(program_list.join('|') == supergirl23list);
+        ProgramInfo lrigrepus23(program_list);
+        QVERIFY(supergirl23 == lrigrepus23);
+
+        // Test accepting an empty string for an invalid QDateTime
+        program_list.clear();
+        supergirl23.ToStringList(program_list);
+        program_list[51] = "";
+        ProgramInfo lrigrepus23b(program_list);
+        QVERIFY(supergirl23 == lrigrepus23b);
+
+        // Test a failure
+        program_list.clear();
+        supergirl23.ToStringList(program_list);
+        program_list[1] = "Welcome to Earth 2";
+        ProgramInfo lrigrepus23c(program_list);
+        QEXPECT_FAIL("", "Intentionally changed title.", Abort);
+        QVERIFY(supergirl23 == lrigrepus23c);
     }
 };

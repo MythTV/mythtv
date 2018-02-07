@@ -125,11 +125,20 @@ public:
     bool m_isWide;
 
     QMap<QString, MythImage *> imageCache;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     QMap<QString, uint> CacheTrack;
+#else
+    QMap<QString, qint64> CacheTrack;
+#endif
     QMutex *m_cacheLock;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     QAtomicInt m_cacheSize;
     QAtomicInt m_maxCacheSize;
+#else
+    QAtomicInteger<qint64> m_cacheSize;
+    QAtomicInteger<qint64> m_maxCacheSize;
+#endif
 
     // The part of the screen(s) allocated for the GUI. Unless
     // overridden by the user, defaults to drawable area above.
@@ -574,7 +583,11 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 
     if (d->imageCache.contains(url))
     {
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         d->CacheTrack[url] = MythDate::current().toTime_t();
+#else
+        d->CacheTrack[url] = MythDate::current().toSecsSinceEpoch();
+#endif
         d->imageCache[url]->IncrRef();
         return d->imageCache[url];
     }
@@ -594,13 +607,21 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 void MythUIHelper::IncludeInCacheSize(MythImage *im)
 {
     if (im)
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         d->m_cacheSize.fetchAndAddOrdered(im->byteCount());
+#else
+        d->m_cacheSize.fetchAndAddOrdered(im->sizeInBytes());
+#endif
 }
 
 void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
 {
     if (im)
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         d->m_cacheSize.fetchAndAddOrdered(-im->byteCount());
+#else
+        d->m_cacheSize.fetchAndAddOrdered(-im->sizeInBytes());
+#endif
 }
 
 MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
@@ -623,12 +644,22 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     // delete the oldest cached images until we fall below threshold.
     QMutexLocker locker(d->m_cacheLock);
 
-    while (d->m_cacheSize.fetchAndAddOrdered(0) + im->byteCount() >=
+    while ((d->m_cacheSize.fetchAndAddOrdered(0) +
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+	   im->byteCount()
+#else
+	   im->sizeInBytes()
+#endif
+	    ) >=
            d->m_maxCacheSize.fetchAndAddOrdered(0) &&
            d->imageCache.size())
     {
         QMap<QString, MythImage *>::iterator it = d->imageCache.begin();
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         uint oldestTime = MythDate::current().toTime_t();
+#else
+        qint64 oldestTime = MythDate::current().toSecsSinceEpoch();
+#endif
         QString oldestKey = it.key();
 
         int count = 0;
@@ -654,7 +685,13 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         {
             LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
                 QString("Cache too big (%1), removing :%2:")
-                .arg(d->m_cacheSize.fetchAndAddOrdered(0) + im->byteCount())
+                .arg(d->m_cacheSize.fetchAndAddOrdered(0) +
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+		     im->byteCount()
+#else
+		     im->sizeInBytes()
+#endif
+		     )
                 .arg(oldestKey));
 
             d->imageCache[oldestKey]->SetIsInCache(false);
@@ -674,12 +711,22 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     {
         im->IncrRef();
         d->imageCache[url] = im;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         d->CacheTrack[url] = MythDate::current().toTime_t();
+#else
+        d->CacheTrack[url] = MythDate::current().toSecsSinceEpoch();
+#endif
 
         im->SetIsInCache(true);
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
             QString("NOT IN RAM CACHE, Adding, and adding to size :%1: :%2:")
-            .arg(url).arg(im->byteCount()));
+            .arg(url)
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+	    .arg(im->byteCount())
+#else
+	    .arg(im->sizeInBytes())
+#endif
+	    );
     }
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
@@ -904,8 +951,11 @@ void MythUIHelper::PruneCacheDir(QString dirname)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Pruning cache directory: %1").arg(dirname));
     QDateTime cutoff = MythDate::current().addDays(-days);
-    /// todo: Use toSecsSinceEpoch() once Qt 5.8 is min version
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
     qint64 cutoffsecs = cutoff.toMSecsSinceEpoch()/1000;
+#else
+    qint64 cutoffsecs = cutoff.toSecsSinceEpoch();
+#endif
 
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
         QString("Removing files not accessed since %1")
@@ -1682,7 +1732,11 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 
         // This only applies to the MEMORY cache
         const uint kImageCacheTimeout = 60;
+#if QT_VERSION < QT_VERSION_CHECK(5,8,0)
         uint now = MythDate::current().toTime_t();
+#else
+        qint64 now = MythDate::current().toSecsSinceEpoch();
+#endif
 
         QMutexLocker locker(d->m_cacheLock);
 
