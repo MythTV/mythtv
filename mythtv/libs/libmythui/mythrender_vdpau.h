@@ -12,6 +12,7 @@
 
 extern "C" {
 #include "libavcodec/vdpau.h"
+#include "libavcodec/vdpau_internal.h"
 #include "vdpau/vdpau_x11.h"
 }
 

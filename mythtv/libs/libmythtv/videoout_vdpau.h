@@ -107,7 +107,7 @@ class VideoOutputVDPAU : public VideoOutput
 
     Window               m_win;
     MythRenderVDPAU     *m_render;
-    AVVDPAUContext       m_context;
+    VDPAUHWContext       m_context;
 
     uint                 m_decoder_buffer_size;
     uint                 m_process_buffer_size;
