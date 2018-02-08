@@ -67,13 +67,15 @@ VideoOutputVDPAU::VideoOutputVDPAU()
 {
     if (gCoreContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);
-    memset(&m_context, 0, sizeof(AVVDPAUContext));
+    m_context = av_vdpau_alloc_context();
+    memset(m_context, 0, sizeof(AVVDPAUContext));
 }
 
 VideoOutputVDPAU::~VideoOutputVDPAU()
 {
     QMutexLocker locker(&m_lock);
     TearDown();
+    av_freep(&m_context);
 }
 
 void VideoOutputVDPAU::TearDown(void)
@@ -1354,5 +1356,5 @@ void VideoOutputVDPAU::SetVideoFlip(void)
 
 void* VideoOutputVDPAU::GetDecoderContext(unsigned char* /*buf*/, uint8_t*& /*id*/)
 {
-    return &m_context;
+    return m_context;
 }

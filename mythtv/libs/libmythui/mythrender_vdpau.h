@@ -12,7 +12,6 @@
 
 extern "C" {
 #include "libavcodec/vdpau.h"
-#include "libavcodec/vdpau_internal.h"
 #include "vdpau/vdpau_x11.h"
 }
 
@@ -144,6 +143,7 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
     void  Decode(uint id, struct vdpau_render_state *render,
                  const VdpPictureInfo *info);
     void  SetVideoFlip(void) { m_flipFrames = true; }
+    void BindContext(AVCodecContext *avctx);
 
   private:
     virtual ~MythRenderVDPAU();
