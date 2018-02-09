@@ -6125,7 +6125,7 @@ for i in $CHECK_QMAKE; do
     if test -e $i ; then
         qt_version_str=`$i -query QT_VERSION`
         qt_version=$(version2num $qt_version_str)
-        qt_version_hex=$(printf "0x%06x" $QT_VERSION)
+        qt_version_hex=$(printf "0x%06x" $qt_version)
         if [ $qt_version -ge $QT_MIN_VERSION ]; then
             found_qmake=$i
             check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=$QT_MIN_VERSION_HEX
