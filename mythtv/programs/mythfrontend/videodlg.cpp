@@ -1,6 +1,7 @@
 #include <set>
 #include <map>
 #include <functional>   //not2
+#include <memory>
 
 #include <QApplication>
 #include <QTimer>
@@ -358,7 +359,7 @@ namespace
         bool            m_bConnected;
     };
 
-    FanartLoader fanartLoader;
+    std::unique_ptr<FanartLoader> fanartLoader;
 
     struct CopyMetadataDestination
     {
@@ -401,7 +402,9 @@ namespace
                 }
                 else
                 {
-                    fanartLoader.LoadImage(filename, image);
+                    if (fanartLoader == nullptr)
+                        fanartLoader.reset(new FanartLoader);
+                    fanartLoader->LoadImage(filename, image);
                 }
             }
         }
