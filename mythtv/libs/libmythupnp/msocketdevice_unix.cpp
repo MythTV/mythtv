@@ -46,8 +46,8 @@
 
 #ifdef Q_OS_ANDROID
 #include <sys/socket.h>
-#include <linux/in.h>
-#include <linux/in6.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 
 // Almost always the same. If not, specify in qplatformdefs.h.
