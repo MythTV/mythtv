@@ -10,12 +10,12 @@
 // will exclude it for Raspberry Pi. With this commented, all
 // code that depends on USE_OPENGL_QT5 will be bypassed and maybe can
 // be removed later.
-//#if defined USING_OPENGLES && QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-//#define USE_OPENGL_QT5
-//#include <QOpenGLContext>
-//#else
+#if defined USING_OPENGLES && QT_VERSION >= QT_VERSION_CHECK(5, 4, 0) && defined(ANDROID)
+#define USE_OPENGL_QT5
+#include <QOpenGLContext>
+#else
 #include <QGLContext>
-//#endif
+#endif
 #include <QHash>
 #include <QMutex>
 #include <QMatrix4x4>
