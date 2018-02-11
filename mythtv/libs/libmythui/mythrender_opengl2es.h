@@ -107,26 +107,11 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         m_exts_supported = kGLFeatNone;
 
         GLint maxtexsz = 0;
+        GLint maxunits = 0;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
+        glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxunits);
+        m_max_units = maxunits;
         m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
-
-        static bool debugged = false;
-        if (!debugged)
-        {
-            debugged = true;
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vendor  : %1")
-                    .arg((const char*) glGetString(GL_VENDOR)));
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Renderer: %1")
-                    .arg((const char*) glGetString(GL_RENDERER)));
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version : %1")
-                    .arg((const char*) glGetString(GL_VERSION)));
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size: %1 x %2")
-                    .arg(m_max_tex_size).arg(m_max_tex_size));
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
-                    .arg(IsDirectRendering() ? "Yes" : "No"));
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
-                    .arg(m_exts_supported, 0, 16));
-        }
 
         if (!(m_glCreateShader && m_glShaderSource && m_glCompileShader &&
             m_glAttachShader && m_glGetShaderiv && m_glGetShaderInfoLog &&
@@ -165,6 +150,11 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         if (!vertexbuffers)
             LOG(VB_GENERAL, LOG_NOTICE, "OpenGL2ES: Disabling VertexBuffer Objects.");
 
+        m_extensions = (const char*) glGetString(GL_EXTENSIONS);
+        LOG(VB_GENERAL, LOG_DEBUG, QString("OpenGL2ES: len=%1: extensions: %2")
+            .arg(m_extensions.length())
+            .arg(m_extensions));
+
         m_exts_supported += (glslshaders ? kGLSL : 0) |
                             (vertexbuffers ? kGLExtVBO : 0) | kGLVertexArray |
                             kGLMultiTex;
@@ -180,9 +170,17 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
                 "OpenGL2ES: Framebuffer Objects available.");
         }
 
-        m_extensions = (const char*) glGetString(GL_EXTENSIONS);
-        LOG(VB_GENERAL, LOG_DEBUG, QString("OpenGL2ES: extensions: %1")
-            .arg(m_extensions));
+        bool pixelbuffers  = !getenv("OPENGL_NOPBO");
+        bool buffer_procs = m_glMapBuffer  && m_glBindBuffer &&
+                            m_glGenBuffers && m_glDeleteBuffers &&
+                            m_glBufferData && m_glUnmapBuffer;
+        if(m_extensions.contains("GL_ARB_pixel_buffer_object")
+           && buffer_procs && pixelbuffers)
+        {
+            m_exts_supported += kGLExtPBufObj;
+            LOG(VB_GENERAL, LOG_INFO,
+                "OpenGL2ES: Pixelbuffer Objects available.");
+        }
 
         // GL_OES_mapbuffer
         if (m_extensions.contains("GL_OES_mapbuffer") &&
@@ -193,6 +191,26 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: OES mapbuffer available.");
         }
         m_exts_used = m_exts_supported;
+
+        static bool debugged = false;
+        if (!debugged)
+        {
+            debugged = true;
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Vendor  : %1")
+                    .arg((const char*) glGetString(GL_VENDOR)));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Renderer: %1")
+                    .arg((const char*) glGetString(GL_RENDERER)));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Version : %1")
+                    .arg((const char*) glGetString(GL_VERSION)));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size: %1 x %2")
+                    .arg(m_max_tex_size).arg(m_max_tex_size));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units: %1")
+                    .arg(m_max_units));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Direct rendering: %1")
+                    .arg(IsDirectRendering() ? "Yes" : "No"));
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Extensions Supported: %1")
+                    .arg(m_exts_supported, 0, 16));
+        }
 
         if (m_exts_supported & kGLSL)
         {
