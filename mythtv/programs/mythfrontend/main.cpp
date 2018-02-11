@@ -1784,18 +1784,6 @@ int main(int argc, char **argv)
     setenv("QT_XCB_GL_INTEGRATION","none",0);
 #endif
 
-#ifdef Q_OS_ANDROID
-    // extra for 0 termination
-    char *newargv[argc+4+1];
-    memset(newargv, 0, sizeof(newargv));
-    memcpy(newargv, argv, sizeof(char*) * argc);
-    //newargv[argc++] = "-v";
-    //newargv[argc++] = "general,gui,playback";
-    //newargv[argc++] = "--loglevel";
-    //newargv[argc++] = "debug";
-    argv = &newargv[0];
-#endif
-
     MythFrontendCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
