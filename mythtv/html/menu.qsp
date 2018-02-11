@@ -102,5 +102,8 @@
   </ul>
   <br>
   <a class='menuitem' href='//www.mythtv.org'>www.mythtv.org</a>
+  <br>
+  <br>
+  <a class='menuitem' href="#"><img src="/images/remote.png" id="remote" class="png" width="128" height="128" border="0" alt="MythTV"></a>
 </nav>
 
