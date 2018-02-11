@@ -285,6 +285,15 @@ void MythRenderOpenGL::setWidget(QWidget *w)
             m_window = w->windowHandle();
     }
 
+#ifdef ANDROID
+    // change all window surfacetypes to OpenGLSurface
+    // otherwise the raster gets painted on top of the GL surface
+    m_window->setSurfaceType(QWindow::OpenGLSurface);
+    QWidget* wNativeParent = w->nativeParentWidget();
+    if (wNativeParent)
+        wNativeParent->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
+#endif
+
     if (!create())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "setWidget create failed");
     else if (w)
@@ -299,6 +308,16 @@ bool MythRenderOpenGL::IsDirectRendering() const
 void MythRenderOpenGL::setWidget(QGLWidget *w)
 {
     setDevice(w);
+
+#ifdef ANDROID
+    // change all window surfacetypes to OpenGLSurface
+    // otherwise the raster gets painted on top of the GL surface
+    m_window->setSurfaceType(QWindow::OpenGLSurface);
+    QWidget* wNativeParent = w->nativeParentWidget();
+    if (wNativeParent)
+        wNativeParent->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
+#endif
+
     w->setContext(this);
 }
 #endif
