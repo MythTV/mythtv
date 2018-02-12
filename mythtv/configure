@@ -7299,8 +7299,8 @@ enabled opengl            && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL
                                check_lib opengl OpenGL/gl3.h glGetError "-Wl,-framework,OpenGL" ||
                                check_lib opengl ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
                                check_lib GLES/gl.h glGetError "-Wl,-framework,OpenGLES" ||
-                               { check_lib GLESv2 GLES2/gl2.h glGetError  &&
-                                 check_lib EGL EGL/egl.h eglGetProcAddress
+                               { check_lib GLESv2 GLES2/gl2.h glGetError "-lGLESv2" &&
+                                 check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL"
                                } ||
                                die "ERROR: opengl not found."
                              }
@@ -7976,7 +7976,7 @@ if enabled taglib; then
     taglib_libs=`taglib-config --libs`
 fi
 
-enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  || disable x11
+enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
 enabled xrandr && check_lib Xrandr "X11/Xdefs.h X11/Xlib.h X11/extensions/Xrandr.h" XRRSelectInput -lXrandr || disable xrandr
 enabled xv && check_lib Xv "X11/Xdefs.h X11/Xlib.h X11/extensions/Xvlib.h" XvPutStill -lXv || disable xv
 
@@ -8669,6 +8669,7 @@ if enabled x11 ; then
     echo "OpenMAX Bellagio          ${openmax_bellagio-no}"
   fi
 fi
+  echo "OpenGL support            ${opengl-no}"
   echo "OpenGL video              ${opengl_video-no}"
   echo "OpenGL ThemePainter       ${opengl_themepainter-no}"
   if test x"$target_os" = x"darwin" ; then
