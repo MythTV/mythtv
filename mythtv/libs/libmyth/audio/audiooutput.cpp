@@ -154,6 +154,9 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             pulsestatus = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
         }
     }
+#else // USING_PULSE
+    // Quiet warning error when not compiling with pulseaudio
+    Q_UNUSED(willsuspendpa);
 #endif
 
     if (main_device.startsWith("ALSA:"))
