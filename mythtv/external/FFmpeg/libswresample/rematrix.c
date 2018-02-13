@@ -371,9 +371,10 @@ av_cold static int auto_matrix(SwrContext *s)
                            s->matrix[1] - s->matrix[0], s->matrix_encoding, s);
 
     if (ret >= 0 && s->int_sample_fmt == AV_SAMPLE_FMT_FLTP) {
-        int i;
-        for (i = 0; i < FF_ARRAY_ELEMS(s->matrix[0])*FF_ARRAY_ELEMS(s->matrix[0]); i++)
-            s->matrix_flt[0][i] = s->matrix[0][i];
+        int i, j;
+        for (i = 0; i < FF_ARRAY_ELEMS(s->matrix[0]); i++)
+            for (j = 0; j < FF_ARRAY_ELEMS(s->matrix[0]); j++)
+                s->matrix_flt[i][j] = s->matrix[i][j];
     }
 
     return ret;
@@ -469,7 +470,7 @@ av_cold int swri_rematrix_init(SwrContext *s){
         s->matrix_ch[i][0]= ch_in;
     }
 
-    if(HAVE_YASM && HAVE_MMX)
+    if(HAVE_X86ASM && HAVE_MMX)
         return swri_rematrix_init_x86(s);
 
     return 0;

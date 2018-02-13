@@ -237,8 +237,8 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
     if (res < 0)
         return res;
 
-    av_frame_set_pkt_pos     (frame, avctx->internal->pkt->pos);
-    av_frame_set_pkt_duration(frame, avctx->internal->pkt->duration);
+    frame->pkt_pos      = avctx->internal->last_pkt_props->pos;
+    frame->pkt_duration = avctx->internal->last_pkt_props->duration;
 
     if (context->tff >= 0) {
         frame->interlaced_frame = 1;
@@ -364,9 +364,16 @@ static int raw_decode(AVCodecContext *avctx, void *data, int *got_frame,
     }
 
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8) {
+        int pal_size;
         const uint8_t *pal = av_packet_get_side_data(avpkt, AV_PKT_DATA_PALETTE,
-                                                     NULL);
+                                                     &pal_size);
         int ret;
+
+        if (pal && pal_size != AVPALETTE_SIZE) {
+            av_log(avctx, AV_LOG_ERROR, "Palette size %d is wrong\n", pal_size);
+            pal = NULL;
+        }
+
         if (!context->palette)
             context->palette = av_buffer_alloc(AVPALETTE_SIZE);
         if (!context->palette) {

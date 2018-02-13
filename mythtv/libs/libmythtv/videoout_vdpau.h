@@ -77,6 +77,7 @@ class VideoOutputVDPAU : public VideoOutput
     virtual QStringList GetVisualiserList(void);
     virtual void ClearDummyFrame(VideoFrame* frame);
     virtual void SetVideoFlip(void);
+    MythRenderVDPAU* getRender() const { return m_render; }
 
   private:
     virtual bool hasFullScreenOSD(void) const { return true; }
@@ -107,7 +108,7 @@ class VideoOutputVDPAU : public VideoOutput
 
     Window               m_win;
     MythRenderVDPAU     *m_render;
-    AVVDPAUContext       m_context;
+    AVVDPAUContext      *m_context;
 
     uint                 m_decoder_buffer_size;
     uint                 m_process_buffer_size;

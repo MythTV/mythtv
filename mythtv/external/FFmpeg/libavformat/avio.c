@@ -179,12 +179,12 @@ int ffurl_connect(URLContext *uc, AVDictionary **options)
                (uc->protocol_blacklist && !strcmp(uc->protocol_blacklist, e->value)));
 
     if (uc->protocol_whitelist && av_match_list(uc->prot->name, uc->protocol_whitelist, ',') <= 0) {
-        av_log(uc, AV_LOG_ERROR, "Protocol not on whitelist \'%s\'!\n", uc->protocol_whitelist);
+        av_log(uc, AV_LOG_ERROR, "Protocol '%s' not on whitelist '%s'!\n", uc->prot->name, uc->protocol_whitelist);
         return AVERROR(EINVAL);
     }
 
     if (uc->protocol_blacklist && av_match_list(uc->prot->name, uc->protocol_blacklist, ',') > 0) {
-        av_log(uc, AV_LOG_ERROR, "Protocol blacklisted \'%s\'!\n", uc->protocol_blacklist);
+        av_log(uc, AV_LOG_ERROR, "Protocol '%s' on blacklist '%s'!\n", uc->prot->name, uc->protocol_blacklist);
         return AVERROR(EINVAL);
     }
 
@@ -263,8 +263,6 @@ static const struct URLProtocol *url_find_protocol(const char *filename)
         av_strlcpy(proto_str, filename,
                    FFMIN(proto_len + 1, sizeof(proto_str)));
 
-    if ((ptr = strchr(proto_str, ',')))
-        *ptr = '\0';
     av_strlcpy(proto_nested, proto_str, sizeof(proto_nested));
     if ((ptr = strchr(proto_nested, '+')))
         *ptr = '\0';
@@ -643,6 +641,13 @@ int ffurl_get_multi_file_handle(URLContext *h, int **handles, int *numhandles)
         return 0;
     }
     return h->prot->url_get_multi_file_handle(h, handles, numhandles);
+}
+
+int ffurl_get_short_seek(URLContext *h)
+{
+    if (!h->prot->url_get_short_seek)
+        return AVERROR(ENOSYS);
+    return h->prot->url_get_short_seek(h);
 }
 
 int ffurl_shutdown(URLContext *h, int flags)

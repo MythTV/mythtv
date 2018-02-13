@@ -2286,3 +2286,8 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     m_reset_video_surfaces = remaining;
     m_errored = !ok;
 }
+
+void MythRenderVDPAU::BindContext(AVCodecContext *avctx)
+{
+    av_vdpau_bind_context(avctx, m_device, vdp_get_proc_address, 0);
+}

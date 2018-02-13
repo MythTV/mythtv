@@ -309,16 +309,16 @@ static int fileTest(uint8_t *ref[4], int refStride[4], int w, int h, FILE *fp,
         struct Results r;
         enum AVPixelFormat srcFormat;
         char srcStr[12];
-        int srcW, srcH;
+        int srcW = 0, srcH = 0;
         enum AVPixelFormat dstFormat;
         char dstStr[12];
-        int dstW, dstH;
+        int dstW = 0, dstH = 0;
         int flags;
         int ret;
 
         ret = sscanf(buf,
                      " %12s %dx%d -> %12s %dx%d flags=%d CRC=%x"
-                     " SSD=%"SCNd64 ", %"SCNd64 ", %"SCNd64 ", %"SCNd64 "\n",
+                     " SSD=%"SCNu64 ", %"SCNu64 ", %"SCNu64 ", %"SCNu64 "\n",
                      srcStr, &srcW, &srcH, dstStr, &dstW, &dstH,
                      &flags, &r.crc, &r.ssdY, &r.ssdU, &r.ssdV, &r.ssdA);
         if (ret != 12) {

@@ -78,6 +78,7 @@ static int is_supported(enum AVCodecID id)
     case AV_CODEC_ID_VP9:
     case AV_CODEC_ID_ADPCM_G722:
     case AV_CODEC_ID_ADPCM_G726:
+    case AV_CODEC_ID_ADPCM_G726LE:
     case AV_CODEC_ID_ILBC:
     case AV_CODEC_ID_MJPEG:
     case AV_CODEC_ID_SPEEX:
@@ -145,7 +146,7 @@ static int rtp_write_header(AVFormatContext *s1)
     } else
         s1->packet_size = s1->pb->max_packet_size;
     if (s1->packet_size <= 12) {
-        av_log(s1, AV_LOG_ERROR, "Max packet size %d too low\n", s1->packet_size);
+        av_log(s1, AV_LOG_ERROR, "Max packet size %u too low\n", s1->packet_size);
         return AVERROR(EIO);
     }
     s->buf = av_malloc(s1->packet_size);
@@ -285,7 +286,7 @@ static void rtcp_send_sr(AVFormatContext *s1, int64_t ntp_time, int bye)
     RTPMuxContext *s = s1->priv_data;
     uint32_t rtp_ts;
 
-    av_log(s1, AV_LOG_TRACE, "RTCP: %02x %"PRIx64" %x\n", s->payload_type, ntp_time, s->timestamp);
+    av_log(s1, AV_LOG_TRACE, "RTCP: %02x %"PRIx64" %"PRIx32"\n", s->payload_type, ntp_time, s->timestamp);
 
     s->last_rtcp_ntp_time = ntp_time;
     rtp_ts = av_rescale_q(ntp_time - s->first_rtcp_ntp_time, (AVRational){1, 1000000},
@@ -550,6 +551,7 @@ static int rtp_write_packet(AVFormatContext *s1, AVPacket *pkt)
          * clock. */
         return rtp_send_samples(s1, pkt->data, size, 8 * st->codecpar->channels);
     case AV_CODEC_ID_ADPCM_G726:
+    case AV_CODEC_ID_ADPCM_G726LE:
         return rtp_send_samples(s1, pkt->data, size,
                                 st->codecpar->bits_per_coded_sample * st->codecpar->channels);
     case AV_CODEC_ID_MP2:
