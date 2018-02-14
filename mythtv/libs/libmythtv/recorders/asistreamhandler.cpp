@@ -65,7 +65,7 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
     return _handlers[devkey];
 }
 
-void ASIStreamHandler::Return(ASIStreamHandler * & ref)
+void ASIStreamHandler::Return(ASIStreamHandler * & ref, int recorder_id)
 {
     QMutexLocker locker(&_handlers_lock);
 
