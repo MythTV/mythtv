@@ -49,8 +49,8 @@ class ASIStreamHandler : public StreamHandler
     static void Return(ASIStreamHandler * & ref, int recorder_id = -1);
 
     virtual void AddListener(MPEGStreamData *data,
-                             bool allow_section_reader = false,
-                             bool needs_drb            = false,
+                             bool /*allow_section_reader*/ = false,
+                             bool /*needs_drb*/            = false,
                              QString output_file       = QString())
     {
         StreamHandler::AddListener(data, false, true, output_file);

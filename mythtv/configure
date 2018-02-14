@@ -125,7 +125,7 @@ Advanced options (experts only):
   --dvb-path=HDRLOC        location of directory containing
                            'linux/dvb/frontend.h', not the
                            directory with frontend.h [$dvb_path_default]
-  --disable-asi            disable support for ASI recorder
+  --disable-asi            disable support for DVEO ASI recorder
   --disable-x11            disable X11 support
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-xrandr         disable X11 resolution switching
@@ -8642,7 +8642,7 @@ if enabled backend; then
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "V@Box TV Gateway support  ${vbox-no}"
   echo "Ceton support             ${ceton-no}"
-  echo "ASI support               ${asi-no}"
+  echo "DVEO ASI support          ${asi-no}"
 fi
 
 if enabled frontend; then

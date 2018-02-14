@@ -12,7 +12,7 @@
 ASIChannel::ASIChannel(TVRec *parent, const QString &device) :
     DTVChannel(parent), m_device(device), m_isopen(false)
 {
-    m_tuner_types.push_back(DTVTunerType::kTunerTypeASI);
+    m_tuner_types.push_back(DTVTunerType(DTVTunerType::kTunerTypeASI));
 }
 
 ASIChannel::~ASIChannel(void)
