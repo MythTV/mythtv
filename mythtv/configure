@@ -7501,7 +7501,7 @@ enabled sndio && check_lib sndio sndio.h sio_open -lsndio
 
 # PulseAudio probe
 ! disabled audio_pulse &&
-    check_lib pulse pulse/version.h pa_get_library_version  &&
+    check_lib pulse pulse/version.h pa_get_library_version -lpulse &&
     $(pkg-config --atleast-version=0.9.7 libpulse) &&
     enable  audio_pulse ||
     disable audio_pulse
@@ -7924,7 +7924,7 @@ if enabled firewire; then
     fi
 fi
 
-enabled libfftw3 && check_lib fftw3_threads fftw3.h fftw_init_threads  -lfftw3f -lfftw3 ||
+enabled libfftw3 && check_lib fftw3_threads fftw3.h fftw_init_threads -lfftw3_threads -lfftw3f -lfftw3 ||
     disable libfftw3
 
 # ass_flush_events was added in 0.9.10
