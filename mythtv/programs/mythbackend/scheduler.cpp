@@ -3071,7 +3071,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
     }
 
     if (!bestid)
-        bestid;
+        bestid = betterid;
 
     if (bestid)
     {
