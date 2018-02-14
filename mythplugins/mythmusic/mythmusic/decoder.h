@@ -24,7 +24,6 @@ class QIODevice;
 class OutputEvent;
 
 class Buffer;
-class Recycler;
 class AudioOutput;
 
 class DecoderEvent : public MythEvent
