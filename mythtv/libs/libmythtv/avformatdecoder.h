@@ -330,6 +330,7 @@ class AvFormatDecoder : public DecoderBase
     MythCodecID video_codec_id;
 
     int maxkeyframedist;
+    int averror_count;
 
     // Caption/Subtitle/Teletext decoders
     uint             ignore_scte;

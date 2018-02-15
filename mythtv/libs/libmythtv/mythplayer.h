@@ -374,6 +374,7 @@ class MTV_PUBLIC MythPlayer
     static const double kInaccuracyFull;
 
     void SaveTotalFrames(void);
+    void SetErrored(const QString &reason);
 
   protected:
     // Initialization
@@ -563,7 +564,6 @@ class MTV_PUBLIC MythPlayer
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
     void SetPlaying(bool is_playing);
-    void SetErrored(const QString &reason);
     void ResetErrored(void);
 
     // Private Gets
