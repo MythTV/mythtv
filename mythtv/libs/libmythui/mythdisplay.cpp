@@ -2,15 +2,13 @@
 #include "mythdisplay.h"
 #include "mythmainwindow.h"
 
+#include <QApplication>
+#include <QDesktopWidget>
+
 #if defined(Q_OS_MAC)
 #import "util-osx.h"
 #elif USING_X11
 #include "mythxdisplay.h"
-#endif
-
-#if !USING_X11
-#include <QApplication>
-#include <QDesktopWidget>
 #endif
 
 #ifdef Q_OS_ANDROID
@@ -145,20 +143,9 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
 int MythDisplay::GetNumberXineramaScreens(void)
 {
     int nr_xinerama_screens = 0;
-
-#if USING_X11
-    // TODO Qt is Xinerama aware so this should be unnecessary
-    MythXDisplay *d = OpenMythXDisplay();
-    if (d)
-    {
-        nr_xinerama_screens = d->GetNumberXineramaScreens();
-        delete d;
+    QDesktopWidget *m_desktop = QApplication::desktop();
+    if (m_desktop) {
+        nr_xinerama_screens = m_desktop->numScreens();
     }
-#else
-    // Mac OS X when not using X11 server supports Xinerama.
-    if (QApplication::desktop())
-        nr_xinerama_screens = QApplication::desktop()->numScreens();
-#endif
-
     return nr_xinerama_screens;
 }
