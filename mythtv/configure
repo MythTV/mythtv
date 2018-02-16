@@ -1682,25 +1682,6 @@ check_exec_cxx(){
     check_ld_cxx "$@" && { enabled cross_compile || $TMPE >> $logfile 2>&1; }
 }
 
-check_foo_config(){
-    cfg=$1
-    pkg=$2
-    header=$3
-    func=$4
-    shift 4
-    disable $cfg
-    check_cmd ${pkg}-config --version
-    err=$?
-    if test "$err" = 0; then
-        backup_cflags=$CFLAGS
-        temp_extralibs=$(${pkg}-config --libs)
-        add_cflags $(${pkg}-config --cflags)
-        check_lib "$@" $header $func $temp_extralibs && enable $cfg
-        CFLAGS=$backup_cflags
-    fi
-    return $err
-}
-
 non_standard_header(){
     test x"$1" != "x/usr/include"
 }
@@ -7387,7 +7368,6 @@ void foo(){switch (0) case 0: case (sizeof(long) == $sizeof):;}
 EOF
 done
 
-# check_foo_config freetype2 freetype ft2build.h FT_Init_FreeType
 if require_pkg_config libfreetype2 freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType ; then
     enable freetype2
 else
