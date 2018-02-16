@@ -7284,7 +7284,8 @@ enabled opengl            && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL
                                check_lib opengl ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
                                check_lib opengl GLES/gl.h glGetError "-Wl,-framework,OpenGLES" ||
                                { check_lib GLESv2 GLES2/gl2.h glGetError "-lGLESv2" &&
-                                 check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL"
+                                 check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" &&
+                                 enable opengl
                                } ||
                                die "ERROR: opengl not found."
                              }
