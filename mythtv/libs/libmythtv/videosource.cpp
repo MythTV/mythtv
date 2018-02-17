@@ -2563,6 +2563,9 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
     info->setEnabled(false);
     a_cardtype.addTargetedChild("EXTERNAL", info);
 
+    a_cardtype.addTargetedChild("EXTERNAL",
+                                new ChannelTimeout(parent, 20000, 1750));
+
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeApp(   const QString&)));
 
@@ -4190,4 +4193,3 @@ void DVBConfigurationGroup::Save(void)
     DiSEqCDev trees;
     trees.InvalidateTrees();
 }
-
