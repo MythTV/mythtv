@@ -969,15 +969,18 @@ class VBIDevice : public CaptureCardComboBoxSetting
     }
 };
 
-class ArgumentString : public LineEditSetting, public CaptureCardDBStorage
+class CommandPath : public MythUITextEditSetting
 {
   public:
-    explicit ArgumentString(const CaptureCard &parent) :
-        LineEditSetting(this, true),
-        CaptureCardDBStorage(this, parent, "audiodevice") // change to arguments
+    explicit CommandPath(const CaptureCard &parent) :
+        MythUITextEditSetting(new CaptureCardDBStorage(this, parent,
+                                                       "videodevice"))
     {
-        setLabel(QObject::tr("Arguments"));
-    }
+        setLabel(QObject::tr(""));
+        setValue("");
+        setHelpText(QObject::tr("Specify the command to run, with any "
+                                "needed arguments."));
+    };
 };
 
 class FileDevice : public MythUIFileBrowserSetting
@@ -2562,7 +2565,8 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
     info(new TransTextEditSetting())
 {
     setVisible(false);
-    FileDevice *device = new FileDevice(parent);
+    CommandPath *device = new CommandPath(parent);
+    device->setLabel(tr("Command path"));
     device->setHelpText(tr("A 'black box' application controlled via "
                            "stdin, status on stderr and TransportStream "
                            "read from stdout"));
@@ -2593,13 +2597,16 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     {
         ci = tr("'%1' is valid.").arg(fileInfo.absoluteFilePath());
         if (!fileInfo.isReadable() || !fileInfo.isFile())
-            ci = tr("'%1' is not readable.").arg(fileInfo.absoluteFilePath());
+            ci = tr("WARNING: '%1' is not readable.")
+                 .arg(fileInfo.absoluteFilePath());
         if (!fileInfo.isExecutable())
-            ci = tr("'%1' is not executable.").arg(fileInfo.absoluteFilePath());
+            ci = tr("WARNING: '%1' is not executable.")
+                 .arg(fileInfo.absoluteFilePath());
     }
     else
     {
-        ci = tr("'%1' does not exist.").arg(fileInfo.absoluteFilePath());
+        ci = tr("WARNING: '%1' does not exist.")
+             .arg(fileInfo.absoluteFilePath());
     }
 
     info->setValue(ci);
