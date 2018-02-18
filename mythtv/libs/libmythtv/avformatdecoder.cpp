@@ -1449,12 +1449,17 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                                            const enum AVPixelFormat *valid_fmts)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-    if (nd && nd->GetPlayer())
+    MythPlayer *player = NULL;
+    VideoOutputVDPAU *videoOut = NULL;
+    if (nd)
+        player =  nd->GetPlayer();
+    if (player)
+        videoOut = (VideoOutputVDPAU*)(player->GetVideoOutput());
+
+    if (videoOut)
     {
         static uint8_t *dummy[1] = { 0 };
-        MythPlayer *player = nd->GetPlayer();
         avctx->hwaccel_context = player->GetDecoderContext(NULL, dummy[0]);
-        VideoOutputVDPAU *videoOut = (VideoOutputVDPAU*)(player->GetVideoOutput());
         MythRenderVDPAU *render = videoOut->getRender();
         render->BindContext(avctx);
         if (avctx->hwaccel_context)
