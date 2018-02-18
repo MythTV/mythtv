@@ -90,6 +90,15 @@ void ExternalSignalMonitor::UpdateValues(void)
     if (!running || exit)
         return;
 
+    if (GetExternalChannel()->IsExternalChannelChangeInUse())
+    {
+        SignalMonitor::UpdateValues();
+
+        QMutexLocker locker(&statusLock);
+        if (!scriptStatus.IsGood())
+            return;
+    }
+
     if (m_stream_handler_started)
     {
         if (!m_stream_handler->IsRunning())

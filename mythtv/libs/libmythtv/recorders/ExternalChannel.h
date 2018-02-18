@@ -38,6 +38,9 @@ class ExternalChannel : public DTVChannel
     virtual QString GetDevice(void) const { return m_device; }
     virtual bool IsPIDTuningSupported(void) const { return true; }
 
+  protected:
+    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+
   private:
     QString                  m_device;
     QStringList              m_args;
