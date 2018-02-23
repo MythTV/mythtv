@@ -38,7 +38,8 @@ class SignalMonitor : protected MThread
     static inline bool IsRequired(const QString &cardtype);
     static inline bool IsSupported(const QString &cardtype);
     static SignalMonitor *Init(QString cardtype, int db_cardnum,
-                               ChannelBase *channel);
+                               ChannelBase *channel,
+                               bool release_stream);
     virtual ~SignalMonitor();
 
     // // // // // // // // // // // // // // // // // // // // // // // //
@@ -117,7 +118,7 @@ class SignalMonitor : protected MThread
 
   protected:
     SignalMonitor(int _capturecardnum, ChannelBase *_channel,
-                  uint64_t wait_for_mask);
+                  uint64_t wait_for_mask, bool _release_stream);
 
     virtual void run(void);
 
@@ -199,6 +200,7 @@ class SignalMonitor : protected MThread
     TVRec       *pParent;
     int          capturecardnum;
     volatile uint64_t flags;
+    bool         release_stream;
     int          update_rate;
     uint         minimum_update_rate;
     bool         update_done;

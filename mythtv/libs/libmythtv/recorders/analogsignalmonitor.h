@@ -12,9 +12,9 @@ class V4LChannel;
 class AnalogSignalMonitor : public SignalMonitor
 {
   public:
-    AnalogSignalMonitor(
-        int db_cardnum, V4LChannel *_channel,
-        uint64_t _flags = kSigMon_WaitForSig);
+    AnalogSignalMonitor(int db_cardnum, V4LChannel *_channel,
+                        bool _release_stream,
+                        uint64_t _flags = kSigMon_WaitForSig);
 
     virtual void UpdateValues(void);
 

@@ -43,8 +43,9 @@
  *  \param _flags   Flags to start with
  */
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
+                                   bool _release_stream,
                                    uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _flags),
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
       // This snr setup is incorrect for API 3.x but works better
       // than int16_t range in practice, however this is correct
       // for the 4.0 DVB API which uses a uint16_t for the snr

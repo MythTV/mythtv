@@ -14,7 +14,7 @@ class ASISignalMonitor: public DTVSignalMonitor
 {
   public:
     ASISignalMonitor(int db_cardnum, ASIChannel *_channel,
-                     uint64_t _flags = 0);
+                     bool _release_stream = true, uint64_t _flags = 0);
     virtual ~ASISignalMonitor();
 
     void Stop(void);

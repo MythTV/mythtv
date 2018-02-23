@@ -105,16 +105,7 @@ void StreamHandler::AddListener(MPEGStreamData *data,
         _needs_buffering      |= needs_buffering;
     }
 
-    StreamDataList::iterator it = _stream_data_list.find(data);
-    if (it != _stream_data_list.end())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Programmer Error, attempted "
-                "to add a listener which is already being listened to.");
-    }
-    else
-    {
-        _stream_data_list[data] = output_file;
-    }
+    _stream_data_list[data] = output_file;
 
     _listener_lock.unlock();
 

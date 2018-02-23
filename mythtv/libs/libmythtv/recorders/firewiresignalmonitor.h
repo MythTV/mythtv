@@ -36,6 +36,7 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
     friend class FirewireTableMonitorThread;
   public:
     FirewireSignalMonitor(int db_cardnum, FirewireChannel *_channel,
+                          bool _release_stream,
                           uint64_t _flags = kFWSigMon_WaitForPower);
 
     virtual void HandlePAT(const ProgramAssociationTable*);
