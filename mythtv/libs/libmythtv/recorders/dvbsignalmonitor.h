@@ -20,6 +20,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
   public:
     DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
+                     bool _release_stream,
                      uint64_t _flags =
                      kSigMon_WaitForSig    | kDVBSigMon_WaitForSNR |
                      kDVBSigMon_WaitForBER | kDVBSigMon_WaitForUB);

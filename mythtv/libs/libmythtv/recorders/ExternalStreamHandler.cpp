@@ -633,8 +633,8 @@ void ExternalStreamHandler::run(void)
             m_notify = false;
         }
 
-        while (read_len = 0, buffer.size() > 188*50 ||
-               (read_len = m_IO->Read(buffer, PACKET_SIZE, 100)) > 0)
+        while (read_len = 0, buffer.size() == PACKET_SIZE ||
+               (read_len = m_IO->Read(buffer, PACKET_SIZE - remainder, 100)) > 0)
         {
             if (m_IO->Error())
             {
@@ -650,12 +650,6 @@ void ExternalStreamHandler::run(void)
 
             if (read_len > 0)
                 empty_cnt = 0;
-
-            if (_stream_data_list.empty())
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "_stream_data_list is empty");
-                continue;
-            }
 
             if (xon)
             {
@@ -693,6 +687,11 @@ void ExternalStreamHandler::run(void)
                 }
             }
 
+            len = remainder = buffer.size();
+
+            if (!m_stream_lock.tryLock())
+                continue;
+
             if (!_listener_lock.tryLock())
                 continue;
 
@@ -703,8 +702,6 @@ void ExternalStreamHandler::run(void)
                              (buffer.constData()), buffer.size());
 
             _listener_lock.unlock();
-
-            len = buffer.size();
 
             if (m_replay)
             {
@@ -718,11 +715,14 @@ void ExternalStreamHandler::run(void)
                 }
             }
 
-            if (remainder > 0 && (len > remainder)) // leftover bytes
-                buffer.remove(0, len - remainder);
-            else
+            m_stream_lock.unlock();
+
+            if (remainder == 0)
                 buffer.clear();
+            else if (len > remainder) // leftover bytes
+                buffer.remove(0, len - remainder);
         }
+
         if (m_IO->Error())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -908,30 +908,22 @@ bool ExternalStreamHandler::RestartStream(void)
 
     if (streaming)
     {
-        return StartStreaming(false);
+        return StartStreaming();
     }
 
     return true;
 }
 
-bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
+void ExternalStreamHandler::ReplayStream(void)
 {
-    QString result;
-
-    QMutexLocker locker(&m_stream_lock);
-
-    LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("StartStreaming with %1 current listeners")
-        .arg(StreamingCount()));
-
-    if (!IsAppOpen())
+    if (m_replay)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder not started.");
-        return false;
-    }
+        QString    result;
 
-    if (flush_buffer && m_replay)
-    {
+        // Let the external app know that we could be busy for a little while
+        if (!m_poll_mode)
+            ProcessCommand(QString("XOFF"), 50, result);
+
         /* If the input is not a 'broadcast' it may only have one
          * copy of the SPS right at the beginning of the stream,
          * so make sure we don't miss it!
@@ -950,6 +942,27 @@ bool ExternalStreamHandler::StartStreaming(bool flush_buffer)
             .arg(m_replay_buffer.size()));
         m_replay_buffer.clear();
         m_replay = false;
+
+        // Let the external app know that we are ready
+        if (!m_poll_mode)
+            ProcessCommand(QString("XON"), 50, result);
+    }
+}
+
+bool ExternalStreamHandler::StartStreaming(void)
+{
+    QString result;
+
+    QMutexLocker locker(&m_stream_lock);
+
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("StartStreaming with %1 current listeners")
+        .arg(StreamingCount()));
+
+    if (!IsAppOpen())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder not started.");
+        return false;
     }
 
     if (StreamingCount() == 0)

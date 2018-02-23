@@ -80,7 +80,11 @@ class ExternalStreamHandler : public StreamHandler
 
     bool RestartStream(void);
 
-    bool StartStreaming(bool flush_buffer);
+    void LockReplay(void) { m_replay_lock.lock(); }
+    void UnlockReplay(bool enable_replay = false)
+        { m_replay = enable_replay; m_replay_lock.unlock(); }
+    void ReplayStream(void);
+    bool StartStreaming(void);
     bool StopStreaming(void);
 
     bool CheckForError(void);
@@ -117,6 +121,7 @@ class ExternalStreamHandler : public StreamHandler
 
     QAtomicInt    m_streaming_cnt;
     QMutex        m_stream_lock;
+    QMutex        m_replay_lock;
 };
 
 #endif // _ExternalSTREAMHANDLER_H_

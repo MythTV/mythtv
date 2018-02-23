@@ -81,11 +81,19 @@ void ExternalRecorder::run(void)
 
     StartNewFile();
 
+    m_stream_handler->LockReplay();
+
+    m_h264_parser.Reset();
+    _wait_for_keyframe_option = true;
+    _seen_sps = false;
+
     _stream_data->AddAVListener(this);
     _stream_data->AddWritingListener(this);
     m_stream_handler->AddListener(_stream_data, false, true);
 
-    StartStreaming();
+    m_stream_handler->ReplayStream();
+    m_stream_handler->UnlockReplay();
+
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -189,7 +197,8 @@ bool ExternalRecorder::PauseAndWait(int timeout)
     else if (IsPaused(true))
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait unpause");
-        StartStreaming();
+
+        // The SignalMonitor will StartStreaming
 
         if (_stream_data)
             _stream_data->Reset(_stream_data->DesiredProgram());
@@ -205,12 +214,8 @@ bool ExternalRecorder::PauseAndWait(int timeout)
 
 bool ExternalRecorder::StartStreaming(void)
 {
-    m_h264_parser.Reset();
-    _wait_for_keyframe_option = true;
-    _seen_sps = false;
-
     LOG(VB_RECORD, LOG_INFO, LOC + "StartStreaming");
-    if (m_stream_handler && m_stream_handler->StartStreaming(true))
+    if (m_stream_handler && m_stream_handler->StartStreaming())
         return true;
 
     return false;

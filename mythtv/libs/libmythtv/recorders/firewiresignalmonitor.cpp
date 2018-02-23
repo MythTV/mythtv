@@ -44,16 +44,16 @@ QMutex           FirewireSignalMonitor::pat_keys_lock;
  *  \param _channel FirewireChannel for card
  *  \param _flags   Flags to start with
  */
-FirewireSignalMonitor::FirewireSignalMonitor(
-    int db_cardnum,
-    FirewireChannel *_channel,
-    uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags),
-    dtvMonitorRunning(false),
-    tableMonitorThread(NULL),
-    stb_needs_retune(true),
-    stb_needs_to_wait_for_pat(false),
-    stb_needs_to_wait_for_power(false)
+FirewireSignalMonitor::FirewireSignalMonitor(int db_cardnum,
+                                             FirewireChannel *_channel,
+                                             bool _release_stream,
+                                             uint64_t _flags)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
+      dtvMonitorRunning(false),
+      tableMonitorThread(NULL),
+      stb_needs_retune(true),
+      stb_needs_to_wait_for_pat(false),
+      stb_needs_to_wait_for_power(false)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 

@@ -36,10 +36,12 @@
  *  \param _channel ExternalChannel for card
  *  \param _flags   Flags to start with
  */
-ExternalSignalMonitor::ExternalSignalMonitor(
-    int db_cardnum, ExternalChannel *_channel, uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags),
-    m_stream_handler(NULL), m_stream_handler_started(false), m_lock_timeout(0)
+ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
+                                             ExternalChannel *_channel,
+                                             bool _release_stream,
+                                             uint64_t _flags)
+    : DTVSignalMonitor(db_cardnum, _channel, _flags, _release_stream),
+      m_stream_handler(NULL), m_stream_handler_started(false), m_lock_timeout(0)
 {
     QString result;
 
@@ -69,11 +71,13 @@ void ExternalSignalMonitor::Stop(void)
     QString result;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
-    m_stream_handler->StopStreaming();
 
     SignalMonitor::Stop();
-    if (GetStreamData())
+    if (release_stream && GetStreamData())
+    {
+        m_stream_handler->StopStreaming();
         m_stream_handler->RemoveListener(GetStreamData());
+    }
     m_stream_handler_started = false;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
@@ -143,7 +147,7 @@ void ExternalSignalMonitor::UpdateValues(void)
         if (!m_stream_handler_started)
         {
             m_stream_handler->AddListener(GetStreamData());
-            m_stream_handler->StartStreaming(false);
+            m_stream_handler->StartStreaming();
             m_stream_handler_started = true;
         }
     }

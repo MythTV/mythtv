@@ -24,9 +24,10 @@
  */
 IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
                                      IPTVChannel *_channel,
-                                     uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags),
-    m_streamHandlerStarted(false), m_locked(false)
+                                     bool _release_stream,
+                                     uint64_t _flags)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
+      m_streamHandlerStarted(false), m_locked(false)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
     signalLock.SetValue(0);

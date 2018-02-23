@@ -19,7 +19,7 @@ class CetonSignalMonitor: public DTVSignalMonitor
 {
   public:
     CetonSignalMonitor(int db_cardnum, CetonChannel* _channel,
-                      uint64_t _flags = 0);
+                       bool _release_stream, uint64_t _flags = 0);
     virtual ~CetonSignalMonitor();
 
     void Stop(void);

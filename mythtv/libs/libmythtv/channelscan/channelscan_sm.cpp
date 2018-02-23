@@ -144,7 +144,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
     : // Set in constructor
       m_scanMonitor(_scan_monitor),
       m_channel(_channel),
-      m_signalMonitor(SignalMonitor::Init(_cardtype, -1, _channel)),
+      m_signalMonitor(SignalMonitor::Init(_cardtype, -1, _channel, true)),
       m_sourceID(_sourceID),
       m_signalTimeout(signal_timeout),
       m_channelTimeout(channel_timeout),

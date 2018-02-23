@@ -13,7 +13,7 @@ class IPTVSignalMonitor : public DTVSignalMonitor
     friend class IPTVTableMonitorThread;
   public:
     IPTVSignalMonitor(int db_cardnum, IPTVChannel *_channel,
-                      uint64_t _flags = 0);
+                      bool _release_stream, uint64_t _flags = 0);
     virtual ~IPTVSignalMonitor();
 
     void Stop(void);

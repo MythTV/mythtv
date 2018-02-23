@@ -21,6 +21,7 @@ class DTVSignalMonitor : public SignalMonitor,
   public:
     DTVSignalMonitor(int db_cardnum,
                      DTVChannel *_channel,
+                     bool _release_stream,
                      uint64_t wait_for_mask);
     virtual ~DTVSignalMonitor();
 

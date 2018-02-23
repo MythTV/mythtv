@@ -38,10 +38,12 @@
  *  \param _channel HDHRChannel for card
  *  \param _flags   Flags to start with
  */
-HDHRSignalMonitor::HDHRSignalMonitor(
-    int db_cardnum, HDHRChannel* _channel, uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags),
-    streamHandlerStarted(false), streamHandler(NULL)
+HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
+                                     HDHRChannel* _channel,
+                                     bool _release_stream,
+                                     uint64_t _flags)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
+      streamHandlerStarted(false), streamHandler(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 

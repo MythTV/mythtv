@@ -38,10 +38,12 @@
  *  \param _channel ASIChannel for card
  *  \param _flags   Flags to start with
  */
-ASISignalMonitor::ASISignalMonitor(
-    int db_cardnum, ASIChannel *_channel, uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags),
-    streamHandlerStarted(false), streamHandler(NULL)
+ASISignalMonitor::ASISignalMonitor(int db_cardnum,
+                                   ASIChannel *_channel,
+                                   bool _release_stream,
+                                   uint64_t _flags)
+    : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
+      streamHandlerStarted(false), streamHandler(NULL)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
     streamHandler = ASIStreamHandler::Get(_channel->GetDevice());

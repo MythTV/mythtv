@@ -43,8 +43,9 @@ static bool insert_crc(QList<uint64_t> &seen_crc, const PSIPTable &psip)
 
 DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
                                    DTVChannel *_channel,
+                                   bool _release_stream,
                                    uint64_t wait_for_mask)
-    : SignalMonitor(db_cardnum, _channel, wait_for_mask),
+    : SignalMonitor(db_cardnum, _channel, _release_stream, wait_for_mask),
       stream_data(NULL),
       seenPAT(QObject::tr("Seen")+" PAT", "seen_pat", 1, true, 0, 1, 0),
       seenPMT(QObject::tr("Seen")+" PMT", "seen_pmt", 1, true, 0, 1, 0),
