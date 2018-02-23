@@ -237,11 +237,6 @@ bool ExternIO::Run(void)
     return true;
 }
 
-void ExternIO::Term(bool /*force*/)
-{
-    LOG(VB_RECORD, LOG_INFO, QString("ExternIO::Term()"));
-}
-
 /* Return true if the process is not, or is no longer running */
 bool ExternIO::KillIfRunning(const QString & cmd)
 {
@@ -307,6 +302,7 @@ void ExternIO::Fork(void)
     }
 
     QString full_command = QString("%1").arg(m_args.join(" "));
+
     if (!KillIfRunning(full_command))
     {
         // Give it one more chance.
@@ -737,7 +733,8 @@ void ExternalStreamHandler::run(void)
             break;
         }
     }
-    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "shutdown");
+    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " +
+        QString("%1 shutdown").arg(_error ? "Error" : "Normal"));
 
     RemoveAllPIDFilters();
     SetRunning(false, true, false);
@@ -873,9 +870,21 @@ void ExternalStreamHandler::CloseApp(void)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 "CloseRecorder failed, sending kill.");
-            m_IO->Term();
-            sleep(5);
-            m_IO->Term(true);
+
+            QString full_command = QString("%1").arg(m_args.join(" "));
+
+            if (!m_IO->KillIfRunning(full_command))
+            {
+                // Give it one more chance.
+                usleep(50000);
+                if (!m_IO->KillIfRunning(full_command))
+                {
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Unable to kill existing '%1'.")
+                        .arg(full_command));
+                    return;
+                }
+            }
         }
         delete m_IO;
         m_IO = 0;
@@ -1018,7 +1027,7 @@ bool ExternalStreamHandler::StopStreaming(void)
             .arg(result));
         if (!result.startsWith("Warn"))
         {
-            LOG(VB_RECORD, LOG_WARNING, LOC +
+            LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("StopStreaming failed: '%1'").arg(result));
             _error = true;
         }
@@ -1062,7 +1071,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
 
         if (m_IO->Error())
         {
-            LOG(VB_GENERAL, LOG_ERR, "External Recorder in bad state: " +
+            LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder in bad state: " +
                 m_IO->ErrorString());
             return false;
         }
@@ -1079,7 +1088,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
             result = m_IO->GetStatus(timeout);
             if (m_IO->Error())
             {
-                LOG(VB_GENERAL, LOG_ERR,
+                LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to read from External Recorder: " +
                     m_IO->ErrorString());
                     _error = true;
@@ -1118,7 +1127,10 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
         }
 
         if (++m_io_errcnt > 10)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Too many I/O errors.");
             _error = true;
+        }
         usleep(timeout);
     }
 

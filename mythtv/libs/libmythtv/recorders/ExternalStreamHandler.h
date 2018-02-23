@@ -30,13 +30,13 @@ class ExternIO
     QString GetStatus(int timeout = 2500);
     int Write(const QByteArray & buffer);
     bool Run(void);
-    void Term(bool force = false);
     bool Error(void) const { return !m_error.isEmpty(); }
     QString ErrorString(void) const { return m_error; }
     void ClearError(void) { m_error.clear(); }
 
-  private:
     bool KillIfRunning(const QString & cmd);
+
+  private:
     void Fork(void);
 
     QFileInfo   m_app;
