@@ -107,6 +107,8 @@ class MBASE_PUBLIC HostDBStorage : public SimpleDBStorage
 {
   public:
     HostDBStorage(StorageUser *_user, const QString &name);
+    using SimpleDBStorage::Save; // prevent compiler warning
+    virtual void Save(void);
 
   protected:
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
@@ -120,6 +122,8 @@ class MBASE_PUBLIC GlobalDBStorage : public SimpleDBStorage
 {
   public:
     GlobalDBStorage(StorageUser *_user, const QString &name);
+    using SimpleDBStorage::Save; // prevent compiler warning
+    virtual void Save(void);
 
   protected:
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
