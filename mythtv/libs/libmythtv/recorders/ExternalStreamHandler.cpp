@@ -263,7 +263,7 @@ bool ExternIO::KillIfRunning(const QString & cmd)
         .arg(cmd));
     res_kil = system(kil.toUtf8().constData());
     if (WEXITSTATUS(res_kil) == 1)
-        LOG(VB_GENERAL, LOG_WARNING, QString("'%1' failed")
+        LOG(VB_GENERAL, LOG_WARNING, QString("'%1' failed: %2")
             .arg(kil).arg(ENO));
 
     res_grp = system(grp.toUtf8().constData());
