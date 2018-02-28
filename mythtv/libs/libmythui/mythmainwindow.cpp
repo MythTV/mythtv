@@ -283,8 +283,6 @@ class MythMainWindowPrivate
     MythRender *oldrender;
 
     QMutex m_drawDisableLock;
-    QMutex m_setDrawEnabledLock;
-    QWaitCondition m_setDrawEnabledWait;
     uint m_drawDisabledDepth;
     bool m_drawEnabled;
 
@@ -571,6 +569,9 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     connect(this, SIGNAL(signalRemoteScreenShot(QString,int,int)),
             this, SLOT(doRemoteScreenShot(QString,int,int)),
+            Qt::BlockingQueuedConnection);
+    connect(this, SIGNAL(signalSetDrawEnabled(bool)),
+            this, SLOT(SetDrawEnabled(bool)),
             Qt::BlockingQueuedConnection);
 
     // We need to listen for playback start/end events
@@ -1586,19 +1587,9 @@ uint MythMainWindow::PopDrawDisabled(void)
 
 void MythMainWindow::SetDrawEnabled(bool enable)
 {
-    QMutexLocker locker(&d->m_setDrawEnabledLock);
-
     if (!gCoreContext->IsUIThread())
     {
-        QCoreApplication::postEvent(
-            this, new MythEvent(
-                (enable) ?
-                MythEvent::kEnableDrawingEventType :
-                MythEvent::kDisableDrawingEventType));
-
-        while (QCoreApplication::hasPendingEvents())
-            d->m_setDrawEnabledWait.wait(&d->m_setDrawEnabledLock);
-
+        emit signalSetDrawEnabled(enable);
         return;
     }
 
@@ -1620,8 +1611,6 @@ void MythMainWindow::SetDrawEnabled(bool enable)
         HidePainterWindow();
         d->drawTimer->stop();
     }
-
-    d->m_setDrawEnabledWait.wakeAll();
 }
 
 void MythMainWindow::SetEffectsEnabled(bool enable)
@@ -2725,14 +2714,6 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() == MythEvent::kPopDisableDrawingEventType)
     {
         PopDrawDisabled();
-    }
-    else if (ce->type() == MythEvent::kDisableDrawingEventType)
-    {
-        SetDrawEnabled(false);
-    }
-    else if (ce->type() == MythEvent::kEnableDrawingEventType)
-    {
-        SetDrawEnabled(true);
     }
     else if (ce->type() == MythEvent::kLockInputDevicesEventType)
     {

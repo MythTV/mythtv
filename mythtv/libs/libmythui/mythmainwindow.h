@@ -150,9 +150,11 @@ class MUI_PUBLIC MythMainWindow : public QWidget
   protected slots:
     void animate();
     void doRemoteScreenShot(QString filename, int x, int y);
+    void SetDrawEnabled(bool enable);
 
   signals:
     void signalRemoteScreenShot(QString filename, int x, int y);
+    void signalSetDrawEnabled(bool enable);
 
   protected:
     explicit MythMainWindow(const bool useDB = true);
@@ -171,8 +173,6 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void ExitToMainMenu();
 
     QObject *getTarget(QKeyEvent &key);
-
-    void SetDrawEnabled(bool enable);
 
     void LockInputDevices(bool locked);
 

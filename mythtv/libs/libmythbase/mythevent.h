@@ -67,8 +67,6 @@ class MBASE_PUBLIC MythEvent : public QEvent
     static Type kUpdateTvProgressEventType;
     static Type kExitToMainMenuEventType;
     static Type kMythPostShowEventType;
-    static Type kEnableDrawingEventType;
-    static Type kDisableDrawingEventType;
     static Type kPushDisableDrawingEventType;
     static Type kPopDisableDrawingEventType;
     static Type kLockInputDevicesEventType;
