@@ -263,6 +263,8 @@ namespace
 
     void cleanup()
     {
+        qApp->processEvents();
+        DestroyMythMainWindow();
 #ifdef USING_AIRPLAY
         MythRAOPDevice::Cleanup();
         MythAirplayServer::Cleanup();
@@ -286,8 +288,6 @@ namespace
             delete pmanager;
             pmanager = NULL;
         }
-
-        DestroyMythMainWindow();
 
         delete gContext;
         gContext = NULL;
