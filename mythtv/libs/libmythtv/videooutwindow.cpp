@@ -533,11 +533,9 @@ void VideoOutWindow::PrintMoveResizeDebug(void)
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("Img(%1,%2 %3,%4)")
            .arg(video_rect.left()).arg(video_rect.top())
            .arg(video_rect.width()).arg(video_rect.height()));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Disp(%1,%1 %2,%4)")
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Disp(%1,%2 %3,%4)")
            .arg(display_video_rect.left()).arg(display_video_rect.top())
            .arg(display_video_rect.width()).arg(display_video_rect.height()));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("Offset(%1,%2)")
-           .arg(xoff).arg(yoff));
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("Vscan(%1, %2)")
            .arg(db_scale_vert).arg(db_scale_vert));
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("DisplayAspect: %1")
@@ -550,7 +548,7 @@ void VideoOutWindow::PrintMoveResizeDebug(void)
            .arg(fix_aspect(GetDisplayAspect())));
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("AspectOverride: %1")
            .arg(aspectoverride));
-    LOG(VB_PLAYBACK, LOG_DEBUG, QString("AdjustFill: %d") .arg(adjustfill));
+    LOG(VB_PLAYBACK, LOG_DEBUG, QString("AdjustFill: %1") .arg(adjustfill));
 #endif
 
     LOG(VB_PLAYBACK, LOG_INFO,
