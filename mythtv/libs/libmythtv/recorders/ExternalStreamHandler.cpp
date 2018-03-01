@@ -1143,6 +1143,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Too many I/O errors.");
             _error = true;
+            break;
         }
         usleep(timeout);
     }
