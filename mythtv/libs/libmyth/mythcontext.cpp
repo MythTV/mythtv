@@ -7,6 +7,10 @@
 #include <QTcpSocket>
 #include <QEventLoop>
 
+#ifdef Q_OS_ANDROID
+#include <QtAndroidExtras>
+#endif
+
 #include <cmath>
 #include <iostream>
 
@@ -597,7 +601,44 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
                     "MCP: Error, could not determine host name." + ENO);
             localhostname[0] = '\0';
         }
+#ifdef Q_OS_ANDROID
+#define ANDROID_EXCEPTION_CHECK \
+  if (env->ExceptionCheck()) { \
+    env->ExceptionClear(); \
+    exception=true; \
+  }
+        if (strcmp(localhostname, "localhost") == 0
+            || localhostname[0] == '\0')
+        {
+            hostname = "android";
+            bool exception=false;
+            QAndroidJniEnvironment env;
+            QAndroidJniObject myID = QAndroidJniObject::fromString("android_id");
+            QAndroidJniObject activity = QtAndroid::androidActivity();
+            ANDROID_EXCEPTION_CHECK;
+            QAndroidJniObject appctx = activity.callObjectMethod
+                ("getApplicationContext","()Landroid/content/Context;");
+            ANDROID_EXCEPTION_CHECK;
+            QAndroidJniObject contentR = appctx.callObjectMethod
+                ("getContentResolver", "()Landroid/content/ContentResolver;");
+            ANDROID_EXCEPTION_CHECK;
+            QAndroidJniObject androidId = QAndroidJniObject::callStaticObjectMethod
+                ("android/provider/Settings$Secure","getString",
+                 "(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;",
+                 contentR.object<jobject>(),
+                 myID.object<jstring>());
+            ANDROID_EXCEPTION_CHECK;
+            if (exception)
+                LOG(VB_GENERAL, LOG_ALERT,
+                    "Java exception looking for android id");
+            else
+                hostname = QString("android-%1").arg(androidId.toString());
+        }
+        else
+            hostname = localhostname;
+#else
         hostname = localhostname;
+#endif
         LOG(VB_GENERAL, LOG_NOTICE, "Empty LocalHostName.");
     }
     else
