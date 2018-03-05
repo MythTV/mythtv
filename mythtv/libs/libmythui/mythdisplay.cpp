@@ -112,16 +112,23 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     ret.size = disp->GetDisplayDimensions();
     delete disp;
 #elif defined(Q_OS_ANDROID)
+    QAndroidJniEnvironment env;
     QAndroidJniObject activity = QtAndroid::androidActivity();
     QAndroidJniObject windowManager =  activity.callObjectMethod("getWindowManager", "()Landroid/view/WindowManager;");
     QAndroidJniObject display =  windowManager.callObjectMethod("getDefaultDisplay", "()Landroid/view/Display;");
     QAndroidJniObject displayMetrics("android/util/DisplayMetrics");
-    display.callMethod<void>("getMetrics", "(Landroid/util/DisplayMetrics;)V", displayMetrics.object());
+    display.callMethod<void>("getRealMetrics", "(Landroid/util/DisplayMetrics;)V", displayMetrics.object());
+    // check if passed or try a different method
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionClear();
+        display.callMethod<void>("getMetrics", "(Landroid/util/DisplayMetrics;)V", displayMetrics.object());
+    }
     float xdpi = displayMetrics.getField<jfloat>("xdpi");
     float ydpi = displayMetrics.getField<jfloat>("ydpi");
+    int height = displayMetrics.getField<jint>("heightPixels");
+    int width = displayMetrics.getField<jint>("widthPixels");
     float rate = display.callMethod<jfloat>("getRefreshRate");
-    int height = display.callMethod<jint>("getHeight");
-    int width = display.callMethod<jint>("getWidth");
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("rate:%1 h:%2 w:%3 xdpi:%4 ydpi:%5")
         .arg(rate).arg(height).arg(width)
