@@ -4177,7 +4177,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
                   "TV Playback", e, actions, isLiveTV);
     }
     if (handled || actions.isEmpty())
-        return true;
+        return handled;
 
     handled = false;
 
