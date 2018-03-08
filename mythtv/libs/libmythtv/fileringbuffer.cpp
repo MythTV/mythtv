@@ -352,7 +352,9 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
         if (suffixPos > 0)
         {
             baseName = tmpSubName.left(suffixPos);
-            extension = tmpSubName.right(suffixPos-1);
+            int extnleng = tmpSubName.size() - baseName.size() - 1;
+            extension = tmpSubName.right(extnleng);
+
             if (is_subtitle_possible(extension))
             {
                 QMutexLocker locker(&subExtLock);
