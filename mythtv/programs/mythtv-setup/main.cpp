@@ -490,23 +490,34 @@ int main(int argc, char *argv[])
         QMap<QString,QString> startChan;
         {
             ChannelScannerCLI scanner(doScanSaveOnly, scanInteractive);
-            scanner.Scan(
-                (freq_std=="atsc") ?
-                ScanTypeSetting::FullScan_ATSC :
-                ((freq_std=="dvbt") ?
-                 ScanTypeSetting::FullScan_DVBT :
-                 ScanTypeSetting::FullScan_ATSC),
-                /* cardid    */ scanCardId,
-                /* inputname */ scanInputName,
-                /* sourceid  */ sourceid,
-                /* ignore signal timeout */ false,
-                /* follow_nit */            true,
-                /* test decryption */       true,
-                scanFTAOnly,
-                scanServiceRequirements,
-                // stuff needed for particular scans
-                /* mplexid   */ 0,
-                startChan, freq_std, mod, tbl);
+
+            int scantype;
+            if (freq_std == "atsc")
+                scantype = ScanTypeSetting::FullScan_ATSC;
+            else if (freq_std == "dvbt")
+                scantype = ScanTypeSetting::FullScan_DVBT;
+            else if (freq_std == "mpeg")
+                scantype = ScanTypeSetting::CurrentTransportScan;
+            else if (freq_std == "iptv")
+            {
+                scantype = ScanTypeSetting::IPTVImportMPTS;
+                scanner.ImportM3U(scanCardId, scanInputName, sourceid, true);
+            }
+            else
+                scantype = ScanTypeSetting::FullScan_ATSC;
+
+            scanner.Scan(scantype,
+                         /* cardid    */ scanCardId,
+                         /* inputname */ scanInputName,
+                         /* sourceid  */ sourceid,
+                         /* ignore signal timeout */ false,
+                         /* follow_nit */            true,
+                         /* test decryption */       true,
+                         scanFTAOnly,
+                         scanServiceRequirements,
+                         // stuff needed for particular scans
+                         /* mplexid   */ 0,
+                         startChan, freq_std, mod, tbl);
             ret = qApp->exec();
         }
         return (ret) ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
