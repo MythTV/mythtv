@@ -154,7 +154,7 @@ class MTV_PUBLIC StreamID
         MPEG2IPMP      = 0x1a, ///< ISO 13818-10 Digital Restrictions Mangment
         MPEG2IPMP2     = 0x7f, ///< ISO 13818-10 Digital Restrictions Mangment
 
-        Splice         = 0x86, ///< ANSI/SCTE 35 2007 
+        Splice         = 0x86, ///< ANSI/SCTE 35 2007
 
         // special id's, not actually ID's but can be used in FindPIDs
         AnyMask        = 0xFFFF0000,
@@ -901,7 +901,7 @@ class MTV_PUBLIC SpliceScheduleView
     //     program_splice_flag  1 5.1 + _ptrs0[i]
     //     duration_flag        1 5.2 + _ptrs0[i]
     //     reserved             5 5.3 + _ptrs0[i]
-    //     if (program_splice_flag == ‘1’) 
+    //     if (program_splice_flag == ‘1’)
     //       utc_splice_time   32 6.0 + _ptrs0[i]
     //     else {
     //       component_count    8 6.0 + _ptrs0[i]
@@ -922,7 +922,7 @@ class MTV_PUBLIC SpliceScheduleView
 
   private:
     vector<const unsigned char*> _ptrs0;
-    vector<const unsigned char*> _ptrs1;    
+    vector<const unsigned char*> _ptrs1;
 };
 
 class MTV_PUBLIC SpliceInsertView
