@@ -706,6 +706,16 @@ static HostCheckBoxSetting *JobAllowTranscode()
     return gc;
 };
 
+static HostCheckBoxSetting *JobAllowPreview()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("JobAllowPreview");
+    gc->setLabel(QObject::tr("Allow preview jobs"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If enabled, allow jobs of this type to "
+                                "run on this backend."));
+    return gc;
+};
+
 static GlobalTextEditSetting *JobQueueTranscodeCommand()
 {
     GlobalTextEditSetting *gc = new GlobalTextEditSetting("JobQueueTranscodeCommand");
@@ -989,6 +999,7 @@ BackendSettings::BackendSettings() :
     group5->addChild(JobAllowMetadata());
     group5->addChild(JobAllowCommFlag());
     group5->addChild(JobAllowTranscode());
+    group5->addChild(JobAllowPreview());
     group5->addChild(JobAllowUserJob(1));
     group5->addChild(JobAllowUserJob(2));
     group5->addChild(JobAllowUserJob(3));

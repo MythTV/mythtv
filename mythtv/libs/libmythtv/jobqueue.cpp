@@ -1441,6 +1441,8 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
                                  break;
             case JOB_METADATA:   allowSetting = "JobAllowMetadata";
                                  break;
+            case JOB_PREVIEW:    allowSetting = "JobAllowPreview";
+                                 break;
             default:             return false;
         }
     }

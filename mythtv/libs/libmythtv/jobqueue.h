@@ -77,6 +77,7 @@ enum JobTypes {
     JOB_TRANSCODE    = 0x0001,
     JOB_COMMFLAG     = 0x0002,
     JOB_METADATA     = 0x0004,
+    JOB_PREVIEW      = 0x0008,
 
     JOB_USERJOB      = 0xff00,
     JOB_USERJOB1     = 0x0100,

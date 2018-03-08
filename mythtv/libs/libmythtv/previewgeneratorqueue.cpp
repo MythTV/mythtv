@@ -158,6 +158,9 @@ void PreviewGeneratorQueue::GetPreviewImage(
         return;
     }
 
+    if (gCoreContext->GetNumSetting("JobAllowPreview", 1) == 0)
+        return;
+
     QStringList extra;
     pginfo.ToStringList(extra);
     extra += token;
