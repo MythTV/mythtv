@@ -34,8 +34,8 @@ PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = NULL;
  *
  * \param[in] mode Local or Remote (or both)
  * \param[in] maxAttempts How many times total will the code attempt
- * 	      to generate a preview for a specific file, before giving
- * 	      up and ignoring all future requests.
+ *            to generate a preview for a specific file, before giving
+ *            up and ignoring all future requests.
  * \param[in] minBlockSeconds How long after a failed preview
  *            generation attempt will the code ignore subsequent
  *            requests.
@@ -71,8 +71,8 @@ void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
  *
  * \param[in] mode Local or Remote (or both)
  * \param[in] maxAttempts How many times total will the code attempt
- * 	      to generate a preview for a specific file, before giving
- * 	      up and ignoring all future requests.
+ *            to generate a preview for a specific file, before giving
+ *            up and ignoring all future requests.
  * \param[in] minBlockSeconds How long after a failed preview
  *            generation attempt will the code ignore subsequent
  *            requests.
@@ -128,11 +128,11 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
  *
  * \param[in] pginfo Generate the image for this program.
  * \param[in] outputsize Generate a preview image of these dimensions.  If this
- * 	      is not specified the generated image will be the same size
- * 	      as the program.
+ *            is not specified the generated image will be the same size
+ *            as the program.
  * \param[in] outputfile Use this specific filename for the preview
- * 	      image. If empty, a default name will be created based on the
- * 	      program information.
+ *            image. If empty, a default name will be created based on the
+ *            program information.
  * \param[in] time An offset from the start of the program. This can be
  *            seconds or frames. (See the next argument.)
  * \param[in] in_seconds If true, the 'time' offset is in seconds. If
@@ -339,19 +339,19 @@ bool PreviewGeneratorQueue::event(QEvent *e)
  * \param[in] pginfo The program info structure from which the preview
  *            was generated.
  * \param[in] eventname The name of the event being sent to all
- * 	      listeners.  This will always be one of PREVIEW_FAILED,
- * 	      PREVIEW_QUEUED, or PREVIEW_SUCCESS.
+ *            listeners.  This will always be one of PREVIEW_FAILED,
+ *            PREVIEW_QUEUED, or PREVIEW_SUCCESS.
  * \param[in] filename For a SUCCESS message, this is the name of the
- * 	      newly generated preview file. For a QUEUED message, this
- * 	      is an empty string. For a FAILED message, this will be
- * 	      the internal key value.
+ *            newly generated preview file. For a QUEUED message, this
+ *            is an empty string. For a FAILED message, this will be
+ *            the internal key value.
  * \param[in] token The token specified by the listener when it
- * 	      requested the preview generation.
+ *            requested the preview generation.
  * \param[in] msg A text string giving more information about the
  *            processing of the event.
  * \param[in] dt For a PREVIEW_SUCCESS message, this is the the last
- * 	      modified time of the preview file.  For the other
- * 	      messages, this is a null datetime.
+ *            modified time of the preview file.  For the other
+ *            messages, this is a null datetime.
  */
 void PreviewGeneratorQueue::SendEvent(
     const ProgramInfo &pginfo,
@@ -385,11 +385,11 @@ void PreviewGeneratorQueue::SendEvent(
  *
  * \param pginfo Generate the image for this program.
  * \param size Generate a preview image of these dimensions.  If this
- * 	  is not specified the generated image will be the same size
- * 	  as the program.
+ *        is not specified the generated image will be the same size
+ *        as the program.
  * \param outputfile Use this specific filename for the preview
- * 	  image. If empty, a default name will be created based on the
- * 	  program information.
+ *        image. If empty, a default name will be created based on the
+ *        program information.
  * \param time An offset from the start of the program. This can be
  *        seconds or frames. (See the next argument.)
  * \param in_seconds If true, the 'time' offset is in seconds. If
@@ -587,12 +587,12 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
 
 /**
  * \param[in] key The name of the specific preview being
- * 	      generated. Keys are generated internally to this file
- * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *            generated. Keys are generated internally to this file
+ *            and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  *
  * \param[out] queue_depth The total number of items in the queue to
- * 	       be processed.  This number does not include previews
- * 	       that are currently in process of being generated.
+ *             be processed.  This number does not include previews
+ *             that are currently in process of being generated.
  *
  * \param[out] token_cnt The number of listeners that are waiting for
  *             this preview to be generated.
@@ -608,8 +608,8 @@ void PreviewGeneratorQueue::GetInfo(
 
 /**
  * \param[in] key The name of the specific preview being
- * 	      generated. Keys are generated internally to this file
- * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *            generated. Keys are generated internally to this file
+ *            and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  *
  * \param[in] token
  */
@@ -658,8 +658,8 @@ void PreviewGeneratorQueue::UpdatePreviewGeneratorThreads(void)
 /** \brief Sets the PreviewGenerator for a specific file.
  *
  * \param[in] key The name of the specific preview being
- * 	      generated. Keys are generated internally to this file
- * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *            generated. Keys are generated internally to this file
+ *            and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  *
  * \param[in] g
  */
@@ -704,8 +704,8 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
  * allowed.
  *
  * \param[in] key The name of the specific preview being
- * 	      generated. Keys are generated internally to this file
- * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *            generated. Keys are generated internally to this file
+ *            and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  *
  * \return True if generating a preview or blocked. False if a new
  * attempt is allowed.
@@ -729,8 +729,8 @@ bool PreviewGeneratorQueue::IsGeneratingPreview(const QString &key) const
  *        started a PreviewGenerator to create this file.
  *
  * \param[in] key The name of the specific preview being
- * 	      generated. Keys are generated internally to this file
- * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *            generated. Keys are generated internally to this file
+ *            and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  */
 uint PreviewGeneratorQueue::IncPreviewGeneratorAttempts(const QString &key)
 {
@@ -744,8 +744,8 @@ uint PreviewGeneratorQueue::IncPreviewGeneratorAttempts(const QString &key)
  * that the next preview request for this file may run immediately.
  *
  * \param[in] key The name of the specific preview being
- * 	      generated. Keys are generated internally to this file
- * 	      and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
+ *            generated. Keys are generated internally to this file
+ *            and are in the form \<basenane\>_\<w\>x\<h\>_\<offset\>.
  */
 void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
 {
