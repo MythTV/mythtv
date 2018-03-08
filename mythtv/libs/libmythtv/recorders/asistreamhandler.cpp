@@ -349,7 +349,7 @@ void ASIStreamHandler::Close(void)
     }
 }
 
-void ASIStreamHandler::PriorityEvent(int fd)
+void ASIStreamHandler::PriorityEventst(int fd)
 {
     int val;
     if(ioctl(fd, ASI_IOC_RXGETEVENTS, &val) < 0)
@@ -380,7 +380,7 @@ void ASIStreamHandler::PriorityEvent(int fd)
             QString("Acquisition of Sync detected %1")
             .arg(_device));
     if(val & ASI_EVENT_RX_DATA)
-        LOG(VB_RECORD, LOG_NOITCE, LOC +
+        LOG(VB_RECORD, LOG_NOTICE, LOC +
             QString("Receive data status change detected %1")
             .arg(_device));
 }
