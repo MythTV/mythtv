@@ -349,7 +349,7 @@ void ASIStreamHandler::Close(void)
     }
 }
 
-void ASIStreamHandler::PriorityEventst(int fd)
+void ASIStreamHandler::PriorityEvent(int fd)
 {
     int val;
     if(ioctl(fd, ASI_IOC_RXGETEVENTS, &val) < 0)
