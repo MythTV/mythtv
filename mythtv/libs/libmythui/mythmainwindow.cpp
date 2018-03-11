@@ -1122,7 +1122,7 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     }
 
     QString painter = forcedpainter.isEmpty() ?
-        GetMythDB()->GetSetting("ThemePainter", QT_PAINTER) : forcedpainter;
+        GetMythDB()->GetSetting("ThemePainter", AUTO_PAINTER) : forcedpainter;
 #ifdef _WIN32
     if (painter == AUTO_PAINTER || painter == D3D9_PAINTER)
     {
@@ -1152,14 +1152,8 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     }
     else
 # endif
-    if (
-#ifdef USE_OPENGL_QT5
-        // The Qt5 OpenGL painter doesn't render all screens correctly (yet)
-        // so only use OpenGL if explicitly requested
-#else
-        (painter == AUTO_PAINTER && (!d->painter && !d->paintwin)) ||
-#endif
-        painter.contains(OPENGL_PAINTER))
+    if ((!d->painter && !d->paintwin) &&
+        (painter == AUTO_PAINTER || painter.contains(OPENGL_PAINTER)))
     {
         MythRenderOpenGL *gl = MythRenderOpenGL::Create(painter);
         d->render = gl;

@@ -2638,19 +2638,19 @@ static HostComboBoxSetting *ThemePainter()
 
     gc->setLabel(AppearanceSettings::tr("Paint engine"));
 
-    gc->addSelection(QCoreApplication::translate("(Common)", "Qt"), QT_PAINTER);
     gc->addSelection(QCoreApplication::translate("(Common)", "Auto", "Automatic"),
                      AUTO_PAINTER);
+#ifdef _WIN32
+    gc->addSelection(QCoreApplication::translate("(Common)", "Direct3D"),
+                     D3D9_PAINTER);
+#endif
 #if defined USING_OPENGL && ! defined USING_OPENGLES
     gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 2"),
                      OPENGL2_PAINTER);
     gc->addSelection(QCoreApplication::translate("(Common)", "OpenGL 1"),
                      OPENGL_PAINTER);
 #endif
-#ifdef _WIN32
-    gc->addSelection(QCoreApplication::translate("(Common)", "Direct3D"),
-                     D3D9_PAINTER);
-#endif
+    gc->addSelection(QCoreApplication::translate("(Common)", "Qt"), QT_PAINTER);
     gc->setHelpText(
         AppearanceSettings::tr("This selects what MythTV uses to draw. "
                                "Choosing '%1' is recommended, unless running "
