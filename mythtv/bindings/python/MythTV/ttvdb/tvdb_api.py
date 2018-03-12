@@ -1160,7 +1160,20 @@ class Tvdb:
                 self._getShowData(key, self.config['language'])
             return self.shows[key]
 
-        sid = self._nameToSid(key)
+        try:
+            # check it just in case the number string is a show
+            sid = self._nameToSid(key)
+        except tvdb_shownotfound as e:
+            try:
+                # check if it's an id key and fetch the data if necessary
+                int(key)
+                if key not in self.shows:
+                    self._getShowData(key, self.config['language'])
+                return self.shows[key]
+            except ValueError:
+                # return the original show not found exception
+                raise e
+
         log().debug('Got series id %s' % sid)
         return self.shows[sid]
 

@@ -100,9 +100,9 @@ Banner:http://thetvdb.com/banners/graphical/80159-g4.jpg,http://thetvdb.com/bann
 0
 >>> sys.argv = shlex.split('ttvdb -PFB "Stargate SG-1"')
 >>> main()
-Coverart:http://thetvdb.com/banners/posters/72449-4.jpg,http://thetvdb.com/banners/posters/72449-5.jpg,http://thetvdb.com/banners/posters/72449-9.jpg,http://thetvdb.com/banners/posters/72449-6.jpg,http://thetvdb.com/banners/posters/72449-7.jpg,http://thetvdb.com/banners/posters/72449-8.jpg,http://thetvdb.com/banners/posters/72449-1.jpg,http://thetvdb.com/banners/posters/72449-3.jpg,http://thetvdb.com/banners/posters/72449-2.jpg
-Fanart:http://thetvdb.com/banners/fanart/original/72449-55.jpg,http://thetvdb.com/banners/fanart/original/72449-34.jpg,http://thetvdb.com/banners/fanart/original/72449-23.jpg,http://thetvdb.com/banners/fanart/original/72449-24.jpg,http://thetvdb.com/banners/fanart/original/72449-29.jpg,http://thetvdb.com/banners/fanart/original/72449-6.jpg,http://thetvdb.com/banners/fanart/original/72449-26.jpg,http://thetvdb.com/banners/fanart/original/72449-36.jpg,http://thetvdb.com/banners/fanart/original/72449-38.jpg,http://thetvdb.com/banners/fanart/original/72449-50.jpg,http://thetvdb.com/banners/fanart/original/72449-27.jpg,http://thetvdb.com/banners/fanart/original/72449-31.jpg,http://thetvdb.com/banners/fanart/original/72449-32.jpg,http://thetvdb.com/banners/fanart/original/72449-35.jpg,http://thetvdb.com/banners/fanart/original/72449-42.jpg,http://thetvdb.com/banners/fanart/original/72449-44.jpg,http://thetvdb.com/banners/fanart/original/72449-25.jpg,http://thetvdb.com/banners/fanart/original/72449-28.jpg,http://thetvdb.com/banners/fanart/original/72449-47.jpg,http://thetvdb.com/banners/fanart/original/72449-33.jpg,http://thetvdb.com/banners/fanart/original/72449-39.jpg,http://thetvdb.com/banners/fanart/original/72449-43.jpg,http://thetvdb.com/banners/fanart/original/72449-22.jpg,http://thetvdb.com/banners/fanart/original/72449-30.jpg,http://thetvdb.com/banners/fanart/original/72449-40.jpg,http://thetvdb.com/banners/fanart/original/72449-41.jpg,http://thetvdb.com/banners/fanart/original/72449-49.jpg,http://thetvdb.com/banners/fanart/original/72449-51.jpg,http://thetvdb.com/banners/fanart/original/72449-21.jpg,http://thetvdb.com/banners/fanart/original/72449-20.jpg,http://thetvdb.com/banners/fanart/original/72449-45.jpg,http://thetvdb.com/banners/fanart/original/72449-67.jpg,http://thetvdb.com/banners/fanart/original/72449-9.jpg,http://thetvdb.com/banners/fanart/original/72449-46.jpg,http://thetvdb.com/banners/fanart/original/72449-48.jpg,http://thetvdb.com/banners/fanart/original/72449-4.jpg,http://thetvdb.com/banners/fanart/original/72449-1.jpg,http://thetvdb.com/banners/fanart/original/72449-65.jpg,http://thetvdb.com/banners/fanart/original/72449-37.jpg,http://thetvdb.com/banners/fanart/original/72449-16.jpg,http://thetvdb.com/banners/fanart/original/72449-17.jpg,http://thetvdb.com/banners/fanart/original/72449-3.jpg,http://thetvdb.com/banners/fanart/original/72449-7.jpg,http://thetvdb.com/banners/fanart/original/72449-10.jpg,http://thetvdb.com/banners/fanart/original/72449-8.jpg,http://thetvdb.com/banners/fanart/original/72449-5.jpg,http://thetvdb.com/banners/fanart/original/72449-64.jpg,http://thetvdb.com/banners/fanart/original/72449-2.jpg,http://thetvdb.com/banners/fanart/original/72449-61.jpg,http://thetvdb.com/banners/fanart/original/72449-12.jpg,http://thetvdb.com/banners/fanart/original/72449-13.jpg,http://thetvdb.com/banners/fanart/original/72449-14.jpg,http://thetvdb.com/banners/fanart/original/72449-15.jpg,http://thetvdb.com/banners/fanart/original/72449-18.jpg,http://thetvdb.com/banners/fanart/original/72449-63.jpg,http://thetvdb.com/banners/fanart/original/72449-11.jpg,http://thetvdb.com/banners/fanart/original/72449-19.jpg,http://thetvdb.com/banners/fanart/original/72449-52.jpg,http://thetvdb.com/banners/fanart/original/72449-53.jpg,http://thetvdb.com/banners/fanart/original/72449-54.jpg,http://thetvdb.com/banners/fanart/original/72449-56.jpg,http://thetvdb.com/banners/fanart/original/72449-57.jpg,http://thetvdb.com/banners/fanart/original/72449-58.jpg,http://thetvdb.com/banners/fanart/original/72449-59.jpg,http://thetvdb.com/banners/fanart/original/72449-60.jpg,http://thetvdb.com/banners/fanart/original/72449-62.jpg,http://thetvdb.com/banners/fanart/original/72449-73.jpg,http://thetvdb.com/banners/fanart/original/72449-74.jpg,http://thetvdb.com/banners/fanart/original/72449-75.jpg
-Banner:http://thetvdb.com/banners/graphical/72449-g6.jpg,http://thetvdb.com/banners/graphical/72449-g7.jpg,http://thetvdb.com/banners/graphical/185-g3.jpg,http://thetvdb.com/banners/graphical/185-g2.jpg,http://thetvdb.com/banners/graphical/72449-g2.jpg,http://thetvdb.com/banners/graphical/72449-g9.jpg,http://thetvdb.com/banners/blank/72449.jpg,http://thetvdb.com/banners/graphical/72449-g3.jpg,http://thetvdb.com/banners/graphical/72449-g4.jpg,http://thetvdb.com/banners/graphical/185-g.jpg,http://thetvdb.com/banners/graphical/72449-g.jpg,http://thetvdb.com/banners/text/185.jpg,http://thetvdb.com/banners/graphical/72449-g5.jpg,http://thetvdb.com/banners/graphical/72449-g8.jpg
+Coverart:http://thetvdb.com/banners/posters/72449....jpg
+Fanart:http://thetvdb.com/banners/fanart/original/72449-....jpg
+Banner:http://thetvdb.com/banners/graphical/72449-....jpg
 0
 
 # Coverart:http://www.thetvdb.com/banners/posters/72449-1.jpg
@@ -488,9 +488,9 @@ Cast:Chip Gaines, Joanna Gaines
 Runtime:45
 Title:Fixer Upper
 ...
-Coverart:http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-4.jpg,http://thetvdb.com/banners/posters/281053-3.jpg,http://thetvdb.com/banners/posters/281053-1.jpg,http://thetvdb.com/banners/posters/281053-2.jpg,http://thetvdb.com/banners/posters/281053-2.jpg
-Fanart:http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-3.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-4.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-1.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-2.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg,http://thetvdb.com/banners/fanart/original/281053-6.jpg,http://thetvdb.com/banners/fanart/original/281053-5.jpg,http://thetvdb.com/banners/fanart/original/281053-7.jpg,http://thetvdb.com/banners/fanart/original/281053-8.jpg,http://thetvdb.com/banners/fanart/original/281053-9.jpg,http://thetvdb.com/banners/fanart/original/281053-10.jpg
-Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg,http://thetvdb.com/banners/text/281053.jpg,http://thetvdb.com/banners/graphical/281053-g.jpg
+Coverart:http://thetvdb.com/banners/posters/281053-....jpg
+Fanart:http://thetvdb.com/banners/fanart/original/281053-....jpg
+Banner:http://thetvdb.com/banners/graphical/281053-....jpg
 0
 
 >>> sys.argv = shlex.split('ttvdb.py -l en -a US -N 72108 Pyramid')
@@ -525,9 +525,9 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
     <releasedate>2011-05-17</releasedate>
     <people>
       <person job="Actor" name="Mark Harmon" character="Leroy Jethro Gibbs" url="http://thetvdb.com/banners/actors/70164.jpg" thumb="http://thetvdb.com/banners/actors/70164.jpg"/>
-      <person job="Actor" name="Sean Murray" character="Timothy &quot;Tim&quot; McGee" url="http://thetvdb.com/banners/actors/70163.jpg" thumb="http://thetvdb.com/banners/actors/70163.jpg"/>
+      <person job="Actor" name="Sean Murray" character="Timothy McGee" url="http://thetvdb.com/banners/actors/70163.jpg" thumb="http://thetvdb.com/banners/actors/70163.jpg"/>
       <person job="Actor" name="David McCallum" character="Donald &quot;Ducky&quot; Mallard" url="http://thetvdb.com/banners/actors/70159.jpg" thumb="http://thetvdb.com/banners/actors/70159.jpg"/>
-      <person job="Actor" name="Pauley Perrette" character="Abigail &quot;Abby&quot; Sciuto" url="http://thetvdb.com/banners/actors/70161.jpg" thumb="http://thetvdb.com/banners/actors/70161.jpg"/>
+      <person job="Actor" name="Pauley Perrette" character="Abby Sciuto" url="http://thetvdb.com/banners/actors/70161.jpg" thumb="http://thetvdb.com/banners/actors/70161.jpg"/>
       <person job="Actor" name="Rocky Carroll" character="Leon Vance" url="http://thetvdb.com/banners/actors/127861.jpg" thumb="http://thetvdb.com/banners/actors/127861.jpg"/>
       <person job="Actor" name="Brian Dietzen" character="Jimmy Palmer" url="http://thetvdb.com/banners/actors/219761.jpg" thumb="http://thetvdb.com/banners/actors/219761.jpg"/>
       <person job="Actor" name="Wilmer Valderrama" character="Nicholas &quot;Nick&quot; Torres" url="http://thetvdb.com/banners/actors/394895.jpg" thumb="http://thetvdb.com/banners/actors/394895.jpg"/>
@@ -536,9 +536,9 @@ Banner:http://thetvdb.com/banners/graphical/281053-g2.jpg,http://thetvdb.com/ban
       <person job="Actor" name="Cote de Pablo" character="Ziva David" url="http://thetvdb.com/banners/actors/70165.jpg" thumb="http://thetvdb.com/banners/actors/70165.jpg"/>
       <person job="Actor" name="Lauren Holly" character="Jennifer &quot;Jenny&quot; Shepard" url="http://thetvdb.com/banners/actors/77850.jpg" thumb="http://thetvdb.com/banners/actors/77850.jpg"/>
       <person job="Actor" name="Jennifer Esposito" character="Alex Quinn" url="http://thetvdb.com/banners/actors/402126.jpg" thumb="http://thetvdb.com/banners/actors/402126.jpg"/>
-      <person job="Actor" name="Emily Wickersham" character="Eleanor “Ellie” Bishop" url="http://thetvdb.com/banners/actors/321201.jpg" thumb="http://thetvdb.com/banners/actors/321201.jpg"/>
+      <person job="Actor" name="Emily Wickersham" character="Ellie Bishop" url="http://thetvdb.com/banners/actors/321201.jpg" thumb="http://thetvdb.com/banners/actors/321201.jpg"/>
       <person job="Actor" name="Duane Henry" character="Clayton Reeves" url="http://thetvdb.com/banners/actors/418530.jpg" thumb="http://thetvdb.com/banners/actors/418530.jpg"/>
-      <person job="Actor" name="Maria Bello" character="Jacqueline “Jack” Sloane" url="http://thetvdb.com/banners/" thumb="http://thetvdb.com/banners/"/>
+      <person job="Actor" name="Maria Bello" character="Jacqueline “Jack” Sloane" url="http://thetvdb.com/banners/actors/461645.jpg" thumb="http://thetvdb.com/banners/actors/461645.jpg"/>
       <person job="Guest Star" name="Kerr Smith"/>
       <person job="Guest Star" name="Sarah Jane Morris"/>
       <person job="Guest Star" name="Matt Craven"/>
@@ -787,6 +787,102 @@ Siteratingcount:0
 ...
 Cast:Ray Mears
 Runtime:60
+0
+
+>>> sys.argv = shlex.split('ttvdb.py -l de -a DE -N 78804 10 1')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Doctor Who (2005)</title>
+    <subtitle>42</subtitle>
+    <description>Der Doktor und Martha Jones betätigen sich als interplanetare Verkehrswacht - und eilen der Besatzung eines Raumfrachters zu Hilfe, der steuerlos auf einen Stern zutreibt. Den beiden bleiben nur 42 Minuten, bevor das Schiff in der Hitze der Sonne verglüht. Als wäre dieses Zeitlimit noch nicht schlimm genug, bekommen sie es auch mit einer mysteriösen Macht zu tun, die den Crewmitgliedern nach dem Leben trachtet...</description>
+    <season>3</season>
+    <episode>7</episode>
+    <certifications>
+      <certification locale="us" name="TV-PG"/>
+    </certifications>
+    <categories>
+      <category type="genre" name="Adventure"/>
+      <category type="genre" name="Drama"/>
+      <category type="genre" name="Science-Fiction"/>
+    </categories>
+    <studios>
+      <studio name="BBC One"/>
+    </studios>
+    <runtime>45</runtime>
+    <inetref>78804</inetref>
+    <collectionref>78804</collectionref>
+    <imdb>0436992</imdb>
+    <tmsref>EP00750178</tmsref>
+    <language>de</language>
+    <year>2007</year>
+    <releasedate>2007-05-19</releasedate>
+    <people>
+      <person job="Actor" name="Jodie Whitaker" character="Thirteenth Doctor" url="http://thetvdb.com/banners/actors/451936.jpg" thumb="http://thetvdb.com/banners/actors/451936.jpg"/>
+      <person job="Actor" name="Peter Capaldi" character="Twelfth Doctor" url="http://thetvdb.com/banners/actors/333133.jpg" thumb="http://thetvdb.com/banners/actors/333133.jpg"/>
+      <person job="Actor" name="Matt Smith" character="Eleventh Doctor" url="http://thetvdb.com/banners/actors/129621.jpg" thumb="http://thetvdb.com/banners/actors/129621.jpg"/>
+      <person job="Actor" name="David Tennant" character="Tenth Doctor" url="http://thetvdb.com/banners/actors/67922.jpg" thumb="http://thetvdb.com/banners/actors/67922.jpg"/>
+      <person job="Actor" name="Billie Piper" character="Rose Tyler" url="http://thetvdb.com/banners/actors/67923.jpg" thumb="http://thetvdb.com/banners/actors/67923.jpg"/>
+      <person job="Actor" name="Freema Agyeman" character="Martha Jones" url="http://thetvdb.com/banners/actors/67924.jpg" thumb="http://thetvdb.com/banners/actors/67924.jpg"/>
+      <person job="Actor" name="John Barrowman" character="Jack Harkness" url="http://thetvdb.com/banners/actors/67925.jpg" thumb="http://thetvdb.com/banners/actors/67925.jpg"/>
+      <person job="Actor" name="Dan Starkey" character="Strax" url="http://thetvdb.com/banners/actors/343990.jpg" thumb="http://thetvdb.com/banners/actors/343990.jpg"/>
+      <person job="Actor" name="Catrin Stewart" character="Jenny Flint" url="http://thetvdb.com/banners/actors/343989.jpg" thumb="http://thetvdb.com/banners/actors/343989.jpg"/>
+      <person job="Actor" name="Neve McIntosh" character="Madame Vastra" url="http://thetvdb.com/banners/actors/343988.jpg" thumb="http://thetvdb.com/banners/actors/343988.jpg"/>
+      <person job="Actor" name="Christopher Eccleston" character="Ninth Doctor" url="http://thetvdb.com/banners/actors/77724.jpg" thumb="http://thetvdb.com/banners/actors/77724.jpg"/>
+      <person job="Actor" name="Catherine Tate" character="Donna Noble" url="http://thetvdb.com/banners/actors/77751.jpg" thumb="http://thetvdb.com/banners/actors/77751.jpg"/>
+      <person job="Actor" name="John Simm" character="The Master" url="http://thetvdb.com/banners/actors/79737.jpg" thumb="http://thetvdb.com/banners/actors/79737.jpg"/>
+      <person job="Actor" name="Karen Gillan" character="Amy Pond" url="http://thetvdb.com/banners/actors/129611.jpg" thumb="http://thetvdb.com/banners/actors/129611.jpg"/>
+      <person job="Actor" name="Arthur Darvill" character="Rory Williams" url="http://thetvdb.com/banners/actors/200011.jpg" thumb="http://thetvdb.com/banners/actors/200011.jpg"/>
+      <person job="Actor" name="Alex Kingston" character="River Song" url="http://thetvdb.com/banners/actors/286535.jpg" thumb="http://thetvdb.com/banners/actors/286535.jpg"/>
+      <person job="Actor" name="Jenna Coleman" character="Clara Oswald" url="http://thetvdb.com/banners/actors/305854.jpg" thumb="http://thetvdb.com/banners/actors/305854.jpg"/>
+      <person job="Actor" name="Bernard Cribbins" character="Wilfred Mott" url="http://thetvdb.com/banners/actors/308282.jpg" thumb="http://thetvdb.com/banners/actors/308282.jpg"/>
+      <person job="Actor" name="Camille Coduri" character="Jackie Tyler" url="http://thetvdb.com/banners/actors/337609.jpg" thumb="http://thetvdb.com/banners/actors/337609.jpg"/>
+      <person job="Actor" name="Noel Clarke" character="Mickey Smith" url="http://thetvdb.com/banners/actors/337610.jpg" thumb="http://thetvdb.com/banners/actors/337610.jpg"/>
+      <person job="Actor" name="Samuel Anderson" character="Danny Pink" url="http://thetvdb.com/banners/actors/339332.jpg" thumb="http://thetvdb.com/banners/actors/339332.jpg"/>
+      <person job="Actor" name="Michelle Gomez" character="Missy" url="http://thetvdb.com/banners/actors/356014.jpg" thumb="http://thetvdb.com/banners/actors/356014.jpg"/>
+      <person job="Actor" name="Jemma Redgrave" character="Kate Stewart" url="http://thetvdb.com/banners/actors/385486.jpg" thumb="http://thetvdb.com/banners/actors/385486.jpg"/>
+      <person job="Actor" name="Matt Lucas" character="Nardole" url="http://thetvdb.com/banners/actors/418731.jpg" thumb="http://thetvdb.com/banners/actors/418731.jpg"/>
+      <person job="Actor" name="Pearl Mackie" character="Bill Potts" url="http://thetvdb.com/banners/actors/418730.jpg" thumb="http://thetvdb.com/banners/actors/418730.jpg"/>
+      <person job="Guest Star" name="Rebecca Oldfield"/>
+      <person job="Guest Star" name="Gary Powell"/>
+      <person job="Guest Star" name="Vinette Robinson"/>
+      <person job="Guest Star" name="Matthew Chambers"/>
+      <person job="Guest Star" name="William Ash"/>
+      <person job="Guest Star" name="Anthony Flanagan"/>
+      <person job="Guest Star" name="Michelle Collins"/>
+      <person job="Guest Star" name="Adjoa Andoh"/>
+      <person job="Guest Star" name="Elize Du Toit"/>
+      <person job="Director" name="Graeme Harper"/>
+      <person job="Author" name="Chris Chibnall"/>
+    </people>
+    <images>
+      <image type="screenshot" url="http://thetvdb.com/banners/episodes/78804/327376.jpg" thumb="http://thetvdb.com/banners/_cache/episodes/78804/327376.jpg"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-54.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-54.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-61.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-61.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-155.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-155.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-122.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-122.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-60.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-60.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-93.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-93.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-59.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-59.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-64.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-64.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-148.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-148.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-13.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-13.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-125.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-125.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-73.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-73.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-85.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-85.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-115.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-115.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-113.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-113.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-143.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-143.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-116.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-116.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-62.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-62.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-114.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-114.jpg" width="1280" height="720"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-117.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-117.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-144.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-144.jpg" width="1920" height="1080"/>
+      <image type="fanart" url="http://www.thetvdb.com/banners/fanart/original/78804-63.jpg" thumb="http://www.thetvdb.com/banners/_cache/fanart/original/78804-63.jpg" width="1280" height="720"/>
+    </images>
+  </item>
+</metadata>
 0
 
 """
