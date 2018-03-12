@@ -4031,7 +4031,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
         alreadyTranslatedPlayback = true;
 
         if (handled || actions.isEmpty())
-            return true;
+            return handled;
 
         bool esc   = has_action("ESCAPE", actions) ||
                      has_action("BACK", actions);
@@ -4047,13 +4047,12 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
     {
         if (QEvent::KeyPress == e->type())
         {
-            osd->DialogHandleKeypress((QKeyEvent*)e);
+            handled = osd->DialogHandleKeypress((QKeyEvent*)e);
         }
         if (MythGestureEvent::kEventType == e->type())
         {
-            osd->DialogHandleGesture((MythGestureEvent*)e);
+            handled = osd->DialogHandleGesture((MythGestureEvent*)e);
         }
-        handled = true;
     }
     ReturnOSDLock(actx, osd);
 
