@@ -183,8 +183,15 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         videoTextureType = GL_YCBCR_MESA;
     else if ((!shaders || preferYCBCR) && (gl_features & kGLAppleYCbCr))
         videoTextureType = GL_YCBCR_422_APPLE;
+#ifndef ANDROID
+    // WORKAROUND - bypass this on Android
+    // because on Android using texture type MYTHTV_YV12
+    // results in a green line on bottom and left with
+    // some videos. It seems to happen on videos that are
+    // being resized (e.g. play 720p video with 1080p screen).
     else if (glsl && fbos && !(pbos && uyvy) && yv12)
         videoTextureType = MYTHTV_YV12;
+#endif
     else if (shaders && fbos && uyvy)
         videoTextureType = MYTHTV_UYVY;
 
