@@ -40,7 +40,6 @@ V4LChannel::V4LChannel(TVRec *parent, const QString &videodevice,
       audio_device(audiodevice),    videofd(-1),
       device_name(),                driver_name(),
       curList(NULL),                totalChannels(0),
-      currentFormat(),
       has_stream_io(false),         has_std_io(false),
       has_async_io(false),
       has_tuner(false),             has_sliced_vbi(false),
@@ -301,10 +300,9 @@ void V4LChannel::SetFormat(const QString &format)
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
             .arg(format).arg(fmt).arg(inputNum));
 
-    if ((fmt == currentFormat) || SetInputAndFormat(inputNum, fmt))
-    {
-        currentFormat = fmt;
-    }
+    if (!SetInputAndFormat(inputNum, fmt))
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set format." + ENO);
+
 }
 
 int V4LChannel::SetDefaultFreqTable(const QString &name)

@@ -3566,48 +3566,6 @@ void TVRec::HandleTuning(void)
     }
 }
 
-/** \fn TVRec::TuningCheckForHWChange(const TuningRequest&,QString&,QString&)
- *  \brief Returns inputid for device info row in capturecard if it changes.
- */
-uint TVRec::TuningCheckForHWChange(const TuningRequest &request,
-                                   QString &channum,
-                                   QString &inputname)
-{
-     LOG(VB_RECORD, LOG_INFO, LOC + QString("request (%1) channum (%2) inputname (%3)")
-                                            .arg(request.toString()).arg(channum).arg(inputname));
-    if (!channel)
-        return 0;
-
-    uint curInputID = 0, newInputID = 0;
-    channum   = request.channel;
-    inputname = request.input;
-
-    if (request.program)
-        request.program->QueryTuningInfo(channum, inputname);
-
-    if (!channum.isEmpty() && inputname.isEmpty())
-        channel->CheckChannel(channum);
-
-    if (!inputname.isEmpty())
-    {
-        curInputID = channel->GetInputID();
-        newInputID = channel->GetInputID();
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("HW Tuner: %1->%2")
-                .arg(curInputID).arg(newInputID));
-    }
-
-    if (curInputID != newInputID || !CardUtil::IsChannelReusable(genOpt.inputtype))
-    {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("Inputtype HW Tuner newinputid channum curinputid: %1->%2 %3")
-                                               .arg(curInputID).arg(newInputID).arg(channum));
-        if (channum.isEmpty())
-            channum = GetStartChannel(newInputID);
-        return newInputID;
-    }
-
-    return 0;
-}
-
 /** \fn TVRec::TuningShutdowns(const TuningRequest&)
  *  \brief This shuts down anything that needs to be shut down
  *         before handling the passed in tuning request.
@@ -3618,8 +3576,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         .arg(request.toString()));
 
     QString channum, inputname;
-    uint newInputID = TuningCheckForHWChange(request, channum, inputname);
-    uint dummyParentID;
 
     if (scanner && !(request.flags & kFlagEITScan) &&
         HasFlags(kFlagEITScannerRunning))
@@ -3651,7 +3607,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
     // At this point any waits are canceled.
 
-    if (newInputID || (request.flags & kFlagNoRec))
+    if (request.flags & kFlagNoRec)
     {
         if (HasFlags(kFlagDummyRecorderRunning))
         {
@@ -3673,19 +3629,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
         CloseChannel();
         // At this point the channel is shut down
-    }
-
-    // handle HW change for digital/analog inputs
-    if (newInputID)
-    {
-        LOG(VB_CHANNEL, LOG_INFO, LOC +
-            "TuningShutdowns: Recreating channel...");
-        channel->Close();
-        delete channel;
-        channel = NULL;
-
-        GetDevices(newInputID, dummyParentID, genOpt, dvbOpt, fwOpt);
-        CreateChannel(channum, false);
     }
 
     if (ringBuffer && (request.flags & kFlagKillRingBuffer))
