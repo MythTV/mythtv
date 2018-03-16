@@ -94,7 +94,6 @@ class V4LChannel : public DTVChannel
     struct CHANLIST *curList;
     int         totalChannels;
 
-    QString     currentFormat;
     bool        has_stream_io;
     bool        has_std_io;
     bool        has_async_io;

@@ -299,9 +299,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void TuningNewRecorder(MPEGStreamData*);
     void TuningRestartRecorder(void);
     QString TuningGetChanNum(const TuningRequest&, QString &input) const;
-    uint TuningCheckForHWChange(const TuningRequest&,
-                                QString &channum,
-                                QString &inputname);
     bool TuningOnSameMultiplex(TuningRequest &request);
 
     void HandleStateChange(void);
