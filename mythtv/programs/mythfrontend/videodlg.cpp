@@ -2472,7 +2472,10 @@ void VideoDialog::VideoMenu()
     m_menuPopup = new MythDialogBox(menu, m_popupStack, "videomenupopup");
 
     if (m_menuPopup->Create())
+    {
         m_popupStack->AddScreen(m_menuPopup);
+        connect(m_menuPopup, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
+    }
     else
         delete m_menuPopup;
 }
@@ -2536,9 +2539,26 @@ void VideoDialog::DisplayMenu()
     m_menuPopup = new MythDialogBox(menu, m_popupStack, "videomenupopup");
 
     if (m_menuPopup->Create())
+    {
         m_popupStack->AddScreen(m_menuPopup);
+        connect(m_menuPopup, SIGNAL(Closed(QString,int)), SLOT(popupClosed(QString,int)));
+    }
     else
         delete m_menuPopup;
+}
+
+// Switch from the display menu to the actions menu on second
+// menu press
+
+void VideoDialog::popupClosed(QString which, int result)
+{
+    m_menuPopup = NULL;
+
+    if (result == -2)
+    {
+        if (which == "display")
+            VideoMenu();
+    }
 }
 
 /** \fn VideoDialog::CreateViewMenu()

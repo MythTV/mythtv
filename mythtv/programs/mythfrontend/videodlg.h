@@ -112,6 +112,8 @@ class VideoDialog : public MythScreenType
     MythMenu* CreateSettingsMenu();
     MythMenu* CreateMetadataBrowseMenu();
 
+    void popupClosed(QString which, int reason);
+
     void PromptToScan();
 
     void ChangeFilter();

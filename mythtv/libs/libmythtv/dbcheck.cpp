@@ -3404,7 +3404,18 @@ NULL
         if (!performActualUpdate(updates, "1348", dbver))
             return false;
     }
+    /*
+     * TODO when consolidating database version 1348 into initialize, you can delete
+     * from mythtv/libs/libmythtv/tv_play.cpp the upgrade code in the lines
+     * preceding REG_KEY for ACTION_SETBOOKMARK and ACTION_TOGGLEBOOKMARK
+     */
 
+    /*
+     * TODO the following settings are no more, clean them up with the next schema change
+     * to avoid confusion by stale settings in the database
+     *
+     * AltClearSavedPosition
+     */
     return true;
 }
 

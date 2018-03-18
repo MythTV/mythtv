@@ -1657,23 +1657,6 @@ static HostCheckBoxSetting *ClearSavedPosition()
     return gc;
 }
 
-static HostCheckBoxSetting *AltClearSavedPosition()
-{
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("AltClearSavedPosition");
-
-    gc->setLabel(PlaybackSettings::tr("Alternate clear and save bookmark"));
-
-    gc->setValue(true);
-
-    gc->setHelpText(PlaybackSettings::tr("During playback the SELECT key "
-                                         "(Enter or Space) will alternate "
-                                         "between \"Bookmark Saved\" and "
-                                         "\"Bookmark Cleared\". If disabled, "
-                                         "the SELECT key will save the current "
-                                         "position for each keypress."));
-    return gc;
-}
-
 static HostCheckBoxSetting *UseProgStartMark()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("UseProgStartMark");
@@ -4017,7 +4000,6 @@ void PlaybackSettings::Load(void)
     general->addChild(AudioReadAhead());
     general->addChild(JumpToProgramOSD());
     general->addChild(ClearSavedPosition());
-    general->addChild(AltClearSavedPosition());
     general->addChild(UseProgStartMark());
     general->addChild(AutomaticSetWatched());
     general->addChild(ContinueEmbeddedTVPlay());

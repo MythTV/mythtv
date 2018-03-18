@@ -175,6 +175,9 @@
   <menu text="Navigate">
     <item action="JUMPFFWD" XXXtext="Jump Ahead" />
     <item action="JUMPRWND" XXXtext="Jump Back" />
+    <item action="SETBOOKMARK" XXXtext="Set Bookmark" />
+    <item action="TOGGLEBOOKMARK" XXXtext="Toggle Bookmark" />
+    <item action="JUMPBKMRK" XXXtext="Jump to Bookmark" />
     <menu text="Commercial Auto-Skip">
       <itemlist actiongroup="TOGGLECOMMSKIP" current="active" />
       <!-- Alternatively:

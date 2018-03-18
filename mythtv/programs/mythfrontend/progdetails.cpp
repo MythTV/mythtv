@@ -137,7 +137,7 @@ bool ProgDetails::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "INFO")
+        if (action == "INFO" || action == "SELECT")
         {
             m_infoList.Toggle();
             updatePage();

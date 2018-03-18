@@ -599,7 +599,37 @@ void TV::InitKeys(void)
             "Change Group View"), "");
     REG_KEY("TV Frontend", ACTION_LISTRECORDEDEPISODES, QT_TRANSLATE_NOOP("MythControls",
             "List recorded episodes"), "");
-
+    /*
+     * TODO when consolidating database version 1348 into initialize, you can delete
+     * the following upgrade code and replace bkmKeys and togBkmKeys  with "" in the
+     * REG_KEY for ACTION_SETBOOKMARK and ACTION_TOGGLEBOOKMARK.
+     */
+    // Bookmarks - Instead of SELECT to add or toggle,
+    // Use separate bookmark actions. This code is to convert users
+    // who may already be using SELECT. If they are not already using
+    // this frontend then nothing will be assigned to bookmark actions.
+    QString bkmKeys;
+    QString togBkmKeys;
+    // Check if this is a new frontend - if PAUSE returns
+    // "?" then frontend is new, never used before, so we will not assign
+    // any default bookmark keys
+    QString testKey = GetMythMainWindow()->GetKey("TV Playback", ACTION_PAUSE);
+    if (testKey != "?")
+    {
+        int alternate = gCoreContext->GetNumSetting("AltClearSavedPosition",0);
+        QString selectKeys = GetMythMainWindow()->GetKey("Global", ACTION_SELECT);
+        if (selectKeys != "?")
+        {
+            if (alternate)
+                togBkmKeys = selectKeys;
+            else
+                bkmKeys = selectKeys;
+        }
+    }
+    REG_KEY("TV Playback", ACTION_SETBOOKMARK, QT_TRANSLATE_NOOP("MythControls",
+            "Add Bookmark"), bkmKeys);
+    REG_KEY("TV Playback", ACTION_TOGGLEBOOKMARK, QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Bookmark"), togBkmKeys);
     REG_KEY("TV Playback", "BACK", QT_TRANSLATE_NOOP("MythControls",
             "Exit or return to DVD menu"), "Esc");
     REG_KEY("TV Playback", ACTION_MENUCOMPACT, QT_TRANSLATE_NOOP("MythControls",
@@ -607,7 +637,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", ACTION_CLEAROSD, QT_TRANSLATE_NOOP("MythControls",
             "Clear OSD"), "Backspace");
     REG_KEY("TV Playback", ACTION_PAUSE, QT_TRANSLATE_NOOP("MythControls",
-            "Pause"), "P");
+            "Pause"), "P,Space");
     REG_KEY("TV Playback", ACTION_SEEKFFWD, QT_TRANSLATE_NOOP("MythControls",
             "Fast Forward"), "Right");
     REG_KEY("TV Playback", ACTION_SEEKRWND, QT_TRANSLATE_NOOP("MythControls",
@@ -1016,7 +1046,6 @@ TV::TV(void)
       db_auto_set_watched(false),   db_end_of_rec_exit_prompt(false),
       db_jump_prefer_osd(true),     db_use_gui_size_for_tv(false),
       db_clear_saved_position(false),
-      db_toggle_bookmark(false),
       db_run_jobs_on_remote(false), db_continue_embedded(false),
       db_use_fixed_size(true),      db_browse_always(false),
       db_browse_all_tuners(false),
@@ -1124,7 +1153,6 @@ void TV::InitFromDB(void)
     kv["JumpToProgramOSD"]         = "1";
     kv["GuiSizeForTV"]             = "0";
     kv["ClearSavedPosition"]       = "1";
-    kv["AltClearSavedPosition"]    = "1";
     kv["JobsRunOnRecordHost"]      = "0";
     kv["ContinueEmbeddedTVPlay"]   = "0";
     kv["UseFixedWindowSize"]       = "1";
@@ -1175,7 +1203,6 @@ void TV::InitFromDB(void)
     db_jump_prefer_osd     = kv["JumpToProgramOSD"].toInt();
     db_use_gui_size_for_tv = kv["GuiSizeForTV"].toInt();
     db_clear_saved_position= kv["ClearSavedPosition"].toInt();
-    db_toggle_bookmark     = kv["AltClearSavedPosition"].toInt();
     db_run_jobs_on_remote  = kv["JobsRunOnRecordHost"].toInt();
     db_continue_embedded   = kv["ContinueEmbeddedTVPlay"].toInt();
     db_use_fixed_size      = kv["UseFixedWindowSize"].toInt();
@@ -5047,12 +5074,21 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx, const QStringList &actions)
     bool isdvd  = state == kState_WatchingDVD;
     bool isdisc = isdvd || state == kState_WatchingBD;
 
-    if (has_action(ACTION_SELECT, actions))
+    if (has_action(ACTION_SETBOOKMARK, actions))
     {
         if (!islivetv || !CommitQueuedInput(ctx))
         {
             ctx->LockDeletePlayer(__FILE__, __LINE__);
-            SetBookmark(ctx, db_toggle_bookmark && ctx->player->GetBookmark());
+            SetBookmark(ctx, false);
+            ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        }
+    }
+    if (has_action(ACTION_TOGGLEBOOKMARK, actions))
+    {
+        if (!islivetv || !CommitQueuedInput(ctx))
+        {
+            ctx->LockDeletePlayer(__FILE__, __LINE__);
+            SetBookmark(ctx, ctx->player->GetBookmark());
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         }
     }
@@ -11069,6 +11105,15 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             DoQueueTranscode(actx, "Medium Quality");
         else if (action == "QUEUETRANSCODE_LOW")
             DoQueueTranscode(actx, "Low Quality");
+        else if (action == ACTION_TOGGLEBOOKMARK
+                || action == ACTION_SETBOOKMARK)
+            ActivePostQHandleAction(actx, QStringList(action));
+        else if (action == ACTION_JUMPBKMRK)
+        {
+            bool isDVD = actx->buffer && actx->buffer->IsDVD();
+            bool isMenuOrStill = actx->buffer && actx->buffer->IsInDiscMenuOrStillFrame();
+            ActiveHandleAction(actx, QStringList(ACTION_JUMPBKMRK), isDVD, isMenuOrStill);
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
