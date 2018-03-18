@@ -54,6 +54,8 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
                            QStringList &actions, bool allowJumps = true)
                            MUNUSED_RESULT;
+    bool keyLongPressFilter(QEvent **e,
+        QScopedPointer<QEvent> &sNewEvent);
 
     void ReloadKeys(void);
     void ClearKey(const QString &context, const QString &action);

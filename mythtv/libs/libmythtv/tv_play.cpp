@@ -3664,6 +3664,10 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 
     // Intercept keypress events unless they need to be handled by a main UI
     // screen (e.g. GuideGrid, ProgramFinder)
+    QScopedPointer<QEvent> sNewEvent(NULL);
+    if (GetMythMainWindow()->keyLongPressFilter(&e, sNewEvent))
+        return false;
+
     if (QEvent::KeyPress == e->type())
         return ignoreKeyPresses ? false : event(e);
     if (MythGestureEvent::kEventType == e->type())
