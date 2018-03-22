@@ -1393,7 +1393,7 @@ void MythMainWindow::InitKeys()
     RegisterKey("Main Menu",    "STANDBYMODE",QT_TRANSLATE_NOOP("MythControls",
         "Enter Standby Mode"),              "");
     RegisterKey("Long Press",    "LONGPRESS1",QT_TRANSLATE_NOOP("MythControls",
-        "Up to 16 Keys that allow Long Press"),      "Enter");
+        "Up to 16 Keys that allow Long Press"),      "");
     RegisterKey("Long Press",    "LONGPRESS2",QT_TRANSLATE_NOOP("MythControls",
         "Up to 16 Keys that allow Long Press"),      "");
     RegisterKey("Long Press",    "LONGPRESS3",QT_TRANSLATE_NOOP("MythControls",
