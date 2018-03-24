@@ -438,6 +438,55 @@ void AudioOutputOMX::CloseDevice(void)
     m_audiorender.Shutdown();
 }
 
+// HDMI uses a different channel order from WAV and others
+// See CEA spec: Table 20, Audio InfoFrame
+
+#define REORD_NUMCHAN 6     // Min Num of channels for reorder to be done
+#define REORD_A 2           // First channel to switch
+#define REORD_B 3           // Second channel to switch
+
+void AudioOutputOMX::reorderChannels(int *aubuf, int size)
+{
+    int t_size = size;
+    int *sample = aubuf;
+    while (t_size >= REORD_NUMCHAN*4)
+    {
+        int savefirst = sample[REORD_A];
+        sample[REORD_A] = sample[REORD_B];
+        sample[REORD_B] = savefirst;
+        sample += channels;
+        t_size -= output_bytes_per_frame;
+    }
+}
+
+void AudioOutputOMX::reorderChannels(short *aubuf, int size)
+{
+    int t_size = size;
+    short *sample = aubuf;
+    while (t_size >= REORD_NUMCHAN*2)
+    {
+        short savefirst = sample[REORD_A];
+        sample[REORD_A] = sample[REORD_B];
+        sample[REORD_B] = savefirst;
+        sample += channels;
+        t_size -= output_bytes_per_frame;
+    }
+}
+
+void AudioOutputOMX::reorderChannels(uchar *aubuf, int size)
+{
+    int t_size = size;
+    uchar *sample = aubuf;
+    while (t_size >= REORD_NUMCHAN)
+    {
+        uchar savefirst = sample[REORD_A];
+        sample[REORD_A] = sample[REORD_B];
+        sample[REORD_B] = savefirst;
+        sample += channels;
+        t_size -= output_bytes_per_frame;
+    }
+}
+
 // virtual
 void AudioOutputOMX::WriteAudio(uchar *aubuf, int size)
 {
@@ -445,6 +494,25 @@ void AudioOutputOMX::WriteAudio(uchar *aubuf, int size)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " No audio render");
         return;
+    }
+
+    // Reorder channels for CEA format
+    // See CEA spec: Table 20, Audio InfoFrame
+    if (!enc && !reenc && channels >= REORD_NUMCHAN)
+    {
+        int samplesize = output_bytes_per_frame / channels;
+        switch (samplesize)
+        {
+            case 1:
+                reorderChannels(aubuf, size);
+                break;
+            case 2:
+                reorderChannels((short*)aubuf, size);
+                break;
+            case 4:
+                reorderChannels((int*)aubuf, size);
+                break;
+        }
     }
 
     while (size > 0)

@@ -49,6 +49,10 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
     typedef OMX_ERRORTYPE ComponentCB();
     ComponentCB FreeBuffersCB, AllocBuffersCB;
 
+    void reorderChannels(int *aubuf, int size);
+    void reorderChannels(short *aubuf, int size);
+    void reorderChannels(uchar *aubuf, int size);
+
   private:
     OMXComponent m_audiorender;
 
