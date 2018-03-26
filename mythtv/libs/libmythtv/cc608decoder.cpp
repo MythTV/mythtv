@@ -65,15 +65,15 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
     // fill translation table
     for (uint i = 0; i < 128; i++)
         stdchar[i] = QChar(i);
-    stdchar[42]  = QLatin1Char('á');
-    stdchar[92]  = QLatin1Char('é');
-    stdchar[94]  = QLatin1Char('í');
-    stdchar[95]  = QLatin1Char('ó');
-    stdchar[96]  = QLatin1Char('ú');
-    stdchar[123] = QLatin1Char('ç');
-    stdchar[124] = QLatin1Char('÷');
-    stdchar[125] = QLatin1Char('Ñ');
-    stdchar[126] = QLatin1Char('ñ');
+    stdchar[42]  = QLatin1Char(0xE1); // Ã¡
+    stdchar[92]  = QLatin1Char(0xE9); // Ã©
+    stdchar[94]  = QLatin1Char(0xED); // Ã­
+    stdchar[95]  = QLatin1Char(0xF3); // Ã³
+    stdchar[96]  = QLatin1Char(0xFA); // Ãº
+    stdchar[123] = QLatin1Char(0xE7); // Ã§
+    stdchar[124] = QLatin1Char(0xF7); // Ã·
+    stdchar[125] = QLatin1Char(0xD1); // Ã‘
+    stdchar[126] = QLatin1Char(0xF1); // Ã±
     stdchar[127] = 0x2588; /* full block */
 
     // VPS data (MS Windows doesn't like bzero())
@@ -119,34 +119,34 @@ static const int rowdata[] =
 
 static const QChar specialchar[] =
 {
-    QLatin1Char('®'), QLatin1Char('°'), QLatin1Char('½'), QLatin1Char('¿'),
-    0x2122 /* TM */,  QLatin1Char('¢'), QLatin1Char('£'), 0x266A /* 1/8 note */,
-    QLatin1Char('à'), QLatin1Char(' '), QLatin1Char('è'), QLatin1Char('â'),
-    QLatin1Char('ê'), QLatin1Char('î'), QLatin1Char('ô'), QLatin1Char('û')
+    QLatin1Char(0xAE), QLatin1Char(0xB0), QLatin1Char(0xBD), QLatin1Char(0xBF), // Â®Â°Â½Â¿
+    0x2122,            QLatin1Char(0xA2), QLatin1Char(0xA3), 0x266A,            // â„¢Â¢Â£â™ª
+    QLatin1Char(0xE0), QLatin1Char(' '),  QLatin1Char(0xE8), QLatin1Char(0xE2), // Ã  Ã¨Ã¢
+    QLatin1Char(0xEA), QLatin1Char(0xEE), QLatin1Char(0xF4), QLatin1Char(0xFB)  // ÃªÃ®Ã´Ã»
 };
 
 static const QChar extendedchar2[] =
 {
-    QLatin1Char('Á'), QLatin1Char('É'),  QLatin1Char('Ó'), QLatin1Char('Ú'),
-    QLatin1Char('Ü'), QLatin1Char('ü'),  QLatin1Char('`'), QLatin1Char('¡'),
-    QLatin1Char('*'), QLatin1Char('\''), 0x2014 /* dash */, QLatin1Char('©'),
-    0x2120 /* SM */,  QLatin1Char('·'),  0x201C, 0x201D /* double quotes */,
-    QLatin1Char('À'), QLatin1Char('Â'),  QLatin1Char('Ç'), QLatin1Char('È'),
-    QLatin1Char('Ê'), QLatin1Char('Ë'),  QLatin1Char('ë'), QLatin1Char('Î'),
-    QLatin1Char('Ï'), QLatin1Char('ï'),  QLatin1Char('Ô'), QLatin1Char('Ù'),
-    QLatin1Char('ù'), QLatin1Char('Û'),  QLatin1Char('«'), QLatin1Char('»')
+    QLatin1Char(0xC1), QLatin1Char(0xC9),  QLatin1Char(0xD3), QLatin1Char(0xDA), // ÃÃ‰Ã“Ãš
+    QLatin1Char(0xDC), QLatin1Char(0xFC),  QLatin1Char('`'),  QLatin1Char(0xA1), // ÃœÃ¼`Â¡
+    QLatin1Char('*'),  QLatin1Char('\''),  0x2014,            QLatin1Char(0xA9), // *'-Â©
+    0x2120,            QLatin1Char(0xB7),  0x201C,            0x201D,            // â„ Â·â€œâ€
+    QLatin1Char(0xC0), QLatin1Char(0xC2),  QLatin1Char(0xC7), QLatin1Char(0xC8), // Ã€Ã‚Ã‡Ãˆ
+    QLatin1Char(0xCA), QLatin1Char(0xCB),  QLatin1Char(0xEB), QLatin1Char(0xCE), // ÃŠÃ‹Ã«ÃŽ
+    QLatin1Char(0xCF), QLatin1Char(0xEF),  QLatin1Char(0xD4), QLatin1Char(0xD9), // ÃÃ¯Ã”Ã™
+    QLatin1Char(0xF9), QLatin1Char(0xDB),  QLatin1Char(0xAB), QLatin1Char(0xBB)  // Ã¹Ã›Â«Â»
 };
 
 static const QChar extendedchar3[] =
 {
-    QLatin1Char('Ã'), QLatin1Char('ã'), QLatin1Char('Í'), QLatin1Char('Ì'),
-    QLatin1Char('ì'), QLatin1Char('Ò'), QLatin1Char('ò'), QLatin1Char('Õ'),
-    QLatin1Char('õ'), QLatin1Char('{'), QLatin1Char('}'), QLatin1Char('\\'),
-    QLatin1Char('^'), QLatin1Char('_'), QLatin1Char('¦'), QLatin1Char('~'),
-    QLatin1Char('Ä'), QLatin1Char('ä'), QLatin1Char('Ö'), QLatin1Char('ö'),
-    QLatin1Char('ß'), QLatin1Char('¥'), QLatin1Char('¤'), QLatin1Char('|'),
-    QLatin1Char('Å'), QLatin1Char('å'), QLatin1Char('Ø'), QLatin1Char('ø'),
-    0x250C, 0x2510, 0x2514, 0x2518 /* box drawing */
+    QLatin1Char(0xC3), QLatin1Char(0xE3), QLatin1Char(0xCD), QLatin1Char(0xCC), // ÃƒÃ£ÃÃŒ
+    QLatin1Char(0xEC), QLatin1Char(0xD2), QLatin1Char(0xF2), QLatin1Char(0xD5), // Ã¬Ã’Ã²Ã•
+    QLatin1Char(0xF5), QLatin1Char('{'),  QLatin1Char('}'),  QLatin1Char('\\'), // Ãµ{}
+    QLatin1Char('^'),  QLatin1Char('_'),  QLatin1Char(0xA6), QLatin1Char('~'),  // ^_Â¦~
+    QLatin1Char(0xC4), QLatin1Char(0xE4), QLatin1Char(0xD6), QLatin1Char(0xF6), // Ã„Ã¤Ã–Ã¶
+    QLatin1Char(0xDF), QLatin1Char(0xA5), QLatin1Char(0xA4), QLatin1Char('|'),  // ÃŸÂ¥Â¤|
+    QLatin1Char(0xC5), QLatin1Char(0xE5), QLatin1Char(0xD8), QLatin1Char(0xF8), // Ã…Ã¥Ã˜Ã¸
+    0x250C, 0x2510, 0x2514, 0x2518                                              // â”Œâ”â””â”˜
 };
 
 void CC608Decoder::FormatCCField(int tc, int field, int data)
