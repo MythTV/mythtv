@@ -741,32 +741,32 @@ ushort CCtableG1[0x60] =
 //          8           9           a           b
 //          c           d           e           f
     0xA0, // unicode non-breaking space
-                (uchar)'¡', (uchar)'¢', (uchar)'£', /* 0xa0-0xa3 */
-    (uchar)'¤', (uchar)'¥', (uchar)'¦', (uchar)'§', /* 0xa4-0xa7 */
-    (uchar)'¨', (uchar)'©', (uchar)'ª', (uchar)'«', /* 0xa8-0xab */
-    (uchar)'¬', (uchar)'­', (uchar)'®', (uchar)'¯', /* 0xac-0xaf */
-    (uchar)'°', (uchar)'±', (uchar)'²', (uchar)'³', /* 0xb0-0xb3 */
-    (uchar)'´', (uchar)'µ', (uchar)'¶', (uchar)'·', /* 0xb4-0xb7 */
-    (uchar)'¸', (uchar)'¹', (uchar)'º', (uchar)'»', /* 0xb8-0xbb */
-    (uchar)'¼', (uchar)'½', (uchar)'¾', (uchar)'¿', /* 0xbc-0xbf */
+            0xA1 /* Â¡ */, 0xA2 /* Â¢ */, 0xA3 /* Â£ */,
+    0xA4 /* Â¤ */, 0xA5 /* Â¥ */, 0xA6 /* Â¦ */, 0xA7 /* Â§ */,
+    0xA8 /* Â¨ */, 0xA9 /* Â© */, 0xAA /* Âª */, 0xAB /* Â« */,
+    0xAC /* Â¬ */, 0xAD /* Â­ */, 0xAE /* Â® */, 0xAF /* Â¯ */,
+    0xB0 /* Â° */, 0xB1 /* Â± */, 0xB2 /* Â² */, 0xB3 /* Â³ */,
+    0xB4 /* Â´ */, 0xB5 /* Âµ */, 0xB6 /* Â¶ */, 0xB7 /* Â· */,
+    0xB8 /* Â¸ */, 0xB9 /* Â¹ */, 0xBA /* Âº */, 0xBB /* Â» */,
+    0xBC /* Â¼ */, 0xBD /* Â½ */, 0xBE /* Â¾ */, 0xBF /* Â¿ */,
 
-    (uchar)'À', (uchar)'Á', (uchar)'Â', (uchar)'Ã', /* 0xc0-0xc3 */
-    (uchar)'Ä', (uchar)'Å', (uchar)'Æ', (uchar)'Ç', /* 0xc4-0xc7 */
-    (uchar)'È', (uchar)'É', (uchar)'Ê', (uchar)'Ë', /* 0xc8-0xcb */
-    (uchar)'Ì', (uchar)'Í', (uchar)'Î', (uchar)'Ï', /* 0xcc-0xcf */
-    (uchar)'Ğ', (uchar)'Ñ', (uchar)'Ò', (uchar)'Ó', /* 0xd0-0xd3 */
-    (uchar)'Ô', (uchar)'Õ', (uchar)'Ö', (uchar)'×', /* 0xd4-0xd7 */
-    (uchar)'Ø', (uchar)'Ù', (uchar)'Ú', (uchar)'Û', /* 0xd8-0xdb */
-    (uchar)'Ü', (uchar)'İ', (uchar)'Ş', (uchar)'ß', /* 0xdc-0xdf */
+    0xC0 /* Ã€ */, 0xC1 /* Ã */, 0xC2 /* Ã‚ */, 0xC3 /* Ãƒ */,
+    0xC4 /* Ã„ */, 0xC5 /* Ã… */, 0xC6 /* Ã† */, 0xC7 /* Ã‡ */,
+    0xC8 /* Ãˆ */, 0xC9 /* Ã‰ */, 0xCA /* ÃŠ */, 0xCB /* Ã‹ */,
+    0xCC /* ÃŒ */, 0xCD /* Ã */, 0xCE /* Ã */, 0xCF /* Ã */,
+    0xD0 /* Ã */, 0xD1 /* Ã‘ */, 0xD2 /* Ã’ */, 0xD3 /* Ã“ */,
+    0xD4 /* Ã” */, 0xD5 /* Ã• */, 0xD6 /* Ã– */, 0xD7 /* Ã— */,
+    0xD8 /* Ã˜ */, 0xD9 /* Ã™ */, 0xDA /* Ãš */, 0xDB /* Ã› */,
+    0xDC /* Ãœ */, 0xDD /* Ã */, 0xDE /* Ã */, 0xDF /* ÃŸ */,
 
-    (uchar)'à', (uchar)'á', (uchar)'â', (uchar)'ã', /* 0xe0-0xe3 */
-    (uchar)'ä', (uchar)'å', (uchar)'æ', (uchar)'ç', /* 0xe4-0xe7 */
-    (uchar)'è', (uchar)'é', (uchar)'ê', (uchar)'ë', /* 0xe8-0xeb */
-    (uchar)'ì', (uchar)'í', (uchar)'î', (uchar)'ï', /* 0xec-0xef */
-    (uchar)'ğ', (uchar)'ñ', (uchar)'ò', (uchar)'ó', /* 0xf0-0xf3 */
-    (uchar)'ô', (uchar)'õ', (uchar)'ö', (uchar)'÷', /* 0xf4-0xf7 */
-    (uchar)'ø', (uchar)'ù', (uchar)'ú', (uchar)'û', /* 0xf8-0xfb */
-    (uchar)'ü', (uchar)'ı', (uchar)'ş', (uchar)'ÿ', /* 0xfc-0xff */
+    0xE0 /* Ã  */, 0xE1 /* Ã¡ */, 0xE2 /* Ã¢ */, 0xE3 /* Ã£ */,
+    0xE4 /* Ã¤ */, 0xE5 /* Ã¥ */, 0xE6 /* Ã¦ */, 0xE7 /* Ã§ */,
+    0xE8 /* Ã¨ */, 0xE9 /* Ã© */, 0xEA /* Ãª */, 0xEB /* Ã« */,
+    0xEC /* Ã¬ */, 0xED /* Ã­ */, 0xEE /* Ã® */, 0xEF /* Ã¯ */,
+    0xF0 /* Ã° */, 0xF1 /* Ã± */, 0xF2 /* Ã² */, 0xF3 /* Ã³ */,
+    0xF4 /* Ã´ */, 0xF5 /* Ãµ */, 0xF6 /* Ã¶ */, 0xF7 /* Ã· */,
+    0xF8 /* Ã¸ */, 0xF9 /* Ã¹ */, 0xFA /* Ãº */, 0xFB /* Ã» */,
+    0xFC /* Ã¼ */, 0xFD /* Ã½ */, 0xFE /* Ã¾ */, 0xFF /* Ã¿ */,
 };
 
 ushort CCtableG2[0x60] =
