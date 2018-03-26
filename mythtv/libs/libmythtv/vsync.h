@@ -117,9 +117,9 @@ class DRMVideoSync : public VideoSync
     DRMVideoSync(VideoOutput *, int refresh_interval);
     ~DRMVideoSync();
 
-    QString getName(void) const { return QString("DRM"); }
-    bool TryInit(void);
-    void Start(void);
+    QString getName(void) const override { return QString("DRM"); }
+    bool TryInit(void) override;
+    void Start(void) override;
     int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 
   private:
@@ -146,8 +146,8 @@ class RTCVideoSync : public VideoSync
     RTCVideoSync(VideoOutput *, int refresh_interval);
     ~RTCVideoSync();
 
-    QString getName(void) const { return QString("RTC"); }
-    bool TryInit(void);
+    QString getName(void) const override { return QString("RTC"); }
+    bool TryInit(void) override;
     int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 
   private:
@@ -171,8 +171,8 @@ class BusyWaitVideoSync : public VideoSync
     BusyWaitVideoSync(VideoOutput *, int refresh_interval);
     ~BusyWaitVideoSync();
 
-    QString getName(void) const { return QString("USleep with busy wait"); }
-    bool TryInit(void);
+    QString getName(void) const override { return QString("USleep with busy wait"); }
+    bool TryInit(void) override;
     int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 
   private:
@@ -196,8 +196,8 @@ class USleepVideoSync : public VideoSync
     USleepVideoSync(VideoOutput *, int refresh_interval);
     ~USleepVideoSync();
 
-    QString getName(void) const { return QString("USleep"); }
-    bool TryInit(void);
+    QString getName(void) const override { return QString("USleep"); }
+    bool TryInit(void) override;
     int WaitForFrame(int nominal_frame_interval, int extra_delay) override;
 };
 
@@ -207,8 +207,8 @@ class DummyVideoSync : public VideoSync
     DummyVideoSync(VideoOutput* vo, int ri) : VideoSync(vo, ri) { }
     ~DummyVideoSync() { }
 
-    QString getName(void) const { return QString("Dummy"); }
-    bool TryInit(void) { return true; }
+    QString getName(void) const override { return QString("Dummy"); }
+    bool TryInit(void) override { return true; }
     int WaitForFrame(int /*nominal_frame_interval*/, int /*extra_delay*/) override
         { return 0; }
 };
