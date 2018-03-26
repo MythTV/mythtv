@@ -12640,7 +12640,7 @@ Fehler: %1</translation>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="403"/>
         <source>Playback stopped</source>
-        <translation>WIedergabe gestoppt</translation>
+        <translation>Wiedergabe gestoppt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/mythsystemevent.cpp" line="405"/>
