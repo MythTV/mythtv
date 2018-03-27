@@ -81,7 +81,7 @@ typedef struct multiplex_s{
 
 	int (*fill_buffers)(void *p, int f);
 	void *priv;
-	int error; // twitham: added to catch full disk write failures
+	int error; // bug12602: added to catch full disk write failures
 } multiplex_t;
 
 void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start);

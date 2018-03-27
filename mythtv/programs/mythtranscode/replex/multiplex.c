@@ -296,7 +296,7 @@ static void writeout_video(multiplex_t *mx)
 	viu->dts = uptsdiff(viu->dts + ((nlength*viu->ptsrate)>>8), 0);
 
 	if (write(mx->fd_out, outbuf, written) != written) {
-	  if (mx->error++ < 10)	/* twitham: log only first few failures */
+	  if (mx->error++ < 10)	/* bug12602: log only first few failures */
 	    LOG(VB_GENERAL, LOG_ERR, "%d writes failed: %s",
 		mx->error, strerror(errno));
 	}
@@ -642,7 +642,7 @@ int finish_mpg(multiplex_t *mx)
 		write(mx->fd_out, mpeg_end,4);
 
 	if (close(mx->fd_out) < 0) {
-	  mx->error++;	     // twitham: close could fail on full disk
+	  mx->error++;	     // bug12602: close could fail on full disk
 	  LOG(VB_GENERAL, LOG_ERR, "close failed: %s",
 	      strerror(errno));
 	}
@@ -695,7 +695,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	int i;
 	uint32_t data_rate;
 
-	mx->error = 0; // twitham: added to catch full disk write failures
+	mx->error = 0; // bug12602: added to catch full disk write failures
 	mx->fill_buffers = fill_buffers;
 	mx->video_delay = video_delay;
 	mx->audio_delay = audio_delay;
