@@ -295,7 +295,11 @@ static void writeout_video(multiplex_t *mx)
 	//estimate next pts based on bitrate of this stream and data written
 	viu->dts = uptsdiff(viu->dts + ((nlength*viu->ptsrate)>>8), 0);
 
-	write(mx->fd_out, outbuf, written);
+	if (write(mx->fd_out, outbuf, written) != written) {
+	  if (mx->error++ < 10)	/* log only first few failures */
+	    LOG(VB_GENERAL, LOG_ERR, "twitham: %d write failed: %s",
+		mx->error, strerror(errno));
+	}
 
 #ifdef OUT_DEBUG
 	LOG(VB_GENERAL, LOG_DEBUG, "VPTS");
@@ -571,7 +575,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 	}
 #endif
 }
-void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok)
+int write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok)
 {
 	int i;
 
@@ -589,10 +593,10 @@ void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok)
 			writeout_padding(mx);
 		}
 	}
-	
+	return mx->error || 0;
 }
 
-void finish_mpg(multiplex_t *mx)
+int finish_mpg(multiplex_t *mx)
 {
 	int start=0;
 	int video_ok = 0;
@@ -637,9 +641,16 @@ void finish_mpg(multiplex_t *mx)
 	if (mx->otype == REPLEX_MPEG2)
 		write(mx->fd_out, mpeg_end,4);
 
+	if (close(mx->fd_out) < 0) {
+	  mx->error++;
+	  LOG(VB_GENERAL, LOG_ERR, "twitham: %d close failed: %s",
+	      mx->error, strerror(errno));
+	}
+
 	dummy_destroy(&mx->vdbuf);
 	for (i=0; i<mx->extcnt;i++)
 		dummy_destroy(&mx->ext[i].dbuf);
+	return mx->error || 0;
 }
 
 static int get_ts_video_overhead(int pktsize, sequence_t *seq)
@@ -684,6 +695,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	int i;
 	uint32_t data_rate;
 
+	mx->error = 0;
 	mx->fill_buffers = fill_buffers;
 	mx->video_delay = video_delay;
 	mx->audio_delay = audio_delay;
