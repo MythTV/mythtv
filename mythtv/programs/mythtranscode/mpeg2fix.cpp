@@ -495,7 +495,8 @@ int MPEG2replex::WaitBuffers()
     if (done)
     {
         finish_mpg(mplex);
-	static int errorcount = 0; // thread exit must return static, not stack
+	// twitham: thread exit must return static, not stack
+	static int errorcount = 0;
 	errorcount = mplex->error;
 	if (mplex->error) {
 	  LOG(VB_GENERAL, LOG_ERR,

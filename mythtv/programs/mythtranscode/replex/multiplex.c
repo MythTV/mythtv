@@ -695,7 +695,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	int i;
 	uint32_t data_rate;
 
-	mx->error = 0;
+	mx->error = 0; // twitham: added to catch full disk write failures
 	mx->fill_buffers = fill_buffers;
 	mx->video_delay = video_delay;
 	mx->audio_delay = audio_delay;
