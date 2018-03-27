@@ -499,7 +499,7 @@ int MPEG2replex::WaitBuffers()
 	errorcount = mplex->error;
 	if (mplex->error) {
 	  LOG(VB_GENERAL, LOG_ERR,
-	      QString("twitham: thread finished with %1 write errors")
+	      QString("thread finished with %1 write errors")
 	      .arg(mplex->error));
 	}
 	pthread_exit(&errorcount);
@@ -562,10 +562,10 @@ void MPEG2replex::Start()
     {
         check_times( &mx, &video_ok, ext_ok, &start);
         if (write_out_packs( &mx, video_ok, ext_ok)) {
-	  // exiting here blocks the reading thread indefinitely;
+	  // twitham: exiting here blocks the reading thread indefinitely;
 	  // maybe there is a way to fail it also?
 	  // LOG(VB_GENERAL, LOG_ERR, // or comment all this to fail until close
-	  //     QString("twitham: exiting thread after %1 write errors")
+	  //     QString("exiting thread after %1 write errors")
 	  //     .arg(mplex->error));
 	  // pthread_exit(&mplex->error);
 	}
@@ -2570,11 +2570,11 @@ int MPEG2fixup::Start()
     pthread_cond_signal(&rx.cond);
     pthread_mutex_unlock( &rx.mutex );
     int ex = REENCODE_OK;
-    void *errors;	// return error if any write or close failures
+    void *errors; // twitham: return error if any write or close failures
     pthread_join(thread, &errors);
     if (*(int *)errors > 0) {
       LOG(VB_GENERAL, LOG_ERR,
-	  QString("twitham: joined thread failed with %1 write errors")
+	  QString("joined thread failed with %1 write errors")
 	  .arg(*(int *)errors));
       ex = REENCODE_ERROR;
     }
