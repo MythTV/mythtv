@@ -280,7 +280,7 @@ void CDRipperThread::run(void)
     QString saveDir = GetConfDir() + "/tmp/RipTemp/";
     QString outfile;
 
-    std::auto_ptr<Encoder> encoder;
+    std::unique_ptr<Encoder> encoder;
 
     for (int trackno = 0; trackno < m_tracks->size(); trackno++)
     {
