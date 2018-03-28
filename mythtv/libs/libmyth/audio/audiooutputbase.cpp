@@ -155,10 +155,17 @@ AudioOutputBase::~AudioOutputBase()
     if (kAudioSRCOutputSize > 0)
         delete[] src_out;
 
+#ifndef NDEBUG
     assert(memory_corruption_test0 == 0xdeadbeef);
     assert(memory_corruption_test1 == 0xdeadbeef);
     assert(memory_corruption_test2 == 0xdeadbeef);
     assert(memory_corruption_test3 == 0xdeadbeef);
+#else
+    Q_UNUSED(memory_corruption_test0);
+    Q_UNUSED(memory_corruption_test1);
+    Q_UNUSED(memory_corruption_test2);
+    Q_UNUSED(memory_corruption_test3);
+#endif
 }
 
 void AudioOutputBase::InitSettings(const AudioSettings &settings)
