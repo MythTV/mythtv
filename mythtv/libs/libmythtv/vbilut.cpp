@@ -1,7 +1,7 @@
 #include <vbilut.h>
 
 extern "C" {
-const char lang_chars[1+8+8][16] =
+const unsigned char lang_chars[1+8+8][16] =
 {
     { 0, 0x23,0x24,0x40,0x5b,0x5c,0x5d,0x5e,0x5f,0x60,0x7b,0x7c,0x7d,0x7e },
 
@@ -44,7 +44,7 @@ const char lang_chars[1+8+8][16] =
 }
 
 // TODO - Add the rest...page 107
-const char chartab_original[13] =
+const unsigned char chartab_original[13] =
 {
     '#', '¤', '@', '[', '\\', ']', '^', '_', '\'', '{', '|', '}', '~'
 };
