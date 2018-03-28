@@ -2266,6 +2266,8 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
             }
             break;
         }
+        default:
+          break;
     }
     return false;
 }
