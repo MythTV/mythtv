@@ -5,7 +5,7 @@ INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmyth
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythservicecontracts
 DEPENDPATH *= $${INCLUDEPATH}
 
-LIBS += -L$${LIBDIR} $$EXTRA_LIBS -lmythbase-$$LIBVERSION
+LIBS += -L$${SYSROOT}$${LIBDIR} $$EXTRA_LIBS -lmythbase-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION -lmythupnp-$$LIBVERSION
 LIBS += -lmythservicecontracts-$$LIBVERSION
 LIBS += -lmythavcodec

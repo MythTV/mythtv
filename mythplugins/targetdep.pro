@@ -10,7 +10,7 @@ MYTH_SHLIB_EXT=$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
 
-DEPLIBS = $${LIBDIR}
+DEPLIBS = $${SYSROOT}$${LIBDIR}
 
 # On Windows, dlls were installed with exes:
 mingw : DEPLIBS = $${PREFIX}/bin

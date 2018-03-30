@@ -220,7 +220,7 @@ EOF
 }
 
 add_ldflags(){
-    append LDFLAGS "$@"
+    append ELDFLAGS "$@"
 }
 
 add_cxxflags(){
@@ -307,6 +307,7 @@ disable $DEPRECATED_PLUGIN_LIST
 prefix="/usr/local"
 libdir_name="lib"
 sysroot=""
+mythroot=""
 ln_s="ln -sf"
 
 logfile="config.ep"
@@ -326,13 +327,16 @@ NB:      all --enable-* options can be reversed with --disable-*
 
 Generic options:
   --prefix=PREFIX          MythTV install location PREFIX [$prefix]
-  --sysroot=SYSROOT        MythTV sysroot location SYSROOT [$sysroot]
+  --sysroot=SYSROOT        General sysroot location SYSROOT [$sysroot]
+  --mythroot=SYSROOT       MythTV specific sysroot location [$mythroot]
   --qmake=QMAKE            use specified qmake [$qmake]
+  --qmakespecs=QMAKE       use specified qmakespecs [$qmakespecs]
   --python=PATH            Force a specific python executable to use [$python]
   --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]
   --help                   print this message
   --enable-all             Enable all options
   --previous               use previous configure parameters if possible
+  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]
 
 MythArchive related options:
   --enable-mytharchive     build the mytharchive plugin [$archive]
@@ -397,8 +401,10 @@ fi
 CMDLINE_SET="
     logfile
     qmake
+    qmakespecs
     python
     sysroot
+    mythroot
 "
 
 CONFIGURATION_OPTS=""
@@ -451,6 +457,9 @@ for opt do
   else
       die_unknown $opt
   fi
+  ;;
+  --extra-ldflags=*)
+      add_ldflags $optval
   ;;
   *)
   optname="${opt%%=*}"
@@ -528,7 +537,11 @@ EOF
 fi
 
 # bring in mythtv config
-if [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
+if [ -e $mythroot$prefix/include/mythtv/mythconfig.mak ] ; then
+    rm mythconfig.mak 2> /dev/null
+    cp $mythroot$prefix/include/mythtv/mythconfig.mak mythconfig.mak
+    sed -i -e "s,^SYSROOT\=.*,SYSROOT=$mythroot,g" mythconfig.mak
+elif [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
     rm mythconfig.mak 2> /dev/null
     ${ln_s} $prefix/include/mythtv/mythconfig.mak mythconfig.mak
 else
@@ -549,7 +562,7 @@ CFLAGS=${CFLAGS#CFLAGS=}
 CPPFLAGS=$(cat mythconfig.mak | grep -e "^CPPFLAGS=")
 CPPFLAGS=${CPPFLAGS#CPPFLAGS=}
 LDFLAGS=$(cat mythconfig.mak | grep -e "^LDFLAGS=")
-LDFLAGS=${LDFLAGS#LDFLAGS=}
+LDFLAGS="${LDFLAGS#LDFLAGS=} ${ELDFLAGS}"
 CXX=$(cat mythconfig.mak | grep -e "^QMAKE_CXX=")
 CXX=${CXX#QMAKE_CXX=}
 ECXXFLAGS=$(cat mythconfig.mak | grep -e "^ECXXFLAGS=")
@@ -580,6 +593,9 @@ if [ x"$qmake" = "xqmake" ]; then
     CHECK_QMAKE=`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake `which $qmake 2>/dev/null`"
 else
     CHECK_QMAKE=`which $qmake 2>/dev/null`" "`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake"
+fi
+if [ -n "qmakespec" ]; then
+	qmake="$qmake -spec $qmakespec"
 fi
 # try to find a qt5 qmake to use
 found_qmake=''
