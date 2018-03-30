@@ -2573,7 +2573,7 @@ int MPEG2fixup::Start()
     int ex = REENCODE_OK;
     void *errors; // bug12602: return error if any write or close failures
     pthread_join(thread, &errors);
-    if (*(int *)errors > 0) {
+    if (*(int *)errors) {
       LOG(VB_GENERAL, LOG_ERR,
 	  QString("joined thread failed with %1 write errors")
 	  .arg(*(int *)errors));
