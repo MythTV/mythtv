@@ -297,7 +297,7 @@ static void writeout_video(multiplex_t *mx)
 
 	if (write(mx->fd_out, outbuf, written) != written) {
 	  mx->error++;
-	  if (!mx->error) mx->error = 1; // avoid int rollover to zero
+	  if (mx->error <= 0) mx->error = 1; // avoid int rollover to zero
 	  if (mx->error < 10) // bug12602: log only first few failures
 	    LOG(VB_GENERAL, LOG_ERR, "%d writes failed: %s",
 		mx->error, strerror(errno));
@@ -645,7 +645,7 @@ int finish_mpg(multiplex_t *mx)
 
 	if (close(mx->fd_out) < 0) {
 	  mx->error++;	    // bug12602: close could fail on full disk
-	  if (!mx->error) mx->error = 1; // avoid int rollover to zero
+	  if (mx->error <= 0) mx->error = 1; // avoid int rollover to zero
 	  LOG(VB_GENERAL, LOG_ERR, "close failed: %s",
 	      strerror(errno));
 	}
