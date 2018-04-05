@@ -8176,6 +8176,11 @@ if enabled gxx; then
     check_cxxflags -Wmissing-declarations
     check_cxxflags -Wno-switch
     check_cxxflags -Woverloaded-virtual
+    # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
+    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\)\{1,\}.*/\1/')
+    if test $gxx_major_version -lt 7; then
+       check_cxxflags -Wno-attributes
+    fi
     check_cxxflags -funit-at-a-time
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)
