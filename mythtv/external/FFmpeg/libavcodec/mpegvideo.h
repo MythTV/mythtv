@@ -250,8 +250,8 @@ typedef struct MpegEncContext {
     int16_t (*b_direct_mv_table)[2];     ///< MV table (1MV per MB) direct mode B-frame encoding
     int16_t (*p_field_mv_table[2][2])[2];   ///< MV table (2MV per MB) interlaced P-frame encoding
     int16_t (*b_field_mv_table[2][2][2])[2];///< MV table (4MV per MB) interlaced B-frame encoding
-    uint8_t (*p_field_select_table[2]);
-    uint8_t (*b_field_select_table[2][2]);
+    uint8_t  *p_field_select_table[2];
+    uint8_t  *b_field_select_table[2][2];
 #if FF_API_MOTION_EST
     int me_method;                       ///< ME algorithm
 #endif
