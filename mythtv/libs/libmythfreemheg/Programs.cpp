@@ -812,19 +812,19 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                     case MHUnion::U_Int:
                         message.append(QString("%1").arg(un.m_nIntVal));
                         break;
-                    case MHParameter::P_Bool:
+                    case MHUnion::U_Bool:
                         message.append(un.m_fBoolVal ? "True" : "False");
                         break;
-                    case MHParameter::P_String:
+                    case MHUnion::U_String:
                         message.append(QString::fromUtf8((const char *)un.m_StrVal.Bytes(), un.m_StrVal.Size()));
                         break;
-                    case MHParameter::P_ObjRef:
+                    case MHUnion::U_ObjRef:
                         message.append(un.m_ObjRefVal.Printable());
                         break;
-                    case MHParameter::P_ContentRef:
+                    case MHUnion::U_ContentRef:
                         message.append(un.m_ContentRefVal.Printable());
                         break;
-                    case MHParameter::P_Null:
+                    case MHUnion::U_None:
                         break;
                 }
             }
