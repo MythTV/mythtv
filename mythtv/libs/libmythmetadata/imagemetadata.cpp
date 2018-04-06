@@ -135,6 +135,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 2;
         case kFlipVertical:   return 4;
         }
+        break;
 
     case 2: // The image is horizontally flipped
         switch (transform)
@@ -144,6 +145,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 1;
         case kFlipVertical:   return 3;
         }
+        break;
 
     case 3: // The image is rotated 180°
         switch (transform)
@@ -153,6 +155,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 4;
         case kFlipVertical:   return 2;
         }
+        break;
 
     case 4: // The image is vertically flipped
         switch (transform)
@@ -162,6 +165,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 3;
         case kFlipVertical:   return 1;
         }
+        break;
 
     case 5: // The image is rotated 90° CW and flipped horizontally
         switch (transform)
@@ -171,6 +175,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 6;
         case kFlipVertical:   return 8;
         }
+        break;
 
     case 6: // The image is rotated 90° CCW
         switch (transform)
@@ -180,6 +185,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 5;
         case kFlipVertical:   return 7;
         }
+        break;
 
     case 7: // The image is rotated 90° CW and flipped vertically
         switch (transform)
@@ -189,6 +195,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 8;
         case kFlipVertical:   return 6;
         }
+        break;
 
     case 8: // The image is rotated 90° CW
         switch (transform)
@@ -198,6 +205,7 @@ int Orientation::Apply(int transform)
         case kFlipHorizontal: return 7;
         case kFlipVertical:   return 5;
         }
+        break;
     }
     return m_current;
 }
