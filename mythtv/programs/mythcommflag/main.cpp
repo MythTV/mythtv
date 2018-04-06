@@ -736,7 +736,6 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         {
             // not an integer, attempt comma separated list
             commDetectMethod = COMM_DETECT_UNINIT;
-            QMap<QString, SkipTypes>::const_iterator sit;
 
             QStringList list = commmethod.split(",", QString::SkipEmptyParts);
             QStringList::const_iterator it = list.begin();
