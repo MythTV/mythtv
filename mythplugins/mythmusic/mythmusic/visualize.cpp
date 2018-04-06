@@ -585,6 +585,8 @@ static class MonoScopeFactory : public VisFactory
 Spectrum::Spectrum()
     : lin(NULL), rin(NULL), lout(NULL), rout(NULL)
 {
+    LOG(VB_GENERAL, LOG_INFO, QString("Spectrum : Being Initialised"));
+
     // Setup the "magical" audio data transformations
     // provided by the Fast Fourier Transforms library
     analyzerBarWidth = 6;
@@ -593,16 +595,9 @@ Spectrum::Spectrum()
     m_fps = 15;
 
     lin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    memset(lin, 0, sizeof(myth_fftw_float)*FFTW_N);
-
     rin = (myth_fftw_float*) av_malloc(sizeof(myth_fftw_float)*FFTW_N);
-    memset(rin, 0, sizeof(myth_fftw_float)*FFTW_N);
-
     lout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-    memset(lout, 0, sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-
     rout = (myth_fftw_complex*) av_malloc(sizeof(myth_fftw_complex)*(FFTW_N/2+1));
-    memset(rout, 0, sizeof(myth_fftw_complex)*(FFTW_N/2+1));
 
     lplan = fftw_plan_dft_r2c_1d(FFTW_N, lin, (myth_fftw_complex_cast*)lout, FFTW_MEASURE);
     rplan = fftw_plan_dft_r2c_1d(FFTW_N, rin, (myth_fftw_complex_cast*)rout, FFTW_MEASURE);
