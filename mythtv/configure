@@ -8077,10 +8077,8 @@ elif enabled gcc; then
 #    check_cflags -Werror=missing-prototypes
     check_cflags -Werror=return-type
     check_cflags -Werror=vla
-    check_cflags -Wformat
     check_cflags -fdiagnostics-color=auto
     enabled extra_warnings || check_disable_warning -Wno-maybe-uninitialized
-    check_cflags -Werror=format-security
 elif enabled llvm_gcc; then
     check_cflags -mllvm -stack-alignment=16
 elif enabled clang; then
@@ -8174,7 +8172,6 @@ if enabled gxx; then
         append CCONFIG "use_hidesyms"
     fi
     check_cxxflags -Wmissing-declarations
-    check_cxxflags -Wno-switch
     check_cxxflags -Woverloaded-virtual
     # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
     gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\)\{1,\}.*/\1/')
