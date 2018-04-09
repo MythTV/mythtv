@@ -847,8 +847,11 @@ bool NAMThread::NewRequest(QEvent *event)
     {
     case NetStreamRequest::kType:
         return StartRequest(dynamic_cast< NetStreamRequest* >(event));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
     case NetStreamAbort::kType:
         return AbortRequest(dynamic_cast< NetStreamAbort* >(event));
+#pragma GCC diagnostic pop
     default:
         break;
     }
