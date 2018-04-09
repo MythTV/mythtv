@@ -11,9 +11,9 @@
 
 // *fast* convenience functions
 
-static inline void stereo16_from_stereopcm8(register short *l,
-					    register short *r,
-					    register uchar *c,
+static inline void stereo16_from_stereopcm8(short *l,
+					    short *r,
+					    uchar *c,
 					    long cnt)
 {
     while (cnt >= 4l) {
@@ -46,9 +46,9 @@ static inline void stereo16_from_stereopcm8(register short *l,
 }
 
 
-static inline void stereo16_from_stereopcm16(register short *l,
-					     register short *r,
-					     register short *s,
+static inline void stereo16_from_stereopcm16(short *l,
+					     short *r,
+					     short *s,
 					     long cnt)
 {
     while (cnt >= 4l) {
@@ -81,9 +81,9 @@ static inline void stereo16_from_stereopcm16(register short *l,
 }
 
 
-static inline void stereo16_from_stereopcm32(register short *l,
-                         register short *r,
-                         register int *s,
+static inline void stereo16_from_stereopcm32(short *l,
+                         short *r,
+                         int *s,
                          long cnt)
 {
     while (cnt--) {
@@ -93,9 +93,9 @@ static inline void stereo16_from_stereopcm32(register short *l,
 }
 
 
-static inline void stereo16_from_stereopcmfloat(register short *l,
-                         register short *r,
-                         register float *s,
+static inline void stereo16_from_stereopcmfloat(short *l,
+                         short *r,
+                         float *s,
                          long cnt)
 {
     while (cnt--) {
@@ -105,8 +105,8 @@ static inline void stereo16_from_stereopcmfloat(register short *l,
 }
 
 
-static inline void mono16_from_monopcm8(register short *l,
-					register uchar *c,
+static inline void mono16_from_monopcm8(short *l,
+					uchar *c,
 					long cnt)
 {
     while (cnt >= 4l) {
@@ -131,8 +131,8 @@ static inline void mono16_from_monopcm8(register short *l,
 }
 
 
-static inline void mono16_from_monopcm16(register short *l,
-					 register short *s,
+static inline void mono16_from_monopcm16(short *l,
+					 short *s,
 					 long cnt)
 {
     while (cnt >= 4l) {
@@ -157,8 +157,8 @@ static inline void mono16_from_monopcm16(register short *l,
 }
 
 
-static inline void mono16_from_monopcm32(register short *l,
-                         register int *s,
+static inline void mono16_from_monopcm32(short *l,
+                         int *s,
                          long cnt)
 {
     while (cnt--)
@@ -166,8 +166,8 @@ static inline void mono16_from_monopcm32(register short *l,
 }
 
 
-static inline void mono16_from_monopcmfloat(register short *l,
-                         register float *s,
+static inline void mono16_from_monopcmfloat(short *l,
+                         float *s,
                          long cnt)
 {
     while (cnt--)
@@ -176,7 +176,7 @@ static inline void mono16_from_monopcmfloat(register short *l,
 
 
 #if FFTW3_SUPPORT
-static inline void fast_short_set(register short *p,
+static inline void fast_short_set(short *p,
 				  short v,
 				  long c)
 {
@@ -201,8 +201,8 @@ static inline void fast_short_set(register short *p,
 }
 
 
-static inline void fast_real_set_from_short(register fftw_real *d,
-					    register short *s,
+static inline void fast_real_set_from_short(fftw_real *d,
+					    short *s,
 					    long c)
 {
     while (c >= 4l) {
@@ -226,8 +226,8 @@ static inline void fast_real_set_from_short(register fftw_real *d,
     }
 }
 
-static inline void fast_reals_set(register fftw_real *p1,
-				  register fftw_real *p2,
+static inline void fast_reals_set(fftw_real *p1,
+				  fftw_real *p2,
 				  fftw_real v,
 				  long c)
 {
