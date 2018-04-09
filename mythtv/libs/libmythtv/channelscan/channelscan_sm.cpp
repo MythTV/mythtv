@@ -2004,8 +2004,6 @@ bool ChannelScanSM::ScanIPTVChannels(uint sourceid,
 bool ChannelScanSM::ScanTransportsStartingOn(
     int sourceid, const QMap<QString,QString> &startChan)
 {
-    QMap<QString,QString>::const_iterator it;
-
     if (startChan.find("std")        == startChan.end() ||
         startChan.find("type")       == startChan.end())
     {
