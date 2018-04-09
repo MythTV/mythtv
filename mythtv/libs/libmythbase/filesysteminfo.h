@@ -23,7 +23,7 @@ class MBASE_PUBLIC FileSystemInfo
             QStringList::const_iterator end);
     explicit FileSystemInfo(const QStringList &slist);
 
-   ~FileSystemInfo(void) {};
+    virtual ~FileSystemInfo(void) {};
 
     FileSystemInfo &operator=(const FileSystemInfo &other);
     virtual void clone(const FileSystemInfo &other);
