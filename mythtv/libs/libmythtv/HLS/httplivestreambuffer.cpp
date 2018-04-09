@@ -152,8 +152,8 @@ public:
         m_bitrate       = rhs.m_bitrate;
         m_url           = rhs.m_url;
         // keep the old data downloaded
-        m_data          = m_data;
-        m_played        = m_played;
+        // m_data       = m_data;
+        // m_played     = m_played;
         m_title         = rhs.m_title;
 #ifdef USING_LIBCRYPTO
         m_psz_key_path  = rhs.m_psz_key_path;
