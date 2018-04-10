@@ -178,6 +178,7 @@ static const char *toString(OMX_AUDIO_DDPBITSTREAMID id)
     {
         CASE2STR(OMX_AUDIO_DDPBitStreamIdAC3);
         CASE2STR(OMX_AUDIO_DDPBitStreamIdEAC3);
+        default: break;
     }
     static char buf[32];
     return strcpy(buf, qPrintable(QString("DDPBitStreamId 0x%1").arg(id,0,16)));

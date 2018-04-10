@@ -1403,6 +1403,7 @@ class OsdRender : public QRunnable
           case FMT_YV12: yv12(); break;
           case FMT_AI44: i44(true); break;
           case FMT_IA44: i44(false); break;
+         default: break;
         }
     }
 
