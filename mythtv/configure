@@ -8176,7 +8176,10 @@ if enabled gxx; then
     # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
     gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\)\{1,\}.*/\1/')
     if test $gxx_major_version -lt 7; then
-       check_cxxflags -Wno-attributes
+        if enabled arm; then
+            check_cxxflags -Wno-psabi
+        fi
+        check_cxxflags -Wno-attributes
     fi
     check_cxxflags -funit-at-a-time
 elif enabled icpc; then
