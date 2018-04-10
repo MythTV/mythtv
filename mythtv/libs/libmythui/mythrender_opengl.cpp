@@ -138,6 +138,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
 #endif
 
 #ifdef USING_OPENGLES
+    Q_UNUSED(painter);
     if (!(openGLVersionFlags & QGLFormat::OpenGL_ES_Version_2_0))
     {
         LOG(VB_GENERAL, LOG_WARNING,

@@ -54,11 +54,11 @@ void yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
     }
 }
 
+#ifdef MMX
 #define ASM(code) __asm__ __volatile__(code);
 void inline mmx_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
                                int left, int top, int right, int bottom)
 {
-#ifdef MMX
     unsigned char *src1, *src2, *y1, *y2, *u, *v;
     int y_wrap, src_wrap, u_wrap, v_wrap, width, height;
 
@@ -230,8 +230,8 @@ void inline mmx_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
         src1 += src_wrap; src2 += src_wrap;
     }
     ASM("emms")
-#endif
 }
+#endif
 
 void c_yuv888_to_yv12(VideoFrame *frame, MythImage *osd_image,
                              int left, int top, int right, int bottom)

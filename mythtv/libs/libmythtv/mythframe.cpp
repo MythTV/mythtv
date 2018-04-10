@@ -350,6 +350,8 @@ void framecopy(VideoFrame* dst, const VideoFrame* src, bool useSSE)
                 asm volatile ("emms");
                 return;
             }
+#else
+            Q_UNUSED(useSSE);
 #endif
             splitplanes(dst->buf + dst->offsets[1], dst->pitches[1],
                         dst->buf + dst->offsets[2], dst->pitches[2],
@@ -585,6 +587,9 @@ MythUSWCCopy::MythUSWCCopy(int width, bool nocache)
     {
         allocateCache(width);
     }
+#else
+    Q_UNUSED(width);
+    Q_UNUSED(nocache);
 #endif
 }
 
@@ -771,6 +776,8 @@ void MythUSWCCopy::reset(int width)
 {
 #if ARCH_X86
     allocateCache(width);
+#else
+    Q_UNUSED(width);
 #endif
     resetUSWCDetection();
 }
