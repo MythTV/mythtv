@@ -1565,6 +1565,10 @@ MythRenderEGL::~MythRenderEGL()
 #endif
     m_display = EGL_NO_DISPLAY;
     DeleteOpenGLResources();
+
+#ifdef NDEBUG
+    Q_UNUSED(b);
+#endif
 }
 
 EGLNativeWindowType MythRenderEGL::createNativeWindow()
@@ -1617,6 +1621,9 @@ EGLNativeWindowType MythRenderEGL::createNativeWindow()
 
     vc_dispmanx_update_submit_sync(update);
     return &gNativewindow;
+#ifdef NDEBUG
+    Q_UNUSED(ret);
+#endif
 #else
     return 0;
 #endif
@@ -1645,6 +1652,9 @@ void MythRenderEGL::destroyNativeWindow()
         ret = vc_dispmanx_display_close(m_dispman_display);
         assert(ret >= 0);
         m_dispman_display = DISPMANX_NO_HANDLE;
+#ifdef NDEBUG
+        Q_UNUSED(ret);
+#endif
     }
 #endif //def USING_BROADCOM
 }
