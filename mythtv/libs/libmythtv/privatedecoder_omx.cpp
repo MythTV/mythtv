@@ -478,21 +478,6 @@ bool PrivateDecoderOMX::CreateFilter(AVCodecContext *avctx)
         return false;
     }
 
-    // Test the filter
-    static const uint8_t test[] = { 0U,0U,0U,2U,0U,0U };
-    int outbuf_size = 0;
-    uint8_t *outbuf = NULL;
-    int res = av_bitstream_filter_filter(m_filter, avctx, NULL, &outbuf,
-                                         &outbuf_size, test, sizeof test, 0);
-    if (res < 0)
-    {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "h264_mp4toannexb filter test failed");
-        av_bitstream_filter_close(m_filter);
-        m_filter = NULL;
-        return false;
-    }
-
-    av_freep(&outbuf);
     LOG(VB_GENERAL, LOG_INFO, LOC + "Installed h264_mp4toannexb filter");
     return true;
 }
