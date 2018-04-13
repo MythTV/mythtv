@@ -162,6 +162,10 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     freeVM = (int)(free >> 10);
 
 #else
+    Q_UNUSED(totalMB);
+    Q_UNUSED(freeMB);
+    Q_UNUSED(totalVM);
+    Q_UNUSED(freeVM);
     LOG(VB_GENERAL, LOG_NOTICE, "getMemStats(): Unknown platform. "
         "How do I get the memory stats?");
     return false;

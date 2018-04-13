@@ -516,6 +516,8 @@ class AudioCompressionSettings : public GroupSetting
                 }
             }
         }
+#else
+	Q_UNUSED(v4l2);
 #endif //  USING_V4L2
     }
 
@@ -1128,6 +1130,8 @@ class VideoCompressionSettings : public GroupSetting
                 }
             }
         }
+#else
+	Q_UNUSED(v4l2);
 #endif // USING_V4L2
     }
 
@@ -1499,6 +1503,8 @@ bool RecordingProfile::loadByType(const QString &name, const QString &card,
         if (v4l2util->IsOpen())
             cardtype = v4l2util->ProfileName();
     }
+#else
+    Q_UNUSED(videodev);
 #endif
 
     MSqlQuery result(MSqlQuery::InitCon());

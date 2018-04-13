@@ -2725,6 +2725,8 @@ void V4L2encGroup::probeCard(const QString &device_name)
         m_device->addTargetedChild(m_DriverName,
                                    new ChannelTimeout(m_parent, 15000, 2000));
     }
+#else
+    Q_UNUSED(device_name);
 #endif // USING_V4L2
 }
 

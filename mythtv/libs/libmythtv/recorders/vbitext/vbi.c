@@ -596,6 +596,7 @@ setup_dev(struct vbi *vbi)
 
     return 0;
 #else
+     (void)vbi;
     return -1;
 #endif // USING_V4L2
 }

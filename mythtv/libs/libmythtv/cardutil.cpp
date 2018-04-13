@@ -235,6 +235,8 @@ bool CardUtil::HasTuner(const QString &rawtype, const QString & device)
         V4L2util v4l2(device);
         return !v4l2 ? false : v4l2.HasTuner();
     }
+#else
+    Q_UNUSED(device);
 #endif
 
     if (rawtype == "EXTERNAL")

@@ -241,10 +241,13 @@ bool ExternIO::Run(void)
 bool ExternIO::KillIfRunning(const QString & cmd)
 {
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
+    Q_UNUSED(cmd);
     return false;
 #elif defined USING_MINGW
+    Q_UNUSED(cmd);
     return false;
 #elif defined( _MSC_VER )
+    Q_UNUSED(cmd);
     return false;
 #else
     QString grp = QString("pgrep -x -f \"%1\" 2>&1 > /dev/null").arg(cmd);
