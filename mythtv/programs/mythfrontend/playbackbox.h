@@ -141,6 +141,7 @@ class PlaybackBox : public ScheduleCommon
     void ItemVisible(MythUIButtonListItem *item);
     void ItemLoaded(MythUIButtonListItem *item);
     void selected(MythUIButtonListItem *item);
+    void updateRecGroup(MythUIButtonListItem *sel_item);
     void PlayFromBookmarkOrProgStart(MythUIButtonListItem *item = NULL);
     void PlayFromBookmark(MythUIButtonListItem *item = NULL);
     void PlayFromBeginning(MythUIButtonListItem *item = NULL);

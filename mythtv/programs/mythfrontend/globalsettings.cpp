@@ -171,6 +171,24 @@ static HostCheckBoxSetting *RememberRecGroup()
     return gc;
 }
 
+static HostCheckBoxSetting *RecGroupMod()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("RecGroupsFocusable");
+
+    gc->setLabel(PlaybackSettings::tr("Change Recording Group using the arrow "
+                                      "keys"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(PlaybackSettings::tr("If enabled, change recording group "
+                                         "directly using the arrow keys "
+                                         "instead of having to use < and >. "
+                                         "Requires theme support for this "
+                                         "feature."));
+    return gc;
+}
+
+
 static HostCheckBoxSetting *PBBStartInTitle()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("PlaybackBoxStartInTitle");
@@ -3971,6 +3989,7 @@ void PlaybackSettings::Load(void)
     pbox2->addChild(DisplayRecGroup());
     pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
+    pbox2->addChild(RecGroupMod());
 
     pbox->addChild(pbox2);
 

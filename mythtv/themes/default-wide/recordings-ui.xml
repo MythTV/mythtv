@@ -21,6 +21,7 @@
             <align>center</align>
             <!-- only allow one button to fix -->
             <spacing>880</spacing>
+            <focusorder>2</focusorder>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>

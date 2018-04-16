@@ -38,6 +38,7 @@
             <arrange>stack</arrange>
             <align>top,hcenter</align>
             <spacing>0</spacing>
+            <focusorder>2</focusorder>
             <scrollstyle>free</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
@@ -78,7 +79,13 @@
                     </group>
                 </state>
 
-                <state name="selectedactive" from="selectedinactive" />
+                <state name="selectedactive" from="selectedinactive">
+                    <group name="areagroup">
+                        <shape name="recGroupShape">
+                            <line color="#ffff00" width="3" alpha="255" />
+                        </shape>
+                    </group>
+                </state>
 
                 <state name="inactive" from="selectedinactive">
                     <area>0,0,100%,100%</area>
@@ -96,7 +103,13 @@
                     </group>
                 </state>
 
-                <state name="active" from="inactive" />
+                <state name="active" from="selectedinactive">
+                    <group name="areagroup">
+                        <shape name="recGroupShape">
+                            <line color="#ffff00" width="3" alpha="100" />
+                        </shape>
+                    </group>
+                </state>
 
             </statetype>
 
@@ -127,7 +140,7 @@
             <spacing>0</spacing>
             <wrapstyle>selection</wrapstyle>
             <searchposition>-1,390</searchposition>
-            <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent>
+            <!-- <triggerevent context="Global" action="ESCAPE">LEFT</triggerevent> -->
             <statetype name="buttonitem">
                 <state name="active" >
                     <area>0,0,220,30</area>

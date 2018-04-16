@@ -556,7 +556,13 @@ bool PlaybackBox::Create()
     }
 
     if (m_recgroupList)
-        m_recgroupList->SetCanTakeFocus(false);
+    {
+        if (gCoreContext->GetNumSetting("RecGroupsFocusable", 0))
+        connect(m_recgroupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(updateRecGroup(MythUIButtonListItem*)));
+        else
+            m_recgroupList->SetCanTakeFocus(false);
+    }
 
     connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateRecList(MythUIButtonListItem*)));
@@ -1337,6 +1343,8 @@ void PlaybackBox::UpdateUIRecGroupList(void)
     if (m_recGroupIdx < 0 || !m_recgroupList || m_recGroups.size() < 2)
         return;
 
+    QSignalBlocker blocker(m_recgroupList);
+
     m_recgroupList->Reset();
 
     int idx = 0;
@@ -1409,6 +1417,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
         if (!sel_idx)
             updateRecList(m_groupList->GetItemCurrent());
     }
+}
+
+void PlaybackBox::updateRecGroup(MythUIButtonListItem *sel_item)
+{
+    QString newRecGroup = sel_item->GetData().toString();
+    displayRecGroup(newRecGroup);
 }
 
 void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
