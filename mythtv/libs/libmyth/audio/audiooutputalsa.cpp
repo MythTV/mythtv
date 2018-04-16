@@ -599,6 +599,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
                 }
                 break;
 
+#if ESTRPIPE != EPIPE
             case -ESTRPIPE:
                 VBAUDIO("WriteAudio: device is suspended");
                 while ((err = snd_pcm_resume(pcm_handle)) == -EAGAIN)
@@ -614,6 +615,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
                     }
                 }
                 break;
+#endif
 
             case -EBADFD:
                 Error(
