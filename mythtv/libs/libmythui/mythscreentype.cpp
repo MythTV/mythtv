@@ -129,7 +129,7 @@ MythUIType *MythScreenType::GetFocusWidget(void) const
 
 bool MythScreenType::SetFocusWidget(MythUIType *widget)
 {
-    if (!widget || !widget->IsVisible())
+    if (!widget || !widget->IsVisible(true))
     {
         QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
         MythUIType *current;
@@ -138,7 +138,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
         {
             current = *it;
 
-            if (current->CanTakeFocus() && current->IsVisible())
+            if (current->CanTakeFocus() && current->IsVisible(true))
             {
                 widget = current;
                 break;
@@ -188,7 +188,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             current = *it;
 
             if ((looped || reachedCurrent) &&
-                current->IsVisible() && current->IsEnabled())
+                current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
 
             if (current == m_CurrentFocusWidget)
@@ -216,7 +216,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             current = *it;
 
             if ((looped || reachedCurrent) &&
-                current->IsVisible() && current->IsEnabled())
+                current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
 
             if (current == m_CurrentFocusWidget)
