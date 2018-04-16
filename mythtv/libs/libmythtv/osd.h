@@ -28,6 +28,7 @@
 #define OSD_DLG_EDITOR    "xx_OSD_EDITOR"
 #define OSD_DLG_CUTPOINT  "xx_OSD_CUTPOINT"
 #define OSD_DLG_DELETE    "xx_OSD_DELETE"
+#define OSD_DLG_NAVIGATE  "xx_OSD_NAVIGATE"
 #define OSD_DLG_CONFIRM   "mythconfirmpopup"
 // subtitles are always painted first
 #define OSD_WIN_TELETEXT  "aa_OSD_TELETEXT"
@@ -181,7 +182,7 @@ class OSD
     bool DialogHandleGesture(MythGestureEvent *e);
     void DialogQuit(void);
     void DialogShow(const QString &window, const QString &text = "",
-                    int updatefor = 0);
+          int updatefor = 0);
     void DialogSetText(const QString &text);
     void DialogBack(QString text = "", QVariant data = 0, bool exit = false);
     void DialogAddButton(QString text, QVariant data,
@@ -201,6 +202,7 @@ class OSD
     void DisplayDVDButton(AVSubtitle* dvdButton, QRect &pos);
 
     void DisplayBDOverlay(BDOverlay *overlay);
+    MythPlayer *GetPlayer(void) { return m_parent; }
 
   private:
     void TearDown(void);
@@ -208,6 +210,8 @@ class OSD
 
     void CheckExpiry(void);
     void SendHideEvent(void);
+    void SetExpiry1(const QString &window, enum OSDTimeout timeout,
+                      int custom_timeout);
 
   private:
     MythPlayer     *m_parent;
@@ -235,6 +239,40 @@ class OSD
 
     QMap<QString, MythScreenType*>    m_Children;
     QHash<MythScreenType*, QDateTime> m_ExpireTimes;
+};
+
+class OsdNavigation : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    OsdNavigation(QObject *retobject, const QString &name, OSD *osd);
+    virtual bool Create(void);
+    virtual bool keyPressEvent(QKeyEvent *event);
+    virtual void SetTextFromMap(const InfoMap &infoMap);
+    int getVisibleGroup() {return m_visibleGroup; }
+    // Virtual
+    void ShowMenu(void);
+
+  protected:
+
+    QObject *m_retObject;
+    OSD *m_osd;
+    MythUIButton *m_playButton;
+    MythUIButton *m_pauseButton;
+    MythUIButton *m_muteButton;
+    MythUIButton *m_unMuteButton;
+    char m_paused;
+    char m_muted;
+    int m_visibleGroup;
+    int m_maxGroupNum;
+    bool m_IsVolumeControl;
+
+    void sendResult(int result, QString action);
+
+  public slots:
+    void GeneralAction(void);
+    void More(void);
 };
 
 #endif

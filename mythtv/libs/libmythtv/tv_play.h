@@ -573,6 +573,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void DoArbSeek(PlayerContext*, ArbSeekWhence whence, bool honorCutlist);
     void DoJumpFFWD(PlayerContext *ctx);
     void DoJumpRWND(PlayerContext *ctx);
+    void DoSeekFFWD(PlayerContext *ctx);
+    void DoSeekRWND(PlayerContext *ctx);
     void NormalSpeed(PlayerContext*);
     void ChangeSpeed(PlayerContext*, int direction);
     void ToggleTimeStretch(PlayerContext*);
@@ -740,6 +742,10 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     void ShowOSDPromptDeleteRecording(PlayerContext *ctx, QString title,
                                       bool force = false);
     bool HandleOSDVideoExit(PlayerContext *ctx, QString action);
+
+    // Navigation Dialog
+    void StartOsdNavigation(PlayerContext *ctx);
+    void UpdateNavDialog(PlayerContext *ctx);
 
     // Menu dialog
     void ShowOSDMenu(bool isCompact = false);

@@ -15,6 +15,7 @@
 #include "mythuibutton.h"
 #include "mythuieditbar.h"
 #include "mythuistatetype.h"
+#include "mythuigroup.h"
 
 // libmythtv
 #include "channelutil.h"
@@ -24,6 +25,7 @@
 #include "osd.h"
 #include "Bluray/bdringbuffer.h"
 #include "Bluray/bdoverlayscreen.h"
+#include "tv_actions.h"
 
 #define LOC     QString("OSD: ")
 
@@ -255,6 +257,18 @@ bool OSD::Reinit(const QRect &rect, float font_aspect)
     int new_stretch = (int)((font_aspect * 100) + 0.5f);
     if ((rect == m_Rect) && (new_stretch == m_fontStretch))
         return true;
+    if (m_Dialog && m_Dialog->objectName() == OSD_DLG_NAVIGATE
+        && m_Dialog->IsVisible())
+    {
+        bool softBlend = (m_parent->GetVideoOutput()->GetOSDRenderer() == "softblend");
+        OsdNavigation *nav = static_cast<OsdNavigation *> (m_Dialog);
+        QString navFocus = nav->GetFocusWidget()->objectName();
+        if (softBlend && navFocus == "TOGGLEFILL")
+            // in this case continue with reinit
+            ;
+        else
+            return true;
+    }
 
     HideAll(false);
     TearDown();
@@ -295,6 +309,9 @@ void OSD::HideAll(bool keepsubs, MythScreenType* except, bool dropnotification)
     while (it.hasNext())
     {
         it.next();
+        if (except && except->objectName() == OSD_DLG_NAVIGATE
+            && it.value()->objectName() == "osd_status")
+            continue;
         bool match1 = keepsubs &&
                      (it.key() == OSD_WIN_SUBTITLE  ||
                       it.key() == OSD_WIN_TELETEXT);
@@ -560,6 +577,8 @@ void OSD::SetText(const QString &window, const InfoMap &map,
         ChannelEditor *edit = dynamic_cast<ChannelEditor*>(m_Dialog);
         if (edit)
             edit->SetText(map);
+        else
+            win->SetTextFromMap(map);
     }
     else
         win->SetTextFromMap(map);
@@ -986,6 +1005,20 @@ void OSD::CheckExpiry(void)
 void OSD::SetExpiry(const QString &window, enum OSDTimeout timeout,
                     int custom_timeout)
 {
+    SetExpiry1(window, timeout, custom_timeout);
+    if (IsWindowVisible(window))
+    {
+        // Keep status and nav timeouts in sync
+        if (window == OSD_DLG_NAVIGATE)
+            SetExpiry1("osd_status", timeout, custom_timeout);
+        else if (window == "osd_status" && IsWindowVisible(OSD_DLG_NAVIGATE))
+            SetExpiry1(OSD_DLG_NAVIGATE, timeout, custom_timeout);
+    }
+}
+
+void OSD::SetExpiry1(const QString &window, enum OSDTimeout timeout,
+                    int custom_timeout)
+{
     if (timeout == kOSDTimeout_Ignore && !custom_timeout)
         return;
 
@@ -994,7 +1027,7 @@ void OSD::SetExpiry(const QString &window, enum OSDTimeout timeout,
     if ((time > 0) && win)
     {
         QDateTime expires = MythDate::current().addMSecs(time);
-        m_ExpireTimes.insert(win, expires);
+            m_ExpireTimes.insert(win, expires);
     }
     else if ((time < 0) && win)
     {
@@ -1186,6 +1219,8 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
             dialog = new ChannelEditor(m_ParentObject, window.toLatin1());
         else if (window == OSD_DLG_CONFIRM)
             dialog = new MythConfirmationDialog(NULL, text, false);
+        else if (window == OSD_DLG_NAVIGATE)
+            dialog = new OsdNavigation(m_ParentObject, window, this);
         else
             dialog = new MythDialogBox(text, NULL, window.toLatin1(), false, true);
 
@@ -1425,4 +1460,210 @@ void OSD::DisplayBDOverlay(BDOverlay* overlay)
     BDOverlayScreen* bd = (BDOverlayScreen*)GetWindow(OSD_WIN_BDOVERLAY);
     if (bd)
         bd->DisplayBDOverlay(overlay);
+}
+
+OsdNavigation::OsdNavigation(QObject *retobject, const QString &name, OSD *osd)
+  : MythScreenType((MythScreenType*)NULL, name),
+    m_retObject(retobject),
+    m_osd(osd),
+    m_playButton(0),
+    m_pauseButton(0),
+    m_muteButton(0),
+    m_unMuteButton(0),
+    m_paused('X'),
+    m_muted('X'),
+    m_visibleGroup(0),
+    m_maxGroupNum(-1),
+    m_IsVolumeControl(true)
+{
+    m_retObject    = retobject;
+}
+
+bool OsdNavigation::Create(void)
+{
+    if (!XMLParseBase::LoadWindowFromXML("osd.xml", "osd_navigation", this))
+        return false;
+
+    MythUIButton *moreButton;
+    UIUtilW::Assign(this, moreButton, "more");
+    if (moreButton)
+        connect(moreButton, SIGNAL(Clicked()), SLOT(More()));
+    UIUtilW::Assign(this, m_pauseButton, "PAUSE");
+    UIUtilW::Assign(this, m_playButton, "PLAY");
+    UIUtilW::Assign(this, m_muteButton, "MUTE");
+    UIUtilW::Assign(this, m_unMuteButton, "unmute");
+
+    MythPlayer *player = m_osd->GetPlayer();
+
+    if (!player || !player->HasAudioOut() ||
+        !player->PlayerControlsVolume())
+    {
+        m_IsVolumeControl = false;
+        if (m_muteButton)
+            m_muteButton->Hide();
+        if (m_unMuteButton)
+            m_unMuteButton->Hide();
+    }
+
+    // find number of groups and make sure only corrrect one is visible
+    MythUIGroup *group;
+    for (int i = 0; i < 100 ; i++)
+    {
+        UIUtilW::Assign(this, group, QString("grp%1").arg(i));
+        if (group)
+        {
+            m_maxGroupNum = i;
+            if (i != m_visibleGroup)
+                group->SetVisible (false);
+            QList<MythUIType *> * children = group->GetAllChildren();
+            QList<MythUIType *>::iterator it;
+            for (it = children->begin(); it != children->end(); ++it)
+            {
+                MythUIType *child = *it;
+                if (child == moreButton)
+                    continue;
+                connect(child, SIGNAL(Clicked()), SLOT(GeneralAction()));
+            }
+        }
+        else
+            break;
+    }
+
+    BuildFocusList();
+
+    return true;
+}
+
+bool OsdNavigation::keyPressEvent(QKeyEvent *event)
+{
+    // bool extendTimeout = (m_paused != 'Y');
+    bool extendTimeout = true;
+    bool handled = false;
+
+    MythUIType *focus = GetFocusWidget();
+    if (focus && focus->keyPressEvent(event))
+        handled = true;
+
+    if (!handled)
+    {
+        QStringList actions;
+        bool handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
+
+        for (int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE" )
+            {
+                sendResult(-1,action);
+                handled = true;
+                extendTimeout = false;
+            }
+        }
+    }
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    if (extendTimeout)
+    {
+        m_osd->SetExpiry(OSD_DLG_NAVIGATE, kOSDTimeout_Long);
+        // m_osd->SetExpiry("osd_status", kOSDTimeout_Long);
+    }
+
+    return handled;
+}
+
+// Virtual
+void OsdNavigation::ShowMenu(void)
+{
+    sendResult(100,"MENU");
+}
+
+void OsdNavigation::sendResult(int result, QString action)
+{
+    if (!m_retObject)
+        return;
+
+   DialogCompletionEvent *dce = new DialogCompletionEvent("", result,
+                                                           "", action);
+    QCoreApplication::postEvent(m_retObject, dce);
+}
+
+void OsdNavigation::GeneralAction(void)
+{
+    MythUIType *fw = GetFocusWidget();
+    if (fw)
+    {
+        QString nameClicked = fw->objectName();
+        int result = 100;
+        int hashPos = nameClicked.indexOf('#');
+        if (hashPos > -1)
+            nameClicked.truncate(hashPos);
+        if (nameClicked == "INFO")
+            result=0;
+        if (nameClicked == "unmute")
+            nameClicked = "MUTE";
+        sendResult(result, nameClicked);
+    }
+}
+
+// Switch to next group of icons. They have to be
+// named grp0, grp1, etc with no gaps in numbers.
+void OsdNavigation::More(void)
+{
+    if (m_maxGroupNum <= 0)
+        return;
+
+    MythUIGroup *group;
+    UIUtilW::Assign(this, group, QString("grp%1").arg(m_visibleGroup));
+    group->SetVisible (false);
+
+    // wrap around after last group displayed
+    if (++m_visibleGroup > m_maxGroupNum)
+        m_visibleGroup = 0;
+
+    UIUtilW::Assign(this, group, QString("grp%1").arg(m_visibleGroup));
+    group->SetVisible (true);
+}
+
+void OsdNavigation::SetTextFromMap(const InfoMap &infoMap)
+{
+
+    char paused = infoMap.value("paused","X").toLocal8Bit().at(0);
+    if (paused != 'X')
+    {
+        if (m_playButton && m_pauseButton && paused != m_paused)
+        {
+            MythUIType *fw = GetFocusWidget();
+            m_playButton->SetVisible(paused=='Y');
+            m_pauseButton->SetVisible(paused!='Y');
+            if (fw && (fw == m_playButton || fw == m_pauseButton))
+            {
+                fw->LoseFocus();
+                MythUIType *newfw = (paused=='Y' ? m_playButton : m_pauseButton);
+                SetFocusWidget(newfw);
+                if (m_paused == 'X')
+                     newfw->TakeFocus();
+            }
+            m_paused = paused;
+        }
+    }
+
+    char muted = infoMap.value("muted","X").toLocal8Bit().at(0);
+    if (m_IsVolumeControl && muted != 'X')
+    {
+        if (m_muteButton && m_unMuteButton && muted != m_muted)
+        {
+            MythUIType *fw = GetFocusWidget();
+            m_muteButton->SetVisible(muted!='Y');
+            m_unMuteButton->SetVisible(muted=='Y');
+            m_muted = muted;
+            if (fw && (fw == m_muteButton || fw == m_unMuteButton))
+            {
+                fw->LoseFocus();
+                SetFocusWidget(muted=='Y' ? m_unMuteButton : m_muteButton);
+            }
+        }
+    }
+
+    MythScreenType::SetTextFromMap(infoMap);
 }

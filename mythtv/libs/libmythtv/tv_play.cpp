@@ -877,6 +877,8 @@ void TV::InitKeys(void)
             "Switch title"), "");
     REG_KEY("TV Playback", ACTION_SWITCHANGLE, QT_TRANSLATE_NOOP("MythControls",
             "Switch angle"), "");
+    REG_KEY("TV Playback", ACTION_OSDNAVIGATION, QT_TRANSLATE_NOOP("MythControls",
+            "OSD Navigation"), "");
     REG_KEY("TV Playback", ACTION_ZOOMUP, QT_TRANSLATE_NOOP("MythControls",
             "Zoom mode - shift up"), "");
     REG_KEY("TV Playback", ACTION_ZOOMDOWN, QT_TRANSLATE_NOOP("MythControls",
@@ -4979,6 +4981,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         else if (!isDVD)
             StartProgramEditMode(ctx);
     }
+    else if (has_action(ACTION_OSDNAVIGATION, actions))
+        StartOsdNavigation(ctx);
     else
         handled = false;
 
@@ -6482,6 +6486,7 @@ void TV::DoPlay(PlayerContext *ctx)
 
     SetSpeedChangeTimer(0, __LINE__);
     gCoreContext->emitTVPlaybackPlaying();
+    UpdateNavDialog(ctx);
 }
 
 float TV::DoTogglePauseStart(PlayerContext *ctx)
@@ -6597,6 +6602,22 @@ void TV::DoTogglePause(PlayerContext *ctx, bool showOSD)
         DoTogglePauseFinish(ctx, DoTogglePauseStart(ctx), showOSD);
     // Emit Pause or Unpaused signal
     paused ? gCoreContext->emitTVPlaybackUnpaused() : gCoreContext->emitTVPlaybackPaused();
+    UpdateNavDialog(ctx);
+}
+
+void TV::UpdateNavDialog(PlayerContext *ctx)
+{
+    OSD *osd = GetOSDLock(ctx);
+    if (osd && osd->DialogVisible(OSD_DLG_NAVIGATE))
+    {
+        osdInfo info;
+        bool paused = ContextIsPaused(ctx, __FILE__, __LINE__);
+        info.text["paused"] = (paused ? "Y" : "N");
+        bool muted = ctx->player->IsMuted();
+        info.text["muted"] = (muted ? "Y" : "N");
+        osd->SetText(OSD_DLG_NAVIGATE, info.text, paused ? kOSDTimeout_None : kOSDTimeout_Long);
+    }
+    ReturnOSDLock(ctx, osd);
 }
 
 bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
@@ -6784,7 +6805,8 @@ void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg,
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
             DoPlayerSeekToFrame(ctx, desiredFrameRel);
         }
-        UpdateOSDSeekMessage(ctx, mesg, kOSDTimeout_Med);
+        bool paused = ctx->player->IsPaused();
+        UpdateOSDSeekMessage(ctx, mesg, paused ? kOSDTimeout_None : kOSDTimeout_Med);
     }
     else
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
@@ -9150,6 +9172,7 @@ void TV::ToggleMute(PlayerContext *ctx, const bool muteIndividualChannels)
         case kMuteRight: text = tr("Right Channel Muted"); break;
     }
 
+    UpdateNavDialog(ctx);
     SetOSDMessage(ctx, text);
 }
 
@@ -10445,6 +10468,20 @@ void TV::StartChannelEditMode(PlayerContext *ctx)
     }
 }
 
+void TV::StartOsdNavigation(PlayerContext *ctx)
+{
+    OSD *osd = GetOSDLock(ctx);
+    if (osd)
+    {
+        osd->DialogQuit();
+        osd->HideAll();
+        ToggleOSD(ctx, true);
+        osd->DialogShow(OSD_DLG_NAVIGATE);
+    }
+    ReturnOSDLock(ctx, osd);
+    UpdateNavDialog(ctx);
+}
+
 /**
  *  \brief Processes channel editing key.
  */
@@ -10778,7 +10815,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             .arg(result).arg(text).arg(action));
 
     bool hide = true;
+    if (result == 100)
+        hide = false;
 
+    bool handled = true;
     if (action.startsWith("DIALOG_"))
     {
         action.remove("DIALOG_");
@@ -10857,6 +10897,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         DoJumpFFWD(actx);
     else if (action == ACTION_JUMPRWND)
         DoJumpRWND(actx);
+    else if (action == ACTION_SEEKFFWD)
+        DoSeekFFWD(actx);
+    else if (action == ACTION_SEEKRWND)
+        DoSeekRWND(actx);
     else if (action.startsWith("DEINTERLACER"))
         HandleDeinterlacer(actx, action);
     else if (action == ACTION_TOGGLEOSDDEBUG)
@@ -10928,15 +10972,21 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
     {
         DoToggleNightMode(actx);
     }
+    else if (action == "TOGGLEASPECT")
+        ToggleAspectOverride(actx);
     else if (action.startsWith("TOGGLEASPECT"))
     {
         ToggleAspectOverride(actx,
                              (AspectOverrideMode) action.right(1).toInt());
     }
+    else if (action == "TOGGLEFILL")
+        ToggleAdjustFill(actx);
     else if (action.startsWith("TOGGLEFILL"))
     {
         ToggleAdjustFill(actx, (AdjustFillMode) action.right(1).toInt());
     }
+    else if (action == "MENU")
+         ShowOSDMenu();
     else if (action == "AUTODETECT_FILL")
     {
         actx->player->detect_letter_box->SetDetectLetterbox(!actx->player->detect_letter_box->GetDetectLetterbox());
@@ -11108,13 +11158,13 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         else if (action == ACTION_TOGGLEBOOKMARK
                 || action == ACTION_SETBOOKMARK)
             ActivePostQHandleAction(actx, QStringList(action));
-        else if (action == ACTION_JUMPBKMRK)
+        else
         {
             bool isDVD = actx->buffer && actx->buffer->IsDVD();
             bool isMenuOrStill = actx->buffer && actx->buffer->IsInDiscMenuOrStillFrame();
-            ActiveHandleAction(actx, QStringList(ACTION_JUMPBKMRK), isDVD, isMenuOrStill);
+            handled = ActiveHandleAction(actx, QStringList(action), isDVD, isMenuOrStill);
         }
-        else
+        if (!handled)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Unknown menu action selected: " + action);
@@ -13056,6 +13106,13 @@ void TV::DoJumpFFWD(PlayerContext *ctx)
                /*honorCutlist*/true);
 }
 
+void TV::DoSeekFFWD(PlayerContext *ctx)
+{
+    DoSeek(ctx, ctx->fftime, tr("Skip Ahead"),
+            /*timeIsOffset*/true,
+            /*honorCutlist*/true);
+}
+
 void TV::DoJumpRWND(PlayerContext *ctx)
 {
     if (GetState(ctx) == kState_WatchingDVD)
@@ -13066,6 +13123,13 @@ void TV::DoJumpRWND(PlayerContext *ctx)
         DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"),
                /*timeIsOffset*/true,
                /*honorCutlist*/true);
+}
+
+void TV::DoSeekRWND(PlayerContext *ctx)
+{
+    DoSeek(ctx, -ctx->rewtime, tr("Jump Back"),
+            /*timeIsOffset*/true,
+            /*honorCutlist*/true);
 }
 
 /*  \fn TV::DVDJumpBack(PlayerContext*)
