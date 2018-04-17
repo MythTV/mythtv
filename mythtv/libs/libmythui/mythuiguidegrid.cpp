@@ -350,7 +350,7 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             UIGTCon *data = *it;
             drawText(p, xoffset, yoffset, data, alphaMod);
 
-            if (data->m_recType != 0 || data->m_arrow != 0)
+            if (data->m_recType != 0 || data->m_arrow != GridTimeNormal)
                 drawRecDecoration(p, xoffset, yoffset, data, alphaMod);
         }
     }
@@ -453,9 +453,9 @@ void MythUIGuideGrid::drawRecDecoration(MythPainter *p, int xoffset, int yoffset
     area.adjust(breakin, breakin, -breakin, -breakin);
 
     // draw arrows
-    if (data->m_arrow != 0)
+    if (data->m_arrow != GridTimeNormal)
     {
-        if (data->m_arrow == 1 || data->m_arrow == 3)
+        if (data->m_arrow & GridTimeStartsBefore)
         {
             if (m_verticalLayout)
             {
@@ -471,7 +471,7 @@ void MythUIGuideGrid::drawRecDecoration(MythPainter *p, int xoffset, int yoffset
             }
         }
 
-        if (data->m_arrow == 2 || data->m_arrow == 3)
+        if (data->m_arrow & GridTimeEndsAfter)
         {
             if (m_verticalLayout)
             {
@@ -662,18 +662,18 @@ void MythUIGuideGrid::drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon
 
     if (m_verticalLayout)
     {
-        if ((data->m_arrow == 1 || data->m_arrow == 3) && m_arrowImages[2])
+        if ((data->m_arrow & GridTimeStartsBefore) && m_arrowImages[2])
             area.setTop(area.top() + m_arrowImages[2]->height());
 
-        if ((data->m_arrow == 2 || data->m_arrow == 3) && m_arrowImages[3])
+        if ((data->m_arrow & GridTimeEndsAfter) && m_arrowImages[3])
             area.setBottom(area.bottom() - m_arrowImages[3]->height());
     }
     else
     {
-        if ((data->m_arrow == 1 || data->m_arrow == 3) && m_arrowImages[0])
+        if ((data->m_arrow & GridTimeStartsBefore) && m_arrowImages[0])
             area.setLeft(area.left() + m_arrowImages[0]->width());
 
-        if ((data->m_arrow == 2 || data->m_arrow == 3) && m_arrowImages[1])
+        if ((data->m_arrow & GridTimeEndsAfter) && m_arrowImages[1])
             area.setRight(area.right() - m_arrowImages[1]->width());
     }
 

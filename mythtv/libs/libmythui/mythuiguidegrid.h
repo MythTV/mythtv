@@ -16,6 +16,10 @@
 #define RECSTATUSSIZE  8
 #define MAX_DISPLAY_CHANS 40
 
+#define GridTimeNormal       0
+#define GridTimeStartsBefore 1
+#define GridTimeEndsAfter    2
+
 class MythFontProperties;
 
 /** \class MythUIGuideGrid
@@ -69,7 +73,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     class UIGTCon
     {
       public:
-        UIGTCon() { m_arrow = m_recType = m_recStat = 0; };
+        UIGTCon() { m_arrow = GridTimeNormal; m_recType = m_recStat = 0; };
         UIGTCon(const QRect &drawArea, const QString &title,
                 const QString &category, int arrow, int recType, int recStat) :
                 m_drawArea(drawArea),               m_title(title),
