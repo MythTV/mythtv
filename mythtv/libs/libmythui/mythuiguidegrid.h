@@ -11,6 +11,7 @@
 
 // MythUI
 #include "mythuitype.h"
+#include "mythuiimage.h"
 
 #define ARROWIMAGESIZE 4
 #define RECSTATUSSIZE  8
@@ -113,8 +114,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     QList<UIGTCon*> *m_allData;
     UIGTCon m_selectedItem;
 
-    MythImage *m_recImages[RECSTATUSSIZE];
-    MythImage *m_arrowImages[ARROWIMAGESIZE];
+    MythUIImage *m_recImages[RECSTATUSSIZE];
+    MythUIImage *m_arrowImages[ARROWIMAGESIZE];
 
     // themeable settings
     int  m_channelCount;

@@ -202,6 +202,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     friend class MythUIEditBar;
     friend class MythUITextEdit;
     friend class ImageLoadThread;
+    friend class MythUIGuideGrid;
 
   private:
     Q_DISABLE_COPY(MythUIImage)

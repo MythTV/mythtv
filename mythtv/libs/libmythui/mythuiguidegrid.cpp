@@ -19,6 +19,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "mythimage.h"
 #include "mythuitype.h"
+#include "mythuiimage.h"
 #include "mythmainwindow.h"
 #include "mythdb.h"
 
@@ -82,17 +83,9 @@ MythUIGuideGrid::~MythUIGuideGrid()
     delete m_font;
     m_font = NULL;
 
-    for (uint x = 0; x < RECSTATUSSIZE; x++)
-    {
-        if (m_recImages[x])
-            m_recImages[x]->DecrRef();
-    }
-
-    for (uint x = 0; x < ARROWIMAGESIZE; x++)
-    {
-        if (m_arrowImages[x])
-            m_arrowImages[x]->DecrRef();
-    }
+    // The m_recImages and m_arrowImages images are now children of
+    // the MythGuiGuideGrid widget and should be automatically deleted
+    // when it is deleted.
 }
 
 bool MythUIGuideGrid::ParseElement(
@@ -459,15 +452,22 @@ void MythUIGuideGrid::drawRecDecoration(MythPainter *p, int xoffset, int yoffset
         {
             if (m_verticalLayout)
             {
-                if (m_arrowImages[2])
-                    p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2),
-                                 area.top() , m_arrowImages[2], alphaMod);
+                if (m_arrowImages[2]) { // UP
+                    MythUIImage *arrow = m_arrowImages[2];
+                    MythRect arrowarea = arrow->GetArea();
+                    arrow->DrawSelf(p, area.center().x() - (arrowarea.width() / 2),
+                                    area.top(), alphaMod, area);
+                }
             }
             else
             {
-                if (m_arrowImages[0])
-                    p->DrawImage(area.left(), area.top() + (area.height() / 2) -
-                                 (m_arrowImages[0]->height() / 2), m_arrowImages[0], alphaMod);
+                if (m_arrowImages[0]) { // LEFT
+                    MythUIImage *arrow = m_arrowImages[0];
+                    MythRect arrowarea = arrow->GetArea();
+                    arrow->DrawSelf(p, area.left(),
+                                    area.center().y() - (arrowarea.height() / 2),
+                                    alphaMod, area);
+                }
             }
         }
 
@@ -475,16 +475,24 @@ void MythUIGuideGrid::drawRecDecoration(MythPainter *p, int xoffset, int yoffset
         {
             if (m_verticalLayout)
             {
-                if (m_arrowImages[3])
-                    p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[3]->width() / 2),
-                                 area.top() + area.height() - m_arrowImages[3]->height(), m_arrowImages[3], alphaMod);
+                if (m_arrowImages[3]) { // BOTTOM
+                    MythUIImage *arrow = m_arrowImages[3];
+                    MythRect arrowarea = arrow->GetArea();
+                    arrow->DrawSelf(p, area.center().x() - (arrowarea.width() / 2),
+                                    area.top() + area.height() - arrowarea.height(),
+                                    alphaMod, area);
+                }
             }
             else
             {
-                if (m_arrowImages[1])
-                    p->DrawImage(area.right() - m_arrowImages[1]->width(),
-                                 area.top() + (area.height() / 2) -
-                                 (m_arrowImages[1]->height() / 2), m_arrowImages[1], alphaMod);
+                if (m_arrowImages[1]) { // RIGHT
+                    MythUIImage *arrow = m_arrowImages[1];
+                    MythRect arrowarea = arrow->GetArea();
+                    arrow->DrawSelf(p,
+                                    area.right() - arrowarea.width(),
+                                    area.center().y() - (arrowarea.height() / 2),
+                                    alphaMod, area);
+                }
             }
         }
     }
@@ -492,9 +500,11 @@ void MythUIGuideGrid::drawRecDecoration(MythPainter *p, int xoffset, int yoffset
     // draw recording status
     if (data->m_recType != 0 && m_recImages[data->m_recType])
     {
-        p->DrawImage(area.right() - m_recImages[data->m_recType]->width(),
-                     area.bottom() - m_recImages[data->m_recType]->height(),
-                     m_recImages[data->m_recType], alphaMod);
+        MythUIImage *image = m_recImages[data->m_recType];
+        MythRect imagearea = image->GetArea();
+        image->DrawSelf(p, area.right() - imagearea.width(),
+                        area.bottom() - imagearea.height(),
+                        alphaMod, area);
     }
 }
 
@@ -663,18 +673,18 @@ void MythUIGuideGrid::drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon
     if (m_verticalLayout)
     {
         if ((data->m_arrow & GridTimeStartsBefore) && m_arrowImages[2])
-            area.setTop(area.top() + m_arrowImages[2]->height());
+            area.setTop(area.top() + m_arrowImages[2]->GetArea().height());
 
-        if ((data->m_arrow & GridTimeEndsAfter) && m_arrowImages[3])
-            area.setBottom(area.bottom() - m_arrowImages[3]->height());
+        if ((data->m_arrow  & GridTimeEndsAfter) && m_arrowImages[3])
+            area.setBottom(area.bottom() - m_arrowImages[3]->GetArea().height());
     }
     else
     {
-        if ((data->m_arrow & GridTimeStartsBefore) && m_arrowImages[0])
-            area.setLeft(area.left() + m_arrowImages[0]->width());
+        if ((data->m_arrow  & GridTimeStartsBefore) && m_arrowImages[0])
+            area.setLeft(area.left() + m_arrowImages[0]->GetArea().width());
 
         if ((data->m_arrow & GridTimeEndsAfter) && m_arrowImages[1])
-            area.setRight(area.right() - m_arrowImages[1]->width());
+            area.setRight(area.right() - m_arrowImages[1]->GetArea().width());
     }
 
     if (area.width() <= 0 || area.height() <= 0)
@@ -791,36 +801,28 @@ void MythUIGuideGrid::SetCategoryColors(const QMap<QString, QString> &catC)
 
 void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 {
-    QString themeDir = GetMythUI()->GetThemeDir();
-    QString filename = themeDir + file;
+    MythUIImage *uiimage = new MythUIImage(file, this, "guidegrid image");
+    uiimage->m_imageProperties.isThemeImage = true;
+    uiimage->SetVisible(false);
+    uiimage->Load(false);
 
-    QPixmap *pix = GetMythUI()->LoadScalePixmap(filename);
-
-    if (pix)
-    {
-        if (m_recImages[recType])
-            m_recImages[recType]->DecrRef();
-        m_recImages[recType] = GetPainter()->GetFormatImage();
-        m_recImages[recType]->Assign(*pix);
-        delete pix;
-    }
+    MythUIImage *tmp = m_recImages[recType];
+    m_recImages[recType] = uiimage;
+    if (tmp)
+        delete tmp;
 }
 
 void MythUIGuideGrid::SetArrow(int direction, const QString &file)
 {
-    QString themeDir = GetMythUI()->GetThemeDir();
-    QString filename = themeDir + file;
+    MythUIImage *uiimage = new MythUIImage(file, this, "guidegrid arrow");
+    uiimage->m_imageProperties.isThemeImage = true;
+    uiimage->SetVisible(false);
+    uiimage->Load(false);
 
-    QPixmap *pix = GetMythUI()->LoadScalePixmap(filename);
-
-    if (pix)
-    {
-        if (m_arrowImages[direction])
-            m_arrowImages[direction]->DecrRef();
-        m_arrowImages[direction] = GetPainter()->GetFormatImage();
-        m_arrowImages[direction]->Assign(*pix);
-        delete pix;
-    }
+    MythUIImage *tmp = m_arrowImages[direction];
+    m_arrowImages[direction] = uiimage;
+    if (tmp)
+        delete tmp;
 }
 
 void MythUIGuideGrid::ResetData(void)
