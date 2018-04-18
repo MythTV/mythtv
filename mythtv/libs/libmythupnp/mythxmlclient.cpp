@@ -115,6 +115,7 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
 
     if (( nErrCode == UPnPResult_HumanInterventionRequired ) || 
         ( nErrCode == UPnPResult_ActionNotAuthorized       ) ||
+        ( nErrCode == UPnPResult_MythTV_XmlParseError      ) ||
         ( nErrCode == 501                                  ) )
     {
         // Service calls no longer return UPnPResult codes, 
