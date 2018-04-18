@@ -129,10 +129,10 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
             if (islinkLocal && !gCoreContext->GetScopeForAddress(addr))
             {
                 addr.setScopeId(QString());
-                while (addr.scopeId().isEmpty())
+                while (addr.scopeId().isEmpty() && iCardsEnd<2)
                 {
                     // search for the next available IPV6 interface.
-                    if (iCard.hasNext() && iCardsEnd<2)
+                    if (iCard.hasNext())
                     {
                         QNetworkInterface card = iCard.next();
                         LOG(VB_GENERAL, LOG_DEBUG, QString("Trying interface %1").arg(card.name()));
