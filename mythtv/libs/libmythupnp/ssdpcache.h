@@ -85,6 +85,8 @@ class UPNP_PUBLIC SSDPCache : public QObject,
     private:
         // Singleton instance used by all.
         static SSDPCache*       g_pSSDPCache;  
+        QStringList             badUrlList;
+        QStringList             goodUrlList;
 
     protected:
 
