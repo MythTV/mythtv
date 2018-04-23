@@ -164,8 +164,10 @@ using_openmax {
                 createlinks.path = $${PREFIX}/share/mythtv/lib
                 createlinks.extra = ln -fs /opt/vc/lib/libbrcmEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1.0.0 ;
                 createlinks.extra += ln -fs /opt/vc/lib/libbrcmEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so.1 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libbrcmEGL.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libEGL.so ;
                 createlinks.extra += ln -fs /opt/vc/lib/libbrcmGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2.0.0 ;
                 createlinks.extra += ln -fs /opt/vc/lib/libbrcmGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so.2 ;
+                createlinks.extra += ln -fs /opt/vc/lib/libbrcmGLESv2.so $(INSTALL_ROOT)/$${PREFIX}/share/mythtv/lib/libGLESv2.so ;
                 INSTALLS += createlinks
             } else {
                 # For raspberry Pi Raspbian pre-stretch
