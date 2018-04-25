@@ -1576,13 +1576,6 @@ void TVRec::HandlePendingRecordings(void)
 {
     QMutexLocker pendlock(&pendingRecLock);
 
-    if (pendingRecordings.empty())
-        return;
-
-    // If we have a pending recording and AskAllowRecording
-    // or DoNotAskAllowRecording is set and the frontend is
-    // ready send an ASK_RECORDING query to frontend.
-
     PendingMap::iterator it, next;
 
     for (it = pendingRecordings.begin(); it != pendingRecordings.end();)
@@ -1600,6 +1593,21 @@ void TVRec::HandlePendingRecordings(void)
         }
         it = next;
     }
+
+    if (pendingRecordings.empty())
+        return;
+
+    // Make sure EIT scan is stopped so it does't interfere
+    if (scanner && HasFlags(kFlagEITScannerRunning))
+    {
+        LOG(VB_CHANNEL, LOG_INFO,
+            LOC + "Stopping active EIT scan for pending recording.");
+        tuningRequests.enqueue(TuningRequest(kFlagNoRec));
+    }
+
+    // If we have a pending recording and AskAllowRecording
+    // or DoNotAskAllowRecording is set and the frontend is
+    // ready send an ASK_RECORDING query to frontend.
 
     bool has_rec = false;
     it = pendingRecordings.begin();
@@ -3952,11 +3960,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
 
         if (scanner && HasFlags(kFlagEITScannerRunning))
         {
-            scanner->StopActiveScan();
-            ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-            eitScanStartTime = current_time;
-            eitScanStartTime = eitScanStartTime.addSecs(eitCrawlIdleStart +
-                                  eit_start_rand(eitTransportTimeout));
+            tuningRequests.enqueue(TuningRequest(kFlagNoRec));
         }
     }
     else if (curRecording && !reachedPreFail && current_time > preFailDeadline)
