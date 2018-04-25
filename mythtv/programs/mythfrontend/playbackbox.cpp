@@ -1343,7 +1343,8 @@ void PlaybackBox::UpdateUIRecGroupList(void)
     if (m_recGroupIdx < 0 || !m_recgroupList || m_recGroups.size() < 2)
         return;
 
-    QSignalBlocker blocker(m_recgroupList);
+    // After qt 5.3. we can use QSignalBlocker blocker(m_recgroupList);
+    const bool wasBlocked = m_recgroupList->blockSignals(true);
 
     m_recgroupList->Reset();
 
@@ -1365,6 +1366,7 @@ void PlaybackBox::UpdateUIRecGroupList(void)
             m_recgroupList->SetItemCurrent(item);
         item->SetText(name);
     }
+    m_recgroupList->blockSignals(wasBlocked);
 }
 
 void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
