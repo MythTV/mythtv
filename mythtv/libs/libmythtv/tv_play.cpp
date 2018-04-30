@@ -11095,14 +11095,13 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
             hide = false;
         }
         else
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Unknown menu action selected: " + action);
-            hide = false;
-        }
+            handled = false;
     }
-    else if (StateIsPlaying(actx->GetState()))
+    else
+        handled = false;
+    if (!handled && StateIsPlaying(actx->GetState()))
     {
+        handled = true;
         if (action == ACTION_JUMPTODVDROOTMENU ||
             action == ACTION_JUMPTODVDCHAPTERMENU ||
             action == ACTION_JUMPTOPOPUPMENU ||
@@ -11159,17 +11158,19 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
                 || action == ACTION_SETBOOKMARK)
             ActivePostQHandleAction(actx, QStringList(action));
         else
-        {
-            bool isDVD = actx->buffer && actx->buffer->IsDVD();
-            bool isMenuOrStill = actx->buffer && actx->buffer->IsInDiscMenuOrStillFrame();
-            handled = ActiveHandleAction(actx, QStringList(action), isDVD, isMenuOrStill);
-        }
-        if (!handled)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Unknown menu action selected: " + action);
-            hide = false;
-        }
+            handled = false;
+    }
+    if (!handled)
+    {
+        bool isDVD = actx->buffer && actx->buffer->IsDVD();
+        bool isMenuOrStill = actx->buffer && actx->buffer->IsInDiscMenuOrStillFrame();
+        handled = ActiveHandleAction(actx, QStringList(action), isDVD, isMenuOrStill);
+    }
+    if (!handled)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "Unknown menu action selected: " + action);
+        hide = false;
     }
 
     if (hide)
