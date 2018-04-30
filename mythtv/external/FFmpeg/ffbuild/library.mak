@@ -1,6 +1,4 @@
-SRC_DIR := $(SRC_PATH_BARE)/lib$(NAME)
-
-include $(SRC_PATH_BARE)/external/FFmpeg/ffbuild/common.mak
+include $(SRC_PATH)/ffbuild/common.mak
 
 ifeq (,$(filter %clean,$(MAKECMDGOALS)))
 -include $(SUBDIR)lib$(NAME).version
@@ -24,8 +22,7 @@ $(SUBDIR)$(LIBNAME): $(OBJS)
 	$(AR) $(ARFLAGS) $(AR_O) $^
 	$(RANLIB) $@
 
-#install-headers: install-lib$(NAME)-headers install-lib$(NAME)-pkgconfig
-install-headers: install-lib$(NAME)-headers
+install-headers: install-lib$(NAME)-headers install-lib$(NAME)-pkgconfig
 
 install-libs-$(CONFIG_STATIC): install-lib$(NAME)-static
 install-libs-$(CONFIG_SHARED): install-lib$(NAME)-shared

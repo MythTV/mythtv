@@ -6,6 +6,8 @@ AVPROGS-$(CONFIG_FFSERVER) += ffserver
 AVPROGS     := $(AVPROGS-yes:%=%$(PROGSSUF)$(EXESUF))
 PROGS       += $(AVPROGS)
 MYTHPROGS   = $(addprefix myth, ${PROGS})
+MYTHFFLIBS  = -lmythavfilter -lmythavformat -lmythavcodec -lmythavresample \
+-lmythpostproc -lmythswresample -lmythswscale
 
 AVBASENAMES  = ffmpeg ffplay ffprobe ffserver
 ALLAVPROGS   = $(AVBASENAMES:%=%$(PROGSSUF)$(EXESUF))
@@ -38,8 +40,10 @@ all: $(AVPROGS)
 fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
 OBJDIRS += fftools
 
-${MYTHPROGS}: myth%: %
-	$(CP) $< $@
+${MYTHPROGS}:
+	cp ffmpeg_g mythffmpeg
+	cp ffprobe_g mythffprobe
+	cp ffserver_g mythffserver
 
 ifdef AVPROGS
 install: install-mythprogs

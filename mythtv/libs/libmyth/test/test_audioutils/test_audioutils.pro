@@ -5,7 +5,8 @@ QT += xml sql network testlib
 TEMPLATE = app
 TARGET = test_audioutils
 DEPENDPATH += . ../.. ../../audio ../../logging ../../../libmythbase
-INCLUDEPATH += . ../.. ../../audio ../../../../external/FFmpeg ../../logging ../../../libmythbase
+INCLUDEPATH += . ../.. ../../audio ../../../.. ../../../../external/FFmpeg
+INCLUDEPATH += ../../logging ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

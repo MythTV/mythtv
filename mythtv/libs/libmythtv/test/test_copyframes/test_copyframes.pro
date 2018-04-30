@@ -6,7 +6,8 @@ TEMPLATE = app
 TARGET = test_copyframes
 DEPENDPATH += . ../..
 INCLUDEPATH += . ../../ ../../../libmyth ../../../libmythbase
-INCLUDEPATH += . ../../../../external/FFmpeg ../../logging ../../../libmythbase
+INCLUDEPATH += ../../../.. ../../../../external/FFmpeg
+INCLUDEPATH += ../../logging ../../../libmythbase
 INCLUDEPATH += ../../../libmythservicecontracts
 
 LIBS += -L../../../libmythbase -lmythbase-$$LIBVERSION

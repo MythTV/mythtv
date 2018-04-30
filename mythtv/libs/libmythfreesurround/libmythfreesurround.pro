@@ -4,7 +4,7 @@ TEMPLATE = lib
 TARGET = mythfreesurround-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 
-INCLUDEPATH += ../../external/FFmpeg ../libmythbase .. ../..
+INCLUDEPATH += ../.. ../../external/FFmpeg ../libmythbase .. ../..
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -19,7 +19,7 @@ contains( CONFIG_LIBFFTW3, yes ) {
     #required until its rewritten to use avcodec fft lib
     DEFINES += USE_FFTW3
 } else {
-    DEPENDPATH += ../../external/FFmpeg
+    DEPENDPATH += ../.. ../../external/FFmpeg
     LIBS += -L../libavcodec
     LIBS += -L../libavcore
     LIBS += -L../libavutil

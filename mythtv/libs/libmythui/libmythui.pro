@@ -15,7 +15,7 @@ INSTALLS = target
 
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../
-INCLUDEPATH += ../../external/FFmpeg
+INCLUDEPATH += ../.. ../../external/FFmpeg
 
 LIBS += -L../libmythbase -lmythbase-$$LIBVERSION
 

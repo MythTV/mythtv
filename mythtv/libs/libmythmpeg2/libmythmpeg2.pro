@@ -17,7 +17,7 @@ SOURCES += cpu_accel.c cpu_state.c \
 inc.path = $${PREFIX}/include/mythtv/mpeg2dec/
 inc.files = mpeg2.h
 
-INCLUDEPATH += ../../external/FFmpeg
+INCLUDEPATH += ../.. ../../external/FFmpeg
 
 INSTALLS += inc
 

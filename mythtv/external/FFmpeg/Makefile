@@ -1,7 +1,5 @@
+MAIN_MAKEFILE=1
 include ffbuild/config.mak
-
-SRC_PATH = ${SRC_PATH_BARE}/external/FFmpeg
-SRC_DIR = $(SRC_PATH)
 
 vpath %.c    $(SRC_PATH)
 vpath %.cpp  $(SRC_PATH)
@@ -84,18 +82,17 @@ endef
 define DOSUBDIR
 $(foreach V,$(SUBDIR_VARS),$(eval $(call RESET,$(V))))
 SUBDIR := $(1)/
-include $(SRC_PATH_BARE)/external/FFmpeg/$(1)/Makefile
--include $(SRC_PATH_BARE)/external/FFmpeg/$(1)/$(ARCH)/Makefile
--include $(SRC_PATH_BARE)/external/FFmpeg/$(1)/$(INTRINSICS)/Makefile
-include $(SRC_PATH_BARE)/external/FFmpeg/ffbuild/library.mak
-
+include $(SRC_PATH)/$(1)/Makefile
+-include $(SRC_PATH)/$(1)/$(ARCH)/Makefile
+-include $(SRC_PATH)/$(1)/$(INTRINSICS)/Makefile
+include $(SRC_PATH)/ffbuild/library.mak
 endef
 
 $(foreach D,$(FFLIBS),$(eval $(call DOSUBDIR,lib$(D))))
 
 include $(SRC_PATH)/fftools/Makefile
-#include $(SRC_PATH)/doc/Makefile
-#include $(SRC_PATH)/doc/examples/Makefile
+include $(SRC_PATH)/doc/Makefile
+include $(SRC_PATH)/doc/examples/Makefile
 
 libavcodec/utils.o libavformat/utils.o libavdevice/avdevice.o libavfilter/avfilter.o libavutil/utils.o libpostproc/postprocess.o libswresample/swresample.o libswscale/utils.o : libavutil/ffversion.h
 
@@ -110,8 +107,8 @@ endif
 %$(PROGSSUF)_g$(EXESUF): $(FF_DEP_LIBS)
 	$(LD) $(LDFLAGS) $(LDEXEFLAGS) $(LD_O) $(OBJS-$*) $(FF_EXTRALIBS)
 
-VERSION_SH  = $(SRC_PATH_BARE)/external/FFmpeg/ffbuild/version.sh
-GIT_LOG     = $(SRC_PATH_BARE)/.git/logs/HEAD
+VERSION_SH  = $(SRC_PATH)/ffbuild/version.sh
+GIT_LOG     = $(SRC_PATH)/.git/logs/HEAD
 
 .version: $(wildcard $(GIT_LOG)) $(VERSION_SH) ffbuild/config.mak
 .version: M=@
@@ -158,9 +155,9 @@ endif
 config:
 	$(SRC_PATH)/configure $(value FFMPEG_CONFIGURATION)
 
-#check: all alltools examples testprogs fate
+check: all alltools examples testprogs fate
 
-#include $(SRC_PATH)/tests/Makefile
+include $(SRC_PATH)/tests/Makefile
 
 $(sort $(OBJDIRS)):
 	$(Q)mkdir -p $@

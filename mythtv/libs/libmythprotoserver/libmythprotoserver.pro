@@ -28,7 +28,7 @@ SOURCES += requesthandler/fileserverutil.cpp sockethandler/filetransfer.cpp
 SOURCES += requesthandler/messagehandler.cpp
 
 INCLUDEPATH += ../libmythbase ../libmyth ../libmythtv ../libmythui
-INCLUDEPATH += ../../external/FFmpeg ../.. ../ ./
+INCLUDEPATH += ../.. ../../external/FFmpeg ../ ./
 INCLUDEPATH += ../libmythservicecontracts
 
 DEPENDPATH += ../ ../libmythbase ../libmythtv ../libmyth ../libmythui

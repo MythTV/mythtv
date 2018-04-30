@@ -39,7 +39,8 @@ SOURCES += musicfilescanner.cpp metadatagrabber.cpp lyricsdata.cpp
 
 INCLUDEPATH += ../libmythbase ../libmythtv
 INCLUDEPATH += ../.. ../ ./ ../libmythui
-INCLUDEPATH += ../../external/FFmpeg ../libmyth  ../../external/libmythbluray/src
+INCLUDEPATH += ../.. ../../external/FFmpeg
+INCLUDEPATH += ../libmyth  ../../external/libmythbluray/src
 INCLUDEPATH += ../libmythservicecontracts
 
 # for TagLib

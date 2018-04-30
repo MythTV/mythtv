@@ -29,7 +29,7 @@ distclean:	${SUBDIRS_DISTCLEAN}
 
 
 FFmpeg-all FFmpeg-install FFmpeg-uninstall FFmpeg-clean FFmpeg-distclean:
-	${MAKE} -C FFmpeg ${@:FFmpeg-%=%}
+	${MAKE} -C FFmpeg ${@:FFmpeg-%=%} DESTDIR=${INSTALL_ROOT}
 
 zeromq-all:	zeromq/Makefile
 	${MAKE} -C zeromq all

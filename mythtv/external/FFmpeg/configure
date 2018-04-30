@@ -3342,7 +3342,7 @@ logfile="ffbuild/config.log"
 # installation paths
 prefix_default="/usr/local"
 bindir_default='${prefix}/bin'
-datadir_default='${prefix}/share/ffmpeg'
+datadir_default='${prefix}/share/mythtv'
 docdir_default='${prefix}/share/doc/ffmpeg'
 incdir_default='${prefix}/include'
 libdir_default='${prefix}/lib'
@@ -3404,11 +3404,11 @@ set_default sws_max_filter_size
 
 # build settings
 SHFLAGS='-shared -Wl,-soname,$$(@F)'
-LIBPREF="lib"
+LIBPREF="libmyth"
 LIBSUF=".a"
 FULLNAME='$(NAME)$(BUILDSUF)'
 LIBNAME='$(LIBPREF)$(FULLNAME)$(LIBSUF)'
-SLIBPREF="lib"
+SLIBPREF="libmyth"
 SLIBSUF=".so"
 SLIBNAME='$(SLIBPREF)$(FULLNAME)$(SLIBSUF)'
 SLIBNAME_WITH_VERSION='$(SLIBNAME).$(LIBVERSION)'
@@ -3435,6 +3435,7 @@ OBJCC_O='-o $@'
 X86ASM_O='-o $@'
 LD_O='-o $@'
 LD_LIB='-l%'
+LD_MYTH_LIB='-lmyth%'
 LD_PATH='-L'
 HOSTCC_C='-c'
 HOSTCC_E='-E -o $@'
@@ -6912,6 +6913,7 @@ NVCC_O=$NVCC_O
 LD_O=$LD_O
 X86ASM_O=$X86ASM_O
 LD_LIB=$LD_LIB
+LD_MYTH_LIB=$LD_MYTH_LIB
 LD_PATH=$LD_PATH
 DLLTOOL=$dlltool
 WINDRES=$windres

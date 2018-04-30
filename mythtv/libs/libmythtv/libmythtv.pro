@@ -46,7 +46,7 @@ DEPENDPATH  += ../libmythupnp
 DEPENDPATH  += ../libmythservicecontracts
 
 INCLUDEPATH += .. ../.. # for avlib headers
-INCLUDEPATH += ../../external/FFmpeg
+INCLUDEPATH += ../.. ../../external/FFmpeg
 INCLUDEPATH += $$DEPENDPATH
 
 !win32-msvc* {
