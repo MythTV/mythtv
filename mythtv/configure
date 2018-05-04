@@ -1386,6 +1386,8 @@ EXTERNAL_LIBRARY_LIST="
     libxml2
     mediacodec
     opengl
+    sdl
+    sdl2
 "
 
 HWACCEL_AUTODETECT_LIBRARY_LIST="
@@ -1434,6 +1436,7 @@ PROGRAM_LIST="
     ffprobe
     ffserver
     ffmpeg
+    ffplay
 "
 
 SUBSYSTEM_LIST="
@@ -2722,6 +2725,9 @@ set_default sws_max_filter_size
 
 # mythtv settings
 enable gpl
+disable sdl2
+disable sdl
+disable ffplay
 
 CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
@@ -3124,6 +3130,10 @@ for opt do
     esac
 done
 
+if enabled sdl ; then
+    enable sdl2
+    enable ffplay
+fi
 
 #setting default runtime prefix and libdir
 if test -n "${prefix}"; then
@@ -6952,7 +6962,7 @@ ffmpeg_optset host_ld
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau vaapi libxml2 libass dxva2 mediacodec
 ffmpeg_optenable jni libbluray libfontconfig libfreetype libiec61883
-ffmpeg_optenable crystalhd
+ffmpeg_optenable crystalhd sdl2 ffplay
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
@@ -6974,8 +6984,6 @@ $ffopts \
 --enable-pic \
 --disable-demuxer=mpegtsraw \
 --disable-indev=dshow \
---disable-sdl2 \
---disable-ffplay \
 --disable-avio_dir_cmd_example \
 --disable-avio_reading_example \
 --disable-decode_audio_example \

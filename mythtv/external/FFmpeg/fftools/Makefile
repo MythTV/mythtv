@@ -40,10 +40,18 @@ all: $(AVPROGS)
 fftools/ffprobe.o fftools/cmdutils.o: libavutil/ffversion.h | fftools
 OBJDIRS += fftools
 
-${MYTHPROGS}:
+# ${MYTHPROGS}:
+mythffmpeg:
 	cp ffmpeg_g mythffmpeg
+
+mythffprobe:
 	cp ffprobe_g mythffprobe
+
+mythffserver:
 	cp ffserver_g mythffserver
+
+mythffplay:
+	cp ffplay_g mythffplay
 
 ifdef AVPROGS
 install: install-mythprogs
