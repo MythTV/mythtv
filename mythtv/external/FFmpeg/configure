@@ -3344,7 +3344,7 @@ prefix_default="/usr/local"
 bindir_default='${prefix}/bin'
 datadir_default='${prefix}/share/mythtv'
 docdir_default='${prefix}/share/doc/ffmpeg'
-incdir_default='${prefix}/include'
+incdir_default='${prefix}/include/mythtv'
 libdir_default='${prefix}/lib'
 mandir_default='${prefix}/share/man'
 
