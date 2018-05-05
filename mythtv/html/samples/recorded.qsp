@@ -4,7 +4,7 @@ import "/js/utility.js"
     var oDvr = new Dvr();
     var oMyth = new Myth();
 
-    var list = oDvr.GetRecordedList( true, 0, 20, "", "", "" );
+    var list = oDvr.GetRecordedList( true, 0, 20, "", "", "", "", "" );
 %>
 
 <br>
