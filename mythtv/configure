@@ -6983,28 +6983,7 @@ $ffopts \
 --enable-gpl \
 --enable-pic \
 --disable-demuxer=mpegtsraw \
---disable-indev=dshow \
---disable-avio_dir_cmd_example \
---disable-avio_reading_example \
---disable-decode_audio_example \
---disable-decode_video_example \
---disable-demuxing_decoding_example \
---disable-encode_audio_example \
---disable-encode_video_example \
---disable-extract_mvs_example \
---disable-filter_audio_example \
---disable-filtering_audio_example \
---disable-filtering_video_example \
---disable-http_multiclient_example \
---disable-hw_decode_example \
---disable-metadata_example \
---disable-muxing_example \
---disable-qsvdec_example \
---disable-remuxing_example \
---disable-resampling_audio_example \
---disable-scaling_video_example \
---disable-transcode_aac_example \
---disable-transcoding_example
+--disable-indev=dshow
 rc=$?
 if [ $rc != 0 ] ; then
     echo "ERROR FFmpeg configure failed"
