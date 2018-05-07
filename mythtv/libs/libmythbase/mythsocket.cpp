@@ -1003,8 +1003,11 @@ void MythSocket::ResetReal(void)
     do
     {
         uint avail = m_tcpSocket->bytesAvailable();
-        trash.resize(max((uint)trash.size(),avail));
-        m_tcpSocket->read(&trash[0], avail);
+        if (avail)
+        {
+            trash.resize(max((uint)trash.size(),avail));
+            m_tcpSocket->read(&trash[0], avail);
+        }
 
         LOG(VB_NETWORK, LOG_INFO, LOC + "Reset() " +
             QString("%1 bytes available").arg(avail));
