@@ -1,8 +1,8 @@
 #ifndef MYTHGOOM 
 #define MYTHGOOM
 
-#include "../mainvisual.h"
-#include "../config.h"
+#include "mainvisual.h"
+#include "config.h"
 
 using namespace std;
 
