@@ -1649,6 +1649,8 @@ HEADERS_LIST="
     fcntl_h
     gsm_h
     io_h
+    linux_videodev_h
+    linux_videodev2_h
     mach_mach_time_h
     machine_ioctl_bt848_h
     machine_ioctl_meteor_h
@@ -1665,7 +1667,6 @@ HEADERS_LIST="
     sys_soundcard_h
     sys_time_h
     sys_un_h
-    sys_videoio_h
     termios_h
     udplite_h
     unistd_h
@@ -1815,7 +1816,6 @@ TYPES_LIST="
     struct_sockaddr_sa_len
     struct_sockaddr_storage
     struct_stat_st_mtim_tv_nsec
-    struct_v4l2_frmivalenum_discrete
 "
 
 HAVE_LIST="
@@ -2439,8 +2439,6 @@ oss_indev_deps_any="soundcard_h sys_soundcard_h"
 oss_outdev_deps_any="soundcard_h sys_soundcard_h"
 pulse_indev_deps="libpulse"
 pulse_outdev_deps="libpulse"
-v4l2_indev_deps_any="linux_videodev2_h sys_videoio_h"
-v4l2_outdev_deps_any="linux_videodev2_h sys_videoio_h"
 vfwcap_indev_deps="vfw32 vfwcap_defines"
 xv_outdev_deps="X11_extensions_Xvlib_h XvGetPortAttribute"
 xv_outdev_extralibs="-lXv -lX11 -lXext"
@@ -5750,6 +5748,9 @@ check_header VideoDecodeAcceleration/VDADecoder.h
 check_func_headers VideoToolbox/VTCompressionSession.h VTCompressionSessionPrepareToEncodeFrames -framework VideoToolbox
 check_header windows.h
 check_header asm/types.h
+check_header linux/videodev.h
+check_header linux/videodev2.h
+
 
 # it seems there are versions of clang in some distros that try to use the
 # gcc headers, which explodes for stdatomic
@@ -5954,6 +5955,7 @@ enabled libfontconfig     && require_pkg_config libfontconfig fontconfig "fontco
 enabled libfreetype       && require_pkg_config libfreetype2 freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
 enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set_VBR_quality -lmp3lame
 enabled libpulse          && require_pkg_config libpulse libpulse pulse/pulseaudio.h pa_context_new
+enabled libv4l2           && require_pkg_config libv4l2 libv4l2 libv4l2.h v4l2_ioctl
 
 enabled libx264           && { use_pkg_config libx264 x264 "stdint.h x264.h" x264_encoder_encode ||
                                { require libx264 "stdint.h x264.h" x264_encoder_encode -lx264 &&
@@ -6042,9 +6044,6 @@ disabled makeinfo_html && texi2html --help 2> /dev/null | grep -q 'init-file' &&
 perl -v            > /dev/null 2>&1 && enable perl      || disable perl
 pod2man --help     > /dev/null 2>&1 && enable pod2man   || disable pod2man
 rsync --help 2> /dev/null | grep -q 'contimeout' && enable rsync_contimeout || disable rsync_contimeout
-
-check_header sys/videoio.h
-check_code cc sys/videoio.h "struct v4l2_frmsizeenum vfse; vfse.discrete.width = 0;" && enable_safe struct_v4l2_frmivalenum_discrete
 
 check_lib user32 "windows.h winuser.h" GetShellWindow -luser32
 check_lib vfw32 "windows.h vfw.h" capCreateCaptureWindow -lvfw32
