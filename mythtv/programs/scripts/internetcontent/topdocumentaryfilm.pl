@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # @(#)$Header: /home/mythtv/mythtvrep/scripts/topdocumentaryfilm.pl,v 1.17 2010/07/24 23:28:11 mythtv Exp $
 # Auric 2010/01/10 http://web.aanet.com.au/auric/
 #

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # @(#)$Header: /home/mythtv/mythtvrep/scripts/twit.tv.pl,v 1.34 2015/11/04 11:29:00 mythtv Exp $
 # Auric 2010/01/10 http://web.aanet.com.au/auric/
 #
