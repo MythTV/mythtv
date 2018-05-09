@@ -1452,26 +1452,6 @@ require_pkg_config(){
     use_pkg_config "$@" || die "ERROR: $pkg not found using pkg-config$pkg_config_fail_message"
 }
 
-require_libfreetype(){
-    log require_libfreetype "$@"
-    pkg="freetype2"
-    check_cmd $pkg_config --exists --print-errors $pkg \
-      || die "ERROR: $pkg not found"
-    pkg_cflags=$($pkg_config --cflags $pkg_config_flags $pkg)
-    pkg_libs=$($pkg_config --libs $pkg_config_flags $pkg)
-    {
-        echo "#include <ft2build.h>"
-        echo "#include FT_FREETYPE_H"
-        echo "long check_func(void) { return (long) FT_Init_FreeType; }"
-        echo "int main(void) { return 0; }"
-    } | check_ld "cc" $pkg_cflags $pkg_libs \
-      && set_safe "${pkg}_cflags" $pkg_cflags \
-      && set_safe "${pkg}_libs"   $pkg_libs \
-      || die "ERROR: $pkg not found"
-    add_cflags    $(get_safe "${pkg}_cflags")
-    add_extralibs $(get_safe "${pkg}_libs")
-}
-
 hostcc_e(){
     eval printf '%s\\n' $HOSTCC_E
 }
@@ -1626,25 +1606,6 @@ check_libx(){
 
 check_exec_cxx(){
     check_ld_cxx "$@" && { enabled cross_compile || $TMPE >> $logfile 2>&1; }
-}
-
-check_foo_config(){
-    cfg=$1
-    pkg=$2
-    header=$3
-    func=$4
-    shift 4
-    disable $cfg
-    check_cmd ${pkg}-config --version
-    err=$?
-    if test "$err" = 0; then
-        backup_cflags=$CFLAGS
-        temp_extralibs=$(${pkg}-config --libs)
-        add_cflags $(${pkg}-config --cflags)
-        check_lib "$@" $header $func $temp_extralibs && enable $cfg
-        CFLAGS=$backup_cflags
-    fi
-    return $err
 }
 
 non_standard_header(){
@@ -6921,7 +6882,7 @@ flite_libs="-lflite_cmu_time_awb -lflite_cmu_us_awb -lflite_cmu_us_kal -lflite_c
 enabled libflite          && require2 libflite "flite/flite.h" flite_init $flite_libs
 enabled fontconfig        && enable libfontconfig
 enabled libfontconfig     && require_pkg_config fontconfig "fontconfig/fontconfig.h" FcInit
-enabled libfreetype       && require_libfreetype
+enabled libfreetype       && require_pkg_config freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType
 enabled libfribidi        && require_pkg_config fribidi fribidi.h fribidi_version_info
 enabled libgme            && require  libgme gme/gme.h gme_new_emu -lgme -lstdc++
 enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
@@ -7134,7 +7095,11 @@ void foo(){switch (0) case 0: case (sizeof(long) == $sizeof):;}
 EOF
 done
 
-check_foo_config freetype2 freetype ft2build.h FT_Init_FreeType
+if require_pkg_config freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType ; then
+    enable freetype2
+else
+    disable freetype2
+fi
 
 enabled freetype2 ||
     die "ERROR! You must have FreeType installed to compile MythTV."
@@ -8571,8 +8536,8 @@ if enabled darwin_da; then
 fi
 
 if enabled freetype2; then
-    echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $TMPMAK
-    echo "FREETYPE_LIBS=`freetype-config --libs`" >> $TMPMAK
+    echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2)" >> $TMPMAK
+    echo "FREETYPE_LIBS=$($pkg_config --libs $pkg_config_flags freetype2)" >> $TMPMAK
 fi
 
 if test $target_os = darwin; then
