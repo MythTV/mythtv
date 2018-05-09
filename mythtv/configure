@@ -7406,8 +7406,8 @@ if enabled darwin_da; then
 fi
 
 if enabled freetype2; then
-    echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $TMPMAK
-    echo "FREETYPE_LIBS=`freetype-config --libs`" >> $TMPMAK
+    echo "FREETYPE_CFLAGS=$($pkg_config --cflags $pkg_config_flags freetype2)" >> $TMPMAK
+    echo "FREETYPE_LIBS=$($pkg_config --libs $pkg_config_flags freetype2)" >> $TMPMAK
 fi
 
 if test $target_os = darwin; then
