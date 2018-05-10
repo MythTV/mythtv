@@ -726,6 +726,18 @@ bool JobQueue::GetJobInfoFromID(
     return result;
 }
 
+int JobQueue::GetJobTypeFromName(const QString &name)
+{
+    if (!JobNameToType.contains(name))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("'%1' is an invalid Job Name.")
+            .arg(name));
+        return JOB_NONE;
+    }
+    else
+        return JobNameToType[name];
+}
+
 bool JobQueue::PauseJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB PAUSE ID %1").arg(jobID);
@@ -1648,6 +1660,36 @@ void JobQueue::CleanupOldJobsInQueue()
         MythDB::DBError("JobQueue::CleanupOldJobsInQueue: Error deleting "
                         "old finished jobs.", delquery);
     }
+}
+
+bool JobQueue::InJobRunWindow(QDateTime jobstarttsRaw)
+{
+    if (!jobstarttsRaw.isValid())
+    {
+        jobstarttsRaw = QDateTime::currentDateTime();
+        LOG(VB_JOBQUEUE, LOG_INFO, LOC + QString("Invalid date/time passed, "
+                                                 "using %1").arg(
+                                                 jobstarttsRaw.toString()));
+    }
+
+    QString hostname(gCoreContext->GetHostName());
+
+    QTime windowStart(QTime::fromString(gCoreContext->GetSettingOnHost(
+                                    "JobQueueWindowStart", hostname, "00:00")));
+
+    QTime windowEnd(QTime::fromString(gCoreContext->GetSettingOnHost(
+                                    "JobQueueWindowEnd", hostname, "23:59")));
+
+    QTime scheduleTime(QTime::fromString(jobstarttsRaw.toString("hh:mm")));
+
+    if (scheduleTime < windowStart || scheduleTime > windowEnd)
+    {
+        LOG(VB_JOBQUEUE, LOG_ERR, LOC + "Time not within job queue window, " +
+                                        "job not queued");
+        return false;
+    }
+
+    return true;
 }
 
 void JobQueue::ProcessJob(JobQueueEntry job)
