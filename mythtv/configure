@@ -6956,7 +6956,7 @@ ffmpeg_optenable() {
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu
 ffmpeg_optset extra_cxxflags extra_ldflags target_os
-ffmpeg_optset pkg_config prefix as objcc dep_cc host_cc
+ffmpeg_optset pkg_config prefix libdir as objcc dep_cc host_cc
 ffmpeg_optset host_ld
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau vaapi libxml2 libass dxva2 mediacodec
