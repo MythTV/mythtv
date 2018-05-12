@@ -44,7 +44,7 @@
 class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "5.0" );
+    Q_CLASSINFO( "version"    , "5.1" );
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
     Q_CLASSINFO( "PutSetting_Method",            "POST" )
@@ -56,6 +56,8 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
     Q_CLASSINFO( "CheckDatabase_Method",         "POST" )
     Q_CLASSINFO( "ProfileSubmit_Method",         "POST" )
     Q_CLASSINFO( "ProfileDelete_Method",         "POST" )
+    Q_CLASSINFO( "ManageDigestUser_Method",      "POST" )
+    Q_CLASSINFO( "ManageUrlProtection_Method",   "POST" )
 
     public:
 
@@ -173,6 +175,15 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
         virtual QString             ProfileText         ( void ) = 0;
 
         virtual DTC::BackendInfo*   GetBackendInfo      ( void ) = 0;
+
+        virtual bool                ManageDigestUser    ( const QString &Action,
+                                                          const QString &UserName,
+                                                          const QString &Password,
+                                                          const QString &NewPassword,
+                                                          const QString &AdminPassword ) = 0;
+
+        virtual bool                ManageUrlProtection ( const QString &Services,
+                                                          const QString &AdminPassword) = 0;
 };
 
 #endif

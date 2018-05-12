@@ -140,6 +140,15 @@ class Myth : public MythServices
         QString             ProfileText         ( void );
 
         DTC::BackendInfo*   GetBackendInfo      ( void );
+
+        bool                ManageDigestUser    ( const QString &Action,
+                                                  const QString &UserName,
+                                                  const QString &Password,
+                                                  const QString &NewPassword,
+                                                  const QString &AdminPassword );
+
+        bool                ManageUrlProtection  ( const QString &Services,
+                                                   const QString &AdminPassword );
 };
 
 // --------------------------------------------------------------------------
@@ -393,6 +402,27 @@ class ScriptableMyth : public QObject
         {
             SCRIPT_CATCH_EXCEPTION( NULL,
                 return m_obj.GetBackendInfo();
+            )
+        }
+        bool ManageDigestUser( const QString &Action,
+                               const QString &UserName,
+                               const QString &Password,
+                               const QString &NewPassword,
+                               const QString &AdminPassword )
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.ManageDigestUser( Action,
+                                               UserName,
+                                               Password,
+                                               NewPassword,
+                                               AdminPassword );
+            )
+        }
+        bool ManageUrlProtection( const QString &Services,
+                                  const QString &AdminPassword )
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.ManageUrlProtection( Services, AdminPassword );
             )
         }
 };

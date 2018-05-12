@@ -46,6 +46,10 @@
 #include "recordinginfo.h"
 #include "musicmetadata.h"
 
+const QStringList KnownServices = { "Capture", "Channel", "Content", \
+                                    "Dvr",     "Guide",   "Music",   \
+                                    "Myth",    "Video" };
+
 void FillProgramInfo( DTC::Program *pProgram,
                       ProgramInfo  *pInfo,
                       bool          bIncChannel = true,

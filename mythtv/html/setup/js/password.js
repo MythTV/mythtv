@@ -10,9 +10,10 @@ function changePassword() {
     } else if (newPassword != newPasswordConfirm) {
         setErrorMessage("New passwords do not match.");
     } else {
-        $.post("/Myth/ChangePassword",
-            { UserName: "admin",
-              OldPassword: oldPassword,
+        $.post("/Myth/ManageDigestUser",
+            { Action: "ChangePassword",
+              UserName: "admin",
+              Password: oldPassword,
               NewPassword: newPassword },
             function(data) {
                 if (data.bool == "true")
