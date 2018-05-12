@@ -4708,6 +4708,7 @@ case $target_os in
         disable ivtv
         disable v4l2
         enable backend
+        enable pic
         ;;
     bsd/os)
         add_extralibs -lpoll -lgnugetopt
