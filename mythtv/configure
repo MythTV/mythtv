@@ -4724,6 +4724,7 @@ case $target_os in
         disable v4l1
         disable v4l2
         disable x11
+        disable qtwebkit
         # Workaround compile errors from missing u_int/uint def
         CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
