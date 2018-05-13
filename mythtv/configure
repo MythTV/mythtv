@@ -140,7 +140,8 @@ Advanced options (experts only):
   --disable-libass         disable libass SSA/ASS subtitle support
   --disable-systemd_notify disable systemd notify support
   --disable-systemd_journal disable systemd journal support
-
+  --disable-qtwebkit       disable QT webkit support (for built in browser)
+  
   --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)
 
   --disable-libxml2        disable libxml2 support (disc metadata)
@@ -6371,16 +6372,16 @@ else
     qt_libs="-L${sysroot}/$(${qmake} -query QT_INSTALL_LIBS)"
 fi
 
-# if $(pkg-config --exists Qt5WebKit) || $(pkg-config --exists QtWebKit) ; then
-#     enable qtwebkit
-# else
-#     check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
-# #include <QtWebKit/QtWebKit>
-# int main(void){ return 0; }
-# EOF
-# fi
-
-# enabled qtwebkit || die "Error! QtWebkit headers not found"
+if ! disabled qtwebkit; then
+  if $(pkg-config --exists Qt5WebKit) || $(pkg-config --exists QtWebKit) ; then
+     enable qtwebkit
+  else
+     check_ecxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
+#include <QtWebKit/QtWebKit>
+int main(void){ return 0; }
+EOF
+  fi
+fi
 
 if $(pkg-config --exists Qt5Script) || $(pkg-config --exists QtScript) ; then
     enable qtscript
