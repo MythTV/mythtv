@@ -543,10 +543,11 @@ AVStream* AVFormatWriter::AddVideoStream(void)
         c->max_b_frames          = 0;
         c->slices                = 8;
 
-        c->flags                |= CODEC_FLAG_LOOP_FILTER;
+        c->flags                |= AV_CODEC_FLAG_LOOP_FILTER;
         c->me_cmp               |= 1;
         // c->me_method             = ME_HEX;
-        av_opt_set_int(c, "me_method", ME_HEX, 0);
+        // av_opt_set_int(c, "me_method", ME_HEX, 0);
+        av_opt_set(c, "me_method", "hex", 0);
         c->me_subpel_quality     = 6;
         c->me_range              = 16;
         c->keyint_min            = 25;
@@ -579,7 +580,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     }
 
     if(m_ctx->oformat->flags & AVFMT_GLOBALHEADER)
-        c->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     return st;
 }
@@ -651,7 +652,7 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     }
 
     if(m_ctx->oformat->flags & AVFMT_GLOBALHEADER)
-        c->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     return st;
 }

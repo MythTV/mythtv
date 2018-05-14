@@ -62,6 +62,7 @@ extern "C" {
 #include "vaapicontext.h"
 #endif
 
+#include <atomic>
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
@@ -1614,9 +1615,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
     else
 #endif
-    if (codec && codec->capabilities & CODEC_CAP_DR1)
+    if (codec && codec->capabilities & AV_CODEC_CAP_DR1)
     {
-        enc->flags          |= CODEC_FLAG_EMU_EDGE;
+        // enc->flags          |= CODEC_FLAG_EMU_EDGE;
     }
     else
     {
@@ -1650,7 +1651,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         {
             if (FlagIsSet(kDecodeNoLoopFilter))
             {
-                enc->flags &= ~CODEC_FLAG_LOOP_FILTER;
+                enc->flags &= ~AV_CODEC_FLAG_LOOP_FILTER;
                 enc->skip_loop_filter = AVDISCARD_ALL;
             }
         }

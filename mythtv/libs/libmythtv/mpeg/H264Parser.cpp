@@ -4,6 +4,8 @@
 #include "mythlogging.h"
 #include "recorders/dtvrecorder.h" // for FrameRate
 
+#include <atomic>
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavcodec/mpegvideo.h"
@@ -325,11 +327,11 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
                           bool found_start_code)
 {
     /*
-      bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE
+      bitstream buffer, must be AV_INPUT_BUFFER_PADDING_SIZE
       bytes larger then the actual data
     */
     uint32_t required_size = rbsp_index + byte_count +
-                             FF_INPUT_BUFFER_PADDING_SIZE;
+                             AV_INPUT_BUFFER_PADDING_SIZE;
     if (rbsp_buffer_size < required_size)
     {
         // Round up to packet size
@@ -394,7 +396,7 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
     }
 
     /* Stick some 0xff on the end for get_bits to run into */
-    memset(&rbsp_buffer[rbsp_index], 0xff, FF_INPUT_BUFFER_PADDING_SIZE);
+    memset(&rbsp_buffer[rbsp_index], 0xff, AV_INPUT_BUFFER_PADDING_SIZE);
     return true;
 }
 

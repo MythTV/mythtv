@@ -29,6 +29,7 @@
 #include "tv_rec.h"
 #include "mythsystemevent.h"
 
+#include <atomic>
 extern "C" {
 #include "libavcodec/mpegvideo.h"
 }

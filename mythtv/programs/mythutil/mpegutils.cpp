@@ -33,7 +33,7 @@
 
 // Application local headers
 #include "mpegutils.h"
-
+#include <atomic>
 extern "C" {
 #include "libavcodec/mpegvideo.h"
 }

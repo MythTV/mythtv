@@ -24,7 +24,6 @@ extern "C" {
 #include "mythframe.h"
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
-#include "libavcodec/audioconvert.h"
 }
 
 #include "avfringbuffer.h"
