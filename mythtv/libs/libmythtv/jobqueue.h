@@ -180,6 +180,8 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static bool RestartJob(int jobID);
     static bool StopJob(int jobID);
     static bool DeleteJob(int jobID);
+    static bool SafeDeleteJob(int jobID, int jobType, int chanid,
+                              QDateTime recstartts);
 
     static enum JobCmds GetJobCmd(int jobID);
     static enum JobFlags GetJobFlags(int jobID);

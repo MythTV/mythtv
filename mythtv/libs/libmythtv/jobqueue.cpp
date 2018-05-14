@@ -897,8 +897,35 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
 
 bool JobQueue::DeleteJob(int jobID)
 {
+    return JobQueue::SafeDeleteJob(jobID, 0, 0, QDateTime());
+}
+
+bool JobQueue::SafeDeleteJob(int jobID, int jobType, int chanid,
+                             QDateTime recstartts)
+{
     if (jobID < 0)
         return false;
+
+    if (chanid)
+    {
+
+        int thisJob = GetJobID(jobType, chanid, recstartts);
+        QString msg;
+
+        if( thisJob != jobID)
+        {
+            msg = QString("JobType, chanid and starttime don't match jobID %1");
+            LOG(VB_JOBQUEUE, LOG_ERR, LOC + QString(msg).arg(jobID));
+            return false;
+        }
+
+        if (JobQueue::IsJobRunning(jobType, chanid, recstartts))
+        {
+            msg = QString("Can't remove running JobID %1");
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString(msg).arg(jobID));
+            return false;
+        }
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -908,7 +935,7 @@ bool JobQueue::DeleteJob(int jobID)
 
     if (!query.exec())
     {
-        MythDB::DBError("Error in JobQueue::DeleteJob()", query);
+        MythDB::DBError("Error in JobQueue::SafeDeleteJob()", query);
         return false;
     }
 
