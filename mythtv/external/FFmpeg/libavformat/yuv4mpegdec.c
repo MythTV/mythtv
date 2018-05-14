@@ -126,6 +126,12 @@ static int yuv4_read_header(AVFormatContext *s)
                 pix_fmt = AV_PIX_FMT_YUV444P;
             } else if (strncmp("mono16", tokstart, 6) == 0) {
                 pix_fmt = AV_PIX_FMT_GRAY16;
+            } else if (strncmp("mono12", tokstart, 6) == 0) {
+                pix_fmt = AV_PIX_FMT_GRAY12;
+            } else if (strncmp("mono10", tokstart, 6) == 0) {
+                pix_fmt = AV_PIX_FMT_GRAY10;
+            } else if (strncmp("mono9", tokstart, 5) == 0) {
+                pix_fmt = AV_PIX_FMT_GRAY9;
             } else if (strncmp("mono", tokstart, 4) == 0) {
                 pix_fmt = AV_PIX_FMT_GRAY8;
             } else {
@@ -308,7 +314,13 @@ static int yuv4_read_packet(AVFormatContext *s, AVPacket *pkt)
 static int yuv4_read_seek(AVFormatContext *s, int stream_index,
                           int64_t pts, int flags)
 {
-    if (avio_seek(s->pb, pts * s->packet_size + s->internal->data_offset, SEEK_SET) < 0)
+    int64_t pos;
+
+    if (flags & AVSEEK_FLAG_BACKWARD)
+        pts = FFMAX(0, pts - 1);
+    pos = pts * s->packet_size;
+
+    if (avio_seek(s->pb, pos + s->internal->data_offset, SEEK_SET) < 0)
         return -1;
     return 0;
 }

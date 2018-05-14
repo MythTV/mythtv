@@ -27,6 +27,7 @@
 typedef enum {
     H264_SEI_TYPE_BUFFERING_PERIOD       = 0,   ///< buffering period (H.264, D.1.1)
     H264_SEI_TYPE_PIC_TIMING             = 1,   ///< picture timing
+    H264_SEI_TYPE_PAN_SCAN_RECT          = 2,   ///< pan-scan rectangle
     H264_SEI_TYPE_FILLER_PAYLOAD         = 3,   ///< filler data
     H264_SEI_TYPE_USER_DATA_REGISTERED   = 4,   ///< registered user data as specified by Rec. ITU-T T.35
     H264_SEI_TYPE_USER_DATA_UNREGISTERED = 5,   ///< unregistered user data
@@ -34,6 +35,7 @@ typedef enum {
     H264_SEI_TYPE_FRAME_PACKING          = 45,  ///< frame packing arrangement
     H264_SEI_TYPE_DISPLAY_ORIENTATION    = 47,  ///< display orientation
     H264_SEI_TYPE_GREEN_METADATA         = 56,  ///< GreenMPEG information
+    H264_SEI_TYPE_MASTERING_DISPLAY_COLOUR_VOLUME = 137,  ///< mastering display properties
     H264_SEI_TYPE_ALTERNATIVE_TRANSFER   = 147, ///< alternative transfer
 } H264_SEI_Type;
 
@@ -119,12 +121,13 @@ typedef struct H264SEIBufferingPeriod {
 
 typedef struct H264SEIFramePacking {
     int present;
-    int frame_packing_arrangement_id;
-    int frame_packing_arrangement_cancel_flag;  ///< is previous arrangement canceled, -1 if never received
-    H264_SEI_FpaType frame_packing_arrangement_type;
-    int frame_packing_arrangement_repetition_period;
+    int arrangement_id;
+    int arrangement_cancel_flag;  ///< is previous arrangement canceled, -1 if never received
+    H264_SEI_FpaType arrangement_type;
+    int arrangement_repetition_period;
     int content_interpretation_type;
     int quincunx_sampling_flag;
+    int current_frame_is_frame0_flag;
 } H264SEIFramePacking;
 
 typedef struct H264SEIDisplayOrientation {

@@ -32,7 +32,6 @@
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libavfilter/avfiltergraph.h>
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 #include <libavutil/opt.h>
@@ -75,7 +74,6 @@ static int open_input_file(const char *filename)
     if (!dec_ctx)
         return AVERROR(ENOMEM);
     avcodec_parameters_to_context(dec_ctx, fmt_ctx->streams[audio_stream_index]->codecpar);
-    av_opt_set_int(dec_ctx, "refcounted_frames", 1, 0);
 
     /* init the audio decoder */
     if ((ret = avcodec_open2(dec_ctx, dec, NULL)) < 0) {
@@ -90,8 +88,8 @@ static int init_filters(const char *filters_descr)
 {
     char args[512];
     int ret = 0;
-    AVFilter *abuffersrc  = avfilter_get_by_name("abuffer");
-    AVFilter *abuffersink = avfilter_get_by_name("abuffersink");
+    const AVFilter *abuffersrc  = avfilter_get_by_name("abuffer");
+    const AVFilter *abuffersink = avfilter_get_by_name("abuffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
     static const enum AVSampleFormat out_sample_fmts[] = { AV_SAMPLE_FMT_S16, -1 };
@@ -228,9 +226,6 @@ int main(int argc, char **argv)
         fprintf(stderr, "Usage: %s file | %s\n", argv[0], player);
         exit(1);
     }
-
-    av_register_all();
-    avfilter_register_all();
 
     if ((ret = open_input_file(argv[1])) < 0)
         goto end;
