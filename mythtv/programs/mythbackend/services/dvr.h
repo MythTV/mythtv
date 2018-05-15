@@ -273,6 +273,15 @@ class Dvr : public DvrServices
         QString           DupInToString        ( QString          DupIn     );
 
         QString           DupInToDescription   ( QString          DupIn     );
+
+        int               ManageJobQueue       ( const QString   &Action,
+                                                 const QString   &JobName,
+                                                 int              JobId,
+                                                 int              RecordedId,
+                                                       QDateTime  JobStartTime,
+                                                       QString    RemoteHost,
+                                                       QString    JobArgs   );
+
 };
 
 // --------------------------------------------------------------------------
@@ -635,6 +644,27 @@ class ScriptableDvr : public QObject
                 return m_obj.DupInToDescription( DupIn );
             )
         }
+
+        int ManageJobQueue( const QString   &Action,
+                            const QString   &JobName,
+                            int              JobId,
+                            int              RecordedId,
+                                  QDateTime  JobStartTime,
+                                  QString    RemoteHost,
+                                  QString    JobArgs )
+
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.ManageJobQueue( Action,
+                                             JobName,
+                                             JobId,
+                                             RecordedId,
+                                             JobStartTime,
+                                             RemoteHost,
+                                             JobArgs );
+            )
+        }
+
 };
 
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableDvr, QObject*)
