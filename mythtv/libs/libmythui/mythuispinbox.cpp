@@ -1,5 +1,10 @@
 
+#include "mythmainwindow.h"
 #include "mythuispinbox.h"
+#include "mythlogging.h"
+#include "mythuibutton.h"
+#include "mythuitextedit.h"
+#include "mythuitext.h"
 
 // QT headers
 #include <QDomDocument>
@@ -7,7 +12,7 @@
 
 MythUISpinBox::MythUISpinBox(MythUIType *parent, const QString &name)
     : MythUIButtonList(parent, name), m_hasTemplate(false),
-      m_moveAmount(0)
+      m_moveAmount(0), m_low(0), m_high(0), m_step(0)
 {
 }
 
@@ -30,6 +35,10 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
 {
     if ((high == low) || step == 0)
         return;
+
+    m_low = low;
+    m_high = high;
+    m_step = step;
 
     m_moveAmount = pageMultiple;
 
@@ -205,4 +214,157 @@ void MythUISpinBox::CopyFrom(MythUIType *base)
     m_positiveTemplate = spinbox->m_positiveTemplate;
 
     MythUIButtonList::CopyFrom(base);
+}
+
+// Open the entry dialog on certain key presses. A select or search action will
+// open the dialog. A number or minus sign will open the entry dialog with the
+// given key as the first digit.
+// If the spinbox uses a template, the entries are not just numbers
+// but can be sentences. The whole sentence is put in the entry field,
+// allowing the user to change the number part of it.
+
+bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
+{
+    QStringList actions;
+    bool handled = false;
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    if (handled)
+        return true;
+
+    QString initialEntry = GetItemCurrent()->GetText();
+    bool doEntry = false;
+    for (int i = 0; i < actions.size(); ++i)
+    {
+        if (actions[i] >= ACTION_0 && actions[i] <= ACTION_9)
+        {
+            if (!m_hasTemplate)
+                initialEntry = actions[i];
+            doEntry=true;
+            break;
+        }
+        if (actions[i] == ACTION_SELECT || actions[i] == "SEARCH")
+        {
+            doEntry=true;
+            break;
+        }
+    }
+    if (actions.size() == 0 && event->text() == "-")
+    {
+        if (!m_hasTemplate)
+            initialEntry = "-";
+        doEntry=true;
+    }
+
+    if (doEntry)
+    {
+        ShowEntryDialog(initialEntry);
+        handled = true;
+    }
+
+    if (handled)
+        return true;
+    else
+        return MythUIButtonList::keyPressEvent(event);
+}
+
+void MythUISpinBox::ShowEntryDialog(QString initialEntry)
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    SpinBoxEntryDialog *dlg = new SpinBoxEntryDialog(popupStack, "SpinBoxEntryDialog",
+        this, initialEntry, m_low, m_high, m_step);
+
+    if (dlg->Create())
+        popupStack->AddScreen(dlg);
+    else
+        delete dlg;
+}
+
+// Convenience Dialog to allow entry of a Spinbox value
+
+SpinBoxEntryDialog::SpinBoxEntryDialog(MythScreenStack *parent, const char *name,
+        MythUIButtonList *parentList, QString searchText,
+        int low, int high, int step)
+    : MythScreenType(parent, name, false),
+        m_parentList(parentList),
+        m_searchText(searchText),
+        m_entryEdit(NULL),
+        m_cancelButton(NULL),
+        m_okButton(NULL),
+        m_rulesText(NULL),
+        m_okClicked(false),
+        m_low(low),
+        m_high(high),
+        m_step(step)
+
+{
+    m_selection = parentList->GetCurrentPos();
+}
+
+
+SpinBoxEntryDialog::~SpinBoxEntryDialog()
+{
+}
+
+bool SpinBoxEntryDialog::Create(void)
+{
+    if (!CopyWindowFromBase("SpinBoxEntryDialog", this))
+        return false;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_entryEdit,  "entry", &err);
+    UIUtilW::Assign(this, m_cancelButton,"cancel", &err);
+    UIUtilW::Assign(this, m_rulesText,"rules", &err);
+    UIUtilE::Assign(this, m_okButton,    "ok", &err);
+
+    if (err)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'SpinBoxEntryDialog'");
+        return false;
+    }
+
+    m_entryEdit->SetText(m_searchText);
+    entryChanged();
+    if (m_rulesText)
+    {
+        InfoMap infoMap;
+        infoMap["low"] = QString::number(m_low);
+        infoMap["high"] = QString::number(m_high);
+        infoMap["step"] = QString::number(m_step);
+        m_rulesText->SetTextFromMap(infoMap);
+    }
+
+    connect(m_entryEdit, SIGNAL(valueChanged()), SLOT(entryChanged()));
+    if (m_cancelButton)
+        connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+    connect(m_okButton, SIGNAL(Clicked()), SLOT(okClicked()));
+
+    BuildFocusList();
+
+    return true;
+}
+
+void SpinBoxEntryDialog::entryChanged(void)
+{
+    int currPos = 0;
+    int count = m_parentList->GetCount();
+    QString searchText = m_entryEdit->GetText();
+    bool found = false;
+    for (currPos = 0; currPos < count; currPos++)
+    {
+        if (searchText.compare(m_parentList->GetItemAt(currPos)->GetText(),
+            Qt::CaseInsensitive) == 0)
+        {
+            found = true;
+            m_selection = currPos;
+            break;
+        }
+    }
+    m_okButton->SetEnabled(found);
+}
+
+void SpinBoxEntryDialog::okClicked(void)
+{
+    m_parentList->SetItemCurrent(m_selection);
+    Close();
 }

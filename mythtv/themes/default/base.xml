@@ -1243,6 +1243,44 @@
         </statetype>
     </window>
 
+    <!-- Popup dialog to enter into a spin box -->
+    <window name="SpinBoxEntryDialog">
+        <area>-1,-1,620,165,800x600</area>
+        <imagetype name="backimg">
+            <area>0,0,620,165,800x600</area>
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>5,10,600,30,800x600</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <value>You may enter a value here or cancel to continue using the Spinbox.</value>
+        </textarea>
+
+        <textedit name="entry" from="basetextedit">
+            <area>120,40,375,50,800x600</area>
+        </textedit>
+
+        <button name="cancel" from="basebutton">
+            <area>20,105,150,40,800x600</area>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <area>445,105,150,40,800x600</area>
+            <value>OK</value>
+        </button>
+
+        <textarea name="rules" from="basetextarea">
+            <area>210,95,200,60,800x600</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <template>Values from %LOW% to %HIGH% in increments of %STEP%</template>
+        </textarea>
+
+    </window>
+
     <window name="MythFileBrowser">
         <area>-1,-1,730,510</area>
         <imagetype name="backimg">
