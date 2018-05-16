@@ -7118,7 +7118,6 @@ if enabled source_path_used; then
         external/libmythdvdnav
         external/libsamplerate
         external/libudfread
-        external/minilzo
         external/libmythsoundtouch
         external/libXNVCtrl
     "
@@ -7141,7 +7140,6 @@ if enabled source_path_used; then
         external/libmythdvdnav/Makefile
         external/libsamplerate/Makefile
         external/libudfread/Makefile
-        external/minilzo/Makefile
         external/libmythsoundtouch/Makefile
         external/libXNVCtrl/Makefile
     "
@@ -7716,9 +7714,6 @@ echo "Configuring libsamplerate..."
        ${qmakeconf} -o Makefile)
 echo "Configuring libudfread..."
 (cd external/libudfread ; \
-       ${qmakeconf} -o Makefile)
-echo "Configuring minilzo..."
-(cd external/minilzo ; \
        ${qmakeconf} -o Makefile)
 echo "Configuring libmythsoundtouch..."
 (cd external/libmythsoundtouch ;

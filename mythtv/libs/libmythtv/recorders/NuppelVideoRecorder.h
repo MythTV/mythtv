@@ -34,7 +34,7 @@ using namespace std;
 #include "format.h"
 #include "cc608decoder.h"
 #include "filter.h"
-#include "minilzo.h"
+#include "lzo/lzo1x.h"
 #include "mthread.h"
 
 #include "mythtvexp.h"

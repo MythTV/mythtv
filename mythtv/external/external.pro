@@ -11,7 +11,6 @@ SUBDIRS += libmythdvdnav
 SUBDIRS += libsamplerate
 SUBDIRS += libudfread
 SUBDIRS += nzmqt/src/nzmqt.pro
-SUBDIRS += minilzo
 SUBDIRS += libmythsoundtouch
 
 }

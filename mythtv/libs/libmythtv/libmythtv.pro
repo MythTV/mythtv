@@ -326,9 +326,6 @@ SOURCES += HLS/m3u.cpp
 using_libcrypto:DEFINES += USING_LIBCRYPTO
 using_libcrypto:LIBS    += -lcrypto
 
-INCLUDEPATH += ../../external/minilzo
-DEPENDPATH += ../../external/minilzo
-
 using_frontend {
     # Recording profile stuff
     HEADERS += profilegroup.h
@@ -624,8 +621,6 @@ using_backend {
 
     using_libmp3lame {
       # Simple NuppelVideo Recorder
-      #INCLUDEPATH += ../../external/minilzo
-      #DEPENDPATH += ../../external/minilzo
       using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
       !mingw:!win32-msvc*:HEADERS += recorders/NuppelVideoRecorder.h
       !mingw:!win32-msvc*:SOURCES += recorders/NuppelVideoRecorder.cpp
@@ -929,7 +924,7 @@ LIBS += -lmythservicecontracts-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_backend:using_mp3lame: LIBS += -lmp3lame
-using_backend: LIBS += -L../../external/minilzo -lmythminilzo-$$LIBVERSION
+using_backend: LIBS += -llzo2
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 using_openmax {
@@ -955,7 +950,6 @@ using_openmax {
 
     using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
     using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-    using_backend: POST_TARGETDEPS += ../../external/minilzo/libmythminilzo-$${MYTH_LIB_EXT}
 }
 
 INCLUDEPATH += $$POSTINC
