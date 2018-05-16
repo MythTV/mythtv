@@ -27,6 +27,7 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
     void AddSelection (int value, const QString &label = "");
     QString GetValue(void) const { return GetDataValue().toString(); }
     int GetIntValue(void) const { return GetDataValue().toInt(); }
+    bool keyPressEvent(QKeyEvent *event);
 
   protected:
     virtual bool ParseElement(
@@ -36,6 +37,7 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
 
     virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
     virtual bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0);
+    void ShowEntryDialog(QString initialEntry);
 
     bool m_hasTemplate;
     QString m_negativeTemplate;
@@ -43,6 +45,42 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
     QString m_positiveTemplate;
 
     uint m_moveAmount;
+    int m_low;
+    int m_high;
+    int m_step;
+};
+
+// Convenience Dialog to allow entry of a Spinbox value
+
+class MUI_PUBLIC SpinBoxEntryDialog : public MythScreenType
+{
+    Q_OBJECT
+  public:
+    SpinBoxEntryDialog(MythScreenStack *parent, const char *name,
+        MythUIButtonList *parentList, QString searchText,
+        int low, int high, int step);
+    ~SpinBoxEntryDialog(void);
+
+    bool Create(void);
+
+  protected slots:
+    void entryChanged(void);
+    void okClicked(void);
+
+  protected:
+    MythUIButtonList  *m_parentList;
+    QString            m_searchText;
+    MythUITextEdit    *m_entryEdit;
+    MythUIButton      *m_cancelButton;
+    MythUIButton      *m_okButton;
+    MythUIText        *m_rulesText;
+    int                m_selection;
+    bool               m_okClicked;
+    int m_low;
+    int m_high;
+    int m_step;
+
+
 };
 
 #endif
