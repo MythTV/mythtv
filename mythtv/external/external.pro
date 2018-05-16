@@ -6,7 +6,6 @@ win32-msvc* {
 
 # Libraries without dependencies
 
-SUBDIRS += libhdhomerun
 SUBDIRS += libmythbluray
 SUBDIRS += libmythdvdnav
 SUBDIRS += libsamplerate

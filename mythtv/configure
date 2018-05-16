@@ -5994,6 +5994,17 @@ if enabled libmpeg2external; then
     disable mythtranscode
 fi
 
+if enabled hdhomerun; then
+     # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
+    if check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
+        :
+    elif check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
+        add_cxxflags -DHDHOMERUN_V2
+    else
+        disable hdhomerun
+    fi
+fi
+
 check_header stdint.h
 
 # test for lrint in math.h
@@ -7103,7 +7114,6 @@ if enabled source_path_used; then
         tools
         external/zeromq
         external/nzmqt/src
-        external/libhdhomerun
         external/libmythbluray
         external/libmythdvdnav
         external/libsamplerate
@@ -7127,7 +7137,6 @@ if enabled source_path_used; then
         libswscale/Makefile
         external/zeromq/Makefile
         external/nzmqt/src/Makefile
-        external/libhdhomerun/Makefile
         external/libmythbluray/Makefile
         external/libmythdvdnav/Makefile
         external/libsamplerate/Makefile
@@ -7695,12 +7704,6 @@ if enabled mythlogserver; then
     echo "Configuring nzmqt..."
     (cd external/nzmqt/src ; \
            ${qmakeconf} -o Makefile)
-fi
-if ! disabled hdhomerun ; then
-    echo "Configuring libhdhomerun..."
-    (cd external/libhdhomerun; \
-           ${qmakeconf} -o Makefile.lib CONFIG+=Makefile.lib; \
-           ${qmakeconf} -o Makefile.app CONFIG+=Makefile.app)
 fi
 echo "Configuring libmythbluray..."
 (cd external/libmythbluray ; \

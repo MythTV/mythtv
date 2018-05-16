@@ -38,7 +38,7 @@
 #endif
 
 #ifdef USING_HDHOMERUN
-#include "hdhomerun.h"
+#include "hdhomerun/hdhomerun.h"
 #endif
 
 #ifdef USING_VBOX
@@ -504,8 +504,13 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         const int max_count   = 50;
         hdhomerun_discover_device_t result_list[max_count];
 
+#ifdef HDHOMERUN_V2
+        int result = hdhomerun_discover_find_devices_custom_v2(
+            target_ip, device_type, device_id, result_list, max_count);
+#else
         int result = hdhomerun_discover_find_devices_custom(
             target_ip, device_type, device_id, result_list, max_count);
+#endif
 
         if (result == -1)
         {

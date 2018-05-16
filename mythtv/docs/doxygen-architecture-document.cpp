@@ -185,15 +185,6 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library does not depend on any of our libraries.
 
-  <dt>libhdhomerun
-      <dd>Interface to the SiliconDust HDHomeRun EtherNet connected TV tuner
-      products.
-
-      <a href="http://www.silicondust.com/hdhomerun/hdhomerun_development.pdf">
-      Documented externally</a>.
-
-      This library does not depend on any of our libraries.
-
 </dl>
 Two libraries libmythmpeg2 and libsamplerate appear redundant, but
 libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and

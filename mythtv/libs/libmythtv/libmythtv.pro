@@ -759,16 +759,6 @@ using_backend {
     using_hdhomerun {
         # MythTV HDHomeRun glue
 
-        !win32-msvc* {
-          QMAKE_CXXFLAGS += -isystem ../../external/libhdhomerun
-        }
-
-        win32-msvc* {
-          INCLUDEPATH += ../../external/libhdhomerun
-        }
-
-        DEPENDPATH += ../../external/libhdhomerun
-
         HEADERS += recorders/hdhrsignalmonitor.h
         HEADERS += recorders/hdhrchannel.h
         HEADERS += recorders/hdhrrecorder.h
@@ -938,7 +928,6 @@ LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythservicecontracts-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
-using_hdhomerun: LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend:using_mp3lame: LIBS += -lmp3lame
 using_backend: LIBS += -L../../external/minilzo -lmythminilzo-$$LIBVERSION
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
@@ -966,7 +955,6 @@ using_openmax {
 
     using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
     using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-    using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
     using_backend: POST_TARGETDEPS += ../../external/minilzo/libmythminilzo-$${MYTH_LIB_EXT}
 }
 

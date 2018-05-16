@@ -6,10 +6,6 @@ ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
 endif
 
-ifdef CONFIG_HDHOMERUN
-    SUBDIRS += libhdhomerun
-endif
-
 ifdef CONFIG_X11
     SUBDIRS += libXNVCtrl
 endif
@@ -46,10 +42,6 @@ nzmqt-all:	zeromq-all
 
 nzmqt-install nzmqt-uninstall nzmqt-clean nzmqt-distclean:
 	${MAKE} -C nzmqt/src ${@:nzmqt-%=%}
-
-libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install libhdhomerun-uninstall:
-	${MAKE} -C libhdhomerun -f Makefile.lib ${@:libhdhomerun-%=%}
-	${MAKE} -C libhdhomerun -f Makefile.app ${@:libhdhomerun-%=%}
 
 libmythbluray-all libmythbluray-clean libmythbluray-distclean libmythbluray-install libmythbluray-uninstall:
 	${MAKE} -C libmythbluray ${@:libmythbluray-%=%}
