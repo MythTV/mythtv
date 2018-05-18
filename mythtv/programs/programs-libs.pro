@@ -19,7 +19,6 @@ win32-msvc* {
 INCLUDEPATH += ../../external/libmythbluray/src
 INCLUDEPATH += ../../external/libmythsoundtouch
 INCLUDEPATH += ../../external/libudfread
-INCLUDEPATH += ../../external/libsamplerate
 INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext
 INCLUDEPATH += ../../libs/libmythservicecontracts

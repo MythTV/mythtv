@@ -937,7 +937,6 @@ else
         Get-ChildItem external\FFmpeg\*.vcxproj*        -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\libmythbluray\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\libmythdvdnav\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
-        Get-ChildItem external\libsamplerate\*.vcxproj* -recurse | remove-item -ErrorAction SilentlyContinue
         Get-ChildItem external\nzmqt\*.vcxproj*         -recurse | remove-item -ErrorAction SilentlyContinue
 
         Remove-Item mythtv.sln  -ErrorAction SilentlyContinue

@@ -5613,6 +5613,7 @@ check_exec -lm << EOF && enable cpu_clips_negative
         return 0 ;
     }
 EOF
+require_pkg_config samplerate samplerate samplerate.h src_get_version
 
 # required to compile inline sse with some compilers
 enabled x86 && enabled sse2 && add_cxxflags "-msse"
@@ -7708,9 +7709,6 @@ echo "Configuring libmythbluray..."
        ${qmakeconf} -o Makefile)
 echo "Configuring libmythdvdnav..."
 (cd external/libmythdvdnav ; \
-       ${qmakeconf} -o Makefile)
-echo "Configuring libsamplerate..."
-(cd external/libsamplerate ; \
        ${qmakeconf} -o Makefile)
 echo "Configuring libudfread..."
 (cd external/libudfread ; \

@@ -8,7 +8,6 @@ win32-msvc* {
 
 SUBDIRS += libmythbluray
 SUBDIRS += libmythdvdnav
-SUBDIRS += libsamplerate
 SUBDIRS += libudfread
 SUBDIRS += nzmqt/src/nzmqt.pro
 SUBDIRS += libmythsoundtouch

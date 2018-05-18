@@ -1,6 +1,6 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg libmythbluray libmythdvdnav libsamplerate libudfread
+SUBDIRS = FFmpeg libmythbluray libmythdvdnav libudfread
 SUBDIRS += libmythsoundtouch
 ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
@@ -48,9 +48,6 @@ libmythbluray-all libmythbluray-clean libmythbluray-distclean libmythbluray-inst
 
 libmythdvdnav-all libmythdvdnav-clean libmythdvdnav-distclean libmythdvdnav-install libmythdvdnav-uninstall:
 	${MAKE} -C libmythdvdnav ${@:libmythdvdnav-%=%}
-
-libsamplerate-all libsamplerate-clean libsamplerate-distclean libsamplerate-install libsamplerate-uninstall:
-	${MAKE} -C libsamplerate ${@:libsamplerate-%=%}
 
 libudfread-all libudfread-clean libudfread-distclean libudfread-install libudfread-uninstall:
 	${MAKE} -C libudfread ${@:libudfread-%=%}
