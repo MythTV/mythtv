@@ -20,12 +20,11 @@ INSTALLS += target installscripts installgiantbomb installgiantbombxsl
 
 # Input
 HEADERS += gamehandler.h rominfo.h gamesettings.h gameui.h
-HEADERS += rom_metadata.h romedit.h gamedetails.h gamescan.h external/unzip.h
-HEADERS += external/ioapi.h
+HEADERS += rom_metadata.h romedit.h gamedetails.h gamescan.h
 
 SOURCES += main.cpp gamehandler.cpp rominfo.cpp gameui.cpp
 SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
-SOURCES += gamedetails.cpp gamescan.cpp external/unzip.c external/ioapi.c
+SOURCES += gamedetails.cpp gamescan.cpp
 
 DEFINES += MPLUGIN_API NOUNCRYPT
 
@@ -33,7 +32,7 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-LIBS += -lz
+LIBS += -lz -lminizip
 
 #The following line was inserted by qt3to4
 QT += xml sql opengl network

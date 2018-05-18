@@ -644,6 +644,13 @@ if ! check_lib libexif/exif-data.h exif_loader_new -lexif ; then
     disable exif
 fi
 
+if enabled game; then
+    if ! check_lib minizip/unzip.h unzGetCurrentFileInfo -lminizip ; then
+        echo 'minizip required to compile mythgame'
+        disable game
+    fi
+fi
+
 if enabled netvision; then
     disable_netvision(){
         msg="$1"
