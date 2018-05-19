@@ -833,5 +833,3 @@ bool ChannelBase::IsExternalChannelChangeInUse(void)
 
     return !m_externalChanger.isEmpty();
 }
-
-;

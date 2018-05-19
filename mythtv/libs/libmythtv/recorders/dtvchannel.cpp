@@ -265,7 +265,7 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     }
 
     bool ok = true;
-    if (m_externalChanger.isEmpty())
+    if (!IsExternalChannelChangeInUse())
     {
         if (IsIPTV())
         {
