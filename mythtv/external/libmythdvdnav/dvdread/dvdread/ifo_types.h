@@ -215,10 +215,10 @@ typedef struct {
   unsigned int interleaved      : 1;
   unsigned int stc_discontinuity: 1;
   unsigned int seamless_angle   : 1;
-
+  unsigned int zero_1           : 1;
   unsigned int playback_mode    : 1;  /**< When set, enter StillMode after each VOBU */
   unsigned int restricted       : 1;  /**< ?? drop out of fastforward? */
-  unsigned int unknown2         : 6;
+  unsigned int cell_type        : 5;  /** for karaoke, reserved otherwise */
   uint8_t still_time;
   uint8_t cell_cmd_nr;
   dvd_time_t playback_time;
@@ -316,7 +316,7 @@ typedef struct {
   uint8_t  entry_id;
   unsigned int block_mode : 2;
   unsigned int block_type : 2;
-  unsigned int unknown1   : 4;
+  unsigned int zero_1   : 4;
   uint16_t ptl_id_mask;
   uint32_t pgc_start_byte;
   pgc_t *pgc;
@@ -578,7 +578,8 @@ typedef struct {
  */
 typedef struct {
   uint16_t lang_code;
-  uint16_t unknown;      /* 0x0001, title 1? disc 1? side 1? */
+  uint8_t  zero_1;
+  uint8_t char_set;      /* 0x00 reserved Unicode, 0x01 ISO 646, 0x10 JIS Roman & JIS Kanji, 0x11 ISO 8859-1, 0x12 Shift JIS Kanji */
   uint32_t txtdt_start_byte;  /* prt, rel start of vmg_txtdt_mgi  */
   txtdt_t  *txtdt;
 } ATTRIBUTE_PACKED txtdt_lu_t;
@@ -588,8 +589,9 @@ typedef struct {
  * Text Data Manager Information. (Incomplete)
  */
 typedef struct {
-  char disc_name[14];            /* how many bytes?? */
-  uint16_t nr_of_language_units; /* 32bit??          */
+  char disc_name[12];
+  uint16_t zero_1;
+  uint16_t nr_of_language_units;
   uint32_t last_byte;
   txtdt_lu_t *lu;
 } ATTRIBUTE_PACKED txtdt_mgi_t;

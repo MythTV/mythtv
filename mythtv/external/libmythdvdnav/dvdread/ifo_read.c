@@ -228,7 +228,7 @@ static void read_pgci_srp(pgci_srp_t *ps) {
   ps->entry_id                       = dvdread_getbits(&state, 8);
   ps->block_mode                     = dvdread_getbits(&state, 2);
   ps->block_type                     = dvdread_getbits(&state, 2);
-  ps->unknown1                       = dvdread_getbits(&state, 4);
+  ps->zero_1                         = dvdread_getbits(&state, 4);
   ps->ptl_id_mask                    = dvdread_getbits(&state, 16);
   ps->pgc_start_byte                 = dvdread_getbits(&state, 32);
 }
@@ -245,9 +245,10 @@ static void read_cell_playback(cell_playback_t *cp) {
   cp->interleaved                     = dvdread_getbits(&state, 1);
   cp->stc_discontinuity               = dvdread_getbits(&state, 1);
   cp->seamless_angle                  = dvdread_getbits(&state, 1);
+  cp->zero_1                          = dvdread_getbits(&state, 1);
   cp->playback_mode                   = dvdread_getbits(&state, 1);
   cp->restricted                      = dvdread_getbits(&state, 1);
-  cp->unknown2                        = dvdread_getbits(&state, 6);
+  cp->cell_type                       = dvdread_getbits(&state, 5);
   cp->still_time                      = dvdread_getbits(&state, 8);
   cp->cell_cmd_nr                     = dvdread_getbits(&state, 8);
 
@@ -1048,6 +1049,10 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   B2N_16(tt_srpt->nr_of_srpts);
   B2N_32(tt_srpt->last_byte);
 
+  /* E-One releases don't fill this field */
+  if(tt_srpt->last_byte == 0) {
+    tt_srpt->last_byte = tt_srpt->nr_of_srpts * sizeof(title_info_t) - 1 + TT_SRPT_SIZE;
+  }
   info_length = tt_srpt->last_byte + 1 - TT_SRPT_SIZE;
 
   tt_srpt->title = calloc(1, info_length);
@@ -1162,6 +1167,10 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
   CHECK_VALUE(vts_ptt_srpt->nr_of_srpts != 0);
   CHECK_VALUE(vts_ptt_srpt->nr_of_srpts < 100); /* ?? */
 
+  /* E-One releases don't fill this field */
+  if(vts_ptt_srpt->last_byte == 0) {
+    vts_ptt_srpt->last_byte  = vts_ptt_srpt->nr_of_srpts * sizeof(*data) - 1 + VTS_PTT_SRPT_SIZE;
+  }
   info_length = vts_ptt_srpt->last_byte + 1 - VTS_PTT_SRPT_SIZE;
   data = calloc(1, info_length);
   if(!data)
@@ -1254,13 +1263,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *ifofile) {
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgcn < 1000); /* ?? */
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgn != 0);
       CHECK_VALUE(vts_ptt_srpt->title[i].ptt[j].pgn < 100); /* ?? */
-      if (vts_ptt_srpt->title[i].ptt[j].pgcn == 0 ||
-          vts_ptt_srpt->title[i].ptt[j].pgcn >= 1000 ||
-          vts_ptt_srpt->title[i].ptt[j].pgn == 0 ||
-          vts_ptt_srpt->title[i].ptt[j].pgn >= 100) {
-        return 0;
-      }
-
+      //don't abort here. E-One DVDs contain PTT with pgcn or pgn == 0
     }
   }
 
@@ -1895,7 +1898,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     memcpy(&pgcit->pgci_srp[i], ptr, PGCI_SRP_SIZE);
     ptr += PGCI_SRP_SIZE;
     read_pgci_srp(&pgcit->pgci_srp[i]);
-    CHECK_VALUE(pgcit->pgci_srp[i].unknown1 == 0);
+    CHECK_VALUE(pgcit->pgci_srp[i].zero_1 == 0);
   }
   free(data);
 
@@ -1920,12 +1923,10 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
     pgcit->pgci_srp[i].pgc->ref_count = 1;
     if(!ifoRead_PGC(ifofile, pgcit->pgci_srp[i].pgc,
                     offset + pgcit->pgci_srp[i].pgc_start_byte)) {
-      int j;
-      for(j = 0; j <= i; j++) {
-        ifoFree_PGC(&pgcit->pgci_srp[j].pgc);
-      }
+      fprintf(stderr, "libdvdread: Unable to read invalid PCG\n");
+      //E-One releases provide boggus PGC, ie: out of bound start_byte
       free(pgcit->pgci_srp[i].pgc);
-      goto fail;
+      pgcit->pgci_srp[i].pgc = NULL;
     }
   }
 
