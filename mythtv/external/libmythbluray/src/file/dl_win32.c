@@ -61,6 +61,7 @@ void *dl_dlopen(const char *path, const char *version)
     char *name;
     void *result;
     int iresult;
+    DWORD flags = 0;
 
     name = str_printf("%s.dll", path);
     if (!name) {
@@ -76,11 +77,20 @@ void *dl_dlopen(const char *path, const char *version)
         return NULL;
     }
 
-    result = LoadLibraryW(wname);
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+    if (GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+                       "SetDefaultDllDirectories") != NULL)
+#endif
+        flags = LOAD_LIBRARY_SEARCH_APPLICATION_DIR |
+                LOAD_LIBRARY_SEARCH_SYSTEM32;
+
+    result = LoadLibraryExW(wname, NULL, flags);
 
     if (!result) {
         char buf[128];
         BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", path, dlerror(buf, sizeof(buf)));
+    } else {
+        BD_DEBUG(DBG_FILE, "opened library '%s'\n", path);
     }
 
     return result;

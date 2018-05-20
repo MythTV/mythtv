@@ -22,8 +22,7 @@ package javax.tv.service.navigation;
 import javax.tv.service.*;
 
 public abstract class ServiceDetailsSIChangeEvent extends SIChangeEvent {
-    public ServiceDetailsSIChangeEvent(ServiceDetails details,
-            SIChangeType type, SIElement element) {
+    public ServiceDetailsSIChangeEvent(ServiceDetails details, SIChangeType type, SIElement element) {
         super(details, type, element);
         this.details = details;
     }

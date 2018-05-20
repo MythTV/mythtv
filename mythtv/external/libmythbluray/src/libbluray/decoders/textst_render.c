@@ -23,7 +23,7 @@
 
 #include "util/macro.h"
 #include "util/logging.h"
-#include "libbluray/bluray.h"          /* bd_char_code_e */
+#include "bluray.h"          /* bd_char_code_e */
 
 #include <stdint.h>
 

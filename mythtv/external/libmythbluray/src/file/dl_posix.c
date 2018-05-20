@@ -27,6 +27,11 @@
 #include "util/logging.h"
 #include "util/strutl.h"
 
+#ifdef __APPLE__
+// Required to make dladdr available
+#    define _DARWIN_C_SOURCE
+#endif
+
 #if defined(HAVE_DLFCN_H)
 #   include <dlfcn.h>
 #elif defined(HAVE_SYS_DL_H)
@@ -39,12 +44,12 @@ static void *_dl_dlopen(const char *path)
 {
     void *result;
 
-    BD_DEBUG(DBG_FILE, "searching for library '%s' ...\n", path);
-
     result = dlopen(path, RTLD_LAZY);
 
     if (!result) {
         BD_DEBUG(DBG_FILE, "can't open library '%s': %s\n", path, dlerror());
+    } else {
+        BD_DEBUG(DBG_FILE, "opened library '%s'\n", path);
     }
 
     return result;
@@ -86,8 +91,6 @@ void *dl_dlopen(const char *path, const char *version)
             continue;
         }
 
-        BD_DEBUG(DBG_FILE, "Attempting to open %s\n", name);
-
         dll = _dl_dlopen (name);
         X_FREE(name);
         if (dll) {
@@ -114,6 +117,7 @@ int dl_dlclose(void *handle)
     return dlclose(handle);
 }
 
+#define PATH_SEPARATOR '/'
 const char *dl_get_path(void)
 {
     static char *lib_path    = NULL;
@@ -122,7 +126,25 @@ const char *dl_get_path(void)
     if (!initialized) {
         initialized = 1;
 
+#ifdef __APPLE__
+        Dl_info dl_info;
+        int ret = dladdr((void *)dl_get_path, &dl_info);
+
+        if (ret != 0) {
+            lib_path = strdup(dl_info.dli_fname);
+
+            /* cut library name from path */
+            char *p = strrchr(lib_path, PATH_SEPARATOR);
+            if (p) {
+                *(p+1) = 0;
+            }
+            BD_DEBUG(DBG_FILE, "library file is %s\n", lib_path);
+        } else {
+            BD_DEBUG(DBG_FILE, "Can't determine libbluray.so install path\n");
+        }
+#else
         BD_DEBUG(DBG_FILE, "Can't determine libbluray.so install path\n");
+#endif
     }
 
     return lib_path;

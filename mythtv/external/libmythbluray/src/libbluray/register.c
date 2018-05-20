@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010-2014  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,10 +76,10 @@ static const uint32_t bd_psr_init[BD_PSR_COUNT] = {
     0,           /*     PSR22: Stereoscopic status */
     0,           /* PS: PSR23: Display capability */
     0,           /* PS: PSR24: 3D capability */
-    0,           /*     PSR25 */
-    0,           /*     PSR26 */
-    0,           /*     PSR27 */
-    0,           /*     PSR28 */
+    0,           /* PS: PSR25: UHD capability */
+    0,           /* PS: PSR26: UHD display capability */
+    0,           /* PS: PSR27: HDR preference */
+    0,           /* PS: PSR28: SDR conversion preference */
                  /* PS: PSR29: player capability for video */
     BLURAY_VCAP_SECONDARY_HD |
     BLURAY_VCAP_25Hz_50Hz,
@@ -362,9 +362,9 @@ void bd_psr_restore_state(BD_REGISTERS *p)
  * GPR read / write
  */
 
-int bd_gpr_write(BD_REGISTERS *p, int reg, uint32_t val)
+int bd_gpr_write(BD_REGISTERS *p, unsigned int reg, uint32_t val)
 {
-    if (reg < 0 || reg >= BD_GPR_COUNT) {
+    if (reg >= BD_GPR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_gpr_write(%d): invalid register\n", reg);
         return -1;
     }
@@ -373,9 +373,9 @@ int bd_gpr_write(BD_REGISTERS *p, int reg, uint32_t val)
     return 0;
 }
 
-uint32_t bd_gpr_read(BD_REGISTERS *p, int reg)
+uint32_t bd_gpr_read(BD_REGISTERS *p, unsigned int reg)
 {
-    if (reg < 0 || reg >= BD_GPR_COUNT) {
+    if (reg >= BD_GPR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_gpr_read(%d): invalid register\n", reg);
         return 0;
     }
@@ -387,11 +387,11 @@ uint32_t bd_gpr_read(BD_REGISTERS *p, int reg)
  * PSR read / write
  */
 
-uint32_t bd_psr_read(BD_REGISTERS *p, int reg)
+uint32_t bd_psr_read(BD_REGISTERS *p, unsigned int reg)
 {
     uint32_t val;
 
-    if (reg < 0 || reg >= BD_PSR_COUNT) {
+    if (reg >= BD_PSR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_psr_read(%d): invalid register\n", reg);
         return -1;
     }
@@ -405,9 +405,9 @@ uint32_t bd_psr_read(BD_REGISTERS *p, int reg)
     return val;
 }
 
-int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
+int bd_psr_setting_write(BD_REGISTERS *p, unsigned int reg, uint32_t val)
 {
-    if (reg < 0 || reg >= BD_PSR_COUNT) {
+    if (reg >= BD_PSR_COUNT) {
         BD_DEBUG(DBG_BLURAY, "bd_psr_write(%d, %d): invalid register\n", reg, val);
         return -1;
     }
@@ -447,21 +447,20 @@ int bd_psr_setting_write(BD_REGISTERS *p, int reg, uint32_t val)
     return 0;
 }
 
-int bd_psr_write(BD_REGISTERS *p, int reg, uint32_t val)
+int bd_psr_write(BD_REGISTERS *p, unsigned int reg, uint32_t val)
 {
     if ((reg == 13) ||
         (reg >= 15 && reg <= 21) ||
-        (reg >= 23 && reg <= 24) ||
-        (reg >= 29 && reg <= 31) ||
+        (reg >= 23 && reg <= 31) ||
         (reg >= 48 && reg <= 61)) {
-      BD_DEBUG(DBG_BLURAY, "bd_psr_write(%d, %d): read-only register !\n", reg, val);
+      BD_DEBUG(DBG_BLURAY | DBG_CRIT, "bd_psr_write(%d, %d): read-only register !\n", reg, val);
       return -2;
   }
 
   return bd_psr_setting_write(p, reg, val);
 }
 
-int bd_psr_write_bits(BD_REGISTERS *p, int reg, uint32_t val, uint32_t mask)
+int bd_psr_write_bits(BD_REGISTERS *p, unsigned int reg, uint32_t val, uint32_t mask)
 {
     int result;
 
@@ -535,9 +534,23 @@ void registers_restore(BD_REGISTERS *p, const uint32_t *psr, const uint32_t *gpr
  *
  */
 
-void psr_init_3D(BD_REGISTERS *p, int initial_mode)
+int psr_init_3D(BD_REGISTERS *p, int initial_mode, int force)
 {
     bd_psr_lock(p);
+
+    /* make automatic initialization to fail if app has already changed player profile */
+    if (!force) {
+        if ((bd_psr_read(p, PSR_PROFILE_VERSION) & BLURAY_PLAYER_PROFILE_VERSION_MASK) >= 0x0300) {
+            BD_DEBUG(DBG_BLURAY | DBG_CRIT, "psr_init_3D() failed: profile version already set to >= 0x0300 (profile 6)\n");
+            bd_psr_unlock(p);
+            return -1;
+        }
+        if (bd_psr_read(p, PSR_PROFILE_VERSION) & BLURAY_PLAYER_PROFILE_3D_FLAG) {
+            BD_DEBUG(DBG_BLURAY | DBG_CRIT, "psr_init_3D() failed: 3D already set in profile\n");
+            bd_psr_unlock(p);
+            return -1;
+        }
+    }
 
     bd_psr_setting_write(p, PSR_OUTPUT_PREFER,
                          BLURAY_OUTPUT_PREFER_3D);
@@ -559,4 +572,44 @@ void psr_init_3D(BD_REGISTERS *p, int initial_mode)
                  !!initial_mode);
 
     bd_psr_unlock(p);
+
+    return 0;
+}
+
+int psr_init_UHD(BD_REGISTERS *p, int force)
+{
+    bd_psr_lock(p);
+
+    /* make automatic initialization to fail if app has already changed player profile */
+    if (!force) {
+        if ((bd_psr_read(p, PSR_PROFILE_VERSION) & BLURAY_PLAYER_PROFILE_VERSION_MASK) >= 0x0300) {
+          BD_DEBUG(DBG_BLURAY | DBG_CRIT, "psr_init_UHD() failed: profile version already >= 0x0300\n");
+          bd_psr_unlock(p);
+          return -1;
+        }
+        if (bd_psr_read(p, PSR_PROFILE_VERSION) & BLURAY_PLAYER_PROFILE_3D_FLAG) {
+            BD_DEBUG(DBG_BLURAY | DBG_CRIT, "psr_init_UHD() failed: 3D already set in profile\n");
+            bd_psr_unlock(p);
+            return -1;
+        }
+    }
+
+    bd_psr_setting_write(p, PSR_UHD_CAP,
+                         /* TODO */ 0xffffffff );
+
+    bd_psr_setting_write(p, PSR_UHD_DISPLAY_CAP,
+                         /* TODO */ 0xffffffff );
+
+    bd_psr_setting_write(p, PSR_UHD_HDR_PREFER,
+                         /* TODO */ 0xffffffff );
+
+    bd_psr_setting_write(p, PSR_UHD_SDR_CONV_PREFER,
+                         /* TODO */ 0 );
+
+    bd_psr_setting_write(p, PSR_PROFILE_VERSION,
+                         BLURAY_PLAYER_PROFILE_6_v3_1);
+
+    bd_psr_unlock(p);
+
+    return 0;
 }

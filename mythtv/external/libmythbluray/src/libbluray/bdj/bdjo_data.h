@@ -123,6 +123,7 @@ typedef struct {
 } BDJO_FILE_ACCESS_INFO;
 
 typedef struct bdjo_data {
+    uint32_t                  bdjo_version;
     BDJO_TERMINAL_INFO        terminal_info;
     BDJO_APP_CACHE_INFO       app_cache_info;
     BDJO_ACCESSIBLE_PLAYLISTS accessible_playlists;

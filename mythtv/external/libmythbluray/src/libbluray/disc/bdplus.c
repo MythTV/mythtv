@@ -258,6 +258,18 @@ int libbdplus_get_date(BD_BDPLUS *p)
     return _bdplus_get(p, "bdplus_get_code_date");
 }
 
+const uint8_t *libbdplus_get_data(BD_BDPLUS *p, int type)
+{
+    switch (type) {
+        case BD_BDPLUS_TYPE:
+            if (libbdplus_is_mmbd(p)) {
+                return (const uint8_t *)"mmbd";
+            }
+    }
+
+    return NULL;
+}
+
 void libbdplus_event(BD_BDPLUS *p, uint32_t event, uint32_t param1, uint32_t param2)
 {
     if (p && p->bdplus && p->event) {

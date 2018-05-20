@@ -20,14 +20,12 @@
 #if !defined(_BD_UO_MASK_TABLE_H_)
 #define _BD_UO_MASK_TABLE_H_
 
-#include <stdint.h>
-
 enum {
     UO_MASK_MENU_CALL_INDEX = 0,
     UO_MASK_TITLE_SEARCH_INDEX = 1,
 };
 
-typedef struct bd_uo_mask_table_s
+typedef struct bd_uo_mask_table
 {
     unsigned int menu_call : 1;
     unsigned int title_search : 1;
@@ -64,31 +62,5 @@ typedef struct bd_uo_mask_table_s
     unsigned int reserved1 : 1;
     unsigned int pip_pg_change : 1;
 } BD_UO_MASK;
-
-static inline BD_UO_MASK bd_uo_mask_combine(BD_UO_MASK a, BD_UO_MASK b)
-{
-    union {
-        uint64_t   u64;
-        BD_UO_MASK mask;
-    } mask_a = {0}, mask_b = {0}, result;
-
-    mask_a.mask = a;
-    mask_b.mask = b;
-    result.u64 = mask_a.u64 | mask_b.u64;
-
-    return result.mask;
-}
-
-#define EMPTY_UO_MASK  {0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0}
-
-static inline BD_UO_MASK bd_empty_uo_mask(void)
-{
-    static const union {
-        const uint64_t   u64;
-        const BD_UO_MASK mask;
-    } empty = {0};
-
-    return empty.mask;
-}
 
 #endif // _BD_UO_MASK_TABLE_H_

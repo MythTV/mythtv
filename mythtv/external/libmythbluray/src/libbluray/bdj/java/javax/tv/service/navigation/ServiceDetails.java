@@ -39,11 +39,9 @@ public interface ServiceDetails extends SIElement, CAIdentification {
 
     public Service getService();
 
-    public void addServiceComponentChangeListener(
-            ServiceComponentChangeListener listener);
+    public void addServiceComponentChangeListener(ServiceComponentChangeListener listener);
 
-    public void removeServiceComponentChangeListener(
-            ServiceComponentChangeListener listener);
+    public void removeServiceComponentChangeListener(ServiceComponentChangeListener listener);
 
     public DeliverySystemType getDeliverySystemType();
 }

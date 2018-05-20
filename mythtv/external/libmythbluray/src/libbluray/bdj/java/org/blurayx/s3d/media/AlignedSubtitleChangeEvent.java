@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.util.EventObject;
 
 public class AlignedSubtitleChangeEvent extends EventObject implements Serializable {
-
     private int subtitleAlignment;
 
     public AlignedSubtitleChangeEvent(AlignedSubtitleControl source, int subtitleAlignment) {

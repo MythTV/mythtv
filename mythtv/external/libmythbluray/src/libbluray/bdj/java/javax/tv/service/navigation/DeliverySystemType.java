@@ -30,13 +30,9 @@ public class DeliverySystemType {
         return name;
     }
 
-    public static final DeliverySystemType SATELLITE = new DeliverySystemType(
-            "SATELLITE");
-    public static final DeliverySystemType CABLE = new DeliverySystemType(
-            "CABLE");
-    public static final DeliverySystemType TERRESTRIAL = new DeliverySystemType(
-            "TERRESTRIAL");
-    public static final DeliverySystemType UNKNOWN = new DeliverySystemType(
-            "UNKNOWN");
+    public static final DeliverySystemType SATELLITE = new DeliverySystemType("SATELLITE");
+    public static final DeliverySystemType CABLE = new DeliverySystemType("CABLE");
+    public static final DeliverySystemType TERRESTRIAL = new DeliverySystemType("TERRESTRIAL");
+    public static final DeliverySystemType UNKNOWN = new DeliverySystemType("UNKNOWN");
     private String name;
 }

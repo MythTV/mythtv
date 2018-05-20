@@ -49,6 +49,7 @@ public class BDJLoader {
             this.fontPath = null;
             this.is = is;
         }
+
         public FontCacheAction(String fontPath) {
             this.fontPath = fontPath;
             this.is = null;
@@ -136,7 +137,7 @@ public class BDJLoader {
             return false;
         synchronized (BDJLoader.class) {
             if (queue == null)
-                queue = new BDJActionQueue(null, "BDJLoader");
+                queue = BDJActionQueue.create("BDJLoader");
         }
         queue.put(new BDJLoaderAction(title, restart, callback));
         return true;
@@ -147,7 +148,7 @@ public class BDJLoader {
 
         synchronized (BDJLoader.class) {
             if (queue == null)
-                queue = new BDJActionQueue(null, "BDJLoader");
+                queue = BDJActionQueue.create("BDJLoader");
         }
         queue.put(new BDJLoaderAction(null, false, callback));
         return true;
@@ -217,7 +218,7 @@ public class BDJLoader {
                     }
                 }
                 if (proxy != null) {
-                    logger.info("Terminating xlet " + (entry == null ? "?" : entry.getInitialClass()));
+                    logger.info("Terminating xlet " + entry.getInitialClass());
                     proxy.release();
                 }
             }
@@ -242,11 +243,8 @@ public class BDJLoader {
             // initialize appProxys
             for (int i = 0; i < appTable.length; i++) {
                 if (proxys[i] == null) {
-                    proxys[i] = BDJAppProxy.newInstance(
-                                                new BDJXletContext(
-                                                                   appTable[i],
-                                                                   bdjo.getAppCaches(),
-                                                                   gui));
+                    proxys[i] = BDJAppProxy.newInstance(new BDJXletContext(appTable[i], bdjo.getAppCaches(), gui));
+
                     /* log startup class, startup parameters and jar file */
                     String[] params = appTable[i].getParams();
                     String p = "";
@@ -318,14 +316,18 @@ public class BDJLoader {
             while (ids.hasMoreElements()) {
                 AppID id = (AppID)ids.nextElement();
                 BDJAppProxy proxy = (BDJAppProxy)db.getAppProxy(id);
-                proxy.stop(true);
+                if (proxy != null) {
+                    proxy.stop(true);
+                }
             }
 
             ids = db.getAppIDs(new CurrentServiceFilter());
             while (ids.hasMoreElements()) {
                 AppID id = (AppID)ids.nextElement();
                 BDJAppProxy proxy = (BDJAppProxy)db.getAppProxy(id);
-                proxy.release();
+                if (proxy != null) {
+                    proxy.release();
+                }
             }
 
             ((BDJAppsDatabase)db).newDatabase(null, null);

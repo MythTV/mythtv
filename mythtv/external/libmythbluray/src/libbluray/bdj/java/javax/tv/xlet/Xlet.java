@@ -19,8 +19,7 @@
 
 package javax.tv.xlet;
 
-public interface Xlet
-{
+public interface Xlet {
     public void initXlet(XletContext context) throws XletStateChangeException;
 
     public void destroyXlet(boolean force) throws XletStateChangeException;

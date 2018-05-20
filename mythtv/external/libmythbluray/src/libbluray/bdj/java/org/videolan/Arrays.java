@@ -36,7 +36,7 @@ public class Arrays {
         buffer.append('[');
         int length = array.length;
         for (int j = 0; j < length; j++) {
-                buffer.append(array[j]);
+            buffer.append(array[j]);
             if (j < (length - 1))
                 buffer.append(", ");
         }

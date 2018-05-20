@@ -25,15 +25,12 @@ import javax.tv.locator.InvalidLocatorException;
 import javax.tv.locator.Locator;
 
 public interface TransportStreamCollection extends Transport {
-    public SIRequest retrieveTransportStream(Locator locator,
-            SIRequestor requestor) throws InvalidLocatorException,
-            SecurityException;
+    public SIRequest retrieveTransportStream(Locator locator, SIRequestor requestor)
+            throws InvalidLocatorException, SecurityException;
 
     public SIRequest retrieveTransportStreams(SIRequestor requestor);
 
-    public void addTransportStreamChangeListener(
-            TransportStreamChangeListener listener);
+    public void addTransportStreamChangeListener(TransportStreamChangeListener listener);
 
-    public void removeTransportStreamChangeListener(
-            TransportStreamChangeListener listener);
+    public void removeTransportStreamChangeListener(TransportStreamChangeListener listener);
 }

@@ -23,14 +23,16 @@ import java.util.ArrayList;
 
 public class StrUtil {
     public static String Join(String[] strings, String separator) {
-        String result = "";
-        if (strings != null) {
-            result = strings[0];
+        if (strings != null && strings.length > 0) {
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(strings[0]);
             for (int i = 1; i < strings.length; i++) {
-                result = result + separator + strings[i];
+                buffer.append(separator);
+                buffer.append(strings[i]);
             }
+            return buffer.toString();
         }
-        return result;
+        return "";
     }
 
     public static String[] split(String str, char delimiter) {

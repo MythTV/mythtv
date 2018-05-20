@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2011-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,5 +32,7 @@ BD_PRIVATE uint32_t str_to_uint32(const char *s, int n);
 BD_PRIVATE void     str_tolower(char *s);
 
 BD_PRIVATE char * str_print_hex(char *out, const uint8_t *str, int count);
+
+BD_PRIVATE const char *str_strcasestr(const char *haystack, const char *needle);
 
 #endif // STRUTL_H_

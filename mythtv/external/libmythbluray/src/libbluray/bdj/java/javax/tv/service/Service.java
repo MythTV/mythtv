@@ -22,7 +22,6 @@ package javax.tv.service;
 import javax.tv.locator.Locator;
 
 public interface Service {
-
     public SIRequest retrieveDetails(SIRequestor requestor);
 
     public String getName();

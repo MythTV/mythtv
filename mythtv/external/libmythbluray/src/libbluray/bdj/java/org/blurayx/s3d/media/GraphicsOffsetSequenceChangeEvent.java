@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.util.EventObject;
 
 public class GraphicsOffsetSequenceChangeEvent extends EventObject implements Serializable {
-
     private int sequenceId;
 
     public GraphicsOffsetSequenceChangeEvent(GraphicsOffsetSequenceControl source, int sequenceId) {

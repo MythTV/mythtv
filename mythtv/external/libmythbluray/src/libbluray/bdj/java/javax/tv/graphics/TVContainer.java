@@ -26,8 +26,7 @@ import org.videolan.BDJXletContext;
 import org.videolan.Logger;
 
 public class TVContainer {
-    public static Container getRootContainer(XletContext context)
-    {
+    public static Container getRootContainer(XletContext context) {
         if (context == null) {
             Logger.getLogger(TVContainer.class.getName()).error("null context");
             throw new NullPointerException();

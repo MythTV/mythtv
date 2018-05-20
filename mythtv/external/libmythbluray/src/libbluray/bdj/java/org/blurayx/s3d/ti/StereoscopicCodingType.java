@@ -34,7 +34,7 @@ public class StereoscopicCodingType {
                         Class classCodingType = Class.forName("org.bluray.ti.CodingType");
                         Constructor constructor = classCodingType.getDeclaredConstructor(new Class[] { String.class });
                         constructor.setAccessible(true);
-                        type = (CodingType)constructor.newInstance(new String[] { "MPEG4_MVC_VIDEO" });
+                        type = (CodingType)constructor.newInstance((Object [])new String[] { "MPEG4_MVC_VIDEO" });
                     }
                     catch (Exception e) {
                         System.err.println("StereoscopicCodingType.MPEG4_MVC_VIDEO initialization failed");

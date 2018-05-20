@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2012  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2012-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
 #endif
 
 #include "bdid_parse.h"
+#include "bdmv_parse.h"
 
 #include "disc/disc.h"
 
@@ -34,25 +35,11 @@
 #include <stdlib.h>
 
 #define BDID_SIG1  ('B' << 24 | 'D' << 16 | 'I' << 8 | 'D')
-#define BDID_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
-#define BDID_SIG2B ('0' << 24 | '1' << 16 | '0' << 8 | '0')
 
 static int _parse_header(BITSTREAM *bs, uint32_t *data_start, uint32_t *extension_data_start)
 {
-    uint32_t sig1, sig2;
-
-    if (bs_seek_byte(bs, 0) < 0) {
+    if (!bdmv_parse_header(bs, BDID_SIG1, NULL)) {
         return 0;
-    }
-
-    sig1 = bs_read(bs, 32);
-    sig2 = bs_read(bs, 32);
-
-    if (sig1 != BDID_SIG1 ||
-       (sig2 != BDID_SIG2A &&
-        sig2 != BDID_SIG2B)) {
-       BD_DEBUG(DBG_NAV | DBG_CRIT, "id.bdmv failed signature match: expected BDID0100 got %8.8s\n", bs->buf);
-       return 0;
     }
 
     *data_start           = bs_read(bs, 32);
@@ -95,6 +82,10 @@ static BDID_DATA *_bdid_parse(BD_FILE_H *fp)
 
     bs_read_bytes(&bs, tmp, 16);
     str_print_hex(bdid->disc_id, tmp, 16);
+
+    if (extension_data_start) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "id.bdmv: ignoring unknown extension data\n");
+    }
 
     return bdid;
 }

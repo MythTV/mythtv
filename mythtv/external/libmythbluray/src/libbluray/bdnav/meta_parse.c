@@ -35,7 +35,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
@@ -54,6 +53,11 @@
 #define XML_FREE(p) (xmlFree(p), p = NULL)
 
 #define MAX_META_FILE_SIZE  0xfffff
+
+struct meta_root {
+    uint8_t              dl_count;
+    META_DL *            dl_entries;
+};
 
 #ifdef HAVE_LIBXML2
 static void _parseManifestNode(xmlNode * a_node, META_DL *disclib)
@@ -154,16 +158,16 @@ META_ROOT *meta_parse(BD_DISC *disc)
 {
 #ifdef HAVE_LIBXML2
     META_ROOT *root = calloc(1, sizeof(META_ROOT));
+    unsigned i;
+
     if (!root) {
         BD_DEBUG(DBG_CRIT, "out of memory\n");
         return NULL;
     }
     root->dl_count = 0;
 
-    xmlDocPtr doc;
     _findMetaXMLfiles(root, disc);
 
-    uint8_t i;
     for (i = 0; i < root->dl_count; i++) {
         uint8_t *data = NULL;
         size_t size;
@@ -173,6 +177,7 @@ META_ROOT *meta_parse(BD_DISC *disc)
         if (!data || size == 0) {
             BD_DEBUG(DBG_DIR, "Failed to read BDMV/META/DL/%s\n", root->dl_entries[i].filename);
         } else {
+            xmlDocPtr doc;
                 doc = xmlReadMemory((char*)data, (int)size, NULL, NULL, 0);
                 if (doc == NULL) {
                     BD_DEBUG(DBG_DIR, "Failed to parse BDMV/META/DL/%s\n", root->dl_entries[i].filename);

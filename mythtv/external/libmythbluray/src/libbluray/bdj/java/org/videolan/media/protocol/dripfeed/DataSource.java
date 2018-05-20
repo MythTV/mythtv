@@ -24,11 +24,11 @@ import org.dvb.media.DripFeedDataSource;
 
 public class DataSource extends DripFeedDataSource {
     public DataSource() {
-    	super();
+        super();
     }
 
     public DataSource(MediaLocator source) {
-    	super(source);
+        super(source);
     }
 
     public void feed(byte[] clip_part) {

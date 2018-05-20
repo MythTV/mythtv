@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010-2014  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -58,6 +58,10 @@ typedef enum {
     PSR_3D_STATUS        = 22,
     PSR_DISPLAY_CAP      = 23,
     PSR_3D_CAP           = 24,
+    PSR_UHD_CAP          = 25,
+    PSR_UHD_DISPLAY_CAP  = 26,
+    PSR_UHD_HDR_PREFER   = 27,
+    PSR_UHD_SDR_CONV_PREFER = 28,
     PSR_VIDEO_CAP        = 29,
     PSR_TEXT_CAP         = 30, /* text subtitles */
     PSR_PROFILE_VERSION  = 31, /* player profile and version */
@@ -104,7 +108,7 @@ BD_PRIVATE void bd_registers_free(BD_REGISTERS *);
  * @param reg  register number
  * @return value stored in register, -1 on error (invalid register number)
  */
-uint32_t bd_gpr_read(BD_REGISTERS *, int reg);
+uint32_t bd_gpr_read(BD_REGISTERS *, unsigned int reg);
 
 /**
  *
@@ -115,7 +119,7 @@ uint32_t bd_gpr_read(BD_REGISTERS *, int reg);
  * @param val  new value for register
  * @return 0 on success, -1 on error (invalid register number)
  */
-int bd_gpr_write(BD_REGISTERS *, int reg, uint32_t val);
+int bd_gpr_write(BD_REGISTERS *, unsigned int reg, uint32_t val);
 
 
 /*
@@ -130,7 +134,7 @@ int bd_gpr_write(BD_REGISTERS *, int reg, uint32_t val);
  * @param reg  register number
  * @return value stored in register, -1 on error (invalid register number)
  */
-uint32_t bd_psr_read(BD_REGISTERS *, int reg);
+uint32_t bd_psr_read(BD_REGISTERS *, unsigned int reg);
 
 /**
  *
@@ -143,7 +147,7 @@ uint32_t bd_psr_read(BD_REGISTERS *, int reg);
  * @param val  new value for register
  * @return 0 on success, -1 on error (invalid register number)
  */
-int bd_psr_write(BD_REGISTERS *, int reg, uint32_t val);
+int bd_psr_write(BD_REGISTERS *, unsigned int reg, uint32_t val);
 
 /**
  *
@@ -159,7 +163,7 @@ int bd_psr_write(BD_REGISTERS *, int reg, uint32_t val);
  * @param mask  bit mask. bits to be written are set to 1.
  * @return 0 on success, -1 on error (invalid register number)
  */
-BD_PRIVATE int bd_psr_write_bits(BD_REGISTERS *, int reg, uint32_t val, uint32_t mask);
+BD_PRIVATE int bd_psr_write_bits(BD_REGISTERS *, unsigned int reg, uint32_t val, uint32_t mask);
 
 /**
  *
@@ -172,7 +176,7 @@ BD_PRIVATE int bd_psr_write_bits(BD_REGISTERS *, int reg, uint32_t val, uint32_t
  * @param val  new value for register
  * @return 0 on success, -1 on error (invalid register number)
  */
-BD_PRIVATE int bd_psr_setting_write(BD_REGISTERS *, int reg, uint32_t val);
+BD_PRIVATE int bd_psr_setting_write(BD_REGISTERS *, unsigned int reg, uint32_t val);
 
 /**
  *
@@ -234,9 +238,9 @@ BD_PRIVATE void bd_psr_reset_backup_registers(BD_REGISTERS *);
 
 /* event data */
 typedef struct {
-    int      ev_type; /* event type */
+    unsigned ev_type; /* event type */
 
-    int      psr_idx; /* register index */
+    unsigned psr_idx; /* register index */
     uint32_t old_val; /* old value of register */
     uint32_t new_val; /* new value of register */
 } BD_PSR_EVENT;
@@ -263,7 +267,19 @@ void bd_psr_register_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), v
  */
 void bd_psr_unregister_cb(BD_REGISTERS *, void (*callback)(void*,BD_PSR_EVENT*), void *cb_handle);
 
-BD_PRIVATE void psr_init_3D(BD_REGISTERS *, int initial_mode);
+BD_PRIVATE int psr_init_3D(BD_REGISTERS *, int initial_mode, int force);
+
+/**
+ *
+ * Initialize registers for profile 6 (UHD) playback.
+ *
+ * Profiles 5 (3D) and 6 (UHD) can't be enabld at the same time.
+ *
+ * @param registers  BD_REGISTERS object
+ * @return 0 on success, -1 on error (invalid state)
+ *
+ */
+BD_PRIVATE int psr_init_UHD(BD_REGISTERS *, int force);
 
 
 /*

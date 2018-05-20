@@ -140,11 +140,11 @@ public class StreamInfo {
         return subpath_id;
     }
 
-    private byte coding_type;
-    private byte format;
-    private byte rate;
-    private char char_code;
-    private String lang;
-    private byte aspect;
-    private byte subpath_id;
+    private final byte coding_type;
+    private final byte format;
+    private final byte rate;
+    private final char char_code;
+    private final String lang;
+    private final byte aspect;
+    private final byte subpath_id;
 }

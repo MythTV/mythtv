@@ -51,7 +51,7 @@ uint32_t bd_get_debug_mask(void)
 
 void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...)
 {
-    static int   debug_init = 0;
+    static int   debug_init = 0, debug_file = 0;
     static FILE *logfile    = NULL;
 
     // Only call getenv() once.
@@ -73,6 +73,7 @@ void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...
             if (fp) {
                 logfile = fp;
                 setvbuf(logfile, NULL, _IONBF, 0);
+                debug_file = 1;
             } else {
                 fprintf(logfile, "%s:%d: Error opening log file %s\n", __FILE__, __LINE__, env);
             }
@@ -84,6 +85,7 @@ void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...
         char buffer[4096];
         va_list args;
         int len, len2;
+        BD_LOG_FUNC lf;
 
         len = sprintf(buffer, "%s:%d: ", f ? f + 1 : file, line);
         if (len < 0) {
@@ -97,12 +99,13 @@ void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...
         if (len2 < 0) {
             return;
         }
-
-        if (log_func) {
+        lf = log_func;
+        if (lf) {
             buffer[sizeof(buffer)-1] = 0;
-            log_func(buffer);
+            lf(buffer);
+        }
 
-        } else {
+        if (!lf || debug_file) {
             len += len2;
             if ((size_t)len >= sizeof(buffer)) {
                 len = sizeof(buffer);

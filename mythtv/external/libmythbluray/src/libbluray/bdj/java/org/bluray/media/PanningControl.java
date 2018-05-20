@@ -24,8 +24,7 @@ import javax.media.Control;
 public abstract interface PanningControl extends Control {
     public abstract void addPanningChangeListener(PanningChangeListener listener);
 
-    public abstract void removePanningChangeListener(
-            PanningChangeListener listener);
+    public abstract void removePanningChangeListener(PanningChangeListener listener);
 
     public abstract float getLeftRight();
 

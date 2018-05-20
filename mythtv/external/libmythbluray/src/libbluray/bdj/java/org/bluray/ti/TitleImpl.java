@@ -84,6 +84,10 @@ public class TitleImpl implements Title {
         return otherNum == titleNum;
     }
 
+    public int hashCode() {
+        return titleNum % 1023;
+    }
+
     public boolean hasMultipleInstances() {
         return false;
     }

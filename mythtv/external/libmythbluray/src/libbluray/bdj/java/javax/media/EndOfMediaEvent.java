@@ -20,8 +20,7 @@
 package javax.media;
 
 public class EndOfMediaEvent extends StopEvent {
-    public EndOfMediaEvent(Controller source, int previous, int current,
-            int target, Time mediaTime) {
+    public EndOfMediaEvent(Controller source, int previous, int current, int target, Time mediaTime) {
         super(source, previous, current, target, mediaTime);
     }
 

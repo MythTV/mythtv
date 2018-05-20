@@ -112,15 +112,21 @@ public class Preference {
     }
 
     public String toString() {
-        String result = "Preference:" + name + "[";
+        StringBuffer result = new StringBuffer();
         String comma = "";
+
+        result.append("Preference:");
+        result.append(name);
+        result.append("[");
+
         Iterator it = values.iterator();
         while (it.hasNext()) {
-            result += comma + (String)it.next();
+            result.append(comma);
+            result.append((String)it.next());
             comma = ",";
         }
-        result += ']';
-        return result;
+        result.append("]");
+        return result.toString();
     }
 
     private String name;

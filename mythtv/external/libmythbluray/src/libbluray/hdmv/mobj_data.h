@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -55,6 +55,7 @@ typedef struct {
 } MOBJ_OBJECT;
 
 typedef struct mobj_objects {
+    uint32_t    mobj_version;
     uint16_t    num_objects;
     MOBJ_OBJECT *objects;
 } MOBJ_OBJECTS;
