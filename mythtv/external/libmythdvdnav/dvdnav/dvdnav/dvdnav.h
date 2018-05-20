@@ -26,8 +26,8 @@
 #ifndef LIBDVDNAV_DVDNAV_H
 #define LIBDVDNAV_DVDNAV_H
 
-#define DVDNAV_VERSION 50400
-#define DVDNAV_VERSION_GIT "8a270d6dd40ac43c98c948fe9d10e5bcb4aa3d41"
+#define DVDNAV_VERSION "6.0.0"
+#define DVDNAV_VERSION_GIT "dcb9109e45ccd304ec82a7c7bf46cca63620adf9"
 
 #ifdef __cplusplus
 extern "C" {
@@ -583,7 +583,7 @@ uint8_t dvdnav_get_video_aspect(dvdnav_t *self);
 /*
  * Get video resolution.
  */
-int dvdnav_get_video_resolution(dvdnav_t *self, uint32_t *width, uint32_t *height);
+dvdnav_status_t dvdnav_get_video_resolution(dvdnav_t *self, uint32_t *width, uint32_t *height);
 
 /*
  * Get video scaling permissions.

@@ -216,8 +216,8 @@ link_t play_Cell(vm_t *vm) {
       }
 #endif
       break;
-    case 2: /*  ?? */
-    case 3: /*  ?? */
+    case 2: /*  reserved */
+    case 3: /*  reserved */
     default:
       fprintf(MSG_OUT, "libdvdnav: Invalid? Cell block_mode (%d), block_type (%d)\n",
               (vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_mode,
@@ -304,8 +304,8 @@ link_t play_Cell_post(vm_t *vm) {
         (vm->state).cellN++;
       }
       break;
-    case 2: /*  ?? */
-    case 3: /*  ?? */
+    case 2: /*  reserved */
+    case 3: /*  reserved */
     default:
       fprintf(MSG_OUT, "libdvdnav: Invalid? Cell block_mode (%d), block_type (%d)\n",
               (vm->state).pgc->cell_playback[(vm->state).cellN - 1].block_mode,

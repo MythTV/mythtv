@@ -39,6 +39,7 @@
 #include <dvdread/ifo_types.h> /* For vm_cmd_t */
 #include "vm/decoder.h"
 #include "vm/vm.h"
+#include "vm/getset.h"
 #include "dvdnav_internal.h"
 #include "read_cache.h"
 #include <dvdread/nav_read.h>
@@ -152,7 +153,7 @@ static dvdnav_status_t dvdnav_open_common(dvdnav_t** dest, const char *path,
   struct timeval time;
 
   /* Create a new structure */
-  fprintf(MSG_OUT, "libdvdnav: Using dvdnav version %d - commit %s\n", DVDNAV_VERSION, DVDNAV_VERSION_GIT);
+  fprintf(MSG_OUT, "libdvdnav: Using dvdnav version %s - commit %s\n", DVDNAV_VERSION, DVDNAV_VERSION_GIT);
 
   (*dest) = NULL;
   this = (dvdnav_t*)calloc(1, sizeof(dvdnav_t));
@@ -485,6 +486,9 @@ int64_t dvdnav_get_current_time(dvdnav_t *this) {
   int64_t tm=0;
   dvd_state_t *state = &this->vm->state;
 
+  if(! state->pgc)
+    return 0;
+
   for(i=0; i<state->cellN-1; i++) {
     if(!
         (state->pgc->cell_playback[i].block_type == BLOCK_TYPE_ANGLE_BLOCK &&
@@ -515,6 +519,12 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
       return DVDNAV_STATUS_ERR;
     }
     this->started = 1;
+  }
+
+  if (!this->vm->state.pgc) {
+      printerr("No current PGC.");
+      pthread_mutex_unlock(&this->vm_lock);
+      return DVDNAV_STATUS_ERR;
   }
 
   state = &(this->vm->state);
@@ -781,6 +791,14 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
     fprintf(MSG_OUT, "libdvdnav: SPU_STREAM_CHANGE stream_id_pan_scan=%d\n",stream_change->physical_pan_scan);
     fprintf(MSG_OUT, "libdvdnav: SPU_STREAM_CHANGE returning DVDNAV_STATUS_OK\n");
 #endif
+    /* This is not realy the right place to do this. FOSL_BTNN should set the register
+     * at HLI_S_PTM rather than when we enter the SPU. As well we should activate FOAC_BTNN
+     * at HLI_E_PTM
+     */
+    if (this->pci.hli.hl_gi.fosl_btnn != 0) {
+      set_HL_BTN(this->vm, this->pci.hli.hl_gi.fosl_btnn);
+    }
+
     pthread_mutex_unlock(&this->vm_lock);
     return DVDNAV_STATUS_OK;
   }
@@ -935,12 +953,12 @@ uint8_t dvdnav_get_video_aspect(dvdnav_t *this) {
 
   return retval;
 }
-int dvdnav_get_video_resolution(dvdnav_t *this, uint32_t *width, uint32_t *height) {
+dvdnav_status_t dvdnav_get_video_resolution(dvdnav_t *this, uint32_t *width, uint32_t *height) {
   int w, h;
 
   if(!this->started) {
     printerr("Virtual DVD machine not started.");
-    return -1;
+    return DVDNAV_STATUS_ERR;
   }
 
   pthread_mutex_lock(&this->vm_lock);
@@ -949,7 +967,7 @@ int dvdnav_get_video_resolution(dvdnav_t *this, uint32_t *width, uint32_t *heigh
 
   *width  = w;
   *height = h;
-  return 0;
+  return DVDNAV_STATUS_OK;
 }
 
 uint8_t dvdnav_get_video_scale_permission(dvdnav_t *this) {
@@ -1098,13 +1116,13 @@ int8_t dvdnav_get_audio_logical_stream(dvdnav_t *this, uint8_t audio_num) {
 dvdnav_status_t dvdnav_get_audio_attr(dvdnav_t *this, uint8_t audio_num, audio_attr_t *audio_attr) {
   if(!this->started) {
     printerr("Virtual DVD machine not started.");
-    return -1;
+    return DVDNAV_STATUS_ERR;
   }
   pthread_mutex_lock(&this->vm_lock);
   if (!this->vm->state.pgc) {
     printerr("No current PGC.");
     pthread_mutex_unlock(&this->vm_lock);
-    return -1;
+    return DVDNAV_STATUS_ERR;
   }
   *audio_attr=vm_get_audio_attr(this->vm, audio_num);
   pthread_mutex_unlock(&this->vm_lock);
@@ -1135,13 +1153,13 @@ int8_t dvdnav_get_spu_logical_stream(dvdnav_t *this, uint8_t subp_num) {
 dvdnav_status_t dvdnav_get_spu_attr(dvdnav_t *this, uint8_t audio_num, subp_attr_t *subp_attr) {
   if(!this->started) {
     printerr("Virtual DVD machine not started.");
-    return -1;
+    return DVDNAV_STATUS_ERR;
   }
   pthread_mutex_lock(&this->vm_lock);
   if (!this->vm->state.pgc) {
     printerr("No current PGC.");
     pthread_mutex_unlock(&this->vm_lock);
-    return -1;
+    return DVDNAV_STATUS_ERR;
   }
   *subp_attr=vm_get_subp_attr(this->vm, audio_num);
   pthread_mutex_unlock(&this->vm_lock);

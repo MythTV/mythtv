@@ -269,6 +269,12 @@ dvdnav_status_t dvdnav_go_up(dvdnav_t *this) {
   /* A nice easy function... delegate to the VM */
   int retval;
   pthread_mutex_lock(&this->vm_lock);
+  if (!this->vm->state.pgc) {
+    printerr("No current PGC.");
+    pthread_mutex_unlock(&this->vm_lock);
+    return DVDNAV_STATUS_ERR;
+  }
+
   retval = vm_jump_up(this->vm);
   pthread_mutex_unlock(&this->vm_lock);
 

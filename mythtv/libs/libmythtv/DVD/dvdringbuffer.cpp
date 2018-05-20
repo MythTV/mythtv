@@ -2021,7 +2021,7 @@ int DVDRingBuffer::GetAudioTrackType(uint idx)
     if (physicalStreamId < 0)
         return -1;
 
-    if (dvdnav_get_audio_attr(m_dvdnav, physicalStreamId, &attributes) >= 1)
+    if (dvdnav_get_audio_attr(m_dvdnav, physicalStreamId, &attributes) == DVDNAV_STATUS_OK)
     {
         LOG(VB_AUDIO, LOG_INFO, QString("DVD Audio Track #%1 Language "
                                         "Extension Code - %2")

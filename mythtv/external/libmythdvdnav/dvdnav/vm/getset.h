@@ -38,6 +38,7 @@ int  set_MENU(vm_t *vm, int menu);
 int  set_PGCN(vm_t *vm, int pgcN);
 int  set_PGN(vm_t *vm); /* Set PGN based on (vm->state).CellN */
 void set_RSMinfo(vm_t *vm, int cellN, int blockN);
+void set_HL_BTN(vm_t *vm, int btnn);
 
 /* Get */
 int get_TT(vm_t *vm, int vtsN, int vts_ttn);

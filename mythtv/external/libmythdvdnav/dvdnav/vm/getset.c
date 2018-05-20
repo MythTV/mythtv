@@ -172,6 +172,9 @@ int set_PGN(vm_t *vm) {
   int new_pgN = 0;
   int dummy, part = 0;
 
+  if ((vm->state).pgc == NULL)
+    return 0;
+
   while(new_pgN < (vm->state).pgc->nr_of_programs
         && (vm->state).cellN >= (vm->state).pgc->program_map[new_pgN])
     new_pgN++;
@@ -211,6 +214,13 @@ void set_RSMinfo(vm_t *vm, int cellN, int blockN) {
   for(i = 0; i < 5; i++) {
     (vm->state).rsm_regs[i] = (vm->state).registers.SPRM[4 + i];
   }
+}
+
+
+/* Force the highlight button number register */
+void set_HL_BTN(vm_t *vm, int btnn)
+{
+    (vm->state).HL_BTNN_REG = btnn << 10;
 }
 
 /* Get functions */
@@ -279,6 +289,10 @@ int get_ID(vm_t *vm, int id) {
 int get_PGCN(vm_t *vm) {
   pgcit_t *pgcit;
   int pgcN = 1;
+
+  if ((vm->state).pgc == NULL) {
+    return 0; /* error */
+  }
 
   pgcit = get_PGCIT(vm);
 

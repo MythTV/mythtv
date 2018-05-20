@@ -42,7 +42,7 @@
 
 #ifdef BUTTON_TESTING
 
-#include "nav_print.h"
+#include <dvdread/nav_print.h>
 
 static void print_time(dvd_time_t *dtime) {
   const char *rate;
@@ -403,6 +403,12 @@ dvdnav_status_t dvdnav_button_activate(dvdnav_t *this, pci_t *pci) {
   }
   pthread_mutex_lock(&this->vm_lock);
 
+  if(!this->vm->state.pgc) {
+    printerr("No current PGC.");
+    pthread_mutex_unlock(&this->vm_lock);
+    return DVDNAV_STATUS_ERR;
+  }
+
   button = this->vm->state.HL_BTNN_REG >> 10;
 
   if((button <= 0) || (button > pci->hli.hl_gi.btn_ns)) {
@@ -454,6 +460,13 @@ dvdnav_status_t dvdnav_button_activate(dvdnav_t *this, pci_t *pci) {
 dvdnav_status_t dvdnav_button_activate_cmd(dvdnav_t *this, int32_t button, vm_cmd_t *cmd)
 {
   pthread_mutex_lock(&this->vm_lock);
+
+  if(!this->vm->state.pgc) {
+    printerr("No current PGC.");
+    pthread_mutex_unlock(&this->vm_lock);
+    return DVDNAV_STATUS_ERR;
+  }
+
   /* make the VM execute the appropriate code and probably
    * schedule a jump */
 #ifdef BUTTON_TESTING
