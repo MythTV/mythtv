@@ -20,13 +20,11 @@
 package javax.tv.locator;
 
 public class MalformedLocatorException extends java.lang.Exception {
-    public MalformedLocatorException()
-    {
+    public MalformedLocatorException() {
         super();
     }
 
-    public MalformedLocatorException(String reason)
-    {
+    public MalformedLocatorException(String reason) {
         super(reason);
     }
 

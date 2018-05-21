@@ -23,27 +23,27 @@ public class FontIndexData {
     public FontIndexData() {
 
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public String getFormat() {
         return format;
     }
-    
+
     public String getFileName() {
         return filename;
     }
-    
+
     public int getMinSize() {
         return minSize;
     }
-    
+
     public int getMaxSize() {
         return maxSize;
     }
-    
+
     public int getStyle() {
         return style;
     }

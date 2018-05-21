@@ -49,7 +49,7 @@ public class LocatorFactoryImpl extends LocatorFactory {
             logger.error("null locator");
             throw new NullPointerException("Source Locator is null");
         }
-        if (source instanceof BDLocator){
+        if (source instanceof BDLocator) {
             return new Locator[] { source };
         }
         logger.error("unsupported locator: " + source);

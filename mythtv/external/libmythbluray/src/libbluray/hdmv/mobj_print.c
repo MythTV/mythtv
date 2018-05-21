@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2009-2012  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2009-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -54,10 +54,10 @@ static const char * const psr_info[128] = {
     "/*     PSR22: Stereoscopic status */ /* 2D / 3D */ ",
     "/* RO: PSR23: display capablity */",
     "/* RO: PSR24: 3D capability */",
-    "/*     PSR25 */",
-    "/*     PSR26 */",
-    "/*     PSR27 */",
-    "/*     PSR28 */",
+    "/* RO: PSR25: UHD capability */",
+    "/* RO: PSR26: UHD display capability */",
+    "/* RO: PSR27: HDR preference */",
+    "/* RO: PSR28: SDR conversion preference */",
     "/* RO: PSR29: player capability for video */",
     "/* RO: PSR30: player capability for text subtitle */",
     "/* RO: PSR31: Player profile and version */",

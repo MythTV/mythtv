@@ -23,8 +23,7 @@ import javax.tv.service.SIElement;
 import javax.tv.service.SIRequestor;
 import javax.tv.service.SIRequest;
 
-public interface Network extends SIElement
-{
+public interface Network extends SIElement {
     public int getNetworkID();
 
     public String getName();

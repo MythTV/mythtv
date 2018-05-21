@@ -21,8 +21,7 @@ package javax.tv.service.selection;
 
 import java.util.EventObject;
 
-public class ServiceContextEvent extends EventObject
-{
+public class ServiceContextEvent extends EventObject {
     public ServiceContextEvent(ServiceContext context) {
         super(context);
         this.context = context;

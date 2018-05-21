@@ -86,10 +86,8 @@ public class SIManagerImpl extends SIManager {
     }
 
     public Service getService(Locator locator) throws InvalidLocatorException, SecurityException {
-
-        BDLocator bdLocator = null;
         try {
-            bdLocator = new BDLocator(locator.toExternalForm());
+            new BDLocator(locator.toExternalForm());
         } catch (org.davic.net.InvalidLocatorException e) {
             System.err.println("invalid locator: " + locator.toExternalForm() + "\n" + org.videolan.Logger.dumpStack(e));
             throw new javax.tv.locator.InvalidLocatorException(locator);
@@ -99,9 +97,9 @@ public class SIManagerImpl extends SIManager {
     }
 
     public String[] getSupportedDimensions() {
-         String[] dimensions = new String[1];
-         dimensions[0] = RatingDimensionImpl.dimensionName;
-         return dimensions;
+        String[] dimensions = new String[1];
+        dimensions[0] = RatingDimensionImpl.dimensionName;
+        return dimensions;
     }
 
     public Transport[] getTransports() {
@@ -128,7 +126,7 @@ public class SIManagerImpl extends SIManager {
     }
 
     public SIRequest retrieveServiceDetails(Locator locator, SIRequestor requestor)
-                throws InvalidLocatorException, SecurityException {
+            throws InvalidLocatorException, SecurityException {
         org.videolan.Logger.unimplemented(SIManagerImpl.class.getName(), "retrieveServiceDetails");
         throw new Error("Not implemented");
     }

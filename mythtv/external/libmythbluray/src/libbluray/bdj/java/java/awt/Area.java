@@ -20,13 +20,13 @@
 package java.awt;
 
 class Area {
-    public int x0;
-    public int y0;
-    public int x1;
-    public int y1;
+    private int x0;
+    private int y0;
+    private int x1;
+    private int y1;
 
     public Area() {
-        clear();
+        this(Integer.MAX_VALUE, Integer.MAX_VALUE, -1, -1);
     }
 
     public Area(int width, int height) {
@@ -38,6 +38,22 @@ class Area {
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
+    }
+
+    public synchronized int getX0() {
+        return x0;
+    }
+
+    public synchronized int getY0() {
+        return y0;
+    }
+
+    public synchronized int getX1() {
+        return x1;
+    }
+
+    public synchronized int getY1() {
+        return y1;
     }
 
     private void clear() {

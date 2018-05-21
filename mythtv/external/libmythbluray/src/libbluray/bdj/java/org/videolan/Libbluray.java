@@ -35,6 +35,7 @@ import javax.tv.service.selection.ServiceContextFactory;
 import javax.tv.service.selection.ServiceContextFactoryImpl;
 import org.bluray.bdplus.Status;
 import org.bluray.net.BDLocator;
+import org.bluray.system.RegisterAccess;
 import org.bluray.ti.DiscManager;
 import org.bluray.ti.TitleImpl;
 import org.bluray.ti.selection.TitleContext;
@@ -68,6 +69,35 @@ public class Libbluray {
         System.setProperties(p);
     }
 
+    /*
+     * Loader hooks
+     */
+
+    private static BDJClassLoaderAdapter loaderAdapter = null;
+
+    protected static BDJClassLoaderAdapter getLoaderAdapter() {
+        return loaderAdapter;
+    }
+
+    private static void loadAdapter(String pkg) {
+        if (pkg == null)
+            return;
+        try {
+            final Object obj = Class.forName("org.videolan." + pkg + ".Adapter").newInstance();
+            if (obj instanceof BDJClassLoaderAdapter) {
+                loaderAdapter = (BDJClassLoaderAdapter)obj;
+            } else {
+                System.err.println("Unsupported interface in " + obj);
+            }
+        } catch (Exception e) {
+            System.err.println("" + e);
+        }
+    }
+
+    /*
+     *
+     */
+
     private static boolean initOnce = false;
     private static void initOnce() {
         if (initOnce) {
@@ -93,14 +123,41 @@ public class Libbluray {
     private static String canonicalize(String path, boolean create) {
         try {
             File dir = new File(path);
-            if (create) {
-                dir.mkdirs();
+            if (create && !dir.isDirectory() && !dir.mkdirs()) {
+                System.err.println("error creating directory " + path);
             }
             return dir.getCanonicalPath();
         } catch (Exception ioe) {
             System.err.println("error canonicalizing " + path + ": " + ioe);
         }
         return path;
+    }
+
+    private static void removeProperty(String property) {
+        try {
+            System.getProperties().remove(property);
+        } catch (Exception e) {
+            System.err.println(""+ e);
+        }
+    }
+
+    private static void resetProfile() {
+        removeProperty("bluray.profile.1");
+        removeProperty("bluray.p1.version.major");
+        removeProperty("bluray.p1.version.minor");
+        removeProperty("bluray.p1.version.micro");
+        removeProperty("bluray.profile.2");
+        removeProperty("bluray.p2.version.major");
+        removeProperty("bluray.p2.version.minor");
+        removeProperty("bluray.p2.version.micro");
+        removeProperty("bluray.profile.5");
+        removeProperty("bluray.p5.version.major");
+        removeProperty("bluray.p5.version.minor");
+        removeProperty("bluray.p5.version.micro");
+        removeProperty("bluray.profile.6");
+        removeProperty("bluray.p6.version.major");
+        removeProperty("bluray.p6.version.minor");
+        removeProperty("bluray.p6.version.micro");
     }
 
     /* called only from native code */
@@ -128,7 +185,7 @@ public class Libbluray {
             persistentRoot = canonicalize(persistentRoot, true);
         }
         if (budaRoot != null) {
-            budaRoot       = canonicalize(budaRoot, true);
+            budaRoot = canonicalize(budaRoot, true);
         }
 
         System.setProperty("dvb.persistent.root", persistentRoot);
@@ -157,7 +214,14 @@ public class Libbluray {
 
         try {
             BDFontMetrics.init();
-        } catch (Throwable t) {}
+        } catch (Throwable t) {
+        }
+
+        byte[] type = getAacsData(4096);
+        String pkg = type != null ? new String(type) : null;
+        if (pkg != null) {
+            System.out.println("using " + pkg);
+        }
 
         System.setProperty("mhp.profile.enhanced_broadcast", "YES");
         System.setProperty("mhp.profile.interactive_broadcast", "YES");
@@ -180,31 +244,43 @@ public class Libbluray {
         System.setProperty("dvb.returnchannel.timeout", "30");
 
         /* get profile from PSR */
-        int psr31 = readPSR(PSR_PROFILE_VERSION);
+        int psr31 = readPSR(RegisterAccess.PSR_PLAYER_PROFILE);
+        int version = psr31 & 0xffff;
         int profile = psr31 >> 16;
         boolean p11 = (profile & 0x01) != 0;
         boolean p2  = (profile & 0x02) != 0;
         boolean p5  = (profile & 0x10) != 0;
+        boolean p6  = ((profile & 0x1f) == 0) && (version >= 0x0300);
 
-        System.setProperty("bluray.profile.1", "YES");
-        System.setProperty("bluray.p1.version.major", "1");
-        System.setProperty("bluray.p1.version.minor", p11 ? "1" : "0");
-        System.setProperty("bluray.p1.version.micro", "0");
+        if (!p6) {
+            System.setProperty("bluray.profile.1", "YES");
+            System.setProperty("bluray.p1.version.major", "1");
+            System.setProperty("bluray.p1.version.minor", p11 ? "1" : "0");
+            System.setProperty("bluray.p1.version.micro", "0");
 
-        System.setProperty("bluray.profile.2", p2 ? "YES" : "NO");
-        System.setProperty("bluray.p2.version.major", "1");
-        System.setProperty("bluray.p2.version.minor", "0");
-        System.setProperty("bluray.p2.version.micro", "0");
-
-        System.setProperty("bluray.profile.5", p5 ? "YES" : "NO");
-        System.setProperty("bluray.p5.version.major", "1");
-        System.setProperty("bluray.p5.version.minor", "0");
-        System.setProperty("bluray.p5.version.micro", "0");
+            System.setProperty("bluray.profile.2", p2 ? "YES" : "NO");
+            System.setProperty("bluray.p2.version.major", "1");
+            System.setProperty("bluray.p2.version.minor", "0");
+            System.setProperty("bluray.p2.version.micro", "0");
+        }
+        if (p5) {
+            System.setProperty("bluray.profile.5", "YES");
+            System.setProperty("bluray.p5.version.major", "1");
+            System.setProperty("bluray.p5.version.minor", "0");
+            System.setProperty("bluray.p5.version.micro", "0");
+        }
+        if (p6) {
+            System.setProperty("bluray.profile.6", "YES");
+            System.setProperty("bluray.p6.version.major", "1");
+            System.setProperty("bluray.p6.version.minor", "0");
+            System.setProperty("bluray.p6.version.micro", "0");
+        }
 
         System.setProperty("bluray.disc.avplayback.readcapability", "NO");
 
         System.setProperty("bluray.video.fullscreenSD", "YES");
         System.setProperty("bluray.video.fullscreenSDPG", "YES");
+        System.setProperty("bluray.DynamicRangeConversion.Level", "0");
 
         System.setProperty("aacs.bluray.online.capability", "YES");
         System.setProperty("aacs.bluray.mc.capability", "NO");
@@ -229,9 +305,9 @@ public class Libbluray {
         System.setProperty("bluray.localstorage.upgradable", "NO");
         System.setProperty("bluray.localstorage.name", "HDD");
 
-        System.setProperty("bluray.memory.images", "65536");
+        System.setProperty("bluray.memory.images", "131072");
         System.setProperty("bluray.memory.audio", "8192");
-        System.setProperty("bluray.memory.audio_plus_img", "73728");
+        System.setProperty("bluray.memory.audio_plus_img", "139264");
         System.setProperty("bluray.memory.java_heap", "32768");
         System.setProperty("bluray.memory.font_cache", "4096");
 
@@ -243,6 +319,9 @@ public class Libbluray {
             System.err.println("System.setSecurityManager() failed: " + ex);
             throw new SecurityException("Failed initializing SecurityManager");
         }
+
+        loadAdapter(System.getProperty("org.videolan.loader.adapter"));
+        loadAdapter(pkg);
     }
 
     /* called only from native code */
@@ -277,10 +356,13 @@ public class Libbluray {
             System.err.println("shutdown() failed: " + e + "\n" + Logger.dumpStack(e));
         }
         nativePointer = 0;
-        titleInfos = null;
+        synchronized (titleInfosLock) {
+            titleInfos = null;
+        }
         synchronized (bdjoFilesLock) {
             bdjoFiles = null;
         }
+        loaderAdapter = null;
     }
 
     /*
@@ -314,34 +396,38 @@ public class Libbluray {
 
     /* used by javax/tv/service/SIManagerImpl */
     public static int numTitles() {
-        if (titleInfos == null) {
-            titleInfos = getTitleInfosN(nativePointer);
+        synchronized (titleInfosLock) {
             if (titleInfos == null) {
-                return -1;
+                titleInfos = getTitleInfosN(nativePointer);
+                if (titleInfos == null) {
+                    return -1;
+                }
             }
+            return titleInfos.length - 2;
         }
-        return titleInfos.length - 2;
     }
 
     /* used by org/bluray/ti/TitleImpl */
     public static TitleInfo getTitleInfo(int titleNum) {
-        int numTitles = numTitles();
-        if (numTitles < 0)
-            return null;
+        synchronized (titleInfosLock) {
+            int numTitles = numTitles();
+            if (numTitles < 0)
+                return null;
 
-        if (titleNum == 0xffff) {
-            return titleInfos[titleInfos.length - 1];
+            if (titleNum == 0xffff) {
+                return titleInfos[titleInfos.length - 1];
+            }
+
+            if (titleNum < 0 || titleNum > numTitles)
+                throw new IllegalArgumentException();
+
+            return titleInfos[titleNum];
         }
-
-        if (titleNum < 0 || titleNum > numTitles)
-            throw new IllegalArgumentException();
-
-        return titleInfos[titleNum];
     }
 
     /* used by org/bluray/ti/PlayListImpl */
     public static int getCurrentTitle() {
-        return readPSR(PSR_TITLE_NUMBER);
+        return readPSR(RegisterAccess.PSR_TITLE_NR);
     }
 
 
@@ -440,7 +526,7 @@ public class Libbluray {
     }
 
     public static int getCurrentAngle() {
-        return readPSR(PSR_ANGLE_NUMBER);
+        return readPSR(RegisterAccess.PSR_ANGLE_NR);
     }
 
     public static long getUOMask() {
@@ -519,6 +605,10 @@ public class Libbluray {
         try {
             BDLocator locator = new BDLocator(null, titleNumber, -1);
             TitleImpl title   = (TitleImpl)SIManager.createInstance().getService(locator);
+            if (title == null) {
+                System.err.println("startTitle() failed: title " + titleNumber + " not found");
+                return false;
+            }
 
             titleContext = (TitleContext)ServiceContextFactory.getInstance().getServiceContext(null);
             titleContext.start(title, true);
@@ -575,7 +665,7 @@ public class Libbluray {
             break;
 
         case BDJ_EVENT_PSR102:
-            org.bluray.bdplus.Status.getInstance().receive(param);
+            Status.getInstance().receive(param);
             break;
 
         case BDJ_EVENT_VK_KEY:
@@ -727,5 +817,6 @@ public class Libbluray {
                                               int x0, int y0, int x1, int y1);
 
     private static long nativePointer = 0;
+    private static Object titleInfosLock = new Object();
     private static TitleInfo[] titleInfos = null;
 }

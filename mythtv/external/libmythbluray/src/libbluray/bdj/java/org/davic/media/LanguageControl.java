@@ -24,8 +24,7 @@ import javax.media.Control;
 public interface LanguageControl extends Control {
     public String[] listAvailableLanguages();
 
-    public void selectLanguage(String lang)
-            throws LanguageNotAvailableException, NotAuthorizedException;
+    public void selectLanguage(String lang) throws LanguageNotAvailableException, NotAuthorizedException;
 
     public String getCurrentLanguage();
 

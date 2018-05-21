@@ -33,6 +33,10 @@ public class HScreenDimension {
         this.height = height;
     }
 
+    public String toString() {
+        return getClass().getName() + "[" + width + "x" + height + "]";
+    }
+
     public float width;
     public float height;
 }

@@ -103,10 +103,12 @@ public class TitleContextImpl implements TitleContext {
     public void select(Locator[] locators)
         throws InvalidLocatorException, InvalidServiceComponentException, SecurityException {
 
-        Logger.unimplemented("TitleContextImpl", "select(Locator[])");
+        if (locators.length != 1) {
+            Logger.unimplemented("TitleContextImpl", "select(Locator[])");
 
-        for (int i = 0; i < locators.length; i++)
-            logger.info("  [" + i + "]: " + locators[i]);
+            for (int i = 0; i < locators.length; i++)
+                logger.error("  [" + i + "]: " + locators[i]);
+        }
 
         select(SIManager.createInstance().getService(locators[0]));
     }
@@ -154,8 +156,7 @@ public class TitleContextImpl implements TitleContext {
         }
     }
 
-    private void postEvent(ServiceContextEvent event)
-    {
+    private void postEvent(ServiceContextEvent event) {
         listeners.putCallback(event);
     }
 

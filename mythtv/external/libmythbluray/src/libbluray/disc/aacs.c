@@ -282,7 +282,7 @@ int libaacs_get_bec_enabled(BD_AACS *p)
 
     *(void **)(&get_bec) = dl_dlsym(p->h_libaacs, "aacs_get_bus_encryption");
     if (!get_bec) {
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "aacs_get_bus_encryption() dlsym failed!\n");
+        BD_DEBUG(DBG_BLURAY, "aacs_get_bus_encryption() dlsym failed!\n");
         return 0;
     }
 

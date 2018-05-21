@@ -83,11 +83,11 @@ public class TIClip {
         return secAudioStreams;
     }
 
-    private int index;
-    private StreamInfo[] videoStreams = null;
-    private StreamInfo[] audioStreams = null;
-    private StreamInfo[] pgStreams = null;
-    private StreamInfo[] igStreams = null;
-    private StreamInfo[] secVideoStreams = null;
-    private StreamInfo[] secAudioStreams = null;
+    private final int index;
+    private final StreamInfo[] videoStreams;
+    private final StreamInfo[] audioStreams;
+    private final StreamInfo[] pgStreams;
+    private final StreamInfo[] igStreams;
+    private final StreamInfo[] secVideoStreams;
+    private final StreamInfo[] secAudioStreams;
 }

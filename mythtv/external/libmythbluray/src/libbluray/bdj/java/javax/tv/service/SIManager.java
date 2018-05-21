@@ -40,25 +40,21 @@ public abstract class SIManager {
 
     public abstract String[] getSupportedDimensions();
 
-    public abstract RatingDimension getRatingDimension(String name)
-            throws SIException;
+    public abstract RatingDimension getRatingDimension(String name) throws SIException;
 
     public abstract Transport[] getTransports();
 
-    public abstract SIRequest retrieveSIElement(Locator locator,
-            SIRequestor requestor) throws InvalidLocatorException,
-            SecurityException;
+    public abstract SIRequest retrieveSIElement(Locator locator, SIRequestor requestor)
+            throws InvalidLocatorException, SecurityException;
 
     public abstract Service getService(Locator locator)
             throws InvalidLocatorException, SecurityException;
 
-    public abstract SIRequest retrieveServiceDetails(Locator locator,
-            SIRequestor requestor) throws InvalidLocatorException,
-            SecurityException;
+    public abstract SIRequest retrieveServiceDetails(Locator locator, SIRequestor requestor)
+            throws InvalidLocatorException, SecurityException;
 
-    public abstract SIRequest retrieveProgramEvent(Locator locator,
-            SIRequestor requestor) throws InvalidLocatorException,
-            SecurityException;
+    public abstract SIRequest retrieveProgramEvent(Locator locator, SIRequestor requestor)
+            throws InvalidLocatorException, SecurityException;
 
     public abstract ServiceList filterServices(ServiceFilter filter);
 }

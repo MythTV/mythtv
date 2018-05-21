@@ -61,13 +61,13 @@ public class TIMark {
         return type;
     }
 
-    private int index;
-    private int type;
-    private long start;
-    private long duration;
-    private long offset;
-    private int clip;
-    
+    private final int index;
+    private final int type;
+    private final long start;
+    private final long duration;
+    private final long offset;
+    private final int clip;
+
     public static final int MARK_TYPE_ENTRY = 1;
     public static final int MARK_TYPE_LINK = 2;
 }

@@ -23,6 +23,5 @@ import javax.media.protocol.DataSource;
 import java.io.IOException;
 
 public interface MediaHandler {
-    public void setSource(DataSource source) throws IOException,
-            IncompatibleSourceException;
+    public void setSource(DataSource source) throws IOException, IncompatibleSourceException;
 }

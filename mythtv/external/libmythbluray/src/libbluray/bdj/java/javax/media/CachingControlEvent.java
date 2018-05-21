@@ -20,8 +20,7 @@
 package javax.media;
 
 public class CachingControlEvent extends ControllerEvent {
-    public CachingControlEvent(Controller from, CachingControl cacheControl,
-            long progress) {
+    public CachingControlEvent(Controller from, CachingControl cacheControl, long progress) {
         super(from);
 
         this.cacheControl = cacheControl;

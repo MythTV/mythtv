@@ -20,8 +20,7 @@
 package javax.media;
 
 public class StopByRequestEvent extends StopEvent {
-    public StopByRequestEvent(Controller source, int previous, int current,
-            int target, Time mediaTime) {
+    public StopByRequestEvent(Controller source, int previous, int current, int target, Time mediaTime) {
         super(source, previous, current, target, mediaTime);
     }
 

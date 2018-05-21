@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010-2014  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,6 +56,7 @@ struct hdmv_vm_s {
     HDMV_EVENT     event[5];      /* pending events to return */
 
     NV_TIMER       nv_timer;      /* navigation timer */
+    uint64_t       rand;          /* RAND state */
 
     /* movie objects */
     MOBJ_OBJECTS  *movie_objects; /* disc movie objects */
@@ -353,6 +354,11 @@ HDMV_VM *hdmv_vm_init(struct bd_disc *disc, BD_REGISTERS *regs,
     p->num_titles      = num_titles;
     p->have_top_menu   = top_menu_available;
     p->have_first_play = first_play_available;
+#ifdef DEBUG
+    p->rand = 1;
+#else
+    p->rand = time(NULL);
+#endif
 
     bd_mutex_init(&p->mutex);
 
@@ -982,9 +988,16 @@ static void _hdmv_trace_res(uint32_t new_src, uint32_t new_dst, uint32_t orig_sr
 
 #define SWAP_u32(a, b) do { uint32_t tmp = a; a = b; b = tmp; } while(0)
 
-static inline uint32_t RAND_u32(uint32_t range)
+static inline uint32_t RAND_u32(HDMV_VM *p, uint32_t range)
 {
-  return range > 0 ? rand() % range + 1 : 0;
+    p->rand = p->rand * UINT64_C(6364136223846793005) + UINT64_C(1);
+
+    if (range == 0) {
+      BD_DEBUG(DBG_HDMV|DBG_CRIT, "RAND_u32: invalid range (0)\n");
+      return 1;
+    }
+
+    return ((uint32_t)(p->rand >> 32)) % range + 1;
 }
 
 static inline uint32_t ADD_u32(uint32_t a, uint32_t b)
@@ -1111,7 +1124,7 @@ static int _hdmv_step(HDMV_VM *p)
                         case INSN_MOD:    dst  = src > 0   ? dst % src : 0xffffffff; break;
                         case INSN_ADD:    dst  = ADD_u32(src, dst);  break;
                         case INSN_MUL:    dst  = MUL_u32(dst, src);  break;
-                        case INSN_RND:    dst  = RAND_u32(src);      break;
+                        case INSN_RND:    dst  = RAND_u32(p, src);   break;
                         case INSN_AND:    dst &= src;         break;
                         case INSN_OR:     dst |= src;         break;
                         case INSN_XOR:    dst ^= src;         break;

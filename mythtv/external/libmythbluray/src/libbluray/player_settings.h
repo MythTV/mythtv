@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2014  VideoLAN
+ * Copyright (C) 2014-2017  VideoLAN
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -144,8 +144,12 @@ enum {
     BLURAY_PLAYER_PROFILE_2_v2_0 = ((0x03 << 16) | (0x0200)),   /* Profile 2, version 2.0 (network access, BdLive) */
     BLURAY_PLAYER_PROFILE_3_v2_0 = ((0x08 << 16) | (0x0200)),   /* Profile 3, version 2.0 (audio only player) */
     BLURAY_PLAYER_PROFILE_5_v2_4 = ((0x13 << 16) | (0x0240)),   /* Profile 5, version 2.4 (3D) */
+    BLURAY_PLAYER_PROFILE_6_v3_0 = ((0x00 << 16) | (0x0300)),   /* Profile 6, version 3.0 (UHD) */
+    BLURAY_PLAYER_PROFILE_6_v3_1 = ((0x00 << 16) | (0x0310)),   /* Profile 6, version 3.1 (UHD) */
 };
 
+#define BLURAY_PLAYER_PROFILE_3D_FLAG       0x100000
+#define BLURAY_PLAYER_PROFILE_VERSION_MASK  0xffff
 
 /*
  * BLURAY_PLAYER_SETTING_DECODE_PG

@@ -21,7 +21,6 @@ package javax.tv.media;
 
 import java.util.EventListener;
 
-public interface MediaSelectListener extends EventListener
-{
+public interface MediaSelectListener extends EventListener {
     public void selectionComplete(MediaSelectEvent event);
 }

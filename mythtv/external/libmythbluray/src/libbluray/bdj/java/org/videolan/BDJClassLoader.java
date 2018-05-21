@@ -29,6 +29,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.tv.xlet.Xlet;
 
@@ -59,28 +60,43 @@ public class BDJClassLoader extends URLClassLoader {
             path = basePath + "/" + classPath;
         if (path.length() < 5)
             return null;
-        String protocol = null;
-        String url = path.substring(0, 5);
-        for (int i = 0; i < appCaches.length; i++) {
-            if (appCaches[i].getRefToName().equals(url)) {
-                if (appCaches[i].getType() == AppCache.JAR_FILE) {
-                    protocol = "file:";
-                    url = url + ".jar";
-                } else if (appCaches[i].getType() == AppCache.DIRECTORY) {
-                    protocol = "file:/";
-                }
+
+        String name = path.substring(0, 5); /* entry name in BDMV/JAR/ */
+        String dir  = path.substring(5);    /* optional sub directory */
+
+        /* find bdjo AppCache entry */
+        int i;
+        for (i = 0; i < appCaches.length; i++) {
+            if (appCaches[i].getRefToName().equals(name)) {
                 break;
             }
         }
-        if (protocol == null)
+        if (i >= appCaches.length)
             return null;
-        url = protocol +
-            BDJLoader.getCachedFile(System.getProperty("bluray.vfs.root") + File.separator +
-                                    "BDMV" + File.separator +
-                                    "JAR" + File.separator +
-                                    url) + path.substring(5);
-        //if (!url.endsWith("/"))
-        //    url += "/";
+
+        /* check AppCache type */
+        String protocol;
+        if (appCaches[i].getType() == AppCache.JAR_FILE) {
+            protocol = "file:";
+            name = name + ".jar";
+        } else if (appCaches[i].getType() == AppCache.DIRECTORY) {
+            protocol = "file:/";
+        } else {
+            return null;
+        }
+
+        /* map to disc root */
+        String fullPath =
+            System.getProperty("bluray.vfs.root") + File.separator +
+            "BDMV" + File.separator + "JAR" + File.separator +
+            name;
+
+        /* find from cache */
+        String cachePath = BDJLoader.getCachedFile(fullPath);
+
+        /* build final url */
+        String url = protocol + cachePath + dir;
+
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
@@ -92,6 +108,13 @@ public class BDJClassLoader extends URLClassLoader {
     private BDJClassLoader(URL[] urls, String xletClass) {
         super(urls);
         this.xletClass = xletClass;
+
+        BDJClassLoaderAdapter a = Libbluray.getLoaderAdapter();
+        if (a != null) {
+            hideClasses = a.getHideClasses();
+            bootClasses = a.getBootClasses();
+            xletClasses = a.getXletClasses();
+        }
     }
 
     protected Xlet loadXlet() throws ClassNotFoundException,
@@ -118,7 +141,15 @@ public class BDJClassLoader extends URLClassLoader {
         this.xletClass = xletClass;
     }
 
-    public Class loadClass(String name) throws java.lang.ClassNotFoundException {
+    public Class loadClass(String name) throws ClassNotFoundException {
+
+        if (hideClasses != null) {
+            if (hideClasses.get(name) != null) {
+                logger.error("Hiding class " + name);
+                throw new ClassNotFoundException(name);
+            }
+        }
+
         /* hook FileSystem in java.io.File */
         if (name.equals("java.io.File")) {
             Class c = super.loadClass(name);
@@ -128,10 +159,21 @@ public class BDJClassLoader extends URLClassLoader {
             return c;
         }
 
+        Class bootclass = tryLoad(name, bootClasses);
+        if (bootclass != null) {
+            return bootclass;
+        }
+
         try {
             return super.loadClass(name);
         } catch (ClassNotFoundException e0) {
             logger.error("ClassNotFoundException: " + name);
+
+            Class xletclass = tryLoad(name, xletClasses);
+            if (xletclass != null) {
+                return xletclass;
+            }
+
             throw e0;
         } catch (Error err) {
             logger.error("FATAL: " + err);
@@ -139,12 +181,27 @@ public class BDJClassLoader extends URLClassLoader {
         }
     }
 
+    private Class tryLoad(String name, Map classes) {
+        if (classes != null) {
+            try {
+                byte[] code = (byte[])classes.get(name);
+                if (code != null) {
+                    logger.info("Overriding class " + name);
+                    return defineClass(code, 0, code.length);
+                }
+            } catch (Exception e) {
+                logger.error("tryLoad(" + name + ") failed: " + e);
+            }
+        }
+        return null;
+    }
+
     private byte[] loadClassCode(String name) throws ClassNotFoundException {
         String path = name.replace('.', '/').concat(".class");
 
         URL res = super.findResource(path);
         if (res == null) {
-            logger.error("loadClassCode(): resource for class " + name + "not found");
+            logger.error("loadClassCode(): resource for class " + name + " not found");
             throw new ClassNotFoundException(name);
         }
 
@@ -156,7 +213,9 @@ public class BDJClassLoader extends URLClassLoader {
             byte[] buffer = new byte[0xffff];
             while (true) {
                 int r = is.read(buffer);
-                if (r == -1) break;
+                if (r == -1) {
+                    break;
+                }
                 os.write(buffer, 0, r);
             }
 
@@ -195,7 +254,7 @@ public class BDJClassLoader extends URLClassLoader {
                 throw ce;
             }
             try {
-                b = new BDJClassFileTransformer().transform(b, 0, b.length);
+                b = new BDJClassFileTransformer().strip(b, 0, b.length);
                 return defineClass(b, 0, b.length);
             } catch (ThreadDeath td) {
                 throw td;
@@ -238,6 +297,10 @@ public class BDJClassLoader extends URLClassLoader {
     }
 
     private String xletClass;
+
+    private Map hideClasses;  /* classes that should be hidden from Xlet */
+    private Map bootClasses;  /* additional bootstrap clases */
+    private Map xletClasses;  /* fallback for possibly missing classes */
 
     private static final Logger logger = Logger.getLogger(BDJClassLoader.class.getName());
 }

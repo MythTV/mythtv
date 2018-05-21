@@ -54,9 +54,9 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
                                               entry.getInitialClass(),
                                               this);
 
-        callbackQueue = new BDJActionQueue(this.threadGroup, "CallbackQueue");
-        mediaQueue = new BDJActionQueue(this.threadGroup, "MediaQueue");
-        userEventQueue = new BDJActionQueue(this.threadGroup, "UserEventQueue");
+        callbackQueue  = BDJActionQueue.create(this.threadGroup, "CallbackQueue");
+        mediaQueue     = BDJActionQueue.create(this.threadGroup, "MediaQueue");
+        userEventQueue = BDJActionQueue.create(this.threadGroup, "UserEventQueue");
 
         mountHomeDir(entry);
     }
@@ -210,8 +210,7 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
     }
 
     /* must be called from synchronized (this) {} */
-    private boolean putCallbackImpl(BDJAction cb, BDJActionQueue queue)
-    {
+    private boolean putCallbackImpl(BDJAction cb, BDJActionQueue queue) {
         if (isReleased()) {
             logger.error("callback ignored (xlet destroyed)");
             return false;
@@ -224,22 +223,19 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
         return true;
     }
 
-    protected boolean putCallback(BDJAction cb)
-    {
+    protected boolean putCallback(BDJAction cb) {
         synchronized (cbLock) {
             return putCallbackImpl(cb, callbackQueue);
         }
     }
 
-    protected boolean putMediaCallback(BDJAction cb)
-    {
+    protected boolean putMediaCallback(BDJAction cb) {
         synchronized (cbLock) {
             return putCallbackImpl(cb, mediaQueue);
         }
     }
 
-    public boolean putUserEvent(BDJAction cb)
-    {
+    public boolean putUserEvent(BDJAction cb) {
         synchronized (cbLock) {
             return putCallbackImpl(cb, userEventQueue);
         }
@@ -336,6 +332,7 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
             ixcThreads.addLast(thread);
         }
     }
+
     protected void removeIxcThread(Thread thread) {
         synchronized (ixcThreads) {
             ixcThreads.remove(thread);
@@ -348,7 +345,8 @@ public class BDJXletContext implements javax.tv.xlet.XletContext, javax.microedi
         while (thread.isAlive() && (System.currentTimeMillis() < endTime)) {
             try {
                 Thread.sleep(10);
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+            }
         }
 
         boolean result = !thread.isAlive();

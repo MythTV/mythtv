@@ -432,7 +432,7 @@ public class Handler extends BDHandler {
         action.waitEnd();
     }
 
-    private class PlaylistPlayerAction extends BDJAction {
+    private static class PlaylistPlayerAction extends BDJAction {
         private PlaylistPlayerAction(Handler player, int action, int param) {
             this.player = player;
             this.action = action;

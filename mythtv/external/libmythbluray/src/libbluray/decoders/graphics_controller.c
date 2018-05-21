@@ -35,6 +35,8 @@
 #include "util/mutex.h"
 #include "util/time.h"
 
+#include "bdnav/uo_mask.h"
+
 #include "../register.h"
 #include "../keys.h"
 
@@ -81,7 +83,7 @@ struct graphics_controller_s {
     unsigned        popup_visible;
     unsigned        valid_mouse_position;
     unsigned        auto_action_triggered;
-    BOG_DATA       *bog_data;
+    BOG_DATA        bog_data[MAX_NUM_BOGS];
     BOG_DATA       *saved_bog_data;
     BD_UO_MASK      page_uo_mask;
 
@@ -357,10 +359,6 @@ static void _reset_user_timeout(GRAPHICS_CONTROLLER *gc)
 
 static int _save_page_state(GRAPHICS_CONTROLLER *gc)
 {
-    if (!gc->bog_data) {
-        GC_TRACE("_save_page_state(): no bog data !\n");
-        return -1;
-    }
     if (!gc->igs || !gc->igs->ics) {
         GC_TRACE("_save_page_state(): no IG composition\n");
         return -1;
@@ -381,7 +379,7 @@ static int _save_page_state(GRAPHICS_CONTROLLER *gc)
     /* copy enabled button state, clear draw state */
 
     X_FREE(gc->saved_bog_data);
-    gc->saved_bog_data = calloc(page->num_bogs, sizeof(*gc->saved_bog_data));
+    gc->saved_bog_data = calloc(1, sizeof(gc->bog_data));
     if (!gc->saved_bog_data) {
         GC_ERROR("_save_page_state(): out of memory\n");
         return -1;
@@ -401,13 +399,8 @@ static int _restore_page_state(GRAPHICS_CONTROLLER *gc)
     gc->out_effects = NULL;
 
     if (gc->saved_bog_data) {
-        if (gc->bog_data) {
-            GC_ERROR("_restore_page_state(): bog data already exists !\n");
-            X_FREE(gc->bog_data);
-        }
-        gc->bog_data       = gc->saved_bog_data;
-        gc->saved_bog_data = NULL;
-
+        memcpy(gc->bog_data, gc->saved_bog_data, sizeof(gc->bog_data));
+        X_FREE(gc->saved_bog_data);
         return 1;
     }
     return -1;
@@ -427,10 +420,7 @@ static void _reset_page_state(GRAPHICS_CONTROLLER *gc)
         return;
     }
 
-    size_t size = page->num_bogs * sizeof(*gc->bog_data);
-    gc->bog_data = realloc(gc->bog_data, size);
-
-    memset(gc->bog_data, 0, size);
+    memset(gc->bog_data, 0, sizeof(gc->bog_data));
 
     for (ii = 0; ii < page->num_bogs; ii++) {
         gc->bog_data[ii].enabled_button = page->bog[ii].default_valid_button_id_ref;
@@ -737,7 +727,7 @@ static void _gc_reset(GRAPHICS_CONTROLLER *gc)
 
     gc->popup_visible = 0;
     gc->valid_mouse_position = 0;
-    gc->page_uo_mask = bd_empty_uo_mask();
+    gc->page_uo_mask = uo_mask_get_empty();
 
     graphics_processor_free(&gc->igp);
     graphics_processor_free(&gc->pgp);
@@ -751,7 +741,7 @@ static void _gc_reset(GRAPHICS_CONTROLLER *gc)
     gc->next_dialog_idx = 0;
     gc->textst_user_style = -1;
 
-    X_FREE(gc->bog_data);
+    memset(gc->bog_data, 0, sizeof(gc->bog_data));
 }
 
 /*
@@ -1391,7 +1381,7 @@ static int _render_page(GRAPHICS_CONTROLLER *gc,
 
     if (s->ics->interactive_composition.ui_model == IG_UI_MODEL_POPUP && !gc->popup_visible) {
 
-        gc->page_uo_mask = bd_empty_uo_mask();
+        gc->page_uo_mask = uo_mask_get_empty();
 
         if (gc->ig_open) {
             GC_TRACE("_render_page(): popup menu not visible\n");
@@ -1946,7 +1936,7 @@ int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS 
         cmds->nav_cmds     = NULL;
         cmds->sound_id_ref = -1;
         cmds->status       = GC_STATUS_NONE;
-        cmds->page_uo_mask = bd_empty_uo_mask();
+        cmds->page_uo_mask = uo_mask_get_empty();
     }
 
     if (!gc) {
@@ -2013,8 +2003,9 @@ int gc_run(GRAPHICS_CONTROLLER *gc, gc_ctrl_e ctrl, uint32_t param, GC_NAV_CMDS 
                 result = _user_input(gc, param, cmds);
                 break;
             }
+            /* BD_VK_POPUP => GC_CTRL_POPUP */
             param = !gc->popup_visible;
-            /* fall thru (BD_VK_POPUP) */
+            /* fall thru */
 
         case GC_CTRL_POPUP:
             if (gc->igs->ics->interactive_composition.ui_model != IG_UI_MODEL_POPUP) {

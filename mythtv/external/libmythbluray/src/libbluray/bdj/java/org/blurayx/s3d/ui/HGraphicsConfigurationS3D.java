@@ -24,14 +24,11 @@ import org.havi.ui.HGraphicsConfiguration;
 import org.havi.ui.HPermissionDeniedException;
 
 public class HGraphicsConfigurationS3D extends HGraphicsConfiguration {
-
     public int getOffsetValue() {
         return 0;
     }
 
-    public void setOffsetValue(int offset)
-        throws HPermissionDeniedException, HConfigurationException {
-
+    public void setOffsetValue(int offset) throws HPermissionDeniedException, HConfigurationException {
         org.videolan.Logger.unimplemented("HGraphicsConfigurationS3D", "setOffsetValue");
     }
 }

@@ -222,8 +222,6 @@ class VFSCache {
 
     protected synchronized File addFont(InputStream is) {
 
-        new File(fontRoot).mkdirs();
-
         // copy stream to tmp file in fontRoot. freetype can not read streams.
         File tmpFile = null;
         for (int i = 0; i < 100; i++) {
@@ -296,7 +294,7 @@ class VFSCache {
         String[] names = Libbluray.listBdFiles(relPath, true);
         if (names != null) {
             /* this is directory. Make sure it exists. */
-            Libbluray.cacheBdRomFile(relPath + "/", cacheRoot + relPath + "/");
+            Libbluray.cacheBdRomFile(relPath + File.separator, cacheRoot + relPath + File.separator);
             return;
         }
 

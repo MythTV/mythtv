@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2009-2010  John Stebbins
+ * Copyright (C) 2011-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -117,4 +118,24 @@ char *str_print_hex(char *out, const uint8_t *buf, int count)
     }
 
     return out;
+}
+
+const char *str_strcasestr(const char *haystack, const char *needle)
+{
+    const char *result = NULL;
+
+    char *h = str_dup(haystack);
+    char *n = str_dup(needle);
+    if (h && n) {
+        str_tolower(h);
+        str_tolower(n);
+        result = strstr(h, n);
+        if (result) {
+            result = haystack + (result - h);
+        }
+    }
+
+    X_FREE(h);
+    X_FREE(n);
+    return result;
 }

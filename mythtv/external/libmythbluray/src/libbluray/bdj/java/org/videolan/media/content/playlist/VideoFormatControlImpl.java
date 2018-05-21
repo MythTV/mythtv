@@ -40,7 +40,7 @@ public class VideoFormatControlImpl implements VideoFormatControl {
 
     public int getAspectRatio() {
         TIClip ci = player.getCurrentClipInfo();
-        if ((ci == null) ||(ci.getVideoStreamCount() <= 0))
+        if ((ci == null) || (ci.getVideoStreamCount() <= 0))
             return ASPECT_RATIO_UNKNOWN;
         Dimension aspect = ci.getVideoStreams()[0].getVideoAspectRatio();
         if (aspect != null) {

@@ -21,8 +21,7 @@ package javax.tv.service.guide;
 
 import javax.tv.service.SIException;
 
-public interface ContentRatingAdvisory
-{
+public interface ContentRatingAdvisory {
     public String[] getDimensionNames();
 
     public short getRatingLevel(String ratingDimension) throws SIException;

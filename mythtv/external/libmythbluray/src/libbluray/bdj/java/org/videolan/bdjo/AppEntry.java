@@ -100,7 +100,7 @@ public class AppEntry implements AppAttributes {
     }
 
     public Locator getServiceLocator() {
-        org.videolan.Logger.unimplemented("AppEntry","getServiceLocator");
+        org.videolan.Logger.unimplemented("AppEntry", "getServiceLocator");
         /*
         try {
             String discID = BDJTitleInfoHelper.getCurrent32LengthDiscIDFromC();
@@ -160,7 +160,7 @@ public class AppEntry implements AppAttributes {
         this.profiles = profiles;
         this.priority = priority;
         this.binding = binding;
-        this.visibility = visibility;
+        //this.visibility = visibility;
         this.names = names;
         if ((iconLocator != null) && (iconLocator.length() > 0)) {
             try {
@@ -217,7 +217,7 @@ public class AppEntry implements AppAttributes {
     private AppProfile[] profiles;
     private short priority;
     private int binding;
-    private int visibility;
+    //private int visibility;
     private String[][] names;
     private AppIcon icon;
     private String basePath;

@@ -23,8 +23,7 @@ import javax.tv.service.SIChangeType;
 import javax.tv.service.navigation.ServiceDetails;
 
 public class ServiceDetailsChangeEvent extends TransportSIChangeEvent {
-    public ServiceDetailsChangeEvent(Transport transport, SIChangeType type,
-            ServiceDetails details) {
+    public ServiceDetailsChangeEvent(Transport transport, SIChangeType type, ServiceDetails details) {
         super(transport, type, details);
         this.details = details;
     }

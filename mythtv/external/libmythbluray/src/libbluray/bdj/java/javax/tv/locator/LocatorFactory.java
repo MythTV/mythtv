@@ -29,7 +29,7 @@ public abstract class LocatorFactory extends Object {
 
     public abstract Locator createLocator(String locatorString) throws MalformedLocatorException;
 
-    public abstract Locator[] transformLocator( Locator source) throws InvalidLocatorException;
+    public abstract Locator[] transformLocator(Locator source) throws InvalidLocatorException;
 
     private static final LocatorFactory instance = new LocatorFactoryImpl();
 }

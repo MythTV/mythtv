@@ -20,6 +20,7 @@
 package org.videolan;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.xml.parsers.SAXParser;
@@ -60,7 +61,7 @@ public class BUMFParser extends DefaultHandler {
             if (stream != null) {
                 try {
                     stream.close();
-                } catch (Exception e) {
+                } catch (IOException ioe) {
                 }
             }
         }
@@ -163,7 +164,3 @@ public class BUMFParser extends DefaultHandler {
 
     private static final Logger logger = Logger.getLogger(BUMFParser.class.getName());
 }
-
-
-
-

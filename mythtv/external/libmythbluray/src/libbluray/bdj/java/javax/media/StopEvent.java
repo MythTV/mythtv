@@ -22,8 +22,7 @@ package javax.media;
 import javax.media.Controller;
 
 public class StopEvent extends TransitionEvent {
-    public StopEvent(Controller source, int previous, int current, int target,
-            Time mediaTime) {
+    public StopEvent(Controller source, int previous, int current, int target, Time mediaTime) {
         super(source, previous, current, target);
 
         this.mediaTime = mediaTime;

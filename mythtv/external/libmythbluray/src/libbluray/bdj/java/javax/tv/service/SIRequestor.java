@@ -20,7 +20,6 @@
 package javax.tv.service;
 
 public interface SIRequestor {
-
     public void notifySuccess(SIRetrievable[] result);
 
     public void notifyFailure(SIRequestFailureType reason);

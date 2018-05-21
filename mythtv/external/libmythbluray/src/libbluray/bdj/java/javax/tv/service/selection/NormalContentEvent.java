@@ -19,8 +19,7 @@
 
 package javax.tv.service.selection;
 
-public class NormalContentEvent extends PresentationChangedEvent
-{
+public class NormalContentEvent extends PresentationChangedEvent {
     public NormalContentEvent(ServiceContext context) {
         super(context);
     }

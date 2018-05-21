@@ -32,7 +32,6 @@ import org.videolan.media.content.control.PanningControlImpl;
 
 import org.videolan.media.content.BDHandler;
 
-
 public class Handler extends BDHandler {
     public Handler() {
         controls = new Control[3];

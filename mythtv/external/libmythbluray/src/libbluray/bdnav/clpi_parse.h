@@ -33,6 +33,6 @@ BD_PRIVATE uint32_t clpi_access_point(const CLPI_CL *cl, uint32_t pkt, int next,
 BD_PRIVATE CLPI_CL* clpi_parse(const char *path) BD_ATTR_MALLOC;
 BD_PRIVATE CLPI_CL* clpi_get(struct bd_disc *disc, const char *file);
 BD_PRIVATE CLPI_CL* clpi_copy(const CLPI_CL* src_cl);
-BD_PRIVATE void clpi_free(CLPI_CL *cl);
+BD_PRIVATE void clpi_free(CLPI_CL **cl);
 
 #endif // _CLPI_PARSE_H_

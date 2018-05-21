@@ -24,10 +24,9 @@ import javax.tv.service.SIRequest;
 import javax.tv.locator.InvalidLocatorException;
 import javax.tv.locator.Locator;
 
-public interface NetworkCollection extends Transport
-{
+public interface NetworkCollection extends Transport {
     public SIRequest retrieveNetwork(Locator locator, SIRequestor requestor)
-        throws InvalidLocatorException, SecurityException;
+            throws InvalidLocatorException, SecurityException;
 
     public SIRequest retrieveNetworks(SIRequestor requestor);
 

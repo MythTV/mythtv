@@ -23,8 +23,7 @@ import javax.tv.service.SIChangeEvent;
 import javax.tv.service.SIChangeType;
 
 public class ProgramScheduleEvent extends SIChangeEvent {
-    public ProgramScheduleEvent(ProgramSchedule schedule, SIChangeType type,
-            ProgramEvent event) {
+    public ProgramScheduleEvent(ProgramSchedule schedule, SIChangeType type, ProgramEvent event) {
         super(schedule, type, event);
     }
 

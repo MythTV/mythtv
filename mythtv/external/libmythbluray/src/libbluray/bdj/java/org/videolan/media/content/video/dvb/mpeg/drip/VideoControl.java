@@ -30,7 +30,7 @@ import org.videolan.StreamInfo;
 
 public class VideoControl implements VideoPresentationControl {
     protected VideoControl(Handler player) {
-        this.player = player;
+        //this.player = player;
     }
 
     protected HScreenRectangle getNormalizedRectangle(Dimension dimension, Rectangle rectangle) {
@@ -78,7 +78,7 @@ public class VideoControl implements VideoPresentationControl {
     }
 
     public Dimension getInputVideoSize() {
-            return new Dimension(0, 0);
+        return new Dimension(0, 0);
     }
 
     public Dimension getVideoSize() {
@@ -114,9 +114,15 @@ public class VideoControl implements VideoPresentationControl {
         Dimension vd = getInputVideoSize();
         if ((vd.width == 0) || (vd.height == 0))
             return new Rectangle(0, 0);
-        srcArea = getRectangleOnScreen(getNormalizedRectangle(vd, clipRect));
+        if (clipRect != null)
+            srcArea = getRectangleOnScreen(getNormalizedRectangle(vd, clipRect));
+        else
+            srcArea = new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f);
+
         //TODO
-       return getRectangle(vd, srcArea);
+        org.videolan.Logger.unimplemented("VideoControl", "setClipRegion");
+
+        return getRectangle(vd, srcArea);
     }
 
     public float[] supportsArbitraryHorizontalScaling() {
@@ -146,7 +152,7 @@ public class VideoControl implements VideoPresentationControl {
         throw new Error("Not implemented"); // TODO implement
     }
 
-    private Handler player;
+    //private Handler player;
     private HScreenRectangle srcArea = new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f);
     private HScreenRectangle dstArea = new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f);
 }

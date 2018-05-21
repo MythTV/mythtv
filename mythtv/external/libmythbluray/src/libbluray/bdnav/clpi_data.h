@@ -77,10 +77,7 @@ typedef struct
     CLPI_TS_TYPE      ts_type_info;
     uint8_t           atc_delta_count;
     CLPI_ATC_DELTA   *atc_delta;
-
-    /* breaks ABI if added here ...
-    CLPI_FONT_INFO    font_info;
-    */
+    CLPI_FONT_INFO    font_info;      /* Text subtitle stream font files */
 } CLPI_CLIP_INFO;
 
 typedef struct
@@ -169,9 +166,6 @@ typedef struct clpi_cl {
     CLPI_EXTENT_START extent_start; /* extent start points (.ssif interleaving) */
     CLPI_PROG_INFO    program_ss;
     CLPI_CPI          cpi_ss;
-
-    /* Text subtitle stream font files */
-    CLPI_FONT_INFO    font_info;
 } CLPI_CL;
 
 #endif // _CLPI_DATA_H_

@@ -31,11 +31,7 @@ class BDJThreadGroup extends ThreadGroup {
 
         String stack = "";
         if (e != null) {
-            StackTraceElement elems[] = e.getStackTrace();
-            if (elems != null) {
-                for (int i = 0; i < elems.length; i++)
-                    stack += "\n\t" + elems[i].toString();
-            }
+            stack = Logger.dumpStack(e);
         }
 
         if (e instanceof ThreadDeath) {
@@ -62,7 +58,8 @@ class BDJThreadGroup extends ThreadGroup {
                (System.currentTimeMillis() < endTime)) {
             try {
                 Thread.sleep(10);
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+            }
         }
 
         boolean result = (activeCount() <= maxThreads);
@@ -85,7 +82,9 @@ class BDJThreadGroup extends ThreadGroup {
             waitForShutdown(500, 0);
         }
 
-        if (destroyed) return;
+        if (destroyed) {
+            return;
+        }
 
         try {
             destroy();

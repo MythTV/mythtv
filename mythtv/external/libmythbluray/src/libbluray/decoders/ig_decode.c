@@ -26,7 +26,7 @@
 #include "pg_decode.h"           // pg_decode_*()
 #include "../hdmv/mobj_parse.h"  // mobj_parse_cmd()
 #include "../hdmv/mobj_data.h"   // MOBJ_CMD
-#include "../bdnav/mpls_parse.h" // mpls_parse_uo()
+#include "../bdnav/uo_mask.h"    // uo_mask_parse()
 
 #include "util/macro.h"
 #include "util/logging.h"
@@ -204,7 +204,7 @@ static int _decode_uo_mask_table(BITBUFFER *bb, BD_UO_MASK *p)
     uint8_t buf[8];
     bb_read_bytes(bb, buf, 8);
 
-    return mpls_parse_uo(buf, p);
+    return uo_mask_parse(buf, p);
 }
 
 static int _decode_page(BITBUFFER *bb, BD_IG_PAGE *p)

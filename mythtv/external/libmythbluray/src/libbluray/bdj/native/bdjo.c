@@ -31,7 +31,7 @@
 
 #include "util.h"
 
-#include "libbluray/bdj/bdjo_data.h"
+#include "bdj/bdjo_data.h"
 
 #include "util/logging.h"
 
@@ -44,7 +44,7 @@
 #define JNICHK(a) \
   do {                                                              \
       if ((*env)->ExceptionOccurred(env)) {                         \
-          BD_DEBUG(DBG_BDJ | DBG_CRIT, "Exception occured\n");      \
+          BD_DEBUG(DBG_BDJ | DBG_CRIT, "Exception occurred\n");     \
           (*env)->ExceptionDescribe(env);                           \
       }                                                             \
       if (!(a)) {                                                   \
@@ -61,7 +61,7 @@ static jobject _make_terminal_info(JNIEnv* env, const BDJO_TERMINAL_INFO *p)
     jstring jdefault_font = (*env)->NewStringUTF(env, p->default_font);
     return bdj_make_object(env, "org/videolan/bdjo/TerminalInfo", "(Ljava/lang/String;IZZ)V",
                            jdefault_font, (jint)p->initial_havi_config_id,
-                           (jint)p->menu_call_mask, (jint)p->title_search_mask);
+                           (jboolean)p->menu_call_mask, (jboolean)p->title_search_mask);
 }
 
 static jobject _make_app_cache_info(JNIEnv* env, const BDJO_APP_CACHE_INFO *p)

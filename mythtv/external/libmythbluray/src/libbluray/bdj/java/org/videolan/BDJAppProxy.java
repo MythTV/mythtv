@@ -63,7 +63,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     public void load() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_LOAD, null);
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -71,7 +71,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     public void init() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_INIT, null);
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -83,7 +83,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     public void start(String[] args) {
         AppCommand cmd = new AppCommand(AppCommand.CMD_START, args);
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -91,7 +91,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     public void stop(boolean force, int timeout) {
         AppCommand cmd = new AppCommand(AppCommand.CMD_STOP, new Boolean(force));
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -108,7 +108,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     public void pause() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_PAUSE, null);
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -116,7 +116,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     public void resume() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_RESUME, null);
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -124,7 +124,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     protected void notifyDestroyed() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_NOTIFY_DESTROYED, null);
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -132,7 +132,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     protected void notifyPaused() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_NOTIFY_PAUSED, null);
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.notifyAll();
         }
@@ -140,7 +140,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
     protected void release() {
         AppCommand cmd = new AppCommand(AppCommand.CMD_STOP, new Boolean(true));
-        synchronized(cmds) {
+        synchronized (cmds) {
             cmds.addLast(cmd);
             cmds.addLast(null);
             cmds.notifyAll();
@@ -162,20 +162,20 @@ class BDJAppProxy implements DVBJProxy, Runnable {
     }
 
     public void addAppStateChangeEventListener(AppStateChangeEventListener listener) {
-        synchronized(listeners) {
+        synchronized (listeners) {
             listeners.add(listener);
         }
     }
 
     public void removeAppStateChangeEventListener(AppStateChangeEventListener listener) {
-        synchronized(listeners) {
+        synchronized (listeners) {
             listeners.remove(listener);
         }
     }
 
     private void notifyListeners(int fromState, int toState, boolean hasFailed) {
         LinkedList list;
-        synchronized(listeners) {
+        synchronized (listeners) {
             list = (LinkedList)listeners.clone();
         }
 
@@ -212,7 +212,10 @@ class BDJAppProxy implements DVBJProxy, Runnable {
                 String persistent = System.getProperty("dvb.persistent.root") + File.separator +
                     (String)context.getXletProperty("dvb.org.id") + File.separator +
                     (String)context.getXletProperty("dvb.app.id");
-                new File(persistent).mkdirs();
+                File f = new File(persistent);
+                if (!f.isDirectory() && !f.mkdirs()) {
+                    logger.error("Error creating persistent storage " + persistent);
+                }
                 xlet.initXlet(context);
                 state = PAUSED;
                 return true;
@@ -299,7 +302,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
 
         for (;;) {
             AppCommand cmd;
-            synchronized(cmds) {
+            synchronized (cmds) {
                 while (cmds.isEmpty()) {
                     try {
                         cmds.wait();
@@ -368,7 +371,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
     private Thread thread;
     private static final Logger logger = Logger.getLogger(BDJAppProxy.class.getName());
 
-    private class AppCommand {
+    private static class AppCommand {
         public AppCommand(int cmd, Object arg) {
             this.cmd = cmd;
             this.arg = arg;
@@ -383,7 +386,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
         }
 
         public boolean waitDone(int timeoutMs) {
-            synchronized(this) {
+            synchronized (this) {
                 while (!done) {
                     try {
                         if (timeoutMs < 1) {
@@ -400,7 +403,7 @@ class BDJAppProxy implements DVBJProxy, Runnable {
         }
 
         public void release() {
-            synchronized(this) {
+            synchronized (this) {
                 done = true;
                 this.notifyAll();
             }

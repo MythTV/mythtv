@@ -21,10 +21,10 @@ package org.bluray.storage;
 
 public class BindingunitDataAreaInfo implements DataAreaInfo {
     public long getFreeSpace() {
-           return 1024000;
+        return 1024000;
     }
 
     public long getTotalSpace() {
-           return 1024000;
+        return 1024000;
     }
 }

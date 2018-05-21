@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -112,6 +112,8 @@ typedef struct indx_root_s {
 
     uint16_t       num_titles;
     INDX_TITLE    *titles;
+
+    uint32_t       indx_version;
 } INDX_ROOT;
 
 

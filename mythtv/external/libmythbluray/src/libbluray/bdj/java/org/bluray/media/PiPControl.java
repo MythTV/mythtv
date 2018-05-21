@@ -22,16 +22,13 @@ package org.bluray.media;
 import org.dvb.media.VideoPresentationControl;
 
 public abstract interface PiPControl extends VideoPresentationControl {
-    public abstract void addPiPStatusListener(
-            PiPStatusListener paramPiPStatusListener);
+    public abstract void addPiPStatusListener(PiPStatusListener paramPiPStatusListener);
 
-    public abstract void removePiPStatusListener(
-            PiPStatusListener paramPiPStatusListener);
+    public abstract void removePiPStatusListener(PiPStatusListener paramPiPStatusListener);
 
     public abstract int getCurrentStreamNumber();
 
-    public abstract void selectStreamNumber(int num)
-            throws StreamNotAvailableException;
+    public abstract void selectStreamNumber(int num) throws StreamNotAvailableException;
 
     public abstract void setDisplay(boolean value);
 

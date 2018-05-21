@@ -56,24 +56,19 @@ public final class Manager {
 //              at com.sun.media.protocol.rtp.DataSource.disconnect(DataSource.java:207)
 //              at javax.media.Manager.createPlayer(Manager.java:425)
 //              at net.sf.fmj.ui.application.ContainerPlayer.createNewPlayer(ContainerPlayer.java:357)
-            }
-            catch (NoPlayerException e) {
+            } catch (NoPlayerException e) {
                 // no need to log, will be logged by call to createPlayer.
                 continue;
-            }
-            catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 logger.warning("createPlayer: " + e);    // no need for call stack
                 continue;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.warning(""  + e);
                 continue;
-            }
-            catch (NoClassDefFoundError e) {
+            } catch (NoClassDefFoundError e) {
                 logger.warning(""  + e);
                 continue;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.warning(""  + e);
                 continue;
             }
@@ -83,8 +78,7 @@ public final class Manager {
         final URL url;
         try {
             url = sourceLocator.getURL();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.warning("" + e);
             throw new NoPlayerException();
         }
@@ -98,8 +92,7 @@ public final class Manager {
         return createPlayer(dataSource);
     }
 
-    public static Player createPlayer(DataSource source) throws IOException,
-            NoPlayerException {
+    public static Player createPlayer(DataSource source) throws IOException, NoPlayerException {
         return createPlayer(source, source.getContentType());
     }
 
@@ -120,20 +113,16 @@ public final class Manager {
                 dataSource.setLocator(sourceLocator);
                 dataSource.connect();
                 return dataSource;
-            }
-            catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 logger.warning("createDataSource: "  + e);    // no need for call stack
                 continue;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.warning("" + e);
                 continue;
-            }
-            catch (NoClassDefFoundError e) {
+            } catch (NoClassDefFoundError e) {
                 logger.warning("" + e);
                 continue;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.warning("" + e);
                 continue;
             }
@@ -143,8 +132,7 @@ public final class Manager {
         final URL url;
         try {
             url = sourceLocator.getURL();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.warning("" + e);
             throw new NoDataSourceException();
         }
@@ -187,30 +175,24 @@ public final class Manager {
                     final MediaProxy mediaProxy = (MediaProxy) handler;
                     return createPlayer(mediaProxy.getDataSource());
                 }
-            }
-            catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 // no need for call stack
                 logger.warning("createPlayer: "  + e);
                 continue;
-            }
-            catch (IncompatibleSourceException e) {
+            } catch (IncompatibleSourceException e) {
                 // no need for call stack
                 logger.warning("createPlayer(" + source + ", " + contentType + "): "  + e);
                 continue;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.warning("" + e);
                 continue;
-            }
-            catch (NoPlayerException e) {
+            } catch (NoPlayerException e) {
                 // no need to log, will be logged by call to createPlayer.
                 continue;
-            }
-            catch (NoClassDefFoundError e) {
+            } catch (NoClassDefFoundError e) {
                 logger.warning("" + e);
                 continue;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.warning("" + e);
                 continue;
             }

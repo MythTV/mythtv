@@ -38,4 +38,9 @@ class BDFileSystemImpl extends BDFileSystem {
     public long getSpace(File f, int t) {
         return fs.getSpace(f, t);
     }
+
+    /* Java 9 */
+    public int getNameMax(String path) {
+        return 255;
+    }
 }

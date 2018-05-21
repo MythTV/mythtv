@@ -33,8 +33,7 @@ public interface ServiceContext {
     public void select(Locator[] locators) throws InvalidLocatorException,
             InvalidServiceComponentException, SecurityException;
 
-    public ServiceContentHandler[] getServiceContentHandlers()
-            throws SecurityException;
+    public ServiceContentHandler[] getServiceContentHandlers() throws SecurityException;
 
     public Service getService();
 
