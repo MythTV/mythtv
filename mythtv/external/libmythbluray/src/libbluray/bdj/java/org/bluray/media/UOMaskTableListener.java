@@ -24,5 +24,6 @@ import java.util.EventListener;
 public abstract interface UOMaskTableListener extends EventListener {
     public abstract void receiveUOMaskedEvent(UOMaskedEvent event);
 
-    public abstract void receiveUOMaskTableChangedEvent(UOMaskTableChangedEvent event);
+    public abstract void receiveUOMaskTableChangedEvent(
+            UOMaskTableChangedEvent event);
 }

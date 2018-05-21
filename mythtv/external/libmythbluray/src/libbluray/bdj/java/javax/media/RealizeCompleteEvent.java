@@ -20,7 +20,8 @@
 package javax.media;
 
 public class RealizeCompleteEvent extends TransitionEvent {
-    public RealizeCompleteEvent(Controller source, int previous, int current, int target) {
+    public RealizeCompleteEvent(Controller source, int previous, int current,
+            int target) {
         super(source, previous, current, target);
     }
 

@@ -29,7 +29,8 @@ public class BDJUtil {
      * @param id
      * @return
      */
-    public static String makeFiveDigitStr(int id) {
+    public static String makeFiveDigitStr(int id)
+    {
         if (id < 0 || id > 99999) {
             System.err.println("Invalid ID: " + id);
             throw new IllegalArgumentException("Invalid ID " + id);
@@ -55,7 +56,8 @@ public class BDJUtil {
      * @param path
      * @return
      */
-    public static String discRootToFilesystem(String path) {
+    public static String discRootToFilesystem(String path)
+    {
         String vfsRoot = System.getProperty("bluray.vfs.root");
         if (vfsRoot == null) {
             System.err.println("discRootToFilesystem(): disc root not set !");

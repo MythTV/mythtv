@@ -21,7 +21,8 @@ package javax.tv.service.navigation;
 
 import javax.tv.service.SIException;
 
-public class SortNotAvailableException extends SIException {
+public class SortNotAvailableException extends SIException
+{
     public SortNotAvailableException() {
     }
 

@@ -32,13 +32,6 @@
 #   include <dirent.h>
 #endif
 
-#if defined(__GLIBC__) && defined(__GLIBC_MINOR__)
-#  if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 24)
-#    define USE_READDIR
-#    include <errno.h>
-#  endif
-#endif
-
 static void _dir_close_posix(BD_DIR_H *dir)
 {
     if (dir) {
@@ -50,41 +43,18 @@ static void _dir_close_posix(BD_DIR_H *dir)
     }
 }
 
-static void _error(const char *msg, int errnum, void *dir)
-{
-    char buf[128];
-    if (strerror_r(errnum, buf, sizeof(buf))) {
-        strcpy(buf, "?");
-    }
-    BD_DEBUG(DBG_DIR | DBG_CRIT, "%s: %d %s (%p)\n", msg, errnum, buf, dir);
-}
-
 static int _dir_read_posix(BD_DIR_H *dir, BD_DIRENT *entry)
 {
-    struct dirent *p_e;
-
-#ifdef USE_READDIR
-    errno = 0;
-    p_e = readdir((DIR*)dir->internal);
-    if (!p_e && errno) {
-        _error("Error reading directory", errno, dir);
-        return -1;
-    }
-#else /* USE_READDIR */
+    struct dirent e, *p_e;
     int result;
-    struct dirent e;
 
     result = readdir_r((DIR*)dir->internal, &e, &p_e);
     if (result) {
-        _error("Error reading directory", result, dir);
         return -result;
-    }
-#endif /* USE_READDIR */
-
-    if (p_e == NULL) {
+    } else if (p_e == NULL) {
         return 1;
     }
-    strncpy(entry->d_name, p_e->d_name, sizeof(entry->d_name));
+    strncpy(entry->d_name, e.d_name, sizeof(entry->d_name));
     entry->d_name[sizeof(entry->d_name) - 1] = 0;
 
     return 0;

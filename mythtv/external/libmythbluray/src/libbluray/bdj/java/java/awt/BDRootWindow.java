@@ -139,14 +139,12 @@ public class BDRootWindow extends Frame {
                     overlay_open = true;
                     a = new Area(getWidth(), getHeight()); /* force full plane update */
                 }
-
-                Libbluray.updateGraphic(getWidth(), getHeight(), backBuffer,
-                                        a.getX0(), a.getY0(), a.getX1(), a.getY1());
+                Libbluray.updateGraphic(getWidth(), getHeight(), backBuffer, a.x0, a.y0, a.x1, a.y1);
             }
         }
     }
 
-    private static class RefreshTimerTask extends TimerTask {
+    private class RefreshTimerTask extends TimerTask {
         public RefreshTimerTask(BDRootWindow window) {
             this.window = window;
             this.changeCount = window.changeCount;
@@ -220,10 +218,10 @@ public class BDRootWindow extends Frame {
     }
 
     private int[] backBuffer = null;
-    private transient Area dirty = new Area();
-    private transient int changeCount = 0;
-    private transient Timer timer = new Timer();
-    private transient TimerTask timerTask = null;
+    private Area dirty = new Area();
+    private int changeCount = 0;
+    private Timer timer = new Timer();
+    private TimerTask timerTask = null;
     private boolean overlay_open = false;
     private Font defaultFont = null;
 

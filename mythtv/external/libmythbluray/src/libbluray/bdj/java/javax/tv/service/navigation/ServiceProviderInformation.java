@@ -19,6 +19,7 @@
 
 package javax.tv.service.navigation;
 
-public interface ServiceProviderInformation {
+public interface ServiceProviderInformation
+{
     public String getProviderName();
 }

@@ -137,6 +137,7 @@ public class ImageFrameAccurateAnimation extends FrameAccurateAnimation
         this.position = position;
     }
 
+
     protected void destroyImpl() {
         stopImpl();
 

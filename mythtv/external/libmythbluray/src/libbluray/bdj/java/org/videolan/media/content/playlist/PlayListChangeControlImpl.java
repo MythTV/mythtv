@@ -41,7 +41,7 @@ public class PlayListChangeControlImpl implements PlayListChangeControl {
 
     public void selectPlayList(PlayList pl) throws InvalidPlayListException, ClockStartedError {
         try {
-            player.selectPlayList((BDLocator)pl.getLocator());
+                player.selectPlayList((BDLocator)pl.getLocator());
         } catch (InvalidLocatorException e) {
             throw new InvalidPlayListException();
         }

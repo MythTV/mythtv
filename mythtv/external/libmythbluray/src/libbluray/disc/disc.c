@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2014-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2014  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,6 @@
 #include "disc.h"
 
 #include "dec.h"
-#include "properties.h"
 
 #include "util/logging.h"
 #include "util/macro.h"
@@ -32,17 +31,16 @@
 #include "util/strutl.h"
 #include "file/file.h"
 #include "file/mount.h"
-#include "file/dirs.h"
 
 #include <ctype.h>
-#include <stdio.h>
 #include <string.h>
 
+#ifdef ENABLE_UDF
 #include "udf_fs.h"
+#endif
 
 struct bd_disc {
     BD_MUTEX  ovl_mutex;     /* protect access to overlay root */
-    BD_MUTEX  properties_mutex; /* protect access to properties file */
 
     char     *disc_root;     /* disc filesystem root (if disc is mounted) */
     char     *overlay_root;  /* overlay filesystem root (if set) */
@@ -55,7 +53,6 @@ struct bd_disc {
     void        (*pf_fs_close)(void *);
 
     const char   *udf_volid;
-    char         *properties_file;  /* NULL if not yet used */
 
     int8_t        avchd;  /* -1 - unknown. 0 - no. 1 - yes */
 };
@@ -268,7 +265,6 @@ static BD_DISC *_disc_init()
     BD_DISC *p = calloc(1, sizeof(BD_DISC));
     if (p) {
         bd_mutex_init(&p->ovl_mutex);
-        bd_mutex_init(&p->properties_mutex);
 
         /* default file access functions */
         p->fs_handle          = (void*)p;
@@ -303,42 +299,42 @@ BD_DISC *disc_open(const char *device_path,
 {
     BD_DISC *p = _disc_init();
 
-    if (!p) {
-        return NULL;
-    }
-
-    if (p_fs && p_fs->open_dir) {
-        p->fs_handle          = p_fs->fs_handle;
-        p->pf_file_open_bdrom = p_fs->open_file;
-        p->pf_dir_open_bdrom  = p_fs->open_dir;
-    }
-
-    _set_paths(p, device_path);
-
-    /* check if disc root directory can be opened. If not, treat it as device/image file. */
-    BD_DIR_H *dp_img = device_path ? dir_open(device_path) : NULL;
-    if (!dp_img) {
-        void *udf = udf_image_open(device_path, p_fs ? p_fs->fs_handle : NULL, p_fs ? p_fs->read_blocks : NULL);
-        if (!udf) {
-            BD_DEBUG(DBG_FILE | DBG_CRIT, "failed opening UDF image %s\n", device_path);
-        } else {
-            p->fs_handle          = udf;
-            p->pf_fs_close        = udf_image_close;
-            p->pf_file_open_bdrom = udf_file_open;
-            p->pf_dir_open_bdrom  = udf_dir_open;
-
-            p->udf_volid = udf_volume_id(udf);
-
-            /* root not accessible with stdio */
-            X_FREE(p->disc_root);
+    if (p) {
+        if (p_fs && p_fs->open_dir) {
+            p->fs_handle          = p_fs->fs_handle;
+            p->pf_file_open_bdrom = p_fs->open_file;
+            p->pf_dir_open_bdrom  = p_fs->open_dir;
         }
-    } else {
-        dir_close(dp_img);
-        BD_DEBUG(DBG_FILE, "%s does not seem to be image file or device node\n", device_path);
-    }
 
-    struct dec_dev dev = { p->fs_handle, p->pf_file_open_bdrom, p, (file_openFp)disc_open_path, p->disc_root, device_path };
-    p->dec = dec_init(&dev, enc_info, keyfile_path, regs, psr_read, psr_write);
+        _set_paths(p, device_path);
+
+#ifdef ENABLE_UDF
+        /* check if disc root directory can be opened. If not, treat it as device/image file. */
+        BD_DIR_H *dp_img = device_path ? dir_open(device_path) : NULL;
+        if (!dp_img) {
+            void *udf = udf_image_open(device_path, p_fs ? p_fs->fs_handle : NULL, p_fs ? p_fs->read_blocks : NULL);
+            if (!udf) {
+                BD_DEBUG(DBG_FILE | DBG_CRIT, "failed opening UDF image %s\n", device_path);
+            } else {
+                p->fs_handle          = udf;
+                p->pf_fs_close        = udf_image_close;
+                p->pf_file_open_bdrom = udf_file_open;
+                p->pf_dir_open_bdrom  = udf_dir_open;
+
+                p->udf_volid = udf_volume_id(udf);
+
+                /* root not accessible with stdio */
+                X_FREE(p->disc_root);
+            }
+        } else {
+            dir_close(dp_img);
+            BD_DEBUG(DBG_FILE, "%s does not seem to be image file or device node\n", device_path);
+        }
+#endif
+
+        struct dec_dev dev = { p->fs_handle, p->pf_file_open_bdrom, p, (file_openFp)disc_open_path, p->disc_root, device_path };
+        p->dec = dec_init(&dev, enc_info, keyfile_path, regs, psr_read, psr_write);
+    }
 
     return p;
 }
@@ -355,10 +351,8 @@ void disc_close(BD_DISC **pp)
         }
 
         bd_mutex_destroy(&p->ovl_mutex);
-        bd_mutex_destroy(&p->properties_mutex);
 
         X_FREE(p->disc_root);
-        X_FREE(p->properties_file);
         X_FREE(*pp);
     }
 }
@@ -580,84 +574,6 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
 }
 
 /*
- * persistent properties storage
- */
-
-static char *_properties_file(BD_DISC *p)
-{
-    const uint8_t *disc_id = NULL;
-    uint8_t  pseudo_id[20];
-    char     id_type, id_str[41];
-    char    *cache_home;
-    char    *properties_file;
-
-    cache_home = file_get_cache_home();
-    if (!cache_home) {
-        return NULL;
-    }
-
-    /* get disc ID */
-    if (p->dec) {
-        id_type = 'A';
-        disc_id = dec_disc_id(p->dec);
-    }
-    if (!disc_id) {
-        id_type = 'P';
-        disc_pseudo_id(p, pseudo_id);
-        disc_id = pseudo_id;
-    }
-
-    properties_file = str_printf("%s" DIR_SEP "bluray" DIR_SEP "properties" DIR_SEP "%c%s",
-                                 cache_home, id_type,
-                                 str_print_hex(id_str, disc_id, 20));
-
-    X_FREE(cache_home);
-
-    return properties_file;
-}
-
-static int _ensure_properties_file(BD_DISC *p)
-{
-    bd_mutex_lock(&p->properties_mutex);
-    if (!p->properties_file) {
-        p->properties_file = _properties_file(p);
-    }
-    bd_mutex_unlock(&p->properties_mutex);
-
-    return p->properties_file ? 0 : -1;
-}
-
-int disc_property_put(BD_DISC *p, const char *property, const char *val)
-{
-    int result;
-
-    if (_ensure_properties_file(p) < 0) {
-        return -1;
-    }
-
-    bd_mutex_lock(&p->properties_mutex);
-    result = properties_put(p->properties_file, property, val);
-    bd_mutex_unlock(&p->properties_mutex);
-
-    return result;
-}
-
-char *disc_property_get(BD_DISC *p, const char *property)
-{
-    char *result;
-
-    if (_ensure_properties_file(p) < 0) {
-        return NULL;
-    }
-
-    bd_mutex_lock(&p->properties_mutex);
-    result = properties_get(p->properties_file, property);
-    bd_mutex_unlock(&p->properties_mutex);
-
-    return result;
-}
-
-/*
  * streams
  */
 
@@ -688,7 +604,7 @@ const uint8_t *disc_get_data(BD_DISC *disc, int type)
 
 void disc_event(BD_DISC *disc, uint32_t event, uint32_t param)
 {
-    if (disc && disc->dec) {
+    if (disc->dec) {
         switch (event) {
             case DISC_EVENT_START:
                 dec_start(disc->dec, param);

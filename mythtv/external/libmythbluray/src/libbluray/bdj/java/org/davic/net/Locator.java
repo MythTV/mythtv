@@ -35,10 +35,6 @@ public class Locator implements javax.tv.locator.Locator {
         return url;
     }
 
-    public int hashCode() {
-        return toExternalForm().hashCode();
-    }
-
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof Locator) || url == null)
             return false;

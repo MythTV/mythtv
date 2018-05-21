@@ -94,8 +94,6 @@ typedef struct bd_ig_effect_sequence_s {
 
 } BD_IG_EFFECT_SEQUENCE;
 
-#define MAX_NUM_BOGS  256
-
 typedef struct bd_ig_page_s {
     uint8_t       id;
     uint8_t       version;

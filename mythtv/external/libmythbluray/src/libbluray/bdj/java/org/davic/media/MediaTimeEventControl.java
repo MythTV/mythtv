@@ -22,7 +22,8 @@ package org.davic.media;
 import javax.media.Control;
 
 public interface MediaTimeEventControl extends Control {
-    public void notifyWhen(MediaTimeEventListener listener, long mediaTime, int id);
+    public void notifyWhen(MediaTimeEventListener listener, long mediaTime,
+            int id);
 
     public void notifyWhen(MediaTimeEventListener listener, long mediaTime);
 }

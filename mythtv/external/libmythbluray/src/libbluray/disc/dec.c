@@ -243,7 +243,7 @@ static int _libbdplus_init(BD_DEC *dec, struct dec_dev *dev,
     if (i->bdplus_date == 0) {
         // libmmbd -> no menu support
         BD_DEBUG(DBG_BLURAY | DBG_CRIT, "WARNING: using libmmbd for BD+. On-disc menus will not work.\n");
-        //i->no_menu_support = 1;
+        i->no_menu_support = 1;
     }
 
     return 1;
@@ -339,24 +339,10 @@ void dec_close(BD_DEC **pp)
 
 const uint8_t *dec_data(BD_DEC *dec, int type)
 {
-    const uint8_t *ret = NULL;
-
-    if (type >= 0x1000) {
-        if (dec->bdplus) {
-            ret = libbdplus_get_data(dec->bdplus, type);
-        }
-    } else {
-        if (dec->aacs) {
-            ret = libaacs_get_aacs_data(dec->aacs, type);
-        }
+    if (dec->aacs) {
+        return libaacs_get_aacs_data(dec->aacs, type);
     }
-
-    return ret;
-}
-
-const uint8_t *dec_disc_id(BD_DEC *dec)
-{
-    return dec_data(dec, BD_AACS_DISC_ID);
+    return NULL;
 }
 
 void dec_start(BD_DEC *dec, uint32_t num_titles)

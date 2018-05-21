@@ -53,7 +53,6 @@ BD_PRIVATE void dec_close(BD_DEC **);
 
 /* get decoder data */
 BD_PRIVATE const uint8_t *dec_data(BD_DEC *, int type);
-BD_PRIVATE const uint8_t *dec_disc_id(BD_DEC *);
 
 /* status events from upper layers */
 BD_PRIVATE void dec_start(BD_DEC *, uint32_t num_titles);

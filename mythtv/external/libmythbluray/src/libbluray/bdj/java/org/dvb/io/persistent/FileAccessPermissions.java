@@ -39,11 +39,11 @@ public class FileAccessPermissions {
         return writeWorld;
     }
 
-    public boolean hasReadOrganisationAccessRight() {
+    public boolean hasReadOrganizationAccessRight() {
         return readOrganization;
     }
 
-    public boolean hasWriteOrganisationAccessRight() {
+    public boolean hasWriteOrganizationAccessRight() {
         return writeOrganization;
     }
 

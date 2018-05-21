@@ -23,10 +23,7 @@
 #include "util/attributes.h"
 
 struct bd_disc;
-struct meta_dl;
 struct meta_root;
-
-typedef struct meta_root META_ROOT;
 
 BD_PRIVATE struct meta_root *     meta_parse(struct bd_disc *disc) BD_ATTR_MALLOC;
 BD_PRIVATE void                   meta_free (struct meta_root **index);

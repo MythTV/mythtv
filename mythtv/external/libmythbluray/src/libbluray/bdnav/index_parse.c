@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2010  hpi1
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,6 @@
 #endif
 
 #include "index_parse.h"
-#include "extdata_parse.h"
-#include "bdmv_parse.h"
 
 #include "disc/disc.h"
 
@@ -35,6 +33,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 static int _parse_hdmv_obj(BITSTREAM *bs, INDX_HDMV_OBJ *hdmv)
 {
@@ -115,11 +114,6 @@ static int _parse_index(BITSTREAM *bs, INDX_ROOT *index)
         return 0;
     }
 
-    if (bs_avail(bs)/(12*8) < index->num_titles) {
-        BD_DEBUG(DBG_HDMV|DBG_CRIT, "index.bdmv: unexpected EOF\n");
-        return 0;
-    }
-
     for (i = 0; i < index->num_titles; i++) {
 
         index->titles[i].object_type = bs_read(bs, 2);
@@ -174,13 +168,25 @@ static int _parse_app_info(BITSTREAM *bs, INDX_APP_INFO *app_info)
 }
 
 #define INDX_SIG1  ('I' << 24 | 'N' << 16 | 'D' << 8 | 'X')
+#define INDX_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
+#define INDX_SIG2B ('0' << 24 | '1' << 16 | '0' << 8 | '0')
 
-static int _parse_header(BITSTREAM *bs,
-                         uint32_t *index_start, uint32_t *extension_data_start,
-                         uint32_t *indx_version)
+static int _parse_header(BITSTREAM *bs, int *index_start, int *extension_data_start)
 {
-    if (!bdmv_parse_header(bs, INDX_SIG1, indx_version)) {
+    uint32_t sig1, sig2;
+
+    if (bs_seek_byte(bs, 0) < 0) {
         return 0;
+    }
+
+    sig1 = bs_read(bs, 32);
+    sig2 = bs_read(bs, 32);
+
+    if (sig1 != INDX_SIG1 ||
+       (sig2 != INDX_SIG2A &&
+        sig2 != INDX_SIG2B)) {
+       BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv failed signature match: expected INDX0100 got %8.8s\n", bs->buf);
+       return 0;
     }
 
     *index_start          = bs_read(bs, 32);
@@ -193,7 +199,7 @@ static INDX_ROOT *_indx_parse(BD_FILE_H *fp)
 {
     BITSTREAM  bs;
     INDX_ROOT *index;
-    uint32_t   indexes_start, extension_data_start;
+    int        indexes_start, extension_data_start;
 
     if (bs_init(&bs, fp) < 0) {
         BD_DEBUG(DBG_NAV, "index.bdmv: read error\n");
@@ -206,7 +212,7 @@ static INDX_ROOT *_indx_parse(BD_FILE_H *fp)
         return NULL;
     }
 
-    if (!_parse_header(&bs, &indexes_start, &extension_data_start, &index->indx_version) ||
+    if (!_parse_header(&bs, &indexes_start, &extension_data_start) ||
         !_parse_app_info(&bs, &index->app_info)) {
 
         indx_free(&index);
@@ -224,7 +230,7 @@ static INDX_ROOT *_indx_parse(BD_FILE_H *fp)
     }
 
     if (extension_data_start) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: unknown extension data at %u\n", (unsigned)extension_data_start);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "index.bdmv: unknown extension data at %d\n", extension_data_start);
     }
 
     return index;

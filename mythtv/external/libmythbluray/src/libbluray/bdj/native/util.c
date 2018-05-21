@@ -30,49 +30,24 @@
 
 jobject bdj_make_object(JNIEnv* env, const char* name, const char* sig, ...)
 {
-    va_list ap;
-    jclass obj_class;
-    jmethodID obj_constructor;
-    jobject obj;
+    jclass obj_class = (*env)->FindClass(env, name);
+    jmethodID obj_constructor = (*env)->GetMethodID(env, obj_class, "<init>", sig);
 
-    obj_class = (*env)->FindClass(env, name);
     if (!obj_class) {
         BD_DEBUG(DBG_BDJ | DBG_CRIT, "Class %s not found\n", name);
         return NULL;
     }
 
-    obj_constructor = (*env)->GetMethodID(env, obj_class, "<init>", sig);
-    if (!obj_constructor) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Class %s constructor %s not found\n", name, sig);
-        return NULL;
-    }
-
+    va_list ap;
     va_start(ap, sig);
-    obj = (*env)->NewObjectV(env, obj_class, obj_constructor, ap);
+    jobject obj = (*env)->NewObjectV(env, obj_class, obj_constructor, ap);
     va_end(ap);
-
-    if (!obj) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Failed to create %s\n", name);
-    }
 
     return obj;
 }
 
 jobjectArray bdj_make_array(JNIEnv* env, const char* name, int count)
 {
-    jobjectArray arr;
-    jclass arr_class;
-
-    arr_class = (*env)->FindClass(env, name);
-    if (!arr_class) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Class %s not found\n", name);
-        return NULL;
-    }
-
-    arr = (*env)->NewObjectArray(env, count, arr_class, NULL);
-    if (!arr) {
-        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Failed to create %s\n", name);
-    }
-
-    return arr;
+    jclass arr_class = (*env)->FindClass(env, name);
+    return (*env)->NewObjectArray(env, count, arr_class, NULL);
 }

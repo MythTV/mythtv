@@ -56,9 +56,9 @@ public class PlaylistInfo {
         return angles;
     }
 
-    private final int playlist;
-    private final long duration;
-    private final int angles;
-    private final TIMark[] marks;
-    private final TIClip[] clips;
+    private int playlist;
+    private long duration;
+    private int angles;
+    private TIMark[] marks;
+    private TIClip[] clips;
 }

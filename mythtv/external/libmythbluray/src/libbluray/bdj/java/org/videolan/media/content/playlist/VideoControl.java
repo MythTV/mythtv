@@ -30,7 +30,7 @@ import org.videolan.StreamInfo;
 
 public abstract class VideoControl extends StreamControl implements VideoPresentationControl {
     protected VideoControl(int plane) {
-        //this.plane = plane;
+        this.plane = plane;
     }
 
     protected HScreenRectangle getNormalizedRectangle(Dimension dimension, Rectangle rectangle) {
@@ -118,10 +118,7 @@ public abstract class VideoControl extends StreamControl implements VideoPresent
         Dimension vd = getInputVideoSize();
         if ((vd.width == 0) || (vd.height == 0))
             return new Rectangle(0, 0);
-        if (clipRect != null)
-            srcArea = getRectangleOnScreen(getNormalizedRectangle(vd, clipRect));
-        else
-            srcArea = new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f);
+        srcArea = getRectangleOnScreen(getNormalizedRectangle(vd, clipRect));
 
         //TODO
         org.videolan.Logger.unimplemented("VideoControl", "setClipRegion");
@@ -156,7 +153,7 @@ public abstract class VideoControl extends StreamControl implements VideoPresent
         return null;
     }
 
-    //private int plane = 0;
+    private int plane = 0;
     private HScreenRectangle srcArea = new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f);
     private HScreenRectangle dstArea = new HScreenRectangle(0.0f, 0.0f, 1.0f, 1.0f);
 }

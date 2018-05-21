@@ -30,7 +30,7 @@ class CacheDir {
         return LockFile.create(path + File.separator + "lock");
     }
 
-    private static synchronized void InitializeBaseDir() throws IOException {
+    private static void InitializeBaseDir() throws IOException {
         if (baseDir == null) {
             try {
                 File tmpDir = new File(System.getProperty("java.io.tmpdir"), "libbluray-bdj-cache");
@@ -62,22 +62,16 @@ class CacheDir {
 
     private static synchronized File getCacheRoot() throws IOException {
 
-        BDJSecurityManager sm = (BDJSecurityManager)System.getSecurityManager();
-
         if (cacheRoot != null) {
-            if (sm != null) {
-                sm.setCacheRoot(cacheRoot.getPath());
-            }
             return cacheRoot;
         }
 
+        BDJSecurityManager sm = (BDJSecurityManager)System.getSecurityManager();
         if (sm != null) {
             InitializeBaseDir();
             File tmpDir = new File(System.getProperty("java.io.tmpdir"));
             sm.setCacheRoot(tmpDir.getCanonicalPath());
-            if (!baseDir.isDirectory() && !baseDir.mkdirs()) {
-                logger.error("Error creating directory " + baseDir.getPath());
-            }
+            baseDir.mkdirs();
             sm.setCacheRoot(baseDir.getCanonicalPath());
         }
 
@@ -108,8 +102,8 @@ class CacheDir {
     public static synchronized File create(String domain) throws IOException {
 
         File tmpDir = new File(getCacheRoot(), domain);
-        if (!tmpDir.isDirectory() && !tmpDir.mkdirs()) {
-            logger.error("Error creating directory " + tmpDir.getPath());
+        if (!tmpDir.exists() && !tmpDir.mkdirs()) {
+            logger.error("Error creating " + tmpDir.getPath());
             throw new IOException();
         }
 

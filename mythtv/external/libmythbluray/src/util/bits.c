@@ -20,10 +20,6 @@
  * <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "bits.h"
 
 #include "file/file.h"

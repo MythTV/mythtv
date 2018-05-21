@@ -22,7 +22,8 @@ package javax.tv.service.navigation;
 import javax.tv.service.SIElement;
 import javax.tv.service.Service;
 
-public interface ServiceComponent extends SIElement {
+public interface ServiceComponent extends SIElement
+{
     public String getName();
 
     public String getAssociatedLanguage();

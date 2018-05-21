@@ -30,15 +30,12 @@ public class PortingHelper {
     }
 
     public static String dumpStack(Thread t) {
+        String dump = "";
         StackTraceElement e[] = t.getStackTrace();
         if (e != null) {
-            StringBuffer dump = new StringBuffer();
-            for (int i = 0; i < e.length; i++) {
-                dump.append("\n\t");
-                dump.append(e[i].toString());
-            }
-            return dump.toString();
+            for (int i = 0; i < e.length; i++)
+                dump += "\n\t" + e[i].toString();
         }
-        return "";
+        return dump;
     }
 }

@@ -26,10 +26,12 @@ import org.bluray.ti.PlayList;
 import org.bluray.net.BDLocator;
 
 public abstract interface PlayListChangeControl extends Control {
-    public abstract void selectPlayList(PlayList pl) throws InvalidPlayListException, ClockStartedError;
+    public abstract void selectPlayList(PlayList pl)
+            throws InvalidPlayListException, ClockStartedError;
 
     public abstract void selectPlayList(BDLocator locator)
-            throws InvalidPlayListException, InvalidLocatorException, ClockStartedError;
+            throws InvalidPlayListException, InvalidLocatorException,
+            ClockStartedError;
 
     public abstract BDLocator getCurrentPlayList();
 }

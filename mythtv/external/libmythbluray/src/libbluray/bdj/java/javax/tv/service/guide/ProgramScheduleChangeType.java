@@ -21,7 +21,8 @@ package javax.tv.service.guide;
 
 import javax.tv.service.SIChangeType;
 
-public class ProgramScheduleChangeType extends SIChangeType {
+public class ProgramScheduleChangeType extends SIChangeType
+{
     protected ProgramScheduleChangeType(String name) {
         super(name);
     }

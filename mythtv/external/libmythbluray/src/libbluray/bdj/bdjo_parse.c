@@ -27,7 +27,6 @@
 #include "bdjo_data.h"
 
 #include "disc/disc.h"
-#include "bdnav/bdmv_parse.h"
 
 #include "file/file.h"
 #include "util/bits.h"
@@ -479,15 +478,35 @@ static void _clean_bdjo(BDJO *p)
     }
 }
 
-#define BDJO_SIG1 ('B' << 24 | 'D' << 16 | 'J' << 8 | 'O')
-
-static int _parse_header(BITSTREAM *bs, uint32_t *bdjo_version)
+static int _get_version(const uint8_t* str)
 {
-    if (!bdmv_parse_header(bs, BDJO_SIG1, bdjo_version)) {
+    if (memcmp(str, "0100", 4) != 0)
+        return 100;
+    else if (memcmp(str, "0200", 4) != 0)
+        return 200;
+    else
+        return 0;
+}
+
+static int _check_version(BITSTREAM *bs)
+{
+    // first check magic number
+    uint8_t magic[4];
+    bs_read_bytes(bs, magic, 4);
+
+    if (memcmp(magic, "BDJO", 4) != 0) {
+        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Invalid magic number in BDJO.\n");
         return -1;
     }
 
-    BD_DEBUG(DBG_BDJ, "[bdj] BDJO > Version: %.4s\n", (const char *)bdjo_version);
+    // get version string
+    uint8_t version[4];
+    bs_read_bytes(bs, version, 4);
+    if (!_get_version(version)) {
+        BD_DEBUG(DBG_BDJ | DBG_CRIT, "Invalid version of BDJO.\n");
+        return -1;
+    }
+    BD_DEBUG(DBG_BDJ, "[bdj] BDJO > Version: %.4s\n", version);
 
     // skip address table
     bs_skip(bs, 8*40);
@@ -511,7 +530,7 @@ static BDJO *_bdjo_parse(BD_FILE_H *fp)
         return NULL;
     }
 
-    if (_parse_header(&bs, &p->bdjo_version) < 0 ||
+    if (_check_version(&bs) < 0 ||
         _parse_terminal_info(&bs, &p->terminal_info) < 0 ||
         _parse_app_cache_info(&bs, &p->app_cache_info) < 0 ||
         _parse_accessible_playlists(&bs, &p->accessible_playlists) < 0 ||

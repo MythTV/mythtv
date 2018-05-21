@@ -39,7 +39,7 @@ import org.videolan.Logger;
 import org.videolan.PlaylistInfo;
 import org.videolan.TIClip;
 
-public class DVBMediaSelectControlImpl implements DVBMediaSelectControl {
+public class DVBMediaSelectControlImpl implements DVBMediaSelectControl{
     protected DVBMediaSelectControlImpl(Handler player) {
         this.player = player;
     }
@@ -191,18 +191,24 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl {
             throw new InvalidLocatorException(locator);
         PlaylistInfo pi = player.getPlaylistInfo();
         if (pi == null)
-            throw new InsufficientResourcesException();
+            throw new  InsufficientResourcesException();
         if (((BDLocator)locator).getPlayListId() != pi.getPlaylist())
             throw new InvalidLocatorException(locator);
-        TIClip ci = player.getCurrentClipInfo();
+        TIClip ci = player. getCurrentClipInfo();
         if (ci == null)
-            throw new InsufficientResourcesException();
+            throw new  InsufficientResourcesException();
         String[] tags = ((BDLocator)locator).getComponentTags();
         String[] tag = new String[1];
         for (int i = 0; i < tags.length; i++) {
             tag[0] = tags[i];
             try {
-                select(new BDLocator(null, -1, pi.getPlaylist(), ci.getIndex(), -1, tag));
+                select(new BDLocator(
+                                     null,
+                                     -1,
+                                     pi.getPlaylist(),
+                                     ci.getIndex(),
+                                     -1,
+                                     tag));
             } catch (org.davic.net.InvalidLocatorException e) {
                 e.printStackTrace();
                 throw new InvalidLocatorException(locator);
@@ -228,7 +234,7 @@ public class DVBMediaSelectControlImpl implements DVBMediaSelectControl {
             return false;
         if (bdLocator.getPlayListId() != -1 && bdLocator.getPlayListId() != pi.getPlaylist())
             return false;
-        TIClip ci = player.getCurrentClipInfo();
+        TIClip ci = player. getCurrentClipInfo();
         if (ci == null)
             return false;
         return (bdLocator.getPlayItemId() == -1) || (bdLocator.getPlayItemId() == ci.getIndex());

@@ -34,7 +34,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class FontIndex extends DefaultHandler implements EntityResolver {
+public class FontIndex extends DefaultHandler implements EntityResolver{
     public static FontIndexData[] parseIndex(String path) {
         return new FontIndex(path).getFontIndexData();
     }
@@ -54,7 +54,7 @@ public class FontIndex extends DefaultHandler implements EntityResolver {
             if (stream != null) {
                 try {
                     stream.close();
-                } catch (IOException ioe) {
+                } catch (Exception e) {
                 }
             }
         }

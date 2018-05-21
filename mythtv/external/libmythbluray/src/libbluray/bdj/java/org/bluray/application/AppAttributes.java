@@ -19,6 +19,7 @@
 
 package org.bluray.application;
 
-public abstract interface AppAttributes extends org.dvb.application.AppAttributes {
+public abstract interface AppAttributes extends
+        org.dvb.application.AppAttributes {
     public abstract boolean isDiscBound();
 }

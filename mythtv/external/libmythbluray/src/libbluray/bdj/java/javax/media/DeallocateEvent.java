@@ -20,7 +20,8 @@
 package javax.media;
 
 public class DeallocateEvent extends StopEvent {
-    public DeallocateEvent(Controller source, int previous, int current, int target, Time mediaTime) {
+    public DeallocateEvent(Controller source, int previous, int current,
+            int target, Time mediaTime) {
         super(source, previous, current, target, mediaTime);
     }
 

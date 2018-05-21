@@ -22,7 +22,8 @@ package javax.media;
 import java.util.EventObject;
 
 public class GainChangeEvent extends EventObject implements MediaEvent {
-    public GainChangeEvent(GainControl source, boolean mute, float dB, float level) {
+    public GainChangeEvent(GainControl source, boolean mute, float dB,
+            float level) {
         super(source);
         this.source = source;
         this.mute = mute;

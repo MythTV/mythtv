@@ -20,7 +20,8 @@
 package javax.media;
 
 public class StartEvent extends TransitionEvent {
-    public StartEvent(Controller source, int previous, int current, int target, Time mediaTime, Time tbTime) {
+    public StartEvent(Controller source, int previous, int current, int target,
+            Time mediaTime, Time tbTime) {
         super(source, previous, current, target);
         this.mediaTime = mediaTime;
         this.tbTime = tbTime;

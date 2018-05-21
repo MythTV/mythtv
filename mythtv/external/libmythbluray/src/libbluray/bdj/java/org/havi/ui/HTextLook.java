@@ -57,7 +57,7 @@ public class HTextLook implements HExtendedLook {
 
     public void renderVisible(Graphics g, HVisible visible, int state) {
         String text = visible.getTextContent(state);
-        //Insets insets = getInsets(visible);
+        Insets insets = getInsets(visible);
         if (text == null) {
             return;
         }

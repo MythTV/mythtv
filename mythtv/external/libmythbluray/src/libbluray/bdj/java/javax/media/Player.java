@@ -30,7 +30,8 @@ public interface Player extends MediaHandler, Controller, Duration {
 
     public void start();
 
-    public void addController(Controller newController) throws IncompatibleTimeBaseException;
+    public void addController(Controller newController)
+            throws IncompatibleTimeBaseException;
 
     public void removeController(Controller oldController);
 }

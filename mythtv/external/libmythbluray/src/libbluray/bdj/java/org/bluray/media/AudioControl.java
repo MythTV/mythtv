@@ -28,13 +28,15 @@ public abstract interface AudioControl extends AudioLanguageControl {
 
     public abstract int getCurrentStreamNumber();
 
-    public abstract void selectStreamNumber(int num) throws StreamNotAvailableException;
+    public abstract void selectStreamNumber(int num)
+            throws StreamNotAvailableException;
 
     public abstract String[] listAvailableLanguages();
 
     public abstract String getCurrentLanguage();
 
-    public abstract String selectDefaultLanguage() throws NotAuthorizedException;
+    public abstract String selectDefaultLanguage()
+            throws NotAuthorizedException;
 
     public abstract void selectLanguage(String language)
             throws LanguageNotAvailableException, NotAuthorizedException;

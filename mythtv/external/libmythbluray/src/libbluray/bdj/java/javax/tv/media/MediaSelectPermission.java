@@ -23,7 +23,9 @@ import java.security.Permission;
 import javax.tv.locator.Locator;
 import java.io.Serializable;
 
-public final class MediaSelectPermission extends Permission implements Serializable {
+public final class MediaSelectPermission extends Permission
+    implements Serializable
+{
     public MediaSelectPermission(Locator locator) {
         super("javax.tv.media.MediaSelectPermission");
 

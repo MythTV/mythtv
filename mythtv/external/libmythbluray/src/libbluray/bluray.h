@@ -2,7 +2,7 @@
  * This file is part of libbluray
  * Copyright (C) 2009-2010  Obliter0n
  * Copyright (C) 2009-2010  John Stebbins
- * Copyright (C) 2010-2017  Petri Hintukainen
+ * Copyright (C) 2010-2014  Petri Hintukainen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -69,33 +69,39 @@ typedef struct {
 typedef struct {
     uint8_t  bluray_detected;
 
-    /* Disc ID */
-    const char *disc_name;     /* optional disc name in preferred language */
-    const char *udf_volume_id; /* optional UDF volume identifier */
-    uint8_t     disc_id[20];
-
-    /* HDMV / BD-J titles */
-    uint8_t  no_menu_support;            /* 1 if this disc can't be played using on-disc menus */
     uint8_t  first_play_supported;
     uint8_t  top_menu_supported;
-
-    uint32_t             num_titles;
-    const BLURAY_TITLE  *const *titles;  /* index is title number 1 ... N */
-    const BLURAY_TITLE  *first_play;     /* titles[N+1].   NULL if not present on the disc. */
-    const BLURAY_TITLE  *top_menu;       /* titles[0]. NULL if not present on the disc. */
 
     uint32_t num_hdmv_titles;
     uint32_t num_bdj_titles;
     uint32_t num_unsupported_titles;
 
-    /* BD-J info  (valid only if disc uses BD-J) */
+    uint8_t  aacs_detected;
+    uint8_t  libaacs_detected;
+    uint8_t  aacs_handled;
+
+    uint8_t  bdplus_detected;
+    uint8_t  libbdplus_detected;
+    uint8_t  bdplus_handled;
+
+    /* aacs error code */
+    int      aacs_error_code;
+    /* aacs MKB version */
+    int      aacs_mkbv;
+
+    /* Disc ID */
+    uint8_t  disc_id[20];
+
+    /* BD-J */
     uint8_t  bdj_detected;     /* 1 if disc uses BD-J */
-    uint8_t  bdj_supported;    /* (deprecated) */
+    uint8_t  bdj_supported;    /* 1 if BD-J support was compiled in */
     uint8_t  libjvm_detected;  /* 1 if usable Java VM was found */
     uint8_t  bdj_handled;      /* 1 if usable Java VM + libbluray.jar was found */
 
-    char bdj_org_id[9];        /* (BD-J) disc organization ID */
-    char bdj_disc_id[33];      /* (BD-J) disc ID */
+    /* BD+ content code generation */
+    uint8_t  bdplus_gen;
+    /* BD+ content code relese date */
+    uint32_t bdplus_date;      /* (year << 16) | (month << 8) | day */
 
     /* disc application info */
     uint8_t video_format;             /* bd_video_format_e */
@@ -104,21 +110,18 @@ typedef struct {
     uint8_t initial_output_mode_preference;   /* 0 - 2D, 1 - 3D */
     uint8_t provider_data[32];
 
-    /* AACS info  (valid only if disc uses AACS) */
-    uint8_t  aacs_detected;       /* 1 if disc is using AACS encoding */
-    uint8_t  libaacs_detected;    /* 1 if usable AACS decoding library was found */
-    uint8_t  aacs_handled;        /* 1 if disc is using supported AACS encoding */
+    /* HDMV / BD-J titles */
+    uint32_t             num_titles;
+    const BLURAY_TITLE  *const *titles;  /* index is title number 1 ... N */
+    const BLURAY_TITLE  *first_play;     /* titles[N+1].   NULL if not present on the disc. */
+    const BLURAY_TITLE  *top_menu;       /* titles[0]. NULL if not present on the disc. */
 
-    int      aacs_error_code;     /* AACS error code (BD_AACS_*) */
-    int      aacs_mkbv;           /* AACS MKB version */
+    char bdj_org_id[9];      /* (BD-J) disc organization ID */
+    char bdj_disc_id[33];    /* (BD-J) disc ID */
 
-    /* BD+ info  (valid only if disc uses BD+) */
-    uint8_t  bdplus_detected;     /* 1 if disc is using BD+ encoding */
-    uint8_t  libbdplus_detected;  /* 1 if usable BD+ decoding library was found */
-    uint8_t  bdplus_handled;      /* 1 if disc is using supporred BD+ encoding */
+    const char *udf_volume_id; /* optional UDF volume identifier */
 
-    uint8_t  bdplus_gen;          /* BD+ content code generation */
-    uint32_t bdplus_date;         /* BD+ content code relese date ((year<<16)|(month<<8)|day) */
+    uint8_t no_menu_support;   /* 1 if this disc can't be played using on-disc menus */
 
 } BLURAY_DISC_INFO;
 
@@ -140,7 +143,6 @@ typedef enum {
     BLURAY_STREAM_TYPE_AUDIO_DTSHD_MASTER       = 0x86,
     BLURAY_STREAM_TYPE_VIDEO_VC1                = 0xea,
     BLURAY_STREAM_TYPE_VIDEO_H264               = 0x1b,
-    BLURAY_STREAM_TYPE_VIDEO_HEVC               = 0x24,
     BLURAY_STREAM_TYPE_SUB_PG                   = 0x90,
     BLURAY_STREAM_TYPE_SUB_IG                   = 0x91,
     BLURAY_STREAM_TYPE_SUB_TEXT                 = 0x92,
@@ -155,8 +157,7 @@ typedef enum {
     BLURAY_VIDEO_FORMAT_1080I             = 4,  // SMPTE 274M
     BLURAY_VIDEO_FORMAT_720P              = 5,  // SMPTE 296M
     BLURAY_VIDEO_FORMAT_1080P             = 6,  // SMPTE 274M
-    BLURAY_VIDEO_FORMAT_576P              = 7,  // ITU-R BT.1358
-    BLURAY_VIDEO_FORMAT_2160P             = 8,  //
+    BLURAY_VIDEO_FORMAT_576P              = 7   // ITU-R BT.1358
 } bd_video_format_e;
 
 typedef enum {
@@ -243,7 +244,6 @@ typedef struct bd_clip {
     uint64_t           start_time;  /* start media time, 90kHz, ("playlist time") */
     uint64_t           in_time;     /* start timestamp, 90kHz */
     uint64_t           out_time;    /* end timestamp, 90kHz */
-    char               clip_id[6];
 } BLURAY_CLIP_INFO;
 
 typedef struct bd_chapter {
@@ -264,15 +264,16 @@ typedef struct bd_mark {
 } BLURAY_TITLE_MARK;
 
 typedef struct bd_title_info {
-    uint32_t             idx;            /* filled only with bd_get_title_info() */
+    uint32_t             idx;
     uint32_t             playlist;
     uint64_t             duration;
     uint32_t             clip_count;
     uint8_t              angle_count;
     uint32_t             chapter_count;
-    uint32_t             mark_count;
     BLURAY_CLIP_INFO     *clips;
     BLURAY_TITLE_CHAPTER *chapters;
+
+    uint32_t             mark_count;
     BLURAY_TITLE_MARK    *marks;
 } BLURAY_TITLE_INFO;
 
@@ -568,18 +569,9 @@ void bd_seamless_angle_change(BLURAY *bd, unsigned angle);
  *
  *  Select stream (PG / TextST track)
  *
- *  When playing with on-disc menus:
- *
- *  Stream selection is controlled by on-disc menus.
- *  If user can change stream selection also in player GUI, this function
- *  should be used to keep on-disc menus in sync with player GUI.
- *
- *  When playing the disc without on-disc menus:
- *
- *  Initial stream selection is done using preferred language settings.
  *  This function can be used to override automatic stream selection.
- *  Without on-disc menus selecting the stream is useful only when using
- *  libbluray internal decoders or the stream is stored in a sub-path.
+ *  Selecting the stream is useful only when using libbluray internal decoders
+ *  or stream is stored in a sub-path.
  *
  * @param bd  BLURAY object
  * @param stream_type  BLURAY_*_STREAM
@@ -670,18 +662,14 @@ typedef enum {
     BLURAY_PLAYER_SETTING_VIDEO_CAP      = 29,    /* Video capability.            Bit mask. */
     BLURAY_PLAYER_SETTING_DISPLAY_CAP    = 23,    /* Display capability.          Bit mask. */
     BLURAY_PLAYER_SETTING_3D_CAP         = 24,    /* 3D capability.               Bit mask. */
-    BLURAY_PLAYER_SETTING_UHD_CAP         = 25,   /* UHD capability.              */
-    BLURAY_PLAYER_SETTING_UHD_DISPLAY_CAP = 26,   /* UHD display capability.      */
-    BLURAY_PLAYER_SETTING_HDR_PREFERENCE  = 27,   /* HDR preference.              */
-    BLURAY_PLAYER_SETTING_SDR_CONV_PREFER = 28,   /* SDR conversion preference.   */
     BLURAY_PLAYER_SETTING_TEXT_CAP       = 30,    /* Text Subtitle capability.    Bit mask. */
     BLURAY_PLAYER_SETTING_PLAYER_PROFILE = 31,    /* Player profile and version. */
 
     BLURAY_PLAYER_SETTING_DECODE_PG          = 0x100, /* Enable/disable PG (subtitle) decoder. Integer. Default: disabled. */
     BLURAY_PLAYER_SETTING_PERSISTENT_STORAGE = 0x101, /* Enable/disable BD-J persistent storage. Integer. Default: enabled. */
 
-    BLURAY_PLAYER_PERSISTENT_ROOT            = 0x200, /* Root path to the BD_J persistent storage location. String. */
-    BLURAY_PLAYER_CACHE_ROOT                 = 0x201, /* Root path to the BD_J cache storage location. String. */
+    BLURAY_PLAYER_PERSISTENT_ROOT        = 400,   /* Root path to the BD_J persistent storage location. String. */
+    BLURAY_PLAYER_CACHE_ROOT             = 401,   /* Root path to the BD_J cache storage location. String. */
 } bd_player_setting;
 
 /**
@@ -706,7 +694,7 @@ int bd_set_player_setting_str(BLURAY *bd, uint32_t idx, const char *value);
 
 typedef enum {
 
-    BD_EVENT_NONE         = 0,  /* no pending events */
+    BD_EVENT_NONE       = 0,  /* no pending events */
 
     /*
      * errors
@@ -725,48 +713,48 @@ typedef enum {
     BD_EVENT_PLAYLIST     = 6,  /* current playlist (xxxxx.mpls) */
     BD_EVENT_PLAYITEM     = 7,  /* current play item, 0...N-1  */
     BD_EVENT_CHAPTER      = 8,  /* current chapter, 1...N */
-    BD_EVENT_PLAYMARK     = 9,  /* playmark reached */
-    BD_EVENT_END_OF_TITLE = 10,
+    BD_EVENT_PLAYMARK     = 30, /* playmark reached */
+    BD_EVENT_END_OF_TITLE = 9,
 
     /*
      * stream selection
      */
 
-    BD_EVENT_AUDIO_STREAM           = 11,  /* 1..32,  0xff  = none */
-    BD_EVENT_IG_STREAM              = 12,  /* 1..32                */
-    BD_EVENT_PG_TEXTST_STREAM       = 13,  /* 1..255, 0xfff = none */
-    BD_EVENT_PIP_PG_TEXTST_STREAM   = 14,  /* 1..255, 0xfff = none */
-    BD_EVENT_SECONDARY_AUDIO_STREAM = 15,  /* 1..32,  0xff  = none */
-    BD_EVENT_SECONDARY_VIDEO_STREAM = 16,  /* 1..32,  0xff  = none */
+    BD_EVENT_AUDIO_STREAM           = 10,  /* 1..32,  0xff  = none */
+    BD_EVENT_IG_STREAM              = 11,  /* 1..32                */
+    BD_EVENT_PG_TEXTST_STREAM       = 12,  /* 1..255, 0xfff = none */
+    BD_EVENT_PIP_PG_TEXTST_STREAM   = 13,  /* 1..255, 0xfff = none */
+    BD_EVENT_SECONDARY_AUDIO_STREAM = 14,  /* 1..32,  0xff  = none */
+    BD_EVENT_SECONDARY_VIDEO_STREAM = 15,  /* 1..32,  0xff  = none */
 
-    BD_EVENT_PG_TEXTST              = 17,  /* 0 - disable, 1 - enable */
-    BD_EVENT_PIP_PG_TEXTST          = 18,  /* 0 - disable, 1 - enable */
-    BD_EVENT_SECONDARY_AUDIO        = 19,  /* 0 - disable, 1 - enable */
-    BD_EVENT_SECONDARY_VIDEO        = 20,  /* 0 - disable, 1 - enable */
-    BD_EVENT_SECONDARY_VIDEO_SIZE   = 21,  /* 0 - PIP, 0xf - fullscreen */
+    BD_EVENT_PG_TEXTST              = 16,  /* 0 - disable, 1 - enable */
+    BD_EVENT_PIP_PG_TEXTST          = 17,  /* 0 - disable, 1 - enable */
+    BD_EVENT_SECONDARY_AUDIO        = 18,  /* 0 - disable, 1 - enable */
+    BD_EVENT_SECONDARY_VIDEO        = 19,  /* 0 - disable, 1 - enable */
+    BD_EVENT_SECONDARY_VIDEO_SIZE   = 20,  /* 0 - PIP, 0xf - fullscreen */
 
     /*
      * playback control
      */
 
     /* HDMV VM or JVM stopped playlist playback. Flush all buffers. */
-    BD_EVENT_PLAYLIST_STOP          = 22,
+    BD_EVENT_PLAYLIST_STOP          = 31,
 
     /* discontinuity in the stream (non-seamless connection). Reset demuxer PES buffers. */
-    BD_EVENT_DISCONTINUITY          = 23,  /* new timestamp (45 kHz) */
+    BD_EVENT_DISCONTINUITY          = 28,  /* new timestamp (45 kHz) */
 
     /* HDMV VM or JVM seeked the stream. Next read() will return data from new position. Flush all buffers. */
-    BD_EVENT_SEEK                   = 24,  /* new media time (45 kHz) */
+    BD_EVENT_SEEK                   = 21,  /* new media time (45 kHz) */
 
     /* still playback (pause) */
-    BD_EVENT_STILL                  = 25,  /* 0 - off, 1 - on */
+    BD_EVENT_STILL                  = 22,  /* 0 - off, 1 - on */
 
     /* Still playback for n seconds (reached end of still mode play item).
      * Playback continues by calling bd_read_skip_still(). */
-    BD_EVENT_STILL_TIME             = 26,  /* 0 = infinite ; 1...300 = seconds */
+    BD_EVENT_STILL_TIME             = 23,  /* 0 = infinite ; 1...300 = seconds */
 
     /* Play sound effect */
-    BD_EVENT_SOUND_EFFECT           = 27,  /* effect ID */
+    BD_EVENT_SOUND_EFFECT           = 24,  /* effect ID */
 
     /*
      * status
@@ -774,16 +762,16 @@ typedef enum {
 
     /* Nothing to do. Playlist is not playing, but title applet is running.
      * Application should not call bd_read*() immediately again to avoid busy loop. */
-    BD_EVENT_IDLE                   = 28,
+    BD_EVENT_IDLE                   = 29,
 
     /* Pop-Up menu available */
-    BD_EVENT_POPUP                  = 29,  /* 0 - no, 1 - yes */
+    BD_EVENT_POPUP                  = 25,  /* 0 - no, 1 - yes */
 
     /* Interactive menu visible */
-    BD_EVENT_MENU                   = 30,  /* 0 - no, 1 - yes */
+    BD_EVENT_MENU                   = 26,  /* 0 - no, 1 - yes */
 
     /* 3D */
-    BD_EVENT_STEREOSCOPIC_STATUS    = 31,  /* 0 - 2D, 1 - 3D */
+    BD_EVENT_STEREOSCOPIC_STATUS    = 27,  /* 0 - 2D, 1 - 3D */
 
     /* BD-J key interest table changed */
     BD_EVENT_KEY_INTEREST_TABLE     = 32,  /* bitmask, BLURAY_KIT_* */
@@ -1008,8 +996,9 @@ int bd_set_rate(BLURAY *bd, uint32_t rate);
 
 /**
  *
- *  Pass user input to graphics controller or BD-J.
+ *  Pass user input to graphics controller.
  *  Keys are defined in libbluray/keys.h.
+ *  Current pts can be updated by using BD_VK_NONE key. This is required for animated menus.
  *
  * @param bd  BLURAY object
  * @param pts current playback position (1/90000s) or -1
@@ -1021,8 +1010,6 @@ int bd_user_input(BLURAY *bd, int64_t pts, uint32_t key);
 /**
  *
  *  Select menu button at location (x,y).
- *
- *  This function has no effect with BD-J menus.
  *
  * @param bd  BLURAY object
  * @param pts current playback position (1/90000s) or -1

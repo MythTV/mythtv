@@ -31,7 +31,7 @@ import org.havi.ui.HScreenPoint;
 import org.havi.ui.HScreenRectangle;
 
 public class BackgroundVideoPresentationControlImpl extends VideoControl
-        implements BackgroundVideoPresentationControl, AWTVideoSizeControl {
+                implements BackgroundVideoPresentationControl, AWTVideoSizeControl {
     protected BackgroundVideoPresentationControlImpl(Handler player) {
         super(player);
     }
@@ -42,7 +42,8 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
         float[] scales = transform.getScalingFactors();
         Dimension vd = getInputVideoSize();
         Dimension sd = getScreenSize();
-        setVideoArea(new HScreenRectangle(pos.x, pos.y,
+        setVideoArea(new HScreenRectangle(
+                                          pos.x, pos.y,
                                           vd.width * scales[0] / sd.width,
                                           vd.height * scales[0] / sd.height));
         return true;
@@ -60,7 +61,10 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
             xscale = rect.width * sd.width / vd.width;
             yscale = rect.height * sd.height / vd.height;
         }
-        return new VideoTransformation(getClipRegion(), xscale, yscale, new HScreenPoint(rect.x, rect.y));
+        return new VideoTransformation(
+                                       getClipRegion(),
+                                       xscale, yscale,
+                                       new HScreenPoint(rect.x, rect.y));
     }
 
     public VideoTransformation getClosestMatch(VideoTransformation transform) {
@@ -68,14 +72,18 @@ public class BackgroundVideoPresentationControlImpl extends VideoControl
     }
 
     public AWTVideoSize getSize() {
-        return new AWTVideoSize(getClipRegion(), getRectangle(getScreenSize(), getActiveVideoArea()));
+        return new AWTVideoSize(
+                                getClipRegion(),
+                                getRectangle(getScreenSize(), getActiveVideoArea()));
     }
 
     public AWTVideoSize getDefaultSize() {
         Dimension vd = getInputVideoSize();
         Dimension sd = getScreenSize();
-        return new AWTVideoSize(new Rectangle(vd.width, vd.height), new Rectangle(sd.width, sd.height));
-    }
+        return new AWTVideoSize(
+                                new Rectangle(vd.width, vd.height),
+                                new Rectangle(sd.width, sd.height));
+        }
 
     public Dimension getSourceVideoSize() {
         return getVideoSize();

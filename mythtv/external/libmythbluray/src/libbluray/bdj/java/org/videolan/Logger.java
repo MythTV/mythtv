@@ -48,10 +48,8 @@ public class Logger {
         public String file = "?";
         public String cls = "?";
         public String func = "?";
-
         Location() {
         }
-
         Location(StackTraceElement e) {
             line = e.getLineNumber();
             file = e.getFileName();
@@ -62,7 +60,6 @@ public class Logger {
             }
         }
     }
-
     private static Location getLocation(int depth) {
         StackTraceElement e[] = new Exception("Stack trace").getStackTrace();
         if (e != null && e.length > 1) {
@@ -78,7 +75,6 @@ public class Logger {
             public void print(final String string) {
                 Logger.log(error, string);
             }
-
             public void println(final String string) {
                 Logger.log(error, string);
             }
@@ -98,7 +94,6 @@ public class Logger {
     private static void log(boolean error, String cls, String msg) {
         logN(error, cls, 0, msg);
     }
-
     private static void log(boolean error, String msg) {
         Location l = getLocation(3);
         logN(error, l.file + ":" + l.cls + "." + l.func, l.line, msg);
@@ -126,7 +121,8 @@ public class Logger {
         unimplemented(null);
     }
 
-    private static String printStackTrace(StackTraceElement[] e, int offset) {
+    private static String printStackTrace(StackTraceElement[] e, int offset)
+    {
         if (e != null && e.length > 1) {
             StringBuffer dump = new StringBuffer();
             dump.append("\t");

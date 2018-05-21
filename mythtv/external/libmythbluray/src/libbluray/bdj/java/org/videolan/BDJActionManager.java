@@ -32,7 +32,7 @@ public class BDJActionManager {
     }
 
     public BDJActionManager() {
-        commandQueue = BDJActionQueue.create("BDJActionManager");
+        commandQueue = new BDJActionQueue("BDJActionManager");
     }
 
     protected static void shutdown() {

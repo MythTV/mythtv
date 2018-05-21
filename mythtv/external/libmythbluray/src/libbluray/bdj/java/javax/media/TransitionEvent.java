@@ -20,7 +20,8 @@
 package javax.media;
 
 public class TransitionEvent extends ControllerEvent {
-    public TransitionEvent(Controller from, int previous, int current, int target) {
+    public TransitionEvent(Controller from, int previous, int current,
+            int target) {
         super(from);
         this.previous = previous;
         this.current = current;

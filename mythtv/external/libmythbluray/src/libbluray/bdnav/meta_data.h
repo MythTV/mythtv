@@ -46,5 +46,10 @@ typedef struct meta_dl {
     META_THUMBNAIL *     thumbnails;
 } META_DL;
 
+typedef struct meta_root {
+    uint8_t              dl_count;
+    META_DL *            dl_entries;
+} META_ROOT;
+
 #endif // _META_DATA_H_
 

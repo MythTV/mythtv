@@ -22,7 +22,8 @@ package javax.tv.service.transport;
 import javax.tv.service.*;
 
 public abstract class TransportSIChangeEvent extends SIChangeEvent {
-    public TransportSIChangeEvent(Transport transport, SIChangeType type, SIElement element) {
+    public TransportSIChangeEvent(Transport transport, SIChangeType type,
+            SIElement element) {
         super(transport, type, element);
         this.transport = transport;
     }

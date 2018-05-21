@@ -28,11 +28,14 @@ public abstract interface PlaybackControl extends Control {
 
     public abstract void skipToMark(int mark) throws IllegalArgumentException;
 
-    public abstract boolean skipToNextMark(int mark) throws IllegalArgumentException;
+    public abstract boolean skipToNextMark(int mark)
+            throws IllegalArgumentException;
 
-    public abstract boolean skipToPreviousMark(int mark) throws IllegalArgumentException;
+    public abstract boolean skipToPreviousMark(int mark)
+            throws IllegalArgumentException;
 
-    public abstract void skipToPlayItem(int item) throws IllegalArgumentException;
+    public abstract void skipToPlayItem(int item)
+            throws IllegalArgumentException;
 
     public static final int ENTRYMARK = 1;
     public static final int LINKPOINT = 2;

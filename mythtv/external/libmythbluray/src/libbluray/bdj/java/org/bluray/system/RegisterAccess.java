@@ -19,7 +19,6 @@
 package org.bluray.system;
 
 import org.videolan.Libbluray;
-import org.videolan.Logger;
 
 public class RegisterAccess {
     private RegisterAccess() {
@@ -30,28 +29,14 @@ public class RegisterAccess {
     }
 
     public int getGPR(int num) {
-        if (num < 0 || num > 4095) {
-            logger.error("getGPR(" + num + "): invalid GPR");
-            throw new IllegalArgumentException("GPR " + num + " is not supported.");
-        }
-
         return Libbluray.readGPR(num);
     }
 
     public int getPSR(int num) {
-        if (num < 0 || num > 127) {
-            logger.error("getPSR(" + num + "): invalid PSR");
-            throw new IllegalArgumentException("PSR " + num + " is not supported.");
-        }
-
         return Libbluray.readPSR(num);
     }
 
     public void setGPR(int num, int value) {
-        if (num < 0 || num > 4095) {
-            logger.error("setGPR(" + num + ", " + value + "): invalid GPR");
-            throw new IllegalArgumentException("GPR " + num + " is not supported.");
-        }
         Libbluray.writeGPR(num, value);
     }
 
@@ -79,6 +64,4 @@ public class RegisterAccess {
     public static final int PSR_PLAYER_PROFILE = 31;
 
     private static final RegisterAccess instance = new RegisterAccess();
-
-    private static final Logger logger = Logger.getLogger(RegisterAccess.class.getName());
 }

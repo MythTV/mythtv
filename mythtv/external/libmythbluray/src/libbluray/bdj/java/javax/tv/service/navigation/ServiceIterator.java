@@ -21,7 +21,8 @@ package javax.tv.service.navigation;
 
 import javax.tv.service.Service;
 
-public interface ServiceIterator {
+public interface ServiceIterator
+{
     public void toBeginning();
 
     public void toEnd();

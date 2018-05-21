@@ -373,7 +373,7 @@ public class HVisible extends HComponent implements HState {
 
     private static final long serialVersionUID = -2076075723286676347L;
 
-    private transient HLook hLook;
+    private HLook hLook;
     private Map lookData;
     private int BackgroundMode = NO_BACKGROUND_FILL;
     private boolean BordersEnabled = true;
@@ -381,7 +381,7 @@ public class HVisible extends HComponent implements HState {
     private int halign = HALIGN_LEFT;
     private int valign = VALIGN_TOP;
     private int resizeMode = RESIZE_NONE;
-    private transient HTextLayoutManager TextLayoutManager = null;
+    private HTextLayoutManager TextLayoutManager = null;
     private Object content[];
     private Dimension defaultSize = NO_DEFAULT_SIZE;
 

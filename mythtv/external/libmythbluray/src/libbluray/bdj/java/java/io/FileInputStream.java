@@ -51,10 +51,8 @@ public class FileInputStream extends InputStream
         if (file.isAbsolute()) {
             String cachedName = BDJLoader.getCachedFile(name);
             if (cachedName != name) {
-                synchronized (FileInputStream.class) {
                 if (logger == null) {
                     logger = Logger.getLogger(FileInputStream.class.getName());
-                }
                 }
                 logger.info("Using cached " + cachedName + " for " + name);
                 name = cachedName;
@@ -66,10 +64,8 @@ public class FileInputStream extends InputStream
 
             String home = BDJXletContext.getCurrentXletHome();
             if (home == null) {
-                synchronized (FileInputStream.class) {
                 if (logger == null) {
                     logger = Logger.getLogger(FileInputStream.class.getName());
-                }
                 }
                 logger.error("no home found for " + name + " at " + Logger.dumpStack());
                 throw new FileNotFoundException(name);

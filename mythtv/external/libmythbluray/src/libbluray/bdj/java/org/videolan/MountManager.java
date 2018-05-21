@@ -102,22 +102,14 @@ public class MountManager {
                     File out = new File(mountPoint.getMountPoint() + File.separator + entry.getName());
 
                     if (entry.isDirectory()) {
-                        if (!out.isDirectory() && !out.mkdirs()) {
-                            logger.error("Error creating directory " + out.getPath());
-                        }
+                        out.mkdirs();
                     } else if (!classFiles && entry.getName().endsWith(".class")) {
                         // logger.info("skip " + entry.getName());
                     } else {
+                        /* make sure path exists */
+                        out.getParentFile().mkdirs();
 
                         logger.info("   mount: " + entry.getName());
-
-                        /* make sure path exists */
-                        File dir = out.getParentFile();
-                        if (dir != null) {
-                            if (!dir.isDirectory() && !dir.mkdirs()) {
-                                logger.error("Error creating directory " + dir.getPath());
-                            }
-                        }
 
                         try {
                             inStream = jar.getInputStream(entry);
@@ -175,7 +167,7 @@ public class MountManager {
             return mountPoint.getMountPoint();
         }
     }
-    /*
+
     private static void unmount(int jarId) {
         logger.info("Unmounting JAR: " + jarId);
 
@@ -201,7 +193,6 @@ public class MountManager {
                 });
         }
     }
-    */
 
     /* package private, called from Libbluray.shutdown() */
     protected static void unmountAll() {

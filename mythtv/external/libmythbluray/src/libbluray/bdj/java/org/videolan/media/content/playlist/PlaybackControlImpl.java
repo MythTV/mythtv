@@ -143,6 +143,7 @@ public class PlaybackControlImpl implements PlaybackControl {
         listeners.putCallback(event);
     }
 
+
     private BDJListeners listeners = new BDJListeners();
     private Handler player;
 }

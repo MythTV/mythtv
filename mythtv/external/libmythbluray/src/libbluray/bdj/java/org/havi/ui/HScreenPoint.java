@@ -29,10 +29,6 @@ public class HScreenPoint {
         this.y = y;
     }
 
-    public int hashCode() {
-        return Float.hashCode(x) + 31 * Float.hashCode(y);
-    }
-
     public boolean equals(Object obj)
     {
         if (!(obj instanceof HScreenPoint))

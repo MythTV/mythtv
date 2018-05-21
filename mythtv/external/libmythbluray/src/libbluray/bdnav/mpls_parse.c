@@ -25,8 +25,6 @@
 #include "mpls_parse.h"
 
 #include "extdata_parse.h"
-#include "bdmv_parse.h"
-#include "uo_mask.h"
 
 #include "disc/disc.h"
 
@@ -38,14 +36,76 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MPLS_SIG1 ('M' << 24 | 'P' << 16 | 'L' << 8 | 'S')
+#define MPLS_SIG1  ('M' << 24 | 'P' << 16 | 'L' << 8 | 'S')
+#define MPLS_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
+#define MPLS_SIG2B ('0' << 24 | '1' << 16 | '0' << 8 | '0')
+
+static void
+_human_readable_sig(char *sig, uint32_t s1, uint32_t s2)
+{
+    sig[0] = (s1 >> 24) & 0xFF;
+    sig[1] = (s1 >> 16) & 0xFF;
+    sig[2] = (s1 >>  8) & 0xFF;
+    sig[3] = (s1      ) & 0xFF;
+    sig[4] = (s2 >> 24) & 0xFF;
+    sig[5] = (s2 >> 16) & 0xFF;
+    sig[6] = (s2 >>  8) & 0xFF;
+    sig[7] = (s2      ) & 0xFF;
+    sig[8] = 0;
+}
+
+int
+mpls_parse_uo(uint8_t *buf, BD_UO_MASK *uo)
+{
+    BITBUFFER bb;
+    bb_init(&bb, buf, 8);
+
+    memset(uo, 0, sizeof(BD_UO_MASK));
+
+    uo->menu_call                       = bb_read(&bb, 1);
+    uo->title_search                    = bb_read(&bb, 1);
+    uo->chapter_search                  = bb_read(&bb, 1);
+    uo->time_search                     = bb_read(&bb, 1);
+    uo->skip_to_next_point              = bb_read(&bb, 1);
+    uo->skip_to_prev_point              = bb_read(&bb, 1);
+    uo->play_firstplay                  = bb_read(&bb, 1);
+    uo->stop                            = bb_read(&bb, 1);
+    uo->pause_on                        = bb_read(&bb, 1);
+    uo->pause_off                       = bb_read(&bb, 1);
+    uo->still_off                       = bb_read(&bb, 1);
+    uo->forward                         = bb_read(&bb, 1);
+    uo->backward                        = bb_read(&bb, 1);
+    uo->resume                          = bb_read(&bb, 1);
+    uo->move_up                         = bb_read(&bb, 1);
+    uo->move_down                       = bb_read(&bb, 1);
+    uo->move_left                       = bb_read(&bb, 1);
+    uo->move_right                      = bb_read(&bb, 1);
+    uo->select                          = bb_read(&bb, 1);
+    uo->activate                        = bb_read(&bb, 1);
+    uo->select_and_activate             = bb_read(&bb, 1);
+    uo->primary_audio_change            = bb_read(&bb, 1);
+    bb_skip(&bb, 1);
+    uo->angle_change                    = bb_read(&bb, 1);
+    uo->popup_on                        = bb_read(&bb, 1);
+    uo->popup_off                       = bb_read(&bb, 1);
+    uo->pg_enable_disable               = bb_read(&bb, 1);
+    uo->pg_change                       = bb_read(&bb, 1);
+    uo->secondary_video_enable_disable  = bb_read(&bb, 1);
+    uo->secondary_video_change          = bb_read(&bb, 1);
+    uo->secondary_audio_enable_disable  = bb_read(&bb, 1);
+    uo->secondary_audio_change          = bb_read(&bb, 1);
+    bb_skip(&bb, 1);
+    uo->pip_pg_change                   = bb_read(&bb, 1);
+    bb_skip(&bb, 30);
+    return 1;
+}
 
 static int
 _parse_uo(BITSTREAM *bits, BD_UO_MASK *uo)
 {
     uint8_t buf[8];
     bs_read_bytes(bits, buf, 8);
-    return uo_mask_parse(buf, uo);
+    return mpls_parse_uo(buf, uo);
 }
 
 static int
@@ -88,16 +148,26 @@ _parse_appinfo(BITSTREAM *bits, MPLS_AI *ai)
 static int
 _parse_header(BITSTREAM *bits, MPLS_PL *pl)
 {
-    pl->type_indicator = MPLS_SIG1;
-    if (!bdmv_parse_header(bits, pl->type_indicator, &pl->type_indicator2)) {
-        return 0;
-    }
-
     if (bs_avail(bits) < 5 * 32 + 160) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_header: unexpected end of file\n");
         return 0;
     }
 
+    pl->type_indicator  = bs_read(bits, 32);
+    pl->type_indicator2 = bs_read(bits, 32);
+    if (pl->type_indicator != MPLS_SIG1 || 
+        (pl->type_indicator2 != MPLS_SIG2A && 
+         pl->type_indicator2 != MPLS_SIG2B)) {
+
+        char sig[9];
+        char expect[9];
+
+        _human_readable_sig(sig, pl->type_indicator, pl->type_indicator2);
+        _human_readable_sig(expect, MPLS_SIG1, MPLS_SIG2A);
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "failed signature match, expected (%s) got (%s)\n",
+                expect, sig);
+        return 0;
+    }
     pl->list_pos = bs_read(bits, 32);
     pl->mark_pos = bs_read(bits, 32);
     pl->ext_pos  = bs_read(bits, 32);
@@ -158,7 +228,6 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
         case 0x02:
         case 0xea:
         case 0x1b:
-        case 0x24:
             s->format = bs_read(bits, 4);
             s->rate   = bs_read(bits, 4);
             break;
@@ -235,9 +304,6 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     ss = NULL;
     if (stn->num_video) {
         ss = calloc(stn->num_video, sizeof(MPLS_STREAM));
-        if (!ss) {
-            return 0;
-        }
         for (ii = 0; ii < stn->num_video; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
@@ -252,9 +318,6 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     ss = NULL;
     if (stn->num_audio) {
         ss = calloc(stn->num_audio, sizeof(MPLS_STREAM));
-        if (!ss) {
-            return 0;
-        }
         for (ii = 0; ii < stn->num_audio; ii++) {
 
             if (!_parse_stream(bits, &ss[ii])) {
@@ -270,9 +333,6 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     ss = NULL;
     if (stn->num_pg  || stn->num_pip_pg) {
         ss = calloc(stn->num_pg + stn->num_pip_pg, sizeof(MPLS_STREAM));
-        if (!ss) {
-            return 0;
-        }
         for (ii = 0; ii < (stn->num_pg + stn->num_pip_pg); ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
@@ -287,9 +347,6 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     ss = NULL;
     if (stn->num_ig) {
         ss = calloc(stn->num_ig, sizeof(MPLS_STREAM));
-        if (!ss) {
-            return 0;
-        }
         for (ii = 0; ii < stn->num_ig; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
                 X_FREE(ss);
@@ -301,79 +358,68 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     stn->ig = ss;
 
     // Secondary Audio Streams
+    ss = NULL;
     if (stn->num_secondary_audio) {
         ss = calloc(stn->num_secondary_audio, sizeof(MPLS_STREAM));
-        if (!ss) {
-            return 0;
-        }
-        stn->secondary_audio = ss;
         for (ii = 0; ii < stn->num_secondary_audio; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
+                X_FREE(ss);
                 BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing secondary audio entry\n");
                 return 0;
             }
             // Read Secondary Audio Extra Attributes
-            ss[ii].sa_num_primary_audio_ref = bs_read(bits, 8);
+            ss->sa_num_primary_audio_ref = bs_read(bits, 8);
             bs_skip(bits, 8);
-            if (ss[ii].sa_num_primary_audio_ref) {
-                ss[ii].sa_primary_audio_ref = calloc(ss[ii].sa_num_primary_audio_ref, sizeof(uint8_t));
-                if (!ss[ii].sa_primary_audio_ref) {
-                    return 0;
+            if (ss->sa_num_primary_audio_ref) {
+                ss->sa_primary_audio_ref = calloc(ss->sa_num_primary_audio_ref, sizeof(uint8_t));
+                for (jj = 0; jj < ss->sa_num_primary_audio_ref; jj++) {
+                   ss->sa_primary_audio_ref[jj] = bs_read(bits, 8);
                 }
-                for (jj = 0; jj < ss[ii].sa_num_primary_audio_ref; jj++) {
-                   ss[ii].sa_primary_audio_ref[jj] = bs_read(bits, 8);
-                }
-                if (ss[ii].sa_num_primary_audio_ref % 2) {
+                if (ss->sa_num_primary_audio_ref % 2) {
                     bs_skip(bits, 8);
                 }
             }
         }
     }
+    stn->secondary_audio = ss;
 
     // Secondary Video Streams
+    ss = NULL;
     if (stn->num_secondary_video) {
         ss = calloc(stn->num_secondary_video, sizeof(MPLS_STREAM));
-        if (!ss) {
-            return 0;
-        }
-        stn->secondary_video = ss;
         for (ii = 0; ii < stn->num_secondary_video; ii++) {
             if (!_parse_stream(bits, &ss[ii])) {
+                X_FREE(ss);
                 BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing secondary video entry\n");
                 return 0;
             }
             // Read Secondary Video Extra Attributes
-            ss[ii].sv_num_secondary_audio_ref = bs_read(bits, 8);
-            bs_skip(bits, 8);
-            if (ss[ii].sv_num_secondary_audio_ref) {
-                ss[ii].sv_secondary_audio_ref = calloc(ss[ii].sv_num_secondary_audio_ref, sizeof(uint8_t));
-                if (!ss[ii].sv_secondary_audio_ref) {
-                    return 0;
+            ss->sv_num_secondary_audio_ref = bs_read(bits, 8);
+           bs_skip(bits, 8);
+            if (ss->sv_num_secondary_audio_ref) {
+                ss->sv_secondary_audio_ref = calloc(ss->sv_num_secondary_audio_ref, sizeof(uint8_t));
+                for (jj = 0; jj < ss->sv_num_secondary_audio_ref; jj++) {
+                    ss->sv_secondary_audio_ref[jj] = bs_read(bits, 8);
                 }
-                for (jj = 0; jj < ss[ii].sv_num_secondary_audio_ref; jj++) {
-                    ss[ii].sv_secondary_audio_ref[jj] = bs_read(bits, 8);
-                }
-                if (ss[ii].sv_num_secondary_audio_ref % 2) {
+                if (ss->sv_num_secondary_audio_ref % 2) {
                     bs_skip(bits, 8);
                 }
             }
-            ss[ii].sv_num_pip_pg_ref = bs_read(bits, 8);
+            ss->sv_num_pip_pg_ref = bs_read(bits, 8);
             bs_skip(bits, 8);
-            if (ss[ii].sv_num_pip_pg_ref) {
-                ss[ii].sv_pip_pg_ref = calloc(ss[ii].sv_num_pip_pg_ref, sizeof(uint8_t));
-                if (!ss[ii].sv_pip_pg_ref) {
-                    return 0;
+            if (ss->sv_num_pip_pg_ref) {
+                ss->sv_pip_pg_ref = calloc(ss->sv_num_pip_pg_ref, sizeof(uint8_t));
+                for (jj = 0; jj < ss->sv_num_pip_pg_ref; jj++) {
+                    ss->sv_pip_pg_ref[jj] = bs_read(bits, 8);
                 }
-                for (jj = 0; jj < ss[ii].sv_num_pip_pg_ref; jj++) {
-                    ss[ii].sv_pip_pg_ref[jj] = bs_read(bits, 8);
-                }
-                if (ss[ii].sv_num_pip_pg_ref % 2) {
+                if (ss->sv_num_pip_pg_ref % 2) {
                     bs_skip(bits, 8);
                 }
             }
 
         }
     }
+    stn->secondary_video = ss;
 
     if (bs_seek_byte(bits, pos + len) < 0) {
         return 0;
@@ -385,18 +431,12 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
 static void
 _clean_stn(MPLS_STN *stn)
 {
-    unsigned ii;
-
     if(stn->secondary_audio) {
-        for (ii = 0; ii < stn->num_secondary_audio; ii++) {
-            X_FREE(stn->secondary_audio[ii].sa_primary_audio_ref);
-        }
+        X_FREE(stn->secondary_audio->sa_primary_audio_ref);
     }
     if(stn->secondary_video) {
-        for (ii = 0; ii < stn->num_secondary_video; ii++) {
-            X_FREE(stn->secondary_video[ii].sv_secondary_audio_ref);
-            X_FREE(stn->secondary_video[ii].sv_pip_pg_ref);
-        }
+        X_FREE(stn->secondary_video->sv_secondary_audio_ref);
+        X_FREE(stn->secondary_video->sv_pip_pg_ref);
     }
 
     X_FREE(stn->video);
@@ -422,15 +462,6 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
     // PlayItem Length
     len = bs_read(bits, 16);
     pos = bs_pos(bits) >> 3;
-
-    if (len < 18) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playitem: invalid length %d\n", len);
-        return 0;
-    }
-    if (bs_avail(bits)/8 < len) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playitem: unexpected EOF\n");
-        return 0;
-    }
 
     // Primary Clip identifer
     bs_read_string(bits, clip_id, 5);
@@ -479,9 +510,6 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
         pi->is_seamless_angle = bs_read(bits, 1);
     }
     pi->clip = calloc(pi->angle_count, sizeof(MPLS_CLIP));
-    if (!pi->clip) {
-        return 0;
-    }
     strcpy(pi->clip[0].clip_id, clip_id);
     strcpy(pi->clip[0].codec_id, codec_id);
     pi->clip[0].stc_id = stc_id;
@@ -529,16 +557,6 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
     len = bs_read(bits, 16);
     pos = bs_pos(bits) >> 3;
 
-    if (len < 24) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_subplayitem: invalid length %d\n", len);
-        return 0;
-    }
-
-    if (bs_avail(bits)/8 < len) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_subplayitem: unexpected EOF\n");
-        return 0;
-    }
-
     // Primary Clip identifer
     bs_read_string(bits, clip_id, 5);
 
@@ -572,9 +590,6 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
         }
     }
     spi->clip = calloc(spi->clip_count, sizeof(MPLS_CLIP));
-    if (!spi->clip) {
-        return 0;
-    }
     strcpy(spi->clip[0].clip_id, clip_id);
     strcpy(spi->clip[0].codec_id, codec_id);
     spi->clip[0].stc_id = stc_id;
@@ -626,19 +641,15 @@ _parse_subpath(BITSTREAM *bits, MPLS_SUB *sp)
     bs_skip(bits, 8);
     sp->sub_playitem_count = bs_read(bits, 8);
 
-    if (sp->sub_playitem_count) {
     spi = calloc(sp->sub_playitem_count,  sizeof(MPLS_SUB_PI));
-        if (!spi) {
-            return 0;
-        }
-    sp->sub_play_item = spi;
     for (ii = 0; ii < sp->sub_playitem_count; ii++) {
         if (!_parse_subplayitem(bits, &spi[ii])) {
+            X_FREE(spi);
             BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing sub play item\n");
             return 0;
         }
     }
-    }
+    sp->sub_play_item = spi;
 
     // Seek to end of subpath
     if (bs_seek_byte(bits, pos + len) < 0) {
@@ -673,25 +684,15 @@ _parse_playlistmark(BITSTREAM *bits, MPLS_PL *pl)
     // length field
     len = bs_read(bits, 32);
 
-    if (bs_avail(bits)/8 < len) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playlistmark: unexpected EOF\n");
+    if (bs_avail(bits) < len * 8) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playlistmark: unexpected end of file\n");
         return 0;
     }
 
     // Then get the number of marks
     pl->mark_count = bs_read(bits, 16);
 
-    if (bs_avail(bits)/(8*14) < pl->mark_count) {
-        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_playlistmark: unexpected EOF\n");
-        return 0;
-    }
-
     plm = calloc(pl->mark_count, sizeof(MPLS_PLM));
-    if (pl->mark_count && !plm) {
-        BD_DEBUG(DBG_CRIT, "out of memory\n");
-        return 0;
-    }
-
     for (ii = 0; ii < pl->mark_count; ii++) {
         bs_skip(bits, 8); /* reserved */
         plm[ii].mark_type     = bs_read(bits, 8);
@@ -730,35 +731,27 @@ _parse_playlist(BITSTREAM *bits, MPLS_PL *pl)
     pl->list_count = bs_read(bits, 16);
     pl->sub_count = bs_read(bits, 16);
 
-    if (pl->list_count) {
     pi = calloc(pl->list_count,  sizeof(MPLS_PI));
-        if (!pi) {
-            return 0;
-        }
-    pl->play_item = pi;
     for (ii = 0; ii < pl->list_count; ii++) {
         if (!_parse_playitem(bits, &pi[ii])) {
+            X_FREE(pi);
             BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing play list item\n");
             return 0;
         }
     }
-    }
+    pl->play_item = pi;
 
-    if (pl->sub_count) {
     sub_path = calloc(pl->sub_count,  sizeof(MPLS_SUB));
-        if (!sub_path) {
-            return 0;
-        }
-    pl->sub_path = sub_path;
     for (ii = 0; ii < pl->sub_count; ii++)
     {
         if (!_parse_subpath(bits, &sub_path[ii]))
         {
+            X_FREE(sub_path);
             BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing subpath\n");
             return 0;
         }
     }
-    }
+    pl->sub_path = sub_path;
 
     return 1;
 }
@@ -773,6 +766,9 @@ _clean_playlist(MPLS_PL *pl)
 {
     int ii;
 
+    if (pl == NULL) {
+        return;
+    }
     if (pl->play_item != NULL) {
         for (ii = 0; ii < pl->list_count; ii++) {
             _clean_playitem(&pl->play_item[ii]);
@@ -803,12 +799,9 @@ _clean_playlist(MPLS_PL *pl)
 }
 
 void
-mpls_free(MPLS_PL **pl)
+mpls_free(MPLS_PL *pl)
 {
-    if (*pl) {
-        _clean_playlist(*pl);
-        *pl = NULL;
-    }
+    _clean_playlist(pl);
 }
 
 static int

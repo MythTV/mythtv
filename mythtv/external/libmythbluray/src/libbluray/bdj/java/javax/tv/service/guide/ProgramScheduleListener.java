@@ -20,6 +20,7 @@ package javax.tv.service.guide;
 
 import javax.tv.service.SIChangeListener;
 
-public interface ProgramScheduleListener extends SIChangeListener {
+public interface ProgramScheduleListener extends SIChangeListener
+{
     public void notifyChange(ProgramScheduleEvent event);
 }

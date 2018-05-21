@@ -47,7 +47,8 @@ public class ServiceContextFactoryImpl extends ServiceContextFactory {
     }
 
     public ServiceContext createServiceContext()
-            throws InsufficientResourcesException, SecurityException {
+            throws InsufficientResourcesException, SecurityException
+    {
         SecurityManager sec = System.getSecurityManager();
         if (sec != null)
             sec.checkPermission(new ServiceContextPermission("create", "own"));
@@ -55,7 +56,8 @@ public class ServiceContextFactoryImpl extends ServiceContextFactory {
     }
 
     public ServiceContext getServiceContext(XletContext context)
-            throws SecurityException, ServiceContextException {
+            throws SecurityException, ServiceContextException
+    {
         SecurityManager sec = System.getSecurityManager();
         if (sec != null)
             sec.checkPermission(new ServiceContextPermission("access", "own"));

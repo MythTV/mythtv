@@ -21,34 +21,23 @@ package org.videolan;
 import java.util.LinkedList;
 
 public class BDJActionQueue implements Runnable {
-
-    public static BDJActionQueue create(String name) {
-        return create(null, name);
+    public BDJActionQueue(String name) {
+        this(null, name);
     }
 
-    public static BDJActionQueue create(BDJThreadGroup threadGroup, String name) {
-        BDJActionQueue aq = new BDJActionQueue(threadGroup, name);
-        aq.startThread(threadGroup, name);
-        return aq;
-    }
-
-    private BDJActionQueue(BDJThreadGroup threadGroup, String name) {
+    public BDJActionQueue(BDJThreadGroup threadGroup, String name) {
         if (threadGroup == null) {
             if (BDJXletContext.getCurrentContext() != null) {
-                logger.error("BDJActionQueue " + name + " created from wrong context: " + Logger.dumpStack());
-                // throw new SecurityException();
+                logger.error("BDJActionQueue created from wrong context: " + Logger.dumpStack());
             }
         }
-    }
 
-    private void startThread(BDJThreadGroup threadGroup, String name) {
         /* run all actions in given thread group / xlet context */
         thread = new Thread(threadGroup, this, name + ".BDJActionQueue");
         thread.setDaemon(true);
         thread.start();
 
-        watchdog = new Watchdog();
-        watchdog.start(name);
+        watchdog = new Watchdog(name);
     }
 
     public void shutdown() {
@@ -126,9 +115,7 @@ public class BDJActionQueue implements Runnable {
         private Object currentAction = null;
         private boolean terminate = false;
 
-        Watchdog() {}
-
-        synchronized void start(String name) {
+        Watchdog(String name) {
             Thread t = new Thread(null, this, name + ".BDJActionQueue.Monitor");
             t.setDaemon(true);
             t.start();

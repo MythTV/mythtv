@@ -22,7 +22,8 @@ package javax.tv.service.transport;
 import javax.tv.service.SIChangeType;
 
 public class NetworkChangeEvent extends TransportSIChangeEvent {
-    public NetworkChangeEvent(NetworkCollection collection, SIChangeType type, Network network) {
+    public NetworkChangeEvent(NetworkCollection collection, SIChangeType type,
+            Network network) {
         super(collection, type, network);
         this.collection = collection;
         this.network = network;

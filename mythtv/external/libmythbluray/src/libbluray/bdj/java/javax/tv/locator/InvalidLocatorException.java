@@ -20,17 +20,20 @@
 package javax.tv.locator;
 
 public class InvalidLocatorException extends Exception {
-    public InvalidLocatorException(Locator locator) {
+    public InvalidLocatorException(Locator locator)
+    {
         super();
         this.locator = locator;
     }
 
-    public InvalidLocatorException(Locator locator, String reason) {
+    public InvalidLocatorException(Locator locator, String reason)
+    {
         super(reason);
         this.locator = locator;
     }
 
-    public Locator getInvalidLocator() {
+    public Locator getInvalidLocator()
+    {
         return locator;
     }
 

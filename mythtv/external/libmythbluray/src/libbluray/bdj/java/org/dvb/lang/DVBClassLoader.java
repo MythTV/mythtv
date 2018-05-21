@@ -75,7 +75,7 @@ public abstract class DVBClassLoader extends java.security.SecureClassLoader {
         return loader.loadClass(name, resolve);
     }
 
-    protected static class DVBURLClassLoader extends URLClassLoader {
+    protected class DVBURLClassLoader extends URLClassLoader {
         public DVBURLClassLoader(URL[] urls) {
             super(urls);
         }

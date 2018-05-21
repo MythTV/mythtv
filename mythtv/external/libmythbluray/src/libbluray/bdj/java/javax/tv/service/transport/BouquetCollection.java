@@ -24,9 +24,10 @@ import javax.tv.service.SIRequest;
 import javax.tv.locator.Locator;
 import javax.tv.locator.InvalidLocatorException;
 
-public interface BouquetCollection extends Transport {
+public interface BouquetCollection extends Transport
+{
     public SIRequest retrieveBouquet(Locator locator, SIRequestor requestor)
-            throws InvalidLocatorException, SecurityException;
+        throws InvalidLocatorException, SecurityException;
 
     public SIRequest retrieveBouquets(SIRequestor requestor);
 

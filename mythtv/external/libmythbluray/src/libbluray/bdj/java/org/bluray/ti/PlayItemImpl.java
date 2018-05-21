@@ -73,7 +73,8 @@ public class PlayItemImpl implements PlayItem {
         StreamInfo[] secVideo = clip.getVideoStreams();
         StreamInfo[] secAudio = clip.getVideoStreams();
 
-        int count = video.length + audio.length + pg.length + ig.length + secVideo.length + secAudio.length;
+        int count = video.length + audio.length + pg.length +
+            ig.length + secVideo.length + secAudio.length;
 
         ServiceComponent[] components = new ServiceComponent[count];
 

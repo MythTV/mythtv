@@ -22,9 +22,11 @@ package javax.tv.service.transport;
 import javax.tv.service.navigation.DeliverySystemType;
 
 public interface Transport {
-    public void addServiceDetailsChangeListener(ServiceDetailsChangeListener listener);
+    public void addServiceDetailsChangeListener(
+            ServiceDetailsChangeListener listener);
 
-    public void removeServiceDetailsChangeListener(ServiceDetailsChangeListener listener);
+    public void removeServiceDetailsChangeListener(
+            ServiceDetailsChangeListener listener);
 
     public DeliverySystemType getDeliverySystemType();
 }

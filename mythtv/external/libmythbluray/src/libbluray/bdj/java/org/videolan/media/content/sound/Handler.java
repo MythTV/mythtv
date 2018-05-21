@@ -59,11 +59,11 @@ public class Handler extends BDHandler {
         if (source.getLocator() == null)
             throw new IncompatibleSourceException();
 
-        try {
-            locator = new BDLocator(source.getLocator().toExternalForm());
-        } catch (org.davic.net.InvalidLocatorException e) {
-            throw new IncompatibleSourceException();
-        }
+            try {
+                locator = new BDLocator(source.getLocator().toExternalForm());
+            } catch (org.davic.net.InvalidLocatorException e) {
+                throw new IncompatibleSourceException();
+            }
     }
 
     public Time getDuration() {

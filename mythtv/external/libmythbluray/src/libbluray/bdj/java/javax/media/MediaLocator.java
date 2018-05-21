@@ -23,7 +23,8 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MediaLocator implements Serializable {
+public class MediaLocator implements Serializable
+{
     public MediaLocator(URL url) {
         this.url = url;
         if (url != null) {

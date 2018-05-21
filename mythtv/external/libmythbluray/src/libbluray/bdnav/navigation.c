@@ -244,12 +244,7 @@ static void _video_props(MPLS_STN *s, int *full_hd, int *mpeg12)
             *mpeg12 = 0;
         }
         if (s->video[ii].format == BD_VIDEO_FORMAT_1080I || s->video[ii].format == BD_VIDEO_FORMAT_1080P) {
-            if (*full_hd < 1) {
-                *full_hd = 1;
-            }
-        }
-        if (s->video[ii].format == BD_VIDEO_FORMAT_2160P) {
-            *full_hd = 2;
+            *full_hd = 1;
         }
     }
 }
@@ -274,7 +269,7 @@ static int _cmp_video_props(const MPLS_PL *p1, const MPLS_PL *p2)
     _video_props(s1, &fhd1, &mp12_1);
     _video_props(s2, &fhd2, &mp12_2);
 
-    /* prefer UHD over FHD over HD/SD */
+    /* prefer Full HD over HD/SD */
     if (fhd1 != fhd2)
         return fhd2 - fhd1;
 
@@ -295,9 +290,7 @@ static int _cmp_audio_props(const MPLS_PL *p1, const MPLS_PL *p2)
     return hda2 - hda1;
 }
 
-static int _pl_guess_main_title(MPLS_PL *p1, MPLS_PL *p2,
-                                const char *mpls_id1, const char *mpls_id2,
-                                const char *known_mpls_ids)
+static int _pl_guess_main_title(MPLS_PL *p1, MPLS_PL *p2)
 {
     uint32_t d1 = _pl_duration(p1);
     uint32_t d2 = _pl_duration(p2);
@@ -311,37 +304,22 @@ static int _pl_guess_main_title(MPLS_PL *p1, MPLS_PL *p2,
         int chap_diff = chap2 - chap1;
         if ((chap1 < 2 || chap2 < 2) && (chap_diff < -5 || chap_diff > 5)) {
             /* chapter count differs by more than 5 */
-            BD_DEBUG(DBG_MAIN_PL, "main title (%s,%s): chapter count difference %d\n",
-                     mpls_id1, mpls_id2, chap_diff);
+            BD_DEBUG(DBG_MAIN_PL, "main title: chapter count difference %d\n", chap_diff);
             return chap_diff;
         }
 
         /* Check video: prefer HD over SD, H.264/VC1 over MPEG1/2 */
         int vid_diff = _cmp_video_props(p1, p2);
         if (vid_diff) {
-            BD_DEBUG(DBG_MAIN_PL, "main title (%s,%s): video properties difference %d\n",
-                     mpls_id1, mpls_id2, vid_diff);
+            BD_DEBUG(DBG_MAIN_PL, "main title: video properties difference %d\n", vid_diff);
             return vid_diff;
         }
 
         /* compare audio: prefer HD audio */
         int aud_diff = _cmp_audio_props(p1, p2);
         if (aud_diff) {
-            BD_DEBUG(DBG_MAIN_PL, "main title (%s,%s): audio properties difference %d\n",
-                     mpls_id1, mpls_id2, aud_diff);
+            BD_DEBUG(DBG_MAIN_PL, "main title: audio properties difference %d\n", aud_diff);
             return aud_diff;
-        }
-
-        /* prefer "known good" playlists */
-        if (known_mpls_ids) {
-            int known1 = !!str_strcasestr(known_mpls_ids, mpls_id1);
-            int known2 = !!str_strcasestr(known_mpls_ids, mpls_id2);
-            int known_diff = known2 - known1;
-            if (known_diff) {
-                BD_DEBUG(DBG_MAIN_PL, "main title (%s,%s): prefer \"known\" playlist %s\n",
-                         mpls_id1, mpls_id2, known_diff < 0 ? mpls_id1 : mpls_id2);
-                return known_diff;
-            }
         }
     }
 
@@ -370,7 +348,6 @@ NAV_TITLE_LIST* nav_get_title_list(BD_DISC *disc, uint32_t flags, uint32_t min_t
     int res;
     NAV_TITLE_LIST *title_list = NULL;
     unsigned int title_info_alloc = 100;
-    char *known_mpls_ids;
 
     dir = disc_open_dir(disc, "BDMV" DIR_SEP "PLAYLIST");
     if (dir == NULL) {
@@ -387,11 +364,6 @@ NAV_TITLE_LIST* nav_get_title_list(BD_DISC *disc, uint32_t flags, uint32_t min_t
         X_FREE(title_list);
         dir_close(dir);
         return NULL;
-    }
-
-    known_mpls_ids = disc_property_get(disc, DISC_PROPERTY_MAIN_FEATURE);
-    if (!known_mpls_ids) {
-        known_mpls_ids = disc_property_get(disc, DISC_PROPERTY_PLAYLISTS);
     }
 
     ii = 0;
@@ -414,16 +386,16 @@ NAV_TITLE_LIST* nav_get_title_list(BD_DISC *disc, uint32_t flags, uint32_t min_t
         if (pl != NULL) {
             if ((flags & TITLES_FILTER_DUP_TITLE) &&
                 !_filter_dup(pl_list, ii, pl)) {
-                mpls_free(&pl);
+                mpls_free(pl);
                 continue;
             }
             if ((flags & TITLES_FILTER_DUP_CLIP) && !_filter_repeats(pl, 2)) {
-                mpls_free(&pl);
+                mpls_free(pl);
                 continue;
             }
             if (min_title_length > 0 &&
                 _pl_duration(pl) < min_title_length*45000) {
-                mpls_free(&pl);
+                mpls_free(pl);
                 continue;
             }
             if (ii >= title_info_alloc) {
@@ -443,10 +415,7 @@ NAV_TITLE_LIST* nav_get_title_list(BD_DISC *disc, uint32_t flags, uint32_t min_t
             if (_filter_dup(pl_list, ii, pl) &&
                 _filter_repeats(pl, 2)) {
 
-                if (_pl_guess_main_title(pl_list[ii], pl_list[title_list->main_title_idx],
-                                         ent.d_name,
-                                         title_list->title_info[title_list->main_title_idx].name,
-                                         known_mpls_ids) <= 0) {
+                if (_pl_guess_main_title(pl_list[ii], pl_list[title_list->main_title_idx]) <= 0) {
                     title_list->main_title_idx = ii;
                 }
             }
@@ -463,19 +432,16 @@ NAV_TITLE_LIST* nav_get_title_list(BD_DISC *disc, uint32_t flags, uint32_t min_t
 
     title_list->count = ii;
     for (ii = 0; ii < title_list->count; ii++) {
-        mpls_free(&pl_list[ii]);
+        mpls_free(pl_list[ii]);
     }
-    X_FREE(known_mpls_ids);
     X_FREE(pl_list);
     return title_list;
 }
 
-void nav_free_title_list(NAV_TITLE_LIST **title_list)
+void nav_free_title_list(NAV_TITLE_LIST *title_list)
 {
-    if (*title_list) {
-        X_FREE((*title_list)->title_info);
-        X_FREE((*title_list));
-    }
+    X_FREE(title_list->title_info);
+    X_FREE(title_list);
 }
 
 /*
@@ -514,6 +480,7 @@ _fill_mark(NAV_TITLE *title, NAV_MARK *mark, int entry)
 
     plm = &pl->play_mark[entry];
 
+    mark->plm = plm;
     mark->mark_type = plm->mark_type;
     mark->clip_ref = plm->play_item_ref;
     clip = &title->clip_list.clip[mark->clip_ref];
@@ -614,7 +581,8 @@ static void _fill_clip(NAV_TITLE *title,
     strncpy(&clip->name[5], ".m2ts", 6);
     clip->clip_id = atoi(mpls_clip[clip->angle].clip_id);
 
-    clpi_free(&clip->cl);
+    clpi_free(clip->cl);
+    clip->cl = NULL;
 
     file = str_printf("%s.clpi", mpls_clip[clip->angle].clip_id);
     if (file) {
@@ -732,16 +700,18 @@ NAV_TITLE* nav_title_open(BD_DISC *disc, const char *playlist, unsigned angle)
     return title;
 }
 
-static
-void _nav_title_close(NAV_TITLE *title)
+void nav_title_close(NAV_TITLE *title)
 {
     unsigned ii, ss;
+
+    if (!title)
+        return;
 
     if (title->sub_path) {
         for (ss = 0; ss < title->sub_path_count; ss++) {
             if (title->sub_path[ss].clip_list.clip) {
                 for (ii = 0; ii < title->sub_path[ss].clip_list.count; ii++) {
-                    clpi_free(&title->sub_path[ss].clip_list.clip[ii].cl);
+                    clpi_free(title->sub_path[ss].clip_list.clip[ii].cl);
                 }
                 X_FREE(title->sub_path[ss].clip_list.clip);
             }
@@ -751,23 +721,15 @@ void _nav_title_close(NAV_TITLE *title)
 
     if (title->clip_list.clip) {
         for (ii = 0; ii < title->clip_list.count; ii++) {
-            clpi_free(&title->clip_list.clip[ii].cl);
+            clpi_free(title->clip_list.clip[ii].cl);
         }
         X_FREE(title->clip_list.clip);
     }
 
-    mpls_free(&title->pl);
+    mpls_free(title->pl);
     X_FREE(title->chap_list.mark);
     X_FREE(title->mark_list.mark);
     X_FREE(title);
-}
-
-void nav_title_close(NAV_TITLE **title)
-{
-    if (*title) {
-        _nav_title_close(*title);
-        *title = NULL;
-    }
 }
 
 // Search for random access point closest to the requested packet

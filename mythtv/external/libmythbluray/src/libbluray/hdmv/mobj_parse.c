@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2010  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,6 @@
 
 #include "mobj_data.h"
 
-#include "bdnav/bdmv_parse.h"
 #include "disc/disc.h"
 
 #include "file/file.h"
@@ -38,11 +37,25 @@
 #include <string.h>
 
 #define MOBJ_SIG1  ('M' << 24 | 'O' << 16 | 'B' << 8 | 'J')
+#define MOBJ_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
+#define MOBJ_SIG2B ('0' << 24 | '1' << 16 | '0' << 8 | '0')
 
-static int _mobj_parse_header(BITSTREAM *bs, int *extension_data_start, uint32_t *mobj_version)
+static int _mobj_parse_header(BITSTREAM *bs, int *extension_data_start)
 {
-    if (!bdmv_parse_header(bs, MOBJ_SIG1, mobj_version)) {
+    uint32_t sig1, sig2;
+
+    if (bs_seek_byte(bs, 0) < 0) {
         return 0;
+    }
+
+    sig1 = bs_read(bs, 32);
+    sig2 = bs_read(bs, 32);
+
+    if (sig1 != MOBJ_SIG1 ||
+       (sig2 != MOBJ_SIG2A &&
+        sig2 != MOBJ_SIG2B)) {
+     BD_DEBUG(DBG_NAV, "MovieObject.bdmv failed signature match: expected MOBJ0100 got %8.8s\n", bs->buf);
+     return 0;
     }
 
     *extension_data_start = bs_read(bs, 32);
@@ -85,10 +98,6 @@ static int _mobj_parse_object(BITSTREAM *bs, MOBJ_OBJECT *obj)
     bs_skip(bs, 13); /* padding */
 
     obj->num_cmds = bs_read(bs, 16);
-    if (!obj->num_cmds) {
-        BD_DEBUG(DBG_HDMV|DBG_CRIT, "MovieObject.bdmv: empty object\n");
-        return 1;
-    }
     obj->cmds     = calloc(obj->num_cmds, sizeof(MOBJ_CMD));
     if (!obj->cmds) {
         BD_DEBUG(DBG_CRIT, "out of memory\n");
@@ -97,10 +106,6 @@ static int _mobj_parse_object(BITSTREAM *bs, MOBJ_OBJECT *obj)
 
     for (i = 0; i < obj->num_cmds; i++) {
         uint8_t buf[12];
-        if (bs_avail(bs) < 12*8) {
-            BD_DEBUG(DBG_HDMV|DBG_CRIT, "MovieObject.bdmv: unexpected EOF\n");
-            return 0;
-        }
         bs_read_bytes(bs, buf, 12);
         mobj_parse_cmd(buf, &obj->cmds[i]);
     }
@@ -138,13 +143,7 @@ static MOBJ_OBJECTS *_mobj_parse(BD_FILE_H *fp)
         goto error;
     }
 
-    objects = calloc(1, sizeof(MOBJ_OBJECTS));
-    if (!objects) {
-        BD_DEBUG(DBG_CRIT, "out of memory\n");
-        goto error;
-    }
-
-    if (!_mobj_parse_header(&bs, &extension_data_start, &objects->mobj_version)) {
+    if (!_mobj_parse_header(&bs, &extension_data_start)) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "MovieObject.bdmv: invalid header\n");
         goto error;
     }
@@ -162,6 +161,12 @@ static MOBJ_OBJECTS *_mobj_parse(BD_FILE_H *fp)
 
     if ((bs_end(&bs) - bs_pos(&bs))/8 < (int64_t)data_len) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "MovieObject.bdmv: invalid data_len %d !\n", data_len);
+        goto error;
+    }
+
+    objects = calloc(1, sizeof(MOBJ_OBJECTS));
+    if (!objects) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
         goto error;
     }
 

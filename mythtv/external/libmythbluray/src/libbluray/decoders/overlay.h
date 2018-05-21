@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2010-2012  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,18 +35,18 @@ typedef enum {
 
 typedef enum {
     /* following events are executed immediately */
-    BD_OVERLAY_INIT  = 0,    /* init overlay plane. Size and position of plane in x,y,w,h */
-    BD_OVERLAY_CLOSE = 1,    /* close overlay plane */
+    BD_OVERLAY_INIT = 0,    /* init overlay plane. Size and position of plane in x,y,w,h */
+    BD_OVERLAY_CLOSE = 5,   /* close overlay plane */
 
     /* following events can be processed immediately, but changes
      * should not be flushed to display before next FLUSH event
      */
-    BD_OVERLAY_CLEAR = 2,    /* clear plane */
-    BD_OVERLAY_DRAW  = 3,    /* draw bitmap (x,y,w,h,img,palette,crop) */
-    BD_OVERLAY_WIPE  = 4,    /* clear area (x,y,w,h) */
-    BD_OVERLAY_HIDE  = 5,    /* overlay is empty and can be hidden */
+    BD_OVERLAY_CLEAR = 1,   /* clear plane */
+    BD_OVERLAY_DRAW = 2,    /* draw bitmap (x,y,w,h,img,palette,crop) */
+    BD_OVERLAY_WIPE = 3,    /* clear area (x,y,w,h) */
+    BD_OVERLAY_HIDE = 6,    /* overlay is empty and can be hidden */
 
-    BD_OVERLAY_FLUSH = 6,    /* all changes have been done, flush overlay to display at given pts */
+    BD_OVERLAY_FLUSH = 4,   /* all changes have been done, flush overlay to display at given pts */
 
 } bd_overlay_cmd_e;
 
@@ -71,8 +71,6 @@ typedef struct bd_overlay_s {
     uint8_t  plane; /* bd_overlay_plane_e */
     uint8_t  cmd;   /* bd_overlay_cmd_e */
 
-    uint8_t  palette_update_flag; /* only palette was changed */
-
     uint16_t x;
     uint16_t y;
     uint16_t w;
@@ -81,6 +79,12 @@ typedef struct bd_overlay_s {
     const BD_PG_PALETTE_ENTRY * palette;
     const BD_PG_RLE_ELEM      * img;
 
+    uint16_t crop_x; /* deprecated: cropping is executed by libbluray */
+    uint16_t crop_y; /* deprecated: cropping is executed by libbluray */
+    uint16_t crop_w; /* deprecated: cropping is executed by libbluray */
+    uint16_t crop_h; /* deprecated: cropping is executed by libbluray */
+
+    uint8_t palette_update_flag; /* only palette was changed */
 } BD_OVERLAY;
 
 /*
@@ -125,14 +129,14 @@ void bd_overlay_free(BD_OVERLAY **pov)
 
 typedef enum {
     /* following events are executed immediately */
-    BD_ARGB_OVERLAY_INIT  = 0,    /* init overlay plane. Size and position of plane in x,y,w,h */
-    BD_ARGB_OVERLAY_CLOSE = 1,    /* close overlay */
+    BD_ARGB_OVERLAY_INIT = 0,    /* init overlay plane. Size and position of plane in x,y,w,h */
+    BD_ARGB_OVERLAY_CLOSE = 5,   /* close overlay */
 
     /* following events can be processed immediately, but changes
      * should not be flushed to display before next FLUSH event
      */
-    BD_ARGB_OVERLAY_DRAW  = 3,    /* draw image */
-    BD_ARGB_OVERLAY_FLUSH = 6,    /* all changes have been done, flush overlay to display at given pts */
+    BD_ARGB_OVERLAY_DRAW = 2,    /* draw image */
+    BD_ARGB_OVERLAY_FLUSH = 4,   /* all changes have been done, flush overlay to display at given pts */
 } bd_argb_overlay_cmd_e;
 
 typedef struct bd_argb_overlay_s {
@@ -144,14 +148,15 @@ typedef struct bd_argb_overlay_s {
      * frame buffer
      */
 
-    /* destination clip on the overlay plane */
+    /* destination clip on the overlay plane
+     */
     uint16_t x;
     uint16_t y;
     uint16_t w;
     uint16_t h;
-    uint16_t stride;       /* buffer stride */
 
     const uint32_t * argb; /* 'h' lines, line length 'stride' pixels */
+    uint16_t stride;       /* buffer stride */
 
 } BD_ARGB_OVERLAY;
 
@@ -178,7 +183,7 @@ typedef struct bd_argb_buffer_s {
      * - buffer can be replaced in overlay callback or lock().
      */
 
-    uint32_t *buf[4]; /* [0] - PG plane, [1] - IG plane. [2], [3] reserved for stereoscopic overlay. */
+    uint32_t *buf[2]; /* [0] - PG plane, [1] - IG plane */
 
     /* size of buffers
      * - Set by application

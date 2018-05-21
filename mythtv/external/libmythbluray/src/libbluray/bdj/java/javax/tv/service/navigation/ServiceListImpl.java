@@ -22,8 +22,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
-import java.io.Serializable;
-
 import javax.tv.locator.Locator;
 import javax.tv.locator.InvalidLocatorException;
 import javax.tv.service.Service;
@@ -122,7 +120,7 @@ public class ServiceListImpl implements ServiceList {
         services.add(service);
     }
 
-    private static class TitleComparator implements Comparator, Serializable {
+    private class TitleComparator implements Comparator {
         public int compare(Object obj1, Object obj2) {
             return ((TitleImpl)obj1).getTitleNum() - ((TitleImpl)obj2).getTitleNum();
         }

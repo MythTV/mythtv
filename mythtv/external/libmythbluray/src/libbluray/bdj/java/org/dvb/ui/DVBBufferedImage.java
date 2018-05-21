@@ -135,8 +135,8 @@ public class DVBBufferedImage extends Image {
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
-        if (startX < 0 || startY < 0 || startX + w > width || startY + h > height) {
-            throw new ArrayIndexOutOfBoundsException(err("getRGB(array) out of bounds"));
+        if (startX < 0 || startY < 0 || startX + w >= width || startY + height >= height) {
+            throw new ArrayIndexOutOfBoundsException(err("getRGB out of bounds"));
         }
 
         return bufferedImage.getRGB(startX, startY, w, h, rgbArray, offset, scansize);

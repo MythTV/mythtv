@@ -31,14 +31,17 @@ public abstract interface SubtitlingControl extends SubtitlingEventControl {
     public abstract void selectLanguage(String language)
             throws LanguageNotAvailableException, NotAuthorizedException;
 
-    public abstract void selectStreamNumber(int num) throws StreamNotAvailableException;
+    public abstract void selectStreamNumber(int num)
+            throws StreamNotAvailableException;
 
-    public abstract void selectSubtitle(int subtitle) throws StreamNotAvailableException;
+    public abstract void selectSubtitle(int subtitle)
+            throws StreamNotAvailableException;
 
     public abstract boolean setPipSubtitleMode(boolean mode);
 
     public abstract void setSubtitleStyle(int style)
-            throws TextSubtitleNotAvailableException, SubtitleStyleNotAvailableException;
+            throws TextSubtitleNotAvailableException,
+            SubtitleStyleNotAvailableException;
 
     public abstract String getCurrentLanguage();
 
@@ -51,7 +54,8 @@ public abstract interface SubtitlingControl extends SubtitlingEventControl {
     public abstract CodingType getCurrentSubtitleType();
 
     public abstract int getSubtitleStyle()
-            throws TextSubtitleNotAvailableException, SubtitleStyleNotAvailableException;
+            throws TextSubtitleNotAvailableException,
+            SubtitleStyleNotAvailableException;
 
     public abstract boolean isPipSubtitleMode();
 }

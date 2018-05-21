@@ -43,9 +43,6 @@ BD_PRIVATE void libbdplus_psr(BD_BDPLUS *p, void *regs, void *read, void *write)
 BD_PRIVATE void libbdplus_start(BD_BDPLUS *p);
 BD_PRIVATE void libbdplus_event(BD_BDPLUS *p, uint32_t event, uint32_t param1, uint32_t param2);
 
-#define BD_BDPLUS_TYPE 0x1000
-BD_PRIVATE const uint8_t *libbdplus_get_data(BD_BDPLUS *p, int type);
-
 /*
  *  stream layer
  */

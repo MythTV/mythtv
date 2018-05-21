@@ -112,11 +112,6 @@ static int _sound_read_samples(BITSTREAM *bs, SOUND_OBJECT *obj)
         return 1;
     }
 
-    if (bs_avail(bs)/16 < num_samples) {
-        BD_DEBUG(DBG_HDMV|DBG_CRIT, "sound.bdmv: unexpected EOF\n");
-        return 0;
-    }
-
     obj->samples = calloc(num_samples, sizeof(uint16_t));
     if (!obj->samples) {
         BD_DEBUG(DBG_CRIT, "out of memory\n");

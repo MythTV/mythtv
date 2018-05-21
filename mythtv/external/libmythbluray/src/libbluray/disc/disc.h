@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2014-2017  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2014  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -90,21 +90,6 @@ BD_PRIVATE struct bd_dir_s  *disc_open_bdrom_dir(BD_DISC *disc, const char *path
  */
 
 BD_PRIVATE struct bd_file_s *disc_open_stream(BD_DISC *disc, const char *file);
-
-/*
- * Store / fetch persistent properties for disc.
- * Data is stored in cache directory and persists between playback sessions.
- *
- * Property name is ASCII string. '=' or '\n' is not allowed in name.
- * property data is UTF8 string without line feeds.
- */
-
-BD_PRIVATE int   disc_property_put(BD_DISC *disc, const char *property, const char *value);
-BD_PRIVATE char *disc_property_get(BD_DISC *disc, const char *property);
-
-/* "Known" playlists */
-#define DISC_PROPERTY_PLAYLISTS    "Playlists"
-#define DISC_PROPERTY_MAIN_FEATURE "MainFeature"
 
 /*
  *

@@ -22,7 +22,7 @@
 
 #include "util/attributes.h"
 
-#include "bdnav/uo_mask_table.h"
+#include "libbluray/bdnav/uo_mask_table.h"
 
 #include <stdint.h>
 #include <stddef.h> /* size_t */

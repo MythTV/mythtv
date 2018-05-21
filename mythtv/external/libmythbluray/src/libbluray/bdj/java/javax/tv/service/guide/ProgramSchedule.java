@@ -29,11 +29,14 @@ import java.util.Date;
 public interface ProgramSchedule {
     public SIRequest retrieveCurrentProgramEvent(SIRequestor requestor);
 
-    public SIRequest retrieveFutureProgramEvent(Date date, SIRequestor requestor) throws SIException;
+    public SIRequest retrieveFutureProgramEvent(Date date, SIRequestor requestor)
+            throws SIException;
 
-    public SIRequest retrieveFutureProgramEvents(Date begin, Date end, SIRequestor requestor) throws SIException;
+    public SIRequest retrieveFutureProgramEvents(Date begin, Date end,
+            SIRequestor requestor) throws SIException;
 
-    public SIRequest retrieveNextProgramEvent(ProgramEvent event, SIRequestor requestor) throws SIException;
+    public SIRequest retrieveNextProgramEvent(ProgramEvent event,
+            SIRequestor requestor) throws SIException;
 
     public SIRequest retrieveProgramEvent(Locator locator, SIRequestor requestor)
             throws InvalidLocatorException, SecurityException;

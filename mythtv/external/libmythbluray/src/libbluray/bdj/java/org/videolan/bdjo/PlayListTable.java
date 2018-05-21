@@ -22,29 +22,35 @@ package org.videolan.bdjo;
 import org.videolan.Arrays;
 
 public class PlayListTable {
-    public PlayListTable(boolean accessToAll, boolean autostartFirst, String[] playLists) {
+    public PlayListTable(boolean accessToAll, boolean autostartFirst, String[] playLists)
+    {
         this.accessToAll = accessToAll;
         this.autostartFirst = autostartFirst;
         this.playLists = playLists;
     }
 
-    public boolean isAccessToAll() {
+    public boolean isAccessToAll()
+    {
         return accessToAll;
     }
 
-    public boolean isAutostartFirst() {
+    public boolean isAutostartFirst()
+    {
         return autostartFirst;
     }
 
-    public String[] getPlayLists() {
+    public String[] getPlayLists()
+    {
         return playLists;
     }
 
-    public String toString() {
-        return "PlayListTable [accessToAll=" + accessToAll + ", playLists=" + Arrays.toString(playLists) + "]";
+    public String toString()
+    {
+        return "PlayListTable [accessToAll=" + accessToAll + ", playLists="
+                + Arrays.toString(playLists) + "]";
     }
 
-    private final boolean accessToAll;
-    private final boolean autostartFirst;
-    private final String[] playLists;
+    private boolean accessToAll;
+    private boolean autostartFirst;
+    private String[] playLists;
 }

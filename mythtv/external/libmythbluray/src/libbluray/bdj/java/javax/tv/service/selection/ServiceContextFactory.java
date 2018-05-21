@@ -27,7 +27,8 @@ public abstract class ServiceContextFactory {
         return ServiceContextFactoryImpl.getInstance();
     }
 
-    public abstract ServiceContext createServiceContext() throws InsufficientResourcesException, SecurityException;
+    public abstract ServiceContext createServiceContext()
+            throws InsufficientResourcesException, SecurityException;
 
     public abstract ServiceContext[] getServiceContexts();
 

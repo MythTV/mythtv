@@ -22,23 +22,28 @@ package javax.tv.graphics;
 import java.awt.Color;
 
 public class AlphaColor extends Color {
-    public AlphaColor(float r, float g, float b, float a) {
+    public AlphaColor(float r, float g, float b, float a)
+    {
         super(r, g, b, a);
     }
 
-    public AlphaColor(int r, int g, int b, int a) {
+    public AlphaColor(int r, int g, int b, int a)
+    {
         super(r, g, b, a);
     }
 
-    public AlphaColor(int rgba, boolean hasAlpha) {
+    public AlphaColor(int rgba, boolean hasAlpha)
+    {
         super(rgba, hasAlpha);
     }
 
-    public AlphaColor(Color c) {
+    public AlphaColor(Color c)
+    {
         super(c.getRGB(), true);
     }
 
-    public Color brighter() {
+    public Color brighter()
+    {
         Color c = super.brighter();
         int a = getAlpha();
 
@@ -46,7 +51,8 @@ public class AlphaColor extends Color {
         return new AlphaColor(c.getRed(), c.getGreen(), c.getBlue(), a);
     }
 
-    public Color darker() {
+    public Color darker()
+    {
         Color c = super.darker();
         int a = getAlpha();
 

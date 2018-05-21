@@ -76,7 +76,8 @@ public class IxcRegistryImpl {
                 if (cls.isInterface() && Remote.class.isAssignableFrom(cls)) {
                     FilteredList.add(cls);
                 }
-            } catch (ClassNotFoundException e) {
+            }
+            catch (ClassNotFoundException e) {
                 logger.error("" + e);
             }
         }
@@ -89,7 +90,8 @@ public class IxcRegistryImpl {
         return null;
     }
 
-    private Object exportRemoteObj(Object proxiedRemoteObj, XletContext toContext) throws RemoteException {
+    private Object exportRemoteObj(Object proxiedRemoteObj, XletContext toContext) throws RemoteException
+    {
         RemoteObjectInvocationHandler handler = (RemoteObjectInvocationHandler)Proxy.getInvocationHandler(proxiedRemoteObj);
 
         if (handler.remoteObj.context == toContext) {
@@ -136,7 +138,8 @@ public class IxcRegistryImpl {
         throw new RemoteException("Object is neither Serializable nor Remote");
     }
 
-    private void getAllInterfaces(Class objClass, ArrayList resultList) {
+    private void getAllInterfaces(Class objClass, ArrayList resultList)
+    {
         if (objClass == null) {
             return;
         }
@@ -144,8 +147,7 @@ public class IxcRegistryImpl {
 
         for (int i = 0; i < ifs.length; i++) {
             int j;
-            for (j = 0; (j < resultList.size()) && (resultList.get(j) != ifs[i]); j++)
-                ;
+            for (j = 0; (j < resultList.size()) && (resultList.get(j) != ifs[i]); j++);
             if (j == resultList.size()) {
                 resultList.add(ifs[i]);
             }
@@ -194,8 +196,8 @@ public class IxcRegistryImpl {
                 if (!Remote.class.isAssignableFrom(superInterfaces[j]))
                     throw new RemoteException("remote parameter not assignable");
             }
-        } else if ((!parameter.isPrimitive()) && (!parameter.equals(Void.TYPE)) &&
-                   (!Serializable.class.isAssignableFrom(parameter))) {
+        }
+        else if ((!parameter.isPrimitive()) && (!parameter.equals(Void.TYPE)) && (!Serializable.class.isAssignableFrom(parameter))) {
             throw new RemoteException("invalid parameter");
         }
     }
@@ -258,7 +260,8 @@ public class IxcRegistryImpl {
             return result;
         }
 
-        private class RemoteMethod implements Runnable {
+        private class RemoteMethod implements Runnable
+        {
             final BDJXletContext calleeContext;
             final BDJXletContext callerContext;
             final Method         methodInCallee;
@@ -270,7 +273,7 @@ public class IxcRegistryImpl {
             public RemoteMethod(final Method method, BDJXletContext context, Object[] args)
                 throws RemoteException {
 
-                callerContext = BDJXletContext.getCurrentContext();
+                callerContext  = BDJXletContext.getCurrentContext();
                 if (callerContext == null) {
                     logger.error("caller context is null");
                     throw new RemoteException("no caller context");
@@ -279,7 +282,7 @@ public class IxcRegistryImpl {
                     logger.error("callee context is null");
                     throw new RemoteException("no callee context");
                 }
-                calleeContext = context;
+                calleeContext  = context;
 
                 //methodInCallee = findMethodInCallee(method);
                 methodInCallee = (Method)AccessController.doPrivileged(
@@ -308,14 +311,16 @@ public class IxcRegistryImpl {
                         TRACE("  type: " + ret.getClass().getName());
                     }
                     retInCaller = IxcRegistryImpl.this.wrapOrCopy(ret, calleeContext, callerContext);
-                } catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException e) {
                     exception = e;
                 } catch (IllegalAccessException e) {
                     exception = e;
                 } catch (InvocationTargetException e) {
                     try {
                         exception = ((Exception)IxcRegistryImpl.this.wrapOrCopy(e, calleeContext, callerContext));
-                    } catch (RemoteException e1) {
+                    }
+                    catch (RemoteException e1) {
                         exception = e1;
                     }
                 } catch (RemoteException e) {
@@ -354,11 +359,13 @@ public class IxcRegistryImpl {
      * store
      */
 
-    private static class WrappedRemoteObj {
+    private class WrappedRemoteObj
+    {
         final Remote         object;
         final BDJXletContext context;
 
-        public WrappedRemoteObj(Remote object, BDJXletContext context) {
+        public WrappedRemoteObj(Remote object, BDJXletContext context)
+        {
             this.object  = object;
             this.context = context;
         }
@@ -450,7 +457,9 @@ public class IxcRegistryImpl {
         return (Remote)remoteObj;
     }
 
-    public void unbind(String path) throws NotBoundException {
+
+    public void unbind(String path) throws NotBoundException
+    {
         Debug("IxcRegistry.unbind(" + path + ")");
 
         synchronized (remoteObjects) {
@@ -468,7 +477,8 @@ public class IxcRegistryImpl {
         Debug("IxcRegistry.unbind(" + path + ") OK");
     }
 
-    public String[] list() {
+    public String[] list()
+    {
         String[] result = null;
         int i = 0;
         synchronized (remoteObjects) {
