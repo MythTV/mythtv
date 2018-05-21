@@ -146,7 +146,10 @@ using_bdjava {
     macx:javaos = darwin
     win32:javaos = win32
     linux:javaos = linux
-    freebsd:javaos = freebsd
+    freebsd:javaos = linux  # Original libbluray configure.ac sets this to 'freebsd'
+                            # but for the fallback case that we're not actually building
+                            # the JAR, it doesn't provide a freebsd version of jni_md.h.
+                            # Let's try using the linux version and hope for the best.
 
     INCLUDEPATH += ./jni ./jni/$$javaos
     HEADERS += ./jni/jni.h ./jni/$$javaos/jni_md.h
