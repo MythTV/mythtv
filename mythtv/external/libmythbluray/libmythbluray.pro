@@ -133,6 +133,7 @@ using_bdjava {
 
     installjar.path = $${PREFIX}/share/mythtv/jars
     installjar.files = $$bdjava.target
+    installjar.CONFIG += no_check_exist directory
 
     INSTALLS += installjar
 
