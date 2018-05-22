@@ -89,7 +89,7 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
 
         if (m_lastVideoPkt)
         {
-            av_copy_packet(pkt, m_lastVideoPkt);
+            av_packet_ref(pkt, m_lastVideoPkt);
 
             if (m_lastVideoPkt->pts != AV_NOPTS_VALUE)
                 m_lastVideoPkt->pts += pkt->duration;
@@ -149,7 +149,8 @@ int AvFormatDecoderDVD::ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& st
 
                                 // Return the first buffered packet
                                 AVPacket *storedPkt = storedPackets.takeFirst();
-                                av_copy_packet(pkt, storedPkt);
+                                av_packet_ref(pkt, storedPkt);
+                                av_packet_unref(storedPkt);
                                 delete storedPkt;
 
                                 return 0;
@@ -318,7 +319,7 @@ bool AvFormatDecoderDVD::ProcessVideoPacket(AVStream *stream, AVPacket *pkt)
         }
 
         av_init_packet(m_lastVideoPkt);
-        av_copy_packet(m_lastVideoPkt, pkt);
+        av_packet_ref(m_lastVideoPkt, pkt);
         m_lbaLastVideoPkt = m_curContext->GetLBA();
 
         if (m_returnContext)
