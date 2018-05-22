@@ -188,26 +188,28 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
 
     command.replace(QString("%ARGS%"), args);
 
-    ProgramInfo pginfo(chanid, recstartts);
-    bool pginfo_loaded = pginfo.GetChanID();
-    if (!pginfo_loaded)
-    {
-        RecordingInfo::LoadStatus status;
-        pginfo = RecordingInfo(chanid, recstartts, false, 0, &status);
-        pginfo_loaded = RecordingInfo::kFoundProgram == status;
-    }
-
-    if (pginfo_loaded)
-    {
-        pginfo.SubstituteMatches(command);
-    }
+    // 1st, try loading RecordingInfo / ProgramInfo
+    RecordingInfo recinfo(chanid, recstartts);
+    bool loaded = recinfo.GetChanID();
+    if (loaded)
+        recinfo.SubstituteMatches(command);
     else
     {
-        command.replace(QString("%CHANID%"), QString::number(chanid));
-        command.replace(QString("%STARTTIME%"),
-                        MythDate::toString(recstartts, MythDate::kFilename));
-        command.replace(QString("%STARTTIMEISO%"),
-                        recstartts.toString(Qt::ISODate));
+        // 2rd Try searching for RecordingInfo
+        RecordingInfo::LoadStatus status;
+        RecordingInfo recinfo2(chanid, recstartts, false, 0, &status);
+        if (status == RecordingInfo::kFoundProgram)
+            recinfo2.SubstituteMatches(command);
+        else
+        {
+            // 3th just use what we know
+            command.replace(QString("%CHANID%"), QString::number(chanid));
+            command.replace(QString("%STARTTIME%"),
+                            MythDate::toString(recstartts,
+                                               MythDate::kFilename));
+            command.replace(QString("%STARTTIMEISO%"),
+                            recstartts.toString(Qt::ISODate));
+        }
     }
 
     command.replace(QString("%VERBOSELEVEL%"), QString("%1").arg(verboseMask));
