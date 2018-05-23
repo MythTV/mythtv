@@ -208,10 +208,8 @@ static int tcp_accept(URLContext *s, URLContext **c)
         return ret;
     cc = (*c)->priv_data;
     ret = ff_accept(sc->fd, sc->listen_timeout, s);
-    if (ret < 0) {
-        ffurl_closep(c);
+    if (ret < 0)
         return ret;
-    }
     cc->fd = ret;
     return 0;
 }

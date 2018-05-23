@@ -1,13 +1,6 @@
 Entries are sorted chronologically from oldest to youngest within each release,
 releases are sorted from youngest to oldest.
 
-version <next>:
-- deblock filter
-- tmix filter
-- amplify filter
-- fftdnoiz filter
-
-
 version 4.0:
 - Bitstream filters for editing metadata in H.264, HEVC and MPEG-2 streams
 - Dropped support for OpenJPEG versions 2.0 and below. Using OpenJPEG now
@@ -61,7 +54,6 @@ version 4.0:
 - Haivision SRT protocol via libsrt
 - segafilm muxer
 - vfrdet filter
-- SRCNN filter
 
 
 version 3.4:

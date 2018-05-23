@@ -32,6 +32,8 @@
 #include "formats.h"
 #include "internal.h"
 
+#define MAX_IR_DURATION 30
+
 typedef struct AudioFIRContext {
     const AVClass *class;
 
@@ -39,7 +41,6 @@ typedef struct AudioFIRContext {
     float dry_gain;
     float length;
     int again;
-    float max_ir_len;
 
     float gain;
 

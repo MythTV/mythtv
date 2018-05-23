@@ -288,7 +288,7 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .comp = {
             { 0, 1, 0, 0, 8, 0, 7, 1 },
         },
-        .flags = AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_ALPHA,
+        .flags = AV_PIX_FMT_FLAG_PAL,
     },
     [AV_PIX_FMT_YUVJ420P] = {
         .name = "yuvj420p",
@@ -610,27 +610,6 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
             { 0, 2, 0, 0, 12, 1, 11, 1 },       /* Y */
         },
         .alias = "y12le",
-    },
-    [AV_PIX_FMT_GRAY14BE] = {
-        .name = "gray14be",
-        .nb_components = 1,
-        .log2_chroma_w = 0,
-        .log2_chroma_h = 0,
-        .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },       /* Y */
-        },
-        .flags = AV_PIX_FMT_FLAG_BE,
-        .alias = "y14be",
-    },
-    [AV_PIX_FMT_GRAY14LE] = {
-        .name = "gray14le",
-        .nb_components = 1,
-        .log2_chroma_w = 0,
-        .log2_chroma_h = 0,
-        .comp = {
-            { 0, 2, 0, 0, 14, 1, 13, 1 },       /* Y */
-        },
-        .alias = "y14le",
     },
     [AV_PIX_FMT_GRAY16BE] = {
         .name = "gray16be",
@@ -2453,6 +2432,7 @@ void ff_check_pixfmt_descriptors(void){
         av_assert0(d->log2_chroma_h <= 3);
         av_assert0(d->nb_components <= 4);
         av_assert0(d->name && d->name[0]);
+        av_assert0((d->nb_components==4 || d->nb_components==2) == !!(d->flags & AV_PIX_FMT_FLAG_ALPHA));
         av_assert2(av_get_pix_fmt(d->name) == i);
 
         for (j=0; j<FF_ARRAY_ELEMS(d->comp); j++) {
@@ -2503,7 +2483,7 @@ enum AVPixelFormat av_pix_fmt_swap_endianness(enum AVPixelFormat pix_fmt)
 #define FF_COLOR_XYZ      4
 
 #define pixdesc_has_alpha(pixdesc) \
-    ((pixdesc)->flags & AV_PIX_FMT_FLAG_ALPHA)
+    ((pixdesc)->nb_components == 2 || (pixdesc)->nb_components == 4 || (pixdesc)->flags & AV_PIX_FMT_FLAG_PAL)
 
 
 static int get_color_type(const AVPixFmtDescriptor *desc) {

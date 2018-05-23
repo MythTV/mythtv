@@ -490,7 +490,7 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
     sec = &filter->u.section_filter;
     sec->section_cb  = section_cb;
     sec->opaque      = opaque;
-    sec->section_buf = av_malloc(MAX_SECTION_SIZE);
+    sec->section_buf = av_mallocz(MAX_SECTION_SIZE);
     sec->check_crc   = check_crc;
     sec->last_ver    = -1;
 
@@ -1745,10 +1745,10 @@ int ff_old_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_
                     }
                 }
 
-               if (st->codecpar->extradata_size < language_count * 2)
-                   return AVERROR_INVALIDDATA;
+                if (st->codecpar->extradata_size < language_count * 2)
+                    return AVERROR_INVALIDDATA;
 
-               extradata = st->codecpar->extradata;
+                extradata = st->codecpar->extradata;
 
                 for (i = 0; i < language_count; i++) {
                     language[i * 4 + 0] = get8(pp, desc_end);
@@ -1847,7 +1847,6 @@ int ff_old_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_
                 break;
             case 0x03:
                 st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED;
-                st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
                 break;
             }
         }
@@ -1923,7 +1922,6 @@ int ff_old_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_
             switch ((flags >> 2) & 0x1F) { /* editorial_classification */
             case 0x01:
                 st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED;
-                st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
                 break;
             case 0x02:
                 st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED;
@@ -1945,34 +1943,6 @@ int ff_old_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_
                  * ISO 639 language descriptor language */
                 if (language[0])
                     av_dict_set(&st->metadata, "language", language, 0);
-            }
-        }
-        break;
-    case 0x6a: /* ac-3_descriptor */
-        {
-            int component_type_flag = get8(pp, desc_end) & (1 << 7);
-            if (component_type_flag) {
-                int component_type = get8(pp, desc_end);
-                int service_type_mask = 0x38;  // 0b00111000
-                int service_type = ((component_type & service_type_mask) >> 3);
-                if (service_type == 0x02 /* 0b010 */) {
-                    st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
-                    av_log(ts->stream, AV_LOG_DEBUG, "New track disposition for id %u: %u\n", st->id, st->disposition);
-                }
-            }
-        }
-        break;
-    case 0x7a: /* enhanced_ac-3_descriptor */
-        {
-            int component_type_flag = get8(pp, desc_end) & (1 << 7);
-            if (component_type_flag) {
-                int component_type = get8(pp, desc_end);
-                int service_type_mask = 0x38;  // 0b00111000
-                int service_type = ((component_type & service_type_mask) >> 3);
-                if (service_type == 0x02 /* 0b010 */) {
-                    st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
-                    av_log(ts->stream, AV_LOG_DEBUG, "New track disposition for id %u: %u\n", st->id, st->disposition);
-                }
             }
         }
         break;

@@ -959,10 +959,6 @@ Set Impulse Response filter length. Default is 1, which means whole IR is proces
 
 @item again
 Enable applying gain measured from power of IR.
-
-@item maxir
-Set max allowed Impulse Response filter duration in seconds. Default is 30 seconds.
-Allowed range is 0.1 to 60 seconds.
 @end table
 
 @subsection Examples
@@ -2057,7 +2053,7 @@ Change bandreject width.
 Syntax for the command is : "@var{width}"
 @end table
 
-@section bass, lowshelf
+@section bass
 
 Boost or cut the bass (lower) frequencies of the audio using a two-pole
 shelving filter with a response similar to that of a standard
@@ -4432,7 +4428,7 @@ Set LFE input volume. By default, this is @var{1}.
 Set LFE output volume. By default, this is @var{1}.
 @end table
 
-@section treble, highshelf
+@section treble
 
 Boost or cut treble (upper) frequencies of the audio using a two-pole
 shelving filter with a response similar to that of a standard
@@ -5187,38 +5183,6 @@ input reaches end of stream. This will cause problems if your encoding
 pipeline drops frames. If you're trying to apply an image as an
 overlay to a video stream, consider the @var{overlay} filter instead.
 
-@section amplify
-
-Amplify differences between current pixel and pixels of adjacent frames in
-same pixel location.
-
-This filter accepts the following options:
-
-@table @option
-@item radius
-Set frame radius. Default is 2. Allowed range is from 1 to 63.
-For example radius of 3 will instruct filter to calculate average of 7 frames.
-
-@item factor
-Set factor to amplify difference. Default is 2. Allowed range is from 0 to 65535.
-
-@item threshold
-Set threshold for difference amplification. Any differrence greater or equal to
-this value will not alter source pixel. Default is 10.
-Allowed range is from 0 to 65535.
-
-@item low
-Set lower limit for changing source pixel. Default is 65535. Allowed range is from 0 to 65535.
-This option controls maximum possible value that will decrease source pixel value.
-
-@item high
-Set high limit for changing source pixel. Default is 65535. Allowed range is from 0 to 65535.
-This option controls maximum possible value that will increase source pixel value.
-
-@item planes
-Set which planes to filter. Default is all. Allowed range is from 0 to 15.
-@end table
-
 @section ass
 
 Same as the @ref{subtitles} filter, except that it doesn't require libavcodec
@@ -5279,7 +5243,7 @@ Threshold A is designed to react on abrupt changes in the input signal and
 threshold B is designed to react on continuous changes in the input signal.
 
 @item s
-Set number of frames filter will use for averaging. Default is 9. Must be odd
+Set number of frames filter will use for averaging. Default is 33. Must be odd
 number in range [5, 129].
 
 @item p
@@ -6416,7 +6380,7 @@ colorspace=smpte240m
 
 @section convolution
 
-Apply convolution of 3x3, 5x5, 7x7 or horizontal/vertical up to 49 elements.
+Apply convolution 3x3, 5x5 or 7x7 filter.
 
 The filter accepts the following options:
 
@@ -6426,15 +6390,13 @@ The filter accepts the following options:
 @item 2m
 @item 3m
 Set matrix for each plane.
-Matrix is sequence of 9, 25 or 49 signed integers in @var{square} mode,
-and from 1 to 49 odd number of signed integers in @var{row} mode.
+Matrix is sequence of 9, 25 or 49 signed integers.
 
 @item 0rdiv
 @item 1rdiv
 @item 2rdiv
 @item 3rdiv
 Set multiplier for calculated value for each plane.
-If unset or 0, it will be sum of all matrix elements.
 
 @item 0bias
 @item 1bias
@@ -6442,13 +6404,6 @@ If unset or 0, it will be sum of all matrix elements.
 @item 3bias
 Set bias for each plane. This value is added to the result of the multiplication.
 Useful for making the overall image brighter or darker. Default is 0.0.
-
-@item 0mode
-@item 1mode
-@item 2mode
-@item 3mode
-Set matrix mode for each plane. Can be @var{square}, @var{row} or @var{column}.
-Default is @var{square}.
 @end table
 
 @subsection Examples
@@ -7118,65 +7073,6 @@ If enabled, current pixel is changed if and only if all pixel components are ban
 e.g. banding detection threshold is triggered for all color components.
 The default is disabled.
 @end table
-
-@section deblock
-
-Remove blocking artifacts from input video.
-
-The filter accepts the following options:
-
-@table @option
-@item filter
-Set filter type, can be @var{weak} or @var{strong}. Default is @var{strong}.
-This controls what kind of deblocking is applied.
-
-@item block
-Set size of block, allowed range is from 4 to 512. Default is @var{8}.
-
-@item alpha
-@item beta
-@item gamma
-@item delta
-Set blocking detection thresholds. Allowed range is 0 to 1.
-Defaults are: @var{0.098} for @var{alpha} and @var{0.05} for the rest.
-Using higher threshold gives more deblocking strength.
-Setting @var{alpha} controls threshold detection at exact edge of block.
-Remaining options controls threshold detection near the edge. Each one for
-below/above or left/right. Setting any of those to @var{0} disables
-deblocking.
-
-@item planes
-Set planes to filter. Default is to filter all available planes.
-@end table
-
-@subsection Examples
-
-@itemize
-@item
-Deblock using weak filter and block size of 4 pixels.
-@example
-deblock=filter=weak:block=4
-@end example
-
-@item
-Deblock using strong filter, block size of 4 pixels and custom thresholds for
-deblocking more edges.
-@example
-deblock=filter=strong:block=4:alpha=0.12:beta=0.07:gamma=0.06:delta=0.05
-@end example
-
-@item
-Similar as above, but filter only first plane.
-@example
-deblock=filter=strong:block=4:alpha=0.12:beta=0.07:gamma=0.06:delta=0.05:planes=1
-@end example
-
-@item
-Similar as above, but filter only second and third plane.
-@example
-deblock=filter=strong:block=4:alpha=0.12:beta=0.07:gamma=0.06:delta=0.05:planes=6
-@end example
-@end itemize
 
 @anchor{decimate}
 @section decimate
@@ -8276,14 +8172,9 @@ Draw white/gray wires on black background.
 
 @item colormix
 Mix the colors to create a paint/cartoon effect.
-
-@item canny
-Apply Canny edge detector on all selected planes.
 @end table
-Default value is @var{wires}.
 
-@item planes
-Select planes for filtering. By default all available planes are filtered.
+Default value is @var{wires}.
 @end table
 
 @subsection Examples
@@ -8695,40 +8586,6 @@ fftfilt=dc_Y=0:weight_Y='exp(-4 * ((Y+X)/(W+H)))'
 @end example
 
 @end itemize
-
-@section fftdnoiz
-Denoise frames using 3D FFT (frequency domain filtering).
-
-The filter accepts the following options:
-
-@table @option
-@item sigma
-Set the noise sigma constant. This sets denoising strength.
-Default value is 1. Allowed range is from 0 to 30.
-Using very high sigma with low overlap may give blocking artifacts.
-
-@item amount
-Set amount of denoising. By default all detected noise is reduced.
-Default value is 1. Allowed range is from 0 to 1.
-
-@item block
-Set size of block, Default is 4, can be 3, 4, 5 or 6.
-Actual size of block in pixels is 2 to power of @var{block}, so by default
-block size in pixels is 2^4 which is 16.
-
-@item overlap
-Set block overlap. Default is 0.5. Allowed range is from 0.2 to 0.8.
-
-@item prev
-Set number of previous frames to use for denoising. By default is set to 0.
-
-@item next
-Set number of next frames to to use for denoising. By default is set to 0.
-
-@item planes
-Set planes which will be filtered, by default are all available filtered
-except alpha.
-@end table
 
 @section field
 
@@ -11232,14 +11089,7 @@ The number of inputs. If unspecified, it defaults to 2.
 
 @item weights
 Specify weight of each input video stream as sequence.
-Each weight is separated by space. If number of weights
-is smaller than number of @var{frames} last specified
-weight will be used for all remaining unset weights.
-
-@item scale
-Specify scale, if it is set it will be multiplied with sum
-of each weight multiplied with pixel values to give final destination
-pixel value. By default @var{scale} is auto scaled to sum of weights.
+Each weight is separated by space.
 
 @item duration
 Specify how end of stream is determined.
@@ -15647,50 +15497,6 @@ Vertical low-pass filtering can only be enabled for @option{mode}
 @var{interleave_top} and @var{interleave_bottom}.
 
 @end table
-
-@section tmix
-
-Mix successive video frames.
-
-A description of the accepted options follows.
-
-@table @option
-@item frames
-The number of successive frames to mix. If unspecified, it defaults to 3.
-
-@item weights
-Specify weight of each input video frame.
-Each weight is separated by space. If number of weights is smaller than
-number of @var{frames} last specified weight will be used for all remaining
-unset weights.
-
-@item scale
-Specify scale, if it is set it will be multiplied with sum
-of each weight multiplied with pixel values to give final destination
-pixel value. By default @var{scale} is auto scaled to sum of weights.
-@end table
-
-@subsection Examples
-
-@itemize
-@item
-Average 7 successive frames:
-@example
-tmix=frames=7:weights="1 1 1 1 1 1 1"
-@end example
-
-@item
-Apply simple temporal convolution:
-@example
-tmix=frames=3:weights="-1 3 -1"
-@end example
-
-@item
-Similar as above but only showing temporal differences:
-@example
-tmix=frames=3:weights="-1 2 -1":scale=1
-@end example
-@end itemize
 
 @section tonemap
 Tone map colors from different dynamic ranges.

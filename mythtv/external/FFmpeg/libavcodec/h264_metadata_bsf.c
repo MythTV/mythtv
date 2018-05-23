@@ -220,7 +220,6 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
     AVPacket *in = NULL;
     CodedBitstreamFragment *au = &ctx->access_unit;
     int err, i, j, has_sps;
-    H264RawAUD aud;
     uint8_t *displaymatrix_side_data = NULL;
     size_t displaymatrix_side_data_size = 0;
 
@@ -257,6 +256,9 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
                 0x3ff, // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
             };
             int primary_pic_type_mask = 0xff;
+            H264RawAUD aud = {
+                .nal_unit_header.nal_unit_type = H264_NAL_AUD,
+            };
 
             for (i = 0; i < au->nb_units; i++) {
                 if (au->units[i].type == H264_NAL_SLICE ||
@@ -279,10 +281,7 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
                 goto fail;
             }
 
-            aud = (H264RawAUD) {
-                .nal_unit_header.nal_unit_type = H264_NAL_AUD,
-                .primary_pic_type = j,
-            };
+            aud.primary_pic_type = j;
 
             err = ff_cbs_insert_unit_content(ctx->cbc, au,
                                              0, H264_NAL_AUD, &aud, NULL);
@@ -341,6 +340,8 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
             udu->data        = udu->data_ref->data;
             udu->data_length = len + 1;
             memcpy(udu->data, ctx->sei_user_data + i + 1, len + 1);
+
+            payload.payload_size = 16 + udu->data_length;
 
             err = ff_cbs_h264_add_sei_message(ctx->cbc, au, &payload);
             if (err < 0) {
