@@ -29,11 +29,6 @@
 #include "tv_rec.h"
 #include "mythsystemevent.h"
 
-#include <atomic>
-extern "C" {
-#include "libavcodec/mpegvideo.h"
-}
-
 #define LOC ((tvrec) ? \
     QString("DTVRec[%1]: ").arg(tvrec->GetInputId()) : \
     QString("DTVRec(0x%1): ").arg(intptr_t(this),0,16))

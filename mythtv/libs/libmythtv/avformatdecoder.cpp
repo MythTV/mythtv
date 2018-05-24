@@ -62,13 +62,11 @@ extern "C" {
 #include "vaapicontext.h"
 #endif
 
-#include <atomic>
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
 #include "libavutil/log.h"
 #include "libavcodec/avcodec.h"
-#include "libavcodec/mpegvideo.h"
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
 #include "libavformat/internal.h"
