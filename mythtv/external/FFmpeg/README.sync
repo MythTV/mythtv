@@ -8,6 +8,9 @@ git://source.ffmpeg.org/ffmpeg.git at n3.4.1-5-g4a53ecb on February 5th, 2018 (P
 As of May 22 2018 we resync the code to the MythTV fork of FFmpeg (git@github.com:MythTV/FFmpeg.git).
 All changes to the FFmpeg code must be made in that repository, master branch and cherry-picked to release branch currently in use.
 
+git@github.com:MythTV/FFmpeg.git at n4.0-43-ge4e7472e73 on May 24, 2018 (release/4.0 branch) 
+git@github.com:FFmpeg/FFmpeg.git at n4.0-39-gda399903c7 (Peter Bennett)
+
 List of files modified from original FFmpeg:
 
 	modified:   Makefile
