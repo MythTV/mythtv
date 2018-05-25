@@ -1037,7 +1037,7 @@ void MythSocket::ResetReal(void)
         if (avail)
         {
             trash.resize(max((uint)trash.size(),avail));
-            m_tcpSocket->read(&trash[0], avail);
+            m_tcpSocket->read(trash.data(), avail);
         }
 
         LOG(VB_NETWORK, LOG_INFO, LOC + "Reset() " +

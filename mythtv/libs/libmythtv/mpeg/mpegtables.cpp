@@ -445,7 +445,7 @@ ProgramMapTable* ProgramMapTable::Create(
         uint len = global_desc[i][1] + 2;
         gdesc.insert(gdesc.end(), global_desc[i], global_desc[i] + len);
     }
-    pmt->SetProgramInfo(&gdesc[0], gdesc.size());
+    pmt->SetProgramInfo(gdesc.data(), gdesc.size());
 
     for (uint i = 0; i < count; i++)
     {
@@ -457,7 +457,7 @@ ProgramMapTable* ProgramMapTable::Create(
                          prog_desc[i][j], prog_desc[i][j] + len);
         }
 
-        pmt->AppendStream(pids[i], types[i], &pdesc[0], pdesc.size());
+        pmt->AppendStream(pids[i], types[i], pdesc.data(), pdesc.size());
     }
     pmt->Finalize();
 
