@@ -15,6 +15,41 @@ extern "C" {
 #include "vdpau/vdpau_x11.h"
 }
 
+
+/**
+ * Copied from earlier version of FFmpeg vdpau.h
+ * @brief This structure is used as a callback between the FFmpeg
+ * decoder (vd_) and presentation (vo_) module.
+ * This is used for defining a video frame containing surface,
+ * picture parameter, bitstream information etc which are passed
+ * between the FFmpeg decoder and its clients.
+ */
+ union AVVDPAUPictureInfo {
+    VdpPictureInfoH264        h264;
+    VdpPictureInfoMPEG1Or2    mpeg;
+    VdpPictureInfoVC1          vc1;
+    VdpPictureInfoMPEG4Part2 mpeg4;
+};
+
+struct vdpau_render_state {
+    VdpVideoSurface surface; ///< Used as rendered surface, never changed.
+
+    int state; ///< Holds FF_VDPAU_STATE_* values.
+
+    /** picture parameter information for all supported codecs */
+    union AVVDPAUPictureInfo info;
+
+    /** Describe size/location of the compressed video data.
+        Set to 0 when freeing bitstream_buffers. */
+    int bitstream_buffers_allocated;
+    int bitstream_buffers_used;
+    /** The user is responsible for freeing this buffer using av_freep(). */
+    VdpBitstreamBuffer *bitstream_buffers;
+};
+#define FF_VDPAU_STATE_USED_FOR_REFERENCE 2
+
+/* End of definitions copied from old VDPAU */
+
 #define MIN_OUTPUT_SURFACES  2 // UI
 #define MAX_OUTPUT_SURFACES  4 // Video
 #define NUM_REFERENCE_FRAMES 3

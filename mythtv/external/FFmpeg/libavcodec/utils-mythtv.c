@@ -36,7 +36,6 @@ const char *ff_codec_id_string(enum AVCodecID codec_id)
         case AV_CODEC_ID_NONE:             return "NONE";
         case AV_CODEC_ID_MPEG1VIDEO:       return "MPEG1VIDEO";
         case AV_CODEC_ID_MPEG2VIDEO:       return "MPEG2VIDEO";
-        case AV_CODEC_ID_MPEG2VIDEO_XVMC:  return "MPEG2VIDEO_XVMC";
         case AV_CODEC_ID_H261:             return "H261";
         case AV_CODEC_ID_H263:             return "H263";
         case AV_CODEC_ID_RV10:             return "RV10";

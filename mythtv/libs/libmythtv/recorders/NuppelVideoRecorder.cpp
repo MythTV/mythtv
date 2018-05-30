@@ -320,23 +320,23 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
     else if (opt == "mpeg4option4mv")
     {
         if (value)
-            mp4opts |= CODEC_FLAG_4MV;
+            mp4opts |= AV_CODEC_FLAG_4MV;
         else
-            mp4opts &= ~CODEC_FLAG_4MV;
+            mp4opts &= ~AV_CODEC_FLAG_4MV;
     }
     else if (opt == "mpeg4optionidct")
     {
         if (value)
-            mp4opts |= CODEC_FLAG_INTERLACED_DCT;
+            mp4opts |= AV_CODEC_FLAG_INTERLACED_DCT;
         else
-            mp4opts &= ~CODEC_FLAG_INTERLACED_DCT;
+            mp4opts &= ~AV_CODEC_FLAG_INTERLACED_DCT;
     }
     else if (opt == "mpeg4optionime")
     {
         if (value)
-            mp4opts |= CODEC_FLAG_INTERLACED_ME;
+            mp4opts |= AV_CODEC_FLAG_INTERLACED_ME;
         else
-            mp4opts &= ~CODEC_FLAG_INTERLACED_ME;
+            mp4opts &= ~AV_CODEC_FLAG_INTERLACED_ME;
     }
     else if (opt == "hardwaremjpegquality")
         hmjpg_quality = value;

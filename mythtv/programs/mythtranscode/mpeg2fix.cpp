@@ -1254,7 +1254,7 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     //We fix the discrepancy by discarding avcodec's sequence header, and
     //replace it with the original
     if (picture->interlaced_frame)
-        c->flags |= CODEC_FLAG_INTERLACED_DCT;
+        c->flags |= AV_CODEC_FLAG_INTERLACED_DCT;
 
     c->bit_rate = info->sequence->byte_rate << 3; //not used
     c->bit_rate_tolerance = c->bit_rate >> 2; //not used

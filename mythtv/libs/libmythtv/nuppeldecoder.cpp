@@ -698,7 +698,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
         return false;
     }
 
-    if (mpa_vidcodec->capabilities & CODEC_CAP_DR1 && codec != AV_CODEC_ID_MJPEG)
+    if (mpa_vidcodec->capabilities & AV_CODEC_CAP_DR1 && codec != AV_CODEC_ID_MJPEG)
         directrendering = true;
 
     if (mpa_vidctx)
@@ -716,7 +716,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
 
     if (directrendering)
     {
-        mpa_vidctx->flags |= CODEC_FLAG_EMU_EDGE;
+        // mpa_vidctx->flags |= CODEC_FLAG_EMU_EDGE;
         mpa_vidctx->draw_horiz_band = NULL;
         mpa_vidctx->get_buffer2 = get_nuppel_buffer;
         mpa_vidctx->opaque = (void *)this;

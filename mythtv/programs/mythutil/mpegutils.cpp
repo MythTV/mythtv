@@ -34,11 +34,6 @@
 // Application local headers
 #include "mpegutils.h"
 
-extern "C" {
-#include "libavcodec/mpegvideo.h"
-}
-
-
 static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
 {
     QHash<uint,bool> use_pid;

@@ -67,7 +67,6 @@ extern "C" {
 #include "libavutil/error.h"
 #include "libavutil/log.h"
 #include "libavcodec/avcodec.h"
-#include "libavcodec/mpegvideo.h"
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
 #include "libavformat/internal.h"
@@ -1614,9 +1613,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
     else
 #endif
-    if (codec && codec->capabilities & CODEC_CAP_DR1)
+    if (codec && codec->capabilities & AV_CODEC_CAP_DR1)
     {
-        enc->flags          |= CODEC_FLAG_EMU_EDGE;
+        // enc->flags          |= CODEC_FLAG_EMU_EDGE;
     }
     else
     {
@@ -1650,7 +1649,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         {
             if (FlagIsSet(kDecodeNoLoopFilter))
             {
-                enc->flags &= ~CODEC_FLAG_LOOP_FILTER;
+                enc->flags &= ~AV_CODEC_FLAG_LOOP_FILTER;
                 enc->skip_loop_filter = AVDISCARD_ALL;
             }
         }

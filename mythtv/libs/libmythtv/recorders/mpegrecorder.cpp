@@ -26,11 +26,6 @@ using namespace std;
 
 #include "mythconfig.h"
 
-// avlib headers
-extern "C" {
-#include "libavcodec/avcodec.h"
-}
-
 // MythTV headers
 #include "mpegrecorder.h"
 #include "ringbuffer.h"
