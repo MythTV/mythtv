@@ -20,9 +20,7 @@
 #define AVCODEC_ERROR_RESILIENCE_H
 
 #include <stdint.h>
-#ifndef __cplusplus
 #include <stdatomic.h>
-#endif
 
 #include "avcodec.h"
 #include "me_cmp.h"
