@@ -5963,7 +5963,7 @@ enabled libx264           && { use_pkg_config libx264 x264 "stdint.h x264.h" x26
                              require_cpp_condition x264.h "X264_BUILD >= 118" &&
                              { check_cpp_condition x264.h "X264_MPEG2" &&
                                enable libx262; }
-enabled libxml2           && require_pkg_config libxml2 libxml-2.0 libxml2/libxml/xmlversion.h xmlCheckVersion
+enabled libxml2           && require_pkg_config libxml2 libxml-2.0 libxml/xmlversion.h xmlCheckVersion
 enabled opengl            && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL" ||
                                check_lib opengl windows.h wglGetProcAddress "-lopengl32 -lgdi32" ||
                                check_lib opengl OpenGL/gl3.h glGetError "-Wl,-framework,OpenGL" ||
