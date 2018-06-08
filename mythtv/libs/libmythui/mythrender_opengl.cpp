@@ -24,7 +24,7 @@ using std::min;
 #include "mythrender_opengl1.h"
 #endif
 
-#ifdef USING_X11
+#ifdef CONFIG_XNVCTRL
 #include "util-nvctrl.h"
 #endif
 
@@ -95,7 +95,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     bool setswapinterval = false;
     int synctovblank = -1;
 
-#ifdef USING_X11
+#ifdef CONFIG_XNVCTRL
     synctovblank = CheckNVOpenGLSyncToVBlank();
 #endif
 

@@ -6,7 +6,7 @@ ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
 endif
 
-ifdef CONFIG_X11
+ifneq ($(CONFIG_XNVCTRL_EXTERNAL),yes)
     SUBDIRS += libXNVCtrl
 endif
 

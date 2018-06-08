@@ -8,7 +8,9 @@
 #include "mythdb.h"
 #include "mythdisplay.h"
 #include "mythxdisplay.h"
+#ifdef CONFIG_XNVCTRL
 #include "util-nvctrl.h"
+#endif
 
 #include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
 
@@ -138,6 +140,7 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
         m_videoModes.push_back(scr);
     }
 
+#if CONFIG_XNVCTRL
     t_screenrate screenmap;
 
     int nvidiarate = GetNvidiaRates(screenmap);
@@ -187,6 +190,7 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
             }
         }
     }
+#endif
 
     m_videoModesUnsorted = m_videoModes;
 

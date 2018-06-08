@@ -104,12 +104,16 @@ using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
-    # Add nvidia XV-EXTENSION support
-    HEADERS += util-nvctrl.h
-    SOURCES += util-nvctrl.cpp
-    INCLUDEPATH += ../../external/libXNVCtrl
-    LIBS += -L../../external/libXNVCtrl -lmythXNVCtrl-$${LIBVERSION}
-    POST_TARGETDEPS += ../../external/libXNVCtrl/libmythXNVCtrl-$${LIBVERSION}.$${QMAKE_EXTENSION_STATICLIB}
+    using_xnvctrl {
+        # Add nvidia XV-EXTENSION support
+        HEADERS += util-nvctrl.h
+        SOURCES += util-nvctrl.cpp
+        ! using_xnvctrl_external {
+            INCLUDEPATH += ../../external/libXNVCtrl
+            LIBS += -L../../external/libXNVCtrl -lmythXNVCtrl-$${LIBVERSION}
+            POST_TARGETDEPS += ../../external/libXNVCtrl/libmythXNVCtrl-$${LIBVERSION}.$${QMAKE_EXTENSION_STATICLIB}
+        }
+    }
 }
 
 using_qtdbus {

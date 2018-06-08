@@ -128,6 +128,7 @@ Advanced options (experts only):
   --disable-asi            disable support for DVEO ASI recorder
   --disable-x11            disable X11 support
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
+  --disable-xnvctrl        disable xNVCtrl support
   --disable-xrandr         disable X11 resolution switching
   --disable-xv             disable XVideo   (X11 video output accel.)
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
@@ -1982,6 +1983,8 @@ MYTHTV_CONFIG_LIST='
     v4l1
     valgrind
     x11
+    xnvctrl
+    xnvctrl_external
     xrandr
     xv
     profiletype
@@ -2773,6 +2776,8 @@ enable symbol_visibility
 enable v4l1
 enable v4l2
 enable x11
+enable xnvctrl
+enable xnvctrl_external
 enable xrandr
 enable xv
 disable indevs
@@ -6526,6 +6531,21 @@ if enabled x11; then
     require libXxf86vm "X11/Xdefs.h X11/Xlib.h X11/extensions/xf86vmode.h" XF86VidModeSetClientVersion -lXxf86vm
     require libXinerama X11/extensions/Xinerama.h XineramaQueryExtension -lXinerama
     require libXext "X11/Xdefs.h X11/Xlib.h X11/extensions/Xext.h" XMissingExtension -lXext
+    if enabled xnvctrl; then
+        case $target_os in
+            linux)
+                require XNVctrl "X11/Xlib.h NVCtrl/NVCtrl.h NVCtrl/NVCtrlLib.h" XNVCTRLIsNvScreen -lXNVCtrl || disable xnvctrl
+                ;;
+            freebsd)
+                # This is hopefully temporary, and will eventually
+                # check for a system library too.
+                disable xnvctrl_external
+                ;;
+            *)
+                disable xnvctrl
+                ;;
+        esac
+    fi
 fi
 
 if enabled x11; then
@@ -6548,18 +6568,6 @@ EOF
     if $cc -o $TMPE $TMPC -framework AGL > /dev/null 2>&1; then
         mac_corevideo="yes"
     fi
-fi
-
-# Ubuntu Dapper installs NVIDIA GL headers to a weird location in order
-# not to overwrite the headers installed from Mesa, etc. We need to
-# add that path to include paths if that's the case.
-if test -d ${sysroot}/usr/share/doc/nvidia-glx-dev/include; then
-    append CONFIG_INCLUDEPATH "${sysroot}/usr/share/doc/nvidia-glx-dev/include"
-fi
-
-# Same for Debian Sid.
-if test -d ${sysroot}/usr/share/nvidia/include/GL; then
-    append CONFIG_INCLUDEPATH "${sysroot}/usr/share/nvidia/include"
 fi
 
 if test $target_os = darwin; then
@@ -7182,6 +7190,15 @@ if enabled frontend; then
   echo "# Video Output Support"
   echo "x11 support               ${x11-no}"
 if enabled x11 ; then
+  if enabled xnvctrl; then
+    if enabled xnvctrl_external; then
+      echo "xnvctrl support           yes (system)"
+    else
+      echo "xnvctrl support           yes (internal)"
+    fi
+  else
+      echo "xnvctrl support           no"
+  fi
   echo "xrandr support            ${xrandr-no}"
   echo "xv support                ${xv-no}"
   echo "VDPAU support             ${vdpau-no}"
@@ -7716,7 +7733,7 @@ echo "Configuring libudfread..."
 echo "Configuring libmythsoundtouch..."
 (cd external/libmythsoundtouch ;
        ${qmakeconf} -o Makefile)
-if ! disabled x11 ; then
+if ! enabled xnvctrl_external ; then
     echo "Configuring libXNVCtrl..."
     (cd external/libXNVCtrl; \
            ${qmakeconf} -o Makefile.lib)
