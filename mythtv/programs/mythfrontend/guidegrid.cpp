@@ -1386,8 +1386,10 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     m_currentStartChannel = 0;
 
     uint avail = 0;
+    const ChannelUtil::OrderBy ordering = m_channelOrdering == "channum" ?
+        ChannelUtil::kChanOrderByChanNum : ChannelUtil::kChanOrderByName;
     ChannelInfoList channels = ChannelUtil::LoadChannels(0, 0, avail, true,
-                                         ChannelUtil::kChanOrderByChanNum,
+                                         ordering,
                                          ChannelUtil::kChanGroupByChanid,
                                          0,
                                          (m_changrpid < 0) ? 0 : m_changrpid);
