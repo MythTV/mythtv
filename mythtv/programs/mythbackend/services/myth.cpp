@@ -1132,7 +1132,8 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     QStringList protectedURLs;
 
     if (serviceList.size() == 1 && serviceList.first() == "All")
-        protectedURLs << "/";
+        for (QString service : KnownServices)
+            protectedURLs << '/' + service;
     else if (serviceList.size() == 1 && serviceList.first() == "None")
         protectedURLs << "Unprotected";
     else
