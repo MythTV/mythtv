@@ -6,10 +6,7 @@
 #include <QPainter>
 
 #include "util/log_control.h"
-#include "libbluray/bdnav/mpls_parse.h"
 #include "libbluray/bdnav/meta_data.h"
-#include "libbluray/bdnav/navigation.h"
-#include "libbluray/bdnav/bdparse.h"
 #include "libbluray/decoders/overlay.h"
 #include "libbluray/keys.h"              // for ::BD_VK_POPUP, ::BD_VK_0, etc
 
@@ -1143,22 +1140,22 @@ double BDRingBuffer::GetFrameRate(void)
         uint8_t rate = m_currentTitleInfo->clips->video_streams->rate;
         switch (rate)
         {
-            case BD_VIDEO_RATE_24000_1001:
+            case BLURAY_VIDEO_RATE_24000_1001:
                 return 23.97;
                 break;
-            case BD_VIDEO_RATE_24:
+            case BLURAY_VIDEO_RATE_24:
                 return 24;
                 break;
-            case BD_VIDEO_RATE_25:
+            case BLURAY_VIDEO_RATE_25:
                 return 25;
                 break;
-            case BD_VIDEO_RATE_30000_1001:
+            case BLURAY_VIDEO_RATE_30000_1001:
                 return 29.97;
                 break;
-            case BD_VIDEO_RATE_50:
+            case BLURAY_VIDEO_RATE_50:
                 return 50;
                 break;
-            case BD_VIDEO_RATE_60000_1001:
+            case BLURAY_VIDEO_RATE_60000_1001:
                 return 59.94;
                 break;
             default:
