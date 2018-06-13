@@ -6,7 +6,7 @@ win32-msvc* {
 
 # Libraries without dependencies
 
-SUBDIRS += libmythbluray
+!using_libbluray_external: SUBDIRS += libmythbluray
 SUBDIRS += libmythdvdnav
 SUBDIRS += libudfread
 SUBDIRS += nzmqt/src/nzmqt.pro

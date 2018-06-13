@@ -1,9 +1,15 @@
+#include "config.h"
+
 // Qt headers
 #include <QHash>
 #include <QCoreApplication>
 #include <QStringList>
 
+#if CONFIG_LIBBLURAY_EXTERNAL
+#include "libbluray/meta_data.h"
+#else
 #include "libbluray/bdnav/meta_data.h"
+#endif
 #include "bluraymetadata.h"
 #include "mythdirs.h"
 

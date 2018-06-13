@@ -296,9 +296,6 @@ LIBS += -L../../external/libmythdvdnav
 LIBS += -lmythdvdnav-$$LIBVERSION
 
 #Bluray stuff
-DEPENDPATH   += ../../external/libmythbluray/
-INCLUDEPATH  += ../../external/libmythbluray/src/
-!win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 HEADERS += Bluray/bdiowrapper.h Bluray/bdringbuffer.h
 SOURCES += Bluray/bdiowrapper.cpp Bluray/bdringbuffer.cpp
 using_frontend {
@@ -309,8 +306,15 @@ using_frontend {
     HEADERS += Bluray/bdoverlayscreen.h
     SOURCES += Bluray/bdoverlayscreen.cpp
 }
-LIBS += -L../../external/libmythbluray
-LIBS += -lmythbluray-$$LIBVERSION
+!using_libbluray_external {
+    INCLUDEPATH += ../../external/libmythbluray/src
+    DEPENDPATH += ../../external/libmythbluray
+    LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
+    !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+}
+using_libbluray_external:android {
+    LIBS += -lbluray -lxml2
+}
 
 DEPENDPATH += ../../external/libudfread
 LIBS += -L../../external/libudfread

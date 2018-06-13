@@ -1,6 +1,4 @@
-#if HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -8,7 +6,11 @@
 #include <strings.h>
 #include <stdio.h>
 
+#if CONFIG_LIBBLURAY_EXTERNAL
+#include "libbluray/filesystem.h"
+#else
 #include "file/filesystem.h"
+#endif
 
 #include "mythiowrapper.h"
 #include "bdiowrapper.h"

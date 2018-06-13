@@ -1,6 +1,6 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg libmythbluray libmythdvdnav libudfread
+SUBDIRS = FFmpeg libmythdvdnav libudfread
 SUBDIRS += libmythsoundtouch
 ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
@@ -8,6 +8,9 @@ endif
 
 ifneq ($(CONFIG_XNVCTRL_EXTERNAL),yes)
     SUBDIRS += libXNVCtrl
+endif
+ifneq ($(CONFIG_LIBBLURAY_EXTERNAL),yes)
+    SUBDIRS += libmythbluray
 endif
 
 SUBDIRS_ALL = $(addsuffix -all, ${SUBDIRS})

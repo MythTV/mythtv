@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <fcntl.h>
 
 #include <QDir>
@@ -5,9 +7,15 @@
 #include <QCryptographicHash>
 #include <QPainter>
 
+#if CONFIG_LIBBLURAY_EXTERNAL
+#include "libbluray/log_control.h"
+#include "libbluray/meta_data.h"
+#include "libbluray/overlay.h"
+#else
 #include "util/log_control.h"
 #include "libbluray/bdnav/meta_data.h"
 #include "libbluray/decoders/overlay.h"
+#endif
 #include "libbluray/keys.h"              // for ::BD_VK_POPUP, ::BD_VK_0, etc
 
 #include "mythcdrom.h"

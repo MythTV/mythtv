@@ -162,6 +162,9 @@ There are also a few simple \ref testing "testing shortcuts".
 
       This library should not depend on any of our libraries.
 
+      This internal library is only used if the system cannot provide
+      version 0.9.3 (or better) or this library.
+
   <dt>libmythfreemheg
       <dd>UK interactive %TV viewer.
 
