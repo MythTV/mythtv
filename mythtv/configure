@@ -4706,7 +4706,6 @@ case $target_os in
         # Workaround compile errors from missing u_int/uint def
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         disable ivtv
-        disable v4l2
         enable backend
         enable pic
         ;;
