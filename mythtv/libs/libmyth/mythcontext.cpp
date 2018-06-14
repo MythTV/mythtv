@@ -639,15 +639,16 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
 #else
         hostname = localhostname;
 #endif
-        LOG(VB_GENERAL, LOG_NOTICE, "Empty LocalHostName.");
+        LOG(VB_GENERAL, LOG_INFO, "Empty LocalHostName. This is typical.");
     }
     else
     {
         m_DBparams.localEnabled = true;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Using localhost value of %1")
-            .arg(hostname));
+    LOG(VB_GENERAL, LOG_INFO, QString("Using a profile name of: '%1' (Usually the "
+                                      "same as this host's name.)")
+                                      .arg(hostname));
     gCoreContext->SetLocalHostname(hostname);
 
     return ok;
