@@ -8,7 +8,7 @@
 #
 
 # Version
-    $VERSION = '.28git';
+    $VERSION = 'v30git';
 
 # Load sub libraries
     use IO::Socket::INET::MythTV;
@@ -24,6 +24,7 @@ package MythTV;
     use HTTP::Request;
     use LWP::UserAgent;
     use POSIX;
+    use XML::Simple qw(:strict);
 
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
@@ -170,10 +171,12 @@ package MythTV;
         ? $ENV{'MYTHCONFDIR'}
         : "$homedir/.mythtv"
         ;
-    unless (-T "$conf/config.xml") {
+    my $config_file = "$conf/config.xml";
+    unless (-T "$config_file") {
+
         unless ($has_upnp) {
             die "Please install Net::UPnP or copy ~/.mythtv/config.xml\n"
-               ."from a working MythTV installation to $conf/config.xml.\n";
+               ."from a working MythTV installation to $config_file.\n";
         }
     # Try to create the config directory first, so we can die sooner if it fails.
         unless (-d $conf) {
@@ -243,7 +246,7 @@ package MythTV;
             #print $dev->getfriendlyname(), "\n";
         }
     # Save the config.xml
-        open CONF, ">$conf/config.xml" or die "Can't write to $conf/config.xml:  $!\n";
+        open CONF, ">$config_file" or die "Can't write to $config_file:  $!\n";
         print CONF <<EOF;
 <Configuration>
   <UPnP>
@@ -286,48 +289,43 @@ EOF
                        'db_name'  => 'mythconverg',
                        'upnp_pin' => '',
                       );
-    open(CONF, "$conf/config.xml") or die "Unable to read $conf/config.xml:  $!\n";
-    while (my $line = <CONF>) {
-    # Search through the XML data
-        if ($line =~ m#<SecurityPin>(.*?)</SecurityPin>#) {
-            $mysql_conf{'upnp_pin'} = $1;
+
+    my $xml = new XML::Simple;
+    my $config = $xml->XMLin($config_file, ForceArray => 0, KeyAttr => [ ]);
+    my $config_errors = 0;
+
+    my %config_kv_list = ('Host'         => 'db_host',
+                          'Port'         => 'db_port',
+                          'UserName'     => 'db_user',
+                          'Password'     => 'db_pass',
+                          'DatabaseName' => 'db_name',
+                         );
+
+    foreach my $config_key (keys %config_kv_list) {
+        if (ref $config->{'Database'}->{$config_key} eq 'ARRAY') {
+            print STDERR "<$config_key> appears more than once in $config_file\n";
+            $config_errors++;
         }
-        elsif (($line =~ m#<Host>(.*?)</Host>#) ||
-               ($line =~ m#<DBHostName>(.*?)</DBHostName>#)) {
-            $mysql_conf{'db_host'}  = $1;
+        elsif (!length $config->{'Database'}->{$config_key}) {
+            print STDERR "<$config_key> is empty/missing in $config_file\n";
+            $config_errors++;
         }
-        elsif (($line =~ m#<UserName>(.*?)</UserName>#) ||
-               ($line =~ m#<DBUserName>(.*?)</DBUserName>#)) {
-            $mysql_conf{'db_user'}  = $1;
-        }
-        elsif (($line =~ m#<Password>(.*?)</Password>#) ||
-               ($line =~ m#<DBPassword>(.*?)</DBPassword>#)) {
-            $mysql_conf{'db_pass'}  = $1;
-            $mysql_conf{'db_pass'} =~ s/&amp;/&/sg;
-            $mysql_conf{'db_pass'} =~ s/&gt;/>/sg;
-            $mysql_conf{'db_pass'} =~ s/&lt;/</sg;
-        }
-        elsif (($line =~ m#<DatabaseName>(.*?)</DatabaseName>#) ||
-               ($line =~ m#<DBName>(.*?)</DBName>#)) {
-            $mysql_conf{'db_name'}  = $1;
-        }
-        elsif (($line =~ m#<Port>(\d*?)</Port>#) ||
-               ($line =~ m#<DBPort>(.*?)</DBPort>#)) {
-            $mysql_conf{'db_port'}  = $1;
-        }
-    # Hostname override.  Not sure if this is still valid or not
-        elsif ($line =~ m#<LocalHostName>(.*?)</LocalHostName>#) {
-            $profileoverride = $1;
-            if ($profileoverride =~ /^\s*$/) {
-                print STDERR "Warning: LocalHostName tag is empty. Ignoring.\n";
-            } elsif ($profileoverride ne "my-unique-identifier-goes-here") {
-                $mysql_conf{'hostname'} = $profileoverride;
-            }
+        else {
+            $mysql_conf{$config_kv_list{$config_key}} = $config->{'Database'}->{$config_key};
         }
     }
-    close CONF;
 
-# Cleanup
+    if ($config_errors > 0) {
+        die "Errors in: $config_file must be fixed before continuing.\n";
+    }
+
+    my $profileoverride = $config->{'LocalHostName'};
+
+    if (length $profileoverride && $profileoverride ne "my-unique-identifier-goes-here") {
+        $mysql_conf{'hostname'} = $profileoverride;
+    }
+
+# Default DB port
     $mysql_conf{'db_port'} ||= 3306;
 
 # Constructor

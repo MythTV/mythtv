@@ -6773,6 +6773,7 @@ if enabled bindings_perl; then
         disable_bindings_perl "Net::UPnP::ControlPoint"
     check_pl_lib "IO::Socket::INET6"  ||
         disable_bindings_perl "IO::Socket::INET6"
+    check_pl_lib "XML::Simple"  || disable_bindings_perl "XML::Simple"
 fi
 
 # Check for php dependencies
