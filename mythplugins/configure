@@ -477,7 +477,9 @@ check_py_lib(){
     check_cmd $python <<EOF
 from distutils.sysconfig import get_python_lib
 import sys
-sys.path.append(get_python_lib(prefix='${prefix}'))
+for mythroot in '${mythroot}'.split(':'):
+    sys.path.append(get_python_lib(prefix=mythroot +'${prefix}'))
+sys.path.append(get_python_lib(prefix='${sysroot}${prefix}'))
 try:
     import $lib
 except:
@@ -537,10 +539,16 @@ EOF
 fi
 
 # bring in mythtv config
-if [ -e $mythroot$prefix/include/mythtv/mythconfig.mak ] ; then
+mythrootlist=$(echo "$mythroot" | tr ":" " ")
+for mythrootitem in $mythrootlist; do
+    if [ -e $mythrootitem$prefix/include/mythtv/mythconfig.mak ] ; then
+        break;
+    fi
+done
+if [ -e $mythrootitem$prefix/include/mythtv/mythconfig.mak ] ; then
     rm mythconfig.mak 2> /dev/null
-    cp $mythroot$prefix/include/mythtv/mythconfig.mak mythconfig.mak
-    sed -i -e "s,^SYSROOT\=.*,SYSROOT=$mythroot,g" mythconfig.mak
+    cp $mythrootitem$prefix/include/mythtv/mythconfig.mak mythconfig.mak
+    sed -i -e "s,^SYSROOT\=.*,SYSROOT=$mythrootitem,g" mythconfig.mak
 elif [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
     rm mythconfig.mak 2> /dev/null
     ${ln_s} $prefix/include/mythtv/mythconfig.mak mythconfig.mak
