@@ -8,9 +8,36 @@ git://source.ffmpeg.org/ffmpeg.git at n3.4.1-5-g4a53ecb on February 5th, 2018 (P
 As of May 22 2018 we resync the code to the MythTV fork of FFmpeg (git@github.com:MythTV/FFmpeg.git).
 All changes to the FFmpeg code must be made in that repository, master branch and cherry-picked to release branch currently in use.
 
-Resync May 30, 2018  (Peter Bennett)
-git@github.com:MythTV/FFmpeg.git at n4.0-45-g3dc75278a9 (release/4.0 branch)
-git@github.com:FFmpeg/FFmpeg.git at n4.0-39-gda399903c7 (release/4.0 branch)
+git@github.com:MythTV/FFmpeg.git at n4.0-43-ge4e7472e73 on May 24, 2018 (release/4.0 branch) 
+git@github.com:FFmpeg/FFmpeg.git at n4.0-39-gda399903c7 (Peter Bennett)
+
+Procedure for FFmpeg resync in future
+=====================================
+- Clone MythTV FFmpeg fork
+git clone git@github.com:MythTV/FFmpeg.git
+- create a branch to track the current ffmpeg release branch (Release/4.0)
+- Add a remote for main FFmpeg
+git remote add ffmpeg git@github.com:FFmpeg/FFmpeg.git
+git fetch ffmpeg
+- Look for any changes that are in MythTV FFmpeg since last sync
+git log mythtv/external/FFmpeg/
+- If the log contains any changes check if they are in the MythTV/FFmpeg repository
+  and if not commit them into MythTV/FFmpeg/master and cherry-pick them into the 
+  current release branch (e.g. release/4.0).
+- Merge updates:
+git checkout master
+git merge ffmpeg/master
+git checkout release/4.0
+git merge ffmpeg/release/4.0
+- Checkout release/4.0 and in MythTV directory checkout master.
+- Delete entire FFmpeg dierctory structure from MythTV directory and copy
+  in the contents of the ffmpeg repository.
+- Test MythTV build and playback.
+- Add and commit all changes with comments identifying
+  ffmpeg/FFmpeg Release/4.0 description (git describe)
+  MythTV/FFmpeg Release/4.0 description (git describe).
+
+This file (README.sync) will no longer contain details of each FFmpeg resync
 
 List of files modified from original FFmpeg:
 

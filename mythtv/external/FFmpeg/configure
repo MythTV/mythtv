@@ -1036,7 +1036,7 @@ EOF
 
 check_insn(){
     log check_insn "$@"
-    check_inline_asm ${1}_inline "$2"
+    check_inline_asm ${1}_inline "\"$2\""
     check_as ${1}_external "$2"
 }
 
@@ -2979,6 +2979,7 @@ vc1_parser_select="vc1dsp"
 
 # bitstream_filters
 aac_adtstoasc_bsf_select="adts_header"
+eac3_core_bsf_select="ac3_parser"
 filter_units_bsf_select="cbs"
 h264_metadata_bsf_deps="const_nan"
 h264_metadata_bsf_select="cbs_h264"
