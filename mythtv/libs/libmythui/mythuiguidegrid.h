@@ -15,7 +15,13 @@
 
 #define ARROWIMAGESIZE 4
 #define RECSTATUSSIZE  8
+
+
+// max number of channels to display in the guide grid
 #define MAX_DISPLAY_CHANS 40
+
+// max number of 5 minute time slots to show in guide grid (48 = 4hrs)
+#define MAX_DISPLAY_TIMES 48
 
 #define GridTimeNormal       0
 #define GridTimeStartsBefore 1

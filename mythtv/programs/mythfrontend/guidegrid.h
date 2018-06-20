@@ -31,8 +31,6 @@ class QTimer;
 class MythUIButtonList;
 class MythUIGuideGrid;
 
-#define MAX_DISPLAY_TIMES 36
-
 typedef vector<ChannelInfo>   db_chan_list_t;
 typedef vector<db_chan_list_t> db_chan_list_list_t;
 typedef ProgramInfo *ProgInfoGuideArray[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
