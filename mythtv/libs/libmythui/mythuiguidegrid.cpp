@@ -113,7 +113,7 @@ bool MythUIGuideGrid::ParseElement(
     {
         m_timeCount = getFirstText(element).toInt();
         m_timeCount = max(m_timeCount, 1);
-        m_timeCount = min(m_timeCount, 8);
+        m_timeCount = min(m_timeCount, MAX_DISPLAY_TIMES / 6);
     }
     else if (element.tagName() == "solidcolor")
     {
