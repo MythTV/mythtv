@@ -3033,6 +3033,7 @@ for opt do
 #FFmpeg original
         --extra-ldflags=*)
             add_ldflags $optval
+	    ffmpeg_extra_ldflags="$optval"
         ;;
         --extra-ldexeflags=*)
             add_ldexeflags $optval
@@ -6976,6 +6977,7 @@ cd external/FFmpeg
 eval ./configure \
 $ffopts \
 --extra-cflags='"$ffmpeg_extra_cflags"' \
+--extra-ldflags='"$ffmpeg_extra_ldflags"' \
 --enable-stripping \
 --strip='"echo skipping strip"' \
 --disable-manpages  \
