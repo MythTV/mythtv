@@ -549,6 +549,12 @@ unique(){
     eval "$var=\"${uniq_list}\""
 }
 
+unique2(){
+    var=$1
+    r=$(echo $(eval echo \$$var) | awk '{for (i=1;i<=NF;i++) if (!a[$i]++) printf("%s%s",$i,FS)}{printf("\n")}')
+    eval "$var=\"${r}\""
+}
+
 add_cppflags(){
     append CPPFLAGS "$@"
 }
@@ -7227,6 +7233,10 @@ echo "x264                      ${libx264-no}"
 echo "x265 (HEVC)               ${libx265-no}"
 echo "vpx                       ${libvpx-no}"
 echo ""
+
+# Remove redundant elements from variables
+unique2 CFLAGS
+unique2 extralibs
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h
 MYTH_CONFIG_MAK=libs/libmythbase/mythconfig.mak
