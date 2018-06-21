@@ -369,7 +369,7 @@ void ASIStreamHandler::PriorityEvent(int fd)
             .arg(_device));
     if(val & ASI_EVENT_RX_CARRIER)
         LOG(VB_RECORD, LOG_NOTICE, LOC +
-            QString("Career Status change detected %1")
+            QString("Carrier Status change detected %1")
             .arg(_device));
     if(val & ASI_EVENT_RX_LOS)
         LOG(VB_RECORD, LOG_ERR, LOC +
