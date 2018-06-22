@@ -5464,6 +5464,7 @@ void ProgramInfo::SubstituteMatches(QString &str)
         str.replace(QString("%%1ISOUTC%").arg(time_str[i]),
                     time_dtr[i]->toString(Qt::ISODate));
     }
+    str.replace(QString("%RECORDEDID%"), QString::number(recordedid));
 }
 
 QMap<QString,uint32_t> ProgramInfo::QueryInUseMap(void)
