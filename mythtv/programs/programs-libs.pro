@@ -42,6 +42,13 @@ LIBS += -L../../libs/libmythmetadata
 LIBS += -L../../libs/libmythservicecontracts
 LIBS += -L../../libs/libmythprotoserver
 
+# Insist that /usr/local/lib come after all the libraries provided
+# in the MythTV sources.
+contains (QMAKE_LIBDIR_POST, /usr/local/lib) {
+  QMAKE_LIBDIR_POST -= /usr/local/lib
+  LIBS += -L/usr/local/lib
+}
+
 LIBS += -lmythswscale
 LIBS += -lmythavformat
 LIBS += -lmythswresample
