@@ -238,6 +238,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             "WHERE capturecard.sourceid = channel.sourceid AND "
             "      videosource.sourceid = channel.sourceid AND "
             "      channel.mplexid        IS NOT NULL      AND "
+            "      visible              = 1                AND "
             "      useonairguide        = 1                AND "
             "      useeit               = 1                AND "
             "      channum             != ''               AND "
