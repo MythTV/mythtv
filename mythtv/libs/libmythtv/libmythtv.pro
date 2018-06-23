@@ -274,14 +274,12 @@ INSTALLS += inc2
 DEPENDPATH  += ../../external/libmythdvdnav/
 DEPENDPATH  += ../../external/libmythdvdnav/dvdread # for dvd_reader.h & dvd_input.h
 
-!win32-msvc* {
-  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
-  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
-}
-
-win32-msvc* {
+win32-msvc*|freebsd {
   INCLUDEPATH += ../../external/libmythdvdnav/dvdnav
   INCLUDEPATH += ../../external/libmythdvdnav/dvdread
+} else {
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdnav
+  QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
 }
 
 !win32-msvc*:POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}

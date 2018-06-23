@@ -1287,7 +1287,7 @@ check_exec_cxx(){
 }
 
 non_standard_header(){
-    test x"$1" != "x/usr/include"
+    test x"$1" != "x/usr/include" -a  x"$1" != "x/usr/local/include"
 }
 
 x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
@@ -7237,6 +7237,12 @@ echo ""
 # Remove redundant elements from variables
 unique2 CFLAGS
 unique2 extralibs
+
+if test $target_os = "freebsd"; then
+    #Strip certain paths (qmake will add them back at the end of the list)
+    LDFLAGS=`echo $LDFLAGS | sed -e 's/-L\/usr\/local\/lib$//'     -e 's/-L\/usr\/local\/lib / /'`
+    CFLAGS=`echo $CFLAGS   | sed -e 's/-I\/usr\/local\/include$//' -e 's/-I\/usr\/local\/include / /'`
+fi
 
 MYTH_CONFIG_H=libs/libmythbase/mythconfig.h
 MYTH_CONFIG_MAK=libs/libmythbase/mythconfig.mak
