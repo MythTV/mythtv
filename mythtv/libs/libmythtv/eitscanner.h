@@ -65,6 +65,7 @@ class EITScanner : public QRunnable
     uint             activeScanTrigTime;
     QStringList      activeScanChannels;
     QStringList::iterator activeScanNextChan;
+    uint             activeScanNextChanIndex;
 
     uint             cardnum;
 

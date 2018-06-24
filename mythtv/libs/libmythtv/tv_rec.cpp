@@ -1051,6 +1051,8 @@ void TVRec::HandleStateChange(void)
     {
         scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
+        eitScanStartTime = MythDate::current().addSecs(
+            eitCrawlIdleStart + eit_start_rand(eitTransportTimeout));
     }
 
     // Handle different state transitions
@@ -1098,7 +1100,9 @@ void TVRec::HandleStateChange(void)
             eitCrawlIdleStart + eit_start_rand(inputid, eitTransportTimeout));
     }
     else
+    {
         eitScanStartTime = eitScanStartTime.addYears(1);
+    }
 }
 #undef TRANSITION
 #undef SET_NEXT
@@ -1304,7 +1308,9 @@ void TVRec::run(void)
             eitCrawlIdleStart + eit_start_rand(inputid, eitTransportTimeout));
     }
     else
+    {
         eitScanStartTime = eitScanStartTime.addYears(1);
+    }
 
     while (HasFlags(kFlagRunMainLoop))
     {
@@ -3575,6 +3581,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     {
         scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
+        eitScanStartTime = MythDate::current().addSecs(
+            eitCrawlIdleStart + eit_start_rand(eitTransportTimeout));
     }
 
     if (scanner && !request.IsOnSameMultiplex())
