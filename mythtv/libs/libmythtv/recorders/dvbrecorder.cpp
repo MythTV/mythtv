@@ -24,6 +24,7 @@
 // MythTV includes
 #include "dvbstreamhandler.h"
 #include "mpegstreamdata.h"
+#include "tsstreamdata.h"
 #include "dvbrecorder.h"
 #include "dvbchannel.h"
 #include "ringbuffer.h"
@@ -52,6 +53,15 @@ bool DVBRecorder::Open(void)
 
     ResetForNewFile();
 
+    if (_channel->GetFormat().compare("MPTS") == 0)
+    {
+        // MPTS only.  Use TSStreamData to write out unfiltered data
+        LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
+        SetStreamData(new TSStreamData(tvrec ? tvrec->GetInputId() : -1));
+        _record_mpts_only = true;
+        _record_mpts = false;
+    }
+
     _stream_handler = DVBStreamHandler::Get(videodevice,
                                             tvrec ? tvrec->GetInputId() : -1);
 
@@ -76,12 +86,15 @@ void DVBRecorder::Close(void)
 
 void DVBRecorder::StartNewFile(void)
 {
-    if (_record_mpts)
-        _stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
+    if (!_record_mpts_only)
+    {
+        if (_record_mpts)
+            _stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
 
-    // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+        // Make sure the first things in the file are a PAT & PMT
+        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+    }
 }
 
 void DVBRecorder::run(void)
@@ -103,6 +116,8 @@ void DVBRecorder::run(void)
     // Listen for time table on DVB standard streams
     if (_channel && (_channel->GetSIStandard() == "dvb"))
         _stream_data->AddListeningPID(DVB_TDT_PID);
+    if (_record_mpts_only)
+        _stream_data->AddListeningPID(0x2000);
 
     StartNewFile();
 
@@ -124,7 +139,7 @@ void DVBRecorder::run(void)
             unpauseWait.wait(&pauseLock, 100);
         }
 
-        if (!_input_pmt)
+        if (!_input_pmt && !_record_mpts_only)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");

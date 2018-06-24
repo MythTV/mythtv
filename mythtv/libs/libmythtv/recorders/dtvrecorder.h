@@ -171,7 +171,8 @@ class DTVRecorder :
     bool                     _has_no_av;
 
     // TS recorder stuff
-    bool          _record_mpts;
+    int           _record_mpts;
+    bool          _record_mpts_only;
     unsigned char _stream_id[0x1fff + 1];
     unsigned char _pid_status[0x1fff + 1];
     unsigned char _continuity_counter[0x1fff + 1];

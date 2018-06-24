@@ -115,6 +115,7 @@ void ChannelScanner::Scan(
     bool           do_follow_nit,
     bool           do_test_decryption,
     bool           do_fta_only,
+    bool           do_add_full_ts,
     ServiceRequirements service_requirements,
     // stuff needed for particular scans
     uint           mplexid /* TransportScan */,
@@ -126,6 +127,7 @@ void ChannelScanner::Scan(
     const QString &tbl_end   /* FullScan optional */)
 {
     freeToAirOnly = do_fta_only;
+    addFullTS = do_add_full_ts;
     serviceRequirements = service_requirements;
 
     PreScanCommon(scantype, cardid, inputname,

@@ -42,6 +42,11 @@ class DTVChannel : public ChannelBase
     // Commands
     virtual bool SetChannelByString(const QString &chan);
 
+    /* Allow 'MPTS' format to be set, so we know when to process the
+       full, unfiltered MPTS from the transport stream. */
+    virtual void SetFormat(const QString & format) { m_tvFormat = format; }
+    QString GetFormat(void) { return m_tvFormat; }
+
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
     virtual bool TuneMultiplex(uint mplexid, QString inputname);
     /// \brief This performs the actual frequency tuning and in some cases
@@ -159,6 +164,7 @@ class DTVChannel : public ChannelBase
     DTVTunerType tunerType;
     QString sistandard; ///< PSIP table standard: MPEG, DVB, ATSC, OpenCable
     QString tuningMode;
+    QString m_tvFormat;
     int     currentProgramNum;
     uint    currentATSCMajorChannel;
     uint    currentATSCMinorChannel;

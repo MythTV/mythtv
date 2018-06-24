@@ -22,6 +22,7 @@
 #include <QString>
 
 // MythTV includes
+#include "tsstreamdata.h"
 #include "asistreamhandler.h"
 #include "asirecorder.h"
 #include "asichannel.h"
@@ -35,10 +36,22 @@
 ASIRecorder::ASIRecorder(TVRec *rec, ASIChannel *channel) :
     DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL)
 {
-    SetStreamData(new MPEGStreamData(-1, rec ? rec->GetInputId() : -1,
-                                     false));
-    if (channel->GetProgramNumber() < 0 || !channel->GetMinorChannel())
-        _stream_data->SetListeningDisabled(true);
+    if (channel->GetFormat().compare("MPTS") == 0)
+    {
+        // MPTS only.  Use TSStreamData to write out unfiltered data
+        LOG(VB_RECORD, LOG_INFO, LOC + "Using TSStreamData");
+        SetStreamData(new TSStreamData(tvrec ? tvrec->GetInputId() : -1));
+        _record_mpts_only = true;
+        _record_mpts = false;
+    }
+    else
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + "Using MPEGStreamData");
+        SetStreamData(new MPEGStreamData(-1, rec ? rec->GetInputId() : -1,
+                                         false));
+        if (channel->GetProgramNumber() < 0 || !channel->GetMinorChannel())
+            _stream_data->SetListeningDisabled(true);
+    }
 }
 
 void ASIRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -55,12 +68,15 @@ void ASIRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void ASIRecorder::StartNewFile(void)
 {
-    if (_record_mpts)
-        m_stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
+    if (!_record_mpts_only)
+    {
+        if (_record_mpts)
+            m_stream_handler->AddNamedOutputFile(ringBuffer->GetFilename());
 
-    // Make sure the first things in the file are a PAT & PMT
-    HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
-    HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+        // Make sure the first things in the file are a PAT & PMT
+        HandleSingleProgramPAT(_stream_data->PATSingleProgram(), true);
+        HandleSingleProgramPMT(_stream_data->PMTSingleProgram(), true);
+    }
 }
 
 
@@ -122,7 +138,7 @@ void ASIRecorder::run(void)
             unpauseWait.wait(&pauseLock, 100);
         }
 
-        if (!_input_pmt)
+        if (!_input_pmt && !_record_mpts_only)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "Recording will not commence until a PMT is set.");

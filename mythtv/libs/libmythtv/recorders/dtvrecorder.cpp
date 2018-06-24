@@ -75,7 +75,8 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _input_pmt(NULL),
     _has_no_av(false),
     // record 'raw' mpts?
-    _record_mpts(false),
+    _record_mpts(0),
+    _record_mpts_only(false),
     // statistics
     _use_pts(false),
     _packet_count(0),
@@ -140,7 +141,7 @@ void DTVRecorder::SetOption(const QString &name, int value)
     if (name == "wait_for_seqstart")
         _wait_for_keyframe_option = (value == 1);
     else if (name == "recordmpts")
-        _record_mpts = (value == 1);
+        _record_mpts = value;
     else
         RecorderBase::SetOption(name, value);
 }
@@ -1485,6 +1486,26 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
     {
         FindOtherKeyframes(&tspacket);
         _buffer_packets = false;
+    }
+    else if (_record_mpts_only)
+    {
+        /* When recording the full, unfiltered, MPTS, trigger a write
+         * every 0.5 seconds.  Since the packets are unfiltered and
+         * unprocessed we cannot wait for a keyframe to trigger the
+         * writes. */
+
+        static MythTimer timer;
+
+        if (_frames_seen_count++ == 0)
+            timer.start();
+
+        if (timer.elapsed() > 500) // 0.5 seconds
+        {
+            UpdateFramesWritten();
+            _last_keyframe_seen = _frames_seen_count;
+            HandleKeyframe(_payload_buffer.size());
+            timer.addMSecs(-500);
+        }
     }
     else if (_stream_id[pid] == 0)
     {

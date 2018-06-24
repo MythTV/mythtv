@@ -133,7 +133,7 @@ class ChannelScanSM : public MPEGStreamListener,
     chan_info_map_t GetChannelList(transport_scan_items_it_t trans_info,
                                    ScannedChannelInfo *scan_info) const;
     uint GetCurrentTransportInfo(QString &chan, QString &chan_tr) const;
-    ScanDTVTransportList GetChannelList(void) const;
+    ScanDTVTransportList GetChannelList(bool addFullTS) const;
 
     // MPEG
     void HandlePAT(const ProgramAssociationTable*);

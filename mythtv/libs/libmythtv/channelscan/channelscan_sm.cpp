@@ -1437,7 +1437,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     return pnum_to_dbchan;
 }
 
-ScanDTVTransportList ChannelScanSM::GetChannelList(void) const
+ScanDTVTransportList ChannelScanSM::GetChannelList(bool addFullTS) const
 {
     ScanDTVTransportList list;
 
@@ -1463,7 +1463,41 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(void) const
         }
 
         if (item.channels.size())
+        {
+            if (addFullTS)
+            {
+                /* If addFullTS, then add a 'MPTS' channel
+                   which can be used to record the entire MPTS from
+                   the transport. */
+                dbchan_it = pnum_to_dbchan.begin();
+                ChannelInsertInfo info = *dbchan_it;
+
+                if (tuner_type == DTVTunerType::kTunerTypeASI)
+                    info.callsign = QString("MPTS_%1")
+                                    .arg(CardUtil::GetDisplayName(cardid));
+                else if (info.si_standard == "mpeg" ||
+                         info.si_standard == "scte" ||
+                         info.si_standard == "opencable")
+                    info.callsign = QString("MPTS_%1").arg(info.freqid);
+                else if (info.atsc_major_channel > 0)
+                    info.callsign =
+                        QString("MPTS_%1").arg(info.atsc_major_channel);
+                else if (info.service_id > 0)
+                    info.callsign = QString("MPTS_%1").arg(info.service_id);
+                else if (!info.chan_num.isEmpty())
+                    info.callsign = QString("MPTS_%1").arg(info.chan_num);
+                else
+                    info.callsign = "MPTS_UNKNOWN";
+
+                info.service_name = info.callsign;
+                info.service_id = 0;
+                info.atsc_minor_channel = 0;
+                info.format = "MPTS";
+                item.channels.push_back(info);
+            }
+
             list.push_back(item);
+        }
     }
 
     return list;

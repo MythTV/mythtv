@@ -274,6 +274,7 @@ int main(int argc, char *argv[])
     bool    expertMode = false;
     uint    scanImport = 0;
     bool    scanFTAOnly = false;
+    bool    addFullTS = false;
     ServiceRequirements scanServiceRequirements = kRequireAV;
     uint    scanCardId = 0;
     QString frequencyStandard = "atsc";
@@ -355,6 +356,8 @@ int main(int argc, char *argv[])
         scanImport = cmdline.toUInt("importscan");
     if (cmdline.toBool("ftaonly"))
         scanFTAOnly = true;
+    if (cmdline.toBool("addfullts"))
+        addFullTS = true;
     if (cmdline.toBool("servicetype"))
     {
         scanServiceRequirements = kRequireNothing;
@@ -506,6 +509,7 @@ int main(int argc, char *argv[])
                          /* follow_nit */            true,
                          /* test decryption */       true,
                          scanFTAOnly,
+                         addFullTS,
                          scanServiceRequirements,
                          // stuff needed for particular scans
                          /* mplexid   */ 0,

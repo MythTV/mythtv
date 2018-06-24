@@ -540,7 +540,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         chan.hidden, chan.hidden_in_guide,
                         chan.freqid,
                         QString(),
-                        QString(),
+                        chan.format,
                         QString(),
                         chan.default_authority);
 
@@ -701,7 +701,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     chan.hidden, chan.hidden_in_guide,
                     chan.freqid,
                     QString(),
-                    QString(),
+                    chan.format,
                     QString(),
                     chan.default_authority);
             }

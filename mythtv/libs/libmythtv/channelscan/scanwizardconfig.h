@@ -44,6 +44,7 @@ class ScanNetwork;
 class IgnoreSignalTimeout;
 class DesiredServices;
 class FreeToAirOnly;
+class AddFullTS;
 class TrustEncSISetting;
 
 class PaneAll;

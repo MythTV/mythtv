@@ -3769,9 +3769,19 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         }
     }
 
+
+    bool mpts_only = GetDTVChannel() &&
+                     GetDTVChannel()->GetFormat().compare("MPTS") == 0;
+    if (mpts_only)
+    {
+        // Not using a signal monitor, so just set the status to recording
+        SetRecordingStatus(RecStatus::Recording, __LINE__);
+    }
+
+
     bool livetv = request.flags & kFlagLiveTV;
     bool antadj = request.flags & kFlagAntennaAdjust;
-    bool use_sm = SignalMonitor::IsRequired(genOpt.inputtype);
+    bool use_sm = !mpts_only && SignalMonitor::IsRequired(genOpt.inputtype);
     bool use_dr = use_sm && (livetv || antadj);
     bool has_dummy = false;
 

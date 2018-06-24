@@ -64,7 +64,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         if (sigmonScanner)
         {
             sigmonScanner->StopScanner();
-            transports = sigmonScanner->GetChannelList();
+            transports = sigmonScanner->GetChannelList(addFullTS);
         }
 
         Teardown();

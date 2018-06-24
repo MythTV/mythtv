@@ -84,7 +84,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         if (sigmonScanner)
         {
             sigmonScanner->StopScanner();
-            transports = sigmonScanner->GetChannelList();
+            transports = sigmonScanner->GetChannelList(addFullTS);
         }
 
 #ifdef USING_VBOX

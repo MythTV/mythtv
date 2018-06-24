@@ -31,10 +31,12 @@ void ScanWizard::SetupConfig(
     scanConfig = new ScanOptionalConfig(scanType);
     services = new DesiredServices();
     ftaOnly = new FreeToAirOnly();
+    addFullTS = new AddFullTS();
     trustEncSI = new TrustEncSISetting();
 
     addChild(services);
     addChild(ftaOnly);
+    addChild(addFullTS);
     addChild(trustEncSI);
 
     addChild(videoSource);
@@ -68,6 +70,11 @@ ServiceRequirements ScanWizard::GetServiceRequirements(void) const
 bool ScanWizard::DoFreeToAirOnly(void) const
 {
     return ftaOnly->getValue().toInt();
+}
+
+bool ScanWizard::DoAddFullTS(void) const
+{
+    return addFullTS->getValue().toInt();
 }
 
 bool ScanWizard::DoTestDecryption(void) const

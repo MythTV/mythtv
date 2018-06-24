@@ -89,6 +89,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     bool    DoFollowNIT(void) const
         { return scanConfig->DoFollowNIT(); }
     bool    DoFreeToAirOnly(void)  const;
+    bool    DoAddFullTS(void)      const;
     bool    DoTestDecryption(void) const;
 
   protected:
@@ -98,6 +99,7 @@ class MTV_PUBLIC ScanWizard : public GroupSetting
     ScanOptionalConfig  *scanConfig;
     DesiredServices     *services;
     FreeToAirOnly       *ftaOnly;
+    AddFullTS           *addFullTS;
     TrustEncSISetting   *trustEncSI;
 // End of members moved from ScanWizardConfig
 };

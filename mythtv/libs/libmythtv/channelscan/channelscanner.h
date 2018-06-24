@@ -71,6 +71,7 @@ class MTV_PUBLIC ChannelScanner
               bool           do_follow_nit,
               bool           do_test_decryption,
               bool           do_fta_only,
+              bool           do_add_full_ts,
               ServiceRequirements service_requirements,
               // stuff needed for particular scans
               uint           mplexid,
@@ -123,6 +124,9 @@ class MTV_PUBLIC ChannelScanner
 
     /// Only fta channels desired post scan?
     bool                freeToAirOnly;
+
+    /// Add MPTS "full transport stream" channels
+    bool                addFullTS;
 
     /// Services desired post scan
     ServiceRequirements serviceRequirements;

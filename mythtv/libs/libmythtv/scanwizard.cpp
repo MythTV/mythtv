@@ -175,7 +175,7 @@ void ScanWizard::Scan()
             GetInputName(),           GetSourceID(),
             DoIgnoreSignalTimeout(),  DoFollowNIT(),
             DoTestDecryption(),       DoFreeToAirOnly(),
-            GetServiceRequirements(),
+            DoAddFullTS(),            GetServiceRequirements(),
             // stuff needed for particular scans
             GetMultiplex(),         start_chan,
             GetFrequencyStandard(), GetModulation(),

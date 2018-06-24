@@ -47,19 +47,24 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
             "Specify which input to scan for, if specified card "
             "supports multiple.");
     add("--FTAonly", "ftaonly", false, "", "Only import 'Free To Air' channels.");
+    add("--add-full-ts", "addfullts", false, "",
+        "Create addition Transport Stream channels, "
+        "which allow recording of the full, unaltered, transport stream.");
     add("--service-type", "servicetype", "all", "",
             "To be used with channel scanning or importing, specify "
             "the type of services to import. Select from the following, "
             "multiple can be added with '+':\n"
             "   all, tv, radio");
 
-    add("--scan", "scan", 0U, "", 
+    add("--scan", "scan", 0U, "",
             "Run the command line channel scanner on a specified card ID.")
         ->SetParentOf("freqstd")
         ->SetParentOf("inputname")
         ->SetParentOf("ftaonly")
         ->SetParentOf("servicetype")
+        ->SetParentOf("addfullts")
         ->SetBlocks("importscan");
+
 
     add("--scan-import", "importscan", 0U, "",
             "Import an existing scan from the database. Use --scan-list "
@@ -67,4 +72,3 @@ void MythTVSetupCommandLineParser::LoadArguments(void)
         ->SetParentOf("ftaonly")
         ->SetParentOf("servicetype");
 }
-
