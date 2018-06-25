@@ -1881,7 +1881,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
 
     /// \brief Adds all available cards to list
     /// If current is >= 0 it will be considered available even
-    /// if no device exists for it in /dev/dvb/adapter*
+    /// if no device exists for it in /dev/asi*
     void fillSelections(const QString &current)
     {
         clearSelections();
@@ -1904,7 +1904,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         // for new configs (preferring non-conflicing devices).
         QMap<QString,bool> in_use;
         QString sel = current;
-        for (uint i = 0; i < (uint)sdevs.size(); i++)
+        for (uint i = 0; i < (uint)sdevs.size(); ++i)
         {
             const QString dev = sdevs[i];
             in_use[sdevs[i]] = find(db.begin(), db.end(), dev) != db.end();
@@ -1921,7 +1921,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
 
         // Add the devices to the UI
         bool found = false;
-        for (uint i = 0; i < (uint)sdevs.size(); i++)
+        for (uint i = 0; i < (uint)sdevs.size(); ++i)
         {
             const QString dev = sdevs[i];
             QString desc = dev + (in_use[sdevs[i]] ? usestr : "");
@@ -1955,11 +1955,13 @@ ASIConfigurationGroup::ASIConfigurationGroup(CaptureCard& a_parent,
     cardinfo(new TransTextEditSetting())
 {
     setVisible(false);
+    cardinfo->setLabel(tr("Status"));
     cardinfo->setEnabled(false);
-    cardType.addChild(device);
-    cardType.addChild(new EmptyAudioDevice(parent));
-    cardType.addChild(new EmptyVBIDevice(parent));
-    cardType.addChild(cardinfo);
+
+    cardType.addTargetedChild("ASI", device);
+    cardType.addTargetedChild("ASI", new EmptyAudioDevice(parent));
+    cardType.addTargetedChild("ASI", new EmptyVBIDevice(parent));
+    cardType.addTargetedChild("ASI", cardinfo);
 
     connect(device, SIGNAL(valueChanged(const QString&)),
             this,   SLOT(  probeCard(   const QString&)));
