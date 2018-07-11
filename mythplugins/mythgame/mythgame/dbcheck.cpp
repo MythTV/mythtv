@@ -10,7 +10,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1018";
+const QString currentDatabaseVersion = "1019";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -434,6 +434,19 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1018", dbver))
+            return false;
+    }
+
+    if (dbver == "1018")
+    {
+        const QString updates[] = {
+"ALTER TABLE romdb MODIFY description varchar(192) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE romdb MODIFY binfile     varchar(128) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE romdb MODIFY filesize    int(12) unsigned default NULL;",
+""
+};
+
+        if (!performActualUpdate(updates, "1019", dbver))
             return false;
     }
 
