@@ -292,8 +292,6 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
     SilenceDBerrors();
 
-    loadSettingsCacheOverride();
-
 #ifdef Q_OS_MAC
     // Qt 4.4 has window-focus problems
     gCoreContext->OverrideSettingForSession("RunFrontendInWindow", "1");
@@ -353,6 +351,7 @@ bool MythContextPrivate::Init(const bool gui,
 {
     gCoreContext->GetDB()->IgnoreDatabase(ignoreDB);
     m_gui = gui;
+    loadSettingsCacheOverride();
 
     if (gCoreContext->IsFrontend())
         needsBackend = true;
@@ -848,8 +847,13 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         {"start","dbAwake","dbStarted","dbConnects","beWOL","beAwake",
             "success" };
 
+    int msStartupScreenDelay = gCoreContext->GetNumSetting("StartupScreenDelay",2);
+    if (msStartupScreenDelay > 0)
+        msStartupScreenDelay *= 1000;
     do
     {
+        QElapsedTimer timer;
+        timer.start();
         if (m_DBparams.dbHostName.isNull() && m_DBhostCp.length())
             host = m_DBhostCp;
         else
@@ -892,8 +896,8 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
             // After that show the GUI (if this is a GUI program)
 
             LOG(VB_GENERAL, LOG_INFO,
-                 QString("Start up testing connections. DB %1, BE %2, attempt %3, status %4")
-                      .arg(host).arg(backendIP).arg(attempt).arg(guiStatuses[startupState]));
+                 QString("Start up testing connections. DB %1, BE %2, attempt %3, status %4, Delay: %5")
+                      .arg(host).arg(backendIP).arg(attempt).arg(guiStatuses[startupState]).arg(msStartupScreenDelay) );
 
             int useTimeout = wakeupTime;
             if (attempt == 0)
@@ -901,7 +905,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
             if (m_gui && !m_guiStartup)
             {
-                if (attempt > 0)
+                if (msStartupScreenDelay==0 || timer.hasExpired(msStartupScreenDelay))
                 {
                     ShowGuiStartup();
                     if (m_guiStartup)
@@ -1017,6 +1021,13 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         LOG(VB_GENERAL, LOG_INFO,
              QString("Start up failure. host %1, status %2")
                   .arg(host).arg(stateMsg));
+
+        if (m_gui && !m_guiStartup)
+        {
+            ShowGuiStartup();
+            if (m_guiStartup)
+                m_guiStartup->setTotal(progressTotal);
+        }
 
         if (m_guiStartup
           && !m_guiStartup->m_Exit
@@ -1472,7 +1483,8 @@ void MythContextPrivate::processEvents(void)
 const QString MythContextPrivate::settingsToSave[] =
 { "Theme", "Language", "Country", "GuiHeight",
   "GuiOffsetX", "GuiOffsetY", "GuiWidth", "RunFrontendInWindow",
-  "AlwaysOnTop", "HideMouseCursor", "ThemePainter", "libCECEnabled" };
+  "AlwaysOnTop", "HideMouseCursor", "ThemePainter", "libCECEnabled",
+  "StartupScreenDelay" };
 
 
 bool MythContextPrivate::saveSettingsCache(void)

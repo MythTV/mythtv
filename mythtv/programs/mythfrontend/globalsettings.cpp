@@ -2426,6 +2426,21 @@ static HostCheckBoxSetting *AlwaysOnTop()
     return gc;
 }
 
+static HostSpinBoxSetting *StartupScreenDelay()
+{
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("StartupScreenDelay", -1, 60, 1, 1, "Never show startup screen");
+
+    gs->setLabel(AppearanceSettings::tr("Startup Screen Delay"));
+
+    gs->setValue(2);
+
+    gs->setHelpText(AppearanceSettings::tr(
+        "The Startup Screen will show the progress of starting the frontend "
+        "if frontend startup takes longer than this number of seconds."));
+    return gs;
+}
+
+
 static HostComboBoxSetting *MythDateFormatCB()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("DateFormat");
@@ -4255,6 +4270,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(RunInWindow());
     screen->addChild(UseFixedWindowSize());
     screen->addChild(AlwaysOnTop());
+    screen->addChild(StartupScreenDelay());
 #ifdef USING_AIRPLAY
     screen->addChild(AirPlayFullScreen());
 #endif
