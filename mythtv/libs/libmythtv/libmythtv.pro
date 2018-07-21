@@ -1,6 +1,7 @@
 include ( ../../settings.pro )
 
 QT += network xml sql widgets
+android: QT += androidextras
 
 TEMPLATE = lib
 TARGET = mythtv-$$LIBVERSION
@@ -501,6 +502,12 @@ using_frontend {
         using_opengl_video:HEADERS += videoout_openglvaapi.h
         using_opengl_video:SOURCES += videoout_openglvaapi.cpp
         using_opengl_video:DEFINES += USING_GLVAAPI
+    }
+
+    using_mediacodec {
+        DEFINES += USING_MEDIACODEC
+        HEADERS += mediacodeccontext.h
+        SOURCES += mediacodeccontext.cpp
     }
 
     # Misc. frontend

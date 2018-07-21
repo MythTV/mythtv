@@ -135,6 +135,7 @@ Advanced options (experts only):
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
   --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
+  --disable-mediacodec     disable hardware accelerated decoding on android
   --disable-opengl-video   disable OpenGL based video display
   --disable-opengl-themepainter disable OpenGL based theme painting
   --disable-libass         disable libass SSA/ASS subtitle support
@@ -2038,6 +2039,7 @@ USING_LIST='
     vaapi
     vdpau
     openmax
+    mediacodec
 '
 
 CMDLINE_SELECT="
@@ -2763,6 +2765,7 @@ enable libcrypto
 enable libdns_sd
 enable libxml2
 enable lirc
+enable mediacodec
 enable mheg
 enable mythtranscode
 enable opengl
@@ -6971,9 +6974,16 @@ ffmpeg_optset extra_cxxflags extra_ldflags target_os
 ffmpeg_optset pkg_config prefix libdir as objcc dep_cc host_cc
 ffmpeg_optset host_ld
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
-ffmpeg_optenable vdpau vaapi libxml2 libass dxva2 mediacodec
-ffmpeg_optenable jni libbluray libfontconfig libfreetype libiec61883
+ffmpeg_optenable vdpau vaapi libxml2 libass dxva2
+ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
 ffmpeg_optenable crystalhd sdl2 ffplay
+if test $target_os = "android"; then
+    enabled mediacodec && enable jni
+    ffmpeg_optenable mediacodec jni
+else
+    disable mediacodec
+fi
+
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here

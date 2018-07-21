@@ -62,6 +62,14 @@ extern "C" {
 #include "vaapicontext.h"
 #endif
 
+#ifdef USING_MEDIACODEC
+#include "mediacodeccontext.h"
+extern "C" {
+#include "libavcodec/jni.h"
+}
+#include <QtAndroidExtras>
+#endif
+
 extern "C" {
 #include "libavutil/avutil.h"
 #include "libavutil/error.h"
@@ -376,6 +384,10 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
 #ifdef USING_VAAPI
     opts.decoders->append("vaapi");
     (*opts.equiv_decoders)["vaapi"].append("dummy");
+#endif
+#ifdef USING_MEDIACODEC
+    opts.decoders->append("mediacodec");
+    (*opts.equiv_decoders)["mediacodec"].append("dummy");
 #endif
 
     PrivateDecoder::GetDecoders(opts);
@@ -1547,6 +1559,21 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
 }
 #endif
 
+#ifdef USING_MEDIACODEC
+static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext *avctx,
+                                           const enum AVPixelFormat *valid_fmts)
+{
+    enum AVPixelFormat ret = *valid_fmts; // default to first
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (*valid_fmts == AV_PIX_FMT_YUV420P)
+            ret = AV_PIX_FMT_YUV420P;
+        valid_fmts++;
+    }
+    return ret;
+}
+#endif
+
+
 static bool IS_DR1_PIX_FMT(const enum AVPixelFormat fmt)
 {
     switch (fmt)
@@ -1616,6 +1643,14 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         enc->get_buffer2     = get_avf_buffer_vaapi;
         enc->get_format      = get_format_vaapi;
+        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+    }
+    else
+#endif
+#ifdef USING_MEDIACODEC
+    if (CODEC_IS_MEDIACODEC(codec))
+    {
+        enc->get_format      = get_format_mediacodec;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
     }
     else
@@ -2495,12 +2530,25 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_DXVA2
-                if (foundgpudecoder)
+#ifdef USING_MEDIACODEC
+                if (!foundgpudecoder)
                 {
-                    enc->codec_id = (AVCodecID) myth2av_codecid(video_codec_id);
-                }
-            }
+                    MythCodecID mediacodec_mcid;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+                    mediacodec_mcid = MediaCodecContext::GetBestSupportedCodec(
+                        &codec, dec, mpeg_version(enc->codec_id),
+                        pix_fmt);
 
+                    if (codec_is_mediacodec(mediacodec_mcid))
+                    {
+                        gCodecMap->freeCodecContext(ic->streams[selTrack]);
+                        enc = gCodecMap->getCodecContext(ic->streams[selTrack], codec);
+                        video_codec_id = mediacodec_mcid;
+                        foundgpudecoder = true;
+                    }
+                }
+#endif // USING_MEDIACODEC
+            }
             // default to mpeg2
             if (video_codec_id == kCodec_NONE)
             {
@@ -2618,6 +2666,10 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 {
     QMutexLocker locker(avcodeclock);
 
+#ifdef USING_MEDIACODEC
+    if (QString("mediacodec") == codec->wrapper_name)
+        av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), NULL);
+#endif
     int ret = avcodec_open2(avctx, codec, NULL);
     if (ret < 0)
     {

@@ -851,6 +851,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["vaapi"]    = QObject::tr("VAAPI acceleration");
         dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
         dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
+        dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
     }
 
     QString ret = decoder;
@@ -906,6 +907,11 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "Openmax will use the graphics hardware to "
             "accelerate video decoding on Raspberry Pi. ");
+
+    if (decoder == "mediacodec")
+        msg += QObject::tr(
+            "Mediacodec will use the graphics hardware to "
+            "accelerate video decoding on Android. ");
 
     return msg;
 }
@@ -1453,6 +1459,20 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
                       "");
     }
 #endif
+
+#ifdef USING_MEDIACODEC
+    if (!profiles.contains("MediaCodec Normal")) {
+        (void) QObject::tr("MediaCodec Normal",
+                           "Sample: MediaCodec Normal");
+        groupid = CreateProfileGroup("MediaCodec Normal", hostname);
+        CreateProfile(groupid, 1, "", "", "",
+                      "mediacodec", 4, true, "opengl",
+                      "opengl2", true,
+                      "none", "none",
+                      "");
+    }
+#endif
+
 }
 
 QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
