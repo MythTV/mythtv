@@ -276,30 +276,33 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     static QString full_line("");
     static const int msg_len = 255;
     static QMutex string_lock;
-    uint64_t   verbose_mask  = VB_GENERAL;
-    LogLevel_t verbose_level = LOG_DEBUG;
+    uint64_t   verbose_mask  = VB_LIBAV;
+    LogLevel_t verbose_level = LOG_EMERG;
 
     // determine mythtv debug level from av log level
     switch (level)
     {
         case AV_LOG_PANIC:
             verbose_level = LOG_EMERG;
+            verbose_mask |= VB_GENERAL;
             break;
         case AV_LOG_FATAL:
             verbose_level = LOG_CRIT;
+            verbose_mask |= VB_GENERAL;
             break;
         case AV_LOG_ERROR:
             verbose_level = LOG_ERR;
-            verbose_mask |= VB_LIBAV;
-            break;
-        case AV_LOG_DEBUG:
-        case AV_LOG_VERBOSE:
-        case AV_LOG_INFO:
-            verbose_level = LOG_DEBUG;
-            verbose_mask |= VB_LIBAV;
             break;
         case AV_LOG_WARNING:
-            verbose_mask |= VB_LIBAV;
+            verbose_level = LOG_WARNING;
+            break;
+        case AV_LOG_INFO:
+            verbose_level = LOG_INFO;
+            break;
+        case AV_LOG_VERBOSE:
+        case AV_LOG_DEBUG:
+        case AV_LOG_TRACE:
+            verbose_level = LOG_DEBUG;
             break;
         default:
             return;
@@ -433,8 +436,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     audioSamples = (uint8_t *)av_mallocz(AudioOutput::MAX_SIZE_BUFFER);
     ccd608->SetIgnoreTimecode(true);
 
-    bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
-    av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
     av_log_set_callback(myth_av_log);
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
@@ -1004,9 +1005,6 @@ extern "C" void HandleStreamChange(void *data)
 int AvFormatDecoder::FindStreamInfo(void)
 {
     QMutexLocker lock(avcodeclock);
-    // Suppress ffmpeg logging unless "-v libav --loglevel debug"
-    if (!VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_DEBUG))
-        silence_ffmpeg_logging = true;
     int retval = avformat_find_stream_info(ic, NULL);
     silence_ffmpeg_logging = false;
     // ffmpeg 3.0 is returning -1 code when there is a channel
