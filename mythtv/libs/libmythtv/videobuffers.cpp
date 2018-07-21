@@ -15,9 +15,9 @@ extern "C" {
 #include "compat.h"
 #include "mythlogging.h"
 
-#define TRY_LOCK_SPINS                 100
-#define TRY_LOCK_SPINS_BEFORE_WARNING   10
-#define TRY_LOCK_SPIN_WAIT             100 /* usec */
+#define TRY_LOCK_SPINS                 2000
+#define TRY_LOCK_SPINS_BEFORE_WARNING  9999
+#define TRY_LOCK_SPIN_WAIT             1000 /* usec */
 
 int next_dbg_str = 0;
 
@@ -289,6 +289,9 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
 
         if (tries >= TRY_LOCK_SPINS)
         {
+            LOG(VB_GENERAL, LOG_ERR, QString("GetNextFreeFrame: "
+            "available:%1 used:%2 limbo:%3 pause:%4 displayed:%5 decode:%6 finished:%7")
+            .arg(available.size()).arg(used.size()).arg(limbo.size()).arg(pause.size()).arg(displayed.size()).arg(decode.size()).arg(finished.size()));
             LOG(VB_GENERAL, LOG_ERR,
                 QString("GetNextFreeFrame() unable to "
                         "lock frame %1 times. Discarding Frames.")
