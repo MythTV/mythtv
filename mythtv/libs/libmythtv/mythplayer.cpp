@@ -1923,7 +1923,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         lastsync = true;
         //currentaudiotime = AVSyncGetAudiotime();
         LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + "dropping frame to catch up.");
-        if (!audio.IsPaused() && max_video_behind)
+        if (max_video_behind)
         {
             audio.Pause(true);
             avsync_audiopaused = true;
@@ -2199,11 +2199,8 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
                     QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
                     .arg(current).arg(length));
-                if (!audio.IsPaused())
-                {
-                    audio.Pause(true);
-                    avsync_audiopaused = true;
-                }
+                audio.Pause(true);
+                avsync_audiopaused = true;
                 prebufferFramesPlayed = framesPlayed;
             }
         }
