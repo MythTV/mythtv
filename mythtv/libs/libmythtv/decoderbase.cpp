@@ -20,6 +20,7 @@ DecoderBase::DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo)
 
       current_width(640), current_height(480),
       current_aspect(1.33333), fps(29.97),
+      fpsMultiplier(1), fpsSkip(0),
       bitrate(4000),
 
       framesPlayed(0), framesRead(0),
@@ -80,6 +81,7 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
     {
         ResetPosMap();
         framesPlayed = 0;
+        fpsSkip = 0;
         framesRead = 0;
         totalDuration = AVRationalInit(0);
         dontSyncPositionMap = false;
@@ -581,6 +583,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
         return false;
 
     framesPlayed = lastKey;
+    fpsSkip = 0;
     framesRead = lastKey;
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
@@ -880,6 +883,7 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
         ringBuffer->Seek(e.pos, SEEK_SET);
         needflush    = true;
         framesPlayed = lastKey;
+        fpsSkip = 0;
         framesRead = lastKey;
     }
 }

@@ -408,6 +408,8 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       pts_detected(false),
       reordered_pts_detected(false),
       pts_selected(true),
+      use_frame_timing(false),
+      flush_discard(0),
       force_dts_timestamps(false),
       playerFlags(flags),
       video_codec_id(kCodec_NONE),
@@ -743,6 +745,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
         lastKey = (long long)((newts*(long double)fps)/AV_TIME_BASE);
         framesPlayed = lastKey;
+        fpsSkip = 0;
         framesRead = lastKey;
 
         normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
@@ -754,6 +757,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         LOG(VB_GENERAL, LOG_INFO, LOC + "No DTS Seeking Hack!");
         no_dts_hack = true;
         framesPlayed = desiredFrame;
+        fpsSkip = 0;
         framesRead = desiredFrame;
         normalframes = 0;
     }
@@ -818,7 +822,11 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             // enc->internal = NULL and cause a segfault in
             // avcodec_flush_buffers
             if (enc && enc->internal)
+            {
                 avcodec_flush_buffers(enc);
+                if (fpsMultiplier > 1)
+                    flush_discard = 4;
+            }
         }
         if (private_dec)
             private_dec->Reset();
@@ -845,6 +853,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             if (!no_dts_hack)
             {
                 framesPlayed = lastKey;
+                fpsSkip = 0;
                 framesRead = lastKey;
             }
 
@@ -1573,7 +1582,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     enc->debug = 0;
     // enc->error_rate = 0;
 
-    AVCodec *codec = avcodec_find_decoder(enc->codec_id);
+    const AVCodec *codec = enc->codec;
 
     if (selectedStream)
     {
@@ -1677,7 +1686,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         }
 
         m_parent->SetKeyframeDistance(keyframedist);
-        AVCodec *codec = avcodec_find_decoder(enc->codec_id);
+        const AVCodec *codec = enc->codec;
         QString codecName;
         if (codec)
             codecName = codec->name;
@@ -2366,7 +2375,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             if (averror_count > SEQ_PKT_ERR_MAX)
                 gCodecMap->freeCodecContext(ic->streams[selTrack]);
-            AVCodecContext *enc = gCodecMap->getCodecContext(ic->streams[selTrack]);
+            AVCodecContext *enc = gCodecMap->getCodecContext(ic->streams[selTrack], codec);
             StreamInfo si(selTrack, 0, 0, 0, 0);
 
             tracks[kTrackTypeVideo].push_back(si);
@@ -2391,10 +2400,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             uint height = max(dim.height(), 16);
             QString dec = "ffmpeg";
             uint thread_count = 1;
-            AVCodec *codec1 = avcodec_find_decoder(enc->codec_id);
             QString codecName;
-            if (codec1)
-                codecName = codec1->name;
+            if (enc->codec)
+                codecName = enc->codec->name;
             if (enc->framerate.den && enc->framerate.num)
                 fps = float(enc->framerate.num) / float(enc->framerate.den);
             else
@@ -2500,10 +2508,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     "Unknown video codec - defaulting to MPEG2");
                 video_codec_id = kCodec_MPEG2;
             }
-            else
-            {
-                codec = avcodec_find_decoder(enc->codec_id);
-            }
 
             // Use a PrivateDecoder if allowed in playerFlags AND matched
             // via the decoder name
@@ -2513,6 +2517,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             if (!codec_is_std(video_codec_id))
                 thread_count = 1;
+
+            use_frame_timing = false;
+            if (! private_dec
+                && (codec_is_std(video_codec_id) || codec_is_mediacodec(video_codec_id)))
+                use_frame_timing = true;
 
             if (FlagIsSet(kDecodeSingleThreaded))
                 thread_count = 1;
@@ -2529,7 +2538,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             ScanATSCCaptionStreams(selTrack);
             UpdateATSCCaptionTracks();
 
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Using %1 for video decoding")
                 .arg(GetCodecDecoderName()));
 
@@ -3534,8 +3543,12 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     return true;
 }
 
+// Maximum retries - 500 = 5 seconds
+#define PACKET_MAX_RETRIES 5000
+#define RETRY_WAIT_TIME 10000   // microseconds
 bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 {
+    int retryCount = 0;
     int ret = 0, gotpicture = 0;
     int64_t pts = 0;
     AVCodecContext *context = gCodecMap->getCodecContext(curstream);
@@ -3549,133 +3562,199 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
         pts_detected = true;
 
-    avcodeclock->lock();
-    if (private_dec)
+    bool tryAgain = true;
+    bool sentPacket = false;
+    int ret2 = 0;
+    while (tryAgain)
     {
-        if (QString(ic->iformat->name).contains("avi") || !pts_detected)
-            pkt->pts = pkt->dts;
-        // TODO disallow private decoders for dvd playback
-        // N.B. we do not reparse the frame as it breaks playback for
-        // everything but libmpeg2
-        ret = private_dec->GetFrame(curstream, mpa_pic, &gotpicture, pkt);
-    }
-    else
-    {
-        context->reordered_opaque = pkt->pts;
-        //  SUGGESTION
-        //  Now that avcodec_decode_video2 is deprecated and replaced
-        //  by 2 calls (receive frame and send packet), this could be optimized
-        //  into separate routines or separate threads.
-        //  Also now that it always consumes a whole buffer some code
-        //  in the caller may be able to be optimized.
-        ret = avcodec_receive_frame(context, mpa_pic);
-        if (ret == 0)
-            gotpicture = 1;
-        if (ret == AVERROR(EAGAIN))
-            ret = 0;
-        if (ret == 0)
-            ret = avcodec_send_packet(context, pkt);
-        // The code assumes that there is always space to add a new
-        // packet. This seems risky but has always worked.
-        // It should actually check if (ret == AVERROR(EAGAIN)) and then keep
-        // the packet around and try it again after processing the frame
-        // received here.
-    }
-    avcodeclock->unlock();
-
-    if (ret < 0)
-    {
-        char error[AV_ERROR_MAX_STRING_SIZE];
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("video decode error: %1 (%2)")
-            .arg(av_make_error_string(error, sizeof(error), ret))
-            .arg(gotpicture));
-        if (ret == AVERROR_INVALIDDATA)
+        tryAgain = false;
+        gotpicture = 0;
+        avcodeclock->lock();
+        if (private_dec)
         {
-            if (++averror_count > SEQ_PKT_ERR_MAX)
+            if (QString(ic->iformat->name).contains("avi") || !pts_detected)
+                pkt->pts = pkt->dts;
+            // TODO disallow private decoders for dvd playback
+            // N.B. we do not reparse the frame as it breaks playback for
+            // everything but libmpeg2
+            ret = private_dec->GetFrame(curstream, mpa_pic, &gotpicture, pkt);
+            sentPacket = true;
+        }
+        else
+        {
+            if (!use_frame_timing)
+                context->reordered_opaque = pkt->pts;
+
+            //  SUGGESTION
+            //  Now that avcodec_decode_video2 is deprecated and replaced
+            //  by 2 calls (receive frame and send packet), this could be optimized
+            //  into separate routines or separate threads.
+            //  Also now that it always consumes a whole buffer some code
+            //  in the caller may be able to be optimized.
+            ret = 0;
+            ret = avcodec_receive_frame(context, mpa_pic);
+
+            if (ret == 0)
+                gotpicture = 1;
+            else
+                gotpicture = 0;
+            if (ret == AVERROR(EAGAIN))
+                ret = 0;
+            // If we got a picture do not send the packet until we have
+            // all available pictures
+            if (ret==0 && !gotpicture)
             {
-                // If erroring on GPU assist, try switching to software decode
-                if (codec_is_std(video_codec_id))
-                    m_parent->SetErrored(QObject::tr("Video Decode Error"));
+                ret2 = avcodec_send_packet(context, pkt);
+                if (ret2 == AVERROR(EAGAIN))
+                {
+                    tryAgain = true;
+                    ret2 = 0;
+                }
                 else
-                    m_streams_changed = true;
+                {
+                    sentPacket = true;
+                }
             }
         }
-        return false;
+        avcodeclock->unlock();
+
+        if (ret < 0 || ret2 < 0)
+        {
+            char error[AV_ERROR_MAX_STRING_SIZE];
+            if (ret < 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("video avcodec_receive_frame error: %1 (%2) gotpicture:%3")
+                    .arg(av_make_error_string(error, sizeof(error), ret))
+                    .arg(ret).arg(gotpicture));
+            }
+            if (ret2 < 0)
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
+                    .arg(av_make_error_string(error, sizeof(error), ret2))
+                    .arg(ret2).arg(gotpicture));
+            if (ret == AVERROR_INVALIDDATA || ret2 == AVERROR_INVALIDDATA)
+            {
+                if (++averror_count > SEQ_PKT_ERR_MAX)
+                {
+                    // If erroring on GPU assist, try switching to software decode
+                    if (codec_is_std(video_codec_id))
+                        m_parent->SetErrored(QObject::tr("Video Decode Error"));
+                    else
+                        m_streams_changed = true;
+                }
+            }
+            if (ret == AVERROR_EXTERNAL || ret2 == AVERROR_EXTERNAL)
+                m_streams_changed = true;
+            return false;
+        }
+
+        if (tryAgain)
+        {
+            if (++retryCount > PACKET_MAX_RETRIES)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("ERROR: Video decode buffering retries exceeded maximum"));
+                return false;
+            }
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Video decode buffering retry"));
+            usleep(RETRY_WAIT_TIME);
+        }
     }
     // averror_count counts sequential errors, so if you have a successful
     // packet then reset it
     averror_count = 0;
+    if (gotpicture)
+    {
+        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
+            QString("video timecodes packet-pts:%1 frame-pts:%2 packet-dts: %3 frame-dts:%4")
+                .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->pts)
+                .arg(mpa_pic->pkt_dts));
 
-    if (!gotpicture)
-    {
-        return true;
-    }
+        if (!use_frame_timing)
+        {
+            // Detect faulty video timestamps using logic from ffplay.
+            if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            {
+                faulty_dts += (pkt->dts <= last_dts_for_fault_detection);
+                last_dts_for_fault_detection = pkt->dts;
+            }
+            if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+            {
+                faulty_pts += (mpa_pic->reordered_opaque <= last_pts_for_fault_detection);
+                last_pts_for_fault_detection = mpa_pic->reordered_opaque;
+                reordered_pts_detected = true;
+            }
 
-    // Detect faulty video timestamps using logic from ffplay.
-    if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-    {
-        faulty_dts += (pkt->dts <= last_dts_for_fault_detection);
-        last_dts_for_fault_detection = pkt->dts;
-    }
-    if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
-    {
-        faulty_pts += (mpa_pic->reordered_opaque <= last_pts_for_fault_detection);
-        last_pts_for_fault_detection = mpa_pic->reordered_opaque;
-        reordered_pts_detected = true;
-    }
+            // Explicity use DTS for DVD since they should always be valid for every
+            // frame and fixups aren't enabled for DVD.
+            // Select reordered_opaque (PTS) timestamps if they are less faulty or the
+            // the DTS timestamp is missing. Also use fixups for missing PTS instead of
+            // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is
+            // more faulty or never detected.
+            if (force_dts_timestamps)
+            {
+                if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+                    pts = pkt->dts;
+                pts_selected = false;
+            }
+            else if (ringBuffer->IsDVD())
+            {
+                if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+                    pts = pkt->dts;
+                pts_selected = false;
+            }
+            else if (private_dec && private_dec->NeedsReorderedPTS() &&
+                    mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+            {
+                pts = mpa_pic->reordered_opaque;
+                pts_selected = true;
+            }
+            else if (faulty_pts <= faulty_dts && reordered_pts_detected)
+            {
+                if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+                    pts = mpa_pic->reordered_opaque;
+                pts_selected = true;
+            }
+            else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            {
+                pts = pkt->dts;
+                pts_selected = false;
+            }
 
-    // Explicity use DTS for DVD since they should always be valid for every
-    // frame and fixups aren't enabled for DVD.
-    // Select reordered_opaque (PTS) timestamps if they are less faulty or the
-    // the DTS timestamp is missing. Also use fixups for missing PTS instead of
-    // DTS to avoid oscillating between PTS and DTS. Only select DTS if PTS is
-    // more faulty or never detected.
-    if (force_dts_timestamps)
-    {
-        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-            pts = pkt->dts;
-        pts_selected = false;
-    }
-    else if (ringBuffer->IsDVD())
-    {
-        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-            pts = pkt->dts;
-        pts_selected = false;
-    }
-    else if (private_dec && private_dec->NeedsReorderedPTS() &&
-             mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
-    {
-        pts = mpa_pic->reordered_opaque;
-        pts_selected = true;
-    }
-    else if (faulty_pts <= faulty_dts && reordered_pts_detected)
-    {
-        if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
-            pts = mpa_pic->reordered_opaque;
-        pts_selected = true;
-    }
-    else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-    {
-        pts = pkt->dts;
-        pts_selected = false;
-    }
+            LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_DEBUG, LOC +
+                QString("video packet timestamps reordered %1 pts %2 dts %3 (%4)")
+                    .arg(mpa_pic->reordered_opaque).arg(pkt->pts).arg(pkt->dts)
+                    .arg((force_dts_timestamps) ? "dts forced" :
+                        (pts_selected) ? "reordered" : "dts"));
 
-    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_DEBUG, LOC +
-        QString("video packet timestamps reordered %1 pts %2 dts %3 (%4)")
-            .arg(mpa_pic->reordered_opaque).arg(pkt->pts).arg(pkt->dts)
-            .arg((force_dts_timestamps) ? "dts forced" :
-                 (pts_selected) ? "reordered" : "dts"));
-
-    mpa_pic->reordered_opaque = pts;
-
-    ProcessVideoFrame(curstream, mpa_pic);
-
+            mpa_pic->reordered_opaque = pts;
+        }
+        ProcessVideoFrame(curstream, mpa_pic);
+    }
+    if (!sentPacket)
+    {
+        // MythTV logic expects that only one frame is processed
+        // Save the packet for later and return.
+        AVPacket *newPkt = new AVPacket;
+        memset(newPkt, 0, sizeof(AVPacket));
+        av_init_packet(newPkt);
+        av_packet_ref(newPkt, pkt);
+        storedPackets.prepend(newPkt);
+    }
     return true;
 }
 
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
+
+    if (flush_discard > 0)
+    {
+        flush_discard--;
+        return true;
+    }
+
     AVCodecContext *context = gCodecMap->getCodecContext(stream);
 
     // We need to mediate between ATSC and SCTE data when both are present.  If
@@ -3775,7 +3854,22 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         return false;
     }
 
-    long long pts = (long long)(av_q2d(stream->time_base) *
+    long long pts;
+    if (use_frame_timing)
+    {
+        pts = mpa_pic->pts;
+        if (pts == AV_NOPTS_VALUE)
+            pts = mpa_pic->pkt_dts;
+        if (pts == AV_NOPTS_VALUE)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "No PTS found - unable to process video.");
+            return false;
+        }
+        pts = (long long)(av_q2d(stream->time_base) *
+                                pts * 1000);
+    }
+    else
+        pts = (long long)(av_q2d(stream->time_base) *
                                 mpa_pic->reordered_opaque * 1000);
 
     long long temppts = pts;
@@ -3792,9 +3886,24 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         temppts += (long long)(mpa_pic->repeat_pict * 500 / fps);
     }
 
+    // Calculate actual fps from the pts values.
+    long long ptsdiff = temppts - lastvpts;
+    double calcfps = 1000.0 / ptsdiff;
+    if (calcfps < 121.0 && calcfps > 3.0)
+    {
+        // If fps has doubled due to frame-doubling deinterlace
+        // Set fps to double value.
+        double fpschange = calcfps / fps;
+        if (fpschange > 1.9 && fpschange < 2.1)
+            fpsMultiplier = 2;
+        if (fpschange > 0.5 && fpschange < 0.6)
+            fpsMultiplier = 1;
+    }
+
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("video timecode %1 %2 %3 %4%5")
-            .arg(mpa_pic->reordered_opaque).arg(pts).arg(temppts).arg(lastvpts)
+            .arg(use_frame_timing ? mpa_pic->pts : mpa_pic->reordered_opaque).arg(pts)
+            .arg(temppts).arg(lastvpts)
             .arg((pts != temppts) ? " fixup" : ""));
 
     if (picframe)
@@ -3813,7 +3922,11 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 
     decoded_video_frame = picframe;
     gotVideoFrame = 1;
-    ++framesPlayed;
+    if (++fpsSkip >= fpsMultiplier)
+    {
+        ++framesPlayed;
+        fpsSkip = 0;
+    }
 
     lastvpts = temppts;
     if (!firstvpts && firstvptsinuse)

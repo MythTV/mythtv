@@ -204,6 +204,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       next_play_speed(1.0f),        next_normal_speed(true),
       play_speed(1.0f),             normal_speed(true),
       frame_interval((int)(1000000.0f / 30)), m_frame_interval(0),
+      m_fpsMultiplier(1),
       ffrew_skip(1),ffrew_adjust(0),
       // Audio and video synchronization stuff
       videosync(NULL),              avsync_delay(0),
@@ -1747,7 +1748,10 @@ int MythPlayer::NextCaptionTrack(int mode)
 
 void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
 {
-    frame_interval = (int)(1000000.0f * frame_period + 0.5f);
+    if (decoder)
+        m_fpsMultiplier = decoder->GetfpsMultiplier();
+    frame_interval = (int)(1000000.0f * frame_period + 0.5f)
+      / m_fpsMultiplier;
     if (!avsync_predictor_enabled)
         avsync_predictor = 0;
     avsync_predictor_enabled = false;
@@ -1940,8 +1944,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
         {
             LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO,
-                LOC + QString("AVSync waitforframe %1 %2")
-                    .arg(avsync_adjustment).arg(m_double_framerate));
+                LOC + QString("AVSync waitforframe %1 %2 %3")
+                    .arg(frameDelay).arg(avsync_adjustment).arg(m_double_framerate));
             vsync_delay_clock = videosync->WaitForFrame(frameDelay, avsync_adjustment + repeat_delay);
         }
         else
@@ -1979,7 +1983,12 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
             osdLock.unlock();
             // Display the second field
             if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
+            {
+                LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO,
+                    LOC + QString("AVSync waitforframe %1 %2 %3")
+                        .arg(frameDelay).arg(avsync_adjustment).arg(m_double_framerate));
                 vsync_delay_clock = videosync->WaitForFrame(frameDelay, avsync_adjustment);
+            }
             videoOutput->Show(ps);
         }
 
@@ -2300,6 +2309,9 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
 
     // Check aspect ratio
     CheckAspectRatio(frame);
+
+    if (decoder && m_fpsMultiplier != decoder->GetfpsMultiplier())
+        UpdateFFRewSkip();
 
     // Player specific processing (dvd, bd, mheg etc)
     PreProcessNormalFrame();
@@ -3734,7 +3746,10 @@ bool MythPlayer::UpdateFFRewSkip(void)
     if (play_speed >= 0.0f && play_speed <= 3.0f)
     {
         skip_changed = (ffrew_skip != 1);
-        frame_interval = (int) (1000000.0f / video_frame_rate / temp_speed);
+        if (decoder)
+            m_fpsMultiplier = decoder->GetfpsMultiplier();
+        frame_interval = (int) (1000000.0f / video_frame_rate / temp_speed)
+          / m_fpsMultiplier;
         ffrew_skip = (play_speed != 0.0f);
     }
     else

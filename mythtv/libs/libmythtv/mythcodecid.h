@@ -75,6 +75,22 @@ typedef enum
     kCodec_HEVC_DXVA2,
 
     kCodec_DXVA2_END,
+
+    kCodec_MEDIACODEC_BEGIN = kCodec_DXVA2_END,
+
+    kCodec_MPEG1_MEDIACODEC,
+    kCodec_MPEG2_MEDIACODEC,
+    kCodec_H263_MEDIACODEC,
+    kCodec_MPEG4_MEDIACODEC,
+    kCodec_H264_MEDIACODEC,
+    kCodec_VC1_MEDIACODEC,
+    kCodec_WMV3_MEDIACODEC,
+    kCodec_VP8_MEDIACODEC,
+    kCodec_VP9_MEDIACODEC,
+    kCodec_HEVC_MEDIACODEC,
+
+    kCodec_MEDIACODEC_END,
+
 } MythCodecID;
 
 // MythCodecID convenience functions
@@ -95,6 +111,10 @@ typedef enum
                                ((id == kCodec_H264_DXVA2)  ||   \
                                 (id == kCodec_MPEG2_DXVA2) ||   \
                                 (id == kCodec_VC1_DXVA2)))
+#define codec_is_mediacodec(id) ((id > kCodec_MEDIACODEC_BEGIN) &&     \
+                               (id < kCodec_MEDIACODEC_END))
+
+#define codec_sw_copy(id) (codec_is_std(id) || codec_is_mediacodec(id))
 
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id);
@@ -130,8 +150,15 @@ int mpeg_version(int codec_id);
 #define CODEC_IS_DXVA2(codec, enc) (0)
 #endif
 
+#ifdef USING_MEDIACODEC
+#define CODEC_IS_MEDIACODEC(codec) (codec && (QString("mediacodec") == codec->wrapper_name))
+#else
+#define CODEC_IS_MEDIACODEC(codec) (0)
+#endif
+
 #define CODEC_IS_HWACCEL(codec, enc) (CODEC_IS_VDPAU(codec)      ||     \
                                       CODEC_IS_VAAPI(codec, enc) ||     \
-                                      CODEC_IS_DXVA2(codec, enc))
+                                      CODEC_IS_DXVA2(codec, enc) ||    \
+                                      CODEC_IS_MEDIACODEC(codec))
 
 #endif // _MYTH_CODEC_ID_H_

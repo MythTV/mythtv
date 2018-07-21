@@ -810,6 +810,7 @@ class MTV_PUBLIC MythPlayer
     bool       normal_speed;
     int        frame_interval;///< always adjusted for play_speed
     int        m_frame_interval;///< used to detect changes to frame_interval
+    int        m_fpsMultiplier;///< used to detect changes
 
     int        ffrew_skip;
     int        ffrew_adjust;

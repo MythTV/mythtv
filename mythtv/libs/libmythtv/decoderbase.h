@@ -269,6 +269,7 @@ class DecoderBase
     void SaveTotalFrames(void);
     bool GetVideoInverted(void) const { return video_inverted; }
     void TrackTotalDuration(bool track) { trackTotalDuration = track; }
+    int GetfpsMultiplier(void) { return fpsMultiplier; }
 
   protected:
     virtual int  AutoSelectTrack(uint type);
@@ -301,6 +302,8 @@ class DecoderBase
     int current_height;
     float current_aspect;
     double fps;
+    int fpsMultiplier;
+    int fpsSkip;
     uint bitrate;
 
     long long framesPlayed;
