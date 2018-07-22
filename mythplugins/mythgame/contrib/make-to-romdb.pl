@@ -2,75 +2,62 @@
 
 use strict;
 
-use XML::Simple;
-use Date::Manip;
-
-Date_Init();
+use utf8;
+use XML::Twig;
 
 if (!$ARGV[0])
 {
-    die("Not exist mame xml");
+    die("MAME xml file not found.");
 }
 
+my $twig = new XML::Twig;
+$twig->parsefile($ARGV[0]);
 
-my $xml = new XML::Simple;
-
-my $data = $xml->XMLin($ARGV[0]);
-
-$data->{build} =~ /\((.*?)\)/gs;
-
-my $date = UnixDate(ParseDate($1), '%Y%m%d');
-
-my $category;
+my $mame = $twig->root();
+$mame->att('build') =~ /^[0-9.]+/;
+my $version = $&;
 
 sub insert_sql
 {
-    my ($crc, $description, $category, $year, $manufacturer, $size, $file) = @_;
+    my ($game, $crc, $description, $category, $year, $manufacturer, $size, $file) = @_;
 
     if (! $year)
     {
 	$year = "????";
     }
 
-    #my $game = $description;
-    #$game =~ s/\s\(.*?\)//g;
+    $description =~ s/"/\\"/g;
 
-    print "INSERT INTO romdb VALUES ('" . $crc . "'," . '"' . $description . '"' . "," . '"' . $description . '"' . ",'" .
+    print "INSERT INTO romdb VALUES ('" . $crc . "'," . '"' . $game . '"' . "," . '"' . $description . '"' . ",'" .
 		    $category . "','" . $year . "'," . '"' . $manufacturer . '"'. ",'" .
 		    "Unknown','" . "Unknown','MAME'," .
-		    $size . ",'','" . $date . "','" . $file . "');\n";
+		    $size . ",'','" . $version . "','" . $file . "');\n";
     return;
 }
 
-foreach my $key (keys (%{$data->{game}}))
+binmode(STDOUT, ":utf8");
+foreach my $machine ($mame->children('machine'))
 {
+    next if ($machine->att('isbios') eq "yes");
+    next if ($machine->att('isdevice') eq "yes");
 
-    next if ($data->{game}->{$key}->{isbios});
-
-    if ($data->{game}->{$key}->{driver}->{status} eq 'good')
+    my $game = $machine->att('name');
+    my $description = $machine->first_child('description')->text();
+    my $category;
+    if ($machine->first_child('driver')->att('status') eq 'good')
     {
-        $category="Players " . $data->{game}->{$key}->{input}->{players};
+        $category="Players " . $machine->first_child('input')->att('players');
     }
     else
     {
-        $category='Inperfect';
+        $category='Imperfect';
     }
 
-    if ($data->{game}->{$key}->{rom}->{crc})
-    {
-	insert_sql($data->{game}->{$key}->{rom}->{crc}, $data->{game}->{$key}->{description}, $category, $data->{game}->{$key}->{year},
-		$data->{game}->{$key}->{manufacturer}, $data->{game}->{$key}->{rom}->{size}, $data->{game}->{$key}->{rom}->{name});
-    }
-    else
-    {
-        foreach my $rom (keys (%{$data->{game}->{$key}->{rom}}))
-	{
-	    if ($data->{game}->{$key}->{rom}->{$rom}->{crc})
-	    {
-		insert_sql($data->{game}->{$key}->{rom}->{$rom}->{crc}, $data->{game}->{$key}->{description},
-		    $category, $data->{game}->{$key}->{year}, $data->{game}->{$key}->{manufacturer},
-		    $data->{game}->{$key}->{rom}->{$rom}->{size}, $rom);
-	    }
-	}
+    my $year = $machine->first_child('year')->text();
+    my $manufacturer = $machine->first_child('manufacturer')->text();
+    foreach my $rom ($machine->children('rom')) {
+        next if not $rom->att('crc');
+        insert_sql($game, $rom->att('crc'), $description, $category, $year,
+            $manufacturer, $rom->att('size'), $rom->att('name'));
     }
 }
