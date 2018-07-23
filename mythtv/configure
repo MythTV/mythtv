@@ -6579,7 +6579,17 @@ if enabled x11; then
     if enabled xnvctrl; then
         case $target_os in
             linux)
-                require XNVctrl "X11/Xlib.h NVCtrl/NVCtrl.h NVCtrl/NVCtrlLib.h" XNVCTRLIsNvScreen -lXNVCtrl || disable xnvctrl
+                # Bah. Suse linux doesn't have xnvctrl.
+                . /etc/os-release
+                case $ID in
+                    *suse*)
+			# This is hopefully temporary.
+			disable xnvctrl_external
+			;;
+		    *)
+                        require XNVctrl "X11/Xlib.h NVCtrl/NVCtrl.h NVCtrl/NVCtrlLib.h" XNVCTRLIsNvScreen -lXNVCtrl || disable xnvctrl
+                        ;;
+                esac
                 ;;
             freebsd)
                 # This is hopefully temporary, and will eventually
