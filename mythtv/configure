@@ -5877,7 +5877,7 @@ enabled ffmpeg_pthreads && enable pthreads
 # Check for libuuid for zeromq
 enabled mythlogserver || disable libuuid
 if enabled libuuid ; then
-  check_lib uuid/uuid.h uuid_generate -luuid || disable libuuid
+  check_lib uuid uuid/uuid.h uuid_generate -luuid || disable libuuid
   if disabled libuuid ; then
     die "ERROR: can not find libuuid. (debian uuid-dev; RedHat libuuid-devel)"
   fi
@@ -5990,7 +5990,7 @@ enabled opengl            && { check_lib opengl GL/glx.h glXGetProcAddress "-lGL
                                die "ERROR: opengl not found."
                              }
 if enabled libmpeg2external; then
-    check_lib mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
+    check_lib libmpeg2external mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
     if disabled libmpeg2external; then
         die "Warning! No suitable external libmpeg2 found, use internal copy."
     fi
