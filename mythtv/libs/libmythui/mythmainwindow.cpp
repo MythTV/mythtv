@@ -2176,13 +2176,16 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
     if (!ke)
         return false;
     int keycode = ke->key();
+    // Ignore unknown key codes
+    if (keycode == 0)
+        return false;
 
     switch ((*e)->type())
     {
         case QEvent::KeyPress:
         {
             // Check if we are in the middle of a long press
-            if (keycode != 0 && keycode == d->m_longPressKeyCode)
+            if (keycode == d->m_longPressKeyCode)
             {
                 if (ke->timestamp() - d->m_longPressTime < LONGPRESS_INTERVAL
                     || d->m_longPressTime == 0)
@@ -2203,6 +2206,12 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
                     return false;
                 }
             }
+            // If we got a keycode different from the long press keycode it
+            // may have been injected by a jump point. Ignore it.
+            if (d->m_longPressKeyCode != 0)
+                return false;
+
+            // Process start of possible new long press.
             d->m_longPressKeyCode = 0;
             QStringList actions;
             bool handled = TranslateKeyPress("Long Press",
@@ -2226,7 +2235,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
         }
         case QEvent::KeyRelease:
         {
-            if (keycode != 0 && keycode == d->m_longPressKeyCode)
+            if (keycode == d->m_longPressKeyCode)
             {
                 if (ke->isAutoRepeat())
                     return true;
@@ -2271,7 +2280,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 
     QScopedPointer<QEvent> sNewEvent(NULL);
     if (keyLongPressFilter(&e, sNewEvent))
-        return false;
+        return true;
 
     switch (e->type())
     {
