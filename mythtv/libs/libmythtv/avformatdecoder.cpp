@@ -421,7 +421,6 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       reordered_pts_detected(false),
       pts_selected(true),
       use_frame_timing(false),
-      flush_discard(0),
       force_dts_timestamps(false),
       playerFlags(flags),
       video_codec_id(kCodec_NONE),
@@ -834,11 +833,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             // enc->internal = NULL and cause a segfault in
             // avcodec_flush_buffers
             if (enc && enc->internal)
-            {
                 avcodec_flush_buffers(enc);
-                if (fpsMultiplier > 1)
-                    flush_discard = 4;
-            }
         }
         if (private_dec)
             private_dec->Reset();
@@ -3800,12 +3795,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
 
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
-
-    if (flush_discard > 0)
-    {
-        flush_discard--;
-        return true;
-    }
 
     AVCodecContext *context = gCodecMap->getCodecContext(stream);
 

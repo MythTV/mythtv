@@ -325,7 +325,6 @@ class AvFormatDecoder : public DecoderBase
     // set use_frame_timing true to utilize the pts values in returned
     // frames. Set fale to use deprecated method.
     bool use_frame_timing;
-    int flush_discard;
 
     bool force_dts_timestamps;
 
