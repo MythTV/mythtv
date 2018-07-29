@@ -20,6 +20,10 @@ using namespace std;
 #include <QProcessEnvironment>
 #endif
 
+#ifdef Q_OS_ANDROID
+#include <QtAndroidExtras>
+#endif
+
 #include "previewgeneratorqueue.h"
 #include "referencecounter.h"
 #include "mythmiscutil.h"
@@ -1396,6 +1400,58 @@ static bool resetTheme(QString themedir, const QString &badtheme)
 
 static int reloadTheme(void)
 {
+
+#ifdef Q_OS_ANDROID
+
+    // jni code to launch the application again
+    // reinitializing the main windows causes a segfault
+    // with android
+
+    auto activity = QtAndroid::androidActivity();
+    auto packageManager = activity.callObjectMethod
+        (   "getPackageManager",
+            "()Landroid/content/pm/PackageManager;"  );
+
+    auto activityIntent = packageManager.callObjectMethod
+        (   "getLaunchIntentForPackage",
+            "(Ljava/lang/String;)Landroid/content/Intent;",
+            activity.callObjectMethod("getPackageName",
+            "()Ljava/lang/String;").object()  );
+
+    auto pendingIntent = QAndroidJniObject::callStaticObjectMethod
+        (   "android/app/PendingIntent",
+            "getActivity",
+            "(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;",
+            activity.object(),
+            jint(0),
+            activityIntent.object(),
+            QAndroidJniObject::getStaticField<jint>("android/content/Intent",
+            "FLAG_ACTIVITY_CLEAR_TOP")  );
+
+    auto alarmManager = activity.callObjectMethod
+        (   "getSystemService",
+            "(Ljava/lang/String;)Ljava/lang/Object;",
+            QAndroidJniObject::getStaticObjectField("android/content/Context",
+            "ALARM_SERVICE",
+            "Ljava/lang/String;").object()  );
+
+    alarmManager.callMethod<void>
+        (   "set",
+            "(IJLandroid/app/PendingIntent;)V",
+            QAndroidJniObject::getStaticField<jint>("android/app/AlarmManager", "RTC"),
+            jlong(QDateTime::currentMSecsSinceEpoch() + 100),
+            pendingIntent.object()  );
+
+    qApp->quit();
+    // QString title = QObject::tr("Your change will take effect the next time "
+    //                     "mythfrontend is started.");
+    //     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");    MythConfirmationDialog *okPopup =
+    //         new MythConfirmationDialog(popupStack, title, false);
+    // if (okPopup->Create())
+    //     popupStack->AddScreen(okPopup);
+    return 0;
+#else
+
     QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
@@ -1437,6 +1493,7 @@ static int reloadTheme(void)
     }
 
     return 0;
+#endif // Q_OS_ANDROID else
 }
 
 static void reloadTheme_void(void)

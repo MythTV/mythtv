@@ -1656,7 +1656,9 @@ bool MythContext::Init(const bool gui,
     saveSettingsCache();
     if (d->m_settingsCacheDirty)
     {
+#ifndef Q_OS_ANDROID
         DestroyMythMainWindow();
+#endif
         d->m_settingsCacheDirty = false;
     }
     gCoreContext->ActivateSettingsCache(true);
