@@ -1442,7 +1442,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
         yselect    /= ((float)inputTextureSize.width() / 2.0f);
     }
 
-    float maxheight  = (float)(min(inputTextureSize.height(), 1080) - 1) *
+    float maxheight  = (float)(min(inputTextureSize.height(), 2160) - 1) *
                        lineHeight;
     float fieldSize = 1.0f / (lineHeight * 2.0);
 

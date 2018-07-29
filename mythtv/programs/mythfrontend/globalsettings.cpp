@@ -2004,7 +2004,7 @@ static HostComboBoxSetting *AdjustFill()
 
 static HostSpinBoxSetting *GuiWidth()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 1920, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiWidth", 0, 3840, 8, true);
 
     gs->setLabel(AppearanceSettings::tr("GUI width (pixels)"));
 
@@ -2020,7 +2020,7 @@ static HostSpinBoxSetting *GuiWidth()
 
 static HostSpinBoxSetting *GuiHeight()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 1600, 8, true);
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GuiHeight", 0, 2160, 8, true);
 
     gs->setLabel(AppearanceSettings::tr("GUI height (pixels)"));
 
@@ -2125,7 +2125,7 @@ static HostSpinBoxSetting *VidModeWidth(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeWidth%1").arg(idx),
-                               0, 1920, 16, true);
+                               0, 3840, 16, true);
 
     gs->setLabel(VideoModeSettings::tr("In X", "Video mode width"));
 
@@ -2141,7 +2141,7 @@ static HostSpinBoxSetting *VidModeHeight(int idx)
 {
     HostSpinBoxSetting *gs =
         new HostSpinBoxSetting(QString("VidModeHeight%1").arg(idx),
-                               0, 1080, 16, true);
+                               0, 2160, 16, true);
 
     gs->setLabel(VideoModeSettings::tr("In Y", "Video mode height"));
 
