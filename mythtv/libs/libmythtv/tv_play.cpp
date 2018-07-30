@@ -1309,7 +1309,7 @@ bool TV::Init(bool createWindow)
         }
 
         // main window sizing
-        int maxWidth = 1920, maxHeight = 1440;
+        int maxWidth = 3840, maxHeight = 2160;
         if (switchMode)
         {
             DisplayRes *display_res = DisplayRes::GetDisplayRes();
