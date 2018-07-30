@@ -747,7 +747,13 @@ void PrevRecordedList::DeleteOldEpisode(bool ok)
         MythDB::DBError("ProgLister::DeleteOldEpisode", query);
 
     ScheduledRecording::RescheduleCheck(*pi, "DeleteOldEpisode");
-    showListTakeFocus();
+
+    // Delete the current item from both m_showData and m_showList.
+    ProgramList::iterator it =
+        m_showData.begin() + m_showList->GetCurrentPos();
+    m_showData.erase(it);
+    MythUIButtonListItem *item = m_showList->GetItemCurrent();
+    m_showList->RemoveItem(item);
 }
 
 void PrevRecordedList::ShowDeleteOldSeriesMenu(void)
@@ -767,11 +773,12 @@ void PrevRecordedList::DeleteOldSeries(bool ok)
     ProgramInfo *pi = GetCurrentProgram();
     if (!ok || !pi)
         return;
+    QString title = pi->GetTitle();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM oldrecorded "
                   "WHERE title = :TITLE AND future = 0");
-    query.bindValue(":TITLE", pi->GetTitle());
+    query.bindValue(":TITLE", title);
     if (!query.exec())
         MythDB::DBError("ProgLister::DeleteOldSeries -- delete", query);
 
@@ -780,5 +787,24 @@ void PrevRecordedList::DeleteOldSeries(bool ok)
     RecordingInfo tempri(*pi);
     tempri.SetProgramID("**any**");
     ScheduledRecording::RescheduleCheck(tempri, "DeleteOldSeries");
-    showListTakeFocus();
+
+    // Delete the matching items from both m_showData and m_showList.
+    int pos = 0;
+    ProgramList::iterator it = m_showData.begin();
+    while (pos < (int)m_showData.size())
+    {
+        if ((*it)->GetTitle() == title)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Deleting %1 at pos %2")
+                .arg(title).arg(pos));
+            it = m_showData.erase(it);
+            MythUIButtonListItem *item = m_showList->GetItemAt(pos);
+            m_showList->RemoveItem(item);
+        }
+        else
+        {
+            ++pos;
+            ++it;
+        }
+    }
 }
