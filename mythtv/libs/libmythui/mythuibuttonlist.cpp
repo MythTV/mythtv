@@ -1559,11 +1559,12 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         --m_selPosition;
     }
     else if (curIndex < m_selPosition ||
-        m_selPosition == m_itemCount - 1)
+             (m_selPosition == m_itemCount - 1 &&
+              m_selPosition > 0))
     {
         // The removed item is visible and before the selected item or
-        // the selected item is the last item, move the selected item
-        // up 1.
+        // the selected item is the last item but not the only item,
+        // move the selected item up 1.
         --m_selPosition;
     }
 
