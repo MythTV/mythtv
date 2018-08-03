@@ -24,7 +24,6 @@ LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
 LIBS += -L../../../../external/FFmpeg/libpostproc -lmythpostproc
 using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
-using_hdhomerun:LIBS += -L../../../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
 LIBS += -L../.. -lmythtv-$$LIBVERSION
 
 contains(QMAKE_CXX, "g++") {
@@ -46,7 +45,6 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavcodec
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavfilter
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libpostproc
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libhdhomerun
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythbase
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmyth
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythui

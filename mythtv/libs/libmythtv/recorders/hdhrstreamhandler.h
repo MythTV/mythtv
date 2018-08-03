@@ -23,7 +23,7 @@ class DeviceReadBuffer;
 
 // HDHomeRun headers
 #ifdef USING_HDHOMERUN
-#include "hdhomerun.h"
+#include "hdhomerun/hdhomerun.h"
 #else
 struct hdhomerun_device_t { int dummy; };
 #endif

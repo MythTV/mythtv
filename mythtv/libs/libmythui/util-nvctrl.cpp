@@ -1,4 +1,4 @@
-
+#include "config.h"
 #include "util-nvctrl.h"
 
 #include "mythlogging.h"
@@ -13,8 +13,13 @@
 
 #include "mythxdisplay.h"
 
+#if CONFIG_XNVCTRL_EXTERNAL
+#include "NVCtrl/NVCtrl.h"
+#include "NVCtrl/NVCtrlLib.h"
+#else
 #include "NVCtrl.h"
 #include "NVCtrlLib.h"
+#endif
 
 #ifdef USING_XRANDR
 #include "DisplayResX.h"

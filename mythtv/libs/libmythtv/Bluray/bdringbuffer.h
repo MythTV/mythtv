@@ -1,6 +1,8 @@
 #ifndef BD_RING_BUFFER_H_
 #define BD_RING_BUFFER_H_
 
+#include "config.h"
+
 #define BD_BLOCK_SIZE 6144LL
 
 //Qt headers
@@ -12,7 +14,11 @@
 
 // external/libmythbluray
 #include "libbluray/bluray.h"
+#if CONFIG_LIBBLURAY_EXTERNAL
+#include "libbluray/overlay.h"
+#else
 #include "libbluray/decoders/overlay.h"
+#endif
 
 #include "ringbuffer.h"
 

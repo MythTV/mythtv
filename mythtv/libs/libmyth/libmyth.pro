@@ -87,22 +87,19 @@ HEADERS += netgrabbermanager.h
 SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
 
-INCLUDEPATH += ../../external/libsamplerate ../../external/libmythsoundtouch ../libmythfreesurround
+INCLUDEPATH += ../../external/libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../.. ../../external/FFmpeg
-#INCLUDEPATH += ../../external/libmythbluray
 INCLUDEPATH += ../libmythservicecontracts
 INCLUDEPATH += $${POSTINC}
-DEPENDPATH += ../../external/libsamplerate ../../external/libmythsoundtouch ../../external/libmythbluray
+DEPENDPATH += ../../external/libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
 DEPENDPATH += ../libmythservicecontracts
 
-#LIBS += -L../../external/libmythbluray -lmythbluray-$$LIBVERSION
-LIBS += -L../../external/libsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../../external/libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
@@ -113,10 +110,14 @@ LIBS += -L../../external/FFmpeg/libavutil  -lmythavutil
 LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavformat  -lmythavformat
 LIBS += -L../libmythservicecontracts         -lmythservicecontracts-$${LIBVERSION}
+!using_libbluray_external {
+    #INCLUDEPATH += ../../external/libmythbluray/src
+    DEPENDPATH += ../../external/libmythbluray
+    #LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
+}
 
 !win32-msvc* {
-    POST_TARGETDEPS += ../../external/libsamplerate/libmythsamplerate-$${MYTH_LIB_EXT}
-#    POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+    !using_libbluray_external:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
     POST_TARGETDEPS += ../../external/libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)

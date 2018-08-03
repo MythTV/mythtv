@@ -60,7 +60,7 @@ using namespace std;
 #endif
 
 #ifdef USING_HDHOMERUN
-#include "hdhomerun.h"
+#include "hdhomerun/hdhomerun.h"
 #endif
 
 static const uint kDefaultMultirecCount = 2;

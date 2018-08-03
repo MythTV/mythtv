@@ -1,17 +1,16 @@
 include ../config.mak
 
-SUBDIRS = FFmpeg libmythbluray libmythdvdnav libsamplerate libudfread minilzo
+SUBDIRS = FFmpeg libmythdvdnav libudfread
 SUBDIRS += libmythsoundtouch
 ifeq ($(CONFIG_MYTHLOGSERVER),yes)
     SUBDIRS += zeromq nzmqt
 endif
 
-ifdef CONFIG_HDHOMERUN
-    SUBDIRS += libhdhomerun
-endif
-
-ifdef CONFIG_X11
+ifneq ($(CONFIG_XNVCTRL_EXTERNAL),yes)
     SUBDIRS += libXNVCtrl
+endif
+ifneq ($(CONFIG_LIBBLURAY_EXTERNAL),yes)
+    SUBDIRS += libmythbluray
 endif
 
 SUBDIRS_ALL = $(addsuffix -all, ${SUBDIRS})
@@ -47,24 +46,14 @@ nzmqt-all:	zeromq-all
 nzmqt-install nzmqt-uninstall nzmqt-clean nzmqt-distclean:
 	${MAKE} -C nzmqt/src ${@:nzmqt-%=%}
 
-libhdhomerun-all libhdhomerun-clean libhdhomerun-distclean libhdhomerun-install libhdhomerun-uninstall:
-	${MAKE} -C libhdhomerun -f Makefile.lib ${@:libhdhomerun-%=%}
-	${MAKE} -C libhdhomerun -f Makefile.app ${@:libhdhomerun-%=%}
-
 libmythbluray-all libmythbluray-clean libmythbluray-distclean libmythbluray-install libmythbluray-uninstall:
 	${MAKE} -C libmythbluray ${@:libmythbluray-%=%}
 
 libmythdvdnav-all libmythdvdnav-clean libmythdvdnav-distclean libmythdvdnav-install libmythdvdnav-uninstall:
 	${MAKE} -C libmythdvdnav ${@:libmythdvdnav-%=%}
 
-libsamplerate-all libsamplerate-clean libsamplerate-distclean libsamplerate-install libsamplerate-uninstall:
-	${MAKE} -C libsamplerate ${@:libsamplerate-%=%}
-
 libudfread-all libudfread-clean libudfread-distclean libudfread-install libudfread-uninstall:
 	${MAKE} -C libudfread ${@:libudfread-%=%}
-
-minilzo-all minilzo-clean minilzo-distclean minilzo-install minilzo-uninstall:
-	${MAKE} -C minilzo ${@:minilzo-%=%}
 
 libmythsoundtouch-all libmythsoundtouch-clean libmythsoundtouch-distclean libmythsoundtouch-install libmythsoundtouch-uninstall:
 	${MAKE} -C libmythsoundtouch ${@:libmythsoundtouch-%=%}

@@ -28,7 +28,7 @@ using namespace std;
 #include "audioplayer.h"                // for AudioPlayer
 #include "cc608reader.h"                // for CC608Reader
 
-#include "minilzo.h"
+#include "lzo/lzo1x.h"
 
 extern "C" {
 #if HAVE_BIGENDIAN

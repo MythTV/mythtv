@@ -16,10 +16,9 @@ win32-msvc* {
   INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 }
 
-INCLUDEPATH += ../../external/libmythbluray/src
+!using_libbluray_external:INCLUDEPATH += ../../external/libmythbluray/src
 INCLUDEPATH += ../../external/libmythsoundtouch
 INCLUDEPATH += ../../external/libudfread
-INCLUDEPATH += ../../external/libsamplerate
 INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext
 INCLUDEPATH += ../../libs/libmythservicecontracts
@@ -67,7 +66,7 @@ LIBS += -lmythprotoserver-$$LIBVERSION
 
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
-using_hdhomerun:LIBS += -L../../external/libhdhomerun -lmythhdhomerun-$$LIBVERSION
+using_hdhomerun:LIBS += -lhdhomerun
 using_taglib: LIBS += $$CONFIG_TAGLIB_LIBS
 
 win32 {
@@ -92,7 +91,6 @@ win32 {
     POST_TARGETDEPS += ../../libs/libmythprotoserver/libmythprotoserver-$${MYTH_SHLIB_EXT}
 
     using_live: POST_TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-    using_hdhomerun: POST_TARGETDEPS += ../../external/libhdhomerun/libmythhdhomerun-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 }
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmyth/audio

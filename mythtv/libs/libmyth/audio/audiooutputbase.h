@@ -11,11 +11,10 @@
 
 // MythTV headers
 #include "audiooutput.h"
-// external/libsamplerate
-#include "samplerate.h"
-
 #include "mythlogging.h"
 #include "mthread.h"
+
+#include "samplerate.h"
 
 #define VBAUDIO(str)   LOG(VB_AUDIO, LOG_INFO, LOC + str)
 #define VBAUDIOTS(str) LOG(VB_AUDIO | VB_TIMESTAMP, LOG_INFO, LOC + str)
