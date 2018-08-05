@@ -6049,11 +6049,16 @@ if enabled libmpeg2external; then
 fi
 
 if enabled hdhomerun; then
-     # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
+    # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
+    # Fedora and Debian/Ubuntu use different include directories.
     if check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
         :
+    elif check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
+        add_cxxflags -DHDHOMERUN_LIBPREFIX
     elif check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
         add_cxxflags -DHDHOMERUN_V2
+    elif check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
+        add_cxxflags -DHDHOMERUN_V2 -DHDHOMERUN_LIBPREFIX
     else
         disable hdhomerun
     fi
