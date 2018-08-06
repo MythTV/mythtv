@@ -7067,7 +7067,7 @@ fi
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
-echo '\n#### FFmpeg CONFIGURATION ####'
+echo -e '\n#### FFmpeg CONFIGURATION ####'
 currentpwd="$PWD"
 cd external/FFmpeg
 eval ./configure \
