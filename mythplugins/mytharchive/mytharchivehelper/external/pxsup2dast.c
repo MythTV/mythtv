@@ -674,7 +674,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
              * Later, bytes 1,2,3,4 (instead of 0,1,2,3) could be used.
              * 256/90000 = 1/351 sec -- way better than required resolution. 
              */
-            eu32 pts = get_uint32_le(xxfread(sfh, data, 8));
+            eu32 volatile pts = get_uint32_le(xxfread(sfh, data, 8));
             eu16 size = get_uint16_be(xxfread(sfh, data, 2));
             eu16 pack = get_uint16_be(xxfread(sfh, data, 2));
             eu32 endpts;
