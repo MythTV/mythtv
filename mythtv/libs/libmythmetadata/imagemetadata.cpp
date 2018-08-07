@@ -519,10 +519,6 @@ protected:
 VideoMetaData::VideoMetaData(const QString &filePath)
     : ImageMetaData(filePath), m_context(NULL), m_dict(NULL)
 {
-    avcodeclock->lock();
-    av_register_all();
-    avcodeclock->unlock();
-
     AVInputFormat* p_inputformat = NULL;
 
     // Open file

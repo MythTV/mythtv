@@ -2512,9 +2512,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (rx.fix_sync)
-		av_register_all();
-	
 	if (optind == argc-1) {
 		if ((rx.fd_in = open(argv[optind] ,O_RDONLY| O_LARGEFILE)) < 0) {
 			perror("Error opening input file ");

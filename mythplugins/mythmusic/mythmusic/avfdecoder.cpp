@@ -298,9 +298,6 @@ bool avfDecoder::initialize()
         return false;
     }
 
-    // register av codecs
-    av_register_all();
-
     output()->PauseUntilBuffered();
 
     if (m_inputContext)

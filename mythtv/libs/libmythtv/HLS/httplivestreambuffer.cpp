@@ -1750,9 +1750,6 @@ bool HLSRingBuffer::IsHTTPLiveStreaming(QByteArray *s)
 bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
 {
     bool isHLS = false;
-    avcodeclock->lock();
-    av_register_all();
-    avcodeclock->unlock();
     URLContext *context;
 
     // Do a peek on the URL to test the format

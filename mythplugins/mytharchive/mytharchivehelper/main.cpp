@@ -1559,8 +1559,6 @@ static int doImportArchive(const QString &inFile, int chanID)
 
 static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
 {
-    av_register_all();
-
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("grabThumbnail(): Opening '%1'")
             .arg(inFile));
@@ -1907,8 +1905,6 @@ static int64_t getFrameCount(const QString &filename, float fps)
 
 static int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
-    av_register_all();
-
     // Open recording
     LOG(VB_JOBQUEUE , LOG_INFO, QString("getFileInfo(): Opening '%1'")
             .arg(inFile));

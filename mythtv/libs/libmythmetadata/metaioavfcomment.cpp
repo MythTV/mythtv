@@ -15,8 +15,6 @@ extern "C" {
 MetaIOAVFComment::MetaIOAVFComment(void)
     : MetaIO()
 {
-    QMutexLocker locker(avcodeclock);
-    av_register_all();
 }
 
 MetaIOAVFComment::~MetaIOAVFComment(void)

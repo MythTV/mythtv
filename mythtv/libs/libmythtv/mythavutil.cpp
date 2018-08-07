@@ -321,11 +321,6 @@ int MythPictureDeinterlacer::DeinterlaceSingle(AVFrame *dst, const AVFrame *src)
 
 int MythPictureDeinterlacer::Flush()
 {
-    {
-        QMutexLocker locker(avcodeclock);
-        avfilter_register_all();
-    }
-
     if (m_filter_graph)
     {
         avfilter_graph_free(&m_filter_graph);

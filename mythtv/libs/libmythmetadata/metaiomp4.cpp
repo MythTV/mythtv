@@ -16,8 +16,6 @@ extern "C" {
 MetaIOMP4::MetaIOMP4(void)
     : MetaIO()
 {
-    QMutexLocker locker(avcodeclock);
-    av_register_all();
 }
 
 MetaIOMP4::~MetaIOMP4(void)

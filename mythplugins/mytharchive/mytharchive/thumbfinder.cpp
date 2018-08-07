@@ -559,8 +559,6 @@ bool ThumbFinder::getThumbImages()
 
 bool ThumbFinder::initAVCodec(const QString &inFile)
 {
-    av_register_all();
-
     // Open recording
     LOG(VB_JOBQUEUE, LOG_INFO, QString("ThumbFinder: Opening '%1'")
             .arg(inFile));

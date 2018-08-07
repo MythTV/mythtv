@@ -292,7 +292,6 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     header_decoder = mpeg2_init();
     img_decoder = mpeg2_init();
 
-    av_register_all();
     av_log_set_callback(my_av_print);
 
     pthread_mutex_init(&rx.mutex, NULL);

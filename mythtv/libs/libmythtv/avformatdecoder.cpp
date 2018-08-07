@@ -952,11 +952,6 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset,
 bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
                                 const QString &filename, int testbufsize)
 {
-    {
-        QMutexLocker locker(avcodeclock);
-        av_register_all();
-    }
-
     AVProbeData probe;
     memset(&probe, 0, sizeof(AVProbeData));
 

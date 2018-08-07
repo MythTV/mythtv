@@ -151,8 +151,6 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     picture_format = AV_PIX_FMT_YUV420P;
     v4l2_pixelformat = 0;
 
-    avcodec_register_all();
-
     mpa_vidcodec = 0;
     mpa_vidctx = NULL;
 

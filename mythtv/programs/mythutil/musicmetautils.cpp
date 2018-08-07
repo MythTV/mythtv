@@ -235,8 +235,6 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;
     }
 
-    av_register_all();
-
     AVFormatContext *inputFC = NULL;
     AVInputFormat *fmt = NULL;
 

@@ -49,8 +49,6 @@ AVFormatWriter::AVFormatWriter()
       m_audPicture(NULL),
       m_audioInBuf(NULL),    m_audioInPBuf(NULL)
 {
-    av_register_all();
-    avcodec_register_all();
     memset(&m_fmt, 0, sizeof(m_fmt));
 }
 

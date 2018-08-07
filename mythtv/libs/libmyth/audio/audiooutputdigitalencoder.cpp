@@ -111,10 +111,6 @@ bool AudioOutputDigitalEncoder::Init(
     // Clear digital encoder from all existing content
     Reset();
 
-    // We need to do this when called from mythmusic
-    avcodeclock->lock();
-    avcodec_register_all();
-    avcodeclock->unlock();
     codec = avcodec_find_encoder_by_name("ac3_fixed");
     if (!codec)
     {

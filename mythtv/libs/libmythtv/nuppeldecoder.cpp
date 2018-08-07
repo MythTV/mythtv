@@ -73,11 +73,6 @@ NuppelDecoder::NuppelDecoder(MythPlayer *parent,
     int format = RTJ_YUV420;
     rtjd->SetFormat(&format);
 
-    {
-        QMutexLocker locker(avcodeclock);
-        avcodec_register_all();
-    }
-
     if (lzo_init() != LZO_E_OK)
     {
         LOG(VB_GENERAL, LOG_ERR, "NuppelDecoder: lzo_init() failed, aborting");

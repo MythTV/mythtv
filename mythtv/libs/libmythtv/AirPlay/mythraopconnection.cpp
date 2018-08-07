@@ -1631,10 +1631,6 @@ bool MythRAOPConnection::CreateDecoder(void)
     DestroyDecoder();
 
     // create an ALAC decoder
-    avcodeclock->lock();
-    av_register_all();
-    avcodeclock->unlock();
-
     m_codec = avcodec_find_decoder(AV_CODEC_ID_ALAC);
     if (!m_codec)
     {
