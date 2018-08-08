@@ -4639,7 +4639,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
     StartedRecording(prog);
 
     *rb = RingBuffer::Create(prog->GetPathname(), true);
-    if (!(*rb)->IsOpen())
+    if (!(*rb) || !(*rb)->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("RingBuffer '%1' not open...")
                 .arg(prog->GetPathname()));
@@ -4823,7 +4823,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
 
     bool write = genOpt.inputtype != "IMPORT";
     RingBuffer *rb = RingBuffer::Create(ri->GetPathname(), write);
-    if (!rb->IsOpen())
+    if (!rb || !rb->IsOpen())
     {
         delete rb;
         ri->SetRecordingStatus(RecStatus::Failed);

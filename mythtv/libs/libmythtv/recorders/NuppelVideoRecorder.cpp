@@ -743,7 +743,7 @@ void NuppelVideoRecorder::Initialize(void)
         ringBuffer = RingBuffer::Create("output.nuv", true);
         weMadeBuffer = true;
         livetv = false;
-        if (!ringBuffer->IsOpen())
+        if (!ringBuffer || !ringBuffer->IsOpen())
         {
             _error = "Could not open RingBuffer";
             LOG(VB_GENERAL, LOG_ERR, LOC + _error);

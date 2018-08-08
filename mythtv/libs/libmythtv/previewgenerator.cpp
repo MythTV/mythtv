@@ -827,7 +827,7 @@ char *PreviewGenerator::GetScreenGrab(
     }
 
     RingBuffer *rbuf = RingBuffer::Create(filename, false, false, 0);
-    if (!rbuf->IsOpen())
+    if (!rbuf || !rbuf->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer could not open file: " +
                 QString("'%1'").arg(filename));

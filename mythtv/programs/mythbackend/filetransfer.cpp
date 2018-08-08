@@ -19,7 +19,8 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
 {
     pginfo = new ProgramInfo(filename);
     pginfo->MarkAsInUse(true, kFileTransferInUseID);
-    rbuffer->Start();
+    if (rbuffer)
+        rbuffer->Start();
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
@@ -34,7 +35,8 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
 
     if (write)
         remote->SetReadyReadCallbackEnabled(false);
-    rbuffer->Start();
+    if (rbuffer)
+        rbuffer->Start();
 }
 
 FileTransfer::~FileTransfer()
@@ -81,13 +83,15 @@ void FileTransfer::Stop(void)
     {
         readthreadlive = false;
         LOG(VB_FILE, LOG_INFO, "calling StopReads()");
-        rbuffer->StopReads();
+        if (rbuffer)
+            rbuffer->StopReads();
         QMutexLocker locker(&lock);
         readsLocked = true;
     }
 
     if (writemode)
-        rbuffer->WriterFlush();
+        if (rbuffer)
+            rbuffer->WriterFlush();
 
     if (pginfo)
         pginfo->UpdateInUseMark();
@@ -96,7 +100,8 @@ void FileTransfer::Stop(void)
 void FileTransfer::Pause(void)
 {
     LOG(VB_FILE, LOG_INFO, "calling StopReads()");
-    rbuffer->StopReads();
+    if (rbuffer)
+        rbuffer->StopReads();
     QMutexLocker locker(&lock);
     readsLocked = true;
 
@@ -107,7 +112,8 @@ void FileTransfer::Pause(void)
 void FileTransfer::Unpause(void)
 {
     LOG(VB_FILE, LOG_INFO, "calling StartReads()");
-    rbuffer->StartReads();
+    if (rbuffer)
+        rbuffer->StartReads();
     {
         QMutexLocker locker(&lock);
         readsLocked = false;
@@ -258,7 +264,7 @@ uint64_t FileTransfer::GetFileSize(void)
     if (pginfo)
         pginfo->UpdateInUseMark();
 
-    return rbuffer->GetRealFileSize();
+    return rbuffer ? rbuffer->GetRealFileSize() : 0;
 }
 
 QString FileTransfer::GetFileName(void)
@@ -274,7 +280,8 @@ void FileTransfer::SetTimeout(bool fast)
     if (pginfo)
         pginfo->UpdateInUseMark();
 
-    rbuffer->SetOldFile(fast);
+    if (rbuffer)
+        rbuffer->SetOldFile(fast);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

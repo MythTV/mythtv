@@ -2407,7 +2407,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
                     playbackURL, false, true,
                     opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
 
-            ctx->buffer->SetLiveMode(ctx->tvchain);
+            if (ctx->buffer)
+                ctx->buffer->SetLiveMode(ctx->tvchain);
         }
 
 
@@ -3149,7 +3150,8 @@ void TV::timerEvent(QTimerEvent *te)
             QMutexLocker locker(&timerIdLock);
             KillTimer(updateOSDDebugTimerId);
             updateOSDDebugTimerId = 0;
-            actx->buffer->EnableBitrateMonitor(false);
+            if (actx->buffer)
+                actx->buffer->EnableBitrateMonitor(false);
             if (actx->player)
                 actx->player->EnableFrameRateMonitor(false);
         }
@@ -4835,7 +4837,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 if (isDVD &&
                     !GetMythMainWindow()->IsExitingToMain() &&
                     has_action("BACK", actions) &&
-                    ctx->buffer->DVD()->GoBack())
+                    ctx->buffer && ctx->buffer->DVD()->GoBack())
                 {
                     return handled;
                 }
@@ -5568,7 +5570,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             }
             else
             {
-                if (ctx->buffer->IsDVD())
+                if (ctx->buffer &&  ctx->buffer->IsDVD())
                     infoStr = "DVD";
                 else if (ctx->playingInfo->IsRecording())
                     infoStr = "Recorded";
@@ -5579,6 +5581,8 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     respDate = ctx->playingInfo->GetRecordingStartTime();
             }
 
+            QString bufferFilename =
+              ctx->buffer ? ctx->buffer->GetFilename() : QString("no buffer");
             if ((infoStr == "Recorded") || (infoStr == "LiveTV"))
             {
                 infoStr += QString(" %1 %2 %3 %4 %5 %6 %7")
@@ -5588,7 +5592,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                          ctx->playingInfo->GetChanID() : 0)
                     .arg(respDate.toString(Qt::ISODate))
                     .arg(fplay)
-                    .arg(ctx->buffer->GetFilename())
+                    .arg(bufferFilename)
                     .arg(rate);
             }
             else
@@ -5597,7 +5601,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                 infoStr += QString(" %1 %2 %3 %4 %5")
                     .arg(position)
                     .arg(speedStr)
-                    .arg(ctx->buffer->GetFilename())
+                    .arg(bufferFilename)
                     .arg(fplay)
                     .arg(rate);
             }
@@ -5779,10 +5783,12 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
 
     mctx->PIPTeardown();
     mctx->SetPIPState(kPBPLeft);
-    mctx->buffer->Seek(0, SEEK_SET);
+    if (mctx->buffer)
+        mctx->buffer->Seek(0, SEEK_SET);
 
     if (StateIsLiveTV(mctx->GetState()))
-        mctx->buffer->Unpause();
+        if (mctx->buffer)
+            mctx->buffer->Unpause();
 
     bool ok = mctx->CreatePlayer(
         this, GetMythMainWindow(), mctx->GetState(), false);
@@ -6290,7 +6296,8 @@ void TV::PBPRestartMainPlayer(PlayerContext *mctx)
 
     mctx->PIPTeardown();
     mctx->SetPIPState(kPIPOff);
-    mctx->buffer->Seek(0, SEEK_SET);
+    if (mctx->buffer)
+        mctx->buffer->Seek(0, SEEK_SET);
 
     if (mctx->CreatePlayer(this, GetMythMainWindow(), mctx->GetState(), false))
     {
@@ -6320,10 +6327,11 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
     if (!mctx)
         return;
 
-    mctx->buffer->Seek(0, SEEK_SET);
-
-    if (StateIsLiveTV(mctx->GetState()))
-        mctx->buffer->Unpause();
+    if (mctx->buffer) {
+        mctx->buffer->Seek(0, SEEK_SET);
+        if (StateIsLiveTV(mctx->GetState()))
+            mctx->buffer->Unpause();
+    }
 
     bool ok = StartPlayer(mctx, mctx, mctx->GetState());
 
@@ -6346,10 +6354,11 @@ void TV::RestartAllPlayers(PlayerContext *lctx,
     {
         PlayerContext *pipctx = GetPlayer(lctx, i);
 
-        pipctx->buffer->Seek(0, SEEK_SET);
-
-        if (StateIsLiveTV(pipctx->GetState()))
-            pipctx->buffer->Unpause();
+        if (pipctx->buffer) {
+            pipctx->buffer->Seek(0, SEEK_SET);
+            if (StateIsLiveTV(pipctx->GetState()))
+                pipctx->buffer->Unpause();
+        }
 
         ok = StartPlayer(mctx, pipctx, pipctx->GetState());
 
@@ -7012,7 +7021,7 @@ void TV::SetFFRew(PlayerContext *ctx, int index)
     {
         speed = ff_rew_speeds[index];
         // Don't allow ffwd if seeking is needed but not available
-        if (!ctx->buffer->IsSeekingAllowed() && speed > 3)
+        if (!ctx->buffer || (!ctx->buffer->IsSeekingAllowed() && speed > 3))
             return;
 
         ctx->ff_rew_index = index;
@@ -7022,7 +7031,7 @@ void TV::SetFFRew(PlayerContext *ctx, int index)
     else
     {
         // Don't rewind if we cannot seek
-        if (!ctx->buffer->IsSeekingAllowed())
+        if (!ctx->buffer || !ctx->buffer->IsSeekingAllowed())
             return;
 
         ctx->ff_rew_index = index;
@@ -7386,14 +7395,18 @@ void TV::SwitchInputs(PlayerContext *ctx,
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
         // pause the decoder first, so we're not reading too close to the end.
-        ctx->buffer->IgnoreLiveEOF(true);
-        ctx->buffer->StopReads();
+        if (ctx->buffer) {
+            ctx->buffer->IgnoreLiveEOF(true);
+            ctx->buffer->StopReads();
+        }
         if (ctx->player)
             ctx->player->PauseDecoder();
 
         // shutdown stuff
-        ctx->buffer->Pause();
-        ctx->buffer->WaitForPause();
+        if (ctx->buffer) {
+            ctx->buffer->Pause();
+            ctx->buffer->WaitForPause();
+        }
         ctx->StopPlaying();
         ctx->recorder->StopLiveTV();
         ctx->SetPlayer(NULL);
@@ -7430,7 +7443,8 @@ void TV::SwitchInputs(PlayerContext *ctx,
                     opennow ? RingBuffer::kLiveTVOpenTimeout : -1));
 
             ctx->tvchain->SetProgram(*ctx->playingInfo);
-            ctx->buffer->SetLiveMode(ctx->tvchain);
+            if (ctx->buffer)
+                ctx->buffer->SetLiveMode(ctx->tvchain);
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 
@@ -8141,14 +8155,16 @@ void TV::ToggleOSDDebug(PlayerContext *ctx)
     OSD *osd = GetOSDLock(ctx);
     if (osd && osd->IsWindowVisible("osd_debug"))
     {
-        ctx->buffer->EnableBitrateMonitor(false);
+        if (ctx->buffer)
+            ctx->buffer->EnableBitrateMonitor(false);
         if (ctx->player)
             ctx->player->EnableFrameRateMonitor(false);
         osd->HideWindow("osd_debug");
     }
     else if (osd)
     {
-        ctx->buffer->EnableBitrateMonitor(true);
+        if (ctx->buffer)
+            ctx->buffer->EnableBitrateMonitor(true);
         if (ctx->player)
             ctx->player->EnableFrameRateMonitor(true);
         show = true;
@@ -9478,7 +9494,7 @@ void TV::customEvent(QEvent *e)
         MythMediaEvent *me = static_cast<MythMediaEvent*>(e);
         MythMediaDevice *device = me->getDevice();
 
-        QString filename = mctx->buffer->GetFilename();
+        QString filename = mctx->buffer ? mctx->buffer->GetFilename() : "";
 
         if (device && filename.endsWith(device->getDevicePath()) &&
             (device->getStatus() == MEDIASTAT_OPEN))
@@ -13066,7 +13082,8 @@ void TV::UnpauseLiveTV(PlayerContext *ctx, bool bQuietly /*=false*/)
         if (ctx->player)
             ctx->player->Play(ctx->ts_normal, true, false);
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
-        ctx->buffer->IgnoreLiveEOF(false);
+        if (ctx->buffer)
+            ctx->buffer->IgnoreLiveEOF(false);
 
         SetSpeedChangeTimer(0, __LINE__);
     }
@@ -13287,7 +13304,7 @@ void TV::ShowOSDStopWatchingRecording(PlayerContext *ctx)
 
     if (StateIsLiveTV(GetState(ctx)))
         videotype = tr("Live TV");
-    else if (ctx->buffer->IsDVD())
+    else if (ctx->buffer && ctx->buffer->IsDVD())
         videotype = tr("this DVD");
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
