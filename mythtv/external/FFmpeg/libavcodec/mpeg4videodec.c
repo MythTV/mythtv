@@ -1983,15 +1983,15 @@ static int mpeg4_decode_gop_header(MpegEncContext *s, GetBitContext *gb)
     return 0;
 }
 
-static int mpeg4_decode_profile_level(MpegEncContext *s, GetBitContext *gb)
+static int mpeg4_decode_profile_level(MpegEncContext *s, GetBitContext *gb, int *profile, int *level)
 {
 
-    s->avctx->profile = get_bits(gb, 4);
-    s->avctx->level   = get_bits(gb, 4);
+    *profile = get_bits(gb, 4);
+    *level   = get_bits(gb, 4);
 
     // for Simple profile, level 0
-    if (s->avctx->profile == 0 && s->avctx->level == 8) {
-        s->avctx->level = 0;
+    if (*profile == 0 && *level == 8) {
+        *level = 0;
     }
 
     return 0;
@@ -2872,11 +2872,13 @@ static int decode_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
     return 0;
 }
 
-static void read_quant_matrix_ext(MpegEncContext *s, GetBitContext *gb)
+static int read_quant_matrix_ext(MpegEncContext *s, GetBitContext *gb)
 {
     int i, j, v;
 
     if (get_bits1(gb)) {
+        if (get_bits_left(gb) < 64*8)
+            return AVERROR_INVALIDDATA;
         /* intra_quantiser_matrix */
         for (i = 0; i < 64; i++) {
             v = get_bits(gb, 8);
@@ -2887,6 +2889,8 @@ static void read_quant_matrix_ext(MpegEncContext *s, GetBitContext *gb)
     }
 
     if (get_bits1(gb)) {
+        if (get_bits_left(gb) < 64*8)
+            return AVERROR_INVALIDDATA;
         /* non_intra_quantiser_matrix */
         for (i = 0; i < 64; i++) {
             get_bits(gb, 8);
@@ -2894,6 +2898,8 @@ static void read_quant_matrix_ext(MpegEncContext *s, GetBitContext *gb)
     }
 
     if (get_bits1(gb)) {
+        if (get_bits_left(gb) < 64*8)
+            return AVERROR_INVALIDDATA;
         /* chroma_intra_quantiser_matrix */
         for (i = 0; i < 64; i++) {
             v = get_bits(gb, 8);
@@ -2903,6 +2909,8 @@ static void read_quant_matrix_ext(MpegEncContext *s, GetBitContext *gb)
     }
 
     if (get_bits1(gb)) {
+        if (get_bits_left(gb) < 64*8)
+            return AVERROR_INVALIDDATA;
         /* chroma_non_intra_quantiser_matrix */
         for (i = 0; i < 64; i++) {
             get_bits(gb, 8);
@@ -2910,6 +2918,7 @@ static void read_quant_matrix_ext(MpegEncContext *s, GetBitContext *gb)
     }
 
     next_start_code_studio(gb);
+    return 0;
 }
 
 static void extension_and_user_data(MpegEncContext *s, GetBitContext *gb, int id)
@@ -3216,13 +3225,19 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb)
         } else if (startcode == GOP_STARTCODE) {
             mpeg4_decode_gop_header(s, gb);
         } else if (startcode == VOS_STARTCODE) {
-            mpeg4_decode_profile_level(s, gb);
-            if (s->avctx->profile == FF_PROFILE_MPEG4_SIMPLE_STUDIO &&
-                (s->avctx->level > 0 && s->avctx->level < 9)) {
+            int profile, level;
+            mpeg4_decode_profile_level(s, gb, &profile, &level);
+            if (profile == FF_PROFILE_MPEG4_SIMPLE_STUDIO &&
+                (level > 0 && level < 9)) {
                 s->studio_profile = 1;
                 next_start_code_studio(gb);
                 extension_and_user_data(s, gb, 0);
+            } else if (s->studio_profile) {
+                avpriv_request_sample(s->avctx, "Mixes studio and non studio profile\n");
+                return AVERROR_PATCHWELCOME;
             }
+            s->avctx->profile = profile;
+            s->avctx->level   = level;
         } else if (startcode == VISUAL_OBJ_STARTCODE) {
             if (s->studio_profile) {
                 if ((ret = decode_studiovisualobject(ctx, gb)) < 0)

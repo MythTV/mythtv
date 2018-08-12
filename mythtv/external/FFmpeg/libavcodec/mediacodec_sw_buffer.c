@@ -150,7 +150,7 @@ void ff_mediacodec_sw_buffer_copy_yuv420_semi_planar(AVCodecContext *avctx,
         } else if (i == 1) {
             height = avctx->height / 2;
 
-            src += s->height * s->stride;
+            src += s->slice_height * s->stride;
             src += s->crop_top * s->stride;
             src += s->crop_left;
         }
