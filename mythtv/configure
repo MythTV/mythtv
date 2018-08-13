@@ -7195,10 +7195,8 @@ if enabled source_path_used; then
         external/nzmqt/src
         external/libmythbluray
         external/libmythdvdnav
-        external/libsamplerate
         external/libudfread
         external/libmythsoundtouch
-        external/libXNVCtrl
     "
     FILES="
         Makefile
@@ -7217,10 +7215,8 @@ if enabled source_path_used; then
         external/nzmqt/src/Makefile
         external/libmythbluray/Makefile
         external/libmythdvdnav/Makefile
-        external/libsamplerate/Makefile
         external/libudfread/Makefile
         external/libmythsoundtouch/Makefile
-        external/libXNVCtrl/Makefile
     "
     map 'mkdir -p $v' $DIRS;
     map 'test -f "$source_path/$v" && $ln_s "$source_path/$v" $v' $FILES
