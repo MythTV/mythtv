@@ -266,7 +266,7 @@ class ChannelGroupSetting : public GroupSetting
   public:
     ChannelGroupSetting(const QString &groupName, int groupId);
     virtual void Load();
-    virtual void Close();
+    virtual void Save();
     virtual bool canDelete(void);
     virtual void deleteEntry(void);
 
