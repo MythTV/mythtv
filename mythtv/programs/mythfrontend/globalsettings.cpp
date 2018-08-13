@@ -4332,7 +4332,7 @@ ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
     m_groupName->setLabel(groupName);
 }
 
-void ChannelGroupSetting::Close()
+void ChannelGroupSetting::Save()
 {
     //Change the name
     if ((m_groupName && m_groupName->haveChanged())
