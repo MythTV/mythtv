@@ -1245,35 +1245,35 @@
 
     <!-- Popup dialog to enter into a spin box -->
     <window name="SpinBoxEntryDialog">
-        <area>-1,-1,620,165,800x600</area>
+        <area>-1,-1,780,330</area>
         <imagetype name="backimg">
-            <area>0,0,620,165,800x600</area>
+            <area>0,0,780,330</area>
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>5,10,600,30,800x600</area>
+            <area>6,20,756,60</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
-            <value>You may enter a value here or cancel to continue using the Spinbox.</value>
+            <value>You may enter a value here or cancel to go back.</value>
         </textarea>
 
         <textedit name="entry" from="basetextedit">
-            <area>120,40,375,50,800x600</area>
+            <area>150,80,473,75</area>
         </textedit>
 
         <button name="cancel" from="basebutton">
-            <area>20,105,150,40,800x600</area>
+            <area>25,210,189,80</area>
             <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
-            <area>445,105,150,40,800x600</area>
+            <area>560,210,189,80</area>
             <value>OK</value>
         </button>
 
         <textarea name="rules" from="basetextarea">
-            <area>210,95,200,60,800x600</area>
+            <area>264,190,252,120</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <template>Values from %LOW% to %HIGH% in increments of %STEP%</template>
