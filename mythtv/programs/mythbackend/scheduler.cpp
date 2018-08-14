@@ -3361,22 +3361,26 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
             break;
 
     // set the wakeuptime if needed
+    QDateTime restarttime;
     if (recIter != reclist.end())
     {
         RecordingInfo *nextRecording = (*recIter);
-        QDateTime restarttime = nextRecording->GetRecordingStartTime()
+        restarttime = nextRecording->GetRecordingStartTime()
             .addSecs((-1) * prerollseconds);
+    }
+    // Check if we need to wake up to grab guide data
+    QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
+    QDateTime guideRefreshTime = MythDate::fromString(str);
 
-        // Check if we need to wake up to grab guide date before the next recording
-        QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
-        QDateTime guideRefreshTime = MythDate::fromString(str);
+    if (gCoreContext->GetNumSetting("MythFillEnabled")
+        && gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime")
+        && guideRefreshTime.isValid()
+        && (guideRefreshTime > MythDate::current())
+        && (restarttime.isNull() || guideRefreshTime < restarttime))
+        restarttime = guideRefreshTime;
 
-        if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime") &&
-            guideRefreshTime.isValid() &&
-            (guideRefreshTime > MythDate::current()) &&
-            (guideRefreshTime < restarttime))
-            restarttime = guideRefreshTime;
-
+    if (restarttime.isValid())
+    {
         int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
             restarttime = restarttime.addSecs((-1) * add);
