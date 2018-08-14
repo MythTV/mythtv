@@ -250,8 +250,8 @@ bool ExternIO::KillIfRunning(const QString & cmd)
     Q_UNUSED(cmd);
     return false;
 #else
-    QString grp = QString("pgrep -x -f \"%1\" 2>&1 > /dev/null").arg(cmd);
-    QString kil = QString("pkill --signal 15 -x -f \"%1\" 2>&1 > /dev/null")
+    QString grp = QString("pgrep -x -f -- \"%1\" 2>&1 > /dev/null").arg(cmd);
+    QString kil = QString("pkill --signal 15 -x -f -- \"%1\" 2>&1 > /dev/null")
                   .arg(cmd);
     int res_grp, res_kil;
 
