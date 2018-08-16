@@ -112,9 +112,11 @@ class Playlist : public QObject
 
     void resync(void);
 
+#ifdef CD_WRTITING_FIXED
     void computeSize(double &size_in_MB, double &size_in_sec);
     int CreateCDMP3(void);
     int CreateCDAudio(void);
+#endif
 
   private slots:
     void mkisofsData(int fd);
@@ -134,9 +136,11 @@ class Playlist : public QObject
     PlaylistContainer    *m_parent;
     bool                  m_changed;
     bool                  m_doSave;
+#ifdef CD_WRTITING_FIXED
     MythProgressDialog   *m_progress;
     MythSystemLegacy     *m_proc;
     uint                  m_procExitVal;
+#endif
 };
 
 #endif
