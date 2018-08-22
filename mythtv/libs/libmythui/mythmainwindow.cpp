@@ -2881,7 +2881,7 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     float desired = 100.0;
 
 #ifdef _WIN32
-    // logicalDpiY not supported in QT3/win.
+    // logicalDpiY not supported in Windows.
     int logicalDpiY = 100;
     HDC hdc = GetDC(NULL);
     if (hdc)
