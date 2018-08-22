@@ -147,7 +147,7 @@ void WelcomeDialog::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *) e;
+        MythEvent *me = static_cast<MythEvent *>(e);
 
         if (me->Message().startsWith("RECORDING_LIST_CHANGE") ||
             me->Message() == "UPDATE_PROG_INFO")

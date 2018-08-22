@@ -4048,7 +4048,7 @@ void PlaybackBox::customEvent(QEvent *event)
     }
     else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)event;
+        MythEvent *me = static_cast<MythEvent *>(event);
         QString message = me->Message();
 
         if (message.startsWith("RECORDING_LIST_CHANGE"))

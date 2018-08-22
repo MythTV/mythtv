@@ -422,7 +422,7 @@ bool PreviewGenerator::event(QEvent *e)
     if (e->type() != (QEvent::Type) MythEvent::MythEventMessage)
         return QObject::event(e);
 
-    MythEvent *me = (MythEvent*)e;
+    MythEvent *me = static_cast<MythEvent*>(e);
     if (me->Message() != "GENERATED_PIXMAP" || me->ExtraDataCount() < 3)
         return QObject::event(e);
 

@@ -226,7 +226,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
     if (e->type() != (QEvent::Type) MythEvent::MythEventMessage)
         return QObject::event(e);
 
-    MythEvent *me = (MythEvent*)e;
+    MythEvent *me = static_cast<MythEvent*>(e);
     if (me->Message() == "GET_PREVIEW")
     {
         const QStringList &list = me->ExtraDataList();

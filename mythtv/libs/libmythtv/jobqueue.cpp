@@ -88,7 +88,7 @@ void JobQueue::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
 
         if (message.startsWith("LOCAL_JOB"))

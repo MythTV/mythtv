@@ -813,7 +813,7 @@ void EditMetadataDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)event;
+        MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (!tokens.isEmpty())
@@ -1211,7 +1211,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
     }
     else if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)event;
+        MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (!tokens.isEmpty())

@@ -1375,7 +1375,7 @@ bool MythContextPrivate::event(QEvent *e)
             m_registration = GetNotificationCenter()->Register(this);
         }
 
-        MythEvent *me = (MythEvent*)e;
+        MythEvent *me = static_cast<MythEvent*>(e);
         if (me->Message() == "VERSION_MISMATCH" && (1 == me->ExtraDataCount()))
             ShowVersionMismatchPopup(me->ExtraData(0).toUInt());
         else if (me->Message() == "CONNECTION_FAILURE")

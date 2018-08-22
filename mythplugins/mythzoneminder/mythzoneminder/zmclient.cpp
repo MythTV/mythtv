@@ -955,7 +955,7 @@ void ZMClient::customEvent (QEvent* event)
 {
     if (event->type() == MythEvent::MythEventMessage)
     {
-        MythEvent *me = dynamic_cast<MythEvent*>(event);
+        MythEvent *me = static_cast<MythEvent*>(event);
 
         if (!me)
             return;

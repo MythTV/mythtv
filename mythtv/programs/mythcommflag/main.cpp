@@ -473,7 +473,7 @@ static void incomingCustomEvent(QEvent* e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
 
         message = message.simplified();

@@ -244,7 +244,7 @@ void VideoSetupWizard::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = static_cast<MythEvent *>(e);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())

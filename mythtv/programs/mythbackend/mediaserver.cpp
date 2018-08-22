@@ -313,7 +313,7 @@ void MediaServer::customEvent( QEvent *e )
 {
     if (MythEvent::Type(e->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
 
         //-=>TODO: Need to handle events to notify clients of changes

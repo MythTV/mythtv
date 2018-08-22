@@ -251,7 +251,7 @@ void BrowserApi::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
 
         if (!message.startsWith("MUSIC_CONTROL"))
@@ -655,7 +655,7 @@ void MythWebView::customEvent(QEvent *event)
     }
     else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)event;
+        MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())

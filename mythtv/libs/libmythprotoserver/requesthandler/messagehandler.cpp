@@ -22,7 +22,7 @@ void MessageHandler::customEvent(QEvent *e)
         // only master backend should forward events
         return;
 
-    //MythEvent *me = (MythEvent *)e;
+    //MythEvent *me = static_cast<MythEvent *>(e);
 
     // TODO: actually do something
     // right now, this really doesnt need to do anything, but at such time as

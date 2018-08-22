@@ -2744,7 +2744,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)ce;
+        MythEvent *me = static_cast<MythEvent *>(ce);
         QString message = me->Message();
 
         if (message.startsWith(ACTION_HANDLEMEDIA))
@@ -2834,7 +2834,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
     {
-        MythEvent *me = (MythEvent *)ce;
+        MythEvent *me = static_cast<MythEvent *>(ce);
         QString message = me->Message();
 
         if (!message.isEmpty())

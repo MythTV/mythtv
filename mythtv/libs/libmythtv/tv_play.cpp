@@ -9411,7 +9411,7 @@ void TV::customEvent(QEvent *e)
 
     if (e->type() == MythEvent::MythUserMessage)
     {
-        MythEvent *me = reinterpret_cast<MythEvent*>(e);
+        MythEvent *me = static_cast<MythEvent*>(e);
         QString message = me->Message();
 
         if (message.isEmpty())
@@ -9518,7 +9518,7 @@ void TV::customEvent(QEvent *e)
         return;
 
     uint cardnum   = 0;
-    MythEvent *me = reinterpret_cast<MythEvent*>(e);
+    MythEvent *me = static_cast<MythEvent*>(e);
     QString message = me->Message();
 
     // TODO Go through these and make sure they make sense...

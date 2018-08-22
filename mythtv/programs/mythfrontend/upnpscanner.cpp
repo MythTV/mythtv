@@ -652,7 +652,7 @@ void UPNPScanner::customEvent(QEvent *event)
         return;
 
     // UPnP events
-    MythEvent *me  = (MythEvent *)event;
+    MythEvent *me  = static_cast<MythEvent *>(event);
     QString    ev  = me->Message();
 
     if (ev == "UPNP_STARTSCAN")

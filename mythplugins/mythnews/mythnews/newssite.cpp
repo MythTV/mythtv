@@ -153,7 +153,7 @@ void NewsSite::customEvent(QEvent *event)
 {
     if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)event;
+        MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
 
         if (tokens.isEmpty())
