@@ -181,15 +181,12 @@ QFileInfo Content::GetImageFile( const QString &sStorageGroup,
     // Must generate Generate Image and save.
     // ----------------------------------------------------------------------
 
-    float fAspect = 0.0;
-
     QImage *pImage = new QImage( sFullFileName );
 
     if (!pImage || pImage->isNull())
         return QFileInfo();
 
-    if (fAspect <= 0)
-           fAspect = (float)(pImage->width()) / pImage->height();
+    float fAspect = (float)(pImage->width()) / pImage->height();
 
     if ( nWidth == 0 )
         nWidth = (int)rint(nHeight * fAspect);
@@ -461,9 +458,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     }
     else
     {
-        float fAspect = 0.0;
-        if (fAspect <= 0)
-            fAspect = (float)(img.width()) / img.height();
+        float fAspect = (float)(img.width()) / img.height();
 
         if ( nWidth == 0 || nWidth > img.width() )
             nWidth = (int)rint(nHeight * fAspect);

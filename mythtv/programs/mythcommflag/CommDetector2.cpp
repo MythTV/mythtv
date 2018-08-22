@@ -393,16 +393,13 @@ CommDetector2::CommDetector2(
      */
     if ((commDetectMethod & COMM_DETECT_2_LOGO))
     {
-        CannyEdgeDetector       *cannyEdgeDetector = NULL;
-
         if (!pgmConverter)
             pgmConverter = new PGMConverter();
 
         if (!borderDetector)
             borderDetector = new BorderDetector();
 
-        if (!cannyEdgeDetector)
-            cannyEdgeDetector = new CannyEdgeDetector();
+        CannyEdgeDetector *cannyEdgeDetector = new CannyEdgeDetector();
 
         if (!logoFinder)
         {

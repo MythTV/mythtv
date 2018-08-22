@@ -553,11 +553,10 @@ bool VideoOutputXv::InitVideoBuffers(bool use_xv, bool use_shm)
     bool done = false;
 
     // Create ffmpeg VideoFrames
-    if (!done)
-        vbuffers.Init(31, true, 1, 12, 4, 2);
+    vbuffers.Init(31, true, 1, 12, 4, 2);
 
     // Fall back to XVideo if there is an xv_port
-    if (!done && use_xv)
+    if (use_xv)
         done = InitXVideo();
 
     // only HW accel allowed for PIP and PBP

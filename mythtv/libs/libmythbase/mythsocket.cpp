@@ -785,7 +785,7 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
                 written_since_timer_restart = 0;
             }
         }
-        else if (temp <= 0)
+        else
         {
             errorcount++;
             if (timer.elapsed() > 1000)

@@ -551,7 +551,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Requested preview for '%1'").arg(key));
         }
-        else if (attempts >= m_maxAttempts)
+        else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Attempted to generate preview for '%1' "

@@ -494,7 +494,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
         serverSock->DecrRef();
         serverSock = NULL;
 
-        if (!serverSock && (cnt == 1))
+        if (cnt == 1)
         {
             QCoreApplication::postEvent(
                 d->m_GUIcontext, new MythEvent("CONNECTION_FAILURE"));

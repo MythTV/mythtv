@@ -438,8 +438,6 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         return QFileInfo();
     }
 
-    float fAspect = 0.0;
-
     QImage *pImage = new QImage( sFullFileName );
 
     if (!pImage)
@@ -449,9 +447,7 @@ QFileInfo Guide::GetChannelIcon( int nChanId,
         return QFileInfo();
     }
 
-    if (fAspect <= 0)
-           fAspect = (float)(pImage->width()) / pImage->height();
-
+    float fAspect = (float)(pImage->width()) / pImage->height();
     if (fAspect == 0)
     {
         LOG(VB_UPNP, LOG_ERR, QString("GetImageFile - zero aspect"));
