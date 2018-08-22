@@ -838,14 +838,6 @@ bool MSqlQuery::prepare(const QString& query)
 
     m_last_prepared_query = query;
 
-    // Database connection down.  Try to restart it, give up if it's still
-    // down
-    if (!m_db)
-    {
-        // Database structure has been deleted...
-        return false;
-    }
-
     if (!m_db->isOpen() && !Reconnect())
     {
         LOG(VB_GENERAL, LOG_INFO, "MySQL server disconnected");
