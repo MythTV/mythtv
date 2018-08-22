@@ -873,6 +873,7 @@ void LogServerThread::run(void)
     }
 #endif
 
+    // cppcheck-suppress knownConditionTrueFalse
     if (!abortThread)
     {
         logForwardThread = new LogForwardThread();
