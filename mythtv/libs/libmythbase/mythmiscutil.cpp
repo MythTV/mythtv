@@ -120,11 +120,11 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
             "getMemStats(): Error, sysinfo() call failed.");
         return false;
     }
-    else
-        totalMB = (int)((sinfo.totalram  * sinfo.mem_unit)/MB),
-        freeMB  = (int)((sinfo.freeram   * sinfo.mem_unit)/MB),
-        totalVM = (int)((sinfo.totalswap * sinfo.mem_unit)/MB),
-        freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
+
+    totalMB = (int)((sinfo.totalram  * sinfo.mem_unit)/MB);
+    freeMB  = (int)((sinfo.freeram   * sinfo.mem_unit)/MB);
+    totalVM = (int)((sinfo.totalswap * sinfo.mem_unit)/MB);
+    freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
 
 #elif CONFIG_DARWIN
     mach_port_t             mp;
