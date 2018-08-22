@@ -533,10 +533,6 @@ MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
     m_returnConnection = qi.returnConnection;
 
     m_isConnected = m_db && m_db->isOpen();
-
-#ifdef DEBUG_QT4_PORT
-    m_testbindings = QRegExp("(:\\w+)\\W.*\\1\\b");
-#endif
 }
 
 MSqlQuery::~MSqlQuery()
@@ -842,18 +838,6 @@ bool MSqlQuery::prepare(const QString& query)
 
     m_last_prepared_query = query;
 
-#ifdef DEBUG_QT4_PORT
-    if (query.contains(m_testbindings))
-    {
-        LOG(VB_GENERAL, LOG_DEBUG,
-                QString("\n\nQuery contains bind value \"%1\" twice:\n\n\n")
-                .arg(m_testbindings.cap(1)) + query);
-#if 0
-        exit(1);
-#endif
-    }
-#endif
-
     // Database connection down.  Try to restart it, give up if it's still
     // down
     if (!m_db)
@@ -914,19 +898,6 @@ bool MSqlQuery::testDBConnection()
 
 void MSqlQuery::bindValue(const QString &placeholder, const QVariant &val)
 {
-#ifdef DEBUG_QT4_PORT
-    // XXX - HACK BEGIN
-    // qt4 doesn't like to bind values without occurrence in the prepared query
-    if (!m_last_prepared_query.contains(placeholder))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Trying to bind a value to placeholder " +
-                placeholder + " without occurrence in the prepared query."
-                " Ignoring it.\nQuery was: \"" + m_last_prepared_query + "\"");
-        return;
-    }
-    // XXX - HACK END
-#endif
-
     QSqlQuery::bindValue(placeholder, val, QSql::In);
 }
 
