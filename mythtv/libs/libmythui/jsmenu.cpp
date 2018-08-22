@@ -204,8 +204,6 @@ void JoystickMenuThread::run(void)
 {
     RunProlog();
 
-    int rc;
-
     fd_set readfds;
     struct js_event js;
     struct timeval timeout;
@@ -224,7 +222,7 @@ void JoystickMenuThread::run(void)
         timeout.tv_sec = 0;
         timeout.tv_usec = 100000;
 
-        rc = select(m_fd + 1, &readfds, NULL, NULL, &timeout);
+        int rc = select(m_fd + 1, &readfds, NULL, NULL, &timeout);
         if (rc == -1)
         {
             /*----------------------------------------------------------------

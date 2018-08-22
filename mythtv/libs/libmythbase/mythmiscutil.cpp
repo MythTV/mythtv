@@ -112,7 +112,7 @@ bool getUptime(time_t &uptime)
 bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 {
 #ifdef __linux__
-    size_t MB = (1024*1024);
+    const size_t MB = (1024*1024);
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) == -1)
     {
@@ -320,7 +320,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
     long long total_bytes = 0LL;
     while (ok)
     {
-        long long rlen, wlen, off = 0;
+        long long rlen, off = 0;
         rlen = src.read(buf, buflen);
         if (rlen<0)
         {
@@ -335,7 +335,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
 
         while ((rlen-off>0) && ok)
         {
-            wlen = dst.write(buf + off, rlen - off);
+            long long wlen = dst.write(buf + off, rlen - off);
             if (wlen>=0)
                 off+= wlen;
             if (wlen<0)
@@ -551,7 +551,6 @@ bool IsMACAddress(QString MAC)
 
     int y;
     bool ok;
-    int value;
     for (y = 0; y < 6; y++)
     {
         if (tokens[y].isEmpty())
@@ -562,7 +561,7 @@ bool IsMACAddress(QString MAC)
             return false;
         }
 
-        value = tokens[y].toInt(&ok, 16);
+        int value = tokens[y].toInt(&ok, 16);
         if (!ok)
         {
             LOG(VB_NETWORK, LOG_ERR,

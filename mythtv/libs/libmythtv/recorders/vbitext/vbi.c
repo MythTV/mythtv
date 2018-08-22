@@ -82,12 +82,11 @@ vbi_send(struct vbi *vbi, int type, int i1, int i2, int i3, void *p1)
 static void
 vbi_send_page(struct vbi *vbi, struct raw_page *rvtp, int page)
 {
-    struct vt_page *cvtp = 0;
-
     if (rvtp->page->flags & PG_ACTIVE)
     {
        if (rvtp->page->pgno % 256 != page)
        {
+           struct vt_page *cvtp = 0;
            rvtp->page->flags &= ~PG_ACTIVE;
            enhance(rvtp->enh, rvtp->page);
 //         if (vbi->cache)
@@ -265,7 +264,7 @@ vt_line(struct vbi *vbi, unsigned char *p)
        case 27:
        {
            // FLOF data (FastText)
-           int b1,b2,b3,x;
+           int b1,b2;
 
            if (~cvtp->flags & PG_ACTIVE)
                return 0; // -1 flushes all pages.  we may never resync again :(
@@ -282,10 +281,10 @@ vt_line(struct vbi *vbi, unsigned char *p)
                err = 0;
                b1 = hamm16(p+1+6*i, &err);
                b2 = hamm16(p+3+6*i, &err);
-               b3 = hamm16(p+5+6*i, &err);
+               int b3 = hamm16(p+5+6*i, &err);
                if (err & 0xf000)
                    return 1;
-               x = (b2 >> 7) | ((b3 >> 5) & 0x06);
+               int x = (b2 >> 7) | ((b3 >> 5) & 0x06);
                cvtp->link[i].pgno = ((mag ^ x) ?: 8) * 256 + b1;
                cvtp->link[i].subno = (b2 + b3 * 256) & 0x3f7f;
            }
@@ -400,7 +399,7 @@ vbi_line(struct vbi *vbi, unsigned char *p)
 void
 vbi_handler(struct vbi *vbi, int fd)
 {
-    int n, i;
+    int n;
     unsigned int seq;
 
     (void)fd;
@@ -425,14 +424,14 @@ vbi_handler(struct vbi *vbi, int fd)
     if (seq > 1)       // the first may contain data from prev channel
     {
 #if 1
-       for (i = 0; i+vbi->bpl <= n; i += vbi->bpl)
+       for (int i = 0; i+vbi->bpl <= n; i += vbi->bpl)
            vbi_line(vbi, rawbuf + i);
 #else
         /* work-around for old saa7134 driver versions (prior 0.2.6) */
-       for (i = 16 * vbi->bpl; i + vbi->bpl <= n; i += vbi->bpl)
+       for (int i = 16 * vbi->bpl; i + vbi->bpl <= n; i += vbi->bpl)
            vbi_line(vbi, rawbuf + i);
 
-       for (i = 0; i + vbi->bpl <= 16 * vbi->bpl; i += vbi->bpl)
+       for (int i = 0; i + vbi->bpl <= 16 * vbi->bpl; i += vbi->bpl)
            vbi_line(vbi, rawbuf + i);
 #endif
     }

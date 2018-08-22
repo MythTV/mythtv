@@ -369,7 +369,7 @@ void ModuleDescriptorData::Process(const unsigned char *data, int length)
 
 int BiopModuleInfo::Process(const unsigned char *data)
 {
-    int off, ret;
+    int off;
     mod_timeout   = COMBINE32(data, 0);
     block_timeout = COMBINE32(data, 4);
     min_blocktime = COMBINE32(data, 8);
@@ -385,7 +385,7 @@ int BiopModuleInfo::Process(const unsigned char *data)
     if (taps_count > 0)
     {
         /* only 1 allowed TODO - may not be first though ? */
-        ret = tap.Process(data + off);
+        int ret = tap.Process(data + off);
         if (ret <= 0)
             return ret;
         off += ret;
@@ -437,7 +437,7 @@ int BiopTap::Process(const unsigned char *data)
 
 int BiopConnbinder::Process(const unsigned char *data)
 {
-    int off = 0, ret;
+    int off = 0;
 
     component_tag = COMBINE32(data, 0);
     if (0x49534F40 != component_tag)
@@ -451,7 +451,7 @@ int BiopConnbinder::Process(const unsigned char *data)
     if (taps_count > 0)
     {
         /* UKProfile - only first tap read */
-        ret = tap.Process(data + off);
+        int ret = tap.Process(data + off);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("Binder - assoc_tag %1")
                                        .arg(tap.assoc_tag));

@@ -629,11 +629,10 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, const QString &app_name,
 
 
     QListIterator<LCDMenuItem> it(menuItems);
-    const LCDMenuItem *curItem;
 
     while (it.hasNext())
     {
-        curItem = &(it.next());
+        const LCDMenuItem *curItem = &(it.next());
         s += ' ' + quotedString(curItem->ItemName());
 
         if (curItem->isChecked() == CHECKED)
@@ -666,11 +665,10 @@ void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
     QString s = "SWITCH_TO_GENERIC";
 
     QListIterator<LCDTextItem> it(textItems);
-    const LCDTextItem *curItem;
 
     while (it.hasNext())
     {
-        curItem = &(it.next());
+        const LCDTextItem *curItem = &(it.next());
 
         QString sRow;
         sRow.setNum(curItem->getRow());

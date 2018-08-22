@@ -644,11 +644,11 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
     dstFile.SetBlocking(true);
 
     bool success = true;
-    int srcLen, dstLen;
+    int srcLen;
 
     while ((srcLen = srcFile.Read(buf, readSize)) > 0)
     {
-        dstLen = dstFile.Write(buf, srcLen);
+        int dstLen = dstFile.Write(buf, srcLen);
 
         if (dstLen == -1 || srcLen != dstLen)
         {

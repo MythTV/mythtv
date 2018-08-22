@@ -33,10 +33,10 @@ uint sig_str_len[SIG_STR_COUNT];
 
 static void sig_str_init(int sig, const char *name)
 {
-    char line[128];
-
     if (sig < SIG_STR_COUNT)
     {
+        char line[128];
+
         if (sig_str[sig])
             free(sig_str[sig]);
         snprintf(line, 128, "Handling %s\n", name);

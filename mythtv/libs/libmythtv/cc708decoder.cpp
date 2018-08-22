@@ -608,8 +608,6 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     const unsigned char* pkt_buf = pkt->data;
     const int pkt_size = pkt->size;
     int off = 1;
-    int service_number = 0;
-    int block_data_offset = 0;
     int len     = ((((int)pkt_buf[0]) & 0x3f)<<1) - 1;
 
     if (len < 0)
@@ -640,8 +638,8 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
     while (off < pkt_size && pkt_buf[off])
     { // service_block
         int block_size = pkt_buf[off] & 0x1f;
-        service_number = (pkt_buf[off]>>5) & 0x7;
-        block_data_offset = (0x7==service_number && block_size!=0) ?
+        int service_number = (pkt_buf[off]>>5) & 0x7;
+        int block_data_offset = (0x7==service_number && block_size!=0) ?
             off+2 : off+1;
 #if DEBUG_CC_SERVICE_BLOCK
         LOG(VB_VBI, LOG_DEBUG,

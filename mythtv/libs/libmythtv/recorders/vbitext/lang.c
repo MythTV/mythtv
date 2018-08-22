@@ -103,10 +103,11 @@ lang_init(void)
 void
 conv2latin(unsigned char *p, int n, int lang)
 {
-    int c, gfx = 0;
+    int gfx = 0;
 
     while (n--)
     {
+       int c;
        if (lang_char[c = *p])
        {
            if (! gfx || (c & 0xa0) != 0x20)

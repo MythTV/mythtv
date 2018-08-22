@@ -303,6 +303,7 @@ bool AudioInputALSA::Recovery(int err)
     if (err > 0)
         err = -err;
     bool isgood = false;
+    // cppcheck-suppress variableScope
     bool suspense = false;
     switch (err)
     {

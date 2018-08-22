@@ -209,7 +209,6 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
 {
     struct v4l2_querymenu qmenu;
     QString  nameStr((char *)queryctrl.name);
-    int      idx;
 
     memset(&qmenu, 0, sizeof(qmenu));
     qmenu.id = queryctrl.id;
@@ -352,7 +351,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
     if (queryctrl.type == V4L2_CTRL_TYPE_MENU ||
         queryctrl.type == V4L2_CTRL_TYPE_INTEGER_MENU)
     {
-        for (idx = queryctrl.minimum; idx <= queryctrl.maximum; ++idx)
+        for (int idx = queryctrl.minimum; idx <= queryctrl.maximum; ++idx)
         {
             qmenu.index = idx;
             if (v4l2_ioctl(m_fd, VIDIOC_QUERYMENU, &qmenu))

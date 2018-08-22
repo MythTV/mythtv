@@ -106,7 +106,6 @@ void StorageGroup::StaticInit(void)
 void StorageGroup::Init(const QString &group, const QString &hostname,
                         const bool allowFallback)
 {
-    bool found = false;
     m_groupname = group;    m_groupname.detach();
     m_hostname  = hostname; m_hostname.detach();
     m_allowFallback = allowFallback;
@@ -114,7 +113,7 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
 
     StaticInit();
 
-    found = FindDirs(m_groupname, m_hostname, &m_dirlist);
+    bool found = FindDirs(m_groupname, m_hostname, &m_dirlist);
 
     if (!found && m_builtinGroups.contains(group))
     {

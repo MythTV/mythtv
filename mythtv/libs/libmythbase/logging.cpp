@@ -636,8 +636,6 @@ void LoggerThread::handleItem(LoggingItem *item)
 bool LoggerThread::logConsole(LoggingItem *item)
 {
     char                line[MAX_STRING_LENGTH];
-    char                usPart[9];
-    char                timestamp[TIMESTAMP_MAX];
 
     if (m_quiet || (m_progress && item->m_level > LOG_ERR))
         return false;
@@ -651,6 +649,8 @@ bool LoggerThread::logConsole(LoggingItem *item)
         snprintf( line, MAX_STRING_LENGTH, "%s", item->m_message );
     else
     {
+        char   usPart[9];
+        char   timestamp[TIMESTAMP_MAX];
         time_t epoch = item->epoch();
         struct tm tm;
         localtime_r(&epoch, &tm);

@@ -777,9 +777,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
         return false;
     }
 
-    HLSRecStream *hls;
     HLSRecSegment seg;
-    long          throttle;
     for (;;)
     {
         m_seq_lock.lock();
@@ -809,7 +807,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
         m_seq_lock.unlock();
 
         m_stream_lock.lock();
-        hls = m_curstream;
+        HLSRecStream *hls = m_curstream;
         m_stream_lock.unlock();
         if (!hls)
         {
@@ -817,7 +815,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
             return false;
         }
 
-        throttle = DownloadSegmentData(downloader, hls,
+        long throttle = DownloadSegmentData(downloader, hls,
                                        seg, m_playlist_size);
 
         m_seq_lock.lock();
@@ -885,7 +883,6 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
                                    HLSRecSegment& segment, int playlist_size)
 {
     uint64_t bandwidth = hls->AverageBandwidth();
-    int estimated_time = 0;
 
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Downloading %1 bandwidth %2 bitrate %3")
@@ -895,7 +892,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     if ((bandwidth > 0) && (hls->Bitrate() > 0))
     {
         uint64_t size = (segment.Duration() * hls->Bitrate()); /* bits */
-        estimated_time = (int)(size / bandwidth);
+        int estimated_time = (int)(size / bandwidth);
         if (estimated_time > segment.Duration())
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +

@@ -228,11 +228,10 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
     uint bytes_read = 0;
     if (IsOpen())
     {
-        int this_read;
         int retries = 0;
         while (bytes_read < num_bytes && retries < 3)
         {
-            this_read = read(dsp_fd, buffer, num_bytes - bytes_read);
+            int this_read = read(dsp_fd, buffer, num_bytes - bytes_read);
             if (this_read < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC_DEV +

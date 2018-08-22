@@ -245,6 +245,7 @@ QString AudioStreamDescriptor::SampleRateCodeString(void) const
 
 QString AudioStreamDescriptor::BitRateCodeString(void) const
 {
+    // cppcheck-suppress variableScope
     static const char* ebr[19] =
     {
         "=32kbps",  "=40kbps",  "=48kbps",  "=56kbps",  "=64kbps",
