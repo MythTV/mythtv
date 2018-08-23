@@ -129,6 +129,7 @@ class MTV_PUBLIC TSPacket : public TSHeader
     friend class PESPacket;
   public:
     /* note: payload is intenionally left uninitialized */
+    // cppcheck-suppress uninitMemberVar
     TSPacket() : TSHeader() { }
 
     static TSPacket* CreatePayloadOnlyPacket()
