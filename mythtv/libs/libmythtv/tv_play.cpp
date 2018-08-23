@@ -12547,47 +12547,47 @@ void TV::PlaybackMenuShow(const MenuBase &menu,
 void TV::MenuStrings(void) const
 {
     // Playback menu
-    tr("Playback Menu");
-    tr("Playback Compact Menu");
-    tr("Audio");
-    tr("Select Audio Track");
-    tr("Visualisation");
-    tr("Video");
-    tr("Change Aspect Ratio");
-    tr("Adjust Fill");
-    tr("Adjust Picture");
-    tr("3D");
-    tr("Advanced");
-    tr("Video Scan");
-    tr("Deinterlacer");
-    tr("Subtitles");
-    tr("Select Subtitle");
-    tr("Text Subtitles");
-    tr("Select ATSC CC");
-    tr("Select VBI CC");
-    tr("Select Teletext CC");
-    tr("Playback");
-    tr("Adjust Time Stretch");
-    tr("Picture-in-Picture");
-    tr("Sleep");
-    tr("Channel Groups");
-    tr("Navigate");
-    tr("Commercial Auto-Skip");
-    tr("Chapter");
-    tr("Angle");
-    tr("Title");
-    tr("Schedule");
-    tr("Source");
-    tr("Jump to Program");
-    tr("Switch Input");
-    tr("Switch Source");
-    tr("Jobs");
-    tr("Begin Transcoding");
+    (void)tr("Playback Menu");
+    (void)tr("Playback Compact Menu");
+    (void)tr("Audio");
+    (void)tr("Select Audio Track");
+    (void)tr("Visualisation");
+    (void)tr("Video");
+    (void)tr("Change Aspect Ratio");
+    (void)tr("Adjust Fill");
+    (void)tr("Adjust Picture");
+    (void)tr("3D");
+    (void)tr("Advanced");
+    (void)tr("Video Scan");
+    (void)tr("Deinterlacer");
+    (void)tr("Subtitles");
+    (void)tr("Select Subtitle");
+    (void)tr("Text Subtitles");
+    (void)tr("Select ATSC CC");
+    (void)tr("Select VBI CC");
+    (void)tr("Select Teletext CC");
+    (void)tr("Playback");
+    (void)tr("Adjust Time Stretch");
+    (void)tr("Picture-in-Picture");
+    (void)tr("Sleep");
+    (void)tr("Channel Groups");
+    (void)tr("Navigate");
+    (void)tr("Commercial Auto-Skip");
+    (void)tr("Chapter");
+    (void)tr("Angle");
+    (void)tr("Title");
+    (void)tr("Schedule");
+    (void)tr("Source");
+    (void)tr("Jump to Program");
+    (void)tr("Switch Input");
+    (void)tr("Switch Source");
+    (void)tr("Jobs");
+    (void)tr("Begin Transcoding");
 
     // Cutlist editor menu
-    tr("Edit Cut Points");
-    tr("Edit Cut Points (Compact)");
-    tr("Cut List Options");
+    (void)tr("Edit Cut Points");
+    (void)tr("Edit Cut Points (Compact)");
+    (void)tr("Cut List Options");
 }
 
 void TV::ShowOSDMenu(bool isCompact)
