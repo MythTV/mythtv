@@ -990,6 +990,7 @@ void NuppelVideoRecorder::ResizeVideoBuffers(void)
 
 void NuppelVideoRecorder::StreamAllocate(void)
 {
+    delete [] strm;
     strm = new signed char[width * height * 2 + 10];
 }
 
