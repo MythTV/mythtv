@@ -2675,7 +2675,7 @@ void HLSRingBuffer::WaitUntilBuffered(void)
         return;
 
     if (m_streamworker->GotBufferedSegments(m_playback->Segment(), 2) ||
-        (!live && (live || m_streamworker->IsAtEnd())))
+        (!live && m_streamworker->IsAtEnd()))
     {
         return;
     }
@@ -2688,7 +2688,7 @@ void HLSRingBuffer::WaitUntilBuffered(void)
     int retries = 0;
     while (!m_error && !m_interrupted &&
            (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
-           (live || (!live && !m_streamworker->IsAtEnd())))
+           (live || !m_streamworker->IsAtEnd()))
     {
         m_streamworker->WaitForSignal(1000);
         retries++;

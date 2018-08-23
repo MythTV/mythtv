@@ -1205,6 +1205,10 @@ void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
     m_busyIndicatorSize = 2.0f;
     m_genericProgress = 0.0;
 
+    // Return if there are no more items
+    if (textItems->isEmpty())
+        return;
+
     // Todo, make scrolling definable in LCDTextItem
     ++it;
 

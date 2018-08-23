@@ -629,7 +629,7 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
     }
     else if (description)
     {
-        if (!valid || (valid && !ParseDescription(url, reply)))
+        if (!valid || !ParseDescription(url, reply))
         {
             // if there will be no more attempts, update the logs
             CheckFailure(url);

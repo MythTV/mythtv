@@ -1071,8 +1071,7 @@ static void update_info(ChannelInsertInfo &info,
     info.atsc_major_channel = vct->MajorChannel(i);
     info.atsc_minor_channel = vct->MinorChannel(i);
 
-    info.use_on_air_guide = !vct->IsHidden(i) ||
-        (vct->IsHidden(i) && !vct->IsHiddenInGuide(i));
+    info.use_on_air_guide = !vct->IsHidden(i) || !vct->IsHiddenInGuide(i);
 
     info.hidden           = vct->IsHidden(i);
     info.hidden_in_guide  = vct->IsHiddenInGuide(i);

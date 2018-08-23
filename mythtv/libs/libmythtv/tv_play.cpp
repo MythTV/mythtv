@@ -8934,8 +8934,7 @@ void TV::EditSchedule(const PlayerContext */*ctx*/, int editType)
 void TV::ChangeVolume(PlayerContext *ctx, bool up, int newvolume)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
-    if (!ctx->player ||
-        (ctx->player && !ctx->player->PlayerControlsVolume()))
+    if (!ctx->player || !ctx->player->PlayerControlsVolume())
     {
         ctx->UnlockDeletePlayer(__FILE__, __LINE__);
         return;
