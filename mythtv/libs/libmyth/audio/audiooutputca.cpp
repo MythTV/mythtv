@@ -949,6 +949,7 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
         return NULL;
     }
 
+    // cppcheck-suppress sizeofDivisionMemfunc
     finallist = (int *)malloc(((listSize / sizeof(AudioValueRange)) + 1)
                               * sizeof(int));
     if (finallist == NULL)
