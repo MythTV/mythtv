@@ -206,7 +206,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
     if (key.startsWith("date"))
     {
         bool isNumber;
-        value.toInt( &isNumber);
+        (void)value.toInt( &isNumber);
 
         if (isNumber)
         {

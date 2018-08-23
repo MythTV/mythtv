@@ -703,7 +703,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         {
             QString chanNum = actions[0];
             bool isNum;
-            chanNum.toInt(&isNum);
+            (void)chanNum.toInt(&isNum);
             if (isNum)
             {
                 // see if we can find a matching channel before creating the JumpToChannel otherwise

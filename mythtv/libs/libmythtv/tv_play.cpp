@@ -4158,7 +4158,7 @@ bool TV::ProcessKeypressOrGesture(PlayerContext *actx, QEvent *e)
         if (HasQueuedInput() && (1 == txt.length()))
         {
             bool ok = false;
-            txt.toInt(&ok, 16);
+            (void)txt.toInt(&ok, 16);
             if (ok || txt=="_" || txt=="-" || txt=="#" || txt==".")
             {
                 AddKeyToInputQueue(actx, txt.at(0).toLatin1());
