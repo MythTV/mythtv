@@ -52,7 +52,7 @@ ChannelScanner::ChannelScanner() :
 #ifdef USING_VBOX
     vboxScanner(NULL),
 #endif
-    freeToAirOnly(false), serviceRequirements(kRequireAV)
+    freeToAirOnly(false), addFullTS(false), serviceRequirements(kRequireAV)
 {
 }
 
