@@ -377,7 +377,7 @@ void DXVA2Decoder::DestroyDecoder(void)
 
 void* DXVA2Decoder::GetSurface(uint num)
 {
-    if (num < 0 || num >= m_context.surface_count)
+    if (num >= m_context.surface_count)
         return NULL;
     return (void*)m_context.surface[num];
 }
