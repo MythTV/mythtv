@@ -21,7 +21,7 @@ class PrivateDecoderCrystalHD;
 class FetcherThread : public MThread
 {
   public:
-    FetcherThread(PrivateDecoderCrystalHD *dec)
+    explicit FetcherThread(PrivateDecoderCrystalHD *dec)
       : MThread("Fetcher"), m_dec(dec) { }
 
   protected:
