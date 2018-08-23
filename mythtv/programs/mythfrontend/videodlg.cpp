@@ -640,21 +640,19 @@ class ItemDetailPopup : public MythScreenType
   protected:
     bool keyPressEvent(QKeyEvent *levent)
     {
-        if (!MythScreenType::keyPressEvent(levent))
+        if (MythScreenType::keyPressEvent(levent))
+            return true;
+
+        QStringList actions;
+        bool handled = GetMythMainWindow()->TranslateKeyPress("Video",
+                       levent, actions);
+        if (!handled && !OnKeyAction(actions))
         {
-            QStringList actions;
-            bool handled = GetMythMainWindow()->TranslateKeyPress("Video",
-                           levent, actions);
-
-            if (!handled && !OnKeyAction(actions))
-            {
-                handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend",
-                        levent, actions);
-                OnKeyAction(actions);
-            }
+            handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend",
+                    levent, actions);
+            OnKeyAction(actions);
         }
-
-        return true;
+        return handled;
     }
 
   private:
