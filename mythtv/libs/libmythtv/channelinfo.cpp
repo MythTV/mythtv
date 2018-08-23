@@ -176,10 +176,10 @@ void ChannelInfo::Init()
 
 bool ChannelInfo::Load(uint lchanid)
 {
-    if (lchanid <= 0 && chanid <= 0)
+    if (lchanid == 0 && chanid == 0)
         return false;
 
-    if (lchanid <= 0)
+    if (lchanid == 0)
         lchanid = chanid;
 
     MSqlQuery query(MSqlQuery::InitCon());

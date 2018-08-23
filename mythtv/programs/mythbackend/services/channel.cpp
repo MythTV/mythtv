@@ -124,7 +124,7 @@ DTC::ChannelInfoList* Channel::GetChannelInfoList( uint nSourceID,
 
 DTC::ChannelInfo* Channel::GetChannelInfo( uint nChanID )
 {
-    if (nChanID <= 0)
+    if (nChanID == 0)
         throw( QString("Channel ID appears invalid."));
 
     DTC::ChannelInfo *pChannelInfo = new DTC::ChannelInfo();

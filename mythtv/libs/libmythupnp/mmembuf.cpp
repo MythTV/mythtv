@@ -69,7 +69,7 @@ MMembuf::~MMembuf()
 */
 bool MMembuf::consumeBytes(quint64 nbytes, char *sink)
 {
-    if (nbytes <= 0 || (qint64)nbytes > _size)
+    if (nbytes == 0 || (qint64)nbytes > _size)
         return false;
     _size -= nbytes;
     while (!buf.isEmpty()) {

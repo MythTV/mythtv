@@ -1242,7 +1242,7 @@ void BDRingBuffer::ClickButton(int64_t pts, uint16_t x, uint16_t y)
     if (!bdnav)
         return;
 
-    if (pts <= 0 || x <= 0 || y <= 0)
+    if (pts <= 0 || x == 0 || y == 0)
         return;
 
     bd_mouse_select(bdnav, pts, x, y);

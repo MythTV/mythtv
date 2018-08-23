@@ -11566,7 +11566,7 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &c)
         }
         else if (actionName == "DIALOG_CUTPOINT_CUTTOBEGINNING_0")
         {
-            if (previous_cut <= 0 &&
+            if (previous_cut == 0 &&
                 (is_temporary_mark || !is_in_delete))
             {
                 BUTTON(actionName, tr("Cut to Beginning"));

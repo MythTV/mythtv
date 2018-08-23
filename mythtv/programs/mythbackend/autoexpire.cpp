@@ -213,7 +213,7 @@ void AutoExpire::CalcParams()
                 }
 
                 uint64_t maxBitrate = enc->GetMaxBitrate();
-                if (maxBitrate<=0)
+                if (maxBitrate==0)
                     maxBitrate = 19500000LL;
                 thisKBperMin += (((uint64_t)maxBitrate)*((uint64_t)15))>>11;
                 LOG(VB_FILE, LOG_INFO, QString("    Cardid %1: max bitrate "

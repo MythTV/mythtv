@@ -1249,7 +1249,7 @@ bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  bool      bAutoUserJob4,
                                  int       nTranscoder)
 {
-    if (nRecordId <= 0 )
+    if (nRecordId == 0 )
         throw QString("Record ID is invalid.");
 
     RecordingRule pRule;
@@ -1370,7 +1370,7 @@ bool Dvr::RemoveRecordSchedule ( uint nRecordId )
 {
     bool bResult = false;
 
-    if (nRecordId <= 0 )
+    if (nRecordId == 0 )
         throw QString("Record ID does not exist.");
 
     RecordingRule pRule;
@@ -1528,7 +1528,7 @@ bool Dvr::EnableRecordSchedule ( uint nRecordId )
 {
     bool bResult = false;
 
-    if (nRecordId <= 0 )
+    if (nRecordId == 0 )
         throw QString("Record ID appears invalid.");
 
     RecordingRule pRule;
@@ -1548,7 +1548,7 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
 {
     bool bResult = false;
 
-    if (nRecordId <= 0 )
+    if (nRecordId == 0 )
         throw QString("Record ID appears invalid.");
 
     RecordingRule pRule;
