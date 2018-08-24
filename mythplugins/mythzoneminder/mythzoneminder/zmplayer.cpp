@@ -67,11 +67,8 @@ void ZMPlayer::stopPlayer(void)
 
 bool ZMPlayer::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("zoneminder-ui.xml", "zmplayer", this);
-
+    bool foundtheme = LoadWindowFromXML("zoneminder-ui.xml", "zmplayer", this);
     if (!foundtheme)
         return false;
 
@@ -191,9 +188,8 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Playback", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("TV Playback", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

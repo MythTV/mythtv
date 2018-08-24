@@ -24,11 +24,8 @@ EditMetadataDialog::EditMetadataDialog(
 
 bool EditMetadataDialog::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mythburn-ui.xml", "edit_metadata", this);
-
+    bool foundtheme = LoadWindowFromXML("mythburn-ui.xml", "edit_metadata", this);
     if (!foundtheme)
         return false;
 

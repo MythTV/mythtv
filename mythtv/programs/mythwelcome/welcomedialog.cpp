@@ -65,11 +65,8 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
 
 bool WelcomeDialog::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("welcome-ui.xml", "welcome_screen", this);
-
+    bool foundtheme = LoadWindowFromXML("welcome-ui.xml", "welcome_screen", this);
     if (!foundtheme)
         return false;
 
@@ -224,9 +221,8 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Welcome", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Welcome", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

@@ -47,11 +47,8 @@ IdleScreen::~IdleScreen()
 
 bool IdleScreen::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("status-ui.xml", "standbymode", this);
-
+    bool foundtheme = LoadWindowFromXML("status-ui.xml", "standbymode", this);
     if (!foundtheme)
         return false;
 

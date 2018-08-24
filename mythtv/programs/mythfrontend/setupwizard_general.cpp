@@ -29,11 +29,8 @@ GeneralSetupWizard::GeneralSetupWizard(MythScreenStack *parent, const char *name
 
 bool GeneralSetupWizard::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("config-ui.xml", "generalwizard", this);
-
+    bool foundtheme = LoadWindowFromXML("config-ui.xml", "generalwizard", this);
     if (!foundtheme)
         return false;
 

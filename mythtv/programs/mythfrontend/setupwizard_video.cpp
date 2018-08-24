@@ -43,11 +43,8 @@ VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
 
 bool VideoSetupWizard::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("config-ui.xml", "videowizard", this);
-
+    bool foundtheme = LoadWindowFromXML("config-ui.xml", "videowizard", this);
     if (!foundtheme)
         return false;
 

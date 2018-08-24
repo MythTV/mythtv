@@ -689,8 +689,7 @@ GuideGrid::~GuideGrid()
 bool GuideGrid::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
-    bool handled = false;
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
 
     if (handled)
         return true;

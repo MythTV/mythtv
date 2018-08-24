@@ -22,10 +22,8 @@ PlaylistView::~PlaylistView()
 
 bool PlaylistView::Create(void)
 {
-    bool err = false;
-
     // Load the theme for this screen
-    err = LoadWindowFromXML("music-ui.xml", "playlistview", this);
+    bool err = LoadWindowFromXML("music-ui.xml", "playlistview", this);
 
     if (!err)
         return false;

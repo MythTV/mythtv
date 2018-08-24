@@ -32,11 +32,8 @@ AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent,
 
 bool AudioSetupWizard::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("config-ui.xml", "audiowizard", this);
-
+    bool foundtheme = LoadWindowFromXML("config-ui.xml", "audiowizard", this);
     if (!foundtheme)
         return false;
 

@@ -181,11 +181,8 @@ ArchiveFileSelector::~ArchiveFileSelector(void)
 
 bool ArchiveFileSelector::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mythnative-ui.xml", "archivefile_selector", this);
-
+    bool foundtheme = LoadWindowFromXML("mythnative-ui.xml", "archivefile_selector", this);
     if (!foundtheme)
         return false;
 
@@ -329,11 +326,8 @@ ImportNative::~ImportNative()
 
 bool ImportNative::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mythnative-ui.xml", "importnative", this);
-
+    bool foundtheme = LoadWindowFromXML("mythnative-ui.xml", "importnative", this);
     if (!foundtheme)
         return false;
 
@@ -403,9 +397,8 @@ bool ImportNative::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

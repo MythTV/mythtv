@@ -24,11 +24,8 @@ TvPlayWindow::~TvPlayWindow()
 
 bool TvPlayWindow::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = CopyWindowFromBase("videowindow", this);
-
+    bool foundtheme = CopyWindowFromBase("videowindow", this);
     if (!foundtheme)
     {
         LOG(VB_GENERAL, LOG_ERR,

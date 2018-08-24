@@ -27,11 +27,8 @@ KeyGrabPopupBox::~KeyGrabPopupBox()
 
 bool KeyGrabPopupBox::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("controls-ui.xml", "keygrabpopup", this);
-
+    bool foundtheme = LoadWindowFromXML("controls-ui.xml", "keygrabpopup", this);
     if (!foundtheme)
         return false;
 

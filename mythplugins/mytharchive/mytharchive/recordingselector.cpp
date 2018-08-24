@@ -79,11 +79,8 @@ RecordingSelector::~RecordingSelector(void)
 
 bool RecordingSelector::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "recording_selector", this);
-
+    bool foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "recording_selector", this);
     if (!foundtheme)
         return false;
 
@@ -176,9 +173,8 @@ bool RecordingSelector::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

@@ -34,11 +34,8 @@ BrowserConfig::BrowserConfig(MythScreenStack *parent, const char *name) :
 
 bool BrowserConfig::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("browser-ui.xml", "browserconfig", this);
-
+    bool foundtheme = LoadWindowFromXML("browser-ui.xml", "browserconfig", this);
     if (!foundtheme)
         return false;
 
@@ -155,11 +152,8 @@ BookmarkManager::BookmarkManager(MythScreenStack *parent, const char *name)
 
 bool BookmarkManager::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("browser-ui.xml", "bookmarkmanager", this);
-
+    bool foundtheme = LoadWindowFromXML("browser-ui.xml", "bookmarkmanager", this);
     if (!foundtheme)
         return false;
 
@@ -268,9 +262,8 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

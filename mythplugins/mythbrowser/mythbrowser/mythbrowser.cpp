@@ -333,9 +333,8 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Browser", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Browser", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

@@ -64,11 +64,8 @@ ImportIconsWizard::~ImportIconsWizard()
 
 bool ImportIconsWizard::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("config-ui.xml", "iconimport", this);
-
+    bool foundtheme = LoadWindowFromXML("config-ui.xml", "iconimport", this);
     if (!foundtheme)
         return false;
 

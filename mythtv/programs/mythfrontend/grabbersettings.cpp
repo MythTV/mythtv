@@ -29,11 +29,8 @@ GrabberSettings::GrabberSettings(MythScreenStack *parent, const char *name)
 
 bool GrabberSettings::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("config-ui.xml", "grabbersettings", this);
-
+    bool foundtheme = LoadWindowFromXML("config-ui.xml", "grabbersettings", this);
     if (!foundtheme)
         return false;
 

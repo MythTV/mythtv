@@ -89,11 +89,8 @@ void MythControls::Teardown(void)
  */
 bool MythControls::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("controls-ui.xml", "controls", this);
-
+    bool foundtheme = LoadWindowFromXML("controls-ui.xml", "controls", this);
     if (!foundtheme)
         return false;
 

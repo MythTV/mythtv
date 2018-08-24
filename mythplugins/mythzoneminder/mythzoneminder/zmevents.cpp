@@ -63,11 +63,8 @@ ZMEvents::~ZMEvents()
 
 bool ZMEvents::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("zoneminder-ui.xml", "zmevents", this);
-
+    bool foundtheme = LoadWindowFromXML("zoneminder-ui.xml", "zmevents", this);
     if (!foundtheme)
         return false;
 
@@ -127,9 +124,8 @@ bool ZMEvents::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Playback", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("TV Playback", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

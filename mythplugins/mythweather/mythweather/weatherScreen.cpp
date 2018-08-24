@@ -40,12 +40,8 @@ WeatherScreen::~WeatherScreen()
 
 bool WeatherScreen::Create()
 {
-
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("weather-ui.xml", m_name, this);
-
+    bool foundtheme = LoadWindowFromXML("weather-ui.xml", m_name, this);
     if (!foundtheme)
         return false;
 

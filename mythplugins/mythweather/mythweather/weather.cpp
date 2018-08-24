@@ -70,11 +70,8 @@ Weather::~Weather()
 
 bool Weather::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("weather-ui.xml", "weatherbase", this);
-
+    bool foundtheme = LoadWindowFromXML("weather-ui.xml", "weatherbase", this);
     if (!foundtheme)
     {
         LOG(VB_GENERAL, LOG_ERR, "Missing required window - weatherbase.");
@@ -258,9 +255,8 @@ bool Weather::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Weather", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Weather", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

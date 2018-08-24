@@ -530,9 +530,8 @@ bool ScheduleEditor::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->
+    bool handled = GetMythMainWindow()->
         TranslateKeyPress("TV Frontend", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
@@ -899,9 +898,8 @@ bool SchedEditChild::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->
+    bool handled = GetMythMainWindow()->
         TranslateKeyPress("TV Frontend", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)

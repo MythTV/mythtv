@@ -25,11 +25,8 @@ PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
 
 bool PlayerSettings::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("video-ui.xml", "playersettings", this);
-
+    bool foundtheme = LoadWindowFromXML("video-ui.xml", "playersettings", this);
     if (!foundtheme)
         return false;
 

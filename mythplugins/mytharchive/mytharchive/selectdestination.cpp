@@ -60,11 +60,8 @@ SelectDestination::~SelectDestination(void)
 
 bool SelectDestination::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "selectdestination", this);
-
+    bool foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "selectdestination", this);
     if (!foundtheme)
         return false;
 
@@ -121,9 +118,8 @@ bool SelectDestination::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

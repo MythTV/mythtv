@@ -25,11 +25,8 @@ ProgDetails::ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo) :
 
 bool ProgDetails::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("schedule-ui.xml", "programdetails", this);
-
+    bool foundtheme = LoadWindowFromXML("schedule-ui.xml", "programdetails", this);
     if (!foundtheme)
         return false;
 

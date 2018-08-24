@@ -53,11 +53,8 @@ DVDThemeSelector::~DVDThemeSelector(void)
 
 bool DVDThemeSelector::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mythburn-ui.xml", "themeselector", this);
-
+    bool foundtheme = LoadWindowFromXML("mythburn-ui.xml", "themeselector", this);
     if (!foundtheme)
         return false;
 

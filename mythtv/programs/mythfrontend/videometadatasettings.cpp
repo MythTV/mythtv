@@ -26,11 +26,8 @@ MetadataSettings::MetadataSettings(MythScreenStack *parent, const char *name)
 
 bool MetadataSettings::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("video-ui.xml", "metadatasettings", this);
-
+    bool foundtheme = LoadWindowFromXML("video-ui.xml", "metadatasettings", this);
     if (!foundtheme)
         return false;
 

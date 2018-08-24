@@ -75,11 +75,8 @@ ExportNative::~ExportNative(void)
 
 bool ExportNative::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mythnative-ui.xml", "exportnative", this);
-
+    bool foundtheme = LoadWindowFromXML("mythnative-ui.xml", "exportnative", this);
     if (!foundtheme)
         return false;
 
@@ -135,9 +132,8 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Archive", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Archive", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

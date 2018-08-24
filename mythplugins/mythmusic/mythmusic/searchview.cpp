@@ -30,10 +30,8 @@ SearchView::~SearchView()
 
 bool SearchView::Create(void)
 {
-    bool err = false;
-
     // Load the theme for this screen
-    err = LoadWindowFromXML("music-ui.xml", "searchview", this);
+    bool err = LoadWindowFromXML("music-ui.xml", "searchview", this);
 
     if (!err)
         return false;
@@ -212,9 +210,8 @@ bool SearchView::keyPressEvent(QKeyEvent *event)
     if (!m_moveTrackMode && GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

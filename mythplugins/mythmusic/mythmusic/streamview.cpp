@@ -46,10 +46,8 @@ StreamView::~StreamView()
 
 bool StreamView::Create(void)
 {
-    bool err = false;
-
     // Load the theme for this screen
-    err = LoadWindowFromXML("stream-ui.xml", "streamview", this);
+    bool err = LoadWindowFromXML("stream-ui.xml", "streamview", this);
 
     if (!err)
         return false;
@@ -343,9 +341,8 @@ bool StreamView::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

@@ -57,11 +57,8 @@ void ScreenWizard::SetInitialSettings(int _x, int _y, int _w, int _h)
 
 bool ScreenWizard::Create()
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("appear-ui.xml", "appearance", this);
-
+    bool foundtheme = LoadWindowFromXML("appear-ui.xml", "appearance", this);
     if (!foundtheme)
         return false;
 
@@ -97,9 +94,7 @@ bool ScreenWizard::keyPressEvent(QKeyEvent *event)
         return true;
 
     QStringList actions;
-    bool handled = false;
-
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

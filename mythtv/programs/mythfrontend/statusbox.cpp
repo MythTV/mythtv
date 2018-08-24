@@ -182,9 +182,8 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Status", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Status", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; ++i)
     {

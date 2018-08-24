@@ -2033,9 +2033,8 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
     if (GetFocusWidget()->keyPressEvent(levent))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Video", levent, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Video", levent, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

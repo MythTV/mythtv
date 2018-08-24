@@ -38,13 +38,11 @@ AirPlayPictureScreen::AirPlayPictureScreen(MythScreenStack *parent)
 
 bool AirPlayPictureScreen::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
     // The xml file containing the screen definition is airplay-ui.xml in this
     // example, the name of the screen in the xml is airplaypicture. This
     // should make sense when you look at the xml below
-    foundtheme = LoadWindowFromXML("airplay-ui.xml", "airplaypicture", this);
+    bool foundtheme = LoadWindowFromXML("airplay-ui.xml", "airplaypicture", this);
 
     if (!foundtheme) // If we cannot load the theme for any reason ...
         return false;

@@ -81,10 +81,9 @@ bool ViewScheduleDiff::keyPressEvent(QKeyEvent *e)
 
     m_inEvent = true;
 
-    bool handled = false;
     QStringList actions;
 
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
     if (!handled && MythScreenType::keyPressEvent(e))
         handled = true;

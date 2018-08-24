@@ -88,11 +88,8 @@ bool MythNews::Create(void)
 {
     QMutexLocker locker(&m_lock);
 
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("news-ui.xml", "news", this);
-
+    bool foundtheme = LoadWindowFromXML("news-ui.xml", "news", this);
     if (!foundtheme)
         return false;
 
@@ -434,9 +431,8 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("News", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("News", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

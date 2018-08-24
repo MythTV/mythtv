@@ -157,9 +157,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         return true;
     }
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event,
+    bool handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event,
                                                      actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)

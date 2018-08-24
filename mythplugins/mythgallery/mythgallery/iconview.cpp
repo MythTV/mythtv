@@ -173,11 +173,8 @@ IconView::~IconView()
 
 bool IconView::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("gallery-ui.xml", "gallery", this);
-
+    bool foundtheme = LoadWindowFromXML("gallery-ui.xml", "gallery", this);
     if (!foundtheme)
         return false;
 
@@ -445,9 +442,8 @@ bool IconView::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Gallery", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Gallery", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

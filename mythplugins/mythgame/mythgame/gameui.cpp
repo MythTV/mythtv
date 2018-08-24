@@ -193,9 +193,8 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Game", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Game", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

@@ -33,10 +33,8 @@ VisualizerView::~VisualizerView()
 
 bool VisualizerView::Create(void)
 {
-    bool err = false;
-
     // Load the theme for this screen
-    err = LoadWindowFromXML("music-ui.xml", "visualizerview", this);
+    bool err = LoadWindowFromXML("music-ui.xml", "visualizerview", this);
 
     if (!err)
         return false;
@@ -71,9 +69,8 @@ bool VisualizerView::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -156,9 +153,7 @@ TrackInfoPopup::~TrackInfoPopup(void)
 
 bool TrackInfoPopup::Create(void)
 {
-    bool err = false;
-
-    err = LoadWindowFromXML("music-ui.xml", "trackinfo_popup", this);
+    bool err = LoadWindowFromXML("music-ui.xml", "trackinfo_popup", this);
 
     if (!err)
         return false;

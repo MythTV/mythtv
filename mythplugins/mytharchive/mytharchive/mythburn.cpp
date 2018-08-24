@@ -92,11 +92,8 @@ MythBurn::~MythBurn(void)
 
 bool MythBurn::Create(void)
 {
-    bool foundtheme = false;
-
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("mythburn-ui.xml", "mythburn", this);
-
+    bool foundtheme = LoadWindowFromXML("mythburn-ui.xml", "mythburn", this);
     if (!foundtheme)
         return false;
 
@@ -151,9 +148,8 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
     if (!m_moveMode && GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Archive", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("Archive", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

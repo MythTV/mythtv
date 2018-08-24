@@ -227,9 +227,8 @@ bool MythNewsConfig::keyPressEvent(QKeyEvent *event)
     if (GetFocusWidget()->keyPressEvent(event))
         return true;
 
-    bool handled = false;
     QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("News", event, actions);
+    bool handled = GetMythMainWindow()->TranslateKeyPress("News", event, actions);
 
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
