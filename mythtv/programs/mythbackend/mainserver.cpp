@@ -5539,7 +5539,6 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
 
     QFile checkFile(fullfile);
     bool followLinks = gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
-    int fd = -1;
     off_t size = 0;
 
     // This will open the file and unlink the dir entry.  The actual file
@@ -5547,7 +5546,7 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     // Since stat fails after unlinking on some filesystems, get the size first
     const QFileInfo info(fullfile);
     size = info.size();
-    fd = DeleteFile(fullfile, followLinks);
+    int fd = DeleteFile(fullfile, followLinks);
 
     if ((fd < 0) && checkFile.exists())
     {

@@ -637,11 +637,10 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
                 int id = query.value(0).toInt();
                 QString filename = query.value(1).toString();
                 int directoryID = query.value(2).toInt();
-                int type = IT_UNKNOWN;
                 MSqlQuery subquery(MSqlQuery::InitCon());
 
                 // guess the type from the filename
-                type = AlbumArtImages::guessImageType(filename);
+                int type = AlbumArtImages::guessImageType(filename);
 
                 // if type is still unknown check to see how many images are available in the dir
                 // and assume that if this is the only image it must be the front cover

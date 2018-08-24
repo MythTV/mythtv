@@ -2335,14 +2335,13 @@ void EITFixUp::FixDK(DBEventEIT &event) const
 {
     // Source: YouSee Rules of Operation v1.16
     // url: http://yousee.dk/~/media/pdf/CPE/Rules_Operation.ashx
-    int        position = -1;
     int        episode = -1;
     int        season = -1;
     QRegExp    tmpRegEx;
     // Title search
     // episode and part/part total
     tmpRegEx = m_dkEpisode;
-    position = event.title.indexOf(tmpRegEx);
+    int position = event.title.indexOf(tmpRegEx);
     if (position != -1)
     {
       episode = tmpRegEx.cap(1).toInt();

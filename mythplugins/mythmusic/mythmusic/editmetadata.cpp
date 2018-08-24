@@ -114,9 +114,7 @@ bool EditMetadataCommon::keyPressEvent(QKeyEvent *event)
 
 void EditMetadataCommon::updateMetadata()
 {
-    MythUITextEdit *edit = NULL;
-
-    edit = dynamic_cast<MythUITextEdit *>(GetChild("albumedit"));
+    MythUITextEdit *edit = dynamic_cast<MythUITextEdit *>(GetChild("albumedit"));
     if (edit)
         m_metadata->setAlbum(edit->GetText());
 

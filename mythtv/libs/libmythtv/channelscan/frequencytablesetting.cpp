@@ -56,8 +56,8 @@ ScanFrequencyTable::ScanFrequencyTable()
 
 ScanCountry::ScanCountry()
 {
-    QString country = "au"; // Default to first in list
-    country = gCoreContext->GetLocale()->GetCountryCode().toLower();
+    // Default to saved country
+    QString country = gCoreContext->GetLocale()->GetCountryCode().toLower();
 
     setLabel(QObject::tr("Country"));
     addSelection(QObject::tr("Australia"),      "au", country == "au");
@@ -79,8 +79,8 @@ ScanCountry::ScanCountry()
 
 ScanNetwork::ScanNetwork()
 {
-    QString country = "de"; // Default to first in list
-    country = gCoreContext->GetLocale()->GetCountryCode().toLower();
+    // Default to saved country
+    QString country = gCoreContext->GetLocale()->GetCountryCode().toLower();
 
     setLabel(QObject::tr("Country"));
     addSelection(QObject::tr("Germany"),        "de", country == "de");

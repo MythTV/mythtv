@@ -69,8 +69,8 @@ MediaRenderer::MediaRenderer(): m_pUPnpCMGR(NULL)
     // Register any HttpServerExtensions...
     // ------------------------------------------------------------------
 
-    HtmlServerExtension *pHtmlServer = NULL;
-    pHtmlServer= new HtmlServerExtension(pHttpServer->GetSharePath() + "html",
+    HtmlServerExtension *pHtmlServer =
+                 new HtmlServerExtension(pHttpServer->GetSharePath() + "html",
                                          "frontend_");
     pHttpServer->RegisterExtension(pHtmlServer);
     pHttpServer->RegisterExtension(new FrontendServiceHost(pHttpServer->GetSharePath()));

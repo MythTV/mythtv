@@ -124,8 +124,7 @@ DTC::ProgramGuide *Guide::GetProgramGuide( const QDateTime &rawStartTime ,
     for (chan_it = chanList.begin(); chan_it != chanList.end(); ++chan_it)
     {
         // Create ChannelInfo Object
-        DTC::ChannelInfo *pChannel   = NULL;
-        pChannel = pGuide->AddNewChannel();
+        DTC::ChannelInfo *pChannel = pGuide->AddNewChannel();
         FillChannelInfo( pChannel, (*chan_it), bDetails );
 
         // Load the list of programmes for this channel

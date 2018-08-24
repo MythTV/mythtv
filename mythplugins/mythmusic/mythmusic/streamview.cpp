@@ -84,9 +84,7 @@ bool StreamView::Create(void)
 
 void StreamView::ShowMenu(void)
 {
-    MythMenu *menu = NULL;
-
-    menu = new MythMenu(tr("Stream Actions"), this, "mainmenu");
+    MythMenu *menu = new MythMenu(tr("Stream Actions"), this, "mainmenu");
     menu->AddItem(tr("Add Stream"));
 
     if (m_streamList->GetItemCurrent())

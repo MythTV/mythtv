@@ -574,13 +574,12 @@ void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
 
 jack_client_t* AudioOutputJACK::_jack_client_open(void)
 {
-    jack_client_t* client = NULL;
     QString client_name = QString("mythtv_%1").arg(getpid());
     jack_options_t open_options =
         (jack_options_t)(JackUseExactName | JackNoStartServer);
     jack_status_t open_status;
 
-    client = jack_client_open(client_name.toLatin1().constData(),
+    jack_client_t *client = jack_client_open(client_name.toLatin1().constData(),
                               open_options, &open_status);
 
     return client;

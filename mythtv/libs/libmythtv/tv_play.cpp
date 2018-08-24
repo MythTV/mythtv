@@ -1561,9 +1561,8 @@ void TV::UpdateChannelList(int groupID)
  */
 TVState TV::GetState(int player_idx) const
 {
-    TVState ret = kState_ChangingState;
     const PlayerContext *ctx = GetPlayerReadLock(player_idx, __FILE__, __LINE__);
-    ret = GetState(ctx);
+    TVState ret = GetState(ctx);
     ReturnPlayerLock(ctx);
     return ret;
 }
@@ -2358,8 +2357,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
             if (reclist.size())
             {
-                RemoteEncoder *testrec = NULL;
-                testrec = RemoteRequestFreeRecorderFromList(reclist, 0);
+                RemoteEncoder *testrec = RemoteRequestFreeRecorderFromList(reclist, 0);
                 if (testrec && testrec->IsValidRecorder())
                 {
                     ctx->SetRecorder(testrec);
@@ -7921,8 +7919,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
 
     if (reclist.size())
     {
-        RemoteEncoder *testrec = NULL;
-        testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
+        RemoteEncoder *testrec = RemoteRequestFreeRecorderFromList(reclist, ctx->GetCardID());
         if (!testrec || !testrec->IsValidRecorder())
         {
             ClearInputQueues(ctx, true);

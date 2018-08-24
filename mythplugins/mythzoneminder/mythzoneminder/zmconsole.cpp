@@ -251,10 +251,7 @@ bool ZMConsole::keyPressEvent(QKeyEvent *event)
 
 void ZMConsole::showEditFunctionPopup()
 {
-    Monitor *currentMonitor = NULL;
-
-    currentMonitor = m_monitor_list->GetItemCurrent()->GetData().value<Monitor*>();
-
+    Monitor *currentMonitor = m_monitor_list->GetItemCurrent()->GetData().value<Monitor*>();
     if (!currentMonitor)
         return;
 

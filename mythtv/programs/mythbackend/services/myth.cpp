@@ -934,11 +934,9 @@ bool Myth::BackupDatabase(void)
 
 bool Myth::CheckDatabase( bool repair )
 {
-    bool bResult = false;
-
     LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Check.");
 
-    bResult = DBUtil::CheckTables(repair);
+    bool bResult = DBUtil::CheckTables(repair);
 
     if (bResult)
         LOG(VB_GENERAL, LOG_NOTICE, "Database check complete.");
@@ -954,12 +952,10 @@ bool Myth::CheckDatabase( bool repair )
 
 bool Myth::ProfileSubmit()
 {
-    bool bResult = false;
-
     HardwareProfile profile;
     LOG(VB_GENERAL, LOG_NOTICE, "Profile Submission...");
     profile.GenerateUUIDs();
-    bResult = profile.SubmitProfile();
+    bool bResult = profile.SubmitProfile();
     if (bResult)
         LOG(VB_GENERAL, LOG_NOTICE, "Profile Submitted.");
 
@@ -972,12 +968,10 @@ bool Myth::ProfileSubmit()
 
 bool Myth::ProfileDelete()
 {
-    bool bResult = false;
-
     HardwareProfile profile;
     LOG(VB_GENERAL, LOG_NOTICE, "Profile Deletion...");
     profile.GenerateUUIDs();
-    bResult = profile.DeleteProfile();
+    bool bResult = profile.DeleteProfile();
     if (bResult)
         LOG(VB_GENERAL, LOG_NOTICE, "Profile Deleted.");
 

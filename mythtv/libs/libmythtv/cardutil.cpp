@@ -131,8 +131,7 @@ bool CardUtil::IsCableCardPresent(uint inputid,
         if (!hdhr)
             return false;
 
-        int oob = -1;
-        oob = hdhomerun_device_get_oob_status(hdhr, NULL, &status);
+        int oob = hdhomerun_device_get_oob_status(hdhr, NULL, &status);
 
         // if no OOB tuner, oob will be < 1.  If no CC present, OOB
         // status will be "none."
@@ -2597,8 +2596,7 @@ bool CardUtil::IsVBoxPresent(uint inputid)
         url = query.value(0).toString();
 
     //now get just the IP address from the url
-    QString ip ="";
-    ip = url.host();
+    QString ip = url.host();
     LOG(VB_GENERAL, LOG_INFO, QString("VBOX IP found (%1) for inputid (%2)")
                 .arg(ip).arg(inputid));
 

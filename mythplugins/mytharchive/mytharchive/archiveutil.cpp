@@ -185,9 +185,8 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
 {
     ProgramInfo *pinfo = NULL;
     QString chanID, startTime;
-    bool bIsMythRecording = false;
 
-    bIsMythRecording = extractDetailsFromFilename(inFile, chanID, startTime);
+    bool bIsMythRecording = extractDetailsFromFilename(inFile, chanID, startTime);
 
     if (bIsMythRecording)
     {

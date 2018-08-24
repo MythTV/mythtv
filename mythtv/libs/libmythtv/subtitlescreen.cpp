@@ -2255,12 +2255,10 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
         return;
 
     CC708Service *cc708service = m_708reader->GetCurrentService();
-    float video_aspect = 1.77777f;
-    bool changed = false;
-    video_aspect = m_player->GetVideoAspect();
+    float video_aspect = m_player->GetVideoAspect();
     QRect oldsafe = m_safeArea;
     m_safeArea = m_player->GetVideoOutput()->GetSafeRect();
-    changed = (oldsafe != m_safeArea || m_textFontZoom != m_textFontZoomPrev);
+    bool changed = (oldsafe != m_safeArea || m_textFontZoom != m_textFontZoomPrev);
     if (changed)
     {
         for (int i = 0; i < k708MaxWindows; i++)
