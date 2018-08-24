@@ -82,7 +82,6 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;
     }
 
-    bool foundFile = false;
     bool fixSeektable = cmdline.toBool("fixseektable");
 
     cout << "Fix seektable is: " << fixSeektable << endl;
@@ -103,7 +102,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
             }
 
             cout << "Checking: " << qPrintable(CreateProgramInfoString(*p)) << endl;
-            foundFile = true;
+            bool foundFile = true;
 
             QString url = p->GetPlaybackURL();
 

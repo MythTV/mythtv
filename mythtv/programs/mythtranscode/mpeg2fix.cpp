@@ -1349,10 +1349,10 @@ bool MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
 {
     MPEG2frame *f;
-    static int frame_count = 0;
 
     if (framePool.isEmpty())
     {
+        static int frame_count = 0;
         if (frame_count >= MAX_FRAMES)
         {
             LOG(VB_GENERAL, LOG_ERR, "No more queue slots!");
@@ -1865,9 +1865,6 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     av_init_packet(&pkt);
     int increment = 0;
     int index = 0;
-#ifdef SPEW_FILES
-    static int ins_count = 0;
-#endif
 
     if ((spare = DecodeToFrame(frameNum, 0)) == NULL)
         return -1;
@@ -1878,6 +1875,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     {
         QString fname;
 #if SPEW_FILES
+        static int ins_count = 0;
         fname = (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY) ?
                 (QString("ins%1").arg(ins_count++)) : QString());
 #endif
@@ -2074,7 +2072,6 @@ int MPEG2fixup::Start()
     int64_t cutStartPTS = 0, cutEndPTS = 0;
     uint64_t frame_count = 0;
     int new_discard_state = 0;
-    int ret;
     QMap<int, int> af_dlta_cnt, cutState;
 
     AVPacket pkt, lastRealvPkt;
@@ -2146,6 +2143,8 @@ int MPEG2fixup::Start()
 
     while (!file_end)
     {
+        int ret;
+
         /* read packet */
         if ((ret = GetFrame(&pkt)) < 0)
             return ret;
@@ -2179,7 +2178,7 @@ int MPEG2fixup::Start()
             for (int frame_pos = 0; frame_pos < vFrame.count() - 1;)
             {
                 bool ptsorder_eq_dtsorder = false;
-                int64_t dtsExtra = 0, PTSdiscrep = 0;
+                int64_t PTSdiscrep = 0;
                 FrameList Lreorder;
                 MPEG2frame *markedFrame = NULL, *markedFrameP = NULL;
 
@@ -2359,6 +2358,7 @@ int MPEG2fixup::Start()
 
                 if (markedFrame || !discard)
                 {
+                    int64_t dtsExtra = 0;
                     //check for PTS discontinuity
                     for (FrameList::Iterator it2 = Lreorder.begin();
                          it2 != Lreorder.end(); it2++)

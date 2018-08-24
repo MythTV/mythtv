@@ -490,7 +490,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
             int segmentSize = hls->GetSegmentSize();
-            int audioOnlyBitrate = 0;
 
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("HLS: Using segment size of %1 seconds")
@@ -498,7 +497,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             if (!hlsDisableAudioOnly)
             {
-                audioOnlyBitrate = hls->GetAudioOnlyBitrate();
+                int audioOnlyBitrate = hls->GetAudioOnlyBitrate();
 
                 avfw2 = new AVFormatWriter();
                 avfw2->SetContainer("mpegts");

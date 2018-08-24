@@ -71,13 +71,11 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
 
     long long totalBytes = srcRB->GetRealFileSize();
     long long totalBytesCopied = 0;
-    int percentComplete = 0;
     bool ok = true;
     int r;
-    int ret;
     while (ok && ((r = srcRB->Read(buf, readSize)) > 0))
     {
-        ret = destRB->Write(buf, r);
+        int ret = destRB->Write(buf, r);
         if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -88,7 +86,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
         else
             totalBytesCopied += ret;
 
-        percentComplete = totalBytesCopied * 100 / totalBytes;
+        int percentComplete = totalBytesCopied * 100 / totalBytes;
         if ((percentComplete % 5) == 0)
         LOG(VB_GENERAL, LOG_INFO,
             QString("%1 bytes copied, %2%% complete")

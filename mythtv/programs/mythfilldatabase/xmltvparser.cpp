@@ -44,12 +44,12 @@ static uint ELFHash(const QByteArray &ba)
 {
     const uchar *k = (const uchar *)ba.data();
     uint h = 0;
-    uint g;
 
     if (k)
     {
         while (*k)
         {
+            uint g;
             h = (h << 4) + *k++;
             if ((g = (h & 0xf0000000)) != 0)
                 h ^= g >> 24;
@@ -403,7 +403,6 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 QDomNodeList values = info.elementsByTagName("value");
                 QDomElement item;
                 QString stars;
-                float num, den;
                 float rating = 0.0;
 
                 // Use the first rating to appear in the xml, this should be
@@ -427,8 +426,8 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 if (!item.isNull())
                 {
                     stars = getFirstText(item);
-                    num = stars.section('/', 0, 0).toFloat() + 1;
-                    den = stars.section('/', 1, 1).toFloat() + 1;
+                    float num = stars.section('/', 0, 0).toFloat() + 1;
+                    float den = stars.section('/', 1, 1).toFloat() + 1;
                     if (0.0 < den)
                         rating = num/den;
                 }

@@ -68,7 +68,7 @@ void Streamer::CloseFile(void)
 
 void Streamer::SendBytes(void)
 {
-    int read_sz = 0, pkt_size = 0, buf_size = 0, write_len = 0, wrote = 0;
+    int pkt_size = 0, buf_size = 0, write_len = 0, wrote = 0;
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "SendBytes -- start");
 
@@ -88,7 +88,7 @@ void Streamer::SendBytes(void)
 
     if (!m_file->atEnd())
     {
-        read_sz = m_blockSize.loadAcquire();
+        int read_sz = m_blockSize.loadAcquire();
         if (!m_start_time.isValid())
             m_start_time = MythDate::current();
         int delta = m_start_time.secsTo(MythDate::current()) + 1;
@@ -307,7 +307,6 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
 {
     QString cmd;
 
-    int ret;
     int poll_cnt = 1;
     struct pollfd polls[2];
     memset(polls, 0, sizeof(polls));
@@ -338,7 +337,7 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
 
     while (m_run)
     {
-        ret = poll(polls, poll_cnt, m_timeout);
+        int ret = poll(polls, poll_cnt, m_timeout);
 
         if (polls[0].revents & POLLHUP)
         {
