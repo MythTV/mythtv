@@ -380,10 +380,10 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             QMultiMap<int, MusicMetadata::IdType> songMap;
             for (int x = 0;  x < m_songs.count(); x++)
             {
-                uint32_t album_order;
                 MusicMetadata *mdata = getRawSongAt(x);
                 if (mdata)
                 {
+                    uint32_t album_order;
                     album = album = mdata->Album() + " ~ " + QString("%1").arg(mdata->getAlbumId());;
                     if ((Ialbum = album_map.find(album)) == album_map.end())
                     {
@@ -448,10 +448,10 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             QMultiMap<int, MusicMetadata::IdType> songMap;
             for (int x = 0; x < m_songs.count(); x++)
             {
-                uint32_t artist_order;
                 MusicMetadata *mdata = getRawSongAt(x);
                 if (mdata)
                 {
+                    uint32_t artist_order;
                     artist = mdata->Artist() + " ~ " + mdata->Title();
                     if ((Iartist = artist_map.find(artist)) == artist_map.end())
                     {

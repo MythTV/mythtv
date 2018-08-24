@@ -188,10 +188,10 @@ int Synaesthesia::bitReverser(int i)
 
 void Synaesthesia::fft(double *x, double *y)
 {
-    int n2 = NumSamples, n1;
+    int n2 = NumSamples;
     for (int twoToTheK = 1; twoToTheK < NumSamples; twoToTheK *= 2)
     {
-        n1 = n2;
+        int n1 = n2;
         n2 /= 2;
         for (int j = 0; j < n2; j++)
         {

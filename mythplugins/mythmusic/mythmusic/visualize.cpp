@@ -98,34 +98,30 @@ void LogScale::setMax(int maxscale, int maxrange)
         delete [] indices;
 
     double alpha;
-    int i, scaled;
     long double domain = (long double) maxscale;
     long double range  = (long double) maxrange;
     long double x  = 1.0;
     long double dx = 1.0;
-    long double y  = 0.0;
-    long double yy = 0.0;
-    long double t  = 0.0;
     long double e4 = 1.0E-8;
 
     indices = new int[maxrange];
-    for (i = 0; i < maxrange; i++)
+    for (int i = 0; i < maxrange; i++)
         indices[i] = 0;
 
     // initialize log scale
     for (uint i=0; i<10000 && (std::abs(dx) > e4); i++)
     {
-        t = std::log((domain + x) / x);
-        y = (x * t) - range;
-        yy = t - (domain / (x + domain));
+        double t = std::log((domain + x) / x);
+        double y = (x * t) - range;
+        double yy = t - (domain / (x + domain));
         dx = y / yy;
         x -= dx;
     }
 
     alpha = x;
-    for (i = 1; i < (int) domain; i++)
+    for (int i = 1; i < (int) domain; i++)
     {
-        scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
+        int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
         if (scaled < 1)
             scaled = 1;
         if (indices[scaled - 1] < i)
@@ -669,7 +665,6 @@ bool Spectrum::process(VisualNode *node)
     long w = 0, index;
     QRect *rectsp = rects.data();
     double *magnitudesp = magnitudes.data();
-    double magL, magR, tmp;
 
     if (node)
     {
@@ -695,11 +690,11 @@ bool Spectrum::process(VisualNode *node)
         // The 1D output is Hermitian symmetric (Yk = Yn-k) so Yn = Y0 etc.
         // The dft_r2c_1d plan doesn't output these redundant values
         // and furthermore they're not allocated in the ctor
-        tmp = 2 * sq(real(lout[index])); // + sq(real(lout[FFTW_N - index]));
-        magL = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
+        double tmp = 2 * sq(real(lout[index])); // + sq(real(lout[FFTW_N - index]));
+        double magL = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
 
         tmp = 2 * sq(real(rout[index])); // + sq(real(rout[FFTW_N - index]));
-        magR = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
+        double magR = (tmp > 1.) ? (log(tmp) - 22.0) * scaleFactor : 0.;
 
         if (magL > size.height() / 2)
         {
@@ -771,20 +766,19 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // MainVisual then bitblts that onto the screen.
 
     QRect *rectsp = rects.data();
-    double r, g, b, per;
 
     p->fillRect(0, 0, size.width(), size.height(), back);
     for (uint i = 0; i < (uint)rects.size(); i++)
     {
-        per = double( rectsp[i].height() - 2 ) / double( size.height() );
+        double per = double( rectsp[i].height() - 2 ) / double( size.height() );
 
         per = clamp(per, 1.0, 0.0);
 
-        r = startColor.red() +
+        double r = startColor.red() +
             (targetColor.red() - startColor.red()) * (per * per);
-        g = startColor.green() +
+        double g = startColor.green() +
             (targetColor.green() - startColor.green()) * (per * per);
-        b = startColor.blue() +
+        double b = startColor.blue() +
             (targetColor.blue() - startColor.blue()) * (per * per);
 
         r = clamp(r, 255.0, 0.0);
@@ -936,13 +930,14 @@ Piano::Piano()
     double bottom_A = concert_A / 2.0 / 2.0 / 2.0 / 2.0;
 
     unsigned int key;
-    double current_freq = bottom_A, samples_required;
+    double current_freq = bottom_A;
     for (key = 0; key < PIANO_N; key++)
     {
         // This is constant through time
         piano_data[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
 
-        samples_required = sample_rate/current_freq * 20.0; // Want 20 whole cycles of the current waveform at least
+        // Want 20 whole cycles of the current waveform at least
+        double samples_required = sample_rate/current_freq * 20.0;
         if (samples_required > sample_rate/4.0)
         {
             // For the really low notes, 4 updates a second is good enough...
@@ -1025,24 +1020,20 @@ void Piano::resize(const QSize &newsize)
     double left =  (double)size.width() / 2.0 - (4.0*7.0 + 3.5) * key_unit_size; // The extra 3.5 centers 'F' inthe middle of the screen
     double top_of_keys = (double)size.height() / 2.0 - key_unit_size * white_height_pct / 2.0; // Vertically center keys
 
-    double width, height, center, offset;
-
     rects.resize(PIANO_N);
 
     unsigned int key;
-    int note;
-    bool is_black = false;
     for (key = 0; key < PIANO_N; key++)
     {
-        note = ((int)key - 3 + 12) % 12;  // This means that C=0, C#=1, D=2, etc (since lowest note is bottom A)
+        int note = ((int)key - 3 + 12) % 12;  // This means that C=0, C#=1, D=2, etc (since lowest note is bottom A)
         if (note == 0) // If we're on a 'C', move the left 'cursor' over an octave
         {
             left += key_unit_size*7.0;
         }
 
-        center = 0.0;
-        offset = 0.0;
-        is_black = false;
+        double center = 0.0;
+        double offset = 0.0;
+        bool is_black = false;
 
         switch (note)
         {
@@ -1061,8 +1052,8 @@ void Piano::resize(const QSize &newsize)
         }
         piano_data[key].is_black_note = is_black;
 
-        width = (is_black ? black_width_pct:white_width_pct) * key_unit_size;
-        height = (is_black? black_height_pct:white_height_pct) * key_unit_size;
+        double width = (is_black ? black_width_pct:white_width_pct) * key_unit_size;
+        double height = (is_black? black_height_pct:white_height_pct) * key_unit_size;
 
         rects[key].setRect(
             left + center * key_unit_size //  Basic position of left side of key
@@ -1112,16 +1103,13 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
     // Take a bunch of data in *node and break it down into piano key spectrum values
     // NB: Remember the state data between calls, so as to accumulate more accurate results.
     bool allZero = true;
-
-    uint i, n, key;
-
-    goertzel_data q0, q1, q2, coeff;
+    uint n;
     goertzel_data magnitude2, magnitude_av;
-    piano_audio short_to_bounded = 32768.0f;
-    int n_samples;
 
     if (node)
     {
+        piano_audio short_to_bounded = 32768.0f;
+
         // Detect start of new song (current node more than 10s earlier than already seen)
         if (node->offset + 10000 < offset_processed)
         {
@@ -1141,14 +1129,14 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
         if (node->right) // Preprocess the data into a combined middle channel, if we have stereo data
         {
-            for (i = 0; i < n; i++)
+            for (uint i = 0; i < n; i++)
             {
                 audio_data[i] = (piano_audio)(((piano_audio)node->left[i] + (piano_audio)node->right[i]) / 2.0 / short_to_bounded);
             }
         }
         else // This is only one channel of data
         {
-            for (i = 0; i < n; i++)
+            for (uint i = 0; i < n; i++)
             {
                 audio_data[i] = (piano_audio)node->left[i] / short_to_bounded;
             }
@@ -1160,16 +1148,15 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         return allZero; // Nothing to see here - the server can stop if it wants to
     }
 
-    for (key = 0; key < PIANO_N; key++)
+    for (uint key = 0; key < PIANO_N; key++)
     {
-        coeff = piano_data[key].coeff;
+        goertzel_data coeff = piano_data[key].coeff;
+        goertzel_data q2 = piano_data[key].q2;
+        goertzel_data q1 = piano_data[key].q1;
 
-        q2 = piano_data[key].q2;
-        q1 = piano_data[key].q1;
-
-        for (i = 0; i < n; i++)
+        for (uint i = 0; i < n; i++)
         {
-            q0 = coeff * q1 - q2 + audio_data[i];
+            goertzel_data q0 = coeff * q1 - q2 + audio_data[i];
             q2 = q1;
             q1 = q0;
         }
@@ -1178,7 +1165,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
         piano_data[key].samples_processed += n;
 
-        n_samples = piano_data[key].samples_processed;
+        int n_samples = piano_data[key].samples_processed;
 
         // Only do this update if we've processed enough chunks for this key...
         if (n_samples > piano_data[key].samples_process_before_display_update)

@@ -451,7 +451,6 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     paranoia_seek(paranoia, start, SEEK_SET);
 
     long int curpos = start;
-    int16_t *buffer;
 
     QApplication::postEvent(
         m_parent,
@@ -462,7 +461,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     int every15 = 15;
     while (curpos < end)
     {
-        buffer = paranoia_read(paranoia, paranoia_cb);
+        int16_t *buffer = paranoia_read(paranoia, paranoia_cb);
 
         if (encoder->addSamples(buffer, CD_FRAMESIZE_RAW))
             break;
@@ -801,10 +800,10 @@ void Ripper::ScanFinished()
 
     m_tracks->clear();
 
-    bool isCompilation = false;
     if (m_decoder)
     {
         MusicMetadata *metadata;
+        bool isCompilation = false;
 
         m_artistName.clear();
         m_albumName.clear();
@@ -993,14 +992,12 @@ bool Ripper::somethingWasRipped()
 void Ripper::artistChanged()
 {
     QString newartist = m_artistEdit->GetText();
-    MusicMetadata *data;
 
     if (m_tracks->size() > 0)
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
-            data = m_tracks->at(trackno)->metadata;
-
+            MusicMetadata *data = m_tracks->at(trackno)->metadata;
             if (data)
             {
                 if (m_compilationCheck->GetBooleanCheckState())
@@ -1024,14 +1021,12 @@ void Ripper::artistChanged()
 void Ripper::albumChanged()
 {
     QString newalbum = m_albumEdit->GetText();
-    MusicMetadata *data;
 
     if (m_tracks->size() > 0)
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
-            data = m_tracks->at(trackno)->metadata;
-
+            MusicMetadata *data = m_tracks->at(trackno)->metadata;
             if (data)
                 data->setAlbum(newalbum);
         }
@@ -1043,14 +1038,12 @@ void Ripper::albumChanged()
 void Ripper::genreChanged()
 {
     QString newgenre = m_genreEdit->GetText();
-    MusicMetadata *data;
 
     if (m_tracks->size() > 0)
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
-            data = m_tracks->at(trackno)->metadata;
-
+            MusicMetadata *data = m_tracks->at(trackno)->metadata;
             if (data)
                 data->setGenre(newgenre);
         }
@@ -1063,14 +1056,11 @@ void Ripper::yearChanged()
 {
     QString newyear = m_yearEdit->GetText();
 
-    MusicMetadata *data;
-
     if (m_tracks->size() > 0)
     {
         for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
-            data = m_tracks->at(trackno)->metadata;
-
+            MusicMetadata *data = m_tracks->at(trackno)->metadata;
             if (data)
                 data->setYear(newyear.toInt());
         }
@@ -1083,14 +1073,12 @@ void Ripper::compilationChanged(bool state)
 {
     if (!state)
     {
-        MusicMetadata *data;
         if (m_tracks->size() > 0)
         {
             // Update artist MetaData of each track on the ablum...
             for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
             {
-                data = m_tracks->at(trackno)->metadata;
-
+                MusicMetadata *data = m_tracks->at(trackno)->metadata;
                 if (data)
                 {
                     data->setCompilationArtist("");
@@ -1479,12 +1467,11 @@ void Ripper::ShowConflictMenu(RipTrack* track)
 void Ripper::updateTrackLengths()
 {
     QVector<RipTrack*>::iterator it;
-    RipTrack *track;
     int length = 0;
 
     for (it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
     {
-        track = *it;
+        RipTrack *track = *it;
         if (track->active)
         {
             track->length = length + track->metadata->Length();

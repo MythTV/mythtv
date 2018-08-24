@@ -103,15 +103,12 @@ void BumpScope::blur_8(unsigned char *ptr, int w, int h, int bpl)
 {
     (void)w;
 
-    unsigned int i, sum;
-    unsigned char *iptr;
-
-    iptr = ptr + bpl + 1;
-    i = bpl * h;
+    uchar *iptr = ptr + bpl + 1;
+    uint i = bpl * h;
 
     while (i--)
     {
-        sum = (iptr[-bpl] + iptr[-1] + iptr[1] + iptr[bpl]) >> 2;
+        uint sum = (iptr[-bpl] + iptr[-1] + iptr[1] + iptr[bpl]) >> 2;
         if (sum > 2)
             sum -= 2;
         *(iptr++) = sum;
@@ -120,16 +117,15 @@ void BumpScope::blur_8(unsigned char *ptr, int w, int h, int bpl)
 
 void BumpScope::generate_cmap(unsigned int color)
 {
-    unsigned int i, red, blue, green, r, g, b;
-
     if (m_image)
     {
-        red = (unsigned int)(color / 0x10000);
-        green = (unsigned int)((color % 0x10000) / 0x100);
-        blue = (unsigned int)(color % 0x100);
+        uint red = (unsigned int)(color / 0x10000);
+        uint green = (unsigned int)((color % 0x10000) / 0x100);
+        uint blue = (unsigned int)(color % 0x100);
 
-        for (i = 255; i > 0; i--)
+        for (uint i = 255; i > 0; i--)
         {
+             uint r, g, b;
              r = (unsigned int)(((double)(100 * red / 255) * m_intense1[i] + m_intense2[i]));
              if (r > 255)
                  r = 255;
@@ -304,17 +300,15 @@ void BumpScope::render_light(int lx, int ly)
 
 void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
 {
-  double max, min, delta, r, g, b;
+  double r = (double)(color>>16) / 255.0;
+  double g = (double)((color>>8)&0xff) / 255.0;
+  double b = (double)(color&0xff) / 255.0;
 
-  r = (double)(color>>16) / 255.0;
-  g = (double)((color>>8)&0xff) / 255.0;
-  b = (double)(color&0xff) / 255.0;
-
-  max = r;
+  double max = r;
   if (g > max) max = g;
   if (b > max) max = b;
 
-  min = r;
+  double min = r;
   if (g < min) min = g;
   if (b < min) min = b;
 
@@ -326,7 +320,7 @@ void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
   if (*s == 0.0) *h = 0.0;
   else
     {
-      delta = max - min;
+      double delta = max - min;
 
       if (r == max) *h = (g - b) / delta;
       else if (g == max) *h = 2.0 + (b - r) / delta;
@@ -340,8 +334,7 @@ void BumpScope::rgb_to_hsv(unsigned int color, double *h, double *s, double *v)
 
 void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
 {
-  int i;
-  double f, w, q, t, r, g, b;
+  double r, g, b;
 
   if (s == 0.0)
     s = 0.000001;
@@ -354,11 +347,11 @@ void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
     {
       if (h == 360.0) h = 0.0;
       h = h / 60.0;
-      i = (int) h;
-      f = h - i;
-      w = v * (1.0 - s);
-      q = v * (1.0 - (s * f));
-      t = v * (1.0 - (s * (1.0 - f)));
+      int i = (int) h;
+      double f = h - i;
+      double w = v * (1.0 - s);
+      double q = v * (1.0 - (s * f));
+      double t = v * (1.0 - (s * (1.0 - f)));
 
       switch (i)
         {
@@ -384,19 +377,16 @@ bool BumpScope::process(VisualNode *node)
     if (node->length < 512)
         numSamps = node->length;
 
-    unsigned int i;
-    int y, prev_y;
-
-    prev_y = (int)m_height / 2 + ((int)node->left[0] * (int)m_height) /
+    int prev_y = (int)m_height / 2 + ((int)node->left[0] * (int)m_height) /
              (int)0x10000;
 
     if (prev_y < 0)
         prev_y = 0;
     if (prev_y >= (int)m_height) prev_y = m_height - 1;
 
-    for (i = 0; i < m_width; i++)
+    for (uint i = 0; i < m_width; i++)
     {
-        y = (i * numSamps) / (m_width - 1);
+        int y = (i * numSamps) / (m_width - 1);
         y = (int)m_height / 2 + ((int)node->left[y] * (int)m_height) /
             (int)0x10000;
 
