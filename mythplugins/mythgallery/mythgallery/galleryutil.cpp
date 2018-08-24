@@ -277,7 +277,6 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
         return false;
 
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
 
     if (thumbGen)
     {
@@ -292,7 +291,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 
     while (it != list.end())
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
         ++it;
 
         // remove these already-resized pictures.

@@ -570,12 +570,11 @@ void GLSingleView::DisplayNext(bool reset, bool loadImage)
 
     // Search for next item that hasn't been deleted.
     // Close viewer if none remain.
-    ThumbItem *item;
     int oldpos = m_pos;
 
     while (true)
     {
-        item = advanceItem();
+        ThumbItem *item = advanceItem();
         if (item)
         {
             if (QFile::exists(item->GetPath()))
@@ -1037,13 +1036,10 @@ void GLSingleView::EffectFlutter(void)
     // wave every two iterations
     if (m_effect_current_frame%2 == 0)
     {
-
-        float hold;
-        int x, y;
-        for (y = 0; y < 40; y++)
+        for (int y = 0; y < 40; y++)
         {
-            hold = m_effect_flutter_points[0][y][2];
-            for (x = 0; x < 39; x++)
+            float hold = m_effect_flutter_points[0][y][2];
+            for (int x = 0; x < 39; x++)
             {
                 m_effect_flutter_points[x][y][2] = m_effect_flutter_points[x + 1][y][2];
             }

@@ -562,11 +562,10 @@ void SingleView::DisplayNext(bool reset, bool loadImage)
 
     // Search for next item that hasn't been deleted.
     // Close viewer in none remain.
-    ThumbItem *item;
     int oldpos = m_pos;
     while (true)
     {
-        item = advanceItem();
+        ThumbItem *item = advanceItem();
         if (item)
         {
             if (QFile::exists(item->GetPath()))
@@ -1158,7 +1157,7 @@ void SingleView::EffectIncomingEdges(void)
 
 void SingleView::EffectMultiCircleOut(void)
 {
-    int x, y, i;
+    int i;
     double alpha;
 
     if (m_effect_current_frame == 0)
@@ -1194,8 +1193,8 @@ void SingleView::EffectMultiCircleOut(void)
     for (alpha = m_effect_alpha, i = m_effect_i; i >= 0;
          i--, alpha += m_effect_multi_circle_out_delta_alpha)
     {
-        x = (m_effect_bounds.width()  >> 1) + (int)(m_effect_delta2_y * cos(-alpha));
-        y = (m_effect_bounds.height() >> 1) + (int)(m_effect_delta2_y * sin(-alpha));
+        int x = (m_effect_bounds.width()  >> 1) + (int)(m_effect_delta2_y * cos(-alpha));
+        int y = (m_effect_bounds.height() >> 1) + (int)(m_effect_delta2_y * sin(-alpha));
 
         m_effect_bounds.moveTopLeft(
             QPoint((m_effect_bounds.width()  >> 1) +
@@ -1366,7 +1365,7 @@ void SingleView::EffectBlobs(void)
 
 void SingleView::EffectNoise(void)
 {
-    int x, y, i, w, h, fact, sz;
+    int w, h, fact, sz;
 
     fact = (random() % 3) + 1;
 
@@ -1375,10 +1374,10 @@ void SingleView::EffectNoise(void)
     sz = 1 << fact;
 
     QPainter p(this);
-    for (i = (w * h) << 1; i > 0; i--)
+    for (int i = (w * h) << 1; i > 0; i--)
     {
-        x = (random() % w) << fact;
-        y = (random() % h) << fact;
+        int x = (random() % w) << fact;
+        int y = (random() % h) << fact;
         p.drawPixmap(QPoint(x, y), *m_effect_pixmap, QRect(x, y, sz, sz));
     }
     p.end();

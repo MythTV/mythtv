@@ -69,7 +69,6 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
                                int *dirCount, int *imageCount, int *movieCount)
 {
     QStringList splitFD;
-    const QFileInfo *fi;
 
     QDir d(dir);
     QString currDir = d.absolutePath();
@@ -87,7 +86,7 @@ bool GalleryFilter::TestFilter(const QString& dir, const GalleryFilter& flt,
     for (QFileInfoList::const_iterator it = list.begin();
          it != list.end(); ++it)
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
 
         // remove these already-resized pictures.
         if ((fi->fileName().indexOf(".thumb.") > 0) ||

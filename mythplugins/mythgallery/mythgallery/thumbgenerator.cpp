@@ -278,8 +278,6 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 
 void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 {
-    static int sequence = 0;
-
     if (GalleryUtil::IsMovie(fi.filePath()))
     {
         bool thumbnailCreated = false;
@@ -296,6 +294,7 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 
         if (tmpDir.exists())
         {
+            static int sequence = 0;
             QString thumbFile = QString("%1.png")
                 .arg(++sequence,8,10,QChar('0'));
 
