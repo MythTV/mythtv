@@ -290,14 +290,12 @@ static void UpdateGameCounts(QStringList updatelist)
     MSqlQuery query(MSqlQuery::InitCon());
 
     QRegExp multiDiskRGXP = QRegExp( "[0-4]$", Qt::CaseSensitive, QRegExp::RegExp);
-    int diskcount = 0;
     int pos = 0;
 
     QString lastrom, firstname, basename;
 
     for ( QStringList::Iterator it = updatelist.begin(); it != updatelist.end(); ++it )
     {
-        diskcount = 0;
         QString GameType = *it;
         LOG(VB_GENERAL, LOG_NOTICE,
             LOC + QString("Update gametype %1").arg(GameType));
@@ -322,6 +320,7 @@ static void UpdateGameCounts(QStringList updatelist)
 
                 if (spandisks)
                 {
+                    int diskcount = 0;
                     int extlength = 0;
                     pos = RomName.lastIndexOf(".");
                     if (pos > 1)

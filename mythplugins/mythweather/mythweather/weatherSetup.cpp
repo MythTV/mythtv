@@ -291,10 +291,9 @@ void ScreenSetup::loadData()
         // available to satisfy the requirements.
         if (m_sourceManager->findPossibleSources(type_strs, scriptList))
         {
-            ScriptInfo *script;
             for (int x = 0; x < scriptList.size(); x++)
             {
-                script = scriptList.at(x);
+                ScriptInfo *script = scriptList.at(x);
                 si->sources.append(script->name);
             }
             MythUIButtonListItem *item =
