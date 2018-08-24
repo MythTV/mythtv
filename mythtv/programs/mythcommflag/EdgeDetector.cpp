@@ -92,7 +92,7 @@ edge_mark(AVFrame *dst, int dstheight,
     const int           dstwidth = dst->linesize[0];
     const int           padded_width = extraleft + dstwidth + extraright;
     unsigned int        thresholdval;
-    int                 nn, dstnn, ii, rr, cc, first, last, last2;
+    int                 nn, dstnn, ii, rr, cc, first;
 
     (void)extrabottom;  /* gcc */
 
@@ -148,7 +148,7 @@ edge_mark(AVFrame *dst, int dstheight,
     {
         unsigned int    newthresholdval;
 
-        last2 = nn - 1;
+        int last, last2 = nn - 1;
         for (last = ii; last < last2 && sgmsorted[last] == thresholdval;
                 last++) ;
         if (sgmsorted[last] != thresholdval)

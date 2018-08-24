@@ -21,17 +21,15 @@ frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap, float fps,
             ii != frameMap->end();
             ++ii)
     {
-        long long   bb, ee, len;
-
         /*
          * QMap'd as 0-based index, but display as 1-based index to match "Edit
          * Recording" OSD.
          */
-        bb = ii.key() + 1;
+        long long bb = ii.key() + 1;
         if (*ii)
         {
-            ee = bb + *ii;
-            len = ee - bb;
+            long long ee = bb + *ii;
+            long long len = ee - bb;
 
             LOG(VB_COMMFLAG, LOG_INFO, QString("%1: %2-%3 (%4-%5, %6)")
                     .arg(comment)
@@ -58,17 +56,15 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
             ii != frameMap->end();
             ++ii)
     {
-        long long   bb, ee, len;
-
         /*
          * QMap'd as 0-based index, but display as 1-based index to match "Edit
          * Recording" OSD.
          */
-        bb = ii.key() + 1;
+        long long bb = ii.key() + 1;
         if (*ii)
         {
-            ee = bb + *ii;
-            len = ee - bb;
+            long long ee = bb + *ii;
+            long long len = ee - bb;
 
             LOG(VB_COMMFLAG, LOG_INFO, QString("%1: %2-%3 (%4-%5, %6)")
                     .arg(comment)

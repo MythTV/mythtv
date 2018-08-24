@@ -81,8 +81,6 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 {
     int seekIncrement =
         (int)(commDetectLogoSampleSpacing * player->GetFrameRate());
-    long long seekFrame;
-    int loops;
     int maxLoops = commDetectLogoSamplesNeeded;
     EdgeMaskEntry *edgeCounts;
     unsigned int pos, i, x, y, dx, dy;
@@ -118,8 +116,8 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
 
         player->DiscardVideoFrame(player->GetRawVideoFrame(0));
 
-        loops = 0;
-        seekFrame = commDetector->preRoll + seekIncrement;
+        int loops = 0;
+        long long seekFrame = commDetector->preRoll + seekIncrement;
         while (loops < maxLoops && player->GetEof() == kEofStateNone)
         {
             VideoFrame* vf = player->GetRawVideoFrame(seekFrame);
