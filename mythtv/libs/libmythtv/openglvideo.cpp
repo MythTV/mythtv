@@ -280,6 +280,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     bool mmx = false;
 #ifdef MMX
+    // cppcheck-suppress redundantAssignment
     mmx = true;
 #endif
 

@@ -373,11 +373,13 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
             .arg(fwnode).arg(fwmodel));
 
 #ifdef USING_LINUX_FIREWIRE
+    // cppcheck-suppress redundantAssignment
     device = new LinuxFirewireDevice(
         guid, 0, 100, 1);
 #endif // USING_LINUX_FIREWIRE
 
 #ifdef USING_OSX_FIREWIRE
+    // cppcheck-suppress redundantAssignment
     device = new DarwinFirewireDevice(guid, 0, 100);
 #endif // USING_OSX_FIREWIRE
 
