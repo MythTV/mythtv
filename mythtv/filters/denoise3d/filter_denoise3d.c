@@ -54,15 +54,12 @@ typedef struct ThisFilter
 
 static void calc_coefs(uint8_t * Ct, double Dist25)
 {
-    int i;
-    double Gamma, Simil, C;
+    double Gamma = log (0.25) / log (1.0 - Dist25 / 255.0);
 
-    Gamma = log (0.25) / log (1.0 - Dist25 / 255.0);
-
-    for (i = -256; i <= 255; i++)
+    for (int i = -256; i <= 255; i++)
     {
-        Simil = 1.0 - ABS (i) / 255.0;
-        C = pow (Simil, Gamma) * (double) i;
+        double Simil = 1.0 - ABS (i) / 255.0;
+        double C = pow (Simil, Gamma) * (double) i;
         Ct[256 + i] = (C < 0) ? (C - 0.5) : (C + 0.5);
     }
 }

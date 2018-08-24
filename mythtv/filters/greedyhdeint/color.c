@@ -385,8 +385,8 @@ static void yuy2_to_yv12_c
  int width, int height) 
 {
 
-    const uint8_t *p_line1, *p_line2 = yuy2_map;
-    uint8_t *p_y1, *p_y2 = y_dst;
+    const uint8_t *p_line2 = yuy2_map;
+    uint8_t *p_y2 = y_dst;
     uint8_t *p_u = u_dst;
     uint8_t *p_v = v_dst;
 
@@ -400,10 +400,10 @@ static void yuy2_to_yv12_c
 
     for ( i_y = height / 2 ; i_y-- ; )
     {
-        p_line1 = p_line2;
+        const uint8_t *p_line1 = p_line2;
         p_line2 += yuy2_pitch;
 
-        p_y1 = p_y2;
+        uint8_t *p_y1 = p_y2;
         p_y2 += y_dst_pitch;
 
         for ( i_x = width / 8 ; i_x-- ; )
@@ -479,8 +479,8 @@ static void yuy2_to_yv12_mmxext
  unsigned char *v_dst, int v_dst_pitch, 
  int width, int height) 
 {
-    const uint8_t *p_line1, *p_line2 = yuy2_map;
-    uint8_t *p_y1, *p_y2 = y_dst;
+    const uint8_t *p_line2 = yuy2_map;
+    uint8_t *p_y2 = y_dst;
     uint8_t *p_u = u_dst;
     uint8_t *p_v = v_dst;
 
@@ -498,10 +498,10 @@ static void yuy2_to_yv12_mmxext
 
     for ( i_y = height / 2 ; i_y-- ; )
     {
-        p_line1 = p_line2;
+        const uint8_t *p_line1 = p_line2;
         p_line2 += yuy2_pitch;
 
-        p_y1 = p_y2;
+        uint8_t *p_y1 = p_y2;
         p_y2 += y_dst_pitch;
 
         for ( i_x = width / 8 ; i_x-- ; )

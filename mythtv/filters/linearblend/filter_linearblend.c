@@ -242,13 +242,11 @@ int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame, int field)
 
 void linearBlend(unsigned char *src, int stride)
 {
-    int a, b, c, x;
-
-    for (x = 0; x < 2; x++)
+    for (int x = 0; x < 2; x++)
     {
-        a= *(uint32_t*)&src[stride*0];
-        b= *(uint32_t*)&src[stride*1];
-        c= *(uint32_t*)&src[stride*2];
+        int a= *(uint32_t*)&src[stride*0];
+        int b= *(uint32_t*)&src[stride*1];
+        int c= *(uint32_t*)&src[stride*2];
         a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
         *(uint32_t*)&src[stride*0]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
 

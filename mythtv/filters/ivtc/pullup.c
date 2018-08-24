@@ -482,11 +482,10 @@ static int find_first_break(struct pullup_field *f, int max)
 
 static void compute_breaks(struct pullup_context *c, struct pullup_field *f0)
 {
-	int i;
 	struct pullup_field *f1 = f0->next;
 	struct pullup_field *f2 = f1->next;
 	struct pullup_field *f3 = f2->next;
-	int l, max_l=0, max_r=0;
+	int max_l=0, max_r=0;
 	//struct pullup_field *ff;
 	//for (i=0, ff=c->first; ff != f0; i++, ff=ff->next);
 
@@ -504,8 +503,8 @@ static void compute_breaks(struct pullup_context *c, struct pullup_field *f0)
 		return;
 	}
 
-	for (i = 0; i < c->metric_len; i++) {
-		l = f2->diffs[i] - f3->diffs[i];
+	for (int i = 0; i < c->metric_len; i++) {
+		int l = f2->diffs[i] - f3->diffs[i];
 		if (l > max_l) max_l = l;
 		if (-l > max_r) max_r = -l;
 	}
@@ -696,12 +695,10 @@ struct pullup_frame *pullup_get_frame(struct pullup_context *c)
 static void copy_field(struct pullup_context *c, struct pullup_buffer *dest,
 	struct pullup_buffer *src, int parity)
 {
-	int i, j;
-	unsigned char *d, *s;
-	for (i = 0; i < c->nplanes; i++) {
-		s = src->planes[i] + parity*c->stride[i];
-		d = dest->planes[i] + parity*c->stride[i];
-		for (j = c->h[i]>>1; j; j--) {
+	for (int i = 0; i < c->nplanes; i++) {
+		unsigned char *s = src->planes[i] + parity*c->stride[i];
+		unsigned char *d = dest->planes[i] + parity*c->stride[i];
+		for (int j = c->h[i]>>1; j; j--) {
 			memcpy(d, s, c->stride[i]);
 			s += c->stride[i]<<1;
 			d += c->stride[i]<<1;

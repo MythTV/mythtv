@@ -80,11 +80,9 @@ static void line_filter_c_fast(uint8_t *dst, int width, int start_width,
                            uint8_t *buf, uint8_t *src2, uint8_t *src3,
                            uint8_t *src4, uint8_t *src5)
 {
-    int X;
-    uint8_t tmp;
-    for (X = start_width; X < width; X++)
+    for (int X = start_width; X < width; X++)
     {
-        tmp    = buf[X];
+        uint8_t tmp = buf[X];
         buf[X] = src3[X];
         if (ABS((int)src3[X] - (int)src2[X]) > 11)
             dst[X] = CLAMP((src2[X] * 4 + src4[X] * 4

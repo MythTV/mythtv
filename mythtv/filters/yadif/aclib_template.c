@@ -133,7 +133,6 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len);
 void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 {
 	void *retval;
-	size_t i;
 	retval = to;
 	long oldbx = 0;
 
@@ -174,7 +173,7 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 	    len -= delta;
 	    small_memcpy(to, from, delta);
 	  }
-	  i = len >> 6; /* len/64 */
+	  size_t i = len >> 6; /* len/64 */
 	  len&=63;
         /*
            This algorithm is top effective when the code consequently

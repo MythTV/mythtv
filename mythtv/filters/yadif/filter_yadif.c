@@ -91,25 +91,24 @@ typedef struct ThisFilter
 
 static void AllocFilter(ThisFilter* filter, int width, int height)
 {
-    int i,j;
     if ((width != filter->width) || height != filter->height)
     {
         printf("YadifDeint: size changed from %d x %d -> %d x %d\n",
                 filter->width, filter->height, width, height);
-        for (i=0; i<3*3; i++)
+        for (int i=0; i<3*3; i++)
         {
             uint8_t **p= &filter->ref[i%3][i/3];
             if (*p) free(*p - 3*filter->stride[i/3]);
             *p= NULL;
         }
-        for (i=0; i<3; i++)
+        for (int i=0; i<3; i++)
         {
             int is_chroma= !!i;
             int w= ((width   + 31) & (~31))>>is_chroma;
             int h= ((height+6+ 31) & (~31))>>is_chroma;
 
             filter->stride[i]= w;
-            for (j=0; j<3; j++)
+            for (int j=0; j<3; j++)
                 filter->ref[j][i]= (uint8_t*)calloc(w*h*sizeof(uint8_t),1)+3*w;
         }
         filter->width = width;
@@ -122,7 +121,6 @@ static inline void * memcpy_pic2(void * dst, const void * src,
                                  int bytesPerLine, int height,
                                  int dstStride, int srcStride, int limit2width)
 {
-    int i;
     void *retval=dst;
 
     if (!limit2width && dstStride == srcStride)
@@ -137,7 +135,7 @@ static inline void * memcpy_pic2(void * dst, const void * src,
     }
     else
     {
-        for (i=0; i<height; i++)
+        for (int i=0; i<height; i++)
         {
             fast_memcpy(dst, src, bytesPerLine);
             src = (const uint8_t*)src + srcStride;

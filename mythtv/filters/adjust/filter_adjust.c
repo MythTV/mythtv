@@ -192,12 +192,9 @@ static int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
 static void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
                 int out_max, float gamma)
 {
-    int i;
-    float f;
-
-    for (i = 0; i < 256; i++)
+    for (int i = 0; i < 256; i++)
     {
-        f = ((float)i - in_min) / (in_max - in_min);
+        float f = ((float)i - in_min) / (in_max - in_min);
         f = f < 0.0 ? 0.0 : f;
         f = f > 1.0 ? 1.0 : f;
         table[i] = (pow (f, gamma) * (out_max - out_min) + out_min + 0.5);

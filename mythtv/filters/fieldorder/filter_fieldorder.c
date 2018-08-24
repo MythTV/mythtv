@@ -41,23 +41,22 @@ typedef struct ThisFilter
 
 static void AllocFilter(ThisFilter* filter, int width, int height)
 {
-    int i, j;
     if ((width != filter->width) || height != filter->height)
     {
-        for (i = 0; i < NCHANS * NREFS; i++)
+        for (int i = 0; i < NCHANS * NREFS; i++)
         {
             uint8_t **p = &filter->ref[i / NCHANS][i % NCHANS];
             if (*p) free(*p);
             *p = NULL;
         }
-        for (i = 0; i < NCHANS; i++)
+        for (int i = 0; i < NCHANS; i++)
         {
             int is_chroma = !!i;
             int w = ((width   + 31) & (~31)) >> is_chroma;
             int h = ((height  + 31) & (~31)) >> is_chroma;
 
             filter->stride[i] = w;
-            for (j = 0; j < NREFS; j++) 
+            for (int j = 0; j < NREFS; j++) 
             {
                 filter->ref[j][i] =
                     (uint8_t*)calloc(w * h * sizeof(uint8_t), 1);
@@ -73,7 +72,6 @@ static inline void * memcpy_pic(void * dst, const void * src,
                                 int bytesPerLine, int height,
                                 int dstStride, int srcStride)
 {
-    int i;
     void *retval = dst;
 
     if (dstStride == srcStride)
@@ -88,7 +86,7 @@ static inline void * memcpy_pic(void * dst, const void * src,
     }
     else
     {
-        for (i = 0; i < height; i++)
+        for (int i = 0; i < height; i++)
         {
             memcpy(dst, src, bytesPerLine);
             src = (const uint8_t*)src + srcStride;

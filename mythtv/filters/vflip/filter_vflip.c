@@ -17,28 +17,24 @@ typedef struct ThisFilter
 
 static void reverse_memcpy(unsigned char *dst, const unsigned char *src, int n)
 {
-    int i;
-    for (i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i)
         dst[n - 1 - i] = src[i];
 }
 
 static int swap(VideoFrame *frame, int datasize, int offset, int shift)
 {
-    int i, j;
-    int oldoffset;
-    int newoffset;
     unsigned char *temp = malloc(datasize);
     if (temp == NULL)
     {
         fprintf(stderr, "Couldn't allocate memory for temp\n");
         return 0;
     }
-    for (i = 0, j = (frame->height - 1); i < frame->height / 2; i++, j--)
+    for (int i = 0, j = (frame->height - 1); i < frame->height / 2; i++, j--)
     {
-        newoffset = i * datasize + offset;
+        int newoffset = i * datasize + offset;
         if (shift)
             newoffset += datasize;
-        oldoffset = j * datasize + offset;
+        int oldoffset = j * datasize + offset;
         if (!shift || i != frame->height - 1)
         {
             memcpy(temp, frame->buf + newoffset,

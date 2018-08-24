@@ -47,15 +47,14 @@ Cvt422420 (VideoFilter * f, VideoFrame * frame, int field)
     (void)field;
     ThisFilter * filter = (ThisFilter *) f;
     int X, Y, field;
-    unsigned char * lineout, * linein0, * linein1;
     TF_VARS;
 
     TF_START;
     for (field = 0; field < 2; field++)
     {
-        lineout = frame->buf + filter->uoff + field * filter->ocsize;
-        linein0 = frame->buf + filter->uoff + field * filter->icsize;
-        linein1 = linein0 + filter->cwidth;
+        uchar *lineout = frame->buf + filter->uoff + field * filter->ocsize;
+        uchar *linein0 = frame->buf + filter->uoff + field * filter->icsize;
+        uchar *linein1 = linein0 + filter->cwidth;
         for (Y = 0; Y < filter->cheight; Y++)
         {
             for (X = 0; X < filter->cwidth; X++)

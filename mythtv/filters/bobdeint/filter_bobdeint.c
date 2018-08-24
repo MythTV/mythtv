@@ -31,7 +31,7 @@ typedef struct BDFilter
 static void doSplit(BDFilter *filter, unsigned char *buf, int lines, int width)
 {
     /* Algorithm shamelessly stolen from mplayer's vo_yuv4mpeg */
-    int i, j, k_start, modv;
+    int k_start, modv;
     unsigned char *line_state = filter->line_state;
     unsigned char *tmp = filter->tmp_ptr;
     
@@ -43,7 +43,8 @@ static void doSplit(BDFilter *filter, unsigned char *buf, int lines, int width)
     line_state[0] = 1;
     while (k_start < modv)
     {
-        i = j = k_start;
+        int i = k_start;
+        int j = k_start;
         memcpy(tmp, &(buf[i*width]), width);
         while (!line_state[j])
         {
