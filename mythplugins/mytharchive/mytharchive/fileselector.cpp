@@ -366,14 +366,12 @@ void FileSelector::updateSelectedList()
         m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    FileData *f;
-    ArchiveItem *a;
     for (int x = 0; x < m_archiveList->size(); x++)
     {
-        a = m_archiveList->at(x);
+        ArchiveItem *a = m_archiveList->at(x);
         for (int y = 0; y < m_fileData.size(); y++)
         {
-            f = m_fileData.at(y);
+            FileData *f = m_fileData.at(y);
             if (f->filename == a->filename)
             {
                 if (m_selectedList.indexOf(f->filename) == -1)

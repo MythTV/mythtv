@@ -216,11 +216,10 @@ void RecordingSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    ProgramInfo *p;
     vector<ProgramInfo *>::iterator i = m_recordingList->begin();
     for ( ; i != m_recordingList->end(); ++i)
     {
-        p = *i;
+        ProgramInfo *p = *i;
         m_selectedList.append(p);
     }
 
@@ -482,7 +481,6 @@ void RecordingSelector::updateRecordingList(void)
 
 void RecordingSelector::getRecordingList(void)
 {
-    ProgramInfo *p;
     m_recordingList = RemoteGetRecordedList(-1);
     m_categories.clear();
 
@@ -491,7 +489,7 @@ void RecordingSelector::getRecordingList(void)
         vector<ProgramInfo *>::iterator i = m_recordingList->begin();
         for ( ; i != m_recordingList->end(); ++i)
         {
-            p = *i;
+            ProgramInfo *p = *i;
             // ignore live tv and deleted recordings
             if (p->GetRecordingGroup() == "LiveTV" ||
                 p->GetRecordingGroup() == "Deleted")
@@ -537,14 +535,12 @@ void RecordingSelector::updateSelectedList()
 
     m_selectedList.clear();
 
-    ProgramInfo *p;
-    ArchiveItem *a;
     for (int x = 0; x < m_archiveList->size(); x++)
     {
-        a = m_archiveList->at(x);
+        ArchiveItem *a = m_archiveList->at(x);
         for (uint y = 0; y < m_recordingList->size(); y++)
         {
-            p = m_recordingList->at(y);
+            ProgramInfo *p = m_recordingList->at(y);
             if (p->GetPlaybackURL(false, true) == a->filename)
             {
                 if (m_selectedList.indexOf(p) == -1)

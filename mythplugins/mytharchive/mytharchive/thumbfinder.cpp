@@ -968,11 +968,11 @@ int ThumbFinder::calcFinalDuration()
         {
             frm_dir_map_t::const_iterator it;
 
-            int start, end, cutLen = 0;
+            int cutLen = 0;
 
             for (it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
             {
-                start = it.key();
+                int start = it.key();
 
                 ++it;
                 if (it == m_deleteMap.end())
@@ -981,7 +981,7 @@ int ThumbFinder::calcFinalDuration()
                     break;
                 }
 
-                end = it.key();
+                int end = it.key();
                 cutLen += end - start;
             }
             return m_archiveItem->duration - (int) (cutLen / m_fps);

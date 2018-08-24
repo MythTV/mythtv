@@ -210,10 +210,9 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 void MythBurn::updateSizeBar(void)
 {
     int64_t size = 0;
-    ArchiveItem *a;
     for (int x = 0; x < m_archiveList.size(); x++)
     {
-        a = m_archiveList.at(x);
+        ArchiveItem *a = m_archiveList.at(x);
         size += a->newsize;
     }
 
@@ -431,11 +430,10 @@ void MythBurn::updateArchiveList(void)
     }
     else
     {
-        ArchiveItem *a;
         for (int x = 0; x < m_archiveList.size(); x++)
         {
             qApp->processEvents();
-            a = m_archiveList.at(x);
+            ArchiveItem *a = m_archiveList.at(x);
 
             // get duration of this file
             if (a->duration == 0)

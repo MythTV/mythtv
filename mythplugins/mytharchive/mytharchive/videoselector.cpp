@@ -165,11 +165,10 @@ void VideoSelector::selectAll()
          m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    VideoInfo *v;
     vector<VideoInfo *>::iterator i = m_videoList->begin();
     for ( ; i != m_videoList->end(); ++i)
     {
-        v = *i;
+        VideoInfo *v = *i;
         m_selectedList.append(v);
     }
 
@@ -350,11 +349,10 @@ void VideoSelector::updateVideoList(void)
 
     if (m_categorySelector)
     {
-        VideoInfo *v;
         vector<VideoInfo *>::iterator i = m_videoList->begin();
         for ( ; i != m_videoList->end(); ++i)
         {
-            v = *i;
+            VideoInfo *v = *i;
 
             if (v->category == m_categorySelector->GetValue() ||
                 m_categorySelector->GetValue() == tr("All Videos"))
@@ -501,7 +499,6 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 
 void VideoSelector::getVideoList(void)
 {
-    VideoInfo *v;
     m_videoList = getVideoListFromDB();
     QStringList categories;
 
@@ -510,7 +507,7 @@ void VideoSelector::getVideoList(void)
         vector<VideoInfo *>::iterator i = m_videoList->begin();
         for ( ; i != m_videoList->end(); ++i)
         {
-            v = *i;
+            VideoInfo *v = *i;
 
             if (categories.indexOf(v->category) == -1)
                 categories.append(v->category);
@@ -552,14 +549,12 @@ void VideoSelector::updateSelectedList()
 
     m_selectedList.clear();
 
-    ArchiveItem *a;
-    VideoInfo *v;
     for (int x = 0; x < m_archiveList->size(); x++)
     {
-        a = m_archiveList->at(x);
+        ArchiveItem *a = m_archiveList->at(x);
         for (uint y = 0; y < m_videoList->size(); y++)
         {
-            v = m_videoList->at(y);
+            VideoInfo *v = m_videoList->at(y);
             if (v->filename == a->filename)
             {
                 if (m_selectedList.indexOf(v) == -1)
