@@ -716,14 +716,9 @@ bool Myth::PutSetting( const QString &sHostName,
                        const QString &sKey,
                        const QString &sValue )
 {
-    bool bResult = false;
-
     if (!sKey.isEmpty())
     {
-        if ( gCoreContext->SaveSettingOnHost( sKey, sValue, sHostName ) )
-            bResult = true;
-
-        return bResult;
+        return gCoreContext->SaveSettingOnHost( sKey, sValue, sHostName );
     }
 
     throw ( QString( "Key Required" ));

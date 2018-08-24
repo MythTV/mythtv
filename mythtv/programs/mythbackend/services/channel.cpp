@@ -362,15 +362,13 @@ DTC::LineupList* Channel::GetDDLineupList( const QString &sSource,
                                            const QString &sUserId,
                                            const QString &sPassword )
 {
-    int source = 0;
-
     DTC::LineupList *pLineups = new DTC::LineupList();
 
     if (sSource.toLower() == "schedulesdirect1" ||
         sSource.toLower() == "schedulesdirect" ||
         sSource.isEmpty())
     {
-        source = 1;
+        int source = 1;
         DataDirectProcessor ddp(source, sUserId, sPassword);
         if (!ddp.GrabLineupsOnly())
         {

@@ -2506,13 +2506,12 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
     QString basename;
     QString hostname;
     QString storagegroup;
-    bool deleteInDB;
     while (query.next())
     {
         basename = query.value(0).toString();
         hostname = query.value(1).toString();
         storagegroup = query.value(2).toString();
-        deleteInDB = false;
+        bool deleteInDB = false;
 
         if (basename == QFileInfo(ds->m_filename).fileName())
             deleteInDB = true;
@@ -4222,7 +4221,6 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
     QString pbshost = pbs->getHostname();
 
     QStringList strlist;
-    int retval;
 
     EncoderLink *encoder = NULL;
     QString enchost;
@@ -4255,7 +4253,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
 
     if (encoder)
     {
-        retval = encoder->LockTuner();
+        int retval = encoder->LockTuner();
 
         if (retval != -1)
         {
@@ -6961,11 +6959,10 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
 
     QStringList scripts;
     QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
 
     while (it != list.end())
     {
-        fi = &(*it);
+        const QFileInfo *fi = &(*it);
         ++it;
         LOG(VB_FILE, LOG_NOTICE, QString("Found lyric script at: %1").arg(fi->filePath()));
         scripts.append(fi->filePath());

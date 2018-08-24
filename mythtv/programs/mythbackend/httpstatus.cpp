@@ -449,7 +449,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QString isLocalstr;
     QString fsID;
     QString ids;
-    long long iTotal = -1, iUsed = -1, iAvail = -1;
 
     if (m_pMainServer)
         m_pMainServer->BackendQueryDiskSpace(strlist, true, m_bIsMaster);
@@ -468,9 +467,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         fsID       = *(sit++);
         ++sit; // ignore dirID
         ++sit; // ignore blocksize
-        iTotal     = (*(sit++)).toLongLong();
-        iUsed      = (*(sit++)).toLongLong();;
-        iAvail     = iTotal - iUsed;
+        long long iTotal     = (*(sit++)).toLongLong();
+        long long iUsed      = (*(sit++)).toLongLong();;
+        long long iAvail     = iTotal - iUsed;
 
         if (fsID == "-2")
             fsID = "total";

@@ -5112,7 +5112,6 @@ int Scheduler::FillRecordingDir(
     MSqlQuery query(MSqlQuery::InitCon());
     QMap<QString, FileSystemInfo>::Iterator fsit;
     QMap<QString, FileSystemInfo>::Iterator fsit2;
-    RecordingInfo *thispg;
     StorageGroup mysgroup(storagegroup, hostname);
     QStringList dirlist = mysgroup.GetDirList();
     QStringList recsCounted;
@@ -5301,10 +5300,9 @@ int Scheduler::FillRecordingDir(
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Adjusting FS Weights from scheduler.");
 
-    RecConstIter recIter;
-    for (recIter = reclist.begin(); recIter != reclist.end(); ++recIter)
+    for (RecConstIter recIter = reclist.begin(); recIter != reclist.end(); ++recIter)
     {
-        thispg = *recIter;
+        RecordingInfo *thispg = *recIter;
 
         if ((recendts < thispg->GetRecordingStartTime()) ||
             (recstartts > thispg->GetRecordingEndTime()) ||
