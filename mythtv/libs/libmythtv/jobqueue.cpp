@@ -173,15 +173,12 @@ void JobQueue::ProcessQueue(void)
     //int flags;
     int status;
     QString hostname;
-    int sleepTime;
 
     QMap<int, int> jobStatus;
-    int maxJobs;
     QString message;
     QMap<int, JobQueueEntry> jobs;
     bool atMax = false;
     bool inTimeWindow = true;
-    bool startedJobAlready = false;
     QMap<int, RunningJobInfo>::Iterator rjiter;
 
     QMutexLocker locker(&queueThreadCondLock);
@@ -189,9 +186,9 @@ void JobQueue::ProcessQueue(void)
     {
         locker.unlock();
 
-        startedJobAlready = false;
-        sleepTime = gCoreContext->GetNumSetting("JobQueueCheckFrequency", 30);
-        maxJobs = gCoreContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
+        bool startedJobAlready = false;
+        int sleepTime = gCoreContext->GetNumSetting("JobQueueCheckFrequency", 30);
+        int maxJobs = gCoreContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
         LOG(VB_JOBQUEUE, LOG_INFO, LOC +
             QString("Currently set to run up to %1 job(s) max.")
                         .arg(maxJobs));
@@ -531,7 +528,6 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
 {
     int tmpStatus = JOB_UNKNOWN;
     int tmpCmd = JOB_UNKNOWN;
-    int jobID = -1;
     int chanidInt = -1;
 
     if(!schedruntime.isValid())
@@ -542,6 +538,7 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
     // In order to replace a job, we must have a chanid/recstartts combo
     if (chanid)
     {
+        int jobID = -1;
         query.prepare("SELECT status, id, cmds FROM jobqueue "
                       "WHERE chanid = :CHANID AND starttime = :STARTTIME "
                       "AND type = :JOBTYPE;");
@@ -1257,7 +1254,6 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
     QMap<int, JobQueueEntry> jobs;
     QMap<int, JobQueueEntry>::Iterator it;
     QDateTime maxSchedRunTime = MythDate::current();
-    int tmpStatus = 0;
     bool checkForQueuedJobs = (startingWithinMins <= 0
                                 || InJobRunWindow(startingWithinMins));
 
@@ -1274,7 +1270,7 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
     if (jobs.size()) {
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            tmpStatus = (*it).status;
+            int tmpStatus = (*it).status;
             if (tmpStatus == JOB_RUNNING) {
                 LOG(VB_JOBQUEUE, LOG_INFO, LOC +
                     QString("HasRunningOrPendingJobs: found running job"));
@@ -1616,13 +1612,11 @@ void JobQueue::RecoverQueue(bool justOld)
         QMap<int, JobQueueEntry>::Iterator it;
         QDateTime oldDate = MythDate::current().addDays(-1);
         QString hostname = gCoreContext->GetHostName();
-        int tmpStatus;
-        int tmpCmds;
 
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            tmpCmds = (*it).cmds;
-            tmpStatus = (*it).status;
+            int tmpCmds = (*it).cmds;
+            int tmpStatus = (*it).status;
 
             if (!(*it).chanid)
                 logInfo = QString("jobID #%1").arg((*it).id);

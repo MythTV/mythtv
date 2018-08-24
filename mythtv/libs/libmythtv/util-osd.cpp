@@ -314,7 +314,6 @@ void yuv888_to_i44(unsigned char *dest, MythImage *osd_image, QSize dst_size,
 {
     int width, ashift, amask, ishift, imask, src_wrap, dst_wrap;
     unsigned char *src, *alpha, *dst;
-    const unsigned char *dmp;
 
     width  = right - left;
     ashift = ifirst ? 0 : 4;
@@ -330,7 +329,7 @@ void yuv888_to_i44(unsigned char *dest, MythImage *osd_image, QSize dst_size,
 
     for (int row = top; row < bottom; row++)
     {
-        dmp = DM[row & (DM_HEIGHT - 1)];
+        const unsigned char *dmp = DM[row & (DM_HEIGHT - 1)];
         for (int col = left; col < right; col++)
         {
             int grey;

@@ -2992,7 +2992,6 @@ void TVRec::ToggleChannelFavorite(QString changroupname)
     }
 
     int  changrpid;
-    bool result;
 
     changrpid = ChannelGroup::GetChannelGroupId(changroupname);
 
@@ -3004,7 +3003,7 @@ void TVRec::ToggleChannelFavorite(QString changroupname)
     }
     else
     {
-        result = ChannelGroup::ToggleChannel(chanid, changrpid, true);
+        bool result = ChannelGroup::ToggleChannel(chanid, changrpid, true);
 
         if (!result)
            LOG(VB_RECORD, LOG_ERR, LOC + "Unable to toggle channel favorite.");

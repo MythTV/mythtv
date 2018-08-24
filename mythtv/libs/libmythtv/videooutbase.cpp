@@ -600,7 +600,6 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
 
         VideoFrameType itmp = FMT_YV12;
         VideoFrameType otmp = FMT_YV12;
-        int btmp;
 
         if (db_vdisp_profile)
             m_deintfiltername =
@@ -623,6 +622,7 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
             }
             else
             {
+                int btmp;
                 int threads = db_vdisp_profile ?
                                 db_vdisp_profile->GetMaxCPUs() : 1;
                 const QSize video_dim = window.GetVideoDim();
@@ -1645,7 +1645,7 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 
 QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
 {
-    float hscale, vscale, tmp;
+    float hscale, tmp;
     tmp = 0.0;
     QRect visible_osd  = GetVisibleOSDBounds(tmp, tmp, tmp);
     QSize video_size   = window.GetVideoDispDim();
@@ -1679,7 +1679,7 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
             vid_rec.setWidth((int)(((float)vid_rec.width() * hscale) + 0.5f));
         }
 
-        vscale = (float)dvr_rec.width() / (float)image_width;
+        float vscale = (float)dvr_rec.width() / (float)image_width;
         hscale = (float)dvr_rec.height() / (float)image_height;
         QMatrix m1;
         m1.translate(dvr_rec.left(), dvr_rec.top());

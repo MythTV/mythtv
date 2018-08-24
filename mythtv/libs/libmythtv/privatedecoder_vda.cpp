@@ -584,12 +584,11 @@ int  PrivateDecoderVDA::GetFrame(AVStream *stream,
                 return result;
             }
 
-            uint32_t nal_size;
             uint8_t *end = pkt->data + pkt->size;
             uint8_t *nal_start = pkt->data;
             while (nal_start < end)
             {
-                nal_size = VDA_RB24(nal_start);
+                uint32_t nal_size = VDA_RB24(nal_start);
                 avio_wb32(pb, nal_size);
                 nal_start += 3;
                 avio_write(pb, nal_start, nal_size);

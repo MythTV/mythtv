@@ -30,10 +30,9 @@ static int gTTBackgroundAlpha;
 
 static QChar cvt_char(char ch, int lang)
 {
-    int c = 0;
     for (int j = 0; j < 14; j++)
     {
-        c = ch & 0x7F;
+        int c = ch & 0x7F;
         if (c == lang_chars[0][j])
             ch = lang_chars[lang + 1][j];
     }

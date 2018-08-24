@@ -804,7 +804,6 @@ static void CopyToVideo(unsigned char *buf, int video_width,
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                                 unsigned char *lstrm, VideoFrame *frame)
 {
-    int r;
     lzo_uint out_len;
     int compoff = 0;
 
@@ -851,7 +850,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
     if (!compoff)
     {
-        r = lzo1x_decompress(lstrm, frameheader->packetlength, buf2, &out_len,
+        int r = lzo1x_decompress(lstrm, frameheader->packetlength, buf2, &out_len,
                               NULL);
         if (r != LZO_E_OK)
         {
@@ -1019,10 +1018,9 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
                                     long timecodeOffset)
 {
-    RawDataList *data;
     while (!StoredData.empty())
     {
-        data = StoredData.front();
+        RawDataList *data = StoredData.front();
 
         if (data->frameheader.frametype != 'S')
             data->frameheader.timecode -= timecodeOffset;
@@ -1040,10 +1038,9 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
 
 void NuppelDecoder::ClearStoredData()
 {
-    RawDataList *data;
     while (!StoredData.empty())
     {
-        data = StoredData.front();
+        RawDataList *data = StoredData.front();
         StoredData.pop_front();
         delete data;
     }
@@ -1264,7 +1261,6 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 av_init_packet(&pkt);
                 pkt.data = strm;
                 pkt.size = frameheader.packetlength;
-                int ret = 0;
 
                 QMutexLocker locker(avcodeclock);
 
@@ -1272,7 +1268,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 {
                     int data_size = 0;
 
-                    ret = m_audio->DecodeAudio(mpa_audctx, m_audioSamples,
+                    int ret = m_audio->DecodeAudio(mpa_audctx, m_audioSamples,
                                                data_size, &pkt);
                     if (ret < 0)
                     {

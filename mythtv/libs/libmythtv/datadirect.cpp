@@ -2121,11 +2121,11 @@ static QString get_setting(QString line, QString key)
 {
     QString llow = line.toLower();
     QString kfind = key + "=\"";
-    int beg = llow.indexOf(kfind), end = -1;
+    int beg = llow.indexOf(kfind);
 
     if (beg >= 0)
     {
-        end = llow.indexOf("\"", beg + kfind.length());
+        int end = llow.indexOf("\"", beg + kfind.length());
         return line.mid(beg + kfind.length(), end - beg - kfind.length());
     }
 

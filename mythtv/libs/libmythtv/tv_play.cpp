@@ -1309,12 +1309,13 @@ bool TV::Init(bool createWindow)
         }
 
         // main window sizing
-        int maxWidth = 3840, maxHeight = 2160;
         if (switchMode)
         {
             DisplayRes *display_res = DisplayRes::GetDisplayRes();
             if(display_res)
             {
+                int maxWidth = 3840, maxHeight = 2160;
+
                 // The very first Resize needs to be the maximum possible
                 // desired res, because X will mask off anything outside
                 // the initial dimensions
@@ -7638,6 +7639,7 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
 
     // Look for channel in line-up
     QString needed_spacer;
+    // cppcheck-suppress variableScope
     uint    pref_cardid;
     bool    is_not_complete = true;
 
@@ -11511,7 +11513,6 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &c)
     const QString &actionName = c.m_action;
 
     bool result = false;
-    bool active = true;
     PlayerContext *ctx = m_tvmCtx;
     OSD *osd = m_tvmOsd;
     if (!osd)
@@ -11537,6 +11538,7 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &c)
     bool is_temporary_mark = ctx->player->IsTemporaryMark(frame);
     if (category == kMenuCategoryItem)
     {
+        bool active = true;
         if (actionName == "DIALOG_CUTPOINT_MOVEPREV_0")
         {
             if ((is_in_delete && is_temporary_mark &&
@@ -11867,9 +11869,9 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     }
     else if (matchesGroup(actionName, "TOGGLECOMMSKIP", category, prefix))
     {
-        static uint cas_ord[] = { 0, 2, 1 };
         if (m_tvm_isrecording || m_tvm_isrecorded)
         {
+            static uint cas_ord[] = { 0, 2, 1 };
             for (uint i = 0; i < sizeof(cas_ord)/sizeof(cas_ord[0]); i++)
             {
                 const CommSkipMode mode = (CommSkipMode) cas_ord[i];

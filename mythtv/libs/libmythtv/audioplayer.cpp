@@ -508,10 +508,10 @@ bool AudioPlayer::GetBufferStatus(uint &fill, uint &total)
 
 bool AudioPlayer::IsBufferAlmostFull(void)
 {
-    uint ofill = 0, ototal = 0, othresh = 0;
+    uint ofill = 0, ototal = 0;
     if (GetBufferStatus(ofill, ototal))
     {
-        othresh =  ((ototal>>1) + (ototal>>2));
+        uint othresh =  ((ototal>>1) + (ototal>>2));
         if (ofill > othresh)
             return true;
         return GetAudioBufferedTime() > 8000;

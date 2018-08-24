@@ -2267,7 +2267,6 @@ QString CardUtil::GetHDHRdesc(const QString &device)
 
 #ifdef USING_HDHOMERUN
     bool      deviceIsIP = false;
-    uint32_t  dev;
 
     if (device.contains('.'))  // Simplistic check, but also allows DNS names
         deviceIsIP = true;
@@ -2275,7 +2274,7 @@ QString CardUtil::GetHDHRdesc(const QString &device)
     {
         bool validID;
 
-        dev = device.toUInt(&validID, 16);
+        uint32_t dev = device.toUInt(&validID, 16);
         if (!validID || !hdhomerun_discover_validate_device_id(dev))
             return QObject::tr("Invalid Device ID");
     }

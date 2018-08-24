@@ -523,9 +523,10 @@ bool VAAPIContext::InitProfiles(void)
     VAProfile *profiles   = new VAProfile[max_profiles];
     VAEntrypoint *entries = new VAEntrypoint[max_entrypoints];
 
-    static bool debugged = false;
     if (profiles && entries)
     {
+        static bool debugged = false;
+
         INIT_ST;
         int act_profiles, act_entries;
         va_status = vaQueryConfigProfiles(m_ctx.display,

@@ -450,7 +450,6 @@ bool FileRingBuffer::IsOpen(void) const
  */
 int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
 {
-    int ret;
     unsigned tot = 0;
     unsigned errcnt = 0;
     unsigned zerocnt = 0;
@@ -476,7 +475,7 @@ int FileRingBuffer::safe_read(int /*fd*/, void *data, uint sz)
         // check that we have some data to read,
         // so we never attempt to read past the end of file
         // if fstat errored or isn't a regular file, default to previous behavior
-        ret = fstat(fd2, &sb);
+        int ret = fstat(fd2, &sb);
         if (ret == 0 && S_ISREG(sb.st_mode))
         {
             if ((internalreadpos + tot) >= sb.st_size)
