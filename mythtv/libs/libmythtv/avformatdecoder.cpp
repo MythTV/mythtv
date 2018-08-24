@@ -3633,7 +3633,6 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             //  into separate routines or separate threads.
             //  Also now that it always consumes a whole buffer some code
             //  in the caller may be able to be optimized.
-            ret = 0;
             ret = avcodec_receive_frame(context, mpa_pic);
 
             if (ret == 0)

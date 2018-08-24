@@ -997,7 +997,6 @@ void ProgLister::FillViewList(const QString &view)
         if (query.exec() && query.next())
         {
             QString title = query.value(0).toString();
-            title = query.value(0).toString();
             m_viewList.push_back(view);
             m_viewTextList.push_back(title);
         }
