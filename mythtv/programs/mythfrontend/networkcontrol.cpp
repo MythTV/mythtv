@@ -491,10 +491,9 @@ QString NetworkControl::processKey(NetworkCommand *nc)
         keyDest = GetMythMainWindow()->currentWidget()->focusWidget();
 
     int curToken = 1;
-    int tokenLen = 0;
     while (curToken < nc->getArgCount())
     {
-        tokenLen = nc->getArg(curToken).length();
+        int tokenLen = nc->getArg(curToken).length();
 
         if (nc->getArg(curToken) == "sleep")
         {

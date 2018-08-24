@@ -300,12 +300,12 @@ void ChannelRecPriority::updateList()
     m_channelList->Reset();
 
     QMap<QString, ChannelInfo*>::Iterator it;
-    MythUIButtonListItem *item;
     for (it = m_sortedChannel.begin(); it != m_sortedChannel.end(); ++it)
     {
         ChannelInfo *chanInfo = *it;
 
-        item = new MythUIButtonListItem(m_channelList, "",
+        MythUIButtonListItem *item =
+               new MythUIButtonListItem(m_channelList, "",
                                                    qVariantFromValue(chanInfo));
 
         QString fontState = "default";
@@ -358,14 +358,12 @@ void ChannelRecPriority::SortList()
     vector<RecPriorityInfo> sortingList;
     QMap<QString, ChannelInfo>::iterator pit;
     vector<RecPriorityInfo>::iterator sit;
-    ChannelInfo *chanInfo;
-    RecPriorityInfo *recPriorityInfo;
 
     // copy m_channelData into sortingList
     for (i = 0, pit = m_channelData.begin(); pit != m_channelData.end();
             ++pit, ++i)
     {
-        chanInfo = &(*pit);
+        ChannelInfo *chanInfo = &(*pit);
         RecPriorityInfo tmp = {chanInfo, i};
         sortingList.push_back(tmp);
     }
@@ -388,7 +386,7 @@ void ChannelRecPriority::SortList()
     // rebuild m_channelData in sortingList order from m_sortedChannel
     for (i = 0, sit = sortingList.begin(); sit != sortingList.end(); i++, ++sit)
     {
-        recPriorityInfo = &(*sit);
+        RecPriorityInfo *recPriorityInfo = &(*sit);
 
         // find recPriorityInfo[i] in m_sortedChannel
         for (j = 0, pit = m_channelData.begin(); j !=recPriorityInfo->cnt; j++, ++pit);

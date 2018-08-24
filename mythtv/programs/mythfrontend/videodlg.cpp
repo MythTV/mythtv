@@ -1444,13 +1444,12 @@ QString VideoDialog::GetImageFromFolder(VideoMetadata *metadata)
     test_files.append(filename + ".jpg");
     test_files.append(filename + ".jpeg");
     test_files.append(filename + ".gif");
-    bool foundCover;
 
     for (QStringList::const_iterator tfp = test_files.begin();
             tfp != test_files.end(); ++tfp)
     {
         QString imagePath = *tfp;
-        foundCover = false;
+        bool foundCover = false;
         if (!host.isEmpty())
         {
             // Strip out any extra /'s
@@ -1598,7 +1597,6 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         test_files.append(filename + ".jpg");
         test_files.append(filename + ".jpeg");
         test_files.append(filename + ".gif");
-        bool foundCover;
 
         for (QStringList::const_iterator tfp = test_files.begin();
                 tfp != test_files.end(); ++tfp)
@@ -1608,7 +1606,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             LOG(VB_GENERAL, LOG_DEBUG, QString("Cover check :%1 : ").arg(*tfp));
 #endif
 
-            foundCover = false;
+            bool foundCover = false;
             if (!host.isEmpty())
             {
                 // Strip out any extra /'s
@@ -1805,6 +1803,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
     if (list_count > 0)
     {
         QList<MythGenericTree *> subDirs;
+        // cppcheck-suppress variableScope
         int maxRecurse = 1;
 
         for (int i = 0; i < list_count; i++)

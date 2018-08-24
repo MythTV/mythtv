@@ -1332,12 +1332,12 @@ void ProgramRecPriority::UpdateList()
     m_programList->Reset();
 
     vector<ProgramRecPriorityInfo*>::iterator it;
-    MythUIButtonListItem *item;
     for (it = m_sortedProgram.begin(); it != m_sortedProgram.end(); ++it)
     {
         ProgramRecPriorityInfo *progInfo = *it;
 
-        item = new MythUIButtonListItem(m_programList, "",
+        MythUIButtonListItem *item =
+               new MythUIButtonListItem(m_programList, "",
                                                 qVariantFromValue(progInfo));
 
         int progRecPriority = progInfo->GetRecordingPriority();
