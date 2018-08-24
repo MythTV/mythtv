@@ -292,7 +292,7 @@ bool LyricsView::keyPressEvent(QKeyEvent *event)
         {
             handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
             if (actions.contains("UP") || actions.contains("DOWN") ||
-                actions.contains("PAGEUP") || actions.contains("PAGEUP"))
+                actions.contains("PAGEUP") || actions.contains("PAGEDOWN"))
                 m_autoScroll = false;
         }
 
