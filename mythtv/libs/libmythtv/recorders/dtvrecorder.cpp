@@ -455,13 +455,12 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     //   (there are others that we don't care about)
     const uint8_t *bufptr = tspacket->data() + tspacket->AFCOffset();
     const uint8_t *bufend = tspacket->data() + TSPacket::kSize;
-    int ext_type, bytes_left;
     _repeat_pict = 0;
 
     while (bufptr < bufend)
     {
         bufptr = avpriv_find_start_code(bufptr, bufend, &_start_code);
-        bytes_left = bufend - bufptr;
+        int bytes_left = bufend - bufptr;
         if ((_start_code & 0xffffff00) == 0x00000100)
         {
             // At this point we have seen the start code 0 0 1
@@ -492,7 +491,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
             {
                 if (bytes_left >= 1)
                 {
-                    ext_type = (bufptr[0] >> 4);
+                    int ext_type = (bufptr[0] >> 4);
                     switch(ext_type)
                     {
                     case 0x1: /* sequence extension */
@@ -1115,10 +1114,9 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             if (PESStreamID::PictureStartCode == stream_id)
             { // pes_packet_length is meaningless
                 pes_packet_length = -1;
-                uint frmtypei = 1;
                 if (bufend-bufptr >= 4)
                 {
-                    frmtypei = (bufptr[1]>>3) & 0x7;
+                    uint frmtypei = (bufptr[1]>>3) & 0x7;
                     if ((1 <= frmtypei) && (frmtypei <= 5))
                         hasFrame = true;
                 }

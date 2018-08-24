@@ -632,8 +632,6 @@ long long AvFormatDecoderDVD::DVDFindPosition(long long desiredFrame)
     if (!ringBuffer->IsDVD())
         return 0;
 
-    int diffTime = 0;
-    long long desiredTimePos;
     int ffrewSkip = 1;
     int current_speed = 0;
     if (m_parent)
@@ -644,8 +642,8 @@ long long AvFormatDecoderDVD::DVDFindPosition(long long desiredFrame)
 
     if (ffrewSkip == 1 || ffrewSkip == 0)
     {
-        diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
-        desiredTimePos = ringBuffer->DVD()->GetCurrentTime() +
+        int diffTime = (int)ceil((desiredFrame - framesPlayed) / fps);
+        long long desiredTimePos = ringBuffer->DVD()->GetCurrentTime() +
                         diffTime;
         if (diffTime <= 0)
             desiredTimePos--;

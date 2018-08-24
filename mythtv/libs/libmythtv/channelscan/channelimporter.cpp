@@ -87,13 +87,12 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     FixUpOpenCable(transports);
 
     // if scan was not aborted prematurely..
-    uint deleted_count = 0;
     if (do_delete)
     {
         ScanDTVTransportList trans = transports;
         for (uint i = 0; i < db_trans.size(); i++)
             trans.push_back(db_trans[i]);
-        deleted_count = DeleteChannels(trans);
+        uint deleted_count = DeleteChannels(trans);
         if (deleted_count)
             transports = trans;
     }

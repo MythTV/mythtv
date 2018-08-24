@@ -33,34 +33,30 @@ class LogScale
             delete [] indices;
 
         double alpha;
-        int i, scaled;
         long double domain = (long double) maxscale;
         long double range  = (long double) maxrange;
         long double x  = 1.0;
         long double dx = 1.0;
-        long double y  = 0.0;
-        long double yy = 0.0;
-        long double t  = 0.0;
         long double e4 = 1.0E-8;
 
         indices = new int[maxrange];
-        for (i = 0; i < maxrange; i++)
+        for (int i = 0; i < maxrange; i++)
             indices[i] = 0;
 
         // initialize log scale
         for (uint i = 0; i < 10000 && (std::abs(dx) > e4); i++)
         {
-            t = std::log((domain + x) / x);
-            y = (x * t) - range;
-            yy = t - (domain / (x + domain));
+            long double t = std::log((domain + x) / x);
+            long double y = (x * t) - range;
+            long double yy = t - (domain / (x + domain));
             dx = y / yy;
             x -= dx;
         }
 
         alpha = x;
-        for (i = 1; i < (int) domain; i++)
+        for (int i = 1; i < (int) domain; i++)
         {
-            scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
+            int scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
             if (scaled < 1)
                 scaled = 1;
             if (indices[scaled - 1] < i)

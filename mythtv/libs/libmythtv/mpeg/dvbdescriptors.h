@@ -2078,7 +2078,6 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     DVBContentIdentifierDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::dvb_content_identifier)
     {
-        size_t length;
         size_t count  = 0;
         uint8_t position = 2; /// position points to the first byte of the "sub"descriptor
 
@@ -2086,7 +2085,7 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
 
         while (_data[1] >= position)
         {
-           length = _data[position+1];
+           size_t length = _data[position+1];
            m_crid[count] = &_data[position];
            count++;
            position+=length+2;

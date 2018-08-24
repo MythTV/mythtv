@@ -1352,14 +1352,11 @@ void BDRingBuffer::HandleBDEvent(BD_EVENT &ev)
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("EVENT_PLAYITEM %1").arg(ev.param));
             {
-                int64_t diff = 0;
-
                 if (m_currentPlayitem != (int)ev.param)
                 {
                     int64_t out = m_currentTitleInfo->clips[m_currentPlayitem].out_time;
                     int64_t in  = m_currentTitleInfo->clips[ev.param].in_time;
-
-                    diff = in - out;
+                    int64_t diff = in - out;
 
                     if (diff != 0 && m_processState == PROCESS_NORMAL)
                     {
@@ -1629,15 +1626,12 @@ bool BDRingBuffer::RestoreBDStateSnapshot(const QString& state)
 
     }
 
-    uint32_t title;
-    uint64_t time;
-    uint64_t angle = 0;
-
     if (settings.contains("title") &&
         settings.contains("time") )
     {
-        title = (uint32_t)settings["title"];
-        time  = (uint64_t)settings["time"];
+        uint32_t title = (uint32_t)settings["title"];
+        uint64_t time  = (uint64_t)settings["time"];
+        uint64_t angle = 0;
 
         if (settings.contains("angle"))
             angle = (uint64_t)settings["angle"];

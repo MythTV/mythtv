@@ -486,11 +486,11 @@ QString MPEGDescriptor::toStringXML(uint level) const
 // Dump the descriptor in the same format as hexdump -C
 QString MPEGDescriptor::hexdump(void) const
 {
+    uint i;
     QString str, hex, prt;
-    uint i, ch;
     for (i=0; i<DescriptorLength(); i++)
     {
-        ch = _data[i+2];
+        uint ch = _data[i+2];
         hex.append(QString(" %1").arg(ch, 2, 16, QChar('0')));
         prt.append(QString("%1").arg(isprint(ch) ? QChar(ch) : '.'));
         if (((i+1) % 8) == 0)

@@ -2378,7 +2378,6 @@ void HLSRingBuffer::SanityCheck(const HLSStream *hls) const
 HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
 {
     HLSSegment *segment = NULL;
-    int retries = 0;
     int stream = m_streamworker->StreamForSegment(segnum);
     if (stream < 0)
     {
@@ -2390,6 +2389,7 @@ HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
         LOG(VB_PLAYBACK, LOG_WARNING, LOC +
             LOC + QString("waiting to get segment %1")
             .arg(segnum));
+        int retries = 0;
         while (!m_error && (stream < 0) && (retries < 10))
         {
             m_streamworker->WaitForSignal(timeout);
