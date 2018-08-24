@@ -254,8 +254,6 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
     snd_ctl_elem_value_t *control; snd_ctl_elem_value_alloca(&control);
     snd_ctl_elem_type_t type;
 
-    unsigned int count;
-
     int err;
 
     snd_ctl_elem_id_set_interface(id, SND_CTL_ELEM_IFACE_PCM);
@@ -290,7 +288,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
             snd_hctl_close(hctl);
             return NULL;
         }
-        count = snd_ctl_elem_info_get_count(info);
+        unsigned int count = snd_ctl_elem_info_get_count(info);
         type = snd_ctl_elem_info_get_type(info);
         if (!snd_ctl_elem_info_is_readable(info))
         {
@@ -550,7 +548,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 {
     uchar *tmpbuf = aubuf;
     uint frames = size / output_bytes_per_frame;
-    int err, lw = 0;
+    int err;
 
     if (pcm_handle == NULL)
     {
@@ -570,7 +568,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
     while (frames > 0)
     {
-        lw = snd_pcm_writei(pcm_handle, tmpbuf, frames);
+        int lw = snd_pcm_writei(pcm_handle, tmpbuf, frames);
 
         if (lw >= 0)
         {
@@ -993,7 +991,6 @@ QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 {
     QMap<QString, QString> *alsadevs = new QMap<QString, QString>();
     void **hints, **n;
-    char *name, *desc;
 
     if (snd_device_name_hint(-1, type, &hints) < 0)
         return alsadevs;
@@ -1001,8 +998,8 @@ QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
 
     while (*n != NULL)
     {
-          name = snd_device_name_get_hint(*n, "NAME");
-          desc = snd_device_name_get_hint(*n, "DESC");
+          char *name = snd_device_name_get_hint(*n, "NAME");
+          char *desc = snd_device_name_get_hint(*n, "DESC");
           if (name && desc && strcmp(name, "null"))
               alsadevs->insert(name, desc);
           if (name)

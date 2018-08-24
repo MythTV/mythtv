@@ -575,7 +575,6 @@ public:
     AudioConvertInternal(AVSampleFormat in, AVSampleFormat out) :
     m_in(in), m_out(out)
     {
-        char error[AV_ERROR_MAX_STRING_SIZE];
         m_swr = swr_alloc_set_opts(NULL,
                                    av_get_default_channel_layout(1),
                                    m_out,
@@ -593,6 +592,7 @@ public:
         int ret = swr_init(m_swr);
         if (ret < 0)
         {
+            char error[AV_ERROR_MAX_STRING_SIZE];
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 QString("error initializing resampler context (%1)")
                 .arg(av_make_error_string(error, sizeof(error), ret)));

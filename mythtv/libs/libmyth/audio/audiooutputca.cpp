@@ -195,7 +195,6 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     AudioOutputSettings *settings = new AudioOutputSettings();
 
     // Seek hardware sample rate available
-    int rate;
     int *rates = d->RatesList(d->mDeviceID);
 
     if (rates == NULL)
@@ -205,7 +204,7 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     }
     else
     {
-        while ((rate = settings->GetNextRate()))
+        while ((int rate = settings->GetNextRate()))
         {
                         int *p_rates = rates;
                         while (*p_rates > 0)

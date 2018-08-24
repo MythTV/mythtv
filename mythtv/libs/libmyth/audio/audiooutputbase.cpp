@@ -1305,17 +1305,16 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
 
     int i = 0;
     len = 0;
-    int nFrames, bdFrames;
     while (i < frames)
     {
         i += upmixer->putFrames(buffer + i * off, frames - i, source_channels);
-        nFrames = upmixer->numFrames();
+        int nFrames = upmixer->numFrames();
         if (!nFrames)
             continue;
 
         len += CheckFreeSpace(nFrames);
 
-        bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
+        int bdFrames = (kAudioRingBufferSize - org_waud) / bpf;
         if (bdFrames < nFrames)
         {
             if ((org_waud % bpf) != 0)
