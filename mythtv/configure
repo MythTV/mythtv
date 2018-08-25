@@ -5742,6 +5742,9 @@ case $target_os in
         enable libudev
         enable libuuid
         enable pic
+	if [ x`uname -m` = x"armv7l" ]; then
+	    disable vaapi
+	fi
         ;;
     irix*)
         target_os=irix
