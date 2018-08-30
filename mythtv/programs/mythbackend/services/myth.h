@@ -88,6 +88,14 @@ class Myth : public MythServices
                                                   const QString   &Key,
                                                   const QString   &Default );
 
+        DTC::KeyBindList*   GetKeyBindList      ( const QString   &HostName,
+                                                  const bool      IncludeDescriptions );
+
+        bool                PutKeyBind          ( const QString   &HostName,
+                                                  const QString   &Context,
+                                                  const QString   &Action,
+                                                  const QString   &KeyList   );
+
         DTC::SettingList*   GetSettingList      ( const QString   &HostName );
 
         bool                PutSetting          ( const QString   &HostName,
@@ -308,6 +316,24 @@ class ScriptableMyth : public QObject
         {
             SCRIPT_CATCH_EXCEPTION( QString(),
                 return m_obj.GetSetting( HostName, Key, Default );
+            )
+        }
+
+        QObject* GetKeyBindList ( const QString   &HostName,
+                                  bool  IncludeDescriptions )
+        {
+            SCRIPT_CATCH_EXCEPTION( NULL,
+                return m_obj.GetKeyBindList( HostName, IncludeDescriptions );
+            )
+        }
+
+        bool PutKeyBind( const QString   &HostName,
+                         const QString   &Context,
+                         const QString   &Action,
+                         const QString   &KeyList   )
+        {
+            SCRIPT_CATCH_EXCEPTION( false,
+                return m_obj.PutKeyBind( HostName, Context, Action, KeyList );
             )
         }
 

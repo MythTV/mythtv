@@ -19,6 +19,7 @@
 #include "datacontracts/connectionInfo.h"
 #include "datacontracts/settingList.h"
 #include "datacontracts/storageGroupDirList.h"
+#include "datacontracts/keyBindList.h"
 #include "datacontracts/timeZoneInfo.h"
 #include "datacontracts/logMessage.h"
 #include "datacontracts/logMessageList.h"
@@ -47,6 +48,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
     Q_CLASSINFO( "version"    , "5.1" );
     Q_CLASSINFO( "AddStorageGroupDir_Method",    "POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir_Method", "POST" )
+    Q_CLASSINFO( "PutKeyBind_Method",            "POST" )
     Q_CLASSINFO( "PutSetting_Method",            "POST" )
     Q_CLASSINFO( "ChangePassword_Method",        "POST" )
     Q_CLASSINFO( "TestDBSettings_Method",        "POST" )
@@ -69,6 +71,7 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
             DTC::ConnectionInfo     ::InitializeCustomTypes();
             DTC::SettingList        ::InitializeCustomTypes();
             DTC::StorageGroupDirList::InitializeCustomTypes();
+            DTC::KeyBindList        ::InitializeCustomTypes();
             DTC::TimeZoneInfo       ::InitializeCustomTypes();
             DTC::LogMessage         ::InitializeCustomTypes();
             DTC::LogMessageList     ::InitializeCustomTypes();
@@ -128,6 +131,14 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
         virtual bool                PutSetting          ( const QString   &HostName,
                                                           const QString   &Key,
                                                           const QString   &Value   ) = 0;
+
+        virtual DTC::KeyBindList*   GetKeyBindList      ( const QString   &HostName,
+                                                          const bool      IncludeDescriptions ) = 0;
+
+        virtual bool                PutKeyBind          ( const QString   &HostName,
+                                                          const QString   &Context,
+                                                          const QString   &Action,
+                                                          const QString   &KeyList   ) = 0;
 
         virtual bool                ChangePassword      ( const QString   &UserName,
                                                           const QString   &OldPassword,
