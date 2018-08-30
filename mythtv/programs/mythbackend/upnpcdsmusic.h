@@ -61,6 +61,9 @@ class UPnpCDSMusic : public UPnpCDSExtension
         bool             LoadTracks(const UPnpCDSRequest *pRequest,
                                     UPnpCDSExtensionResults *pResults,
                                     IDTokenMap tokens);
+        bool             LoadPlaylists(const UPnpCDSRequest *pRequest,
+                                    UPnpCDSExtensionResults *pResults,
+                                    IDTokenMap tokens);
 
         // Common code helpers
         QString BuildWhereClause( QStringList clauses,

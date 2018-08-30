@@ -29,7 +29,9 @@
  *     + <Track 2>                   Music/Track=2
  *     + <Track 3>                   Music/Track=3
  *
- *   - PlayLists                     // TODO
+ *   - PlayList                      Music/Playlist
+ *     - <Playlist 1>                Music/Playlist=5
+ *       + <Track 1>                 Music/Playlist=5/Track=1
  *
  *   - By Artist                     Music/Artist
  *     - <Artist 1>                  Music/Artist=123
@@ -42,9 +44,15 @@
  *       + <Track 1>                 Music/Album=789/Track=1
  *       + <Track 2>                 Music/Album=789/Track=2
  *
- *   - By Recently Added             // TODO
- *     + <Track 1>
- *     + <Track 2>
+ *   - By Recently Added             Music/Album (sorted by date_entered)
+ *     - <Album 1>                   Music/Album=789
+ *       + <Track 1>                 Music/Album=789/Track=1
+ *       + <Track 2>                 Music/Album=789/Track=2
+ *
+ *   - By Recently Played            Music/Album (sorted by lastplay)
+ *     - <Album 1>                   Music/Album=789
+ *       + <Track 1>                 Music/Album=789/Track=1
+ *       + <Track 2>                 Music/Album=789/Track=2
  *
  *   - By Genre                      Music/Genre
  *     - <Genre 1>                   Music/Genre=252
@@ -68,9 +76,12 @@ UPnpCDSMusic::UPnpCDSMusic()
     // ShortCuts
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC, "Music");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ALL, "Music/Track");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_PLAYLISTS, "Music/Playlist");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ALBUMS, "Music/Album");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_ARTISTS, "Music/Artist");
     m_shortcuts.insert(UPnPShortcutFeature::MUSIC_GENRES, "Music/Genre");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_RECENTLY_ADDED, "Music/Recently Added");
+    m_shortcuts.insert(UPnPShortcutFeature::MUSIC_LAST_PLAYED, "Music/Recently Played");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -113,6 +124,20 @@ void UPnpCDSMusic::CreateRoot()
     m_pRoot->AddChild(pContainer);
 
     // -----------------------------------------------------------------------
+    // Playlists
+    // -----------------------------------------------------------------------
+    pContainer = CDSObject::CreateContainer ( containerId.arg("Playlist"),
+                                              QObject::tr("Playlist"),
+                                              m_sExtensionId, // Parent Id
+                                              NULL );
+    // HACK
+    LoadPlaylists(pRequest, pResult, tokens);
+    pContainer->SetChildCount(pResult->m_nTotalMatches);
+    pContainer->SetChildContainerCount(pResult->m_nTotalMatches);
+    // END HACK
+    m_pRoot->AddChild(pContainer);
+
+    // -----------------------------------------------------------------------
     // By Artist
     // -----------------------------------------------------------------------
     pContainer = CDSObject::CreateContainer ( containerId.arg("Artist"),
@@ -149,6 +174,34 @@ void UPnpCDSMusic::CreateRoot()
                                               NULL );
     // HACK
     LoadGenres(pRequest, pResult, tokens);
+    pContainer->SetChildCount(pResult->m_nTotalMatches);
+    pContainer->SetChildContainerCount(pResult->m_nTotalMatches);
+    // END HACK
+    m_pRoot->AddChild(pContainer);
+
+    // -----------------------------------------------------------------------
+    // Recently Added
+    // -----------------------------------------------------------------------
+    pContainer = CDSObject::CreateContainer ( containerId.arg("Recently Added"),
+                                              QObject::tr("Recently Added"),
+                                              m_sExtensionId, // Parent Id
+                                              NULL );
+    // HACK
+    LoadAlbums(pRequest, pResult, tokens);
+    pContainer->SetChildCount(pResult->m_nTotalMatches);
+    pContainer->SetChildContainerCount(pResult->m_nTotalMatches);
+    // END HACK
+    m_pRoot->AddChild(pContainer);
+
+    // -----------------------------------------------------------------------
+    // Recently Played
+    // -----------------------------------------------------------------------
+    pContainer = CDSObject::CreateContainer ( containerId.arg("Recently Played"),
+                                              QObject::tr("Recently Played"),
+                                              m_sExtensionId, // Parent Id
+                                              NULL );
+    // HACK
+    LoadAlbums(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
     pContainer->SetChildContainerCount(pResult->m_nTotalMatches);
     // END HACK
@@ -298,6 +351,13 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
         // the ids for filtering
         return LoadGenres(pRequest, pResults, tokens);
     }
+    else if (currentToken == "playlist")
+    {
+        // Playlist is presently a top tier node, since it doesn't appear
+        // below Artist/Album/etc we don't need to pass through
+        // the ids for filtering
+        return LoadPlaylists(pRequest, pResults, tokens);
+    }
     else if (currentToken == "artist")
     {
         return LoadArtists(pRequest, pResults, tokens);
@@ -309,6 +369,14 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
     else if (currentToken == "track")
     {
         return LoadTracks(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "recently added")
+    {
+        return LoadAlbums(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "recently played")
+    {
+        return LoadAlbums(pRequest, pResults, tokens);
     }
     else
         LOG(VB_GENERAL, LOG_ERR,
@@ -344,6 +412,13 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
         else
             return LoadGenres(pRequest, pResults, tokens);
     }
+    else if (currentToken == "playlist")
+    {
+        if (tokens["playlist"].toInt() > 0)
+            return LoadTracks(pRequest, pResults, tokens);
+        else
+            return LoadPlaylists(pRequest, pResults, tokens);
+    }
     else if (currentToken == "artist")
     {
         if (tokens["artist"].toInt() > 0)
@@ -354,6 +429,20 @@ bool UPnpCDSMusic::LoadChildren(const UPnpCDSRequest* pRequest,
     else if (currentToken == "album")
     {
         if (tokens["album"].toInt() > 0)
+            return LoadTracks(pRequest, pResults, tokens);
+        else
+            return LoadAlbums(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "recently added")
+    {
+        if (tokens["recently added"].toInt() > 0)
+            return LoadTracks(pRequest, pResults, tokens);
+        else
+            return LoadAlbums(pRequest, pResults, tokens);
+    }
+    else if (currentToken == "recently played")
+    {
+        if (tokens["recently played"].toInt() > 0)
             return LoadTracks(pRequest, pResults, tokens);
         else
             return LoadAlbums(pRequest, pResults, tokens);
@@ -483,13 +572,21 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
                   "LEFT JOIN music_albumart w ON s.song_id=w.song_id "
                   "%1 " // WHERE clauses
                   "GROUP BY a.album_id "
-                  "ORDER BY a.album_name "
+                  "%2 " // ORDER clauses
                   "LIMIT :OFFSET,:COUNT";
 
     QStringList clauses;
     QString whereString = BuildWhereClause(clauses, tokens);
+    QString orderString = "";
 
-    query.prepare(sql.arg(whereString));
+    if (tokens.contains("recently added"))
+        orderString = "ORDER BY max(s.date_entered) DESC ";
+    else if (tokens.contains("recently played"))
+        orderString = "ORDER BY max(s.lastplay) DESC ";
+    else
+        orderString = "ORDER BY a.album_name ";
+
+    query.prepare(sql.arg(whereString).arg(orderString));
 
     BindValues(query, tokens);
 
@@ -706,6 +803,77 @@ bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+bool UPnpCDSMusic::LoadPlaylists(const UPnpCDSRequest *pRequest,
+                              UPnpCDSExtensionResults *pResults,
+                              IDTokenMap tokens )
+{
+    QString sRequestId = pRequest->m_sObjectId;
+
+    uint16_t nCount = pRequest->m_nRequestedCount;
+    uint16_t nOffset = pRequest->m_nStartingIndex;
+
+    // We must use a dedicated connection to get an acccurate value from
+    // FOUND_ROWS()
+    MSqlQuery query(MSqlQuery::InitCon(MSqlQuery::kDedicatedConnection));
+
+    QString sql = "SELECT SQL_CALC_FOUND_ROWS p.playlist_id, p.playlist_name, "
+                  "COUNT( 1 ) "
+                  "FROM music_playlists p "
+                  "WHERE p.playlist_name NOT LIKE '%storage' "
+                  "%1 " // WHERE clauses
+                  "GROUP BY p.playlist_id "
+                  "ORDER BY p.playlist_name "
+                  "LIMIT :OFFSET,:COUNT";
+
+    QStringList clauses;
+    QString whereString = BuildWhereClause(clauses, tokens);
+
+    query.prepare(sql.arg(whereString));
+
+    BindValues(query, tokens);
+
+    query.bindValue(":OFFSET", nOffset);
+    query.bindValue(":COUNT", nCount);
+
+    if (!query.exec())
+        return false;
+
+    while (query.next())
+    {
+        int nPlaylistId = query.value(0).toInt();
+        QString sPlaylistName = query.value(1).toString();
+        int nPlaylistCount = query.value(2).toInt();
+
+        CDSObject* pContainer = CDSObject::CreatePlaylistContainer( CreateIDString(sRequestId, "Playlist", nPlaylistId),
+                                                             sPlaylistName,
+                                                             pRequest->m_sParentId,
+                                                             NULL );
+        pContainer->SetPropValue("description", sPlaylistName);
+
+        pContainer->SetChildCount(nPlaylistCount);
+        pContainer->SetChildContainerCount(nPlaylistCount);
+
+        pResults->Add(pContainer);
+        pContainer->DecrRef();
+    }
+
+    // Just in case FOUND_ROWS() should fail, ensure m_nTotalMatches contains
+    // at least the size of this result set
+    if (query.size() > 0)
+        pResults->m_nTotalMatches = query.size();
+
+    // Fetch the total number of matches ignoring any LIMITs
+    query.prepare("SELECT FOUND_ROWS()");
+    if (query.exec() && query.next())
+            pResults->m_nTotalMatches = query.value(0).toUInt();
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
                               UPnpCDSExtensionResults *pResults,
                               IDTokenMap tokens)
@@ -729,15 +897,27 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
                   "LEFT JOIN music_albums a ON a.album_id = s.album_id "
                   "LEFT JOIN music_genres g ON  g.genre_id = s.genre_id "
                   "LEFT JOIN music_albumart w ON s.song_id = w.song_id "
+                  "%3 " // playlist JOIN
                   "%1 " // WHERE clauses
                   "GROUP BY s.song_id "
-                  "ORDER BY t.artist_name, a.album_name, s.track "
+                  "%2 " // ORDER clauses
                   "LIMIT :OFFSET,:COUNT";
 
     QStringList clauses;
     QString whereString = BuildWhereClause(clauses, tokens);
+    QString orderString = "";
+    QString joinString = "";
 
-    query.prepare(sql.arg(whereString));
+    if (tokens["playlist"].toInt() > 0)
+    {
+        orderString = "ORDER BY FIND_IN_SET(s.song_id, p.playlist_songs) ";
+        joinString = "LEFT JOIN music_playlists p on FIND_IN_SET(s.song_id, p.playlist_songs) ";
+    }
+    else
+    {
+        orderString = "ORDER BY t.artist_name, a.album_name, s.track ";
+    }
+    query.prepare(sql.arg(whereString).arg(orderString).arg(joinString));
 
     BindValues(query, tokens);
 
@@ -849,6 +1029,8 @@ QString UPnpCDSMusic::BuildWhereClause( QStringList clauses,
 {
     if (tokens["track"].toInt() > 0)
         clauses.append("s.song_id=:TRACK_ID");
+    if (tokens["playlist"].toInt() > 0)
+        clauses.append("playlist_id=:PLAYLIST_ID");
     if (tokens["album"].toInt() > 0)
         clauses.append("s.album_id=:ALBUM_ID");
     if (tokens["artist"].toInt() > 0)
@@ -857,6 +1039,10 @@ QString UPnpCDSMusic::BuildWhereClause( QStringList clauses,
         clauses.append("s.genre_id=:GENRE_ID");
     if (tokens["year"].toInt() > 0)
         clauses.append("s.year=:YEAR");
+    if (tokens["recently added"].toInt() > 0)
+        clauses.append("s.album_id=:ALBUM_ID");
+    if (tokens["recently played"].toInt() > 0)
+        clauses.append("s.album_id=:ALBUM_ID");
     if (tokens["directory"].toInt() > 0)
         clauses.append("s.directory_id=:DIRECTORY_ID");
 
@@ -884,6 +1070,8 @@ void UPnpCDSMusic::BindValues( MSqlQuery &query,
 {
     if (tokens["track"].toInt() > 0)
         query.bindValue(":TRACK_ID", tokens["track"]);
+    if (tokens["playlist"].toInt() > 0)
+        query.bindValue(":PLAYLIST_ID", tokens["playlist"]);
     if (tokens["album"].toInt() > 0)
         query.bindValue(":ALBUM_ID", tokens["album"]);
     if (tokens["artist"].toInt() > 0)
@@ -892,6 +1080,10 @@ void UPnpCDSMusic::BindValues( MSqlQuery &query,
         query.bindValue(":GENRE_ID", tokens["genre"]);
     if (tokens["year"].toInt() > 0)
         query.bindValue(":YEAR", tokens["year"]);
+    if (tokens["recently added"].toInt() > 0)
+        query.bindValue(":ALBUM_ID", tokens["recently added"]);
+    if (tokens["recently played"].toInt() > 0)
+        query.bindValue(":ALBUM_ID", tokens["recently played"]);
     if (tokens["directory"].toInt() > 0)
         query.bindValue(":DIRECTORY_ID", tokens["directory"]);
 }
