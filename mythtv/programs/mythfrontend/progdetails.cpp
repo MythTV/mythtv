@@ -449,6 +449,8 @@ void ProgDetails::loadPage(void)
         attr += tr("720p Resolution") + ", ";
     if  (videoprop & VID_1080)
         attr += tr("1080i/p Resolution") + ", ";
+    if  (videoprop & VID_DAMAGED)
+        attr += tr("Damaged") + ", ";
 
     if (subtype & SUB_HARDHEAR)
         attr += tr("CC","Closed Captioned") + ", ";
