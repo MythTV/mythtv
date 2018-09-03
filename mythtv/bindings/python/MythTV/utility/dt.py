@@ -158,11 +158,24 @@ class posixtzinfo( basetzinfo ):
                     1)
             return
 
-        transitions = []
-        for i in range(counts.transitions): # read in epoch time data
+        transitions = [None] * counts.transitions
+        # First transition which is in range for gmtime. Some zoneinfo
+        # files have massively negative leading entries for e.g. the
+        # big bang which gmtime() cannot cope with.
+        first_modern_transition = None
+        for i in range(counts.transitions):  # read in epoch time data
             t = unpack(ttmfmt, fd.read(calcsize(ttmfmt)))[0]
-            tt = time.gmtime(t)
-            transitions.append([t, tt, None, None, None, None])
+
+            try:
+                tt = time.gmtime(t)
+                transitions[i] = ([t, tt, None, None, None, None])
+                if first_modern_transition is None:
+                    first_modern_transition = i
+            except ValueError as e:
+                # ValueError is only accepted until we have seen a modern
+                # transition.
+                if first_modern_transition is not None:
+                    raise e
 
         # read in transition type indexes
         types = [None]*counts.transitions
@@ -177,15 +190,15 @@ class posixtzinfo( basetzinfo ):
         for i in range(counts.types):
             offset, isdst, _ = unpack('!lbB', fd.read(6))
             typedefs.append([offset, isdst])
-        for i in range(counts.transitions):
-            offset,isdst = typedefs[types[i]]
+        for i in range(first_modern_transition, counts.transitions):
+            offset, isdst = typedefs[types[i]]
             transitions[i][2] = time.gmtime(transitions[i][0] + offset)
             transitions[i][3] = offset
             transitions[i][5] = isdst
 
         # read in type names
         for i, name in enumerate(fd.read(counts.abbrevs)[:-1].split('\0')):
-            for j in range(counts.transitions):
+            for j in range(first_modern_transition, counts.transitions):
                 if types[j] == i:
                     transitions[j][4] = name
 
@@ -196,8 +209,9 @@ class posixtzinfo( basetzinfo ):
         # skip utc/local indicators
         fd.seek(counts.gmt_indicators, 1)
 
-        for i in range(counts.transitions):
-            transitions[i] = self._Transition(*transitions[i])
+        transitions = [self._Transition(*x)
+                       for x
+                       in transitions[first_modern_transition:]]
         self._transitions = tuple(transitions)
 
 
