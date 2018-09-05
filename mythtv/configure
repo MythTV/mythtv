@@ -6164,7 +6164,8 @@ check_header soundcard.h
 enabled alsa && check_lib alsa alsa/asoundlib.h snd_pcm_htimestamp -lasound
 
 enabled jack && check_lib jack jack/jack.h jack_client_open -ljack &&
-    check_func jack_port_get_latency_range -ljack
+    check_func jack_port_get_latency_range -ljack &&
+    enable audio_jack
 
 # PulseAudio probe
 ! disabled audio_pulse &&
