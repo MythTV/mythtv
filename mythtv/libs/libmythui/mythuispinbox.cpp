@@ -233,6 +233,13 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
 
     QString initialEntry = GetItemCurrent()->GetText();
     bool doEntry = false;
+
+    // Only invoke the entry dialog if the entry is a number
+    bool isNumber = false;
+    (void)initialEntry.toLongLong(&isNumber,10);
+    if (!isNumber)
+        return MythUIButtonList::keyPressEvent(event);
+
     for (int i = 0; i < actions.size(); ++i)
     {
         if (actions[i] >= ACTION_0 && actions[i] <= ACTION_9)
