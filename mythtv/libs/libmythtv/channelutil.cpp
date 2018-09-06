@@ -1443,20 +1443,20 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
     if (chansep > 0)
     {
         chanid =
-            sourceid * 1000 +
-            chan_num.left(chansep).toInt() * 10 +
-            chan_num.right(chan_num.length()-chansep-1).toInt();
+            sourceid * 10000 +
+            chan_num.left(chansep).toInt() * 100 +
+            chan_num.right(chan_num.length() - chansep - 1).toInt();
     }
     else
     {
-        chanid = sourceid * 1000 + chan_num.toInt();
+        chanid = sourceid * 10000 + chan_num.toInt();
     }
 
-    if ((chanid > sourceid * 1000) && (chanid_available(chanid)))
+    if ((chanid > sourceid * 10000) && (chanid_available(chanid)))
         return chanid;
 
     // try to at least base it on the sourceid for human readability
-    chanid = max(get_max_chanid(sourceid) + 1, sourceid * 1000);
+    chanid = max(get_max_chanid(sourceid) + 1, sourceid * 10000);
 
     if (chanid_available(chanid))
         return chanid;
