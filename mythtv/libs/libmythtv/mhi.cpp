@@ -975,7 +975,7 @@ int MHIContext::GetChannelIndex(const QString &str)
             QString("[mhi] GetChannelIndex -- Unrecognized URL %1")
             .arg(str));
     }
-    while (0);
+    while (false);
 
     LOG(VB_MHEG, LOG_INFO, QString("[mhi] GetChannelIndex %1 => %2")
         .arg(str).arg(nResult));

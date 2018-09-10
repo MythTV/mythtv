@@ -19,7 +19,7 @@ CC708Reader::CC708Reader(MythPlayer *owner)
         buf_alloc[i] = 512;
         buf[i]       = (unsigned char*) malloc(buf_alloc[i]);
         buf_size[i]  = 0;
-        delayed[i]   = 0;
+        delayed[i]   = false;
 
         temp_str_alloc[i] = 512;
         temp_str_size[i]  = 0;

@@ -339,7 +339,7 @@ int MythPictureDeinterlacer::Flush()
                            "[in]yadif[out];[out] buffersink")
                        .arg(m_width).arg(m_height).arg(m_pixfmt).arg(ar.num).arg(ar.den);
     int res = avfilter_graph_parse2(m_filter_graph, args.toLatin1().data(), &inputs, &outputs);
-    while (1)
+    while (true)
     {
         if (res < 0 || inputs || outputs)
         {

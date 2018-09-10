@@ -149,7 +149,7 @@ void H264Parser::Reset(void)
     sar_width = sar_height = 0;
     unitsInTick = 0;
     timeScale = 0;
-    fixedRate = 0;
+    fixedRate = false;
 
     pkt_offset = AU_offset = frame_start_offset = keyframe_start_offset = 0;
     on_frame = on_key_frame = false;

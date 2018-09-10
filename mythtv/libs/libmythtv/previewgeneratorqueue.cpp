@@ -495,7 +495,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
 
         bool preview_exists = previewLastModified.isValid();
 
-        if (0)
+        if (false)
         {
             QString alttext = (bookmark_ts.isValid()) ? QString() :
                 QString("\n\t\t\tcmp_ts:               %1")

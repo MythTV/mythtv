@@ -2359,7 +2359,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     detect_letter_box->SwitchTo(frame);
 
-    AVSync(frame, 0);
+    AVSync(frame, false);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!player_ctx->IsPIP())
         videoOutput->DoneDisplayingFrame(frame);
@@ -4668,7 +4668,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
         return NULL;
     }
 
-    while (1)
+    while (true)
     {
         if (!(data = frame->buf))
         {

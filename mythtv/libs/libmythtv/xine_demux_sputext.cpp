@@ -283,7 +283,7 @@ static subtitle_t *sub_read_line_subviewer(demux_sputext_t *demuxstr, subtitle_t
 
   memset (current, 0, sizeof(subtitle_t));
 
-  while (1) {
+  while (true) {
     if (!read_line_from_input(demuxstr, line, LINE_LEN)) return NULL;
     if (sscanf (line, "%d:%d:%d.%d,%d:%d:%d.%d",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4) < 8) {
       if (sscanf (line, "%d:%d:%d,%d,%d:%d:%d,%d",&a1,&a2,&a3,&a4,&b1,&b2,&b3,&b4) < 8)
@@ -671,7 +671,7 @@ static subtitle_t *sub_read_line_aqt (demux_sputext_t *demuxstr, subtitle_t *cur
 
   memset (current, 0, sizeof(subtitle_t));
 
-  while (1) {
+  while (true) {
     /* try to locate next subtitle_t */
     if (!read_line_from_input(demuxstr, line, LINE_LEN))
       return NULL;
@@ -1143,7 +1143,7 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   if (demuxstr->uses_time) timeout *= 100;
   else timeout *= 10;
 
-  while(1) {
+  while(true) {
     subtitle_t *sub;
 
     if(demuxstr->num>=n_max){

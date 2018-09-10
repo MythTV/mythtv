@@ -3674,7 +3674,7 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     justAfterChange = false;
 
     if (exitafterdecoded)
-        gotVideoFrame = 1;
+        gotVideoFrame = true;
 
     return true;
 }
@@ -4077,7 +4077,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
 
     decoded_video_frame = picframe;
-    gotVideoFrame = 1;
+    gotVideoFrame = true;
     if (++fpsSkip >= fpsMultiplier)
     {
         ++framesPlayed;
@@ -5384,7 +5384,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 if (!(decodetype & kDecodeVideo))
                 {
                     framesPlayed++;
-                    gotVideoFrame = 1;
+                    gotVideoFrame = true;
                     break;
                 }
 

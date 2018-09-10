@@ -520,12 +520,12 @@ void MythDVDPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
         if (player_ctx->buffer->DVD()->IsInMenu() &&
             !player_ctx->buffer->DVD()->IsInStillFrame())
         {
-            GoToDVDProgram(1);
+            GoToDVDProgram(true);
         }
     }
     else if (player_ctx->buffer->DVD()->GetTotalTimeOfTitle() < 60)
     {
-        GoToDVDProgram(1);
+        GoToDVDProgram(true);
         number = frameNum;
         if (number >= totalFrames)
             number = totalFrames / 2;

@@ -1185,7 +1185,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             if (!(kDecodeVideo & decodetype))
             {
                 framesPlayed++;
-                gotvideo = 1;
+                gotvideo = true;
                 continue;
             }
 
@@ -1211,7 +1211,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                 GetPlayer()->DeLimboFrame(buf);
 
             decoded_video_frame = buf;
-            gotvideo = 1;
+            gotvideo = true;
             if (getrawframes && getrawvideo)
                 StoreRawData(strm);
             framesPlayed++;
@@ -1287,7 +1287,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             }
             else
             {
-                getrawframes = 0;
+                getrawframes = false;
 #if HAVE_BIGENDIAN
                 // Why endian correct the audio buffer here?
                 // Don't big-endian clients have to do it in audiooutBlah.cpp?

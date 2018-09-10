@@ -150,7 +150,7 @@ void FIFOWriter::FIFOWriteThread(int id)
     int fd = -1;
 
     QMutexLocker flock(&fifo_lock[id]);
-    while (1)
+    while (true)
     {
         if ((fb_inptr[id] == fb_outptr[id]) && (0 == killwr[id]))
             empty_cond[id].wait(flock.mutex());

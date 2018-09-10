@@ -1725,7 +1725,7 @@ bool HLSRingBuffer::IsHTTPLiveStreaming(QByteArray *s)
     /* Parse stream and search for
      * EXT-X-TARGETDURATION or EXT-X-STREAM-INF tag, see
      * http://tools.ietf.org/html/draft-pantos-http-live-streaming-04#page-8 */
-    while (1)
+    while (true)
     {
         QString line = stream.readLine();
         if (line.isNull())

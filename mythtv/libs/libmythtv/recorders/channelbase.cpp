@@ -375,7 +375,7 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
 #ifdef USING_LINUX_FIREWIRE
     // cppcheck-suppress redundantAssignment
     device = new LinuxFirewireDevice(
-        guid, 0, 100, 1);
+        guid, 0, 100, true);
 #endif // USING_LINUX_FIREWIRE
 
 #ifdef USING_OSX_FIREWIRE

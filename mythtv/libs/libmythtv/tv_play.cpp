@@ -13198,7 +13198,7 @@ void TV::DVDJumpBack(PlayerContext *ctx)
         {
             ctx->LockDeletePlayer(__FILE__, __LINE__);
             if (ctx->player)
-                ctx->player->GoToDVDProgram(0);
+                ctx->player->GoToDVDProgram(false);
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
             UpdateOSDSeekMessage(ctx, tr("Previous Title"), kOSDTimeout_Med);
@@ -13243,7 +13243,7 @@ void TV::DVDJumpForward(PlayerContext *ctx)
         {
             ctx->LockDeletePlayer(__FILE__, __LINE__);
             if (ctx->player)
-                ctx->player->GoToDVDProgram(1);
+                ctx->player->GoToDVDProgram(true);
             ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
             UpdateOSDSeekMessage(ctx, tr("Next Title"), kOSDTimeout_Med);

@@ -445,7 +445,7 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
     while (m_packet_buffers.size() > 0)
     {
         PacketBuffer *buffer = m_packet_buffers.last();
-        if (GetTxFreeSize(0) < buffer->size)
+        if (GetTxFreeSize(false) < buffer->size)
         {
             usleep(10000);
             return 0;

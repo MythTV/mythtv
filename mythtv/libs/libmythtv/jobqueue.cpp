@@ -867,7 +867,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
         {
             MythDB::DBError("Error in JobQueue::DeleteAllJobs(), Unable "
                             "to query list of Jobs left in Queue.", query);
-            return 0;
+            return false;
         }
 
         LOG(VB_GENERAL, LOG_ERR, LOC +

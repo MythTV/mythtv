@@ -178,7 +178,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     if (rst_loc)
     {
         cc->Reset(service_num);
-        cc->delayed[service_num] = 0; // Reset implicitly cancels delay
+        cc->delayed[service_num] = false; // Reset implicitly cancels delay
         blk_start = rst_loc + 1;
     }
 
@@ -186,14 +186,14 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
     if (dlc_loc && cc->delayed[service_num])
     {
         cc->DelayCancel(service_num);
-        cc->delayed[service_num] = 0;
+        cc->delayed[service_num] = false;
     }
 
     // cancel delay if the buffer is full
     if (cc->delayed[service_num] && blk_size >= 126)
     {
         cc->DelayCancel(service_num);
-        cc->delayed[service_num] = 0;
+        cc->delayed[service_num] = false;
         dlc_loc = blk_size - 1;
     }
 
@@ -257,7 +257,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
             {
                 LOG(VB_VBI, LOG_INFO, "eia-708 decoding error...");
                 cc->Reset(service_num);
-                cc->delayed[service_num] = 0;
+                cc->delayed[service_num] = false;
                 i = cc->buf_size[service_num];
             }
             // There must be an incomplete code in buffer...
@@ -272,7 +272,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         {
             // this delay has already been canceled..
             cc->DelayCancel(service_num);
-            cc->delayed[service_num] = 0;
+            cc->delayed[service_num] = false;
         }
     }
 
@@ -401,7 +401,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
         else if (DLY==code)
         {
             cc->Delay(service_num, param1);
-            cc->delayed[service_num] = 1;
+            cc->delayed[service_num] = true;
         }
         i+=2;
     }
@@ -618,7 +618,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
 #elif DEBUG_CAPTIONS
     if (len > pkt_size)
 #else
-    if (0)
+    if (false)
 #endif
     {
         int j;
