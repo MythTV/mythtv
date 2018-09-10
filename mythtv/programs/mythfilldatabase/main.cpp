@@ -663,7 +663,7 @@ int main(int argc, char *argv[])
     found += updt.numRowsAffected();
     LOG(VB_GENERAL, LOG_INFO, QString("    Found %1").arg(found));
 
-    if (1) // limit MSqlQuery's lifetime
+    if (true) // limit MSqlQuery's lifetime
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT count(previouslyshown) "

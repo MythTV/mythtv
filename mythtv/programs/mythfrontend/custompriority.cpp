@@ -353,7 +353,7 @@ bool CustomPriority::checkSyntax(void)
         QString qstr = QString("SELECT (%1) FROM (recordmatch, record, "
                                "program, channel, capturecard, "
                                "oldrecorded) WHERE NULL").arg(desc);
-        while (1)
+        while (true)
         {
             int i = qstr.indexOf("RECTABLE");
             if (i == -1) break;

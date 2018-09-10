@@ -146,7 +146,7 @@ PTSOffsetQueue::PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS)
     idx.newPTS = initPTS;
     idx.pos_pts = 0;
     idx.framenum = 0;
-    idx.type = 0;
+    idx.type = false;
 
     for (it = keyList.begin(); it != keyList.end(); ++it)
         offset[*it].push_back(idx);
@@ -186,7 +186,7 @@ void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
 
     idx.newPTS = newPTS;
     idx.pos_pts = atPTS;
-    idx.type = 0;
+    idx.type = false;
     idx.framenum = 0;
 
     for (it = keyList.begin(); it != keyList.end(); ++it)
@@ -201,7 +201,7 @@ void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
 
     idx.pos_pts = pkt->pos;
     idx.framenum = pkt->duration;
-    idx.type = 1;
+    idx.type = true;
 
     LOG(VB_FRAME, LOG_INFO, QString("Offset %1 -> %2 (%3) at %4")
             .arg(PtsTime(offset[vid_id].last().newPTS))
@@ -531,7 +531,7 @@ MPEG2replex::~MPEG2replex()
 int MPEG2replex::WaitBuffers()
 {
     pthread_mutex_lock( &mutex );
-    while (1)
+    while (true)
     {
         int i, ok = 1;
 
@@ -609,7 +609,7 @@ void MPEG2replex::Start()
                    &vrbuf, &index_vrbuf, extrbuf, index_extrbuf, otype);
     setup_multiplex(&mx);
 
-    while (1)
+    while (true)
     {
         check_times( &mx, &video_ok, ext_ok, &start);
         write_out_packs( &mx, video_ok, ext_ok);
@@ -851,7 +851,7 @@ bool MPEG2fixup::InitAV(QString inputfile, const char *type, int64_t offset)
         }
     }
 
-    mkvfile = !strcmp(inputFC->iformat->name, "mkv") ? 1 : 0;
+    mkvfile = !strcmp(inputFC->iformat->name, "mkv") ? true : false;
 
     if (offset)
         av_seek_frame(inputFC, vid_id, offset, AVSEEK_FLAG_BYTE);
@@ -948,8 +948,8 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
     if (dec == header_decoder)
     {
         mpeg2_reset(dec, 0);
-        vf->isSequence = 0;
-        vf->isGop = 0;
+        vf->isSequence = false;
+        vf->isGop = false;
     }
 
     info = (mpeg2_info_t *)mpeg2_info(dec);
@@ -970,12 +970,12 @@ int MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
                 case STATE_SEQUENCE_REPEATED:
                     memcpy(&vf->mpeg2_seq, info->sequence,
                            sizeof(mpeg2_sequence_t));
-                    vf->isSequence = 1;
+                    vf->isSequence = true;
                     break;
 
                 case STATE_GOP:
                     memcpy(&vf->mpeg2_gop, info->gop, sizeof(mpeg2_gop_t));
-                    vf->isGop = 1;
+                    vf->isGop = true;
                     vf->gopPos = vf->pkt.data + last_pos;
                     //pd->adjustFrameCount=0;
                     break;
@@ -1603,7 +1603,7 @@ bool MPEG2fixup::FindStart()
                         LOG(VB_PROCESS, LOG_INFO,
                             QString("Found useful audio frame from stream %1")
                                 .arg(it.key()));
-                        found[it.key()] = 1;
+                        found[it.key()] = true;
                         break;
                     }
                     else
@@ -1620,7 +1620,7 @@ bool MPEG2fixup::FindStart()
                     LOG(VB_PROCESS, LOG_INFO,
                         QString("Found useful audio frame from stream %1")
                             .arg(it.key()));
-                    found[it.key()] = 1;
+                    found[it.key()] = true;
                     break;
                 }
 
@@ -2390,7 +2390,7 @@ int MPEG2fixup::Start()
 
                         //remove repeat_first_field if necessary
                         if (no_repeat)
-                            SetRepeat(curFrame, 2, 0);
+                            SetRepeat(curFrame, 2, false);
 
                         //force PTS to stay in sync (this could be a bad idea!)
                         if (fix_PTS)

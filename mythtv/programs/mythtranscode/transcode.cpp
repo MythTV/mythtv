@@ -1073,7 +1073,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     float vidFrameTime = 1000.0f / video_frame_rate;
     int wait_recover = 0;
     VideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
-    bool is_key = 0;
+    bool is_key = false;
     bool first_loop = true;
     AVFrame imageIn, imageOut;
     struct SwsContext  *scontext = NULL;

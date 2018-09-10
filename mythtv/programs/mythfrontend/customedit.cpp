@@ -166,7 +166,7 @@ void CustomEdit::loadData(void)
 QString CustomEdit::evaluate(QString clause)
 {
     int e0=0;
-    while (1) {
+    while (true) {
         int s0 = clause.indexOf (QRegExp("\\{[A-Z]+\\}"), e0);
 
         if (s0 < 0)

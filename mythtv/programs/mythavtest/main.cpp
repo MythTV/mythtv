@@ -93,7 +93,7 @@ class VideoPerformanceTest
 
         int ms = secondstorun * 1000;
         QTime start = QTime::currentTime();
-        while (1)
+        while (true)
         {
             int duration = start.msecsTo(QTime::currentTime());
             if (duration < 0 || duration > ms)
