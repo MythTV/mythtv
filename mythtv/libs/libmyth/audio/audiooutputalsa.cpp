@@ -324,7 +324,6 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     snd_pcm_hw_params_t *params;
     snd_pcm_format_t afmt = SND_PCM_FORMAT_UNKNOWN;
     AudioFormat fmt;
-    int rate;
     int err;
 
     AudioOutputSettings *settings = new AudioOutputSettings();
@@ -365,7 +364,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
              "(using plugin?)");
     }
 
-    while ((rate = settings->GetNextRate()))
+    while (int rate = settings->GetNextRate())
         if(snd_pcm_hw_params_test_rate(pcm_handle, params, rate, 0) >= 0)
             settings->AddSupportedRate(rate);
 

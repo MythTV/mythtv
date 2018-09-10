@@ -636,8 +636,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
 
     AudioOutputSettings *settings = new AudioOutputSettings();
 
-    int rate;
-    while ((rate = settings->GetNextRate()))
+    while (int rate = settings->GetNextRate())
     {
         pcm.nSamplingRate = rate;
         if (OMX_ErrorNone == m_audiorender.SetParameter(OMX_IndexParamAudioPcm, &pcm))

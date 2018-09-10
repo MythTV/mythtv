@@ -204,7 +204,7 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     }
     else
     {
-        while ((int rate = settings->GetNextRate()))
+        while (int rate = settings->GetNextRate())
         {
                         int *p_rates = rates;
                         while (*p_rates > 0)

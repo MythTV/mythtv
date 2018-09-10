@@ -50,8 +50,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
     QByteArray device = main_device.toLatin1();
     audiofd = open(device.constData(), O_WRONLY | O_NONBLOCK);
 
-    AudioFormat fmt;
-    int rate, formats = 0;
+    int formats = 0;
 
     if (audiofd < 0)
     {
@@ -60,7 +59,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
         return NULL;
     }
 
-    while ((rate = settings->GetNextRate()))
+    while (int rate = settings->GetNextRate())
     {
         int rate2 = rate;
         if(ioctl(audiofd, SNDCTL_DSP_SPEED, &rate2) >= 0
@@ -74,7 +73,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
     {
         int ofmt;
 
-        while ((fmt = settings->GetNextFormat()))
+        while (AudioFormat fmt = settings->GetNextFormat())
         {
             switch (fmt)
             {

@@ -56,16 +56,14 @@ void AudioOutputNULL::CloseDevice()
 AudioOutputSettings* AudioOutputNULL::GetOutputSettings(bool /*digital*/)
 {
     // Pretend that we support everything
-    AudioFormat fmt;
-    int rate;
     AudioOutputSettings *settings = new AudioOutputSettings();
 
-    while ((rate = settings->GetNextRate()))
+    while (int rate = settings->GetNextRate())
     {
         settings->AddSupportedRate(rate);
     }
 
-    while ((fmt = settings->GetNextFormat()))
+    while (AudioFormat fmt = settings->GetNextFormat())
     {
         settings->AddSupportedFormat(fmt);
     }
