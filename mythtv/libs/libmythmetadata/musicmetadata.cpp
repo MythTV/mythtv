@@ -84,7 +84,7 @@ MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QS
             m_dateadded(QDateTime()),
             m_playcount(0),
             m_tempplaycount(0),
-            m_compilation(0),
+            m_compilation(false),
             m_albumArt(NULL),
             m_lyricsData(NULL),
             m_id(lid),

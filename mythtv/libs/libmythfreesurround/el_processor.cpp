@@ -101,7 +101,7 @@ public:
         surround_coefficients(0.8165,0.5774);
         phase_mode(0);
         separation(1,1);
-        steering_mode(1);
+        steering_mode(true);
     }
 
     // destructor

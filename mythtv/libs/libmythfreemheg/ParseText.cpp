@@ -382,7 +382,7 @@ void MHParseText::Error(const char *str)
 // Lexical analysis.  Get the next symbol.
 void MHParseText::NextSym()
 {
-    while (1)
+    while (true)
     {
 
         switch (m_ch)
@@ -457,7 +457,7 @@ void MHParseText::NextSym()
                 // null-terminate the strings.
                 m_nStringLength = 0;
 
-                while (1)
+                while (true)
                 {
                     GetNextChar();
 
@@ -501,7 +501,7 @@ void MHParseText::NextSym()
                 // Quotable printable strings contain escape sequences beginning with the
                 // escape character '='.  The strings can span lines but each line must
                 // end with an equal sign.
-                while (1)
+                while (true)
                 {
                     GetNextChar();
 

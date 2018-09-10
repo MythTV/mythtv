@@ -1130,7 +1130,7 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
         {
             // one digit-sequence starts with 0 -> assume we are in a fraction part
             // do left aligned comparison (numbers are considered left aligned)
-            while (1)
+            while (true)
             {
                 if (!currA->isDigit() && !currB->isDigit())
                 {
@@ -1168,7 +1168,7 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
             bool isFirstRun = true;
             int weight = 0;
 
-            while (1)
+            while (true)
             {
                 if (!currA->isDigit() && !currB->isDigit())
                 {

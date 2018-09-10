@@ -666,9 +666,9 @@ void VideoMetadataImp::saveToDatabase()
 
     if (inserting)
     {
-        m_browse = 1;
+        m_browse = true;
 
-        m_watched = 0;
+        m_watched = false;
 
         query.prepare("INSERT INTO videometadata (title,subtitle,tagline,director,studio,plot,"
                       "rating,year,userrating,length,season,episode,filename,hash,"

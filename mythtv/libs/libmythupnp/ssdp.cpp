@@ -332,7 +332,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
     // Note: this function MUST do a read even if someone sends a zero byte UDP message
     // Otherwise the select() will continue to signal data ready, so to prevent using 100%
     // CPU, we need to call a recv function to make select() block again
-    bool didDoRead = 0;
+    bool didDoRead = false;
 
     // UDP message of zero length? OK, "recv" it and move on
     if (nBytes == 0)
@@ -348,7 +348,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         do
         {
             long ret = pSocket->readBlock( buffer.data() + nRead, nBytes - nRead );
-            didDoRead = 1;
+            didDoRead = true;
             if (ret < 0)
             {
                 if (errno == EAGAIN || errno == EWOULDBLOCK)

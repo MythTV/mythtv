@@ -61,5 +61,5 @@ void ScreenSaverOSX::Reset(void)
 
 bool ScreenSaverOSX::Asleep(void)
 {
-    return 0;
+    return false;
 }

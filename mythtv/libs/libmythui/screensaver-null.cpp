@@ -22,5 +22,5 @@ void ScreenSaverNull::Reset(void)
 
 bool ScreenSaverNull::Asleep(void)
 {
-    return 0;
+    return false;
 }
