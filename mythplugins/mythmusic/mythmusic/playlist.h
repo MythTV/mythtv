@@ -116,12 +116,12 @@ class Playlist : public QObject
     void computeSize(double &size_in_MB, double &size_in_sec);
     int CreateCDMP3(void);
     int CreateCDAudio(void);
-#endif
 
   private slots:
     void mkisofsData(int fd);
     void cdrecordData(int fd);
     void processExit(uint retval = 0);
+#endif
 
   private:
     MusicMetadata* getRawSongAt(int pos) const;
