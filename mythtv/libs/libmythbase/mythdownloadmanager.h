@@ -57,9 +57,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     bool download(QNetworkRequest *req, QByteArray *data);
     bool downloadAuth(const QString &url, const QString &dest,
                       const bool reload = false,
-                      AuthCallback authCallback = NULL,
-                      void *authArg = NULL,
-                      const QHash<QByteArray, QByteArray> *headers = NULL);
+                      AuthCallback authCallback = nullptr,
+                      void *authArg = nullptr,
+                      const QHash<QByteArray, QByteArray> *headers = nullptr);
 
     // Methods to POST to a URL
     void queuePost(const QString &url, QByteArray *data, QObject *caller);
@@ -68,7 +68,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
     bool post(QNetworkRequest *req, QByteArray *data);
     bool postAuth(const QString &url, QByteArray *data,
                   AuthCallback authCallback, void *authArg,
-                  const QHash<QByteArray, QByteArray> *headers = NULL);
+                  const QHash<QByteArray, QByteArray> *headers = nullptr);
 
     // Cancel a download
     void cancelDownload(const QString &url, bool block = true);
@@ -112,9 +112,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
                      const QString &dest, QByteArray *data,
                      const MRequestType reqType = kRequestGet,
                      const bool reload = false,
-                     AuthCallback authCallback = NULL,
-                     void *authArg = NULL,
-                     const QHash<QByteArray, QByteArray> *headers = NULL);
+                     AuthCallback authCallback = nullptr,
+                     void *authArg = nullptr,
+                     const QHash<QByteArray, QByteArray> *headers = nullptr);
 
     void downloadRemoteFile(MythDownloadInfo *dlInfo);
     void downloadQNetworkRequest(MythDownloadInfo *dlInfo);

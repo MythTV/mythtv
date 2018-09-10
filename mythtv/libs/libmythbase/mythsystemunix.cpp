@@ -54,10 +54,10 @@ typedef QMap<int, FDType_t*> FDMap_t;
  * MythSystemLegacyManager method defines
  *********************************/
 static bool                     run_system = true;
-static MythSystemLegacyManager       *manager = NULL;
-static MythSystemLegacySignalManager *smanager = NULL;
-static MythSystemLegacyIOHandler     *readThread = NULL;
-static MythSystemLegacyIOHandler     *writeThread = NULL;
+static MythSystemLegacyManager       *manager = nullptr;
+static MythSystemLegacySignalManager *smanager = nullptr;
+static MythSystemLegacyIOHandler     *readThread = nullptr;
+static MythSystemLegacyIOHandler     *writeThread = nullptr;
 static MSList_t                 msList;
 static QMutex                   listLock;
 static FDMap_t                  fdMap;
@@ -107,7 +107,7 @@ void MythSystemLegacyIOHandler::run(void)
             struct timespec ts;
             ts.tv_sec = 0;
             ts.tv_nsec = 10*1000*1000;  // 10ms
-            nanosleep(&ts, NULL); // ~100x per second, for ~3MBps throughput
+            nanosleep(&ts, nullptr); // ~100x per second, for ~3MBps throughput
             m_pLock.lock();
             if( m_pMap.isEmpty() )
             {
@@ -122,9 +122,9 @@ void MythSystemLegacyIOHandler::run(void)
             fd_set fds = m_fds;
 
             if( m_read )
-                retval = select(m_maxfd+1, &fds, NULL, NULL, &tv);
+                retval = select(m_maxfd+1, &fds, nullptr, nullptr, &tv);
             else
-                retval = select(m_maxfd+1, NULL, &fds, NULL, &tv);
+                retval = select(m_maxfd+1, nullptr, &fds, nullptr, &tv);
 
             if( retval == -1 )
                 LOG(VB_SYSTEM, LOG_ERR,
@@ -275,7 +275,7 @@ void MythSystemLegacyManager::run(void)
     RunProlog();
     LOG(VB_GENERAL, LOG_INFO, "Starting process manager");
 
-    // run_system is set to NULL during shutdown, and we need this thread to
+    // run_system is set to false during shutdown, and we need this thread to
     // exit during shutdown.
     while( run_system )
     {
@@ -385,7 +385,7 @@ void MythSystemLegacyManager::run(void)
 
         // loop through running processes for any that require action
         MSMap_t::iterator   i, next;
-        time_t              now = time(NULL);
+        time_t              now = time(nullptr);
 
         m_mapLock.lock();
         m_jumpLock.lock();
@@ -512,7 +512,7 @@ void MythSystemLegacySignalManager::run(void)
         struct timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 50 * 1000 * 1000; // 50ms
-        nanosleep(&ts, NULL); // sleep 50ms
+        nanosleep(&ts, nullptr); // sleep 50ms
 
         while (run_system)
         {
@@ -585,25 +585,25 @@ MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
             m_parent, SIGNAL(readDataReady(int)));
 
     // Start the threads if they haven't been started yet.
-    if( manager == NULL )
+    if( manager == nullptr )
     {
         manager = new MythSystemLegacyManager;
         manager->start();
     }
 
-    if( smanager == NULL )
+    if( smanager == nullptr )
     {
         smanager = new MythSystemLegacySignalManager;
         smanager->start();
     }
 
-    if( readThread == NULL )
+    if( readThread == nullptr )
     {
         readThread = new MythSystemLegacyIOHandler(true);
         readThread->start();
     }
 
-    if( writeThread == NULL )
+    if( writeThread == nullptr )
     {
         writeThread = new MythSystemLegacyIOHandler(false);
         writeThread->start();
@@ -904,14 +904,14 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         {
             cmdargs[i++] = strdup(it->toUtf8().constData());
         }
-        cmdargs[i] = (char *)NULL;
+        cmdargs[i] = (char *)nullptr;
     }
     else
         LOG(VB_GENERAL, LOG_CRIT, LOC_ERR +
                         "Failed to allocate memory for cmdargs " +
                         ENO);
 
-    char *directory = NULL;
+    char *directory = nullptr;
     QString dir = GetDirectory();
     if (GetSetting("SetDirectory") && !dir.isEmpty())
         directory = strdup(dir.toUtf8().constData());
@@ -922,7 +922,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     /* Do this before forking in case the child miserably fails */
     m_timeout = timeout;
     if( timeout )
-        m_timeout += time(NULL);
+        m_timeout += time(nullptr);
 
     listLock.lock();
     pid_t child = fork();
@@ -960,7 +960,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         m_stdpipe[1] = p_stdout[0];
         m_stdpipe[2] = p_stderr[0];
 
-        if( manager == NULL )
+        if( manager == nullptr )
         {
             manager = new MythSystemLegacyManager;
             manager->start();
@@ -1169,7 +1169,7 @@ void MythSystemLegacyUnix::Manage(void)
 
 void MythSystemLegacyUnix::JumpAbort(void)
 {
-    if( manager == NULL )
+    if( manager == nullptr )
     {
         manager = new MythSystemLegacyManager;
         manager->start();

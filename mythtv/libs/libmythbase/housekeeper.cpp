@@ -511,7 +511,7 @@ void HouseKeepingThread::run(void)
 {
     RunProlog();
     m_waitMutex.lock();
-    HouseKeeperTask *task = NULL;
+    HouseKeeperTask *task = nullptr;
 
     while (m_keepRunning)
     {
@@ -526,14 +526,14 @@ void HouseKeepingThread::run(void)
             {
                 // something else has caused the lastrun time to
                 // change since this was requested to run. abort.
-                task = NULL;
+                task = nullptr;
                 continue;
             }
 
             task->UpdateLastRun(false);
             if (task->Run())
                 task->UpdateLastRun(task->GetLastRun(), true);
-            task = NULL;
+            task = nullptr;
 
             if (!m_keepRunning)
                 // thread has been discarded, don't try to start another task
@@ -569,7 +569,7 @@ void HouseKeepingThread::run(void)
  *  Tasks cannot be removed from the housekeeper once added.
  *
  */
-HouseKeeper::HouseKeeper(void) : m_timer(NULL)
+HouseKeeper::HouseKeeper(void) : m_timer(nullptr)
 {
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(Run()));
@@ -586,7 +586,7 @@ HouseKeeper::~HouseKeeper(void)
         m_timer->stop();
         disconnect(m_timer);
         delete m_timer;
-        m_timer = NULL;
+        m_timer = nullptr;
     }
 
     {
@@ -654,14 +654,14 @@ void HouseKeeper::RegisterTask(HouseKeeperTask *task)
 HouseKeeperTask* HouseKeeper::GetQueuedTask(void)
 {
     QMutexLocker queueLock(&m_queueLock);
-    HouseKeeperTask *task = NULL;
+    HouseKeeperTask *task = nullptr;
 
     if (!m_taskQueue.isEmpty())
     {
         task = m_taskQueue.dequeue();
     }
 
-    // returning NULL tells the thread that the queue is empty and
+    // returning nullptr tells the thread that the queue is empty and
     // to go into standby
     return task;
 }

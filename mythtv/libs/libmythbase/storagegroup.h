@@ -35,7 +35,7 @@ class MBASE_PUBLIC StorageGroup
     static QString GetRelativePathname(const QString &filename);
     static bool FindDirs(const QString &group = "Default",
                          const QString &hostname = "",
-                         QStringList *dirlist = NULL);
+                         QStringList *dirlist = nullptr);
 
     QString FindFile(const QString &filename);
     QString FindFileDir(const QString &filename);

@@ -100,7 +100,7 @@ static QMutex s_all_threads_lock;
 static QSet<MThread*> s_all_threads;
 
 MThread::MThread(const QString &objectName) :
-    m_thread(new MThreadInternal(*this)), m_runnable(NULL),
+    m_thread(new MThreadInternal(*this)), m_runnable(nullptr),
     m_prolog_executed(true), m_epilog_executed(true)
 {
     m_thread->setObjectName(objectName);
@@ -140,7 +140,7 @@ MThread::~MThread()
     }
 
     delete m_thread;
-    m_thread = NULL;
+    m_thread = nullptr;
 }
 
 void MThread::Cleanup(void)

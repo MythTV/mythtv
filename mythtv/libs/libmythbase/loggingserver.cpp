@@ -65,8 +65,8 @@ extern "C" {
 static QMutex                      loggerMapMutex;
 static QMap<QString, LoggerBase *> loggerMap;
 
-LogServerThread                    *logServerThread = NULL;
-LogForwardThread                   *logForwardThread = NULL;
+LogServerThread                    *logServerThread = nullptr;
+LogForwardThread                   *logForwardThread = nullptr;
 
 static QMutex                       logThreadStartedMutex;
 static QWaitCondition               logThreadStarted;
@@ -117,7 +117,7 @@ LoggerBase::LoggerBase(const char *string)
     }
     else
     {
-        m_handle = NULL;
+        m_handle = nullptr;
         loggerMap.insert(QString(""), this);
     }
 }
@@ -138,7 +138,7 @@ LoggerBase::~LoggerBase()
 /// \brief FileLogger constructor
 /// \param filename Filename of the logfile.
 FileLogger::FileLogger(const char *filename) :
-        LoggerBase(filename), m_opened(false), m_fd(-1), m_zmqSock(NULL)
+        LoggerBase(filename), m_opened(false), m_fd(-1), m_zmqSock(nullptr)
 {
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
@@ -173,7 +173,7 @@ FileLogger *FileLogger::create(QString filename, QMutex *mutex)
     QByteArray ba = filename.toLocal8Bit();
     const char *file = ba.constData();
     FileLogger *logger =
-        dynamic_cast<FileLogger *>(loggerMap.value(filename, NULL));
+        dynamic_cast<FileLogger *>(loggerMap.value(filename, nullptr));
 
     if (logger)
         return logger;
@@ -187,7 +187,7 @@ FileLogger *FileLogger::create(QString filename, QMutex *mutex)
     if (!logger->setupZMQSocket())
     {
         delete logger;
-        return NULL;
+        return nullptr;
     }
 
     ClientList *clients = new ClientList;
@@ -291,11 +291,11 @@ bool FileLogger::setupZMQSocket(void)
 /// \brief SyslogLogger constructor
 /// \param facility Syslog facility to use in logging
 SyslogLogger::SyslogLogger(bool open) :
-    LoggerBase(NULL), m_opened(false), m_zmqSock(NULL)
+    LoggerBase(nullptr), m_opened(false), m_zmqSock(nullptr)
 {
     if (open)
     {
-        openlog(NULL, LOG_NDELAY, 0 );
+        openlog(nullptr, LOG_NDELAY, 0 );
         m_opened = true;
     }
 
@@ -321,7 +321,7 @@ SyslogLogger::~SyslogLogger()
 SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
 {
     SyslogLogger *logger =
-        dynamic_cast<SyslogLogger *>(loggerMap.value("", NULL));
+        dynamic_cast<SyslogLogger *>(loggerMap.value("", nullptr));
 
     if (logger)
         return logger;
@@ -335,7 +335,7 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
     if (!logger->setupZMQSocket())
     {
         delete logger;
-        return NULL;
+        return nullptr;
     }
 
     ClientList *clients = new ClientList;
@@ -373,7 +373,7 @@ bool SyslogLogger::logmsg(LoggingItem *item)
 
     {
         QMutexLocker locker(&loglevelMapMutex);
-        LoglevelDef *lev = loglevelMap.value(item->level(), NULL);
+        LoglevelDef *lev = loglevelMap.value(item->level(), nullptr);
         if (!lev)
             shortname = '-';
         else
@@ -447,7 +447,7 @@ const int DatabaseLogger::kMinDisabledTime = 1000;
 /// \param table C-string of the database table to log to
 DatabaseLogger::DatabaseLogger(const char *table) :
     LoggerBase(table), m_opened(false), m_loggingTableExists(false),
-    m_zmqSock(NULL)
+    m_zmqSock(nullptr)
 {
     m_query = QString(
         "INSERT INTO %1 "
@@ -488,7 +488,7 @@ DatabaseLogger *DatabaseLogger::create(QString table, QMutex *mutex)
     QByteArray ba = table.toLocal8Bit();
     const char *tble = ba.constData();
     DatabaseLogger *logger =
-        dynamic_cast<DatabaseLogger *>(loggerMap.value(table, NULL));
+        dynamic_cast<DatabaseLogger *>(loggerMap.value(table, nullptr));
 
     if (logger)
         return logger;
@@ -502,7 +502,7 @@ DatabaseLogger *DatabaseLogger::create(QString table, QMutex *mutex)
     if (!logger->setupZMQSocket())
     {
         delete logger;
-        return NULL;
+        return nullptr;
     }
 
     ClientList *clients = new ClientList;
@@ -518,7 +518,7 @@ void DatabaseLogger::stopDatabaseAccess(void)
         m_thread->stop();
         m_thread->wait();
         delete m_thread;
-        m_thread = NULL;
+        m_thread = nullptr;
     }
 }
 
@@ -712,8 +712,8 @@ DBLoggerThread::~DBLoggerThread()
         m_queue->dequeue()->DecrRef();
     delete m_queue;
     delete m_wait;
-    m_queue = NULL;
-    m_wait = NULL;
+    m_queue = nullptr;
+    m_wait = nullptr;
 }
 
 /// \brief Start the thread.
@@ -822,8 +822,8 @@ void logSigHup(void)
 
 /// \brief LogServerThread constructor.
 LogServerThread::LogServerThread() :
-    MThread("LogServer"), m_zmqContext(NULL), m_zmqInSock(NULL),
-    m_heartbeatTimer(NULL)
+    MThread("LogServer"), m_zmqContext(nullptr), m_zmqInSock(nullptr),
+    m_heartbeatTimer(nullptr)
 {
     moveToThread(qthread());
 }
@@ -918,7 +918,7 @@ void LogServerThread::run(void)
     {
         logForwardThread->stop();
         delete logForwardThread;
-        logForwardThread = NULL;
+        logForwardThread = nullptr;
     }
 
 #ifndef NOLOGSERVER
@@ -1156,8 +1156,8 @@ void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 
 /// \brief LogForwardThread constructor.
 LogForwardThread::LogForwardThread() :
-    MThread("LogForward"), m_aborted(false), m_zmqContext(NULL),
-    m_zmqPubSock(NULL), m_shutdownTimer(NULL)
+    MThread("LogForward"), m_aborted(false), m_zmqContext(nullptr),
+    m_zmqPubSock(nullptr), m_shutdownTimer(nullptr)
 {
     moveToThread(qthread());
 }
@@ -1200,7 +1200,7 @@ void LogForwardThread::run(void)
     while (!m_aborted)
     {
         qApp->processEvents(QEventLoop::AllEvents, 10);
-        qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
+        qApp->sendPostedEvents(nullptr, QEvent::DeferredDelete);
 
         {
             QMutexLocker lock(&logMsgListMutex);
@@ -1224,7 +1224,7 @@ void LogForwardThread::run(void)
                 if ((processed & 127) == 0)
                 {
                     qApp->processEvents(QEventLoop::AllEvents, 10);
-                    qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
+                    qApp->sendPostedEvents(nullptr, QEvent::DeferredDelete);
                 }
 
                 lock.relock();
@@ -1376,7 +1376,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     {
         // This is either a ping response or a first gasp
         logClientMapMutex.lock();
-        LoggerListItem *logItem = logClientMap.value(clientId, NULL);
+        LoggerListItem *logItem = logClientMap.value(clientId, nullptr);
         logClientMapMutex.unlock();
         if (!logItem)
         {
@@ -1386,18 +1386,18 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         else
         {
             // cout << "pong " << clientId.toLocal8Bit().constData() << endl;
-            loggingGetTimeStamp(&logItem->epoch, NULL);
+            loggingGetTimeStamp(&logItem->epoch, nullptr);
         }
         return;
     }
 
     QMutexLocker lock(&logClientMapMutex);
-    LoggerListItem *logItem = logClientMap.value(clientId, NULL);
+    LoggerListItem *logItem = logClientMap.value(clientId, nullptr);
 
     // cout << "msg  " << clientId.toLocal8Bit().constData() << endl;
     if (logItem)
     {
-        loggingGetTimeStamp(&logItem->epoch, NULL);
+        loggingGetTimeStamp(&logItem->epoch, nullptr);
     }
     else
     {
@@ -1479,7 +1479,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         }
 
         logItem = new LoggerListItem;
-        loggingGetTimeStamp(&logItem->epoch, NULL);
+        loggingGetTimeStamp(&logItem->epoch, nullptr);
         logItem->list = loggers;
         logClientMap.insert(clientId, logItem);
 

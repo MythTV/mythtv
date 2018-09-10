@@ -248,11 +248,11 @@ static QString getSystemTimeZoneID(void)
             time_t t;
             struct tm *result = (struct tm *)malloc(sizeof(*result));
 
-            if (result != NULL)
+            if (result != nullptr)
             {
-                t = time(NULL);
+                t = time(nullptr);
                 localtime_r(&t, result);
-                if (result != NULL)
+                if (result != nullptr)
                 {
                     if (strftime(name, sizeof(name), "%Z", result) > 0)
                         zone_id = name;

@@ -237,7 +237,7 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
     QString newname = FindPluginName(plugname);
 
     if (moduleMap.find(newname) == moduleMap.end())
-        return NULL;
+        return nullptr;
 
     return moduleMap[newname];
 }

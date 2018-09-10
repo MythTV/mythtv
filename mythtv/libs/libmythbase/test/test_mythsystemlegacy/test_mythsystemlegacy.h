@@ -59,7 +59,7 @@ class TestMythSystemLegacy: public QObject
     // called at the beginning of these sets of tests
     void initTestCase(void)
     {
-        gCoreContext = new MythCoreContext("bin_version", NULL);
+        gCoreContext = new MythCoreContext("bin_version", nullptr);
 #ifdef NEW_LOGGING
         DebugLogHandler::AddReplacement("ConsoleLogHandler");
         myth_logging::initialize_logging(

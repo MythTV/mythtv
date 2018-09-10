@@ -21,13 +21,13 @@ class AutoDeleteDeque
     {
         if (index < list.size())
             return list[index];
-        return NULL;
+        return nullptr;
     }
     const T operator[](uint index) const
     {
         if (index < list.size())
             return list[index];
-        return NULL;
+        return nullptr;
     }
 
     T take(uint i);
@@ -79,7 +79,7 @@ T AutoDeleteDeque<T>::take(uint index)
     for (uint i = 0; i < index; i++, ++it)
     {
         if (it == list.end())
-            return NULL;
+            return nullptr;
     }
     T info = *it;
     list.erase(it);

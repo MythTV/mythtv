@@ -1168,7 +1168,7 @@ MythCommandLineParser::MythCommandLineParser(QString appname) :
     m_overridesImported(false), m_verbose(false)
 {
     char *verbose = getenv("VERBOSE_PARSER");
-    if (verbose != NULL)
+    if (verbose != nullptr)
     {
         cerr << "MythCommandLineParser is now operating verbosely." << endl;
         m_verbose = true;

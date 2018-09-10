@@ -21,7 +21,7 @@ class MBASE_PUBLIC RemoteFile
                bool write = false,
                bool usereadahead = true,
                int timeout_ms = 2000/*RingBuffer::kDefaultOpenTimeout*/,
-               const QStringList *possibleAuxiliaryFiles = NULL);
+               const QStringList *possibleAuxiliaryFiles = nullptr);
    ~RemoteFile();
 
     bool ReOpen(QString newFilename);

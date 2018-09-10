@@ -150,7 +150,7 @@ static int _def_close(udfread_block_input *p_gen)
     if (p && p->file)
     {
         delete p->file;
-        p->file = NULL;
+        p->file = nullptr;
         result = 0;
     }
 

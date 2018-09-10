@@ -100,7 +100,7 @@ static quint8* convert_int(quint8 *p, quint8 s)
 }
 
 PList::PList(const QByteArray &data)
-  : m_data(NULL), m_offsetTable(NULL), m_rootObj(0),
+  : m_data(nullptr), m_offsetTable(nullptr), m_rootObj(0),
     m_numObjs(0), m_offsetSize(0), m_parmSize(0)
 {
     ParseBinaryPList(data);
@@ -329,7 +329,7 @@ quint64 PList::GetBinaryUInt(quint8 *p, quint64 size)
 quint8* PList::GetBinaryObject(quint64 num)
 {
     if (num > m_numObjs)
-        return NULL;
+        return nullptr;
 
     quint8* p = m_offsetTable + (num * m_offsetSize);
     quint64 offset = GetBinaryUInt(p, m_offsetSize);

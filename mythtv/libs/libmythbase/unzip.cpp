@@ -179,7 +179,7 @@
 //! Checks if some file has been already extracted.
 #define UNZIP_CHECK_FOR_VALID_DATA \
 	{\
-		if (headers != 0)\
+		if (headers != nullptr)\
 		{\
 			qDebug() << "Corrupted zip archive. Some files might be extracted.";\
 			ec = headers->size() != 0 ? UnZip::PartiallyCorrupted : UnZip::Corrupted;\
@@ -188,7 +188,7 @@
 		else\
 		{\
 			delete device;\
-			device = 0;\
+			device = nullptr;\
 			qDebug() << "Corrupted or invalid zip archive";\
 			ec = UnZip::Corrupted;\
 			break;\
@@ -222,7 +222,7 @@ UnZip::~UnZip()
 */
 bool UnZip::isOpen() const
 {
-	return d->device != 0;
+	return d->device != nullptr;
 }
 
 /*!
@@ -252,7 +252,7 @@ UnZip::ErrorCode UnZip::openArchive(const QString& filename)
 */
 UnZip::ErrorCode UnZip::openArchive(QIODevice* device)
 {
-	if (device == 0)
+	if (device == nullptr)
 	{
 		qDebug() << "Invalid device.";
 		return UnZip::InvalidDevice;
@@ -271,7 +271,7 @@ void UnZip::closeArchive()
 
 QString UnZip::archiveComment() const
 {
-	if (d->device == 0)
+	if (d->device == nullptr)
 		return QString();
 	return d->comment;
 }
@@ -310,7 +310,7 @@ QString UnZip::formatError(UnZip::ErrorCode c) const
 */
 bool UnZip::contains(const QString& file) const
 {
-	if (d->headers == 0)
+	if (d->headers == nullptr)
 		return false;
 
 	return d->headers->contains(file);
@@ -321,7 +321,7 @@ bool UnZip::contains(const QString& file) const
 */
 QStringList UnZip::fileList() const
 {
-	return d->headers == 0 ? QStringList() : d->headers->keys();
+	return d->headers == nullptr ? QStringList() : d->headers->keys();
 }
 
 /*!
@@ -331,12 +331,12 @@ QList<UnZip::ZipEntry> UnZip::entryList() const
 {
 	QList<UnZip::ZipEntry> list;
 
-	if (d->headers != 0)
+	if (d->headers != nullptr)
 	{
 		for (QMap<QString,ZipEntryP*>::ConstIterator it = d->headers->constBegin(); it != d->headers->constEnd(); ++it)
 		{
 			const ZipEntryP* entry = it.value();
-			Q_ASSERT(entry != 0);
+			Q_ASSERT(entry != nullptr);
 
 			ZipEntry z;
 
@@ -374,17 +374,17 @@ UnZip::ErrorCode UnZip::extractAll(const QString& dirname, ExtractionOptions opt
 UnZip::ErrorCode UnZip::extractAll(const QDir& dir, ExtractionOptions options)
 {
 	// this should only happen if we didn't call openArchive() yet
-	if (d->device == 0)
+	if (d->device == nullptr)
 		return NoOpenArchive;
 
-	if (d->headers == 0)
+	if (d->headers == nullptr)
 		return Ok;
 
 	bool end = false;
 	for (QMap<QString,ZipEntryP*>::Iterator itr = d->headers->begin(); itr != d->headers->end(); ++itr)
 	{
 		ZipEntryP* entry = itr.value();
-		Q_ASSERT(entry != 0);
+		Q_ASSERT(entry != nullptr);
 
 		if ((entry->isEncrypted()) && d->skipAllEncrypted)
 			continue;
@@ -432,7 +432,7 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, const QDir& dir, Ex
 	if (itr != d->headers->end())
 	{
 		ZipEntryP* entry = itr.value();
-		Q_ASSERT(entry != 0);
+		Q_ASSERT(entry != nullptr);
 		return d->extractFile(itr.key(), *entry, dir, options);
 	}
 
@@ -444,13 +444,13 @@ UnZip::ErrorCode UnZip::extractFile(const QString& filename, const QDir& dir, Ex
 */
 UnZip::ErrorCode UnZip::extractFile(const QString& filename, QIODevice* dev, ExtractionOptions options)
 {
-	if (dev == 0)
+	if (dev == nullptr)
 		return InvalidDevice;
 
 	QMap<QString,ZipEntryP*>::Iterator itr = d->headers->find(filename);
 	if (itr != d->headers->end()) {
 		ZipEntryP* entry = itr.value();
-		Q_ASSERT(entry != 0);
+		Q_ASSERT(entry != nullptr);
 		return d->extractFile(itr.key(), *entry, dev, options);
 	}
 
@@ -526,8 +526,8 @@ UnZip::ZipEntry::ZipEntry()
 UnzipPrivate::UnzipPrivate()
 {
 	skipAllEncrypted = false;
-	headers = 0;
-	device = 0;
+	headers = nullptr;
+	device = nullptr;
 
     memset(buffer1, 0, sizeof(buffer1));
     memset(buffer2, 0, sizeof(buffer2));
@@ -543,9 +543,9 @@ UnzipPrivate::UnzipPrivate()
 //! \internal Parses a Zip archive.
 UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
 {
-	Q_ASSERT(dev != 0);
+	Q_ASSERT(dev != nullptr);
 
-	if (device != 0)
+	if (device != nullptr)
 		closeArchive();
 
 	device = dev;
@@ -553,7 +553,7 @@ UnZip::ErrorCode UnzipPrivate::openArchive(QIODevice* dev)
 	if (!(device->isOpen() || device->open(QIODevice::ReadOnly)))
 	{
 		delete device;
-		device = 0;
+		device = nullptr;
 
 		qDebug() << "Unable to open device for reading";
 		return UnZip::OpenFailed;
@@ -777,7 +777,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
 	else
 	{
 		qint64 read;
-		char* p = 0;
+		char* p = nullptr;
 
 		offset -= UNZIP_EOCD_SIZE;
 
@@ -789,7 +789,7 @@ UnZip::ErrorCode UnzipPrivate::seekToCentralDirectory()
 
 		while ((read = device->read(buffer1, UNZIP_EOCD_SIZE)) >= 0)
 		{
-			if ( (p = strstr(buffer1, "PK\5\6")) != 0)
+			if ( (p = strstr(buffer1, "PK\5\6")) != nullptr)
 			{
 				// Seek to the start of the EOCD record so we can read it fully
 				// Yes... we could simply read the missing bytes and append them to the buffer
@@ -979,7 +979,7 @@ UnZip::ErrorCode UnzipPrivate::parseCentralDirectoryRecord()
 
 	h->lhOffset = getULong(uBuffer, UNZIP_CD_OFF_LHOFFSET);
 
-	if (headers == 0)
+	if (headers == nullptr)
 		headers = new QMap<QString, ZipEntryP*>();
 	headers->insert(filename, h);
 
@@ -989,19 +989,19 @@ UnZip::ErrorCode UnzipPrivate::parseCentralDirectoryRecord()
 //! \internal Closes the archive and resets the internal status.
 void UnzipPrivate::closeArchive()
 {
-	if (device == 0)
+	if (device == nullptr)
 		return;
 
 	skipAllEncrypted = false;
 
-	if (headers != 0)
+	if (headers != nullptr)
 	{
 		qDeleteAll(*headers);
 		delete headers;
-		headers = 0;
+		headers = nullptr;
 	}
 
-	delete device; device = 0;
+	delete device; device = nullptr;
 
 	cdOffset = eocdOffset = 0;
 	cdEntryCount = 0;
@@ -1085,7 +1085,7 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, ZipEntryP& entry
 UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, ZipEntryP& entry, QIODevice* dev, UnZip::ExtractionOptions options)
 {
 	Q_UNUSED(options);
-	Q_ASSERT(dev != 0);
+	Q_ASSERT(dev != nullptr);
 
 	if (!entry.lhEntryChecked)
 	{
