@@ -43,7 +43,7 @@ class META_PUBLIC MetaGrabberScript
                                         bool refresh=false);
 
     static MetaGrabberScript    GetGrabber(GrabberType defaultType,
-                                           const MetadataLookup *lookup = NULL);
+                                           const MetadataLookup *lookup = nullptr);
     static MetaGrabberScript    GetType(const QString &type);
     static MetaGrabberScript    GetType(GrabberType type);
     static MetaGrabberScript    FromTag(const QString &tag,

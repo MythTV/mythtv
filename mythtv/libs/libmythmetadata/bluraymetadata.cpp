@@ -14,7 +14,7 @@
 #include "mythdirs.h"
 
 BlurayMetadata::BlurayMetadata(const QString &path) :
-    m_bdnav(NULL),
+    m_bdnav(nullptr),
     m_title(QString()),          m_alttitle(QString()),
     m_language(QString()),       m_discnumber(0),
     m_disctotal(0),              m_path(path),

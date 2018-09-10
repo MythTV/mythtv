@@ -80,7 +80,7 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, MusicMetadata *metadata)
     if (metadata->Title().isEmpty())
         readFromFilename(metadata);
 
-    // If we don't have title and artist or don't have the length return NULL
+    // If we don't have title and artist or don't have the length return nullptr
     if (metadata->Title().isEmpty() && metadata->Artist().isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR,

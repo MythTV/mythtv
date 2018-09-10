@@ -19,7 +19,7 @@ MetadataResultsDialog::MetadataResultsDialog(
 
     MythScreenType(lparent, "metadataresultspopup"),
     m_results(results),
-    m_resultsList(0)
+    m_resultsList(nullptr)
 {
     m_imageDownload = new MetadataImageDownload(this);
 }
@@ -31,7 +31,7 @@ MetadataResultsDialog::~MetadataResultsDialog()
     if (m_imageDownload)
     {
         delete m_imageDownload;
-        m_imageDownload = NULL;
+        m_imageDownload = nullptr;
     }
 }
 

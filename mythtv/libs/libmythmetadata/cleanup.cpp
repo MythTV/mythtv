@@ -44,7 +44,7 @@ class CleanupHooksImp
 
 namespace
 {
-    CleanupHooks *g_cleanup_hooks = 0;
+    CleanupHooks *g_cleanup_hooks = nullptr;
 }
 
 CleanupHooks *CleanupHooks::getInstance()
@@ -70,7 +70,7 @@ void CleanupHooks::cleanup()
 {
     m_imp->cleanup();
     delete g_cleanup_hooks;
-    g_cleanup_hooks = 0;
+    g_cleanup_hooks = nullptr;
 }
 
 CleanupHooks::CleanupHooks()

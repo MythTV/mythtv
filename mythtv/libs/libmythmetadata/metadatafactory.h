@@ -43,7 +43,7 @@ class META_PUBLIC MetadataFactorySingleResult : public QEvent
         if (result)
         {
             result->DecrRef();
-            result = NULL;
+            result = nullptr;
         }
     }
 
@@ -68,7 +68,7 @@ class META_PUBLIC MetadataFactoryNoResult : public QEvent
         if (result)
         {
             result->DecrRef();
-            result = NULL;
+            result = nullptr;
         }
     }
 

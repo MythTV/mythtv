@@ -24,7 +24,7 @@ template <typename T, class Locker = NoLock>
 class simple_ref_ptr
 {
   public:
-    simple_ref_ptr() : m_ref(0)
+    simple_ref_ptr() : m_ref(nullptr)
     {
     }
 
@@ -33,7 +33,7 @@ class simple_ref_ptr
         m_ref = new ref(ptr);
     }
 
-    simple_ref_ptr(const simple_ref_ptr &rhs) : m_ref(0)
+    simple_ref_ptr(const simple_ref_ptr &rhs) : m_ref(nullptr)
     {
         *this = rhs;
     }
@@ -66,7 +66,7 @@ class simple_ref_ptr
     {
         if (m_ref) return m_ref->get();
 
-        return 0;
+        return nullptr;
     }
 
     void reset(T *ptr)
@@ -79,12 +79,12 @@ class simple_ref_ptr
 
     operator fake_bool() const
     {
-        return m_ref == 0 ? 0 : &simple_ref_ptr<T>::get;
+        return m_ref == nullptr ? nullptr : &simple_ref_ptr<T>::get;
     }
 
     bool operator!() const
     {
-        return m_ref == 0;
+        return m_ref == nullptr;
     }
 
   private:
@@ -134,7 +134,7 @@ class simple_ref_ptr
         if (m_ref && m_ref->dec() <= 0)
         {
             delete m_ref;
-            m_ref = 0;
+            m_ref = nullptr;
         }
     }
 

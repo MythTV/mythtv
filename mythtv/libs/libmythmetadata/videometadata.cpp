@@ -47,7 +47,7 @@ static bool operator<(const SortData &lhs, const SortData &rhs)
     return ret < 0;
 }
 
-VideoMetadata::SortKey::SortKey() : m_sd(NULL)
+VideoMetadata::SortKey::SortKey() : m_sd(nullptr)
 {
 }
 
@@ -56,7 +56,7 @@ VideoMetadata::SortKey::SortKey(const SortData &data)
     m_sd = new SortData(data);
 }
 
-VideoMetadata::SortKey::SortKey(const SortKey &other) : m_sd(NULL)
+VideoMetadata::SortKey::SortKey(const SortKey &other) : m_sd(nullptr)
 {
     *this = other;
 }
@@ -80,13 +80,13 @@ VideoMetadata::SortKey::~SortKey()
 
 bool VideoMetadata::SortKey::isSet() const
 {
-    return m_sd != 0;
+    return m_sd != nullptr;
 }
 
 void VideoMetadata::SortKey::Clear()
 {
     delete m_sd;
-    m_sd = 0;
+    m_sd = nullptr;
 }
 
 class VideoMetadataImp
@@ -1225,7 +1225,7 @@ VideoMetadata::VideoMetadata(MSqlQuery &query)
     m_imp = new VideoMetadataImp(query);
 }
 
-VideoMetadata::VideoMetadata(const VideoMetadata &rhs) : m_imp(NULL)
+VideoMetadata::VideoMetadata(const VideoMetadata &rhs) : m_imp(nullptr)
 {
     *this = rhs;
 }

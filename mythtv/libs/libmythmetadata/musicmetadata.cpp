@@ -85,8 +85,8 @@ MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QS
             m_playcount(0),
             m_tempplaycount(0),
             m_compilation(false),
-            m_albumArt(NULL),
-            m_lyricsData(NULL),
+            m_albumArt(nullptr),
+            m_lyricsData(nullptr),
             m_id(lid),
             m_filename(lurls[0]),
             m_hostname(""),
@@ -111,13 +111,13 @@ MusicMetadata::~MusicMetadata()
     if (m_albumArt)
     {
         delete m_albumArt;
-        m_albumArt = NULL;
+        m_albumArt = nullptr;
     }
 
     if (m_lyricsData)
     {
         delete m_lyricsData;
-        m_lyricsData = NULL;
+        m_lyricsData = nullptr;
     }
 }
 
@@ -153,8 +153,8 @@ MusicMetadata& MusicMetadata::operator=(const MusicMetadata &rhs)
     m_compartistid = rhs.m_compartistid;
     m_albumid = rhs.m_albumid;
     m_genreid = rhs.m_genreid;
-    m_albumArt = NULL;
-    m_lyricsData = NULL;
+    m_albumArt = nullptr;
+    m_lyricsData = nullptr;
     m_format = rhs.m_format;
     m_changed = rhs.m_changed;
     m_fileSize = rhs.m_fileSize;
@@ -264,7 +264,7 @@ MusicMetadata *MusicMetadata::createFromFilename(const QString &filename)
     if (!query.exec())
     {
         MythDB::DBError("MusicMetadata::createFromFilename", query);
-        return NULL;
+        return nullptr;
     }
 
     if (!query.next())
@@ -272,7 +272,7 @@ MusicMetadata *MusicMetadata::createFromFilename(const QString &filename)
         LOG(VB_GENERAL, LOG_WARNING,
             QString("MusicMetadata::createFromFilename: Could not find '%1'")
                 .arg(filename));
-        return NULL;
+        return nullptr;
     }
 
     int songID = query.value(0).toInt();
@@ -337,7 +337,7 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         return mdata;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 // static
@@ -367,7 +367,7 @@ bool MusicMetadata::updateStreamList(void)
         return true;
     }
 
-    gCoreContext->SaveSettingOnHost("MusicStreamListModified", "Updating", NULL);
+    gCoreContext->SaveSettingOnHost("MusicStreamListModified", "Updating", nullptr);
 
     LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: downloading radio streams list");
 
@@ -375,7 +375,7 @@ bool MusicMetadata::updateStreamList(void)
     if (!GetMythDownloadManager()->download(QString(STREAMUPDATEURL), &compressedData), false)
     {
         LOG(VB_GENERAL, LOG_ERR, "MusicMetadata: failed to download radio stream list");
-        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
         return false;
     }
 
@@ -397,7 +397,7 @@ bool MusicMetadata::updateStreamList(void)
                 QString("\n\t\t\tError parsing %1").arg(STREAMUPDATEURL) +
                 QString("\n\t\t\tat line: %1  column: %2 msg: %3")
                 .arg(errorLine).arg(errorColumn).arg(errorMsg));
-        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
         return false;
     }
 
@@ -406,7 +406,7 @@ bool MusicMetadata::updateStreamList(void)
     if (!query.exec() || !query.isActive() || query.numRowsAffected() < 0)
     {
         MythDB::DBError("music delete radio streams", query);
-        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
+        gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
         return false;
     }
 
@@ -441,12 +441,12 @@ bool MusicMetadata::updateStreamList(void)
         if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
         {
             MythDB::DBError("music insert radio stream", query);
-            gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", NULL);
+            gCoreContext->SaveSettingOnHost("MusicStreamListModified", "", nullptr);
             return false;
         }
     }
 
-    gCoreContext->SaveSettingOnHost("MusicStreamListModified", lastModified.toString(Qt::ISODate), NULL);
+    gCoreContext->SaveSettingOnHost("MusicStreamListModified", lastModified.toString(Qt::ISODate), nullptr);
 
     LOG(VB_GENERAL, LOG_INFO, "MusicMetadata: updating radio streams list completed OK");
 
@@ -1248,7 +1248,7 @@ QString MusicMetadata::getAlbumArtFile(void)
     if (!m_albumArt)
         m_albumArt = new AlbumArtImages(this);
 
-    AlbumArtImage *albumart_image = NULL;
+    AlbumArtImage *albumart_image = nullptr;
     QString res;
 
     if ((albumart_image = m_albumArt->getImage(IT_FRONTCOVER)))
@@ -1357,7 +1357,7 @@ AlbumArtImages *MusicMetadata::getAlbumArtImages(void)
 void MusicMetadata::reloadAlbumArtImages(void)
 {
     delete m_albumArt;
-    m_albumArt = NULL; //new AlbumArtImages(this);
+    m_albumArt = nullptr; //new AlbumArtImages(this);
 }
 
 LyricsData* MusicMetadata::getLyricsData(void)
@@ -1384,7 +1384,7 @@ MetaIO* MusicMetadata::getTagger(void)
     }
 
     LOG(VB_GENERAL, LOG_ERR, QString("MusicMetadata::getTagger - failed to find %1 on the local filesystem").arg(Filename(false)));
-    return NULL;
+    return nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -1406,7 +1406,7 @@ void MetadataLoadingThread::run()
 AllMusic::AllMusic(void) :
     m_numPcs(0),
     m_numLoaded(0),
-    m_metadata_loader(NULL),
+    m_metadata_loader(nullptr),
     m_done_loading(false),
 
     m_playcountMin(0),
@@ -1646,7 +1646,7 @@ MusicMetadata* AllMusic::getMetadata(int an_id)
     if (music_map.contains(an_id))
         return music_map[an_id];
 
-    return NULL;
+    return nullptr;
 }
 
 bool AllMusic::isValidID(int an_id)
@@ -1726,7 +1726,7 @@ MusicMetadata* AllMusic::getCDMetadata(int the_track)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**************************************************************************/
@@ -1764,7 +1764,7 @@ MusicMetadata *AllStream::getMetadata(MusicMetadata::IdType an_id)
             return m_streamList.at(x);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void AllStream::loadStreams(void)
@@ -1930,7 +1930,7 @@ void AlbumArtImages::findImages(void)
         m_imageList.pop_back();
     }
 
-    if (m_parent == NULL)
+    if (m_parent == nullptr)
         return;
 
     int trackid = ID_TO_ID(m_parent->ID());
@@ -2043,7 +2043,7 @@ void AlbumArtImages::scanForImages()
     else
     {
         delete busy;
-        busy = NULL;
+        busy = nullptr;
     }
 
     QStringList strList;
@@ -2121,7 +2121,7 @@ AlbumArtImage *AlbumArtImages::getImage(ImageType type)
             return *it;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 AlbumArtImage *AlbumArtImages::getImageByID(int imageID)
@@ -2133,7 +2133,7 @@ AlbumArtImage *AlbumArtImages::getImageByID(int imageID)
             return *it;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 QStringList AlbumArtImages::getImageFilenames(void) const
@@ -2152,7 +2152,7 @@ AlbumArtImage *AlbumArtImages::getImageAt(uint index)
     if (index < (uint)m_imageList.size())
         return m_imageList[index];
 
-    return NULL;
+    return nullptr;
 }
 
 // static method to get a translated type name from an ImageType
@@ -2237,7 +2237,7 @@ ImageType AlbumArtImages::getImageTypeFromName(const QString &name)
 void AlbumArtImages::addImage(const AlbumArtImage &newImage)
 {
     // do we already have an image of this type?
-    AlbumArtImage *image = NULL;
+    AlbumArtImage *image = nullptr;
 
     AlbumArtList::iterator it = m_imageList.begin();
     for (; it != m_imageList.end(); ++it)

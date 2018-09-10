@@ -20,7 +20,7 @@ const String email = "music@mythtv.org";  // TODO username/ip/hostname?
 
 MetaIOID3::MetaIOID3(void)
     : MetaIOTagLib(),
-        m_file(NULL), m_fileType(kMPEG)
+        m_file(nullptr), m_fileType(kMPEG)
 {
 }
 
@@ -112,7 +112,7 @@ void MetaIOID3::CloseFile()
 {
     LOG(VB_FILE, LOG_DEBUG, QString("MetaIO Close file: %1") .arg(m_filename));
     delete m_file;
-    m_file = NULL;
+    m_file = nullptr;
     m_fileType = kMPEG;
     m_filename.clear();
 }
@@ -120,9 +120,9 @@ void MetaIOID3::CloseFile()
 TagLib::ID3v2::Tag* MetaIOID3::GetID3v2Tag(bool create)
 {
     if (!m_file)
-        return NULL;
+        return nullptr;
 
-    TagLib::ID3v2::Tag *tag = NULL;
+    TagLib::ID3v2::Tag *tag = nullptr;
     switch (m_fileType)
     {
         case kMPEG :
@@ -139,9 +139,9 @@ TagLib::ID3v2::Tag* MetaIOID3::GetID3v2Tag(bool create)
 TagLib::ID3v1::Tag* MetaIOID3::GetID3v1Tag(bool create)
 {
     if (!m_file)
-        return NULL;
+        return nullptr;
 
-    TagLib::ID3v1::Tag *tag = NULL;
+    TagLib::ID3v1::Tag *tag = nullptr;
     switch (m_fileType)
     {
         case kMPEG :
@@ -179,7 +179,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
     writeLastPlay(tag, mdata->LastPlay());
 
     // MusicBrainz ID
-    UserTextIdentificationFrame *musicbrainz = NULL;
+    UserTextIdentificationFrame *musicbrainz = nullptr;
     musicbrainz = find(tag, "MusicBrainz Album Artist Id");
 
     if (mdata->Compilation())
@@ -200,7 +200,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
     // Compilation Artist Frame (TPE4/2)
     if (!mdata->CompilationArtist().isEmpty())
     {
-        TextIdentificationFrame *tpe4frame = NULL;
+        TextIdentificationFrame *tpe4frame = nullptr;
         TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
         if (!tpelist.isEmpty())
             tpe4frame = (TextIdentificationFrame *)tpelist.front();
@@ -214,7 +214,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
         tpe4frame->setText(QStringToTString(mdata->CompilationArtist()));
 
 
-        TextIdentificationFrame *tpe2frame = NULL;
+        TextIdentificationFrame *tpe2frame = nullptr;
         tpelist = tag->frameListMap()["TPE2"];
         if (!tpelist.isEmpty())
             tpe2frame = (TextIdentificationFrame *)tpelist.front();
@@ -240,7 +240,7 @@ bool MetaIOID3::write(const QString &filename, MusicMetadata* mdata)
 MusicMetadata *MetaIOID3::read(const QString &filename)
 {
     if (!OpenFile(filename))
-        return NULL;
+        return nullptr;
 
     TagLib::ID3v2::Tag *tag = GetID3v2Tag(true); // Create tag if none are found
 
@@ -251,7 +251,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
         TagLib::ID3v1::Tag *tag_v1 = GetID3v1Tag();
 
         if (!tag_v1)
-            return NULL;
+            return nullptr;
 
         if (!tag_v1->isEmpty())
         {
@@ -274,7 +274,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     // N.B. The existance of a either frame is NOT an indication that this
     // is a compilation, but if it is then one of them will probably hold
     // the compilation artist.
-    TextIdentificationFrame *tpeframe = NULL;
+    TextIdentificationFrame *tpeframe = nullptr;
     TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
     if (tpelist.isEmpty() || tpelist.front()->toString().isEmpty())
         tpelist = tag->frameListMap()["TPE2"];
@@ -399,7 +399,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
  *
  * \param filename The filename for which we want to find the albumart.
  * \param type The type of image we want - front/back etc
- * \returns A pointer to a QImage owned by the caller or NULL if not found.
+ * \returns A pointer to a QImage owned by the caller or nullptr if not found.
  */
 QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 {
@@ -456,7 +456,7 @@ QImage* MetaIOID3::getAlbumArt(const QString &filename, ImageType type)
 
     delete picture;
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -603,7 +603,7 @@ AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
         (description.isNull() || f->description() == description))
       return f;
   }
-  return NULL;
+  return nullptr;
 }
 
 /*!
@@ -837,7 +837,7 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
     if (f && f->description() == description)
       return f;
   }
-  return NULL;
+  return nullptr;
 }
 
 /*!
@@ -857,7 +857,7 @@ PopularimeterFrame* MetaIOID3::findPOPM(TagLib::ID3v2::Tag *tag,
     if (f && f->email() == email)
       return f;
   }
-  return NULL;
+  return nullptr;
 }
 
 bool MetaIOID3::writePlayCount(TagLib::ID3v2::Tag *tag, int playcount)

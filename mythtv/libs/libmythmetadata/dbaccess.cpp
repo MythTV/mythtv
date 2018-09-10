@@ -117,7 +117,7 @@ class SingleValueImp
         return m_entries.find(id) != m_entries.end();
     }
 
-    bool exists(const QString &name, int *id = 0)
+    bool exists(const QString &name, int *id = nullptr)
     {
         entry_map::const_iterator p = find(name);
         if (p != m_entries.end())
@@ -638,7 +638,7 @@ class FileAssociationsImp
     {
         file_association ret_fa(fa);
 
-        file_association *existing_fa = 0;
+        file_association *existing_fa = nullptr;
         MSqlQuery query(MSqlQuery::InitCon());
 
         association_list::iterator p = find(ret_fa.extension);

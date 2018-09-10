@@ -19,7 +19,7 @@ ImageSearchResultsDialog::ImageSearchResultsDialog(
     MythScreenType(lparent, "videosearchresultspopup"),
     m_list(list),
     m_type(type),
-    m_resultsList(0)
+    m_resultsList(nullptr)
 {
     m_imageDownload = new MetadataImageDownload(this);
 }
@@ -31,7 +31,7 @@ ImageSearchResultsDialog::~ImageSearchResultsDialog()
     if (m_imageDownload)
     {
         delete m_imageDownload;
-        m_imageDownload = NULL;
+        m_imageDownload = nullptr;
     }
 }
 

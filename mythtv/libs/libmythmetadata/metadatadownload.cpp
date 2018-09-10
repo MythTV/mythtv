@@ -69,7 +69,7 @@ void MetadataDownload::cancel()
     QMutexLocker lock(&m_mutex);
 
     m_lookupList.clear();
-    m_parent = NULL;
+    m_parent = nullptr;
 }
 
 void MetadataDownload::run()
@@ -250,7 +250,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
                                             const QString &originaltitle) const
 {
     QStringList titles;
-    MetadataLookup *ret = NULL;
+    MetadataLookup *ret = nullptr;
     QDate exactTitleDate;
     float exactTitlePopularity;
     int exactMatches = 0;
@@ -284,7 +284,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
             // so if none are found so far in the search, pick the most recently
             // released entry with artwork. Also, if the first exact match had
             // no artwork, prefer any later exact match with artwork.
-            if ((ret == NULL) ||
+            if ((ret == nullptr) ||
                 (hasArtwork &&
                  ((!foundMatchWithArt) ||
                   (((*i)->GetPopularity() > exactTitlePopularity)) ||
@@ -339,7 +339,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
             QString("No adequate match or multiple "
                     "matches found for %1.  Update manually.")
                     .arg(originaltitle));
-        return NULL;
+        return nullptr;
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Best Title Match For %1: %2")
@@ -472,7 +472,7 @@ MetadataLookupList MetadataDownload::readMXML(QString MXMLpath,
         }
 
         delete rf;
-        rf = NULL;
+        rf = nullptr;
 
         MetadataLookup *tmp = ParseMetadataItem(item, lookup, passseas);
         list.append(tmp);
@@ -523,7 +523,7 @@ MetadataLookupList MetadataDownload::readNFO(QString NFOpath,
         }
 
         delete rf;
-        rf = NULL;
+        rf = nullptr;
 
         if (!error)
         {

@@ -38,20 +38,20 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
     QString artist, compilation_artist, album, title, genre;
     int year = 0, tracknum = 0, length = 0;
 
-    AVFormatContext* p_context = NULL;
-    AVInputFormat* p_inputformat = NULL;
+    AVFormatContext* p_context = nullptr;
+    AVInputFormat* p_inputformat = nullptr;
 
     QByteArray local8bit = filename.toLocal8Bit();
     if ((avformat_open_input(&p_context, local8bit.constData(),
-                             p_inputformat, NULL) < 0))
+                             p_inputformat, nullptr) < 0))
     {
-        return NULL;
+        return nullptr;
     }
 
-    if (avformat_find_stream_info(p_context, NULL) < 0)
-        return NULL;
+    if (avformat_find_stream_info(p_context, nullptr) < 0)
+        return nullptr;
 
-    AVDictionaryEntry *tag = av_dict_get(p_context->metadata, "title", NULL, 0);
+    AVDictionaryEntry *tag = av_dict_get(p_context->metadata, "title", nullptr, 0);
     if (!tag)
     {
         readFromFilename(filename, artist, album, title, genre, tracknum);
@@ -60,24 +60,24 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
     {
         title = (char *)tag->value;
 
-        tag = av_dict_get(p_context->metadata, "author", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "author", nullptr, 0);
         if (tag)
             artist += (char *)tag->value;
 
         // compilation_artist???
-        tag = av_dict_get(p_context->metadata, "album", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "album", nullptr, 0);
         if (tag)
             album += (char *)tag->value;
 
-        tag = av_dict_get(p_context->metadata, "genre", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "genre", nullptr, 0);
         if (tag)
             genre += (char *)tag->value;
 
-        tag = av_dict_get(p_context->metadata, "year", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "year", nullptr, 0);
         if (tag)
             year = atoi(tag->value);
 
-        tag = av_dict_get(p_context->metadata, "tracknum", NULL, 0);
+        tag = av_dict_get(p_context->metadata, "tracknum", nullptr, 0);
         if (tag)
             tracknum = atoi(tag->value);
     }
@@ -102,18 +102,18 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
  */
 int MetaIOAVFComment::getTrackLength(const QString &filename)
 {
-    AVFormatContext* p_context = NULL;
-    AVInputFormat* p_inputformat = NULL;
+    AVFormatContext* p_context = nullptr;
+    AVInputFormat* p_inputformat = nullptr;
 
     // Open the specified file and populate the metadata info
     QByteArray local8bit = filename.toLocal8Bit();
     if ((avformat_open_input(&p_context, local8bit.constData(),
-                             p_inputformat, NULL) < 0))
+                             p_inputformat, nullptr) < 0))
     {
         return 0;
     }
 
-    if (avformat_find_stream_info(p_context, NULL) < 0)
+    if (avformat_find_stream_info(p_context, nullptr) < 0)
         return 0;
 
     int rv = getTrackLength(p_context);
