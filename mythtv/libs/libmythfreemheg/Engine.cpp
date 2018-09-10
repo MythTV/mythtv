@@ -49,7 +49,7 @@ MHEngine::MHEngine(MHContext *context): m_Context(context)
 {
     m_fInTransition = false;
     m_fBooting = true;
-    m_Interacting = 0;
+    m_Interacting = nullptr;
 
     // Required for BBC Freeview iPlayer
     MHPSEntry *pEntry = new MHPSEntry;
@@ -199,7 +199,7 @@ MHGroup *MHEngine::ParseProgram(QByteArray &text)
 {
     if (text.size() == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     // Look at the first byte to decide whether this is text or binary.  Binary
@@ -207,9 +207,9 @@ MHGroup *MHEngine::ParseProgram(QByteArray &text)
     // or curly bracket.
     // This is only there for testing: all downloaded objects will be in ASN1
     unsigned char ch = text[0];
-    MHParseBase *parser = NULL;
-    MHParseNode *pTree = NULL;
-    MHGroup *pRes = NULL;
+    MHParseBase *parser = nullptr;
+    MHParseNode *pTree = nullptr;
+    MHGroup *pRes = nullptr;
 
     if (ch >= 128)
     {
@@ -308,7 +308,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
         delete pProgram;
         return false;
     }
-    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0)   // Print it so we know what's going on.
+    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != nullptr)   // Print it so we know what's going on.
     {
         pProgram->PrintMe(__mhlogStream, 0);
     }
@@ -499,17 +499,17 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     if (pApp->m_pCurrentScene)
     {
         delete(pApp->m_pCurrentScene);
-        pApp->m_pCurrentScene = NULL;
+        pApp->m_pCurrentScene = nullptr;
     }
 
-    m_Interacting = 0;
+    m_Interacting = nullptr;
 
     // Switch to the new scene.
     CurrentApp()->m_pCurrentScene = static_cast< MHScene* >(pProgram);
     SetInputRegister(CurrentScene()->m_nEventReg);
     m_redrawRegion = QRegion(0, 0, CurrentScene()->m_nSceneCoordX, CurrentScene()->m_nSceneCoordY); // Redraw the whole screen
 
-    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != 0)   // Print it so we know what's going on.
+    if ((__mhlogoptions & MHLogScenes) && __mhlogStream != nullptr)   // Print it so we know what's going on.
     {
         pProgram->PrintMe(__mhlogStream, 0);
     }
@@ -578,7 +578,7 @@ QString MHEngine::GetPathName(const MHOctetString &str)
 MHRoot *MHEngine::FindObject(const MHObjectRef &oRef, bool failOnNotFound)
 {
     // It should match either the application or the scene.
-    MHGroup *pSearch = NULL;
+    MHGroup *pSearch = nullptr;
     MHGroup *pScene = CurrentScene(), *pApp = CurrentApp();
 
     if (pScene && GetPathName(pScene->m_ObjectReference.m_GroupId) == GetPathName(oRef.m_GroupId))
@@ -610,7 +610,7 @@ MHRoot *MHEngine::FindObject(const MHObjectRef &oRef, bool failOnNotFound)
         throw "FindObject failed";
     }
 
-    return NULL; // If we don't generate an error.
+    return nullptr; // If we don't generate an error.
 }
 
 // Run queued actions.
@@ -624,7 +624,7 @@ void MHEngine::RunActions()
         // Run it.  If it fails and throws an exception catch it and continue with the next.
         try
         {
-            if ((__mhlogoptions & MHLogActions) && __mhlogStream != 0)   // Debugging
+            if ((__mhlogoptions & MHLogActions) && __mhlogStream != nullptr)   // Debugging
             {
                 fprintf(__mhlogStream, "[freemheg] Action - ");
                 pAction->PrintMe(__mhlogStream, 0);
@@ -895,7 +895,7 @@ void MHEngine::DrawDisplay(QRegion toDraw)
         return;
     }
 
-    int nTopStack = CurrentApp() == NULL ? -1 : CurrentApp()->m_DisplayStack.Size() - 1;
+    int nTopStack = CurrentApp() == nullptr ? -1 : CurrentApp()->m_DisplayStack.Size() - 1;
     DrawRegion(toDraw, nTopStack);
 }
 
@@ -1122,7 +1122,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
             (const char *)fileName.Bytes(), fileName.Size() );
 
     // See if there is an entry there already.
-    MHPSEntry *pEntry = NULL;
+    MHPSEntry *pEntry = nullptr;
     int i;
 
     for (i = 0; i < m_PersistentStore.Size(); i++)
@@ -1549,7 +1549,7 @@ const char *MHEngine::MHEGEngineProviderIdString = "MHGGNU001";
 // Define the logging function and settings
 int __mhlogoptions = MHLogError;
 
-FILE *__mhlogStream = NULL;
+FILE *__mhlogStream = nullptr;
 
 // The MHEG engine calls this when it needs to log something.
 void __mhlog(QString logtext)

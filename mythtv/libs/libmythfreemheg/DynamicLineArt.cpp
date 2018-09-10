@@ -32,7 +32,7 @@
 
 MHDynamicLineArt::MHDynamicLineArt()
 {
-    m_picture = NULL;
+    m_picture = nullptr;
 }
 
 MHDynamicLineArt::~MHDynamicLineArt()

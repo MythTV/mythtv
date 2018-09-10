@@ -39,7 +39,7 @@ class MHEngine;
 // Simple sequence class.
 template <class BASE> class MHSequence {
     public:
-        MHSequence(){ m_VecSize = 0; m_Values = 0; }
+        MHSequence(){ m_VecSize = 0; m_Values = nullptr; }
         // The destructor frees the vector but not the elements.
         ~MHSequence() { free(m_Values); }
         // Get the current size.
@@ -52,7 +52,7 @@ template <class BASE> class MHSequence {
         void InsertAt(BASE b, int n) {
             MHASSERT(n >= 0 && n <= m_VecSize);
             BASE *ptr = (BASE*)realloc(m_Values, (m_VecSize+1) * sizeof(BASE));
-            if (ptr == NULL) throw "Out of Memory";
+            if (ptr == nullptr) throw "Out of Memory";
             m_Values = ptr;
             for (int i = m_VecSize; i > n; i--) m_Values[i] = m_Values[i-1];
             m_Values[n] = b;

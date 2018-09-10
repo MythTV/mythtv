@@ -85,7 +85,7 @@ class MHEngine: public MHEG {
 
     // Look up an object by its object reference.  In nearly all cases we want to throw
     // an exception if it isn't found.  In a very few cases where we don't fail this
-    // returns NULL if it isn't there.
+    // returns nullptr if it isn't there.
     MHRoot *FindObject(const MHObjectRef &objr, bool failOnNotFound = true);
 
     // Called when an event is triggered.  Either queues the event or finds a link that matches.
@@ -173,11 +173,11 @@ class MHEngine: public MHEG {
     QStack<MHApplication*> m_ApplicationStack;
     MHApplication *CurrentApp() {
         if (m_ApplicationStack.isEmpty())
-            return NULL;
+            return nullptr;
         else
             return m_ApplicationStack.top();
     }
-    MHScene *CurrentScene() { return CurrentApp() == NULL ? NULL : CurrentApp()->m_pCurrentScene; }
+    MHScene *CurrentScene() { return CurrentApp() == nullptr ? nullptr : CurrentApp()->m_pCurrentScene; }
 
     // Action stack.  Actions may generate synchronous events which fire links and add
     // new actions.  These new actions have to be processed before we continue with other

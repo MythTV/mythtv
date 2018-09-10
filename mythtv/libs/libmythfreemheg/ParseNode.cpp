@@ -113,15 +113,15 @@ MHParseNode *MHParseNode::GetArgN(int n)
         Failure("Expected tagged value");
     }
 
-    return 0; // To keep the compiler happy
+    return nullptr; // To keep the compiler happy
 }
 
-// Get an argument with a specific tag.  Returns NULL if it doesn't exist.
+// Get an argument with a specific tag.  Returns nullptr if it doesn't exist.
 // There is a defined order of tags for both the binary and textual representations.
 // Unfortunately they're not the same.
 MHParseNode *MHParseNode::GetNamedArg(int nTag)
 {
-    MHParseSequence *pArgs = NULL;
+    MHParseSequence *pArgs = nullptr;
 
     if (m_nNodeType == PNTagged)
     {
@@ -146,7 +146,7 @@ MHParseNode *MHParseNode::GetNamedArg(int nTag)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 // Sequence.

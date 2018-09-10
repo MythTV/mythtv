@@ -88,7 +88,7 @@ class MHRoot
     virtual void Preload(MHEngine *) { InvalidAction("Preload"); }
     virtual void Unload(MHEngine *) { InvalidAction("Unload"); }
     // The UK MHEG profile only requires cloning for Text, Bitmap and Rectangle.
-    virtual MHIngredient *Clone(MHEngine *) { InvalidAction("Clone"); return NULL; }
+    virtual MHIngredient *Clone(MHEngine *) { InvalidAction("Clone"); return nullptr; }
 
     // Actions on Presentables.  The Run/Stop actions on presentables and the Activate/Deactivate actions
     // on Links have identical effects.  They could be merged.

@@ -136,7 +136,7 @@ class MHContext
     virtual bool CheckStop(void) = 0;
 
     // Begin playing the specified stream
-    virtual bool BeginStream(const QString &str, MHStream* notify = 0) = 0;
+    virtual bool BeginStream(const QString &str, MHStream* notify = nullptr) = 0;
     // Stop playing stream
     virtual void EndStream() = 0;
     // Begin playing audio component

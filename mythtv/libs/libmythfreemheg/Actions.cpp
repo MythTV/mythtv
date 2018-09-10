@@ -454,7 +454,7 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
                 MHLOG(MHLogWarning, QString("WARN Unknown action %1").arg(pElemAction->GetTagNo()));
                 // Future proofing: ignore any actions that we don't know about.
                 // Obviously these can only arise in the binary coding.
-                pAction = NULL;
+                pAction = nullptr;
         }
 
         if (pAction)

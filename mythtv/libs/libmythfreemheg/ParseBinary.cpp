@@ -65,7 +65,7 @@ void MHParseBinary::ParseString(int endStr, MHOctetString &str)
 
     int nLength = endStr - m_p;
     unsigned char *stringValue = (unsigned char *)malloc(nLength + 1);
-    if (stringValue == NULL)
+    if (stringValue == nullptr)
     {
         MHERROR("Out of memory");
     }

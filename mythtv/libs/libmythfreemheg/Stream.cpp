@@ -206,7 +206,7 @@ MHRoot *MHStream::FindByObjectNo(int n)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void MHStream::BeginPlaying(MHEngine *engine)

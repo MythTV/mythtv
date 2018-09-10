@@ -582,7 +582,7 @@ void MHInteractible::InteractSetInteractionStatus(bool newStatus, MHEngine *engi
 {
     if (newStatus)   // Turning interaction on.
     {
-        if (engine->GetInteraction() == 0) // No current interactible
+        if (engine->GetInteraction() == nullptr) // No current interactible
         {
             Interaction(engine);    // virtual function
         }
@@ -592,7 +592,7 @@ void MHInteractible::InteractSetInteractionStatus(bool newStatus, MHEngine *engi
         if (m_fInteractionStatus)
         {
             m_fInteractionStatus = false;
-            engine->SetInteraction(0);
+            engine->SetInteraction(nullptr);
             InteractionCompleted(engine); // Interaction is interrupted.
             engine->EventTriggered(m_parent, EventInteractionCompleted);
         }
@@ -948,7 +948,7 @@ void MHSlider::KeyEvent(MHEngine *engine, int nCode)
         case 15: // Select key
         case 16: // Cancel key
             m_fInteractionStatus = false;
-            engine->SetInteraction(0);
+            engine->SetInteraction(nullptr);
             InteractionCompleted(engine); // Interaction is interrupted.
             engine->EventTriggered(this, EventInteractionCompleted);
             break;
