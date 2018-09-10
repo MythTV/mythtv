@@ -512,7 +512,7 @@ void NetSearch::SlotItemChanged()
                        QString(), QString(), QString(), QString(),
                        QDateTime(), 0, 0, -1, QString(), QStringList(),
                        QString(), QStringList(), 0, 0, QString(),
-                       0, QStringList(), 0, 0, 0);
+                       false, QStringList(), 0, 0, false);
 
         SetTextAndThumbnail(btn, &res);
     }

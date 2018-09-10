@@ -718,7 +718,7 @@ void NetTree::UpdateSiteItem(RSSSite *site)
                    site->GetURL(), site->GetImage(), QString(),
                    site->GetAuthor(), QDateTime(), 0, 0, -1, QString(),
                    QStringList(), QString(), QStringList(), 0, 0, QString(),
-                   0, QStringList(), 0, 0, 0);
+                   false, QStringList(), 0, 0, false);
 
     InfoMap metadataMap;
     res.toMap(metadataMap);
@@ -761,7 +761,7 @@ void NetTree::UpdateCurrentItem(void)
         ResultItem(title, QString(), QString(), QString(), thumb, QString(),
                    QString(), QDateTime(), 0, 0, -1, QString(),
                    QStringList(), QString(), QStringList(), 0, 0, QString(),
-                   0, QStringList(), 0, 0, 0);
+                   false, QStringList(), 0, 0, false);
 
     InfoMap metadataMap;
     res.toMap(metadataMap);
