@@ -245,7 +245,7 @@ void GrabberDownloadThread::run()
 }
 
 Search::Search()
-    : m_searchProcess(NULL), m_numResults(0),
+    : m_searchProcess(nullptr), m_numResults(0),
       m_numReturned(0), m_numIndex(0)
 {
     m_videoList.clear();
@@ -256,7 +256,7 @@ Search::~Search()
     resetSearch();
 
     delete m_searchProcess;
-    m_searchProcess = NULL;
+    m_searchProcess = nullptr;
 }
 
 
@@ -383,7 +383,7 @@ void Search::slotProcessSearchExit(uint exitcode)
         {
             m_searchProcess->Term(true);
             m_searchProcess->deleteLater();
-            m_searchProcess = NULL;
+            m_searchProcess = nullptr;
         }
         emit searchTimedOut(this);
         return;
@@ -403,7 +403,7 @@ void Search::slotProcessSearchExit(uint exitcode)
     }
 
     m_searchProcess->deleteLater();
-    m_searchProcess = NULL;
+    m_searchProcess = nullptr;
     emit finishedSearch(this);
 }
 

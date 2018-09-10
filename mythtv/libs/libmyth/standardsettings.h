@@ -95,10 +95,10 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void valueChanged(const QString &);
     void valueChanged(StandardSetting *);
     void ShouldRedraw(StandardSetting *);
-    void settingsChanged(StandardSetting *selectedSetting = NULL);
+    void settingsChanged(StandardSetting *selectedSetting = nullptr);
 
   protected:
-    explicit StandardSetting(Storage *_storage = NULL);
+    explicit StandardSetting(Storage *_storage = nullptr);
     virtual ~StandardSetting();
     void setParent(StandardSetting *parent);
     QString m_settingValue;
@@ -144,7 +144,7 @@ class MPUBLIC MythUITextEditSetting : public StandardSetting
     void SetPasswordEcho(bool b);
 
   protected:
-    explicit MythUITextEditSetting(Storage *_storage = NULL);
+    explicit MythUITextEditSetting(Storage *_storage = nullptr);
     bool m_passwordEcho;
 };
 
@@ -224,7 +224,7 @@ class MPUBLIC MythUIComboBoxSetting : public StandardSetting
     void setValue(const QString&);
 
   protected:
-    MythUIComboBoxSetting(Storage *_storage = NULL, bool rw = false);
+    MythUIComboBoxSetting(Storage *_storage = nullptr, bool rw = false);
     ~MythUIComboBoxSetting();
     QVector<QString> m_labels;
     QVector<QString> m_values;
@@ -254,7 +254,7 @@ class MPUBLIC TransMythUIComboBoxSetting: public MythUIComboBoxSetting
 {
   public:
     explicit TransMythUIComboBoxSetting(bool rw = false) :
-        MythUIComboBoxSetting(NULL, rw) { }
+        MythUIComboBoxSetting(nullptr, rw) { }
 };
 
 class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
@@ -317,7 +317,7 @@ class MPUBLIC TransMythUISpinBoxSetting: public MythUISpinBoxSetting
     TransMythUISpinBoxSetting(int min, int max, int step,
                               int pageMultiple = 5,
                               const QString &special_value_text = QString()) :
-        MythUISpinBoxSetting(NULL, min, max, step, pageMultiple,
+        MythUISpinBoxSetting(nullptr, min, max, step, pageMultiple,
                              special_value_text)
     { }
 };
@@ -365,7 +365,7 @@ class MPUBLIC MythUICheckBoxSetting : public StandardSetting
     void valueChanged(bool);
 
   protected:
-    explicit MythUICheckBoxSetting(Storage *_storage = NULL);
+    explicit MythUICheckBoxSetting(Storage *_storage = nullptr);
 
 };
 
@@ -435,7 +435,7 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
   public:
 
     StandardSettingDialog(MythScreenStack *parent, const char *name,
-                          GroupSetting *groupSettings = NULL);
+                          GroupSetting *groupSettings = nullptr);
     virtual ~StandardSettingDialog();
     bool Create(void);
     virtual void customEvent(QEvent *event);
@@ -445,7 +445,7 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
 
   public slots:
     void Close(void);
-    void updateSettings(StandardSetting *selectedSetting = NULL);
+    void updateSettings(StandardSetting *selectedSetting = nullptr);
     void editEntry(void);
     void deleteSelected(void);
     void deleteEntryConfirmed(bool ok);
@@ -464,7 +464,7 @@ class MPUBLIC StandardSettingDialog : public MythScreenType
     void LevelUp();
     void LevelDown();
     void setCurrentGroupSetting(StandardSetting *groupSettings,
-                                StandardSetting *selectedSetting = 0);
+                                StandardSetting *selectedSetting = nullptr);
     void Save();
 
     MythUIText      *m_title;

@@ -470,7 +470,7 @@ QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
         "TRUEHD",
         "DTSHD",
         "AAC",
-        NULL
+        nullptr
     };
 
     for (unsigned int i = 0; feature[i] != (DigitalFeature)-1; i++)

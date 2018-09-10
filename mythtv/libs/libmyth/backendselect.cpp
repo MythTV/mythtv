@@ -18,8 +18,8 @@ BackendSelection::BackendSelection(
     Configuration *conf, bool exitOnFinish) :
     MythScreenType(parent, "BackEnd Selection"),
     m_DBparams(params), m_pConfig(conf), m_exitOnFinish(exitOnFinish),
-    m_backendList(NULL), m_manualButton(NULL), m_saveButton(NULL),
-    m_cancelButton(NULL), m_backendDecision(kCancelConfigure), m_loop(NULL)
+    m_backendList(nullptr), m_manualButton(nullptr), m_saveButton(nullptr),
+    m_cancelButton(nullptr), m_backendDecision(kCancelConfigure), m_loop(nullptr)
 {
     if (exitOnFinish)
     {

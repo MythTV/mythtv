@@ -94,7 +94,7 @@ bool AudioOutputOpenSLES::CreateEngine()
     }
 
     slCreateEnginePtr = (slCreateEngine_t)dlsym(p_so_handle, "slCreateEngine");
-    if (slCreateEnginePtr == 0)
+    if (slCreateEnginePtr == nullptr)
     {
         VBERROR("Error: Failed to load symbol slCreateEngine");
         Close();
@@ -104,7 +104,7 @@ bool AudioOutputOpenSLES::CreateEngine()
 #define OPENSL_DLSYM(dest, name)                       \
     do {                                                       \
         const SLInterfaceID *sym = (const SLInterfaceID *)dlsym(p_so_handle, "SL_IID_" name);        \
-        if (sym == 0)                             \
+        if (sym == nullptr)                             \
         {                                                      \
             LOG(VB_GENERAL, LOG_ERR, "AOOSLES Error: Failed to load symbol SL_IID_" name); \
             Close();  \
@@ -120,7 +120,7 @@ bool AudioOutputOpenSLES::CreateEngine()
 #undef OPENSL_DLSYM
 
     // create engine
-    result = slCreateEnginePtr(&engineObject, 0, NULL, 0, NULL, NULL);
+    result = slCreateEnginePtr(&engineObject, 0, nullptr, 0, nullptr, nullptr);
     CHECK_OPENSL_ERROR("Failed to create engine");
 
     // realize the engine in synchronous mode
@@ -186,7 +186,7 @@ bool AudioOutputOpenSLES::StartPlayer()
         SL_DATALOCATOR_OUTPUTMIX,
         outputMixObject
     };
-    SLDataSink audioSnk = {&loc_outmix, NULL};
+    SLDataSink audioSnk = {&loc_outmix, nullptr};
 
     //create audio player
     const SLInterfaceID ids2[] = { SL_IID_ANDROIDSIMPLEBUFFERQUEUE, SL_IID_VOLUME };

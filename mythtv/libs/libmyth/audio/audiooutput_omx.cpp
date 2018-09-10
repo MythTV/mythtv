@@ -603,7 +603,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
     if (!m_audiorender.IsValid())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + __func__ + " No audio render");
-        return NULL;
+        return nullptr;
     }
 
     m_audiorender.Shutdown();
@@ -619,7 +619,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
         LOG(VB_AUDIO, LOG_ERR, LOC + QString(
                 "SetParameter AudioPortFormat PCM error %1")
             .arg(Error2String(e)));
-        return NULL;
+        return nullptr;
     }
 
     OMX_AUDIO_PARAM_PCMMODETYPE pcm;
@@ -631,7 +631,7 @@ AudioOutputSettings* AudioOutputOMX::GetOutputSettings(bool /*passthrough*/)
         LOG(VB_AUDIO, LOG_ERR, LOC + QString(
                 "GetParameter AudioPcm error %1")
             .arg(Error2String(e)));
-        return NULL;
+        return nullptr;
     }
 
     AudioOutputSettings *settings = new AudioOutputSettings();

@@ -36,7 +36,7 @@ class MPUBLIC ConfigurationDialogWidget : public MythDialog
 class MPUBLIC ConfigurationDialog : public Storage
 {
   public:
-    ConfigurationDialog() : dialog(NULL), cfgGrp(new ConfigurationGroup()) { }
+    ConfigurationDialog() : dialog(nullptr), cfgGrp(new ConfigurationGroup()) { }
     virtual ~ConfigurationDialog();
 
     // Make a modal dialog containing configWidget

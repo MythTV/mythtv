@@ -21,11 +21,11 @@ RawSettingsEditor::RawSettingsEditor(MythScreenStack *parent, const char *name)
   : MythScreenType(parent, name),
     m_title(tr("Settings Editor")),
     // Settings widgets
-    m_settingsList(NULL),      m_settingValue(NULL),
+    m_settingsList(nullptr),   m_settingValue(nullptr),
     // Action buttons
-    m_saveButton(NULL),        m_cancelButton(NULL),
+    m_saveButton(nullptr),     m_cancelButton(nullptr),
     // Labels
-    m_textLabel(NULL)
+    m_textLabel(nullptr)
 {
 }
 
@@ -63,7 +63,7 @@ bool RawSettingsEditor::Create(void)
     if (text)
         text->SetText(m_title);
 
-    MythUIShape *shape = NULL;
+    MythUIShape *shape = nullptr;
 
     for (int i = -8; i <= 8; i++)
     {

@@ -76,7 +76,7 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
         bool luselabel   = true,  bool luseframe  = true,
         bool lzeroMargin = false, bool lzeroSpace = false) :
         ConfigurationGroup(luselabel, luseframe, lzeroMargin, lzeroSpace),
-        widget(NULL), confgrp(NULL), layout(NULL)
+        widget(nullptr), confgrp(nullptr), layout(nullptr)
     {
     }
 
@@ -152,14 +152,14 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
         bool uselabel   = true,  bool useframe  = true,
         bool zeroMargin = false, bool zeroSpace = false) :
         ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace),
-        widget(NULL), confgrp(NULL), top(0), saveAll(true)
+        widget(nullptr), confgrp(nullptr), top(0), saveAll(true)
     {
     }
 
     virtual void deleteLater(void);
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = 0);
+                                  const char *widgetName = nullptr);
 
     void raise(Configurable *child);
     virtual void Save(void);
@@ -200,8 +200,8 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
         stackUseLabel(stack_uselabel),     stackUseFrame(stack_useframe),
         stackZeroMargin(stack_zeroMargin), stackZeroSpace(stack_zeroSpace),
         isVertical(true),                  isSaveAll(true),
-        configLayout(NULL),                configStack(NULL),
-        trigger(NULL),                     widget(NULL)
+        configLayout(nullptr),             configStack(nullptr),
+        trigger(nullptr),                  widget(nullptr)
     {
     }
 

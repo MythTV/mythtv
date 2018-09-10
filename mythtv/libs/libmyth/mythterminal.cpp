@@ -31,8 +31,8 @@ MythTerminal::MythTerminal(MythScreenStack *parent, QString _program,
                            QStringList _arguments) :
     MythScreenType(parent, "terminal"), m_lock(QMutex::Recursive),
     m_running(false), m_process(new QProcess()), m_program(_program),
-    m_arguments(_arguments), m_currentLine(NULL), m_output(NULL),
-    m_textEdit(NULL), m_enterButton(NULL)
+    m_arguments(_arguments), m_currentLine(nullptr), m_output(nullptr),
+    m_textEdit(nullptr), m_enterButton(nullptr)
 {
     m_process->setProcessChannelMode(QProcess::MergedChannels);
     connect(m_process, SIGNAL(readyRead()),
@@ -53,7 +53,7 @@ void MythTerminal::TeardownAll(void)
                 Kill();
             m_process->disconnect();
             m_process->deleteLater();
-            m_process = NULL;
+            m_process = nullptr;
         }
     }
 }
@@ -159,7 +159,7 @@ bool MythTerminal::Create(void)
 
     BuildFocusList();
 
-    MythUIButton *close = NULL;
+    MythUIButton *close = nullptr;
     UIUtilW::Assign(this, close, "close");
     if (close)
         connect(close, SIGNAL(Clicked()), this, SLOT(Close()));

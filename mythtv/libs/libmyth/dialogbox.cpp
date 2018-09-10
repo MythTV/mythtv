@@ -26,7 +26,7 @@ DialogBox::DialogBox(MythMainWindow *parent, const QString &text,
     box->setSpacing(0);
     box->addWidget(maintext, 1);
 
-    checkbox = NULL;
+    checkbox = nullptr;
     if (checkboxtext)
     {
         checkbox = new MythCheckBox(this);

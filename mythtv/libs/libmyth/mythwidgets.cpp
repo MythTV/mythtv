@@ -533,7 +533,7 @@ MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char *name) :
     QTextEdit(parent)
 {
     setObjectName(name);
-    my_font = NULL;
+    my_font = nullptr;
     m_lines = 1;
     this->Init();
 }
@@ -543,7 +543,7 @@ MythRemoteLineEdit::MythRemoteLineEdit(const QString & contents,
     QTextEdit(parent)
 {
     setObjectName(name);
-    my_font = NULL;
+    my_font = nullptr;
     m_lines = 1;
     this->Init();
     setText(contents);
@@ -564,7 +564,7 @@ MythRemoteLineEdit::MythRemoteLineEdit(int lines, QWidget * parent,
     QTextEdit(parent)
 {
     setObjectName(name);
-    my_font = NULL;
+    my_font = nullptr;
     m_lines = lines;
     this->Init();
 }
@@ -1063,7 +1063,7 @@ void MythRemoteLineEdit::Teardown(void)
     {
         cycle_timer->disconnect();
         cycle_timer->deleteLater();
-        cycle_timer = NULL;
+        cycle_timer = nullptr;
     }
 }
 
@@ -1296,7 +1296,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
             if (action == "UP")
             {
                 // Qt::Key_Up at top of list allows focus to move to other widgets
-                if (currentItem() == 0)
+                if (currentItem() == nullptr)
                 {
                     focusNextPrevChild(false);
                     handled = true;

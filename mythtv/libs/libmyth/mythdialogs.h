@@ -128,16 +128,16 @@ class MPUBLIC MythPopupBox : public MythDialog
     MythLabel *addLabel(QString caption, LabelSize size = Medium,
                      bool wrap = false);
 
-    QAbstractButton *addButton(QString caption, QObject *target = NULL,
-                               const char *slot = NULL);
+    QAbstractButton *addButton(QString caption, QObject *target = nullptr,
+                               const char *slot = nullptr);
 
-    void ShowPopup(QObject *target = NULL, const char *slot = NULL);
+    void ShowPopup(QObject *target = nullptr, const char *slot = nullptr);
     void ShowPopupAtXY(int destx, int desty,
-                       QObject *target = NULL, const char *slot = NULL);
+                       QObject *target = nullptr, const char *slot = nullptr);
 
-    DialogCode ExecPopup(QObject *target = NULL, const char *slot = NULL);
+    DialogCode ExecPopup(QObject *target = nullptr, const char *slot = nullptr);
     DialogCode ExecPopupAtXY(int destx, int desty,
-                             QObject *target = NULL, const char *slot = NULL);
+                             QObject *target = nullptr, const char *slot = nullptr);
 
     static bool showOkPopup(MythMainWindow *parent,
                             const QString  &title,
@@ -207,8 +207,8 @@ class MPUBLIC MythProgressDialog: public MythDialog
       */
     MythProgressDialog(const QString& message, int totalSteps = 0,
                        bool cancelButton = false,
-                       const QObject * target = NULL,
-                       const char * slot = NULL) MDEPRECATED;
+                       const QObject * target = nullptr,
+                       const char * slot = nullptr) MDEPRECATED;
 
     /* \brief Close the dialog.
 

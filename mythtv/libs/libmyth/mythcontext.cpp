@@ -60,7 +60,7 @@ using namespace std;
 
 #define LOC      QString("MythContext: ")
 
-MythContext *gContext = NULL;
+MythContext *gContext = nullptr;
 
 static const QString _Location = "MythContext";
 
@@ -240,16 +240,16 @@ static void eject_cb(void)
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_gui(false),
-      m_pConfig(NULL),
+      m_pConfig(nullptr),
       disableeventpopup(false),
-      m_ui(NULL),
+      m_ui(nullptr),
       m_sh(new MythContextSlotHandler(this)),
-      m_guiStartup(0),
+      m_guiStartup(nullptr),
       needsBackend(false),
       m_settingsCacheDirty(false),
-      MBEversionPopup(NULL),
+      MBEversionPopup(nullptr),
       m_registration(-1),
-      m_socket(0)
+      m_socket(nullptr)
 {
     m_loop = new QEventLoop(this);
     InitializeMythDirs();
@@ -319,7 +319,7 @@ void MythContextPrivate::EndTempWindow(void)
             MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
             if (mainStack) {
                 mainStack->PopScreen(m_guiStartup, false);
-                m_guiStartup = 0;
+                m_guiStartup = nullptr;
             }
         }
     }
@@ -389,7 +389,7 @@ bool MythContextPrivate::Init(const bool gui,
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         if (mainStack)
             mainStack->PopScreen(m_guiStartup, false);
-        m_guiStartup=0;
+        m_guiStartup=nullptr;
     }
     EndTempWindow();
 
@@ -1086,7 +1086,7 @@ void MythContextPrivate::ShowGuiStartup(void)
             m_guiStartup = new GUIStartup(mainStack,m_loop);
             if (!m_guiStartup->Create()) {
                 delete m_guiStartup;
-                m_guiStartup = 0;
+                m_guiStartup = nullptr;
             }
             if (m_guiStartup) {
                 mainStack->AddScreen(m_guiStartup, false);
@@ -1233,7 +1233,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
     // Get this backend's location:
     DeviceLocation *BE = backends->GetFirst();
     backends->DecrRef();
-    backends = NULL;
+    backends = nullptr;
 
     // We don't actually know the backend's access PIN, so this will
     // only work for ones that have PIN access disabled (i.e. 0000)
@@ -1275,7 +1275,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
     // We need to give the server time to respond...
     // ----------------------------------------------------------------------
 
-    DeviceLocation *pDevLoc = NULL;
+    DeviceLocation *pDevLoc = nullptr;
     MythTimer totalTime; totalTime.start();
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
@@ -1526,7 +1526,7 @@ void MythContextPrivate::loadSettingsCacheOverride(void)
             gCoreContext->OverrideSettingForSession(settingsToSave[ix], value);
     }
     // Prevent power off TV after temporary window
-    gCoreContext->OverrideSettingForSession("PowerOffTVAllowed", 0);
+    gCoreContext->OverrideSettingForSession("PowerOffTVAllowed", nullptr);
 
     QString language = gCoreContext->GetSetting("Language",QString());
     MythTranslation::load("mythfrontend");
@@ -1550,12 +1550,12 @@ void MythContextPrivate::clearSettingsCacheOverride(void)
 
 void MythContextSlotHandler::VersionMismatchPopupClosed(void)
 {
-    d->MBEversionPopup = NULL;
+    d->MBEversionPopup = nullptr;
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
 MythContext::MythContext(const QString &binversion, bool needsBackend)
-    : d(NULL), app_binary_version(binversion)
+    : d(nullptr), app_binary_version(binversion)
 {
 #ifdef _WIN32
     static bool WSAStarted = false;
@@ -1678,7 +1678,7 @@ MythContext::~MythContext()
     TaskQueue::Shutdown();
 
     delete gCoreContext;
-    gCoreContext = NULL;
+    gCoreContext = nullptr;
 
     delete d;
 }

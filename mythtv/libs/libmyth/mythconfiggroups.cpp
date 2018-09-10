@@ -72,7 +72,7 @@ void ConfigurationGroup::deleteLater(void)
 
 Setting *ConfigurationGroup::byName(const QString &name)
 {
-    Setting *tmp = NULL;
+    Setting *tmp = nullptr;
 
     childList::iterator it = children.begin();
     for (; !tmp && (it != children.end()); ++it)
@@ -132,7 +132,7 @@ QWidget *VerticalConfigurationGroup::configWidget(
     {
         if (children[i] && children[i]->isVisible())
         {
-            childwidget[i] = children[i]->configWidget(cg, NULL, NULL);
+            childwidget[i] = children[i]->configWidget(cg, nullptr, nullptr);
             layout->addWidget(childwidget[i]);
             children[i]->setEnabled(children[i]->isEnabled());
         }
@@ -173,7 +173,7 @@ QWidget *VerticalConfigurationGroup::configWidget(
 
 void VerticalConfigurationGroup::widgetInvalid(QObject *obj)
 {
-    widget = (widget == obj) ? NULL : widget;
+    widget = (widget == obj) ? nullptr : widget;
 }
 
 void VerticalConfigurationGroup::deleteLater(void)
@@ -204,7 +204,7 @@ bool VerticalConfigurationGroup::replaceChild(
             old_child->widgetInvalid(childwidget[i]);
             layout->removeWidget(childwidget[i]);
             childwidget[i]->deleteLater();
-            childwidget[i] = NULL;
+            childwidget[i] = nullptr;
         }
 
         bool was_visible = old_child->isVisible();
@@ -214,7 +214,7 @@ bool VerticalConfigurationGroup::replaceChild(
 
         if (was_visible)
         {
-            childwidget[i] = new_child->configWidget(confgrp, widget, NULL);
+            childwidget[i] = new_child->configWidget(confgrp, widget, nullptr);
             layout->addWidget(childwidget[i]);
             new_child->setEnabled(was_enabled);
             childwidget[i]->resize(1,1);
@@ -246,7 +246,7 @@ QWidget *HorizontalConfigurationGroup::configWidget(
     {
         if (children[i] && children[i]->isVisible())
         {
-            QWidget *child = children[i]->configWidget(cg, NULL, NULL);
+            QWidget *child = children[i]->configWidget(cg, nullptr, nullptr);
             layout->addWidget(child);
             children[i]->setEnabled(children[i]->isEnabled());
         }
@@ -258,7 +258,7 @@ QWidget *HorizontalConfigurationGroup::configWidget(
                 cg,   SIGNAL(changeHelpText(QString)));
     }
 
-    QWidget *widget = NULL;
+    QWidget *widget = nullptr;
     if (uselabel)
     {
         MythGroupBox *groupbox = new MythGroupBox(parent);
@@ -296,7 +296,7 @@ QWidget* GridConfigurationGroup::configWidget(
     {
         if (children[i] && children[i]->isVisible())
         {
-            QWidget *child = children[i]->configWidget(cg, NULL, NULL);
+            QWidget *child = children[i]->configWidget(cg, nullptr, nullptr);
             layout->addWidget(child, i / columns, i % columns);
             children[i]->setEnabled(children[i]->isEnabled());
         }
@@ -308,7 +308,7 @@ QWidget* GridConfigurationGroup::configWidget(
                 cg,   SIGNAL(changeHelpText(QString)));
     }
 
-    QWidget *widget = NULL;
+    QWidget *widget = nullptr;
     if (uselabel)
     {
         MythGroupBox *groupbox = new MythGroupBox(parent);
@@ -361,7 +361,7 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
         if (!children[i]->isVisible())
             continue;
 
-        childwidget[i] = children[i]->configWidget(cg, widget, NULL);
+        childwidget[i] = children[i]->configWidget(cg, widget, nullptr);
         if (!childwidget[i])
             continue;
 
@@ -386,11 +386,11 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
 void StackedConfigurationGroup::widgetInvalid(QObject *obj)
 {
-    widget = (widget == obj) ? NULL : widget;
+    widget = (widget == obj) ? nullptr : widget;
     for (uint i = 0; i < childwidget.size(); i++)
     {
         if ((QObject*)childwidget[i] == obj)
-            childwidget[i] = NULL;
+            childwidget[i] = nullptr;
     }
 }
 
@@ -404,7 +404,7 @@ void StackedConfigurationGroup::addChild(Configurable *child)
     uint i = children.size() - 1;
     if ((i < children.size()) && children[i]->isVisible())
     {
-        childwidget[i] = children[i]->configWidget(confgrp, widget, NULL);
+        childwidget[i] = children[i]->configWidget(confgrp, widget, nullptr);
         widget->addWidget(childwidget[i]);
         childwidget[i]->resize(1,1);
         childwidget[i]->show();
@@ -681,7 +681,7 @@ QWidget *TriggeredConfigurationGroup::configWidget(
 
 void TriggeredConfigurationGroup::widgetInvalid(QObject *obj)
 {
-    widget = (widget == obj) ? NULL : widget;
+    widget = (widget == obj) ? nullptr : widget;
 }
 
 JumpPane::JumpPane(const QStringList &labels, const QStringList &helptext) :

@@ -267,14 +267,14 @@ class MPUBLIC ProgramInfo
     ProgramInfo(QStringList::const_iterator &it,
                 QStringList::const_iterator  end) :
         chanid(0),
-        positionMapDBReplacement(NULL)
+        positionMapDBReplacement(nullptr)
     {
         if (!FromStringList(it, end))
             clear();
     }
     explicit ProgramInfo(const QStringList &list) :
         chanid(0),
-        positionMapDBReplacement(NULL)
+        positionMapDBReplacement(nullptr)
     {
         QStringList::const_iterator it = list.begin();
         if (!FromStringList(it, list.end()))
@@ -906,8 +906,8 @@ bool LoadFromScheduler(AutoDeleteDeque<T> &destination)
 // Moved from programdetails.cpp/h, used by MythWelcome/MythShutdown
 // could be factored out
 MPUBLIC bool GetNextRecordingList(QDateTime &nextRecordingStart,
-                                  bool *hasConflicts = NULL,
-                                  std::vector<ProgramInfo> *list = NULL);
+                                  bool *hasConflicts = nullptr,
+                                  std::vector<ProgramInfo> *list = nullptr);
 
 class QMutex;
 class MPUBLIC PMapDBReplacement

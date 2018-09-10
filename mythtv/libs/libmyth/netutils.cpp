@@ -537,7 +537,7 @@ bool findInDB(const QString& url, ArticleType type)
 
 RSSSite* findByURL(const QString& url, ArticleType type)
 {
-    RSSSite *tmp = NULL;
+    RSSSite *tmp = nullptr;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name,thumbnail,author,description,"
                   "commandline,download,updated FROM internetcontent "

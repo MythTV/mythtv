@@ -15,7 +15,7 @@ class MPUBLIC DialogBox : public MythDialog
     Q_OBJECT
   public:
     DialogBox(MythMainWindow *parent, const QString &text, 
-              const char *checkboxtext = NULL, const char *name = NULL) MDEPRECATED;
+              const char *checkboxtext = nullptr, const char *name = nullptr) MDEPRECATED;
 
     void AddButton(const QString &title);
 

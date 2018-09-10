@@ -53,7 +53,7 @@ class MPUBLIC MythWizard : public MythDialog
     Q_PROPERTY(QFont titleFont READ titleFont WRITE setTitleFont)
 
 public:
-    MythWizard(MythMainWindow* parent, const char* name = 0);
+    MythWizard(MythMainWindow* parent, const char* name = nullptr);
     virtual ~MythWizard();
 
     void Show();

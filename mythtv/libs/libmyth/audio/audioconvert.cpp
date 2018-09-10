@@ -575,14 +575,14 @@ public:
     AudioConvertInternal(AVSampleFormat in, AVSampleFormat out) :
     m_in(in), m_out(out)
     {
-        m_swr = swr_alloc_set_opts(NULL,
+        m_swr = swr_alloc_set_opts(nullptr,
                                    av_get_default_channel_layout(1),
                                    m_out,
                                    48000,
                                    av_get_default_channel_layout(1),
                                    m_in,
                                    48000,
-                                   0, NULL);
+                                   0, nullptr);
         if (!m_swr)
         {
             LOG(VB_AUDIO, LOG_ERR, LOC + "error allocating resampler context");
@@ -629,14 +629,14 @@ public:
 
 
 AudioConvert::AudioConvert(AudioFormat in, AudioFormat out) :
-    m_ctx(NULL), m_in(in), m_out(out)
+    m_ctx(nullptr), m_in(in), m_out(out)
 {
 }
 
 AudioConvert::~AudioConvert()
 {
     delete m_ctx;
-    m_ctx = NULL;
+    m_ctx = nullptr;
 }
 
 /**
@@ -783,7 +783,7 @@ void AudioConvert::DeinterleaveSamples(AudioFormat format, int channels,
 
 template <class AudioDataType>
 void _InterleaveSample(AudioDataType* out, const AudioDataType* in, int channels, int frames,
-                       const AudioDataType*  const* inp = NULL)
+                       const AudioDataType*  const* inp = nullptr)
 {
     const AudioDataType* my_inp[8];
 
@@ -831,17 +831,17 @@ void AudioConvert::InterleaveSamples(AudioFormat format, int channels,
     int bits = AudioOutputSettings::FormatToBits(format);
     if (bits == 8)
     {
-        _InterleaveSample((char*)output, (const char*)NULL, channels, data_size/sizeof(char)/channels,
+        _InterleaveSample((char*)output, (const char*)nullptr, channels, data_size/sizeof(char)/channels,
                           (const char*  const*)input);
     }
     else if (bits == 16)
     {
-        _InterleaveSample((short*)output, (const short*)NULL, channels, data_size/sizeof(short)/channels,
+        _InterleaveSample((short*)output, (const short*)nullptr, channels, data_size/sizeof(short)/channels,
                           (const short*  const*)input);
     }
     else
     {
-        _InterleaveSample((int*)output, (const int*)NULL, channels, data_size/sizeof(int)/channels,
+        _InterleaveSample((int*)output, (const int*)nullptr, channels, data_size/sizeof(int)/channels,
                           (const int*  const*)input);
     }
 }

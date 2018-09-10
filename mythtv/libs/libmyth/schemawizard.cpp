@@ -18,7 +18,7 @@ using std::endl;
 #include "mythdb.h"
 
 
-static SchemaUpgradeWizard * c_wizard = 0;
+static SchemaUpgradeWizard * c_wizard = nullptr;
 
 
 SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
@@ -28,7 +28,7 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
       backupStatus(kDB_Backup_Unknown),
       m_autoUpgrade(false),
       m_backupResult(),
-      m_busyPopup(NULL),
+      m_busyPopup(nullptr),
       m_expertMode(false),
       m_schemaSetting(DBSchemaSetting),
       m_schemaName(appName),
@@ -51,7 +51,7 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
 
 SchemaUpgradeWizard::~SchemaUpgradeWizard()
 {
-    c_wizard = 0;
+    c_wizard = nullptr;
 }
 
 SchemaUpgradeWizard *
@@ -59,7 +59,7 @@ SchemaUpgradeWizard::Get(const QString &DBSchemaSetting,
                          const QString &appName,
                          const QString &upgradeSchemaVal)
 {
-    if (c_wizard == 0)
+    if (c_wizard == nullptr)
         c_wizard = new SchemaUpgradeWizard(DBSchemaSetting, appName,
                                            upgradeSchemaVal);
     else

@@ -101,7 +101,7 @@ void ResultItem::toMap(InfoMap &metadataMap)
         metadataMap["length"] = fin.toString(format);
     }
 
-    if (m_rating == 0 || m_rating.isNull())
+    if (m_rating == nullptr || m_rating.isNull())
         metadataMap["rating"] = QString();
     else
         metadataMap["rating"] = m_rating;

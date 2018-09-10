@@ -58,15 +58,15 @@ GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                   m_Setup(false),
                   m_Retry(false),
                   m_Search(false),
-                  m_dummyButton(0),
-                  m_retryButton(0),
-                  m_searchButton(0),
-                  m_setupButton(0),
-                  m_exitButton(0),
-                  m_statusState(0),
-                  m_messageState(0),
-                  m_progressBar(0),
-                  m_progressTimer(0),
+                  m_dummyButton(nullptr),
+                  m_retryButton(nullptr),
+                  m_searchButton(nullptr),
+                  m_setupButton(nullptr),
+                  m_exitButton(nullptr),
+                  m_statusState(nullptr),
+                  m_messageState(nullptr),
+                  m_progressBar(nullptr),
+                  m_progressTimer(nullptr),
                   m_loop(eventLoop),
                   m_dlgLoop(this),
                   m_total(0)
@@ -173,7 +173,7 @@ bool GUIStartup::updateProgress(bool finished)
             m_timer.stop();
             emit cancelPortCheck();
             delete m_progressTimer;
-            m_progressTimer = 0;
+            m_progressTimer = nullptr;
         }
         return elapsed >= m_total;
     }

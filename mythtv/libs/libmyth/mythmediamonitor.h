@@ -26,7 +26,7 @@ class MonitorThread : public MThread
 {
   public:
     MonitorThread(MediaMonitor* pMon,  unsigned long interval);
-    ~MonitorThread() { wait(); m_Monitor = NULL; }
+    ~MonitorThread() { wait(); m_Monitor = nullptr; }
     void setMonitor(MediaMonitor* pMon) { m_Monitor = pMon; }
     virtual void run(void);
 

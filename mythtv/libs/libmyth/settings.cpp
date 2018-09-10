@@ -39,7 +39,7 @@ using namespace std;
  *   in children. byName(const &QString) is abstract. While
  *   configWidget(ConfigurationGroup *, QWidget*, const char*)
  *   has an implementation, all it does is print an error message
- *   and return a NULL pointer.
+ *   and return a nullptr.
  */
 
 QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
@@ -50,7 +50,7 @@ QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
     (void)widgetName;
     LOG(VB_GENERAL, LOG_ALERT,
              "BUG: Configurable is visible, but has no configWidget");
-    return NULL;
+    return nullptr;
 }
 
 /** \brief This slot calls the virtual widgetInvalid(QObject*) method.
@@ -281,7 +281,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     QWidget *widget = new QWidget(parent);
     widget->setObjectName(widgetName);
 
-    QBoxLayout *layout = NULL;
+    QBoxLayout *layout = nullptr;
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
@@ -306,7 +306,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this,     SLOT(widgetDeleted(QObject*)));
 
     edit = new MythLineEdit(
-        settingValue, NULL,
+        settingValue, nullptr,
         QString(QString(widgetName) + "-edit").toLatin1().constData());
     edit->setHelpText(getHelpText());
     edit->setText( getValue() );
@@ -334,8 +334,8 @@ void LineEditSetting::widgetInvalid(QObject *obj)
 {
     if (bxwidget == obj)
     {
-        bxwidget = NULL;
-        edit     = NULL;
+        bxwidget = nullptr;
+        edit     = nullptr;
     }
 }
 
@@ -385,7 +385,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     QWidget *widget = new QWidget(parent);
     widget->setObjectName(widgetName);
 
-    QBoxLayout *layout = NULL;
+    QBoxLayout *layout = nullptr;
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
@@ -407,7 +407,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     }
 
     MythSlider *slider = new MythSlider(
-        NULL, QString(QString(widgetName) + "-slider").toLatin1().constData());
+        nullptr, QString(QString(widgetName) + "-slider").toLatin1().constData());
     slider->setHelpText(getHelpText());
     slider->setMinimum(min);
     slider->setMaximum(max);
@@ -441,7 +441,7 @@ SpinBoxSetting::SpinBoxSetting(
     Storage *_storage, int _min, int _max, int _step,
     bool _allow_single_step, QString _special_value_text) :
     BoundedIntegerSetting(_storage, _min, _max, _step),
-    bxwidget(NULL), spinbox(NULL), relayEnabled(true),
+    bxwidget(nullptr), spinbox(nullptr), relayEnabled(true),
     sstep(_allow_single_step), svtext("")
 {
     if (!_special_value_text.isEmpty())
@@ -458,7 +458,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     QWidget *widget = new QWidget(parent);
     widget->setObjectName(widgetName);
 
-    QBoxLayout *layout = NULL;
+    QBoxLayout *layout = nullptr;
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
@@ -483,7 +483,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this,     SLOT(widgetDeleted(QObject*)));
 
     QString sbname = QString(widgetName) + "MythSpinBox";
-    spinbox = new MythSpinBox(NULL, sbname.toLatin1().constData(), sstep);
+    spinbox = new MythSpinBox(nullptr, sbname.toLatin1().constData(), sstep);
     spinbox->setHelpText(getHelpText());
     spinbox->setMinimum(min);
     spinbox->setMaximum(max);
@@ -513,8 +513,8 @@ void SpinBoxSetting::widgetInvalid(QObject *obj)
 {
     if (bxwidget == obj)
     {
-        bxwidget = NULL;
-        spinbox  = NULL;
+        bxwidget = nullptr;
+        spinbox  = nullptr;
     }
 }
 
@@ -574,7 +574,7 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
     QWidget *widget = new QWidget(parent);
     widget->setObjectName(widgetName);
 
-    QBoxLayout *layout = NULL;
+    QBoxLayout *layout = nullptr;
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
@@ -613,7 +613,7 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     QWidget *widget = new QWidget(parent);
     widget->setObjectName(widgetName);
 
-    QBoxLayout *layout = NULL;
+    QBoxLayout *layout = nullptr;
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
@@ -680,8 +680,8 @@ void ComboBoxSetting::widgetInvalid(QObject *obj)
 {
     if (bxwidget == obj)
     {
-        bxwidget = NULL;
-        cbwidget = NULL;
+        bxwidget = nullptr;
+        cbwidget = nullptr;
     }
 }
 
@@ -912,7 +912,7 @@ QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
 void CheckBoxSetting::widgetInvalid(QObject *obj)
 {
-    widget = (widget == obj) ? NULL : widget;
+    widget = (widget == obj) ? nullptr : widget;
 }
 
 void CheckBoxSetting::setVisible(bool b)
@@ -1062,7 +1062,7 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    lbwidget = new MythListBox(NULL);
+    lbwidget = new MythListBox(nullptr);
     lbwidget->setHelpText(getHelpText());
     if (eventFilter)
         lbwidget->installEventFilter(eventFilter);
@@ -1107,8 +1107,8 @@ void ListBoxSetting::widgetInvalid(QObject *obj)
 {
     if (bxwidget == obj)
     {
-        bxwidget = NULL;
-        lbwidget = NULL;
+        bxwidget = nullptr;
+        lbwidget = nullptr;
     }
 }
 
@@ -1176,7 +1176,7 @@ QWidget* ButtonSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
 
 void ButtonSetting::widgetInvalid(QObject *obj)
 {
-    button = (button == obj) ? NULL : button;
+    button = (button == obj) ? nullptr : button;
 }
 
 void ButtonSetting::SendPressedString(void)
@@ -1222,7 +1222,7 @@ QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
         layout->addWidget(label);
     }
 
-    QProgressBar *progress = new QProgressBar(NULL);
+    QProgressBar *progress = new QProgressBar(nullptr);
     progress->setObjectName(widgetName);
     progress->setRange(0,totalSteps);
     layout->addWidget(progress);
