@@ -44,7 +44,7 @@ class VideoOutputOMX : public VideoOutput, private OMXComponentCtx
     virtual QString GetName(void) const { return kName; } // = "openmax"
     virtual bool IsPIPSupported(void) const { return true; }
     virtual bool IsPBPSupported(void) const { return true; }
-    virtual QRect GetPIPRect(PIPLocation, MythPlayer* = NULL, bool = true) const;
+    virtual QRect GetPIPRect(PIPLocation, MythPlayer* = nullptr, bool = true) const;
     virtual MythPainter *GetOSDPainter(void);
 
     // VideoOutput implementation

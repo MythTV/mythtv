@@ -30,7 +30,7 @@ class MTV_PUBLIC RemoteEncoder
     int GetRecorderNumber(void) const;
 
     ProgramInfo *GetRecording(void);
-    bool IsRecording(bool *ok = NULL);
+    bool IsRecording(bool *ok = nullptr);
     float GetFrameRate(void);
     long long GetFramesWritten(void);
     /// \brief Return value last returned by GetFramesWritten().

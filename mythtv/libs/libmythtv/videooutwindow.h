@@ -111,7 +111,7 @@ class VideoOutWindow
     QRect GetTotalOSDBounds(void) const;
 
     QRect GetPIPRect(PIPLocation  location,
-                     MythPlayer  *pipplayer    = NULL,
+                     MythPlayer  *pipplayer    = nullptr,
                      bool         do_pixel_adj = true) const;
 
   protected:

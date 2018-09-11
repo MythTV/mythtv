@@ -349,7 +349,7 @@ SubtitleFormat::~SubtitleFormat(void)
     {
         m_cleanup[i]->DeleteAllChildren();
         m_cleanup[i]->deleteLater();
-        m_cleanup[i] = NULL; // just to be safe
+        m_cleanup[i] = nullptr; // just to be safe
     }
 }
 
@@ -455,7 +455,7 @@ void SubtitleFormat::Load(const QString &family,
                           const CC708CharacterAttribute &attr)
 {
     // Widgets for the actual values
-    MythUIType *baseParent = new MythUIType(NULL, "base");
+    MythUIType *baseParent = new MythUIType(nullptr, "base");
     m_cleanup += baseParent;
     MythFontProperties *providerBaseFont;
     MythUIShape *providerBaseShape;
@@ -463,7 +463,7 @@ void SubtitleFormat::Load(const QString &family,
                           &providerBaseFont, &providerBaseShape);
 
     // Widgets for the "negative" values
-    MythUIType *negParent = new MythUIType(NULL, "base");
+    MythUIType *negParent = new MythUIType(nullptr, "base");
     m_cleanup += negParent;
     MythFontProperties *negFont;
     MythUIShape *negBG;
@@ -599,7 +599,7 @@ SubtitleFormat::GetBackground(MythUIType *parent, const QString &name,
     if (!m_shapeMap.contains(prefix))
         Load(family, attr);
     if (m_shapeMap[prefix]->GetAlpha() == 0)
-        return NULL;
+        return nullptr;
     SubShape *result = new SubShape(parent, name, area, whichImageCache,
                                     start + duration);
     result->CopyFrom(m_shapeMap[prefix]);
@@ -630,7 +630,7 @@ int SubtitleFormat::GetBackgroundAlpha(const QString &family)
     // This is a "temporary" hack for allowing teletextscreen.cpp to get the
     // background alpha value from osd_subtitle.xml.
     CC708CharacterAttribute attr(false, false, false, Qt::white);
-    SubShape *bgShape = GetBackground(NULL, "dummyName", family, attr,
+    SubShape *bgShape = GetBackground(nullptr, "dummyName", family, attr,
                                       MythRect(), -1, 0, -1);
     return bgShape->m_fillBrush.color().alpha();
 }
@@ -771,7 +771,7 @@ FormattedTextSubtitle::FormattedTextSubtitle(const QString &base,
 }
 
 FormattedTextSubtitle::FormattedTextSubtitle(void) :
-    m_start(0), m_duration(0), m_subScreen(NULL)
+    m_start(0), m_duration(0), m_subScreen(nullptr)
 {
     // make cppcheck happy
     m_xAnchorPoint = 0;
@@ -895,7 +895,7 @@ void FormattedTextSubtitle::Draw(void)
                 m_subScreen->GetFont((*chunk).m_format);
             if (!mythfont)
                 continue;
-            // Note: NULL is passed as the parent argument to the
+            // Note: nullptr is passed as the parent argument to the
             // MythUI constructors so that we can control the drawing
             // order of the children.  In particular, background
             // shapes should be added/drawn first, and text drawn on
@@ -905,14 +905,14 @@ void FormattedTextSubtitle::Draw(void)
                     new SubSimpleText((*chunk).text, *mythfont,
                                       (*chunk).textRect,
                                       Qt::AlignLeft|Qt::AlignTop,
-                                      /*m_subScreen*/NULL,
+                                      /*m_subScreen*/nullptr,
                                       (*chunk).textName, CacheNum(),
                                       m_start + m_duration);
                 textList += text;
             }
             if ((*chunk).bgShapeRect.width() > 0) {
                 MythUIShape *bgshape = m_subScreen->GetSubtitleFormat()->
-                    GetBackground(/*m_subScreen*/NULL,
+                    GetBackground(/*m_subScreen*/nullptr,
                                   (*chunk).bgShapeName,
                                   m_base, (*chunk).m_format,
                                   MythRect((*chunk).bgShapeRect), CacheNum(),
@@ -1365,9 +1365,9 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
 
 SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
                                int fontStretch) :
-    MythScreenType((MythScreenType*)NULL, name),
-    m_player(player),  m_subreader(NULL),   m_608reader(NULL),
-    m_708reader(NULL), m_safeArea(QRect()),
+    MythScreenType((MythScreenType*)nullptr, name),
+    m_player(player),     m_subreader(nullptr),   m_608reader(nullptr),
+    m_708reader(nullptr), m_safeArea(QRect()),
     m_removeHTML(QRegExp("</?.+>")),        m_subtitleType(kDisplayNone),
     m_fontSize(0),
     m_textFontZoom(100), m_textFontZoomPrev(100),
@@ -1379,10 +1379,10 @@ SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
     m_removeHTML.setMinimal(true);
 
 #ifdef USING_LIBASS
-    m_assLibrary   = NULL;
-    m_assRenderer  = NULL;
+    m_assLibrary   = nullptr;
+    m_assRenderer  = nullptr;
     m_assTrackNum  = -1;
-    m_assTrack     = NULL;
+    m_assTrack     = nullptr;
     m_assFontCount = 0;
 #endif
 }
@@ -1716,7 +1716,7 @@ void SubtitleScreen::Pulse(void)
     QList<MythUIType *>::iterator it, itNext;
 
     VideoOutput    *videoOut = m_player->GetVideoOutput();
-    VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : NULL;
+    VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
     long long now = currentFrame ? currentFrame->timecode : LLONG_MAX;
     bool needRescale = (m_textFontZoom != m_textFontZoomPrev);
 
@@ -1832,7 +1832,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         return;
 
     VideoOutput    *videoOut = m_player->GetVideoOutput();
-    VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : NULL;
+    VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
 
     if (!currentFrame || !videoOut)
         return;
@@ -2076,11 +2076,11 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
 
 
     MythPainter *osd_painter = videoOut->GetOSDPainter();
-    MythImage *image = NULL;
+    MythImage *image = nullptr;
     if (osd_painter)
        image = osd_painter->GetFormatImage();
 
-    SubImage *uiimage = NULL;
+    SubImage *uiimage = nullptr;
     if (image)
     {
         image->Assign(qImage);
@@ -2093,7 +2093,7 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
             SetElementAdded();
         }
         image->DecrRef();
-        image = NULL;
+        image = nullptr;
     }
     if (uiimage)
     {
@@ -2314,7 +2314,7 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     }
 
     MythPainter *osd_painter = vo->GetOSDPainter();
-    MythImage* image = NULL;
+    MythImage* image = nullptr;
     if (osd_painter)
          image = osd_painter->GetFormatImage();
 
@@ -2399,7 +2399,7 @@ bool SubtitleScreen::InitialiseAssLibrary(void)
         if (!m_assLibrary)
             return false;
 
-        ass_set_message_cb(m_assLibrary, myth_libass_log, NULL);
+        ass_set_message_cb(m_assLibrary, myth_libass_log, nullptr);
         ass_set_extract_fonts(m_assLibrary, true);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialised libass object.");
     }
@@ -2412,7 +2412,7 @@ bool SubtitleScreen::InitialiseAssLibrary(void)
         if (!m_assRenderer)
             return false;
 
-        ass_set_fonts(m_assRenderer, NULL, "sans-serif", 1, NULL, 1);
+        ass_set_fonts(m_assRenderer, nullptr, "sans-serif", 1, nullptr, 1);
         ass_set_hinting(m_assRenderer, ASS_HINTING_LIGHT);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Initialised libass renderer.");
     }
@@ -2451,7 +2451,7 @@ void SubtitleScreen::CleanupAssLibrary(void)
 
     if (m_assRenderer)
         ass_renderer_done(m_assRenderer);
-    m_assRenderer = NULL;
+    m_assRenderer = nullptr;
 
     if (m_assLibrary)
     {
@@ -2459,7 +2459,7 @@ void SubtitleScreen::CleanupAssLibrary(void)
         m_assFontCount = 0;
         ass_library_done(m_assLibrary);
     }
-    m_assLibrary = NULL;
+    m_assLibrary = nullptr;
 }
 
 void SubtitleScreen::InitialiseAssTrack(int tracknum)
@@ -2487,7 +2487,7 @@ void SubtitleScreen::CleanupAssTrack(void)
 {
     if (m_assTrack)
         ass_free_track(m_assTrack);
-    m_assTrack = NULL;
+    m_assTrack = nullptr;
 }
 
 void SubtitleScreen::AddAssEvent(char *event)
@@ -2573,8 +2573,8 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
             src += images->stride;
         }
 
-        MythImage* image = NULL;
-        SubImage *uiimage = NULL;
+        MythImage* image = nullptr;
+        SubImage *uiimage = nullptr;
 
         if (osd_painter)
             image = osd_painter->GetFormatImage();

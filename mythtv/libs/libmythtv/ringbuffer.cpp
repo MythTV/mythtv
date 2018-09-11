@@ -225,12 +225,12 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
     rbrpos(0),                rbwpos(0),
     stopreads(false),         safefilename(QString()),
     filename(),               subtitlefilename(),
-    tfw(NULL),                fd2(-1),
-    writemode(false),         remotefile(NULL),
+    tfw(nullptr),             fd2(-1),
+    writemode(false),         remotefile(nullptr),
     bufferSize(BUFFER_SIZE_MINIMUM),
     low_buffers(false),
     fileismatroska(false),    unknownbitrate(false),
-    startreadahead(false),    readAheadBuffer(NULL),
+    startreadahead(false),    readAheadBuffer(nullptr),
     readaheadrunning(false),  reallyrunning(false),
     request_pause(false),     paused(false),
     ateof(false),
@@ -242,7 +242,7 @@ RingBuffer::RingBuffer(RingBufferType rbtype) :
     fill_threshold(65536),    fill_min(-1),
     readblocksize(CHUNK),     wanttoread(0),
     numfailures(0),           commserror(false),
-    oldfile(false),           livetvchain(NULL),
+    oldfile(false),           livetvchain(nullptr),
     ignoreliveeof(false),     readAdjust(0),
     readOffset(0),            readInternalMode(false),
     bitrateMonitorEnabled(false),
@@ -284,13 +284,13 @@ RingBuffer::~RingBuffer(void)
     wait();
 
     delete [] readAheadBuffer;
-    readAheadBuffer = NULL;
+    readAheadBuffer = nullptr;
 
     if (tfw)
     {
         tfw->Flush();
         delete tfw;
-        tfw = NULL;
+        tfw = nullptr;
     }
 }
 
@@ -922,7 +922,7 @@ void RingBuffer::run(void)
     bool ignore_for_read_timing = true;
     int eofreads = 0;
 
-    gettimeofday(&lastread, NULL); // this is just to keep gcc happy
+    gettimeofday(&lastread, nullptr); // this is just to keep gcc happy
 
     CreateReadAheadBuffer();
     rwlock.lockForWrite();
@@ -1010,7 +1010,7 @@ void RingBuffer::run(void)
                 totfree = readblocksize;
 
             // adapt blocksize
-            gettimeofday(&now, NULL);
+            gettimeofday(&now, nullptr);
             if (!ignore_for_read_timing)
             {
                 int readinterval = (now.tv_sec  - lastread.tv_sec ) * 1000 +
@@ -1260,7 +1260,7 @@ void RingBuffer::run(void)
 
     delete [] readAheadBuffer;
 
-    readAheadBuffer = NULL;
+    readAheadBuffer = nullptr;
     rbrpos          = 0;
     rbwpos          = 0;
     reallyrunning   = false;

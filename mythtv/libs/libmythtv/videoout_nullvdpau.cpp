@@ -24,9 +24,9 @@ void VideoOutputNullVDPAU::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputNullVDPAU::VideoOutputNullVDPAU()
-  : m_render(NULL), m_lock(QMutex::Recursive), m_decoder(0), m_pix_fmt(-1),
+  : m_render(nullptr), m_lock(QMutex::Recursive), m_decoder(0), m_pix_fmt(-1),
     m_decoder_buffer_size(MAX_REFERENCE_FRAMES),
-    m_checked_surface_ownership(false), m_shadowBuffers(NULL),
+    m_checked_surface_ownership(false), m_shadowBuffers(nullptr),
     m_surfaceSize(QSize(0,0))
 {
     memset(&m_context, 0, sizeof(AVVDPAUContext));
@@ -92,7 +92,7 @@ void VideoOutputNullVDPAU::DeleteRender(void)
     }
 
     m_decoder = 0;
-    m_render  = NULL;
+    m_render  = nullptr;
     m_pix_fmt = -1;
 }
 
@@ -182,7 +182,7 @@ void VideoOutputNullVDPAU::DeleteShadowBuffers(void)
     m_shadowBuffers->Reset();
     m_shadowBuffers->DeleteBuffers();
     delete m_shadowBuffers;
-    m_shadowBuffers = NULL;
+    m_shadowBuffers = nullptr;
 }
 
 bool VideoOutputNullVDPAU::CreateVideoSurfaces(uint num)
@@ -301,7 +301,7 @@ void VideoOutputNullVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int
                             created++;
                             m_shadowBuffers->AddBuffer(m_surfaceSize.width(),
                                                        m_surfaceSize.height(),
-                                                       NULL,
+                                                       nullptr,
                                                        FMT_YV12);
                         }
                     }
@@ -382,28 +382,28 @@ void VideoOutputNullVDPAU::ClearAfterSeek(void)
 VideoFrame* VideoOutputNullVDPAU::GetLastDecodedFrame(void)
 {
     if (!BufferSizeCheck())
-        return NULL;
+        return nullptr;
 
     VideoFrame* gpu = vbuffers.GetLastDecodedFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
         if (vbuffers.At(i) == gpu)
             return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
-    return NULL;
+    return nullptr;
 }
 
 // Always returns the CPU version of a frame
 VideoFrame* VideoOutputNullVDPAU::GetLastShownFrame(void)
 {
     if (!BufferSizeCheck())
-        return NULL;
+        return nullptr;
 
     VideoFrame* gpu = vbuffers.GetLastShownFrame();
     for (uint i = 0; i < vbuffers.Size(); i++)
         if (vbuffers.At(i) == gpu)
             return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
-    return NULL;
+    return nullptr;
 }
 
 // Should work with either the CPU or GPU version of a frame

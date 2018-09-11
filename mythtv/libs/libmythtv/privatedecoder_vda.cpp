@@ -225,9 +225,9 @@ const int isom_write_avcc(AVIOContext *pb, const uint8_t *data, int len)
         /* check for h264 start code */
         if (VDA_RB32(data) == 0x00000001 || VDA_RB24(data) == 0x000001)
         {
-            uint8_t *buf=NULL, *end, *start;
+            uint8_t *buf=nullptr, *end, *start;
             uint32_t sps_size=0, pps_size=0;
-            uint8_t *sps=0, *pps=0;
+            uint8_t *sps=nullptr, *pps=nullptr;
 
             int ret = avc_parse_nal_units_buf(data, &buf, &len);
             if (ret < 0)

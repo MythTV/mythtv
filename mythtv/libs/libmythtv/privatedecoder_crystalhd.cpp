@@ -47,10 +47,10 @@ void PrivateDecoderCrystalHD::GetDecoders(render_opts &opts)
 }
 
 PrivateDecoderCrystalHD::PrivateDecoderCrystalHD()
-  : m_device(NULL), m_device_type(BC_70012),
+  : m_device(nullptr), m_device_type(BC_70012),
     m_pix_fmt(OUTPUT_MODE_INVALID), m_decoded_frames_lock(QMutex::Recursive),
-    m_fetcher_thread(NULL), m_fetcher_pause(false), m_fetcher_paused(false),
-    m_fetcher_stop(false),  m_frame(NULL), m_filter(NULL)
+    m_fetcher_thread(nullptr), m_fetcher_pause(false), m_fetcher_paused(false),
+    m_fetcher_stop(false),  m_frame(nullptr), m_filter(nullptr)
 {
 }
 
@@ -349,8 +349,8 @@ bool PrivateDecoderCrystalHD::CreateFilter(AVCodecContext *avctx)
     const uint8_t *test = testnal;
     int testsize  = 6;
     int outbuf_size = 0;
-    uint8_t *outbuf = NULL;
-    int res = av_bitstream_filter_filter(m_filter, avctx, NULL, &outbuf,
+    uint8_t *outbuf = nullptr;
+    int res = av_bitstream_filter_filter(m_filter, avctx, nullptr, &outbuf,
                                          &outbuf_size, test, testsize, 0);
     av_freep(&outbuf);
     return res > 0;
@@ -392,7 +392,7 @@ bool PrivateDecoderCrystalHD::Reset(void)
 
     QMutexLocker lock(&m_decoded_frames_lock);
     free_frame(m_frame);
-    m_frame = NULL;
+    m_frame = nullptr;
 
     for (int i = 0; i < m_decoded_frames.size(); i++)
         free_frame(m_decoded_frames[i]);
@@ -456,11 +456,11 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
         int size        = buffer->size;
         bool free_buf   = false;
         int outbuf_size = 0;
-        uint8_t *outbuf = NULL;
+        uint8_t *outbuf = nullptr;
 
         if (m_filter)
         {
-            int res = av_bitstream_filter_filter(m_filter, avctx, NULL, &outbuf,
+            int res = av_bitstream_filter_filter(m_filter, avctx, nullptr, &outbuf,
                                                  &outbuf_size, buf, size, 0);
             if (res <= 0)
             {
@@ -606,7 +606,7 @@ void PrivateDecoderCrystalHD::FetchFrames(void)
 
         if (ok && valid && (out.PoutFlags & BC_POUT_FLAGS_PIB_VALID))
             FillFrame(&out);
-        st = DtsReleaseOutputBuffs(m_device, NULL, false);
+        st = DtsReleaseOutputBuffs(m_device, nullptr, false);
         CHECK_ST;
     }
 }
@@ -710,7 +710,7 @@ void PrivateDecoderCrystalHD::AddFrameToQueue(void)
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Decoded frame queue size %1")
             .arg(m_decoded_frames.size()));
     m_decoded_frames_lock.unlock();
-    m_frame = NULL;
+    m_frame = nullptr;
 }
 
 void PrivateDecoderCrystalHD::CheckProcOutput(BC_DTS_PROC_OUT *out)

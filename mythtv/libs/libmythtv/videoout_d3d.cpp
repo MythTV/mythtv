@@ -56,16 +56,16 @@ void VideoOutputD3D::GetRenderOptions(render_opts &opts,
 
 VideoOutputD3D::VideoOutputD3D(void)
   : VideoOutput(),         m_lock(QMutex::Recursive),
-    m_hWnd(NULL),          m_render(NULL),
-    m_video(NULL),
-    m_render_valid(false), m_render_reset(false), m_pip_active(NULL),
+    m_hWnd(NULL),          m_render(nullptr),
+    m_video(nullptr),
+    m_render_valid(false), m_render_reset(false), m_pip_active(nullptr),
     m_osd_painter(NULL)
 {
-    m_pauseFrame.buf = NULL;
+    m_pauseFrame.buf = nullptr;
 #ifdef USING_DXVA2
     m_decoder = NULL;
 #endif
-    m_pause_surface = NULL;
+    m_pause_surface = nullptr;
 }
 
 VideoOutputD3D::~VideoOutputD3D()
@@ -82,7 +82,7 @@ void VideoOutputD3D::TearDown(void)
     if (m_pauseFrame.buf)
     {
         delete [] m_pauseFrame.buf;
-        m_pauseFrame.buf = NULL;
+        m_pauseFrame.buf = nullptr;
     }
 
     if (m_osd_painter)
@@ -117,13 +117,13 @@ void VideoOutputD3D::DestroyContext(void)
     if (m_video)
     {
         delete m_video;
-        m_video = NULL;
+        m_video = nullptr;
     }
 
     if (m_render)
     {
         m_render->DecrRef();
-        m_render = NULL;
+        m_render = nullptr;
     }
 }
 
@@ -527,7 +527,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     if (frame)
         dummy = frame->dummy;
-    bool deint_proc = m_deinterlacing && (m_deintFilter != NULL) &&
+    bool deint_proc = m_deinterlacing && (m_deintFilter != nullptr) &&
                       !dummy;
 
     if (filterList && !gpu && !dummy)
@@ -711,7 +711,7 @@ void* VideoOutputD3D::GetDecoderContext(unsigned char* buf, uint8_t*& id)
     if (m_decoder)
         return (void*)&m_decoder->m_context;
 #endif
-    return NULL;
+    return nullptr;
 }
 
 bool VideoOutputD3D::CreateDecoder(void)

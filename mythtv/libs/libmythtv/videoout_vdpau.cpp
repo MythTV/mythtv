@@ -52,7 +52,7 @@ void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputVDPAU::VideoOutputVDPAU()
-  : m_win(0),                m_render(NULL),
+  : m_win(0),                m_render(nullptr),
     m_decoder_buffer_size(MAX_REFERENCE_FRAMES),
     m_process_buffer_size(DEF_PROCESS_BUFFER), m_pause_surface(0),
     m_need_deintrefs(false), m_video_mixer(0), m_mixer_features(kVDPFeatNone),
@@ -60,7 +60,7 @@ VideoOutputVDPAU::VideoOutputVDPAU()
     m_checked_output_surfaces(false),
     m_decoder(0),            m_pix_fmt(-1),
     m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
-    m_pip_ready(false),      m_osd_painter(NULL),
+    m_pip_ready(false),      m_osd_painter(nullptr),
     m_skip_chroma(false),    m_denoise(0.0f),
     m_sharpen(0.0f),
     m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
@@ -179,13 +179,13 @@ void VideoOutputVDPAU::DeleteRender(void)
             m_render->DestroyDecoder(m_decoder);
 
         m_render->DecrRef();
-        m_render = NULL;
+        m_render = nullptr;
     }
 
     m_checked_output_surfaces = false;
-    m_osd_painter = NULL;
+    m_osd_painter = nullptr;
     m_decoder = 0;
-    m_render = NULL;
+    m_render = nullptr;
     m_pix_fmt = -1;
 }
 
@@ -530,12 +530,12 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
 
     if (dummy)
     {
-        m_render->DrawBitmap(0, 0, NULL, NULL, kVDPBlendNormal, 255);
+        m_render->DrawBitmap(0, 0, nullptr, nullptr, kVDPBlendNormal, 255);
     }
     else
     {
         if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
-                                  deint ? &m_reference_frames : NULL,
+                                  deint ? &m_reference_frames : nullptr,
                                   scan == kScan_Interlaced,
                                   window.GetVideoRect(),
                                   QRect(QPoint(0,0), size),
@@ -550,7 +550,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan,
     if (m_pip_ready)
         m_render->DrawLayer(m_pip_layer, 0);
     if (m_visual)
-        m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
+        m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, nullptr);
 
     if (osd && m_osd_painter && !window.IsEmbedding())
         osd->DrawDirect(m_osd_painter, GetTotalOSDBounds().size(), true);
@@ -1167,7 +1167,7 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame * /* frame */, MythPlayer *pipplayer,
             QRect rect = GetPIPRect(loc, pipplayer);
 
             if (!m_pip_ready)
-                m_render->DrawBitmap(0, m_pip_surface, NULL, NULL,
+                m_render->DrawBitmap(0, m_pip_surface, nullptr, nullptr,
                                      kVDPBlendNull);
 
             uint32_t pitches[] = {
@@ -1185,10 +1185,10 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame * /* frame */, MythPlayer *pipplayer,
             ok &= m_render->MixAndRend(m_pips[pipplayer].videoMixer,
                                        VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
                                        m_pips[pipplayer].videoSurface,
-                                       m_pip_surface, NULL, false,
+                                       m_pip_surface, nullptr, false,
                                        QRect(QPoint(0,0), pipVideoDim),
                                        rect, rect);
-            ok &= m_render->DrawBitmap(0, m_pip_surface, NULL, &rect,
+            ok &= m_render->DrawBitmap(0, m_pip_surface, nullptr, &rect,
                                        kVDPBlendPiP, 255);
 
             if (pipActive)
@@ -1202,10 +1202,10 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame * /* frame */, MythPlayer *pipplayer,
                                 QSize(rect.width(), 10));
                 QRect r = QRect(QPoint(rect.x() + rect.width(), rect.y() -10),
                                 QSize(10, rect.height() + 20));
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &l, kVDPBlendNormal, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &t, kVDPBlendNormal, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &b, kVDPBlendNormal, 255, 127);
-                m_render->DrawBitmap(0, m_pip_surface, NULL, &r, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, nullptr, &l, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, nullptr, &t, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, nullptr, &b, kVDPBlendNormal, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, nullptr, &r, kVDPBlendNormal, 255, 127);
             }
 
             m_pip_ready = ok;

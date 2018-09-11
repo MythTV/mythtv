@@ -191,7 +191,7 @@ QString ProfileGroup::getName(int group)
         return result.value(0).toString();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool ProfileGroup::allowedGroupName(void)

@@ -27,7 +27,7 @@ extern uint cnt_open_xv_port(void);
 extern QString xvflags2str(int flags);
 extern bool xv_is_attrib_supported(
     MythXDisplay *disp, int port, const char *name,
-    int *current_value = NULL, int *min_val = NULL, int *max_val = NULL);
+    int *current_value = nullptr, int *min_val = nullptr, int *max_val = nullptr);
 extern bool xv_set_attrib(MythXDisplay *disp, int port,
                           const char *name, int val);
 extern bool xv_get_attrib(MythXDisplay *disp, int port,

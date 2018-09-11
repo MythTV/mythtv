@@ -124,7 +124,7 @@ class AskProgramInfo
     AskProgramInfo() :
         has_rec(false),                has_later(false),
         is_in_same_input_group(false), is_conflicting(false),
-        info(NULL) {}
+        info(nullptr) {}
     AskProgramInfo(const QDateTime &e, bool r, bool l, ProgramInfo *i) :
         expiry(e), has_rec(r), has_later(l),
         is_in_same_input_group(false), is_conflicting(false),
@@ -228,7 +228,7 @@ public:
 class MenuBase
 {
 public:
-    MenuBase() : m_document(NULL), m_translationContext("") {}
+    MenuBase() : m_document(nullptr), m_translationContext("") {}
     ~MenuBase();
     bool        LoadFromFile(const QString &filename,
                              const QString &menuname,
@@ -238,7 +238,7 @@ public:
                                const QString &menuname,
                                const char *translationContext,
                                const QString &keyBindingContext);
-    bool        IsLoaded(void) const { return (m_document != NULL); }
+    bool        IsLoaded(void) const { return (m_document != nullptr); }
     QDomElement GetRoot(void) const;
     QString     Translate(const QString &text) const;
     bool        Show(const QDomNode &node, const QDomNode &selected,
@@ -535,7 +535,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
     // get queued up input
     QString GetQueuedInput(void)   const;
-    int     GetQueuedInputAsInt(bool *ok = NULL, int base = 10) const;
+    int     GetQueuedInputAsInt(bool *ok = nullptr, int base = 10) const;
     QString GetQueuedChanNum(void) const;
     uint    GetQueuedChanID(void)  const { return queuedChanID; }
 
@@ -652,8 +652,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
     bool CreatePIP(PlayerContext *lctx, const ProgramInfo *info);
     bool ResizePIPWindow(PlayerContext*);
-    bool IsPBPSupported(const PlayerContext *ctx = NULL) const;
-    bool IsPIPSupported(const PlayerContext *ctx = NULL) const;
+    bool IsPBPSupported(const PlayerContext *ctx = nullptr) const;
+    bool IsPIPSupported(const PlayerContext *ctx = nullptr) const;
     void PxPToggleView(  PlayerContext *actx, bool wantPBP);
     void PxPCreateView(  PlayerContext *actx, bool wantPBP);
     void PxPTeardownView(PlayerContext *actx);

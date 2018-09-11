@@ -47,7 +47,7 @@ class VideoOutputNullVAAPI : public VideoOutput
         { return false; }
     virtual bool SetupVisualisation(AudioPlayer *, MythRender *,
                                     const QString &) { return false; }
-    virtual MythPainter *GetOSDPainter(void) { return NULL; }
+    virtual MythPainter *GetOSDPainter(void) { return nullptr; }
     virtual VideoFrame *GetLastDecodedFrame(void);
     virtual VideoFrame *GetLastShownFrame(void);
     virtual void DoneDisplayingFrame(VideoFrame *frame);

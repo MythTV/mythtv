@@ -139,10 +139,10 @@ VideoOutputXv::VideoOutputXv()
       video_output_subtype(XVUnknown),
       global_lock(QMutex::Recursive),
 
-      XJ_win(0), XJ_curwin(0), disp(NULL), XJ_letterbox_colour(0),
+      XJ_win(0), XJ_curwin(0), disp(nullptr), XJ_letterbox_colour(0),
       XJ_started(false),
 
-      XJ_non_xv_image(0), non_xv_frames_shown(0), non_xv_show_frame(1),
+      XJ_non_xv_image(nullptr), non_xv_frames_shown(0), non_xv_show_frame(1),
       non_xv_fps(0), non_xv_av_format(AV_PIX_FMT_NB), non_xv_stop_time(0),
 
       xv_port(-1),      xv_hue_base(0),
@@ -151,7 +151,7 @@ VideoOutputXv::VideoOutputXv()
       xv_need_bobdeint_repaint(false),
       xv_use_picture_controls(true),
 
-      chroma_osd(NULL)
+      chroma_osd(nullptr)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "ctor");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
@@ -196,7 +196,7 @@ VideoOutputXv::~VideoOutputXv()
     {
         XJ_started = false;
         delete disp;
-        disp = NULL;
+        disp = nullptr;
     }
 }
 
@@ -396,7 +396,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     }
 
     // get the list of Xv ports
-    XvAdaptorInfo *ai = NULL;
+    XvAdaptorInfo *ai = nullptr;
     uint p_num_adaptors = 0;
     int ret = Success;
     XLOCK(disp, ret = XvQueryAdaptors(disp->GetDisplay(), root,
@@ -1058,14 +1058,14 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
     for (uint i = 0; i < num; i++)
     {
         XShmSegmentInfo *info = new XShmSegmentInfo;
-        void *image = NULL;
+        void *image = nullptr;
         int size = 0;
         int desiredsize = 0;
 
         if (use_xv)
         {
             XvImage *img =
-                XvShmCreateImage(d, xv_port, xv_chroma, 0,
+                XvShmCreateImage(d, xv_port, xv_chroma, nullptr,
                                  video_dim.width(), video_dim.height(), info);
             size = img->data_size + 64;
             image = img;
@@ -1077,7 +1077,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                         "XvShmCreateImage() failed to create image of the "
                         "requested size.");
                 XFree(image);
-                image = NULL;
+                image = nullptr;
                 delete info;
             }
 
@@ -1100,7 +1100,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                         "XvShmCreateImage() failed to create image "
                         "with the correct number of pixel planes.");
                 XFree(image);
-                image = NULL;
+                image = nullptr;
                 delete info;
             }
         }
@@ -1110,7 +1110,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             int height = window.GetDisplayVisibleRect().height() & ~0x1;
             XImage *img =
                 XShmCreateImage(d, DefaultVisual(d, disp->GetScreen()),
-                                disp->GetDepth(), ZPixmap, 0, info,
+                                disp->GetDepth(), ZPixmap, nullptr, info,
                                 width, height);
             size = img->bytes_per_line * img->height + 64;
             image = img;
@@ -1121,14 +1121,14 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                         "XShmCreateImage() failed to create image of the "
                         "requested size.");
                 XDestroyImage((XImage *)image);
-                image = NULL;
+                image = nullptr;
                 delete info;
             }
 
             if (image)
             {
                 YUVInfo tmp(img->width, img->height,
-                            img->bytes_per_line * img->height, NULL, NULL);
+                            img->bytes_per_line * img->height, nullptr, nullptr);
                 XJ_yuv_infos.push_back(tmp);
                 XJ_shm_infos.push_back(info);
             }
@@ -1140,7 +1140,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             if (XJ_shm_infos[i]->shmid >= 0)
             {
                 XJ_shm_infos[i]->shmaddr = (char*)
-                    shmat(XJ_shm_infos[i]->shmid, 0, 0);
+                    shmat(XJ_shm_infos[i]->shmid, nullptr, 0);
                 if (use_xv)
                     ((XvImage*)image)->data = XJ_shm_infos[i]->shmaddr;
                 else
@@ -1153,7 +1153,7 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
 
                 // Mark for delete immediately.
                 // It won't actually be removed until after we detach it.
-                shmctl(XJ_shm_infos[i]->shmid, IPC_RMID, 0);
+                shmctl(XJ_shm_infos[i]->shmid, IPC_RMID, nullptr);
 
                 bufs.push_back((unsigned char*) XJ_shm_infos[i]->shmaddr);
             }
@@ -1210,7 +1210,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
             int scrn = disp->GetScreen();
             Visual *visual = DefaultVisual(d, scrn);
             XJ_non_xv_image = XCreateImage(d, visual, disp->GetDepth(),
-                                           ZPixmap, /*offset*/0, /*data*/0,
+                                           ZPixmap, /*offset*/0, /*data*/nullptr,
                                            display_visible_rect.width()  & ~0x1,
                                            display_visible_rect.height() & ~0x1,
                                            /*bitmap_pad*/8, 0);
@@ -1267,7 +1267,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     if (chroma_osd)
     {
         delete chroma_osd;
-        chroma_osd = NULL;
+        chroma_osd = nullptr;
     }
 
     Display *d = disp->GetDisplay();
@@ -1302,13 +1302,13 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         if (XJ_shm_infos[i]->shmaddr)
             shmdt(XJ_shm_infos[i]->shmaddr);
         if (XJ_shm_infos[i]->shmid > 0)
-            shmctl(XJ_shm_infos[i]->shmid, IPC_RMID, 0);
+            shmctl(XJ_shm_infos[i]->shmid, IPC_RMID, nullptr);
         delete XJ_shm_infos[i];
     }
     XJ_shm_infos.clear();
     xv_buffers.clear();
     XJ_yuv_infos.clear();
-    XJ_non_xv_image = NULL;
+    XJ_non_xv_image = nullptr;
 }
 
 void VideoOutputXv::EmbedInWidget(const QRect &rect)
@@ -1401,11 +1401,11 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     // bad way to throttle frame display for non-Xv mode.
     // calculate fps we can do and skip enough frames so we don't exceed.
     if (non_xv_frames_shown == 0)
-        non_xv_stop_time = time(NULL) + 4;
+        non_xv_stop_time = time(nullptr) + 4;
 
     const QRect display_visible_rect = window.GetDisplayVisibleRect();
 
-    if ((!non_xv_fps) && (time(NULL) > non_xv_stop_time))
+    if ((!non_xv_fps) && (time(nullptr) > non_xv_stop_time))
     {
         non_xv_fps = (int)(non_xv_frames_shown / 4);
 
@@ -1429,7 +1429,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
     if (!XJ_non_xv_image)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "XJ_non_xv_image == NULL");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "XJ_non_xv_image == nullptr");
         return;
     }
 
@@ -1445,7 +1445,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     else
     {
         static QMutex lock;
-        static struct SwsContext *scontext = NULL;
+        static struct SwsContext *scontext = nullptr;
         int size = buffersize(FMT_YV12, out_width, out_height);
         unsigned char *sbuf = (unsigned char*)av_malloc(size);
 
@@ -1457,7 +1457,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         scontext = sws_getCachedContext(scontext, width, height,
                        AV_PIX_FMT_YUV420P, out_width,
                        out_height, AV_PIX_FMT_YUV420P,
-                       SWS_FAST_BILINEAR, NULL, NULL, NULL);
+                       SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
         sws_scale(scontext, image_in.data, image_in.linesize, 0, height,
                   image_out.data, image_out.linesize);
@@ -1768,7 +1768,7 @@ void VideoOutputXv::UpdatePauseFrame(int64_t &disp_timecode)
         // Try used frame first, then fall back to scratch frame.
         vbuffers.begin_lock(kVideoBuffer_used);
 
-        VideoFrame *used_frame = NULL;
+        VideoFrame *used_frame = nullptr;
         if (vbuffers.Size(kVideoBuffer_used) > 0)
             used_frame = vbuffers.Head(kVideoBuffer_used);
 
@@ -1798,7 +1798,7 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
-    bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
+    bool deint_proc = m_deinterlacing && (m_deintFilter != nullptr);
     bool pauseframe = false;
     if (!frame)
     {

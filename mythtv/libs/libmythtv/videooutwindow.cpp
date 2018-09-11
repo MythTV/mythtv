@@ -99,7 +99,7 @@ VideoOutWindow::VideoOutWindow() :
 void VideoOutWindow::populateGeometry(void)
 {
     qApp->processEvents();
-    QDesktopWidget *desktop = NULL;
+    QDesktopWidget *desktop = nullptr;
     if (qobject_cast<QApplication*>(qApp))
         desktop = QApplication::desktop();
 

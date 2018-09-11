@@ -828,7 +828,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
         uint cnt = 0;
 
         QFileInfoList il = dir.entryInfoList();
-        QRegExp *driverExp = NULL;
+        QRegExp *driverExp = nullptr;
         if (!driver.isEmpty())
             driverExp = new QRegExp(driver);
 
@@ -2207,7 +2207,7 @@ bool HDHomeRunConfigurationGroup::ProbeCard(HDHomeRunDevice &tmpdevice)
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t *thisdevice =
         hdhomerun_device_create_from_str(
-            tmpdevice.mythdeviceid.toLocal8Bit().constData(), NULL);
+            tmpdevice.mythdeviceid.toLocal8Bit().constData(), nullptr);
 
     if (thisdevice)
     {
@@ -2470,7 +2470,7 @@ void V4LConfigurationGroup::probeCard(const QString &device)
 MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
                                                CardType &a_cardtype) :
     parent(a_parent),
-    device(NULL), vbidevice(NULL),
+    device(nullptr), vbidevice(nullptr),
     cardinfo(new TransTextEditSetting())
 {
     setVisible(false);
@@ -2623,7 +2623,7 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
                                                  CardType &a_cardtype) :
     parent(a_parent), cardinfo(new GroupSetting()),
     audioinput(new TunerCardAudioInput(parent, QString(), "HDPVR")),
-    vbidevice(NULL)
+    vbidevice(nullptr)
 {
     setVisible(false);
 
@@ -3377,8 +3377,8 @@ CardInput::CardInput(const QString & cardtype, const QString & device,
     externalInputSettings(new DiSEqCDevSettings()),
     inputgrp0(new InputGroup(*this, 0)),
     inputgrp1(new InputGroup(*this, 1)),
-    instancecount(NULL),
-    schedgroup(NULL)
+    instancecount(nullptr),
+    schedgroup(nullptr)
 {
     addChild(id);
 
@@ -3465,7 +3465,7 @@ CardInput::~CardInput()
     if (externalInputSettings)
     {
         delete externalInputSettings;
-        externalInputSettings = NULL;
+        externalInputSettings = nullptr;
     }
 }
 
@@ -4195,7 +4195,7 @@ DVBConfigurationGroup::~DVBConfigurationGroup()
     if (diseqc_tree)
     {
         delete diseqc_tree;
-        diseqc_tree = NULL;
+        diseqc_tree = nullptr;
     }
 }
 

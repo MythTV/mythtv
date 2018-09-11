@@ -172,7 +172,7 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
         if (credits)
         {
             delete credits;
-            credits = NULL;
+            credits = nullptr;
         }
 
         if (other.credits)

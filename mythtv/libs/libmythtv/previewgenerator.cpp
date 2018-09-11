@@ -73,7 +73,7 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
                                    const QString     &token,
                                    PreviewGenerator::Mode mode)
     : MThread("PreviewGenerator"),
-      m_programInfo(*pginfo), m_mode(mode), m_listener(NULL),
+      m_programInfo(*pginfo), m_mode(mode), m_listener(nullptr),
       m_pathname(pginfo->GetPathname()),
       m_timeInSeconds(true),  m_captureTime(-1),
       m_outSize(0,0),  m_outFormat("PNG"),
@@ -104,7 +104,7 @@ void PreviewGenerator::TeardownAll(void)
 {
     QMutexLocker locker(&m_previewLock);
     m_previewWaitCondition.wakeAll();
-    m_listener = NULL;
+    m_listener = nullptr;
 }
 
 void PreviewGenerator::deleteLater()
@@ -788,7 +788,7 @@ bool PreviewGenerator::IsLocal(void) const
  *  \param video_height Returns height of frame grabbed.
  *  \param video_aspect Returns aspect ratio of frame grabbed.
  *  \return Buffer allocated with new containing frame in RGBA32 format if
- *          successful, NULL otherwise.
+ *          successful, nullptr otherwise.
  */
 char *PreviewGenerator::GetScreenGrab(
     const ProgramInfo &pginfo, const QString &filename,
@@ -803,13 +803,13 @@ char *PreviewGenerator::GetScreenGrab(
     (void) bufferlen;
     (void) video_width;
     (void) video_height;
-    char *retbuf = NULL;
+    char *retbuf = nullptr;
     bufferlen = 0;
 
     if (!MSqlQuery::testDBConnection())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer could not connect to DB.");
-        return NULL;
+        return nullptr;
     }
 
     // pre-test local files for existence and size. 500 ms speed-up...
@@ -822,7 +822,7 @@ char *PreviewGenerator::GetScreenGrab(
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer file " +
                     QString("'%1'").arg(filename) + " is not valid.");
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -832,14 +832,14 @@ char *PreviewGenerator::GetScreenGrab(
         LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer could not open file: " +
                 QString("'%1'").arg(filename));
         delete rbuf;
-        return NULL;
+        return nullptr;
     }
 
     PlayerContext *ctx = new PlayerContext(kPreviewGeneratorInUseID);
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetPlayer(new MythPlayer((PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV)));
-    ctx->player->SetPlayerInfo(NULL, NULL, ctx);
+    ctx->player->SetPlayerInfo(nullptr, nullptr, ctx);
 
     if (time_in_secs)
         retbuf = ctx->player->GetScreenGrab(seektime, bufferlen,

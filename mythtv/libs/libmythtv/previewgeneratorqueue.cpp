@@ -24,7 +24,7 @@ using std::max;
 
 #define LOC QString("PreviewQueue: ")
 
-PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = NULL;
+PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = nullptr;
 
 /**
  * Create the singleton queue of preview generators.  This should be
@@ -58,7 +58,7 @@ void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
     s_pgq->exit(0);
     s_pgq->wait();
     delete s_pgq;
-    s_pgq = NULL;
+    s_pgq = nullptr;
 }
 
 /*
@@ -115,7 +115,7 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
     {
         if ((*it).gen)
             (*it).gen->deleteLater();
-        (*it).gen = NULL;
+        (*it).gen = nullptr;
     }
     locker.unlock();
     wait();
@@ -283,7 +283,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
 
             if ((*it).gen)
                 (*it).gen->deleteLater();
-            (*it).gen           = NULL;
+            (*it).gen           = nullptr;
             (*it).genStarted    = false;
             if (me->Message() == "PREVIEW_SUCCESS")
             {
@@ -682,7 +682,7 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
                 if (!g->GetToken().isEmpty())
                     state.tokens.insert(g->GetToken());
                 g->deleteLater();
-                g = NULL;
+                g = nullptr;
             }
         }
         else

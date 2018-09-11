@@ -1384,9 +1384,9 @@ class ImageSize : public GroupSetting
 // id and name will be deleted by ConfigurationGroup's destructor
 RecordingProfile::RecordingProfile(QString profName)
     : id(new ID()),        name(new Name(*this)),
-      imageSize(NULL),     videoSettings(NULL),
-      audioSettings(NULL), profileName(profName),
-      isEncoder(true),     v4l2util(NULL)
+      imageSize(nullptr),  videoSettings(nullptr),
+      audioSettings(nullptr), profileName(profName),
+      isEncoder(true),     v4l2util(nullptr)
 {
     // This must be first because it is needed to load/save the other settings
     addChild(id);
@@ -1394,9 +1394,9 @@ RecordingProfile::RecordingProfile(QString profName)
     setLabel(profName);
     addChild(name);
 
-    tr_filters = NULL;
-    tr_lossless = NULL;
-    tr_resize = NULL;
+    tr_filters = nullptr;
+    tr_lossless = nullptr;
+    tr_resize = nullptr;
 
     if (!profName.isEmpty())
     {

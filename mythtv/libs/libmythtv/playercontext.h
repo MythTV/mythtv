@@ -63,7 +63,7 @@ class MTV_PUBLIC PlayerContext
     void UpdateTVChain(const QStringList &data = QStringList());
     bool ReloadTVChain(void);
     void CreatePIPWindow(const QRect&, int pos = -1, 
-                        QWidget *widget = NULL);
+                        QWidget *widget = nullptr);
     void ResizePIPWindow(const QRect&);
     bool StartPIPPlayer(TV *tv, TVState desiredState);
     void PIPTeardown(void);

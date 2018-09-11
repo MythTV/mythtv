@@ -119,8 +119,8 @@ void del_open_xv_port(int port)
 
         if (open_xv_ports.isEmpty())
         {
-            SignalHandler::SetHandler(SIGINT, NULL);
-            SignalHandler::SetHandler(SIGTERM, NULL);
+            SignalHandler::SetHandler(SIGINT, nullptr);
+            SignalHandler::SetHandler(SIGTERM, nullptr);
         }
     }
 }

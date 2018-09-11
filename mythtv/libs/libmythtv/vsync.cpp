@@ -77,7 +77,7 @@ int VideoSync::m_forceskip = 0;
 VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
                                  uint refresh_interval)
 {
-    VideoSync *trial = NULL;
+    VideoSync *trial = nullptr;
     tryingVideoSync  = true;
 
     // m_forceskip allows for skipping one sync method
@@ -105,7 +105,7 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
     TESTVIDEOSYNC(BusyWaitVideoSync);
 
     tryingVideoSync=false;
-    return NULL;
+    return nullptr;
 }
 
 /** \fn VideoSync::VideoSync(VideoOutput*,int)
@@ -121,7 +121,7 @@ VideoSync::VideoSync(VideoOutput *video_output, int refreshint) :
 int64_t VideoSync::GetTime(void)
 {
     struct timeval now_tv;
-    gettimeofday(&now_tv, NULL);
+    gettimeofday(&now_tv, nullptr);
     return now_tv.tv_sec * 1000000LL + now_tv.tv_usec;
 }
 

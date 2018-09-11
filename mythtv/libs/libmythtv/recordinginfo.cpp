@@ -109,8 +109,8 @@ RecordingInfo::RecordingInfo(
     sgroupid(_sgroupid),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
-    record(NULL),
-    m_recordingFile(NULL)
+    record(nullptr),
+    m_recordingFile(nullptr)
 {
     hostname = _hostname;
     storagegroup = _storagegroup;
@@ -212,8 +212,8 @@ RecordingInfo::RecordingInfo(
     sgroupid(0),
     desiredrecstartts(_startts),
     desiredrecendts(_endts),
-    record(NULL),
-    m_recordingFile(NULL)
+    record(nullptr),
+    m_recordingFile(nullptr)
 {
     recpriority = _recpriority;
 
@@ -251,8 +251,8 @@ RecordingInfo::RecordingInfo(
     sgroupid(0),
     desiredrecstartts(),
     desiredrecendts(),
-    record(NULL),
-    m_recordingFile(NULL)
+    record(nullptr),
+    m_recordingFile(nullptr)
 {
     ProgramList schedList;
     ProgramList progList;
@@ -394,7 +394,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
     if (!is_same)
     {
         delete record;
-        record = NULL;
+        record = nullptr;
     }
 
     if (!ignore_non_serialized_data)
@@ -410,7 +410,7 @@ void RecordingInfo::clone(const RecordingInfo &other,
     }
 
     delete m_recordingFile;
-    m_recordingFile = NULL;
+    m_recordingFile = nullptr;
     LoadRecordingFile();
 }
 
@@ -429,7 +429,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
     if (!is_same)
     {
         delete record;
-        record = NULL;
+        record = nullptr;
     }
 
     oldrecstatus   = RecStatus::Unknown;
@@ -442,7 +442,7 @@ void RecordingInfo::clone(const ProgramInfo &other,
     desiredrecendts = QDateTime();
 
     delete m_recordingFile;
-    m_recordingFile = NULL;
+    m_recordingFile = nullptr;
     LoadRecordingFile();
 }
 
@@ -451,7 +451,7 @@ void RecordingInfo::clear(void)
     ProgramInfo::clear();
 
     delete record;
-    record = NULL;
+    record = nullptr;
 
     oldrecstatus = RecStatus::Unknown;
     savedrecstatus = RecStatus::Unknown;
@@ -463,7 +463,7 @@ void RecordingInfo::clear(void)
     desiredrecendts = QDateTime();
 
     delete m_recordingFile;
-    m_recordingFile = NULL;
+    m_recordingFile = nullptr;
 }
 
 
@@ -473,10 +473,10 @@ void RecordingInfo::clear(void)
 RecordingInfo::~RecordingInfo()
 {
     delete record;
-    record = NULL;
+    record = nullptr;
 
     delete m_recordingFile;
-    m_recordingFile = NULL;
+    m_recordingFile = nullptr;
 }
 
 /** \fn RecordingInfo::GetProgramRecordingStatus()
@@ -486,7 +486,7 @@ RecordingInfo::~RecordingInfo()
  */
 RecordingType RecordingInfo::GetProgramRecordingStatus(void)
 {
-    if (record == NULL)
+    if (record == nullptr)
     {
         record = new RecordingRule();
         record->LoadByProgram(this);
@@ -502,7 +502,7 @@ RecordingType RecordingInfo::GetProgramRecordingStatus(void)
  */
 QString RecordingInfo::GetProgramRecordingProfile(void) const
 {
-    if (record == NULL)
+    if (record == nullptr)
     {
         record = new RecordingRule();
         record->LoadByProgram(this);
@@ -516,7 +516,7 @@ QString RecordingInfo::GetProgramRecordingProfile(void) const
  */
 int RecordingInfo::GetAutoRunJobs(void) const
 {
-    if (record == NULL)
+    if (record == nullptr)
     {
         record = new RecordingRule();
         record->LoadByProgram(this);

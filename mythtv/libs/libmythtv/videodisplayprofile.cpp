@@ -153,7 +153,7 @@ bool ProfileItem::checkRange(QString key,
             }
         }
     }
-    if (ok != Q_NULLPTR)
+    if (ok != nullptr)
         *ok = isOK;
     if (!isOK)
         match=false;

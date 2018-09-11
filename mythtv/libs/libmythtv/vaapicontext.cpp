@@ -100,7 +100,7 @@ class VAAPIDisplay : ReferenceCounter
     explicit VAAPIDisplay(VAAPIDisplayType display_type) :
         ReferenceCounter("VAAPIDisplay"),
         m_va_disp_type(display_type),
-        m_va_disp(NULL), m_x_disp(NULL),
+        m_va_disp(nullptr), m_x_disp(nullptr),
         m_driver() { }
   public:
    ~VAAPIDisplay()
@@ -192,7 +192,7 @@ class VAAPIDisplay : ReferenceCounter
         if (cnt == 0)
         {
             if (s_VAAPIDisplay == tmp)
-                s_VAAPIDisplay = NULL;
+                s_VAAPIDisplay = nullptr;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting VAAPI display.");
         }
         return cnt;
@@ -215,7 +215,7 @@ class VAAPIDisplay : ReferenceCounter
                 return tmp;
             }
             tmp->DecrRef();
-            return NULL;
+            return nullptr;
         }
 
         QMutexLocker locker(&s_VAAPIDisplayLock);
@@ -226,7 +226,7 @@ class VAAPIDisplay : ReferenceCounter
             {
                 LOG(VB_GENERAL, LOG_ERR, "Already have a VAAPI display "
                     "of a different type - aborting");
-                return NULL;
+                return nullptr;
             }
             s_VAAPIDisplay->IncrRef();
             return s_VAAPIDisplay;
@@ -237,7 +237,7 @@ class VAAPIDisplay : ReferenceCounter
             return s_VAAPIDisplay;
 
         s_VAAPIDisplay->DecrRef();
-        return NULL;
+        return nullptr;
     }
 
     static QMutex        s_VAAPIDisplayLock;
@@ -249,7 +249,7 @@ class VAAPIDisplay : ReferenceCounter
 };
 
 QMutex VAAPIDisplay::s_VAAPIDisplayLock(QMutex::Recursive);
-VAAPIDisplay *VAAPIDisplay::s_VAAPIDisplay = NULL;
+VAAPIDisplay *VAAPIDisplay::s_VAAPIDisplay = nullptr;
 
 bool VAAPIContext::IsFormatAccelerated(QSize size, MythCodecID codec,
                                        AVPixelFormat &pix_fmt)
@@ -269,13 +269,13 @@ VAAPIContext::VAAPIContext(VAAPIDisplayType display_type,
                            MythCodecID codec)
   : m_dispType(display_type),
     m_codec(codec),
-    m_display(NULL),
+    m_display(nullptr),
     m_vaProfile(VAProfileMPEG2Main)/* ?? */,
     m_vaEntrypoint(VAEntrypointEncSlice),
     m_pix_fmt(AV_PIX_FMT_YUV420P), m_numSurfaces(NUM_VAAPI_BUFFERS),
-    m_surfaces(NULL), m_surfaceData(NULL), m_pictureAttributes(NULL),
+    m_surfaces(nullptr), m_surfaceData(nullptr), m_pictureAttributes(nullptr),
     m_pictureAttributeCount(0), m_hueBase(0), m_deriveSupport(false),
-    m_copy(NULL)
+    m_copy(nullptr)
 {
     memset(&m_ctx, 0, sizeof(vaapi_context));
     memset(&m_image, 0, sizeof(m_image));
@@ -347,7 +347,7 @@ bool VAAPIContext::CreateDisplay(QSize size, bool noreuse)
     bool ok = true;
     m_display = VAAPIDisplay::GetDisplay(m_dispType, noreuse);
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size");
-    CREATE_CHECK(m_display != NULL, "Invalid display");
+    CREATE_CHECK(m_display != nullptr, "Invalid display");
     CREATE_CHECK(InitDisplay(),     "Invalid VADisplay");
     CREATE_CHECK(InitProfiles(),    "No supported profiles");
     if (ok)
@@ -663,18 +663,18 @@ bool VAAPIContext::InitContext(void)
 void* VAAPIContext::GetVideoSurface(int i)
 {
     if (i < 0 || i >= m_numSurfaces)
-        return NULL;
+        return nullptr;
     return &m_surfaceData[i];
 }
 
 uint8_t* VAAPIContext::GetSurfaceIDPointer(void* buf)
 {
     if (!buf)
-        return NULL;
+        return nullptr;
 
     const vaapi_surface *surf = (vaapi_surface*)buf;
     if (!surf->m_id)
-        return NULL;
+        return nullptr;
 
     INIT_ST;
     va_status = vaSyncSurface(m_ctx.display, surf->m_id);
@@ -812,7 +812,7 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
     if (ok)
     {
         VideoFrame src;
-        void* source = NULL;
+        void* source = nullptr;
 
         if (vaMapBuffer(m_ctx.display, m_image.buf, &source))
             return false;
@@ -820,8 +820,8 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
         if (m_image.format.fourcc == VA_FOURCC_NV12)
         {
             init(&src, FMT_NV12, (unsigned char*)source, m_image.width,
-                 m_image.height, m_image.data_size, NULL,
-                 NULL, frame->aspect, frame->frame_rate);
+                 m_image.height, m_image.data_size, nullptr,
+                 nullptr, frame->aspect, frame->frame_rate);
             for (int i = 0; i < 2; i++)
             {
                 src.pitches[i] = m_image.pitches[i];
@@ -833,8 +833,8 @@ bool VAAPIContext::CopySurfaceToFrame(VideoFrame *frame, const void *buf)
             // Our VideoFrame YV12 format, is really YUV420P/IYUV
             bool swap = m_image.format.fourcc == VA_FOURCC_YV12;
             init(&src, FMT_YV12, (unsigned char*)source, m_image.width,
-                 m_image.height, m_image.data_size, NULL,
-                 NULL, frame->aspect, frame->frame_rate);
+                 m_image.height, m_image.data_size, nullptr,
+                 nullptr, frame->aspect, frame->frame_rate);
             src.pitches[0] = m_image.pitches[0];
             src.pitches[1] = m_image.pitches[swap ? 2 : 1];
             src.pitches[2] = m_image.pitches[swap ? 1 : 2];
@@ -887,13 +887,13 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
 void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
 {
     if (m_dispType != kVADisplayGLX)
-        return NULL;
+        return nullptr;
 
     if (m_glxSurfaces.contains(texture))
         return m_glxSurfaces.value(texture);
 
     MythXLocker locker(m_display->m_x_disp);
-    void *glx_surface = NULL;
+    void *glx_surface = nullptr;
     INIT_ST;
     va_status = vaCreateSurfaceGLX(m_ctx.display, texture_type,
                                    texture, &glx_surface);
@@ -901,7 +901,7 @@ void* VAAPIContext::GetGLXSurface(uint texture, uint texture_type)
     if (!glx_surface)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLX surface.");
-        return NULL;
+        return nullptr;
     }
 
     m_glxSurfaces.insert(texture, glx_surface);

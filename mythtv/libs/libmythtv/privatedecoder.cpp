@@ -62,5 +62,5 @@ PrivateDecoder* PrivateDecoder::Create(const QString &decoder,
     Q_UNUSED(avctx);
 #endif
 
-    return NULL;
+    return nullptr;
 }

@@ -71,7 +71,7 @@ RecordingRule::RecordingRule()
     m_isOverride(false),
     m_isTemplate(false),
     m_template(),
-    m_progInfo(NULL),
+    m_progInfo(nullptr),
     m_loaded(false)
 {
     QDateTime dt = MythDate::current();

@@ -23,7 +23,7 @@ class PreviewGenState
 {
   public:
     PreviewGenState() :
-        gen(NULL), genStarted(false),
+        gen(nullptr), genStarted(false),
         attempts(0), lastBlockTime(0) {}
 
     /// A pointer to the generator that this state object describes.

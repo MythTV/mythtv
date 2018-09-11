@@ -19,7 +19,7 @@ using namespace std;
 #define MAX_SIZE_CHECK 500  // in ms
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
-    : recordernum(num),       controlSock(NULL),      remotehost(host),
+    : recordernum(num),       controlSock(nullptr),   remotehost(host),
       remoteport(port),       lastchannel(""),        lastinput(""),
       backendError(false),    cachedFramesWritten(0)
 {
@@ -30,7 +30,7 @@ RemoteEncoder::~RemoteEncoder()
     if (controlSock)
     {
         controlSock->DecrRef();
-        controlSock = NULL;
+        controlSock = nullptr;
     }
 }
 
@@ -116,7 +116,7 @@ bool RemoteEncoder::SendReceiveStringList(
     if (backendError)
     {
         controlSock->DecrRef();
-        controlSock = NULL;
+        controlSock = nullptr;
         return false;
     }
 
@@ -156,7 +156,7 @@ ProgramInfo *RemoteEncoder::GetRecording(void)
         delete proginfo;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /** \fn RemoteEncoder::GetFrameRate(void)
