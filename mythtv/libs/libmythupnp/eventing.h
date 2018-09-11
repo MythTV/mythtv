@@ -73,7 +73,7 @@ class UPNP_PUBLIC SubscriberInfo
         void SetExpireTime( unsigned long nSecs )
         {
             TaskTime tt;
-            gettimeofday( (&tt), NULL );
+            gettimeofday( (&tt), nullptr );
 
             AddMicroSecToTaskTime( tt, (nSecs * 1000000) );
 
@@ -105,7 +105,7 @@ class UPNP_PUBLIC  StateVariableBase
         {
             m_bNotify = bNotify;
             m_sName   = sName;
-            gettimeofday( (&m_ttLastChanged), NULL );
+            gettimeofday( (&m_ttLastChanged), nullptr );
         }
         virtual ~StateVariableBase() {};
 
@@ -156,7 +156,7 @@ class UPNP_PUBLIC  StateVariable : public StateVariableBase
             if ( m_value != value )
             {
                 m_value = value;
-                gettimeofday( (&m_ttLastChanged), NULL );
+                gettimeofday( (&m_ttLastChanged), nullptr );
             }
         }
 };
@@ -192,7 +192,7 @@ class UPNP_PUBLIC StateVariables
 
         void AddVariable( StateVariableBase *pBase )
         {
-            if (pBase != NULL)
+            if (pBase != nullptr)
                 m_map.insert(pBase->m_sName, pBase);
         }
 
@@ -207,7 +207,7 @@ class UPNP_PUBLIC StateVariables
             StateVariable< T > *pVariable =
                 dynamic_cast< StateVariable< T > *>( *it );
 
-            if (pVariable == NULL)
+            if (pVariable == nullptr)
                 return false;           // It's not the expected type.
 
             if ( pVariable->GetValue() != value)
@@ -226,7 +226,7 @@ class UPNP_PUBLIC StateVariables
         template < class T >
         T GetValue( const QString &sName )
         {
-            T *dummy = NULL;
+            T *dummy = nullptr;
             SVMap::iterator it = m_map.find(sName);
             if (it == m_map.end())
                 return state_var_init(dummy);
@@ -234,7 +234,7 @@ class UPNP_PUBLIC StateVariables
             StateVariable< T > *pVariable =
                 dynamic_cast< StateVariable< T > *>( *it );
 
-            if (pVariable != NULL)
+            if (pVariable != nullptr)
                 return pVariable->GetValue();
 
             return state_var_init(dummy);

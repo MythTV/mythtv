@@ -50,7 +50,7 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /* = NULL*/,
+BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /* = nullptr*/,
                                             bool bTakeOwnership /* = false */ )
 {
     m_pSocket            = pSocket;
@@ -85,7 +85,7 @@ void BufferedSocketDevice::Close()
     m_bufRead.clear();
     ClearPendingData();
 
-    if (m_pSocket != NULL)
+    if (m_pSocket != nullptr)
     {
         if (m_pSocket->isValid())
             m_pSocket->close();
@@ -93,7 +93,7 @@ void BufferedSocketDevice::Close()
         if (m_bHandleSocketDelete)
             delete m_pSocket;
 
-        m_pSocket = NULL;
+        m_pSocket = nullptr;
     }
 
 }
@@ -104,7 +104,7 @@ void BufferedSocketDevice::Close()
 
 bool BufferedSocketDevice::Connect( const QHostAddress &addr, quint16 port )
 {
-    if (m_pSocket == NULL)
+    if (m_pSocket == nullptr)
         return false;
 
     return m_pSocket->connect( addr, port );
@@ -125,7 +125,7 @@ MSocketDevice *BufferedSocketDevice::SocketDevice()
 
 void BufferedSocketDevice::SetSocketDevice( MSocketDevice *pSocket )
 {
-    if ((m_bHandleSocketDelete) && (m_pSocket != NULL))
+    if ((m_bHandleSocketDelete) && (m_pSocket != nullptr))
         delete m_pSocket;
     
     m_bHandleSocketDelete = false;
@@ -168,7 +168,7 @@ qulonglong BufferedSocketDevice::ReadBufferSize(void) const
 
 int BufferedSocketDevice::ReadBytes()
 {
-    if (m_pSocket == NULL)
+    if (m_pSocket == nullptr)
         return m_bufRead.size();
 
     qlonglong maxToRead = 0;
@@ -184,7 +184,7 @@ int BufferedSocketDevice::ReadBytes()
     qlonglong nbytes = m_pSocket->bytesAvailable();
     qlonglong nread;
 
-    QByteArray *a = 0;
+    QByteArray *a = nullptr;
 
     if ( nbytes > 0 )
     {
@@ -259,7 +259,7 @@ bool BufferedSocketDevice::ConsumeWriteBuf( qulonglong nbytes )
 void BufferedSocketDevice::Flush()
 {
 
-    if ((m_pSocket == NULL) || !m_pSocket->isValid())
+    if ((m_pSocket == nullptr) || !m_pSocket->isValid())
         return;
 
     bool osBufferFull = false;
@@ -351,7 +351,7 @@ bool BufferedSocketDevice::At( qlonglong index )
         return false;
 
     // throw away data 0..index-1
-    m_bufRead.consumeBytes( (qulonglong)index, 0 );
+    m_bufRead.consumeBytes( (qulonglong)index, nullptr );
 
     return true;
 }
@@ -388,7 +388,7 @@ qulonglong BufferedSocketDevice::BytesAvailable(void)
 /////////////////////////////////////////////////////////////////////////////
 
 qulonglong BufferedSocketDevice::WaitForMore(
-    int msecs, bool *pTimeout /* = NULL*/ ) 
+    int msecs, bool *pTimeout /* = nullptr*/ ) 
 {
     bool bTimeout = false;
 
@@ -428,7 +428,7 @@ qulonglong BufferedSocketDevice::WaitForMore(
 
         nBytes = m_pSocket->waitForMore( msecs, &bTimeout );
 
-        if (pTimeout != NULL)
+        if (pTimeout != nullptr)
             *pTimeout = bTimeout;
     }
             
@@ -474,7 +474,7 @@ void BufferedSocketDevice::ClearReadBuffer()
 
 qlonglong BufferedSocketDevice::ReadBlock( char *data, qulonglong maxlen )
 {
-    if ( data == 0 && maxlen != 0 ) 
+    if ( data == nullptr && maxlen != 0 ) 
         return -1;
 
     if ( !m_pSocket->isOpen() ) 
@@ -600,7 +600,7 @@ bool BufferedSocketDevice::CanReadLine()
 {
     ReadBytes();
 
-    if (( BytesAvailable() > 0 ) && m_bufRead.scanNewline( 0 ) )
+    if (( BytesAvailable() > 0 ) && m_bufRead.scanNewline( nullptr ) )
         return true;
 
     return false;

@@ -247,7 +247,7 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
 
     QString sXml;
 
-    if (!GetMythDownloadManager()->postAuth(url.toString(), &aBuffer, NULL, NULL, &headers))
+    if (!GetMythDownloadManager()->postAuth(url.toString(), &aBuffer, nullptr, nullptr, &headers))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("SOAPClient::SendSOAPRequest: request failed: %1")
                                          .arg(url.toString()));

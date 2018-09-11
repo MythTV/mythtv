@@ -170,7 +170,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 
     delete pMulticast;
 
-    pMulticast = NULL;
+    pMulticast = nullptr;
 
     m_mutex.lock();
 

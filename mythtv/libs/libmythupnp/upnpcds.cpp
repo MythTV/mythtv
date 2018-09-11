@@ -367,7 +367,7 @@ void UPnpCDS::DetermineClient( HTTPRequest *pRequest,
 
 void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 {
-    UPnpCDSExtensionResults *pResult  = NULL;
+    UPnpCDSExtensionResults *pResult  = nullptr;
     UPnpCDSRequest           request;
 
     DetermineClient( pRequest, &request );
@@ -490,7 +490,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
             pResult = (*it)->Browse(&request);
         }
 
-        if (pResult != NULL)
+        if (pResult != nullptr)
         {
             eErrorCode  = pResult->m_eErrorCode;
             sErrorDesc  = pResult->m_sErrorDesc;
@@ -507,7 +507,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
             }
 
             delete pResult;
-            pResult = NULL;
+            pResult = nullptr;
         }
     }
 
@@ -541,7 +541,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
 void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 {
-    UPnpCDSExtensionResults *pResult  = NULL;
+    UPnpCDSExtensionResults *pResult  = nullptr;
     UPnpCDSRequest           request;
 
     UPnPResultCode eErrorCode      = UPnPResult_InvalidAction;
@@ -632,7 +632,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     for (; (it != m_extensions.end()) && !pResult; ++it)
         pResult = (*it)->Search(&request);
 
-    if (pResult != NULL)
+    if (pResult != nullptr)
     {
         eErrorCode  = pResult->m_eErrorCode;
         sErrorDesc  = pResult->m_sErrorDesc;
@@ -650,7 +650,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
         }
 
         delete pResult;
-        pResult = NULL;
+        pResult = nullptr;
     }
 
 #if 0
@@ -793,7 +793,7 @@ UPnpCDSExtension::~UPnpCDSExtension()
     if (m_pRoot)
     {
         m_pRoot->DecrRef();
-        m_pRoot = NULL;
+        m_pRoot = nullptr;
     }
 }
 
@@ -820,7 +820,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
     // -=>TODO: Need to add Filter & Sorting Support.
 
     if (!IsBrowseRequestForUs( pRequest ))
-        return( NULL );
+        return( nullptr );
 
     // ----------------------------------------------------------------------
     // Split the request ID into token key/value
@@ -840,7 +840,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
     UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();
 
-    if (pResults != NULL)
+    if (pResults != nullptr)
     {
         switch( pRequest->m_eBrowseFlag )
         {
@@ -919,7 +919,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Search( UPnpCDSRequest *pRequest )
             QString("UPnpCDSExtension::Search - Not For Us : "
                     "m_sClass = %1 : m_sSearchClass = %2")
                 .arg(m_sClass).arg(pRequest->m_sSearchClass));
-        return NULL;
+        return nullptr;
     }
 
     UPnpCDSExtensionResults *pResults = new UPnpCDSExtensionResults();

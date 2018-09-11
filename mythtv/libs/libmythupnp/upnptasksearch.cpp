@@ -185,7 +185,7 @@ void UPnpSearchTask::Execute( TaskQueue * /*pQueue*/ )
     }
 
     delete pSocket;
-    pSocket = NULL;
+    pSocket = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////

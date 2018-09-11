@@ -25,7 +25,7 @@
 UPnpDeviceDesc      UPnp::g_UPnpDeviceDesc;
 QList<QHostAddress> UPnp::g_IPAddrList;
 
-Configuration   *UPnp::g_pConfig        = NULL;
+Configuration   *UPnp::g_pConfig        = nullptr;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ Configuration   *UPnp::g_pConfig        = NULL;
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
-    : m_pHttpServer(NULL), m_nServicePort(0)
+    : m_pHttpServer(nullptr), m_nServicePort(0)
 {
     LOG(VB_UPNP, LOG_DEBUG, "UPnp - Constructor");
 }
@@ -73,10 +73,10 @@ void UPnp::SetConfiguration( Configuration *pConfig )
 
 Configuration *UPnp::GetConfiguration()
 {
-    // If someone is asking for a config and it's NULL, create a 
+    // If someone is asking for a config and it's nullptr, create a 
     // new XmlConfiguration since we don't have database info yet.
     
-    if (g_pConfig == NULL)
+    if (g_pConfig == nullptr)
         g_pConfig = new XmlConfiguration( "config.xml" );
 
     return g_pConfig;
@@ -113,14 +113,14 @@ bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpS
         return false;
     }
 
-    if (g_pConfig == NULL)
+    if (g_pConfig == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "UPnp::Initialize - Must call SetConfiguration.");
         return false;
     }
 
-    if ((m_pHttpServer = pHttpServer) == NULL)
+    if ((m_pHttpServer = pHttpServer) == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "UPnp::Initialize - Invalid Parameter (pHttpServer == NULL)");
@@ -189,7 +189,7 @@ void UPnp::CleanUp()
     if (g_pConfig)
     {
         delete g_pConfig;
-        g_pConfig = NULL;
+        g_pConfig = nullptr;
     }
 
 }
@@ -274,7 +274,7 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
 {
     QString sMsg( msg );
 
-    if (pRequest != NULL)
+    if (pRequest != nullptr)
     {
         QString sDetails = "";
 

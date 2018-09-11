@@ -41,7 +41,7 @@ UPnpEventTask::UPnpEventTask( QHostAddress peerAddress,
 
 UPnpEventTask::~UPnpEventTask()  
 { 
-    if (m_pPayload != NULL)
+    if (m_pPayload != nullptr)
         delete m_pPayload;
 }
 
@@ -51,7 +51,7 @@ UPnpEventTask::~UPnpEventTask()
 
 void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
 {
-    if (m_pPayload == NULL)
+    if (m_pPayload == nullptr)
         return;
 
     MSocketDevice        sockDev( MSocketDevice::Stream );

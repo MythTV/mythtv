@@ -59,7 +59,7 @@ class BufferedSocketDevice
     public:
 
         explicit BufferedSocketDevice( int nSocket );
-        explicit BufferedSocketDevice( MSocketDevice *pSocket = NULL,
+        explicit BufferedSocketDevice( MSocketDevice *pSocket = nullptr,
                                        bool bTakeOwnership    = false );
 
         virtual ~BufferedSocketDevice( );
@@ -81,7 +81,7 @@ class BufferedSocketDevice
 
         qulonglong          BytesAvailable      (); 
         qulonglong          WaitForMore         ( int msecs,
-                                                  bool *timeout = NULL );
+                                                  bool *timeout = nullptr );
 
         qulonglong          BytesToWrite        () const;
         void                ClearPendingData    ();

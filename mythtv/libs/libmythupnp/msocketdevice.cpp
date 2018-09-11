@@ -227,7 +227,7 @@ MSocketDevice::~MSocketDevice()
 {
     close();
     delete d;
-    d = 0;
+    d = nullptr;
 #if defined(MSOCKETDEVICE_DEBUG)
     qDebug("MSocketDevice: Destroyed MSocketDevice %p", this);
 #endif

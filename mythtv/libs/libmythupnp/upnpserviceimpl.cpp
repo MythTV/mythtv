@@ -4,7 +4,7 @@
 /// Creates a UPnpService and adds it to the UPnpDevice's list of services.
 void UPnpServiceImpl::RegisterService(UPnpDevice *pDevice)
 {
-    if (pDevice != NULL)
+    if (pDevice != nullptr)
     {
         UPnpService *pService = new UPnpService();
             

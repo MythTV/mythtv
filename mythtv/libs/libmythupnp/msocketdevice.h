@@ -111,7 +111,7 @@ public:
     virtual int  accept();
 
     qint64  bytesAvailable() const;
-    qint64  waitForMore(int msecs, bool *timeout = 0) const;
+    qint64  waitForMore(int msecs, bool *timeout = nullptr) const;
     virtual qint64 writeBlock(const char *data, quint64 len,
                               const QHostAddress & host, quint16 port);
     inline qint64  writeBlock(const char *data, quint64 len)

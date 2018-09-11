@@ -93,7 +93,7 @@ inline QByteArray MMembuf::readAll()
 { QByteArray ba; ba.resize(_size); consumeBytes(_size,ba.data()); return ba; }
 
 inline bool MMembuf::canReadLine() const
-{ return const_cast<MMembuf*>(this)->scanNewline(0); }
+{ return const_cast<MMembuf*>(this)->scanNewline(nullptr); }
 
 inline qint64 MMembuf::size() const
 { return _size; }

@@ -41,7 +41,7 @@ MythXMLClient::~MythXMLClient()
 
 UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabaseParams *pParams, QString &sMsg )
 {
-    if (pParams == NULL)
+    if (pParams == nullptr)
         return UPnPResult_InvalidArgs;
 
     int           nErrCode = 0;

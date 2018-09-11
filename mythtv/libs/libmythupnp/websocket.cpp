@@ -111,7 +111,7 @@ WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
                                  )
                 : m_eventLoop(new QEventLoop()),
                   m_webSocketServer(webSocketServer),
-                  m_socketFD(sock), m_socket(NULL),
+                  m_socketFD(sock), m_socket(nullptr),
                   m_connectionType(type), m_webSocketMode(false),
                   m_errorCount(0), m_isRunning(false),
                   m_heartBeat(new QTimer()),
@@ -143,11 +143,11 @@ WebSocketWorker::~WebSocketWorker()
     {
         WebSocketExtension *extension = m_extensions.takeFirst();
         extension->deleteLater();
-        extension = NULL;
+        extension = nullptr;
     }
 
     m_eventLoop->deleteLater();
-    m_eventLoop = NULL;
+    m_eventLoop = nullptr;
     delete m_heartBeat;
 }
 
@@ -186,13 +186,13 @@ void WebSocketWorker::SetupSocket()
             {
                 LOG(VB_HTTP, LOG_WARNING, "SSL Handshake FAILED, connection terminated");
                 delete pSslSocket;
-                pSslSocket = NULL;
+                pSslSocket = nullptr;
             }
         }
         else
         {
             delete pSslSocket;
-            pSslSocket = NULL;
+            pSslSocket = nullptr;
         }
 
         if (pSslSocket)
@@ -210,7 +210,7 @@ void WebSocketWorker::SetupSocket()
         if (!gCoreContext->CheckSubnet(m_socket))
         {
             delete m_socket;
-            m_socket = 0;
+            m_socket = nullptr;
             return;
         }
 
@@ -285,7 +285,7 @@ void WebSocketWorker::CleanupSocket()
 
     m_socket->close();
     m_socket->deleteLater();
-    m_socket = NULL;
+    m_socket = nullptr;
 }
 
 void WebSocketWorker::doRead()

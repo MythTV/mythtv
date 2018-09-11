@@ -55,25 +55,25 @@ class NameValue
 
   public:
     NameValue() :
-        sName(), sValue(), bRequired(false), pAttributes(NULL) { }
+        sName(), sValue(), bRequired(false), pAttributes(nullptr) { }
     NameValue(const QString &name, const QString &value, bool required = false) :
-        sName(name), sValue(value), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(value), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, const char *value, bool required = false) :
-        sName(name), sValue(value), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(value), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, int value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, long value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, qlonglong value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, uint value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, ulong value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, qulonglong value, bool required = false) :
-        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue(QString::number(value)), bRequired(required), pAttributes(nullptr) { }
     NameValue(const QString &name, bool value, bool required = false) :
-        sName(name), sValue((value) ? "1" : "0"), bRequired(required), pAttributes(NULL) { }
+        sName(name), sValue((value) ? "1" : "0"), bRequired(required), pAttributes(nullptr) { }
     inline NameValue(const NameValue &nv);
     inline NameValue& operator=(const NameValue &nv);
 
@@ -85,7 +85,7 @@ class NameValue
 class NameValues : public QList<NameValue> {};
 
 inline NameValue::NameValue(const NameValue &nv) :
-    sName(nv.sName), sValue(nv.sValue), bRequired(nv.bRequired), pAttributes(NULL)
+    sName(nv.sName), sValue(nv.sValue), bRequired(nv.bRequired), pAttributes(nullptr)
 {
     if (nv.pAttributes)
     {
@@ -110,7 +110,7 @@ inline NameValue& NameValue::operator=(const NameValue &nv)
     }
     else
     {
-        pAttributes = NULL;
+        pAttributes = nullptr;
     }
 
     return *this;
@@ -121,7 +121,7 @@ inline NameValue::~NameValue()
     if (pAttributes)
     {
         delete pAttributes;
-        pAttributes = NULL;
+        pAttributes = nullptr;
     }
 }
 

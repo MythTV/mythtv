@@ -92,7 +92,7 @@ class OutputStream : public QObject, public QScriptable
 
     public:
 
-         OutputStream( QTextStream *pStream, QObject *parent = 0 )
+         OutputStream( QTextStream *pStream, QObject *parent = nullptr )
              : QObject( parent ), m_pTextStream( pStream )  {}
 
          ~OutputStream() {} 

@@ -45,7 +45,7 @@ using namespace std;
 // We're creating this class immediately so it will always be available.
 
 static QMutex g_pSSDPCreationLock;
-SSDP* SSDP::g_pSSDP = NULL;
+SSDP* SSDP::g_pSSDP = nullptr;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -65,7 +65,7 @@ void SSDP::Shutdown()
 {
     QMutexLocker locker(&g_pSSDPCreationLock);
     delete g_pSSDP;
-    g_pSSDP = NULL;
+    g_pSSDP = nullptr;
 }
  
 /////////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ SSDP::SSDP() :
     m_nPort                ( SSDP_PORT ),
     m_nSearchPort          ( SSDP_SEARCHPORT ),
     m_nServicePort         ( 0 ),
-    m_pNotifyTask          ( NULL ),
+    m_pNotifyTask          ( nullptr ),
     m_bAnnouncementsEnabled( false ),
     m_bTermRequested       ( false ),
     m_lock                 ( QMutex::NonRecursive )
@@ -129,15 +129,15 @@ SSDP::~SSDP()
     m_bTermRequested = true;
     wait();
 
-    if (m_pNotifyTask != NULL)
+    if (m_pNotifyTask != nullptr)
     {
         m_pNotifyTask->DecrRef();
-        m_pNotifyTask = NULL;
+        m_pNotifyTask = nullptr;
     }
 
     for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
     {
-        if (m_Sockets[ nIdx ] != NULL )
+        if (m_Sockets[ nIdx ] != nullptr )
         {
             delete m_Sockets[ nIdx ];
         }
@@ -157,7 +157,7 @@ void SSDP::RequestTerminate(void)
 
 void SSDP::EnableNotifications( int nServicePort )
 {
-    if ( m_pNotifyTask == NULL )
+    if ( m_pNotifyTask == nullptr )
     {
         m_nServicePort = nServicePort;
 
@@ -172,7 +172,7 @@ void SSDP::EnableNotifications( int nServicePort )
         LOG(VB_UPNP, LOG_INFO,
             "SSDP::EnableNotifications() - sending NTS_byebye");
         m_pNotifyTask->SetNTS( NTS_byebye );
-        m_pNotifyTask->Execute( NULL );
+        m_pNotifyTask->Execute( nullptr );
 
         m_bAnnouncementsEnabled = true;
     }
@@ -199,12 +199,12 @@ void SSDP::DisableNotifications()
 {
     m_bAnnouncementsEnabled = false;
 
-    if (m_pNotifyTask != NULL)
+    if (m_pNotifyTask != nullptr)
     {
         // Send Announcement that we are leaving.
 
         m_pNotifyTask->SetNTS( NTS_byebye );
-        m_pNotifyTask->Execute( NULL );
+        m_pNotifyTask->Execute( nullptr );
     }
 }
 
@@ -276,7 +276,7 @@ void SSDP::run()
 
         for (uint nIdx = 0; nIdx < NumberOfSockets; nIdx++ )
         {
-            if (m_Sockets[nIdx] != NULL && m_Sockets[nIdx]->socket() >= 0)
+            if (m_Sockets[nIdx] != nullptr && m_Sockets[nIdx]->socket() >= 0)
             {
                 FD_SET( m_Sockets[ nIdx ]->socket(), &read_set );
                 nMaxSocket = max( m_Sockets[ nIdx ]->socket(), nMaxSocket );
@@ -297,11 +297,11 @@ void SSDP::run()
         timeout.tv_usec = 0;
 
         int count;
-        count = select(nMaxSocket + 1, &read_set, NULL, NULL, &timeout);
+        count = select(nMaxSocket + 1, &read_set, nullptr, nullptr, &timeout);
 
         for (int nIdx = 0; count && nIdx < (int)NumberOfSockets; nIdx++ )
         {
-            bool cond1 = m_Sockets[nIdx] != NULL;
+            bool cond1 = m_Sockets[nIdx] != nullptr;
             bool cond2 = cond1 && m_Sockets[nIdx]->socket() >= 0;
             bool cond3 = cond2 && FD_ISSET(m_Sockets[nIdx]->socket(), &read_set);
 
@@ -444,7 +444,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
                 // want to answer search requests.
                 // ----------------------------------------------------------
 
-                if (m_pNotifyTask != NULL)
+                if (m_pNotifyTask != nullptr)
                     ProcessSearchRequest( headers, peerAddress, peerPort ); 
 
                 break;
@@ -563,7 +563,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 #if 0
         // Excute task now for fastest response, queue for time-delayed response
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
-        pTask->Execute( NULL );
+        pTask->Execute( nullptr );
 #endif
 
         TaskQueue::Instance()->AddTask( nNewMX, pTask );
@@ -590,7 +590,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
         // Excute task now for fastest response, queue for time-delayed response
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
-        pTask->Execute( NULL );
+        pTask->Execute( nullptr );
 
         TaskQueue::Instance()->AddTask( nNewMX, pTask );
 

@@ -136,7 +136,7 @@ void ServerSideScripting::RegisterMetaObjectType( const QString &sName,
 
 ScriptInfo *ServerSideScripting::GetLoadedScript( const QString &sFileName )
 {
-    ScriptInfo *pInfo = NULL;
+    ScriptInfo *pInfo = nullptr;
 
     Lock();
 
@@ -158,7 +158,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
     try
     {
 
-        ScriptInfo *pInfo = NULL;
+        ScriptInfo *pInfo = nullptr;
 
         // ------------------------------------------------------------------
         // See if page has already been loaded
@@ -174,7 +174,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
         QDateTime  dtLastModified = fileInfo.lastModified();
 
         Lock();
-        if ((pInfo == NULL) || (pInfo->m_dtTimeStamp != dtLastModified ))
+        if ((pInfo == nullptr) || (pInfo->m_dtTimeStamp != dtLastModified ))
         {
             QString      sCode = CreateMethodFromFile( sFileName );
 
@@ -192,7 +192,7 @@ bool ServerSideScripting::EvaluatePage( QTextStream *pOutStream, const QString &
                 return false;
             }
 
-            if (pInfo != NULL)
+            if (pInfo != nullptr)
             {
                 pInfo->m_oFunc       = func;
                 pInfo->m_dtTimeStamp = dtLastModified;

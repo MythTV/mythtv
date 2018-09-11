@@ -110,7 +110,7 @@ bool MMembuf::scanNewline(QByteArray *store)
     if (_size == 0)
         return false;
     int i = 0; // index into 'store'
-    QByteArray *a = 0;
+    QByteArray *a = nullptr;
     char *p;
     int n;
     bool retval = false;

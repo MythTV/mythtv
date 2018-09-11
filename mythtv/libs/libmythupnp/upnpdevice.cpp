@@ -366,7 +366,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
                                    UPnpDevice *pDevice,
                                    const QString &sUserAgent )
 {
-    if (pDevice == NULL)
+    if (pDevice == nullptr)
         return;
 
     QString sFriendlyName = QString( "%1: %2" )
@@ -630,11 +630,11 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
     {
         UPnpDevice *pFound = FindDevice(*dit, sURI);
 
-        if (pFound != NULL)
+        if (pFound != nullptr)
             return pFound;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -643,7 +643,7 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
 
 UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL )
 {
-    UPnpDeviceDesc *pDevice = NULL;
+    UPnpDeviceDesc *pDevice = nullptr;
 
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpDeviceDesc::Retrieve( %1 )")
         .arg(sURL));

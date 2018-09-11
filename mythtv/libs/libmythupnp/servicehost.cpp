@@ -87,7 +87,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
         }
         else
         {
-            param[ 0 ] = NULL;    
+            param[ 0 ] = nullptr;
             types[ 0 ] = 0;
         }
 
@@ -101,7 +101,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
             QString sParamType = paramTypes[ nIdx ];
 
             int     nId        = QMetaType::type( paramTypes[ nIdx ] );
-            void   *pParam     = NULL;
+            void   *pParam     = nullptr;
 
             if (nId != 0)
             {
@@ -140,7 +140,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 
         for (int nIdx=1; nIdx < paramNames.length()+1; nIdx++)
         {
-            if ((types[ nIdx ] != 0) && (param[ nIdx ] != NULL))
+            if ((types[ nIdx ] != 0) && (param[ nIdx ] != nullptr))
                 QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
         }
     }
@@ -150,7 +150,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
             QString("MethodInfo::Invoke - An Exception Occurred: %1")
                  .arg(sMsg));
 
-        if  ((types[ 0 ] != 0) && (param[ 0 ] != NULL ))
+        if  ((types[ 0 ] != 0) && (param[ 0 ] != nullptr ))
             QMetaType::destroy( types[ 0 ], param[ 0 ] );
 
         throw;
@@ -172,7 +172,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams )
 
     QVariant vReturn;
   
-    if ( param[ 0 ] != NULL)
+    if ( param[ 0 ] != nullptr)
     {
         vReturn = pService->ConvertToVariant( types[ 0 ], param[ 0 ] );
 
@@ -267,7 +267,7 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
 
     // ----------------------------------------------------------------------
 
-    if (pService != NULL)
+    if (pService != nullptr)
         delete pService;
 }
 
@@ -295,7 +295,7 @@ QStringList ServiceHost::GetBasePaths()
 bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
 {
     bool     bHandled = false;
-    Service *pService = NULL;
+    Service *pService = nullptr;
 
     try
     {
@@ -344,7 +344,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                     else
                         bHandled = xsd.GetEnumXSD( pRequest, pRequest->m_mapParams[ "enum" ] );
                     delete pService;
-                    pService = NULL;
+                    pService = nullptr;
                 }
 
                 if (!bHandled)
@@ -464,7 +464,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
         bHandled = true;
     }
 
-    if (pService != NULL)
+    if (pService != nullptr)
         delete pService;
 
     return bHandled;
@@ -476,7 +476,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
 
 bool ServiceHost::FormatResponse( HTTPRequest *pRequest, QObject *pResults )
 {
-    if (pResults != NULL)
+    if (pResults != nullptr)
     {
         Serializer *pSer = pRequest->GetSerializer();
 

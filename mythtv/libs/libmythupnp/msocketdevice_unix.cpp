@@ -926,7 +926,7 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 
     tv.tv_usec = (msecs % 1000) * 1000;
 
-    int rv = select(fd + 1, &fds, 0, 0, msecs < 0 ? 0 : &tv);
+    int rv = select(fd + 1, &fds, nullptr, nullptr, msecs < 0 ? nullptr : &tv);
 
     if (rv < 0)
         return -1;
@@ -967,7 +967,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
         return 0;
     }
 
-    if (data == 0)
+    if (data == nullptr)
     {
         LOG(VB_SOCKET, LOG_DEBUG,
             "MSocketDevice::readBlock: Null pointer error");
@@ -1097,7 +1097,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
     if (len == 0)
         return 0;
 
-    if (data == 0)
+    if (data == nullptr)
     {
         LOG(VB_SOCKET, LOG_DEBUG,
             "MSocketDevice::writeBlock: Null pointer error");
@@ -1226,7 +1226,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
         return -1; // for now - later we can do t/tcp
     }
 
-    if (data == 0)
+    if (data == nullptr)
     {
         LOG(VB_SOCKET, LOG_DEBUG,
             "MSocketDevice::sendBlock: Null pointer error");
