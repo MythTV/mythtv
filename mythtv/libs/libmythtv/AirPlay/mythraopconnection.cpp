@@ -22,7 +22,7 @@
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
 
-RSA *MythRAOPConnection::g_rsa = NULL;
+RSA *MythRAOPConnection::g_rsa = nullptr;
 QString MythRAOPConnection::g_rsaLastError;
 
 // RAOP RTP packet type
@@ -61,17 +61,17 @@ public:
 
 MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
                                        QByteArray id, int port)
-  : QObject(parent),       m_watchdogTimer(NULL),    m_socket(socket),
-    m_textStream(NULL),    m_hardwareId(id),
+  : QObject(parent),       m_watchdogTimer(nullptr), m_socket(socket),
+    m_textStream(nullptr), m_hardwareId(id),
     m_incomingHeaders(),   m_incomingContent(),      m_incomingPartial(false),
     m_incomingSize(0),
-    m_dataSocket(NULL),                              m_dataPort(port),
-    m_clientControlSocket(NULL),                     m_clientControlPort(0),
-    m_clientTimingSocket(NULL),                      m_clientTimingPort(0),
-    m_eventServer(NULL),                             m_eventPort(-1),
-    m_audio(NULL),         m_codec(NULL),            m_codeccontext(NULL),
+    m_dataSocket(nullptr),                           m_dataPort(port),
+    m_clientControlSocket(nullptr),                  m_clientControlPort(0),
+    m_clientTimingSocket(nullptr),                   m_clientTimingPort(0),
+    m_eventServer(nullptr),                          m_eventPort(-1),
+    m_audio(nullptr),      m_codec(nullptr),         m_codeccontext(nullptr),
     m_channels(2),         m_sampleSize(16),         m_frameRate(44100),
-    m_framesPerPacket(352),m_dequeueAudioTimer(NULL),
+    m_framesPerPacket(352),m_dequeueAudioTimer(nullptr),
     m_queueLength(0),      m_streamingStarted(false),
     m_allowVolumeControl(true),
     //audio sync
@@ -83,7 +83,7 @@ MythRAOPConnection::MythRAOPConnection(QObject *parent, QTcpSocket *socket,
     // clock sync
     m_masterTimeStamp(0),  m_deviceTimeStamp(0),     m_networkLatency(0),
     m_clockSkew(0),
-    m_audioTimer(NULL),
+    m_audioTimer(nullptr),
     m_progressStart(0),    m_progressCurrent(0),     m_progressEnd(0),
     m_firstsend(false),    m_playbackStarted(false)
 {
@@ -107,7 +107,7 @@ MythRAOPConnection::~MythRAOPConnection()
         m_eventServer->disconnect();
         m_eventServer->close();
         m_eventServer->deleteLater();
-        m_eventServer = NULL;
+        m_eventServer = nullptr;
     }
 
     // delete main socket
@@ -116,13 +116,13 @@ MythRAOPConnection::~MythRAOPConnection()
         m_socket->disconnect();
         m_socket->close();
         m_socket->deleteLater();
-        m_socket = NULL;
+        m_socket = nullptr;
     }
 
     if (m_textStream)
     {
         delete m_textStream;
-        m_textStream = NULL;
+        m_textStream = nullptr;
     }
 
     if (m_id > 0)
@@ -141,14 +141,14 @@ void MythRAOPConnection::CleanUp(void)
     {
         m_watchdogTimer->stop();
         delete m_watchdogTimer;
-        m_watchdogTimer = NULL;
+        m_watchdogTimer = nullptr;
     }
 
     if (m_dequeueAudioTimer)
     {
         m_dequeueAudioTimer->stop();
         delete m_dequeueAudioTimer;
-        m_dequeueAudioTimer = NULL;
+        m_dequeueAudioTimer = nullptr;
     }
 
     if (m_clientTimingSocket)
@@ -156,7 +156,7 @@ void MythRAOPConnection::CleanUp(void)
         m_clientTimingSocket->disconnect();
         m_clientTimingSocket->close();
         delete m_clientTimingSocket;
-        m_clientTimingSocket = NULL;
+        m_clientTimingSocket = nullptr;
     }
 
     // delete data socket
@@ -165,7 +165,7 @@ void MythRAOPConnection::CleanUp(void)
         m_dataSocket->disconnect();
         m_dataSocket->close();
         m_dataSocket->deleteLater();
-        m_dataSocket = NULL;
+        m_dataSocket = nullptr;
     }
 
     // client control socket
@@ -174,7 +174,7 @@ void MythRAOPConnection::CleanUp(void)
         m_clientControlSocket->disconnect();
         m_clientControlSocket->close();
         m_clientControlSocket->deleteLater();
-        m_clientControlSocket = NULL;
+        m_clientControlSocket = nullptr;
     }
 
     // close audio decoder
@@ -385,7 +385,7 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Receiving SYNC packet"));
     }
 
-    timeval  t; gettimeofday(&t, NULL);
+    timeval  t; gettimeofday(&t, nullptr);
     m_timeLastSync = t.tv_sec * 1000 + t.tv_usec / 1000;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("SYNC: cur:%1 next:%2 time:%3")
@@ -514,7 +514,7 @@ void MythRAOPConnection::SendTimeRequest(void)
         return;
 
     timeval t;
-    gettimeofday(&t, NULL);
+    gettimeofday(&t, nullptr);
 
     unsigned char req[32];
     req[0] = 0x80;
@@ -554,7 +554,7 @@ void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
     t1.tv_sec  = qFromBigEndian(*(uint32_t *)(req + 8));
     t1.tv_usec = qFromBigEndian(*(uint32_t *)(req + 12));
 
-    gettimeofday(&t2, NULL);
+    gettimeofday(&t2, nullptr);
     uint64_t time1, time2;
     time1 = t1.tv_sec * 1000 + t1.tv_usec / 1000;
     time2 = t2.tv_sec * 1000 + t2.tv_usec / 1000;
@@ -689,7 +689,7 @@ void MythRAOPConnection::ProcessAudio()
         // packets, so unpause as early as possible
         m_audio->Pause(false);
     }
-    timeval  t; gettimeofday(&t, NULL);
+    timeval  t; gettimeofday(&t, nullptr);
     uint64_t dtime    = (t.tv_sec * 1000 + t.tv_usec / 1000) - m_timeLastSync;
     uint64_t rtp      = dtime + m_currentTimestamp;
     uint64_t buffered = m_audioStarted ? m_audio->GetAudioBufferedTime() : 0;
@@ -1234,7 +1234,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 m_eventServer->disconnect();
                 m_eventServer->close();
                 delete m_eventServer;
-                m_eventServer = NULL;
+                m_eventServer = nullptr;
             }
 
             if (events)
@@ -1501,12 +1501,12 @@ RSA *MythRAOPConnection::LoadKey(void)
     if ( !file )
     {
         g_rsaLastError = tr("Failed to read key from: %1").arg(GetConfDir() + sName);
-        g_rsa = NULL;
+        g_rsa = nullptr;
         LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
-        return NULL;
+        return nullptr;
     }
 
-    g_rsa = PEM_read_RSAPrivateKey(file, NULL, NULL, NULL);
+    g_rsa = PEM_read_RSAPrivateKey(file, nullptr, nullptr, nullptr);
     fclose(file);
 
     if (g_rsa)
@@ -1518,9 +1518,9 @@ RSA *MythRAOPConnection::LoadKey(void)
     }
 
     g_rsaLastError = tr("Failed to load RSA private key.");
-    g_rsa = NULL;
+    g_rsa = nullptr;
     LOG(VB_PLAYBACK, LOG_ERR, LOC + g_rsaLastError);
-    return NULL;
+    return nullptr;
 }
 
 RawHash MythRAOPConnection::FindTags(const QStringList &lines)
@@ -1665,7 +1665,7 @@ bool MythRAOPConnection::CreateDecoder(void)
         m_codeccontext->extradata = extradata;
         m_codeccontext->extradata_size = 36;
         m_codeccontext->channels = m_channels;
-        if (avcodec_open2(m_codeccontext, m_codec, NULL) < 0)
+        if (avcodec_open2(m_codeccontext, m_codec, nullptr) < 0)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 "Failed to open ALAC decoder - going silent...");
@@ -1684,7 +1684,7 @@ void MythRAOPConnection::DestroyDecoder(void)
     {
         avcodec_free_context(&m_codeccontext);
     }
-    m_codec = NULL;
+    m_codec = nullptr;
 }
 
 bool MythRAOPConnection::OpenAudioDevice(void)
@@ -1726,7 +1726,7 @@ bool MythRAOPConnection::OpenAudioDevice(void)
 void MythRAOPConnection::CloseAudioDevice(void)
 {
     delete m_audio;
-    m_audio = NULL;
+    m_audio = nullptr;
 }
 
 void MythRAOPConnection::StartAudioTimer(void)
@@ -1746,7 +1746,7 @@ void MythRAOPConnection::StopAudioTimer(void)
         m_audioTimer->stop();
     }
     delete m_audioTimer;
-    m_audioTimer = NULL;
+    m_audioTimer = nullptr;
 }
 
 /**

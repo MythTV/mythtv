@@ -702,7 +702,7 @@ nit_const_ptr_t DVBStreamData::GetCachedNIT(
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    nit_ptr_t nit = NULL;
+    nit_ptr_t nit = nullptr;
 
     nit_cache_t::const_iterator it = _cached_nit.find(section_num);
     if (it != _cached_nit.end())
@@ -736,7 +736,7 @@ sdt_const_ptr_t DVBStreamData::GetCachedSDT(
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    sdt_ptr_t sdt = NULL;
+    sdt_ptr_t sdt = nullptr;
 
     uint key = (tsid << 8) | section_num;
     sdt_cache_t::const_iterator it = _cached_sdts.find(key);
@@ -818,13 +818,13 @@ bool DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
     else if ((TableID::NIT == psip->TableID()) &&
              _cached_nit[psip->Section()])
     {
-        _cached_nit[psip->Section()] = NULL;
+        _cached_nit[psip->Section()] = nullptr;
         delete psip;
     }
     else if ((TableID::SDT == psip->TableID()) &&
              _cached_sdts[tid << 8 | psip->Section()])
     {
-        _cached_sdts[tid << 8 | psip->Section()] = NULL;
+        _cached_sdts[tid << 8 | psip->Section()] = nullptr;
         delete psip;
     }
     else

@@ -397,8 +397,8 @@ class MTV_PUBLIC PSIPTable : public PESPacket
     PSIPTable(const TSPacket& tspacket, bool)
         : PESPacket()
     {
-        _pesdata = NULL;
-        _fullbuffer = NULL;
+        _pesdata = nullptr;
+        _fullbuffer = nullptr;
          _ccLast = tspacket.ContinuityCounter();
          _allocSize = 0;
         InitPESPacket(const_cast<TSPacket&>(tspacket));
@@ -773,7 +773,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         SetProgramInfoLength(0);
         _ptrs.clear();
     }
-    void AppendStream(uint pid, uint type, unsigned char* si = 0, uint il = 0);
+    void AppendStream(uint pid, uint type, unsigned char* si = nullptr, uint il = 0);
 
     void Parse(void) const;
     virtual QString toString(void) const;
@@ -991,13 +991,13 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
 {
   public:
     SpliceInformationTable(const SpliceInformationTable &table) :
-        PSIPTable(table), _epilog(NULL)
+        PSIPTable(table), _epilog(nullptr)
     {
         assert(TableID::SITscte == TableID());
         Parse();
     }
     explicit SpliceInformationTable(const PSIPTable &table) :
-        PSIPTable(table), _epilog(NULL)
+        PSIPTable(table), _epilog(nullptr)
     {
         assert(TableID::SITscte == TableID());
         Parse();
@@ -1141,7 +1141,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     //   splice_descriptor()   ??   ??.?
     const unsigned char *SpliceDescriptors(void) const
     {
-        return (_epilog) ? _epilog + 2 : NULL;
+        return (_epilog) ? _epilog + 2 : nullptr;
     }
     // for (i = 0; i < ?; i++)
     //   alignment_stuffing     8   ??.0

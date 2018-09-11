@@ -1570,7 +1570,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     else
     {
         delete popup;
-        popup = NULL;
+        popup = nullptr;
     }
 
     if (1 == dc)

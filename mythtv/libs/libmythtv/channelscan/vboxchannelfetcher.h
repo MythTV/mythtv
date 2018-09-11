@@ -66,7 +66,7 @@ class VBoxChannelFetcher : public QRunnable
   public:
     VBoxChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
                        bool ftaOnly, ServiceRequirements serviceType,
-                       ScanMonitor *monitor = NULL);
+                       ScanMonitor *monitor = nullptr);
     ~VBoxChannelFetcher();
 
     void Scan(void);

@@ -45,7 +45,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
       _have_CRC_bug(false),
       _si_time_offset_cnt(0),
       _si_time_offset_indx(0),
-      _eit_helper(NULL), _eit_rate(0.0f),
+      _eit_helper(nullptr), _eit_rate(0.0f),
       _listening_disabled(false),
       _encryption_lock(QMutex::Recursive), _listener_lock(QMutex::Recursive),
       _cache_tables(cacheTables), _cache_lock(QMutex::Recursive),
@@ -58,7 +58,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
       _pid_pmt_single_program(0xffffffff),
       _pmt_single_program_num_video(1),
       _pmt_single_program_num_audio(0),
-      _pat_single_program(NULL), _pmt_single_program(NULL),
+      _pat_single_program(nullptr), _pmt_single_program(nullptr),
       _invalid_pat_seen(false), _invalid_pat_warning(false)
 {
     memset(_si_time_offsets, 0, sizeof(_si_time_offsets));
@@ -70,8 +70,8 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
 MPEGStreamData::~MPEGStreamData()
 {
     Reset(-1);
-    SetPATSingleProgram(NULL);
-    SetPMTSingleProgram(NULL);
+    SetPATSingleProgram(nullptr);
+    SetPMTSingleProgram(nullptr);
 
     // Delete any cached tables that haven't been returned
     psip_refcnt_map_t::iterator it = _cached_slated_for_deletion.begin();
@@ -87,7 +87,7 @@ void MPEGStreamData::SetDesiredProgram(int p)
 {
     bool reset = true;
     uint pid = 0;
-    const ProgramAssociationTable* pat = NULL;
+    const ProgramAssociationTable* pat = nullptr;
     pat_vec_t pats = GetCachedPATs();
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetDesiredProgram(%2)").arg(p));
@@ -155,8 +155,8 @@ void MPEGStreamData::Reset(int desiredProgram)
 
     _invalid_pat_seen = false;
 
-    SetPATSingleProgram(NULL);
-    SetPMTSingleProgram(NULL);
+    SetPATSingleProgram(nullptr);
+    SetPMTSingleProgram(nullptr);
 
     pid_psip_map_t old = _partial_psip_packet_cache;
     pid_psip_map_t::iterator it = old.begin();
@@ -251,7 +251,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                     .arg(partial->PSIOffset() + 1 + 3)
                     .arg(partial->TSSizeInBuffer()));
             DeletePartialPSIP(tspacket->PID());
-            return NULL;
+            return nullptr;
         }
 
         // Discard broken packets
@@ -262,7 +262,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         {
             LOG(VB_SIPARSER, LOG_ERR, LOC + "Discarding broken PSIP packet");
             DeletePartialPSIP(tspacket->PID());
-            return NULL;
+            return nullptr;
         }
 
         PSIPTable* psip = new PSIPTable(*partial);
@@ -307,7 +307,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                         "into a buffer of %2 bytes.")
                     .arg(packetStart).arg(partial->TSSizeInBuffer()));
             delete psip;
-            psip = NULL;
+            psip = nullptr;
         }
 
         moreTablePackets = false;
@@ -320,7 +320,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
             DeletePartialPSIP(tspacket->PID());
 
         moreTablePackets = false;
-        return 0; // partial packet is not yet complete.
+        return nullptr; // partial packet is not yet complete.
     }
 
     if (!tspacket->PayloadStart())
@@ -328,7 +328,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         // We didn't see this PSIP packet's start, so this must be the
         // tail end of something we missed. Ignore it.
         moreTablePackets = false;
-        return 0;
+        return nullptr;
     }
 
     // table_id (8 bits) and section_length(12), syntax(1), priv(1), res(2)
@@ -342,7 +342,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
                 "AFCOffset(%1)+StartOfFieldPointer(%2)>184, "
                 "pes length & current cannot be queried")
                 .arg(tspacket->AFCOffset()).arg(tspacket->StartOfFieldPointer()));
-        return 0;
+        return nullptr;
     }
 
     const unsigned char* pesdata = tspacket->data() + offset;
@@ -351,7 +351,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     {
         SavePartialPSIP(tspacket->PID(), new PSIPTable(*tspacket));
         moreTablePackets = false;
-        return 0;
+        return nullptr;
     }
 
     PSIPTable *psip = new PSIPTable(*tspacket); // must be complete packet
@@ -401,7 +401,7 @@ bool MPEGStreamData::CreatePATSingleProgram(
             QString("Desired program #%1 not found in PAT."
                     "\n\t\t\tCannot create single program PAT.")
                 .arg(_desired_program));
-        SetPATSingleProgram(NULL);
+        SetPATSingleProgram(nullptr);
         return false;
     }
 
@@ -497,7 +497,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
 
     uint programNumber = 1; // MPEG Program Number
 
-    ATSCStreamData *sd = NULL;
+    ATSCStreamData *sd = nullptr;
     tvct_vec_t tvct;
     cvct_vec_t cvct;
 
@@ -861,7 +861,7 @@ double MPEGStreamData::TimeOffset(void) const
 void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
 {
     struct timeval tm;
-    if (gettimeofday(&tm, NULL) != 0)
+    if (gettimeofday(&tm, nullptr) != 0)
         return;
 
     double utc_time = tm.tv_sec + (tm.tv_usec * 0.000001);
@@ -1326,7 +1326,7 @@ bool MPEGStreamData::HasCachedAnyPMTs(void) const
 pat_const_ptr_t MPEGStreamData::GetCachedPAT(uint tsid, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
-    ProgramAssociationTable *pat = NULL;
+    ProgramAssociationTable *pat = nullptr;
 
     uint key = (tsid << 8) | section_num;
     pat_cache_t::const_iterator it = _cached_pats.find(key);
@@ -1370,7 +1370,7 @@ pat_vec_t MPEGStreamData::GetCachedPATs(void) const
 cat_const_ptr_t MPEGStreamData::GetCachedCAT(uint tsid, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
-    ConditionalAccessTable *cat = NULL;
+    ConditionalAccessTable *cat = nullptr;
 
     uint key = (tsid << 8) | section_num;
     cat_cache_t::const_iterator it = _cached_cats.find(key);
@@ -1415,7 +1415,7 @@ pmt_const_ptr_t MPEGStreamData::GetCachedPMT(
     uint program_num, uint section_num) const
 {
     QMutexLocker locker(&_cache_lock);
-    ProgramMapTable *pmt = NULL;
+    ProgramMapTable *pmt = nullptr;
 
     uint key = (program_num << 8) | section_num;
     pmt_cache_t::const_iterator it = _cached_pmts.find(key);
@@ -1538,19 +1538,19 @@ bool MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
     else if (TableID::PAT == psip->TableID() &&
              (_cached_pats[(tid << 8) | psip->Section()] == psip))
     {
-        _cached_pats[(tid << 8) | psip->Section()] = NULL;
+        _cached_pats[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
     }
     else if (TableID::CAT == psip->TableID() &&
              (_cached_cats[(tid << 8) | psip->Section()] == psip))
     {
-        _cached_cats[(tid << 8) | psip->Section()] = NULL;
+        _cached_cats[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
     }
     else if ((TableID::PMT == psip->TableID()) &&
              (_cached_pmts[(tid << 8) | psip->Section()] == psip))
     {
-        _cached_pmts[(tid << 8) | psip->Section()] = NULL;
+        _cached_pmts[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
     }
     else

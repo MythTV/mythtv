@@ -39,14 +39,14 @@ ChannelScannerGUIScanPane::ChannelScannerGUIScanPane(
     bool snr, bool rotorpos,
     MythScreenStack *parent)
     : MythScreenType(parent, "channelscanner"),
-      m_showSignalLock(lock),      m_showSignalStrength(strength),
-      m_showSignalNoise(snr),      m_showRotorPos(rotorpos),
-      m_signalStrengthBar(NULL),   m_signalNoiseBar(NULL),
-      m_rotatorPositionBar(NULL),  m_progressBar(NULL),
-      m_statusText(NULL),          m_scanProgressText(NULL),
-      m_signalLockedText(NULL),    m_signalStrengthText(NULL),
-      m_signalNoiseText(NULL),     m_rotatorPositionText(NULL),
-      m_progressText(NULL),        m_log(NULL)
+      m_showSignalLock(lock),        m_showSignalStrength(strength),
+      m_showSignalNoise(snr),        m_showRotorPos(rotorpos),
+      m_signalStrengthBar(nullptr),  m_signalNoiseBar(nullptr),
+      m_rotatorPositionBar(nullptr), m_progressBar(nullptr),
+      m_statusText(nullptr),         m_scanProgressText(nullptr),
+      m_signalLockedText(nullptr),   m_signalStrengthText(nullptr),
+      m_signalNoiseText(nullptr),    m_rotatorPositionText(nullptr),
+      m_progressText(nullptr),       m_log(nullptr)
 {
 }
 
@@ -112,7 +112,7 @@ bool ChannelScannerGUIScanPane::Create()
     m_statusText->SetText(tr("Tuning"));
     m_progressBar->SetTotal(65535);
 
-    MythUIButton *exitButton = NULL;
+    MythUIButton *exitButton = nullptr;
     UIUtilW::Assign(this, exitButton, "exit");
     if (exitButton)
         connect(exitButton, SIGNAL(Clicked()), SLOT(Close()));

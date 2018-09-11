@@ -62,7 +62,7 @@ class IPTVChannelFetcher : public QRunnable
 
   public:
     IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
-                       bool is_mpts, ScanMonitor *monitor = NULL);
+                       bool is_mpts, ScanMonitor *monitor = nullptr);
     ~IPTVChannelFetcher();
 
     void Scan(void);
@@ -71,7 +71,7 @@ class IPTVChannelFetcher : public QRunnable
 
     static QString DownloadPlaylist(const QString &url);
     static fbox_chan_map_t ParsePlaylist(
-        const QString &rawdata, IPTVChannelFetcher *fetcher = NULL);
+        const QString &rawdata, IPTVChannelFetcher *fetcher = nullptr);
 
   private:
     void SetTotalNumChannels(uint val) { _chan_cnt = (val) ? val : 1; }

@@ -161,14 +161,14 @@ class TestIPTVRecorder: public QObject
         fbox_chan_map_t chanmap;
 
         /* test plain old MPEG-2 TS over multicast playlist */
-        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataUDP, NULL);
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataUDP, nullptr);
         QCOMPARE (chanmap["001"].m_name, QString ("La 1"));
         QVERIFY (chanmap["001"].IsValid ());
         QVERIFY (chanmap["001"].m_tuning.IsValid ());
         QCOMPARE (chanmap["001"].m_tuning.GetDataURL().toString(), QString ("udp://239.0.0.76:8208"));
 
         /* test playlist for Neutrino STBs */
-        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataHTTP, NULL);
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataHTTP, nullptr);
         QVERIFY (chanmap["1"].IsValid ());
         QVERIFY (chanmap["1"].m_tuning.IsValid ());
         QCOMPARE (chanmap["1"].m_name, QString ("SVT1 HD Mitt"));
@@ -177,26 +177,26 @@ class TestIPTVRecorder: public QObject
         QCOMPARE (chanmap["1"].m_tuning.GetDataURL().toString(), QString ("http://192.168.0.234:8001/1:0:19:532:6:22F1:EEEE0000:0:0:0:"));
 
         /* test playlist for FreeboxTV, last channel in playlist "wins" */
-        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataRTSP, NULL);
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataRTSP, nullptr);
         QVERIFY (chanmap["2"].IsValid ());
         QVERIFY (chanmap["2"].m_tuning.IsValid ());
         QCOMPARE (chanmap["2"].m_name, QString ("France 2 (auto)"));
         QCOMPARE (chanmap["2"].m_tuning.GetDataURL().toString(), QString ("rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=201"));
 
         /* test playlist for SAT>IP with "#. name" instead of "# - name" */
-        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataSATIP, NULL);
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataSATIP, nullptr);
         QVERIFY (chanmap["10"].IsValid ());
         QVERIFY (chanmap["10"].m_tuning.IsValid ());
         QCOMPARE (chanmap["10"].m_name, QString ("ZDFinfokanal"));
 
         /* test playlist from A1 TV with empty lines and tvg-num */
-        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataA1TV, NULL);
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataA1TV, nullptr);
         QVERIFY (chanmap["1"].IsValid ());
         QVERIFY (chanmap["1"].m_tuning.IsValid ());
         QCOMPARE (chanmap["1"].m_name, QString ("ORFeins"));
 
         /* test playlist from Movistar TV with channel number in braces */
-        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataMovistarTV, NULL);
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataMovistarTV, nullptr);
         QVERIFY (chanmap["001"].IsValid ());
         QVERIFY (chanmap["001"].m_tuning.IsValid ());
         QCOMPARE (chanmap["001"].m_name, QString ("La 1"));
@@ -205,7 +205,7 @@ class TestIPTVRecorder: public QObject
         QCOMPARE (chanmap["2275"].m_name, QString ("Canal Sur Andalucía"));
 
         /* test playlist from iptv.ink with channel number in duration */
-        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataIPTVInk, NULL);
+        chanmap = IPTVChannelFetcher::ParsePlaylist (rawdataIPTVInk, nullptr);
         QVERIFY (chanmap["0002"].IsValid ());
         QVERIFY (chanmap["0002"].m_tuning.IsValid ());
         QCOMPARE (chanmap["0002"].m_name, QString ("[COLOR gold]Das Erste[/COLOR]"));

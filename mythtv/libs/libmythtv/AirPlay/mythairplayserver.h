@@ -35,7 +35,7 @@ class AirplayConnection
 {
   public:
     AirplayConnection()
-      : controlSocket(NULL), reverseSocket(NULL), speed(1.0f),
+      : controlSocket(nullptr), reverseSocket(nullptr), speed(1.0f),
         position(0.0f), initial_position(-1.0f), url(QUrl()),
         lastEvent(AP_EVENT_NONE), stopped(false), was_playing(false),
         initialized(false), photos(false), notificationid(-1)

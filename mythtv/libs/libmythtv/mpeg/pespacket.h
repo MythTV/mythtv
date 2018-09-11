@@ -27,7 +27,7 @@ class MTV_PUBLIC PESPacket
   protected:
     /** noop constructor, only for use by derived classes */
     PESPacket()
-        : _pesdata(NULL), _fullbuffer(NULL),  _psiOffset(0),
+        : _pesdata(nullptr), _fullbuffer(nullptr),  _psiOffset(0),
           _ccLast(255), _pesdataSize(0), _allocSize(0), _badPacket(false)
     { ; }
 
@@ -49,7 +49,7 @@ class MTV_PUBLIC PESPacket
   public:
     // may be modified
     PESPacket(const PESPacket& pkt)
-        : _pesdata(NULL),
+        : _pesdata(nullptr),
           _psiOffset(pkt._psiOffset),
           _ccLast(pkt._ccLast),
           _pesdataSize(pkt._pesdataSize),
@@ -75,8 +75,8 @@ class MTV_PUBLIC PESPacket
         if (IsClone())
             pes_free(_fullbuffer);
 
-        _fullbuffer = NULL;
-        _pesdata    = NULL;
+        _fullbuffer = nullptr;
+        _pesdata    = nullptr;
     }
 
     bool IsClone() const { return bool(_allocSize); }

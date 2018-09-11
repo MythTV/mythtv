@@ -147,7 +147,7 @@ ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
     if (desc)
         return new ServiceDescriptor(desc);
 
-    return NULL;
+    return nullptr;
 }
 
 bool ServiceDescriptionTable::Mutate(void)

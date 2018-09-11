@@ -76,7 +76,7 @@ class MTV_PUBLIC HTTPLiveStream
     static DTC::LiveStreamInfo     *StopStream(int id);
     static bool                     RemoveStream(int id);
 
-           DTC::LiveStreamInfo     *GetLiveStreamInfo(DTC::LiveStreamInfo *info = NULL);
+           DTC::LiveStreamInfo     *GetLiveStreamInfo(DTC::LiveStreamInfo *info = nullptr);
     static DTC::LiveStreamInfoList *GetLiveStreamInfoList( const QString &FileName = "");
 
  protected:

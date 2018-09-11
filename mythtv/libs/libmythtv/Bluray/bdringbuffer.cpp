@@ -151,7 +151,7 @@ static int _img_read(void *handle, void *buf, int lba, int num_blocks)
 BDInfo::BDInfo(const QString &filename)
     : m_isValid(true)
 {
-    BLURAY* bdnav = NULL;
+    BLURAY* bdnav = nullptr;
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("BDInfo: Trying %1").arg(filename));
     QString name = filename;
@@ -249,7 +249,7 @@ void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
             .arg(name));
     }
 
-    void*   pBuf = 0;
+    void*   pBuf = nullptr;
     int64_t bufsize = 0;
 
     serialnum.clear();
@@ -301,17 +301,17 @@ bool BDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 
 BDRingBuffer::BDRingBuffer(const QString &lfilename)
   : RingBuffer(kRingBuffer_BD),
-    bdnav(NULL), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
+    bdnav(nullptr), m_isHDMVNavigation(false), m_tryHDMVNavigation(false),
     m_topMenuSupported(false), m_firstPlaySupported(false),
-    m_numTitles(0), m_currentTitleInfo(NULL), m_imgHandle(-1),
+    m_numTitles(0), m_currentTitleInfo(nullptr), m_imgHandle(-1),
     m_titleChanged(false), m_playerWait(false),
     m_ignorePlayerWait(true),
-    m_overlayPlanes(2, NULL),
+    m_overlayPlanes(2, nullptr),
     m_stillTime(0), m_stillMode(BLURAY_STILL_NONE),
     m_processState(PROCESS_NORMAL),
-    m_infoLock(QMutex::Recursive), m_mainThread(NULL)
+    m_infoLock(QMutex::Recursive), m_mainThread(nullptr)
 {
-    m_tryHDMVNavigation = NULL != getenv("MYTHTV_HDMV");
+    m_tryHDMVNavigation = nullptr != getenv("MYTHTV_HDMV");
     m_mainThread = QThread::currentThread();
     OpenFile(lfilename);
 }
@@ -340,7 +340,7 @@ void BDRingBuffer::close(void)
         m_infoLock.unlock();
 
         bd_close(bdnav);
-        bdnav = NULL;
+        bdnav = nullptr;
     }
 
     if (m_imgHandle > 0)
@@ -607,7 +607,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     {
         lastError = tr("Could not open Blu-ray device: %1").arg(filename);
         rwlock.unlock();
-        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
 
@@ -636,11 +636,11 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     {
         // couldn't decrypt bluray
         bd_close(bdnav);
-        bdnav = NULL;
+        bdnav = nullptr;
         lastError = tr("Could not open Blu-ray device %1, failed to decrypt")
                     .arg(filename);
         rwlock.unlock();
-        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
 
@@ -687,10 +687,10 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     {
         // no title, no point trying any longer
         bd_close(bdnav);
-        bdnav = NULL;
+        bdnav = nullptr;
         lastError = tr("Unable to find any Blu-ray compatible titles");
         rwlock.unlock();
-        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+        mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
         return false;
     }
 
@@ -728,7 +728,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     m_currentTitleLength = 0;
     m_titlesize = 0;
     m_currentTime = 0;
-    m_currentTitleInfo = NULL;
+    m_currentTitleInfo = nullptr;
     m_currentTitleAngleCount = 0;
     m_processState = PROCESS_NORMAL;
     m_lastEvent.event = BD_EVENT_NONE;
@@ -765,7 +765,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
         // Register the Menu Overlay Callback
         bd_register_overlay_proc(bdnav, this, HandleOverlayCallback);
-        bd_register_argb_overlay_proc(bdnav, this, HandleARGBOverlayCallback, NULL);
+        bd_register_argb_overlay_proc(bdnav, this, HandleARGBOverlayCallback, nullptr);
     }
     else
     {
@@ -773,7 +773,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
         // Loop through the relevant titles and find the longest
         uint64_t titleLength = 0;
-        BLURAY_TITLE_INFO *titleInfo = NULL;
+        BLURAY_TITLE_INFO *titleInfo = nullptr;
         bool found = false;
         for( unsigned i = 0; i < m_numTitles; ++i)
         {
@@ -793,10 +793,10 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
         {
             // no title, no point trying any longer
             bd_close(bdnav);
-            bdnav = NULL;
+            bdnav = nullptr;
             lastError = tr("Unable to find any usable Blu-ray titles");
             rwlock.unlock();
-            mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+            mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
             return false;
         }
         SwitchTitle(m_mainTitle);
@@ -812,7 +812,7 @@ bool BDRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
 
     rwlock.unlock();
 
-    mythfile_open_register_callback(filename.toLocal8Bit().data(), this, NULL);
+    mythfile_open_register_callback(filename.toLocal8Bit().data(), this, nullptr);
     return true;
 }
 
@@ -911,14 +911,14 @@ bool BDRingBuffer::SwitchPlaylist(uint32_t index)
 BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t index)
 {
     if (!bdnav)
-        return NULL;
+        return nullptr;
 
     QMutexLocker locker(&m_infoLock);
     if (m_cachedTitleInfo.contains(index))
         return m_cachedTitleInfo.value(index);
 
     if (index > m_numTitles)
-        return NULL;
+        return nullptr;
 
     BLURAY_TITLE_INFO* result = bd_get_title_info(bdnav, index, 0);
     if (result)
@@ -928,13 +928,13 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetTitleInfo(uint32_t index)
         m_cachedTitleInfo.insert(index,result);
         return result;
     }
-    return NULL;
+    return nullptr;
 }
 
 BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t index)
 {
     if (!bdnav)
-        return NULL;
+        return nullptr;
 
     QMutexLocker locker(&m_infoLock);
     if (m_cachedPlaylistInfo.contains(index))
@@ -948,7 +948,7 @@ BLURAY_TITLE_INFO* BDRingBuffer::GetPlaylistInfo(uint32_t index)
         m_cachedPlaylistInfo.insert(index,result);
         return result;
     }
-    return NULL;
+    return nullptr;
 }
 
 bool BDRingBuffer::UpdateTitleInfo(void)
@@ -1657,7 +1657,7 @@ void BDRingBuffer::ClearOverlays(void)
     {
         BDOverlay *overlay = m_overlayImages.takeFirst();
         delete overlay;
-        overlay = NULL;
+        overlay = nullptr;
     }
 
     for (int i = 0; i < m_overlayPlanes.size(); i++)
@@ -1667,7 +1667,7 @@ void BDRingBuffer::ClearOverlays(void)
         if (osd)
         {
             delete osd;
-            osd = NULL;
+            osd = nullptr;
         }
     }
 }
@@ -1677,7 +1677,7 @@ BDOverlay* BDRingBuffer::GetOverlay(void)
     QMutexLocker lock(&m_overlayLock);
     if (!m_overlayImages.isEmpty())
         return m_overlayImages.takeFirst();
-    return NULL;
+    return nullptr;
 }
 
 void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
@@ -1711,7 +1711,7 @@ void BDRingBuffer::SubmitOverlay(const bd_overlay_s * const overlay)
                 if (osd)
                 {
                     delete osd;
-                    osd = NULL;
+                    osd = nullptr;
                 }
 
                 QMutexLocker lock(&m_overlayLock);
@@ -1803,7 +1803,7 @@ void BDRingBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const overlay)
                 if (osd)
                 {
                     delete osd;
-                    osd = NULL;
+                    osd = nullptr;
                 }
 
                 QMutexLocker lock(&m_overlayLock);

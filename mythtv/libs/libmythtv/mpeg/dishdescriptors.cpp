@@ -21,7 +21,7 @@ QString DishEventNameDescriptor::Name(uint compression_type) const
 const unsigned char *DishEventDescriptionDescriptor::DescriptionRaw(void) const
 {
     if (DescriptorLength() <= 2)
-        return NULL;
+        return nullptr;
 
     bool offset = (_data[3] & 0xf8) == 0x80;
     return _data + ((offset) ? 4 : 3);

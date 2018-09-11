@@ -80,7 +80,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::caption_service)
     {
         if (_data && !Parse())
-            _data = NULL;
+            _data = nullptr;
     }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
@@ -138,7 +138,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::content_advisory)
     {
         if (_data && !Parse())
-            _data = NULL;
+            _data = nullptr;
     }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x87
@@ -180,7 +180,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     const unsigned char *Offset(int i, int j) const
     {
         IntToBuf::const_iterator it = _ptrs.find(Index(i,j));
-        return (it != _ptrs.end()) ? *it : NULL;
+        return (it != _ptrs.end()) ? *it : nullptr;
     }
     IntToBuf _ptrs;
 };

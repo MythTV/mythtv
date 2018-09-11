@@ -41,7 +41,7 @@ extern QString dvb_decode_text(const unsigned char *src, uint length,
 
 inline QString dvb_decode_text(const unsigned char *src, uint length)
 {
-    return dvb_decode_text(src, length, NULL, 0);
+    return dvb_decode_text(src, length, nullptr, 0);
 }
 
 QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
@@ -91,26 +91,26 @@ class LinkageDescriptor : public MPEGDescriptor
             return;
         if (DescriptorLength() < 7)
         {
-            _data = NULL;
+            _data = nullptr;
         }
         else if (kMobileHandOver == LinkageType())
         {
             uint end = 8;
             if (DescriptorLength() < end)
             {
-                _data = NULL;
+                _data = nullptr;
                 return;
             }
             end += (HasMobileNetworkID()) ? 2 : 0;
             end += (HasMobileInitialServiceID()) ? 2 : 0;
             if (DescriptorLength() < end)
-                _data = NULL;
+                _data = nullptr;
             m_offset = end + 2;
         }
         else if (kEventLinkage == LinkageType())
         {
             if (DescriptorLength() < 10)
-                _data = NULL;
+                _data = nullptr;
             m_offset = 12;
         }
     }

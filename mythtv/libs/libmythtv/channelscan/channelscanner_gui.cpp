@@ -50,7 +50,7 @@ using namespace std;
 #define LOC QString("ChScanGUI: ")
 
 ChannelScannerGUI::ChannelScannerGUI(void)
-    : m_scanStage(NULL)
+    : m_scanStage(nullptr)
 {
 }
 
@@ -88,9 +88,9 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         }
 
 #ifdef USING_VBOX
-        bool success = (iptvScanner != NULL || vboxScanner != NULL);
+        bool success = (iptvScanner != nullptr || vboxScanner != nullptr);
 #else
-        bool success = iptvScanner != NULL;
+        bool success = iptvScanner != nullptr;
 #endif
 
         Teardown();
@@ -150,7 +150,7 @@ void ChannelScannerGUI::InformUser(const QString &error)
 
 void ChannelScannerGUI::quitScanning(void)
 {
-    m_scanStage = NULL;
+    m_scanStage = nullptr;
 
     if (scanMonitor)
     {
@@ -177,6 +177,6 @@ void ChannelScannerGUI::MonitorProgress(bool lock, bool strength,
     else
     {
         delete m_scanStage;
-        m_scanStage = NULL;
+        m_scanStage = nullptr;
     }
 }

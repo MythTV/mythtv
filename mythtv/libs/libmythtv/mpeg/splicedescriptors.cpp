@@ -94,7 +94,7 @@ const unsigned char *SpliceDescriptor::Find(
         if ((*it)[0] == desc_tag)
             return *it;
     }
-    return NULL;
+    return nullptr;
 }
 
 desc_list_t SpliceDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)

@@ -94,7 +94,7 @@ H264Parser::H264Parser(void)
 {
     rbsp_buffer_size = 188 * 2;
     rbsp_buffer = new uint8_t[rbsp_buffer_size];
-    if (rbsp_buffer == 0)
+    if (rbsp_buffer == nullptr)
         rbsp_buffer_size = 0;
 
     Reset();
@@ -338,7 +338,7 @@ bool H264Parser::fillRBSP(const uint8_t *byteP, uint32_t byte_count,
         /* Need a bigger buffer */
         uint8_t *new_buffer = new uint8_t[required_size];
 
-        if (new_buffer == NULL)
+        if (new_buffer == nullptr)
         {
             /* Allocation failed. Discard the new bytes */
             LOG(VB_GENERAL, LOG_ERR,

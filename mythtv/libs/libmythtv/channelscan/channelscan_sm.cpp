@@ -88,7 +88,7 @@ QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 class ScannedChannelInfo
 {
   public:
-    ScannedChannelInfo() : mgt(NULL) {}
+    ScannedChannelInfo() : mgt(nullptr) {}
 
     bool IsEmpty() const
     {
@@ -165,9 +165,9 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
       m_currentTestingDecryption(false),
       // Misc
       m_channelsFound(999),
-      m_currentInfo(NULL),
+      m_currentInfo(nullptr),
       m_analogSignalHandler(new AnalogSignalHandler(this)),
-      m_scannerThread(NULL)
+      m_scannerThread(nullptr)
 {
     m_inputName.detach();
 
@@ -222,7 +222,7 @@ ChannelScanSM::~ChannelScanSM(void)
     StopScanner();
     LOG(VB_CHANSCAN, LOG_INFO, LOC + "ChannelScanSM Stopped");
 
-    ScanStreamData *sd = NULL;
+    ScanStreamData *sd = nullptr;
     if (GetDTVSignalMonitor())
     {
         sd = GetDTVSignalMonitor()->GetScanStreamData();
@@ -232,7 +232,7 @@ ChannelScanSM::~ChannelScanSM(void)
     {
         m_signalMonitor->RemoveListener(m_analogSignalHandler);
         delete m_signalMonitor;
-        m_signalMonitor = NULL;
+        m_signalMonitor = nullptr;
     }
 
     delete sd;
@@ -240,7 +240,7 @@ ChannelScanSM::~ChannelScanSM(void)
     if (m_analogSignalHandler)
     {
         delete m_analogSignalHandler;
-        m_analogSignalHandler = NULL;
+        m_analogSignalHandler = nullptr;
     }
 
     teardown_frequency_tables();
@@ -623,11 +623,11 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
             continue;
         }
 
-        const ProgramMapTable *pmt = NULL;
+        const ProgramMapTable *pmt = nullptr;
         for (uint i = 0; !pmt && (i < m_currentInfo->pmts.size()); i++)
         {
             pmt = (m_currentInfo->pmts[i]->ProgramNumber() == pnum) ?
-                m_currentInfo->pmts[i] : NULL;
+                m_currentInfo->pmts[i] : nullptr;
         }
 
         if (pmt)
@@ -976,12 +976,12 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             }
 
             m_channelList << ChannelListItem(m_current, m_currentInfo);
-            m_currentInfo = NULL;
+            m_currentInfo = nullptr;
         }
         else
         {
             delete m_currentInfo;
-            m_currentInfo = NULL;
+            m_currentInfo = nullptr;
         }
 
         SignalMonitor *sm = GetSignalMonitor();
@@ -1511,7 +1511,7 @@ DVBSignalMonitor* ChannelScanSM::GetDVBSignalMonitor(void)
 #ifdef USING_DVB
     return dynamic_cast<DVBSignalMonitor*>(m_signalMonitor);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -1530,7 +1530,7 @@ HDHRChannel *ChannelScanSM::GetHDHRChannel(void)
 #ifdef USING_HDHOMERUN
     return dynamic_cast<HDHRChannel*>(m_channel);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -1539,7 +1539,7 @@ DVBChannel *ChannelScanSM::GetDVBChannel(void)
 #ifdef USING_DVB
     return dynamic_cast<DVBChannel*>(m_channel);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -1548,7 +1548,7 @@ const DVBChannel *ChannelScanSM::GetDVBChannel(void) const
 #ifdef USING_DVB
     return dynamic_cast<const DVBChannel*>(m_channel);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -1557,7 +1557,7 @@ V4LChannel *ChannelScanSM::GetV4LChannel(void)
 #ifdef USING_V4L2
     return dynamic_cast<V4LChannel*>(m_channel);
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -1572,7 +1572,7 @@ void ChannelScanSM::StartScanner(void)
         if (m_scannerThread->wait(1000))
         {
             delete m_scannerThread;
-            m_scannerThread = NULL;
+            m_scannerThread = nullptr;
         }
     }
     m_threadExit = false;
@@ -1635,7 +1635,7 @@ bool ChannelScanSM::HasTimedOut(void)
     if (m_timer.elapsed() > (int)m_channelTimeout)
     {
         // the channelTimeout alone is only valid if we have seen no tables..
-        const ScanStreamData *sd = NULL;
+        const ScanStreamData *sd = nullptr;
         if (GetDTVSignalMonitor())
             sd = GetDTVSignalMonitor()->GetScanStreamData();
 
@@ -1657,7 +1657,7 @@ bool ChannelScanSM::HasTimedOut(void)
     if ((m_timer.elapsed() > (int)(*m_current).timeoutTune) &&
         sm && !sm->HasSignalLock())
     {
-        const ScanStreamData *sd = NULL;
+        const ScanStreamData *sd = nullptr;
         if (GetDTVSignalMonitor())
             sd = GetDTVSignalMonitor()->GetScanStreamData();
 
@@ -1859,7 +1859,7 @@ void ChannelScanSM::StopScanner(void)
         if (m_scannerThread->wait(1000))
         {
             delete m_scannerThread;
-            m_scannerThread = NULL;
+            m_scannerThread = nullptr;
         }
     }
 

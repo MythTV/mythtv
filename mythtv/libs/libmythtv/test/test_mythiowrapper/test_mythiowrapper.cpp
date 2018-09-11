@@ -40,7 +40,7 @@ void TestMythIOWrapper::local_directory_test(void)
 
     char *name;
     QSet<QString> found;
-    while ((name = mythdir_readdir(dirid)) != NULL) {
+    while ((name = mythdir_readdir(dirid)) != nullptr) {
         if (name[0] != '.')
             found += name;
         free(name);

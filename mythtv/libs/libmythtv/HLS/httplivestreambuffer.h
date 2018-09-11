@@ -71,10 +71,10 @@ protected:
 private:
     void FreeStreamsList(QList<HLSStream*> *streams) const;
     HLSStream *GetStreamForSegment(int segid) const;
-    HLSStream *GetStream(const int wanted, const StreamsList *streams = NULL) const;
-    HLSStream *GetFirstStream(const StreamsList *streams = NULL) const;
-    HLSStream *GetLastStream(const StreamsList *streams = NULL) const;
-    HLSStream *FindStream(const HLSStream *hls_new, const StreamsList *streams = NULL) const;
+    HLSStream *GetStream(const int wanted, const StreamsList *streams = nullptr) const;
+    HLSStream *GetFirstStream(const StreamsList *streams = nullptr) const;
+    HLSStream *GetLastStream(const StreamsList *streams = nullptr) const;
+    HLSStream *FindStream(const HLSStream *hls_new, const StreamsList *streams = nullptr) const;
     HLSStream *GetCurrentStream(void) const;
     QString ParseAttributes(const QString &line, const char *attr) const;
     int ParseDecimalValue(const QString &line, int &target) const;
@@ -89,7 +89,7 @@ private:
     int ParseVersion(const QString &line, int &version) const;
     int ParseEndList(HLSStream *hls) const;
     int ParseDiscontinuity(HLSStream *hls, const QString &line) const;
-    int ParseM3U8(const QByteArray *buffer, StreamsList *streams = NULL);
+    int ParseM3U8(const QByteArray *buffer, StreamsList *streams = nullptr);
     int Prefetch(int count);
     void SanityCheck(const HLSStream *hls) const;
     HLSSegment *GetSegment(int segnum, int timeout = 1000);
@@ -97,7 +97,7 @@ private:
     int ChooseSegment(int stream) const;
     int64_t SizeMedia(void) const;
     void WaitUntilBuffered(void);
-    void SanitizeStreams(StreamsList *streams = NULL);
+    void SanitizeStreams(StreamsList *streams = nullptr);
 
     // private member variables
     QString             m_m3u8;     // M3U8 url

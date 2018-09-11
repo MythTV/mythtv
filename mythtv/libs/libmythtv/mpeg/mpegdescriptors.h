@@ -223,25 +223,25 @@ class MTV_PUBLIC MPEGDescriptor
     MPEGDescriptor(const unsigned char *data, int len = 300) : _data(data)
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            _data = NULL;
+            _data = nullptr;
     }
     MPEGDescriptor(const unsigned char *data,
                    int len, uint tag) : _data(data)
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            _data = NULL;
+            _data = nullptr;
         else if (DescriptorTag() != tag)
-            _data = NULL;
+            _data = nullptr;
     }
     MPEGDescriptor(const unsigned char *data,
                    int len, uint tag, uint req_desc_len) : _data(data)
     {
         if ((len < 2) || (int(DescriptorLength()) + 2) > len)
-            _data = NULL;
+            _data = nullptr;
         else if (DescriptorTag() != tag)
-            _data = NULL;
+            _data = nullptr;
         else if (DescriptorLength() != req_desc_len)
-            _data = NULL;
+            _data = nullptr;
     }
     virtual ~MPEGDescriptor() {}
 
@@ -284,7 +284,7 @@ class RegistrationDescriptor : public MPEGDescriptor
         // The HD-PVR outputs a registration descriptor with a length
         // of 8 rather than 4, so we accept any length >= 4, not just 4.
         if (DescriptorLength() < 4)
-            _data = NULL;
+            _data = nullptr;
     }
 
     uint FormatIdentifier(void) const

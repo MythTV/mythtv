@@ -90,7 +90,7 @@ static QString relative_URI(const QString &surl, const QString &spath)
 static uint64_t mdate(void)
 {
     timeval  t;
-    gettimeofday(&t, NULL);
+    gettimeofday(&t, nullptr);
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
@@ -229,14 +229,14 @@ public:
         return m_played;
     }
 
-    uint32_t Read(uint8_t *buffer, int32_t length, FILE *fd = NULL)
+    uint32_t Read(uint8_t *buffer, int32_t length, FILE *fd = nullptr)
     {
         int32_t left = m_data.size() - m_played;
         if (length > left)
         {
             length = left;
         }
-        if (buffer != NULL)
+        if (buffer != nullptr)
         {
             memcpy(buffer, m_data.constData() + m_played, length);
             // write data to disk if required
@@ -309,7 +309,7 @@ public:
         int aeslen = m_data.size() & ~0xf;
         unsigned char iv[AES_BLOCK_SIZE];
         char *decrypted_data = new char[m_data.size()];
-        if (IV == NULL)
+        if (IV == nullptr)
         {
             /*
              * If the EXT-X-KEY tag does not have the IV attribute, implementations
@@ -536,32 +536,32 @@ public:
     {
         int count = NumSegments();
         if (count <= 0)
-            return NULL;
+            return nullptr;
         if ((wanted < 0) || (wanted >= count))
-            return NULL;
+            return nullptr;
         return m_segments[wanted];
     }
 
-    HLSSegment *FindSegment(const int id, int *segnum = NULL) const
+    HLSSegment *FindSegment(const int id, int *segnum = nullptr) const
     {
         int count = NumSegments();
         if (count <= 0)
-            return NULL;
+            return nullptr;
         for (int n = 0; n < count; n++)
         {
             HLSSegment *segment = GetSegment(n);
-            if (segment == NULL)
+            if (segment == nullptr)
                 break;
             if (segment->Id() == id)
             {
-                if (segnum != NULL)
+                if (segnum != nullptr)
                 {
                     *segnum = n;
                 }
                 return segment;
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     void AddSegment(const int duration, const QString &title, const QString &uri)
@@ -627,7 +627,7 @@ public:
     int DownloadSegmentData(int segnum, uint64_t &bandwidth, int stream)
     {
         HLSSegment *segment = GetSegment(segnum);
-        if (segment == NULL)
+        if (segment == nullptr)
             return RET_ERROR;
 
         segment->Lock();
@@ -694,7 +694,7 @@ public:
                     return RET_OK;
                 }
             }
-            if (segment->DecodeData(m_ivloaded ? m_AESIV : NULL) != RET_OK)
+            if (segment->DecodeData(m_ivloaded ? m_AESIV : nullptr) != RET_OK)
             {
                 segment->Unlock();
                 return RET_ERROR;
@@ -802,15 +802,15 @@ public:
      */
     int ManageSegmentKeys()
     {
-        HLSSegment   *seg       = NULL;
-        HLSSegment   *prev_seg  = NULL;
+        HLSSegment   *seg       = nullptr;
+        HLSSegment   *prev_seg  = nullptr;
         int          count      = NumSegments();
 
         for (int i = 0; i < count; i++)
         {
             prev_seg = seg;
             seg = GetSegment(i);
-            if (seg == NULL )
+            if (seg == nullptr )
                 continue;
             if (!seg->HasKeyPath())
                 continue;   /* No key to load ? continue */
@@ -1227,7 +1227,7 @@ protected:
         {
             /* Select best bandwidth match */
             HLSStream *hls = m_parent->GetStream(n);
-            if (hls == NULL)
+            if (hls == nullptr)
                 break;
 
             /* only consider streams with the same PROGRAM-ID */
@@ -1327,7 +1327,7 @@ protected:
 
         while (!m_interrupted)
         {
-            if (m_parent->m_streamworker == NULL)
+            if (m_parent->m_streamworker == nullptr)
             {
                 // streamworker not running
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
@@ -1385,7 +1385,7 @@ protected:
             }
 
             HLSStream *hls = m_parent->GetCurrentStream();
-            if (hls == NULL)
+            if (hls == nullptr)
             {
                 // an irrevocable error has occured. exit
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
@@ -1424,11 +1424,11 @@ private:
         for (int n = 0; n < count; n++)
         {
             HLSStream *hls_new = m_parent->GetStream(n, streams);
-            if (hls_new == NULL)
+            if (hls_new == nullptr)
                 continue;
 
             HLSStream *hls_old = m_parent->FindStream(hls_new);
-            if (hls_old == NULL)
+            if (hls_old == nullptr)
             {   /* new hls stream - append */
                 m_parent->m_streams.append(hls_new);
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -1460,7 +1460,7 @@ private:
         for (int n = 0; n < count; n++)
         {
             HLSSegment *p = hls_new->GetSegment(n);
-            if (p == NULL)
+            if (p == nullptr)
                 return RET_ERROR;
 
             hls->Lock();
@@ -1496,7 +1496,7 @@ private:
             {
                 int last = hls->NumSegments() - 1;
                 HLSSegment *l = hls->GetSegment(last);
-                if (l == NULL)
+                if (l == nullptr)
                 {
                     hls->Unlock();
                     return RET_ERROR;
@@ -1533,7 +1533,7 @@ private:
         {
             HLSStream *src, *dst;
             src = m_parent->GetStream(i);
-            if (src == NULL)
+            if (src == nullptr)
                 return RET_ERROR;
 
             dst = new HLSStream(*src);
@@ -1567,7 +1567,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename) :
     m_playback(new HLSPlayback()),
     m_meta(false),          m_error(false),         m_aesmsg(false),
     m_startup(0),           m_bitrate(0),           m_seektoend(false),
-    m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL),
+    m_streamworker(nullptr),m_playlistworker(nullptr), m_fd(nullptr),
     m_interrupted(false),   m_killed(false)
 {
     startreadahead = false;
@@ -1579,7 +1579,7 @@ HLSRingBuffer::HLSRingBuffer(const QString &lfilename, bool open) :
     m_playback(new HLSPlayback()),
     m_meta(false),          m_error(false),         m_aesmsg(false),
     m_startup(0),           m_bitrate(0),           m_seektoend(false),
-    m_streamworker(NULL),   m_playlistworker(NULL), m_fd(NULL),
+    m_streamworker(nullptr),m_playlistworker(nullptr), m_fd(nullptr),
     m_interrupted(false),   m_killed(false)
 {
     startreadahead = false;
@@ -1646,15 +1646,15 @@ HLSStream *HLSRingBuffer::GetStreamForSegment(int segnum) const
 
 HLSStream *HLSRingBuffer::GetStream(const int wanted, const StreamsList *streams) const
 {
-    if (streams == NULL)
+    if (streams == nullptr)
     {
         streams = &m_streams;
     }
     int count = streams->size();
     if (count <= 0)
-        return NULL;
+        return nullptr;
     if ((wanted < 0) || (wanted >= count))
-        return NULL;
+        return nullptr;
     return streams->at(wanted);
 }
 
@@ -1665,13 +1665,13 @@ HLSStream *HLSRingBuffer::GetFirstStream(const StreamsList *streams) const
 
 HLSStream *HLSRingBuffer::GetLastStream(const StreamsList *streams) const
 {
-    if (streams == NULL)
+    if (streams == nullptr)
     {
         streams = &m_streams;
     }
     int count = streams->size();
     if (count <= 0)
-        return NULL;
+        return nullptr;
     count--;
     return GetStream(count, streams);
 }
@@ -1679,7 +1679,7 @@ HLSStream *HLSRingBuffer::GetLastStream(const StreamsList *streams) const
 HLSStream *HLSRingBuffer::FindStream(const HLSStream *hls_new,
                                      const StreamsList *streams) const
 {
-    if (streams == NULL)
+    if (streams == nullptr)
     {
         streams = &m_streams;
     }
@@ -1698,7 +1698,7 @@ HLSStream *HLSRingBuffer::FindStream(const HLSStream *hls_new,
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -1708,7 +1708,7 @@ HLSStream *HLSRingBuffer::GetCurrentStream(void) const
 {
     if (!m_streamworker)
     {
-        return NULL;
+        return nullptr;
     }
     return GetStream(m_streamworker->CurrentStream());
 }
@@ -1755,7 +1755,7 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
     // Do a peek on the URL to test the format
     RingBuffer::AVFormatInitNetwork();
     int ret = ffurl_open(&context, filename.toLatin1(),
-                         AVIO_FLAG_READ, NULL, NULL);
+                         AVIO_FLAG_READ, nullptr, nullptr);
     if (ret >= 0)
     {
         unsigned char buffer[1024];
@@ -1919,14 +1919,14 @@ HLSStream *HLSRingBuffer::ParseStreamInformation(const QString &line, const QStr
     if (attr.isNull())
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "#EXT-X-STREAM-INF: expected BANDWIDTH=<value>");
-        return NULL;
+        return nullptr;
     }
     bw = attr.toInt();
 
     if (bw == 0)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "#EXT-X-STREAM-INF: bandwidth cannot be 0");
-        return NULL;
+        return nullptr;
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -2145,7 +2145,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
      * ALLOW-CACHE, EXT-X-STREAM-INF, EXT-X-ENDLIST, EXT-X-DISCONTINUITY,
      * and EXT-X-VERSION.
      */
-    if (streams == NULL)
+    if (streams == nullptr)
     {
         streams = &m_streams;
     }
@@ -2246,7 +2246,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
     }
     else
     {
-        HLSStream *hls = NULL;
+        HLSStream *hls = nullptr;
         if (m_meta)
             hls = GetLastStream(streams);
         else
@@ -2373,11 +2373,11 @@ void HLSRingBuffer::SanityCheck(const HLSStream *hls) const
 /**
  * Retrieve segment [segnum] from any available streams.
  * Assure that the segment has been downloaded
- * Return NULL if segment couldn't be retrieved after timeout (in ms)
+ * Return nullptr if segment couldn't be retrieved after timeout (in ms)
  */
 HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
 {
-    HLSSegment *segment = NULL;
+    HLSSegment *segment = nullptr;
     int stream = m_streamworker->StreamForSegment(segnum);
     if (stream < 0)
     {
@@ -2398,7 +2398,7 @@ HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
         }
         m_streamworker->Unlock();
         if (stream < 0)
-            return NULL;
+            return nullptr;
     }
     HLSStream *hls = GetStream(stream);
     hls->Lock();
@@ -2419,7 +2419,7 @@ int HLSRingBuffer::NumStreams(void) const
 int HLSRingBuffer::NumSegments(void) const
 {
     HLSStream *hls = GetStream(0);
-    if (hls == NULL)
+    if (hls == nullptr)
         return 0;
     hls->Lock();
     int count = hls->NumSegments();
@@ -2475,7 +2475,7 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
 {
     // no lock is required as, at this stage, no threads have either been started
     // or we are working on a stream list unique to PlaylistWorker
-    if (streams == NULL)
+    if (streams == nullptr)
     {
         streams = &m_streams;
     }
@@ -2623,7 +2623,7 @@ bool HLSRingBuffer::SaveToDisk(const QString &filename, int segstart, int segend
 {
     // download it all
     FILE *fp = fopen(filename.toLatin1().constData(), "w");
-    if (fp == NULL)
+    if (fp == nullptr)
         return false;
     int count = NumSegments();
     if (segend < 0)
@@ -2633,7 +2633,7 @@ bool HLSRingBuffer::SaveToDisk(const QString &filename, int segstart, int segend
     for (int i = segstart; i < segend; i++)
     {
         HLSSegment *segment = GetSegment(i);
-        if (segment == NULL)
+        if (segment == nullptr)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 QString("downloading %1 failed").arg(i));
@@ -2728,10 +2728,10 @@ int HLSRingBuffer::safe_read(void *data, uint sz)
             continue;
         }
         HLSStream *hls = GetStream(stream);
-        if (hls == NULL)
+        if (hls == nullptr)
             break;
         HLSSegment *segment = hls->GetSegment(segnum);
-        if (segment == NULL)
+        if (segment == nullptr)
             break;
 
         segment->Lock();
@@ -2788,12 +2788,12 @@ int HLSRingBuffer::DurationForBytes(uint size)
         return 0;
     }
     HLSStream *hls = GetStream(stream);
-    if (hls == NULL)
+    if (hls == nullptr)
     {
         return 0;
     }
     HLSSegment *segment = hls->GetSegment(segnum);
-    if (segment == NULL)
+    if (segment == nullptr)
     {
         return 0;
     }
@@ -2853,7 +2853,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
 
     /* restore current segment's file position indicator to 0 */
     segment = hls->GetSegment(segnum);
-    if (segment != NULL)
+    if (segment != nullptr)
     {
         segment->Lock();
         segment->Reset();
@@ -2876,13 +2876,13 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     for (int n = m_startup; n < count; n++)
     {
         hls = GetStreamForSegment(n);
-        if (hls == NULL)
+        if (hls == nullptr)
         {
             // error, should never happen, irrecoverable error
             return -1;
         }
         segment = hls->GetSegment(n);
-        if (segment == NULL)
+        if (segment == nullptr)
         {
             // stream doesn't contain segment error can't continue,
             // unknown error
@@ -2953,14 +2953,14 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     }
     else
     {
-        if (segment == NULL) // can never happen, make coverity happy
+        if (segment == nullptr) // can never happen, make coverity happy
         {
             // stream doesn't contain segment error can't continue,
             // unknown error
             return -1;
         }
         int32_t skip = ((postime - starttime) * segment->Size()) / segment->Duration();
-        segment->Read(NULL, skip);
+        segment->Read(nullptr, skip);
     }
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("seek completed in %1s").arg((mdate() - starting) / 1000000.0));

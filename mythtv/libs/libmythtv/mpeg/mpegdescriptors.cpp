@@ -84,7 +84,7 @@ const unsigned char *MPEGDescriptor::Find(const desc_list_t &parsed,
         if ((*it)[0] == desc_tag)
             return *it;
     }
-    return NULL;
+    return nullptr;
 }
 
 desc_list_t MPEGDescriptor::FindAll(const desc_list_t &parsed, uint desc_tag)
@@ -145,7 +145,7 @@ const unsigned char *MPEGDescriptor::FindBestMatch(
         return parsed[unmatched_idx];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 desc_list_t MPEGDescriptor::FindBestMatches(
