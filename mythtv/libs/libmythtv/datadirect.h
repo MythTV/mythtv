@@ -307,7 +307,7 @@ class MTV_PUBLIC DataDirectProcessor
                         QString userid = "", QString password = "");
     ~DataDirectProcessor();
 
-    QString CreateTempDirectory(bool *ok = NULL) const;
+    QString CreateTempDirectory(bool *ok = nullptr) const;
 
     // web service commands
     bool GrabData(const QDateTime &startdate, const QDateTime &enddate);

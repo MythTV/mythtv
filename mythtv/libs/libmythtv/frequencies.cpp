@@ -2249,5 +2249,5 @@ struct CHANLISTS chanlists[] = {
     { "malaysia",         pal_bcast_my,      CHAN_COUNT(pal_bcast_my)      },
     { "israel-hot-matav", israel_hot_matav,  CHAN_COUNT(israel_hot_matav)  },
     { "try-all",          try_all,           CHAN_COUNT(try_all)           },
-    { NULL, NULL, 0 } /* EOF */
+    { nullptr, nullptr, 0 } /* EOF */
 };

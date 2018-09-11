@@ -49,7 +49,7 @@ inline uint32_t Len2Blocks(uint32_t len)
 }
 
 DVDStream::DVDStream(const QString& filename)
-: RingBuffer(kRingBuffer_File), m_reader(0), m_start(0), m_pos(0), m_title(-1)
+: RingBuffer(kRingBuffer_File), m_reader(nullptr), m_start(0), m_pos(0), m_title(-1)
 {
     OpenFile(filename);
 }
@@ -102,7 +102,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
             LOG(VB_GENERAL, LOG_ERR, QString("DVDStream(%1) UDFFindFile(%2) failed").
                 arg(root).arg(path));
             DVDClose(m_reader);
-            m_reader = 0;
+            m_reader = nullptr;
             rwlock.unlock();
             return false;
         }
@@ -159,7 +159,7 @@ bool DVDStream::OpenFile(const QString &filename, uint /*retry_ms*/)
 bool DVDStream::IsOpen(void) const
 {
     rwlock.lockForRead();
-    bool ret = m_reader != 0;
+    bool ret = m_reader != nullptr;
     rwlock.unlock();
     return ret;
 }

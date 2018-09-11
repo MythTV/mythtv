@@ -30,10 +30,10 @@
  */
 
 EITScanner::EITScanner(uint _cardnum)
-    : channel(NULL),              eitSource(NULL),
+    : channel(nullptr),           eitSource(nullptr),
       eitHelper(new EITHelper()), eventThread(new MThread("EIT", this)),
       exitThread(false),
-      rec(NULL),                  activeScan(false),
+      rec(nullptr),               activeScan(false),
       activeScanStopped(true),    activeScanTrigTime(0),
       activeScanNextChanIndex(random()),
       cardnum(_cardnum)
@@ -56,12 +56,12 @@ void EITScanner::TeardownAll(void)
     }
     eventThread->wait();
     delete eventThread;
-    eventThread = NULL;
+    eventThread = nullptr;
 
     if (eitHelper)
     {
         delete eitHelper;
-        eitHelper = NULL;
+        eitHelper = nullptr;
     }
 }
 
@@ -227,10 +227,10 @@ void EITScanner::StopPassiveScan(void)
 
     if (eitSource)
     {
-        eitSource->SetEITHelper(NULL);
-        eitSource  = NULL;
+        eitSource->SetEITHelper(nullptr);
+        eitSource  = nullptr;
     }
-    channel = NULL;
+    channel = nullptr;
 
     eitHelper->WriteEITCache();
     eitHelper->SetChannelID(0);
@@ -316,5 +316,5 @@ void EITScanner::StopActiveScan(void)
     while (!activeScan && !activeScanStopped)
         activeScanCond.wait(&lock, 100);
 
-    rec = NULL;
+    rec = nullptr;
 }

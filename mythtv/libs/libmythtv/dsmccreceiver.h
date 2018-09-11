@@ -14,7 +14,7 @@ class DsmccDii
         download_id(0),          block_size(0),
         tc_download_scenario(0), number_modules(0),
         private_data_len(0),
-        modules(NULL),           private_data(NULL) {}
+        modules(nullptr),        private_data(nullptr) {}
 
     ~DsmccDii()
     {

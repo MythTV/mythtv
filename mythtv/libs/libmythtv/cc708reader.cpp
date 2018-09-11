@@ -123,7 +123,7 @@ void CC708Reader::DisplayWindows(uint service_num, int window_map)
             if (win.text)
             {
                 delete [] win.text;
-                win.text = NULL;
+                win.text = nullptr;
             }
         }
         CC708DelayedDeletes[service_num & 63] = 0;

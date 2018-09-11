@@ -310,7 +310,7 @@ void DiSEqCDevTrees::InvalidateTrees(void)
 const uint DiSEqCDevTree::kFirstFakeDiSEqCID = 0xf0000000;
 
 DiSEqCDevTree::DiSEqCDevTree() :
-    m_fd_frontend(-1), m_root(NULL),
+    m_fd_frontend(-1), m_root(nullptr),
     m_previous_fake_diseqcid(kFirstFakeDiSEqCID)
 {
     Reset();
@@ -363,7 +363,7 @@ bool DiSEqCDevTree::Load(uint cardid)
     // clear children
     delete m_root;
     m_delete.clear();
-    m_root = NULL;
+    m_root = nullptr;
 
     // lookup configuration for this card
     MSqlQuery query(MSqlQuery::InitCon());
@@ -559,12 +559,12 @@ void DiSEqCDevTree::Reset(void)
  *  \brief Returns the nth rotor device object in the tree.
  *  \param settings Configuration chain in effect.
  *  \param index 0 for first rotor, 1 for second, etc.
- *  \return Pointer to rotor object if found, NULL otherwise.
+ *  \return Pointer to rotor object if found, nullptr otherwise.
  */
 DiSEqCDevRotor *DiSEqCDevTree::FindRotor(const DiSEqCDevSettings &settings, uint index)
 {
     DiSEqCDevDevice *node  = m_root;
-    DiSEqCDevRotor  *rotor = NULL;
+    DiSEqCDevRotor  *rotor = nullptr;
 
     for (uint count = 0; node;)
     {
@@ -582,12 +582,12 @@ DiSEqCDevRotor *DiSEqCDevTree::FindRotor(const DiSEqCDevSettings &settings, uint
 /** \fn DiSEqCDevTree::FindLNB(const DiSEqCDevSettings&)
  *  \brief Returns the LNB device object selected by the configuration chain.
  *  \param settings Configuration chain in effect.
- *  \return Pointer to LNB object if found, NULL otherwise.
+ *  \return Pointer to LNB object if found, nullptr otherwise.
  */
 DiSEqCDevLNB *DiSEqCDevTree::FindLNB(const DiSEqCDevSettings &settings)
 {
     DiSEqCDevDevice *node = m_root;
-    DiSEqCDevLNB    *lnb  = NULL;
+    DiSEqCDevLNB    *lnb  = nullptr;
 
     while (node)
     {
@@ -605,12 +605,12 @@ DiSEqCDevLNB *DiSEqCDevTree::FindLNB(const DiSEqCDevSettings &settings)
 /** \fn DiSEqCDevTree::FindSCR(const DiSEqCDevSettings&)
  *  \brief Returns the SCR device object selected by the configuration chain.
  *  \param settings Configuration chain in effect.
- *  \return Pointer to SCR object if found, NULL otherwise.
+ *  \return Pointer to SCR object if found, nullptr otherwise.
  */
 DiSEqCDevSCR *DiSEqCDevTree::FindSCR(const DiSEqCDevSettings &settings)
 {
     DiSEqCDevDevice *node = m_root;
-    DiSEqCDevSCR    *scr  = NULL;
+    DiSEqCDevSCR    *scr  = nullptr;
 
     while (node)
     {
@@ -629,19 +629,19 @@ DiSEqCDevSCR *DiSEqCDevTree::FindSCR(const DiSEqCDevSettings &settings)
 /** \fn DiSEqCDevTree::FindDevice(uint)
  *  \brief Returns a device by ID.
  *  \param dev_id Device ID to find.
- *  \return Pointer to device, or NULL if not found in this tree.
+ *  \return Pointer to device, or nullptr if not found in this tree.
  */
 DiSEqCDevDevice *DiSEqCDevTree::FindDevice(uint dev_id)
 {
     if (m_root)
         return m_root->FindDevice(dev_id);
 
-    return NULL;
+    return nullptr;
 }
 
 /** \fn DiSEqCDevTree::SetRoot(DiSEqCDevDevice*)
  *  \brief Changes the root node of the tree.
- *  \param root New root node (may be NULL).
+ *  \param root New root node (may be nullptr).
  */
 void DiSEqCDevTree::SetRoot(DiSEqCDevDevice *root)
 {
@@ -890,7 +890,7 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevDevice::dvbdev_lookup[5] =
 DiSEqCDevDevice::DiSEqCDevDevice(DiSEqCDevTree &tree, uint devid)
     : m_devid(devid),           m_dev_type(kTypeLNB),
                                 m_tree(tree),
-      m_parent(NULL),           m_ordinal(0),
+      m_parent(nullptr),        m_ordinal(0),
       m_repeat(1)
 {
 }
@@ -903,7 +903,7 @@ DiSEqCDevDevice::~DiSEqCDevDevice()
 
 DiSEqCDevDevice *DiSEqCDevDevice::FindDevice(uint dev_id)
 {
-    DiSEqCDevDevice *dev = NULL;
+    DiSEqCDevDevice *dev = nullptr;
 
     if (GetDeviceID() == dev_id)
         dev = this;
@@ -938,14 +938,14 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateById(DiSEqCDevTree &tree, uint devid)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("DiSEqCDevDevice::CreateById", query);
-        return NULL;
+        return nullptr;
     }
     else if (!query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "CreateById failed to find dtv dev " +
                 QString("%1").arg(devid));
 
-        return NULL;
+        return nullptr;
     }
 
     dvbdev_t      type = DevTypeFromString(query.value(0).toString());
@@ -968,7 +968,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
     if (!dev_id)
         dev_id = tree.CreateFakeDiSEqCID();
 
-    DiSEqCDevDevice *node = NULL;
+    DiSEqCDevDevice *node = nullptr;
     switch (type)
     {
         case kTypeSwitch:
@@ -1026,7 +1026,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
 /** \fn DiSEqCDevDevice::GetSelectedChild(const DiSEqCDevSettings& settings) const
  *  \brief Retrieves the selected child for this configuration, if any.
  *  \param settings Configuration chain in effect.
- *  \return Child node object, or NULL if none.
+ *  \return Child node object, or nullptr if none.
  */
 
 /** \fn DiSEqCDevDevice::GetChildCount(void) const
@@ -1037,13 +1037,13 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
 /** \fn DiSEqCDevDevice::GetChild(uint ordinal)
  *  \brief Retrieves the nth child of this node.
  *  \param ordinal Child number (starting at 0).
- *  \return Pointer to device object, or NULL if no child.
+ *  \return Pointer to device object, or nullptr if no child.
  */
 
 /** \fn DiSEqCDevDevice::SetChild(uint ordinal,DiSEqCDevDevice* device)
  *  \brief Changes the nth child of this node.
  *  \param ordinal Child number (starting at 0).
- *  \param device New child device. (may be NULL)
+ *  \param device New child device. (may be nullptr)
  *  \return true if object was added to tree.
  */
 
@@ -1067,7 +1067,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
 /** \fn DiSEqCDevDevice::FindDevice(uint)
  *   Returns a device by ID.
  *  \param dev_id Device ID to find.
- *  \return Pointer to device, or NULL if not found in this tree.
+ *  \return Pointer to device, or nullptr if not found in this tree.
  */
 
 //////////////////////////////////////// DiSEqCDevSwitch
@@ -1097,7 +1097,7 @@ DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
     m_children.resize(m_num_ports);
 
     for (uint i = 0; i < m_num_ports; i++)
-        m_children[i] = NULL;
+        m_children[i] = nullptr;
 
     Reset();
 }
@@ -1198,7 +1198,7 @@ DiSEqCDevDevice *DiSEqCDevSwitch::GetSelectedChild(const DiSEqCDevSettings &sett
     // sanity check switch position
     int pos = GetPosition(settings);
     if (pos < 0)
-        return NULL;
+        return nullptr;
 
     return m_children[pos];
 }
@@ -1213,7 +1213,7 @@ DiSEqCDevDevice *DiSEqCDevSwitch::GetChild(uint ordinal)
     if (ordinal < m_children.size())
         return m_children[ordinal];
 
-    return NULL;
+    return nullptr;
 }
 
 bool DiSEqCDevSwitch::SetChild(uint ordinal, DiSEqCDevDevice *device)
@@ -1279,7 +1279,7 @@ bool DiSEqCDevSwitch::Load(void)
         m_repeat = query.value(3).toUInt();
         m_children.resize(m_num_ports);
         for (uint i = 0; i < m_num_ports; i++)
-            m_children[i] = NULL;
+            m_children[i] = nullptr;
     }
 
     // load children from db
@@ -1393,7 +1393,7 @@ void DiSEqCDevSwitch::SetNumPorts(uint num_ports)
     {
         m_children.resize(num_ports);
         for (uint ch = old_num; ch < num_ports; ch++)
-            m_children[ch] = NULL;
+            m_children[ch] = nullptr;
     }
 
     m_num_ports = num_ports;
@@ -1413,7 +1413,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
     static const unsigned char sw64_v_cmds[] = { 0x39, 0x4b, 0x0d, };
     static const unsigned char sw64_h_cmds[] = { 0x1a, 0x5c, 0x2e, };
 
-    const unsigned char *cmds = NULL;
+    const unsigned char *cmds = nullptr;
     unsigned char horizcmd = 0x00;
     uint num_ports = 0;
 
@@ -1724,7 +1724,7 @@ int DiSEqCDevSwitch::GetPosition(const DiSEqCDevSettings &settings) const
 static double GetCurTimeFloating(void)
 {
     struct timeval curtime;
-    gettimeofday(&curtime, NULL);
+    gettimeofday(&curtime, nullptr);
     return (double)curtime.tv_sec + (((double)curtime.tv_usec) / 1000000);
 }
 
@@ -1736,14 +1736,14 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevRotor::RotorTypeTable[] =
 {
     { "diseqc_1_2", kTypeDiSEqC_1_2 },
     { "diseqc_1_3", kTypeDiSEqC_1_3 },
-    { NULL, kTypeDiSEqC_1_3 }
+    { nullptr, kTypeDiSEqC_1_3 }
 };
 
 DiSEqCDevRotor::DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
     : DiSEqCDevDevice(tree, devid),
       m_type(kTypeDiSEqC_1_3),
       m_speed_hi(2.5),          m_speed_lo(1.9),
-      m_child(NULL),
+      m_child(nullptr),
       m_last_position(0.0),     m_desired_azimuth(0.0),
       m_reset(true),            m_move_time(0.0),
       m_last_pos_known(false),  m_last_azimuth(0.0)
@@ -1826,7 +1826,7 @@ bool DiSEqCDevRotor::SetChild(uint ordinal, DiSEqCDevDevice *device)
         return false;
 
     DiSEqCDevDevice *old_child = m_child;
-    m_child = NULL;
+    m_child = nullptr;
     if (old_child)
         delete old_child;
 
@@ -1906,7 +1906,7 @@ bool DiSEqCDevRotor::Load(void)
     if (m_child)
     {
         delete m_child;
-        m_child = NULL;
+        m_child = nullptr;
     }
 
     query.prepare(
@@ -2165,7 +2165,7 @@ DiSEqCDevSCR::DiSEqCDevSCR(DiSEqCDevTree &tree, uint devid)
     , m_scr_userband(0)
     , m_scr_frequency(1400)
     , m_scr_pin(-1)
-    , m_child(0)
+    , m_child(nullptr)
 {
     Reset();
 }
@@ -2337,7 +2337,7 @@ bool DiSEqCDevSCR::Load(void)
     if (m_child)
     {
         delete m_child;
-        m_child = NULL;
+        m_child = nullptr;
     }
 
     query.prepare(
@@ -2427,7 +2427,7 @@ bool DiSEqCDevSCR::SetChild(uint ordinal, DiSEqCDevDevice *device)
         return false;
 
     DiSEqCDevDevice *old_child = m_child;
-    m_child = NULL;
+    m_child = nullptr;
     if (old_child)
         delete old_child;
 

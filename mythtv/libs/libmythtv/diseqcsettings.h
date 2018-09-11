@@ -139,9 +139,9 @@ class DeviceTree : public GroupSetting
   protected:
     void PopulateTree(void);
     void PopulateTree(DiSEqCDevDevice *node,
-                      DiSEqCDevDevice *parent   = NULL,
+                      DiSEqCDevDevice *parent   = nullptr,
                       uint             childnum = 0,
-                      GroupSetting    *parentSetting = NULL);
+                      GroupSetting    *parentSetting = nullptr);
     void PopulateChildren(DiSEqCDevDevice *node, GroupSetting *parentSetting);
     void AddDeviceTypeSetting(DeviceTypeSetting *devtype,
                               DiSEqCDevDevice *parent,

@@ -53,7 +53,7 @@ public:
     }
     bool operator !() const
     {
-        return m_frame == NULL;
+        return m_frame == nullptr;
     }
     AVFrame* operator->() const
     {
@@ -93,7 +93,7 @@ class MTV_PUBLIC MythCodecMap
     ~MythCodecMap();
     static MythCodecMap *getInstance();
     AVCodecContext *getCodecContext(const AVStream*,
-        const AVCodec *pCodec = NULL, bool nullCodec = false);
+        const AVCodec *pCodec = nullptr, bool nullCodec = false);
     AVCodecContext *hasCodecContext(const AVStream*);
     void freeCodecContext(const AVStream*);
     void freeAllCodecContexts();
@@ -128,7 +128,7 @@ public:
      * av_freep(pic->data[0])
      */
     int Copy(AVFrame *pic, const VideoFrame *frame,
-             unsigned char *buffer = NULL,
+             unsigned char *buffer = nullptr,
              AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
     /**
      * Copy
@@ -173,7 +173,7 @@ public:
     ~MythPictureDeinterlacer();
     // Will deinterlace src into dst. If EAGAIN is returned, more frames
     // are needed to output a frame.
-    // To drain the deinterlacer, call Deinterlace with src = NULL until you
+    // To drain the deinterlacer, call Deinterlace with src = nullptr until you
     // get no more frames. Once drained, you must call Flush() to start
     // deinterlacing again.
     int Deinterlace(AVFrame *dst, const AVFrame *src);

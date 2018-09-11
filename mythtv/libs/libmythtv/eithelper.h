@@ -26,13 +26,13 @@ class ATSCEvent
     ATSCEvent(uint a, uint b, uint c, QString d,
               const unsigned char *e, uint f)
         : start_time(a), length(b), etm(c), desc_length(f), title(d), desc(e),
-          scan_time(time(NULL)) {}
+          scan_time(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for EIT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any EIT event seen > 2 minutes in the past as stale.
-        return scan_time + 2 * 60 < time(NULL);
+        return scan_time + 2 * 60 < time(nullptr);
     }
 
     uint32_t start_time;
@@ -51,13 +51,13 @@ class ATSCEvent
 class ATSCEtt
 {
   public:
-    explicit ATSCEtt(QString text) : ett_text(text), scan_time(time(NULL)) {}
+    explicit ATSCEtt(QString text) : ett_text(text), scan_time(time(nullptr)) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for ETT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any ETT event seen > 2 minutes in the past as stale.
-        return scan_time + 2 * 60 < time(NULL);
+        return scan_time + 2 * 60 < time(nullptr);
     }
 
     QString ett_text;

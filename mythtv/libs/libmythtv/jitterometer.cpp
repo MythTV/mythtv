@@ -10,7 +10,7 @@
 
 Jitterometer::Jitterometer(const QString &nname, int ncycles)
   : count(0), num_cycles(ncycles), starttime_valid(0), last_fps(0),
-    last_sd(0), name(nname), cpustat(NULL), laststats(NULL)
+    last_sd(0), name(nname), cpustat(nullptr), laststats(nullptr)
 {
     times.resize(num_cycles);
     memset(&starttime, 0, sizeof(struct timeval));
@@ -27,7 +27,7 @@ Jitterometer::Jitterometer(const QString &nname, int ncycles)
             if (!cpustat->open(QIODevice::ReadOnly))
             {
                 delete cpustat;
-                cpustat = NULL;
+                cpustat = nullptr;
             }
             else
             {
@@ -70,7 +70,7 @@ bool Jitterometer::RecordEndTime()
 
     int cycles = num_cycles;
     struct timeval timenow;
-    gettimeofday(&timenow, NULL);
+    gettimeofday(&timenow, nullptr);
 
     if (starttime_valid)
     {
@@ -129,7 +129,7 @@ void Jitterometer::RecordStartTime()
 {
     if (!num_cycles)
         return;
-    gettimeofday(&starttime, NULL);
+    gettimeofday(&starttime, nullptr);
     starttime_valid = 1;
 }
 

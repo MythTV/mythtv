@@ -85,7 +85,7 @@ const DTVParamHelperStruct DTVTunerType::parseTable[] =
     { "ASI",     kTunerTypeASI     },
     { "OCUR",    kTunerTypeOCUR    },
     { "UNKNOWN", kTunerTypeUnknown },
-    { NULL,      kTunerTypeUnknown },
+    { nullptr,   kTunerTypeUnknown },
 };
 
 const DTVParamHelperStruct DTVInversion::confTable[] =
@@ -93,7 +93,7 @@ const DTVParamHelperStruct DTVInversion::confTable[] =
    { "INVERSION_AUTO", kInversionAuto },
    { "INVERSION_OFF",  kInversionOff  },
    { "INVERSION_ON",   kInversionOn   },
-   { NULL,             kInversionAuto },
+   { nullptr,          kInversionAuto },
 };
 
 const DTVParamHelperStruct DTVInversion::vdrTable[] =
@@ -101,7 +101,7 @@ const DTVParamHelperStruct DTVInversion::vdrTable[] =
    { "999", kInversionAuto },
    { "0",   kInversionOff  },
    { "1",   kInversionOn   },
-   { NULL,  kInversionAuto },
+   { nullptr, kInversionAuto },
 };
 
 const DTVParamHelperStruct DTVInversion::parseTable[] =
@@ -109,7 +109,7 @@ const DTVParamHelperStruct DTVInversion::parseTable[] =
    { "a",  kInversionAuto },
    { "0",  kInversionOff  },
    { "1",  kInversionOn   },
-   { NULL, kInversionAuto },
+   { nullptr, kInversionAuto },
 };
 
 const char *DTVInversion::dbStr[DTVInversion::kDBStrCnt] =
@@ -125,7 +125,7 @@ const DTVParamHelperStruct DTVBandwidth::confTable[] =
    { "BANDWIDTH_8_MHZ", kBandwidth8MHz },
    { "BANDWIDTH_7_MHZ", kBandwidth7MHz },
    { "BANDWIDTH_6_MHZ", kBandwidth6MHz },
-   { NULL,              kBandwidthAuto },
+   { nullptr,           kBandwidthAuto },
 };
 
 const DTVParamHelperStruct DTVBandwidth::vdrTable[] =
@@ -134,7 +134,7 @@ const DTVParamHelperStruct DTVBandwidth::vdrTable[] =
    { "8",   kBandwidth8MHz },
    { "7",   kBandwidth7MHz },
    { "6",   kBandwidth6MHz },
-   { NULL,  kBandwidthAuto },
+   { nullptr, kBandwidthAuto },
 };
 
 const DTVParamHelperStruct DTVBandwidth::parseTable[] =
@@ -143,7 +143,7 @@ const DTVParamHelperStruct DTVBandwidth::parseTable[] =
    { "8",    kBandwidth8MHz },
    { "7",    kBandwidth7MHz },
    { "6",    kBandwidth6MHz },
-   { NULL,   kBandwidthAuto },
+   { nullptr,kBandwidthAuto },
 };
 
 const char *DTVBandwidth::dbStr[DTVBandwidth::kDBStrCnt] =
@@ -168,7 +168,7 @@ const DTVParamHelperStruct DTVCodeRate::confTable[] =
     { "FEC_NONE", kFECNone },
     { "FEC_3_5",  kFEC_3_5  },
     { "FEC_9_10", kFEC_9_10 },
-    { NULL,       kFECAuto },
+    { nullptr,    kFECAuto },
 };
 
 const DTVParamHelperStruct DTVCodeRate::vdrTable[] =
@@ -185,7 +185,7 @@ const DTVParamHelperStruct DTVCodeRate::vdrTable[] =
     { "0",   kFECNone },
     { "35",  kFEC_3_5 },
     { "910", kFEC_9_10 },
-    { NULL,  kFECAuto }
+    { nullptr, kFECAuto }
 };
 
 const DTVParamHelperStruct DTVCodeRate::parseTable[] =
@@ -202,7 +202,7 @@ const DTVParamHelperStruct DTVCodeRate::parseTable[] =
     { "none", kFECNone },
     { "3/5",  kFEC_3_5 },
     { "9/10", kFEC_9_10},
-    { NULL,   kFECAuto }
+    { nullptr, kFECAuto }
 };
 
 const char *DTVCodeRate::dbStr[DTVCodeRate::kDBStrCnt] =
@@ -241,7 +241,7 @@ const DTVParamHelperStruct DTVModulation::confTable[] =
    { "4VSB",     kModulationInvalid },
    { "BPSK",     kModulationInvalid },
    { "analog",   kModulationAnalog  },
-   { NULL,       kModulationQAMAuto },
+   { nullptr,    kModulationQAMAuto },
 };
 
 const DTVParamHelperStruct DTVModulation::vdrTable[] =
@@ -258,7 +258,7 @@ const DTVParamHelperStruct DTVModulation::vdrTable[] =
    { "7",   kModulation32APSK  },
    { "10",  kModulation8VSB    },
    { "11",  kModulation16VSB   },
-   { NULL,  kModulationQAMAuto },
+   { nullptr, kModulationQAMAuto },
 };
 
 const DTVParamHelperStruct DTVModulation::parseTable[] =
@@ -299,7 +299,7 @@ const DTVParamHelperStruct DTVModulation::parseTable[] =
    { "4-vsb",    kModulationInvalid },
    { "16psk",    kModulationInvalid },
    { "16-psk",   kModulationInvalid },
-   { NULL,       kModulationQAMAuto },
+   { nullptr,    kModulationQAMAuto },
 };
 
 const char *DTVModulation::dbStr[DTVModulation::kDBStrCnt] =
@@ -324,7 +324,7 @@ const DTVParamHelperStruct DTVTransmitMode::confTable[] =
    { "TRANSMISSION_MODE_AUTO", kTransmissionModeAuto },
    { "TRANSMISSION_MODE_2K",   kTransmissionMode2K   },
    { "TRANSMISSION_MODE_8K",   kTransmissionMode8K   },
-   { NULL,                     kTransmissionModeAuto },
+   { nullptr,                  kTransmissionModeAuto },
 };
 
 const DTVParamHelperStruct DTVTransmitMode::vdrTable[] =
@@ -332,7 +332,7 @@ const DTVParamHelperStruct DTVTransmitMode::vdrTable[] =
    { "999", kTransmissionModeAuto },
    { "2",   kTransmissionMode2K   },
    { "8",   kTransmissionMode8K   },
-   { NULL,  kTransmissionModeAuto },
+   { nullptr, kTransmissionModeAuto },
 };
 
 const DTVParamHelperStruct DTVTransmitMode::parseTable[] =
@@ -340,7 +340,7 @@ const DTVParamHelperStruct DTVTransmitMode::parseTable[] =
    { "a",    kTransmissionModeAuto },
    { "2",    kTransmissionMode2K   },
    { "8",    kTransmissionMode8K   },
-   { NULL,   kTransmissionModeAuto },
+   { nullptr,  kTransmissionModeAuto },
 };
 
 const char *DTVTransmitMode::dbStr[DTVTransmitMode::kDBStrCnt] =
@@ -357,7 +357,7 @@ const DTVParamHelperStruct DTVGuardInterval::confTable[] =
    { "GUARD_INTERVAL_1_16", kGuardInterval_1_16 },
    { "GUARD_INTERVAL_1_8",  kGuardInterval_1_8  },
    { "GUARD_INTERVAL_1_4",  kGuardInterval_1_4  },
-   { NULL,                  kGuardIntervalAuto  },
+   { nullptr,               kGuardIntervalAuto  },
 };
 
 const DTVParamHelperStruct DTVGuardInterval::vdrTable[] =
@@ -367,7 +367,7 @@ const DTVParamHelperStruct DTVGuardInterval::vdrTable[] =
    { "16",  kGuardInterval_1_16 },
    { "8",   kGuardInterval_1_8  },
    { "4",   kGuardInterval_1_4  },
-   { NULL,  kGuardIntervalAuto  },
+   { nullptr, kGuardIntervalAuto  },
 };
 
 const DTVParamHelperStruct DTVGuardInterval::parseTable[] =
@@ -377,7 +377,7 @@ const DTVParamHelperStruct DTVGuardInterval::parseTable[] =
    { "1/16", kGuardInterval_1_16 },
    { "1/8",  kGuardInterval_1_8  },
    { "1/4",  kGuardInterval_1_4  },
-   { NULL,   kGuardIntervalAuto  },
+   { nullptr, kGuardIntervalAuto  },
 };
 
 const char *DTVGuardInterval::dbStr[DTVGuardInterval::kDBStrCnt] =
@@ -396,7 +396,7 @@ const DTVParamHelperStruct DTVHierarchy::confTable[] =
    { "HIERARCHY_2",    kHierarchy2    },
    { "HIERARCHY_4",    kHierarchy4    },
    { "HIERARCHY_AUTO", kHierarchyAuto },
-   { NULL,             kHierarchyAuto },
+   { nullptr,          kHierarchyAuto },
 };
 
 const DTVParamHelperStruct DTVHierarchy::vdrTable[] =
@@ -406,7 +406,7 @@ const DTVParamHelperStruct DTVHierarchy::vdrTable[] =
    { "2",   kHierarchy2    },
    { "4",   kHierarchy4    },
    { "999", kHierarchyAuto },
-   { NULL,  kHierarchyAuto },
+   { nullptr, kHierarchyAuto },
 };
 
 const DTVParamHelperStruct DTVHierarchy::parseTable[] =
@@ -416,7 +416,7 @@ const DTVParamHelperStruct DTVHierarchy::parseTable[] =
    { "2",  kHierarchy2    },
    { "4",  kHierarchy4    },
    { "a",  kHierarchyAuto },
-   { NULL, kHierarchyAuto },
+   { nullptr, kHierarchyAuto },
 };
 
 const char *DTVHierarchy::dbStr[DTVHierarchy::kDBStrCnt] =
@@ -434,7 +434,7 @@ const DTVParamHelperStruct DTVPolarity::parseTable[] =
     { "h",  kPolarityHorizontal },
     { "r",  kPolarityRight      },
     { "l",  kPolarityLeft       },
-    { NULL, kPolarityVertical   },
+    { nullptr, kPolarityVertical   },
 };
 
 const char *DTVPolarity::dbStr[DTVPolarity::kDBStrCnt] =
@@ -466,14 +466,14 @@ const DTVParamHelperStruct DTVModulationSystem::confTable[] =
     { "SYS_DAB",           kModulationSystem_DAB           },
     { "SYS_TURBO",         kModulationSystem_TURBO         },
     { "SYS_DVBC_ANNEX_C",  kModulationSystem_DVBC_ANNEX_C  },
-    { NULL,                kModulationSystem_UNDEFINED     },
+    { nullptr,             kModulationSystem_UNDEFINED     },
 };
 
 const DTVParamHelperStruct DTVModulationSystem::vdrTable[] =
 {
     { "0",  kModulationSystem_DVBS      },
     { "1",  kModulationSystem_DVBS2     },
-    { NULL, kModulationSystem_UNDEFINED },
+    { nullptr, kModulationSystem_UNDEFINED },
 };
 
 const DTVParamHelperStruct DTVModulationSystem::parseTable[] =
@@ -497,7 +497,7 @@ const DTVParamHelperStruct DTVModulationSystem::parseTable[] =
     { "DAB",       kModulationSystem_DAB           },
     { "TURBO",     kModulationSystem_TURBO         },
     { "DVBC_C",    kModulationSystem_DVBC_ANNEX_C  },
-    { NULL,        kModulationSystem_UNDEFINED     },
+    { nullptr,     kModulationSystem_UNDEFINED     },
 };
 
 const char *DTVModulationSystem::dbStr[DTVModulationSystem::kDBStrCnt] =
@@ -529,7 +529,7 @@ const DTVParamHelperStruct DTVRollOff::confTable[] =
    { "ROLLOFF_20",   kRollOff_20   },
    { "ROLLOFF_25",   kRollOff_25   },
    { "ROLLOFF_AUTO", kRollOff_Auto },
-   { NULL,           kRollOff_35 },
+   { nullptr,        kRollOff_35 },
 };
 
 const DTVParamHelperStruct DTVRollOff::vdrTable[] =
@@ -538,7 +538,7 @@ const DTVParamHelperStruct DTVRollOff::vdrTable[] =
    { "20",   kRollOff_20   },
    { "25",   kRollOff_25   },
    { "0",    kRollOff_Auto },
-   { NULL,   kRollOff_35   },
+   { nullptr, kRollOff_35   },
 };
 const DTVParamHelperStruct DTVRollOff::parseTable[] =
 {
@@ -546,7 +546,7 @@ const DTVParamHelperStruct DTVRollOff::parseTable[] =
    { "0.20", kRollOff_20   },
    { "0.25", kRollOff_25   },
    { "auto", kRollOff_Auto },
-   { NULL,   kRollOff_35   },
+   { nullptr, kRollOff_35   },
 };
 
 const char *DTVRollOff::dbStr[DTVRollOff::kDBStrCnt] =

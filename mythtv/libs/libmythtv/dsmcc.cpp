@@ -56,7 +56,7 @@ ObjCarousel *Dsmcc::GetCarouselById(unsigned int carouselId)
         if (car && car->m_id == carouselId)
             return car;
     }
-    return NULL;
+    return nullptr;
 }
 
 /** \fn Dsmcc::AddTap(unsigned short,unsigned)
@@ -73,7 +73,7 @@ ObjCarousel *Dsmcc::AddTap(unsigned short componentTag, unsigned carouselId)
     // I think we will nearly always already have a carousel with this id
     // except for start-up.
 
-    if (car == NULL)
+    if (car == nullptr)
     { // Need to make a new one.
         car = new ObjCarousel(this);
         carousels.append(car);
@@ -259,7 +259,7 @@ void Dsmcc::ProcessDownloadInfoIndication(const unsigned char *data,
 
     ObjCarousel *car = GetCarouselById(dii.download_id);
 
-    if (car == NULL)
+    if (car == nullptr)
     {
         LOG(VB_DSMCC, LOG_ERR, QString("[dsmcc] Section Info for "
                                        "unknown carousel %1")
@@ -439,7 +439,7 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
             .arg(ddb.module_id).arg(ddb.block_number).arg(ddb.module_version));
 
     ObjCarousel *car = GetCarouselById(download_id);
-    if (car != NULL)
+    if (car != nullptr)
         car->AddModuleData(&ddb, blockData + 6);
     else
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Data Block ModID %1 Pos %2"

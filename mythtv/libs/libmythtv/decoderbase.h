@@ -213,7 +213,7 @@ class DecoderBase
     virtual QString GetCodecDecoderName(void) const = 0;
     virtual QString GetRawEncodingType(void) { return QString(); }
     virtual MythCodecID GetVideoCodecID(void) const = 0;
-    virtual void *GetVideoCodecPrivate(void) { return NULL; }
+    virtual void *GetVideoCodecPrivate(void) { return nullptr; }
 
     virtual void ResetPosMap(void);
     virtual bool SyncPositionMap(void);

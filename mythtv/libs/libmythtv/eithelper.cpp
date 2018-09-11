@@ -254,7 +254,7 @@ static void parse_dvb_event_descriptors(desc_list_t list, FixupValue fix,
     unsigned char enc_9[3]  = { 0x10, 0x00, 0x09 }; // could use { 0x05 } instead
     unsigned char enc_15[3] = { 0x10, 0x00, 0x0f }; // could use { 0x0B } instead
     int enc_len = 0;
-    const unsigned char *enc = NULL;
+    const unsigned char *enc = nullptr;
 
     // Is this BellExpressVU EIT (Canada) ?
     // Use an encoding override of ISO 8859-1 (Latin1)
@@ -408,7 +408,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         desc_list_t list = MPEGDescriptor::Parse(
             eit->Descriptors(i), eit->DescriptorsLength(i));
 
-        const unsigned char *dish_event_name = NULL;
+        const unsigned char *dish_event_name = nullptr;
         if (EITFixUp::kFixDish & fix)
         {
             dish_event_name = MPEGDescriptor::Find(

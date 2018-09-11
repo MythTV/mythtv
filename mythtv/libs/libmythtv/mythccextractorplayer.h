@@ -74,7 +74,7 @@ class SRTStuff
 class CC608Stuff : public SRTStuff
 {
   public:
-    CC608Stuff() : reader(NULL) { }
+    CC608Stuff() : reader(nullptr) { }
     ~CC608Stuff();
     CC608Reader *reader;
     CC608StreamType subs;
@@ -84,7 +84,7 @@ typedef QHash<uint, CC608Stuff> CC608Info;
 class CC708Stuff : public SRTStuff
 {
   public:
-    CC708Stuff() : reader(NULL) { }
+    CC708Stuff() : reader(nullptr) { }
     ~CC708Stuff();
     CC708Reader *reader;
     CC708StreamType subs;
@@ -95,7 +95,7 @@ class TeletextExtractorReader;
 class TeletextStuff : public SRTStuff
 {
   public:
-    TeletextStuff() : reader(NULL) { }
+    TeletextStuff() : reader(nullptr) { }
     ~TeletextStuff();
     TeletextExtractorReader *reader;
     TeletextStreamType subs;
@@ -105,7 +105,7 @@ typedef QHash<uint, TeletextStuff> TeletextInfo;
 class DVBSubStuff
 {
   public:
-    DVBSubStuff() : reader(NULL), subs_num(0) { }
+    DVBSubStuff() : reader(nullptr), subs_num(0) { }
     ~DVBSubStuff();
     SubtitleReader *reader;
     int             subs_num;

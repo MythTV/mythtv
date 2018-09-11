@@ -101,7 +101,7 @@ FilterManager::~FilterManager()
     for (; itf != filters.end(); ++itf)
     {
         FilterInfo *tmp = itf->second;
-        itf->second = NULL;
+        itf->second = nullptr;
 
         free(tmp->name);
         free(tmp->descript);
@@ -115,7 +115,7 @@ FilterManager::~FilterManager()
     for (; ith != dlhandles.end(); ++ith)
     {
         void *tmp = ith->second;
-        ith->second = NULL;
+        ith->second = nullptr;
         dlclose(tmp);
     }
     dlhandles.clear();
@@ -125,7 +125,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
 {
     dlerror(); // clear out any pre-existing dlerrors
 
-    void *dlhandle = NULL;
+    void *dlhandle = nullptr;
     library_map_t::iterator it = dlhandles.find(path);
     if (it != dlhandles.end())
         dlhandle = it->second;
@@ -161,7 +161,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
             break;
 
         FilterInfo *newFilter = new FilterInfo;
-        newFilter->filter_init = NULL;
+        newFilter->filter_init = nullptr;
         newFilter->name     = strdup(filtInfo->name);
         newFilter->descript = strdup(filtInfo->descript);
 
@@ -183,7 +183,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
 
 const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
 {
-    const FilterInfo *finfo = NULL;
+    const FilterInfo *finfo = nullptr;
     filter_map_t::const_iterator it = filters.find(name);
     if (it != filters.end())
         finfo = it->second;
@@ -201,7 +201,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                                         int max_threads)
 {
     if (Filters.toLower() == "none")
-        return NULL;
+        return nullptr;
 
     vector<const FilterInfo*> FiltInfoChain;
     FilterChain *FiltChain = new FilterChain;
@@ -212,7 +212,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     const FilterInfo *Convert = GetFilterInfo("convert");
     QStringList OptsList;
     QStringList FilterList = Filters.split(",", QString::SkipEmptyParts);
-    VideoFilter *NewFilt = NULL;
+    VideoFilter *NewFilt = nullptr;
     FmtConv *FC, *FC2, *S1, *S2, *S3;
     VideoFrameType ifmt;
     unsigned int i;
@@ -251,7 +251,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     ifmt = inpixfmt;
     for (i = 0; i < FiltInfoChain.size(); i++)
     {
-        S1 = S2 = S3 = NULL;
+        S1 = S2 = S3 = nullptr;
         FI = FiltInfoChain[i];
         if (FiltInfoChain.size() - i == 1)
         {
@@ -377,7 +377,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     if (FiltInfoChain.empty())
     {
         delete FiltChain;
-        FiltChain = NULL;
+        FiltChain = nullptr;
     }
 
     for (i = 0; i < FiltInfoChain.size(); i++)
@@ -397,7 +397,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                     .arg(FmtToString(FmtList[i]->in))
                     .arg(FmtToString(FmtList[i]->out))
                     .arg(OptsList[i]));
-            FiltChain = NULL;
+            FiltChain = nullptr;
             nbufsize = -1;
             break;
         }
@@ -497,19 +497,19 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
     void *handle;
     VideoFilter *Filter;
 
-    if (FiltInfo == NULL)
+    if (FiltInfo == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, "FilterManager: LoadFilter called with NULL"
                                  "FilterInfo");
-        return NULL;
+        return nullptr;
     }
 
-    if (FiltInfo->libname == NULL)
+    if (FiltInfo->libname == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "FilterManager: LoadFilter called with invalid "
             "FilterInfo (libname is NULL)");
-        return NULL;
+        return nullptr;
     }
 
     handle = dlopen(FiltInfo->libname, RTLD_NOW);
@@ -521,7 +521,7 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
                     "shared library '%1', dlopen reports error '%2'")
                 .arg(FiltInfo->libname)
                 .arg(dlerror()));
-        return NULL;
+        return nullptr;
     }
 
     const FilterInfo *filtInfo =
@@ -536,16 +536,16 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
                 .arg(FiltInfo->libname)
                 .arg(dlerror()));
         dlclose(handle);
-        return NULL;
+        return nullptr;
     }
 
     Filter = filtInfo->filter_init(inpixfmt, outpixfmt, &width, &height,
                                    const_cast<char*>(opts), max_threads);
 
-    if (Filter == NULL)
+    if (Filter == nullptr)
     {
         dlclose(handle);
-        return NULL;
+        return nullptr;
     }
 
     Filter->handle = handle;
@@ -554,7 +554,7 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
     if (opts)
         Filter->opts = strdup(opts);
     else
-        Filter->opts = NULL;
+        Filter->opts = nullptr;
     Filter->info = const_cast<FilterInfo*>(FiltInfo);
     return Filter;
 }

@@ -19,7 +19,7 @@ class BiopNameComp
 {
   public:
     BiopNameComp() :
-        m_id_len(0), m_kind_len(0), m_id(NULL), m_kind(NULL) {}
+        m_id_len(0), m_kind_len(0), m_id(nullptr), m_kind(nullptr) {}
 
     ~BiopNameComp();
 
@@ -49,7 +49,7 @@ class BiopTap
     BiopTap() :
         id(0),               use(0),
         assoc_tag(0),        selector_len(0),
-        selector_data(NULL) { }
+        selector_data(nullptr) { }
     ~BiopTap();
 
     int Process(const unsigned char*);
@@ -130,7 +130,7 @@ class ProfileBodyLite: public ProfileBody
     virtual int Process(const unsigned char *);
 
     // TODO Not currently implemented
-    virtual DSMCCCacheReference *GetReference() { return NULL; }
+    virtual DSMCCCacheReference *GetReference() { return nullptr; }
 };
 
 // IOR - Interoperable Object Reference.
@@ -138,9 +138,9 @@ class BiopIor
 {
   public:
     BiopIor() :
-        type_id_len(0),           type_id(NULL),
+        type_id_len(0),           type_id(nullptr),
         tagged_profiles_count(0), profile_id_tag(0),
-        m_profile_body(NULL) { }
+        m_profile_body(nullptr) { }
 
     ~BiopIor()
     {
@@ -163,7 +163,7 @@ class BiopIor
 class BiopBinding
 {
   public:
-    BiopBinding() : m_binding_type(0), m_objinfo_len(0), m_objinfo(0) {}
+    BiopBinding() : m_binding_type(0), m_objinfo_len(0), m_objinfo(nullptr) {}
     ~BiopBinding();
 
     int Process(const unsigned char *data);
@@ -183,8 +183,8 @@ class BiopMessage
     BiopMessage() :
         m_version_major(0), m_version_minor(0),
         m_message_size(0),  m_objkind_len(0),
-        m_objinfo_len(0),  m_objinfo(NULL),
-        m_objkind(NULL) {}
+        m_objinfo_len(0),  m_objinfo(nullptr),
+        m_objkind(nullptr) {}
     ~BiopMessage();
 
     bool Process(DSMCCCacheModuleData *cachep, DSMCCCache *cache,

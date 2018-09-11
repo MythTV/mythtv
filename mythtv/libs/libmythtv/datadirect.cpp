@@ -466,7 +466,7 @@ bool DDStructureParser::characters(const QString& pchars)
 
             gCoreContext->SaveSettingOnHost("DataDirectMessage",
                                             ExpirationDateMessage,
-                                            NULL);
+                                            nullptr);
         }
     }
     if (currtagname == "callSign")
@@ -1157,7 +1157,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     {
         gCoreContext->SaveSettingOnHost(
             "MythFillSuggestedRunTime",
-            nextSuggestedTime.toString(Qt::ISODate), NULL);
+            nextSuggestedTime.toString(Qt::ISODate), nullptr);
     }
 
     return nextSuggestedTime.isValid();

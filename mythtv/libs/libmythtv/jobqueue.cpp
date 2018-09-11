@@ -47,7 +47,7 @@ JobQueue::JobQueue(bool master) :
     m_hostname(gCoreContext->GetHostName()),
     jobsRunning(0),
     jobQueueCPU(0),
-    m_pginfo(NULL),
+    m_pginfo(nullptr),
     runningJobsLock(new QMutex(QMutex::Recursive)),
     isMaster(master),
     queueThread(new MThread("JobQueue", this)),
@@ -77,7 +77,7 @@ JobQueue::~JobQueue(void)
 
     queueThread->wait();
     delete queueThread;
-    queueThread = NULL;
+    queueThread = nullptr;
 
     gCoreContext->removeListener(this);
 
@@ -1726,7 +1726,7 @@ void JobQueue::ProcessJob(JobQueueEntry job)
     }
 
     ChangeJobStatus(jobID, JOB_PENDING);
-    ProgramInfo *pginfo = NULL;
+    ProgramInfo *pginfo = nullptr;
 
     if (job.chanid)
     {
@@ -1944,7 +1944,7 @@ void *JobQueue::TranscodeThread(void *param)
 
     delete jts;
 
-    return NULL;
+    return nullptr;
 }
 
 void JobQueue::DoTranscodeThread(int jobID)
@@ -2175,7 +2175,7 @@ void *JobQueue::MetadataLookupThread(void *param)
 
     delete jts;
 
-    return NULL;
+    return nullptr;
 }
 
 void JobQueue::DoMetadataLookupThread(int jobID)
@@ -2300,7 +2300,7 @@ void *JobQueue::FlagCommercialsThread(void *param)
 
     delete jts;
 
-    return NULL;
+    return nullptr;
 }
 
 void JobQueue::DoFlagCommercialsThread(int jobID)
@@ -2447,7 +2447,7 @@ void *JobQueue::UserJobThread(void *param)
 
     delete jts;
 
-    return NULL;
+    return nullptr;
 }
 
 void JobQueue::DoUserJobThread(int jobID)

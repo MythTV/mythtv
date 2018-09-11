@@ -92,8 +92,8 @@ void MTV_PUBLIC framecopy(VideoFrame *dst, const VideoFrame *src,
 
 static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height, int _size,
-                        const int *p = 0,
-                        const int *o = 0,
+                        const int *p = nullptr,
+                        const int *o = nullptr,
                         float _aspect = -1.0f, double _rate = -1.0f,
                         int _aligned = 64) MUNUSED;
 static inline void clear(VideoFrame *vf);
@@ -118,7 +118,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     vf->frameNumber  = 0;
     vf->timecode     = 0;
 
-    vf->qscale_table = 0;
+    vf->qscale_table = nullptr;
     vf->qstride      = 0;
 
     vf->interlaced_frame = 1;

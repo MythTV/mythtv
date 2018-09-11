@@ -204,7 +204,7 @@ static int determinable_frame_size(struct AVCodecContext *avctx)
 
 static int has_codec_parameters(AVStream *st)
 {
-    AVCodecContext *avctx = NULL;
+    AVCodecContext *avctx = nullptr;
 
 #define FAIL(errmsg) do {                                     \
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + errmsg);                \
@@ -409,12 +409,12 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  PlayerFlags flags)
     : DecoderBase(parent, pginfo),
-      private_dec(NULL),
+      private_dec(nullptr),
       is_db_ignored(gCoreContext->IsDatabaseIgnored()),
       m_h264_parser(new H264Parser()),
-      ic(NULL),
-      frame_decoded(0),             decoded_video_frame(NULL),
-      avfRingBuffer(NULL),          sws_ctx(NULL),
+      ic(nullptr),
+      frame_decoded(0),             decoded_video_frame(nullptr),
+      avfRingBuffer(nullptr),       sws_ctx(nullptr),
       directrendering(false),
       no_dts_hack(false),           dorewind(false),
       gopset(false),                seen_gop(false),
@@ -446,7 +446,7 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
       ccd708(new CC708Decoder(parent->GetCC708Reader())),
       ttd(new TeletextDecoder(parent->GetTeletextReader())),
       // Interactive TV
-      itv(NULL),
+      itv(nullptr),
       // Audio
       disable_passthru(false),
       m_fps(0.0f),
@@ -534,12 +534,12 @@ void AvFormatDecoder::CloseContext()
         av_free(ic->pb->buffer);
         av_free(ic->pb);
         avformat_close_input(&ic);
-        ic = NULL;
+        ic = nullptr;
         fmt->flags &= ~AVFMT_NOFILE;
     }
 
     delete private_dec;
-    private_dec = NULL;
+    private_dec = nullptr;
     m_h264_parser->Reset();
 }
 
@@ -553,7 +553,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
 {
     int64_t start_pts = 0, pts;
 
-    AVStream *st = NULL;
+    AVStream *st = nullptr;
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st1 = ic->streams[i];
@@ -692,7 +692,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     bool oldrawstate = getrawframes;
     getrawframes = false;
 
-    AVStream *st = NULL;
+    AVStream *st = nullptr;
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st1 = ic->streams[i];
@@ -843,7 +843,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         {
             AVCodecContext *enc = gCodecMap->hasCodecContext(ic->streams[i]);
             // note that contexts that have not been opened have
-            // enc->internal = NULL and cause a segfault in
+            // enc->internal = nullptr and cause a segfault in
             // avcodec_flush_buffers
             if (enc && enc->internal)
                 avcodec_flush_buffers(enc);
@@ -907,7 +907,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         if (decoded_video_frame)
         {
             m_parent->DiscardVideoFrame(decoded_video_frame);
-            decoded_video_frame = NULL;
+            decoded_video_frame = nullptr;
         }
         if (!exactSeeks && profileFrames >= 5 && profileFrames < 10)
         {
@@ -1029,7 +1029,7 @@ extern "C" void HandleStreamChange(void *data)
 int AvFormatDecoder::FindStreamInfo(void)
 {
     QMutexLocker lock(avcodeclock);
-    int retval = avformat_find_stream_info(ic, NULL);
+    int retval = avformat_find_stream_info(ic, nullptr);
     silence_ffmpeg_logging = false;
     // ffmpeg 3.0 is returning -1 code when there is a channel
     // change or some encoding error just after the start
@@ -1071,7 +1071,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         delete avfRingBuffer;
     avfRingBuffer = new AVFRingBuffer(rbuffer);
 
-    AVInputFormat *fmt      = NULL;
+    AVInputFormat *fmt      = nullptr;
     QString        fnames   = ringBuffer->GetFilename();
     QByteArray     fnamea   = fnames.toLatin1();
     const char    *filename = fnamea.constData();
@@ -1128,7 +1128,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
             InitByteContext(true);
 
-            err = avformat_open_input(&ic, filename, fmt, NULL);
+            err = avformat_open_input(&ic, filename, fmt, nullptr);
             if (err < 0)
             {
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -1195,7 +1195,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         InitByteContext();
 
-        err = avformat_open_input(&ic, filename, fmt, NULL);
+        err = avformat_open_input(&ic, filename, fmt, nullptr);
         if (err < 0)
         {
             if (!strcmp(fmt->name, "mpegts"))
@@ -1219,7 +1219,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("avformat err(%1) on avformat_open_input call.").arg(err));
-        ic = NULL;
+        ic = nullptr;
         return -1;
     }
 
@@ -1231,7 +1231,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec parameters. " +
                     QString("file was \"%1\".").arg(filename));
             avformat_close_input(&ic);
-            ic = NULL;
+            ic = nullptr;
             return -1;
         }
     }
@@ -1470,8 +1470,8 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
                                            const enum AVPixelFormat *valid_fmts)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
-    MythPlayer *player = NULL;
-    VideoOutputVDPAU *videoOut = NULL;
+    MythPlayer *player = nullptr;
+    VideoOutputVDPAU *videoOut = nullptr;
     if (nd)
         player =  nd->GetPlayer();
     if (player)
@@ -1479,8 +1479,8 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
 
     if (videoOut)
     {
-        static uint8_t *dummy[1] = { 0 };
-        avctx->hwaccel_context = player->GetDecoderContext(NULL, dummy[0]);
+        static uint8_t *dummy[1] = { nullptr };
+        avctx->hwaccel_context = player->GetDecoderContext(nullptr, dummy[0]);
         MythRenderVDPAU *render = videoOut->getRender();
         render->BindContext(avctx);
         if (avctx->hwaccel_context)
@@ -1512,9 +1512,9 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
-        static uint8_t *dummy[1] = { 0 };
+        static uint8_t *dummy[1] = { nullptr };
         avctx->hwaccel_context =
-            (dxva_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+            (dxva_context*)nd->GetPlayer()->GetDecoderContext(nullptr, dummy[0]);
     }
 
     while (*valid_fmts != AV_PIX_FMT_NONE) {
@@ -1548,9 +1548,9 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
     AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
     if (nd && nd->GetPlayer())
     {
-        static uint8_t *dummy[1] = { 0 };
+        static uint8_t *dummy[1] = { nullptr };
         avctx->hwaccel_context =
-            (vaapi_context*)nd->GetPlayer()->GetDecoderContext(NULL, dummy[0]);
+            (vaapi_context*)nd->GetPlayer()->GetDecoderContext(nullptr, dummy[0]);
     }
 
     while (*valid_fmts != AV_PIX_FMT_NONE) {
@@ -1641,7 +1641,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
 
     AVDictionaryEntry *metatag =
-        av_dict_get(stream->metadata, "rotate", NULL, 0);
+        av_dict_get(stream->metadata, "rotate", nullptr, 0);
     if (metatag && metatag->value && QString("180") == metatag->value)
         video_inverted = true;
 
@@ -1953,7 +1953,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
         // choose lowest available next..
         // stream_id's of 608 and 708 streams alias, but this
         // is ok as we just want each list to be ordered.
-        StreamInfo const *si = NULL;
+        StreamInfo const *si = nullptr;
         int type = 0; // 0 if 608, 1 if 708
         bool isp = true; // if true use pmt_tracks next, else stream_tracks
 
@@ -2053,7 +2053,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
 void AvFormatDecoder::ScanRawTextCaptions(int av_stream_index)
 {
     AVDictionaryEntry *metatag =
-        av_dict_get(ic->streams[av_stream_index]->metadata, "language", NULL,
+        av_dict_get(ic->streams[av_stream_index]->metadata, "language", nullptr,
                     0);
     bool forced =
       ic->streams[av_stream_index]->disposition & AV_DISPOSITION_FORCED;
@@ -2170,7 +2170,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     for (uint i = 0; i < ic->nb_streams; i++)
     {
         AVCodecParameters *par = ic->streams[i]->codecpar;
-        AVCodecContext *enc = NULL;
+        AVCodecContext *enc = nullptr;
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Stream #%1, has id 0x%2 codec id %3, "
@@ -2288,7 +2288,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         if (!enc)
             enc = gCodecMap->getCodecContext(ic->streams[i]);
 
-        const AVCodec *codec = NULL;
+        const AVCodec *codec = nullptr;
         if (enc)
             codec = enc->codec;
         else
@@ -2302,7 +2302,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             // only caused by build problems, where libavcodec needs a rebuild
             if (VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY))
             {
-                AVCodec *p = av_codec_next(NULL);
+                AVCodec *p = av_codec_next(nullptr);
                 int      i = 1;
                 while (p)
                 {
@@ -2313,7 +2313,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     else
                         msg = QString("Codec %1, null name,").arg(i);
 
-                    if (p->decode == NULL)
+                    if (p->decode == nullptr)
                         msg += "decoder is null";
 
                     LOG(VB_LIBAV, LOG_INFO, LOC + msg);
@@ -2437,7 +2437,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         for(;;)
         {
-            AVCodec *codec = NULL;
+            AVCodec *codec = nullptr;
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 "Trying to select best video track");
 
@@ -2446,11 +2446,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
              *
              * The best stream is determined according to various heuristics as
              * the most likely to be what the user expects. If the decoder parameter
-             * is non-NULL, av_find_best_stream will find the default decoder
+             * is not nullptr, av_find_best_stream will find the default decoder
              * for the stream's codec; streams for which no decoder can be found
              * are ignored.
              *
-             * If av_find_best_stream returns successfully and decoder_ret is not NULL,
+             * If av_find_best_stream returns successfully and decoder_ret is not nullptr,
              * then *decoder_ret is guaranteed to be set to a valid AVCodec.
              */
             int selTrack = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO,
@@ -2482,7 +2482,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             codec_is_mpeg = CODEC_IS_FFMPEG_MPEG(enc->codec_id);
 
             delete private_dec;
-            private_dec = NULL;
+            private_dec = nullptr;
             m_h264_parser->Reset();
 
             QSize dim = get_video_dim(*enc);
@@ -2743,9 +2743,9 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 
 #ifdef USING_MEDIACODEC
     if (QString("mediacodec") == codec->wrapper_name)
-        av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), NULL);
+        av_jni_set_java_vm(QAndroidJniEnvironment::javaVM(), nullptr);
 #endif
-    int ret = avcodec_open2(avctx, codec, NULL);
+    int ret = avcodec_open2(avctx, codec, nullptr);
     if (ret < 0)
     {
         char error[AV_ERROR_MAX_STRING_SIZE];
@@ -2803,7 +2803,7 @@ int AvFormatDecoder::GetSubtitleLanguage(uint subtitle_index, uint stream_index)
 {
     (void)subtitle_index;
     AVDictionaryEntry *metatag =
-        av_dict_get(ic->streams[stream_index]->metadata, "language", NULL, 0);
+        av_dict_get(ic->streams[stream_index]->metadata, "language", nullptr, 0);
     return metatag ? get_canonical_lang(metatag->value) :
                      iso639_str3_to_key("und");
 }
@@ -3027,7 +3027,7 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 
     for (int i = 0; i < 4; i++)
     {
-        pic->data[i]     = NULL;
+        pic->data[i]     = nullptr;
         pic->linesize[i] = 0;
     }
     pic->opaque     = frame;
@@ -3097,7 +3097,7 @@ int get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 
     for (int i = 0; i < 4; i++)
     {
-        pic->data[i]     = NULL;
+        pic->data[i]     = nullptr;
         pic->linesize[i] = 0;
     }
     pic->opaque      = frame;
@@ -3123,7 +3123,7 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 
     for (int i = 0; i < 4; i++)
     {
-        pic->data[i]     = NULL;
+        pic->data[i]     = nullptr;
         pic->linesize[i] = 0;
     }
     pic->opaque      = frame;
@@ -3978,7 +3978,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
                                        use_frame->height, (AVPixelFormat)use_frame->format,
                                        use_frame->width, use_frame->height,
                                        AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                                       NULL, NULL, NULL);
+                                       nullptr, nullptr, nullptr);
         if (!sws_ctx)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate sws context");
@@ -4491,7 +4491,7 @@ void AvFormatDecoder::GetAttachmentData(uint trackNo, QByteArray &filename,
 
     int index = tracks[kTrackTypeAttachment][trackNo].av_stream_index;
     AVDictionaryEntry *tag = av_dict_get(ic->streams[index]->metadata,
-                                         "filename", NULL, 0);
+                                         "filename", nullptr, 0);
     if (tag)
         filename  = QByteArray(tag->value);
     AVCodecParameters *par = ic->streams[index]->codecpar;
@@ -5105,7 +5105,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 // documented in decoderbase.h
 bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 {
-    AVPacket *pkt = NULL;
+    AVPacket *pkt = nullptr;
     bool have_err = false;
 
     const DecodeType origDecodetype = decodetype;
@@ -5113,7 +5113,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     gotVideoFrame = false;
 
     frame_decoded = 0;
-    decoded_video_frame = NULL;
+    decoded_video_frame = nullptr;
 
     allowedquit = false;
     bool storevideoframes = false;
@@ -5155,7 +5155,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             return false;
         }
 
-        private_dec->GetFrame(stream, mpa_pic, &got_picture, NULL);
+        private_dec->GetFrame(stream, mpa_pic, &got_picture, nullptr);
         if (got_picture)
             ProcessVideoFrame(stream, mpa_pic);
     }
@@ -5293,7 +5293,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         {
             // av_dup_packet(pkt);
             storedPackets.append(pkt);
-            pkt = NULL;
+            pkt = nullptr;
             continue;
         }
 
@@ -5509,7 +5509,7 @@ QString AvFormatDecoder::GetRawEncodingType(void)
 
 void *AvFormatDecoder::GetVideoCodecPrivate(void)
 {
-    return NULL; // TODO is this still needed
+    return nullptr; // TODO is this still needed
 }
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)
@@ -5586,8 +5586,8 @@ bool AvFormatDecoder::DoPassThrough(const AVCodecParameters *par, bool withProfi
 bool AvFormatDecoder::SetupAudioStream(void)
 {
     AudioInfo info; // no_audio
-    AVStream *curstream = NULL;
-    AVCodecContext *ctx = NULL;
+    AVStream *curstream = nullptr;
+    AVCodecContext *ctx = nullptr;
     AudioInfo old_in    = audioIn;
     int requested_channels;
 
@@ -5740,7 +5740,7 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
 {
     int64_t start_time, end_time;
     int64_t duration;
-    AVStream *st = NULL;
+    AVStream *st = nullptr;
 
     start_time = INT64_MAX;
     end_time = INT64_MIN;

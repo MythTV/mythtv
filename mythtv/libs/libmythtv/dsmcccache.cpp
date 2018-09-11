@@ -95,7 +95,7 @@ bool DSMCCCacheReference::Equal(const DSMCCCacheReference &r) const
 
 bool DSMCCCacheReference::Equal(const DSMCCCacheReference *p) const
 {
-    return p != NULL && Equal(*p);
+    return p != nullptr && Equal(*p);
 }
 
 
@@ -244,7 +244,7 @@ DSMCCCacheFile *DSMCCCache::FindFileData(DSMCCCacheReference &ref)
         m_Files.find(ref);
 
     if (fil == m_Files.end())
-        return NULL;
+        return nullptr;
 
     return *fil;
 }
@@ -256,7 +256,7 @@ DSMCCCacheDir *DSMCCCache::FindDir(DSMCCCacheReference &ref)
         m_Directories.find(ref);
 
     if (dir == m_Directories.end())
-        return NULL;
+        return nullptr;
 
     return *dir;
 }
@@ -268,7 +268,7 @@ DSMCCCacheDir *DSMCCCache::FindGateway(DSMCCCacheReference &ref)
         m_Gateways.find(ref);
 
     if (dir == m_Gateways.end())
-        return NULL;
+        return nullptr;
 
     return *dir;
 }
@@ -281,7 +281,7 @@ DSMCCCacheDir *DSMCCCache::FindGateway(DSMCCCacheReference &ref)
 int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 {
     DSMCCCacheDir *dir = FindGateway(m_GatewayRef);
-    if (dir == NULL)
+    if (dir == nullptr)
         return 1; // No gateway yet.
 
     QStringList::Iterator it = objectPath.begin();
@@ -299,7 +299,7 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 
             DSMCCCacheFile *fil = FindFileData(*ref);
 
-            if (fil == NULL) // Exists but not yet set.
+            if (fil == nullptr) // Exists but not yet set.
                 return 1;
 
             result = fil->m_Contents;
@@ -315,7 +315,7 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 
             dir = FindDir(*ref);
 
-            if (dir == NULL) // Exists but not yet set.
+            if (dir == nullptr) // Exists but not yet set.
                 return 1;
             // else search in this directory
         }

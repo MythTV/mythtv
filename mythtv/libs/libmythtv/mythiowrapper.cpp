@@ -160,11 +160,11 @@ int mythfile_open(const char *pathname, int flags)
     }
     else
     {
-        RingBuffer *rb = NULL;
-        RemoteFile *rf = NULL;
+        RingBuffer *rb = nullptr;
+        RemoteFile *rf = nullptr;
 
         if ((fileinfo.st_size < 512) &&
-            (fileinfo.st_mtime < (time(NULL) - 300)))
+            (fileinfo.st_mtime < (time(nullptr) - 300)))
         {
             if (flags & O_WRONLY)
                 rf = new RemoteFile(pathname, true, false); // Writeable
@@ -500,7 +500,7 @@ int mythdir_closedir(int dirID)
 
 char *mythdir_readdir(int dirID)
 {
-    char *result = NULL;
+    char *result = nullptr;
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_readdir(%1)").arg(dirID));
 
@@ -517,10 +517,10 @@ char *mythdir_readdir(int dirID)
     }
     else if (m_localdirs.contains(dirID))
     {
-        struct dirent *r = NULL;
+        struct dirent *r = nullptr;
         // glibc deprecated readdir_r in version 2.24,
         // cppcheck-suppress readdirCalled
-        if ((r = readdir(m_localdirs[dirID])) != NULL)
+        if ((r = readdir(m_localdirs[dirID])) != nullptr)
             result = strdup(r->d_name);
     }
     m_dirWrapperLock.unlock();

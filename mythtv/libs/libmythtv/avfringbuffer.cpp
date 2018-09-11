@@ -9,7 +9,7 @@ int AVFRingBuffer::AVF_Open(URLContext *h, const char *filename, int flags)
     (void)filename;
     (void)flags;
 
-    h->priv_data = NULL;
+    h->priv_data = nullptr;
     return 0;
 }
 

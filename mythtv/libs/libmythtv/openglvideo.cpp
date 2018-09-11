@@ -64,12 +64,12 @@ class OpenGLFilter
  */
 
 OpenGLVideo::OpenGLVideo() :
-    gl_context(NULL),         video_disp_dim(0,0),
+    gl_context(nullptr),      video_disp_dim(0,0),
     video_dim(0,0),           viewportSize(0,0),
     masterViewportSize(0,0),  display_visible_rect(0,0,0,0),
     display_video_rect(0,0,0,0), video_rect(0,0,0,0),
     frameBufferRect(0,0,0,0), hardwareDeinterlacing(false),
-    colourSpace(NULL),        viewportControl(false),
+    colourSpace(nullptr),     viewportControl(false),
     inputTextureSize(0,0),    currentFrameNum(0),
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
@@ -522,7 +522,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         temp->frameBuffers.clear();
         temp->frameBufferTextures.clear();
         filters[filter] = temp;
-        temp = NULL;
+        temp = nullptr;
         success &= OptimiseFilters();
     }
 
@@ -561,7 +561,7 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
     DeleteTextures(&(filters[filter]->frameBufferTextures));
 
     delete filters[filter];
-    filters[filter] = NULL;
+    filters[filter] = nullptr;
 
     return true;
 }

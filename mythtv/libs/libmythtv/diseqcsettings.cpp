@@ -39,7 +39,7 @@ static GlobalTextEditSetting *DiSEqCLongitude(void)
 class DeviceTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
-    DeviceTypeSetting() : m_device(NULL)
+    DeviceTypeSetting() : m_device(nullptr)
     {
         setLabel(DeviceTree::tr("Device Type"));
         addSelection(DeviceTree::tr("Unconnected"),
@@ -71,7 +71,7 @@ class DeviceTypeSetting : public TransMythUIComboBoxSetting
 
     void DeleteDevice()
     {
-        SetDevice(NULL);
+        SetDevice(nullptr);
         clearSettings();
     }
 
@@ -214,7 +214,7 @@ class SwitchAddressSetting : public TransTextEditSetting
 
     virtual void Save(void)
     {
-        m_switch.SetAddress(getValue().toUInt(0, 16));
+        m_switch.SetAddress(getValue().toUInt(nullptr, 16));
     }
 
   private:
@@ -1025,9 +1025,9 @@ void DeviceTree::DeleteDevice(DeviceTypeSetting *devtype)
     {
         DiSEqCDevDevice *parent = dev->GetParent();
         if (parent)
-            parent->SetChild(dev->GetOrdinal(), NULL);
+            parent->SetChild(dev->GetOrdinal(), nullptr);
         else
-            m_tree.SetRoot(NULL);
+            m_tree.SetRoot(nullptr);
     }
 
     devtype->DeleteDevice();
@@ -1042,7 +1042,7 @@ void DeviceTree::PopulateTree(void)
 DiseqcConfigBase* DiseqcConfigBase::CreateByType(DiSEqCDevDevice *dev,
                                                  StandardSetting *parent)
 {
-    DiseqcConfigBase *setting = NULL;
+    DiseqcConfigBase *setting = nullptr;
     switch (dev->GetDeviceType())
     {
         case DiSEqCDevDevice::kTypeSwitch:
@@ -1382,7 +1382,7 @@ void DTVDeviceConfigGroup::AddNodes(
     if (!node)
         return;
 
-    StandardSetting *setting = NULL;
+    StandardSetting *setting = nullptr;
     switch (node->GetDeviceType())
     {
         case DiSEqCDevDevice::kTypeSwitch:

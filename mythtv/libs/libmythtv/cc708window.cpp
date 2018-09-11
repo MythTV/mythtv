@@ -122,7 +122,7 @@ CC708Window::CC708Window()
       justify(0),               word_wrap(0),
 
       true_row_count(0),        true_column_count(0),
-      text(NULL),               m_exists(false),
+      text(nullptr),            m_exists(false),
       m_changed(true),          lock(QMutex::Recursive)
 {
 }
@@ -179,7 +179,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
 void CC708Window::Resize(uint new_rows, uint new_columns)
 {
 
-    if (!GetExists() || text == NULL)
+    if (!GetExists() || text == nullptr)
     {
         true_row_count = 0;
         true_column_count = 0;
@@ -271,7 +271,7 @@ CC708Window::~CC708Window()
     if (text)
     {
         delete [] text;
-        text = NULL;
+        text = nullptr;
     }
 }
 
@@ -322,7 +322,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
 
     vector<CC708String*> list;
 
-    CC708String *cur = NULL;
+    CC708String *cur = nullptr;
 
     if (!text)
         return list;
@@ -364,7 +364,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
                 createdString = true;
                 createdNonblankStrings = true;
                 inTrailingSpaces = true;
-                cur = NULL;
+                cur = nullptr;
                 i--;
             }
         }
@@ -383,7 +383,7 @@ vector<CC708String*> CC708Window::GetStrings(void) const
             }
             else
                 delete cur;
-            cur = NULL;
+            cur = nullptr;
         }
     }
     if (!createdNonblankStrings)

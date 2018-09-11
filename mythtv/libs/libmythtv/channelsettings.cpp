@@ -487,7 +487,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
         addChild(freqid);
     }
     else
-        freqid = 0;
+        freqid = nullptr;
     addChild(new Callsign(id));
 
 

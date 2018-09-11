@@ -13,7 +13,7 @@ extern URLProtocol AVF_RingBuffer_Protocol;
 class AVFRingBuffer
 {
 public:
-    explicit AVFRingBuffer(RingBuffer *rbuffer = NULL)
+    explicit AVFRingBuffer(RingBuffer *rbuffer = nullptr)
         : m_rbuffer(rbuffer), m_initState(false) { }
     void                SetRingBuffer(RingBuffer *rbuffer)
     {

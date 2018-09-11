@@ -41,13 +41,13 @@ extern "C" {
 AVFormatWriter::AVFormatWriter()
     : FileWriterBase(),
 
-      m_avfRingBuffer(NULL), m_ringBuffer(NULL),
-      m_ctx(NULL),
-      m_videoStream(NULL),   m_avVideoCodec(NULL),
-      m_audioStream(NULL),   m_avAudioCodec(NULL),
-      m_picture(NULL),
-      m_audPicture(NULL),
-      m_audioInBuf(NULL),    m_audioInPBuf(NULL)
+      m_avfRingBuffer(nullptr), m_ringBuffer(nullptr),
+      m_ctx(nullptr),
+      m_videoStream(nullptr),   m_avVideoCodec(nullptr),
+      m_audioStream(nullptr),   m_avAudioCodec(nullptr),
+      m_picture(nullptr),
+      m_audPicture(nullptr),
+      m_audioInBuf(nullptr),    m_audioInPBuf(nullptr)
 {
     memset(&m_fmt, 0, sizeof(m_fmt));
 }
@@ -83,7 +83,7 @@ AVFormatWriter::~AVFormatWriter()
 bool AVFormatWriter::Init(void)
 {
     AVOutputFormat *fmt = av_guess_format(m_container.toLatin1().constData(),
-                                          NULL, NULL);
+                                          nullptr, nullptr);
     if (!fmt)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
@@ -185,7 +185,7 @@ bool AVFormatWriter::OpenFile(void)
     uc->prot            = AVFRingBuffer::GetRingBufferURLProtocol();
     uc->priv_data       = (void *)m_avfRingBuffer;
 
-    if (avformat_write_header(m_ctx, NULL) < 0)
+    if (avformat_write_header(m_ctx, nullptr) < 0)
     {
         Cleanup();
         return false;
@@ -201,9 +201,9 @@ void AVFormatWriter::Cleanup(void)
         avio_closep(&m_ctx->pb);
     }
     delete m_avfRingBuffer;
-    m_avfRingBuffer = NULL;
+    m_avfRingBuffer = nullptr;
     delete m_ringBuffer;
-    m_ringBuffer = NULL;
+    m_ringBuffer = nullptr;
 }
 
 bool AVFormatWriter::CloseFile(void)
@@ -252,7 +252,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
 
     AVPacket pkt;
     av_init_packet(&pkt);
-    pkt.data = NULL;
+    pkt.data = nullptr;
     pkt.size = 0;
     AVCodecContext *avctx = gCodecMap->getCodecContext(m_videoStream);
     {
@@ -334,7 +334,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
 
     AVPacket pkt;
     av_init_packet(&pkt);
-    pkt.data          = NULL;
+    pkt.data          = nullptr;
     pkt.size          = 0;
 
     if (av_get_packed_sample_fmt(avctx->sample_fmt) == AV_SAMPLE_FMT_FLT)
@@ -457,12 +457,12 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     AVStream *st;
     AVCodec *codec;
 
-    st = avformat_new_stream(m_ctx, NULL);
+    st = avformat_new_stream(m_ctx, nullptr);
     if (!st)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "AddVideoStream(): avformat_new_stream() failed");
-        return NULL;
+        return nullptr;
     }
     st->id = 0;
 
@@ -472,7 +472,7 @@ AVStream* AVFormatWriter::AddVideoStream(void)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "AddVideoStream(): avcodec_find_encoder() failed");
-        return NULL;
+        return nullptr;
     }
 
     gCodecMap->freeCodecContext(st);
@@ -592,7 +592,7 @@ bool AVFormatWriter::OpenVideo(void)
     if (!m_width || !m_height)
         return false;
 
-    if (avcodec_open2(c, NULL, NULL) < 0)
+    if (avcodec_open2(c, nullptr, nullptr) < 0)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "OpenVideo(): avcodec_open() failed");
@@ -622,16 +622,16 @@ AVStream* AVFormatWriter::AddAudioStream(void)
     AVCodecContext *c;
     AVStream *st;
 
-    st = avformat_new_stream(m_ctx, NULL);
+    st = avformat_new_stream(m_ctx, nullptr);
     if (!st)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "AddAudioStream(): avformat_new_stream() failed");
-        return NULL;
+        return nullptr;
     }
     st->id = 1;
 
-    c = gCodecMap->getCodecContext(st, NULL, true);
+    c = gCodecMap->getCodecContext(st, nullptr, true);
 
     c->codec_id     = m_ctx->oformat->audio_codec;
     c->codec_type   = AVMEDIA_TYPE_AUDIO;
@@ -696,7 +696,7 @@ bool AVFormatWriter::OpenAudio(void)
         FindAudioFormat(c, codec, AV_SAMPLE_FMT_FLT);
     }
 
-    if (avcodec_open2(c, codec, NULL) < 0)
+    if (avcodec_open2(c, codec, nullptr) < 0)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "OpenAudio(): avcodec_open() failed");
@@ -741,7 +741,7 @@ AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat pix_fmt)
     {
         LOG(VB_RECORD, LOG_ERR,
             LOC + "AllocPicture(): avcodec_alloc_frame() failed");
-        return NULL;
+        return nullptr;
     }
     size = av_image_get_buffer_size(pix_fmt, m_width, m_height, IMAGE_ALIGN);
     picture_buf = (unsigned char *)av_malloc(size);
@@ -749,7 +749,7 @@ AVFrame* AVFormatWriter::AllocPicture(enum AVPixelFormat pix_fmt)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + "AllocPicture(): av_malloc() failed");
         av_frame_free(&picture);
-        return NULL;
+        return nullptr;
     }
     av_image_fill_arrays(picture->data, picture->linesize,
         picture_buf, pix_fmt, m_width, m_height, IMAGE_ALIGN);
@@ -766,7 +766,7 @@ AVRational AVFormatWriter::GetCodecTimeBase(void)
     if (m_avVideoCodec && m_avVideoCodec->supported_framerates) {
         const AVRational *p= m_avVideoCodec->supported_framerates;
         AVRational req = {result.den, result.num};
-        const AVRational *best = NULL;
+        const AVRational *best = nullptr;
         AVRational best_error= {INT_MAX, 1};
         for(; p->den!=0; p++) {
             AVRational error = av_sub_q(req, *p);

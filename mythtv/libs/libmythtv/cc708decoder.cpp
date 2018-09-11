@@ -74,7 +74,7 @@ void CC708Decoder::decode_cc_null(void)
 
 void CC708Decoder::services(uint seconds, bool seen[64]) const
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     time_t then = now - seconds;
 
     seen[0] = false; // service zero is not allowed in CEA-708-D
@@ -673,7 +673,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
             append_cc(cb_cbs, service_number,
                       &pkt_buf[block_data_offset], block_size);
 
-            last_seen[service_number] = time(NULL);
+            last_seen[service_number] = time(nullptr);
         }
         off+=block_size+1;
     }

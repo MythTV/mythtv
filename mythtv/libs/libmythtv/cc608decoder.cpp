@@ -105,7 +105,7 @@ void CC608Decoder::FormatCC(int tc, int code1, int code2)
 
 void CC608Decoder::GetServices(uint seconds, bool seen[4]) const
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     time_t then = now - seconds;
     for (uint i = 0; i < 4; i++)
         seen[i] = (last_seen[i] >= then);
@@ -773,7 +773,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
         case CC_CC4: stream = 3; break;
     }
     if (stream >= 0)
-        last_seen[stream] = time(NULL);
+        last_seen[stream] = time(nullptr);
 
     resumetext[mode] = 0;
     if (clr && !len)

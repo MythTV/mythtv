@@ -25,7 +25,7 @@ class MTV_PUBLIC DeleteMap
                  m_nextCutStartIsValid(false),
                  m_nextCutStart(0), m_changed(true),
                  m_seekamountpos(4), m_seekamount(1.0),
-                 m_ctx(NULL), m_cachedTotalForOSD(0), m_undoStackPointer(0)
+                 m_ctx(nullptr), m_cachedTotalForOSD(0), m_undoStackPointer(0)
     {
     }
 
@@ -39,7 +39,7 @@ class MTV_PUBLIC DeleteMap
     void UpdateOSD(int64_t timecode, OSD *osd);
 
     bool IsEditing(void) const { return m_editing; }
-    void SetEditing(bool edit, OSD *osd = NULL);
+    void SetEditing(bool edit, OSD *osd = nullptr);
     void SetFileEditing(bool edit);
     bool IsFileEditing(void);
     bool IsEmpty(void) const;
@@ -63,7 +63,7 @@ class MTV_PUBLIC DeleteMap
 
     bool     IsInDelete(uint64_t frame) const;
     uint64_t GetNearestMark(uint64_t frame, bool right,
-                            bool *hasMark = NULL) const;
+                            bool *hasMark = nullptr) const;
     bool     IsTemporaryMark(uint64_t frame) const;
     bool     HasTemporaryMark(void) const;
     uint64_t GetLastFrame(void) const;

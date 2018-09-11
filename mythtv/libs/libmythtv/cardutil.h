@@ -314,7 +314,7 @@ class MTV_PUBLIC CardUtil
 
     static vector<uint> GetInputIDs(uint sourceid);
     static bool         GetInputInfo(InputInfo &info,
-                                     vector<uint> *groupids = NULL);
+                                     vector<uint> *groupids = nullptr);
     static QList<InputInfo> GetAllInputInfo();
     static QString      GetInputName(uint inputid);
     static QString      GetStartingChannel(uint inputid);
@@ -399,16 +399,16 @@ class MTV_PUBLIC CardUtil
 
     // ASI info
     static int          GetASIDeviceNumber(const QString &device,
-                                           QString *error = NULL);
+                                           QString *error = nullptr);
 
     static uint         GetASIBufferSize(uint device_num,
-                                         QString *error = NULL);
+                                         QString *error = nullptr);
     static uint         GetASINumBuffers(uint device_num,
-                                         QString *error = NULL);
+                                         QString *error = nullptr);
     static int          GetASIMode(uint device_num,
-                                   QString *error = NULL);
+                                   QString *error = nullptr);
     static bool         SetASIMode(uint device_num, uint mode,
-                                   QString *error = NULL);
+                                   QString *error = nullptr);
 
   private:
     static QStringList  ProbeV4LVideoInputs(QString device);
