@@ -50,7 +50,7 @@ FirewireSignalMonitor::FirewireSignalMonitor(int db_cardnum,
                                              uint64_t _flags)
     : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
       dtvMonitorRunning(false),
-      tableMonitorThread(NULL),
+      tableMonitorThread(nullptr),
       stb_needs_retune(true),
       stb_needs_to_wait_for_pat(false),
       stb_needs_to_wait_for_power(false)
@@ -86,7 +86,7 @@ void FirewireSignalMonitor::Stop(void)
         dtvMonitorRunning = false;
         tableMonitorThread->wait();
         delete tableMonitorThread;
-        tableMonitorThread = NULL;
+        tableMonitorThread = nullptr;
     }
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }

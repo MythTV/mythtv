@@ -36,7 +36,7 @@ AudioInput::AudioInput(const QString &device)
 
 AudioInput *AudioInput::CreateDevice(const QByteArray &device)
 {
-    AudioInput *audio = NULL;
+    AudioInput *audio = nullptr;
     if (CONFIG_AUDIO_OSS && device.startsWith("/"))
     {
 #if defined( CONFIG_AUDIO_OSS ) && (CONFIG_AUDIO_OSS==1)

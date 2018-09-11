@@ -51,10 +51,10 @@ class LFDPriv
     LFDPriv() :
         generation(0), reset_timer_on(false),
         run_port_handler(false), is_port_handler_running(false),
-        avstream(NULL), channel(-1),
+        avstream(nullptr), channel(-1),
         output_plug(-1), input_plug(-1), bandwidth(0), no_data_cnt(0),
         is_p2p_node_open(false), is_bcast_node_open(false),
-        is_streaming(false), port_handler_thread(NULL)
+        is_streaming(false), port_handler_thread(nullptr)
     {
     }
 
@@ -157,7 +157,7 @@ LinuxFirewireDevice::~LinuxFirewireDevice()
     if (m_priv)
     {
         delete m_priv;
-        m_priv = NULL;
+        m_priv = nullptr;
     }
 }
 
@@ -333,7 +333,7 @@ bool LinuxFirewireDevice::ClosePort(void)
         mlocker.relock();
 
         delete m_priv->port_handler_thread;
-        m_priv->port_handler_thread = NULL;
+        m_priv->port_handler_thread = nullptr;
 
         LOG(VB_RECORD, LOG_INFO, LOC + "Joined port handler thread");
 
@@ -583,7 +583,7 @@ bool LinuxFirewireDevice::CloseAVStream(void)
         StopStreaming();
 
     iec61883_mpeg2_close(m_priv->avstream);
-    m_priv->avstream = NULL;
+    m_priv->avstream = nullptr;
 
     return true;
 }
@@ -905,7 +905,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
             LOG(VB_GENERAL, LOG_ERR, QString("LinuxFirewireDevice: ") +
                     "Couldn't get handle " +
                 QString("(after setting port %1").arg(port) + ENO);
-            item.handle = NULL;
+            item.handle = nullptr;
             break;
         }
 
@@ -915,7 +915,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
     if (item.handle)
     {
         raw1394_destroy_handle(item.handle);
-        item.handle = NULL;
+        item.handle = nullptr;
     }
 
     item.port = -1;
@@ -958,19 +958,19 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void)
 {
     if (!m_priv)
-        return NULL;
+        return nullptr;
 
     avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
-    return (it == m_priv->devices.end()) ? NULL : *it;
+    return (it == m_priv->devices.end()) ? nullptr : *it;
 }
 
 const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
 {
     if (!m_priv)
-        return NULL;
+        return nullptr;
 
     avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
-    return (it == m_priv->devices.end()) ? NULL : *it;
+    return (it == m_priv->devices.end()) ? nullptr : *it;
 }
 
 int linux_firewire_device_tspacket_handler(
@@ -1001,7 +1001,7 @@ static bool has_data(int fd, uint msec)
     tv.tv_sec  = msec / 1000;
     tv.tv_usec = (msec % 1000) * 1000;
 
-    int ready = select(fd + 1, &rfds, NULL, NULL, &tv);
+    int ready = select(fd + 1, &rfds, nullptr, nullptr, &tv);
 
     if (ready < 0)
         LOG(VB_GENERAL, LOG_ERR, "LFireDev: Select Error" + ENO);

@@ -37,10 +37,10 @@ class AudioInputALSA : public AudioInput
     ~AudioInputALSA() { Close(); };
 
     bool Open(uint sample_bits, uint sample_rate, uint channels);
-    inline bool IsOpen(void) { return (pcm_handle != NULL); }
+    inline bool IsOpen(void) { return (pcm_handle != nullptr); }
     void Close(void);
 
-    bool Start(void) { return (pcm_handle != NULL); }
+    bool Start(void) { return (pcm_handle != nullptr); }
     bool Stop(void);
 
     inline int GetBlockSize(void) { return myth_block_bytes; };

@@ -40,7 +40,7 @@ class ImportRecorder : public DTVRecorder
     void InitStreamData(void) {}
 
     virtual long long GetFramesWritten(void);
-    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const {return NULL;}
+    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const {return nullptr;}
     void UpdateRecSize();
 
   private:

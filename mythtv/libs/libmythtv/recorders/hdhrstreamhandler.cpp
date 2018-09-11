@@ -76,7 +76,7 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int recorder_id)
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -97,12 +97,12 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int recorder_id)
     }
 
     _handlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
     StreamHandler(device),
-    _hdhomerun_device(NULL),
+    _hdhomerun_device(nullptr),
     _tuner(-1),
     _tune_mode(hdhrTuneModeNone),
     _hdhr_lock(QMutex::Recursive)
@@ -116,7 +116,7 @@ HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
 void HDHRStreamHandler::run(void)
 {
     int tunerLock = 0;
-    char *error = NULL;
+    char *error = nullptr;
 
     RunProlog();
     /* Get a tuner lock */
@@ -322,7 +322,7 @@ bool HDHRStreamHandler::Open(void)
             hdhomerun_tuner_status_t t_status;
 
             if (hdhomerun_device_get_oob_status(
-                    _hdhomerun_device, NULL, &t_status) < 0)
+                    _hdhomerun_device, nullptr, &t_status) < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Failed to query Cable card OOB channel");
@@ -367,14 +367,14 @@ void HDHRStreamHandler::Close(void)
     {
         TuneChannel("none");
         hdhomerun_device_destroy(_hdhomerun_device);
-        _hdhomerun_device = NULL;
+        _hdhomerun_device = nullptr;
     }
 }
 
 bool HDHRStreamHandler::Connect(void)
 {
     _hdhomerun_device = hdhomerun_device_create_from_str(
-        _device.toLocal8Bit().constData(), NULL);
+        _device.toLocal8Bit().constData(), nullptr);
 
     if (!_hdhomerun_device)
     {
@@ -423,8 +423,8 @@ QString HDHRStreamHandler::TunerGet(
     }
 
     QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
-    char *value = NULL;
-    char *error = NULL;
+    char *value = nullptr;
+    char *error = nullptr;
     if (hdhomerun_device_get_var(
             _hdhomerun_device, valname.toLocal8Bit().constData(),
             &value, &error) < 0)
@@ -461,8 +461,8 @@ QString HDHRStreamHandler::TunerSet(
 
 
     QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
-    char *value = NULL;
-    char *error = NULL;
+    char *value = nullptr;
+    char *error = nullptr;
 
     if (hdhomerun_device_set_var(
             _hdhomerun_device, valname.toLocal8Bit().constData(),
@@ -489,12 +489,12 @@ QString HDHRStreamHandler::TunerSet(
 
 void HDHRStreamHandler::GetTunerStatus(struct hdhomerun_tuner_status_t *status)
 {
-    hdhomerun_device_get_tuner_status(_hdhomerun_device, NULL, status);
+    hdhomerun_device_get_tuner_status(_hdhomerun_device, nullptr, status);
 }
 
 bool HDHRStreamHandler::IsConnected(void) const
 {
-    return (_hdhomerun_device != NULL);
+    return (_hdhomerun_device != nullptr);
 }
 
 bool HDHRStreamHandler::TuneChannel(const QString &chn)

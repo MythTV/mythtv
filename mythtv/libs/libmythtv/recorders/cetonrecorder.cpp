@@ -16,7 +16,7 @@
             .arg(tvrec ? tvrec->GetInputId() : -1)
 
 CetonRecorder::CetonRecorder(TVRec *rec, CetonChannel *channel) :
-    DTVRecorder(rec), _channel(channel), _stream_handler(NULL)
+    DTVRecorder(rec), _channel(channel), _stream_handler(nullptr)
 {
 }
 

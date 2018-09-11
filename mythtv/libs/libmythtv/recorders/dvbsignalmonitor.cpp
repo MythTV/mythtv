@@ -59,7 +59,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
       rotorPosition    (tr("Rotor Progress"),     "pos",
                         100,    true,      0,   100, 0),
       streamHandlerStarted(false),
-      streamHandler(NULL)
+      streamHandler(nullptr)
 {
     // These two values should probably come from the database...
     int wait = 3000; // timeout when waiting on signal
@@ -154,7 +154,7 @@ void DVBSignalMonitor::Stop(void)
     if (GetStreamData())
         streamHandler->RemoveListener(GetStreamData());
     streamHandlerStarted = false;
-    streamHandler->SetRetuneAllowed(false, NULL, NULL);
+    streamHandler->SetRetuneAllowed(false, nullptr, nullptr);
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- end");
 }
 

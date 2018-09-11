@@ -11,7 +11,7 @@
 #define LOC  QString("ExternChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 ExternalChannel::ExternalChannel(TVRec *parent, const QString & device) :
-    DTVChannel(parent), m_device(device), m_stream_handler(0)
+    DTVChannel(parent), m_device(device), m_stream_handler(nullptr)
 {
 }
 
@@ -63,7 +63,7 @@ void ExternalChannel::Close()
     if (IsOpen())
     {
         ExternalStreamHandler::Return(m_stream_handler);
-        m_stream_handler = 0;
+        m_stream_handler = nullptr;
     }
 }
 

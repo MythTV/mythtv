@@ -51,7 +51,7 @@ ChannelBase::ChannelBase(TVRec *parent) :
     m_pParent(parent), m_curchannelname(""),
     m_commfree(false), m_inputid(0), m_sourceid(0), m_name(""),
     m_startChanNum(""), m_externalChanger(""), m_tuneToChannel(""),
-    m_system(NULL), m_system_status(0)
+    m_system(nullptr), m_system_status(0)
 {
 }
 
@@ -272,7 +272,7 @@ bool ChannelBase::KillScript(void)
     m_system->Term(true);
 
     delete m_system;
-    m_system = NULL;
+    m_system = nullptr;
     return true;
 }
 
@@ -363,7 +363,7 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
                                         uint inputid)
 {
 #ifdef USING_FIREWIRE
-    FirewireDevice *device = NULL;
+    FirewireDevice *device = nullptr;
     QString fwnode = CardUtil::GetFirewireChangerNode(inputid);
     uint64_t guid = string_to_guid(fwnode);
     QString fwmodel = CardUtil::GetFirewireChangerModel(inputid);
@@ -393,13 +393,13 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
     {
         device->ClosePort();
         delete device;
-        device = NULL;
+        device = nullptr;
         return false;
     }
 
     device->ClosePort();
     delete device;
-    device = NULL;
+    device = nullptr;
     return true;
 #else
     Q_UNUSED(freqid);
@@ -441,7 +441,7 @@ uint ChannelBase::GetScriptStatus(bool holding_lock)
         m_system_status != GENERIC_EXIT_START)
     {
         delete m_system;
-        m_system = NULL;
+        m_system = nullptr;
 
         HandleScriptEnd(m_system_status == GENERIC_EXIT_OK);
     }
@@ -693,7 +693,7 @@ ChannelBase *ChannelBase::CreateChannel(
 {
     rbFileExt = "ts";
 
-    ChannelBase *channel = NULL;
+    ChannelBase *channel = nullptr;
     if (genOpt.inputtype == "DVB")
     {
 #ifdef USING_DVB
@@ -786,7 +786,7 @@ ChannelBase *ChannelBase::CreateChannel(
             .arg(genOpt.inputtype).arg(genOpt.inputtype);
         LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: \n" +
             msg + "\n");
-        return NULL;
+        return nullptr;
     }
 
     if (!channel->Open())
@@ -794,7 +794,7 @@ ChannelBase *ChannelBase::CreateChannel(
         LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: " +
             QString("Failed to open device %1").arg(genOpt.videodev));
         delete channel;
-        return NULL;
+        return nullptr;
     }
 
     QString input = CardUtil::GetInputName(tvrec->GetInputId());

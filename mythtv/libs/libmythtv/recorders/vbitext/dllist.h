@@ -22,7 +22,11 @@ static inline struct dl_head *
 dl_init(struct dl_head *h)
 {
     h->first = (struct dl_node *)&h->null;
-    h->null = 0;
+#ifdef __cplusplus
+    h->null = nullptr;
+#else
+    h->null = NULL;
+#endif
     h->last = (struct dl_node *)&h->first;
     return h;
 }

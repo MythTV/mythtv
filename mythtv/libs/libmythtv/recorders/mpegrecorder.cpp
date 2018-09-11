@@ -66,12 +66,12 @@ const char* MpegRecorder::streamType[] =
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
     "",          "",              "DVD",           "VCD",
-    "SVCD",      "DVD-Special 1", "DVD-Special 2", 0
+    "SVCD",      "DVD-Special 1", "DVD-Special 2", nullptr
 };
 
 const char* MpegRecorder::aspectRatio[] =
 {
-    "Square", "4:3", "16:9", "2.21:1", 0
+    "Square", "4:3", "16:9", "2.21:1", nullptr
 };
 
 MpegRecorder::MpegRecorder(TVRec *rec) :
@@ -98,7 +98,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     high_mpeg4avgbitrate(13500),  high_mpeg4peakbitrate(20200),
     // Input file descriptors
     chanfd(-1),                   readfd(-1),
-    _device_read_buffer(NULL)
+    _device_read_buffer(nullptr)
 {
 }
 
@@ -128,7 +128,7 @@ void MpegRecorder::TeardownAll(void)
             _device_read_buffer->Stop();
 
         delete _device_read_buffer;
-        _device_read_buffer = NULL;
+        _device_read_buffer = nullptr;
     }
 
 }
@@ -265,7 +265,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     else if (opt == "mpeg2aspectratio")
     {
         bool found = false;
-        for (int i = 0; aspectRatio[i] != 0; i++)
+        for (int i = 0; aspectRatio[i] != nullptr; i++)
         {
             if (QString(aspectRatio[i]) == value)
             {
@@ -472,7 +472,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
             _device_read_buffer->Stop();
 
         delete _device_read_buffer;
-        _device_read_buffer = NULL;
+        _device_read_buffer = nullptr;
     }
 
     _device_read_buffer = new DeviceReadBuffer(this);
@@ -1120,7 +1120,7 @@ void MpegRecorder::run(void)
                 FD_ZERO(&rdset);
                 FD_SET(readfd, &rdset);
 
-                switch (select(readfd + 1, &rdset, NULL, NULL, &tv))
+                switch (select(readfd + 1, &rdset, nullptr, nullptr, &tv))
                 {
                     case -1:
                         if (errno == EINTR)
@@ -1216,7 +1216,7 @@ void MpegRecorder::run(void)
     {
         vbi_thread->wait();
         delete vbi_thread;
-        vbi_thread = NULL;
+        vbi_thread = nullptr;
         CloseVBIDevice();
     }
 
@@ -1228,7 +1228,7 @@ void MpegRecorder::run(void)
     {
         _stream_data->RemoveWritingListener(this);
         _stream_data->RemoveAVListener(this);
-        SetStreamData(NULL);
+        SetStreamData(nullptr);
     }
 
     QMutexLocker locker(&pauseLock);
@@ -1241,7 +1241,7 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 {
     const uint pid = tspacket_real.PID();
 
-    TSPacket *tspacket_fake = NULL;
+    TSPacket *tspacket_fake = nullptr;
     if ((driver == "hdpvr") && (pid == 0x1001)) // PCRPID for HD-PVR
     {
         tspacket_fake = tspacket_real.CreateClone();

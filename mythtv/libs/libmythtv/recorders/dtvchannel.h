@@ -135,8 +135,8 @@ class DTVChannel : public ChannelBase
 
     virtual bool IsIPTV(void) const { return false; }
 
-    bool HasGeneratedPAT(void) const { return genPAT != NULL; }
-    bool HasGeneratedPMT(void) const { return genPMT != NULL; }
+    bool HasGeneratedPAT(void) const { return genPAT != nullptr; }
+    bool HasGeneratedPMT(void) const { return genPMT != nullptr; }
     const ProgramAssociationTable *GetGeneratedPAT(void) const {return genPAT;}
     const ProgramMapTable         *GetGeneratedPMT(void) const {return genPMT;}
 

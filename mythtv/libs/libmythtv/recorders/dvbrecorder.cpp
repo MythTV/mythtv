@@ -35,7 +35,7 @@
             .arg(tvrec ? tvrec->GetInputId() : -1).arg(videodevice)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel *channel)
-    : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)
+    : DTVRecorder(rec), _channel(channel), _stream_handler(nullptr)
 {
     videodevice.clear();
 }
@@ -72,7 +72,7 @@ bool DVBRecorder::Open(void)
 
 bool DVBRecorder::IsOpen(void) const
 {
-    return (NULL != _stream_handler);
+    return (nullptr != _stream_handler);
 }
 
 void DVBRecorder::Close(void)

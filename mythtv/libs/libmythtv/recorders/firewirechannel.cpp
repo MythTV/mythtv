@@ -20,7 +20,7 @@ FirewireChannel::FirewireChannel(TVRec *parent, const QString &_videodevice,
     DTVChannel(parent),
     videodevice(_videodevice),
     fw_opts(firewire_opts),
-    device(NULL),
+    device(nullptr),
     current_channel(0),
     isopen(false)
 {

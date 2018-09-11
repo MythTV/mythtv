@@ -61,7 +61,7 @@ private:
   cMutex *mutex;
   bool locked;
 public:
-  explicit cMutexLock(cMutex *Mutex = NULL);
+  explicit cMutexLock(cMutex *Mutex = nullptr);
   ~cMutexLock();
   bool Lock(cMutex *Mutex);
   };
@@ -87,7 +87,7 @@ public:
   const char *TitleText(void) { return titleText; }
   const char *SubTitleText(void) { return subTitleText; }
   const char *BottomText(void) { return bottomText; }
-  const char *Entry(int n) { return n < numEntries ? entries[n] : NULL; }
+  const char *Entry(int n) { return n < numEntries ? entries[n] : nullptr; }
   int NumEntries(void) { return numEntries; }
   bool Selectable(void) { return selectable; }
   bool Select(int Index);

@@ -57,7 +57,7 @@ bool LinuxAVCInfo::ClosePort(void)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Releasing raw1394 handle");
         raw1394_destroy_handle(fw_handle);
-        fw_handle = NULL;
+        fw_handle = nullptr;
     }
 
     return true;

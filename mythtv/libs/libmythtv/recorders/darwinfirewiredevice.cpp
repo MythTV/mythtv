@@ -898,7 +898,7 @@ void *dfd_controller_thunk(void *callback_data)
     MThread::ThreadSetup("DarwinController");
     reinterpret_cast<DarwinFirewireDevice*>(callback_data)->RunController();
     MThread::ThreadCleanup();
-    return NULL;
+    return nullptr;
 }
 
 void dfd_update_device_list_item(

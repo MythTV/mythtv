@@ -16,7 +16,7 @@
 #define LOC QString("CetonChan[%1](%2): ").arg(m_inputid).arg(GetDevice())
 
 CetonChannel::CetonChannel(TVRec *parent, const QString &device) :
-    DTVChannel(parent), _device_id(device), _stream_handler(NULL)
+    DTVChannel(parent), _device_id(device), _stream_handler(nullptr)
 {
 }
 

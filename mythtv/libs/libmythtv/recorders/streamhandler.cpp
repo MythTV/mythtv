@@ -25,7 +25,7 @@ StreamHandler::StreamHandler(const QString &device) :
 
     _pid_lock(QMutex::Recursive),
     _open_pid_filters(0),
-    _mpts_tfw(NULL),
+    _mpts_tfw(nullptr),
 
     _listener_lock(QMutex::Recursive)
 {
@@ -394,7 +394,7 @@ PIDPriority StreamHandler::GetPIDPriority(uint pid) const
 
 void StreamHandler::WriteMPTS(unsigned char * buffer, uint len)
 {
-    if (_mpts_tfw == NULL)
+    if (_mpts_tfw == nullptr)
         return;
     _mpts_tfw->Write(buffer, len);
 }
@@ -416,7 +416,7 @@ bool StreamHandler::AddNamedOutputFile(const QString &file)
         if (!_mpts_tfw->Open())
         {
             delete _mpts_tfw;
-            _mpts_tfw = NULL;
+            _mpts_tfw = nullptr;
             return false;
         }
         LOG(VB_RECORD, LOG_INFO, LOC +
@@ -457,7 +457,7 @@ void StreamHandler::RemoveNamedOutputFile(const QString &file)
         if (_mpts_files.isEmpty())
         {
             delete _mpts_tfw;
-            _mpts_tfw = NULL;
+            _mpts_tfw = nullptr;
         }
     }
 #endif //  !defined( USING_MINGW ) && !defined( _MSC_VER )

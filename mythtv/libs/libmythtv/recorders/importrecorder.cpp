@@ -40,13 +40,13 @@
 #include "mythdate.h"
 
 #define TVREC_CARDNUM \
-        ((tvrec != NULL) ? QString::number(tvrec->GetInputId()) : "NULL")
+        ((tvrec != nullptr) ? QString::number(tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("ImportRec[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(videodevice)
 
 ImportRecorder::ImportRecorder(TVRec *rec) :
-    DTVRecorder(rec), _import_fd(-1), m_cfp(NULL), m_nfc(0)
+    DTVRecorder(rec), _import_fd(-1), m_cfp(nullptr), m_nfc(0)
 {
 }
 
@@ -139,13 +139,13 @@ void ImportRecorder::run(void)
         ctx->SetPlayingInfo(curRecording);
         ctx->SetRingBuffer(rb);
         ctx->SetPlayer(cfp);
-        cfp->SetPlayerInfo(NULL, NULL, ctx);
+        cfp->SetPlayerInfo(nullptr, nullptr, ctx);
 
         m_cfp=cfp;
         gCoreContext->RegisterFileForWrite(ringBuffer->GetFilename());
         cfp->RebuildSeekTable(false,UpdateFS,this);
         gCoreContext->UnregisterFileForWrite(ringBuffer->GetFilename());
-        m_cfp=NULL;
+        m_cfp=nullptr;
 
         delete ctx;
     }

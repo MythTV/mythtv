@@ -42,7 +42,7 @@ class CetonRTSP : QObject
 
 protected:
     bool ProcessRequest(
-        const QString &method, const QStringList *headers = NULL,
+        const QString &method, const QStringList *headers = nullptr,
                         bool use_control = false, bool waitforanswer = true,
                         const QString &alternative = QString());
 

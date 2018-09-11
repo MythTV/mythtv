@@ -81,7 +81,7 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int recorder_id)
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -102,14 +102,14 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int recorder_id)
     }
 
     _handlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 ASIStreamHandler::ASIStreamHandler(const QString &device) :
     StreamHandler(device),
     _device_num(-1), _buf_size(-1), _fd(-1),
     _packet_size(TSPacket::kSize), _clock_source(kASIInternalClock),
-    _rx_mode(kASIRXSyncOnActualConvertTo188), _drb(NULL)
+    _rx_mode(kASIRXSyncOnActualConvertTo188), _drb(nullptr)
 {
     setObjectName("ASISH");
 }
@@ -156,7 +156,7 @@ void ASIStreamHandler::run(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate DRB buffer");
         delete drb;
-        drb = NULL;
+        drb = nullptr;
         Close();
         _error = true;
         RunEpilog();
@@ -169,7 +169,7 @@ void ASIStreamHandler::run(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate buffer");
         delete drb;
-        drb = NULL;
+        drb = nullptr;
         Close();
         _error = true;
         RunEpilog();
@@ -249,7 +249,7 @@ void ASIStreamHandler::run(void)
 
     {
         QMutexLocker locker(&_start_stop_lock);
-        _drb = NULL;
+        _drb = nullptr;
     }
 
     if (drb->IsRunning())

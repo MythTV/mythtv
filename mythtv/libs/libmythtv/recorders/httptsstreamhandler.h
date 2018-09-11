@@ -43,7 +43,7 @@ class MTV_PUBLIC HTTPReader : public QObject
 
   public:
     explicit HTTPReader(HTTPTSStreamHandler* parent) :
-        m_parent(parent), m_reply(NULL), m_buffer(NULL), m_ok(true), m_size(0) {}
+        m_parent(parent), m_reply(nullptr), m_buffer(nullptr), m_ok(true), m_size(0) {}
     void Cancel(void);
     bool DownloadStream(const QUrl url);
 

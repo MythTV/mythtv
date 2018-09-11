@@ -85,7 +85,7 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -106,7 +106,7 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
     }
 
     _handlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 CetonStreamHandler::CetonStreamHandler(const QString &device) :

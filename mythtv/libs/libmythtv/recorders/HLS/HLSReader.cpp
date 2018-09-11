@@ -22,15 +22,15 @@ static QUrl RelativeURI (const QString& baseString, const QString& uriString)
 static uint64_t MDate(void)
 {
     timeval  t;
-    gettimeofday(&t, NULL);
+    gettimeofday(&t, nullptr);
     return t.tv_sec * 1000000ULL + t.tv_usec;
 }
 
 HLSReader::HLSReader(void)
-    : m_curstream(NULL), m_cur_seq(-1), m_bitrate_index(0),
+    : m_curstream(nullptr), m_cur_seq(-1), m_bitrate_index(0),
       m_fatal(false), m_cancel(false),
       m_throttle(true), m_aesmsg(false),
-      m_playlistworker(NULL), m_streamworker(NULL),
+      m_playlistworker(nullptr), m_streamworker(nullptr),
       m_playlist_size(0), m_bandwidthcheck(false), m_prebuffer_cnt(10),
       m_debug(false), m_debug_cnt(0), m_slow_cnt(0)
 {
@@ -89,7 +89,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
 
     QMutexLocker lock(&m_stream_lock);
     m_streams.clear();
-    m_curstream = NULL;
+    m_curstream = nullptr;
 
     if (!ParseM3U8(buffer))
         return false;
@@ -100,7 +100,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
         StreamContainer::iterator Istream;
         for (Istream = m_streams.begin(); Istream != m_streams.end(); ++Istream)
         {
-            if (m_curstream == NULL ||
+            if (m_curstream == nullptr ||
                 (*Istream)->Bitrate() > m_curstream->Bitrate())
                 m_curstream = *Istream;
         }
@@ -148,7 +148,7 @@ void HLSReader::Close(bool quiet)
     Cancel(quiet);
 
     QMutexLocker stream_lock(&m_stream_lock);
-    m_curstream = NULL;
+    m_curstream = nullptr;
 
     StreamContainer::iterator Istream;
     for (Istream = m_streams.begin(); Istream != m_streams.end(); ++Istream)
@@ -156,9 +156,9 @@ void HLSReader::Close(bool quiet)
     m_streams.clear();
 
     delete m_streamworker;
-    m_streamworker = NULL;
+    m_streamworker = nullptr;
     delete m_playlistworker;
-    m_playlistworker = NULL;
+    m_playlistworker = nullptr;
 
     LOG(VB_RECORD, (quiet ? LOG_DEBUG : LOG_INFO), LOC + "Close -- end");
 }
@@ -696,7 +696,7 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
 
 void HLSReader::DecreaseBitrate(int progid)
 {
-    HLSRecStream *hls = NULL;
+    HLSRecStream *hls = nullptr;
     uint64_t bitrate = m_curstream->Bitrate();
     uint64_t candidate = 0;
     StreamContainer::const_iterator Istream;
@@ -732,7 +732,7 @@ void HLSReader::DecreaseBitrate(int progid)
 
 void HLSReader::IncreaseBitrate(int progid)
 {
-    HLSRecStream *hls = NULL;
+    HLSRecStream *hls = nullptr;
     uint64_t bitrate = m_curstream->Bitrate();
     uint64_t candidate = INT_MAX;
     StreamContainer::const_iterator Istream;
@@ -941,7 +941,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     /* If the segment is encrypted, decode it */
     if (segment.HasKeyPath())
     {
-        if (!hls->DecodeData(downloader, hls->IVLoaded() ? hls->AESIV() : NULL,
+        if (!hls->DecodeData(downloader, hls->IVLoaded() ? hls->AESIV() : nullptr,
                              segment.KeyPath(),
                              buffer, segment.Sequence()))
             return 0;

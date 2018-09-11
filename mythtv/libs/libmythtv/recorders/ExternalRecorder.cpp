@@ -33,7 +33,7 @@
             .arg(m_channel->GetDevice())
 
 ExternalRecorder::ExternalRecorder(TVRec *rec, ExternalChannel *channel) :
-    DTVRecorder(rec), m_channel(channel), m_stream_handler(NULL)
+    DTVRecorder(rec), m_channel(channel), m_stream_handler(nullptr)
 {
 }
 

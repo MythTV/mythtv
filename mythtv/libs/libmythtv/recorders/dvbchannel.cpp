@@ -69,7 +69,7 @@ QDateTime DVBChannel::last_tuning = QDateTime::currentDateTime();
 DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     : DTVChannel(parent),
     // Helper classes
-    diseqc_tree(NULL),              dvbcam(NULL),
+    diseqc_tree(nullptr),           dvbcam(nullptr),
     // Device info
     capabilities(0),                ext_modulations(0),
     frequency_minimum(0),           frequency_maximum(0),
@@ -118,7 +118,7 @@ DVBChannel::~DVBChannel()
     if (master == this)
     {
         master_map[key].pop_front();
-        DVBChannel *new_master = NULL;
+        DVBChannel *new_master = nullptr;
         if (!master_map[key].empty())
             new_master = dynamic_cast<DVBChannel*>(master_map[key].front());
         if (new_master)
@@ -137,7 +137,7 @@ DVBChannel::~DVBChannel()
     MasterMap::iterator mit = master_map.find(key);
     if ((*mit).empty())
         delete dvbcam;
-    dvbcam = NULL;
+    dvbcam = nullptr;
     master_map_lock.unlock();
 
     // diseqc_tree is managed elsewhere
@@ -156,10 +156,10 @@ void DVBChannel::Close(DVBChannel *who)
     QMutexLocker locker(&hw_lock);
 
     DVBChannel *master = GetMasterLock();
-    if (master != NULL && master != this)
+    if (master != nullptr && master != this)
     {
         if (dvbcam->IsRunning())
-            dvbcam->SetPMT(this, NULL);
+            dvbcam->SetPMT(this, nullptr);
         master->Close(this);
         fd_frontend = -1;
         ReturnMasterLock(master);
@@ -414,7 +414,7 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
     if (!diseqc_tree)
     {
         const DVBChannel *master = GetMasterLock();
-        if (master == NULL || !master->diseqc_tree)
+        if (master == nullptr || !master->diseqc_tree)
             CheckFrequency(tuning.frequency);
         ReturnMasterLock(master);
     }
@@ -593,20 +593,20 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     {
         LOG(VB_GENERAL, LOG_ERR, "DVBChan: Unsupported tuner type " +
             tuner_type.toString());
-        return NULL;
+        return nullptr;
     }
 
     LOG(VB_CHANNEL, LOG_DEBUG, "DVBChan: modsys " + tuning.mod_sys.toString());
 
     cmdseq = (struct dtv_properties*) calloc(1, sizeof(*cmdseq));
     if (!cmdseq)
-        return NULL;
+        return nullptr;
 
     cmdseq->props = (struct dtv_property*) calloc(20, sizeof(*(cmdseq->props)));
     if (!(cmdseq->props))
     {
         free(cmdseq);
-        return NULL;
+        return nullptr;
     }
 
     // The cx24116 DVB-S2 demod anounce FE_CAN_FEC_AUTO but has apparently
@@ -1070,7 +1070,7 @@ const DiSEqCDevRotor *DVBChannel::GetRotor(void) const
     if (diseqc_tree)
         return diseqc_tree->FindRotor(diseqc_settings);
 
-    return NULL;
+    return nullptr;
 }
 
 // documented in dvbchannel.h
@@ -1429,7 +1429,7 @@ void DVBChannel::ReturnMasterLock(DVBChannelP &dvbm)
 {
     DTVChannel *chan = static_cast<DTVChannel*>(dvbm);
     DTVChannel::ReturnMasterLock(chan);
-    dvbm = NULL;
+    dvbm = nullptr;
 }
 
 const DVBChannel *DVBChannel::GetMasterLock(void) const
@@ -1450,7 +1450,7 @@ void DVBChannel::ReturnMasterLock(DVBChannelCP &dvbm)
     DTVChannel *chan =
         static_cast<DTVChannel*>(const_cast<DVBChannel*>(dvbm));
     DTVChannel::ReturnMasterLock(chan);
-    dvbm = NULL;
+    dvbm = nullptr;
 }
 
 bool DVBChannel::IsMaster(void) const
@@ -1509,7 +1509,7 @@ static bool wait_for_backend(int fd, int timeout_ms)
     // Try to wait for some output like an event, unfortunately
     // this fails on several DVB cards, so we have a timeout.
     int ret = 0;
-    do ret = select(fd+1, &fd_select_set, NULL, NULL, &select_timeout);
+    do ret = select(fd+1, &fd_select_set, nullptr, nullptr, &select_timeout);
     while ((-1 == ret) && (EINTR == errno));
 
     if (-1 == ret)

@@ -20,7 +20,7 @@
 QMutex CetonRTSP::_rtspMutex;
 
 CetonRTSP::CetonRTSP(const QString &ip, uint tuner, ushort port) :
-    _socket(NULL),
+    _socket(nullptr),
     _sequenceNumber(0),
     _sessionId("0"),
     _responseCode(-1),
@@ -35,7 +35,7 @@ CetonRTSP::CetonRTSP(const QString &ip, uint tuner, ushort port) :
 }
 
 CetonRTSP::CetonRTSP(const QUrl &url) :
-    _socket(NULL),
+    _socket(nullptr),
     _sequenceNumber(0),
     _sessionId("0"),
     _requestUrl(url),
@@ -86,7 +86,7 @@ bool CetonRTSP::ProcessRequest(
                 QString("Could not connect to server %1:%2")
                 .arg(_requestUrl.host()).arg(_requestUrl.port()));
             delete _socket;
-            _socket = NULL;
+            _socket = nullptr;
             return false;
         }
     }
@@ -114,7 +114,7 @@ bool CetonRTSP::ProcessRequest(
     requestHeaders.append(QString("CSeq: %1").arg(++_sequenceNumber));
     if (_sessionId != "0")
         requestHeaders.append(QString("Session: %1").arg(_sessionId));
-    if (headers != NULL)
+    if (headers != nullptr)
     {
         for(int i = 0; i < headers->count(); i++)
         {
@@ -476,7 +476,7 @@ bool CetonRTSP::Teardown(void)
     QMutexLocker locker(&_rtspMutex);
 
     delete _socket;
-    _socket = NULL;
+    _socket = nullptr;
 
     _sessionId = "0";
     return result;
@@ -509,10 +509,10 @@ void CetonRTSP::timerEvent(QTimerEvent*)
     LOG(VB_RECORD, LOG_DEBUG, LOC + "Sending KeepAlive");
     if (_canGetParameter)
     {
-        ProcessRequest("GET_PARAMETER", NULL, false, false);
+        ProcessRequest("GET_PARAMETER", nullptr, false, false);
     }
     else
     {
-        ProcessRequest("OPTIONS", NULL, false, false, "*");
+        ProcessRequest("OPTIONS", nullptr, false, false, "*");
     }
 }

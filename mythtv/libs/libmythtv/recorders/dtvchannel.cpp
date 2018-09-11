@@ -21,7 +21,7 @@ DTVChannel::DTVChannel(TVRec *parent)
       currentProgramNum(-1),
       currentATSCMajorChannel(0), currentATSCMinorChannel(0),
       currentTransportID(0),      currentOriginalNetworkID(0),
-      genPAT(NULL),               genPMT(NULL)
+      genPAT(nullptr),            genPMT(nullptr)
 {
 }
 
@@ -30,13 +30,13 @@ DTVChannel::~DTVChannel()
     if (genPAT)
     {
         delete genPAT;
-        genPAT = NULL;
+        genPAT = nullptr;
     }
 
     if (genPMT)
     {
         delete genPMT;
-        genPMT = NULL;
+        genPMT = nullptr;
     }
 }
 
@@ -158,16 +158,16 @@ DTVChannel *DTVChannel::GetMasterLock(const QString &key)
     if (mit == master_map.end() || (*mit).empty())
     {
         master_map_lock.unlock();
-        return NULL;
+        return nullptr;
     }
     return (*mit).front();
 }
 
 void DTVChannel::ReturnMasterLock(DTVChannelP &chan)
 {
-    if (chan != NULL)
+    if (chan != nullptr)
     {
-        chan = NULL;
+        chan = nullptr;
         master_map_lock.unlock();
     }
 }
@@ -260,8 +260,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     if (genPAT)
     {
         version = (genPAT->Version()+1) & 0x1f;
-        delete genPAT; genPAT = NULL;
-        delete genPMT; genPMT = NULL;
+        delete genPAT; genPAT = nullptr;
+        delete genPMT; genPMT = nullptr;
     }
 
     bool ok = true;

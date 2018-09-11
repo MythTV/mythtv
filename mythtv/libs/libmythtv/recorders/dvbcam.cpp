@@ -62,7 +62,7 @@ using namespace std;
 DVBCam::DVBCam(const QString &aDevice)
     : device(aDevice),        numslots(0),
       ciHandlerDoRun(false),  ciHandlerRunning(false),
-      ciHandler(NULL),        ciHandlerThread(NULL),
+      ciHandler(nullptr),     ciHandlerThread(nullptr),
       have_pmt(false),        pmt_sent(false),
       pmt_updated(false),     pmt_added(false)
 {
@@ -130,13 +130,13 @@ bool DVBCam::Stop(void)
             ciHandlerThread->wait();
             locker.relock();
             delete ciHandlerThread;
-            ciHandlerThread = NULL;
+            ciHandlerThread = nullptr;
         }
 
         if (ciHandler)
         {
             delete ciHandler;
-            ciHandler = NULL;
+            ciHandler = nullptr;
         }
     }
 
@@ -157,29 +157,29 @@ bool DVBCam::Stop(void)
 void DVBCam::HandleUserIO(void)
 {
     cCiEnquiry* enq = ciHandler->GetEnquiry();
-    if (enq != NULL)
+    if (enq != nullptr)
     {
-        if (enq->Text() != NULL)
+        if (enq->Text() != nullptr)
             LOG(VB_DVBCAM, LOG_INFO, LOC + QString("CAM: Received message: %1")
                     .arg(enq->Text()));
         delete enq;
     }
 
     cCiMenu* menu = ciHandler->GetMenu();
-    if (menu != NULL)
+    if (menu != nullptr)
     {
-        if (menu->TitleText() != NULL)
+        if (menu->TitleText() != nullptr)
             LOG(VB_DVBCAM, LOG_INFO, LOC + QString("CAM: Menu Title: %1")
                     .arg(menu->TitleText()));
-        if (menu->SubTitleText() != NULL)
+        if (menu->SubTitleText() != nullptr)
             LOG(VB_DVBCAM, LOG_INFO, LOC + QString("CAM: Menu SubTitle: %1")
                     .arg(menu->SubTitleText()));
-        if (menu->BottomText() != NULL)
+        if (menu->BottomText() != nullptr)
             LOG(VB_DVBCAM, LOG_INFO, LOC + QString("CAM: Menu BottomText: %1")
                     .arg(menu->BottomText()));
 
         for (int i=0; i<menu->NumEntries(); i++)
-            if (menu->Entry(i) != NULL)
+            if (menu->Entry(i) != nullptr)
                 LOG(VB_DVBCAM, LOG_INFO, LOC + QString("CAM: Menu Entry: %1")
                         .arg(menu->Entry(i)));
 

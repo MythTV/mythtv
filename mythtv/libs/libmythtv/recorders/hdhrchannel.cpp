@@ -33,7 +33,7 @@ using namespace std;
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
     : DTVChannel(parent),
       _device_id(device),
-      _stream_handler(NULL)
+      _stream_handler(nullptr)
 {
     RegisterForMaster(_device_id);
 }
