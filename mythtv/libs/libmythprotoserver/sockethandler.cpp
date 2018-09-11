@@ -19,7 +19,7 @@ SocketHandler::~SocketHandler()
     if (m_socket)
     {
         m_socket->DecrRef();
-        m_socket = NULL;
+        m_socket = nullptr;
     }
 }
 

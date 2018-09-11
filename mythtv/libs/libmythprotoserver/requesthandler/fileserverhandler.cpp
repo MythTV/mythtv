@@ -22,7 +22,7 @@
 #include "requesthandler/fileserverhandler.h"
 #include "requesthandler/fileserverutil.h"
 
-DeleteThread *deletethread = NULL;
+DeleteThread *deletethread = nullptr;
 
 void FileServerHandler::connectionClosed(MythSocket *socket)
 {
@@ -157,13 +157,13 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
 
 void FileServerHandler::RunDeleteThread(void)
 {
-    if (deletethread != NULL)
+    if (deletethread != nullptr)
     {
 		if (deletethread->isRunning())
 			return;
 
         delete deletethread;
-        deletethread = NULL;
+        deletethread = nullptr;
     }
 
     deletethread = new DeleteThread();
@@ -206,7 +206,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     if ((commands.size() < 3) || (commands.size() > 6))
         return false;
 
-    FileTransfer *ft    = NULL;
+    FileTransfer *ft    = nullptr;
     QString hostname    = "";
     QString filename    = "";
     bool writemode      = false;
@@ -348,7 +348,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
 
     socket->WriteStringList(slist);
     m_parent->AddSocketHandler(ft);
-    ft->DecrRef(); ft = NULL;
+    ft->DecrRef(); ft = nullptr;
 
     return true;
 }
@@ -363,7 +363,7 @@ void FileServerHandler::connectionAnnounced(MythSocket *socket,
         if (slist.size() >= 3)
         {
             SocketHandler *handler = m_parent->GetConnectionBySocket(socket);
-            if (handler == NULL)
+            if (handler == nullptr)
                 return;
 
             QWriteLocker wlock(&m_fsLock);
@@ -708,7 +708,7 @@ bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
 
 bool FileServerHandler::DeleteFile(QString filename, QString storagegroup)
 {
-    return HandleDeleteFile( (SocketHandler *)NULL, filename, storagegroup);
+    return HandleDeleteFile(nullptr, filename, storagegroup);
 }
 
 bool FileServerHandler::HandleDeleteFile(SocketHandler *socket,
@@ -821,7 +821,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
     else
     {
         // handle request on remote server
-        SocketHandler *remsock = NULL;
+        SocketHandler *remsock = nullptr;
         {
             QReadLocker rlock(&m_fsLock);
             if (m_fsMap.contains(wantHost))
@@ -885,7 +885,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
     else
     {
         // handle request on remote server
-        SocketHandler *remsock = NULL;
+        SocketHandler *remsock = nullptr;
         {
             QReadLocker rlock(&m_fsLock);
             if (m_fsMap.contains(wantHost))

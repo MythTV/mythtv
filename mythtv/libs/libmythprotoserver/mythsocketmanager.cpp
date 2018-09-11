@@ -39,7 +39,7 @@ class ProcessRequestRunnable : public QRunnable
     {
         m_parent.ProcessRequest(m_sock);
         m_sock->DecrRef();
-        m_sock = NULL;
+        m_sock = nullptr;
     }
 
     MythSocketManager &m_parent;
@@ -56,7 +56,7 @@ void MythServer::newTcpConnection(qt_socket_fd_t socket)
 }
 
 MythSocketManager::MythSocketManager() :
-    m_server(NULL), m_threadPool("MythSocketManager")
+    m_server(nullptr), m_threadPool("MythSocketManager")
 {
 }
 
@@ -82,11 +82,11 @@ MythSocketManager::~MythSocketManager()
 
 bool MythSocketManager::Listen(int port)
 {
-    if (m_server != NULL)
+    if (m_server != nullptr)
     {
         m_server->close();
         delete m_server;
-        m_server = NULL;
+        m_server = nullptr;
     }
 
     m_server = new MythServer(this);
@@ -146,7 +146,7 @@ SocketHandler *MythSocketManager::GetConnectionBySocket(MythSocket *sock)
 {
     QReadLocker rlock(&m_socketLock);
     if (!m_socketMap.contains(sock))
-        return NULL;
+        return nullptr;
 
     SocketHandler *handler = m_socketMap[sock];
     handler->IncrRef();

@@ -13,7 +13,7 @@
 #include "requesthandler/outboundhandler.h"
 
 OutboundRequestHandler::OutboundRequestHandler(void) :
-    m_socket(NULL)
+    m_socket(nullptr)
 {
     m_timer.setSingleShot(true);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(ConnectToMaster()));
@@ -41,7 +41,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     {
         LOG(VB_GENERAL, LOG_ERR, "Failed to connect to master backend.");
         m_socket->DecrRef();
-        m_socket = NULL;
+        m_socket = nullptr;
         return false;
     }
 
@@ -50,7 +50,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Unable to confirm protocol version with backend.");
         m_socket->DecrRef();
-        m_socket = NULL;
+        m_socket = nullptr;
         return false;
     }
 #endif
@@ -59,7 +59,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     {
         LOG(VB_GENERAL, LOG_NOTICE, "Announcement to upstream master backend failed.");
         m_socket->DecrRef();
-        m_socket = NULL;
+        m_socket = nullptr;
         return false;
     }
 
@@ -69,7 +69,7 @@ bool OutboundRequestHandler::DoConnectToMaster(void)
     handler->AllowSystemEvents(true);
     m_parent->AddSocketHandler(handler); // register socket for reception of events
     handler->DecrRef(); // drop local instance in counter
-    handler = NULL;
+    handler = nullptr;
 
     LOG(VB_GENERAL, LOG_NOTICE, "Connected to master backend.");
 

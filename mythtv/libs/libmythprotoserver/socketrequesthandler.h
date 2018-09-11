@@ -13,7 +13,7 @@ class PROTOSERVER_PUBLIC SocketRequestHandler : public QObject
 {
     Q_OBJECT
   public:
-    SocketRequestHandler() : m_parent(NULL) {};
+    SocketRequestHandler() : m_parent(nullptr) {};
    ~SocketRequestHandler() {};
 
     virtual bool HandleAnnounce(MythSocket */*socket*/, QStringList &/*commands*/,
