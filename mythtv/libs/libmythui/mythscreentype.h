@@ -62,7 +62,7 @@ class MUI_PUBLIC MythScreenType : public MythUIComposite
     void SetFullscreen(bool full);
 
     MythUIType *GetFocusWidget(void) const;
-    bool SetFocusWidget(MythUIType *widget = NULL);
+    bool SetFocusWidget(MythUIType *widget = nullptr);
     virtual bool NextPrevWidgetFocus(bool up_or_down);
     void BuildFocusList(void);
 

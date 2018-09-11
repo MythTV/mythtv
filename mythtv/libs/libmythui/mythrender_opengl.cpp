@@ -79,7 +79,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
      && display.contains(':'))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is disabled for Remote X Session");
-        return 0;
+        return nullptr;
     }
 #ifdef USE_OPENGL_QT5
     MythRenderFormat format = QSurfaceFormat::defaultFormat();
@@ -163,7 +163,7 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
     if (!(openGLVersionFlags & QGLFormat::OpenGL_Version_1_2))
     {
         LOG(VB_GENERAL, LOG_WARNING, "OpenGL 1.2 not supported, get new hardware!");
-        return NULL;
+        return nullptr;
     }
 
     LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL 1.2 render");
@@ -181,14 +181,14 @@ MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice*
   : MythRender(type), m_lock(QMutex::Recursive)
 {
     QWidget *w = dynamic_cast<QWidget*>(device);
-    m_window = (w) ? w->windowHandle() : NULL;
+    m_window = (w) ? w->windowHandle() : nullptr;
     ResetVars();
     ResetProcs();
     setFormat(format);
 }
 
 MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
-  : MythRender(type), m_lock(QMutex::Recursive), m_window(0)
+  : MythRender(type), m_lock(QMutex::Recursive), m_window(nullptr)
 {
     ResetVars();
     ResetProcs();
@@ -458,7 +458,7 @@ void MythRenderOpenGL::SetFence(void)
 void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
 {
     if (!m_textures.contains(tex))
-        return NULL;
+        return nullptr;
 
     makeCurrent(); // associated doneCurrent() in UpdateTexture
 
@@ -466,13 +466,13 @@ void* MythRenderOpenGL::GetTextureBuffer(uint tex, bool create_buffer)
     glBindTexture(m_textures[tex].m_type, tex);
 
     if (!create_buffer)
-        return NULL;
+        return nullptr;
 
     if (m_textures[tex].m_pbo)
     {
         m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_textures[tex].m_pbo);
         m_glBufferData(GL_PIXEL_UNPACK_BUFFER,
-                             m_textures[tex].m_data_size, NULL, GL_STREAM_DRAW);
+                             m_textures[tex].m_data_size, nullptr, GL_STREAM_DRAW);
         return m_glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
     }
 
@@ -501,7 +501,7 @@ void MythRenderOpenGL::UpdateTexture(uint tex, void *buf)
         m_glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
         glTexSubImage2D(m_textures[tex].m_type, 0, 0, 0, size.width(),
                         size.height(), m_textures[tex].m_data_fmt,
-                        m_textures[tex].m_data_type, 0);
+                        m_textures[tex].m_data_type, nullptr);
         m_glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     }
     else
@@ -774,7 +774,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     glBindTexture(m_textures[tex].m_type, tex);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  (GLint) size.width(), (GLint) size.height(), 0,
-                 m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, NULL);
+                 m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
     m_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                              m_textures[tex].m_type, tex, 0);
 
@@ -1012,7 +1012,7 @@ void* MythRenderOpenGL::GetProcAddress(const QString &proc) const
             break;
 #endif
     }
-    if (result == NULL)
+    if (result == nullptr)
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Extension not found: %1").arg(proc));
 
@@ -1192,27 +1192,27 @@ void MythRenderOpenGL::ResetProcs(void)
 {
     m_extensions = QString();
 
-    m_glTexImage1D = NULL;
-    m_glActiveTexture = NULL;
-    m_glMapBuffer = NULL;
-    m_glBindBuffer = NULL;
-    m_glGenBuffers = NULL;
-    m_glBufferData = NULL;
-    m_glUnmapBuffer = NULL;
-    m_glDeleteBuffers = NULL;
-    m_glGenFramebuffers = NULL;
-    m_glBindFramebuffer = NULL;
-    m_glFramebufferTexture2D = NULL;
-    m_glCheckFramebufferStatus = NULL;
-    m_glDeleteFramebuffers = NULL;
-    m_glGenFencesNV = NULL;
-    m_glDeleteFencesNV = NULL;
-    m_glSetFenceNV = NULL;
-    m_glFinishFenceNV = NULL;
-    m_glGenFencesAPPLE = NULL;
-    m_glDeleteFencesAPPLE = NULL;
-    m_glSetFenceAPPLE = NULL;
-    m_glFinishFenceAPPLE = NULL;
+    m_glTexImage1D = nullptr;
+    m_glActiveTexture = nullptr;
+    m_glMapBuffer = nullptr;
+    m_glBindBuffer = nullptr;
+    m_glGenBuffers = nullptr;
+    m_glBufferData = nullptr;
+    m_glUnmapBuffer = nullptr;
+    m_glDeleteBuffers = nullptr;
+    m_glGenFramebuffers = nullptr;
+    m_glBindFramebuffer = nullptr;
+    m_glFramebufferTexture2D = nullptr;
+    m_glCheckFramebufferStatus = nullptr;
+    m_glDeleteFramebuffers = nullptr;
+    m_glGenFencesNV = nullptr;
+    m_glDeleteFencesNV = nullptr;
+    m_glSetFenceNV = nullptr;
+    m_glFinishFenceNV = nullptr;
+    m_glGenFencesAPPLE = nullptr;
+    m_glDeleteFencesAPPLE = nullptr;
+    m_glSetFenceAPPLE = nullptr;
+    m_glFinishFenceAPPLE = nullptr;
 }
 
 uint MythRenderOpenGL::CreatePBO(uint tex)
@@ -1236,7 +1236,7 @@ uint MythRenderOpenGL::CreatePBO(uint tex)
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
                  m_textures[tex].m_size.width(),
                  m_textures[tex].m_size.height(), 0,
-                 m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, NULL);
+                 m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
 
     GLuint tmp_pbo;
     m_glGenBuffers(1, &tmp_pbo);
@@ -1429,7 +1429,7 @@ void MythRenderOpenGL::ExpireVertices(uint max)
     {
         uint64_t ref = m_vertexExpiry.first();
         m_vertexExpiry.removeFirst();
-        GLfloat *vertices = NULL;
+        GLfloat *vertices = nullptr;
         if (m_cachedVertices.contains(ref))
             vertices = m_cachedVertices.value(ref);
         m_cachedVertices.remove(ref);
@@ -1460,7 +1460,7 @@ void MythRenderOpenGL::GetCachedVBO(GLuint type, const QRect &area)
         m_glBindBuffer(GL_ARRAY_BUFFER, vbo);
         if (m_exts_used & kGLExtPBufObj)
         {
-            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, NULL, GL_STREAM_DRAW);
+            m_glBufferData(GL_ARRAY_BUFFER, kTextureOffset, nullptr, GL_STREAM_DRAW);
             void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
             if (target)
                 memcpy(target, vertices, kTextureOffset);

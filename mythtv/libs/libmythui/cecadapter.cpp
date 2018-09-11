@@ -65,7 +65,7 @@ class CECAdapterPriv
 {
   public:
     CECAdapterPriv()
-      : adapter(NULL), valid(false),
+      : adapter(nullptr), valid(false),
          powerOffTV(false),  powerOffTVAllowed(false), powerOffTVOnExit(false),
          powerOnTV(false),   powerOnTVAllowed(false),  powerOnTVOnStart(false),
          switchInput(false), switchInputAllowed(true)
@@ -157,10 +157,10 @@ class CECAdapterPriv
         // find adapters
 #if CEC_LIB_VERSION_MAJOR >= 4
         cec_adapter_descriptor *devices = new cec_adapter_descriptor[MAX_CEC_DEVICES];
-        uint8_t num_devices = adapter->DetectAdapters(devices, MAX_CEC_DEVICES, NULL, true);
+        uint8_t num_devices = adapter->DetectAdapters(devices, MAX_CEC_DEVICES, nullptr, true);
 #else
         cec_adapter *devices = new cec_adapter[MAX_CEC_DEVICES];
-        uint8_t num_devices = adapter->FindAdapters(devices, MAX_CEC_DEVICES, NULL);
+        uint8_t num_devices = adapter->FindAdapters(devices, MAX_CEC_DEVICES, nullptr);
 #endif
         if (num_devices < 1)
         {
@@ -241,7 +241,7 @@ class CECAdapterPriv
             LOG(VB_GENERAL, LOG_INFO, LOC + "Closing down CEC.");
         }
         valid = false;
-        adapter = NULL;
+        adapter = nullptr;
     }
 
     int LogMessage(const cec_log_message &message)
@@ -1024,7 +1024,7 @@ class CECAdapterPriv
                 break;
             case CEC_PARAMETER_TYPE_UNKOWN: /* libcec typo */
             default:
-                if (data.paramData != NULL)
+                if (data.paramData != nullptr)
                 {
                     param = QString(": UNKNOWN param has type %1").arg(data.paramType);
                 }

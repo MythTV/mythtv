@@ -197,28 +197,28 @@ void MythRenderOpenGL2::ResetProcs(void)
 {
     MythRenderOpenGL::ResetProcs();
 
-    m_glCreateShader = NULL;
-    m_glShaderSource = NULL;
-    m_glCompileShader = NULL;
-    m_glGetShaderiv = NULL;
-    m_glGetShaderInfoLog = NULL;
-    m_glCreateProgram = NULL;
-    m_glAttachShader = NULL;
-    m_glLinkProgram = NULL;
-    m_glUseProgram = NULL;
-    m_glDeleteProgram = NULL;
-    m_glGetProgramInfoLog = NULL;
-    m_glGetProgramiv = NULL;
-    m_glDetachShader = NULL;
-    m_glDeleteShader = NULL;
-    m_glGetUniformLocation = NULL;
-    m_glUniform1i = NULL;
-    m_glUniformMatrix4fv = NULL;
-    m_glVertexAttribPointer = NULL;
-    m_glEnableVertexAttribArray = NULL;
-    m_glDisableVertexAttribArray = NULL;
-    m_glBindAttribLocation = NULL;
-    m_glVertexAttrib4f = NULL;
+    m_glCreateShader = nullptr;
+    m_glShaderSource = nullptr;
+    m_glCompileShader = nullptr;
+    m_glGetShaderiv = nullptr;
+    m_glGetShaderInfoLog = nullptr;
+    m_glCreateProgram = nullptr;
+    m_glAttachShader = nullptr;
+    m_glLinkProgram = nullptr;
+    m_glUseProgram = nullptr;
+    m_glDeleteProgram = nullptr;
+    m_glGetProgramInfoLog = nullptr;
+    m_glGetProgramiv = nullptr;
+    m_glDetachShader = nullptr;
+    m_glDeleteShader = nullptr;
+    m_glGetUniformLocation = nullptr;
+    m_glUniform1i = nullptr;
+    m_glUniformMatrix4fv = nullptr;
+    m_glVertexAttribPointer = nullptr;
+    m_glEnableVertexAttribArray = nullptr;
+    m_glDisableVertexAttribArray = nullptr;
+    m_glBindAttribLocation = nullptr;
+    m_glVertexAttrib4f = nullptr;
 }
 
 bool MythRenderOpenGL2::InitFeatures(void)
@@ -445,7 +445,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
     UpdateTextureVertices(tex, src, dst);
     if (m_exts_used & kGLExtPBufObj)
     {
-        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
         void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         if (target)
             memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
@@ -512,7 +512,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
     UpdateTextureVertices(first, src, dst);
     if (m_exts_used & kGLExtPBufObj)
     {
-        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
         void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         if (target)
             memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
@@ -814,7 +814,7 @@ uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
     uint result = m_glCreateShader(type);
     QByteArray src = source.toLatin1();
     const char* tmp[1] = { src.constData() };
-    m_glShaderSource(result, 1, tmp, NULL);
+    m_glShaderSource(result, 1, tmp, nullptr);
     m_glCompileShader(result);
     GLint compiled;
     m_glGetShaderiv(result, GL_COMPILE_STATUS, &compiled);
@@ -825,7 +825,7 @@ uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
         if (length > 1)
         {
             char *log = (char*)malloc(sizeof(char) * length);
-            m_glGetShaderInfoLog(result, length, NULL, log);
+            m_glGetShaderInfoLog(result, length, nullptr, log);
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to compile shader.");
             LOG(VB_GENERAL, LOG_ERR, log);
             LOG(VB_GENERAL, LOG_ERR, source);

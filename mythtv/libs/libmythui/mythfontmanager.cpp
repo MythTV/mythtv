@@ -7,7 +7,7 @@
 #include "mythfontmanager.h"
 #include "mythlogging.h"
 
-static MythFontManager *gFontManager = NULL;
+static MythFontManager *gFontManager = nullptr;
 
 #define LOC      QString("MythFontManager: ")
 #define MAX_DIRS 100
@@ -226,7 +226,7 @@ bool MythFontManager::RegisterFont(const QString &fontPath,
         if (values.isEmpty())
             return false;
         MythFontReference *ref = values.first();
-        if (ref == NULL)
+        if (ref == nullptr)
             return false;
         else
             id = ref->GetFontID();

@@ -25,8 +25,8 @@ MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
     m_Pushed = false;
     m_Lockable = false;
 
-    m_Text = NULL;
-    m_BackgroundState = NULL;
+    m_Text = nullptr;
+    m_BackgroundState = nullptr;
 
     connect(m_clickTimer, SIGNAL(timeout()), SLOT(UnPush()));
 

@@ -14,7 +14,7 @@ AppleRemoteListener::AppleRemoteListener(QObject* mainWindow_)
 void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
                                             bool pressedDown)
 {
-    QString code = 0;
+    QString code = nullptr;
     bool separateRelease = false;
 
     switch (button)

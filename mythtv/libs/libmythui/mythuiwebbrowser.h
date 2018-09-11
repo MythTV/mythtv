@@ -62,7 +62,7 @@ class MythNetworkAccessManager : public QNetworkAccessManager
     MythNetworkAccessManager();
 
   protected:
-    QNetworkReply* createRequest(Operation op, const QNetworkRequest & req, QIODevice * outgoingData = 0);
+    QNetworkReply* createRequest(Operation op, const QNetworkRequest & req, QIODevice * outgoingData = nullptr);
 };
 
 class MythWebPage : public QWebPage
@@ -70,10 +70,10 @@ class MythWebPage : public QWebPage
   Q_OBJECT
 
   public:
-    explicit MythWebPage(QObject *parent = 0);
+    explicit MythWebPage(QObject *parent = nullptr);
     ~MythWebPage();
 
-    virtual bool extension (Extension extension, const ExtensionOption *option = 0, ExtensionReturn *output = 0);
+    virtual bool extension (Extension extension, const ExtensionOption *option = nullptr, ExtensionReturn *output = nullptr);
     virtual bool supportsExtension (Extension extension) const;
 
   protected:

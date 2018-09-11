@@ -20,7 +20,7 @@
 #include "mythpainter.h"
 
 MythPainter::MythPainter()
-  : m_Parent(0), m_HardwareCacheSize(0), m_SoftwareCacheSize(0),
+  : m_Parent(nullptr), m_HardwareCacheSize(0), m_SoftwareCacheSize(0),
     m_showBorders(false), m_showNames(false)
 {
     SetMaximumCacheSizes(
@@ -43,7 +43,7 @@ void MythPainter::Teardown(void)
 
     QSet<MythImage*>::iterator it = m_allocatedImages.begin();
     for (; it !=  m_allocatedImages.end(); ++it)
-        (*it)->SetParent(NULL);
+        (*it)->SetParent(nullptr);
     m_allocatedImages.clear();
 }
 
@@ -355,7 +355,7 @@ MythImage *MythPainter::GetImageFromString(const QString &msg,
                        QString::number(flags) +
                        QString::number(font.color().rgba()) + msg;
 
-    MythImage *im = NULL;
+    MythImage *im = nullptr;
     if (m_StringToImageMap.contains(incoming))
     {
         m_StringExpireList.remove(incoming);
@@ -397,7 +397,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
     for (Ipara = layouts.begin(); Ipara != layouts.end(); ++Ipara)
         incoming += (*Ipara)->text();
 
-    MythImage *im = NULL;
+    MythImage *im = nullptr;
     if (m_StringToImageMap.contains(incoming))
     {
         m_StringExpireList.remove(incoming);
@@ -475,7 +475,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
                                          const QPen &linePen)
 {
     if (area.width() <= 0 || area.height() <= 0)
-        return NULL;
+        return nullptr;
 
     uint64_t hash1 = ((0xfff & (uint64_t)area.width())) +
                      ((0xfff & (uint64_t)area.height())     << 12) +
@@ -510,7 +510,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
 
     incoming += QString::number(hash1) + QString::number(hash2);
 
-    MythImage *im = NULL;
+    MythImage *im = nullptr;
     if (m_StringToImageMap.contains(incoming))
     {
         m_StringExpireList.remove(incoming);

@@ -185,6 +185,6 @@ void MythUIScrollBar::timerEvent(QTimerEvent *)
 
 void MythUIScrollBar::DoneFading(void)
 {
-    disconnect(this, SIGNAL(FinishedFading()), 0, 0);
+    disconnect(this, SIGNAL(FinishedFading()), nullptr, nullptr);
     Hide();
 }

@@ -15,7 +15,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainter
 {
     friend class VideoOutputOpenGL;
   public:
-    MythOpenGLPainter(MythRenderOpenGL *render =  NULL, QWidget *parent = NULL);
+    MythOpenGLPainter(MythRenderOpenGL *render =  nullptr, QWidget *parent = nullptr);
    ~MythOpenGLPainter();
 
     void SetTarget(int new_target)       { target = new_target;      }

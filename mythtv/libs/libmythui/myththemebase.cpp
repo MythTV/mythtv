@@ -43,7 +43,7 @@ void MythThemeBase::Reload(void)
     GetGlobalFontManager()->LoadFonts(GetMythUI()->GetThemeDir(), "UI");
     XMLParseBase::LoadBaseTheme();
 
-    d->background->PopScreen(NULL, false, true);
+    d->background->PopScreen(nullptr, false, true);
 
     d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
 

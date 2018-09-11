@@ -55,7 +55,7 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 
     MythMainWindow *mainwindow = GetMythMainWindow();
 
-    screen->setParent(0);
+    screen->setParent(nullptr);
     if (allowFade && m_DoTransitions && !mainwindow->IsExitingToMain())
     {
         screen->SetFullscreen(false);
@@ -79,10 +79,10 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
         if (deleteScreen)
             screen->deleteLater();
 
-        screen = NULL;
+        screen = nullptr;
     }
 
-    m_topScreen = NULL;
+    m_topScreen = nullptr;
 
     RecalculateDrawOrder();
 
@@ -125,7 +125,7 @@ void MythNotificationScreenStack::PopScreen(MythScreenType *screen, bool allowFa
 MythScreenType *MythNotificationScreenStack::GetTopScreen(void) const
 {
     if (m_Children.isEmpty())
-        return NULL;
+        return nullptr;
     // The top screen is the only currently displayed first, if there's a
     // fullscreen notification displayed, it's the last one
     MythScreenType *top = m_Children.front();
@@ -156,14 +156,14 @@ MythScreenType *MythNotificationScreenStack::GetTopScreen(void) const
 
 MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
                                                    int id)
-    : MythScreenType(stack, "mythnotification"),    m_id(id),
-      m_duration(-1),           m_progress(-1.0),   m_fullscreen(false),
+    : MythScreenType(stack, "mythnotification"),         m_id(id),
+      m_duration(-1),             m_progress(-1.0),      m_fullscreen(false),
       m_added(false),
-      m_created(false),         m_content(kNone),   m_update(kAll),
+      m_created(false),           m_content(kNone),      m_update(kAll),
       m_type(MythNotification::New),
-      m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
-      m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
+      m_artworkImage(nullptr),    m_titleText(nullptr),  m_originText(nullptr),
+      m_descriptionText(nullptr), m_extraText(nullptr),  m_progresstextText(nullptr),
+      m_progressBar(nullptr),     m_errorState(nullptr), m_mediaState(nullptr),
       m_index(0),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
@@ -177,14 +177,14 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
 
 MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
                                                    MythNotification &notification)
-    : MythScreenType(stack, "mythnotification"),    m_id(notification.GetId()),
-      m_duration(notification.GetDuration()),       m_progress(-1.0),
+    : MythScreenType(stack, "mythnotification"),         m_id(notification.GetId()),
+      m_duration(notification.GetDuration()),            m_progress(-1.0),
       m_fullscreen(false),
-      m_added(false),           m_created(false),   m_content(kNone),
-      m_update(kAll),           m_type(MythNotification::New),
-      m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
-      m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
+      m_added(false),             m_created(false),      m_content(kNone),
+      m_update(kAll),             m_type(MythNotification::New),
+      m_artworkImage(nullptr),    m_titleText(nullptr),  m_originText(nullptr),
+      m_descriptionText(nullptr), m_extraText(nullptr),  m_progresstextText(nullptr),
+      m_progressBar(nullptr),     m_errorState(nullptr), m_mediaState(nullptr),
       m_index(0),
       m_timer(new QTimer(this)),
       m_visibility(MythNotification::kAll),
@@ -214,9 +214,9 @@ MythNotificationScreen::MythNotificationScreen(MythScreenStack *stack,
       m_content(s.m_content),
       m_update(s.m_content), // so all fields are initialised regardless of notification type
       m_type(s.m_type),
-      m_artworkImage(NULL),     m_titleText(NULL),  m_originText(NULL),
-      m_descriptionText(NULL),  m_extraText(NULL),  m_progresstextText(NULL),
-      m_progressBar(NULL),      m_errorState(NULL), m_mediaState(NULL),
+      m_artworkImage(nullptr),     m_titleText(nullptr),  m_originText(nullptr),
+      m_descriptionText(nullptr),  m_extraText(nullptr),  m_progresstextText(nullptr),
+      m_progressBar(nullptr),      m_errorState(nullptr), m_mediaState(nullptr),
       m_creation(),
       m_expiry(),
       m_index(0),
@@ -819,7 +819,7 @@ NCPrivate::~NCPrivate()
     m_notifications.clear();
 
     delete m_screenStack;
-    m_originalScreenStack = m_screenStack = NULL;
+    m_originalScreenStack = m_screenStack = nullptr;
 }
 
 /**
@@ -897,7 +897,7 @@ void NCPrivate::ScreenDeleted(void)
 
 void NCPrivate::ScreenStackDeleted(void)
 {
-    m_screenStack = NULL;
+    m_screenStack = nullptr;
 }
 
 bool NCPrivate::Queue(const MythNotification &notification)
@@ -956,7 +956,7 @@ void NCPrivate::ProcessQueue(void)
     {
         int id = n->GetId();
         bool created = false;
-        MythNotificationScreen *screen = NULL;
+        MythNotificationScreen *screen = nullptr;
 
         if (id > 0)
         {
@@ -1044,7 +1044,7 @@ MythNotificationScreen *NCPrivate::CreateScreen(MythNotification *n, int id)
         // If we can't create the screen then we can't display it, so delete
         // and abort
         delete screen;
-        return NULL;
+        return nullptr;
     }
     connect(screen, SIGNAL(ScreenDeleted()), this, SLOT(ScreenDeleted()));
     return screen;
@@ -1058,7 +1058,7 @@ int NCPrivate::Register(void *from)
         return -1;
 
     m_currentId++;
-    m_registrations.insert(m_currentId, NULL);
+    m_registrations.insert(m_currentId, nullptr);
     m_clients.insert(m_currentId, from);
 
     return m_currentId;
@@ -1118,7 +1118,7 @@ void NCPrivate::DeleteAllScreens(void)
         // we remove the screen from the list before deleting the screen
         // so the MythScreenType::Exiting() signal won't process it a second time
         m_deletedScreens.removeLast();
-        if (m_screenStack == NULL &&
+        if (m_screenStack == nullptr &&
             screen->GetScreenStack() == m_originalScreenStack)
         {
             // our screen stack got deleted already and all its children
@@ -1133,7 +1133,7 @@ void NCPrivate::DeleteAllScreens(void)
         {
             screen->GetScreenStack()->PopScreen(screen, true, true);
         }
-        else if (screen->GetScreenStack() == NULL)
+        else if (screen->GetScreenStack() == nullptr)
         {
             // this screen was never added to a screen stack, delete it now
             delete screen;
@@ -1150,12 +1150,12 @@ void NCPrivate::DeleteUnregistered(void)
     {
         int id = it.key();
         bool closeimemdiately = it.value();
-        MythNotificationScreen *screen = NULL;
+        MythNotificationScreen *screen = nullptr;
 
         if (m_registrations.contains(id))
         {
             screen = m_registrations[id];
-            if (screen != NULL && !m_suspended.contains(id))
+            if (screen != nullptr && !m_suspended.contains(id))
             {
                 // mark the screen for deletion if no timer is set
                 if (screen->m_duration <= 0 || closeimemdiately)
@@ -1295,7 +1295,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
             if (!m_converted.contains(screen))
             {
                 // screen hasn't been created, return it
-                newscreen = new MythNotificationScreen(NULL, *screen);
+                newscreen = new MythNotificationScreen(nullptr, *screen);
                 // CreateScreen can never fail, no need to test return value
                 m_converted[screen] = newscreen;
             }
@@ -1393,7 +1393,7 @@ MythNotificationCenter::~MythNotificationCenter()
     }
 
     delete d;
-    d = NULL;
+    d = nullptr;
 }
 
 bool MythNotificationCenter::Queue(const MythNotification &notification)

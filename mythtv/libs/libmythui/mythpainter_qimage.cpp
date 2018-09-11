@@ -11,7 +11,7 @@
 #include "mythlogging.h"
 
 MythQImagePainter::MythQImagePainter() :
-    MythPainter(), painter(NULL), copy(false)
+    MythPainter(), painter(nullptr), copy(false)
 {
 }
 

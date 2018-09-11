@@ -179,7 +179,7 @@ class MythGesture
 
     /**
      * \brief Complete the gesture event of the last completed stroke.
-     * \return A new gesture event, or NULL on error.
+     * \return A new gesture event, or nullptr on error.
      */
     MythGestureEvent *gesture(void) const;
 

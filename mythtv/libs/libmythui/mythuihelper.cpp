@@ -43,7 +43,7 @@
 
 #define LOC      QString("MythUIHelper: ")
 
-static MythUIHelper *mythui = NULL;
+static MythUIHelper *mythui = nullptr;
 static QMutex uiLock;
 QString MythUIHelper::x11_display;
 
@@ -75,7 +75,7 @@ void MythUIHelper::destroyMythUI(void)
     mythui->PruneCacheDir(GetThumbnailDir());
     uiLock.lock();
     delete mythui;
-    mythui = NULL;
+    mythui = nullptr;
     uiLock.unlock();
 }
 
@@ -181,15 +181,15 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_cacheLock(new QMutex(QMutex::Recursive)),
       m_cacheSize(0), m_maxCacheSize(30 * 1024 * 1024),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
-      screensaver(NULL), screensaverEnabled(false), display_res(NULL),
+      screensaver(nullptr), screensaverEnabled(false), display_res(nullptr),
       screenSetup(false), m_imageThreadPool(new MThreadPool("MythUIHelper")),
       parent(p), m_fontStretch(100)
 {
-    callbacks.exec_program = NULL;
-    callbacks.exec_program_tv = NULL;
-    callbacks.configplugin = NULL;
-    callbacks.plugin = NULL;
-    callbacks.eject = NULL;
+    callbacks.exec_program = nullptr;
+    callbacks.exec_program_tv = nullptr;
+    callbacks.configplugin = nullptr;
+    callbacks.plugin = nullptr;
+    callbacks.eject = nullptr;
 }
 
 MythUIHelperPrivate::~MythUIHelperPrivate()
@@ -582,7 +582,7 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
         }
     */
 
-    return NULL;
+    return nullptr;
 }
 
 void MythUIHelper::IncludeInCacheSize(MythImage *im)
@@ -609,7 +609,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
                                     bool nodisk)
 {
     if (!im)
-        return NULL;
+        return nullptr;
 
     if (!nodisk)
     {
@@ -1410,7 +1410,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         QString("LoadCacheImage(%1,%2)").arg(srcfile).arg(label));
 
     if (srcfile.isEmpty() || label.isEmpty())
-        return NULL;
+        return nullptr;
 
     if (!(kCacheForceStat & cacheMode))
     {
@@ -1439,7 +1439,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         }
     }
 
-    MythImage *ret = NULL;
+    MythImage *ret = nullptr;
 
     // Check Memory Cache
     ret = GetImageFromCache(label);
@@ -1457,7 +1457,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         // If the file isn't in the disk cache, then we don't want to bother
         // checking the last modified times of the original
         if (!cacheFileInfo.exists())
-            return NULL;
+            return nullptr;
 
         // Now compare the time on the source versus our cached copy
         QDateTime srcLastModified;
@@ -1485,7 +1485,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
         else
         {
             if (!FindThemeFile(srcfile))
-                return NULL;
+                return nullptr;
 
             QFileInfo original(srcfile);
 
@@ -1523,14 +1523,14 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 
                         ret->SetIsInCache(false);
                         ret->DecrRef();
-                        ret = NULL;
+                        ret = nullptr;
                     }
                 }
             }
         }
         else
         {
-            ret = NULL;
+            ret = nullptr;
             // If file has changed on disk, then remove it from the memory
             // and disk cache
             RemoveFromCacheByURL(label);

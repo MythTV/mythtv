@@ -104,7 +104,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 MythUIText::~MythUIText()
 {
     delete m_Font;
-    m_Font = NULL;
+    m_Font = nullptr;
 
     QVector<QTextLayout *>::iterator Ilayout;
     for (Ilayout = m_Layouts.begin(); Ilayout != m_Layouts.end(); ++Ilayout)
@@ -761,7 +761,7 @@ void MythUIText::FillCutMessage(void)
         if (isNumber && m_TemplateText.contains("%n"))
         {
             m_CutMessage = qApp->translate("ThemeUI",
-                                           m_TemplateText.toUtf8(), NULL,
+                                           m_TemplateText.toUtf8(), nullptr,
                                            qAbs(value));
         }
         else if (m_TemplateText.contains("%1"))

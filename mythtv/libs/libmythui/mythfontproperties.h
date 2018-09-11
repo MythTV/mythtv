@@ -35,7 +35,7 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
 
     static MythFontProperties *ParseFromXml(
         const QString &filename, const QDomElement &element,
-        MythUIType *parent = NULL, bool addToGlobal = false,
+        MythUIType *parent = nullptr, bool addToGlobal = false,
         bool showWarnings = true);
 
     void SetRelativeSize(float rSize) { m_relativeSize = rSize; }

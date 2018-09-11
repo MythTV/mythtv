@@ -17,7 +17,7 @@ class MythQtImage : public MythImage
   public:
     explicit MythQtImage(MythQtPainter *parent) :
         MythImage(parent, "MythQtImage"),
-        m_Pixmap(NULL), m_bRegenPixmap(false) { }
+        m_Pixmap(nullptr), m_bRegenPixmap(false) { }
 
     void SetChanged(bool change = true);
     QPixmap *GetPixmap(void) { return m_Pixmap; }
@@ -55,7 +55,7 @@ void MythQtImage::RegeneratePixmap(void)
 
 MythQtPainter::MythQtPainter() :
     MythPainter(),
-    painter(0)
+    painter(nullptr)
 {
 }
 
@@ -149,6 +149,6 @@ void MythQtPainter::DeleteFormatImagePriv(MythImage *im)
     if (qim->GetPixmap())
     {
         m_imageDeleteList.push_back(qim->GetPixmap());
-        qim->SetPixmap(NULL);
+        qim->SetPixmap(nullptr);
     }
 }

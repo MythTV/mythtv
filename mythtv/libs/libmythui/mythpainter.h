@@ -48,7 +48,7 @@ class MUI_PUBLIC MythPainter
     virtual bool SupportsClipping(void) = 0;
     virtual void FreeResources(void) { }
     virtual void Begin(QPaintDevice *parent) { m_Parent = parent; }
-    virtual void End() { m_Parent = NULL; }
+    virtual void End() { m_Parent = nullptr; }
 
     virtual void SetClipRect(const QRect &clipRect);
     virtual void SetClipRegion(const QRegion &clipRegion);

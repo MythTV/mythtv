@@ -70,7 +70,7 @@ class MythGLTexture
 {
   public:
     MythGLTexture() :
-        m_type(GL_TEXTURE_2D), m_data(NULL), m_data_size(0),
+        m_type(GL_TEXTURE_2D), m_data(nullptr), m_data_size(0),
         m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_BGRA),
         m_internal_fmt(GL_RGBA8), m_pbo(0), m_vbo(0),
         m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
@@ -124,7 +124,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
 {
   public:
     static MythRenderOpenGL* Create(const QString &painter,
-                                    QPaintDevice* device = NULL);
+                                    QPaintDevice* device = nullptr);
 
     MythRenderOpenGL(const MythRenderFormat &format, QPaintDevice* device,
                      RenderType type = kRenderUnknown);

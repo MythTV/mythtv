@@ -32,8 +32,8 @@ class ScreenSaverX11Private
         m_dpmsaware(false),           m_dpmsdeactivated(false),
         m_xscreensaverRunning(false),
         m_dpmsenabled(false),
-        m_timeoutInterval(-1),        m_resetTimer(NULL),
-        m_display(NULL)
+        m_timeoutInterval(-1),        m_resetTimer(nullptr),
+        m_display(nullptr)
     {
         const uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing |
                            kMSProcessEvents;
@@ -286,7 +286,7 @@ void ScreenSaverX11::Restore(void)
 void ScreenSaverX11::Reset(void)
 {
     bool need_xsync = false;
-    Display *dsp = NULL;
+    Display *dsp = nullptr;
     if (d->m_display)
         dsp = d->m_display->GetDisplay();
 

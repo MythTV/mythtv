@@ -25,7 +25,7 @@ struct UIUtilDisp
 {
     template <typename ContainerType, typename UIType>
     static bool Assign(ContainerType *container, UIType *&item,
-                       const QString &name, bool *err = NULL)
+                       const QString &name, bool *err = nullptr)
     {
         if (!container)
         {

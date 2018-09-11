@@ -21,7 +21,7 @@
 
 #include "mythlogging.h"
 
-AppleRemote*    AppleRemote::_instance = 0;
+AppleRemote*    AppleRemote::_instance = nullptr;
 
 
 #define REMOTE_SWITCH_COOKIE 19
@@ -49,7 +49,7 @@ AppleRemote::Listener::~Listener()
 
 AppleRemote * AppleRemote::Get()
 {
-    if (_instance == 0)
+    if (_instance == nullptr)
         _instance = new AppleRemote();
 
     return _instance;
@@ -68,7 +68,7 @@ AppleRemote::~AppleRemote()
     }
     if (this == _instance)
     {
-        _instance = 0;
+        _instance = nullptr;
     }
 }
 
@@ -179,7 +179,7 @@ AppleRemote::AppleRemote() : MThread("AppleRemote"),
                              hidDeviceInterface(0),
                              queue(0),
                              remoteId(0),
-                             _listener(0),
+                             _listener(nullptr),
                              mUsingNewAtv(false),
                              mLastEvent(AppleRemote::Undefined),
                              mEventCount(0),

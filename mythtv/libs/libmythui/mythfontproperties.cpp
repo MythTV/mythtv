@@ -160,14 +160,14 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         VERBOSE_XML(VB_GENERAL, LOG_ERR,
                     filename, element, "Font requires a name");
         delete newFont;
-        return NULL;
+        return nullptr;
     }
 
     QString base = element.attribute("from", "");
 
     if (!base.isEmpty())
     {
-        MythFontProperties *tmp = NULL;
+        MythFontProperties *tmp = nullptr;
 
         if (parent)
             tmp = parent->GetFont(base);
@@ -181,7 +181,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                 QString("Specified base font '%1' does not exist.").arg(base));
 
             delete newFont;
-            return NULL;
+            return nullptr;
         }
 
         *newFont = *tmp;
@@ -199,7 +199,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                         "Font needs a face");
             delete newFont;
-            return NULL;
+            return nullptr;
         }
     }
     else
@@ -220,7 +220,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                 .arg((tmp) ? QFontInfo(tmp->m_face).family() : "ERROR"));
         }
         delete newFont;
-        return NULL;
+        return nullptr;
     }
 
     QString hint = element.attribute("stylehint", "");
@@ -375,7 +375,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                 VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, info,
                             QString("Unknown tag in font '%1'").arg(name));
                 delete newFont;
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -385,7 +385,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     "Font size must be greater than 0.");
         delete newFont;
-        return NULL;
+        return nullptr;
     }
     else if (pixelsize > 0)
     {
@@ -450,7 +450,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     return newFont;
 }
 
-static FontMap *gFontMap = NULL;
+static FontMap *gFontMap = nullptr;
 
 // FIXME: remove
 QMap<QString, fontProp> globalFontMap;
@@ -458,11 +458,11 @@ QMap<QString, fontProp> globalFontMap;
 MythFontProperties *FontMap::GetFont(const QString &text)
 {
     if (text.isEmpty())
-        return NULL;
+        return nullptr;
 
     if (m_FontMap.contains(text))
         return &(m_FontMap[text]);
-    return NULL;
+    return nullptr;
 }
 
 bool FontMap::AddFont(const QString &text, MythFontProperties *font)

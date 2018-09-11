@@ -12,7 +12,7 @@
 #define LOC QString("UDPListener: ")
 
 MythUDPListener::MythUDPListener() :
-    m_socketPool(NULL)
+    m_socketPool(nullptr)
 {
     Enable();
 }
@@ -44,7 +44,7 @@ void MythUDPListener::Enable(void)
             gCoreContext->GetNumSetting("UDPNotifyPort", 0), false))
     {
         delete m_socketPool;
-        m_socketPool = NULL;
+        m_socketPool = nullptr;
     }
 }
 
@@ -57,7 +57,7 @@ void MythUDPListener::Disable(void)
 
     m_socketPool->close();
     delete m_socketPool;
-    m_socketPool = NULL;
+    m_socketPool = nullptr;
 }
 
 void MythUDPListener::Process(const QByteArray &buf, QHostAddress /*sender*/,

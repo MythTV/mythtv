@@ -55,8 +55,8 @@ JoystickMenuThread::JoystickMenuThread(QObject *main_window)
     : MThread("JoystickMenu"),
       m_mainWindow(main_window), m_devicename(""),
       m_fd(-1),                  m_buttonCount(0),
-      m_axesCount(0),            m_buttons(NULL),
-      m_axes(NULL),              m_bStop(false)
+      m_axesCount(0),            m_buttons(nullptr),
+      m_axes(nullptr),           m_bStop(false)
 {
 }
 
@@ -69,10 +69,10 @@ JoystickMenuThread::~JoystickMenuThread()
     }
 
     delete [] m_axes;
-    m_axes = NULL;
+    m_axes = nullptr;
 
     delete [] m_buttons;
-    m_buttons = NULL;
+    m_buttons = nullptr;
 }
 
 /**
@@ -222,7 +222,7 @@ void JoystickMenuThread::run(void)
         timeout.tv_sec = 0;
         timeout.tv_usec = 100000;
 
-        int rc = select(m_fd + 1, &readfds, NULL, NULL, &timeout);
+        int rc = select(m_fd + 1, &readfds, nullptr, nullptr, &timeout);
         if (rc == -1)
         {
             /*----------------------------------------------------------------

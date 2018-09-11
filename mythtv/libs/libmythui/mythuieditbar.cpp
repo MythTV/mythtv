@@ -264,7 +264,7 @@ MythUIType *MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void MythUIEditBar::CalcInverseRegions(void)

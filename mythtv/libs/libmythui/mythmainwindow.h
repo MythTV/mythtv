@@ -132,7 +132,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);
-    void draw(MythPainter *painter = 0);
+    void draw(MythPainter *painter = nullptr);
 
     void ResetIdleTimer(void);
     void PauseIdleTimer(bool pause);

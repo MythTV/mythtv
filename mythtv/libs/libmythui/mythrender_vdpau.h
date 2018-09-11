@@ -137,8 +137,8 @@ class MUI_PUBLIC MythRenderVDPAU : public MythRender
                           uint features,
                           VdpChromaType type = VDP_CHROMA_TYPE_420,
                           uint existing = 0);
-    uint CreateLayer(uint surface, const QRect *src = NULL,
-                     const QRect *dst = NULL);
+    uint CreateLayer(uint surface, const QRect *src = nullptr,
+                     const QRect *dst = nullptr);
 
     void DestroyOutputSurface(uint id);
     void DestroyVideoSurface(uint id);

@@ -44,7 +44,7 @@ void MythYUVAPainter::DrawText(const QRect &dest, const QString &msg, int flags,
         {
             im->SetToYUV();
             im->DecrRef();
-            im = NULL;
+            im = nullptr;
         }
 
         MythQImagePainter::DrawText(dest, msg, flags, *converted,
@@ -90,7 +90,7 @@ void MythYUVAPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
     {
         im->SetToYUV();
         im->DecrRef();
-        im = NULL;
+        im = nullptr;
     }
 
     MythQImagePainter::DrawRect(area, brush, pen, alpha);
@@ -113,7 +113,7 @@ void MythYUVAPainter::DrawRoundRect(const QRect &area, int cornerRadius,
     {
         im->SetToYUV();
         im->DecrRef();
-        im = NULL;
+        im = nullptr;
     }
 
     MythQImagePainter::DrawRoundRect(area, cornerRadius, brush, pen, alpha);
@@ -135,7 +135,7 @@ void MythYUVAPainter::DrawEllipse(const QRect &area, const QBrush &fillBrush,
     {
         im->SetToYUV();
         im->DecrRef();
-        im = NULL;
+        im = nullptr;
     }
 
     MythQImagePainter::DrawEllipse(area, brush, pen, alpha);

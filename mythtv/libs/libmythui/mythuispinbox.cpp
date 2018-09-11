@@ -69,7 +69,7 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
             if (!temp.isEmpty())
             {
                 if (temp.contains("%n"))
-                    text = qApp->translate("ThemeUI", temp.toUtf8(), NULL,
+                    text = qApp->translate("ThemeUI", temp.toUtf8(), nullptr,
                                            qAbs(value));
                 else
                     text = qApp->translate("ThemeUI", temp.toUtf8());
@@ -289,10 +289,10 @@ SpinBoxEntryDialog::SpinBoxEntryDialog(MythScreenStack *parent, const char *name
     : MythScreenType(parent, name, false),
         m_parentList(parentList),
         m_searchText(searchText),
-        m_entryEdit(NULL),
-        m_cancelButton(NULL),
-        m_okButton(NULL),
-        m_rulesText(NULL),
+        m_entryEdit(nullptr),
+        m_cancelButton(nullptr),
+        m_okButton(nullptr),
+        m_rulesText(nullptr),
         m_okClicked(false),
         m_low(low),
         m_high(high),
