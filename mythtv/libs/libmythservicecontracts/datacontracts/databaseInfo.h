@@ -48,7 +48,7 @@ class SERVICE_PUBLIC DatabaseInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE DatabaseInfo(QObject *parent = 0)
+        Q_INVOKABLE DatabaseInfo(QObject *parent = nullptr)
             : QObject       ( parent ),
               m_Ping        ( false  ),
               m_Port        ( 0      ),

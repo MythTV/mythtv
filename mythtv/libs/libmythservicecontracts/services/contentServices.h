@@ -47,7 +47,7 @@ class SERVICE_PUBLIC ContentServices : public Service  //, public QScriptable ??
         // Must call InitializeCustomTypes for each unique Custom Type used
         // in public slots below.
 
-        ContentServices( QObject *parent = 0 ) : Service( parent )
+        ContentServices( QObject *parent = nullptr ) : Service( parent )
         {
             DTC::ArtworkInfoList::InitializeCustomTypes();
             DTC::LiveStreamInfoList::InitializeCustomTypes();

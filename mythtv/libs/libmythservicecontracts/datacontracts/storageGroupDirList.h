@@ -29,7 +29,7 @@ class SERVICE_PUBLIC StorageGroupDirList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE StorageGroupDirList(QObject *parent = 0)
+        Q_INVOKABLE StorageGroupDirList(QObject *parent = nullptr)
             : QObject( parent )               
         {
         }

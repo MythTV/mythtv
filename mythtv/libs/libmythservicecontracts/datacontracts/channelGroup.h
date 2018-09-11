@@ -40,7 +40,7 @@ class SERVICE_PUBLIC ChannelGroup : public QObject
 
         static void InitializeCustomTypes();
 
-        Q_INVOKABLE ChannelGroup(QObject *parent = 0)
+        Q_INVOKABLE ChannelGroup(QObject *parent = nullptr)
             : QObject           ( parent ),
               m_GroupId         ( 0      )
         {

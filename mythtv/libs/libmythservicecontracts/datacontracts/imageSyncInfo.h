@@ -28,7 +28,7 @@ class SERVICE_PUBLIC ImageSyncInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE ImageSyncInfo(QObject *parent = 0)
+        Q_INVOKABLE ImageSyncInfo(QObject *parent = nullptr)
                         : QObject         ( parent ),
                           m_Running       ( false  ),
                           m_Current       ( 0 ),

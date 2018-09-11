@@ -45,7 +45,7 @@ class SERVICE_PUBLIC RecRuleList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE RecRuleList(QObject *parent = 0)
+        Q_INVOKABLE RecRuleList(QObject *parent = nullptr)
             : QObject          ( parent ),
               m_StartIndex     ( 0      ),
               m_Count          ( 0      ),

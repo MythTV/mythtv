@@ -43,7 +43,7 @@ class SERVICE_PUBLIC ArtworkItem : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE ArtworkItem(QObject *parent = 0)
+        Q_INVOKABLE ArtworkItem(QObject *parent = nullptr)
                         : QObject         ( parent )
         {
             m_Width            = 0                      ;
@@ -124,7 +124,7 @@ class SERVICE_PUBLIC VideoLookup : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE VideoLookup(QObject *parent = 0)
+        Q_INVOKABLE VideoLookup(QObject *parent = nullptr)
                         : QObject         ( parent )
         {
             m_Season           = 0                      ;

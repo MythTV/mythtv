@@ -24,7 +24,7 @@ class SERVICE_PUBLIC ImageServices : public Service
 
         // Must call InitializeCustomTypes for each unique
         // Custom Type used in public slots below.
-        ImageServices( QObject *parent = 0 ) : Service( parent )
+        ImageServices( QObject *parent = nullptr ) : Service( parent )
         {
             // Must call InitializeCustomTypes for each
             // unique Custom Type used in public slots below.

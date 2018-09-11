@@ -42,7 +42,7 @@ class SERVICE_PUBLIC CastMember : public QObject
 
         static void InitializeCustomTypes();
 
-        Q_INVOKABLE CastMember(QObject *parent = 0)
+        Q_INVOKABLE CastMember(QObject *parent = nullptr)
             : QObject           ( parent )
         {
         }

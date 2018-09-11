@@ -39,11 +39,11 @@ class SERVICE_PUBLIC BackendInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE BackendInfo(QObject *parent = 0)
-            : QObject   ( parent ),
-              m_Build   ( NULL   ),
-              m_Env     ( NULL   ),
-              m_Log     ( NULL   )
+        Q_INVOKABLE BackendInfo(QObject *parent = nullptr)
+            : QObject   ( parent  ),
+              m_Build   ( nullptr ),
+              m_Env     ( nullptr ),
+              m_Log     ( nullptr )
         {
         }
 

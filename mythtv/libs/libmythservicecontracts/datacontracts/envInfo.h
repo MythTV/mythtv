@@ -41,7 +41,7 @@ class SERVICE_PUBLIC EnvInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE EnvInfo(QObject *parent = 0)
+        Q_INVOKABLE EnvInfo(QObject *parent = nullptr)
             : QObject       ( parent ),
               m_LANG        ( ""     ),
               m_LCALL       ( ""     ),

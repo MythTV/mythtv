@@ -58,7 +58,7 @@ class SERVICE_PUBLIC Encoder : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE Encoder(QObject *parent = 0)
+        Q_INVOKABLE Encoder(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_Local         ( true   ),
@@ -66,7 +66,7 @@ class SERVICE_PUBLIC Encoder : public QObject
               m_State         ( 0      ),
               m_SleepStatus   ( 0      ),
               m_LowOnFreeSpace( false  ),
-              m_Recording     ( NULL   )  
+              m_Recording     ( nullptr )
         { 
         }
 
@@ -79,9 +79,9 @@ class SERVICE_PUBLIC Encoder : public QObject
             m_State         = src->m_State         ;
             m_SleepStatus   = src->m_SleepStatus   ;
             m_LowOnFreeSpace= src->m_LowOnFreeSpace;
-            m_Recording     = NULL                ;
+            m_Recording     = nullptr                ;
         
-            if ( src->m_Recording != NULL)
+            if ( src->m_Recording != nullptr)
                 Recording()->Copy( src->m_Recording );
 
             CopyListContents< Input >( this, m_Inputs, src->m_Inputs );

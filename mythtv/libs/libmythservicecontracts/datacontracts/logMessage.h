@@ -61,7 +61,7 @@ class SERVICE_PUBLIC LogMessage : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE LogMessage(QObject *parent = 0)
+        Q_INVOKABLE LogMessage(QObject *parent = nullptr)
             : QObject       ( parent ),
               m_HostName    (        ),
               m_Application (        ),

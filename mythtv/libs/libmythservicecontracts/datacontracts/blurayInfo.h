@@ -72,7 +72,7 @@ class SERVICE_PUBLIC BlurayInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE BlurayInfo(QObject *parent = 0)
+        Q_INVOKABLE BlurayInfo(QObject *parent = nullptr)
                  : QObject                ( parent    ),
                    m_Path                 ( QString() ),
                    m_Title                ( QString() ),

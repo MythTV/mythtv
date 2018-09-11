@@ -71,7 +71,7 @@ class SERVICE_PUBLIC VideoMultiplex : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE VideoMultiplex(QObject *parent = 0)
+        Q_INVOKABLE VideoMultiplex(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_MplexId       ( 0      ),
               m_SourceId      ( 0      ),

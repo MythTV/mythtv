@@ -40,7 +40,7 @@ class SERVICE_PUBLIC Frontend : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE Frontend(QObject *parent = 0)
+        Q_INVOKABLE Frontend(QObject *parent = nullptr)
             : QObject         ( parent ),
             m_Port(0), m_OnLine(false)
         {

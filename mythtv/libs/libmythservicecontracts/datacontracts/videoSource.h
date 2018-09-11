@@ -42,7 +42,7 @@ class SERVICE_PUBLIC VideoSource : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE VideoSource(QObject *parent = 0)
+        Q_INVOKABLE VideoSource(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_UseEIT        ( false  ),

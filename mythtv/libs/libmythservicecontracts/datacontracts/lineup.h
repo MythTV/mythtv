@@ -44,7 +44,7 @@ class SERVICE_PUBLIC Lineup : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE Lineup(QObject *parent = 0)
+        Q_INVOKABLE Lineup(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }
@@ -81,7 +81,7 @@ class SERVICE_PUBLIC LineupList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE LineupList(QObject *parent = 0)
+        Q_INVOKABLE LineupList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

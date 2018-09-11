@@ -37,7 +37,7 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE TimeZoneInfo(QObject *parent = 0)
+        Q_INVOKABLE TimeZoneInfo(QObject *parent = nullptr)
             : QObject             ( parent ),
               m_TimeZoneID        (        ),
               m_UTCOffset         ( 0      ),

@@ -95,7 +95,7 @@ class SERVICE_PUBLIC ChannelInfo : public QObject
 
         static void InitializeCustomTypes();
 
-        Q_INVOKABLE ChannelInfo(QObject *parent = 0)
+        Q_INVOKABLE ChannelInfo(QObject *parent = nullptr)
             : QObject           ( parent ),
               m_ChanId          ( 0      ),
               m_MplexId         ( 0      ),
@@ -227,7 +227,7 @@ class SERVICE_PUBLIC Program : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE Program(QObject *parent = 0)
+        Q_INVOKABLE Program(QObject *parent = nullptr)
             : QObject               ( parent ),
               m_Repeat              ( false  ),
               m_Stars               ( 0      ),
@@ -239,10 +239,10 @@ class SERVICE_PUBLIC Program : public QObject
               m_Episode             ( 0      ),
               m_TotalEpisodes       ( 0      ),
               m_FileSize            ( 0      ), // DEPRECATED
-              m_Channel             ( NULL   ),
-              m_Recording           ( NULL   ),
-              m_Artwork             ( NULL   ),
-              m_Cast                ( NULL   ),
+              m_Channel             ( nullptr ),
+              m_Recording           ( nullptr ),
+              m_Artwork             ( nullptr ),
+              m_Cast                ( nullptr ),
               m_SerializeDetails    ( true   ),
               m_SerializeChannel    ( true   ),
               m_SerializeRecording  ( true   ),
@@ -285,16 +285,16 @@ class SERVICE_PUBLIC Program : public QObject
             m_SerializeArtwork  = src->m_SerializeArtwork;
             m_SerializeCast     = src->m_SerializeCast;
 
-            if ( src->m_Channel != NULL)
+            if ( src->m_Channel != nullptr)
                 Channel()->Copy( src->m_Channel );
 
-            if ( src->m_Recording != NULL)
+            if ( src->m_Recording != nullptr)
                 Recording()->Copy( src->m_Recording );
 
-            if ( src->m_Artwork != NULL)
+            if ( src->m_Artwork != nullptr)
                 Artwork()->Copy( src->m_Artwork );
 
-            if (src->m_Cast != NULL)
+            if (src->m_Cast != nullptr)
                 Cast()->Copy( src->m_Cast );
         }
 

@@ -18,7 +18,7 @@ class SERVICE_PUBLIC FrontendServices : public Service
 
 
   public:
-    explicit FrontendServices(QObject *parent = 0) : Service(parent)
+    explicit FrontendServices(QObject *parent = nullptr) : Service(parent)
     {
         DTC::FrontendStatus::InitializeCustomTypes();
         DTC::FrontendActionList::InitializeCustomTypes();

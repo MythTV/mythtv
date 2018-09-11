@@ -39,7 +39,7 @@ class SERVICE_PUBLIC InputList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE InputList(QObject *parent = 0)
+        Q_INVOKABLE InputList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

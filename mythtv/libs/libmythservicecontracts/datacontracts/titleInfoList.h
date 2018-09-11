@@ -39,7 +39,7 @@ class SERVICE_PUBLIC TitleInfoList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE TitleInfoList(QObject *parent = 0)
+        Q_INVOKABLE TitleInfoList(QObject *parent = nullptr)
             : QObject( parent )               
         {
         }

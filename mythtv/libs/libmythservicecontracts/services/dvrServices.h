@@ -65,7 +65,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
         // Must call InitializeCustomTypes for each unique Custom Type used
         // in public slots below.
 
-        DvrServices( QObject *parent = 0 ) : Service( parent )
+        DvrServices( QObject *parent = nullptr ) : Service( parent )
         {
             DTC::ProgramList::InitializeCustomTypes();
             DTC::EncoderList::InitializeCustomTypes();
