@@ -19,8 +19,8 @@ class SlotRelayer : public QObject
 
   public:
     explicit SlotRelayer(void (*fp_in)(const QString&)) :
-        fp_qstring(fp_in), fp_void(0) {}
-    explicit SlotRelayer(void (*fp_in)()) : fp_qstring(0), fp_void(fp_in) {};
+        fp_qstring(fp_in), fp_void(nullptr) {}
+    explicit SlotRelayer(void (*fp_in)()) : fp_qstring(nullptr), fp_void(fp_in) {};
 
   public slots:
     void relay(const QString& arg) {if (fp_qstring) fp_qstring(arg);}

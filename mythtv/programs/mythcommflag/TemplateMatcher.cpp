@@ -332,10 +332,10 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
                                  TemplateFinder *tf, QString debugdir) :
     FrameAnalyzer(),      pgmConverter(pgmc),
     edgeDetector(ed),     templateFinder(tf),
-    tmpl(0),
+    tmpl(nullptr),
     tmplrow(-1),          tmplcol(-1),
     tmplwidth(-1),        tmplheight(-1),
-    matches(NULL),        match(NULL),
+    matches(nullptr),     match(nullptr),
     fps(0.0f),
     debugLevel(0),        debugdir(debugdir),
 #ifdef PGM_CONVERT_GREYSCALE
@@ -343,7 +343,7 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
 #else  /* !PGM_CONVERT_GREYSCALE */
     debugdata(debugdir + "/TemplateMatcher-yuv.txt"),
 #endif /* !PGM_CONVERT_GREYSCALE */
-    player(NULL),
+    player(nullptr),
     debug_matches(false), debug_removerunts(false),
     matches_done(false)
 {
@@ -480,7 +480,7 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
     if (!(pgm = pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight)))
         goto error;
 
-    (void)gettimeofday(&start, NULL);
+    (void)gettimeofday(&start, nullptr);
 
     if (pgm_crop(&cropped, pgm, pgmheight, tmplrow, tmplcol,
                 tmplwidth, tmplheight))
@@ -493,7 +493,7 @@ TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
     if (pgm_match(tmpl, edges, tmplheight, JITTER_RADIUS, &matches[frameno]))
         goto error;
 
-    (void)gettimeofday(&end, NULL);
+    (void)gettimeofday(&end, nullptr);
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
 

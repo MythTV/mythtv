@@ -58,7 +58,7 @@ namespace
     void cleanup()
     {
         delete gContext;
-        gContext = NULL;
+        gContext = nullptr;
         SignalHandler::Done();
     }
 }
@@ -70,9 +70,9 @@ bool force = false;
 MythCommFlagCommandLineParser cmdline;
 
 bool watchingRecording = false;
-CommDetectorBase* commDetector = NULL;
-RemoteEncoder* recorder = NULL;
-ProgramInfo *global_program_info = NULL;
+CommDetectorBase* commDetector = nullptr;
+RemoteEncoder* recorder = nullptr;
+ProgramInfo *global_program_info = nullptr;
 int recorderNum = -1;
 
 int jobID = -1;
@@ -585,7 +585,7 @@ static int DoFlagCommercials(
 
         print_comm_flag_output(
             program_info, commBreakList, cfp->GetTotalFrameCount(),
-            (outputMethod == kOutputMethodFull) ? commDetector : NULL,
+            (outputMethod == kOutputMethodFull) ? commDetector : nullptr,
             outputfilename);
     }
     else
@@ -595,7 +595,7 @@ static int DoFlagCommercials(
     }
 
     CommDetectorBase *tmp = commDetector;
-    commDetector = NULL;
+    commDetector = nullptr;
     sleep(1);
     tmp->deleteLater();
 
@@ -821,7 +821,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         return GENERIC_EXIT_OK;
 
     frm_dir_map_t blanks;
-    recorder = NULL;
+    recorder = nullptr;
 
 /*
  * is there a purpose to this not fulfilled by --getskiplist?
@@ -831,9 +831,9 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         program_info->QueryCommBreakList(commBreakList);
 
         print_comm_flag_output(program_info, commBreakList,
-                               0, NULL, outputfilename);
+                               0, nullptr, outputfilename);
 
-        global_program_info = NULL;
+        global_program_info = nullptr;
         return GENERIC_EXIT_OK;
     }
 */
@@ -852,7 +852,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Unable to create RingBuffer for %1").arg(filename));
-        global_program_info = NULL;
+        global_program_info = nullptr;
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
@@ -862,7 +862,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         {
             LOG(VB_GENERAL, LOG_ERR, "Unable to open commflag DB connection");
             delete tmprbuf;
-            global_program_info = NULL;
+            global_program_info = nullptr;
             return GENERIC_EXIT_DB_ERROR;
         }
     }
@@ -885,7 +885,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(NULL, NULL, ctx);
+    cfp->SetPlayerInfo(nullptr, nullptr, ctx);
 
     if (useDB)
     {
@@ -931,7 +931,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         .arg(breaksFound));
 
     delete ctx;
-    global_program_info = NULL;
+    global_program_info = nullptr;
 
     return breaksFound;
 }
@@ -1033,7 +1033,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = fal
     ctx->SetPlayingInfo(pginfo);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
-    cfp->SetPlayerInfo(NULL, NULL, ctx);
+    cfp->SetPlayerInfo(nullptr, nullptr, ctx);
 
     if (progress)
     {
