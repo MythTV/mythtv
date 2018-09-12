@@ -166,6 +166,7 @@ class MTV_PUBLIC MythPlayer
     void SetVideoResize(const QRect &videoRect);
     void EnableFrameRateMonitor(bool enable = false);
     void ForceDeinterlacer(const QString &override = QString());
+    void SetFrameRate(double fps);
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }
@@ -240,6 +241,7 @@ class MTV_PUBLIC MythPlayer
                                 int &vw, int &vh, float &ar);
     InteractiveTV *GetInteractiveTV(void);
     VideoOutput *GetVideoOutput(void)       { return videoOutput; }
+    MythCodecContext *GetMythCodecContext(void) { return decoder->GetMythCodecContext(); }
 
     // Title stuff
     virtual bool SwitchTitle(int /*title*/) { return false; }

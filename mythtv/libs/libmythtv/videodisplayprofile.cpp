@@ -8,6 +8,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "videooutbase.h"
 #include "avformatdecoder.h"
+#include "mythcodeccontext.h"
 
 
 // options are NNN NNN-MMM 0-MMM NNN-99999 >NNN >=NNN <MMM <=MMM or blank
@@ -258,6 +259,8 @@ bool ProfileItem::IsValid(QString *reason) const
     }
 
     QStringList deints    = VideoDisplayProfile::GetDeinterlacers(renderer);
+    QStringList decoderdeints  = MythCodecContext::GetDeinterlacers(decoder);
+    deints.append(decoderdeints);
     QString     deint0    = Get("pref_deint0");
     QString     deint1    = Get("pref_deint1");
     if (!deint0.isEmpty() && !deints.contains(deint0))
@@ -852,6 +855,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["dxva2"]    = QObject::tr("Windows hardware acceleration");
         dec_name["vda"]      = QObject::tr("Mac VDA hardware acceleration");
         dec_name["mediacodec"] = QObject::tr("Android MediaCodec decoder");
+        dec_name["vaapi2"]   = QObject::tr("VAAPI2 acceleration");
     }
 
     QString ret = decoder;
@@ -913,6 +917,11 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
             "Mediacodec will use the graphics hardware to "
             "accelerate video decoding on Android. ");
 
+    if (decoder == "vaapi2")
+        msg += QObject::tr(
+            "VAAPI2 is a new implementation of VAAPI to will use the graphics hardware to "
+            "accelerate video decoding on Intel CPUs. ");
+
     return msg;
 }
 
@@ -941,19 +950,19 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
     else if ("fieldorderdoubleprocessdeint" == short_name)
         return QObject::tr("Interlaced (2x)");
     else if ("opengllinearblend" == short_name)
-        return QObject::tr("Linear blend (HW)");
+        return QObject::tr("Linear blend (HW-GL)");
     else if ("openglkerneldeint" == short_name)
-        return QObject::tr("Kernel (HW)");
+        return QObject::tr("Kernel (HW-GL)");
     else if ("openglbobdeint" == short_name)
-        return QObject::tr("Bob (2x, HW)");
+        return QObject::tr("Bob (2x, HW-GL)");
     else if ("openglonefield" == short_name)
-        return QObject::tr("One field (HW)");
+        return QObject::tr("One field (HW-GL)");
     else if ("opengldoubleratekerneldeint" == short_name)
-        return QObject::tr("Kernel (2x, HW)");
+        return QObject::tr("Kernel (2x, HW-GL)");
     else if ("opengldoubleratelinearblend" == short_name)
-        return QObject::tr("Linear blend (2x, HW)");
+        return QObject::tr("Linear blend (2x, HW-GL)");
     else if ("opengldoubleratefieldorder" == short_name)
-        return QObject::tr("Interlaced (2x, HW)");
+        return QObject::tr("Interlaced (2x, HW-GL)");
     else if ("vdpauonefield" == short_name)
         return QObject::tr("One Field (1x, HW)");
     else if ("vdpaubobdeint" == short_name)
@@ -978,6 +987,28 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString &short_name)
     else if ("openmaxlinedouble" == short_name)
         return QObject::tr("Line double (HW)");
 #endif // def USING_OPENMAX
+#ifdef USING_VAAPI2
+    else if ("vaapi2default" == short_name)
+        return QObject::tr("Advanced (HW-VA)");
+    else if ("vaapi2bob" == short_name)
+        return QObject::tr("Bob (HW-VA)");
+    else if ("vaapi2weave" == short_name)
+        return QObject::tr("Weave (HW-VA)");
+    else if ("vaapi2motion_adaptive" == short_name)
+        return QObject::tr("Motion Adaptive (HW-VA)");
+    else if ("vaapi2motion_compensated" == short_name)
+        return QObject::tr("Motion Compensated (HW-VA)");
+    else if ("vaapi2doubleratedefault" == short_name)
+        return QObject::tr("Advanced (2x, HW-VA)");
+    else if ("vaapi2doubleratebob" == short_name)
+        return QObject::tr("Bob (2x, HW-VA)");
+    else if ("vaapi2doublerateweave" == short_name)
+        return QObject::tr("Weave (2x, HW-VA)");
+    else if ("vaapi2doubleratemotion_adaptive" == short_name)
+        return QObject::tr("Motion Adaptive (2x, HW-VA)");
+    else if ("vaapi2doubleratemotion_compensated" == short_name)
+        return QObject::tr("Motion Compensated (2x, HW-VA)");
+#endif
 
     return "";
 }
@@ -1468,7 +1499,20 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
         CreateProfile(groupid, 1, "", "", "",
                       "mediacodec", 4, true, "opengl",
                       "opengl2", true,
-                      "none", "none",
+                      "opengldoubleratelinearblend", "opengllinearblend",
+                      "");
+    }
+#endif
+
+#if defined(USING_VAAPI2) && defined(USING_OPENGL_VIDEO)
+    if (!profiles.contains("VAAPI2 Normal")) {
+        (void) QObject::tr("VAAPI2 Normal",
+                           "Sample: VAAPI2 Normal");
+        groupid = CreateProfileGroup("VAAPI2 Normal", hostname);
+        CreateProfile(groupid, 1, "", "", "",
+                      "vaapi2", 4, true, "opengl",
+                      "opengl2", true,
+                      "vaapi2doubleratedefault", "vaapi2default",
                       "");
     }
 #endif
@@ -1615,6 +1659,10 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
 
     QString kUsingGPU = QObject::tr("(Hardware Accelerated)");
 
+    QString kUsingVA = QObject::tr("(VAAPI Hardware Accelerated)");
+
+    QString kUsingGL = QObject::tr("(OpenGL Hardware Accelerated)");
+
     QString kGreedyHMsg = QObject::tr(
         "This deinterlacer uses several fields to reduce motion blur. "
         "It has increased CPU requirements.");
@@ -1635,6 +1683,18 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         "This deinterlacer uses multiple fields to reduce motion blur "
         "and smooth edges. ");
 
+    QString kMostAdvMsg = QObject::tr(
+        "Use the most advanced hardware deinterlacing algorithm available. ");
+
+    QString kWeaveMsg = QObject::tr(
+        "Use the weave deinterlacing algorithm. ");
+
+    QString kMAMsg = QObject::tr(
+        "Use the motion adaptive deinterlacing algorithm. ");
+
+    QString kMCMsg = QObject::tr(
+        "Use the motion compensated deinterlacing algorithm. ");
+
     if (deint == "none")
         msg = kNoneMsg;
     else if (deint == "onefield")
@@ -1648,19 +1708,19 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
     else if (deint == "kerneldoubleprocessdeint")
         msg = kKernelMsg + " " + kDoubleRateMsg;
     else if (deint == "openglonefield")
-        msg = kOneFieldMsg + " " + kUsingGPU;
+        msg = kOneFieldMsg + " " + kUsingGL;
     else if (deint == "openglbobdeint")
-        msg = kBobMsg + " " + kUsingGPU;
+        msg = kBobMsg + " " + kUsingGL;
     else if (deint == "opengllinearblend")
-        msg = kLinearBlendMsg + " " + kUsingGPU;
+        msg = kLinearBlendMsg + " " + kUsingGL;
     else if (deint == "openglkerneldeint")
-        msg = kKernelMsg + " " + kUsingGPU;
+        msg = kKernelMsg + " " + kUsingGL;
     else if (deint == "opengldoubleratelinearblend")
-        msg = kLinearBlendMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
+        msg = kLinearBlendMsg + " " +  kDoubleRateMsg + " " + kUsingGL;
     else if (deint == "opengldoubleratekerneldeint")
-        msg = kKernelMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
+        msg = kKernelMsg + " " +  kDoubleRateMsg + " " + kUsingGL;
     else if (deint == "opengldoubleratefieldorder")
-        msg = kFieldOrderMsg + " " +  kDoubleRateMsg  + " " + kUsingGPU;
+        msg = kFieldOrderMsg + " " +  kDoubleRateMsg  + " " + kUsingGL;
     else if (deint == "greedyhdeint")
         msg = kGreedyHMsg;
     else if (deint == "greedyhdoubleprocessdeint")
@@ -1687,6 +1747,27 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kOneFieldMsg + " " + kUsingGPU;
     else if (deint == "vaapibobdeint")
         msg = kBobMsg + " " + kUsingGPU;
+
+    else if (deint == "vaapi2default")
+        msg = kMostAdvMsg + " " +  kUsingVA;
+    else if (deint == "vaapi2bob")
+        msg = kBobMsg + " " +  kUsingVA;
+    else if (deint == "vaapi2weave")
+        msg = kWeaveMsg + " " +  kUsingVA;
+    else if (deint == "vaapi2motion_adaptive")
+        msg = kMAMsg + " " +  kUsingVA;
+    else if (deint == "vaapi2motion_compensated")
+        msg = kMCMsg + " " +  kUsingVA;
+    else if (deint == "vaapi2doubleratedefault")
+        msg = kMostAdvMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
+    else if (deint == "vaapi2doubleratebob")
+        msg = kBobMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
+    else if (deint == "vaapi2doublerateweave")
+        msg = kWeaveMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
+    else if (deint == "vaapi2doubleratemotion_adaptive")
+        msg = kMAMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
+    else if (deint == "vaapi2doubleratemotion_compensated")
+        msg = kMCMsg + " " +  kDoubleRateMsg + " " + kUsingVA;
     else
         msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
 

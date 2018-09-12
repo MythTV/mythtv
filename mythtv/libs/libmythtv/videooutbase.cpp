@@ -18,6 +18,7 @@
 #include "mythxdisplay.h"
 #include "mythavutil.h"
 #include "mthreadpool.h"
+#include "mythcodeccontext.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"
@@ -607,8 +608,16 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         else
             m_deintfiltername = "";
 
-        m_deintFiltMan = new FilterManager;
         m_deintFilter = NULL;
+        m_deintFiltMan = NULL;
+
+        if (MythCodecContext::isCodecDeinterlacer(m_deintfiltername))
+        {
+            m_deinterlacing = false;
+            return false;
+        }
+
+        m_deintFiltMan = new FilterManager;
 
         if (!m_deintfiltername.isEmpty())
         {

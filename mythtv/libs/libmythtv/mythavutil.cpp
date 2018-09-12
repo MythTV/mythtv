@@ -10,6 +10,7 @@
 #include "mythavutil.h"
 #include "mythcorecontext.h"
 #include "mythconfig.h"
+#include "vaapi2context.h"
 extern "C" {
 #include "libswscale/swscale.h"
 #include "libavfilter/avfilter.h"
@@ -411,7 +412,7 @@ AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
             avcodec_free_context(&avctx);
         if (avctx)
         {
-            av_codec_set_pkt_timebase(avctx, stream->time_base);
+            avctx->pkt_timebase =  stream->time_base;
             streamMap.insert(stream, avctx);
         }
     }

@@ -366,9 +366,11 @@ using_frontend {
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h
     HEADERS += privatedecoder.h
+    HEADERS += mythcodeccontext.h
     SOURCES += decoderbase.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
     SOURCES += privatedecoder.cpp
+    SOURCES += mythcodeccontext.cpp
 
     using_crystalhd {
         DEFINES += USING_CRYSTALHD
@@ -503,6 +505,12 @@ using_frontend {
         using_opengl_video:HEADERS += videoout_openglvaapi.h
         using_opengl_video:SOURCES += videoout_openglvaapi.cpp
         using_opengl_video:DEFINES += USING_GLVAAPI
+    }
+
+    using_vaapi2 {
+        DEFINES += USING_VAAPI2
+        HEADERS += vaapi2context.h
+        SOURCES += vaapi2context.cpp
     }
 
     using_mediacodec {

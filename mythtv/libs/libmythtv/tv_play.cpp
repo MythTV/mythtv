@@ -78,6 +78,7 @@ using namespace std;
 #include "programtypes.h"
 #include "ringbuffer.h"                 // for RingBuffer, etc
 #include "tv_actions.h"                 // for ACTION_TOGGLESLEEP, etc
+#include "mythcodeccontext.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -11767,7 +11768,8 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &c)
     }
     else if (matchesGroup(actionName, "DEINTERLACER_", category, prefix))
     {
-        if (m_tvm_scan_type != kScan_Progressive)
+        if (m_tvm_scan_type != kScan_Progressive
+            || ctx->player->GetMythCodecContext()->isDeinterlacing())
         {
             foreach (QString deint, m_tvm_deinterlacers)
             {
@@ -12463,8 +12465,14 @@ void TV::PlaybackMenuInit(const MenuBase &menu)
         m_tvm_subs_havetext      = ctx->player->HasTextSubtitles();
         m_tvm_subs_forcedon      = ctx->player->GetAllowForcedSubtitles();
         ctx->player->GetVideoOutput()->GetDeinterlacers(m_tvm_deinterlacers);
-        m_tvm_currentdeinterlacer =
-            ctx->player->GetVideoOutput()->GetDeinterlacer();
+        QStringList decoderdeints
+            = ctx->player->GetMythCodecContext()->GetDeinterlacers();
+        m_tvm_deinterlacers.append(decoderdeints);
+        m_tvm_currentdeinterlacer
+            = ctx->player->GetMythCodecContext()->getDeinterlacerName();
+        if (m_tvm_currentdeinterlacer.isEmpty())
+            m_tvm_currentdeinterlacer =
+                ctx->player->GetVideoOutput()->GetDeinterlacer();
         if (m_tvm_visual)
             m_tvm_visualisers = ctx->player->GetVisualiserList();
         VideoOutput *vo = ctx->player->GetVideoOutput();

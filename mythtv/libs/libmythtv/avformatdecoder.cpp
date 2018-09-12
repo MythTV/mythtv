@@ -43,6 +43,7 @@ using namespace std;
 #include "lcddevice.h"
 
 #include "audiooutput.h"
+#include "mythcodeccontext.h"
 
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
@@ -68,6 +69,10 @@ extern "C" {
 #include "libavcodec/jni.h"
 }
 #include <QtAndroidExtras>
+#endif
+
+#ifdef USING_VAAPI2
+#include "vaapi2context.h"
 #endif
 
 extern "C" {
@@ -181,6 +186,9 @@ int  get_avf_buffer_dxva2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 #ifdef USING_VAAPI
 int  get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int flags);
+#endif
+#ifdef USING_VAAPI2
+int  get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags);
 #endif
 
 static int determinable_frame_size(struct AVCodecContext *avctx)
@@ -385,6 +393,10 @@ void AvFormatDecoder::GetDecoders(render_opts &opts)
     opts.decoders->append("vaapi");
     (*opts.equiv_decoders)["vaapi"].append("dummy");
 #endif
+#ifdef USING_VAAPI2
+    opts.decoders->append("vaapi2");
+    (*opts.equiv_decoders)["vaapi2"].append("dummy");
+#endif
 #ifdef USING_MEDIACODEC
     opts.decoders->append("mediacodec");
     (*opts.equiv_decoders)["mediacodec"].append("dummy");
@@ -478,6 +490,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ttd;
     delete private_dec;
     delete m_h264_parser;
+    delete m_mythcodecctx;
 
     sws_freeContext(sws_ctx);
 
@@ -1515,14 +1528,16 @@ enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
 }
 #endif
 
-#ifdef USING_VAAPI
+#if defined(USING_VAAPI) || defined(USING_VAAPI2)
 static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 {
     return fmt == AV_PIX_FMT_VAAPI_MOCO ||
            fmt == AV_PIX_FMT_VAAPI_IDCT ||
            fmt == AV_PIX_FMT_VAAPI_VLD;
 }
+#endif
 
+#ifdef USING_VAAPI
 // Declared separately to allow attribute
 static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
                                          const enum AVPixelFormat *) MUNUSED;
@@ -1546,6 +1561,25 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
         valid_fmts++;
     }
     return AV_PIX_FMT_NONE;
+}
+#endif
+
+#ifdef USING_VAAPI2
+static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext *avctx,
+                                           const enum AVPixelFormat *valid_fmts)
+{
+    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
+    while (*valid_fmts != AV_PIX_FMT_NONE) {
+        if (IS_VAAPI_PIX_FMT(*valid_fmts))
+        {
+            ret = *valid_fmts;
+            avctx->pix_fmt = ret;
+            // Vaapi2Context::SetHwframeCtx(avctx, 20);
+            break;
+        }
+        valid_fmts++;
+    }
+    return ret;
 }
 #endif
 
@@ -1629,7 +1663,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else
 #endif
 #ifdef USING_VAAPI
-    if (CODEC_IS_VAAPI(codec, enc))
+    if (CODEC_IS_VAAPI(codec, enc) && codec_is_vaapi(video_codec_id))
     {
         enc->get_buffer2     = get_avf_buffer_vaapi;
         enc->get_format      = get_format_vaapi;
@@ -1645,6 +1679,14 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
     else
 #endif
+#ifdef USING_VAAPI2
+    if (codec_is_vaapi2(video_codec_id))
+    {
+        enc->get_buffer2     = get_avf_buffer_vaapi2;
+        enc->get_format      = get_format_vaapi2;
+    }
+    else
+#endif
     if (codec && codec->capabilities & AV_CODEC_CAP_DR1)
     {
         // enc->flags          |= CODEC_FLAG_EMU_EDGE;
@@ -1657,6 +1699,31 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
             QString("Using software scaling to convert pixel format %1 for "
                     "codec %2").arg(enc->pix_fmt)
                 .arg(ff_codec_id_string(enc->codec_id)));
+    }
+
+    QString deinterlacer;
+    if (m_mythcodecctx)
+        deinterlacer = m_mythcodecctx->getDeinterlacerName();
+    delete m_mythcodecctx;
+    m_mythcodecctx = MythCodecContext::createMythCodecContext(video_codec_id);
+    m_mythcodecctx->setPlayer(m_parent);
+    m_mythcodecctx->setStream(stream);
+    m_mythcodecctx->setDeinterlacer(true,deinterlacer);
+
+    int ret = m_mythcodecctx->HwDecoderInit(enc);
+    if (ret < 0)
+    {
+        char error[AV_ERROR_MAX_STRING_SIZE];
+        if (ret < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("HwDecoderInit unable to initialize hardware decoder: %1 (%2)")
+                .arg(av_make_error_string(error, sizeof(error), ret))
+                .arg(ret));
+            // force it to switch to software decoding
+            averror_count = SEQ_PKT_ERR_MAX + 1;
+            m_streams_changed = true;
+        }
     }
 
     if (FlagIsSet(kDecodeLowRes)    || FlagIsSet(kDecodeSingleThreaded) ||
@@ -2536,6 +2603,24 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 #endif // USING_MEDIACODEC
+#ifdef USING_VAAPI2
+                if (!foundgpudecoder)
+                {
+                    MythCodecID vaapi2_mcid;
+                    AVPixelFormat pix_fmt = AV_PIX_FMT_YUV420P;
+                    vaapi2_mcid = Vaapi2Context::GetBestSupportedCodec(
+                        &codec, dec, mpeg_version(enc->codec_id),
+                        pix_fmt);
+
+                    if (codec_is_vaapi2(vaapi2_mcid))
+                    {
+                        gCodecMap->freeCodecContext(ic->streams[selTrack]);
+                        enc = gCodecMap->getCodecContext(ic->streams[selTrack], codec);
+                        video_codec_id = vaapi2_mcid;
+                        foundgpudecoder = true;
+                    }
+                }
+#endif // USING_VAAPI2
             }
             // default to mpeg2
             if (video_codec_id == kCodec_NONE)
@@ -2556,7 +2641,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             use_frame_timing = false;
             if (! private_dec
-                && (codec_is_std(video_codec_id) || codec_is_mediacodec(video_codec_id)))
+                && (codec_is_std(video_codec_id)
+                    || codec_is_mediacodec(video_codec_id)
+                    || codec_is_vaapi2(video_codec_id)))
                 use_frame_timing = true;
 
             if (FlagIsSet(kDecodeSingleThreaded))
@@ -3053,6 +3140,15 @@ int get_avf_buffer_vaapi(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
     pic->buf[0] = buffer;
 
     return 0;
+}
+#endif
+
+#ifdef USING_VAAPI2
+int get_avf_buffer_vaapi2(struct AVCodecContext *c, AVFrame *pic, int flags)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    nd->directrendering = false;
+    return avcodec_default_get_buffer2(c, pic, flags);
 }
 #endif
 
@@ -3630,7 +3726,10 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             //  into separate routines or separate threads.
             //  Also now that it always consumes a whole buffer some code
             //  in the caller may be able to be optimized.
-            ret = avcodec_receive_frame(context, mpa_pic);
+
+            // FilteredReceiveFrame will call avcodec_receive_frame and
+            // apply any codec-dependent filtering
+            ret = m_mythcodecctx->FilteredReceiveFrame(context, mpa_pic);
 
             if (ret == 0)
                 gotpicture = 1;
@@ -3671,16 +3770,13 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
                     QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
                     .arg(av_make_error_string(error, sizeof(error), ret2))
                     .arg(ret2).arg(gotpicture));
-            if (ret == AVERROR_INVALIDDATA || ret2 == AVERROR_INVALIDDATA)
+            if (++averror_count > SEQ_PKT_ERR_MAX)
             {
-                if (++averror_count > SEQ_PKT_ERR_MAX)
-                {
-                    // If erroring on GPU assist, try switching to software decode
-                    if (codec_is_std(video_codec_id))
-                        m_parent->SetErrored(QObject::tr("Video Decode Error"));
-                    else
-                        m_streams_changed = true;
-                }
+                // If erroring on GPU assist, try switching to software decode
+                if (codec_is_std(video_codec_id))
+                    m_parent->SetErrored(QObject::tr("Video Decode Error"));
+                else
+                    m_streams_changed = true;
             }
             if (ret == AVERROR_EXTERNAL || ret2 == AVERROR_EXTERNAL)
                 m_streams_changed = true;
@@ -3840,6 +3936,27 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
     else if (!directrendering)
     {
+        AVFrame *tmp_frame = NULL;
+        AVFrame *use_frame = NULL;
+#ifdef USING_VAAPI2
+        if (IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format))
+        {
+            int ret = 0;
+            tmp_frame = av_frame_alloc();
+            use_frame = tmp_frame;
+            /* retrieve data from GPU to CPU */
+            if ((ret = av_hwframe_transfer_data(use_frame, mpa_pic, 0)) < 0) {
+                LOG(VB_GENERAL, LOG_ERR, LOC
+                    + QString("Error %1 transferring the data to system memory")
+                        .arg(ret));
+                av_frame_free(&use_frame);
+                return false;
+            }
+        }
+        else
+#endif // USING_VAAPI2
+            use_frame = mpa_pic;
+
         AVFrame tmppicture;
 
         VideoFrame *xf = picframe;
@@ -3847,8 +3964,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 
         unsigned char *buf = picframe->buf;
         av_image_fill_arrays(tmppicture.data, tmppicture.linesize,
-            buf, AV_PIX_FMT_YUV420P, context->width,
-                       context->height, IMAGE_ALIGN);
+            buf, AV_PIX_FMT_YUV420P, use_frame->width,
+                       use_frame->height, IMAGE_ALIGN);
         tmppicture.data[0] = buf + picframe->offsets[0];
         tmppicture.data[1] = buf + picframe->offsets[1];
         tmppicture.data[2] = buf + picframe->offsets[2];
@@ -3857,9 +3974,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         tmppicture.linesize[2] = picframe->pitches[2];
 
         QSize dim = get_video_dim(*context);
-        sws_ctx = sws_getCachedContext(sws_ctx, context->width,
-                                       context->height, context->pix_fmt,
-                                       context->width, context->height,
+        sws_ctx = sws_getCachedContext(sws_ctx, use_frame->width,
+                                       use_frame->height, (AVPixelFormat)use_frame->format,
+                                       use_frame->width, use_frame->height,
                                        AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
                                        NULL, NULL, NULL);
         if (!sws_ctx)
@@ -3867,7 +3984,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate sws context");
             return false;
         }
-        sws_scale(sws_ctx, mpa_pic->data, mpa_pic->linesize, 0, dim.height(),
+        sws_scale(sws_ctx, use_frame->data, use_frame->linesize, 0, dim.height(),
                   tmppicture.data, tmppicture.linesize);
 
         if (xf)
@@ -3880,6 +3997,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             xf->aspect = current_aspect;
             m_parent->DiscardVideoFrame(xf);
         }
+        if (tmp_frame)
+            av_frame_free(&tmp_frame);
     }
     else if (!picframe)
     {
@@ -3928,10 +4047,13 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         // If fps has doubled due to frame-doubling deinterlace
         // Set fps to double value.
         double fpschange = calcfps / fps;
+        int prior = fpsMultiplier;
         if (fpschange > 1.9 && fpschange < 2.1)
             fpsMultiplier = 2;
         if (fpschange > 0.5 && fpschange < 0.6)
             fpsMultiplier = 1;
+        if (fpsMultiplier != prior)
+            m_parent->SetFrameRate(fps);
     }
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +

@@ -38,6 +38,7 @@
 #include "mythuihelper.h"
 #include "mythuidefines.h"
 #include "langsettings.h"
+#include "mythcodeccontext.h"
 
 #ifdef USING_AIRPLAY
 #include "AirPlay/mythraopconnection.h"
@@ -65,6 +66,25 @@ static HostSpinBoxSetting *AudioReadAhead()
         "value here. Default is 100."));
     return gc;
 }
+
+#ifdef USING_VAAPI2
+static HostTextEditSetting *VAAPIDevice()
+{
+    HostTextEditSetting *ge = new HostTextEditSetting("VAAPIDevice");
+
+    ge->setLabel(MainGeneralSettings::tr("Decoder Device for VAAPI2 hardware decoding"));
+
+    ge->setValue("");
+
+    QString help = MainGeneralSettings::tr(
+        "Use this if your system does not detect the VAAPI device. "
+        "Example: '/dev/dri/renderD128'.");
+
+    ge->setHelpText(help);
+
+    return ge;
+}
+#endif
 
 #if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
@@ -937,6 +957,9 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 
     decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
 
+    QString vrenderer2 = vidrend->getValue();
+    vrenderChanged(vrenderer2);
+
     InitLabel();
 }
 
@@ -944,6 +967,9 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
     QStringList osds    = VideoDisplayProfile::GetOSDs(renderer);
     QStringList deints  = VideoDisplayProfile::GetDeinterlacers(renderer);
+    QString decodername = decoder->getValue();
+    QStringList decoderdeints  = MythCodecContext::GetDeinterlacers(decodername);
+    deints.append(decoderdeints);
     QString     losd    = osdrend->getValue();
     QString     ldeint0 = deint0->getValue();
     QString     ldeint1 = deint1->getValue();
@@ -3958,6 +3984,9 @@ void PlaybackSettings::Load(void)
     GroupSetting* general = new GroupSetting();
     general->setLabel(tr("General Playback"));
     general->addChild(RealtimePriority());
+#ifdef USING_VAAPI2
+    general->addChild(VAAPIDevice());
+#endif
     general->addChild(AudioReadAhead());
     general->addChild(JumpToProgramOSD());
     general->addChild(ClearSavedPosition());

@@ -134,6 +134,7 @@ Advanced options (experts only):
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
   --disable-crystalhd      disable Broadcom CrystalHD hardware decoder support
   --disable-vaapi          disable VAAPI hardware accelerated video decoding
+  --disable-vaapi2         disable VAAPI2 hardware accelerated video decoding
   --disable-openmax        disable OpenMAX hardware accelerated video decoding
   --disable-dxva2          disable hardware accelerated decoding on windows
   --disable-mediacodec     disable hardware accelerated decoding on android
@@ -1395,12 +1396,13 @@ EXTERNAL_LIBRARY_LIST="
     opengl
     sdl
     sdl2
+    vaapi
+    vaapi2
 "
 
 HWACCEL_AUTODETECT_LIBRARY_LIST="
     crystalhd
     dxva2
-    vaapi
     vda
     vdpau
 "
@@ -2040,6 +2042,7 @@ USING_LIST='
     opengl
     opengles
     vaapi
+    vaapi2
     vdpau
     openmax
     mediacodec
@@ -2769,6 +2772,8 @@ enable libdns_sd
 enable libxml2
 enable lirc
 enable mediacodec
+enable vaapi
+enable vaapi2
 enable mheg
 enable mythtranscode
 enable opengl
@@ -6203,6 +6208,10 @@ enabled vaapi &&
     check_cpp_condition "va/va.h" "VA_CHECK_VERSION(1, 0, 0)" &&
     enable vaapi_1
 
+enabled vaapi2 &&
+    check_func_headers va/va.h vaInitialize -lva ||
+    disable vaapi2
+
 enabled vdpau &&
     check_cpp_condition vdpau/vdpau.h "defined VDP_DECODER_PROFILE_MPEG4_PART2_ASP" ||
     disable vdpau
@@ -7057,7 +7066,7 @@ ffmpeg_optset extra_cxxflags extra_ldflags target_os
 ffmpeg_optset pkg_config prefix libdir as objcc dep_cc host_cc
 ffmpeg_optset host_ld
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
-ffmpeg_optenable vdpau vaapi libxml2 libass dxva2
+ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
 ffmpeg_optenable crystalhd sdl2 ffplay
 if test $target_os = "android"; then
@@ -7066,7 +7075,9 @@ if test $target_os = "android"; then
 else
     disable mediacodec
 fi
-
+if enabled vaapi || enabled vaapi2 ; then
+    ffopts="$ffopts --enable-vaapi"
+fi
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
@@ -7272,6 +7283,7 @@ if enabled x11 ; then
   echo "xv support                ${xv-no}"
   echo "VDPAU support             ${vdpau-no}"
   echo "VAAPI support             ${vaapi-no}"
+  echo "VAAPI2 support            ${vaapi2-no}"
   echo "CrystalHD support         ${crystalhd-no}"
   echo "OpenMAX support           ${openmax-no}"
   if enabled openmax ; then

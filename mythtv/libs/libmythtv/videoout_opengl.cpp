@@ -10,6 +10,7 @@
 #include "openglvideo.h"
 #include "mythrender_opengl.h"
 #include "mythpainter_ogl.h"
+#include "mythcodeccontext.h"
 
 #define LOC      QString("VidOutGL: ")
 
@@ -40,6 +41,8 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
         (*opts.safe_renderers)["openmax"].append("opengl");
     if (opts.decoders->contains("mediacodec"))
         (*opts.safe_renderers)["mediacodec"].append("opengl");
+    if (opts.decoders->contains("vaapi2"))
+        (*opts.safe_renderers)["vaapi2"].append("opengl");
     opts.priorities->insert("opengl", 65);
 
     // lite profile - no colourspace control, GPU deinterlacing
@@ -270,7 +273,9 @@ bool VideoOutputOpenGL::InputChanged(const QSize &video_dim_buf,
         StopEmbedding();
     }
 
-    if (!codec_is_std(av_codec_id) && !codec_is_mediacodec(av_codec_id))
+    if (!codec_is_std(av_codec_id)
+        && !codec_is_mediacodec(av_codec_id)
+        && !codec_is_vaapi2(av_codec_id))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "New video codec is not supported.");
         errorState = kError_Unknown;
@@ -741,7 +746,8 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(
     {
         list << "opengl" << "opengl-lite";
     }
-    else if (codec_is_mediacodec(myth_codec_id) && !getenv("NO_OPENGL"))
+    else if ((codec_is_mediacodec(myth_codec_id) || codec_is_vaapi2(myth_codec_id))
+            && !getenv("NO_OPENGL"))
     {
         list << "opengl";
     }
@@ -811,6 +817,9 @@ bool VideoOutputOpenGL::SetupDeinterlace(
 
     if (db_vdisp_profile)
         m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+
+    if (MythCodecContext::isCodecDeinterlacer(m_deintfiltername))
+        return false;
 
     if (!m_deintfiltername.contains("opengl"))
     {

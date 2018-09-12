@@ -76,6 +76,8 @@ class VideoOutput
     virtual void PrepareFrame(VideoFrame *buffer, FrameScanType,
                               OSD *osd) = 0;
     virtual void Show(FrameScanType) = 0;
+    VideoDisplayProfile *GetProfile() { return db_vdisp_profile; }
+
 
     virtual void WindowResized(const QSize &) {}
 

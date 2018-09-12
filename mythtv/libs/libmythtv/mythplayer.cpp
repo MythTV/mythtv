@@ -53,6 +53,7 @@ using namespace std;
 #include "mythuiactions.h"              // for ACTION_LEFT, ACTION_RIGHT, etc
 #include "ringbuffer.h"                 // for RingBuffer, etc
 #include "tv_actions.h"                 // for ACTION_BIGJUMPFWD, etc
+#include "mythcodeccontext.h"
 
 extern "C" {
 #include "vsync.h"
@@ -676,7 +677,12 @@ void MythPlayer::FallbackDeint(void)
      m_double_process   = false;
 
      if (videoOutput)
-         videoOutput->FallbackDeint();
+     {
+        videoOutput->SetupDeinterlace(false);
+        bool hwset = decoder->GetMythCodecContext()->FallbackDeint();
+        if (!hwset)
+            videoOutput->FallbackDeint();
+     }
 }
 
 void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
@@ -715,7 +721,18 @@ void MythPlayer::AutoDeint(VideoFrame *frame, bool allow_lock)
 
     if ((m_scan_tracker % 400) == 0)
     {
-        QString type = (m_scan_tracker < 0) ? "progressive" : "interlaced";
+        QString type;
+        //  = (m_scan_tracker < 0) ? "progressive" : "interlaced";
+        if (m_scan_tracker < 0)
+        {
+            if (decoder->GetMythCodecContext()->isDeinterlacing())
+                type = "codec-deinterlaced";
+            else
+                type = "progressive";
+        }
+        else
+            type = "interlaced";
+
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 %2 frames seen.")
                 .arg(abs(m_scan_tracker)).arg(type));
     }
@@ -763,13 +780,13 @@ void MythPlayer::SetScanType(FrameScanType scan)
 
     if (interlaced)
     {
-        m_deint_possible = videoOutput->SetDeinterlacingEnabled(true);
-        if (!m_deint_possible)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to enable deinterlacing");
-            m_scan = scan;
-            return;
-        }
+            m_deint_possible = videoOutput->SetDeinterlacingEnabled(true);
+            if (!m_deint_possible)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + "Unable to enable Video Output based deinterlacing");
+                m_scan = scan;
+                return;
+            }
         if (videoOutput->NeedsDoubleFramerate())
         {
             m_double_framerate = true;
@@ -782,7 +799,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
             }
         }
         m_double_process = videoOutput->IsExtraProcessingRequired();
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled deinterlacing");
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Enabled Video Output based deinterlacing");
     }
     else
     {
@@ -791,7 +808,7 @@ void MythPlayer::SetScanType(FrameScanType scan)
             m_double_process = false;
             m_double_framerate = false;
             videoOutput->SetDeinterlacingEnabled(false);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled deinterlacing");
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled Video Output based deinterlacing");
         }
     }
 
@@ -847,6 +864,16 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
                                 video_disp_dim.height()));
     m_scan_locked  = false;
     m_scan_tracker = (m_scan == kScan_Interlaced) ? 2 : 0;
+}
+
+
+void MythPlayer::SetFrameRate(double fps)
+{
+    video_frame_rate = fps;
+    float temp_speed = (play_speed == 0.0f) ?
+        audio.GetStretchFactor() : play_speed;
+    SetFrameInterval(kScan_Progressive,
+                        1.0 / (video_frame_rate * temp_speed));
 }
 
 void MythPlayer::SetFileLength(int total, int frames)
@@ -1889,7 +1916,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         else
         {
             dropframe = true;
-            dbg = "A/V predict drop frame, ";
+            dbg = QString("A/V predict drop frame, refreshrate %1, avsync_predictor %2, diverge %3, ")
+            .arg(refreshrate).arg(avsync_predictor).arg(diverge);
         }
     }
 
@@ -2182,6 +2210,11 @@ void MythPlayer::SetBuffering(bool new_buffering)
     }
 }
 
+// For debugging playback set this to increase the timeout so that
+// playback does not fail if stepping through code.
+// Set PREBUFFERDEBUG to any value and you will get 30 minutes.
+static char *preBufferDebug = getenv("PREBUFFERDEBUG");
+
 bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
 {
     if (!videoOutput)
@@ -2247,7 +2280,10 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 audio.Pause(false);
             }
         }
-        if ((waited_for > 500) && !videoOutput->EnoughFreeFrames())
+        int msecs = 500;
+        if (preBufferDebug)
+            msecs = 1800000;
+        if ((waited_for > msecs /*500*/) && !videoOutput->EnoughFreeFrames())
         {
             LOG(VB_GENERAL, LOG_NOTICE, LOC +
                 "Timed out waiting for frames, and"
@@ -2257,7 +2293,10 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             // to recover from serious problems if frames get leaked.
             DiscardVideoFrames(true);
         }
-        if (waited_for > 30000) // 30 seconds for internet streamed media
+        msecs = 30000;
+        if (preBufferDebug)
+            msecs = 1800000;
+        if (waited_for > msecs /*30000*/) // 30 seconds for internet streamed media
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Waited too long for decoder to fill video buffers. Exiting..");
@@ -2382,12 +2421,22 @@ void MythPlayer::ForceDeinterlacer(const QString &overridefilter)
     bool normal = play_speed > 0.99f && play_speed < 1.01f && normal_speed;
     videofiltersLock.lock();
 
-    m_double_framerate =
-         videoOutput->SetupDeinterlace(true, overridefilter) &&
-         videoOutput->NeedsDoubleFramerate();
-    m_double_process = videoOutput->IsExtraProcessingRequired();
-
-    if (m_double_framerate && (!CanSupportDoubleRate() || !normal))
+    bool hwset = decoder->GetMythCodecContext()->setDeinterlacer(true, overridefilter);
+    if (hwset)
+    {
+        m_double_framerate = false;
+        m_double_process = false;
+        videoOutput->SetupDeinterlace(false);
+    }
+    else
+    {
+        m_double_framerate =
+            videoOutput->SetupDeinterlace(true, overridefilter) &&
+            videoOutput->NeedsDoubleFramerate();
+        m_double_process = videoOutput->IsExtraProcessingRequired();
+    }
+    if ((decoder->GetMythCodecContext()->getDoubleRate() || m_double_framerate)
+      && (!CanSupportDoubleRate() || !normal))
         FallbackDeint();
 
     videofiltersLock.unlock();
@@ -2480,13 +2529,18 @@ void MythPlayer::VideoStart(void)
     }
     else if (videoOutput)
     {
-        // Set up deinterlacing in the video output method
-        m_double_framerate =
-            (videoOutput->SetupDeinterlace(true) &&
-             videoOutput->NeedsDoubleFramerate());
+        bool hwset = decoder->GetMythCodecContext()->setDeinterlacer(true);
+        if (hwset)
+            videoOutput->SetupDeinterlace(false);
+        else
+        {
+            // Set up deinterlacing in the video output method
+            m_double_framerate =
+                (videoOutput->SetupDeinterlace(true) &&
+                videoOutput->NeedsDoubleFramerate());
 
-        m_double_process = videoOutput->IsExtraProcessingRequired();
-
+            m_double_process = videoOutput->IsExtraProcessingRequired();
+        }
         videosync = VideoSync::BestMethod(videoOutput, (uint)rf_int);
 
         // Make sure video sync can do it
@@ -3808,13 +3862,22 @@ void MythPlayer::ChangeSpeed(void)
                        kScan_Intr2ndField == m_scan);
 
         videofiltersLock.lock();
-        if (m_double_framerate && !play_1)
-            videoOutput->FallbackDeint();
-        else if (!m_double_framerate && CanSupportDoubleRate() && play_1 &&
-                 inter)
-            videoOutput->BestDeint();
+        bool doublerate = m_double_framerate || decoder->GetMythCodecContext()->getDoubleRate();
+        if (doublerate && !play_1)
+        {
+            bool hwdeint = decoder->GetMythCodecContext()->FallbackDeint();
+            if (!hwdeint)
+                videoOutput->FallbackDeint();
+        }
+        else if (!m_double_framerate && CanSupportDoubleRate() && play_1
+                && (inter || decoder->GetMythCodecContext()->isDeinterlacing()))
+        {
+            videoOutput->SetupDeinterlace(false);
+            bool hwdeint = decoder->GetMythCodecContext()->BestDeint();
+            if (!hwdeint)
+                videoOutput->BestDeint();
+        }
         videofiltersLock.unlock();
-
         m_double_framerate = videoOutput->NeedsDoubleFramerate();
         m_double_process = videoOutput->IsExtraProcessingRequired();
     }
@@ -5502,8 +5565,14 @@ void MythPlayer::SetDecoder(DecoderBase *dec)
             decoder = dec;
         else
         {
+            // Copy the deinterlacer name to the new decoder.
             DecoderBase *d = decoder;
             decoder = dec;
+            if (d && decoder)
+            {
+                QString deinterlacer = d->GetMythCodecContext()->getDeinterlacerName();
+                decoder->GetMythCodecContext()->setDeinterlacer(true,deinterlacer);
+            }
             delete d;
         }
         decoder_change_lock.unlock();
