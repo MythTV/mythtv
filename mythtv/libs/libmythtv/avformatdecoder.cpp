@@ -3936,8 +3936,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     }
     else if (!directrendering)
     {
-        AVFrame *tmp_frame = NULL;
-        AVFrame *use_frame = NULL;
+        AVFrame *tmp_frame = nullptr;
+        AVFrame *use_frame = nullptr;
 #ifdef USING_VAAPI2
         if (IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format))
         {

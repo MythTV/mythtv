@@ -46,13 +46,13 @@ extern "C" {
 #define LOC QString("MythCodecContext: ")
 
 MythCodecContext::MythCodecContext() :
-    stream(NULL),
-    buffersink_ctx(NULL),
-    buffersrc_ctx(NULL),
-    filter_graph(NULL),
+    stream(nullptr),
+    buffersink_ctx(nullptr),
+    buffersrc_ctx(nullptr),
+    filter_graph(nullptr),
     filtersInitialized(false),
-    hw_frames_ctx(NULL),
-    player(NULL),
+    hw_frames_ctx(nullptr),
+    player(nullptr),
     ptsUsed(0),
     doublerate(false)
 {
@@ -68,7 +68,7 @@ MythCodecContext::~MythCodecContext()
 // static
 MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 {
-    MythCodecContext *mctx = NULL;
+    MythCodecContext *mctx = nullptr;
 #ifdef USING_VAAPI2
     if (codec_is_vaapi2(codec))
         mctx = new Vaapi2Context();
@@ -226,8 +226,8 @@ bool MythCodecContext::setDeinterlacer(bool enable, QString name)
     {
         if (deinterlacername.isEmpty())
         {
-            VideoOutput *vo = NULL;
-            VideoDisplayProfile *vdisp_profile = NULL;
+            VideoOutput *vo = nullptr;
+            VideoDisplayProfile *vdisp_profile = nullptr;
             if (player)
                 vo = player->GetVideoOutput();
             if (vo)
@@ -269,8 +269,8 @@ bool MythCodecContext::FallbackDeint(void)
 QString MythCodecContext::GetFallbackDeint(void)
 {
 
-    VideoOutput *vo = NULL;
-    VideoDisplayProfile *vdisp_profile = NULL;
+    VideoOutput *vo = nullptr;
+    VideoDisplayProfile *vdisp_profile = nullptr;
     if (player)
         vo = player->GetVideoOutput();
     if (vo)
@@ -323,7 +323,7 @@ int MythCodecContext::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
     AVRational time_base = stream->time_base;
-    AVBufferSrcParameters* params = NULL;
+    AVBufferSrcParameters* params = nullptr;
 
     filter_graph = avfilter_graph_alloc();
     if (!outputs || !inputs || !filter_graph)
@@ -342,7 +342,7 @@ int MythCodecContext::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     // isInterlaced = frame->interlaced_frame;
 
     ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
-                                       args, NULL, filter_graph);
+                                       args, nullptr, filter_graph);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer source");
@@ -367,7 +367,7 @@ int MythCodecContext::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
 
     /* buffer video sink: to terminate the filter chain. */
     ret = avfilter_graph_create_filter(&buffersink_ctx, buffersink, "out",
-                                       NULL, NULL, filter_graph);
+                                       nullptr, nullptr, filter_graph);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "avfilter_graph_create_filter failed for buffer sink");
@@ -388,7 +388,7 @@ int MythCodecContext::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     outputs->name       = av_strdup("in");
     outputs->filter_ctx = buffersrc_ctx;
     outputs->pad_idx    = 0;
-    outputs->next       = NULL;
+    outputs->next       = nullptr;
 
     /*
      * The buffer sink input must be connected to the output pad of
@@ -399,17 +399,17 @@ int MythCodecContext::InitDeinterlaceFilter(AVCodecContext *ctx, AVFrame *frame)
     inputs->name       = av_strdup("out");
     inputs->filter_ctx = buffersink_ctx;
     inputs->pad_idx    = 0;
-    inputs->next       = NULL;
+    inputs->next       = nullptr;
 
     if ((ret = avfilter_graph_parse_ptr(filter_graph, filters.toLocal8Bit(),
-                                    &inputs, &outputs,0)) < 0)
+                                    &inputs, &outputs,nullptr)) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC
             + QString("avfilter_graph_parse_ptr failed for %1").arg(filters));
         goto end;
     }
 
-    if ((ret = avfilter_graph_config(filter_graph, NULL)) < 0)
+    if ((ret = avfilter_graph_config(filter_graph, nullptr)) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC
             + QString("avfilter_graph_config failed"));
@@ -423,7 +423,7 @@ end:
     if (ret < 0)
     {
         avfilter_graph_free(&filter_graph);
-        filter_graph = NULL;
+        filter_graph = nullptr;
         doublerate = false;
     }
     avfilter_inout_free(&inputs);
@@ -435,9 +435,9 @@ end:
 void MythCodecContext::CloseFilters()
 {
     avfilter_graph_free(&filter_graph);
-    filter_graph = NULL;
-    buffersink_ctx = NULL;
-    buffersrc_ctx = NULL;
+    filter_graph = nullptr;
+    buffersink_ctx = nullptr;
+    buffersrc_ctx = nullptr;
     filtersInitialized = false;
     ptsUsed = 0;
     priorPts[0] = 0;

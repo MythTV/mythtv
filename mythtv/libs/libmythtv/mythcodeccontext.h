@@ -52,7 +52,7 @@ class MTV_PUBLIC MythCodecContext
     virtual QString GetDeinterlaceFilter() { return QString(); }
     void setPlayer(MythPlayer *tPlayer) { player = tPlayer; }
     bool setDeinterlacer(bool enable, QString name = QString());
-    bool isDeinterlacing(void) { return filter_graph != NULL;}
+    bool isDeinterlacing(void) { return filter_graph != nullptr;}
     QString getDeinterlacerName(void) { return deinterlacername; }
     bool BestDeint(void);
     bool FallbackDeint(void);
