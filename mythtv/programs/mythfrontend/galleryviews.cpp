@@ -1,6 +1,7 @@
 #include "galleryviews.h"
 
 #include <cmath> // for qsrand
+#include <random>
 
 
 #define LOC QString("Galleryviews: ")
@@ -222,7 +223,8 @@ void FlatView::Populate(ImageList &files)
         // Modify viewing sequence
         if (m_order == kShuffle)
         {
-            std::random_shuffle(m_sequence.begin(), m_sequence.end());
+            std::shuffle(m_sequence.begin(), m_sequence.end(),
+                         std::mt19937(std::random_device()()));
         }
         else if (m_order == kRandom)
         {

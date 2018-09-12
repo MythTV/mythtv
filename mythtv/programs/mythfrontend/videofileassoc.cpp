@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <random>
 #include <vector>
 #include <iterator>
 #include <map>
@@ -299,7 +300,8 @@ class FileAssocDialogPrivate
                             new FileAssociationWrap(*p)));
         }
 
-        std::random_shuffle(tmp_fa.begin(), tmp_fa.end());
+        std::shuffle(tmp_fa.begin(), tmp_fa.end(),
+                     std::mt19937(std::random_device()()));
 
         for (tmp_fa_list::const_iterator p = tmp_fa.begin(); p != tmp_fa.end();
                 ++p)

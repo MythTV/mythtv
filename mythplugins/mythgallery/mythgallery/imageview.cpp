@@ -30,6 +30,7 @@
 #include <QMutexLocker>
 #include <QRunnable>
 #include <QWaitCondition>
+#include <random>
 
 // MythTV plugin headers
 #include <mythcontext.h>
@@ -420,7 +421,8 @@ void ImageView::LoadAlbumRunnable::run()
         // The first images should not always come from the first directory.
         if (m_slideshow_sequencing > 1)
         {
-            std::random_shuffle(children.begin(), children.end());
+            std::shuffle(children.begin(), children.end(),
+                         std::mt19937(std::random_device()()));
         }
 
         ThumbList fileList;
