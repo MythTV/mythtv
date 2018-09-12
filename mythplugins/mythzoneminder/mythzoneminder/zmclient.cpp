@@ -24,9 +24,9 @@
 #define BUFFER_SIZE  (2048*1536*3)
 
 ZMClient::ZMClient()
-    : QObject(NULL),
+    : QObject(nullptr),
       m_listLock(QMutex::Recursive),
-      m_socket(NULL),
+      m_socket(nullptr),
       m_socketLock(QMutex::Recursive),
       m_hostname("localhost"),
       m_port(6548),
@@ -41,7 +41,7 @@ ZMClient::ZMClient()
     gCoreContext->addListener(this);
 }
 
-ZMClient *ZMClient::m_zmclient = NULL;
+ZMClient *ZMClient::m_zmclient = nullptr;
 
 ZMClient *ZMClient::get(void)
 {
@@ -90,7 +90,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         if (m_socket)
         {
             m_socket->DecrRef();
-            m_socket = NULL;
+            m_socket = nullptr;
         }
 
         m_socket = new MythSocket();
@@ -98,7 +98,7 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         if (!m_socket->ConnectToHost(m_hostname, m_port))
         {
             m_socket->DecrRef();
-            m_socket = NULL;
+            m_socket = nullptr;
         }
         else
         {
@@ -257,12 +257,12 @@ ZMClient::~ZMClient()
 {
     gCoreContext->removeListener(this);
 
-    m_zmclient = NULL;
+    m_zmclient = nullptr;
 
     if (m_socket)
     {
         m_socket->DecrRef();
-        m_socket = NULL;
+        m_socket = nullptr;
         m_zmclientReady = false;
     }
 
@@ -644,7 +644,7 @@ void ZMClient::getEventFrame(Event *event, int frameNo, MythImage **image)
     if (*image)
     {
         (*image)->DecrRef();
-        *image = NULL;
+        *image = nullptr;
     }
 
     QStringList strList("GET_EVENT_FRAME");
@@ -843,7 +843,7 @@ Monitor *ZMClient::getMonitorAt(int pos)
     QMutexLocker locker(&m_listLock);
 
     if (pos < 0 || pos > m_monitorList.count() - 1)
-        return NULL;
+        return nullptr;
 
     return m_monitorList.at(pos);
 }
@@ -855,7 +855,7 @@ Monitor* ZMClient::getMonitorByID(int monID)
     if (m_monitorMap.contains(monID))
         return m_monitorMap.find(monID).value();
 
-    return NULL;
+    return nullptr;
 }
 
 void ZMClient::doGetMonitorList(void)

@@ -103,8 +103,8 @@ static void runZMMiniPlayer(void)
 }
 
 // these point to the the mainmenu callback if found
-static void (*m_callback)(void *, QString &) = NULL;
-static void *m_callbackdata = NULL;
+static void (*m_callback)(void *, QString &) = nullptr;
+static void *m_callbackdata = nullptr;
 
 static void ZoneMinderCallback(void *data, QString &selection)
 {
@@ -132,7 +132,7 @@ static int runMenu(QString which_menu)
     QString themedir = GetMythUI()->GetThemeDir();
 
     // find the 'mainmenu' MythThemedMenu so we can use the callback from it
-    MythThemedMenu *mainMenu = NULL;
+    MythThemedMenu *mainMenu = nullptr;
     QObject *parentObject = GetMythMainWindow()->GetMainStack()->GetTopScreen();
 
     while (parentObject)
@@ -154,11 +154,11 @@ static int runMenu(QString which_menu)
         mainMenu->getCallback(&m_callback, &m_callbackdata);
     else
     {
-        m_callback = NULL;
-        m_callbackdata = NULL;
+        m_callback = nullptr;
+        m_callbackdata = nullptr;
     }
 
-    diag->setCallback(ZoneMinderCallback, NULL);
+    diag->setCallback(ZoneMinderCallback, nullptr);
     diag->setKillable();
 
     if (diag->foundTheme())

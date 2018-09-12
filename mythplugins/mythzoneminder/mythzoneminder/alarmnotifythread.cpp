@@ -8,11 +8,11 @@
 #include "zmclient.h"
 #include "zmdefines.h"
 
-class AlarmNotifyThread *AlarmNotifyThread::m_alarmNotifyThread = NULL;
+class AlarmNotifyThread *AlarmNotifyThread::m_alarmNotifyThread = nullptr;
 
 class AlarmNotifyThread *AlarmNotifyThread::get(void)
 {
-    if (m_alarmNotifyThread == NULL)
+    if (m_alarmNotifyThread == nullptr)
         m_alarmNotifyThread = new AlarmNotifyThread;
     return m_alarmNotifyThread;
 }

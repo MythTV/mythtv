@@ -275,7 +275,7 @@ int main(int argc, char **argv)
         timeout.tv_usec = 0;
 
         read_fds = master; // copy it
-        int res = select(fdmax+1, &read_fds, NULL, NULL, &timeout);
+        int res = select(fdmax+1, &read_fds, nullptr, nullptr, &timeout);
 
         if (res == -1)
         {
