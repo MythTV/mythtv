@@ -237,7 +237,7 @@ QString RomInfo::getExtension()
 {
     int pos = Romname().lastIndexOf(".");
     if (pos == -1)
-        return NULL;
+        return nullptr;
 
     pos = Romname().length() - pos;
     pos--;
@@ -369,7 +369,7 @@ QList<RomInfo*> RomInfo::GetAllRomInfo()
 
 RomInfo *RomInfo::GetRomInfoById(int id)
 {
-    RomInfo *ret = NULL;
+    RomInfo *ret = nullptr;
 
     MSqlQuery query(MSqlQuery::InitCon());
 

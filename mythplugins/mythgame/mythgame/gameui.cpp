@@ -46,14 +46,14 @@ Q_DECLARE_METATYPE(GameTreeInfo *)
 GameUI::GameUI(MythScreenStack *parent)
        : MythScreenType(parent, "GameUI"),
             m_showHashed(false), m_gameShowFileName(0),
-            m_gameTree(NULL), m_favouriteNode(NULL),
-            m_busyPopup(0),
-            m_gameUITree(NULL), m_gameTitleText(NULL),
-            m_gameSystemText(NULL), m_gameYearText(NULL),
-            m_gameGenreText(NULL), m_gamePlotText(NULL),
-            m_gameFavouriteState(NULL), m_gameImage(NULL),
-            m_fanartImage(NULL), m_boxImage(NULL),
-            m_scanner(NULL)
+            m_gameTree(nullptr), m_favouriteNode(nullptr),
+            m_busyPopup(nullptr),
+            m_gameUITree(nullptr), m_gameTitleText(nullptr),
+            m_gameSystemText(nullptr), m_gameYearText(nullptr),
+            m_gameGenreText(nullptr), m_gamePlotText(nullptr),
+            m_gameFavouriteState(nullptr), m_gameImage(nullptr),
+            m_fanartImage(nullptr), m_boxImage(nullptr),
+            m_scanner(nullptr)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -109,7 +109,7 @@ void GameUI::BuildTree()
     {
         m_gameUITree->Reset();
         delete m_gameTree;
-        m_gameTree = NULL;
+        m_gameTree = nullptr;
     }
 
     m_gameTree = new MythGenericTree("game root", 0, false);
@@ -272,7 +272,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
             return;
         if (romInfo->RomCount() == 1)
         {
-            GameHandler::Launchgame(romInfo, NULL);
+            GameHandler::Launchgame(romInfo, nullptr);
         }
         else
         {
@@ -470,7 +470,7 @@ void GameUI::searchStart(void)
 {
     MythGenericTree *parent = m_gameUITree->GetCurrentNode()->getParent();
 
-    if (parent != NULL)
+    if (parent != nullptr)
     {
         QStringList childList;
         QList<MythGenericTree*>::iterator it;
@@ -568,7 +568,7 @@ void GameUI::customEvent(QEvent *event)
         else if (resultid == "detailsPopup")
         {
             // Play button pushed
-            itemClicked(0);
+            itemClicked(nullptr);
         }
     }
     if (event->type() == MetadataLookupEvent::kEventType)
@@ -580,7 +580,7 @@ void GameUI::customEvent(QEvent *event)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         if (lul.isEmpty())
@@ -612,7 +612,7 @@ void GameUI::customEvent(QEvent *event)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         if (lul.size())
@@ -971,7 +971,7 @@ void GameUI::OnGameSearchDone(MetadataLookup *lookup)
     if (m_busyPopup)
     {
         m_busyPopup->Close();
-        m_busyPopup = NULL;
+        m_busyPopup = nullptr;
     }
 
     if (!lookup)
@@ -1119,7 +1119,7 @@ void GameUI::doScan()
 void GameUI::reloadAllData(bool dbChanged)
 {
     delete m_scanner;
-    m_scanner = NULL;
+    m_scanner = nullptr;
 
     if (dbChanged)
         BuildTree();

@@ -61,7 +61,7 @@ class GameHandler : public QObject
         rebuild(false),             spandisks(0),
                                     gameplayerid(0),
         m_RemoveAll(false),         m_KeepAll(false),
-        m_progressDlg(NULL) {}
+        m_progressDlg(nullptr) {}
 
     static void updateSettings(GameHandler*);
     static GameHandler *getHandler(uint i);

@@ -128,7 +128,7 @@ class MPUBLIC MythGamePlayerEditor : public QObject, public ConfigurationDialog
     MythGamePlayerEditor();
 
     virtual MythDialog *dialogWidget(MythMainWindow *parent,
-                                     const char     *widgetName=0);
+                                     const char     *widgetName=nullptr);
 
     virtual DialogCode exec(bool saveOnExec = true, bool doLoad = true);
 

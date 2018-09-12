@@ -38,7 +38,7 @@ class GameUI : public MythScreenType
     void itemClicked(MythUIButtonListItem* item);
     void showImages(void);
     void searchComplete(QString);
-    void gameSearch(MythGenericTree *node = NULL,
+    void gameSearch(MythGenericTree *node = nullptr,
                      bool automode = false);
     void OnGameSearchListSelection(RefCountHandler<MetadataLookup> lookup);
     void OnGameSearchDone(MetadataLookup *lookup);
