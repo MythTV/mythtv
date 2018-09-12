@@ -6824,6 +6824,8 @@ if enabled gxx; then
         check_cxxflags -Wno-attributes
     fi
     check_cxxflags -funit-at-a-time
+    # Don't complain about over-aligned types
+    check_cxxflags -faligned-new
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)
     # 192: icpc confused by Qt %0-%99 in strings
@@ -6848,6 +6850,8 @@ elif enabled clangxx; then
     check_cxxflags -Wimplicit-fallthrough
     # Clang needs this to link on Fedora
     add_extralibs -lstdc++
+    # Don't complain about over-aligned types
+    check_cxxflags -faligned-allocation
 fi
 
 # Check for python dependencies
