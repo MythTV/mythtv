@@ -51,9 +51,9 @@
 
 MediaServer::MediaServer(void) :
 #ifdef USING_LIBDNS_SD
-    m_bonjour(NULL),
+    m_bonjour(nullptr),
 #endif
-    m_pUPnpCDS(NULL), m_pUPnpCMGR(NULL),
+    m_pUPnpCDS(nullptr), m_pUPnpCMGR(nullptr),
     m_sSharePath(GetShareDir())
 {
     LOG(VB_UPNP, LOG_INFO, "MediaServer(): Begin");
@@ -89,7 +89,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
         {
             LOG(VB_GENERAL, LOG_ERR, "MediaServer: HttpServer Create Error");
             delete pHttpServer;
-            pHttpServer = NULL;
+            pHttpServer = nullptr;
             return;
         }
 

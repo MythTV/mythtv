@@ -20,7 +20,7 @@ class Music : public MusicServices
 
     public:
 
-        Q_INVOKABLE explicit Music( QObject */*parent*/ = 0 ) {}
+        Q_INVOKABLE explicit Music( QObject */*parent*/ = nullptr ) {}
 
     public:
 
@@ -60,7 +60,7 @@ class ScriptableMusic : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableMusic( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableMusic( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -70,14 +70,14 @@ class ScriptableMusic : public QObject
         QObject* GetTrackList(       int              StartIndex,
                                      int              Count      )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetTrackList(StartIndex, Count );
             )
         }
 
         QObject* GetTrack( int  Id )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetTrack( Id );
             )
         }

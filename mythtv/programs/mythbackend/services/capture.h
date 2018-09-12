@@ -36,7 +36,7 @@ class Capture : public CaptureServices
 
     public:
 
-        Q_INVOKABLE explicit Capture( QObject */*parent*/ = 0 ) {}
+        Q_INVOKABLE explicit Capture( QObject */*parent*/ = nullptr ) {}
 
     public:
 
@@ -128,7 +128,7 @@ class ScriptableCapture : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableCapture( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableCapture( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }

@@ -43,7 +43,7 @@ PlaybackSock::PlaybackSock(
 PlaybackSock::~PlaybackSock()
 {
     sock->DecrRef();
-    sock = NULL;
+    sock = nullptr;
 }
 
 bool PlaybackSock::wantsEvents(void) const
@@ -426,13 +426,13 @@ ProgramInfo *PlaybackSock::GetRecording(uint cardid)
     strlist << "GET_CURRENT_RECORDING";
 
     if (!SendReceiveStringList(strlist))
-        return NULL;
+        return nullptr;
 
     ProgramInfo *pginfo = new ProgramInfo(strlist);
     if (!pginfo->HasPathname() && !pginfo->GetChanID())
     {
         delete pginfo;
-        pginfo = NULL;
+        pginfo = nullptr;
     }
 
     return pginfo;

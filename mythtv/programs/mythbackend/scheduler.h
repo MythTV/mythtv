@@ -38,7 +38,7 @@ class SchedInputInfo
         schedgroup(false),
         group_inputs(),
         conflicting_inputs(),
-        conflictlist(NULL) {};
+        conflictlist(nullptr) {};
     ~SchedInputInfo(void) {};
 
     uint inputid;
@@ -53,7 +53,7 @@ class Scheduler : public MThread, public MythScheduler
 {
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
-              QString recordTbl = "record", Scheduler *master_sched = NULL);
+              QString recordTbl = "record", Scheduler *master_sched = nullptr);
     ~Scheduler();
 
     void Stop(void);
@@ -163,10 +163,10 @@ class Scheduler : public MThread, public MythScheduler
     bool FindNextConflict(const RecList &cardlist,
                           const RecordingInfo *p, RecConstIter &iter,
                           OpenEndType openEnd = openEndNever,
-                          uint *paffinity = NULL) const;
+                          uint *paffinity = nullptr) const;
     const RecordingInfo *FindConflict(const RecordingInfo *p,
                                       OpenEndType openEnd = openEndNever,
-                                      uint *affinity = NULL,
+                                      uint *affinity = nullptr,
                                       bool checkAll = false)
         const;
     void MarkOtherShowings(RecordingInfo *p);

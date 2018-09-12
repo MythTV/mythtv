@@ -36,7 +36,7 @@ class Content : public ContentServices
 
     public:
 
-        Q_INVOKABLE explicit Content( QObject */*parent*/ = 0 ) {}
+        Q_INVOKABLE explicit Content( QObject */*parent*/ = nullptr ) {}
 
     public:
 
@@ -153,7 +153,7 @@ class ScriptableContent : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableContent( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableContent( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -162,7 +162,7 @@ class ScriptableContent : public QObject
 
         QObject* GetRecordingArtworkList( int RecordedId )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetRecordingArtworkList( RecordedId, 0, QDateTime() );
             )
         }
@@ -170,7 +170,7 @@ class ScriptableContent : public QObject
         QObject* GetProgramArtworkList( const QString &Inetref,
                                               int      Season  )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetProgramArtworkList( Inetref, Season );
             )
         }
@@ -194,7 +194,7 @@ class ScriptableContent : public QObject
                                  int              AudioBitrate,
                                  int              SampleRate )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.AddLiveStream(StorageGroup, FileName, HostName,
                                        MaxSegments, Width, Height, Bitrate,
                                        AudioBitrate, SampleRate);
@@ -209,7 +209,7 @@ class ScriptableContent : public QObject
                                          int              AudioBitrate,
                                          int              SampleRate )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.AddRecordingLiveStream(RecordedId, 0, QDateTime(),
                                                 MaxSegments,
                                                 Width, Height, Bitrate,
@@ -225,7 +225,7 @@ class ScriptableContent : public QObject
                                      int              AudioBitrate,
                                      int              SampleRate )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.AddVideoLiveStream(Id, MaxSegments, Width, Height,
                                             Bitrate, AudioBitrate, SampleRate);
             )
@@ -233,21 +233,21 @@ class ScriptableContent : public QObject
 
         QObject* GetLiveStream( int Id )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetLiveStream( Id );
             )
         }
 
         QObject* GetLiveStreamList( const QString &FileName )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetLiveStreamList( FileName );
             )
         }
 
         QObject* StopLiveStream( int Id )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.StopLiveStream(Id);
             )
         }

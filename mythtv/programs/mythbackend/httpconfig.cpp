@@ -306,7 +306,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
         return true;
     }
-    else if ((request->m_sMethod == "Database") || (NULL == gContext))
+    else if ((request->m_sMethod == "Database") || (nullptr == gContext))
     {
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_database.xml";

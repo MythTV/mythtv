@@ -67,7 +67,7 @@ void UPnpCDSVideo::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Video"),
                                               QObject::tr("All Videos"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadVideos(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -81,7 +81,7 @@ void UPnpCDSVideo::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Movie"),
                                               QObject::tr("Movies"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadMovies(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -95,7 +95,7 @@ void UPnpCDSVideo::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Series"),
                                               QObject::tr("Series"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadSeries(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -109,7 +109,7 @@ void UPnpCDSVideo::CreateRoot()
 //     pContainer = CDSObject::CreateContainer ( containerId.arg("Other"),
 //                                               QObject::tr("Other"),
 //                                               m_sExtensionId, // Parent Id
-//                                               NULL );
+//                                               nullptr );
 //     m_pRoot->AddChild(pContainer);
 
     // -----------------------------------------------------------------------
@@ -118,7 +118,7 @@ void UPnpCDSVideo::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Genre"),
                                               QObject::tr("Genre"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadGenres(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -132,7 +132,7 @@ void UPnpCDSVideo::CreateRoot()
 //     pContainer = CDSObject::CreateStorageSystem ( containerId.arg("Directory"),
 //                                                   QObject::tr("Directory"),
 //                                                   m_sExtensionId, // Parent Id
-//                                                   NULL );
+//                                                   nullptr );
 //    m_pRoot->AddChild(pContainer);
 
     // HACK
@@ -269,7 +269,7 @@ bool UPnpCDSVideo::LoadMetadata(const UPnpCDSRequest* pRequest,
     // Root or Root + 1
     if (tokens[currentToken].isEmpty())
     {
-        CDSObject *container = NULL;
+        CDSObject *container = nullptr;
 
         if (pRequest->m_sObjectId == m_sExtensionId)
             container = GetRoot();
@@ -416,7 +416,7 @@ bool UPnpCDSVideo::LoadSeries(const UPnpCDSRequest* pRequest,
         CDSObject* pContainer = CDSObject::CreateAlbum( CreateIDString(sRequestId, "Series", sTitle),
                                                         sTitle,
                                                         pRequest->m_sParentId,
-                                                        NULL );
+                                                        nullptr );
         pContainer->SetPropValue("description", QObject::tr("%n Seasons", "", nSeasonCount));
         pContainer->SetPropValue("longdescription", QObject::tr("%n Seasons", "", nSeasonCount));
         pContainer->SetPropValue("storageMedium", "HDD");
@@ -493,7 +493,7 @@ bool UPnpCDSVideo::LoadSeasons(const UPnpCDSRequest* pRequest,
         CDSObject* pContainer = CDSObject::CreateAlbum( CreateIDString(sRequestId, "Season", nSeason),
                                                         sTitle,
                                                         pRequest->m_sParentId,
-                                                        NULL );
+                                                        nullptr );
         pContainer->SetPropValue("description", QObject::tr("%n Episode(s)", "", nVideoCount));
         pContainer->SetPropValue("longdescription", QObject::tr("%n Episode(s)", "", nVideoCount));
         pContainer->SetPropValue("storageMedium", "HDD");
@@ -583,7 +583,7 @@ bool UPnpCDSVideo::LoadGenres(const UPnpCDSRequest* pRequest,
         CDSObject* pContainer = CDSObject::CreateMovieGenre( CreateIDString(sRequestId, "Genre", nGenreID),
                                                              sName,
                                                         pRequest->m_sParentId,
-                                                        NULL );
+                                                        nullptr );
 
         pContainer->SetChildCount(nVideoCount);
         pContainer->SetChildContainerCount(0);

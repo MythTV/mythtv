@@ -472,7 +472,7 @@ void ThemeUpdateTask::Terminate(void)
 
 RadioStreamUpdateTask::RadioStreamUpdateTask(void) : DailyHouseKeeperTask("UpdateRadioStreams",
                                                        kHKGlobal, kHKRunOnStartup),
-    m_msMU(NULL)
+    m_msMU(nullptr)
 {
 }
 
@@ -484,7 +484,7 @@ bool RadioStreamUpdateTask::DoRun(void)
         if (m_msMU->GetStatus() == GENERIC_EXIT_RUNNING)
             m_msMU->Term(true);
         delete m_msMU;
-        m_msMU = NULL;
+        m_msMU = nullptr;
     }
 
     QString command = GetAppBinDir() + "mythutil";
@@ -501,7 +501,7 @@ bool RadioStreamUpdateTask::DoRun(void)
     uint result = m_msMU->Wait();
 
     delete m_msMU;
-    m_msMU = NULL;
+    m_msMU = nullptr;
 
     if (result != GENERIC_EXIT_OK)
     {
@@ -517,7 +517,7 @@ bool RadioStreamUpdateTask::DoRun(void)
 RadioStreamUpdateTask::~RadioStreamUpdateTask(void)
 {
     delete m_msMU;
-    m_msMU = NULL;
+    m_msMU = nullptr;
 }
 
 bool RadioStreamUpdateTask::DoCheckRun(QDateTime now)
@@ -542,7 +542,7 @@ void RadioStreamUpdateTask::Terminate(void)
 
 ArtworkTask::ArtworkTask(void) : DailyHouseKeeperTask("RecordedArtworkUpdate",
                                          kHKGlobal, kHKRunOnStartup),
-    m_msMML(NULL)
+    m_msMML(nullptr)
 {
 }
 
@@ -554,7 +554,7 @@ bool ArtworkTask::DoRun(void)
         if (m_msMML->GetStatus() == GENERIC_EXIT_RUNNING)
             m_msMML->Term(true);
         delete m_msMML;
-        m_msMML = NULL;
+        m_msMML = nullptr;
     }
 
     QString command = GetAppBinDir() + "mythmetadatalookup";
@@ -571,7 +571,7 @@ bool ArtworkTask::DoRun(void)
     uint result = m_msMML->Wait();
 
     delete m_msMML;
-    m_msMML = NULL;
+    m_msMML = nullptr;
 
     if (result != GENERIC_EXIT_OK)
     {
@@ -586,7 +586,7 @@ bool ArtworkTask::DoRun(void)
 ArtworkTask::~ArtworkTask(void)
 {
     delete m_msMML;
-    m_msMML = NULL;
+    m_msMML = nullptr;
 }
 
 bool ArtworkTask::DoCheckRun(QDateTime now)
@@ -611,7 +611,7 @@ bool JobQueueRecoverTask::DoRun(void)
 }
 
 MythFillDatabaseTask::MythFillDatabaseTask(void) :
-    DailyHouseKeeperTask("MythFillDB"), m_msMFD(NULL)
+    DailyHouseKeeperTask("MythFillDB"), m_msMFD(nullptr)
 {
     SetHourWindowFromDB();
 }
@@ -710,7 +710,7 @@ bool MythFillDatabaseTask::DoRun(void)
         if (m_msMFD->GetStatus() == GENERIC_EXIT_RUNNING)
             m_msMFD->Term(true);
         delete m_msMFD;
-        m_msMFD = NULL;
+        m_msMFD = nullptr;
     }
 
     QString mfpath = gCoreContext->GetSetting("MythFillDatabasePath",
@@ -732,7 +732,7 @@ bool MythFillDatabaseTask::DoRun(void)
     uint result = m_msMFD->Wait();
 
     delete m_msMFD;
-    m_msMFD = NULL;
+    m_msMFD = nullptr;
 
     if (result != GENERIC_EXIT_OK)
     {
@@ -747,7 +747,7 @@ bool MythFillDatabaseTask::DoRun(void)
 MythFillDatabaseTask::~MythFillDatabaseTask(void)
 {
     delete m_msMFD;
-    m_msMFD = NULL;
+    m_msMFD = nullptr;
 }
 
 void MythFillDatabaseTask::Terminate(void)

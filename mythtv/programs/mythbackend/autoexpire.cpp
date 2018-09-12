@@ -74,7 +74,7 @@ AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList) :
     expire_thread(new ExpireThread(this)),
     desired_freq(15),
     expire_thread_run(true),
-    main_server(NULL)
+    main_server(nullptr)
 {
     expire_thread->start();
     gCoreContext->addListener(this);
@@ -84,11 +84,11 @@ AutoExpire::AutoExpire(QMap<int, EncoderLink *> *tvList) :
  *  \brief Creates AutoExpire class
  */
 AutoExpire::AutoExpire() :
-    encoderList(NULL),
-    expire_thread(NULL),
+    encoderList(nullptr),
+    expire_thread(nullptr),
     desired_freq(15),
     expire_thread_run(false),
-    main_server(NULL)
+    main_server(nullptr)
 {
 }
 
@@ -113,7 +113,7 @@ AutoExpire::~AutoExpire()
         gCoreContext->removeListener(this);
         expire_thread->wait();
         delete expire_thread;
-        expire_thread = NULL;
+        expire_thread = nullptr;
     }
 }
 
@@ -889,7 +889,7 @@ void AutoExpire::GetAllExpiring(pginfolist_t &list)
  */
 void AutoExpire::ClearExpireList(pginfolist_t &expireList, bool deleteProg)
 {
-    ProgramInfo *pginfo = NULL;
+    ProgramInfo *pginfo = nullptr;
     while (!expireList.empty())
     {
         if (deleteProg)
