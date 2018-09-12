@@ -61,7 +61,7 @@ class Task : public ReferenceCounter
 
         // Destructor protected to force use of Release Method
 
-        virtual        ~Task();
+        virtual        ~Task() = default;
 
     public:
 

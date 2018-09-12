@@ -13,7 +13,7 @@ class ImportSettings : public MythScreenType
     Q_OBJECT
   public:
     ImportSettings(MythScreenStack *parent, const char *name = nullptr);
-    ~ImportSettings();
+    ~ImportSettings() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

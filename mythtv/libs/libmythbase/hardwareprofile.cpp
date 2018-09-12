@@ -40,10 +40,6 @@ HardwareProfile::HardwareProfile() :
     }
 }
 
-HardwareProfile::~HardwareProfile()
-{
-}
-
 void HardwareProfile::Enable(void)
 {
     if (m_uuid.isEmpty())

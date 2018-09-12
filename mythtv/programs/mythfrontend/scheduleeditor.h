@@ -244,7 +244,7 @@ class SchedEditChild : public MythScreenType
     SchedEditChild(MythScreenStack *parent, const QString &name,
                    ScheduleEditor &editor, RecordingRule &rule,
                    RecordingInfo *recinfo);
-   ~SchedEditChild();
+   ~SchedEditChild() = default;
 
     virtual bool keyPressEvent(QKeyEvent *event);
     virtual bool CreateEditChild(
@@ -276,7 +276,7 @@ class SchedOptEditor : public SchedEditChild, public SchedOptMixin
   public:
     SchedOptEditor(MythScreenStack *parent, ScheduleEditor &editor,
                    RecordingRule &rule, RecordingInfo *recinfo);
-   ~SchedOptEditor();
+   ~SchedOptEditor() = default;
 
     bool Create(void);
 
@@ -296,7 +296,7 @@ class SchedFilterEditor : public SchedEditChild, public FilterOptMixin
   public:
     SchedFilterEditor(MythScreenStack *parent, ScheduleEditor &editor,
                       RecordingRule &rule, RecordingInfo *recinfo);
-   ~SchedFilterEditor();
+   ~SchedFilterEditor() = default;
 
     bool Create(void);
 
@@ -314,7 +314,7 @@ class StoreOptEditor : public SchedEditChild, public StoreOptMixin
   public:
     StoreOptEditor(MythScreenStack *parent, ScheduleEditor &editor,
                    RecordingRule &rule, RecordingInfo *recinfo);
-   ~StoreOptEditor();
+   ~StoreOptEditor() = default;
 
     bool Create(void);
     void customEvent(QEvent *event);
@@ -334,7 +334,7 @@ class PostProcEditor : public SchedEditChild, public PostProcMixin
   public:
     PostProcEditor(MythScreenStack *parent, ScheduleEditor &editor,
                    RecordingRule &rule, RecordingInfo *recinfo);
-   ~PostProcEditor();
+   ~PostProcEditor() = default;
 
     bool Create(void);
 

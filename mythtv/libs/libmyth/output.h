@@ -99,7 +99,7 @@ class MPUBLIC OutputListeners : public MythObservable
 {
 public:
     OutputListeners();
-    virtual ~OutputListeners();
+    virtual ~OutputListeners() = default;
 
     bool hasVisual(void) { return visuals.size(); }
     void addVisual(MythTV::Visual *);

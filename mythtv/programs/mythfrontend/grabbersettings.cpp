@@ -76,10 +76,6 @@ bool GrabberSettings::Create()
     return true;
 }
 
-GrabberSettings::~GrabberSettings()
-{
-}
-
 void GrabberSettings::Load(void)
 {
     m_movieGrabberList = MetaGrabberScript::GetList(kGrabberMovie, true);

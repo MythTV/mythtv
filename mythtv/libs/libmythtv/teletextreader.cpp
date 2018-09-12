@@ -29,10 +29,6 @@ TeletextReader::TeletextReader()
     Reset();
 }
 
-TeletextReader::~TeletextReader()
-{
-}
-
 bool TeletextReader::KeyPress(const QString &key)
 {
     int newPage        = m_curpage;

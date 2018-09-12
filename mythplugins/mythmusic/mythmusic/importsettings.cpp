@@ -21,11 +21,6 @@ ImportSettings::ImportSettings(MythScreenStack *parent, const char *name)
 {
 }
 
-ImportSettings::~ImportSettings()
-{
-
-}
-
 bool ImportSettings::Create()
 {
     bool err = false;

@@ -127,8 +127,8 @@ void ImageProperties::SetMaskImage(MythImage *image)
 class ImageLoader
 {
   public:
-    ImageLoader() { };
-   ~ImageLoader() { };
+    ImageLoader() = default;
+   ~ImageLoader() = default;
 
     static QHash<QString, const MythUIImage *> m_loadingImages;
     static QMutex                        m_loadingImagesLock;
@@ -574,7 +574,7 @@ public:
     explicit MythUIImagePrivate(MythUIImage *p)
         : m_parent(p),            m_UpdateLock(QReadWriteLock::Recursive)
     { };
-    ~MythUIImagePrivate() {};
+    ~MythUIImagePrivate() = default;
 
     MythUIImage *m_parent;
 

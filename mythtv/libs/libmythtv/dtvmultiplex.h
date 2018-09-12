@@ -26,9 +26,9 @@ class MTV_PUBLIC DTVMultiplex
   public:
     DTVMultiplex()
         : frequency(0), symbolrate(0), mplex(0) { }
-    DTVMultiplex(const DTVMultiplex &other);
-    DTVMultiplex &operator=(const DTVMultiplex &other);
-    virtual ~DTVMultiplex() { }
+    DTVMultiplex(const DTVMultiplex &/*other*/) = default;
+    DTVMultiplex &operator=(const DTVMultiplex &/*other*/) = default;
+    virtual ~DTVMultiplex() = default;
 
     bool operator==(const DTVMultiplex &m) const;
 

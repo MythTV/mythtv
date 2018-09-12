@@ -35,7 +35,7 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
   public:
     MythUITextEdit(MythUIType *parent, const QString &name);
-   ~MythUITextEdit();
+   ~MythUITextEdit() = default;
 
     virtual void Pulse(void);
     virtual bool keyPressEvent(QKeyEvent *);

@@ -27,10 +27,6 @@ QString UPnPFeature::toXML()
     return xml;
 }
 
-UPnPFeatureList::UPnPFeatureList()
-{
-}
-
 UPnPFeatureList::~UPnPFeatureList()
 {
     while (!m_features.isEmpty())

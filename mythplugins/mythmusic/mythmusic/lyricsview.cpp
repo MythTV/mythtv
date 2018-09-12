@@ -688,8 +688,3 @@ void EditLyricsDialog::cancelPressed(void )
     emit haveResult(false);
     Close();
 }
-
-EditLyricsDialog::~EditLyricsDialog()
-{
-}
-

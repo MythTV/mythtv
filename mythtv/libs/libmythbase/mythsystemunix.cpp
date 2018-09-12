@@ -610,10 +610,6 @@ MythSystemLegacyUnix::MythSystemLegacyUnix(MythSystemLegacy *parent) :
     }
 }
 
-MythSystemLegacyUnix::~MythSystemLegacyUnix(void)
-{
-}
-
 bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
                                 QStringList &args)
 {

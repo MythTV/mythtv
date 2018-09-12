@@ -15,10 +15,6 @@ MetaIOWavPack::MetaIOWavPack(void)
 {
 }
 
-MetaIOWavPack::~MetaIOWavPack(void)
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *

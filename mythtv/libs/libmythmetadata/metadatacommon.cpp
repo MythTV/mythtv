@@ -399,10 +399,6 @@ MetadataLookup::MetadataLookup(
     m_base_title.replace(manRecSuffix,"");
 }
 
-MetadataLookup::~MetadataLookup()
-{
-}
-
 QList<PersonInfo> MetadataLookup::GetPeople(PeopleType type) const
 {
     QList<PersonInfo> ret;

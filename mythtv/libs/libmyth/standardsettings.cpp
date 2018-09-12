@@ -281,10 +281,6 @@ void StandardSetting::MoveToThread(QThread *thread)
 /******************************************************************************
                             Group Setting
 *******************************************************************************/
-GroupSetting::GroupSetting()
-{
-}
-
 void GroupSetting::edit(MythScreenType *screen)
 {
     if (!isEnabled())

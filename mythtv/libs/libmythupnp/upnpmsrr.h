@@ -53,7 +53,7 @@ class UPNP_PUBLIC  UPnpMSRR : public Eventing
                  UPnpMSRR( UPnpDevice *pDevice,
                            const QString &sSharePath ); 
 
-        virtual ~UPnpMSRR();
+        virtual ~UPnpMSRR() = default;
 
         virtual QStringList GetBasePaths();
 

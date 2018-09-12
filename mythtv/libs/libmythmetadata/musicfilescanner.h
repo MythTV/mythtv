@@ -30,7 +30,7 @@ class META_PUBLIC MusicFileScanner
     typedef QMap <QString, MusicFileData> MusicLoadedMap;
     public:
         MusicFileScanner(void);
-        ~MusicFileScanner(void);
+        ~MusicFileScanner(void) = default;
 
         void SearchDirs(const QStringList &directory);
 

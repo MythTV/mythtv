@@ -289,7 +289,7 @@ class MPUBLIC ProgramInfo
     virtual void clear(void);
 
     // Destructor
-    virtual ~ProgramInfo();
+    virtual ~ProgramInfo() = default;
 
     // Serializers
     void ToStringList(QStringList &list) const;

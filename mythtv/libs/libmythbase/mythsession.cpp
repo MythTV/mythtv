@@ -118,14 +118,6 @@ MythSessionManager::MythSessionManager()
 }
 
 /**
- * \public
- */
-MythSessionManager::~MythSessionManager()
-{
-
-}
-
-/**
  * \private
  */
 void MythSessionManager::LoadSessions(void)

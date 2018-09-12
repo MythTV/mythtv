@@ -889,10 +889,6 @@ SchedEditChild::SchedEditChild(MythScreenStack *parent, const QString &name,
 {
 }
 
-SchedEditChild::~SchedEditChild(void)
-{
-}
-
 bool SchedEditChild::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget()->keyPressEvent(event))
@@ -991,10 +987,6 @@ SchedOptEditor::SchedOptEditor(MythScreenStack *parent,
 {
 }
 
-SchedOptEditor::~SchedOptEditor(void)
-{
-}
-
 bool SchedOptEditor::Create()
 {
     if (!SchedEditChild::CreateEditChild(
@@ -1062,10 +1054,6 @@ SchedFilterEditor::SchedFilterEditor(MythScreenStack *parent,
 {
 }
 
-SchedFilterEditor::~SchedFilterEditor(void)
-{
-}
-
 bool SchedFilterEditor::Create()
 {
     if (!SchedEditChild::CreateEditChild(
@@ -1123,10 +1111,6 @@ StoreOptEditor::StoreOptEditor(MythScreenStack *parent,
                                RecordingInfo *recInfo)
     : SchedEditChild(parent, "StorageOptionsEditor", editor, rule, recInfo),
       StoreOptMixin(*this, &rule, &editor)
-{
-}
-
-StoreOptEditor::~StoreOptEditor(void)
 {
 }
 
@@ -1213,10 +1197,6 @@ PostProcEditor::PostProcEditor(MythScreenStack *parent,
                                RecordingInfo *recInfo)
     : SchedEditChild(parent, "PostProcOptionsEditor", editor, rule, recInfo),
       PostProcMixin(*this, &rule, &editor)
-{
-}
-
-PostProcEditor::~PostProcEditor(void)
 {
 }
 

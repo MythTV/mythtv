@@ -407,10 +407,6 @@ VideoDisplayProfile::VideoDisplayProfile()
     }
 }
 
-VideoDisplayProfile::~VideoDisplayProfile()
-{
-}
-
 void VideoDisplayProfile::SetInput(const QSize &size,
     float framerate, const QString &codecName)
 {

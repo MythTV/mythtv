@@ -1,14 +1,6 @@
 #include "scheduledrecording.h"
 #include "mythcorecontext.h"
 
-ScheduledRecording::ScheduledRecording()
-{
-}
-
-ScheduledRecording::~ScheduledRecording()
-{
-}
-
 void ScheduledRecording::SendReschedule(const QStringList &request)
 {
     if (gCoreContext->IsBackend())

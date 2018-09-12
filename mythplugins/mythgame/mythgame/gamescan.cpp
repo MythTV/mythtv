@@ -26,10 +26,6 @@ GameScannerThread::GameScannerThread(void) :
 {
 }
 
-GameScannerThread::~GameScannerThread()
-{
-}
-
 void GameScannerThread::run(void)
 {
     RunProlog();

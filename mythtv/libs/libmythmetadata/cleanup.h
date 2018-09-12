@@ -7,7 +7,7 @@ class META_PUBLIC CleanupProc
 {
   public:
     virtual void doClean() = 0;
-    virtual ~CleanupProc();
+    virtual ~CleanupProc() = default;
 };
 
 class META_PUBLIC CleanupHooks

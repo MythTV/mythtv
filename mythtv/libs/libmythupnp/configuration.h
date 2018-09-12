@@ -84,9 +84,9 @@ class UPNP_PUBLIC DBConfiguration : public Configuration
 {
     public:
 
-        DBConfiguration();
+        DBConfiguration() = default;
 
-        virtual ~DBConfiguration() {}
+        virtual ~DBConfiguration() = default;
 
         virtual bool    Load    ( void );
         virtual bool    Save    ( void );

@@ -116,10 +116,6 @@ bool PlayerSettings::Create()
     return true;
 }
 
-PlayerSettings::~PlayerSettings()
-{
-}
-
 void PlayerSettings::slotSave(void)
 {
     gCoreContext->SaveSetting("VideoDefaultPlayer", m_defaultPlayerEdit->GetText());

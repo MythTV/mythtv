@@ -3,10 +3,6 @@
 
 #include "cleanup.h"
 
-CleanupProc::~CleanupProc()
-{
-}
-
 class CleanupHooksImp
 {
   private:

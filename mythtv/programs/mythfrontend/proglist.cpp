@@ -1048,7 +1048,7 @@ class plCompare : binary_function<const ProgramInfo*, const ProgramInfo*, bool>
 {
   public:
     virtual bool operator()(const ProgramInfo*, const ProgramInfo*) = 0;
-    virtual ~plCompare() {}
+    virtual ~plCompare() = default;
 };
 
 class plTitleSort : public plCompare

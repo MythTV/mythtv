@@ -19,10 +19,6 @@ MythUIScrollBar::MythUIScrollBar(MythUIType *parent, const QString &name)
 {
 }
 
-MythUIScrollBar::~MythUIScrollBar()
-{
-}
-
 void MythUIScrollBar::Reset()
 {
     m_pageStep = kDefaultPageStep;

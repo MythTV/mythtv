@@ -17,7 +17,7 @@ class META_PUBLIC MetaIOMP4 : public MetaIO
 {
   public:
     MetaIOMP4(void);
-    virtual ~MetaIOMP4(void);
+    virtual ~MetaIOMP4(void) = default;
 
     bool write(const QString &filename, MusicMetadata* mdata);
     MusicMetadata* read(const QString &filename);

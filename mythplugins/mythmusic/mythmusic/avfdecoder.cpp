@@ -61,7 +61,7 @@ class ShoutCastMetaParser
   public:
     ShoutCastMetaParser(void) :
         m_meta_artist_pos(-1), m_meta_title_pos(-1), m_meta_album_pos(-1) { }
-    ~ShoutCastMetaParser(void) { }
+    ~ShoutCastMetaParser(void) = default;
 
     void setMetaFormat(const QString &metaformat);
     ShoutCastMetaMap parseMeta(const QString &meta);

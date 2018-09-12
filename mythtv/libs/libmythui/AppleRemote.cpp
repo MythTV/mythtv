@@ -43,10 +43,6 @@ typedef struct _ATV_IR_EVENT
 
 static io_object_t _findAppleRemoteDevice(const char *devName);
 
-AppleRemote::Listener::~Listener()
-{
-}
-
 AppleRemote * AppleRemote::Get()
 {
     if (_instance == nullptr)

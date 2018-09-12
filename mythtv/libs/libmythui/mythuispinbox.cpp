@@ -16,10 +16,6 @@ MythUISpinBox::MythUISpinBox(MythUIType *parent, const QString &name)
 {
 }
 
-MythUISpinBox::~MythUISpinBox()
-{
-}
-
 /**
  * \brief Set the lower and upper bounds of the spinbox, the interval and page
  *        amount
@@ -302,10 +298,6 @@ SpinBoxEntryDialog::SpinBoxEntryDialog(MythScreenStack *parent, const char *name
     m_selection = parentList->GetCurrentPos();
 }
 
-
-SpinBoxEntryDialog::~SpinBoxEntryDialog()
-{
-}
 
 bool SpinBoxEntryDialog::Create(void)
 {

@@ -169,7 +169,7 @@ class BusyWaitVideoSync : public VideoSync
 {
   public:
     BusyWaitVideoSync(VideoOutput *, int refresh_interval);
-    ~BusyWaitVideoSync();
+    ~BusyWaitVideoSync() = default;
 
     QString getName(void) const override { return QString("USleep with busy wait"); }
     bool TryInit(void) override;
@@ -194,7 +194,7 @@ class USleepVideoSync : public VideoSync
 {
   public:
     USleepVideoSync(VideoOutput *, int refresh_interval);
-    ~USleepVideoSync();
+    ~USleepVideoSync() = default;
 
     QString getName(void) const override { return QString("USleep"); }
     bool TryInit(void) override;

@@ -1084,10 +1084,6 @@ PlaybackProfileConfig::PlaybackProfileConfig(const QString &profilename,
     InitUI(parent);
 }
 
-PlaybackProfileConfig::~PlaybackProfileConfig()
-{
-}
-
 void PlaybackProfileItemConfig::InitLabel(void)
 {
     QString andStr = tr("&", "and");

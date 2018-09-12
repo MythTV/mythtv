@@ -570,10 +570,6 @@ MythSystemLegacyWindows::MythSystemLegacyWindows(MythSystemLegacy *parent) :
     }
 }
 
-MythSystemLegacyWindows::~MythSystemLegacyWindows(void)
-{
-}
-
 bool MythSystemLegacyWindows::ParseShell(const QString&, QString &, QStringList&)
 {
     return false;

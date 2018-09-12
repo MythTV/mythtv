@@ -59,7 +59,7 @@ class MythNetworkAccessManager : public QNetworkAccessManager
 {
   Q_OBJECT
   public:
-    MythNetworkAccessManager();
+    MythNetworkAccessManager() = default;
 
   protected:
     QNetworkReply* createRequest(Operation op, const QNetworkRequest & req, QIODevice * outgoingData = nullptr);

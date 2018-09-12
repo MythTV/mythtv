@@ -26,7 +26,7 @@ class ViewScheduleDiff : public MythScreenType
   public:
     ViewScheduleDiff(MythScreenStack *parent, QString altTbl,
                      int recordid = -1, QString ltitle = "");
-    ~ViewScheduleDiff();
+    ~ViewScheduleDiff() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

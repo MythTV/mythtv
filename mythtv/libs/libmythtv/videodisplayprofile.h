@@ -86,7 +86,7 @@ class MTV_PUBLIC VideoDisplayProfile
 {
   public:
     VideoDisplayProfile();
-    ~VideoDisplayProfile();
+    ~VideoDisplayProfile() = default;
 
     void SetInput(const QSize &size,
         float framerate = 0, const QString &codecName = QString());

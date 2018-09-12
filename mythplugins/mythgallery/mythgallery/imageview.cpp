@@ -451,10 +451,6 @@ LoadAlbumListener::LoadAlbumListener(ImageView *parent)
 {
 }
 
-LoadAlbumListener::~LoadAlbumListener()
-{
-}
-
 void LoadAlbumListener::FinishLoading() const
 {
     m_parent->FinishLoading();

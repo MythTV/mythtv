@@ -21,11 +21,6 @@ PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
 {
 }
 
-PlayerSettings::~PlayerSettings()
-{
-
-}
-
 bool PlayerSettings::Create()
 {
     bool err = false;

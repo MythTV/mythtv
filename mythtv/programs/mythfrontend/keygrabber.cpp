@@ -21,10 +21,6 @@ KeyGrabPopupBox::KeyGrabPopupBox(MythScreenStack *parent)
     m_messageText = nullptr;
 }
 
-KeyGrabPopupBox::~KeyGrabPopupBox()
-{
-}
-
 bool KeyGrabPopupBox::Create(void)
 {
     // Load the theme for this screen

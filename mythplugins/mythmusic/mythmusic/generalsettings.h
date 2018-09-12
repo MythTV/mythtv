@@ -15,7 +15,7 @@ class GeneralSettings : public MythScreenType
     Q_OBJECT
   public:
     GeneralSettings(MythScreenStack *parent, const char *name = nullptr);
-    ~GeneralSettings();
+    ~GeneralSettings() = default;
 
     bool Create(void);
 

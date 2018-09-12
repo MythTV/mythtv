@@ -868,10 +868,6 @@ MythProgressDialog::MythProgressDialog(
     qApp->processEvents();
 }
 
-MythProgressDialog::~MythProgressDialog()
-{
-}
-
 void MythProgressDialog::deleteLater(void)
 {
     hide();

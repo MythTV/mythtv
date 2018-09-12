@@ -27,10 +27,6 @@ GlobalSetup::GlobalSetup(MythScreenStack *parent, const QString &name)
 {
 }
 
-GlobalSetup::~GlobalSetup()
-{
-}
-
 bool GlobalSetup::Create()
 {
     // Load the theme for this screen

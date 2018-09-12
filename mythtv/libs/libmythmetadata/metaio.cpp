@@ -29,13 +29,6 @@ MetaIO::MetaIO()
     memset(&m_fileinfo, 0, sizeof(m_fileinfo));
 }
 
-/*!
- * \brief Destructor
- */
-MetaIO::~MetaIO()
-{
-}
-
 // static
 MetaIO* MetaIO::createTagger(const QString& filename)
 {

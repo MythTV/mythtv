@@ -302,10 +302,6 @@ SmartPLCriteriaRow::SmartPLCriteriaRow(void) :
 {
 }
 
-SmartPLCriteriaRow::~SmartPLCriteriaRow()
-{
-}
-
 QString SmartPLCriteriaRow::getSQL(void)
 {
     if (Field.isEmpty())
@@ -1254,10 +1250,6 @@ CriteriaRowEditor::CriteriaRowEditor(MythScreenStack* parent, SmartPLCriteriaRow
     m_criteriaRow = row;
 }
 
-CriteriaRowEditor::~CriteriaRowEditor(void)
-{
-}
-
 bool CriteriaRowEditor::Create(void)
 {
     if (!LoadWindowFromXML("music-ui.xml", "criteriaroweditor", this))
@@ -1693,10 +1685,6 @@ SmartPLResultViewer::SmartPLResultViewer(MythScreenStack *parent)
 {
 }
 
-SmartPLResultViewer::~SmartPLResultViewer()
-{
-}
-
 bool SmartPLResultViewer::Create(void)
 {
     if (!LoadWindowFromXML("music-ui.xml", "smartplresultviewer", this))
@@ -1836,10 +1824,6 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythScreenStack *parent)
         m_deleteButton(nullptr), m_moveUpButton(nullptr), m_moveDownButton(nullptr),
         m_ascendingButton(nullptr), m_descendingButton(nullptr), m_cancelButton(nullptr),
         m_okButton(nullptr)
-{
-}
-
-SmartPLOrderByDialog::~SmartPLOrderByDialog(void)
 {
 }
 
@@ -2114,10 +2098,6 @@ bool SmartPLDateDialog::Create(void)
     BuildFocusList();
 
     return true;
-}
-
-SmartPLDateDialog::~SmartPLDateDialog(void)
-{
 }
 
 QString SmartPLDateDialog::getDate(void)

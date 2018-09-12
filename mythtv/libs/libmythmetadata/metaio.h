@@ -18,7 +18,7 @@ class META_PUBLIC MetaIO
 {
   public:
     MetaIO(void);
-    virtual ~MetaIO(void);
+    virtual ~MetaIO(void) = default;
 
     /*!
     * \brief Writes all metadata back to a file

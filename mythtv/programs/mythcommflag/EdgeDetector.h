@@ -27,7 +27,7 @@ int edge_mark_uniform_exclude(AVFrame *dst, int dstheight, int extramargin,
 class EdgeDetector
 {
 public:
-    virtual ~EdgeDetector(void);
+    virtual ~EdgeDetector(void) = default;
 
     /* Exclude an area from edge detection. */
     virtual int setExcludeArea(int row, int col, int width, int height);

@@ -21,10 +21,6 @@ MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
     emit DependChanged(false);
 }
 
-MythUIStateType::~MythUIStateType()
-{
-}
-
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
     QString key = name.toLower();

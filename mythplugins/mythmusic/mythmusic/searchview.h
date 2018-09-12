@@ -20,7 +20,7 @@ class SearchView : public MusicCommon
     Q_OBJECT
   public:
     SearchView(MythScreenStack *parent, MythScreenType *parentScreen);
-    ~SearchView(void);
+    ~SearchView(void) = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

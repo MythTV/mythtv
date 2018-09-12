@@ -18,10 +18,6 @@ MetaIOMP4::MetaIOMP4(void)
 {
 }
 
-MetaIOMP4::~MetaIOMP4(void)
-{
-}
-
 /*!
  * \copydoc MetaIO::write()
  */

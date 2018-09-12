@@ -17,11 +17,6 @@ VisualizationSettings::VisualizationSettings(MythScreenStack *parent, const char
 {
 }
 
-VisualizationSettings::~VisualizationSettings()
-{
-
-}
-
 bool VisualizationSettings::Create()
 {
     bool err = false;

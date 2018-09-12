@@ -1373,13 +1373,6 @@ bool ProgramInfo::operator==(const ProgramInfo& rhs)
     return true;
 }
 
-/** \fn ProgramInfo::~ProgramInfo()
- *  \brief Destructor deletes "record" if it exists.
- */
-ProgramInfo::~ProgramInfo()
-{
-}
-
 /// \brief Creates a unique string that can be used to identify a recording.
 QString ProgramInfo::MakeUniqueKey(
     uint chanid, const QDateTime &recstartts)

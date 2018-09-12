@@ -41,7 +41,7 @@ public:
     class Listener
     {
     public:
-        virtual      ~Listener();
+        virtual      ~Listener() = default;
         virtual void appleRemoteButton(Event button, bool pressedDown) = 0;
     };
 

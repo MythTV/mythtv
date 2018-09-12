@@ -66,7 +66,7 @@ class UPnpNotifyTask : public Task
 
         // Destructor protected to force use of Release Method
 
-        virtual ~UPnpNotifyTask();
+        virtual ~UPnpNotifyTask() = default;
 
         void     ProcessDevice( MSocketDevice *pSocket, UPnpDevice *pDevice );
         void     SendNotifyMsg( MSocketDevice *pSocket, QString sNT, QString sUDN );

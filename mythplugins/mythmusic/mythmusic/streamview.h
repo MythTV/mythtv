@@ -22,7 +22,7 @@ class StreamView : public MusicCommon
 
   public:
     StreamView(MythScreenStack *parent, MythScreenType *parentScreen);
-    ~StreamView(void);
+    ~StreamView(void) = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

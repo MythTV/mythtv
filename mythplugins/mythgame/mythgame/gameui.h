@@ -27,7 +27,7 @@ class GameUI : public MythScreenType
 
   public:
     explicit GameUI(MythScreenStack *parentStack);
-    ~GameUI();
+    ~GameUI() = default;
 
     bool Create();
     void BuildTree();

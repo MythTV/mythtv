@@ -1,13 +1,5 @@
 #include "screensaver-null.h"
 
-ScreenSaverNull::ScreenSaverNull()
-{
-}
-
-ScreenSaverNull::~ScreenSaverNull()
-{
-}
-
 void ScreenSaverNull::Disable(void)
 {
 }

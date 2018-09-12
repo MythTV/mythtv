@@ -969,11 +969,6 @@ ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
 {
 }
 
-ImportCoverArtDialog::~ImportCoverArtDialog()
-{
-
-}
-
 bool ImportCoverArtDialog::keyPressEvent(QKeyEvent *event)
 {
     if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))

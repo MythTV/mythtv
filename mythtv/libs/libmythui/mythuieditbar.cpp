@@ -13,10 +13,6 @@ MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
 {
 }
 
-MythUIEditBar::~MythUIEditBar(void)
-{
-}
-
 void MythUIEditBar::ReleaseImages(void)
 {
     ClearImages();

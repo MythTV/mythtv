@@ -118,7 +118,7 @@ class MythDownloadInfo
 class MythCookieJar : public QNetworkCookieJar
 {
   public:
-    MythCookieJar();
+    MythCookieJar() = default;
     void copyAllCookies(MythCookieJar &old);
     void load(const QString &filename);
     void save(const QString &filename);
@@ -1794,12 +1794,6 @@ void MythCookieJar::copyAllCookies(MythCookieJar &old)
 {
     const QList<QNetworkCookie> cookieList = old.allCookies();
     setAllCookies(cookieList);
-}
-
-/** \brief Creates an empty MythCookieJar
- */
-MythCookieJar::MythCookieJar()
-{
 }
 
 /** \brief Loads the cookie jar from a cookie file

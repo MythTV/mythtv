@@ -84,10 +84,6 @@ bool BrowserConfig::Create()
     return true;
 }
 
-BrowserConfig::~BrowserConfig()
-{
-}
-
 void BrowserConfig::slotSave(void)
 {
     float zoom = m_zoomEdit->GetText().toFloat();

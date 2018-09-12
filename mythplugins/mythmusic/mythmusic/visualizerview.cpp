@@ -27,10 +27,6 @@ VisualizerView::VisualizerView(MythScreenStack *parent, MythScreenType *parentSc
     m_currentView = MV_VISUALIZER;
 }
 
-VisualizerView::~VisualizerView()
-{
-}
-
 bool VisualizerView::Create(void)
 {
     // Load the theme for this screen

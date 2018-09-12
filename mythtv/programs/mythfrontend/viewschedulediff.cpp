@@ -29,10 +29,6 @@ ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
 {
 }
 
-ViewScheduleDiff::~ViewScheduleDiff()
-{
-}
-
 bool ViewScheduleDiff::Create()
 {
     if (!LoadWindowFromXML("schedule-ui.xml", "schedulediff", this))

@@ -116,10 +116,6 @@ bool MetadataSettings::Create()
     return true;
 }
 
-MetadataSettings::~MetadataSettings()
-{
-}
-
 void MetadataSettings::slotSave(void)
 {
     gCoreContext->SaveSetting("mythvideo.TrailersRandomCount",

@@ -40,7 +40,7 @@ class MUI_PUBLIC MythThemedMenuState : public MythScreenType
 {
   public:
     MythThemedMenuState(MythScreenStack *parent, const QString &name);
-   ~MythThemedMenuState();
+   ~MythThemedMenuState() = default;
 
     bool Create(void);
 

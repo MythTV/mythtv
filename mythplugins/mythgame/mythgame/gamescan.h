@@ -32,7 +32,7 @@ class GameScannerThread : public MThread
 {
   public:
     explicit GameScannerThread(void);
-    ~GameScannerThread();
+    ~GameScannerThread() = default;
 
     virtual void run(void); // MThread
 

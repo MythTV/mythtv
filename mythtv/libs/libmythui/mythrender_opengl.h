@@ -203,7 +203,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     virtual bool RectanglesAreAccelerated(void) { return false; }
 
   protected:
-    virtual ~MythRenderOpenGL();
+    virtual ~MythRenderOpenGL() = default;
     virtual void DrawBitmapPriv(uint tex, const QRect *src, const QRect *dst,
                                 uint prog, int alpha,
                                 int red, int green, int blue) = 0;

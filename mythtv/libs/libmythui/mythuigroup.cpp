@@ -6,10 +6,6 @@ MythUIGroup::MythUIGroup(MythUIType *parent, const QString &name)
 {
 }
 
-MythUIGroup::~MythUIGroup()
-{
-}
-
 void MythUIGroup::Reset()
 {
     MythUIType::Reset();

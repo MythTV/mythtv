@@ -24,8 +24,8 @@ class UPnpDevice;
 class UPNP_PUBLIC UPnpServiceImpl
 {
   public:
-    UPnpServiceImpl() {}
-    virtual ~UPnpServiceImpl() {}
+    UPnpServiceImpl() = default;
+    virtual ~UPnpServiceImpl() = default;
 
     void RegisterService(UPnpDevice *device);
 
@@ -60,7 +60,7 @@ class UPNP_PUBLIC UPnPFeature
 class UPNP_PUBLIC UPnPFeatureList
 {
   public:
-    UPnPFeatureList();
+    UPnPFeatureList() = default;
    ~UPnPFeatureList();
 
     void AddFeature( UPnPFeature *feature );

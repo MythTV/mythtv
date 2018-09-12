@@ -13,11 +13,6 @@ BackendContext *gBackendContext = nullptr;
 QString      pidfile;
 QString      logfile;
 
-BackendContext::BackendContext()
-{
-
-}
-
 BackendContext::~BackendContext()
 {
     QMap<QString, Frontend*>::iterator it = m_knownFrontends.begin();

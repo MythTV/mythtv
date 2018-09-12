@@ -29,13 +29,6 @@ RawSettingsEditor::RawSettingsEditor(MythScreenStack *parent, const char *name)
 {
 }
 
-/** \fn RawSettingsEditor::~RawSettingsEditor()
- *  \brief Raw Settings Editor destructor
- */
-RawSettingsEditor::~RawSettingsEditor()
-{
-}
-
 /** \fn RawSettingsEditor::Create(void)
  *  \brief Creates the UI screen.
  */

@@ -17,10 +17,6 @@ MetaIOAVFComment::MetaIOAVFComment(void)
 {
 }
 
-MetaIOAVFComment::~MetaIOAVFComment(void)
-{
-}
-
 /*!
  * \copydoc MetaIO::write()
  */

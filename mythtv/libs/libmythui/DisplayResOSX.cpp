@@ -12,10 +12,6 @@ DisplayResOSX::DisplayResOSX(void)
     Initialize();
 }
 
-DisplayResOSX::~DisplayResOSX(void)
-{
-}
-
 bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
                                    int &h_mm, double &rate, double &par) const
 {

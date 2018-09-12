@@ -14,11 +14,6 @@ RatingSettings::RatingSettings(MythScreenStack *parent, const char *name)
 {
 }
 
-RatingSettings::~RatingSettings()
-{
-
-}
-
 bool RatingSettings::Create()
 {
     // Load the theme for this screen

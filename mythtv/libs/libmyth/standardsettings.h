@@ -399,7 +399,7 @@ class MPUBLIC GroupSetting : public StandardSetting
     Q_OBJECT
 
   public:
-    GroupSetting();
+    GroupSetting() = default;
 
     virtual void edit(MythScreenType *screen);
     virtual void resultEdit(DialogCompletionEvent *) {}

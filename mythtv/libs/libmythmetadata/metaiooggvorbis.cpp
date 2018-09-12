@@ -12,10 +12,6 @@ MetaIOOggVorbis::MetaIOOggVorbis(void)
 {
 }
 
-MetaIOOggVorbis::~MetaIOOggVorbis(void)
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *

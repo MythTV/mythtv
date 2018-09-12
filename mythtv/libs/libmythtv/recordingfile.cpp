@@ -15,11 +15,6 @@ RecordingFile::RecordingFile()
 
 }
 
-RecordingFile::~RecordingFile()
-{
-
-}
-
 bool RecordingFile::Load()
 {
     if (m_recordingId == 0)

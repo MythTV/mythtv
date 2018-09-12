@@ -41,11 +41,6 @@ ScreenWizard::ScreenWizard(MythScreenStack *parent, const char *name) :
 {
 }
 
-ScreenWizard::~ScreenWizard()
-{
-
-}
-
 void ScreenWizard::SetInitialSettings(int _x, int _y, int _w, int _h)
 {
     m_xoffset = _x;

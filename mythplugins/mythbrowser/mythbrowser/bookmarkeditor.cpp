@@ -34,10 +34,6 @@ BookmarkEditor::BookmarkEditor(Bookmark *site, bool edit,
     }
 }
 
-BookmarkEditor::~BookmarkEditor()
-{
-}
-
 bool BookmarkEditor::Create()
 {
     if (!LoadWindowFromXML("browser-ui.xml", "bookmarkeditor", this))

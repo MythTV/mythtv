@@ -27,7 +27,7 @@ class Frontend
 {
   public:
     Frontend() : connectionCount(0) { };
-   ~Frontend() { };
+   ~Frontend() = default;
 
     QString name; /// The user friendly name of the frontend
     QHostAddress ip; /// The frontend IP address
@@ -40,7 +40,7 @@ class Frontend
 class BackendContext
 {
   public:
-    BackendContext();
+    BackendContext() = default;
    ~BackendContext();
 
     void SetFrontendConnected(Frontend *frontend);

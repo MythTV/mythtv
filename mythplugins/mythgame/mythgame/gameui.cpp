@@ -61,10 +61,6 @@ GameUI::GameUI(MythScreenStack *parent)
     m_imageDownload = new MetadataImageDownload(this);
 }
 
-GameUI::~GameUI()
-{
-}
-
 bool GameUI::Create()
 {
     if (!LoadWindowFromXML("game-ui.xml", "gameui", this))

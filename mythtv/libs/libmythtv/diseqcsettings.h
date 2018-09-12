@@ -164,7 +164,7 @@ class DTVDeviceConfigGroup : public GroupSetting
   public:
     DTVDeviceConfigGroup(DiSEqCDevSettings &settings, uint cardid,
                          bool switches_enabled);
-    ~DTVDeviceConfigGroup(void);
+    ~DTVDeviceConfigGroup(void) = default;
 
   protected:
     void AddNodes(StandardSetting *group, const QString &trigger,

@@ -43,7 +43,7 @@ class GlobalSetup : public MythScreenType
 
   public:
     GlobalSetup(MythScreenStack *parent, const QString &name);
-    ~GlobalSetup();
+    ~GlobalSetup() = default;
 
     bool Create(void);
 

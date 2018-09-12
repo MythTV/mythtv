@@ -40,10 +40,6 @@ StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
     m_currentView = MV_RADIO;
 }
 
-StreamView::~StreamView()
-{
-}
-
 bool StreamView::Create(void)
 {
     // Load the theme for this screen

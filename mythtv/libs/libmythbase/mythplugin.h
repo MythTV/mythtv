@@ -58,7 +58,7 @@ class MBASE_PUBLIC MythPluginManager
 {
   public:
     MythPluginManager();
-   ~MythPluginManager();
+   ~MythPluginManager() = default;
 
     bool init_plugin(const QString &plugname);
     bool run_plugin(const QString &plugname);

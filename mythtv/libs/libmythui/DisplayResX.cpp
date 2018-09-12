@@ -21,10 +21,6 @@ DisplayResX::DisplayResX(void)
     Initialize();
 }
 
-DisplayResX::~DisplayResX(void)
-{
-}
-
 bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
                                  int &h_mm, double &rate, double &par) const
 {

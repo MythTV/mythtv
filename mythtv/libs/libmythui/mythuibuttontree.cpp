@@ -34,10 +34,6 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
     connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
 }
 
-MythUIButtonTree::~MythUIButtonTree()
-{
-}
-
 /*!
  * \brief Initialise the tree having loaded the formatting options from the
  *        theme

@@ -11,7 +11,7 @@ class RatingSettings : public MythScreenType
     Q_OBJECT
 public:
     RatingSettings(MythScreenStack *parent, const char *name = nullptr);
-    ~RatingSettings();
+    ~RatingSettings() = default;
 
     bool Create(void);
 

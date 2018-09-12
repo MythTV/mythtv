@@ -61,11 +61,6 @@ MusicFileScanner::MusicFileScanner():
     }
 }
 
-MusicFileScanner::~MusicFileScanner ()
-{
-
-}
-
 /*!
  * \brief Builds a list of all the files found descending recursively
  *        into the given directory

@@ -58,10 +58,6 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     m_composeKey = 0;
 }
 
-MythUITextEdit::~MythUITextEdit()
-{
-}
-
 void MythUITextEdit::Select()
 {
     if (m_backgroundState && !m_backgroundState->DisplayState("selected"))

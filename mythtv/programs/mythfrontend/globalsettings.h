@@ -232,7 +232,7 @@ class PlaybackProfileConfig : public GroupSetting
 
   public:
     PlaybackProfileConfig(const QString &profilename, StandardSetting *parent);
-    virtual ~PlaybackProfileConfig();
+    virtual ~PlaybackProfileConfig() = default;
 
     virtual void Save(void);
 

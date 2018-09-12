@@ -22,7 +22,7 @@ class MUI_PUBLIC ThemeInfo : public XMLParseBase
 {
   public:
     explicit ThemeInfo(QString theme);
-    ~ThemeInfo();
+    ~ThemeInfo() = default;
 
     bool IsWide() const;
     QString GetAspect() const { return m_aspect; }

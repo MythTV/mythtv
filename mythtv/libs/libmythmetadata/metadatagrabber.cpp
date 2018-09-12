@@ -366,16 +366,6 @@ MetaGrabberScript::MetaGrabberScript(const QString &path) :
     m_valid = true;
 }
 
-MetaGrabberScript::MetaGrabberScript(const MetaGrabberScript &other) :
-    m_name(other.m_name), m_author(other.m_author),
-    m_thumbnail(other.m_thumbnail), m_fullcommand(other.m_fullcommand),
-    m_command(other.m_command), m_type(other.m_type),
-    m_typestring(other.m_typestring), m_description(other.m_description),
-    m_accepts(other.m_accepts), m_version(other.m_version),
-    m_valid(other.m_valid)
-{
-}
-
 MetaGrabberScript& MetaGrabberScript::operator=(const MetaGrabberScript &other)
 {
     if (this != &other)

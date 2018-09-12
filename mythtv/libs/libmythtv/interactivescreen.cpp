@@ -8,10 +8,6 @@ InteractiveScreen::InteractiveScreen(MythPlayer *player,
     UpdateArea();
 }
 
-InteractiveScreen::~InteractiveScreen(void)
-{
-}
-
 void InteractiveScreen::Close(void)
 {
     if (m_player)

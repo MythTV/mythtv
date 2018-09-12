@@ -3864,10 +3864,6 @@ SearchButtonListDialog::SearchButtonListDialog(MythScreenStack *parent, const ch
 {
 }
 
-SearchButtonListDialog::~SearchButtonListDialog(void)
-{
-}
-
 bool SearchButtonListDialog::Create(void)
 {
     if (!CopyWindowFromBase("MythSearchListDialog", this))

@@ -87,7 +87,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
 
     public:
         explicit MythSystemLegacyUnix(MythSystemLegacy *parent);
-        ~MythSystemLegacyUnix();
+        ~MythSystemLegacyUnix() = default;
 
         virtual void Fork(time_t timeout) MOVERRIDE;
         virtual void Manage(void) MOVERRIDE;

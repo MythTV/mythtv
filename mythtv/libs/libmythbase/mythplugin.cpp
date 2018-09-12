@@ -143,10 +143,6 @@ MythPluginManager::MythPluginManager()
                  "No plugins directory " + filterDir.path());
 }
 
-MythPluginManager::~MythPluginManager()
-{
-}
-
 bool MythPluginManager::init_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);

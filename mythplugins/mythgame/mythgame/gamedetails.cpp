@@ -23,10 +23,6 @@ GameDetailsPopup::GameDetailsPopup(MythScreenStack *parent,
     m_romInfo = romInfo;
 }
 
-GameDetailsPopup::~GameDetailsPopup(void)
-{
-}
-
 void GameDetailsPopup::handleText(const QString &name, const QString &value)
 {
     MythUIText *textarea = nullptr;

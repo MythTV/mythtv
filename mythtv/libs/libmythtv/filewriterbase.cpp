@@ -36,10 +36,6 @@ FileWriterBase::FileWriterBase()
 {
 }
 
-FileWriterBase::~FileWriterBase()
-{
-}
-
 int FileWriterBase::WriteVideoFrame(VideoFrame */*frame*/)
 {
     LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): Shouldn't be here!");

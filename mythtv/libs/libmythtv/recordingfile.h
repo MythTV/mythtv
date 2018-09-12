@@ -30,7 +30,7 @@ class MTV_PUBLIC RecordingFile
 {
   public:
     RecordingFile();
-   ~RecordingFile();
+   ~RecordingFile() = default;
 
     bool Load();
     bool Save();

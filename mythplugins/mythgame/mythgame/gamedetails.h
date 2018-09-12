@@ -12,7 +12,7 @@ class GameDetailsPopup : public MythScreenType
 
   public:
     GameDetailsPopup(MythScreenStack *parent, const RomInfo *romInfo);
-    ~GameDetailsPopup();
+    ~GameDetailsPopup() = default;
 
     bool Create(void);
     void SetReturnEvent(QObject *retobject, const QString &resultid);

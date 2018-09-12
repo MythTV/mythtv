@@ -82,10 +82,6 @@ static MimeType SupportedMimeTypes[] =
 static int SupportedMimeTypesCount = sizeof(SupportedMimeTypes) /
                                         sizeof(SupportedMimeTypes[0]);
 
-MythNetworkAccessManager::MythNetworkAccessManager()
-{
-}
-
 QNetworkReply* MythNetworkAccessManager::createRequest(Operation op, const QNetworkRequest& req, QIODevice* outgoingData)
 {
     QNetworkReply* reply = QNetworkAccessManager::createRequest(op, req, outgoingData);

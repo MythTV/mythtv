@@ -146,10 +146,6 @@ StereoScope::StereoScope() :
     m_fps = 45;
 }
 
-StereoScope::~StereoScope()
-{
-}
-
 void StereoScope::resize( const QSize &newsize )
 {
     size = newsize;
@@ -373,14 +369,6 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 
 ///////////////////////////////////////////////////////////////////////////////
 // MonoScope
-
-MonoScope::MonoScope()
-{
-}
-
-MonoScope::~MonoScope()
-{
-}
 
 bool MonoScope::process( VisualNode *node )
 {
@@ -823,10 +811,6 @@ Squares::Squares() :
     actualSize(0,0), fake_height(0), number_of_squares(16)
 {
     fake_height = number_of_squares * analyzerBarWidth;
-}
-
-Squares::~Squares()
-{
 }
 
 void Squares::resize (const QSize &newsize) {
@@ -1424,10 +1408,6 @@ bool AlbumArt::cycleImage(void)
     return false;
 }
 
-AlbumArt::~AlbumArt()
-{
-}
-
 void AlbumArt::resize(const QSize &newsize)
 {
     m_size = newsize;
@@ -1570,10 +1550,6 @@ Blank::Blank()
     : VisualBase(true)
 {
     m_fps = 1;
-}
-
-Blank::~Blank()
-{
 }
 
 void Blank::resize(const QSize &newsize)

@@ -1372,10 +1372,6 @@ DTVDeviceConfigGroup::DTVDeviceConfigGroup(
     AddNodes(this, QString(), m_tree.Root());
 }
 
-DTVDeviceConfigGroup::~DTVDeviceConfigGroup(void)
-{
-}
-
 void DTVDeviceConfigGroup::AddNodes(
     StandardSetting *group, const QString &trigger, DiSEqCDevDevice *node)
 {

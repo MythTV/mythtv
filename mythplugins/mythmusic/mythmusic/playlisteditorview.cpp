@@ -45,10 +45,6 @@ MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
     }
 }
 
-MusicGenericTree::~MusicGenericTree(void)
-{
-}
-
 void MusicGenericTree::setDrawArrow(bool flag)
 {
     m_showArrow = flag;

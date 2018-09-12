@@ -164,7 +164,7 @@ class WebSocketWorkerThread : public QRunnable
                           , QSslConfiguration sslConfig
 #endif
                         );
-    virtual ~WebSocketWorkerThread();
+    virtual ~WebSocketWorkerThread() = default;
 
     virtual void run(void);
 

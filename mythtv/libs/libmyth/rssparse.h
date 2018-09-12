@@ -125,7 +125,7 @@ class MPUBLIC ResultItem
               const bool& downloadable, const QStringList& countries,
               const uint& season, const uint& episode, const bool& customhtml);
     ResultItem();
-    ~ResultItem();
+    ~ResultItem() = default;
 
     void toMap(InfoMap &infoMap);
 
@@ -185,8 +185,8 @@ class MPUBLIC Parse : public QObject
     friend class MRSSParser;
 
   public:
-    Parse();
-    virtual ~Parse();
+    Parse() = default;
+    virtual ~Parse() = default;
 
     ResultItem::resultList parseRSS(QDomDocument domDoc);
     ResultItem* ParseItem(const QDomElement& item) const;

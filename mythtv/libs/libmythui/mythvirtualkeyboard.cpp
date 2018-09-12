@@ -104,10 +104,6 @@ MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythU
      loadEventKeyDefinitions(&m_newlineKey, "NEWLINE");
 }
 
-MythUIVirtualKeyboard::~MythUIVirtualKeyboard(void)
-{
-}
-
 bool MythUIVirtualKeyboard::Create()
 {
     if (!LoadWindowFromXML("keyboard/keyboard.xml", "keyboard", this))

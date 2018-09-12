@@ -2805,10 +2805,6 @@ TrackInfoDialog::TrackInfoDialog(MythScreenStack *parent, MusicMetadata *metadat
     m_metadata = metadata;
 }
 
-TrackInfoDialog::~TrackInfoDialog(void)
-{
-}
-
 bool TrackInfoDialog::Create(void)
 {
     if (!LoadWindowFromXML("music-ui.xml", "trackdetail_popup", this))

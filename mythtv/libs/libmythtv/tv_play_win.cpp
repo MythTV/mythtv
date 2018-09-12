@@ -18,10 +18,6 @@ TvPlayWindow::TvPlayWindow(MythScreenStack *parent, const char *name)
     SetCanTakeFocus(true);
 }
 
-TvPlayWindow::~TvPlayWindow()
-{
-}
-
 bool TvPlayWindow::Create()
 {
     // Load the theme for this screen

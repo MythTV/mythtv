@@ -395,10 +395,6 @@ BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo, int ri) :
     m_fudge = 0;
 }
 
-BusyWaitVideoSync::~BusyWaitVideoSync()
-{
-}
-
 bool BusyWaitVideoSync::TryInit(void)
 {
     return true;
@@ -438,10 +434,6 @@ int BusyWaitVideoSync::WaitForFrame(int nominal_frame_interval, int extra_delay)
 
 USleepVideoSync::USleepVideoSync(VideoOutput *vo, int ri) :
     VideoSync(vo, ri)
-{
-}
-
-USleepVideoSync::~USleepVideoSync()
 {
 }
 

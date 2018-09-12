@@ -211,10 +211,6 @@ MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType ty
 }
 #endif
 
-MythRenderOpenGL::~MythRenderOpenGL()
-{
-}
-
 void MythRenderOpenGL::Init(void)
 {
     if (!isValid())

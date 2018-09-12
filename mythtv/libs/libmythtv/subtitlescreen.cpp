@@ -130,7 +130,7 @@ public:
 class SubtitleFormat
 {
 public:
-    SubtitleFormat(void) {}
+    SubtitleFormat(void) = default;
     ~SubtitleFormat(void);
     MythFontProperties *GetFont(const QString &family,
                                 const CC708CharacterAttribute &attr,

@@ -34,10 +34,6 @@ WeatherScreen::WeatherScreen(MythScreenStack *parent,
     }
 }
 
-WeatherScreen::~WeatherScreen()
-{
-}
-
 bool WeatherScreen::Create()
 {
     // Load the theme for this screen

@@ -82,10 +82,6 @@ WebSocketWorkerThread::WebSocketWorkerThread(WebSocketServer& webSocketServer,
 {
 }
 
-WebSocketWorkerThread::~WebSocketWorkerThread()
-{
-}
-
 void WebSocketWorkerThread::run(void)
 {
     WebSocketWorker *worker = new WebSocketWorker(m_webSocketServer, m_socketFD,

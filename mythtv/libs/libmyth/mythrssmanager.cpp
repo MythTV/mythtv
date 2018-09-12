@@ -122,10 +122,6 @@ RSSSite::RSSSite(const QString& title,
 {
 }
 
-RSSSite::~RSSSite()
-{
-}
-
 void RSSSite::insertRSSArticle(ResultItem *item)
 {
     QMutexLocker locker(&m_lock);

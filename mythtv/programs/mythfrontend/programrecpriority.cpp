@@ -43,18 +43,6 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
 {
 }
 
-ProgramRecPriorityInfo::ProgramRecPriorityInfo(
-    const ProgramRecPriorityInfo &other) :
-    RecordingInfo(other),
-    recType(other.recType),
-    matchCount(other.matchCount),
-    recCount(other.recCount),
-    last_record(other.last_record),
-    avg_delay(other.avg_delay),
-    profile(other.profile)
-{
-}
-
 void ProgramRecPriorityInfo::clone(
     const ProgramRecPriorityInfo &other, bool ignore_non_serialized_data)
 {
@@ -411,10 +399,6 @@ ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
     m_sortType = (SortType)gCoreContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
     m_reverseSort = gCoreContext->GetNumSetting("ProgramRecPriorityReverse", 0);
-}
-
-ProgramRecPriority::~ProgramRecPriority()
-{
 }
 
 bool ProgramRecPriority::Create()

@@ -42,10 +42,6 @@ MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
 {
 }
 
-MythThemedMenuState::~MythThemedMenuState()
-{
-}
-
 bool MythThemedMenuState::Create(void)
 {
     if (!LoadWindowFromXML("menu-ui.xml", "mainmenu", this))

@@ -7,7 +7,7 @@ class DisplayResOSX : public DisplayRes
 {
   public:
     DisplayResOSX(void);
-    ~DisplayResOSX(void);
+    ~DisplayResOSX(void) = default;
 
     const std::vector<DisplayResScreen>& GetVideoModes() const;
 

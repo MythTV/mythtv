@@ -16,10 +16,6 @@ PlaylistView::PlaylistView(MythScreenStack *parent, MythScreenType *parentScreen
     m_currentView = MV_PLAYLIST;
 }
 
-PlaylistView::~PlaylistView()
-{
-}
-
 bool PlaylistView::Create(void)
 {
     // Load the theme for this screen

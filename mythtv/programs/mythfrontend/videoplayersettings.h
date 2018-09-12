@@ -15,7 +15,7 @@ class PlayerSettings : public MythScreenType
   public:
 
     PlayerSettings(MythScreenStack *parent, const char *name = nullptr);
-    ~PlayerSettings();
+    ~PlayerSettings() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

@@ -20,10 +20,6 @@ MetaIOTagLib::MetaIOTagLib()
 {
 }
 
-MetaIOTagLib::~MetaIOTagLib(void)
-{
-}
-
 /*!
 * \brief Writes metadata common to all tag formats to the tag
 *

@@ -21,11 +21,6 @@ GeneralSettings::GeneralSettings(MythScreenStack *parent, const char *name)
 {
 }
 
-GeneralSettings::~GeneralSettings()
-{
-
-}
-
 bool GeneralSettings::Create()
 {
     bool err = false;

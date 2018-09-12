@@ -235,7 +235,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
     void pressed();
 
   protected:
-    ~MythProgressDialog(); // use deleteLater() instead for thread safety
+    ~MythProgressDialog() = default; // use deleteLater() instead for thread safety
     QProgressBar *progress;
     MythLabel *msglabel;
 

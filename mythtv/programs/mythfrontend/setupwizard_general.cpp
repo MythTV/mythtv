@@ -92,10 +92,6 @@ bool GeneralSetupWizard::Create()
     return true;
 }
 
-GeneralSetupWizard::~GeneralSetupWizard()
-{
-}
-
 void GeneralSetupWizard::loadData()
 {
     if (!m_hardwareProfile)

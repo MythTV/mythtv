@@ -63,7 +63,7 @@ class EditLyricsDialog : public MythScreenType
   public:
 
     EditLyricsDialog(MythScreenStack *parent, LyricsData *sourceData);
-    ~EditLyricsDialog();
+    ~EditLyricsDialog() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *e);

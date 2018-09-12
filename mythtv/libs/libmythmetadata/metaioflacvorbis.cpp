@@ -18,10 +18,6 @@ MetaIOFLACVorbis::MetaIOFLACVorbis(void)
 {
 }
 
-MetaIOFLACVorbis::~MetaIOFLACVorbis(void)
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *

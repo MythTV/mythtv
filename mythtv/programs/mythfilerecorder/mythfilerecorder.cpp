@@ -160,10 +160,6 @@ Commands::Commands(void) : m_streamer(nullptr), m_timeout(10), m_run(true),
     setObjectName("Command");
 }
 
-Commands::~Commands(void)
-{
-}
-
 bool Commands::send_status(const QString & status) const
 {
     QByteArray buf = status.toLatin1() + '\n';

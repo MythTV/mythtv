@@ -24,10 +24,6 @@ SearchView::SearchView(MythScreenStack *parent, MythScreenType *parentScreen)
     m_currentView = MV_SEARCH;
 }
 
-SearchView::~SearchView()
-{
-}
-
 bool SearchView::Create(void)
 {
     // Load the theme for this screen

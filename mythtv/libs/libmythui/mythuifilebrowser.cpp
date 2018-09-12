@@ -26,10 +26,6 @@ MFileInfo::MFileInfo(QString fileName, QString sgDir, bool isDir, qint64 size)
     init(fileName, sgDir, isDir, size);
 }
 
-MFileInfo::~MFileInfo()
-{
-}
-
 void MFileInfo::init(QString fileName, QString sgDir, bool isDir,
                      qint64 size)
 {
@@ -166,10 +162,6 @@ MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
     m_previewTimer = new QTimer(this);
     m_previewTimer->setSingleShot(true);
     connect(m_previewTimer, SIGNAL(timeout()), SLOT(LoadPreview()));
-}
-
-MythUIFileBrowser::~MythUIFileBrowser()
-{
 }
 
 void MythUIFileBrowser::SetPath(const QString &startPath)

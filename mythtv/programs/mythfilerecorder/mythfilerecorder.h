@@ -60,7 +60,7 @@ class Commands : public QObject
 
   public:
     Commands(void);
-    virtual ~Commands(void);
+    virtual ~Commands(void) = default;
     bool Run(const QString & filename, int data_rate, bool loopinput);
     void setEoF(void) { m_eof = true; }
 

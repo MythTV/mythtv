@@ -19,10 +19,6 @@ HttpConfig::HttpConfig() : HttpServerExtension("HttpConfig", QString())
 {
 }
 
-HttpConfig::~HttpConfig()
-{
-}
-
 QStringList HttpConfig::GetBasePaths()
 {
     QStringList paths;

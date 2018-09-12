@@ -25,10 +25,6 @@ MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
     SetCanTakeFocus(true);
 }
 
-MythUICheckBox::~MythUICheckBox()
-{
-}
-
 void MythUICheckBox::SetInitialStates()
 {
     m_BackgroundState = dynamic_cast<MythUIStateType *>(GetChild("background"));

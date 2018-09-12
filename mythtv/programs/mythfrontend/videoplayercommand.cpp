@@ -58,11 +58,11 @@ namespace
 struct VideoPlayProc
 {
   protected:
-    VideoPlayProc() {}
+    VideoPlayProc() = default;
     VideoPlayProc &operator=(const VideoPlayProc &);
 
   public:
-    virtual ~VideoPlayProc() {}
+    virtual ~VideoPlayProc() = default;
 
     // returns true if item played
     virtual bool Play() const = 0;
@@ -180,7 +180,7 @@ class VideoPlayerCommandPrivate
     VideoPlayerCommandPrivate &operator=(const VideoPlayerCommandPrivate &rhs);
 
   public:
-    VideoPlayerCommandPrivate() {}
+    VideoPlayerCommandPrivate() = default;
 
     VideoPlayerCommandPrivate(const VideoPlayerCommandPrivate &other)
     {

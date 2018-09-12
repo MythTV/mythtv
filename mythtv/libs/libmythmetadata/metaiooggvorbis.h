@@ -22,7 +22,7 @@ class META_PUBLIC MetaIOOggVorbis : public MetaIOTagLib
 {
   public:
     MetaIOOggVorbis(void);
-    ~MetaIOOggVorbis(void);
+    ~MetaIOOggVorbis(void) = default;
 
     bool write(const QString &filename, MusicMetadata* mdata);
     MusicMetadata* read(const QString &filename);
