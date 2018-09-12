@@ -56,14 +56,14 @@ void VideoOutputD3D::GetRenderOptions(render_opts &opts,
 
 VideoOutputD3D::VideoOutputD3D(void)
   : VideoOutput(),         m_lock(QMutex::Recursive),
-    m_hWnd(NULL),          m_render(nullptr),
+    m_hWnd(nullptr),       m_render(nullptr),
     m_video(nullptr),
     m_render_valid(false), m_render_reset(false), m_pip_active(nullptr),
-    m_osd_painter(NULL)
+    m_osd_painter(nullptr)
 {
     m_pauseFrame.buf = nullptr;
 #ifdef USING_DXVA2
-    m_decoder = NULL;
+    m_decoder = nullptr;
 #endif
     m_pause_surface = nullptr;
 }
@@ -94,7 +94,7 @@ void VideoOutputD3D::TearDown(void)
         if (invalid_osd_painter)
             delete invalid_osd_painter;
         invalid_osd_painter = m_osd_painter;
-        m_osd_painter = NULL;
+        m_osd_painter = nullptr;
     }
 
     DeleteDecoder();
@@ -385,7 +385,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t,
                 }
 
                 if (m_visual)
-                    m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, NULL);
+                    m_visual->Draw(GetTotalOSDBounds(), m_osd_painter, nullptr);
 
                 if (osd && m_osd_painter && !window.IsEmbedding())
                     osd->DrawDirect(m_osd_painter, GetTotalOSDBounds().size(),
@@ -411,7 +411,7 @@ void VideoOutputD3D::Show(FrameScanType )
 
     m_render_valid = m_render->Test(m_render_reset);
     if (m_render_valid)
-        m_render->Present(window.IsEmbedding() ? m_hEmbedWnd : NULL);
+        m_render->Present(window.IsEmbedding() ? m_hEmbedWnd : nullptr);
 }
 
 void VideoOutputD3D::EmbedInWidget(const QRect &rect)
@@ -734,7 +734,7 @@ void VideoOutputD3D::DeleteDecoder(void)
 #ifdef USING_DXVA2
     QMutexLocker locker(&m_lock);
     delete m_decoder;
-    m_decoder = NULL;
+    m_decoder = nullptr;
 #endif
 }
 

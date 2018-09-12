@@ -40,7 +40,7 @@ if( (x) ) { \
     delete fdMap.value((x)); \
     fdMap.remove((x)); \
     fdLock.unlock(); \
-    (x) = NULL; \
+    (x) = nullptr; \
 }
 
 typedef struct
@@ -54,10 +54,10 @@ typedef QMap<HANDLE, FDType_t*> FDMap_t;
  * MythSystemLegacyManager method defines
  *********************************/
 static bool                     run_system = true;
-static MythSystemLegacyManager       *manager = NULL;
-static MythSystemLegacySignalManager *smanager = NULL;
-static MythSystemLegacyIOHandler     *readThread = NULL;
-static MythSystemLegacyIOHandler     *writeThread = NULL;
+static MythSystemLegacyManager       *manager = nullptr;
+static MythSystemLegacySignalManager *smanager = nullptr;
+static MythSystemLegacyIOHandler     *readThread = nullptr;
+static MythSystemLegacyIOHandler     *writeThread = nullptr;
 static MSList_t                 msList;
 static QMutex                   listLock;
 static FDMap_t                  fdMap;
@@ -137,7 +137,7 @@ bool MythSystemLegacyIOHandler::HandleRead(HANDLE h, QBuffer *buff)
 {
     DWORD lenAvail;
 
-    if ( !PeekNamedPipe( h, NULL, 0, NULL, &lenAvail, NULL) )
+    if ( !PeekNamedPipe( h, nullptr, 0, nullptr, &lenAvail, nullptr) )
         return false;
 
     if ( lenAvail > 65536 )
@@ -145,7 +145,7 @@ bool MythSystemLegacyIOHandler::HandleRead(HANDLE h, QBuffer *buff)
 
     DWORD lenRead;
 
-    if ( !ReadFile( h, &m_readbuf, lenAvail, &lenRead, NULL ) || lenRead == 0 )
+    if ( !ReadFile( h, &m_readbuf, lenAvail, &lenRead, nullptr ) || lenRead == 0 )
     {
         m_pMap.remove(h);
         return false;
@@ -179,7 +179,7 @@ bool MythSystemLegacyIOHandler::HandleWrite(HANDLE h, QBuffer *buff)
     DWORD rlen;
     len = (len > 32768 ? 32768 : len);
 
-    if( !WriteFile(h, buff->read(len).constData(), len, &rlen, NULL) )
+    if( !WriteFile(h, buff->read(len).constData(), len, &rlen, nullptr) )
     {
         m_pMap.remove(h);
         return false;
@@ -235,7 +235,7 @@ MythSystemLegacyManager::MythSystemLegacyManager() :
 {
     m_jumpAbort = false;
     m_childCount = 0;
-    m_children = NULL;
+    m_children = nullptr;
 }
 
 MythSystemLegacyManager::~MythSystemLegacyManager()
@@ -251,7 +251,7 @@ void MythSystemLegacyManager::run(void)
 
     LOG(VB_GENERAL, LOG_INFO, "Starting process manager");
 
-    // run_system is set to NULL during shutdown, and we need this thread to
+    // run_system is set to false during shutdown, and we need this thread to
     // exit during shutdown.
     while( run_system )
     {
@@ -318,7 +318,7 @@ void MythSystemLegacyManager::run(void)
 
         // loop through running processes for any that require action
         MSMap_t::iterator   i;
-        time_t              now = time(NULL);
+        time_t              now = time(nullptr);
 
         m_mapLock.lock();
         m_jumpLock.lock();
@@ -396,7 +396,7 @@ void MythSystemLegacyManager::ChildListRebuild()
         {
             LOG(VB_SYSTEM, LOG_CRIT, "No memory to allocate new children");
             free(m_children);
-            m_children = NULL;
+            m_children = nullptr;
             return;
         }
 
@@ -530,13 +530,13 @@ void MythSystemLegacySignalManager::run(void)
 
 MythSystemLegacyWindows::MythSystemLegacyWindows(MythSystemLegacy *parent) :
     MythSystemLegacyPrivate("MythSystemLegacyWindows"),
-    m_child(NULL), m_timeout(0)
+    m_child(nullptr), m_timeout(0)
 {
     m_parent = parent;
 
-    m_stdpipe[0] = NULL;
-    m_stdpipe[1] = NULL;
-    m_stdpipe[2] = NULL;
+    m_stdpipe[0] = nullptr;
+    m_stdpipe[1] = nullptr;
+    m_stdpipe[2] = nullptr;
 
     connect(this, SIGNAL(started()), m_parent, SIGNAL(started()));
     connect(this, SIGNAL(finished()), m_parent, SIGNAL(finished()));
@@ -545,25 +545,25 @@ MythSystemLegacyWindows::MythSystemLegacyWindows(MythSystemLegacy *parent) :
             m_parent, SIGNAL(readDataReady(int)));
 
     // Start the threads if they haven't been started yet.
-    if (manager == NULL)
+    if (manager == nullptr)
     {
         manager = new MythSystemLegacyManager;
         manager->start();
     }
 
-    if (smanager == NULL)
+    if (smanager == nullptr)
     {
         smanager = new MythSystemLegacySignalManager;
         smanager->start();
     }
 
-    if (readThread == NULL)
+    if (readThread == nullptr)
     {
         readThread = new MythSystemLegacyIOHandler(true);
         readThread->start();
     }
 
-    if (writeThread == NULL)
+    if (writeThread == nullptr)
     {
         writeThread = new MythSystemLegacyIOHandler(false);
         writeThread->start();
@@ -612,9 +612,9 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
     LOG(VB_SYSTEM, LOG_DEBUG, QString("Launching: %1").arg(GetLogCmd()));
 
-    HANDLE p_stdin[2] = { NULL, NULL };
-    HANDLE p_stdout[2] = { NULL, NULL };
-    HANDLE p_stderr[2] = { NULL, NULL };
+    HANDLE p_stdin[2] = { nullptr, nullptr };
+    HANDLE p_stdout[2] = { nullptr, nullptr };
+    HANDLE p_stderr[2] = { nullptr, nullptr };
 
     SECURITY_ATTRIBUTES saAttr;
     STARTUPINFO si;
@@ -625,7 +625,7 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
     // Set the bInheritHandle flag so pipe handles are inherited.
     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
     saAttr.bInheritHandle = true;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = nullptr;
 
     /* set up pipes */
     if( GetSetting("UseStdin") )
@@ -720,19 +720,19 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
     m_timeout = timeout;
     if( timeout )
-        m_timeout += time(NULL);
+        m_timeout += time(nullptr);
 
-    LPCWSTR pDir = NULL;
+    LPCWSTR pDir = nullptr;
     if (dir.length() > 0)
         pDir = (LPCWSTR)dir.utf16();
 
-    bool success = CreateProcess( NULL,
+    bool success = CreateProcess( nullptr,
                           (LPWSTR)sCmd.utf16(),       // command line
-                          NULL,          // process security attributes
-                          NULL,          // primary thread security attributes
+                          nullptr,       // process security attributes
+                          nullptr,       // primary thread security attributes
                           bInherit,      // handles are inherited
                           0,             // creation flags
-                          NULL,          // use parent's environment
+                          nullptr,       // use parent's environment
                           pDir,          // use parent's current directory
                           &si,            // STARTUPINFO pointer
                           &pi);           // receives PROCESS_INFORMATION
@@ -786,7 +786,7 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
 
 void MythSystemLegacyWindows::Manage(void)
 {
-    if( manager == NULL )
+    if( manager == nullptr )
     {
         manager = new MythSystemLegacyManager;
         manager->start();
@@ -796,7 +796,7 @@ void MythSystemLegacyWindows::Manage(void)
 
 void MythSystemLegacyWindows::JumpAbort(void)
 {
-    if( manager == NULL )
+    if( manager == nullptr )
     {
         manager = new MythSystemLegacyManager;
         manager->start();

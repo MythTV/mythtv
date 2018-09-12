@@ -105,10 +105,10 @@ void MythD3D9Painter::End(void)
         if (m_swap_control)
         {
             m_render->End();
-            m_render->Present(NULL);
+            m_render->Present(nullptr);
         }
         if (m_target)
-            m_render->SetRenderTarget(NULL);
+            m_render->SetRenderTarget(nullptr);
     }
     MythPainter::End();
 }
