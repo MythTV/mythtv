@@ -46,7 +46,7 @@ void VideoDecodeBuffer::run()
             locker.unlock();
 
             DecodedFrameInfo tfInfo;
-            tfInfo.frame = NULL;
+            tfInfo.frame = nullptr;
             tfInfo.didFF = 0;
             tfInfo.isKey = false;
 
@@ -83,12 +83,12 @@ VideoFrame *VideoDecodeBuffer::GetFrame(int &didFF, bool &isKey)
     if (m_frameList.isEmpty())
     {
         if (m_eof)
-            return NULL;
+            return nullptr;
 
         m_frameWaitCond.wait(locker.mutex());
 
         if (m_frameList.isEmpty())
-            return NULL;
+            return nullptr;
     }
 
     DecodedFrameInfo tfInfo = m_frameList.takeFirst();
