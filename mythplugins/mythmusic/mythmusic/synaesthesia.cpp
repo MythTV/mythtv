@@ -43,7 +43,7 @@ Synaesthesia::Synaesthesia(void) :
     m_outWidth(0),
     m_outHeight(0),
 
-    m_outputImage(NULL),
+    m_outputImage(nullptr),
 
     m_fgRedSlider(0.0),  m_fgGreenSlider(0.5),
     m_bgRedSlider(0.75), m_bgGreenSlider(0.4),

@@ -62,7 +62,7 @@ class PlayListFile
         if (i >= 0 && i < m_entries.count())
             return m_entries.at(i);
 
-        return NULL;
+        return nullptr;
     }
 
     /** \brief Version of the parsed pls file 

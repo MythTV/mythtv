@@ -91,7 +91,7 @@ static SmartPLOperator *lookupOperator(QString name)
         if (SmartPLOperators[x].name == name)
             return &SmartPLOperators[x];
     }
-    return NULL;
+    return nullptr;
 }
 
 static SmartPLField *lookupField(QString name)
@@ -101,7 +101,7 @@ static SmartPLField *lookupField(QString name)
         if (SmartPLFields[x].name == name)
             return &SmartPLFields[x];
     }
-    return NULL;
+    return nullptr;
 }
 
 QString formattedFieldValue(const QVariant &value)
@@ -373,14 +373,14 @@ QString SmartPLCriteriaRow::toString(void)
 
 SmartPlaylistEditor::SmartPlaylistEditor(MythScreenStack *parent)
               : MythScreenType(parent, "smartplaylisteditor"),
-                m_tempCriteriaRow(NULL), m_matchesCount(0),
+                m_tempCriteriaRow(nullptr), m_matchesCount(0),
                 m_newPlaylist(false), m_playlistIsValid(false),
-                m_categorySelector(NULL), m_categoryButton(NULL),
-                m_titleEdit(NULL), m_matchSelector(NULL),
-                m_criteriaList(NULL), m_orderBySelector(NULL),
-                m_orderByButton(NULL), m_matchesText(NULL),
-                m_limitSpin(NULL), m_cancelButton(NULL),
-                m_saveButton(NULL), m_showResultsButton(NULL)
+                m_categorySelector(nullptr), m_categoryButton(nullptr),
+                m_titleEdit(nullptr), m_matchSelector(nullptr),
+                m_criteriaList(nullptr), m_orderBySelector(nullptr),
+                m_orderByButton(nullptr), m_matchesText(nullptr),
+                m_limitSpin(nullptr), m_cancelButton(nullptr),
+                m_saveButton(nullptr), m_showResultsButton(nullptr)
 {
 }
 
@@ -542,7 +542,7 @@ void SmartPlaylistEditor::editCriteria(void)
     if (m_tempCriteriaRow)
     {
         delete m_tempCriteriaRow;
-        m_tempCriteriaRow = NULL;
+        m_tempCriteriaRow = nullptr;
     }
 
     MythUIButtonListItem *item = m_criteriaList->GetItemCurrent();
@@ -636,7 +636,7 @@ void SmartPlaylistEditor::addCriteria(void)
 
 void SmartPlaylistEditor::criteriaChanged()
 {
-    MythUIButtonListItem *item = NULL;
+    MythUIButtonListItem *item = nullptr;
 
     if (m_tempCriteriaRow)
     {
@@ -648,7 +648,7 @@ void SmartPlaylistEditor::criteriaChanged()
 
         m_criteriaList->SetItemCurrent(item);
 
-        m_tempCriteriaRow = NULL;
+        m_tempCriteriaRow = nullptr;
     }
     else
     {
@@ -684,9 +684,9 @@ void SmartPlaylistEditor::showCategoryMenu(void)
 
     menu->SetReturnEvent(this, "categorymenu");
 
-    menu->AddButton(tr("New Category"),    NULL);
-    menu->AddButton(tr("Delete Category"), NULL);
-    menu->AddButton(tr("Rename Category"), NULL);
+    menu->AddButton(tr("New Category"),    nullptr);
+    menu->AddButton(tr("Delete Category"), nullptr);
+    menu->AddButton(tr("Rename Category"), nullptr);
 
     popupStack->AddScreen(menu);
 }
@@ -1243,13 +1243,13 @@ void  SmartPlaylistEditor::getCategoryAndName(QString &category, QString &name)
 
 CriteriaRowEditor::CriteriaRowEditor(MythScreenStack* parent, SmartPLCriteriaRow* row)
                  : MythScreenType(parent, "CriteriaRowEditor"),
-                m_criteriaRow(NULL), m_fieldSelector(NULL),
-                m_operatorSelector(NULL), m_value1Edit(NULL),
-                m_value2Edit(NULL), m_value1Selector(NULL),
-                m_value2Selector(NULL), m_value1Spinbox(NULL),
-                m_value2Spinbox(NULL), m_value1Button(NULL),
-                m_value2Button(NULL), m_andText(NULL),
-                m_cancelButton(NULL), m_saveButton(NULL)
+                m_criteriaRow(nullptr), m_fieldSelector(nullptr),
+                m_operatorSelector(nullptr), m_value1Edit(nullptr),
+                m_value2Edit(nullptr), m_value1Selector(nullptr),
+                m_value2Selector(nullptr), m_value1Spinbox(nullptr),
+                m_value2Spinbox(nullptr), m_value1Button(nullptr),
+                m_value2Button(nullptr), m_andText(nullptr),
+                m_cancelButton(nullptr), m_saveButton(nullptr)
 {
     m_criteriaRow = row;
 }
@@ -1689,7 +1689,7 @@ void CriteriaRowEditor::setDate(QString date)
 
 SmartPLResultViewer::SmartPLResultViewer(MythScreenStack *parent)
                    : MythScreenType(parent, "SmartPLResultViewer"),
-                   m_trackList(NULL), m_positionText(NULL)
+                   m_trackList(nullptr), m_positionText(nullptr)
 {
 }
 
@@ -1832,10 +1832,10 @@ void SmartPLResultViewer::setSQL(QString sql)
 
 SmartPLOrderByDialog::SmartPLOrderByDialog(MythScreenStack *parent)
                  :MythScreenType(parent, "SmartPLOrderByDialog"),
-        m_fieldList(NULL), m_orderSelector(NULL), m_addButton(NULL),
-        m_deleteButton(NULL), m_moveUpButton(NULL), m_moveDownButton(NULL),
-        m_ascendingButton(NULL), m_descendingButton(NULL), m_cancelButton(NULL),
-        m_okButton(NULL)
+        m_fieldList(nullptr), m_orderSelector(nullptr), m_addButton(nullptr),
+        m_deleteButton(nullptr), m_moveUpButton(nullptr), m_moveDownButton(nullptr),
+        m_ascendingButton(nullptr), m_descendingButton(nullptr), m_cancelButton(nullptr),
+        m_okButton(nullptr)
 {
 }
 
@@ -2057,10 +2057,10 @@ void SmartPLOrderByDialog::getOrderByFields(void)
 
 SmartPLDateDialog::SmartPLDateDialog(MythScreenStack *parent)
                  :MythScreenType(parent, "SmartPLDateDialog"),
-                  m_updating(false), m_fixedRadio(NULL), m_daySpin(NULL),
-                  m_monthSpin(NULL), m_yearSpin(NULL), m_nowRadio(NULL),
-                  m_addDaysSpin(NULL), m_statusText(NULL),
-                  m_cancelButton(NULL), m_okButton(NULL)
+                  m_updating(false), m_fixedRadio(nullptr), m_daySpin(nullptr),
+                  m_monthSpin(nullptr), m_yearSpin(nullptr), m_nowRadio(nullptr),
+                  m_addDaysSpin(nullptr), m_statusText(nullptr),
+                  m_cancelButton(nullptr), m_okButton(nullptr)
 {
     m_updating = false;
 }

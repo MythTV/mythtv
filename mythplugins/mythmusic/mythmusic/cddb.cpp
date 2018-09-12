@@ -141,7 +141,7 @@ bool Cddb::Query(Matches& res, const Toc& toc)
         res.isExact = true;
         res.matches.push_back(Match(
             cddb.section(' ', 0, 0), // genre
-            cddb.section(' ', 1, 1).toUInt(0,16), // discID
+            cddb.section(' ', 1, 1).toUInt(nullptr,16), // discID
             cddb.section(' ', 2).section(" / ", 0, 0), // artist
             cddb.section(' ', 2).section(" / ", 1) // title
         ));
@@ -170,7 +170,7 @@ bool Cddb::Query(Matches& res, const Toc& toc)
                 arg(cddb.section('\n',0,0)));
             res.matches.push_back(Match(
                 cddb.section(' ', 0, 0), // genre
-                cddb.section(' ', 1, 1).toUInt(0,16), // discID
+                cddb.section(' ', 1, 1).toUInt(nullptr,16), // discID
                 cddb.section(' ', 2).section(" / ", 0, 0), // artist
                 cddb.section(' ', 2).section(" / ", 1) // title
             ));
@@ -485,7 +485,7 @@ bool Dbase::Search(Cddb::Matches& res, const Cddb::discid_t discID)
         QFileInfoList ids = QDir(it->canonicalFilePath()).entryInfoList(QDir::Files);
         for (QFileInfoList::const_iterator it2 = ids.begin(); it2 != ids.end(); ++it2)
         {
-            if (it2->baseName().toUInt(0,16) == discID)
+            if (it2->baseName().toUInt(nullptr,16) == discID)
             {
                 QFile file(it2->canonicalFilePath());
                 if (file.open(QIODevice::ReadOnly | QIODevice::Text))

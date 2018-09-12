@@ -60,7 +60,7 @@ class EditStreamMetadata : public MythScreenType
 
   public:
     EditStreamMetadata(MythScreenStack *parentStack, StreamView *parent,
-                       MusicMetadata *mdata = NULL);
+                       MusicMetadata *mdata = nullptr);
 
     bool Create();
     void changeStreamMetadata(MusicMetadata *mdata);

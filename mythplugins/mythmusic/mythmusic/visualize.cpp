@@ -39,7 +39,7 @@ using namespace std;
 // static_assert(FFTW_N==SAMPLES_DEFAULT_SIZE)
 
 
-VisFactory* VisFactory::g_pVisFactories = 0;
+VisFactory* VisFactory::g_pVisFactories = nullptr;
 
 VisualBase::VisualBase(bool screensaverenable)
     : m_fps(20), m_xscreensaverenable(screensaverenable)
@@ -75,7 +75,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 // LogScale
 
 LogScale::LogScale(int maxscale, int maxrange)
-    : indices(0), s(0), r(0)
+    : indices(nullptr), s(0), r(0)
 {
     setMax(maxscale, maxrange);
 }
@@ -579,7 +579,7 @@ static class MonoScopeFactory : public VisFactory
 
 #if FFTW3_SUPPORT
 Spectrum::Spectrum()
-    : lin(NULL), rin(NULL), lout(NULL), rout(NULL)
+    : lin(nullptr), rin(nullptr), lout(nullptr), rout(nullptr)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Spectrum : Being Initialised"));
 
@@ -909,7 +909,7 @@ static class SquaresFactory : public VisFactory
 #endif // FFTW3_SUPPORT
 
 Piano::Piano()
-    : piano_data(NULL), audio_data(NULL)
+    : piano_data(nullptr), audio_data(nullptr)
 {
     // Setup the "magical" audio coefficients
     // required by the Goetzel Algorithm
@@ -1369,7 +1369,7 @@ static class PianoFactory : public VisFactory
 }PianoFactory;
 
 AlbumArt::AlbumArt(void) :
-    m_currentMetadata(NULL),
+    m_currentMetadata(nullptr),
     m_lastCycle(QDateTime::currentDateTime())
 {
     findFrontCover();

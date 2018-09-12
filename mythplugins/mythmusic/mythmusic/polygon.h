@@ -10,7 +10,7 @@ class Bitmap
     int width, height, extra;
     Pixel *data;
 
-    explicit Bitmap(int e = 0) : width(0), height(0), extra(e), data(NULL) { }
+    explicit Bitmap(int e = 0) : width(0), height(0), extra(e), data(nullptr) { }
     ~Bitmap() { delete[] data; }
 
     void size(int w,int h)

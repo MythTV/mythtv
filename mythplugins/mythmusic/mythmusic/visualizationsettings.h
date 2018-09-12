@@ -10,7 +10,7 @@ class VisualizationSettings : public MythScreenType
 {
     Q_OBJECT
 public:
-    VisualizationSettings(MythScreenStack *parent, const char *name = 0);
+    VisualizationSettings(MythScreenStack *parent, const char *name = nullptr);
     ~VisualizationSettings();
 
     bool Create(void);

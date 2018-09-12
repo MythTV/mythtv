@@ -31,8 +31,8 @@ void PlaylistLoadingThread::run()
 #define LOC_ERR  QString("PlaylistContainer, Error: ")
 
 PlaylistContainer::PlaylistContainer(AllMusic *all_music) :
-    m_activePlaylist(NULL), m_streamPlaylist(NULL),
-    m_allPlaylists(NULL),
+    m_activePlaylist(nullptr), m_streamPlaylist(nullptr),
+    m_allPlaylists(nullptr),
 
     m_playlistsLoader(new PlaylistLoadingThread(this, all_music)),
     m_doneLoading(false), m_myHost(gCoreContext->GetHostName()),
@@ -49,7 +49,7 @@ PlaylistContainer::~PlaylistContainer()
 {
     m_playlistsLoader->wait();
     delete m_playlistsLoader;
-    m_playlistsLoader = NULL;
+    m_playlistsLoader = nullptr;
 
     if (m_activePlaylist)
         delete m_activePlaylist;
@@ -162,7 +162,7 @@ Playlist *PlaylistContainer::getPlaylist(int id)
 
     LOG(VB_GENERAL, LOG_ERR,
         "getPlaylistName() called with unknown index number");
-    return NULL;
+    return nullptr;
 }
 
 Playlist *PlaylistContainer::getPlaylist(const QString &name)
@@ -178,7 +178,7 @@ Playlist *PlaylistContainer::getPlaylist(const QString &name)
     }
 
     LOG(VB_GENERAL, LOG_ERR, QString("getPlaylistName() called with unknown name: %1").arg(name));
-    return NULL;
+    return nullptr;
 }
 
 void PlaylistContainer::save(void)

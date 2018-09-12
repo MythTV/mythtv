@@ -19,8 +19,8 @@ class RemoteAVFormatContext
 {
   public:
     explicit RemoteAVFormatContext(const QString &filename = "") :
-        m_inputFC(NULL), m_inputIsRemote(false), m_isOpen(false),
-        m_rf(NULL), m_byteIOContext(NULL), m_buffer(NULL)
+        m_inputFC(nullptr), m_inputIsRemote(false), m_isOpen(false),
+        m_rf(nullptr), m_byteIOContext(nullptr), m_buffer(nullptr)
     { if (!filename.isEmpty()) Open(filename); }
 
     ~RemoteAVFormatContext()
@@ -87,7 +87,7 @@ class RemoteAVFormatContext
 
             m_inputFC->pb = m_byteIOContext;
 
-            int ret = avformat_open_input(&m_inputFC, "stream", fmt, NULL);
+            int ret = avformat_open_input(&m_inputFC, "stream", fmt, nullptr);
             if (ret)
             {
                 LOG(VB_GENERAL, LOG_ERR,  QString("RemoteAVFormatContext::Open: Failed to open input: %1").arg(filename));
@@ -97,12 +97,12 @@ class RemoteAVFormatContext
         else
         {
             // if this is a ice/shoutcast stream setup grabbing the inline metadata
-            AVDictionary *options = NULL;
+            AVDictionary *options = nullptr;
 
             if (filename.startsWith("http://"))
                 av_dict_set(&options, "icy", "1", 0);
 
-            int ret = avformat_open_input(&m_inputFC,  qPrintable(filename), NULL, &options);
+            int ret = avformat_open_input(&m_inputFC,  qPrintable(filename), nullptr, &options);
             if (ret)
             {
                 LOG(VB_GENERAL, LOG_ERR,  QString("RemoteAVFormatContext::Open: Failed to open input: %1").arg(filename));
@@ -119,13 +119,13 @@ class RemoteAVFormatContext
         if (m_inputFC)
         {
             avformat_close_input(&m_inputFC);
-            m_inputFC = NULL;
+            m_inputFC = nullptr;
         }
 
         if (m_rf)
         {
             delete m_rf;
-            m_rf = NULL;
+            m_rf = nullptr;
         }
 
         m_isOpen = false;

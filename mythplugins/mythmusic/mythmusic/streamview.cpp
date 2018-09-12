@@ -34,8 +34,8 @@ using namespace std;
 
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
            :MusicCommon(parent, parentScreen, "streamview"),
-            m_streamList(NULL), m_noStreams(NULL), m_bufferStatus(NULL),
-            m_bufferProgress(NULL), m_currStream(NULL), m_lastStream(NULL)
+            m_streamList(nullptr), m_noStreams(nullptr), m_bufferStatus(nullptr),
+            m_bufferProgress(nullptr), m_currStream(nullptr), m_lastStream(nullptr)
 {
     m_currentView = MV_RADIO;
 }
@@ -96,7 +96,7 @@ void StreamView::ShowMenu(void)
     menu->AddItem(MusicCommon::tr("Fullscreen Visualizer"), qVariantFromValue((int)MV_VISUALIZER));
     menu->AddItem(MusicCommon::tr("Lyrics"), qVariantFromValue((int)MV_LYRICS));
 
-    menu->AddItem(tr("More Options"), NULL, createSubMenu());
+    menu->AddItem(tr("More Options"), nullptr, createSubMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -305,7 +305,7 @@ void StreamView::customEvent(QEvent *event)
             if (resulttext == tr("Add Stream"))
             {
                 MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-                MythScreenType *screen = new EditStreamMetadata(mainStack, this, NULL);
+                MythScreenType *screen = new EditStreamMetadata(mainStack, this, nullptr);
 
                 if (screen->Create())
                     mainStack->AddScreen(screen);
@@ -654,11 +654,11 @@ EditStreamMetadata::EditStreamMetadata(MythScreenStack *parentStack,
                                  MusicMetadata *mdata)
     : MythScreenType(parentStack, "editstreampopup"),
         m_parent(parent), m_streamMeta(mdata),
-    m_broadcasterEdit(NULL),  m_channelEdit(NULL), m_descEdit(NULL),
-    m_url1Edit(NULL), m_url2Edit(NULL),m_url3Edit(NULL),m_url4Edit(NULL),m_url5Edit(NULL),
-    m_logourlEdit(NULL),  m_formatEdit(NULL),  m_genreEdit(NULL),
-    m_countryEdit(NULL), m_languageEdit(NULL),
-    m_searchButton(NULL), m_cancelButton(NULL), m_saveButton(NULL)
+    m_broadcasterEdit(nullptr),  m_channelEdit(nullptr), m_descEdit(nullptr),
+    m_url1Edit(nullptr), m_url2Edit(nullptr),m_url3Edit(nullptr),m_url4Edit(nullptr),m_url5Edit(nullptr),
+    m_logourlEdit(nullptr),  m_formatEdit(nullptr),  m_genreEdit(nullptr),
+    m_countryEdit(nullptr), m_languageEdit(nullptr),
+    m_searchButton(nullptr), m_cancelButton(nullptr), m_saveButton(nullptr)
 {
 }
 
@@ -790,9 +790,9 @@ void EditStreamMetadata::changeStreamMetadata(MusicMetadata* mdata)
 SearchStream::SearchStream(MythScreenStack *parentStack,
                            EditStreamMetadata *parent)
     : MythScreenType(parentStack, "searchstream"),
-    m_parent(NULL),  m_broadcasterList(NULL), m_genreList(NULL),
-    m_countryList(NULL),m_languageList(NULL), m_channelEdit(NULL),
-    m_streamList(NULL), m_matchesText(NULL), m_updating(false)
+    m_parent(nullptr),  m_broadcasterList(nullptr), m_genreList(nullptr),
+    m_countryList(nullptr),m_languageList(nullptr), m_channelEdit(nullptr),
+    m_streamList(nullptr), m_matchesText(nullptr), m_updating(false)
 {
     m_parent = parent;
 }

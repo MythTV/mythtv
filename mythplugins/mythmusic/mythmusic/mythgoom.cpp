@@ -22,7 +22,7 @@ Goom::Goom()
 {
     m_fps = 20;
 
-    m_buffer = NULL;
+    m_buffer = nullptr;
 
     goom_init(800, 600, 0);
 

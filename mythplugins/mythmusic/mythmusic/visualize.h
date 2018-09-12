@@ -282,7 +282,7 @@ class AlbumArt : public VisualBase
     virtual ~AlbumArt();
 
     void resize(const QSize &size);
-    bool process(VisualNode *node = 0);
+    bool process(VisualNode *node = nullptr);
     bool draw(QPainter *p, const QColor &back = Qt::black);
     void handleKeyPress(const QString &action);
 
@@ -307,7 +307,7 @@ class Blank : public VisualBase
     virtual ~Blank();
 
     void resize(const QSize &size);
-    bool process(VisualNode *node = 0);
+    bool process(VisualNode *node = nullptr);
     bool draw(QPainter *p, const QColor &back = Qt::black);
     void handleKeyPress(const QString &action) {(void) action;}
 

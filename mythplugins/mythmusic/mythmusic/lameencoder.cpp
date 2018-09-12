@@ -123,7 +123,7 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
 
 LameEncoder::~LameEncoder()
 {
-    addSamples(0, 0); //flush
+    addSamples(nullptr, 0); //flush
 
     if (gf && m_out)
         lame_mp3_tags_fid (gf, m_out);
@@ -138,7 +138,7 @@ LameEncoder::~LameEncoder()
         fclose(m_out);
 
         // Make sure the base class doesn't do a double clear.
-        m_out = NULL;
+        m_out = nullptr;
     }
 
     // Now write the Metadata

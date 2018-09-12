@@ -32,7 +32,7 @@ QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registe
 QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
 
 DecoderHandlerEvent::DecoderHandlerEvent(Type t, const MusicMetadata &meta)
-    : MythEvent(t), m_msg(NULL), m_meta(NULL), m_available(0), m_maxSize(0)
+    : MythEvent(t), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0)
 { 
     m_meta = new MusicMetadata(meta);
 }
@@ -73,7 +73,7 @@ void DecoderHandlerEvent::getBufferStatus(int *available, int *maxSize) const
 DecoderHandler::DecoderHandler(void) :
     m_state(STOPPED),
     m_playlist_pos(0),
-    m_decoder(NULL),
+    m_decoder(nullptr),
     m_op(false),
     m_redirects(0)
 {
@@ -207,7 +207,7 @@ void DecoderHandler::stop(void)
     {
         m_decoder->wait();
         delete m_decoder;
-        m_decoder = NULL;
+        m_decoder = nullptr;
     }
 
     doOperationStop();
@@ -341,12 +341,12 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
     if (m_decoder && !m_decoder->factory()->supports(format)) 
     {
         delete m_decoder;
-        m_decoder = NULL;
+        m_decoder = nullptr;
     }
 
     if (!m_decoder)
     {
-        if ((m_decoder = Decoder::create(format, NULL, true)) == NULL)
+        if ((m_decoder = Decoder::create(format, nullptr, true)) == nullptr)
         {
             doFailed(url, QString("No decoder for this format '%1'").arg(format));
             return;

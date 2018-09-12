@@ -155,7 +155,7 @@ static void startPlayback(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    PlaylistView *view = new PlaylistView(mainStack, NULL);
+    PlaylistView *view = new PlaylistView(mainStack, nullptr);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -169,7 +169,7 @@ static void startStreamPlayback(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    StreamView *view = new StreamView(mainStack, NULL);
+    StreamView *view = new StreamView(mainStack, nullptr);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -187,7 +187,7 @@ static void startDatabaseTree(void)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     QString lastView = gCoreContext->GetSetting("MusicPlaylistEditorView", "tree");
-    PlaylistEditorView *view = new PlaylistEditorView(mainStack, NULL, lastView);
+    PlaylistEditorView *view = new PlaylistEditorView(mainStack, nullptr, lastView);
 
     if (view->Create())
         mainStack->AddScreen(view);
@@ -257,8 +257,8 @@ static void startImport(void)
 }
 
 // these point to the the mainmenu callback if found
-static void (*m_callback)(void *, QString &) = NULL;
-static void *m_callbackdata = NULL;
+static void (*m_callback)(void *, QString &) = nullptr;
+static void *m_callbackdata = nullptr;
 
 static void MusicCallback(void *data, QString &selection)
 {
@@ -348,7 +348,7 @@ static int runMenu(QString which_menu)
     QString themedir = GetMythUI()->GetThemeDir();
 
     // find the 'mainmenu' MythThemedMenu so we can use the callback from it
-    MythThemedMenu *mainMenu = NULL;
+    MythThemedMenu *mainMenu = nullptr;
     QObject *parentObject = GetMythMainWindow()->GetMainStack()->GetTopScreen();
 
     while (parentObject)
@@ -372,7 +372,7 @@ static int runMenu(QString which_menu)
     if (mainMenu)
         mainMenu->getCallback(&m_callback, &m_callbackdata);
 
-    diag->setCallback(MusicCallback, NULL);
+    diag->setCallback(MusicCallback, nullptr);
     diag->setKillable();
 
     if (diag->foundTheme())
@@ -552,7 +552,7 @@ static void handleMedia(MythMediaDevice *cd)
     else
     {
         delete busy;
-        busy = NULL;
+        busy = nullptr;
     }
 
     // Search for music files
@@ -577,7 +577,7 @@ static void handleMedia(MythMediaDevice *cd)
     else
     {
         delete progress;
-        progress = NULL;
+        progress = nullptr;
     }
 
     // Read track metadata and add to all_music
@@ -698,7 +698,7 @@ static void handleCDMedia(MythMediaDevice *cd)
     gMusicData->all_playlists->getActive()->removeAllCDTracks();
 
     // find any new cd tracks
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL);
+    CdDecoder *decoder = new CdDecoder("cda", nullptr, nullptr);
     decoder->setDevice(newDevice);
 
     int tracks = decoder->getNumTracks();
@@ -895,7 +895,7 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-    gPlayer = new MusicPlayer(NULL);
+    gPlayer = new MusicPlayer(nullptr);
     gMusicData = new MusicData();
 
     return 0;

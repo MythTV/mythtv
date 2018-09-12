@@ -35,7 +35,7 @@
 // how long to wait before updating the lastplay and playcount fields
 #define LASTPLAY_DELAY 15
 
-MusicPlayer  *gPlayer = NULL;
+MusicPlayer  *gPlayer = nullptr;
 QString gCDdevice = "";
 
 ////////////////////////////////////////////////////////////////
@@ -58,8 +58,8 @@ MusicPlayer::MusicPlayer(QObject *parent)
 {
     setObjectName("MusicPlayer");
 
-    m_output = NULL;
-    m_decoderHandler = NULL;
+    m_output = nullptr;
+    m_decoderHandler = nullptr;
     m_currentTrack = -1;
 
     m_currentTime = 0;
@@ -68,7 +68,7 @@ MusicPlayer::MusicPlayer(QObject *parent)
     m_bufferAvailable = 0;
     m_bufferSize = 0;
 
-    m_oneshotMetadata = NULL;
+    m_oneshotMetadata = nullptr;
 
     m_isAutoplay = false;
     m_isPlaying = false;
@@ -132,13 +132,13 @@ MusicPlayer::~MusicPlayer()
     {
         m_decoderHandler->removeListener(this);
         m_decoderHandler->deleteLater();
-        m_decoderHandler = NULL;
+        m_decoderHandler = nullptr;
     }
 
     if (m_oneshotMetadata)
     {
         delete m_oneshotMetadata;
-        m_oneshotMetadata = NULL;
+        m_oneshotMetadata = nullptr;
     }
 
     while (!m_playedList.empty())
@@ -255,7 +255,7 @@ void MusicPlayer::playFile(const MusicMetadata &mdata)
     if (m_oneshotMetadata)
     {
         delete m_oneshotMetadata;
-        m_oneshotMetadata = NULL;
+        m_oneshotMetadata = nullptr;
     }
 
     m_oneshotMetadata = new MusicMetadata();
@@ -278,7 +278,7 @@ void MusicPlayer::stop(bool stopAll)
     if (m_oneshotMetadata)
     {
         delete m_oneshotMetadata;
-        m_oneshotMetadata = NULL;
+        m_oneshotMetadata = nullptr;
     }
 
     m_isPlaying = false;
@@ -302,7 +302,7 @@ void MusicPlayer::stop(bool stopAll)
     {
         m_output->removeListener(this);
         delete m_output;
-        m_output = NULL;
+        m_output = nullptr;
     }
 
     // because we don't actually stop the audio output we have to fake a Stopped
@@ -422,7 +422,7 @@ bool MusicPlayer::openOutputDevice(void)
             QString("Error was: %1").arg(m_output->GetError()));
 
         delete m_output;
-        m_output = NULL;
+        m_output = nullptr;
 
         return false;
     }
@@ -460,7 +460,7 @@ void MusicPlayer::next(void)
     if (m_oneshotMetadata)
     {
         delete m_oneshotMetadata;
-        m_oneshotMetadata = NULL;
+        m_oneshotMetadata = nullptr;
     }
     else
         currentTrack++;
@@ -497,7 +497,7 @@ void MusicPlayer::previous(void)
     if (m_oneshotMetadata)
     {
         delete m_oneshotMetadata;
-        m_oneshotMetadata = NULL;
+        m_oneshotMetadata = nullptr;
     }
     else
         currentTrack--;
@@ -526,7 +526,7 @@ void MusicPlayer::nextAuto(void)
     if (m_oneshotMetadata)
     {
         delete m_oneshotMetadata;
-        m_oneshotMetadata = NULL;
+        m_oneshotMetadata = nullptr;
         stop(true);
         return;
     }
@@ -929,7 +929,7 @@ void MusicPlayer::customEvent(QEvent *event)
         if (m_oneshotMetadata)
         {
             delete m_oneshotMetadata;
-            m_oneshotMetadata = NULL;
+            m_oneshotMetadata = nullptr;
             stop(true);
         }
         else
@@ -1186,7 +1186,7 @@ MusicMetadata *MusicPlayer::getCurrentMetadata(void)
         return m_oneshotMetadata;
 
     if (!getCurrentPlaylist() || !getCurrentPlaylist()->getSongAt(m_currentTrack))
-        return NULL;
+        return nullptr;
 
     return getCurrentPlaylist()->getSongAt(m_currentTrack);
 }
@@ -1195,13 +1195,13 @@ MusicMetadata *MusicPlayer::getCurrentMetadata(void)
 MusicMetadata *MusicPlayer::getNextMetadata(void)
 {
     if (m_playMode == PLAYMODE_RADIO)
-        return NULL;
+        return nullptr;
 
     if (m_oneshotMetadata)
         return getCurrentMetadata();
 
     if (!getCurrentPlaylist() || !getCurrentPlaylist()->getSongAt(m_currentTrack))
-        return NULL;
+        return nullptr;
 
     if (m_repeatMode == REPEAT_TRACK)
         return getCurrentMetadata();
@@ -1216,10 +1216,10 @@ MusicMetadata *MusicPlayer::getNextMetadata(void)
         if (m_repeatMode == REPEAT_ALL)
             return getCurrentPlaylist()->getSongAt(0);
         else
-            return NULL;
+            return nullptr;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 MusicPlayer::RepeatMode MusicPlayer::toggleRepeatMode(void)
@@ -1636,7 +1636,7 @@ void MusicPlayer::addTrack(int trackID, bool updateUI)
 Playlist* MusicPlayer::getCurrentPlaylist ( void )
 {
     if (!gMusicData || !gMusicData->all_playlists)
-        return NULL;
+        return nullptr;
 
     if (m_playMode == PLAYMODE_RADIO)
     {
@@ -1647,7 +1647,7 @@ Playlist* MusicPlayer::getCurrentPlaylist ( void )
         return gMusicData->all_playlists->getActive();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 StreamList  *MusicPlayer::getStreamList(void) 

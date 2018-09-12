@@ -12,7 +12,7 @@ class ImportSettings : public MythScreenType
 {
     Q_OBJECT
   public:
-    ImportSettings(MythScreenStack *parent, const char *name = 0);
+    ImportSettings(MythScreenStack *parent, const char *name = nullptr);
     ~ImportSettings();
 
     bool Create(void);

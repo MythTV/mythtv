@@ -68,7 +68,7 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
 #else
     /* FLAC 1.1.3 and up */
     int ret = FLAC__stream_encoder_init_file(
-        encoder, ofile.constData(), NULL, NULL);
+        encoder, ofile.constData(), nullptr, nullptr);
     if (ret != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 #endif
     {
@@ -87,7 +87,7 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
 
 FlacEncoder::~FlacEncoder()
 {
-    addSamples(0, 0); // flush buffer
+    addSamples(nullptr, 0); // flush buffer
 
     if (encoder)
     {
