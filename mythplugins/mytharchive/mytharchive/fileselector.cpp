@@ -32,13 +32,13 @@ FileSelector::FileSelector(
     m_filemask(filemask),
     m_curDirectory(startDir),
     m_archiveList(archiveList),
-    m_titleText(NULL),
-    m_fileButtonList(NULL),
-    m_locationEdit(NULL),
-    m_okButton(NULL),
-    m_cancelButton(NULL),
-    m_backButton(NULL),
-    m_homeButton(NULL)
+    m_titleText(nullptr),
+    m_fileButtonList(nullptr),
+    m_locationEdit(nullptr),
+    m_okButton(nullptr),
+    m_cancelButton(nullptr),
+    m_backButton(nullptr),
+    m_homeButton(nullptr)
 {
 }
 
@@ -299,7 +299,7 @@ void FileSelector::OKPressed()
                 a->videoHeight = 0;
                 a->fileCodec = "";
                 a->videoCodec = "";
-                a->encoderProfile = NULL;
+                a->encoderProfile = nullptr;
                 a->editedDetails = false;
                 m_archiveList->append(a);
             }

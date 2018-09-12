@@ -56,19 +56,19 @@ MythBurn::MythBurn(MythScreenStack   *parent,
     m_saveFilename(""),
     m_theme(),
     m_moveMode(false),
-    m_nextButton(NULL),
-    m_prevButton(NULL),
-    m_cancelButton(NULL),
-    m_archiveButtonList(NULL),
-    m_nofilesText(NULL),
-    m_addrecordingButton(NULL),
-    m_addvideoButton(NULL),
-    m_addfileButton(NULL),
-    m_sizeBar(NULL),
-    m_maxsizeText(NULL),
-    m_minsizeText(NULL),
-    m_currentsizeErrorText(NULL),
-    m_currentsizeText(NULL)
+    m_nextButton(nullptr),
+    m_prevButton(nullptr),
+    m_cancelButton(nullptr),
+    m_archiveButtonList(nullptr),
+    m_nofilesText(nullptr),
+    m_addrecordingButton(nullptr),
+    m_addvideoButton(nullptr),
+    m_addfileButton(nullptr),
+    m_sizeBar(nullptr),
+    m_maxsizeText(nullptr),
+    m_minsizeText(nullptr),
+    m_currentsizeErrorText(nullptr),
+    m_currentsizeText(nullptr)
 {
     // remove any old thumb images
     QString thumbDir = getTempDirectory() + "/config/thumbs";
@@ -417,7 +417,7 @@ void MythBurn::updateArchiveList(void)
     else
     {
         delete busyPopup;
-        busyPopup = NULL;
+        busyPopup = nullptr;
     }
 
     qApp->processEvents();
@@ -445,7 +445,7 @@ void MythBurn::updateArchiveList(void)
 
             // get default encoding profile if needed
 
-            if (a->encoderProfile == NULL)
+            if (a->encoderProfile == nullptr)
                 a->encoderProfile = getDefaultProfile(a);
 
             recalcItemSize(a);
@@ -542,7 +542,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     if (!item)
         return m_profileList.at(0);
 
-    EncoderProfile *profile = NULL;
+    EncoderProfile *profile = nullptr;
 
     // is the file an mpeg2 file?
     if (item->videoCodec.toLower() == "mpeg2video (main)")
@@ -732,7 +732,7 @@ EncoderProfile *MythBurn::getProfileFromName(const QString &profileName)
         if (m_profileList.at(x)->name == profileName)
             return m_profileList.at(x);
 
-    return NULL;
+    return nullptr;
 }
 
 void MythBurn::saveConfiguration(void)
@@ -1049,13 +1049,13 @@ ProfileDialog::ProfileDialog(
     MythScreenType(parent, "functionpopup"),
     m_archiveItem(archiveItem),
     m_profileList(profileList),
-    m_captionText(NULL),
-    m_descriptionText(NULL),
-    m_oldSizeText(NULL),
-    m_newSizeText(NULL),
-    m_profile_list(NULL),
-    m_enabledCheck(NULL),
-    m_okButton(NULL)
+    m_captionText(nullptr),
+    m_descriptionText(nullptr),
+    m_oldSizeText(nullptr),
+    m_newSizeText(nullptr),
+    m_profile_list(nullptr),
+    m_enabledCheck(nullptr),
+    m_okButton(nullptr)
 {
 }
 
@@ -1133,7 +1133,7 @@ void ProfileDialog::save(void)
 ///////////////////////////////////////////////////////////////////////////////
 
 BurnMenu::BurnMenu(void)
-        :QObject(NULL)
+        :QObject(nullptr)
 {
     setObjectName("BurnMenu");
 }

@@ -12,13 +12,13 @@ EditMetadataDialog::EditMetadataDialog(
     MythScreenStack *parent, ArchiveItem *source_metadata) :
     MythScreenType(parent, "EditMetadataDialog"),
     m_sourceMetadata(source_metadata),
-    m_titleEdit(NULL),
-    m_subtitleEdit(NULL),
-    m_descriptionEdit(NULL),
-    m_startdateEdit(NULL),
-    m_starttimeEdit(NULL),
-    m_cancelButton(NULL),
-    m_okButton(NULL)
+    m_titleEdit(nullptr),
+    m_subtitleEdit(nullptr),
+    m_descriptionEdit(nullptr),
+    m_startdateEdit(nullptr),
+    m_starttimeEdit(nullptr),
+    m_cancelButton(nullptr),
+    m_okButton(nullptr)
 {
 }
 

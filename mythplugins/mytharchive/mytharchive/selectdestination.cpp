@@ -31,24 +31,24 @@ SelectDestination::SelectDestination(
     MythScreenType(parent, name),
     m_nativeMode(nativeMode),
     m_freeSpace(0),
-    m_nextButton(NULL),
-    m_prevButton(NULL),
-    m_cancelButton(NULL),
-    m_destinationSelector(NULL),
-    m_destinationText(NULL),
-    m_freespaceText(NULL),
-    m_filenameEdit(NULL),
-    m_findButton(NULL),
-    m_createISOCheck(NULL),
-    m_doBurnCheck(NULL),
-    m_eraseDvdRwCheck(NULL),
-    m_createISOText(NULL),
-    m_doBurnText(NULL),
-    m_eraseDvdRwText(NULL)
+    m_nextButton(nullptr),
+    m_prevButton(nullptr),
+    m_cancelButton(nullptr),
+    m_destinationSelector(nullptr),
+    m_destinationText(nullptr),
+    m_freespaceText(nullptr),
+    m_filenameEdit(nullptr),
+    m_findButton(nullptr),
+    m_createISOCheck(nullptr),
+    m_doBurnCheck(nullptr),
+    m_eraseDvdRwCheck(nullptr),
+    m_createISOText(nullptr),
+    m_doBurnText(nullptr),
+    m_eraseDvdRwText(nullptr)
 {
     m_archiveDestination.type = AD_FILE;
-    m_archiveDestination.name = NULL;
-    m_archiveDestination.description = NULL;
+    m_archiveDestination.name = nullptr;
+    m_archiveDestination.description = nullptr;
     m_archiveDestination.freeSpace = 0LL;
 }
 
@@ -299,7 +299,7 @@ void SelectDestination::handleFind(void)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     FileSelector *selector = new
-            FileSelector(mainStack, NULL, FSTYPE_DIRECTORY, m_filenameEdit->GetText(), "*.*");
+            FileSelector(mainStack, nullptr, FSTYPE_DIRECTORY, m_filenameEdit->GetText(), "*.*");
 
     connect(selector, SIGNAL(haveResult(QString)),
             this, SLOT(fileFinderClosed(QString)));
