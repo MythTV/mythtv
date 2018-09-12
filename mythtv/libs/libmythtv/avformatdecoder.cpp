@@ -1587,6 +1587,7 @@ static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext *avctx,
 static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext *avctx,
                                            const enum AVPixelFormat *valid_fmts)
 {
+    Q_UNUSED(avctx);
     enum AVPixelFormat ret = *valid_fmts; // default to first
     while (*valid_fmts != AV_PIX_FMT_NONE) {
         if (*valid_fmts == AV_PIX_FMT_YUV420P)
@@ -4252,6 +4253,9 @@ void AvFormatDecoder::ProcessDSMCCPacket(
         length -= sectionLen;
         data += sectionLen;
     }
+#else
+    Q_UNUSED(str);
+    Q_UNUSED(pkt);
 #endif // USING_MHEG
 }
 
@@ -4366,6 +4370,8 @@ bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
 #ifdef USING_MHEG
             if (!(decodetype & kDecodeVideo))
                 allowedquit |= (itv && itv->ImageHasChanged());
+#else
+            Q_UNUSED(decodetype);
 #endif // USING_MHEG:
             break;
         }

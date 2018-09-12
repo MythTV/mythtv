@@ -302,6 +302,8 @@ bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
         proto_mismatch = true;
         return false;
     }
+#else
+    Q_UNUSED(timeout_in_ms);
 #endif
 
     QStringList strlist(announcement);

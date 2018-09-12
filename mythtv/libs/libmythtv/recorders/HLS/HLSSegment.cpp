@@ -39,6 +39,8 @@ HLSRecSegment::HLSRecSegment(int seq, int duration, const QString& title,
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 #ifdef USING_LIBCRYPTO
     m_psz_key_path  = current_key_path;
+#else
+    Q_UNUSED(current_key_path);
 #endif
 }
 

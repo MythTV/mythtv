@@ -5363,6 +5363,8 @@ bool MythPlayer::ITVHandleAction(const QString &action)
 
     QMutexLocker locker(&itvLock);
     result = interactiveTV->OfferKey(action);
+#else
+    Q_UNUSED(action);
 #endif // USING_MHEG
 
     return result;
@@ -5380,6 +5382,10 @@ void MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
     QMutexLocker locker(&itvLock);
     interactiveTV->Restart(chanid, cardid, isLiveTV);
     itvVisible = false;
+#else
+    Q_UNUSED(chanid);
+    Q_UNUSED(cardid);
+    Q_UNUSED(isLiveTV);
 #endif // USING_MHEG
 }
 

@@ -72,6 +72,8 @@ MythCodecContext *MythCodecContext::createMythCodecContext(MythCodecID codec)
 #ifdef USING_VAAPI2
     if (codec_is_vaapi2(codec))
         mctx = new Vaapi2Context();
+#else
+    Q_UNUSED(codec);
 #endif
     if (!mctx)
         mctx = new MythCodecContext();
@@ -115,6 +117,8 @@ QStringList MythCodecContext::GetDeinterlacers(QString decodername)
 */
 
     }
+#else
+    Q_UNUSED(decodername);
 #endif
     return ret;
 }

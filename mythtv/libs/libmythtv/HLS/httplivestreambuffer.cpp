@@ -130,6 +130,8 @@ public:
         m_keyloaded     = false;
         m_psz_key_path  = current_key_path;
         memset(&m_aeskey, 0, sizeof(m_aeskey));
+#else
+        Q_UNUSED(current_key_path);
 #endif
         m_downloading   = false;
     }

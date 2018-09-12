@@ -2234,6 +2234,7 @@ bool HDHomeRunConfigurationGroup::ProbeCard(HDHomeRunDevice &tmpdevice)
         return true;
     }
 #endif // USING_HDHOMERUN
+    Q_UNUSED(tmpdevice);
     return false;
 }
 
@@ -2392,6 +2393,7 @@ void CetonDeviceID::UpdateValues(void)
     }
 }
 
+#ifdef USING_CETON
 static void CetonConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 {
     CetonDeviceID *deviceid = new CetonDeviceID(parent);
@@ -2422,6 +2424,7 @@ static void CetonConfigurationGroup(CaptureCard& parent, CardType& cardtype)
     QObject::connect(deviceid, SIGNAL(LoadedTuner(const QString&)),
                      tuner,    SLOT(  LoadValue(const QString&)));
 }
+#endif
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
                                              CardType& a_cardtype) :

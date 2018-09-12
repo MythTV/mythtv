@@ -285,6 +285,10 @@ namespace M3U
          * methods are defined: NONE and AES-128.
          */
 
+#ifndef USING_LIBCRYPTO
+        Q_UNUSED(aesmsg);
+#endif
+
         path.clear();
         iv.clear();
 
