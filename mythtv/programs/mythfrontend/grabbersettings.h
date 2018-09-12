@@ -16,7 +16,7 @@ class GrabberSettings : public MythScreenType
 
   public:
 
-    GrabberSettings(MythScreenStack *parent, const char *name = 0);
+    GrabberSettings(MythScreenStack *parent, const char *name = nullptr);
     ~GrabberSettings();
 
     bool Create(void);

@@ -23,7 +23,7 @@ class VideoSetupWizard : public MythScreenType
   public:
 
     VideoSetupWizard(MythScreenStack *parent, MythScreenType *general,
-                     MythScreenType *audio, const char *name = 0);
+                     MythScreenType *audio, const char *name = nullptr);
     ~VideoSetupWizard();
 
     bool Create(void);

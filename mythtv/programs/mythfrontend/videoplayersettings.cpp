@@ -15,11 +15,11 @@ using namespace std;
 
 PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_defaultPlayerEdit(NULL),    m_dvdPlayerEdit(NULL),
-      m_dvdDriveEdit(NULL),         m_blurayMountEdit(NULL),
-      m_altPlayerEdit(NULL),        m_blurayRegionList(NULL),
-      m_altCheck(NULL),             m_okButton(NULL),
-      m_cancelButton(NULL)
+      m_defaultPlayerEdit(nullptr), m_dvdPlayerEdit(nullptr),
+      m_dvdDriveEdit(nullptr),      m_blurayMountEdit(nullptr),
+      m_altPlayerEdit(nullptr),     m_blurayRegionList(nullptr),
+      m_altCheck(nullptr),          m_okButton(nullptr),
+      m_cancelButton(nullptr)
 {
 }
 

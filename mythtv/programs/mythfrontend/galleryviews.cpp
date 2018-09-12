@@ -40,7 +40,7 @@ ImageListK FlatView::GetAllNodes() const
 
 /*!
  \brief Get current selection
- \return ImagePtr An image or NULL
+ \return ImagePtr An image or nullptr
 */
 ImagePtrK FlatView::GetSelected() const
 {
@@ -127,7 +127,7 @@ void FlatView::Clear(bool resetParent)
 
 /*!
  \brief Peeks at next image in view but does not advance iterator
- \return ImageItem The next image or NULL
+ \return ImageItem The next image or nullptr
 */
 ImagePtrK FlatView::HasNext(int inc) const
 {
@@ -139,7 +139,7 @@ ImagePtrK FlatView::HasNext(int inc) const
 /*!
  \brief Advance iterator and return next image, wrapping if necessary.
  Regenerates unordered views on wrap.
- \return ImageItem Next image or NULL if empty
+ \return ImageItem Next image or nullptr if empty
 */
 ImagePtrK FlatView::Next(int inc)
 {
@@ -161,7 +161,7 @@ ImagePtrK FlatView::Next(int inc)
 
 /*!
  \brief Peeks at previous image in view but does not decrement iterator
- \return ImageItem The previous image or NULL
+ \return ImageItem The previous image or nullptr
 */
 ImagePtrK FlatView::HasPrev(int inc) const
 {
@@ -172,7 +172,7 @@ ImagePtrK FlatView::HasPrev(int inc) const
 
 /*!
  \brief Decrements iterator and returns previous image. Wraps at start.
- \return ImageItem Previous image or NULL if empty
+ \return ImageItem Previous image or nullptr if empty
 */
 ImagePtrK FlatView::Prev(int inc)
 {

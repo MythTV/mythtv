@@ -9,7 +9,7 @@
 Transition::Transition(QString name)
     : QObject(),
       m_duration(gCoreContext->GetNumSetting("GalleryTransitionTime", 1000)),
-      m_old(NULL), m_new(NULL), m_prev(NULL), m_next(NULL)
+      m_old(nullptr), m_new(nullptr), m_prev(nullptr), m_next(nullptr)
 {
     setObjectName(name);
 }
@@ -29,9 +29,9 @@ Transition &TransitionRegistry::Select(int setting)
 
     // If chosen transition isn't viable for painter then use previous ones.
     // First transition must always be useable by all painters
-    Transition *result = NULL;
+    Transition *result = nullptr;
     do
-        result = m_map.value(value--, NULL);
+        result = m_map.value(value--, nullptr);
     while (value >= kNoTransition && !result);
 
     if (result)
@@ -423,8 +423,8 @@ void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 void TransitionRandom::Finished()
 {
     // Clean up
-    disconnect(m_current, 0, 0, 0);
-    m_current = NULL;
+    disconnect(m_current, nullptr, nullptr, nullptr);
+    m_current = nullptr;
     emit finished();
 }
 

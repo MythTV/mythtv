@@ -17,10 +17,10 @@ using namespace std;
 
 MetadataSettings::MetadataSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_trailerSpin(NULL),
-      m_unknownFileCheck(NULL),            m_autoMetaUpdateCheck(NULL),
-      m_treeLoadsMetaCheck(NULL),          m_randomTrailerCheck(NULL),
-      m_okButton(NULL),                    m_cancelButton(NULL)
+      m_trailerSpin(nullptr),
+      m_unknownFileCheck(nullptr),         m_autoMetaUpdateCheck(nullptr),
+      m_treeLoadsMetaCheck(nullptr),       m_randomTrailerCheck(nullptr),
+      m_okButton(nullptr),                 m_cancelButton(nullptr)
 {
 }
 

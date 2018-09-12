@@ -46,7 +46,7 @@ class PlaybackBoxHelper : public MThread
 
     QString LocateArtwork(const QString &inetref, uint season,
                           VideoArtworkType type, const ProgramInfo *pginfo,
-                          const QString &groupname = NULL);
+                          const QString &groupname = nullptr);
 
     uint64_t GetFreeSpaceTotalMB(void) const;
     uint64_t GetFreeSpaceUsedMB(void) const;

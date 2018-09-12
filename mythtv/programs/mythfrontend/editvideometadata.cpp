@@ -34,21 +34,21 @@
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, VideoMetadata *source_metadata,
         const VideoMetadataListManager &cache) : MythScreenType(lparent, lname),
-    m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
-    m_taglineEdit(0), m_playerEdit(0), m_ratingEdit(0), m_directorEdit(0),
-    m_inetrefEdit(0), m_homepageEdit(0), m_plotEdit(0), m_seasonSpin(0),
-    m_episodeSpin(0), m_yearSpin(0), m_userRatingSpin(0), m_lengthSpin(0),
-    m_categoryList(0), m_levelList(0), m_childList(0), m_browseCheck(0),
-    m_watchedCheck(0), m_coverartButton(0), m_coverartText(0),
-    m_screenshotButton(0), m_screenshotText(0), m_bannerButton(0),
-    m_bannerText(0), m_fanartButton(0), m_fanartText(0),
-    m_trailerButton(0), m_trailerText(0),
-    m_netCoverartButton(0), m_netFanartButton(0), m_netBannerButton(0),
-    m_netScreenshotButton(0), m_coverart(0), m_screenshot(0),
-    m_banner(0), m_fanart(0),
-    m_doneButton(0),
+    m_origMetadata(source_metadata), m_titleEdit(nullptr), m_subtitleEdit(nullptr),
+    m_taglineEdit(nullptr), m_playerEdit(nullptr), m_ratingEdit(nullptr), m_directorEdit(nullptr),
+    m_inetrefEdit(nullptr), m_homepageEdit(nullptr), m_plotEdit(nullptr), m_seasonSpin(nullptr),
+    m_episodeSpin(nullptr), m_yearSpin(nullptr), m_userRatingSpin(nullptr), m_lengthSpin(nullptr),
+    m_categoryList(nullptr), m_levelList(nullptr), m_childList(nullptr), m_browseCheck(nullptr),
+    m_watchedCheck(nullptr), m_coverartButton(nullptr), m_coverartText(nullptr),
+    m_screenshotButton(nullptr), m_screenshotText(nullptr), m_bannerButton(nullptr),
+    m_bannerText(nullptr), m_fanartButton(nullptr), m_fanartText(nullptr),
+    m_trailerButton(nullptr), m_trailerText(nullptr),
+    m_netCoverartButton(nullptr), m_netFanartButton(nullptr), m_netBannerButton(nullptr),
+    m_netScreenshotButton(nullptr), m_coverart(nullptr), m_screenshot(nullptr),
+    m_banner(nullptr), m_fanart(nullptr),
+    m_doneButton(nullptr),
     cachedChildSelection(0),
-    m_metaCache(cache), m_busyPopup(0)
+    m_metaCache(cache), m_busyPopup(nullptr)
 {
     m_query = new MetadataDownload(this);
     m_imageDownload = new MetadataImageDownload(this);
@@ -652,7 +652,7 @@ void EditMetadataDialog::OnArtworkSearchDone(MetadataLookup *lookup)
     if (m_busyPopup)
     {
         m_busyPopup->Close();
-        m_busyPopup = NULL;
+        m_busyPopup = nullptr;
     }
 
     VideoArtworkType type = lookup->GetData().value<VideoArtworkType>();
@@ -711,7 +711,7 @@ void EditMetadataDialog::handleDownloadedImages(MetadataLookup *lookup)
     if (m_busyPopup)
     {
         m_busyPopup->Close();
-        m_busyPopup = NULL;
+        m_busyPopup = nullptr;
     }
 
     VideoArtworkType type = lookup->GetData().value<VideoArtworkType>();
@@ -1021,7 +1021,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
             if (m_busyPopup)
             {
                 m_busyPopup->Close();
-                m_busyPopup = NULL;
+                m_busyPopup = nullptr;
             }
         }
     }
@@ -1034,7 +1034,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         if (lul.size())

@@ -85,7 +85,7 @@ class ProgramRecPriority : public ScheduleCommon
     virtual void Init(void);
 
     void FillList(void);
-    void SortList(ProgramRecPriorityInfo *newCurrentItem = NULL);
+    void SortList(ProgramRecPriorityInfo *newCurrentItem = nullptr);
     void UpdateList();
     void RemoveItemFromList(MythUIButtonListItem *item);
 

@@ -109,7 +109,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     static void RunProgramGuide(uint           startChanId,
                                 const QString &startChanNum,
                                 const QDateTime &startTime,
-                                TV            *player = NULL,
+                                TV            *player = nullptr,
                                 bool           embedVideo = false,
                                 bool           allowFinder = true,
                                 int            changrpid = -1);
@@ -160,7 +160,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     GuideGrid(MythScreenStack *parentStack,
               uint chanid, const QString &channum,
               const QDateTime &startTime,
-              TV *player = NULL,
+              TV *player = nullptr,
               bool embedVideo = false,
               bool allowFinder = true,
               int changrpid = -1);

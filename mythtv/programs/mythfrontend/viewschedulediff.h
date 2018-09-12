@@ -13,7 +13,7 @@
 class ProgramStruct
 {
   public:
-    ProgramStruct() : before(NULL), after(NULL) {}
+    ProgramStruct() : before(nullptr), after(nullptr) {}
     ProgramInfo *before;
     ProgramInfo *after;
 };

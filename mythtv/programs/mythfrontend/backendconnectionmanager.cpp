@@ -39,7 +39,7 @@ class Reconnect : public QRunnable
 };
 
 BackendConnectionManager::BackendConnectionManager() :
-    QObject(), m_reconnecting(NULL), m_reconnect_timer(NULL),
+    QObject(), m_reconnecting(nullptr), m_reconnect_timer(nullptr),
     m_reconnect_again(false)
 {
     setObjectName("BackendConnectionManager");
@@ -93,7 +93,7 @@ void BackendConnectionManager::customEvent(QEvent *event)
                 .arg(message));
 
             delete m_reconnecting;
-            m_reconnecting = NULL;
+            m_reconnecting = nullptr;
 
             if (!m_reconnect_again)
             {

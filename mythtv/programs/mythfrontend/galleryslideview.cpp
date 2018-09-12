@@ -19,11 +19,11 @@
 GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
                                    bool editsAllowed)
     : MythScreenType(parent, name),
-      m_uiImage(NULL),
-      m_uiStatus(NULL),
-      m_uiSlideCount(NULL), m_uiCaptionText(NULL), m_uiHideCaptions(NULL),
+      m_uiImage(nullptr),
+      m_uiStatus(nullptr),
+      m_uiSlideCount(nullptr), m_uiCaptionText(nullptr), m_uiHideCaptions(nullptr),
       m_mgr(ImageManagerFe::getInstance()),
-      m_view(NULL),
+      m_view(nullptr),
       m_availableTransitions(GetMythPainter()->SupportsAnimation()),
       m_transition(m_availableTransitions.Select(
                        gCoreContext->GetNumSetting("GalleryTransitionType",
@@ -341,7 +341,7 @@ void GallerySlideView::MenuTransforms(MythMenu &mainMenu)
         if (m_slides.GetCurrent().CanZoomOut())
             menu->AddItem(tr("Zoom Out"));
 
-        mainMenu.AddItem(tr("Transforms"), NULL, menu);
+        mainMenu.AddItem(tr("Transforms"), nullptr, menu);
     }
 }
 
@@ -669,7 +669,7 @@ void GallerySlideView::TransitionComplete()
 */
 void GallerySlideView::ShowPrevSlide(int inc)
 {
-    if (m_playing && m_view->HasPrev(inc) == NULL)
+    if (m_playing && m_view->HasPrev(inc) == nullptr)
         // Prohibit back-wrapping during slideshow: it will cause premature end
         //: Cannot go back beyond first slide of slideshow
         SetStatus(tr("Start"));
@@ -687,7 +687,7 @@ void GallerySlideView::ShowPrevSlide(int inc)
 void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
 {
     // Browsing always wraps; slideshows depend on repeat setting
-    if (m_playing && m_view->HasNext(inc) == NULL
+    if (m_playing && m_view->HasNext(inc) == nullptr
             && !gCoreContext->GetNumSetting("GalleryRepeat", false))
     {
         // Don't stop due to jumping past end

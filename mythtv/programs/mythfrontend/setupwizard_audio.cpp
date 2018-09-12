@@ -19,13 +19,13 @@ AudioSetupWizard::AudioSetupWizard(MythScreenStack *parent,
                                    MythScreenType *previous,
                                    const char *name)
     : MythScreenType(parent, name),
-      m_outputlist(NULL),                m_testThread(NULL),
-      m_generalScreen(previous),         m_audioDeviceButtonList(NULL),
-      m_speakerNumberButtonList(NULL),   m_dtsCheck(NULL),
-      m_ac3Check(NULL),                  m_eac3Check(NULL),
-      m_truehdCheck(NULL),               m_dtshdCheck(NULL),
-      m_testSpeakerButton(NULL),         m_nextButton(NULL),
-      m_prevButton(NULL),                m_maxspeakers(2),
+      m_outputlist(nullptr),             m_testThread(nullptr),
+      m_generalScreen(previous),         m_audioDeviceButtonList(nullptr),
+      m_speakerNumberButtonList(nullptr),m_dtsCheck(nullptr),
+      m_ac3Check(nullptr),               m_eac3Check(nullptr),
+      m_truehdCheck(nullptr),            m_dtshdCheck(nullptr),
+      m_testSpeakerButton(nullptr),      m_nextButton(nullptr),
+      m_prevButton(nullptr),             m_maxspeakers(2),
       m_lastAudioDevice("")
 {
 }
@@ -257,7 +257,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
 
     int cur_speakers = m_maxspeakers;
 
-    if (m_speakerNumberButtonList->GetItemCurrent() != NULL)
+    if (m_speakerNumberButtonList->GetItemCurrent() != nullptr)
     {
         cur_speakers = m_speakerNumberButtonList->GetItemCurrent()->GetData()
                                       .value<int>();
@@ -423,7 +423,7 @@ void AudioSetupWizard::toggleSpeakers(void)
         m_testThread->cancel();
         m_testThread->wait();
         delete m_testThread;
-        m_testThread = NULL;
+        m_testThread = nullptr;
         m_testSpeakerButton->SetText(tr("Test Speakers"));
         return;
     }
@@ -440,7 +440,7 @@ void AudioSetupWizard::toggleSpeakers(void)
         QString msg = QObject::tr("Audio device is invalid or not useable.");
         ShowOkPopup(msg);
         delete m_testThread;
-        m_testThread = NULL;
+        m_testThread = nullptr;
     }
     else
     {

@@ -27,7 +27,7 @@ class ScheduleCommon : public MythScreenType
     void MakeOverride(RecordingInfo *recinfo);
 
     virtual void customEvent(QEvent*);
-    virtual ProgramInfo *GetCurrentProgram(void) const { return NULL; };
+    virtual ProgramInfo *GetCurrentProgram(void) const { return nullptr; };
 
   public slots:
     virtual void ShowDetails(void) const;

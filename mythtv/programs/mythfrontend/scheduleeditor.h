@@ -33,7 +33,7 @@ class SchedOptMixin
 {
   protected:
     SchedOptMixin(MythScreenType &screen, RecordingRule *rule,
-                  SchedOptMixin *other = NULL);
+                  SchedOptMixin *other = nullptr);
     void SetRule(RecordingRule *rule) { m_rule = rule; };
     void Create(bool *err);
     void Load(void);
@@ -62,7 +62,7 @@ class StoreOptMixin
 {
   protected:
     StoreOptMixin(MythScreenType &screen, RecordingRule *rule,
-                  StoreOptMixin *other = NULL);
+                  StoreOptMixin *other = nullptr);
     void SetRule(RecordingRule *rule) { m_rule = rule; };
     void Create(bool *err);
     void Load(void);
@@ -93,7 +93,7 @@ class PostProcMixin
 {
   protected:
     PostProcMixin(MythScreenType &screen, RecordingRule *rule,
-                  PostProcMixin *other= NULL);
+                  PostProcMixin *other= nullptr);
     void SetRule(RecordingRule *rule) { m_rule = rule; };
     void Create(bool *err);
     void Load(void);
@@ -121,7 +121,7 @@ class FilterOptMixin
 {
   protected:
     FilterOptMixin(MythScreenType &screen, RecordingRule *rule,
-                  FilterOptMixin *other = NULL);
+                  FilterOptMixin *other = nullptr);
     void SetRule(RecordingRule *rule) { m_rule = rule; };
     void Create(bool *err);
     void Load(void);
@@ -148,9 +148,9 @@ class ScheduleEditor : public ScheduleCommon,
   Q_OBJECT
   public:
     ScheduleEditor(MythScreenStack *parent, RecordingInfo* recinfo,
-                   TV *player = NULL);
+                   TV *player = nullptr);
     ScheduleEditor(MythScreenStack *parent, RecordingRule* recrule,
-                   TV *player = NULL);
+                   TV *player = nullptr);
    ~ScheduleEditor();
 
     bool Create(void);
@@ -162,7 +162,7 @@ class ScheduleEditor : public ScheduleCommon,
     void showUpcomingByTitle(void);
 
     /// Callback
-    static void *RunScheduleEditor(ProgramInfo *proginfo, void *player = NULL);
+    static void *RunScheduleEditor(ProgramInfo *proginfo, void *player = nullptr);
 
   signals:
     void ruleSaved(int ruleId);

@@ -51,10 +51,10 @@ StatusBox::StatusBox(MythScreenStack *parent)
 {
     m_minLevel = gCoreContext->GetNumSetting("LogDefaultView",5);
 
-    m_iconState = NULL;
-    m_categoryList = m_logList = NULL;
-    m_helpText = NULL;
-    m_justHelpText = NULL;
+    m_iconState = nullptr;
+    m_categoryList = m_logList = nullptr;
+    m_helpText = nullptr;
+    m_justHelpText = nullptr;
 
     QStringList strlist;
     strlist << "QUERY_IS_ACTIVE_BACKEND";
@@ -254,7 +254,7 @@ void StatusBox::updateLogList(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    disconnect(this, SIGNAL(updateLog()),0,0);
+    disconnect(this, SIGNAL(updateLog()),nullptr,nullptr);
 
     const char *slot = (const char *)item->GetData().value<void*>();
 

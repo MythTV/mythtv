@@ -14,7 +14,7 @@ class PlayerSettings : public MythScreenType
 
   public:
 
-    PlayerSettings(MythScreenStack *parent, const char *name = 0);
+    PlayerSettings(MythScreenStack *parent, const char *name = nullptr);
     ~PlayerSettings();
 
     bool Create(void);

@@ -546,10 +546,10 @@ void VideoFilterSettings::setTextFilter(QString val)
 /////////////////////////////////
 VideoFilterDialog::VideoFilterDialog(MythScreenStack *lparent, QString lname,
         VideoList *video_list) : MythScreenType(lparent, lname),
-    m_browseList(0), m_watchedList(0), m_orderbyList(0), m_yearList(0),
-    m_userratingList(0), m_categoryList(0), m_countryList(0), m_genreList(0),
-    m_castList(0), m_runtimeList(0), m_inetrefList(0), m_coverfileList(0),
-    m_saveButton(0), m_doneButton(0), m_numvideosText(0), m_textfilter(0),
+    m_browseList(nullptr), m_watchedList(nullptr), m_orderbyList(nullptr), m_yearList(nullptr),
+    m_userratingList(nullptr), m_categoryList(nullptr), m_countryList(nullptr), m_genreList(nullptr),
+    m_castList(nullptr), m_runtimeList(nullptr), m_inetrefList(nullptr), m_coverfileList(nullptr),
+    m_saveButton(nullptr), m_doneButton(nullptr), m_numvideosText(nullptr), m_textfilter(nullptr),
     m_videoList(*video_list)
 {
     m_fsp = new BasicFilterSettingsProxy<VideoList>(*video_list);

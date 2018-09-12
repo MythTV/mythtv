@@ -150,10 +150,10 @@ static void WaitUntilDone(MThread &worker)
  */
 GalleryThumbView::GalleryThumbView(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_imageList(NULL),
-      m_captionText(NULL),      m_crumbsText(NULL),     m_emptyText(NULL),
-      m_hideFilterText(NULL),   m_typeFilterText(NULL), m_positionText(NULL),
-      m_scanProgressText(NULL), m_scanProgressBar(NULL),
+      m_imageList(nullptr),
+      m_captionText(nullptr),      m_crumbsText(nullptr),     m_emptyText(nullptr),
+      m_hideFilterText(nullptr),   m_typeFilterText(nullptr), m_positionText(nullptr),
+      m_scanProgressText(nullptr), m_scanProgressBar(nullptr),
       m_zoomWidgets(),          m_zoomLevel(0),
       m_popupStack(*GetMythMainWindow()->GetStack("popup stack")),
       m_mgr(ImageManagerFe::getInstance()),
@@ -1094,7 +1094,7 @@ void GalleryThumbView::MenuMarked(MythMenu *mainMenu)
     if (menu->IsEmpty())
         delete menu;
     else
-        mainMenu->AddItem(tr("Mark"), NULL, menu);
+        mainMenu->AddItem(tr("Mark"), nullptr, menu);
 }
 
 
@@ -1122,7 +1122,7 @@ void GalleryThumbView::MenuPaste(MythMenu *mainMenu)
         menu->AddItem(tr("Move Marked Into"), SLOT(Move()));
         menu->AddItem(tr("Copy Marked Into"), SLOT(Copy()));
 
-        mainMenu->AddItem(tr("Paste"), NULL, menu);
+        mainMenu->AddItem(tr("Paste"), nullptr, menu);
     }
 }
 
@@ -1146,7 +1146,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
         menu->AddItem(tr("Flip Marked Vertical"), SLOT(FlipVerticalMarked()));
         menu->AddItem(tr("Reset Marked to Exif"), SLOT(ResetExifMarked()));
 
-        mainMenu->AddItem(tr("Transforms"), NULL, menu);
+        mainMenu->AddItem(tr("Transforms"), nullptr, menu);
     }
     else if (m_menuState.m_selected->IsFile())
     {
@@ -1158,7 +1158,7 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
         menu->AddItem(tr("Flip Vertical"), SLOT(FlipVertical()));
         menu->AddItem(tr("Reset to Exif"), SLOT(ResetExif()));
 
-        mainMenu->AddItem(tr("Transforms"), NULL, menu);
+        mainMenu->AddItem(tr("Transforms"), nullptr, menu);
     }
 }
 
@@ -1225,7 +1225,7 @@ void GalleryThumbView::MenuAction(MythMenu *mainMenu)
     if (menu->IsEmpty())
         delete menu;
     else
-        mainMenu->AddItem(tr("Actions"), NULL, menu);
+        mainMenu->AddItem(tr("Actions"), nullptr, menu);
 }
 
 
@@ -1265,19 +1265,19 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     MythMenu *orderMenu = new MythMenu(tr("Slideshow Order"), this,
                                        "SlideOrderMenu");
 
-    orderMenu->AddItem(tr("Ordered"),  NULL, NULL, order == kOrdered);
-    orderMenu->AddItem(tr("Shuffled"), NULL, NULL, order == kShuffle);
-    orderMenu->AddItem(tr("Random"),   NULL, NULL, order == kRandom);
-    orderMenu->AddItem(tr("Seasonal"), NULL, NULL, order == kSeasonal);
+    orderMenu->AddItem(tr("Ordered"),  nullptr, nullptr, order == kOrdered);
+    orderMenu->AddItem(tr("Shuffled"), nullptr, nullptr, order == kShuffle);
+    orderMenu->AddItem(tr("Random"),   nullptr, nullptr, order == kRandom);
+    orderMenu->AddItem(tr("Seasonal"), nullptr, nullptr, order == kSeasonal);
 
-    menu->AddItem(tr("Change Order"), NULL, orderMenu);
+    menu->AddItem(tr("Change Order"), nullptr, orderMenu);
 
     if (gCoreContext->GetNumSetting("GalleryRepeat", 0))
         menu->AddItem(tr("Turn Repeat Off"), SLOT(RepeatOff()));
     else
         menu->AddItem(tr("Turn Repeat On"), SLOT(RepeatOn()));
 
-    mainMenu->AddItem(tr("Slideshow"), NULL, menu);
+    mainMenu->AddItem(tr("Slideshow"), nullptr, menu);
 }
 
 
@@ -1303,21 +1303,21 @@ void GalleryThumbView::MenuShow(MythMenu *mainMenu)
     MythMenu *captionMenu = new MythMenu(tr("Image Captions"), this,
                                          "ImageCaptionMenu");
 
-    captionMenu->AddItem(tr("Name"),    NULL, NULL, show == kNameCaption);
-    captionMenu->AddItem(tr("Date"),    NULL, NULL, show == kDateCaption);
-    captionMenu->AddItem(tr("Comment"), NULL, NULL, show == kUserCaption);
-    captionMenu->AddItem(tr("None"),    NULL, NULL, show == kNoCaption);
+    captionMenu->AddItem(tr("Name"),    nullptr, nullptr, show == kNameCaption);
+    captionMenu->AddItem(tr("Date"),    nullptr, nullptr, show == kDateCaption);
+    captionMenu->AddItem(tr("Comment"), nullptr, nullptr, show == kUserCaption);
+    captionMenu->AddItem(tr("None"),    nullptr, nullptr, show == kNoCaption);
 
-    menu->AddItem(tr("Image Captions"), NULL, captionMenu);
+    menu->AddItem(tr("Image Captions"), nullptr, captionMenu);
 
     show = gCoreContext->GetNumSetting("GalleryDirCaption");
     captionMenu = new MythMenu(tr("Directory Captions"), this, "DirCaptionMenu");
 
-    captionMenu->AddItem(tr("Name"), NULL, NULL, show == kNameCaption);
-    captionMenu->AddItem(tr("Date"), NULL, NULL, show == kDateCaption);
-    captionMenu->AddItem(tr("None"), NULL, NULL, show == kNoCaption);
+    captionMenu->AddItem(tr("Name"), nullptr, nullptr, show == kNameCaption);
+    captionMenu->AddItem(tr("Date"), nullptr, nullptr, show == kDateCaption);
+    captionMenu->AddItem(tr("None"), nullptr, nullptr, show == kNoCaption);
 
-    menu->AddItem(tr("Directory Captions"), NULL, captionMenu);
+    menu->AddItem(tr("Directory Captions"), nullptr, captionMenu);
 
     if (m_editsAllowed)
     {
@@ -1337,7 +1337,7 @@ void GalleryThumbView::MenuShow(MythMenu *mainMenu)
 
     menu->AddItem(details, SLOT(ShowDetails()));
 
-    mainMenu->AddItem(tr("Show"), NULL, menu);
+    mainMenu->AddItem(tr("Show"), nullptr, menu);
 }
 
 
@@ -1819,7 +1819,7 @@ void GalleryThumbView::SelectZoomWidget(int change)
     if (m_imageList)
     {
         m_imageList->SetVisible(false);
-        disconnect(m_imageList, 0, this, 0);
+        disconnect(m_imageList, nullptr, this, nullptr);
     }
 
     // initialise new list widget
@@ -1932,7 +1932,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
     else
     {
         delete progress;
-        progress = NULL;
+        progress = nullptr;
     }
 
     // Copy files in a servant thread
@@ -1944,7 +1944,7 @@ void GalleryThumbView::Copy(bool deleteAfter)
         progress->Close();
 
     if (!failed.isEmpty())
-        ShowOkPopup(tr("Failed to copy %L1/%Ln file(s)", 0, transfers.size())
+        ShowOkPopup(tr("Failed to copy %L1/%Ln file(s)", nullptr, transfers.size())
                     .arg(failed.size()));
 
     // Don't update Db for files that failed
@@ -2067,7 +2067,7 @@ void GalleryThumbView::Move()
     else
     {
         delete progress;
-        progress = NULL;
+        progress = nullptr;
     }
 
     // Move files in a servant thread
@@ -2079,7 +2079,7 @@ void GalleryThumbView::Move()
         progress->Close();
 
     if (!failed.isEmpty())
-        ShowOkPopup(tr("Failed to move %L1/%Ln file(s)", 0, transfers.size())
+        ShowOkPopup(tr("Failed to move %L1/%Ln file(s)", nullptr, transfers.size())
                     .arg(failed.size()));
 
     // Don't update Db for files that failed

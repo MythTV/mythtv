@@ -15,7 +15,7 @@ class MetadataSettings : public MythScreenType
 
   public:
 
-    MetadataSettings(MythScreenStack *parent, const char *name = 0);
+    MetadataSettings(MythScreenStack *parent, const char *name = nullptr);
     ~MetadataSettings();
 
     bool Create(void);

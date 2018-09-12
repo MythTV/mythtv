@@ -65,11 +65,11 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_reverseSort(false),
     m_useGenres(false),
 
-    m_schedText(NULL),
-    m_curviewText(NULL),
-    m_positionText(NULL),
-    m_progList(NULL),
-    m_messageText(NULL),
+    m_schedText(nullptr),
+    m_curviewText(nullptr),
+    m_positionText(nullptr),
+    m_progList(nullptr),
+    m_messageText(nullptr),
 
     m_allowViewDialog(true)
 {
@@ -133,11 +133,11 @@ ProgLister::ProgLister(
     m_reverseSort(true),
     m_useGenres(false),
 
-    m_schedText(NULL),
-    m_curviewText(NULL),
-    m_positionText(NULL),
-    m_progList(NULL),
-    m_messageText(NULL),
+    m_schedText(nullptr),
+    m_curviewText(nullptr),
+    m_positionText(nullptr),
+    m_progList(nullptr),
+    m_messageText(nullptr),
 
     m_allowViewDialog(true)
 {
@@ -333,7 +333,7 @@ void ProgLister::ShowMenu(void)
         menu->AddItem(tr("Choose Search Phrase..."), SLOT(ShowChooseViewMenu()));
     }
 
-    menu->AddItem(tr("Sort"), NULL, sortMenu);
+    menu->AddItem(tr("Sort"), nullptr, sortMenu);
 
     if (m_type != plPreviouslyRecorded)
         menu->AddItem(tr("Record"), SLOT(QuickRecord()));
@@ -469,7 +469,7 @@ void ProgLister::ShowChooseViewMenu(void)
 {
     MythScreenStack *popupStack =
         GetMythMainWindow()->GetStack("popup stack");
-    MythScreenType *screen = NULL;
+    MythScreenType *screen = nullptr;
     bool connect_string = true;
 
     switch (m_type)
@@ -631,7 +631,7 @@ ProgramInfo *ProgLister::GetCurrentProgram(void) const
     int pos = m_progList->GetCurrentPos();
     if (pos >= 0 && pos < (int) m_itemList.size())
         return m_itemList[pos];
-    return NULL;
+    return nullptr;
 }
 
 void ProgLister::ShowDeleteItemMenu(void)
@@ -1363,7 +1363,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
 
     ProgramInfo        selected;
-    const ProgramInfo *selectedP = (restorePosition) ? GetCurrentProgram() : NULL;
+    const ProgramInfo *selectedP = (restorePosition) ? GetCurrentProgram() : nullptr;
     if (selectedP)
     {
         selected = *selectedP;

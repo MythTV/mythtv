@@ -340,7 +340,7 @@ PlaybackBoxHelper::~PlaybackBoxHelper()
 {
     // delete the event handler
     m_eventHandler->deleteLater();
-    m_eventHandler = NULL;
+    m_eventHandler = nullptr;
 
     MThread::exit();
     wait();

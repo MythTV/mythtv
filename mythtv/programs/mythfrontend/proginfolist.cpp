@@ -5,7 +5,7 @@
 
 //! Constructor
 ProgInfoList::ProgInfoList(MythScreenType &screen)
-    : m_screen(screen), m_btnList(NULL),
+    : m_screen(screen), m_btnList(nullptr),
       m_infoVisible(kLevel1)
 {
 }

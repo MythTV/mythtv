@@ -56,14 +56,14 @@ MythControls::MythControls(MythScreenStack *parent, const char *name)
     : MythScreenType (parent, name)
 {
     m_currentView = kActionsByContext;
-    m_leftList = m_rightList = NULL;
-    m_description = m_leftDescription = m_rightDescription = NULL;
-    m_bindings = NULL;
+    m_leftList = m_rightList = nullptr;
+    m_description = m_leftDescription = m_rightDescription = nullptr;
+    m_bindings = nullptr;
 
     m_leftListType  = kContextList;
     m_rightListType = kActionList;
 
-    m_menuPopup = NULL;
+    m_menuPopup = nullptr;
 }
 
 MythControls::~MythControls()
@@ -76,7 +76,7 @@ void MythControls::Teardown(void)
     if (m_bindings)
     {
         delete m_bindings;
-        m_bindings = NULL;
+        m_bindings = nullptr;
     }
 
     m_contexts.clear();
@@ -769,7 +769,7 @@ void MythControls::customEvent(QEvent *event)
         }
 
         if (m_menuPopup)
-            m_menuPopup = NULL;
+            m_menuPopup = nullptr;
     }
 
 }

@@ -28,17 +28,17 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
               : MythScreenType(parent, "CustomEdit"),
                 m_maxex(0),
                 m_evaluate(true),
-                m_ruleList(NULL),
-                m_clauseList(NULL),
-                m_titleEdit(NULL),
-                m_descriptionEdit(NULL),
-                m_subtitleEdit(NULL),
-                m_clauseText(NULL),
-                m_testButton(NULL),
-                m_recordButton(NULL),
-                m_storeButton(NULL),
-                m_cancelButton(NULL),
-                m_currentRuleItem(NULL)
+                m_ruleList(nullptr),
+                m_clauseList(nullptr),
+                m_titleEdit(nullptr),
+                m_descriptionEdit(nullptr),
+                m_subtitleEdit(nullptr),
+                m_clauseText(nullptr),
+                m_testButton(nullptr),
+                m_recordButton(nullptr),
+                m_storeButton(nullptr),
+                m_cancelButton(nullptr),
+                m_currentRuleItem(nullptr)
 {
     if (pginfo)
         m_pginfo = new ProgramInfo(*pginfo);
@@ -691,7 +691,7 @@ void CustomEdit::recordClicked(void)
         record->LoadBySearch(kPowerSearch, m_titleEdit->GetText(),
                              evaluate(m_descriptionEdit->GetText()),
                              m_subtitleEdit->GetText(),
-                             m_pginfo->GetTitle().isEmpty() ? NULL : m_pginfo);
+                             m_pginfo->GetTitle().isEmpty() ? nullptr : m_pginfo);
     }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

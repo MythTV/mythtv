@@ -754,7 +754,7 @@ void AudioTestThread::run()
 
 AudioTest::AudioTest()
     : GroupSetting(),
-      m_at(NULL),
+      m_at(nullptr),
       m_quality(false)
 {
     int channels = 2;

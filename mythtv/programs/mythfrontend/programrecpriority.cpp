@@ -400,13 +400,13 @@ class ProgramAvgDelaySort
 ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
                                        const QString &name)
                    : ScheduleCommon(parent, name),
-                     m_programList(NULL), m_schedInfoText(NULL),
-                     m_recPriorityText(NULL),
-                     m_recPriorityBText(NULL), m_finalPriorityText(NULL),
-                     m_lastRecordedText(NULL), m_lastRecordedDateText(NULL),
-                     m_lastRecordedTimeText(NULL), m_channameText(NULL),
-                     m_channumText(NULL), m_callsignText(NULL),
-                     m_recProfileText(NULL), m_currentItem(NULL)
+                     m_programList(nullptr), m_schedInfoText(nullptr),
+                     m_recPriorityText(nullptr),
+                     m_recPriorityBText(nullptr), m_finalPriorityText(nullptr),
+                     m_lastRecordedText(nullptr), m_lastRecordedDateText(nullptr),
+                     m_lastRecordedTimeText(nullptr), m_channameText(nullptr),
+                     m_channumText(nullptr), m_callsignText(nullptr),
+                     m_recProfileText(nullptr), m_currentItem(nullptr)
 {
     m_sortType = (SortType)gCoreContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
@@ -632,7 +632,7 @@ void ProgramRecPriority::showMenu(void)
 
         menuPopup->AddButton(tr("Increase Priority"));
         menuPopup->AddButton(tr("Decrease Priority"));
-        menuPopup->AddButton(tr("Sort"), NULL, true);
+        menuPopup->AddButton(tr("Sort"), nullptr, true);
         menuPopup->AddButton(tr("Program Details"));
         menuPopup->AddButton(tr("Upcoming"));
         menuPopup->AddButton(tr("Custom Edit"));
@@ -918,7 +918,7 @@ void ProgramRecPriority::scheduleChanged(int recid)
 {
     // Assumes that the current item didn't change, which isn't guaranteed
     MythUIButtonListItem *item = m_programList->GetItemCurrent();
-    ProgramRecPriorityInfo *pgRecInfo = NULL;
+    ProgramRecPriorityInfo *pgRecInfo = nullptr;
     if (item)
         pgRecInfo = item->GetData().value<ProgramRecPriorityInfo*>();
 
@@ -1444,7 +1444,7 @@ void ProgramRecPriority::UpdateList()
             m_programList->SetItemCurrent(item);
     }
 
-    m_currentItem = NULL;
+    m_currentItem = nullptr;
 
     MythUIText *norecordingText = dynamic_cast<MythUIText*>
                                                 (GetChild("norecordings_info"));
@@ -1585,7 +1585,7 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
 ProgramInfo *ProgramRecPriority::GetCurrentProgram(void) const
 {
     MythUIButtonListItem *item = m_programList->GetItemCurrent();
-    return item ? item->GetData().value<ProgramRecPriorityInfo*>() : NULL;
+    return item ? item->GetData().value<ProgramRecPriorityInfo*>() : nullptr;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

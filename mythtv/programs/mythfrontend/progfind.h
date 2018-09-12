@@ -18,14 +18,14 @@ class TV;
 class MythUIText;
 class MythUIButtonList;
 
-void RunProgramFinder(TV *player = NULL, bool embedVideo = false, bool allowEPG = true);
+void RunProgramFinder(TV *player = nullptr, bool embedVideo = false, bool allowEPG = true);
 
 class ProgFinder : public ScheduleCommon
 {
     Q_OBJECT
   public:
     explicit ProgFinder(MythScreenStack *parentStack, bool allowEPG = true,
-               TV *player = NULL, bool embedVideo = false);
+               TV *player = nullptr, bool embedVideo = false);
     virtual ~ProgFinder();
 
     bool Create(void);
@@ -89,7 +89,7 @@ class JaProgFinder : public ProgFinder
 {
   public:
     explicit JaProgFinder(MythScreenStack *parentStack, bool gg = false,
-                 TV *player = NULL, bool embedVideo = false);
+                 TV *player = nullptr, bool embedVideo = false);
 
   protected:
     virtual void initAlphabetList();
@@ -107,7 +107,7 @@ class HeProgFinder : public ProgFinder
 {
   public:
     explicit HeProgFinder(MythScreenStack *parentStack, bool gg = false,
-                 TV *player = NULL, bool embedVideo = false);
+                 TV *player = nullptr, bool embedVideo = false);
 
   protected:
     virtual void initAlphabetList();
@@ -125,7 +125,7 @@ class RuProgFinder : public ProgFinder
 {
   public:
     explicit RuProgFinder(MythScreenStack *parentStack, bool gg = false, 
-                       TV *player = NULL, bool embedVideo = false);
+                       TV *player = nullptr, bool embedVideo = false);
                        
   protected:
     virtual void initAlphabetList();

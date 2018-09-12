@@ -3146,7 +3146,7 @@ static HostCheckBoxSetting *AirPlayFullScreen()
 //{
 //    TransLabelSetting *ts = new TransLabelSetting();
 //
-//    if (MythRAOPConnection::LoadKey() == NULL)
+//    if (MythRAOPConnection::LoadKey() == nullptr)
 //    {
 //        ts->setValue(MainGeneralSettings::tr("AirTunes RSA key couldn't be "
 //            "loaded. Check http://www.mythtv.org/wiki/AirTunes/AirPlay. "
@@ -3973,8 +3973,8 @@ void PlaybackSettingsDialog::DeleteProfileItem(void)
 }
 
 PlaybackSettings::PlaybackSettings()
-    : m_newPlaybackProfileButton(NULL),
-      m_playbackProfiles(NULL)
+    : m_newPlaybackProfileButton(nullptr),
+      m_playbackProfiles(nullptr)
 {
     setLabel(tr("Playback settings"));
 }
@@ -4353,7 +4353,7 @@ ChannelGroupSetting::ChannelGroupSetting(const QString &groupName,
                                          int groupId = -1)
     :GroupSetting(),
     m_groupId(groupId),
-    m_groupName(NULL)
+    m_groupName(nullptr)
 {
     setLabel(groupName);//TODO this should be the translated name if Favorite
     setValue(groupName);
@@ -4511,7 +4511,7 @@ void ChannelGroupSetting::deleteEntry(void)
 
 ChannelGroupsSetting::ChannelGroupsSetting()
     : GroupSetting(),
-      m_addGroupButton(NULL)
+      m_addGroupButton(nullptr)
 {
     setLabel(tr("Channel Groups"));
 }
@@ -4548,7 +4548,7 @@ void ChannelGroupsSetting::Load()
     //Load all the groups
     GroupSetting::Load();
     //TODO select the new one or the edited one
-    emit settingsChanged(NULL);
+    emit settingsChanged(nullptr);
 }
 
 

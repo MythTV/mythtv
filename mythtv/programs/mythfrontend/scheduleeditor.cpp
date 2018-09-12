@@ -72,11 +72,11 @@ void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
                                             static_cast<TV*>(player));
 
     if (se->Create())
-        mainStack->AddScreen(se, (player == NULL));
+        mainStack->AddScreen(se, (player == nullptr));
     else
         delete se;
 
-    return NULL;
+    return nullptr;
 }
 
 /** \class ScheduleEditor
@@ -87,16 +87,16 @@ void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
                                RecordingInfo *recInfo, TV *player)
           : ScheduleCommon(parent, "ScheduleEditor"),
-            SchedOptMixin(*this, NULL), FilterOptMixin(*this, NULL),
-            StoreOptMixin(*this, NULL), PostProcMixin(*this, NULL),
-            m_recInfo(new RecordingInfo(*recInfo)), m_recordingRule(NULL),
+            SchedOptMixin(*this, nullptr), FilterOptMixin(*this, nullptr),
+            StoreOptMixin(*this, nullptr), PostProcMixin(*this, nullptr),
+            m_recInfo(new RecordingInfo(*recInfo)), m_recordingRule(nullptr),
             m_sendSig(false),
-            m_saveButton(NULL), m_cancelButton(NULL), m_rulesList(NULL),
-            m_schedOptButton(NULL), m_storeOptButton(NULL),
-            m_postProcButton(NULL), m_schedInfoButton(NULL),
-            m_previewButton(NULL), m_metadataButton(NULL),
-            m_filtersButton(NULL),
-            m_player(player), m_loaded(false), m_view(kMainView), m_child(NULL)
+            m_saveButton(nullptr), m_cancelButton(nullptr), m_rulesList(nullptr),
+            m_schedOptButton(nullptr), m_storeOptButton(nullptr),
+            m_postProcButton(nullptr), m_schedInfoButton(nullptr),
+            m_previewButton(nullptr), m_metadataButton(nullptr),
+            m_filtersButton(nullptr),
+            m_player(player), m_loaded(false), m_view(kMainView), m_child(nullptr)
 {
     m_recordingRule = new RecordingRule();
     m_recordingRule->m_recordID = m_recInfo->GetRecordingRuleID();
@@ -113,14 +113,14 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             FilterOptMixin(*this, recRule),
             StoreOptMixin(*this, recRule),
             PostProcMixin(*this, recRule),
-            m_recInfo(NULL), m_recordingRule(recRule),
+            m_recInfo(nullptr), m_recordingRule(recRule),
             m_sendSig(false),
-            m_saveButton(NULL), m_cancelButton(NULL), m_rulesList(NULL),
-            m_schedOptButton(NULL), m_storeOptButton(NULL),
-            m_postProcButton(NULL), m_schedInfoButton(NULL),
-            m_previewButton(NULL), m_metadataButton(NULL),
-            m_filtersButton(NULL),
-            m_player(player), m_loaded(false), m_view(kMainView), m_child(NULL)
+            m_saveButton(nullptr), m_cancelButton(nullptr), m_rulesList(nullptr),
+            m_schedOptButton(nullptr), m_storeOptButton(nullptr),
+            m_postProcButton(nullptr), m_schedInfoButton(nullptr),
+            m_previewButton(nullptr), m_metadataButton(nullptr),
+            m_filtersButton(nullptr),
+            m_player(player), m_loaded(false), m_view(kMainView), m_child(nullptr)
 {
 }
 
@@ -796,7 +796,7 @@ void ScheduleEditor::ChildClosing(void)
     else if (m_view == kPostProcView)
         PostProcMixin::Load();
 
-    m_child = NULL;
+    m_child = nullptr;
     m_view = kMainView;
 }
 
@@ -885,7 +885,7 @@ SchedEditChild::SchedEditChild(MythScreenStack *parent, const QString &name,
                                RecordingInfo *recInfo)
     : MythScreenType(parent, name),
       m_editor(&editor), m_recordingRule(&rule), m_recInfo(recInfo),
-      m_backButton(NULL), m_saveButton(NULL), m_previewButton(NULL)
+      m_backButton(nullptr), m_saveButton(nullptr), m_previewButton(nullptr)
 {
 }
 
@@ -987,7 +987,7 @@ SchedOptEditor::SchedOptEditor(MythScreenStack *parent,
                                RecordingRule &rule,
                                RecordingInfo *recInfo)
     : SchedEditChild(parent, "ScheduleOptionsEditor", editor, rule, recInfo),
-      SchedOptMixin(*this, &rule, &editor), m_filtersButton(NULL)
+      SchedOptMixin(*this, &rule, &editor), m_filtersButton(nullptr)
 {
 }
 
@@ -1277,12 +1277,12 @@ MetadataOptions::MetadataOptions(MythScreenStack *parent,
                                  RecordingRule &rule,
                                  RecordingInfo *recInfo)
     : SchedEditChild(parent, "MetadataOptions", editor, rule, recInfo),
-      m_busyPopup(NULL), m_fanart(NULL), m_coverart(NULL),
-      m_banner(NULL), m_inetrefEdit(NULL), m_seasonSpin(NULL),
-      m_episodeSpin(NULL), m_queryButton(NULL), m_localFanartButton(NULL),
-      m_localCoverartButton(NULL), m_localBannerButton(NULL),
-      m_onlineFanartButton(NULL), m_onlineCoverartButton(NULL),
-      m_onlineBannerButton(NULL)
+      m_busyPopup(nullptr), m_fanart(nullptr), m_coverart(nullptr),
+      m_banner(nullptr), m_inetrefEdit(nullptr), m_seasonSpin(nullptr),
+      m_episodeSpin(nullptr), m_queryButton(nullptr), m_localFanartButton(nullptr),
+      m_localCoverartButton(nullptr), m_localBannerButton(nullptr),
+      m_onlineFanartButton(nullptr), m_onlineCoverartButton(nullptr),
+      m_onlineBannerButton(nullptr)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -1300,14 +1300,14 @@ MetadataOptions::~MetadataOptions(void)
     {
         m_imageLookup->cancel();
         delete m_imageLookup;
-        m_imageLookup = NULL;
+        m_imageLookup = nullptr;
     }
 
     if (m_imageDownload)
     {
         m_imageDownload->cancel();
         delete m_imageDownload;
-        m_imageDownload = NULL;
+        m_imageDownload = nullptr;
     }
 }
 
@@ -1652,7 +1652,7 @@ void MetadataOptions::OnArtworkSearchDone(MetadataLookup *lookup)
     if (m_busyPopup)
     {
         m_busyPopup->Close();
-        m_busyPopup = NULL;
+        m_busyPopup = nullptr;
     }
 
     VideoArtworkType type = lookup->GetData().value<VideoArtworkType>();
@@ -1735,7 +1735,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         MetadataFactoryMultiResult *mfmr = dynamic_cast<MetadataFactoryMultiResult*>(levent);
@@ -1801,7 +1801,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         MetadataFactorySingleResult *mfsr = dynamic_cast<MetadataFactorySingleResult*>(levent);
@@ -1821,7 +1821,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         MetadataFactoryNoResult *mfnr = dynamic_cast<MetadataFactoryNoResult*>(levent);
@@ -1844,7 +1844,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         MetadataLookupEvent *lue = (MetadataLookupEvent *)levent;
@@ -1864,7 +1864,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         MetadataLookupFailure *luf = (MetadataLookupFailure *)levent;
@@ -1890,7 +1890,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
 
         ImageDLEvent *ide = (ImageDLEvent *)levent;
@@ -1907,7 +1907,7 @@ void MetadataOptions::customEvent(QEvent *levent)
         if (m_busyPopup)
         {
             m_busyPopup->Close();
-            m_busyPopup = NULL;
+            m_busyPopup = nullptr;
         }
         MythErrorNotification n(tr("Failed to retrieve image(s)"),
                                 tr("Schedule Editor"),
@@ -1952,9 +1952,9 @@ void MetadataOptions::customEvent(QEvent *levent)
 
 SchedOptMixin::SchedOptMixin(MythScreenType &screen, RecordingRule *rule,
                              SchedOptMixin *other)
-    : m_prioritySpin(NULL), m_startoffsetSpin(NULL), m_endoffsetSpin(NULL),
-      m_dupmethodList(NULL), m_dupscopeList(NULL), m_inputList(NULL),
-      m_ruleactiveCheck(NULL), m_newrepeatList(NULL),
+    : m_prioritySpin(nullptr), m_startoffsetSpin(nullptr), m_endoffsetSpin(nullptr),
+      m_dupmethodList(nullptr), m_dupscopeList(nullptr), m_inputList(nullptr),
+      m_ruleactiveCheck(nullptr), m_newrepeatList(nullptr),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false),
       m_haveRepeats(gCoreContext->GetNumSetting("HaveRepeats", 0))
 {
@@ -2216,7 +2216,7 @@ void SchedOptMixin::DupMethodChanged(MythUIButtonListItem *item)
 
 FilterOptMixin::FilterOptMixin(MythScreenType &screen, RecordingRule *rule,
                          FilterOptMixin *other)
-    : m_filtersList(NULL), m_activeFiltersList(NULL),
+    : m_filtersList(nullptr), m_activeFiltersList(nullptr),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false)
 {
 }
@@ -2350,9 +2350,9 @@ void FilterOptMixin::ToggleSelected(MythUIButtonListItem *item)
 
 StoreOptMixin::StoreOptMixin(MythScreenType &screen, RecordingRule *rule,
                              StoreOptMixin *other)
-    : m_recprofileList(NULL), m_recgroupList(NULL), m_storagegroupList(NULL),
-      m_playgroupList(NULL), m_maxepSpin(NULL), m_maxbehaviourList(NULL),
-      m_autoexpireCheck(NULL),
+    : m_recprofileList(nullptr), m_recgroupList(nullptr), m_storagegroupList(nullptr),
+      m_playgroupList(nullptr), m_maxepSpin(nullptr), m_maxbehaviourList(nullptr),
+      m_autoexpireCheck(nullptr),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false)
 {
 }
@@ -2692,10 +2692,10 @@ int StoreOptMixin::CreateRecordingGroup(const QString& groupName)
 
 PostProcMixin::PostProcMixin(MythScreenType &screen, RecordingRule *rule,
                              PostProcMixin *other)
-    : m_commflagCheck(NULL), m_transcodeCheck(NULL),
-      m_transcodeprofileList(NULL), m_userjob1Check(NULL),
-      m_userjob2Check(NULL), m_userjob3Check(NULL), m_userjob4Check(NULL),
-      m_metadataLookupCheck(NULL),
+    : m_commflagCheck(nullptr), m_transcodeCheck(nullptr),
+      m_transcodeprofileList(nullptr), m_userjob1Check(nullptr),
+      m_userjob2Check(nullptr), m_userjob3Check(nullptr), m_userjob4Check(nullptr),
+      m_metadataLookupCheck(nullptr),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false)
 {
 }
@@ -2781,7 +2781,7 @@ void PostProcMixin::Load(void)
     {
         if (!m_loaded)
         {
-        MythUIText *userjob1Text = NULL;
+        MythUIText *userjob1Text = nullptr;
         UIUtilW::Assign(m_screen, userjob1Text, "userjob1text");
         if (userjob1Text)
             userjob1Text->SetText(QObject::tr("Run '%1'")
@@ -2795,7 +2795,7 @@ void PostProcMixin::Load(void)
     {
         if (!m_loaded)
         {
-        MythUIText *userjob2Text = NULL;
+        MythUIText *userjob2Text = nullptr;
         UIUtilW::Assign(m_screen, userjob2Text, "userjob2text");
         if (userjob2Text)
             userjob2Text->SetText(QObject::tr("Run '%1'")
@@ -2809,7 +2809,7 @@ void PostProcMixin::Load(void)
     {
         if (!m_loaded)
         {
-        MythUIText *userjob3Text = NULL;
+        MythUIText *userjob3Text = nullptr;
         UIUtilW::Assign(m_screen, userjob3Text, "userjob3text");
         if (userjob3Text)
             userjob3Text->SetText(QObject::tr("Run '%1'")
@@ -2823,7 +2823,7 @@ void PostProcMixin::Load(void)
     {
         if (!m_loaded)
         {
-        MythUIText *userjob4Text = NULL;
+        MythUIText *userjob4Text = nullptr;
         UIUtilW::Assign(m_screen, userjob4Text, "userjob4text");
         if (userjob4Text)
             userjob4Text->SetText(QObject::tr("Run '%1'")

@@ -28,12 +28,12 @@ const QString VIDEO_SAMPLE_SD_FILENAME =
 VideoSetupWizard::VideoSetupWizard(MythScreenStack *parent,
                                    MythScreenType *general,
                                    MythScreenType *audio, const char *name)
-    : MythScreenType(parent, name),      m_downloadFile(QString()),
+    : MythScreenType(parent, name),         m_downloadFile(QString()),
       m_testType(ttNone),
-      m_generalScreen(general),          m_audioScreen(audio),
-      m_playbackProfileButtonList(NULL), m_progressDialog(NULL),
-          m_testSDButton(NULL),              m_testHDButton(NULL),
-          m_nextButton(NULL),                m_prevButton(NULL)
+      m_generalScreen(general),             m_audioScreen(audio),
+      m_playbackProfileButtonList(nullptr), m_progressDialog(nullptr),
+      m_testSDButton(nullptr),              m_testHDButton(nullptr),
+      m_nextButton(nullptr),                m_prevButton(nullptr)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_vdp = new VideoDisplayProfile();
@@ -124,13 +124,13 @@ void VideoSetupWizard::slotNext(void)
     if (m_audioScreen)
     {
         m_audioScreen->Close();
-        m_audioScreen = NULL;
+        m_audioScreen = nullptr;
     }
 
     if (m_generalScreen)
     {
         m_generalScreen->Close();
-        m_generalScreen = NULL;
+        m_generalScreen = nullptr;
     }
 
     Close();
@@ -233,7 +233,7 @@ void VideoSetupWizard::initProgressDialog()
     else
     {
         delete m_progressDialog;
-        m_progressDialog = NULL;
+        m_progressDialog = nullptr;
     }
 }
 
