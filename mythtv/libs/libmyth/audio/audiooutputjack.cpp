@@ -42,7 +42,7 @@ using namespace std;
 AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     AudioOutputBase(settings),
     client(nullptr), stale_client(nullptr),
-    jack_latency(0), jack_underrun(false), jack_xruns(0), aubuf(nullptr)
+    jack_latency(0), jack_xruns(0), aubuf(nullptr)
 {
     for (int i = 0; i < JACK_CHANNELS_MAX; i++)
         ports[i] = nullptr;
