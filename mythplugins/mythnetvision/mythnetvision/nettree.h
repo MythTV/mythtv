@@ -43,7 +43,7 @@ class NetTree : public NetBase
   Q_OBJECT
 
   public:
-    NetTree(DialogType type, MythScreenStack *parent, const char *name = 0);
+    NetTree(DialogType type, MythScreenStack *parent, const char *name = nullptr);
     ~NetTree();
 
     bool Create(void);

@@ -24,8 +24,8 @@ using namespace std;
 #include <mythcommandlineparser.h>
 #include <mythlogging.h>
 
-GrabberDownloadThread *gdt = 0;
-RSSManager *rssMan = 0;
+GrabberDownloadThread *gdt = nullptr;
+RSSManager *rssMan = nullptr;
 
 class MPUBLIC MythFillNVCommandLineParser : public MythCommandLineParser
 {
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     {
         QEventLoop treeloop;
 
-        gdt = new GrabberDownloadThread(NULL);
+        gdt = new GrabberDownloadThread(nullptr);
         if (refreshall)
             gdt->refreshAll();
         gdt->start();

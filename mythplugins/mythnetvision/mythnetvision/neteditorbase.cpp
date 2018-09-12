@@ -24,11 +24,11 @@
 NetEditorBase::NetEditorBase(MythScreenStack *parent,
                              const QString &name) :
     MythScreenType(parent, name),
-    m_grabbers(NULL),
-    m_busyPopup(NULL),
+    m_grabbers(nullptr),
+    m_busyPopup(nullptr),
     m_popupStack(),
-    m_manager(NULL),
-    m_reply(NULL),
+    m_manager(nullptr),
+    m_reply(nullptr),
     m_changed(false)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -40,7 +40,7 @@ NetEditorBase::~NetEditorBase()
     {
         m_manager->disconnect();
         m_manager->deleteLater();
-        m_manager = NULL;
+        m_manager = nullptr;
     }
 
     qDeleteAll(m_grabberList);
@@ -166,7 +166,7 @@ void NetEditorBase::ParsedData()
     if (m_busyPopup)
     {
         m_busyPopup->Close();
-        m_busyPopup = NULL;
+        m_busyPopup = nullptr;
     }
 
     FillGrabberButtonList();
@@ -187,7 +187,7 @@ void NetEditorBase::CreateBusyDialog(QString title)
     else
     {
         delete m_busyPopup;
-        m_busyPopup = NULL;
+        m_busyPopup = nullptr;
     }
 }
 

@@ -54,14 +54,14 @@ RSSEditPopup::RSSEditPopup(
     const QString &url, bool edit,
     MythScreenStack *parent, const QString &name) :
     MythScreenType(parent, name),
-    m_site(NULL),
+    m_site(nullptr),
     m_urlText(url),        m_editing(edit),
-    m_thumbImage(NULL),    m_thumbButton(NULL),
-    m_urlEdit(NULL),       m_titleEdit(NULL),
-    m_descEdit(NULL),      m_authorEdit(NULL),
-    m_okButton(NULL),      m_cancelButton(NULL),
-    m_download(NULL),      m_manager(NULL),
-    m_reply(NULL)
+    m_thumbImage(nullptr), m_thumbButton(nullptr),
+    m_urlEdit(nullptr),    m_titleEdit(nullptr),
+    m_descEdit(nullptr),   m_authorEdit(nullptr),
+    m_okButton(nullptr),   m_cancelButton(nullptr),
+    m_download(nullptr),   m_manager(nullptr),
+    m_reply(nullptr)
 {
 }
 
@@ -71,7 +71,7 @@ RSSEditPopup::~RSSEditPopup()
     {
         m_manager->disconnect();
         m_manager->deleteLater();
-        m_manager = NULL;
+        m_manager = nullptr;
     }
 }
 
@@ -332,8 +332,8 @@ void RSSEditPopup::customEvent(QEvent *levent)
 
 RSSEditor::RSSEditor(MythScreenStack *parent, const QString &name) :
     MythScreenType(parent, name), m_lock(QMutex::Recursive),
-    m_changed(false), m_sites(NULL), m_new(NULL), m_delete(NULL), m_edit(NULL),
-    m_image(NULL), m_title(NULL), m_url(NULL), m_desc(NULL), m_author(NULL)
+    m_changed(false), m_sites(nullptr), m_new(nullptr), m_delete(nullptr), m_edit(nullptr),
+    m_image(nullptr), m_title(nullptr), m_url(nullptr), m_desc(nullptr), m_author(nullptr)
 {
 }
 

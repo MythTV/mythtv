@@ -20,8 +20,8 @@
 
 using namespace std;
 
-GrabberManager *grabMan = 0;
-RSSManager *rssMan = 0;
+GrabberManager *grabMan = nullptr;
+RSSManager *rssMan = nullptr;
 
 static int RunNetVision(void)
 {
