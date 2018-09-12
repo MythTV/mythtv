@@ -34,13 +34,13 @@ MythNewsEditor::MythNewsEditor(NewsSite *site, bool edit,
     m_site(site),
     m_siteName((edit && site) ? site->name() : QString()),
     m_editing(edit),
-    m_titleText(NULL),     m_nameLabelText(NULL),
-    m_urlLabelText(NULL),  m_iconLabelText(NULL),
-    m_podcastLabelText(NULL),
-    m_nameEdit(NULL),      m_urlEdit(NULL),
-    m_iconEdit(NULL),
-    m_okButton(NULL),      m_cancelButton(NULL),
-    m_podcastCheck(NULL)
+    m_titleText(nullptr),     m_nameLabelText(nullptr),
+    m_urlLabelText(nullptr),  m_iconLabelText(nullptr),
+    m_podcastLabelText(nullptr),
+    m_nameEdit(nullptr),      m_urlEdit(nullptr),
+    m_iconEdit(nullptr),
+    m_okButton(nullptr),      m_cancelButton(nullptr),
+    m_podcastCheck(nullptr)
 {
 }
 
