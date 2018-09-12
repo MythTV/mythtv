@@ -13,7 +13,7 @@ bool dash_open(QFile &file, const QString &filename, int m, FILE *handle)
     bool retval = false;
     if (filename == "-")
     {
-        if (handle == NULL)
+        if (handle == nullptr)
         {
             handle = stdout;
             if (m & QIODevice::ReadOnly)

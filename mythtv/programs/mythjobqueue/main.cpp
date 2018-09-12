@@ -40,14 +40,14 @@
 
 using namespace std;
 
-JobQueue *jobqueue = NULL;
+JobQueue *jobqueue = nullptr;
 QString   pidfile;
 QString   logfile;
 
 static void cleanup(void)
 {
     delete gContext;
-    gContext = NULL;
+    gContext = nullptr;
 
     if (pidfile.size())
     {

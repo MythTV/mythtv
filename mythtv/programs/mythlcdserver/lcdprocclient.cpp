@@ -42,7 +42,7 @@
 int lcdStartCol = LCD_START_COL;
 
 LCDProcClient::LCDProcClient(LCDServer *lparent)
-              : QObject(NULL),
+              : QObject(nullptr),
                 m_socket(new QTcpSocket(this)),
                 m_timeTimer (new QTimer(this)),
                 m_scrollWTimer (new QTimer(this)),

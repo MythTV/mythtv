@@ -27,7 +27,7 @@ using namespace std;
 
 Streamer::Streamer(Commands *parent, const QString &fname,
                    int data_rate, bool loopinput) :
-    m_parent(parent), m_fileName(fname), m_file(NULL), m_loop(loopinput),
+    m_parent(parent), m_fileName(fname), m_file(nullptr), m_loop(loopinput),
     m_bufferMax(188 * 100000), m_blockSize(m_bufferMax / 4),
     m_data_rate(data_rate), m_data_read(0)
 {
@@ -60,7 +60,7 @@ void Streamer::CloseFile(void)
     if (m_file)
     {
         delete m_file;
-        m_file = NULL;
+        m_file = nullptr;
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Streamer::Close -- end");
@@ -154,7 +154,7 @@ void Streamer::SendBytes(void)
 }
 
 
-Commands::Commands(void) : m_streamer(NULL), m_timeout(10), m_run(true),
+Commands::Commands(void) : m_streamer(nullptr), m_timeout(10), m_run(true),
     m_eof(false)
 {
     setObjectName("Command");
@@ -360,8 +360,8 @@ bool Commands::Run(const QString & filename, int data_rate, bool loopinput)
                     streamThread->quit();
                     streamThread->wait();
                     delete streamThread;
-                    streamThread = NULL;
-                    m_streamer = NULL;
+                    streamThread = nullptr;
+                    m_streamer = nullptr;
                     m_run = false;
                 }
             }

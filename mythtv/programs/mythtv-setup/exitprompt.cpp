@@ -69,7 +69,7 @@ void ExitPrompter::handleExit()
     {
         problems.push_back(QString());
         problems.push_back(tr("Do you want to go back and fix this(these) "
-                              "problem(s)?", 0, problems.size()));
+                              "problem(s)?", nullptr, problems.size()));
 
         MythDialogBox *dia = new MythDialogBox(problems.join("\n"),
                                                 m_d->stk, "exit prompt");

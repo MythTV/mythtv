@@ -65,9 +65,9 @@ class FillData
     bool GrabDDData(Source source, int poffset,
                     QDate pdate, int ddSource);
     bool GrabDataFromFile(int id, QString &filename);
-    bool GrabData(Source source, int offset, QDate *qCurrentDate = 0);
+    bool GrabData(Source source, int offset, QDate *qCurrentDate = nullptr);
     bool GrabDataFromDDFile(int id, int offset, const QString &filename,
-                            const QString &lineupid, QDate *qCurrentDate = 0);
+                            const QString &lineupid, QDate *qCurrentDate = nullptr);
     bool Run(SourceList &sourcelist);
 
     enum

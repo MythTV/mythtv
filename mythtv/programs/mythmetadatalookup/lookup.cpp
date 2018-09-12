@@ -246,7 +246,7 @@ void LookerUpper::customEvent(QEvent *levent)
         if (list.count() > 1)
         {
             int yearindex = -1;
-            MetadataLookup *exactTitleMeta = NULL;
+            MetadataLookup *exactTitleMeta = nullptr;
             QDate exactTitleDate;
             float exactTitlePopularity = 0.0;
             bool foundMatchWithArt = false;
@@ -267,7 +267,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     // so if none are found so far in the search, pick the most recently
                     // released entry with artwork. Also, if the first exact match had
                     // no artwork, prefer any later exact match with artwork.
-                    if ((exactTitleMeta == NULL) ||
+                    if ((exactTitleMeta == nullptr) ||
                         (hasArtwork &&
                          ((!foundMatchWithArt) ||
                           ((list[p]->GetPopularity() > exactTitlePopularity)) ||
@@ -320,7 +320,7 @@ void LookerUpper::customEvent(QEvent *levent)
                 return;
             }
 
-            if (exactTitleMeta != NULL)
+            if (exactTitleMeta != nullptr)
             {
                 LOG(VB_GENERAL, LOG_INFO, QString("Best match released %1").arg(exactTitleDate.toString()));
                 MetadataLookup *lookup = exactTitleMeta;

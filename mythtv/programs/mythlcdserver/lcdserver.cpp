@@ -79,12 +79,12 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
     :QObject(),
      m_lcd(new LCDProcClient(this)),
      m_serverPool(new ServerPool()),
-     m_lastSocket(NULL)
+     m_lastSocket(nullptr)
 {
     if (!m_lcd->SetupLCD())
     {
         delete m_lcd;
-        m_lcd = NULL;
+        m_lcd = nullptr;
     }
 
     connect(m_serverPool, SIGNAL(newConnection(QTcpSocket*)),
@@ -129,7 +129,7 @@ void LCDServer::endConnection(void)
     }
 
     if (m_lastSocket == socket)
-        m_lastSocket = NULL;
+        m_lastSocket = nullptr;
 }
 
 void LCDServer::readSocket()
@@ -279,7 +279,7 @@ void LCDServer::shutDown()
     m_serverPool->disconnect();
     m_serverPool->close();
     delete m_serverPool;
-    m_serverPool = NULL;
+    m_serverPool = nullptr;
 
     exit(0);
 }

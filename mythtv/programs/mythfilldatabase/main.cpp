@@ -39,7 +39,7 @@ namespace
     void cleanup()
     {
         delete gContext;
-        gContext = NULL;
+        gContext = nullptr;
         SignalHandler::Done();
     }
 }
@@ -671,9 +671,9 @@ int main(int argc, char *argv[])
         if (query.exec() && query.next())
         {
             if (query.value(0).toInt() != 0)
-                gCoreContext->SaveSettingOnHost("HaveRepeats", "1", NULL);
+                gCoreContext->SaveSettingOnHost("HaveRepeats", "1", nullptr);
             else
-                gCoreContext->SaveSettingOnHost("HaveRepeats", "0", NULL);
+                gCoreContext->SaveSettingOnHost("HaveRepeats", "0", nullptr);
         }
     }
 

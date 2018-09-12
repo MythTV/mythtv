@@ -44,7 +44,7 @@ QString   logfile  = "";
 static void cleanup(void)
 {
     delete gContext;
-    gContext = NULL;
+    gContext = nullptr;
 
     if (pidfile.size())
     {

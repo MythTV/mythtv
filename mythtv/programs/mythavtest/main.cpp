@@ -35,7 +35,7 @@ class VideoPerformanceTest
     VideoPerformanceTest(const QString &filename, bool novsync, bool onlydecode,
                          int runfor, bool deint)
       : file(filename), novideosync(novsync), decodeonly(onlydecode),
-        secondstorun(runfor), deinterlace(deint), ctx(NULL)
+        secondstorun(runfor), deinterlace(deint), ctx(nullptr)
     {
         if (secondstorun < 1)
             secondstorun = 1;
@@ -63,7 +63,7 @@ class VideoPerformanceTest
         ctx->SetRingBuffer(rb);
         ctx->SetPlayer(mp);
         ctx->SetPlayingInfo(new ProgramInfo(file));
-        mp->SetPlayerInfo(NULL, GetMythMainWindow(), ctx);
+        mp->SetPlayerInfo(nullptr, GetMythMainWindow(), ctx);
         FrameScanType scan = deinterlace ? kScan_Interlaced : kScan_Progressive;
         if (!mp->StartPlaying())
         {
@@ -124,8 +124,8 @@ class VideoPerformanceTest
 
             if (!decodeonly)
             {
-                vo->ProcessFrame(frame, NULL, NULL, dummy, scan);
-                vo->PrepareFrame(frame, scan, NULL);
+                vo->ProcessFrame(frame, nullptr, nullptr, dummy, scan);
+                vo->PrepareFrame(frame, scan, nullptr);
                 vo->Show(scan);
             }
             vo->DoneDisplayingFrame(frame);
@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
 
         if (filename.isEmpty())
         {
-            TV::StartTV(NULL, kStartTVNoFlags);
+            TV::StartTV(nullptr, kStartTVNoFlags);
         }
         else
         {

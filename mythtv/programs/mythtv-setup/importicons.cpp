@@ -28,11 +28,11 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_strChannelname(channelname), m_fRefresh(fRefresh),
     m_nMaxCount(0),                m_nCount(0),
     m_missingMaxCount(0),          m_missingCount(0),
-    m_url("http://services.mythtv.org/channel-icon/"), m_progressDialog(NULL),
-    m_iconsList(NULL),             m_manualEdit(NULL),
-    m_nameText(NULL),              m_manualButton(NULL),
-    m_skipButton(NULL),            m_statusText(NULL),
-    m_preview(NULL),               m_previewtitle(NULL)
+    m_url("http://services.mythtv.org/channel-icon/"), m_progressDialog(nullptr),
+    m_iconsList(nullptr),          m_manualEdit(nullptr),
+    m_nameText(nullptr),           m_manualButton(nullptr),
+    m_skipButton(nullptr),         m_statusText(nullptr),
+    m_preview(nullptr),            m_previewtitle(nullptr)
 {
     m_strChannelname.detach();
     if (!m_strChannelname.isEmpty())
@@ -325,7 +325,7 @@ bool ImportIconsWizard::initialLoad(QString name)
         else
         {
             delete m_progressDialog;
-            m_progressDialog = NULL;
+            m_progressDialog = nullptr;
         }
 
         while(query.next())
@@ -380,7 +380,7 @@ bool ImportIconsWizard::initialLoad(QString name)
         if (m_progressDialog)
         {
             m_progressDialog->Close();
-            m_progressDialog = NULL;
+            m_progressDialog = nullptr;
         }
     }
 
@@ -399,7 +399,7 @@ bool ImportIconsWizard::initialLoad(QString name)
     else
     {
         delete m_progressDialog;
-        m_progressDialog = NULL;
+        m_progressDialog = nullptr;
     }
 
     /*: %1 is the current channel position,
@@ -440,7 +440,7 @@ bool ImportIconsWizard::initialLoad(QString name)
     if (m_progressDialog)
     {
         m_progressDialog->Close();
-        m_progressDialog = NULL;
+        m_progressDialog = nullptr;
     }
 
     if (m_missingEntries.size() == 0 || closeDialog)

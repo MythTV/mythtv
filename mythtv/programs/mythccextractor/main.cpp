@@ -26,7 +26,7 @@ namespace {
     void cleanup()
     {
         delete gContext;
-        gContext = NULL;
+        gContext = nullptr;
         SignalHandler::Done();
     }
 }
@@ -77,7 +77,7 @@ static int RunCCExtract(const ProgramInfo &program_info, const QString & destdir
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(ccp);
 
-    ccp->SetPlayerInfo(NULL, NULL, ctx);
+    ccp->SetPlayerInfo(nullptr, nullptr, ctx);
     if (ccp->OpenFile() < 0)
     {
         cerr << "Failed to open " << qPrintable(filename) << endl;

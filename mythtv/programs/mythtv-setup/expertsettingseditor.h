@@ -10,7 +10,7 @@ class ExpertSettingsEditor : public RawSettingsEditor
     Q_OBJECT
 
   public:
-    ExpertSettingsEditor(MythScreenStack *parent, const char *name = 0)
+    ExpertSettingsEditor(MythScreenStack *parent, const char *name = nullptr)
       : RawSettingsEditor(parent, name)
     {
         MSqlQuery query(MSqlQuery::InitCon());

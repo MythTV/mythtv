@@ -34,7 +34,7 @@ namespace
     void cleanup()
     {
         delete gContext;
-        gContext = NULL;
+        gContext = nullptr;
         SignalHandler::Done();
     }
 }

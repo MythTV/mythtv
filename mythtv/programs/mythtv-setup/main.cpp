@@ -51,8 +51,8 @@
 
 using namespace std;
 
-ExitPrompter   *exitPrompt  = NULL;
-StartPrompter  *startPrompt = NULL;
+ExitPrompter   *exitPrompt  = nullptr;
+StartPrompter  *startPrompt = nullptr;
 
 static MythThemedMenu *menu;
 static QString  logfile;
@@ -62,7 +62,7 @@ static void cleanup()
     DestroyMythMainWindow();
 
     delete gContext;
-    gContext = NULL;
+    gContext = nullptr;
 
     delete qApp;
 
@@ -193,7 +193,7 @@ static bool RunMenu(QString themedir, QString themename)
 
     LOG(VB_GENERAL, LOG_ERR, QString("Couldn't use theme '%1'").arg(themename));
     delete menu;
-    menu = NULL;
+    menu = nullptr;
 
     return false;
 }
@@ -612,7 +612,7 @@ int main(int argc, char *argv[])
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
         return GENERIC_EXIT_NO_THEME;
 
-    ExpertSettingsEditor *expertEditor = NULL;
+    ExpertSettingsEditor *expertEditor = nullptr;
     if (expertMode)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -623,7 +623,7 @@ int main(int argc, char *argv[])
         else
         {
             delete expertEditor;
-            expertEditor = NULL;
+            expertEditor = nullptr;
             LOG(VB_GENERAL, LOG_ERR,
                 "Unable to create expert settings editor window");
             return GENERIC_EXIT_OK;

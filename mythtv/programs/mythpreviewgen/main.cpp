@@ -66,7 +66,7 @@ namespace
     void cleanup()
     {
         delete gContext;
-        gContext = NULL;
+        gContext = nullptr;
         SignalHandler::Done();
     }
 }
@@ -83,7 +83,7 @@ int preview_helper(uint chanid, QDateTime starttime,
     if (!QFileInfo(infile).isReadable() && (!chanid || !starttime.isValid()))
         ProgramInfo::QueryKeyFromPathname(infile, chanid, starttime);
 
-    ProgramInfo *pginfo = NULL;
+    ProgramInfo *pginfo = nullptr;
     if (chanid && starttime.isValid())
     {
         pginfo = new ProgramInfo(chanid, starttime);
