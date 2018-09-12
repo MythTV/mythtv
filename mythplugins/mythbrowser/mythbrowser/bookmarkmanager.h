@@ -34,7 +34,7 @@ class BrowserConfig : public MythScreenType
 
   public:
 
-    BrowserConfig(MythScreenStack *parent, const char *name = 0);
+    BrowserConfig(MythScreenStack *parent, const char *name = nullptr);
     ~BrowserConfig();
 
     bool Create(void);

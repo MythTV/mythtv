@@ -25,10 +25,10 @@ using namespace std;
 
 BrowserConfig::BrowserConfig(MythScreenStack *parent, const char *name) :
     MythScreenType(parent, name),
-    m_commandEdit(NULL),     m_zoomEdit(NULL),
-    m_descriptionText(NULL), m_titleText(NULL),
-    m_enablePluginsCheck(NULL),
-    m_okButton(NULL),        m_cancelButton(NULL)
+    m_commandEdit(nullptr),     m_zoomEdit(nullptr),
+    m_descriptionText(nullptr), m_titleText(nullptr),
+    m_enablePluginsCheck(nullptr),
+    m_okButton(nullptr),        m_cancelButton(nullptr)
 {
 }
 
@@ -144,10 +144,10 @@ void BrowserConfig::slotFocusChanged(void)
 BookmarkManager::BookmarkManager(MythScreenStack *parent, const char *name)
                : MythScreenType(parent, name)
 {
-    m_bookmarkList = NULL;
-    m_groupList = NULL;
-    m_messageText = NULL;
-    m_menuPopup = NULL;
+    m_bookmarkList = nullptr;
+    m_groupList = nullptr;
+    m_messageText = nullptr;
+    m_menuPopup = nullptr;
 }
 
 bool BookmarkManager::Create(void)
@@ -282,7 +282,7 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
             if (!m_menuPopup->Create())
             {
                 delete m_menuPopup;
-                m_menuPopup = NULL;
+                m_menuPopup = nullptr;
                 return true;
             }
 
@@ -408,7 +408,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
 
 void BookmarkManager::ShowEditDialog(bool edit)
 {
-    Bookmark *site = NULL;
+    Bookmark *site = nullptr;
 
     if (edit)
     {

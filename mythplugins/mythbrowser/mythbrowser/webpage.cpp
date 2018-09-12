@@ -68,13 +68,13 @@ WebPage::~WebPage()
     {
         m_browser->disconnect();
         m_parent->DeleteChild(m_browser);
-        m_browser = NULL;
+        m_browser = nullptr;
     }
 
     if (m_listItem)
     {
         delete m_listItem;
-        m_listItem = NULL;
+        m_listItem = nullptr;
     }
 }
 
@@ -127,7 +127,7 @@ void WebPage::slotLoadStarted(void)
 {
     m_listItem->SetText(tr("Loading..."));
     m_listItem->DisplayState("loading", "loadingstate");
-    m_listItem->SetImage(NULL, "favicon");
+    m_listItem->SetImage(nullptr, "favicon");
     m_listItem->SetImage("", "favicon");
 
     m_parent->m_pageList->Update();
