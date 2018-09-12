@@ -103,9 +103,9 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
       m_effect_cube_yrot(0.0f),
       m_effect_cube_zrot(0.0f),
       m_effect_kenBurns_image_timeout(0.0f),
-      m_effect_kenBurns_imageLoadThread(NULL),
+      m_effect_kenBurns_imageLoadThread(nullptr),
       m_effect_kenBurns_image_ready(true),
-      m_effect_kenBurns_item(NULL),
+      m_effect_kenBurns_item(nullptr),
       m_effect_kenBurns_initialized(false),
       m_effect_kenBurns_new_image_started(true)
 {
@@ -175,7 +175,7 @@ void GLSingleView::CleanUp(void)
     {
         m_slideshow_timer->stop();
         m_slideshow_timer->deleteLater();
-        m_slideshow_timer = NULL;
+        m_slideshow_timer = nullptr;
     }
 
     m_texItem[0].Deinit();
@@ -446,7 +446,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             ThumbItem *item = getCurrentItem();
             if (item && GalleryUtil::Delete(item->GetPath()))
             {
-                item->SetPixmap(NULL);
+                item->SetPixmap(nullptr);
                 DisplayNext(true, true);
             }
             m_info_show = wasInfo;
@@ -1251,7 +1251,7 @@ void GLSingleView::EffectKenBurns(void)
     {
 
         m_effect_kenBurns_initialized = !m_effect_kenBurns_initialized;
-        m_effect_kenBurns_item = NULL;
+        m_effect_kenBurns_item = nullptr;
         // Need to load images in the background to keep effect smooth
         m_effect_kenBurns_imageLoadThread = new KenBurnsImageLoader(this, m_texSize, m_screenSize);
         //Since total image time is longer/different than effect time, create image timers

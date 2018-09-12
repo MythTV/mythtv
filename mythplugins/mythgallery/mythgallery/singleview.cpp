@@ -55,24 +55,24 @@ SingleView::SingleView(
       ImageView(itemList, pos, slideShow, sortorder),
 
       // General
-      m_pixmap(NULL),
+      m_pixmap(nullptr),
       m_angle(0),
       m_source_loc(0,0),
       m_scaleMax(kScaleToFit),
 
       // Info variables
-      m_info_pixmap(NULL),
+      m_info_pixmap(nullptr),
 
       // Caption variables
       m_caption_show(0),
       m_caption_remove(false),
-      m_caption_pixmap(NULL),
-      m_caption_restore_pixmap(NULL),
+      m_caption_pixmap(nullptr),
+      m_caption_restore_pixmap(nullptr),
       m_caption_timer(new QTimer(this)),
 
       // Common effect state variables
-      m_effect_pixmap(NULL),
-      m_effect_painter(NULL),
+      m_effect_pixmap(nullptr),
+      m_effect_painter(nullptr),
       m_effect_subtype(0),
       m_effect_bounds(0,0,0,0),
       m_effect_delta0(0,0),
@@ -160,21 +160,21 @@ SingleView::~SingleView()
             m_effect_painter->end();
 
         delete m_effect_painter;
-        m_effect_painter = NULL;
+        m_effect_painter = nullptr;
     }
 
-    SetPixmap(NULL);
+    SetPixmap(nullptr);
 
     if (m_effect_pixmap)
     {
         delete m_effect_pixmap;
-        m_effect_pixmap = NULL;
+        m_effect_pixmap = nullptr;
     }
 
     if (m_info_pixmap)
     {
         delete m_info_pixmap;
-        m_info_pixmap = NULL;
+        m_info_pixmap = nullptr;
     }
 
     // save the current m_scaleMax setting so we can restore it later
@@ -492,7 +492,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             ThumbItem *item = getCurrentItem();
             if (item && GalleryUtil::Delete(item->GetPath()))
             {
-                item->SetPixmap(NULL);
+                item->SetPixmap(nullptr);
                 DisplayNext(true, true);
             }
             m_info_show = wasInfo;
@@ -617,7 +617,7 @@ void SingleView::Load(void)
 {
     m_movieState = 0;
 
-    SetPixmap(NULL);
+    SetPixmap(nullptr);
 
     ThumbItem *item = getCurrentItem();
     if (!item)
@@ -694,7 +694,7 @@ void SingleView::SetPixmap(QPixmap *pixmap)
     if (m_pixmap)
     {
         delete m_pixmap;
-        m_pixmap = NULL;
+        m_pixmap = nullptr;
     }
     m_pixmap = pixmap;
 }
