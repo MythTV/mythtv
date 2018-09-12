@@ -34,12 +34,12 @@ class TypeListInfo
     }
 
     explicit TypeListInfo(const QString &_name)
-        : name(_name), src(NULL)
+        : name(_name), src(nullptr)
     {
         name.detach();
     }
     TypeListInfo(const QString &_name, const QString &_location)
-        : name(_name), location(_location), src(NULL)
+        : name(_name), location(_location), src(nullptr)
     {
         name.detach();
         location.detach();
