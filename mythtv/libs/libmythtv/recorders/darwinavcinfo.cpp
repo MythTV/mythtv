@@ -16,7 +16,7 @@ using namespace std;
 #ifndef kIOFireWireAVCLibUnitInterfaceID2
 #define kIOFireWireAVCLibUnitInterfaceID2 \
     CFUUIDGetConstantUUIDWithBytes( \
-        NULL, \
+        nullptr, \
         0x85, 0xB5, 0xE9, 0x54, 0x0A, 0xEF, 0x11, 0xD8, \
         0x8D, 0x19, 0x00, 0x03, 0x93, 0x91, 0x4A, 0xBA)
 #endif
@@ -207,7 +207,7 @@ bool DarwinAVCInfo::OpenAVCInterface(CFRunLoopRef &thread_cf_ref)
     if (kIOReturnSuccess != ret)
     {
         (*avc_handle)->Release(avc_handle);
-        avc_handle = NULL;
+        avc_handle = nullptr;
         return false;
     }
 
@@ -215,7 +215,7 @@ bool DarwinAVCInfo::OpenAVCInterface(CFRunLoopRef &thread_cf_ref)
     if (kIOReturnSuccess != ret)
     {
         (*avc_handle)->Release(avc_handle);
-        avc_handle = NULL;
+        avc_handle = nullptr;
         return false;
     }
 
@@ -231,7 +231,7 @@ void DarwinAVCInfo::CloseAVCInterface(void)
     (*avc_handle)->close(avc_handle);
     (*avc_handle)->Release(avc_handle);
 
-    avc_handle = NULL;
+    avc_handle = nullptr;
 }
 
 bool DarwinAVCInfo::OpenDeviceInterface(CFRunLoopRef &thread_cf_ref)
@@ -277,7 +277,7 @@ bool DarwinAVCInfo::OpenDeviceInterface(CFRunLoopRef &thread_cf_ref)
     if (kIOReturnSuccess != ret)
     {
         (*fw_handle)->Release(fw_handle);
-        fw_handle = NULL;
+        fw_handle = nullptr;
         return false;
     }
 
@@ -293,7 +293,7 @@ void DarwinAVCInfo::CloseDeviceInterface(void)
     (*fw_handle)->Close(fw_handle);
     (*fw_handle)->Release(fw_handle);
 
-    fw_handle = NULL;
+    fw_handle = nullptr;
 }
 
 bool DarwinAVCInfo::GetDeviceNodes(int &local_node, int &remote_node)

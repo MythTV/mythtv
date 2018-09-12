@@ -19,7 +19,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 }
-VDALibrary *gVDALib = NULL;
+VDALibrary *gVDALib = nullptr;
 
 VDALibrary* VDALibrary::GetVDALibrary(void)
 {
@@ -34,15 +34,15 @@ VDALibrary* VDALibrary::GetVDALibrary(void)
             return gVDALib;
         delete gVDALib;
     }
-    gVDALib = NULL;
+    gVDALib = nullptr;
     return gVDALib;
 }
 
 VDALibrary::VDALibrary(void)
-  : decoderCreate(NULL),  decoderDecode(NULL), decoderFlush(NULL),
-    decoderDestroy(NULL), decoderConfigWidth(NULL),
-    decoderConfigHeight(NULL), decoderConfigSourceFmt(NULL),
-    decoderConfigAVCCData(NULL), m_lib(NULL), m_valid(false)
+  : decoderCreate(nullptr),  decoderDecode(nullptr), decoderFlush(nullptr),
+    decoderDestroy(nullptr), decoderConfigWidth(nullptr),
+    decoderConfigHeight(nullptr), decoderConfigSourceFmt(nullptr),
+    decoderConfigAVCCData(nullptr), m_lib(nullptr), m_valid(false)
 {
     m_lib = new QLibrary(VDA_DECODER_PATH);
     if (m_lib)
@@ -296,7 +296,7 @@ void PrivateDecoderVDA::GetDecoders(render_opts &opts)
 }
 
 PrivateDecoderVDA::PrivateDecoderVDA()
-  : PrivateDecoder(), m_lib(NULL), m_decoder(NULL), m_size(QSize()),
+  : PrivateDecoder(), m_lib(nullptr), m_decoder(nullptr), m_size(QSize()),
     m_frame_lock(QMutex::Recursive), m_frames_decoded(0), m_annexb(false),
     m_slice_count(0), m_convert_3byteTo4byteNALSize(false), m_max_ref_frames(0)
 {
@@ -311,7 +311,7 @@ PrivateDecoderVDA::~PrivateDecoderVDA()
         vda_st = m_lib->decoderDestroy((VDADecoder)m_decoder);
         CHECK_ST;
     }
-    m_decoder = NULL;
+    m_decoder = nullptr;
 }
 
 bool PrivateDecoderVDA::Init(const QString &decoder,
@@ -331,7 +331,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
     if (!extradata || extrasize < 7)
         return false;
 
-    CFDataRef avc_cdata = NULL;
+    CFDataRef avc_cdata = nullptr;
     if (extradata[0] != 1)
     {
         if (extradata[0] == 0 && extradata[1] == 0 && extradata[2] == 0 &&
@@ -348,7 +348,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
             m_annexb = true;
             isom_write_avcc(pb, extradata, extrasize);
             // unhook from ffmpeg's extradata
-            extradata = NULL;
+            extradata = nullptr;
             // extract the avcC atom data into extradata then write it into avcCData for VDADecoder
             extrasize = avio_close_dyn_buf(pb, &extradata);
             // CFDataCreate makes a copy of extradata contents
@@ -461,7 +461,7 @@ bool PrivateDecoderVDA::Init(const QString &decoder,
                          pixelFormat);
 
     //CFDictionaryRef emptyDictionary =
-    //    CFDictionaryCreate(kCFAllocatorDefault, NULL, NULL, 0,
+    //    CFDictionaryCreate(kCFAllocatorDefault, nullptr, nullptr, 0,
     //                       &kCFTypeDictionaryKeyCallBacks,
     //                       &kCFTypeDictionaryValueCallBacks);
     //CFDictionarySetValue(destinationImageBufferAttributes,

@@ -24,7 +24,7 @@ void *CreateOSXCocoaPool(void)
          withObject:nil];
     }
 
-    NSAutoreleasePool *pool = NULL;
+    NSAutoreleasePool *pool = nullptr;
     pool = [[NSAutoreleasePool alloc] init];
     return pool;
 }
@@ -34,7 +34,7 @@ void DeleteOSXCocoaPool(void* &pool)
     if (pool)
     {
         NSAutoreleasePool *a_pool = (NSAutoreleasePool*) pool;
-        pool = NULL;
+        pool = nullptr;
         [a_pool release];
     }
 }
@@ -43,10 +43,10 @@ CGDirectDisplayID GetOSXCocoaDisplay(void* view)
 {
     NSView *thisview = static_cast<NSView *>(view);
     if (!thisview)
-        return NULL;
+        return nullptr;
     NSScreen *screen = [[thisview window] screen];
     if (!screen)
-        return NULL;
+        return nullptr;
     NSDictionary* desc = [screen deviceDescription];
     return (CGDirectDisplayID)[[desc objectForKey:@"NSScreenNumber"] intValue];
 }

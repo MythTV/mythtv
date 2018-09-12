@@ -184,7 +184,7 @@ static char * getVolName(CFDictionaryRef diskDetails)
            CFDictionaryGetValue(diskDetails, kDADiskDescriptionVolumeNameKey);
 
     if (!name)
-        return NULL;
+        return nullptr;
 
     size = CFStringGetLength(name) + 1;
     volName = (char *) malloc(size);
@@ -192,13 +192,13 @@ static char * getVolName(CFDictionaryRef diskDetails)
     {
         LOG(VB_GENERAL, LOG_ALERT,
                 QString("getVolName() - Can't malloc(%1)?").arg(size));
-        return NULL;
+        return nullptr;
     }
 
     if (!CFStringGetCString(name, volName, size, kCFStringEncodingUTF8))
     {
         free(volName);
-        return NULL;
+        return nullptr;
     }
 
     return volName;
@@ -416,9 +416,9 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
                       .arg(devName).arg(volName).arg(model).arg(isCDorDVD));
 
     if (isCDorDVD)
-        media = MythCDROM::get(NULL, devName, true, m_Monitor->m_AllowEject);
+        media = MythCDROM::get(nullptr, devName, true, m_Monitor->m_AllowEject);
     else
-        media = MythHDD::Get(NULL, devName, true, false);
+        media = MythHDD::Get(nullptr, devName, true, false);
 
     if (!media)
     {
@@ -580,7 +580,7 @@ bool MediaMonitorDarwin::AddDevice(MythMediaDevice* pDevice)
 static const QString getModel(io_object_t drive)
 {
     QString                 desc;
-    CFMutableDictionaryRef  props = NULL;
+    CFMutableDictionaryRef  props = nullptr;
 
     props = (CFMutableDictionaryRef) IORegistryEntrySearchCFProperty(drive, kIOServicePlane, CFSTR(kIOPropertyProtocolCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateParents | kIORegistryIterateRecursively);
 CFShow(props);
@@ -660,7 +660,7 @@ QStringList MediaMonitorDarwin::GetCDROMBlockDevices()
 
     while ((drive = IOIteratorNext(iter)))
     {
-        CFMutableDictionaryRef  p = NULL;  // properties of drive
+        CFMutableDictionaryRef  p = nullptr;  // properties of drive
 
         IORegistryEntryCreateCFProperties(drive, &p, kCFAllocatorDefault, 0);
         if (p)

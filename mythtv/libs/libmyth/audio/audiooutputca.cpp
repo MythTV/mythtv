@@ -197,7 +197,7 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     // Seek hardware sample rate available
     int *rates = d->RatesList(d->mDeviceID);
 
-    if (rates == NULL)
+    if (rates == nullptr)
     {
         // Error retrieving rates, assume 48kHz
         settings->AddSupportedRate(48000);
@@ -224,7 +224,7 @@ AudioOutputSettings* AudioOutputCA::GetOutputSettings(bool digital)
     settings->AddSupportedFormat(FORMAT_FLT);
 
     bool *channels = d->ChannelsList(d->mDeviceID, digital);
-    if (channels == NULL)
+    if (channels == nullptr)
     {
         // Error retrieving list of supported channels, assume stereo only
         settings->AddSupportedChannels(2);
@@ -496,7 +496,7 @@ static OSStatus RenderCallbackSPDIF(AudioDeviceID        inDevice,
 void CoreAudioData::Initialise()
 {
     // Initialise private data
-    mOutputUnit     = NULL;
+    mOutputUnit     = nullptr;
     mDeviceID       = 0;
     mDigitalInUse   = false;
     mRevertFormat   = false;
@@ -554,7 +554,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(QString deviceName)
     UInt32 size = 0;
     AudioDeviceID deviceID = 0;
 
-    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, NULL);
+    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, nullptr);
     UInt32 deviceCount = size / sizeof(AudioDeviceID);
     AudioDeviceID* pDevices = new AudioDeviceID[deviceCount];
 
@@ -569,7 +569,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(QString deviceName)
     {
         for (UInt32 dev = 0; dev < deviceCount; dev++)
         {
-            CoreAudioData device(NULL, pDevices[dev]);
+            CoreAudioData device(nullptr, pDevices[dev]);
             if (device.GetTotalOutputChannels() == 0)
                 continue;
             QString *name = device.GetName();
@@ -616,7 +616,7 @@ int CoreAudioData::GetTotalOutputChannels()
     UInt32 size = 0;
     AudioDeviceGetPropertyInfo(mDeviceID, 0, false,
                                kAudioDevicePropertyStreamConfiguration,
-                               &size, NULL);
+                               &size, nullptr);
     AudioBufferList *pList = (AudioBufferList *)malloc(size);
     OSStatus err = AudioDeviceGetProperty(mDeviceID, 0, false,
                                           kAudioDevicePropertyStreamConfiguration,
@@ -642,7 +642,7 @@ int CoreAudioData::GetTotalOutputChannels()
 QString *CoreAudioData::GetName()
 {
     if (!mDeviceID)
-        return NULL;
+        return nullptr;
     UInt32 propertySize;
     AudioObjectPropertyAddress propertyAddress;
 
@@ -652,12 +652,12 @@ QString *CoreAudioData::GetName()
     propertyAddress.mScope = kAudioObjectPropertyScopeGlobal;
     propertyAddress.mElement = kAudioObjectPropertyElementMaster;
     OSStatus err = AudioObjectGetPropertyData(mDeviceID, &propertyAddress,
-                                              0, NULL, &propertySize, &name);
+                                              0, nullptr, &propertySize, &name);
     if (err)
     {
         Error(QString("AudioObjectGetPropertyData for kAudioObjectPropertyName error: [%1]")
               .arg(err));
-        return NULL;
+        return nullptr;
     }
     char *cname = new char[CFStringGetLength(name) + 1];
     CFStringGetCString(name, cname, CFStringGetLength(name) + 1, kCFStringEncodingUTF8);
@@ -727,7 +727,7 @@ bool CoreAudioData::SetHogStatus(bool hog)
         {
             Debug(QString("SetHogStatus: Setting 'hog' status on device %1")
                   .arg(mDeviceID));
-            OSStatus err = AudioDeviceSetProperty(mDeviceID, NULL, 0, false,
+            OSStatus err = AudioDeviceSetProperty(mDeviceID, nullptr, 0, false,
                                                   kAudioDevicePropertyHogMode,
                                                   sizeof(mHog), &mHog);
             if (err || mHog != getpid())
@@ -747,7 +747,7 @@ bool CoreAudioData::SetHogStatus(bool hog)
             Debug(QString("SetHogStatus: Releasing 'hog' status on device %1")
                   .arg(mDeviceID));
             pid_t hogPid = -1;
-            OSStatus err = AudioDeviceSetProperty(mDeviceID, NULL, 0, false,
+            OSStatus err = AudioDeviceSetProperty(mDeviceID, nullptr, 0, false,
                                                   kAudioDevicePropertyHogMode,
                                                   sizeof(hogPid), &hogPid);
             if (err || hogPid == getpid())
@@ -773,7 +773,7 @@ bool CoreAudioData::SetMixingSupport(bool mix)
     Debug(QString("SetMixingSupport: %1abling mixing for device %2")
           .arg(mix ? "En" : "Dis")
           .arg(mDeviceID));
-    OSStatus err = AudioDeviceSetProperty(mDeviceID, NULL, 0, false,
+    OSStatus err = AudioDeviceSetProperty(mDeviceID, nullptr, 0, false,
                                           kAudioDevicePropertySupportsMixing,
                                           sizeof(mixEnable), &mixEnable);
     if (err)
@@ -814,22 +814,22 @@ AudioStreamID *CoreAudioData::StreamsList(AudioDeviceID d)
 
     err = AudioDeviceGetPropertyInfo(d, 0, FALSE,
                                      kAudioDevicePropertyStreams,
-                                     &listSize, NULL);
+                                     &listSize, nullptr);
     if (err != noErr)
     {
         Error(QString("StreamsList: could not get list size: [%1]")
               .arg(OSS_STATUS(err)));
-        return NULL;
+        return nullptr;
     }
 
     // Space for a terminating ID:
     listSize += sizeof(AudioStreamID);
     list      = (AudioStreamID *)malloc(listSize);
 
-    if (list == NULL)
+    if (list == nullptr)
     {
         Error("StreamsList(): out of memory?");
-        return NULL;
+        return nullptr;
     }
 
     err = AudioDeviceGetProperty(d, 0, FALSE,
@@ -839,7 +839,7 @@ AudioStreamID *CoreAudioData::StreamsList(AudioDeviceID d)
     {
         Error(QString("StreamsList: could not get list: [%1]")
               .arg(OSS_STATUS(err)));
-        return NULL;
+        return nullptr;
     }
     // Add a terminating ID:
     list[listSize/sizeof(AudioStreamID)] = kAudioHardwareBadStreamError;
@@ -860,22 +860,22 @@ AudioStreamBasicDescription *CoreAudioData::FormatsList(AudioStreamID s)
     p = kAudioStreamPropertyPhysicalFormats;
 
     // Retrieve all the stream formats supported by this output stream
-    err = AudioStreamGetPropertyInfo(s, 0, p, &listSize, NULL);
+    err = AudioStreamGetPropertyInfo(s, 0, p, &listSize, nullptr);
     if (err != noErr)
     {
         Warn(QString("FormatsList(): couldn't get list size: [%1]")
              .arg(OSS_STATUS(err)));
-        return NULL;
+        return nullptr;
     }
 
     // Space for a terminating ID:
     listSize += sizeof(AudioStreamBasicDescription);
     list      = (AudioStreamBasicDescription *)malloc(listSize);
 
-    if (list == NULL)
+    if (list == nullptr)
     {
         Error("FormatsList(): out of memory?");
-        return NULL;
+        return nullptr;
     }
 
     err = AudioStreamGetProperty(s, 0, p, &listSize, list);
@@ -884,7 +884,7 @@ AudioStreamBasicDescription *CoreAudioData::FormatsList(AudioStreamID s)
         Warn(QString("FormatsList: couldn't get list: [%1]")
              .arg(OSS_STATUS(err)));
         free(list);
-        return NULL;
+        return nullptr;
     }
 
     // Add a terminating ID:
@@ -922,19 +922,19 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
     // retrieve size of rate list
     err = AudioDeviceGetPropertyInfo(d, 0, 0,
                                      kAudioDevicePropertyAvailableNominalSampleRates,
-                                     &listSize, NULL);
+                                     &listSize, nullptr);
     if (err != noErr)
     {
         Warn(QString("RatesList(): couldn't get data rate list size: [%1]")
              .arg(err));
-        return NULL;
+        return nullptr;
     }
 
     list      = (AudioValueRange *)malloc(listSize);
-    if (list == NULL)
+    if (list == nullptr)
     {
         Error("RatesList(): out of memory?");
-        return NULL;
+        return nullptr;
     }
 
     err = AudioDeviceGetProperty(
@@ -945,17 +945,17 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
         Warn(QString("RatesList(): couldn't get list: [%1]")
              .arg(err));
         free(list);
-        return NULL;
+        return nullptr;
     }
 
     // cppcheck-suppress sizeofDivisionMemfunc
     finallist = (int *)malloc(((listSize / sizeof(AudioValueRange)) + 1)
                               * sizeof(int));
-    if (finallist == NULL)
+    if (finallist == nullptr)
     {
         Error("RatesList(): out of memory?");
         free(list);
-        return NULL;
+        return nullptr;
     }
 
     // iterate through the ranges and add the minimum, maximum, and common rates in between
@@ -997,8 +997,8 @@ bool *CoreAudioData::ChannelsList(AudioDeviceID d, bool passthru)
     bool                        founddigital = false;
     bool                        *list;
 
-    if ((list = (bool *)malloc((CHANNELS_MAX+1) * sizeof(bool))) == NULL)
-        return NULL;
+    if ((list = (bool *)malloc((CHANNELS_MAX+1) * sizeof(bool))) == nullptr)
+        return nullptr;
 
     memset(list, 0, (CHANNELS_MAX+1) * sizeof(bool));
 
@@ -1006,7 +1006,7 @@ bool *CoreAudioData::ChannelsList(AudioDeviceID d, bool passthru)
     if (!streams)
     {
         free(list);
-        return NULL;
+        return nullptr;
     }
 
     if (passthru)
@@ -1071,8 +1071,8 @@ int CoreAudioData::OpenAnalog()
     desc.componentFlagsMask = 0;
     mDigitalInUse = false;
 
-    Component comp = FindNextComponent(NULL, &desc);
-    if (comp == NULL)
+    Component comp = FindNextComponent(nullptr, &desc);
+    if (comp == nullptr)
     {
         Error("OpenAnalog: AudioComponentFindNext failed");
         return false;
@@ -1161,7 +1161,7 @@ int CoreAudioData::OpenAnalog()
                                    kAudioUnitScope_Output,
                                    0,
                                    &param_size,
-                                   NULL);
+                                   nullptr);
 
     if(!err)
     {
@@ -1390,7 +1390,7 @@ void CoreAudioData::CloseAnalog()
         err = CloseComponent(mOutputUnit);
         Debug(QString("CloseAnalog: CloseComponent %1")
               .arg(err));
-        mOutputUnit = NULL;
+        mOutputUnit = nullptr;
     }
     mIoProc = false;
     mInitialized = false;
@@ -1620,7 +1620,7 @@ void CoreAudioData::ResetAudioDevices()
     UInt32         size;
 
 
-    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, NULL);
+    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, nullptr);
     devices    = (AudioDeviceID*)malloc(size);
     if (!devices)
     {
@@ -1670,7 +1670,7 @@ void CoreAudioData::ResetStream(AudioStreamID s)
         for (int i = 0; !streamReset && formats[i].mFormatID != 0; i++)
             if (formats[i].mFormatID == kAudioFormatLinearPCM)
             {
-                err = AudioStreamSetProperty(s, NULL, 0,
+                err = AudioStreamSetProperty(s, nullptr, 0,
                                              kAudioStreamPropertyPhysicalFormat,
                                              sizeof(formats[i]), &(formats[i]));
                 if (err != noErr)
@@ -1696,7 +1696,7 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char *type)
 
     // Obtain a list of all available audio devices
     UInt32 size = 0;
-    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, NULL);
+    AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, nullptr);
     UInt32 deviceCount = size / sizeof(AudioDeviceID);
     AudioDeviceID* pDevices = new AudioDeviceID[deviceCount];
     OSStatus err = AudioHardwareGetProperty(kAudioHardwarePropertyDevices,
@@ -1711,7 +1711,7 @@ QMap<QString, QString> *AudioOutputCA::GetDevices(const char *type)
 
         for (UInt32 dev = 0; dev < deviceCount; dev++)
         {
-            CoreAudioData device(NULL, pDevices[dev]);
+            CoreAudioData device(nullptr, pDevices[dev]);
             if (device.GetTotalOutputChannels() == 0)
                 continue;
             QString *name = device.GetName();

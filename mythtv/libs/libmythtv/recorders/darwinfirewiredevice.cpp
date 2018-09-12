@@ -76,9 +76,9 @@ class DFDPriv
   public:
     DFDPriv() :
         controller_thread(0),
-        controller_thread_cf_ref(NULL), controller_thread_running(false),
-        notify_port(NULL), notify_source(NULL), deviter(NULL),
-        actual_fwchan(-1), is_streaming(false), avstream(NULL), logger(NULL),
+        controller_thread_cf_ref(nullptr), controller_thread_running(false),
+        notify_port(nullptr), notify_source(nullptr), deviter(nullptr),
+        actual_fwchan(-1), is_streaming(false), avstream(nullptr), logger(nullptr),
         no_data_cnt(0), no_data_timer_set(false)
     {
         logger = new AVS::StringLogger(dfd_streaming_log_message);
@@ -94,7 +94,7 @@ class DFDPriv
         if (logger)
         {
             delete logger;
-            logger = NULL;
+            logger = nullptr;
         }
     }
 
@@ -138,7 +138,7 @@ DarwinFirewireDevice::~DarwinFirewireDevice()
     if (m_priv)
     {
         delete m_priv;
-        m_priv = NULL;
+        m_priv = nullptr;
     }
 }
 
@@ -182,7 +182,7 @@ void DarwinFirewireDevice::StartController(void)
 {
     m_lock.unlock();
 
-    pthread_create(&m_priv->controller_thread, NULL,
+    pthread_create(&m_priv->controller_thread, nullptr,
                    dfd_controller_thunk, this);
 
     m_lock.lock();
@@ -202,19 +202,19 @@ void DarwinFirewireDevice::StopController(void)
     if (m_priv->deviter)
     {
         IOObjectRelease(m_priv->deviter);
-        m_priv->deviter = NULL;
+        m_priv->deviter = nullptr;
     }
 
     if (m_priv->notify_source)
     {
         CFRunLoopSourceInvalidate(m_priv->notify_source);
-        m_priv->notify_source = NULL;
+        m_priv->notify_source = nullptr;
     }
 
     if (m_priv->notify_port)
     {
         IONotificationPortDestroy(m_priv->notify_port);
-        m_priv->notify_port = NULL;
+        m_priv->notify_port = nullptr;
     }
 
     CFRunLoopStop(m_priv->controller_thread_cf_ref);
@@ -430,7 +430,7 @@ bool DarwinFirewireDevice::CloseAVStream(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Destroying A/V stream object");
     AVS::DestroyMPEG2Receiver(m_priv->avstream);
-    m_priv->avstream = NULL;
+    m_priv->avstream = nullptr;
 
     return true;
 }
@@ -688,13 +688,13 @@ void DarwinFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 DarwinAVCInfo *DarwinFirewireDevice::GetInfoPtr(void)
 {
     avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
-    return (it == m_priv->devices.end()) ? NULL : *it;
+    return (it == m_priv->devices.end()) ? nullptr : *it;
 }
 
 const DarwinAVCInfo *DarwinFirewireDevice::GetInfoPtr(void) const
 {
     avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
-    return (it == m_priv->devices.end()) ? NULL : *it;
+    return (it == m_priv->devices.end()) ? nullptr : *it;
 }
 
 
@@ -948,7 +948,7 @@ static void dfd_update_device_list(void *dfd, io_iterator_t deviter)
 {
     DarwinFirewireDevice *dev = reinterpret_cast<DarwinFirewireDevice*>(dfd);
 
-    io_object_t it = NULL;
+    io_object_t it = nullptr;
     while ((it = IOIteratorNext(deviter)))
     {
         uint64_t guid = 0;

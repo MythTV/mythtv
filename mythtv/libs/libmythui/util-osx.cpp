@@ -50,7 +50,7 @@ float get_float_CF(CFDictionaryRef dict, CFStringRef key)
 CGDirectDisplayID GetOSXDisplay(WId win)
 {
     if (!win)
-        return NULL;
+        return nullptr;
 
     return GetOSXCocoaDisplay((void*)win);
 }
