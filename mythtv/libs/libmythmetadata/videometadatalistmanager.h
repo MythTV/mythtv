@@ -40,7 +40,7 @@ class META_PUBLIC meta_node
   public:
     meta_node(meta_node *parent, bool is_path_root = false) :
             m_parent(parent), m_path_root(is_path_root) {}
-    virtual ~meta_node() {}
+    virtual ~meta_node() = default;
 
     virtual const QString &getName() const = 0;
     virtual const QString &getPath() const;

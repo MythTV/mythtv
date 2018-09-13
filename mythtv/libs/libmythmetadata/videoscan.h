@@ -45,7 +45,7 @@ class META_PUBLIC VideoScanChanges : public QEvent
                      QList<int>dels) : QEvent(kEventType),
                      additions(adds), moved(movs),
                      deleted(dels) {}
-    ~VideoScanChanges() {}
+    ~VideoScanChanges() = default;
 
     QList<int> additions; // newly added intids
     QList<int> moved; // intids moved to new filename

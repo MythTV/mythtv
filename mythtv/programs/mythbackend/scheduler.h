@@ -39,7 +39,7 @@ class SchedInputInfo
         group_inputs(),
         conflicting_inputs(),
         conflictlist(nullptr) {};
-    ~SchedInputInfo(void) {};
+    ~SchedInputInfo(void) = default;
 
     uint inputid;
     uint sgroupid;

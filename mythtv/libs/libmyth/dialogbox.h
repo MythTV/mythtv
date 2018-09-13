@@ -26,7 +26,7 @@ class MPUBLIC DialogBox : public MythDialog
     void buttonPressed(int which);
 
   protected:
-    ~DialogBox() {} // use deleteLater() for thread safety
+    ~DialogBox() = default; // use deleteLater() for thread safety
 
   private:
     QVBoxLayout *box;

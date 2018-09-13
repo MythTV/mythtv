@@ -127,7 +127,7 @@ class MPUBLIC OMXComponentCtx
 class MPUBLIC OMXComponentAbstractCB
 {
   public:
-    virtual ~OMXComponentAbstractCB() {}
+    virtual ~OMXComponentAbstractCB() = default;
     virtual OMX_ERRORTYPE Action(OMXComponent*) = 0;
 };
 

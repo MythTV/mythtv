@@ -35,7 +35,7 @@ class MHElemAction
 {
   public:
     MHElemAction(const char *name): m_ActionName(name) {}
-    virtual ~MHElemAction() {}
+    virtual ~MHElemAction() = default;
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
     virtual void Perform(MHEngine *engine) = 0; // Perform the action.

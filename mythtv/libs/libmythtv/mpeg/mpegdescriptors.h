@@ -243,7 +243,7 @@ class MTV_PUBLIC MPEGDescriptor
         else if (DescriptorLength() != req_desc_len)
             _data = nullptr;
     }
-    virtual ~MPEGDescriptor() {}
+    virtual ~MPEGDescriptor() = default;
 
     bool IsValid(void) const { return _data; }
     uint size(void) const { return DescriptorLength() + 2; }

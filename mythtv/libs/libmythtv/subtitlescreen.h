@@ -75,7 +75,7 @@ protected:
                           SubtitleScreen *p);
     FormattedTextSubtitle(void);
 public:
-    virtual ~FormattedTextSubtitle() {}
+    virtual ~FormattedTextSubtitle() = default;
     // These are the steps that can be done outside of the UI thread
     // and the decoder thread.
     virtual void WrapLongLines(void) {}

@@ -56,7 +56,7 @@ class TSDataListener
     virtual void AddData(const unsigned char *data, uint dataSize) = 0;
 
   protected:
-    virtual ~TSDataListener() { }
+    virtual ~TSDataListener() = default;
 };
 
 class TSPacketListener
@@ -65,7 +65,7 @@ class TSPacketListener
     virtual bool ProcessTSPacket(const TSPacket& tspacket) = 0;
 
   protected:
-    virtual ~TSPacketListener() { }
+    virtual ~TSPacketListener() = default;
 };
 
 class TSPacketListenerAV
@@ -75,13 +75,13 @@ class TSPacketListenerAV
     virtual bool ProcessAudioTSPacket(const TSPacket& tspacket) = 0;
 
   protected:
-    virtual ~TSPacketListenerAV() { }
+    virtual ~TSPacketListenerAV() = default;
 };
 
 class MPEGStreamListener
 {
   protected:
-    virtual ~MPEGStreamListener() {}
+    virtual ~MPEGStreamListener() = default;
   public:
     virtual void HandlePAT(const ProgramAssociationTable*) = 0;
     virtual void HandleCAT(const ConditionalAccessTable*) = 0;
@@ -93,7 +93,7 @@ class MPEGStreamListener
 class MPEGSingleProgramStreamListener
 {
   protected:
-    virtual ~MPEGSingleProgramStreamListener() {}
+    virtual ~MPEGSingleProgramStreamListener() = default;
   public:
     virtual void HandleSingleProgramPAT(ProgramAssociationTable*,
                                         bool insert) = 0;
@@ -106,13 +106,13 @@ class PSStreamListener
     virtual void FindPSKeyFrames(const uint8_t *buffer, uint len) = 0;
 
   protected:
-    virtual ~PSStreamListener() { }
+    virtual ~PSStreamListener() = default;
 };
 
 class ATSCMainStreamListener
 {
   protected:
-    virtual ~ATSCMainStreamListener() {}
+    virtual ~ATSCMainStreamListener() = default;
   public:
     virtual void HandleSTT(const SystemTimeTable*) = 0;
     virtual void HandleMGT(const MasterGuideTable*) = 0;
@@ -122,7 +122,7 @@ class ATSCMainStreamListener
 class ATSCAuxStreamListener
 {
   protected:
-    virtual ~ATSCAuxStreamListener() {}
+    virtual ~ATSCAuxStreamListener() = default;
   public:
     virtual void HandleTVCT(uint pid,const TerrestrialVirtualChannelTable*)=0;
     virtual void HandleCVCT(uint pid, const CableVirtualChannelTable*) = 0;
@@ -135,7 +135,7 @@ class ATSCAuxStreamListener
 class ATSCEITStreamListener
 {
   protected:
-    virtual ~ATSCEITStreamListener() {}
+    virtual ~ATSCEITStreamListener() = default;
   public:
     virtual void HandleEIT( uint pid, const EventInformationTable*) = 0;
     virtual void HandleETT( uint pid, const ExtendedTextTable*) = 0;
@@ -144,7 +144,7 @@ class ATSCEITStreamListener
 class SCTEMainStreamListener // only adds the things not in ATSC
 {
   protected:
-    virtual ~SCTEMainStreamListener() {}
+    virtual ~SCTEMainStreamListener() = default;
   public:
     // SCTE 65
     virtual void HandleNIT(const SCTENetworkInformationTable*) = 0;
@@ -163,7 +163,7 @@ class SCTEMainStreamListener // only adds the things not in ATSC
 class ATSC81EITStreamListener // ATSC A/81, & SCTE 65
 {
   protected:
-    virtual ~ATSC81EITStreamListener() {}
+    virtual ~ATSC81EITStreamListener() = default;
   public:
     virtual void HandleAEIT(uint pid, const AggregateEventInformationTable*)=0;
     virtual void HandleAETT(uint pid, const AggregateExtendedTextTable*) = 0;
@@ -172,7 +172,7 @@ class ATSC81EITStreamListener // ATSC A/81, & SCTE 65
 class DVBMainStreamListener
 {
   protected:
-    virtual ~DVBMainStreamListener() {}
+    virtual ~DVBMainStreamListener() = default;
   public:
     virtual void HandleTDT(const TimeDateTable*) = 0;
     virtual void HandleNIT(const NetworkInformationTable*) = 0;
@@ -182,7 +182,7 @@ class DVBMainStreamListener
 class DVBOtherStreamListener
 {
   protected:
-    virtual ~DVBOtherStreamListener() {}
+    virtual ~DVBOtherStreamListener() = default;
   public:
     virtual void HandleNITo(const NetworkInformationTable*) = 0;
     virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable*) = 0;
@@ -192,7 +192,7 @@ class DVBOtherStreamListener
 class DVBEITStreamListener
 {
   protected:
-    virtual ~DVBEITStreamListener() {}
+    virtual ~DVBEITStreamListener() = default;
   public:
     virtual void HandleEIT(const DVBEventInformationTable*) = 0;
     virtual void HandleEIT(const PremiereContentInformationTable*) = 0;

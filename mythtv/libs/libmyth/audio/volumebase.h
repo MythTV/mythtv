@@ -14,7 +14,7 @@ class MPUBLIC VolumeBase
 {
   public:
     VolumeBase();
-    virtual ~VolumeBase() {};
+    virtual ~VolumeBase() = default;
 
     void SWVolume(bool set);
     bool SWVolume(void) const;

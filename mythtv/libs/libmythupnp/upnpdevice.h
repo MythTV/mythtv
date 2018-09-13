@@ -74,7 +74,7 @@ class UPNP_PUBLIC UPnpService
     QString m_sControlURL;
     QString m_sEventSubURL;
 
-    UPnpService() {}        
+    UPnpService() = default;
 
     QString toString(uint padding) const
     {

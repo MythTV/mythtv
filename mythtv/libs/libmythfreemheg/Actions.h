@@ -28,8 +28,8 @@ class MHElemAction;
 class MHActionSequence: public MHOwnPtrSequence<MHElemAction>
 {
   public:
-    MHActionSequence() {}
-    virtual ~MHActionSequence() {}
+    MHActionSequence() = default;
+    virtual ~MHActionSequence() = default;
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
 };

@@ -149,7 +149,7 @@ class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
   public:
     explicit HostRefreshRateComboBoxSetting(const QString &name) :
         HostComboBoxSetting(name) { }
-    virtual ~HostRefreshRateComboBoxSetting() { }
+    virtual ~HostRefreshRateComboBoxSetting() = default;
 
   public slots:
 #if defined(USING_XRANDR) || CONFIG_DARWIN

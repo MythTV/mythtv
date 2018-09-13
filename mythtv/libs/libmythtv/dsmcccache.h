@@ -18,7 +18,7 @@ class Dsmcc;
 class DSMCCCacheKey: public QByteArray
 {
   public:
-    DSMCCCacheKey() {}
+    DSMCCCacheKey() = default;
     DSMCCCacheKey(const char * data, int size):
         QByteArray(data, size) {}
     QString toString(void) const;
@@ -72,7 +72,7 @@ class DSMCCCacheReference
 class DSMCCCacheDir
 {
   public:
-    DSMCCCacheDir() {}
+    DSMCCCacheDir() = default;
     explicit DSMCCCacheDir(const DSMCCCacheReference &r) : m_Reference(r) {}
 
     // These maps give the cache reference for each name
@@ -86,7 +86,7 @@ class DSMCCCacheDir
 class DSMCCCacheFile
 {
   public:
-    DSMCCCacheFile() {}
+    DSMCCCacheFile() = default;
     explicit DSMCCCacheFile(const DSMCCCacheReference &r) : m_Reference(r) {}
 
     DSMCCCacheReference m_Reference;

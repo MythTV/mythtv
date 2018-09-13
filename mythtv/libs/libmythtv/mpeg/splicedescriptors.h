@@ -57,7 +57,7 @@ class SpliceDescriptor
         else if (DescriptorTag() != tag)
             _data = nullptr;
     }
-    virtual ~SpliceDescriptor(void) {}
+    virtual ~SpliceDescriptor(void) = default;
 
     bool IsValid(void) const { return _data; }
     uint size(void) const { return DescriptorLength() + 2; }

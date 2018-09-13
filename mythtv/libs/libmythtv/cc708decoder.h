@@ -29,7 +29,7 @@ class CC708Decoder
         memset(&partialPacket, 0, sizeof(CaptionPacket));
         memset(last_seen,      0, sizeof(last_seen));
     }
-   ~CC708Decoder() {}
+   ~CC708Decoder() = default;
 
     void decode_cc_data(uint cc_type, uint data1, uint data2);
     void decode_cc_null(void);

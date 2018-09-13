@@ -33,7 +33,7 @@ class VideoColourSpace
 {
   public:
     explicit VideoColourSpace(VideoCStd colour_std = kCSTD_ITUR_BT_601);
-   ~VideoColourSpace() { }
+   ~VideoColourSpace() = default;
 
     PictureAttributeSupported SupportedAttributes(void) const
         { return m_supported_attributes; }

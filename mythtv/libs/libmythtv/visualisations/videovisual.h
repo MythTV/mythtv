@@ -73,7 +73,7 @@ class VideoVisualFactory
         m_nextVideoVisualFactory = g_videoVisualFactory;
         g_videoVisualFactory = this;
     }
-    virtual ~VideoVisualFactory() { }
+    virtual ~VideoVisualFactory() = default;
     virtual const QString &name(void) const = 0;
     virtual VideoVisual* Create(AudioPlayer *audio,
                                 MythRender *render) const = 0;

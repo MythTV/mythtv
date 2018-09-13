@@ -31,7 +31,7 @@ class MBASE_PUBLIC DBUtil
 {
   public:
     DBUtil();
-    ~DBUtil() { }
+    ~DBUtil() = default;
 
     QString GetDBMSVersion(void);
     int CompareDBMSVersion(int major, int minor=0, int point=0);

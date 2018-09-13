@@ -65,7 +65,7 @@ class DsmccDb
         module_id(0),    module_version(0),
         block_number(0), len (0) {}
 
-    ~DsmccDb() {}
+    ~DsmccDb() = default;
 
     unsigned short module_id;
     unsigned char  module_version;

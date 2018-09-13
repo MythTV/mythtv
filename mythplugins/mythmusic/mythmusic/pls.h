@@ -20,7 +20,7 @@ class PlayListFileEntry
 {
   public:
     PlayListFileEntry(void) : m_length(0) {}
-    ~PlayListFileEntry(void) {}
+    ~PlayListFileEntry(void) = default;
 
     QString File(void) { return m_file; }
     QString Title(void) { return m_title; }

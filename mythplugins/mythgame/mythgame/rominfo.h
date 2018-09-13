@@ -69,7 +69,7 @@ class RomInfo
                 inetref = lhs.inetref;
             }
 
-    ~RomInfo() {}
+    ~RomInfo() = default;
 
     bool FindImage(QString BaseFileName, QString *result);
 

@@ -79,7 +79,7 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
 class MUI_PUBLIC FontMap
 {
   public:
-    FontMap() {}
+    FontMap() = default;
 
     MythFontProperties *GetFont(const QString &text);
     bool AddFont(const QString &text, MythFontProperties *fontProp);

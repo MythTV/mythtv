@@ -81,7 +81,7 @@ class BiopObjLocation
     BiopObjLocation() :
         component_tag(0), component_data_len(0),
         version_major(0), version_minor(0) { }
-    ~BiopObjLocation() { }
+    ~BiopObjLocation() = default;
 
     int Process(const unsigned char*);
 
@@ -95,7 +95,7 @@ class BiopObjLocation
 class ProfileBody
 {
   public:
-    virtual ~ProfileBody() {}
+    virtual ~ProfileBody() = default;
     virtual DSMCCCacheReference *GetReference() = 0;
     virtual int Process(const unsigned char *) = 0;
 };
@@ -106,7 +106,7 @@ class ProfileBodyFull: public ProfileBody
     ProfileBodyFull() :
         data_len(0), byte_order(0),
         lite_components_count(0) { }
-    virtual ~ProfileBodyFull() { }
+    virtual ~ProfileBodyFull() = default;
     virtual int Process(const unsigned char *);
     virtual DSMCCCacheReference *GetReference()
         { return &obj_loc.m_Reference; }

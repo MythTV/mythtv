@@ -36,7 +36,7 @@ class MTV_PUBLIC RecordingRule
     static const int kNumFilters = 12;
 
     RecordingRule();
-   ~RecordingRule() {};
+   ~RecordingRule() = default;
 
     bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);

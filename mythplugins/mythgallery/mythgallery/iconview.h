@@ -173,7 +173,7 @@ class ChildCountEvent : public QEvent
   public:
     explicit ChildCountEvent(ChildCountData *ccd) :
         QEvent(kEventType), childCountData(ccd) {}
-    ~ChildCountEvent() {}
+    ~ChildCountEvent() = default;
 
     ChildCountData *childCountData;
 

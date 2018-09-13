@@ -22,7 +22,7 @@ struct DriverOption
     DriverOption(void) : category(UNKNOWN_CAT), minimum(0), maximum(0),
                          default_value(0), current(0), step(0), flags(0),
                          type(UNKNOWN_TYPE) {}
-    ~DriverOption(void) {}
+    ~DriverOption(void) = default;
 
     QString    name;
     category_t category;

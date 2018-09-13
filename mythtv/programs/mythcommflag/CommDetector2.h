@@ -50,7 +50,7 @@ class CommDetector2 : public CommDetectorBase
         ostream &out, const frm_dir_map_t *comm_breaks, bool verbose) const;
 
   private:
-    virtual ~CommDetector2() {}
+    virtual ~CommDetector2() = default;
 
     void reportState(int elapsed_sec, long long frameno, long long nframes,
             unsigned int passno, unsigned int npasses);

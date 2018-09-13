@@ -13,7 +13,7 @@ class META_PUBLIC MetadataLookupEvent : public QEvent
   public:
     explicit MetadataLookupEvent(MetadataLookupList lul) : QEvent(kEventType),
                                             lookupList(lul) {}
-    ~MetadataLookupEvent() {}
+    ~MetadataLookupEvent() = default;
 
     MetadataLookupList lookupList;
 
@@ -25,7 +25,7 @@ class META_PUBLIC MetadataLookupFailure : public QEvent
   public:
     explicit MetadataLookupFailure(MetadataLookupList lul) : QEvent(kEventType),
                                             lookupList(lul) {}
-    ~MetadataLookupFailure() {}
+    ~MetadataLookupFailure() = default;
 
     MetadataLookupList lookupList;
 

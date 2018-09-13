@@ -89,7 +89,7 @@ class MPUBLIC MediaMonitor : public QObject
 
   protected:
     MediaMonitor(QObject *par, unsigned long interval, bool allowEject);
-    virtual ~MediaMonitor() {}
+    virtual ~MediaMonitor() = default;
 
     void AttemptEject(MythMediaDevice *device);
     void CheckDevices(void);

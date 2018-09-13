@@ -25,7 +25,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
     public:
 
         UPnpCDSVideo( );
-        virtual ~UPnpCDSVideo() {}
+        virtual ~UPnpCDSVideo() = default;
 
     protected:
 

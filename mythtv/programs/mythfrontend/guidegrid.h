@@ -39,7 +39,7 @@ class JumpToChannel;
 class JumpToChannelListener
 {
   public:
-    virtual ~JumpToChannelListener() {}
+    virtual ~JumpToChannelListener() = default;
     virtual void GoTo(int start, int cur_row) = 0;
     virtual void SetJumpToChannel(JumpToChannel *ptr) = 0;
     virtual int  FindChannel(uint chanid, const QString &channum,
@@ -63,7 +63,7 @@ class JumpToChannel : public QObject
     virtual void deleteLater(void);
 
   private:
-    ~JumpToChannel() {}
+    ~JumpToChannel() = default;
     bool Update(void);
 
   private:

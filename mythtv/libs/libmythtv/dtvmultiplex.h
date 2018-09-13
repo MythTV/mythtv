@@ -110,7 +110,7 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
         cardid(0) { }
     ScanDTVTransport(const DTVMultiplex &mplex, DTVTunerType tt, uint cid) :
         DTVMultiplex(mplex), tuner_type(tt), cardid(cid) { }
-    virtual ~ScanDTVTransport() {}
+    virtual ~ScanDTVTransport() = default;
 
     virtual bool FillFromDB(DTVTunerType type, uint mplexid);
     uint SaveScan(uint scanid) const;

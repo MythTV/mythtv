@@ -142,7 +142,7 @@ class cCiTransportConnection;
 
 class cCiHandler {
 public:
-  virtual ~cCiHandler() {};
+  virtual ~cCiHandler() = default;
   static cCiHandler *CreateCiHandler(const char *FileName);
   virtual int NumSlots(void) = 0;
   virtual bool Process(void) = 0;

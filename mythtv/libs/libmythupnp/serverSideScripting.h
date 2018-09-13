@@ -35,7 +35,7 @@ class ScriptInfo
     QScriptValue    m_oFunc;
     QDateTime       m_dtTimeStamp;
 
-    ScriptInfo() {}
+    ScriptInfo() = default;
 
     ScriptInfo( QScriptValue func, QDateTime dt )
         : m_oFunc( func ), m_dtTimeStamp( dt )
@@ -95,7 +95,7 @@ class OutputStream : public QObject, public QScriptable
          OutputStream( QTextStream *pStream, QObject *parent = nullptr )
              : QObject( parent ), m_pTextStream( pStream )  {}
 
-         ~OutputStream() {} 
+         ~OutputStream() = default;
 
     public slots:
 

@@ -53,7 +53,7 @@ class MHProgram : public MHIngredient
 class MHResidentProgram : public MHProgram  
 {
   public:
-    MHResidentProgram() {}
+    MHResidentProgram() = default;
     virtual const char *ClassName() { return "ResidentProgram"; }
     virtual void PrintMe(FILE *fd, int nTabs) const;
     virtual void CallProgram(bool fIsFork, const MHObjectRef &success,

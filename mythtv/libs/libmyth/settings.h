@@ -79,7 +79,7 @@ class MPUBLIC Configurable : public QObject
     explicit Configurable(Storage *_storage) :
         labelAboveWidget(false), enabled(true), storage(_storage),
         configName(""), label(""), helptext(""), visible(true) { }
-    virtual ~Configurable() { }
+    virtual ~Configurable() = default;
 
   protected:
     bool labelAboveWidget;
@@ -114,7 +114,7 @@ class MPUBLIC Setting : public Configurable, public StorageUser
 
   protected:
     explicit Setting(Storage *_storage) : Configurable(_storage) {};
-    virtual ~Setting() {};
+    virtual ~Setting() = default;
 
   protected:
     QString settingValue;
@@ -698,7 +698,7 @@ class MPUBLIC HostCheckBox : public CheckBoxSetting, public HostDBStorage
   public:
     explicit HostCheckBox(const QString &name) :
         CheckBoxSetting(this), HostDBStorage(this, name) { }
-    virtual ~HostCheckBox() { ; }
+    virtual ~HostCheckBox() = default;
 };
 
 class MPUBLIC HostComboBox : public ComboBoxSetting, public HostDBStorage
@@ -707,7 +707,7 @@ class MPUBLIC HostComboBox : public ComboBoxSetting, public HostDBStorage
   public:
     HostComboBox(const QString &name, bool rw = false) :
         ComboBoxSetting(this, rw), HostDBStorage(this, name) { }
-    virtual ~HostComboBox() { ; }
+    virtual ~HostComboBox() = default;
 };
 
 class MPUBLIC HostRefreshRateComboBox : public HostComboBox
@@ -716,7 +716,7 @@ class MPUBLIC HostRefreshRateComboBox : public HostComboBox
   public:
     HostRefreshRateComboBox(const QString &name, bool rw = false) :
         HostComboBox(name, rw) { }
-    virtual ~HostRefreshRateComboBox() { ; }
+    virtual ~HostRefreshRateComboBox() = default;
 
   public slots:
     virtual void ChangeResolution(const QString &resolution);

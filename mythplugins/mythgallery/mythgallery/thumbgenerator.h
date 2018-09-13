@@ -40,7 +40,7 @@ class ThumbGenEvent : public QEvent
 {
   public:
     explicit ThumbGenEvent(ThumbData *td) : QEvent(kEventType), thumbData(td) {}
-    ~ThumbGenEvent() {}
+    ~ThumbGenEvent() = default;
 
     ThumbData *thumbData;
 

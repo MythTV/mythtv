@@ -35,7 +35,7 @@ class MTV_PUBLIC ProfileItem
 {
   public:
     ProfileItem() : profileid(0) {}
-    ~ProfileItem() {}
+    ~ProfileItem() = default;
 
     void    Clear(void) { pref.clear(); }
 

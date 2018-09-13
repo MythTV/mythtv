@@ -92,7 +92,7 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
 
   protected:
     /// You need to call deleteLater to delete QObject
-    virtual ~VerticalConfigurationGroup() { }
+    virtual ~VerticalConfigurationGroup() = default;
 
   private:
     std::vector<QWidget*>    childwidget;
@@ -117,7 +117,7 @@ class MPUBLIC HorizontalConfigurationGroup : public ConfigurationGroup
 
   protected:
     /// You need to call deleteLater to delete QObject
-    virtual ~HorizontalConfigurationGroup() { }
+    virtual ~HorizontalConfigurationGroup() = default;
 };
 
 class MPUBLIC GridConfigurationGroup : public ConfigurationGroup
@@ -137,7 +137,7 @@ class MPUBLIC GridConfigurationGroup : public ConfigurationGroup
 
   protected:
     /// You need to call deleteLater to delete QObject
-    virtual ~GridConfigurationGroup() { }
+    virtual ~GridConfigurationGroup() = default;
 
   private:
     uint columns;
@@ -243,7 +243,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
 
   protected:
     /// You need to call deleteLater to delete QObject
-    virtual ~TriggeredConfigurationGroup() { }
+    virtual ~TriggeredConfigurationGroup() = default;
     void VerifyLayout(void);
 
   protected:

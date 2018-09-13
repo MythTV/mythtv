@@ -230,7 +230,7 @@ class RawLineup
 {
 
 public:
-    RawLineup() {}
+    RawLineup() = default;
 
     RawLineup(QString a, QString b, QString c) :
             get_action(a), udl_id(b), zipcode(c) {}

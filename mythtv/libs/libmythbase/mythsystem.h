@@ -107,7 +107,7 @@ class MBASE_PUBLIC MythSystem
         Priority cpuPriority = kInheritPriority,
         Priority diskPriority = kInheritPriority);
 
-    virtual ~MythSystem(void) {}
+    virtual ~MythSystem(void) = default;
 
     /// Returns the flags passed to the constructor
     virtual uint GetFlags(void) const = 0;
@@ -155,7 +155,7 @@ class MBASE_PUBLIC MythSystem
     virtual int GetExitCode(void) const = 0;
 
   protected:
-    MythSystem() {}
+    MythSystem() = default;
 
   private:
     MythSystem(const MythSystem&); // no-implementation

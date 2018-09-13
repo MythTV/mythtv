@@ -47,7 +47,7 @@ class UPNP_PUBLIC UPnPFeature
   public:
     UPnPFeature(const QString &name, int version) :
         m_name(name), m_version(version) {}
-    virtual ~UPnPFeature() {}
+    virtual ~UPnPFeature() = default;
 
     QString toXML();
     virtual QString CreateXML() = 0;

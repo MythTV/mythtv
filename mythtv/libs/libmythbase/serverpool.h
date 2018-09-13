@@ -42,7 +42,7 @@ class MBASE_PUBLIC PrivTcpServer : public QTcpServer
   public:
     PrivTcpServer(QObject *parent = nullptr,
                   PoolServerType type = kTCPServer);
-   ~PrivTcpServer() {};
+   ~PrivTcpServer() = default;
 
    PoolServerType GetServerType(void) { return m_serverType; }
 

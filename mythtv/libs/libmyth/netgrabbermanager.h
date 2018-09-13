@@ -103,7 +103,7 @@ class MPUBLIC GrabberUpdateEvent : public QEvent
   public:
     GrabberUpdateEvent(void)
          : QEvent((QEvent::Type)kGrabberUpdateEventType) {}
-    ~GrabberUpdateEvent() {}
+    ~GrabberUpdateEvent() = default;
 };
 
 class MPUBLIC GrabberDownloadThread : public QObject, public MThread

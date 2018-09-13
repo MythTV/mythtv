@@ -233,7 +233,7 @@ class MHIText : public MHTextDisplay
 {
   public:
     explicit MHIText(MHIContext *parent);
-    virtual ~MHIText() {}
+    virtual ~MHIText() = default;
 
     virtual void Draw(int x, int y);
     virtual void Clear(void);

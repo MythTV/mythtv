@@ -156,7 +156,7 @@ class RecordingProfileEditor :
 
   public:
     RecordingProfileEditor(int id, QString profName);
-    virtual ~RecordingProfileEditor() {}
+    virtual ~RecordingProfileEditor() = default;
 
     virtual void Load(void);
 

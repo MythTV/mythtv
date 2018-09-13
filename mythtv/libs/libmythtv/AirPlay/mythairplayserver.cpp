@@ -209,7 +209,7 @@ class APHTTPRequest
         Process();
         Check();
     }
-   ~APHTTPRequest() { }
+   ~APHTTPRequest() = default;
 
     QByteArray&       GetMethod(void)  { return m_method;   }
     QByteArray&       GetURI(void)     { return m_uri;      }

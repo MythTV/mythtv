@@ -11,7 +11,7 @@ class MythSocket;
 class MBASE_PUBLIC MythSocketCBs
 {
   public:
-    virtual ~MythSocketCBs() {}
+    virtual ~MythSocketCBs() = default;
     virtual void connected(MythSocket*) = 0;
     virtual void error(MythSocket*, int) {}
     virtual void readyRead(MythSocket*) = 0;

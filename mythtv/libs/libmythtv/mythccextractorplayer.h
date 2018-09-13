@@ -65,7 +65,7 @@ typedef QList<OneSubtitle> DVBStreamType;
 class SRTStuff
 {
   public:
-    SRTStuff() {}
+    SRTStuff() = default;
     virtual ~SRTStuff();
     QHash<int, SRTWriter*> srtwriters;
     QHash<int,int>         subs_num;
@@ -121,7 +121,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     MythCCExtractorPlayer(PlayerFlags flags, bool showProgress,
                           const QString &fileName, const QString & destdir);
     MythCCExtractorPlayer(const MythCCExtractorPlayer& rhs);
-    ~MythCCExtractorPlayer() {}
+    ~MythCCExtractorPlayer() = default;
 
     bool run(void);
 

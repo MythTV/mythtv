@@ -56,7 +56,7 @@ class MTV_PUBLIC InputInfo
     bool operator == (const QString &_name) const
         { return name == _name; }
 
-    virtual ~InputInfo() {}
+    virtual ~InputInfo() = default;
 
     virtual bool FromStringList(QStringList::const_iterator &it,
                                 QStringList::const_iterator  end);

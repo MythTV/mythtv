@@ -17,7 +17,7 @@
 class DeviceReaderCB
 {
   protected:
-    virtual ~DeviceReaderCB() {}
+    virtual ~DeviceReaderCB() = default;
   public:
     virtual void ReaderPaused(int fd) = 0;
     virtual void PriorityEvent(int fd) = 0;

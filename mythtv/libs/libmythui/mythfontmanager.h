@@ -13,7 +13,7 @@ typedef QMultiHash<QString, MythFontReference*> FontPathToReference;
 class MUI_PUBLIC MythFontManager
 {
   public:
-    MythFontManager() {}
+    MythFontManager() = default;
 
     void LoadFonts(const QString &directory, const QString &registeredFor);
     void ReleaseFonts(const QString &registeredFor);

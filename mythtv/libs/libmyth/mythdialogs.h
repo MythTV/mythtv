@@ -168,7 +168,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     void popupDone(int);
 
   protected:
-    ~MythPopupBox() {} // use deleteLater() instead for thread safety
+    ~MythPopupBox() = default; // use deleteLater() instead for thread safety
     bool focusNextPrevChild(bool next);
     void keyPressEvent(QKeyEvent *e);
 

@@ -23,7 +23,7 @@ class UDPPacket
     UDPPacket(const UDPPacket &o) : m_key(o.m_key), m_data(o.m_data) { }
     explicit UDPPacket(uint64_t key) : m_key(key) { }
     UDPPacket(void) : m_key(0ULL) { }
-    virtual ~UDPPacket() {}
+    virtual ~UDPPacket() = default;
 
     UDPPacket& operator=(const UDPPacket &rhs)
     {

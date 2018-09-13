@@ -29,8 +29,8 @@ class UPNP_PUBLIC SOAPClient
                const QString &sControlPath);
     /// \brief Empty SOAPClient constructor. When this is used, Init()
     ///        Must be called before SendSOAPRequest().
-    SOAPClient() {}
-    virtual ~SOAPClient() {}
+    SOAPClient() = default;
+    virtual ~SOAPClient() = default;
 
     bool Init(const QUrl    &url,
               const QString &sNamespace,

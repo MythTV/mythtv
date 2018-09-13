@@ -27,7 +27,7 @@ class SlotRelayer : public QObject
     void relay() {if (fp_void) fp_void();}
 
   private:
-    virtual ~SlotRelayer() {}
+    virtual ~SlotRelayer() = default;
     void (*fp_qstring)(const QString&);
     void (*fp_void)();
 };

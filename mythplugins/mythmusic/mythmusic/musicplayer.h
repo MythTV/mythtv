@@ -23,7 +23,7 @@ class MusicPlayerEvent : public MythEvent
             MythEvent(t), TrackID(id), Volume(0), IsMuted(false) {}
         MusicPlayerEvent(Type t, uint vol, bool muted) :
             MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
-        ~MusicPlayerEvent() {}
+        ~MusicPlayerEvent() = default;
 
         virtual MythEvent *clone(void) const { return new MusicPlayerEvent(*this); }
 

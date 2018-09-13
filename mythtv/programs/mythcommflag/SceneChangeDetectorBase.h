@@ -20,7 +20,7 @@ class SceneChangeDetectorBase : public QObject
                             float debugValue = 0.0);
 
   protected:
-    virtual ~SceneChangeDetectorBase() {}
+    virtual ~SceneChangeDetectorBase() = default;
 
   protected:
     unsigned int width, height;

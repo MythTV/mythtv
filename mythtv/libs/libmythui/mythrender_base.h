@@ -42,7 +42,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     virtual void Release(void)  { }
 
   protected:
-    virtual  ~MythRender() { }
+    virtual  ~MythRender() = default;
 
     RenderType  m_type;
     QSize       m_size;

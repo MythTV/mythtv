@@ -99,7 +99,7 @@ public:
     static ImageMetaData* FromPicture(const QString &filePath);
     static ImageMetaData* FromVideo(const QString &filePath);
 
-    virtual ~ImageMetaData() {}
+    virtual ~ImageMetaData() = default;
 
     //! Unique separator to delimit fields within a string
     static const QString kSeparator;
