@@ -1129,11 +1129,11 @@ TV::TV(void)
     setObjectName("TV");
     keyRepeatTimer.start();
 
-    sleep_times.push_back(SleepTimerInfo(tr("Off",   "Sleep timer"),       0));
-    sleep_times.push_back(SleepTimerInfo(tr("30m",   "Sleep timer"),   30*60));
-    sleep_times.push_back(SleepTimerInfo(tr("1h",    "Sleep timer"),    60*60));
-    sleep_times.push_back(SleepTimerInfo(tr("1h30m", "Sleep timer"), 90*60));
-    sleep_times.push_back(SleepTimerInfo(tr("2h",    "Sleep timer"),   120*60));
+    sleep_times.emplace_back(tr("Off",   "Sleep timer"),      0);
+    sleep_times.emplace_back(tr("30m",   "Sleep timer"),  30*60);
+    sleep_times.emplace_back(tr("1h",    "Sleep timer"),  60*60);
+    sleep_times.emplace_back(tr("1h30m", "Sleep timer"),  90*60);
+    sleep_times.emplace_back(tr("2h",    "Sleep timer"), 120*60);
 
     playerLock.lockForWrite();
     player.push_back(new PlayerContext(kPlayerInUseID));

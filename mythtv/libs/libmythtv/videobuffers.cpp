@@ -749,7 +749,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
         }
 
         bufs.push_back(data);
-        yuvinfo.push_back(YUVInfo(width, height, buf_size, nullptr, nullptr));
+        yuvinfo.emplace_back(width, height, buf_size, nullptr, nullptr);
         allocated_arrays.push_back(data);
     }
 

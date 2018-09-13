@@ -26,7 +26,7 @@ void ProgramInfoUpdater::insert(
     }
     else
     {
-        needsAddDelete.push_back(PIKeyAction(recordedid, action));
+        needsAddDelete.emplace_back(recordedid, action);
     }
 
     // Start a new run() if one isn't already running..
