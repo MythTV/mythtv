@@ -562,9 +562,7 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         rad = area.height() / 2;
     int dia = rad * 2;
 
-
-    QRect r(area.left() + halfline, area.top() + halfline,
-            area.width() - (halfline * 2), area.height() - (halfline * 2));
+    QRect r(area.left(), area.top(), area.width(), area.height());
 
     QRect tl(r.left(),  r.top(), rad, rad);
     QRect tr(r.left() + r.width() - rad, r.top(), rad, rad);
