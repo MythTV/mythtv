@@ -177,7 +177,7 @@ class VideoPlayMythSystem : public VideoPlayProc
 class VideoPlayerCommandPrivate
 {
   private:
-    VideoPlayerCommandPrivate &operator=(const VideoPlayerCommandPrivate &rhs);
+    VideoPlayerCommandPrivate &operator=(const VideoPlayerCommandPrivate &rhs) = delete;
 
   public:
     VideoPlayerCommandPrivate() = default;
