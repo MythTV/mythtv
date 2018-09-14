@@ -3045,6 +3045,67 @@ static HostTextEditSetting *UDPNotifyPort()
     return ge;
 }
 
+#ifdef USING_LIBCEC
+static HostCheckBoxSetting *CECEnabled()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("libCECEnabled");
+    gc->setLabel(MainGeneralSettings::tr("Enable CEC Control "
+                                         "interface"));
+    gc->setHelpText(MainGeneralSettings::tr("This enables "
+        "controlling MythFrontend from a TV remote or powering the TV "
+        "on and off from a MythTV remote "
+        "if you have compatible hardware. "
+        "These settings only take effect after a restart."));
+    gc->setValue(true);
+    return gc;
+}
+
+static HostCheckBoxSetting *CECPowerOnTVAllowed()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOnTVAllowed");
+    gc->setLabel(MainGeneralSettings::tr("Allow Power On TV"));
+    gc->setHelpText(MainGeneralSettings::tr("Enables your TV to be powered "
+        "on from MythTV remote or when MythTV starts "
+        "if you have compatible hardware."));
+    gc->setValue(true);
+    return gc;
+}
+
+static HostCheckBoxSetting *CECPowerOffTVAllowed()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOffTVAllowed");
+    gc->setLabel(MainGeneralSettings::tr("Allow Power Off TV"));
+    gc->setHelpText(MainGeneralSettings::tr("Enables your TV to be powered "
+        "off from MythTV remote or when MythTV starts "
+        "if you have compatible hardware."));
+    gc->setValue(true);
+    return gc;
+}
+
+static HostCheckBoxSetting *CECPowerOnTVOnStart()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOnTVOnStart");
+    gc->setLabel(MainGeneralSettings::tr("Power on TV At Start"));
+    gc->setHelpText(MainGeneralSettings::tr("Powers "
+        "on your TV when you start MythTV "
+        "if you have compatible hardware."));
+    gc->setValue(true);
+    return gc;
+}
+
+static HostCheckBoxSetting *CECPowerOffTVOnExit()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("PowerOffTVOnExit");
+    gc->setLabel(MainGeneralSettings::tr("Power off TV At Exit"));
+    gc->setHelpText(MainGeneralSettings::tr("Powers "
+        "off your TV when you exit MythTV "
+        "if you have compatible hardware."));
+    gc->setValue(true);
+    return gc;
+}
+
+#endif //USING_LIBCEC
+
 #ifdef USING_AIRPLAY
 // AirPlay Settings
 static HostCheckBoxSetting *AirPlayEnabled()
@@ -3808,6 +3869,22 @@ MainGeneralSettings::MainGeneralSettings()
     remotecontrol->addChild(NetworkControlEnabled());
     remotecontrol->addChild(NetworkControlPort());
     remotecontrol->addChild(UDPNotifyPort());
+#ifdef USING_LIBCEC
+    HostCheckBoxSetting *cec = CECEnabled();
+    remotecontrol->addChild(cec);
+    m_CECPowerOnTVAllowed = CECPowerOnTVAllowed();
+    m_CECPowerOffTVAllowed = CECPowerOffTVAllowed();
+    m_CECPowerOnTVOnStart = CECPowerOnTVOnStart();
+    m_CECPowerOffTVOnExit = CECPowerOffTVOnExit();
+    cec->addTargetedChild("1",m_CECPowerOnTVAllowed);
+    cec->addTargetedChild("1",m_CECPowerOffTVAllowed);
+    cec->addTargetedChild("1",m_CECPowerOnTVOnStart);
+    cec->addTargetedChild("1",m_CECPowerOffTVOnExit);
+    connect(m_CECPowerOnTVAllowed, SIGNAL(valueChanged(bool)),
+            this, SLOT(cecChanged(bool)));
+    connect(m_CECPowerOffTVAllowed, SIGNAL(valueChanged(bool)),
+            this, SLOT(cecChanged(bool)));
+#endif // USING_LIBCEC
     addChild(remotecontrol);
 
 #ifdef USING_AIRPLAY
@@ -3822,6 +3899,27 @@ MainGeneralSettings::MainGeneralSettings()
     addChild(airplay);
 #endif
 }
+
+#ifdef USING_LIBCEC
+void MainGeneralSettings::cecChanged(bool)
+{
+    if (m_CECPowerOnTVAllowed->boolValue())
+        m_CECPowerOnTVOnStart->setEnabled(true);
+    else
+    {
+        m_CECPowerOnTVOnStart->setEnabled(false);
+        m_CECPowerOnTVOnStart->setValue(false);
+    }
+
+    if (m_CECPowerOffTVAllowed->boolValue())
+        m_CECPowerOffTVOnExit->setEnabled(true);
+    else
+    {
+        m_CECPowerOffTVOnExit->setEnabled(false);
+        m_CECPowerOffTVOnExit->setValue(false);
+    }
+}
+#endif  // USING_LIBCEC
 
 void MainGeneralSettings::applyChange()
 {

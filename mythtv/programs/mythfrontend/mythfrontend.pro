@@ -124,6 +124,7 @@ using_alsa:DEFINES += USING_ALSA
 using_jack:DEFINES += USING_JACK
 using_oss: DEFINES += USING_OSS
 using_openmax: DEFINES += USING_OPENMAX
+using_libcec: DEFINES += USING_LIBCEC
 macx:      DEFINES += USING_COREAUDIO
 using_libdns_sd {
     DEFINES += USING_LIBDNS_SD
