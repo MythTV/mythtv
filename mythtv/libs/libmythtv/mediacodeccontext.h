@@ -23,8 +23,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef VIDEOOUTOPENGLMEDIACODEC_H
-#define VIDEOOUTOPENGLMEDIACODEC_H
+#ifndef MEDIACODECCONTEXT_H
+#define MEDIACODECCONTEXT_H
 
 #include "videoout_opengl.h"
 
@@ -38,4 +38,4 @@ class MediaCodecContext
                                              AVPixelFormat &pix_fmt);
 };
 
-#endif // VIDEOOUTOPENGLMEDIACODEC_H
+#endif // MEDIACODECCONTEXT_H

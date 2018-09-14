@@ -1573,8 +1573,6 @@ static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext *avctx,
         if (IS_VAAPI_PIX_FMT(*valid_fmts))
         {
             ret = *valid_fmts;
-            avctx->pix_fmt = ret;
-            // Vaapi2Context::SetHwframeCtx(avctx, 20);
             break;
         }
         valid_fmts++;
@@ -1587,10 +1585,13 @@ static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext *avctx,
 static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext *avctx,
                                            const enum AVPixelFormat *valid_fmts)
 {
-    enum AVPixelFormat ret = *valid_fmts; // default to first
+    enum AVPixelFormat ret = AV_PIX_FMT_NONE;
     while (*valid_fmts != AV_PIX_FMT_NONE) {
-        if (*valid_fmts == AV_PIX_FMT_YUV420P)
-            ret = AV_PIX_FMT_YUV420P;
+        if (*valid_fmts == AV_PIX_FMT_MEDIACODEC)
+        {
+            ret = AV_PIX_FMT_MEDIACODEC;
+            break;
+        }
         valid_fmts++;
     }
     return ret;
