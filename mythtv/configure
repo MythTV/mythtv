@@ -787,7 +787,7 @@ check_cflags(){
 
 check_cxxflags(){
     log check_cxxflags "$@"
-    check_cxx "$@" <<EOF && add_cxxflags "$@" || echolog "WARNING! An unknown C++ compiler flag in: \"$@\". Option(s) will be ignored."
+    check_cxx "$@" <<EOF && add_cxxflags "$@" || log "WARNING! An unknown C++ compiler flag in: \"$@\". Option(s) will be ignored."
 class X {};
 int x;
 EOF
@@ -7092,7 +7092,8 @@ fi
 ffmpeg_extra_cflags="$extra_cflags -w"
 
 ## Call FFmpeg configure here
-echo -e '\n#### FFmpeg CONFIGURATION ####'
+echo
+echo '#### FFmpeg CONFIGURATION ####'
 currentpwd="$PWD"
 cd external/FFmpeg
 eval ./configure \
@@ -7120,7 +7121,8 @@ cd "$currentpwd"
 
 if test "$quiet" != "yes"; then
 
-echo '\n#### MythTV CONFIGURATION ####'
+echo
+echo '#### MythTV CONFIGURATION ####'
 echo "# Basic Settings"
 echo "Qt minimum version        $QT_MIN_VERSION_STR"
 echo "Qt installed version      `$qmake -query QT_VERSION`"
