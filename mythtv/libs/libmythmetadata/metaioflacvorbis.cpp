@@ -201,10 +201,10 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
         for (TagLib::List<Picture *>::ConstIterator it = picList.begin();
                 it != picList.end(); it++)
         {
-            pic = *it;
             if (pic->type() == artType)
             {
                 //found the type we were looking for
+                pic = *it;
                 break;
             }
         }
