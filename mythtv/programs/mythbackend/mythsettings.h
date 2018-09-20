@@ -9,8 +9,8 @@
 class MythSettingBase
 {
   public:
-    MythSettingBase() {}
-    virtual ~MythSettingBase() {}
+    MythSettingBase() = default;
+    virtual ~MythSettingBase() = default;
     virtual QString ToHTML(uint) const { return QString(); }
 };
 typedef QList<MythSettingBase*> MythSettingList;

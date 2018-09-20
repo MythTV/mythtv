@@ -53,7 +53,7 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
     struct timeval now, elapsed;
     long sleepus;
 
-    (void)gettimeofday(&now, NULL);
+    (void)gettimeofday(&now, nullptr);
     timersub(&now, framestart, &elapsed);
 
     // Sleep for one frame's worth of time.
@@ -321,14 +321,14 @@ CommDetector2::CommDetector2(
     isRecording(MythDate::current() < recendts),
     sendBreakMapUpdates(false),     breakMapUpdateRequested(false),
     finished(false),                currentFrameNumber(0),
-    logoFinder(NULL),               logoMatcher(NULL),
-    blankFrameDetector(NULL),       sceneChangeDetector(NULL),
+    logoFinder(nullptr),            logoMatcher(nullptr),
+    blankFrameDetector(nullptr),    sceneChangeDetector(nullptr),
     debugdir("")
 {
     FrameAnalyzerItem        pass0, pass1;
-    PGMConverter            *pgmConverter = NULL;
-    BorderDetector          *borderDetector = NULL;
-    HistogramAnalyzer       *histogramAnalyzer = NULL;
+    PGMConverter            *pgmConverter = nullptr;
+    BorderDetector          *borderDetector = nullptr;
+    HistogramAnalyzer       *histogramAnalyzer = nullptr;
 
     if (useDB)
         debugdir = debugDirectory(chanid, recstartts);
@@ -478,7 +478,7 @@ int CommDetector2::computeBreaks(long long nframes)
 
     matcher = logoFinder &&
         logoFinder->getTemplate(&trow, &tcol, &twidth, &theight) ? logoMatcher :
-        NULL;
+        nullptr;
 
     if (matcher && blankFrameDetector)
     {
@@ -593,13 +593,13 @@ bool CommDetector2::go(void)
         {
             struct timeval start, end, elapsedtv;
 
-            (void)gettimeofday(&start, NULL);
+            (void)gettimeofday(&start, nullptr);
             bool fetchNext = (nextFrame == currentFrameNumber + 1);
             VideoFrame *currentFrame =
                 player->GetRawVideoFrame(fetchNext ? -1 : nextFrame);
             long long lastFrameNumber = currentFrameNumber;
             currentFrameNumber = currentFrame->frameNumber + 1;
-            (void)gettimeofday(&end, NULL);
+            (void)gettimeofday(&end, nullptr);
             timersub(&end, &start, &elapsedtv);
             timeradd(&getframetime, &elapsedtv, &getframetime);
 

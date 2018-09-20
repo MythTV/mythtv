@@ -24,8 +24,8 @@ class UPnpDevice;
 class UPNP_PUBLIC UPnpServiceImpl
 {
   public:
-    UPnpServiceImpl() {}
-    virtual ~UPnpServiceImpl() {}
+    UPnpServiceImpl() = default;
+    virtual ~UPnpServiceImpl() = default;
 
     void RegisterService(UPnpDevice *device);
 
@@ -47,7 +47,7 @@ class UPNP_PUBLIC UPnPFeature
   public:
     UPnPFeature(const QString &name, int version) :
         m_name(name), m_version(version) {}
-    virtual ~UPnPFeature() {}
+    virtual ~UPnPFeature() = default;
 
     QString toXML();
     virtual QString CreateXML() = 0;
@@ -60,7 +60,7 @@ class UPNP_PUBLIC UPnPFeature
 class UPNP_PUBLIC UPnPFeatureList
 {
   public:
-    UPnPFeatureList();
+    UPnPFeatureList() = default;
    ~UPnPFeatureList();
 
     void AddFeature( UPnPFeature *feature );

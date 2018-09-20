@@ -63,10 +63,6 @@ ResultItem::ResultItem() :
 {
 }
 
-ResultItem::~ResultItem()
-{
-}
-
 void ResultItem::toMap(InfoMap &metadataMap)
 {
     metadataMap["title"] = m_title;
@@ -101,7 +97,7 @@ void ResultItem::toMap(InfoMap &metadataMap)
         metadataMap["length"] = fin.toString(format);
     }
 
-    if (m_rating == 0 || m_rating.isNull())
+    if (m_rating == nullptr || m_rating.isNull())
         metadataMap["rating"] = QString();
     else
         metadataMap["rating"] = m_rating;
@@ -256,7 +252,7 @@ class MRSSParser
 
 
 public:
-    MRSSParser() {}
+    MRSSParser() = default;
 
     QList<MRSSEntry> operator() (const QDomElement& item)
     {
@@ -701,14 +697,6 @@ const QString Parse::GeoRSSSimple = "http://www.georss.org/georss";
 const QString Parse::GeoRSSW3 = "http://www.w3.org/2003/01/geo/wgs84_pos#";
 const QString Parse::MediaRSS = "http://search.yahoo.com/mrss/";
 const QString Parse::MythRSS = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format";
-
-Parse::Parse()
-{
-}
-
-Parse::~Parse()
-{
-}
 
 ResultItem::resultList Parse::parseRSS(QDomDocument domDoc)
 {

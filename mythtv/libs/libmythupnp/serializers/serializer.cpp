@@ -75,7 +75,7 @@ void Serializer::Serialize( const QVariant &vValue, const QString &_sName )
 
     BeginSerialize( sName );
 
-    AddProperty( sName, vValue, NULL, NULL );
+    AddProperty( sName, vValue, nullptr, nullptr );
 
     EndSerialize();
 }
@@ -101,7 +101,7 @@ void Serializer::SerializeObject( const QObject *pObject, const QString &sName )
 
 void Serializer::SerializeObjectProperties( const QObject *pObject )
 {
-    if (pObject != NULL)
+    if (pObject != nullptr)
     {
         const QMetaObject *pMetaObject = pObject->metaObject();
 

@@ -53,12 +53,12 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     m_recProfile(new RecordingProfile("Transcoders")),
     keyframedist(30),
 #if CONFIG_LIBMP3LAME
-    nvr(NULL),
+    nvr(nullptr),
 #endif
-    ctx(NULL),
-    outRingBuffer(NULL),
-    fifow(NULL),
-    kfa_table(NULL),
+    ctx(nullptr),
+    outRingBuffer(nullptr),
+    fifow(nullptr),
+    kfa_table(nullptr),
     showprogress(false),
     recorderOptions(""),
     avfMode(false),
@@ -78,7 +78,7 @@ Transcode::~Transcode()
     if (nvr)
         delete nvr;
 #endif
-    SetPlayerContext(NULL);
+    SetPlayerContext(nullptr);
     if (outRingBuffer)
         delete outRingBuffer;
     if (fifow)
@@ -223,10 +223,10 @@ int Transcode::TranscodeFile(const QString &inputname,
     QDateTime curtime = MythDate::current();
     QDateTime statustime = curtime;
     int audioFrame = 0;
-    Cutter *cutter = NULL;
-    AVFormatWriter *avfw = NULL;
-    AVFormatWriter *avfw2 = NULL;
-    HTTPLiveStream *hls = NULL;
+    Cutter *cutter = nullptr;
+    AVFormatWriter *avfw = nullptr;
+    AVFormatWriter *avfw2 = nullptr;
+    HTTPLiveStream *hls = nullptr;
     int hlsSegmentSize = 0;
     int hlsSegmentFrames = 0;
 
@@ -256,7 +256,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (!avfMode)
     {
 #if CONFIG_LIBMP3LAME
-        nvr = new NuppelVideoRecorder(NULL, NULL);
+        nvr = new NuppelVideoRecorder(nullptr, nullptr);
 #else
         LOG(VB_GENERAL, LOG_ERR,
             "Not compiled with libmp3lame support");
@@ -283,7 +283,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     player_ctx->SetRingBuffer(rb);
     player_ctx->SetPlayer(new MythPlayer((PlayerFlags)(kVideoIsNull | kNoITV)));
     SetPlayerContext(player_ctx);
-    GetPlayer()->SetPlayerInfo(NULL, NULL, GetPlayerContext());
+    GetPlayer()->SetPlayerInfo(nullptr, nullptr, GetPlayerContext());
     if (m_proginfo->GetRecordingEndTime() > curtime)
     {
         player_ctx->SetRecorder(RemoteGetExistingRecorder(m_proginfo));
@@ -304,7 +304,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (GetPlayer()->OpenFile() < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, error opening file.");
-        SetPlayerContext(NULL);
+        SetPlayerContext(nullptr);
         if (hls)
             delete hls;
         return REENCODE_ERROR;
@@ -364,7 +364,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             (JobQueue::IsJobRunning(JOB_COMMFLAG, *m_proginfo)))
         {
             LOG(VB_GENERAL, LOG_INFO, "Transcoding aborted, cutlist changed");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (hls)
                 delete hls;
             return REENCODE_CUTLIST_CHANGE;
@@ -377,7 +377,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     QString encodingType = GetPlayer()->GetEncodingType();
     bool copyvideo = false, copyaudio = false;
 
-    QString vidsetting = NULL, audsetting = NULL, vidfilters = NULL;
+    QString vidsetting = nullptr, audsetting = nullptr, vidfilters = nullptr;
 
     QSize buf_size = GetPlayer()->GetVideoBufferSize();
     int video_width = buf_size.width();
@@ -452,7 +452,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "Transcoding aborted, error creating AVFormatWriter.");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (hls)
                 delete hls;
             return REENCODE_ERROR;
@@ -481,7 +481,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 if (!hls || hlsStreamID == -1)
                 {
                     LOG(VB_GENERAL, LOG_ERR, "Unable to create new stream");
-                    SetPlayerContext(NULL);
+                    SetPlayerContext(nullptr);
                     delete avfw;
                     if (avfw2)
                         delete avfw2;
@@ -518,7 +518,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (!hls->InitForWrite())
             {
                 LOG(VB_GENERAL, LOG_ERR, "hls->InitForWrite() failed");
-                SetPlayerContext(NULL);
+                SetPlayerContext(nullptr);
                 delete hls;
                 delete avfw;
                 if (avfw2)
@@ -583,7 +583,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!avfw->Init())
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->Init() failed");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (hls)
                 delete hls;
             delete avfw;
@@ -595,7 +595,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!avfw->OpenFile())
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw->OpenFile() failed");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (hls)
                 delete hls;
             delete avfw;
@@ -607,7 +607,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (avfw2 && !avfw2->Init())
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->Init() failed");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (hls)
                 delete hls;
             delete avfw;
@@ -618,7 +618,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (avfw2 && !avfw2->OpenFile())
         {
             LOG(VB_GENERAL, LOG_ERR, "avfw2->OpenFile() failed");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (hls)
                 delete hls;
             delete avfw;
@@ -637,7 +637,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (!GetProfile(profileName, encodingType, video_height,
                         (int)round(video_frame_rate))) {
             LOG(VB_GENERAL, LOG_ERR, "Transcoding aborted, no profile found.");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             return REENCODE_ERROR;
         }
 
@@ -670,7 +670,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             get_int_option(m_recProfile, "transcodelossless"))
         {
             LOG(VB_GENERAL, LOG_NOTICE, "Switching to MPEG-2 transcoder.");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             return REENCODE_MPEG2TRANS;
         }
 
@@ -771,14 +771,14 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_ERR, "No video information found!");
             LOG(VB_GENERAL, LOG_ERR, "Please ensure that recording profiles "
                                      "for the transcoder are set");
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             return REENCODE_ERROR;
         }
         else
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Unknown video codec: %1").arg(vidsetting));
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             return REENCODE_ERROR;
         }
 
@@ -881,7 +881,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Unable to initialize MythPlayer for Transcode");
-        SetPlayerContext(NULL);
+        SetPlayerContext(nullptr);
         if (hls)
             delete hls;
         if (avfw)
@@ -926,7 +926,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (nonAligned)
         {
             // Set a stride identical to actual width, to ease fifo post-conversion process.
-            init(&frame, FMT_YV12, newFrame, video_width, video_height, newSize, NULL, NULL, -1, -1, 0 /* aligned */);
+            init(&frame, FMT_YV12, newFrame, video_width, video_height, newSize, nullptr, nullptr, -1, -1, 0 /* aligned */);
         }
         else
         {
@@ -1008,7 +1008,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             // Request was for just the format of fifo data, not for
             // the actual transcode, so stop here.
             unlink(outputname.toLocal8Bit().constData());
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (rescale)
             {
                 av_freep(&frame.buf);
@@ -1031,7 +1031,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_ERR,
                 "Error initializing fifo writer.  Aborting");
             unlink(outputname.toLocal8Bit().constData());
-            SetPlayerContext(NULL);
+            SetPlayerContext(nullptr);
             if (rescale)
             {
                 av_freep(&frame.buf);
@@ -1048,7 +1048,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
 #if CONFIG_LIBMP3LAME
-    bool forceKeyFrames = (fifow == NULL) ? framecontrol : false;
+    bool forceKeyFrames = (fifow == nullptr) ? framecontrol : false;
     bool writekeyframe = true;
     long lastKeyFrame = 0;
     int num_keyframes = 0;
@@ -1073,10 +1073,10 @@ int Transcode::TranscodeFile(const QString &inputname,
     float vidFrameTime = 1000.0f / video_frame_rate;
     int wait_recover = 0;
     VideoOutput *videoOutput = GetPlayer()->GetVideoOutput();
-    bool is_key = 0;
+    bool is_key = false;
     bool first_loop = true;
     AVFrame imageIn, imageOut;
-    struct SwsContext  *scontext = NULL;
+    struct SwsContext  *scontext = nullptr;
 
     if (fifow)
         LOG(VB_GENERAL, LOG_INFO, "Dumping Video and Audio data to fifos");
@@ -1100,7 +1100,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         cutter->Activate(vidFrameTime * rateTimeConv, total_frame_count);
 
     bool stopSignalled = false;
-    VideoFrame *lastDecode = NULL;
+    VideoFrame *lastDecode = nullptr;
 
     if (hls)
     {
@@ -1137,7 +1137,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             scontext = sws_getCachedContext(scontext,
                            lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
                            frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
-                           SWS_FAST_BILINEAR, NULL, NULL, NULL);
+                           SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
             // Typically, wee aren't rescaling per say, we're just correcting the stride set by the decoder.
             // However, it allows to properly handle recordings that see their resolution change half-way.
             sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
@@ -1207,8 +1207,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                     .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime)
                     .arg(delta));
 #endif
-            AudioBuffer *ab = NULL;
-            while ((ab = arb->GetData(frame.timecode)) != NULL)
+            AudioBuffer *ab = nullptr;
+            while ((ab = arb->GetData(frame.timecode)) != nullptr)
             {
                 if (!cutter ||
                     !cutter->InhibitUseAudioFrames(ab->m_frames, &totalAudio))
@@ -1260,7 +1260,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     av_freep(&frame.buf);
                 }
-                SetPlayerContext(NULL);
+                SetPlayerContext(nullptr);
                 if (videoBuffer)
                     videoBuffer->stop();
                 if (hls)
@@ -1347,7 +1347,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     scontext = sws_getCachedContext(scontext,
                                    lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
                                    frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
-                                   SWS_FAST_BILINEAR, NULL, NULL, NULL);
+                                   SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
                     sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
                               lastDecode->height - bottomBand,
@@ -1405,7 +1405,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 scontext = sws_getCachedContext(scontext,
                                lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
                                frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
-                               SWS_FAST_BILINEAR, NULL, NULL, NULL);
+                               SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
                 sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
                           lastDecode->height - bottomBand,
@@ -1413,8 +1413,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
             // audio is fully decoded, so we need to reencode it
-            AudioBuffer *ab = NULL;
-            while ((ab = arb->GetData(lastWrittenTime)) != NULL)
+            AudioBuffer *ab = nullptr;
+            while ((ab = arb->GetData(lastWrittenTime)) != nullptr)
             {
                 unsigned char *buf = (unsigned char *)ab->data();
                 if (avfMode)
@@ -1456,7 +1456,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                         {
                             av_freep(&frame.buf);
                         }
-                        SetPlayerContext(NULL);
+                        SetPlayerContext(nullptr);
                         if (videoBuffer)
                             videoBuffer->stop();
                         delete ab;
@@ -1557,7 +1557,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     av_freep(&frame.buf);
                 }
-                SetPlayerContext(NULL);
+                SetPlayerContext(nullptr);
                 if (videoBuffer)
                     videoBuffer->stop();
                 return REENCODE_CUTLIST_CHANGE;
@@ -1575,7 +1575,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     {
                         av_freep(&frame.buf);
                     }
-                    SetPlayerContext(NULL);
+                    SetPlayerContext(nullptr);
                     if (videoBuffer)
                         videoBuffer->stop();
                     if (hls)
@@ -1681,7 +1681,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     {
         av_freep(&frame.buf);
     }
-    SetPlayerContext(NULL);
+    SetPlayerContext(nullptr);
 
     return REENCODE_OK;
 }

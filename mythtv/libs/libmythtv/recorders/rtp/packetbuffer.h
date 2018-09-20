@@ -16,7 +16,7 @@ class PacketBuffer
 {
   public:
     explicit PacketBuffer(unsigned int bitrate);
-    virtual ~PacketBuffer() { }
+    virtual ~PacketBuffer() = default;
 
     virtual void PushDataPacket(const UDPPacket&) = 0;
 

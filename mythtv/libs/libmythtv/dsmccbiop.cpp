@@ -43,7 +43,7 @@ int BiopNameComp::Process(const unsigned char *data)
 BiopName::BiopName()
 {
     m_comp_count = 0;
-    m_comps = NULL;
+    m_comps = nullptr;
 }
 
 BiopName::~BiopName()
@@ -100,7 +100,7 @@ int BiopBinding::Process(const unsigned char *data)
         memcpy(m_objinfo, data + off, m_objinfo_len);
     }
     else
-        m_objinfo = NULL;
+        m_objinfo = nullptr;
 
     off += m_objinfo_len;
 
@@ -595,7 +595,7 @@ int BiopIor::Process(const unsigned char *data)
 void BiopIor::AddTap(Dsmcc *pStatus)
 {
     DSMCCCacheReference *ref = m_profile_body->GetReference();
-    if (ref != NULL)
+    if (ref != nullptr)
         pStatus->AddTap(ref->m_nStreamTag, ref->m_nCarouselId);
 }
 

@@ -66,7 +66,7 @@ void StartPrompter::backendRunningPrompt(void)
     if (!gCoreContext->IsConnectedToMaster() &&
         gCoreContext->ConnectToMasterServer(false))
     {
-        backendIsRecording = RemoteGetRecordingStatus(NULL, false);
+        backendIsRecording = RemoteGetRecordingStatus(nullptr, false);
     }
     
     QString warning = tr("WARNING: The backend is currently running.")+"\n\n"+

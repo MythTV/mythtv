@@ -140,7 +140,7 @@ class WebSocketExtension : public QObject
 
   public:
     WebSocketExtension() : QObject() { };
-    virtual ~WebSocketExtension() {};
+    virtual ~WebSocketExtension() = default;
 
     virtual bool HandleTextFrame(const WebSocketFrame &/*frame*/) { return false; }
     virtual bool HandleBinaryFrame(const WebSocketFrame &/*frame*/) { return false; }
@@ -164,7 +164,7 @@ class WebSocketWorkerThread : public QRunnable
                           , QSslConfiguration sslConfig
 #endif
                         );
-    virtual ~WebSocketWorkerThread();
+    virtual ~WebSocketWorkerThread() = default;
 
     virtual void run(void);
 

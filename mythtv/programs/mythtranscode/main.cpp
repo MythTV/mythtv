@@ -138,7 +138,7 @@ namespace
     void cleanup()
     {
         delete gContext;
-        gContext = NULL;
+        gContext = nullptr;
         SignalHandler::Done();
     }
 }
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     QDateTime starttime;
     QString infile, outfile;
     QString profilename = QString("autodetect");
-    QString fifodir = NULL;
+    QString fifodir = nullptr;
     int jobID = -1;
     int jobType = JOB_NONE;
     int otype = REPLEX_MPEG2;
@@ -472,7 +472,7 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_ERROR;
     }
 
-    ProgramInfo *pginfo = NULL;
+    ProgramInfo *pginfo = nullptr;
     if (cmdline.toBool("hls"))
     {
         if (cmdline.toBool("hlsstreamid"))
@@ -480,7 +480,7 @@ int main(int argc, char *argv[])
             HTTPLiveStream hls(cmdline.toInt("hlsstreamid"));
             pginfo = new ProgramInfo(hls.GetSourceFile());
         }
-        if (pginfo == NULL)
+        if (pginfo == nullptr)
             pginfo = new ProgramInfo();
     }
     else if (isVideo)
@@ -628,8 +628,8 @@ int main(int argc, char *argv[])
     int exitcode = GENERIC_EXIT_OK;
     if ((result == REENCODE_MPEG2TRANS) || mpeg2 || build_index)
     {
-        void (*update_func)(float) = NULL;
-        int (*check_func)() = NULL;
+        void (*update_func)(float) = nullptr;
+        int (*check_func)() = nullptr;
         if (useCutlist)
         {
             LOG(VB_GENERAL, LOG_INFO, "Honoring the cutlist while transcoding");
@@ -644,7 +644,7 @@ int main(int argc, char *argv[])
         }
 
         MPEG2fixup *m2f = new MPEG2fixup(infile, outfile,
-                                         &deleteMap, NULL, false, false, 20,
+                                         &deleteMap, nullptr, false, false, 20,
                                          showprogress, otype, update_func,
                                          check_func);
 
@@ -659,11 +659,11 @@ int main(int argc, char *argv[])
             if (err)
             {
                 delete m2f;
-                m2f = NULL;
+                m2f = nullptr;
                 return err;
             }
             if (update_index)
-                UpdatePositionMap(posMap, durMap, NULL, pginfo);
+                UpdatePositionMap(posMap, durMap, nullptr, pginfo);
             else
                 UpdatePositionMap(posMap, durMap, outfile + QString(".map"), pginfo);
         }
@@ -676,7 +676,7 @@ int main(int argc, char *argv[])
                 if (result == REENCODE_OK)
                 {
                     if (update_index)
-                        UpdatePositionMap(posMap, durMap, NULL, pginfo);
+                        UpdatePositionMap(posMap, durMap, nullptr, pginfo);
                     else
                         UpdatePositionMap(posMap, durMap, outfile + QString(".map"),
                                           pginfo);
@@ -697,7 +697,7 @@ int main(int argc, char *argv[])
             }
         }
         delete m2f;
-        m2f = NULL;
+        m2f = nullptr;
     }
 
     if (result == REENCODE_OK)
@@ -768,7 +768,7 @@ static int transUnlink(QString filename, ProgramInfo *pginfo)
 static uint64_t ComputeNewBookmark(uint64_t oldBookmark,
                                    frm_dir_map_t *deleteMap)
 {
-    if (deleteMap == NULL)
+    if (deleteMap == nullptr)
         return oldBookmark;
 
     uint64_t subtraction = 0;

@@ -86,7 +86,7 @@ class MBASE_PUBLIC MythSystemLegacyWindows : public MythSystemLegacyPrivate
 
     public:
         explicit MythSystemLegacyWindows(MythSystemLegacy *parent);
-        ~MythSystemLegacyWindows();
+        ~MythSystemLegacyWindows() = default;
 
         virtual void Fork(time_t timeout) MOVERRIDE;
         virtual void Manage(void) MOVERRIDE;

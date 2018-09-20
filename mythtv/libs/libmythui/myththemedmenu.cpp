@@ -36,13 +36,9 @@
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
     : MythScreenType(parent, name),
-      m_callback(NULL), m_callbackdata(NULL),
-      m_killable(false), m_loaded(false), m_titleState(NULL),
-      m_watermarkState(NULL), m_buttonList(NULL), m_descriptionText(NULL)
-{
-}
-
-MythThemedMenuState::~MythThemedMenuState()
+      m_callback(nullptr), m_callbackdata(nullptr),
+      m_killable(false), m_loaded(false), m_titleState(nullptr),
+      m_watermarkState(nullptr), m_buttonList(nullptr), m_descriptionText(nullptr)
 {
 }
 
@@ -106,7 +102,7 @@ MythThemedMenu::MythThemedMenu(const QString &/*cdir*/, const QString &menufile,
                                bool /*allowreorder*/, MythThemedMenuState *state)
     : MythThemedMenuState(parent, name),
       m_state(state), m_allocedstate(false), m_foundtheme(false),
-      m_ignorekeys(false), m_wantpop(false), m_menuPopup(NULL)
+      m_ignorekeys(false), m_wantpop(false), m_menuPopup(nullptr)
 {
     if (!m_state)
     {
@@ -440,7 +436,7 @@ void MythThemedMenu::customEvent(QEvent *event)
             }
         }
 
-        m_menuPopup = NULL;
+        m_menuPopup = nullptr;
     }
 }
 

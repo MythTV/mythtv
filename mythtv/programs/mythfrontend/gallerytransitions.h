@@ -27,7 +27,7 @@ class Transition : public QObject
     Q_OBJECT
 public:
     explicit Transition(QString name);
-    virtual ~Transition()              {}
+    virtual ~Transition()              = default;
 
     virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
     virtual void SetSpeed(float)       {}
@@ -156,7 +156,7 @@ class TransitionRandom : public Transition
     Q_OBJECT
 public:
     explicit TransitionRandom(QList<Transition*> peers)
-        : Transition(Transition::tr("Random")), m_peers(peers), m_current(NULL) {}
+        : Transition(Transition::tr("Random")), m_peers(peers), m_current(nullptr) {}
     virtual void Start(Slide &from, Slide &to, bool forwards, float speed = 1.0);
     virtual void SetSpeed(float speed) { if (m_current) m_current->SetSpeed(speed); }
     virtual void Pulse(int interval)   { if (m_current) m_current->Pulse(interval); }

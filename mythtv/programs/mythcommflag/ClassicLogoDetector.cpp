@@ -58,7 +58,7 @@ unsigned int ClassicLogoDetector::getRequiredAvailableBufferForSearch()
 
 void ClassicLogoDetector::deleteLater(void)
 {
-    commDetector = 0;
+    commDetector = nullptr;
     if (edgeMask)
         delete [] edgeMask;
     if (logoFrame)

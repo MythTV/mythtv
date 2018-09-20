@@ -206,7 +206,7 @@ ActionID *KeyBindings::GetConflict(
         }
     }
 
-    return NULL; // no conflicts
+    return nullptr; // no conflicts
 }
 
 /**

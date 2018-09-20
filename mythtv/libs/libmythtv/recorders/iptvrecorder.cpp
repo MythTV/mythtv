@@ -77,7 +77,7 @@ bool IPTVRecorder::PauseAndWait(int timeout)
     {
         if (!IsPaused(true))
         {
-            m_channel->SetStreamData(NULL);
+            m_channel->SetStreamData(nullptr);
             paused = true;
             pauseWait.wakeAll();
             if (tvrec)

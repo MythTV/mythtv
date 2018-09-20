@@ -28,13 +28,13 @@ QEvent::Type DialogCompletionEvent::kEventType =
 
 
 MythMenu::MythMenu(const QString &text, QObject *retobject, const QString &resultid) :
-    m_parentMenu(NULL),  m_title(""), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
+    m_parentMenu(nullptr),  m_title(""), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
 {
     Init();
 }
 
 MythMenu::MythMenu(const QString &title, const QString &text, QObject *retobject, const QString &resultid) :
-    m_parentMenu(NULL),  m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
+    m_parentMenu(nullptr),  m_title(title), m_text(text), m_resultid(resultid), m_retObject(retobject), m_selectedItem(0)
 {
     Init();
 }
@@ -130,13 +130,13 @@ MythDialogBox::MythDialogBox(const QString &text,
                              bool fullscreen, bool osd)
          : MythScreenType(parent, name, false)
 {
-    m_menu = NULL;
-    m_currentMenu = NULL;
-    m_retObject = NULL;
-    m_titlearea = NULL;
+    m_menu = nullptr;
+    m_currentMenu = nullptr;
+    m_retObject = nullptr;
+    m_titlearea = nullptr;
     m_text = text;
-    m_textarea = NULL;
-    m_buttonList = NULL;
+    m_textarea = nullptr;
+    m_buttonList = nullptr;
 
     m_fullscreen = fullscreen;
     m_osdDialog  = osd;
@@ -153,15 +153,15 @@ MythDialogBox::MythDialogBox(const QString &title, const QString &text,
                              bool fullscreen, bool osd)
          : MythScreenType(parent, name, false)
 {
-    m_menu = NULL;
-    m_currentMenu = NULL;
+    m_menu = nullptr;
+    m_currentMenu = nullptr;
     m_id = "";
-    m_retObject = NULL;
+    m_retObject = nullptr;
     m_title = title;
-    m_titlearea = NULL;
+    m_titlearea = nullptr;
     m_text = text;
-    m_textarea = NULL;
-    m_buttonList = NULL;
+    m_textarea = nullptr;
+    m_buttonList = nullptr;
 
     m_fullscreen = fullscreen;
     m_osdDialog  = osd;
@@ -180,11 +180,11 @@ MythDialogBox::MythDialogBox(MythMenu *menu, MythScreenStack *parent, const char
     m_menu = menu;
     m_currentMenu = m_menu;
     m_id = "";
-    m_retObject = NULL;
+    m_retObject = nullptr;
     m_title = "";
-    m_titlearea = NULL;
-    m_textarea = NULL;
-    m_buttonList = NULL;
+    m_titlearea = nullptr;
+    m_textarea = nullptr;
+    m_buttonList = nullptr;
 
     m_fullscreen = fullscreen;
     m_osdDialog  = osd;
@@ -201,7 +201,7 @@ MythDialogBox::~MythDialogBox(void)
     if (m_menu)
     {
         delete m_menu;
-        m_menu = NULL;
+        m_menu = nullptr;
     }
 }
 
@@ -274,7 +274,7 @@ void MythDialogBox::updateMenu(void)
         MythMenuItem *menuItem = m_currentMenu->m_menuItems.at(x);
         MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, menuItem->Text);
         button->SetData(qVariantFromValue(menuItem));
-        button->setDrawArrow((menuItem->SubMenu != NULL));
+        button->setDrawArrow((menuItem->SubMenu != nullptr));
 
         if (m_currentMenu->m_selectedItem == x)
             m_buttonList->SetItemCurrent(button);
@@ -346,7 +346,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     }
 
     if (m_ScreenStack)
-        m_ScreenStack->PopScreen(NULL, false);
+        m_ScreenStack->PopScreen(nullptr, false);
 }
 
 void MythDialogBox::SetReturnEvent(QObject *retobject,
@@ -518,12 +518,12 @@ MythConfirmationDialog::MythConfirmationDialog(MythScreenStack *parent,
                                                bool showCancel)
                        : MythScreenType(parent, "mythconfirmpopup")
 {
-    m_messageText = NULL;
+    m_messageText = nullptr;
     m_message = message;
     m_showCancel = showCancel;
 
     m_id = "";
-    m_retObject = NULL;
+    m_retObject = nullptr;
 }
 
 bool MythConfirmationDialog::Create(void)
@@ -531,8 +531,8 @@ bool MythConfirmationDialog::Create(void)
     if (!CopyWindowFromBase("MythConfirmationDialog", this))
         return false;
 
-    MythUIButton *okButton = NULL;
-    MythUIButton *cancelButton = NULL;
+    MythUIButton *okButton = nullptr;
+    MythUIButton *cancelButton = nullptr;
 
     bool err = false;
     UIUtilE::Assign(this, m_messageText, "message", &err);
@@ -629,7 +629,7 @@ void MythConfirmationDialog::sendResult(bool ok)
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, "",
                                                                m_resultData);
         QCoreApplication::postEvent(m_retObject, dce);
-        m_retObject = NULL;
+        m_retObject = nullptr;
     }
 
     Close();
@@ -643,7 +643,7 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
     MythConfirmationDialog  *pop;
-    MythScreenStack         *stk = NULL;
+    MythScreenStack         *stk = nullptr;
 
     MythMainWindow *win = GetMythMainWindow();
 
@@ -652,14 +652,14 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
-        return NULL;
+        return nullptr;
     }
 
     if (!stk)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
                                        "Is there a MythThemeBase?");
-        return NULL;
+        return nullptr;
     }
 
     pop = new MythConfirmationDialog(stk, message, showCancel);
@@ -673,7 +673,7 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     else
     {
         delete pop;
-        pop = NULL;
+        pop = nullptr;
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't Create() Dialog");
     }
 
@@ -693,10 +693,10 @@ MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
     m_isPassword = isPassword;
     m_message = message;
     m_defaultValue = defaultValue;
-    m_textEdit = NULL;
+    m_textEdit = nullptr;
 
     m_id = "";
-    m_retObject = NULL;
+    m_retObject = nullptr;
 }
 
 bool MythTextInputDialog::Create(void)
@@ -704,9 +704,9 @@ bool MythTextInputDialog::Create(void)
     if (!CopyWindowFromBase("MythTextInputDialog", this))
         return false;
 
-    MythUIText *messageText = NULL;
-    MythUIButton *okButton = NULL;
-    MythUIButton *cancelButton = NULL;
+    MythUIText *messageText = nullptr;
+    MythUIButton *okButton = nullptr;
+    MythUIButton *cancelButton = nullptr;
 
     bool err = false;
     UIUtilE::Assign(this, m_textEdit, "input", &err);
@@ -762,9 +762,9 @@ void MythTextInputDialog::sendResult()
 MythSpinBoxDialog::MythSpinBoxDialog(MythScreenStack *parent,
                                      const QString &message)
     : MythScreenType(parent, "mythspinboxpopup"),
-      m_spinBox(NULL),
+      m_spinBox(nullptr),
       m_message(message),
-      m_retObject(NULL),
+      m_retObject(nullptr),
       m_id("")
 {
 }
@@ -774,9 +774,9 @@ bool MythSpinBoxDialog::Create(void)
     if (!CopyWindowFromBase("MythSpinBoxDialog", this))
         return false;
 
-    MythUIText *messageText = NULL;
-    MythUIButton *okButton = NULL;
-    MythUIButton *cancelButton = NULL;
+    MythUIText *messageText = nullptr;
+    MythUIButton *okButton = nullptr;
+    MythUIButton *cancelButton = nullptr;
 
     bool err = false;
     UIUtilE::Assign(this, m_spinBox, "input", &err);
@@ -885,13 +885,13 @@ MythUISearchDialog::MythUISearchDialog(MythScreenStack *parent,
     m_title = title;
     m_defaultValue = defaultValue;
 
-    m_titleText = NULL;
-    m_matchesText = NULL;
-    m_textEdit = NULL;
-    m_itemList = NULL;
+    m_titleText = nullptr;
+    m_matchesText = nullptr;
+    m_textEdit = nullptr;
+    m_itemList = nullptr;
 
     m_id = "";
-    m_retObject = NULL;
+    m_retObject = nullptr;
 }
 
 bool MythUISearchDialog::Create(void)
@@ -899,8 +899,8 @@ bool MythUISearchDialog::Create(void)
     if (!CopyWindowFromBase("MythSearchDialog", this))
         return false;
 
-    MythUIButton *okButton = NULL;
-    MythUIButton *cancelButton = NULL;
+    MythUIButton *okButton = nullptr;
+    MythUIButton *cancelButton = nullptr;
 
     bool err = false;
     UIUtilE::Assign(this, m_textEdit, "input", &err);
@@ -984,7 +984,7 @@ void MythUISearchDialog::slotUpdateList(void)
         }
 
         // add item to list
-        new MythUIButtonListItem(m_itemList, item, NULL, false);
+        new MythUIButtonListItem(m_itemList, item, nullptr, false);
     }
 
     m_itemList->SetItemCurrent(0);
@@ -1003,7 +1003,7 @@ MythTimeInputDialog::MythTimeInputDialog(MythScreenStack *parent,
     : MythScreenType(parent, "timepopup"),
         m_message(message), m_startTime(startTime),
         m_resolution(resolutionFlags), m_rangeLimit(rangeLimit),
-        m_dateList(NULL), m_timeList(NULL), m_retObject(NULL)
+        m_dateList(nullptr), m_timeList(nullptr), m_retObject(nullptr)
 {
 }
 
@@ -1012,8 +1012,8 @@ bool MythTimeInputDialog::Create()
     if (!CopyWindowFromBase("MythTimeInputDialog", this))
         return false;
 
-    MythUIText *messageText = NULL;
-    MythUIButton *okButton = NULL;
+    MythUIText *messageText = nullptr;
+    MythUIButton *okButton = nullptr;
 
     bool err = false;
     UIUtilE::Assign(this, messageText, "message", &err);
@@ -1082,7 +1082,7 @@ bool MythTimeInputDialog::Create()
                     selected = true;
             }
 
-            item = new MythUIButtonListItem(m_dateList, text, NULL, false);
+            item = new MythUIButtonListItem(m_dateList, text, nullptr, false);
             item->SetData(QVariant(date));
 
             if (selected)
@@ -1123,7 +1123,7 @@ bool MythTimeInputDialog::Create()
                     selected = true;
             }
 
-            item = new MythUIButtonListItem(m_timeList, text, NULL, false);
+            item = new MythUIButtonListItem(m_timeList, text, nullptr, false);
             item->SetData(QVariant(time));
 
             if (selected)

@@ -88,22 +88,22 @@ int SeekAmountsCount = sizeof(SeekAmounts) / sizeof(SeekAmounts[0]);
 ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
                          const QString &menuTheme)
             :MythScreenType(parent, "ThumbFinder"),
-    m_inputFC(NULL),        m_codecCtx(NULL),
-    m_codec(NULL),
-    m_fps(0.0),             m_outputbuf(NULL),
-    m_frameWidth(0),        m_frameHeight(0),
-    m_videostream(0),       m_currentSeek(0),
-    m_startTime(-1),        m_startPTS(-1),
-    m_currentPTS(-1),       m_firstIFramePTS(-1),
-    m_frameTime(0),         m_updateFrame(false),
-    m_finalDuration(0),     m_offset(0),
+    m_inputFC(nullptr),        m_codecCtx(nullptr),
+    m_codec(nullptr),
+    m_fps(0.0),                m_outputbuf(nullptr),
+    m_frameWidth(0),           m_frameHeight(0),
+    m_videostream(0),          m_currentSeek(0),
+    m_startTime(-1),           m_startPTS(-1),
+    m_currentPTS(-1),          m_firstIFramePTS(-1),
+    m_frameTime(0),            m_updateFrame(false),
+    m_finalDuration(0),        m_offset(0),
     m_archiveItem(archiveItem),
     m_thumbCount(getChapterCount(menuTheme)),
     m_thumbDir(createThumbDir()),
-    m_frameButton(NULL),    m_saveButton(NULL),
-    m_cancelButton(NULL),   m_frameImage(NULL),
-    m_positionImage(NULL),  m_imageGrid(NULL),
-    m_seekAmountText(NULL), m_currentPosText(NULL)
+    m_frameButton(nullptr),    m_saveButton(nullptr),
+    m_cancelButton(nullptr),   m_frameImage(nullptr),
+    m_positionImage(nullptr),  m_imageGrid(nullptr),
+    m_seekAmountText(nullptr), m_currentPosText(nullptr)
 {
     // copy thumbList so we can abandon changes if required
     m_thumbList.clear();
@@ -471,7 +471,7 @@ bool ThumbFinder::getThumbImages()
 
     // add title thumb
     m_frameFile = m_thumbDir + "/title.jpg";
-    ThumbImage *thumb = NULL;
+    ThumbImage *thumb = nullptr;
 
     if (m_thumbList.size() > 0)
     {
@@ -502,7 +502,7 @@ bool ThumbFinder::getThumbImages()
     {
         m_frameFile = QString(m_thumbDir + "/chapter-%1.jpg").arg(x);
 
-        thumb = NULL;
+        thumb = nullptr;
 
         if (m_archiveItem->thumbList.size() > x)
         {
@@ -566,7 +566,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     }
 
     // Getting stream information
-    int ret = avformat_find_stream_info(m_inputFC, NULL);
+    int ret = avformat_find_stream_info(m_inputFC, nullptr);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -628,7 +628,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     // get decoder for video stream
     m_codec = avcodec_find_decoder(m_codecCtx->codec_id);
 
-    if (m_codec == NULL)
+    if (m_codec == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ThumbFinder: Couldn't find codec for video stream");
@@ -636,7 +636,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     }
 
     // open codec
-    if (avcodec_open2(m_codecCtx, m_codec, NULL) < 0)
+    if (avcodec_open2(m_codecCtx, m_codec, nullptr) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ThumbFinder: Couldn't open codec for video stream");

@@ -123,7 +123,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
         LOG(VB_GUI, LOG_INFO,
             QString("The NV-CONTROL X extension is not available on screen %1 "
                     "of '%2'.")
-                .arg(screen) .arg(XDisplayName(NULL)));
+                .arg(screen) .arg(XDisplayName(nullptr)));
         delete d;
         return -1;
     }
@@ -133,7 +133,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
     {
         LOG(VB_GUI, LOG_INFO,
             QString("The NV-CONTROL X extension does not exist on '%1'.")
-                .arg(XDisplayName(NULL)));
+                .arg(XDisplayName(nullptr)));
         delete d;
         return -1;
     }
@@ -247,10 +247,10 @@ int GetNvidiaRates(t_screenrate& screenmap)
 
             /* split the MetaMode string by comma */
 
-            char *strtok_state = NULL;
+            char *strtok_state = nullptr;
             for (modeString = strtok_r(tmp, ",", &strtok_state);
                  modeString;
-                 modeString = strtok_r(NULL, ",", &strtok_state))
+                 modeString = strtok_r(nullptr, ",", &strtok_state))
             {
                 /*
                  * retrieve the modeName and display device mask
@@ -279,7 +279,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                 {
                     int w, h, vfl, hfl, i, irate;
                     double dcl, r;
-                    char *buf[9] = {NULL};
+                    char *buf[9] = {nullptr};
                     uint64_t key, key2;
 
                     // skip name
@@ -290,7 +290,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                     i = 0;
                     for (modeString = strtok_r(tmp, " ", &strtok_state);
                          modeString;
-                         modeString = strtok_r(NULL, " ", &strtok_state))
+                         modeString = strtok_r(nullptr, " ", &strtok_state))
                     {
                         buf[i++] = modeString;
 
@@ -305,10 +305,10 @@ int GetNvidiaRates(t_screenrate& screenmap)
                         continue;
                     }
 
-                    w = strtol(buf[1], NULL, 10);
-                    h = strtol(buf[5], NULL, 10);
-                    vfl = strtol(buf[8], NULL, 10);
-                    hfl = strtol(buf[4], NULL, 10);
+                    w = strtol(buf[1], nullptr, 10);
+                    h = strtol(buf[5], nullptr, 10);
+                    vfl = strtol(buf[8], nullptr, 10);
+                    hfl = strtol(buf[4], nullptr, 10);
                     istringstream istr(buf[0]);
                     istr.imbue(locale("C"));
                     istr >> dcl;
@@ -446,7 +446,7 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
 /*
  * find_modeline() - search the pModeLines list of ModeLines for the
  * mode named 'modeName'; return a pointer to the matching ModeLine,
- * or NULL if no match is found
+ * or nullptr if no match is found
  */
 
 static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
@@ -467,7 +467,7 @@ static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
              */
 
             beginQuote = strchr(start, '"');
-            endQuote = beginQuote ? strchr(beginQuote+1, '"') : NULL;
+            endQuote = beginQuote ? strchr(beginQuote+1, '"') : nullptr;
 
             if (beginQuote && endQuote)
             {
@@ -498,7 +498,7 @@ static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
         }
     }
 
-    return NULL;
+    return nullptr;
 
 }
 
@@ -534,7 +534,7 @@ static int extract_id_string(char *str)
  */
 static int modeline_is_interlaced(char *modeLine)
 {
-    return (strstr(modeLine, "Interlace") != NULL);
+    return (strstr(modeLine, "Interlace") != nullptr);
 }
 
 #endif

@@ -25,7 +25,7 @@ Q_IMPORT_PLUGIN(DcrawPlugin)
 #endif // DCRAW_SUPPORT
 void runRandomSlideshow(void);
 
-static int run(MythMediaDevice *dev = NULL, bool startRandomShow = false)
+static int run(MythMediaDevice *dev = nullptr, bool startRandomShow = false)
 {
     QDir startdir(gCoreContext->GetSetting("GalleryDir"));
     if (startdir.exists() && startdir.isReadable())
@@ -70,7 +70,7 @@ static void runGallery(void)
 
 void runRandomSlideshow(void)
 {
-    run(NULL, true);
+    run(nullptr, true);
 }
 
 static void handleMedia(MythMediaDevice *dev)

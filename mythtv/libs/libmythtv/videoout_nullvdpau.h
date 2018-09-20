@@ -69,7 +69,7 @@ class VideoOutputNullVDPAU : public VideoOutput
         { return false; }
     virtual bool SetupVisualisation(AudioPlayer *, MythRender *,
                                     const QString &) { return false; }
-    virtual MythPainter *GetOSDPainter(void) { return NULL; }
+    virtual MythPainter *GetOSDPainter(void) { return nullptr; }
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
     virtual VideoFrame *GetLastDecodedFrame(void);

@@ -22,7 +22,7 @@ void VideoOutputNullVAAPI::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputNullVAAPI::VideoOutputNullVAAPI()
-  : m_ctx(NULL), m_lock(QMutex::Recursive), m_shadowBuffers(NULL)
+  : m_ctx(nullptr), m_lock(QMutex::Recursive), m_shadowBuffers(nullptr)
 {
 }
 
@@ -54,7 +54,7 @@ void VideoOutputNullVAAPI::DeleteVAAPIContext(void)
 {
     QMutexLocker lock(&m_lock);
     delete m_ctx;
-    m_ctx = NULL;
+    m_ctx = nullptr;
 }
 
 bool VideoOutputNullVAAPI::InitBuffers(void)
@@ -106,7 +106,7 @@ void VideoOutputNullVAAPI::DeleteBuffers(void)
         m_shadowBuffers->DeleteBuffers();
     }
     delete m_shadowBuffers;
-    m_shadowBuffers = NULL;
+    m_shadowBuffers = nullptr;
 }
 
 QStringList VideoOutputNullVAAPI::GetAllowedRenderers(MythCodecID myth_codec_id)
@@ -184,7 +184,7 @@ void* VideoOutputNullVAAPI::GetDecoderContext(unsigned char* buf, uint8_t*& id)
         id = m_ctx->GetSurfaceIDPointer(buf);
         return &m_ctx->m_ctx;
     }
-    return NULL;
+    return nullptr;
 }
 
 // Always returns the CPU version of a frame
@@ -195,7 +195,7 @@ VideoFrame* VideoOutputNullVAAPI::GetLastDecodedFrame(void)
         if (vbuffers.At(i) == gpu)
             return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
-    return NULL;
+    return nullptr;
 }
 
 // Always returns the CPU version of a frame
@@ -206,7 +206,7 @@ VideoFrame* VideoOutputNullVAAPI::GetLastShownFrame(void)
         if (vbuffers.At(i) == gpu)
             return m_shadowBuffers->At(i);
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find frame.");
-    return NULL;
+    return nullptr;
 }
 
 // Should work with either the CPU or GPU version of a frame

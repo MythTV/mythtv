@@ -19,7 +19,7 @@ class PlaylistView : public MusicCommon
     Q_OBJECT
   public:
     PlaylistView(MythScreenStack *parent, MythScreenType *parentScreen);
-    ~PlaylistView(void);
+    ~PlaylistView(void) = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

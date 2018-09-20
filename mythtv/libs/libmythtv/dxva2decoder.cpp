@@ -114,7 +114,7 @@ static const dxva2_mode dxva2_modes[] =
     {"Intel H.264 MoComp, no FGT", &DXVA2_Intel_ModeH264_A, kCodec_NONE},
     {"Intel VC-1 VLD",             &DXVA2_Intel_ModeVC1_E,  kCodec_VC1_DXVA2},
 
-    {"", NULL, kCodec_NONE}
+    {"", nullptr, kCodec_NONE}
 };
 
 #define CREATE_CHECK(arg1, arg2) \
@@ -127,7 +127,7 @@ static const dxva2_mode dxva2_modes[] =
 
 DXVA2Decoder::DXVA2Decoder(uint num_bufs, MythCodecID codec_id,
                            uint width, uint height)
-  : m_deviceManager(NULL), m_device(NULL), m_service(NULL),
+  : m_deviceManager(nullptr), m_device(nullptr), m_service(nullptr),
     m_codec_id(codec_id), m_width(width),  m_height(height)
 {
     memset(&m_format, 0, sizeof(DXVA2_VideoDesc));
@@ -137,7 +137,7 @@ DXVA2Decoder::DXVA2Decoder(uint num_bufs, MythCodecID codec_id,
     m_context.surface_count = num_bufs;
     m_context.surface = new IDirect3DSurface9*[num_bufs];
     for (uint i = 0; i < num_bufs; i++)
-        m_context.surface[i] = NULL;
+        m_context.surface[i] = nullptr;
 }
 
 DXVA2Decoder::~DXVA2Decoder(void)
@@ -207,9 +207,9 @@ void DXVA2Decoder::DestroyVideoService(void)
         IDirect3DDeviceManager9_CloseDeviceHandle(m_deviceManager, m_device);
     if (m_service)
         IDirectXVideoDecoderService_Release(m_service);
-    m_deviceManager = NULL;
-    m_device  = NULL;
-    m_service = NULL;
+    m_deviceManager = nullptr;
+    m_device  = nullptr;
+    m_service = nullptr;
 }
 
 bool DXVA2Decoder::GetInputOutput(void)
@@ -250,7 +250,7 @@ bool DXVA2Decoder::TestTarget(const GUID &guid)
     if (!m_service)
         return false;
     uint       output_count = 0;
-    D3DFORMAT *output_list  = NULL;
+    D3DFORMAT *output_list  = nullptr;
     IDirectXVideoDecoderService_GetDecoderRenderTargets(
         m_service, guid, &output_count, &output_list);
     for(uint i = 0; i < output_count; i++)
@@ -283,9 +283,9 @@ bool DXVA2Decoder::GetDecoderConfig(void)
         return false;
 
     uint                       cfg_count = 0;
-    DXVA2_ConfigPictureDecode *cfg_list  = NULL;
+    DXVA2_ConfigPictureDecode *cfg_list  = nullptr;
     IDirectXVideoDecoderService_GetDecoderConfigurations(
-        m_service, m_input, &m_format, NULL, &cfg_count, &cfg_list);
+        m_service, m_input, &m_format, nullptr, &cfg_count, &cfg_list);
 
     DXVA2_ConfigPictureDecode config = {};
     uint bitstream = 1;
@@ -323,7 +323,7 @@ bool DXVA2Decoder::CreateSurfaces(void)
         m_service, (m_width + 15) & ~15, (m_height + 15) & ~15,
         m_context.surface_count - 1, m_format.Format,
         D3DPOOL_DEFAULT, 0, DXVA2_VideoDecoderRenderTarget,
-        m_context.surface, NULL);
+        m_context.surface, nullptr);
 
     if (FAILED(hr))
         return false;
@@ -341,10 +341,10 @@ void DXVA2Decoder::DestroySurfaces(void)
         if (m_context.surface[i])
         {
             m_context.surface[i]->Release();
-            m_context.surface[i] = NULL;
+            m_context.surface[i] = nullptr;
         }
     }
-    m_context.surface = NULL;
+    m_context.surface = nullptr;
     m_context.surface_count = 0;
 }
 
@@ -372,12 +372,12 @@ void DXVA2Decoder::DestroyDecoder(void)
 {
     if (m_context.decoder)
         IDirectXVideoDecoder_Release(m_context.decoder);
-    m_context.decoder = NULL;
+    m_context.decoder = nullptr;
 }
 
 void* DXVA2Decoder::GetSurface(uint num)
 {
     if (num >= m_context.surface_count)
-        return NULL;
+        return nullptr;
     return (void*)m_context.surface[num];
 }

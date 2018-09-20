@@ -39,7 +39,7 @@ MHText::MHText()
     m_LineOrientation = Horizontal;
     m_StartCorner = UpperLeft;
     m_fTextWrap = false;
-    m_pDisplay = NULL;
+    m_pDisplay = nullptr;
     m_fNeedsRedraw = false;
 }
 
@@ -55,7 +55,7 @@ MHText::MHText(const MHText &ref): MHVisible(ref) // Copy constructor for clonin
     m_LineOrientation = ref.m_LineOrientation;
     m_StartCorner = ref.m_StartCorner;
     m_fTextWrap = ref.m_fTextWrap;
-    m_pDisplay = NULL;
+    m_pDisplay = nullptr;
     m_fNeedsRedraw = ref.m_fNeedsRedraw;
 }
 
@@ -328,7 +328,7 @@ void MHText::Preparation(MHEngine *engine)
 
     MHVisible::Preparation(engine);
 
-    if (m_pDisplay == NULL)
+    if (m_pDisplay == nullptr)
     {
 	    m_pDisplay = engine->GetContext()->CreateText();
     }
@@ -423,7 +423,7 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
         char *p = (char *)str;
         char *q = strchr(p, '.'); // Find the terminating dot
 
-        if (q != NULL)   // plain, italic etc.
+        if (q != nullptr)   // plain, italic etc.
         {
             if (q - p == 6 && strncmp(p, "italic", 6) == 0)
             {
@@ -443,7 +443,7 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
             q = strchr(p, '.'); // Find the next dot.
         }
 
-        if (q != NULL)   // Size
+        if (q != nullptr)   // Size
         {
             size = atoi(p);
 
@@ -456,7 +456,7 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
             q = strchr(p, '.'); // Find the next dot.
         }
 
-        if (q != NULL)   // lineSpacing
+        if (q != nullptr)   // lineSpacing
         {
             lineSpace = atoi(p);
 
@@ -469,7 +469,7 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
             q = strchr(p, '.'); // Find the next dot.
         }
 
-        if (q != NULL)   // letter spacing.  May be zero or negative
+        if (q != nullptr)   // letter spacing.  May be zero or negative
         {
             letterSpace = atoi(p);
         }

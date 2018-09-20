@@ -40,7 +40,7 @@ class MUI_PUBLIC MythPainter
      *  DeleteImagePriv() is a pure virtual in this class. Instead
      *  children should call MythPainter::Teardown() for cleanup.
      */
-    virtual ~MythPainter() {}
+    virtual ~MythPainter() = default;
 
     virtual QString GetName(void) = 0;
     virtual bool SupportsAnimation(void) = 0;
@@ -48,7 +48,7 @@ class MUI_PUBLIC MythPainter
     virtual bool SupportsClipping(void) = 0;
     virtual void FreeResources(void) { }
     virtual void Begin(QPaintDevice *parent) { m_Parent = parent; }
-    virtual void End() { m_Parent = NULL; }
+    virtual void End() { m_Parent = nullptr; }
 
     virtual void SetClipRect(const QRect &clipRect);
     virtual void SetClipRegion(const QRegion &clipRegion);

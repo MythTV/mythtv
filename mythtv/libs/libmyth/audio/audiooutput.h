@@ -51,7 +51,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
         const QString &audiodevice, const QString &passthrudevice,
         AudioFormat format, int channels, int codec, int samplerate,
         AudioOutputSource source, bool set_initial_vol, bool passthru,
-        int upmixer_startup = 0, AudioOutputSettings *custom = NULL);
+        int upmixer_startup = 0, AudioOutputSettings *custom = nullptr);
     static AudioOutput *OpenAudio(AudioSettings &settings,
                                   bool willsuspendpa = true);
     static AudioOutput *OpenAudio(
@@ -61,7 +61,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
-        pulsewassuspended(false), _frame(NULL) {}
+        pulsewassuspended(false), _frame(nullptr) {}
 
     virtual ~AudioOutput();
 

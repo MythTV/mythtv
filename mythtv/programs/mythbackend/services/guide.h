@@ -43,7 +43,7 @@ class Guide : public GuideServices
 
     public:
 
-        Q_INVOKABLE explicit Guide( QObject */*parent*/ = 0 ) {}
+        Q_INVOKABLE explicit Guide( QObject */*parent*/ = nullptr ) {}
 
     public:
 
@@ -115,7 +115,7 @@ class ScriptableGuide : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableGuide( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableGuide( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -129,7 +129,7 @@ class ScriptableGuide : public QObject
                                   int              StartIndex,
                                   int              Count )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetProgramGuide( StartTime, EndTime, Details,
                                               ChannelGroupId, StartIndex, Count );
             )
@@ -149,7 +149,7 @@ class ScriptableGuide : public QObject
                                 const QString   &Sort,
                                 bool             Descending)
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetProgramList( StartIndex, Count,
                                          StartTime, EndTime, ChanId,
                                          TitleFilter, CategoryFilter,
@@ -161,7 +161,7 @@ class ScriptableGuide : public QObject
 
         QObject* GetProgramDetails( int ChanId, const QDateTime &StartTime )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetProgramDetails( ChanId, StartTime );
             )
         }
@@ -173,7 +173,7 @@ class ScriptableGuide : public QObject
 
         QObject* GetChannelGroupList( bool IncludeEmpty = false )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetChannelGroupList( IncludeEmpty );
             )
         }

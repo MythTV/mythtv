@@ -150,7 +150,7 @@ SignalMonitorValue* SignalMonitorValue::Create(const QString& _name,
     if (!smv->Set(_name, _longString))
     {
         delete smv;
-        return NULL;
+        return nullptr;
     }
     return smv;
 }

@@ -27,7 +27,7 @@
 
 AudioInputALSA::AudioInputALSA(const QString &device):
     AudioInput(device),
-    pcm_handle(NULL),
+    pcm_handle(nullptr),
     period_size(0),
     myth_block_bytes(0)
 {
@@ -50,13 +50,13 @@ bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
                              SND_PCM_STREAM_CAPTURE, 0), // blocking mode
                 "pcm open failed"))
     {
-        pcm_handle = NULL;
+        pcm_handle = nullptr;
         return false;
     }
     if (!(PrepHwParams() && PrepSwParams()))
     {
         (void)snd_pcm_close(pcm_handle);
-        pcm_handle = NULL;
+        pcm_handle = nullptr;
         return false;
     }
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV + "pcm open");
@@ -65,18 +65,18 @@ bool AudioInputALSA::Open(uint sample_bits, uint sample_rate, uint channels)
 
 void AudioInputALSA::Close(void)
 {
-    if (pcm_handle != NULL)
+    if (pcm_handle != nullptr)
     {
         Stop();
         (void)AlsaBad(snd_pcm_close(pcm_handle), "Close close failed");
     }
-    pcm_handle = NULL;
+    pcm_handle = nullptr;
 }
 
 bool AudioInputALSA::Stop(void)
 {
     bool stopped = false;
-    if (pcm_handle != NULL &&
+    if (pcm_handle != nullptr &&
         !AlsaBad(snd_pcm_drop(pcm_handle), "Stop drop failed"))
     {
         stopped = true;
@@ -122,7 +122,7 @@ int AudioInputALSA::GetSamples(void* buf, uint nbytes)
 int AudioInputALSA::GetNumReadyBytes(void)
 {
     int bytes_avail = 0;
-    if (pcm_handle != NULL)
+    if (pcm_handle != nullptr)
     {
         snd_pcm_sframes_t frames_avail;
         int pcm_state = snd_pcm_state(pcm_handle);
@@ -191,13 +191,13 @@ bool AudioInputALSA::PrepHwParams(void)
     }
     uint buffer_time = 64000; // 64 msec
     uint period_time = buffer_time / 4;
-    if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams, &period_time, NULL),
+    if (AlsaBad(snd_pcm_hw_params_set_period_time_near(pcm_handle, hwparams, &period_time, nullptr),
                 "failed to set period time"))
         return false;
-    if (AlsaBad(snd_pcm_hw_params_set_buffer_time_near(pcm_handle, hwparams, &buffer_time, NULL),
+    if (AlsaBad(snd_pcm_hw_params_set_buffer_time_near(pcm_handle, hwparams, &buffer_time, nullptr),
                 "failed to set buffer time"))
         return false;
-    if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size, NULL),
+    if (AlsaBad(snd_pcm_hw_params_get_period_size(hwparams, &period_size, nullptr),
                 "failed to get period size"))
         return false;
 

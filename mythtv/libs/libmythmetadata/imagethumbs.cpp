@@ -357,7 +357,7 @@ ImageThumb<DBFS>::~ImageThumb()
 {
     delete m_imageThread;
     delete m_videoThread;
-    m_imageThread = m_videoThread = NULL;
+    m_imageThread = m_videoThread = nullptr;
 }
 
 

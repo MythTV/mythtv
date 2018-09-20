@@ -129,7 +129,7 @@ class ChannelChangedEvent : public QEvent
   public:
     ChannelChangedEvent(QString channame, bool fulltest) :
         QEvent(kEventType), channel(channame), fulltest(fulltest) {}
-    ~ChannelChangedEvent() {}
+    ~ChannelChangedEvent() = default;
 
     QString channel;
     bool    fulltest;

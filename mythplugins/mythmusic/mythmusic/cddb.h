@@ -76,7 +76,7 @@ struct Cddb
         ext_t ext;
         Toc toc;
 
-        Album(discid_t d = 0, const char* g = 0) :
+        Album(discid_t d = 0, const char* g = nullptr) :
             discGenre(g), discID(d), year(0), rev(1), isCompilation(false) {}
 
         explicit Album(const QString& s) { *this = s; }

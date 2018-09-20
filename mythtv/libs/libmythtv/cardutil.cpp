@@ -121,17 +121,21 @@ QString CardUtil::GetScanableInputTypes(void)
 bool CardUtil::IsCableCardPresent(uint inputid,
                                   const QString &inputType)
 {
+#if (!USING_HDHOMERUN && !USING_CETON)
+    Q_UNUSED(inputid);
+#endif
+
     if (inputType == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
         hdhomerun_device_t *hdhr;
         hdhomerun_tuner_status_t status;
         QString device = GetVideoDevice(inputid);
-        hdhr = hdhomerun_device_create_from_str(device.toLatin1(), NULL);
+        hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
         if (!hdhr)
             return false;
 
-        int oob = hdhomerun_device_get_oob_status(hdhr, NULL, &status);
+        int oob = hdhomerun_device_get_oob_status(hdhr, nullptr, &status);
 
         // if no OOB tuner, oob will be < 1.  If no CC present, OOB
         // status will be "none."
@@ -2118,7 +2122,7 @@ bool CardUtil::DeleteInput(uint inputid)
         }
         else if (!query.next())
         {
-            tree.SetRoot(NULL);
+            tree.SetRoot(nullptr);
             tree.Store(inputid);
         }
     }
@@ -2239,7 +2243,7 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
 
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), NULL);
+    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
     if (!hdhr)
         return false;
 
@@ -2284,7 +2288,7 @@ QString CardUtil::GetHDHRdesc(const QString &device)
                               ") - trying to locate device");
 
     hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), NULL);
+    hdhr = hdhomerun_device_create_from_str(device.toLatin1(), nullptr);
     if (!hdhr)
         return QObject::tr("Invalid Device ID or address.");
 

@@ -26,7 +26,7 @@ class PremiereContentTransmissionDescriptor : public MPEGDescriptor
           _transmission_count(0)
     {
         if (_data && !Parse())
-            _data = NULL;
+            _data = nullptr;
     }
 
     // descriptor_tag           8   0.0

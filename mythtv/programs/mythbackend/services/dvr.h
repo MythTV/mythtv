@@ -36,7 +36,7 @@ class Dvr : public DvrServices
 
     public:
 
-        Q_INVOKABLE explicit Dvr( QObject */*parent*/ = 0 ) {}
+        Q_INVOKABLE explicit Dvr( QObject */*parent*/ = nullptr ) {}
 
     public:
 
@@ -311,7 +311,7 @@ class ScriptableDvr : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableDvr( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableDvr( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -321,7 +321,7 @@ class ScriptableDvr : public QObject
         QObject* GetExpiringList     ( int              StartIndex,
                                        int              Count      )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetExpiringList( StartIndex, Count );
             )
         }
@@ -336,7 +336,7 @@ class ScriptableDvr : public QObject
                                        const QString   &Sort
                                      )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetRecordedList( Descending, StartIndex, Count,
                                               TitleRegEx, RecGroup,
                                               StorageGroup, Category, Sort);
@@ -353,7 +353,7 @@ class ScriptableDvr : public QObject
                                        int              RecordId,
                                        const QString   &Sort)
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetOldRecordedList( Descending, StartIndex, Count,
                                                  StartTime, EndTime, Title,
                                                  SeriesId, RecordId, Sort);
@@ -362,7 +362,7 @@ class ScriptableDvr : public QObject
 
         QObject* GetRecorded         ( int              RecordedId )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetRecorded( RecordedId, 0, QDateTime() );
             )
         }
@@ -398,7 +398,7 @@ class ScriptableDvr : public QObject
                                       int              Count,
                                       int              RecordId )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetConflictList( StartIndex, Count, RecordId );
             )
         }
@@ -409,7 +409,7 @@ class ScriptableDvr : public QObject
                                       int              RecordId,
                                       int              RecStatus )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetUpcomingList( StartIndex, Count, ShowAll,
                                               RecordId, RecStatus );
             )
@@ -417,14 +417,14 @@ class ScriptableDvr : public QObject
 
         QObject*    GetEncoderList()
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetEncoderList();
             )
         }
 
         QObject*    GetInputList()
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetInputList();
             )
         }
@@ -452,7 +452,7 @@ class ScriptableDvr : public QObject
 
         QObject*    GetRecRuleFilterList()
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetRecRuleFilterList();
             )
         }
@@ -466,7 +466,7 @@ class ScriptableDvr : public QObject
 
         QObject* GetTitleInfoList()
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetTitleInfoList();
             )
         }
@@ -553,7 +553,7 @@ class ScriptableDvr : public QObject
                                         const QString  &Sort,
                                         bool            Descending  )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetRecordScheduleList(StartIndex, Count, Sort, Descending);
             )
         }
@@ -565,7 +565,7 @@ class ScriptableDvr : public QObject
                                      QDateTime StartTime,
                                      bool      MakeOverride )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetRecordSchedule( RecordId,  Template, RecordedId,
                                                 ChanId, StartTime, MakeOverride);
             )

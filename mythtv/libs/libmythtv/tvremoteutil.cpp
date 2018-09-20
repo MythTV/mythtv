@@ -195,7 +195,7 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int inputid)
         LOG(VB_CHANNEL, LOG_INFO,
             QString("RemoteRequestNextFreeRecorder got no input (after input %1)")
             .arg(inputid));
-        return NULL;
+        return nullptr;
     }
 
     uint i;
@@ -292,7 +292,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList
 
     LOG(VB_CHANNEL, LOG_INFO,
         QString("RemoteRequestFreeRecorderFromList got no input"));
-    return NULL;
+    return nullptr;
 }
 
 RemoteEncoder *RemoteRequestRecorder(void)
@@ -307,7 +307,7 @@ RemoteEncoder *RemoteRequestRecorder(void)
     {
         LOG(VB_CHANNEL, LOG_INFO,
             QString("RemoteRequestRecorder got no input"));
-        return NULL;
+        return nullptr;
     }
 
     LOG(VB_CHANNEL, LOG_INFO,
@@ -329,7 +329,7 @@ RemoteEncoder *RemoteGetExistingRecorder(const ProgramInfo *pginfo)
     {
         LOG(VB_CHANNEL, LOG_INFO,
             QString("RemoteGetExistingRecorder got no input"));
-        return NULL;
+        return nullptr;
     }
 
     int num = strlist[0].toInt();
@@ -354,7 +354,7 @@ RemoteEncoder *RemoteGetExistingRecorder(int recordernum)
     {
         LOG(VB_CHANNEL, LOG_INFO,
             QString("RemoteGetExistingRecorder got no input"));
-        return NULL;
+        return nullptr;
     }
 
     QString hostname = strlist[0];

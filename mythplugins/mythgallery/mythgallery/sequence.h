@@ -44,7 +44,7 @@ public:
     : len(0), idx(0)
     { }
 
-    virtual ~SequenceBase() { }
+    virtual ~SequenceBase() = default;
 
     virtual void set(size_t _idx) = 0;
 

@@ -74,7 +74,7 @@ class DarwinFirewireDevice : public FirewireDevice
     const DarwinAVCInfo *GetInfoPtr(void) const;
 
     int GetMaxSpeed(void);
-    bool IsSTBStreaming(uint *fw_channel = NULL);
+    bool IsSTBStreaming(uint *fw_channel = nullptr);
 
     vector<AVCInfo> GetSTBListPrivate(void);
 

@@ -36,7 +36,7 @@ class ChannelIcon : public ChannelIconServices
 
     public:
 
-        Q_INVOKABLE explicit ChannelIcon( QObject *parent = 0 ) {}
+        Q_INVOKABLE explicit ChannelIcon( QObject *parent = nullptr ) {}
 
     public:
 
@@ -74,7 +74,7 @@ class ScriptableChannelIcon : public QObject
 
     public:
 
-        Q_INVOKABLE explicit ScriptableChannelIcon( QObject *parent = 0 ) : QObject( parent ) {}
+        Q_INVOKABLE explicit ScriptableChannelIcon( QObject *parent = nullptr ) : QObject( parent ) {}
 
     public slots:
 

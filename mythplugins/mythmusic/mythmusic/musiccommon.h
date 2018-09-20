@@ -235,7 +235,7 @@ class MPUBLIC TrackInfoDialog : public MythScreenType
   Q_OBJECT
   public:
     TrackInfoDialog(MythScreenStack *parent, MusicMetadata *mdata, const char *name);
-    ~TrackInfoDialog(void);
+    ~TrackInfoDialog(void) = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);

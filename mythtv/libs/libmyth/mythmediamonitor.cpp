@@ -36,7 +36,7 @@ using namespace std;
 
 static const QString _Location = QObject::tr("Media Monitor");
 
-MediaMonitor *MediaMonitor::c_monitor = NULL;
+MediaMonitor *MediaMonitor::c_monitor = nullptr;
 
 // MonitorThread
 MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) :
@@ -88,12 +88,12 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
         return c_monitor;
 
 #ifdef USING_DARWIN_DA
-    c_monitor = new MediaMonitorDarwin(NULL, MONITOR_INTERVAL, true);
+    c_monitor = new MediaMonitorDarwin(nullptr, MONITOR_INTERVAL, true);
 #else
   #if CONFIG_CYGWIN || defined(_WIN32)
-    c_monitor = new MediaMonitorWindows(NULL, MONITOR_INTERVAL, true);
+    c_monitor = new MediaMonitorWindows(nullptr, MONITOR_INTERVAL, true);
   #else
-    c_monitor = new MediaMonitorUnix(NULL, MONITOR_INTERVAL, true);
+    c_monitor = new MediaMonitorUnix(nullptr, MONITOR_INTERVAL, true);
   #endif
 #endif
 
@@ -114,7 +114,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
         }
     }
 
-    MythCDROM *cd = MythCDROM::get(NULL, device, false, false);
+    MythCDROM *cd = MythCDROM::get(nullptr, device, false, false);
     if (cd)
     {
         cd->setDeviceSpeed(device, speed);
@@ -194,7 +194,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
         QString msg = "MediaMonitor::selectDrivePopup() - no removable devices";
 
         LOG(VB_MEDIA, LOG_INFO, msg);
-        return NULL;
+        return nullptr;
     }
 
     if (drives.count() == 1)
@@ -225,7 +225,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
     if (idx < drives.count())
         return drives[idx];
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -330,7 +330,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
                            bool allowEject)
     : QObject(par), m_DevicesLock(QMutex::Recursive),
-      m_Active(false), m_Thread(NULL),
+      m_Active(false), m_Thread(nullptr),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
     // User can specify that some devices are not monitored
@@ -372,7 +372,7 @@ void MediaMonitor::deleteLater(void)
     {
         StopMonitoring();
         delete m_Thread;
-        m_Thread = NULL;
+        m_Thread = nullptr;
     }
     QObject::deleteLater();
 }
@@ -544,7 +544,7 @@ MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -569,7 +569,7 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
         // Create a fake media device just to lookup mount map:
         else
         {
-            pMedia = MythCDROM::get(NULL, devPath.toLatin1(), true, false);
+            pMedia = MythCDROM::get(nullptr, devPath.toLatin1(), true, false);
             if (pMedia && pMedia->findMountPath())
                 mountPath = pMedia->getMountPath();
             else
@@ -862,7 +862,7 @@ QString MediaMonitor::defaultDevice(const QString &dbSetting,
             if (d == (MythMediaDevice *) -1)    // User cancelled
             {
                 device.clear(); // If user has explicitly cancelled return empty string
-                d = NULL;
+                d = nullptr;
             }
 
             if (d && c_monitor->ValidateAndLock(d))

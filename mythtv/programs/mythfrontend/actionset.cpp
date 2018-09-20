@@ -336,7 +336,7 @@ Action *ActionSet::GetAction(const ActionID &id)
             QString("GetAction: Did not find context '%1'")
                 .arg(id.GetContext()));
 
-        return NULL;
+        return nullptr;
     }
 
     Context::iterator it = (*cit).find(id.GetAction());
@@ -346,7 +346,7 @@ Action *ActionSet::GetAction(const ActionID &id)
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetAction: Did not find action '%1' in context '%1'")
                 .arg(id.GetAction()).arg(id.GetContext()));
-        return NULL;
+        return nullptr;
     }
 
     return *it;

@@ -47,7 +47,7 @@ class EncoderLink
     /// \brief Returns true for a local EncoderLink.
     bool IsLocal(void) const { return local; }
     /// \brief Returns true if the EncoderLink instance is usable.
-    bool IsConnected(void) const { return (IsLocal() || sock!=NULL); }
+    bool IsConnected(void) const { return (IsLocal() || sock!=nullptr); }
     /// \brief Returns true if the encoder is awake.
     bool IsAwake(void) const { return (sleepStatus == sStatus_Awake); }
     /// \brief Returns true if the encoder is asleep.
@@ -83,7 +83,7 @@ class EncoderLink
     long long GetMaxBitrate(void);
     int SetSignalMonitoringRate(int rate, int notifyFrontend);
 
-    bool IsBusy(InputInfo *busy_input = NULL, int time_buffer = 5);
+    bool IsBusy(InputInfo *busy_input = nullptr, int time_buffer = 5);
     bool IsBusyRecording(void);
 
     TVState GetState();

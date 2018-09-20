@@ -22,11 +22,7 @@ class MythUIProgressDialog;
 GameScannerThread::GameScannerThread(void) :
     MThread("GameScanner"),
     m_HasGUI(gCoreContext->HasGUI()),
-    m_dialog(NULL), m_DBDataChanged(false)
-{
-}
-
-GameScannerThread::~GameScannerThread()
+    m_dialog(nullptr), m_DBDataChanged(false)
 {
 }
 
@@ -55,7 +51,7 @@ void GameScannerThread::removeOrphan(const int id)
     {
         info->DeleteFromDatabase();
         delete info;
-        info = NULL;
+        info = nullptr;
     }
 }
 
@@ -99,7 +95,7 @@ void GameScannerThread::verifyFiles()
             SendProgressEvent(++counter);
 
         delete info;
-        info = NULL;
+        info = nullptr;
     }
 }
 
@@ -226,7 +222,7 @@ void GameScanner::doScan(QList<GameHandler*> handlers)
         else
         {
             delete progressDlg;
-            progressDlg = NULL;
+            progressDlg = nullptr;
         }
         m_scanThread->SetProgressDialog(progressDlg);
     }

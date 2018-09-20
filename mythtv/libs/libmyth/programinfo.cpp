@@ -228,7 +228,7 @@ ProgramInfo::ProgramInfo(void) :
 
     // Private
     inUseForWhat(),
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
 }
 
@@ -348,7 +348,7 @@ ProgramInfo::ProgramInfo(uint _recordedid)
  *  \brief Constructs a ProgramInfo from data in 'recorded' table
  */
 ProgramInfo::ProgramInfo(uint _chanid, const QDateTime &_recstartts) :
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
     clear();
 
@@ -498,7 +498,7 @@ ProgramInfo::ProgramInfo(
 
     // Private
     inUseForWhat(),
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
     if (originalAirDate.isValid() && originalAirDate < QDate(1940, 1, 1))
         originalAirDate = QDate();
@@ -615,7 +615,7 @@ ProgramInfo::ProgramInfo(
 
     // Private
     inUseForWhat(),
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
 }
 
@@ -745,7 +745,7 @@ ProgramInfo::ProgramInfo(
 
     // Private
     inUseForWhat(),
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
     programflags |= (commfree) ? FL_CHANCOMMFREE : 0;
     programflags |= (repeat)   ? FL_REPEAT       : 0;
@@ -901,7 +901,7 @@ ProgramInfo::ProgramInfo(
 
     // Private
     inUseForWhat(),
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
 }
 
@@ -909,7 +909,7 @@ ProgramInfo::ProgramInfo(
  *  \brief Constructs a ProgramInfo for a pathname.
  */
 ProgramInfo::ProgramInfo(const QString &_pathname) :
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
     clear();
     if (_pathname.isEmpty())
@@ -954,7 +954,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
                          uint _length_in_minutes,
                          uint _year,
                          const QString &_programid) :
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
     clear();
 
@@ -987,7 +987,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
 ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
                          const QDateTime &_startts,
                          const QDateTime &_endts) :
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
     clear();
 
@@ -1031,7 +1031,7 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
 ProgramInfo::ProgramInfo(
     const QString   &_title,   const QString   &_category,
     const QDateTime &_startts, const QDateTime &_endts) :
-    positionMapDBReplacement(NULL)
+    positionMapDBReplacement(nullptr)
 {
     clear();
     title    = _title;
@@ -1250,7 +1250,7 @@ void ProgramInfo::clear(void)
 
     // Private
     inUseForWhat.clear();
-    positionMapDBReplacement = NULL;
+    positionMapDBReplacement = nullptr;
 }
 
 /*!
@@ -1371,13 +1371,6 @@ bool ProgramInfo::operator==(const ProgramInfo& rhs)
         return false;
 
     return true;
-}
-
-/** \fn ProgramInfo::~ProgramInfo()
- *  \brief Destructor deletes "record" if it exists.
- */
-ProgramInfo::~ProgramInfo()
-{
 }
 
 /// \brief Creates a unique string that can be used to identify a recording.
@@ -1685,7 +1678,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
         startCol = -1;
         sortTitle = QString();
         inUseForWhat = QString();
-        positionMapDBReplacement = NULL;
+        positionMapDBReplacement = nullptr;
     }
 
     return true;
@@ -2155,7 +2148,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
         sortTitle.clear();
         availableStatus = asAvailable;
         inUseForWhat.clear();
-        positionMapDBReplacement = NULL;
+        positionMapDBReplacement = nullptr;
     }
 
     title        = query.value(0).toString();
@@ -5815,7 +5808,7 @@ bool LoadFromProgram( ProgramList &destination,
 ProgramInfo* LoadProgramFromProgram(const uint chanid,
                                    const QDateTime& starttime)
 {
-    ProgramInfo *progInfo = NULL;
+    ProgramInfo *progInfo = nullptr;
 
     // Build add'l SQL statement for Program Listing
 

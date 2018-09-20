@@ -36,10 +36,6 @@ MythUISimpleText::MythUISimpleText(const QString &text,
     m_Font = font;
 }
 
-MythUISimpleText::~MythUISimpleText()
-{
-}
-
 void MythUISimpleText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                                 int alphaMod, QRect clipRect)
 {

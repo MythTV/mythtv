@@ -205,7 +205,7 @@ class MTV_PUBLIC ChannelImporter
     static QString FormatChannel(
         const ScanDTVTransport          &transport,
         const ChannelInsertInfo         &chan,
-        const ChannelImporterBasicStats *info = NULL);
+        const ChannelImporterBasicStats *info = nullptr);
 
     static QString SimpleFormatChannel(
         const ScanDTVTransport          &transport,

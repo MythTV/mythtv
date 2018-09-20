@@ -79,7 +79,7 @@ void ImageProperties::Init()
     reflectSpacing = 0;
     orientation = 1;
     isThemeImage = false;
-    maskImage = NULL;
+    maskImage = nullptr;
 }
 
 void ImageProperties::Copy(const ImageProperties &other)
@@ -127,8 +127,8 @@ void ImageProperties::SetMaskImage(MythImage *image)
 class ImageLoader
 {
   public:
-    ImageLoader() { };
-   ~ImageLoader() { };
+    ImageLoader() = default;
+   ~ImageLoader() = default;
 
     static QHash<QString, const MythUIImage *> m_loadingImages;
     static QMutex                        m_loadingImagesLock;
@@ -238,17 +238,17 @@ class ImageLoader
                                  // each MythUIImage object?
                                 const MythUIImage *parent,
                                 bool &aborted,
-                                MythImageReader *imageReader = NULL)
+                                MythImageReader *imageReader = nullptr)
     {
         QString cacheKey = GenImageLabel(imProps);
         if (!PreLoad(cacheKey, parent))
         {
             aborted = true;
-            return NULL;
+            return nullptr;
         }
 
         QString filename = imProps.filename;
-        MythImage *image = NULL;
+        MythImage *image = nullptr;
 
         bool bResize = false;
         bool bFoundInCache = false;
@@ -310,7 +310,7 @@ class ImageLoader
             if (!ok)
             {
                 image->DecrRef();
-                image = NULL;
+                image = nullptr;
             }
         }
 
@@ -321,7 +321,7 @@ class ImageLoader
                                                     .arg(filename));
 
             image->DecrRef();
-            image = NULL;
+            image = nullptr;
         }
 
         if (image && !bFoundInCache)
@@ -374,7 +374,7 @@ class ImageLoader
                     imProps.SetMaskImage(newMaskImage);
                 }
                 else
-                    imProps.SetMaskImage(NULL);
+                    imProps.SetMaskImage(nullptr);
                 newMaskImage->DecrRef();
 
                 QRect imageArea = image->rect();
@@ -467,13 +467,13 @@ class ImageLoadEvent : public QEvent
         : QEvent(kEventType),
           m_parent(parent), m_image(image), m_basefile(basefile),
           m_filename(filename), m_number(number),
-          m_images(NULL), m_aborted(aborted) { }
+          m_images(nullptr), m_aborted(aborted) { }
 
     ImageLoadEvent(const MythUIImage *parent, AnimationFrames *frames,
                    const QString &basefile,
                    const QString &filename, bool aborted)
         : QEvent(kEventType),
-          m_parent(parent), m_image(NULL), m_basefile(basefile),
+          m_parent(parent), m_image(nullptr), m_basefile(basefile),
           m_filename(filename), m_number(0),
           m_images(frames), m_aborted(aborted) { }
 
@@ -574,7 +574,7 @@ public:
     explicit MythUIImagePrivate(MythUIImage *p)
         : m_parent(p),            m_UpdateLock(QReadWriteLock::Recursive)
     { };
-    ~MythUIImagePrivate() {};
+    ~MythUIImagePrivate() = default;
 
     MythUIImage *m_parent;
 
@@ -1139,7 +1139,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
             }
             else
             {
-                MythImage *image = NULL;
+                MythImage *image = nullptr;
 
                 image = ImageLoader::LoadImage(GetPainter(),
                                                imProps,
@@ -1175,7 +1175,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     Reset();
 
                     m_ImagesLock.lock();
-                    m_Images[j] = NULL;
+                    m_Images[j] = nullptr;
                     m_ImagesLock.unlock();
                 }
             }
@@ -1594,8 +1594,8 @@ void MythUIImage::customEvent(QEvent *event)
 {
     if (event->type() == ImageLoadEvent::kEventType)
     {
-        MythImage *image = NULL;
-        AnimationFrames *animationFrames = NULL;
+        MythImage *image = nullptr;
+        AnimationFrames *animationFrames = nullptr;
         int number = 0;
         QString filename;
         bool aborted;

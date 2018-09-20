@@ -71,10 +71,10 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
     Q_OBJECT;
 
   public:
-    explicit MythSystemLegacy(QObject * = Q_NULLPTR);
-    MythSystemLegacy(const QString &, uint, QObject * = Q_NULLPTR);
+    explicit MythSystemLegacy(QObject * = nullptr);
+    MythSystemLegacy(const QString &, uint, QObject * = nullptr);
     MythSystemLegacy(const QString &, const QStringList &, uint,
-                     QObject * = Q_NULLPTR);
+                     QObject * = nullptr);
     ~MythSystemLegacy(void);
 
     // FIXME: We should not allow a MythSystemLegacy to be reused for a new command.

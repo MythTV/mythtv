@@ -29,13 +29,13 @@
 
 WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
               :MythScreenType(parent, name),
-    m_status_text(NULL),        m_recording_text(NULL), m_scheduled_text(NULL),
-    m_warning_text(NULL),       m_startfrontend_button(NULL),
-    m_menuPopup(NULL),          m_updateStatusTimer(new QTimer(this)),
-    m_updateScreenTimer(new QTimer(this)),              m_isRecording(false),
+    m_status_text(nullptr),     m_recording_text(nullptr), m_scheduled_text(nullptr),
+    m_warning_text(nullptr),    m_startfrontend_button(nullptr),
+    m_menuPopup(nullptr),       m_updateStatusTimer(new QTimer(this)),
+    m_updateScreenTimer(new QTimer(this)),                 m_isRecording(false),
     m_hasConflicts(false),      m_bWillShutdown(false),
-    m_secondsToShutdown(-1),    m_preRollSeconds(0),    m_idleWaitForRecordingTime(0),
-    m_idleTimeoutSecs(0),       m_screenTunerNo(0),     m_screenScheduledNo(0),
+    m_secondsToShutdown(-1),    m_preRollSeconds(0),       m_idleWaitForRecordingTime(0),
+    m_idleTimeoutSecs(0),       m_screenTunerNo(0),        m_screenScheduledNo(0),
     m_statusListNo(0),          m_frontendIsRunning(false),
     m_pendingRecListUpdate(false), m_pendingSchedUpdate(false)
 {

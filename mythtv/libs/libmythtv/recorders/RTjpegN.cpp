@@ -2802,7 +2802,7 @@ RTjpeg::RTjpeg(void)
     lb8 = cb8 = Ywidth = Cwidth = Ysize = Csize = key_count = 0;
     width = height = Q = f = key_rate = 0;
 
-    old = old_start = NULL;
+    old = old_start = nullptr;
 
 #ifdef MMX
     lmask.q = cmask.q = 0;

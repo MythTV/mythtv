@@ -167,7 +167,7 @@ class MainServer : public QObject, public MythSocketCBs
                         const QString &src, const QString &dst);
     bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
     bool HandleDeleteFile(QString filename, QString storagegroup,
-                          PlaybackSock *pbs = NULL);
+                          PlaybackSock *pbs = nullptr);
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);

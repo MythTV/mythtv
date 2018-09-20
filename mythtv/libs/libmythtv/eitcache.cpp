@@ -224,7 +224,7 @@ static void unlock_channel(uint chanid, uint updated)
 event_map_t * EITCache::LoadChannel(uint chanid)
 {
     if (!lock_channel(chanid, lastPruneTime))
-        return NULL;
+        return nullptr;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -243,7 +243,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("Error loading eitcache", query);
-        return NULL;
+        return nullptr;
     }
 
     event_map_t * eventMap = new event_map_t();

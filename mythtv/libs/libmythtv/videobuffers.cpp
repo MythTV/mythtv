@@ -246,7 +246,7 @@ void VideoBuffers::SetPrebuffering(bool normal)
 VideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType enqueue_to)
 {
     QMutexLocker locker(&global_lock);
-    VideoFrame *frame = NULL;
+    VideoFrame *frame = nullptr;
 
     // Try to get a frame not being used by the decoder
     for (uint i = 0; i < available.size(); i++)
@@ -309,7 +309,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(BufferType enqueue_to)
         std::this_thread::sleep_for(std::chrono::microseconds(TRY_LOCK_SPIN_WAIT));
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -402,7 +402,7 @@ frame_queue_t *VideoBuffers::Queue(BufferType type)
 {
     QMutexLocker locker(&global_lock);
 
-    frame_queue_t *q = NULL;
+    frame_queue_t *q = nullptr;
 
     if (type == kVideoBuffer_avail)
         q = &available;
@@ -426,7 +426,7 @@ const frame_queue_t *VideoBuffers::Queue(BufferType type) const
 {
     QMutexLocker locker(&global_lock);
 
-    const frame_queue_t *q = NULL;
+    const frame_queue_t *q = nullptr;
 
     if (type == kVideoBuffer_avail)
         q = &available;
@@ -453,7 +453,7 @@ VideoFrame *VideoBuffers::Dequeue(BufferType type)
     frame_queue_t *q = Queue(type);
 
     if (!q)
-        return NULL;
+        return nullptr;
 
     return q->dequeue();
 }
@@ -465,12 +465,12 @@ VideoFrame *VideoBuffers::Head(BufferType type)
     frame_queue_t *q = Queue(type);
 
     if (!q)
-        return NULL;
+        return nullptr;
 
     if (q->size())
         return q->head();
 
-    return NULL;
+    return nullptr;
 }
 
 VideoFrame *VideoBuffers::Tail(BufferType type)
@@ -480,12 +480,12 @@ VideoFrame *VideoBuffers::Tail(BufferType type)
     frame_queue_t *q = Queue(type);
 
     if (!q)
-        return NULL;
+        return nullptr;
 
     if (q->size())
         return q->tail();
 
-    return NULL;
+    return nullptr;
 }
 
 void VideoBuffers::Enqueue(BufferType type, VideoFrame *frame)
@@ -749,7 +749,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
         }
 
         bufs.push_back(data);
-        yuvinfo.push_back(YUVInfo(width, height, buf_size, NULL, NULL));
+        yuvinfo.push_back(YUVInfo(width, height, buf_size, nullptr, nullptr));
         allocated_arrays.push_back(data);
     }
 
@@ -760,7 +760,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType type, int width, int height,
              max(buf_size, yuvinfo[i].size),
              (const int*) yuvinfo[i].pitches, (const int*) yuvinfo[i].offsets);
 
-        ok &= (bufs[i] != NULL);
+        ok &= (bufs[i] != nullptr);
     }
 
     Clear();
@@ -813,7 +813,7 @@ void VideoBuffers::DeleteBuffers()
     next_dbg_str = 0;
     for (uint i = 0; i < Size(); i++)
     {
-        buffers[i].buf = NULL;
+        buffers[i].buf = nullptr;
 
         av_freep(&buffers[i].qscale_table);
     }

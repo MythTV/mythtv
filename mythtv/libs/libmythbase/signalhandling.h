@@ -27,7 +27,7 @@ class MBASE_PUBLIC SignalHandler: public QObject
     Q_OBJECT
 
   public:
-    static void Init(QList<int> &signallist, QObject *parent = NULL);
+    static void Init(QList<int> &signallist, QObject *parent = nullptr);
     static void Done(void);
 
     static void SetHandler(int signal, SigHandlerFunc handler);

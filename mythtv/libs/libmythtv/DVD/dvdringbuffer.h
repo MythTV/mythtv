@@ -73,7 +73,7 @@ class MTV_PUBLIC DVDInfo
   public:
     explicit DVDInfo(const QString &filename);
    ~DVDInfo(void);
-    bool IsValid(void) const { return m_nav != NULL; }
+    bool IsValid(void) const { return m_nav != nullptr; }
     bool GetNameAndSerialNum(QString &name, QString &serialnum);
     QString GetLastError(void) const { return m_lastError; }
 

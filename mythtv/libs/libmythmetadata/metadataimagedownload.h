@@ -32,7 +32,7 @@ class META_PUBLIC ImageDLEvent : public QEvent
         if (item)
         {
             item->DecrRef();
-            item = NULL;
+            item = nullptr;
         }
     }
 
@@ -58,7 +58,7 @@ class META_PUBLIC ImageDLFailureEvent : public QEvent
         if (item)
         {
             item->DecrRef();
-            item = NULL;
+            item = nullptr;
         }
     }
 
@@ -76,7 +76,7 @@ class META_PUBLIC ThumbnailDLEvent : public QEvent
     ~ThumbnailDLEvent()
     {
         delete thumb;
-        thumb = NULL;
+        thumb = nullptr;
     }
 
     ThumbnailData *thumb;

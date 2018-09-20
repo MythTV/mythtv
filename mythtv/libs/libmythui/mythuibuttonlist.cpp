@@ -93,10 +93,10 @@ void MythUIButtonList::Const(void)
     m_searchFields     = "**ALL**";
     m_searchStartsWith = false;
 
-    m_upArrow = m_downArrow = NULL;
-    m_scrollBar = NULL;
+    m_upArrow = m_downArrow = nullptr;
+    m_scrollBar = nullptr;
 
-    m_buttontemplate = NULL;
+    m_buttontemplate = nullptr;
 
     m_nextItemLoaded = 0;
 
@@ -337,7 +337,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
         buttonstate = PrepareButton(first_button, first_item,
                                     selectedIdx, button_shift);
 
-    if (buttonstate == NULL)
+    if (buttonstate == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to query buttonlist state: %1")
             .arg(last_button));
@@ -409,7 +409,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
     initial_last_item    = last_item;
 
     /*
-     * if col_widths is not NULL, then grow_left & grow_right
+     * if col_widths is not nullptr, then grow_left & grow_right
      * are mutually exclusive.  So, col_idx can be anchored from
      * the left or right.
     */
@@ -451,7 +451,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
                 buttonstate = PrepareButton(last_button + 1, last_item + 1,
                                             selectedIdx, button_shift);
 
-                if (buttonstate == NULL)
+                if (buttonstate == nullptr)
                     continue;
 
                 width = minButtonWidth(buttonstate->GetArea());
@@ -522,7 +522,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
                 buttonstate = PrepareButton(first_button - 1, first_item - 1,
                                             selectedIdx, button_shift);
 
-                if (buttonstate == NULL)
+                if (buttonstate == nullptr)
                     continue;
 
                 width = minButtonWidth(buttonstate->GetArea());
@@ -596,7 +596,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
         return false;
     }
 
-    if (*col_widths == 0)
+    if (*col_widths == nullptr)
     {
         /*
          * Allocate array to hold columns widths, now that we know
@@ -794,7 +794,7 @@ bool MythUIButtonList::DistributeButtons(void)
     start_item = m_selPosition;
     selected_column = selected_row = -1;
     top_height = bottom_height = 0;
-    col_widths = 0;
+    col_widths = nullptr;
     first_button = last_button = start_button = 0;
 
     LOG(VB_GUI, LOG_DEBUG, QString("DistributeButtons: "
@@ -930,7 +930,7 @@ bool MythUIButtonList::DistributeButtons(void)
             break; // Buttons fit on each row, so done
 
         delete[] col_widths;
-        col_widths = 0;
+        col_widths = nullptr;
 
         --m_columns;
         start_item = m_selPosition;
@@ -943,7 +943,7 @@ bool MythUIButtonList::DistributeButtons(void)
         .arg(m_rows).arg(m_columns).arg(m_contentsRect.width())
         .arg(m_contentsRect.height()));
 
-    if (col_widths == 0)
+    if (col_widths == nullptr)
         return false;
 
     int total, row, col;
@@ -1198,7 +1198,7 @@ bool MythUIButtonList::DistributeButtons(void)
     left_spacing   += m_itemHorizSpacing;
     right_spacing  += m_itemHorizSpacing;
 
-    MythUIStateType *realButton = NULL;
+    MythUIStateType *realButton = nullptr;
     MythUIGroup *buttonstate;
 
     // Calculate position of each button
@@ -1378,8 +1378,8 @@ void MythUIButtonList::CalculateButtonPositions(void)
 
     bool seenSelected = false;
 
-    MythUIStateType *realButton = NULL;
-    MythUIButtonListItem *buttonItem = NULL;
+    MythUIStateType *realButton = nullptr;
+    MythUIButtonListItem *buttonItem = nullptr;
 
     if (it < m_itemList.begin())
         it = m_itemList.begin();
@@ -1576,7 +1576,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     if (m_selPosition < m_itemCount)
         emit itemSelected(m_itemList.at(m_selPosition));
     else
-        emit itemSelected(NULL);
+        emit itemSelected(nullptr);
 
     if (IsEmpty())
         emit DependChanged(true);
@@ -1636,7 +1636,7 @@ MythUIButtonListItem *MythUIButtonList::GetItemCurrent() const
 {
     if (m_itemList.isEmpty() || m_selPosition >= m_itemList.size() ||
         m_selPosition < 0)
-        return NULL;
+        return nullptr;
 
     return m_itemList.at(m_selPosition);
 }
@@ -1683,7 +1683,7 @@ MythUIButtonListItem *MythUIButtonList::GetItemFirst() const
     if (!m_itemList.empty())
         return m_itemList[0];
 
-    return NULL;
+    return nullptr;
 }
 
 MythUIButtonListItem *MythUIButtonList::GetItemNext(MythUIButtonListItem *item)
@@ -1692,7 +1692,7 @@ const
     QListIterator<MythUIButtonListItem *> it(m_itemList);
 
     if (!it.findNext(item))
-        return 0;
+        return nullptr;
 
     return it.previous();
 }
@@ -1724,7 +1724,7 @@ bool MythUIButtonList::IsEmpty() const
 MythUIButtonListItem *MythUIButtonList::GetItemAt(int pos) const
 {
     if (pos < 0 || pos >= m_itemList.size())
-        return NULL;
+        return nullptr;
 
     return m_itemList.at(pos);
 }
@@ -1742,7 +1742,7 @@ MythUIButtonListItem *MythUIButtonList::GetItemByData(QVariant data)
             return item;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 int MythUIButtonList::GetItemPos(MythUIButtonListItem *item) const
@@ -1813,7 +1813,7 @@ int MythUIButtonList::PageUp(void)
             buttonstate = dynamic_cast<MythUIGroup *>
                           (realButton->GetCurrentState());
 
-            if (buttonstate == NULL)
+            if (buttonstate == nullptr)
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     "PageUp: Failed to query buttonlist state");
@@ -1864,7 +1864,7 @@ int MythUIButtonList::PageUp(void)
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
 
-        if (buttonstate == NULL)
+        if (buttonstate == nullptr)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "PageUp: Failed to query buttonlist state");
@@ -1918,7 +1918,7 @@ int MythUIButtonList::PageDown(void)
             buttonstate = dynamic_cast<MythUIGroup *>
                           (realButton->GetCurrentState());
 
-            if (buttonstate == NULL)
+            if (buttonstate == nullptr)
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     "PageDown: Failed to query buttonlist state");
@@ -3074,7 +3074,7 @@ void MythUIButtonList::updateLCD(void)
 
     LCD *lcddev = LCD::Get();
 
-    if (lcddev == NULL)
+    if (lcddev == nullptr)
         return;
 
     // Build a list of the menu items
@@ -3252,7 +3252,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
 
     m_parent    = lbtype;
     m_text      = text;
-    m_image     = NULL;
+    m_image     = nullptr;
     m_imageFilename = image;
     m_checkable = checkable;
     m_state     = state;
@@ -3279,7 +3279,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList *lbtype,
     m_text      = text;
     m_data      = data;
 
-    m_image     = NULL;
+    m_image     = nullptr;
 
     m_checkable = false;
     m_state     = CantCheck;
@@ -3495,7 +3495,7 @@ MythImage *MythUIButtonListItem::GetImage(const QString &name)
         return m_image;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void MythUIButtonListItem::SetImage(
@@ -3858,13 +3858,9 @@ SearchButtonListDialog::SearchButtonListDialog(MythScreenStack *parent, const ch
                                                MythUIButtonList *parentList, QString searchText)
     : MythScreenType(parent, name, false),
         m_startsWith(false),            m_parentList(parentList),
-        m_searchText(searchText),       m_searchEdit(NULL),
-        m_prevButton(NULL),             m_nextButton(NULL),
-        m_searchState(NULL)
-{
-}
-
-SearchButtonListDialog::~SearchButtonListDialog(void)
+        m_searchText(searchText),       m_searchEdit(nullptr),
+        m_prevButton(nullptr),          m_nextButton(nullptr),
+        m_searchState(nullptr)
 {
 }
 

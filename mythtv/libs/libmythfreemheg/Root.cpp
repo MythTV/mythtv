@@ -120,7 +120,7 @@ MHRoot *MHRoot::FindByObjectNo(int n)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 

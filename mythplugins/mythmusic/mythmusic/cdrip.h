@@ -184,7 +184,7 @@ class RipStatusEvent : public QEvent
         QEvent(t), text(""), value(val) {}
     RipStatusEvent(Type t, const QString &val) :
         QEvent(t), text(val), value(-1) {}
-    ~RipStatusEvent() {}
+    ~RipStatusEvent() = default;
 
     QString text;
     int value;

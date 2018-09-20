@@ -382,7 +382,7 @@ void MHParseText::Error(const char *str)
 // Lexical analysis.  Get the next symbol.
 void MHParseText::NextSym()
 {
-    while (1)
+    while (true)
     {
 
         switch (m_ch)
@@ -453,11 +453,11 @@ void MHParseText::NextSym()
             case '"': // Start of a string
             {
                 m_nType = PTString;
-                // MHEG strings can include NULLs.  For the moment we pass back the length and also
+                // MHEG strings can include NULs.  For the moment we pass back the length and also
                 // null-terminate the strings.
                 m_nStringLength = 0;
 
-                while (1)
+                while (true)
                 {
                     GetNextChar();
 
@@ -479,7 +479,7 @@ void MHParseText::NextSym()
                     // We grow the buffer to the largest string in the input.
                     unsigned char *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
 
-                    if (str == NULL)
+                    if (str == nullptr)
                     {
                         Error("Insufficient memory");
                     }
@@ -501,7 +501,7 @@ void MHParseText::NextSym()
                 // Quotable printable strings contain escape sequences beginning with the
                 // escape character '='.  The strings can span lines but each line must
                 // end with an equal sign.
-                while (1)
+                while (true)
                 {
                     GetNextChar();
 
@@ -583,7 +583,7 @@ void MHParseText::NextSym()
                     // We grow the buffer to the largest string in the input.
                     unsigned char *str = (unsigned char *)realloc(m_String, m_nStringLength + 2);
 
-                    if (str == NULL)
+                    if (str == nullptr)
                     {
                         Error("Insufficient memory");
                     }
@@ -800,7 +800,7 @@ void MHParseText::NextSym()
                         m_nType = PTString;
                         unsigned char *str = (unsigned char *)realloc(m_String, 4 + 1);
 
-                        if (str == NULL)
+                        if (str == nullptr)
                         {
                             Error("Insufficient memory");
                         }
@@ -855,7 +855,7 @@ void MHParseText::NextSym()
 
 MHParseNode *MHParseText::DoParse()
 {
-    MHParseNode *pRes = NULL;
+    MHParseNode *pRes = nullptr;
 
     try
     {

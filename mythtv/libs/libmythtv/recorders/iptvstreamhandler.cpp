@@ -79,7 +79,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -101,14 +101,14 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
     }
 
     s_iptvhandlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning) :
     StreamHandler(tuning.GetDeviceKey()),
     m_tuning(tuning),
-    m_write_helper(NULL),
-    m_buffer(NULL),
+    m_write_helper(nullptr),
+    m_buffer(nullptr),
     m_rtsp_rtp_port(0),
     m_rtsp_rtcp_port(0),
     m_rtsp_ssrc(0)
@@ -129,7 +129,7 @@ void IPTVStreamHandler::run(void)
     // TODO Error handling..
 
     // Setup
-    CetonRTSP *rtsp = NULL;
+    CetonRTSP *rtsp = nullptr;
     IPTVTuningData tuning = m_tuning;
     if(m_tuning.IsRTSP())
     {
@@ -319,15 +319,15 @@ void IPTVStreamHandler::run(void)
         if (m_sockets[i])
         {
             delete m_sockets[i];
-            m_sockets[i] = NULL;
+            m_sockets[i] = nullptr;
             delete m_read_helpers[i];
-            m_read_helpers[i] = NULL;
+            m_read_helpers[i] = nullptr;
         }
     }
     delete m_buffer;
-    m_buffer = NULL;
+    m_buffer = nullptr;
     delete m_write_helper;
-    m_write_helper = NULL;
+    m_write_helper = nullptr;
 
     if (rtsp)
     {
@@ -423,7 +423,7 @@ IPTVStreamHandlerWriteHelper::~IPTVStreamHandlerWriteHelper()
     }
     m_timer = 0;
     m_timer_rtcp = 0;
-    m_parent = NULL;
+    m_parent = nullptr;
 }
 
 void IPTVStreamHandlerWriteHelper::timerEvent(QTimerEvent* event)

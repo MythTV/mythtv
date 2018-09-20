@@ -76,7 +76,7 @@ class ScanMonitor :
     virtual void StatusRotorPosition(const SignalMonitorValue&);
 
   private:
-    ~ScanMonitor() { }
+    ~ScanMonitor() = default;
 
     ChannelScanner *channelScanner;
 };
@@ -90,7 +90,7 @@ class ScannerEvent : public QEvent
   public:
 
     explicit ScannerEvent(QEvent::Type t) :
-        QEvent(t), str(""), intvalue(0), cfg_ptr(NULL) { ; }
+        QEvent(t), str(""), intvalue(0), cfg_ptr(nullptr) { ; }
 
     QString strValue()              const { return str; }
     void    strValue(const QString& _str) { str = _str; }
@@ -116,7 +116,7 @@ class ScannerEvent : public QEvent
     static Type SetStatusChannelTuned;
 
   private:
-    ~ScannerEvent() { }
+    ~ScannerEvent() = default;
 
   private:
     QString str;

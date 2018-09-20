@@ -25,7 +25,7 @@ class FirewireTableMonitorThread : public MThread
   public:
     explicit FirewireTableMonitorThread(FirewireSignalMonitor *p) :
         MThread("FirewireTableMonitor"), m_parent(p) { start(); }
-    virtual ~FirewireTableMonitorThread() { wait(); m_parent = NULL; }
+    virtual ~FirewireTableMonitorThread() { wait(); m_parent = nullptr; }
     virtual void run(void);
   private:
     FirewireSignalMonitor *m_parent;

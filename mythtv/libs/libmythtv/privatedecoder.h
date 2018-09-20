@@ -22,8 +22,8 @@ class PrivateDecoder
     static PrivateDecoder* Create(const QString &decoder,
                                   PlayerFlags flags,
                                   AVCodecContext *avctx);
-    PrivateDecoder() { }
-    virtual ~PrivateDecoder() { }
+    PrivateDecoder() = default;
+    virtual ~PrivateDecoder() = default;
     virtual QString GetName(void) = 0;
     virtual bool Init(const QString &decoder,
                       PlayerFlags flags,

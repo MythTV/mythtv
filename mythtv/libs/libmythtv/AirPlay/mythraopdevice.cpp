@@ -14,8 +14,8 @@
 #include "mythraopdevice.h"
 #include "mythairplayserver.h"
 
-MythRAOPDevice *MythRAOPDevice::gMythRAOPDevice = NULL;
-MThread        *MythRAOPDevice::gMythRAOPDeviceThread = NULL;
+MythRAOPDevice *MythRAOPDevice::gMythRAOPDevice = nullptr;
+MThread        *MythRAOPDevice::gMythRAOPDeviceThread = nullptr;
 QMutex         *MythRAOPDevice::gMythRAOPDeviceMutex = new QMutex(QMutex::Recursive);
 
 #define LOC QString("RAOP Device: ")
@@ -77,14 +77,14 @@ void MythRAOPDevice::Cleanup(void)
         gMythRAOPDeviceThread->wait();
     }
     delete gMythRAOPDeviceThread;
-    gMythRAOPDeviceThread = NULL;
+    gMythRAOPDeviceThread = nullptr;
 
     delete gMythRAOPDevice;
-    gMythRAOPDevice = NULL;
+    gMythRAOPDevice = nullptr;
 }
 
 MythRAOPDevice::MythRAOPDevice()
-  : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
+  : ServerPool(), m_name(QString("MythTV")), m_bonjour(nullptr), m_valid(false),
     m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5000), m_basePort(0)
 {
     m_hardwareId = QByteArray::fromHex(AirPlayHardwareId().toLatin1());
@@ -93,7 +93,7 @@ MythRAOPDevice::MythRAOPDevice()
 MythRAOPDevice::~MythRAOPDevice()
 {
     delete m_lock;
-    m_lock = NULL;
+    m_lock = nullptr;
 }
 
 void MythRAOPDevice::Teardown(void)
@@ -105,10 +105,10 @@ void MythRAOPDevice::Teardown(void)
 
     // disconnect from mDNS
     delete m_bonjour;
-    m_bonjour = NULL;
+    m_bonjour = nullptr;
 
     // disconnect clients
-    DeleteAllClients(NULL);
+    DeleteAllClients(nullptr);
 }
 
 void MythRAOPDevice::Start(void)
@@ -201,7 +201,7 @@ bool MythRAOPDevice::RegisterForBonjour(void)
 void MythRAOPDevice::TVPlaybackStarting(void)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Receiving new playback message"));
-    DeleteAllClients(NULL);
+    DeleteAllClients(nullptr);
 }
 
 void MythRAOPDevice::newConnection(QTcpSocket *client)

@@ -12,7 +12,7 @@ class Frontend : public FrontendServices
     Q_OBJECT
 
   public:
-    Q_INVOKABLE explicit Frontend(QObject *parent = 0) : FrontendServices(parent) { }
+    Q_INVOKABLE explicit Frontend(QObject *parent = nullptr) : FrontendServices(parent) { }
 
   public:
     DTC::FrontendStatus* GetStatus(void);
@@ -74,12 +74,12 @@ class ScriptableFrontend : public QObject
     QScriptEngine *m_pEngine;
 
   public:
-    Q_INVOKABLE ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+    Q_INVOKABLE ScriptableFrontend( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
     {
         m_pEngine = pEngine;
     }
   public slots:
-    QObject* GetStatus(void) { SCRIPT_CATCH_EXCEPTION( NULL,
+    QObject* GetStatus(void) { SCRIPT_CATCH_EXCEPTION( nullptr,
                                     return m_obj.GetStatus(); ) }
 };
 

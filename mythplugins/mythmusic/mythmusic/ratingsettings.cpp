@@ -8,15 +8,10 @@
 
 RatingSettings::RatingSettings(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name),
-        m_ratingWeight(NULL), m_playCountWeight(NULL),
-        m_lastPlayWeight(NULL), m_randomWeight(NULL),
-        m_saveButton(NULL), m_cancelButton(NULL)
+        m_ratingWeight(nullptr), m_playCountWeight(nullptr),
+        m_lastPlayWeight(nullptr), m_randomWeight(nullptr),
+        m_saveButton(nullptr), m_cancelButton(nullptr)
 {
-}
-
-RatingSettings::~RatingSettings()
-{
-
 }
 
 bool RatingSettings::Create()

@@ -31,7 +31,7 @@ class SERVICE_PUBLIC ChannelGroupList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE ChannelGroupList(QObject *parent = 0)
+        Q_INVOKABLE ChannelGroupList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

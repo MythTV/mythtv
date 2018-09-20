@@ -124,12 +124,12 @@ IconView::IconView(MythScreenStack *parent, const char *name,
         : MythScreenType(parent, name),
             m_galleryDir(galleryDir),
             m_galleryFilter(new GalleryFilter()),
-            m_imageList(NULL),
-            m_captionText(NULL),    m_crumbsText(NULL),
-            m_positionText(NULL),   m_noImagesText(NULL),
-            m_selectedImage(NULL),  m_menuPopup(NULL),
-            m_popupStack(NULL),
-            m_isGallery(false),     m_showDevices(false),
+            m_imageList(nullptr),
+            m_captionText(nullptr),   m_crumbsText(nullptr),
+            m_positionText(nullptr),  m_noImagesText(nullptr),
+            m_selectedImage(nullptr), m_menuPopup(nullptr),
+            m_popupStack(nullptr),
+            m_isGallery(false),       m_showDevices(false),
             m_currDevice(initialDevice),
             m_thumbGen(new ThumbGenerator(this, 0, 0)),
             m_childCountThread(new ChildCountThread(this))
@@ -157,17 +157,17 @@ IconView::~IconView()
     if (m_thumbGen)
     {
         delete m_thumbGen;
-        m_thumbGen = NULL;
+        m_thumbGen = nullptr;
     }
     if (m_galleryFilter)
     {
         delete m_galleryFilter;
-        m_galleryFilter = NULL;
+        m_galleryFilter = nullptr;
     }
     if (m_childCountThread)
     {
         delete m_childCountThread;
-        m_childCountThread = NULL;
+        m_childCountThread = nullptr;
     }
 }
 
@@ -265,7 +265,7 @@ void IconView::LoadDirectory(const QString &dir)
 
         thumbitem->InitCaption(m_showcaption);
         MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), 0,
+            new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), nullptr,
                                      true, MythUIButtonListItem::NotChecked);
         item->SetData(qVariantFromValue(thumbitem));
         if (thumbitem->IsDir())
@@ -648,7 +648,7 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
             HandleShowDevices();
 
             // Make sure previous devices are visible and selected
-            ThumbItem *item = NULL;
+            ThumbItem *item = nullptr;
             if (!(*it)->getVolumeID().isEmpty())
                 item = m_itemHash.value((*it)->getVolumeID());
             else
@@ -895,7 +895,7 @@ void IconView::customEvent(QEvent *event)
             }
         }
 
-        m_menuPopup = NULL;
+        m_menuPopup = nullptr;
 
     }
 
@@ -914,7 +914,7 @@ void IconView::HandleMainMenu(void)
 
     if (!m_itemList.isEmpty())
     {
-        menu->AddItem(tr("SlideShow"), 0);
+        menu->AddItem(tr("SlideShow"), nullptr);
         menu->AddItem(tr("Random"), 1);
 #ifdef EXIF_SUPPORT
         menu->AddItem(tr("Seasonal"), 7);
@@ -941,7 +941,7 @@ void IconView::HandleMainMenu(void)
     if (!m_menuPopup->Create())
     {
         delete m_menuPopup;
-        m_menuPopup = NULL;
+        m_menuPopup = nullptr;
         return;
     }
 
@@ -954,7 +954,7 @@ MythMenu* IconView::CreateMetadataMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "metadatamenu");
 
-    menu->AddItem(tr("Rotate CW"), 0);
+    menu->AddItem(tr("Rotate CW"), nullptr);
     menu->AddItem(tr("Rotate CCW"), 1);
 
     return menu;
@@ -966,7 +966,7 @@ MythMenu* IconView::CreateMarkingMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "markingmenu");
 
-    menu->AddItem(tr("Select One"), 0);
+    menu->AddItem(tr("Select One"), nullptr);
     menu->AddItem(tr("Clear One Marked"), 1);
     menu->AddItem(tr("Select All"), 2);
     menu->AddItem(tr("Clear Marked"), 3);
@@ -993,7 +993,7 @@ MythMenu* IconView::CreateFileMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "filemenu");
 
-    menu->AddItem(tr("Show Devices"), 0);
+    menu->AddItem(tr("Show Devices"), nullptr);
     menu->AddItem(tr("Eject"), 1);
     menu->AddItem(tr("Import"), 2);
 
@@ -1135,7 +1135,7 @@ void IconView::ReloadSettings(void)
     }
     else
     {
-        m_currDevice = NULL;
+        m_currDevice = nullptr;
         LoadDirectory(m_galleryDir);
     }
 
@@ -1186,7 +1186,7 @@ void IconView::HandleImport(void)
                 else
                 {
                     delete busy;
-                    busy = NULL;
+                    busy = nullptr;
                 }
 
                 ImportThread *import = new ImportThread(cmd);
@@ -1247,7 +1247,7 @@ void IconView::HandleShowDevices(void)
         m_currDir = m_galleryDir;
 #endif
 
-    m_currDevice = NULL;
+    m_currDevice = nullptr;
 
     m_showDevices = true;
 
@@ -1293,7 +1293,7 @@ void IconView::HandleShowDevices(void)
 
         thumbitem->InitCaption(m_showcaption);
         MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), 0,
+            new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), nullptr,
                                      true, MythUIButtonListItem::NotChecked);
         item->SetData(qVariantFromValue(thumbitem));
     }
@@ -1529,7 +1529,7 @@ void IconView::CopyMarkedFiles(bool move)
     else
     {
         delete copy_progress;
-        copy_progress = NULL;
+        copy_progress = nullptr;
     }
 
     FileCopyThread *filecopy = new FileCopyThread(this, move);
@@ -1576,7 +1576,7 @@ ThumbItem *IconView::GetCurrentThumb(void)
     MythUIButtonListItem *item = m_imageList->GetItemCurrent();
     if (item)
         return item->GetData().value<ThumbItem *>();
-    return NULL;
+    return nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

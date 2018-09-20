@@ -17,7 +17,7 @@ class RemoteAVFormatContext
 {
   public:
     explicit RemoteAVFormatContext(const QString &filename = "") :
-        m_inputFC(NULL), m_inputIsRemote(false), m_rf(NULL), m_byteIOContext(NULL), m_buffer(NULL)
+        m_inputFC(nullptr), m_inputIsRemote(false), m_rf(nullptr), m_byteIOContext(nullptr), m_buffer(nullptr)
     { if (!filename.isEmpty()) Open(filename); }
 
     ~RemoteAVFormatContext()
@@ -74,13 +74,13 @@ class RemoteAVFormatContext
 
             m_inputFC->pb = m_byteIOContext;
 
-            int ret = avformat_open_input(&m_inputFC, "stream", fmt, NULL);
+            int ret = avformat_open_input(&m_inputFC, "stream", fmt, nullptr);
             if (ret)
                 return false;
         }
         else
         {
-            int ret = avformat_open_input(&m_inputFC,  qPrintable(filename), NULL, NULL);
+            int ret = avformat_open_input(&m_inputFC,  qPrintable(filename), nullptr, nullptr);
             if (ret)
                 return false;
         }
@@ -93,22 +93,22 @@ class RemoteAVFormatContext
         if (m_inputFC)
         {
             avformat_close_input(&m_inputFC);
-            m_inputFC = NULL;
+            m_inputFC = nullptr;
         }
 
         if (m_rf)
         {
             delete m_rf;
-            m_rf = NULL;
+            m_rf = nullptr;
         }
     }
 
     bool isOpen() const
     {
         if (m_inputIsRemote)
-            return (m_inputFC != NULL && m_rf != NULL && m_rf->isOpen());
+            return (m_inputFC != nullptr && m_rf != nullptr && m_rf->isOpen());
         else
-            return (m_inputFC != NULL);
+            return (m_inputFC != nullptr);
     }
 
     operator AVFormatContext * () const { return m_inputFC; }

@@ -336,8 +336,8 @@ bool Frontend::SendKey(const QString &sKey)
 {
     int keyCode;
     int ret = false;
-    QObject *keyDest = NULL;
-    QKeyEvent *event = NULL;
+    QObject *keyDest = nullptr;
+    QKeyEvent *event = nullptr;
     QMap <QString, int> keyMap;
     QString keyText;
     QString msg;

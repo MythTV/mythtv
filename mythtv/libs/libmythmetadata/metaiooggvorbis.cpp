@@ -12,10 +12,6 @@ MetaIOOggVorbis::MetaIOOggVorbis(void)
 {
 }
 
-MetaIOOggVorbis::~MetaIOOggVorbis(void)
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *
@@ -31,7 +27,7 @@ TagLib::Ogg::Vorbis::File *MetaIOOggVorbis::OpenFile(const QString &filename)
     if (!oggfile->isOpen())
     {
         delete oggfile;
-        oggfile = NULL;
+        oggfile = nullptr;
     }
 
     return oggfile;
@@ -104,14 +100,14 @@ MusicMetadata* MetaIOOggVorbis::read(const QString &filename)
     TagLib::Ogg::Vorbis::File *oggfile = OpenFile(filename);
 
     if (!oggfile)
-        return NULL;
+        return nullptr;
 
     TagLib::Ogg::XiphComment *tag = oggfile->tag();
 
     if (!tag)
     {
         delete oggfile;
-        return NULL;
+        return nullptr;
     }
 
     MusicMetadata *metadata = new MusicMetadata(filename);

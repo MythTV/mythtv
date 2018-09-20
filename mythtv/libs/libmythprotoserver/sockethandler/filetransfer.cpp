@@ -45,7 +45,7 @@ FileTransfer::~FileTransfer()
     if (rbuffer)
     {
         delete rbuffer;
-        rbuffer = NULL;
+        rbuffer = nullptr;
     }
 
     if (pginfo)

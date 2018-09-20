@@ -42,7 +42,7 @@ class SERVICE_PUBLIC VersionInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE VersionInfo(QObject *parent = 0)
+        Q_INVOKABLE VersionInfo(QObject *parent = nullptr)
             : QObject   ( parent ),
               m_Version ( ""     ),
               m_Branch  ( ""     ),

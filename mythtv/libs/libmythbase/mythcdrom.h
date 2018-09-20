@@ -10,7 +10,7 @@ class MBASE_PUBLIC MythCDROM : public MythMediaDevice
     MythCDROM(QObject* par, const char* DevicePath, bool SuperMount,
               bool AllowEject);
   public:
-    virtual ~MythCDROM() {};
+    virtual ~MythCDROM() = default;
 
     virtual bool mediaChanged(void) { return false; }
     virtual bool checkOK(void)      { return true; }

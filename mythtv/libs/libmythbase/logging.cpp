@@ -72,7 +72,7 @@ static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;
 static QRegExp                 logRegExp = QRegExp("[%]{1,2}");
 
-static LoggerThread           *logThread = NULL;
+static LoggerThread           *logThread = nullptr;
 static QMutex                  logThreadMutex;
 static QHash<uint64_t, char *> logThreadHash;
 
@@ -127,7 +127,7 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 {
 #if HAVE_GETTIMEOFDAY
     struct timeval  tv;
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nullptr);
     *epoch = tv.tv_sec;
     if (usec)
         *usec  = tv.tv_usec;
@@ -147,8 +147,8 @@ LoggingItem::LoggingItem() :
         ReferenceCounter("LoggingItem", false),
         m_pid(-1), m_tid(-1), m_threadId(-1), m_usec(0), m_line(0),
         m_type(kMessage), m_level((LogLevel_t)LOG_INFO), m_facility(0), m_epoch(0),
-        m_file(NULL), m_function(NULL), m_threadName(NULL), m_appName(NULL),
-        m_table(NULL), m_logFile(NULL)
+        m_file(nullptr), m_function(nullptr), m_threadName(nullptr), m_appName(nullptr),
+        m_table(nullptr), m_logFile(nullptr)
 {
     m_message[0]='\0';
     m_message[LOGLINE_MAX]='\0';
@@ -160,7 +160,7 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         m_threadId((uint64_t)(QThread::currentThreadId())),
         m_line(_line), m_type(_type), m_level(_level), m_facility(0),
         m_file(strdup(_file)), m_function(strdup(_function)),
-        m_threadName(NULL), m_appName(NULL), m_table(NULL), m_logFile(NULL)
+        m_threadName(nullptr), m_appName(nullptr), m_table(nullptr), m_logFile(nullptr)
 {
     loggingGetTimeStamp(&m_epoch, &m_usec);
 
@@ -262,11 +262,11 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
     m_tablename(table), m_facility(facility), m_pid(getpid()), m_epoch(0),
-    m_zmqContext(NULL), m_zmqSocket(NULL), m_initialTimer(NULL),
-    m_heartbeatTimer(NULL), m_noserver(noserver)
+    m_zmqContext(nullptr), m_zmqSocket(nullptr), m_initialTimer(nullptr),
+    m_heartbeatTimer(nullptr), m_noserver(noserver)
 {
     char *debug = getenv("VERBOSE_THREADS");
-    if (debug != NULL)
+    if (debug != nullptr)
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             "Logging thread registration/deregistration enabled!");
@@ -390,7 +390,7 @@ void LoggerThread::run(void)
     {
         qLock.unlock();
         qApp->processEvents(QEventLoop::AllEvents, 10);
-        qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
+        qApp->sendPostedEvents(nullptr, QEvent::DeferredDelete);
 
         qLock.relock();
         if (logQueue.isEmpty())
@@ -544,7 +544,7 @@ void LoggerThread::messageReceived(const QList<QByteArray> &/*msg*/)
 {
     m_initialWaiting = false;
     // cout << "ping" << endl;
-    loggingGetTimeStamp(&m_epoch, NULL);
+    loggingGetTimeStamp(&m_epoch, nullptr);
     pingLogServer();
 }
 
@@ -664,7 +664,7 @@ bool LoggerThread::logConsole(LoggingItem *item)
 
         {
             QMutexLocker locker(&loglevelMapMutex);
-            LoglevelDef *lev = loglevelMap.value(item->m_level, NULL);
+            LoglevelDef *lev = loglevelMap.value(item->m_level, nullptr);
             if (!lev)
                 shortname = '-';
             else
@@ -784,7 +784,7 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
     if (!item)
         return;
 
-    char *formatcopy = NULL;
+    char *formatcopy = nullptr;
     if( fromQString && strchr(format, '%') )
     {
         QString string(format);
@@ -959,7 +959,7 @@ void logStop(void)
         logThread->stop();
         logThread->wait();
         delete logThread;
-        logThread = NULL;
+        logThread = nullptr;
     }
 }
 
@@ -1009,14 +1009,17 @@ int syslogGetFacility(QString facility)
 #ifdef _WIN32
     LOG(VB_GENERAL, LOG_NOTICE,
         "Windows does not support syslog, disabling" );
+    Q_UNUSED(facility);
     return( -2 );
 #elif defined(Q_OS_ANDROID)
     LOG(VB_GENERAL, LOG_NOTICE,
         "Android does not support syslog, disabling" );
+    Q_UNUSED(facility);
     return( -2 );
 #elif defined(Q_OS_ANDROID)
     LOG(VB_GENERAL, LOG_NOTICE,
         "Android does not support syslog, disabling" );
+    Q_UNUSED(facility);
     return( -2 );
 #else
     const CODE *name;

@@ -49,7 +49,7 @@ qobject2qvariant( const QObject* object )
 {
 #if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
     QVariantMap map;
-    if ( object == NULL )
+    if ( object == nullptr )
     {
         return map;
     }
@@ -102,7 +102,7 @@ parseJson( const QByteArray& jsonData, bool* ok )
 #if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson( jsonData, &error );
-    if ( ok != NULL )
+    if ( ok != nullptr )
     {
         *ok = ( error.error == QJsonParseError::NoError );
     }

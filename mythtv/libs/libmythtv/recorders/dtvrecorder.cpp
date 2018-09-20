@@ -65,14 +65,14 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _has_written_other_keyframe(false),
     // state
     _error(),
-    _stream_data(NULL),
+    _stream_data(nullptr),
     // TS packet buffer
     // keyframe TS buffer
     _buffer_packets(false),
     // general recorder stuff
     _pid_lock(QMutex::Recursive),
-    _input_pat(NULL),
-    _input_pmt(NULL),
+    _input_pat(nullptr),
+    _input_pmt(nullptr),
     _has_no_av(false),
     // record 'raw' mpts?
     _record_mpts(0),
@@ -107,18 +107,18 @@ DTVRecorder::~DTVRecorder(void)
 {
     StopRecording();
 
-    SetStreamData(NULL);
+    SetStreamData(nullptr);
 
     if (_input_pat)
     {
         delete _input_pat;
-        _input_pat = NULL;
+        _input_pat = nullptr;
     }
 
     if (_input_pmt)
     {
         delete _input_pmt;
-        _input_pmt = NULL;
+        _input_pmt = nullptr;
     }
 }
 
@@ -1301,7 +1301,7 @@ void DTVRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
     QMutexLocker change_lock(&_pid_lock);
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetPMT(%1, %2)").arg(progNum)
-        .arg(_pmt == 0 ? "NULL" : "valid"));
+        .arg(_pmt == nullptr ? "NULL" : "valid"));
 
 
     if ((int)progNum == _stream_data->DesiredProgram())

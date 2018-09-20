@@ -33,11 +33,6 @@ OutputListeners::OutputListeners()
 }
 
 
-OutputListeners::~OutputListeners()
-{
-}
-
-
 void OutputListeners::error(const QString &e)
 {
     OutputEvent event(e);

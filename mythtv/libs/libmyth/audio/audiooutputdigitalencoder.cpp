@@ -21,12 +21,12 @@ extern "C" {
 #define LOC QString("DEnc: ")
 
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
-    av_context(NULL),
-    out(NULL), out_size(0),
-    in(NULL), inp(NULL), in_size(0),
+    av_context(nullptr),
+    out(nullptr), out_size(0),
+    in(nullptr), inp(nullptr), in_size(0),
     outlen(0), inlen(0),
     samples_per_frame(0),
-    m_spdifenc(NULL), m_frame(NULL)
+    m_spdifenc(nullptr), m_frame(nullptr)
 {
     out = (outbuf_t *)av_mallocz(OUTBUFSIZE);
     if (out)
@@ -68,7 +68,7 @@ void AudioOutputDigitalEncoder::Reset(void)
     av_frame_free(&m_frame);
 
     delete m_spdifenc;
-    m_spdifenc = NULL;
+    m_spdifenc = nullptr;
 
     clear();
 }
@@ -127,7 +127,7 @@ bool AudioOutputDigitalEncoder::Init(
     av_context->sample_fmt     = AV_SAMPLE_FMT_S16P;
 
     // open it
-    ret = avcodec_open2(av_context, codec, NULL);
+    ret = avcodec_open2(av_context, codec, nullptr);
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -174,7 +174,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             (realloc(in, in_size, required_len));
         if (!tmp)
         {
-            in = NULL;
+            in = nullptr;
             in_size = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 "AC-3 encode error, insufficient memory");
@@ -203,7 +203,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     {
         if (!(m_frame = av_frame_alloc()))
         {
-            in = NULL;
+            in = nullptr;
             in_size = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 "AC-3 encode error, insufficient memory");
@@ -230,7 +230,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     {
         AVPacket pkt;
         av_init_packet(&pkt);
-        pkt.data          = NULL;
+        pkt.data          = nullptr;
         pkt.size          = 0;
         bool got_packet   = false;
 
@@ -288,7 +288,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
                 (realloc(out, out_size, required_len));
             if (!tmp)
             {
-                out = NULL;
+                out = nullptr;
                 out_size = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +
                     "AC-3 encode error, insufficient memory");

@@ -104,7 +104,7 @@ void UPnpCDSMusic::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Track"),
                                               QObject::tr("All Tracks"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadTracks(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -118,7 +118,7 @@ void UPnpCDSMusic::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Artist"),
                                               QObject::tr("Artist"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadArtists(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -132,7 +132,7 @@ void UPnpCDSMusic::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Album"),
                                               QObject::tr("Album"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadAlbums(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -146,7 +146,7 @@ void UPnpCDSMusic::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Genre"),
                                               QObject::tr("Genre"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadGenres(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -160,7 +160,7 @@ void UPnpCDSMusic::CreateRoot()
 //     pContainer = CDSObject::CreateStorageSystem ( containerId.arg("Directory"),
 //                                                   QObject::tr("Directory"),
 //                                                   m_sExtensionId, // Parent Id
-//                                                   NULL );
+//                                                   nullptr );
 //     // HACK
 //     LoadDirectories(pRequest, pResult, tokens);
 //     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -273,7 +273,7 @@ bool UPnpCDSMusic::LoadMetadata(const UPnpCDSRequest* pRequest,
     // Root or Root + 1
     if (tokens[currentToken].isEmpty())
     {
-        CDSObject *container = NULL;
+        CDSObject *container = nullptr;
 
         if (pRequest->m_sObjectId == m_sExtensionId)
             container = GetRoot();
@@ -514,7 +514,7 @@ bool UPnpCDSMusic::LoadAlbums(const UPnpCDSRequest *pRequest,
         CDSObject* pContainer = CDSObject::CreateMusicAlbum( CreateIDString(sRequestId, "Album", nAlbumID),
                                                              sAlbumName,
                                                              pRequest->m_sParentId,
-                                                             NULL );
+                                                             nullptr );
         pContainer->SetPropValue("artist", sArtist);
         pContainer->SetPropValue("date", sYear);
         pContainer->SetPropValue("genre", sGenre);
@@ -600,7 +600,7 @@ bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
         CDSObject* pContainer = CDSObject::CreateMusicArtist( CreateIDString(sRequestId, "Artist", nArtistId),
                                                               sArtistName,
                                                               pRequest->m_sParentId,
-                                                              NULL );
+                                                              nullptr );
 // TODO: Add SetPropValues option for multi-value properties
 //         QStringList::Iterator it;
 //         for (it = sGenres.begin(); it != sGenres.end(); ++it)
@@ -679,7 +679,7 @@ bool UPnpCDSMusic::LoadGenres(const UPnpCDSRequest *pRequest,
         CDSObject* pContainer = CDSObject::CreateMusicGenre( CreateIDString(sRequestId, "Genre", nGenreId),
                                                              sGenreName,
                                                              pRequest->m_sParentId,
-                                                             NULL );
+                                                             nullptr );
         pContainer->SetPropValue("description", sGenreName);
 
         pContainer->SetChildCount(nArtistCount);
@@ -768,7 +768,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
         CDSObject* pItem = CDSObject::CreateMusicTrack( CreateIDString(sRequestId, "Track", nId),
                                                         sTitle,
                                                         pRequest->m_sParentId,
-                                                        NULL );
+                                                        nullptr );
 
         // Only add the reference ID for items which are not in the
         // 'All Tracks' container

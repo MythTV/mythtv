@@ -27,14 +27,14 @@ using namespace std;
 
 MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
-    m_allData(NULL)
+    m_allData(nullptr)
 {
     // themeable setting defaults
     for (uint x = 0; x < RECSTATUSSIZE; x++)
-        m_recImages[x] = NULL;
+        m_recImages[x] = nullptr;
 
     for (uint x = 0; x < ARROWIMAGESIZE; x++)
-        m_arrowImages[x] = NULL;
+        m_arrowImages[x] = nullptr;
 
     m_channelCount = 5;
     m_timeCount = 4;
@@ -81,7 +81,7 @@ MythUIGuideGrid::~MythUIGuideGrid()
     delete [] m_allData;
 
     delete m_font;
-    m_font = NULL;
+    m_font = nullptr;
 
     // The m_recImages and m_arrowImages images are now children of
     // the MythGuiGuideGrid widget and should be automatically deleted

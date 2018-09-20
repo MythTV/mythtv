@@ -50,7 +50,7 @@ signals:
     void breathe();
 
 protected:    
-    ~CommDetectorBase() {}
+    ~CommDetectorBase() = default;
     bool m_bPaused;
     bool m_bStop;    
     

@@ -13,7 +13,7 @@
 class ProgramStruct
 {
   public:
-    ProgramStruct() : before(NULL), after(NULL) {}
+    ProgramStruct() : before(nullptr), after(nullptr) {}
     ProgramInfo *before;
     ProgramInfo *after;
 };
@@ -26,7 +26,7 @@ class ViewScheduleDiff : public MythScreenType
   public:
     ViewScheduleDiff(MythScreenStack *parent, QString altTbl,
                      int recordid = -1, QString ltitle = "");
-    ~ViewScheduleDiff();
+    ~ViewScheduleDiff() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

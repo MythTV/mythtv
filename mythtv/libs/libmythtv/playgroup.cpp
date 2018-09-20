@@ -265,7 +265,7 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
 
 
 PlayGroupEditor::PlayGroupEditor()
-    : m_addGroupButton(NULL)
+    : m_addGroupButton(nullptr)
 {
     setLabel(tr("Playback Groups"));
     m_addGroupButton = new ButtonStandardSetting(tr("Create New Playback Group"));
@@ -318,7 +318,7 @@ void PlayGroupEditor::CreateNewPlayBackGroupSlot(const QString& name)
 
     addChild(new PlayGroupConfig(name, name, true));
 
-    emit settingsChanged(NULL);
+    emit settingsChanged(nullptr);
 }
 
 void PlayGroupEditor::Load()
@@ -336,5 +336,5 @@ void PlayGroupEditor::Load()
     GroupSetting::Load();
 
     //TODO select the new one or the edited one
-    emit settingsChanged(NULL);
+    emit settingsChanged(nullptr);
 }

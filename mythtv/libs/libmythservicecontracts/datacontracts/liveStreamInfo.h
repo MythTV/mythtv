@@ -69,7 +69,7 @@ class SERVICE_PUBLIC LiveStreamInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE explicit LiveStreamInfo(QObject *parent = 0)
+        Q_INVOKABLE explicit LiveStreamInfo(QObject *parent = nullptr)
             : QObject            ( parent ),
               m_Id               ( 0      ),
               m_Width            ( 0      ),

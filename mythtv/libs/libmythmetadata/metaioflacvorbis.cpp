@@ -18,10 +18,6 @@ MetaIOFLACVorbis::MetaIOFLACVorbis(void)
 {
 }
 
-MetaIOFLACVorbis::~MetaIOFLACVorbis(void)
-{
-}
-
 /*!
 * \brief Open the file to read the tag
 *
@@ -37,7 +33,7 @@ TagLib::FLAC::File *MetaIOFLACVorbis::OpenFile(const QString &filename)
     if (!flacfile->isOpen())
     {
         delete flacfile;
-        flacfile = NULL;
+        flacfile = nullptr;
     }
 
     return flacfile;
@@ -110,14 +106,14 @@ MusicMetadata* MetaIOFLACVorbis::read(const QString &filename)
     TagLib::FLAC::File *flacfile = OpenFile(filename);
 
     if (!flacfile)
-        return NULL;
+        return nullptr;
 
     TagLib::Ogg::XiphComment *tag = flacfile->xiphComment();
 
     if (!tag)
     {
         delete flacfile;
-        return NULL;
+        return nullptr;
     }
 
     MusicMetadata *metadata = new MusicMetadata(filename);
@@ -160,7 +156,7 @@ MusicMetadata* MetaIOFLACVorbis::read(const QString &filename)
  *
  * \param filename The filename for which we want to find the albumart.
  * \param type The type of image we want - front/back etc
- * \returns A pointer to a QImage owned by the caller or NULL if not found.
+ * \returns A pointer to a QImage owned by the caller or nullptr if not found.
  */
 QImage* MetaIOFLACVorbis::getAlbumArt(const QString &filename, ImageType type)
 {
@@ -178,7 +174,7 @@ QImage* MetaIOFLACVorbis::getAlbumArt(const QString &filename, ImageType type)
         else
         {
             delete picture;
-            return NULL;
+            return nullptr;
         }
 
         delete flacfile;
@@ -193,7 +189,7 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
 {
     using TagLib::FLAC::Picture;
 
-    Picture *pic = NULL;
+    Picture *pic = nullptr;
 
     if (flacfile)
     {
@@ -205,10 +201,10 @@ TagLib::FLAC::Picture *MetaIOFLACVorbis::getPictureFromFile(
         for (TagLib::List<Picture *>::ConstIterator it = picList.begin();
                 it != picList.end(); it++)
         {
-            pic = *it;
             if (pic->type() == artType)
             {
                 //found the type we were looking for
+                pic = *it;
                 break;
             }
         }

@@ -40,7 +40,7 @@ class SERVICE_PUBLIC SettingList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE SettingList(QObject *parent = 0)
+        Q_INVOKABLE SettingList(QObject *parent = nullptr)
             : QObject( parent )               
         {
         }

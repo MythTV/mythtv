@@ -40,7 +40,7 @@ class SERVICE_PUBLIC GenreList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE GenreList(QObject *parent = 0)
+        Q_INVOKABLE GenreList(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

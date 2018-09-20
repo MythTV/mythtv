@@ -158,7 +158,7 @@ class SSDPExtension : public HttpServerExtension
 
     public:
                  SSDPExtension( int nServicePort, const QString &sSharePath);
-        virtual ~SSDPExtension( );
+        virtual ~SSDPExtension( ) = default;
 
         virtual QStringList GetBasePaths();
         

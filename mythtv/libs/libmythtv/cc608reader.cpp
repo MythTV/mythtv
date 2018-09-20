@@ -27,7 +27,7 @@ CC608Reader::~CC608Reader()
         if (m_inputBuffers[i].buffer)
         {
             delete [] m_inputBuffers[i].buffer;
-            m_inputBuffers[i].buffer = NULL;
+            m_inputBuffers[i].buffer = nullptr;
         }
     }
 }
@@ -53,7 +53,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
@@ -61,7 +61,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
     streamIdx = -1;
 
     if (!m_enabled)
-        return NULL;
+        return nullptr;
 
     if (!m_parent)
     {
@@ -84,7 +84,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
             return &m_state[MAXOUTBUFFERS - 1].m_output;
     }
 
-    VideoFrame *last = NULL;
+    VideoFrame *last = nullptr;
     if (m_parent->GetVideoOutput())
         last = m_parent->GetVideoOutput()->GetLastShownFrame();
 
@@ -197,7 +197,7 @@ int CC608Reader::Update(unsigned char *inpos)
 
         vector<CC608Text*> *ccbuf = new vector<CC608Text*>;
         vector<CC608Text*>::iterator ccp;
-        CC608Text *tmpcc = NULL;
+        CC608Text *tmpcc = nullptr;
         int replace = linecont;
         int scroll = 0;
         bool scroll_prsv = false;

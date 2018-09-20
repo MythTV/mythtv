@@ -20,7 +20,7 @@ class PlayListFileEntry
 {
   public:
     PlayListFileEntry(void) : m_length(0) {}
-    ~PlayListFileEntry(void) {}
+    ~PlayListFileEntry(void) = default;
 
     QString File(void) { return m_file; }
     QString Title(void) { return m_title; }
@@ -62,7 +62,7 @@ class PlayListFile
         if (i >= 0 && i < m_entries.count())
             return m_entries.at(i);
 
-        return NULL;
+        return nullptr;
     }
 
     /** \brief Version of the parsed pls file 

@@ -416,7 +416,7 @@ void MHListGroup::Preparation(MHEngine *engine)
         try
         {
             MHRoot *pItem = (MHRoot *)engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
-            MHListItem *p = 0;
+            MHListItem *p = nullptr;
             QList<MHListItem *>::iterator it = m_ItemList.begin();
 
             for (; it != m_ItemList.end(); ++it)
@@ -616,7 +616,7 @@ void MHListGroup::Select(int nIndex, MHEngine *engine)
 {
     MHListItem *pListItem = m_ItemList.at(nIndex - 1);
 
-    if (pListItem == 0 || pListItem->m_fSelected)
+    if (pListItem == nullptr || pListItem->m_fSelected)
     {
         return;    // Ignore if already selected.
     }
@@ -640,7 +640,7 @@ void MHListGroup::Deselect(int nIndex, MHEngine *engine)
 {
     MHListItem *pListItem = m_ItemList.at(nIndex - 1);
 
-    if (pListItem == 0 || ! pListItem->m_fSelected)
+    if (pListItem == nullptr || ! pListItem->m_fSelected)
     {
         return;    // Ignore if not selected.
     }

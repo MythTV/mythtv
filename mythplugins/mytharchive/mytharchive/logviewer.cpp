@@ -82,15 +82,15 @@ LogViewer::LogViewer(MythScreenStack *parent) :
     MythScreenType(parent, "logviewer"),
     m_autoUpdate(false),
     m_updateTime(DEFAULT_UPDATE_TIME),
-    m_updateTimer(NULL),
+    m_updateTimer(nullptr),
     m_currentLog(),
     m_progressLog(),
     m_fullLog(),
-    m_logList(NULL),
-    m_logText(NULL),
-    m_exitButton(NULL),
-    m_cancelButton(NULL),
-    m_updateButton(NULL)
+    m_logList(nullptr),
+    m_logText(nullptr),
+    m_exitButton(nullptr),
+    m_cancelButton(nullptr),
+    m_updateButton(nullptr)
 {
     m_updateTime = gCoreContext->GetNumSetting(
         "LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
@@ -133,7 +133,7 @@ bool LogViewer::Create(void)
     connect(m_logList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(updateLogItem(MythUIButtonListItem*)));
 
-    m_updateTimer = NULL;
+    m_updateTimer = nullptr;
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimerTimeout()) );
 

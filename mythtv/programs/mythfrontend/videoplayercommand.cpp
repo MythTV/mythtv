@@ -58,11 +58,11 @@ namespace
 struct VideoPlayProc
 {
   protected:
-    VideoPlayProc() {}
+    VideoPlayProc() = default;
     VideoPlayProc &operator=(const VideoPlayProc &);
 
   public:
-    virtual ~VideoPlayProc() {}
+    virtual ~VideoPlayProc() = default;
 
     // returns true if item played
     virtual bool Play() const = 0;
@@ -177,10 +177,10 @@ class VideoPlayMythSystem : public VideoPlayProc
 class VideoPlayerCommandPrivate
 {
   private:
-    VideoPlayerCommandPrivate &operator=(const VideoPlayerCommandPrivate &rhs);
+    VideoPlayerCommandPrivate &operator=(const VideoPlayerCommandPrivate &rhs) = delete;
 
   public:
-    VideoPlayerCommandPrivate() {}
+    VideoPlayerCommandPrivate() = default;
 
     VideoPlayerCommandPrivate(const VideoPlayerCommandPrivate &other)
     {
@@ -255,7 +255,7 @@ class VideoPlayerCommandPrivate
         }
     }
 
-    void PlayerFor(const QString &filename, const VideoMetadata *extraData = 0)
+    void PlayerFor(const QString &filename, const VideoMetadata *extraData = nullptr)
     {
         QString extension = filename.section(".", -1, -1);
         QDir dir_test(QString("%1/VIDEO_TS").arg(filename));
@@ -378,7 +378,7 @@ VideoPlayerCommand VideoPlayerCommand::PlayerFor(const QString &filename)
     return ret;
 }
 
-VideoPlayerCommand::VideoPlayerCommand() : m_d(0)
+VideoPlayerCommand::VideoPlayerCommand() : m_d(nullptr)
 {
     m_d = new VideoPlayerCommandPrivate;
 }
@@ -386,7 +386,7 @@ VideoPlayerCommand::VideoPlayerCommand() : m_d(0)
 VideoPlayerCommand::~VideoPlayerCommand()
 {
     delete m_d;
-    m_d = 0;
+    m_d = nullptr;
 }
 
 VideoPlayerCommand::VideoPlayerCommand(const VideoPlayerCommand &other)
@@ -412,7 +412,7 @@ void VideoPlayerCommand::Play() const
         lcd->setFunctionLEDs(FUNC_TV, false);
         lcd->setFunctionLEDs(FUNC_MOVIE, true);
     }
-    gCoreContext->WantingPlayback(NULL);
+    gCoreContext->WantingPlayback(nullptr);
     GetMythMainWindow()->PauseIdleTimer(true);
     m_d->Play();
     gCoreContext->emitTVPlaybackStopped();

@@ -78,7 +78,7 @@ class VideoOutputXv : public VideoOutput
     virtual bool NeedExtraAudioDecode(void) const { return false; }
 
     virtual QRect GetPIPRect(PIPLocation  location,
-                             MythPlayer  *pipplayer = NULL,
+                             MythPlayer  *pipplayer = nullptr,
                              bool         do_pixel_adj = true) const;
 
     static MythCodecID GetBestSupportedCodec(uint stream_type);
@@ -87,7 +87,7 @@ class VideoOutputXv : public VideoOutput
                                   MythCodecID type,
                                   uint width, uint height,
                                   bool &xvsetdefaults,
-                                  QString *adaptor_name = NULL);
+                                  QString *adaptor_name = nullptr);
     static void UngrabXvPort(MythXDisplay* disp, int port);
 
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,

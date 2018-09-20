@@ -43,7 +43,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
                                      bool _release_stream,
                                      uint64_t _flags)
     : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
-      streamHandlerStarted(false), streamHandler(NULL)
+      streamHandlerStarted(false), streamHandler(nullptr)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 

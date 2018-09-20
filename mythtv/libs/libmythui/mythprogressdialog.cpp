@@ -15,7 +15,7 @@ QEvent::Type ProgressUpdateEvent::kEventType =
 MythUIBusyDialog::MythUIBusyDialog(const QString &message,
                              MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false),
-            m_haveNewMessage(false), m_messageText(NULL)
+            m_haveNewMessage(false), m_messageText(nullptr)
 {
     if (!message.isEmpty())
         m_message = message;
@@ -90,8 +90,8 @@ bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)
 MythUIBusyDialog  *ShowBusyPopup(const QString &message)
 {
     QString                  LOC = "ShowBusyPopup('" + message + "') - ";
-    MythUIBusyDialog        *pop = NULL;
-    static MythScreenStack  *stk = NULL;
+    MythUIBusyDialog        *pop = nullptr;
+    static MythScreenStack  *stk = nullptr;
 
 
     if (!stk)
@@ -103,14 +103,14 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
-            return NULL;
+            return nullptr;
         }
 
         if (!stk)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "no popup stack? "
                                            "Is there a MythThemeBase?");
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -126,7 +126,7 @@ MythUIProgressDialog::MythUIProgressDialog(const QString &message,
                              MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false),
             m_total(0), m_count(0),
-            m_messageText(NULL), m_progressText(NULL), m_progressBar(NULL)
+            m_messageText(nullptr), m_progressText(nullptr), m_progressBar(nullptr)
 {
     m_message = message;
 }

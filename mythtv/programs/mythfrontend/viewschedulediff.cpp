@@ -24,12 +24,8 @@ ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
         : MythScreenType(parent, "ViewScheduleDiff"),
             m_inEvent(false), m_inFill(false),
             m_altTable(altTable), m_title(title),
-            m_conflictList(NULL), m_titleText(NULL),
-            m_noChangesText(NULL), m_recordid(recordidDiff)
-{
-}
-
-ViewScheduleDiff::~ViewScheduleDiff()
+            m_conflictList(nullptr), m_titleText(nullptr),
+            m_noChangesText(nullptr), m_recordid(recordidDiff)
 {
 }
 
@@ -245,8 +241,8 @@ void ViewScheduleDiff::fillList(void)
     m_recList.clear();
     while (pa != m_recListAfter.end() || pb != m_recListBefore.end())
     {
-        s.before = (pb != m_recListBefore.end()) ? *pb : NULL;
-        s.after  = (pa != m_recListAfter.end())  ? *pa : NULL;
+        s.before = (pb != m_recListBefore.end()) ? *pb : nullptr;
+        s.after  = (pa != m_recListAfter.end())  ? *pa : nullptr;
 
         if (pa == m_recListAfter.end())
         {
@@ -266,10 +262,10 @@ void ViewScheduleDiff::fillList(void)
                     break;
                 case -1: // pb BEFORE pa
                     ++pb;
-                    s.after = NULL;
+                    s.after = nullptr;
                     break;
                 case 1: // pa BEFORE pb
-                    s.before = NULL;
+                    s.before = nullptr;
                     ++pa;
                     break;
             }
@@ -350,7 +346,7 @@ ProgramInfo *ViewScheduleDiff::CurrentProgram()
 {
     int pos = m_conflictList->GetCurrentPos();
     if (pos >= (int)m_recList.size())
-        return NULL;
+        return nullptr;
 
     ProgramStruct s = m_recList[pos];
 

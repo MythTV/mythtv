@@ -17,7 +17,7 @@
 #include <unistd.h> // for usleep()
 
 // this is the global MusicData object shared thoughout MythMusic
-MusicData  *gMusicData = NULL;
+MusicData  *gMusicData = nullptr;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,9 +25,9 @@ MusicData  *gMusicData = NULL;
 
 MusicData::MusicData(void)
 {
-    all_playlists = NULL;
-    all_music = NULL;
-    all_streams = NULL;
+    all_playlists = nullptr;
+    all_music = nullptr;
+    all_streams = nullptr;
     initialized = false;
 }
 
@@ -36,19 +36,19 @@ MusicData::~MusicData(void)
     if (all_playlists)
     {
         delete all_playlists;
-        all_playlists = NULL;
+        all_playlists = nullptr;
     }
 
     if (all_music)
     {
         delete all_music;
-        all_music = NULL;
+        all_music = nullptr;
     }
 
     if (all_streams)
     {
         delete all_streams;
-        all_streams = NULL;
+        all_streams = nullptr;
     }
 }
 
@@ -76,7 +76,7 @@ void MusicData::reloadMusic(void)
     if (busy->Create())
         popupStack->AddScreen(busy, false);
     else
-        busy = NULL;
+        busy = nullptr;
 
     // TODO make it so the player isn't interupted
     // for the moment stop playing and try to resume after reloading
@@ -119,7 +119,7 @@ void MusicData::loadMusic(void)
     if (busy->Create())
         popupStack->AddScreen(busy, false);
     else
-        busy = NULL;
+        busy = nullptr;
 
     // Set the various track formatting modes
     MusicMetadata::setArtistAndTrackFormats();

@@ -62,7 +62,7 @@ void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref)
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -84,11 +84,11 @@ void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref)
     }
 
     s_httphandlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 HTTPTSStreamHandler::HTTPTSStreamHandler(const IPTVTuningData& tuning) :
-    IPTVStreamHandler(tuning), m_reader(NULL)
+    IPTVStreamHandler(tuning), m_reader(nullptr)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "ctor");
 }
@@ -172,9 +172,9 @@ bool HTTPReader::DownloadStream(const QUrl url)
     }
 
     delete m_reply;
-    m_reply = NULL;
+    m_reply = nullptr;
     delete[] m_buffer;
-    m_buffer=NULL;
+    m_buffer=nullptr;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "DownloadStream -- end");
     return m_ok;
@@ -193,7 +193,7 @@ void HTTPReader::ReadBytes()
     QMutexLocker replylock(&m_replylock);
     QMutexLocker bufferlock(&m_bufferlock);
 
-    if(m_reply == NULL || m_buffer == NULL || m_size > BUFFER_SIZE)
+    if(m_reply == nullptr || m_buffer == nullptr || m_size > BUFFER_SIZE)
         return;
 
     qint64 bytesRead = m_reply->read( reinterpret_cast<char*>(m_buffer + m_size), BUFFER_SIZE - m_size);

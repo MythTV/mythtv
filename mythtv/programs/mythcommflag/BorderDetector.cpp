@@ -17,8 +17,8 @@ using namespace frameAnalyzer;
 using namespace commDetector2;
 
 BorderDetector::BorderDetector(void)
-    : logoFinder(NULL),
-      logo(NULL),
+    : logoFinder(nullptr),
+      logo(nullptr),
       logorow(-1),
       logocol(-1),
       logowidth(-1),
@@ -136,7 +136,7 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     bool                    top, bottom, left, right, inrange;
     int                     range, outliers, lines;
 
-    (void)gettimeofday(&start, NULL);
+    (void)gettimeofday(&start, nullptr);
 
     if (_frameno != UNCACHED && _frameno == frameno)
         goto done;
@@ -389,7 +389,7 @@ done:
     *pwidth = width;
     *pheight = height;
 
-    (void)gettimeofday(&end, NULL);
+    (void)gettimeofday(&end, nullptr);
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
 

@@ -36,7 +36,7 @@ class Channel : public ChannelServices
 
     public:
 
-        Q_INVOKABLE explicit Channel( QObject */*parent*/ = 0 ) {}
+        Q_INVOKABLE explicit Channel( QObject */*parent*/ = nullptr ) {}
 
     public:
 
@@ -164,7 +164,7 @@ class ScriptableChannel : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableChannel( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableChannel( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -181,14 +181,14 @@ class ScriptableChannel : public QObject
                                        bool     GroupByCallsign = false
                                      )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetChannelInfoList( SourceID, ChannelGroupID, StartIndex, Count, OnlyVisible, Details, OrderByName, GroupByCallsign );
             )
         }
 
         QObject* GetChannelInfo      ( int      ChanID     )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetChannelInfo( ChanID );
             )
         }
@@ -254,14 +254,14 @@ class ScriptableChannel : public QObject
 
         QObject* GetVideoSourceList ( void )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetVideoSourceList();
             )
         }
 
         QObject* GetVideoSource ( uint SourceID )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetVideoSource( SourceID );
             )
         }
@@ -312,14 +312,14 @@ class ScriptableChannel : public QObject
                                           int      StartIndex,
                                           int      Count      )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetVideoMultiplexList( SourceID, StartIndex, Count );
             )
         }
 
         QObject* GetVideoMultiplex  ( int      MplexID )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetVideoMultiplex( MplexID );
             )
         }

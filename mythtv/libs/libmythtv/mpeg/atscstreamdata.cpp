@@ -39,7 +39,7 @@ ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
       _GPS_UTC_offset(GPS_LEAP_SECONDS),
       _atsc_eit_reset(false),
       _mgt_version(-1),
-      _cached_mgt(NULL),
+      _cached_mgt(nullptr),
       _desired_major_channel(desiredMajorChannel),
       _desired_minor_channel(desiredMinorChannel)
 {
@@ -69,8 +69,8 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
 
     if (mgt && (!tvcts.empty() || !cvcts.empty()))
     {
-        const TerrestrialVirtualChannelTable *tvct = NULL;
-        const CableVirtualChannelTable       *cvct = NULL;
+        const TerrestrialVirtualChannelTable *tvct = nullptr;
+        const CableVirtualChannelTable       *cvct = nullptr;
         int chan_idx = -1;
         for (uint i = 0; (i < tvcts.size()) && (chan_idx < 0); i++)
         {
@@ -138,7 +138,7 @@ void ATSCStreamData::Reset(int major, int minor)
         QMutexLocker locker(&_cache_lock);
 
         DeleteCachedTable(_cached_mgt);
-        _cached_mgt = NULL;
+        _cached_mgt = nullptr;
 
         tvct_cache_t::iterator tit = _cached_tvcts.begin();
         for (; tit != _cached_tvcts.end(); ++tit)
@@ -767,7 +767,7 @@ tvct_const_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    tvct_ptr_t tvct = NULL;
+    tvct_ptr_t tvct = nullptr;
 
     _cache_lock.lock();
     tvct_cache_t::const_iterator it = _cached_tvcts.find(pid);
@@ -784,7 +784,7 @@ cvct_const_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    cvct_ptr_t cvct = NULL;
+    cvct_ptr_t cvct = nullptr;
 
     _cache_lock.lock();
     cvct_cache_t::const_iterator it = _cached_cvcts.find(pid);
@@ -875,19 +875,19 @@ bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
     else if (TableID::MGT == psip->TableID())
     {
         if (psip == _cached_mgt)
-            _cached_mgt = NULL;
+            _cached_mgt = nullptr;
         delete psip;
     }
     else if ((TableID::TVCT == psip->TableID()) &&
              _cached_tvcts[psip->tsheader()->PID()])
     {
-        _cached_tvcts[psip->tsheader()->PID()] = NULL;
+        _cached_tvcts[psip->tsheader()->PID()] = nullptr;
         delete psip;
     }
     else if ((TableID::CVCT == psip->TableID()) &&
              _cached_cvcts[psip->tsheader()->PID()])
     {
-        _cached_cvcts[psip->tsheader()->PID()] = NULL;
+        _cached_cvcts[psip->tsheader()->PID()] = nullptr;
         delete psip;
     }
     else

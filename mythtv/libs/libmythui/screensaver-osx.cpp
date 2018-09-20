@@ -18,7 +18,7 @@ public:
 ScreenSaverOSX::ScreenSaverOSX()
 {
     d = new ScreenSaverOSXPrivate();
-    d->m_timer = NULL;
+    d->m_timer = nullptr;
 }
 
 ScreenSaverOSX::~ScreenSaverOSX()
@@ -29,10 +29,10 @@ ScreenSaverOSX::~ScreenSaverOSX()
 
 void ScreenSaverOSX::Disable(void)
 {
-    CFRunLoopTimerContext context = { 0, NULL, NULL, NULL, NULL };
+    CFRunLoopTimerContext context = { 0, nullptr, nullptr, nullptr, nullptr };
     if (!d->m_timer)
     {
-        d->m_timer = CFRunLoopTimerCreate(NULL, CFAbsoluteTimeGetCurrent(),
+        d->m_timer = CFRunLoopTimerCreate(nullptr, CFAbsoluteTimeGetCurrent(),
                                           30, 0, 0,
                                           ScreenSaverOSXPrivate::timerCallback,
                                           &context);
@@ -49,17 +49,17 @@ void ScreenSaverOSX::Restore(void)
     {
         CFRunLoopTimerInvalidate(d->m_timer);
         CFRelease(d->m_timer);
-        d->m_timer = NULL;
+        d->m_timer = nullptr;
     }
 }
 
 void ScreenSaverOSX::Reset(void)
 {
     // Wake up the screen saver now.
-    ScreenSaverOSXPrivate::timerCallback(NULL, NULL);
+    ScreenSaverOSXPrivate::timerCallback(nullptr, nullptr);
 }
 
 bool ScreenSaverOSX::Asleep(void)
 {
-    return 0;
+    return false;
 }

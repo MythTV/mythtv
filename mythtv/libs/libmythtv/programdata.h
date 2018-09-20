@@ -80,7 +80,7 @@ class MTV_PUBLIC DBEvent
         category(),
         /*starttime, endtime,*/
         airdate(0),
-        credits(NULL),
+        credits(nullptr),
         partnumber(0),
         parttotal(0),
         syndicatedepisodenumber(),
@@ -115,7 +115,7 @@ class MTV_PUBLIC DBEvent
         category(_category),
         starttime(_start),       endtime(_end),
         airdate(0),
-        credits(NULL),
+        credits(nullptr),
         partnumber(0),           parttotal(0),
         syndicatedepisodenumber(),
         subtitleType(_subtitleType),

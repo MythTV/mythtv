@@ -93,17 +93,17 @@ public:
         m_isRemote = !is_local;
         if (m_isRemote)
         {
-            m_localFile = NULL;
+            m_localFile = nullptr;
             m_remoteFile = new RemoteFile(filename, false, false, 0);
         }
         else
         {
-            m_remoteFile = NULL;
+            m_remoteFile = nullptr;
             m_localFile = new QFile(filename);
             if (!m_localFile->open(QIODevice::ReadOnly))
             {
                 delete m_localFile;
-                m_localFile = NULL;
+                m_localFile = nullptr;
             }
         }
     }
@@ -322,7 +322,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
 
     // try to determine the text codec
     QByteArray test(sub_data.rbuffer_text, sub_data.rbuffer_len);
-    QTextCodec *textCodec = QTextCodec::codecForUtfText(test, NULL);
+    QTextCodec *textCodec = QTextCodec::codecForUtfText(test, nullptr);
     if (!textCodec)
     {
         LOG(VB_VBI, LOG_WARNING, "Failed to autodetect a UTF encoding.");

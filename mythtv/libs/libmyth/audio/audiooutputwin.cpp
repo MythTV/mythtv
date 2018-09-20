@@ -49,11 +49,11 @@ class AudioOutputWinPrivate
 {
   public:
     AudioOutputWinPrivate() :
-        m_hWaveOut(NULL), m_WaveHdrs(NULL), m_hEvent(NULL)
+        m_hWaveOut(nullptr), m_WaveHdrs(nullptr), m_hEvent(nullptr)
     {
         m_WaveHdrs = new WAVEHDR[AudioOutputWin::kPacketCnt];
         memset(m_WaveHdrs, 0, sizeof(WAVEHDR) * AudioOutputWin::kPacketCnt);
-        m_hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
+        m_hEvent = CreateEvent(nullptr, FALSE, TRUE, nullptr);
     }
 
     ~AudioOutputWinPrivate()
@@ -61,12 +61,12 @@ class AudioOutputWinPrivate
         if (m_WaveHdrs)
         {
             delete[] m_WaveHdrs;
-            m_WaveHdrs = NULL;
+            m_WaveHdrs = nullptr;
         }
         if (m_hEvent)
         {
             CloseHandle(m_hEvent);
-            m_hEvent = NULL;
+            m_hEvent = nullptr;
         }
     }
 
@@ -76,7 +76,7 @@ class AudioOutputWinPrivate
         {
             waveOutReset(m_hWaveOut);
             waveOutClose(m_hWaveOut);
-            m_hWaveOut = NULL;
+            m_hWaveOut = nullptr;
         }
     }
 
@@ -109,7 +109,7 @@ AudioOutputWin::AudioOutputWin(const AudioSettings &settings) :
     m_priv(new AudioOutputWinPrivate()),
     m_nPkts(0),
     m_CurrentPkt(0),
-    m_OutPkts(NULL),
+    m_OutPkts(nullptr),
     m_UseSPDIF(settings.use_passthru)
 {
     InitSettings(settings);
@@ -125,7 +125,7 @@ AudioOutputWin::~AudioOutputWin()
     if (m_priv)
     {
         delete m_priv;
-        m_priv = NULL;
+        m_priv = nullptr;
     }
 
     if (m_OutPkts)
@@ -135,7 +135,7 @@ AudioOutputWin::~AudioOutputWin()
                 free(m_OutPkts[i]);
 
         free(m_OutPkts);
-        m_OutPkts = NULL;
+        m_OutPkts = nullptr;
     }
 }
 

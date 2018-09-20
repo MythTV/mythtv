@@ -9,7 +9,7 @@
 #define LOC QString("BDScreen: ")
 
 BDOverlayScreen::BDOverlayScreen(MythPlayer *player, const QString &name)
-  : MythScreenType((MythScreenType*)NULL, name),
+  : MythScreenType((MythScreenType*)nullptr, name),
     m_player(player)
 {
 }
@@ -43,7 +43,7 @@ void BDOverlayScreen::DisplayBDOverlay(BDOverlay *overlay)
     }
 
     MythPainter *osd_painter = vo->GetOSDPainter();
-    MythImage* image = NULL;
+    MythImage* image = nullptr;
     if (osd_painter)
          image = osd_painter->GetFormatImage();
 

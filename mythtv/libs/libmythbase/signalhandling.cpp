@@ -50,7 +50,7 @@ static void sig_str_init(void)
 {
     for (int i = 0; i < SIG_STR_COUNT; i++)
     {
-        sig_str[i] = NULL;
+        sig_str[i] = nullptr;
         sig_str_init(i, qPrintable(QString("Signal %1").arg(i)));
     }
 }
@@ -58,7 +58,7 @@ static void sig_str_init(void)
 QList<int> SignalHandler::s_defaultHandlerList;
 
 SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
-    QObject(parent), m_notifier(NULL)
+    QObject(parent), m_notifier(nullptr)
 {
     s_exit_program = false; // set here due to "C++ static initializer madness"
     sig_str_init();
@@ -71,11 +71,11 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
     stack.ss_size = SIGSTKSZ;
 
     // Carry on without the signal stack if it fails
-    if (sigaltstack(&stack, NULL) == -1)
+    if (sigaltstack(&stack, nullptr) == -1)
     {
         cerr << "Couldn't create signal stack!" << endl;
         delete [] m_sigStack;
-        m_sigStack = NULL;
+        m_sigStack = nullptr;
     }
 #endif
 
@@ -106,14 +106,14 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
             continue;
         }
 
-        SetHandlerPrivate(signum, NULL);
+        SetHandlerPrivate(signum, nullptr);
     }
 #endif
 }
 
 SignalHandler::~SignalHandler()
 {
-    s_singleton = NULL;
+    s_singleton = nullptr;
 
 #ifndef _WIN32
     if (m_notifier)
@@ -168,7 +168,7 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
     {
         QMutexLocker locker(&m_sigMapLock);
         sa_handler_already_set = m_sigMap.contains(signum);
-        if (m_sigMap.value(signum, NULL) && (handler != NULL))
+        if (m_sigMap.value(signum, nullptr) && (handler != nullptr))
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 QString("Warning %1 signal handler overridden")
@@ -188,7 +188,7 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
 
         sig_str_init(signum, qPrintable(signal_name));
 
-        sigaction(signum, &sa, NULL);
+        sigaction(signum, &sa, nullptr);
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Setup %1 handler").arg(signal_name));
@@ -306,7 +306,7 @@ void SignalHandler::handleSignal(void)
         free(signame);
     }
 
-    SigHandlerFunc handler = NULL;
+    SigHandlerFunc handler = nullptr;
     bool allowNullHandler = false;
 
 #if ! CONFIG_DARWIN
@@ -324,7 +324,7 @@ void SignalHandler::handleSignal(void)
     case SIGINT:
     case SIGTERM:
         m_sigMapLock.lock();
-        handler = m_sigMap.value(signum, NULL);
+        handler = m_sigMap.value(signum, nullptr);
         m_sigMapLock.unlock();
 
         if (handler)
@@ -343,7 +343,7 @@ void SignalHandler::handleSignal(void)
         break;
     default:
         m_sigMapLock.lock();
-        handler = m_sigMap.value(signum, NULL);
+        handler = m_sigMap.value(signum, nullptr);
         m_sigMapLock.unlock();
         if (handler)
         {

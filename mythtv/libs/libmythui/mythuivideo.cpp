@@ -30,7 +30,7 @@ MythUIVideo::~MythUIVideo()
     if (m_image)
     {
         m_image->DecrRef();
-        m_image = NULL;
+        m_image = nullptr;
     }
 }
 
@@ -42,7 +42,7 @@ void MythUIVideo::Reset(void)
     if (m_image)
     {
         m_image->DecrRef();
-        m_image = NULL;
+        m_image = nullptr;
     }
 
     m_image = GetMythPainter()->GetFormatImage();

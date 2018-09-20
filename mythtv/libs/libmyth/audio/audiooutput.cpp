@@ -83,7 +83,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
                                     bool willsuspendpa)
 {
     QString &main_device = settings.main_device;
-    AudioOutput *ret = NULL;
+    AudioOutput *ret = nullptr;
 
     // Don't suspend Pulse if unnecessary.  This can save 100mS
     if (settings.format == FORMAT_NONE || settings.channels <= 0)
@@ -112,7 +112,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 #else
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to PulseAudio "
                                  "but PulseAudio support is not compiled in!");
-        return NULL;
+        return nullptr;
 #endif
     }
     else if (main_device.startsWith("NULL"))
@@ -236,7 +236,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         if (pulsestatus)
             PulseHandler::Suspend(PulseHandler::kPulseResume);
 #endif
-        return NULL;
+        return nullptr;
     }
 #ifdef USING_PULSE
     ret->pulsewassuspended = pulsestatus;
@@ -322,7 +322,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     if (aosettings.IsInvalid())
     {
         if (!willsuspendpa)
-            return NULL;
+            return nullptr;
         else
         {
             QString msg = tr("Invalid or unuseable audio device");
@@ -489,7 +489,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
 #if CONFIG_DARWIN
 
     {
-        QMap<QString, QString> *devs = AudioOutputCA::GetDevices(NULL);
+        QMap<QString, QString> *devs = AudioOutputCA::GetDevices(nullptr);
         if (!devs->empty())
         {
             for (QMap<QString, QString>::const_iterator i = devs->begin();

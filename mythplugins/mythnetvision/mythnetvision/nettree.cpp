@@ -39,15 +39,15 @@ namespace
         if (item)
             return item->GetData().value<MythGenericTree *>();
 
-        return NULL;
+        return nullptr;
     }
 }
 
 NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     : NetBase(parent, name),
-      m_siteMap(NULL),               m_siteButtonList(NULL),
-      m_siteGeneric(NULL),           m_currentNode(NULL),
-      m_noSites(NULL),
+      m_siteMap(nullptr),            m_siteButtonList(nullptr),
+      m_siteGeneric(nullptr),        m_currentNode(nullptr),
+      m_noSites(nullptr),
       m_gdt(new GrabberDownloadThread(this)), m_type(type)
 {
     connect(m_gdt, SIGNAL(finished()), SLOT(DoTreeRefresh()));
@@ -150,10 +150,10 @@ void NetTree::SetCurrentNode(MythGenericTree *node)
 NetTree::~NetTree()
 {
     delete m_siteGeneric;
-    m_siteGeneric = NULL;
+    m_siteGeneric = nullptr;
 
     delete m_gdt;
-    m_gdt = NULL;
+    m_gdt = nullptr;
 
     m_rssList.clear();
 
@@ -183,10 +183,10 @@ void NetTree::LoadData(void)
         for (MGTreeChildList::const_iterator p = lchildren->begin();
                 p != lchildren->end(); ++p)
         {
-            if (*p != NULL)
+            if (*p != nullptr)
             {
                 MythUIButtonListItem *item =
-                        new MythUIButtonListItem(m_siteButtonList, QString(), 0,
+                        new MythUIButtonListItem(m_siteButtonList, QString(), nullptr,
                                 true, MythUIButtonListItem::NotChecked);
 
                 item->SetData(qVariantFromValue(*p));
@@ -406,7 +406,7 @@ void NetTree::ShowMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "options");
 
-    ResultItem *item = NULL;
+    ResultItem *item = nullptr;
     if (m_type == DLG_TREE)
     {
         MythGenericTree *node = m_siteMap->GetCurrentNode();
@@ -433,8 +433,8 @@ void NetTree::ShowMenu(void)
             menu->AddItem(tr("Save This Video"), SLOT(DoDownloadAndPlay()));
     }
 
-    menu->AddItem(tr("Scan/Manage Subscriptions"), NULL, CreateShowManageMenu());
-    menu->AddItem(tr("Change View"), NULL, CreateShowViewMenu());
+    menu->AddItem(tr("Scan/Manage Subscriptions"), nullptr, CreateShowManageMenu());
+    menu->AddItem(tr("Change View"), nullptr, CreateShowViewMenu());
 
     MythDialogBox *menuPopup =
         new MythDialogBox(menu, m_popupStack, "mythnettreemenupopup");
@@ -595,12 +595,12 @@ void NetTree::FillTree()
 void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
                                QString dirthumb, QList<ResultItem*> videos)
 {
-    MythGenericTree *folder = NULL;
+    MythGenericTree *folder = nullptr;
 
     // A little loop to determine what path of the provided path might
     // already exist in the tree.
 
-    while (folder == NULL && paths.size())
+    while (folder == nullptr && paths.size())
     {
         QString curPath = paths.takeFirst();
         curPath.replace("|", "/");
@@ -649,7 +649,7 @@ void NetTree::AddFileNode(MythGenericTree *where_to_add, ResultItem *video)
 
 ResultItem* NetTree::GetStreamItem()
 {
-    ResultItem *item = NULL;
+    ResultItem *item = nullptr;
 
     if (m_type == DLG_TREE)
         item = m_siteMap->GetCurrentNode()->GetData().value<ResultItem *>();
@@ -716,9 +716,9 @@ void NetTree::UpdateSiteItem(RSSSite *site)
     ResultItem res =
         ResultItem(site->GetTitle(), QString(), site->GetDescription(),
                    site->GetURL(), site->GetImage(), QString(),
-                   site->GetAuthor(), QDateTime(), 0, 0, -1, QString(),
+                   site->GetAuthor(), QDateTime(), nullptr, nullptr, -1, QString(),
                    QStringList(), QString(), QStringList(), 0, 0, QString(),
-                   0, QStringList(), 0, 0, 0);
+                   false, QStringList(), 0, 0, false);
 
     InfoMap metadataMap;
     res.toMap(metadataMap);
@@ -759,9 +759,9 @@ void NetTree::UpdateCurrentItem(void)
 
     ResultItem res =
         ResultItem(title, QString(), QString(), QString(), thumb, QString(),
-                   QString(), QDateTime(), 0, 0, -1, QString(),
+                   QString(), QDateTime(), nullptr, nullptr, -1, QString(),
                    QStringList(), QString(), QStringList(), 0, 0, QString(),
-                   0, QStringList(), 0, 0, 0);
+                   false, QStringList(), 0, 0, false);
 
     InfoMap metadataMap;
     res.toMap(metadataMap);

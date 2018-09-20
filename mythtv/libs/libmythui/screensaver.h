@@ -29,8 +29,8 @@ protected:
 class ScreenSaver
 {
   public:
-    ScreenSaver() { };
-    virtual ~ScreenSaver() { };
+    ScreenSaver() = default;
+    virtual ~ScreenSaver() = default;
 
     virtual void Disable(void) = 0;
     virtual void Restore(void) = 0;

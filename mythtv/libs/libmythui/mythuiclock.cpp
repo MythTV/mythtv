@@ -28,7 +28,7 @@ MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
 MythUIClock::~MythUIClock()
 {
     delete m_Font;
-    m_Font = NULL;
+    m_Font = nullptr;
 }
 
 /** \brief Looks up the time and sets the clock if the current time is

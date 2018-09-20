@@ -259,7 +259,7 @@ class UPNP_PUBLIC UPnpCDSExtension
 
         UPnpCDSExtension( QString sName, 
                           QString sExtensionId, 
-                          QString sClass ) : m_pRoot(NULL)
+                          QString sClass ) : m_pRoot(nullptr)
         {
             m_sName        = QObject::tr(sName.toLatin1().constData());
             m_sExtensionId = sExtensionId;

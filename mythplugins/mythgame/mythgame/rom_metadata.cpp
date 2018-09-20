@@ -73,7 +73,7 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
             if (unzOpenCurrentFile(zf) == UNZ_OK)
             {
                 char filename_inzip[256];
-                unzGetCurrentFileInfo(zf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
+                unzGetCurrentFileInfo(zf,&file_info,filename_inzip,sizeof(filename_inzip),nullptr,0,nullptr,0);
 
                 offset = calcOffset(GameType, file_info.uncompressed_size);
 

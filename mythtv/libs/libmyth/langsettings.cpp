@@ -24,10 +24,10 @@
 
 LanguageSelection::LanguageSelection(MythScreenStack *parent, bool exitOnFinish)
                  :MythScreenType(parent, "LanguageSelection"),
-                  m_languageList(NULL), m_countryList(NULL),
-                  m_saveButton(NULL), m_cancelButton(NULL),
+                  m_languageList(nullptr), m_countryList(nullptr),
+                  m_saveButton(nullptr), m_cancelButton(nullptr),
                   m_exitOnFinish(exitOnFinish), m_loaded(false),
-                  m_loop(NULL)
+                  m_loop(nullptr)
 {
     m_language = gCoreContext->GetSetting("Language");
     m_country = gCoreContext->GetSetting("Country");
@@ -220,7 +220,7 @@ void LanguageSelection::Save(void)
     }
 
     QString langCode = item->GetData().toString();
-    gCoreContext->SaveSettingOnHost("Language", langCode, NULL);
+    gCoreContext->SaveSettingOnHost("Language", langCode, nullptr);
 
     item = m_countryList->GetItemCurrent();
 
@@ -233,7 +233,7 @@ void LanguageSelection::Save(void)
     }
 
     QString countryCode = item->GetData().toString();
-    gCoreContext->SaveSettingOnHost("Country", countryCode, NULL);
+    gCoreContext->SaveSettingOnHost("Country", countryCode, nullptr);
 
     if (m_language != langCode)
         m_languageChanged = true;

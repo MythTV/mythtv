@@ -20,8 +20,8 @@ typedef RecList::iterator RecIter;
 class MythScheduler
 {
   public:
-    MythScheduler() {}
-    virtual ~MythScheduler() {}
+    MythScheduler() = default;
+    virtual ~MythScheduler() = default;
     // Returns a string list containing the a boolean
     // value for whether there are conflicts, followed
     // by the number of ProgramInfo's represented by

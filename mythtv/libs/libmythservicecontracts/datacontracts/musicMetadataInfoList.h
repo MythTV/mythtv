@@ -58,7 +58,7 @@ class SERVICE_PUBLIC MusicMetadataInfoList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE MusicMetadataInfoList(QObject *parent = 0)
+        Q_INVOKABLE MusicMetadataInfoList(QObject *parent = nullptr)
             : QObject( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),

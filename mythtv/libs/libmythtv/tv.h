@@ -88,6 +88,7 @@ typedef enum
      */
     kState_ChangingState,
 } TVState;
+inline TVState myth_deque_init(const TVState*) { return (TVState)(0); }
 
 QString StateToString(TVState state);
 

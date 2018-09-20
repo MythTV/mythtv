@@ -29,13 +29,6 @@ MetaIO::MetaIO()
     memset(&m_fileinfo, 0, sizeof(m_fileinfo));
 }
 
-/*!
- * \brief Destructor
- */
-MetaIO::~MetaIO()
-{
-}
-
 // static
 MetaIO* MetaIO::createTagger(const QString& filename)
 {
@@ -45,7 +38,7 @@ MetaIO* MetaIO::createTagger(const QString& filename)
     if (extension.isEmpty() || !MetaIO::ValidFileExtensions.contains(extension))
     {
         LOG(VB_FILE, LOG_WARNING, QString("MetaIO: unknown extension: '%1'").arg(extension));
-        return NULL;
+        return nullptr;
     }
 
     if (extension == "mp3" || extension == "mp2")
@@ -74,7 +67,7 @@ MetaIO* MetaIO::createTagger(const QString& filename)
 // static
 MusicMetadata* MetaIO::readMetadata(const QString &filename)
 {
-    MusicMetadata *mdata = NULL;
+    MusicMetadata *mdata = nullptr;
     MetaIO *tagger = MetaIO::createTagger(filename);
     bool ignoreID3 = (gCoreContext->GetNumSetting("Ignore_ID3", 0) == 1);
 

@@ -33,7 +33,7 @@ MBASE_PUBLIC QString getResponse(const QString &query, const QString &def);
 MBASE_PUBLIC int     intResponse(const QString &query, int def);
 
 MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
-                                      QStringList   *intermediaries = NULL,
+                                      QStringList   *intermediaries = nullptr,
                                       unsigned       maxLinks       = 255);
 
 MBASE_PUBLIC void wrapList(QStringList &list, int width);

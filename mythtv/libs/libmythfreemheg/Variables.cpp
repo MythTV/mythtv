@@ -49,7 +49,7 @@ static const char *TestToText(int tc)
             return "GreaterOrEqual";
     }
 
-    return NULL; // To keep the compiler happy
+    return nullptr; // To keep the compiler happy
 }
 
 // Normal activation behaviour.

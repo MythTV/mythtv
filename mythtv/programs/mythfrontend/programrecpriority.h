@@ -25,7 +25,7 @@ class ProgramRecPriorityInfo : public RecordingInfo
 
   public:
     ProgramRecPriorityInfo();
-    ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other);
+    ProgramRecPriorityInfo(const ProgramRecPriorityInfo &/*other*/) = default;
     ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo &other)
         { clone(other); return *this; }
     ProgramRecPriorityInfo &operator=(const RecordingInfo &other)
@@ -58,7 +58,7 @@ class ProgramRecPriority : public ScheduleCommon
     Q_OBJECT
   public:
     ProgramRecPriority(MythScreenStack *parent, const QString &name);
-   ~ProgramRecPriority();
+   ~ProgramRecPriority() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
@@ -85,7 +85,7 @@ class ProgramRecPriority : public ScheduleCommon
     virtual void Init(void);
 
     void FillList(void);
-    void SortList(ProgramRecPriorityInfo *newCurrentItem = NULL);
+    void SortList(ProgramRecPriorityInfo *newCurrentItem = nullptr);
     void UpdateList();
     void RemoveItemFromList(MythUIButtonListItem *item);
 

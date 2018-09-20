@@ -12,7 +12,7 @@
 #include <QTimer>
 
 MiniPlayer::MiniPlayer(MythScreenStack *parent)
-          : MusicCommon(parent, NULL, "music_miniplayer")
+          : MusicCommon(parent, nullptr, "music_miniplayer")
 {
     m_currentView = MV_MINIPLAYER;
     m_displayTimer = new QTimer(this);
@@ -26,7 +26,7 @@ MiniPlayer::~MiniPlayer(void)
 
     // Timers are deleted by Qt
     m_displayTimer->disconnect();
-    m_displayTimer = NULL;
+    m_displayTimer = nullptr;
 
     if (LCD *lcd = LCD::Get())
         lcd->switchToTime ();

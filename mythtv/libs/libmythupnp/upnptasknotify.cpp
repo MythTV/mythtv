@@ -53,14 +53,6 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpNotifyTask::~UPnpNotifyTask()  
-{ 
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                                     QString        sNT,
                                     QString        sUDN )
@@ -170,7 +162,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 
     delete pMulticast;
 
-    pMulticast = NULL;
+    pMulticast = nullptr;
 
     m_mutex.lock();
 

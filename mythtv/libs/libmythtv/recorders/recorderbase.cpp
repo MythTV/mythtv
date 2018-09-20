@@ -37,7 +37,7 @@ using namespace std;
 #endif
 
 #define TVREC_CARDNUM \
-        ((tvrec != NULL) ? QString::number(tvrec->GetInputId()) : "NULL")
+        ((tvrec != nullptr) ? QString::number(tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("RecBase[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(videodevice)
@@ -45,7 +45,7 @@ using namespace std;
 const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
 
 RecorderBase::RecorderBase(TVRec *rec)
-    : tvrec(rec),               ringBuffer(NULL),
+    : tvrec(rec),               ringBuffer(nullptr),
       weMadeBuffer(true),
       m_containerFormat(formatUnknown),
       m_primaryVideoCodec(AV_CODEC_ID_NONE),
@@ -55,10 +55,10 @@ RecorderBase::RecorderBase(TVRec *rec)
       video_frame_rate(29.97),
       m_videoAspect(0),         m_videoHeight(0),
       m_videoWidth(0),          m_frameRate(0),
-      curRecording(NULL),
+      curRecording(nullptr),
       request_pause(false),     paused(false),
       request_recording(false), recording(false),
-      nextRingBuffer(NULL),     nextRecording(NULL),
+      nextRingBuffer(nullptr),  nextRecording(nullptr),
       positionMapType(MARK_GOP_BYFRAME),
       estimatedProgStartMS(0), lastSavedKeyframe(0), lastSavedDuration(0)
 {
@@ -74,19 +74,19 @@ RecorderBase::~RecorderBase(void)
     if (weMadeBuffer && ringBuffer)
     {
         delete ringBuffer;
-        ringBuffer = NULL;
+        ringBuffer = nullptr;
     }
-    SetRecording(NULL);
+    SetRecording(nullptr);
     if (nextRingBuffer)
     {
         QMutexLocker locker(&nextRingBufferLock);
         delete nextRingBuffer;
-        nextRingBuffer = NULL;
+        nextRingBuffer = nullptr;
     }
     if (nextRecording)
     {
         delete nextRecording;
-        nextRecording = NULL;
+        nextRecording = nullptr;
     }
 }
 
@@ -130,7 +130,7 @@ void RecorderBase::SetRecording(const RecordingInfo *pginfo)
         recFile->Save();
     }
     else
-        curRecording = NULL;
+        curRecording = nullptr;
 
     if (oldrec)
         delete oldrec;
@@ -156,7 +156,7 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, RingBuffer *rb)
     if (nextRecording)
     {
         delete nextRecording;
-        nextRecording = NULL;
+        nextRecording = nullptr;
     }
     if (ri)
         nextRecording = new RecordingInfo(*ri);
@@ -368,13 +368,13 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 {
     nextRingBufferLock.lock();
 
-    RecordingQuality *recq = NULL;
+    RecordingQuality *recq = nullptr;
 
     if (nextRingBuffer)
     {
         FinishRecording();
 
-        recq = GetRecordingQuality(NULL);
+        recq = GetRecordingQuality(nullptr);
 
         ResetForNewFile();
 
@@ -384,8 +384,8 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         SetRingBuffer(nextRingBuffer);
         SetRecording(nextRecording);
 
-        nextRingBuffer = NULL;
-        nextRecording = NULL;
+        nextRingBuffer = nullptr;
+        nextRecording = nullptr;
 
         StartNewFile();
     }
@@ -849,9 +849,9 @@ RecorderBase *RecorderBase::CreateRecorder(
     const GeneralDBOptions &genOpt)
 {
     if (!channel)
-        return NULL;
+        return nullptr;
 
-    RecorderBase *recorder = NULL;
+    RecorderBase *recorder = nullptr;
     if (genOpt.inputtype == "MPEG")
     {
 #ifdef USING_IVTV

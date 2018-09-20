@@ -56,7 +56,7 @@ AudioOutputSettings* AudioOutputOSS::GetOutputSettings(bool /*digital*/)
     {
         VBERRENO(QString("Error opening audio device (%1)").arg(main_device));
         delete settings;
-        return NULL;
+        return nullptr;
     }
 
     while (int rate = settings->GetNextRate())

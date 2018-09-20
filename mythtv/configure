@@ -6164,7 +6164,8 @@ check_header soundcard.h
 enabled alsa && check_lib alsa alsa/asoundlib.h snd_pcm_htimestamp -lasound
 
 enabled jack && check_lib jack jack/jack.h jack_client_open -ljack &&
-    check_func jack_port_get_latency_range -ljack
+    check_func jack_port_get_latency_range -ljack &&
+    enable audio_jack
 
 # PulseAudio probe
 ! disabled audio_pulse &&
@@ -6823,6 +6824,8 @@ if enabled gxx; then
         check_cxxflags -Wno-attributes
     fi
     check_cxxflags -funit-at-a-time
+    # Don't complain about over-aligned types
+    check_cxxflags -faligned-new
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)
     # 192: icpc confused by Qt %0-%99 in strings
@@ -6847,6 +6850,8 @@ elif enabled clangxx; then
     check_cxxflags -Wimplicit-fallthrough
     # Clang needs this to link on Fedora
     add_extralibs -lstdc++
+    # Don't complain about over-aligned types
+    check_cxxflags -faligned-allocation
 fi
 
 # Check for python dependencies

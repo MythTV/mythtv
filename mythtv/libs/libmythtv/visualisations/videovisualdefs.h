@@ -7,7 +7,7 @@ class LogScale
 {
   public:
     LogScale(int maxscale = 0, int maxrange = 0)
-    : indices(0), s(0), r(0)
+    : indices(nullptr), s(0), r(0)
     {
         setMax(maxscale, maxrange);
     }

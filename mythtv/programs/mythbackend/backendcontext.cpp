@@ -5,18 +5,13 @@
 #include "mythcorecontext.h"
 
 QMap<int, EncoderLink *> tvList;
-AutoExpire  *expirer      = NULL;
-JobQueue    *jobqueue     = NULL;
-HouseKeeper *housekeeping = NULL;
-MediaServer *g_pUPnp      = NULL;
-BackendContext *gBackendContext = NULL;
+AutoExpire  *expirer      = nullptr;
+JobQueue    *jobqueue     = nullptr;
+HouseKeeper *housekeeping = nullptr;
+MediaServer *g_pUPnp      = nullptr;
+BackendContext *gBackendContext = nullptr;
 QString      pidfile;
 QString      logfile;
-
-BackendContext::BackendContext()
-{
-
-}
 
 BackendContext::~BackendContext()
 {
@@ -25,7 +20,7 @@ BackendContext::~BackendContext()
     {
         Frontend *fe = (*it);
         delete fe;
-        fe = NULL;
+        fe = nullptr;
         ++it;
     }
 
@@ -47,7 +42,7 @@ void BackendContext::SetFrontendConnected(Frontend *frontend)
         // Frontend may have changed IP since we last saw it
         fe->ip = frontend->ip;
         delete frontend;
-        frontend = NULL;
+        frontend = nullptr;
 
         if (!m_connectedFrontends.contains(fe->name))
         {

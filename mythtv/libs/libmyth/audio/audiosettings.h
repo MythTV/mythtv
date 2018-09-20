@@ -37,7 +37,7 @@ class MPUBLIC AudioSettings
         bool                    set_initial_vol,
         bool                    use_passthru,
         int                     upmixer_startup = 0,
-        AudioOutputSettings     *custom = NULL);
+        AudioOutputSettings     *custom = nullptr);
 
     AudioSettings(AudioFormat   format,
                   int           channels,

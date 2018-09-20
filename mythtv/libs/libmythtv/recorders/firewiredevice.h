@@ -190,7 +190,7 @@ class FirewireDevice
 
     } IEEE1394PanelPassThroughParam0;
 
-    virtual ~FirewireDevice() { }
+    virtual ~FirewireDevice() = default;
 
     // Commands
     virtual bool OpenPort(void) = 0;

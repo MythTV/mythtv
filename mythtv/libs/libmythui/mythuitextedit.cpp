@@ -40,9 +40,9 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
 
     m_maxLength = 255;
 
-    m_backgroundState = NULL;
-    m_cursorImage = NULL;
-    m_Text = NULL;
+    m_backgroundState = nullptr;
+    m_cursorImage = nullptr;
+    m_Text = nullptr;
 
     m_keyboardPosition = VK_POSBELOWEDIT;
 
@@ -56,10 +56,6 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     m_lastKeyPress.start();
 
     m_composeKey = 0;
-}
-
-MythUITextEdit::~MythUITextEdit()
-{
 }
 
 void MythUITextEdit::Select()
@@ -186,9 +182,9 @@ void MythUITextEdit::SetInitialStates()
 
     if (!m_Text || !m_cursorImage)
     {
-        m_Text = NULL;
-        m_cursorImage = NULL;
-        m_backgroundState = NULL;
+        m_Text = nullptr;
+        m_cursorImage = nullptr;
+        m_backgroundState = nullptr;
         return;
     }
 

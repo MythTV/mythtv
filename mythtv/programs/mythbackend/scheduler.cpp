@@ -65,9 +65,9 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     specsched(master_sched),
     schedulingEnabled(true),
     m_tvList(tvList),
-    m_expirer(NULL),
+    m_expirer(nullptr),
     doRun(runthread),
-    m_mainServer(NULL),
+    m_mainServer(nullptr),
     resetIdleTime(false),
     m_isShuttingDown(false),
     error(0),
@@ -78,7 +78,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     tmLastLog = 0;
     char *debug = getenv("DEBUG_CONFLICTS");
-    debugConflicts = (debug != NULL);
+    debugConflicts = (debug != nullptr);
 
     if (master_sched)
         master_sched->GetAllPending(reclist);
@@ -540,25 +540,25 @@ void Scheduler::FillRecordListFromDB(uint recordid)
 
     QMutexLocker locker(&schedLock);
 
-    gettimeofday(&fillstart, NULL);
+    gettimeofday(&fillstart, nullptr);
     UpdateMatches(recordid, 0, 0, QDateTime());
-    gettimeofday(&fillend, NULL);
+    gettimeofday(&fillend, nullptr);
     matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
 
-    gettimeofday(&fillstart, NULL);
+    gettimeofday(&fillstart, nullptr);
     LOG(VB_SCHEDULE, LOG_INFO, "UpdateDuplicates...");
     UpdateDuplicates();
-    gettimeofday(&fillend, NULL);
+    gettimeofday(&fillend, nullptr);
     checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
-    gettimeofday(&fillstart, NULL);
+    gettimeofday(&fillstart, nullptr);
     FillRecordList();
-    gettimeofday(&fillend, NULL);
+    gettimeofday(&fillend, nullptr);
     placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
@@ -805,7 +805,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
     }
     else
     {
-        RecordingInfo *foundp = NULL;
+        RecordingInfo *foundp = nullptr;
         RecIter i = reclist.begin();
         for (; i != reclist.end(); ++i)
         {
@@ -823,7 +823,7 @@ bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
         // future conflicting and force a reschedule by marking
         // reclist as changed.
         RecConstIter j = reclist.begin();
-        while (FindNextConflict(reclist, foundp, j, openEndNever, NULL))
+        while (FindNextConflict(reclist, foundp, j, openEndNever, nullptr))
         {
             RecordingInfo *recp = *j;
             if (recp->GetRecordingStatus() == RecStatus::Pending)
@@ -1018,7 +1018,7 @@ static void erase_nulls(RecList &reclist)
 
 void Scheduler::PruneOverlaps(void)
 {
-    RecordingInfo *lastp = NULL;
+    RecordingInfo *lastp = nullptr;
 
     RecIter dreciter = worklist.begin();
     while (dreciter != worklist.end())
@@ -1033,7 +1033,7 @@ void Scheduler::PruneOverlaps(void)
         else
         {
             delete p;
-            *(dreciter++) = NULL;
+            *(dreciter++) = nullptr;
         }
     }
 
@@ -1219,7 +1219,7 @@ const RecordingInfo *Scheduler::FindConflict(
         return firstConflict;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void Scheduler::MarkOtherShowings(RecordingInfo *p)
@@ -1306,7 +1306,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
     RecStatus::Type oldstatus = p->GetRecordingStatus();
     p->SetRecordingStatus(RecStatus::LaterShowing);
 
-    RecordingInfo *best = NULL;
+    RecordingInfo *best = nullptr;
     uint bestaffinity = 0;
 
     RecIter j = showinglist->begin();
@@ -1491,7 +1491,7 @@ void Scheduler::SchedNewFirstPass(RecIter &i, RecIter end,
             break;
 
         RecordingInfo *first = *i;
-        RecordingInfo *best = NULL;
+        RecordingInfo *best = nullptr;
         uint bestaffinity = 0;
 
         // Try each showing of this program at this time.
@@ -1600,7 +1600,7 @@ void Scheduler::SchedNewRetryPass(RecIter i, RecIter end,
 
 void Scheduler::PruneRedundants(void)
 {
-    RecordingInfo *lastp = NULL;
+    RecordingInfo *lastp = nullptr;
     int lastrecpri2 = 0;
 
     RecIter i = worklist.begin();
@@ -1618,7 +1618,7 @@ void Scheduler::PruneRedundants(void)
             p->GetRecordingEndTime() < schedTime)
         {
             delete p;
-            *(i++) = NULL;
+            *(i++) = nullptr;
             continue;
         }
 
@@ -1672,7 +1672,7 @@ void Scheduler::PruneRedundants(void)
                     lastrecpri2 - p->GetRecordingPriority2());
             }
             delete p;
-            *(i++) = NULL;
+            *(i++) = nullptr;
         }
     }
 
@@ -2238,7 +2238,7 @@ void Scheduler::run(void)
         }
 
         // if idletimeout is 0, the user disabled the auto-shutdown feature
-        if ((idleTimeoutSecs > 0) && (m_mainServer != NULL))
+        if ((idleTimeoutSecs > 0) && (m_mainServer != nullptr))
         {
             HandleIdleShutdown(blockShutdown, idleSince, prerollseconds,
                                idleTimeoutSecs, idleWaitForRecordingTime,
@@ -2343,7 +2343,7 @@ bool Scheduler::HandleReschedule(void)
     struct timeval fillstart, fillend;
     float matchTime, checkTime, placeTime;
 
-    gettimeofday(&fillstart, NULL);
+    gettimeofday(&fillstart, nullptr);
     QString msg;
     bool deleteFuture = false;
     bool runCheck = false;
@@ -2433,26 +2433,26 @@ bool Scheduler::HandleReschedule(void)
             MythDB::DBError("DeleteFuture", query);
     }
 
-    gettimeofday(&fillend, NULL);
+    gettimeofday(&fillend, nullptr);
     matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
 
-    gettimeofday(&fillstart, NULL);
+    gettimeofday(&fillstart, nullptr);
     if (runCheck)
     {
         LOG(VB_SCHEDULE, LOG_INFO, "UpdateDuplicates...");
         UpdateDuplicates();
     }
-    gettimeofday(&fillend, NULL);
+    gettimeofday(&fillend, nullptr);
     checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
-    gettimeofday(&fillstart, NULL);
+    gettimeofday(&fillstart, nullptr);
     bool worklistused = FillRecordList();
-    gettimeofday(&fillend, NULL);
+    gettimeofday(&fillend, nullptr);
     placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                  (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
@@ -2976,8 +2976,8 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri)
     for (uint i = 0; !bestid && i < inputs.size(); ++i)
     {
         uint inputid = inputs[i];
-        RecordingInfo *pend = NULL;
-        RecordingInfo *rec = NULL;
+        RecordingInfo *pend = nullptr;
+        RecordingInfo *rec = nullptr;
 
         // First, see if anything is already pending or still
         // recording.
@@ -3106,7 +3106,7 @@ void Scheduler::HandleIdleShutdown(
         tmLastLog = tm;
     }
 
-    if ((idleTimeoutSecs <= 0) || (m_mainServer == NULL))
+    if ((idleTimeoutSecs <= 0) || (m_mainServer == nullptr))
         return;
 
     // we release the block when a client connects
@@ -3431,7 +3431,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
         gCoreContext->SaveSettingOnHost("MythShutdownWakeupTime",
                                         MythDate::toString(restarttime, MythDate::kDatabase),
-                                        NULL);
+                                        nullptr);
     }
 
     // tell anyone who is listening the master server is going down now
@@ -3468,7 +3468,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 {
     int prerollseconds = 0;
     int secsleft = 0;
-    EncoderLink *enc = NULL;
+    EncoderLink *enc = nullptr;
 
     QReadLocker tvlocker(&TVRec::inputsLock);
 
@@ -4117,7 +4117,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query %1...")
                 .arg(clause));
 
-        gettimeofday(&dbstart, NULL);
+        gettimeofday(&dbstart, nullptr);
         MSqlQuery result(dbConn);
         result.prepare(query);
 
@@ -4128,7 +4128,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         }
 
         bool ok = result.exec();
-        gettimeofday(&dbend, NULL);
+        gettimeofday(&dbend, nullptr);
 
         if (!ok)
         {
@@ -4506,14 +4506,14 @@ void Scheduler::AddNewRecords(void)
 
     LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
-    gettimeofday(&dbstart, NULL);
+    gettimeofday(&dbstart, nullptr);
     result.prepare(query);
     if (!result.exec())
     {
         MythDB::DBError("AddNewRecords", result);
         return;
     }
-    gettimeofday(&dbend, NULL);
+    gettimeofday(&dbend, nullptr);
 
     LOG(VB_SCHEDULE, LOG_INFO,
         QString(" |-- %1 results in %2 sec. Processing...")
@@ -4521,7 +4521,7 @@ void Scheduler::AddNewRecords(void)
             .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                   (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
 
-    RecordingInfo *lastp = NULL;
+    RecordingInfo *lastp = nullptr;
 
     while (result.next())
     {
@@ -4644,11 +4644,11 @@ void Scheduler::AddNewRecords(void)
                      p->GetRecordingRuleType() == kOverrideRecord))
                     ChangeRecordingEnd(r, p);
                 delete p;
-                p = NULL;
+                p = nullptr;
                 break;
             }
         }
-        if (p == NULL)
+        if (p == nullptr)
             continue;
 
         lastp = p;
@@ -4772,11 +4772,11 @@ void Scheduler::AddNotListed(void) {
 
     LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
-    gettimeofday(&dbstart, NULL);
+    gettimeofday(&dbstart, nullptr);
     MSqlQuery result(dbConn);
     result.prepare(query);
     bool ok = result.exec();
-    gettimeofday(&dbend, NULL);
+    gettimeofday(&dbend, nullptr);
 
     if (!ok)
     {
@@ -5432,7 +5432,7 @@ int Scheduler::FillRecordingDir(
                 it != expiring.end(); ++it)
             {
                 // find the filesystem its on
-                FileSystemInfo *fs = NULL;
+                FileSystemInfo *fs = nullptr;
                 for (fslistit = fsInfoList.begin();
                     fslistit != fsInfoList.end(); ++fslistit)
                 {

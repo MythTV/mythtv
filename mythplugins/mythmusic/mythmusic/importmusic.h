@@ -166,7 +166,7 @@ class ImportCoverArtDialog : public MythScreenType
 
     ImportCoverArtDialog(MythScreenStack *parent, const QString &sourceDir,
                          MusicMetadata *metadata, const QString &storageDir);
-    ~ImportCoverArtDialog();
+    ~ImportCoverArtDialog() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

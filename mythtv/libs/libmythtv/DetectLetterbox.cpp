@@ -22,10 +22,6 @@ DetectLetterbox::DetectLetterbox(MythPlayer* const player)
     m_player = player;
 }
 
-DetectLetterbox::~DetectLetterbox()
-{
-}
-
 /** \fn DetectLetterbox::Detect(VideoFrame*)
  *  \brief Detects if this frame is or is not letterboxed
  *

@@ -16,7 +16,7 @@ class CustomPriority : public MythScreenType
     Q_OBJECT
   public:
     explicit CustomPriority(MythScreenStack *parent,
-                            ProgramInfo *proginfo = NULL);
+                            ProgramInfo *proginfo = nullptr);
    ~CustomPriority();
 
     bool Create();

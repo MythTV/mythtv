@@ -21,7 +21,7 @@
             .arg(tvrec ? tvrec->GetInputId() : -1)
 
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
-    : DTVRecorder(rec), _channel(channel), _stream_handler(NULL)
+    : DTVRecorder(rec), _channel(channel), _stream_handler(nullptr)
 {
 }
 

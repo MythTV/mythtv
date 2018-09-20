@@ -35,7 +35,7 @@ class MTV_PUBLIC ProfileItem
 {
   public:
     ProfileItem() : profileid(0) {}
-    ~ProfileItem() {}
+    ~ProfileItem() = default;
 
     void    Clear(void) { pref.clear(); }
 
@@ -65,12 +65,12 @@ class MTV_PUBLIC ProfileItem
     pref_map_t GetAll(void) const { return pref; }
 
     // Other
-    bool checkRange(QString key, float fvalue, bool *ok = Q_NULLPTR) const;
-    bool checkRange(QString key, int ivalue, bool *ok = Q_NULLPTR) const;
+    bool checkRange(QString key, float fvalue, bool *ok = nullptr) const;
+    bool checkRange(QString key, int ivalue, bool *ok = nullptr) const;
     bool checkRange(QString key,
-        float fvalue, int ivalue, bool isFloat, bool *ok = Q_NULLPTR) const;
+        float fvalue, int ivalue, bool isFloat, bool *ok = nullptr) const;
     bool IsMatch(const QSize &size, float framerate, const QString &codecName) const;
-    bool IsValid(QString *reason = NULL) const;
+    bool IsValid(QString *reason = nullptr) const;
 
     bool    operator<(const ProfileItem &other) const;
 
@@ -86,7 +86,7 @@ class MTV_PUBLIC VideoDisplayProfile
 {
   public:
     VideoDisplayProfile();
-    ~VideoDisplayProfile();
+    ~VideoDisplayProfile() = default;
 
     void SetInput(const QSize &size,
         float framerate = 0, const QString &codecName = QString());

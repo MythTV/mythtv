@@ -52,11 +52,11 @@ void MythTranslation::load(const QString &module_name)
 
     if (lang == "en")
     {
-        gCoreContext->SaveSettingOnHost("Language", "en_US", NULL);
+        gCoreContext->SaveSettingOnHost("Language", "en_US", nullptr);
         lang = "en_us";
     }
 
-    QTranslator *trans = new QTranslator(0);
+    QTranslator *trans = new QTranslator(nullptr);
     if (trans->load(GetTranslationsDir() + module_name
                     + "_" + lang + ".qm", "."))
     {

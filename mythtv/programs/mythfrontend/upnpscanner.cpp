@@ -52,7 +52,7 @@ MediaServerItem* MediaServerItem::Find(QString &id)
             return result;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool MediaServerItem::Add(MediaServerItem &item)
@@ -118,9 +118,9 @@ class MediaServer : public MediaServerItem
     int     m_systemUpdateID;
 };
 
-UPNPScanner* UPNPScanner::gUPNPScanner        = NULL;
+UPNPScanner* UPNPScanner::gUPNPScanner        = nullptr;
 bool         UPNPScanner::gUPNPScannerEnabled = false;
-MThread*     UPNPScanner::gUPNPScannerThread  = NULL;
+MThread*     UPNPScanner::gUPNPScannerThread  = nullptr;
 QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
 
 /**
@@ -135,7 +135,7 @@ QMutex*      UPNPScanner::gUPNPScannerLock    = new QMutex(QMutex::Recursive);
  */
 UPNPScanner::UPNPScanner(UPNPSubscription *sub)
   : QObject(), m_subscription(sub), m_lock(QMutex::Recursive),
-    m_network(NULL), m_updateTimer(NULL), m_watchdogTimer(NULL),
+    m_network(nullptr), m_updateTimer(nullptr), m_watchdogTimer(nullptr),
     m_masterHost(QString()), m_masterPort(0), m_scanComplete(false),
     m_fullscan(false)
 {
@@ -159,7 +159,7 @@ void UPNPScanner::Enable(bool enable, UPNPSubscription *sub)
 
 /**
  * \fn UPNPScanner::Instance(UPNPSubscription*)
- *  Returns the global UPNPScanner instance if it has been enabled or NULL
+ *  Returns the global UPNPScanner instance if it has been enabled or nullptr
  *  if UPNPScanner is currently disabled.
  */
 UPNPScanner* UPNPScanner::Instance(UPNPSubscription *sub)
@@ -173,10 +173,10 @@ UPNPScanner* UPNPScanner::Instance(UPNPSubscription *sub)
             gUPNPScannerThread->wait();
         }
         delete gUPNPScannerThread;
-        gUPNPScannerThread = NULL;
+        gUPNPScannerThread = nullptr;
         delete gUPNPScanner;
-        gUPNPScanner = NULL;
-        return NULL;
+        gUPNPScanner = nullptr;
+        return nullptr;
     }
 
     if (!gUPNPScannerThread)
@@ -496,13 +496,13 @@ void UPNPScanner::Stop(void)
     }
     m_browseRequests.clear();
     delete m_network;
-    m_network = NULL;
+    m_network = nullptr;
 
     // delete the timers
     delete m_updateTimer;
     delete m_watchdogTimer;
-    m_updateTimer   = NULL;
-    m_watchdogTimer = NULL;
+    m_updateTimer   = nullptr;
+    m_watchdogTimer = nullptr;
 
     m_lock.unlock();
     LOG(VB_GENERAL, LOG_INFO, LOC + "Finished");
@@ -1017,7 +1017,7 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     LOG(VB_UPNP, LOG_INFO, "\n\n" + parent->toString(4) + "\n\n");
 
     // pull out the actual result
-    QDomDocument *result = NULL;
+    QDomDocument *result = nullptr;
     uint num      = 0;
     uint total    = 0;
     uint updateid = 0;
@@ -1037,7 +1037,7 @@ void UPNPScanner::ParseBrowse(const QUrl &url, QNetworkReply *reply)
     // determine the 'server' which requested the browse
     m_lock.lock();
 
-    MediaServer* server = NULL;
+    MediaServer* server = nullptr;
     QHashIterator<QString,MediaServer*> it(m_servers);
     while (it.hasNext())
     {
@@ -1171,10 +1171,10 @@ void UPNPScanner::FindItems(const QDomNode &n, MediaServerItem &content,
 QDomDocument* UPNPScanner::FindResult(const QDomNode &n, uint &num,
                                       uint &total, uint &updateid)
 {
-    QDomDocument *result = NULL;
+    QDomDocument *result = nullptr;
     QDomElement node = n.toElement();
     if (node.isNull())
-        return NULL;
+        return nullptr;
 
     if (node.tagName() == "NumberReturned")
         num = node.text().toUInt();
@@ -1194,7 +1194,7 @@ QDomDocument* UPNPScanner::FindResult(const QDomNode &n, uint &num,
                 QString("DIDL Parse error, Line: %1 Col: %2 Error: '%3'")
                     .arg(errorLine).arg(errorColumn).arg(errorMessage));
             delete result;
-            result = NULL;
+            result = nullptr;
         }
     }
 

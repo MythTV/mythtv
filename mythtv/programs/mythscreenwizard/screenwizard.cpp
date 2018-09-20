@@ -35,15 +35,10 @@ ScreenWizard::ScreenWizard(MythScreenStack *parent, const char *name) :
     m_xsize(GetMythMainWindow()->GetUIScreenRect().width()),
     m_ysize(GetMythMainWindow()->GetUIScreenRect().height()),
     m_xoffset(0),            m_yoffset(0),
-    m_blackout(NULL),        m_preview(NULL),
-    m_size(NULL),            m_offsets(NULL),
-    m_changeamount(NULL),    m_menuPopup(NULL)
+    m_blackout(nullptr),     m_preview(nullptr),
+    m_size(nullptr),         m_offsets(nullptr),
+    m_changeamount(nullptr), m_menuPopup(nullptr)
 {
-}
-
-ScreenWizard::~ScreenWizard()
-{
-
 }
 
 void ScreenWizard::SetInitialSettings(int _x, int _y, int _w, int _h)
@@ -390,7 +385,7 @@ void ScreenWizard::customEvent(QEvent *event)
                 slotResetSettings();
         }
 
-        m_menuPopup = NULL;
+        m_menuPopup = nullptr;
     }
 
 }

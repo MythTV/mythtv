@@ -34,8 +34,8 @@ class MTV_PUBLIC ScheduledRecording
         { SendReschedule(BuildPlaceRequest(why)); };
 
   private:
-    ScheduledRecording();
-    ~ScheduledRecording();
+    ScheduledRecording() = default;
+    ~ScheduledRecording() = default;
 
     static void SendReschedule(const QStringList &request);
     static QStringList BuildMatchRequest(uint recordid, uint sourceid, 

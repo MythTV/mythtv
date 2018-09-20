@@ -8,18 +8,13 @@
 
 VisualizationSettings::VisualizationSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-    m_changeOnSongChange(NULL),
-    m_randomizeOrder(NULL),
-    m_scaleWidth(NULL),
-    m_scaleHeight(NULL),
-    m_saveButton(NULL),
-    m_cancelButton(NULL)
+    m_changeOnSongChange(nullptr),
+    m_randomizeOrder(nullptr),
+    m_scaleWidth(nullptr),
+    m_scaleHeight(nullptr),
+    m_saveButton(nullptr),
+    m_cancelButton(nullptr)
 {
-}
-
-VisualizationSettings::~VisualizationSettings()
-{
-
 }
 
 bool VisualizationSettings::Create()

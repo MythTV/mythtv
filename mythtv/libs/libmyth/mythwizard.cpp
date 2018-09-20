@@ -86,10 +86,10 @@ public:
     Page * page( const QWidget * w )
     {
         if ( !w )
-            return 0;
+            return nullptr;
         int i = pages.count();
         while( --i >= 0 && pages.at( i ) && pages.at( i )->w != w ) { }
-        return i >= 0 ? pages.at( i ) : 0;
+        return i >= 0 ? pages.at( i ) : nullptr;
     }
 
 };
@@ -98,7 +98,7 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
           : MythDialog(parent, name)
 {
     d = new MythWizardPrivate();
-    d->current = 0; // not quite true, but...
+    d->current = nullptr; // not quite true, but...
     d->ws = new QStackedWidget(this);
     d->ws->setObjectName("MythWizard - stacked widget");
     d->title = new MythLabel(this);
@@ -112,11 +112,11 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
 
     d->ws->installEventFilter( this );
 
-    d->helpgroup = 0;
-    d->help = 0;
-    d->v = 0;
-    d->hbar1 = 0;
-    d->hbar2 = 0;
+    d->helpgroup = nullptr;
+    d->help = nullptr;
+    d->v = nullptr;
+    d->hbar1 = nullptr;
+    d->hbar2 = nullptr;
 
     d->cancelButton->setText( tr( "&Cancel" ) );
     d->backButton->setText( tr( "< &Back" ) );
@@ -152,7 +152,7 @@ void MythWizard::Show()
     else if ( pageCount() > 0 )
         showPage( d->pages[0]->w );
     else
-        showPage( 0 );
+        showPage( nullptr );
 
     MythDialog::Show();
 }
@@ -498,7 +498,7 @@ void MythWizard::layOut()
     layOutTitleRow( l, d->current ? d->current->t : QString() );
 
     if ( ! d->hbar1 ) {
-        d->hbar1 = new QFrame(this, 0);
+        d->hbar1 = new QFrame(this, nullptr);
         d->hbar1->setObjectName("MythWizard - hbar1");
         d->hbar1->setFrameStyle(QFrame::Sunken | QFrame::HLine);
         d->hbar1->setFixedHeight( 12 );
@@ -535,7 +535,7 @@ void MythWizard::layOut()
     d->v->addWidget(d->helpgroup);
 
     if ( ! d->hbar2 ) {
-        d->hbar2 = new QFrame( this, 0 );
+        d->hbar2 = new QFrame( this, nullptr );
         d->hbar2->setObjectName("MythWizard - hbar2");
         d->hbar2->setFrameStyle(QFrame::Sunken | QFrame::HLine);
         d->hbar2->setFixedHeight( 12 );
@@ -626,7 +626,7 @@ void MythWizard::removePage( QWidget * page )
 QWidget* MythWizard::page( int index ) const
 {
     if ( index >= pageCount() || index < 0 )
-      return 0;
+      return nullptr;
 
     return d->pages[index]->w;
 }

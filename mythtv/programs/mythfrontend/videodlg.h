@@ -94,9 +94,9 @@ class VideoDialog : public MythScreenType
     void SwitchVideoTVMovieGroup();
 
     void EditMetadata();
-    void VideoSearch(MythGenericTree *node = NULL,
+    void VideoSearch(MythGenericTree *node = nullptr,
                      bool automode = false);
-    void VideoAutoSearch(MythGenericTree *node = NULL);
+    void VideoAutoSearch(MythGenericTree *node = nullptr);
     void ResetMetadata();
     void ToggleWatched();
     void ToggleProcess();

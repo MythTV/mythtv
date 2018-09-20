@@ -13,14 +13,14 @@ class ChromaKeyOSD
   public:
     explicit ChromaKeyOSD(VideoOutputXv *vo) :
         current_size(QSize()), current_rect(QRect()),
-        videoOutput(vo), img(NULL), image(NULL), painter(NULL), visible(false)
+        videoOutput(vo), img(nullptr), image(nullptr), painter(nullptr), visible(false)
     {
         memset(&shm_infos, 0, sizeof(XShmSegmentInfo));
     }
     ~ChromaKeyOSD(void);
 
     bool    ProcessOSD(OSD *osd);
-    XImage *GetImage() { return visible ? img : NULL; }
+    XImage *GetImage() { return visible ? img : nullptr; }
     MythPainter* GetPainter(void) { return (MythPainter*)painter; }
 
   private:

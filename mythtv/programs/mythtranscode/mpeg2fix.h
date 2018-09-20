@@ -120,7 +120,7 @@ class MPEG2fixup
     MPEG2fixup(const QString &inf, const QString &outf,
                frm_dir_map_t *deleteMap, const char *fmt, int norp,
                int fixPTS, int maxf, bool showprog, int otype,
-               void (*update_func)(float) = NULL, int (*check_func)() = NULL);
+               void (*update_func)(float) = nullptr, int (*check_func)() = nullptr);
     ~MPEG2fixup();
     int Start();
     void AddRangeList(QStringList cutlist, int type);
@@ -198,13 +198,13 @@ class MPEG2fixup
     AVCodecContext *getCodecContext(uint id)
     {
         if (id >= inputFC->nb_streams)
-            return NULL;
+            return nullptr;
         return gCodecMap->getCodecContext(inputFC->streams[id]);
     }
     AVCodecParserContext *getCodecParserContext(uint id)
     {
         if (id >= inputFC->nb_streams)
-            return NULL;
+            return nullptr;
         return inputFC->streams[id]->parser;
     }
 

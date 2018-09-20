@@ -100,7 +100,7 @@ class VisFactory
 {
   public:
     VisFactory() {m_pNextVisFactory = g_pVisFactories; g_pVisFactories = this;}
-    virtual ~VisFactory() {}
+    virtual ~VisFactory() = default;
     const VisFactory* next() const {return m_pNextVisFactory;}
     virtual const QString &name(void) const = 0;
     virtual VisualBase* create(MainVisual *parent, const QString &pluginName) const = 0;
@@ -115,7 +115,7 @@ class StereoScope : public VisualBase
 {
   public:
     StereoScope();
-    virtual ~StereoScope();
+    virtual ~StereoScope() = default;
 
     void resize( const QSize &size );
     bool process( VisualNode *node );
@@ -133,8 +133,8 @@ class StereoScope : public VisualBase
 class MonoScope : public StereoScope
 {
   public:
-    MonoScope();
-    virtual ~MonoScope();
+    MonoScope() = default;
+    virtual ~MonoScope() = default;
 
     bool process( VisualNode *node );
     bool draw( QPainter *p, const QColor &back );
@@ -195,7 +195,7 @@ class Squares : public Spectrum
 {
   public:
     Squares();
-    virtual ~Squares();
+    virtual ~Squares() = default;
 
     void resize (const QSize &newsize);
     bool draw(QPainter *p, const QColor &back = Qt::black);
@@ -279,10 +279,10 @@ class AlbumArt : public VisualBase
 
   public:
     AlbumArt(void);
-    virtual ~AlbumArt();
+    virtual ~AlbumArt() = default;
 
     void resize(const QSize &size);
-    bool process(VisualNode *node = 0);
+    bool process(VisualNode *node = nullptr);
     bool draw(QPainter *p, const QColor &back = Qt::black);
     void handleKeyPress(const QString &action);
 
@@ -304,10 +304,10 @@ class Blank : public VisualBase
     // This draws ... well ... nothing    
   public:
     Blank();
-    virtual ~Blank();
+    virtual ~Blank() = default;
 
     void resize(const QSize &size);
-    bool process(VisualNode *node = 0);
+    bool process(VisualNode *node = nullptr);
     bool draw(QPainter *p, const QColor &back = Qt::black);
     void handleKeyPress(const QString &action) {(void) action;}
 

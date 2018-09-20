@@ -51,16 +51,16 @@ class channelRecPrioritySort
 
 ChannelRecPriority::ChannelRecPriority(MythScreenStack *parent)
                   : MythScreenType(parent, "ChannelRecPriority"),
-                    m_channelList(NULL), m_chanstringText(NULL),
-                    m_channameText(NULL), m_channumText(NULL),
-                    m_callsignText(NULL), m_sourcenameText(NULL),
-                    m_sourceidText(NULL), m_priorityText(NULL),
-                    m_iconImage(NULL)
+                    m_channelList(nullptr), m_chanstringText(nullptr),
+                    m_channameText(nullptr), m_channumText(nullptr),
+                    m_callsignText(nullptr), m_sourcenameText(nullptr),
+                    m_sourceidText(nullptr), m_priorityText(nullptr),
+                    m_iconImage(nullptr)
 {
     m_sortType = (SortType)gCoreContext->GetNumSetting("ChannelRecPrioritySorting",
                                                  (int)byChannel);
 
-    m_currentItem = NULL;
+    m_currentItem = nullptr;
 
     gCoreContext->addListener(this);
 }
@@ -171,7 +171,7 @@ void ChannelRecPriority::ShowMenu()
     if (!menuPopup->Create())
     {
         delete menuPopup;
-        menuPopup = NULL;
+        menuPopup = nullptr;
         return;
     }
 

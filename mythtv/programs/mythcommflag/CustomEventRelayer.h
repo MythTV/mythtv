@@ -35,7 +35,7 @@ class CustomEventRelayer : public QObject
     void customEvent(QEvent *e) { fp(e); }
 
   protected:
-    virtual ~CustomEventRelayer() {}
+    virtual ~CustomEventRelayer() = default;
 
   private:
     void (*fp)(QEvent*);

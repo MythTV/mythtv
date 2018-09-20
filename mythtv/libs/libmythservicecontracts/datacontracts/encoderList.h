@@ -39,7 +39,7 @@ class SERVICE_PUBLIC EncoderList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE EncoderList(QObject *parent = 0)
+        Q_INVOKABLE EncoderList(QObject *parent = nullptr)
             : QObject( parent )               
         {
         }

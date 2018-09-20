@@ -47,10 +47,6 @@ ThemeInfo::ThemeInfo(QString theme)
     }
 }
 
-ThemeInfo::~ThemeInfo()
-{
-}
-
 bool ThemeInfo::parseThemeInfo()
 {
 

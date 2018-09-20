@@ -10,7 +10,7 @@ class MTV_PUBLIC DetectLetterbox
 {
 public:
     explicit DetectLetterbox(MythPlayer* const player);
-    ~DetectLetterbox();
+    ~DetectLetterbox() = default;
     void SetDetectLetterbox(bool detect);
     bool GetDetectLetterbox() const;
     void Detect(VideoFrame *frame);

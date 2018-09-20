@@ -97,8 +97,8 @@ NetStream::NetStream(const QUrl &url, EMode mode /*= kPreferCache*/,
     m_id(s_nRequest.fetchAndAddRelaxed(1)),
     m_url(url),
     m_state(kClosed),
-    m_pending(0),
-    m_reply(0),
+    m_pending(nullptr),
+    m_reply(nullptr),
     m_nRedirections(0),
     m_size(-1),
     m_pos(0),
@@ -172,7 +172,7 @@ bool NetStream::Request(const QUrl& url)
     {
         // Cancel the pending request
         m_pending->m_bCancelled = true;
-        m_pending = 0;
+        m_pending = nullptr;
     }
 
     if (m_reply)
@@ -182,7 +182,7 @@ bool NetStream::Request(const QUrl& url)
         m_reply->disconnect(this);
         NAMThread::PostEvent(new NetStreamAbort(m_id, m_reply));
         // NAMthread will delete the reply
-        m_reply = 0;
+        m_reply = nullptr;
     }
 
     m_request.setUrl(url);
@@ -277,7 +277,7 @@ void NetStream::slotRequestStarted(int id, QNetworkReply *reply)
     if (m_id != id)
         return;
 
-    m_pending = 0; // Event is no longer valid
+    m_pending = nullptr; // Event is no longer valid
 
     if (!m_reply)
     {
@@ -528,7 +528,7 @@ void NetStream::Abort()
     {
         LOG(VB_FILE, LOG_INFO, LOC + QString("(%1) Cancelled").arg(m_id) );
         m_pending->m_bCancelled = true;
-        m_pending = 0;
+        m_pending = nullptr;
     }
 
     if (m_reply)
@@ -539,7 +539,7 @@ void NetStream::Abort()
 
         NAMThread::PostEvent(new NetStreamAbort(m_id, m_reply));
         // NAMthread will delete the reply
-        m_reply = 0;
+        m_reply = nullptr;
     }
 
     m_state = kFinished;
@@ -673,7 +673,7 @@ QByteArray NetStream::ReadAll()
     QMutexLocker locker(&m_mutex);
 
     if (!m_reply)
-        return 0;
+        return nullptr;
 
     QByteArray data =  m_reply->readAll();
     m_pos += data.size();
@@ -732,7 +732,7 @@ NAMThread & NAMThread::manager()
     return thread;
 }
 
-NAMThread::NAMThread() : m_bQuit(false), m_mutexNAM(QMutex::Recursive), m_nam(0)
+NAMThread::NAMThread() : m_bQuit(false), m_mutexNAM(QMutex::Recursive), m_nam(nullptr)
 {
     setObjectName("NAMThread");
 
@@ -823,7 +823,7 @@ void NAMThread::run()
     m_running.acquire();
 
     delete m_nam;
-    m_nam = 0;
+    m_nam = nullptr;
 
     LOG(VB_FILE, LOG_INFO, LOC "NAMThread stopped");
 }

@@ -41,11 +41,11 @@ using namespace std;
 
 AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    client(NULL), stale_client(NULL),
-    jack_latency(0), jack_underrun(false), jack_xruns(0), aubuf(NULL)
+    client(nullptr), stale_client(nullptr),
+    jack_latency(0), jack_xruns(0), aubuf(nullptr)
 {
     for (int i = 0; i < JACK_CHANNELS_MAX; i++)
-        ports[i] = NULL;
+        ports[i] = nullptr;
     for (int i = 0; i < JACK_CHANNELS_MAX; i++)
         chan_volumes[i] = 100;
 
@@ -59,7 +59,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
 {
     int rate = 0;
     int i = 0;
-    const char **matching_ports = NULL;
+    const char **matching_ports = nullptr;
     AudioOutputSettings *settings = new AudioOutputSettings();
 
     client = _jack_client_open();
@@ -68,7 +68,7 @@ AudioOutputSettings* AudioOutputJACK::GetOutputSettings(bool /*digital*/)
         JERROR(tr("Cannot start/connect to jack server "
                "(to check supported rate/channels)"));
         delete settings;
-        return NULL;
+        return nullptr;
     }
 
     if (client)
@@ -112,7 +112,7 @@ err_out:
     free(matching_ports);
     _jack_client_close(&client);
     delete settings;
-    return NULL;
+    return nullptr;
 }
 
 
@@ -124,7 +124,7 @@ AudioOutputJACK::~AudioOutputJACK()
 
 bool AudioOutputJACK::OpenDevice()
 {
-    const char **matching_ports = NULL;
+    const char **matching_ports = nullptr;
     int i = 0;
 
     // We have a hard coded channel limit - check we haven't exceeded it
@@ -236,7 +236,7 @@ void AudioOutputJACK::CloseDevice()
     if (aubuf)
     {
         delete[] aubuf;
-        aubuf = NULL;
+        aubuf = nullptr;
     }
 
     VBAUDIO("Jack: Stop Event");
@@ -587,9 +587,9 @@ jack_client_t* AudioOutputJACK::_jack_client_open(void)
 
 const char** AudioOutputJACK::_jack_get_ports(void)
 {
-    const char **matching_ports = NULL;
+    const char **matching_ports = nullptr;
     unsigned long port_flags=JackPortIsInput;
-    const char *port_name = NULL;
+    const char *port_name = nullptr;
 
     // Have we been given a target port to connect to
     if (!main_device.isEmpty())
@@ -602,7 +602,7 @@ const char** AudioOutputJACK::_jack_get_ports(void)
     }
 
     // list matching ports
-    matching_ports = jack_get_ports(client, port_name, NULL, port_flags);
+    matching_ports = jack_get_ports(client, port_name, nullptr, port_flags);
     return matching_ports;
 }
 
@@ -632,7 +632,7 @@ void AudioOutputJACK::_jack_client_close(jack_client_t **client)
         if (err != 0)
             JERROR(tr("Error closing Jack output device. Error: %1")
                        .arg(err));
-        *client = NULL;
+        *client = nullptr;
     }
 }
 

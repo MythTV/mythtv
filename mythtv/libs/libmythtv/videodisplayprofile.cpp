@@ -153,7 +153,7 @@ bool ProfileItem::checkRange(QString key,
             }
         }
     }
-    if (ok != Q_NULLPTR)
+    if (ok != nullptr)
         *ok = isOK;
     if (!isOK)
         match=false;
@@ -405,10 +405,6 @@ VideoDisplayProfile::VideoDisplayProfile()
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Accepting: " + (*it).toString());
         all_pref.push_back(*it);
     }
-}
-
-VideoDisplayProfile::~VideoDisplayProfile()
-{
 }
 
 void VideoDisplayProfile::SetInput(const QSize &size,

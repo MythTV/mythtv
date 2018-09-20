@@ -36,10 +36,10 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
     m_startDateTime = m_nowDateTime;
 
     m_daysahead = 0;
-    m_titleEdit = NULL;
-    m_channelList = m_startdateList = NULL;
-    m_recordButton = m_cancelButton = NULL;
-    m_durationSpin = m_starthourSpin = m_startminuteSpin = NULL;
+    m_titleEdit = nullptr;
+    m_channelList = m_startdateList = nullptr;
+    m_recordButton = m_cancelButton = nullptr;
+    m_durationSpin = m_starthourSpin = m_startminuteSpin = nullptr;
 }
 
 bool ManualSchedule::Create(void)
@@ -137,9 +137,9 @@ void ManualSchedule::connectSignals()
 
 void ManualSchedule::disconnectSignals()
 {
-    disconnect(m_startdateList, 0, this, 0);
-    disconnect(m_starthourSpin, 0, this, 0);
-    disconnect(m_startminuteSpin, 0, this, 0);
+    disconnect(m_startdateList, nullptr, this, nullptr);
+    disconnect(m_starthourSpin, nullptr, this, nullptr);
+    disconnect(m_startminuteSpin, nullptr, this, nullptr);
 }
 
 void ManualSchedule::hourRollover(void)

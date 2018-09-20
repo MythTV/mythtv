@@ -39,9 +39,9 @@ class MythBDPlayer : public MythPlayer
     // Non-const gets
     // Disable screen grabs for Bluray
     virtual char *GetScreenGrabAtFrame(uint64_t /*frameNum*/, bool /*absolute*/,
-        int &/*buflen*/, int &/*vw*/, int &/*vh*/, float &/*ar*/) { return NULL; }
+        int &/*buflen*/, int &/*vw*/, int &/*vh*/, float &/*ar*/) { return nullptr; }
     virtual char *GetScreenGrab(int /*secondsin*/, int &/*bufflen*/,
-        int &/*vw*/, int &/*vh*/, float &/*ar*/) { return NULL; }
+        int &/*vw*/, int &/*vh*/, float &/*ar*/) { return nullptr; }
 
   protected:
     // Playback

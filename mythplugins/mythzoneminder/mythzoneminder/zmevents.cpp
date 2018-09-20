@@ -40,13 +40,13 @@ ZMEvents::ZMEvents(MythScreenStack *parent) :
     m_savedPosition(0),
     m_currentCamera(-1),
     m_currentDate(-1),
-    m_eventNoText(NULL),
-    m_eventGrid(NULL),
-    m_playButton(NULL),
-    m_deleteButton(NULL),
-    m_cameraSelector(NULL),
-    m_dateSelector(NULL),
-    m_menuPopup(NULL)
+    m_eventNoText(nullptr),
+    m_eventGrid(nullptr),
+    m_playButton(nullptr),
+    m_deleteButton(nullptr),
+    m_cameraSelector(nullptr),
+    m_dateSelector(nullptr),
+    m_menuPopup(nullptr)
 {
 }
 

@@ -29,7 +29,7 @@ void VideoOutputOpenGLVAAPI::GetRenderOptions(render_opts &opts)
 }
 
 VideoOutputOpenGLVAAPI::VideoOutputOpenGLVAAPI()
-  : VideoOutputOpenGL(), m_ctx(NULL), m_pauseBuffer(NULL)
+  : VideoOutputOpenGL(), m_ctx(nullptr), m_pauseBuffer(nullptr)
 {
 }
 
@@ -173,7 +173,7 @@ void VideoOutputOpenGLVAAPI::DeleteVAAPIContext(void)
 {
     QMutexLocker locker(&gl_context_lock);
     delete m_ctx;
-    m_ctx = NULL;
+    m_ctx = nullptr;
 }
 
 bool VideoOutputOpenGLVAAPI::CreateBuffers(void)
@@ -194,14 +194,14 @@ void* VideoOutputOpenGLVAAPI::GetDecoderContext(unsigned char* buf, uint8_t*& id
         id = GetSurfaceIDPointer(buf);
         return &m_ctx->m_ctx;
     }
-    return NULL;
+    return nullptr;
 }
 
 uint8_t* VideoOutputOpenGLVAAPI::GetSurfaceIDPointer(void* buf)
 {
     if (m_ctx)
         return m_ctx->GetSurfaceIDPointer(buf);
-    return NULL;
+    return nullptr;
 }
 
 void VideoOutputOpenGLVAAPI::SetProfile(void)

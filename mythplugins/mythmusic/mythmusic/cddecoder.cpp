@@ -96,7 +96,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     m_inited(false),   m_user_stop(false),
     m_devicename(""),
     m_stat(DecoderEvent::Error),
-    m_output_buf(NULL),
+    m_output_buf(nullptr),
     m_output_at(0),    m_bks(0),
     m_bksFrames(0),    m_decodeBytes(0),
     m_finish(false),
@@ -104,7 +104,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     m_chan(0),
     m_seekTime(-1.),
     m_settracknum(-1), m_tracknum(0),
-    m_cdio(0),        m_device(0), m_paranoia( 0),
+    m_cdio(nullptr),   m_device(nullptr), m_paranoia(nullptr),
     m_start(CDIO_INVALID_LSN),
     m_end(CDIO_INVALID_LSN),
     m_curpos(CDIO_INVALID_LSN)
@@ -191,7 +191,7 @@ bool CdDecoder::initialize()
         CDIO_INVALID_LSN  == m_end)
     {
         LOG(VB_MEDIA, LOG_INFO, "CdDecoder: No tracks on " + m_devicename);
-        cdio_destroy(m_cdio), m_cdio = 0;
+        cdio_destroy(m_cdio), m_cdio = nullptr;
         return false;
     }
 
@@ -199,13 +199,13 @@ bool CdDecoder::initialize()
             .arg(m_tracknum).arg(m_start).arg(m_end));
     m_curpos = m_start;
 
-    m_device = cdio_cddap_identify_cdio(m_cdio, 0, NULL);
-    if (NULL == m_device)
+    m_device = cdio_cddap_identify_cdio(m_cdio, 0, nullptr);
+    if (nullptr == m_device)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error: CdDecoder: cdio_cddap_identify(%1) failed")
                 .arg(m_devicename));
-        cdio_destroy(m_cdio), m_cdio = 0;
+        cdio_destroy(m_cdio), m_cdio = nullptr;
         return false;
     }
 
@@ -230,7 +230,7 @@ bool CdDecoder::initialize()
         // detect when the user has ejected a CD otherwise we enter a
         // recursive loop in cdio_paranoia_read_limited()
         //m_paranoia = cdio_paranoia_init(m_device);
-        if (NULL != m_paranoia)
+        if (nullptr != m_paranoia)
         {
             cdio_paranoia_modeset(m_paranoia, PARANOIA_MODE_DISABLE);
             (void)cdio_paranoia_seek(m_paranoia, m_start, SEEK_SET);
@@ -292,20 +292,20 @@ void CdDecoder::deinit()
     QMutexLocker lock(&getCdioMutex());
 
     if (m_paranoia)
-        cdio_paranoia_free(m_paranoia), m_paranoia = 0;
+        cdio_paranoia_free(m_paranoia), m_paranoia = nullptr;
     if (m_device)
-        cdio_cddap_close(m_device), m_device = 0, m_cdio = 0;
+        cdio_cddap_close(m_device), m_device = nullptr, m_cdio = nullptr;
     if (m_cdio)
-        cdio_destroy(m_cdio), m_cdio = 0;
+        cdio_destroy(m_cdio), m_cdio = nullptr;
 
     if (m_output_buf)
-        ::av_free(m_output_buf), m_output_buf = NULL;
+        ::av_free(m_output_buf), m_output_buf = nullptr;
 
     m_inited = m_user_stop = m_finish = false;
     m_freq = m_bitrate = 0L;
     m_stat = DecoderEvent::Finished;
     m_chan = 0;
-    setOutput(0);
+    setOutput(nullptr);
 }
 
 // private virtual
@@ -356,7 +356,7 @@ void CdDecoder::run()
                     if (m_paranoia)
                     {
                         int16_t *cdbuffer = cdio_paranoia_read_limited(
-                                                m_paranoia, 0, 10);
+                                                m_paranoia, nullptr, 10);
                         if (cdbuffer)
                             memcpy(&m_output_buf[m_output_at],
                                 cdbuffer, CDIO_CD_FRAMESIZE_RAW);
@@ -573,14 +573,14 @@ MusicMetadata *CdDecoder::getMetadata()
 
     StCdioDevice cdio(m_devicename);
     if (!cdio)
-        return NULL;
+        return nullptr;
 
     const track_t lastTrack = cdio_get_last_track_num(cdio);
     if (CDIO_INVALID_TRACK == lastTrack)
-        return NULL;
+        return nullptr;
 
     if (TRACK_FORMAT_AUDIO != cdio_get_track_format(cdio, tracknum))
-        return NULL;
+        return nullptr;
 
     // Assume disc changed if max LSN different
     bool isDiscChanged = false;
@@ -602,8 +602,8 @@ MusicMetadata *CdDecoder::getMetadata()
 
         if (audioTracks < lastTrack)
         {
-            cdrom_drive_t *dev = cdio_cddap_identify_cdio(cdio, 0, NULL);
-            if (NULL != dev)
+            cdrom_drive_t *dev = cdio_cddap_identify_cdio(cdio, 0, nullptr);
+            if (nullptr != dev)
             {
                 if (DRIVER_OP_SUCCESS == cdio_cddap_open(dev))
                 {
@@ -643,7 +643,7 @@ MusicMetadata *CdDecoder::getMetadata()
             LOG(VB_MEDIA, LOG_INFO,
                 QString("Getting cdtext for track %1...").arg(tracknum));
         cdtext_t * cdtext = cdio_get_cdtext(m_cdio, tracknum);
-        if (NULL != cdtext)
+        if (nullptr != cdtext)
         {
             genre = cdtext_get_const(CDTEXT_GENRE, cdtext);
             artist = cdtext_get_const(CDTEXT_PERFORMER, cdtext);
@@ -671,7 +671,7 @@ MusicMetadata *CdDecoder::getMetadata()
 
                 // Get disc info
                 cdtext = cdio_get_cdtext(cdio, 0);
-                if (NULL != cdtext)
+                if (nullptr != cdtext)
                 {
                     compilation_artist = cdtext_get_const(
                         CDTEXT_PERFORMER, cdtext);

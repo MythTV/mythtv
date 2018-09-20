@@ -239,7 +239,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
 
     gCoreContext->SaveSettingOnHost(
         "BackupDBLastRunStart",
-        MythDate::toString(MythDate::current(), MythDate::kDatabase), NULL);
+        MythDate::toString(MythDate::current(), MythDate::kDatabase), nullptr);
 
     if (!backupScript.isEmpty())
     {
@@ -254,7 +254,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
 
     gCoreContext->SaveSettingOnHost(
         "BackupDBLastRunEnd",
-        MythDate::toString(MythDate::current(), MythDate::kDatabase), NULL);
+        MythDate::toString(MythDate::current(), MythDate::kDatabase), nullptr);
 
     if (query.isConnected())
     {

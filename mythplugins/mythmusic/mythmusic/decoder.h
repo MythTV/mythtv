@@ -29,7 +29,7 @@ class AudioOutput;
 class DecoderEvent : public MythEvent
 {
   public:
-    explicit DecoderEvent(Type t) : MythEvent(t), error_msg(NULL) { ; }
+    explicit DecoderEvent(Type t) : MythEvent(t), error_msg(nullptr) { ; }
 
     explicit DecoderEvent(QString *e) : MythEvent(Error), error_msg(e) { ; }
 
@@ -49,7 +49,7 @@ class DecoderEvent : public MythEvent
     static Type Error;
 
   private:
-    DecoderEvent(const DecoderEvent &o) : MythEvent(o), error_msg(NULL)
+    DecoderEvent(const DecoderEvent &o) : MythEvent(o), error_msg(nullptr)
     {
         if (o.error_msg)
         {
@@ -116,7 +116,7 @@ public:
     virtual const QString &extension() const = 0; // file extension, ie. ".mp3" or ".ogg"
     virtual const QString &description() const = 0; // file type, ie. "MPEG Audio Files"
     virtual Decoder *create(const QString &, AudioOutput *, bool) = 0;
-    virtual ~DecoderFactory() {}
+    virtual ~DecoderFactory() = default;
 };
 
 class CdDecoderFactory : public DecoderFactory

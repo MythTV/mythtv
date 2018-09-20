@@ -124,14 +124,14 @@ static int toTrackType(int type)
 
 MythPlayer::MythPlayer(PlayerFlags flags)
     : playerFlags(flags),
-      decoder(NULL),                decoder_change_lock(QMutex::Recursive),
-      videoOutput(NULL),            player_ctx(NULL),
-      decoderThread(NULL),          playerThread(NULL),  
+      decoder(nullptr),             decoder_change_lock(QMutex::Recursive),
+      videoOutput(nullptr),         player_ctx(nullptr),
+      decoderThread(nullptr),       playerThread(nullptr),
 #ifdef Q_OS_ANDROID
       playerThreadId(0),
 #endif
       // Window stuff
-      parentWidget(NULL), embedding(false), embedRect(QRect()),
+      parentWidget(nullptr), embedding(false), embedRect(QRect()),
       // State
       totalDecoderPause(false), decoderPaused(false),
       inJumpToProgramPause(false),
@@ -185,10 +185,10 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       cc608(this), cc708(this),
       // MHEG/MHI Interactive TV visible in OSD
       itvVisible(false),
-      interactiveTV(NULL),
+      interactiveTV(nullptr),
       itvEnabled(false),
       // OSD stuff
-      osd(NULL), reinit_osd(false), osdLock(QMutex::Recursive),
+      osd(nullptr), reinit_osd(false), osdLock(QMutex::Recursive),
       // Audio
       audio(this, (flags & kAudioMuted)),
       // Picture-in-Picture stuff
@@ -196,7 +196,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // Filters
       videoFiltersForProgram(""),   videoFiltersOverride(""),
       postfilt_width(0),            postfilt_height(0),
-      videoFilters(NULL),           FiltMan(new FilterManager()),
+      videoFilters(nullptr),        FiltMan(new FilterManager()),
 
       forcePositionMapSync(false),  pausedBeforeEdit(false),
       speedBeforeEdit(1.0f),
@@ -208,7 +208,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       m_fpsMultiplier(1),
       ffrew_skip(1),ffrew_adjust(0),
       // Audio and video synchronization stuff
-      videosync(NULL),              avsync_delay(0),
+      videosync(nullptr),           avsync_delay(0),
       avsync_adjustment(0),         avsync_avg(0),
       avsync_predictor(0),          avsync_predictor_enabled(false),
       refreshrate(0),
@@ -222,7 +222,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       prevtc(0),                    prevrp(0),
       savedAudioTimecodeOffset(0),
       // LiveTVChain stuff
-      m_tv(NULL),                   isDummy(false),
+      m_tv(nullptr),                isDummy(false),
       // Counter for buffering messages
       bufferingCounter(0),
       // Debugging variables
@@ -270,7 +270,7 @@ MythPlayer::~MythPlayer(void)
     {
         QMutexLocker lk0(&itvLock);
         delete interactiveTV;
-        interactiveTV = NULL;
+        interactiveTV = nullptr;
     }
 
     QMutexLocker lk1(&osdLock);
@@ -280,51 +280,51 @@ MythPlayer::~MythPlayer(void)
     if (osd)
     {
         delete osd;
-        osd = NULL;
+        osd = nullptr;
     }
 
-    SetDecoder(NULL);
+    SetDecoder(nullptr);
 
     if (decoderThread)
     {
         delete decoderThread;
-        decoderThread = NULL;
+        decoderThread = nullptr;
     }
 
     if (FiltMan)
     {
         delete FiltMan;
-        FiltMan = NULL;
+        FiltMan = nullptr;
     }
 
     if (videoFilters)
     {
         delete videoFilters;
-        videoFilters = NULL;
+        videoFilters = nullptr;
     }
 
     if (videosync)
     {
         delete videosync;
-        videosync = NULL;
+        videosync = nullptr;
     }
 
     if (videoOutput)
     {
         delete videoOutput;
-        videoOutput = NULL;
+        videoOutput = nullptr;
     }
 
     if (output_jmeter)
     {
         delete output_jmeter;
-        output_jmeter = NULL;
+        output_jmeter = nullptr;
     }
 
     if (detect_letter_box)
     {
         delete detect_letter_box;
-        detect_letter_box = NULL;
+        detect_letter_box = nullptr;
     }
 }
 
@@ -946,7 +946,7 @@ int MythPlayer::OpenFile(uint retries)
     UnpauseBuffer();
 
     // delete any pre-existing recorder
-    SetDecoder(NULL);
+    SetDecoder(nullptr);
     int testreadsize = 2048;
 
     MythTimer bigTimer; bigTimer.start();
@@ -993,7 +993,7 @@ int MythPlayer::OpenFile(uint retries)
     else if (decoder->IsErrored())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not initialize A/V decoder.");
-        SetDecoder(NULL);
+        SetDecoder(nullptr);
         SetErrored(tr("Could not initialize A/V decoder"));
 
         delete[] testbuf;
@@ -1108,7 +1108,7 @@ void MythPlayer::InitFilters(void)
     if (videoFilters)
     {
         delete videoFilters;
-        videoFilters = NULL;
+        videoFilters = nullptr;
     }
 
     if (!filters.isEmpty())
@@ -1152,7 +1152,7 @@ VideoFrame *MythPlayer::GetNextVideoFrame(void)
 {
     if (videoOutput)
         return videoOutput->GetNextFreeFrame();
-    return NULL;
+    return nullptr;
 }
 
 /** \fn MythPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)
@@ -1220,7 +1220,7 @@ void* MythPlayer::GetDecoderContext(unsigned char* buf, uint8_t*& id)
 {
     if (videoOutput)
         return videoOutput->GetDecoderContext(buf, id);
-    return NULL;
+    return nullptr;
 }
 
 bool MythPlayer::HasReachedEof(void) const
@@ -1242,7 +1242,7 @@ VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
     w = video_dim.width();
     h = video_dim.height();
 
-    VideoFrame *retval = NULL;
+    VideoFrame *retval = nullptr;
 
     vidExitLock.lock();
     if (videoOutput)
@@ -2187,9 +2187,9 @@ void MythPlayer::DisplayPauseFrame(void)
 
     osdLock.lock();
     videofiltersLock.lock();
-    videoOutput->ProcessFrame(NULL, osd, videoFilters, pip_players);
+    videoOutput->ProcessFrame(nullptr, osd, videoFilters, pip_players);
     videofiltersLock.unlock();
-    videoOutput->PrepareFrame(NULL, kScan_Ignore, osd);
+    videoOutput->PrepareFrame(nullptr, kScan_Ignore, osd);
     osdLock.unlock();
     videoOutput->Show(kScan_Ignore);
     videosync->Start();
@@ -2359,7 +2359,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     AutoDeint(frame);
     detect_letter_box->SwitchTo(frame);
 
-    AVSync(frame, 0);
+    AVSync(frame, false);
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!player_ctx->IsPIP())
         videoOutput->DoneDisplayingFrame(frame);
@@ -2544,7 +2544,7 @@ void MythPlayer::VideoStart(void)
         videosync = VideoSync::BestMethod(videoOutput, (uint)rf_int);
 
         // Make sure video sync can do it
-        if (videosync != NULL && m_double_framerate)
+        if (videosync != nullptr && m_double_framerate)
         {
             if (!CanSupportDoubleRate())
             {
@@ -2600,9 +2600,9 @@ void MythPlayer::VideoEnd(void)
     delete osd;
     delete videosync;
     delete videoOutput;
-    osd         = NULL;
-    videosync   = NULL;
-    videoOutput = NULL;
+    osd         = nullptr;
+    videosync   = nullptr;
+    videoOutput = nullptr;
     vidExitLock.unlock();
     osdLock.unlock();
 }
@@ -3393,7 +3393,7 @@ void MythPlayer::DecoderEnd(void)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to stop decoder loop.");
     else
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Exited decoder loop.");
-    SetDecoder(NULL);
+    SetDecoder(nullptr);
 }
 
 void MythPlayer::DecoderPauseCheck(void)
@@ -4606,9 +4606,9 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
                                        float &ar)
 {
     uint64_t       number    = 0;
-    unsigned char *data      = NULL;
-    unsigned char *outputbuf = NULL;
-    VideoFrame    *frame     = NULL;
+    unsigned char *data      = nullptr;
+    unsigned char *outputbuf = nullptr;
+    VideoFrame    *frame     = nullptr;
     AVFrame      orig;
     AVFrame      retbuf;
     MythAVCopy     copyCtx;
@@ -4622,7 +4622,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     if (OpenFile(0) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not open file for preview.");
-        return NULL;
+        return nullptr;
     }
 
     if ((video_dim.width() <= 0) || (video_dim.height() <= 0))
@@ -4646,7 +4646,7 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Unable to initialize video for screen grab.");
-        return NULL;
+        return nullptr;
     }
 
     ClearAfterSeek();
@@ -4665,10 +4665,10 @@ char *MythPlayer::GetScreenGrabAtFrame(uint64_t frameNum, bool absolute,
 
     if (!(frame = videoOutput->GetLastDecodedFrame()))
     {
-        return NULL;
+        return nullptr;
     }
 
-    while (1)
+    while (true)
     {
         if (!(data = frame->buf))
         {
@@ -5363,6 +5363,8 @@ bool MythPlayer::ITVHandleAction(const QString &action)
 
     QMutexLocker locker(&itvLock);
     result = interactiveTV->OfferKey(action);
+#else
+    Q_UNUSED(action);
 #endif // USING_MHEG
 
     return result;
@@ -5380,6 +5382,10 @@ void MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
     QMutexLocker locker(&itvLock);
     interactiveTV->Restart(chanid, cardid, isLiveTV);
     itvVisible = false;
+#else
+    Q_UNUSED(chanid);
+    Q_UNUSED(cardid);
+    Q_UNUSED(isLiveTV);
 #endif // USING_MHEG
 }
 

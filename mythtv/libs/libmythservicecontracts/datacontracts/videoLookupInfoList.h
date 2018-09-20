@@ -50,7 +50,7 @@ class SERVICE_PUBLIC VideoLookupList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE VideoLookupList(QObject *parent = 0)
+        Q_INVOKABLE VideoLookupList(QObject *parent = nullptr)
             : QObject( parent ),
               m_Count         ( 0      )
         {

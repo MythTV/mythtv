@@ -14,7 +14,7 @@ public:
                             const QDateTime& recordingStopsAt_in);
 
     virtual void GetCommercialBreakList(frm_dir_map_t &comms);
-    virtual ~PrePostRollFlagger(){}
+    virtual ~PrePostRollFlagger() = default;
     bool go();
 
 private:

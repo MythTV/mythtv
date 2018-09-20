@@ -5,7 +5,7 @@
 
 HLSStreamWorker::HLSStreamWorker(HLSReader *parent)
     : MThread("HLSStream"),
-      m_parent(parent), m_downloader(NULL),
+      m_parent(parent), m_downloader(nullptr),
       m_cancel(false), m_wokenup(false)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
@@ -96,7 +96,7 @@ void HLSStreamWorker::run(void)
 
     m_downloader->Cancel();
     delete m_downloader;
-    m_downloader = NULL;
+    m_downloader = nullptr;
 
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
     RunEpilog();

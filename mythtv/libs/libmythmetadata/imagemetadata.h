@@ -99,7 +99,7 @@ public:
     static ImageMetaData* FromPicture(const QString &filePath);
     static ImageMetaData* FromVideo(const QString &filePath);
 
-    virtual ~ImageMetaData() {}
+    virtual ~ImageMetaData() = default;
 
     //! Unique separator to delimit fields within a string
     static const QString kSeparator;
@@ -117,9 +117,9 @@ public:
 
     virtual bool        IsValid()                                = 0;
     virtual QStringList GetAllTags()                             = 0;
-    virtual int         GetOrientation(bool *exists = NULL)      = 0;
-    virtual QDateTime   GetOriginalDateTime(bool *exists = NULL) = 0;
-    virtual QString     GetComment(bool *exists = NULL)          = 0;
+    virtual int         GetOrientation(bool *exists = nullptr)      = 0;
+    virtual QDateTime   GetOriginalDateTime(bool *exists = nullptr) = 0;
+    virtual QString     GetComment(bool *exists = nullptr)          = 0;
 
 protected:
     explicit ImageMetaData(const QString &filePath) : m_filePath(filePath) {}

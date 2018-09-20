@@ -40,9 +40,9 @@ class MBASE_PUBLIC PrivTcpServer : public QTcpServer
 {
     Q_OBJECT
   public:
-    PrivTcpServer(QObject *parent = 0,
+    PrivTcpServer(QObject *parent = nullptr,
                   PoolServerType type = kTCPServer);
-   ~PrivTcpServer() {};
+   ~PrivTcpServer() = default;
 
    PoolServerType GetServerType(void) { return m_serverType; }
 
@@ -61,7 +61,7 @@ class MBASE_PUBLIC ServerPool : public QObject
     Q_OBJECT
 
   public:
-    explicit ServerPool(QObject *parent=0);
+    explicit ServerPool(QObject *parent=nullptr);
    ~ServerPool(void);
 
     static void RefreshDefaultListen(void);
@@ -102,9 +102,9 @@ class MBASE_PUBLIC ServerPool : public QObject
     int tryBindingPort(int baseport, int range = 1);
     // Utility functions
     static int tryListeningPort(QTcpServer *server, int baseport,
-                                int range = 1, bool *isipv6 = NULL);
+                                int range = 1, bool *isipv6 = nullptr);
     static int tryBindingPort(QUdpSocket *socket, int baseport,
-                              int range = 1, bool *isipv6 = NULL);
+                              int range = 1, bool *isipv6 = nullptr);
 
   signals:
     void newConnection(QTcpSocket *);

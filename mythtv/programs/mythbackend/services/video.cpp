@@ -188,7 +188,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
 
     MetadataLookupList list;
 
-    MetadataFactory *factory = new MetadataFactory(NULL);
+    MetadataFactory *factory = new MetadataFactory(nullptr);
 
     if (factory)
         list = factory->SynchronousLookup(Title, Subtitle,

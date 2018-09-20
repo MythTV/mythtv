@@ -82,10 +82,6 @@ static MimeType SupportedMimeTypes[] =
 static int SupportedMimeTypesCount = sizeof(SupportedMimeTypes) /
                                         sizeof(SupportedMimeTypes[0]);
 
-MythNetworkAccessManager::MythNetworkAccessManager()
-{
-}
-
 QNetworkReply* MythNetworkAccessManager::createRequest(Operation op, const QNetworkRequest& req, QIODevice* outgoingData)
 {
     QNetworkReply* reply = QNetworkAccessManager::createRequest(op, req, outgoingData);
@@ -93,14 +89,14 @@ QNetworkReply* MythNetworkAccessManager::createRequest(Operation op, const QNetw
     return reply;
 }
 
-static MythNetworkAccessManager *networkManager = NULL;
+static MythNetworkAccessManager *networkManager = nullptr;
 
 static void DestroyNetworkAccessManager(void)
 {
     if (networkManager)
     {
         delete networkManager;
-        networkManager = NULL;
+        networkManager = nullptr;
     }
 }
 
@@ -130,7 +126,7 @@ static QNetworkAccessManager *GetNetworkAccessManager(void)
  */
 BrowserApi::BrowserApi(QObject *parent)
            : QObject(parent),
-            m_frame(NULL), m_gotAnswer(false)
+            m_frame(nullptr), m_gotAnswer(false)
 {
     gCoreContext->addListener(this);
 }
@@ -303,7 +299,7 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
 
         const ErrorPageExtensionOption *erroroption
                         = static_cast<const ErrorPageExtensionOption *>(option);
-        ErrorPageExtensionReturn *erroroutput = NULL;
+        ErrorPageExtensionReturn *erroroutput = nullptr;
         erroroutput = static_cast<ErrorPageExtensionReturn *>(output);
 
         QString filename = "htmls/notfound.html";
@@ -326,7 +322,7 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
         QBuffer imageBuffer;
         imageBuffer.open(QBuffer::ReadWrite);
         QIcon icon = qApp->style()->standardIcon(QStyle::SP_MessageBoxWarning,
-                                                 0, 0);
+                                                 nullptr, nullptr);
         QPixmap pixmap = icon.pixmap(QSize(32, 32));
 
         if (pixmap.save(&imageBuffer, "PNG"))
@@ -360,7 +356,7 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
     setPage(m_webpage);
 
     m_parentBrowser = parentBrowser;
-    m_busyPopup = NULL;
+    m_busyPopup = nullptr;
 
     connect(page(), SIGNAL(unsupportedContent(QNetworkReply *)),
             this, SLOT(handleUnsupportedContent(QNetworkReply *)));
@@ -374,7 +370,7 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
     m_api->setWebView(this);
 
     m_downloadAndPlay = false;
-    m_downloadReply = NULL;
+    m_downloadReply = nullptr;
 }
 
 MythWebView::~MythWebView(void)
@@ -485,7 +481,7 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 
 void  MythWebView::handleDownloadRequested(const QNetworkRequest &request)
 {
-    m_downloadReply = NULL;
+    m_downloadReply = nullptr;
     doDownloadRequested(request);
 }
 
@@ -599,7 +595,7 @@ void MythWebView::closeBusyPopup(void)
     if (m_busyPopup)
         m_busyPopup->Close();
 
-    m_busyPopup = NULL;
+    m_busyPopup = nullptr;
 }
 
 void MythWebView::customEvent(QEvent *event)
@@ -834,9 +830,9 @@ QWebView *MythWebView::createWindow(QWebPage::WebWindowType /* type */)
  */
 MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
                  : MythUIType(parent, name),
-      m_parentScreen(NULL),
-      m_browser(NULL),       m_browserArea(MythRect()),
-      m_actualBrowserArea(MythRect()), m_image(NULL),
+      m_parentScreen(nullptr),
+      m_browser(nullptr),    m_browserArea(MythRect()),
+      m_actualBrowserArea(MythRect()), m_image(nullptr),
       m_active(false),       m_wasActive(false),
       m_initialized(false),  m_lastUpdateTime(QTime()),
       m_updateInterval(0),   m_zoom(1.0),
@@ -845,7 +841,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_defaultSaveFilename(""),
       m_inputToggled(false), m_lastMouseAction(""),
       m_mouseKeyCount(0),    m_lastMouseActionTime(),
-      m_horizontalScrollbar(NULL), m_verticalScrollbar(NULL)
+      m_horizontalScrollbar(nullptr), m_verticalScrollbar(nullptr)
 {
     SetCanTakeFocus(true);
     m_scrollAnimation.setDuration(0);
@@ -951,7 +947,7 @@ void MythUIWebBrowser::Init(void)
             this, SLOT(slotLinkClicked(const QUrl &)));
 
     // find what screen we are on
-    m_parentScreen = NULL;
+    m_parentScreen = nullptr;
     QObject *parentObject = parent();
 
     while (parentObject)
@@ -1038,13 +1034,13 @@ MythUIWebBrowser::~MythUIWebBrowser()
         m_browser->hide();
         m_browser->disconnect();
         m_browser->deleteLater();
-        m_browser = NULL;
+        m_browser = nullptr;
     }
 
     if (m_image)
     {
         m_image->DecrRef();
-        m_image = NULL;
+        m_image = nullptr;
     }
 }
 
@@ -1139,7 +1135,7 @@ void MythUIWebBrowser::SetActive(bool active)
         m_browser->raise();
         if (qApp->platformName().contains("egl"))
         {
-            m_browser->setParent(0);
+            m_browser->setParent(nullptr);
             m_browser->setFocus();
             m_browser->show();
             m_browser->raise();
@@ -1398,7 +1394,7 @@ void MythUIWebBrowser::slotScrollBarShowing(void)
 void MythUIWebBrowser::slotScrollBarHiding(void)
 {
     SetActive(m_wasActive);
-    slotTopScreenChanged(NULL);
+    slotTopScreenChanged(nullptr);
 }
 
 void MythUIWebBrowser::slotTopScreenChanged(MythScreenType * /* screen */)

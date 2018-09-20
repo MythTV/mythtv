@@ -116,7 +116,7 @@ class SERVICE_PUBLIC CaptureCard : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE CaptureCard(QObject *parent = 0)
+        Q_INVOKABLE CaptureCard(QObject *parent = nullptr)
             : QObject         ( parent ), m_CardId(0), m_ParentId(0),
             m_AudioRateLimit(0), m_DVBSWFilter(0),
             m_DVBSatType(0), m_DVBWaitForSeqStart(false),

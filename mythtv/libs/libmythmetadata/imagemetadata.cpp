@@ -274,14 +274,14 @@ public:
 
     virtual bool        IsValid()                  { return m_image.get(); }
     virtual QStringList GetAllTags();
-    virtual int         GetOrientation(bool *exists = NULL);
-    virtual QDateTime   GetOriginalDateTime(bool *exists = NULL);
-    virtual QString     GetComment(bool *exists = NULL);
+    virtual int         GetOrientation(bool *exists = nullptr);
+    virtual QDateTime   GetOriginalDateTime(bool *exists = nullptr);
+    virtual QString     GetComment(bool *exists = nullptr);
 
 protected:
     static QString DecodeComment(std::string rawValue);
 
-    std::string GetTag(const QString &key, bool *exists = NULL);
+    std::string GetTag(const QString &key, bool *exists = nullptr);
 
     // Clang8 warns that 'AutoPtr' is deprecated. It was apparently
     // deprecated in glibc-2.27, and the exiv2 library hasn't been
@@ -296,7 +296,7 @@ protected:
    \param filePath Absolute image path
  */
 PictureMetaData::PictureMetaData(const QString &filePath)
-    : ImageMetaData(filePath), m_image(NULL), m_exifData()
+    : ImageMetaData(filePath), m_image(nullptr), m_exifData()
 {
     try
     {
@@ -499,12 +499,12 @@ public:
 
     virtual bool        IsValid()                        { return m_dict; }
     virtual QStringList GetAllTags();
-    virtual int         GetOrientation(bool *exists = NULL);
-    virtual QDateTime   GetOriginalDateTime(bool *exists = NULL);
-    virtual QString     GetComment(bool *exists = NULL);
+    virtual int         GetOrientation(bool *exists = nullptr);
+    virtual QDateTime   GetOriginalDateTime(bool *exists = nullptr);
+    virtual QString     GetComment(bool *exists = nullptr);
 
 protected:
-    QString GetTag(const QString &key, bool *exists = NULL);
+    QString GetTag(const QString &key, bool *exists = nullptr);
 
     AVFormatContext *m_context;
     //! FFmpeg tag dictionary
@@ -517,17 +517,17 @@ protected:
    \param filePath Absolute video path
  */
 VideoMetaData::VideoMetaData(const QString &filePath)
-    : ImageMetaData(filePath), m_context(NULL), m_dict(NULL)
+    : ImageMetaData(filePath), m_context(nullptr), m_dict(nullptr)
 {
-    AVInputFormat* p_inputformat = NULL;
+    AVInputFormat* p_inputformat = nullptr;
 
     // Open file
     if (avformat_open_input(&m_context, filePath.toLatin1().constData(),
-                            p_inputformat, NULL) < 0)
+                            p_inputformat, nullptr) < 0)
         return;
 
     // Locate video stream
-    int vidStream = av_find_best_stream(m_context, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+    int vidStream = av_find_best_stream(m_context, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
     if (vidStream >= 0)
         m_dict  = m_context->streams[vidStream]->metadata;
 
@@ -644,7 +644,7 @@ QString VideoMetaData::GetTag(const QString &key, bool *exists)
 {
     if (m_dict)
     {
-        AVDictionaryEntry *tag = NULL;
+        AVDictionaryEntry *tag = nullptr;
         while ((tag = av_dict_get(m_dict, "\0", tag, AV_DICT_IGNORE_SUFFIX)))
         {
             if (QString(tag->key) == key)

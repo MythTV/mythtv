@@ -7,7 +7,7 @@
 #include "mythuistatetracker.h"
 #include "mythuiactions.h"
 
-MythUIStateTracker* MythUIStateTracker::gUIState = NULL;
+MythUIStateTracker* MythUIStateTracker::gUIState = nullptr;
 QMutex* MythUIStateTracker::gUIStateLock = new QMutex();
 
 MythUIStateTracker* MythUIStateTracker::GetMythUIStateTracker(void)

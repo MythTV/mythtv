@@ -16,13 +16,9 @@
 MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
     : MythUIComposite(parent, name)
 {
-    m_CurrentState = NULL;
+    m_CurrentState = nullptr;
     m_ShowEmpty = true;
     emit DependChanged(false);
-}
-
-MythUIStateType::~MythUIStateType()
-{
 }
 
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
@@ -117,7 +113,7 @@ bool MythUIStateType::DisplayState(const QString &name)
     }
     AdjustDependence();
 
-    return (m_CurrentState != NULL);
+    return (m_CurrentState != nullptr);
 }
 
 bool MythUIStateType::DisplayState(StateType type)
@@ -129,7 +125,7 @@ bool MythUIStateType::DisplayState(StateType type)
     if (i != m_ObjectsByState.end())
         m_CurrentState = i.value();
     else
-        m_CurrentState = NULL;
+        m_CurrentState = nullptr;
 
     if (m_CurrentState != old)
     {
@@ -147,7 +143,7 @@ bool MythUIStateType::DisplayState(StateType type)
     }
     AdjustDependence();
 
-    return (m_CurrentState != NULL);
+    return (m_CurrentState != nullptr);
 }
 
 MythUIType *MythUIStateType::GetState(const QString &name)
@@ -157,7 +153,7 @@ MythUIType *MythUIStateType::GetState(const QString &name)
     if (m_ObjectsByName.contains(lcname))
         return m_ObjectsByName[lcname];
 
-    return NULL;
+    return nullptr;
 }
 
 MythUIType *MythUIStateType::GetState(StateType state)
@@ -165,7 +161,7 @@ MythUIType *MythUIStateType::GetState(StateType state)
     if (m_ObjectsByState.contains(state))
         return m_ObjectsByState[state];
 
-    return NULL;
+    return nullptr;
 }
 
 /*!
@@ -193,7 +189,7 @@ void MythUIStateType::Clear()
     m_ObjectsByName.clear();
     m_ObjectsByState.clear();
 
-    m_CurrentState = NULL;
+    m_CurrentState = nullptr;
     SetRedraw();
 }
 
@@ -209,7 +205,7 @@ void MythUIStateType::Reset()
             if (m_CurrentState)
                 m_CurrentState->SetVisible(false);
 
-            m_CurrentState = NULL;
+            m_CurrentState = nullptr;
         }
     }
 
@@ -237,7 +233,7 @@ bool MythUIStateType::ParseElement(
         element.setAttribute("name", statename);
 
         MythUIGroup *uitype = dynamic_cast<MythUIGroup *>
-                              (ParseUIType(filename, element, "group", this, NULL, showWarnings, dependsMap));
+                              (ParseUIType(filename, element, "group", this, nullptr, showWarnings, dependsMap));
 
         if (!type.isEmpty())
         {
@@ -371,7 +367,7 @@ void MythUIStateType::RecalculateArea(bool recurse)
 
 void MythUIStateType::AdjustDependence(void)
 {
-    if (m_CurrentState == NULL || !m_CurrentState->IsVisible())
+    if (m_CurrentState == nullptr || !m_CurrentState->IsVisible())
     {
         emit DependChanged(true);
         return;

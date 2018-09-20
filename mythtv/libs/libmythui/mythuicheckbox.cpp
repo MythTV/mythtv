@@ -15,7 +15,7 @@ MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
     m_currentCheckState = MythUIStateType::Off;
     m_state = "active";
 
-    m_BackgroundState = m_CheckState = NULL;
+    m_BackgroundState = m_CheckState = nullptr;
 
     connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
     connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
@@ -23,10 +23,6 @@ MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
     connect(this, SIGNAL(Disabling()), this, SLOT(Disable()));
 
     SetCanTakeFocus(true);
-}
-
-MythUICheckBox::~MythUICheckBox()
-{
 }
 
 void MythUICheckBox::SetInitialStates()

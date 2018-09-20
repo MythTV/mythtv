@@ -15,7 +15,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythcorecontext.h"
 
-static MythDB *mythdb = NULL;
+static MythDB *mythdb = nullptr;
 static QMutex dbLock;
 
 // For thread safety reasons this is not a QString
@@ -39,7 +39,7 @@ void MythDB::destroyMythDB(void)
 {
     dbLock.lock();
     delete mythdb;
-    mythdb = NULL;
+    mythdb = nullptr;
     dbLock.unlock();
 }
 

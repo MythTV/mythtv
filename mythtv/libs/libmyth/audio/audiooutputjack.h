@@ -62,7 +62,6 @@ class AudioOutputJACK : public AudioOutputBase
     int chan_volumes[JACK_CHANNELS_MAX];
     jack_client_t *client, *stale_client;
     int jack_latency;
-    bool jack_underrun;
     int jack_xruns;
     unsigned char *aubuf;
 

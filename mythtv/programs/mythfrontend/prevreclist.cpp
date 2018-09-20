@@ -56,11 +56,11 @@ static const int fDefault = fReverseSort;
 PrevRecordedList::PrevRecordedList(MythScreenStack *parent, uint recid,
     const QString &title) :
     ScheduleCommon(parent,"PrevRecordedList"),
-    m_titleList(NULL),
-    m_showList(NULL),
-    m_curviewText(NULL),
-    m_help1Text(NULL),
-    m_help2Text(NULL),
+    m_titleList(nullptr),
+    m_showList(nullptr),
+    m_curviewText(nullptr),
+    m_help1Text(nullptr),
+    m_help2Text(nullptr),
     m_titleGroup(true),
     m_reverseSort(false),
     m_allowEvents(true),
@@ -547,7 +547,7 @@ void PrevRecordedList::ShowMenu(void)
 
     MythMenu *menu = new MythMenu(tr("List Options"), this, "menu");
 
-    menu->AddItem(tr("Sort"), NULL, sortMenu);
+    menu->AddItem(tr("Sort"), nullptr, sortMenu);
 
     ProgramInfo *pi = GetCurrentProgram();
     if (pi)
@@ -714,7 +714,7 @@ ProgramInfo *PrevRecordedList::GetCurrentProgram(void) const
     int pos = m_showList->GetCurrentPos();
     if (pos >= 0 && pos < (int) m_showData.size())
         return m_showData[pos];
-    return NULL;
+    return nullptr;
 }
 
 void PrevRecordedList::ShowDeleteOldEpisodeMenu(void)

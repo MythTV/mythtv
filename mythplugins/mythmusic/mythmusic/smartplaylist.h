@@ -50,7 +50,7 @@ class SmartPLCriteriaRow
                        const QString &_Value1, const QString &_Value2);
     SmartPLCriteriaRow(void);
 
-    ~SmartPLCriteriaRow(void);
+    ~SmartPLCriteriaRow(void) = default;
 
     QString getSQL(void);
 
@@ -152,7 +152,7 @@ class CriteriaRowEditor : public MythScreenType
   public:
 
     CriteriaRowEditor(MythScreenStack *parent, SmartPLCriteriaRow *row);
-   ~CriteriaRowEditor(void);
+   ~CriteriaRowEditor(void) = default;
 
     bool Create(void);
 
@@ -212,7 +212,7 @@ class SmartPLResultViewer : public MythScreenType
   public:
 
     explicit SmartPLResultViewer(MythScreenStack *parent);
-   ~SmartPLResultViewer(void);
+   ~SmartPLResultViewer(void) = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);
@@ -237,7 +237,7 @@ class SmartPLOrderByDialog: public MythScreenType
   public:
 
     explicit SmartPLOrderByDialog(MythScreenStack *parent);
-    ~SmartPLOrderByDialog();
+    ~SmartPLOrderByDialog() = default;
 
     bool Create(void);
 
@@ -280,7 +280,7 @@ class SmartPLDateDialog: public MythScreenType
   public:
 
     explicit SmartPLDateDialog(MythScreenStack *parent);
-    ~SmartPLDateDialog();
+    ~SmartPLDateDialog() = default;
 
     bool Create(void);
 

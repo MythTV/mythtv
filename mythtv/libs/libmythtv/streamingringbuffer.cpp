@@ -7,7 +7,7 @@
 #define LOC QString("StreamRingBuf(%1): ").arg(filename)
 
 StreamingRingBuffer::StreamingRingBuffer(const QString &lfilename)
-  : RingBuffer(kRingBuffer_HTTP), m_context(NULL), m_streamed(true),
+  : RingBuffer(kRingBuffer_HTTP), m_context(nullptr), m_streamed(true),
     m_allowSeeks(false)
 {
     startreadahead = false;
@@ -64,7 +64,7 @@ bool StreamingRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
     }
 
     int res = ffurl_open(&m_context, url.toString().toLatin1(), AVIO_FLAG_READ,
-                         NULL, NULL);
+                         nullptr, nullptr);
     if (res >=0 && m_context &&
         !m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0)
     {

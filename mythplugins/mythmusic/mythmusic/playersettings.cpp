@@ -9,21 +9,16 @@
 
 PlayerSettings::PlayerSettings(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name),
-        m_resumeMode(NULL),
+        m_resumeMode(nullptr),
         m_resumeModeEditor(),
         m_resumeModeRadio(),
-        m_exitAction(NULL),
-        m_jumpAction(NULL),
-        m_autoLookupCD(NULL),
-        m_autoPlayCD(NULL),
-        m_saveButton(NULL),
-        m_cancelButton(NULL)
+        m_exitAction(nullptr),
+        m_jumpAction(nullptr),
+        m_autoLookupCD(nullptr),
+        m_autoPlayCD(nullptr),
+        m_saveButton(nullptr),
+        m_cancelButton(nullptr)
 {
-}
-
-PlayerSettings::~PlayerSettings()
-{
-
 }
 
 bool PlayerSettings::Create()

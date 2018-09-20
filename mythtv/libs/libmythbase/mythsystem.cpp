@@ -52,7 +52,7 @@ class MythSystemLegacyWrapper : public MythSystem
         Priority /*diskPriority*/)
     {
         if (args.empty())
-            return NULL;
+            return nullptr;
 
         QString program = args[0];
         QStringList other_args = args.mid(1);
@@ -67,7 +67,7 @@ class MythSystemLegacyWrapper : public MythSystem
         if ((ac & flags) == ac)
         {
             legacy->Run();
-            return NULL;
+            return nullptr;
         }
 
         MythSystemLegacyWrapper *wrapper =
@@ -127,12 +127,12 @@ class MythSystemLegacyWrapper : public MythSystem
     QIODevice *GetStandardInputStream(void) MOVERRIDE
     {
         if (!(kMSStdIn & m_flags))
-            return NULL;
+            return nullptr;
 
         if (!m_legacy->GetBuffer(0)->isOpen() &&
             !m_legacy->GetBuffer(0)->open(QIODevice::WriteOnly))
         {
-            return NULL;
+            return nullptr;
         }
 
         return m_legacy->GetBuffer(0);
@@ -143,14 +143,14 @@ class MythSystemLegacyWrapper : public MythSystem
     QIODevice *GetStandardOutputStream(void) MOVERRIDE
     {
         if (!(kMSStdOut & m_flags))
-            return NULL;
+            return nullptr;
 
         Wait(0); // legacy getbuffer is not thread-safe, so wait
 
         if (!m_legacy->GetBuffer(1)->isOpen() &&
             !m_legacy->GetBuffer(1)->open(QIODevice::ReadOnly))
         {
-            return NULL;
+            return nullptr;
         }
 
         return m_legacy->GetBuffer(1);
@@ -161,14 +161,14 @@ class MythSystemLegacyWrapper : public MythSystem
     QIODevice *GetStandardErrorStream(void) MOVERRIDE
     {
         if (!(kMSStdErr & m_flags))
-            return NULL;
+            return nullptr;
 
         Wait(0); // legacy getbuffer is not thread-safe, so wait
 
         if (!m_legacy->GetBuffer(2)->isOpen() &&
             !m_legacy->GetBuffer(2)->open(QIODevice::ReadOnly))
         {
-            return NULL;
+            return nullptr;
         }
 
         return m_legacy->GetBuffer(2);

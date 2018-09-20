@@ -74,8 +74,8 @@ int channel_select = -1;
 
 FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     srate(srate),
-    bufs(NULL),
-    decoder(0),
+    bufs(nullptr),
+    decoder(nullptr),
     in_count(0),
     out_count(0),
     processed(true),
@@ -153,7 +153,7 @@ FreeSurround::~FreeSurround()
     LOG(VB_AUDIO, LOG_DEBUG, QString("FreeSurround::~FreeSurround"));
     close();
     delete bufs;
-    bufs = NULL;
+    bufs = nullptr;
     LOG(VB_AUDIO, LOG_DEBUG, QString("FreeSurround::~FreeSurround done"));
 }
 
@@ -454,7 +454,7 @@ void FreeSurround::open()
 void FreeSurround::close()
 {
     delete decoder;
-    decoder = NULL;
+    decoder = nullptr;
 }
 
 uint FreeSurround::numUnprocessedFrames()

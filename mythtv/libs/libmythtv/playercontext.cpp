@@ -27,8 +27,8 @@ const uint PlayerContext::kSMExitTimeout     = 2000;
 const uint PlayerContext::kMaxChannelHistory = 30;
 
 PlayerContext::PlayerContext(const QString &inUseID) :
-    recUsage(inUseID), player(NULL), playerUnsafe(false), recorder(NULL),
-    tvchain(NULL), buffer(NULL), playingInfo(NULL), playingLen(0),
+    recUsage(inUseID), player(nullptr), playerUnsafe(false), recorder(nullptr),
+    tvchain(nullptr), buffer(nullptr), playingInfo(nullptr), playingLen(0),
     nohardwaredecoders(false), last_cardid(-1),
     // Fast forward state
     ff_rew_state(0), ff_rew_index(0), ff_rew_speed(0),
@@ -36,7 +36,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     playingState(kState_None),
     errored(false),
     // pseudo states
-    pseudoLiveTVRec(NULL), pseudoLiveTVState(kPseudoNormalLiveTV),
+    pseudoLiveTVRec(nullptr), pseudoLiveTVState(kPseudoNormalLiveTV),
     // DB values
     fftime(0), rewtime(0),
     jumptime(0), ts_normal(1.0f), ts_alt(1.5f),
@@ -44,7 +44,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     playingInfoLock(QMutex::Recursive), deletePlayerLock(QMutex::Recursive),
     stateLock(QMutex::Recursive),
     // pip
-    pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL), pipLocation(0),
+    pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(nullptr), pipLocation(0),
     useNullVideo(false)
 {
     lastSignalMsgTime.start();
@@ -64,11 +64,11 @@ void PlayerContext::TeardownPlayer(void)
     ff_rew_speed = 0;
     ts_normal    = 1.0f;
 
-    SetPlayer(NULL);
-    SetRecorder(NULL);
-    SetRingBuffer(NULL);
-    SetTVChain(NULL);
-    SetPlayingInfo(NULL);
+    SetPlayer(nullptr);
+    SetRecorder(nullptr);
+    SetRingBuffer(nullptr);
+    SetTVChain(nullptr);
+    SetPlayingInfo(nullptr);
 }
 
 /**
@@ -211,9 +211,9 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
 
     if (useNullVideo || !ok)
     {
-        SetPlayer(NULL);
+        SetPlayer(nullptr);
         useNullVideo = true;
-        ok = CreatePlayer(tv, NULL, desiredState,
+        ok = CreatePlayer(tv, nullptr, desiredState,
                           false);
     }
 
@@ -239,10 +239,10 @@ void PlayerContext::PIPTeardown(void)
         StopPlaying();
     }
 
-    SetPlayer(NULL);
+    SetPlayer(nullptr);
 
     useNullVideo = false;
-    parentWidget = NULL;
+    parentWidget = nullptr;
 }
 
 /**
@@ -388,7 +388,7 @@ bool PlayerContext::CreatePlayer(TV *tv, QWidget *widget,
     playerflags |= useNullVideo       ? kVideoIsNull : kNoFlags;
     playerflags |= nohardwaredecoders ? kNoFlags : kDecodeAllowGPU;
 
-    MythPlayer *player = NULL;
+    MythPlayer *player = nullptr;
     if (kState_WatchingBD  == desiredState)
         player = new MythBDPlayer((PlayerFlags)playerflags);
     else if (kState_WatchingDVD == desiredState)
@@ -828,7 +828,7 @@ void PlayerContext::SetRecorder(RemoteEncoder *rec)
     if (recorder)
     {
         delete recorder;
-        recorder = NULL;
+        recorder = nullptr;
     }
 
     if (rec)
@@ -844,7 +844,7 @@ void PlayerContext::SetTVChain(LiveTVChain *chain)
     {
         tvchain->DestroyChain();
         tvchain->DecrRef();
-        tvchain = NULL;
+        tvchain = nullptr;
     }
 
     tvchain = chain;
@@ -867,7 +867,7 @@ void PlayerContext::SetRingBuffer(RingBuffer *buf)
     if (buffer)
     {
         delete buffer;
-        buffer = NULL;
+        buffer = nullptr;
     }
 
     buffer = buf;
@@ -887,7 +887,7 @@ void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
         if (!ignoreDB)
             playingInfo->MarkAsInUse(false, recUsage);
         delete playingInfo;
-        playingInfo = NULL;
+        playingInfo = nullptr;
     }
 
     if (info)
@@ -912,7 +912,7 @@ void PlayerContext::SetPseudoLiveTV(
     const ProgramInfo *pi, PseudoState new_state)
 {
     ProgramInfo *old_rec = pseudoLiveTVRec;
-    ProgramInfo *new_rec = NULL;
+    ProgramInfo *new_rec = nullptr;
 
     if (pi)
     {

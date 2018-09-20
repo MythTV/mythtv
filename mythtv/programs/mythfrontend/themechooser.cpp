@@ -75,16 +75,16 @@ class ThemeExtractThread : public QRunnable
 ThemeChooser::ThemeChooser(MythScreenStack *parent,
                            const QString &name) :
     MythScreenType(parent, name),
-    m_themes(NULL),
-    m_preview(NULL),
+    m_themes(nullptr),
+    m_preview(nullptr),
     m_fullPreviewShowing(false),
-    m_fullPreviewStateType(NULL),
-    m_fullScreenName(NULL),
-    m_fullScreenPreview(NULL),
+    m_fullPreviewStateType(nullptr),
+    m_fullScreenName(nullptr),
+    m_fullScreenPreview(nullptr),
     m_refreshDownloadableThemes(false),
-    m_downloadTheme(NULL),
+    m_downloadTheme(nullptr),
     m_downloadState(dsIdle),
-    m_popupMenu(NULL)
+    m_popupMenu(nullptr)
 {
     gCoreContext->addListener(this);
 
@@ -389,7 +389,7 @@ void ThemeChooser::LoadVersion(const QString &version,
                         GetMythDownloadManager()->queueDownload(
                             remoteDir.append("/").append(finfo.fileName()),
                             localDir.append("/").append(finfo.fileName()),
-                            NULL);
+                            nullptr);
                     }
                 }
                 else if ((rmtMaj == locMaj) &&
@@ -422,7 +422,7 @@ void ThemeChooser::LoadVersion(const QString &version,
                     GetMythDownloadManager()->queueDownload(
                         remoteDir.append("/").append(finfo.fileName()),
                         localDir.append("/").append(finfo.fileName()),
-                        NULL);
+                        nullptr);
                 }
             }
         }
@@ -433,9 +433,9 @@ void ThemeChooser::LoadVersion(const QString &version,
 void ThemeChooser::Init(void)
 {
     QString curTheme = gCoreContext->GetSetting("Theme");
-    ThemeInfo *themeinfo = NULL;
-    ThemeInfo *curThemeInfo = NULL;
-    MythUIButtonListItem *item = NULL;
+    ThemeInfo *themeinfo = nullptr;
+    ThemeInfo *curThemeInfo = nullptr;
+    MythUIButtonListItem *item = nullptr;
 
     m_themes->Reset();
     for( QFileInfoList::iterator it =  m_infoList.begin();
@@ -508,21 +508,21 @@ void ThemeChooser::Init(void)
 ThemeInfo *ThemeChooser::loadThemeInfo(QFileInfo &theme)
 {
     if (theme.fileName() == "default" || theme.fileName() == "default-wide")
-        return NULL;
+        return nullptr;
 
-    ThemeInfo *themeinfo = NULL;
+    ThemeInfo *themeinfo = nullptr;
     if (theme.exists()) // local directory vs http:// or remote URL
         themeinfo = new ThemeInfo(theme.absoluteFilePath());
     else
         themeinfo = new ThemeInfo(theme.filePath());
 
     if (!themeinfo)
-        return NULL;
+        return nullptr;
 
     if (themeinfo->GetName().isEmpty() || !(themeinfo->GetType() & THEME_UI))
     {
         delete themeinfo;
-        return NULL;
+        return nullptr;
     }
 
     m_themeFileNameInfos[theme.filePath()] = themeinfo;
@@ -549,7 +549,7 @@ void ThemeChooser::showPopupMenu(void)
     else
     {
         delete m_popupMenu;
-        m_popupMenu = NULL;
+        m_popupMenu = nullptr;
         return;
     }
 
@@ -597,7 +597,7 @@ void ThemeChooser::popupClosed(QString which, int result)
     (void)which;
     (void)result;
 
-    m_popupMenu = NULL;
+    m_popupMenu = nullptr;
 }
 
 bool ThemeChooser::keyPressEvent(QKeyEvent *event)
@@ -1057,7 +1057,7 @@ ThemeUpdateChecker::~ThemeUpdateChecker()
     {
         m_updateTimer->stop();
         delete m_updateTimer;
-        m_updateTimer = NULL;
+        m_updateTimer = nullptr;
     }
 }
 
@@ -1066,7 +1066,7 @@ void ThemeUpdateChecker::checkForUpdate(void)
     if (GetMythUI()->GetCurrentLocation(false, true) != "mainmenu")
         return;
 
-    ThemeInfo *localTheme = NULL;
+    ThemeInfo *localTheme = nullptr;
 
     if (RemoteFile::Exists(m_infoPackage))
     {
@@ -1103,7 +1103,7 @@ void ThemeUpdateChecker::checkForUpdate(void)
                                 "Unable to create ThemeInfo for %1")
                         .arg(infoXML));
                     delete remoteTheme;
-                    remoteTheme = NULL;
+                    remoteTheme = nullptr;
                     return;
                 }
 
@@ -1116,7 +1116,7 @@ void ThemeUpdateChecker::checkForUpdate(void)
                             "ThemeUpdateChecker::checkForUpdate(): "
                             "Unable to create ThemeInfo for current theme");
                         delete localTheme;
-                        localTheme = NULL;
+                        localTheme = nullptr;
                         return;
                     }
                     locMaj = localTheme->GetMajorVersion();
@@ -1127,7 +1127,7 @@ void ThemeUpdateChecker::checkForUpdate(void)
                 int rmtMin = remoteTheme->GetMinorVersion();
 
                 delete remoteTheme;
-                remoteTheme = NULL;
+                remoteTheme = nullptr;
 
                 if ((rmtMaj > locMaj) ||
                     ((rmtMaj == locMaj) &&

@@ -29,7 +29,7 @@ MythObservable::~MythObservable()
     m_listeners.clear();
     m_lock->unlock();
     delete m_lock;
-    m_lock = NULL;
+    m_lock = nullptr;
 }
 
 /** \brief Add a listener to the observable

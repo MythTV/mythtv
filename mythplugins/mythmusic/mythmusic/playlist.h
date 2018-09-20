@@ -108,7 +108,7 @@ class Playlist : public QObject
     int  getID(void) { return m_playlistid; }
     void setID(int x) { m_playlistid = x; }
 
-    void getStats(uint *trackCount, uint *totalLength, uint currentTrack = 0, uint *playedLength = NULL) const;
+    void getStats(uint *trackCount, uint *totalLength, uint currentTrack = 0, uint *playedLength = nullptr) const;
 
     void resync(void);
 

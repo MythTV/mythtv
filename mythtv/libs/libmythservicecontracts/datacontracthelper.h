@@ -87,7 +87,7 @@
     public:                             \
     type* name()                        \
     {                                   \
-        if (m_##name == NULL)           \
+        if (m_##name == nullptr)        \
             m_##name = new type( this );\
         return m_##name;                \
     }
@@ -118,7 +118,7 @@ inline void DeleteListContents( QVariantList &list )
 
         const QObject *pObject = vValue.value< QObject* >();
 
-        if (pObject != NULL)
+        if (pObject != nullptr)
             delete pObject;
     }
 }
@@ -136,7 +136,7 @@ void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &
         {
             const QObject *pObject = vValue.value< QObject* >();
 
-            if (pObject != NULL)
+            if (pObject != nullptr)
             {
                 QObject *pNew = new T( pParent );
 

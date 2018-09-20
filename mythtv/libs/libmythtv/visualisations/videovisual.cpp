@@ -2,7 +2,7 @@
 #include "mythplayer.h"
 #include "videovisual.h"
 
-VideoVisualFactory* VideoVisualFactory::g_videoVisualFactory = NULL;
+VideoVisualFactory* VideoVisualFactory::g_videoVisualFactory = nullptr;
 
 bool VideoVisual::CanVisualise(AudioPlayer *audio, MythRender *render)
 {
@@ -31,7 +31,7 @@ VideoVisual* VideoVisual::Create(const QString &name,
                                  AudioPlayer *audio, MythRender *render)
 {
     if (!audio || !render || name.isEmpty())
-        return NULL;
+        return nullptr;
 
     const VideoVisualFactory* factory;
     for (factory = VideoVisualFactory::VideoVisualFactories();
@@ -42,7 +42,7 @@ VideoVisual* VideoVisual::Create(const QString &name,
         else if (factory->name() == name)
             return factory->Create(audio, render);
     }
-    return NULL;
+    return nullptr;
 }
 
 VideoVisual::VideoVisual(AudioPlayer *audio, MythRender *render)
@@ -101,7 +101,7 @@ VisualNode* VideoVisual::GetNode(void)
     }
 
     if (m_nodes.isEmpty())
-        return NULL;
+        return nullptr;
 
     return m_nodes.first();
 }
@@ -143,7 +143,7 @@ void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c
         return;
 
     long len = b_len, cnt;
-    short *l = 0, *r = 0;
+    short *l = nullptr, *r = nullptr;
 
     len /= c;
     len /= (p / 8);

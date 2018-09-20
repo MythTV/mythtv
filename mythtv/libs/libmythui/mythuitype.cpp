@@ -60,7 +60,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_deferload = false;
     m_IsDependDefault = false;
 
-    m_Parent = NULL;
+    m_Parent = nullptr;
 
     if (parent)
     {
@@ -74,7 +74,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 
     m_Fonts = new FontMap();
     m_focusOrder = 0;
-    m_Painter = NULL;
+    m_Painter = nullptr;
 
     m_BorderColor = QColor(random() % 255, random()  % 255, random()  % 255);
 }
@@ -117,7 +117,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                              bool recursiveSearch, const QObjectList &children)
 {
     if (children.isEmpty())
-        return 0;
+        return nullptr;
 
     bool onlyWidgets = (inheritsClass
                         && qstrcmp(inheritsClass, "QWidget") == 0);
@@ -136,30 +136,30 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                  && (!objName || obj->objectName() == oName))
             return obj;
 
-        if (recursiveSearch && (dynamic_cast<MythUIGroup *>(obj) != NULL)
+        if (recursiveSearch && (dynamic_cast<MythUIGroup *>(obj) != nullptr)
             && (obj = qChildHelper(objName, inheritsClass,
                                    recursiveSearch,
                                    obj->children())))
             return obj;
     }
 
-    return 0;
+    return nullptr;
 }
 
 /**
  *  \brief Get a named child of this UIType
  *
  *  \param name Name of child
- *  \return Pointer to child if found, or NULL
+ *  \return Pointer to child if found, or nullptr
  */
 MythUIType *MythUIType::GetChild(const QString &name) const
 {
-    QObject *ret = qChildHelper(name.toLatin1().constData(), NULL, true, children());
+    QObject *ret = qChildHelper(name.toLatin1().constData(), nullptr, true, children());
 
     if (ret)
         return dynamic_cast<MythUIType *>(ret);
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -189,7 +189,7 @@ void MythUIType::DeleteChild(const QString &name)
  *  \brief Delete the given UIType if it is a child of this UIType.
  *
  *  Will not delete the object if it is not a child. Pointer will be set to
- *  NULL if successful.
+ *  nullptr if successful.
  */
 void MythUIType::DeleteChild(MythUIType *child)
 {
@@ -207,7 +207,7 @@ void MythUIType::DeleteChild(MythUIType *child)
         {
             delete type;
             it.remove();
-            child = NULL;
+            child = nullptr;
             return;
         }
     }
@@ -249,10 +249,10 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
     if (GetArea().contains(p))
     {
         if (!IsVisible() || !IsEnabled())
-            return NULL;
+            return nullptr;
 
         if (m_ChildrenList.isEmpty())
-            return NULL;
+            return nullptr;
 
         /* check all children */
         QList<MythUIType *>::const_iterator it;
@@ -287,7 +287,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void MythUIType::ActivateAnimations(MythUIAnimation::Trigger trigger)

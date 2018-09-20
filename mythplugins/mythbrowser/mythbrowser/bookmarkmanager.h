@@ -34,8 +34,8 @@ class BrowserConfig : public MythScreenType
 
   public:
 
-    BrowserConfig(MythScreenStack *parent, const char *name = 0);
-    ~BrowserConfig();
+    BrowserConfig(MythScreenStack *parent, const char *name = nullptr);
+    ~BrowserConfig() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

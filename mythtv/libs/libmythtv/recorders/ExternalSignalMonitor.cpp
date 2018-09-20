@@ -41,7 +41,7 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
                                              bool _release_stream,
                                              uint64_t _flags)
     : DTVSignalMonitor(db_cardnum, _channel, _flags, _release_stream),
-      m_stream_handler(NULL), m_stream_handler_started(false), m_lock_timeout(0)
+      m_stream_handler(nullptr), m_stream_handler_started(false), m_lock_timeout(0)
 {
     QString result;
 

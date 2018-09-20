@@ -32,7 +32,7 @@ static QString state_to_string(pa_context_state state)
     return ret;
 }
 
-PulseHandler* PulseHandler::g_pulseHandler = NULL;
+PulseHandler* PulseHandler::g_pulseHandler = nullptr;
 bool          PulseHandler::g_pulseHandlerActive = false;
 
 bool PulseHandler::Suspend(enum PulseAction action)
@@ -48,7 +48,7 @@ bool PulseHandler::Suspend(enum PulseAction action)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Cleaning up PulseHandler");
             delete g_pulseHandler;
-            g_pulseHandler = NULL;
+            g_pulseHandler = nullptr;
         }
         return true;
     }
@@ -87,7 +87,7 @@ bool PulseHandler::Suspend(enum PulseAction action)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "PulseHandler invalidated. Deleting.");
         delete g_pulseHandler;
-        g_pulseHandler = NULL;
+        g_pulseHandler = nullptr;
     }
 
     // create our handler
@@ -195,9 +195,9 @@ static void OperationCallback(pa_context *ctx, int success, void *userdata)
 }
 
 PulseHandler::PulseHandler(void)
-  : m_ctx_state(PA_CONTEXT_UNCONNECTED), m_ctx(NULL), m_pending_operations(0),
-    m_loop(NULL), m_initialised(false), m_valid(false),
-    m_thread(NULL)
+  : m_ctx_state(PA_CONTEXT_UNCONNECTED), m_ctx(nullptr), m_pending_operations(0),
+    m_loop(nullptr), m_initialised(false), m_valid(false),
+    m_thread(nullptr)
 {
 }
 
@@ -272,7 +272,7 @@ bool PulseHandler::Init(void)
     // we set the callback, connect and then run the main loop 'by hand'
     // until we've successfully connected (or not)
     pa_context_set_state_callback(m_ctx, StatusCallback, this);
-    pa_context_connect(m_ctx, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL);
+    pa_context_connect(m_ctx, nullptr, PA_CONTEXT_NOAUTOSPAWN, nullptr);
     int ret = 0;
     int tries = 0;
     while ((tries++ < 100) && !IS_READY(m_ctx_state))

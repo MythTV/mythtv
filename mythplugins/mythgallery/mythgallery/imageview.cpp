@@ -30,6 +30,7 @@
 #include <QMutexLocker>
 #include <QRunnable>
 #include <QWaitCondition>
+#include <random>
 
 // MythTV plugin headers
 #include <mythcontext.h>
@@ -95,16 +96,16 @@ ImageView::ImageView(const ThumbList &itemList,
       m_slideshow_sequencing(slideShow),
       m_slideshow_frame_delay(2),
       m_slideshow_frame_delay_state(m_slideshow_frame_delay * 1000),
-      m_slideshow_timer(NULL),
+      m_slideshow_timer(nullptr),
 
       // Common effect state variables
       m_effect_running(false),
       m_effect_current_frame(0),
       m_effect_random(false),
 
-      m_loaderRunnable(NULL),
+      m_loaderRunnable(nullptr),
       m_listener(this),
-      m_loaderThread(NULL),
+      m_loaderThread(nullptr),
       m_slideshow_sequence(ComposeSlideshowSequence(slideShow)),
       m_finishedLoading(false)
 {
@@ -118,7 +119,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     bool recurse = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
 
-    ThumbItem *origItem = NULL;
+    ThumbItem *origItem = nullptr;
     if (m_pos < itemList.size())
         origItem = itemList.at(m_pos);
 
@@ -180,7 +181,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
 ImageView::~ImageView()
 {
-    UpdateLCD(NULL);
+    UpdateLCD(nullptr);
     if (m_loaderRunnable && m_loaderThread)
     {
         m_loaderRunnable->abort();
@@ -190,19 +191,19 @@ ImageView::~ImageView()
     if (m_slideshow_sequence)
     {
         delete m_slideshow_sequence;
-        m_slideshow_sequence = NULL;
+        m_slideshow_sequence = nullptr;
     }
 
     if (m_loaderRunnable)
     {
         delete m_loaderRunnable;
-        m_loaderRunnable = NULL;
+        m_loaderRunnable = nullptr;
     }
 
     if (m_loaderThread)
     {
         delete m_loaderThread;
-        m_loaderThread = NULL;
+        m_loaderThread = nullptr;
     }
 
     *m_savedPos = m_pos;
@@ -407,7 +408,7 @@ void ImageView::LoadAlbumRunnable::run()
         ThumbList children;
         GalleryUtil::LoadDirectory(children, dir->GetPath(),
                                    GalleryFilter(m_sortorder != 0),
-                                   false, NULL, NULL);
+                                   false, nullptr, nullptr);
 
         {
             QMutexLocker guard(&m_isAliveLock);
@@ -420,7 +421,8 @@ void ImageView::LoadAlbumRunnable::run()
         // The first images should not always come from the first directory.
         if (m_slideshow_sequencing > 1)
         {
-            std::random_shuffle(children.begin(), children.end());
+            std::shuffle(children.begin(), children.end(),
+                         std::mt19937(std::random_device()()));
         }
 
         ThumbList fileList;
@@ -446,10 +448,6 @@ void ImageView::LoadAlbumRunnable::filterDirectories(const ThumbList &input,
 
 LoadAlbumListener::LoadAlbumListener(ImageView *parent)
     : m_parent(parent)
-{
-}
-
-LoadAlbumListener::~LoadAlbumListener()
 {
 }
 

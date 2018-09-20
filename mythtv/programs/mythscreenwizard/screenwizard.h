@@ -20,7 +20,7 @@ class ScreenWizard : public MythScreenType
   public:
 
     ScreenWizard(MythScreenStack *parent, const char *name);
-    ~ScreenWizard();
+    ~ScreenWizard() = default;
 
     void SetInitialSettings(int _x, int _y, int _w, int _h);
     bool Create(void);

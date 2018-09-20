@@ -85,13 +85,13 @@ bool getUptime(time_t &uptime)
     len    = sizeof(bootTime);
     mib[0] = CTL_KERN;
     mib[1] = KERN_BOOTTIME;
-    if (sysctl(mib, 2, &bootTime, &len, NULL, 0) == -1)
+    if (sysctl(mib, 2, &bootTime, &len, nullptr, 0) == -1)
     {
         LOG(VB_GENERAL, LOG_ERR, "sysctl() error");
         return false;
     }
     else
-        uptime = time(NULL) - bootTime.tv_sec;
+        uptime = time(nullptr) - bootTime.tv_sec;
 #elif defined(_WIN32)
     uptime = ::GetTickCount() / 1000;
 #else
@@ -1130,7 +1130,7 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
         {
             // one digit-sequence starts with 0 -> assume we are in a fraction part
             // do left aligned comparison (numbers are considered left aligned)
-            while (1)
+            while (true)
             {
                 if (!currA->isDigit() && !currB->isDigit())
                 {
@@ -1168,7 +1168,7 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
             bool isFirstRun = true;
             int weight = 0;
 
-            while (1)
+            while (true)
             {
                 if (!currA->isDigit() && !currB->isDigit())
                 {

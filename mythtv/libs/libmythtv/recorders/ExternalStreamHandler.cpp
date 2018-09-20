@@ -32,7 +32,7 @@
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
     : m_appin(-1), m_appout(-1), m_apperr(-1),
-      m_pid(-1), m_bufsize(0), m_buffer(NULL),
+      m_pid(-1), m_bufsize(0), m_buffer(nullptr),
       m_status(&m_status_buf, QIODevice::ReadWrite),
       m_errcnt(0)
 
@@ -430,7 +430,7 @@ void ExternIO::Fork(void)
         arguments[i] = new char[len];
         memcpy(arguments[i], m_args[i].toStdString().c_str(), len);
     }
-    arguments[m_args.size()] = reinterpret_cast<char *>(0);
+    arguments[m_args.size()] = nullptr;
 
     if (execv(command, arguments) < 0)
     {
@@ -510,7 +510,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         --(*rit);
         return;
     }
@@ -530,7 +530,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     }
 
     m_handlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 /*
@@ -538,7 +538,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
  */
 
 ExternalStreamHandler::ExternalStreamHandler(const QString & path) :
-    StreamHandler(path), m_IO(0), m_tsopen(false), m_io_errcnt(0),
+    StreamHandler(path), m_IO(nullptr), m_tsopen(false), m_io_errcnt(0),
     m_poll_mode(false), m_notify(false), m_replay(true)
 {
     setObjectName("ExternSH");
@@ -756,7 +756,7 @@ bool ExternalStreamHandler::OpenApp(void)
 
         m_IO = new ExternIO(m_app, m_args);
 
-        if (m_IO == NULL)
+        if (m_IO == nullptr)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "ExternIO failed: " + ENO);
             _error = true;
@@ -770,7 +770,7 @@ bool ExternalStreamHandler::OpenApp(void)
                 LOG(VB_GENERAL, LOG_ERR,
                     "Failed to start External Recorder: " + m_IO->ErrorString());
                 delete m_IO;
-                m_IO = NULL;
+                m_IO = nullptr;
                 _error = true;
                 return false;
             }
@@ -827,7 +827,7 @@ bool ExternalStreamHandler::OpenApp(void)
 
 bool ExternalStreamHandler::IsAppOpen(void)
 {
-    if (m_IO == NULL)
+    if (m_IO == nullptr)
     {
         LOG(VB_RECORD, LOG_WARNING, LOC +
             "WARNING: Unable to communicate with external app.");
@@ -886,7 +886,7 @@ void ExternalStreamHandler::CloseApp(void)
             }
         }
         delete m_IO;
-        m_IO = 0;
+        m_IO = nullptr;
     }
     m_IO_lock.unlock();
 }

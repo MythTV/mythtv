@@ -53,7 +53,7 @@ MythXDisplay *GetMythXDisplay(Display *d)
 {
     if (xdisplays.count(d))
         return xdisplays[d];
-    return NULL;
+    return nullptr;
 }
 
 MythXDisplay *OpenMythXDisplay(void)
@@ -64,12 +64,12 @@ MythXDisplay *OpenMythXDisplay(void)
 
     LOG(VB_GENERAL, LOG_CRIT, "MythXOpenDisplay() failed");
     delete disp;
-    return NULL;
+    return nullptr;
 }
 
 MythXDisplay::MythXDisplay()
-  : m_disp(NULL), m_screen_num(0), m_screen(NULL),
-    m_depth(0), m_black(0), m_gc(0),
+  : m_disp(nullptr), m_screen_num(0), m_screen(nullptr),
+    m_depth(0), m_black(0), m_gc(nullptr),
     m_root(0), m_lock(QMutex::Recursive)
 {
 }
@@ -85,7 +85,7 @@ MythXDisplay::~MythXDisplay()
         if (xdisplays.count(m_disp))
             xdisplays.erase(m_disp);
         XCloseDisplay(m_disp);
-        m_disp = NULL;
+        m_disp = nullptr;
     }
 }
 
@@ -94,7 +94,7 @@ bool MythXDisplay::Open(void)
     MythXLocker locker(this);
 
     QString dispStr = GetMythUI()->GetX11Display();
-    const char *dispCStr = NULL;
+    const char *dispCStr = nullptr;
     if (!dispStr.isEmpty())
         dispCStr = dispStr.toLatin1().constData();
 
@@ -115,7 +115,7 @@ bool MythXDisplay::Open(void)
 bool MythXDisplay::CreateGC(Window win)
 {
     StartLog();
-    XLOCK(this, m_gc = XCreateGC(m_disp, win, 0, NULL));
+    XLOCK(this, m_gc = XCreateGC(m_disp, win, 0, nullptr));
     return StopLog();
 }
 

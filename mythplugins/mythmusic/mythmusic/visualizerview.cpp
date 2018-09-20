@@ -27,10 +27,6 @@ VisualizerView::VisualizerView(MythScreenStack *parent, MythScreenType *parentSc
     m_currentView = MV_VISUALIZER;
 }
 
-VisualizerView::~VisualizerView()
-{
-}
-
 bool VisualizerView::Create(void)
 {
     // Load the theme for this screen
@@ -100,9 +96,9 @@ void VisualizerView::ShowMenu(void)
 
     MythMenu *menu = new MythMenu(label, this, "menu");
 
-    menu->AddItem(tr("Change Visualizer"), NULL, createVisualizerMenu());
+    menu->AddItem(tr("Change Visualizer"), nullptr, createVisualizerMenu());
     menu->AddItem(tr("Show Track Info"), SLOT(showTrackInfoPopup()));
-    menu->AddItem(tr("Other Options"), NULL, createMainMenu());
+    menu->AddItem(tr("Other Options"), nullptr, createMainMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -138,7 +134,7 @@ TrackInfoPopup::TrackInfoPopup(MythScreenStack *parent, MusicMetadata *metadata)
          : MythScreenType(parent, "trackinfopopup", false)
 {
     m_metadata = metadata;
-    m_displayTimer = NULL;
+    m_displayTimer = nullptr;
 }
 
 TrackInfoPopup::~TrackInfoPopup(void)
@@ -147,7 +143,7 @@ TrackInfoPopup::~TrackInfoPopup(void)
     {
         m_displayTimer->stop();
         delete m_displayTimer;
-        m_displayTimer = NULL;
+        m_displayTimer = nullptr;
     }
 }
 

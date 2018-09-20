@@ -96,8 +96,8 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
     m_lock.unlock();
 
     delete m_reply;
-    m_reply = NULL;
-    m_buffer = NULL;
+    m_reply = nullptr;
+    m_buffer = nullptr;
 
     return ret;
 }

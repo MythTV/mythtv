@@ -23,19 +23,19 @@
 using namespace std;
 
 FIFOWriter::FIFOWriter(int count, bool sync) :
-    fifo_buf(NULL),
-    fb_inptr(NULL),
-    fb_outptr(NULL),
-    fifothrds(NULL),
-    fifo_lock(NULL),
-    full_cond(NULL),
-    empty_cond(NULL),
-    filename(NULL),
-    fbdesc(NULL),
-    maxblksize(NULL),
-    killwr(NULL),
-    fbcount(NULL),
-    fbmaxcount( NULL),
+    fifo_buf(nullptr),
+    fb_inptr(nullptr),
+    fb_outptr(nullptr),
+    fifothrds(nullptr),
+    fifo_lock(nullptr),
+    full_cond(nullptr),
+    empty_cond(nullptr),
+    filename(nullptr),
+    fbdesc(nullptr),
+    maxblksize(nullptr),
+    killwr(nullptr),
+    fbcount(nullptr),
+    fbmaxcount( nullptr),
     num_fifos(count),
     usesync(sync)
 {
@@ -150,7 +150,7 @@ void FIFOWriter::FIFOWriteThread(int id)
     int fd = -1;
 
     QMutexLocker flock(&fifo_lock[id]);
-    while (1)
+    while (true)
     {
         if ((fb_inptr[id] == fb_outptr[id]) && (0 == killwr[id]))
             empty_cond[id].wait(flock.mutex());

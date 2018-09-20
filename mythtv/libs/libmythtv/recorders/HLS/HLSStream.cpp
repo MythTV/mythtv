@@ -100,7 +100,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
     int aeslen = data.size() & ~0xf;
     unsigned char iv[AES_BLOCK_SIZE];
     char *decrypted_data = new char[data.size()];
-    if (IV == NULL)
+    if (IV == nullptr)
     {
         /*
          * If the EXT-X-KEY tag does not have the IV attribute,

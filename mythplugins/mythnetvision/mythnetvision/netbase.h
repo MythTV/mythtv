@@ -20,7 +20,7 @@ class NetBase : public MythScreenType
   Q_OBJECT
 
   public:
-    NetBase(MythScreenStack *parent, const char *name = 0);
+    NetBase(MythScreenStack *parent, const char *name = nullptr);
     virtual ~NetBase();
 
   protected:

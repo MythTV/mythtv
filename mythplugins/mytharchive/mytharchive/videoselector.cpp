@@ -28,12 +28,12 @@ using namespace std;
 
 VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
               :MythScreenType(parent, "VideoSelector"),
-               m_archiveList(archiveList), m_videoList(NULL),
+               m_archiveList(archiveList), m_videoList(nullptr),
                m_currentParentalLevel(ParentalLevel::plNone),
-               m_plText(NULL), m_videoButtonList(NULL), m_warningText(),
-               m_okButton(NULL), m_cancelButton(NULL), m_categorySelector(NULL),
-               m_titleText(NULL), m_filesizeText(NULL), m_plotText(NULL),
-               m_coverImage(NULL)
+               m_plText(nullptr), m_videoButtonList(nullptr), m_warningText(),
+               m_okButton(nullptr), m_cancelButton(nullptr), m_categorySelector(nullptr),
+               m_titleText(nullptr), m_filesizeText(nullptr), m_plotText(nullptr),
+               m_coverImage(nullptr)
 {
     m_parentalLevelChecker = new ParentalLevelChangeChecker();
     connect(m_parentalLevelChecker, SIGNAL(SigResultReady(bool, ParentalLevel::Level)),
@@ -325,7 +325,7 @@ void VideoSelector::OKPressed()
         a->videoHeight = 0;
         a->fileCodec = "";
         a->videoCodec = "";
-        a->encoderProfile = NULL;
+        a->encoderProfile = nullptr;
         a->editedDetails = false;
         m_archiveList->append(a);
     }
@@ -494,7 +494,7 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 
     LOG(VB_GENERAL, LOG_ERR, "VideoSelector: Failed to get any videos");
 
-    return NULL;
+    return nullptr;
 }
 
 void VideoSelector::getVideoList(void)
@@ -533,7 +533,7 @@ void VideoSelector::getVideoList(void)
         }
     }
 
-    setCategory(0);
+    setCategory(nullptr);
 }
 
 void VideoSelector::setCategory(MythUIButtonListItem *item)

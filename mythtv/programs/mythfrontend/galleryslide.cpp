@@ -293,12 +293,12 @@ void PanAnimation::updateCurrentValue(const QVariant &value)
 Slide::Slide(MythUIType *parent, QString name, MythUIImage *image)
     : MythUIImage(parent, name),
       m_state(kEmpty),
-      m_data(NULL),
-      m_waitingFor(NULL),
+      m_data(nullptr),
+      m_waitingFor(nullptr),
       m_zoom(1.0),
       m_direction(0),
-      m_zoomAnimation(NULL),
-      m_panAnimation(NULL),
+      m_zoomAnimation(nullptr),
+      m_panAnimation(nullptr),
       m_pan(QPoint(0,0))
 {
     // Clone from image
@@ -619,7 +619,7 @@ void SlideBuffer::Initialise(MythUIImage &image)
     // Fill buffer with slides cloned from the XML image widget
 
     // Create first as a child of the XML image.
-    Slide *slide = new Slide(NULL, "slide0", &image);
+    Slide *slide = new Slide(nullptr, "slide0", &image);
 
     // Buffer is notified when it has loaded image
     connect(slide, SIGNAL(ImageLoaded(Slide *)),

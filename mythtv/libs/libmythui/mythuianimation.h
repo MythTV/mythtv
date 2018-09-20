@@ -46,7 +46,7 @@ class MythUIAnimation : public QVariantAnimation, XMLParseBase
     enum Type    { Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle };
     enum Trigger { AboutToHide, AboutToShow };
 
-    MythUIAnimation(MythUIType* parent = NULL,
+    MythUIAnimation(MythUIType* parent = nullptr,
                     Trigger trigger = AboutToShow, Type type = Alpha);
     void Activate(void);
     void CopyFrom(const MythUIAnimation* animation);

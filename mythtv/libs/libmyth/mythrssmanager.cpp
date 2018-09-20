@@ -118,11 +118,7 @@ RSSSite::RSSSite(const QString& title,
     m_title(title), m_image(image), m_type(type),
     m_description(description), m_url(url), m_author(author),
     m_download(download), m_updated(updated), m_lock(QMutex::Recursive),
-    m_podcast(false), m_reply(NULL), m_manager(NULL)
-{
-}
-
-RSSSite::~RSSSite()
+    m_podcast(false), m_reply(nullptr), m_manager(nullptr)
 {
 }
 

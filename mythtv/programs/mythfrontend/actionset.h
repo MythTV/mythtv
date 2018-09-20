@@ -37,7 +37,7 @@ class ActionSet
 {
   public:
     /// \brief Create a new, empty set of action bindings.
-    ActionSet() {}
+    ActionSet() = default;
     ~ActionSet();
 
     // Commands

@@ -31,7 +31,7 @@ const char* V4L2encStreamHandler::m_stream_types[] =
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
     "",          "",              "DVD",           "VCD",
-    "SVCD",      "DVD-Special 1", "DVD-Special 2", 0
+    "SVCD",      "DVD-Special 1", "DVD-Special 2", nullptr
 };
 
 const int V4L2encStreamHandler::m_audio_rateL1[] =
@@ -484,11 +484,11 @@ void V4L2encStreamHandler::Close(void)
 {
 #if 0
 // VBI
-    if (m_vbi_thread != NULL)
+    if (m_vbi_thread != nullptr)
     {
         m_vbi_thread->wait();
         delete m_vbi_thread;
-        m_vbi_thread = NULL;
+        m_vbi_thread = nullptr;
 
         CloseVBIDevice();
     }

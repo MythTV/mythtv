@@ -68,7 +68,7 @@ void VideoOutputNull::CreatePauseFrame(void)
     if (av_pause_frame.buf)
     {
         delete [] av_pause_frame.buf;
-        av_pause_frame.buf = NULL;
+        av_pause_frame.buf = nullptr;
     }
 
     init(&av_pause_frame, FMT_YV12,
@@ -220,7 +220,7 @@ void VideoOutputNull::UpdatePauseFrame(int64_t &disp_timecode)
 
     // Try used frame first, then fall back to scratch frame.
     vbuffers.begin_lock(kVideoBuffer_used);
-    VideoFrame *used_frame = NULL;
+    VideoFrame *used_frame = nullptr;
     if (vbuffers.Size(kVideoBuffer_used) > 0)
         used_frame = vbuffers.Head(kVideoBuffer_used);
 

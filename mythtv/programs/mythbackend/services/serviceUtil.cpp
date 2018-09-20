@@ -47,7 +47,7 @@ void FillProgramInfo( DTC::Program *pProgram,
                       bool          bDetails    /* = true */,
                       bool          bIncCast    /* = true */)
 {
-    if ((pProgram == NULL) || (pInfo == NULL))
+    if ((pProgram == nullptr) || (pInfo == nullptr))
         return;
 
     pProgram->setStartTime (  pInfo->GetScheduledStartTime());
@@ -266,7 +266,7 @@ void FillChannelGroup(DTC::ChannelGroup* pGroup, ChannelGroupItem pGroupItem)
 void FillRecRuleInfo( DTC::RecRule  *pRecRule,
                       RecordingRule *pRule    )
 {
-    if ((pRecRule == NULL) || (pRule == NULL))
+    if ((pRecRule == nullptr) || (pRule == nullptr))
         return;
 
     pRecRule->setId             (  pRule->m_recordID               );

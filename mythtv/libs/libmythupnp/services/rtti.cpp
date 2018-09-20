@@ -36,7 +36,7 @@
 DTC::Enum* Rtti::GetEnum( const QString &sFQN )
 {
     if (sFQN.isEmpty())
-        return NULL;
+        return nullptr;
 
     // ----------------------------------------------------------------------
     // accept enum FQN in either class::enum or class.enum formats.
@@ -49,7 +49,7 @@ DTC::Enum* Rtti::GetEnum( const QString &sFQN )
     int nLastIdx = sType.lastIndexOf( "::" );
 
     if (nLastIdx == -1)
-        return NULL;
+        return nullptr;
 
     QString sParentFQN = sType.mid( 0, nLastIdx );
     QString sEnumName  = sType.mid( nLastIdx+2  );
@@ -67,8 +67,8 @@ DTC::Enum* Rtti::GetEnum( const QString &sFQN )
     }
 
     QObject *pParentClass = (QObject *)QMetaType::create( nParentId );
-    if (pParentClass == NULL)
-        return NULL;
+    if (pParentClass == nullptr)
+        return nullptr;
 
     const QMetaObject *pMetaObject = pParentClass->metaObject();
 
@@ -81,7 +81,7 @@ DTC::Enum* Rtti::GetEnum( const QString &sFQN )
     int nEnumIdx = pMetaObject->indexOfEnumerator( sEnumName.toUtf8() );
 
     if (nEnumIdx < 0 )
-        return NULL;
+        return nullptr;
 
     QMetaEnum metaEnum = pMetaObject->enumerator( nEnumIdx );
 

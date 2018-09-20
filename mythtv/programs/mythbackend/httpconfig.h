@@ -12,7 +12,7 @@ class HttpConfig : public HttpServerExtension
 {
   public:
     HttpConfig();
-    virtual ~HttpConfig();
+    virtual ~HttpConfig() = default;
 
     virtual QStringList GetBasePaths();
 

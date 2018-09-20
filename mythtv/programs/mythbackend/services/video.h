@@ -38,7 +38,7 @@ class Video : public VideoServices
 
     public:
 
-        Q_INVOKABLE explicit Video( QObject */*parent*/ = 0 ) {}
+        Q_INVOKABLE explicit Video( QObject */*parent*/ = nullptr ) {}
 
     public:
 
@@ -142,7 +142,7 @@ class ScriptableVideo : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableVideo( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableVideo( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -155,7 +155,7 @@ class ScriptableVideo : public QObject
                                      int              StartIndex,
                                      int              Count      )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetVideoList( Folder, Sort, Descending,
                                            StartIndex, Count );
             )
@@ -163,14 +163,14 @@ class ScriptableVideo : public QObject
 
         QObject* GetVideo( int  Id )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetVideo( Id );
             )
         }
 
         QObject* GetVideoByFileName( const QString    &FileName  )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetVideoByFileName( FileName );
             )
         }
@@ -183,7 +183,7 @@ class ScriptableVideo : public QObject
                               const QString    &GrabberType,
                               bool             AllowGeneric )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.LookupVideo( Title, Subtitle, Inetref,
                                           Season, Episode, GrabberType,
                                           AllowGeneric );

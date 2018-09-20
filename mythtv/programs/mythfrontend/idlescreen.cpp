@@ -19,11 +19,11 @@
 
 IdleScreen::IdleScreen(MythScreenStack *parent)
               :MythScreenType(parent, "standbymode"),
-              m_updateScreenTimer(new QTimer(this)), m_statusState(NULL),
-              m_currentRecordings(NULL),
-              m_nextRecordings(NULL),
-              m_conflictingRecordings(NULL),
-              m_conflictWarning(NULL),
+              m_updateScreenTimer(new QTimer(this)), m_statusState(nullptr),
+              m_currentRecordings(nullptr),
+              m_nextRecordings(nullptr),
+              m_conflictingRecordings(nullptr),
+              m_conflictWarning(nullptr),
               m_secondsToShutdown(-1),
               m_pendingSchedUpdate(false),
               m_hasConflicts(false)
@@ -177,7 +177,7 @@ void IdleScreen::UpdateScreen(void)
             ProgramInfo *progInfo = *pit;
             if (progInfo)
             {
-                MythUIButtonList *list = NULL;
+                MythUIButtonList *list = nullptr;
                 const RecStatus::Type recstatus = progInfo->GetRecordingStatus();
 
                 switch(recstatus)
@@ -198,11 +198,11 @@ void IdleScreen::UpdateScreen(void)
                         break;
 
                     default:
-                        list = NULL;
+                        list = nullptr;
                         break;
                 }
 
-                if (list != NULL)
+                if (list != nullptr)
                 {
                     item = new MythUIButtonListItem(list,"",
                                                     qVariantFromValue(progInfo));

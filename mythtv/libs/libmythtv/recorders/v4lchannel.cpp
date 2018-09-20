@@ -39,7 +39,7 @@ V4LChannel::V4LChannel(TVRec *parent, const QString &videodevice,
     : DTVChannel(parent),           device(videodevice),
       audio_device(audiodevice),    videofd(-1),
       device_name(),                driver_name(),
-      curList(NULL),                totalChannels(0),
+      curList(nullptr),             totalChannels(0),
       has_stream_io(false),         has_std_io(false),
       has_async_io(false),
       has_tuner(false),             has_sliced_vbi(false),
@@ -325,8 +325,8 @@ int V4LChannel::SetFreqTable(const QString &tablename)
     int i = 0;
     char *listname = (char *)chanlists[i].name;
 
-    curList = NULL;
-    while (listname != NULL)
+    curList = nullptr;
+    while (listname != nullptr)
     {
         if (use_default)
         {

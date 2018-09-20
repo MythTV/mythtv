@@ -21,7 +21,7 @@ class NewsArticle
                 const QString &desc, const QString &artURL);
     explicit NewsArticle(const QString &title);
 
-    NewsArticle();
+    NewsArticle() = default;
 
     QString title(void)       const { return m_title;      }
     QString description(void) const { return m_desc;       }

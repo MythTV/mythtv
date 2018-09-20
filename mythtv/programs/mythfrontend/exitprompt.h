@@ -10,8 +10,8 @@ class ExitPrompter : public QObject
     Q_OBJECT
 
   public:
-    ExitPrompter() {};
-   ~ExitPrompter() {};
+    ExitPrompter() = default;
+   ~ExitPrompter() = default;
 
   public slots:
     void quit(void);

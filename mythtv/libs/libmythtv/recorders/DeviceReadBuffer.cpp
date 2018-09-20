@@ -36,8 +36,8 @@ DeviceReadBuffer::DeviceReadBuffer(
       read_quanta(0),               dev_buffer_count(1),
       dev_read_size(0),             readThreshold(0),
 
-      buffer(NULL),                 readPtr(NULL),
-      writePtr(NULL),               endPtr(NULL),
+      buffer(nullptr),              readPtr(nullptr),
+      writePtr(nullptr),            endPtr(nullptr),
 
       // statistics
       max_used(0),                  avg_used(0),
@@ -67,7 +67,7 @@ DeviceReadBuffer::~DeviceReadBuffer()
     if (buffer)
     {
         delete[] buffer;
-        buffer = NULL;
+        buffer = nullptr;
     }
 }
 

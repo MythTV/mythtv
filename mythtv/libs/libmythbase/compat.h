@@ -216,7 +216,7 @@
     #define mkfifo(path, mode) \
         (int)CreateNamedPipeA(path, PIPE_ACCESS_DUPLEX | WRITE_DAC, \
                           PIPE_WAIT, PIPE_UNLIMITED_INSTANCES, \
-                          1024, 1024, 10000, NULL)
+                          1024, 1024, 10000, nullptr)
 
 #    define RTLD_LAZY 0
 #    define dlopen(x, y) LoadLibraryA((x))
@@ -233,9 +233,9 @@
             if (!FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM |
                                 FORMAT_MESSAGE_IGNORE_INSERTS |
                                 FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                                NULL, errCode,
+                                nullptr, errCode,
                                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                errStr, DLERR_MAX - 1, NULL))
+                                errStr, DLERR_MAX - 1, nullptr))
                 snprintf(errStr, DLERR_MAX - 1,
                          "dlopen()/dlsym() caused error %d", (int)errCode);
 
@@ -265,7 +265,7 @@ static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
         *result = *tmp;
         return result;
     }
-    return NULL;
+    return nullptr;
 }
 #endif
 
@@ -281,7 +281,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
         memcpy(result, win_tmp, sizeof(struct tm));
         return result;
     }
-    return NULL;
+    return nullptr;
 }
 #endif
 
@@ -372,7 +372,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
         else
         {
             if (result)
-                *result = NULL;
+                *result = nullptr;
             return errno;
         }
     }

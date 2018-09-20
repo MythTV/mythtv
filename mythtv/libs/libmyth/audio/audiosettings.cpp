@@ -19,7 +19,7 @@ AudioSettings::AudioSettings() :
     source(AUDIOOUTPUT_UNKNOWN),
     upmixer(0),
     init(false),
-    custom(NULL)
+    custom(nullptr)
 {
 }
 
@@ -44,7 +44,7 @@ AudioSettings::AudioSettings(const AudioSettings &other) :
         *custom = *other.custom;
     }
     else
-        custom = NULL;
+        custom = nullptr;
 }
 
 AudioSettings::AudioSettings(
@@ -79,7 +79,7 @@ AudioSettings::AudioSettings(
         *this->custom = *custom;
     }
     else
-        this->custom = NULL;
+        this->custom = nullptr;
 }
 
 AudioSettings::AudioSettings(
@@ -100,7 +100,7 @@ AudioSettings::AudioSettings(
     source(AUDIOOUTPUT_UNKNOWN),
     upmixer(upmixer_startup),
     init(true),
-    custom(NULL)
+    custom(nullptr)
 {
 }
 
@@ -119,7 +119,7 @@ AudioSettings::AudioSettings(
     source(AUDIOOUTPUT_UNKNOWN),
     upmixer(0),
     init(false),
-    custom(NULL)
+    custom(nullptr)
 {
 }
 

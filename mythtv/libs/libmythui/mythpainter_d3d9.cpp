@@ -12,7 +12,7 @@
 #define LOC QString("D3D9 Painter: ")
 
 MythD3D9Painter::MythD3D9Painter(MythRenderD3D9 *render) :
-    MythPainter(), m_render(render), m_target(NULL),
+    MythPainter(), m_render(render), m_target(nullptr),
     m_swap_control(true)
 {
     if (m_render)
@@ -57,7 +57,7 @@ void MythD3D9Painter::Teardown(void)
     if (m_render)
     {
         m_render->DecrRef();
-        m_render = NULL;
+        m_render = nullptr;
     }
 }
 
@@ -105,10 +105,10 @@ void MythD3D9Painter::End(void)
         if (m_swap_control)
         {
             m_render->End();
-            m_render->Present(NULL);
+            m_render->Present(nullptr);
         }
         if (m_target)
-            m_render->SetRenderTarget(NULL);
+            m_render->SetRenderTarget(nullptr);
     }
     MythPainter::End();
 }
@@ -213,7 +213,7 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     }
 
     im->SetChanged(false);
-    D3D9Image *newimage = NULL;
+    D3D9Image *newimage = nullptr;
     if (m_render)
         newimage = new D3D9Image(m_render,im->size());
 
@@ -237,7 +237,7 @@ D3D9Image* MythD3D9Painter::GetImageFromCache(MythImage *im)
     {
        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create D3D9 UI bitmap.");
        delete newimage;
-       newimage = NULL;
+       newimage = nullptr;
     }
 
     return newimage;

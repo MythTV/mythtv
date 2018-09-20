@@ -48,12 +48,12 @@ void MythRenderOpenGL1::ResetVars(void)
 void MythRenderOpenGL1::ResetProcs(void)
 {
     MythRenderOpenGL::ResetProcs();
-    m_glGenProgramsARB = NULL;
-    m_glBindProgramARB = NULL;
-    m_glProgramStringARB = NULL;
-    m_glProgramLocalParameter4fARB = NULL;
-    m_glDeleteProgramsARB = NULL;
-    m_glGetProgramivARB = NULL;
+    m_glGenProgramsARB = nullptr;
+    m_glBindProgramARB = nullptr;
+    m_glProgramStringARB = nullptr;
+    m_glProgramLocalParameter4fARB = nullptr;
+    m_glDeleteProgramsARB = nullptr;
+    m_glGetProgramivARB = nullptr;
 }
 
 bool MythRenderOpenGL1::InitFeatures(void)
@@ -257,7 +257,7 @@ uint MythRenderOpenGL1::CreateHelperTexture(void)
         return 0;
     }
 
-    float *buf = NULL;
+    float *buf = nullptr;
     buf = new float[m_textures[tmp_tex].m_data_size];
     float *ref = buf;
 

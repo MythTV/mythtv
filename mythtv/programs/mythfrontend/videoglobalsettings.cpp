@@ -246,8 +246,8 @@ struct ConfigPage
     }
 
   private:
-    ConfigPage(const ConfigPage &);
-    ConfigPage &operator=(const ConfigPage &);
+    ConfigPage(const ConfigPage &) = delete;
+    ConfigPage &operator=(const ConfigPage &) = delete;
 
   private:
     PageList &m_pl;

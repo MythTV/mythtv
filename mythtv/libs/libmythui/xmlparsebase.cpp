@@ -330,20 +330,20 @@ QString XMLParseBase::parseText(QDomElement &element)
     return text;
 }
 
-static MythUIType *globalObjectStore = NULL;
+static MythUIType *globalObjectStore = nullptr;
 static QStringList loadedBaseFiles;
 
 MythUIType *XMLParseBase::GetGlobalObjectStore(void)
 {
     if (!globalObjectStore)
-        globalObjectStore = new MythUIType(NULL, "global store");
+        globalObjectStore = new MythUIType(nullptr, "global store");
     return globalObjectStore;
 }
 
 void XMLParseBase::ClearGlobalObjectStore(void)
 {
     delete globalObjectStore;
-    globalObjectStore = NULL;
+    globalObjectStore = nullptr;
     GetGlobalObjectStore();
 
     // clear any loaded base xml files which will force a reload the next time they are used
@@ -403,7 +403,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
                      type == "editbar" ||
                      type == "video")
             {
-                ParseUIType(filename, info, type, parent, NULL, showWarnings, dependsMap);
+                ParseUIType(filename, info, type, parent, nullptr, showWarnings, dependsMap);
             }
             else
             {
@@ -430,10 +430,10 @@ MythUIType *XMLParseBase::ParseUIType(
     {
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     "This element requires a name");
-        return NULL;
+        return nullptr;
     }
 
-    MythUIType *olduitype = NULL;
+    MythUIType *olduitype = nullptr;
 
     // check for name in immediate parent as siblings cannot share names
     if (parent && parent->GetChild(name))
@@ -441,14 +441,14 @@ MythUIType *XMLParseBase::ParseUIType(
         // if we're the global object store, assume it's just a theme overriding
         // the defaults..
         if (parent == GetGlobalObjectStore())
-            return NULL;
+            return nullptr;
 
         // Reuse the existing child and reparse
         olduitype = parent->GetChild(name);
     }
 
-    MythUIType *uitype = NULL;
-    MythUIType *base = NULL;
+    MythUIType *uitype = nullptr;
+    MythUIType *base = nullptr;
 
     QString inherits = element.attribute("from", "");
     if (!inherits.isEmpty())
@@ -468,7 +468,7 @@ MythUIType *XMLParseBase::ParseUIType(
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                        QString("Couldn't find object '%1' to inherit '%2' from")
                         .arg(inherits).arg(name));
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -516,14 +516,14 @@ MythUIType *XMLParseBase::ParseUIType(
     {
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     "Unknown widget type.");
-        return NULL;
+        return nullptr;
     }
 
     if (!uitype)
     {
         VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                     "Failed to instantiate widget type.");
-        return NULL;
+        return nullptr;
     }
 
     if (olduitype && parent)
@@ -551,7 +551,7 @@ MythUIType *XMLParseBase::ParseUIType(
                         .arg(name).arg(inherits));
             if (parent)
                 parent->DeleteChild(uitype);
-            return NULL;
+            return nullptr;
         }
         else
             uitype->CopyFrom(base);
@@ -814,9 +814,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
                     // We don't want widgets in base.xml
                     // depending on each other so ignore dependsMap
                     QMap<QString, QString> dependsMap;
-                    MythUIType *uitype = NULL;
+                    MythUIType *uitype = nullptr;
                     uitype = ParseUIType(filename, e, type, parent,
-                                         NULL, showWarnings, dependsMap);
+                                         nullptr, showWarnings, dependsMap);
                     if (uitype)
                         uitype->ConnectDependants(true);
                 }

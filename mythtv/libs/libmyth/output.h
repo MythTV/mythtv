@@ -30,12 +30,12 @@ class MPUBLIC OutputEvent : public MythEvent
 {
   public:
     explicit OutputEvent(Type t) :
-        MythEvent(t), error_msg(NULL), elasped_seconds(0), written_bytes(0),
+        MythEvent(t), error_msg(nullptr), elasped_seconds(0), written_bytes(0),
         brate(0), freq(0), prec(0), chan(0)
     { ; }
 
     OutputEvent(long s, unsigned long w, int b, int f, int p, int c) :
-        MythEvent(Info), error_msg(NULL), elasped_seconds(s), written_bytes(w),
+        MythEvent(Info), error_msg(nullptr), elasped_seconds(s), written_bytes(w),
         brate(b), freq(f), prec(p), chan(c)
     { ; }
 
@@ -72,7 +72,7 @@ class MPUBLIC OutputEvent : public MythEvent
 
   private:
     OutputEvent(const OutputEvent &o) : MythEvent(o),
-        error_msg(NULL),
+        error_msg(nullptr),
         elasped_seconds(o.elasped_seconds),
         written_bytes(o.written_bytes),
         brate(o.brate), freq(o.freq), prec(o.prec), chan(o.chan)
@@ -99,7 +99,7 @@ class MPUBLIC OutputListeners : public MythObservable
 {
 public:
     OutputListeners();
-    virtual ~OutputListeners();
+    virtual ~OutputListeners() = default;
 
     bool hasVisual(void) { return visuals.size(); }
     void addVisual(MythTV::Visual *);

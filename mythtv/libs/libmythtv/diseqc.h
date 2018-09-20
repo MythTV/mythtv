@@ -95,7 +95,7 @@ class DiSEqCDevTree
     void SetRoot(DiSEqCDevDevice *root);
 
     bool SendCommand(uint adr, uint cmd, uint repeats = 0,
-                     uint data_len = 0, unsigned char *data = NULL);
+                     uint data_len = 0, unsigned char *data = nullptr);
 
     bool ResetDiseqc(bool hard_reset, bool is_SCR);
 
@@ -178,8 +178,8 @@ class DiSEqCDevDevice
     // Non-const Gets
     DiSEqCDevDevice *FindDevice(uint dev_id);
     virtual DiSEqCDevDevice *GetSelectedChild(
-        const DiSEqCDevSettings&)      const { return NULL;          }
-    virtual DiSEqCDevDevice *GetChild(uint)  { return NULL;          }
+        const DiSEqCDevSettings&)      const { return nullptr;          }
+    virtual DiSEqCDevDevice *GetChild(uint)  { return nullptr;          }
 
     // Statics
     static QString DevTypeToString(dvbdev_t type)
@@ -417,7 +417,7 @@ class DiSEqCDevSCR : public DiSEqCDevDevice
 
   protected:
     bool         SendCommand(uint cmd, uint repeats, uint data_len = 0,
-                             unsigned char *data = NULL) const;
+                             unsigned char *data = nullptr) const;
 
   private:
     uint         m_scr_userband;  /* 0-7 */

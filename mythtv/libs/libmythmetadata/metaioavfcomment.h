@@ -20,7 +20,7 @@ class META_PUBLIC MetaIOAVFComment : public MetaIO
 {
 public:
     MetaIOAVFComment(void);
-    virtual ~MetaIOAVFComment(void);
+    virtual ~MetaIOAVFComment(void) = default;
 
     bool write(const QString &filename, MusicMetadata* mdata);
     MusicMetadata* read(const QString &filename);

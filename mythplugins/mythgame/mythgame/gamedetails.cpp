@@ -13,23 +13,19 @@
 GameDetailsPopup::GameDetailsPopup(MythScreenStack *parent,
                                    const RomInfo *romInfo)
            : MythScreenType (parent, "gamedetailspopup"),
-        m_romInfo(romInfo), m_id(""), m_retObject(NULL),
-        m_gameName(NULL), m_gameType(NULL), m_romName(NULL),
-        m_crc(NULL), m_romPath(NULL), m_genre(NULL),
-        m_year(NULL), m_country(NULL), m_plot(NULL),
-        m_publisher(NULL), m_allSystems(NULL), m_fanartImage(NULL),
-        m_boxImage(NULL), m_playButton(NULL), m_doneButton(NULL)
+        m_romInfo(romInfo), m_id(""), m_retObject(nullptr),
+        m_gameName(nullptr), m_gameType(nullptr), m_romName(nullptr),
+        m_crc(nullptr), m_romPath(nullptr), m_genre(nullptr),
+        m_year(nullptr), m_country(nullptr), m_plot(nullptr),
+        m_publisher(nullptr), m_allSystems(nullptr), m_fanartImage(nullptr),
+        m_boxImage(nullptr), m_playButton(nullptr), m_doneButton(nullptr)
 {
     m_romInfo = romInfo;
 }
 
-GameDetailsPopup::~GameDetailsPopup(void)
-{
-}
-
 void GameDetailsPopup::handleText(const QString &name, const QString &value)
 {
-    MythUIText *textarea = NULL;
+    MythUIText *textarea = nullptr;
     UIUtilE::Assign(this, textarea, name);
     if (textarea)
     {
@@ -39,7 +35,7 @@ void GameDetailsPopup::handleText(const QString &name, const QString &value)
 
 void GameDetailsPopup::handleImage(const QString &name, const QString &filename)
 {
-    MythUIImage *image = NULL;
+    MythUIImage *image = nullptr;
     UIUtilW::Assign(this, image, name);
     if (image)
     {

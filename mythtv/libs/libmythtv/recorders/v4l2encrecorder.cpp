@@ -38,7 +38,7 @@
             .arg(m_channel->GetDevice())
 
 V4L2encRecorder::V4L2encRecorder(TVRec *rec, V4LChannel *channel) :
-    V4LRecorder(rec), m_channel(channel), m_stream_handler(NULL)
+    V4LRecorder(rec), m_channel(channel), m_stream_handler(nullptr)
 {
     if (!Open())
     {

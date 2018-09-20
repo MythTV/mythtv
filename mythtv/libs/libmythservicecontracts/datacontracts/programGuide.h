@@ -73,7 +73,7 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE ProgramGuide(QObject *parent = 0)
+        Q_INVOKABLE ProgramGuide(QObject *parent = nullptr)
             : QObject           ( parent ),
               m_Details         ( false  ),
               m_StartIndex      ( 0      ),

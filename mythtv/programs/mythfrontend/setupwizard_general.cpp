@@ -18,10 +18,10 @@
 
 GeneralSetupWizard::GeneralSetupWizard(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_submitButton(NULL),    m_viewButton(NULL),
-      m_deleteButton(NULL),    m_nextButton(NULL),
-      m_cancelButton(NULL),    m_profileLocation(NULL),
-      m_adminPassword(NULL),   m_busyPopup(NULL)
+      m_submitButton(nullptr), m_viewButton(nullptr),
+      m_deleteButton(nullptr), m_nextButton(nullptr),
+      m_cancelButton(nullptr), m_profileLocation(nullptr),
+      m_adminPassword(nullptr),m_busyPopup(nullptr)
 {
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_hardwareProfile = new HardwareProfile();
@@ -92,10 +92,6 @@ bool GeneralSetupWizard::Create()
     return true;
 }
 
-GeneralSetupWizard::~GeneralSetupWizard()
-{
-}
-
 void GeneralSetupWizard::loadData()
 {
     if (!m_hardwareProfile)
@@ -151,7 +147,7 @@ void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
             if (m_busyPopup)
             {
                 m_busyPopup->Close();
-                m_busyPopup = NULL;
+                m_busyPopup = nullptr;
             }
             ShowOkPopup(tr("Hardware profile submitted. Thank you for supporting "
                            "MythTV!"));
@@ -165,7 +161,7 @@ void GeneralSetupWizard::OnSubmitPromptReturn(bool submit)
             if (m_busyPopup)
             {
                 m_busyPopup->Close();
-                m_busyPopup = NULL;
+                m_busyPopup = nullptr;
             }
             ShowOkPopup(tr("Encountered a problem while submitting your profile."));
         }
@@ -253,7 +249,7 @@ void GeneralSetupWizard::OnDeletePromptReturn(bool submit)
             if (m_busyPopup)
             {
                 m_busyPopup->Close();
-                m_busyPopup = NULL;
+                m_busyPopup = nullptr;
             }
             ShowOkPopup(tr("Hardware profile deleted."));
             if (m_profileLocation)
@@ -266,7 +262,7 @@ void GeneralSetupWizard::OnDeletePromptReturn(bool submit)
             if (m_busyPopup)
             {
                 m_busyPopup->Close();
-                m_busyPopup = NULL;
+                m_busyPopup = nullptr;
             }
             ShowOkPopup(tr("Encountered a problem while deleting your profile."));
         }

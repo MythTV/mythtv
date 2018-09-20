@@ -21,7 +21,7 @@ typedef enum {
 class MTV_PUBLIC SignalMonitorListener
 {
   protected:
-    virtual ~SignalMonitorListener() { }
+    virtual ~SignalMonitorListener() = default;
 
   public:
     /** \brief Signal to be sent when you have a lock on all values.
@@ -57,7 +57,7 @@ class MTV_PUBLIC SignalMonitorListener
 class MTV_PUBLIC DVBSignalMonitorListener : public SignalMonitorListener
 {
   protected:
-    virtual ~DVBSignalMonitorListener() { }
+    virtual ~DVBSignalMonitorListener() = default;
 
   public:
     virtual void StatusSignalToNoise(    const SignalMonitorValue&) = 0;

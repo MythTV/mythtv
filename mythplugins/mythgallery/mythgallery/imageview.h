@@ -44,7 +44,7 @@ class LoadAlbumListener : public QObject {
     ImageView *m_parent;
 public:
     explicit LoadAlbumListener(ImageView *parent);
-    virtual ~LoadAlbumListener();
+    virtual ~LoadAlbumListener() = default;
 private slots:
     void FinishLoading() const;
 };

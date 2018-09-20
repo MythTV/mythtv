@@ -51,17 +51,17 @@ RecordingRule::RecordingRule()
     m_recGroupID(RecordingInfo::kDefaultRecGroup),
     m_storageGroup("Default"),
     m_playGroup("Default"),
-    m_autoExpire(0),
+    m_autoExpire(false),
     m_maxEpisodes(0),
     m_maxNewest(false),
-    m_autoCommFlag(1),
-    m_autoTranscode(0),
+    m_autoCommFlag(true),
+    m_autoTranscode(false),
     m_transcoder(RecordingProfile::TranscoderAutodetect),
-    m_autoUserJob1(0),
-    m_autoUserJob2(0),
-    m_autoUserJob3(0),
-    m_autoUserJob4(0),
-    m_autoMetadataLookup(1),
+    m_autoUserJob1(false),
+    m_autoUserJob2(false),
+    m_autoUserJob3(false),
+    m_autoUserJob4(false),
+    m_autoMetadataLookup(true),
     m_nextRecording(),
     m_lastRecorded(),
     m_lastDeleted(),
@@ -71,7 +71,7 @@ RecordingRule::RecordingRule()
     m_isOverride(false),
     m_isTemplate(false),
     m_template(),
-    m_progInfo(NULL),
+    m_progInfo(nullptr),
     m_loaded(false)
 {
     QDateTime dt = MythDate::current();
@@ -374,7 +374,7 @@ bool RecordingRule::MakeOverride(void)
     m_parentRecID = m_recordID;
     m_recordID = 0;
     m_type = kNotRecording;
-    m_isInactive = 0;
+    m_isInactive = false;
 
     if (m_searchType != kManualSearch)
         m_searchType = kNoSearch;

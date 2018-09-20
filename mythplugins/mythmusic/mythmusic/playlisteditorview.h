@@ -38,7 +38,7 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
                      const QString &action = "",
                      MythUIButtonListItem::CheckState state = MythUIButtonListItem::CantCheck,
                      bool showArrow = true);
-    virtual ~MusicGenericTree();
+    virtual ~MusicGenericTree() = default;
 
     QString getAction(void) const { return m_action; }
 

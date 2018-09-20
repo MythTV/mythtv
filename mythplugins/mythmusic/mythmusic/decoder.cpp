@@ -37,8 +37,8 @@ Decoder::Decoder(DecoderFactory *d, AudioOutput *o) :
 
 Decoder::~Decoder()
 {
-    m_fctry = 0;
-    m_out = 0;
+    m_fctry = nullptr;
+    m_out = nullptr;
 }
 
 /*
@@ -63,7 +63,7 @@ void Decoder::error(const QString &e)
 }
 
 // static methods
-static QList<DecoderFactory*> *factories = NULL;
+static QList<DecoderFactory*> *factories = nullptr;
 
 static void checkFactories()
 {
@@ -121,5 +121,5 @@ Decoder *Decoder::create(const QString &source, AudioOutput *output, bool deleta
             return (*it)->create(source, output, deletable);
     }
 
-    return NULL;
+    return nullptr;
 }

@@ -25,8 +25,8 @@
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
 
-MythAirplayServer* MythAirplayServer::gMythAirplayServer = NULL;
-MThread*           MythAirplayServer::gMythAirplayServerThread = NULL;
+MythAirplayServer* MythAirplayServer::gMythAirplayServer = nullptr;
+MThread*           MythAirplayServer::gMythAirplayServerThread = nullptr;
 QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMutex::Recursive);
 
 #define LOC QString("AirPlay: ")
@@ -209,7 +209,7 @@ class APHTTPRequest
         Process();
         Check();
     }
-   ~APHTTPRequest() { }
+   ~APHTTPRequest() = default;
 
     QByteArray&       GetMethod(void)  { return m_method;   }
     QByteArray&       GetURI(void)     { return m_uri;      }
@@ -392,24 +392,24 @@ void MythAirplayServer::Cleanup(void)
         gMythAirplayServerThread->wait();
     }
     delete gMythAirplayServerThread;
-    gMythAirplayServerThread = NULL;
+    gMythAirplayServerThread = nullptr;
 
     delete gMythAirplayServer;
-    gMythAirplayServer = NULL;
+    gMythAirplayServer = nullptr;
 }
 
 
 MythAirplayServer::MythAirplayServer()
-  : ServerPool(), m_name(QString("MythTV")), m_bonjour(NULL), m_valid(false),
+  : ServerPool(), m_name(QString("MythTV")), m_bonjour(nullptr), m_valid(false),
     m_lock(new QMutex(QMutex::Recursive)), m_setupPort(5100),
-    m_serviceRefresh(NULL)
+    m_serviceRefresh(nullptr)
 {
 }
 
 MythAirplayServer::~MythAirplayServer()
 {
     delete m_lock;
-    m_lock = NULL;
+    m_lock = nullptr;
 }
 
 void MythAirplayServer::Teardown(void)
@@ -424,17 +424,17 @@ void MythAirplayServer::Teardown(void)
     {
         m_serviceRefresh->stop();
         delete m_serviceRefresh;
-        m_serviceRefresh = NULL;
+        m_serviceRefresh = nullptr;
     }
 
     // disconnect from mDNS
     delete m_bonjour;
-    m_bonjour = NULL;
+    m_bonjour = nullptr;
 
     // disconnect connections
     foreach (QTcpSocket* connection, m_sockets)
     {
-        disconnect(connection, 0, 0, 0);
+        disconnect(connection, nullptr, nullptr, nullptr);
         delete connection;
     }
     m_sockets.clear();
@@ -562,9 +562,9 @@ void MythAirplayServer::deleteConnection(QTcpSocket *socket)
     {
         it.next();
         if (it.value().reverseSocket == socket)
-            it.value().reverseSocket = NULL;
+            it.value().reverseSocket = nullptr;
         if (it.value().controlSocket == socket)
-            it.value().controlSocket = NULL;
+            it.value().controlSocket = nullptr;
         if (!it.value().reverseSocket &&
             !it.value().controlSocket)
         {
@@ -696,7 +696,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     if (req->GetURI() == "/reverse")
     {
         QTcpSocket *s = m_connections[session].reverseSocket;
-        if (s != socket && s != NULL)
+        if (s != socket && s != nullptr)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Already have a different reverse socket for this connection.");
@@ -710,7 +710,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     }
 
     QTcpSocket *s = m_connections[session].controlSocket;
-    if (s != socket && s != NULL)
+    if (s != socket && s != nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Already have a different control socket for this connection.");
@@ -718,8 +718,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     }
     m_connections[session].controlSocket = socket;
 
-    if (m_connections[session].controlSocket != NULL &&
-        m_connections[session].reverseSocket != NULL &&
+    if (m_connections[session].controlSocket != nullptr &&
+        m_connections[session].reverseSocket != nullptr &&
         !m_connections[session].initialized)
     {
         // Got a full connection, disconnect any other clients
@@ -1220,7 +1220,7 @@ void MythAirplayServer::StartPlayback(const QString &pathname)
     // Wait until we receive that the play has started
     gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackStarted()),
                                    SIGNAL(TVPlaybackAborted()),
-                                   NULL);
+                                   nullptr);
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("ACTION_HANDLEMEDIA completed"));
 }
@@ -1239,7 +1239,7 @@ void MythAirplayServer::StopPlayback(void)
         // Wait until we receive that playback has stopped
         gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackStopped()),
                                        SIGNAL(TVPlaybackAborted()),
-                                       NULL);
+                                       nullptr);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_STOP completed"));
     }
@@ -1266,7 +1266,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
         gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackSought(qint64)),
                                        SIGNAL(TVPlaybackStopped()),
                                        SIGNAL(TVPlaybackAborted()),
-                                       NULL);
+                                       nullptr);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_SEEKABSOLUTE completed"));
     }
@@ -1292,7 +1292,7 @@ void MythAirplayServer::PausePlayback(void)
         gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackPaused()),
                                        SIGNAL(TVPlaybackStopped()),
                                        SIGNAL(TVPlaybackAborted()),
-                                       NULL);
+                                       nullptr);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PAUSE completed"));
     }
@@ -1318,7 +1318,7 @@ void MythAirplayServer::UnpausePlayback(void)
         gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackPlaying()),
                                        SIGNAL(TVPlaybackStopped()),
                                        SIGNAL(TVPlaybackAborted()),
-                                       NULL);
+                                       nullptr);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PLAY completed"));
     }

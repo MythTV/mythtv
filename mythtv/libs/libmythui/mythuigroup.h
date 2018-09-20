@@ -13,7 +13,7 @@ class MUI_PUBLIC MythUIGroup : public MythUIComposite
 
   public:
     MythUIGroup(MythUIType *parent, const QString &name);
-   ~MythUIGroup();
+   ~MythUIGroup() = default;
 
     void Reset(void);
 

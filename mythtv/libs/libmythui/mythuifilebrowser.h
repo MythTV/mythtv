@@ -25,7 +25,7 @@ class MUI_PUBLIC MFileInfo : public QFileInfo
   public:
     MFileInfo(QString fileName = "", QString sgDir = "", bool isDir = false,
               qint64 size = 0);
-   ~MFileInfo();
+   ~MFileInfo() = default;
 
     MFileInfo &operator=(const MFileInfo &fileinfo);
 
@@ -78,7 +78,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 
   public:
     MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
-   ~MythUIFileBrowser();
+   ~MythUIFileBrowser() = default;
 
     bool Create(void);
 

@@ -126,7 +126,7 @@ void OMXComponent::DecrRef()
 }
 
 OMXComponent::OMXComponent(const QString &name, OMXComponentCtx &cb) :
-    m_ref(s_ref++), m_cb(cb), m_handle(0), m_base(0),
+    m_ref(s_ref++), m_cb(cb), m_handle(nullptr), m_base(0),
     m_state_lock(QMutex::Recursive), m_state(OMX_StateInvalid),
     m_error(OMX_ErrorNone)
 {
@@ -174,7 +174,7 @@ OMXComponent::~OMXComponent()
     if (m_handle)
     {
         OMX_ERRORTYPE e = OMX_FreeHandle(m_handle);
-        m_handle = 0;
+        m_handle = nullptr;
         m_state = OMX_StateInvalid;
         if (e != OMX_ErrorNone)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("OMX_FreeHandle error %1")
@@ -202,9 +202,9 @@ void OMXComponent::Shutdown()
     {
         OMX_ERRORTYPE e;
         if (PortDef(port).eDir == OMX_DirOutput)
-            e = OMX_SetupTunnel(Handle(), Base() + port, 0, 0);
+            e = OMX_SetupTunnel(Handle(), Base() + port, nullptr, 0);
         else
-            e = OMX_SetupTunnel(0, 0, Handle(), Base() + port);
+            e = OMX_SetupTunnel(nullptr, 0, Handle(), Base() + port);
         if (e != OMX_ErrorNone)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString(
                 "OMX_SetupTunnel shutdown error %1").arg(Error2String(e)));
@@ -469,7 +469,7 @@ OMX_ERRORTYPE OMXComponent::SetState(OMX_STATETYPE state, int ms, OMXComponentAb
         return OMX_ErrorSameState;
     lock.unlock();
 
-    OMX_ERRORTYPE e = SendCommand(OMX_CommandStateSet, state, 0, ms, cb);
+    OMX_ERRORTYPE e = SendCommand(OMX_CommandStateSet, state, nullptr, ms, cb);
     if (e != OMX_ErrorNone)
         return e;
 

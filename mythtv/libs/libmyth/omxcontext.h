@@ -54,13 +54,13 @@ class MPUBLIC OMXComponent
     void ShowFormats(unsigned index = 0, LogLevel_t = LOG_INFO, uint64_t = VB_PLAYBACK) const;
 
     OMX_ERRORTYPE SendCommand(OMX_COMMANDTYPE cmd, OMX_U32 nParam = 0,
-            void *pCmdData = 0, int ms = -1, OMXComponentAbstractCB *cb = 0);
+            void *pCmdData = nullptr, int ms = -1, OMXComponentAbstractCB *cb = nullptr);
     bool IsCommandComplete() const { return m_state_sema.available() > 0; }
     OMX_ERRORTYPE WaitComplete(int ms = -1);
     OMX_ERRORTYPE LastError();
 
     OMX_ERRORTYPE SetState(OMX_STATETYPE state, int ms = -1,
-            OMXComponentAbstractCB *cb = 0);
+            OMXComponentAbstractCB *cb = nullptr);
     OMX_STATETYPE GetState();
 
     OMX_ERRORTYPE SetParameter(OMX_INDEXTYPE type, OMX_PTR p) {
@@ -74,15 +74,15 @@ class MPUBLIC OMXComponent
         return OMX_GetConfig(m_handle, type, p); }
 
     OMX_ERRORTYPE PortEnable(unsigned index = 0, int ms = -1,
-            OMXComponentAbstractCB *cb = 0) {
-        return SendCommand(OMX_CommandPortEnable, Base() + index, 0, ms, cb); }
+            OMXComponentAbstractCB *cb = nullptr) {
+        return SendCommand(OMX_CommandPortEnable, Base() + index, nullptr, ms, cb); }
     OMX_ERRORTYPE PortDisable(unsigned index = 0, int ms = -1,
-            OMXComponentAbstractCB *cb = 0) {
-        return SendCommand(OMX_CommandPortDisable, Base() + index, 0, ms, cb); }
+            OMXComponentAbstractCB *cb = nullptr) {
+        return SendCommand(OMX_CommandPortDisable, Base() + index, nullptr, ms, cb); }
 
     static void EnumComponents(const QRegExp &re, LogLevel_t level = LOG_INFO,
                                 uint64_t mask = VB_PLAYBACK)
-        { GetComponent(0, re, level, mask); }
+        { GetComponent(nullptr, re, level, mask); }
 
   private:
     static OMX_ERRORTYPE GetComponent(OMXComponent*, const QRegExp&,
@@ -127,7 +127,7 @@ class MPUBLIC OMXComponentCtx
 class MPUBLIC OMXComponentAbstractCB
 {
   public:
-    virtual ~OMXComponentAbstractCB() {}
+    virtual ~OMXComponentAbstractCB() = default;
     virtual OMX_ERRORTYPE Action(OMXComponent*) = 0;
 };
 

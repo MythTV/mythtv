@@ -26,7 +26,3 @@ NewsArticle::NewsArticle(const QString &title) :
     m_title(title)
 {
 }
-
-NewsArticle::NewsArticle()
-{
-}

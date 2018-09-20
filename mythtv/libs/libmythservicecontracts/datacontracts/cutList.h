@@ -40,7 +40,7 @@ class SERVICE_PUBLIC CutList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE CutList(QObject *parent = 0)
+        Q_INVOKABLE CutList(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

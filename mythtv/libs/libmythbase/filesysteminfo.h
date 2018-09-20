@@ -23,7 +23,7 @@ class MBASE_PUBLIC FileSystemInfo
             QStringList::const_iterator end);
     explicit FileSystemInfo(const QStringList &slist);
 
-    virtual ~FileSystemInfo(void) {};
+    virtual ~FileSystemInfo(void) = default;
 
     FileSystemInfo &operator=(const FileSystemInfo &other);
     virtual void clone(const FileSystemInfo &other);
@@ -56,7 +56,7 @@ class MBASE_PUBLIC FileSystemInfo
 
     bool        ToStringList(QStringList &slist) const;
 
-    static const QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=NULL);
+    static const QList<FileSystemInfo> RemoteGetInfo(MythSocket *sock=nullptr);
     static void Consolidate(QList<FileSystemInfo> &disks, bool merge=true,
                             int64_t fuzz=14000);
     void PopulateDiskSpace(void);

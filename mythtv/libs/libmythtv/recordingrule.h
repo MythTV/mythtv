@@ -36,12 +36,12 @@ class MTV_PUBLIC RecordingRule
     static const int kNumFilters = 12;
 
     RecordingRule();
-   ~RecordingRule() {};
+   ~RecordingRule() = default;
 
     bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);
     bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
-                      QString from = "", ProgramInfo *pginfo = NULL);
+                      QString from = "", ProgramInfo *pginfo = nullptr);
     bool LoadTemplate(QString category, QString categoryType = "Default");
 
     bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,

@@ -580,7 +580,7 @@ static void SSE_splitplanes(uint8_t *dstu, int dstu_pitch,
 #endif // ARCH_X86
 
 MythUSWCCopy::MythUSWCCopy(int width, bool nocache)
-    :m_cache(NULL), m_size(0), m_uswc(-1)
+    :m_cache(nullptr), m_size(0), m_uswc(-1)
 {
 #if ARCH_X86
     if (!nocache)

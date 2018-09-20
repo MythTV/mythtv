@@ -63,7 +63,7 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, QString sEnumName )
     }
 
     const QMetaObject *pMetaObject = QMetaType::metaObjectForType(nParentId);
-    if (pMetaObject == NULL)
+    if (pMetaObject == nullptr)
         return false;
 
     // ----------------------------------------------------------------------
@@ -277,7 +277,7 @@ bool Xsd::GetXSD( HTTPRequest *pRequest, QString sTypeName )
         if (pMetaObject)
         {
             QObject* pClass = pMetaObject->newInstance();
-            if (pClass != NULL)
+            if (pClass != nullptr)
                 bHandled = RenderXSD( pRequest, pClass );
             delete pClass;
         }

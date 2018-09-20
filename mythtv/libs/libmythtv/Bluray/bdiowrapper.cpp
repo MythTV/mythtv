@@ -19,8 +19,8 @@
 
 #define LOC      QString("BDIOWrapper: ")
 
-static BD_FILE_OPEN sDefaultFileOpen = NULL;
-static BD_DIR_OPEN  sDefaultDirOpen  = NULL;
+static BD_FILE_OPEN sDefaultFileOpen = nullptr;
+static BD_DIR_OPEN  sDefaultDirOpen  = nullptr;
 
 static void dir_close_mythiowrapper(BD_DIR_H *dir)
 {
@@ -50,7 +50,7 @@ static int dir_read_mythiowrapper(BD_DIR_H *dir, BD_DIRENT *entry)
 
 static BD_DIR_H *dir_open_mythiowrapper(const char* dirname)
 {
-    if ((strncmp(dirname, "myth://", 7) != 0) && (sDefaultDirOpen != NULL))
+    if ((strncmp(dirname, "myth://", 7) != 0) && (sDefaultDirOpen != nullptr))
     {
         // Use the original directory handling for directories that are
         // not in a storage group.
@@ -74,7 +74,7 @@ static BD_DIR_H *dir_open_mythiowrapper(const char* dirname)
 
     free(dir);
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -112,7 +112,7 @@ static int64_t file_write_mythiowrapper(BD_FILE_H *file, const uint8_t *buf, int
 
 static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmode)
 {
-    if ((strncmp(filename, "myth://", 7) != 0) && (sDefaultFileOpen != NULL))
+    if ((strncmp(filename, "myth://", 7) != 0) && (sDefaultFileOpen != nullptr))
     {
         // Use the original file handling for files that are
         // not in a storage group.
@@ -127,7 +127,7 @@ static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmod
     file->read = file_read_mythiowrapper;
     file->write = file_write_mythiowrapper;
     file->tell = file_tell_mythiowrapper;
-    file->eof = NULL;
+    file->eof = nullptr;
 
     int fd;
     int intMode = O_RDONLY;
@@ -145,7 +145,7 @@ static BD_FILE_H *file_open_mythiowrapper(const char* filename, const char *cmod
 
     free(file);
 
-    return NULL;
+    return nullptr;
 }
 
 void redirectBDIO()
@@ -153,9 +153,9 @@ void redirectBDIO()
     BD_FILE_OPEN origFile = bd_register_file(file_open_mythiowrapper);
     BD_DIR_OPEN  origDir  = bd_register_dir(dir_open_mythiowrapper);
 
-    if (sDefaultFileOpen == NULL)
+    if (sDefaultFileOpen == nullptr)
         sDefaultFileOpen = origFile;
 
-    if (sDefaultDirOpen == NULL)
+    if (sDefaultDirOpen == nullptr)
         sDefaultDirOpen = origDir;
 }

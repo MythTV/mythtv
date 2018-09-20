@@ -874,14 +874,14 @@ class MythFillSettings : public GroupSetting
 };
 
 BackendSettings::BackendSettings() :
-    isMasterBackend(0),
-    localServerPort(0),
-    backendServerAddr(0),
-    masterServerName(0),
-    ipAddressSettings(0),
+    isMasterBackend(nullptr),
+    localServerPort(nullptr),
+    backendServerAddr(nullptr),
+    masterServerName(nullptr),
+    ipAddressSettings(nullptr),
     isLoaded(false),
-    masterServerIP(0),
-    masterServerPort(0)
+    masterServerIP(nullptr),
+    masterServerPort(nullptr)
 {
     // These two are included for backward compatibility -
     // used by python bindings. They could be removed later
@@ -1169,8 +1169,8 @@ BackendSettings::~BackendSettings()
 {
     if (masterServerIP)
         delete masterServerIP;
-    masterServerIP=0;
+    masterServerIP=nullptr;
     if (masterServerPort)
         delete masterServerPort;
-    masterServerPort=0;
+    masterServerPort=nullptr;
 }

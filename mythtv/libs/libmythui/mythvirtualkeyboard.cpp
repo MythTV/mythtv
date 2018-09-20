@@ -84,11 +84,11 @@ MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythU
     m_alt = false;
     m_lock = false;
 
-    m_lockButton = NULL;
-    m_altButton = NULL;
-    m_compButton = NULL;
-    m_shiftRButton = NULL;
-    m_shiftLButton = NULL;
+    m_lockButton = nullptr;
+    m_altButton = nullptr;
+    m_compButton = nullptr;
+    m_shiftRButton = nullptr;
+    m_shiftLButton = nullptr;
 
     m_composing = false;
 
@@ -102,10 +102,6 @@ MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythU
      loadEventKeyDefinitions(&m_leftKey, "LEFT");
      loadEventKeyDefinitions(&m_rightKey, "RIGHT");
      loadEventKeyDefinitions(&m_newlineKey, "NEWLINE");
-}
-
-MythUIVirtualKeyboard::~MythUIVirtualKeyboard(void)
-{
 }
 
 bool MythUIVirtualKeyboard::Create()
@@ -126,7 +122,7 @@ bool MythUIVirtualKeyboard::Create()
     MythPoint newPos;
 
     //FIXME this assumes the edit is a direct child of the parent screen
-    MythUIType *parentScreen = NULL;
+    MythUIType *parentScreen = nullptr;
     parentScreen = dynamic_cast<MythUIType *>(m_parentEdit->parent());
     if (parentScreen)
     {

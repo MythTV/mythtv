@@ -36,19 +36,19 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
                                            showTV);
 
     if (vsb->Create())
-        mainStack->AddScreen(vsb, (player == NULL));
+        mainStack->AddScreen(vsb, (player == nullptr));
     else
         delete vsb;
 
-    return NULL;
+    return nullptr;
 }
 
 ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool /*showTV*/)
              : ScheduleCommon(parent, "ViewScheduled"),
                m_conflictBool(false),
                m_conflictDate(QDate()),
-               m_schedulesList(NULL),
-               m_groupList(NULL),
+               m_schedulesList(nullptr),
+               m_groupList(nullptr),
                m_showAll(!gCoreContext->GetNumSetting("ViewSchedShowLevel", 0)),
                m_inEvent(false),
                m_inFill(false),
@@ -695,5 +695,5 @@ void ViewScheduled::customEvent(QEvent *event)
 ProgramInfo *ViewScheduled::GetCurrentProgram(void) const
 {
     MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
-    return item ? item->GetData().value<ProgramInfo*>() : NULL;
+    return item ? item->GetData().value<ProgramInfo*>() : nullptr;
 }

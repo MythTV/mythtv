@@ -31,14 +31,14 @@ using namespace std;
 
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    pcm_handle(NULL),
+    pcm_handle(nullptr),
     m_pbufsize(-1),
     m_card(-1),
     m_device(-1),
     m_subdevice(-1)
 {
-    m_mixer.handle = NULL;
-    m_mixer.elem = NULL;
+    m_mixer.handle = nullptr;
+    m_mixer.elem = nullptr;
 
     // Set everything up
     if (passthru_device == "auto")
@@ -161,7 +161,7 @@ int AudioOutputALSA::GetPCMInfo(int &card, int &device, int &subdevice)
         return -1;
 
     int err;
-    snd_pcm_info_t *pcm_info = NULL;
+    snd_pcm_info_t *pcm_info = nullptr;
     int tcard, tdevice, tsubdevice;
 
     snd_pcm_info_alloca(&pcm_info);
@@ -246,7 +246,7 @@ bool AudioOutputALSA::IncPreallocBufferSize(int requested, int buffer_time)
 
 QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
 {
-    QByteArray *result = NULL;
+    QByteArray *result = nullptr;
     snd_hctl_t *hctl;
     snd_hctl_elem_t *elem;
     snd_ctl_elem_info_t *info;     snd_ctl_elem_info_alloca(&info);
@@ -267,7 +267,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
         VBAUDIO(QString("Control %1 open error: %2")
                 .arg(card)
                 .arg(snd_strerror(err)));
-        return NULL;
+        return nullptr;
     }
     if ((err = snd_hctl_load(hctl)) < 0)
     {
@@ -275,7 +275,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
                 .arg(card)
                 .arg(snd_strerror(err)));
         /* frees automatically the control which cannot be added. */
-        return NULL;
+        return nullptr;
     }
     elem = snd_hctl_find_elem(hctl, id);
     if (elem)
@@ -286,7 +286,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
                     .arg(card)
                     .arg(snd_strerror(err)));
             snd_hctl_close(hctl);
-            return NULL;
+            return nullptr;
         }
         unsigned int count = snd_ctl_elem_info_get_count(info);
         type = snd_ctl_elem_info_get_type(info);
@@ -295,7 +295,7 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
             VBAUDIO(QString("Control %1 element info is not readable")
                     .arg(card));
             snd_hctl_close(hctl);
-            return NULL;
+            return nullptr;
         }
         if ((err = snd_hctl_elem_read(elem, control)) < 0)
         {
@@ -303,14 +303,14 @@ QByteArray *AudioOutputALSA::GetELD(int card, int device, int subdevice)
                     .arg(card)
                     .arg(snd_strerror(err)));
             snd_hctl_close(hctl);
-            return NULL;
+            return nullptr;
         }
         if (type != SND_CTL_ELEM_TYPE_BYTES)
         {
             VBAUDIO(QString("Control %1 element is of the wrong type")
                     .arg(card));
             snd_hctl_close(hctl);
-            return NULL;
+            return nullptr;
         }
         result = new QByteArray((char *)snd_ctl_elem_value_get_bytes(control),
                                 count);
@@ -331,14 +331,14 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     if (pcm_handle)
     {
         snd_pcm_close(pcm_handle);
-        pcm_handle = NULL;
+        pcm_handle = nullptr;
     }
 
     if ((err = TryOpenDevice(OPEN_FLAGS, passthrough)) < 0)
     {
         AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
         delete settings;
-        return NULL;
+        return nullptr;
     }
 
     snd_pcm_hw_params_alloca(&params);
@@ -350,15 +350,15 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
         {
             AERROR(QString("snd_pcm_open(\"%1\")").arg(m_lastdevice));
             delete settings;
-            return NULL;
+            return nullptr;
         }
         if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
         {
             AERROR("No playback configurations available");
             snd_pcm_close(pcm_handle);
-            pcm_handle = NULL;
+            pcm_handle = nullptr;
             delete settings;
-            return NULL;
+            return nullptr;
         }
         Warn("Supported audio format detection will be inacurrate "
              "(using plugin?)");
@@ -393,7 +393,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     {
         // Check if we can retrieve ELD for this device
         QByteArray *eld = GetELD(card, device, subdevice);
-        if (eld != NULL)
+        if (eld != nullptr)
         {
             VBAUDIO(QString("Successfully retrieved ELD data"));
             settings->setELD(eld);
@@ -406,7 +406,7 @@ AudioOutputSettings* AudioOutputALSA::GetOutputSettings(bool passthrough)
     }
 
     snd_pcm_close(pcm_handle);
-    pcm_handle = NULL;
+    pcm_handle = nullptr;
 
     /* Check if name or description contains information
        to know if device can accept passthrough or not */
@@ -454,7 +454,7 @@ bool AudioOutputALSA::OpenDevice()
     uint buffer_time, period_time;
     int err;
 
-    if (pcm_handle != NULL)
+    if (pcm_handle != nullptr)
         CloseDevice();
 
     if ((err = TryOpenDevice(0, passthru || enc)) < 0)
@@ -503,12 +503,12 @@ void AudioOutputALSA::CloseDevice()
 {
     if (m_mixer.handle)
         snd_mixer_close(m_mixer.handle);
-    m_mixer.handle = NULL;
+    m_mixer.handle = nullptr;
     if (pcm_handle)
     {
         snd_pcm_drain(pcm_handle);
         snd_pcm_close(pcm_handle);
-        pcm_handle = NULL;
+        pcm_handle = nullptr;
     }
 }
 
@@ -549,9 +549,9 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
     uint frames = size / output_bytes_per_frame;
     int err;
 
-    if (pcm_handle == NULL)
+    if (pcm_handle == nullptr)
     {
-        Error("WriteAudio() called with pcm_handle == NULL!");
+        Error("WriteAudio() called with pcm_handle == nullptr!");
         return;
     }
 
@@ -630,9 +630,9 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
 
 int AudioOutputALSA::GetBufferedOnSoundcard(void) const
 {
-    if (pcm_handle == NULL)
+    if (pcm_handle == nullptr)
     {
-        VBERROR("getBufferedOnSoundcard() called with pcm_handle == NULL!");
+        VBERROR("getBufferedOnSoundcard() called with pcm_handle == nullptr!");
         return 0;
     }
 
@@ -669,9 +669,9 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
             .arg(format).arg(channels).arg(rate).arg(buffer_time)
             .arg(period_time));
 
-    if (handle == NULL)
+    if (handle == nullptr)
     {
-        Error(QObject::tr("SetParameters() called with handle == NULL!"));
+        Error(QObject::tr("SetParameters() called with handle == nullptr!"));
         return -1;
     }
 
@@ -702,7 +702,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
         CHECKERR(QString("Resampling setup failed").arg(rate));
 
         uint rrate = rate;
-        err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, 0);
+        err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, nullptr);
         CHECKERR(QString("Rate %1Hz not available for playback: %s").arg(rate));
 
         if (rrate != rate)
@@ -721,8 +721,8 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     /* set the buffer time */
     err = snd_pcm_hw_params_get_buffer_size_min(params, &buffer_size_min);
     err = snd_pcm_hw_params_get_buffer_size_max(params, &buffer_size_max);
-    err = snd_pcm_hw_params_get_period_size_min(params, &period_size_min, NULL);
-    err = snd_pcm_hw_params_get_period_size_max(params, &period_size_max, NULL);
+    err = snd_pcm_hw_params_get_period_size_min(params, &period_size_min, nullptr);
+    err = snd_pcm_hw_params_get_period_size_max(params, &period_size_max, nullptr);
     VBAUDIO(QString("Buffer size range from %1 to %2")
             .arg(buffer_size_min)
             .arg(buffer_size_max));
@@ -734,7 +734,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     uint original_buffer_time = buffer_time;
     bool canincrease = true;
     err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
-                                                 &buffer_time, NULL);
+                                                 &buffer_time, nullptr);
     if (err < 0)
     {
         int dir         = -1;
@@ -784,7 +784,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
 
     /* set the period time */
     err = snd_pcm_hw_params_set_periods_near(handle, params,
-                                             &period_time, NULL);
+                                             &period_time, nullptr);
     CHECKERR(QString("Unable to set period time %1").arg(period_time));
     VBAUDIO(QString("Period time = %1 periods").arg(period_time));
 
@@ -905,12 +905,12 @@ bool AudioOutputALSA::OpenMixer(void)
 
     QByteArray dev_ba = m_mixer.device.toLatin1();
     struct snd_mixer_selem_regopt regopts =
-        {1, SND_MIXER_SABSTRACT_NONE, dev_ba.constData(), NULL, NULL};
+        {1, SND_MIXER_SABSTRACT_NONE, dev_ba.constData(), nullptr, nullptr};
 
-    if ((chk = snd_mixer_selem_register(m_mixer.handle, &regopts, NULL)) < 0)
+    if ((chk = snd_mixer_selem_register(m_mixer.handle, &regopts, nullptr)) < 0)
     {
         snd_mixer_close(m_mixer.handle);
-        m_mixer.handle = NULL;
+        m_mixer.handle = nullptr;
         VBERROR(QString("failed to register %1: %2")
                 .arg(mixer_device_tag).arg(snd_strerror(chk)));
         return false;
@@ -919,17 +919,17 @@ bool AudioOutputALSA::OpenMixer(void)
     if ((chk = snd_mixer_load(m_mixer.handle)) < 0)
     {
         snd_mixer_close(m_mixer.handle);
-        m_mixer.handle = NULL;
+        m_mixer.handle = nullptr;
         VBERROR(QString("failed to load %1: %2")
                 .arg(mixer_device_tag).arg(snd_strerror(chk)));
         return false;
     }
 
-    m_mixer.elem = NULL;
+    m_mixer.elem = nullptr;
     uint elcount = snd_mixer_get_count(m_mixer.handle);
     snd_mixer_elem_t* elx = snd_mixer_first_elem(m_mixer.handle);
 
-    for (uint ctr = 0; elx != NULL && ctr < elcount; ctr++)
+    for (uint ctr = 0; elx != nullptr && ctr < elcount; ctr++)
     {
         QString tmp = QString(snd_mixer_selem_get_name(elx));
         if (m_mixer.control == tmp &&
@@ -948,7 +948,7 @@ bool AudioOutputALSA::OpenMixer(void)
     if (!m_mixer.elem)
     {
         snd_mixer_close(m_mixer.handle);
-        m_mixer.handle = NULL;
+        m_mixer.handle = nullptr;
         VBERROR(QString("no playback control %1 found on %2")
                 .arg(m_mixer.control).arg(mixer_device_tag));
         return false;
@@ -958,7 +958,7 @@ bool AudioOutputALSA::OpenMixer(void)
                                                    &m_mixer.volmax) < 0))
     {
         snd_mixer_close(m_mixer.handle);
-        m_mixer.handle = NULL;
+        m_mixer.handle = nullptr;
         VBERROR(QString("failed to get volume range on %1/%2")
                 .arg(mixer_device_tag).arg(m_mixer.control));
         return false;
@@ -995,7 +995,7 @@ QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
         return alsadevs;
     n = hints;
 
-    while (*n != NULL)
+    while (*n != nullptr)
     {
           char *name = snd_device_name_get_hint(*n, "NAME");
           char *desc = snd_device_name_get_hint(*n, "DESC");

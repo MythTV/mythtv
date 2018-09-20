@@ -70,7 +70,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref)
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -94,7 +94,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref)
     }
 
     s_hlshandlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 HLSStreamHandler::HLSStreamHandler(const IPTVTuningData& tuning) :

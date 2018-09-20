@@ -29,7 +29,7 @@ class MediaMonitorUnix : public MediaMonitor
 #endif
 
   protected:
-    ~MediaMonitorUnix() {}
+    ~MediaMonitorUnix() = default;
 
 #if !CONFIG_QTDBUS
     virtual void CheckDeviceNotifications(void);

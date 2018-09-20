@@ -21,7 +21,7 @@ class ClassicLogoDetector : public LogoDetectorBase
     unsigned int getRequiredAvailableBufferForSearch();
 
   protected:
-    virtual ~ClassicLogoDetector() {}
+    virtual ~ClassicLogoDetector() = default;
 
   private:
     void SetLogoMaskArea();

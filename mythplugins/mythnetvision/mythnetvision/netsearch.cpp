@@ -34,11 +34,11 @@ using namespace std;
 
 NetSearch::NetSearch(MythScreenStack *parent, const char *name)
     : NetBase(parent, name),
-      m_searchResultList(NULL),      m_siteList(NULL),
-      m_search(NULL),                m_pageText(NULL),
-      m_noSites(NULL),               m_progress(NULL),
-      m_okPopup(NULL),               m_netSearch(NULL),
-      m_reply(NULL),
+      m_searchResultList(nullptr),   m_siteList(nullptr),
+      m_search(nullptr),             m_pageText(nullptr),
+      m_noSites(nullptr),            m_progress(nullptr),
+      m_okPopup(nullptr),            m_netSearch(nullptr),
+      m_reply(nullptr),
       m_currentSearch(QString()),    m_currentGrabber(0),
       m_currentCmd(QString()),       m_pagenum(0),
       m_maxpage(0),                  m_mythXML(GetMythXMLURL())
@@ -109,7 +109,7 @@ NetSearch::~NetSearch()
     {
         m_netSearch->disconnect();
         m_netSearch->deleteLater();
-        m_netSearch = NULL;
+        m_netSearch = nullptr;
     }
 }
 
@@ -418,7 +418,7 @@ void NetSearch::SearchTimeout(Search *)
         else
         {
             delete m_okPopup;
-            m_okPopup = NULL;
+            m_okPopup = nullptr;
         }
     }
 }
@@ -510,9 +510,9 @@ void NetSearch::SlotItemChanged()
 
         ResultItem res(btn->GetText(), QString(), QString(),
                        QString(), QString(), QString(), QString(),
-                       QDateTime(), 0, 0, -1, QString(), QStringList(),
+                       QDateTime(), nullptr, nullptr, -1, QString(), QStringList(),
                        QString(), QStringList(), 0, 0, QString(),
-                       0, QStringList(), 0, 0, 0);
+                       false, QStringList(), 0, 0, false);
 
         SetTextAndThumbnail(btn, &res);
     }

@@ -20,7 +20,7 @@
 #define LOC_ERR QString("MythGame:GAMEHANDLER Error: ")
 #define LOC QString("MythGame:GAMEHANDLER: ")
 
-static QList<GameHandler*> *handlers = NULL;
+static QList<GameHandler*> *handlers = nullptr;
 
 static void checkHandlers(void)
 {
@@ -76,7 +76,7 @@ void GameHandler::updateSettings(GameHandler *handler)
     }
 }
 
-GameHandler* GameHandler::newInstance = 0;
+GameHandler* GameHandler::newInstance = nullptr;
 
 GameHandler* GameHandler::newHandler(QString name)
 {
@@ -490,7 +490,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     if (m_progressDlg)
     {
         m_progressDlg->Close();
-        m_progressDlg = NULL;
+        m_progressDlg = nullptr;
 }
 }
 
@@ -545,7 +545,7 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
     if (m_progressDlg)
     {
         m_progressDlg->Close();
-        m_progressDlg = NULL;
+        m_progressDlg = nullptr;
     }
 }
 
@@ -713,7 +713,7 @@ void GameHandler::processGames(GameHandler *handler)
         else
         {
             delete busyDialog;
-            busyDialog = NULL;
+            busyDialog = nullptr;
         }
 
         m_GameMap[handler->SystemCmdLine()] =
@@ -744,7 +744,7 @@ void GameHandler::processGames(GameHandler *handler)
         if (m_progressDlg)
         {
             m_progressDlg->Close();
-            m_progressDlg = NULL;
+            m_progressDlg = nullptr;
         }
     }
 
@@ -790,7 +790,7 @@ void GameHandler::processAllGames(void)
 GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
 {
     if (!rominfo)
-        return NULL;
+        return nullptr;
 
     for (int x = 0; x < handlers->size(); x++)
     {
@@ -802,13 +802,13 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 GameHandler* GameHandler::GetHandlerByName(QString systemname)
 {
     if (systemname.isEmpty() || systemname.isNull())
-        return NULL;
+        return nullptr;
 
     for (int x = 0; x < handlers->size(); x++)
     {
@@ -821,7 +821,7 @@ GameHandler* GameHandler::GetHandlerByName(QString systemname)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
@@ -934,7 +934,7 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
 RomInfo *GameHandler::CreateRomInfo(RomInfo *parent)
 {
     if (!parent || !GetHandler(parent))
-        return NULL;
+        return nullptr;
 
     return new RomInfo(*parent);
 }
@@ -1013,6 +1013,6 @@ void GameHandler::CreateProgress(QString message)
     else
     {
         delete m_progressDlg;
-        m_progressDlg = NULL;
+        m_progressDlg = nullptr;
     }
 }

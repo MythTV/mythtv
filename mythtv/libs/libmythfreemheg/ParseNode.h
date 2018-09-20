@@ -30,7 +30,7 @@ class MHGroup;
 // Abstract base class for the text and binary parsers.
 class MHParseBase {
   public:
-    virtual ~MHParseBase() {}
+    virtual ~MHParseBase() = default;
     virtual MHParseNode *Parse() = 0;
 };
 
@@ -42,7 +42,7 @@ class MHParseNode
   protected:
     MHParseNode(enum NodeType nt): m_nNodeType(nt) {}
   public:
-    virtual ~MHParseNode() {}
+    virtual ~MHParseNode() = default;
     enum NodeType m_nNodeType;
 
     void Failure(const char *p); // Report a parse failure.

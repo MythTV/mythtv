@@ -25,7 +25,7 @@ static void free_vec(VPI_ptr &v)
         for (; it != v->end(); ++it)
             delete *it;
         delete v;
-        v = NULL;
+        v = nullptr;
     }
 }
 
@@ -45,7 +45,7 @@ class ProgramInfoLoader : public QRunnable
 };
 
 ProgramInfoCache::ProgramInfoCache(QObject *o) :
-    m_next_cache(NULL), m_listener(o),
+    m_next_cache(nullptr), m_listener(o),
     m_load_is_queued(false), m_loads_in_progress(0)
 {
 }
@@ -135,7 +135,7 @@ void ProgramInfoCache::Refresh(void)
             m_cache[(*it)->GetRecordingID()] = *it;
         }
         delete m_next_cache;
-        m_next_cache = NULL;
+        m_next_cache = nullptr;
         return;
     }
     locker.unlock();
@@ -270,7 +270,7 @@ ProgramInfo *ProgramInfoCache::GetRecordingInfo(uint recordingID) const
     if (it != m_cache.end())
         return *it;
 
-    return NULL;
+    return nullptr;
 }
 
 /// Clears the cache, m_lock must be held when this is called.

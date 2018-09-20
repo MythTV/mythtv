@@ -33,13 +33,13 @@ QEvent::Type OSDHideEvent::kEventType =
     (QEvent::Type) QEvent::registerEventType();
 
 ChannelEditor::ChannelEditor(QObject *retobject, const char *name)
-  : MythScreenType((MythScreenType*)NULL, name)
+  : MythScreenType((MythScreenType*)nullptr, name)
 {
     m_retObject    = retobject;
-    m_callsignEdit = NULL;
-    m_channumEdit  = NULL;
-    m_channameEdit = NULL;
-    m_xmltvidEdit  = NULL;
+    m_callsignEdit = nullptr;
+    m_channumEdit  = nullptr;
+    m_channameEdit = nullptr;
+    m_xmltvidEdit  = nullptr;
 }
 
 bool ChannelEditor::Create(void)
@@ -47,8 +47,8 @@ bool ChannelEditor::Create(void)
     if (!XMLParseBase::LoadWindowFromXML("osd.xml", "ChannelEditor", this))
         return false;
 
-    MythUIButton *probeButton = NULL;
-    MythUIButton *okButton    = NULL;
+    MythUIButton *probeButton = nullptr;
+    MythUIButton *okButton    = nullptr;
 
     bool err = false;
     UIUtilE::Assign(this, m_callsignEdit, "callsign", &err);
@@ -152,7 +152,7 @@ void ChannelEditor::sendResult(int result)
 
 OSD::OSD(MythPlayer *player, QObject *parent, MythPainter *painter)
   : m_parent(player), m_ParentObject(parent), m_CurrentPainter(painter),
-    m_Rect(QRect()), m_Effects(true), m_FadeTime(kOSDFadeTime), m_Dialog(NULL),
+    m_Rect(QRect()), m_Effects(true), m_FadeTime(kOSDFadeTime), m_Dialog(nullptr),
     m_PulsedDialogText(QString()), m_NextPulseUpdate(QDateTime()),
     m_Refresh(false), m_Visible(false), m_UIScaleOverride(false),
     m_SavedWMult(1.0f), m_SavedHMult(1.0f),   m_SavedUIRect(QRect()),
@@ -172,7 +172,7 @@ void OSD::TearDown(void)
     foreach(MythScreenType* screen, m_Children)
         delete screen;
     m_Children.clear();
-    m_Dialog = NULL;
+    m_Dialog = nullptr;
 }
 
 bool OSD::Init(const QRect &rect, float font_aspect)
@@ -332,7 +332,7 @@ void OSD::LoadWindows(void)
     for (int i = 0; i < 7; i++)
     {
         const char* window = default_windows[i];
-        MythOSDWindow *win = new MythOSDWindow(NULL, window, true);
+        MythOSDWindow *win = new MythOSDWindow(nullptr, window, true);
 
         win->SetPainter(m_CurrentPainter);
         if (win->Create())
@@ -753,7 +753,7 @@ bool OSD::DrawDirect(MythPainter* painter, QSize size, bool repaint)
     if (redraw && visible)
     {
         QRect cliprect = QRect(QPoint(0, 0), size);
-        painter->Begin(NULL);
+        painter->Begin(nullptr);
         for (it = m_Children.begin(); it != m_Children.end(); ++it)
         {
             if ((*it)->IsVisible())
@@ -1086,7 +1086,7 @@ MythScreenType *OSD::GetWindow(const QString &window)
     if (m_Children.contains(window))
         return m_Children.value(window);
 
-    MythScreenType *new_window = NULL;
+    MythScreenType *new_window = nullptr;
 
     if (window == OSD_WIN_INTERACT)
     {
@@ -1098,7 +1098,7 @@ MythScreenType *OSD::GetWindow(const QString &window)
     }
     else
     {
-        new_window = new MythOSDWindow(NULL, window, false);
+        new_window = new MythOSDWindow(nullptr, window, false);
     }
 
     new_window->SetPainter(m_CurrentPainter);
@@ -1113,7 +1113,7 @@ MythScreenType *OSD::GetWindow(const QString &window)
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create window %1")
             .arg(window));
     delete new_window;
-    return NULL;
+    return nullptr;
 }
 
 void OSD::SetFunctionalWindow(const QString &window, enum OSDFunctionalType type)
@@ -1187,7 +1187,7 @@ void OSD::DialogQuit(void)
         return;
 
     RemoveWindow(m_Dialog->objectName());
-    m_Dialog = NULL;
+    m_Dialog = nullptr;
     m_PulsedDialogText = QString();
 }
 
@@ -1218,11 +1218,11 @@ void OSD::DialogShow(const QString &window, const QString &text, int updatefor)
         if (window == OSD_DLG_EDITOR)
             dialog = new ChannelEditor(m_ParentObject, window.toLatin1());
         else if (window == OSD_DLG_CONFIRM)
-            dialog = new MythConfirmationDialog(NULL, text, false);
+            dialog = new MythConfirmationDialog(nullptr, text, false);
         else if (window == OSD_DLG_NAVIGATE)
             dialog = new OsdNavigation(m_ParentObject, window, this);
         else
-            dialog = new MythDialogBox(text, NULL, window.toLatin1(), false, true);
+            dialog = new MythDialogBox(text, nullptr, window.toLatin1(), false, true);
 
         dialog->SetPainter(m_CurrentPainter);
         if (dialog->Create())
@@ -1296,7 +1296,7 @@ void OSD::DialogGetText(InfoMap &map)
 
 TeletextScreen* OSD::InitTeletext(void)
 {
-    TeletextScreen *tt = NULL;
+    TeletextScreen *tt = nullptr;
     if (m_Children.contains(OSD_WIN_TELETEXT))
     {
         tt = (TeletextScreen*)m_Children.value(OSD_WIN_TELETEXT);
@@ -1316,14 +1316,14 @@ TeletextScreen* OSD::InitTeletext(void)
         else
         {
             delete tt;
-            tt = NULL;
+            tt = nullptr;
         }
         RevertUIScale();
     }
     if (!tt)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Teletext window");
-        return NULL;
+        return nullptr;
     }
 
     HideWindow(OSD_WIN_TELETEXT);
@@ -1382,7 +1382,7 @@ void OSD::TeletextClear(void)
 
 SubtitleScreen* OSD::InitSubtitles(void)
 {
-    SubtitleScreen *sub = NULL;
+    SubtitleScreen *sub = nullptr;
     if (m_Children.contains(OSD_WIN_SUBTITLE))
     {
         sub = (SubtitleScreen*)m_Children.value(OSD_WIN_SUBTITLE);
@@ -1401,14 +1401,14 @@ SubtitleScreen* OSD::InitSubtitles(void)
         else
         {
             delete sub;
-            sub = NULL;
+            sub = nullptr;
         }
         RevertUIScale();
     }
     if (!sub)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create subtitle window");
-        return NULL;
+        return nullptr;
     }
     return sub;
 }
@@ -1463,13 +1463,13 @@ void OSD::DisplayBDOverlay(BDOverlay* overlay)
 }
 
 OsdNavigation::OsdNavigation(QObject *retobject, const QString &name, OSD *osd)
-  : MythScreenType((MythScreenType*)NULL, name),
+  : MythScreenType((MythScreenType*)nullptr, name),
     m_retObject(retobject),
     m_osd(osd),
-    m_playButton(0),
-    m_pauseButton(0),
-    m_muteButton(0),
-    m_unMuteButton(0),
+    m_playButton(nullptr),
+    m_pauseButton(nullptr),
+    m_muteButton(nullptr),
+    m_unMuteButton(nullptr),
     m_paused('X'),
     m_muted('X'),
     m_visibleGroup(0),

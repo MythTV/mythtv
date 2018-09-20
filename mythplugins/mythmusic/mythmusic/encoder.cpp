@@ -9,7 +9,7 @@
 using namespace std;
 
 Encoder::Encoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata)
-    : m_outfile(outfile), m_out(NULL), m_quality(qualitylevel),
+    : m_outfile(outfile), m_out(nullptr), m_quality(qualitylevel),
       m_metadata(metadata)
 {
     if (!m_outfile.isEmpty())

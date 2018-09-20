@@ -154,8 +154,8 @@ class VDPAULayer
             memset(&m_dst, 0, sizeof(m_dst));
         m_layer.struct_version   = VDP_LAYER_VERSION;
         m_layer.source_surface   = surface;
-        m_layer.source_rect      = src ? &m_src : NULL;
-        m_layer.destination_rect = dst ? &m_dst : NULL;
+        m_layer.source_rect      = src ? &m_src : nullptr;
+        m_layer.destination_rect = dst ? &m_dst : nullptr;
     }
 
     VdpLayer m_layer;
@@ -168,7 +168,7 @@ class VDPAUResource
   public:
     VDPAUResource() : m_id(0) {}
     VDPAUResource(uint id, QSize size) : m_id(id), m_size(size) { }
-    virtual ~VDPAUResource() {}
+    virtual ~VDPAUResource() = default;
 
     uint  m_id;
     QSize m_size;
@@ -187,7 +187,7 @@ class VDPAUOutputSurface : public VDPAUResource
 class VDPAUVideoSurface : public VDPAUResource
 {
   public:
-    VDPAUVideoSurface() : m_type(0), m_needs_reset(false), m_owner(NULL)
+    VDPAUVideoSurface() : m_type(0), m_needs_reset(false), m_owner(nullptr)
     {
         memset(&m_render, 0, sizeof(struct vdpau_render_state));
     }
@@ -238,15 +238,15 @@ class VDPAUVideoMixer : public VDPAUResource
   public:
     VDPAUVideoMixer() :
         m_layers(0), m_features(0), m_type(0),
-        m_noise_reduction(NULL), m_sharpness(NULL),
-        m_skip_chroma(NULL), m_background(NULL)
+        m_noise_reduction(nullptr), m_sharpness(nullptr),
+        m_skip_chroma(nullptr), m_background(nullptr)
     {
     }
     VDPAUVideoMixer(uint id, QSize size, uint layers, uint features,
                     VdpChromaType type)
      : VDPAUResource(id, size), m_layers(layers), m_features(features),
-      m_type(type), m_noise_reduction(NULL), m_sharpness(NULL),
-      m_skip_chroma(NULL), m_background(NULL)
+      m_type(type), m_noise_reduction(nullptr), m_sharpness(nullptr),
+      m_skip_chroma(nullptr), m_background(nullptr)
     {
         memset(&m_csc, 0, sizeof(VdpCSCMatrix));
     }
@@ -292,10 +292,10 @@ MythRenderVDPAU::MythRenderVDPAU()
   : MythRender(kRenderVDPAU), m_preempted(false), m_recreating(false),
     m_recreated(false), m_reset_video_surfaces(false),
     m_render_lock(QMutex::Recursive), m_decode_lock(QMutex::Recursive),
-    m_display(NULL), m_window(0), m_device(0), m_surface(0),
+    m_display(nullptr), m_window(0), m_device(0), m_surface(0),
     m_flipQueue(0),  m_flipTarget(0), m_flipReady(false), m_colorKey(0),
     m_flipFrames(false),
-    vdp_get_proc_address(NULL), vdp_get_error_string(NULL)
+    vdp_get_proc_address(nullptr), vdp_get_error_string(nullptr)
 {
     LOCK_ALL
     ResetProcs();
@@ -373,7 +373,7 @@ bool MythRenderVDPAU::CreateDummy(void)
 
     bool ok = true;
     m_display = OpenMythXDisplay();
-    CREATE_CHECK(m_display != NULL, "Invalid display")
+    CREATE_CHECK(m_display != nullptr, "Invalid display")
     CREATE_CHECK(CreateDevice(),    "No VDPAU device")
     CREATE_CHECK(GetProcs(),        "No VDPAU procedures")
     CREATE_CHECK(CheckHardwareSupport(), "")
@@ -390,7 +390,7 @@ bool MythRenderVDPAU::CreateDecodeOnly(void)
 
     bool ok = true;
     m_display = OpenMythXDisplay();
-    CREATE_CHECK(m_display != NULL,  "Invalid display")
+    CREATE_CHECK(m_display != nullptr,  "Invalid display")
     CREATE_CHECK(CreateDevice(),     "No VDPAU device")
     CREATE_CHECK(GetProcs(),         "No VDPAU procedures")
     CREATE_CHECK(RegisterCallback(), "No callback")
@@ -417,7 +417,7 @@ bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
     bool ok = true;
 
     CREATE_CHECK(!m_size.isEmpty(), "Invalid size")
-    CREATE_CHECK(m_display != NULL, "Invalid display")
+    CREATE_CHECK(m_display != nullptr, "Invalid display")
     CREATE_CHECK(m_window > 0, "Invalid window")
     CREATE_CHECK(m_display->CreateGC(m_window), "No GC")
     CREATE_CHECK(CreateDevice(), "No VDPAU device")
@@ -565,7 +565,7 @@ bool MythRenderVDPAU::GetScreenShot(int width, int height, QString filename)
     unsigned char* buffer = new unsigned char[size];
     void* const data[1] = { buffer };
     const uint32_t pitches[1] = { w * 4 };
-    vdp_st = vdp_output_surface_get_bits_native(surface, NULL, data, pitches);
+    vdp_st = vdp_output_surface_get_bits_native(surface, nullptr, data, pitches);
     CHECK_ST
 
     if (!ok)
@@ -867,7 +867,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
                 "High quality scaling not available");
     }
 
-    vdp_st = vdp_video_mixer_create(m_device, count, count ? feat : NULL,
+    vdp_st = vdp_video_mixer_create(m_device, count, count ? feat : nullptr,
                                     4, parameters, parameter_values, &tmp);
     CHECK_ST
 
@@ -1162,12 +1162,12 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
     outRectVid.y1 = dst_vid.top() +  dst_vid.height();
 
     vdp_st = vdp_video_mixer_render(mixer, VDP_INVALID_HANDLE,
-                                    NULL, field, deint ? 2 : 0,
-                                    deint ? past_surfaces : NULL,
+                                    nullptr, field, deint ? 2 : 0,
+                                    deint ? past_surfaces : nullptr,
                                     vid_surf, deint ? 1 : 0,
-                                    deint ? future_surfaces : NULL,
+                                    deint ? future_surfaces : nullptr,
                                     &srcRect, surf, &outRect, &outRectVid,
-                                    num_layers, num_layers ? layers : NULL);
+                                    num_layers, num_layers ? layers : nullptr);
     CHECK_ST
     return ok;
 }
@@ -1298,7 +1298,7 @@ bool MythRenderVDPAU::UploadBitmap(uint id, void* const plane[1], uint32_t pitch
     }
 
     INIT_ST
-    vdp_st = vdp_bitmap_surface_put_bits_native(bitmap, plane, pitch, NULL);
+    vdp_st = vdp_bitmap_surface_put_bits_native(bitmap, plane, pitch, nullptr);
     CHECK_ST
 
     return ok;
@@ -1431,7 +1431,7 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
             void *plane[1] = { bmp };
             uint32_t pitch[1] = { 4 };
             vdp_st =
-                vdp_bitmap_surface_put_bits_native(bitmap, plane, pitch, NULL);
+                vdp_bitmap_surface_put_bits_native(bitmap, plane, pitch, nullptr);
             CHECK_ST
             if (!ok)
             {
@@ -1446,8 +1446,8 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     }
 
     vdp_st = vdp_output_surface_render_bitmap_surface(
-                surface, dst ? &vdest : NULL, bitmap, src ? &vsrc  : NULL,
-                alpha >= 0 ? &color : NULL, &VDPBlends[blend],
+                surface, dst ? &vdest : nullptr, bitmap, src ? &vsrc  : nullptr,
+                alpha >= 0 ? &color : nullptr, &VDPBlends[blend],
                 VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
     CHECK_ST
 
@@ -1477,7 +1477,7 @@ bool MythRenderVDPAU::DrawLayer(uint id, uint target)
     vdp_st = vdp_output_surface_render_output_surface(
                 m_outputSurfaces[target].m_id, (m_layers[id].m_layer.destination_rect),
                 m_layers[id].m_layer.source_surface, (m_layers[id].m_layer.source_rect),
-                NULL, &VDPBlends[kVDPBlendNormal], VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
+                nullptr, &VDPBlends[kVDPBlendNormal], VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
     CHECK_ST
     return ok;
 }
@@ -1492,11 +1492,11 @@ int MythRenderVDPAU::GetBitmapSize(uint id)
 
 void* MythRenderVDPAU::GetRender(uint id)
 {
-    CHECK_STATUS(NULL)
+    CHECK_STATUS(nullptr)
     LOCK_RENDER
 
     if (!m_videoSurfaces.contains(id))
-        return NULL;
+        return nullptr;
 
     return &(m_videoSurfaces[id].m_render);
 }
@@ -1765,7 +1765,7 @@ bool MythRenderVDPAU::RegisterCallback(bool enable)
     if (vdp_preemption_callback_register && m_device)
     {
         vdp_st = vdp_preemption_callback_register(
-                    m_device, enable ? &vdpau_preemption_callback : NULL,
+                    m_device, enable ? &vdpau_preemption_callback : nullptr,
                     (void*)this);
         CHECK_ST
     }
@@ -1884,14 +1884,14 @@ void MythRenderVDPAU::Destroy(void)
     if (m_display)
     {
         delete m_display;
-        m_display = NULL;
+        m_display = nullptr;
     }
 }
 
 void MythRenderVDPAU::DestroyDevice(void)
 {
-    vdp_get_error_string = NULL;
-    vdp_get_proc_address = NULL;
+    vdp_get_error_string = nullptr;
+    vdp_get_proc_address = nullptr;
     if (vdp_device_destroy && m_device)
     {
         vdp_device_destroy(m_device);
@@ -1901,44 +1901,44 @@ void MythRenderVDPAU::DestroyDevice(void)
 
 void MythRenderVDPAU::ResetProcs(void)
 {
-    vdp_device_destroy = NULL;
-    vdp_video_surface_create = NULL;
-    vdp_video_surface_destroy = NULL;
-    vdp_video_surface_put_bits_y_cb_cr = NULL;
-    vdp_video_surface_get_parameters = NULL;
-    vdp_video_surface_get_bits_y_cb_cr = NULL;
-    vdp_output_surface_put_bits_native = NULL;
-    vdp_output_surface_create = NULL;
-    vdp_output_surface_destroy = NULL;
-    vdp_output_surface_render_bitmap_surface = NULL;
-    vdp_output_surface_get_parameters = NULL;
-    vdp_output_surface_get_bits_native = NULL;
-    vdp_output_surface_render_output_surface = NULL;
-    vdp_video_mixer_create = NULL;
-    vdp_video_mixer_set_feature_enables = NULL;
-    vdp_video_mixer_destroy = NULL;
-    vdp_video_mixer_render = NULL;
-    vdp_video_mixer_set_attribute_values = NULL;
-    vdp_generate_csc_matrix = NULL;
-    vdp_video_mixer_query_feature_support = NULL;
-    vdp_presentation_queue_target_destroy = NULL;
-    vdp_presentation_queue_create = NULL;
-    vdp_presentation_queue_destroy = NULL;
-    vdp_presentation_queue_display = NULL;
-    vdp_presentation_queue_block_until_surface_idle = NULL;
-    vdp_presentation_queue_target_create_x11 = NULL;
-    vdp_presentation_queue_get_time = NULL;
-    vdp_presentation_queue_set_background_color = NULL;
-    vdp_decoder_create = NULL;
-    vdp_decoder_destroy = NULL;
-    vdp_decoder_render = NULL;
-    vdp_decoder_query_capabilities = NULL;
-    vdp_bitmap_surface_create = NULL;
-    vdp_bitmap_surface_destroy = NULL;
-    vdp_bitmap_surface_put_bits_native = NULL;
-    vdp_preemption_callback_register = NULL;
-    vdp_get_api_version = NULL;
-    vdp_get_information_string = NULL;
+    vdp_device_destroy = nullptr;
+    vdp_video_surface_create = nullptr;
+    vdp_video_surface_destroy = nullptr;
+    vdp_video_surface_put_bits_y_cb_cr = nullptr;
+    vdp_video_surface_get_parameters = nullptr;
+    vdp_video_surface_get_bits_y_cb_cr = nullptr;
+    vdp_output_surface_put_bits_native = nullptr;
+    vdp_output_surface_create = nullptr;
+    vdp_output_surface_destroy = nullptr;
+    vdp_output_surface_render_bitmap_surface = nullptr;
+    vdp_output_surface_get_parameters = nullptr;
+    vdp_output_surface_get_bits_native = nullptr;
+    vdp_output_surface_render_output_surface = nullptr;
+    vdp_video_mixer_create = nullptr;
+    vdp_video_mixer_set_feature_enables = nullptr;
+    vdp_video_mixer_destroy = nullptr;
+    vdp_video_mixer_render = nullptr;
+    vdp_video_mixer_set_attribute_values = nullptr;
+    vdp_generate_csc_matrix = nullptr;
+    vdp_video_mixer_query_feature_support = nullptr;
+    vdp_presentation_queue_target_destroy = nullptr;
+    vdp_presentation_queue_create = nullptr;
+    vdp_presentation_queue_destroy = nullptr;
+    vdp_presentation_queue_display = nullptr;
+    vdp_presentation_queue_block_until_surface_idle = nullptr;
+    vdp_presentation_queue_target_create_x11 = nullptr;
+    vdp_presentation_queue_get_time = nullptr;
+    vdp_presentation_queue_set_background_color = nullptr;
+    vdp_decoder_create = nullptr;
+    vdp_decoder_destroy = nullptr;
+    vdp_decoder_render = nullptr;
+    vdp_decoder_query_capabilities = nullptr;
+    vdp_bitmap_surface_create = nullptr;
+    vdp_bitmap_surface_destroy = nullptr;
+    vdp_bitmap_surface_put_bits_native = nullptr;
+    vdp_preemption_callback_register = nullptr;
+    vdp_get_api_version = nullptr;
+    vdp_get_information_string = nullptr;
 }
 
 void MythRenderVDPAU::DestroyPresentationQueue(void)

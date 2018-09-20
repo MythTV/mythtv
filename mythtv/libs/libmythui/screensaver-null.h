@@ -6,8 +6,8 @@
 class ScreenSaverNull : public ScreenSaver
 {
 public:
-    ScreenSaverNull();
-    ~ScreenSaverNull();
+    ScreenSaverNull() = default;
+    ~ScreenSaverNull() = default;
 
     void Disable(void);
     void Restore(void);

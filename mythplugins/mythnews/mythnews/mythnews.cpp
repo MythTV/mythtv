@@ -47,17 +47,17 @@ MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     m_UpdateFreq(gCoreContext->GetNumSetting("NewsUpdateFrequency", 30)),
     m_zoom(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0")),
     m_browser(gCoreContext->GetSetting("WebBrowserCommand", "")),
-    m_menuPopup(NULL),
-    m_sitesList(NULL),
-    m_articlesList(NULL),
-    m_nositesText(NULL),
-    m_updatedText(NULL),
-    m_titleText(NULL),
-    m_descText(NULL),
-    m_thumbnailImage(NULL),
-    m_downloadImage(NULL),
-    m_enclosureImage(NULL),
-    m_podcastImage(NULL)
+    m_menuPopup(nullptr),
+    m_sitesList(nullptr),
+    m_articlesList(nullptr),
+    m_nositesText(nullptr),
+    m_updatedText(nullptr),
+    m_titleText(nullptr),
+    m_descText(nullptr),
+    m_thumbnailImage(nullptr),
+    m_downloadImage(nullptr),
+    m_enclosureImage(nullptr),
+    m_podcastImage(nullptr)
 {
     // Setup cache directory
 
@@ -223,7 +223,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
     if (!selected)
         return;
 
-    NewsSite *site = NULL;
+    NewsSite *site = nullptr;
     NewsArticle article;
 
     if (GetFocusWidget() == m_articlesList)
@@ -628,7 +628,7 @@ void MythNews::ShowEditDialog(bool edit)
 {
     QMutexLocker locker(&m_lock);
 
-    NewsSite *site = NULL;
+    NewsSite *site = nullptr;
 
     if (edit)
     {
@@ -698,7 +698,7 @@ void MythNews::ShowMenu(void)
     else
     {
         delete m_menuPopup;
-        m_menuPopup = NULL;
+        m_menuPopup = nullptr;
     }
 }
 
@@ -748,6 +748,6 @@ void MythNews::customEvent(QEvent *event)
                 deleteNewsSite();
         }
 
-        m_menuPopup = NULL;
+        m_menuPopup = nullptr;
     }
 }

@@ -88,9 +88,9 @@ MythCodecID Vaapi2Context::GetBestSupportedCodec(
 int Vaapi2Context::HwDecoderInit(AVCodecContext *ctx)
 {
     int ret = 0;
-    AVBufferRef *hw_device_ctx = NULL;
+    AVBufferRef *hw_device_ctx = nullptr;
 
-    const char *device = NULL;
+    const char *device = nullptr;
     QString vaapiDevice = gCoreContext->GetSetting("VAAPIDevice");
     if (!vaapiDevice.isEmpty())
     {
@@ -98,7 +98,7 @@ int Vaapi2Context::HwDecoderInit(AVCodecContext *ctx)
     }
 
     ret = av_hwdevice_ctx_create(&hw_device_ctx, AV_HWDEVICE_TYPE_VAAPI,
-                                      device, NULL, 0);
+                                      device, nullptr, 0);
     if (ret < 0)
     {
         char error[AV_ERROR_MAX_STRING_SIZE];

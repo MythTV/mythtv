@@ -74,9 +74,9 @@ void FilterScanThread::run()
 GalleryFilterDialog::GalleryFilterDialog(MythScreenStack *parent, QString name,
                                          GalleryFilter *filter)
             : MythScreenType(parent, name),
-            m_dirFilter(NULL), m_typeFilter(NULL), m_numImagesText(NULL),
-            m_sortList(NULL), m_checkButton(NULL), m_saveButton(NULL),
-            m_doneButton(NULL)
+            m_dirFilter(nullptr), m_typeFilter(nullptr), m_numImagesText(nullptr),
+            m_sortList(nullptr), m_checkButton(nullptr), m_saveButton(nullptr),
+            m_doneButton(nullptr)
 {
     m_settingsOriginal = filter;
     m_settingsOriginal->dumpFilter("GalleryFilterDialog:ctor (original)");

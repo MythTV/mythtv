@@ -43,8 +43,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         sgroupid(0),
         desiredrecstartts(),
         desiredrecendts(),
-        record(NULL),
-        m_recordingFile(NULL) { LoadRecordingFile(); }
+        record(nullptr),
+        m_recordingFile(nullptr) { LoadRecordingFile(); }
     RecordingInfo(const RecordingInfo &other) :
         ProgramInfo(other),
         oldrecstatus(other.oldrecstatus),
@@ -55,8 +55,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         sgroupid(other.sgroupid),
         desiredrecstartts(other.desiredrecstartts),
         desiredrecendts(other.desiredrecendts),
-        record(NULL),
-        m_recordingFile(NULL)  { LoadRecordingFile(); }
+        record(nullptr),
+        m_recordingFile(nullptr)  { LoadRecordingFile(); }
     explicit RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other),
         oldrecstatus(RecStatus::Unknown),
@@ -67,8 +67,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
-        record(NULL),
-        m_recordingFile(NULL)  { LoadRecordingFile(); }
+        record(nullptr),
+        m_recordingFile(nullptr)  { LoadRecordingFile(); }
     explicit RecordingInfo(uint _recordedid) :
         ProgramInfo(_recordedid),
         oldrecstatus(RecStatus::Unknown),
@@ -79,8 +79,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
-        record(NULL),
-        m_recordingFile(NULL)  { LoadRecordingFile(); }
+        record(nullptr),
+        m_recordingFile(nullptr)  { LoadRecordingFile(); }
     RecordingInfo(uint _chanid, const QDateTime &_recstartts) : /// DEPRECATED
         ProgramInfo(_chanid, _recstartts),
         oldrecstatus(RecStatus::Unknown),
@@ -91,8 +91,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
-        record(NULL),
-        m_recordingFile(NULL)  { LoadRecordingFile(); }
+        record(nullptr),
+        m_recordingFile(nullptr)  { LoadRecordingFile(); }
     RecordingInfo(QStringList::const_iterator &it,
                   QStringList::const_iterator  end) :
         ProgramInfo(it, end),
@@ -104,8 +104,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         sgroupid(0),
         desiredrecstartts(startts),
         desiredrecendts(endts),
-        record(NULL),
-        m_recordingFile(NULL)  { LoadRecordingFile(); }
+        record(nullptr),
+        m_recordingFile(nullptr)  { LoadRecordingFile(); }
     /// Create RecordingInfo from 'program'+'record'+'channel' tables,
     /// used in scheduler.cpp @ ~ 3296
     RecordingInfo(
@@ -224,7 +224,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     } LoadStatus;
     RecordingInfo(uint _chanid, const QDateTime &desiredts,
                   bool genUnknown, uint maxHours = 0,
-                  LoadStatus *status = NULL);
+                  LoadStatus *status = nullptr);
 
     typedef enum {
         kDefaultRecGroup     = 1, // Auto-increment columns start at one

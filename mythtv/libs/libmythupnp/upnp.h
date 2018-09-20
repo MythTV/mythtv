@@ -118,7 +118,7 @@ class UPNP_PUBLIC UPnp
         bool Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort,
                          HttpServer *pHttpServer );
 
-        bool isInitialized() { return (m_pHttpServer != NULL); }
+        bool isInitialized() { return (m_pHttpServer != nullptr); }
 
         virtual void Start();
 

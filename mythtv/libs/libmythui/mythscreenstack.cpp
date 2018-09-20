@@ -21,8 +21,8 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
     if (parent)
         parent->AddScreenStack(this, mainstack);
 
-    m_newTop = NULL;
-    m_topScreen = NULL;
+    m_newTop = nullptr;
+    m_topScreen = nullptr;
 
     EnableEffects();
     m_InNewTransition = false;
@@ -106,7 +106,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 
     MythMainWindow *mainwindow = GetMythMainWindow();
 
-    screen->setParent(0);
+    screen->setParent(nullptr);
     if ((screen == m_topScreen) && allowFade && m_DoTransitions
         && !mainwindow->IsExitingToMain())
     {
@@ -128,7 +128,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
         if (deleteScreen)
             screen->deleteLater();
 
-        screen = NULL;
+        screen = nullptr;
 
         mainwindow->update();
         if (mainwindow->IsExitingToMain())
@@ -138,7 +138,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
         }
     }
 
-    m_topScreen = NULL;
+    m_topScreen = nullptr;
 
     RecalculateDrawOrder();
 
@@ -180,7 +180,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
         }
 
         if (!allowFade || !m_DoTransitions)
-            emit topScreenChanged(NULL);
+            emit topScreenChanged(nullptr);
     }
 }
 
@@ -190,7 +190,7 @@ MythScreenType *MythScreenStack::GetTopScreen(void) const
         return m_topScreen;
     if (!m_DrawOrder.isEmpty())
         return m_DrawOrder.back();
-    return NULL;
+    return nullptr;
 }
 
 void MythScreenStack::GetDrawOrder(QVector<MythScreenType *> &screens)
@@ -298,7 +298,7 @@ void MythScreenStack::CheckNewFadeTransition(void)
         m_InNewTransition = false;
         if (!m_newTop->IsInitialized())
             m_DoInit = true;
-        m_newTop = NULL;
+        m_newTop = nullptr;
 
         RecalculateDrawOrder();
     }
@@ -352,7 +352,7 @@ void MythScreenStack::CheckDeletes(bool force)
             }
 
             if (*it == m_newTop)
-                m_newTop = NULL;
+                m_newTop = nullptr;
             delete (*it);
             m_ToDelete.erase(it);
             it = m_ToDelete.begin();

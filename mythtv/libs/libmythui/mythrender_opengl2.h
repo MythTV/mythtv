@@ -108,6 +108,11 @@ class MUI_PUBLIC MythRenderOpenGL2 : public MythRenderOpenGL
     MYTH_GLDISABLEVERTEXATTRIBARRAYPROC  m_glDisableVertexAttribArray;
     MYTH_GLBINDATTRIBLOCATIONPROC        m_glBindAttribLocation;
     MYTH_GLVERTEXATTRIB4FPROC            m_glVertexAttrib4f;
+
+    // Prevent compiler complaints about using 0 as a null pointer.
+    inline void m_glVertexAttribPointerI(GLuint index, GLint size, GLenum type,
+                                  GLboolean normalize, GLsizei stride,
+                                  const GLuint value);
 };
 
 #endif // MYTHRENDEROPENGL2_H

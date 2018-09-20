@@ -553,6 +553,7 @@ bool AudioConfigSettings::CheckPassthrough()
     return ok;
 }
 
+#ifdef USING_OSS
 static void fillSelectionsFromDir(HostComboBoxSetting *comboBox,
                                   const QDir& dir, bool absPath = true)
 
@@ -571,6 +572,7 @@ static void fillSelectionsFromDir(HostComboBoxSetting *comboBox,
             comboBox->addSelection( fi.fileName() );
     }
 }
+#endif
 
 void AudioConfigSettings::UpdateAudioTest()
 {
@@ -754,7 +756,7 @@ void AudioTestThread::run()
 
 AudioTest::AudioTest()
     : GroupSetting(),
-      m_at(NULL),
+      m_at(nullptr),
       m_quality(false)
 {
     int channels = 2;

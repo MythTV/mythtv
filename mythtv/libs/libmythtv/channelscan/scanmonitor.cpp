@@ -91,7 +91,7 @@ void post_event(QObject *dest, QEvent::Type type, int val,
 
 void ScanMonitor::deleteLater(void)
 {
-    channelScanner = NULL;
+    channelScanner = nullptr;
 
     QObject::deleteLater();
 }

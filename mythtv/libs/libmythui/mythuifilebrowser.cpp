@@ -26,10 +26,6 @@ MFileInfo::MFileInfo(QString fileName, QString sgDir, bool isDir, qint64 size)
     init(fileName, sgDir, isDir, size);
 }
 
-MFileInfo::~MFileInfo()
-{
-}
-
 void MFileInfo::init(QString fileName, QString sgDir, bool isDir,
                      qint64 size)
 {
@@ -148,15 +144,15 @@ qint64 MFileInfo::size(void) const
 MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
                                      const QString &startPath)
     : MythScreenType(parent, "mythuifilebrowser"),
-        m_isRemote(false),      m_previewTimer(NULL),
+        m_isRemote(false),      m_previewTimer(nullptr),
         m_typeFilter(QDir::AllDirs | QDir::Drives | QDir::Files |
                     QDir::Readable | QDir::Writable | QDir::Executable),
-        m_fileList(NULL),       m_locationEdit(NULL),
-        m_okButton(NULL),       m_cancelButton(NULL),
-        m_backButton(NULL),     m_homeButton(NULL),
-        m_previewImage(NULL),   m_infoText(NULL),
-        m_filenameText(NULL),   m_fullpathText(NULL),
-        m_retObject(NULL)
+        m_fileList(nullptr),    m_locationEdit(nullptr),
+        m_okButton(nullptr),    m_cancelButton(nullptr),
+        m_backButton(nullptr),  m_homeButton(nullptr),
+        m_previewImage(nullptr),m_infoText(nullptr),
+        m_filenameText(nullptr),m_fullpathText(nullptr),
+        m_retObject(nullptr)
 {
     SetPath(startPath);
 
@@ -166,10 +162,6 @@ MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
     m_previewTimer = new QTimer(this);
     m_previewTimer->setSingleShot(true);
     connect(m_previewTimer, SIGNAL(timeout()), SLOT(LoadPreview()));
-}
-
-MythUIFileBrowser::~MythUIFileBrowser()
-{
 }
 
 void MythUIFileBrowser::SetPath(const QString &startPath)

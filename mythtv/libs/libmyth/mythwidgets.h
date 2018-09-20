@@ -39,7 +39,7 @@ class MPUBLIC MythComboBox: public QComboBox
     Q_OBJECT
 
   public:
-    MythComboBox(bool rw, QWidget* parent=0, const char* name="MythComboBox");
+    MythComboBox(bool rw, QWidget* parent=nullptr, const char* name="MythComboBox");
 
     void setHelpText(const QString &help);
 
@@ -77,7 +77,7 @@ class MPUBLIC MythSpinBox: public QSpinBox
     Q_OBJECT
 
   public:
-    MythSpinBox(QWidget* parent = NULL, const char* name = "MythSpinBox",
+    MythSpinBox(QWidget* parent = nullptr, const char* name = "MythSpinBox",
                 bool allow_single_step = false);
 
     void setHelpText(const QString&);
@@ -103,7 +103,7 @@ class MPUBLIC MythSlider: public QSlider
     Q_OBJECT
 
   public:
-    MythSlider(QWidget* parent=0, const char* name="MythSlider");
+    MythSlider(QWidget* parent=nullptr, const char* name="MythSlider");
 
     void setHelpText(const QString&);
 
@@ -124,9 +124,9 @@ class MPUBLIC MythLineEdit : public QLineEdit
     Q_OBJECT
 
   public:
-    MythLineEdit(QWidget *parent=NULL, const char *name="MythLineEdit");
+    MythLineEdit(QWidget *parent=nullptr, const char *name="MythLineEdit");
     MythLineEdit(const QString &text,
-                 QWidget *parent=NULL, const char *name="MythLineEdit");
+                 QWidget *parent=nullptr, const char *name="MythLineEdit");
 
     void setHelpText(const QString&);;
     void setRW(bool readwrite = true) { rw = readwrite; };
@@ -278,9 +278,9 @@ class MPUBLIC MythCheckBox: public QCheckBox
     Q_OBJECT
 
   public:
-    MythCheckBox(QWidget *parent = 0, const char *name = "MythCheckBox");
+    MythCheckBox(QWidget *parent = nullptr, const char *name = "MythCheckBox");
     MythCheckBox(const QString &text,
-                 QWidget *parent = 0, const char *name = "MythCheckBox");
+                 QWidget *parent = nullptr, const char *name = "MythCheckBox");
 
     void setHelpText(const QString&);
 
@@ -301,7 +301,7 @@ class MPUBLIC MythRadioButton: public QRadioButton
     Q_OBJECT
 
   public:
-    MythRadioButton(QWidget* parent = 0, const char* name = "MythRadioButton");
+    MythRadioButton(QWidget* parent = nullptr, const char* name = "MythRadioButton");
 
     void setHelpText(const QString&);
 
@@ -376,8 +376,8 @@ class MPUBLIC MythLabel: public QLabel
     Q_OBJECT
 
 public:
-    MythLabel(QWidget* parent = 0, const char* name = "MythLabel");
-    MythLabel(const QString& text, QWidget* parent = 0,
+    MythLabel(QWidget* parent = nullptr, const char* name = "MythLabel");
+    MythLabel(const QString& text, QWidget* parent = nullptr,
               const char* name = "MythLabel");
 };
 
@@ -386,8 +386,8 @@ class MPUBLIC MythGroupBox: public QGroupBox
     Q_OBJECT
 
 public:
-    MythGroupBox(QWidget* parent = 0, const char* name = "MythGroupBox");
-    MythGroupBox(const QString& text, QWidget* parent = 0,
+    MythGroupBox(QWidget* parent = nullptr, const char* name = "MythGroupBox");
+    MythGroupBox(const QString& text, QWidget* parent = nullptr,
                  const char* name = "MythGroupBox");
 };
 

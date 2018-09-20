@@ -99,7 +99,7 @@ class MBASE_PUBLIC MythSessionManager
 {
   public :
     MythSessionManager();
-   ~MythSessionManager();
+   ~MythSessionManager() = default;
 
     /**
      * \brief Check if the given user exists but not whether there is a valid

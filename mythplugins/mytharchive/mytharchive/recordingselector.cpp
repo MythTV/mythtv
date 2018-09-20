@@ -54,17 +54,17 @@ RecordingSelector::RecordingSelector(
     MythScreenStack *parent, QList<ArchiveItem *> *archiveList) :
     MythScreenType(parent, "RecordingSelector"),
     m_archiveList(archiveList),
-    m_recordingList(NULL),
-    m_recordingButtonList(NULL),
-    m_okButton(NULL),
-    m_cancelButton(NULL),
-    m_categorySelector(NULL),
-    m_titleText(NULL),
-    m_datetimeText(NULL),
-    m_filesizeText(NULL),
-    m_descriptionText(NULL),
-    m_previewImage(NULL),
-    m_cutlistImage(NULL)
+    m_recordingList(nullptr),
+    m_recordingButtonList(nullptr),
+    m_okButton(nullptr),
+    m_cancelButton(nullptr),
+    m_categorySelector(nullptr),
+    m_titleText(nullptr),
+    m_datetimeText(nullptr),
+    m_filesizeText(nullptr),
+    m_descriptionText(nullptr),
+    m_previewImage(nullptr),
+    m_cutlistImage(nullptr)
 {
 }
 
@@ -139,7 +139,7 @@ void RecordingSelector::Init(void)
     else
     {
         delete busyPopup;
-        busyPopup = NULL;
+        busyPopup = nullptr;
     }
 
     GetRecordingListThread *thread = new GetRecordingListThread(this);
@@ -377,7 +377,7 @@ void RecordingSelector::OKPressed()
         a->videoHeight = 0;
         a->fileCodec = "";
         a->videoCodec = "";
-        a->encoderProfile = NULL;
+        a->encoderProfile = nullptr;
         a->editedDetails = false;
         m_archiveList->append(a);
     }

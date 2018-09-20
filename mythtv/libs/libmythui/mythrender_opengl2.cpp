@@ -197,28 +197,28 @@ void MythRenderOpenGL2::ResetProcs(void)
 {
     MythRenderOpenGL::ResetProcs();
 
-    m_glCreateShader = NULL;
-    m_glShaderSource = NULL;
-    m_glCompileShader = NULL;
-    m_glGetShaderiv = NULL;
-    m_glGetShaderInfoLog = NULL;
-    m_glCreateProgram = NULL;
-    m_glAttachShader = NULL;
-    m_glLinkProgram = NULL;
-    m_glUseProgram = NULL;
-    m_glDeleteProgram = NULL;
-    m_glGetProgramInfoLog = NULL;
-    m_glGetProgramiv = NULL;
-    m_glDetachShader = NULL;
-    m_glDeleteShader = NULL;
-    m_glGetUniformLocation = NULL;
-    m_glUniform1i = NULL;
-    m_glUniformMatrix4fv = NULL;
-    m_glVertexAttribPointer = NULL;
-    m_glEnableVertexAttribArray = NULL;
-    m_glDisableVertexAttribArray = NULL;
-    m_glBindAttribLocation = NULL;
-    m_glVertexAttrib4f = NULL;
+    m_glCreateShader = nullptr;
+    m_glShaderSource = nullptr;
+    m_glCompileShader = nullptr;
+    m_glGetShaderiv = nullptr;
+    m_glGetShaderInfoLog = nullptr;
+    m_glCreateProgram = nullptr;
+    m_glAttachShader = nullptr;
+    m_glLinkProgram = nullptr;
+    m_glUseProgram = nullptr;
+    m_glDeleteProgram = nullptr;
+    m_glGetProgramInfoLog = nullptr;
+    m_glGetProgramiv = nullptr;
+    m_glDetachShader = nullptr;
+    m_glDeleteShader = nullptr;
+    m_glGetUniformLocation = nullptr;
+    m_glUniform1i = nullptr;
+    m_glUniformMatrix4fv = nullptr;
+    m_glVertexAttribPointer = nullptr;
+    m_glEnableVertexAttribArray = nullptr;
+    m_glDisableVertexAttribArray = nullptr;
+    m_glBindAttribLocation = nullptr;
+    m_glVertexAttrib4f = nullptr;
 }
 
 bool MythRenderOpenGL2::InitFeatures(void)
@@ -319,6 +319,17 @@ void MythRenderOpenGL2::InitProcs(void)
         GetProcAddress("glBindAttribLocation");
     m_glVertexAttrib4f = (MYTH_GLVERTEXATTRIB4FPROC)
         GetProcAddress("glVertexAttrib4f");
+}
+
+inline void MythRenderOpenGL2::m_glVertexAttribPointerI(
+    GLuint index, GLint size, GLenum type, GLboolean normalize,
+    GLsizei stride, const GLuint value)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+    m_glVertexAttribPointer(index, size, type, normalize,
+                            stride, (const char *)value);
+#pragma GCC diagnostic pop
 }
 
 uint MythRenderOpenGL2::CreateShaderObject(const QString &vertex,
@@ -445,7 +456,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
     UpdateTextureVertices(tex, src, dst);
     if (m_exts_used & kGLExtPBufObj)
     {
-        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
         void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         if (target)
             memcpy(target, m_textures[tex].m_vertex_data, kVertexSize);
@@ -459,13 +470,13 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);
 
-    m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+    m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                             VERTEX_SIZE * sizeof(GLfloat),
-                            (const void *) kVertexOffset);
+                            kVertexOffset);
     m_glVertexAttrib4f(COLOR_INDEX, red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
-    m_glVertexAttribPointer(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
+    m_glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
                             TEXTURE_SIZE * sizeof(GLfloat),
-                            (const void *) kTextureOffset);
+                            kTextureOffset);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glCheck();
@@ -474,8 +485,6 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint tex, const QRect *src,
     m_glDisableVertexAttribArray(VERTEX_INDEX);
     m_glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
-
 
 void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
                                        const QRectF *src, const QRectF *dst,
@@ -512,7 +521,7 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
     UpdateTextureVertices(first, src, dst);
     if (m_exts_used & kGLExtPBufObj)
     {
-        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, NULL, GL_STREAM_DRAW);
+        m_glBufferData(GL_ARRAY_BUFFER, kVertexSize, nullptr, GL_STREAM_DRAW);
         void* target = m_glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         if (target)
             memcpy(target, m_textures[first].m_vertex_data, kVertexSize);
@@ -526,13 +535,13 @@ void MythRenderOpenGL2::DrawBitmapPriv(uint *textures, uint texture_count,
     m_glEnableVertexAttribArray(VERTEX_INDEX);
     m_glEnableVertexAttribArray(TEXTURE_INDEX);
 
-    m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+    m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                             VERTEX_SIZE * sizeof(GLfloat),
-                            (const void *) kVertexOffset);
+                            kVertexOffset);
     m_glVertexAttrib4f(COLOR_INDEX, 1.0, 1.0, 1.0, 1.0);
-    m_glVertexAttribPointer(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
+    m_glVertexAttribPointerI(TEXTURE_INDEX, TEXTURE_SIZE, GL_FLOAT, GL_FALSE,
                             TEXTURE_SIZE * sizeof(GLfloat),
-                            (const void *) kTextureOffset);
+                            kTextureOffset);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -601,9 +610,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
 
         SetShaderParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the top right segment
@@ -611,9 +620,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = tr.top() + rad;
         SetShaderParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tr);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom left segment
@@ -621,9 +630,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = bl.top();
         SetShaderParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, bl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom right segment
@@ -631,9 +640,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = br.top();
         SetShaderParams(elip, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, br);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Fill the remaining areas
@@ -645,19 +654,19 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         SetShaderParams(fill, m_transforms.top(), "u_transform");
 
         GetCachedVBO(GL_TRIANGLE_STRIP, main);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         GetCachedVBO(GL_TRIANGLE_STRIP, left);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         GetCachedVBO(GL_TRIANGLE_STRIP, right);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         m_glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -689,9 +698,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = tl.top() + rad;
         SetShaderParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the top right edge segment
@@ -699,9 +708,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = tr.top() + rad;
         SetShaderParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, tr);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom left edge segment
@@ -709,9 +718,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = bl.top();
         SetShaderParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, bl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom right edge segment
@@ -719,9 +728,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(1,0) = br.top();
         SetShaderParams(edge, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, br);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Vertical lines
@@ -736,9 +745,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(0,0) = vl.left() + lineWidth;
         SetShaderParams(vline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the right line segment
@@ -746,9 +755,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(0,0) = vl.left();
         SetShaderParams(vline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, vl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Horizontal lines
@@ -761,9 +770,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(0,0) = hl.top() + lineWidth;
         SetShaderParams(hline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         // Draw the bottom line segment
@@ -771,9 +780,9 @@ void MythRenderOpenGL2::DrawRoundRectPriv(const QRect &area, int cornerRadius,
         m_parameters(0,0) = hl.top();
         SetShaderParams(hline, m_parameters, "u_parameters");
         GetCachedVBO(GL_TRIANGLE_STRIP, hl);
-        m_glVertexAttribPointer(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
+        m_glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE,
                                 VERTEX_SIZE * sizeof(GLfloat),
-                               (const void *) kVertexOffset);
+                               kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         m_glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -812,7 +821,7 @@ uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
     uint result = m_glCreateShader(type);
     QByteArray src = source.toLatin1();
     const char* tmp[1] = { src.constData() };
-    m_glShaderSource(result, 1, tmp, NULL);
+    m_glShaderSource(result, 1, tmp, nullptr);
     m_glCompileShader(result);
     GLint compiled;
     m_glGetShaderiv(result, GL_COMPILE_STATUS, &compiled);
@@ -823,7 +832,7 @@ uint MythRenderOpenGL2::CreateShader(int type, const QString &source)
         if (length > 1)
         {
             char *log = (char*)malloc(sizeof(char) * length);
-            m_glGetShaderInfoLog(result, length, NULL, log);
+            m_glGetShaderInfoLog(result, length, nullptr, log);
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to compile shader.");
             LOG(VB_GENERAL, LOG_ERR, log);
             LOG(VB_GENERAL, LOG_ERR, source);

@@ -87,7 +87,7 @@ class PlaybackSock : public ReferenceCounter
     bool CheckFile(ProgramInfo *pginfo);
 
     bool IsBusy(int        capturecardnum,
-                InputInfo *busy_input  = NULL,
+                InputInfo *busy_input  = nullptr,
                 int        time_buffer = 5);
     int GetEncoderState(int capturecardnum);
     long long GetMaxBitrate(int capturecardnum);

@@ -18,7 +18,7 @@ class VisualizerView : public MusicCommon
     Q_OBJECT
   public:
     VisualizerView(MythScreenStack *parent, MythScreenType *parentScreen);
-    ~VisualizerView(void);
+    ~VisualizerView(void) = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

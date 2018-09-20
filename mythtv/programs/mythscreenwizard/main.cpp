@@ -56,7 +56,7 @@ namespace
         DestroyMythMainWindow();
 
         delete gContext;
-        gContext = NULL;
+        gContext = nullptr;
 
         ReferenceCounter::PrintDebug();
 

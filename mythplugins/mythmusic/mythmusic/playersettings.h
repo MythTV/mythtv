@@ -10,8 +10,8 @@ class PlayerSettings : public MythScreenType
 {
     Q_OBJECT
 public:
-    PlayerSettings(MythScreenStack *parent, const char *name = 0);
-    ~PlayerSettings();
+    PlayerSettings(MythScreenStack *parent, const char *name = nullptr);
+    ~PlayerSettings() = default;
 
     bool Create(void);
 

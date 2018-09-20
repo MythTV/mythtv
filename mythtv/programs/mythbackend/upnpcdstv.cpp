@@ -171,7 +171,7 @@ void UPnpCDSTv::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Recording"),
                                               QObject::tr("All Recordings"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadRecordings(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -185,7 +185,7 @@ void UPnpCDSTv::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Movie"),
                                               QObject::tr("Movies"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadMovies(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -199,7 +199,7 @@ void UPnpCDSTv::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Title"),
                                               QObject::tr("Title"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadTitles(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -215,7 +215,7 @@ void UPnpCDSTv::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Date"),
                                               QObject::tr("Date"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadDates(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -229,7 +229,7 @@ void UPnpCDSTv::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Genre"),
                                               QObject::tr("Genre"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadGenres(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -243,7 +243,7 @@ void UPnpCDSTv::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Channel"),
                                               QObject::tr("Channel"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadChannels(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -257,7 +257,7 @@ void UPnpCDSTv::CreateRoot()
     pContainer = CDSObject::CreateContainer ( containerId.arg("Recgroup"),
                                               QObject::tr("Recording Group"),
                                               m_sExtensionId, // Parent Id
-                                              NULL );
+                                              nullptr );
     // HACK
     LoadRecGroups(pRequest, pResult, tokens);
     pContainer->SetChildCount(pResult->m_nTotalMatches);
@@ -292,7 +292,7 @@ bool UPnpCDSTv::LoadMetadata(const UPnpCDSRequest* pRequest,
     // Root or Root + 1
     if (tokens[currentToken].isEmpty())
     {
-        CDSObject *container = NULL;
+        CDSObject *container = nullptr;
 
         if (pRequest->m_sObjectId == m_sExtensionId)
             container = GetRoot();
@@ -569,7 +569,7 @@ bool UPnpCDSTv::LoadTitles(const UPnpCDSRequest* pRequest,
             CDSObject* pContainer = CDSObject::CreateAlbum( CreateIDString(sRequestId, "Title", sTitle),
                                                             sTitle,
                                                             pRequest->m_sParentId,
-                                                            NULL );
+                                                            nullptr );
 
 
             pContainer->SetPropValue("description", QObject::tr("%n Episode(s)", "", nTitleCount));
@@ -652,7 +652,7 @@ bool UPnpCDSTv::LoadDates(const UPnpCDSRequest* pRequest,
         CDSObject* pContainer = CDSObject::CreateContainer( CreateIDString(sRequestId, "Date", dtDate.toString(Qt::ISODate)),
                                                             MythDate::toString(dtDate, MythDate::kDateFull | MythDate::kAutoYear | MythDate::kSimplify),
                                                             pRequest->m_sParentId,
-                                                            NULL );
+                                                            nullptr );
         pContainer->SetChildCount(nRecCount);
         pContainer->SetChildContainerCount(nRecCount);
 
@@ -723,7 +723,7 @@ bool UPnpCDSTv::LoadGenres( const UPnpCDSRequest* pRequest,
         CDSObject* pContainer = CDSObject::CreateMovieGenre( CreateIDString(sRequestId, "Genre", sGenre),
                                                              sDisplayGenre,
                                                              pRequest->m_sParentId,
-                                                             NULL );
+                                                             nullptr );
         pContainer->SetChildCount(nRecCount);
         pContainer->SetChildContainerCount(nRecCount);
 
@@ -795,7 +795,7 @@ bool UPnpCDSTv::LoadRecGroups(const UPnpCDSRequest* pRequest,
         CDSObject* pContainer = CDSObject::CreateContainer( CreateIDString(sRequestId, "RecGroup", sName),
                                                         sDisplayName.isEmpty() ? sName : sDisplayName,
                                                         pRequest->m_sParentId,
-                                                        NULL );
+                                                        nullptr );
         pContainer->SetChildCount(nRecCount);
         pContainer->SetChildContainerCount(nRecCount);
 
@@ -870,7 +870,7 @@ bool UPnpCDSTv::LoadChannels(const UPnpCDSRequest* pRequest,
         CDSObject* pContainer = CDSObject::CreateContainer( CreateIDString(sRequestId, "Channel", nChanID),
                                                         sFullName,
                                                         pRequest->m_sParentId,
-                                                        NULL );
+                                                        nullptr );
         pContainer->SetChildCount(nRecCount);
         pContainer->SetChildContainerCount(nRecCount);
 

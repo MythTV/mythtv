@@ -15,7 +15,7 @@ class CustomEdit : public MythScreenType
     Q_OBJECT
   public:
 
-    explicit CustomEdit(MythScreenStack *parent, ProgramInfo *m_pginfo = NULL);
+    explicit CustomEdit(MythScreenStack *parent, ProgramInfo *m_pginfo = nullptr);
    ~CustomEdit(void);
 
    bool Create();

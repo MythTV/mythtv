@@ -10,7 +10,7 @@ class MTV_PUBLIC FileWriterBase
 {
  public:
                  FileWriterBase();
-    virtual     ~FileWriterBase();
+    virtual     ~FileWriterBase() = default;
 
     virtual bool Init(void) { return true; }
     virtual bool OpenFile(void) { return true; }

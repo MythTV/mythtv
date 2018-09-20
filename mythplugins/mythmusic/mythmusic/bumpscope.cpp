@@ -18,7 +18,7 @@ using namespace std;
 #include <QPainter>
 
 BumpScope::BumpScope() :
-    m_image(NULL),
+    m_image(nullptr),
 
     m_size(0,0),
 
@@ -32,7 +32,7 @@ BumpScope::BumpScope() :
 
     m_bpl(0),
 
-    m_rgb_buf(NULL),
+    m_rgb_buf(nullptr),
 
     m_iangle(0), m_ixo(0), m_iyo(0), m_ixd(0), m_iyd(0), m_ilx(0), m_ily(0),
     m_was_moving(0), m_was_color(0),

@@ -17,7 +17,7 @@
 #include "sourceManager.h"
 #include "dbcheck.h"
 
-SourceManager *srcMan = 0;
+SourceManager *srcMan = nullptr;
 
 static int RunWeather()
 {
@@ -127,7 +127,7 @@ int mythplugin_config()
         themedir, menuname,
         GetMythMainWindow()->GetMainStack(), "weather menu");
 
-    menu->setCallback(WeatherCallback, 0);
+    menu->setCallback(WeatherCallback, nullptr);
     menu->setKillable();
     if (menu->foundTheme())
     {
@@ -153,7 +153,7 @@ void  mythplugin_destroy()
     if (srcMan)
     {
         delete srcMan;
-        srcMan = 0;
+        srcMan = nullptr;
     }
 }
 

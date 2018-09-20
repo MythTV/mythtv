@@ -67,7 +67,7 @@ void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
 void Playlist::addTrack(MusicMetadata::IdType trackID, bool update_display)
 {
     int repo = ID_TO_REPO(trackID);
-    MusicMetadata *mdata = NULL;
+    MusicMetadata *mdata = nullptr;
 
     if (repo == RT_Radio)
         mdata = gMusicData->all_streams->getMetadata(trackID);
@@ -148,12 +148,12 @@ void Playlist::moveTrackUpDown(bool flag, int where_its_at)
 Playlist::Playlist(void) :
     m_playlistid(0),
     m_name(tr("oops")),
-    m_parent(NULL),
+    m_parent(nullptr),
     m_changed(false),
     m_doSave(true)
 #ifdef CD_WRTITING_FIXED
-    m_progress(NULL),
-    m_proc(NULL),
+    m_progress(nullptr),
+    m_proc(nullptr),
     m_procExitVal(0)
 #endif
 {
@@ -1097,7 +1097,7 @@ QString Playlist::removeDuplicateTracks(const QString &orig_songlist, const QStr
 
 MusicMetadata* Playlist::getSongAt(int pos) const
 {
-    MusicMetadata *mdata = NULL;
+    MusicMetadata *mdata = nullptr;
 
     if (pos >= 0 && pos < m_shuffledSongs.size())
     {
@@ -1115,7 +1115,7 @@ MusicMetadata* Playlist::getSongAt(int pos) const
 
 MusicMetadata* Playlist::getRawSongAt(int pos) const
 {
-    MusicMetadata *mdata = NULL;
+    MusicMetadata *mdata = nullptr;
 
     if (pos >= 0 && pos < m_songs.size())
     {

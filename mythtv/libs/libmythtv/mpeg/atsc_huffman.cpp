@@ -10,7 +10,7 @@ extern unsigned char ATSC_C5[];
 extern unsigned char ATSC_C7[];
 static const unsigned char *atsc_tables[] =
 {
-    NULL,
+    nullptr,
     ATSC_C5,
     ATSC_C7,
 };

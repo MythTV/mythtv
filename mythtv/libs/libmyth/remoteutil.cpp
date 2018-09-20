@@ -30,7 +30,7 @@ vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
     if (!RemoteGetRecordingList(*info, strlist))
     {
         delete info;
-        return NULL;
+        return nullptr;
     }
 
     return info;
@@ -546,7 +546,7 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
         return reclist;
     }
 
-    ProgramInfo *p = NULL;
+    ProgramInfo *p = nullptr;
     vector<ProgramInfo *>::iterator it = info->begin();
     // make sure whatever RemoteGetRecordingList() returned
     // only has RecStatus::Recording shows

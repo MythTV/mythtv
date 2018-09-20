@@ -70,7 +70,7 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
     MythSocket *ConnectCommandSocket(const QString &hostname, int  port,
                                      const QString &announcement,
-                                     bool *proto_mismatch = NULL,
+                                     bool *proto_mismatch = nullptr,
                                      int maxConnTry = -1,
                                      int setup_timeout = -1);
 

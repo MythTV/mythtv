@@ -40,7 +40,7 @@ class MUI_PUBLIC MythXDisplay
     bool     StopLog(void);
 
   private:
-    bool CheckErrors(Display *disp = NULL);
+    bool CheckErrors(Display *disp = nullptr);
     void CheckOrphanedErrors(void);
 
     Display      *m_disp;

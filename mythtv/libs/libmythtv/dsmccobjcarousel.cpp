@@ -24,7 +24,7 @@ DSMCCCacheModuleData::DSMCCCacheModuleData(DsmccDii *dii,
 {
     // The number of blocks needed to hold this module.
     int num_blocks = (m_moduleSize + dii->block_size - 1) / dii->block_size;
-    m_blocks.resize(num_blocks, NULL); // Set it to all zeros
+    m_blocks.resize(num_blocks, nullptr); // Set it to all zeros
 
     // Copy the descriptor information.
     m_descriptorData = info->modinfo.descriptorData;
@@ -40,7 +40,7 @@ DSMCCCacheModuleData::~DSMCCCacheModuleData()
 
 /** \fn DSMCCCacheModuleData::AddModuleData(DsmccDb*,const unsigned char*)
  *  \brief Add block to the module and create the module if it's now complete.
- *  \return data for the module if it is complete, NULL otherwise.
+ *  \return data for the module if it is complete, nullptr otherwise.
  */
 unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
                                                    const unsigned char *data)
@@ -49,11 +49,11 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
     {
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] Module %1 my version %2 != %3")
             .arg(ddb->module_id).arg(m_version).arg(ddb->module_version));
-        return NULL; // Wrong version
+        return nullptr; // Wrong version
     }
 
     if (m_completed)
-        return NULL; // Already got it.
+        return nullptr; // Already got it.
 
     if (ddb->block_number >= m_blocks.size())
     {
@@ -61,7 +61,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
                                            "is larger than %3")
             .arg(ddb->module_id).arg(ddb->block_number)
             .arg(m_blocks.size()));
-        return NULL;
+        return nullptr;
     }
 
     // Check if we have this block already or not. If not append to list
@@ -74,7 +74,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Module %1 block %2 dup: %3")
             .arg(ddb->module_id).arg(ddb->block_number +1).arg(s));
 
-        return NULL; // We have seen this block before.
+        return nullptr; // We have seen this block before.
     }
 
     // Add this to our set of blocks.
@@ -88,7 +88,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         .arg(m_receivedData).arg(m_moduleSize));
 
     if (m_receivedData < m_moduleSize)
-        return NULL; // Not yet complete
+        return nullptr; // Not yet complete
 
     LOG(VB_DSMCC, LOG_INFO,
         QString("[dsmcc] Reconstructing module %1 from blocks")
@@ -96,14 +96,14 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
 
     // Re-assemble the blocks into the complete module.
     unsigned char *tmp_data = (unsigned char*) malloc(m_receivedData);
-    if (tmp_data == NULL)
-        return NULL;
+    if (tmp_data == nullptr)
+        return nullptr;
 
     uint curp = 0;
     for (uint i = 0; i < m_blocks.size(); i++)
     {
         QByteArray *block = m_blocks[i];
-        m_blocks[i] = NULL;
+        m_blocks[i] = nullptr;
         uint size = block->size();
         memcpy(tmp_data + curp, block->data(), size);
         curp += size;
@@ -125,7 +125,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
             LOG(VB_DSMCC, LOG_ERR, "[dsmcc] compression error, skipping");
             free(tmp_data);
             free(uncompressed);
-            return NULL;
+            return nullptr;
         }
 
         free(tmp_data);

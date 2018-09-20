@@ -61,7 +61,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
         return;
     }
 
-    vorbis_encode_ctl(&vi, OV_ECTL_RATEMANAGE_SET, NULL);
+    vorbis_encode_ctl(&vi, OV_ECTL_RATEMANAGE_SET, nullptr);
     vorbis_encode_setup_init(&vi);
     vorbis_analysis_init(&vd, &vi);
     vorbis_block_init(&vd, &vb);
@@ -95,7 +95,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
 
 VorbisEncoder::~VorbisEncoder()
 {
-    addSamples(0, 0); //flush
+    addSamples(nullptr, 0); //flush
     ogg_stream_clear(&os);
     vorbis_block_clear(&vb);
     vorbis_dsp_clear(&vd);
@@ -132,7 +132,7 @@ int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
 
     while (vorbis_analysis_blockout(&vd, &vb) == 1)
     {
-        vorbis_analysis(&vb, NULL);
+        vorbis_analysis(&vb, nullptr);
         vorbis_bitrate_addblock(&vb);
  
         while (vorbis_bitrate_flushpacket(&vd, &op))

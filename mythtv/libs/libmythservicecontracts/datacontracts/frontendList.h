@@ -39,7 +39,7 @@ class SERVICE_PUBLIC FrontendList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE FrontendList(QObject *parent = 0)
+        Q_INVOKABLE FrontendList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

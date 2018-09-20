@@ -139,24 +139,24 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
         QString debugdir)
     : pgmConverter(pgmc)
     , borderDetector(bd)
-    , logoFinder(NULL)
-    , logo(NULL)
+    , logoFinder(nullptr)
+    , logo(nullptr)
     , logowidth(-1)
     , logoheight(-1)
     , logorr1(-1)
     , logocc1(-1)
     , logorr2(-1)
     , logocc2(-1)
-    , mean(NULL)
-    , median(NULL)
-    , stddev(NULL)
-    , frow(NULL)
-    , fcol(NULL)
-    , fwidth(NULL)
-    , fheight(NULL)
-    , histogram(NULL)
-    , monochromatic(NULL)
-    , buf(NULL)
+    , mean(nullptr)
+    , median(nullptr)
+    , stddev(nullptr)
+    , frow(nullptr)
+    , fcol(nullptr)
+    , fwidth(nullptr)
+    , fheight(nullptr)
+    , histogram(nullptr)
+    , monochromatic(nullptr)
+    , buf(nullptr)
     , lastframeno(-1)
     , debugLevel(0)
 #ifdef PGM_CONVERT_GREYSCALE
@@ -327,7 +327,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     ismonochromatic = borderDetector->getDimensions(pgm, pgmheight, frameno,
             &croprow, &cropcol, &cropwidth, &cropheight) != 0;
 
-    gettimeofday(&start, NULL);
+    gettimeofday(&start, nullptr);
 
     frow[frameno] = croprow;
     fcol[frameno] = cropcol;
@@ -407,7 +407,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
         sqrt((sumsquares - (float)sumval * sumval / npixels) / (npixels - 1)) :
             0;
 
-    (void)gettimeofday(&end, NULL);
+    (void)gettimeofday(&end, nullptr);
     timersub(&end, &start, &elapsed);
     timeradd(&analyze_time, &elapsed, &analyze_time);
 

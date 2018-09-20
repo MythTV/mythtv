@@ -10,7 +10,7 @@ class TeletextDecoder
   public:
     explicit TeletextDecoder(TeletextReader *reader)
       : m_teletext_reader(reader), m_decodertype(-1) {}
-    virtual ~TeletextDecoder() {}
+    virtual ~TeletextDecoder() = default;
 
     int  GetDecoderType(void) const { return m_decodertype; }
     void Decode(const unsigned char *buf, int vbimode);

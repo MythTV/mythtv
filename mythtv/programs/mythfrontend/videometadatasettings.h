@@ -15,8 +15,8 @@ class MetadataSettings : public MythScreenType
 
   public:
 
-    MetadataSettings(MythScreenStack *parent, const char *name = 0);
-    ~MetadataSettings();
+    MetadataSettings(MythScreenStack *parent, const char *name = nullptr);
+    ~MetadataSettings() = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);

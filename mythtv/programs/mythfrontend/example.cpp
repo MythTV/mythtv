@@ -32,7 +32,7 @@ class AirPlayPictureScreen : public MythScreenType
 AirPlayPictureScreen::AirPlayPictureScreen(MythScreenStack *parent)
               :MythScreenType(parent, "airplaypicture"),
               m_imageFilename(""), m_imageDescription(""),
-              m_airplayImage(NULL), m_airplayText(NULL)
+              m_airplayImage(nullptr), m_airplayText(nullptr)
 {
 }
 

@@ -8,22 +8,17 @@
 
 ImportSettings::ImportSettings(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name),
-        m_paranoiaLevel(NULL),
-        m_filenameTemplate(NULL),
-        m_noWhitespace(NULL),
-        m_postCDRipScript(NULL),
-        m_ejectCD(NULL),
-        m_encoderType(NULL),
-        m_defaultRipQuality(NULL),
-        m_mp3UseVBR(NULL),
-        m_saveButton(NULL),
-        m_cancelButton(NULL)
+        m_paranoiaLevel(nullptr),
+        m_filenameTemplate(nullptr),
+        m_noWhitespace(nullptr),
+        m_postCDRipScript(nullptr),
+        m_ejectCD(nullptr),
+        m_encoderType(nullptr),
+        m_defaultRipQuality(nullptr),
+        m_mp3UseVBR(nullptr),
+        m_saveButton(nullptr),
+        m_cancelButton(nullptr)
 {
-}
-
-ImportSettings::~ImportSettings()
-{
-
 }
 
 bool ImportSettings::Create()

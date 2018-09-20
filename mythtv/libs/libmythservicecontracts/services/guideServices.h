@@ -49,7 +49,7 @@ class SERVICE_PUBLIC GuideServices : public Service  //, public QScriptable ???
         // Must call InitializeCustomTypes for each unique Custom Type used
         // in public slots below.
 
-        GuideServices( QObject *parent = 0 ) : Service( parent )
+        GuideServices( QObject *parent = nullptr ) : Service( parent )
         {
             DTC::ProgramGuide::InitializeCustomTypes();
             DTC::ProgramList ::InitializeCustomTypes();

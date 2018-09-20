@@ -27,7 +27,7 @@ QImageIOPlugin::Capabilities DcrawPlugin::capabilities(QIODevice *device, const 
             return CanRead;
     }
 
-    return 0;
+    return nullptr;
 }
 
 QImageIOHandler *DcrawPlugin::create(QIODevice *device, const QByteArray &format) const

@@ -78,10 +78,10 @@ RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
     readposition(0LL),    lastposition(0LL),
     canresume(false),     recordernum(0),
     lock(QMutex::NonRecursive),
-    controlSock(NULL),    sock(NULL),
+    controlSock(nullptr), sock(nullptr),
     query("QUERY_FILETRANSFER %1"),
     writemode(write),     completed(false),
-    localFile(-1),        fileWriter(NULL)
+    localFile(-1),        fileWriter(nullptr)
 {
     if (writemode)
     {
@@ -103,12 +103,12 @@ RemoteFile::~RemoteFile()
     if (controlSock)
     {
         controlSock->DecrRef();
-        controlSock = NULL;
+        controlSock = nullptr;
     }
     if (sock)
     {
         sock->DecrRef();
-        sock = NULL;
+        sock = nullptr;
     }
 }
 
@@ -159,7 +159,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Could not connect to server %1:%2") .arg(host).arg(port));
         lsock->DecrRef();
-        return NULL;
+        return nullptr;
     }
 
     QString hostname = GetMythDB()->GetHostName();
@@ -172,7 +172,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Failed validation to server %1:%2").arg(host).arg(port));
         lsock->DecrRef();
-        return NULL;
+        return nullptr;
     }
 #endif
 
@@ -185,7 +185,7 @@ MythSocket *RemoteFile::openSocket(bool control)
                 QString("Could not read string list from server %1:%2")
                     .arg(host).arg(port));
             lsock->DecrRef();
-            return NULL;
+            return nullptr;
         }
     }
     else
@@ -233,7 +233,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     if (strlist.isEmpty() || strlist[0] == "ERROR")
     {
         lsock->DecrRef();
-        lsock = NULL;
+        lsock = nullptr;
         if (strlist.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, loc + "Failed to open socket, timeout");
@@ -254,7 +254,7 @@ bool RemoteFile::isOpen() const
 {
     if (isLocal())
     {
-        return writemode ? (fileWriter != NULL) : (localFile != -1);
+        return writemode ? (fileWriter != nullptr) : (localFile != -1);
     }
     return sock && controlSock;
 }
@@ -301,7 +301,7 @@ bool RemoteFile::OpenInternal()
             if (!fileWriter->Open())
             {
                 delete fileWriter;
-                fileWriter = NULL;
+                fileWriter = nullptr;
                 LOG(VB_FILE, LOG_ERR, QString("RemoteFile::Open(%1) write mode error")
                     .arg(path));
                 return false;
@@ -386,7 +386,7 @@ void RemoteFile::Close(bool haslock)
         ::close(localFile);
         localFile = -1;
         delete fileWriter;
-        fileWriter = NULL;
+        fileWriter = nullptr;
         return;
     }
     if (!controlSock)
@@ -408,12 +408,12 @@ void RemoteFile::Close(bool haslock)
     if (sock)
     {
         sock->DecrRef();
-        sock = NULL;
+        sock = nullptr;
     }
     if (controlSock)
     {
         controlSock->DecrRef();
-        controlSock = NULL;
+        controlSock = nullptr;
     }
 
     if (!haslock)

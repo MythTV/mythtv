@@ -24,7 +24,7 @@ class UPnpCDSMusic : public UPnpCDSExtension
     public:
 
         UPnpCDSMusic();
-        virtual ~UPnpCDSMusic() { };
+        virtual ~UPnpCDSMusic() = default;
 
     protected:
 

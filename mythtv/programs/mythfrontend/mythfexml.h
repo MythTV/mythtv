@@ -47,7 +47,7 @@ class MythFEXML : public Eventing
 
   public:
     MythFEXML( UPnpDevice *pDevice ,  const QString &sSharePath);
-    virtual ~MythFEXML();
+    virtual ~MythFEXML() = default;
 
     virtual QStringList GetBasePaths();
 

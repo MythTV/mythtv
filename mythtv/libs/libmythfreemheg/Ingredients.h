@@ -35,7 +35,7 @@ class MHIngredient : public MHRoot
   public:
     MHIngredient();
     MHIngredient(const MHIngredient &ref);
-    virtual ~MHIngredient() {}
+    virtual ~MHIngredient() = default;
     virtual void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
     virtual void PrintMe(FILE *fd, int nTabs) const;
     virtual bool InitiallyActive() { return m_fInitiallyActive; }

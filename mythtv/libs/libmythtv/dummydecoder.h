@@ -11,7 +11,7 @@ class DummyDecoder : public DecoderBase
   public:
     DummyDecoder(MythPlayer *parent, const ProgramInfo &pginfo) :
         DecoderBase(parent, pginfo) {}
-    virtual ~DummyDecoder() {}
+    virtual ~DummyDecoder() = default;
 
     virtual int OpenFile(RingBuffer *, bool, char *, int) { return 0; }
     virtual bool GetFrame(DecodeType) { usleep(10000); return false; }

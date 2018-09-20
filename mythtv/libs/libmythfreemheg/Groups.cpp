@@ -94,7 +94,7 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
     // Ignore the other stuff at the moment.
     MHParseNode *pItems = p->GetNamedArg(C_ITEMS);
 
-    if (pItems == NULL)
+    if (pItems == nullptr)
     {
         p->Failure("Missing :Items block");
         return;
@@ -103,7 +103,7 @@ void MHGroup::Initialise(MHParseNode *p, MHEngine *engine)
     for (int i = 0; i < pItems->GetArgCount(); i++)
     {
         MHParseNode *pItem = pItems->GetArgN(i);
-        MHIngredient *pIngredient = NULL;
+        MHIngredient *pIngredient = nullptr;
 
         try
         {
@@ -351,7 +351,7 @@ MHRoot *MHGroup::FindByObjectNo(int n)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 // Set up a timer or cancel a timer.
@@ -451,7 +451,7 @@ MHApplication::MHApplication()
     m_nLineArtCHook = 0;
     m_tuneinfo = 0;
 
-    m_pCurrentScene = NULL;
+    m_pCurrentScene = nullptr;
     m_nLockCount = 0;
     m_fRestarting = false;
 }
@@ -484,7 +484,7 @@ void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)
     MHParseNode *pDefattrs = p->GetNamedArg(C_DEFAULT_ATTRIBUTES);
 
     // but in the text form they're encoded in the Application block.
-    if (pDefattrs == NULL)
+    if (pDefattrs == nullptr)
     {
         pDefattrs = p;
     }
@@ -573,7 +573,7 @@ void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)
     // finds the first occurrence of :Font in the table and returns 13.
     MHParseNode *pFont = pDefattrs->GetNamedArg(C_FONT2);
 
-    if (pFont == NULL)
+    if (pFont == nullptr)
     {
         pFont = pDefattrs->GetNamedArg(C_FONT);
     }

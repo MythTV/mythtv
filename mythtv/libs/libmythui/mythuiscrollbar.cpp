@@ -19,10 +19,6 @@ MythUIScrollBar::MythUIScrollBar(MythUIType *parent, const QString &name)
 {
 }
 
-MythUIScrollBar::~MythUIScrollBar()
-{
-}
-
 void MythUIScrollBar::Reset()
 {
     m_pageStep = kDefaultPageStep;
@@ -185,6 +181,6 @@ void MythUIScrollBar::timerEvent(QTimerEvent *)
 
 void MythUIScrollBar::DoneFading(void)
 {
-    disconnect(this, SIGNAL(FinishedFading()), 0, 0);
+    disconnect(this, SIGNAL(FinishedFading()), nullptr, nullptr);
     Hide();
 }

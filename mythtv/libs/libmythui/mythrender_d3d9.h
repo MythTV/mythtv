@@ -84,7 +84,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     IDirect3DTexture9*      CreateTexture(const QSize &size);
     void                    DeleteTexture(IDirect3DTexture9* texture);
 
-    IDirect3DVertexBuffer9* CreateVertexBuffer(IDirect3DTexture9* texture = NULL);
+    IDirect3DVertexBuffer9* CreateVertexBuffer(IDirect3DTexture9* texture = nullptr);
     bool                    UpdateVertexBuffer(IDirect3DVertexBuffer9* vertexbuffer,
                                                const QRect &dvr, const QRect &vr,
                                                int alpha = 255, bool video = false);
@@ -108,7 +108,7 @@ class MUI_PUBLIC MythRenderD3D9 : public MythRender
     void                    Init2DState(void);
     void                    EnableBlending(IDirect3DDevice9* dev, bool enable);
     void                    MultiTexturing(IDirect3DDevice9* dev, bool enable,
-                                           IDirect3DTexture9 *texture = NULL);
+                                           IDirect3DTexture9 *texture = nullptrptr);
     void                    SetTextureVertices(IDirect3DDevice9* dev, bool enable);
 
   private:

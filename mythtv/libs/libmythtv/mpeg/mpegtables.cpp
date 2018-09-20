@@ -359,7 +359,7 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
         LOG(VB_GENERAL, LOG_ERR,
             "PAT::Create: Error, old PAT size exceeds maximum PAT size.");
         delete pat;
-        return 0;
+        return nullptr;
     }
 
     uint offset = PSIP_OFFSET;
@@ -380,7 +380,7 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
 
 ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
 {
-    ProgramMapTable *pmt = NULL;
+    ProgramMapTable *pmt = nullptr;
     TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
     memcpy(tspacket->data() + sizeof(TSHeader) + 1/* start of field pointer */,
            DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
@@ -1263,12 +1263,12 @@ SpliceInformationTable *SpliceInformationTable::GetDecrypted(
     const QString &/*codeWord*/) const
 {
     // TODO
-    return NULL;
+    return nullptr;
 }
 
 bool SpliceInformationTable::Parse(void)
 {
-    _epilog = NULL;
+    _epilog = nullptr;
     _ptrs0.clear();
     _ptrs1.clear();
 
@@ -1300,7 +1300,7 @@ bool SpliceInformationTable::Parse(void)
             bool event_cancel = cur[4] & 0x80;
             if (event_cancel)
             {
-                _ptrs1.push_back(NULL);
+                _ptrs1.push_back(nullptr);
                 cur += 5;
                 continue;
             }
@@ -1353,10 +1353,10 @@ bool SpliceInformationTable::Parse(void)
     }
     else
     {
-        _epilog = NULL;
+        _epilog = nullptr;
     }
 
-    return _epilog != NULL;
+    return _epilog != nullptr;
 }
 
 QString SpliceInformationTable::EncryptionAlgorithmString(void) const

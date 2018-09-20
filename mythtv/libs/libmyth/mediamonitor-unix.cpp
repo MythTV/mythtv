@@ -144,7 +144,7 @@ void MediaMonitorUnix::deleteLater(void)
 bool MediaMonitorUnix::CheckFileSystemTable(void)
 {
 #ifndef Q_OS_ANDROID
-    struct fstab * mep = NULL;
+    struct fstab * mep = nullptr;
 
     // Attempt to open the file system descriptor entry.
     if (!setfsent())
@@ -154,7 +154,7 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
     }
 
     // Add all the entries
-    while ((mep = getfsent()) != NULL)
+    while ((mep = getfsent()) != nullptr)
         AddDevice(mep);
 
     endfsent();
@@ -350,15 +350,15 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     // Use libudev to determine the name
     ret.clear();
     struct udev *udev = udev_new();
-    if (udev != NULL)
+    if (udev != nullptr)
     {
         struct udev_device *device =
             udev_device_new_from_syspath(udev, sysfs.toLatin1().constData());
-        if (device != NULL)
+        if (device != nullptr)
         {
             const char *name = udev_device_get_devnode(device);
 
-            if (name != NULL)
+            if (name != nullptr)
                 ret = tr(name);
             else
             {
@@ -638,7 +638,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     LOG(VB_GENERAL, LOG_DEBUG, "AddDevice - " + devicePath);
 #endif
 
-    MythMediaDevice* pDevice = NULL;
+    MythMediaDevice* pDevice = nullptr;
     struct stat sbuf;
 
     bool is_supermount = false;
@@ -684,10 +684,10 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     }
     else
     {
-        char *dev = 0;
+        char *dev = nullptr;
         int len = 0;
         dev = strstr(mep->fs_mntops, SUPER_OPT_DEV);
-        if (dev == NULL)
+        if (dev == nullptr)
             return false;
 
         dev += sizeof(SUPER_OPT_DEV)-1;
@@ -786,7 +786,7 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
     LOG(VB_MEDIA, LOG_DEBUG,
              LOC + ":FindPartitions(" + dev +
              QString(",%1").arg(checkPartitions ? " true" : " false" ) + ")");
-    MythMediaDevice* pDevice = NULL;
+    MythMediaDevice* pDevice = nullptr;
 
     if (checkPartitions)
     {

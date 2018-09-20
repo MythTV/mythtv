@@ -26,11 +26,11 @@ class DarwinFirewireDevice;
 class DarwinAVCInfo : public AVCInfo
 {
   public:
-    DarwinAVCInfo() :
-        fw_node_ref(NULL), fw_device_ref(NULL),
-        fw_service_ref(NULL), avc_service_ref(NULL),
-        fw_device_notifier_ref(NULL),
-        avc_handle(NULL), fw_handle(NULL) { }
+    DarwinAVCInfo() :%
+        fw_node_ref(nullptr), fw_device_ref(nullptr),
+        fw_service_ref(nullptr), avc_service_ref(nullptr),
+        fw_device_notifier_ref(nullptr),
+        avc_handle(nullptr), fw_handle(nullptr) { }
 
     void Update(uint64_t _guid, DarwinFirewireDevice *dev,
                 IONotificationPortRef notify_port,

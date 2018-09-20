@@ -56,7 +56,7 @@ class META_PUBLIC MultiValue
 
   protected:
     explicit MultiValue(MultiValueImp *imp);
-    virtual ~MultiValue();
+    virtual ~MultiValue() = default;
 
   private:
     MultiValueImp *m_imp;
@@ -69,7 +69,7 @@ class META_PUBLIC VideoCategory : public SingleValue
 
   private:
     VideoCategory();
-    ~VideoCategory();
+    ~VideoCategory() = default;
 };
 
 class META_PUBLIC VideoCountry : public SingleValue
@@ -79,7 +79,7 @@ class META_PUBLIC VideoCountry : public SingleValue
 
   private:
     VideoCountry();
-    ~VideoCountry();
+    ~VideoCountry() = default;
 };
 
 class META_PUBLIC VideoGenre : public SingleValue
@@ -89,7 +89,7 @@ class META_PUBLIC VideoGenre : public SingleValue
 
   private:
     VideoGenre();
-    ~VideoGenre();
+    ~VideoGenre() = default;
 };
 
 class META_PUBLIC VideoGenreMap : public MultiValue
@@ -99,7 +99,7 @@ class META_PUBLIC VideoGenreMap : public MultiValue
 
   private:
     VideoGenreMap();
-    ~VideoGenreMap();
+    ~VideoGenreMap() = default;
 };
 
 class META_PUBLIC VideoCountryMap : public MultiValue
@@ -109,7 +109,7 @@ class META_PUBLIC VideoCountryMap : public MultiValue
 
   private:
     VideoCountryMap();
-    ~VideoCountryMap();
+    ~VideoCountryMap() = default;
 };
 
 class META_PUBLIC VideoCast : public SingleValue
@@ -119,7 +119,7 @@ class META_PUBLIC VideoCast : public SingleValue
 
   private:
     VideoCast();
-    ~VideoCast();
+    ~VideoCast() = default;
 };
 
 class META_PUBLIC VideoCastMap : public MultiValue
@@ -129,7 +129,7 @@ class META_PUBLIC VideoCastMap : public MultiValue
 
   private:
     VideoCastMap();
-    ~VideoCastMap();
+    ~VideoCastMap() = default;
 };
 
 class META_PUBLIC FileAssociations

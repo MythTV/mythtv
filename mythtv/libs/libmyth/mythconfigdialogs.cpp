@@ -104,7 +104,7 @@ DialogCode ConfigurationDialog::exec(bool saveOnAccept, bool doLoad)
     clear_widgets(cfgChildren, childwidget);
 
     dialog->deleteLater();
-    dialog = NULL;
+    dialog = nullptr;
 
     return ret;
 }
@@ -142,7 +142,7 @@ MythDialog *ConfigurationWizard::dialogWidget(MythMainWindow *parent,
     QWidget *widget = parent;
     if (qApp->platformName().contains("egl"))
         widget = wizard;
-    QWidget *child = NULL;
+    QWidget *child = nullptr;
     ChildList::iterator it = cfgChildren.begin();
     for (; it != cfgChildren.end(); ++it)
     {

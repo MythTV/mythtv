@@ -92,7 +92,7 @@ bool SourceManager::findScripts()
     QString busymessage = tr("Searching for scripts");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("weather stack");
-    if (popupStack == NULL)
+    if (popupStack == nullptr)
         popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
@@ -105,7 +105,7 @@ bool SourceManager::findScripts()
     else
     {
         delete busyPopup;
-        busyPopup = NULL;
+        busyPopup = nullptr;
     }
 
     qApp->processEvents();
@@ -145,7 +145,7 @@ bool SourceManager::findScripts()
     if (busyPopup)
     {
         busyPopup->Close();
-        busyPopup = NULL;
+        busyPopup = nullptr;
     }
 
     return m_scripts.count() > 0;
@@ -195,7 +195,7 @@ void SourceManager::setupSources()
 
 ScriptInfo *SourceManager::getSourceByName(const QString &name)
 {
-    ScriptInfo *src = 0;
+    ScriptInfo *src = nullptr;
     for (int x = 0; x < m_scripts.size(); x++)
     {
         src = m_scripts.at(x);
@@ -210,7 +210,7 @@ ScriptInfo *SourceManager::getSourceByName(const QString &name)
         LOG(VB_GENERAL, LOG_ERR, "No Source found for " + name);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 QStringList SourceManager::getLocationList(ScriptInfo *si, const QString &str)
@@ -257,7 +257,7 @@ WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,
     LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("NeedSourceFor: Unable to find source for %1, %2, %3")
             .arg(id).arg(loc).arg(units));
-    return NULL;
+    return nullptr;
 }
 
 void SourceManager::startTimers()

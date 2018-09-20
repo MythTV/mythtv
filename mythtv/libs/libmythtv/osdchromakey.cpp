@@ -41,19 +41,19 @@ bool ChromaKeyOSD::CreateShmImage(QSize area)
 
     XImage *shm_img =
         XShmCreateImage(d, DefaultVisual(d,screen_num),
-                        disp->GetDepth(), ZPixmap, 0,
+                        disp->GetDepth(), ZPixmap, nullptr,
                         &shm_infos, area.width(),area.height());
     if (shm_img)
         size = shm_img->bytes_per_line * (shm_img->height+1) + 128;
 
     shm_infos.shmid   = 0;
-    shm_infos.shmaddr = NULL;
+    shm_infos.shmaddr = nullptr;
     if (shm_img)
     {
         shm_infos.shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
         if (shm_infos.shmid >= 0)
         {
-            shm_infos.shmaddr = (char*) shmat(shm_infos.shmid, 0, 0);
+            shm_infos.shmaddr = (char*) shmat(shm_infos.shmid, nullptr, 0);
 
             shm_img->data = shm_infos.shmaddr;
             shm_infos.readOnly = False;
@@ -63,7 +63,7 @@ bool ChromaKeyOSD::CreateShmImage(QSize area)
 
             // Mark for delete immediately.
             // It won't actually be removed until after we detach it.
-            shmctl(shm_infos.shmid, IPC_RMID, 0);
+            shmctl(shm_infos.shmid, IPC_RMID, nullptr);
             img = shm_img;
             return true;
         }
@@ -80,13 +80,13 @@ void ChromaKeyOSD::DestroyShmImage(void)
     disp->Lock();
     XShmDetach(disp->GetDisplay(), &shm_infos);
     XFree(img);
-    img = NULL;
+    img = nullptr;
     disp->Unlock();
 
     if (shm_infos.shmaddr)
         shmdt(shm_infos.shmaddr);
     if (shm_infos.shmid > 0)
-        shmctl(shm_infos.shmid, IPC_RMID, 0);
+        shmctl(shm_infos.shmid, IPC_RMID, nullptr);
 
     memset(&shm_infos, 0, sizeof(XShmSegmentInfo));
 }
@@ -123,13 +123,13 @@ void ChromaKeyOSD::TearDown(void)
     if (image)
     {
         delete image;
-        image = NULL;
+        image = nullptr;
     }
 
     if (painter)
     {
         delete painter;
-        painter = NULL;
+        painter = nullptr;
     }
 }
 
@@ -171,8 +171,8 @@ void ChromaKeyOSD::BlendOrCopy(uint32_t colour, const QRect &rect)
     static mmx_t zero   = {0x0000000000000000LL};
     uint32_t *src_start = (uint32_t*)src;
     uint32_t *dst_start = (uint32_t*)dst;
-    uint32_t *src_end   = NULL;
-    uint32_t *dst_end   = NULL;
+    uint32_t *src_end   = nullptr;
+    uint32_t *dst_end   = nullptr;
 
     if (odd_end)
     {

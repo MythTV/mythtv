@@ -11,8 +11,8 @@ class QDateTime;
 class CommDetectorFactory
 {
   public:
-    CommDetectorFactory() {}
-    ~CommDetectorFactory() {}
+    CommDetectorFactory() = default;
+    ~CommDetectorFactory() = default;
 
     CommDetectorBase* makeCommDetector(
         SkipType commDetectMethod,

@@ -33,8 +33,8 @@ using std::min;
 
 AudioOutputPulseAudio::AudioOutputPulseAudio(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    pcontext(NULL), pstream(NULL), mainloop(NULL),
-    m_aosettings(NULL)
+    pcontext(nullptr), pstream(nullptr), mainloop(nullptr),
+    m_aosettings(nullptr)
 {
     volume_control.channels = 0;
     for (unsigned int i = 0; i < PA_CHANNELS_MAX; ++i)
@@ -56,7 +56,7 @@ AudioOutputPulseAudio::~AudioOutputPulseAudio()
     if (pcontext)
     {
         pa_context_unref(pcontext);
-        pcontext = NULL;
+        pcontext = nullptr;
     }
 }
 
@@ -73,7 +73,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
     {
         VBERROR(fn_log_tag + "Failed to get new threaded mainloop");
         delete m_aosettings;
-        return NULL;
+        return nullptr;
     }
 
     pa_threaded_mainloop_start(mainloop);
@@ -84,7 +84,7 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
         pa_threaded_mainloop_unlock(mainloop);
         pa_threaded_mainloop_stop(mainloop);
         delete m_aosettings;
-        return NULL;
+        return nullptr;
     }
 
     /* Get the samplerate and channel count of the default sink, supported rate
@@ -120,9 +120,9 @@ AudioOutputSettings* AudioOutputPulseAudio::GetOutputSettings(bool /*digital*/)
 
     pa_context_disconnect(pcontext);
     pa_context_unref(pcontext);
-    pcontext = NULL;
+    pcontext = nullptr;
     pa_threaded_mainloop_stop(mainloop);
-    mainloop = NULL;
+    mainloop = nullptr;
 
     return m_aosettings;
 }
@@ -211,22 +211,22 @@ void AudioOutputPulseAudio::CloseDevice()
         FlushStream("CloseDevice");
         pa_stream_disconnect(pstream);
         pa_stream_unref(pstream);
-        pstream = NULL;
+        pstream = nullptr;
     }
 
     if (pcontext)
     {
-        pa_context_drain(pcontext, NULL, NULL);
+        pa_context_drain(pcontext, nullptr, nullptr);
         pa_context_disconnect(pcontext);
         pa_context_unref(pcontext);
-        pcontext = NULL;
+        pcontext = nullptr;
     }
 
     if (mainloop)
     {
         pa_threaded_mainloop_unlock(mainloop);
         pa_threaded_mainloop_stop(mainloop);
-        mainloop = NULL;
+        mainloop = nullptr;
     }
 }
 
@@ -256,7 +256,7 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
             {
                 size_t write = min(to_write, writable);
                 write_status = pa_stream_write(pstream, buf_ptr, write,
-                                               NULL, 0, PA_SEEK_RELATIVE);
+                                               nullptr, 0, PA_SEEK_RELATIVE);
 
                 if (0 != write_status)
                     break;
@@ -305,7 +305,7 @@ int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
 
     pa_threaded_mainloop_lock(mainloop);
 
-    while (pa_stream_get_latency(pstream, &latency, NULL) < 0)
+    while (pa_stream_get_latency(pstream, &latency, nullptr) < 0)
     {
         if (pa_context_errno(pcontext) != PA_ERR_NODATA)
         {
@@ -388,7 +388,7 @@ void AudioOutputPulseAudio::Drain(void)
 {
     AudioOutputBase::Drain();
     pa_threaded_mainloop_lock(mainloop);
-    pa_operation *op = pa_stream_drain(pstream, NULL, this);
+    pa_operation *op = pa_stream_drain(pstream, nullptr, this);
     pa_threaded_mainloop_unlock(mainloop);
 
     if (op)
@@ -404,7 +404,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
     {
         VBERROR(fn_log_tag + "context appears to exist, but shouldn't (yet)");
         pa_context_unref(pcontext);
-        pcontext = NULL;
+        pcontext = nullptr;
         return false;
     }
     pa_proplist *proplist = pa_proplist_new();
@@ -428,7 +428,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
 
     char *pulse_host = ChooseHost();
     int chk = pa_context_connect(
-        pcontext, pulse_host, (pa_context_flags_t)0, NULL);
+        pcontext, pulse_host, (pa_context_flags_t)0, nullptr);
 
     delete[] pulse_host;
 
@@ -477,7 +477,7 @@ bool AudioOutputPulseAudio::ContextConnect(void)
 char *AudioOutputPulseAudio::ChooseHost(void)
 {
     QString fn_log_tag = "ChooseHost, ";
-    char *pulse_host = NULL;
+    char *pulse_host = nullptr;
     char *device = strdup(main_device.toLatin1().constData());
     const char *host;
 
@@ -515,7 +515,7 @@ char *AudioOutputPulseAudio::ChooseHost(void)
     }
 
     VBAUDIO(fn_log_tag + QString("chosen PulseAudio server: %1")
-                         .arg((pulse_host != NULL) ? pulse_host : "default"));
+                         .arg((pulse_host != nullptr) ? pulse_host : "default"));
 
     free(device);
 
@@ -567,8 +567,8 @@ bool AudioOutputPulseAudio::ConnectPlaybackStream(void)
         | PA_STREAM_AUTO_TIMING_UPDATE
         | PA_STREAM_NO_REMIX_CHANNELS;
 
-    pa_stream_connect_playback(pstream, NULL, &buffer_settings,
-                               (pa_stream_flags_t)flags, NULL, NULL);
+    pa_stream_connect_playback(pstream, nullptr, &buffer_settings,
+                               (pa_stream_flags_t)flags, nullptr, nullptr);
 
     pa_context_state_t cstate;
     pa_stream_state_t sstate;
@@ -618,7 +618,7 @@ void AudioOutputPulseAudio::FlushStream(const char *caller)
 {
     QString fn_log_tag = QString("FlushStream (%1), ").arg(caller);
     pa_threaded_mainloop_lock(mainloop);
-    pa_operation *op = pa_stream_flush(pstream, NULL, this);
+    pa_operation *op = pa_stream_flush(pstream, nullptr, this);
     pa_threaded_mainloop_unlock(mainloop);
     if (op)
         pa_operation_unref(op);

@@ -143,14 +143,14 @@ class MPoolThread : public MThread
             if (m_reserved)
                 m_pool.ReleaseThread();
             m_reserved = false;
-            m_runnable = NULL;
+            m_runnable = nullptr;
 
             loggingDeregisterThread();
             loggingRegisterThread(objectName());
 
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
             qApp->processEvents();
-            qApp->sendPostedEvents(NULL, QEvent::DeferredDelete);
+            qApp->sendPostedEvents(nullptr, QEvent::DeferredDelete);
 
             t.start();
 
@@ -176,7 +176,7 @@ class MPoolThread : public MThread
                      bool reserved)
     {
         QMutexLocker locker(&m_lock);
-        if (m_do_run && (m_runnable == NULL))
+        if (m_do_run && (m_runnable == nullptr))
         {
             m_runnable = runnable;
             m_runnable_name = runnableName;
@@ -246,7 +246,7 @@ class MThreadPoolPrivate
 };
 
 QMutex MThreadPoolPrivate::s_pool_lock(QMutex::Recursive);
-MThreadPool *MThreadPoolPrivate::s_pool = NULL;
+MThreadPool *MThreadPoolPrivate::s_pool = nullptr;
 QList<MThreadPool*> MThreadPoolPrivate::s_all_pools;
 
 //////////////////////////////////////////////////////////////////////
@@ -267,7 +267,7 @@ MThreadPool::~MThreadPool()
         MThreadPoolPrivate::s_all_pools.removeAll(this);
     }
     delete m_priv;
-    m_priv = NULL;
+    m_priv = nullptr;
 }
 
 void MThreadPool::Stop(void)

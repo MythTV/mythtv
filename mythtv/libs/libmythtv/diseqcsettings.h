@@ -139,9 +139,9 @@ class DeviceTree : public GroupSetting
   protected:
     void PopulateTree(void);
     void PopulateTree(DiSEqCDevDevice *node,
-                      DiSEqCDevDevice *parent   = NULL,
+                      DiSEqCDevDevice *parent   = nullptr,
                       uint             childnum = 0,
-                      GroupSetting    *parentSetting = NULL);
+                      GroupSetting    *parentSetting = nullptr);
     void PopulateChildren(DiSEqCDevDevice *node, GroupSetting *parentSetting);
     void AddDeviceTypeSetting(DeviceTypeSetting *devtype,
                               DiSEqCDevDevice *parent,
@@ -164,7 +164,7 @@ class DTVDeviceConfigGroup : public GroupSetting
   public:
     DTVDeviceConfigGroup(DiSEqCDevSettings &settings, uint cardid,
                          bool switches_enabled);
-    ~DTVDeviceConfigGroup(void);
+    ~DTVDeviceConfigGroup(void) = default;
 
   protected:
     void AddNodes(StandardSetting *group, const QString &trigger,

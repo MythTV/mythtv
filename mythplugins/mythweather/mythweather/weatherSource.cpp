@@ -196,14 +196,14 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
     QStringList temp;
 
     if (!fi.isReadable() || !fi.isExecutable())
-        return NULL;
+        return nullptr;
 
     ScriptInfo info;
     info.path = fi.absolutePath();
     info.program = fi.absoluteFilePath();
 
     if (!WeatherSource::ProbeInfo(info))
-        return NULL;
+        return nullptr;
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query =
@@ -217,7 +217,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
     if (!db.exec())
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid response from database");
-        return NULL;
+        return nullptr;
     }
 
     // the script exists in the db
@@ -257,7 +257,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
             if (!db.exec())
             {
                 MythDB::DBError("Updating weather source settings.", db);
-                return NULL;
+                return nullptr;
             }
         }
     }
@@ -275,7 +275,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
                                           info.updateTimeout,
                                           info.scriptTimeout))
         {
-            return NULL;
+            return nullptr;
         }
         db.prepare(query);
         db.bindValue(":NAME", info.name);
@@ -291,7 +291,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         if (!db.exec())
         {
             MythDB::DBError("Inserting weather source", db);
-            return NULL;
+            return nullptr;
         }
         query = "SELECT sourceid FROM weathersourcesettings "
                 "WHERE source_name = :NAME AND hostname = :HOST;";
@@ -303,12 +303,12 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         if (!db.exec())
         {
             MythDB::DBError("Getting weather sourceid", db);
-            return NULL;
+            return nullptr;
         }
         else if (!db.next())
         {
             LOG(VB_GENERAL, LOG_ERR, "Error getting weather sourceid");
-            return NULL;
+            return nullptr;
         }
         else
         {
@@ -326,7 +326,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
 WeatherSource::WeatherSource(ScriptInfo *info)
     : m_ready(info ? true : false),    m_inuse(info ? true : false),
       m_info(info),
-      m_ms(NULL),
+      m_ms(nullptr),
       m_locale(""),
       m_cachefile(""),
       m_units(SI_UNITS),
@@ -369,7 +369,7 @@ void WeatherSource::connectScreen(WeatherScreen *ws)
 
 void WeatherSource::disconnectScreen(WeatherScreen *ws)
 {
-    disconnect(this, 0, ws, 0);
+    disconnect(this, nullptr, ws, nullptr);
     --m_connectCnt;
 }
 
@@ -512,7 +512,7 @@ void WeatherSource::processExit(uint status)
     }
 
     delete m_ms;
-    m_ms = NULL;
+    m_ms = nullptr;
 
     if (status != GENERIC_EXIT_OK)
     {

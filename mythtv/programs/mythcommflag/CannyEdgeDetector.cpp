@@ -17,8 +17,8 @@ extern "C" {
 using namespace edgeDetector;
 
 CannyEdgeDetector::CannyEdgeDetector(void)
-    : sgm(NULL)
-    , sgmsorted(NULL)
+    : sgm(nullptr)
+    , sgmsorted(nullptr)
     , ewidth(-1)
     , eheight(-1)
 {
@@ -92,7 +92,7 @@ CannyEdgeDetector::resetBuffers(int newwidth, int newheight)
         av_freep(&edges.data[0]);
         delete []sgm;
         delete []sgmsorted;
-        sgm = NULL;
+        sgm = nullptr;
     }
 
     const int   padded_width = newwidth + 2 * mask_radius;
@@ -172,11 +172,11 @@ CannyEdgeDetector::detectEdges(const AVFrame *pgm, int pgmheight,
     const int   padded_height = pgmheight + 2 * mask_radius;
 
     if (resetBuffers(pgmwidth, pgmheight))
-        return NULL;
+        return nullptr;
 
     if (pgm_convolve_radial(&convolved, &s1, &s2, pgm, pgmheight,
                 mask, mask_radius))
-        return NULL;
+        return nullptr;
 
     if (edge_mark_uniform_exclude(&edges, pgmheight, mask_radius,
                 sgm_init_exclude(sgm, &convolved, padded_height,
@@ -184,7 +184,7 @@ CannyEdgeDetector::detectEdges(const AVFrame *pgm, int pgmheight,
                     exclude.width, exclude.height),
                 sgmsorted, percentile,
                 exclude.row, exclude.col, exclude.width, exclude.height))
-        return NULL;
+        return nullptr;
 
     return &edges;
 }

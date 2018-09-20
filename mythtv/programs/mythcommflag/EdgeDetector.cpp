@@ -202,10 +202,6 @@ int edge_mark_uniform_exclude(AVFrame *dst, int dstheight, int extramargin,
 
 };  /* namespace */
 
-EdgeDetector::~EdgeDetector(void)
-{
-}
-
 int
 EdgeDetector::setExcludeArea(int row, int col, int width, int height)
 {

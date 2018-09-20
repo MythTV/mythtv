@@ -12,13 +12,13 @@
 #endif
 
 
-DisplayRes * DisplayRes::m_instance = NULL;
+DisplayRes * DisplayRes::m_instance = nullptr;
 bool         DisplayRes::m_locked   = false;
 
 DisplayRes * DisplayRes::GetDisplayRes(bool lock)
 {
     if (lock && m_locked)
-        return NULL;
+        return nullptr;
 
     if (!m_instance)
     {

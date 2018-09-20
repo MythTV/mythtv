@@ -28,7 +28,7 @@ class ViewScheduled : public ScheduleCommon
 {
     Q_OBJECT
   public:
-    explicit ViewScheduled(MythScreenStack *parent, TV *player = NULL,
+    explicit ViewScheduled(MythScreenStack *parent, TV *player = nullptr,
                   bool showTV = false);
     ~ViewScheduled();
 

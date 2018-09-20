@@ -16,7 +16,7 @@ ThumbItem::ThumbItem(const QString &name, const QString &path, bool isDir,
                      MythMediaDevice *dev) :
         m_name(name),
         m_path(path), m_isDir(isDir),
-        m_pixmap(NULL), m_mediaDevice(dev)
+        m_pixmap(nullptr), m_mediaDevice(dev)
 {
     m_name.detach();
     m_path.detach();
@@ -27,7 +27,7 @@ ThumbItem::~ThumbItem()
     if (m_pixmap)
     {
         delete m_pixmap;
-        m_pixmap = NULL;
+        m_pixmap = nullptr;
     }
 }
 
@@ -78,7 +78,7 @@ void ThumbItem::SetRotationAngle(int angle)
     if (!query.exec())
         MythDB::DBError("set_rotation_angle", query);
 
-    SetPixmap(NULL);
+    SetPixmap(nullptr);
 }
 
 void ThumbItem::SetPixmap(QPixmap *pixmap)

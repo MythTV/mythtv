@@ -241,7 +241,7 @@ void MythDVDPlayer::DisplayLastFrame(void)
     SetScanType(kScan_Progressive);
     DisplayDVDButton();
 
-    AVSync(NULL, true);
+    AVSync(nullptr, true);
 }
 
 bool MythDVDPlayer::FastForward(float seconds)
@@ -325,7 +325,7 @@ void MythDVDPlayer::ResetPlaying(bool /*resetframes*/)
 void MythDVDPlayer::EventEnd(void)
 {
     if (player_ctx->buffer->DVD())
-        player_ctx->buffer->DVD()->SetParent(NULL);
+        player_ctx->buffer->DVD()->SetParent(nullptr);
 }
 
 bool MythDVDPlayer::PrepareAudioSample(int64_t &timecode)
@@ -520,12 +520,12 @@ void MythDVDPlayer::SeekForScreenGrab(uint64_t &number, uint64_t frameNum,
         if (player_ctx->buffer->DVD()->IsInMenu() &&
             !player_ctx->buffer->DVD()->IsInStillFrame())
         {
-            GoToDVDProgram(1);
+            GoToDVDProgram(true);
         }
     }
     else if (player_ctx->buffer->DVD()->GetTotalTimeOfTitle() < 60)
     {
-        GoToDVDProgram(1);
+        GoToDVDProgram(true);
         number = frameNum;
         if (number >= totalFrames)
             number = totalFrames / 2;
@@ -613,7 +613,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
 
     bool expired = false;
 
-    VideoFrame *currentFrame = videoOutput ? videoOutput->GetLastShownFrame() : NULL;
+    VideoFrame *currentFrame = videoOutput ? videoOutput->GetLastShownFrame() : nullptr;
 
     if (!currentFrame)
     {

@@ -334,7 +334,7 @@ static bool InitializeVideoSchema(void)
 "INSERT INTO videotypes VALUES (30,'swf','Internal',0,0);",
 "INSERT INTO videotypes VALUES (31,'f4v','Internal',0,0);",
 "INSERT INTO videotypes VALUES (32,'nuv','Internal',0,0);",
-NULL
+nullptr
 };
 
     QString dbver = "";

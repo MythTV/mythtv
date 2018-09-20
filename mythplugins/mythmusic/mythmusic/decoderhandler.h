@@ -27,13 +27,13 @@ class DecoderHandlerEvent : public MythEvent
 {
   public:
     explicit DecoderHandlerEvent(Type t)
-        : MythEvent(t), m_msg(0), m_meta(0), m_available(0), m_maxSize(0) {}
+        : MythEvent(t), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0) {}
 
     DecoderHandlerEvent(Type t, QString *e)
-        : MythEvent(t), m_msg(e), m_meta(0), m_available(0), m_maxSize(0) {}
+        : MythEvent(t), m_msg(e), m_meta(nullptr), m_available(0), m_maxSize(0) {}
 
     DecoderHandlerEvent(Type t, int available, int maxSize)
-        : MythEvent(t), m_msg(0), m_meta(0), 
+        : MythEvent(t), m_msg(nullptr), m_meta(nullptr), 
           m_available(available), m_maxSize(maxSize) {}
 
     DecoderHandlerEvent(Type t, const MusicMetadata &m);

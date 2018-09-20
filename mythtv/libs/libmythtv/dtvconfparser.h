@@ -83,7 +83,7 @@ class DTVConfParser
     enum cardtype_t { ATSC, OFDM, QPSK, QAM, DVBS2, UNKNOWN };
 
     DTVConfParser(enum cardtype_t _type, uint sourceid, const QString &_file);
-    virtual ~DTVConfParser() { }
+    virtual ~DTVConfParser() = default;
 
     return_t Parse(void);
 

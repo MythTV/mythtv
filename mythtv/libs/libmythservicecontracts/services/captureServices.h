@@ -53,7 +53,7 @@ class SERVICE_PUBLIC CaptureServices : public Service
         // Must call InitializeCustomTypes for each unique Custom Type used
         // in public slots below.
 
-        CaptureServices( QObject *parent = 0 ) : Service( parent )
+        CaptureServices( QObject *parent = nullptr ) : Service( parent )
         {
             DTC::CaptureCard::InitializeCustomTypes();
             DTC::CaptureCardList::InitializeCustomTypes();

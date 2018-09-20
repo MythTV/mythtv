@@ -164,12 +164,12 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
 ////////////////////////////////////////////////////////////////
 
 ArchiveFileSelector::ArchiveFileSelector(MythScreenStack *parent) :
-    FileSelector(parent, NULL, FSTYPE_FILE, "", "*.xml"),
-    m_nextButton(NULL),
-    m_prevButton(NULL),
-    m_progTitle(NULL),
-    m_progSubtitle(NULL),
-    m_progStartTime(NULL)
+    FileSelector(parent, nullptr, FSTYPE_FILE, "", "*.xml"),
+    m_nextButton(nullptr),
+    m_prevButton(nullptr),
+    m_progTitle(nullptr),
+    m_progSubtitle(nullptr),
+    m_progStartTime(nullptr)
 {
     m_curDirectory = gCoreContext->GetSetting("MythNativeLoadFilename", "/");
 }
@@ -298,24 +298,24 @@ ImportNative::ImportNative(
     m_xmlFile(xmlFile),
     m_details(details),
     m_previousScreen(previousScreen),
-    m_progTitle_text(NULL),
-    m_progDateTime_text(NULL),
-    m_progDescription_text(NULL),
-    m_chanID_text(NULL),
-    m_chanNo_text(NULL),
-    m_chanName_text(NULL),
-    m_callsign_text(NULL),
-    m_localChanID_text(NULL),
-    m_localChanNo_text(NULL),
-    m_localChanName_text(NULL),
-    m_localCallsign_text(NULL),
-    m_searchChanID_button(NULL),
-    m_searchChanNo_button(NULL),
-    m_searchChanName_button(NULL),
-    m_searchCallsign_button(NULL),
-    m_finishButton(NULL),
-    m_prevButton(NULL),
-    m_cancelButton(NULL),
+    m_progTitle_text(nullptr),
+    m_progDateTime_text(nullptr),
+    m_progDescription_text(nullptr),
+    m_chanID_text(nullptr),
+    m_chanNo_text(nullptr),
+    m_chanName_text(nullptr),
+    m_callsign_text(nullptr),
+    m_localChanID_text(nullptr),
+    m_localChanNo_text(nullptr),
+    m_localChanName_text(nullptr),
+    m_localCallsign_text(nullptr),
+    m_searchChanID_button(nullptr),
+    m_searchChanNo_button(nullptr),
+    m_searchChanName_button(nullptr),
+    m_searchCallsign_button(nullptr),
+    m_finishButton(nullptr),
+    m_prevButton(nullptr),
+    m_cancelButton(nullptr),
     m_isValidXMLSelected(false)
 {
 }
@@ -549,7 +549,7 @@ void ImportNative::showList(const QString &caption, QString &value,
     if (!searchDialog->Create())
     {
         delete searchDialog;
-        searchDialog = NULL;
+        searchDialog = nullptr;
         return;
     }
 

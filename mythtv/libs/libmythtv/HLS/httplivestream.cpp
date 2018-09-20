@@ -933,12 +933,12 @@ DTC::LiveStreamInfo *HTTPLiveStream::StopStream(int id)
         LOG(VB_GENERAL, LOG_ERR, SLOC +
             QString("Unable to remove mark stream stopped for stream %1.")
                     .arg(id));
-        return NULL;
+        return nullptr;
     }
 
     HTTPLiveStream *hls = new HTTPLiveStream(id);
     if (!hls)
-        return NULL;
+        return nullptr;
 
     MythTimer statusTimer;
     int       delay = 250000;
@@ -1025,8 +1025,8 @@ DTC::LiveStreamInfoList *HTTPLiveStream::GetLiveStreamInfoList(const QString &Fi
         return infoList;
     }
 
-    DTC::LiveStreamInfo *info = NULL;
-    HTTPLiveStream *hls = NULL;
+    DTC::LiveStreamInfo *info = nullptr;
+    HTTPLiveStream *hls = nullptr;
     while (query.next())
     {
         hls = new HTTPLiveStream(query.value(0).toUInt());

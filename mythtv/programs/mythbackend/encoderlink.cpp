@@ -42,7 +42,7 @@
 EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
                          QString lhostname)
     : m_inputid(inputid), sock(lsock), hostname(lhostname),
-      tv(NULL), local(false), locked(false),
+      tv(nullptr), local(false), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
     endRecordingTime = MythDate::current().addDays(-2);
@@ -59,7 +59,7 @@ EncoderLink::EncoderLink(int inputid, PlaybackSock *lsock,
  *  \brief This is the EncoderLink constructor for local recorders.
  */
 EncoderLink::EncoderLink(int inputid, TVRec *ltv)
-    : m_inputid(inputid), sock(NULL),
+    : m_inputid(inputid), sock(nullptr),
       tv(ltv), local(true), locked(false),
       sleepStatus(sStatus_Undefined), chanid(0)
 {
@@ -80,9 +80,9 @@ EncoderLink::~EncoderLink(void)
     if (tv)
     {
         delete tv;
-        tv = NULL;
+        tv = nullptr;
     }
-    SetSocket(NULL);
+    SetSocket(nullptr);
 }
 
 /**
@@ -263,7 +263,7 @@ bool EncoderLink::IsRecording(const ProgramInfo *rec)
 bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
 {
     bool retval = false;
-    ProgramInfo *tvrec = NULL;
+    ProgramInfo *tvrec = nullptr;
 
     if (local)
     {
@@ -498,11 +498,11 @@ RecStatus::Type EncoderLink::GetRecordingStatus(void)
  *  \brief Returns TVRec's current recording.
  *
  *   Caller is responsible for deleting the ProgramInfo when done with it.
- *  \return Returns TVRec's current recording if it succeeds, NULL otherwise.
+ *  \return Returns TVRec's current recording if it succeeds, nullptr otherwise.
  */
 ProgramInfo *EncoderLink::GetRecording(void)
 {
-    ProgramInfo *info = NULL;
+    ProgramInfo *info = nullptr;
 
     if (local)
         info = tv->GetRecording();

@@ -36,7 +36,7 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
 {
     // Language specific progfinder, if needed
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgFinder *programFind = NULL;
+    ProgFinder *programFind = nullptr;
     if (gCoreContext->GetLanguage() == "ja")
         programFind = new JaProgFinder(mainStack, allowEPG, player, embedVideo);
     else if (gCoreContext->GetLanguage() == "he")
@@ -47,7 +47,7 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
         programFind = new ProgFinder(mainStack, allowEPG, player, embedVideo);
 
     if (programFind->Create())
-        mainStack->AddScreen(programFind, (player == NULL));
+        mainStack->AddScreen(programFind, (player == nullptr));
     else
         delete programFind;
 }
@@ -58,9 +58,9 @@ ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG,
     m_currentLetter(""),
     m_player(player),            m_embedVideo(embedVideo),
     m_allowEPG(allowEPG),        m_allowKeypress(true),
-    m_alphabetList(NULL),        m_showList(NULL),
-    m_timesList(NULL),           m_searchText(NULL),
-    m_help1Text(NULL),           m_help2Text(NULL)
+    m_alphabetList(nullptr),     m_showList(nullptr),
+    m_timesList(nullptr),        m_searchText(nullptr),
+    m_help1Text(nullptr),        m_help2Text(nullptr)
 {
 }
 
@@ -1059,7 +1059,7 @@ void RuProgFinder::restoreSelectedData(QString& data)
 ProgramInfo *ProgFinder::GetCurrentProgram(void) const
 {
     return (GetFocusWidget() == m_timesList) ?
-        m_showData[m_timesList->GetCurrentPos()] : NULL;
+        m_showData[m_timesList->GetCurrentPos()] : nullptr;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1076,9 +1076,9 @@ bool SearchInputDialog::Create(void)
     if (!LoadWindowFromXML("schedule-ui.xml", "searchpopup", this))
         return false;
 
-    MythUIText *messageText = NULL;
-    MythUIButton *okButton = NULL;
-    MythUIButton *cancelButton = NULL;
+    MythUIText *messageText = nullptr;
+    MythUIButton *okButton = nullptr;
+    MythUIButton *cancelButton = nullptr;
 
     bool err = false;
     UIUtilE::Assign(this, m_textEdit, "input", &err);

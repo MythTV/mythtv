@@ -232,7 +232,7 @@ static bool isRecording()
         }
     }
 
-    return RemoteGetRecordingStatus(NULL, false);
+    return RemoteGetRecordingStatus(nullptr, false);
 }
 
 static int getStatus(bool bWantRecStatus)

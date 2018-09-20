@@ -7,7 +7,7 @@ class Histogram
 {
 public:
     Histogram();
-    ~Histogram();
+    ~Histogram() = default;
 
     void generateFromImage(VideoFrame* frame, unsigned int frameWidth,
              unsigned int frameHeight, unsigned int minScanX,

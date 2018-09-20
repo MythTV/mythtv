@@ -12,10 +12,6 @@ DisplayResOSX::DisplayResOSX(void)
     Initialize();
 }
 
-DisplayResOSX::~DisplayResOSX(void)
-{
-}
-
 bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
                                    int &h_mm, double &rate, double &par) const
 {
@@ -32,7 +28,7 @@ bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
 bool DisplayResOSX::SwitchToVideoMode(int width, int height, double refreshrate)
 {
     CGDirectDisplayID d = GetOSXDisplay(MythDisplay::GetWindowID());
-    CFDictionaryRef dispMode = NULL;
+    CFDictionaryRef dispMode = nullptr;
     boolean_t match = 0;
 
     // find mode that matches the desired size
@@ -80,7 +76,7 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
 
     CFArrayRef displayModes = CGDisplayAvailableModes(d);
 
-    if (NULL == displayModes)
+    if (nullptr == displayModes)
         return m_videoModes;
 
     DisplayResMap screen_map;

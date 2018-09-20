@@ -45,8 +45,8 @@ class UPNPScanner : public QObject
   public:
    ~UPNPScanner();
 
-    static void         Enable(bool enable, UPNPSubscription *sub = NULL);
-    static UPNPScanner* Instance(UPNPSubscription *sub = NULL);
+    static void         Enable(bool enable, UPNPSubscription *sub = nullptr);
+    static UPNPScanner* Instance(UPNPSubscription *sub = nullptr);
 
     void StartFullScan(void);
     void GetInitialMetadata(VideoMetadataListManager::metadata_list* list,

@@ -70,7 +70,7 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref,
 
     if (*rit > 1)
     {
-        ref = NULL;
+        ref = nullptr;
         (*rit)--;
         return;
     }
@@ -87,7 +87,7 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref,
     }
 
     _handlers_refcnt.erase(rit);
-    ref = NULL;
+    ref = nullptr;
 }
 
 DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
@@ -95,9 +95,9 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
     _dvr_dev_path(CardUtil::GetDeviceName(DVB_DEV_DVR, _device)),
     _allow_retune(false),
 
-    _sigmon(NULL),
-    _dvbchannel(NULL),
-    _drb(NULL)
+    _sigmon(nullptr),
+    _dvbchannel(nullptr),
+    _drb(nullptr)
 {
     setObjectName("DVBRead");
 }
@@ -176,7 +176,7 @@ void DVBStreamHandler::RunTS(void)
     }
     memset(buffer, 0, buffer_size);
 
-    DeviceReadBuffer *drb = NULL;
+    DeviceReadBuffer *drb = nullptr;
     if (_needs_buffering)
     {
         drb = new DeviceReadBuffer(this, true, false);
@@ -235,7 +235,7 @@ void DVBStreamHandler::RunTS(void)
         {
             // timeout gets reset by select, so we need to create new one
             struct timeval timeout = { 0, 50 /* ms */ * 1000 /* -> usec */ };
-            int ret = select(dvr_fd+1, &fd_select_set, NULL, NULL, &timeout);
+            int ret = select(dvr_fd+1, &fd_select_set, nullptr, nullptr, &timeout);
             if (ret == -1 && errno != EINTR)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "select() failed" + ENO);
@@ -286,7 +286,7 @@ void DVBStreamHandler::RunTS(void)
 
     {
         QMutexLocker locker(&_start_stop_lock);
-        _drb = NULL;
+        _drb = nullptr;
     }
 
     if (drb)
@@ -517,8 +517,8 @@ void DVBStreamHandler::SetRetuneAllowed(
     else
     {
         _allow_retune = false;
-        _sigmon       = NULL;
-        _dvbchannel   = NULL;
+        _sigmon       = nullptr;
+        _dvbchannel   = nullptr;
     }
 }
 

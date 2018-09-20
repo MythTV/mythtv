@@ -235,8 +235,8 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;
     }
 
-    AVFormatContext *inputFC = NULL;
-    AVInputFormat *fmt = NULL;
+    AVFormatContext *inputFC = nullptr;
+    AVInputFormat *fmt = nullptr;
 
     // Open track
     LOG(VB_GENERAL, LOG_DEBUG, QString("CalcTrackLength: Opening '%1'")
@@ -244,7 +244,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
 
     QByteArray inFileBA = musicFile.toLocal8Bit();
 
-    int ret = avformat_open_input(&inputFC, inFileBA.constData(), fmt, NULL);
+    int ret = avformat_open_input(&inputFC, inFileBA.constData(), fmt, nullptr);
 
     if (ret)
     {
@@ -254,14 +254,14 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     }
 
     // Getting stream information
-    ret = avformat_find_stream_info(inputFC, NULL);
+    ret = avformat_find_stream_info(inputFC, nullptr);
 
     if (ret < 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("CalcTrackLength: Couldn't get stream info, error #%1").arg(ret));
         avformat_close_input(&inputFC);
-        inputFC = NULL;
+        inputFC = nullptr;
         return GENERIC_EXIT_NOT_OK;;
     }
 
@@ -316,7 +316,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
 
     // Close input file
     avformat_close_input(&inputFC);
-    inputFC = NULL;
+    inputFC = nullptr;
 
     if (mdata->Length() / 1000 != duration)
     {

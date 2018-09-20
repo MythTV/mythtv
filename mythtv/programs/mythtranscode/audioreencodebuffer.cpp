@@ -14,7 +14,7 @@ AudioBuffer::AudioBuffer()
 {
     m_size      = 0;
     m_buffer    = (uint8_t *)av_malloc(ABLOCK_SIZE);
-    if (m_buffer == NULL)
+    if (m_buffer == nullptr)
     {
         throw std::bad_alloc();
     }
@@ -26,7 +26,7 @@ AudioBuffer::AudioBuffer(const AudioBuffer &old)
     m_frames(old.m_frames), m_time(old.m_time)
 {
     m_buffer = (uint8_t *)av_malloc(m_realsize);
-    if (m_buffer == NULL)
+    if (m_buffer == nullptr)
     {
         throw std::bad_alloc();
     }
@@ -48,7 +48,7 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
         // to be 16 bytes aligned
         m_realsize = ((m_size + len) / ABLOCK_SIZE + 1 ) * ABLOCK_SIZE;
         uint8_t *tmp = (uint8_t *)av_malloc(m_realsize);
-        if (tmp == NULL)
+        if (tmp == nullptr)
         {
             throw std::bad_alloc();
         }
@@ -68,7 +68,7 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
 AudioReencodeBuffer::AudioReencodeBuffer(AudioFormat audio_format,
                                          int audio_channels, bool passthru)
   : m_last_audiotime(0),        m_audioFrameSize(0),
-    m_initpassthru(passthru),   m_saveBuffer(NULL)
+    m_initpassthru(passthru),   m_saveBuffer(nullptr)
 {
     Reset();
     const AudioSettings settings(audio_format, audio_channels, 0, 0, false);
@@ -179,7 +179,7 @@ bool AudioReencodeBuffer::AddData(void *buffer, int len, int64_t timecode,
                 // store the buffer
                 m_bufferList.append(m_saveBuffer);
                 // mark m_saveBuffer as emtpy.
-                m_saveBuffer = NULL;
+                m_saveBuffer = nullptr;
                 // m_last_audiotime is updated iff we store a buffer.
                 m_last_audiotime = timecode;
             }
@@ -198,7 +198,7 @@ bool AudioReencodeBuffer::AddData(void *buffer, int len, int64_t timecode,
 
         QMutexLocker locker(&m_bufferMutex);
         m_bufferList.append(m_saveBuffer);
-        m_saveBuffer = NULL;
+        m_saveBuffer = nullptr;
         m_last_audiotime = timecode;
     }
 
@@ -210,7 +210,7 @@ AudioBuffer *AudioReencodeBuffer::GetData(long long time)
     QMutexLocker locker(&m_bufferMutex);
 
     if (m_bufferList.isEmpty())
-        return NULL;
+        return nullptr;
 
     AudioBuffer *ab = m_bufferList.front();
 
@@ -220,7 +220,7 @@ AudioBuffer *AudioReencodeBuffer::GetData(long long time)
         return ab;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 long long AudioReencodeBuffer::GetSamples(long long time)

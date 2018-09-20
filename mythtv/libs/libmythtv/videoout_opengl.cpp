@@ -65,16 +65,16 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
 
 VideoOutputOpenGL::VideoOutputOpenGL(const QString &profile)
     : VideoOutput(),
-    gl_context_lock(QMutex::Recursive), gl_context(NULL), gl_valid(true),
-    gl_videochain(NULL), gl_pipchain_active(NULL),
-    gl_parent_win(0),    gl_painter(NULL), gl_created_painter(false),
+    gl_context_lock(QMutex::Recursive), gl_context(nullptr), gl_valid(true),
+    gl_videochain(nullptr), gl_pipchain_active(nullptr),
+    gl_parent_win(0),    gl_painter(nullptr), gl_created_painter(false),
     gl_opengl_lite(false)
 {
     if (profile.contains("lite"))
         gl_opengl_lite = true;
 
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
-    av_pause_frame.buf = NULL;
+    av_pause_frame.buf = nullptr;
 
     if (gCoreContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);
@@ -87,7 +87,7 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
 
     if (gl_context)
         gl_context->DecrRef();
-    gl_context = NULL;
+    gl_context = nullptr;
     gl_context_lock.unlock();
 }
 
@@ -172,7 +172,7 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
     else if (gl_painter)
         gl_painter->SetSwapControl(true);
 
-    gl_painter = NULL;
+    gl_painter = nullptr;
     gl_created_painter = false;
 
     if (gl_context)
@@ -190,7 +190,7 @@ void VideoOutputOpenGL::DestroyVideoResources(void)
     if (gl_videochain)
     {
         delete gl_videochain;
-        gl_videochain = NULL;
+        gl_videochain = nullptr;
     }
 
     while (!gl_pipchains.empty())
@@ -372,7 +372,7 @@ bool VideoOutputOpenGL::SetupContext(void)
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create MythRenderOpenGL device.");
     if (gl_context)
         gl_context->DecrRef();
-    gl_context = NULL;
+    gl_context = nullptr;
 */
     LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to use OpenGL when ThemePainter is set to QT.");
     return false;
@@ -538,7 +538,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
 
     bool sw_frame = codec_sw_copy(video_codec_id) &&
                     video_codec_id != kCodec_NONE;
-    bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
+    bool deint_proc = m_deinterlacing && (m_deintFilter != nullptr);
     OpenGLLocker ctx_lock(gl_context);
 
     bool pauseframe = false;
@@ -567,7 +567,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD */*osd*/,
 
     if (!window.IsEmbedding())
     {
-        gl_pipchain_active = NULL;
+        gl_pipchain_active = nullptr;
         ShowPIPs(frame, pipPlayers);
     }
 
@@ -693,11 +693,11 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
     {
         if (twopass)
             gl_context->SetViewPort(first, true);
-        m_visual->Draw(GetTotalOSDBounds(), gl_painter, NULL);
+        m_visual->Draw(GetTotalOSDBounds(), gl_painter, nullptr);
         if (twopass)
         {
             gl_context->SetViewPort(second, true);
-            m_visual->Draw(GetTotalOSDBounds(), gl_painter, NULL);
+            m_visual->Draw(GetTotalOSDBounds(), gl_painter, nullptr);
             gl_context->SetViewPort(main);
         }
     }
@@ -836,12 +836,12 @@ bool VideoOutputOpenGL::SetupDeinterlace(
     if (m_deintFiltMan)
     {
         delete m_deintFiltMan;
-        m_deintFiltMan = NULL;
+        m_deintFiltMan = nullptr;
     }
     if (m_deintFilter)
     {
         delete m_deintFilter;
-        m_deintFilter = NULL;
+        m_deintFilter = nullptr;
     }
 
     MoveResize();

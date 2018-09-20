@@ -53,7 +53,7 @@ class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
 
     void GetEntryMap(EntryMap&);
 
-    QTextStream &OutputXML(QTextStream &os, uint *pnEntryCount = NULL) const;
+    QTextStream &OutputXML(QTextStream &os, uint *pnEntryCount = nullptr) const;
     void Dump(uint &nEntryCount) const;
 
     static QString GetNormalizedUSN(const QString &sUSN);
@@ -131,8 +131,8 @@ class UPNP_PUBLIC SSDPCache : public QObject,
         void Dump       (void);
 
         QTextStream &OutputXML(QTextStream &os,
-                               uint        *pnDevCount   = NULL,
-                               uint        *pnEntryCount = NULL) const;
+                               uint        *pnDevCount   = nullptr,
+                               uint        *pnEntryCount = nullptr) const;
 
         SSDPCacheEntries *Find( const QString &sURI );
         DeviceLocation   *Find( const QString &sURI, const QString &sUSN );

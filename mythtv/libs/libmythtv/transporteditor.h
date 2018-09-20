@@ -80,7 +80,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     void NewTransport(void);
 
   private:
-    ~TransportListEditor() { }
+    ~TransportListEditor() = default;
     void Delete(TransportSetting *transport);
 
   private:

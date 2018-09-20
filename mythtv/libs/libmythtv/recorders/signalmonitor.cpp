@@ -90,7 +90,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     (void) db_cardnum;
     (void) channel;
 
-    SignalMonitor *signalMonitor = NULL;
+    SignalMonitor *signalMonitor = nullptr;
 
 #ifdef USING_DVB
     if (CardUtil::IsDVBInputType(cardtype))
@@ -218,7 +218,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                              uint64_t wait_for_mask, bool _release_stream)
     : MThread("SignalMonitor"),
-      channel(_channel),               pParent(NULL),
+      channel(_channel),               pParent(nullptr),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
       release_stream(_release_stream),
       update_rate(25),                 minimum_update_rate(5),

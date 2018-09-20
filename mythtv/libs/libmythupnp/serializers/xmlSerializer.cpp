@@ -39,10 +39,10 @@ XmlSerializer::XmlSerializer( QIODevice *pDevice, const QString &sRequestName )
 
 XmlSerializer::~XmlSerializer()
 {
-    if (m_pXmlWriter != NULL)
+    if (m_pXmlWriter != nullptr)
     {
         delete m_pXmlWriter;
-        m_pXmlWriter = NULL;
+        m_pXmlWriter = nullptr;
     }
 }
 
@@ -123,7 +123,7 @@ void XmlSerializer::AddProperty( const QString       &sName,
 {
     m_pXmlWriter->writeStartElement( sName );
 
-    if ((pMetaProp != NULL) &&
+    if ((pMetaProp != nullptr) &&
         (pMetaProp->isEnumType() || pMetaProp->isFlagType()))
     {
         RenderEnum ( sName, vValue, pMetaProp );

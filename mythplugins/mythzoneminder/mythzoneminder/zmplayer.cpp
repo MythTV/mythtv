@@ -37,14 +37,14 @@ using namespace std;
 ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
                    vector<Event *> *eventList, int *currentEvent)
          :MythScreenType(parent, name),
-          m_activeFrameImage(NULL), m_frameImageFS(NULL), m_frameImage(NULL),
-          m_noEventsText(NULL), m_eventText(NULL),
-          m_cameraText(NULL), m_frameText(NULL), m_dateText(NULL),
-          m_playButton(NULL), m_deleteButton(NULL), m_nextButton(NULL),
-          m_prevButton(NULL), m_currentEvent(currentEvent),
+          m_activeFrameImage(nullptr), m_frameImageFS(nullptr), m_frameImage(nullptr),
+          m_noEventsText(nullptr), m_eventText(nullptr),
+          m_cameraText(nullptr), m_frameText(nullptr), m_dateText(nullptr),
+          m_playButton(nullptr), m_deleteButton(nullptr), m_nextButton(nullptr),
+          m_prevButton(nullptr), m_currentEvent(currentEvent),
           m_eventList(eventList), m_frameList(new vector<Frame*>),
           m_frameTimer(new QTimer(this)), m_curFrame(0),
-          m_paused(false), m_fullScreen(false), m_image(NULL)
+          m_paused(false), m_fullScreen(false), m_image(nullptr)
 {
     connect(m_frameTimer, SIGNAL(timeout()), this,
             SLOT(updateFrame()));

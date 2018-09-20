@@ -34,7 +34,7 @@ class SERVICE_PUBLIC LogInfo : public QObject
 
         static inline void InitializeCustomTypes();
 
-        Q_INVOKABLE LogInfo(QObject *parent = 0)
+        Q_INVOKABLE LogInfo(QObject *parent = nullptr)
             : QObject    ( parent ),
               m_LogArgs  ( ""     )
         {

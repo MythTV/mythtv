@@ -22,7 +22,7 @@ class UPNP_PUBLIC Configuration
 {
     public:
 
-        virtual ~Configuration() {}
+        virtual ~Configuration() = default;
 
         virtual bool    Load    ( void ) = 0;
         virtual bool    Save    ( void ) = 0;
@@ -63,7 +63,7 @@ class UPNP_PUBLIC XmlConfiguration : public Configuration
 
         explicit XmlConfiguration( const QString &sFileName );
 
-        virtual ~XmlConfiguration() {}
+        virtual ~XmlConfiguration() = default;
 
         virtual bool    Load    ( void );
         virtual bool    Save    ( void );
@@ -84,9 +84,9 @@ class UPNP_PUBLIC DBConfiguration : public Configuration
 {
     public:
 
-        DBConfiguration();
+        DBConfiguration() = default;
 
-        virtual ~DBConfiguration() {}
+        virtual ~DBConfiguration() = default;
 
         virtual bool    Load    ( void );
         virtual bool    Save    ( void );

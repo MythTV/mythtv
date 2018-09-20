@@ -15,14 +15,14 @@ class StorageUser
   public:
     virtual void SetDBValue(const QString&) = 0;
     virtual QString GetDBValue(void) const = 0;
-    virtual ~StorageUser() { }
+    virtual ~StorageUser() = default;
 };
 
 class MBASE_PUBLIC Storage
 {
   public:
-    Storage() { }
-    virtual ~Storage() { }
+    Storage() = default;
+    virtual ~Storage() = default;
 
     virtual void Load(void) = 0;
     virtual void Save(void) = 0;
@@ -37,7 +37,7 @@ class MBASE_PUBLIC DBStorage : public Storage
     DBStorage(StorageUser *_user, QString _table, QString _column) :
         user(_user), tablename(_table), columnname(_column) { }
 
-    virtual ~DBStorage() { }
+    virtual ~DBStorage() = default;
 
   protected:
     QString GetColumnName(void) const { return columnname; }
@@ -54,7 +54,7 @@ class MBASE_PUBLIC SimpleDBStorage : public DBStorage
     SimpleDBStorage(StorageUser *_user,
                     QString _table, QString _column) :
         DBStorage(_user, _table, _column) { initval.clear(); }
-    virtual ~SimpleDBStorage() { }
+    virtual ~SimpleDBStorage() = default;
 
     virtual void Load(void);
     virtual void Save(void);
@@ -78,7 +78,7 @@ class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
                      QString _keycolumn, QString _keyvalue = QString()) :
         SimpleDBStorage(_user, _table, _column),
         keycolumn(_keycolumn), keyvalue(_keyvalue) {}
-    virtual ~GenericDBStorage() { }
+    virtual ~GenericDBStorage() = default;
 
     void SetKeyValue(const QString &val) { keyvalue = val; }
     void SetKeyValue(long long val) { keyvalue = QString::number(val); }
@@ -95,8 +95,8 @@ class MBASE_PUBLIC GenericDBStorage : public SimpleDBStorage
 class MBASE_PUBLIC TransientStorage : public Storage
 {
   public:
-    TransientStorage() { }
-    virtual ~TransientStorage() { }
+    TransientStorage() = default;
+    virtual ~TransientStorage() = default;
 
     virtual void Load(void) { }
     virtual void Save(void) { }

@@ -33,7 +33,7 @@ class Device
 {
 public:
     Device(const QString &name, const QString &mount,
-           MythMediaDevice *media = NULL, QTemporaryDir *import = NULL)
+           MythMediaDevice *media = nullptr, QTemporaryDir *import = nullptr)
         : m_present(true), m_name(name), m_mount(mount),
           m_media(media), m_dir(import)
     {
@@ -76,7 +76,7 @@ public:
                 LOG(VB_MEDIA, LOG_DEBUG, LOC + QString("Unlocked '%1'").arg(m_name));
 
             MediaMonitor::GetMediaMonitor()->Unlock(m_media);
-            m_media = NULL;
+            m_media = nullptr;
         }
     }
 
@@ -377,7 +377,7 @@ ImageItem *ImageAdapterLocal::CreateItem(const QFileInfo &fi, int parentId,
     if (im->m_type == kUnknown)
     {
         delete im;
-        return NULL;
+        return nullptr;
     }
 
     im->m_thumbPath = GetAbsThumbPath(ThumbDir(im->m_device), ThumbPath(*im));
@@ -446,7 +446,7 @@ ImageItem *ImageAdapterSg::CreateItem(const QFileInfo &fi, int parentId,
     if (im->m_type == kUnknown)
     {
         delete im;
-        return NULL;
+        return nullptr;
     }
 
     im->m_thumbPath = GetAbsThumbPath(ThumbDir(im->m_device), ThumbPath(*im));
@@ -1597,7 +1597,7 @@ template <class DBFS>
 QStringList ImageHandler<DBFS>::HandleIgnore(const QString &exclusions) const
 {
     // Save new setting. FE will have already saved it but not cleared the cache
-    gCoreContext->SaveSettingOnHost("GalleryIgnoreFilter", exclusions, NULL);
+    gCoreContext->SaveSettingOnHost("GalleryIgnoreFilter", exclusions, nullptr);
 
     // Rescan
     HandleScanRequest("START");
@@ -1920,9 +1920,9 @@ void ImageDbReader::GetDescendantCount(int id, int &dirs, int &pics,
 
 
 //! Backend Gallery instance
-ImageManagerBe *ImageManagerBe::m_instance = NULL;
+ImageManagerBe *ImageManagerBe::m_instance = nullptr;
 //! Frontend Gallery instance
-ImageManagerFe *ImageManagerFe::m_instance = NULL;
+ImageManagerFe *ImageManagerFe::m_instance = nullptr;
 
 
 /*!
@@ -2509,7 +2509,7 @@ QString ImageManagerFe::CreateImport()
     }
 
     QString time(QDateTime::currentDateTime().toString("mm:ss"));
-    OpenDevice("Import " + time, tmp->path(), NULL, tmp);
+    OpenDevice("Import " + time, tmp->path(), nullptr, tmp);
     return tmp->path();
 }
 

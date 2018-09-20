@@ -46,7 +46,7 @@ IPTVChannelFetcher::~IPTVChannelFetcher()
 {
     Stop();
     delete _thread;
-    _thread = NULL;
+    _thread = nullptr;
 }
 
 /** \fn IPTVChannelFetcher::Stop(void)

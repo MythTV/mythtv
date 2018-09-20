@@ -22,7 +22,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 static QMutex g_pTaskQueueCreationLock;
-TaskQueue* TaskQueue::g_pTaskQueue = NULL;
+TaskQueue* TaskQueue::g_pTaskQueue = nullptr;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -41,14 +41,6 @@ long Task::m_nTaskCount = 0;
 Task::Task(const QString &debugName) : ReferenceCounter(debugName)
 {
     m_nTaskId = m_nTaskCount++;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-Task::~Task()
-{
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,7 +69,7 @@ void TaskQueue::Shutdown()
 {
     QMutexLocker locker(&g_pTaskQueueCreationLock);
     delete g_pTaskQueue;
-    g_pTaskQueue = NULL;
+    g_pTaskQueue = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -130,9 +122,9 @@ void TaskQueue::run( )
         // ------------------------------------------------------------------
 
         TaskTime ttNow;
-        gettimeofday( (&ttNow), NULL );
+        gettimeofday( (&ttNow), nullptr );
 
-        if ((pTask = GetNextExpiredTask( ttNow )) != NULL)
+        if ((pTask = GetNextExpiredTask( ttNow )) != nullptr)
         {
             try
             {
@@ -165,7 +157,7 @@ void TaskQueue::Clear( )
                             it != m_mapTasks.end();
                           ++it )
     {
-        if ((*it).second != NULL)
+        if ((*it).second != nullptr)
             (*it).second->DecrRef();
     }
 
@@ -181,7 +173,7 @@ void TaskQueue::Clear( )
 void TaskQueue::AddTask( long msec, Task *pTask )
 {
     TaskTime tt;
-    gettimeofday( (&tt), NULL );
+    gettimeofday( (&tt), nullptr );
 
     AddMicroSecToTaskTime( tt, (msec * 1000) );
 
@@ -194,7 +186,7 @@ void TaskQueue::AddTask( long msec, Task *pTask )
 
 void TaskQueue::AddTask( TaskTime ttKey, Task *pTask )
 {
-    if (pTask != NULL)
+    if (pTask != nullptr)
     {
         m_mutex.lock();
         pTask->IncrRef();
@@ -210,10 +202,10 @@ void TaskQueue::AddTask( TaskTime ttKey, Task *pTask )
 void TaskQueue::AddTask( Task *pTask )
 {
 
-    if (pTask != NULL)
+    if (pTask != nullptr)
     {
         TaskTime tt;
-        gettimeofday( (&tt), NULL );
+        gettimeofday( (&tt), nullptr );
 
         AddTask( tt, pTask );
     }
@@ -225,7 +217,7 @@ void TaskQueue::AddTask( Task *pTask )
 
 Task *TaskQueue::GetNextExpiredTask( TaskTime tt, long nWithinMilliSecs /*=50*/ )
 {
-    Task *pTask = NULL;
+    Task *pTask = nullptr;
 
     AddMicroSecToTaskTime( tt, nWithinMilliSecs * 1000 );
 

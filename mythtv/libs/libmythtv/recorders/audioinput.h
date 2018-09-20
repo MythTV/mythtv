@@ -27,7 +27,7 @@
 class AudioInput
 {
   public:
-    virtual ~AudioInput() {}
+    virtual ~AudioInput() = default;
 
     virtual bool Open(uint sample_bits, uint sample_rate, uint channels) = 0;
     virtual bool IsOpen(void) = 0;

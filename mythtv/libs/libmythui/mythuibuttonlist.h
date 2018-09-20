@@ -348,7 +348,7 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
   public:
     SearchButtonListDialog(MythScreenStack *parent, const char *name,
                            MythUIButtonList *parentList, QString searchText);
-    ~SearchButtonListDialog(void);
+    ~SearchButtonListDialog(void) = default;
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);

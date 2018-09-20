@@ -63,7 +63,7 @@ void MythVDPAUPainter::Teardown(void)
     if (m_render)
     {
         m_render->DecrRef();
-        m_render = NULL;
+        m_render = nullptr;
     }
 }
 
@@ -89,7 +89,7 @@ void MythVDPAUPainter::Begin(QPaintDevice *parent)
     DeleteBitmaps();
 
     if (m_target)
-        m_render->DrawBitmap(0, m_target, NULL, NULL);
+        m_render->DrawBitmap(0, m_target, nullptr, nullptr);
     else if (m_swap_control)
         m_render->WaitForFlip();
 

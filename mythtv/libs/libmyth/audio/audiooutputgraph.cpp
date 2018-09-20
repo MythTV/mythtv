@@ -215,7 +215,7 @@ private:
  * Audio graphic
  */
 AudioOutputGraph::AudioOutputGraph() :
-    m_painter(0),
+    m_painter(nullptr),
     m_dBsilence(-72), m_dBquiet(-60), m_dBLoud(-12), m_dbMax(-6),
     m_buffer(new AudioOutputGraph::Buffer())
 { }
@@ -279,13 +279,13 @@ MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
 
     const int width = m_buffer->Samples(avail);
     if (width <= 0)
-        return 0;
+        return nullptr;
 
     const unsigned range = 1U << m_buffer->BitsPerChannel();
     const double threshold = 20 * log10(1.0 / range); // 16bit=-96.3296dB => ~6dB/bit
     const int height = (int)-ceil(threshold); // 96
     if (height <= 0)
-        return 0;
+        return nullptr;
 
     QImage image(width, height, QImage::Format_ARGB32);
     image.fill(0);

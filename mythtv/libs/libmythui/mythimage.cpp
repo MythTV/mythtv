@@ -24,7 +24,7 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 
-MythUIHelper *MythImage::s_ui = NULL;
+MythUIHelper *MythImage::s_ui = nullptr;
 
 MythImage::MythImage(MythPainter *parent, const char *name) :
     ReferenceCounter(name)
@@ -309,7 +309,7 @@ bool MythImage::Load(const QString &filename)
     if (filename.isEmpty())
         return false;
 
-    QImage *im = NULL;
+    QImage *im = nullptr;
     if (filename.startsWith("myth://"))
     {
         // Attempting a file transfer on a file that doesn't exist throws
@@ -367,7 +367,7 @@ bool MythImage::Load(const QString &filename)
     if (im && im->isNull())
     {
         delete im;
-        im = NULL;
+        im = nullptr;
     }
 
     SetFileName(filename);
@@ -481,7 +481,7 @@ void MythImage::ConvertToYUV(void)
 
 MythImageReader::MythImageReader(const QString &fileName)
   : QImageReader(),
-    m_fileName(fileName), m_networkReply(NULL)
+    m_fileName(fileName), m_networkReply(nullptr)
 {
     if ((m_fileName.startsWith("http://")) ||
         (m_fileName.startsWith("https://")) ||
@@ -507,8 +507,8 @@ MythImageReader::~MythImageReader()
 {
     if (m_networkReply)
     {
-        setDevice(NULL);
+        setDevice(nullptr);
         m_networkReply->deleteLater();
-        m_networkReply = NULL;
+        m_networkReply = nullptr;
     }
 }

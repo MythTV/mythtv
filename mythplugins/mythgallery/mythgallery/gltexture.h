@@ -35,7 +35,7 @@ class ThumbItem;
 class GLTexture
 {
   public:
-    GLTexture() : tex(0), angle(0), item(NULL),
+    GLTexture() : tex(0), angle(0), item(nullptr),
         width(512), height(512), cx(1.0f), cy(1.0f) {}
     ~GLTexture() { Deinit(); }
 

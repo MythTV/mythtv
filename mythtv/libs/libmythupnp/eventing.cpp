@@ -66,7 +66,7 @@ Eventing::Eventing(const QString &sExtensionName,
     m_nSubscriptionDuration(
         UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800)),
     m_nHoldCount(0),
-    m_pInitializeSubscriber(NULL)
+    m_pInitializeSubscriber(nullptr)
 {
     m_sEventMethodName.detach();
     m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
@@ -183,11 +183,11 @@ void Eventing::ExecutePostProcess( )
     // Use PostProcessing Hook to perform Initial Notification
     // to make sure they receive it AFTER the subscription results
 
-    if (m_pInitializeSubscriber != NULL)
+    if (m_pInitializeSubscriber != nullptr)
     {
         NotifySubscriber( m_pInitializeSubscriber );
         
-        m_pInitializeSubscriber = NULL;
+        m_pInitializeSubscriber = nullptr;
     }
 }
 
@@ -205,7 +205,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
     QString sTimeout  = pRequest->GetRequestHeader( "TIMEOUT"  , "" );
     QString sSID      = pRequest->GetRequestHeader( "SID"     , "" );
 
-    SubscriberInfo *pInfo = NULL;
+    SubscriberInfo *pInfo = nullptr;
 
     // ----------------------------------------------------------------------
     // Validate Header Values...
@@ -276,7 +276,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
     }
     
-    if (pInfo != NULL)
+    if (pInfo != nullptr)
     {
         pRequest->m_mapRespHeaders[ "SID"    ] = QString( "uuid:%1" )
                                                     .arg( pInfo->sUUID );
@@ -327,7 +327,7 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
 void Eventing::Notify()
 {
     TaskTime tt;
-    gettimeofday( (&tt), NULL );
+    gettimeofday( (&tt), nullptr );
 
     m_mutex.lock();
 
@@ -363,7 +363,7 @@ void Eventing::Notify()
 
 void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 {
-    if (pInfo == NULL)
+    if (pInfo == nullptr)
         return;
 
     QByteArray   aBody;
@@ -428,7 +428,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         pInfo->IncrementKey();
 
-        gettimeofday( (&pInfo->ttLastNotified), NULL );
+        gettimeofday( (&pInfo->ttLastNotified), nullptr );
     }
 }
 

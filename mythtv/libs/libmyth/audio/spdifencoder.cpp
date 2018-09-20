@@ -22,14 +22,14 @@ extern "C" {
  *   AVCodecContext *ctx : CodecContext to be encaspulated
  */
 SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
-    : m_complete(false), m_oc(NULL), m_size(0)
+    : m_complete(false), m_oc(nullptr), m_size(0)
 {
     memset(&m_buffer, 0, sizeof(m_buffer));
 
     QByteArray dev_ba     = muxer.toLatin1();
     AVOutputFormat *fmt;
 
-    fmt = av_guess_format(dev_ba.constData(), NULL, NULL);
+    fmt = av_guess_format(dev_ba.constData(), nullptr, nullptr);
     if (!fmt)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "av_guess_format");
@@ -45,7 +45,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     m_oc->oformat = fmt;
 
     m_oc->pb = avio_alloc_context(m_buffer, sizeof(m_buffer), 1,
-                                  this, NULL, funcIO, NULL);
+                                  this, nullptr, funcIO, nullptr);
     if (!m_oc->pb)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "avio_alloc_context");
@@ -64,7 +64,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
         return;
     }
 
-    AVStream *stream = avformat_new_stream(m_oc, NULL);
+    AVStream *stream = avformat_new_stream(m_oc, nullptr);
     if (!stream)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "avformat_new_stream");
@@ -77,7 +77,7 @@ SPDIFEncoder::SPDIFEncoder(QString muxer, int codec_id)
     stream->codecpar->codec_type  = codec->type;
     stream->codecpar->sample_rate = 48000; // dummy rate, so codecpar initialization doesn't fail.
 
-    if (avformat_write_header(m_oc, NULL) < 0)
+    if (avformat_write_header(m_oc, nullptr) < 0)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "avformat_write_header");
         Destroy();

@@ -17,11 +17,11 @@ extern "C" {
 AvFormatDecoderDVD::AvFormatDecoderDVD(
     MythPlayer *parent, const ProgramInfo &pginfo, PlayerFlags flags)
   : AvFormatDecoder(parent, pginfo, flags)
-  , m_curContext(NULL)
-  , m_lastVideoPkt(NULL)
+  , m_curContext(nullptr)
+  , m_lastVideoPkt(nullptr)
   , m_lbaLastVideoPkt(INVALID_LBA)
   , m_framesReq(0)
-  , m_returnContext(NULL)
+  , m_returnContext(nullptr)
 {
 }
 
@@ -42,7 +42,7 @@ void AvFormatDecoderDVD::ReleaseLastVideoPkt()
     {
         av_packet_unref(m_lastVideoPkt);
         delete m_lastVideoPkt;
-        m_lastVideoPkt = NULL;
+        m_lastVideoPkt = nullptr;
         m_lbaLastVideoPkt = INVALID_LBA;
     }
 }
@@ -52,7 +52,7 @@ void AvFormatDecoderDVD::ReleaseContext(MythDVDContext *&context)
     if (context)
     {
         context->DecrRef();
-        context = NULL;
+        context = nullptr;
     }
 }
 
@@ -267,7 +267,7 @@ void AvFormatDecoderDVD::CheckContext(int64_t pts)
                         ringBuffer->DVD()->SectorSeek(lastVideoSector);
 
                         m_returnContext = m_curContext;
-                        m_curContext = NULL;
+                        m_curContext = nullptr;
                     }
                     else
                     {
@@ -357,7 +357,7 @@ bool AvFormatDecoderDVD::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 {
     bool ret = true;
 
-    if (m_returnContext == NULL)
+    if (m_returnContext == nullptr)
     {
         // Only process video frames if we're not searching for
         // the previous video frame after seeking in a slideshow.
@@ -379,7 +379,7 @@ bool AvFormatDecoderDVD::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
         if (context)
             m_contextList.append(context);
 
-        if ((m_curContext == NULL) && (m_contextList.size() > 0))
+        if ((m_curContext == nullptr) && (m_contextList.size() > 0))
         {
             // If we don't have a current context, use
             // the first in the list

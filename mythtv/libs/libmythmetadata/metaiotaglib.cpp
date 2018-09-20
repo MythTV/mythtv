@@ -20,10 +20,6 @@ MetaIOTagLib::MetaIOTagLib()
 {
 }
 
-MetaIOTagLib::~MetaIOTagLib(void)
-{
-}
-
 /*!
 * \brief Writes metadata common to all tag formats to the tag
 *
@@ -80,7 +76,7 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, MusicMetadata *metadata)
     if (metadata->Title().isEmpty())
         readFromFilename(metadata);
 
-    // If we don't have title and artist or don't have the length return NULL
+    // If we don't have title and artist or don't have the length return nullptr
     if (metadata->Title().isEmpty() && metadata->Artist().isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR,

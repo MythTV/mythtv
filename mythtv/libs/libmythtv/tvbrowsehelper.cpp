@@ -38,7 +38,7 @@ TVBrowseHelper::TVBrowseHelper(
     db_browse_max_forward(browse_max_forward),
     db_browse_all_tuners(browse_all_tuners),
     db_use_channel_groups(use_channel_groups),
-    m_ctx(NULL),
+    m_ctx(nullptr),
     m_chanid(0),
     m_run(true)
 {
@@ -141,7 +141,7 @@ void TVBrowseHelper::BrowseEnd(PlayerContext *ctx, bool change_channel)
     if (change_channel)
         m_tv->ChangeChannel(ctx, 0, m_channum);
 
-    m_ctx = NULL;
+    m_ctx = nullptr;
 }
 
 void TVBrowseHelper::BrowseDispInfo(PlayerContext *ctx, BrowseInfo &bi)
@@ -198,7 +198,7 @@ BrowseInfo TVBrowseHelper::GetBrowsedInfo(void) const
 {
     QMutexLocker locker(&m_lock);
     BrowseInfo bi(BROWSE_SAME);
-    if (m_ctx != NULL)
+    if (m_ctx != nullptr)
     {
         bi.m_channum   = m_channum;
         bi.m_chanid    = m_chanid;
@@ -215,7 +215,7 @@ bool TVBrowseHelper::IsBrowsing(void) const
     if (!gCoreContext->IsUIThread())
         return true;
 
-    return m_ctx != NULL;
+    return m_ctx != nullptr;
 }
 
 /** \brief Returns a chanid for the channum, or 0 if none is available.

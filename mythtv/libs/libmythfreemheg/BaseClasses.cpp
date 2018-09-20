@@ -34,7 +34,7 @@ static char THIS_FILE[] = __FILE__;
 MHOctetString::MHOctetString()
 {
     m_nLength = 0;
-    m_pChars = NULL;
+    m_pChars = nullptr;
 }
 
 // Construct from a string
@@ -49,7 +49,7 @@ MHOctetString::MHOctetString(const char *str, int nLen)
 
     if (nLen == 0)
     {
-        m_pChars = 0;
+        m_pChars = nullptr;
     }
     else
     {
@@ -70,7 +70,7 @@ MHOctetString::MHOctetString(const unsigned char *str, int nLen)
 
     if (nLen == 0)
     {
-        m_pChars = 0;
+        m_pChars = nullptr;
     }
     else
     {
@@ -107,7 +107,7 @@ MHOctetString::MHOctetString(const MHOctetString &str, int nOffset, int nLen)
 
     if (nLen == 0)
     {
-        m_pChars = 0;
+        m_pChars = nullptr;
     }
     else
     {
@@ -131,7 +131,7 @@ MHOctetString::~MHOctetString()
 void MHOctetString::Copy(const MHOctetString &str)
 {
     free(m_pChars);
-    m_pChars = NULL;
+    m_pChars = nullptr;
     m_nLength = str.m_nLength;
 
     if (str.m_pChars)
@@ -139,7 +139,7 @@ void MHOctetString::Copy(const MHOctetString &str)
         // Allocate a copy of the string.  For simplicity we always add a null.
         m_pChars = (unsigned char *)malloc(m_nLength + 1);
 
-        if (m_pChars == NULL)
+        if (m_pChars == nullptr)
         {
             throw "Out of memory";
         }
@@ -224,7 +224,7 @@ void MHOctetString::Append(const MHOctetString &str)
     // Allocate a new string big enough to contain both and initialised to the first string.
     unsigned char *p = (unsigned char *)realloc(m_pChars, newLen);
 
-    if (p == NULL)
+    if (p == nullptr)
     {
         throw "Out of memory";
     }
@@ -801,10 +801,10 @@ MHObjectRef *MHParameter::GetReference()
         case P_ContentRef:
             return m_ContentRefVal.GetReference();
         case P_Null:
-            return NULL;
+            return nullptr;
     }
 
-    return NULL; // To keep VC++ happy
+    return nullptr; // To keep VC++ happy
 }
 
 // A content reference is simply a string.

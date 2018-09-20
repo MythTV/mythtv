@@ -49,26 +49,26 @@ MusicCommon::MusicCommon(MythScreenStack *parent, MythScreenType *parentScreen,
                          const QString &name)
             : MythScreenType(parent, name),
     m_parentScreen(parentScreen),
-    m_currentView(),            m_mainvisual(NULL),
-    m_fullscreenBlank(false),   m_randomVisualizer(false),
-    m_currentVisual(0),         m_moveTrackMode(false),
-    m_movingTrack(false),       m_controlVolume(true),
-    m_currentTrack(0),          m_currentTime(0),
-    m_maxTime(0),               m_playlistTrackCount(0),
-    m_playlistPlayedTime(0),    m_playlistMaxTime(0),
-    m_timeText(NULL),           m_infoText(NULL),
-    m_visualText(NULL),         m_noTracksText(NULL),
-    m_shuffleState(NULL),       m_repeatState(NULL),
-    m_movingTracksState(NULL),  m_ratingState(NULL),
-    m_trackProgress(NULL),      m_trackProgressText(NULL),
-    m_trackSpeedText(NULL),     m_trackState(NULL),
-    m_muteState(NULL),          m_volumeText(NULL),
-    m_playlistProgress(NULL),   m_prevButton(NULL),
-    m_rewButton(NULL),          m_pauseButton(NULL),
-    m_playButton(NULL),         m_stopButton(NULL),
-    m_ffButton(NULL),           m_nextButton(NULL),
-    m_coverartImage(NULL),      m_currentPlaylist(NULL),
-    m_playedTracksList(NULL),   m_visualizerVideo(NULL)
+    m_currentView(),              m_mainvisual(nullptr),
+    m_fullscreenBlank(false),     m_randomVisualizer(false),
+    m_currentVisual(0),           m_moveTrackMode(false),
+    m_movingTrack(false),         m_controlVolume(true),
+    m_currentTrack(0),            m_currentTime(0),
+    m_maxTime(0),                 m_playlistTrackCount(0),
+    m_playlistPlayedTime(0),      m_playlistMaxTime(0),
+    m_timeText(nullptr),          m_infoText(nullptr),
+    m_visualText(nullptr),        m_noTracksText(nullptr),
+    m_shuffleState(nullptr),      m_repeatState(nullptr),
+    m_movingTracksState(nullptr), m_ratingState(nullptr),
+    m_trackProgress(nullptr),     m_trackProgressText(nullptr),
+    m_trackSpeedText(nullptr),    m_trackState(nullptr),
+    m_muteState(nullptr),         m_volumeText(nullptr),
+    m_playlistProgress(nullptr),  m_prevButton(nullptr),
+    m_rewButton(nullptr),         m_pauseButton(nullptr),
+    m_playButton(nullptr),        m_stopButton(nullptr),
+    m_ffButton(nullptr),          m_nextButton(nullptr),
+    m_coverartImage(nullptr),     m_currentPlaylist(nullptr),
+    m_playedTracksList(nullptr),  m_visualizerVideo(nullptr)
 {
     m_cycleVisualizer = gCoreContext->GetNumSetting("VisualCycleOnSongChange", 0);
 
@@ -90,7 +90,7 @@ MusicCommon::~MusicCommon(void)
     {
         stopVisualizer();
         delete m_mainvisual;
-        m_mainvisual = NULL;
+        m_mainvisual = nullptr;
     }
 
     if (LCD *lcd = LCD::Get())
@@ -460,7 +460,7 @@ void MusicCommon::switchView(MusicView view)
     if (m_mainvisual)
     {
         delete m_mainvisual;
-        m_mainvisual = NULL;
+        m_mainvisual = nullptr;
     }
 
     gPlayer->removeListener(this);
@@ -492,7 +492,7 @@ void MusicCommon::switchView(MusicView view)
             if (oldView)
                 oldView->saveTreePosition();
 
-            MythScreenType *parentScreen = (oldView != NULL ? m_parentScreen : this);
+            MythScreenType *parentScreen = (oldView != nullptr ? m_parentScreen : this);
 
             PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "tree", restorePos);
 
@@ -522,7 +522,7 @@ void MusicCommon::switchView(MusicView view)
             if (oldView)
                 oldView->saveTreePosition();
 
-            MythScreenType *parentScreen = (oldView != NULL ? m_parentScreen : this);
+            MythScreenType *parentScreen = (oldView != nullptr ? m_parentScreen : this);
 
             PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "gallery", restorePos);
 
@@ -1739,7 +1739,7 @@ void MusicCommon::customEvent(QEvent *event)
     {
         updateUIPlaylist();
         updatePlaylistStats();
-        updateTrackInfo(NULL);
+        updateTrackInfo(nullptr);
     }
     else if (event->type() == MusicPlayerEvent::MetadataChangedEvent ||
              event->type() == MusicPlayerEvent::TrackStatsChangedEvent)
@@ -2245,7 +2245,7 @@ MythMenu* MusicCommon::createMainMenu(void)
     if (!screenList.contains("lyricsview"))
         menu->AddItem(tr("Lyrics"));
 
-    menu->AddItem(tr("More Options"), NULL, createSubMenu());
+    menu->AddItem(tr("More Options"), nullptr, createSubMenu());
 
     return menu;
 }
@@ -2262,18 +2262,18 @@ MythMenu* MusicCommon::createSubMenu(void)
 
     if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
     {
-        menu->AddItem(tr("Playlist Options"), NULL, createPlaylistMenu());
-        menu->AddItem(tr("Set Shuffle Mode"), NULL, createShuffleMenu());
-        menu->AddItem(tr("Set Repeat Mode"),  NULL, createRepeatMenu());
+        menu->AddItem(tr("Playlist Options"), nullptr, createPlaylistMenu());
+        menu->AddItem(tr("Set Shuffle Mode"), nullptr, createShuffleMenu());
+        menu->AddItem(tr("Set Repeat Mode"),  nullptr, createRepeatMenu());
     }
 
-    menu->AddItem(tr("Player Options"),   NULL, createPlayerMenu());
+    menu->AddItem(tr("Player Options"),   nullptr, createPlayerMenu());
 
     if (gPlayer->getPlayMode() != MusicPlayer::PLAYMODE_RADIO)
-        menu->AddItem(tr("Quick Playlists"),  NULL, createQuickPlaylistsMenu());
+        menu->AddItem(tr("Quick Playlists"),  nullptr, createQuickPlaylistsMenu());
 
     if (m_visualizerVideo)
-        menu->AddItem(tr("Change Visualizer"), NULL, createVisualizerMenu());
+        menu->AddItem(tr("Change Visualizer"), nullptr, createVisualizerMenu());
 
     return menu;
 }
@@ -2544,7 +2544,7 @@ void MusicCommon::showPlaylistOptionsMenu(bool addMainMenu)
     MythMenu *menu = createPlaylistOptionsMenu();
 
     if (addMainMenu)
-        menu->AddItem(tr("More Options"), NULL, createMainMenu());
+        menu->AddItem(tr("More Options"), nullptr, createMainMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -2693,9 +2693,9 @@ void MusicCommon::playFirstTrack()
 
 MythMusicVolumeDialog::MythMusicVolumeDialog(MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false),
-    m_displayTimer(NULL),  m_messageText(NULL),
-    m_volText(NULL),       m_muteState(NULL),
-    m_volProgress(NULL)
+    m_displayTimer(nullptr),  m_messageText(nullptr),
+    m_volText(nullptr),       m_muteState(nullptr),
+    m_volProgress(nullptr)
 {
 }
 
@@ -2705,7 +2705,7 @@ MythMusicVolumeDialog::~MythMusicVolumeDialog(void)
     {
         m_displayTimer->stop();
         delete m_displayTimer;
-        m_displayTimer = NULL;
+        m_displayTimer = nullptr;
     }
 }
 
@@ -2803,10 +2803,6 @@ TrackInfoDialog::TrackInfoDialog(MythScreenStack *parent, MusicMetadata *metadat
          : MythScreenType(parent, name, false)
 {
     m_metadata = metadata;
-}
-
-TrackInfoDialog::~TrackInfoDialog(void)
-{
 }
 
 bool TrackInfoDialog::Create(void)

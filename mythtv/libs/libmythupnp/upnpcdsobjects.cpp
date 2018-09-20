@@ -60,7 +60,7 @@ CDSObject::~CDSObject()
     for (; it != m_properties.end(); ++it)
     {
         delete *it;
-        *it = NULL;
+        *it = nullptr;
     }
     m_properties.clear();
 }
@@ -182,7 +182,7 @@ CDSObject *CDSObject::AddChild( CDSObject *pChild )
 
 CDSObject *CDSObject::GetChild( const QString &sID )
 {
-    CDSObject *pChild = NULL;
+    CDSObject *pChild = nullptr;
     CDSObjects::iterator it;
     for (it = m_children.begin(); it != m_children.end(); ++it)
     {
@@ -194,7 +194,7 @@ CDSObject *CDSObject::GetChild( const QString &sID )
             return pChild;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -455,7 +455,7 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 
 CDSObject *CDSObject::CreateItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item";
@@ -473,7 +473,7 @@ CDSObject *CDSObject::CreateItem( QString sId, QString sTitle, QString sParentId
 
 CDSObject *CDSObject::CreateContainer( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )    
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container";
@@ -500,7 +500,7 @@ CDSObject *CDSObject::CreateContainer( QString sId, QString sTitle, QString sPar
 
 CDSObject *CDSObject::CreateAudioItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.audioItem";
@@ -526,7 +526,7 @@ CDSObject *CDSObject::CreateAudioItem( QString sId, QString sTitle, QString sPar
 
 CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.audioItem.musicTrack";
@@ -568,7 +568,7 @@ CDSObject *CDSObject::CreateMusicTrack( QString sId, QString sTitle, QString sPa
 
 CDSObject *CDSObject::CreateAudioBroadcast( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.audioItem.audioBroadcast";
@@ -589,7 +589,7 @@ CDSObject *CDSObject::CreateAudioBroadcast( QString sId, QString sTitle, QString
 
 CDSObject *CDSObject::CreateAudioBook( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.audioItem.audioBook";
@@ -608,7 +608,7 @@ CDSObject *CDSObject::CreateAudioBook( QString sId, QString sTitle, QString sPar
 
 CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.videoItem";
@@ -666,7 +666,7 @@ CDSObject *CDSObject::CreateVideoItem( QString sId, QString sTitle, QString sPar
 
 CDSObject *CDSObject::CreateMovie( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.videoItem.movie";
@@ -684,7 +684,7 @@ CDSObject *CDSObject::CreateMovie( QString sId, QString sTitle, QString sParentI
 
 CDSObject *CDSObject::CreateVideoBroadcast( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.videoItem.videoBroadcast";
@@ -702,7 +702,7 @@ CDSObject *CDSObject::CreateVideoBroadcast( QString sId, QString sTitle, QString
 
 CDSObject *CDSObject::CreateMusicVideoClip( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.videoItem.musicVideoClip";
@@ -722,7 +722,7 @@ CDSObject *CDSObject::CreateMusicVideoClip( QString sId, QString sTitle, QString
 
 CDSObject *CDSObject::CreateImageItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.imageItem";
@@ -747,7 +747,7 @@ CDSObject *CDSObject::CreateImageItem( QString sId, QString sTitle, QString sPar
 
 CDSObject *CDSObject::CreatePhoto( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.imageItem.photo";
@@ -764,7 +764,7 @@ CDSObject *CDSObject::CreatePhoto( QString sId, QString sTitle, QString sParentI
 
 CDSObject *CDSObject::CreatePlaylistItem ( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.playlistItem";
@@ -786,7 +786,7 @@ CDSObject *CDSObject::CreatePlaylistItem ( QString sId, QString sTitle, QString 
 
 CDSObject *CDSObject::CreateTextItem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.item.textItem";
@@ -813,7 +813,7 @@ CDSObject *CDSObject::CreateTextItem( QString sId, QString sTitle, QString sPare
 
 CDSObject *CDSObject::CreateAlbum( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.album";
@@ -840,7 +840,7 @@ CDSObject *CDSObject::CreateAlbum( QString sId, QString sTitle, QString sParentI
 
 CDSObject *CDSObject::CreateMusicAlbum( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.album.musicAlbum";
@@ -860,7 +860,7 @@ CDSObject *CDSObject::CreateMusicAlbum( QString sId, QString sTitle, QString sPa
 
 CDSObject *CDSObject::CreatePhotoAlbum( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.album.photoAlbum";
@@ -875,7 +875,7 @@ CDSObject *CDSObject::CreatePhotoAlbum( QString sId, QString sTitle, QString sPa
 
 CDSObject *CDSObject::CreateGenre( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.genre";
@@ -890,7 +890,7 @@ CDSObject *CDSObject::CreateGenre( QString sId, QString sTitle, QString sParentI
 
 CDSObject *CDSObject::CreateMusicGenre( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.genre.musicGenre";
@@ -905,7 +905,7 @@ CDSObject *CDSObject::CreateMusicGenre( QString sId, QString sTitle, QString sPa
 
 CDSObject *CDSObject::CreateMovieGenre( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.genre.movieGenre";
@@ -920,7 +920,7 @@ CDSObject *CDSObject::CreateMovieGenre( QString sId, QString sTitle, QString sPa
 
 CDSObject *CDSObject::CreatePlaylistContainer( QString sId, QString sTitle, QString sParentId, CDSObject *pObject ) 
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.playlistContainer";
@@ -943,7 +943,7 @@ CDSObject *CDSObject::CreatePlaylistContainer( QString sId, QString sTitle, QStr
 
 CDSObject *CDSObject::CreatePerson( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.person";
@@ -960,7 +960,7 @@ CDSObject *CDSObject::CreatePerson( QString sId, QString sTitle, QString sParent
 
 CDSObject *CDSObject::CreateMusicArtist( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.person.musicArtist";
@@ -978,7 +978,7 @@ CDSObject *CDSObject::CreateMusicArtist( QString sId, QString sTitle, QString sP
 
 CDSObject *CDSObject::CreateStorageSystem( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.storageSystem";
@@ -999,7 +999,7 @@ CDSObject *CDSObject::CreateStorageSystem( QString sId, QString sTitle, QString 
 
 CDSObject *CDSObject::CreateStorageVolume( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.storageVolume";
@@ -1019,7 +1019,7 @@ CDSObject *CDSObject::CreateStorageVolume( QString sId, QString sTitle, QString 
 
 CDSObject *CDSObject::CreateStorageFolder( QString sId, QString sTitle, QString sParentId, CDSObject *pObject )
 {
-    if (pObject == NULL)
+    if (pObject == nullptr)
     {
         pObject = new CDSObject( sId, sTitle, sParentId );
         pObject->m_sClass = "object.container.storageFolder";

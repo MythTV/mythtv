@@ -21,9 +21,9 @@ class ThumbItem
   public:
     ThumbItem() :
         m_isDir(false),
-        m_pixmap(NULL),        m_mediaDevice(NULL) { }
+        m_pixmap(nullptr),     m_mediaDevice(nullptr) { }
     ThumbItem(const QString &name, const QString &path, bool isDir,
-              MythMediaDevice *dev = NULL);
+              MythMediaDevice *dev = nullptr);
     ~ThumbItem();
 
     // commands

@@ -196,7 +196,7 @@ class VideoFilterSettings
 
 struct FilterSettingsProxy
 {
-    virtual ~FilterSettingsProxy() {}
+    virtual ~FilterSettingsProxy() = default;
     virtual const VideoFilterSettings &getSettings() = 0;
     virtual void setSettings(const VideoFilterSettings &settings) = 0;
 };

@@ -22,7 +22,7 @@ class UPnpCDSTv : public UPnpCDSExtension
     public:
 
         UPnpCDSTv();
-        virtual ~UPnpCDSTv() {}
+        virtual ~UPnpCDSTv() = default;
 
     protected:
 

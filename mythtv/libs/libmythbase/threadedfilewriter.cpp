@@ -69,7 +69,7 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     ignore_writes(false),                tfw_min_write_size(kMinWriteSize),
     totalBufferUse(0),
     // threads
-    writeThread(NULL),                   syncThread(NULL),
+    writeThread(nullptr),                syncThread(nullptr),
     m_warned(false),                     m_blocking(false),
     m_registered(false)
 {
@@ -171,7 +171,7 @@ ThreadedFileWriter::~ThreadedFileWriter()
     {
         writeThread->wait();
         delete writeThread;
-        writeThread = NULL;
+        writeThread = nullptr;
     }
 
     while (!writeBuffers.empty())
@@ -190,7 +190,7 @@ ThreadedFileWriter::~ThreadedFileWriter()
     {
         syncThread->wait();
         delete syncThread;
-        syncThread = NULL;
+        syncThread = nullptr;
     }
 
     if (fd >= 0)
@@ -260,7 +260,7 @@ int ThreadedFileWriter::Write(const void *data, uint count)
             continue;
         }
 
-        TFWBuffer *buf = NULL;
+        TFWBuffer *buf = nullptr;
 
         if (!writeBuffers.empty() &&
             (writeBuffers.back()->data.size() + towrite) < kMinWriteSize)

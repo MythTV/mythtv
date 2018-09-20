@@ -48,7 +48,7 @@ class SERVICE_PUBLIC ChannelInfoList : public QObject
 
         static void InitializeCustomTypes();
 
-        Q_INVOKABLE ChannelInfoList(QObject *parent = 0)
+        Q_INVOKABLE ChannelInfoList(QObject *parent = nullptr)
             : QObject( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),

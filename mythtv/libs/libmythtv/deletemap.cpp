@@ -614,7 +614,7 @@ bool DeleteMap::IsTemporaryMark(uint64_t frame) const
 /**
  * \brief Returns the next or previous mark. If these do not exist,
  *        returns either zero (the first frame) or total (the last
- *        frame).  If hasMark is non-NULL, it is set to true if the
+ *        frame).  If hasMark is not nullptr, it is set to true if the
  *        next/previous mark exists, and false otherwise.
  */
 uint64_t DeleteMap::GetNearestMark(uint64_t frame, bool right, bool *hasMark)

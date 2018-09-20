@@ -42,10 +42,6 @@ PortChecker::PortChecker() :
 {
 }
 
-PortChecker::~PortChecker()
-{
-}
-
 /**
  * Check if a port is open and sort out the link-local scope.
  *

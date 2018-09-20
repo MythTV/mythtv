@@ -28,11 +28,11 @@
 
 CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)
               : MythScreenType(parent, "CustomPriority"),
-                m_ruleList(NULL),      m_clauseList(NULL),
-                m_titleEdit(NULL),     m_descriptionEdit(NULL),
-                m_prioritySpin(NULL),  m_addButton(NULL),
-                m_testButton(NULL),    m_installButton(NULL),
-                m_deleteButton(NULL),  m_cancelButton(NULL)
+                m_ruleList(nullptr),      m_clauseList(nullptr),
+                m_titleEdit(nullptr),     m_descriptionEdit(nullptr),
+                m_prioritySpin(nullptr),  m_addButton(nullptr),
+                m_testButton(nullptr),    m_installButton(nullptr),
+                m_deleteButton(nullptr),  m_cancelButton(nullptr)
 {
     if (proginfo)
         m_pginfo = new ProgramInfo(*proginfo);
@@ -121,7 +121,7 @@ void CustomPriority::loadData()
 
     if (result.exec())
     {
-        MythUIButtonListItem *item = NULL;
+        MythUIButtonListItem *item = nullptr;
         while (result.next())
         {
             QString trimTitle = result.value(0).toString();
@@ -353,7 +353,7 @@ bool CustomPriority::checkSyntax(void)
         QString qstr = QString("SELECT (%1) FROM (recordmatch, record, "
                                "program, channel, capturecard, "
                                "oldrecorded) WHERE NULL").arg(desc);
-        while (1)
+        while (true)
         {
             int i = qstr.indexOf("RECTABLE");
             if (i == -1) break;

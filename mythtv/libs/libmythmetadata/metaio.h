@@ -18,7 +18,7 @@ class META_PUBLIC MetaIO
 {
   public:
     MetaIO(void);
-    virtual ~MetaIO(void);
+    virtual ~MetaIO(void) = default;
 
     /*!
     * \brief Writes all metadata back to a file
@@ -48,7 +48,7 @@ class META_PUBLIC MetaIO
     * \brief Reads MusicMetadata from a file.
     *
     * \param filename The filename to read metadata from.
-    * \returns MusicMetadata pointer or NULL on error
+    * \returns MusicMetadata pointer or nullptr on error
     */
     virtual MusicMetadata* read(const QString &filename) = 0;
 
@@ -104,7 +104,7 @@ class META_PUBLIC MetaIO
     {
         (void)filename;
         (void)type;
-        return NULL;
+        return nullptr;
     }
 
     /*!
@@ -126,7 +126,7 @@ class META_PUBLIC MetaIO
     *
     * \param filename The filename to try and determine metadata for.
     * \param blnLength If true, read the file length as well.
-    * \returns MusicMetadata Pointer, or NULL on error.
+    * \returns MusicMetadata Pointer, or nullptr on error.
     */
     MusicMetadata* readFromFilename(const QString &filename, bool blnLength = false);
 
@@ -142,7 +142,7 @@ class META_PUBLIC MetaIO
     * \brief Finds an appropriate tagger for the given file
     *
     * \param filename The filename to find a tagger for.
-    * \returns MetaIO Pointer, or NULL if non found.
+    * \returns MetaIO Pointer, or nullptr if non found.
     *
     * \note The caller is responsible for freeing it when no longer required
     */

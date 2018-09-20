@@ -32,7 +32,7 @@ class Image : public ImageServices
     Q_OBJECT
 
 public:
-    Q_INVOKABLE explicit Image( QObject */*parent*/ = 0 ) {}
+    Q_INVOKABLE explicit Image( QObject */*parent*/ = nullptr ) {}
 
 public:
     QString                     GetImageInfo                ( int   id,
@@ -78,7 +78,7 @@ class ScriptableImage : public QObject
 
     public:
 
-        Q_INVOKABLE ScriptableImage( QScriptEngine *pEngine, QObject *parent = 0 ) : QObject( parent )
+        Q_INVOKABLE ScriptableImage( QScriptEngine *pEngine, QObject *parent = nullptr ) : QObject( parent )
         {
             m_pEngine = pEngine;
         }
@@ -95,7 +95,7 @@ class ScriptableImage : public QObject
 
         QObject* GetImageInfoList( int   Id )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetImageInfoList( Id );
             )
         }
@@ -131,7 +131,7 @@ class ScriptableImage : public QObject
 
         QObject* GetSyncStatus( void )
         {
-            SCRIPT_CATCH_EXCEPTION( NULL,
+            SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetSyncStatus();
             )
         }

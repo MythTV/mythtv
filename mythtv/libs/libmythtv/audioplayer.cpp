@@ -10,7 +10,7 @@
 //static const QString _Location = AudioPlayer::tr("Audio Player");
 
 AudioPlayer::AudioPlayer(MythPlayer *parent, bool muted)
-  : m_parent(parent),     m_audioOutput(NULL),   m_channels(-1),
+  : m_parent(parent),     m_audioOutput(nullptr),m_channels(-1),
     m_orig_channels(-1),  m_codec(0),            m_format(FORMAT_NONE),
     m_samplerate(44100),  m_codec_profile(0),
     m_stretchfactor(1.0f),m_passthru(false),
@@ -100,7 +100,7 @@ void AudioPlayer::DeleteOutput(void)
     if (m_audioOutput)
     {
         delete m_audioOutput;
-        m_audioOutput = NULL;
+        m_audioOutput = nullptr;
     }
     m_no_audio_out = true;
 }

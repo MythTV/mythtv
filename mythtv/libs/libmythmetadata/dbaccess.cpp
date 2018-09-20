@@ -46,7 +46,7 @@ class SingleValueImp
                 .arg(m_table_name).arg(m_id_name);
     }
 
-    virtual ~SingleValueImp() {}
+    virtual ~SingleValueImp() = default;
 
     mutable QMutex mutex;
 
@@ -117,7 +117,7 @@ class SingleValueImp
         return m_entries.find(id) != m_entries.end();
     }
 
-    bool exists(const QString &name, int *id = 0)
+    bool exists(const QString &name, int *id = nullptr)
     {
         entry_map::const_iterator p = find(name);
         if (p != m_entries.end())
@@ -455,10 +455,6 @@ MultiValue::MultiValue(MultiValueImp *imp) : m_imp(imp)
 {
 }
 
-MultiValue::~MultiValue()
-{
-}
-
 int MultiValue::add(int id, int value)
 {
     return m_imp->add(id, value);
@@ -501,10 +497,6 @@ VideoCategory::VideoCategory() :
 {
 }
 
-VideoCategory::~VideoCategory()
-{
-}
-
 VideoCategory &VideoCategory::GetCategory()
 {
     static VideoCategory vc;
@@ -516,10 +508,6 @@ VideoCategory &VideoCategory::GetCategory()
 
 VideoCountry::VideoCountry() :
     SingleValue(new SingleValueImp("videocountry", "intid", "country"))
-{
-}
-
-VideoCountry::~VideoCountry()
 {
 }
 
@@ -537,10 +525,6 @@ VideoGenre::VideoGenre() :
 {
 }
 
-VideoGenre::~VideoGenre()
-{
-}
-
 VideoGenre &VideoGenre::getGenre()
 {
     static VideoGenre vg;
@@ -555,10 +539,6 @@ VideoCast::VideoCast() :
 {
 }
 
-VideoCast::~VideoCast()
-{
-}
-
 VideoCast &VideoCast::GetCast()
 {
     static VideoCast vc;
@@ -570,10 +550,6 @@ VideoCast &VideoCast::GetCast()
 
 VideoGenreMap::VideoGenreMap() :
     MultiValue(new MultiValueImp("videometadatagenre", "idvideo", "idgenre"))
-{
-}
-
-VideoGenreMap::~VideoGenreMap()
 {
 }
 
@@ -592,10 +568,6 @@ VideoCountryMap::VideoCountryMap() :
 {
 }
 
-VideoCountryMap::~VideoCountryMap()
-{
-}
-
 VideoCountryMap &VideoCountryMap::getCountryMap()
 {
     static VideoCountryMap vcm;
@@ -608,10 +580,6 @@ VideoCountryMap &VideoCountryMap::getCountryMap()
 VideoCastMap::VideoCastMap() :
     MultiValue(new MultiValueImp("videometadatacast", "idvideo",
                                  "idcast"))
-{
-}
-
-VideoCastMap::~VideoCastMap()
 {
 }
 
@@ -638,7 +606,7 @@ class FileAssociationsImp
     {
         file_association ret_fa(fa);
 
-        file_association *existing_fa = 0;
+        file_association *existing_fa = nullptr;
         MSqlQuery query(MSqlQuery::InitCon());
 
         association_list::iterator p = find(ret_fa.extension);

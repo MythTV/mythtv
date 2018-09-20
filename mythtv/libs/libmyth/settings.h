@@ -34,7 +34,7 @@ class MPUBLIC Configurable : public QObject
     ///       of a parent container is a good time. Some UI classes
     ///       depend on this for properly updating the UI.
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
     /// Tell any Configurable keeping a pointer to a widget,
     /// that the pointer returned by an earlier configWidget
     /// call is invalid.
@@ -79,7 +79,7 @@ class MPUBLIC Configurable : public QObject
     explicit Configurable(Storage *_storage) :
         labelAboveWidget(false), enabled(true), storage(_storage),
         configName(""), label(""), helptext(""), visible(true) { }
-    virtual ~Configurable() { }
+    virtual ~Configurable() = default;
 
   protected:
     bool labelAboveWidget;
@@ -101,7 +101,7 @@ class MPUBLIC Setting : public Configurable, public StorageUser
 
     // non-const Gets
     virtual Setting *byName(const QString &name)
-        { return (name == configName) ? this : NULL; }
+        { return (name == configName) ? this : nullptr; }
 
     // StorageUser
     void SetDBValue(const QString &val) { setValue(val); }
@@ -114,7 +114,7 @@ class MPUBLIC Setting : public Configurable, public StorageUser
 
   protected:
     explicit Setting(Storage *_storage) : Configurable(_storage) {};
-    virtual ~Setting() {};
+    virtual ~Setting() = default;
 
   protected:
     QString settingValue;
@@ -129,19 +129,19 @@ class MPUBLIC LabelSetting : public Setting
     explicit LabelSetting(Storage *_storage) : Setting(_storage) { }
   public:
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
 };
 
 class MPUBLIC LineEditSetting : public Setting
 {
   protected:
     LineEditSetting(Storage *_storage, bool readwrite = true) :
-        Setting(_storage), bxwidget(NULL), edit(NULL),
+        Setting(_storage), bxwidget(nullptr), edit(nullptr),
         rw(readwrite), password_echo(false) { }
 
   public:
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
     virtual void widgetInvalid(QObject *obj);
 
     void setRW(bool readwrite = true)
@@ -218,7 +218,7 @@ class MPUBLIC SliderSetting: public BoundedIntegerSetting
         BoundedIntegerSetting(_storage, min, max, step) { }
   public:
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
 };
 
 class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
@@ -231,7 +231,7 @@ class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
                    QString special_value_text = "");
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
     virtual void widgetInvalid(QObject *obj);
 
     void setFocus(void);
@@ -319,7 +319,7 @@ class MPUBLIC SelectLabelSetting : public SelectSetting
 
   public:
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
 };
 
 class MPUBLIC ComboBoxSetting: public SelectSetting
@@ -329,11 +329,11 @@ class MPUBLIC ComboBoxSetting: public SelectSetting
   protected:
     ComboBoxSetting(Storage *_storage, bool _rw = false, int _step = 1) :
         SelectSetting(_storage), rw(_rw),
-        bxwidget(NULL), cbwidget(NULL), step(_step) { }
+        bxwidget(nullptr), cbwidget(nullptr), step(_step) { }
 
   public:
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
     virtual void widgetInvalid(QObject *obj);
 
     void setFocus(void) { if (cbwidget) cbwidget->setFocus(); }
@@ -374,11 +374,11 @@ class MPUBLIC ListBoxSetting: public SelectSetting
   public:
     explicit ListBoxSetting(Storage *_storage) :
         SelectSetting(_storage),
-        bxwidget(NULL), lbwidget(NULL), eventFilter(NULL),
+        bxwidget(nullptr), lbwidget(nullptr), eventFilter(nullptr),
         selectionMode(MythListBox::SingleSelection) { }
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
     virtual void widgetInvalid(QObject *obj);
 
     void setFocus(void)
@@ -457,10 +457,10 @@ class MPUBLIC CheckBoxSetting: public BooleanSetting
 
   public:
     explicit CheckBoxSetting(Storage *_storage) :
-        BooleanSetting(_storage), widget(NULL) { }
+        BooleanSetting(_storage), widget(nullptr) { }
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = NULL);
+                                  const char *widgetName = nullptr);
 
     virtual void widgetInvalid(QObject*);
 
@@ -489,7 +489,7 @@ class MPUBLIC PathSetting : public ComboBoxSetting
 
     // Use a combobox for now, maybe a modified file dialog later
     //virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-    //                              const char *widgetName = NULL);
+    //                              const char *widgetName = nullptr);
 
   protected:
     bool mustexist;
@@ -567,10 +567,10 @@ class MPUBLIC ButtonSetting: public Setting
 
   public:
     ButtonSetting(Storage *_storage, QString _name = "button") :
-        Setting(_storage), name(_name), button(NULL) { }
+        Setting(_storage), name(_name), button(nullptr) { }
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName=0);
+                                  const char *widgetName=nullptr);
     virtual void widgetInvalid(QObject *obj);
 
     virtual void setEnabled(bool b);
@@ -599,7 +599,7 @@ class MPUBLIC ProgressSetting : public IntegerSetting
         IntegerSetting(_storage), totalSteps(_totalSteps) { }
 
     QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                          const char *widgetName = NULL);
+                          const char *widgetName = nullptr);
 
   private:
     int totalSteps;
@@ -698,7 +698,7 @@ class MPUBLIC HostCheckBox : public CheckBoxSetting, public HostDBStorage
   public:
     explicit HostCheckBox(const QString &name) :
         CheckBoxSetting(this), HostDBStorage(this, name) { }
-    virtual ~HostCheckBox() { ; }
+    virtual ~HostCheckBox() = default;
 };
 
 class MPUBLIC HostComboBox : public ComboBoxSetting, public HostDBStorage
@@ -707,7 +707,7 @@ class MPUBLIC HostComboBox : public ComboBoxSetting, public HostDBStorage
   public:
     HostComboBox(const QString &name, bool rw = false) :
         ComboBoxSetting(this, rw), HostDBStorage(this, name) { }
-    virtual ~HostComboBox() { ; }
+    virtual ~HostComboBox() = default;
 };
 
 class MPUBLIC HostRefreshRateComboBox : public HostComboBox
@@ -716,7 +716,7 @@ class MPUBLIC HostRefreshRateComboBox : public HostComboBox
   public:
     HostRefreshRateComboBox(const QString &name, bool rw = false) :
         HostComboBox(name, rw) { }
-    virtual ~HostRefreshRateComboBox() { ; }
+    virtual ~HostRefreshRateComboBox() = default;
 
   public slots:
     virtual void ChangeResolution(const QString &resolution);

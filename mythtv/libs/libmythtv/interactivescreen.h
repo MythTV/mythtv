@@ -8,7 +8,7 @@ class InteractiveScreen : public MythScreenType
 {
   public:
     InteractiveScreen(MythPlayer *player, const QString &name);
-    virtual ~InteractiveScreen();
+    virtual ~InteractiveScreen() = default;
     virtual bool Create(void)
     {
         SetArea(MythRect());

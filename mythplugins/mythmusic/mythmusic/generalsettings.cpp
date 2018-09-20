@@ -13,17 +13,12 @@
 
 GeneralSettings::GeneralSettings(MythScreenStack *parent, const char *name)
         : MythScreenType(parent, name),
-        m_musicAudioDevice(NULL),
-        m_musicDefaultUpmix(NULL), m_musicCDDevice(NULL),
-        m_nonID3FileNameFormat(NULL), m_ignoreID3Tags(NULL),
-        m_allowTagWriting(NULL), m_resetDBButton(NULL), m_saveButton(NULL),
-        m_cancelButton(NULL)
+        m_musicAudioDevice(nullptr),
+        m_musicDefaultUpmix(nullptr), m_musicCDDevice(nullptr),
+        m_nonID3FileNameFormat(nullptr), m_ignoreID3Tags(nullptr),
+        m_allowTagWriting(nullptr), m_resetDBButton(nullptr), m_saveButton(nullptr),
+        m_cancelButton(nullptr)
 {
-}
-
-GeneralSettings::~GeneralSettings()
-{
-
 }
 
 bool GeneralSettings::Create()

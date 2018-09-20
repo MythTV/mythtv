@@ -15,7 +15,7 @@ class MPUBLIC DialogBox : public MythDialog
     Q_OBJECT
   public:
     DialogBox(MythMainWindow *parent, const QString &text, 
-              const char *checkboxtext = NULL, const char *name = NULL) MDEPRECATED;
+              const char *checkboxtext = nullptr, const char *name = nullptr) MDEPRECATED;
 
     void AddButton(const QString &title);
 
@@ -26,7 +26,7 @@ class MPUBLIC DialogBox : public MythDialog
     void buttonPressed(int which);
 
   protected:
-    ~DialogBox() {} // use deleteLater() for thread safety
+    ~DialogBox() = default; // use deleteLater() for thread safety
 
   private:
     QVBoxLayout *box;

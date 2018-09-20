@@ -39,7 +39,7 @@ using namespace std;
 // static_assert(FFTW_N==SAMPLES_DEFAULT_SIZE)
 
 
-VisFactory* VisFactory::g_pVisFactories = 0;
+VisFactory* VisFactory::g_pVisFactories = nullptr;
 
 VisualBase::VisualBase(bool screensaverenable)
     : m_fps(20), m_xscreensaverenable(screensaverenable)
@@ -75,7 +75,7 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
 // LogScale
 
 LogScale::LogScale(int maxscale, int maxrange)
-    : indices(0), s(0), r(0)
+    : indices(nullptr), s(0), r(0)
 {
     setMax(maxscale, maxrange);
 }
@@ -144,10 +144,6 @@ StereoScope::StereoScope() :
     rubberband(RUBBERBAND), falloff(1.0)
 {
     m_fps = 45;
-}
-
-StereoScope::~StereoScope()
-{
 }
 
 void StereoScope::resize( const QSize &newsize )
@@ -374,14 +370,6 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 ///////////////////////////////////////////////////////////////////////////////
 // MonoScope
 
-MonoScope::MonoScope()
-{
-}
-
-MonoScope::~MonoScope()
-{
-}
-
 bool MonoScope::process( VisualNode *node )
 {
     bool allZero = true;
@@ -579,7 +567,7 @@ static class MonoScopeFactory : public VisFactory
 
 #if FFTW3_SUPPORT
 Spectrum::Spectrum()
-    : lin(NULL), rin(NULL), lout(NULL), rout(NULL)
+    : lin(nullptr), rin(nullptr), lout(nullptr), rout(nullptr)
 {
     LOG(VB_GENERAL, LOG_INFO, QString("Spectrum : Being Initialised"));
 
@@ -825,10 +813,6 @@ Squares::Squares() :
     fake_height = number_of_squares * analyzerBarWidth;
 }
 
-Squares::~Squares()
-{
-}
-
 void Squares::resize (const QSize &newsize) {
     // Trick the spectrum analyzer into calculating 16 rectangles
     Spectrum::resize (QSize (fake_height, fake_height));
@@ -909,7 +893,7 @@ static class SquaresFactory : public VisFactory
 #endif // FFTW3_SUPPORT
 
 Piano::Piano()
-    : piano_data(NULL), audio_data(NULL)
+    : piano_data(nullptr), audio_data(nullptr)
 {
     // Setup the "magical" audio coefficients
     // required by the Goetzel Algorithm
@@ -1369,7 +1353,7 @@ static class PianoFactory : public VisFactory
 }PianoFactory;
 
 AlbumArt::AlbumArt(void) :
-    m_currentMetadata(NULL),
+    m_currentMetadata(nullptr),
     m_lastCycle(QDateTime::currentDateTime())
 {
     findFrontCover();
@@ -1422,10 +1406,6 @@ bool AlbumArt::cycleImage(void)
     }
 
     return false;
-}
-
-AlbumArt::~AlbumArt()
-{
 }
 
 void AlbumArt::resize(const QSize &newsize)
@@ -1570,10 +1550,6 @@ Blank::Blank()
     : VisualBase(true)
 {
     m_fps = 1;
-}
-
-Blank::~Blank()
-{
 }
 
 void Blank::resize(const QSize &newsize)

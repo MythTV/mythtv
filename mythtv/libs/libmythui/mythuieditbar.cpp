@@ -13,10 +13,6 @@ MythUIEditBar::MythUIEditBar(MythUIType *parent, const QString &name)
 {
 }
 
-MythUIEditBar::~MythUIEditBar(void)
-{
-}
-
 void MythUIEditBar::ReleaseImages(void)
 {
     ClearImages();
@@ -264,7 +260,7 @@ MythUIType *MythUIEditBar::GetNew(MythUIShape *shape, MythUIImage *image)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void MythUIEditBar::CalcInverseRegions(void)

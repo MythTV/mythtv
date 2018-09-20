@@ -22,18 +22,18 @@
 #include "tv.h" // for VBIMode
 
 #define TVREC_CARDNUM \
-        ((tvrec != NULL) ? QString::number(tvrec->GetInputId()) : "NULL")
+        ((tvrec != nullptr) ? QString::number(tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("V4LRec[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(videodevice)
 
 V4LRecorder::V4LRecorder(TVRec *tv) :
     DTVRecorder(tv),          vbimode(VBIMode::None),
-    pal_vbi_cb(NULL),         pal_vbi_tt(NULL),
+    pal_vbi_cb(nullptr),      pal_vbi_tt(nullptr),
     ntsc_vbi_width(0),        ntsc_vbi_start_line(0),
     ntsc_vbi_line_count(0),
-    vbi608(NULL),
-    vbi_thread(NULL),         vbi_fd(-1),
+    vbi608(nullptr),
+    vbi_thread(nullptr),      vbi_fd(-1),
     request_helper(false)
 {
 }
@@ -50,7 +50,7 @@ V4LRecorder::~V4LRecorder()
     {
         vbi_thread->wait();
         delete vbi_thread;
-        vbi_thread = NULL;
+        vbi_thread = nullptr;
         CloseVBIDevice();
     }
 }
@@ -111,14 +111,14 @@ int V4LRecorder::OpenVBIDevice(void)
     if (vbi_fd >= 0)
         return vbi_fd;
 
-    struct VBIData *vbi_cb = NULL;
-    struct vbi     *pal_tt = NULL;
+    struct VBIData *vbi_cb = nullptr;
+    struct vbi     *pal_tt = nullptr;
     uint width = 0, start_line = 0, line_count = 0;
 
     QByteArray vbidev = vbidevice.toLatin1();
     if (VBIMode::PAL_TT == vbimode)
     {
-        pal_tt = vbi_open(vbidev.constData(), NULL, 99, -1);
+        pal_tt = vbi_open(vbidev.constData(), nullptr, 99, -1);
         if (pal_tt)
         {
             fd = pal_tt->fd;
@@ -244,11 +244,11 @@ void V4LRecorder::CloseVBIDevice(void)
         vbi_del_handler(pal_vbi_tt, (void*) vbi_event, pal_vbi_cb);
         vbi_close(pal_vbi_tt);
         delete pal_vbi_cb;
-        pal_vbi_cb = NULL;
+        pal_vbi_cb = nullptr;
     }
     else
     {
-        delete vbi608; vbi608 = NULL;
+        delete vbi608; vbi608 = nullptr;
         close(vbi_fd);
     }
 
@@ -260,7 +260,7 @@ void V4LRecorder::RunVBIDevice(void)
     if (vbi_fd < 0)
         return;
 
-    unsigned char *buf = NULL, *ptr = NULL, *ptr_end = NULL;
+    unsigned char *buf = nullptr, *ptr = nullptr, *ptr_end = nullptr;
     if (ntsc_vbi_width)
     {
         uint sz   = ntsc_vbi_width * ntsc_vbi_line_count * 2;
@@ -284,7 +284,7 @@ void V4LRecorder::RunVBIDevice(void)
         FD_ZERO(&rdset);
         FD_SET(vbi_fd, &rdset);
 
-        int nr = select(vbi_fd + 1, &rdset, 0, 0, &tv);
+        int nr = select(vbi_fd + 1, &rdset, nullptr, nullptr, &tv);
         if (nr < 0)
             LOG(VB_GENERAL, LOG_ERR, LOC + "vbi select failed" + ENO);
 

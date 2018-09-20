@@ -17,7 +17,7 @@ class AudioSetupWizard : public MythScreenType
   public:
 
     AudioSetupWizard(MythScreenStack *parent, MythScreenType *generalScreen,
-                     const char *name = 0);
+                     const char *name = nullptr);
     ~AudioSetupWizard();
 
     bool Create(void);

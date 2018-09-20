@@ -19,7 +19,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gCoreContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,NULL))
+    if (!gCoreContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,nullptr))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("DB Error (Setting new DB version number): %1\n")
@@ -72,7 +72,7 @@ bool UpgradeMusicDatabaseSchema(void)
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
 #endif
-    SchemaUpgradeWizard *schema_wizard = NULL;
+    SchemaUpgradeWizard *schema_wizard = nullptr;
 
     // Suppress DB messages and turn of the settings cache,
     // These are likely to confuse the users and the code, respectively.

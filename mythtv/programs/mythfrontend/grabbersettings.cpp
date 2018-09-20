@@ -21,9 +21,9 @@ using namespace std;
 
 GrabberSettings::GrabberSettings(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_movieGrabberButtonList(NULL),      m_tvGrabberButtonList(NULL),
-      m_gameGrabberButtonList(NULL),       m_dailyUpdatesCheck(NULL),
-      m_okButton(NULL),                    m_cancelButton(NULL)
+      m_movieGrabberButtonList(nullptr),   m_tvGrabberButtonList(nullptr),
+      m_gameGrabberButtonList(nullptr),    m_dailyUpdatesCheck(nullptr),
+      m_okButton(nullptr),                 m_cancelButton(nullptr)
 {
 }
 
@@ -74,10 +74,6 @@ bool GrabberSettings::Create()
     LoadInBackground(message);
 
     return true;
-}
-
-GrabberSettings::~GrabberSettings()
-{
 }
 
 void GrabberSettings::Load(void)

@@ -18,10 +18,10 @@
 
 NetBase::NetBase(MythScreenStack *parent, const char *name)
     : MythScreenType(parent, name),
-      m_thumbImage(NULL),
-      m_downloadable(NULL),
+      m_thumbImage(nullptr),
+      m_downloadable(nullptr),
       m_popupStack(GetMythMainWindow()->GetStack("popup stack")),
-      m_progressDialog(NULL),
+      m_progressDialog(nullptr),
       m_imageDownload(new MetadataImageDownload(this))
 {
     gCoreContext->addListener(this);
@@ -37,7 +37,7 @@ NetBase::~NetBase()
     cleanThumbnailCacheDir();
 
     delete m_imageDownload;
-    m_imageDownload = NULL;
+    m_imageDownload = nullptr;
 
     gCoreContext->removeListener(this);
 }
@@ -64,7 +64,7 @@ void NetBase::InitProgressDialog()
     else
     {
         delete m_progressDialog;
-        m_progressDialog = NULL;
+        m_progressDialog = nullptr;
     }
 }
 
@@ -260,7 +260,7 @@ void NetBase::customEvent(QEvent *event)
                 if (m_progressDialog)
                 {
                     m_progressDialog->Close();
-                    m_progressDialog = NULL;
+                    m_progressDialog = nullptr;
                 }
 
                 if ((m_downloadFile.startsWith("myth://")))

@@ -86,8 +86,8 @@ void NVRAudioThread::run(void)
 }
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
-    V4LRecorder(rec), audio_device(NULL),
-    write_thread(NULL), audio_thread(NULL), recording(false)
+    V4LRecorder(rec), audio_device(nullptr),
+    write_thread(nullptr), audio_thread(nullptr), recording(false)
 {
     channelObj = channel;
 
@@ -111,10 +111,10 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     height_multiplier = 1.0;
 
     mp3quality = 3;
-    gf = NULL;
-    rtjc = NULL;
-    strm = NULL;
-    mp3buf = NULL;
+    gf = nullptr;
+    rtjc = nullptr;
+    strm = nullptr;
+    mp3buf = nullptr;
     mp3buf_size = 0;
 
     transcoding = false;
@@ -151,8 +151,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     picture_format = AV_PIX_FMT_YUV420P;
     v4l2_pixelformat = 0;
 
-    mpa_vidcodec = 0;
-    mpa_vidctx = NULL;
+    mpa_vidcodec = nullptr;
+    mpa_vidctx = nullptr;
 
     useavcodec = false;
 
@@ -183,7 +183,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel) :
     cleartimeonpause = false;
 
     videoFilterList = "";
-    videoFilters = NULL;
+    videoFilters = nullptr;
     FiltMan = new FilterManager;
     inpixfmt = FMT_YV12;
     correct_bttv = false;
@@ -220,7 +220,7 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     if (weMadeBuffer && ringBuffer)
     {
         delete ringBuffer;
-        ringBuffer = NULL;
+        ringBuffer = nullptr;
     }
     if (rtjc)
         delete rtjc;
@@ -233,7 +233,7 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     if (audio_device)
     {
         delete audio_device;
-        audio_device = NULL;
+        audio_device = nullptr;
     }
     if (fd >= 0)
         close(fd);
@@ -532,7 +532,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
         return false;
     }
 
-    mpa_vidctx = avcodec_alloc_context3(NULL);
+    mpa_vidctx = avcodec_alloc_context3(nullptr);
 
     switch (picture_format)
     {
@@ -580,7 +580,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
                    break;
     }
 
-    AVDictionary *opts = NULL;
+    AVDictionary *opts = nullptr;
 
     mpa_vidctx->bit_rate = usebitrate;
     mpa_vidctx->bit_rate_tolerance = usebitrate * 100;
@@ -1571,7 +1571,7 @@ void NuppelVideoRecorder::DoV4L2(void)
             return;
         }
 
-        buffers[i] = (unsigned char *)mmap(NULL, vbuf.length,
+        buffers[i] = (unsigned char *)mmap(nullptr, vbuf.length,
                                            PROT_READ|PROT_WRITE, MAP_SHARED,
                                            fd, vbuf.m.offset);
 
@@ -1606,8 +1606,8 @@ void NuppelVideoRecorder::DoV4L2(void)
     resetcapture = false;
 
     // setup pixel format conversions for YUYV and UYVY
-    uint8_t *output_buffer = NULL;
-    struct SwsContext *convert_ctx = NULL;
+    uint8_t *output_buffer = nullptr;
+    struct SwsContext *convert_ctx = nullptr;
     AVFrame img_out;
     if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV ||
         v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
@@ -1626,7 +1626,7 @@ void NuppelVideoRecorder::DoV4L2(void)
 
         convert_ctx = sws_getCachedContext(convert_ctx, width, height, in_pixfmt,
                                            width, height, AV_PIX_FMT_YUV420P,
-                                           SWS_FAST_BILINEAR, NULL, NULL, NULL);
+                                           SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
         if (!convert_ctx)
         {
             _error = "Cannot initialize image conversion context";
@@ -1692,7 +1692,7 @@ again:
         FD_ZERO(&rdset);
         FD_SET(fd, &rdset);
 
-        switch (select(fd+1, &rdset, NULL, NULL, &tv))
+        switch (select(fd+1, &rdset, nullptr, nullptr, &tv))
         {
             case -1:
                   if (errno == EINTR)
@@ -1951,21 +1951,21 @@ void NuppelVideoRecorder::KillChildren(void)
     {
         write_thread->wait();
         delete write_thread;
-        write_thread = NULL;
+        write_thread = nullptr;
     }
 
     if (audio_thread)
     {
         audio_thread->wait();
         delete audio_thread;
-        audio_thread = NULL;
+        audio_thread = nullptr;
     }
 
     if (vbi_thread)
     {
         vbi_thread->wait();
         delete vbi_thread;
-        vbi_thread = NULL;
+        vbi_thread = nullptr;
         CloseVBIDevice();
     }
 }

@@ -45,7 +45,7 @@ class MPUBLIC RSSSite : public QObject
                   const bool& download,
                   const QDateTime& updated);
 
-    ~RSSSite();
+    ~RSSSite() = default;
 
     typedef QList<RSSSite *> rssList;
 

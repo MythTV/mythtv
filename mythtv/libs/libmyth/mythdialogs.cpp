@@ -45,9 +45,9 @@ static bool inline IsEGLFS()
  */
 
 MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
-    : QFrame(IsEGLFS() ? 0 : parent), wmult(0.0), hmult(0.0),
+    : QFrame(IsEGLFS() ? nullptr : parent), wmult(0.0), hmult(0.0),
       screenwidth(0), screenheight(0), xbase(0), ybase(0),
-      m_parent(NULL), rescode(kDialogCodeAccepted), in_loop(false)
+      m_parent(nullptr), rescode(kDialogCodeAccepted), in_loop(false)
 {
     setObjectName(name);
     if (!parent)
@@ -97,7 +97,7 @@ void MythDialog::TeardownAll(void)
     if (m_parent)
     {
         m_parent->detach(this);
-        m_parent = NULL;
+        m_parent = nullptr;
     }
 }
 
@@ -331,7 +331,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
     QList<QWidget *> objList = this->findChildren<QWidget *>();
 
     QWidget *pCurr    = focusWidget();
-    QWidget *pNew     = NULL;
+    QWidget *pNew     = nullptr;
     int      nCurrIdx = -1;
     int      nIdx;
 
@@ -381,10 +381,10 @@ bool MythPopupBox::focusNextPrevChild(bool next)
 
 #if 0
     QFocusData *focusList = focusData();
-    QObjectList *objList = queryList(NULL,NULL,false,true);
+    QObjectList *objList = queryList(nullptr,nullptr,false,true);
 
     QWidget *startingPoint = focusList->home();
-    QWidget *candidate = NULL;
+    QWidget *candidate = nullptr;
 
     QWidget *w = (next) ? focusList->prev() : focusList->next();
 
@@ -825,7 +825,7 @@ MythProgressDialog::MythProgressDialog(
     if (cancelButton && slot && target)
     {
         MythPushButton *button = new MythPushButton(
-            QObject::tr("Cancel"), NULL);
+            QObject::tr("Cancel"), nullptr);
         button->setFocus();
         hlayout->addWidget(button);
         connect(button, SIGNAL(pressed()), target, slot);
@@ -866,10 +866,6 @@ MythProgressDialog::MythProgressDialog(
     show();
 
     qApp->processEvents();
-}
-
-MythProgressDialog::~MythProgressDialog()
-{
 }
 
 void MythProgressDialog::deleteLater(void)

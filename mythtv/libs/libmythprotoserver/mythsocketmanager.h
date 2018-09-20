@@ -22,7 +22,7 @@ class MythServer : public ServerPool
 {
     Q_OBJECT
   public:
-    explicit MythServer(QObject *parent=0);
+    explicit MythServer(QObject *parent=nullptr);
 
   signals:
     void newConnection(qt_socket_fd_t socket);

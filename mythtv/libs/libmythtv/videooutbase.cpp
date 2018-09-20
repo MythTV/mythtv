@@ -116,7 +116,7 @@ void VideoOutput::GetRenderOptions(render_opts &opts)
 /**
  * \brief  Depending on compile-time configure settings and run-time
  *         renderer settings, create a relevant VideoOutput subclass.
- * \return instance of VideoOutput if successful, NULL otherwise.
+ * \return instance of VideoOutput if successful, nullptr otherwise.
  */
 VideoOutput *VideoOutput::Create(
     const QString &decoder, MythCodecID  codec_id,     void *codec_priv,
@@ -217,7 +217,7 @@ VideoOutput *VideoOutput::Create(
         else
             break;
 
-        VideoOutput *vo = NULL;
+        VideoOutput *vo = nullptr;
 
         /* these cases are mutually exlusive */
         if (renderer == "null")
@@ -274,16 +274,16 @@ VideoOutput *VideoOutput::Create(
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
                 delete vo;
-                vo = NULL;
-                return NULL;
+                vo = nullptr;
+                return nullptr;
             }
 
             if (!widget->winId())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + "No window for video output.");
                 delete vo;
-                vo = NULL;
-                return NULL;
+                vo = nullptr;
+                return nullptr;
             }
 
             // determine the display rectangle
@@ -301,9 +301,9 @@ VideoOutput *VideoOutput::Create(
                 return vo;
             }
 
-            vo->db_vdisp_profile = NULL;
+            vo->db_vdisp_profile = nullptr;
             delete vo;
-            vo = NULL;
+            vo = nullptr;
         }
         else if (vo && (playerFlags & kVideoIsNull))
         {
@@ -313,9 +313,9 @@ VideoOutput *VideoOutput::Create(
                 return vo;
             }
 
-            vo->db_vdisp_profile = NULL;
+            vo->db_vdisp_profile = nullptr;
             delete vo;
-            vo = NULL;
+            vo = nullptr;
         }
 
         renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
@@ -325,7 +325,7 @@ VideoOutput *VideoOutput::Create(
         "Not compiled with any useable video output method.");
     delete vprof;
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -404,40 +404,40 @@ VideoOutput::VideoOutput() :
     db_letterbox_colour(kLetterBoxColour_Black),
 
     // Video parameters
-    video_codec_id(kCodec_NONE),        db_vdisp_profile(NULL),
+    video_codec_id(kCodec_NONE),        db_vdisp_profile(nullptr),
 
     // Picture-in-Picture stuff
     pip_desired_display_size(160,128),  pip_display_size(0,0),
     pip_video_size(0,0),
-    pip_tmp_buf(NULL),                  pip_tmp_buf2(NULL),
-    pip_scaling_context(NULL),
+    pip_tmp_buf(nullptr),               pip_tmp_buf2(nullptr),
+    pip_scaling_context(nullptr),
 
     // Video resizing (for ITV)
     vsz_enabled(false),
     vsz_desired_display_rect(0,0,0,0),  vsz_display_size(0,0),
     vsz_video_size(0,0),
-    vsz_tmp_buf(NULL),                  vsz_scale_context(NULL),
+    vsz_tmp_buf(nullptr),               vsz_scale_context(nullptr),
 
     // Deinterlacing
     m_deinterlacing(false),             m_deintfiltername("linearblend"),
-    m_deintFiltMan(NULL),               m_deintFilter(NULL),
+    m_deintFiltMan(nullptr),            m_deintFilter(nullptr),
     m_deinterlaceBeforeOSD(true),
 
     // Various state variables
     errorState(kError_None),            framesPlayed(0),
 
     // Custom display resolutions
-    display_res(NULL),
+    display_res(nullptr),
 
     // Physical display
     monitor_sz(640,480),                monitor_dim(400,300),
 
     // OSD
-    osd_painter(NULL),                  osd_image(NULL),
-    invalid_osd_painter(0),
+    osd_painter(nullptr),               osd_image(nullptr),
+    invalid_osd_painter(nullptr),
 
     // Visualisation
-    m_visual(NULL),
+    m_visual(nullptr),
 
     // 3D TV
     m_stereo(kStereoscopicModeNone)
@@ -453,7 +453,7 @@ VideoOutput::VideoOutput() :
     db_letterbox_colour = (LetterBoxColour)
         gCoreContext->GetNumSetting("LetterboxColour",     0);
 
-    db_vdisp_profile = 0;
+    db_vdisp_profile = nullptr;
 }
 
 /**
@@ -468,7 +468,7 @@ VideoOutput::~VideoOutput()
         delete osd_painter;
     if (invalid_osd_painter)
         delete invalid_osd_painter;
-    invalid_osd_painter = 0;
+    invalid_osd_painter = nullptr;
 
     ShutdownPipResize();
 
@@ -585,12 +585,12 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
     if (m_deintFiltMan)
     {
         delete m_deintFiltMan;
-        m_deintFiltMan = NULL;
+        m_deintFiltMan = nullptr;
     }
     if (m_deintFilter)
     {
         delete m_deintFilter;
-        m_deintFilter = NULL;
+        m_deintFilter = nullptr;
     }
 
     m_deinterlacing = interlaced;
@@ -608,8 +608,8 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
         else
             m_deintfiltername = "";
 
-        m_deintFilter = NULL;
-        m_deintFiltMan = NULL;
+        m_deintFilter = nullptr;
+        m_deintFiltMan = nullptr;
 
         if (MythCodecContext::isCodecDeinterlacer(m_deintfiltername))
         {
@@ -644,7 +644,7 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
             }
         }
 
-        if (m_deintFilter == NULL)
+        if (m_deintFilter == nullptr)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Couldn't load deinterlace filter %1")
@@ -1032,7 +1032,7 @@ void VideoOutput::DoPipResize(int pipwidth, int pipheight)
                               pip_display_size.width(),
                               pip_display_size.height(),
                               AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                              NULL, NULL, NULL);
+                              nullptr, nullptr, nullptr);
 }
 
 /**
@@ -1056,7 +1056,7 @@ void VideoOutput::ShutdownPipResize(void)
     if (pip_scaling_context)
     {
         sws_freeContext(pip_scaling_context);
-        pip_scaling_context = NULL;
+        pip_scaling_context = nullptr;
     }
 
     pip_video_size   = QSize(0,0);
@@ -1225,7 +1225,7 @@ void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
                               vsz_display_size.width(),
                               vsz_display_size.height(),
                               AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                              NULL, NULL, NULL);
+                              nullptr, nullptr, nullptr);
 }
 
 void VideoOutput::ResizeVideo(VideoFrame *frame)
@@ -1347,13 +1347,13 @@ void VideoOutput::ShutdownVideoResize(void)
     if (vsz_tmp_buf)
     {
         delete [] vsz_tmp_buf;
-        vsz_tmp_buf = NULL;
+        vsz_tmp_buf = nullptr;
     }
 
     if (vsz_scale_context)
     {
         sws_freeContext(vsz_scale_context);
-        vsz_scale_context = NULL;
+        vsz_scale_context = nullptr;
     }
 
     vsz_video_size   = QSize(0,0);
@@ -1488,7 +1488,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("OSD size changed."));
         osd_image->DecrRef();
-        osd_image = NULL;
+        osd_image = nullptr;
     }
 
     if (!osd_image)
@@ -1512,7 +1512,7 @@ bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Visualiser not supported here");
         // Clear the audio buffer
-        m_visual->Draw(QRect(), NULL, NULL);
+        m_visual->Draw(QRect(), nullptr, nullptr);
     }
 
     switch (frame->codec)
@@ -1599,7 +1599,7 @@ bool VideoOutput::EnableVisualisation(AudioPlayer *audio, bool enable,
         DestroyVisualisation();
         return false;
     }
-    return SetupVisualisation(audio, NULL, name);
+    return SetupVisualisation(audio, nullptr, name);
 }
 
 bool VideoOutput::CanVisualise(AudioPlayer *audio, MythRender *render)
@@ -1630,7 +1630,7 @@ QStringList VideoOutput::GetVisualiserList(void)
 void VideoOutput::DestroyVisualisation(void)
 {
     delete m_visual;
-    m_visual = NULL;
+    m_visual = nullptr;
 }
 
 /**
@@ -1643,7 +1643,7 @@ void VideoOutput::DestroyVisualisation(void)
  */
 void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 {
-    if (to == NULL || from == NULL)
+    if (to == nullptr || from == nullptr)
         return;
 
     to->frameNumber = from->frameNumber;

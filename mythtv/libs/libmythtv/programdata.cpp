@@ -172,7 +172,7 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
         if (credits)
         {
             delete credits;
-            credits = NULL;
+            credits = nullptr;
         }
 
         if (other.credits)
@@ -1309,7 +1309,7 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
     std::stable_sort(fixlist.begin(), fixlist.end(), start_time_less_than);
 
     QList<ProgInfo*>::iterator it = fixlist.begin();
-    while (1)
+    while (true)
     {
         QList<ProgInfo*>::iterator cur = it;
         ++it;

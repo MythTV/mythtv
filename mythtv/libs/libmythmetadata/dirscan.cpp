@@ -12,10 +12,6 @@
 #include "videoutils.h"
 #include "storagegroup.h"
 
-DirectoryHandler::~DirectoryHandler()
-{
-}
-
 namespace
 {
     class ext_lookup

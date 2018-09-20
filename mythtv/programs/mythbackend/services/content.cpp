@@ -908,7 +908,7 @@ DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
             LOG(VB_UPNP, LOG_ERR,
                 QString("AddLiveStream - Unable to find %1.").arg(sFileName));
 
-            return NULL;
+            return nullptr;
         }
     }
     else
@@ -925,7 +925,7 @@ DTC::LiveStreamInfo *Content::AddLiveStream( const QString   &sStorageGroup,
     {
         LOG(VB_UPNP, LOG_ERR,
             "AddLiveStream - Unable to create HTTPLiveStream.");
-        return NULL;
+        return nullptr;
     }
 
     DTC::LiveStreamInfo *lsInfo = hls->StartStream();
@@ -965,7 +965,7 @@ DTC::LiveStreamInfo *Content::GetLiveStream( int nId )
     {
         LOG( VB_UPNP, LOG_ERR,
              QString("GetLiveStream - for stream id %1 failed").arg( nId ));
-        return NULL;
+        return nullptr;
     }
 
     DTC::LiveStreamInfo *hlsInfo = hls->GetLiveStreamInfo();
@@ -974,7 +974,7 @@ DTC::LiveStreamInfo *Content::GetLiveStream( int nId )
         LOG( VB_UPNP, LOG_ERR,
              QString("HLS::GetLiveStreamInfo - for stream id %1 failed")
                      .arg( nId ));
-        return NULL;
+        return nullptr;
     }
 
     delete hls;
@@ -1025,7 +1025,7 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
         LOG(VB_UPNP, LOG_ERR,
             QString("AddRecordingLiveStream - for %1, %2 failed")
             .arg(QString::number(nRecordedId)));
-        return NULL;
+        return nullptr;
     }
 
     if (pginfo.GetHostname().toLower() != gCoreContext->GetHostName().toLower())
@@ -1053,7 +1053,7 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
         LOG( VB_UPNP, LOG_ERR, QString("AddRecordingLiveStream - for %1, %2 failed")
                                     .arg( nChanId )
                                     .arg( recstarttsRaw.toUTC().toString() ));
-        return NULL;
+        return nullptr;
     }
 
     QFileInfo fInfo( sFileName );
@@ -1085,7 +1085,7 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
     {
         LOG( VB_UPNP, LOG_ERR, QString("AddVideoLiveStream - no metadata for %1")
                                     .arg( nId ));
-        return NULL;
+        return nullptr;
     }
 
     if ( metadata->GetHost().toLower() != gCoreContext->GetHostName().toLower())
@@ -1112,7 +1112,7 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
     if (!QFile::exists( sFileName ))
     {
         LOG( VB_UPNP, LOG_ERR, QString("AddVideoLiveStream - file does not exist."));
-        return NULL;
+        return nullptr;
     }
 
     return AddLiveStream( "Videos", metadata->GetFilename(),

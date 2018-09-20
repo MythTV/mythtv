@@ -19,10 +19,6 @@ HttpConfig::HttpConfig() : HttpServerExtension("HttpConfig", QString())
 {
 }
 
-HttpConfig::~HttpConfig()
-{
-}
-
 QStringList HttpConfig::GetBasePaths()
 {
     QStringList paths;
@@ -306,7 +302,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
 
         return true;
     }
-    else if ((request->m_sMethod == "Database") || (NULL == gContext))
+    else if ((request->m_sMethod == "Database") || (nullptr == gContext))
     {
         QString fn = GetShareDir() + "backend-config/"
             "config_backend_database.xml";

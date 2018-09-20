@@ -54,12 +54,12 @@ class AudioOutputDXPrivate
     public:
         explicit AudioOutputDXPrivate(AudioOutputDX *in_parent) :
             parent(in_parent),
-            dsound_dll(NULL),
-            dsobject(NULL),
-            dsbuffer(NULL),
+            dsound_dll(nullptr),
+            dsobject(nullptr),
+            dsbuffer(nullptr),
             playStarted(false),
             writeCursor(0),
-            chosenGUID(NULL),
+            chosenGUID(nullptr),
             device_count(0),
             device_num(0)
         {
@@ -127,7 +127,7 @@ AudioOutputDX::~AudioOutputDX()
     if (m_priv)
     {
         delete m_priv;
-        m_priv = NULL;
+        m_priv = nullptr;
     }
     timeEndPeriod(1);
 }
@@ -181,16 +181,16 @@ void AudioOutputDXPrivate::ResetDirectSound(void)
     if (dsobject)
     {
         IDirectSound_Release(dsobject);
-        dsobject = NULL;
+        dsobject = nullptr;
     }
 
     if (dsound_dll)
     {
        FreeLibrary(dsound_dll);
-       dsound_dll = NULL;
+       dsound_dll = nullptr;
     }
 
-    chosenGUID   = NULL;
+    chosenGUID   = nullptr;
     device_count = 0;
     device_num   = 0;
     device_list.clear();
@@ -205,13 +205,13 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     ResetDirectSound();
 
     dsound_dll = LoadLibrary(TEXT("DSOUND.DLL"));
-    if (dsound_dll == NULL)
+    if (dsound_dll == nullptr)
     {
         VBERROR("Cannot open DSOUND.DLL");
         goto error;
     }
 
-    if (parent)  // parent can be NULL only when called from GetDXDevices()
+    if (parent)  // parent can be nullptr only when called from GetDXDevices()
         device_name = passthrough ?
                       parent->passthru_device : parent->main_device;
     device_name = device_name.section(':', 1);
@@ -238,13 +238,13 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     OurDirectSoundCreate =
         (LPFNDSC)GetProcAddress(dsound_dll, "DirectSoundCreate");
 
-    if (OurDirectSoundCreate == NULL)
+    if (OurDirectSoundCreate == nullptr)
     {
         VBERROR("GetProcAddress FAILED");
         goto error;
     }
 
-    if (FAILED(OurDirectSoundCreate(chosenGUID, &dsobject, NULL)))
+    if (FAILED(OurDirectSoundCreate(chosenGUID, &dsobject, nullptr)))
     {
         VBERROR("Cannot create a direct sound device");
         goto error;
@@ -269,11 +269,11 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
     return 0;
 
  error:
-    dsobject = NULL;
+    dsobject = nullptr;
     if (dsound_dll)
     {
         FreeLibrary(dsound_dll);
-        dsound_dll = NULL;
+        dsound_dll = nullptr;
     }
     return -1;
 }
@@ -289,7 +289,7 @@ void AudioOutputDXPrivate::DestroyDSBuffer(void)
     IDirectSoundBuffer_SetCurrentPosition(dsbuffer, writeCursor);
     playStarted = false;
     IDirectSoundBuffer_Release(dsbuffer);
-    dsbuffer = NULL;
+    dsbuffer = nullptr;
 }
 
 void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
@@ -406,7 +406,7 @@ AudioOutputSettings* AudioOutputDX::GetOutputSettings(bool passthrough)
         FAILED(IDirectSound_GetCaps(m_priv->dsobject, &devcaps)) )
     {
         delete settings;
-        return NULL;
+        return nullptr;
     }
 
     VBAUDIO(QString("GetCaps sample rate min: %1 max: %2")
@@ -517,14 +517,14 @@ bool AudioOutputDX::OpenDevice(void)
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&wf;
 
     if (FAILED(IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
-                                            &m_priv->dsbuffer, NULL)))
+                                            &m_priv->dsbuffer, nullptr)))
     {
         /* Vista does not support hardware mixing
            try without DSBCAPS_LOCHARDWARE */
         dsbdesc.dwFlags &= ~DSBCAPS_LOCHARDWARE;
         HRESULT dsresult =
             IDirectSound_CreateSoundBuffer(m_priv->dsobject, &dsbdesc,
-                                           &m_priv->dsbuffer, NULL);
+                                           &m_priv->dsbuffer, nullptr);
         if (FAILED(dsresult))
         {
             if (dsresult == DSERR_UNSUPPORTED)
@@ -628,7 +628,7 @@ void AudioOutputDX::SetVolumeChannel(int channel, int volume)
 
 QMap<int, QString> *AudioOutputDX::GetDXDevices(void)
 {
-    AudioOutputDXPrivate *tmp_priv = new AudioOutputDXPrivate(NULL);
+    AudioOutputDXPrivate *tmp_priv = new AudioOutputDXPrivate(nullptr);
     tmp_priv->InitDirectSound(false);
     QMap<int, QString> *dxdevs = new QMap<int, QString>(tmp_priv->device_list);
     delete tmp_priv;

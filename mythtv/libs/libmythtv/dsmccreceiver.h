@@ -14,7 +14,7 @@ class DsmccDii
         download_id(0),          block_size(0),
         tc_download_scenario(0), number_modules(0),
         private_data_len(0),
-        modules(NULL),           private_data(NULL) {}
+        modules(nullptr),        private_data(nullptr) {}
 
     ~DsmccDii()
     {
@@ -65,7 +65,7 @@ class DsmccDb
         module_id(0),    module_version(0),
         block_number(0), len (0) {}
 
-    ~DsmccDb() {}
+    ~DsmccDb() = default;
 
     unsigned short module_id;
     unsigned char  module_version;

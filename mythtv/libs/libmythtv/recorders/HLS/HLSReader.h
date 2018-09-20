@@ -54,7 +54,7 @@ class MTV_PUBLIC  HLSReader
 
     bool LoadMetaPlaylists(MythSingleDownload& downloader);
     void ResetStream(void)
-      { QMutexLocker lock(&m_stream_lock); m_curstream = NULL; }
+      { QMutexLocker lock(&m_stream_lock); m_curstream = nullptr; }
     void ResetSequence(void) { m_cur_seq = -1; }
 
     QString StreamURL(void) const
@@ -82,7 +82,7 @@ class MTV_PUBLIC  HLSReader
     int  PlaylistRetryCount(void) const;
 
   private:
-    bool ParseM3U8(const QByteArray & buffer, HLSRecStream* stream = NULL);
+    bool ParseM3U8(const QByteArray & buffer, HLSRecStream* stream = nullptr);
     void DecreaseBitrate(int progid);
     void IncreaseBitrate(int progid);
 

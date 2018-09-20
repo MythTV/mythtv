@@ -18,10 +18,6 @@ MetaIOMP4::MetaIOMP4(void)
 {
 }
 
-MetaIOMP4::~MetaIOMP4(void)
-{
-}
-
 /*!
  * \copydoc MetaIO::write()
  */
@@ -36,19 +32,19 @@ bool MetaIOMP4::write(const QString &filename, MusicMetadata* mdata)
 // Disabled because it doesn't actually work. Better implemented with Taglib
 // when we formally move to 1.6
 
-//     AVFormatContext* p_context = NULL;
-//     AVFormatParameters* p_params = NULL;
-//     AVInputFormat* p_inputformat = NULL;
+//     AVFormatContext* p_context = nullptr;
+//     AVFormatParameters* p_params = nullptr;
+//     AVInputFormat* p_inputformat = nullptr;
 //
 //     QByteArray local8bit = filename.toLocal8Bit();
 //     if ((av_open_input_file(&p_context, local8bit.constData(),
 //                             p_inputformat, 0, p_params) < 0))
 //     {
-//         return NULL;
+//         return nullptr;
 //     }
 //
 //     if (av_find_stream_info(p_context) < 0)
-//         return NULL;
+//         return nullptr;
 //
 //     QByteArray artist = mdata->Artist().toUtf8();
 //     QByteArray album  = mdata->Album().toUtf8();
@@ -82,25 +78,25 @@ MusicMetadata* MetaIOMP4::read(const QString &filename)
     int year = 0, tracknum = 0, length = 0;
     bool compilation = false;
 
-    AVFormatContext* p_context = NULL;
-    AVInputFormat* p_inputformat = NULL;
+    AVFormatContext* p_context = nullptr;
+    AVInputFormat* p_inputformat = nullptr;
 
     QByteArray local8bit = filename.toLocal8Bit();
     if ((avformat_open_input(&p_context, local8bit.constData(),
-                             p_inputformat, NULL) < 0))
+                             p_inputformat, nullptr) < 0))
     {
-        return NULL;
+        return nullptr;
     }
 
-    if (avformat_find_stream_info(p_context, NULL) < 0)
-        return NULL;
+    if (avformat_find_stream_info(p_context, nullptr) < 0)
+        return nullptr;
 
 #if 0
     //### Debugging, enable to dump a list of all field names/values found
 
-    AVDictionaryEntry *tag = av_dict_get(p_context->metadata, "\0", NULL,
+    AVDictionaryEntry *tag = av_dict_get(p_context->metadata, "\0", nullptr,
                                          AV_METADATA_IGNORE_SUFFIX);
-    while (tag != NULL)
+    while (tag != nullptr)
     {
         LOG(VB_GENERAL, LOG_DEBUG, QString("Tag: %1 Value: %2")
                 .arg(tag->key) .arg(QString::fromUtf8(tag->value)));
@@ -159,7 +155,7 @@ MusicMetadata* MetaIOMP4::read(const QString &filename)
  */
 QString MetaIOMP4::getFieldValue(AVFormatContext* context, const char* tagname)
 {
-    AVDictionaryEntry *tag = av_dict_get(context->metadata, tagname, NULL, 0);
+    AVDictionaryEntry *tag = av_dict_get(context->metadata, tagname, nullptr, 0);
 
     QString value;
 
@@ -177,18 +173,18 @@ QString MetaIOMP4::getFieldValue(AVFormatContext* context, const char* tagname)
  */
 int MetaIOMP4::getTrackLength(const QString &filename)
 {
-    AVFormatContext* p_context = NULL;
-    AVInputFormat* p_inputformat = NULL;
+    AVFormatContext* p_context = nullptr;
+    AVInputFormat* p_inputformat = nullptr;
 
     // Open the specified file and populate the metadata info
     QByteArray local8bit = filename.toLocal8Bit();
     if ((avformat_open_input(&p_context, local8bit.constData(),
-                             p_inputformat, NULL) < 0))
+                             p_inputformat, nullptr) < 0))
     {
         return 0;
     }
 
-    if (avformat_find_stream_info(p_context, NULL) < 0)
+    if (avformat_find_stream_info(p_context, nullptr) < 0)
         return 0;
 
     int rv = getTrackLength(p_context);

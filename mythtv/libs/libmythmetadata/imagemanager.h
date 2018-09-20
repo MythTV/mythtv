@@ -98,8 +98,8 @@ public:
 
 protected:
     int     OpenDevice(const QString &name, const QString &mount,
-                       MythMediaDevice *media = NULL,
-                       QTemporaryDir   *dir = NULL);
+                       MythMediaDevice *media = nullptr,
+                       QTemporaryDir   *dir = nullptr);
 
     int         LocateMount(const QString &mount) const;
     StringMap   GetDeviceDirs() const;
@@ -164,7 +164,7 @@ public:
                 : m_videoFileExt.contains(ext) ? kVideoFile : kUnknown; }
 protected:
     ImageAdapterBase();
-    virtual ~ImageAdapterBase() {}
+    virtual ~ImageAdapterBase() = default;
 
 private:
     //! A pre-configured dir for reading image/video files

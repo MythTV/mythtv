@@ -15,7 +15,7 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
 
   public:
     MythUIScrollBar(MythUIType *parent, const QString &name);
-   ~MythUIScrollBar();
+   ~MythUIScrollBar() = default;
 
     void Reset(void);
 

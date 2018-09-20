@@ -43,18 +43,18 @@ using namespace std;
 class LIRCPriv
 {
   public:
-    LIRCPriv() : lircState(NULL), lircConfig(NULL) {}
+    LIRCPriv() : lircState(nullptr), lircConfig(nullptr) {}
     ~LIRCPriv()
     {
         if (lircState)
         {
             lirc_deinit(lircState);
-            lircState = NULL;
+            lircState = nullptr;
         }
         if (lircConfig)
         {
             lirc_freeconfig(lircConfig);
-            lircConfig = NULL;
+            lircConfig = nullptr;
         }
     }
 
@@ -118,7 +118,7 @@ void LIRC::TeardownAll(void)
     if (d)
     {
         delete d;
-        d = NULL;
+        d = nullptr;
     }
 }
 
@@ -136,7 +136,7 @@ static QByteArray get_ip(const QString &h)
     hints.ai_protocol = IPPROTO_TCP;
 
     struct addrinfo *result;
-    int err = getaddrinfo(hba.constData(), NULL, &hints, &result);
+    int err = getaddrinfo(hba.constData(), nullptr, &hints, &result);
     if (err)
     {
         LOG(VB_GENERAL, LOG_DEBUG,
@@ -293,7 +293,7 @@ bool LIRC::Init(void)
         }
     }
 
-    d->lircState = lirc_init("/etc/lircrc", ".lircrc", "mythtv", NULL, 0);
+    d->lircState = lirc_init("/etc/lircrc", ".lircrc", "mythtv", nullptr, 0);
     if (!d->lircState)
     {
         close(lircd_socket);
@@ -306,13 +306,13 @@ bool LIRC::Init(void)
     {
         QMutexLocker static_lock(&lirclib_lock);
         QByteArray cfg = configFile.toLocal8Bit();
-        if (lirc_readconfig(d->lircState, cfg.constData(), &d->lircConfig, NULL))
+        if (lirc_readconfig(d->lircState, cfg.constData(), &d->lircConfig, nullptr))
         {
             LOG(vtype, LOG_ERR, LOC +
                 QString("Failed to read config file '%1'").arg(configFile));
 
             lirc_deinit(d->lircState);
-            d->lircState = NULL;
+            d->lircState = nullptr;
             return false;
         }
     }
@@ -349,7 +349,7 @@ void LIRC::Process(const QByteArray &data)
     QMutexLocker static_lock(&lirclib_lock);
 
     // lirc_code2char will make code point to a static datafer..
-    char *code = NULL;
+    char *code = nullptr;
     int ret = lirc_code2char(
         d->lircState, d->lircConfig, const_cast<char*>(data.constData()), &code);
 
@@ -436,7 +436,7 @@ void LIRC::run(void)
             LOG(VB_FILE, LOG_WARNING, LOC + "EOF -- reconnecting");
 
             lirc_deinit(d->lircState);
-            d->lircState = NULL;
+            d->lircState = nullptr;
 
             if (Init())
                 retryCount = 0;
@@ -456,7 +456,7 @@ void LIRC::run(void)
         timeout.tv_sec = 1; // 1 second
         timeout.tv_usec = 100 * 1000; // 100 ms
 
-        int ret = select(d->lircState->lirc_lircd + 1, &readfds, NULL, NULL,
+        int ret = select(d->lircState->lirc_lircd + 1, &readfds, nullptr, nullptr,
                          &timeout);
 
         if (ret < 0 && errno != EINTR)

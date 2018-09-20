@@ -85,7 +85,7 @@ class MythUIProgressDialog;
 
 VideoScannerThread::VideoScannerThread(QObject *parent) :
     MThread("VideoScanner"),
-    m_RemoveAll(false), m_KeepAll(false), m_dialog(NULL),
+    m_RemoveAll(false), m_KeepAll(false), m_dialog(nullptr),
     m_DBDataChanged(false)
 {
     m_parent = parent;
@@ -453,7 +453,7 @@ void VideoScanner::doScan(const QStringList &dirs)
         else
         {
             delete progressDlg;
-            progressDlg = NULL;
+            progressDlg = nullptr;
         }
         m_scanThread->SetProgressDialog(progressDlg);
     }

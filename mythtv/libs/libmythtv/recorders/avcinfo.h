@@ -19,7 +19,7 @@ class AVCInfo
     AVCInfo();
     AVCInfo(const AVCInfo &o);
     AVCInfo &operator=(const AVCInfo &o);
-    virtual ~AVCInfo() { }
+    virtual ~AVCInfo() = default;
 
     virtual bool SendAVCCommand(
         const vector<uint8_t> &/*cmd*/,

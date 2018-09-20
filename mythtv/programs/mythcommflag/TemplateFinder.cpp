@@ -709,7 +709,7 @@ TemplateFinder::TemplateFinder(PGMConverter *pgmc, BorderDetector *bd,
     , nextFrame(0)
     , width(-1)
     , height(-1)
-    , scores(NULL)
+    , scores(nullptr)
     , mincontentrow(INT_MAX)
     , mincontentcol(INT_MAX)
     , maxcontentrow1(INT_MIN)
@@ -941,7 +941,7 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
     {
         /* Not a blank frame. */
 
-        (void)gettimeofday(&start, NULL);
+        (void)gettimeofday(&start, nullptr);
 
         if (croprow < mincontentrow)
             mincontentrow = croprow;
@@ -985,7 +985,7 @@ TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
                 goto error;
         }
 
-        (void)gettimeofday(&end, NULL);
+        (void)gettimeofday(&end, nullptr);
         timersub(&end, &start, &elapsed);
         timeradd(&analyze_time, &elapsed, &analyze_time);
     }
@@ -1077,7 +1077,7 @@ TemplateFinder::getTemplate(int *prow, int *pcol, int *pwidth, int *pheight)
         *pheight = tmplheight;
         return &tmpl;
     }
-    return NULL;
+    return nullptr;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

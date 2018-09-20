@@ -141,7 +141,7 @@ protected:
     /// 'setOutPipe' function.
     FIFOProcessor()
     {
-        output = NULL;
+        output = nullptr;
     }
 
 

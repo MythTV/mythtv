@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <random>
 #include <vector>
 #include <iterator>
 #include <map>
@@ -139,7 +140,7 @@ namespace
     {
         typedef unsigned int UID_type;
 
-        UIDToFAPair() : m_uid(0), m_file_assoc(0) {}
+        UIDToFAPair() : m_uid(0), m_file_assoc(nullptr) {}
 
         UIDToFAPair(UID_type uid, FileAssociationWrap *assoc) :
             m_uid(uid), m_file_assoc(assoc) {}
@@ -245,7 +246,7 @@ class FileAssocDialogPrivate
             }
         }
 
-        return NULL;
+        return nullptr;
     }
 
     void SetSelectionOverride(UIDToFAPair::UID_type new_sel)
@@ -299,7 +300,8 @@ class FileAssocDialogPrivate
                             new FileAssociationWrap(*p)));
         }
 
-        std::random_shuffle(tmp_fa.begin(), tmp_fa.end());
+        std::shuffle(tmp_fa.begin(), tmp_fa.end(),
+                     std::mt19937(std::random_device()()));
 
         for (tmp_fa_list::const_iterator p = tmp_fa.begin(); p != tmp_fa.end();
                 ++p)
@@ -326,9 +328,9 @@ class FileAssocDialogPrivate
 
 FileAssocDialog::FileAssocDialog(MythScreenStack *screenParent,
         const QString &lname) :
-    MythScreenType(screenParent, lname), m_commandEdit(0),
-    m_extensionList(0), m_defaultCheck(0), m_ignoreCheck(0), m_doneButton(0),
-    m_newButton(0), m_deleteButton(0), m_private(new FileAssocDialogPrivate)
+    MythScreenType(screenParent, lname), m_commandEdit(nullptr),
+    m_extensionList(nullptr), m_defaultCheck(nullptr), m_ignoreCheck(nullptr), m_doneButton(nullptr),
+    m_newButton(nullptr), m_deleteButton(nullptr), m_private(new FileAssocDialogPrivate)
 {
 }
 

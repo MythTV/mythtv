@@ -14,7 +14,7 @@ class MUI_PUBLIC MythVDPAUPainter : public MythPainter
 {
     friend class VideoOutputVDPAU;
   public:
-    explicit MythVDPAUPainter(MythRenderVDPAU *render = NULL);
+    explicit MythVDPAUPainter(MythRenderVDPAU *render = nullptr);
    ~MythVDPAUPainter();
 
     void SetTarget(uint target)    { m_target = target;     }

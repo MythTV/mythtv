@@ -65,21 +65,21 @@ MetadataFactory::~MetadataFactory()
     {
         m_lookupthread->cancel();
         delete m_lookupthread;
-        m_lookupthread = NULL;
+        m_lookupthread = nullptr;
     }
 
     if (m_imagedownload)
     {
         m_imagedownload->cancel();
         delete m_imagedownload;
-        m_imagedownload = NULL;
+        m_imagedownload = nullptr;
     }
 
     if (m_videoscanner && m_videoscanner->wait())
         delete m_videoscanner;
 
     delete m_mlm;
-    m_mlm = NULL;
+    m_mlm = nullptr;
 }
 
 void MetadataFactory::Lookup(RecordingRule *recrule, bool automatic,

@@ -27,7 +27,7 @@ PGMConverter::PGMConverter(void)
     , height(-1)
 #ifdef PGM_CONVERT_GREYSCALE
     , time_reported(false)
-    , m_copy(NULL)
+    , m_copy(nullptr)
 #endif /* PGM_CONVERT_GREYSCALE */
 {
     memset(&pgm, 0, sizeof(pgm));
@@ -101,10 +101,10 @@ PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
     }
 
 #ifdef PGM_CONVERT_GREYSCALE
-    (void)gettimeofday(&start, NULL);
+    (void)gettimeofday(&start, nullptr);
     if (m_copy->Copy(&pgm, frame, pgm.data[0], AV_PIX_FMT_GRAY8) < 0)
         goto error;
-    (void)gettimeofday(&end, NULL);
+    (void)gettimeofday(&end, nullptr);
     timersub(&end, &start, &elapsed);
     timeradd(&convert_time, &elapsed, &convert_time);
 #else  /* !PGM_CONVERT_GREYSCALE */
@@ -126,7 +126,7 @@ out:
     return &pgm;
 
 error:
-    return NULL;
+    return nullptr;
 }
 
 int

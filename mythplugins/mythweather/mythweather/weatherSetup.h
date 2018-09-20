@@ -43,7 +43,7 @@ class GlobalSetup : public MythScreenType
 
   public:
     GlobalSetup(MythScreenStack *parent, const QString &name);
-    ~GlobalSetup();
+    ~GlobalSetup() = default;
 
     bool Create(void);
 
@@ -108,7 +108,7 @@ class SourceSetup : public MythScreenType
     bool loadData(void);
 
   protected slots:
-    void sourceListItemSelected(MythUIButtonListItem *itm = 0);
+    void sourceListItemSelected(MythUIButtonListItem *itm = nullptr);
     void updateSpinboxUpdate(void);
     void retrieveSpinboxUpdate(void);
     void saveData(void);

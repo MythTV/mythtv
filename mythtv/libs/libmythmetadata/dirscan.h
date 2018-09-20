@@ -6,7 +6,7 @@
 class META_PUBLIC DirectoryHandler
 {
   public:
-    virtual ~DirectoryHandler();
+    virtual ~DirectoryHandler() = default;
     virtual DirectoryHandler *newDir(const QString &dir_name,
                                      const QString &fq_dir_name) = 0;
     virtual void handleFile(const QString &file_name,

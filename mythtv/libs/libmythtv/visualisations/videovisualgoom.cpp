@@ -18,7 +18,7 @@ extern "C" {
 #include "videovisualgoom.h"
 
 VideoVisualGoom::VideoVisualGoom(AudioPlayer *audio, MythRender *render, bool hd)
-  : VideoVisual(audio, render), m_buffer(NULL), m_surface(0), m_hd(hd)
+  : VideoVisual(audio, render), m_buffer(nullptr), m_surface(0), m_hd(hd)
 {
     int max_width  = m_hd ? 1200 : 600;
     int max_height = m_hd ? 800  : 400;
@@ -145,7 +145,7 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
                 uint32_t pitch[1] = { static_cast<uint32_t>(m_area.width() * 4) };
                 render->UploadBitmap(m_surface, plane, pitch);
             }
-            render->DrawBitmap(m_surface, 0, NULL, NULL, kVDPBlendNull, 255, 255, 255, 255);
+            render->DrawBitmap(m_surface, 0, nullptr, nullptr, kVDPBlendNull, 255, 255, 255, 255);
         }
         return;
     }

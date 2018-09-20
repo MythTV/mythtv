@@ -309,7 +309,7 @@ ProgramInfo *LiveTVChain::EntryToProgram(const LiveTVChainEntry &entry)
         QString("EntryToProgram(%1@%2) failed to get pginfo")
         .arg(entry.chanid).arg(entry.starttime.toString(Qt::ISODate)));
     delete pginfo;
-    return NULL;
+    return nullptr;
 }
 
 /** \fn LiveTVChain::GetProgramAt(int) const
@@ -450,7 +450,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                                            bool &discont, bool &newtype)
 {
     LiveTVChainEntry oldentry, entry;
-    ProgramInfo *pginfo = NULL;
+    ProgramInfo *pginfo = nullptr;
 
     GetEntryAt(curpos, oldentry);
 
@@ -486,7 +486,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                     QString("Skipping empty program %1")
                     .arg(pginfo->MakeUniqueKey()));
                 delete pginfo;
-                pginfo = NULL;
+                pginfo = nullptr;
             }
 
             if (!pginfo)
@@ -522,7 +522,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                         QString("Skipping empty program %1")
                         .arg(pginfo->MakeUniqueKey()));
                     delete pginfo;
-                    pginfo = NULL;
+                    pginfo = nullptr;
                 }
             }
             while (!pginfo && newid < (int)m_chain.count() && newid >= 0);
@@ -530,7 +530,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
             if (!pginfo)
             {
                 // still not found so abort (will never happen once playback has started)
-                return NULL;
+                return nullptr;
             }
         }
     }

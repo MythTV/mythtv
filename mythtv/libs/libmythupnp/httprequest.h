@@ -95,7 +95,7 @@ class IPostProcess
 {
     public:
         virtual void ExecutePostProcess( ) = 0;
-        virtual ~IPostProcess() {};
+        virtual ~IPostProcess() = default;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ class UPNP_PUBLIC HTTPRequest
     public:
 
                         HTTPRequest     ();
-        virtual        ~HTTPRequest     () {};
+        virtual        ~HTTPRequest     () = default;
 
         bool            ParseRequest    ();
 
@@ -279,7 +279,7 @@ class BufferedSocketDeviceRequest : public HTTPRequest
     public:
 
         explicit BufferedSocketDeviceRequest( QTcpSocket *pSocket );
-        virtual ~BufferedSocketDeviceRequest() {};
+        virtual ~BufferedSocketDeviceRequest() = default;
 
         virtual QString  ReadLine        ( int msecs );
         virtual qint64   ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  );
@@ -306,8 +306,7 @@ class UPNP_PUBLIC HttpException
         {}
 
         // Needed to force a v-table.
-        virtual ~HttpException()
-        {}
+        virtual ~HttpException() = default;
 };
 
 class UPNP_PUBLIC HttpRedirectException : public HttpException
@@ -323,8 +322,7 @@ class UPNP_PUBLIC HttpRedirectException : public HttpException
                : HttpException( nCode, sMsg ), hostName( sHostName )
         {}
 
-        virtual ~HttpRedirectException()
-        {}
+        virtual ~HttpRedirectException() = default;
 
 };
 

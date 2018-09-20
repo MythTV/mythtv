@@ -74,7 +74,7 @@ class UPNP_PUBLIC UPnpService
     QString m_sControlURL;
     QString m_sEventSubURL;
 
-    UPnpService() {}        
+    UPnpService() = default;
 
     QString toString(uint padding) const
     {
@@ -127,7 +127,7 @@ class UPNP_PUBLIC UPnpDevice
 
         void toMap(InfoMap &map);
 
-        UPnpService GetService(const QString &urn, bool *found = NULL) const;
+        UPnpService GetService(const QString &urn, bool *found = nullptr) const;
 
         QString toString(uint padding = 0) const;
 };
@@ -217,7 +217,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
             // Should be atomic decrement
             g_nAllocated--;
 
-            if (m_pDeviceDesc != NULL)
+            if (m_pDeviceDesc != nullptr)
                 delete m_pDeviceDesc;
         }
 
@@ -240,7 +240,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
                         const QString &sLocation,
                         TaskTime       ttExpires ) : ReferenceCounter(
                                                          "DeviceLocation"     ),
-                                                     m_pDeviceDesc( NULL      ),
+                                                     m_pDeviceDesc( nullptr   ),
                                                      m_sURI       ( sURI      ),
                                                      m_sUSN       ( sUSN      ),
                                                      m_sLocation  ( sLocation ),
@@ -255,7 +255,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         int ExpiresInSecs(void) const
         {
             TaskTime ttNow;
-            gettimeofday( (&ttNow), NULL );
+            gettimeofday( (&ttNow), nullptr );
 
             return m_ttExpires.tv_sec - ttNow.tv_sec;
         }
@@ -264,7 +264,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 
         UPnpDeviceDesc *GetDeviceDesc(void)
         {
-            if (m_pDeviceDesc == NULL)
+            if (m_pDeviceDesc == nullptr)
                 m_pDeviceDesc = UPnpDeviceDesc::Retrieve( m_sLocation );
 
             return m_pDeviceDesc;
@@ -276,7 +276,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         {
             UPnpDeviceDesc *pDevice = GetDeviceDesc();
 
-            if ( pDevice == NULL)
+            if ( pDevice == nullptr)
                return "<Unknown>";
 
             QString sName = pDevice->m_rootDevice.m_sFriendlyName;
@@ -291,7 +291,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
         {
             UPnpDeviceDesc *pDevice = GetDeviceDesc();
 
-            if ( pDevice == NULL)
+            if ( pDevice == nullptr)
                return "<Unknown> (" + m_sLocation + ")";
 
             return pDevice->m_rootDevice.m_sFriendlyName
