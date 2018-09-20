@@ -84,7 +84,8 @@ bool TvPlayWindow::gestureEvent(MythGestureEvent *event)
                     break;
             }
             break;
-
+        default:
+            break;
     }
 #else
     if (event->gesture() == MythGestureEvent::Click)
