@@ -805,7 +805,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
                                               params.wolReconnect);
             params.wolRetry     = intResponse("Number of times to retry:",
                                               params.wolRetry);
-            params.wolCommand   = getResponse("Command to use to wake server:",
+            params.wolCommand   = getResponse("Command to use to wake server or server MAC address:",
                                               params.wolCommand);
         }
 
@@ -924,7 +924,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 if (m_DBparams.wolEnabled)
                 {
                     if (attempt > 0)
-                        myth_system(m_DBparams.wolCommand);
+                        MythWakeup(m_DBparams.wolCommand);
                     if (!checkPort(host, port, useTimeout))
                         break;
                 }
@@ -988,7 +988,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
             case st_beWOL:
                 if (!beWOLCmd.isEmpty()) {
                     if (attempt > 0)
-                        myth_system(beWOLCmd);
+                        MythWakeup(beWOLCmd);
                     if (!checkPort(backendIP, backendPort, useTimeout))
                         break;
                 }

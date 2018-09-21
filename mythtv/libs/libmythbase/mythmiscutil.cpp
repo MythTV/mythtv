@@ -666,6 +666,16 @@ bool WakeOnLAN(QString MAC)
         msg, msglen, QHostAddress::Broadcast, 32767) == msglen;
 }
 
+// Wake up either by command or by MAC address
+// return true = success
+bool MythWakeup(const QString &wakeUpCommand, uint flags, uint timeout)
+{
+    if (!IsMACAddress(wakeUpCommand))
+        return !myth_system(wakeUpCommand, flags, timeout);
+
+    return WakeOnLAN(wakeUpCommand);
+}
+
 bool IsPulseAudioRunning(void)
 {
 #ifdef _WIN32

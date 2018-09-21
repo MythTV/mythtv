@@ -24,6 +24,7 @@
 #include "mthread.h"
 #include "mythdate.h"
 #include "portchecker.h"
+#include "mythmiscutil.h"
 
 #define DEBUG_RECONNECT 0
 #if DEBUG_RECONNECT
@@ -181,7 +182,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                             "%2)")
                          .arg(trycount).arg(m_dbparms.wolRetry));
 
-                if (myth_system(m_dbparms.wolCommand) != GENERIC_EXIT_OK)
+                if (!MythWakeup(m_dbparms.wolCommand))
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                             QString("Failed to run WOL command '%1'")

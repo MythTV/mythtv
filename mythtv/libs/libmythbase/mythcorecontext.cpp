@@ -47,6 +47,7 @@ using namespace std;
 #include "serverpool.h"
 #include "mythdate.h"
 #include "mythplugin.h"
+#include "mythmiscutil.h"
 
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
@@ -488,7 +489,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 d->m_WOLInProgress = we_attempted_wol = true;
             }
 
-            myth_system(WOLcmd, kMSDontDisableDrawing | kMSDontBlockInputDevs |
+            MythWakeup(WOLcmd, kMSDontDisableDrawing | kMSDontBlockInputDevs |
                                 kMSProcessEvents);
             sleepms = WOLsleepTime * 1000;
         }

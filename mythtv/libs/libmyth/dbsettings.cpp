@@ -124,12 +124,12 @@ DatabaseSettings::DatabaseSettings(const QString &DBhostOverride)
     wolEnabled->addTargetedChild("1", wolRetry);
 
     wolCommand = new TransTextEditSetting();
-    wolCommand->setLabel(DatabaseSettings::tr("Wake command"));
+    wolCommand->setLabel(DatabaseSettings::tr("Wake command or MAC"));
     wolCommand->setHelpText(
         DatabaseSettings::tr("The command executed on this "
-                             "frontend to wake up the database "
+                             "frontend or server MAC to wake up the database "
                              "server (eg. sudo /etc/init.d/mysql "
-                             "restart)."));
+                             "restart or 32:D2:86:00:17:A8)."));
     wolEnabled->addTargetedChild("1", wolCommand);
 }
 

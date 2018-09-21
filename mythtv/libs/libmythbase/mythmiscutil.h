@@ -10,6 +10,7 @@
 #include <QDir>
 
 #include "mythbaseexp.h"
+#include "mythsystem.h"
 
 class QStringList;
 class QFile;
@@ -66,6 +67,9 @@ MBASE_PUBLIC QString xml_indent(uint level);
 
 MBASE_PUBLIC bool IsMACAddress(QString MAC);
 MBASE_PUBLIC bool WakeOnLAN(QString MAC);
+MBASE_PUBLIC bool MythWakeup(const QString &wakeUpCommand,
+    uint flags = kMSNone, uint timeout = 0);
+
 MBASE_PUBLIC QString FileHash(QString filename);
 
 /// Is A/V Sync destruction daemon is running on this host?
