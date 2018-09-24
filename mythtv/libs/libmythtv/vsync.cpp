@@ -174,26 +174,6 @@ int VideoSync::CalcDelay(int nominal_frame_interval)
     return ret_val;
 }
 
-/** \fn VideoSync::KeepPhase()
- *  \brief Keep our nexttrigger from drifting too close to the exact retrace.
- *
- *   If delay is near zero, some frames will be delay < 0 and others
- *   delay > 0 which would cause continous rapid fire stuttering.
- *   This method is only useful for those sync methods where WaitForFrame
- *   targets hardware retrace rather than targeting nexttrigger.
- *   \deprecated deprecated in favor of handling phase issues in mythplayer's AVSync.
- */
-void VideoSync::KeepPhase()
-{
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("%1").arg(m_delay));
-#endif
-    if (m_delay < -(m_refresh_interval/2))
-        m_nexttrigger += 200;
-    else if (m_delay > -500)
-        m_nexttrigger += -2000;
-}
-
 #ifndef _WIN32
 #define DRM_VBLANK_RELATIVE 0x1;
 
