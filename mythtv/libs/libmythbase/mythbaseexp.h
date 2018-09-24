@@ -15,22 +15,6 @@
 # define MBASE_PUBLIC
 #endif
 
-#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
-# define MHIDDEN     __attribute__((visibility("hidden")))
-# define MUNUSED     __attribute__((unused))
-# define MDEPRECATED __attribute__((deprecated))
-#else
-# define MHIDDEN
-# define MUNUSED
-# define MDEPRECATED
-#endif
-
-#if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)))
-# define MERROR(x)   __attribute__((error(x)))
-#else
-# define MERROR(x)
-#endif
-
 #define MOVERRIDE
 #define MFINAL
 #if (defined (__cplusplus) && (__cplusplus >= 201103L))

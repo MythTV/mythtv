@@ -52,8 +52,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     MythScreenStack *GetStackAt(int pos);
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
-                           QStringList &actions, bool allowJumps = true)
-                           MUNUSED_RESULT;
+                           QStringList &actions, bool allowJumps = true);
     bool keyLongPressFilter(QEvent **e,
         QScopedPointer<QEvent> &sNewEvent);
 

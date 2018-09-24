@@ -1504,7 +1504,7 @@ static enum AVPixelFormat get_format_vdpau(struct AVCodecContext *avctx,
 #ifdef USING_DXVA2
 // Declared separately to allow attribute
 static enum AVPixelFormat get_format_dxva2(struct AVCodecContext *,
-                                           const enum AVPixelFormat *) MUNUSED;
+                                           const enum AVPixelFormat *);
 
 enum AVPixelFormat get_format_dxva2(struct AVCodecContext *avctx,
                                     const enum AVPixelFormat *valid_fmts)
@@ -1540,7 +1540,7 @@ static bool IS_VAAPI_PIX_FMT(enum AVPixelFormat fmt)
 #ifdef USING_VAAPI
 // Declared separately to allow attribute
 static enum AVPixelFormat get_format_vaapi(struct AVCodecContext *,
-                                         const enum AVPixelFormat *) MUNUSED;
+                                         const enum AVPixelFormat *);
 
 enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
                                          const enum AVPixelFormat *valid_fmts)

@@ -9,7 +9,6 @@
 #ifndef MythTV_mythavutil_h
 #define MythTV_mythavutil_h
 
-#include "mythtvexp.h" // for MUNUSED
 #include "mythframe.h"
 extern "C" {
 #include "libavcodec/avcodec.h"

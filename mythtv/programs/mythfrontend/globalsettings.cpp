@@ -1425,7 +1425,8 @@ static HostComboBoxSetting *MenuTheme()
     return gc;
 }
 
-static HostComboBoxSetting MUNUSED *DecodeVBIFormat()
+#if 0
+static HostComboBoxSetting *DecodeVBIFormat()
 {
     QString beVBI = gCoreContext->GetSetting("VbiFormat");
     QString fmt = beVBI.toLower().left(4);
@@ -1448,6 +1449,7 @@ static HostComboBoxSetting MUNUSED *DecodeVBIFormat()
 
     return gc;
 }
+#endif
 
 static HostComboBoxSetting *SubtitleCodec()
 {

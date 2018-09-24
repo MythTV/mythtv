@@ -330,10 +330,10 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
 {
     bool mosaic;
     bool conceal;
-    MUNUSED bool seperation;
-    MUNUSED bool flash;
+    bool seperation;
+    bool flash;
     bool doubleheight;
-    MUNUSED bool blink;
+    bool blink;
     bool hold;
     bool endbox;
     bool startbox;
@@ -531,6 +531,9 @@ void TeletextScreen::DrawLine(const uint8_t *page, uint row, int lang)
             }
         }
     }
+    Q_UNUSED(seperation);
+    Q_UNUSED(flash);
+    Q_UNUSED(blink);
 }
 
 void TeletextScreen::DrawCharacter(int x, int y, QChar ch, int doubleheight)
