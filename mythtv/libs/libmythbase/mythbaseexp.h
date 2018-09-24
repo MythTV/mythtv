@@ -15,16 +15,4 @@
 # define MBASE_PUBLIC
 #endif
 
-#define MOVERRIDE
-#define MFINAL
-#if (defined (__cplusplus) && (__cplusplus >= 201103L))
-#  if ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7))) || \
-      (defined(__ICC) || defined(__INTEL_COMPILER))
-#    undef MOVERRIDE
-#    undef MFINAL
-#    define MOVERRIDE   override
-#    define MFINAL      final
-#  endif
-#endif
-
 #endif // MYTHBASEEXP_H_

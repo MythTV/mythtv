@@ -89,15 +89,15 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
         explicit MythSystemLegacyUnix(MythSystemLegacy *parent);
         ~MythSystemLegacyUnix() = default;
 
-        virtual void Fork(time_t timeout) MOVERRIDE;
-        virtual void Manage(void) MOVERRIDE;
+        virtual void Fork(time_t timeout) override;
+        virtual void Manage(void) override;
 
-        virtual void Term(bool force=false) MOVERRIDE;
-        virtual void Signal(int sig) MOVERRIDE;
-        virtual void JumpAbort(void) MOVERRIDE;
+        virtual void Term(bool force=false) override;
+        virtual void Signal(int sig) override;
+        virtual void JumpAbort(void) override;
 
         virtual bool ParseShell(const QString &cmd, QString &abscmd,
-                                QStringList &args) MOVERRIDE;
+                                QStringList &args) override;
 
         friend class MythSystemLegacyManager;
         friend class MythSystemLegacySignalManager;
