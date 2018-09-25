@@ -13,6 +13,7 @@ class QSize;
 bool setupTVs(bool ismaster, bool &error);
 void cleanup(void);
 int  handle_command(const MythBackendCommandLineParser &cmdline);
+int  bootstrap(bool allow);
 int  connect_to_master(void);
 void print_warnings(const MythBackendCommandLineParser &cmdline);
 int  run_backend(MythBackendCommandLineParser &cmdline);

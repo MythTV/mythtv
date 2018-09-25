@@ -436,6 +436,12 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_OK;
     }
 
+    if (cmdline.toBool("bootstrap"))
+    {
+        int ret = bootstrap(true);
+        return ret;
+    }
+
     // This should never actually be reached..
     return GENERIC_EXIT_OK;
 }
@@ -553,10 +559,8 @@ void print_warnings(const MythBackendCommandLineParser &cmdline)
     }
 }
 
-int run_backend(MythBackendCommandLineParser &cmdline)
+int bootstrap(bool allow)
 {
-    gBackendContext = new BackendContext();
-
     if (!DBUtil::CheckTimeZoneSupport())
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -566,13 +570,26 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_DB_NOTIMEZONE;
     }
 
-    bool ismaster = gCoreContext->IsMasterHost();
 
-    if (!UpgradeTVDatabaseSchema(ismaster, ismaster))
+    if (!UpgradeTVDatabaseSchema(allow, allow))
     {
         LOG(VB_GENERAL, LOG_ERR, "Couldn't upgrade database to new schema");
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
+
+    return GENERIC_EXIT_OK;
+}
+
+int run_backend(MythBackendCommandLineParser &cmdline)
+{
+    gBackendContext = new BackendContext();
+
+    bool ismaster = gCoreContext->IsMasterHost();
+    
+    int bs_ret = bootstrap(ismaster);
+    if (bs_ret != GENERIC_EXIT_OK)
+        return bs_ret;
+
 
     MythTranslation::load("mythfrontend");
 

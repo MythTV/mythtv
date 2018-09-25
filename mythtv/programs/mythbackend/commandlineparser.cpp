@@ -65,6 +65,8 @@ void MythBackendCommandLineParser::LoadArguments(void)
          << add("--setloglevel", "setloglevel", "",
                 "Change logging level of the existing master backend.", "")
 //                    ->SetDeprecated("use mythutil instead");
+         << add("--bootstrap", "bootstrap", "",
+                "Bootstrap the database by upgrading it if necessary", "")
     );
 
     add("--nosched", "nosched", false, "",
