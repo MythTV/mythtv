@@ -1,7 +1,7 @@
 // c/c++
+#include <cassert>
+#include <cstdio>
 #include <unistd.h>
-#include <stdio.h>
-#include <assert.h>
 
 // qt
 #include <QApplication>

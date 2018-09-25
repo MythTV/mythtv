@@ -1,7 +1,7 @@
 #ifndef FLACENCODER_H_
 #define FLACENCODER_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <FLAC/export.h>
 #if !defined(FLAC_API_VERSION_CURRENT) || FLAC_API_VERSION_CURRENT <= 7

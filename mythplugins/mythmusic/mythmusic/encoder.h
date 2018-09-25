@@ -1,8 +1,8 @@
 #ifndef ENCODER_H_
 #define ENCODER_H_
 
+#include <cstdio>
 #include <sys/types.h>
-#include <stdio.h>
 
 #define EENCODEERROR -1
 #define EPARTIALSAMPLE -2

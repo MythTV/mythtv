@@ -24,11 +24,11 @@
  *
  */
 
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
-#include <stdint.h>
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 #include <unistd.h>
-#include <cstdlib>
 
 #include <mythconfig.h>
 #if CONFIG_DARWIN or defined(__FreeBSD__)

@@ -1,7 +1,7 @@
 #ifndef AVFECODER_H_
 #define AVFECODER_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QObject>
 

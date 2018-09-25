@@ -7,7 +7,7 @@
 #ifndef ARCHIVEUTIL_H_
 #define ARCHIVEUTIL_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <QString>
 #include <QMetaType>
 

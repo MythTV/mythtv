@@ -7,14 +7,12 @@
 //
 
 #include "config.h"
-#include <stdint.h>
-#include <inttypes.h>
-
-// C
-#include <cmath>
-#include <cstdlib>
 
 // C++
+#include <cinttypes>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
 using namespace std;
 

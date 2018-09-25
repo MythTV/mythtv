@@ -16,13 +16,13 @@
 #ifndef ZMSERVER_H
 #define ZMSERVER_H
 
-#include <stdint.h>
-#include <unistd.h>
-#include <string>
-#include <sstream>
-#include <vector>
+#include <cstdint>
 #include <map>
 #include <mysql/mysql.h>
+#include <sstream>
+#include <string>
+#include <unistd.h>
+#include <vector>
 
 using namespace std;
 

@@ -1,13 +1,9 @@
 // System
 #include <vorbis/vorbisfile.h>
 
-// POSIX
-#include <time.h>
-
-// ANSI C
-#include <cstdlib>
-
 // C++
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 using namespace std;
 

@@ -1,9 +1,6 @@
-#include <unistd.h>
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
+#include <unistd.h>
 
 // qt
 #include <QDir>

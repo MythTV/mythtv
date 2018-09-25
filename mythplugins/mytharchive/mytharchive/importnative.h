@@ -1,8 +1,8 @@
 #ifndef IMPORTNATIVE_H_
 #define IMPORTNATIVE_H_
 
+#include <cstdint>
 #include <iostream>
-#include <stdint.h>
 
 // qt
 #include <QString>

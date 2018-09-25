@@ -1,7 +1,6 @@
-// c
-#include <stdlib.h>
-#include <unistd.h>
+// c++
 #include <cstdlib>
+#include <unistd.h>
 
 // qt
 #include <QDir>

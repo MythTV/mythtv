@@ -1,6 +1,5 @@
 // c
 #include <cstdlib>
-#include <stdlib.h>
 #include <unistd.h>
 
 // qt

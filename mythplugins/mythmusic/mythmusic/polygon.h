@@ -1,7 +1,7 @@
 #ifndef POLYGON_H_
 #define POLYGON_H_
 
-#include <string.h>
+#include <cstring>
 
 template<typename Pixel>
 class Bitmap

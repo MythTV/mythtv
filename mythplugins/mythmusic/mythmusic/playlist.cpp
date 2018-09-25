@@ -1,9 +1,8 @@
-#include <unistd.h>
-#include <inttypes.h>
-#include <cstdlib>
-
-#include <map>
 #include <algorithm>
+#include <cinttypes>
+#include <cstdlib>
+#include <map>
+#include <unistd.h>
 using namespace std;
 
 // qt

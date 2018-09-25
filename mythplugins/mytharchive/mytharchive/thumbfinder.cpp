@@ -24,14 +24,12 @@
  *
  */
 
-// c
-#include <sys/stat.h>
-#include <math.h>
-#include <errno.h>
-
 // c++
+#include <cerrno>
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <sys/stat.h>
 
 // qt
 #include <QApplication>

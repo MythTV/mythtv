@@ -1,13 +1,9 @@
-// POSIX headers
+// C++ headers
+#include <cerrno>
+#include <cstdlib>
+#include <iostream>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
-
-// ANSI C headers
-#include <cstdlib>
-
-// C++ headers
-#include <iostream>
 using namespace std;
 
 // qt

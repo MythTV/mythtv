@@ -5,9 +5,9 @@
     
     Starting point for the MythArchive module
 */
-#include <iostream>
+#include <csignal>
 #include <cstdlib>
-#include <signal.h>
+#include <iostream>
 
 using namespace std;
 

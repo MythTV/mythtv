@@ -1,7 +1,7 @@
-// POSIX headers
-#include <sys/types.h>
+// C++ headers
+#include <cstdlib>
 #include <sys/stat.h>
-#include <stdlib.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 // Qt headers
