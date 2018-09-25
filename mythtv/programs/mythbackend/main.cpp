@@ -1,13 +1,11 @@
-#include <signal.h> // for signal
-#include <stdlib.h>
+#include <csignal> // for signal
+#include <cstdlib>
 
 #ifndef _WIN32
 #include <QCoreApplication>
 #else
 #include <QApplication>
 #endif
-
-#include <signal.h>
 
 #include <QFileInfo>
 #include <QRegExp>

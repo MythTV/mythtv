@@ -1,8 +1,8 @@
 #ifndef MANUALSCHEDULE_H_
 #define MANUALSCHEDULE_H_
 
-// ANSI C
-#include <stdint.h> // for [u]int[32,64]_t
+// C++
+#include <cstdint> // for [u]int[32,64]_t
 
 #include <QDateTime>
 #include <QStringList>

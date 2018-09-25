@@ -1,7 +1,7 @@
 #ifndef _FREE_SPACE_H_
 #define _FREE_SPACE_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QStringList>
 #include <QDateTime>

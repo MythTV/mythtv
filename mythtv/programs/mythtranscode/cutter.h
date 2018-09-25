@@ -1,7 +1,7 @@
 #ifndef CUTTER_H
 #define CUTTER_H
 
-#include <stdint.h>                     // for int64_t
+#include <cstdint>                      // for int64_t
 #include "deletemap.h"                  // for DeleteMap
 #include "programtypes.h"               // for frm_dir_map_t
 

@@ -1,17 +1,15 @@
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <unistd.h>
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
 #include <cmath>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <QCoreApplication>
 #include <QString>

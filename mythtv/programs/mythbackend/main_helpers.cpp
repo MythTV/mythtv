@@ -1,12 +1,3 @@
-// POSIX headers
-#include <sys/time.h>     // for setpriority
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-//#include <libgen.h>
-#include <signal.h>
-
 #include "mythconfig.h"
 #if CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
@@ -15,9 +6,15 @@
     #include <systemd/sd-daemon.h>
 #endif
 
-// C headers
-#include <cstdlib>
+// C++ headers
 #include <cerrno>
+#include <csignal>
+#include <cstdlib>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/time.h>     // for setpriority
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <QCoreApplication>
 #include <QFileInfo>

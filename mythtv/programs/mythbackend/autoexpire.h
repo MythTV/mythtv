@@ -1,8 +1,7 @@
 #ifndef AUTOEXPIRE_H_
 #define AUTOEXPIRE_H_
 
-#include <stdint.h>
-
+#include <cstdint>
 #include <vector>
 using namespace std;
 

@@ -3,10 +3,8 @@
 #ifndef _PROGRAM_INFO_CACHE_H_
 #define _PROGRAM_INFO_CACHE_H_
 
-// ANSI C headers
-#include <stdint.h>
-
 // C++ headers
+#include <cstdint>
 #include <vector>
 using namespace std;
 

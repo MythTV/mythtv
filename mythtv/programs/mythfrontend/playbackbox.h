@@ -3,12 +3,10 @@
 #ifndef PLAYBACKBOX_H_
 #define PLAYBACKBOX_H_
 
-// ANSI C headers
-#include <stdint.h> // for [u]int[32,64]_t
-
 // C++ headers
-#include <vector>
+#include <cstdint> // for [u]int[32,64]_t
 #include <deque>
+#include <vector>
 using namespace std;
 
 #include <QStringList>

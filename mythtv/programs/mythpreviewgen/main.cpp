@@ -1,24 +1,20 @@
-// POSIX headers
-#include <sys/time.h>     // for setpriority
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <libgen.h>
-#include <signal.h>
-
 #include "mythconfig.h"
 #if CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif
 
-// C headers
-#include <cstdlib>
-#include <cerrno>
-
 // C++ headers
-#include <iostream>
+#include <cerrno>
+#include <csignal>
+#include <cstdlib>
+#include <fcntl.h>
 #include <fstream>
+#include <iostream>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <sys/time.h>     // for setpriority
+#include <sys/types.h>
+#include <unistd.h>
 using namespace std;
 
 #ifndef _WIN32

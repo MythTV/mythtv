@@ -1,10 +1,8 @@
-// POSIX headers
-#include <fcntl.h> // for open flags
-
 // C++ headers
-#include <iostream>
-#include <fstream>
 #include <cerrno>
+#include <fcntl.h> // for open flags
+#include <fstream>
+#include <iostream>
 using namespace std;
 
 // Qt headers

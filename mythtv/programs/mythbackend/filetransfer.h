@@ -1,10 +1,8 @@
 #ifndef FILETRANSFER_H_
 #define FILETRANSFER_H_
 
-// ANSI C headers
-#include <stdint.h>
-
 // C++ headers
+#include <cstdint>
 #include <vector>
 using namespace std;
 

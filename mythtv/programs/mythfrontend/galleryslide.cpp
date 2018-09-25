@@ -1,6 +1,6 @@
 #include "galleryslide.h"
 
-#include <math.h>       // for roundf
+#include <cmath>       // for roundf
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 

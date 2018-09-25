@@ -26,7 +26,7 @@
 
 #include <QList>
 
-#include <math.h>
+#include <cmath>
 
 #include "channel.h"
 

@@ -4,8 +4,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-// POSIX headers
-#include <limits.h>
+// C++ headers
+#include <climits>
 
 // Qt headers
 #include <QFileInfo>

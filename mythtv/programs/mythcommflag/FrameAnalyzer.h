@@ -9,7 +9,7 @@
 
 /* Base class for commercial flagging video frame analyzers. */
 
-#include <limits.h>
+#include <climits>
 
 #include <QMap>
 

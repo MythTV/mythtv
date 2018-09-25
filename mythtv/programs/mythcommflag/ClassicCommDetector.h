@@ -1,8 +1,8 @@
 #ifndef _CLASSIC_COMMDETECTOR_H_
 #define _CLASSIC_COMMDETECTOR_H_
 
-// POSIX headers
-#include <stdint.h>
+// C++ headers
+#include <cstdint>
 
 // Qt headers
 #include <QObject>

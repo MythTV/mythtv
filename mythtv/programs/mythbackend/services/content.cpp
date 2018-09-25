@@ -29,8 +29,8 @@
 #include <QImage>
 #include <QImageWriter>
 
-#include <math.h>
-#include <compat.h>
+#include <cmath>
+#include "compat.h"
 
 #include "mythcorecontext.h"
 #include "storagegroup.h"

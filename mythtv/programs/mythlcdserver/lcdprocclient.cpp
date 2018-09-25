@@ -9,9 +9,9 @@
 
 // c/c++
 #include <chrono> // for milliseconds
-#include <thread> // for sleep_for
-#include <stdlib.h>
 #include <cmath>
+#include <cstdlib>
+#include <thread> // for sleep_for
 
 //qt
 #include <QCoreApplication>

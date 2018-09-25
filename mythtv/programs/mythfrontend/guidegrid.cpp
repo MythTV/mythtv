@@ -2,9 +2,9 @@
 #include "guidegrid.h"
 
 // c/c++
-#include <stdint.h>                     // for uint64_t
-#include <deque>                        // for _Deque_iterator, operator!=, etc
 #include <algorithm>
+#include <cstdint>                     // for uint64_t
+#include <deque>                        // for _Deque_iterator, operator!=, etc
 using namespace std;
 
 //qt

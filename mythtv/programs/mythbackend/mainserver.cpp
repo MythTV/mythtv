@@ -1,15 +1,15 @@
-#include <list>
-#include <cstdlib>
-#include <iostream>
 #include <algorithm>
 #include <cerrno>
-#include <memory>
 #include <chrono> // for milliseconds
+#include <cmath>
+#include <cstdlib>
+#include <fcntl.h>
+#include <iostream>
+#include <list>
+#include <memory>
 #include <thread> // for sleep_for
 using namespace std;
 
-#include <math.h>
-#include <fcntl.h>
 #include "mythconfig.h"
 
 #ifndef _WIN32

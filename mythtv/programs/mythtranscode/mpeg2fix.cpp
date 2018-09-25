@@ -2,16 +2,14 @@
 //support missing audio frames
 //support analyze-only mode
 
-// C headers
-#include <cstdlib>
+// C++ headers
+#include <cstdint>
 #include <cstdio>
-
-// POSIC headers
+#include <cstdlib>
 #include <fcntl.h>
-#include <unistd.h>
 #include <getopt.h>
-#include <stdint.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "config.h"
 #include "mpeg2fix.h"

@@ -8,9 +8,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-// POSIX headers
-#include <limits.h>
-#include <stdint.h>
+// C++ headers
+#include <climits>
+#include <cstdint>
 
 // Qt headers
 #include <QSize>

@@ -5,11 +5,11 @@
 
 */
 
-#include <iostream>
-using namespace std;
-#include <unistd.h>
+#include <csignal>
 #include <fcntl.h>
-#include <signal.h>
+#include <iostream>
+#include <unistd.h>
+using namespace std;
 
 #include <QCoreApplication>
 #include <QFile>
