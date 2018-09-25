@@ -7,10 +7,8 @@
 #ifndef TEXT_SUBTITLE_PARSER_H
 #define TEXT_SUBTITLE_PARSER_H
 
-// POSIX headers
-#include <stdint.h>
-
 // C++ headers
+#include <cstdint>
 #include <vector>
 using namespace std;
 

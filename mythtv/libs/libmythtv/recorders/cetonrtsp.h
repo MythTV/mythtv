@@ -7,7 +7,7 @@
 #ifndef CETONRTSP_H
 #define CETONRTSP_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QObject>
 #include <QMap>

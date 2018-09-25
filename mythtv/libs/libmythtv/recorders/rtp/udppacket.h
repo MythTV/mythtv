@@ -6,7 +6,7 @@
 #ifndef _UDP_PACKET_H_
 #define _UDP_PACKET_H_
 
-#include <inttypes.h>
+#include <cinttypes>
 
 #include <QByteArray>
 

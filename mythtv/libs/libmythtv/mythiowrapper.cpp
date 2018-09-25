@@ -3,11 +3,11 @@
 #else
 #include <dlfcn.h>
 #endif
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <cstdio>
 #include <dirent.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <QFile>

@@ -1,7 +1,7 @@
 #ifndef REMOTEENCODER_H_
 #define REMOTEENCODER_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QString>
 #include <QMutex>

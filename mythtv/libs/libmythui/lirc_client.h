@@ -14,7 +14,11 @@
 #ifndef LIRC_CLIENT_H
 #define LIRC_CLIENT_H
 
+#ifdef __cplusplus
+#include <cstddef>
+#else
 #include <stddef.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

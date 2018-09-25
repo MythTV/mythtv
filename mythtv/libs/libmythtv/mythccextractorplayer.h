@@ -3,7 +3,7 @@
 #ifndef MYTHCCEXTRACTORPLAYER_H
 #define MYTHCCEXTRACTORPLAYER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QStringList>
 #include <QImage>

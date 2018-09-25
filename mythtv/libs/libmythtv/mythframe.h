@@ -1,8 +1,13 @@
 #ifndef _FRAME_H
 #define _FRAME_H
 
-#include <string.h>
+#ifdef __cplusplus
+#include <cstdint>
+#include <cstring>
+#else
 #include <stdint.h>
+#include <string.h>
+#endif
 #include "mythtvexp.h" // for MTV_PUBLIC
 
 #ifdef __cplusplus

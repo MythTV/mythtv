@@ -19,7 +19,7 @@
 
 */
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "BaseActions.h"
 #include "BaseClasses.h"

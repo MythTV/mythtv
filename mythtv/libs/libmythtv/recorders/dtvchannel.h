@@ -7,10 +7,8 @@
 #ifndef _DTVCHANNEL_H_
 #define _DTVCHANNEL_H_
 
-// POSIX headers
-#include <stdint.h>
-
 // C++ headers
+#include <cstdint>
 #include <vector>
 using namespace std;
 

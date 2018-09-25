@@ -1,8 +1,8 @@
 #include <climits>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <QDir>

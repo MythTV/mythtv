@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "audiooutputbase.h"
 #include "audiooutputdownmix.h"
 
-#include "string.h"
+#include <cstring>
 
 #define LOC QString("Downmixer: ")
 

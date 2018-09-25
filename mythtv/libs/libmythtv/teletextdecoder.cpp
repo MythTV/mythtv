@@ -16,13 +16,12 @@
  * GNU General Public License for more details.
  *
  * ============================================================= */
+#include <cctype>
+#include <cstdint>
 #include <cstring>
 
-#include <stdint.h>
-#include <ctype.h>
-
 extern "C" {
-#include <inttypes.h>
+#include <cinttypes>
 #include "ivtv_myth.h"
 #include "vbitext/vt.h"
 }

@@ -1,7 +1,7 @@
 #ifndef MYTHRENDER_OPENGL_H_
 #define MYTHRENDER_OPENGL_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QtGlobal>
 // The below is commented because it causes raspberry Pi with OpenMAX

@@ -1,9 +1,8 @@
 // -*- Mode: c++ -*-
 
-#include <limits.h>
-
 // C++ includes
 #include <algorithm>
+#include <climits>
 using namespace std;
 
 // Qt includes

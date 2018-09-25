@@ -44,7 +44,7 @@
 #include "msocketdevice.h"
 
 #include "qwindowdefs.h"
-#include <string.h>
+#include <cstring>
 
 //#define MSOCKETDEVICE_DEBUG
 

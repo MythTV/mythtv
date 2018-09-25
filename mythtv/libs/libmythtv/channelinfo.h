@@ -1,10 +1,8 @@
 #ifndef DB_CHANNEL_INFO_H_
 #define DB_CHANNEL_INFO_H_
 
-// POSIX headers
-#include <stdint.h>
-
 // C++ headers
+#include <cstdint>
 #include <vector>
 
 using namespace std;

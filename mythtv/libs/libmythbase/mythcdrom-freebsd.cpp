@@ -1,6 +1,6 @@
-#include <errno.h>
-#include <sys/ioctl.h>
+#include <cerrno>
 #include <sys/cdio.h>
+#include <sys/ioctl.h>
 
 #include "mythcdrom.h"
 #include "mythcdrom-freebsd.h"

@@ -2,7 +2,7 @@
 #ifndef RECORDERBASE_H_
 #define RECORDERBASE_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QWaitCondition>
 #include <QAtomicInt>

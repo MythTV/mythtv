@@ -1,7 +1,7 @@
 // Std C headers
 #include <cstdio>
+#include <cstring>
 #include <unistd.h>
-#include <string.h>
 
 #include "mythcorecontext.h"
 #include "config.h"

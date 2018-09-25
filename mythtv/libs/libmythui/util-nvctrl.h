@@ -1,9 +1,9 @@
 #ifndef __UTIL_NVIDIA_H__
 #define __UTIL_NVIDIA_H__
 
+#include <cstdlib>
 #include <map>
 #include <vector>
-#include <stdlib.h>
 using namespace std;
 
 typedef map<unsigned int, double> t_screenrate;

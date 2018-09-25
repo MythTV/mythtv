@@ -7,7 +7,7 @@
 #include <QString>
 #include <QVariant>
 
-#include <stdint.h>   // for uint64_t
+#include <cstdint>   // for uint64_t
 
 #include "mythbaseexp.h"
 #include "mythlogging.h"

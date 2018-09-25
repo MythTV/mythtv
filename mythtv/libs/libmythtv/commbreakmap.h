@@ -11,9 +11,8 @@
 #include <QMap>
 #include <QCoreApplication>
 
-
-#include <compat.h>
-#include <stdint.h>
+#include <cstdint>
+#include "compat.h"
 
 class NuppelVideoPlayer;
 

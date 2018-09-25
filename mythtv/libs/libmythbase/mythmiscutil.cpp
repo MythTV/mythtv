@@ -2,14 +2,12 @@
 #include "mythmiscutil.h"
 
 // C++ headers
+#include <cerrno>
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 using namespace std;
-
-// C headers
-#include <cerrno>
-#include <stdlib.h>
-#include <time.h>
 
 // POSIX
 #include <unistd.h>
@@ -738,9 +736,9 @@ void myth_yield(void)
 #if defined(__linux__) && ( defined(__i386__) || defined(__ppc__) || \
                             defined(__x86_64__) || defined(__ia64__) )
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
 #include <getopt.h>
 #include <unistd.h>
 #include <sys/ptrace.h>

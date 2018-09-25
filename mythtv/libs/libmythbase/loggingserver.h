@@ -7,8 +7,8 @@
 #include <QQueue>
 #include <QTime>
 
-#include <stdint.h>
-#include <time.h>
+#include <cstdint>
+#include <ctime>
 #include <unistd.h>
 
 #include "mythconfig.h"

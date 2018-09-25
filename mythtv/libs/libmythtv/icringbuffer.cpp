@@ -1,6 +1,6 @@
 #include "icringbuffer.h"
 
-#include <stdio.h> // SEEK_SET
+#include <cstdio> // SEEK_SET
 
 #include <QScopedPointer>
 #include <QWriteLocker>

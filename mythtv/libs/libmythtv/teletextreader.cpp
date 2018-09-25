@@ -1,6 +1,6 @@
 #include "teletextreader.h"
 
-#include <string.h>
+#include <cstring>
 
 #include "vbilut.h"
 #include "tv.h"

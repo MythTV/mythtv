@@ -1,12 +1,10 @@
-// C headers
-#include <cassert>
-#include <unistd.h>
-#include <cmath>
-#include <stdint.h>
-
 // C++ headers
 #include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstdint>
 #include <iostream>
+#include <unistd.h>
 using namespace std;
 
 #include <QTextCodec>

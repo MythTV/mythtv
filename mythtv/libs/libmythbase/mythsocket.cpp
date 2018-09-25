@@ -13,7 +13,7 @@
 #if defined(Q_OS_WIN)
 #include <winsock2.h>
 #include <Ws2tcpip.h>
-#include <stdio.h>
+#include <cstdio>
 #else
 #include <sys/socket.h>
 #endif

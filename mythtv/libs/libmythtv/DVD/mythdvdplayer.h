@@ -1,7 +1,7 @@
 #ifndef MYTHDVDPLAYER_H
 #define MYTHDVDPLAYER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "mythplayer.h"
 

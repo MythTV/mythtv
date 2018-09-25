@@ -11,11 +11,10 @@
 #include <QTime>                        // for QTime
 #include <QHash>                        // for QHash
 
-#include <stdint.h>                     // for uint8_t
-#include <string.h>                     // for memcpy, memset
-
 #include <algorithm>                    // for min
 #include <cmath>                        // for round, sqrt
+#include <cstdint>                      // for uint8_t
+#include <cstring>                      // for memcpy, memset
 #include <deque>                        // for _Deque_iterator, operator!=
 
 #include "dsmcc.h"                      // for Dsmcc

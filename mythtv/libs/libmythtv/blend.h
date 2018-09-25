@@ -7,7 +7,11 @@ extern "C" {
 
 #include "mythconfig.h"
 #if HAVE_STDINT_H
+#ifdef __cplusplus
+#include <cstdint>
+#else
 #include <stdint.h>
+#endif
 #endif
 
 #ifdef __OpenBSD__

@@ -5,7 +5,11 @@
 #ifndef __COMPAT_H__
 #define __COMPAT_H__
 
+#ifdef __cplusplus
+#    include <cstdio>         // for snprintf(), used by inline dlerror()
+#else
 #    include <stdio.h>        // for snprintf(), used by inline dlerror()
+#endif
 
 #ifdef _WIN32
 #    ifndef _MSC_VER
@@ -46,8 +50,8 @@
 #endif
 
 #ifdef _WIN32
-#    include <stdlib.h>       // for rand()
-#    include <time.h>
+#    include <cstdlib>       // for rand()
+#    include <ctime>
 #    include <sys/time.h>
 #    include <sys/types.h>    // suseconds_t
 #endif
@@ -60,7 +64,7 @@
     #undef restrict
     #endif
 
-    #include <inttypes.h>
+    #include <cinttypes>
     #include <direct.h>
     #include <process.h>
 
@@ -350,10 +354,10 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #endif
 
 #if defined(USING_MINGW) && defined(FILENAME_MAX)
-#    include <errno.h>
+#    include <cerrno>
+#    include <cstddef>
+#    include <cstring>
 #    include <dirent.h>
-#    include <string.h>
-#    include <stddef.h>
     static inline int readdir_r(
         DIR *dirp, struct dirent *entry, struct dirent **result)
     {

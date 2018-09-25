@@ -25,14 +25,13 @@
 #define USE_SETSOCKOPT
 #include <sys/sendfile.h>
 #endif
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <fcntl.h>
 #include <cerrno>
+#include <cstdlib>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 // FOR DEBUGGING
 #include <iostream>
-#include <complex>
 
 #ifndef _WIN32
 #include <netinet/tcp.h>

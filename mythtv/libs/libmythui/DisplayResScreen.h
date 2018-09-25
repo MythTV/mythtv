@@ -1,13 +1,12 @@
 #ifndef __DISPLAYRESCREEN_H__
 #define __DISPLAYRESCREEN_H__
 
-#include <vector>
-#include <map>
 #include <algorithm>
+#include <cstdint>   // for uint64_t
+#include <map>
+#include <vector>
 
 #include <QString>
-
-#include <stdint.h>   // for uint64_t
 
 #include "mythuiexp.h"
 

@@ -17,19 +17,17 @@
 #include <QDateTime>
 #include <QRunnable>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdarg>
-
-#include <unistd.h>       // for usleep()
-
 #include <queue>
-#include <algorithm>
+#include <unistd.h>       // for usleep()
 using namespace std;
 
 #ifdef _WIN32
 #include <winsock2.h>
 #else
-#include <locale.h>
+#include <clocale>
 #endif
 
 #include "compat.h"

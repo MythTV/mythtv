@@ -1,9 +1,7 @@
-// Std C headers
-#include <cmath>
-#include <limits>
-
 // C++ headers
 #include <algorithm>
+#include <cmath>
+#include <limits>
 
 using namespace std;
 

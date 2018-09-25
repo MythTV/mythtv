@@ -24,7 +24,7 @@
 #include <QEventLoop>
 #include <QTimer>
 
-#include <stdint.h>
+#include <cstdint>
 
 /**
  * \class WebSocketServer

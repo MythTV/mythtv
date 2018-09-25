@@ -2,7 +2,7 @@
 #define LYRICSDATA_H_
 
 // C/C++
-#include <stdint.h>
+#include <cstdint>
 
 // qt
 #include <QObject>

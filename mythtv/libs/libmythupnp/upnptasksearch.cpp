@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <stdlib.h>
 #include <chrono> // for milliseconds
+#include <cstdlib>
 #include <thread> // for sleep_for
 
 #include <QStringList>

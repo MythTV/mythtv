@@ -3,7 +3,7 @@
 #ifndef _ATSC_TABLES_H_
 #define _ATSC_TABLES_H_
 
-#include <stdint.h>  // uint32_t
+#include <cstdint>  // uint32_t
 #include <QString>
 
 #include "atscdescriptors.h"

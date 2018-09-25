@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#include <stdint.h> // for intptr_t
+#include <cstdint> // for intptr_t
 #include "tspacket.h"
 
 const unsigned int TSHeader::kHeaderSize       = 4;

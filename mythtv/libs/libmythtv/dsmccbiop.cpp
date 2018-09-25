@@ -2,9 +2,8 @@
  *  Copyright (C) David C.J. Matthews 2005, 2006
  *     Derived from libdsmcc by Richard Palmer
  */
-//#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include "dsmccbiop.h"
 #include "dsmccreceiver.h"

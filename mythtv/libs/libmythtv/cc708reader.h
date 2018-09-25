@@ -4,7 +4,7 @@
 #ifndef CC708READER_H
 #define CC708READER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "format.h"
 #include "compat.h"
 #include "cc708window.h"

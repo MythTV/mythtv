@@ -27,22 +27,22 @@ using namespace std;
 #include "exitcodes.h"
 #include "compat.h"
 
+#include <csignal>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#if HAVE_GETTIMEOFDAY
+#include <sys/time.h>
+#endif
 #define SYSLOG_NAMES
 #ifndef _WIN32
 #include <syslog.h>
 #endif
-#include <stdarg.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <stdio.h>
 #include <unistd.h>
-#if HAVE_GETTIMEOFDAY
-#include <sys/time.h>
-#endif
-#include <signal.h>
 
 // Various ways to get to thread's tid
 #if defined(linux)

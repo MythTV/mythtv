@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 
 #include "mythconfig.h"
 #include "mythtvexp.h"
-#include <stdint.h>
+#include <cstdint>
 
 /*
  * Macros and definitions used internally to RTjpeg
@@ -48,7 +48,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
 #endif
 
 #if HAVE_STDINT_H
-#include <stdint.h>
+#include <cstdint>
 #endif
 
 #ifdef MMX

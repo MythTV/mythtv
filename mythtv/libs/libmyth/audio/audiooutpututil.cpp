@@ -1,6 +1,6 @@
-#include <math.h>
+#include <cinttypes>
+#include <cmath>
 #include <sys/types.h>
-#include <inttypes.h>
 
 #include "mythconfig.h"
 #include "mythlogging.h"

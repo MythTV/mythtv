@@ -27,12 +27,12 @@
 
 // C++/C headers
 #include <cerrno>
-#include <unistd.h>
-#include <stdlib.h>
+#include <csignal> // for kill() and SIGXXX
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <fcntl.h>
-#include <time.h>
-#include <signal.h> // for kill() and SIGXXX
-#include <string.h>
+#include <unistd.h>
 
 // QT headers
 #include <QCoreApplication>

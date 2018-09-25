@@ -23,11 +23,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+#include <algorithm>
+#include <cinttypes>
+#include <climits>
 #include <cstdio>
 #include <cstdlib>
-#include <algorithm>
-#include <inttypes.h>
-#include <limits.h>
 #include "mythconfig.h"
 
 #if HAVE_MMX

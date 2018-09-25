@@ -23,7 +23,7 @@
 #ifndef __ELDUTILS_H
 #define __ELDUTILS_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <QString>
 #include "mythexp.h"
 

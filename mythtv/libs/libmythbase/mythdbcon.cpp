@@ -28,7 +28,7 @@
 
 #define DEBUG_RECONNECT 0
 #if DEBUG_RECONNECT
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 static const uint kPurgeTimeout = 60 * 60;

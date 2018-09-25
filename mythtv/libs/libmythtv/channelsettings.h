@@ -1,10 +1,8 @@
 #ifndef CHANNELSETTINGS_H
 #define CHANNELSETTINGS_H
 
-// ANSI C
-#include <cstdlib>
-
 // C++
+#include <cstdlib>
 #include <vector>
 
 // Qt

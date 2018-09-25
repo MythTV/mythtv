@@ -1,6 +1,6 @@
 #include "mythuibuttonlist.h"
 
-#include <math.h>
+#include <cmath>
 
 // QT headers
 #include <QCoreApplication>

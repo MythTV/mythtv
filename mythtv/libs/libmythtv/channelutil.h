@@ -2,12 +2,10 @@
 #ifndef CHANUTIL_H
 #define CHANUTIL_H
 
-// POSIX headers
-#include <stdint.h>
-
 // C++ headers
-#include <vector>
+#include <cstdint>
 #include <deque>
+#include <vector>
 using namespace std;
 
 // Qt headers

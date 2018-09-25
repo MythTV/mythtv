@@ -2,7 +2,7 @@
  *  Copyright (C) David C.J. Matthews 2005, 2006
  *     Derived from libdsmcc by Richard Palmer
  */
-#include <string.h> // For memcmp
+#include <cstring> // For memcmp
 
 #include <QStringList>
 

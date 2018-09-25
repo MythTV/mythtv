@@ -1,10 +1,9 @@
 #ifndef MYTHMISCUTIL_H_
 #define MYTHMISCUTIL_H_
 
-#include <stdint.h>
-#include <time.h>
-
 #include <algorithm>
+#include <cstdint>
+#include <ctime>
 
 #include <QString>
 #include <QDir>

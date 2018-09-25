@@ -1,12 +1,10 @@
 
 #include "mythuiimage.h"
 
-// C
+// C++
+#include <cstdint>
 #include <cstdlib>
-#include <time.h>
-
-// POSIX
-#include <stdint.h>
+#include <ctime>
 
 // QT
 #include <QFile>

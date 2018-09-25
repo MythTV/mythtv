@@ -2,7 +2,7 @@
 #define DISKINFO_H_
 #define NUMDISKINFOLINES 8
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QList>
 #include <QString>

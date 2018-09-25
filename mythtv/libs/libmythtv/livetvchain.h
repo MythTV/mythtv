@@ -1,12 +1,13 @@
 #ifndef _LIVETVCHAIN_H_
 #define _LIVETVCHAIN_H_
 
+#include <climits>
+
 #include <QString>
 #include <QStringList>
 #include <QDateTime>
 #include <QMutex>
 #include <QList>
-#include <limits.h>
 
 #include "mythtvexp.h"
 #include "referencecounter.h"

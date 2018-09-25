@@ -2,10 +2,8 @@
 #ifndef _CARDUTIL_H_
 #define _CARDUTIL_H_
 
-// ANSI C
-#include <stdint.h>
-
 // C++ headers
+#include <cstdint>
 #include <vector>
 using namespace std;
 

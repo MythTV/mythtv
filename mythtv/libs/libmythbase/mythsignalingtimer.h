@@ -3,7 +3,7 @@
 #ifndef _MYTH_SIGNALING_TIMER_H_
 #define _MYTH_SIGNALING_TIMER_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QWaitCondition>
 #include <QMutex>

@@ -31,7 +31,7 @@
 #include "Logging.h"
 #include "freemheg.h"
 
-#include "inttypes.h"
+#include <cinttypes>
 
 /*
 UK MHEG content hook values: 2 => MPEG I-frame, 4 => PNG bitmap

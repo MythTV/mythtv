@@ -23,13 +23,15 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+#include <cinttypes>
+#include <sys/types.h>
+
+#include <QString>
+
 #include "mythconfig.h"
 #include "eldutils.h"
-#include <sys/types.h>
-#include <inttypes.h>
 #include "bswap.h"
 #include "audiooutputbase.h"
-#include <QString>
 
 #define LOC QString("ELDUTILS: ")
 

@@ -1,5 +1,5 @@
+#include <cstdio>
 #include <iostream>
-#include <stdio.h>
 using namespace std;
 
 #include <QString>

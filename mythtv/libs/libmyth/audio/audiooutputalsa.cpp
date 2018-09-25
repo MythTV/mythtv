@@ -1,8 +1,9 @@
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <stdint.h>
+#include <ctime>
 #include <sys/time.h>
-#include <time.h>
+
 #include "config.h"
 
 using namespace std;

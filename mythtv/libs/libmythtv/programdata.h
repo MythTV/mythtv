@@ -2,11 +2,9 @@
 #define _PROGRAMDATA_H_
 
 // C++ headers
+#include <cstdint>
 #include <vector>
 using namespace std;
-
-// POSIX headers
-#include <stdint.h>
 
 // Qt headers
 #include <QString>

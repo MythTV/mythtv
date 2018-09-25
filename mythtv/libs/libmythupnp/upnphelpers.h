@@ -7,7 +7,7 @@
 #include <QTime>
 #include <QSize>
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "upnpexp.h"
 #include "compat.h"

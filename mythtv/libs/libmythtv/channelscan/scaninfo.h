@@ -1,11 +1,9 @@
 #ifndef _CHANNEL_IMPORTER_HELPERS_H_
 #define _CHANNEL_IMPORTER_HELPERS_H_
 
-// POSIX headers
-#include <stdint.h>
-typedef unsigned uint;
-
 // C++ headers
+#include <cstdint>
+typedef unsigned uint;
 #include <vector>
 using namespace std;
 

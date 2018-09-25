@@ -2,18 +2,14 @@
 
 #undef HAVE_AV_CONFIG_H
 
-// Std C headers
-#include <stdint.h>
-#include <cstdio>
-#include <cstdlib>
-
-// POSIX headers
-#include <unistd.h>
-#include <assert.h>
-#include <cmath>                        // for fabs, ceil, round, signbit
-
 // C++ headers
 #include <algorithm>
+#include <cassert>
+#include <cmath>                        // for fabs, ceil, round, signbit
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
 using namespace std;
 
 // Qt headers

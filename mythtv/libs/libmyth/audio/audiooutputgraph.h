@@ -1,6 +1,6 @@
 #ifndef AUDIOOUTPUTGRAPH_H
 #define AUDIOOUTPUTGRAPH_H
-#include <stdint.h>
+#include <cstdint>
 
 #include "mythexp.h"
 #include <QMutex>

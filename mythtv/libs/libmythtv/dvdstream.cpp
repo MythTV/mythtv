@@ -3,8 +3,8 @@
  */
 #include "dvdstream.h"
 
-#include <stdio.h>
 #include <algorithm>
+#include <cstdio>
 
 #include <QMutexLocker>
 #include <QtGlobal>

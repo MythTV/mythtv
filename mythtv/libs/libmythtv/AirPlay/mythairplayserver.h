@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QUrl>
-#include <stdint.h>     // for uintxx_t
+#include <cstdint>     // for uintxx_t
 
 #include "serverpool.h"
 #include "mythtvexp.h"

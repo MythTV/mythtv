@@ -3,10 +3,8 @@
 #ifndef TVPLAY_H
 #define TVPLAY_H
 
-// C
-#include <stdint.h>
-
 // C++
+#include <cstdint>
 #include <vector>
 using namespace std;
 

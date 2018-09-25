@@ -25,22 +25,23 @@
  */
 
 #include "dvbci.h"
-#include <errno.h>
-#include <ctype.h>
+
+#include <cctype>
+#include <cerrno>
+#include <cstring>
+#include <ctime>
+#include <fcntl.h>
 #include <linux/dvb/ca.h>
+#include <netinet/in.h>
+#include <poll.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <unistd.h>
 #ifdef __FreeBSD__
 #  include <stdlib.h>
 #else
 #  include <malloc.h>
 #endif
-#include <netinet/in.h>
-#include <poll.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/time.h>
-#include <time.h>
-#include <unistd.h>
-#include <fcntl.h>
 
 #include <QString>
 

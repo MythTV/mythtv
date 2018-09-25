@@ -12,10 +12,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-// ANSI C
-#include <stdint.h> // for [u]int[32,64]_t
-
 // C++ headers
+#include <cstdint> // for [u]int[32,64]_t
 #include <deque>
 
 // Qt headers

@@ -1,8 +1,8 @@
 #include "audiooutput_omx.h"
 
-#include <cstddef>
-#include <cassert>
 #include <algorithm> // max/min
+#include <cassert>
+#include <cstddef>
 #include <vector>
 
 #include <OMX_Core.h>

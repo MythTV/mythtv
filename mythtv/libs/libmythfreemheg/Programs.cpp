@@ -38,7 +38,7 @@
 #ifdef __FreeBSD__
 #include <sys/time.h>
 #else
-#include <time.h>
+#include <ctime>
 #endif
 
 #include "config.h"

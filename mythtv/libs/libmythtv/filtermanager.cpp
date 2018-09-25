@@ -1,5 +1,5 @@
 // POSIX headers
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifndef _WIN32 // dlfcn for mingw defined in compat.h
 #include <dlfcn.h> // needed for dlopen(), dlerror(), dlsym(), and dlclose()

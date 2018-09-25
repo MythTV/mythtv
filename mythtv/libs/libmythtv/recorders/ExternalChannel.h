@@ -3,10 +3,9 @@
 #ifndef _EXTERNAL_CHANNEL_H_
 #define _EXTERNAL_CHANNEL_H_
 
+#include <cstdint>
 #include <vector>
 using namespace std;
-
-#include <stdint.h>
 
 // Qt headers
 #include <QString>

@@ -1,19 +1,15 @@
 // -*- Mode: c++ -*-
 
-// C headers
-#include <ctime>
-
 // C++ headers
 #include <algorithm>
 #include <chrono> // for milliseconds
+#include <cinttypes>
+#include <ctime>
+#include <fcntl.h>
 #include <thread> // for sleep_for
+#include <unistd.h>
 #include <vector>
 using namespace std;
-
-// POSIX headers
-#include <fcntl.h>
-#include <unistd.h>
-#include <inttypes.h>
 
 // System headers
 #include <sys/types.h>

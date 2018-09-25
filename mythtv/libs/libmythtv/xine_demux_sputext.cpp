@@ -32,15 +32,14 @@
 #include "config.h"
 #endif
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
-#include <ctype.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "xine_demux_sputext.h"
 
 #define LOG_MODULE "demux_sputext"

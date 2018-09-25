@@ -10,9 +10,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <cmath>
 #include <algorithm>
-#include <stdint.h>
+#include <cmath>
+#include <cstdint>
 using namespace std;
 
 #include "upnp.h"

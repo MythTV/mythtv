@@ -35,9 +35,9 @@
 #include "Visible.h"  // For MHInteractible
 #include "Stream.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 
 // External creation function.
 MHEG *MHCreateEngine(MHContext *context)

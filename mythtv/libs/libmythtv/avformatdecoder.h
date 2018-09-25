@@ -2,7 +2,7 @@
 #ifndef AVFORMATDECODER_H_
 #define AVFORMATDECODER_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QString>
 #include <QMap>

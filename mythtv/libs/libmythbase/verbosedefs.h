@@ -5,8 +5,10 @@
 #include <QMap>
 #include <QString>
 #include <QMutex>
-#endif
+#include <cstdint>
+#else
 #include <stdint.h>
+#endif
 
 /// This file gets included in two different ways:
 /// 1) from mythlogging.h from nearly every file.  This will define the

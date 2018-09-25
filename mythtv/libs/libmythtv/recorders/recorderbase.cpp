@@ -1,6 +1,5 @@
-#include <stdint.h>
-
 #include <algorithm> // for min
+#include <cstdint>
 using namespace std;
 
 #include "firewirerecorder.h"

@@ -1,7 +1,7 @@
 #ifndef CC608READER_H
 #define CC608READER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QMutex>
 

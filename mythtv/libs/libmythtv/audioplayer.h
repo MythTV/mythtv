@@ -8,7 +8,7 @@
 #include <QCoreApplication>
 #include <QMutex>
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 using std::vector;

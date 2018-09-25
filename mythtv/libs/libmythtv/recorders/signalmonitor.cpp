@@ -2,8 +2,8 @@
 // Copyright (c) 2005, Daniel Thor Kristjansson
 
 // C headers
+#include <csignal>
 #include <sys/types.h>
-#include <signal.h>
 #include <unistd.h>
 
 // MythTV headers

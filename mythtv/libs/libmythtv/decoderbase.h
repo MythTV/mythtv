@@ -1,8 +1,7 @@
 #ifndef DECODERBASE_H_
 #define DECODERBASE_H_
 
-#include <stdint.h>
-
+#include <cstdint>
 #include <vector>
 using namespace std;
 

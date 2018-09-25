@@ -14,8 +14,7 @@
 #include <QUrl>
 #include <QTcpSocket>
 
-#include "stdlib.h"
-
+#include <cstdlib>
 #include <unistd.h> // for usleep()
 
 // libmythbase

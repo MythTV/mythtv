@@ -1,10 +1,9 @@
-#include <iostream>
-
 // Own header
 #include "mythimage.h"
 
 // C++ headers
-#include <stdint.h>
+#include <cstdint>
+#include <iostream>
 
 // QT headers
 #include <QImageReader>

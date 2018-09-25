@@ -7,12 +7,11 @@
     (c) 2002, 2003 Thor Sigvaldason, Dan Morphis and Isaac Richards
 */
 
-// ANSI C headers
-#include <cstdlib>
+// C++ headers
+#include <cerrno>
 #include <cmath>
+#include <cstdlib>
 #include <fcntl.h>
-#include <errno.h>
-
 #include <unistd.h> // for usleep()
 
 // Qt headers

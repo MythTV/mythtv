@@ -1,10 +1,10 @@
 #include "config.h"
 
+#include <cstdio>
 #include <fcntl.h>
+#include <strings.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <strings.h>
-#include <stdio.h>
 
 #if CONFIG_LIBBLURAY_EXTERNAL
 #include "libbluray/filesystem.h"

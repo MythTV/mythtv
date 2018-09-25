@@ -1,7 +1,7 @@
 #ifndef MYTHTV_BSWAP_H
 #define MYTHTV_BSWAP_H
 
-#include <stdint.h> /* uint32_t */
+#include <cstdint> /* uint32_t */
 
 #if HAVE_BYTESWAP_H
 #  include <byteswap.h> /* bswap_16|32|64 */

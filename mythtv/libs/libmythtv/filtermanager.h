@@ -5,8 +5,8 @@
 #include "mythframe.h"
 
 // C++ headers
-#include <vector>
 #include <map>
+#include <vector>
 using namespace std;
 
 // Qt headers

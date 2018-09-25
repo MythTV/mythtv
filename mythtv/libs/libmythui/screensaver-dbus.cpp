@@ -1,5 +1,7 @@
-#include <stdint.h>
 #include "screensaver-dbus.h"
+
+#include <cstdint>
+
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDBusReply>

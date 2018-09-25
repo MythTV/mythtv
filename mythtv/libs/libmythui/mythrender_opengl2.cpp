@@ -2,7 +2,7 @@
 
 #include <QPainter>
 
-#include <math.h>
+#include <cmath>
 
 #define LOC QString("OpenGL2: ")
 

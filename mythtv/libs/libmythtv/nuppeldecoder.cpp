@@ -1,12 +1,10 @@
-// C headers
-#include <cerrno>
-#include <cassert>
-#include <cstring>
-#include <sys/types.h>
-#include <stdio.h>                      // for SEEK_SET, SEEK_CUR
-
 // C++ headers
 #include <algorithm>
+#include <cassert>
+#include <cerrno>
+#include <cstdio>                      // for SEEK_SET, SEEK_CUR
+#include <cstring>
+#include <sys/types.h>
 #include <vector>                       // for vector
 using namespace std;
 

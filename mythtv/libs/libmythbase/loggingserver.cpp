@@ -25,7 +25,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "compat.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #ifndef _WIN32
 #include <syslog.h>
 #if CONFIG_SYSTEMD_JOURNAL
@@ -33,17 +33,17 @@ using namespace std;
 #include <systemd/sd-journal.h>
 #endif
 #endif
-#include <stdarg.h>
-#include <string.h>
+#include <cstdarg>
+#include <cstring>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #if HAVE_GETTIMEOFDAY
 #include <sys/time.h>
 #endif
-#include <signal.h>
+#include <csignal>
 
 // Various ways to get to thread's tid
 #if defined(linux)

@@ -19,7 +19,6 @@
 #include <cmath>
 
 // POSIX headers
-#include <compat.h>
 #ifndef _WIN32
 #include <sys/utsname.h> 
 #endif

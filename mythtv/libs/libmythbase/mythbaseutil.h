@@ -2,9 +2,9 @@
 #define _MYTH_DB_UTIL_H_
 
 // POSIX
-#include <sys/types.h>  // for fnctl
+#include <cerrno>       // for checking errno
 #include <fcntl.h>      // for fnctl
-#include <errno.h>      // for checking errno
+#include <sys/types.h>  // for fnctl
 
 // Qt
 #include <QString>

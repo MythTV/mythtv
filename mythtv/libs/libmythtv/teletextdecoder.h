@@ -1,7 +1,7 @@
 #ifndef VBIDECODER_H_
 #define VBIDECODER_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 class TeletextReader;
 

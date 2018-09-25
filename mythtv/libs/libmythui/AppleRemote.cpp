@@ -1,13 +1,14 @@
 
 #include "AppleRemote.h"
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/errno.h>
 #include <sys/sysctl.h>  // for sysctlbyname
 #include <sysexits.h>
+#include <unistd.h>
+
 #include <mach/mach.h>
 #include <mach/mach_error.h>
 #include <IOKit/IOKitLib.h>

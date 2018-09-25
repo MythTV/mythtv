@@ -1,7 +1,7 @@
 #ifndef _mythtv_m3u_h_
 #define _mythtv_m3u_h_
 
-#include <inttypes.h>
+#include <cinttypes>
 
 #include <QDateTime>
 

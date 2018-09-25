@@ -9,7 +9,7 @@
 #ifndef MythTV_util_osx_h
 #define MythTV_util_osx_h
 
-#include <stdint.h>
+#include <cstdint>
 
 extern "C" {
 void GetOSXVersion(int32_t* aMajorVersion, int32_t* aMinorVersion);

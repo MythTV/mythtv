@@ -1,15 +1,15 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>       // ioctls
+#include <cerrno>
+#include <climits>
+#include <cstdint>
+#include <fcntl.h>
 #include <linux/cdrom.h>     // old ioctls for cdrom
 #include <linux/fs.h>        // BLKRRPART
+#include <linux/iso_fs.h>
 #include <scsi/scsi.h>
 #include <scsi/sg.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <stdint.h>
-#include <limits.h>
-#include <linux/iso_fs.h>
+#include <sys/ioctl.h>       // ioctls
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <QDateTime>

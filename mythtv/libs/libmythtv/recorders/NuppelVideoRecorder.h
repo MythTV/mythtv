@@ -2,10 +2,7 @@
 #define NUPPELVIDEORECORDER
 
 // C headers
-#include <stdint.h>
-
 #include <sys/time.h>
-#include <time.h>
 #ifdef MMX
 #undef MMX
 #define MMXBLAH
@@ -23,6 +20,8 @@ extern "C" {
 }
 
 // C++ std headers
+#include <cstdint>
+#include <ctime>
 #include <vector>
 using namespace std;
 

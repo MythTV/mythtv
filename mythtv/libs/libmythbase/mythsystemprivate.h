@@ -4,7 +4,7 @@
 #define MYTHSYSTEMPRIVATE_H_
 
 // C header
-#include <stdint.h> // for uint
+#include <cstdint> // for uint
 
 // Qt header
 #include <QPointer> // FIXME: QPointer is deprecated

@@ -9,8 +9,8 @@
 #ifndef _CHANNEL_IMPORTER_H_
 #define _CHANNEL_IMPORTER_H_
 
-// ANSI C headers
-#include <string.h>
+// C++ headers
+#include <cstring>
 
 // Qt headers
 #include <QMap>

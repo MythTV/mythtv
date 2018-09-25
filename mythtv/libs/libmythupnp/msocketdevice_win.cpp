@@ -48,7 +48,7 @@
 #include <QCoreApplication>
 #include "mythlogging.h"
 
-#include <string.h>
+#include <cstring>
 
 #if defined (QT_NO_IPV6)
 #  include <windows.h>
@@ -107,7 +107,7 @@ typedef struct
 #  if defined(Q_OS_WINCE)
 #     include "qfunctions_wince.h"
 #  else
-#     include <errno.h>
+#     include <cerrno>
 #  endif
 #endif
 

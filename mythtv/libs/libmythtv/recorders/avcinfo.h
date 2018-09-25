@@ -1,9 +1,8 @@
 #ifndef _AVC_INFO_H_
 #define _AVC_INFO_H_
 
-#include <stdint.h>
-
 // C++ headers
+#include <cstdint>
 #include <vector>
 using namespace std;
 

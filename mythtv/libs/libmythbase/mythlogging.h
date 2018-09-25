@@ -4,9 +4,12 @@
 #ifdef __cplusplus
 #include <QString>
 #include <QStringList>
-#endif
+#include <cstdint>
+#include <cerrno>
+#else
 #include <stdint.h>
 #include <errno.h>
+#endif
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"

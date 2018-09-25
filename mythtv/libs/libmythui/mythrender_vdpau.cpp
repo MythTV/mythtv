@@ -1,8 +1,8 @@
 
 #include "mythrender_vdpau.h"
 
-#include <math.h>
 #include <chrono> // for milliseconds
+#include <cmath>
 #include <thread> // for sleep_for
 
 #include <QSize>

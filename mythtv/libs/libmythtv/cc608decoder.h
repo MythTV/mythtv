@@ -3,8 +3,8 @@
 #ifndef CCDECODER_H_
 #define CCDECODER_H_
 
-#include <time.h>
-#include <stdint.h>
+#include <cstdint>
+#include <ctime>
 
 #include <vector>
 using namespace std;

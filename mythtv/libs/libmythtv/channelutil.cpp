@@ -1,8 +1,7 @@
 // -*- Mode: c++ -*-
 
-#include <stdint.h>
-
 #include <algorithm>
+#include <cstdint>
 #include <set>
 using namespace std;
 

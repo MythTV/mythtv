@@ -3,8 +3,8 @@
 #ifndef _MYTHSYSTEM_UNIX_H_
 #define _MYTHSYSTEM_UNIX_H_
 
+#include <csignal>
 #include <sys/select.h>
-#include <signal.h>
 
 #include <QObject>
 #include <QString>

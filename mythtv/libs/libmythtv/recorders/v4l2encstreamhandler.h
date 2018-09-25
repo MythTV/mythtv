@@ -3,6 +3,7 @@
 #ifndef _V4L2encStreamhandler_H_
 #define _V4L2encStreamhandler_H_
 
+#include <cstdint>
 #include <vector>
 using namespace std;
 
@@ -10,7 +11,6 @@ using namespace std;
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMap>
-#include <stdint.h>
 
 #include "streamhandler.h"
 #include "v4l2util.h"

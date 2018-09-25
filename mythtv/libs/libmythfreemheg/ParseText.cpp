@@ -30,7 +30,7 @@ This is very basic and is only there to enable some test programs to be run.
 #include "ASN1Codes.h"
 #include "Root.h"
 #include "Groups.h"
-#include <ctype.h>
+#include <cctype>
 #include "Ingredients.h" // For GetEventType
 #include "Text.h" // For GetJustification etc
 #include "Engine.h"

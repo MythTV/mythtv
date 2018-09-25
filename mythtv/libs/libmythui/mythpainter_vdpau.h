@@ -1,7 +1,7 @@
 #ifndef MYTHPAINTER_VDPAU_H_
 #define MYTHPAINTER_VDPAU_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QMap>
 

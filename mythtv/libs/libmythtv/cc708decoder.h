@@ -4,8 +4,8 @@
 #ifndef CC708DECODER_H_
 #define CC708DECODER_H_
 
-#include <stdint.h>
-#include <time.h>
+#include <cstdint>
+#include <ctime>
 
 #include "format.h"
 #include "compat.h"

@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2005, Daniel Thor Kristjansson
 
-#include <limits.h>
+#include <climits>
 
 #include "sctedescriptors.h"
 #include "atscdescriptors.h"

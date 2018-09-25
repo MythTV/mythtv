@@ -1,8 +1,8 @@
 #ifndef DELETETHREAD_H_
 #define DELETETHREAD_H_
 
-// ANSI C headers
-#include <stdint.h>
+// C++ headers
+#include <cstdint>
 #include <unistd.h>
 
 // Qt headers

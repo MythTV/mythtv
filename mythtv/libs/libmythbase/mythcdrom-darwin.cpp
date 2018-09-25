@@ -1,4 +1,4 @@
-#include <errno.h>
+#include <cerrno>
 #include <sys/fcntl.h>
 #include <unistd.h> // for close definition
 

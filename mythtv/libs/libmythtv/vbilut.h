@@ -1,7 +1,7 @@
 #ifndef _VBILUT_H_
 #define _VBILUT_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 extern "C" const unsigned char lang_chars[][16];
 extern const unsigned char  chartab_original[];

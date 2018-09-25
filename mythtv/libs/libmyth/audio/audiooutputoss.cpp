@@ -1,15 +1,14 @@
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <fcntl.h>
+#include <iostream>
+#include <sys/ioctl.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <time.h>
 
-#include <sys/ioctl.h>
-#include <cerrno>
-#include <cstring>
-
-#include <iostream>
 #include "config.h"
 
 #if HAVE_SYS_SOUNDCARD_H

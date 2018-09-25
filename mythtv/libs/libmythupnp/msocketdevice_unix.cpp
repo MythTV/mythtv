@@ -89,7 +89,7 @@ static inline int qt_socket_socket(int domain, int type, int protocol)
 
 #include "qwindowdefs.h"
 
-#include <errno.h>
+#include <cerrno>
 #include <sys/types.h>
 
 static inline void qt_socket_getportaddr(struct sockaddr *sa,

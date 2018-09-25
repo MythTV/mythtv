@@ -14,7 +14,7 @@
 #include <QList>
 #include <QMap>
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "mythscreenstack.h"
 #include "mythscreentype.h"

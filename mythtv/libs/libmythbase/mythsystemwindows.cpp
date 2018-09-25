@@ -8,12 +8,13 @@
 
 // C++/C headers
 #include <cerrno>
-#include <unistd.h>
-#include <stdlib.h>
+#include <csignal>  // for kill()
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <fcntl.h>
-#include <time.h>
-#include <signal.h>  // for kill()
-#include <string.h>
+#include <unistd.h>
 
 // QT headers
 #include <QCoreApplication>
@@ -31,7 +32,6 @@
 // Windows headers
 #include <windows.h>
 #include <tchar.h>
-#include <stdio.h>
 
 #define CLOSE(x) \
 if( (x) ) { \

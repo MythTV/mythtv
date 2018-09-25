@@ -5,7 +5,7 @@
 #ifndef DSMCC_BIOP_H
 #define DSMCC_BIOP_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "dsmcccache.h"
 

@@ -1,8 +1,8 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2005, Daniel Kristjansson
 
+#include <cstdio>
 #include <cstdlib>
-#include <stdio.h>
 
 #include "mythlogging.h"
 #include "cc708reader.h"

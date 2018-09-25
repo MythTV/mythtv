@@ -20,7 +20,7 @@
 #define VSYNC_H_INCLUDED
 
 #include <sys/time.h>
-#include <time.h>
+#include <ctime>
 
 class VideoOutput;
 

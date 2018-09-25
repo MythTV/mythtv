@@ -1,17 +1,17 @@
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <fcntl.h>
+#include <iostream>
 #include <sys/time.h>
 #include <unistd.h>
-#include <time.h>
 #ifndef _WIN32
 #include <sys/ioctl.h>
 #else
 #include "compat.h"
 #endif
-#include <cerrno>
-#include <cstring>
-#include <iostream>
 
 #include "config.h"
 

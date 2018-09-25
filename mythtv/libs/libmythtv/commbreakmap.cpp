@@ -1,8 +1,6 @@
 
 #include "commbreakmap.h"
 
-#include <time.h> // for time()
-
 #include "mythcontext.h"
 #include "programinfo.h"
 

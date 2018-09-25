@@ -3,15 +3,15 @@
 #include <QCoreApplication>
 #include <QList>
 
-#include <stdint.h>
-#include <stdlib.h> // for free
-#include <signal.h>
-#include <unistd.h>
+#include <csignal>
+#include <cstdint>
+#include <cstdlib> // for free
+#include <iostream>
 #include <sys/types.h>
+#include <unistd.h>
 #ifndef _WIN32
 #include <sys/socket.h>
 #endif
-#include <iostream>
 
 using namespace std;
 

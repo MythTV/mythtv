@@ -8,10 +8,10 @@
 #define DVBTYPES_H
 
 // POSIX headers
+#include <cstdint>
 #include <sys/poll.h>
 #include <sys/ioctl.h>
 #include <sys/param.h>
-#include <stdint.h>
 #include <unistd.h>
 
 // DVB headers

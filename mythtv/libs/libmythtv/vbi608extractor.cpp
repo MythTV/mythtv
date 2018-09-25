@@ -21,9 +21,8 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include <stdint.h>
-
 #include <algorithm>
+#include <cstdint>
 using namespace std;
 
 #include "vbi608extractor.h"

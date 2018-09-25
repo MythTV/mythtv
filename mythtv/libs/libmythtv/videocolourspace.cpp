@@ -1,4 +1,4 @@
-#include "math.h"
+#include <cmath>
 
 #include "compat.h"
 #include "mythcorecontext.h"

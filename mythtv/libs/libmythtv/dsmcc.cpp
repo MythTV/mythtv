@@ -2,7 +2,7 @@
  *  Copyright (C) David C.J. Matthews 2005, 2006
  *     Derived from libdsmcc by Richard Palmer
  */
-#include <stdint.h>
+#include <cstdint>
 
 #include "mythlogging.h"
 

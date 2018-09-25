@@ -1,15 +1,13 @@
-// ANSI C headers
+// C++ headers
+#include <cerrno>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
-#include <cerrno>
-
-// Unix C headers
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <signal.h>
+#include <cstring>
 #include <fcntl.h>
-#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 // Qt headers
 #include <QString>

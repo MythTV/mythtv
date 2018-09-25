@@ -2,10 +2,9 @@
 #ifndef _PRIVATE_DESCRIPTORS_H_
 #define _PRIVATE_DESCRIPTORS_H_
 
-#include <stdint.h>
-#include <inttypes.h>
-
 // C++ headers
+#include <cinttypes>
+#include <cstdint>
 #include <vector>
 using namespace std;
 

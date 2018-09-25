@@ -6,7 +6,7 @@
 #ifndef _EIT_CACHE_H
 #define _EIT_CACHE_H
 
-#include <stdint.h>
+#include <cstdint>
 
 // Qt headers
 #include <QString>

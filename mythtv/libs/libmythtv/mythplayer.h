@@ -1,7 +1,7 @@
 #ifndef MYTHPLAYER_H
 #define MYTHPLAYER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QCoreApplication>
 #include <QList>

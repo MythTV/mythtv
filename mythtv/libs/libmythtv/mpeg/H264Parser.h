@@ -33,7 +33,7 @@
 #define NULL nullptr
 
 #include <QString>
-#include <stdint.h>
+#include <cstdint>
 #include "mythconfig.h"
 #include "compat.h" // for uint on Darwin, MinGW
 

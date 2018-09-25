@@ -21,9 +21,9 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <math.h>
+#include <cinttypes>
+#include <cmath>
 #include <sys/types.h>
-#include <inttypes.h>
 
 #include "mythconfig.h"
 #include "mythlogging.h"

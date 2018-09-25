@@ -32,11 +32,9 @@
 #ifndef _DTVCONFPARSER_H_
 #define _DTVCONFPARSER_H_
 
-// POSIX headers
-#include <stdint.h>
-#include <unistd.h>
-
 // C++ headers
+#include <cstdint>
+#include <unistd.h>
 #include <vector>
 using namespace std;
 

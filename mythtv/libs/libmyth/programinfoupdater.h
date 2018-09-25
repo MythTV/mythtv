@@ -1,10 +1,8 @@
 #ifndef _PROGRAM_INFO_UPDATER_H_
 #define _PROGRAM_INFO_UPDATER_H_
 
-// ANSI C headers
-#include <stdint.h> // for [u]int[32,64]_t
-
 // C++ headers
+#include <cstdint> // for [u]int[32,64]_t
 #include <vector>
 
 // Qt headers

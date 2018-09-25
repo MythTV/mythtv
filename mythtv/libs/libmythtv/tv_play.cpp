@@ -1,13 +1,12 @@
 
 #include "tv_play.h"
 
-#include <cstdlib>
-#include <cstdarg>
-#include <cmath>
-#include <stdint.h>
-
 #include <algorithm>
 #include <chrono> // for milliseconds
+#include <cmath>
+#include <cstdarg>
+#include <cstdint>
+#include <cstdlib>
 #include <thread> // for sleep_for
 
 using namespace std;

@@ -41,8 +41,8 @@
 // review and some cleanup.
 
 // C headers
-#include <stdint.h>
-#include <time.h>
+#include <cstdint>
+#include <ctime>
 
 #ifdef __cplusplus
 

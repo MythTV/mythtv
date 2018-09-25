@@ -9,15 +9,15 @@
 
 // C++/C headers
 #include <cerrno>
-#include <unistd.h>
-#include <stdlib.h>
+#include <csignal>  // for kill()
+#include <cstdlib>
+#include <cstring> // for strerror()
+#include <ctime>
 #include <fcntl.h>
-#include <time.h>
-#include <signal.h>  // for kill()
-#include <string.h> // for strerror()
+#include <iostream> // for cerr()
 #include <sys/select.h>
 #include <sys/wait.h>
-#include <iostream> // for cerr()
+#include <unistd.h>
 using namespace std; // for most of the above
 
 // QT headers

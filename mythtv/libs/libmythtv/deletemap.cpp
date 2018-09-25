@@ -1,7 +1,7 @@
 
 #include "deletemap.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "mythlogging.h"
 #include "osd.h"

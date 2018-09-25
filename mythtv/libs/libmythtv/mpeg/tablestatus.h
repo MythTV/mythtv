@@ -3,10 +3,8 @@
 #ifndef TABLESTATUS_H_
 #define TABLESTATUS_H_
 
-// POSIX
-#include <stdint.h>  // uint64_t
-
 // C++
+#include <cstdint>  // uint64_t
 #include <vector>
 using namespace std;
 

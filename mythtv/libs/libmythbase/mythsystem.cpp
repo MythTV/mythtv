@@ -20,11 +20,9 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-// C headers
-#include <stdint.h>
-
-// POSIX header
-#include <signal.h> // for SIGXXX
+// C++ headers
+#include <cstdint>
+#include <csignal> // for SIGXXX
 
 // Qt headers
 #include <QStringList>
@@ -37,8 +35,6 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 
-// temporary debugging headers
-#include <iostream>
 using namespace std;
 
 class MythSystemLegacyWrapper : public MythSystem

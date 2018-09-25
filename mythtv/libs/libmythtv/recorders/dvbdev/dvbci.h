@@ -28,10 +28,10 @@
 #define __CI_H
 
 #if HAVE_STDINT_H
-#include <stdint.h>
+#include <cstdint>
 #endif 
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <pthread.h>
 #include <sys/types.h>

@@ -20,7 +20,7 @@
 #ifndef _VBI_608_EXTRACTOR_H_
 #define _VBI_608_EXTRACTOR_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QList>
 

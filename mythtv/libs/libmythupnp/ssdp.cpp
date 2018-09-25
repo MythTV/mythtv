@@ -11,7 +11,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <cerrno>
 #include <chrono> // for milliseconds
+#include <cstdlib>
 #include <thread> // for sleep_for
 
 #include "upnp.h"
@@ -29,8 +31,6 @@
 #ifdef ANDROID
 #include <sys/select.h>
 #endif
-#include <stdlib.h>
-#include <errno.h>
 
 using namespace std;
 

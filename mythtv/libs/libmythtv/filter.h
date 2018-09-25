@@ -53,7 +53,7 @@ struct VideoFilter_
 #endif /* TF_INTERVAL */
 
 #ifdef TF_TYPE_TSC
-#include <stdio.h>
+#include <cstdio>
 
 #define TF_STRUCT int tf_frames; unsigned long long tf_ticks;
 #define TF_INIT(filter) (filter)->tf_frames=0; (filter)->tf_ticks=0;
@@ -87,7 +87,7 @@ struct VideoFilter_
 #endif /* TF_TSC_TICKS */
 #else /* TF_TYPE_TSC */
 #include <sys/time.h>
-#include <stdio.h>
+#include <cstdio>
 #define TF_STRUCT int tf_frames; double tf_seconds;
 #define TF_INIT(filter) (filter)->tf_frames=0; (filter)->tf_seconds=0;
 #define TF_VARS struct timeval tf_1, tf_2;

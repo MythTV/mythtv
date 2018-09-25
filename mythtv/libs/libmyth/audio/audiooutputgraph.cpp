@@ -1,8 +1,8 @@
 #include "audiooutputgraph.h"
 
-#include <limits.h>
-#include <stdint.h>
-#include <math.h>
+#include <climits>
+#include <cmath>
+#include <cstdint>
 
 #include <QtGlobal>
 #include <QImage>

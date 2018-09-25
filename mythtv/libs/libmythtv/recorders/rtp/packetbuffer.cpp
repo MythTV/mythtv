@@ -5,7 +5,7 @@
  */
 
 // POSIX headers
-#include <stdlib.h> // for random
+#include <cstdlib> // for random
 
 // MythTV headers
 #include "packetbuffer.h"

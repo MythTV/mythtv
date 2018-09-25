@@ -4,12 +4,12 @@
 #include "mythlogging.h"
 #include "mythdb.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+#include <cctype>
 #include <cmath>
-#include <sstream>
+#include <cstdio>
+#include <cstring>
 #include <locale>
+#include <sstream>
 
 #include "mythxdisplay.h"
 

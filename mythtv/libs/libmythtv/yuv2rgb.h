@@ -24,7 +24,7 @@
 #ifndef MYTH_YUV2RGB_H
 #define MYTH_YUV2RGB_H
 
-#include <inttypes.h>
+#include <cinttypes>
 
 #define MODE_RGB  0x1
 #define MODE_BGR  0x2

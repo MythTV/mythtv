@@ -1,5 +1,5 @@
-// POSIX headers
-#include <stdint.h>
+// C++ headers
+#include <cstdint>
 
 // Qt headers
 #include <QString>

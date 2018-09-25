@@ -18,9 +18,9 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <stdio.h>
-#include <unistd.h>
+#include <cstdio>
 #include <iostream>
+#include <unistd.h>
 #include "mythiowrapper.h"
 #include "test_mythiowrapper.h"
 

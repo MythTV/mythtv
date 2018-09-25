@@ -4,7 +4,7 @@
 #define _MYTHSYSTEM_WINDOWS_H_
 
 #include <Windows.h>
-#include <signal.h>
+#include <csignal>
 
 #include <QWaitCondition>
 #include <QBuffer>

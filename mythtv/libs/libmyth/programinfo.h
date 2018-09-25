@@ -4,7 +4,7 @@
 #define MYTHPROGRAM_H_
 
 // ANSI C
-#include <stdint.h> // for [u]int[32,64]_t
+#include <cstdint> // for [u]int[32,64]_t
 #include <vector> // for GetNextRecordingList
 
 #include <QStringList>

@@ -16,7 +16,7 @@
 #import "util-osx.h"
 #import "util-osx-cocoa.h"
 #import <CoreFoundation/CFNumber.h>
-#include <stdio.h>
+#include <cstdio>
 
 
 int get_int_CF(CFDictionaryRef dict, CFStringRef key)

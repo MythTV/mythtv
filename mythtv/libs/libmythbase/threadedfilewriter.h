@@ -10,8 +10,8 @@ using namespace std;
 #include <QString>
 #include <QMutex>
 
+#include <cstdint>
 #include <fcntl.h>
-#include <stdint.h>
 
 #include "mythbaseexp.h"
 #include "mthread.h"

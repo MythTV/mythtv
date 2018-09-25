@@ -1,7 +1,7 @@
 #ifndef _HLS_Segment_h_
 #define _HLS_Segment_h_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QString>
 #include <QUrl>

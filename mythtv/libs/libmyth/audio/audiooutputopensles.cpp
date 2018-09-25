@@ -2,8 +2,8 @@
 
 using namespace std;
 
+#include <cassert>
 #include <dlfcn.h>
-#include <assert.h>
 
 #include <QAndroidJniEnvironment>
 

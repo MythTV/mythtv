@@ -7,8 +7,8 @@
 #include <QList>
 #include <QMap>
 
-#include <stdint.h>
-#include <signal.h>
+#include <cstdint>
+#include <csignal>
 #include <unistd.h>
 
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.

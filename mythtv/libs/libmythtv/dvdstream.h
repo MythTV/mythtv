@@ -4,7 +4,7 @@
 #ifndef DVDSTREAM_H
 #define DVDSTREAM_H
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <QString>
 #include <QList>

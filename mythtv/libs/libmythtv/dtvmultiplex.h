@@ -7,8 +7,8 @@
 #ifndef _DTVMULTIPLEX_H_
 #define _DTVMULTIPLEX_H_
 
-// POSIX headers
-#include <stdint.h>
+// C++ headers
+#include <cstdint>
 
 // Qt headers
 #include <QString>

@@ -3,7 +3,7 @@
 #ifndef TELETEXTREADER_H
 #define TELETEXTREADER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 
 #include <QString>

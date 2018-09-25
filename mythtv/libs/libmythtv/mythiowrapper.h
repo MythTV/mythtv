@@ -1,11 +1,15 @@
 #ifndef __MYTHIOWRAPPER__
 #define __MYTHIOWRAPPER__
 
+#ifdef __cplusplus
+#include <cstring>
+#else
+#include <string.h>
+#endif
+#include <strings.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <string.h>
-#include <strings.h>
 
 #include "mythtvexp.h"
 

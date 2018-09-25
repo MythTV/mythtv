@@ -1,8 +1,10 @@
 // -*- Mode: c++ -*-
 
-#include <string.h>
-#include <stdint.h>
+#include <cstring>
+#include <cstdint>
+
 #include <QSize>
+
 #include "compat.h"
 #include "util-opengl.h"
 
