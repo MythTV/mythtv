@@ -24,7 +24,6 @@
 
 // C++ headers
 #include <algorithm>
-using std::max;
 using std::min;
 
 #define LOC     QString("PulseAudio: ")
