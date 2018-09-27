@@ -367,11 +367,8 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
     // if there is a pending jump point pass the key press to the default handler
     if (GetMythMainWindow()->IsExitingToMain())
     {
-        // do we need to stop playing?
-        if (gPlayer->isPlaying() && gCoreContext->GetSetting("MusicJumpPointAction", "stop") == "stop")
-            gPlayer->stop(true);
-
-        return MythScreenType::keyPressEvent(event);
+        // Just call the parent handler.  It will properly clean up.
+        return MusicCommon::keyPressEvent(event);
     }
 
     if (!m_moveTrackMode && GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))

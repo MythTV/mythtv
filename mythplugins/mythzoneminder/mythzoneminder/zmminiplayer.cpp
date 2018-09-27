@@ -107,6 +107,8 @@ void ZMMiniPlayer::customEvent (QEvent* event)
         }
     }
 
+    // Parent MythUIType handler always returns false. (Shouldn't it
+    // call up?)  Continue to call QObject as before.
     QObject::customEvent(event);
 }
 

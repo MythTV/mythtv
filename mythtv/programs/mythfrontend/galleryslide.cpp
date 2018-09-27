@@ -177,6 +177,8 @@ void SequentialAnimation::Start(bool forwards, float speed)
     m_current = forwards ? 0 : m_group.size() - 1;
 
     // Start group, then first child
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::Start(forwards, speed);
     m_group.at(m_current)->Start(m_forwards, m_speed);
 }
@@ -189,6 +191,8 @@ void SequentialAnimation::Start(bool forwards, float speed)
 void SequentialAnimation::SetSpeed(float speed)
 {
     // Set group speed for subsequent children
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::SetSpeed(speed);
 
     // Set active child
@@ -240,6 +244,8 @@ void ParallelAnimation::Start(bool forwards, float speed)
     m_finished = m_group.size();
 
     // Start group, then all children
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::Start(forwards, speed);
     foreach(AbstractAnimation *animation, m_group)
         animation->Start(m_forwards, m_speed);
@@ -253,6 +259,8 @@ void ParallelAnimation::Start(bool forwards, float speed)
 void ParallelAnimation::SetSpeed(float speed)
 {
     // Set group speed, then all children
+    // Parent function explicitly set to zero. Have to call
+    // grandparent directly to get work done.
     AbstractAnimation::SetSpeed(speed);
     foreach(AbstractAnimation *animation, m_group)
         animation->SetSpeed(m_speed);

@@ -2863,7 +2863,7 @@ void NuppelVideoRecorder::FinishRecording(void)
 
     WriteSeekTable();
 
-    RecorderBase::FinishRecording();
+    V4LRecorder::FinishRecording();
     
     positionMapLock.lock();
     positionMap.clear();
