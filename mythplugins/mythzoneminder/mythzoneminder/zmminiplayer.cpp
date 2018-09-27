@@ -146,8 +146,5 @@ bool ZMMiniPlayer::keyPressEvent(QKeyEvent *event)
     if (!handled && ZMLivePlayer::keyPressEvent(event))
         handled = true;
 
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
     return handled;
 }
