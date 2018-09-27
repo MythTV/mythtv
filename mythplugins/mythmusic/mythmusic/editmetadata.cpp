@@ -991,13 +991,11 @@ bool EditAlbumartDialog::keyPressEvent(QKeyEvent *event)
             showMenu();
         else if (action == "INFO")
             showTypeMenu();
-        else if (action == "ESCAPE")
-            showSaveMenu();
         else
             handled = false;
     }
 
-    if (!handled && MythScreenType::keyPressEvent(event))
+    if (!handled && EditMetadataCommon::keyPressEvent(event))
         handled = true;
 
     return handled;
