@@ -3624,6 +3624,7 @@ void CardInput::sourceFetch(void)
         if (!CardUtil::IsCableCardPresent(crdid, cardtype) &&
             !CardUtil::IsUnscanable(cardtype) &&
             !CardUtil::IsEncoder(cardtype)    &&
+            cardtype != "HDHOMERUN"           &&
             !num_channels_before)
         {
             LOG(VB_GENERAL, LOG_ERR, "Skipping channel fetch, you need to "

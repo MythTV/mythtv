@@ -332,7 +332,8 @@ bool SourceUtil::IsCableCardPresent(uint sourceid)
     vector<uint>::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
     {
-        if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawInputType(*it)))
+        if (CardUtil::IsCableCardPresent(*it, CardUtil::GetRawInputType(*it))
+            || CardUtil::GetRawInputType(*it) == "HDHOMERUN")
             ccpresent = true;
     }
 
