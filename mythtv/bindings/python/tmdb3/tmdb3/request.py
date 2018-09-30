@@ -132,8 +132,8 @@ class Request(urllib2.Request):
                     if data.get('status_code', 1) ==25:
                         # Sleep and retry query.
                         if DEBUG:
-                            print 'Retry after {0} seconds'.format(max(float(e.headers['retry-after']),10))
-                        time.sleep(max(float(e.headers['retry-after']),10))
+                            print 'Retry after {0} seconds'.format(min(float(e.headers['retry-after']),10))
+                        time.sleep(min(float(e.headers['retry-after']),10))
                         continue
                     else:
                         # response parsed, try to raise error from TMDB
