@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <thread> // for sleep_for
+#include <assert.h>
 
 using namespace std;
 
@@ -210,12 +211,17 @@ class DDLoader : public QRunnable
     QWaitCondition m_wait;
 };
 
+static const MenuBase dummy_menubase;
+
 class MenuNodeTuple
 {
 public:
     MenuNodeTuple(const MenuBase &menu, const QDomNode &node) :
         m_menu(menu), m_node(node) {}
-    MenuNodeTuple(void) : m_menu(MenuBase()) {}
+    MenuNodeTuple(void) : m_menu(dummy_menubase)
+        {
+            assert("Should never be reached.");
+        }
     const MenuBase &m_menu;
     const QDomNode  m_node;
 };
