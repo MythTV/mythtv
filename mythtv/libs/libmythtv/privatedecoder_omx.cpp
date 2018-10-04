@@ -34,8 +34,10 @@ using namespace omxcontext;
 
 // VideoFrame <> OMX_BUFFERHEADERTYPE
 #define FRAMESETHDR(f,h) ((f)->priv[2] = reinterpret_cast<unsigned char* >(h))
+#define FRAMESETHDRNONE(f) ((f)->priv[2] = nullptr)
 #define FRAME2HDR(f) ((OMX_BUFFERHEADERTYPE*)((f)->priv[2]))
 #define FRAMESETREF(f,r) ((f)->priv[1] = reinterpret_cast<unsigned char* >(r))
+#define FRAMESETREFNONE(f) ((f)->priv[1] = nullptr)
 #define FRAME2REF(f) ((AVBufferRef*)((f)->priv[1]))
 #define HDR2FRAME(h) ((VideoFrame*)((h)->pAppPrivate))
 
@@ -578,12 +580,12 @@ OMX_ERRORTYPE PrivateDecoderOMX::FreeOutputBuffersCB()
         VideoFrame *frame = HDR2FRAME(hdr);
         if (frame && FRAME2HDR(frame) == hdr)
         {
-            FRAMESETHDR(frame, 0);
+            FRAMESETHDRNONE(frame);
 
             AVBufferRef *ref = FRAME2REF(frame);
             if (ref)
             {
-                FRAMESETREF(frame, 0);
+                FRAMESETREFNONE(frame);
                 av_buffer_unref(&ref);
             }
         }
@@ -998,7 +1000,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
 
             // Indicate the buffered frame from the completed OMX buffer
             picture->buf[0] = FRAME2REF(frame);
-            FRAMESETREF(frame, 0);
+            FRAMESETREFNONE(frame);
             picture->opaque = frame;
         }
         else if (in_fmt == avctx->pix_fmt)
