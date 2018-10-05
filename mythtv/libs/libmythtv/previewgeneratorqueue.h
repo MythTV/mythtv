@@ -116,7 +116,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     uint IncPreviewGeneratorAttempts(const QString &key);
     void ClearPreviewGeneratorAttempts(const QString &key);
 
-    virtual bool event(QEvent *e); // QObject
+    bool event(QEvent *e) override; // QObject
 
     void SendEvent(const ProgramInfo &pginfo,
                    const QString     &eventname,

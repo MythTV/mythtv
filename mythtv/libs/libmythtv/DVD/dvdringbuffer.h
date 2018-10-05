@@ -105,26 +105,26 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int  GetPart(void)         const { return m_part;                   }
     int  GetCurrentAngle(void) const { return m_currentAngle;           }
     int  GetNumAngles(void)          { return m_currentTitleAngleCount; }
-    bool IsOpen(void)          const { return m_dvdnav;                 }
+    bool IsOpen(void)          const override { return m_dvdnav;        } // RingBuffer
     long long GetTotalReadPosition(void) { return m_titleLength;        }
     uint GetChapterLength(void)    const { return m_pgLength / 90000;   }
     void GetChapterTimes(QList<long long> &times);
     uint64_t GetChapterTimes(uint title);
-    virtual long long GetReadPosition(void) const;
+    long long GetReadPosition(void) const override; // RingBuffer
     void GetDescForPos(QString &desc);
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = m_part; _title = m_title; }
     uint GetTotalTimeOfTitle(void);
     float GetAspectOverride(void)     { return m_forcedAspect; }
-    virtual bool IsBookmarkAllowed(void);
-    virtual bool IsSeekingAllowed(void);
-    virtual bool IsStreamed(void)     { return true; }
-    virtual int  BestBufferSize(void) { return 2048; }
+    bool IsBookmarkAllowed(void) override; // RingBuffer
+    bool IsSeekingAllowed(void) override; // RingBuffer
+    bool IsStreamed(void) override    { return true; } // RingBuffer
+    int  BestBufferSize(void) override { return 2048; } // RingBuffer
 
     uint GetCellStart(void);
     bool PGCLengthChanged(void);
     bool CellChanged(void);
-    virtual bool IsInStillFrame(void)   const { return m_still > 0;             }
+    bool IsInStillFrame(void) const override { return m_still > 0; } // RingBuffer
     bool IsStillFramePending(void) const { return dvdnav_get_next_still_flag(m_dvdnav) > 0; }
     bool AudioStreamsChanged(void) const { return m_audioStreamsChanged; }
     bool IsWaiting(void) const           { return m_dvdWaiting;          }
@@ -141,8 +141,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     int         NumMenuButtons(void) const;
     QRect       GetButtonCoords(void);
     void        ReleaseMenuButton(void);
-    virtual bool IsInMenu(void) const { return m_inMenu; }
-    virtual bool HandleAction(const QStringList &actions, int64_t pts);
+    bool IsInMenu(void) const override { return m_inMenu; } // RingBuffer
+    bool HandleAction(const QStringList &actions, int64_t pts) override; // RingBuffer
 
     // Subtitles
     uint GetSubtitleLanguage(int key);
@@ -164,11 +164,11 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
                                      (m_titleParts == 1)); }
 
     // commands
-    virtual bool OpenFile(const QString &lfilename,
-                          uint retry_ms = kDefaultOpenTimeout);
+    bool OpenFile(const QString &lfilename,
+                  uint retry_ms = kDefaultOpenTimeout) override; //RingBuffer
     void PlayTitleAndPart(int _title, int _part)
         { dvdnav_part_play(m_dvdnav, _title, _part); }
-    virtual bool StartFromBeginning(void);
+    bool StartFromBeginning(void) override; //RingBuffer
     void CloseDVD(void);
     bool playTrack(int track);
     bool nextTrack(void);
@@ -185,7 +185,7 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void GoToPreviousProgram(void);
     bool GoBack(void);
 
-    virtual void IgnoreWaitStates(bool ignore) { m_skipstillorwait = ignore; }
+    void IgnoreWaitStates(bool ignore) override { m_skipstillorwait = ignore; } // RingBuffer
     void AudioStreamsChanged(bool change) { m_audioStreamsChanged = change; }
     int64_t GetCurrentTime(void)          { return (m_currentTime / 90000); }
     uint TitleTimeLeft(void);
@@ -199,8 +199,8 @@ class MTV_PUBLIC DVDRingBuffer : public RingBuffer
     void SetParent(MythDVDPlayer *p) { m_parent = p; }
 
   protected:
-    virtual int safe_read(void *data, uint sz);
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint sz) override; //RingBuffer
+    long long SeekInternal(long long pos, int whence) override; //RingBuffer
 
     typedef enum
     {

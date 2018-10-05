@@ -22,8 +22,8 @@ class ProfileGroupStorage : public SimpleDBStorage
     {
     }
 
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
     const ProfileGroup& m_parent;
 };
 
@@ -51,8 +51,8 @@ class ProfileGroup : public GroupSetting
             setVisible(false);
         }
 
-        virtual void edit(MythScreenType * /*screen*/) { }
-        virtual void resultEdit(DialogCompletionEvent * /*dce*/) { }
+        void edit(MythScreenType * /*screen*/) override { } // StandardSetting
+        void resultEdit(DialogCompletionEvent * /*dce*/) override { } // StandardSetting
     };
 
     class Name : public MythUITextEditSetting
@@ -106,7 +106,8 @@ public:
 
     QString getName(void) const { return name->getValue(); };
     static QString getName(int group);
-    void setName(const QString& newName) { name->setValue(newName); };
+    void setName(const QString& newName) override // StandardSetting
+        { name->setValue(newName); };
     bool allowedGroupName(void);
 
 private:
@@ -125,7 +126,7 @@ class MTV_PUBLIC ProfileGroupEditor :
   public:
     ProfileGroupEditor() { setLabel(tr("Profile Group")); }
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 };
 
 #endif

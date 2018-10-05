@@ -183,7 +183,7 @@ class VAAPIDisplay : ReferenceCounter
         return ok;
     }
 
-    virtual int DecrRef(void)
+    int DecrRef(void) override // ReferenceCounter
     {
         QMutexLocker locker(&s_VAAPIDisplayLock);
 

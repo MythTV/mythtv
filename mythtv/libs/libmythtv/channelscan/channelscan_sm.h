@@ -73,10 +73,10 @@ class AnalogSignalHandler : public SignalMonitorListener
     explicit AnalogSignalHandler(ChannelScanSM *_siscan) : siscan(_siscan) { }
 
   public:
-    virtual inline void AllGood(void);
-    virtual void StatusSignalLock(const SignalMonitorValue&) { }
-    virtual void StatusChannelTuned(const SignalMonitorValue&) { }
-    virtual void StatusSignalStrength(const SignalMonitorValue&) { }
+    inline void AllGood(void) override; // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
 
   private:
     ChannelScanSM *siscan;
@@ -136,25 +136,25 @@ class ChannelScanSM : public MPEGStreamListener,
     ScanDTVTransportList GetChannelList(bool addFullTS) const;
 
     // MPEG
-    void HandlePAT(const ProgramAssociationTable*);
-    void HandleCAT(const ConditionalAccessTable*) { }
-    void HandlePMT(uint, const ProgramMapTable*);
-    void HandleEncryptionStatus(uint pnum, bool encrypted);
+    void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable*) override { } // MPEGStreamListener
+    void HandlePMT(uint, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandleEncryptionStatus(uint pnum, bool encrypted) override; // MPEGStreamListener
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) {}
-    void HandleMGT(const MasterGuideTable*);
-    void HandleVCT(uint tsid, const VirtualChannelTable*);
+    void HandleSTT(const SystemTimeTable*) override {} // ATSCMainStreamListener
+    void HandleMGT(const MasterGuideTable*) override; // ATSCMainStreamListener
+    void HandleVCT(uint tsid, const VirtualChannelTable*) override; // ATSCMainStreamListener
 
     // DVB Main
-    void HandleNIT(const NetworkInformationTable*);
-    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
-    void HandleTDT(const TimeDateTable*) {}
+    void HandleNIT(const NetworkInformationTable*) override; // DVBMainStreamListener
+    void HandleSDT(uint tsid, const ServiceDescriptionTable*) override; // DVBMainStreamListener
+    void HandleTDT(const TimeDateTable*) override {} // DVBMainStreamListener
 
     // DVB Other
-    void HandleNITo(const NetworkInformationTable*) {}
-    void HandleSDTo(uint tsid, const ServiceDescriptionTable*);
-    void HandleBAT(const BouquetAssociationTable*);
+    void HandleNITo(const NetworkInformationTable*) override {} // DVBOtherStreamListener
+    void HandleSDTo(uint tsid, const ServiceDescriptionTable*) override; // DVBOtherStreamListener
+    void HandleBAT(const BouquetAssociationTable*) override; // DVBOtherStreamListener
 
   private:
     // some useful gets
@@ -165,7 +165,7 @@ class ChannelScanSM : public MPEGStreamListener,
     DVBChannel       *GetDVBChannel(void);
     const DVBChannel *GetDVBChannel(void) const;
 
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);

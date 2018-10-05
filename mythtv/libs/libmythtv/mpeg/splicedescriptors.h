@@ -117,7 +117,7 @@ class AvailDescriptor : SpliceDescriptor
             QChar(_data[8]) + QChar(_data[9]);
     }
 
-    virtual QString toString(void) const
+    QString toString(void) const override // SpliceDescriptor
     {
         return QString("Splice Avail: id(%1)").arg(ProviderAvailId());
     }
@@ -149,7 +149,7 @@ class DTMFDescriptor : SpliceDescriptor
 
     static bool IsParsible(const unsigned char *data, uint safe_bytes);
 
-    virtual QString toString(void) const
+    QString toString(void) const override // SpliceDescriptor
     {
         return QString("Splice DTMF: %1").arg(DTMFString());
     }
@@ -275,8 +275,8 @@ class SegmentationDescriptor : SpliceDescriptor
     uint SegmentsExpected(void) const { return _ptrs[2][2]; }
     // }
 
-    virtual bool Parse(void);
-    QString toString(void) const;
+    bool Parse(void) override; // SpliceDescriptor
+    QString toString(void) const override; // SpliceDescriptor
 
     // _ptrs[0] = program_segmentation_flag ? 12 : 13 + component_count * 6
     // _ptrs[1] = _ptrs[0] + HasSegmentationDuration() ? 5 : 0

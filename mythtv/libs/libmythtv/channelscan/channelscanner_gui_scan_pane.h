@@ -49,7 +49,7 @@ class ChannelScannerGUIScanPane : public MythScreenType
         bool lock, bool strength, bool snr, bool rotorpos,
         MythScreenStack *parent);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
     void SetStatusRotorPosition(int value);
     void SetStatusSignalToNoise(int value);

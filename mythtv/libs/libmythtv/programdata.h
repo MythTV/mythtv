@@ -244,9 +244,9 @@ class MTV_PUBLIC ProgInfo : public DBEvent
 
     ProgInfo(const ProgInfo &other);
 
-    uint InsertDB(MSqlQuery &query, uint chanid) const;
+    uint InsertDB(MSqlQuery &query, uint chanid) const override; // DBEvent
 
-    void Squeeze(void);
+    void Squeeze(void) override; // DBEvent
 
     ProgInfo &operator=(const ProgInfo&);
 

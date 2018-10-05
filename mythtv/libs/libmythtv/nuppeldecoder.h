@@ -41,21 +41,23 @@ class NuppelDecoder : public DecoderBase
 
     int OpenFile(RingBuffer *rbuffer, bool novideo, 
                  char testbuf[kDecoderProbeBufferSize], 
-                 int testbufsize = kDecoderProbeBufferSize);
+                 int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
-    virtual bool GetFrame(DecodeType); // DecoderBase
+    bool GetFrame(DecodeType) override; // DecoderBase
 
     // lastFrame is really (framesPlayed - 1) since we increment after getting
-    virtual bool IsLastFrameKey(void) const
-        { return (lastKey == framesPlayed); } // DecoderBase
-    void WriteStoredData(RingBuffer *rb, bool writevid, long timecodeOffset);
-    void ClearStoredData(void);
+    bool IsLastFrameKey(void) const override // DecoderBase
+        { return (lastKey == framesPlayed); }
+    void WriteStoredData(RingBuffer *rb, bool writevid,
+                         long timecodeOffset) override; // DecoderBase
+    void ClearStoredData(void) override; // DecoderBase
 
-    long UpdateStoredFrameNum(long framenumber);
+    long UpdateStoredFrameNum(long framenumber) override; // DecoderBase
 
-    QString GetCodecDecoderName(void) const { return "nuppel"; }
-    QString GetRawEncodingType(void);
-    MythCodecID GetVideoCodecID(void) const;
+    QString GetCodecDecoderName(void) const override // DecoderBase
+         { return "nuppel"; }
+    QString GetRawEncodingType(void) override; // DecoderBase
+    MythCodecID GetVideoCodecID(void) const override; // DecoderBase
 
   private:
     inline bool ReadFileheader(struct rtfileheader *fileheader);
@@ -72,7 +74,7 @@ class NuppelDecoder : public DecoderBase
     void StoreRawData(unsigned char *strm);
 
     void SeekReset(long long newKey = 0, uint skipFrames = 0,
-                   bool needFlush = false, bool discardFrames = false);
+                   bool needFlush = false, bool discardFrames = false) override; // DecoderBase
 
     friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
     friend void release_nuppel_buffer(void *opaque, uint8_t *data);

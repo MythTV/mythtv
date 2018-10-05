@@ -170,7 +170,7 @@ class MTV_PUBLIC RingBuffer : protected MThread
   protected:
     explicit RingBuffer(RingBufferType rbtype);
 
-    void run(void); // MThread
+    void run(void) override; // MThread
     void CreateReadAheadBuffer(void);
     void CalcReadAheadThresh(void);
     bool PauseAndWait(void);

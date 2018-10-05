@@ -233,7 +233,7 @@ class XMLTVGrabber : public MythUIComboBoxSetting
         setLabel(QObject::tr("Listings grabber"));
     };
 
-    void Load(void)
+    void Load(void) override // StandardSetting
     {
         addTargetedChild("schedulesdirect1",
                          new DataDirect_config(m_parent, DD_SCHEDULES_DIRECT,
@@ -300,7 +300,7 @@ class XMLTVGrabber : public MythUIComboBoxSetting
 #endif
     }
 
-    void Save(void)
+    void Save(void) override // StandardSetting
     {
         MythUIComboBoxSetting::Save();
 
@@ -1145,7 +1145,7 @@ class DVBCardNum : public CaptureCardComboBoxSetting
         }
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         clearSelections();
         addSelection(QString());
@@ -1943,7 +1943,7 @@ class ASIDevice : public CaptureCardComboBoxSetting
         }
     }
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         clearSelections();
         addSelection(QString());
@@ -3015,7 +3015,7 @@ class InputName : public MythUIComboBoxSetting
         setLabel(QObject::tr("Input name"));
     };
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         fillSelections();
         MythUIComboBoxSetting::Load();
@@ -3071,7 +3071,7 @@ class SourceID : public CardInputComboBoxSetting
         addSelection(QObject::tr("(None)"), "0");
     };
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         fillSelections();
         CardInputComboBoxSetting::Load();
@@ -3099,9 +3099,9 @@ class InputGroup : public TransMythUIComboBoxSetting
                         "group will be allowed to record at any given time."));
     }
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         uint inputid     = cardinput.getInputID();
         uint new_groupid = getValue().toUInt();

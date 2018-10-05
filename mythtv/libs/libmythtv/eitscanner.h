@@ -41,7 +41,7 @@ class EITScanner : public QRunnable
     void StopActiveScan(void);
 
   protected:
-    void run(void);
+    void run(void) override; // QRunnable
 
   private:
     void TeardownAll(void);

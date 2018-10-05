@@ -22,7 +22,7 @@ class DiseqcConfigBase : public GroupSetting
     Q_OBJECT
 
   public:
-    virtual bool keyPressEvent(QKeyEvent *);
+    bool keyPressEvent(QKeyEvent *) override; // StandardSetting
     static DiseqcConfigBase* CreateByType(DiSEqCDevDevice *dev,
                                           StandardSetting *parent);
 
@@ -36,7 +36,7 @@ class SwitchConfig : public DiseqcConfigBase
 
   public:
     SwitchConfig(DiSEqCDevSwitch &switch_dev, StandardSetting *parent);
-    void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void update(void);
@@ -55,8 +55,8 @@ class RotorPosMap : public GroupSetting
   public:
     explicit RotorPosMap(DiSEqCDevRotor &rotor);
 
-    virtual void Load(void);
-    virtual void Save(void);
+    void Load(void) override; // StandardSetting
+    void Save(void) override; // StandardSetting
 
   private slots:
     void valueChanged(StandardSetting*);
@@ -74,7 +74,7 @@ class RotorConfig : public DiseqcConfigBase
     Q_OBJECT
 
   public:
-    void Load();
+    void Load() override; // StandardSetting
     RotorConfig(DiSEqCDevRotor &rotor, StandardSetting *parent);
 
   public slots:
@@ -109,7 +109,7 @@ class LNBConfig : public DiseqcConfigBase
 
   public:
     LNBConfig(DiSEqCDevLNB &lnb, StandardSetting *parent);
-    void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void SetPreset(const QString &value);
@@ -134,7 +134,7 @@ class DeviceTree : public GroupSetting
     explicit DeviceTree(DiSEqCDevTree &tree);
     void DeleteDevice(DeviceTypeSetting *devtype);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   protected:
     void PopulateTree(void);

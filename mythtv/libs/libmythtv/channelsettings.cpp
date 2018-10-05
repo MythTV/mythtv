@@ -72,7 +72,7 @@ class Source : public MythUIComboBoxSetting
         setLabel(QCoreApplication::translate("(Common)", "Video Source"));
     }
 
-    void Load(void)
+    void Load(void) override // StandardSetting
     {
         fillSelections();
         StandardSetting::Load();
@@ -261,7 +261,7 @@ class XmltvID : public MythUIComboBoxSetting
             "'mythfilldatabase' is run."));
     }
 
-    void Load(void)
+    void Load(void) override // StandardSetting
     {
         fillSelections();
         StandardSetting::Load();
@@ -317,7 +317,7 @@ class ServiceID : public MythUISpinBoxSetting
                 "If there is only one channel, then setting this to anything will still find it."));
     }
 
-    void Load(void)
+    void Load(void) override // StandardSetting
     {
         StandardSetting::Load();
 
@@ -325,7 +325,7 @@ class ServiceID : public MythUISpinBoxSetting
             setValue("-1");
     }
 
-    QString getValue(void) const
+    QString getValue(void) const override // StandardSetting
     {
         if (StandardSetting::getValue().toInt() == -1)
             return QString();

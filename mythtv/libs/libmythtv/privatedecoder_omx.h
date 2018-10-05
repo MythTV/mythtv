@@ -29,24 +29,25 @@ class PrivateDecoderOMX : public PrivateDecoder, private OMXComponentCtx
     virtual ~PrivateDecoderOMX();
 
     // PrivateDecoder implementation
-    virtual QString GetName(void);
-    virtual bool Init(const QString &decoder,
-                      PlayerFlags flags,
-                      AVCodecContext *avctx);
-    virtual bool Reset(void);
-    virtual int  GetFrame(AVStream *stream,
-                          AVFrame *picture,
-                          int *got_picture_ptr,
-                          AVPacket *pkt);
-    virtual bool HasBufferedFrames(void);
-    virtual bool NeedsReorderedPTS(void) { return true; }
+    QString GetName(void) override; // PrivateDecoder
+    bool Init(const QString &decoder,
+              PlayerFlags flags,
+              AVCodecContext *avctx) override; // PrivateDecoder
+    bool Reset(void) override; // PrivateDecoder
+    int  GetFrame(AVStream *stream,
+                  AVFrame *picture,
+                  int *got_picture_ptr,
+                  AVPacket *pkt) override; // PrivateDecoder
+    bool HasBufferedFrames(void) override; // PrivateDecoder
+    bool NeedsReorderedPTS(void)  override // PrivateDecoder
+        { return true; }
 
   private:
     // OMXComponentCtx implementation
-    virtual OMX_ERRORTYPE Event(OMXComponent&, OMX_EVENTTYPE, OMX_U32, OMX_U32, OMX_PTR);
-    virtual OMX_ERRORTYPE EmptyBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*);
-    virtual OMX_ERRORTYPE FillBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*);
-    virtual void ReleaseBuffers(OMXComponent&);
+    OMX_ERRORTYPE Event(OMXComponent&, OMX_EVENTTYPE, OMX_U32, OMX_U32, OMX_PTR) override; // OMXComponentCtx
+    OMX_ERRORTYPE EmptyBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*) override; // OMXComponentCtx
+    OMX_ERRORTYPE FillBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*) override; // OMXComponentCtx
+    void ReleaseBuffers(OMXComponent&) override; // OMXComponentCtx
 
   private:
     // OMXComponentCB actions

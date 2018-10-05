@@ -103,8 +103,8 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     double TimeOffset(void) const;
 
     // EIT Source
-    virtual void SetEITHelper(EITHelper *eit_helper);
-    virtual void SetEITRate(float rate);
+    void SetEITHelper(EITHelper *eit_helper) override; // EITSource
+    void SetEITRate(float rate) override; // EITSource
     virtual bool HasEITPIDChanges(const uint_vec_t& /*in_use_pids*/) const
         { return false; }
     virtual bool GetEITPIDChanges(const uint_vec_t& /*in_use_pids*/,

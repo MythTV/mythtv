@@ -97,11 +97,12 @@ class AvFormatDecoder : public DecoderBase
                     PlayerFlags flags);
     virtual ~AvFormatDecoder();
 
-    virtual void SetEof(bool eof);
+    void SetEof(bool eof) override; // DecoderBase
 
     void CloseCodecs();
     void CloseContext();
-    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
+    void Reset(bool reset_video_data, bool seek_reset,
+               bool reset_file) override; // DecoderBase
 
     /// Perform an av_probe_input_format on the passed data to see if we
     /// can decode it with this class.
@@ -112,72 +113,72 @@ class AvFormatDecoder : public DecoderBase
     /// Open our file and set up or audio and video parameters.
     int OpenFile(RingBuffer *rbuffer, bool novideo, 
                  char testbuf[kDecoderProbeBufferSize],
-                 int testbufsize = kDecoderProbeBufferSize);
+                 int testbufsize = kDecoderProbeBufferSize) override; // DecoderBase
 
-    virtual bool GetFrame(DecodeType); // DecoderBase
+    bool GetFrame(DecodeType) override; // DecoderBase
 
-    virtual bool IsLastFrameKey(void) const { return false; } // DecoderBase
+    bool IsLastFrameKey(void) const override { return false; } // DecoderBase
 
-    virtual bool IsCodecMPEG(void) const
-        { return codec_is_mpeg; } // DecoderBase
-
-    /// This is a No-op for this class.
-    void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
-                           { (void)rb; (void)storevid; (void)timecodeOffset;}
+    bool IsCodecMPEG(void) const override // DecoderBase
+        { return codec_is_mpeg; }
 
     /// This is a No-op for this class.
-    void SetRawAudioState(bool state) { (void)state; }
+    void WriteStoredData(RingBuffer *rb, bool storevid,
+                         long timecodeOffset) override // DecoderBase
+        { (void)rb; (void)storevid; (void)timecodeOffset;}
 
     /// This is a No-op for this class.
-    bool GetRawAudioState(void) const { return false; }
+    void SetRawAudioState(bool state) override { (void)state; } // DecoderBase
 
     /// This is a No-op for this class.
-    void SetRawVideoState(bool state) { (void)state; }
+    bool GetRawAudioState(void) const override { return false; } // DecoderBase
 
     /// This is a No-op for this class.
-    bool GetRawVideoState(void) const { return false; }
+    void SetRawVideoState(bool state) override { (void)state; } // DecoderBase
 
     /// This is a No-op for this class.
-    long UpdateStoredFrameNum(long frame) { (void)frame; return 0;}
+    bool GetRawVideoState(void) const override { return false; } // DecoderBase
 
-    QString      GetCodecDecoderName(void) const;
-    QString      GetRawEncodingType(void);
-    MythCodecID  GetVideoCodecID(void) const { return video_codec_id; }
-    void        *GetVideoCodecPrivate(void);
+    /// This is a No-op for this class.
+    long UpdateStoredFrameNum(long frame) override { (void)frame; return 0;} // DecoderBase
 
-    virtual void SetDisablePassThrough(bool disable);
-    virtual void ForceSetupAudioStream(void);
+    QString      GetCodecDecoderName(void) const override; // DecoderBase
+    QString      GetRawEncodingType(void) override; // DecoderBase
+    MythCodecID  GetVideoCodecID(void) const override { return video_codec_id; } // DecoderBase
+    void        *GetVideoCodecPrivate(void) override; // DecoderBase
+
+    void SetDisablePassThrough(bool disable) override; // DecoderBase
+    void ForceSetupAudioStream(void) override; // DecoderBase
     void AddTextData(unsigned char *buf, int len, int64_t timecode, char type);
 
-    virtual QString GetTrackDesc(uint type, uint trackNo) const;
-    virtual int SetTrack(uint type, int trackNo);
+    QString GetTrackDesc(uint type, uint trackNo) const override; // DecoderBase
+    int SetTrack(uint type, int trackNo) override; // DecoderBase
 
     int ScanStreams(bool novideo);
     int FindStreamInfo(void);
 
-    virtual int  GetNumChapters();
-    virtual void GetChapterTimes(QList<long long> &times);
-    virtual int  GetCurrentChapter(long long framesPlayed);
-    virtual long long GetChapter(int chapter);
-    virtual bool DoRewind(long long desiredFrame, bool doflush = true);
-    virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
-    virtual void SetIdrOnlyKeyframes(bool value) {
-        m_h264_parser->use_I_forKeyframes(!value);
-    }
+    int  GetNumChapters() override; // DecoderBase
+    void GetChapterTimes(QList<long long> &times) override; // DecoderBase
+    int  GetCurrentChapter(long long framesPlayed) override; // DecoderBase
+    long long GetChapter(int chapter) override; // DecoderBase
+    bool DoRewind(long long desiredFrame, bool doflush = true) override; // DecoderBase
+    bool DoFastForward(long long desiredFrame, bool doflush = true) override; // DecoderBase
+    void SetIdrOnlyKeyframes(bool value) override // DecoderBase
+        { m_h264_parser->use_I_forKeyframes(!value); }
 
-    virtual int64_t NormalizeVideoTimecode(int64_t timecode);
+    int64_t NormalizeVideoTimecode(int64_t timecode) override; // DecoderBase
     virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
 
-    virtual int  GetTeletextDecoderType(void) const;
+    int  GetTeletextDecoderType(void) const override; // DecoderBase
 
-    virtual QString GetXDS(const QString&) const;
-    virtual QByteArray GetSubHeader(uint trackNo) const;
-    virtual void GetAttachmentData(uint trackNo, QByteArray &filename,
-                                   QByteArray &data);
+    QString GetXDS(const QString&) const override; // DecoderBase
+    QByteArray GetSubHeader(uint trackNo) const override; // DecoderBase
+    void GetAttachmentData(uint trackNo, QByteArray &filename,
+                           QByteArray &data) override; // DecoderBase
 
     // MHEG stuff
-    virtual bool SetAudioByComponentTag(int tag);
-    virtual bool SetVideoByComponentTag(int tag);
+    bool SetAudioByComponentTag(int tag) override; // DecoderBase
+    bool SetVideoByComponentTag(int tag) override; // DecoderBase
 
     // Stream language info
     virtual int GetTeletextLanguage(uint lang_idx) const;
@@ -189,7 +190,7 @@ class AvFormatDecoder : public DecoderBase
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
-    virtual int AutoSelectTrack(uint type);
+    int AutoSelectTrack(uint type) override; // DecoderBase
 
     void ScanATSCCaptionStreams(int av_stream_index);
     void UpdateATSCCaptionTracks(void);
@@ -242,7 +243,7 @@ class AvFormatDecoder : public DecoderBase
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
-    void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
+    void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
 
     inline bool DecoderWillDownmix(const AVCodecContext *ctx);
     bool DoPassThrough(const AVCodecParameters *ctx, bool withProfile=true);
@@ -260,9 +261,9 @@ class AvFormatDecoder : public DecoderBase
     void av_update_stream_timings_video(AVFormatContext *ic);
     bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 
-    virtual void UpdateFramesPlayed(void);
-    virtual bool DoRewindSeek(long long desiredFrame);
-    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
+    void UpdateFramesPlayed(void) override; // DecoderBase
+    bool DoRewindSeek(long long desiredFrame) override; // DecoderBase
+    void DoFastForwardSeek(long long desiredFrame, bool &needflush) override; // DecoderBase
     virtual void StreamChangeCheck(void);
     virtual void PostProcessTracks(void) { }
     virtual bool IsValidStream(int /*streamid*/) {return true;}

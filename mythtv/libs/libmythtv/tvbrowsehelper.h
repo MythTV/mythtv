@@ -108,7 +108,7 @@ class TVBrowseHelper : public MThread
     void GetNextProgram(BrowseDirection direction, InfoMap &infoMap) const;
     void GetNextProgramDB(BrowseDirection direction, InfoMap &infoMap) const;
 
-    virtual void run();
+    void run() override; // MThread
 
     TV               *m_tv;
     ChannelInfoList   db_all_channels;

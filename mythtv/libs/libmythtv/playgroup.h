@@ -24,7 +24,7 @@ class MTV_PUBLIC PlayGroupEditor : public GroupSetting
 
   public:
     PlayGroupEditor(void);
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void CreateNewPlayBackGroup();
@@ -40,10 +40,10 @@ class MTV_PUBLIC PlayGroupConfig : public GroupSetting
 
   public:
     PlayGroupConfig(const QString &label, const QString &name, bool isNew=false);
-    virtual void updateButton(MythUIButtonListItem *item);
-    virtual void Save();
-    virtual bool canDelete(void);
-    virtual void deleteEntry(void);
+    void updateButton(MythUIButtonListItem *item) override; // GroupSetting
+    void Save() override; // StandardSetting
+    bool canDelete(void) override; // GroupSetting
+    void deleteEntry(void) override; // GroupSetting
 
   private:
     StandardSetting            *m_titleMatch;

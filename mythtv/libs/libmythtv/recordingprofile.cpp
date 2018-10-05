@@ -30,8 +30,8 @@ class CodecParamStorage : public SimpleDBStorage
         _setting->setName(name);
     }
 
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const RecordingProfile &m_parent;
     QString codecname;
@@ -127,7 +127,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
 
     };
 
-    void Load(void)
+    void Load(void) override // StandardSetting
     {
         CodecParamStorage::Load();
         QString val = getValue();
@@ -196,7 +196,7 @@ class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
         setHelpText(QObject::tr("Sets the audio type"));
     }
 
-    void Load(void)
+    void Load(void) override // StandardSetting
     {
         CodecParamStorage::Load();
         QString val = getValue();

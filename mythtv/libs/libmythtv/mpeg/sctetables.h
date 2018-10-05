@@ -244,8 +244,8 @@ class MTV_PUBLIC SCTENetworkInformationTable : public PSIPTable
     // CRC_32                  32
 
     bool Parse(void);
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
     vector<const unsigned char*> _ptrs;
@@ -318,8 +318,8 @@ class MTV_PUBLIC NetworkTextTable : public PSIPTable
     // CRC_32                  32
 
     void Parse(void) const;
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 };
 
 class MTV_PUBLIC DefinedChannelsMapSubtable
@@ -555,8 +555,8 @@ class MTV_PUBLIC ShortVirtualChannelTable : public PSIPTable
     // CRC_32                  32
 
     bool Parse(void);
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 
   private:
     vector<const unsigned char*> _ptrs;
@@ -625,8 +625,8 @@ class MTV_PUBLIC SCTESystemTimeTable : public PSIPTable
 
     // CRC_32                  32
 
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 };
 
 // PIM = 0xC0 -- Program Information Message (57 2003) PMT PID
@@ -643,9 +643,9 @@ class MTV_PUBLIC ProgramInformationMessageTable : public PSIPTable
         assert(TableID::PIM == TableID());
     }
 
-    QString toString(void) const
+    QString toString(void) const override // PSIPTable
         { return "Program Information Message\n"; }
-    QString toStringXML(uint /*indent_level*/) const
+    QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<ProgramInformationMessage />"; }
 };
 
@@ -663,9 +663,9 @@ class MTV_PUBLIC ProgramNameMessageTable : public PSIPTable
         assert(TableID::PNM == TableID());
     }
 
-    QString toString(void) const
+    QString toString(void) const override // PSIPTable
         { return "Program Name Message\n"; }
-    QString toStringXML(uint /*indent_level*/) const
+    QString toStringXML(uint /*indent_level*/) const override // PSIPTable
         { return "<ProgramNameMessage />"; }
 };
 
@@ -683,8 +683,8 @@ class MTV_PUBLIC AggregateDataEventTable : public PSIPTable
         assert(TableID::ADET == TableID());
     }
 
-    QString toString(void) const;
-    QString toStringXML(uint indent_level) const;
+    QString toString(void) const override; // PSIPTable
+    QString toStringXML(uint indent_level) const override; // PSIPTable
 };
 
 

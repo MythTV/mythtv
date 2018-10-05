@@ -51,7 +51,7 @@ class TransportSetting : public GroupSetting
     TransportSetting(const QString &label, uint mplexid, uint sourceid,
                      uint cardtype);
 
-    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
 
     uint getMplexId() const;
 
@@ -70,7 +70,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
 
   public:
     explicit TransportListEditor(uint initial_sourceid);
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
     void SetSourceID(uint _sourceid);
 

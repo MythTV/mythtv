@@ -10,10 +10,10 @@ class VideoVisualSpectrum : public VideoVisual
     VideoVisualSpectrum(AudioPlayer *audio, MythRender *render);
     virtual ~VideoVisualSpectrum();
 
-    virtual void Draw(const QRect &area, MythPainter *painter,
-                      QPaintDevice* device);
-    virtual QString Name(void) { return "Spectrum"; }
-    virtual void prepare();
+    void Draw(const QRect &area, MythPainter *painter,
+              QPaintDevice* device) override; // VideoVisual
+    QString Name(void) override { return "Spectrum"; } // VideoVisual
+    void prepare() override; // VideoVisual
 
   protected:
     virtual bool Initialise(const QRect &area);
