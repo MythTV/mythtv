@@ -35,7 +35,7 @@ class ProcessRequestRunnable : public QRunnable
         m_sock->IncrRef();
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         m_parent.ProcessRequest(m_sock);
         m_sock->DecrRef();
