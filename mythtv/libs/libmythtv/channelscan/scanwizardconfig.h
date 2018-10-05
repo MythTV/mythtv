@@ -95,6 +95,8 @@ class ScanTypeSetting : public TransMythUIComboBoxSetting
         ExistingScanImport,
         // Import using the VBox API to get the channel list
         VBoxImport,
+        // Import using the ExternalRecorder API to get the channel list
+        ExternRecImport
     };
 
     ScanTypeSetting() : hw_cardid(0)

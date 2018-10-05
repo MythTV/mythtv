@@ -192,6 +192,8 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
         case CardUtil::EXTERNAL:
             addSelection(tr("MPTS Scan"),
                          QString::number(CurrentTransportScan), true);
+            addSelection(tr("Import from ExternalRecorder"),
+                         QString::number(ExternRecImport), true);
             return;
         case CardUtil::ERROR_PROBE:
             addSelection(tr("Failed to probe the card"),

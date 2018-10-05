@@ -87,12 +87,12 @@ class ExternalStreamHandler : public StreamHandler
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    bool CheckForError(void);
+    bool CheckForStatus(void);
 
     void PurgeBuffer(void);
 
-    bool ProcessCommand(const QString & cmd, uint timeout,
-                        QString & result);
+    bool ProcessCommand(const QString & cmd, uint timeout, QString & result,
+                        int retry_cnt = 10, int wait_cnt = 5);
 
   private:
     int StreamingCount(void) const;

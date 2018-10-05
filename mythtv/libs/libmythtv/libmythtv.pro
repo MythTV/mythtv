@@ -580,6 +580,11 @@ using_backend {
     SOURCES += channelscan/scanmonitor.cpp
     SOURCES += channelscan/scanwizardconfig.cpp
 
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    HEADERS += channelscan/externrecscanner.h
+    SOURCES += channelscan/externrecscanner.cpp
+#endif
+
     # EIT stuff
     HEADERS += eithelper.h                 eitscanner.h
     HEADERS += eitfixup.h                  eitcache.h
@@ -812,6 +817,8 @@ using_backend {
     # External recorder
     HEADERS += recorders/ExternalChannel.h
     SOURCES += recorders/ExternalChannel.cpp
+    HEADERS += recorders/ExternalRecChannelFetcher.h
+    SOURCES += recorders/ExternalRecChannelFetcher.cpp
     HEADERS += recorders/ExternalRecorder.h
     SOURCES += recorders/ExternalRecorder.cpp
     HEADERS += recorders/ExternalStreamHandler.h

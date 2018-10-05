@@ -44,8 +44,13 @@
 #include "vboxchannelfetcher.h"
 #endif
 
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+#include "externrecscanner.h"
+#endif
+
 class ScanMonitor;
 class IPTVChannelFetcher;
+class ExternRecChannelFetcher;
 class ChannelScanSM;
 class ChannelBase;
 
@@ -88,6 +93,8 @@ class MTV_PUBLIC ChannelScanner
                            uint sourceid, bool is_mpts);
     virtual bool ImportVBox(uint cardid, const QString &inputname, uint sourceid,
                             bool ftaOnly, ServiceRequirements serviceType);
+    virtual bool ImportExternRecorder(uint cardid, const QString &inputname,
+                                      uint sourceid);
 
   protected:
     virtual void Teardown(void);
@@ -120,9 +127,13 @@ class MTV_PUBLIC ChannelScanner
 #ifdef USING_VBOX
     VBoxChannelFetcher *vboxScanner;
 #endif
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    ExternRecChannelScanner *m_ExternRecScanner;
+#endif
 
     /// Only fta channels desired post scan?
     bool                freeToAirOnly;
+    int                 m_sourceid;
 
     /// Services desired post scan
     ServiceRequirements serviceRequirements;

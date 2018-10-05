@@ -47,12 +47,20 @@ using namespace std;
 
 #define LOC QString("ChScan: ")
 
-ChannelScanner::ChannelScanner() :
-    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), iptvScanner(NULL),
+ChannelScanner::ChannelScanner()
+    : scanMonitor(NULL)
+    , channel(NULL)
+    , sigmonScanner(NULL)
+    , iptvScanner(NULL)
 #ifdef USING_VBOX
-    vboxScanner(NULL),
+    , vboxScanner(NULL)
 #endif
-    freeToAirOnly(false), serviceRequirements(kRequireAV)
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    , m_ExternRecScanner(NULL)
+#endif
+    , freeToAirOnly(false)
+    , m_sourceid(-1)
+    , serviceRequirements(kRequireAV)
 {
 }
 
@@ -97,6 +105,15 @@ void ChannelScanner::Teardown(void)
     }
 #endif
 
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    if (m_ExternRecScanner)
+    {
+        m_ExternRecScanner->Stop();
+        delete m_ExternRecScanner;
+        m_ExternRecScanner = nullptr;
+    }
+#endif
+
     if (scanMonitor)
     {
         scanMonitor->deleteLater();
@@ -127,6 +144,7 @@ void ChannelScanner::Scan(
 {
     freeToAirOnly = do_fta_only;
     serviceRequirements = service_requirements;
+    m_sourceid = sourceid;
 
     PreScanCommon(scantype, cardid, inputname,
                   sourceid, do_ignore_signal_timeout, do_test_decryption);
@@ -272,6 +290,7 @@ void ChannelScanner::Scan(
 DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     uint sourceid, int cardtype, const QString &file)
 {
+    m_sourceid = sourceid;
     channels.clear();
 
     DTVConfParser::cardtype_t type = DTVConfParser::UNKNOWN;
@@ -314,7 +333,7 @@ bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
 {
     (void) cardid;
     (void) inputname;
-    (void) sourceid;
+    m_sourceid = sourceid;
 
     if (!scanMonitor)
         scanMonitor = new ScanMonitor(this);
@@ -336,6 +355,7 @@ bool ChannelScanner::ImportM3U(uint cardid, const QString &inputname,
 bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sourceid,
                                 bool ftaOnly, ServiceRequirements serviceType)
 {
+    m_sourceid = sourceid;
 #ifdef USING_VBOX
     if (!scanMonitor)
         scanMonitor = new ScanMonitor(this);
@@ -351,7 +371,33 @@ bool ChannelScanner::ImportVBox(uint cardid, const QString &inputname, uint sour
 #else
     (void) cardid;
     (void) inputname;
-    (void) sourceid;
+    return false;
+#endif
+}
+
+bool ChannelScanner::ImportExternRecorder(uint cardid, const QString &inputname,
+                                          uint sourceid)
+{
+    m_sourceid = sourceid;
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+    if (!scanMonitor)
+        scanMonitor = new ScanMonitor(this);
+
+    // Create a External Recorder Channel Fetcher
+    m_ExternRecScanner = new ExternRecChannelScanner(cardid,
+                                                     inputname,
+                                                     sourceid,
+                                                     scanMonitor);
+
+    MonitorProgress(false, false, false, false);
+
+    m_ExternRecScanner->Scan();
+
+    return true;
+#else
+    (void) cardid;
+    (void) inputname;
+
     return false;
 #endif
 }
@@ -443,10 +489,12 @@ void ChannelScanner::PreScanCommon(
     }
 #endif
 
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
     if ("EXTERNAL" == card_type)
     {
         channel = new ExternalChannel(NULL, device);
     }
+#endif
 
     if (!channel)
     {
