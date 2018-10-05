@@ -65,9 +65,8 @@ class ZMLivePlayer : public MythScreenType
     ZMLivePlayer(MythScreenStack *parent, bool isMiniPlayer = false);
     ~ZMLivePlayer();
 
-    bool Create(void);
-
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void setMonitorLayout(int layout, bool restore = false);
 

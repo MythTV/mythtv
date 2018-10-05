@@ -28,7 +28,7 @@ class MPUBLIC ZMClient : public QObject
     static ZMClient *get(void);
     static bool setupZMClient (void);
 
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
     // Used to actually connect to an ZM server
     bool connectToHost(const QString &hostname, unsigned int port);

@@ -38,8 +38,8 @@ class ZMPlayer : public MythScreenType
              std::vector<Event *> *eventList, int *currentEvent);
     ~ZMPlayer();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
     void updateFrame(void);

@@ -35,8 +35,8 @@ public:
     explicit ZMEvents(MythScreenStack *parent);
     ~ZMEvents();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
     void getEventList(void);
