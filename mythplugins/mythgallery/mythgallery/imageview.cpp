@@ -70,7 +70,7 @@ public:
             int slideshow_sequencing);
 
     void abort();
-    virtual void run();
+    void run() override; // QRunnable
 
     /** Separate the input into files and directories */
     static void filterDirectories(const ThumbList &input,

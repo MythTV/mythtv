@@ -43,7 +43,7 @@ class FilterScanThread : public MThread
   public:
     FilterScanThread(const QString& dir, const GalleryFilter& flt,
                      int *dirCount, int *imageCount, int *movieCount);
-    virtual void run();
+    void run() override; // MThread
 
   private:
     GalleryFilter m_filter;

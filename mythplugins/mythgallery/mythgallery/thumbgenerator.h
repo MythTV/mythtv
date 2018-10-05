@@ -63,7 +63,7 @@ public:
 
 protected:
 
-    void run();
+    void run() override; // MThread
 
 private:
 

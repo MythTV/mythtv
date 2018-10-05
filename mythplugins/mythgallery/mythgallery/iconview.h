@@ -57,9 +57,9 @@ class IconView : public MythScreenType
              const QString &galleryDir, MythMediaDevice *initialDevice);
     ~IconView();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent*) override; // MythUIType
     void HandleRandomShow(void);
     void HandleSeasonalShow(void);
 
@@ -191,7 +191,7 @@ public:
     void cancel();
 
 protected:
-    void run();
+    void run() override; // MThread
 
 private:
 
@@ -207,7 +207,7 @@ class ImportThread: public MThread
 {
     public:
         explicit ImportThread(const QString &cmd);
-        virtual void run();
+        void run() override; // MThread
     private:
         QString m_command;
 };
