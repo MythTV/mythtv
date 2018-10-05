@@ -89,7 +89,7 @@ class MTV_PUBLIC ChannelImporter
         m_success(success),
         m_service_requirements(service_requirements) { }
 
-    void Process(const ScanDTVTransportList&);
+    void Process(const ScanDTVTransportList&, int sourceid = -1);
 
   protected:
     typedef enum

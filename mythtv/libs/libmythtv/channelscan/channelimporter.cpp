@@ -30,13 +30,14 @@ static QString map_str(QString str)
     return str;
 }
 
-void ChannelImporter::Process(const ScanDTVTransportList &_transports)
+void ChannelImporter::Process(const ScanDTVTransportList &_transports,
+                              int sourceid)
 {
     if (_transports.empty())
     {
         if (use_gui)
         {
-            int channels = ChannelUtil::GetChannelCount();
+            int channels = ChannelUtil::GetChannelCount(sourceid);
 
             LOG(VB_GENERAL, LOG_INFO, LOC + (channels ?
                                              (m_success ?
@@ -81,7 +82,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     FilterServices(transports);
 
     // Pull in DB info
-    uint sourceid = transports[0].channels[0].source_id;
+    sourceid = transports[0].channels[0].source_id;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
 
     // Make sure "Open Cable" channels are marked that way.

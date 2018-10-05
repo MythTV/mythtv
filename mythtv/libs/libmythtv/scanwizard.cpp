@@ -111,6 +111,11 @@ void ScanWizard::Scan()
                                 DoFreeToAirOnly(),
                                 GetServiceRequirements());
     }
+    else if (scantype == ScanTypeSetting::ExternRecImport)
+    {
+        do_scan = false;
+        scannerPane->ImportExternRecorder(cardid, inputname, sourceid);
+    }
     else if (scantype == ScanTypeSetting::IPTVImportMPTS)
     {
         scannerPane->ImportM3U(cardid, inputname, sourceid, true);
@@ -134,7 +139,7 @@ void ScanWizard::Scan()
         ChannelImporter ci(true, true, true, true, false,
                            DoFreeToAirOnly(),
                            GetServiceRequirements());
-        ci.Process(transports);
+        ci.Process(transports, sourceid);
     }
     else
     {

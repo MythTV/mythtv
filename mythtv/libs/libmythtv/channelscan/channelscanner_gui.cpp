@@ -87,10 +87,12 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             transports = sigmonScanner->GetChannelList(addFullTS);
         }
 
+        bool success = (iptvScanner != nullptr);
 #ifdef USING_VBOX
-        bool success = (iptvScanner != nullptr || vboxScanner != nullptr);
-#else
-        bool success = iptvScanner != nullptr;
+        success |= (vboxScanner != nullptr);
+#endif
+#if !defined( USING_MINGW ) && !defined( _MSC_VER )
+        success |= (m_ExternRecScanner != nullptr);
 #endif
 
         Teardown();
@@ -136,11 +138,12 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         m_scanStage->SetStatusSignalStrength(scanEvent->intValue());
 }
 
-void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports, bool success)
+void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports,
+                                bool success)
 {
     ChannelImporter ci(true, true, true, true, true,
                        freeToAirOnly, serviceRequirements, success);
-    ci.Process(_transports);
+    ci.Process(_transports, m_sourceid);
 }
 
 void ChannelScannerGUI::InformUser(const QString &error)
