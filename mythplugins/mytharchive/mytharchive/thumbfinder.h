@@ -46,8 +46,8 @@ class ThumbFinder : public MythScreenType
                   const QString &menuTheme);
     ~ThumbFinder();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
 
   private slots:
@@ -58,7 +58,7 @@ class ThumbFinder : public MythScreenType
     void updateThumb(void);
 
   private:
-    void Init(void);
+    void Init(void) override; // MythScreenType
     bool getThumbImages(void);
     int  getChapterCount(const QString &menuTheme);
     void changeSeekAmount(bool up);

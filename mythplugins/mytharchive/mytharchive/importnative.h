@@ -51,7 +51,7 @@ class ArchiveFileSelector : public FileSelector
     explicit ArchiveFileSelector(MythScreenStack *parent);
     ~ArchiveFileSelector(void);
 
-    bool Create(void);
+    bool Create(void) override; // FileSelector
 
   private slots:
     void nextPressed(void);
@@ -79,8 +79,8 @@ class ImportNative : public MythScreenType
                    const QString &xmlFile, FileDetails details);
       ~ImportNative();
 
-      bool Create(void);
-      bool keyPressEvent(QKeyEvent *e);
+      bool Create(void) override; // MythScreenType
+      bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
   private slots:
     void finishedPressed();

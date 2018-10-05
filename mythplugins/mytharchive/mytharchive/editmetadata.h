@@ -25,8 +25,8 @@ class EditMetadataDialog : public MythScreenType
     EditMetadataDialog(MythScreenStack *parent, ArchiveItem *source_metadata);
     ~EditMetadataDialog();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
   signals:
     void haveResult(bool ok, ArchiveItem *item);

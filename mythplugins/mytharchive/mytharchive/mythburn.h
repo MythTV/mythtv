@@ -22,7 +22,7 @@ class ProfileDialog : public MythScreenType
     ProfileDialog(MythScreenStack *parent, ArchiveItem *archiveItem,
                   QList<EncoderProfile *> profileList);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void haveResult(int profile);
@@ -57,8 +57,8 @@ class MythBurn : public MythScreenType
 
     ~MythBurn(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void createConfigFile(const QString &filename);
 
@@ -140,7 +140,7 @@ class BurnMenu : public QObject
     void start(void);
 
   private:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
     void doBurn(int mode);
 };
 
