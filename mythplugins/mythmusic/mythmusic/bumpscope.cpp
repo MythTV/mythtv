@@ -551,20 +551,20 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
 static class BumpScopeFactory : public VisFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VisFactory
     {
         static QString name = QCoreApplication::translate("Visualizers",
                                                           "BumpScope");
         return name;
     }
 
-    uint plugins(QStringList *list) const
+    uint plugins(QStringList *list) const override // VisFactory
     {
         *list << name();
         return 1;
     }
 
-    VisualBase *create(MainVisual *parent, const QString &pluginName) const
+    VisualBase *create(MainVisual *parent, const QString &pluginName) const override // VisFactory
     {
         (void)parent;
         (void)pluginName;

@@ -27,7 +27,7 @@ class EditMetadataCommon : public MythScreenType
 
     bool CreateCommon(void);
 
-    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void setSaveMetadataOnly(void);
 
@@ -66,10 +66,10 @@ class EditMetadataDialog : public EditMetadataCommon
     explicit EditMetadataDialog(MythScreenStack *parent);
     ~EditMetadataDialog(void);
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // EditMetadataCommon
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
     void searchArtist(void);
@@ -147,10 +147,10 @@ class EditAlbumartDialog : public EditMetadataCommon
     explicit EditAlbumartDialog(MythScreenStack *parent);
     ~EditAlbumartDialog();
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // EditMetadataCommon
+    void customEvent(QEvent *event) override; // MythUIType
 
   signals:
     void metadataChanged(void);

@@ -75,10 +75,10 @@ class SmartPlaylistEditor : public MythScreenType
     explicit SmartPlaylistEditor(MythScreenStack *parent);
    ~SmartPlaylistEditor(void);
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
     QString getSQL(QString fields);
     QString getWhereClause(void);
@@ -154,7 +154,7 @@ class CriteriaRowEditor : public MythScreenType
     CriteriaRowEditor(MythScreenStack *parent, SmartPLCriteriaRow *row);
    ~CriteriaRowEditor(void) = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void fieldChanged(void);
@@ -214,8 +214,8 @@ class SmartPLResultViewer : public MythScreenType
     explicit SmartPLResultViewer(MythScreenStack *parent);
    ~SmartPLResultViewer(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void setSQL(QString sql);
 
   private slots:
@@ -239,7 +239,7 @@ class SmartPLOrderByDialog: public MythScreenType
     explicit SmartPLOrderByDialog(MythScreenStack *parent);
     ~SmartPLOrderByDialog() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
     QString getFieldList(void);
     void setFieldList(const QString &fieldList);
@@ -282,7 +282,7 @@ class SmartPLDateDialog: public MythScreenType
     explicit SmartPLDateDialog(MythScreenStack *parent);
     ~SmartPLDateDialog() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
     QString getDate(void);
     void setDate(QString date);

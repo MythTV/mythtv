@@ -41,7 +41,8 @@ class DecoderEvent : public MythEvent
 
     const QString *errorMessage() const { return error_msg; }
 
-    virtual MythEvent *clone(void) const { return new DecoderEvent(*this); }
+    MythEvent *clone(void) const override // MythEvent
+        { return new DecoderEvent(*this); }
 
     static Type Decoding;
     static Type Stopped;
@@ -124,10 +125,10 @@ class CdDecoderFactory : public DecoderFactory
     Q_DECLARE_TR_FUNCTIONS(CdDecoderFactory);
 
 public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, AudioOutput *, bool);
+    bool supports(const QString &) const override; // DecoderFactory
+    const QString &extension() const override; // DecoderFactory
+    const QString &description() const override; // DecoderFactory
+    Decoder *create(const QString &, AudioOutput *, bool) override; // DecoderFactory
 };
 
 class avfDecoderFactory : public DecoderFactory
@@ -135,10 +136,10 @@ class avfDecoderFactory : public DecoderFactory
     Q_DECLARE_TR_FUNCTIONS(avfDecoderFactory);
 
 public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, AudioOutput *, bool);
+    bool supports(const QString &) const override; // DecoderFactory
+    const QString &extension() const override; // DecoderFactory
+    const QString &description() const override; // DecoderFactory
+    Decoder *create(const QString &, AudioOutput *, bool) override; // DecoderFactory
 };
 
 #endif

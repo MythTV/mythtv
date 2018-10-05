@@ -47,7 +47,7 @@ class MPUBLIC MusicGenericTree : public MythGenericTree
 
     void setDrawArrow(bool flag);
 
-    MythUIButtonListItem *CreateListButton(MythUIButtonList *list);
+    MythUIButtonListItem *CreateListButton(MythUIButtonList *list) override; // MythGenericTree
 
   protected:
     QString  m_action;
@@ -67,15 +67,15 @@ class PlaylistEditorView : public MusicCommon
                        const QString &layout, bool restorePosition = false);
     ~PlaylistEditorView(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
     void saveTreePosition(void);
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
 
   private slots:
     void treeItemClicked(MythUIButtonListItem *item);

@@ -22,13 +22,13 @@ class LyricsView : public MusicCommon
     LyricsView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~LyricsView(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
 
   private:
     void findLyrics(const QString &grabber="ALL");
@@ -65,8 +65,8 @@ class EditLyricsDialog : public MythScreenType
     EditLyricsDialog(MythScreenStack *parent, LyricsData *sourceData);
     ~EditLyricsDialog() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
   signals:
     void haveResult(bool ok);

@@ -15,10 +15,11 @@ public:
     BumpScope();
     virtual ~BumpScope();
 
-    void resize(const QSize &size);
-    bool process(VisualNode *node);
-    bool draw(QPainter *p, const QColor &back);
-    void handleKeyPress(const QString &action) {(void) action;}
+    void resize(const QSize &size) override; // VisualBase
+    bool process(VisualNode *node) override; // VisualBase
+    bool draw(QPainter *p, const QColor &back) override; // VisualBase
+    void handleKeyPress(const QString &action) override // VisualBase
+        {(void) action;}
 
 private:
     void blur_8(unsigned char *ptr, int w, int h, int bpl);

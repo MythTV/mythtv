@@ -17,7 +17,7 @@ class GeneralSettings : public MythScreenType
     GeneralSettings(MythScreenStack *parent, const char *name = nullptr);
     ~GeneralSettings() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   private:
     MythUITextEdit     *m_musicAudioDevice;

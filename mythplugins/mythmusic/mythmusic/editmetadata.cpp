@@ -1331,7 +1331,7 @@ class CopyImageThread: public MThread
     explicit CopyImageThread(QStringList strList) :
             MThread("CopyImage"), m_strList(strList) {}
 
-    virtual void run()
+    void run() override // MThread
     {
         RunProlog();
         gCoreContext->SendReceiveStringList(m_strList);

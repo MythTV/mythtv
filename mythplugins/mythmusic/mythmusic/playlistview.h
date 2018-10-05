@@ -21,11 +21,11 @@ class PlaylistView : public MusicCommon
     PlaylistView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~PlaylistView(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
 };
 
 #endif
