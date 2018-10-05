@@ -53,8 +53,8 @@ class GameDBStorage : public SimpleDBStorage
     {
     }
 
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const MythGamePlayerSettings &parent;
 };
@@ -83,13 +83,13 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
 
     QString getSourceName(void) const { return name->getValue(); };
 
-    virtual void Save(void)
+    void Save(void) override // ConfigurationDialog
     {
         if (name)
             ConfigurationWizard::Save();
     }
 
-    virtual void Save(QString /*destination*/) { }
+    void Save(QString /*destination*/) override { } // ConfigurationDialog
 
   private:
     class ID : public AutoIncrementDBSetting
@@ -127,14 +127,14 @@ class MPUBLIC MythGamePlayerEditor : public QObject, public ConfigurationDialog
   public:
     MythGamePlayerEditor();
 
-    virtual MythDialog *dialogWidget(MythMainWindow *parent,
-                                     const char     *widgetName=nullptr);
+    MythDialog *dialogWidget(MythMainWindow *parent,
+                             const char     *widgetName=nullptr) override; // ConfigurationDialog
 
-    virtual DialogCode exec(bool saveOnExec = true, bool doLoad = true);
+    DialogCode exec(bool saveOnExec = true, bool doLoad = true) override; // ConfigurationDialog
 
-    virtual void Load(void);
-    virtual void Save(void) { }
-    virtual void Save(QString /*destination*/) { }
+    void Load(void) override; // ConfigurationDialog
+    void Save(void) override { } // ConfigurationDialog
+    void Save(QString /*destination*/) override { } // ConfigurationDialog
 
 public slots:
     void menu();

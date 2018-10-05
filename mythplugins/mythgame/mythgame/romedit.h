@@ -16,8 +16,8 @@ class EditRomInfoDialog : public MythScreenType
 
     ~EditRomInfoDialog();
 
-    bool Create();
-    void customEvent(QEvent *levent);
+    bool Create() override; // MythScreenType
+    void customEvent(QEvent *levent) override; // MythUIType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   public slots:
