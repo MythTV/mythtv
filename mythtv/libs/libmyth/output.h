@@ -61,7 +61,8 @@ class MPUBLIC OutputEvent : public MythEvent
     const int &precision() const { return prec; }
     const int &channels() const { return chan; }
 
-    virtual MythEvent *clone(void) const { return new OutputEvent(*this); }
+    MythEvent *clone(void) const override // MythEvent
+        { return new OutputEvent(*this); }
 
     static Type Playing;
     static Type Buffering;

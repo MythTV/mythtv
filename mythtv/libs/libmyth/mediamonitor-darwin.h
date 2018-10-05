@@ -10,7 +10,7 @@ class MonitorThreadDarwin : public MonitorThread
     MonitorThreadDarwin(MediaMonitor* pMon,  unsigned long interval)
         : MonitorThread(pMon, interval) {};
 
-    virtual void run(void);
+    void run(void) override; // MThread
 
     void  diskInsert(const char *devName,
                      const char *volName, QString model, bool isCDorDVD = 1);
@@ -24,8 +24,8 @@ class MediaMonitorDarwin : public MediaMonitor
     MediaMonitorDarwin(QObject* par, unsigned long interval, bool allowEject)
         : MediaMonitor(par, interval, allowEject) {};
 
-    virtual void StartMonitoring(void);
-    virtual bool AddDevice(MythMediaDevice* pDevice);
-    QStringList GetCDROMBlockDevices(void);
+    void StartMonitoring(void) override; // MediaMonitor
+    bool AddDevice(MythMediaDevice* pDevice) override; // MediaMonitor
+    QStringList GetCDROMBlockDevices(void) override; // MediaMonitor
 };
 #endif // MYTH_MEDIA_MONITOR_DARWIN_H

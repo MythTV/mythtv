@@ -13,16 +13,16 @@ class MPUBLIC StorageGroupEditor :
     Q_OBJECT
   public:
     explicit StorageGroupEditor(QString group);
-    virtual void Load(void);
-    virtual bool canDelete(void);
+    void Load(void) override; // StandardSetting
+    bool canDelete(void) override; // GroupSetting
 
   protected slots:
     void DoDeleteSlot(bool doDelete);
     void ShowFileBrowser(void);
 
   protected:
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
+    void customEvent(QEvent *event) override; // QObject
     void ShowDeleteDialog();
     void SetLabel(void);
     QString         m_group;
@@ -34,7 +34,7 @@ class MPUBLIC StorageGroupListEditor :
     Q_OBJECT
   public:
     StorageGroupListEditor(void);
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
     void AddSelection(const QString &label, const QString &value);
 
 public slots:
@@ -49,8 +49,8 @@ class StorageGroupDirStorage : public SimpleDBStorage
                            const QString &group);
 
   protected:
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     int m_id;
     QString m_group;
@@ -63,7 +63,7 @@ class StorageGroupDirSetting : public MythUIFileBrowserSetting
   public:
       StorageGroupDirSetting(int id, const QString &group);
 
-    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
 
     void ShowDeleteDialog();
 

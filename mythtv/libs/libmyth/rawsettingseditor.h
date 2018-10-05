@@ -34,9 +34,9 @@ class MPUBLIC RawSettingsEditor : public MythScreenType
    ~RawSettingsEditor() = default;
 
     // MythScreenType overrides
-    bool Create(void);
-    void Load(void);
-    void Init(void);
+    bool Create(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
   private slots:
     // Saves changes

@@ -53,67 +53,69 @@ class AudioOutputBase : public AudioOutput, public MThread
     explicit AudioOutputBase(const AudioSettings &settings);
     virtual ~AudioOutputBase();
 
-    AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true);
-    AudioOutputSettings* GetOutputSettingsUsers(bool digital = false);
+    AudioOutputSettings* GetOutputSettingsCleaned(bool digital = true) override; // AudioOutput
+    AudioOutputSettings* GetOutputSettingsUsers(bool digital = false) override; // AudioOutput
 
     // reconfigure sound out for new params
-    virtual void Reconfigure(const AudioSettings &settings);
+    void Reconfigure(const AudioSettings &settings) override; // AudioOutput
 
     // dsprate is in 100 * samples/second
-    virtual void SetEffDsp(int dsprate);
+    void SetEffDsp(int dsprate) override; // AudioOutput
 
     // timestretch
-    virtual void SetStretchFactor(float factor);
-    virtual float GetStretchFactor(void) const;
-    virtual int GetChannels(void) const { return channels; }
-    virtual AudioFormat GetFormat(void) const { return format; };
-    virtual int GetBytesPerFrame(void) const { return source_bytes_per_frame; };
+    void SetStretchFactor(float factor) override; // AudioOutput
+    float GetStretchFactor(void) const override; // AudioOutput
+    int GetChannels(void) const override { return channels; } // AudioOutput
+    AudioFormat GetFormat(void) const override { return format; }; // AudioOutput
+    int GetBytesPerFrame(void) const override // AudioOutput
+        { return source_bytes_per_frame; }
 
-    virtual bool CanPassthrough(int samplerate, int channels,
-                                int codec, int profile) const;
-    virtual bool CanDownmix(void) const { return true; };
-    virtual bool IsUpmixing(void);
-    virtual bool ToggleUpmix(void);
-    virtual bool CanUpmix(void);
-    virtual bool CanProcess(AudioFormat /*fmt*/) { return true; }
-    virtual uint32_t CanProcess(void)
+    bool CanPassthrough(int samplerate, int channels,
+                        int codec, int profile) const override; // AudioOutput
+    bool CanDownmix(void) const override { return true; } // AudioOutput
+    bool IsUpmixing(void) override; // AudioOutput
+    bool ToggleUpmix(void) override; // AudioOutput
+    bool CanUpmix(void) override; // AudioOutput
+    bool CanProcess(AudioFormat /*fmt*/) override { return true; } // AudioOutput
+    uint32_t CanProcess(void) override // AudioOutput
     {
         // we support all codec
         return ~(((~0ULL) >> FORMAT_FLT) << FORMAT_FLT);
     }
 
-    virtual void Reset(void);
+    void Reset(void) override; // AudioOutput
 
-    void SetSWVolume(int new_volume, bool save);
-    int GetSWVolume(void);
+    void SetSWVolume(int new_volume, bool save) override; // VolumeBase
+    int GetSWVolume(void) override; // VolumeBase
 
     // timecode is in milliseconds.
-    virtual bool AddFrames(void *buffer, int frames, int64_t timecode);
-    virtual bool AddData(void *buffer, int len, int64_t timecode, int frames);
-    virtual bool NeedDecodingBeforePassthrough() const { return false; };
-    virtual int64_t LengthLastData(void) const { return m_length_last_data; }
+    bool AddFrames(void *buffer, int frames, int64_t timecode) override; // AudioOutput
+    bool AddData(void *buffer, int len, int64_t timecode, int frames) override; // AudioOutput
+    bool NeedDecodingBeforePassthrough() const override { return false; }; // AudioOutput
+    int64_t LengthLastData(void) const override { return m_length_last_data; } // AudioOutput
 
-    virtual void SetTimecode(int64_t timecode);
-    virtual bool IsPaused(void) const { return actually_paused; }
-    virtual void Pause(bool paused);
-    void PauseUntilBuffered(void);
+    void SetTimecode(int64_t timecode) override; // AudioOutput
+    bool IsPaused(void) const override { return actually_paused; } // AudioOutput
+    void Pause(bool paused) override; // AudioOutput
+    void PauseUntilBuffered(void) override; // AudioOutput
 
     // Wait for all data to finish playing
-    virtual void Drain(void);
+    void Drain(void) override; // AudioOutput
 
-    virtual int64_t GetAudiotime(void);
-    virtual int64_t GetAudioBufferedTime(void);
+    int64_t GetAudiotime(void) override; // AudioOutput
+    int64_t GetAudioBufferedTime(void) override; // AudioOutput
 
     // Send output events showing current progress
     virtual void Status(void);
 
-    virtual void SetSourceBitrate(int rate);
+    void SetSourceBitrate(int rate) override; // AudioOutput
 
-    virtual void GetBufferStatus(uint &fill, uint &total);
+    void GetBufferStatus(uint &fill, uint &total) override; // AudioOutput
 
     //  Only really used by the AudioOutputNULL object
-    virtual void bufferOutputData(bool y){ buffer_output_data_for_use = y; }
-    virtual int readOutputData(unsigned char *read_buffer, int max_length);
+    void bufferOutputData(bool y) override // AudioOutput
+        { buffer_output_data_for_use = y; }
+    int readOutputData(unsigned char *read_buffer, int max_length) override; // AudioOutput
 
     static const uint kAudioSRCInputSize = 16384;
 
@@ -149,7 +151,7 @@ class AudioOutputBase : public AudioOutput, public MThread
 
     void OutputAudioLoop(void);
 
-    virtual void run();
+    void run() override; // MThread
 
     int CheckFreeSpace(int &frames);
 

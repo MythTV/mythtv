@@ -62,6 +62,7 @@ class MPUBLIC MythDialog : public QFrame
 
     DialogCode result(void) const { return rescode; }
 
+     // QFrame::Show is not virtual, so this isn't an override.
     virtual void Show(void);
 
     void hide(void);
@@ -72,6 +73,9 @@ class MPUBLIC MythDialog : public QFrame
 
     void setResult(DialogCode r);
 
+    // Not an override because the underlying QObject::deleteLater
+    // function isn't virtual.  This is a new virtual function, which
+    // calls QFrame::deleteLater.
     virtual void deleteLater(void);
 
     static int CalcItemIndex(DialogCode code);
@@ -91,7 +95,7 @@ class MPUBLIC MythDialog : public QFrame
     ~MythDialog();
     void TeardownAll(void);
 
-    void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *e) override; // QWidget
 
     float wmult, hmult;
     int screenwidth, screenheight;
@@ -160,17 +164,17 @@ class MPUBLIC MythPopupBox : public MythDialog
                                  QString message, QString& text);
 
   public slots:
-    virtual void AcceptItem(int);
-    virtual void accept(void);
-    virtual void reject(void);
+    void AcceptItem(int) override; // MythDialog
+    void accept(void) override; // MythDialog
+    void reject(void) override; // MythDialog
 
   signals:
     void popupDone(int);
 
   protected:
     ~MythPopupBox() = default; // use deleteLater() instead for thread safety
-    bool focusNextPrevChild(bool next);
-    void keyPressEvent(QKeyEvent *e);
+    bool focusNextPrevChild(bool next) override; // QWidget
+    void keyPressEvent(QKeyEvent *e) override; // QWidget
 
   protected slots:
     void defaultButtonPressedHandler(void);
@@ -227,9 +231,9 @@ class MPUBLIC MythProgressDialog: public MythDialog
 
     void setLabel(QString newlabel);
 
-    void keyPressEvent(QKeyEvent *);
+    void keyPressEvent(QKeyEvent *) override; // QWidget
 
-    virtual void deleteLater(void);
+    void deleteLater(void) override; // MythDialog
 
   signals:
     void pressed();

@@ -52,7 +52,7 @@ class MPUBLIC ProgramInfoUpdater : public QRunnable
 
     void insert(uint     recordedid,
                 PIAction action, uint64_t         filesize = 0ULL);
-    void run(void);
+    void run(void) override; // QRunnable
 
   private:
     QMutex        lock;

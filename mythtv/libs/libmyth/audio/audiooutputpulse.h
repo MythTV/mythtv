@@ -30,16 +30,16 @@ class AudioOutputPulseAudio : public AudioOutputBase
     explicit AudioOutputPulseAudio(const AudioSettings &settings);
    ~AudioOutputPulseAudio();
 
-    int GetVolumeChannel(int channel) const;
-    void SetVolumeChannel(int channel, int volume);
-    void Drain(void);
+    int GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
+    void Drain(void) override; // AudioOutputBase
 
   protected:
-    AudioOutputSettings* GetOutputSettings(bool digital);
-    bool OpenDevice(void);
-    void CloseDevice(void);
-    void WriteAudio(unsigned char *aubuf, int size);
-    int GetBufferedOnSoundcard(void) const;
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int GetBufferedOnSoundcard(void) const override; // AudioOutputBase
 
   private:
     char *ChooseHost(void);

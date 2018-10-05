@@ -31,13 +31,13 @@ class MPUBLIC LanguageSelection : public MythScreenType
     /// load(), it will not ask unless force is set.
     static bool prompt(bool force = false);
 
-    bool Create(void);
-    void Load(void);
+    bool Create(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
 
   private slots:
     //void LanguageClicked(MythUIButtonListItem *item);
     //void CountryClicked(MythUIButtonListItem *item);
-    void Close(void);
+    void Close(void) override; // MythScreenType
     void Save(void);
 
   private:

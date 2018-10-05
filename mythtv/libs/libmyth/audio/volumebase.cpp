@@ -54,7 +54,7 @@ class VolumeWriteBackThread : public MThread
     }
 
   protected:
-    virtual void run(void)
+    void run(void) override // MThread
     {
         m_state = kRunning;
         RunProlog();

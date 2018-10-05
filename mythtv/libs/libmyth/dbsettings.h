@@ -16,9 +16,9 @@ class MPUBLIC DatabaseSettings : public GroupSetting
     explicit DatabaseSettings(const QString &DBhostOverride = QString());
     ~DatabaseSettings();
 
-    void Load(void);
+    void Load(void) override; // StandardSetting
     void Save(QString) {}
-    void Save(void);
+    void Save(void) override; // StandardSetting
 
   signals:
     void isClosing(void);
