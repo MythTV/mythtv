@@ -26,9 +26,9 @@ class MythNews : public MythScreenType
     MythNews(MythScreenStack *parent, const QString &name);
     ~MythNews();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent*) override; // MythUIType
 
   private:
     void updateInfoView(void);
@@ -40,7 +40,7 @@ class MythNews : public MythScreenType
     void playVideo(const NewsArticle &article);
 
     // menu stuff
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void deleteNewsSite(void);
     void ShowEditDialog(bool edit);
     void ShowFeedManager();

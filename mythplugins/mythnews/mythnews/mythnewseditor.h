@@ -26,8 +26,8 @@ class MythNewsEditor : public MythScreenType
                    const QString &name = "MythNewsEditor");
    ~MythNewsEditor();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
 
   private:
     mutable QMutex  m_lock;
