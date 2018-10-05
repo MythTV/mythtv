@@ -1127,7 +1127,7 @@ public:
     ReadMetaThread(ImagePtrK im, const QString &path)
         : QRunnable(), m_im(im), m_path(path) {}
 
-    void run()
+    void run() override // QRunnable
     {
         QStringList tags;
         QString     orientation, size;

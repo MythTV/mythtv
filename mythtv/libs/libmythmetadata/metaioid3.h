@@ -36,22 +36,22 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
     MetaIOID3(void);
     virtual ~MetaIOID3(void);
 
-    virtual bool write(const QString &filename, MusicMetadata* mdata);
-    bool writeVolatileMetadata(const QString &filename, MusicMetadata* mdata);
+    bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIOTagLib
+    bool writeVolatileMetadata(const QString &filename, MusicMetadata* mdata) override; // MetaIO
 
-    bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
-    bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart);
+    bool writeAlbumArt(const QString &filename, const AlbumArtImage *albumart) override; // MetaIO
+    bool removeAlbumArt(const QString &filename, const AlbumArtImage *albumart) override; // MetaIO
 
-    MusicMetadata* read(const QString &filename);
-    AlbumArtList getAlbumArtList(const QString &filename);
-    QImage *getAlbumArt(const QString &filename, ImageType type);
+    MusicMetadata* read(const QString &filename) override; // MetaIOTagLib
+    AlbumArtList getAlbumArtList(const QString &filename) override; // MetaIO
+    QImage *getAlbumArt(const QString &filename, ImageType type) override; // MetaIO
 
-    bool supportsEmbeddedImages(void) { return true; }
+    bool supportsEmbeddedImages(void) override { return true; } // MetaIO
 
     bool changeImageType(const QString &filename, const AlbumArtImage *albumart,
-                         ImageType newType);
+                         ImageType newType) override; // MetaIO
 
-    virtual bool TagExists(const QString &filename);
+    bool TagExists(const QString &filename) override; // MetaIO
 
   private:
     bool OpenFile(const QString &filename, bool forWriting = false);

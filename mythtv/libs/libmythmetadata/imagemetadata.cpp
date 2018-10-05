@@ -272,11 +272,12 @@ public:
     { // libexiv2 closes file, cleans up via autoptrs
     }
 
-    virtual bool        IsValid()                  { return m_image.get(); }
-    virtual QStringList GetAllTags();
-    virtual int         GetOrientation(bool *exists = nullptr);
-    virtual QDateTime   GetOriginalDateTime(bool *exists = nullptr);
-    virtual QString     GetComment(bool *exists = nullptr);
+    bool        IsValid() override // ImageMetaData
+        { return m_image.get(); }
+    QStringList GetAllTags() override; // ImageMetaData
+    int         GetOrientation(bool *exists = nullptr) override; // ImageMetaData
+    QDateTime   GetOriginalDateTime(bool *exists = nullptr) override; // ImageMetaData
+    QString     GetComment(bool *exists = nullptr) override; // ImageMetaData
 
 protected:
     static QString DecodeComment(std::string rawValue);
@@ -497,11 +498,12 @@ public:
     explicit VideoMetaData(const QString &filePath);
     ~VideoMetaData();
 
-    virtual bool        IsValid()                        { return m_dict; }
-    virtual QStringList GetAllTags();
-    virtual int         GetOrientation(bool *exists = nullptr);
-    virtual QDateTime   GetOriginalDateTime(bool *exists = nullptr);
-    virtual QString     GetComment(bool *exists = nullptr);
+    bool        IsValid() override  // ImageMetaData
+        { return m_dict; }
+    QStringList GetAllTags() override; // ImageMetaData
+    int         GetOrientation(bool *exists = nullptr) override; // ImageMetaData
+    QDateTime   GetOriginalDateTime(bool *exists = nullptr) override; // ImageMetaData
+    QString     GetComment(bool *exists = nullptr) override; // ImageMetaData
 
 protected:
     QString GetTag(const QString &key, bool *exists = nullptr);

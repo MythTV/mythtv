@@ -53,7 +53,7 @@ class META_PUBLIC MetadataDownload : public MThread
 
   protected:
 
-    void run();
+    void run() override; // MThread
 
     QString getMXMLPath(QString filename);
     QString getNFOPath(QString filename);

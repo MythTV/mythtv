@@ -129,7 +129,7 @@ class META_PUBLIC MetadataFactory : public QObject
 
   private:
 
-    void customEvent(QEvent *levent);
+    void customEvent(QEvent *levent) override; // QObject
 
     void OnMultiResult(MetadataLookupList list);
     void OnSingleResult(MetadataLookup *lookup);

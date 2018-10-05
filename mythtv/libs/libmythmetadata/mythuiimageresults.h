@@ -17,9 +17,9 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
 
     ~ImageSearchResultsDialog();
 
-    bool Create();
+    bool Create() override; // MythScreenType
     void cleanCacheDir();
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MythUIType
 
   signals:
     void haveResult(ArtworkInfo, VideoArtworkType);

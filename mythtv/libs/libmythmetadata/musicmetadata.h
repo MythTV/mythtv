@@ -391,7 +391,7 @@ class META_PUBLIC MetadataLoadingThread : public MThread
   public:
 
     explicit MetadataLoadingThread(AllMusic *parent_ptr);
-    virtual void run();
+    void run() override; // MThread
 
   private:
 
@@ -494,7 +494,7 @@ class AlbumArtScannerThread: public MThread
     explicit AlbumArtScannerThread(QStringList strList) :
             MThread("AlbumArtScanner"), m_strList(strList) {}
 
-    virtual void run()
+    void run() override // MThread
     {
         RunProlog();
         gCoreContext->SendReceiveStringList(m_strList);

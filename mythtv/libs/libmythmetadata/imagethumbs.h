@@ -92,7 +92,7 @@ public:
     void PauseBackground(bool pause);
 
 protected:
-    void run();
+    void run() override; // MThread
 
 private:
     Q_DISABLE_COPY(ThumbThread)

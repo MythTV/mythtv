@@ -94,7 +94,7 @@ class META_PUBLIC LyricsData : public QObject
     void findLyrics(const QString &grabber);
     void save(void);
 
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
   signals:
     void statusChanged(LyricsData::Status status, const QString &message);
