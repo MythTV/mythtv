@@ -37,8 +37,8 @@ class BrowserConfig : public MythScreenType
     BrowserConfig(MythScreenStack *parent, const char *name = nullptr);
     ~BrowserConfig() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private:
     MythUITextEdit   *m_commandEdit;
@@ -64,8 +64,8 @@ class BookmarkManager : public MythScreenType
     BookmarkManager(MythScreenStack *parent, const char *name);
     ~BookmarkManager();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
     void slotGroupSelected(MythUIButtonListItem *item);
