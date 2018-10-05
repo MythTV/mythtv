@@ -25,8 +25,8 @@ class Weather : public MythScreenType
     Weather(MythScreenStack *parent, const QString &name, SourceManager *srcMan);
     ~Weather();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     bool UpdateData();
     bool SetupScreens();
