@@ -68,11 +68,11 @@ class FileLogger : public LoggerBase
   public:
     explicit FileLogger(const char *filename);
     ~FileLogger();
-    bool logmsg(LoggingItem *item);
-    void reopen(void);
+    bool logmsg(LoggingItem *item) override; // LoggerBase
+    void reopen(void) override; // LoggerBase
     static FileLogger *create(QString filename, QMutex *mutex);
   protected:
-    bool setupZMQSocket(void);
+    bool setupZMQSocket(void) override; // LoggerBase
   private:
     bool m_opened;      ///< true when the logfile is opened
     int  m_fd;          ///< contains the file descriptor for the logfile
@@ -90,12 +90,12 @@ class SyslogLogger : public LoggerBase
     SyslogLogger();
     explicit SyslogLogger(bool open);
     ~SyslogLogger();
-    bool logmsg(LoggingItem *item);
+    bool logmsg(LoggingItem *item) override; // LoggerBase
     /// \brief Unused for this logger.
-    void reopen(void) { };
+    void reopen(void) override { }; // LoggerBase
     static SyslogLogger *create(QMutex *mutex, bool open = true);
   protected:
-    bool setupZMQSocket(void);
+    bool setupZMQSocket(void) override; // LoggerBase
   private:
     bool m_opened;          ///< true when syslog channel open.
     nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
@@ -114,12 +114,12 @@ class DatabaseLogger : public LoggerBase
   public:
     explicit DatabaseLogger(const char *table);
     ~DatabaseLogger();
-    bool logmsg(LoggingItem *item);
-    void reopen(void) { };
-    virtual void stopDatabaseAccess(void);
+    bool logmsg(LoggingItem *item) override; // LoggerBase
+    void reopen(void) override { }; // LoggerBase
+    void stopDatabaseAccess(void) override; // LoggerBase
     static DatabaseLogger *create(QString table, QMutex *mutex);
   protected:
-    bool setupZMQSocket(void);
+    bool setupZMQSocket(void) override; // LoggerBase
   protected:
     bool logqmsg(MSqlQuery &query, LoggingItem *item);
     void prepare(MSqlQuery &query);
@@ -158,7 +158,7 @@ class LogServerThread : public QObject, public MThread
   public:
     LogServerThread();
     ~LogServerThread();
-    void run(void);
+    void run(void) override; // MThread
     void stop(void);
     nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
 
@@ -187,7 +187,7 @@ class LogForwardThread : public QObject, public MThread
   public:
     LogForwardThread();
     ~LogForwardThread();
-    void run(void);
+    void run(void) override; // MThread
     void stop(void);
     nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
   private:
@@ -224,7 +224,7 @@ class DBLoggerThread : public MThread
   public:
     explicit DBLoggerThread(DatabaseLogger *logger);
     ~DBLoggerThread();
-    void run(void);
+    void run(void) override; // MThread
     void stop(void);
     /// \brief Enqueues a LoggingItem onto the queue for the thread to
     ///        consume.

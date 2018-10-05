@@ -29,7 +29,7 @@ class MythSystemLegacyIOHandler: public MThread
     public:
         explicit MythSystemLegacyIOHandler(bool read);
         ~MythSystemLegacyIOHandler() { wait(); }
-        void   run(void);
+        void   run(void) override; // MThread
 
         void   insert(HANDLE h, QBuffer *buff);
         void   Wait(HANDLE h);
@@ -54,7 +54,7 @@ class MythSystemLegacyManager : public MThread
     public:
         MythSystemLegacyManager();
         ~MythSystemLegacyManager();
-        void run(void);
+        void run(void) override; // MThread
         void append(MythSystemLegacyWindows *);
         void jumpAbort(void);
 
@@ -75,7 +75,7 @@ class MythSystemLegacySignalManager : public MThread
     public:
         MythSystemLegacySignalManager();
         ~MythSystemLegacySignalManager() { wait(); }
-        void run(void);
+        void run(void) override; // MThread
     private:
 };
 
@@ -88,15 +88,15 @@ class MBASE_PUBLIC MythSystemLegacyWindows : public MythSystemLegacyPrivate
         explicit MythSystemLegacyWindows(MythSystemLegacy *parent);
         ~MythSystemLegacyWindows() = default;
 
-        virtual void Fork(time_t timeout) override;
-        virtual void Manage(void) override;
+        void Fork(time_t timeout) override; // MythSystemLegacyPrivate
+        void Manage(void) override; // MythSystemLegacyPrivate
 
-        virtual void Term(bool force=false) override;
-        virtual void Signal(int sig) override;
-        virtual void JumpAbort(void) override;
+        void Term(bool force=false) override; // MythSystemLegacyPrivate
+        void Signal(int sig) override; // MythSystemLegacyPrivate
+        void JumpAbort(void) override; // MythSystemLegacyPrivate
 
-        virtual bool ParseShell(const QString &cmd, QString &abscmd,
-                                QStringList &args) override;
+        bool ParseShell(const QString &cmd, QString &abscmd,
+                        QStringList &args) override; // MythSystemLegacyPrivate
 
         friend class MythSystemLegacyManager;
         friend class MythSystemLegacySignalManager;

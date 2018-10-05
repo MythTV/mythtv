@@ -64,7 +64,7 @@ class DBPurgeHandler : public QObject
     {
         purgeTimer = startTimer(5 * 60000);
     }
-    void timerEvent(QTimerEvent *event)
+    void timerEvent(QTimerEvent *event) override // QObject
     {
         if (event->timerId() == purgeTimer)
             GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
@@ -76,7 +76,7 @@ class MThreadInternal : public QThread
 {
   public:
     explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
-    virtual void run(void) { m_parent.run(); }
+    void run(void) override { m_parent.run(); } // QThread
 
     void QThreadRun(void) { QThread::run(); }
     int exec(void)

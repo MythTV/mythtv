@@ -50,7 +50,7 @@ class MBASE_PUBLIC PrivTcpServer : public QTcpServer
     void newConnection(qt_socket_fd_t socket);
 
   protected:
-    virtual void incomingConnection(qt_socket_fd_t socket);
+    void incomingConnection(qt_socket_fd_t socket) override; // QTcpServer
 
   private:
     PoolServerType m_serverType;

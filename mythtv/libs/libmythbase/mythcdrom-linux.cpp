@@ -131,15 +131,15 @@ public:
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {
     }
 
-    virtual MythMediaError testMedia(void);
-    virtual bool mediaChanged(void);
-    virtual bool checkOK(void);
-    virtual MythMediaStatus checkMedia(void);
-    virtual MythMediaError eject(bool open_close = true);
-    virtual void setDeviceSpeed(const char *device, int speed);
-    virtual bool isSameDevice(const QString &path);
-    virtual MythMediaError lock(void);
-    virtual MythMediaError unlock(void);
+    MythMediaError testMedia(void) override; // MythMediaDevice
+    bool mediaChanged(void) override; // MythCDROM
+    bool checkOK(void) override; // MythCDROM
+    MythMediaStatus checkMedia(void) override; // MythMediaDevice
+    MythMediaError eject(bool open_close = true) override; // MythMediaDevice
+    void setDeviceSpeed(const char *device, int speed) override; // MythMediaDevice
+    bool isSameDevice(const QString &path) override; // MythMediaDevice
+    MythMediaError lock(void) override; // MythMediaDevice
+    MythMediaError unlock(void) override; // MythMediaDevice
 
 protected:
     MythMediaError ejectCDROM(bool open_close);
