@@ -14,10 +14,10 @@ class ControlRequestHandler : public OutboundRequestHandler
 {
   public:
     bool HandleQuery(SocketHandler *socket, QStringList &commands,
-                            QStringList &slist);
+                     QStringList &slist)override; // SocketRequestHandler
 
   protected:
-    bool AnnounceSocket(void);
+    bool AnnounceSocket(void) override; // OutboundRequestHandler
 };
 
 #endif

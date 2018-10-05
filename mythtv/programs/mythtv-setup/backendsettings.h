@@ -9,8 +9,8 @@ class BackendSettings : public GroupSetting
   Q_OBJECT
   public:
     BackendSettings();
-    virtual void Load(void);
-    virtual void Save(void);
+    void Load(void) override; // StandardSetting
+    void Save(void) override; // StandardSetting
     ~BackendSettings();
 
   private:

@@ -7,7 +7,7 @@ class MythExternRecorderCommandLineParser : public MythCommandLineParser
 {
   public:
     MythExternRecorderCommandLineParser();
-    void LoadArguments(void);
+    void LoadArguments(void) override; // MythCommandLineParser
   protected:
-    QString GetHelpHeader(void) const;
+    QString GetHelpHeader(void) const override; // MythCommandLineParser
 };

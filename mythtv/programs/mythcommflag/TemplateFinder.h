@@ -36,14 +36,16 @@ public:
     ~TemplateFinder(void);
 
     /* FrameAnalyzer interface. */
-    const char *name(void) const { return "TemplateFinder"; }
+    const char *name(void) const override // FrameAnalyzer
+        { return "TemplateFinder"; }
     enum analyzeFrameResult MythPlayerInited(MythPlayer *player,
-            long long nframes);
+            long long nframes) override; // FrameAnalyzer
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
-            long long frameno, long long *pNextFrame);
-    int finished(long long nframes, bool final);
-    int reportTime(void) const;
-    FrameMap GetMap(unsigned int) const { FrameMap map; return map; }
+            long long frameno, long long *pNextFrame) override; // FrameAnalyzer
+    int finished(long long nframes, bool final) override; // FrameAnalyzer
+    int reportTime(void) const override; // FrameAnalyzer
+    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+        { FrameMap map; return map; }
 
     /* TemplateFinder implementation. */
     const struct AVFrame *getTemplate(int *prow, int *pcol,
