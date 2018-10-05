@@ -88,9 +88,9 @@ class HttpStatus : public HttpServerExtension
         void     SetMainServer(MainServer *mainServer)
                     { m_pMainServer = mainServer; }
 
-        virtual QStringList GetBasePaths();
+        QStringList GetBasePaths() override; // HttpServerExtension
         
-        bool     ProcessRequest( HTTPRequest *pRequest );
+        bool     ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 };
 
 #endif

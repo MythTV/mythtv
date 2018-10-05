@@ -85,8 +85,8 @@ class Scheduler : public MThread, public MythScheduler
     // true iff there are conflicts
     bool GetAllPending(RecList &retList, int recRuleId = 0) const;
     bool GetAllPending(ProgramList &retList, int recRuleId = 0) const;
-    virtual void GetAllPending(QStringList &strList) const;
-    virtual QMap<QString,ProgramInfo*> GetRecording(void) const;
+    void GetAllPending(QStringList &strList) const override; // MythScheduler
+    QMap<QString,ProgramInfo*> GetRecording(void) const override; // MythScheduler
 
     enum SchedSortColumn { kSortTitle, kSortLastRecorded, kSortNextRecording,
                            kSortPriority, kSortType };
@@ -124,7 +124,7 @@ class Scheduler : public MThread, public MythScheduler
     void AddChildInput(uint parentid, uint childid);
 
   protected:
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
   private:
     enum OpenEndType {

@@ -79,7 +79,7 @@ class DeleteThread : public QRunnable, public DeleteStruct
                                   recendts, recordingId, forceMetadataDelete)  {}
     void start(void)
         { MThreadPool::globalInstance()->startReserved(this, "DeleteThread"); }
-    void run(void);
+    void run(void) override; // QRunnable
 };
 
 class TruncateThread : public QRunnable, public DeleteStruct
@@ -89,7 +89,7 @@ class TruncateThread : public QRunnable, public DeleteStruct
                 DeleteStruct(ms, filename, fd, size)  {}
     void start(void)
         { MThreadPool::globalInstance()->start(this, "Truncate"); }
-    void run(void);
+    void run(void) override; // QRunnable
 };
 
 class RenameThread : public QRunnable
@@ -97,7 +97,7 @@ class RenameThread : public QRunnable
 public:
     RenameThread(MainServer &ms, PlaybackSock &pbs, QString src, QString dst)
         : m_ms(ms), m_pbs(pbs), m_src(src), m_dst(dst) {}
-    void run(void);
+    void run(void) override; // QRunnable
 
 private:
     static QMutex m_renamelock;
@@ -124,17 +124,19 @@ class MainServer : public QObject, public MythSocketCBs
 
     void Stop(void);
 
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 
     bool isClientConnected(bool onlyBlockingClients = false);
     void ShutSlaveBackendsDown(QString &haltcmd);
 
     void ProcessRequest(MythSocket *sock);
 
-    void readyRead(MythSocket *socket);
-    void connectionClosed(MythSocket *socket);
-    void connectionFailed(MythSocket *socket) { (void)socket; }
-    void connected(MythSocket *socket) { (void)socket; }
+    void readyRead(MythSocket *socket) override; // MythSocketCBs
+    void connectionClosed(MythSocket *socket) override; // MythSocketCBs
+    void connectionFailed(MythSocket *socket) override // MythSocketCBs
+        { (void)socket; }
+    void connected(MythSocket *socket) override // MythSocketCBs
+        { (void)socket; }
 
     void DeletePBS(PlaybackSock *pbs);
 
