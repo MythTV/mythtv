@@ -19,7 +19,7 @@ class MythQtImage : public MythImage
         MythImage(parent, "MythQtImage"),
         m_Pixmap(nullptr), m_bRegenPixmap(false) { }
 
-    void SetChanged(bool change = true);
+    void SetChanged(bool change = true) override; // MythImage
     QPixmap *GetPixmap(void) { return m_Pixmap; }
     void SetPixmap(QPixmap *p) { m_Pixmap = p; }
 

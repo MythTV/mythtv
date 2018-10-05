@@ -94,7 +94,8 @@ class MUI_PUBLIC MythNotification : public MythEvent
     {
     }
 
-    virtual MythEvent *clone(void) const  { return new MythNotification(*this); }
+    MythEvent *clone(void) const override // MythEvent
+        { return new MythNotification(*this); }
 
     /** Priority enum
      * A notification can be given a priority. Display order of notification
@@ -251,7 +252,8 @@ class MUI_PUBLIC MythImageNotification : public virtual MythNotification
     {
     }
 
-    virtual MythEvent *clone(void) const    { return new MythImageNotification(*this); }
+    MythEvent *clone(void) const override // MythNotification
+        { return new MythImageNotification(*this); }
 
     // Setter
     /**
@@ -300,7 +302,8 @@ class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
         m_progressText  = stringFromSeconds(duration);
     }
 
-    virtual MythEvent *clone(void) const    { return new MythPlaybackNotification(*this); }
+    MythEvent *clone(void) const override // MythNotification
+        { return new MythPlaybackNotification(*this); }
 
     // Setter
     /**
@@ -365,7 +368,8 @@ class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
     {
     }
 
-    virtual MythEvent *clone(void) const { return new MythMediaNotification(*this); }
+    MythEvent *clone(void) const override // MythImageNotification
+        { return new MythMediaNotification(*this); }
 
   protected:
     MythMediaNotification(const MythMediaNotification &o)

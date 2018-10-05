@@ -45,7 +45,7 @@ class ScreenLoadTask : public QRunnable
     explicit ScreenLoadTask(MythScreenType &parent) : m_parent(parent) {}
 
   private:
-    void run(void)
+    void run(void) override // QRunnable
     {
         m_parent.Load();
         m_parent.m_IsLoaded = true;

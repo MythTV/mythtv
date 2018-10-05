@@ -16,7 +16,7 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
     {
     }
 
-    virtual void InitProcs(void)
+    void InitProcs(void) override // MythRenderOpenGL2
     {
         // GLSL version
         m_GLSLVersion = "#version 100\n";
@@ -102,7 +102,7 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
         m_glUnmapBuffer = (MYTH_GLUNMAPBUFFERPROC)GetProcAddress("glUnmapBufferOES");
     }
 
-    virtual bool InitFeatures(void)
+    bool InitFeatures(void) override // MythRenderOpenGL2
     {
         m_exts_supported = kGLFeatNone;
 

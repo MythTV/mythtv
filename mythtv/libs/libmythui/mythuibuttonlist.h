@@ -146,9 +146,9 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
                    bool showScrollBar = false);
     ~MythUIButtonList();
 
-    virtual bool keyPressEvent(QKeyEvent *event);
-    virtual bool gestureEvent(MythGestureEvent *event);
-    virtual void customEvent(QEvent *);
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
+    bool gestureEvent(MythGestureEvent *event) override; // MythUIType
+    void customEvent(QEvent *) override; // MythUIType
 
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
                         MoveMid, MoveByAmount };
@@ -156,7 +156,7 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     void SetDrawFromBottom(bool draw);
 
-    void Reset();
+    void Reset() override; // MythUIType
     void Update();
 
     virtual void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
@@ -225,8 +225,8 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     enum WrapStyle   { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems,
                        WrapFlowing };
 
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
     void Const();
     virtual void Init();
 
@@ -273,11 +273,11 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     virtual QPoint GetButtonPosition(int column, int row) const;
 
     void SetButtonArea(const MythRect &rect);
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void SanitizePosition(void);
 
@@ -350,8 +350,8 @@ class MUI_PUBLIC SearchButtonListDialog : public MythScreenType
                            MythUIButtonList *parentList, QString searchText);
     ~SearchButtonListDialog(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected slots:
     void searchChanged(void);

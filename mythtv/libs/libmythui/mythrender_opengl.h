@@ -130,9 +130,18 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
                      RenderType type = kRenderUnknown);
     MythRenderOpenGL(const MythRenderFormat &format, RenderType type = kRenderUnknown);
 
+#ifdef USE_OPENGL_QT5
+    // These functions are not virtual in the base QOpenGLContext
+    // class, so these are not overrides but new functions.
     virtual void makeCurrent();
     virtual void doneCurrent();
-    virtual void Release(void);
+#else
+    // These functions are virtual in the base QGLContext class, so
+    // these are overrides of those functions.
+    void makeCurrent() override; // MythRenderContext
+    void doneCurrent() override; // MythRenderContext
+#endif
+    void Release(void) override; // MythRender
 
     using MythRenderContext::create;
 #ifdef USE_OPENGL_QT5

@@ -35,12 +35,11 @@ class MUI_PUBLIC MythUIBusyDialog : public MythScreenType
     MythUIBusyDialog(const QString &message,
                   MythScreenStack *parent, const char *name);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void SetMessage(const QString &message);
-    void Reset(void);
-
-    virtual void Pulse(void);
+    void Reset(void) override; // MythUIType
+    void Pulse(void) override; // MythUIType
 
   protected:
     QString m_origMessage;
@@ -59,9 +58,9 @@ class MUI_PUBLIC MythUIProgressDialog : public MythScreenType
     MythUIProgressDialog(const QString &message,
                   MythScreenStack *parent, const char *name);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
     void SetTotal(uint total);
     void SetProgress(uint count);
     void SetMessage(const QString &message);

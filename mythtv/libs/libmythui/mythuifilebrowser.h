@@ -80,7 +80,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
     MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
    ~MythUIFileBrowser() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 

@@ -27,7 +27,7 @@ class CECAdapter : public QObject, public MThread
     void Action(const QString &action);
 
   protected:
-    virtual void run();
+    void run() override; // MThread
 
   private:
     CECAdapterPriv *m_priv;

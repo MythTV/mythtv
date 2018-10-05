@@ -128,12 +128,12 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void SetDelay(int delayms);
     void SetDelays(QVector<int> delays);
 
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     bool Load(bool allowLoadInBackground = true, bool forceStat = false);
 
-    virtual void Pulse(void);
+    void Pulse(void) override; // MythUIType
 
-    virtual void LoadNow(void);
+    void LoadNow(void) override; // MythUIType
 
     void SetOrientation(int orientation);
 
@@ -141,23 +141,23 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void LoadComplete();
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
 
     void Init(void);
     void Clear(void);
 
     void SetAnimationFrames(AnimationFrames frames);
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MythUIType
 
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void SetSize(int width, int height);
-    void SetSize(const QSize &size);
+    void SetSize(const QSize &size) override; // MythUIType
     void ForceSize(const QSize &size);
 
     void SetCropRect(int x, int y, int width, int height);
