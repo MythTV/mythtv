@@ -25,16 +25,16 @@ class NetSearch : public NetBase
     NetSearch(MythScreenStack *parent, const char *name = nullptr);
     ~NetSearch();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void PopulateResultList(ResultItem::resultList list);
 
   protected:
-    virtual ResultItem *GetStreamItem();
+    ResultItem *GetStreamItem() override; // NetBase
 
   private:
-    virtual void Load();
+    void Load() override; // MythScreenType
 
     MythUIButtonList   *m_searchResultList;
     MythUIButtonList   *m_siteList;
@@ -62,7 +62,7 @@ class NetSearch : public NetBase
     QString m_prevPageToken;
 
   private slots:
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void GetMoreResults();
     void GetLastResults();
     void SkipPagesBack();
@@ -73,12 +73,12 @@ class NetSearch : public NetBase
     void DoSearch(void);
     void SearchFinished(void);
     void SearchTimeout(Search *item);
-    void LoadData(void);
+    void LoadData(void) override; // NetBase
     void FillGrabberButtonList(void);
     void SlotItemChanged(void);
     void SetTextAndThumbnail(MythUIButtonListItem *btn, ResultItem *item);
     void SetThumbnail(MythUIButtonListItem *btn);
-    void customEvent(QEvent *levent);
+    void customEvent(QEvent *levent) override; // NetBase
 };
 
 #endif

@@ -31,8 +31,8 @@ class RSSEditPopup : public MythScreenType
                  const QString &name = "RSSEditPopup");
    ~RSSEditPopup();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
 
   private:
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,
@@ -68,7 +68,7 @@ class RSSEditPopup : public MythScreenType
     void SelectImagePopup(const QString &prefix,
                         QObject &inst,
                         const QString &returnEvent);
-    void customEvent(QEvent *levent);
+    void customEvent(QEvent *levent) override; // MythUIType
 };
 
 class RSSEditor : public MythScreenType
@@ -79,8 +79,8 @@ class RSSEditor : public MythScreenType
     RSSEditor(MythScreenStack *parent, const QString &name = "RSSEditor");
    ~RSSEditor();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
 
   private:
     void fillRSSButtonList();
