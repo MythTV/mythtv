@@ -12,8 +12,9 @@ class UPNP_PUBLIC UPNPSubscription : public HttpServerExtension, public MythObse
     UPNPSubscription(const QString &share_path, int port);
     virtual ~UPNPSubscription();
 
-    virtual QStringList GetBasePaths() { return QStringList( "/Subscriptions" ); }
-    virtual bool ProcessRequest(HTTPRequest *pRequest);
+    QStringList GetBasePaths() override // HttpServerExtension
+        { return QStringList( "/Subscriptions" ); }
+    bool ProcessRequest(HTTPRequest *pRequest) override; // HttpServerExtension
 
     int  Subscribe(const QString &usn, const QUrl &url, const QString &path);
     void Unsubscribe(const QString &usn);

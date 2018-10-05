@@ -96,7 +96,7 @@ class UPNP_PUBLIC TaskQueue : public MThread
 
         bool  IsTermRequested();
 
-        virtual void run    ();
+        void run() override; // MThread
 
     private:
 

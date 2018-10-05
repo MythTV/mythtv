@@ -193,7 +193,7 @@ class UPNP_PUBLIC UPnPShortcutFeature : public UPnPFeature
     };
 
     bool AddShortCut(ShortCutType type, const QString &objectID);
-    QString CreateXML();
+    QString CreateXML() override; // UPnPFeature
 
   private:
     QString TypeToName(ShortCutType type);
@@ -319,10 +319,14 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
 
         // Implement UPnpServiceImpl methods that we can
 
-        virtual QString GetServiceType      () { return "urn:schemas-upnp-org:service:ContentDirectory:4"; }
-        virtual QString GetServiceId        () { return "urn:upnp-org:serviceId:ContentDirectory"; }
-        virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
-        virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
+        QString GetServiceType() override // UPnpServiceImpl
+            { return "urn:schemas-upnp-org:service:ContentDirectory:4"; }
+        QString GetServiceId() override // UPnpServiceImpl
+            { return "urn:upnp-org:serviceId:ContentDirectory"; }
+        QString GetServiceControlURL() override // UPnpServiceImpl
+            { return m_sControlUrl.mid( 1 ); }
+        QString GetServiceDescURL() override // UPnpServiceImpl
+            { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
     public:
         UPnpCDS( UPnpDevice *pDevice,
@@ -337,9 +341,9 @@ class UPNP_PUBLIC UPnpCDS : public Eventing
                                       const QString &objectID );
         void     RegisterFeature    ( UPnPFeature *feature );
 
-        virtual QStringList GetBasePaths();
+        QStringList GetBasePaths() override; // Eventing
         
-        virtual bool ProcessRequest( HTTPRequest *pRequest );
+        bool ProcessRequest( HTTPRequest *pRequest ) override; // Eventing
 };
 
 #endif

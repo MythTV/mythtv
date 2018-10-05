@@ -75,8 +75,8 @@ class UPnpNotifyTask : public Task
 
         explicit UPnpNotifyTask( int nServicePort );
 
-        virtual QString Name   ()               { return( "Notify" );   }
-        virtual void    Execute( TaskQueue * );
+        QString Name() override { return( "Notify" ); } // Task
+        void Execute( TaskQueue * ) override; // Task
 
         // ------------------------------------------------------------------
 
