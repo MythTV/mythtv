@@ -53,7 +53,7 @@ class NVRWriteThread : public MThread
     explicit NVRWriteThread(NuppelVideoRecorder *parent) :
         MThread("NVRWrite"), m_parent(parent) {}
     virtual ~NVRWriteThread() { wait(); m_parent = nullptr; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
     NuppelVideoRecorder *m_parent;
 };
@@ -64,7 +64,7 @@ class NVRAudioThread : public MThread
     explicit NVRAudioThread(NuppelVideoRecorder *parent) :
         MThread("NVRAudio"), m_parent(parent) {}
     virtual ~NVRAudioThread() { wait(); m_parent = nullptr; }
-    virtual void run(void);
+    void run(void) override; // MThread
   private:
     NuppelVideoRecorder *m_parent;
 };
@@ -77,34 +77,34 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
 
-    void SetOption(const QString &name, int value);
-    void SetOption(const QString &name, const QString &value);
+    void SetOption(const QString &name, int value) override; // DTVRecorder
+    void SetOption(const QString &name, const QString &value) override; // DTVRecorder
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // DTVRecorder
  
-    void Initialize(void);
-    void run(void);
+    void Initialize(void) override; // DTVRecorder
+    void run(void) override; // RecorderBase
     
-    virtual void Pause(bool clear = true);
-    virtual bool IsPaused(bool holding_lock = false) const;
+    void Pause(bool clear = true) override; // RecorderBase
+    bool IsPaused(bool holding_lock = false) const override; // RecorderBase
  
-    bool IsRecording(void);
+    bool IsRecording(void) override; // RecorderBase
 
-    long long GetFramesWritten(void); 
+    long long GetFramesWritten(void) override; // DTVRecorder
 
     bool Open(void);
-    int GetVideoFd(void);
-    void Reset(void);
+    int GetVideoFd(void) override; // DTVRecorder
+    void Reset(void) override; // DTVRecorder
 
-    void SetVideoFilters(QString &filters);
+    void SetVideoFilters(QString &filters) override; // DTVRecorder
     void SetTranscoding(bool value) { transcoding = value; };
 
-    void ResetForNewFile(void);
-    void FinishRecording(void);
-    void StartNewFile(void);
+    void ResetForNewFile(void) override; // DTVRecorder
+    void FinishRecording(void) override; // DTVRecorder
+    void StartNewFile(void) override; // RecorderBase
 
     // reencode stuff
     void StreamAllocate(void);
@@ -152,9 +152,9 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void DoV4L2(void);
     void DoMJPEG(void);
 
-    virtual void FormatTT(struct VBIData*); // RecorderBase
-    virtual void FormatCC(uint code1, uint code2); // RecorderBase
-    virtual void AddTextData(unsigned char*,int,int64_t,char); // CC608Decoder
+    void FormatTT(struct VBIData*) override; // V4LRecorder
+    void FormatCC(uint code1, uint code2) override; // V4LRecorder
+    void AddTextData(unsigned char*,int,int64_t,char) override; // CC608Input
 
     void UpdateResolutions(void);
     

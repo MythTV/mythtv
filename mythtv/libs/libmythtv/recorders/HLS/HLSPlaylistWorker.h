@@ -17,7 +17,7 @@ class HLSPlaylistWorker : public MThread
     void Cancel(void);
 
   protected:
-    void run(void);
+    void run() override; // MThread
 
   private:
     // Class vars

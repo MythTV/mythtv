@@ -36,16 +36,19 @@ class AudioInputALSA : public AudioInput
     explicit AudioInputALSA(const QString &device);
     ~AudioInputALSA() { Close(); };
 
-    bool Open(uint sample_bits, uint sample_rate, uint channels);
-    inline bool IsOpen(void) { return (pcm_handle != nullptr); }
-    void Close(void);
+    bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
+    inline bool IsOpen(void) override // AudioInput
+        { return (pcm_handle != nullptr); }
+    void Close(void) override; // AudioInput
 
-    bool Start(void) { return (pcm_handle != nullptr); }
-    bool Stop(void);
+    bool Start(void) override // AudioInput
+        { return (pcm_handle != nullptr); }
+    bool Stop(void) override; // AudioInput
 
-    inline int GetBlockSize(void) { return myth_block_bytes; };
-    int GetSamples(void* buf, uint nbytes);
-    int GetNumReadyBytes(void);
+    inline int GetBlockSize(void) override // AudioInput
+        { return myth_block_bytes; };
+    int GetSamples(void* buf, uint nbytes) override; // AudioInput
+    int GetNumReadyBytes(void) override; // AudioInput
 
   private:
     bool PrepHwParams(void);

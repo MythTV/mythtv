@@ -26,8 +26,8 @@ class DVBPIDInfo : public PIDInfo
     explicit DVBPIDInfo(uint pid) : PIDInfo(pid) {}
     DVBPIDInfo(uint pid, uint stream_type, int pes_type) :
         PIDInfo(pid, stream_type, pes_type) {}
-    bool Open(const QString &dvb_dev, bool use_section_reader);
-    bool Close(const QString &dvb_dev);
+    bool Open(const QString &dvb_dev, bool use_section_reader) override; // PIDInfo
+    bool Close(const QString &dvb_dev) override; // PIDInfo
 };
 
 class DVBStreamHandler : public StreamHandler
@@ -50,15 +50,15 @@ class DVBStreamHandler : public StreamHandler
   private:
     explicit DVBStreamHandler(const QString &);
 
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
     void RunTS(void);
     void RunSR(void);
 
-    virtual void CycleFiltersByPriority(void);
+    void CycleFiltersByPriority(void) override; // StreamHandler
 
     bool SupportsTSMonitoring(void);
 
-    virtual PIDInfo *CreatePIDInfo(uint pid, uint stream_type, int pes_type)
+    PIDInfo *CreatePIDInfo(uint pid, uint stream_type, int pes_type) override // StreamHandler
         { return new DVBPIDInfo(pid, stream_type, pes_type); }
 
     virtual void SetRunningDesired(bool desired); // StreamHandler

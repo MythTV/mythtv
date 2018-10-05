@@ -45,10 +45,10 @@ class DarwinAVCInfo : public AVCInfo
     bool OpenDeviceInterface(CFRunLoopRef &thread_cf_ref);
     void CloseDeviceInterface(void);
 
-    virtual bool SendAVCCommand(
+    bool SendAVCCommand(
         const vector<uint8_t> &cmd,
         vector<uint8_t>       &result,
-        int                   retry_cnt);
+        int                   retry_cnt) override; // AVCInfo
 
     bool GetDeviceNodes(int &local_node, int &remote_node);
 

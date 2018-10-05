@@ -26,26 +26,27 @@ class HDHRChannel : public DTVChannel
     HDHRChannel(TVRec *parent, const QString &device);
     ~HDHRChannel(void);
 
-    bool Open(void);
-    void Close(void);
-    bool EnterPowerSavingMode(void);
+    bool Open(void) override; // ChannelBase
+    void Close(void) override; // ChannelBase
+    bool EnterPowerSavingMode(void) override; // DTVChannel
 
     // Gets
-    bool IsOpen(void) const;
-    QString GetDevice(void) const { return _device_id; }
-    virtual vector<DTVTunerType> GetTunerTypes(void) const
+    bool IsOpen(void) const override; // ChannelBase
+    QString GetDevice(void) const override // ChannelBase
+        { return _device_id; }
+    vector<DTVTunerType> GetTunerTypes(void) const override // DTVChannel
         { return _tuner_types; }
-    virtual bool IsMaster(void) const;
+    bool IsMaster(void) const override; // DTVChannel
 
     // Sets
-    virtual bool SetChannelByString(const QString &channum);
+    bool SetChannelByString(const QString &channum) override; // DTVChannel
 
     using DTVChannel::Tune;
     // ATSC/DVB scanning/tuning stuff
-    bool Tune(const DTVMultiplex &tuning);
+    bool Tune(const DTVMultiplex &tuning) override; // DTVChannel
 
     // Virtual tuning
-    bool Tune(const QString &freqid, int /*finetune*/);
+    bool Tune(const QString &freqid, int /*finetune*/) override; // DTVChannel
 
   private:
     QString               _device_id;

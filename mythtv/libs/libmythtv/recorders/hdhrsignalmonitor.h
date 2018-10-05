@@ -17,13 +17,13 @@ class HDHRSignalMonitor: public DTVSignalMonitor
                       bool _release_stream, uint64_t _flags = 0);
     virtual ~HDHRSignalMonitor();
 
-    void Stop(void);
+    void Stop(void) override; // SignalMonitor
 
   protected:
     HDHRSignalMonitor(void);
     HDHRSignalMonitor(const HDHRSignalMonitor&);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
     HDHRChannel *GetHDHRChannel(void);
 
   protected:

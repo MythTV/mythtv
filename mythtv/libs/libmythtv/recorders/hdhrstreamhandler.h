@@ -53,13 +53,13 @@ class HDHRStreamHandler : public StreamHandler
                                   int recorder_id = -1);
     static void Return(HDHRStreamHandler * & ref, int recorder_id = -1);
 
-    virtual void AddListener(MPEGStreamData *data,
-                             bool /*allow_section_reader*/ = false,
-                             bool /*needs_drb*/            = false,
-                             QString output_file       = QString())
+    void AddListener(MPEGStreamData *data,
+                     bool /*allow_section_reader*/ = false,
+                     bool /*needs_drb*/            = false,
+                     QString output_file       = QString()) override // StreamHandler
     {
         StreamHandler::AddListener(data, false, false, output_file);
-    } // StreamHandler
+    }
 
     void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
     bool IsConnected(void) const;
@@ -86,9 +86,9 @@ class HDHRStreamHandler : public StreamHandler
     bool Open(void);
     void Close(void);
 
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
-    virtual bool UpdateFilters(void);
+    bool UpdateFilters(void) override; // StreamHandler
 
   private:
     hdhomerun_device_t     *_hdhomerun_device;

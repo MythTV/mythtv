@@ -22,19 +22,19 @@ class CetonRecorder : public DTVRecorder
   public:
     CetonRecorder(TVRec *rec, CetonChannel *channel);
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     void Close(void);
-    void StartNewFile(void);
+    void StartNewFile(void) override; // RecorderBase
 
     bool IsOpen(void) const { return _stream_handler; }
 
-    QString GetSIStandard(void) const;
+    QString GetSIStandard(void) const override; // DTVRecorder
 
   private:
     void ReaderPaused(int fd);
-    bool PauseAndWait(int timeout = 100);
+    bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
   private:
     CetonChannel       *_channel;

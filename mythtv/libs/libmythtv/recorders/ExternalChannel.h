@@ -21,24 +21,29 @@ class ExternalChannel : public DTVChannel
     ~ExternalChannel(void);
 
     // Commands
-    virtual bool Open(void);
-    virtual void Close(void);
+    bool Open(void) override; // ChannelBase
+    void Close(void) override; // ChannelBase
 
     // ATSC/DVB scanning/tuning stuff
     using DTVChannel::Tune;
-    virtual bool Tune(const DTVMultiplex&) { return true; }
-    virtual bool Tune(const QString &channum);
-    virtual bool Tune(const QString &freqid, int /*finetune*/);
+    bool Tune(const DTVMultiplex&) override // DTVChannel
+        { return true; }
+    bool Tune(const QString &channum) override; // DTVChannel
+    bool Tune(const QString &freqid, int /*finetune*/) override; // DTVChannel
 
-    virtual bool EnterPowerSavingMode(void);
+    bool EnterPowerSavingMode(void) override; // DTVChannel
 
     // Gets
-    virtual bool IsOpen(void) const { return m_stream_handler; }
-    virtual QString GetDevice(void) const { return m_device; }
-    virtual bool IsPIDTuningSupported(void) const { return true; }
+    bool IsOpen(void) const override // ChannelBase
+        { return m_stream_handler; }
+    QString GetDevice(void) const override // ChannelBase
+        { return m_device; }
+    bool IsPIDTuningSupported(void) const override // DTVChannel
+        { return true; }
 
   protected:
-    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+    bool IsExternalChannelChangeSupported(void) override // ChannelBase
+        { return true; }
 
   private:
     QString                  m_device;

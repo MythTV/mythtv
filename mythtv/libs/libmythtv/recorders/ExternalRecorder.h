@@ -30,14 +30,14 @@ class ExternalRecorder : public DTVRecorder
   public:
     ExternalRecorder(TVRec *rec, ExternalChannel *channel);
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     bool IsOpen(void) const { return m_stream_handler; }
     void Close(void);
-    void StartNewFile(void);
+    void StartNewFile(void) override; // RecorderBase
 
-    bool PauseAndWait(int timeout = 100);
+    bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
   protected:
     bool StartStreaming(void);

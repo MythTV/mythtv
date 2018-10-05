@@ -65,7 +65,7 @@ public:
     void SendRTCPReport(void);
 
 private:
-    void timerEvent(QTimerEvent*);
+    void timerEvent(QTimerEvent*) override; // QObject
 
 private:
     IPTVStreamHandler *m_parent;
@@ -82,19 +82,19 @@ class IPTVStreamHandler : public StreamHandler
     static IPTVStreamHandler *Get(const IPTVTuningData &tuning);
     static void Return(IPTVStreamHandler * & ref);
 
-    virtual void AddListener(MPEGStreamData *data,
-                             bool /*allow_section_reader*/ = false,
-                             bool /*needs_drb*/            = false,
-                             QString output_file           = QString())
+    void AddListener(MPEGStreamData *data,
+                     bool /*allow_section_reader*/ = false,
+                     bool /*needs_drb*/            = false,
+                     QString output_file           = QString()) override // StreamHandler
     {
         // Force allow_section_reader and needs_buffering to false;
         StreamHandler::AddListener(data, false, false, output_file);
-    } // StreamHandler
+    }
 
   protected:
     explicit IPTVStreamHandler(const IPTVTuningData &tuning);
 
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
   protected:
     IPTVTuningData m_tuning;

@@ -20,19 +20,23 @@ class DummyChannel : public ChannelBase
         { (void)parent; m_curchannelname.clear(); curinputname.clear(); return; }
     ~DummyChannel(void) { return; }
 
-    bool IsTunable(const QString &/*channum*/) const
+    bool IsTunable(const QString &/*channum*/) const override // ChannelBase
         { return true; }
 
-    bool Open(void)     { return InitializeInput(); }
-    void Close(void)    { return; }
+    bool Open(void) override // ChannelBase
+        { return InitializeInput(); }
+    void Close(void) override // ChannelBase
+        { return; }
 
     // Sets
-    bool SetChannelByString(const QString &chan)
+    bool SetChannelByString(const QString &chan) override // ChannelBase
         { m_curchannelname = chan; return true; }
 
     // Gets
-    bool    IsOpen(void)             const { return true; }
-    QString GetDevice(void)          const { return "/dev/dummy"; }
+    bool    IsOpen(void)             const override // ChannelBase
+        { return true; }
+    QString GetDevice(void) const override // ChannelBase
+        { return "/dev/dummy"; }
     QString GetCurrentInput(void)    const { return curinputname; }
     uint    GetCurrentSourceID(void) const { return 0; }
 

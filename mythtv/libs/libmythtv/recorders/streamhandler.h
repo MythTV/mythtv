@@ -94,8 +94,8 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     PIDPriority GetPIDPriority(uint pid) const;
 
     // DeviceReaderCB
-    virtual void ReaderPaused(int fd) { (void) fd; }
-    virtual void PriorityEvent(int fd) { (void) fd; }
+    void ReaderPaused(int fd) override { (void) fd; } // DeviceReaderCB
+    void PriorityEvent(int fd) override { (void) fd; } // DeviceReaderCB
 
     virtual PIDInfo *CreatePIDInfo(uint pid, uint stream_type, int pes_type)
         { return new PIDInfo(pid, stream_type, pes_type); }

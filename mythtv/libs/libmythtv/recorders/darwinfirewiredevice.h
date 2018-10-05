@@ -24,17 +24,17 @@ class DarwinFirewireDevice : public FirewireDevice
     DarwinFirewireDevice(uint64_t guid, uint subunitid, uint speed);
     ~DarwinFirewireDevice();
 
-    virtual bool OpenPort(void);
-    virtual bool ClosePort(void);
-    virtual bool ResetBus(void);
+    bool OpenPort(void) override; // FirewireDevice
+    bool ClosePort(void) override; // FirewireDevice
+    bool ResetBus(void) override; // FirewireDevice
 
     void HandleDeviceChange(uint messageType);
 
-    virtual void AddListener(TSDataListener*);
-    virtual void RemoveListener(TSDataListener*);
+    void AddListener(TSDataListener*) override; // FirewireDevice
+    void RemoveListener(TSDataListener*) override; // FirewireDevice
 
     // Gets
-    virtual bool IsPortOpen(void) const;
+    bool IsPortOpen(void) const override; // FirewireDevice
 
     // Statics
     static vector<AVCInfo> GetSTBList(void);
@@ -50,10 +50,10 @@ class DarwinFirewireDevice : public FirewireDevice
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    virtual bool SendAVCCommand(
+    bool SendAVCCommand(
         const vector<uint8_t> &cmd,
         vector<uint8_t>       &result,
-        int                   /*retry_cnt*/);
+        int                   /*retry_cnt*/) override; // FirewireDevice
 
     void HandleBusReset(void);
     bool UpdatePlugRegisterPrivate(

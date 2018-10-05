@@ -38,7 +38,7 @@ class DVBCam : public QRunnable
     void SetTimeOffset(double offset_in_seconds);
 
   private:
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
     void HandleUserIO(void);
     void HandlePMT(void);
 

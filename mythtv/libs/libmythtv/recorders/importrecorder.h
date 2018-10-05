@@ -30,17 +30,18 @@ class ImportRecorder : public DTVRecorder
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // DTVRecorder
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     void Close(void);
 
-    void InitStreamData(void) {}
+    void InitStreamData(void) override {} // DTVRecorder
 
-    virtual long long GetFramesWritten(void);
-    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const {return nullptr;}
+    long long GetFramesWritten(void) override; // DTVRecorder
+    RecordingQuality *GetRecordingQuality(const RecordingInfo*) const override // DTVRecorder
+        {return nullptr;}
     void UpdateRecSize();
 
   private:

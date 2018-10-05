@@ -871,7 +871,7 @@ private:
   int state;
 public:
   cCiResourceManager(int SessionId, cCiTransportConnection *Tc);
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   };
 
 cCiResourceManager::cCiResourceManager(int SessionId, cCiTransportConnection *Tc)
@@ -942,7 +942,7 @@ private:
 public:
   cCiApplicationInformation(int SessionId, cCiTransportConnection *Tc);
   virtual ~cCiApplicationInformation();
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   bool EnterMenu(void);
   char *GetApplicationString() { return strdup(menuString); };
   uint16_t GetApplicationManufacturer() { return applicationManufacturer; };
@@ -1022,7 +1022,7 @@ private:
   bool needCaPmt;
 public:
   cCiConditionalAccessSupport(int SessionId, cCiTransportConnection *Tc);
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   const unsigned short *GetCaSystemIds(void) { return caSystemIds; }
   bool SendPMT(cCiCaPmt &CaPmt);
   bool NeedCaPmt(void) { return needCaPmt; }
@@ -1104,7 +1104,7 @@ private:
   bool SendDateTime(void);
 public:
   cCiDateTime(int SessionId, cCiTransportConnection *Tc);
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
   void SetTimeOffset(double offset);
   };
 
@@ -1234,8 +1234,8 @@ private:
 public:
   cCiMMI(int SessionId, cCiTransportConnection *Tc);
   virtual ~cCiMMI();
-  virtual bool Process(int Length = 0, const uint8_t *Data = nullptr);
-  virtual bool HasUserIO(void) { return menu || enquiry; }
+  bool Process(int Length = 0, const uint8_t *Data = nullptr) override; // cCiSession
+  bool HasUserIO(void) override { return menu || enquiry; } // cCiSession
   cCiMenu *Menu(void);
   cCiEnquiry *Enquiry(void);
   bool SendMenuAnswer(uint8_t Selection);

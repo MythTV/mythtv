@@ -15,13 +15,13 @@ class UDPPacketBuffer : public PacketBuffer
     UDPPacketBuffer(unsigned int bitrate) : PacketBuffer(bitrate) {}
 
     /// Adds Raw UDP data packet
-    virtual void PushDataPacket(const UDPPacket &packet)
+    void PushDataPacket(const UDPPacket &packet) override // PacketBuffer
     {
         m_available_packets.push_back(packet);
     }
 
     /// Frees the packet, there is no FEC used by Raw UDP
-    virtual void PushFECPacket(const UDPPacket &packet, unsigned int)
+    void PushFECPacket(const UDPPacket &packet, unsigned int) override // PacketBuffer
     {
         FreePacket(packet);
     }

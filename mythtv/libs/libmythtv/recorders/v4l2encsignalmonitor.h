@@ -20,13 +20,13 @@ class V4L2encSignalMonitor: public DTVSignalMonitor
                          bool _release_stream, uint64_t _flags = 0);
     virtual ~V4L2encSignalMonitor();
 
-    void Stop(void);
+    void Stop(void) override; // SignalMonitor
 
   protected:
     V4L2encSignalMonitor(void);
     V4L2encSignalMonitor(const V4L2encSignalMonitor &);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
     V4LChannel *GetV4L2encChannel(void)
         { return dynamic_cast<V4LChannel*>(channel); }
 

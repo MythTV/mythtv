@@ -122,7 +122,7 @@ class SignalMonitor : protected MThread
     // Prevent implicit conversion of wrongly ordered arguments
     SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
 
-    virtual void run(void);
+    void run(void) override; // MThread
 
     /// \brief This should be overridden to actually do signal monitoring.
     virtual void UpdateValues(void);

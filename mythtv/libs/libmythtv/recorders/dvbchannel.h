@@ -32,10 +32,12 @@ class DVBChannel : public DTVChannel
     DVBChannel(const QString &device, TVRec *parent = nullptr);
     ~DVBChannel();
 
-    bool Open(void) { return Open(this); }
-    void Close(void) { Close(this); }
+    bool Open(void) override // ChannelBase
+        { return Open(this); }
+    void Close(void) override // ChannelBase
+        { Close(this); }
 
-    bool Init(QString &startchannel, bool setchan);
+    bool Init(QString &startchannel, bool setchan) override; // ChannelBase
 
     // Sets
     void SetPMT(const ProgramMapTable*);
@@ -44,16 +46,18 @@ class DVBChannel : public DTVChannel
         { tuning_delay = how_slow_in_ms; }
 
     // Gets
-    bool IsOpen(void) const;
-    int  GetFd(void)                    const { return fd_frontend; }
+    bool IsOpen(void) const override; // ChannelBase
+    int  GetFd(void) const  override // ChannelBase
+        { return fd_frontend; }
     bool IsTuningParamsProbeSupported(void) const;
 
-    QString GetDevice(void)             const { return device; }
+    QString GetDevice(void) const override // ChannelBase
+        { return device; }
     /// Returns DVB device number, used to construct filenames for DVB devices
     QString GetCardNum(void)            const { return device; };
     /// Returns frontend name as reported by driver
     QString GetFrontendName(void)       const;
-    bool IsMaster(void)                 const;
+    bool IsMaster(void)                 const override; // DTVChannel
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
     uint GetMinSignalMonitorDelay(void) const { return sigmon_delay; }
@@ -80,10 +84,10 @@ class DVBChannel : public DTVChannel
     // Commands
     bool SwitchToInput(int newcapchannel, bool setstarting);
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex &tuning);
+    bool Tune(const DTVMultiplex &tuning) override; // DTVChannel
     bool Tune(const DTVMultiplex &tuning,
               bool force_reset = false, bool same_input = false);
-    bool Retune(void);
+    bool Retune(void) override; // ChannelBase
 
     bool ProbeTuningParams(DTVMultiplex &tuning) const;
 
@@ -91,9 +95,9 @@ class DVBChannel : public DTVChannel
     bool Open(DVBChannel*);
     void Close(DVBChannel*);
 
-    int  GetChanID(void) const;
+    int  GetChanID(void) const override; // ChannelBase
 
-    void CheckOptions(DTVMultiplex &t) const;
+    void CheckOptions(DTVMultiplex &t) const override; // DTVChannel
     void CheckFrequency(uint64_t frequency) const;
     bool CheckModulation(DTVModulation modulation) const;
     bool CheckCodeRate(DTVCodeRate rate) const;
