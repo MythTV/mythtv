@@ -25,7 +25,7 @@ class ManualSchedule : public MythScreenType
     explicit ManualSchedule(MythScreenStack *parent);
    ~ManualSchedule(void) = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void dateChanged(void);

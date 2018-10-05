@@ -27,8 +27,8 @@ class EditMetadataDialog : public MythScreenType
                        const VideoMetadataListManager &cache);
     ~EditMetadataDialog();
 
-    bool Create();
-    void customEvent(QEvent *levent);
+    bool Create() override; // MythScreenType
+    void customEvent(QEvent *levent) override; // MythUIType
 
     void fillWidgets();
 

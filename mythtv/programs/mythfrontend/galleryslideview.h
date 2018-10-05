@@ -26,19 +26,19 @@ class GallerySlideView : public MythScreenType
 public:
     GallerySlideView(MythScreenStack *parent, const char *name, bool editsAllowed);
     ~GallerySlideView();
-    bool Create();
+    bool Create() override; // MythScreenType
 
 public slots:
     void Start(ImageSlideShowType type, int parentId, int selectedId = 0);
-    void Close();
-    void Pulse();
+    void Close() override; // MythScreenType
+    void Pulse() override; // MythScreenType
 
 signals:
     void ImageSelected(int);
 
 private:
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *);
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *) override; // MythUIType
     void MenuMain();
     void MenuTransforms(MythMenu &);
     void Suspend();

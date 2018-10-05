@@ -53,8 +53,8 @@ class VideoDialog : public MythScreenType
             BrowseType browse);
     ~VideoDialog();
 
-    bool Create();
-    bool keyPressEvent(QKeyEvent *levent);
+    bool Create() override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *levent) override; // MythScreenType
 
   private:
     void searchStart();
@@ -63,8 +63,8 @@ class VideoDialog : public MythScreenType
     void searchComplete(QString string);
 
   protected slots:
-    void Init(); /// Called after the screen is created by MythScreenStack
-    void Load(); /// Called after the screen is created by MythScreenStack
+    void Init() override; /// Called after the screen is created by MythScreenStack
+    void Load() override; /// Called after the screen is created by MythScreenStack
 
   private slots:
     void UpdatePosition();
@@ -143,7 +143,7 @@ class VideoDialog : public MythScreenType
     void UpdateItem(MythUIButtonListItem *item);
 
   protected:
-    void customEvent(QEvent *levent);
+    void customEvent(QEvent *levent) override; // MythUIType
 
     virtual MythUIButtonListItem *GetItemCurrent();
     virtual MythUIButtonListItem *GetItemByMetadata(VideoMetadata *metadata);

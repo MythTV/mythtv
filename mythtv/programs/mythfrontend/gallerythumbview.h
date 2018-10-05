@@ -26,17 +26,18 @@ class GalleryThumbView : public MythScreenType
 public:
     GalleryThumbView(MythScreenStack *parent, const char *name);
     ~GalleryThumbView();
-    bool    Create();
+    bool    Create() override; // MythScreenType
 
 public slots:
     void    Start();
-    void    Close();
+    void    Close() override; // MythScreenType
     void    ClearSgDb()  { m_mgr.ClearStorageGroup(); }
 
 private:
-    bool    keyPressEvent(QKeyEvent *);
-    void    mediaEvent(MythMediaEvent *event)     { m_mgr.DeviceEvent(event); }
-    void    customEvent(QEvent *);
+    bool    keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void    mediaEvent(MythMediaEvent *event) override // MythUIType
+            { m_mgr.DeviceEvent(event); }
+    void    customEvent(QEvent *) override; // MythUIType
     void    RemoveImages(const QStringList &ids, bool deleted = true);
     void    BuildImageList();
     void    ResetUiSelection();

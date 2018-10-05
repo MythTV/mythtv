@@ -184,7 +184,7 @@ public:
     { return m_sequence.isEmpty() ? ImagePtrK() : m_images.value(m_sequence.at(0)); }
 
     QString      GetPosition() const;
-    bool         LoadFromDb(int parentId);
+    bool         LoadFromDb(int parentId) override; // FlatView
     void         Clear(bool resetParent = true);
     MenuSubjects GetMenuSubjects();
     QStringList  RemoveImage(int id, bool deleted = false);
@@ -224,7 +224,7 @@ class TreeView : public FlatView
 public:
     explicit TreeView(SlideOrderType order) : FlatView(order) {}
 
-    bool LoadFromDb(int parentId);
+    bool LoadFromDb(int parentId) override; // FlatView
 };
 
 

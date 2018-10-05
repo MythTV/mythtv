@@ -15,7 +15,7 @@ class CastDialog : public MythScreenType
   public:
     CastDialog(MythScreenStack *lparent, VideoMetadata *metadata);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private:
     VideoMetadata *m_metadata;
@@ -28,7 +28,7 @@ class PlotDialog : public MythScreenType
   public:
     PlotDialog(MythScreenStack *lparent, VideoMetadata *metadata);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private:
     VideoMetadata *m_metadata;

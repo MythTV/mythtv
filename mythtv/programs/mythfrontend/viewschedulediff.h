@@ -28,16 +28,16 @@ class ViewScheduleDiff : public MythScreenType
                      int recordid = -1, QString ltitle = "");
     ~ViewScheduleDiff() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
    void updateInfo(MythUIButtonListItem *item);
    void showStatus(MythUIButtonListItem *item);
 
   private:
-    virtual void Load(void);
-    virtual void Init(void);
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
     void fillList(void);
     void updateUIList();

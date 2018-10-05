@@ -273,7 +273,7 @@ public:
                 m_programInfos[i][j] = nullptr;
     }
     virtual ~GuideUpdateProgramRow() = default;
-    virtual bool ExecuteNonUI(void)
+    bool ExecuteNonUI(void) override // GuideUpdaterBase
     {
         // Don't bother to do any work if the starting coordinates of
         // the guide have changed while the thread was waiting to
@@ -296,7 +296,7 @@ public:
         }
         return true;
     }
-    virtual void ExecuteUI(void)
+    void ExecuteUI(void) override // GuideUpdaterBase
     {
         m_guide->updateProgramsUI(m_firstRow, m_numRows,
                                   m_progPast, m_proglists,
@@ -335,14 +335,14 @@ class GuideUpdateChannels : public GuideUpdaterBase
 public:
     GuideUpdateChannels(GuideGrid *guide, uint startChan)
         : GuideUpdaterBase(guide), m_currentStartChannel(startChan) {}
-    virtual bool ExecuteNonUI(void)
+    bool ExecuteNonUI(void) override // GuideUpdaterBase
     {
         if (m_currentStartChannel != m_guide->GetCurrentStartChannel())
             return false;
         m_guide->updateChannelsNonUI(m_chinfos, m_unavailables);
         return true;
     }
-    virtual void ExecuteUI(void)
+    void ExecuteUI(void) override // GuideUpdaterBase
     {
         m_guide->updateChannelsUI(m_chinfos, m_unavailables);
     }
@@ -371,7 +371,7 @@ public:
         QMutexLocker locker(&s_lock);
         ++s_loading[m_guide];
     }
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         QThread::currentThread()->setPriority(QThread::IdlePriority);
         if (m_updater)

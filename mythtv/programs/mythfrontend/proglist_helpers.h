@@ -23,7 +23,7 @@ class PhrasePopup : public MythScreenType
                 const QStringList &list,
                 const QString &currentValue);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void haveResult(QString item);
@@ -61,7 +61,7 @@ class PowerSearchPopup : public MythScreenType
                 const QStringList &list,
                 const QString &currentValue);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void haveResult(QString item);
@@ -95,7 +95,7 @@ class EditPowerSearchPopup : public MythScreenType
     EditPowerSearchPopup(MythScreenStack *parentStack, ProgLister *parent,
                          const QString &currentValue);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private slots:
     void okClicked(void);

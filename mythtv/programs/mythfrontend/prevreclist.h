@@ -33,12 +33,12 @@ class PrevRecordedList : public ScheduleCommon
     explicit PrevRecordedList(MythScreenStack *parent, uint recid = 0,
                         const QString &title = QString());
     ~PrevRecordedList();
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void ShowItemMenu(void);
     void updateInfo(void);
     void showListLoseFocus(void);
@@ -51,8 +51,8 @@ class PrevRecordedList : public ScheduleCommon
     void ShowDeleteOldEpisodeMenu(void);
 
   protected:
-    void Init(void);
-    void Load(void);
+    void Init(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
 
     bool LoadTitles(void);
     bool LoadDates(void);
@@ -63,7 +63,7 @@ class PrevRecordedList : public ScheduleCommon
     void LoadShowsByTitle(void);
     void LoadShowsByDate(void);
 
-    ProgramInfo *GetCurrentProgram(void) const;
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
     // Left hand list - titles or dates
     ProgramList m_titleData;

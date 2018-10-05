@@ -54,8 +54,8 @@ class MythControls : public MythScreenType
     MythControls(MythScreenStack *parent, const char *name);
     ~MythControls();
 
-    bool Create(void);
-    void customEvent(QEvent*);
+    bool Create(void) override; // MythScreenType
+    void customEvent(QEvent*) override; // MythUIType
 
     typedef enum
     {
@@ -104,8 +104,8 @@ class MythControls : public MythScreenType
     void AddKeyToAction(QString key, bool ignoreconflict = false);
 
   private:
-    void ShowMenu(void);
-    void Close(void);
+    void ShowMenu(void) override; // MythScreenType
+    void Close(void) override; // MythScreenType
 
     ViewType          m_currentView;
     MythUIButtonList    *m_leftList;

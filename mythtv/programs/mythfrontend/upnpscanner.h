@@ -57,8 +57,8 @@ class UPNPScanner : public QObject
     QMap<QString,QString> ServerList(void);
 
   protected:
-    virtual void customEvent(QEvent *event);
-    virtual void timerEvent(QTimerEvent * event);
+    void customEvent(QEvent *event) override; // QObject
+    void timerEvent(QTimerEvent * event) override; // QObject
 
   private slots:
     void Start();

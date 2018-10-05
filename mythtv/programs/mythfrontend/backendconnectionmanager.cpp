@@ -29,7 +29,7 @@ class Reconnect : public QRunnable
         setAutoDelete(false);
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         if (!gCoreContext->SafeConnectToMasterServer(gCoreContext->IsBlockingClient()))
             gCoreContext->dispatch(MythEvent(QString("RECONNECT_FAILURE")));

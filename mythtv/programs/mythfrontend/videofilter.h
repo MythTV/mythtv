@@ -207,12 +207,12 @@ class BasicFilterSettingsProxy : public FilterSettingsProxy
   public:
     explicit BasicFilterSettingsProxy(T &type) : m_type(type) {}
 
-    const VideoFilterSettings &getSettings()
+    const VideoFilterSettings &getSettings() override // FilterSettingsProxy
     {
         return m_type.getCurrentVideoFilter();
     }
 
-    void setSettings(const VideoFilterSettings &settings)
+    void setSettings(const VideoFilterSettings &settings) override // FilterSettingsProxy
     {
         m_type.setCurrentVideoFilter(settings);
     }
@@ -231,7 +231,7 @@ class VideoFilterDialog : public MythScreenType
                        VideoList *video_list);
     ~VideoFilterDialog();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void filterChanged();

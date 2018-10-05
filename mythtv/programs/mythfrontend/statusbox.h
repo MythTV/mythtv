@@ -22,15 +22,15 @@ class StatusBox : public MythScreenType
     explicit StatusBox(MythScreenStack *parent);
    ~StatusBox(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent*) override; // MythUIType
 
   signals:
     void updateLog();
 
   protected:
-    virtual void Init(void);
+    void Init(void) override; // MythScreenType
     
   private slots:
     void setHelpText(MythUIButtonListItem *item);

@@ -3845,7 +3845,7 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
   private slots:
-    void childChanged(StandardSetting *);
+    void childChanged(StandardSetting *) override; // StandardSetting
   private:
     StandardSetting * m_overrideExitMenu;
     StandardSetting * m_haltCommand;
@@ -3982,10 +3982,10 @@ class PlayBackScaling : public GroupSetting
 {
   public:
     PlayBackScaling();
-    virtual void updateButton(MythUIButtonListItem *item);
+    void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
   private slots:
-    virtual void childChanged(StandardSetting *);
+    void childChanged(StandardSetting *) override; // StandardSetting
 
   private:
     StandardSetting * m_VertScan;
@@ -4370,11 +4370,11 @@ class GuiDimension : public GroupSetting
 {
     public:
         GuiDimension();
-        //virtual QString getValue();
-        virtual void updateButton(MythUIButtonListItem *item);
+        //QString getValue() override; // StandardSetting
+        void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
     private slots:
-        virtual void childChanged(StandardSetting *);
+        void childChanged(StandardSetting *) override; // StandardSetting
     private:
         StandardSetting *m_width;
         StandardSetting *m_height;

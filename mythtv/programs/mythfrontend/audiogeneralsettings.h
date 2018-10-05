@@ -23,8 +23,8 @@ class AudioConfigScreen : public StandardSettingDialog
     AudioConfigScreen(MythScreenStack *parent, const char *name,
                       GroupSetting *groupSetting);
   protected:
-    virtual void Load(void);
-    virtual void Init(void);
+    void Load(void) override; // StandardSettingDialog
+    void Init(void) override; // StandardSettingDialog
 };
 
 class AudioConfigSettings : public GroupSetting
@@ -33,7 +33,7 @@ class AudioConfigSettings : public GroupSetting
 
   public:
     AudioConfigSettings();
-    virtual void Load();
+    void Load() override; // StandardSetting
 
     typedef QMap<QString,AudioOutput::AudioDeviceConfig> ADCMap;
 
@@ -115,7 +115,7 @@ class AudioDeviceComboBox : public HostComboBoxSetting
     explicit AudioDeviceComboBox(AudioConfigSettings*);
     void AudioRescan();
 
-    virtual void edit(MythScreenType * screen);
+    void edit(MythScreenType * screen) override; // MythUIComboBoxSetting
 
   private slots:
     void AudioDescriptionHelp(StandardSetting * setting);
@@ -152,7 +152,7 @@ class AudioTestThread : public MThread
     void setChannel(int channel);
 
   protected:
-    void run();
+    void run() override; // MThread
 
   private:
     QObject                *m_parent;
@@ -175,7 +175,7 @@ class AudioTest : public GroupSetting
     ~AudioTest();
     void UpdateCapabilities(const QString &main, const QString &passthrough,
                             int channels, const AudioOutputSettings &settings);
-    bool event(QEvent *event);
+    bool event(QEvent *event) override; // QObject
 
   private:
     int                         m_channels;

@@ -28,7 +28,7 @@ public:
 
     int GetResult(void) { return m_result; }
 
-    virtual void run()
+    void run() override // MThread
     {
         RunProlog();
 
@@ -63,7 +63,7 @@ public:
 
     ImageSet GetResult(void) { return m_failed; }
 
-    virtual void run()
+    void run() override // MThread
     {
         RunProlog();
 

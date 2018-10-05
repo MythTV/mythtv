@@ -52,7 +52,7 @@ class ThemeExtractThread : public QRunnable
         m_destDir.detach();
     }
 
-    void run()
+    void run() override // QRunnable
     {
         extractZIP(m_srcFile, m_destDir);
 

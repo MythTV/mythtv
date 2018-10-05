@@ -116,17 +116,17 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     ChannelInfoList GetSelection(void) const;
 
-    virtual void GoTo(int start, int cur_row);
-    virtual void SetJumpToChannel(JumpToChannel *ptr);
+    void GoTo(int start, int cur_row) override; // JumpToChannelListener
+    void SetJumpToChannel(JumpToChannel *ptr) override; // JumpToChannelListener
 
-    bool Create(void);
-    virtual void Load(void);
-    virtual void Init(void);
-    bool keyPressEvent(QKeyEvent *event);
-    bool gestureEvent(MythGestureEvent *event);
+    bool Create(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    bool gestureEvent(MythGestureEvent *event) override; // MythScreenType
 
-    virtual void aboutToShow();
-    virtual void aboutToHide();
+    void aboutToShow() override; // MythScreenType
+    void aboutToHide() override; // MythScreenType
     // Allow class GuideUpdateProgramRow to figure out whether the
     // current start time/channel coordinates are the same, so that it can
     // skip the work if not.
@@ -153,8 +153,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void deleteRule();
 
-    void Close();
-    void customEvent(QEvent *event);
+    void Close() override; // MythScreenType
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected:
     GuideGrid(MythScreenStack *parentStack,
@@ -165,7 +165,7 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
               bool allowFinder = true,
               int changrpid = -1);
    ~GuideGrid();
-    virtual ProgramInfo *GetCurrentProgram(void) const
+    ProgramInfo *GetCurrentProgram(void) const override // ScheduleCommon
         { return m_programInfos[m_currentRow][m_currentCol]; };
 
   private slots:
@@ -194,12 +194,12 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void moveUpDown(MoveVector movement);
     void moveToTime(QDateTime datetime);
 
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void ShowRecordingMenu(void);
     void ShowJumpToTime(void);
 
     int  FindChannel(uint chanid, const QString &channum,
-                     bool exact = true) const;
+                     bool exact = true) const override; // JumpToChannelListener
 
     void fillChannelInfos(bool gotostartchannel = true);
     void fillTimeInfos(void);
