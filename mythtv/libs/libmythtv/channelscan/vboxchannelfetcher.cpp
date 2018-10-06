@@ -190,7 +190,8 @@ void VBoxChannelFetcher::run(void)
             // ignore this encrypted channel
             if (_scan_monitor)
             {
-                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Encrypted %1").arg(msg));
+                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Encrypted %1")
+                                                   .arg(msg));
             }
         }
         else if (chanType == "Radio" && _serviceType != kRequireAudio)
@@ -198,7 +199,8 @@ void VBoxChannelFetcher::run(void)
             // ignore this radio channel
             if (_scan_monitor)
             {
-                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Radio %1").arg(msg));
+                _scan_monitor->ScanAppendTextToLog(tr("Ignoring Radio %1")
+                                                   .arg(msg));
             }
         }
         else if (!SupportedTransmission(transType))

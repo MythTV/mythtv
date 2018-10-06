@@ -34,7 +34,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
 
     // Delete very old scans
     const vector<ScanInfo> list = LoadScanList();
-    for (uint i = 0; i < list.size(); i++)
+    for (uint i = 0; i < list.size(); ++i)
     {
         if (list[i].scandate > MythDate::current().addDays(-14))
             continue;
@@ -65,7 +65,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
     if (!scanid)
         return scanid;
 
-    for (uint i = 0; i < scan.size(); i++)
+    for (uint i = 0; i < scan.size(); ++i)
         scan[i].SaveScan(scanid);
 
     return scanid;

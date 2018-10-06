@@ -13,5 +13,5 @@ void LogList::AppendLine(const QString &text)
 {
     addSelection(text, QString::number(idx));
     setCurrentItem(idx);
-    idx++;
+    ++idx;
 }

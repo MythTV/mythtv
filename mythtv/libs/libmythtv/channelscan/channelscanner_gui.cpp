@@ -170,7 +170,7 @@ void ChannelScannerGUI::MonitorProgress(bool lock, bool strength,
     {
         connect(m_scanStage, SIGNAL(Exiting()), SLOT(quitScanning()));
 
-        for (uint i = 0; i < (uint) m_messageList.size(); i++)
+        for (uint i = 0; i < (uint) m_messageList.size(); ++i)
             m_scanStage->AppendLine(m_messageList[i]);
         mainStack->AddScreen(m_scanStage);
     }
