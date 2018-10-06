@@ -324,7 +324,7 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
 
     // Parse each channel
     uint lineNum = 1;
-    for (uint i = 1; true; i++)
+    for (uint i = 1; true; ++i)
     {
         IPTVChannelInfo info;
         QString channum = QString::null;

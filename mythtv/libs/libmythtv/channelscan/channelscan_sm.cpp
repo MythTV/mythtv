@@ -338,7 +338,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
         return false;
     }
 
-    for (uint i = 0; i < multiplexes.size(); i++)
+    for (uint i = 0; i < multiplexes.size(); ++i)
         AddToList(multiplexes[i]);
 
     m_extendScanList = follow_nit;
@@ -372,7 +372,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 
     // Add pmts to list, so we can do MPEG scan properly.
     ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
-    for (uint i = 0; i < pat->ProgramCount(); i++)
+    for (uint i = 0; i < pat->ProgramCount(); ++i)
     {
         if (pat->ProgramPID(i)) // don't add NIT "program", MPEG/ATSC safe.
             sd->AddListeningPID(pat->ProgramPID(i));
@@ -399,7 +399,7 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
         QString("Got a Virtual Channel Table for %1")
             .arg((*m_current).FriendlyName) + "\n" + vct->toString());
 
-    for (uint i = 0; !m_currentTestingDecryption && i < vct->ChannelCount(); i++)
+    for (uint i = 0; !m_currentTestingDecryption && i < vct->ChannelCount(); ++i)
     {
         if (vct->IsAccessControlled(i))
         {
@@ -455,7 +455,7 @@ void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
     uint id = sdt->OriginalNetworkID() << 16 | sdt->TSID();
     m_tsScanned.insert(id);
 
-    for (uint i = 0; !m_currentTestingDecryption && i < sdt->ServiceCount(); i++)
+    for (uint i = 0; !m_currentTestingDecryption && i < sdt->ServiceCount(); ++i)
     {
         if (sdt->IsEncrypted(i))
         {
@@ -486,7 +486,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
 
     m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
 
-    for (uint i = 0; i < bat->TransportStreamCount(); i++)
+    for (uint i = 0; i < bat->TransportStreamCount(); ++i)
     {
         uint tsid = bat->TSID(i);
         uint netid = bat->OriginalNetworkID(i);
@@ -504,7 +504,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             DefaultAuthorityDescriptor authority(def_auth);
             ServiceListDescriptor services(serv_list);
 
-            for (uint j = 0; j < services.ServiceCount(); j++)
+            for (uint j = 0; j < services.ServiceCount(); ++j)
             {
                 // If the default authority is given in the SDT this
                 // overrides any definition in the BAT (or in the NIT)
@@ -531,7 +531,7 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
 
     uint netid = sdt->OriginalNetworkID();
 
-    for (uint i = 0; i < sdt->ServiceCount(); i++)
+    for (uint i = 0; i < sdt->ServiceCount(); ++i)
     {
         uint serviceId = sdt->ServiceID(i);
         desc_list_t parsed =
@@ -604,7 +604,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
         }
 
         const ProgramMapTable *pmt = NULL;
-        for (uint i = 0; !pmt && (i < m_currentInfo->pmts.size()); i++)
+        for (uint i = 0; !pmt && (i < m_currentInfo->pmts.size()); ++i)
         {
             pmt = (m_currentInfo->pmts[i]->ProgramNumber() == pnum) ?
                 m_currentInfo->pmts[i] : NULL;
@@ -771,7 +771,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     // Grab PAT tables
     pat_vec_t pattmp = sd->GetCachedPATs();
     QMap<uint,bool> tsid_checked;
-    for (uint i = 0; i < pattmp.size(); i++)
+    for (uint i = 0; i < pattmp.size(); ++i)
     {
         uint tsid = pattmp[i]->TransportStreamID();
         if (tsid_checked[tsid])
@@ -826,7 +826,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
     sdt_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
-    for (uint i = 0; i < sdttmp.size(); i++)
+    for (uint i = 0; i < sdttmp.size(); ++i)
     {
         uint tsid = sdttmp[i]->TSID();
         if (tsid_checked[tsid])
@@ -1002,7 +1002,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
         if (m_scanning)
         {
-            m_transportsScanned++;
+            ++m_transportsScanned;
             UpdateScanPercentCompleted();
             m_waitingForTables = false;
             m_nextIt = m_current.nextTransport();
@@ -1158,7 +1158,7 @@ uint ChannelScanSM::GetCurrentTransportInfo(
 
     QMap<uint,ChannelInsertInfo> list = GetChannelList(m_current, m_currentInfo);
     {
-        for (int i = 0; i < list.size(); i++)
+        for (int i = 0; i < list.size(); ++i)
         {
             max_chan_cnt +=
                 (list[i].in_pat || list[i].in_pmt ||
@@ -1192,7 +1192,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // channels.conf
     const DTVChannelInfoList &echan = (*trans_info).expectedChannels;
-    for (uint i = 0; i < echan.size(); i++)
+    for (uint i = 0; i < echan.size(); ++i)
     {
         uint pnum = echan[i].serviceid;
         PCM_INFO_INIT("mpeg");
@@ -1208,7 +1208,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         for (; pat_it != (*pat_list_it).end(); ++pat_it)
         {
             bool could_be_opencable = false;
-            for (uint i = 0; i < (*pat_it)->ProgramCount(); i++)
+            for (uint i = 0; i < (*pat_it)->ProgramCount(); ++i)
             {
                 if (((*pat_it)->ProgramNumber(i) == 0) &&
                     ((*pat_it)->ProgramPID(i) == 0x1ffc))
@@ -1217,7 +1217,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                 }
             }
 
-            for (uint i = 0; i < (*pat_it)->ProgramCount(); i++)
+            for (uint i = 0; i < (*pat_it)->ProgramCount(); ++i)
             {
                 uint pnum = (*pat_it)->ProgramNumber(i);
                 if (pnum)
@@ -1238,7 +1238,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         const ProgramMapTable *pmt = *pmt_it;
         uint pnum = pmt->ProgramNumber();
         PCM_INFO_INIT("mpeg");
-        for (uint i = 0; i < pmt->StreamCount(); i++)
+        for (uint i = 0; i < pmt->StreamCount(); ++i)
         {
             info.could_be_opencable |=
                 (StreamID::OpenCableVideo == pmt->StreamType(i));
@@ -1248,7 +1248,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             pmt->ProgramInfo(), pmt->ProgramInfoLength(),
             DescriptorID::registration);
 
-        for (uint i = 0; i < descs.size(); i++)
+        for (uint i = 0; i < descs.size(); ++i)
         {
             RegistrationDescriptor reg(descs[i]);
             if (reg.FormatIdentifierString() == "CUEI" ||
@@ -1264,7 +1264,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     cvct_vec_t::const_iterator cvct_it = scan_info->cvcts.begin();
     for (; cvct_it != scan_info->cvcts.end(); ++cvct_it)
     {
-        for (uint i = 0; i < (*cvct_it)->ChannelCount(); i++)
+        for (uint i = 0; i < (*cvct_it)->ChannelCount(); ++i)
         {
             uint pnum = (*cvct_it)->ProgramNumber(i);
             PCM_INFO_INIT("atsc");
@@ -1276,7 +1276,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     tvct_vec_t::const_iterator tvct_it = scan_info->tvcts.begin();
     for (; tvct_it != scan_info->tvcts.end(); ++tvct_it)
     {
-        for (uint i = 0; i < (*tvct_it)->ChannelCount(); i++)
+        for (uint i = 0; i < (*tvct_it)->ChannelCount(); ++i)
         {
             uint pnum = (*tvct_it)->ProgramNumber(i);
             PCM_INFO_INIT("atsc");
@@ -1291,7 +1291,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         sdt_vec_t::const_iterator sdt_it = (*sdt_list_it).begin();
         for (; sdt_it != (*sdt_list_it).end(); ++sdt_it)
         {
-            for (uint i = 0; i < (*sdt_it)->ServiceCount(); i++)
+            for (uint i = 0; i < (*sdt_it)->ServiceCount(); ++i)
             {
                 uint pnum = (*sdt_it)->ServiceID(i);
                 PCM_INFO_INIT("dvb");
@@ -1312,7 +1312,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         nit_vec_t::const_iterator nits_it = scan_info->nits.begin();
         for (; nits_it != scan_info->nits.end(); ++nits_it)
         {
-            for (uint i = 0; i < (*nits_it)->TransportStreamCount(); i++)
+            for (uint i = 0; i < (*nits_it)->TransportStreamCount(); ++i)
             {
                 const NetworkInformationTable *nit = (*nits_it);
                 if ((nit->TSID(i)              == info.sdt_tsid) &&
@@ -1338,7 +1338,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                 if (desc)
                 {
                     DVBLogicalChannelDescriptor uklist(desc);
-                    for (uint j = 0; j < uklist.ChannelCount(); j++)
+                    for (uint j = 0; j < uklist.ChannelCount(); ++j)
                     {
                         ukChanNums[((qlonglong)info.orig_netid<<32) |
                                    uklist.ServiceID(j)] =
@@ -1870,7 +1870,7 @@ bool ChannelScanSM::ScanTransports(
                     item.toString());
             }
 
-            name_num++;
+            ++name_num;
             freq += ft.frequencyStep;
 
             if (!end.isEmpty() && name == end)
@@ -1909,7 +1909,7 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
     tunertype.Parse(cardtype);
 
     DTVChannelList::const_iterator it = channels.begin();
-    for (uint i = 0; it != channels.end(); ++it, i++)
+    for (uint i = 0; it != channels.end(); ++it, ++i)
     {
         DTVTransport tmp = *it;
         tmp.sistandard = std;
@@ -2075,7 +2075,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
         struct CHANLIST *curList = chanlists[0].list;
         int totalChannels = chanlists[0].count;
         int findFrequency = (query.value(3).toInt() / 1000) - 1750;
-        for (int x = 0 ; x < totalChannels ; x++)
+        for (int x = 0 ; x < totalChannels ; ++x)
         {
             if ((curList[x].freq <= findFrequency + 200) &&
                 (curList[x].freq >= findFrequency - 200))
@@ -2157,7 +2157,7 @@ bool ChannelScanSM::CheckImportedList(
         return true;
 
     bool found = false;
-    for (uint i = 0; i < channels.size(); i++)
+    for (uint i = 0; i < channels.size(); ++i)
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("comparing %1 %2 against %3 %4")

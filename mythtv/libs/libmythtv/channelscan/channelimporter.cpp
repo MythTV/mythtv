@@ -40,7 +40,8 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
 
             LOG(VB_GENERAL, LOG_INFO, LOC + (channels ?
                                              (m_success ?
-                                              QString("Found %1 channels").arg(channels) :
+                                              QString("Found %1 channels")
+                                              .arg(channels) :
                                               "No new channels to process") :
                                              "No channels to process.."));
 
@@ -91,7 +92,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     if (do_delete)
     {
         ScanDTVTransportList trans = transports;
-        for (uint i = 0; i < db_trans.size(); i++)
+        for (uint i = 0; i < db_trans.size(); ++i)
             trans.push_back(db_trans[i]);
         deleted_count = DeleteChannels(trans);
         if (deleted_count)
@@ -148,9 +149,9 @@ uint ChannelImporter::DeleteChannels(
     vector<uint> off_air_list;
     QMap<uint,bool> deleted;
 
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].channels[j];
             bool was_in_db = chan.db_mplexid && chan.channel_id;
@@ -178,7 +179,7 @@ uint ChannelImporter::DeleteChannels(
 
     if (kDeleteAll == action)
     {
-        for (uint k = 0; k < off_air_list.size(); k++)
+        for (uint k = 0; k < off_air_list.size(); ++k)
         {
             int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
             ChannelUtil::DeleteChannel(
@@ -188,7 +189,7 @@ uint ChannelImporter::DeleteChannels(
     }
     else if (kDeleteInvisibleAll == action)
     {
-        for (uint k = 0; k < off_air_list.size(); k++)
+        for (uint k = 0; k < off_air_list.size(); ++k)
         {
             int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
             int chanid = transports[i].channels[j].channel_id;
@@ -209,11 +210,11 @@ uint ChannelImporter::DeleteChannels(
         return 0;
 
     // Create a new transports list without the deleted channels
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
         newlist.push_back(transports[i]);
         newlist.back().channels.clear();
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             if (!deleted.contains(i<<16|j))
             {
@@ -293,7 +294,7 @@ void ChannelImporter::InsertChannels(
     // and complete tuning information.
 
     uint chantype = (uint) kChannelTypeNonConflictingFirst;
-    for (; chantype <= (uint) kChannelTypeNonConflictingLast; chantype++)
+    for (; chantype <= (uint) kChannelTypeNonConflictingLast; ++chantype)
     {
         ChannelType type = (ChannelType) chantype;
         uint new_chan, old_chan;
@@ -340,7 +341,7 @@ void ChannelImporter::InsertChannels(
     // for remaining channels with complete tuning information
     // insert channels with contiguous list of numbers as the channums
     chantype = (uint) kChannelTypeConflictingFirst;
-    for (; chantype <= (uint) kChannelTypeConflictingLast; chantype++)
+    for (; chantype <= (uint) kChannelTypeConflictingLast; ++chantype)
     {
 
         ChannelType type = (ChannelType) chantype;
@@ -385,14 +386,14 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
 
     // insert all channels with non-conflicting channum
     // and complete tuning information.
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
         bool created_new_transport = false;
         ScanDTVTransport new_transport;
         bool created_filter_transport = false;
         ScanDTVTransport filter_transport;
 
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].channels[j];
 
@@ -595,14 +596,14 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
 
     // update all channels with non-conflicting channum
     // and complete tuning information.
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
         bool created_transport = false;
         ScanDTVTransport new_transport;
         bool created_filter_transport = false;
         ScanDTVTransport filter_transport;
 
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].channels[j];
 
@@ -753,12 +754,12 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 
     vector<bool> ignore;
     ignore.resize(transports.size());
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
         if (ignore[i])
             continue;
 
-        for (uint j = i+1; j < transports.size(); j++)
+        for (uint j = i+1; j < transports.size(); ++j)
         {
             if (!transports[i].IsEqual(
                     tuner_type, transports[j], 500 * freq_mult))
@@ -766,10 +767,10 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
                 continue;
             }
 
-            for (uint k = 0; k < transports[j].channels.size(); k++)
+            for (uint k = 0; k < transports[j].channels.size(); ++k)
             {
                 bool found_same = false;
-                for (uint l = 0; l < transports[i].channels.size(); l++)
+                for (uint l = 0; l < transports[i].channels.size(); ++l)
                 {
                     if (transports[j].channels[k].IsSameChannel(
                             transports[i].channels[l]))
@@ -795,10 +796,10 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
     bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
     bool require_a  = m_service_requirements & kRequireAudio;
 
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
         ChannelInsertInfoList filtered;
-        for (uint k = 0; k < transports[i].channels.size(); k++)
+        for (uint k = 0; k < transports[i].channels.size(); ++k)
         {
             if (m_fta_only && transports[i].channels[k].is_encrypted &&
                 transports[i].channels[k].decryption_status != kEncDecrypted)
@@ -870,17 +871,17 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
         bool newt_found = false;
         QMap<uint,bool> found_chan;
 
-        for (uint i = 0; i < transports.size(); i++)
+        for (uint i = 0; i < transports.size(); ++i)
         {
             if (!transports[i].IsEqual(tuner_type, newt, 500 * freq_mult, true))
                 continue;
 
             transports[i].mplex = mplexid;
             newt_found = true;
-            for (uint j = 0; j < transports[i].channels.size(); j++)
+            for (uint j = 0; j < transports[i].channels.size(); ++j)
             {
                 ChannelInsertInfo &chan = transports[i].channels[j];
-                for (uint k = 0; k < newt.channels.size(); k++)
+                for (uint k = 0; k < newt.channels.size(); ++k)
                 {
                     if (newt.channels[k].IsSameChannel(chan, true))
                     {
@@ -907,7 +908,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
             ScanDTVTransport tmp = newt;
             tmp.channels.clear();
 
-            for (uint k = 0; k < newt.channels.size(); k++)
+            for (uint k = 0; k < newt.channels.size(); ++k)
             {
                 if (!found_chan[k])
                     tmp.channels.push_back(newt.channels[k]);
@@ -924,9 +925,9 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 void ChannelImporter::FixUpOpenCable(ScanDTVTransportList &transports)
 {
     ChannelImporterBasicStats info;
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             ChannelInsertInfo &chan = transports[i].channels[j];
             if (((chan.could_be_opencable && (chan.si_standard == "mpeg")) ||
@@ -942,9 +943,9 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
     const ScanDTVTransportList &transports)
 {
     ChannelImporterBasicStats info;
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             const ChannelInsertInfo &chan = transports[i].channels[j];
             int enc = (chan.is_encrypted) ?
@@ -956,20 +957,20 @@ ChannelImporterBasicStats ChannelImporter::CollectStats(
             info.ntsc_channels[enc] += (chan.si_standard == "ntsc");
             if (chan.si_standard != "ntsc")
             {
-                info.prognum_cnt[chan.service_id]++;
-                info.channum_cnt[map_str(chan.chan_num)]++;
+                ++info.prognum_cnt[chan.service_id];
+                ++info.channum_cnt[map_str(chan.chan_num)];
             }
             if (chan.si_standard == "atsc")
             {
-                info.atscnum_cnt[(chan.atsc_major_channel << 16) |
-                                 (chan.atsc_minor_channel)]++;
-                info.atscmin_cnt[chan.atsc_minor_channel]++;
-                info.atscmaj_cnt[chan.atsc_major_channel]++;
+                ++info.atscnum_cnt[(chan.atsc_major_channel << 16) |
+                                   (chan.atsc_minor_channel)];
+                ++info.atscmin_cnt[chan.atsc_minor_channel];
+                ++info.atscmaj_cnt[chan.atsc_major_channel];
             }
             if (chan.si_standard == "ntsc")
             {
-                info.atscnum_cnt[(chan.atsc_major_channel << 16) |
-                                 (chan.atsc_minor_channel)]++;
+                ++info.atscnum_cnt[(chan.atsc_major_channel << 16) |
+                                   (chan.atsc_minor_channel)];
             }
         }
     }
@@ -983,9 +984,9 @@ ChannelImporterUniquenessStats ChannelImporter::CollectUniquenessStats(
 {
     ChannelImporterUniquenessStats stats;
 
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             const ChannelInsertInfo &chan = transports[i].channels[j];
             stats.unique_prognum +=
@@ -1135,8 +1136,8 @@ QString ChannelImporter::FormatChannels(
 {
     QString msg;
 
-    for (uint i = 0; i < transports.size(); i++)
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+    for (uint i = 0; i < transports.size(); ++i)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
             msg += FormatChannel(transports[i], transports[i].channels[j],
                                  &info) + "\n";
 
@@ -1234,17 +1235,17 @@ void ChannelImporter::CountChannels(
     ChannelType type, uint &new_chan, uint &old_chan)
 {
     new_chan = old_chan = 0;
-    for (uint i = 0; i < transports.size(); i++)
+    for (uint i = 0; i < transports.size(); ++i)
     {
-        for (uint j = 0; j < transports[i].channels.size(); j++)
+        for (uint j = 0; j < transports[i].channels.size(); ++j)
         {
             ChannelInsertInfo chan = transports[i].channels[j];
             if (IsType(info, chan, type))
             {
                 if (chan.channel_id)
-                    old_chan++;
+                    ++old_chan;
                 else
-                    new_chan++;
+                    ++new_chan;
             }
         }
     }
@@ -1289,7 +1290,7 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
 
     QMutexLocker locker(&last_free_lock);
     uint last_free_chan_num = last_free_chan_num_map[chan.source_id];
-    for (last_free_chan_num++; ; last_free_chan_num++)
+    for (last_free_chan_num++; ; ++last_free_chan_num)
     {
         chan_num = QString::number(last_free_chan_num);
         if (!ChannelUtil::IsConflicting(chan_num, chan.source_id))

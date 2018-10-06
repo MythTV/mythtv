@@ -60,7 +60,7 @@ void MultiplexSetting::Load(void)
             struct CHANLIST* curList = chanlists[0].list;
             int totalChannels = chanlists[0].count;
             int findFrequency = (query.value(3).toInt() / 1000) - 1750;
-            for (int x = 0 ; x < totalChannels ; x++)
+            for (int x = 0 ; x < totalChannels ; ++x)
             {
                 if ((curList[x].freq <= findFrequency + 200) &&
                     (curList[x].freq >= findFrequency - 200))

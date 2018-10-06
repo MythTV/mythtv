@@ -66,7 +66,7 @@ void InputSelector::Load(void)
     }
 
     uint which = 0, cnt = 0;
-    for (; query.next(); cnt++)
+    for (; query.next(); ++cnt)
     {
         uint    cardid     = query.value(0).toUInt();
         QString inputname  = query.value(3).toString();
