@@ -34,7 +34,9 @@
 #endif // _WIN32
 
 
-#include "zlib.h"
+#include <zlib.h>
+#undef Z_NULL
+#define Z_NULL nullptr
 
 /////////////////////////////////////////////////////////////////////////////
 //

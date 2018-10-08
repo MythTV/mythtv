@@ -4,7 +4,9 @@
 
 #include <mythcontext.h>
 
-#include "minizip/unzip.h"
+#include <minizip/unzip.h>
+#undef Z_NULL
+#define Z_NULL nullptr
 
 static int calcOffset(QString GameType, uLong filesize) {
     int result;

@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <zlib.h>
+#undef Z_NULL
+#define Z_NULL nullptr
 #include <fcntl.h>
 
 // Qt headers

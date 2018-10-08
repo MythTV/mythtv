@@ -33,6 +33,8 @@
 #include <QDateTime>
 
 #include <zlib.h>
+#undef Z_NULL
+#define Z_NULL nullptr
 
 #include "mythbaseexp.h"
 

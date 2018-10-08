@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <zlib.h>
+#undef Z_NULL
+#define Z_NULL nullptr
 
 #include "dsmccobjcarousel.h"
 #include "dsmccreceiver.h"
