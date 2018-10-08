@@ -403,10 +403,8 @@ bool Dvr::ReactivateRecording(int RecordedId)
 
 bool Dvr::RescheduleRecordings(void)
 {
-    QString cmd = QString("RESCHEDULE_RECORDINGS");
-    MythEvent me(cmd);
-
-    gCoreContext->dispatch(me);
+    ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
+                                        "RescheduleRecordings");
     return true;
 }
 

@@ -3140,15 +3140,46 @@ void MainServer::DoHandleUndeleteRecording(
     SendResponse(pbssock, outputlist);
 }
 
+/**
+ * \fn MainServer::HandleRescheduleRecordings
+ *
+ * This function processes the received network protocol message to
+ * reschedule recordings. It ignores the parameters supplied by the
+ * caller and always asks the scheduling system to reschedule all
+ * recordings.
+ *
+ * The network message should look like this:
+ *
+ * RESCHEDULE_RECORDINGS[]:[]MATCH 0 0 0 - MythUtilCommand
+ *
+ * The five values after the 'MATCH' keyword control which recordings
+ * should be rescheduled. They are described in the BuildMatchRequest
+ * function.
+ *
+ * \sa ScheduledRecording::BuildMatchRequest
+ *
+ * \param request Ignored. This function doesn't parse any additional
+ *                parameters.
+ * \param pbs     The socket used to send the response.
+ *
+ * \addtogroup myth_network_protocol
+ * \par        RESCHEDULE_RECORDINGS
+ * Requests that all recordings after the current time be rescheduled.
+ */
 void MainServer::HandleRescheduleRecordings(const QStringList &request,
                                             PlaybackSock *pbs)
 {
-     ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
-                                         "HandleRescheduleRecordings");
+    QStringList result;
+    if (m_sched)
+    {
+        m_sched->Reschedule(request);
+        result = QStringList(QString::number(1));
+    }
+    else
+        result = QStringList(QString::number(0));
 
     if (pbs)
     {
-        QStringList result  = QStringList( QString::number(1) );
         MythSocket *pbssock = pbs->getSocket();
         if (pbssock)
             SendResponse(pbssock, result);
