@@ -3206,15 +3206,20 @@ void MainServer::DoHandleUndeleteRecording(
  * \par        RESCHEDULE_RECORDINGS
  * Requests that all recordings after the current time be rescheduled.
  */
-void MainServer::HandleRescheduleRecordings(const QStringList &/*request*/,
+void MainServer::HandleRescheduleRecordings(const QStringList &request,
                                             PlaybackSock *pbs)
 {
-     ScheduledRecording::RescheduleMatch(0, 0, 0, QDateTime(),
-                                         "HandleRescheduleRecordings");
+    QStringList result;
+    if (m_sched)
+    {
+        m_sched->Reschedule(request);
+        result = QStringList(QString::number(1));
+    }
+    else
+        result = QStringList(QString::number(0));
 
     if (pbs)
     {
-        QStringList result  = QStringList( QString::number(1) );
         MythSocket *pbssock = pbs->getSocket();
         if (pbssock)
             SendResponse(pbssock, result);
