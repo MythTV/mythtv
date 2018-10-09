@@ -5835,10 +5835,15 @@ if ! disabled openmax; then
     if test -f /opt/vc/include/IL/OMX_Broadcom.h \
         && test -f /opt/vc/lib/libopenmaxil.so ; then
         enable openmax_broadcom
-    elif test -f /usr/include/bellagio/omxcore.h \
-        && test -f /usr/lib*/libomxil-bellagio.so; then
-        enable openmax_bellagio
-        add_extralibs -lomxil-bellagio
+    elif test -f /usr/include/bellagio/omxcore.h ; then
+        if test -f /usr/lib/libomxil-bellagio.so \
+           -o -f /usr/lib32/libomxil-bellagio.so \
+           -o -f /usr/lib64/libomxil-bellagio.so ; then
+            enable openmax_bellagio
+            add_extralibs -lomxil-bellagio
+        else
+            disable openmax
+        fi
     else
         disable openmax
     fi
