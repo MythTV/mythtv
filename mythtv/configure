@@ -6856,8 +6856,16 @@ elif enabled clangxx; then
     check_cxxflags -Wimplicit-fallthrough
     # Clang needs this to link on Fedora
     add_extralibs -lstdc++
-    # Don't complain about over-aligned types
-    check_cxxflags -faligned-allocation
+    # Don't complain about over-aligned types.
+    if test $target_os = "freebsd"; then
+        # The libc++ library on FreeBSD 10 is missing the required
+        # new() function and doesn't work with this flag enabled.
+        if test $(uname -K) -gt 1100000; then
+            check_cxxflags -faligned-allocation
+        fi
+    else
+        check_cxxflags -faligned-allocation
+    fi
 fi
 
 # Check for python dependencies
