@@ -21,6 +21,7 @@ using_backend {
 
     !win32-msvc*:SUBDIRS += scripts
     !mingw:!win32-msvc*: SUBDIRS += mythfilerecorder
+    !mingw:!win32-msvc*: SUBDIRS += mythexternrecorder
 }
 
 using_mythtranscode: SUBDIRS += mythtranscode

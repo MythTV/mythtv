@@ -32,6 +32,7 @@
 #define MYTH_APPNAME_MYTHLOGSERVER "mythlogserver"
 #define MYTH_APPNAME_MYTHSCREENWIZARD "mythscreenwizard"
 #define MYTH_APPNAME_MYTHFFPROBE "mythffprobe"
+#define MYTH_APPNAME_MYTHEXTERNRECORDER "mythexternrecorder"
 
 class MDBManager;
 class MythCoreContextPrivate;
