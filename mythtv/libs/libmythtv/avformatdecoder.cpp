@@ -4052,7 +4052,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         int prior = fpsMultiplier;
         if (fpschange > 1.9 && fpschange < 2.1)
             fpsMultiplier = 2;
-        if (fpschange > 0.5 && fpschange < 0.6)
+        if (fpschange > 0.9 && fpschange < 1.1)
             fpsMultiplier = 1;
         if (fpsMultiplier != prior)
             m_parent->SetFrameRate(fps);
