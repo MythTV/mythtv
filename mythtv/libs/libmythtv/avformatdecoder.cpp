@@ -4984,21 +4984,26 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
             lastapts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
 
-        if (skipaudio && selectedTrack[kTrackTypeVideo].av_stream_index > -1)
+        if (!use_frame_timing)
         {
-            if ((lastapts < lastvpts - (10.0 / fps)) || lastvpts == 0)
-                break;
-            else
-                skipaudio = false;
-        }
+            // This code under certain conditions causes jump backwards to lose
+            // audio.
+            if (skipaudio && selectedTrack[kTrackTypeVideo].av_stream_index > -1)
+            {
+                if ((lastapts < lastvpts - (10.0 / fps)) || lastvpts == 0)
+                    break;
+                else
+                    skipaudio = false;
+            }
 
-        // skip any audio frames preceding first video frame
-        if (firstvptsinuse && firstvpts && (lastapts < firstvpts))
-        {
-            LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-                QString("discarding early audio timecode %1 %2 %3")
-                    .arg(pkt->pts).arg(pkt->dts).arg(lastapts));
-            break;
+            // skip any audio frames preceding first video frame
+            if (firstvptsinuse && firstvpts && (lastapts < firstvpts))
+            {
+                LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
+                    QString("discarding early audio timecode %1 %2 %3")
+                        .arg(pkt->pts).arg(pkt->dts).arg(lastapts));
+                break;
+            }
         }
         firstvptsinuse = false;
 
