@@ -645,7 +645,7 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     // seconds.  Otherwise, this check is only performed on keyframes,
     // and if there is a problem with the input we may never see one
     // again, resulting in a wedged recording.
-    if (ringBufferCheckTimer.isRunning() &&
+    if (!finished && ringBufferCheckTimer.isRunning() &&
         ringBufferCheckTimer.elapsed() > 60000)
     {
         LOG(VB_RECORD, LOG_WARNING, LOC + "It has been over 60 seconds "
