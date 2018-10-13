@@ -988,7 +988,9 @@ int DecoderBase::SetTrack(uint type, int trackNo)
 
 StreamInfo DecoderBase::GetTrackInfo(uint type, uint trackNo) const
 {
-    QMutexLocker locker(avcodeclock);
+    // This locker causes a deadlock with DVDRingBuffer
+    // which is waiting while holding the lock.
+    // QMutexLocker locker(avcodeclock);
 
     if (trackNo >= tracks[type].size())
     {
