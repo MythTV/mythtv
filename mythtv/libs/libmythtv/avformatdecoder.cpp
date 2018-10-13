@@ -1565,7 +1565,7 @@ enum AVPixelFormat get_format_vaapi(struct AVCodecContext *avctx,
 #endif
 
 #ifdef USING_VAAPI2
-static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext *avctx,
+static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext */*avctx*/,
                                            const enum AVPixelFormat *valid_fmts)
 {
     enum AVPixelFormat ret = AV_PIX_FMT_NONE;
@@ -1582,10 +1582,9 @@ static enum AVPixelFormat get_format_vaapi2(struct AVCodecContext *avctx,
 #endif
 
 #ifdef USING_MEDIACODEC
-static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext *avctx,
+static enum AVPixelFormat get_format_mediacodec(struct AVCodecContext */*avctx*/,
                                            const enum AVPixelFormat *valid_fmts)
 {
-    Q_UNUSED(avctx);
     enum AVPixelFormat ret = AV_PIX_FMT_NONE;
     while (*valid_fmts != AV_PIX_FMT_NONE) {
         if (*valid_fmts == AV_PIX_FMT_MEDIACODEC)
