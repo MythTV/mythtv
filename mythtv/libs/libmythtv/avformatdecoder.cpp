@@ -2643,6 +2643,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             use_frame_timing = false;
             if (! private_dec
+                && ! ringBuffer->IsDVD()
                 && (codec_is_std(video_codec_id)
                     || codec_is_mediacodec(video_codec_id)
                     || codec_is_vaapi2(video_codec_id)))
