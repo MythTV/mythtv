@@ -99,6 +99,7 @@ enum PlayerFlags
     kVideoIsNull          = 0x000100,
     kAudioMuted           = 0x010000,
     kNoITV                = 0x020000,
+    kMusicChoice          = 0x040000,
 };
 
 #define FlagIsSet(arg) (playerFlags & arg)

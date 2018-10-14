@@ -1681,6 +1681,23 @@ static HostCheckBoxSetting *EndOfRecordingExitPrompt()
     return gc;
 }
 
+static HostCheckBoxSetting *MusicChoiceEnabled()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MusicChoiceEnabled");
+
+    gc->setLabel(PlaybackSettings::tr("Enable Music Choice"));
+
+    gc->setValue(false);
+
+    gc->setHelpText(PlaybackSettings::tr("Enable this to improve playing of Music Choice channels "
+                                         "or recordings from those channels. "
+                                         "These are audio channels with slide show "
+                                         "from some cable providers. "
+                                         "In unusual situations this could cause lip sync problems "
+                                         "watching normal videos or TV shows."));
+    return gc;
+}
+
 static HostCheckBoxSetting *JumpToProgramOSD()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("JumpToProgramOSD");
@@ -4104,6 +4121,7 @@ void PlaybackSettings::Load(void)
     general->addChild(PIPLocationComboBox());
     general->addChild(PlaybackExitPrompt());
     general->addChild(EndOfRecordingExitPrompt());
+    general->addChild(MusicChoiceEnabled());
     addChild(general);
 
     m_playbackProfiles = CurrentPlaybackProfile();

@@ -1915,7 +1915,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
         }
         else
         {
-            dropframe = true;
+            dropframe = !FlagIsSet(kMusicChoice);
             dbg = QString("A/V predict drop frame, refreshrate %1, avsync_predictor %2, diverge %3, ")
             .arg(refreshrate).arg(avsync_predictor).arg(diverge);
         }
@@ -1923,7 +1923,7 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     if (max_video_behind)
     {
-        dropframe = true;
+        dropframe = !FlagIsSet(kMusicChoice);
         // If video is way behind of audio, adjust for it...
         dbg = QString("Video is %1 frames behind audio (too slow), ")
             .arg(-diverge);
@@ -2236,7 +2236,8 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         {
             float current   = ComputeSecs(framesPlayed, true);
             float length    = ComputeSecs(totalFrames, true);
-            if (length > current && length - current < 1.5)
+            if (length > current && length - current < 1.5
+                && !FlagIsSet(kMusicChoice))
             {
                 LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
                     QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
@@ -2249,7 +2250,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         usleep(frame_interval >> 3);
         int waited_for = buffering_start.msecsTo(QTime::currentTime());
         int last_msg = buffering_last_msg.msecsTo(QTime::currentTime());
-        if (last_msg > 100)
+        if (last_msg > 100 && !FlagIsSet(kMusicChoice))
         {
             if (++bufferingCounter == 10)
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
@@ -2263,9 +2264,15 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                     QString("Waited %1ms for video buffers %2")
                         .arg(waited_for).arg(videoOutput->GetFrameStatus()));
             buffering_last_msg = QTime::currentTime();
-            // music choice only sends a frame every 6 seconds
-            // so wait 7 seconds before doing this reset
-            if (waited_for > 7000 && audio.IsBufferAlmostFull())
+            if (audio.GetAudioBufferedTime() > 2000 && framesPlayed < 5
+                && gCoreContext->GetNumSetting("MusicChoiceEnabled", 0))
+            {
+                playerFlags = (PlayerFlags)(playerFlags | kMusicChoice);
+                LOG(VB_GENERAL, LOG_NOTICE, LOC +
+                    "Music Choice program detected - disabling AV Sync.");
+            }
+            if (waited_for > 7000 && audio.IsBufferAlmostFull()
+                && !FlagIsSet(kMusicChoice))
             {
                 // We are likely to enter this condition
                 // if the audio buffer was too full during GetFrame in AVFD
