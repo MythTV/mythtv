@@ -5839,6 +5839,7 @@ if ! disabled openmax; then
         if test -f /usr/lib/libomxil-bellagio.so \
            -o -f /usr/lib32/libomxil-bellagio.so \
            -o -f /usr/lib64/libomxil-bellagio.so ; then
+            enable openmax
             enable openmax_bellagio
             add_extralibs -lomxil-bellagio
         else
