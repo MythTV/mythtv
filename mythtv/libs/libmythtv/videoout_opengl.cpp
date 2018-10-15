@@ -40,7 +40,10 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
     if (opts.decoders->contains("openmax"))
         (*opts.safe_renderers)["openmax"].append("opengl");
     if (opts.decoders->contains("mediacodec"))
+    {
         (*opts.safe_renderers)["mediacodec"].append("opengl");
+        (*opts.safe_renderers)["mediacodec"].append("opengl-lite");
+    }
     if (opts.decoders->contains("vaapi2"))
         (*opts.safe_renderers)["vaapi2"].append("opengl");
     opts.priorities->insert("opengl", 65);

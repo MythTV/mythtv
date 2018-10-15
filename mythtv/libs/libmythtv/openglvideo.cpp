@@ -162,11 +162,18 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     bool glsl    = gl_features & kGLSL;
     bool shaders = glsl || (gl_features & kGLExtFragProg);
     bool fbos    = gl_features & kGLExtFBufObj;
-#ifndef ANDROID
     bool pbos    = gl_features & kGLExtPBufObj;
-    static bool yv12 = !getenv("OPENGL_NOYV12");
-#endif
-    static bool uyvy = !getenv("OPENGL_NOUYVY");
+
+    #ifdef ANDROID
+    #define YV12DEFAULT 0
+    #else
+    #define YV12DEFAULT 1
+    #endif
+
+    bool yv12 = gCoreContext->GetNumSetting("OpenGLYV12", YV12DEFAULT)
+        && !getenv("OPENGL_NOYV12");
+    bool uyvy = gCoreContext->GetNumSetting("OpenGLUYVY", 1)
+        && !getenv("OPENGL_NOUYVY");
     bool ycbcr   = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
 
     // warn about the lite profile when it offers no benefit
@@ -185,15 +192,8 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         videoTextureType = GL_YCBCR_MESA;
     else if ((!shaders || preferYCBCR) && (gl_features & kGLAppleYCbCr))
         videoTextureType = GL_YCBCR_422_APPLE;
-#ifndef ANDROID
-    // WORKAROUND - bypass this on Android
-    // because on Android using texture type MYTHTV_YV12
-    // results in a green line on bottom and left with
-    // some videos. It seems to happen on videos that are
-    // being resized (e.g. play 720p video with 1080p screen).
     else if (glsl && fbos && !(pbos && uyvy) && yv12)
         videoTextureType = MYTHTV_YV12;
-#endif
     else if (shaders && fbos && uyvy)
         videoTextureType = MYTHTV_UYVY;
 

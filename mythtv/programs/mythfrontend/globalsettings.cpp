@@ -86,6 +86,41 @@ static HostTextEditSetting *VAAPIDevice()
 }
 #endif
 
+static HostCheckBoxSetting *OpenGLYV12()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLYV12");
+
+    gc->setLabel(PlaybackSettings::tr("Allow YV12 (YUV 4:2:0) pixel format for OpenGL"));
+
+    gc->setHelpText(PlaybackSettings::tr("Disabling one or more pixel formats may help with picture "
+                                         "problems when using "
+                                         "OpenGL video rendering. By default YV12 is disabled for "
+                                         "android and enabled for other systems."));
+#ifdef ANDROID
+#define YV12DEFAULT false
+#else
+#define YV12DEFAULT true
+#endif
+
+    gc->setValue(YV12DEFAULT);
+
+    return gc;
+}
+
+static HostCheckBoxSetting *OpenGLUYVY()
+{
+    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLUYVY");
+
+    gc->setLabel(PlaybackSettings::tr("Allow UYVY (YUV 4:2:2) pixel format for OpenGL"));
+
+    gc->setHelpText(PlaybackSettings::tr("Disabling one or more pixel formats may help with picture "
+                                         "problems when using "
+                                         "OpenGL video rendering. By default UYVY is enabled. "));
+    gc->setValue(true);
+
+    return gc;
+}
+
 #if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
 {
@@ -4096,11 +4131,6 @@ void PlaybackSettings::Load(void)
 {
     GroupSetting* general = new GroupSetting();
     general->setLabel(tr("General Playback"));
-    general->addChild(RealtimePriority());
-#ifdef USING_VAAPI2
-    general->addChild(VAAPIDevice());
-#endif
-    general->addChild(AudioReadAhead());
     general->addChild(JumpToProgramOSD());
     general->addChild(ClearSavedPosition());
     general->addChild(UseProgStartMark());
@@ -4123,6 +4153,17 @@ void PlaybackSettings::Load(void)
     general->addChild(EndOfRecordingExitPrompt());
     general->addChild(MusicChoiceEnabled());
     addChild(general);
+
+    GroupSetting* advanced = new GroupSetting();
+    advanced->setLabel(tr("Advanced Playback Settings"));
+    advanced->addChild(RealtimePriority());
+    advanced->addChild(AudioReadAhead());
+#ifdef USING_VAAPI2
+    advanced->addChild(VAAPIDevice());
+#endif
+    advanced->addChild(OpenGLYV12());
+    advanced->addChild(OpenGLUYVY());
+    addChild(advanced);
 
     m_playbackProfiles = CurrentPlaybackProfile();
     addChild(m_playbackProfiles);
