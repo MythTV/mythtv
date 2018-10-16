@@ -86,22 +86,24 @@ class Commands : public QObject
     }
 
     bool SendStatus(const QString & cmd, const QString & status);
+    bool SendStatus(const QString & cmd, const QString & serial,
+                    const QString & status);
     bool ProcessCommand(const QString & cmd);
 
   protected:
     void Run(void);
     bool Open(void);
     void Close(void);
-    void StartStreaming(void);
-    void StopStreaming(bool silent);
-    void LockTimeout(void) const;
-    void HasTuner(void) const;
-    void HasPictureAttributes(void) const;
-    void SetBlockSize(int blksz);
-    void TuneChannel(const QString & channum);
-    void LoadChannels(void);
-    void FirstChannel(void);
-    void NextChannel(void);
+    void StartStreaming(const QString & serial);
+    void StopStreaming(const QString & serial, bool silent);
+    void LockTimeout(const QString & serial) const;
+    void HasTuner(const QString & serial) const;
+    void HasPictureAttributes(const QString & serial) const;
+    void SetBlockSize(const QString & serial, int blksz);
+    void TuneChannel(const QString & serial, const QString & channum);
+    void LoadChannels(const QString & serial);
+    void FirstChannel(const QString & serial);
+    void NextChannel(const QString & serial);
 
   private:
     std::thread m_thread;
@@ -133,20 +135,21 @@ class MythExternControl : public QObject
   signals:
     void Open(void);
     void Close(void);
-    void StartStreaming(void);
-    void StopStreaming(bool silent);
-    void LockTimeout(void) const;
-    void HasTuner(void) const;
-    void HasPictureAttributes(void) const;
-    void SetBlockSize(int blksz);
-    void TuneChannel(const QString & channum);
-    void LoadChannels(void);
-    void FirstChannel(void);
-    void NextChannel(void);
+    void StartStreaming(const QString & serial);
+    void StopStreaming(const QString & serial, bool silent);
+    void LockTimeout(const QString & serial) const;
+    void HasTuner(const QString & serial) const;
+    void HasPictureAttributes(const QString & serial) const;
+    void SetBlockSize(const QString & serial, int blksz);
+    void TuneChannel(const QString & serial, const QString & channum);
+    void LoadChannels(const QString & serial);
+    void FirstChannel(const QString & serial);
+    void NextChannel(const QString & serial);
 
   public slots:
     void SetDescription(const QString & desc) { m_desc = desc; }
-    void SendMessage(const QString & command, const QString & msg);
+    void SendMessage(const QString & command, const QString & serial,
+                     const QString & msg);
     void ErrorMessage(const QString & msg);
     void Opened(void);
     void Done(void);

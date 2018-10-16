@@ -24,6 +24,7 @@
 #include <QtCore/QtCore>
 #include <QFileInfo>
 #include <QProcess>
+#include <QElapsedTimer>
 
 #define LOC Desc()
 
@@ -32,6 +33,7 @@ MythExternRecApp::MythExternRecApp(const QString & command,
     : QObject()
     , m_fatal(false)
     , m_run(true)
+    , m_streaming(false)
     , m_result(0)
     , m_buffer_max(188 * 10000)
     , m_block_size(m_buffer_max / 4)
@@ -113,14 +115,14 @@ bool MythExternRecApp::Open(void)
 {
     if (m_fatal)
     {
-        emit SendMessage("Open", "ERR:Already dead.");
+        emit SendMessage("Open", "0", "ERR:Already dead.");
         return false;
     }
 
     if (m_command.isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": No recorder provided.");
-        emit SendMessage("Open", "ERR:No recorder provided.");
+        emit SendMessage("Open", "0", "ERR:No recorder provided.");
         return false;
     }
 
@@ -214,12 +216,12 @@ void MythExternRecApp::Run(void)
     emit Done();
 }
 
-Q_SLOT void MythExternRecApp::LoadChannels(void)
+Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)
 {
     if (m_channels_ini.isEmpty())
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": No channels configured.");
-        emit SendMessage("LoadChannels", "ERR:No channels configured.");
+        emit SendMessage("LoadChannels", serial, "ERR:No channels configured.");
         return;
     }
 
@@ -235,7 +237,8 @@ Q_SLOT void MythExternRecApp::LoadChannels(void)
         {
             QString errmsg = QString("Failed to start '%1': ").arg(cmd) + ENO;
             LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + errmsg);
-            emit SendMessage("LoadChannels", QString("ERR:%1").arg(errmsg));
+            emit SendMessage("LoadChannels", serial,
+                             QString("ERR:%1").arg(errmsg));
             return;
         }
 
@@ -265,7 +268,8 @@ Q_SLOT void MythExternRecApp::LoadChannels(void)
         {
             QString errmsg = QString("Timedout waiting for '%1'").arg(cmd);
             LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + errmsg);
-            emit SendMessage("LoadChannels", QString("ERR:%1").arg(errmsg));
+            emit SendMessage("LoadChannels", serial,
+                             QString("ERR:%1").arg(errmsg));
             return;
         }
     }
@@ -276,29 +280,32 @@ Q_SLOT void MythExternRecApp::LoadChannels(void)
     m_chan_settings->sync();
     m_channels = m_chan_settings->childGroups();
 
-    emit SendMessage("LoadChannels", QString("OK:%1").arg(m_channels.size()));
+    emit SendMessage("LoadChannels", serial,
+                     QString("OK:%1").arg(m_channels.size()));
 }
 
-void MythExternRecApp::GetChannel(QString func)
+void MythExternRecApp::GetChannel(const QString & serial, const QString & func)
 {
     if (m_channels_ini.isEmpty() || m_channels.size() == 0)
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": No channels configured.");
-        emit SendMessage("FirstChannel", QString("ERR:No channels configured."));
+        emit SendMessage("FirstChannel", serial,
+                         QString("ERR:No channels configured."));
         return;
     }
 
     if (m_chan_settings == nullptr)
     {
         LOG(VB_CHANNEL, LOG_WARNING, LOC + ": Invalid channel configuration.");
-        emit SendMessage(func, "ERR:Invalid channel configuration.");
+        emit SendMessage(func, serial,
+                         "ERR:Invalid channel configuration.");
         return;
     }
 
     if (m_channels.size() <= m_channel_idx)
     {
         LOG(VB_CHANNEL, LOG_WARNING, LOC + ": No more channels.");
-        emit SendMessage(func, "ERR:No more channels.");
+        emit SendMessage(func, serial, "ERR:No more channels.");
         return;
     }
 
@@ -316,27 +323,28 @@ void MythExternRecApp::GetChannel(QString func)
         QString(": NextChannel Name:'%1',Callsign:'%2',xmltvid:%3")
         .arg(name).arg(callsign).arg(xmltvid));
 
-    emit SendMessage(func, QString("OK:%1,%2,%3,%4")
+    emit SendMessage(func, serial, QString("OK:%1,%2,%3,%4")
                      .arg(channum).arg(name).arg(callsign).arg(xmltvid));
 }
 
-Q_SLOT void MythExternRecApp::FirstChannel(void)
+Q_SLOT void MythExternRecApp::FirstChannel(const QString & serial)
 {
     m_channel_idx = 0;
-    GetChannel("FirstChannel");
+    GetChannel(serial, "FirstChannel");
 }
 
-Q_SLOT void MythExternRecApp::NextChannel(void)
+Q_SLOT void MythExternRecApp::NextChannel(const QString & serial)
 {
-    GetChannel("NextChannel");
+    GetChannel(serial, "NextChannel");
 }
 
-Q_SLOT void MythExternRecApp::TuneChannel(const QString & channum)
+Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
+                                          const QString & channum)
 {
     if (m_channels_ini.isEmpty())
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": No channels configured.");
-        emit SendMessage("TuneChannel", "ERR:No channels configured.");
+        emit SendMessage("TuneChannel", serial, "ERR:No channels configured.");
         return;
     }
 
@@ -347,12 +355,12 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & channum)
 
     if (url.isEmpty())
     {
-        QString msg = QString("Channel number %1 is missing a URL.")
+        QString msg = QString("Channel number [%1] is missing a URL.")
                       .arg(channum);
 
         LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + msg);
 
-        emit SendMessage("TuneChannel", QString("ERR:%1").arg(msg));
+        emit SendMessage("TuneChannel", serial, QString("ERR:%1").arg(msg));
         return;
     }
 
@@ -366,7 +374,7 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & channum)
         {
             QString errmsg = QString("'%1' failed: ").arg(tune) + ENO;
             LOG(VB_CHANNEL, LOG_ERR, LOC + ": " + errmsg);
-            emit SendMessage("TuneChannel", QString("ERR:%1").arg(errmsg));
+            emit SendMessage("TuneChannel", serial, QString("ERR:%1").arg(errmsg));
             return;
         }
         LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -395,51 +403,56 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & channum)
         QString(": TuneChannel %1: URL '%2'").arg(channum).arg(url));
     m_tuned = true;
 
-    emit SetDescription(m_desc);
-    emit SendMessage("TuneChannel", QString("OK:Tunned to %1").arg(channum));
+    emit SetDescription(Desc());
+    emit SendMessage("TuneChannel", serial,
+                     QString("OK:Tunned to %1").arg(channum));
 }
 
-Q_SLOT void MythExternRecApp::LockTimeout(void)
+Q_SLOT void MythExternRecApp::LockTimeout(const QString & serial)
 {
     if (!Open())
         return;
 
     if (m_lock_timeout > 0)
-        emit SendMessage("LockTimeout", QString("OK:%1").arg(m_lock_timeout));
-    emit SendMessage("LockTimeout", QString("OK:%1")
+        emit SendMessage("LockTimeout", serial,
+                         QString("OK:%1").arg(m_lock_timeout));
+    emit SendMessage("LockTimeout", serial, QString("OK:%1")
                      .arg(m_scan_command.isEmpty() ? 12000 : 120000));
 }
 
-Q_SLOT void MythExternRecApp::HasTuner(void)
+Q_SLOT void MythExternRecApp::HasTuner(const QString & serial)
 {
-    emit SendMessage("HasTuner", QString("OK:%1")
+    emit SendMessage("HasTuner", serial, QString("OK:%1")
                      .arg(m_channels_ini.isEmpty() ? "No" : "Yes"));
 }
 
-Q_SLOT void MythExternRecApp::HasPictureAttributes(void)
+Q_SLOT void MythExternRecApp::HasPictureAttributes(const QString & serial)
 {
-    emit SendMessage("HasPictureAttributes", "OK:No");
+    emit SendMessage("HasPictureAttributes", serial, "OK:No");
 }
 
-Q_SLOT void MythExternRecApp::SetBlockSize(int blksz)
+Q_SLOT void MythExternRecApp::SetBlockSize(const QString & serial, int blksz)
 {
     m_block_size = blksz;
-    emit SendMessage("BlockSize", "OK");
+    emit SendMessage("BlockSize", serial, "OK");
 }
 
-Q_SLOT void MythExternRecApp::StartStreaming(void)
+Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
 {
+    m_streaming = true;
     if (!m_tuned && !m_channels_ini.isEmpty())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": No channel has been tuned");
-        emit SendMessage("StartStreaming", "ERR:No channel has been tuned");
+        emit SendMessage("StartStreaming", serial,
+                         "ERR:No channel has been tuned");
         return;
     }
 
     if (m_proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": Application already running");
-        emit SendMessage("StartStreaming", "WARN:Application already running");
+        emit SendMessage("StartStreaming", serial,
+                         "WARN:Application already running");
         return;
     }
 
@@ -453,7 +466,8 @@ Q_SLOT void MythExternRecApp::StartStreaming(void)
     if (!m_proc.waitForStarted())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to start application.");
-        emit SendMessage("StartStreaming", "ERR:Failed to start application.");
+        emit SendMessage("StartStreaming", serial,
+                         "ERR:Failed to start application.");
         return;
     }
 
@@ -461,11 +475,13 @@ Q_SLOT void MythExternRecApp::StartStreaming(void)
         .arg(m_proc.program()).arg(m_proc.processId()));
 
     emit Streaming(true);
-    emit SendMessage("StartStreaming", "OK:Streaming Started");
+    emit SetDescription(Desc());
+    emit SendMessage("StartStreaming", serial, "OK:Streaming Started");
 }
 
-Q_SLOT void MythExternRecApp::StopStreaming(bool silent)
+Q_SLOT void MythExternRecApp::StopStreaming(const QString & serial, bool silent)
 {
+    m_streaming = false;
     if (m_proc.state() == QProcess::Running)
     {
         m_proc.terminate();
@@ -474,19 +490,22 @@ Q_SLOT void MythExternRecApp::StopStreaming(bool silent)
 
         LOG(VB_RECORD, LOG_INFO, LOC + ": External application terminated.");
         if (silent)
-            emit SendMessage("StopStreaming", "STATUS:Streaming Stopped");
+            emit SendMessage("StopStreaming", serial, "STATUS:Streaming Stopped");
         else
-            emit SendMessage("StopStreaming", "OK:Streaming Stopped");
+            emit SendMessage("StopStreaming", serial, "OK:Streaming Stopped");
     }
     else
     {
         if (silent)
-            emit SendMessage("StopStreaming", "STATUS:Already not Streaming");
+            emit SendMessage("StopStreaming", serial,
+                             "STATUS:Already not Streaming");
         else
-            emit SendMessage("StopStreaming", "WARN:Already not Streaming");
+            emit SendMessage("StopStreaming", serial,
+                             "WARN:Already not Streaming");
     }
 
     emit Streaming(false);
+    emit SetDescription(Desc());
 }
 
 Q_SLOT void MythExternRecApp::ProcStarted(void)
@@ -500,7 +519,8 @@ Q_SLOT void MythExternRecApp::ProcFinished(int exitCode,
                                            QProcess::ExitStatus exitStatus)
 {
     m_result = exitCode;
-    QString msg = QString("Finished: %1 (exit code: %2)")
+    QString msg = QString("%1Finished: %2 (exit code: %3)")
+                  .arg(exitStatus != QProcess::NormalExit ? "ERR " : "")
                   .arg(exitStatus == QProcess::NormalExit ? "OK" : "Failed")
                   .arg(m_result);
     LOG(VB_RECORD, LOG_INFO, LOC + ": " + msg);
@@ -509,11 +529,13 @@ Q_SLOT void MythExternRecApp::ProcFinished(int exitCode,
 
 Q_SLOT void MythExternRecApp::ProcStateChanged(QProcess::ProcessState newState)
 {
+    bool unexpected = false;
     QString msg = "State Changed: ";
     switch (newState)
     {
         case QProcess::NotRunning:
           msg += "Not running";
+          unexpected = m_streaming;
           break;
         case QProcess::Starting:
           msg += "Starting ";
@@ -522,7 +544,10 @@ Q_SLOT void MythExternRecApp::ProcStateChanged(QProcess::ProcessState newState)
           msg += QString("Running PID %1").arg(m_proc.processId());
           break;
     }
-    LOG(VB_RECORD, LOG_INFO, LOC + ": " + msg);
+
+    LOG(VB_RECORD, LOG_INFO, LOC + msg);
+    if (unexpected)
+        MythLog("ERR Unexpected " + msg);
 }
 
 Q_SLOT void MythExternRecApp::ProcError(QProcess::ProcessError /*error */)

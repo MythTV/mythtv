@@ -31,7 +31,7 @@
 
 using namespace std;
 
-const QString VERSION = "0.1";
+const QString VERSION = "0.5";
 
 #define LOC Desc()
 
@@ -117,10 +117,11 @@ void MythExternControl::Fatal(const QString & msg)
 }
 
 Q_SLOT void MythExternControl::SendMessage(const QString & cmd,
+                                           const QString & serial,
                                            const QString & msg)
 {
     std::unique_lock<std::mutex> lk(m_msg_mutex);
-    m_commands.SendStatus(cmd, msg);
+    m_commands.SendStatus(cmd, serial, msg);
 }
 
 Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
@@ -154,76 +155,101 @@ void Commands::Close(void)
     m_parent->m_flow_cond.notify_all();
 }
 
-void Commands::StartStreaming(void)
+void Commands::StartStreaming(const QString & serial)
 {
-    emit m_parent->StartStreaming();
+    emit m_parent->StartStreaming(serial);
 }
 
-void Commands::StopStreaming(bool silent)
+void Commands::StopStreaming(const QString & serial, bool silent)
 {
-    emit m_parent->StopStreaming(silent);
+    emit m_parent->StopStreaming(serial, silent);
 }
 
-void Commands::LockTimeout(void) const
+void Commands::LockTimeout(const QString & serial) const
 {
-    emit m_parent->LockTimeout();
+    emit m_parent->LockTimeout(serial);
 }
 
-void Commands::HasTuner(void)   const
+void Commands::HasTuner(const QString & serial)   const
 {
-    emit m_parent->HasTuner();
+    emit m_parent->HasTuner(serial);
 }
 
-void Commands::HasPictureAttributes(void) const
+void Commands::HasPictureAttributes(const QString & serial) const
 {
-    emit m_parent->HasPictureAttributes();
+    emit m_parent->HasPictureAttributes(serial);
 }
 
-void Commands::SetBlockSize(int blksz)
+void Commands::SetBlockSize(const QString & serial, int blksz)
 {
-    emit m_parent->SetBlockSize(blksz);
+    emit m_parent->SetBlockSize(serial, blksz);
 }
 
-void Commands::TuneChannel(const QString & channum)
+void Commands::TuneChannel(const QString & serial, const QString & channum)
 {
-    emit m_parent->TuneChannel(channum);
+    emit m_parent->TuneChannel(serial, channum);
 }
 
-void Commands::LoadChannels(void)
+void Commands::LoadChannels(const QString & serial)
 {
-    emit m_parent->LoadChannels();
+    emit m_parent->LoadChannels(serial);
 }
 
-void Commands::FirstChannel(void)
+void Commands::FirstChannel(const QString & serial)
 {
-    emit m_parent->FirstChannel();
+    emit m_parent->FirstChannel(serial);
 }
 
-void Commands::NextChannel(void)
+void Commands::NextChannel(const QString & serial)
 {
-    emit m_parent->NextChannel();
+    emit m_parent->NextChannel(serial);
 }
 
-bool Commands::SendStatus(const QString & command, const QString & status)
+bool Commands::SendStatus(const QString & command, const QString & msg)
 {
-    int len = write(2, status.toUtf8().constData(), status.size());
+    int len = write(2, msg.toUtf8().constData(), msg.size());
     write(2, "\n", 1);
 
-    if (len != static_cast<int>(status.size()))
+    if (len != static_cast<int>(msg.size()))
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
-            QString("%1: Only wrote %2 of %3 bytes of status '%4'.")
-            .arg(command).arg(len).arg(status.size()).arg(status));
+            QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
+            .arg(command).arg(len).arg(msg.size()).arg(msg));
+        return false;
+    }
+
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
+        .arg(command).arg(msg));
+
+    m_parent->ClearError();
+    return true;
+}
+
+bool Commands::SendStatus(const QString & command, const QString & serial,
+                          const QString & status)
+{
+    QString msg = QString("%1:%2").arg(serial).arg(status);
+
+    int len = write(2, msg.toUtf8().constData(), msg.size());
+    write(2, "\n", 1);
+
+    if (len != static_cast<int>(msg.size()))
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            QString("%1: Only wrote %2 of %3 bytes of message '%4'.")
+            .arg(command).arg(len).arg(msg.size()).arg(msg));
         return false;
     }
 
     if (!command.isEmpty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-            .arg(command).arg(status));
+            .arg(command).arg(msg));
     }
+#if 0
     else
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("%1").arg(status));
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("%1").arg(msg));
+#endif
 
     m_parent->ClearError();
     return true;
@@ -235,112 +261,137 @@ bool Commands::ProcessCommand(const QString & cmd)
 
     std::unique_lock<std::mutex> lk(m_parent->m_msg_mutex);
 
-    if (cmd.startsWith("Version?"))
+    if (cmd.startsWith("APIVersion?"))
     {
         if (m_parent->m_fatal)
             SendStatus(cmd, "ERR:" + m_parent->ErrorString());
         else
-            SendStatus(cmd, "OK:" + VERSION);
+            SendStatus(cmd, "OK:2");
+        return true;
     }
-    else if (cmd.startsWith("HasLock?"))
+
+    QStringList tokens = cmd.split(':', QString::SkipEmptyParts);
+    if (tokens.size() < 2)
+    {
+        SendStatus(cmd, "0",
+                   QString("0:ERR:Version 2 API expects serial_no:msg format. "
+                           "Saw '%1' instead").arg(cmd));
+        return true;
+    }
+
+    if (tokens[1].startsWith("Version?"))
+    {
+        if (m_parent->m_fatal)
+            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
+        else
+            SendStatus(cmd, tokens[0], "OK:" + VERSION);
+    }
+    else if (tokens[1].startsWith("HasLock?"))
     {
         if (m_parent->m_ready)
-            SendStatus(cmd, "OK:Yes");
+            SendStatus(cmd, tokens[0], "OK:Yes");
         else
-            SendStatus(cmd, "OK:No");
+            SendStatus(cmd, tokens[0], "OK:No");
     }
-    else if (cmd.startsWith("SignalStrengthPercent"))
+    else if (tokens[1].startsWith("SignalStrengthPercent"))
     {
         if (m_parent->m_ready)
-            SendStatus(cmd, "OK:100");
+            SendStatus(cmd, tokens[0], "OK:100");
         else
-            SendStatus(cmd, "OK:20");
+            SendStatus(cmd, tokens[0], "OK:20");
     }
-    else if (cmd.startsWith("LockTimeout"))
+    else if (tokens[1].startsWith("LockTimeout"))
     {
-        LockTimeout();
+        LockTimeout(tokens[0]);
     }
-    else if (cmd.startsWith("HasTuner"))
+    else if (tokens[1].startsWith("HasTuner"))
     {
-        HasTuner();
+        HasTuner(tokens[0]);
     }
-    else if (cmd.startsWith("HasPictureAttributes"))
+    else if (tokens[1].startsWith("HasPictureAttributes"))
     {
-        HasPictureAttributes();
+        HasPictureAttributes(tokens[0]);
     }
-    else if (cmd.startsWith("SendBytes"))
+    else if (tokens[1].startsWith("SendBytes"))
     {
         // Used when FlowControl is Polling
-        SendStatus(cmd, "ERR:Not supported");
+        SendStatus(cmd, tokens[0], "ERR:Not supported");
     }
-    else if (cmd.startsWith("XON"))
+    else if (tokens[1].startsWith("XON"))
     {
         // Used when FlowControl is XON/XOFF
-        SendStatus(cmd, "OK");
+        SendStatus(cmd, tokens[0], "OK");
         m_parent->m_xon = true;
         m_parent->m_flow_cond.notify_all();
     }
-    else if (cmd.startsWith("XOFF"))
+    else if (tokens[1].startsWith("XOFF"))
     {
-        SendStatus(cmd, "OK");
+        SendStatus(cmd, tokens[0], "OK");
         // Used when FlowControl is XON/XOFF
         m_parent->m_xon = false;
         m_parent->m_flow_cond.notify_all();
     }
-    else if (cmd.startsWith("TuneChannel"))
+    else if (tokens[1].startsWith("TuneChannel"))
     {
-        TuneChannel(cmd.mid(12));
+        if (tokens.size() > 1)
+            TuneChannel(tokens[0], tokens[2]);
+        else
+            SendStatus(cmd, tokens[0], "ERR:Missing channum");
     }
-    else if (cmd.startsWith("LoadChannels"))
+    else if (tokens[1].startsWith("LoadChannels"))
     {
-        LoadChannels();
+        LoadChannels(tokens[0]);
     }
-    else if (cmd.startsWith("FirstChannel"))
+    else if (tokens[1].startsWith("FirstChannel"))
     {
-        FirstChannel();
+        FirstChannel(tokens[0]);
     }
-    else if (cmd.startsWith("NextChannel"))
+    else if (tokens[1].startsWith("NextChannel"))
     {
-        NextChannel();
+        NextChannel(tokens[0]);
     }
-    else if (cmd.startsWith("IsOpen?"))
+    else if (tokens[1].startsWith("IsOpen?"))
     {
         std::unique_lock<std::mutex> lk(m_parent->m_run_mutex);
         if (m_parent->m_fatal)
-            SendStatus(cmd, "ERR:" + m_parent->ErrorString());
+            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
         else if (m_parent->m_ready)
-            SendStatus(cmd, "OK:Open");
+            SendStatus(cmd, tokens[0], "OK:Open");
         else
-            SendStatus(cmd, "WARN:Not Open yet");
+            SendStatus(cmd, tokens[0], "WARN:Not Open yet");
     }
-    else if (cmd.startsWith("CloseRecorder"))
+    else if (tokens[1].startsWith("CloseRecorder"))
     {
         if (m_parent->m_streaming)
-            StopStreaming(true);
+            StopStreaming(tokens[0], true);
         m_parent->Terminate();
-        SendStatus(cmd, "OK:Terminating");
+        SendStatus(cmd, tokens[0], "OK:Terminating");
     }
-    else if (cmd.startsWith("FlowControl?"))
+    else if (tokens[1].startsWith("FlowControl?"))
     {
-        SendStatus(cmd, "OK:XON/XOFF");
+        SendStatus(cmd, tokens[0], "OK:XON/XOFF");
     }
-    else if (cmd.startsWith("BlockSize"))
+    else if (tokens[1].startsWith("BlockSize"))
     {
-        SetBlockSize(cmd.mid(10).toInt());
+        if (tokens.size() > 1)
+            SetBlockSize(tokens[0], tokens[2].toUInt());
+        else
+            SendStatus(cmd, tokens[0], "ERR:Missing block size");
     }
-    else if (cmd.startsWith("StartStreaming"))
+    else if (tokens[1].startsWith("StartStreaming"))
     {
-        StartStreaming();
+        StartStreaming(tokens[0]);
     }
-    else if (cmd.startsWith("StopStreaming"))
+    else if (tokens[1].startsWith("StopStreaming"))
     {
         /* This does not close the stream!  When Myth is done with
          * this 'recording' ExternalChannel::EnterPowerSavingMode()
          * will be called, which invokes CloseRecorder() */
-        StopStreaming(false);
+        StopStreaming(tokens[0], false);
     }
     else
-        SendStatus(cmd, "ERR:Unrecognized command");
+        SendStatus(cmd, tokens[0],
+                   QString("ERR:Unrecognized command '%1'").arg(tokens[1]));
 
     return true;
 }
@@ -430,6 +481,7 @@ bool Buffer::Fill(const QByteArray & buffer)
         return false;
 
     static int dropped = 0;
+    static int dropped_bytes = 0;
 
     m_parent->m_flow_mutex.lock();
     if (m_data.size() < MAX_QUEUE)
@@ -446,9 +498,12 @@ bool Buffer::Fill(const QByteArray & buffer)
     }
     else
     {
+        dropped_bytes += buffer.size();
         LOG(VB_RECORD, LOG_WARNING, LOC +
-            QString("Packet queue overrun. Dropped %1 packets.")
-            .arg(++dropped));
+            QString("Packet queue overrun. Dropped %1 packets, %2 bytes.")
+            .arg(++dropped).arg(dropped_bytes));
+
+        std::this_thread::sleep_for(std::chrono::microseconds(250));
     }
 
     m_parent->m_flow_mutex.unlock();

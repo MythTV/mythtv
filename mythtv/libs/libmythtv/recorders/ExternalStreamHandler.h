@@ -19,7 +19,7 @@ class ExternalChannel;
 
 class ExternIO
 {
-    enum constants { kMaxErrorCnt = 5 };
+    enum constants { kMaxErrorCnt = 20 };
 
   public:
     ExternIO(const QString & app, const QStringList & args);
@@ -87,12 +87,16 @@ class ExternalStreamHandler : public StreamHandler
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    bool CheckForStatus(void);
+    bool CheckForError(void);
 
     void PurgeBuffer(void);
 
     bool ProcessCommand(const QString & cmd, uint timeout, QString & result,
-                        int retry_cnt = 10, int wait_cnt = 5);
+                        uint retry_cnt = 10, uint wait_cnt = 10);
+    bool ProcessVer1(const QString & cmd, uint timeout, QString & result,
+                     uint retry_cnt, uint wait_cnt);
+    bool ProcessVer2(const QString & cmd, uint timeout, QString & result,
+                     uint retry_cnt, uint wait_cnt);
 
   private:
     int StreamingCount(void) const;
@@ -108,6 +112,8 @@ class ExternalStreamHandler : public StreamHandler
     bool           m_poll_mode;
     bool           m_notify;
 
+    uint           m_apiVersion;
+    uint           m_serialNo;
     bool           m_hasTuner;
     bool           m_hasPictureAttributes;
 
@@ -122,6 +128,7 @@ class ExternalStreamHandler : public StreamHandler
     QAtomicInt    m_streaming_cnt;
     QMutex        m_stream_lock;
     QMutex        m_replay_lock;
+    QMutex        m_process_lock;
 };
 
 #endif // _ExternalSTREAMHANDLER_H_

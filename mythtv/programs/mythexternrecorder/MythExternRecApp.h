@@ -41,12 +41,13 @@ class MythExternRecApp : public QObject
 
     QString Desc(void) const;
     void MythLog(const QString & msg)
-    { SendMessage("", QString("STATUS:%1").arg(msg)); }
+    { SendMessage("", "0", QString("STATUS:%1").arg(msg)); }
     void SetErrorMsg(const QString & msg) { emit ErrorMessage(msg); }
 
   signals:
     void SetDescription(const QString & desc);
-    void SendMessage(const QString & func, const QString & msg);
+    void SendMessage(const QString & func, const QString & serial,
+                     const QString & msg);
     void ErrorMessage(const QString & msg);
     void Opened(void);
     void Done(void);
@@ -62,20 +63,20 @@ class MythExternRecApp : public QObject
     void ProcReadStandardOutput(void);
 
     void Close(void);
-    void StartStreaming(void);
-    void StopStreaming(bool silent);
-    void LockTimeout(void);
-    void HasTuner(void);
-    void LoadChannels(void);
-    void FirstChannel(void);
-    void NextChannel(void);
+    void StartStreaming(const QString & serial);
+    void StopStreaming(const QString & serial, bool silent);
+    void LockTimeout(const QString & serial);
+    void HasTuner(const QString & serial);
+    void LoadChannels(const QString & serial);
+    void FirstChannel(const QString & serial);
+    void NextChannel(const QString & serial);
 
-    void TuneChannel(const QString & channum);
-    void HasPictureAttributes(void);
-    void SetBlockSize(int blksz);
+    void TuneChannel(const QString & serial, const QString & channum);
+    void HasPictureAttributes(const QString & serial);
+    void SetBlockSize(const QString & serial, int blksz);
 
   protected:
-    void GetChannel(QString func);
+    void GetChannel(const QString & serial, const QString & func);
 
   private:
     bool config(void);
@@ -85,6 +86,7 @@ class MythExternRecApp : public QObject
     std::atomic<bool>       m_run;
     std::condition_variable m_run_cond;
     std::mutex              m_run_mutex;
+    std::atomic<bool>       m_streaming;
     int       m_result;
 
     uint      m_buffer_max;
