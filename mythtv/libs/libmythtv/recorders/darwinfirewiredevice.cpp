@@ -77,7 +77,7 @@ class DFDPriv
     DFDPriv() :
         controller_thread(0),
         controller_thread_cf_ref(nullptr), controller_thread_running(false),
-        notify_port(nullptr), notify_source(nullptr), deviter(nullptr),
+        notify_port(0), notify_source(0), deviter(0),
         actual_fwchan(-1), is_streaming(false), avstream(nullptr), logger(nullptr),
         no_data_cnt(0), no_data_timer_set(false)
     {
@@ -202,7 +202,7 @@ void DarwinFirewireDevice::StopController(void)
     if (m_priv->deviter)
     {
         IOObjectRelease(m_priv->deviter);
-        m_priv->deviter = nullptr;
+        m_priv->deviter = 0;
     }
 
     if (m_priv->notify_source)
@@ -948,7 +948,7 @@ static void dfd_update_device_list(void *dfd, io_iterator_t deviter)
 {
     DarwinFirewireDevice *dev = reinterpret_cast<DarwinFirewireDevice*>(dfd);
 
-    io_object_t it = nullptr;
+    io_object_t it = 0;
     while ((it = IOIteratorNext(deviter)))
     {
         uint64_t guid = 0;

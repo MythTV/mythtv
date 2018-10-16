@@ -43,10 +43,10 @@ CGDirectDisplayID GetOSXCocoaDisplay(void* view)
 {
     NSView *thisview = static_cast<NSView *>(view);
     if (!thisview)
-        return nullptr;
+        return 0;
     NSScreen *screen = [[thisview window] screen];
     if (!screen)
-        return nullptr;
+        return 0;
     NSDictionary* desc = [screen deviceDescription];
     return (CGDirectDisplayID)[[desc objectForKey:@"NSScreenNumber"] intValue];
 }
