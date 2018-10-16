@@ -640,7 +640,7 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
         positionMapLock.unlock();
     }
 
-    // Make sure a ringbuffer switch is checked at least every 10
+    // Make sure a ringbuffer switch is checked at least every 60
     // seconds.  Otherwise, this check is only performed on keyframes,
     // and if there is a problem with the input we may never see one
     // again, resulting in a wedged recording.
