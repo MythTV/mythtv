@@ -23,6 +23,15 @@
 #ifndef H264PARSER_H
 #define H264PARSER_H
 
+// OMG this is a hack.  Buried several layers down in FFmpeg includes
+// is an include of unistd.h that using GCC will foricibly redefine
+// NULL back to the wrong value.  (Maybe just on ARM?)  Include
+// unistd.h up front so that the subsequent inclusions will be
+// skipped, and then define NULL to the right value.
+#include <unistd.h>
+#undef NULL
+#define NULL nullptr
+
 #include <QString>
 #include <stdint.h>
 #include "mythconfig.h"
@@ -34,6 +43,9 @@
 
 // copied from libavutil/internal.h
 extern "C" {
+// Grr. NULL keeps getting redefined back to 0
+#undef NULL
+#define NULL nullptr
 #include "libavutil/common.h" // for AV_GCC_VERSION_AT_LEAST()
 }
 #ifndef av_alias
@@ -45,6 +57,9 @@ extern "C" {
 #endif
 
 extern "C" {
+// Grr. NULL keeps getting redefined back to 0
+#undef NULL
+#define NULL nullptr
 #include "libavcodec/get_bits.h"
 }
 
