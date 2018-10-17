@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_OK;
     }
 
-    pthread_setname_np(pthread_self(), "main");
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mythexternrecorder");
 
