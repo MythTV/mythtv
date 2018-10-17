@@ -24,6 +24,7 @@
 #include <QObject>
 #include <QtCore/QtCore>
 
+#include <atomic>
 #include <condition_variable>
 
 class MythExternControl;
