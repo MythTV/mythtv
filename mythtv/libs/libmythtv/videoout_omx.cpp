@@ -1433,7 +1433,7 @@ MythRenderEGL::MythRenderEGL() :
     MythRenderOpenGL2ES(MythRenderFormat()),
     m_display(EGL_NO_DISPLAY),
     m_context(EGL_NO_CONTEXT),
-    m_window(0),
+    m_window(nullptr),
     m_surface(EGL_NO_SURFACE)
 {
     // Disable flush to get performance improvement
