@@ -33,6 +33,7 @@ mpeg2_mc_t mpeg2_mc;
 
 void mpeg2_mc_init (uint32_t accel)
 {
+    (void)accel; // Unused depending on cpu architecture
 #if ARCH_X86
 #if HAVE_MMX
     if (accel & MPEG2_ACCEL_X86_MMXEXT)

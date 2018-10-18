@@ -503,7 +503,6 @@ private:
     void ff_fft_permuteCR(FFTContext *s, FFTComplex *z, FFTSample *r)
     {
         int j, k, np;
-        FFTComplex tmp;
         const uint16_t *revtab = s->revtab;
 
         /* reverse */

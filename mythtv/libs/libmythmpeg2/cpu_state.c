@@ -124,5 +124,7 @@ void mpeg2_cpu_state_init (uint32_t accel)
 	mpeg2_cpu_state_save = state_save_altivec;
 	mpeg2_cpu_state_restore = state_restore_altivec;
     }
+#else
+    (void)accel;
 #endif
 }

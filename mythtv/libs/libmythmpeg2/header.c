@@ -813,6 +813,7 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels)
 
 static int copyright_ext (mpeg2dec_t * mpeg2dec)
 {
+    (void)mpeg2dec;
     return 0;
 }
 

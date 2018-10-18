@@ -1352,6 +1352,7 @@ static void motion_fr_dmv_##FORMAT (mpeg2_decoder_t * const decoder,	      \
 {									      \
     int motion_x, motion_y, dmv_x, dmv_y, m, other_x, other_y;		      \
     unsigned int pos_x, pos_y, xy_half, offset;				      \
+    (void)table;                                                        \
 									      \
     NEEDBITS (bit_buf, bits, bit_ptr);					      \
     motion_x = motion->pmv[0][0] + get_motion_delta (decoder,		      \
@@ -1480,6 +1481,7 @@ static void motion_fi_dmv_##FORMAT (mpeg2_decoder_t * const decoder,	      \
 {									      \
     int motion_x, motion_y, other_x, other_y;				      \
     unsigned int pos_x, pos_y, xy_half, offset;				      \
+    (void)table;							      \
 									      \
     NEEDBITS (bit_buf, bits, bit_ptr);					      \
     motion_x = motion->pmv[0][0] + get_motion_delta (decoder,		      \
