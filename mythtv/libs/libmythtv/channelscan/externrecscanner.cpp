@@ -41,7 +41,7 @@ ExternRecChannelScanner::~ExternRecChannelScanner(void)
 {
     Stop();
     delete m_thread;
-    m_thread = NULL;
+    m_thread = nullptr;
 }
 
 /** \fn ExternRecChannelScanner::Stop(void)

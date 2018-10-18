@@ -520,7 +520,7 @@ void Buffer::Run(void)
 
     bool       is_empty = false;
     bool       wait = false;
-    time_t     send_time = time (NULL) + (60 * 5);
+    time_t     send_time = time (nullptr) + (60 * 5);
     uint64_t   write_total = 0;
     uint64_t   written = 0;
     uint64_t   write_cnt = 0;
@@ -539,10 +539,10 @@ void Buffer::Run(void)
             wait = false;
         }
 
-        if (send_time < static_cast<double>(time (NULL)))
+        if (send_time < static_cast<double>(time (nullptr)))
         {
             // Every 5 minutes, write out some statistics.
-            send_time = time (NULL) + (60 * 5);
+            send_time = time (nullptr) + (60 * 5);
             write_total += written;
             if (m_parent->m_streaming)
                 LOG(VB_RECORD, LOG_NOTICE, LOC +
