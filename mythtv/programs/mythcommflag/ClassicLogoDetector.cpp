@@ -51,6 +51,12 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
     m_commDetectLogoBadEdgeThreshold =
         gCoreContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
         .toDouble();
+    m_commDetectLogoLocation =
+        gCoreContext->GetSetting("CommDetectLogoLocation", "");
+    m_commDetectLogoWidthRatio =
+        gCoreContext->GetNumSetting("CommDetectLogoWidthRatio", 4);
+    m_commDetectLogoHeightRatio =
+        gCoreContext->GetNumSetting("CommDetectLogoHeightRatio", 4);
 }
 
 ClassicLogoDetector::~ClassicLogoDetector()
@@ -234,8 +240,8 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
         cerr << "Hit ENTER to continue" << endl;
         getchar();
 #endif
-        if (((m_logoMaxX - m_logoMinX) < (m_width / 4)) &&
-            ((m_logoMaxY - m_logoMinY) < (m_height / 4)) &&
+        if (((m_logoMaxX - m_logoMinX) < (m_width  / m_commDetectLogoWidthRatio)) &&
+            ((m_logoMaxY - m_logoMinY) < (m_height / m_commDetectLogoHeightRatio)) &&
             (pixelsInMask > minPixelsInMask))
         {
             m_logoInfoAvailable = true;
@@ -446,14 +452,22 @@ void ClassicLogoDetector::DetectEdges(MythVideoFrame *frame, EdgeMaskEntry *edge
 
     for (uint y = m_commDetectBorder + r; y < (m_height - m_commDetectBorder - r); y++)
     {
-        if ((y > (m_height/4)) && (y < (m_height * 3 / 4)))
+        if (
+            (m_commDetectLogoLocation.contains("N") && (y > (m_height/4))) ||
+            (m_commDetectLogoLocation.contains("S") && (y < (m_height * 3 / 4))) ||
+            ((y > (m_height/4)) && (y < (m_height * 3 / 4)))
+            )
             continue;
 
         for (uint x = m_commDetectBorder + r; x < (m_width - m_commDetectBorder - r); x++)
         {
             int edgeCount = 0;
 
-            if ((x > (m_width/4)) && (x < (m_width * 3 / 4)))
+            if (
+                (m_commDetectLogoLocation.contains("W") && (x > (m_width/4))) ||
+                (m_commDetectLogoLocation.contains("E") && (x < (m_width * 3 / 4))) ||
+                ((x > (m_width/4)) && (x < (m_width * 3 / 4)))
+                )
                 continue;
 
             uint pos = y * m_width + x;
