@@ -118,7 +118,7 @@ class SignalMonitor : protected MThread
 
   protected:
     SignalMonitor(int _capturecardnum, ChannelBase *_channel,
-                  uint64_t wait_for_mask, bool _release_stream);
+                  bool _release_stream, uint64_t wait_for_mask);
 
     virtual void run(void);
 

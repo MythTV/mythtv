@@ -216,7 +216,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *  \param wait_for_mask   SignalMonitorFlags to start with.
  */
 SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
-                             uint64_t wait_for_mask, bool _release_stream)
+                             bool _release_stream, uint64_t wait_for_mask)
     : MThread("SignalMonitor"),
       channel(_channel),               pParent(nullptr),
       capturecardnum(_capturecardnum), flags(wait_for_mask),
