@@ -119,6 +119,8 @@ class SignalMonitor : protected MThread
   protected:
     SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                   bool _release_stream, uint64_t wait_for_mask);
+    // Prevent implicit conversion of wrongly ordered arguments
+    SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
 
     virtual void run(void);
 
