@@ -49,6 +49,12 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
     commDetectLogoBadEdgeThreshold =
         gCoreContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
         .toDouble();
+    commDetectLogoLocation =
+        gCoreContext->GetSetting("CommDetectLogoLocation", "");
+    commDetectLogoWidthRatio =
+        gCoreContext->GetNumSetting("CommDetectLogoWidthRatio", 4);
+    commDetectLogoHeightRatio =
+        gCoreContext->GetNumSetting("CommDetectLogoHeightRatio", 4);
 }
 
 unsigned int ClassicLogoDetector::getRequiredAvailableBufferForSearch()
@@ -239,8 +245,8 @@ bool ClassicLogoDetector::searchForLogo(MythPlayer* player)
         cerr << "Hit ENTER to continue" << endl;
         getchar();
 #endif
-        if (((logoMaxX - logoMinX) < (width / 4)) &&
-            ((logoMaxY - logoMinY) < (height / 4)) &&
+        if (((logoMaxX - logoMinX) < (width / commDetectLogoWidthRatio)) &&
+            ((logoMaxY - logoMinY) < (height / commDetectLogoHeightRatio)) &&
             (pixelsInMask > minPixelsInMask))
         {
             logoInfoAvailable = true;
@@ -461,14 +467,22 @@ void ClassicLogoDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
 
     for (y = commDetectBorder + r; y < (height - commDetectBorder - r); y++)
     {
-        if ((y > (height/4)) && (y < (height * 3 / 4)))
+        if (
+            (commDetectLogoLocation.contains("N") && (y > (height/4))) ||
+            (commDetectLogoLocation.contains("S") && (y < (height * 3 / 4))) ||
+            ((y > (height/4)) && (y < (height * 3 / 4)))
+            )
             continue;
 
         for (x = commDetectBorder + r; x < (width - commDetectBorder - r); x++)
         {
             int edgeCount = 0;
 
-            if ((x > (width/4)) && (x < (width * 3 / 4)))
+            if (
+                (commDetectLogoLocation.contains("W") && (x > (width/4))) ||
+                (commDetectLogoLocation.contains("E") && (x < (width * 3 / 4))) ||
+                ((x > (width/4)) && (x < (width * 3 / 4)))
+                )
                 continue;
 
             pos = y * width + x;

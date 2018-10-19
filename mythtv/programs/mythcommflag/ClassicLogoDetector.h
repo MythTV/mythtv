@@ -35,8 +35,11 @@ class ClassicLogoDetector : public LogoDetectorBase
     int commDetectLogoSamplesNeeded;
     int commDetectLogoSampleSpacing;
     int commDetectLogoSecondsNeeded;
+    int commDetectLogoWidthRatio;
+    int commDetectLogoHeightRatio;
     double commDetectLogoGoodEdgeThreshold;
     double commDetectLogoBadEdgeThreshold;
+    QString commDetectLogoLocation;
 
     EdgeMaskEntry *edgeMask;
 
