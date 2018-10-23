@@ -73,9 +73,10 @@ class MHEngine: public MHEG {
     MHEngine(MHContext *context);
     virtual ~MHEngine();
 
-    virtual void SetBooting() { m_fBooting = true; }
+    void SetBooting() override // MHEG
+        { m_fBooting = true; }
 
-    virtual void DrawDisplay(QRegion toDraw);
+    void DrawDisplay(QRegion toDraw) override; // MHEG
 
     void BootApplication(const char *fileName);
     void TransitionToScene(const MHObjectRef &);
@@ -110,14 +111,14 @@ class MHEngine: public MHEG {
 
     // Run synchronous actions and process any asynchronous events until the queues are empty.
     // Returns the number of milliseconds until wake-up or 0 if none.
-    virtual int RunAll(void);
+    int RunAll(void) override; // MHEG
 
     // Run synchronous actions.
     void RunActions();
     // Generate a UserAction event i.e. a key press.
-    virtual void GenerateUserAction(int nCode);
-    virtual void EngineEvent(int nCode);
-    virtual void StreamStarted(MHStream*, bool bStarted);
+    void GenerateUserAction(int nCode) override; // MHEG
+    void EngineEvent(int nCode) override; // MHEG
+    void StreamStarted(MHStream*, bool bStarted) override; // MHEG
 
     // Called from an ingredient to request a load of external content.
     void RequestExternalContent(MHIngredient *pRequester);

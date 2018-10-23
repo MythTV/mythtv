@@ -36,22 +36,27 @@ class MHIngredient : public MHRoot
     MHIngredient();
     MHIngredient(const MHIngredient &ref);
     virtual ~MHIngredient() = default;
-    virtual void Initialise(MHParseNode *p, MHEngine *engine); // Set this up from the parse tree.
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    // Set this up from the parse tree.
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHRoot
+    void PrintMe(FILE *fd, int nTabs) const override; // MHRoot
     virtual bool InitiallyActive() { return m_fInitiallyActive; }
     virtual bool InitiallyAvailable() { return false; } // Used for programs only.
-    virtual bool IsShared() { return m_fShared; }
+    bool IsShared() override // MHRoot
+        { return m_fShared; }
 
     // Internal behaviours.
-    virtual void Preparation(MHEngine *engine);
-    virtual void Destruction(MHEngine *engine);
-    virtual void ContentPreparation(MHEngine *engine);
+    void Preparation(MHEngine *engine) override; // MHRoot
+    void Destruction(MHEngine *engine) override; // MHRoot
+    void ContentPreparation(MHEngine *engine) override; // MHRoot
 
     // Actions.
-    virtual void SetData(const MHOctetString &included, MHEngine *engine);
-    virtual void SetData(const MHContentRef &referenced, bool fSizeGiven, int size, bool fCCGiven, int cc, MHEngine *engine);
-    virtual void Preload(MHEngine *engine) { Preparation(engine); } 
-    virtual void Unload(MHEngine *engine) { Destruction(engine); }
+    void SetData(const MHOctetString &included, MHEngine *engine) override; // MHRoot
+    void SetData(const MHContentRef &referenced, bool fSizeGiven,
+                 int size, bool fCCGiven, int cc, MHEngine *engine) override; // MHRoot
+    void Preload(MHEngine *engine) override // MHRoot
+        { Preparation(engine); }
+    void Unload(MHEngine *engine) override // MHRoot
+        { Destruction(engine); }
 
     // Called by the engine to deliver external content.
     virtual void ContentArrived(const unsigned char *, int, MHEngine *) { }
@@ -81,9 +86,10 @@ class MHFont : public MHIngredient
   public:
     MHFont();
     virtual ~MHFont();
-    virtual const char *ClassName() { return "Font"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    const char *ClassName() override // MHRoot
+        { return "Font"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
 
   protected:
 };
@@ -94,9 +100,10 @@ class MHCursorShape : public MHIngredient
   public:
     MHCursorShape();
     virtual ~MHCursorShape();
-    virtual const char *ClassName() { return "CursorShape"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    const char *ClassName() override // MHRoot
+        { return "CursorShape"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
 
   protected:
 };
@@ -107,9 +114,10 @@ class MHPalette : public MHIngredient
   public:
     MHPalette();
     virtual ~MHPalette();
-    virtual const char *ClassName() { return "Palette"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    const char *ClassName() override // MHRoot
+        { return "Palette"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHIngredient
+    void PrintMe(FILE *fd, int nTabs) const override; // MHIngredient
 
   protected:
 };
@@ -121,9 +129,9 @@ class MHSetData: public MHElemAction
   public:
   MHSetData(): MHElemAction(":SetData"), m_fIsIncluded(false),
         m_fSizePresent(false), m_fCCPriorityPresent(false) {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
-    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
   protected:
     // Either included content or referenced content.
     bool m_fIsIncluded, m_fSizePresent, m_fCCPriorityPresent;
@@ -138,14 +146,16 @@ class MHPreload: public MHElemAction
 {
   public:
     MHPreload(): MHElemAction(":Preload") {}
-    virtual void Perform(MHEngine *engine) { Target(engine)->Preload(engine); }
+    void Perform(MHEngine *engine) override // MHElemAction
+        { Target(engine)->Preload(engine); }
 };
 
 class MHUnload: public MHElemAction
 {
   public:
     MHUnload(): MHElemAction(":Unload") {}
-    virtual void Perform(MHEngine *engine) { Target(engine)->Unload(engine); }
+    void Perform(MHEngine *engine) override // MHElemAction
+        { Target(engine)->Unload(engine); }
 };
 
 // Clone - make a copy of an existing object.
@@ -153,7 +163,7 @@ class MHClone: public MHActionGenericObjectRef
 {
   public:
     MHClone(): MHActionGenericObjectRef(":Clone") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pRef);
+    void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pRef) override; // MHActionGenericObjectRef
 };
 
 #endif

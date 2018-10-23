@@ -38,26 +38,28 @@ class MHBitmap : public MHVisible
   public:
     MHBitmap();
     MHBitmap(const MHBitmap &ref);
-    virtual const char *ClassName() { return "Bitmap"; }
+    const char *ClassName() override // MHRoot
+        { return "Bitmap"; }
     virtual ~MHBitmap();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
+    void PrintMe(FILE *fd, int nTabs) const override; // MHVisible
 
-    virtual void Preparation(MHEngine *engine);
-    virtual void ContentPreparation(MHEngine *engine);
-    virtual void ContentArrived(const unsigned char *data, int length, MHEngine *engine);
+    void Preparation(MHEngine *engine) override; // MHVisible
+    void ContentPreparation(MHEngine *engine) override; // MHIngredient
+    void ContentArrived(const unsigned char *data, int length, MHEngine *engine) override; // MHIngredient
 
     // Actions.
-    virtual void SetTransparency(int nTransPerCent, MHEngine *);
-    virtual void ScaleBitmap(int xScale, int yScale, MHEngine *engine);
-    virtual void SetBitmapDecodeOffset(int newXOffset, int newYOffset, MHEngine *engine);
-    virtual void GetBitmapDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset);
-    virtual MHIngredient *Clone(MHEngine *) { return new MHBitmap(*this); } // Create a clone of this ingredient.
+    void SetTransparency(int nTransPerCent, MHEngine *) override; // MHRoot
+    void ScaleBitmap(int xScale, int yScale, MHEngine *engine) override; // MHRoot
+    void SetBitmapDecodeOffset(int newXOffset, int newYOffset, MHEngine *engine) override; // MHRoot
+    void GetBitmapDecodeOffset(MHRoot *pXOffset, MHRoot *pYOffset) override; // MHRoot
+    MHIngredient *Clone(MHEngine *) override // MHRoot
+        { return new MHBitmap(*this); } // Create a clone of this ingredient.
 
     // Display function.
-    virtual void Display(MHEngine *d);
-    virtual QRegion GetVisibleArea();
-    virtual QRegion GetOpaqueArea();
+    void Display(MHEngine *d) override; // MHVisible
+    QRegion GetVisibleArea() override; // MHVisible
+    QRegion GetOpaqueArea() override; // MHVisible
 
   protected:
     bool    m_fTiling;
@@ -77,13 +79,15 @@ class MHBitmap : public MHVisible
 class MHSetTransparency: public MHActionInt {
   public:
     MHSetTransparency(): MHActionInt(":SetTransparency") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetTransparency(nArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) override // MHActionInt
+        { pTarget->SetTransparency(nArg, engine); }
 };
 
 class MHScaleBitmap: public MHActionIntInt {
   public:
     MHScaleBitmap(): MHActionIntInt(":ScaleBitmap") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) { pTarget->ScaleBitmap(nArg1, nArg2, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) override // MHActionIntInt
+        { pTarget->ScaleBitmap(nArg1, nArg2, engine); }
 };
 
 // Actions added in the UK MHEG profile.
@@ -91,15 +95,16 @@ class MHSetBitmapDecodeOffset: public MHActionIntInt
 {
   public:
     MHSetBitmapDecodeOffset(): MHActionIntInt(":SetBitmapDecodeOffset") {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2)
-    { pTarget->SetBitmapDecodeOffset(nArg1, nArg2, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2) override // MHActionIntInt
+        { pTarget->SetBitmapDecodeOffset(nArg1, nArg2, engine); }
 };
 
 class MHGetBitmapDecodeOffset: public MHActionObjectRef2
 {
   public:
     MHGetBitmapDecodeOffset(): MHActionObjectRef2(":GetBitmapDecodeOffset")  {}
-    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) { pTarget->GetBitmapDecodeOffset(pArg1, pArg2); }
+    void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pArg1, MHRoot *pArg2) override // MHActionObjectRef2
+        { pTarget->GetBitmapDecodeOffset(pArg1, pArg2); }
 };
 
 

@@ -35,7 +35,8 @@ class MHParseBinary: public MHParseBase
     virtual ~MHParseBinary() {}
 
     // Parse the binary and return a pointer to the parse tree
-    virtual MHParseNode *Parse() { return DoParse(); }
+    MHParseNode *Parse() override // MHParseBase
+        { return DoParse(); }
 
   private:
     MHParseNode *DoParse();
