@@ -156,7 +156,7 @@ void ExternRecChannelScanner::run(void)
                 m_scan_monitor->ScanAppendTextToLog(tr("Adding %1").arg(msg));
 
             chanid = ChannelUtil::CreateChanID(m_sourceid, channum);
-            ChannelUtil::CreateChannel(0, m_sourceid, chanid, name, callsign,
+            ChannelUtil::CreateChannel(0, m_sourceid, chanid, callsign, name,
                                        channum, 1, 0, 0,
                                        false, false, false, QString(),
                                        QString(), "Default", xmltvid);
@@ -166,7 +166,7 @@ void ExternRecChannelScanner::run(void)
             if (m_scan_monitor)
                 m_scan_monitor->ScanAppendTextToLog(tr("Updating %1").arg(msg));
 
-            ChannelUtil::UpdateChannel(0, m_sourceid, chanid, name, callsign,
+            ChannelUtil::UpdateChannel(0, m_sourceid, chanid, callsign, name,
                                        channum, 1, 0, 0,
                                        false, false, false, QString(),
                                        QString(), "Default", xmltvid);
