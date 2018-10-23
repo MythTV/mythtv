@@ -208,16 +208,16 @@ public:
     /// Adds 'numSamples' pcs of samples from the 'samples' memory position into
     /// the input of the object. Notice that sample rate _has_to_ be set before
     /// calling this function, otherwise throws a runtime_error exception.
-    virtual void putSamples(
+    void putSamples(
             const SAMPLETYPE *samples,              ///< Pointer to sample buffer.
             uint numSamples                         ///< Number of samples in buffer. Notice
                                                     ///< that in case of stereo-sound a single sample
                                                     ///< contains data for both channels.
-            );
+            ) override; // FIFOSamplePipe
 
     /// Clears all the samples in the object's output and internal processing
     /// buffers.
-    virtual void clear();
+    void clear() override; // FIFOSamplePipe
 
     /// Changes a setting controlling the processing system behaviour. See the
     /// 'SETTING_...' defines for available setting ID's.
