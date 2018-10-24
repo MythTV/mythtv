@@ -4211,6 +4211,15 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     commBreakMap.ResetLastSkip();
     needNewPauseFrame = true;
     ResetAVSync();
+
+    // Reset hardware deinterlacer
+    MythCodecContext *ctx = decoder->GetMythCodecContext();
+    if (ctx && ctx->isDeinterlacing())
+    {
+        QString currdeint = ctx->getDeinterlacerName();
+        ctx->setDeinterlacer(false);
+        ctx->setDeinterlacer(true, currdeint);
+    }
 }
 
 void MythPlayer::SetPlayerInfo(TV *tv, QWidget *widget, PlayerContext *ctx)
