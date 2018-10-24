@@ -1238,7 +1238,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
             }
             else if (sMimeType == "video/mp2t")
             {
-                sMimeType == "video/mp2p";
+                sMimeType = "video/mp2p";
                 sContainer = "MPEG2-TS";
             }
         }
