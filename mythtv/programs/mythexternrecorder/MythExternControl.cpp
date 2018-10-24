@@ -31,7 +31,7 @@
 
 using namespace std;
 
-const QString VERSION = "0.5";
+const QString VERSION = "0.6";
 
 #define LOC Desc()
 
@@ -139,6 +139,7 @@ Q_SLOT void MythExternControl::ErrorMessage(const QString & msg)
 Commands::Commands(MythExternControl * parent)
     : m_thread()
     , m_parent(parent)
+    , m_apiVersion(-1)
 {
 }
 
@@ -279,7 +280,17 @@ bool Commands::ProcessCommand(const QString & cmd)
         return true;
     }
 
-    if (tokens[1].startsWith("Version?"))
+    if (tokens[1].startsWith("APIVersion"))
+    {
+        if (tokens.size() > 1)
+        {
+            m_apiVersion = tokens[2].toInt();
+            SendStatus(cmd, tokens[0], QString("OK:%1").arg(m_apiVersion));
+        }
+        else
+            SendStatus(cmd, tokens[0], "ERR:Missing API Version number");
+    }
+    else if (tokens[1].startsWith("Version?"))
     {
         if (m_parent->m_fatal)
             SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
