@@ -69,7 +69,7 @@ class ASIStreamHandler : public StreamHandler
 
     void PriorityEvent(int fd) override; // DeviceReaderCB
 
-    virtual void SetRunningDesired(bool desired); // StreamHandler
+    void SetRunningDesired(bool desired) override; // StreamHandler
 
   private:
     int                                     _device_num;

@@ -61,7 +61,7 @@ class DVBStreamHandler : public StreamHandler
     PIDInfo *CreatePIDInfo(uint pid, uint stream_type, int pes_type) override // StreamHandler
         { return new DVBPIDInfo(pid, stream_type, pes_type); }
 
-    virtual void SetRunningDesired(bool desired); // StreamHandler
+    void SetRunningDesired(bool desired) override; // StreamHandler
 
   private:
     QString           _dvr_dev_path;
