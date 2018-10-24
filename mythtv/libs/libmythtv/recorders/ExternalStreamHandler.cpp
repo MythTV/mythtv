@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
+#include <algorithm>
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
 #include <poll.h>
 #include <sys/ioctl.h>
@@ -814,13 +815,16 @@ bool ExternalStreamHandler::OpenApp(void)
 
         if (tokens.size() > 1)
             m_apiVersion = tokens[1].toUInt();
-        if (m_apiVersion != 1 && m_apiVersion != 2)
+        m_apiVersion = min(m_apiVersion, static_cast<int>(MAX_API_VERSION));
+        if (m_apiVersion < 1)
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("Bad response to 'APIVersion?' - '%1'. "
                         "Expecting 1 or 2").arg(result));
             m_apiVersion = 1;
         }
+
+        ProcessCommand(QString("APIVersion:%1").arg(m_apiVersion), 2500, result);
     }
 
     if (!IsAppOpen())

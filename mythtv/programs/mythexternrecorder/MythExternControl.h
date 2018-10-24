@@ -109,6 +109,7 @@ class Commands : public QObject
     std::thread m_thread;
 
     MythExternControl* m_parent;
+    int m_apiVersion;
 };
 
 class MythExternControl : public QObject
