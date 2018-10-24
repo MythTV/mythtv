@@ -27,9 +27,9 @@ class Music : public MusicServices
         /* Music Metadata Methods */
 
         DTC::MusicMetadataInfoList*  GetTrackList    ( int      StartIndex,
-                                                       int      Count      );
+                                                       int      Count      ) override; // MusicServices
 
-        DTC::MusicMetadataInfo*      GetTrack        ( int      Id               );
+        DTC::MusicMetadataInfo*      GetTrack        ( int      Id               ) override; // MusicServices
 
 
 };

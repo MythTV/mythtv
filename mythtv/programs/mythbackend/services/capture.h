@@ -41,11 +41,11 @@ class Capture : public CaptureServices
     public:
 
         DTC::CaptureCardList*       GetCaptureCardList ( const QString    &HostName,
-                                                         const QString    &CardType  );
+                                                         const QString    &CardType  ) override; // CaptureServices
 
-        DTC::CaptureCard*           GetCaptureCard     ( int              CardId     );
+        DTC::CaptureCard*           GetCaptureCard     ( int              CardId     ) override; // CaptureServices
 
-        bool                        RemoveCaptureCard  ( int              CardId     );
+        bool                        RemoveCaptureCard  ( int              CardId     ) override; // CaptureServices
 
         int                         AddCaptureCard     ( const QString    &VideoDevice,
                                                          const QString    &AudioDevice,
@@ -70,15 +70,15 @@ class Capture : public CaptureServices
                                                          const uint       Colour,
                                                          const uint       Hue,
                                                          const uint       DiSEqCId,
-                                                         bool             DVBEITScan);
+                                                         bool             DVBEITScan) override; // CaptureServices
 
         bool                        UpdateCaptureCard  ( int              CardId,
                                                          const QString    &Setting,
-                                                         const QString    &Value );
+                                                         const QString    &Value ) override; // CaptureServices
 
         // Card Inputs
 
-        bool                        RemoveCardInput    ( int              CardInputId);
+        bool                        RemoveCardInput    ( int              CardInputId) override; // CaptureServices
 
         int                         AddCardInput       ( const uint CardId,
                                                          const uint SourceId,
@@ -94,11 +94,11 @@ class Capture : public CaptureServices
                                                          const uint RecPriority,
                                                          const uint Quicktune,
                                                          const uint SchedOrder,
-                                                         const uint LiveTVOrder);
+                                                         const uint LiveTVOrder) override; // CaptureServices
 
         bool                        UpdateCardInput    ( int              CardInputId,
                                                          const QString    &Setting,
-                                                         const QString    &Value );
+                                                         const QString    &Value ) override; // CaptureServices
 
 };
 
