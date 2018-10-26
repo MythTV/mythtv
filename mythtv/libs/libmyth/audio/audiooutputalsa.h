@@ -24,7 +24,7 @@ class AudioOutputALSA : public AudioOutputBase
     // You need to implement the following functions
     bool OpenDevice(void) override; // AudioOutputBase
     void CloseDevice(void) override; // AudioOutputBase
-    void WriteAudio(uchar *aubuf, int size) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
     int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool passthrough) override; // AudioOutputBase
 

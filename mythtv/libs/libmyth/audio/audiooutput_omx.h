@@ -30,7 +30,7 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
     // AudioOutputBase implementation
     bool OpenDevice(void) override; // AudioOutputBase
     void CloseDevice(void) override; // AudioOutputBase
-    void WriteAudio(uchar *aubuf, int size) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
     int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
 
     // AudioOutputBase overrides

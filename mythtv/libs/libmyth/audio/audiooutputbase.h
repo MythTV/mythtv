@@ -130,7 +130,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     // You need to implement the following functions
     virtual bool OpenDevice(void) = 0;
     virtual void CloseDevice(void) = 0;
-    virtual void WriteAudio(uchar *aubuf, int size) = 0;
+    virtual void WriteAudio(unsigned char *aubuf, int size) = 0;
     /**
      * Return the size in bytes of frames currently in the audio buffer adjusted
      * with the audio playback latency
