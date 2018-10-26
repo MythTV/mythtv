@@ -36,6 +36,7 @@ class Frontend : public FrontendServices
                                     uint Width, uint Height);
     virtual bool         PlayRecording(int RecordedId, int ChanId,
                                        const QDateTime &StartTime);
+    bool                 PlayLiveTV(int ChanId);
     bool                 PlayVideo(const QString &Id, bool UseBookmark);
     QStringList          GetContextList(void);
     DTC::FrontendActionList* GetActionList(const QString &Context);
