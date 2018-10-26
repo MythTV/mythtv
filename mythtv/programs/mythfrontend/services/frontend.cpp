@@ -189,6 +189,44 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
     return false;
 }
 
+bool Frontend::PlayLiveTV(int ChanId)
+{
+    if (ChanId <= 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("PlayLiveTV: Channel ID is invalid."));
+        return false;
+    }
+
+    // channel tuning is only available from state playback i.e. Live TV
+    if (GetMythUI()->GetCurrentLocation().toLower() != "playback")
+    {
+        GetMythMainWindow()->JumpTo(jumpMap["Live TV"]);
+
+        QTime timer;
+        timer.start();
+        while ((timer.elapsed() < FE_LONG_TO) &&
+               (GetMythUI()->GetCurrentLocation().toLower() != "playback"))
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
+    if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("PlayLiveTV, ChanID: %1")
+            .arg(ChanId));
+
+        QString message = QString("NETWORK_CONTROL PLAY CHANID %1")
+            .arg(ChanId);
+
+        MythEvent me(message);
+        gCoreContext->dispatch(me);
+        return true;
+    }
+
+    return false;
+}
+
 bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
 {
     if (TV::IsTVRunning())
