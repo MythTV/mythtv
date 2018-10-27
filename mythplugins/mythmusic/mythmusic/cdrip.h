@@ -27,7 +27,7 @@ class CDScannerThread: public MThread
 {
   public:
     explicit CDScannerThread(Ripper *ripper);
-    virtual void run();
+    void run() override; // MThread
 
   private:
     Ripper *m_parent;
@@ -37,7 +37,7 @@ class CDEjectorThread: public MThread
 {
     public:
         explicit CDEjectorThread(Ripper *ripper);
-        virtual void run();
+        void run() override; // MThread
 
     private:
         Ripper            *m_parent;
@@ -67,7 +67,7 @@ class CDRipperThread: public MThread
         void cancel(void);
 
     private:
-        virtual void run(void);
+        void run(void) override; // MThread
         int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
 
         bool isCancelled(void);
@@ -95,15 +95,15 @@ class Ripper : public MythScreenType
     Ripper(MythScreenStack *parent, QString device);
    ~Ripper(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *) override; // MythUIType
 
     bool somethingWasRipped();
     void scanCD(void);
     void ejectCD(void);
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
 
   protected slots:
     void startRipper(void);
@@ -212,8 +212,8 @@ class RipStatus : public MythScreenType
               QVector<RipTrack*> *tracks, int quality);
     ~RipStatus(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   signals:
     void Result(bool);
@@ -222,7 +222,7 @@ class RipStatus : public MythScreenType
     void startRip(void);
 
   private:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MythUIType
 
     QVector<RipTrack*> *m_tracks;
     int                m_quality;

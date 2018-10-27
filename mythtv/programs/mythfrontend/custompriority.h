@@ -19,7 +19,7 @@ class CustomPriority : public MythScreenType
                             ProgramInfo *proginfo = nullptr);
    ~CustomPriority();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   protected slots:
     void ruleChanged(MythUIButtonListItem *item);

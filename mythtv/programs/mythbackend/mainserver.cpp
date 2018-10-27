@@ -155,7 +155,7 @@ class ProcessRequestRunnable : public QRunnable
         }
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         m_parent.ProcessRequest(m_sock);
         m_sock->DecrRef();
@@ -182,7 +182,7 @@ class FreeSpaceUpdater : public QRunnable
         m_parent.masterFreeSpaceListWait.wakeAll();
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         while (true)
         {

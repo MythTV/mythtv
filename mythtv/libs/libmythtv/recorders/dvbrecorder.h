@@ -23,19 +23,19 @@ class DVBRecorder : public DTVRecorder
   public:
     DVBRecorder(TVRec*, DVBChannel*);
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     bool IsOpen(void) const;
     void Close(void);
-    void StartNewFile(void);
+    void StartNewFile(void) override; // RecorderBase
 
   private:
-    bool PauseAndWait(int timeout = 100);
+    bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
-    QString GetSIStandard(void) const;
-    void SetCAMPMT(const ProgramMapTable*);
-    void UpdateCAMTimeOffset(void);
+    QString GetSIStandard(void) const override; // DTVRecorder
+    void SetCAMPMT(const ProgramMapTable*) override; // DTVRecorder
+    void UpdateCAMTimeOffset(void) override; // DTVRecorder
 
   private:
     DVBChannel       *_channel;

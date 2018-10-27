@@ -63,20 +63,20 @@ class SingleView : public MythDialog, public ImageView
 
   protected:
     // Commands
-    virtual void Rotate(int angle);
-    virtual void DisplayNext(bool reset, bool loadImage);
-    virtual void DisplayPrev(bool reset, bool loadImage);
-    virtual void Load(void);
-    virtual void paintEvent(QPaintEvent *e);
-    virtual void keyPressEvent(QKeyEvent *e);
+    void Rotate(int angle) override; // ImageView
+    void DisplayNext(bool reset, bool loadImage) override; // ImageView
+    void DisplayPrev(bool reset, bool loadImage) override; // ImageView
+    void Load(void) override; // ImageView
+    void paintEvent(QPaintEvent *e) override; // QWidget
+    void keyPressEvent(QKeyEvent *e) override; // QWidget
 
     // Sets
-    virtual void SetZoom(float zoom);
+    void SetZoom(float zoom) override; // ImageView
     void SetPixmap(QPixmap*);
 
     // Effects
-    virtual void RegisterEffects(void);
-    virtual void RunEffect(const QString &effect);
+    void RegisterEffects(void) override; // ImageView
+    void RunEffect(const QString &effect) override; // ImageView
 
   private:
     void  StartPainter(void);

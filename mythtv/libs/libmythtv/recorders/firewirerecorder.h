@@ -39,22 +39,22 @@ class FirewireRecorder :
     void StartStreaming(void);
     void StopStreaming(void);
 
-    void run(void);
-    bool PauseAndWait(int timeout = 100);
+    void run(void) override; // RecorderBase
+    bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
     // Implements TSDataListener
-    void AddData(const unsigned char *data, uint dataSize);
+    void AddData(const unsigned char *data, uint dataSize) override; // TSDataListener
 
-    bool ProcessTSPacket(const TSPacket &tspacket);
+    bool ProcessTSPacket(const TSPacket &tspacket) override; // DTVRecorder
 
     // Sets
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // DTVRecorder
 
   protected:
-    virtual void InitStreamData(void);
+    void InitStreamData(void) override; // DTVRecorder
     explicit FirewireRecorder(TVRec *rec);
 
   private:

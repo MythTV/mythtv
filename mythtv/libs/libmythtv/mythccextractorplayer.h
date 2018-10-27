@@ -125,10 +125,10 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
 
     bool run(void);
 
-    virtual CC708Reader    *GetCC708Reader(uint id=0);
-    virtual CC608Reader    *GetCC608Reader(uint id=0);
-    virtual SubtitleReader *GetSubReader(uint id=0);
-    virtual TeletextReader *GetTeletextReader(uint id=0);
+    CC708Reader    *GetCC708Reader(uint id=0) override; // MythPlayer
+    CC608Reader    *GetCC608Reader(uint id=0) override; // MythPlayer
+    SubtitleReader *GetSubReader(uint id=0) override; // MythPlayer
+    TeletextReader *GetTeletextReader(uint id=0) override; // MythPlayer
 
   private:
     void IngestSubtitle(QList<OneSubtitle>&, const QStringList&);

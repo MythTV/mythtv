@@ -58,10 +58,10 @@ class MPUBLIC MusicCommon : public MythScreenType
 
     void switchView(MusicView view);
 
-    virtual void customEvent(QEvent *event);
-    bool keyPressEvent(QKeyEvent *e);
+    void customEvent(QEvent *event) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
 
   protected slots:
     void viewExited(void);
@@ -213,8 +213,8 @@ class MPUBLIC MythMusicVolumeDialog : public MythScreenType
     MythMusicVolumeDialog(MythScreenStack *parent, const char *name);
     ~MythMusicVolumeDialog(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
     void increaseVolume(void);
@@ -237,8 +237,8 @@ class MPUBLIC TrackInfoDialog : public MythScreenType
     TrackInfoDialog(MythScreenStack *parent, MusicMetadata *mdata, const char *name);
     ~TrackInfoDialog(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
     MusicMetadata *m_metadata;

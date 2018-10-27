@@ -17,10 +17,10 @@ public:
         MythCDROM(par, DevicePath, SuperMount, AllowEject) {
     }
 
-    virtual MythMediaError testMedia(void);
-    virtual MythMediaError eject(bool open_close = true);
-    virtual MythMediaError lock(void);
-    virtual MythMediaError unlock(void);
+    MythMediaError testMedia(void) override; // MythMediaDevice
+    MythMediaError eject(bool open_close = true) override; // MythMediaDevice
+    MythMediaError lock(void) override; // MythMediaDevice
+    MythMediaError unlock(void) override; // MythMediaDevice
 };
 
 MythCDROM *GetMythCDROMFreeBSD(QObject* par, const char* devicePath,

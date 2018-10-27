@@ -63,7 +63,7 @@ class FileCopyThread : public MThread
 {
   public:
     FileCopyThread(IconView *parent, bool move);
-    virtual void run();
+    void run() override; // MThread
     int GetProgress(void) { return m_progress; }
 
   private:

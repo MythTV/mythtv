@@ -138,6 +138,8 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetAlpha(int newalpha);
     int GetAlpha(void) const;
 
+    // This class is not based on QWidget, so this is a new function
+    // and not an override of QWidget::keyPressEvent.
     virtual bool keyPressEvent(QKeyEvent *event);
     virtual bool gestureEvent(MythGestureEvent *event);
     virtual void mediaEvent(MythMediaEvent *event);
@@ -176,7 +178,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
   protected:
     virtual ~MythUIType();
-    virtual void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
   public slots:
     void LoseFocus();

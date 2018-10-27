@@ -26,9 +26,9 @@ class CdDecoder : public Decoder
     virtual ~CdDecoder();
 
     // Decoder implementation
-    virtual bool initialize();
-    virtual void seek(double);
-    virtual void stop();
+    bool initialize() override; // Decoder
+    void seek(double) override; // Decoder
+    void stop() override; // Decoder
 
     MusicMetadata *getMetadata(void);
 
@@ -47,7 +47,7 @@ class CdDecoder : public Decoder
     void setCDSpeed(int speed);
 
   private:
-    void run();
+    void run() override; // MThread
 
     void writeBlock();
     void deinit();

@@ -39,7 +39,7 @@ class GetRecordingListThread : public MThread
         start();
     }
 
-    virtual void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
         m_parent->getRecordingList();

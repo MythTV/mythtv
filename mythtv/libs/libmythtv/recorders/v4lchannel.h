@@ -36,41 +36,46 @@ class V4LChannel : public DTVChannel
                const QString &audiodevice = "");
     virtual ~V4LChannel(void);
 
-    bool Init(QString &startchannel, bool setchan);
+    bool Init(QString &startchannel, bool setchan) override; // ChannelBase
 
     // Commands
-    bool Open(void);
-    void Close(void);
+    bool Open(void) override; // ChannelBase
+    void Close(void) override; // ChannelBase
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex &tuning);
-    bool Tune(uint64_t frequency);
-    bool Tune(const QString &freqid, int finetune);
-    bool Retune(void);
+    bool Tune(const DTVMultiplex &tuning) override; // DTVChannel
+    bool Tune(uint64_t frequency) override; // DTVChannel
+    bool Tune(const QString &freqid, int finetune) override; // DTVChannel
+    bool Retune(void) override; // ChannelBase
 
     // Sets
-    void SetFd(int fd);
-    void SetFormat(const QString &format);
+    void SetFd(int fd) override; // ChannelBase
+    void SetFormat(const QString &format) override; // DTVChannel
     int  SetDefaultFreqTable(const QString &name);
 
     // Gets
-    bool IsOpen(void)       const { return GetFd() >= 0; }
-    int  GetFd(void)        const { return videofd; }
-    QString GetDevice(void) const { return device; }
+    bool IsOpen(void)       const override // ChannelBase
+        { return GetFd() >= 0; }
+    int  GetFd(void)        const override // ChannelBase
+        { return videofd; }
+    QString GetDevice(void) const override // ChannelBase
+        { return device; }
     QString GetAudioDevice(void) const { return audio_device; }
     QString GetSIStandard(void) const { return "atsc"; }
 
     // Picture attributes.
-    bool InitPictureAttributes(void);
-    int  GetPictureAttribute(PictureAttribute) const;
-    int  ChangePictureAttribute(PictureAdjustType, PictureAttribute, bool up);
+    bool InitPictureAttributes(void) override; // ChannelBase
+    int  GetPictureAttribute(PictureAttribute) const override; // ChannelBase
+    int  ChangePictureAttribute(PictureAdjustType,
+                                PictureAttribute, bool up) override; // ChannelBase
 
   protected:
-    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+    bool IsExternalChannelChangeSupported(void) override // ChannelBase
+        { return true; }
 
   private:
     // Helper Sets
     void SetFreqTable(const int index);
-    int  SetFreqTable(const QString &name);
+    int  SetFreqTable(const QString &name) override; // ChannelBase
     bool SetInputAndFormat(int newcapchannel, QString newFmt);
 
     // Helper Gets

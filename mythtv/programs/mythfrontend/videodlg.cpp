@@ -374,17 +374,17 @@ namespace
       public:
         explicit ScreenCopyDest(MythScreenType *screen) : m_screen(screen) {}
 
-        void handleText(const QString &name, const QString &value)
+        void handleText(const QString &name, const QString &value) override // CopyMetadataDestination
         {
             CheckedSet(m_screen, name, value);
         }
 
-        void handleState(const QString &name, const QString &value)
+        void handleState(const QString &name, const QString &value) override // CopyMetadataDestination
         {
             handleText(name, value);
         }
 
-        void handleImage(const QString &name, const QString &filename)
+        void handleImage(const QString &name, const QString &filename) override // CopyMetadataDestination
         {
             MythUIImage *image = nullptr;
             UIUtilW::Assign(m_screen, image, name);
@@ -419,17 +419,17 @@ namespace
         explicit MythUIButtonListItemCopyDest(MythUIButtonListItem *item) :
             m_item(item) {}
 
-        void handleText(const QString &name, const QString &value)
+        void handleText(const QString &name, const QString &value) override // CopyMetadataDestination
         {
             m_item->SetText(value, name);
         }
 
-        void handleState(const QString &name, const QString &value)
+        void handleState(const QString &name, const QString &value) override // CopyMetadataDestination
         {
             m_item->DisplayState(value, name);
         }
 
-        void handleImage(const QString &name, const QString &filename)
+        void handleImage(const QString &name, const QString &filename) override // CopyMetadataDestination
         {
             (void) name;
             (void) filename;
@@ -578,7 +578,7 @@ class ItemDetailPopup : public MythScreenType
     {
     }
 
-    bool Create()
+    bool Create() override // MythScreenType
     {
         if (!LoadWindowFromXML("video-ui.xml", WINDOW_NAME, this))
             return false;
@@ -638,7 +638,7 @@ class ItemDetailPopup : public MythScreenType
     }
 
   protected:
-    bool keyPressEvent(QKeyEvent *levent)
+    bool keyPressEvent(QKeyEvent *levent) override // MythScreenType
     {
         if (MythScreenType::keyPressEvent(levent))
             return true;
@@ -3165,7 +3165,7 @@ namespace
         explicit SimpleCollect(QStringList &fileList) : m_fileList(fileList) {}
 
         DirectoryHandler *newDir(const QString &dirName,
-                const QString &fqDirName)
+                const QString &fqDirName) override // DirectoryHandler
         {
             (void) dirName;
             (void) fqDirName;
@@ -3173,7 +3173,7 @@ namespace
         }
 
         void handleFile(const QString &fileName, const QString &fqFileName,
-                const QString &extension, const QString &host)
+                const QString &extension, const QString &host) override // DirectoryHandler
         {
             (void) fileName;
             (void) extension;

@@ -153,9 +153,9 @@ class ScheduleEditor : public ScheduleCommon,
                    TV *player = nullptr);
    ~ScheduleEditor();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
     void showMenu(void);
     void showUpcomingByRule(void);
@@ -189,16 +189,16 @@ class ScheduleEditor : public ScheduleCommon,
     void TranscodeChanged(bool enable);
     void ShowSchedInfo(void);
     void ChildClosing(void);
-    void Close(void);
+    void Close(void) override; // MythScreenType
 
   private:
-    void Load(void);
+    void Load(void) override; // MythScreenType
     void LoadTemplate(QString name);
     void DeleteRule(void);
 
     void showTemplateMenu(void);
 
-    virtual ProgramInfo *GetCurrentProgram(void) const
+    ProgramInfo *GetCurrentProgram(void) const override // ScheduleCommon
         { return m_recInfo; };
 
     RecordingInfo *m_recInfo;
@@ -246,7 +246,7 @@ class SchedEditChild : public MythScreenType
                    RecordingInfo *recinfo);
    ~SchedEditChild() = default;
 
-    virtual bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     virtual bool CreateEditChild(
         const QString &xmlfile, const QString &winname, bool isTemplate);
 
@@ -254,8 +254,8 @@ class SchedEditChild : public MythScreenType
     void Closing(void);
 
   public slots:
-    virtual void Close(void);
-    virtual void Load(void) = 0;
+    void Close(void) override; // MythScreenType
+    void Load(void) override = 0; // MythScreenType
     virtual void Save(void) = 0;
 
   protected:
@@ -278,14 +278,14 @@ class SchedOptEditor : public SchedEditChild, public SchedOptMixin
                    RecordingRule &rule, RecordingInfo *recinfo);
    ~SchedOptEditor() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void DupMethodChanged(MythUIButtonListItem *);
 
   private:
-    void Load(void);
-    void Save(void);
+    void Load(void) override; // SchedEditChild
+    void Save(void) override; // SchedEditChild
 
     MythUIButton  *m_filtersButton;
 };
@@ -298,14 +298,14 @@ class SchedFilterEditor : public SchedEditChild, public FilterOptMixin
                       RecordingRule &rule, RecordingInfo *recinfo);
    ~SchedFilterEditor() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void ToggleSelected(MythUIButtonListItem *item);
 
   private:
-    void Load(void);
-    void Save(void);
+    void Load(void) override; // SchedEditChild
+    void Save(void) override; // SchedEditChild
 };
 
 class StoreOptEditor : public SchedEditChild, public StoreOptMixin
@@ -316,16 +316,16 @@ class StoreOptEditor : public SchedEditChild, public StoreOptMixin
                    RecordingRule &rule, RecordingInfo *recinfo);
    ~StoreOptEditor() = default;
 
-    bool Create(void);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
     void MaxEpisodesChanged(MythUIButtonListItem *);
     void PromptForRecGroup(void);
 
   private:
-    void Load(void);
-    void Save(void);
+    void Load(void) override; // SchedEditChild
+    void Save(void) override; // SchedEditChild
 };
 
 class PostProcEditor : public SchedEditChild, public PostProcMixin
@@ -336,14 +336,14 @@ class PostProcEditor : public SchedEditChild, public PostProcMixin
                    RecordingRule &rule, RecordingInfo *recinfo);
    ~PostProcEditor() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void TranscodeChanged(bool enable);
 
   private:
-    void Load(void);
-    void Save(void);
+    void Load(void) override; // SchedEditChild
+    void Save(void) override; // SchedEditChild
 };
 
 class MetadataOptions : public SchedEditChild
@@ -354,7 +354,7 @@ class MetadataOptions : public SchedEditChild
                     RecordingRule &rule, RecordingInfo *recinfo);
    ~MetadataOptions();
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
   protected slots:
     void PerformQuery();
@@ -374,8 +374,8 @@ class MetadataOptions : public SchedEditChild
     void ValuesChanged();
 
   private:
-    void Load(void);
-    void Save(void);
+    void Load(void) override; // SchedEditChild
+    void Save(void) override; // SchedEditChild
 
     void CreateBusyDialog(QString title);
     void FindImagePopup(const QString &prefix,
@@ -389,7 +389,7 @@ class MetadataOptions : public SchedEditChild
 
     bool CanSetArtwork(void);
 
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MythUIType
 
     // For all metadata downloads
     MetadataFactory *m_metadataFactory;

@@ -8,7 +8,7 @@ class LogCleanerTask : public DailyHouseKeeperTask
 {
   public:
     LogCleanerTask(void) : DailyHouseKeeperTask("LogClean", kHKGlobal) {};
-    bool DoRun(void);
+    bool DoRun(void) override; // HouseKeeperTask
 };
 
 
@@ -16,7 +16,7 @@ class CleanupTask : public DailyHouseKeeperTask
 {
   public:
     CleanupTask(void) : DailyHouseKeeperTask("DBCleanup", kHKGlobal) {};
-    bool DoRun(void);
+    bool DoRun(void) override; // HouseKeeperTask
 
   private:
     void CleanupOldRecordings(void);
@@ -31,9 +31,9 @@ class RadioStreamUpdateTask : public DailyHouseKeeperTask
   public:
     RadioStreamUpdateTask(void);
     virtual ~RadioStreamUpdateTask(void);
-    bool DoRun(void);
-    virtual bool DoCheckRun(QDateTime now);
-    virtual void Terminate(void);
+    bool DoRun(void) override; // HouseKeeperTask
+    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    void Terminate(void) override; // HouseKeeperTask
   private:
     MythSystemLegacy *m_msMU;
 };
@@ -44,9 +44,9 @@ class ThemeUpdateTask : public DailyHouseKeeperTask
     ThemeUpdateTask(void) : DailyHouseKeeperTask("ThemeUpdateNotifications",
                                             kHKGlobal, kHKRunOnStartup),
                             m_running(false) {};
-    bool DoRun(void);
-    bool DoCheckRun(QDateTime now);
-    virtual void Terminate(void);
+    bool DoRun(void) override; // HouseKeeperTask
+    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    void Terminate(void) override; // HouseKeeperTask
   private:
     bool LoadVersion(const QString &version, int download_log_level);
 
@@ -59,9 +59,9 @@ class ArtworkTask : public DailyHouseKeeperTask
   public:
     ArtworkTask(void);
     virtual ~ArtworkTask(void);
-    bool DoRun(void);
-    virtual bool DoCheckRun(QDateTime now);
-    virtual void Terminate(void);
+    bool DoRun(void) override; // HouseKeeperTask
+    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    void Terminate(void) override; // HouseKeeperTask
   private:
     MythSystemLegacy *m_msMML;
 };
@@ -72,7 +72,7 @@ class JobQueueRecoverTask : public DailyHouseKeeperTask
   public:
     JobQueueRecoverTask(void) : DailyHouseKeeperTask("JobQueueRecover",
                                                      kHKLocal) {};
-    bool DoRun(void);
+    bool DoRun(void) override; // HouseKeeperTask
 };
 
 
@@ -84,10 +84,10 @@ class MythFillDatabaseTask : public DailyHouseKeeperTask
 
     static bool UseSuggestedTime(void);
 
-    virtual bool DoCheckRun(QDateTime now);
-    virtual bool DoRun(void);
+    bool DoCheckRun(QDateTime now) override; // PeriodicHouseKeeperTask
+    bool DoRun(void) override; // HouseKeeperTask
 
-    virtual void Terminate(void);
+    void Terminate(void) override; // HouseKeeperTask
 
     void SetHourWindowFromDB(void);
   private:

@@ -19,36 +19,39 @@ class MpegRecorder : public V4LRecorder,
    ~MpegRecorder();
     void TeardownAll(void);
 
-    void SetOption(const QString &opt, int value);
-    void SetOption(const QString &name, const QString &value);
-    void SetVideoFilters(QString&) {}
+    void SetOption(const QString &opt, int value) override; // DTVRecorder
+    void SetOption(const QString &name, const QString &value) override; // DTVRecorder
+    void SetVideoFilters(QString&) override {} // DTVRecorder
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // DTVRecorder
 
-    void Initialize(void) {}
-    void run(void);
-    void Reset(void);
+    void Initialize(void) override {} // DTVRecorder
+    void run(void) override; // RecorderBase
+    void Reset(void) override; // DTVRecorder
 
-    void Pause(bool clear = true);
-    bool PauseAndWait(int timeout = 100);
+    void Pause(bool clear = true) override; // RecorderBase
+    bool PauseAndWait(int timeout = 100) override; // RecorderBase
 
-    bool IsRecording(void) { return recording; }
+    bool IsRecording(void) override // RecorderBase
+        { return recording; }
 
     bool Open(void);
-    int GetVideoFd(void) { return chanfd; }
+    int GetVideoFd(void) override // DTVRecorder
+        { return chanfd; }
 
     // TSPacketListener
-    bool ProcessTSPacket(const TSPacket &tspacket);
+    bool ProcessTSPacket(const TSPacket &tspacket) override; // DTVRecorder
 
     // DeviceReaderCB
-    virtual void ReaderPaused(int /*fd*/) { pauseWait.wakeAll(); }
-    virtual void PriorityEvent(int /*fd*/) { }
+    void ReaderPaused(int /*fd*/) override // DeviceReaderCB
+        { pauseWait.wakeAll(); }
+    void PriorityEvent(int /*fd*/) override { } //DeviceReaderCB
 
   private:
-    virtual void InitStreamData(void);
+    void InitStreamData(void) override; // DTVRecorder
     void SetIntOption(RecordingProfile *profile, const QString &name);
     void SetStrOption(RecordingProfile *profile, const QString &name);
 
@@ -71,7 +74,7 @@ class MpegRecorder : public V4LRecorder,
     void SetBitrate(int bitrate, int maxbitrate, const QString & reason);
     bool HandleResolutionChanges(void);
 
-    virtual void FormatCC(uint code1, uint code2); // RecorderBase
+    void FormatCC(uint code1, uint code2) override; // V4LRecorder
 
     bool deviceIsMpegFile;
     int bufferSize;

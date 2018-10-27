@@ -266,15 +266,15 @@ public:
             parent(_ddparent) {}
 
     bool startElement(const QString &pnamespaceuri, const QString &plocalname,
-                      const QString &pqname, const QXmlAttributes &pxmlatts);
+                      const QString &pqname, const QXmlAttributes &pxmlatts) override; // QXmlDefaultHandler
 
     bool endElement(const QString &pnamespaceuri, const QString &plocalname,
-                    const QString &pqname);
+                    const QString &pqname) override; // QXmlDefaultHandler
 
-    bool characters(const QString &pchars);
+    bool characters(const QString &pchars) override; // QXmlDefaultHandler
 
-    bool startDocument(void);
-    bool endDocument(void);
+    bool startDocument(void) override; // QXmlDefaultHandler
+    bool endDocument(void) override; // QXmlDefaultHandler
 
 private:
     DataDirectProcessor     &parent;

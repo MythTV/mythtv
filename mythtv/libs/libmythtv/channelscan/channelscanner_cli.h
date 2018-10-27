@@ -44,15 +44,15 @@ class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner
     ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk);
     virtual ~ChannelScannerCLI();
 
-    virtual void HandleEvent(const ScannerEvent *scanEvent);
+    void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
 
     bool IsDone(void) const { return done; }
 
   protected:
-    virtual void InformUser(const QString &error);
+    void InformUser(const QString &error) override; // ChannelScanner
     virtual void Process(const ScanDTVTransportList&);
-    virtual void MonitorProgress(bool lock, bool strength,
-                                 bool snr, bool rotor);
+    void MonitorProgress(bool lock, bool strength,
+                         bool snr, bool rotor) override; // ChannelScanner
   private:
     bool    done;
     bool    onlysavescan;

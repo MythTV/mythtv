@@ -184,7 +184,7 @@ class DDLoader : public QRunnable
     void SetParent(TV *parent) { m_parent = parent; }
     void SetSourceID(uint sourceid) { m_sourceid = sourceid; }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         if (m_parent)
             m_parent->RunLoadDDMap(m_sourceid);
@@ -13527,7 +13527,7 @@ void TV::HandleSaveLastPlayPosEvent(void)
     public:
         PositionSaver(const ProgramInfo &pginfo, uint64_t frame) :
             m_pginfo(pginfo), m_frame(frame) {}
-        virtual void run(void)
+        void run(void) override // QRunnable
         {
             LOG(VB_PLAYBACK, LOG_DEBUG,
                 QString("PositionSaver frame=%1").arg(m_frame));

@@ -1470,7 +1470,7 @@ class SendAsyncMessage : public QRunnable
 
     explicit SendAsyncMessage(const QString &msg) : m_message(msg) { }
 
-    void run(void)
+    void run(void) override // QRunnable
     {
         QStringList strlist("MESSAGE");
         strlist << m_message;

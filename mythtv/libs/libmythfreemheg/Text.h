@@ -40,21 +40,24 @@ class MHText : public MHVisible
     MHText();
     MHText(const MHText &ref);
     ~MHText();
-    virtual const char *ClassName() { return "Text"; }
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *, int nTabs) const;
+    const char *ClassName() override // MHRoot
+        { return "Text"; }
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHVisible
+    void PrintMe(FILE *, int nTabs) const override; // MHVisible
 
-    virtual void Preparation(MHEngine *engine);
-    virtual void ContentPreparation(MHEngine *engine);
-    virtual void ContentArrived(const unsigned char *data, int length, MHEngine *engine);
+    void Preparation(MHEngine *engine) override; // MHVisible
+    void ContentPreparation(MHEngine *engine) override; // MHIngredient
+    void ContentArrived(const unsigned char *data, int length, MHEngine *engine) override; // MHIngredient
 
     // Actions.
     // Extract the text from an object.  This can be used to load content from a file.
-    virtual void GetTextData(MHRoot *pDestination, MHEngine *) { pDestination->SetVariableValue(m_Content); }
-    virtual MHIngredient *Clone(MHEngine *) { return new MHText(*this); } // Create a clone of this ingredient.
-    virtual void SetBackgroundColour(const MHColour &colour, MHEngine *engine);
-    virtual void SetTextColour(const MHColour &colour, MHEngine *engine);
-    virtual void SetFontAttributes(const MHOctetString &fontAttrs, MHEngine *engine);
+    void GetTextData(MHRoot *pDestination, MHEngine *) override // MHRoot
+        { pDestination->SetVariableValue(m_Content); }
+    MHIngredient *Clone(MHEngine *) override // MHRoot
+        { return new MHText(*this); } // Create a clone of this ingredient.
+    void SetBackgroundColour(const MHColour &colour, MHEngine *engine) override; // MHRoot
+    void SetTextColour(const MHColour &colour, MHEngine *engine) override; // MHRoot
+    void SetFontAttributes(const MHOctetString &fontAttrs, MHEngine *engine) override; // MHRoot
 
     // Enumerated type lookup functions for the text parser.
     static int GetJustification(const char *str);
@@ -62,8 +65,8 @@ class MHText : public MHVisible
     static int GetStartCorner(const char *str);
 
     // Display function.
-    virtual void Display(MHEngine *d);
-    virtual QRegion GetOpaqueArea();
+    void Display(MHEngine *d) override; // MHVisible
+    QRegion GetOpaqueArea() override; // MHVisible
 
   protected:
     void Redraw();
@@ -94,19 +97,23 @@ class MHHyperText : public MHText, public MHInteractible
 {
   public:
     MHHyperText();
-    virtual const char *ClassName() { return "HyperText"; }
+    const char *ClassName() override // MHText
+        { return "HyperText"; }
     virtual ~MHHyperText();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHText
+    void PrintMe(FILE *fd, int nTabs) const override; // MHText
 
     // Implement the actions in the main inheritance line.
-    virtual void SetInteractionStatus(bool newStatus, MHEngine *engine)
-    { InteractSetInteractionStatus(newStatus, engine); }
-    virtual bool GetInteractionStatus(void) { return InteractGetInteractionStatus(); }
-    virtual void SetHighlightStatus(bool newStatus, MHEngine *engine)
-    { InteractSetHighlightStatus(newStatus, engine); }
-    virtual bool GetHighlightStatus(void) { return InteractGetHighlightStatus(); }
-    virtual void Deactivation(MHEngine */*engine*/) { InteractDeactivation(); }
+    void SetInteractionStatus(bool newStatus, MHEngine *engine) override // MHRoot
+        { InteractSetInteractionStatus(newStatus, engine); }
+    bool GetInteractionStatus(void) override // MHRoot
+        { return InteractGetInteractionStatus(); }
+    void SetHighlightStatus(bool newStatus, MHEngine *engine) override // MHRoot
+        { InteractSetHighlightStatus(newStatus, engine); }
+    bool GetHighlightStatus(void) override // MHRoot
+        { return InteractGetHighlightStatus(); }
+    void Deactivation(MHEngine */*engine*/) override // MHVisible
+        { InteractDeactivation(); }
 };
 
 // Get Text Data - get the data out of a text object.
@@ -114,7 +121,8 @@ class MHGetTextData: public MHActionObjectRef
 {
   public:
     MHGetTextData(): MHActionObjectRef(":GetTextData")  {}
-    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) { pTarget->GetTextData(pArg, engine); }
+    void CallAction(MHEngine *engine, MHRoot *pTarget, MHRoot *pArg) override // MHActionObjectRef
+        { pTarget->GetTextData(pArg, engine); }
 };
 
 // Actions added in UK MHEG profile.
@@ -122,24 +130,27 @@ class MHSetBackgroundColour: public MHSetColour {
   public:
     MHSetBackgroundColour(): MHSetColour(":SetBackgroundColour") { }
   protected:
-    virtual void SetColour(const MHColour &colour, MHEngine *engine) { Target(engine)->SetBackgroundColour(colour, engine); }
+    void SetColour(const MHColour &colour, MHEngine *engine) override // MHSetColour
+        { Target(engine)->SetBackgroundColour(colour, engine); }
 };
 
 class MHSetTextColour: public MHSetColour {
   public:
     MHSetTextColour(): MHSetColour(":SetTextColour") { }
   protected:
-    virtual void SetColour(const MHColour &colour, MHEngine *engine) { Target(engine)->SetTextColour(colour, engine); }
+    void SetColour(const MHColour &colour, MHEngine *engine) override // MHSetColour
+        { Target(engine)->SetTextColour(colour, engine); }
 };
 
 class MHSetFontAttributes: public MHElemAction
 {
   public:
     MHSetFontAttributes(): MHElemAction(":SetFontAttributes") {}
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void Perform(MHEngine *engine);
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
+    void Perform(MHEngine *engine) override; // MHElemAction
   protected:
-    virtual void PrintArgs(FILE *fd, int /*nTabs*/) const { m_FontAttrs.PrintMe(fd, 0); }
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override // MHElemAction
+        { m_FontAttrs.PrintMe(fd, 0); }
     MHGenericOctetString m_FontAttrs; // New font attributes.
 };
 

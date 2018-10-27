@@ -139,7 +139,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     void EnterStandby(bool manual = true);
     void ExitStandby(bool manual = true);
 
-    virtual QPaintEngine *paintEngine() const;
+    QPaintEngine *paintEngine() const override; // QWidget
 
   public slots:
     void mouseTimeout();
@@ -161,13 +161,13 @@ class MUI_PUBLIC MythMainWindow : public QWidget
 
     void InitKeys(void);
 
-    bool eventFilter(QObject *o, QEvent *e);
-    void customEvent(QEvent *ce);
-    void closeEvent(QCloseEvent *e);
+    bool eventFilter(QObject *o, QEvent *e) override; // QWidget
+    void customEvent(QEvent *ce) override; // QWidget
+    void closeEvent(QCloseEvent *e) override; // QWidget
 
     void drawScreen();
 
-    bool event(QEvent* e);
+    bool event(QEvent* e) override; // QWidget
 
     void ExitToMainMenu();
 

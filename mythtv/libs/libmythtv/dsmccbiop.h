@@ -107,8 +107,8 @@ class ProfileBodyFull: public ProfileBody
         data_len(0), byte_order(0),
         lite_components_count(0) { }
     virtual ~ProfileBodyFull() = default;
-    virtual int Process(const unsigned char *);
-    virtual DSMCCCacheReference *GetReference()
+    int Process(const unsigned char *) override; // ProfileBody
+    DSMCCCacheReference *GetReference() override // ProfileBody
         { return &obj_loc.m_Reference; }
 
   protected:
@@ -127,10 +127,11 @@ class ProfileBodyLite: public ProfileBody
 {
   public:
 
-    virtual int Process(const unsigned char *);
+    int Process(const unsigned char *) override; // ProfileBody
 
     // TODO Not currently implemented
-    virtual DSMCCCacheReference *GetReference() { return nullptr; }
+    DSMCCCacheReference *GetReference() override // ProfileBody
+        { return nullptr; }
 };
 
 // IOR - Interoperable Object Reference.

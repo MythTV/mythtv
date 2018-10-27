@@ -44,8 +44,8 @@ class FileSelector : public MythScreenType
                  FSTYPE type, const QString &startDir, const QString &filemask);
     ~FileSelector();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
     QString getSelected(void);
 

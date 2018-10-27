@@ -1109,7 +1109,7 @@ public:
     }
 
 protected:
-    void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
 
@@ -1318,7 +1318,7 @@ public:
     }
 
 protected:
-    void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
 

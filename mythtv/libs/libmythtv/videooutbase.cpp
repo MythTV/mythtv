@@ -1405,7 +1405,7 @@ class OsdRender : public QRunnable
         m_frame(frame), m_osd_image(osd_image), m_video_dim(dim), m_vis(vis)
     { }
 
-    virtual void run()
+    void run() override // QRunnable
     {
         switch (m_frame->codec)
         {

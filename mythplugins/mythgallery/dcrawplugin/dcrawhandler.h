@@ -5,8 +5,8 @@
 class DcrawHandler : public QImageIOHandler
 {
   public:
-    bool canRead() const;
-    bool read(QImage *image);
+    bool canRead() const override; // QImageIOHandler
+    bool read(QImage *image) override; // QImageIOHandler
     static int loadThumbnail(QImage *image, QString fileName);
 };
 

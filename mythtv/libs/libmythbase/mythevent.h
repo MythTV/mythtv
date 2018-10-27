@@ -110,7 +110,7 @@ class MBASE_PUBLIC MythInfoMapEvent : public MythEvent
                      const InfoMap &linfoMap)
       : MythEvent(lmessage), m_infoMap(linfoMap) { }
 
-    virtual MythInfoMapEvent *clone() const
+    MythInfoMapEvent *clone() const override // MythEvent
         { return new MythInfoMapEvent(Message(), m_infoMap); }
     const InfoMap* GetInfoMap(void) { return &m_infoMap; }
 

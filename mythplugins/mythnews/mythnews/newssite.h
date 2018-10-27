@@ -79,7 +79,7 @@ class NewsSite : public QObject
              const QDateTime &updated, const bool     podcast);
     virtual void deleteLater();
 
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
     QString   url(void)  const;
     QString   name(void) const;

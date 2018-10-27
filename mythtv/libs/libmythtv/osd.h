@@ -86,8 +86,8 @@ class ChannelEditor : public MythScreenType
   public:
     ChannelEditor(QObject *retobject, const char * name);
 
-    virtual bool Create(void);
-    virtual bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     void SetText(const InfoMap &map);
     void GetText(InfoMap &map);
@@ -117,7 +117,7 @@ class MythOSDWindow : public MythScreenType
     {
     }
 
-    virtual bool Create(void)
+    bool Create(void) override // MythScreenType
     {
         if (m_themed)
             return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(),
@@ -247,12 +247,12 @@ class OsdNavigation : public MythScreenType
 
   public:
     OsdNavigation(QObject *retobject, const QString &name, OSD *osd);
-    virtual bool Create(void);
-    virtual bool keyPressEvent(QKeyEvent *event);
-    virtual void SetTextFromMap(const InfoMap &infoMap);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void SetTextFromMap(const InfoMap &infoMap) override; // MythUIComposite
     int getVisibleGroup() {return m_visibleGroup; }
     // Virtual
-    void ShowMenu(void);
+    void ShowMenu(void) override; // MythScreenType
 
   protected:
 

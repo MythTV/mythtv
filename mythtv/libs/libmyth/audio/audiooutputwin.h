@@ -14,15 +14,15 @@ class AudioOutputWin : public AudioOutputBase
     virtual ~AudioOutputWin();
 
     // Volume control
-    virtual int  GetVolumeChannel(int channel) const;
-    virtual void SetVolumeChannel(int channel, int volume);
+    int  GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
   protected:
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(bool digital);
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
 
   protected:
     AudioOutputWinPrivate *m_priv;

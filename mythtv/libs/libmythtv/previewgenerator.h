@@ -62,7 +62,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 
     QString GetToken(void) const { return m_token; }
 
-    void run(void); // MThread
+    void run(void) override; // MThread
     bool Run(void);
 
     void AttachSignals(QObject*);
@@ -99,7 +99,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     static QString CreateAccessibleFilename(
         const QString &pathname, const QString &outFileName);
 
-    virtual bool event(QEvent *e); // QObject
+    bool event(QEvent *e) override; // QObject
     bool SaveOutFile(const QByteArray &data, const QDateTime &dt);
 
   protected:

@@ -20,11 +20,11 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     MythUIButtonTree(MythUIType *parent, const QString &name);
    ~MythUIButtonTree() = default;
 
-    virtual bool keyPressEvent(QKeyEvent *);
-    virtual bool gestureEvent(MythGestureEvent *event);
+    bool keyPressEvent(QKeyEvent *) override; // MythUIType
+    bool gestureEvent(MythGestureEvent *event) override; // MythUIType
 
     bool AssignTree(MythGenericTree *tree);
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     bool SetNodeByString(QStringList route);
     bool SetNodeById(QList<int> route);
     bool SetCurrentNode(MythGenericTree *node);
@@ -52,10 +52,10 @@ class MUI_PUBLIC MythUIButtonTree : public MythUIType
     void rootChanged(MythGenericTree* node);
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
   private:
     void Init(void);

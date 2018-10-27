@@ -20,7 +20,7 @@ class HLSStreamWorker : public MThread
     void Wakeup(void) { QMutexLocker lock(&m_lock); m_waitcond.wakeAll(); }
 
   protected:
-    void run(void);
+    void run() override; // MThread
 
   private:
     void Segment(void);

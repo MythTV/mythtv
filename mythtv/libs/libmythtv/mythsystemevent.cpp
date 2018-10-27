@@ -41,7 +41,7 @@ class SystemEventThread : public QRunnable
      *
      *  Overrides QRunnable::run()
      */
-    void run(void)
+    void run(void) override // QRunnable
     {
         uint flags = kMSDontBlockInputDevs;
 

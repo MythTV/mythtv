@@ -16,7 +16,7 @@ class AnalogSignalMonitor : public SignalMonitor
                         bool _release_stream,
                         uint64_t _flags = kSigMon_WaitForSig);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
 
   private:
     bool VerifyHDPVRaudio(int videofd);

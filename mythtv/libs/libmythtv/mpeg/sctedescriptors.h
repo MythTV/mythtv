@@ -69,7 +69,7 @@ class FrameRateDescriptor : public MPEGDescriptor
     }
     // reserved                 3   2.5
 
-    QString toString(void) const
+    QString toString(void) const override // MPEGDescriptor
     {
         return QString("FrameRateDescriptor: "
                        "MultipleFrameRates(%1) MaximumFrameRate(%2)")
@@ -93,7 +93,7 @@ class ExtendedVideoDescriptor : public MPEGDescriptor
     bool VideoIncludesSetup(void) const { return _data[2] & 0x40; }
     // reserved                 6   2.2
 
-    QString toString(void) const
+    QString toString(void) const override // MPEGDescriptor
     {
         return QString("ExtendedVideoDescriptor: "
                        "CatalogModeFlag(%1) VideoIncludesSetup(%2)")
@@ -136,7 +136,7 @@ class SCTEComponentNameDescriptor : public MPEGDescriptor
     QString NameString(uint i) const;
     // }
 
-    QString toString(void) const;
+    QString toString(void) const override; // MPEGDescriptor
 
   private:
     uint loc(uint number) const
@@ -174,7 +174,7 @@ class CueIdentifierDescriptor : public MPEGDescriptor
     };
     uint CueStreamType(void) const { return _data[2]; }
     QString CueStreamTypeString(void) const;
-    QString toString(void) const;
+    QString toString(void) const override; // MPEGDescriptor
 };
 
 // See SCTE 57 p 80
@@ -199,7 +199,7 @@ class FrequencySpecificationDescriptor : public MPEGDescriptor
         return FrequencyUnitHz() * ((unsigned long long) CarrierFrequency());
     }
 
-    QString toString(void) const
+    QString toString(void) const override // MPEGDescriptor
     {
         return QString("FrequencySpecificationDescriptor: %2 Hz")
             .arg(CarrierFrequnecyHz());
@@ -246,7 +246,7 @@ class TransportStreamIdDescriptor : public MPEGDescriptor
     uint TargetTransportStreamId(void) const
         { return (_data[2] << 8) | _data[3]; }
 
-    QString toString(void) const
+    QString toString(void) const override // MPEGDescriptor
     {
         return QString("TransportStreamIdDescriptor: 0x%1")
             .arg(TargetTransportStreamId(),0,16);
@@ -270,7 +270,7 @@ class RevisionDetectionDescriptor : public MPEGDescriptor
     // last_section_number      8   4.0
     uint LastSectionNumber(void) const { return _data[4]; }
 
-    QString toString(void) const;
+    QString toString(void) const override; // MPEGDescriptor
 };
 
 #endif // _SCTE_TABLES_H_

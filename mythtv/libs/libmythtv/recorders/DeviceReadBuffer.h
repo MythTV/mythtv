@@ -61,7 +61,7 @@ class DeviceReadBuffer : protected MThread
     uint GetUsed(void) const;
 
   private:
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 
     void SetPaused(bool);
     void IncrWritePointer(uint len);

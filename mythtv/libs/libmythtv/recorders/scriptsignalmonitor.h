@@ -18,7 +18,7 @@ class ScriptSignalMonitor : public SignalMonitor
         signalStrength.SetValue(100);
     }
 
-    virtual void UpdateValues(void)
+    void UpdateValues(void) override // SignalMonitor
     {
         SignalMonitor::UpdateValues();
 

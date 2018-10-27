@@ -239,19 +239,20 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         { clone(other); return *this; }
     virtual void clone(const RecordingInfo &other,
                        bool ignore_non_serialized_data = false);
-    virtual void clone(const ProgramInfo &other,
-                       bool ignore_non_serialized_data = false);
+    void clone(const ProgramInfo &other,
+               bool ignore_non_serialized_data = false) override; // ProgramInfo
 
-    virtual void clear(void);
+    void clear(void) override; // ProgramInfo
 
     // Destructor
     virtual ~RecordingInfo();
 
     // Serializers
-    virtual void SubstituteMatches(QString &str);
+    void SubstituteMatches(QString &str) override; // ProgramInfo
 
-    void SetRecordingID(uint _recordedid) {  recordedid = _recordedid;
-                                             m_recordingFile->m_recordingId = _recordedid; }
+    void SetRecordingID(uint _recordedid) override // ProgramInfo
+        {  recordedid = _recordedid;
+            m_recordingFile->m_recordingId = _recordedid; }
 
     // Quick gets
     /// Creates a unique string that can be used to identify a
@@ -306,9 +307,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     // File specific metdata
     void LoadRecordingFile();
     RecordingFile *GetRecordingFile() const { return m_recordingFile; }
-    void SaveFilesize(uint64_t fsize);   /// Will replace the one in ProgramInfo
-    void SetFilesize( uint64_t sz );     /// Will replace the one in ProgramInfo
-    uint64_t GetFilesize(void) const; /// Will replace the one in ProgramInfo
+    void SaveFilesize(uint64_t fsize) override; // ProgramInfo
+    void SetFilesize( uint64_t sz ) override; // ProgramInfo
+    uint64_t GetFilesize(void) const override; // ProgramInfo
 
     RecStatus::Type oldrecstatus;
     RecStatus::Type savedrecstatus;

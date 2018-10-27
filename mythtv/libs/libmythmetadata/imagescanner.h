@@ -39,7 +39,7 @@ public:
     QStringList GetProgress();
 
 protected:
-    void run();
+    void run() override; // MThread
 
 private:
     Q_DISABLE_COPY(ImageScanThread)

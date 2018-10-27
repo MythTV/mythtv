@@ -30,9 +30,9 @@ class MUI_PUBLIC MythUIEditBar : public MythUIType
     void ReleaseImages(void);
 
   protected:
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
   private:
 

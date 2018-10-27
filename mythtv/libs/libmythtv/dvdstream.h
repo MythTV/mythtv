@@ -27,13 +27,13 @@ public:
 
 public:
     // RingBuffer methods
-    virtual long long GetReadPosition(void)  const;
-    virtual bool IsOpen(void) const;
-    virtual bool OpenFile(const QString &lfilename, uint retry_ms = 0);
+    long long GetReadPosition(void) const override; // RingBuffer
+    bool IsOpen(void) const override; // RingBuffer
+    bool OpenFile(const QString &lfilename, uint retry_ms = 0) override; // RingBuffer
 
 protected:
-    virtual int safe_read(void *data, uint sz);
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint sz) override; // RingBuffer
+    long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
     // Implementation
 private:

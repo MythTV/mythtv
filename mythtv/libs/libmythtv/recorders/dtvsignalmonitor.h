@@ -26,7 +26,7 @@ class DTVSignalMonitor : public SignalMonitor,
     virtual ~DTVSignalMonitor();
 
   public:
-    virtual QStringList GetStatusList(void) const;
+    QStringList GetStatusList(void) const override; // SignalMonitor
 
     void SetChannel(int major, int minor);
     int  GetMajorChannel() const { return majorChannel; }
@@ -49,8 +49,8 @@ class DTVSignalMonitor : public SignalMonitor,
         { was_moving = is_moving = false; }
     virtual void SetRotorValue(int) {}
 
-    virtual void AddFlags(uint64_t _flags);
-    virtual void RemoveFlags(uint64_t _flags);
+    void AddFlags(uint64_t _flags) override; // SignalMonitor
+    void RemoveFlags(uint64_t _flags) override; // SignalMonitor
 
     /// Sets the MPEG stream data for DTVSignalMonitor to use,
     /// and connects the table signals to the monitor.
@@ -74,31 +74,31 @@ class DTVSignalMonitor : public SignalMonitor,
     /// Returns the scan stream data if it exists
     const ScanStreamData *GetScanStreamData() const;
 
-    virtual bool IsAllGood(void) const;
+    bool IsAllGood(void) const override; // SignalMonitor
 
     // MPEG
-    void HandlePAT(const ProgramAssociationTable*);
-    void HandleCAT(const ConditionalAccessTable*) {}
-    void HandlePMT(uint, const ProgramMapTable*);
-    void HandleEncryptionStatus(uint, bool enc_status);
+    void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable*) override {}  // MPEGStreamListener
+    void HandlePMT(uint, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandleEncryptionStatus(uint, bool enc_status) override; // MPEGStreamListener
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*);
-    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
-    void HandleMGT(const MasterGuideTable*);
+    void HandleSTT(const SystemTimeTable*) override; // ATSCMainStreamListener
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) override {} // ATSCMainStreamListener
+    void HandleMGT(const MasterGuideTable*) override; // ATSCMainStreamListener
 
     // ATSC Aux
-    void HandleTVCT(uint, const TerrestrialVirtualChannelTable*);
-    void HandleCVCT(uint, const CableVirtualChannelTable*);
-    void HandleRRT(const RatingRegionTable*) {}
-    void HandleDCCT(const DirectedChannelChangeTable*) {}
+    void HandleTVCT(uint, const TerrestrialVirtualChannelTable*) override; // ATSCAuxStreamListener
+    void HandleCVCT(uint, const CableVirtualChannelTable*) override; // ATSCAuxStreamListener
+    void HandleRRT(const RatingRegionTable*) override {} // ATSCAuxStreamListener
+    void HandleDCCT(const DirectedChannelChangeTable*) override {} // ATSCAuxStreamListener
     void HandleDCCSCT(
-        const DirectedChannelChangeSelectionCodeTable*) {}
+        const DirectedChannelChangeSelectionCodeTable*) override {} // ATSCAuxStreamListener
 
     // DVB Main
-    void HandleTDT(const TimeDateTable*);
-    void HandleNIT(const NetworkInformationTable*);
-    void HandleSDT(uint, const ServiceDescriptionTable*);
+    void HandleTDT(const TimeDateTable*) override; // DVBMainStreamListener
+    void HandleNIT(const NetworkInformationTable*) override; // DVBMainStreamListener
+    void HandleSDT(uint, const ServiceDescriptionTable*) override; // DVBMainStreamListener
 
     void IgnoreEncrypted(bool ignore) { ignore_encrypted = ignore; }
 

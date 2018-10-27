@@ -32,7 +32,7 @@ class FileScannerThread: public MThread
 {
     public:
         explicit FileScannerThread(ImportMusicDialog *parent);
-        virtual void run();
+        void run() override; // MThread
 
     private:
         ImportMusicDialog *m_parent;
@@ -42,7 +42,7 @@ class FileCopyThread: public MThread
 {
     public:
         FileCopyThread(const QString &src, const QString &dst);
-        virtual void run();
+        void run() override; // MThread
 
         bool GetResult(void) { return m_result; }
 
@@ -61,9 +61,9 @@ class ImportMusicDialog : public MythScreenType
     explicit ImportMusicDialog(MythScreenStack *parent);
     ~ImportMusicDialog();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *) override; // MythUIType
 
     bool somethingWasImported() { return m_somethingWasImported; }
     void doScan(void);
@@ -168,8 +168,8 @@ class ImportCoverArtDialog : public MythScreenType
                          MusicMetadata *metadata, const QString &storageDir);
     ~ImportCoverArtDialog() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   public slots:
     void copyPressed(void);

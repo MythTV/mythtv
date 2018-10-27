@@ -42,8 +42,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     MythUIGuideGrid(MythUIType *parent, const QString &name);
     ~MythUIGuideGrid();
 
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
 
     enum FillType { Alpha = 10, Dense, Eco, Solid };
 
@@ -67,11 +67,11 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     QPoint GetRowAndColumn(QPoint position);
 
   protected:
-    virtual void Finalize(void);
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
+    void Finalize(void) override; // MythUIType
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
 
     bool parseDefaultCategoryColors(QMap<QString, QString> &catColors);
 

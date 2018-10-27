@@ -111,7 +111,7 @@ class MPoolThread : public MThread
         s_thread_num++;
     }
 
-    void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
 

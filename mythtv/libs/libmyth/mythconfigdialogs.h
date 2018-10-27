@@ -22,7 +22,7 @@ class MPUBLIC ConfigurationDialogWidget : public MythDialog
                               const char     *widgetName) :
         MythDialog(parent, widgetName) { }
 
-    virtual void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *e) override; // QWidget
 
   signals:
     void editButtonPressed(void);
@@ -54,9 +54,10 @@ class MPUBLIC ConfigurationDialog : public Storage
     void setLabel(const QString &label);
 
     // Storage
-    virtual void Load(void) { cfgGrp->Load(); }
-    virtual void Save(void) { cfgGrp->Save(); }
-    virtual void Save(QString destination) { cfgGrp->Save(destination); }
+    void Load(void) override { cfgGrp->Load(); } // Storage
+    void Save(void) override { cfgGrp->Save(); } // Storage
+    void Save(QString destination) override // Storage
+        { cfgGrp->Save(destination); }
 
   protected:
     typedef std::vector<Configurable*> ChildList;
@@ -76,8 +77,8 @@ class MPUBLIC ConfigurationWizard : public ConfigurationDialog
   public:
     ConfigurationWizard() : ConfigurationDialog() {}
 
-    virtual MythDialog *dialogWidget(MythMainWindow *parent,
-                                     const char *widgetName);
+    MythDialog *dialogWidget(MythMainWindow *parent,
+                             const char *widgetName) override; // ConfigurationDialog
 };
 
 #endif // MYTH_CONFIG_DIALOGS_H

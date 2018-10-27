@@ -47,13 +47,13 @@ public:
     HLSRingBuffer(const QString &lfilename, bool open);
     virtual ~HLSRingBuffer();
 
-    virtual bool IsOpen(void) const;
-    virtual long long GetReadPosition(void) const;
-    virtual bool OpenFile(const QString &lfilename,
-                          uint retry_ms = kDefaultOpenTimeout);
-    virtual bool IsStreamed(void)           { return false;   }
-    virtual bool IsSeekingAllowed(void)     { return !m_error; }
-    virtual bool IsBookmarkAllowed(void)    { return true; }
+    bool IsOpen(void) const override; // RingBuffer
+    long long GetReadPosition(void) const override; // RingBuffer
+    bool OpenFile(const QString &lfilename,
+                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
+    bool IsStreamed(void) override          { return false;   }  // RingBuffer
+    bool IsSeekingAllowed(void) override    { return !m_error; } // RingBuffer
+    bool IsBookmarkAllowed(void) override   { return true; }     // RingBuffer
     static bool IsHTTPLiveStreaming(QByteArray *s);
     static bool TestForHTTPLiveStreaming(const QString &filename);
     bool SaveToDisk(const QString &filename, int segstart = 0, int segend = -1);
@@ -64,9 +64,9 @@ public:
     int DurationForBytes(uint size);
 
 protected:
-    virtual int safe_read(void *data, uint i_read);
-    virtual long long GetRealFileSizeInternal(void) const;
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint i_read) override; // RingBuffer
+    long long GetRealFileSizeInternal(void) const override; // RingBuffer
+    long long SeekInternal(long long pos, int whence) override; // RingBuffer
 
 private:
     void FreeStreamsList(QList<HLSStream*> *streams) const;

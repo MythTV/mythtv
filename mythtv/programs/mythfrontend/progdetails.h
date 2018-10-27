@@ -17,9 +17,9 @@ class ProgDetails : public MythScreenType
      ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo);
     ~ProgDetails();
 
-    bool Create(void);
-    void Init(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
     QString getRatings(bool recorded, uint chanid, QDateTime startts);

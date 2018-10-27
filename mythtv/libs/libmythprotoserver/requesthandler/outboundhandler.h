@@ -18,8 +18,9 @@ class PROTOSERVER_PUBLIC OutboundRequestHandler : public SocketRequestHandler
     Q_OBJECT
   public:
     OutboundRequestHandler(void);
-    QString GetHandlerName(void)                    { return "OUTBOUND"; }
-    void connectionClosed(MythSocket *socket);
+    QString GetHandlerName(void) override // SocketRequestHandler
+        { return "OUTBOUND"; }
+    void connectionClosed(MythSocket *socket) override; // SocketRequestHandler
 
   public slots:
     void ConnectToMaster(void);

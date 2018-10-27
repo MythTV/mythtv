@@ -16,14 +16,14 @@ class TeletextScreen: public MythScreenType
     virtual ~TeletextScreen();
 
     // MythScreenType methods
-    virtual bool Create(void);
-    virtual void Pulse(void);
+    bool Create(void) override; // MythScreenType
+    void Pulse(void) override; // MythUIType
 
     // TeletextViewer interface methods
     bool KeyPress(const QString &key);
     void SetPage(int page, int subpage);
     void SetDisplaying(bool display);
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     void ClearScreen(void);
 
   private:

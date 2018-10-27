@@ -31,7 +31,7 @@ class MPUBLIC MythFillNVCommandLineParser : public MythCommandLineParser
 {
   public:
     MythFillNVCommandLineParser(); 
-    void LoadArguments(void);
+    void LoadArguments(void) override; // MythCommandLineParser
 };
 
 MythFillNVCommandLineParser::MythFillNVCommandLineParser() :

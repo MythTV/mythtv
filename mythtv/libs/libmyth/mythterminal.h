@@ -27,8 +27,8 @@ class MPUBLIC MythTerminal : public MythScreenType
                  QStringList arguments);
     virtual void deleteLater(void)
         { TeardownAll(); MythScreenType::deleteLater(); }
-    virtual void Init(void);
-    virtual bool Create(void);
+    void Init(void) override; // MythScreenType
+    bool Create(void) override; // MythScreenType
 
   public slots:
     void Start(void);

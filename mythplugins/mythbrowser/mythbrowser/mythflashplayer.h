@@ -13,8 +13,8 @@ class MythFlashPlayer : public MythScreenType
     MythFlashPlayer(MythScreenStack *parent, QStringList &urlList);
     ~MythFlashPlayer();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private:
     QVariant evaluateJavaScript(const QString&);

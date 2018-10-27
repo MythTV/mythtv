@@ -22,8 +22,8 @@ class MythBrowser : public MythScreenType
     MythBrowser(MythScreenStack *parent, QStringList &urlList);
     ~MythBrowser();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void setDefaultSaveDirectory(const QString &saveDir) { m_defaultSaveDir = saveDir; }
     void setDefaultSaveFilename(const QString &saveFile) { m_defaultSaveFilename = saveFile; }

@@ -17,13 +17,13 @@ class ASISignalMonitor: public DTVSignalMonitor
                      bool _release_stream = true, uint64_t _flags = 0);
     virtual ~ASISignalMonitor();
 
-    void Stop(void);
+    void Stop(void) override; // SignalMonitor
 
   protected:
     ASISignalMonitor(void);
     ASISignalMonitor(const ASISignalMonitor&);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
     ASIChannel *GetASIChannel(void);
 
   protected:

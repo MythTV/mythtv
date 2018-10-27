@@ -62,7 +62,7 @@ class META_PUBLIC VideoScannerThread : public MThread
     explicit VideoScannerThread(QObject *parent);
     ~VideoScannerThread();
 
-    void run();
+    void run() override; // MThread
     void SetDirs(QStringList dirs);
     void SetHosts(const QStringList &hosts);
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };

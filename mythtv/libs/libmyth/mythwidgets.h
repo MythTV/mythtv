@@ -61,9 +61,9 @@ class MPUBLIC MythComboBox: public QComboBox
   protected:
     void Teardown(void);
     virtual ~MythComboBox(); // use deleteLater for thread safety
-    virtual void keyPressEvent (QKeyEvent *e);
-    virtual void focusInEvent(QFocusEvent *e);
-    virtual void focusOutEvent(QFocusEvent *e);
+    void keyPressEvent (QKeyEvent *e) override;  // QWidget
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
     void Init(void);
 
   private:
@@ -89,9 +89,9 @@ class MPUBLIC MythSpinBox: public QSpinBox
     void changeHelpText(QString);
 
   protected:
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void focusInEvent(QFocusEvent *e);
-    virtual void focusOutEvent(QFocusEvent *e);
+    void keyPressEvent(QKeyEvent* e) override;   // QWidget
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
 
   private:
     QString helptext;
@@ -111,9 +111,9 @@ class MPUBLIC MythSlider: public QSlider
     void changeHelpText(QString);
 
   protected:
-    virtual void keyPressEvent (QKeyEvent* e);
-    virtual void focusInEvent(QFocusEvent *e);
-    virtual void focusOutEvent(QFocusEvent *e);
+    void keyPressEvent (QKeyEvent* e) override;  // QWidget
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
 
   private:
     QString helptext;
@@ -145,11 +145,11 @@ class MPUBLIC MythLineEdit : public QLineEdit
     void Teardown(void);
     virtual ~MythLineEdit(); // use deleteLater for thread safety
 
-    virtual void keyPressEvent(QKeyEvent *e);
-    virtual void focusInEvent(QFocusEvent *e);
-    virtual void focusOutEvent(QFocusEvent *e);
-    virtual void hideEvent(QHideEvent *e);
-    virtual void mouseDoubleClickEvent(QMouseEvent *e);
+    void keyPressEvent(QKeyEvent *e) override;   // QWidget
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
+    void hideEvent(QHideEvent *e) override;      // QWidget
+    void mouseDoubleClickEvent(QMouseEvent *e) override; // QWidget
 
   private:
     QString helptext;
@@ -199,9 +199,9 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
   protected:
     void Teardown(void);
     virtual ~MythRemoteLineEdit(); // use deleteLater for thread safety
-    virtual void focusInEvent(QFocusEvent *e);
-    virtual void focusOutEvent(QFocusEvent *e);
-    virtual void keyPressEvent(QKeyEvent *e);
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
+    void keyPressEvent(QKeyEvent *e) override;   // QWidget
 
   private slots:
     void    startCycle(QString current_choice, QString set);
@@ -252,8 +252,8 @@ class MPUBLIC MythPushButton : public QPushButton
 
     void setHelpText(const QString &help);
 
-    void keyPressEvent(QKeyEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *e) override; // QWidget
+    void keyReleaseEvent(QKeyEvent *e) override; // QWidget
 
     void toggleText(void);
 
@@ -261,8 +261,8 @@ class MPUBLIC MythPushButton : public QPushButton
     void changeHelpText(QString);
 
   protected:
-    void focusInEvent(QFocusEvent *e);
-    void focusOutEvent(QFocusEvent *e);
+    void focusInEvent(QFocusEvent *e) override; // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
 
   private:
     QColor origcolor;
@@ -288,9 +288,9 @@ class MPUBLIC MythCheckBox: public QCheckBox
     void changeHelpText(QString);
 
   protected:
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void focusInEvent(QFocusEvent *e);
-    virtual void focusOutEvent(QFocusEvent *e);
+    void keyPressEvent(QKeyEvent* e) override;   // QWidget
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
 
   private:
     QString helptext;
@@ -309,9 +309,9 @@ class MPUBLIC MythRadioButton: public QRadioButton
     void changeHelpText(QString);
 
   protected:
-    virtual void keyPressEvent(QKeyEvent* e);
-    virtual void focusInEvent(QFocusEvent *e);
-    virtual void focusOutEvent(QFocusEvent *e);
+    void keyPressEvent(QKeyEvent* e) override;   // QWidget
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
 
   private:
     QString helptext;
@@ -325,7 +325,7 @@ class MPUBLIC MythListBox: public QListWidget
     MythListBox(QWidget       *parent,
                 const QString &name = QString("MythListBox"));
 
-    virtual void keyPressEvent(QKeyEvent* e);
+    void keyPressEvent(QKeyEvent* e) override; // QWidget
 
     QString currentText(void) const { return text(currentRow()); }
 
@@ -345,8 +345,11 @@ class MPUBLIC MythListBox: public QListWidget
     void setHelpText(const QString&);
 
   protected:
-    void focusInEvent(QFocusEvent *e);
-    void focusOutEvent(QFocusEvent *e);
+    void focusInEvent(QFocusEvent *e) override;  // QWidget
+    void focusOutEvent(QFocusEvent *e) override; // QWidget
+    // Not an override because the underlying QWidget::ensurePolished
+    // function isn't virtual.  This is a new virtual function which
+    // calls QListWidget::ensurePolished.
     virtual void ensurePolished(void) const;
 
     bool itemVisible(uint row) const;

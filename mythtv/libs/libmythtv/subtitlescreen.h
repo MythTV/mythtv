@@ -113,7 +113,7 @@ public:
     {
         Init(subs);
     }
-    virtual void WrapLongLines(void);
+    void WrapLongLines(void) override; // FormattedTextSubtitle
 private:
     void Init(const QStringList &subs);
 };
@@ -129,7 +129,7 @@ public:
     {
         Init(buffers);
     }
-    virtual void Layout(void);
+    void Layout(void) override; // FormattedTextSubtitle
 private:
     void Init(const vector<CC608Text*> &buffers);
 };
@@ -151,8 +151,9 @@ public:
     {
         Init(win, list, aspect);
     }
-    virtual void Draw(void);
-    virtual int CacheNum(void) const { return m_num; }
+    void Draw(void) override; // FormattedTextSubtitle
+    int CacheNum(void) const override // FormattedTextSubtitle
+        { return m_num; }
 private:
     void Init(const CC708Window &win,
               const vector<CC708String*> &list,
@@ -203,8 +204,8 @@ public:
     static int GetTeletextBackgroundAlpha(void);
 
     // MythScreenType methods
-    virtual bool Create(void);
-    virtual void Pulse(void);
+    bool Create(void) override; // MythScreenType
+    void Pulse(void) override; // MythUIType
 
 private:
     void ResetElementState(void);

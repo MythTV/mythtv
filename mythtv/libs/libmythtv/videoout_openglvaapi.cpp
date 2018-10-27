@@ -248,7 +248,7 @@ int VideoOutputOpenGLVAAPI::SetPictureAttribute(PictureAttribute attribute,
     int val = newValue;
     if (codec_is_vaapi(video_codec_id) && m_ctx)
         val = m_ctx->SetPictureAttribute(attribute, newValue);
-    return VideoOutput::SetPictureAttribute(attribute, val);
+    return VideoOutputOpenGL::SetPictureAttribute(attribute, val);
 }
 
 void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)

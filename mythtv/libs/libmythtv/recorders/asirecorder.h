@@ -60,14 +60,14 @@ class ASIRecorder : public DTVRecorder
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev);
+                               const QString &vbidev) override; // RecorderBase
 
-    void run(void);
+    void run(void) override; // RecorderBase
 
     bool Open(void);
     bool IsOpen(void) const;
     void Close(void);
-    void StartNewFile(void);
+    void StartNewFile(void) override; // RecorderBase
 
   private:
     ASIChannel       *m_channel;

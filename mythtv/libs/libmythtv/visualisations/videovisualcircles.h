@@ -7,11 +7,12 @@ class VideoVisualCircles : public VideoVisualSpectrum
 {
   public:
     VideoVisualCircles(AudioPlayer *audio, MythRender *render);
-    virtual QString Name(void) { return "Circles"; }
+    QString Name(void) override // VideoVisualSpectrum
+        { return "Circles"; }
 
   protected:
-    virtual bool InitialisePriv(void);
-    virtual void DrawPriv(MythPainter *painter, QPaintDevice* device);
+    bool InitialisePriv(void) override; // VideoVisualSpectrum
+    void DrawPriv(MythPainter *painter, QPaintDevice* device) override; // VideoVisualSpectrum
 };
 
 #endif // VIDEOVISUALCIRCLES_H

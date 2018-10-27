@@ -143,7 +143,8 @@ class MPUBLIC OMXComponentCB : public OMXComponentAbstractCB
     OMXComponentCB( T *inst, OMX_ERRORTYPE (T::*cb)() ) :
         m_inst(inst), m_cb(cb) {}
 
-    virtual OMX_ERRORTYPE Action(OMXComponent *) { return  (m_inst->*m_cb)(); }
+    OMX_ERRORTYPE Action(OMXComponent *) override // OMXComponentAbstractCB
+        { return  (m_inst->*m_cb)(); }
 
   protected:
     T * const m_inst;

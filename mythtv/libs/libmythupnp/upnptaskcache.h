@@ -46,12 +46,12 @@ class SSDPCacheTask : public Task
               UPnp::GetConfiguration()->GetValue("UPnP/SSDP/CacheInterval", 30);
         }
 
-        virtual QString Name   ()
+        QString Name() override // Task
         { 
             return( "SSDPCache" );
         }
 
-        virtual void    Execute( TaskQueue *pQueue )
+        void Execute( TaskQueue *pQueue ) override // Task
         {
             m_nExecuteCount++;
 

@@ -58,7 +58,7 @@ class MPUBLIC GUIStartup : public MythScreenType
 
     GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop);
    ~GUIStartup(void);
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
     bool setStatusState(const QString &name);
     bool setMessageState(const QString &name);
     void setTotal(int total);
@@ -70,7 +70,7 @@ class MPUBLIC GUIStartup : public MythScreenType
     void Retry(void);
     void Search(void);
     void Setup(void);
-    void Close(void);
+    void Close(void) override; // MythScreenType
     void OnClosePromptReturn(bool submit);
 
   signals:

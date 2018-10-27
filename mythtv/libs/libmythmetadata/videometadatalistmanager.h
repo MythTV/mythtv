@@ -62,7 +62,7 @@ class META_PUBLIC meta_data_node : public meta_node
   public:
     meta_data_node(VideoMetadata *data, meta_node *parent = nullptr) :
                    meta_node(parent), m_data(data) {}
-    const QString &getName() const;
+    const QString &getName() const override; // meta_node
     const VideoMetadata *getData() const;
     VideoMetadata *getData();
 
@@ -96,12 +96,12 @@ class META_PUBLIC meta_dir_node : public meta_node
     meta_dir_node() : meta_node(nullptr) { }
 
     void setName(const QString &name);
-    const QString &getName() const;
+    const QString &getName() const override; // meta_node
     void SetHost(const QString &host);
     const QString &GetHost() const;
     void SetPrefix(const QString &prefix);
     const QString &GetPrefix() const;
-    const QString &getPath() const;
+    const QString &getPath() const override; // meta_node
     void setPath(const QString &path);
     void SetData(const QVariant &data);
     const QVariant &GetData() const;

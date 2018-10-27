@@ -78,15 +78,15 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     explicit BDRingBuffer(const QString &lfilename);
     virtual ~BDRingBuffer();
 
-    virtual bool IsStreamed(void) { return true; }
+    bool IsStreamed(void) override { return true; } // RingBuffer
 
     void ProgressUpdate(void);
 
     // Player interaction
     bool BDWaitingForPlayer(void)     { return m_playerWait;  }
     void SkipBDWaitingForPlayer(void) { m_playerWait = false; }
-    virtual void IgnoreWaitStates(bool ignore) { m_ignorePlayerWait = ignore; }
-    virtual bool StartFromBeginning(void);
+    void IgnoreWaitStates(bool ignore) override { m_ignorePlayerWait = ignore; } // RingBuffer
+    bool StartFromBeginning(void) override; // RingBuffer
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
     bool GetBDStateSnapshot(QString& state);
     bool RestoreBDStateSnapshot(const QString &state);
@@ -105,17 +105,17 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     // Get The total duration of the current title in 90Khz ticks.
     uint64_t GetTotalTimeOfTitle(void) const { return (m_currentTitleLength / 90000); }
     uint64_t GetCurrentTime(void) { return (m_currentTime / 90000); }
-    virtual long long GetReadPosition(void) const; // RingBuffer
+    long long GetReadPosition(void) const override; // RingBuffer
     uint64_t GetTotalReadPosition(void);
     uint32_t GetNumChapters(void);
     uint32_t GetCurrentChapter(void);
     uint64_t GetNumAngles(void) { return m_currentTitleAngleCount; }
     uint64_t GetChapterStartTime(uint32_t chapter);
     uint64_t GetChapterStartFrame(uint32_t chapter);
-    bool IsOpen(void)        const { return bdnav; }
+    bool IsOpen(void) const override { return bdnav; } // RingBuffer
     bool IsHDMVNavigation(void) const { return m_isHDMVNavigation; }
-    virtual bool IsInMenu(void) const { return m_inMenu; }
-    virtual bool IsInStillFrame(void) const;
+    bool IsInMenu(void) const override { return m_inMenu; } // RingBuffer
+    bool IsInStillFrame(void) const override; // RingBuffer
     bool TitleChanged(void);
     bool IsValidStream(int streamid);
     void UnblockReading(void)             { m_processState = PROCESS_REPROCESS; }
@@ -129,9 +129,9 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     int GetSubtitleLanguage(uint streamID);
 
     // commands
-    virtual bool HandleAction(const QStringList &actions, int64_t pts);
-    virtual bool OpenFile(const QString &lfilename,
-                          uint retry_ms = kDefaultOpenTimeout);
+    bool HandleAction(const QStringList &actions, int64_t pts) override; // RingBuffer
+    bool OpenFile(const QString &lfilename,
+                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
     void close(void);
 
     bool GoToMenu(const QString &str, int64_t pts);
@@ -140,8 +140,8 @@ class MTV_PUBLIC BDRingBuffer : public RingBuffer
     bool SwitchAngle(uint angle);
 
   protected:
-    virtual int safe_read(void *data, uint sz);
-    virtual long long SeekInternal(long long pos, int whence);
+    int safe_read(void *data, uint sz) override; // RingBuffer
+    long long SeekInternal(long long pos, int whence) override; // RingBuffer
     uint64_t SeekInternal(uint64_t pos);
 
   private:

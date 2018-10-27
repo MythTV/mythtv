@@ -42,7 +42,7 @@ class GalleryFilterDialog : public MythScreenType
                         GalleryFilter *filter);
     ~GalleryFilterDialog();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
     void filterChanged();

@@ -34,7 +34,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
                MythUIType *parent, const QString &name);
     ~MythUIText();
 
-    void Reset(void);
+    void Reset(void) override; // MythUIType
     void ResetMap(const InfoMap &map);
 
     virtual void SetText(const QString &text);
@@ -50,26 +50,28 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void UseAlternateArea(bool useAlt);
 #endif
 
-    virtual void Pulse(void);
+    void Pulse(void) override; // MythUIType
     QPoint CursorPosition(int text_offset);
     int MoveCursor(int lines);
 
     // StorageUser
-    void SetDBValue(const QString &text) { SetText(text); }
-    QString GetDBValue(void) const { return GetText(); }
+    void SetDBValue(const QString &text) override // StorageUser
+        { SetText(text); }
+    QString GetDBValue(void) const override // StorageUser
+        { return GetText(); }
 
     void SetFontState(const QString&);
     void SetJustification(int just);
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod, QRect clipRect);
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                          int alphaMod, QRect clipRect) override; // MythUIType
 
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void SetFontProperties(const MythFontProperties &fontProps);
     const MythFontProperties* GetFontProperties() { return m_Font; }
@@ -83,8 +85,8 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     void SetMultiLine(bool multiline);
     bool GetMultiLine(void) const { return m_MultiLine; }
 
-    void SetArea(const MythRect &rect);
-    void SetPosition(const MythPoint &pos);
+    void SetArea(const MythRect &rect) override; // MythUIType
+    void SetPosition(const MythPoint &pos) override; // MythUIType
     MythRect GetDrawRect(void) { return m_drawRect; }
 
     void SetCanvasPosition(int x, int y);

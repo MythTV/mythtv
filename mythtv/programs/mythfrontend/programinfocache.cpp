@@ -35,7 +35,7 @@ class ProgramInfoLoader : public QRunnable
     ProgramInfoLoader(ProgramInfoCache &c, const bool updateUI)
       : m_cache(c), m_updateUI(updateUI) {}
 
-    void run(void)
+    void run(void) override // QRunnable
     {
         m_cache.Load(m_updateUI);
     }

@@ -39,53 +39,56 @@ class DTVRecorder :
     explicit DTVRecorder(TVRec *rec);
     virtual ~DTVRecorder();
 
-    virtual void SetOption(const QString &opt, const QString &value);
-    virtual void SetOption(const QString &name, int value);
-    virtual void SetOptionsFromProfile(
+    void SetOption(const QString &opt, const QString &value) override; // RecorderBase
+    void SetOption(const QString &name, int value) override; // RecorderBase
+    void SetOptionsFromProfile(
         RecordingProfile *profile, const QString &videodev,
-        const QString&, const QString&);
+        const QString&, const QString&) override; // RecorderBase
 
-    bool IsErrored(void) { return !_error.isEmpty(); }
+    bool IsErrored(void) override // RecorderBase
+        { return !_error.isEmpty(); }
 
-    long long GetFramesWritten(void) { return _frames_written_count; }
+    long long GetFramesWritten(void) override // RecorderBase
+        { return _frames_written_count; }
 
-    void SetVideoFilters(QString &/*filters*/) {;}
-    void Initialize(void) {;}
-    int GetVideoFd(void) { return _stream_fd; }
+    void SetVideoFilters(QString &/*filters*/) override {;} // RecorderBase
+    void Initialize(void) override {;} // RecorderBase
+    int GetVideoFd(void) override // RecorderBase
+        { return _stream_fd; }
 
     virtual void SetStreamData(MPEGStreamData* sd);
     MPEGStreamData *GetStreamData(void) const { return _stream_data; }
 
-    virtual void Reset(void);
-    virtual void ClearStatistics(void);
-    virtual RecordingQuality *GetRecordingQuality(const RecordingInfo*) const;
+    void Reset(void) override; // RecorderBase
+    void ClearStatistics(void) override; // RecorderBase
+    RecordingQuality *GetRecordingQuality(const RecordingInfo*) const override; // RecorderBase
 
     // MPEG Stream Listener
-    void HandlePAT(const ProgramAssociationTable*);
-    void HandleCAT(const ConditionalAccessTable*) {}
-    void HandlePMT(uint pid, const ProgramMapTable*);
-    void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) { }
+    void HandlePAT(const ProgramAssociationTable*) override; // MPEGStreamListener
+    void HandleCAT(const ConditionalAccessTable*) override {} // MPEGStreamListener
+    void HandlePMT(uint pid, const ProgramMapTable*) override; // MPEGStreamListener
+    void HandleEncryptionStatus(uint /*pnum*/, bool /*encrypted*/) override { } // MPEGStreamListener
 
     // MPEG Single Program Stream Listener
-    void HandleSingleProgramPAT(ProgramAssociationTable *pat, bool insert);
-    void HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert);
+    void HandleSingleProgramPAT(ProgramAssociationTable *pat, bool insert) override; // MPEGSingleProgramStreamListener
+    void HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert) override; // MPEGSingleProgramStreamListener
 
     // ATSC Main
-    void HandleSTT(const SystemTimeTable*) { UpdateCAMTimeOffset(); }
-    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
-    void HandleMGT(const MasterGuideTable*) {}
+    void HandleSTT(const SystemTimeTable*) override { UpdateCAMTimeOffset(); } // ATSCMainStreamListener
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) override {} // ATSCMainStreamListener
+    void HandleMGT(const MasterGuideTable*) override {} // ATSCMainStreamListener
 
     // DVBMainStreamListener
-    void HandleTDT(const TimeDateTable*) { UpdateCAMTimeOffset(); }
-    void HandleNIT(const NetworkInformationTable*) {}
-    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) {}
+    void HandleTDT(const TimeDateTable*) override { UpdateCAMTimeOffset(); } // DVBMainStreamListener
+    void HandleNIT(const NetworkInformationTable*) override {} // DVBMainStreamListener
+    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) override {} // DVBMainStreamListener
 
     // TSPacketListener
-    bool ProcessTSPacket(const TSPacket &tspacket);
+    bool ProcessTSPacket(const TSPacket &tspacket) override; // TSPacketListener
 
     // TSPacketListenerAV
-    bool ProcessVideoTSPacket(const TSPacket& tspacket);
-    bool ProcessAudioTSPacket(const TSPacket& tspacket);
+    bool ProcessVideoTSPacket(const TSPacket& tspacket) override; // TSPacketListenerAV
+    bool ProcessAudioTSPacket(const TSPacket& tspacket) override; // TSPacketListenerAV
 
     // Common audio/visual processing
     bool ProcessAVTSPacket(const TSPacket &tspacket);
@@ -93,8 +96,8 @@ class DTVRecorder :
   protected:
     virtual void InitStreamData(void);
 
-    void FinishRecording(void);
-    void ResetForNewFile(void);
+    void FinishRecording(void) override; // RecorderBase
+    void ResetForNewFile(void) override; // RecorderBase
 
     void HandleKeyframe(int64_t extra);
     void HandleTimestamps(int stream_id, int64_t pts, int64_t dts);
@@ -113,7 +116,7 @@ class DTVRecorder :
     void HandleH264Keyframe(void);
 
     // MPEG2 PS support (Hauppauge PVR-x50/PVR-500)
-    virtual void FindPSKeyFrames(const uint8_t *buffer, uint len);
+    void FindPSKeyFrames(const uint8_t *buffer, uint len) override; // PSStreamListener
 
     // For handling other (non audio/video) packets
     bool FindOtherKeyframes(const TSPacket *tspacket);

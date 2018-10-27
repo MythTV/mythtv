@@ -12,7 +12,7 @@ class VorbisEncoder : public Encoder
   public:
     VorbisEncoder(const QString &outfile, int qualitylevel, MusicMetadata *metadata);
    ~VorbisEncoder();
-    int addSamples(int16_t *bytes, unsigned int len);
+    int addSamples(int16_t *bytes, unsigned int len) override; // Encoder
 
   private:
     ogg_page og;

@@ -19,13 +19,13 @@ class ExternalSignalMonitor: public DTVSignalMonitor
                           bool _release_stream, uint64_t _flags = 0);
     virtual ~ExternalSignalMonitor();
 
-    void Stop(void);
+    void Stop(void) override; // SignalMonitor
 
   protected:
     ExternalSignalMonitor(void);
     ExternalSignalMonitor(const ExternalSignalMonitor &);
 
-    virtual void UpdateValues(void);
+    void UpdateValues(void) override; // SignalMonitor
     ExternalChannel *GetExternalChannel(void)
         { return dynamic_cast<ExternalChannel*>(channel); }
 

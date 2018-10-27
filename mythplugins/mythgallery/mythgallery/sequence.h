@@ -83,23 +83,24 @@ protected:
 class SequenceInc : public SequenceBase
 {
 protected:
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceBase
     {
         idx = _idx;
     }
 
-    virtual size_t get() { return idx; }
+    size_t get() override // SequenceBase
+    { return idx; }
 };
 
 class SequenceDec : public SequenceBase
 {
 protected:
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceBase
     {
         idx = len - _idx - 1;
     }
 
-    virtual size_t get()
+    size_t get() override // SequenceBase
     {
         return len - idx - 1;
     }
@@ -112,13 +113,13 @@ public:
     : eviction_idx(0)
     { }
 
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceBase
     {
         size_t seq_idx = (idx + 1) % seq.size();
         seq[seq_idx] = _idx;
     }
 
-    virtual void extend(size_t items)
+    void extend(size_t items) override // SequenceBase
     {
         size_t extension = std::min(len + items, MAX_HISTORY_SIZE) - len;
         SequenceBase::extend(extension);
@@ -137,7 +138,7 @@ public:
     }
 
 protected:
-    virtual size_t get()
+    size_t get() override // SequenceBase
     {
         if (idx == eviction_idx)
         {
@@ -189,14 +190,14 @@ public:
         SequenceRandomBase::extend(MAX_HISTORY_SIZE);
     }
 
-    virtual void extend(size_t _items)
+    void extend(size_t _items) override // SequenceRandomBase
     {
         items += _items;
         // The parent len was already extended enough, so it is not called.
     }
 
 protected:
-    virtual size_t create()
+    size_t create() override // SequenceRandomBase
     {
         return (size_t)(((double)random()) * items / RAND_MAX);
     }
@@ -211,7 +212,7 @@ public:
     : unseen(0)
     { }
 
-    virtual void set(size_t _idx)
+    void set(size_t _idx) override // SequenceRandomBase
     {
         size_t seq_idx = (idx + 1) % seq.size();
         evict(seq_idx);
@@ -235,7 +236,7 @@ public:
         SequenceRandomBase::set(_idx);
     }
 
-    virtual void extend(size_t items)
+    void extend(size_t items) override // SequenceRandomBase
     {
         SequenceRandomBase::extend(items);
         map.resize(len, 0);
@@ -243,7 +244,7 @@ public:
     }
 
 protected:
-    virtual size_t create()
+    size_t create() override // SequenceRandomBase
     {
         size_t unseen_idx = (size_t)(((double)random()) * unseen / RAND_MAX);
         for (size_t i = 0; ; ++i)
@@ -261,7 +262,7 @@ protected:
         }
     }
 
-    virtual void evict(size_t i)
+    void evict(size_t i) override // SequenceRandomBase
     {
         ssize_t evicted = seq[i];
         if (evicted != -1)
@@ -283,7 +284,7 @@ public:
     : weightCursor(0), totalWeight(0)
     { }
 
-    virtual void extend(size_t items)
+    void extend(size_t items) override // SequenceRandom
     {
         weights.resize(weights.size() + items, totalWeight);
         SequenceRandom::extend(items);
@@ -296,7 +297,7 @@ public:
     }
 
 protected:
-    virtual size_t create()
+    size_t create() override // SequenceRandom
     {
         double slot = (((double)random()) * totalWeight / RAND_MAX);
         vector<double>::iterator slot_iter = std::upper_bound(

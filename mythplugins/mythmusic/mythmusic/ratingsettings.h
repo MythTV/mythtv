@@ -13,7 +13,7 @@ public:
     RatingSettings(MythScreenStack *parent, const char *name = nullptr);
     ~RatingSettings() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
 private:
     MythUISpinBox      *m_ratingWeight;

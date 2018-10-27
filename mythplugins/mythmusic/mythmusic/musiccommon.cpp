@@ -890,6 +890,8 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
+    if (!handled && MythScreenType::keyPressEvent(e))
+        handled = true;
     return handled;
 }
 

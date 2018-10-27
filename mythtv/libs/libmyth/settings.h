@@ -100,12 +100,12 @@ class MPUBLIC Setting : public Configurable, public StorageUser
     virtual QString getValue(void) const;
 
     // non-const Gets
-    virtual Setting *byName(const QString &name)
+    Setting *byName(const QString &name) override // Configurable
         { return (name == configName) ? this : nullptr; }
 
     // StorageUser
-    void SetDBValue(const QString &val) { setValue(val); }
-    QString GetDBValue(void) const { return getValue(); }
+    void SetDBValue(const QString &val) override { setValue(val); } // StorageUser
+    QString GetDBValue(void) const override { return getValue(); } // StorageUser
   public slots:
     virtual void setValue(const QString &newValue);
 
@@ -128,8 +128,8 @@ class MPUBLIC LabelSetting : public Setting
   protected:
     explicit LabelSetting(Storage *_storage) : Setting(_storage) { }
   public:
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
 };
 
 class MPUBLIC LineEditSetting : public Setting
@@ -140,9 +140,9 @@ class MPUBLIC LineEditSetting : public Setting
         rw(readwrite), password_echo(false) { }
 
   public:
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
-    virtual void widgetInvalid(QObject *obj);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
+    void widgetInvalid(QObject *obj) override; // Configurable
 
     void setRW(bool readwrite = true)
     {
@@ -153,11 +153,11 @@ class MPUBLIC LineEditSetting : public Setting
 
     void setRO(void) { setRW(false); }
 
-    virtual void setEnabled(bool b);
+    void setEnabled(bool b) override; // Configurable
     virtual void setVisible(bool b);
     virtual void SetPasswordEcho(bool b);
 
-    virtual void setHelpText(const QString &str);
+    void setHelpText(const QString &str) override; // Configurable
 
   private:
     QWidget      *bxwidget;
@@ -187,7 +187,7 @@ class MPUBLIC IntegerSetting : public Setting
         Setting::setValue(QString::number(newValue));
         emit valueChanged(newValue);
     }
-    virtual void setValue(const QString &nv) { setValue(nv.toInt()); }
+    void setValue(const QString &nv) override { setValue(nv.toInt()); } // Setting
 
   signals:
     void valueChanged(int newValue);
@@ -200,8 +200,8 @@ class MPUBLIC BoundedIntegerSetting : public IntegerSetting
         IntegerSetting(_storage), min(_min), max(_max), step(_step) { }
 
   public:
-    virtual void setValue(int newValue);
-    virtual void setValue(const QString &nv) { setValue(nv.toInt()); }
+    void setValue(int newValue) override; // IntegerSetting
+    void setValue(const QString &nv) override { setValue(nv.toInt()); }  // Setting
 
   protected:
     int min;
@@ -217,8 +217,8 @@ class MPUBLIC SliderSetting: public BoundedIntegerSetting
     SliderSetting(Storage *_storage, int min, int max, int step) :
         BoundedIntegerSetting(_storage, min, max, step) { }
   public:
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
 };
 
 class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
@@ -230,9 +230,9 @@ class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
                    bool allow_single_step = false,
                    QString special_value_text = "");
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
-    virtual void widgetInvalid(QObject *obj);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
+    void widgetInvalid(QObject *obj) override; // Configurable
 
     void setFocus(void);
     void clearFocus(void);
@@ -241,11 +241,11 @@ class MPUBLIC SpinBoxSetting: public BoundedIntegerSetting
     void SetRelayEnabled(bool enabled) { relayEnabled = enabled; }
     bool IsRelayEnabled(void) const { return relayEnabled; }
 
-    virtual void setHelpText(const QString &str);
+    void setHelpText(const QString &str) override; // Configurable
 
   public slots:
-    virtual void setValue(int newValue);
-    virtual void setValue(const QString &nv) { setValue(nv.toInt()); }
+    void setValue(int newValue) override; // IntegerSetting
+    void setValue(const QString &nv) override { setValue(nv.toInt()); } // Setting
 
   signals:
     void valueChanged(const QString &name, int newValue);
@@ -295,7 +295,7 @@ class MPUBLIC SelectSetting : public Setting
     void selectionsCleared(void);
 
   public slots:
-    virtual void setValue(const QString &newValue);
+    void setValue(const QString &newValue) override; // Setting
     virtual void setValue(int which);
 
     virtual QString getSelectionLabel(void) const;
@@ -318,8 +318,8 @@ class MPUBLIC SelectLabelSetting : public SelectSetting
     explicit SelectLabelSetting(Storage *_storage) : SelectSetting(_storage) { }
 
   public:
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
 };
 
 class MPUBLIC ComboBoxSetting: public SelectSetting
@@ -332,30 +332,30 @@ class MPUBLIC ComboBoxSetting: public SelectSetting
         bxwidget(nullptr), cbwidget(nullptr), step(_step) { }
 
   public:
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
-    virtual void widgetInvalid(QObject *obj);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
+    void widgetInvalid(QObject *obj) override; // Configurable
 
     void setFocus(void) { if (cbwidget) cbwidget->setFocus(); }
     void resetMaxCount(int count)
         { if (cbwidget) cbwidget->setMaxCount(count + rw); }
 
-    virtual void setEnabled(bool b);
+    void setEnabled(bool b) override; // Configurable
     virtual void setVisible(bool b);
 
-    virtual void setHelpText(const QString &str);
+    void setHelpText(const QString &str) override; // Configurable
 
   public slots:
-    virtual void SetDBValue(const QString &newValue)
+    void SetDBValue(const QString &newValue) override // StorageUser
         { SelectSetting::setValue(newValue); }
-    virtual void setValue(const QString &newValue);
-    virtual void setValue(int which);
+    void setValue(const QString &newValue) override; // Setting
+    void setValue(int which) override; // SelectSetting
 
     void addSelection(const QString &label,
                       QString value = QString(),
-                      bool select = false);
+                      bool select = false) override; // SelectSetting
     bool removeSelection(const QString &label,
-                         QString value = QString());
+                         QString value = QString()) override; // SelectSetting
     void editTextChanged(const QString &newText);
 
   private:
@@ -377,9 +377,9 @@ class MPUBLIC ListBoxSetting: public SelectSetting
         bxwidget(nullptr), lbwidget(nullptr), eventFilter(nullptr),
         selectionMode(MythListBox::SingleSelection) { }
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
-    virtual void widgetInvalid(QObject *obj);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
+    void widgetInvalid(QObject *obj) override; // Configurable
 
     void setFocus(void)
         { if (lbwidget) lbwidget->setFocus(); }
@@ -391,15 +391,14 @@ class MPUBLIC ListBoxSetting: public SelectSetting
     int currentItem(void)
         { return (lbwidget) ? lbwidget->currentRow() : -1; }
 
-    virtual void setEnabled(bool b);
+    void setEnabled(bool b) override; // Configurable
 
-    virtual void clearSelections(void);
+    void clearSelections(void) override; // SelectSetting
 
-    virtual void setHelpText(const QString &str);
+    void setHelpText(const QString &str) override; // Configurable
 
     virtual void SetEventFilter(QObject *filter) { eventFilter = filter; }
-    virtual bool ReplaceLabel(
-        const QString &new_label, const QString &value);
+    bool ReplaceLabel(const QString &new_label, const QString &value) override; // SelectSetting
 
   signals:
     void accepted(int);
@@ -410,7 +409,7 @@ class MPUBLIC ListBoxSetting: public SelectSetting
   public slots:
     void addSelection(const QString &label,
                       QString        value  = QString(),
-                      bool           select = false);
+                      bool           select = false) override; // SelectSetting
 
     void setValueByIndex(int index);
 
@@ -440,7 +439,7 @@ class MPUBLIC BooleanSetting : public Setting
         emit valueChanged(check);
     };
 
-    virtual void setValue(const QString &newValue)
+    void setValue(const QString &newValue) override // Setting
     {
         setValue((newValue=="1" ||
                   newValue.toLower().startsWith("y") ||
@@ -459,16 +458,16 @@ class MPUBLIC CheckBoxSetting: public BooleanSetting
     explicit CheckBoxSetting(Storage *_storage) :
         BooleanSetting(_storage), widget(nullptr) { }
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
 
-    virtual void widgetInvalid(QObject*);
+    void widgetInvalid(QObject*) override; // Configurable
 
     virtual void setVisible(bool b);
-    virtual void setLabel(QString str);
-    virtual void setEnabled(bool b);
+    void setLabel(QString str) override; // Configurable
+    void setEnabled(bool b) override; // Configurable
 
-    virtual void setHelpText(const QString &str);
+    void setHelpText(const QString &str) override; // Configurable
 
   protected:
     MythCheckBox *widget;
@@ -483,13 +482,13 @@ class MPUBLIC PathSetting : public ComboBoxSetting
         ComboBoxSetting(_storage, true), mustexist(_mustexist) { }
 
     // TODO: this should support globbing of some sort
-    virtual void addSelection(const QString &label,
-                              QString value=QString(),
-                              bool select=false);
+    void addSelection(const QString &label,
+                      QString value=QString(),
+                      bool select=false) override; // SelectSetting
 
     // Use a combobox for now, maybe a modified file dialog later
-    //virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-    //                              const char *widgetName = nullptr);
+    //QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+    //                      const char *widgetName = nullptr) override; // Configurable
 
   protected:
     bool mustexist;
@@ -522,13 +521,13 @@ class MPUBLIC DateSetting : public Setting
   public:
     explicit DateSetting(Storage *_storage) : Setting(_storage) { }
 
-    QString getValue(void) const;
+    QString getValue(void) const override; // Setting
 
     QDate dateValue(void) const;
 
   public slots:
     void setValue(const QDate &newValue);
-    void setValue(const QString &newValue);
+    void setValue(const QString &newValue) override; // Setting
 };
 
 class MPUBLIC TimeSetting : public Setting
@@ -541,7 +540,7 @@ class MPUBLIC TimeSetting : public Setting
 
   public slots:
     void setValue(const QTime &newValue);
-    void setValue(const QString &newValue);
+    void setValue(const QString &newValue) override;  // Setting
 };
 
 class MPUBLIC AutoIncrementDBSetting :
@@ -556,9 +555,9 @@ class MPUBLIC AutoIncrementDBSetting :
         setValue(0);
     }
 
-    virtual void Load(void) { }
-    virtual void Save(void);
-    virtual void Save(QString destination);
+    void Load(void) override { } // Storage
+    void Save(void) override; // Storage
+    void Save(QString destination) override; // Storage
 };
 
 class MPUBLIC ButtonSetting: public Setting
@@ -569,15 +568,15 @@ class MPUBLIC ButtonSetting: public Setting
     ButtonSetting(Storage *_storage, QString _name = "button") :
         Setting(_storage), name(_name), button(nullptr) { }
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName=nullptr);
-    virtual void widgetInvalid(QObject *obj);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName=nullptr) override; // Configurable
+    void widgetInvalid(QObject *obj) override; // Configurable
 
-    virtual void setEnabled(bool b);
+    void setEnabled(bool b) override; // Configurable
 
-    virtual void setLabel(QString);
+    void setLabel(QString) override; // Configurable
 
-    virtual void setHelpText(const QString &);
+    void setHelpText(const QString &) override; // Configurable
 
   signals:
     void pressed(void);
@@ -599,7 +598,7 @@ class MPUBLIC ProgressSetting : public IntegerSetting
         IntegerSetting(_storage), totalSteps(_totalSteps) { }
 
     QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                          const char *widgetName = nullptr);
+                          const char *widgetName = nullptr) override; // Configurable
 
   private:
     int totalSteps;

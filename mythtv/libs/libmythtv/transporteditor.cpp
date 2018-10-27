@@ -366,8 +366,8 @@ class MuxDBStorage : public SimpleDBStorage
     {
     }
 
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const MultiplexID *mplexid;
 };
@@ -405,8 +405,8 @@ class VideoSourceID : public StandardSetting, public MuxDBStorage
         setVisible(false);
         setValue(_sourceid);
     }
-    virtual void edit(MythScreenType * /*screen*/) { }
-    virtual void resultEdit(DialogCompletionEvent * /*dce*/) { }
+    void edit(MythScreenType * /*screen*/) override { } // StandardSetting
+    void resultEdit(DialogCompletionEvent * /*dce*/) override { } // StandardSetting
 };
 
 class DTVStandard : public MythUIComboBoxSetting, public MuxDBStorage

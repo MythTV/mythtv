@@ -38,11 +38,12 @@ class DTVChannel : public ChannelBase
     virtual ~DTVChannel();
 
     // Commands
-    virtual bool SetChannelByString(const QString &chan);
+    bool SetChannelByString(const QString &chan) override; // ChannelBase
 
     /* Allow 'MPTS' format to be set, so we know when to process the
        full, unfiltered MPTS from the transport stream. */
-    virtual void SetFormat(const QString & format) { m_tvFormat = format; }
+    void SetFormat(const QString & format) override // ChannelBase
+        { m_tvFormat = format; }
     QString GetFormat(void) { return m_tvFormat; }
 
     /// \brief To be used by the channel scanner and possibly the EIT scanner.
@@ -72,7 +73,7 @@ class DTVChannel : public ChannelBase
     /// This is only called when there is no frequency set. This is used
     /// to implement "Channel Numbers" in analog tuning scenarios and to
     /// implement "Virtual Channels" in the OCUR and Firewire tuners.
-    virtual bool Tune(const QString &freqid, int finetune)
+    bool Tune(const QString &freqid, int finetune) override // ChannelBase
     {
         (void) freqid; (void) finetune;
         return false;
@@ -154,7 +155,7 @@ class DTVChannel : public ChannelBase
     void ClearDTVInfo(void) { SetDTVInfo(0, 0, 0, 0, -1); }
     /// \brief Checks tuning for problems, and tries to fix them.
     virtual void CheckOptions(DTVMultiplex &/*tuning*/) const {}
-    virtual void HandleScriptEnd(bool ok);
+    void HandleScriptEnd(bool ok) override; // ChannelBase
 
   protected:
     mutable QMutex dtvinfo_lock;

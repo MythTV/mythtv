@@ -134,7 +134,7 @@ signals:
 
     // Implementation
 protected:
-    virtual void run(); // QThread override
+    void run() override; // QThread
     bool NewRequest(QEvent *);
     bool StartRequest(NetStreamRequest *);
     bool AbortRequest(NetStreamAbort *);

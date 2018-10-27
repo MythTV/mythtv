@@ -65,15 +65,15 @@ class UPNP_PUBLIC XmlConfiguration : public Configuration
 
         virtual ~XmlConfiguration() = default;
 
-        virtual bool    Load    ( void );
-        virtual bool    Save    ( void );
+        bool    Load    ( void ) override; // Configuration
+        bool    Save    ( void ) override; // Configuration
 
-        virtual int     GetValue( const QString &sSetting, int     Default ); 
-        virtual QString GetValue( const QString &sSetting, QString Default ); 
+        int     GetValue( const QString &sSetting, int     Default ) override; // Configuration
+        QString GetValue( const QString &sSetting, QString Default ) override; // Configuration
 
-        virtual void    SetValue( const QString &sSetting, int     value   ); 
-        virtual void    SetValue( const QString &sSetting, QString value   ); 
-        virtual void    ClearValue( const QString &sSetting );
+        void    SetValue( const QString &sSetting, int     value   ) override; // Configuration
+        void    SetValue( const QString &sSetting, QString value   ) override; // Configuration
+        void    ClearValue( const QString &sSetting ) override; // Configuration
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -88,15 +88,15 @@ class UPNP_PUBLIC DBConfiguration : public Configuration
 
         virtual ~DBConfiguration() = default;
 
-        virtual bool    Load    ( void );
-        virtual bool    Save    ( void );
+        bool    Load    ( void ) override; // Configuration
+        bool    Save    ( void ) override; // Configuration
 
-        virtual int     GetValue( const QString &sSetting, int     Default ); 
-        virtual QString GetValue( const QString &sSetting, QString Default ); 
+        int     GetValue( const QString &sSetting, int     Default ) override; // Configuration
+        QString GetValue( const QString &sSetting, QString Default ) override; // Configuration
 
-        virtual void    SetValue( const QString &sSetting, int     value   ); 
-        virtual void    SetValue( const QString &sSetting, QString value   ); 
-        virtual void    ClearValue( const QString &sSetting );
+        void    SetValue( const QString &sSetting, int     value   ) override; // Configuration
+        void    SetValue( const QString &sSetting, QString value   ) override; // Configuration
+        void    ClearValue( const QString &sSetting ) override; // Configuration
 };
 
 #endif

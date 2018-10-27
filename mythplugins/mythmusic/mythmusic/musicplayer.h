@@ -25,7 +25,8 @@ class MusicPlayerEvent : public MythEvent
             MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
         ~MusicPlayerEvent() = default;
 
-        virtual MythEvent *clone(void) const { return new MusicPlayerEvent(*this); }
+         MythEvent *clone(void) const override //  MythEvent
+            { return new MusicPlayerEvent(*this); }
 
         // for track changed/added/deleted/metadata changed/playlist changed events
         int TrackID;
@@ -191,7 +192,7 @@ class MusicPlayer : public QObject, public MythObservable
     void StopPlayback(void);
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
   private:
     void loadSettings(void);

@@ -186,7 +186,7 @@ class LoggerThread : public QObject, public MThread
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
                  int facility, bool noserver);
     ~LoggerThread();
-    void run(void);
+    void run(void) override; // MThread
     void stop(void);
     bool flush(int timeoutMS = 200000);
     void handleItem(LoggingItem *item);

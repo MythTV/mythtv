@@ -59,13 +59,13 @@ public:
     enum Type {None, Alpha, Position, Zoom, HorizontalZoom, VerticalZoom, Angle};
 
     Animation(Slide *image, Type type = Alpha);
-    virtual void Start(bool forwards = true, float speed = 1.0);
-    virtual void Pulse(int interval);
-    void         Set(QVariant from, QVariant to,
-                     int duration = 500,
-                     QEasingCurve curve = QEasingCurve::InOutCubic,
-                     UIEffects::Centre = UIEffects::Middle);
-    virtual void updateCurrentValue(const QVariant &value);
+    void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
+    void Pulse(int interval) override; // AbstractAnimation
+    void Set(QVariant from, QVariant to,
+             int duration = 500,
+             QEasingCurve curve = QEasingCurve::InOutCubic,
+             UIEffects::Centre = UIEffects::Middle);
+    void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
 
 protected:
     //! Image to be animated
@@ -86,11 +86,11 @@ class GroupAnimation : public AbstractAnimation
 public:
     GroupAnimation() : AbstractAnimation()            {}
     virtual ~GroupAnimation()                        { Clear(); }
-    virtual void Pulse(int interval)                      = 0;
-    virtual void Start(bool forwards, float speed = 1.0) = 0;
-    virtual void SetSpeed(float speed)                    = 0;
+    void Pulse(int interval) override                     = 0; // AbstractAnimation
+    void Start(bool forwards, float speed = 1.0) override = 0; // AbstractAnimation
+    void SetSpeed(float speed) override                   = 0; // AbstractAnimation
     virtual void Add(AbstractAnimation *child);
-    virtual void Clear();
+    void Clear() override; // AbstractAnimation
 
 protected:
     QList<AbstractAnimation *> m_group;
@@ -104,12 +104,12 @@ class SequentialAnimation : public GroupAnimation
     Q_OBJECT
 public:
     SequentialAnimation() : GroupAnimation(), m_current(-1)  {}
-    virtual void Pulse(int interval);
-    virtual void Start(bool forwards, float speed = 1.0);
-    virtual void SetSpeed(float speed);
+    void Pulse(int interval) override; // GroupAnimation
+    void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
+    void SetSpeed(float speed) override; // GroupAnimation
 
 protected slots:
-    virtual void Finished();
+    void Finished() override; // AbstractAnimation
 
 protected:
     int m_current; //!< Index of child currently playing
@@ -122,12 +122,12 @@ class ParallelAnimation : public GroupAnimation
     Q_OBJECT
 public:
     ParallelAnimation() : GroupAnimation(), m_finished(0)  {}
-    virtual void Pulse(int interval);
-    virtual void Start(bool forwards, float speed = 1.0);
-    virtual void SetSpeed(float speed);
+    void Pulse(int interval) override; // GroupAnimation
+    void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
+    void SetSpeed(float speed) override; // GroupAnimation
 
 protected slots:
-    virtual void Finished();
+    void Finished() override; // AbstractAnimation
 
 protected:
     int m_finished; //!< Count of child animations that have finished
@@ -140,7 +140,7 @@ class PanAnimation : public Animation
 {
 public:
     explicit PanAnimation(Slide *image) : Animation(image) {}
-    virtual void updateCurrentValue(const QVariant &value);
+    void updateCurrentValue(const QVariant &value) override; // Animation
 };
 
 
@@ -165,7 +165,7 @@ public:
     bool      IsLoaded() const      { return m_state >= kLoaded && m_waitingFor; }
     bool      FailedLoad() const    { return m_state == kFailed; }
     int       GetDirection() const  { return m_direction; }
-    void      Pulse();
+    void      Pulse() override; // MythUIImage
 
     QChar     GetDebugState() const;
 

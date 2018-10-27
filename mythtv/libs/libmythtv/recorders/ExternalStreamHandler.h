@@ -72,8 +72,8 @@ class ExternalStreamHandler : public StreamHandler
     explicit ExternalStreamHandler(const QString & path);
     ~ExternalStreamHandler(void) { CloseApp(); }
 
-    virtual void run(void); // MThread
-    virtual void PriorityEvent(int fd); // DeviceReaderCB
+    void run(void) override; // MThread
+    void PriorityEvent(int fd) override; // DeviceReaderCB
 
     bool IsAppOpen(void);
     bool IsTSOpen(void);

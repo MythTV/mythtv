@@ -48,7 +48,7 @@ namespace
         }
 
         DirectoryHandler *newDir(const QString &dir_name,
-                                 const QString &fq_dir_name)
+                                 const QString &fq_dir_name) override // DirectoryHandler
         {
             (void) dir_name;
             (void) fq_dir_name;
@@ -58,7 +58,7 @@ namespace
         void handleFile(const QString &file_name,
                         const QString &fq_file_name,
                         const QString &extension,
-                        const QString &host)
+                        const QString &host) override // DirectoryHandler
 
         {
 #if 0

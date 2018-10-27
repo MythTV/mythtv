@@ -281,13 +281,14 @@ class BufferedSocketDeviceRequest : public HTTPRequest
         explicit BufferedSocketDeviceRequest( QTcpSocket *pSocket );
         virtual ~BufferedSocketDeviceRequest() = default;
 
-        virtual QString  ReadLine        ( int msecs );
-        virtual qint64   ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  );
-        virtual qint64   WriteBlock      ( const char *pData, qint64 nLen    );
-        virtual QString  GetHostAddress  ();
-        virtual quint16  GetHostPort     ();
-        virtual QString  GetPeerAddress  ();
-        virtual int      getSocketHandle () {return( m_pSocket->socketDescriptor() ); }
+        QString  ReadLine        ( int msecs ) override; // HTTPRequest
+        qint64   ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  ) override; // HTTPRequest
+        qint64   WriteBlock      ( const char *pData, qint64 nLen    ) override; // HTTPRequest
+        QString  GetHostAddress  () override; // HTTPRequest
+        quint16  GetHostPort     () override; // HTTPRequest
+        QString  GetPeerAddress  () override; // HTTPRequest
+        int      getSocketHandle () override // HTTPRequest
+            {return( m_pSocket->socketDescriptor() ); }
 
 };
 

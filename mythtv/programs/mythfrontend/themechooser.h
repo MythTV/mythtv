@@ -33,11 +33,11 @@ class ThemeChooser : public MythScreenType
                const QString &name = "ThemeChooser");
    ~ThemeChooser();
 
-    bool Create(void);
-    void Load(void);
-    void Init(void);
-    bool keyPressEvent(QKeyEvent*);
-    void customEvent(QEvent *e);
+    bool Create(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent*) override; // MythScreenType
+    void customEvent(QEvent *e) override; // MythUIType
 
   private slots:
     void itemChanged(MythUIButtonListItem *item);

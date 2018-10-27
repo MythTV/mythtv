@@ -53,8 +53,5 @@ bool PlaylistView::keyPressEvent(QKeyEvent *event)
     if (MusicCommon::keyPressEvent(event))
         handled = true;
 
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
     return handled;
 }

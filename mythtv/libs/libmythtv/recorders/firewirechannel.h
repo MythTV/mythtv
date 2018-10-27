@@ -22,23 +22,26 @@ class FirewireChannel : public DTVChannel
     virtual ~FirewireChannel();
 
     // Commands
-    virtual bool Open(void);
-    virtual void Close(void);
+     bool Open(void) override; // ChannelBase
+    void Close(void) override; // ChannelBase
 
     using DTVChannel::Tune;
-    virtual bool Tune(const DTVMultiplex&) { return false; }
-    virtual bool Tune(const QString &freqid, int finetune);
-    virtual bool Retune(void);
+    bool Tune(const DTVMultiplex&) override // DTVChannel
+        { return false; }
+    bool Tune(const QString &freqid, int finetune) override; // DTVChannel
+    bool Retune(void) override; // ChannelBase
 
     // Sets
     virtual bool SetPowerState(bool on);
 
     // Gets
-    virtual bool IsOpen(void) const { return isopen; }
-    virtual QString GetDevice(void) const;
+    bool IsOpen(void) const override // ChannelBase
+        { return isopen; }
+    QString GetDevice(void) const override; // ChannelBase
 
   protected:
-    virtual bool IsExternalChannelChangeSupported(void) { return true; }
+    bool IsExternalChannelChangeSupported(void) override // ChannelBase
+        { return true; }
 
   private:
     virtual FirewireDevice::PowerState GetPowerState(void) const;

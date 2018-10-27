@@ -152,7 +152,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *         exit until the recording is complete.
      *  \sa StopRecording()
      */
-    virtual void run(void) = 0;
+    void run(void) override = 0; // QRunnable
 
     /** \brief Reset the recorder to the startup state.
      *

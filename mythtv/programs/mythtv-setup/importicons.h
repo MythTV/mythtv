@@ -34,10 +34,10 @@ class ImportIconsWizard : public MythScreenType
                       const QString &channelname = "");
    ~ImportIconsWizard();
 
-    bool Create(void);
-    void Load(void);
-//    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    void Load(void) override; // MythScreenType
+//    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
 
     struct SearchEntry               //! search entry results
     {
@@ -150,13 +150,13 @@ class ImportIconsWizard : public MythScreenType
     void menuSelection(MythUIButtonListItem *);//!< process the icon selection
     void skip();                   //!< skip this icon
     void askSubmit(const QString& strParam);
-    void Close();
+    void Close() override; // MythScreenType
 
   private slots:
     void itemChanged(MythUIButtonListItem *item);
 
   protected:
-    void Init(void);
+    void Init(void) override; // MythScreenType
 
   private:
     ListSearchEntries m_listSearch;  //!< the list of SearchEntry

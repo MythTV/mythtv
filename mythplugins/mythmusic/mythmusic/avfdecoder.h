@@ -20,16 +20,16 @@ class avfDecoder : public QObject, public Decoder
     avfDecoder(const QString &file, DecoderFactory *, AudioOutput *);
     virtual ~avfDecoder(void);
 
-    bool initialize();
+    bool initialize() override; // Decoder
     double lengthInSeconds();
-    void seek(double);
-    void stop();
+    void seek(double) override; // Decoder
+    void stop() override; // Decoder
 
   protected slots:
     void checkMetatdata(void);
 
   private:
-    void run();
+    void run() override; // MThread
 
     void deinit();
 

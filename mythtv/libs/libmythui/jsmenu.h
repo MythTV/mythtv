@@ -92,7 +92,7 @@ class JoystickMenuThread : public MThread
     void Stop(void) { m_bStop = true; }
 
   private:
-    void run(void);
+    void run() override; // MThread
 
     QObject *m_mainWindow;
     QString m_devicename;

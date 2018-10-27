@@ -40,7 +40,7 @@ class SubtitleLoadHelper : public QRunnable
         ++s_loading[m_target];
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         TextSubtitleParser::LoadSubtitles(m_fileName, *m_target, false);
 

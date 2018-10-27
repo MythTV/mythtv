@@ -17,9 +17,9 @@ class IdleScreen : public MythScreenType
     explicit IdleScreen(MythScreenStack *parent);
     virtual ~IdleScreen();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *e) override; // MythUIType
 
 
   public slots:
@@ -28,8 +28,8 @@ class IdleScreen : public MythScreenType
     bool UpdateScheduledList();
 
   protected:
-    void Load(void);
-    void Init(void);
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
   private:
     bool CheckConnectionToServer(void);

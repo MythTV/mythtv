@@ -112,7 +112,7 @@ class DecoderThread : public MThread
     ~DecoderThread() { wait(); }
 
   protected:
-    virtual void run(void);
+    void run(void) override; // MThread
 
   private:
     MythPlayer *m_mp;

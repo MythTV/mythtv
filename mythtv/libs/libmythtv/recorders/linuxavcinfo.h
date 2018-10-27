@@ -31,10 +31,10 @@ class LinuxAVCInfo : public AVCInfo
     bool OpenPort(void);
     bool ClosePort(void);
 
-    virtual bool SendAVCCommand(
+    bool SendAVCCommand(
         const vector<uint8_t> &cmd,
         vector<uint8_t>       &result,
-        int                    retry_cnt);
+        int                    retry_cnt)  override; // AVCInfo
 
     bool IsPortOpen(void) const { return fw_handle; }
 

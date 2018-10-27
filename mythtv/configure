@@ -6879,6 +6879,13 @@ if enabled gxx; then
     if enabled require_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
     fi
+    # Ubuntu 16.04 has problems with this flag.  Its not GCC or Qt, as
+    # both older compilers and/or older Qt versions on other systems
+    # produce clean output.  This is a simple check to eliminate that
+    # specific version (and more, but it gets the job done).
+    if [ $qt_version -ge $(version2num "5.7.0") ]; then
+        check_cxxflags -Wsuggest-override
+    fi
 elif enabled icpc; then
     # 177: function declared but never referenced (triggers on Q_OBJECT)
     # 192: icpc confused by Qt %0-%99 in strings

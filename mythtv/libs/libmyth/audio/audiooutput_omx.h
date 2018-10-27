@@ -23,23 +23,23 @@ class AudioOutputOMX : public AudioOutputBase, private OMXComponentCtx
     virtual ~AudioOutputOMX();
 
     // VolumeBase implementation
-    virtual int GetVolumeChannel(int channel) const; // Returns 0-100
-    virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
+    int GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
   protected:
     // AudioOutputBase implementation
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(uchar *aubuf, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
 
     // AudioOutputBase overrides
-    virtual AudioOutputSettings* GetOutputSettings(bool passthrough);
+    AudioOutputSettings* GetOutputSettings(bool passthrough) override; // AudioOutputBase
 
   private:
     // OMXComponentCtx implementation
-    virtual OMX_ERRORTYPE EmptyBufferDone(OMXComponent&, OMX_BUFFERHEADERTYPE*);
-    virtual void ReleaseBuffers(OMXComponent&);
+    OMX_ERRORTYPE EmptyBufferDone (OMXComponent&, OMX_BUFFERHEADERTYPE*) override; // OMXComponentCtx
+    void ReleaseBuffers(OMXComponent&) override; // OMXComponentCtx
 
   private:
     // implementation

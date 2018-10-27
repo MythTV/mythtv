@@ -24,17 +24,17 @@ class StreamView : public MusicCommon
     StreamView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~StreamView(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
     void addStream(MusicMetadata *mdata);
     void deleteStream(MusicMetadata *mdata);
     void updateStream(MusicMetadata *mdata);
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
     void updateStreamList(void);
     void editStream(void);
     void removeStream(void);
@@ -62,7 +62,7 @@ class EditStreamMetadata : public MythScreenType
     EditStreamMetadata(MythScreenStack *parentStack, StreamView *parent,
                        MusicMetadata *mdata = nullptr);
 
-    bool Create();
+    bool Create() override; // MythScreenType
     void changeStreamMetadata(MusicMetadata *mdata);
 
   private slots:
@@ -100,7 +100,7 @@ class SearchStream : public MythScreenType
   public:
     SearchStream(MythScreenStack *parentStack, EditStreamMetadata *parent);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   private slots:
     void doneLoading(void);
@@ -110,7 +110,7 @@ class SearchStream : public MythScreenType
     void streamVisible(MythUIButtonListItem *item);
 
   private:
-    void Load(void);
+    void Load(void) override; // MythScreenType
     void loadStreams(void);
     void updateBroadcasters(void);
     void updateGenres(void);

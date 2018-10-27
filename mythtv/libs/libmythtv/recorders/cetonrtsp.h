@@ -50,7 +50,7 @@ protected:
     QStringList splitLines(const QByteArray &lines);
     QString readParameters(const QString &key, Params &parameters);
     QUrl GetBaseUrl(void);
-    void timerEvent(QTimerEvent*);
+    void timerEvent(QTimerEvent*) override; // QObject
 
     QTcpSocket *_socket;
     uint        _sequenceNumber;

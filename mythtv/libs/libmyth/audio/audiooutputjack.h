@@ -22,21 +22,21 @@ class AudioOutputJACK : public AudioOutputBase
     virtual ~AudioOutputJACK();
 
     // Volume control
-    virtual int GetVolumeChannel(int channel) const; // Returns 0-100
-    virtual void SetVolumeChannel(int channel, int volume); // range 0-100
+    int GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
   protected:
 
     // You need to implement the following functions
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
-    AudioOutputSettings* GetOutputSettings(bool digital);
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
 
     // Overriding these to do nothing.  Not needed here.
-    virtual bool StartOutputThread(void);
-    virtual void StopOutputThread(void);
+    bool StartOutputThread(void) override; // AudioOutputBase
+    void StopOutputThread(void) override; // AudioOutputBase
 
   private:
 

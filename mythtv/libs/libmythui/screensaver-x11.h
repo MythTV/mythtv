@@ -13,11 +13,11 @@ class ScreenSaverX11 : public QObject, public ScreenSaver
     ScreenSaverX11();
     ~ScreenSaverX11();
 
-    void Disable(void);
-    void Restore(void);
-    void Reset(void);
+    void Disable(void) override; // ScreenSaver
+    void Restore(void) override; // ScreenSaver
+    void Reset(void) override; // ScreenSaver
 
-    bool Asleep(void);
+    bool Asleep(void) override; // ScreenSaver
 
   public slots:
     void resetSlot();

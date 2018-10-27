@@ -20,7 +20,7 @@ class PlaylistLoadingThread : public MThread
   public:
     PlaylistLoadingThread(PlaylistContainer *parent_ptr,
                           AllMusic *all_music_ptr);
-    virtual void run();
+    void run() override; // MThread
 
   private:
     PlaylistContainer *parent;

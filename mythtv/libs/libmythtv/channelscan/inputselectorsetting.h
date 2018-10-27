@@ -39,7 +39,7 @@ class InputSelector : public TransMythUIComboBoxSetting
   public:
     InputSelector(uint _default_cardid, const QString &_default_inputname);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
     uint GetCardID(void) const;
 

@@ -32,8 +32,9 @@ public:
 
     // MythTV::Visual implementation
 public:
-    virtual void add(const void *b, unsigned long b_len, unsigned long timecode, int chnls, int bits);
-    virtual void prepare();
+    void add(const void *b, unsigned long b_len, unsigned long timecode,
+             int chnls, int bits) override; // Visual
+    void prepare() override; // Visual
 
     // Implementation
 private:

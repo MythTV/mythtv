@@ -20,13 +20,13 @@ class VisualizerView : public MusicCommon
     VisualizerView(MythScreenStack *parent, MythScreenType *parentScreen);
     ~VisualizerView(void) = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MusicCommon
 
-    virtual void ShowMenu(void);
+    void ShowMenu(void) override; // MusicCommon
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // MusicCommon
 
   private slots:
     void showTrackInfoPopup(void);
@@ -39,8 +39,8 @@ class MPUBLIC TrackInfoPopup : public MythScreenType
     TrackInfoPopup(MythScreenStack *parent, MusicMetadata *mdata);
     ~TrackInfoPopup(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
     MusicMetadata *m_metadata;

@@ -25,10 +25,10 @@ class MUI_PUBLIC MythUIButton : public MythUIType
     MythUIButton(MythUIType *parent, const QString &name);
    ~MythUIButton();
 
-    virtual void Reset(void);
+    void Reset(void) override; // MythUIType
 
-    virtual bool gestureEvent(MythGestureEvent *event);
-    virtual bool keyPressEvent(QKeyEvent *event);
+    bool gestureEvent(MythGestureEvent *event) override; // MythUIType
+    bool keyPressEvent(QKeyEvent *event) override; // MythUIType
 
     void SetText(const QString &msg);
     QString GetText(void) const;
@@ -50,11 +50,11 @@ class MUI_PUBLIC MythUIButton : public MythUIType
     void Clicked();
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void SetInitialStates(void);
     void SetState(QString state);

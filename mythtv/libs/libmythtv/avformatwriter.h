@@ -19,14 +19,14 @@ class MTV_PUBLIC AVFormatWriter : public FileWriterBase
     AVFormatWriter();
    ~AVFormatWriter();
 
-    bool Init(void);
-    bool OpenFile(void);
-    bool CloseFile(void);
+    bool Init(void) override; // FileWriterBase
+    bool OpenFile(void) override; // FileWriterBase
+    bool CloseFile(void) override; // FileWriterBase
 
-    int  WriteVideoFrame(VideoFrame *frame);
-    int  WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode);
+    int  WriteVideoFrame(VideoFrame *frame) override; // FileWriterBase
+    int  WriteAudioFrame(unsigned char *buf, int fnum, long long &timecode) override; // FileWriterBase
     int  WriteTextFrame(int vbimode, unsigned char *buf, int len,
-                        long long timecode, int pagenr);
+                        long long timecode, int pagenr) override; // FileWriterBase
 
     bool NextFrameIsKeyFrame(void);
     bool ReOpen(QString filename);

@@ -16,24 +16,25 @@ class MTV_PUBLIC ScanStreamData :
     explicit ScanStreamData(bool no_default_pid = false);
     virtual ~ScanStreamData();
 
-    bool IsRedundant(uint pid, const PSIPTable&) const;
-    bool HandleTables(uint pid, const PSIPTable &psip);
+    bool IsRedundant(uint pid, const PSIPTable&) const override; // ATSCStreamData
+    bool HandleTables(uint pid, const PSIPTable &psip) override; // ATSCStreamData
 
     using DVBStreamData::Reset;
-    virtual void Reset(void);
+    void Reset(void) override; // ATSCStreamData
 
-    bool HasEITPIDChanges(const uint_vec_t& /*in_use_pids*/) const
+    bool HasEITPIDChanges(const uint_vec_t& /*in_use_pids*/) const override // ATSCStreamData
         { return false; }
     bool GetEITPIDChanges(const uint_vec_t& /*in_use_pids*/,
                           uint_vec_t& /*add_pids*/,
-                          uint_vec_t& /*del_pids*/) const { return false; }
+                          uint_vec_t& /*del_pids*/) const override // ATSCStreamData
+        { return false; }
 
     QString GetSIStandard(QString guess = "mpeg") const;
 
     void SetFreesatAdditionalSI(bool freesat_si);
 
   private:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;
+    bool DeleteCachedTable(PSIPTable *psip) const override; // ATSCStreamData
     /// listen for addiotional Freesat service information
     int dvb_uk_freesat_si;
     bool m_no_default_pid;

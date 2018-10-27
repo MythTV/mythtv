@@ -17,7 +17,7 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
     MythUIScrollBar(MythUIType *parent, const QString &name);
    ~MythUIScrollBar() = default;
 
-    void Reset(void);
+    void Reset(void) override; // MythUIType
 
     enum LayoutType { LayoutVertical, LayoutHorizontal };
 
@@ -29,14 +29,14 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
     void DoneFading(void);
 
   protected:
-    virtual bool ParseElement(
-        const QString &filename, QDomElement &element, bool showWarnings);
-    virtual void CopyFrom(MythUIType *base);
-    virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
+    bool ParseElement(const QString &filename, QDomElement &element,
+                      bool showWarnings) override; // MythUIType
+    void CopyFrom(MythUIType *base) override; // MythUIType
+    void CreateCopy(MythUIType *parent) override; // MythUIType
+    void Finalize(void) override; // MythUIType
 
     void CalculatePosition(void);
-    void timerEvent(QTimerEvent *);
+    void timerEvent(QTimerEvent *) override; // QObject
 
     LayoutType m_layout;
 

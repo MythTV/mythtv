@@ -19,11 +19,11 @@ class META_PUBLIC MetaIOMP4 : public MetaIO
     MetaIOMP4(void);
     virtual ~MetaIOMP4(void) = default;
 
-    bool write(const QString &filename, MusicMetadata* mdata);
-    MusicMetadata* read(const QString &filename);
+    bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIO
+    MusicMetadata* read(const QString &filename) override; // MetaIO
 
   private:
-    int getTrackLength(const QString &filename);
+    int getTrackLength(const QString &filename) override; // MetaIO
     int getTrackLength(AVFormatContext* p_context);
     QString getFieldValue(AVFormatContext* context, const char* tagname);
     void metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre);

@@ -21,7 +21,7 @@ class DeleteThread : public QObject, public MThread
     Q_OBJECT
   public:
     DeleteThread(void);
-    void run(void);
+    void run() override; // MThread
     bool AddFile(QString path);
     bool AddFile(DeleteHandler *handler);
     void Stop(void)         { m_run = false; }

@@ -14,11 +14,11 @@ class ClassicLogoDetector : public LogoDetectorBase
         unsigned int height, unsigned int commdetectborder);
     virtual void deleteLater(void);
 
-    bool searchForLogo(MythPlayer* player);
-    bool doesThisFrameContainTheFoundLogo(VideoFrame* frame);
-    bool pixelInsideLogo(unsigned int x, unsigned int y);
+    bool searchForLogo(MythPlayer* player) override; // LogoDetectorBase
+    bool doesThisFrameContainTheFoundLogo(VideoFrame* frame) override; // LogoDetectorBase
+    bool pixelInsideLogo(unsigned int x, unsigned int y) override; // LogoDetectorBase
 
-    unsigned int getRequiredAvailableBufferForSearch();
+    unsigned int getRequiredAvailableBufferForSearch() override; // LogoDetectorBase
 
   protected:
     virtual ~ClassicLogoDetector() = default;

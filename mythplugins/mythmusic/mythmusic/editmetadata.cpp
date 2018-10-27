@@ -991,13 +991,11 @@ bool EditAlbumartDialog::keyPressEvent(QKeyEvent *event)
             showMenu();
         else if (action == "INFO")
             showTypeMenu();
-        else if (action == "ESCAPE")
-            showSaveMenu();
         else
             handled = false;
     }
 
-    if (!handled && MythScreenType::keyPressEvent(event))
+    if (!handled && EditMetadataCommon::keyPressEvent(event))
         handled = true;
 
     return handled;
@@ -1333,7 +1331,7 @@ class CopyImageThread: public MThread
     explicit CopyImageThread(QStringList strList) :
             MThread("CopyImage"), m_strList(strList) {}
 
-    virtual void run()
+    void run() override // MThread
     {
         RunProlog();
         gCoreContext->SendReceiveStringList(m_strList);

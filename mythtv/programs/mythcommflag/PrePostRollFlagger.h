@@ -13,9 +13,9 @@ public:
                             const QDateTime& recordingStartedAt_in,
                             const QDateTime& recordingStopsAt_in);
 
-    virtual void GetCommercialBreakList(frm_dir_map_t &comms);
+    void GetCommercialBreakList(frm_dir_map_t &comms) override; // ClassicCommDetector
     virtual ~PrePostRollFlagger() = default;
-    bool go();
+    bool go() override; // ClassicCommDetector
 
 private:
     long long myTotalFrames;

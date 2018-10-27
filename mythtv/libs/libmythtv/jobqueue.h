@@ -132,7 +132,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
   public:
     explicit JobQueue(bool master);
     ~JobQueue(void);
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e)  override; // QObject
 
     static bool QueueRecordingJobs(
         const RecordingInfo&, int jobTypes = JOB_NONE);
@@ -222,7 +222,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
         int jobID;
     } JobThreadStruct;
 
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
     void ProcessQueue(void);
 
     void ProcessJob(JobQueueEntry job);

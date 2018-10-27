@@ -34,16 +34,16 @@ class ProgramRecPriorityInfo : public RecordingInfo
         { clone(other); return *this; }
     virtual void clone(const ProgramRecPriorityInfo &other,
                        bool ignore_non_serialized_data = false);
-    virtual void clone(const RecordingInfo &other,
-                       bool ignore_non_serialized_data = false);
-    virtual void clone(const ProgramInfo &other,
-                       bool ignore_non_serialized_data = false);
+    void clone(const RecordingInfo &other,
+               bool ignore_non_serialized_data = false) override; // RecordingInfo
+    void clone(const ProgramInfo &other,
+               bool ignore_non_serialized_data = false) override; // RecordingInfo
 
-    virtual void clear(void);
+    void clear(void) override; // RecordingInfo
 
-    virtual void ToMap(InfoMap &progMap,
-                       bool showrerecord = false,
-                       uint star_range = 10) const;
+    void ToMap(InfoMap &progMap,
+               bool showrerecord = false,
+               uint star_range = 10) const override; // ProgramInfo
 
     RecordingType recType;
     int matchCount;
@@ -60,9 +60,9 @@ class ProgramRecPriority : public ScheduleCommon
     ProgramRecPriority(MythScreenStack *parent, const QString &name);
    ~ProgramRecPriority() = default;
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent *event);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *event) override; // ScheduleCommon
 
     enum SortType
     {
@@ -81,8 +81,8 @@ class ProgramRecPriority : public ScheduleCommon
     void scheduleChanged(int recid);
 
   private:
-    virtual void Load(void);
-    virtual void Init(void);
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
     void FillList(void);
     void SortList(ProgramRecPriorityInfo *newCurrentItem = nullptr);
@@ -98,7 +98,7 @@ class ProgramRecPriority : public ScheduleCommon
     void showMenu(void);
     void showSortMenu(void);
 
-    virtual ProgramInfo *GetCurrentProgram(void) const;
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
     QMap<int, ProgramRecPriorityInfo> m_programData;
     std::vector<ProgramRecPriorityInfo*> m_sortedProgram;

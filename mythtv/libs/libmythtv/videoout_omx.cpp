@@ -87,13 +87,14 @@ class MythRenderEGL : public MythRenderOpenGL2ES
   public:
     MythRenderEGL();
 
-    virtual void makeCurrent();
-    virtual void doneCurrent();
+    void makeCurrent() override; // MythRenderOpenGL
+    void doneCurrent() override; // MythRenderOpenGL
 #ifdef USE_OPENGL_QT5
-    virtual void swapBuffers();
+    void swapBuffers() override; // MythRenderOpenGL
 #else
-    virtual void swapBuffers() const;
-    virtual bool create(const QGLContext * = nullptr) { return isValid(); }
+    void swapBuffers() const override; // QGLContext
+    bool create(const QGLContext * = nullptr) override // QGLContext
+        { return isValid(); }
 #endif
 
   protected:
@@ -127,7 +128,7 @@ class GlOsdThread : public MThread
             rectsChanged = false;
             m_lock.lock();
         }
-        virtual void run()
+        void run() override // MThread
         {
             RunProlog();
             m_EGLRender = new MythRenderEGL();

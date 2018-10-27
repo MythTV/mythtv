@@ -41,7 +41,7 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
         //
         // ------------------------------------------------------------------
 
-        virtual void AddHeaders( QStringMap &headers )
+        void AddHeaders( QStringMap &headers ) override // Serializer
         {
             XmlSerializer::AddHeaders( headers );
 
@@ -58,7 +58,7 @@ class UPNP_PUBLIC SoapSerializer : public XmlSerializer
         //
         // ------------------------------------------------------------------
 
-        virtual void BeginSerialize( QString &sName) 
+        void BeginSerialize( QString &sName)  override // Serializer
         {
             m_pXmlWriter->writeStartDocument( "1.0" );
 

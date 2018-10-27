@@ -13,7 +13,7 @@ public:
     PlayerSettings(MythScreenStack *parent, const char *name = nullptr);
     ~PlayerSettings() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
 private:
     MythUIButtonList   *m_resumeMode;

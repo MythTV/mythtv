@@ -717,6 +717,7 @@ void ComboBoxSetting::setValue(const QString &newValue)
 
     if (rw)
     {
+        // Skip parent (because it might add a selection)
         Setting::setValue(newValue);
         if (cbwidget)
             cbwidget->setCurrentIndex(current);

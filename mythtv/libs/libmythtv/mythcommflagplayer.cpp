@@ -21,7 +21,7 @@ class RebuildSaver : public QRunnable
         s_cnt[d]++;
     }
 
-    virtual void run(void)
+    void run(void) override // QRunnable
     {
         m_decoder->SavePositionMapDelta(m_first, m_last);
 

@@ -34,7 +34,7 @@ class MHParseText: public MHParseBase
     virtual ~MHParseText();
 
     // Parse the text and return a pointer to the parse tree
-    virtual MHParseNode *Parse();
+    MHParseNode *Parse() override; // MHParseBase
 
   private:
     void GetNextChar();

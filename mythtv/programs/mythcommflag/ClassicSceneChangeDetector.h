@@ -13,7 +13,7 @@ class ClassicSceneChangeDetector : public SceneChangeDetectorBase
         unsigned int yspacing);
     virtual void deleteLater(void);
 
-    void processFrame(VideoFrame* frame);
+    void processFrame(VideoFrame* frame) override; // SceneChangeDetectorBase
 
   private:
     ~ClassicSceneChangeDetector() = default;

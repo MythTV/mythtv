@@ -51,7 +51,7 @@ class GLSDialog : public MythDialog
               MythMainWindow *parent, const char *name="GLSDialog");
 
   protected:
-    void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e) override; // QWidget
 
   private:
     GLSingleView *m_view;
@@ -72,30 +72,30 @@ class GLSingleView : public QGLWidget, public ImageView
 
 
   protected:
-    void initializeGL(void);
+    void initializeGL(void) override; // QGLWidget
 
     // Commands
-    virtual void Rotate(int angle);
-    virtual void DisplayNext(bool reset, bool loadImage);
-    virtual void DisplayPrev(bool reset, bool loadImage);
-    virtual void Load(void);
-    void resizeGL(int w, int h);
+    void Rotate(int angle) override; // ImageView
+    void DisplayNext(bool reset, bool loadImage) override; // ImageView
+    void DisplayPrev(bool reset, bool loadImage) override; // ImageView
+    void Load(void) override; // ImageView
+    void resizeGL(int w, int h) override; // QGLWidget
 
-    void paintGL(void);
+    void paintGL(void) override; // QGLWidget
     void paintTexture(void);
     void createTexInfo(void);
-    virtual void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *e) override; // QWidget
     void checkPosition(void);
 
     // Sets
-    virtual void SetZoom(float zoom);
+    void SetZoom(float zoom) override; // ImageView
     void SetTransitionTimeout(int timeout);
 
     // Gets
     int GetNearestGLTextureSize(int) const;
 
-    virtual void RegisterEffects(void);
-    virtual void RunEffect(const QString &effect);
+    void RegisterEffects(void) override; // ImageView
+    void RunEffect(const QString &effect) override; // ImageView
 
     void EffectNone(void);
     void EffectBlend(void);
@@ -162,7 +162,7 @@ class KenBurnsImageLoader : public MThread
 {
 public:
     KenBurnsImageLoader(GLSingleView *singleView, QSize m_texSize, QSize m_screenSize);
-    void run();
+    void run() override; // MThread
 private:
     GLSingleView *m_singleView;
     QSize         m_screenSize;

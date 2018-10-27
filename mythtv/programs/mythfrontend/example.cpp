@@ -13,8 +13,8 @@ class AirPlayPictureScreen : public MythScreenType
 
    // These two methods are declared by MythScreenType and their signatures
    // should not be changed
-    virtual bool Create(void);
-    virtual void Init(void);
+    bool Create(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
     void UpdatePicture(const QString &imageFilename,
                        const QString &imageDescription);

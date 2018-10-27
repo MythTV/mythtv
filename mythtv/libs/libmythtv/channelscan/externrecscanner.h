@@ -37,7 +37,7 @@ class ExternRecChannelScanner : public QRunnable
     void SetMessage(const QString &status);
 
   protected:
-    virtual void run(void); // QRunnable
+    void run(void) override; // QRunnable
 
   private:
     ScanMonitor *m_scan_monitor;

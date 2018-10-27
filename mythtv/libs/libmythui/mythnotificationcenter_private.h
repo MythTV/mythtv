@@ -157,12 +157,12 @@ public:
     
     virtual ~MythNotificationScreen();
 
-    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
     // These two methods are declared by MythScreenType and their signatures
     // should not be changed
-    virtual bool Create(void);
-    virtual void Init(void);
+    bool Create(void) override; // MythScreenType
+    void Init(void)  override; // MythScreenType
 
     void SetNotification(MythNotification &notification);
 
@@ -264,9 +264,9 @@ public:
 
     static const int kFadeVal = 20;
 
-    virtual void PopScreen(MythScreenType *screen, bool allowFade = true,
-                           bool deleteScreen = true);
-    virtual MythScreenType *GetTopScreen(void) const;
+    void PopScreen(MythScreenType *screen, bool allowFade = true,
+                   bool deleteScreen = true) override; // MythScreenStack
+    MythScreenType *GetTopScreen(void) const override; // MythScreenStack
 private:
     NCPrivate *m_owner;
 

@@ -18,7 +18,7 @@ class PlayGroupDBStorage : public SimpleDBStorage
     {
     }
 
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const PlayGroupConfig &parent;
 };
@@ -106,14 +106,14 @@ class TimeStretch : public MythUISpinBoxSetting
                                         "speed."));
     };
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         StandardSetting::Load();
         if (intValue() < 50 || intValue() > 200)
             setValue(45);
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         if (intValue() < 50 || intValue() > 200)
             setValue(0);

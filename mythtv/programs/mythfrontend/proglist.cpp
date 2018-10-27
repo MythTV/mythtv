@@ -1054,7 +1054,7 @@ class plCompare : binary_function<const ProgramInfo*, const ProgramInfo*, bool>
 class plTitleSort : public plCompare
 {
   public:
-    bool operator()(const ProgramInfo *a, const ProgramInfo *b)
+    bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
         if (a->sortTitle != b->sortTitle)
             return (a->sortTitle < b->sortTitle);
@@ -1087,7 +1087,7 @@ class plPrevTitleSort : public plCompare
   public:
     plPrevTitleSort(void) : plCompare() {;}
 
-    bool operator()(const ProgramInfo *a, const ProgramInfo *b)
+    bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
         if (a->sortTitle != b->sortTitle)
             return (a->sortTitle < b->sortTitle);
@@ -1104,7 +1104,7 @@ class plTimeSort : public plCompare
   public:
     plTimeSort(void) : plCompare() {;}
 
-    bool operator()(const ProgramInfo *a, const ProgramInfo *b)
+    bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
         if (a->GetScheduledStartTime() == b->GetScheduledStartTime())
             return (a->GetChanID() < b->GetChanID());

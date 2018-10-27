@@ -18,7 +18,7 @@ class FileAssocDialog : public MythScreenType
     FileAssocDialog(MythScreenStack *screeParent, const QString &lname);
     ~FileAssocDialog();
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   public slots:
     void OnFASelected(MythUIButtonListItem *item);

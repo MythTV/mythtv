@@ -20,7 +20,7 @@ class PlaybackSettingsDialog : public StandardSettingDialog
 
   public:
     explicit PlaybackSettingsDialog(MythScreenStack *stack);
-    void ShowMenu(void);
+    void ShowMenu(void) override; // StandardSettingDialog
 
   protected slots:
     void ShowPlaybackProfileMenu(MythUIButtonListItem *item);
@@ -35,7 +35,7 @@ class PlaybackSettings : public GroupSetting
 
   public:
     PlaybackSettings();
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   private slots:
     void NewPlaybackProfileSlot(void);
@@ -53,7 +53,7 @@ class VideoModeSettings : public HostCheckBoxSetting
   public:
     explicit VideoModeSettings(const char *c);
 #if defined(USING_XRANDR) || CONFIG_DARWIN
-    virtual void updateButton(MythUIButtonListItem *item);
+    void updateButton(MythUIButtonListItem *item) override; // MythUICheckBoxSetting
 #endif
 };
 
@@ -139,7 +139,7 @@ class AppearanceSettings : public GroupSetting
 
   public:
     AppearanceSettings();
-    virtual void applyChange();
+    void applyChange() override; // GroupSetting
 };
 
 class HostRefreshRateComboBoxSetting : public HostComboBoxSetting
@@ -166,7 +166,7 @@ class MainGeneralSettings : public GroupSetting
 
   public:
     MainGeneralSettings();
-    virtual void applyChange();
+    void applyChange() override; // GroupSetting
 
 #ifdef USING_LIBCEC
   public slots:
@@ -196,10 +196,10 @@ class PlaybackProfileItemConfig : public GroupSetting
     PlaybackProfileItemConfig(PlaybackProfileConfig *parent, uint idx,
                               ProfileItem &_item);
 
-    virtual void Load(void);
-    virtual void Save(void);
+    void Load(void) override; // StandardSetting
+    void Save(void) override; // StandardSetting
 
-    bool keyPressEvent(QKeyEvent *);
+    bool keyPressEvent(QKeyEvent *) override; // StandardSetting
     uint GetIndex(void) const;
     void ShowDeleteDialog(void);
     void DecreasePriority(void);
@@ -244,7 +244,7 @@ class PlaybackProfileConfig : public GroupSetting
     PlaybackProfileConfig(const QString &profilename, StandardSetting *parent);
     virtual ~PlaybackProfileConfig() = default;
 
-    virtual void Save(void);
+    void Save(void) override; // StandardSetting
 
     void DeleteProfileItem(PlaybackProfileItemConfig *profile);
 
@@ -274,10 +274,10 @@ class ChannelGroupSetting : public GroupSetting
 {
   public:
     ChannelGroupSetting(const QString &groupName, int groupId);
-    virtual void Load();
-    virtual void Save();
-    virtual bool canDelete(void);
-    virtual void deleteEntry(void);
+    void Load() override; // StandardSetting
+    void Save() override; // StandardSetting
+    bool canDelete(void) override; // GroupSetting
+    void deleteEntry(void) override; // GroupSetting
 
   private:
     int m_groupId;
@@ -290,7 +290,7 @@ class ChannelGroupsSetting : public GroupSetting
 
   public:
     ChannelGroupsSetting();
-    virtual void Load();
+    void Load() override; // StandardSetting
 
   public slots:
     void ShowNewGroupDialog(void);

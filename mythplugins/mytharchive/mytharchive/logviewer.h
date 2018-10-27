@@ -22,8 +22,8 @@ class LogViewer : public MythScreenType
     explicit LogViewer(MythScreenStack *parent);
    ~LogViewer(void);
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
     void setFilenames(const QString &progressLog, const QString &fullLog);
 
@@ -39,7 +39,7 @@ class LogViewer : public MythScreenType
     void updateLogItem(MythUIButtonListItem *item);
 
   private:
-    void Init(void);
+    void Init(void) override; // MythScreenType
     QString getSetting(const QString &key);
 
     bool                m_autoUpdate;

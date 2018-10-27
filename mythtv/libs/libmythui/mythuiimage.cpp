@@ -516,7 +516,7 @@ class ImageLoadThread : public QRunnable
     {
     }
 
-    void run()
+    void run() override // QRunnable
     {
         bool aborted = false;
         QString filename =  m_imageProperties.filename;

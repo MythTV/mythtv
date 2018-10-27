@@ -20,14 +20,14 @@ class AudioSetupWizard : public MythScreenType
                      const char *name = nullptr);
     ~AudioSetupWizard();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
     void save(void);
 
   private:
-    virtual void Load(void);
-    virtual void Init(void);
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
     QVector<AudioOutput::AudioDeviceConfig> *m_outputlist;
     AudioTestThread     *m_testThread;

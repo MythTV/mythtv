@@ -15,10 +15,10 @@ class SearchEditor : public NetEditorBase
                const QString &name = "SearchEditor");
 
   protected:
-    bool InsertInDB(GrabberScript *script);
-    bool RemoveFromDB(GrabberScript *script);
-    bool FindGrabberInDB(const QString &filename);
-    bool Matches(bool search, bool tree);
+    bool InsertInDB(GrabberScript *script) override; // NetEditorBase
+    bool RemoveFromDB(GrabberScript *script) override; // NetEditorBase
+    bool FindGrabberInDB(const QString &filename) override; // NetEditorBase
+    bool Matches(bool search, bool tree) override; // NetEditorBase
 };
 
 #endif /* SEARCHEDITOR_H */

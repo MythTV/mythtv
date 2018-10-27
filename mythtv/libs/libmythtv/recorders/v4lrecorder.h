@@ -27,11 +27,10 @@ class MTV_PUBLIC V4LRecorder : public DTVRecorder
     explicit V4LRecorder(TVRec *rec);
     virtual ~V4LRecorder();
 
-    virtual void StopRecording(void); // RecorderBase
-    virtual void SetOption(
-        const QString &name, const QString &value); // RecorderBase
-    virtual void SetOption(const QString &name, int value)
-        { DTVRecorder::SetOption(name, value); } // RecorderBase
+    void StopRecording(void) override; // RecorderBase
+    void SetOption(const QString &name, const QString &value) override; // DTVRecorder
+    void SetOption(const QString &name, int value) override // DTVRecorder
+        { DTVRecorder::SetOption(name, value); }
 
   protected:
     int  OpenVBIDevice(void);
@@ -76,7 +75,7 @@ class VBIThread : public MThread
         }
     }
 
-    virtual void run(void)
+    void run(void) override // MThread
     {
         RunProlog();
         parent->RunVBIDevice();

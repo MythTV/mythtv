@@ -112,7 +112,7 @@ class GameHandler : public QObject
     static GameHandler* GetHandlerByName(QString systemname);
 
   protected:
-    void customEvent(QEvent *event);
+    void customEvent(QEvent *event) override; // QObject
 
     bool rebuild;
     int spandisks;

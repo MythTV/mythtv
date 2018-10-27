@@ -43,7 +43,7 @@ class DecoderHandlerEvent : public MythEvent
     MusicMetadata *getMetadata(void) const { return m_meta; }
     void getBufferStatus(int *available, int *maxSize) const;
 
-    virtual MythEvent *clone(void) const;
+    MythEvent *clone(void) const override; // MythEvent
 
     static Type Ready;
     static Type Meta;
@@ -88,7 +88,7 @@ class DecoderHandler : public QObject, public MythObservable
     void start(MusicMetadata *mdata);
 
     void stop(void);
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
     bool done(void);
     bool next(void);
     void error(const QString &msg);

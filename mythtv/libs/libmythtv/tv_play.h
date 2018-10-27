@@ -308,8 +308,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
     static bool IsPaused(void);
 
     // Public event handling
-    bool event(QEvent *e);
-    bool eventFilter(QObject *o, QEvent *e);
+    bool event(QEvent *e) override; // QObject
+    bool eventFilter(QObject *o, QEvent *e) override; // QObject
 
     // Public PlaybackBox methods
     /// true iff program is the same as the one in the selected player
@@ -337,12 +337,12 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
 
   public slots:
     void HandleOSDClosed(int osdType);
-    void timerEvent(QTimerEvent*);
+    void timerEvent(QTimerEvent*) override; // QObject
     void StopPlayback(void);
 
   protected:
     // Protected event handling
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 
     static QStringList lastProgramStringList;
     static EMBEDRETURNVOID RunPlaybackBoxPtr;
@@ -755,7 +755,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer
                           const QDomNode &node, const QDomNode &selected);
     void CutlistMenuShow(const MenuBase &menu,
                          const QDomNode &node, const QDomNode &selected);
-    virtual bool MenuItemDisplay(const MenuItemContext &c);
+    bool MenuItemDisplay(const MenuItemContext &c) override; // MenuItemDisplayer
     bool MenuItemDisplayPlayback(const MenuItemContext &c);
     bool MenuItemDisplayCutlist(const MenuItemContext &c);
     void PlaybackMenuInit(const MenuBase &menu);

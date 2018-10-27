@@ -25,7 +25,7 @@ class SendStringListThread : public QRunnable
         m_strList = strList;
     }
 
-    void run()
+    void run() override // QRunnable
     {
         gCoreContext->SendReceiveStringList(m_strList);
     }

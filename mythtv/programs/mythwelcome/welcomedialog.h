@@ -26,9 +26,9 @@ class WelcomeDialog : public MythScreenType
     WelcomeDialog(MythScreenStack *parent, const char *name);
     ~WelcomeDialog();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *event);
-    void customEvent(QEvent *e);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    void customEvent(QEvent *e) override; // MythUIType
 
   protected slots:
     void startFrontendClick(void);

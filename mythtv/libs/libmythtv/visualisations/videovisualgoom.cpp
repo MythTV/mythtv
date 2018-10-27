@@ -155,19 +155,19 @@ void VideoVisualGoom::Draw(const QRect &area, MythPainter */*painter*/,
 static class VideoVisualGoomFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VideoVisualFactory
     {
         static QString name("Goom");
         return name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const
+                        MythRender  *render) const override // VideoVisualFactory
     {
         return new VideoVisualGoom(audio, render, false);
     }
 
-    virtual bool SupportedRenderer(RenderType type)
+    bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
         return (type == kRenderVDPAU   ||
                 type == kRenderOpenGL1 ||
@@ -179,19 +179,19 @@ static class VideoVisualGoomFactory : public VideoVisualFactory
 static class VideoVisualGoomHDFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VideoVisualFactory
     {
         static QString name("Goom HD");
         return name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const
+                        MythRender  *render) const override // VideoVisualFactory
     {
         return new VideoVisualGoom(audio, render, true);
     }
 
-    virtual bool SupportedRenderer(RenderType type)
+    bool SupportedRenderer(RenderType type) override // VideoVisualFactory
     {
         return (type == kRenderVDPAU   ||
                 type == kRenderOpenGL1 ||

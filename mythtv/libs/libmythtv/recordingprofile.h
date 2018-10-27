@@ -26,7 +26,7 @@ class RecordingProfileStorage : public SimpleDBStorage
     }
 
   protected:
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const RecordingProfile &m_parent;
 };
@@ -64,7 +64,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
       //          Is this slot even used????
       //public slots:
       public:
-        virtual void setValue(const QString &newValue)
+        void setValue(const QString &newValue) override // StandardSetting
         {
             bool editable = (newValue != "Default") && (newValue != "Live TV");
             setEnabled(editable);
@@ -84,12 +84,12 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
     virtual bool loadByGroup(const QString &name, const QString &group);
     virtual void CompleteLoad(int profileId, const QString &type,
                               const QString &name);
-    virtual bool canDelete(void);
-    virtual void deleteEntry(void);
+    bool canDelete(void) override; // GroupSetting
+    void deleteEntry(void) override; // GroupSetting
 
     // sets
     void setCodecTypes();
-    void setName(const QString& newName)
+    void setName(const QString& newName) override // StandardSetting
         { name->setValue(newName); }
 
     // gets
@@ -158,7 +158,7 @@ class RecordingProfileEditor :
     RecordingProfileEditor(int id, QString profName);
     virtual ~RecordingProfileEditor() = default;
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void ShowNewProfileDialog();

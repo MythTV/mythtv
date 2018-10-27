@@ -44,10 +44,14 @@ class UPNP_PUBLIC  UPnpMSRR : public Eventing
 
         // Implement UPnpServiceImpl methods that we can
 
-        virtual QString GetServiceType      () { return "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1"; }
-        virtual QString GetServiceId        () { return "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar"; }
-        virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
-        virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
+        QString GetServiceType() override // UPnpServiceImpl
+            { return "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1"; }
+        QString GetServiceId() override // UPnpServiceImpl
+            { return "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar"; }
+        QString GetServiceControlURL() override // UPnpServiceImpl
+            { return m_sControlUrl.mid( 1 ); }
+        QString GetServiceDescURL() override // UPnpServiceImpl
+            { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
     public:
                  UPnpMSRR( UPnpDevice *pDevice,
@@ -55,9 +59,9 @@ class UPNP_PUBLIC  UPnpMSRR : public Eventing
 
         virtual ~UPnpMSRR() = default;
 
-        virtual QStringList GetBasePaths();
+        QStringList GetBasePaths() override; // Eventing
 
-        bool     ProcessRequest( HTTPRequest *pRequest );
+        bool ProcessRequest( HTTPRequest *pRequest ) override; // Eventing
 };
 
 #endif

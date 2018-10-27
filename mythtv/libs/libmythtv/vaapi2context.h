@@ -42,10 +42,10 @@ class MTV_PUBLIC Vaapi2Context : public MythCodecContext
                                              const QString &decoder,
                                              uint stream_type,
                                              AVPixelFormat &pix_fmt);
-    int HwDecoderInit(AVCodecContext *ctx);
-    virtual QString GetDeinterlaceFilter(void);
-    virtual bool isValidDeinterlacer(QString /*name*/ );
-    virtual QStringList GetDeinterlacers(void);
+    int HwDecoderInit(AVCodecContext *ctx) override; // MythCodecContext
+    QString GetDeinterlaceFilter(void) override; // MythCodecContext
+    bool isValidDeinterlacer(QString /*name*/ ) override; // MythCodecContext
+    QStringList GetDeinterlacers(void) override; // MythCodecContext
 
 };
 

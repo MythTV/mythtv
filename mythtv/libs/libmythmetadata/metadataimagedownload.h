@@ -97,7 +97,7 @@ class META_PUBLIC MetadataImageDownload : public MThread
 
   protected:
 
-    void run();
+    void run() override; // MThread
 
   private:
 

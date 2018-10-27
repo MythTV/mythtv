@@ -252,13 +252,13 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     static TVRec *GetTVRec(uint inputid);
 
-    virtual void AllGood(void) { WakeEventLoop(); }
-    virtual void StatusChannelTuned(const SignalMonitorValue&) { }
-    virtual void StatusSignalLock(const SignalMonitorValue&) { }
-    virtual void StatusSignalStrength(const SignalMonitorValue&) { }
+    void AllGood(void) override { WakeEventLoop(); } // SignalMonitorListener
+    void StatusChannelTuned(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusSignalLock(const SignalMonitorValue&) override { } // SignalMonitorListener
+    void StatusSignalStrength(const SignalMonitorValue&) override { } // SignalMonitorListener
 
   protected:
-    virtual void run(void); // QRunnable
+    void run(void) override; // QRunnable
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
 
   private:

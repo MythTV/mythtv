@@ -63,8 +63,8 @@ class VideoSourceDBStorage : public SimpleDBStorage
     }
 
   protected:
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
     const VideoSource& m_parent;
 };
@@ -78,7 +78,7 @@ class VideoSourceSelector : public TransMythUIComboBoxSetting
                         const QString &_card_types,
                         bool           _must_have_mplexid);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
     uint GetSourceID(void) const { return getValue().toUInt(); }
 
@@ -103,9 +103,9 @@ class TransFreqTableSelector : public TransMythUIComboBoxSetting
   public:
     explicit TransFreqTableSelector(uint _sourceid);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
-    virtual void Save(void);
+    void Save(void) override; // StandardSetting
     virtual void Save(QString /*destination*/) { Save(); }
 
     void SetSourceID(uint _sourceid);
@@ -147,7 +147,7 @@ class DataDirect_config: public GroupSetting
   public:
     DataDirect_config(const VideoSource& _parent, int _ddsource, StandardSetting *_setting);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
     QString getLineupID(void) const { return lineupselector->getValue(); };
 
@@ -173,7 +173,7 @@ class XMLTV_generic_config: public GroupSetting
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber,
                          StandardSetting *_setting);
 
-    virtual void Save(void);
+    void Save(void) override; // StandardSetting
     virtual void Save(QString) { Save(); }
 
   public slots:
@@ -190,7 +190,7 @@ class EITOnly_config: public GroupSetting
 public:
     EITOnly_config(const VideoSource& _parent, StandardSetting *_setting);
 
-    virtual void Save();
+    void Save(void) override; // StandardSetting
     virtual void Save(QString) { Save(); }
 
 protected:
@@ -202,7 +202,7 @@ class NoGrabber_config: public GroupSetting
 public:
     explicit NoGrabber_config(const VideoSource& _parent);
 
-    virtual void Save(void);
+    void Save(void) override; // StandardSetting
     virtual void Save(QString) { Save(); }
 
 protected:
@@ -218,7 +218,8 @@ public:
     }
 
     int intValue() { return getValue().toInt(); }
-    void setValue(int value) { setValue(QString::number(value)); }
+    void setValue(int value) override // StandardSetting
+        { setValue(QString::number(value)); }
     using StandardSetting::setValue;
 };
 
@@ -238,18 +239,18 @@ class VideoSource : public GroupSetting {
 
     QString getSourceName(void) const { return name->getValue(); };
 
-    virtual void Load(void)
+    void Load(void) override // StandardSetting
     {
         GroupSetting::Load();
     }
 
-    virtual void Save(void)
+    void Save(void) override // StandardSetting
     {
         if (name)
             GroupSetting::Save();
     }
-    virtual bool canDelete(void);
-    virtual void deleteEntry(void);
+    bool canDelete(void) override; // GroupSetting
+    void deleteEntry(void) override; // GroupSetting
 
   private:
     class ID: public IdSetting
@@ -288,8 +289,8 @@ class CaptureCardDBStorage : public SimpleDBStorage
 
 protected:
     int getCardID(void) const;
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 private:
     const CaptureCard& m_parent;
 };
@@ -333,7 +334,7 @@ class EmptyAudioDevice : public MythUITextEditSetting
         setVisible(false);
     }
 
-    void Save(void)
+    void Save(void) override // StandardSetting
     {
         GetStorage()->SetSaveRequired();
         setValue("");
@@ -358,7 +359,7 @@ class EmptyVBIDevice : public MythUITextEditSetting
         setVisible(false);
     };
 
-    void Save(void)
+    void Save(void) override // StandardSetting
     {
         GetStorage()->SetSaveRequired();
         setValue("");
@@ -612,9 +613,9 @@ class DVBConfigurationGroup : public GroupSetting
     DVBConfigurationGroup(CaptureCard& a_parent, CardType& cardType);
     ~DVBConfigurationGroup();
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
-    virtual void Save(void);
+    void Save(void) override; // StandardSetting
 
   public slots:
     void probeCard(const QString& cardNumber);
@@ -688,10 +689,10 @@ public:
 
     void reload(void);
 
-    virtual void Save(void);
+    void Save(void) override; // StandardSetting
 
-    virtual bool canDelete(void);
-    virtual void deleteEntry(void);
+    bool canDelete(void) override; // GroupSetting
+    void deleteEntry(void) override; // GroupSetting
 
 private:
 
@@ -712,8 +713,8 @@ private:
             setVisible(false);
             setValue(gCoreContext->GetHostName());
         }
-        void edit(MythScreenType *) {}
-        void resultEdit(DialogCompletionEvent *) {}
+        void edit(MythScreenType *) override {} // StandardSetting
+        void resultEdit(DialogCompletionEvent *) override {} // StandardSetting
     };
 
 private:
@@ -735,8 +736,8 @@ class CardInputDBStorage : public SimpleDBStorage
   protected:
     void fillSelections();
 
-    virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
+    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
   private:
     const CardInput& m_parent;
@@ -753,7 +754,7 @@ class CaptureCardButton : public ButtonStandardSetting
     {
     }
 
-    virtual void edit(MythScreenType *screen);
+    void edit(MythScreenType *screen) override; // ButtonStandardSetting
 
   signals:
     void Clicked(const QString &choice);
@@ -769,7 +770,7 @@ class MTV_PUBLIC CaptureCardEditor : public GroupSetting
   public:
     CaptureCardEditor();
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
     void AddSelection(const QString &label, const char *slot);
 
@@ -791,7 +792,7 @@ class MTV_PUBLIC VideoSourceEditor : public GroupSetting
     bool cardTypesInclude(const int& SourceID,
                           const QString& thecardtype);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
     void AddSelection(const QString &label, const char *slot);
 
   public slots:
@@ -807,7 +808,7 @@ class MTV_PUBLIC CardInputEditor : public GroupSetting
   public:
     CardInputEditor();
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   private:
     vector<CardInput*>  cardinputs;
@@ -845,7 +846,7 @@ class CardInput : public GroupSetting
     void loadByInput(int cardid, QString input);
     QString getSourceName(void) const;
 
-    virtual void Save(void);
+    void Save(void) override; // StandardSetting
 
   public slots:
     void CreateNewInputGroup();
@@ -887,7 +888,7 @@ class HDHomeRunIP : public MythUITextEditSetting
   public:
     HDHomeRunIP();
 
-    virtual void setEnabled(bool e);
+    void setEnabled(bool e) override; // StandardSetting
     void SetOldValue(const QString &s)
         { _oldValue = s; _oldValue.detach(); };
 
@@ -908,7 +909,7 @@ class HDHomeRunTunerIndex : public MythUITextEditSetting
   public:
     HDHomeRunTunerIndex();
 
-    virtual void setEnabled(bool e);
+    void setEnabled(bool e) override; // StandardSetting
     void SetOldValue(const QString &s)
         { _oldValue = s; _oldValue.detach(); };
 
@@ -937,7 +938,7 @@ class HDHomeRunDeviceIDList : public TransMythUIComboBoxSetting
 
     void fillSelections(const QString &current);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void UpdateDevices(const QString&);
@@ -960,7 +961,7 @@ class HDHomeRunDeviceID : public MythUITextEditSetting
   public:
     explicit HDHomeRunDeviceID(const CaptureCard &parent);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void SetIP(const QString&);
@@ -984,7 +985,7 @@ class VBoxIP : public MythUITextEditSetting
   public:
     VBoxIP();
 
-    virtual void setEnabled(bool e);
+    void setEnabled(bool e) override; // StandardSetting
     void SetOldValue(const QString &s)
         { _oldValue = s; _oldValue.detach(); };
 
@@ -1005,7 +1006,7 @@ class VBoxTunerIndex : public MythUITextEditSetting
   public:
     VBoxTunerIndex();
 
-    virtual void setEnabled(bool e);
+    void setEnabled(bool e) override; // StandardSetting
     void SetOldValue(const QString &s)
         { _oldValue = s; _oldValue.detach(); };
 
@@ -1033,7 +1034,7 @@ class VBoxDeviceIDList : public TransMythUIComboBoxSetting
 
     void fillSelections(const QString &current);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void UpdateDevices(const QString&);
@@ -1056,7 +1057,7 @@ class VBoxDeviceID : public MythUITextEditSetting
   public:
     explicit VBoxDeviceID(const CaptureCard &parent);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
   public slots:
     void SetIP(const QString&);
@@ -1091,7 +1092,7 @@ class CetonDeviceID : public MythUITextEditSetting
   public:
     explicit CetonDeviceID(const CaptureCard &parent);
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
     void UpdateValues();
 
   signals:

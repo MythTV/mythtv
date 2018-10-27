@@ -25,7 +25,7 @@ class FetcherThread : public MThread
       : MThread("Fetcher"), m_dec(dec) { }
 
   protected:
-    virtual void run(void);
+    void run(void) override; // MThread
 
   private:
     PrivateDecoderCrystalHD *m_dec;
@@ -52,17 +52,19 @@ class PrivateDecoderCrystalHD : public PrivateDecoder
     static void GetDecoders(render_opts &opts);
     PrivateDecoderCrystalHD();
     virtual ~PrivateDecoderCrystalHD();
-    virtual QString GetName(void) { return QString("crystalhd"); }
-    virtual bool Init(const QString &decoder,
-                      PlayerFlags flags,
-                      AVCodecContext *avctx);
-    virtual bool Reset(void);
-    virtual int  GetFrame(AVStream *stream,
-                          AVFrame *picture,
-                          int *got_picture_ptr,
-                          AVPacket *pkt);
-    virtual bool HasBufferedFrames(void);
-    virtual bool NeedsReorderedPTS(void) { return true; }
+    QString GetName(void) override // PrivateDecoder
+        { return QString("crystalhd"); }
+    bool Init(const QString &decoder,
+              PlayerFlags flags,
+              AVCodecContext *avctx) override; // PrivateDecoder
+    bool Reset(void) override; // PrivateDecoder
+    int  GetFrame(AVStream *stream,
+                  AVFrame *picture,
+                  int *got_picture_ptr,
+                  AVPacket *pkt) override; // PrivateDecoder
+    bool HasBufferedFrames(void) override; // PrivateDecoder
+    bool NeedsReorderedPTS(void) override // PrivateDecoder
+        { return true; }
 
   private:
     void FetchFrames(void);

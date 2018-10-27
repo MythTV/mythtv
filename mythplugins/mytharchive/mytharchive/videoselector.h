@@ -44,8 +44,8 @@ class VideoSelector : public MythScreenType
 
     ~VideoSelector(void);
 
-    bool Create();
-    bool keyPressEvent(QKeyEvent *e);
+    bool Create() override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
   signals:
     void haveResult(bool ok);

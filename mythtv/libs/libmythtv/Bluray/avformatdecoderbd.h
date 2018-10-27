@@ -8,19 +8,19 @@ class AvFormatDecoderBD : public AvFormatDecoder
   public:
     AvFormatDecoderBD(MythPlayer *parent, const ProgramInfo &pginfo,
                       PlayerFlags flags);
-    virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
-    virtual void UpdateFramesPlayed(void);
-    virtual int ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket);
+    void Reset(bool reset_video_data, bool seek_reset, bool reset_file) override; // AvFormatDecoder
+    void UpdateFramesPlayed(void) override; // AvFormatDecoder
+    int ReadPacket(AVFormatContext *ctx, AVPacket* pkt, bool& storePacket) override; // AvFormatDecoder
 
   protected:
-    virtual bool IsValidStream(int streamid);
+    bool IsValidStream(int streamid) override; // AvFormatDecoder
 
   private:
-    virtual bool DoRewindSeek(long long desiredFrame);
-    virtual void DoFastForwardSeek(long long desiredFrame, bool &needflush);
-    virtual void StreamChangeCheck(void);
-    virtual int GetSubtitleLanguage(uint subtitle_index, uint stream_index);
-    virtual int GetAudioLanguage(uint audio_index, uint stream_index);
+    bool DoRewindSeek(long long desiredFrame) override; // AvFormatDecoder
+    void DoFastForwardSeek(long long desiredFrame, bool &needflush) override; // AvFormatDecoder
+    void StreamChangeCheck(void) override; // AvFormatDecoder
+    int GetSubtitleLanguage(uint subtitle_index, uint stream_index) override; // AvFormatDecoder
+    int GetAudioLanguage(uint audio_index, uint stream_index) override; // AvFormatDecoder
 
     long long BDFindPosition(long long desiredFrame);
 };

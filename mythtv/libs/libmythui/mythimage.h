@@ -39,8 +39,8 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     MythPainter* GetParent(void)        { return m_Parent;   }
     void SetParent(MythPainter *parent) { m_Parent = parent; }
 
-    virtual int IncrRef(void);
-    virtual int DecrRef(void);
+    int IncrRef(void) override; // ReferenceCounter
+    int DecrRef(void) override; // ReferenceCounter
 
     virtual void SetChanged(bool change = true) { m_Changed = change; }
     bool IsChanged() const { return m_Changed; }

@@ -94,7 +94,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
     void SetMode(int mode);
     void ClearBuffers(bool input, bool output, int outputStreamIdx = -1);
     void AddTextData(unsigned char *buf, int len,
-                     int64_t timecode, char type);
+                     int64_t timecode, char type) override; // CC608Input
     void TranscodeWriteText(void (*func)
                            (void *, unsigned char *, int, int, int),
                             void * ptr);

@@ -179,17 +179,20 @@ private:
   cLlCiHandler(int Fd, int NumSlots);
 public:
   virtual ~cLlCiHandler();
-  int NumSlots(void) { return numSlots; }
-  bool Process(void);
-  bool HasUserIO(void) { return hasUserIO; }
-  bool NeedCaPmt(void) { return needCaPmt; }
-  bool EnterMenu(int Slot);
-  cCiMenu *GetMenu(void);
-  cCiEnquiry *GetEnquiry(void);
+  int NumSlots(void) override // cCiHandler
+      { return numSlots; }
+  bool Process(void) override; // cCiHandler
+  bool HasUserIO(void) override // cCiHandler
+      { return hasUserIO; }
+  bool NeedCaPmt(void) override // cCiHandler
+      { return needCaPmt; }
+  bool EnterMenu(int Slot) override; // cCiHandler
+  cCiMenu *GetMenu(void) override; // cCiHandler
+  cCiEnquiry *GetEnquiry(void) override; // cCiHandler
   bool SetCaPmt(cCiCaPmt &CaPmt);
-  const unsigned short *GetCaSystemIds(int Slot);
-  bool SetCaPmt(cCiCaPmt &CaPmt, int Slot);
-  void SetTimeOffset(double offset_in_seconds);
+  const unsigned short *GetCaSystemIds(int Slot) override; // cCiHandler
+  bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) override; // cCiHandler
+  void SetTimeOffset(double offset_in_seconds) override; // cCiHandler
   bool Reset(int Slot);
   bool connected() const;
   };
@@ -209,16 +212,17 @@ class cHlCiHandler : public cCiHandler {
     int SendData(unsigned tag, struct ca_msg *msg);
   public:
     virtual ~cHlCiHandler();
-    int NumSlots(void) { return numSlots; }
-    bool Process(void);
-    bool HasUserIO(void) { return false; }//hasUserIO; }
-    bool NeedCaPmt(void);
-    bool EnterMenu(int Slot);
-    cCiMenu *GetMenu(void);
-    cCiEnquiry *GetEnquiry(void);
+    int NumSlots(void) override // cCiHandler
+        { return numSlots; }
+    bool Process(void) override; // cCiHandler
+    bool HasUserIO(void) override { return false; } // cCiHandler
+    bool NeedCaPmt(void) override; // cCiHandler
+    bool EnterMenu(int Slot) override; // cCiHandler
+    cCiMenu *GetMenu(void) override; // cCiHandler
+    cCiEnquiry *GetEnquiry(void) override; // cCiHandler
     bool SetCaPmt(cCiCaPmt &CaPmt);
-    const unsigned short *GetCaSystemIds(int Slot);
-    bool SetCaPmt(cCiCaPmt &CaPmt, int Slot);
+    const unsigned short *GetCaSystemIds(int Slot) override; // cCiHandler
+    bool SetCaPmt(cCiCaPmt &CaPmt, int Slot) override; // cCiHandler
     bool Reset(int Slot);
     bool connected() const;
 };

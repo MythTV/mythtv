@@ -19,23 +19,28 @@ class MUI_PUBLIC MythD3D9Painter : public MythPainter
 
     void         SetTarget(D3D9Image *target) { m_target = target;  }
     void         SetSwapControl(bool swap) { m_swap_control = swap; }
-    virtual QString GetName(void)        { return QString("D3D9");  }
-    virtual bool SupportsAnimation(void) { return true;             }
-    virtual bool SupportsAlpha(void)     { return true;             }
-    virtual bool SupportsClipping(void)  { return false;            }
-    virtual void FreeResources(void);
-    virtual void Begin(QPaintDevice *parent);
-    virtual void End();
+    QString GetName(void) override // MythPainter
+        { return QString("D3D9");  }
+    bool SupportsAnimation(void) override // MythPainter
+        { return true; }
+    bool SupportsAlpha(void) override // MythPainter
+        { return true; }
+    bool SupportsClipping(void) override // MythPainter
+        { return false; }
+    void FreeResources(void) override; // MythPainter
+    void Begin(QPaintDevice *parent) override; // MythPainter
+    void End() override; // MythPainter
 
-    virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
-                           int alpha);
-    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
-                          const QPen &linePen, int alpha);
+    void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
+                   int alpha) override; // MythPainter
+    void DrawRect(const QRect &area, const QBrush &fillBrush,
+                  const QPen &linePen, int alpha) override; // MythPainter
 
   protected:
-    virtual MythImage* GetFormatImagePriv(void) { return new MythImage(this); }
-    virtual void DeleteFormatImagePriv(MythImage *im);
-    virtual void Teardown(void);
+    MythImage* GetFormatImagePriv(void) override // MythPainter
+        { return new MythImage(this); }
+    void DeleteFormatImagePriv(MythImage *im) override; // MythPainter
+    void Teardown(void) override; // MythPainter
 
     bool InitD3D9(QPaintDevice *parent);
     void ClearCache(void);

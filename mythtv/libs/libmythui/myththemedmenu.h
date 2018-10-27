@@ -42,7 +42,7 @@ class MUI_PUBLIC MythThemedMenuState : public MythScreenType
     MythThemedMenuState(MythScreenStack *parent, const QString &name);
    ~MythThemedMenuState() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
     void (*m_callback)(void *, QString &);
     void *m_callbackdata;
@@ -56,7 +56,7 @@ class MUI_PUBLIC MythThemedMenuState : public MythScreenType
     MythUIText *m_descriptionText;
 
   protected:
-    void CopyFrom(MythUIType*);
+    void CopyFrom(MythUIType*) override; // MythScreenType
 };
 
 /// \brief Themed menu class, used for main menus in %MythTV frontend
@@ -77,15 +77,15 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 
     QString getSelection(void);
 
-    virtual void aboutToShow(void);
+    void aboutToShow(void) override; // MythScreenType
 
-    void ShowMenu();
+    void ShowMenu() override; // MythScreenType
     void aboutScreen();
-    void customEvent(QEvent *event);
-    void mediaEvent(MythMediaEvent *event);
+    void customEvent(QEvent *event) override; // MythUIType
+    void mediaEvent(MythMediaEvent *event) override; // MythUIType
     
   protected:
-    virtual bool keyPressEvent(QKeyEvent *e);
+    bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
   private slots:
     void setButtonActive(MythUIButtonListItem* item);

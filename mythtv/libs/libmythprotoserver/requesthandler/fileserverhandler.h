@@ -15,14 +15,15 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
     Q_OBJECT
   public:
     bool HandleAnnounce(MythSocket *socket, QStringList &commands,
-                        QStringList &slist);
+                        QStringList &slist) override; // SocketRequestHandler
     bool HandleQuery(SocketHandler *socket, QStringList &commands,
-                     QStringList &slist);
-    QString GetHandlerName(void)                    { return "FILETRANSFER"; }
+                     QStringList &slist) override; // SocketRequestHandler
+    QString GetHandlerName(void) override // SocketRequestHandler
+        { return "FILETRANSFER"; }
 
     void connectionAnnounced(MythSocket *socket, QStringList &commands,
-                             QStringList &slist);
-    void connectionClosed(MythSocket *socket);
+                             QStringList &slist) override; // SocketRequestHandler
+    void connectionClosed(MythSocket *socket) override; // SocketRequestHandler
 
     bool DeleteFile(QString filename, QString storagegroup);
 

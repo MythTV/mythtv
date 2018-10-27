@@ -189,17 +189,17 @@ bool VideoVisualSpectrum::InitialisePriv(void)
 static class VideoVisualSpectrumFactory : public VideoVisualFactory
 {
   public:
-    const QString &name(void) const
+    const QString &name(void) const override // VideoVisualFactory
     {
         static QString name("Spectrum");
         return name;
     }
 
     VideoVisual *Create(AudioPlayer *audio,
-                        MythRender  *render) const
+                        MythRender  *render) const override // VideoVisualFactory
     {
         return new VideoVisualSpectrum(audio, render);
     }
 
-    virtual bool SupportedRenderer(RenderType /*type*/) { return true; }
+    bool SupportedRenderer(RenderType /*type*/) override { return true; } // VideoVisualFactory
 } VideoVisualSpectrumFactory;

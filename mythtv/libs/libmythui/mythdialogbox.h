@@ -139,7 +139,7 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
 
     ~MythDialogBox(void);
 
-    virtual bool Create(void);
+    bool Create(void) override; // MythScreenType
 
     void SetMenuItems(MythMenu *menu);
 
@@ -159,8 +159,8 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
         m_useSlots = true;
     }
 
-    virtual bool keyPressEvent(QKeyEvent *event);
-    virtual bool gestureEvent(MythGestureEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+    bool gestureEvent(MythGestureEvent *event) override; // MythScreenType
 
   public slots:
     void Select(MythUIButtonListItem* item);
@@ -211,12 +211,12 @@ class MUI_PUBLIC MythConfirmationDialog : public MythScreenType
     MythConfirmationDialog(MythScreenStack *parent, const QString &message,
                            bool showCancel = true);
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
     void SetData(QVariant data) { m_resultData = data; }
     void SetMessage(const QString &message);
 
-    bool keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
  signals:
      void haveResult(bool);
@@ -253,7 +253,7 @@ class MUI_PUBLIC MythTextInputDialog : public MythScreenType
                         bool isPassword = false,
                         const QString &defaultValue = "");
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   signals:
@@ -288,7 +288,7 @@ class MUI_PUBLIC MythSpinBoxDialog : public MythScreenType
   public:
     MythSpinBoxDialog(MythScreenStack *parent, const QString &message);
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
     void SetRange(int low, int high, int step, uint pageMultiple=5);
@@ -336,7 +336,7 @@ class MUI_PUBLIC MythUISearchDialog : public MythScreenType
                      bool  matchAnywhere = false,
                      const QString &defaultValue = "");
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   signals:
@@ -398,7 +398,7 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
                         QDateTime startTime = QDateTime::currentDateTime(),
                         int dayLimit = 14);
 
-    bool Create();
+    bool Create() override; // MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   signals:

@@ -19,7 +19,7 @@ class VideoDecodeBuffer : public QRunnable
     virtual ~VideoDecodeBuffer();
 
     void          stop(void);
-    virtual void run();
+    void run() override; // QRunnable
     VideoFrame *GetFrame(int &didFF, bool &isKey);
 
   private:

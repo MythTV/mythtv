@@ -104,7 +104,7 @@ class NetworkControl : public ServerPool, public QRunnable
     void deleteClient(void);
 
   protected:
-    void run(void); // QRunnable
+    void run(void) override; // QRunnable
 
   private:
     QString processJump(NetworkCommand *nc);
@@ -120,7 +120,7 @@ class NetworkControl : public ServerPool, public QRunnable
 
     void notifyDataAvailable(void);
     void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *e) override; // QObject
 
     QString listRecordings(QString chanid = "", QString starttime = "");
     QString listSchedule(const QString& chanID = "") const;

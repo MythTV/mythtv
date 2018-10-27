@@ -2245,7 +2245,7 @@ class MPUBLIC MythArchiveHelperCommandLineParser : public MythCommandLineParser
 {
   public:
     MythArchiveHelperCommandLineParser();
-    void LoadArguments(void);
+    void LoadArguments(void) override; // MythCommandLineParser
 };
 
 MythArchiveHelperCommandLineParser::MythArchiveHelperCommandLineParser() :

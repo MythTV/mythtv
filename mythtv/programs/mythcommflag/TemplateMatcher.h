@@ -37,14 +37,16 @@ public:
     ~TemplateMatcher(void);
 
     /* FrameAnalyzer interface. */
-    const char *name(void) const { return "TemplateMatcher"; }
+    const char *name(void) const override // FrameAnalyzer
+        { return "TemplateMatcher"; }
     enum analyzeFrameResult MythPlayerInited(MythPlayer *player,
-            long long nframes);
+            long long nframes) override; // FrameAnalyzer
     enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
-            long long frameno, long long *pNextFrame);
-    int finished(long long nframes, bool final);
-    int reportTime(void) const;
-    FrameMap GetMap(unsigned int) const { return breakMap; }
+            long long frameno, long long *pNextFrame) override; // FrameAnalyzer
+    int finished(long long nframes, bool final) override; // FrameAnalyzer
+    int reportTime(void) const override; // FrameAnalyzer
+    FrameMap GetMap(unsigned int) const override // FrameAnalyzer
+        { return breakMap; }
 
     /* TemplateMatcher interface. */
     int templateCoverage(long long nframes, bool final) const;

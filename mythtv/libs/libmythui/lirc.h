@@ -39,7 +39,7 @@ class LIRC : public QObject, public MThread
     void TeardownAll();
 
     bool IsDoRunSet(void) const;
-    virtual void run(void);
+    void run(void) override; // MThread
     QList<QByteArray> GetCodes(void);
     void Process(const QByteArray &data);
 

@@ -33,9 +33,9 @@ class V4L2encStreamHandler : public StreamHandler
     V4L2encStreamHandler(const QString & path, int audio_input);
     ~V4L2encStreamHandler(void);
 
-    virtual void run(void); // MThread
+    void run(void) override; // MThread
 #if 0
-    virtual void PriorityEvent(int fd); // DeviceReaderCB
+    void PriorityEvent(int fd) override; // DeviceReaderCB
 #endif
 
     bool Configure(void);

@@ -34,7 +34,7 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
         children.push_back(child);
     };
 
-    virtual Setting *byName(const QString &name);
+    Setting *byName(const QString &name) override; // Configurable
 
     void setUseLabel(bool useit) { uselabel = useit; }
     void setUseFrame(bool useit) { useframe = useit; }
@@ -47,10 +47,10 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
     }
 
     // Storage
-    virtual void Load(void);
-    virtual void Save(void);
-    virtual void Save(QString destination);
-    virtual void SetSaveRequired(void);
+    void Load(void) override; // Storage
+    void Save(void) override; // Storage
+    void Save(QString destination) override; // Storage
+    void SetSaveRequired(void) override; // Storage
 
   signals:
     void changeHelpText(QString);
@@ -80,12 +80,12 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
     {
     }
 
-    virtual void deleteLater(void);
+    void deleteLater(void) override; // ConfigurationGroup
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg,
-                                  QWidget            *parent,
-                                  const char         *widgetName);
-    virtual void widgetInvalid(QObject *obj);
+    QWidget *configWidget(ConfigurationGroup *cg,
+                          QWidget            *parent,
+                          const char         *widgetName) override; // Configurable
+    void widgetInvalid(QObject *obj) override; // Configurable
 
     bool replaceChild(Configurable *old_child, Configurable *new_child);
     void repaint(void);
@@ -111,9 +111,9 @@ class MPUBLIC HorizontalConfigurationGroup : public ConfigurationGroup
     {
     }
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg,
-                                  QWidget            *parent,
-                                  const char         *widgetName);
+    QWidget *configWidget(ConfigurationGroup *cg,
+                          QWidget            *parent,
+                          const char         *widgetName) override; // Configurable
 
   protected:
     /// You need to call deleteLater to delete QObject
@@ -131,9 +131,9 @@ class MPUBLIC GridConfigurationGroup : public ConfigurationGroup
     {
     }
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg,
-                                  QWidget            *parent,
-                                  const char         *widgetName);
+    QWidget *configWidget(ConfigurationGroup *cg,
+                          QWidget            *parent,
+                          const char         *widgetName) override; // Configurable
 
   protected:
     /// You need to call deleteLater to delete QObject
@@ -156,14 +156,14 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     {
     }
 
-    virtual void deleteLater(void);
+    void deleteLater(void) override; // ConfigurationGroup
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
-                                  const char *widgetName = nullptr);
+    QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
+                          const char *widgetName = nullptr) override; // Configurable
 
     void raise(Configurable *child);
-    virtual void Save(void);
-    virtual void Save(QString destination);
+    void Save(void) override; // ConfigurationGroup
+    void Save(QString destination) override; // ConfigurationGroup
 
     // save all children, or only the top?
     void setSaveAll(bool b) { saveAll = b; };
@@ -172,7 +172,7 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     void removeChild(Configurable*);
 
   public slots:
-    virtual void widgetInvalid(QObject *obj);
+    void widgetInvalid(QObject *obj) override; // Configurable
 
   protected:
     /// You need to call deleteLater to delete QObject
@@ -212,16 +212,16 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     void addTarget(QString triggerValue, Configurable *target);
     void removeTarget(QString triggerValue);
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg,
-                                  QWidget            *parent,
-                                  const char         *widgetName);
-    virtual void widgetInvalid(QObject *obj);
+    QWidget *configWidget(ConfigurationGroup *cg,
+                          QWidget            *parent,
+                          const char         *widgetName) override; // Configurable
+    void widgetInvalid(QObject *obj) override; // Configurable
 
-    virtual Setting *byName(const QString &settingName);
+    Setting *byName(const QString &settingName) override; // ConfigurationGroup
 
-    virtual void Load(void);
-    virtual void Save(void);
-    virtual void Save(QString destination);
+    void Load(void) override; // ConfigurationGroup
+    void Save(void) override; // ConfigurationGroup
+    void Save(QString destination) override; // ConfigurationGroup
 
     void repaint(void);
 

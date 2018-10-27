@@ -35,7 +35,7 @@ class FunctionDialog : public MythScreenType
   public:
     FunctionDialog(MythScreenStack *parent, Monitor *monitor);
 
-    bool Create();
+    bool Create() override; // MythScreenType
 
   signals:
      void haveResult(bool);
@@ -60,8 +60,8 @@ class ZMConsole : public MythScreenType
     explicit ZMConsole(MythScreenStack *parent);
     ~ZMConsole();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private slots:
     void updateTime();

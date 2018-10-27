@@ -19,15 +19,15 @@ public:
     AudioOutputSettings* GetOutputSettings(bool digital);
     static QMap<QString, QString> *GetDevices(const char *type = nullptr);
 
-    virtual int64_t GetAudiotime(void);
+    int64_t GetAudiotime(void) override; // AudioOutputBase
 
     // callback for delivering audio to output device
     bool RenderAudio(unsigned char *aubuf, int size,
                      unsigned long long timestamp);
 
     // Volume control
-    virtual int  GetVolumeChannel(int channel) const;
-    virtual void SetVolumeChannel(int channel, int volume);
+    int  GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
     // TODO: convert these to macros!
     void Debug(QString msg)
@@ -42,13 +42,13 @@ public:
 protected:
 
     // You need to implement the following functions
-    virtual bool OpenDevice(void);
-    virtual void CloseDevice(void);
-    virtual void WriteAudio(unsigned char *aubuf, int size);
-    virtual int  GetBufferedOnSoundcard(void) const;
+    bool OpenDevice(void) override; // AudioOutputBase
+    void CloseDevice(void) override; // AudioOutputBase
+    void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
+    int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
     
-    virtual bool StartOutputThread(void) { return true; }
-    virtual void StopOutputThread(void) {}
+    bool StartOutputThread(void) override { return true; } // AudioOutputBase
+    void StopOutputThread(void) override {} // AudioOutputBase
 
 private:
 

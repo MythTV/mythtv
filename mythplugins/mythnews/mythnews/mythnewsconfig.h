@@ -21,8 +21,8 @@ class MythNewsConfig : public MythScreenType
                    const QString &name);
     ~MythNewsConfig();
 
-    bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
+    bool Create(void) override; // MythScreenType
+    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
 
   private:
     void loadData(void);

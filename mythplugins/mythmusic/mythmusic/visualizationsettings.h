@@ -13,7 +13,7 @@ public:
     VisualizationSettings(MythScreenStack *parent, const char *name = nullptr);
     ~VisualizationSettings() = default;
 
-    bool Create(void);
+    bool Create(void) override; // MythScreenType
 
 private:
     MythUICheckBox     *m_changeOnSongChange;

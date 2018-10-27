@@ -16,7 +16,7 @@ class MultiplexSetting : public TransMythUIComboBoxSetting
     MultiplexSetting() : sourceid(0)
         { setLabel(tr("Transport")); }
 
-    virtual void Load(void);
+    void Load(void) override; // StandardSetting
 
     void SetSourceID(uint _sourceid);
 

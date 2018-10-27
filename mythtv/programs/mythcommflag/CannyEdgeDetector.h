@@ -21,9 +21,9 @@ public:
     CannyEdgeDetector(void);
     ~CannyEdgeDetector(void);
     int MythPlayerInited(const MythPlayer *player, int width, int height);
-    virtual int setExcludeArea(int row, int col, int width, int height);
-    virtual const AVFrame *detectEdges(const AVFrame *pgm, int pgmheight,
-            int percentile);
+    int setExcludeArea(int row, int col, int width, int height) override; // EdgeDetector
+    const AVFrame *detectEdges(const AVFrame *pgm, int pgmheight,
+            int percentile) override; // EdgeDetector
 
 private:
     int resetBuffers(int pgmwidth, int pgmheight);

@@ -38,7 +38,7 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
    ~MythDownloadManager();
 
     // Methods for starting the queue manager thread
-    void run(void);
+    void run(void) override; // MThread
     void setRunThread(void) { m_runThread = true; }
     QThread *getQueueThread(void) { return m_queueThread; }
     bool isRunning(void) { return m_isRunning; }
