@@ -217,6 +217,8 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       // Time Code stuff
       prevtc(0),                    prevrp(0),
       savedAudioTimecodeOffset(0),
+      rtcbase(0),
+      maxtcval(0), maxtcframes(0),
       // LiveTVChain stuff
       m_tv(nullptr),                isDummy(false),
       // Counter for buffering messages
@@ -257,6 +259,11 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     uint tmp = mypage.toInt(&valid, 16);
     ttPageNum = (valid) ? tmp : ttPageNum;
     cc608.SetTTPageNum(ttPageNum);
+    avsync2adjustms = (int64_t)gCoreContext->GetNumSetting("AVSync2AdjustMS", 10);
+    if (avsync2adjustms < 1)
+        avsync2adjustms = 1;
+    if (avsync2adjustms > 40)
+        avsync2adjustms = 40;
 }
 
 MythPlayer::~MythPlayer(void)
@@ -403,7 +410,7 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
         pauseLock.unlock();
         return false;
     }
-
+    rtcbase = 0;
     SetEof(kEofStateNone);
     UnpauseBuffer();
     UnpauseDecoder();
@@ -1795,6 +1802,7 @@ void MythPlayer::ResetAVSync(void)
         avsync_predictor = 0;
     prevtc = 0;
     avsync_next = avsync_interval;      // Frames till next sync check
+    rtcbase = 0;
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "A/V sync reset");
 }
 
@@ -1810,6 +1818,7 @@ void MythPlayer::InitAVSync(void)
 
     // Number of frames over which to average time divergence
     avsync_averaging=4;
+    rtcbase = 0;
 
     // Special averaging default of 60 for OpenMAX passthru
     QString device = gCoreContext->GetSetting("AudioOutputDevice","");
@@ -1856,6 +1865,12 @@ int64_t MythPlayer::AVSyncGetAudiotime(void)
 
 void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 {
+    if (gCoreContext->GetNumSetting("PlaybackAVSync2", 0))
+    {
+        AVSync2(buffer);
+        return;
+    }
+
     int repeat_pict  = 0;
     int64_t timecode = audio.GetAudioTime();
 
@@ -2140,6 +2155,224 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     }
 }
 
+static int64_t time_to_usecs(timespec *tm);
+static void usecs_to_time(int64_t utime, timespec *tm);
+
+
+int64_t time_to_usecs(timespec *tm)
+{
+    // add 315576000000000 (10 years) to prevent it going negative
+    return (int64_t) (tm->tv_sec) * 1000000
+       + tm->tv_nsec / 1000 + (int64_t) 315576000000000;
+}
+
+void usecs_to_time(int64_t utime, timespec *tm)
+{
+    utime -= (int64_t) 315576000000000;
+    tm->tv_sec = (time_t)(utime / 1000000);
+    tm->tv_nsec = (utime - tm->tv_sec * 1000000) * 1000;
+}
+
+#define AVSYNC_MAX_LATE 1000000
+void MythPlayer::AVSync2(VideoFrame *buffer)
+{
+    if (videoOutput->IsErrored())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "AVSync: Unknown error in videoOutput, aborting playback.");
+        SetErrored(tr("Failed to initialize A/V Sync"));
+        return;
+    }
+    int64_t audiotimecode = audio.GetAudioTime();
+    int64_t videotimecode = 0;
+
+    bool dropframe = false;
+    bool pause_audio = false;
+    int64_t framedue = 0;
+    int64_t audio_adjustment = 0;
+    timespec now;
+    int64_t unow = 0;
+    int64_t lateness = 0;
+    int64_t playspeed1000 = (float)1000 / play_speed;
+
+    while (framedue == 0)
+    {
+        bool reset = false;
+        if (buffer)
+        {
+            videotimecode = buffer->timecode & 0x0000ffffffffffff;
+            // Detect bogus timecodes from DVD and ignore them.
+            if (videotimecode != buffer->timecode)
+                videotimecode = maxtcval;
+        }
+        else
+            videotimecode = audiotimecode;
+        // first time or after a seek - setup of rtcbase
+        if (rtcbase == 0)
+        {
+            if (clock_gettime(CLOCK_MONOTONIC,&now) != 0)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("AVSync: Error %1 in clock_gettime, aborting playback.").arg(errno));
+                SetErrored(tr("Failed to initialize A/V Sync"));
+                return;
+            }
+            unow = time_to_usecs(&now);
+            rtcbase = unow - videotimecode * playspeed1000;
+            maxtcval = 0;
+            maxtcframes = 0;
+        }
+
+        int64_t tcincr = videotimecode - maxtcval;
+        if (tcincr > 0 || tcincr < -100)
+        {
+            maxtcval = videotimecode;
+            maxtcframes = 0;
+        }
+        else
+        {
+            maxtcframes++;
+            videotimecode = maxtcval + maxtcframes * frame_interval/1000;
+        }
+
+        clock_gettime(CLOCK_MONOTONIC,&now);
+        unow = time_to_usecs(&now);
+        if (play_speed > 0.0f)
+            framedue = rtcbase + videotimecode * playspeed1000;
+        else
+            framedue = unow + frame_interval / 2;
+
+        lateness = unow - framedue;
+        dropframe = false;
+        if (lateness > 30000)
+            dropframe = !FlagIsSet(kMusicChoice);
+
+        if (lateness <= 30000 && audiotimecode > 0 && normal_speed)
+        {
+            // Get video in sync with audio
+            audio_adjustment = audiotimecode - videotimecode;
+            int sign = audio_adjustment < 0 ? -1 : 1;
+            if (audio_adjustment * sign > 40)
+            {
+                // adjust by AVSyncIncrementMS milliseconds at a time (range 1-40)
+                rtcbase -= (int64_t)1000000 * avsync2adjustms * sign / playspeed1000;
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("AV Sync, audio ahead by %1 ms").arg(audio_adjustment));
+            }
+        }
+        // sanity check - reset rtcbase if time codes have gone crazy.
+        if (lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE)
+        {
+            framedue = 0;
+            rtcbase = 0;
+            if (reset)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("Resetting AV Sync2 failed, lateness = %1").arg(lateness));
+                SetErrored(tr("Failed to initialize A/V Sync"));
+                return;
+            }
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                QString("Resetting AV Sync2, lateness = %1").arg(lateness));
+            reset = true;
+        }
+    }
+
+    disp_timecode = videotimecode;
+
+    output_jmeter && output_jmeter->RecordCycleTime();
+    avsync_avg = audio_adjustment * 1000;
+
+    FrameScanType ps = m_scan;
+    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+        ps = kScan_Progressive;
+
+    if (buffer && !dropframe)
+    {
+        osdLock.lock();
+        videofiltersLock.lock();
+        videoOutput->ProcessFrame(buffer, osd, videoFilters, pip_players, ps);
+        videofiltersLock.unlock();
+        osdLock.unlock();
+    }
+
+    if (!pause_audio && avsync_audiopaused)
+    {
+        avsync_audiopaused = false;
+        audio.Pause(false);
+    }
+    LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
+        QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
+                "audioadj=%4 tcoffset=%5 unow=%6 udue=%7")
+            .arg(audiotimecode)
+            .arg(videotimecode)
+            .arg(frame_interval)
+            .arg(audio_adjustment)
+            .arg(tc_wrap[TC_AUDIO])
+            .arg(unow)
+            .arg(framedue)
+                );
+    if (dropframe)
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("dropping frame to catch up, lateness=%1 usec")
+                .arg(lateness));
+    else if (!FlagIsSet(kVideoIsNull) && buffer)
+    {
+        // if we get here, we're actually going to do video output
+        osdLock.lock();
+        videoOutput->PrepareFrame(buffer, ps, osd);
+        osdLock.unlock();
+        // Don't wait for sync if this is a secondary PBP otherwise
+        // the primary PBP will become out of sync
+        if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
+        {
+            timespec tm;
+            usecs_to_time(framedue, &tm);
+            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tm, NULL);
+        }
+        videoOutput->Show(ps);
+        if (videoOutput->IsErrored())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Error condition detected "
+                    "in videoOutput after Show(), aborting playback.");
+            SetErrored(tr("Serious error detected in Video Output"));
+            return;
+        }
+        if (m_double_framerate)
+        {
+            //second stage of deinterlacer processing
+            ps = (kScan_Intr2ndField == ps) ?
+                kScan_Interlaced : kScan_Intr2ndField;
+            osdLock.lock();
+            if (m_double_process && ps != kScan_Progressive)
+            {
+                videofiltersLock.lock();
+                videoOutput->ProcessFrame(
+                        buffer, osd, videoFilters, pip_players, ps);
+                videofiltersLock.unlock();
+            }
+
+            videoOutput->PrepareFrame(buffer, ps, osd);
+            osdLock.unlock();
+            // Display the second field
+            if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
+            {
+                int64_t due = framedue + frame_interval / 2;
+                timespec tm;
+                usecs_to_time(due, &tm);
+                clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tm, NULL);
+            }
+            videoOutput->Show(ps);
+        }
+    }
+    else
+    {
+        timespec tm;
+        usecs_to_time(framedue, &tm);
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tm, NULL);
+    }
+}
+
 void MythPlayer::RefreshPauseFrame(void)
 {
     if (needNewPauseFrame)
@@ -2363,6 +2596,7 @@ void MythPlayer::DisplayNormalFrame(bool check_prebuffer)
     detect_letter_box->SwitchTo(frame);
 
     AVSync(frame, false);
+
     // If PiP then keep this frame for MythPlayer::GetCurrentFrame
     if (!player_ctx->IsPIP())
         videoOutput->DoneDisplayingFrame(frame);
@@ -3838,6 +4072,7 @@ void MythPlayer::ChangeSpeed(void)
     float last_speed = play_speed;
     play_speed   = next_play_speed;
     normal_speed = next_normal_speed;
+    rtcbase = 0;
 
     bool skip_changed = UpdateFFRewSkip();
 
@@ -5005,7 +5240,14 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     infoMap.insert("bufferavail", player_ctx->buffer->GetAvailableBuffer());
     infoMap.insert("buffersize",
         QString::number(player_ctx->buffer->GetBufferSize() >> 20));
-    infoMap.insert("avsync",
+    if (gCoreContext->GetNumSetting("PlaybackAVSync2", 0))
+    {
+        int avsync = avsync_avg / 1000;
+        infoMap.insert("avsync",
+            tr("%1 ms").arg(avsync));
+    }
+    else
+        infoMap.insert("avsync",
             QString::number((float)avsync_avg / (float)frame_interval, 'f', 2));
     if (videoOutput)
     {

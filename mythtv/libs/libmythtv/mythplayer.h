@@ -2,6 +2,7 @@
 #define MYTHPLAYER_H
 
 #include <cstdint>
+#include <time.h>
 
 #include <QCoreApplication>
 #include <QList>
@@ -615,6 +616,8 @@ class MTV_PUBLIC MythPlayer
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  InitAVSync(void);
     virtual void AVSync(VideoFrame *buffer, bool limit_delay = false);
+    // New video sync method
+    void AVSync2(VideoFrame *buffer);
     void  ResetAVSync(void);
     int64_t AVSyncGetAudiotime(void);
     void  SetFrameInterval(FrameScanType scan, double speed);
@@ -843,6 +846,12 @@ class MTV_PUBLIC MythPlayer
     int64_t    tc_wrap[TCTYPESMAX];
     int64_t    tc_lastval[TCTYPESMAX];
     int64_t    savedAudioTimecodeOffset;
+
+    // AVSync2
+    int64_t   rtcbase;        // real time clock base for presentation time (microsecs)
+    int64_t   maxtcval;       // maximum to date video tc
+    int       maxtcframes;    // number of frames seen since max to date tc
+    int64_t   avsync2adjustms; // number of milliseconds to adjust for av sync errors
 
     // LiveTV
     TV *m_tv;

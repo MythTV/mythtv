@@ -2639,11 +2639,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 thread_count = 1;
 
             use_frame_timing = false;
-            if (! private_dec
-                && ! ringBuffer->IsDVD()
+            if (! ringBuffer->IsDVD()
                 && (codec_is_std(video_codec_id)
                     || codec_is_mediacodec(video_codec_id)
-                    || codec_is_vaapi2(video_codec_id)))
+                    || codec_is_vaapi2(video_codec_id)
+                    || GetCodecDecoderName() == "openmax"))
                 use_frame_timing = true;
 
             if (FlagIsSet(kDecodeSingleThreaded))
@@ -4013,6 +4013,8 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         pts = mpa_pic->pts;
         if (pts == AV_NOPTS_VALUE)
             pts = mpa_pic->pkt_dts;
+        if (pts == AV_NOPTS_VALUE)
+            pts = mpa_pic->reordered_opaque;
         if (pts == AV_NOPTS_VALUE)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "No PTS found - unable to process video.");
