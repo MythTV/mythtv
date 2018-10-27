@@ -150,8 +150,10 @@ bool TVRec::CreateChannel(const QString &startchannel,
         if (!CardUtil::IsVBoxPresent(inputid))
         {
             // VBOX presence failed  recorder is marked errored
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("CreateChannel(%1) failed due to VBOX not responding "
-                                                   "to network check on inputid (%2)").arg(startchannel).arg(inputid));
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("CreateChannel(%1) failed due to VBOX not responding "
+                        "to network check on inputid [%2]")
+                .arg(startchannel).arg(inputid));
             channel = nullptr;
         }
     }
@@ -311,7 +313,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     if (secsleft < 0)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
-            QString("inputid %1").arg(rcinfo->GetInputID()));
+            QString("inputid [%1]").arg(rcinfo->GetInputID()));
 
         PendingMap::iterator it = pendingRecordings.find(rcinfo->GetInputID());
         if (it != pendingRecordings.end())
@@ -323,7 +325,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("RecordPending on inputid %1").arg(rcinfo->GetInputID()));
+        QString("RecordPending on inputid [%1]").arg(rcinfo->GetInputID()));
 
     PendingInfo pending;
     pending.info            = new ProgramInfo(*rcinfo);
@@ -408,7 +410,7 @@ void TVRec::CancelNextRecording(bool cancel)
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("CancelNextRecording -- inputid %1")
+            QString("CancelNextRecording -- inputid [%1]")
                            .arg(inputid));
 
         RecordPending((*it).info, -1, false);
@@ -543,14 +545,14 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         for (uint i = 0; (i < inputids2.size()) && ok; i++)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("Attempting to stop input %1 in state %2")
+                QString("Attempting to stop input [%1] in state %2")
                     .arg(inputids2[i]).arg(StateToString(states[i])));
 
             bool success = RemoteStopRecording(inputids2[i]);
             if (success)
             {
                 uint state = RemoteGetState(inputids2[i]);
-                LOG(VB_GENERAL, LOG_INFO, LOC + QString("a %1: %2")
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("a [%1]: %2")
                         .arg(inputids2[i]).arg(StateToString((TVState)state)));
                 success = (kState_None == state);
             }
@@ -564,7 +566,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
             }
 
             LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("Stopping recording on %1, %2") .arg(inputids2[i])
+                QString("Stopping recording on [%1], %2") .arg(inputids2[i])
                     .arg(success ? "succeeded" : "failed"));
 
             ok &= success;
@@ -1485,7 +1487,7 @@ void TVRec::run(void)
                 else
                 {
                     LOG(VB_CHANNEL, LOG_INFO, LOC + QString(
-                            "Postponing EIT scan on input %1 "
+                            "Postponing EIT scan on input [%1] "
                             "because input %2 is busy")
                         .arg(inputid).arg(busy_input.inputid));
                     eitScanStartTime = eitScanStartTime.addSecs(300);
@@ -1590,7 +1592,7 @@ void TVRec::HandlePendingRecordings(void)
         if (MythDate::current() > (*it).recordingStart.addSecs(30))
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
-                QString("%1 '%2'")
+                QString("[%1] '%2'")
                     .arg((*it).info->GetInputID())
                     .arg((*it).info->GetTitle()));
 
@@ -1747,7 +1749,7 @@ QString TVRec::GetStartChannel(uint inputid)
 {
     QString startchan;
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("GetStartChannel(%1)")
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("GetStartChannel[%1]")
         .arg(inputid));
 
     // Get last tuned channel from database, to use as starting channel
@@ -2247,7 +2249,7 @@ bool TVRec::ShouldSwitchToAnotherInput(QString chanid)
     }
     else if (query.size() > 0)
     {
-        msg = "Found channel (%1) on current input(%2).";
+        msg = "Found channel (%1) on current input[%2].";
         LOG(VB_RECORD, LOG_INFO, LOC + msg.arg(channelname).arg(inputid));
         return false;
     }
