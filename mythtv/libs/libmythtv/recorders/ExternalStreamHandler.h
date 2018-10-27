@@ -94,7 +94,7 @@ class ExternalStreamHandler : public StreamHandler
     void PurgeBuffer(void);
 
     bool ProcessCommand(const QString & cmd, uint timeout, QString & result,
-                        uint retry_cnt = 10, uint wait_cnt = 10);
+                        uint retry_cnt = 10, uint wait_cnt = 2);
     bool ProcessVer1(const QString & cmd, uint timeout, QString & result,
                      uint retry_cnt, uint wait_cnt);
     bool ProcessVer2(const QString & cmd, uint timeout, QString & result,

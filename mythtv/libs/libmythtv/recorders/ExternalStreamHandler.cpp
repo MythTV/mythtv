@@ -809,7 +809,7 @@ bool ExternalStreamHandler::OpenApp(void)
 
     QString result;
 
-    if (ProcessCommand("APIVersion?", 10000, result))
+    if (ProcessCommand("APIVersion?", 1000, result))
     {
         QStringList tokens = result.split(':', QString::SkipEmptyParts);
 
@@ -824,7 +824,7 @@ bool ExternalStreamHandler::OpenApp(void)
             m_apiVersion = 1;
         }
 
-        ProcessCommand(QString("APIVersion:%1").arg(m_apiVersion), 2500, result);
+        ProcessCommand(QString("APIVersion:%1").arg(m_apiVersion), 500, result);
     }
 
     if (!IsAppOpen())
@@ -835,7 +835,7 @@ bool ExternalStreamHandler::OpenApp(void)
     }
 
     // Gather capabilities
-    if (!ProcessCommand("HasTuner?", 10000, result))
+    if (!ProcessCommand("HasTuner?", 500, result))
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("Bad response to 'HasTuner?' - '%1'").arg(result));
@@ -843,7 +843,7 @@ bool ExternalStreamHandler::OpenApp(void)
         return false;
     }
     m_hasTuner = result.startsWith("OK:Yes");
-    if (!ProcessCommand("HasPictureAttributes?", 2500, result))
+    if (!ProcessCommand("HasPictureAttributes?", 500, result))
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("Bad response to 'HasPictureAttributes?' - '%1'")
@@ -854,7 +854,7 @@ bool ExternalStreamHandler::OpenApp(void)
     m_hasPictureAttributes = result.startsWith("OK:Yes");
 
     /* Operate in "poll" or "xon/xoff" mode */
-    m_poll_mode = ProcessCommand("FlowControl?", 2500, result) &&
+    m_poll_mode = ProcessCommand("FlowControl?", 500, result) &&
                   result.startsWith("OK:Poll");
 
     LOG(VB_RECORD, LOG_INFO, LOC + "App opened successfully");
@@ -868,7 +868,7 @@ bool ExternalStreamHandler::OpenApp(void)
         );
 
     /* Let the external app know how many bytes will read without blocking */
-    ProcessCommand(QString("BlockSize:%1").arg(PACKET_SIZE), 2500, result);
+    ProcessCommand(QString("BlockSize:%1").arg(PACKET_SIZE), 500, result);
 
     return true;
 }
@@ -883,7 +883,7 @@ bool ExternalStreamHandler::IsAppOpen(void)
     }
 
     QString result;
-    return ProcessCommand("Version?", 10000, result);
+    return ProcessCommand("Version?", 500, result, 10, 10);
 }
 
 bool ExternalStreamHandler::IsTSOpen(void)
@@ -893,7 +893,7 @@ bool ExternalStreamHandler::IsTSOpen(void)
 
     QString result;
 
-    if (!ProcessCommand("IsOpen?", 2500, result))
+    if (!ProcessCommand("IsOpen?", 1000, result))
         return false;
 
     m_tsopen = true;
@@ -909,7 +909,7 @@ void ExternalStreamHandler::CloseApp(void)
 
         LOG(VB_RECORD, LOG_INFO, LOC + "CloseRecorder");
         m_IO_lock.unlock();
-        ProcessCommand("CloseRecorder", 30000, result);
+        ProcessCommand("CloseRecorder", 1000, result, 10, 3);
         m_IO_lock.lock();
 
         if (!result.startsWith("OK"))
@@ -1008,7 +1008,7 @@ bool ExternalStreamHandler::StartStreaming(void)
 
     if (StreamingCount() == 0)
     {
-        if (!ProcessCommand("StartStreaming", 15000, result))
+        if (!ProcessCommand("StartStreaming", 1000, result, 10, 5))
         {
             LogLevel_t level = LOG_ERR;
             if (!result.toLower().startsWith("warn"))
@@ -1069,7 +1069,7 @@ bool ExternalStreamHandler::StopStreaming(void)
         return false;
     }
 
-    if (!ProcessCommand("StopStreaming", 15000, result))
+    if (!ProcessCommand("StopStreaming", 1000, result, 10, 5))
     {
         LogLevel_t level = LOG_ERR;
         if (!result.toLower().startsWith("warn"))
