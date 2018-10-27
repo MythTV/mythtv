@@ -281,6 +281,12 @@ void ChannelScanner::Scan(
             "ScanCurrentTransport(" + sistandard + ")");
         ok = sigmonScanner->ScanCurrentTransport(sistandard);
     }
+    else if (ScanTypeSetting::ExternRecImport == scantype)
+    {
+        LOG(VB_CHANSCAN, LOG_INFO, LOC +
+            "Importing channels from External Recorder");
+        ok = ImportExternRecorder(cardid, inputname, sourceid);
+    }
 
     if (!ok)
     {

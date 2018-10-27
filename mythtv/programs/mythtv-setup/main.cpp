@@ -505,6 +505,8 @@ int main(int argc, char *argv[])
                 scantype = ScanTypeSetting::IPTVImportMPTS;
                 scanner.ImportM3U(scanCardId, scanInputName, sourceid, true);
             }
+            else if (frequencyStandard == "extern")
+                scantype = ScanTypeSetting::ExternRecImport;
             else
                 scantype = ScanTypeSetting::FullScan_ATSC;
 
