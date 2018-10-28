@@ -259,7 +259,16 @@ void StandardSetting::setName(const QString &name)
 
 StandardSetting* StandardSetting::byName(const QString &name)
 {
-    return (name == m_name) ? this : nullptr;
+    if (name == m_name)
+        return this;
+
+    foreach (StandardSetting *setting, *getSubSettings())
+    {
+        StandardSetting *s = setting->byName(name);
+        if (s)
+            return s;
+    }
+    return nullptr;
 }
 
 void StandardSetting::MoveToThread(QThread *thread)
@@ -299,17 +308,6 @@ void GroupSetting::updateButton(MythUIButtonListItem *item)
     item->SetText(m_settingValue, "value");
     item->SetText(getHelpText(), "description");
     item->setDrawArrow(haveSubSettings());
-}
-
-StandardSetting* GroupSetting::byName(const QString &name)
-{
-    foreach (StandardSetting *setting, *getSubSettings())
-    {
-        StandardSetting *s = setting->byName(name);
-        if (s)
-            return s;
-    }
-    return nullptr;
 }
 
 ButtonStandardSetting::ButtonStandardSetting(const QString &label)

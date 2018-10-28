@@ -37,7 +37,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
 
     virtual void setName(const QString &str);
     QString getName(void) const { return m_name; }
-    virtual StandardSetting * byName(const QString &name);
+    StandardSetting * byName(const QString &name);
 
     bool isVisible(void) const { return m_visible; };
     bool isEnabled() const { return m_enabled; }
@@ -405,7 +405,6 @@ class MPUBLIC GroupSetting : public StandardSetting
     void resultEdit(DialogCompletionEvent *) override {} // StandardSetting
     virtual void applyChange() {}
     void updateButton(MythUIButtonListItem *item) override; // StandardSetting
-    StandardSetting* byName(const QString &name) override; // StandardSetting
     virtual bool canDelete(void) {return false;}
     virtual void deleteEntry(void) {}
 };
