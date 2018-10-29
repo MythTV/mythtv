@@ -46,7 +46,8 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
     QString result;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
-    m_stream_handler = ExternalStreamHandler::Get(_channel->GetDevice());
+    m_stream_handler = ExternalStreamHandler::Get(channel->GetDevice(),
+                                                  channel->GetInputID());
     if (!m_stream_handler || m_stream_handler->HasError())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
     else
@@ -60,7 +61,7 @@ ExternalSignalMonitor::~ExternalSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    ExternalStreamHandler::Return(m_stream_handler);
+    ExternalStreamHandler::Return(m_stream_handler, channel->GetInputID());
 }
 
 /** \fn ExternalSignalMonitor::Stop(void)

@@ -59,7 +59,7 @@ bool HDHRChannel::Open(void)
     if (IsOpen())
         return true;
 
-    _stream_handler = HDHRStreamHandler::Get(_device_id);
+    _stream_handler = HDHRStreamHandler::Get(_device_id, GetInputID());
 
     _tuner_types = _stream_handler->GetTunerTypes();
     tunerType = (_tuner_types.empty()) ?
@@ -81,7 +81,7 @@ void HDHRChannel::Close(void)
     if (!IsOpen())
         return; // this caller didn't have it open in the first place..
 
-    HDHRStreamHandler::Return(_stream_handler);
+    HDHRStreamHandler::Return(_stream_handler, GetInputID());
 }
 
 bool HDHRChannel::EnterPowerSavingMode(void)

@@ -28,8 +28,7 @@
 #include "cardutil.h"
 #include "exitcodes.h"
 
-#define LOC QString("ExternalRec%1(%2): ").arg(_recorder_ids_string) \
-                                          .arg(_device)
+#define LOC QString("ExternalRec[%1](%2): ").arg(_inputid).arg(_device)
 
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
@@ -461,7 +460,7 @@ QMap<QString,uint>              ExternalStreamHandler::m_handlers_refcnt;
 QMutex                          ExternalStreamHandler::m_handlers_lock;
 
 ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
-                                                  int recorder_id)
+                                                  int inputid)
 {
     QMutexLocker locker(&m_handlers_lock);
 
@@ -471,29 +470,29 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
 
     if (it == m_handlers.end())
     {
-        ExternalStreamHandler *newhandler = new ExternalStreamHandler(devname);
+        ExternalStreamHandler *newhandler =
+            new ExternalStreamHandler(devname, inputid);
         m_handlers[devkey] = newhandler;
         m_handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("ExternSH: Creating new stream handler %1 for %2")
-                .arg(devkey).arg(devname));
+            QString("ExternSH[%1]: Creating new stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(devname));
     }
     else
     {
         m_handlers_refcnt[devkey]++;
         uint rcount = m_handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("ExternSH: Using existing stream handler for %1")
-                .arg(devkey) + QString(" (%1 in use)").arg(rcount));
+            QString("ExternSH[%1]: Using existing stream handler for %2")
+            .arg(inputid).arg(devkey) + QString(" (%1 in use)").arg(rcount));
     }
 
-    m_handlers[devkey]->AddRecorderId(recorder_id);
     return m_handlers[devkey];
 }
 
 void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
-                                   int recorder_id)
+                                   int inputid)
 {
     QMutexLocker locker(&m_handlers_lock);
 
@@ -505,11 +504,9 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
 
     QMap<QString, ExternalStreamHandler*>::iterator it =
         m_handlers.find(devname);
-    if (it != m_handlers.end())
-        (*it)->DelRecorderId(recorder_id);
 
-    LOG(VB_RECORD, LOG_INFO, QString("ExternSH: Return '%1' in use %2")
-        .arg(devname).arg(*rit));
+    LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Return '%2' in use %3")
+        .arg(inputid).arg(devname).arg(*rit));
 
     if (*rit > 1)
     {
@@ -520,16 +517,16 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
 
     if ((it != m_handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("ExternSH: Closing handler for %1")
-                           .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         delete *it;
         m_handlers.erase(it);
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("ExternSH: Error: Couldn't find handler for %1")
-                .arg(devname));
+            QString("ExternSH[%1]: Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
     m_handlers_refcnt.erase(rit);
@@ -540,8 +537,8 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
   ExternalStreamHandler
  */
 
-ExternalStreamHandler::ExternalStreamHandler(const QString & path)
-    : StreamHandler(path)
+ExternalStreamHandler::ExternalStreamHandler(const QString & path, int inputid)
+    : StreamHandler(path, inputid)
     , m_IO(nullptr)
     , m_tsopen(false)
     , m_io_errcnt(0)

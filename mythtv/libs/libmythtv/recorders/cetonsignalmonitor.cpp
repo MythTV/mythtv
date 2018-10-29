@@ -43,7 +43,8 @@ CetonSignalMonitor::CetonSignalMonitor(int db_cardnum,
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = CetonStreamHandler::Get(_channel->GetDevice());
+    streamHandler = CetonStreamHandler::Get(channel->GetDevice(),
+                                            channel->GetInputID());
 }
 
 /** \fn CetonSignalMonitor::~CetonSignalMonitor()
@@ -53,7 +54,7 @@ CetonSignalMonitor::~CetonSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    CetonStreamHandler::Return(streamHandler);
+    CetonStreamHandler::Return(streamHandler, channel->GetInputID());
 }
 
 /** \fn CetonSignalMonitor::Stop(void)

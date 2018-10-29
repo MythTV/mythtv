@@ -26,11 +26,12 @@ class V4L2encStreamHandler : public StreamHandler
     enum constants {PACKET_SIZE = 188 * 32768};
 
   public:
-    static V4L2encStreamHandler *Get(const QString &devicename, int audioinput);
-    static void Return(V4L2encStreamHandler * & ref);
+    static V4L2encStreamHandler *Get(const QString &devicename, int audioinput,
+                                     int inputid);
+    static void Return(V4L2encStreamHandler * & ref, int inputid);
 
   public:
-    V4L2encStreamHandler(const QString & path, int audio_input);
+    V4L2encStreamHandler(const QString & path, int audio_input, int inputid);
     ~V4L2encStreamHandler(void);
 
     void run(void) override; // MThread

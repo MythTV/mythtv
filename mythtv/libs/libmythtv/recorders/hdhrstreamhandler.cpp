@@ -19,15 +19,14 @@
 #include "cardutil.h"
 #include "mythlogging.h"
 
-#define LOC      QString("HDHRSH%1(%2): ").arg(_recorder_ids_string) \
-                                          .arg(_device)
+#define LOC      QString("HDHRSH[%1](%2): ").arg(_inputid).arg(_device)
 
 QMap<QString,HDHRStreamHandler*> HDHRStreamHandler::_handlers;
 QMap<QString,uint>               HDHRStreamHandler::_handlers_refcnt;
 QMutex                           HDHRStreamHandler::_handlers_lock;
 
 HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
-                                          int recorder_id)
+                                          int inputid)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -37,30 +36,29 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
 
     if (it == _handlers.end())
     {
-        HDHRStreamHandler *newhandler = new HDHRStreamHandler(devkey);
+        HDHRStreamHandler *newhandler = new HDHRStreamHandler(devkey, inputid);
         newhandler->Open();
         _handlers[devkey] = newhandler;
         _handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("HDHRSH: Creating new stream handler %1 for %2")
-                .arg(devkey).arg(devname));
+            QString("HDHRSH[%1]: Creating new stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(devname));
     }
     else
     {
         _handlers_refcnt[devkey]++;
         uint rcount = _handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("HDHRSH: Using existing stream handler %1 for %2")
-                .arg(devkey)
-                .arg(devname) + QString(" (%1 in use)").arg(rcount));
+            QString("HDHRSH[%1]: Using existing stream handler %2 for %3")
+            .arg(inputid).arg(devkey)
+            .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    _handlers[devkey]->AddRecorderId(recorder_id);
     return _handlers[devkey];
 }
 
-void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int recorder_id)
+void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -71,9 +69,6 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int recorder_id)
         return;
 
     QMap<QString,HDHRStreamHandler*>::iterator it = _handlers.find(devname);
-    if (it != _handlers.end())
-        (*it)->DelRecorderId(recorder_id);
-
     if (*rit > 1)
     {
         ref = nullptr;
@@ -83,8 +78,8 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int recorder_id)
 
     if ((it != _handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("HDHRSH: Closing handler for %1")
-                           .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("HDHRSH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         ref->Close();
         delete *it;
         _handlers.erase(it);
@@ -92,20 +87,20 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int recorder_id)
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("HDHRSH Error: Couldn't find handler for %1")
-                .arg(devname));
+            QString("HDHRSH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
     _handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
-HDHRStreamHandler::HDHRStreamHandler(const QString &device) :
-    StreamHandler(device),
-    _hdhomerun_device(nullptr),
-    _tuner(-1),
-    _tune_mode(hdhrTuneModeNone),
-    _hdhr_lock(QMutex::Recursive)
+HDHRStreamHandler::HDHRStreamHandler(const QString &device, int inputid)
+    : StreamHandler(device, inputid)
+    , _hdhomerun_device(nullptr)
+    , _tuner(-1)
+    , _tune_mode(hdhrTuneModeNone)
+    , _hdhr_lock(QMutex::Recursive)
 {
     setObjectName("HDHRStreamHandler");
 }

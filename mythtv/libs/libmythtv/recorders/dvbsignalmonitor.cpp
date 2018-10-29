@@ -108,7 +108,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     if (minimum_update_rate > 30)
         usleep(minimum_update_rate * 1000);
 
-    streamHandler = DVBStreamHandler::Get(_channel->GetCardNum());
+    streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(),
+                                          channel->GetInputID());
 }
 
 /** \fn DVBSignalMonitor::~DVBSignalMonitor()
@@ -117,7 +118,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 DVBSignalMonitor::~DVBSignalMonitor()
 {
     Stop();
-    DVBStreamHandler::Return(streamHandler);
+    DVBStreamHandler::Return(streamHandler, channel->GetInputID());
 }
 
 // documented in dtvsignalmonitor.h

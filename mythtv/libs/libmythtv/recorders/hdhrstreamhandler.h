@@ -49,9 +49,8 @@ enum HDHRTuneMode {
 class HDHRStreamHandler : public StreamHandler
 {
   public:
-    static HDHRStreamHandler *Get(const QString &devicename,
-                                  int recorder_id = -1);
-    static void Return(HDHRStreamHandler * & ref, int recorder_id = -1);
+    static HDHRStreamHandler *Get(const QString &devicename, int inputid);
+    static void Return(HDHRStreamHandler * & ref, int inputid);
 
     void AddListener(MPEGStreamData *data,
                      bool /*allow_section_reader*/ = false,
@@ -72,7 +71,7 @@ class HDHRStreamHandler : public StreamHandler
     bool EnterPowerSavingMode(void);
 
   private:
-    explicit HDHRStreamHandler(const QString &);
+    explicit HDHRStreamHandler(const QString &, int inputid);
 
     bool Connect(void);
 

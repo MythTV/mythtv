@@ -51,7 +51,8 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = HDHRStreamHandler::Get(_channel->GetDevice());
+    streamHandler = HDHRStreamHandler::Get(channel->GetDevice(),
+                                           channel->GetInputID());
 }
 
 /** \fn HDHRSignalMonitor::~HDHRSignalMonitor()
@@ -61,7 +62,7 @@ HDHRSignalMonitor::~HDHRSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    HDHRStreamHandler::Return(streamHandler);
+    HDHRStreamHandler::Return(streamHandler, channel->GetInputID());
 }
 
 /** \fn HDHRSignalMonitor::Stop(void)

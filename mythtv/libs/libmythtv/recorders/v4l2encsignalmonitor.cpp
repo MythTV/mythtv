@@ -68,7 +68,8 @@ V4L2encSignalMonitor::~V4L2encSignalMonitor()
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
     if (m_stream_handler)
-        V4L2encStreamHandler::Return(m_stream_handler);
+        V4L2encStreamHandler::Return(m_stream_handler,
+                                     channel->GetInputID());
 }
 
 /** \fn V4L2encSignalMonitor::Stop(void)
@@ -145,7 +146,8 @@ void V4L2encSignalMonitor::UpdateValues(void)
         V4LChannel* chn = reinterpret_cast<V4LChannel*>(channel);
         m_stream_handler =
             V4L2encStreamHandler::Get(chn->GetDevice(),
-                                      chn->GetAudioDevice().toInt());
+                                      chn->GetAudioDevice().toInt(),
+                                      channel->GetInputID());
         if (!m_stream_handler || m_stream_handler->HasError())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +

@@ -69,11 +69,8 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     virtual void RemoveNamedOutputFile(const QString &filename);
 
   protected:
-    explicit StreamHandler(const QString &device);
+    explicit StreamHandler(const QString &device, int inputid);
     ~StreamHandler();
-
-    void AddRecorderId(int id);
-    void DelRecorderId(int id);
 
     void Start(void);
     void Stop(void);
@@ -110,8 +107,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
 
   protected:
     QString           _device;
-    QSet<int>         _recorder_ids;
-    QString           _recorder_ids_string;
+    int               _inputid;
     bool              _needs_buffering;
     bool              _allow_section_reader;
 

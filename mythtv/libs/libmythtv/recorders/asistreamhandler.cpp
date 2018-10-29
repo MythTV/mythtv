@@ -24,15 +24,14 @@
 #include <dveo/asi.h>
 #include <dveo/master.h>
 
-#define LOC      QString("ASISH%1(%2): ").arg(_recorder_ids_string) \
-                                         .arg(_device)
+#define LOC      QString("ASISH[%1](%2): ").arg(_inputid).arg(_device)
 
 QMap<QString,ASIStreamHandler*> ASIStreamHandler::_handlers;
 QMap<QString,uint>              ASIStreamHandler::_handlers_refcnt;
 QMutex                          ASIStreamHandler::_handlers_lock;
 
 ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
-                                        int recorder_id)
+                                        int inputid)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -42,30 +41,29 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
 
     if (it == _handlers.end())
     {
-        ASIStreamHandler *newhandler = new ASIStreamHandler(devname);
+        ASIStreamHandler *newhandler = new ASIStreamHandler(devname, inputid);
         newhandler->Open();
         _handlers[devkey] = newhandler;
         _handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("ASISH: Creating new stream handler %1 for %2")
-                .arg(devkey).arg(devname));
+            QString("ASISH[%1]: Creating new stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(devname));
     }
     else
     {
         _handlers_refcnt[devkey]++;
         uint rcount = _handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("ASISH: Using existing stream handler %1 for %2")
-                .arg(devkey)
-                .arg(devname) + QString(" (%1 in use)").arg(rcount));
+            QString("ASISH[%1]: Using existing stream handler %2 for %3")
+            .arg(inputid).arg(devkey)
+            .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    _handlers[devkey]->AddRecorderId(recorder_id);
     return _handlers[devkey];
 }
 
-void ASIStreamHandler::Return(ASIStreamHandler * & ref, int recorder_id)
+void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -76,8 +74,6 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int recorder_id)
         return;
 
     QMap<QString,ASIStreamHandler*>::iterator it = _handlers.find(devname);
-    if (it != _handlers.end())
-        (*it)->DelRecorderId(recorder_id);
 
     if (*rit > 1)
     {
@@ -88,8 +84,8 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int recorder_id)
 
     if ((it != _handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("ASISH: Closing handler for %1")
-                           .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("ASISH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         ref->Close();
         delete *it;
         _handlers.erase(it);
@@ -97,19 +93,21 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int recorder_id)
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("ASISH Error: Couldn't find handler for %1")
-                .arg(devname));
+            QString("ASISH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
     _handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
-ASIStreamHandler::ASIStreamHandler(const QString &device) :
-    StreamHandler(device),
-    _device_num(-1), _buf_size(-1), _fd(-1),
-    _packet_size(TSPacket::kSize), _clock_source(kASIInternalClock),
-    _rx_mode(kASIRXSyncOnActualConvertTo188), _drb(nullptr)
+ASIStreamHandler::ASIStreamHandler(const QString &device, int inputd)
+    : StreamHandler(device, inputid)
+    , _device_num(-1), _buf_size(-1), _fd(-1)
+    , _packet_size(TSPacket::kSize)
+    , _clock_source(kASIInternalClock)
+    , _rx_mode(kASIRXSyncOnActualConvertTo188)
+    , _drb(nullptr)
 {
     setObjectName("ASISH");
 }

@@ -24,11 +24,11 @@ class HLSReader;
 class HLSStreamHandler : public IPTVStreamHandler
 {
   public:
-    static HLSStreamHandler* Get(const IPTVTuningData& tuning);
-    static void Return(HLSStreamHandler* & ref);
+    static HLSStreamHandler* Get(const IPTVTuningData& tuning, int inputid);
+    static void Return(HLSStreamHandler* & ref, int inputid);
 
   protected:
-    explicit HLSStreamHandler(const IPTVTuningData &tuning);
+    explicit HLSStreamHandler(const IPTVTuningData &tuning, int inputid);
     virtual ~HLSStreamHandler(void);
 
     void run(void) override; // MThread

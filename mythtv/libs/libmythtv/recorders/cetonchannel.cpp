@@ -32,7 +32,7 @@ bool CetonChannel::Open(void)
     if (IsOpen())
         return true;
 
-    _stream_handler = CetonStreamHandler::Get(_device_id);
+    _stream_handler = CetonStreamHandler::Get(_device_id, GetInputID());
 
     tunerType = DTVTunerType::kTunerTypeATSC;
     _tuner_types.push_back(tunerType);
@@ -53,7 +53,7 @@ void CetonChannel::Close(void)
     if (!IsOpen())
         return; // this caller didn't have it open in the first place..
 
-    CetonStreamHandler::Return(_stream_handler);
+    CetonStreamHandler::Return(_stream_handler, GetInputID());
 }
 
 bool CetonChannel::EnterPowerSavingMode(void)

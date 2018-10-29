@@ -8,26 +8,23 @@
 #define O_LARGEFILE 0
 #endif
 
-#define LOC      QString("SH%1(%2): ").arg(_recorder_ids_string) \
-                                      .arg(_device)
+#define LOC      QString("SH[%1](%2): ").arg(_inputid).arg(_device)
 
-StreamHandler::StreamHandler(const QString &device) :
-    MThread("StreamHandler"),
-    _device(device),
-    _needs_buffering(false),
-    _allow_section_reader(false),
-
-    _running_desired(false),
-    _error(false),
-    _running(false),
-    _using_buffering(false),
-    _using_section_reader(false),
-
-    _pid_lock(QMutex::Recursive),
-    _open_pid_filters(0),
-    _mpts_tfw(nullptr),
-
-    _listener_lock(QMutex::Recursive)
+StreamHandler::StreamHandler(const QString &device, int inputid)
+    : MThread("StreamHandler")
+    , _device(device)
+    , _inputid(inputid)
+    , _needs_buffering(false)
+    , _allow_section_reader(false)
+    , _running_desired(false)
+    , _error(false)
+    , _running(false)
+    , _using_buffering(false)
+    , _using_section_reader(false)
+    , _pid_lock(QMutex::Recursive)
+    , _open_pid_filters(0)
+    , _mpts_tfw(nullptr)
+    , _listener_lock(QMutex::Recursive)
 {
 }
 
@@ -47,27 +44,6 @@ StreamHandler::~StreamHandler()
     // This should never be triggered.. just to be safe..
     if (_running)
         Stop();
-}
-
-void StreamHandler::AddRecorderId(int id)
-{
-    if (id < 0)
-        return;
-
-    _recorder_ids_string.clear();
-    _recorder_ids.insert(id);
-    foreach (const int &value, _recorder_ids)
-        _recorder_ids_string += QString("[%1]").arg(value);
-}
-
-void StreamHandler::DelRecorderId(int id)
-{
-    if (id < 0)
-        return;
-    _recorder_ids.remove(id);
-    _recorder_ids_string.clear();
-    foreach (const int &value, _recorder_ids)
-        _recorder_ids_string += QString("[%1]").arg(value);
 }
 
 void StreamHandler::AddListener(MPEGStreamData *data,

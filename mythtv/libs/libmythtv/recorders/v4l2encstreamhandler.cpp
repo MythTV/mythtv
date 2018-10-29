@@ -49,14 +49,14 @@ const int V4L2encStreamHandler::m_audio_rateL3[] =
     32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
 };
 
-#define LOC      QString("V4L2SH(%1): ").arg(_device)
+#define LOC      QString("V4L2SH[%1](%2): ").arg(_inputid).arg(_device)
 
 QMap<QString,V4L2encStreamHandler*> V4L2encStreamHandler::m_handlers;
 QMap<QString,uint>              V4L2encStreamHandler::m_handlers_refcnt;
 QMutex                          V4L2encStreamHandler::m_handlers_lock;
 
 V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
-                                                int audioinput)
+                                                int audioinput, int inputid)
 {
     QMutexLocker locker(&m_handlers_lock);
 
@@ -67,28 +67,29 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
     if (it == m_handlers.end())
     {
         V4L2encStreamHandler *newhandler = new V4L2encStreamHandler(devname,
-                                                                    audioinput);
+                                                                    audioinput,
+                                                                    inputid);
 
         m_handlers[devkey] = newhandler;
         m_handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("V4L2SH: Creating new stream handler for %1")
-            .arg(devname));
+            QString("V4L2SH[%1]: Creating new stream handler for %2")
+            .arg(inputid).arg(devname));
     }
     else
     {
         m_handlers_refcnt[devkey]++;
         uint rcount = m_handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("V4L2SH: Using existing stream handler for %1")
-            .arg(devkey) + QString(" (%1 in use)").arg(rcount));
+            QString("V4L2SH[%1]: Using existing stream handler for %2")
+            .arg(inputid).arg(devkey) + QString(" (%1 in use)").arg(rcount));
     }
 
     return m_handlers[devkey];
 }
 
-void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref)
+void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&m_handlers_lock);
 
@@ -98,8 +99,8 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref)
     if (rit == m_handlers_refcnt.end())
         return;
 
-    LOG(VB_RECORD, LOG_INFO, QString("V4L2SH: Return '%1' in use %2")
-        .arg(devname).arg(*rit));
+    LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Return '%2' in use %3")
+        .arg(inputid).arg(devname).arg(*rit));
 
     if (*rit > 1)
     {
@@ -112,16 +113,16 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref)
         m_handlers.find(devname);
     if ((it != m_handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("V4L2SH: Closing handler for %1")
-            .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         delete *it;
         m_handlers.erase(it);
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("V4L2SH: Error: Couldn't find handler for %1")
-            .arg(devname));
+            QString("V4L2SH[%1]: Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
     m_handlers_refcnt.erase(rit);
@@ -139,28 +140,43 @@ bool V4L2encStreamHandler::Status(bool &failed, bool &failing)
 }
 
 V4L2encStreamHandler::V4L2encStreamHandler(const QString & device,
-                                           int audio_input) :
-    StreamHandler(device),          m_failing(false),
-    m_hasTuner(false),              m_hasPictureAttributes(false),
-    m_bufferSize(1000 * TSPacket::kSize), m_desired_stream_type(-1),
-    m_stream_type(-1),              m_aspect_ratio(-1),
-    m_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_bitrate(-1),                  m_max_bitrate(-1),
-    m_audio_codec(-1),              m_audio_samplerate(-1),
-    m_audio_bitrateL1(-1),          m_audio_bitrateL2(-1),
-    m_audio_bitrateL3(-1),          m_audio_volume(-1),
-    m_lang_mode(-1),
-    m_low_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_low_bitrate(-1),              m_low_peak_bitrate(-1),
-    m_medium_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_medium_bitrate(-1),           m_medium_peak_bitrate(-1),
-    m_high_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR),
-    m_high_bitrate(-1),             m_high_peak_bitrate(-1),
-    m_fd(-1),                       m_audio_input(audio_input),
-    m_width(-1),                    m_height(-1),
-    m_has_lock(false),              m_signal_strength(-1),
-    m_drb(nullptr),
-    m_streaming_cnt(0),             m_pause_encoding_allowed(true)
+                                           int audio_input, int inputid)
+    : StreamHandler(device, inputid)
+    , m_failing(false)
+    , m_hasTuner(false)
+    , m_hasPictureAttributes(false)
+    , m_bufferSize(1000 * TSPacket::kSize)
+    , m_desired_stream_type(-1)
+    , m_stream_type(-1)
+    , m_aspect_ratio(-1)
+    , m_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR)
+    , m_bitrate(-1)
+    , m_max_bitrate(-1)
+    , m_audio_codec(-1)
+    , m_audio_samplerate(-1)
+    , m_audio_bitrateL1(-1)
+    , m_audio_bitrateL2(-1)
+    , m_audio_bitrateL3(-1)
+    , m_audio_volume(-1)
+    , m_lang_mode(-1)
+    , m_low_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR)
+    , m_low_bitrate(-1)
+    , m_low_peak_bitrate(-1)
+    , m_medium_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR)
+    , m_medium_bitrate(-1)
+    , m_medium_peak_bitrate(-1)
+    , m_high_bitrate_mode(V4L2_MPEG_VIDEO_BITRATE_MODE_VBR)
+    , m_high_bitrate(-1)
+    , m_high_peak_bitrate(-1)
+    , m_fd(-1)
+    , m_audio_input(audio_input)
+    , m_width(-1)
+    , m_height(-1)
+    , m_has_lock(false)
+    , m_signal_strength(-1)
+    , m_drb(nullptr)
+    , m_streaming_cnt(0)
+    , m_pause_encoding_allowed(true)
 {
     setObjectName("V4L2encSH");
 

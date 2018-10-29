@@ -27,8 +27,7 @@
 #include "cardutil.h"
 #include "mythdownloadmanager.h"
 
-#define LOC QString("CetonSH%1(%2): ").arg(_recorder_ids_string) \
-                                      .arg(_device)
+#define LOC QString("CetonSH[%1](%2): ").arg(_inputid).arg(_device)
 
 QMap<QString,CetonStreamHandler*> CetonStreamHandler::_handlers;
 QMap<QString,uint>                CetonStreamHandler::_handlers_refcnt;
@@ -36,7 +35,7 @@ QMutex                            CetonStreamHandler::_handlers_lock;
 QMap<QString, bool>               CetonStreamHandler::_info_queried;
 
 CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
-                                            int recorder_id)
+                                            int inputid)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -46,30 +45,29 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
 
     if (it == _handlers.end())
     {
-        CetonStreamHandler *newhandler = new CetonStreamHandler(devkey);
+        CetonStreamHandler *newhandler = new CetonStreamHandler(devkey, inputid);
         newhandler->Open();
         _handlers[devkey] = newhandler;
         _handlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("CetonSH: Creating new stream handler %1 for %2")
-                .arg(devkey).arg(devname));
+            QString("CetonSH[%1]: Creating new stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(devname));
     }
     else
     {
         _handlers_refcnt[devkey]++;
         uint rcount = _handlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("CetonSH: Using existing stream handler %1 for %2")
-                .arg(devkey)
-                .arg(devname) + QString(" (%1 in use)").arg(rcount));
+            QString("CetonSH[%1]: Using existing stream handler %2 for %3")
+            .arg(inputid).arg(devkey)
+            .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    _handlers[devkey]->AddRecorderId(recorder_id);
     return _handlers[devkey];
 }
 
-void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
+void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&_handlers_lock);
 
@@ -80,8 +78,6 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
         return;
 
     QMap<QString,CetonStreamHandler*>::iterator it = _handlers.find(devname);
-    if (it != _handlers.end())
-        (*it)->DelRecorderId(recorder_id);
 
     if (*rit > 1)
     {
@@ -92,8 +88,8 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
 
     if ((it != _handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("CetonSH: Closing handler for %1")
-                           .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("CetonSH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         ref->Close();
         delete *it;
         _handlers.erase(it);
@@ -101,23 +97,24 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int recorder_id)
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("CetonSH Error: Couldn't find handler for %1")
-                .arg(devname));
+            QString("CetonSH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
     _handlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
-CetonStreamHandler::CetonStreamHandler(const QString &device) :
-    IPTVStreamHandler(IPTVTuningData("", 0, IPTVTuningData::kNone, "", 0, "", 0)),
-    _card(0),
-    _tuner(0),
-    _using_cablecard(false),
-    _connected(false),
-    _valid(false),
-    _last_frequency(0),
-    _last_program(0)
+CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
+    : IPTVStreamHandler(IPTVTuningData("", 0, IPTVTuningData::kNone,
+                                       "", 0, "", 0), inputid)
+    , _card(0)
+    , _tuner(0)
+    , _using_cablecard(false)
+    , _connected(false)
+    , _valid(false)
+    , _last_frequency(0)
+    , _last_program(0)
 {
     setObjectName("CetonStreamHandler");
 

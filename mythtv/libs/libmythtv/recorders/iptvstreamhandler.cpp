@@ -26,13 +26,14 @@
 #include "mythlogging.h"
 #include "cetonrtsp.h"
 
-#define LOC QString("IPTVSH(%1): ").arg(_device)
+#define LOC QString("IPTVSH[%1](%2): ").arg(_inputid).arg(_device)
 
 QMap<QString,IPTVStreamHandler*> IPTVStreamHandler::s_iptvhandlers;
 QMap<QString,uint>               IPTVStreamHandler::s_iptvhandlers_refcnt;
 QMutex                           IPTVStreamHandler::s_iptvhandlers_lock;
 
-IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning)
+IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning,
+                                          int inputid)
 {
     QMutexLocker locker(&s_iptvhandlers_lock);
 
@@ -42,29 +43,29 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning)
 
     if (it == s_iptvhandlers.end())
     {
-        IPTVStreamHandler *newhandler = new IPTVStreamHandler(tuning);
+        IPTVStreamHandler *newhandler = new IPTVStreamHandler(tuning, inputid);
         newhandler->Start();
         s_iptvhandlers[devkey] = newhandler;
         s_iptvhandlers_refcnt[devkey] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("IPTVSH: Creating new stream handler %1 for %2")
-            .arg(devkey).arg(tuning.GetDeviceName()));
+            QString("IPTVSH[%1]: Creating new stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()));
     }
     else
     {
         s_iptvhandlers_refcnt[devkey]++;
         uint rcount = s_iptvhandlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
-            QString("IPTVSH: Using existing stream handler %1 for %2")
-            .arg(devkey).arg(tuning.GetDeviceName()) +
+            QString("IPTVSH[%1]: Using existing stream handler %2 for %3")
+            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
     return s_iptvhandlers[devkey];
 }
 
-void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
+void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
 {
     QMutexLocker locker(&s_iptvhandlers_lock);
 
@@ -74,8 +75,8 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
     if (rit == s_iptvhandlers_refcnt.end())
         return;
 
-    LOG(VB_RECORD, LOG_INFO, QString("IPTVSH: Return(%1) has %2 handlers")
-        .arg(devname).arg(*rit));
+    LOG(VB_RECORD, LOG_INFO, QString("IPTVSH[%1]: Return(%2) has %3 handlers")
+        .arg(inputid).arg(devname).arg(*rit));
 
     if (*rit > 1)
     {
@@ -87,8 +88,8 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
     QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devname);
     if ((it != s_iptvhandlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("IPTVSH: Closing handler for %1")
-                           .arg(devname));
+        LOG(VB_RECORD, LOG_INFO, QString("IPTVSH[%1]: Closing handler for %2")
+            .arg(inputid).arg(devname));
         ref->Stop();
         delete *it;
         s_iptvhandlers.erase(it);
@@ -96,22 +97,22 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref)
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("IPTVSH Error: Couldn't find handler for %1")
-                .arg(devname));
+            QString("IPTVSH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
     }
 
     s_iptvhandlers_refcnt.erase(rit);
     ref = nullptr;
 }
 
-IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning) :
-    StreamHandler(tuning.GetDeviceKey()),
-    m_tuning(tuning),
-    m_write_helper(nullptr),
-    m_buffer(nullptr),
-    m_rtsp_rtp_port(0),
-    m_rtsp_rtcp_port(0),
-    m_rtsp_ssrc(0)
+IPTVStreamHandler::IPTVStreamHandler(const IPTVTuningData &tuning, int inputid)
+    : StreamHandler(tuning.GetDeviceKey(), inputid)
+    , m_tuning(tuning)
+    , m_write_helper(nullptr)
+    , m_buffer(nullptr)
+    , m_rtsp_rtp_port(0)
+    , m_rtsp_rtcp_port(0)
+    , m_rtsp_ssrc(0)
 {
     memset(m_sockets, 0, sizeof(m_sockets));
     memset(m_read_helpers, 0, sizeof(m_read_helpers));

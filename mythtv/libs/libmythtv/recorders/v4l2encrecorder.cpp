@@ -245,7 +245,8 @@ bool V4L2encRecorder::Open(void)
 // ??    ResetForNewFile();
 
     m_stream_handler = V4L2encStreamHandler::Get(m_channel->GetDevice(),
-                                            m_channel->GetAudioDevice().toInt());
+                                         m_channel->GetAudioDevice().toInt(),
+                                         tvrec ? tvrec->GetInputId() : -1);
     if (!m_stream_handler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -258,7 +259,8 @@ bool V4L2encRecorder::Open(void)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Open() -- Failed to open recorder: %1")
             .arg(m_stream_handler->ErrorString()));
-        V4L2encStreamHandler::Return(m_stream_handler);
+        V4L2encStreamHandler::Return(m_stream_handler,
+                                     tvrec ? tvrec->GetInputId() : -1);
         return false;
     }
 
@@ -273,7 +275,8 @@ void V4L2encRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- begin");
 
     if (IsOpen())
-        V4L2encStreamHandler::Return(m_stream_handler);
+        V4L2encStreamHandler::Return(m_stream_handler,
+                                     tvrec ? tvrec->GetInputId() : -1);
 
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");

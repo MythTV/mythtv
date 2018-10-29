@@ -32,8 +32,7 @@ class IPTVStreamHandlerReadHelper : QObject
     Q_OBJECT
 
   public:
-    IPTVStreamHandlerReadHelper(
-        IPTVStreamHandler *p, QUdpSocket *s, uint stream);
+    IPTVStreamHandlerReadHelper(IPTVStreamHandler *p, QUdpSocket *s, uint stream);
 
   public slots:
     void ReadPending(void);
@@ -79,8 +78,8 @@ class IPTVStreamHandler : public StreamHandler
     friend class IPTVStreamHandlerReadHelper;
     friend class IPTVStreamHandlerWriteHelper;
   public:
-    static IPTVStreamHandler *Get(const IPTVTuningData &tuning);
-    static void Return(IPTVStreamHandler * & ref);
+    static IPTVStreamHandler *Get(const IPTVTuningData &tuning, int inputid);
+    static void Return(IPTVStreamHandler * & ref, int inputid);
 
     void AddListener(MPEGStreamData *data,
                      bool /*allow_section_reader*/ = false,
@@ -92,7 +91,7 @@ class IPTVStreamHandler : public StreamHandler
     }
 
   protected:
-    explicit IPTVStreamHandler(const IPTVTuningData &tuning);
+    explicit IPTVStreamHandler(const IPTVTuningData &tuning, int inputid);
 
     void run(void) override; // MThread
 

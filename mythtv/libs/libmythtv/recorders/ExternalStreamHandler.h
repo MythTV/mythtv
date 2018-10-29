@@ -65,11 +65,11 @@ class ExternalStreamHandler : public StreamHandler
 
   public:
     static ExternalStreamHandler *Get(const QString &devicename,
-                                      int recorder_id = -1);
-    static void Return(ExternalStreamHandler * & ref, int recorder_id = -1);
+                                      int inputid);
+    static void Return(ExternalStreamHandler * & ref, int inputid);
 
   public:
-    explicit ExternalStreamHandler(const QString & path);
+    explicit ExternalStreamHandler(const QString & path, int inputid);
     ~ExternalStreamHandler(void) { CloseApp(); }
 
     void run(void) override; // MThread

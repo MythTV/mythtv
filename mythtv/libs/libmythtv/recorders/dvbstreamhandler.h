@@ -33,9 +33,8 @@ class DVBPIDInfo : public PIDInfo
 class DVBStreamHandler : public StreamHandler
 {
   public:
-    static DVBStreamHandler *Get(const QString &dvb_device,
-                                 int recorder_id = -1);
-    static void Return(DVBStreamHandler * & ref, int recorder_id = -1);
+    static DVBStreamHandler *Get(const QString &dvb_device, int inputid);
+    static void Return(DVBStreamHandler * & ref, int inputid);
 
     // DVB specific
 
@@ -48,7 +47,7 @@ class DVBStreamHandler : public StreamHandler
                           DVBChannel       *dvbchan);
 
   private:
-    explicit DVBStreamHandler(const QString &);
+    explicit DVBStreamHandler(const QString &, int inputid);
 
     void run(void) override; // MThread
     void RunTS(void);
