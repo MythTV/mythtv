@@ -21,14 +21,11 @@ void MythExternRecorderCommandLineParser::LoadArguments(void)
     addVersion();
     addLogging();
 
-#if 0
-    add(QStringList(QStringList() << "--conf"),
-        "conf", "", "Path to a configuration file in INI format.", "")
-        ->SetGroup("ExternalRecorder");
-#else
     add("--conf", "conf", "", "Path to a configuration file in INI format.", "")
         ->SetGroup("ExternalRecorder");
-#endif
+
+    add("--inputid", "inputid", "", "MythTV input this app is attached to.", "")
+        ->SetGroup("ExternalRecorder");
 
     add(QStringList(QStringList() << "--exec"),
         "exec", false,

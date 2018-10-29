@@ -23,6 +23,9 @@ void MythFileRecorderCommandLineParser::LoadArguments(void)
 
     addInFile();
 
+    add("--inputid", "inputid", "", "MythTV input this app is attached to.", "")
+        ->SetGroup("ExternalRecorder");
+
     add(QStringList(QStringList() << "--noloop"),
         "noloop", false,
         "Don't loop input back to beginning on EOF.", "");

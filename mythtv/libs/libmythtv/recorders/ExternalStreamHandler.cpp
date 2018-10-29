@@ -464,7 +464,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&m_handlers_lock);
 
-    QString devkey = devname;
+    QString devkey = QString("[%1]%2").arg(inputid).arg(devname);
 
     QMap<QString,ExternalStreamHandler*>::iterator it = m_handlers.find(devkey);
 
@@ -497,16 +497,17 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     QMutexLocker locker(&m_handlers_lock);
 
     QString devname = ref->_device;
+    QString devkey = QString("[%1]%2").arg(inputid).arg(devname);
 
-    QMap<QString,uint>::iterator rit = m_handlers_refcnt.find(devname);
+    QMap<QString,uint>::iterator rit = m_handlers_refcnt.find(devkey);
     if (rit == m_handlers_refcnt.end())
         return;
 
     QMap<QString, ExternalStreamHandler*>::iterator it =
-        m_handlers.find(devname);
+        m_handlers.find(devkey);
 
     LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Return '%2' in use %3")
-        .arg(inputid).arg(devname).arg(*rit));
+        .arg(inputid).arg(devkey).arg(*rit));
 
     if (*rit > 1)
     {
@@ -518,7 +519,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     if ((it != m_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Closing handler for %2")
-            .arg(inputid).arg(devname));
+            .arg(inputid).arg(devkey));
         delete *it;
         m_handlers.erase(it);
     }
@@ -526,7 +527,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("ExternSH[%1]: Error: Couldn't find handler for %2")
-            .arg(inputid).arg(devname));
+            .arg(inputid).arg(devkey));
     }
 
     m_handlers_refcnt.erase(rit);
@@ -554,6 +555,7 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path, int inputid)
              logPropagateArgs.split(' ', QString::SkipEmptyParts);
     m_app = m_args.first();
     m_args.removeFirst();
+    m_args << "--inputid" << QString::number(inputid);
     LOG(VB_RECORD, LOG_INFO, LOC + QString("args \"%1\"")
         .arg(m_args.join(" ")));
 
@@ -833,10 +835,14 @@ bool ExternalStreamHandler::OpenApp(void)
     // Gather capabilities
     if (!ProcessCommand("HasTuner?", 500, result))
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            QString("Bad response to 'HasTuner?' - '%1'").arg(result));
-        _error = true;
-        return false;
+        // Some apps can get confused by the APIVersion message
+        if (!ProcessCommand("HasTuner?", 500, result))
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("Bad response to 'HasTuner?' - '%1'").arg(result));
+            _error = true;
+            return false;
+        }
     }
     m_hasTuner = result.startsWith("OK:Yes");
     if (!ProcessCommand("HasPictureAttributes?", 500, result))
