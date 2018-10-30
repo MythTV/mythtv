@@ -292,7 +292,7 @@ class MiroInterpreter(cmd.Cmd):
 
                 # Any item without a proper file name needs to be removed
                 # as Miro metadata is corrupt
-                if it.get_filename() == None:
+                if it.get_filename() is None:
                     it.expire()
                     self.statistics[u'Miro_videos_deleted']+=1
                     logging.info(
@@ -327,7 +327,7 @@ u'Unwatched video (%s) has been removed from Miro as item had no valid file name
                         continue
 
                 # Any item without a proper file name needs to be removed as Miro metadata is corrupt
-                if it.get_filename() == None:
+                if it.get_filename() is None:
                     it.expire()
                     self.statistics[u'Miro_videos_deleted']+=1
                     logging.info(

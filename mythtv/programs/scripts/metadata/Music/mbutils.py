@@ -246,7 +246,7 @@ def find_disc(cddrive):
         if "offset-list" in result['disc']:
             offsets = None
             for offset in result['disc']['offset-list']:
-                if offsets == None:
+                if offsets is None:
                     offsets = str(offset)
                 else:
                     offsets += " " + str(offset)
@@ -358,11 +358,11 @@ def main():
         performSelfTest()
 
     if opts.searchreleases:
-        if opts.artist == None:
+        if opts.artist is None:
             print("Missing --artist argument")
             sys.exit(1)
 
-        if opts.album == None:
+        if opts.album is None:
             print("Missing --album argument")
             sys.exit(1)
 
@@ -373,7 +373,7 @@ def main():
         search_releases(opts.artist, opts.album, limit)
 
     if opts.searchartists:
-        if opts.artist == None:
+        if opts.artist is None:
             print("Missing --artist argument")
             sys.exit(1)
 
@@ -384,25 +384,25 @@ def main():
         search_artists(opts.artist, limit)
 
     if opts.getartist:
-        if opts.id == None:
+        if opts.id is None:
             print("Missing --id argument")
             sys.exit(1)
 
         get_artist(opts.id)
 
     if opts.finddisc:
-        if opts.cddevice == None:
+        if opts.cddevice is None:
             print("Missing --cddevice argument")
             sys.exit(1)
 
         find_disc(opts.cddevice)
 
     if opts.findcoverart:
-        if opts.id == None and opts.relgroupid == None:
+        if opts.id is None and opts.relgroupid is None:
             print("Missing --id or --relgroupid argument")
             sys.exit(1)
 
-        if opts.id != None:
+        if opts.id is not None:
             find_coverart(opts.id)
         else:
             find_coverart_releasegroup(opts.relgroupid)

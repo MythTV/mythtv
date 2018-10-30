@@ -269,16 +269,16 @@ class FontDef(object):
         self.font = None
 
     def getFont(self):
-        if self.font == None:
+        if self.font is None:
             self.font = ImageFont.truetype(self.fontFile, int(self.size))
 
         return self.font
 
     def drawText(self, text, color=None):
-        if self.font == None:
+        if self.font is None:
             self.font = ImageFont.truetype(self.fontFile, int(self.size))
 
-        if color == None:
+        if color is None:
             color = self.color
 
         textwidth, textheight = self.font.getsize(text)
@@ -1170,7 +1170,7 @@ def paintText(draw, image, text, node, color = None,
     """Takes a piece of text and draws it onto an image inside a bounding box."""
     #The text is wider than the width of the bounding box
 
-    if x == None:
+    if x is None:
         x = getScaledAttribute(node, "x")
         y = getScaledAttribute(node, "y")
         width = getScaledAttribute(node, "w")
@@ -1178,7 +1178,7 @@ def paintText(draw, image, text, node, color = None,
 
     font = themeFonts[node.attributes["font"].value]
 
-    if color == None:
+    if color is None:
         if node.hasAttribute("colour"):
             color = node.attributes["colour"].value
         elif node.hasAttribute("color"):
@@ -3498,7 +3498,7 @@ def drawThemeItem(page, itemsonthispage, itemnum, menuitem, bgimage, draw,
         else:
             write( "Dont know how to process %s" % node.nodeName)
 
-    if drawmask == None:
+    if drawmask is None:
         return
 
     #Draw the selection mask for this item
@@ -3685,7 +3685,7 @@ def createMenu(screensize, screendpi, numberofitems):
                             picture = Image.open(imagefile, "r").resize((previeww[itemsonthispage-1], previewh[itemsonthispage-1]))
                             picture = picture.convert("RGBA")
                             imagemaskfile = os.path.join(previewpath, "mask-i%d.png" % itemsonthispage)
-                            if previewmask[itemsonthispage-1] != None:
+                            if previewmask[itemsonthispage-1] is not None:
                                 bgimage.paste(picture, (previewx[itemsonthispage-1], previewy[itemsonthispage-1]), previewmask[itemsonthispage-1])
                             else:
                                 bgimage.paste(picture, (previewx[itemsonthispage-1], previewy[itemsonthispage-1]))
@@ -3886,7 +3886,7 @@ def createChapterMenu(screensize, screendpi, numberofitems):
                             picture = Image.open(imagefile, "r").resize((previeww[previewchapter], previewh[previewchapter]))
                             picture = picture.convert("RGBA")
                             imagemaskfile = os.path.join(previewpath, "mask-i%d.png" % previewchapter)
-                            if previewmask[previewchapter] != None:
+                            if previewmask[previewchapter] is not None:
                                 bgimage.paste(picture, (previewx[previewchapter], previewy[previewchapter]), previewmask[previewchapter])
                             else:
                                 bgimage.paste(picture, (previewx[previewchapter], previewy[previewchapter]))
@@ -4035,7 +4035,7 @@ def createDetailsPage(screensize, screendpi, numberofitems):
                         picture = Image.open(imagefile, "r").resize((previeww, previewh))
                         picture = picture.convert("RGBA")
                         imagemaskfile = os.path.join(previewpath, "mask-i%d.png" % 1)
-                        if previewmask != None:
+                        if previewmask is not None:
                             bgimage.paste(picture, (previewx, previewy), previewmask)
                         else:
                             bgimage.paste(picture, (previewx, previewy))

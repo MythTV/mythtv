@@ -286,7 +286,7 @@ def mention_profile_web_view(opts, pub_uuid, admin):
 
 
 def get_proxies(opts):
-    if opts.httpproxy == None:
+    if opts.httpproxy is None:
         proxies = dict()
     else:
         proxies = {'http':opts.httpproxy}

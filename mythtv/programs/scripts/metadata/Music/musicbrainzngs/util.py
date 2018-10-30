@@ -17,7 +17,7 @@ def _unicode(string, encoding=None):
     if isinstance(string, compat.unicode):
         unicode_string = string
     elif isinstance(string, compat.bytes):
-        # use given encoding, stdin, preferred until something != None is found
+        # use given encoding, stdin, preferred until something is not None is found
         if encoding is None:
             encoding = sys.stdin.encoding
         if encoding is None:

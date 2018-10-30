@@ -395,7 +395,7 @@ class Videos(object):
             print
 
         # Get the source data
-        if sourceData.find('url') != None:
+        if sourceData.find('url') is not None:
             # Process each directory of the user preferences that have an enabled rss feed
             try:
                 resultTree = self.common.getUrlData(sourceData)
@@ -488,7 +488,7 @@ class Videos(object):
             url = etree.XML(u'<url></url>')
             etree.SubElement(url, "name").text = uniqueName
             etree.SubElement(url, "href").text = source.attrib.get('url')
-            if source.attrib.get('parameter') != None:
+            if source.attrib.get('parameter') is not None:
                 etree.SubElement(url, "parameter").text = source.attrib.get('parameter')
             if len(xsltFilename(source)):
                 for xsltName in xsltFilename(source):
@@ -502,7 +502,7 @@ class Videos(object):
             print
 
         # Get the source data
-        if sourceData.find('url') != None:
+        if sourceData.find('url') is not None:
             # Process each directory of the user preferences that have an enabled rss feed
             try:
                 resultTree = self.common.getUrlData(sourceData)
@@ -566,7 +566,7 @@ class Videos(object):
 
                 # Create a new directory and/or subdirectory if required
                 if names[0] != categoryDir:
-                    if categoryDir != None:
+                    if categoryDir is not None:
                         channelTree.append(categoryElement)
                     categoryElement = etree.XML(u'<directory></directory>')
                     categoryElement.attrib['name'] = names[0]
@@ -627,7 +627,7 @@ class Videos(object):
                                 break
 
             # Add the last directory processed and the "Special" directories
-            if categoryElement != None:
+            if categoryElement is not None:
                 if len(itemFilter(categoryElement)):
                     channelTree.append(categoryElement)
                 # Add the special directories videos

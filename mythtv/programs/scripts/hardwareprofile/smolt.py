@@ -376,7 +376,7 @@ def ignoreDevice(device):
     ignore = 1
     if device.bus == 'Unknown' or device.bus == 'unknown':
         return 1
-    if device.vendorid in (0, None) and device.type == None:
+    if device.vendorid in (0, None) and device.type is None:
         return 1
     if device.bus == 'usb' and device.driver == 'hub':
         return 1
@@ -388,7 +388,7 @@ def ignoreDevice(device):
         return 1
     if device.bus == 'block' and device.type == 'DISK':
         return 1
-    if device.bus == 'usb_device' and device.type == None:
+    if device.bus == 'usb_device' and device.type is None:
         return 1
     return 0
 

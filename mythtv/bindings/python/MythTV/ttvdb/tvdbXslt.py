@@ -218,7 +218,7 @@ class xpathFunctions(object):
             for image in xpathFilter(args[0][0]):
                 # print("im %r" % image)
                 # print(etree.tostring(image, method="xml", xml_declaration=False, pretty_print=True, ))
-                if image.find('fileName') == None:
+                if image.find('fileName') is None:
                     continue
                 # print("im2 %r" % image)
                 tmpElement = etree.XML(u'<image></image>')
@@ -242,7 +242,7 @@ class xpathFunctions(object):
     # end imageElements()
 
     def textUtf8(self, text):
-        if text == None:
+        if text is None:
             return text
         try:
             return unicode(text, 'utf8')
