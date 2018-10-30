@@ -167,7 +167,7 @@ class gamedbQueries():
 
 
     def textUtf8(self, text):
-        if text == None:
+        if text is None:
             return text
         try:
             return unicode(text, 'utf8')
@@ -268,15 +268,15 @@ class gamedbQueries():
         return If there is not enough information to make a date then return an empty string
         '''
         try:
-            if gameElement.find('expected_release_year').text != None:
+            if gameElement.find('expected_release_year').text is not None:
                 year = gameElement.find('expected_release_year').text
             else:
                 year = None
-            if gameElement.find('expected_release_quarter').text != None:
+            if gameElement.find('expected_release_quarter').text is not None:
                 quarter = gameElement.find('expected_release_quarter').text
             else:
                 quarter = None
-            if gameElement.find('expected_release_month').text != None:
+            if gameElement.find('expected_release_month').text is not None:
                 month = gameElement.find('expected_release_month').text
             else:
                 month = None
@@ -416,7 +416,7 @@ class gamedbQueries():
 
         items = queryXslt(queryResult)
 
-        if items.getroot() != None:
+        if items.getroot() is not None:
             if len(items.xpath('//item')):
                 sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
         sys.exit(0)
@@ -446,7 +446,7 @@ class gamedbQueries():
             gamebombXpath[key] = self.FuncDict[key]
         items = gameXslt(videoResult)
 
-        if items.getroot() != None:
+        if items.getroot() is not None:
             if len(items.xpath('//item')):
                 sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
         sys.exit(0)

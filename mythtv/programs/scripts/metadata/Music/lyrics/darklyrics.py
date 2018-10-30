@@ -97,7 +97,7 @@ class LyricsFetcher:
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
         links = self.search(lyrics.artist, lyrics.title);
 
-        if(links == None or len(links) == 0):
+        if(links is None or len(links) == 0):
             return False;
         elif len(links) > 1:
             lyrics.list = links

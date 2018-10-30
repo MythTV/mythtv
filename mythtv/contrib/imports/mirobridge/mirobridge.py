@@ -537,7 +537,7 @@ def _can_int(x):
     >>> _can_int("A test")
     False
     """
-    if x == None:
+    if x is None:
         return False
     try:
         int(x)
@@ -571,7 +571,7 @@ def sanitiseFileName(name):
     return a sanitised valid file name
     '''
     global filename_char_filter
-    if name == None or name == u'':
+    if name is None or name == u'':
         return u'_'
     for char in filename_char_filter:
         name = name.replace(char, u'_')
@@ -793,7 +793,7 @@ def rtnAbsolutePath(relpath, filetype=u'mythvideo'):
     return an absolute path and file name
     return the relpath sting if the file does not actually exist in the absolute path location
     '''
-    if relpath == None or relpath == u'':
+    if relpath is None or relpath == u'':
         return relpath
 
     # There is a chance that this is already an absolute path
@@ -1264,7 +1264,7 @@ def getStartEndTimes(duration, downloadedTime):
                  starttime.strftime('%Y-%m-%d %H:%M:%S'),
                  starttime.strftime('%Y%m%d%H%M%S')]
 
-    if downloadedTime != None:
+    if downloadedTime is not None:
         try:
             dummy = downloadedTime.strftime('%Y-%m-%d')
         except ValueError:
@@ -1416,7 +1416,7 @@ def createRecordedRecords(item):
     ffmpeg_details = metadata.getVideoDetails(item[u'videoFilename'])
     start_end = getStartEndTimes(ffmpeg_details[u'duration'], item[u'downloadedTime'])
 
-    if item[u'releasedate'] == None:
+    if item[u'releasedate'] is None:
         item[u'releasedate'] = item[u'downloadedTime']
     try:
         dummy = item[u'releasedate'].strftime('%Y-%m-%d')
@@ -1444,12 +1444,12 @@ def createRecordedRecords(item):
     tmp_recorded[u'hostname'] = localhostname
     tmp_recorded[u'lastmodified'] = tmp_recorded[u'endtime']
     tmp_recorded[u'filesize'] = item[u'size']
-    if item[u'releasedate'] != None:
+    if item[u'releasedate'] is not None:
         tmp_recorded[u'originalairdate'] = item[u'releasedate'].strftime('%Y-%m-%d')
 
     basename = setSymbolic(item[u'videoFilename'], u'default', u"%s_%s" % \
                                     (channel_id, start_end[2]), allow_symlink=True)
-    if basename != None:
+    if basename is not None:
         tmp_recorded[u'basename'] = basename
     else:
         logger.critical(u"The file (%s) must exist to create a recorded record" % \
@@ -1472,7 +1472,7 @@ def createRecordedRecords(item):
 
     tmp_recordedprogram[u'category'] = u"Miro"
     tmp_recordedprogram[u'category_type'] = u"series"
-    if item[u'releasedate'] != None:
+    if item[u'releasedate'] is not None:
         tmp_recordedprogram[u'airdate'] = item[u'releasedate'].strftime('%Y')
         tmp_recordedprogram[u'originalairdate'] = item[u'releasedate'].strftime('%Y-%m-%d')
     tmp_recordedprogram[u'stereo'] = ffmpeg_details[u'stereo']
@@ -1524,14 +1524,14 @@ def createVideometadataRecord(item):
     for key in details.keys():
         videometadata[key] = details[key]
 
-    if item[u'releasedate'] == None:
+    if item[u'releasedate'] is None:
         item[u'releasedate'] = item[u'downloadedTime']
     try:
         dummy = item[u'releasedate'].strftime('%Y-%m-%d')
     except ValueError:
         item[u'releasedate'] = item[u'downloadedTime']
 
-    if item[u'releasedate'] != None:
+    if item[u'releasedate'] is not None:
         videometadata[u'year'] = item[u'releasedate'].strftime('%Y')
         videometadata[u'releasedate'] = item[u'releasedate'].strftime('%Y-%m-%d')
     videometadata[u'length'] = ffmpeg_details[u'duration']/60
@@ -1544,7 +1544,7 @@ def createVideometadataRecord(item):
         videofile = setSymbolic(item[u'videoFilename'], u'mythvideo', "%s/%s - %s" % \
                             (sympath, sanitiseFileName(item[u'channelTitle']),
                              sanitiseFileName(item[u'title'])), allow_symlink=True)
-        if videofile != None:
+        if videofile is not None:
             videometadata[u'filename'] = videofile
             if not local_only and videometadata[u'filename'][0] != u'/':
                 videometadata[u'host'] = localhostname.lower()
@@ -1565,14 +1565,14 @@ def createVideometadataRecord(item):
         elif item[u'channel_icon'] and not item[u'channelTitle'].lower() in channel_icon_override:
             filename = setSymbolic(item[u'channel_icon'], u'posterdir', u"%s" % \
                                 (sanitiseFileName(item[u'channelTitle'])))
-            if filename != None:
+            if filename is not None:
                 videometadata[u'coverfile'] = filename
         else:
             if item[u'item_icon']:
                 filename = setSymbolic(item[u'item_icon'], u'posterdir', u"%s - %s" % \
                                         (sanitiseFileName(item[u'channelTitle']),
                                          sanitiseFileName(item[u'title'])))
-                if filename != None:
+                if filename is not None:
                     videometadata[u'coverfile'] = filename
     else:
         videometadata[u'coverfile'] = item[u'channel_icon']
@@ -1582,7 +1582,7 @@ def createVideometadataRecord(item):
             filename = setSymbolic(item[u'screenshot'], u'episodeimagedir', u"%s - %s" % \
                                         (sanitiseFileName(item[u'channelTitle']),
                                          sanitiseFileName(item[u'title'])))
-            if filename != None:
+            if filename is not None:
                 videometadata[u'screenshot'] = filename
     else:
         if item[u'screenshot']:
@@ -1818,7 +1818,7 @@ def updateMythRecorded(items):
     # Add new Miro unwatched videos to MythTV'd data base
     for item in items_copy:
         # Do not create records for Miro video files when Miro has a corrupt or missing file name
-        if item[u'videoFilename'] == None:
+        if item[u'videoFilename'] is None:
             continue
         # Do not create records for Miro video files that do not exist
         if not os.path.isfile(os.path.realpath(item[u'videoFilename'])):
@@ -2021,7 +2021,7 @@ def updateMythVideo(items):
                 result = takeScreenShot(item[u'videoFilename'], screenshot_mythvideo, size_limit=False)
             except:
                 result = None
-            if result != None:
+            if result is not None:
                 item[u'screenshot'] = screenshot_mythvideo
         tmp_array = createVideometadataRecord(item)
         videometadata = tmp_array[0]

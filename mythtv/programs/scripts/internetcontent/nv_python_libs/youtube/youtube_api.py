@@ -171,7 +171,7 @@ class Videos(object):
 
         # Read region code from user preferences, used by tree view
         region = self.userPrefs.find("region")
-        if region != None and region.text:
+        if region is not None and region.text:
             self.config['region'] = region.text
         else:
             self.config['region'] = u'us'
@@ -179,7 +179,7 @@ class Videos(object):
         self.apikey = getData().update(getData().a)
 
         apikey = self.userPrefs.find("apikey")
-        if apikey != None and apikey.text:
+        if apikey is not None and apikey.text:
             self.apikey = apikey.text
 
         self.feed_icons = {
@@ -256,7 +256,7 @@ class Videos(object):
 
         ip = getExternalIP()
 
-        if ip == None:
+        if ip is None:
             return {}
 
         try:
@@ -445,7 +445,7 @@ class Videos(object):
 
             for key in item.keys():
                 # Make sure there are no item elements that are None
-                if item[key] == None:
+                if item[key] is None:
                     item[key] = u''
                 elif key == 'published_parsed': # 2010-01-23T08:38:39.000Z
                     if item[key]:
@@ -499,7 +499,7 @@ class Videos(object):
             sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
-        if data == None:
+        if data is None:
             return None
         if not len(data):
             return None

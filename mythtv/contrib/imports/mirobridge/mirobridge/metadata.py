@@ -169,7 +169,7 @@ class MetaData(object):
         # If there is no Record rule then check ttvdb.com
         if not len(recordedRules_array):
             inetref = self.searchTvdb(title)
-            if inetref != None:     # Create a new rule for this Miro Channel title
+            if inetref is not None:     # Create a new rule for this Miro Channel title
                 ttvdbGraphics['inetref'] = inetref
                 self.makeRecordRule['title'] = title
                 self.makeRecordRule['inetref'] = inetref

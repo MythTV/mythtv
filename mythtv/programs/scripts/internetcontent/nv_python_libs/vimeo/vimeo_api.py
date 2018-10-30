@@ -231,7 +231,7 @@ class SimpleOAuthClient(oauth.OAuthClient):
         self.authorization_url = authorization_url
         self.consumer = oauth.OAuthConsumer(self.key, self.secret)
 
-        if token != None and token_secret != None:
+        if token is not None and token_secret is not None:
             self.token = oauth.OAuthToken(token, token_secret)
         else:
             self.token = None
@@ -325,9 +325,9 @@ class SimpleOAuthClient(oauth.OAuthClient):
         params = {'user_id': user_id}
         if sort in ('newest', 'oldest', 'alphabetical'):
             params['sort'] = sort
-        if per_page != None:
+        if per_page is not None:
             params['per_page'] = per_page
-        if page != None:
+        if page is not None:
             params['page'] = page
         return self._do_vimeo_unauthenticated_call(inspect.stack()[0][3].replace('_', '.'),
                                                    parameters=params)
@@ -347,9 +347,9 @@ class SimpleOAuthClient(oauth.OAuthClient):
             params['sort'] = sort
         else:
             params['sort'] = 'most_liked'
-        if per_page != None:
+        if per_page is not None:
             params['per_page'] = per_page
-        if page != None:
+        if page is not None:
             params['page'] = page
         params['full_response'] = '1'
         #params['query'] = query.replace(u' ', u'_')
@@ -371,9 +371,9 @@ class SimpleOAuthClient(oauth.OAuthClient):
         if sort in ('newest', 'oldest', 'alphabetical',
                     'most_videos', 'most_subscribed', 'most_recently_updated'):
             params['sort'] = sort
-        if per_page != None:
+        if per_page is not None:
             params['per_page'] = per_page
-        if page != None:
+        if page is not None:
             params['page'] = page
 
         return self._do_vimeo_unauthenticated_call(inspect.stack()[0][3].replace('_', '.'),
@@ -388,13 +388,13 @@ class SimpleOAuthClient(oauth.OAuthClient):
         """
         # full_response channel_id
         params = {}
-        if channel_id != None:
+        if channel_id is not None:
             params['channel_id'] = channel_id
-        if full_response != None:
+        if full_response is not None:
             params['full_response'] = 1
-        if per_page != None:
+        if per_page is not None:
             params['per_page'] = per_page
-        if page != None:
+        if page is not None:
             params['page'] = page
 
         return self._do_vimeo_unauthenticated_call(inspect.stack()[0][3].replace('_', '.'),
@@ -824,7 +824,7 @@ class Videos(object):
 
 
     def textUtf8(self, text):
-        if text == None:
+        if text is None:
             return text
         try:
             return unicode(text, 'utf8')
@@ -915,7 +915,7 @@ class Videos(object):
         except Exception, msg:
             raise VimeoVideosSearchError(u'%s' % msg)
 
-        if xml_data == None:
+        if xml_data is None:
             raise VimeoVideoNotFound(self.error_messages['VimeoVideoNotFound'] % title)
 
         if not len(xml_data.keys()):
@@ -1063,7 +1063,7 @@ class Videos(object):
             sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
-        if data == None:
+        if data is None:
             return None
         if not len(data):
             return None
@@ -1123,7 +1123,7 @@ class Videos(object):
                     except Exception, msg:
                         raise VimeoAllChannelError(u'%s' % msg)
 
-                    if xml_data == None:
+                    if xml_data is None:
                         raise VimeoAllChannelError(self.error_messages['1-VimeoAllChannelError'] % sort)
 
                     if not len(xml_data.keys()):
@@ -1311,7 +1311,7 @@ class Videos(object):
         except Exception, msg:
             raise VimeoVideosSearchError(u'%s' % msg)
 
-        if xml_data == None:
+        if xml_data is None:
             raise VimeoVideoNotFound(self.error_messages['VimeoVideoNotFound'] % self.dir_name)
 
         if not len(xml_data.keys()):
