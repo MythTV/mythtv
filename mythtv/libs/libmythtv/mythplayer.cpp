@@ -2155,22 +2155,15 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
     }
 }
 
-static int64_t time_to_usecs(timespec *tm);
-static void usecs_to_time(int64_t utime, timespec *tm);
+static void wait_for_time(int64_t framedue);
 
-
-int64_t time_to_usecs(timespec *tm)
+void wait_for_time(int64_t framedue)
 {
-    // add 315576000000000 (10 years) to prevent it going negative
-    return (int64_t) (tm->tv_sec) * 1000000
-       + tm->tv_nsec / 1000 + (int64_t) 315576000000000;
-}
-
-void usecs_to_time(int64_t utime, timespec *tm)
-{
-    utime -= (int64_t) 315576000000000;
-    tm->tv_sec = (time_t)(utime / 1000000);
-    tm->tv_nsec = (utime - tm->tv_sec * 1000000) * 1000;
+    QDateTime now = QDateTime::currentDateTimeUtc();
+    int64_t unow = now.toMSecsSinceEpoch() * 1000;
+    int64_t delay = framedue - unow;
+    if (delay > 0)
+        QThread::usleep(delay);
 }
 
 #define AVSYNC_MAX_LATE 1000000
@@ -2190,7 +2183,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
     bool pause_audio = false;
     int64_t framedue = 0;
     int64_t audio_adjustment = 0;
-    timespec now;
+    QDateTime now;
     int64_t unow = 0;
     int64_t lateness = 0;
     int64_t playspeed1000 = (float)1000 / play_speed;
@@ -2207,17 +2200,11 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         }
         else
             videotimecode = audiotimecode;
+        now = QDateTime::currentDateTimeUtc();
+        unow = now.toMSecsSinceEpoch() * 1000;
         // first time or after a seek - setup of rtcbase
         if (rtcbase == 0)
         {
-            if (clock_gettime(CLOCK_MONOTONIC,&now) != 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("AVSync: Error %1 in clock_gettime, aborting playback.").arg(errno));
-                SetErrored(tr("Failed to initialize A/V Sync"));
-                return;
-            }
-            unow = time_to_usecs(&now);
             rtcbase = unow - videotimecode * playspeed1000;
             maxtcval = 0;
             maxtcframes = 0;
@@ -2235,8 +2222,6 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             videotimecode = maxtcval + maxtcframes * frame_interval/1000;
         }
 
-        clock_gettime(CLOCK_MONOTONIC,&now);
-        unow = time_to_usecs(&now);
         if (play_speed > 0.0f)
             framedue = rtcbase + videotimecode * playspeed1000;
         else
@@ -2325,11 +2310,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         // Don't wait for sync if this is a secondary PBP otherwise
         // the primary PBP will become out of sync
         if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
-        {
-            timespec tm;
-            usecs_to_time(framedue, &tm);
-            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tm, NULL);
-        }
+            wait_for_time(framedue);
         videoOutput->Show(ps);
         if (videoOutput->IsErrored())
         {
@@ -2358,19 +2339,13 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             if (!player_ctx->IsPBP() || player_ctx->IsPrimaryPBP())
             {
                 int64_t due = framedue + frame_interval / 2;
-                timespec tm;
-                usecs_to_time(due, &tm);
-                clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tm, NULL);
+                wait_for_time(due);
             }
             videoOutput->Show(ps);
         }
     }
     else
-    {
-        timespec tm;
-        usecs_to_time(framedue, &tm);
-        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tm, NULL);
-    }
+        wait_for_time(framedue);
 }
 
 void MythPlayer::RefreshPauseFrame(void)

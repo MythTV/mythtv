@@ -2,7 +2,6 @@
 #define MYTHPLAYER_H
 
 #include <cstdint>
-#include <time.h>
 
 #include <QCoreApplication>
 #include <QList>
