@@ -22,7 +22,7 @@
 #include "hdhrstreamhandler.h"
 
 #define LOC QString("HDHRSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(inputid).arg(channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -51,8 +51,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = HDHRStreamHandler::Get(channel->GetDevice(),
-                                           channel->GetInputID());
+    streamHandler = HDHRStreamHandler::Get(channel->GetDevice(), inputid);
 }
 
 /** \fn HDHRSignalMonitor::~HDHRSignalMonitor()
@@ -62,7 +61,7 @@ HDHRSignalMonitor::~HDHRSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    HDHRStreamHandler::Return(streamHandler, channel->GetInputID());
+    HDHRStreamHandler::Return(streamHandler, inputid);
 }
 
 /** \fn HDHRSignalMonitor::Stop(void)

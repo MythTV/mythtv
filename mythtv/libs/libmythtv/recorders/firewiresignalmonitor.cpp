@@ -15,7 +15,7 @@
 #include "mythlogging.h"
 
 #define LOC QString("FireSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(inputid).arg(channel->GetDevice())
 
 void FirewireTableMonitorThread::run(void)
 {

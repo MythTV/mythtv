@@ -26,7 +26,7 @@
 #include "dvbstreamhandler.h"
 
 #define LOC QString("DVBSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(inputid).arg(channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -108,8 +108,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     if (minimum_update_rate > 30)
         usleep(minimum_update_rate * 1000);
 
-    streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(),
-                                          channel->GetInputID());
+    streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), inputid);
 }
 
 /** \fn DVBSignalMonitor::~DVBSignalMonitor()
@@ -118,7 +117,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 DVBSignalMonitor::~DVBSignalMonitor()
 {
     Stop();
-    DVBStreamHandler::Return(streamHandler, channel->GetInputID());
+    DVBStreamHandler::Return(streamHandler, inputid);
 }
 
 // documented in dtvsignalmonitor.h

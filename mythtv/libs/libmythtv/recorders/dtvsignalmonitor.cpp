@@ -13,11 +13,11 @@ using namespace std;
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \
-    QString("DTVSigMon[%1](%2)::%3: %4").arg(capturecardnum) \
+    QString("DTVSigMon[%1](%2)::%3: %4").arg(inputid) \
     .arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 #define LOC QString("DTVSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(inputid).arg(channel->GetDevice())
 
 // inserts tid&crc value into an ordered list
 // returns true if item is inserted

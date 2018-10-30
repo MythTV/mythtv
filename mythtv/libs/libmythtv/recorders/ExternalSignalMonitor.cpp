@@ -20,7 +20,8 @@
 #include "ExternalRecorder.h"
 #include "ExternalStreamHandler.h"
 
-#define LOC QString("ExternSigMon(%1): ").arg(channel->GetDevice())
+#define LOC QString("ExternSigMon[%1](%2): ") \
+    .arg(inputid).arg(channel->GetDevice())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -46,8 +47,7 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
     QString result;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
-    m_stream_handler = ExternalStreamHandler::Get(channel->GetDevice(),
-                                                  channel->GetInputID());
+    m_stream_handler = ExternalStreamHandler::Get(channel->GetDevice(), inputid);
     if (!m_stream_handler || m_stream_handler->HasError())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
     else
@@ -61,7 +61,7 @@ ExternalSignalMonitor::~ExternalSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     Stop();
-    ExternalStreamHandler::Return(m_stream_handler, channel->GetInputID());
+    ExternalStreamHandler::Return(m_stream_handler, inputid);
 }
 
 /** \fn ExternalSignalMonitor::Stop(void)

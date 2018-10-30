@@ -62,7 +62,7 @@ extern "C" {
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
-    QString("SigMon[%1](%2)::%3: %4").arg(capturecardnum) \
+    QString("SigMon[%1](%2)::%3: %4").arg(inputid) \
                               .arg(channel->GetDevice()).arg(FUNC).arg(MSG))
 
 /** \class SignalMonitor
@@ -209,17 +209,17 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *   Start() must be called to actually begin continuous
  *   signal monitoring.
  *
- *  \param _capturecardnum Recorder number to monitor, if this is less than 0,
+ *  \param _inputid        Recorder number to monitor, if this is less than 0,
  *                         SIGNAL events will not be sent to the frontend even
  *                         if SetNotifyFrontend(true) is called.
  *  \param _channel        ChannelBase class for our monitoring
  *  \param wait_for_mask   SignalMonitorFlags to start with.
  */
-SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
+SignalMonitor::SignalMonitor(int _inputid, ChannelBase *_channel,
                              bool _release_stream, uint64_t wait_for_mask)
     : MThread("SignalMonitor"),
       channel(_channel),               pParent(nullptr),
-      capturecardnum(_capturecardnum), flags(wait_for_mask),
+      inputid(_inputid), flags(wait_for_mask),
       release_stream(_release_stream),
       update_rate(25),                 minimum_update_rate(5),
       update_done(false),              notify_frontend(true),
@@ -341,10 +341,10 @@ void SignalMonitor::run(void)
 
         UpdateValues();
 
-        if (notify_frontend && capturecardnum>=0)
+        if (notify_frontend && inputid>=0)
         {
             QStringList slist = GetStatusList();
-            MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
+            MythEvent me(QString("SIGNAL %1").arg(inputid), slist);
             gCoreContext->dispatch(me);
         }
 
@@ -356,10 +356,10 @@ void SignalMonitor::run(void)
     // signal update may have come in while we were sleeping
     // if we are using the multithreaded dtvsignalmonitor.
     locker.unlock();
-    if (notify_frontend && capturecardnum>=0)
+    if (notify_frontend && inputid>=0)
     {
         QStringList slist = GetStatusList();
-        MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
+        MythEvent me(QString("SIGNAL %1").arg(inputid), slist);
         gCoreContext->dispatch(me);
     }
     locker.relock();

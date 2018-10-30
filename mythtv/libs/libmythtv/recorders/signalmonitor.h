@@ -117,7 +117,7 @@ class SignalMonitor : protected MThread
     virtual void EmitStatus(void);
 
   protected:
-    SignalMonitor(int _capturecardnum, ChannelBase *_channel,
+    SignalMonitor(int _inputid, ChannelBase *_channel,
                   bool _release_stream, uint64_t wait_for_mask);
     // Prevent implicit conversion of wrongly ordered arguments
     SignalMonitor(int, ChannelBase *, uint64_t, bool) = delete;
@@ -200,7 +200,7 @@ class SignalMonitor : protected MThread
   protected:
     ChannelBase *channel;
     TVRec       *pParent;
-    int          capturecardnum;
+    int          inputid;
     volatile uint64_t flags;
     bool         release_stream;
     int          update_rate;

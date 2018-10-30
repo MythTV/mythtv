@@ -7,7 +7,7 @@
 #include "mythlogging.h"
 
 #define LOC QString("IPTVSigMon[%1](%2): ") \
-            .arg(capturecardnum).arg(channel->GetDevice())
+            .arg(inputid).arg(channel->GetDevice())
 
 /** \brief Initializes signal lock and signal values.
  *
