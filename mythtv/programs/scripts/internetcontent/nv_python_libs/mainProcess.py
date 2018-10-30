@@ -241,7 +241,7 @@ xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""
         self.config['target'].mashup_title = self.mashup_title
 
         data_sets = self.config['target'].searchForVideos(search_text, pagenumber)
-        if data_sets == None:
+        if data_sets is None:
             return
         if not len(data_sets):
             return
@@ -272,7 +272,7 @@ xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""
         self.config['target'].mashup_title = self.mashup_title
 
         data_sets = self.config['target'].displayTreeView()
-        if data_sets == None:
+        if data_sets is None:
             return
         if not len(data_sets):
             return

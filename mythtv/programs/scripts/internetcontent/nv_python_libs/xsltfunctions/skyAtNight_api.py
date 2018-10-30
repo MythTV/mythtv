@@ -117,7 +117,7 @@ class xpathFunctions(object):
         mythtv = "{%s}" % mythtvNamespace
         NSMAP = {'mythtv' : mythtvNamespace}
         elementTmp = etree.Element(mythtv + "mythtv", nsmap=NSMAP)
-        if not episodeNumber == None:
+        if not episodeNumber is None:
             etree.SubElement(elementTmp, "title").text = u"EP%02d" % episodeNumber
             etree.SubElement(elementTmp, mythtv + "episode").text = u"%s" % episodeNumber
         else:

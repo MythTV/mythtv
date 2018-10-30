@@ -1081,7 +1081,7 @@ class Tvdb:
 
                 self._setShowData(sid, tag, value)
         # set language
-        if language == None:
+        if language is None:
             language = self.config['language']
         self._setShowData(sid, u'language', language)
 

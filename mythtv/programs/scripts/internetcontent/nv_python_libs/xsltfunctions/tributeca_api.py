@@ -115,7 +115,7 @@ class xpathFunctions(object):
 
         # If this is for the download then just return what was found for the "link" element
         if self.persistence.has_key('tributecaLinkGeneration'):
-            if self.persistence['tributecaLinkGeneration'] != None:
+            if self.persistence['tributecaLinkGeneration'] is not None:
                 returnValue = self.persistence['tributecaLinkGeneration']
                 self.persistence['tributecaLinkGeneration'] = None
                 if returnValue != webURL:
@@ -233,7 +233,7 @@ class xpathFunctions(object):
         return True if the link does not starts with "http://"
         return False if the link starts with "http://"
         '''
-        if self.persistence['tributecaLinkGeneration'] == None:
+        if self.persistence['tributecaLinkGeneration'] is None:
             return False
 
         if self.persistence['tributecaLinkGeneration'].startswith(u'http://'):

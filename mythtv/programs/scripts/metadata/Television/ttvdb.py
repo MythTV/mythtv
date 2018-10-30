@@ -1451,7 +1451,7 @@ class Season( tvdb_api.Season ):
 class Episode( tvdb_api.Episode ):
     _re_strippart = re.compile('(.*) \([0-9]+\)')
     def fuzzysearch(self, term = None, key = None):
-        if term == None:
+        if term is None:
             raise TypeError("must supply string to search for (contents)")
 
         term = unicode(term).lower()
@@ -1643,7 +1643,7 @@ def get_graphics(t, opts, series_season_ep, graphics_type, single_option, langua
     graphics = sorted(graphics, key=lambda k: k['rating'], reverse=True)
     for URL in graphics:
         if graphics_type == 'filename':
-            if URL[graphics_type] == None:
+            if URL[graphics_type] is None:
                 continue
         if language and 'language' in URL:        # Is there a language to filter URLs on?
             if language == URL['language']:
@@ -1753,7 +1753,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
         genres_string = series_data[u'genre'].encode('utf-8')
     except:
         genres_string=''
-    if genres_string != None and genres_string != '':
+    if genres_string is not None and genres_string != '':
         genres = change_amp(genres_string)
         genres = change_to_commas(genres)
 
@@ -1791,7 +1791,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                         continue
                     i = data_keys.index(key) # Include only specific episode data
                 except ValueError:
-                    if series_data[season][episode][key] != None:
+                    if series_data[season][episode][key] is not None:
                         text = series_data[season][episode][key]
                         if isinstance(text, dict):
                             # handle language tuple
@@ -1810,11 +1810,11 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                     continue
                 text = series_data[season][episode][key]
 
-                if text == None and key.title() == 'Director':
+                if text is None and key.title() == 'Director':
                     text = u"Unknown"
                 if isinstance(text, list):
                     text = ', '.join(text)
-                if text == None or text == 'None':
+                if text is None or text == 'None':
                     continue
                 else:
                     # handle language tuple
@@ -1832,7 +1832,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                 print(u"Title:%s" % series_data[u'seriesname'])
 
             for key in data_titles:
-                if key_values[index] != None:
+                if key_values[index] is not None:
                     if data_titles[index] == u'ReleaseDate:' and len(key_values[index]) > 4:
                         print(u'%s%s'% (u'Year:', key_values[index][:4]))
                     if key_values[index] != 'None':
@@ -2119,7 +2119,7 @@ def displaySearchXML(tvdb_api):
 
     tvdbQueryXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbQuery.xsl')))
     items = tvdbQueryXslt(tvdb_api.searchTree)
-    if items.getroot() != None:
+    if items.getroot() is not None:
         if len(items.xpath('//item')):
             sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
     return 0
@@ -2144,7 +2144,7 @@ def displaySeriesXML(tvdb_api, series_season_ep):
 
     tvdbQueryXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbVideo.xsl')))
     items = tvdbQueryXslt(allDataElement)
-    if items.getroot() != None:
+    if items.getroot() is not None:
         if len(items.xpath('//item')):
             sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
     return 0
@@ -2169,7 +2169,7 @@ def displayCollectionXML(tvdb_api):
 
     tvdbCollectionXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbCollection.xsl')))
     items = tvdbCollectionXslt(tvdb_api.seriesInfoTree)
-    if items.getroot() != None:
+    if items.getroot() is not None:
         if len(items.xpath('//item')):
             sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
     return 0

@@ -132,7 +132,7 @@ _uuid_db_instance = None
 def UuidDb():
     """Simple singleton wrapper with lazy initialization"""
     global _uuid_db_instance
-    if _uuid_db_instance == None:
+    if _uuid_db_instance is None:
         import config
         from smolt import get_config_attr
         _uuid_db_instance =  _UuidDb(get_config_attr("UUID_DB", os.path.expanduser('~/.smolt/uuiddb.cfg')))

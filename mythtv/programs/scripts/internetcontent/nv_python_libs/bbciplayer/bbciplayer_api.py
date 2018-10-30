@@ -349,7 +349,7 @@ class Videos(object):
         pubDate = datetime.datetime.now().strftime(self.common.pubDateFormat)
 
         # Set the display type for the link (Fullscreen, Web page, Game Console)
-        if self.userPrefs.find('displayURL') != None:
+        if self.userPrefs.find('displayURL') is not None:
             urlType = self.userPrefs.find('displayURL').text
         else:
             urlType = u'fullscreen'
@@ -519,7 +519,7 @@ class Videos(object):
         searchResultTree = []
         searchFilter = etree.XPath(u"//item")
         userSearchStrings = u'userSearchStrings'
-        if self.userPrefs.find(userSearchStrings) != None:
+        if self.userPrefs.find(userSearchStrings) is not None:
             userSearch = self.userPrefs.find(userSearchStrings).xpath('./userSearch')
             if len(userSearch):
                 for searchDetails in userSearch:
@@ -554,7 +554,7 @@ class Videos(object):
         # Create a structure of feeds that can be concurrently downloaded
         rssData = etree.XML(u'<xml></xml>')
         for feedType in [u'treeviewURLS', u'userFeeds']:
-            if self.userPrefs.find(feedType) == None:
+            if self.userPrefs.find(feedType) is None:
                 continue
             if not len(self.userPrefs.find(feedType).xpath('./url')):
                 continue
@@ -581,7 +581,7 @@ class Videos(object):
             print
 
         # Get the RSS Feed data
-        if rssData.find('url') != None:
+        if rssData.find('url') is not None:
             try:
                 resultTree = self.common.getUrlData(rssData)
             except Exception, errormsg:
@@ -592,7 +592,7 @@ class Videos(object):
                 print
 
              # Set the display type for the link (Fullscreen, Web page, Game Console)
-            if self.userPrefs.find('displayURL') != None:
+            if self.userPrefs.find('displayURL') is not None:
                 urlType = self.userPrefs.find('displayURL').text
             else:
                 urlType = u'fullscreen'
@@ -638,7 +638,7 @@ class Videos(object):
                 channelLanguage = u'en'
                 # Create a new directory and/or subdirectory if required
                 if names[0] != categoryDir:
-                    if categoryDir != None:
+                    if categoryDir is not None:
                         channelTree.append(categoryElement)
                     categoryElement = etree.XML(u'<directory></directory>')
                     categoryElement.attrib['name'] = names[0]
@@ -714,8 +714,8 @@ class Videos(object):
                             break
 
             # Add the last directory processed
-            if categoryElement != None:
-                if categoryElement.xpath('.//item') != None:
+            if categoryElement is not None:
+                if categoryElement.xpath('.//item') is not None:
                     channelTree.append(categoryElement)
 
         # Check that there was at least some items
