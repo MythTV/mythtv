@@ -17,12 +17,12 @@ class MythD3DVertexBuffer
 {
   public:
     explicit MythD3DVertexBuffer(IDirect3DTexture9* tex = nullptr) :
-        m_color(0xFFFFFFFF), m_dest(QRect(QPoint(0,0),QSize(0,0))),
+        m_dest(QRect(QPoint(0,0),QSize(0,0))),
         m_src(QRect(QPoint(0,0),QSize(0,0))), m_texture(tex)
     {
     }
 
-    uint32_t           m_color;
+    uint32_t           m_color {0xFFFFFFFF};
     QRect              m_dest;
     QRect              m_src;
     IDirect3DTexture9 *m_texture;

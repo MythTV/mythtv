@@ -12,8 +12,7 @@
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {
   public:
-    SortableMythGenericTreeList() : m_sortType(SORT_STRING),
-                                    m_attributeIndex(0) { }
+    SortableMythGenericTreeList() = default;
     enum SortType {SORT_STRING=0, SORT_SELECTABLE=1};
 
     void SetSortType(SortType stype) { m_sortType = stype; }
@@ -54,8 +53,8 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
     }
 
   private:
-    SortType m_sortType;
-    int m_attributeIndex; // for getAttribute
+    SortType m_sortType {SORT_STRING};
+    int m_attributeIndex {0}; // for getAttribute
 };
 
 ///////////////////////////////////////////////////////

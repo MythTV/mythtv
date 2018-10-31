@@ -80,18 +80,16 @@ class MediaServer : public MediaServerItem
   public:
     MediaServer()
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(), m_connectionAttempts(0), m_controlURL(QUrl()),
+       m_URL(), m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
-       m_friendlyName(QString("Unknown")), m_subscribed(false),
-       m_renewalTimerId(0), m_systemUpdateID(-1)
+       m_friendlyName(QString("Unknown"))
     {
     }
     explicit MediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_URL(URL), m_connectionAttempts(0), m_controlURL(QUrl()),
+       m_URL(URL), m_controlURL(QUrl()),
        m_eventSubURL(QUrl()), m_eventSubPath(QString()),
-       m_friendlyName(QString("Unknown")), m_subscribed(false),
-       m_renewalTimerId(0), m_systemUpdateID(-1)
+       m_friendlyName(QString("Unknown"))
     {
     }
 
@@ -108,14 +106,14 @@ class MediaServer : public MediaServerItem
     }
 
     QUrl    m_URL;
-    int     m_connectionAttempts;
+    int     m_connectionAttempts {0};
     QUrl    m_controlURL;
     QUrl    m_eventSubURL;
     QString m_eventSubPath;
     QString m_friendlyName;
-    bool    m_subscribed;
-    int     m_renewalTimerId;
-    int     m_systemUpdateID;
+    bool    m_subscribed {false};
+    int     m_renewalTimerId {0};
+    int     m_systemUpdateID {-1};
 };
 
 UPNPScanner* UPNPScanner::gUPNPScanner        = nullptr;

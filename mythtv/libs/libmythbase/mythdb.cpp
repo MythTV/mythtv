@@ -72,11 +72,11 @@ class MythDBPrivate
     QString m_localhostname;
     MDBManager m_dbmanager;
 
-    bool ignoreDatabase;
-    bool suppressDBMessages;
+    bool ignoreDatabase {false};
+    bool suppressDBMessages {true};
 
     QReadWriteLock settingsCacheLock;
-    volatile bool useSettingsCache;
+    volatile bool useSettingsCache {false};
     /// Permanent settings in the DB and overridden settings
     SettingsMap settingsCache;
     /// Overridden this session only
@@ -85,15 +85,13 @@ class MythDBPrivate
     /// available
     QList<SingleSetting> delayedSettings;
 
-    bool haveDBConnection;
-    bool haveSchema;
+    bool haveDBConnection {false};
+    bool haveSchema {false};
 };
 
 static const int settings_reserve = 61;
 
-MythDBPrivate::MythDBPrivate() :
-    ignoreDatabase(false), suppressDBMessages(true), useSettingsCache(false),
-    haveDBConnection(false), haveSchema(false)
+MythDBPrivate::MythDBPrivate()
 {
     m_localhostname.clear();
     settingsCache.reserve(settings_reserve);

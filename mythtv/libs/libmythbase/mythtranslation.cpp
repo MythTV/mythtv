@@ -16,8 +16,7 @@ typedef QMap<QString, QTranslator*> TransMap;
 class MythTranslationPrivate
 {
   public:
-    MythTranslationPrivate():
-          m_loaded(false) { };
+    MythTranslationPrivate() = default;
 
     void Init(void)
     {
@@ -28,7 +27,7 @@ class MythTranslationPrivate
         }
     };
 
-    bool m_loaded;
+    bool m_loaded {false};
     QString m_language;
     TransMap m_translators;
 };

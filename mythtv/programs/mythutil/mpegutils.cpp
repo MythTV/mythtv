@@ -291,7 +291,7 @@ class PTSListener :
     public TSPacketListenerAV
 {
   public:
-    PTSListener() : m_start_code(0xFFFFFFFF)
+    PTSListener()
     {
         for (int i = 0; i < 256; i++)
             m_pts_count[i] = 0;
@@ -341,7 +341,7 @@ class PTSListener :
     }
 
   public:
-    uint32_t m_start_code;
+    uint32_t m_start_code {0xFFFFFFFF};
     QMap<uint,uint> m_pts_streams;
     uint32_t m_pts_count[256];
     int64_t  m_pts_first[256];

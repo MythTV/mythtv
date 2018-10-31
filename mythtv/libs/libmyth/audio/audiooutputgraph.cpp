@@ -25,14 +25,7 @@ const int kBufferMilliSecs = 500;
 class AudioOutputGraph::Buffer : protected QByteArray
 {
 public:
-    Buffer() :
-        m_maxSamples(0),
-        m_sample_rate(44100),
-        m_tcFirst(0), m_tcNext(0),
-        m_bits(0),
-        m_channels(0),
-        m_sizeMax(0)
-    { }
+    Buffer() = default;
 
     // Properties
     void SetMaxSamples(unsigned samples) { m_maxSamples = samples; }
@@ -202,12 +195,12 @@ private:
     }
 
 private:
-    unsigned m_maxSamples;
-    unsigned m_sample_rate;
-    unsigned long m_tcFirst, m_tcNext;
-    int m_bits;
-    int m_channels;
-    int m_sizeMax;
+    unsigned m_maxSamples {0};
+    unsigned m_sample_rate {44100};
+    unsigned long m_tcFirst {0}, m_tcNext {0};
+    int m_bits {0};
+    int m_channels {0};
+    int m_sizeMax {0};
 };
 
 

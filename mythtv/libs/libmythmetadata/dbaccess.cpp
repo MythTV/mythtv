@@ -600,7 +600,7 @@ class FileAssociationsImp
     typedef FileAssociations::ext_ignore_list ext_ignore_list;
 
   public:
-    FileAssociationsImp() : m_ready(false) {}
+    FileAssociationsImp() = default;
 
     bool add(file_association &fa)
     {
@@ -792,7 +792,7 @@ class FileAssociationsImp
 
   private:
     association_list m_file_associations;
-    bool m_ready;
+    bool m_ready {false};
 };
 
 

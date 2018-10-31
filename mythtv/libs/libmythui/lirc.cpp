@@ -43,7 +43,7 @@ using namespace std;
 class LIRCPriv
 {
   public:
-    LIRCPriv() : lircState(nullptr), lircConfig(nullptr) {}
+    LIRCPriv() = default;
     ~LIRCPriv()
     {
         if (lircState)
@@ -58,8 +58,8 @@ class LIRCPriv
         }
     }
 
-    struct lirc_state  *lircState;
-    struct lirc_config *lircConfig;
+    struct lirc_state  *lircState {nullptr};
+    struct lirc_config *lircConfig {nullptr};
 };
 
 QMutex LIRC::lirclib_lock;

@@ -65,10 +65,6 @@ class CECAdapterPriv
 {
   public:
     CECAdapterPriv()
-      : adapter(nullptr), valid(false),
-         powerOffTV(false),  powerOffTVAllowed(false), powerOffTVOnExit(false),
-         powerOnTV(false),   powerOnTVAllowed(false),  powerOnTVOnStart(false),
-         switchInput(false), switchInputAllowed(true)
      {
 #if CEC_LIB_VERSION_MAJOR < 2
         // libcec1 has this as a POD struct, with no
@@ -1120,17 +1116,17 @@ class CECAdapterPriv
         switchInput = false;
     }
 
-    ICECAdapter *adapter;
+    ICECAdapter *adapter {nullptr};
     ICECCallbacks callbacks;
-    bool         valid;
-    bool         powerOffTV;
-    bool         powerOffTVAllowed;
-    bool         powerOffTVOnExit;
-    bool         powerOnTV;
-    bool         powerOnTVAllowed;
-    bool         powerOnTVOnStart;
-    bool         switchInput;
-    bool         switchInputAllowed;
+    bool         valid {false};
+    bool         powerOffTV {false};
+    bool         powerOffTVAllowed {false};
+    bool         powerOffTVOnExit {false};
+    bool         powerOnTV {false};
+    bool         powerOnTVAllowed {false};
+    bool         powerOnTVOnStart {false};
+    bool         switchInput {false};
+    bool         switchInputAllowed {true};
 };
 
 CECAdapter::CECAdapter() : MThread("CECAdapter"), m_priv(new CECAdapterPriv)

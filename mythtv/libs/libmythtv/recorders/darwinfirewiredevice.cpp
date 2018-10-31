@@ -74,12 +74,7 @@ int dfd_no_data_notification(void *callback_data);
 class DFDPriv
 {
   public:
-    DFDPriv() :
-        controller_thread(0),
-        controller_thread_cf_ref(nullptr), controller_thread_running(false),
-        notify_port(0), notify_source(0), deviter(0),
-        actual_fwchan(-1), is_streaming(false), avstream(nullptr), logger(nullptr),
-        no_data_cnt(0), no_data_timer_set(false)
+    DFDPriv()
     {
         logger = new AVS::StringLogger(dfd_streaming_log_message);
     }
@@ -98,20 +93,20 @@ class DFDPriv
         }
     }
 
-    pthread_t                 controller_thread;
-    CFRunLoopRef              controller_thread_cf_ref;
-    bool                      controller_thread_running;
+    pthread_t                 controller_thread{0};
+    CFRunLoopRef              controller_thread_cf_ref {nullptr};
+    bool                      controller_thread_running {false};
 
-    IONotificationPortRef     notify_port;
-    CFRunLoopSourceRef        notify_source;
-    io_iterator_t             deviter;
+    IONotificationPortRef     notify_port {0};
+    CFRunLoopSourceRef        notify_source {0};
+    io_iterator_t             deviter {0};
 
-    int                       actual_fwchan;
-    bool                      is_streaming;
-    AVS::MPEG2Receiver       *avstream;
-    AVS::StringLogger        *logger;
-    uint                      no_data_cnt;
-    bool                      no_data_timer_set;
+    int                       actual_fwchan {-1};
+    bool                      is_streaming {false};
+    AVS::MPEG2Receiver       *avstream {nullptr};
+    AVS::StringLogger        *logger {nullptr};
+    uint                      no_data_cnt {0};
+    bool                      no_data_timer_set {false};
     MythTimer                 no_data_timer;
 
     avcinfo_list_t            devices;

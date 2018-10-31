@@ -189,12 +189,12 @@ class MRSSParser
         QString Keywords;
         QString CopyrightURL;
         QString CopyrightText;
-        int RatingAverage;
-        int RatingCount;
-        int RatingMin;
-        int RatingMax;
-        int Views;
-        int Favs;
+        int RatingAverage {0};
+        int RatingCount {0};
+        int RatingMin {0};
+        int RatingMax {0};
+        int Views {0};
+        int Favs {0};
         QString Tags;
         QList<MRSSThumbnail> Thumbnails;
         QList<MRSSCredit> Credits;
@@ -202,8 +202,7 @@ class MRSSParser
         QList<MRSSPeerLink> PeerLinks;
         QList<MRSSScene> Scenes;
 
-        ArbitraryLocatedData() : RatingAverage(0), RatingCount(0), RatingMin(0),
-                                 RatingMax(0), Views(0), Favs(0) {}
+        ArbitraryLocatedData() = default;
 
         /**  Updates *this's fields according to the
          * child. Some kind of merge.

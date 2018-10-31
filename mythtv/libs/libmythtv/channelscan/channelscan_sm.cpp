@@ -88,7 +88,7 @@ QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 class ScannedChannelInfo
 {
   public:
-    ScannedChannelInfo() : mgt(nullptr) {}
+    ScannedChannelInfo() = default;
 
     bool IsEmpty() const
     {
@@ -104,7 +104,7 @@ class ScannedChannelInfo
     QMap<uint,uint>   program_encryption_status; // pnum->enc_status
 
     // ATSC
-    const MasterGuideTable *mgt;
+    const MasterGuideTable *mgt {nullptr};
     cvct_vec_t        cvcts;
     tvct_vec_t        tvcts;
 

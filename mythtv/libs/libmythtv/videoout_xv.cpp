@@ -321,16 +321,15 @@ void VideoOutputXv::MoveResizeWindow(QRect new_rect)
 class XvAttributes
 {
   public:
-    XvAttributes() :
-        xv_flags(0), feature_flags(0) {}
+    XvAttributes() = default;
     XvAttributes(const QString &a, uint b, uint c) :
         description(a), xv_flags(b), feature_flags(c)
         { description.detach(); }
 
   public:
     QString description;
-    uint    xv_flags;
-    uint    feature_flags;
+    uint    xv_flags {0};
+    uint    feature_flags {0};
 
     static const uint kFeatureNone      = 0x00;
     static const uint kFeatureChromakey = 0x01;

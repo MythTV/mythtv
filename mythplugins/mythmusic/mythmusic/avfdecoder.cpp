@@ -59,8 +59,7 @@ typedef QMap<QString,QString> ShoutCastMetaMap;
 class ShoutCastMetaParser
 {
   public:
-    ShoutCastMetaParser(void) :
-        m_meta_artist_pos(-1), m_meta_title_pos(-1), m_meta_album_pos(-1) { }
+    ShoutCastMetaParser(void) = default;
     ~ShoutCastMetaParser(void) = default;
 
     void setMetaFormat(const QString &metaformat);
@@ -68,9 +67,9 @@ class ShoutCastMetaParser
 
   private:
     QString m_meta_format;
-    int m_meta_artist_pos;
-    int m_meta_title_pos;
-    int m_meta_album_pos;
+    int m_meta_artist_pos {-1};
+    int m_meta_title_pos {-1};
+    int m_meta_album_pos {-1};
 };
 
 void ShoutCastMetaParser::setMetaFormat(const QString &metaformat)

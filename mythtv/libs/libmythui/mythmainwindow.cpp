@@ -131,114 +131,43 @@ class MythMainWindowPrivate
 {
   public:
     MythMainWindowPrivate() :
-        wmult(1.0f), hmult(1.0f),
-        screenwidth(0), screenheight(0),
-        xbase(0), ybase(0),
-        does_fill_screen(false),
-        ignore_lirc_keys(false),
-        ignore_joystick_keys(false),
-        lircThread(nullptr),
-#ifdef USE_JOYSTICK_MENU
-        joystickThread(nullptr),
-#endif
-
-#ifdef USING_APPLEREMOTE
-        appleRemoteListener(nullptr),
-        appleRemote(nullptr),
-#endif
-
-#ifdef USING_LIBCEC
-        cecAdapter(nullptr),
-#endif
-
-        exitingtomain(false),
-        popwindows(false),
-
-        m_useDB(true),
-
-        exitmenucallback(nullptr),
-
-        exitmenumediadevicecallback(nullptr),
-        mediadeviceforcallback(nullptr),
-
-        escapekey(0),
-
-        sysEventHandler(nullptr),
-
-        drawInterval(1000 / MythMainWindow::drawRefresh),
-        drawTimer(nullptr),
-        mainStack(nullptr),
-
-        painter(nullptr),
-        render(nullptr),
-
-        AllowInput(true),
-
-        gesture(MythGesture()),
-        gestureTimer(nullptr),
-        hideMouseTimer(nullptr),
-
-        paintwin(nullptr),
-
-        oldpaintwin(nullptr),
-        oldpainter(nullptr),
-        oldrender(nullptr),
-
-        m_drawDisabledDepth(0),
-        m_drawEnabled(true),
-
-        m_themeBase(nullptr),
-
-        m_udpListener(nullptr),
-
-        m_pendingUpdate(false),
-
-        idleTimer(nullptr),
-        idleTime(0),
-        standby(false),
-        enteringStandby(false),
-        disableIdle(false),
-        NC(nullptr),
-        firstinit(true),
-        m_bSavedPOS(false),
-        m_longPressKeyCode(0),
-        m_longPressTime(0)
+        gesture(MythGesture())
     {
     }
 
     int TranslateKeyNum(QKeyEvent *e);
 
-    float wmult, hmult;
-    int screenwidth, screenheight;
+    float wmult {1.0f}, hmult {1.0f};
+    int screenwidth {0}, screenheight {0};
 
     QRect screenRect;
     QRect uiScreenRect;
 
-    int xbase, ybase;
-    bool does_fill_screen;
+    int xbase {0}, ybase {0};
+    bool does_fill_screen {false};
 
-    bool ignore_lirc_keys;
-    bool ignore_joystick_keys;
+    bool ignore_lirc_keys {false};
+    bool ignore_joystick_keys {false};
 
-    LIRC *lircThread;
+    LIRC *lircThread {nullptr};
 
 #ifdef USE_JOYSTICK_MENU
-    JoystickMenuThread *joystickThread;
+    JoystickMenuThread *joystickThread {nullptr};
 #endif
 
 #ifdef USING_APPLEREMOTE
-    AppleRemoteListener *appleRemoteListener;
-    AppleRemote         *appleRemote;
+    AppleRemoteListener *appleRemoteListener {nullptr};
+    AppleRemote         *appleRemote {nullptr};
 #endif
 
 #ifdef USING_LIBCEC
-    CECAdapter* cecAdapter;
+    CECAdapter* cecAdapter {nullptr};
 #endif
 
-    bool exitingtomain;
-    bool popwindows;
+    bool exitingtomain {false};
+    bool popwindows {false};
 
-    bool m_useDB;              ///< To allow or prevent database access
+    bool m_useDB {true};       ///< To allow or prevent database access
 
     QHash<QString, KeyContext *> keyContexts;
     QMap<int, JumpData*> jumpMap;
@@ -246,63 +175,63 @@ class MythMainWindowPrivate
     QMap<QString, MPData> mediaPluginMap;
     QHash<QString, QHash<QString, QString> > actionText;
 
-    void (*exitmenucallback)(void);
+    void (*exitmenucallback)(void) {nullptr};
 
-    void (*exitmenumediadevicecallback)(MythMediaDevice* mediadevice);
-    MythMediaDevice * mediadeviceforcallback;
+    void (*exitmenumediadevicecallback)(MythMediaDevice* mediadevice) {nullptr};
+    MythMediaDevice * mediadeviceforcallback {nullptr};
 
-    int escapekey;
+    int escapekey {0};
 
-    QObject *sysEventHandler;
+    QObject *sysEventHandler {nullptr};
 
-    int drawInterval;
-    MythSignalingTimer *drawTimer;
+    int drawInterval {1000 / MythMainWindow::drawRefresh};
+    MythSignalingTimer *drawTimer {nullptr};
     QVector<MythScreenStack *> stackList;
-    MythScreenStack *mainStack;
+    MythScreenStack *mainStack {nullptr};
 
-    MythPainter *painter;
-    MythRender  *render;
+    MythPainter *painter {nullptr};
+    MythRender  *render {nullptr};
 
 
-    bool AllowInput;
+    bool AllowInput {true};
 
     QRegion repaintRegion;
 
     MythGesture gesture;
-    QTimer *gestureTimer;
-    QTimer *hideMouseTimer;
+    QTimer *gestureTimer {nullptr};
+    QTimer *hideMouseTimer {nullptr};
 
     /* compatibility only, FIXME remove */
     std::vector<QWidget *> widgetList;
     QMap<QWidget *, bool> enabledWidgets;
 
-    QWidget *paintwin;
+    QWidget *paintwin {nullptr};
 
-    QWidget *oldpaintwin;
-    MythPainter *oldpainter;
-    MythRender *oldrender;
+    QWidget *oldpaintwin {nullptr};
+    MythPainter *oldpainter {nullptr};
+    MythRender *oldrender {nullptr};
 
     QMutex m_drawDisableLock;
-    uint m_drawDisabledDepth;
-    bool m_drawEnabled;
+    uint m_drawDisabledDepth {0};
+    bool m_drawEnabled {true};
 
-    MythThemeBase *m_themeBase;
-    MythUDPListener *m_udpListener;
+    MythThemeBase *m_themeBase {nullptr};
+    MythUDPListener *m_udpListener {nullptr};
 
-    bool m_pendingUpdate;
+    bool m_pendingUpdate {false};
 
-    QTimer *idleTimer;
-    int  idleTime;
-    bool standby;
-    bool enteringStandby;
-    bool disableIdle;
-    MythNotificationCenter *NC;
+    QTimer *idleTimer {nullptr};
+    int  idleTime {0};
+    bool standby {false};
+    bool enteringStandby {false};
+    bool disableIdle {false};
+    MythNotificationCenter *NC {nullptr};
         // window aspect
-    bool firstinit;
-    bool m_bSavedPOS;
+    bool firstinit {true};
+    bool m_bSavedPOS {false};
     // Support for long press
-    int m_longPressKeyCode;
-    ulong m_longPressTime;
+    int m_longPressKeyCode {0};
+    ulong m_longPressTime {0};
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence

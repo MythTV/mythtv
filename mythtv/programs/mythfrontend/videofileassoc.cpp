@@ -140,13 +140,13 @@ namespace
     {
         typedef unsigned int UID_type;
 
-        UIDToFAPair() : m_uid(0), m_file_assoc(nullptr) {}
+        UIDToFAPair() = default;
 
         UIDToFAPair(UID_type uid, FileAssociationWrap *assoc) :
             m_uid(uid), m_file_assoc(assoc) {}
 
-        UID_type m_uid;
-        FileAssociationWrap *m_file_assoc;
+        UID_type m_uid {0};
+        FileAssociationWrap *m_file_assoc {nullptr};
     };
 
 
@@ -168,7 +168,7 @@ class FileAssocDialogPrivate
     typedef std::vector<UIDToFAPair> UIReadyList_type;
 
   public:
-    FileAssocDialogPrivate() : m_nextFAID(0), m_selectionOverride(0)
+    FileAssocDialogPrivate()
     {
         LoadFileAssociations();
     }
@@ -320,8 +320,8 @@ class FileAssocDialogPrivate
 
   private:
     FA_collection m_fileAssociations;
-    UIDToFAPair::UID_type m_nextFAID;
-    UIDToFAPair::UID_type m_selectionOverride;
+    UIDToFAPair::UID_type m_nextFAID {0};
+    UIDToFAPair::UID_type m_selectionOverride {0};
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -39,7 +39,7 @@ static GlobalTextEditSetting *DiSEqCLongitude(void)
 class DeviceTypeSetting : public TransMythUIComboBoxSetting
 {
   public:
-    DeviceTypeSetting() : m_device(nullptr)
+    DeviceTypeSetting()
     {
         setLabel(DeviceTree::tr("Device Type"));
         addSelection(DeviceTree::tr("Unconnected"),
@@ -81,7 +81,7 @@ class DeviceTypeSetting : public TransMythUIComboBoxSetting
     }
 
   private:
-    DiSEqCDevDevice *m_device;
+    DiSEqCDevDevice *m_device {nullptr};
 };
 
 //////////////////////////////////////// DeviceDescrSetting

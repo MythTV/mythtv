@@ -47,13 +47,7 @@ class MythDownloadInfo
 {
   public:
     MythDownloadInfo() :
-        m_request(nullptr),      m_reply(nullptr),     m_data(nullptr),
-        m_caller(nullptr),       m_requestType(kRequestGet),
-        m_reload(false),         m_preferCache(false), m_syncMode(false),
-        m_processReply(true),    m_done(false),        m_bytesReceived(0),
-        m_bytesTotal(0),         m_lastStat(MythDate::current()),
-        m_authCallback(nullptr), m_authArg(nullptr),
-        m_headers(nullptr),      m_errorCode(QNetworkReply::NoError)
+        m_lastStat(MythDate::current())
     {
         qRegisterMetaType<QNetworkReply::NetworkError>("QNetworkReply::NetworkError");
     }
@@ -86,26 +80,26 @@ class MythDownloadInfo
 
     QString          m_url;
     QUrl             m_redirectedTo;
-    QNetworkRequest *m_request;
-    QNetworkReply   *m_reply;
+    QNetworkRequest *m_request {nullptr};
+    QNetworkReply   *m_reply {nullptr};
     QString          m_outFile;
-    QByteArray      *m_data;
+    QByteArray      *m_data {nullptr};
     QByteArray       m_privData;
-    QObject         *m_caller;
-    MRequestType     m_requestType;
-    bool             m_reload;
-    bool             m_preferCache;
-    bool             m_syncMode;
-    bool             m_processReply;
-    bool             m_done;
-    qint64           m_bytesReceived;
-    qint64           m_bytesTotal;
+    QObject         *m_caller {nullptr};
+    MRequestType     m_requestType {kRequestGet};
+    bool             m_reload {false};
+    bool             m_preferCache {false};
+    bool             m_syncMode {false};
+    bool             m_processReply {true};
+    bool             m_done {false};
+    qint64           m_bytesReceived {0};
+    qint64           m_bytesTotal {0};
     QDateTime        m_lastStat;
-    AuthCallback     m_authCallback;
-    void            *m_authArg;
-    const QHash<QByteArray, QByteArray> *m_headers;
+    AuthCallback     m_authCallback {nullptr};
+    void            *m_authArg {nullptr};
+    const QHash<QByteArray, QByteArray> *m_headers {nullptr};
 
-    QNetworkReply::NetworkError m_errorCode;
+    QNetworkReply::NetworkError m_errorCode {QNetworkReply::NoError};
     QMutex           m_lock;
 };
 

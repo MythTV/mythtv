@@ -18,8 +18,7 @@ class VolumeWriteBackThread : public MThread
 {
     VolumeWriteBackThread(const VolumeWriteBackThread &);
     VolumeWriteBackThread & operator =(const VolumeWriteBackThread &);
-    VolumeWriteBackThread() : MThread("VolumeWriteBack"),
-        m_state(kStopped), m_volume(-1)
+    VolumeWriteBackThread() : MThread("VolumeWriteBack") 
     { }
 
   public:
@@ -89,8 +88,8 @@ class VolumeWriteBackThread : public MThread
   private:
     static QMutex s_mutex;
     QMutex mutable m_mutex;
-    enum { kStopped, kRunning, kFinished } m_state;
-    int m_volume;
+    enum { kStopped, kRunning, kFinished } m_state {kStopped};
+    int m_volume {-1};
 };
 
 QMutex VolumeWriteBackThread::s_mutex;

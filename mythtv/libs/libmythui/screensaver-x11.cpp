@@ -211,14 +211,12 @@ class ScreenSaverX11Private
     class ScreenSaverState
     {
       public:
-        ScreenSaverState() :
-            saved(false), timeout(-1), interval(-1),
-            preferblank(-1), allowexposure(-1) {}
-        bool saved;
-        int timeout;
-        int interval;
-        int preferblank;
-        int allowexposure;
+        ScreenSaverState() = default;
+        bool saved {false};
+        int timeout {-1};
+        int interval {-1};
+        int preferblank {-1};
+        int allowexposure {-1};
     };
 
   private:

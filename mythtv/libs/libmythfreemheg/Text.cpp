@@ -511,12 +511,12 @@ MHTextItem *MHTextItem::NewItem()
 class MHTextLine
 {
   public:
-    MHTextLine(): m_nLineWidth(0), m_nLineHeight(0), m_nDescent(0) {}
+    MHTextLine() = default;
     ~MHTextLine();
     MHSequence <MHTextItem *> m_Items;
-    int m_nLineWidth;
-    int m_nLineHeight;
-    int m_nDescent;
+    int m_nLineWidth {0};
+    int m_nLineHeight {0};
+    int m_nDescent {0};
 };
 
 MHTextLine::~MHTextLine()

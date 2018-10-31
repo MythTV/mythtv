@@ -890,9 +890,8 @@ private:
 class HLSPlayback
 {
 public:
-    HLSPlayback(void) : m_offset(0), m_stream(0), m_segment(0)
-    {
-    }
+    HLSPlayback(void) = default;
+
     /* offset is only used from main thread, no need for locking */
     uint64_t Offset(void) const
     {
@@ -933,9 +932,9 @@ public:
     }
 
 private:
-    uint64_t        m_offset;   // current offset in media
-    int             m_stream;   // current HLSStream
-    int             m_segment;  // current segment for playback
+    uint64_t        m_offset {0};   // current offset in media
+    int             m_stream {0};   // current HLSStream
+    int             m_segment {0};  // current segment for playback
     QMutex          m_lock;
 };
 

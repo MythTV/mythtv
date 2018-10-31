@@ -48,15 +48,7 @@ typedef QMap<raw1394handle_t,LinuxFirewireDevice*> handle_to_lfd_t;
 class LFDPriv
 {
   public:
-    LFDPriv() :
-        generation(0), reset_timer_on(false),
-        run_port_handler(false), is_port_handler_running(false),
-        avstream(nullptr), channel(-1),
-        output_plug(-1), input_plug(-1), bandwidth(0), no_data_cnt(0),
-        is_p2p_node_open(false), is_bcast_node_open(false),
-        is_streaming(false), port_handler_thread(nullptr)
-    {
-    }
+    LFDPriv() = default;
 
     ~LFDPriv()
     {
@@ -72,28 +64,28 @@ class LFDPriv
         }
     }
 
-    uint             generation;
-    bool             reset_timer_on;
+    uint             generation {0};
+    bool             reset_timer_on {false};
     MythTimer        reset_timer;
 
-    bool             run_port_handler;
-    bool             is_port_handler_running;
+    bool             run_port_handler {false};
+    bool             is_port_handler_running {false};
     QWaitCondition   port_handler_wait;
     QMutex           start_stop_port_handler_lock;
 
-    iec61883_mpeg2_t avstream;
-    int              channel;
-    int              output_plug;
-    int              input_plug;
-    int              bandwidth;
-    uint             no_data_cnt;
+    iec61883_mpeg2_t avstream {nullptr};
+    int              channel {-1};
+    int              output_plug {-1};
+    int              input_plug {-1};
+    int              bandwidth {0};
+    uint             no_data_cnt {0};
 
-    bool             is_p2p_node_open;
-    bool             is_bcast_node_open;
-    bool             is_streaming;
+    bool             is_p2p_node_open {false};
+    bool             is_bcast_node_open {false};
+    bool             is_streaming {false};
 
     QDateTime        stop_streaming_timer;
-    MThread         *port_handler_thread;
+    MThread         *port_handler_thread {nullptr};
 
     avcinfo_list_t   devices;
 

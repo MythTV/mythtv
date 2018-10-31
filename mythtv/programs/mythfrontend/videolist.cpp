@@ -464,7 +464,7 @@ class VideoListImp
     metadata_view_list m_metadata_view_flat;
     meta_dir_node m_metadata_view_tree;
 
-    metadata_list_type m_metadata_list_type;
+    metadata_list_type m_metadata_list_type {ltNone};
 
     VideoFilterSettings m_video_filter;
 };
@@ -548,8 +548,7 @@ void VideoList::InvalidateCache(void)
 //////////////////////////////
 // VideoListImp
 //////////////////////////////
-VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
-                               m_metadata_list_type(ltNone)
+VideoListImp::VideoListImp() : m_metadata_view_tree("", "top")
 {
     m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFileTypes", 0);
 

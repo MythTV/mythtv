@@ -289,7 +289,7 @@ namespace
         Q_OBJECT
 
       public:
-        FanartLoader() : itemsPast(0), m_fanart(nullptr), m_bConnected( false )
+        FanartLoader()
         {
             // NOTE: Moved call to connect to first call of LoadImage/
             //       Having it here causes a runtime error on windows
@@ -352,11 +352,11 @@ namespace
         }
 
       private:
-        int             itemsPast;
+        int             itemsPast {0};
         QMutex          m_fanartLock;
-        MythUIImage    *m_fanart;
+        MythUIImage    *m_fanart {nullptr};
         QTimer          m_fanartTimer;
-        bool            m_bConnected;
+        bool            m_bConnected {false};
     };
 
     std::unique_ptr<FanartLoader> fanartLoader;

@@ -144,11 +144,10 @@ class MythGLShaderObject
   public:
     MythGLShaderObject(uint vert, uint frag)
       : m_vertex_shader(vert), m_fragment_shader(frag) { }
-    MythGLShaderObject()
-      : m_vertex_shader(0), m_fragment_shader(0) { }
+    MythGLShaderObject() = default;
 
-    GLuint m_vertex_shader;
-    GLuint m_fragment_shader;
+    GLuint m_vertex_shader {0};
+    GLuint m_fragment_shader {0};
 };
 
 MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format,
