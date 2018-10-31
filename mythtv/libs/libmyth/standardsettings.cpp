@@ -259,7 +259,16 @@ void StandardSetting::setName(const QString &name)
 
 StandardSetting* StandardSetting::byName(const QString &name)
 {
-    return (name == m_name) ? this : NULL;
+    if (name == m_name)
+        return this;
+
+    foreach (StandardSetting *setting, *getSubSettings())
+    {
+        StandardSetting *s = setting->byName(name);
+        if (s)
+            return s;
+    }
+    return nullptr;
 }
 
 void StandardSetting::MoveToThread(QThread *thread)
