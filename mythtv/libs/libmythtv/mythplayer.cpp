@@ -219,6 +219,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       savedAudioTimecodeOffset(0),
       rtcbase(0),
       maxtcval(0), maxtcframes(0),
+      numdroppedframes(0),
       // LiveTVChain stuff
       m_tv(nullptr),                isDummy(false),
       // Counter for buffering messages
@@ -2208,6 +2209,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             rtcbase = unow - videotimecode * playspeed1000;
             maxtcval = 0;
             maxtcframes = 0;
+            numdroppedframes = 0;
         }
 
         int64_t tcincr = videotimecode - maxtcval;
@@ -2230,7 +2232,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         lateness = unow - framedue;
         dropframe = false;
         if (lateness > 30000)
-            dropframe = !FlagIsSet(kMusicChoice);
+            dropframe = !FlagIsSet(kMusicChoice) && numdroppedframes < 10;
 
         if (lateness <= 30000 && audiotimecode > 0 && normal_speed)
         {
@@ -2244,6 +2246,8 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("AV Sync, audio ahead by %1 ms").arg(audio_adjustment));
             }
+            if (audio_adjustment > 1000)
+                pause_audio = true;
         }
         // sanity check - reset rtcbase if time codes have gone crazy.
         if (lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE)
@@ -2286,6 +2290,12 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         avsync_audiopaused = false;
         audio.Pause(false);
     }
+    if (pause_audio && !avsync_audiopaused)
+    {
+        avsync_audiopaused = true;
+        audio.Pause(true);
+    }
+
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 "
                 "audioadj=%4 tcoffset=%5 unow=%6 udue=%7")
@@ -2297,6 +2307,12 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             .arg(unow)
             .arg(framedue)
                 );
+
+    if (dropframe)
+        numdroppedframes++;
+    else
+        numdroppedframes = 0;
+
     if (dropframe)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("dropping frame to catch up, lateness=%1 usec")
