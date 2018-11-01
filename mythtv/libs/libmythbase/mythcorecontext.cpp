@@ -844,7 +844,7 @@ void MythCoreContext::ActivateSettingsCache(bool activate)
 
 QString MythCoreContext::GetHostName(void)
 {
-    QMutexLocker (&d->m_localHostLock);
+    QMutexLocker locker(&d->m_localHostLock);
     QString tmp = d->m_localHostname;
     tmp.detach();
     return tmp;
