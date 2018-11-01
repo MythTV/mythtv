@@ -146,7 +146,7 @@ int mythfile_open(const char *pathname, int flags)
         return errno = EISDIR, -1;
 
     int fileID = -1;
-    if (strncmp(pathname, "myth://", 7))
+    if (strncmp(pathname, "myth://", 7) != 0)
     {
         int lfd = open(pathname, flags);
         if (lfd < 0)
@@ -423,7 +423,7 @@ int mythdir_opendir(const char *dirname)
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("mythdir_opendir(%1)").arg(dirname));
 
     int id = 0;
-    if (strncmp(dirname, "myth://", 7))
+    if (strncmp(dirname, "myth://", 7) != 0)
     {
         DIR *dir = opendir(dirname);
         if (dir) {

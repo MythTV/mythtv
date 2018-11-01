@@ -1028,7 +1028,7 @@ int syslogGetFacility(QString facility)
     char *string = (char *)ba.constData();
 
     for (i = 0, name = &facilitynames[0];
-         name->c_name && strcmp(name->c_name, string); i++, name++);
+         name->c_name && (strcmp(name->c_name, string) != 0); i++, name++);
 
     return( name->c_val );
 #endif

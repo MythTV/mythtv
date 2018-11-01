@@ -168,7 +168,7 @@ bool xv_is_attrib_supported(
                                        port, &attrib_count);
     for (int i = (attributes) ? 0 : attrib_count; i < attrib_count; i++)
     {
-        if (strcmp(attributes[i].name, name))
+        if (strcmp(attributes[i].name, name) != 0)
             continue;
 
         if (min_value)

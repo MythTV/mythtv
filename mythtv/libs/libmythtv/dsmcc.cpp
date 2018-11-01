@@ -175,7 +175,7 @@ void Dsmcc::ProcessDownloadServerInitiate(const unsigned char *data,
     if (ret <= 0)
         return; /* error */
 
-    if (strcmp(gatewayProfile.type_id, "srg"))
+    if (strcmp(gatewayProfile.type_id, "srg") != 0)
     {
         LOG(VB_DSMCC, LOG_WARNING, QString("[dsmcc] IOR unexpected type_id: '%1'")
             .arg(gatewayProfile.type_id));
