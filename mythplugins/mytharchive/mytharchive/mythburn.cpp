@@ -183,7 +183,7 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "DELETE")
         {
@@ -787,7 +787,7 @@ void MythBurn::saveConfiguration(void)
     }
 }
 
-void MythBurn::showMenu()
+void MythBurn::ShowMenu()
 {
     if (m_archiveList.size() == 0)
         return;

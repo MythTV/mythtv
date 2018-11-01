@@ -35,7 +35,7 @@ class LogViewer : public MythScreenType
     bool loadFile(QString filename, QStringList &list, int startline);
     void showProgressLog(void);
     void showFullLog(void);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void updateLogItem(MythUIButtonListItem *item);
 
   private:

@@ -71,7 +71,7 @@ class MythBurn : public MythScreenType
     void handleAddFile(void);
 
     void toggleUseCutlist(void);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void editDetails(void);
     void editThumbnails(void);
     void changeProfile(void);

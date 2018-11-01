@@ -134,7 +134,7 @@ bool ZMEvents::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "ESCAPE")
         {
@@ -442,7 +442,7 @@ void ZMEvents::setGridLayout(int layout)
     }
 }
 
-void ZMEvents::showMenu()
+void ZMEvents::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

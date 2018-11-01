@@ -52,7 +52,7 @@ class GameUI : public MythScreenType
     void clearRomInfo(void);
     void edit(void);
     void showInfo(void);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void searchStart(void);
     void toggleFavorite(void);
     void customEvent(QEvent *event) override; // MythUIType

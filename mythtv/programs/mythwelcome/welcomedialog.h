@@ -37,7 +37,7 @@ class WelcomeDialog : public MythScreenType
     void updateStatus(void);
     void updateScreen(void);
     void closeDialog(void);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void shutdownNow(void);
     void runEPGGrabber(void);
     void lockShutdown(void);

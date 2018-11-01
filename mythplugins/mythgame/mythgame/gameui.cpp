@@ -198,7 +198,7 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
-            showMenu();
+            ShowMenu();
         else if (action == "EDIT")
             edit();
         else if (action == "INFO")
@@ -428,7 +428,7 @@ void GameUI::showInfo()
     }
 }
 
-void GameUI::showMenu()
+void GameUI::ShowMenu()
 {
     MythGenericTree *node = m_gameUITree->GetCurrentNode();
 

@@ -115,7 +115,7 @@ bool VideoSelector::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "1")
         {
@@ -143,7 +143,7 @@ bool VideoSelector::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void VideoSelector::showMenu()
+void VideoSelector::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

@@ -141,7 +141,7 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "DELETE")
         {
@@ -375,7 +375,7 @@ void ExportNative::saveConfiguration(void)
     }
 }
 
-void ExportNative::showMenu()
+void ExportNative::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

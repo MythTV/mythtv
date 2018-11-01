@@ -188,7 +188,7 @@ bool ThumbFinder::keyPressEvent(QKeyEvent *event)
 
         if (action == "ESCAPE")
         {
-            showMenu();
+            ShowMenu();
             return true;
         }
 
@@ -887,7 +887,7 @@ void ThumbFinder::closeAVCodec()
     m_inputFC.Close();
 }
 
-void ThumbFinder::showMenu()
+void ThumbFinder::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"), popupStack, "actionmenu");

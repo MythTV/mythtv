@@ -52,7 +52,7 @@ class ThumbFinder : public MythScreenType
 
   private slots:
     void gridItemChanged(MythUIButtonListItem *item);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void cancelPressed(void);
     void savePressed(void);
     void updateThumb(void);

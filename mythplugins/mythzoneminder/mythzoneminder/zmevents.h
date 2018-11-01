@@ -57,7 +57,7 @@ public:
     void getCameraList(void);
     void getDateList(void);
     void setGridLayout(int layout);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
 
     bool                 m_oldestFirst;
     bool                 m_showContinuous;

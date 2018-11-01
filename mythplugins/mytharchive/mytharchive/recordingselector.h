@@ -46,7 +46,7 @@ class RecordingSelector : public MythScreenType
     void OKPressed(void);
     void cancelPressed(void);
 
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void selectAll(void);
     void clearAll(void);
 

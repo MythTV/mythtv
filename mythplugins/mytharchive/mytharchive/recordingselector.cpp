@@ -182,7 +182,7 @@ bool RecordingSelector::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else
             handled = false;
@@ -194,7 +194,7 @@ bool RecordingSelector::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void RecordingSelector::showMenu()
+void RecordingSelector::ShowMenu()
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

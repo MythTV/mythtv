@@ -195,7 +195,7 @@ bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "ESCAPE" && !GetMythMainWindow()->IsExitingToMain())
         {
@@ -660,7 +660,7 @@ void ImportMusicDialog::metadataChanged(void)
     fillWidgets();
 }
 
-void ImportMusicDialog::showMenu()
+void ImportMusicDialog::ShowMenu()
 {
     if (m_tracks->empty())
         return;

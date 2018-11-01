@@ -235,7 +235,7 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "MENU")
         {
-            showMenu();
+            ShowMenu();
         }
         else if (action == "NEXTVIEW")
         {
@@ -582,7 +582,7 @@ bool WelcomeDialog::checkConnectionToServer(void)
     return bRes;
 }
 
-void WelcomeDialog::showMenu(void)
+void WelcomeDialog::ShowMenu(void)
 {
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

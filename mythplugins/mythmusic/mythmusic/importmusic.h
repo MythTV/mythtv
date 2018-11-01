@@ -84,7 +84,7 @@ class ImportMusicDialog : public MythScreenType
     void doExit(bool ok);
 
     // popup menu
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void saveDefaults(void);
     void setCompilation(void);
     void setCompilationArtist(void);

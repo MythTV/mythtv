@@ -51,7 +51,7 @@ class ExportNative : public MythScreenType
     void handleAddVideo(void);
 
     void titleChanged(MythUIButtonListItem *item);
-    void showMenu(void);
+    void ShowMenu(void) override; // MythScreenType
     void removeItem(void);
     void selectorClosed(bool ok);
 
