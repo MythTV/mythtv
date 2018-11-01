@@ -6485,12 +6485,12 @@ int x;
 EOF
 }
 
-qt_compiler_check Q_COMPILER_NULLPTR && enable require_nullptr
+qt_compiler_check Q_COMPILER_NULLPTR && enable enforce_nullptr
 case "$cc_type" in
     gcc)
         # Gcc < 6 doesn't seem to ignore warnings in system headers
         if [ $gxx_major -lt 6 ] ; then
-            disable require_nullptr
+            disable enforce_nullptr
         fi
         ;;
     clang)
@@ -6498,18 +6498,18 @@ case "$cc_type" in
             # The zero-as-null-pointer-constant warning wasn't added
             # until clang 5.0, and clang < 6 doesn't seem to ignore
             # warnings in all system headers.
-            disable require_nullptr
+            disable enforce_nullptr
         fi
         # Clang on FreeBSD doesn't ignore warnings in system headers.
         # A trivial test shows that Clang defaults /usr/local/include
         # to a system directory, but somehow this gets messed up in
         # MythTV builds.
         if test $target_os = "freebsd"; then
-            disable require_nullptr
+            disable enforce_nullptr
         fi
         ## Not yet tested on MacOSX.
         if test $target_os = "darwin"; then
-            disable require_nullptr
+            disable enforce_nullptr
         fi
         ;;
 esac
@@ -6876,7 +6876,7 @@ if enabled gxx; then
     check_cxxflags -funit-at-a-time
     # Don't complain about over-aligned types
     check_cxxflags -faligned-new
-    if enabled require_nullptr; then
+    if enabled enforce_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
     fi
     # Ubuntu 16.04 has problems with this flag.  Its not GCC or Qt, as
@@ -6920,7 +6920,7 @@ elif enabled clangxx; then
     else
         check_cxxflags -faligned-allocation
     fi
-    if enabled require_nullptr; then
+    if enabled enforce_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
     fi
 fi
@@ -7424,7 +7424,7 @@ echo "vpx                       ${libvpx-no}"
 echo ""
 
 echo "# Compilation Options"
-echo "Require c++11 nullptr     ${require_nullptr-no}"
+echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo ""
 
 # Remove redundant elements from variables
