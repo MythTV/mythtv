@@ -971,7 +971,7 @@ int MythCoreContext::GetMasterServerPort(void)
 /**
  * Returns the Master Backend status port
  * If no master server status port has been defined in the database,
- * return the default 65434
+ * return the default 6544
  */
 int MythCoreContext::GetMasterServerStatusPort(void)
 {
