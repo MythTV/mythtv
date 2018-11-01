@@ -585,6 +585,12 @@ void ExternalStreamHandler::run(void)
     uint       restart_cnt = 0;
     MythTimer  status_timer;
 
+    if (!m_IO)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("%1 is not running.").arg(_device));
+    }
+
     status_timer.start();
 
     RunProlog();
@@ -640,7 +646,7 @@ void ExternalStreamHandler::run(void)
                 if (empty_cnt % 5000)
                 {
                     if (restart_cnt++)
-                        std::this_thread::sleep_for(std::chrono::seconds(5));
+                        std::this_thread::sleep_for(std::chrono::seconds(20));
                     if (!RestartStream())
                         _error = true;
                     xon = false;
@@ -664,7 +670,7 @@ void ExternalStreamHandler::run(void)
                 if (CheckForError())
                 {
                     if (restart_cnt++)
-                        std::this_thread::sleep_for(std::chrono::seconds(5));
+                        std::this_thread::sleep_for(std::chrono::seconds(20));
                     if (!RestartStream())
                         _error = true;
                     xon = false;
@@ -753,7 +759,12 @@ void ExternalStreamHandler::run(void)
                 buffer.remove(0, len - remainder);
         }
 
-        if (m_IO->Error())
+        if (m_IO == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "I/O thread has disappeared!");
+            _error = true;
+        }
+        else if (m_IO->Error())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Fatal Error from External Recorder: %1")
@@ -1011,7 +1022,7 @@ bool ExternalStreamHandler::StartStreaming(void)
         if (!ProcessCommand("StartStreaming", 1000, result, 10, 5))
         {
             LogLevel_t level = LOG_ERR;
-            if (!result.toLower().startsWith("warn"))
+            if (result.toLower().startsWith("warn"))
                 level = LOG_WARNING;
             else
                 _error = true;
@@ -1072,7 +1083,7 @@ bool ExternalStreamHandler::StopStreaming(void)
     if (!ProcessCommand("StopStreaming", 1000, result, 10, 5))
     {
         LogLevel_t level = LOG_ERR;
-        if (!result.toLower().startsWith("warn"))
+        if (result.toLower().startsWith("warn"))
             level = LOG_WARNING;
         else
             _error = true;
