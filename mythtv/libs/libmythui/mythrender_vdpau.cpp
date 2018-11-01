@@ -51,7 +51,7 @@
 
 #define GET_PROC(FUNC_ID, PROC) \
     vdp_st = vdp_get_proc_address( \
-        m_device, FUNC_ID, (void **)&PROC); \
+        m_device, FUNC_ID, (void **)&(PROC)); \
     CHECK_ST
 
 #define CREATE_CHECK(arg1, arg2) \
@@ -59,7 +59,7 @@
   { \
       ok = arg1; \
       if (!ok) \
-          LOG(VB_GENERAL, LOG_ERR, LOC + arg2); \
+          LOG(VB_GENERAL, LOG_ERR, LOC + (arg2)); \
   }
 
 #define CHECK_VIDEO_SURFACES(arg1) \

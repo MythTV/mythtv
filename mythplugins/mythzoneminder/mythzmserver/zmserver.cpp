@@ -52,9 +52,9 @@
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
 
-#define ADD_STR(list,s)  list += s; list += "[]:[]";
+#define ADD_STR(list,s)  list += (s); (list) += "[]:[]";
 // TODO rewrite after we require C++11, see http://en.cppreference.com/w/cpp/string/basic_string/to_string
-#define ADD_INT(list,n)  sprintf(m_buf, "%d", (int)n); list += m_buf; list += "[]:[]";
+#define ADD_INT(list,n)  sprintf(m_buf, "%d", (int)(n)); (list) += m_buf; (list) += "[]:[]";
 
 // error messages
 #define ERROR_TOKEN_COUNT      "Invalid token count"

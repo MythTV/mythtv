@@ -34,7 +34,7 @@ using std::vector;
 
 #define SLOC(a) QString("MythSocket(%1:%2): ") \
     .arg((intptr_t)(a), 0, 16)                 \
-    .arg(a->GetSocketDescriptor())
+    .arg((a)->GetSocketDescriptor())
 #define LOC SLOC(this)
 
 const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;

@@ -2256,7 +2256,7 @@ TVState TV::RemoveRecording(TVState state)
 }
 
 #define TRANSITION(ASTATE,BSTATE) \
-   ((ctxState == ASTATE) && (desiredNextState == BSTATE))
+   ((ctxState == (ASTATE)) && (desiredNextState == (BSTATE)))
 
 #define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0)
 #define SET_LAST() do { nextState = ctxState; changed = true; } while(0)
@@ -12932,7 +12932,7 @@ bool TV::HandleJumpToProgramAction(
     return true;
 }
 
-#define MINUTE 60*1000
+#define MINUTE (60*1000)
 
 void TV::ToggleSleepTimer(const PlayerContext *ctx, const QString &time)
 {

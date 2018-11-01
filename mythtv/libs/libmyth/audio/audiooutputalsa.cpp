@@ -27,7 +27,7 @@ using namespace std;
 
 #define FILTER_FLAGS ~(SND_PCM_NO_AUTO_FORMAT)
 
-#define AERROR(str)   VBERROR(str + QString(": %1").arg(snd_strerror(err)))
+#define AERROR(str)   VBERROR((str) + QString(": %1").arg(snd_strerror(err)))
 #define CHECKERR(str) { if (err < 0) { AERROR(str); return err; } }
 
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :

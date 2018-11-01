@@ -37,21 +37,21 @@ using namespace std;
     }
 
 
-#define Destroy(a) (*a)->Destroy(a);
-#define SetPlayState(a, b) (*a)->SetPlayState(a, b)
-#define RegisterCallback(a, b, c) (*a)->RegisterCallback(a, b, c)
-#define GetInterface(a, b, c) (*a)->GetInterface(a, b, c)
-#define Realize(a, b) (*a)->Realize(a, b)
-#define CreateOutputMix(a, b, c, d, e) (*a)->CreateOutputMix(a, b, c, d, e)
+#define Destroy(a) (*(a))->Destroy(a);
+#define SetPlayState(a, b) (*(a))->SetPlayState(a, b)
+#define RegisterCallback(a, b, c) (*(a))->RegisterCallback(a, b, c)
+#define GetInterface(a, b, c) (*(a))->GetInterface(a, b, c)
+#define Realize(a, b) (*(a))->Realize(a, b)
+#define CreateOutputMix(a, b, c, d, e) (*(a))->CreateOutputMix(a, b, c, d, e)
 #define CreateAudioPlayer(a, b, c, d, e, f, g) \
-    (*a)->CreateAudioPlayer(a, b, c, d, e, f, g)
-#define Enqueue(a, b, c) (*a)->Enqueue(a, b, c)
-#define Clear(a) (*a)->Clear(a)
-#define GetState(a, b) (*a)->GetState(a, b)
-#define SetPositionUpdatePeriod(a, b) (*a)->SetPositionUpdatePeriod(a, b)
-#define SetVolumeLevel(a, b) (*a)->SetVolumeLevel(a, b)
-#define GetVolumeLevel(a, b) (*a)->GetVolumeLevel(a, b)
-#define SetMute(a, b) (*a)->SetMute(a, b)
+    (*(a))->CreateAudioPlayer(a, b, c, d, e, f, g)
+#define Enqueue(a, b, c) (*(a))->Enqueue(a, b, c)
+#define Clear(a) (*(a))->Clear(a)
+#define GetState(a, b) (*(a))->GetState(a, b)
+#define SetPositionUpdatePeriod(a, b) (*(a))->SetPositionUpdatePeriod(a, b)
+#define SetVolumeLevel(a, b) (*(a))->SetVolumeLevel(a, b)
+#define GetVolumeLevel(a, b) (*(a))->GetVolumeLevel(a, b)
+#define SetMute(a, b) (*(a))->SetMute(a, b)
 
 int GetNativeOutputSampleRate(void);
 
@@ -110,7 +110,7 @@ bool AudioOutputOpenSLES::CreateEngine()
             Close();  \
             return false;   \
         }                                                      \
-        dest = *sym;                                           \
+        (dest) = *sym;                                         \
     } while(0)
 
     OPENSL_DLSYM(SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");

@@ -37,7 +37,7 @@ using namespace std;
 
 #define LOC QString("AOJack: ")
 
-#define JERROR(str) Error(LOC + str)
+#define JERROR(str) Error(LOC + (str))
 
 AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     AudioOutputBase(settings),

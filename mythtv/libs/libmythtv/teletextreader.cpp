@@ -8,7 +8,7 @@
 #include "tv_actions.h"    // for ACTION_MENUBLUE, etc
 #include "mythlogging.h"
 
-#define MAGAZINE(page) (page / 256)
+#define MAGAZINE(page) ((page) / 256)
 
 TeletextReader::TeletextReader()
   : m_curpage(0x100),           m_cursubpage(-1),

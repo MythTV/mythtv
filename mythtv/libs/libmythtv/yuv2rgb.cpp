@@ -418,10 +418,10 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 
 #define RGBOUT(r, g, b, y1)\
 {\
-    y = (y1 - 16) * C_Y;\
-    r = std::min(UCHAR_MAX, std::max(0, (y + r_add) >> SCALE_BITS));\
-    g = std::min(UCHAR_MAX, std::max(0, (y + g_add) >> SCALE_BITS));\
-    b = std::min(UCHAR_MAX, std::max(0, (y + b_add) >> SCALE_BITS));\
+    y = ((y1) - 16) * C_Y;\
+    (r) = std::min(UCHAR_MAX, std::max(0, (y + r_add) >> SCALE_BITS));\
+    (g) = std::min(UCHAR_MAX, std::max(0, (y + g_add) >> SCALE_BITS));\
+    (b) = std::min(UCHAR_MAX, std::max(0, (y + b_add) >> SCALE_BITS));\
 }
 
 static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,

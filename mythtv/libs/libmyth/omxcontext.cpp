@@ -16,7 +16,7 @@ using namespace omxcontext;
 
 #define LOC QString("OMX:%1 ").arg(Id())
 #define LOCA QString("OMX: ")
-#define LOCB(c) QString("OMX:%1 ").arg(c.Id())
+#define LOCB(c) QString("OMX:%1 ").arg((c).Id())
 
 
 // Stringize a macro
@@ -1106,9 +1106,9 @@ const char *Command2String(OMX_COMMANDTYPE cmd)
 
 #define FLAG2LIST(_f,_n,_l)\
     do {\
-        if (_n & OMX_BUFFERFLAG_##_f) {\
-            _n &= ~OMX_BUFFERFLAG_##_f;\
-            _l << STR(_f);\
+        if ((_n) & OMX_BUFFERFLAG_##_f) {\
+            (_n) &= ~OMX_BUFFERFLAG_##_f;\
+            (_l) << STR(_f);\
         }\
     } while(0)
 

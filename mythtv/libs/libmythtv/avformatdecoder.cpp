@@ -205,7 +205,7 @@ static int has_codec_parameters(AVStream *st)
     AVCodecContext *avctx = nullptr;
 
 #define FAIL(errmsg) do {                                     \
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + errmsg);                \
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + (errmsg));              \
     return 0;                                                 \
 } while (0)
 

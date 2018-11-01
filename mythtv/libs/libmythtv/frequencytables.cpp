@@ -584,13 +584,13 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
 #define FREQ(A,B, C,D, E,F,G, H, I) \
     fmap[QString("atsc_%1_us%2").arg(A).arg(B)] = \
-        new FrequencyTable(C+D, E, F, G, H, I);
+        new FrequencyTable((C)+(D), E, F, G, H, I);
 
 // The maximum channel defined in the US frequency tables (standard, HRC, IRC)
 #define US_MAX_CHAN 159
 // Equation for computing EIA-542 frequency of channels > 99
 // A = bandwidth, B = offset, C = channel designation (number)
-#define EIA_542_FREQUENCY(A,B,C) ( ( A * ( 8 + C ) ) + B )
+#define EIA_542_FREQUENCY(A,B,C) ( ( (A) * ( 8 + (C) ) ) + (B) )
 
     for (uint i = 0; i < 4; i++)
     {

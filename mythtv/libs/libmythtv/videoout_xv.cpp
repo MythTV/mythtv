@@ -793,7 +793,7 @@ bool VideoOutputXv::CreateOSD(void)
 do { \
     if (test) \
     { \
-        LOG(VB_GENERAL, LOG_ERR, LOC + msg + " Exiting playback."); \
+        LOG(VB_GENERAL, LOG_ERR, LOC + (msg) + " Exiting playback."); \
         errorState = kError_Unknown; \
         return false; \
     } \

@@ -122,7 +122,7 @@ static const dxva2_mode dxva2_modes[] =
   { \
       ok = arg1; \
       if (!ok) \
-          LOG(VB_GENERAL, LOG_ERR, LOC + arg2); \
+          LOG(VB_GENERAL, LOG_ERR, LOC + (arg2)); \
   }
 
 DXVA2Decoder::DXVA2Decoder(uint num_bufs, MythCodecID codec_id,

@@ -37,7 +37,7 @@
 #include "mythcdrom.h"
 
 // about one second at 35mbit
-#define BUFFER_SIZE_MINIMUM 4 * 1024 * 1024
+#define BUFFER_SIZE_MINIMUM (4 * 1024 * 1024)
 #define BUFFER_FACTOR_NETWORK  2
 #define BUFFER_FACTOR_BITRATE  2
 #define BUFFER_FACTOR_MATROSKA 2

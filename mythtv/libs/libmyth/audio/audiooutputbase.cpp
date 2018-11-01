@@ -26,11 +26,11 @@ using namespace std;
 
 #define LOC QString("AOBase: ")
 
-#define WPOS audiobuffer + org_waud
-#define RPOS audiobuffer + raud
+#define WPOS (audiobuffer + org_waud)
+#define RPOS (audiobuffer + raud)
 #define ABUF audiobuffer
 #define STST soundtouch::SAMPLETYPE
-#define AOALIGN(x) (((long)&x + 15) & ~0xf);
+#define AOALIGN(x) (((long)&(x) + 15) & ~0xf);
 
 // 1,2,5 and 7 channels are currently valid for upmixing if required
 #define UPMIX_CHANNEL_MASK ((1<<1)|(1<<2)|(1<<5)|1<<7)
@@ -1772,7 +1772,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
                                   volatile uint *local_raud)
 {
 
-#define LRPOS audiobuffer + *local_raud
+#define LRPOS (audiobuffer + *local_raud)
     // re-check audioready() in case things changed.
     // for example, ClearAfterSeek() might have run
     int avail_size   = audioready();

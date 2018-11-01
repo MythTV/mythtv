@@ -67,8 +67,8 @@ static bool _connected = false;
 #define dbgprotocol(a...) if (DebugProtocol) LOG(VB_DVBCAM, LOG_DEBUG, QString().sprintf(a))
 
 #define OK       0
-#define TIMEOUT -1
-#define ERROR   -2
+#define TIMEOUT (-1)
+#define ERROR   (-2)
 
 // --- Workarounds -----------------------------------------------------------
 
@@ -1141,7 +1141,7 @@ bool cCiDateTime::SendDateTime(void)
      int D = tm_gmt.tm_mday;
      int L = (M == 1 || M == 2) ? 1 : 0;
      int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
-#define DEC2BCD(d) (uint8_t(((d / 10) << 4) + (d % 10)))
+#define DEC2BCD(d) (uint8_t((((d) / 10) << 4) + ((d) % 10)))
      struct tTime { unsigned short mjd; uint8_t h, m, s; short offset; };
      tTime T;
      T.mjd = htons(MJD);

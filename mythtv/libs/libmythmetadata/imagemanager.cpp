@@ -18,11 +18,11 @@
 #define DB_TABLE "gallery_files"
 
 #define RESULT_ERR(ERR, MESG) \
-{   LOG(VB_GENERAL, LOG_ERR, LOC + MESG); \
-    return QStringList("ERROR") << ERR; }
+{   LOG(VB_GENERAL, LOG_ERR, LOC + (MESG)); \
+    return QStringList("ERROR") << (ERR); }
 
 #define RESULT_OK(MESG) \
-{   LOG(VB_FILE, LOG_DEBUG, LOC + MESG); \
+{   LOG(VB_FILE, LOG_DEBUG, LOC + (MESG)); \
     return QStringList("OK"); }
 
 #define IMPORTDIR "Import"

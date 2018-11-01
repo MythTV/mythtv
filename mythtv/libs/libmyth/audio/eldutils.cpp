@@ -40,12 +40,12 @@
 #define LE_INT(v)        bswap_32(*((uint32_t *)v))
 #define LE_INT64(v)      bswap_64(*((uint64_t *)v))
 #else
-#define LE_SHORT(v)      (*((uint16_t *)v))
-#define LE_INT(v)        (*((uint32_t *)v))
-#define LE_INT64(v)      (*((uint64_t *)v))
+#define LE_SHORT(v)      (*((uint16_t *)(v)))
+#define LE_INT(v)        (*((uint32_t *)(v)))
+#define LE_INT64(v)      (*((uint64_t *)(v)))
 #endif
 
-#define SIZE_ARRAY(x) (sizeof(x) / sizeof(x[0]))
+#define SIZE_ARRAY(x) (sizeof(x) / sizeof((x)[0]))
 
 enum eld_versions
 {
@@ -149,7 +149,7 @@ static int cea_sampling_frequencies[8] = {
 
 #define GRAB_BITS(buf, byte, lowbit, bits)            \
 (                                                    \
-    (buf[byte] >> (lowbit)) & ((1 << (bits)) - 1)    \
+    ((buf)[byte] >> (lowbit)) & ((1 << (bits)) - 1)  \
 )
 
 ELD::ELD(const char *buf, int size)

@@ -44,19 +44,19 @@
     if (it == tokens.end()) return false; else ++it; } while(0)
 
 #define PARSE_CONF(VAR) do { \
-    if (it == tokens.end() || !VAR.ParseConf(*it++)) \
+    if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
         return false; } while(0)
 
 #define PARSE_STR(VAR) do { \
-    if (it != tokens.end()) VAR = *it++; else return false; } while(0)
+    if (it != tokens.end()) (VAR) = *it++; else return false; } while(0)
 
 #define PARSE_UINT(VAR) do { \
     if (it != tokens.end()) \
-         VAR = (*it++).toUInt(); else return false; } while(0)
+         (VAR) = (*it++).toUInt(); else return false; } while(0)
 
 #define PARSE_UINT_1000(VAR) do { \
     if (it != tokens.end()) \
-         VAR = (*it++).toUInt() * 1000ULL; else return false; } while(0)
+         (VAR) = (*it++).toUInt() * 1000ULL; else return false; } while(0)
 
 
 QString DTVChannelInfo::toString() const

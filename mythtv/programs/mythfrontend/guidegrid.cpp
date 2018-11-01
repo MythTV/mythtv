@@ -1288,7 +1288,7 @@ uint GuideGrid::GetAlternateChannelIndex(
 }
 
 
-#define MKKEY(IDX,SEL) ((((uint64_t)IDX) << 32) | SEL)
+#define MKKEY(IDX,SEL) ((((uint64_t)(IDX)) << 32) | (SEL))
 ChannelInfoList GuideGrid::GetSelection(void) const
 {
     ChannelInfoList selected;

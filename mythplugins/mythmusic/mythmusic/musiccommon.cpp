@@ -2691,7 +2691,7 @@ void MusicCommon::playFirstTrack()
 //---------------------------------------------------------
 // MythMusicVolumeDialog
 //---------------------------------------------------------
-#define MUSICVOLUMEPOPUPTIME 4 * 1000
+#define MUSICVOLUMEPOPUPTIME (4 * 1000)
 
 MythMusicVolumeDialog::MythMusicVolumeDialog(MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false),

@@ -17,7 +17,7 @@
 #define LOC      QString("DispInfo: ")
 #endif
 
-#define VALID_RATE(rate) (rate > 20.0 && rate < 200.0)
+#define VALID_RATE(rate) ((rate) > 20.0 && (rate) < 200.0)
 
 static float fix_rate(int video_rate)
 {

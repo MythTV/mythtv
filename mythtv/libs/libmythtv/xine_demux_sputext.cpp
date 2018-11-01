@@ -48,7 +48,7 @@
 #define LOG
 */
 
-#define ERR           (void *)-1
+#define ERR           ((void *)-1)
 #define LINE_LEN      1000
 #define LINE_LEN_QUOT "1000"
 
@@ -56,7 +56,7 @@
  * Demuxer code start
  */
 
-#define FORMAT_UNKNOWN   -1
+#define FORMAT_UNKNOWN   (-1)
 #define FORMAT_MICRODVD   0
 #define FORMAT_SUBRIP     1
 #define FORMAT_SUBVIEWER  2

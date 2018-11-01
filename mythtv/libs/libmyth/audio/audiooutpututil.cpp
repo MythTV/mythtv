@@ -16,7 +16,7 @@ extern "C" {
 
 #define LOC QString("AOUtil: ")
 
-#define ISALIGN(x) (((unsigned long)x & 0xf) == 0)
+#define ISALIGN(x) (((unsigned long)(x) & 0xf) == 0)
 
 #if ARCH_X86
 static int has_sse2 = -1;

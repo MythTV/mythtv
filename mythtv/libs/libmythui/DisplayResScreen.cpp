@@ -195,9 +195,9 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
 }
 
 #define extract_key(key) { \
-        r = (key & ((1<<18) - 1)) / 1000.0; \
-        h = (key >> 18) & ((1<<16) - 1); \
-        w = (key >> 34) & ((1<<16) - 1); }
+        r = ((key) & ((1<<18) - 1)) / 1000.0; \
+        h = ((key) >> 18) & ((1<<16) - 1); \
+        w = ((key) >> 34) & ((1<<16) - 1); }
 
 uint64_t DisplayResScreen::FindBestScreen(const DisplayResMap& resmap,
                                           int iwidth, int iheight, double frate)

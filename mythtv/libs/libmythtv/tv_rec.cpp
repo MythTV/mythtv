@@ -1017,7 +1017,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 }
 
 #define TRANSITION(ASTATE,BSTATE) \
-   ((internalState == ASTATE) && (desiredNextState == BSTATE))
+   ((internalState == (ASTATE)) && (desiredNextState == (BSTATE)))
 #define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0)
 #define SET_LAST() do { nextState = internalState; changed = true; } while(0)
 

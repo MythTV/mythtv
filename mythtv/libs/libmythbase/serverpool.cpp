@@ -8,12 +8,12 @@
 #include "mythlogging.h"
 #include "serverpool.h"
 
-#define PRETTYIP(x)      x->protocol() == QAbstractSocket::IPv6Protocol ? \
-                                    "[" + x->toString().toLower() + "]" : \
-                                          x->toString().toLower()
-#define PRETTYIP_(x)      x.protocol() == QAbstractSocket::IPv6Protocol ? \
-                                    "[" + x.toString().toLower() + "]" : \
-                                          x.toString().toLower()
+#define PRETTYIP(x)      ((x)->protocol() == QAbstractSocket::IPv6Protocol ? \
+                                    "[" + (x)->toString().toLower() + "]" :  \
+                                          (x)->toString().toLower())
+#define PRETTYIP_(x)      ((x).protocol() == QAbstractSocket::IPv6Protocol ? \
+                                    "[" + (x).toString().toLower() + "]" :   \
+                                          (x).toString().toLower())
 
 #define LOC QString("ServerPool: ")
 

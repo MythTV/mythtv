@@ -1573,9 +1573,9 @@ void ProgramInfo::ToStringList(QStringList &list) const
 #define DATETIME_FROM_LIST(x) \
     do { NEXT_STR();                                                    \
          if (ts.isEmpty() or (ts.toUInt() == kInvalidDateTime)) {       \
-              x = QDateTime();                                          \
+              (x) = QDateTime();                                        \
          } else {                                                       \
-              x = MythDate::fromSecsSinceEpoch(ts.toLongLong());        \
+              (x) = MythDate::fromSecsSinceEpoch(ts.toLongLong());      \
          }                                                              \
     } while (0)
 #endif

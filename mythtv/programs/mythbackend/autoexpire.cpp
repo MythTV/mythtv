@@ -50,7 +50,7 @@ extern AutoExpire *expirer;
 /** If calculated desired space for 10 min freq is > SPACE_TOO_BIG_KB
  *  then we use 5 min expire frequency.
  */
-#define SPACE_TOO_BIG_KB 3*1024*1024
+#define SPACE_TOO_BIG_KB (3*1024*1024)
 
 /// \brief This calls AutoExpire::RunExpirer() from within a new thread.
 void ExpireThread::run(void)

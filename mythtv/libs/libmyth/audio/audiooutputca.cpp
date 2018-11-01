@@ -27,7 +27,7 @@
 #define CHANNELS_MIN 1
 #define CHANNELS_MAX 8
 
-#define OSS_STATUS(x) UInt32ToFourCC((UInt32*)&x)
+#define OSS_STATUS(x) UInt32ToFourCC((UInt32*)&(x))
 char* UInt32ToFourCC(UInt32* pVal)
 {
     UInt32 inVal = *pVal;
