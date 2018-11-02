@@ -262,7 +262,7 @@ void CDRipperThread::run(void)
 
     QString textstatus;
     QString encodertype = gCoreContext->GetSetting("EncoderType");
-    bool mp3usevbr = gCoreContext->GetNumSetting("Mp3UseVBR", 0);
+    bool mp3usevbr = gCoreContext->GetBoolSetting("Mp3UseVBR", false);
 
     QApplication::postEvent(m_parent,
         new RipStatusEvent(RipStatusEvent::kOverallStartEvent, m_totalSectors));
@@ -1170,7 +1170,7 @@ void Ripper::RipComplete(bool result)
 {
     if (result == true)
     {
-        bool EjectCD = gCoreContext->GetNumSetting("EjectCDAfterRipping", 1);
+        bool EjectCD = gCoreContext->GetBoolSetting("EjectCDAfterRipping", true);
         if (EjectCD)
             startEjectCD();
 
@@ -1210,7 +1210,7 @@ void Ripper::EjectFinished()
 void Ripper::ejectCD()
 {
     LOG(VB_MEDIA, LOG_INFO, __PRETTY_FUNCTION__);
-    bool bEjectCD = gCoreContext->GetNumSetting("EjectCDAfterRipping",1);
+    bool bEjectCD = gCoreContext->GetBoolSetting("EjectCDAfterRipping",true);
     if (bEjectCD)
     {
 #ifdef HAVE_CDIO

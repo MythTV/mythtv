@@ -398,7 +398,7 @@ ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
 {
     m_sortType = (SortType)gCoreContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
-    m_reverseSort = gCoreContext->GetNumSetting("ProgramRecPriorityReverse", 0);
+    m_reverseSort = gCoreContext->GetBoolSetting("ProgramRecPriorityReverse", false);
 }
 
 bool ProgramRecPriority::Create()

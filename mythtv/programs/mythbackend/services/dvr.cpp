@@ -1698,8 +1698,8 @@ int Dvr::ManageJobQueue( const QString   &sAction,
         return nReturn;
     }
 
-    if (!gCoreContext->GetNumSettingOnHost(QString("JobAllow%1").arg(sJobName),
-                                           sRemoteHost, 0))
+    if (!gCoreContext->GetBoolSettingOnHost(QString("JobAllow%1").arg(sJobName),
+                                            sRemoteHost, false))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been allowed on host %2.")
                                          .arg(sJobName).arg(sRemoteHost));

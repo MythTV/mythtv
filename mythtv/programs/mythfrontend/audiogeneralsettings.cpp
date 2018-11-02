@@ -324,14 +324,14 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
         //bDTS  = settingsdigital.canFeature(FEATURE_DTS)  &&
         //    m_DTSPassThrough->boolValue();
         bLPCM = settings.canFeature(FEATURE_LPCM) &&
-            !gCoreContext->GetNumSetting("StereoPCM", false);
+            !gCoreContext->GetBoolSetting("StereoPCM", false);
         bEAC3 = settingsdigital.canFeature(FEATURE_EAC3) &&
-            !gCoreContext->GetNumSetting("Audio48kOverride", false);
+            !gCoreContext->GetBoolSetting("Audio48kOverride", false);
         bTRUEHD = settingsdigital.canFeature(FEATURE_TRUEHD) &&
-            !gCoreContext->GetNumSetting("Audio48kOverride", false) &&
-            gCoreContext->GetNumSetting("HBRPassthru", true);
+            !gCoreContext->GetBoolSetting("Audio48kOverride", false) &&
+            gCoreContext->GetBoolSetting("HBRPassthru", true);
         bDTSHD = settingsdigital.canFeature(FEATURE_DTSHD) &&
-            !gCoreContext->GetNumSetting("Audio48kOverride", false);
+            !gCoreContext->GetBoolSetting("Audio48kOverride", false);
 
         if (max_speakers > 2 && !bLPCM)
             max_speakers = 2;

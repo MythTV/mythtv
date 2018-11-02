@@ -509,7 +509,7 @@ bool JobQueue::QueueRecordingJobs(const RecordingInfo &recinfo, int jobTypes)
     {
         QString jobHost = QString("");
 
-        if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
+        if (gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false))
             jobHost = recinfo.GetHostname();
 
         return JobQueue::QueueJobs(
@@ -612,7 +612,7 @@ bool JobQueue::QueueJob(int jobType, uint chanid, const QDateTime &recstartts,
 bool JobQueue::QueueJobs(int jobTypes, uint chanid, const QDateTime &recstartts,
                          QString args, QString comment, QString host)
 {
-    if (gCoreContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0))
+    if (gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false))
     {
         if (jobTypes & JOB_METADATA)
             QueueJob(JOB_METADATA, chanid, recstartts, args, comment, host);
@@ -1307,7 +1307,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     QString logInfo;
     int jobCount = 0;
     bool commflagWhileRecording =
-             gCoreContext->GetNumSetting("AutoCommflagWhileRecording", 0);
+             gCoreContext->GetBoolSetting("AutoCommflagWhileRecording", false);
 
     jobs.clear();
 
@@ -1482,10 +1482,7 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
         }
     }
 
-    if (gCoreContext->GetNumSetting(allowSetting, 1))
-        return true;
-
-    return false;
+    return gCoreContext->GetBoolSetting(allowSetting, true);
 }
 
 enum JobCmds JobQueue::GetJobCmd(int jobID)
@@ -1641,7 +1638,7 @@ void JobQueue::RecoverQueue(bool justOld)
 
                 ChangeJobStatus((*it).id, JOB_QUEUED, "");
                 ChangeJobCmds((*it).id, JOB_RUN);
-                if (!gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
+                if (!gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false))
                     ChangeJobHost((*it).id, "");
             }
             else

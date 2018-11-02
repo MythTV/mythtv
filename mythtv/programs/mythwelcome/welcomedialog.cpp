@@ -131,7 +131,7 @@ void WelcomeDialog::checkAutoStart(void)
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("mythshutdown --startup returned: %1").arg(state));
 
-    bool bAutoStartFrontend = gCoreContext->GetNumSetting("AutoStartFrontend", 1);
+    bool bAutoStartFrontend = gCoreContext->GetBoolSetting("AutoStartFrontend", true);
 
     if (state == 1 && bAutoStartFrontend)
         startFrontendClick();

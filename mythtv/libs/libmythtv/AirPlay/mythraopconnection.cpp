@@ -228,7 +228,7 @@ bool MythRAOPConnection::Init(void)
         return false;
 
     // use internal volume control
-    m_allowVolumeControl = gCoreContext->GetNumSetting("MythControlsVolume", 1);
+    m_allowVolumeControl = gCoreContext->GetBoolSetting("MythControlsVolume", true);
 
     // start the watchdog timer to auto delete the client after a period of inactivity
     m_watchdogTimer = new QTimer();
@@ -947,7 +947,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             .arg(RTPseq).arg(RTPtimestamp));
     }
 
-    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    if (gCoreContext->GetBoolSetting("AirPlayPasswordEnabled", false))
     {
         if (m_nonce.isEmpty())
         {
@@ -1691,7 +1691,7 @@ bool MythRAOPConnection::OpenAudioDevice(void)
 {
     CloseAudioDevice();
 
-    QString passthru = gCoreContext->GetNumSetting("PassThruDeviceOverride", false)
+    QString passthru = gCoreContext->GetBoolSetting("PassThruDeviceOverride", false)
                         ? gCoreContext->GetSetting("PassThruOutputDevice") : QString();
     QString device = gCoreContext->GetSetting("AudioOutputDevice");
 
@@ -1815,7 +1815,7 @@ void MythRAOPConnection::SendNotification(bool update)
     n->SetId(m_id);
     n->SetParent(this);
     n->SetDuration(5);
-    n->SetFullScreen(gCoreContext->GetNumSetting("AirPlayFullScreen"));
+    n->SetFullScreen(gCoreContext->GetBoolSetting("AirPlayFullScreen"));
     GetNotificationCenter()->Queue(*n);
     m_firstsend = true;
     delete n;

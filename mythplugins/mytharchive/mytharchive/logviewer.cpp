@@ -94,7 +94,7 @@ LogViewer::LogViewer(MythScreenStack *parent) :
 {
     m_updateTime = gCoreContext->GetNumSetting(
         "LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
-    m_autoUpdate = gCoreContext->GetNumSetting("LogViewerAutoUpdate", 1);
+    m_autoUpdate = gCoreContext->GetBoolSetting("LogViewerAutoUpdate", true);
 }
 
 LogViewer::~LogViewer(void)

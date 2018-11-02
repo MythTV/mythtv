@@ -48,10 +48,12 @@ class MBASE_PUBLIC MythDB
     bool GetSettings(QMap<QString,QString> &_key_value_pairs);
 
     QString GetSetting(     const QString &_key, const QString &defaultval);
+    bool    GetBoolSetting( const QString &key, bool           defaultval);
     int     GetNumSetting(  const QString &key, int            defaultval);
     double  GetFloatSetting(const QString &key, double         defaultval);
 
     QString GetSetting(     const QString &key);
+    bool    GetBoolSetting( const QString &key);
     int     GetNumSetting(  const QString &key);
     double  GetFloatSetting(const QString &key);
 

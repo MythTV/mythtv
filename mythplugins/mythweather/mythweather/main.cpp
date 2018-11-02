@@ -68,7 +68,7 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-    if (gCoreContext->GetNumSetting("weatherbackgroundfetch", 0))
+    if (gCoreContext->GetBoolSetting("weatherbackgroundfetch", false))
     {
         srcMan = new SourceManager();
         srcMan->startTimers();

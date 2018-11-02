@@ -247,9 +247,9 @@ MythPlayer::MythPlayer(PlayerFlags flags)
     defaultDisplayAspect =
         gCoreContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
                                             gCoreContext->GetHostName(), 1.7777);
-    captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
-    decode_extra_audio = gCoreContext->GetNumSetting("DecodeExtraAudio", 0);
-    itvEnabled         = gCoreContext->GetNumSetting("EnableMHEG", 0);
+    captionsEnabledbyDefault = gCoreContext->GetBoolSetting("DefaultCCMode");
+    decode_extra_audio = gCoreContext->GetBoolSetting("DecodeExtraAudio", false);
+    itvEnabled         = gCoreContext->GetBoolSetting("EnableMHEG", false);
     clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
     pip_default_loc    = (PIPLocation)gCoreContext->GetNumSetting("PIPLocation", kPIPTopLeft);
@@ -1866,7 +1866,7 @@ int64_t MythPlayer::AVSyncGetAudiotime(void)
 
 void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 {
-    if (gCoreContext->GetNumSetting("PlaybackAVSync2", 0))
+    if (gCoreContext->GetBoolSetting("PlaybackAVSync2", false))
     {
         AVSync2(buffer);
         return;
@@ -2487,7 +2487,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                         .arg(waited_for).arg(videoOutput->GetFrameStatus()));
             buffering_last_msg = QTime::currentTime();
             if (audio.GetAudioBufferedTime() > 2000 && framesPlayed < 5
-                && gCoreContext->GetNumSetting("MusicChoiceEnabled", 0))
+                && gCoreContext->GetBoolSetting("MusicChoiceEnabled", false))
             {
                 playerFlags = (PlayerFlags)(playerFlags | kMusicChoice);
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
@@ -5233,7 +5233,7 @@ void MythPlayer::GetPlaybackData(InfoMap &infoMap)
     infoMap.insert("bufferavail", player_ctx->buffer->GetAvailableBuffer());
     infoMap.insert("buffersize",
         QString::number(player_ctx->buffer->GetBufferSize() >> 20));
-    if (gCoreContext->GetNumSetting("PlaybackAVSync2", 0))
+    if (gCoreContext->GetBoolSetting("PlaybackAVSync2", false))
     {
         int avsync = avsync_avg / 1000;
         infoMap.insert("avsync",

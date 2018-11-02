@@ -75,7 +75,7 @@ void runRandomSlideshow(void)
 
 static void handleMedia(MythMediaDevice *dev)
 {
-    if (! gCoreContext->GetNumSetting("GalleryAutoLoad", 0))
+    if (! gCoreContext->GetBoolSetting("GalleryAutoLoad", false))
         return;
 
     if (dev && dev->isUsable())

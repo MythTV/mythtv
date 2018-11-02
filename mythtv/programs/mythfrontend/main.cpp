@@ -839,7 +839,7 @@ static void handleGalleryMedia(MythMediaDevice *dev)
         }
     }
 
-    if (gCoreContext->GetNumSetting("GalleryAutoLoad", 0))
+    if (gCoreContext->GetBoolSetting("GalleryAutoLoad", false))
     {
         LOG(VB_GUI, LOG_INFO, "Main: Autostarting Gallery for new media");
         GetMythMainWindow()->JumpTo(JUMP_GALLERY_DEFAULT);
@@ -2045,10 +2045,10 @@ int main(int argc, char **argv)
                                                "Main window title"));
 
 #ifdef USING_AIRPLAY
-    if (gCoreContext->GetNumSetting("AirPlayEnabled", true))
+    if (gCoreContext->GetBoolSetting("AirPlayEnabled", true))
     {
         MythRAOPDevice::Create();
-        if (!gCoreContext->GetNumSetting("AirPlayAudioOnly", false))
+        if (!gCoreContext->GetBoolSetting("AirPlayAudioOnly", false))
         {
             MythAirplayServer::Create();
         }
@@ -2099,7 +2099,7 @@ int main(int argc, char **argv)
     }
 
     NetworkControl *networkControl = nullptr;
-    if (gCoreContext->GetNumSetting("NetworkControlEnabled", 0))
+    if (gCoreContext->GetBoolSetting("NetworkControlEnabled", false))
     {
         int port = gCoreContext->GetNumSetting("NetworkControlPort", 6546);
         networkControl = new NetworkControl();
@@ -2121,7 +2121,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_THEME;
     }
     ThemeUpdateChecker *themeUpdateChecker = nullptr;
-    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+    if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
         themeUpdateChecker = new ThemeUpdateChecker();
 
     MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();

@@ -693,7 +693,7 @@ class VideoDialogPrivate
         m_currentNode(nullptr), m_treeLoaded(false), m_isFlatList(false),
         m_type(type), m_browse(browse), m_scanner(nullptr)
     {
-        if (gCoreContext->GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
+        if (gCoreContext->GetBoolSetting("mythvideo.ParentalLevelFromRating", false))
         {
             for (ParentalLevel sl(ParentalLevel::plLowest);
                 sl.GetLevel() <= ParentalLevel::plHigh && sl.good(); ++sl)
@@ -715,15 +715,15 @@ class VideoDialogPrivate
         }
 
         m_rememberPosition =
-                gCoreContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
+                gCoreContext->GetBoolSetting("mythvideo.VideoTreeRemember", false);
 
-        m_isFileBrowser = gCoreContext->GetNumSetting("VideoDialogNoDB", 0);
+        m_isFileBrowser = gCoreContext->GetBoolSetting("VideoDialogNoDB", false);
         m_groupType = gCoreContext->GetNumSetting("mythvideo.db_group_type", 0);
 
         m_altPlayerEnabled =
-                    gCoreContext->GetNumSetting("mythvideo.EnableAlternatePlayer");
+                    gCoreContext->GetBoolSetting("mythvideo.EnableAlternatePlayer");
 
-        m_autoMeta = gCoreContext->GetNumSetting("mythvideo.AutoMetaDataScan", 1);
+        m_autoMeta = gCoreContext->GetBoolSetting("mythvideo.AutoMetaDataScan", true);
 
         m_artDir = gCoreContext->GetSetting("VideoArtworkDir");
         m_sshotDir = gCoreContext->GetSetting("mythvideo.screenshotDir");
@@ -935,13 +935,13 @@ bool VideoDialog::Create()
     }
 
     QString windowName = "videogallery";
-    int flatlistDefault = 0;
+    bool flatlistDefault = false;
 
     switch (m_d->m_type)
     {
         case DLG_BROWSER:
             windowName = "browser";
-            flatlistDefault = 1;
+            flatlistDefault = true;
             break;
         case DLG_GALLERY:
             windowName = "gallery";
@@ -951,9 +951,9 @@ bool VideoDialog::Create()
             break;
         case DLG_MANAGER:
             m_d->m_isFlatList =
-                    gCoreContext->GetNumSetting("mythvideo.db_folder_view", 1);
+                    gCoreContext->GetBoolSetting("mythvideo.db_folder_view", true);
             windowName = "manager";
-            flatlistDefault = 1;
+            flatlistDefault = true;
             break;
         case DLG_DEFAULT:
         default:
@@ -996,7 +996,7 @@ bool VideoDialog::Create()
     }
 
     m_d->m_isFlatList =
-            gCoreContext->GetNumSetting(QString("mythvideo.folder_view_%1")
+            gCoreContext->GetBoolSetting(QString("mythvideo.folder_view_%1")
                     .arg(m_d->m_type), flatlistDefault);
 
     if (!LoadWindowFromXML("video-ui.xml", windowName, this))
@@ -2443,7 +2443,7 @@ void VideoDialog::VideoMenu()
     if (metadata)
     {
         if (!metadata->GetTrailer().isEmpty() ||
-                gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0) ||
+                gCoreContext->GetBoolSetting("mythvideo.TrailersRandomEnabled", false) ||
                 m_d->m_altPlayerEnabled)
             menu->AddItem(tr("Play..."), nullptr, CreatePlayMenu());
         else
@@ -2500,7 +2500,7 @@ MythMenu* VideoDialog::CreatePlayMenu()
         menu->AddItem(tr("Play in Alternate Player"), SLOT(playVideoAlt()));
     }
 
-    if (gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
+    if (gCoreContext->GetBoolSetting("mythvideo.TrailersRandomEnabled", false))
     {
          menu->AddItem(tr("Play With Trailers"), SLOT(playVideoWithTrailers()));
     }

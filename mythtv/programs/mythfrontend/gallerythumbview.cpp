@@ -1272,7 +1272,7 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
 
     menu->AddItem(tr("Change Order"), nullptr, orderMenu);
 
-    if (gCoreContext->GetNumSetting("GalleryRepeat", 0))
+    if (gCoreContext->GetBoolSetting("GalleryRepeat", false))
         menu->AddItem(tr("Turn Repeat Off"), SLOT(RepeatOff()));
     else
         menu->AddItem(tr("Turn Repeat On"), SLOT(RepeatOn()));

@@ -738,7 +738,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
                     // allow re-record if auto expired
                     RecordingInfo recInfo(chanid, startts);
-                    if (gCoreContext->GetNumSetting("RerecordWatched", 0) ||
+                    if (gCoreContext->GetBoolSetting("RerecordWatched", false) ||
                         !recInfo.IsWatched())
                     {
                         recInfo.ForgetHistory();
@@ -919,21 +919,21 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         case emOldestFirst:
             msg = "Adding programs expirable in Oldest First order";
             where = "autoexpire > 0";
-            if (gCoreContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+            if (gCoreContext->GetBoolSetting("AutoExpireWatchedPriority", false))
                 orderby = "recorded.watched DESC, ";
             orderby += "starttime ASC";
             break;
         case emLowestPriorityFirst:
             msg = "Adding programs expirable in Lowest Priority First order";
             where = "autoexpire > 0";
-            if (gCoreContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+            if (gCoreContext->GetBoolSetting("AutoExpireWatchedPriority", false))
                 orderby = "recorded.watched DESC, ";
             orderby += "recorded.recpriority ASC, starttime ASC";
             break;
         case emWeightedTimePriority:
             msg = "Adding programs expirable in Weighted Time Priority order";
             where = "autoexpire > 0";
-            if (gCoreContext->GetNumSetting("AutoExpireWatchedPriority", 0))
+            if (gCoreContext->GetBoolSetting("AutoExpireWatchedPriority", false))
                 orderby = "recorded.watched DESC, ";
             orderby += QString("DATE_ADD(starttime, INTERVAL '%1' * "
                                         "recorded.recpriority DAY) ASC")

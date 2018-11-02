@@ -1134,7 +1134,7 @@ CECAdapter::CECAdapter() : MThread("CECAdapter"), m_priv(new CECAdapterPriv)
     QMutexLocker lock(gLock);
 
     // don't try if disabled
-    if (!gCoreContext->GetNumSetting(LIBCEC_ENABLED, 1))
+    if (!gCoreContext->GetBoolSetting(LIBCEC_ENABLED, true))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "libCEC support is disabled.");
         return;

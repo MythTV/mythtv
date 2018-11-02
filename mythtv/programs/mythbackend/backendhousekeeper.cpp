@@ -366,7 +366,7 @@ void CleanupTask::CleanupProgramListings(void)
 
 bool ThemeUpdateTask::DoCheckRun(QDateTime now)
 {
-    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1) &&
+    if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true) &&
             PeriodicHouseKeeperTask::DoCheckRun(now))
         return true;
 
@@ -591,7 +591,7 @@ ArtworkTask::~ArtworkTask(void)
 
 bool ArtworkTask::DoCheckRun(QDateTime now)
 {
-    if (gCoreContext->GetNumSetting("DailyArtworkUpdates", 0) &&
+    if (gCoreContext->GetBoolSetting("DailyArtworkUpdates", false) &&
             PeriodicHouseKeeperTask::DoCheckRun(now))
         return true;
     return false;
@@ -640,7 +640,7 @@ void MythFillDatabaseTask::SetHourWindowFromDB(void)
 
 bool MythFillDatabaseTask::UseSuggestedTime(void)
 {
-//     if (!gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
+//     if (!gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", true))
 //         // this feature is disabled, so don't bother with a deeper check
 //         return false;
 //
@@ -660,12 +660,12 @@ bool MythFillDatabaseTask::UseSuggestedTime(void)
 //                 return true;
 //     }
 
-    return gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1);
+    return gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", true);
 }
 
 bool MythFillDatabaseTask::DoCheckRun(QDateTime now)
 {
-    if (!gCoreContext->GetNumSetting("MythFillEnabled", 1))
+    if (!gCoreContext->GetBoolSetting("MythFillEnabled", true))
     {
         // we don't want to run this manually, so abort early
         LOG(VB_GENERAL, LOG_DEBUG, "MythFillDatabase is disabled. Cannot run.");

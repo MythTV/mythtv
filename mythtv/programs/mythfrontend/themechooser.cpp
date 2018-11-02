@@ -584,7 +584,7 @@ void ThemeChooser::showPopupMenu(void)
         }
     }
 
-    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+    if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
         m_popupMenu->AddButton(tr("Disable Theme Update Notifications"),
                                SLOT(toggleThemeUpdateNotifications()));
     else
@@ -671,7 +671,7 @@ void ThemeChooser::toggleFullscreenPreview(void)
 
 void ThemeChooser::toggleThemeUpdateNotifications(void)
 {
-    if (gCoreContext->GetNumSetting("ThemeUpdateNofications", 1))
+    if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
         gCoreContext->SaveSettingOnHost("ThemeUpdateNofications", "0", "");
     else
         gCoreContext->SaveSettingOnHost("ThemeUpdateNofications", "1", "");

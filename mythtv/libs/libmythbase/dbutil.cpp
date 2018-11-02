@@ -210,7 +210,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
     return kDB_Backup_Disabled;
 #else
 
-    if (gCoreContext->GetNumSetting("DisableAutomaticBackup", 0))
+    if (gCoreContext->GetBoolSetting("DisableAutomaticBackup", false))
     {
         LOG(VB_GENERAL, LOG_CRIT,
             "Database backups disabled.  Skipping backup.");

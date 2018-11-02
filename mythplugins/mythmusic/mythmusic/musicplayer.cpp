@@ -398,7 +398,7 @@ bool MusicPlayer::openOutputDevice(void)
     else
         adevice = gCoreContext->GetSetting("MusicAudioDevice");
 
-    pdevice = gCoreContext->GetNumSetting("PassThruDeviceOverride", false) ?
+    pdevice = gCoreContext->GetBoolSetting("PassThruDeviceOverride", false) ?
               gCoreContext->GetSetting("PassThruOutputDevice") : "auto";
 
     m_output = AudioOutput::OpenAudio(

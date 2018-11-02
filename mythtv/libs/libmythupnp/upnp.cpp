@@ -129,8 +129,8 @@ bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpS
 
     g_IPAddrList   = sIPAddrList;
     int it;
-    bool ipv4 = gCoreContext->GetNumSetting("IPv4Support",1);
-    bool ipv6 = gCoreContext->GetNumSetting("IPv6Support",1);
+    bool ipv4 = gCoreContext->GetBoolSetting("IPv4Support",true);
+    bool ipv6 = gCoreContext->GetBoolSetting("IPv6Support",true);
 
     for (it = 0; it < g_IPAddrList.size(); ++it)
     {

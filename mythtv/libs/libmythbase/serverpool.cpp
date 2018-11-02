@@ -89,7 +89,7 @@ void ServerPool::SelectDefaultListen(bool force)
     naList_4.clear();
     naList_6.clear();
 
-    if (gCoreContext->GetNumSetting("ListenOnAllIps",1))
+    if (gCoreContext->GetBoolSetting("ListenOnAllIps",true))
     {
         QNetworkAddressEntry entry;
         entry.setIp(QHostAddress(QHostAddress::AnyIPv4));
@@ -110,7 +110,7 @@ void ServerPool::SelectDefaultListen(bool force)
                                            QString(),
                                            gCoreContext->ResolveIPv6, true));
     bool v6IsSet = config_v6.isNull() ? true : false;
-    bool allowLinkLocal = gCoreContext->GetNumSetting("AllowLinkLocal", true) > 0;
+    bool allowLinkLocal = gCoreContext->GetBoolSetting("AllowLinkLocal", true);
 
     // loop through all available interfaces
     QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
@@ -331,7 +331,7 @@ QList<QHostAddress> ServerPool::DefaultListenIPv6(void)
 QList<QHostAddress> ServerPool::DefaultBroadcast(void)
 {
     QList<QHostAddress> blist;
-    if (!gCoreContext->GetNumSetting("ListenOnAllIps",1))
+    if (!gCoreContext->GetBoolSetting("ListenOnAllIps",true))
     {
         blist << DefaultBroadcastIPv4();
         blist << DefaultBroadcastIPv6();
@@ -394,12 +394,12 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         // If IPV4 support is disabled and this is an IPV4 address,
         // bypass this address
         if (it->protocol() == QAbstractSocket::IPv4Protocol
-          && ! gCoreContext->GetNumSetting("IPv4Support",1))
+          && ! gCoreContext->GetBoolSetting("IPv4Support",true))
             continue;
         // If IPV6 support is disabled and this is an IPV6 address,
         // bypass this address
         if (it->protocol() == QAbstractSocket::IPv6Protocol
-          && ! gCoreContext->GetNumSetting("IPv6Support",1))
+          && ! gCoreContext->GetBoolSetting("IPv6Support",true))
             continue;
 
         PrivTcpServer *server = new PrivTcpServer(this, servertype);
@@ -496,12 +496,12 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
         // If IPV4 support is disabled and this is an IPV4 address,
         // bypass this address
         if (it->protocol() == QAbstractSocket::IPv4Protocol
-          && ! gCoreContext->GetNumSetting("IPv4Support",1))
+          && ! gCoreContext->GetBoolSetting("IPv4Support",true))
             continue;
         // If IPV6 support is disabled and this is an IPV6 address,
         // bypass this address
         if (it->protocol() == QAbstractSocket::IPv6Protocol
-          && ! gCoreContext->GetNumSetting("IPv6Support",1))
+          && ! gCoreContext->GetBoolSetting("IPv6Support",true))
             continue;
 
         QNetworkAddressEntry host;

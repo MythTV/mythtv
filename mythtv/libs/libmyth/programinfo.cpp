@@ -2749,7 +2749,7 @@ QString ProgramInfo::GetPlaybackURL(
 
     // Check to see if we should stream from the master backend
     if ((checkMaster) &&
-        (gCoreContext->GetNumSetting("MasterBackendOverride", 0)) &&
+        (gCoreContext->GetBoolSetting("MasterBackendOverride", false)) &&
         (RemoteCheckFile(this, false)))
     {
         tmpURL = gCoreContext->GenMythURL(gCoreContext->GetMasterHostName(),

@@ -117,7 +117,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     // --------------------------------------------------------------------
 
-    bool recurse = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    bool recurse = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);
 
     ThumbItem *origItem = nullptr;
     if (m_pos < itemList.size())

@@ -148,7 +148,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                            const QString &host);
 
     // Convenience setting query methods
+    bool GetBoolSetting(const QString &key, bool defaultval = false);
     int GetNumSetting(const QString &key, int defaultval = 0);
+    int GetBoolSetting(const QString &key, int defaultval) = delete;
+    bool GetNumSetting(const QString &key, bool defaultvalue) = delete;
     double GetFloatSetting(const QString &key, double defaultval = 0.0);
     void GetResolutionSetting(const QString &type, int &width, int &height,
                               double& forced_aspect, double &refreshrate,
@@ -158,8 +161,14 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
 
     QString GetSettingOnHost(const QString &key, const QString &host,
                              const QString &defaultval = "");
+    bool GetBoolSettingOnHost(const QString &key, const QString &host,
+                             bool defaultval = 0);
     int GetNumSettingOnHost(const QString &key, const QString &host,
                             int defaultval = 0);
+    int GetBoolSettingOnHost(const QString &key, const QString &host,
+                             int defaultval) = delete;
+    bool GetNumSettingOnHost(const QString &key, const QString &host,
+                            bool defaultval = 0) = delete;
     double GetFloatSettingOnHost(const QString &key, const QString &host,
                                  double defaultval = 0.0);
 

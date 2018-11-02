@@ -180,7 +180,7 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
         gCoreContext->GetNumSetting("CommDetectMaxCommLength", 125);
 
     commDetectBlankCanHaveLogo =
-        !!gCoreContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
+        !!gCoreContext->GetBoolSetting("CommDetectBlankCanHaveLogo", true);
 }
 
 void ClassicCommDetector::Init()
@@ -369,7 +369,7 @@ bool ClassicCommDetector::go()
         return false;
 
     aggressiveDetection =
-        gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
+        gCoreContext->GetBoolSetting("AggressiveCommDetect", true);
 
     if (!player->InitVideo())
     {

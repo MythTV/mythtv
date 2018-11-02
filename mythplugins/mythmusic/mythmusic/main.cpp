@@ -529,7 +529,7 @@ static void handleMedia(MythMediaDevice *cd)
     s_mountPath.clear();
 
     // don't show the music screen if AutoPlayCD is off
-    if (!gCoreContext->GetNumSetting("AutoPlayCD", 0))
+    if (!gCoreContext->GetBoolSetting("AutoPlayCD", false))
         return;
 
     if (!gMusicData->initialized)
@@ -747,7 +747,7 @@ static void handleCDMedia(MythMediaDevice *cd)
 
     // if the AutoPlayCD setting is set we remove all the existing tracks
     // from the playlist and replace them with the new CD tracks found
-    if (gCoreContext->GetNumSetting("AutoPlayCD", 0))
+    if (gCoreContext->GetBoolSetting("AutoPlayCD", false))
     {
         gMusicData->all_playlists->getActive()->removeAllTracks();
 

@@ -910,6 +910,12 @@ QString MythCoreContext::GetSetting(const QString &key,
     return d->m_database->GetSetting(key, defaultval);
 }
 
+bool MythCoreContext::GetBoolSetting(const QString &key, bool defaultval)
+{
+    int result = GetNumSetting(key, static_cast<int>(defaultval));
+    return (result > 0) ? true : false;
+}
+
 int MythCoreContext::GetNumSetting(const QString &key, int defaultval)
 {
     return d->m_database->GetNumSetting(key, defaultval);
@@ -925,6 +931,14 @@ QString MythCoreContext::GetSettingOnHost(const QString &key,
                                           const QString &defaultval)
 {
     return d->m_database->GetSettingOnHost(key, host, defaultval);
+}
+
+bool MythCoreContext::GetBoolSettingOnHost(const QString &key,
+                                           const QString &host,
+                                           bool defaultval)
+{
+    int result = GetNumSettingOnHost(key, host, static_cast<int>(defaultval));
+    return (result > 0) ? true : false;
 }
 
 int MythCoreContext::GetNumSettingOnHost(const QString &key,
@@ -1255,7 +1269,7 @@ bool MythCoreContext::CheckSubnet(const QAbstractSocket *socket)
 bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
 {
     static const QHostAddress linklocal("fe80::");
-    if (GetNumSetting("AllowConnFromAll",0))
+    if (GetBoolSetting("AllowConnFromAll",false))
         return true;
     if (d->m_approvedIps.contains(peer))
         return true;
@@ -1289,7 +1303,7 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
             int pfxlen = qnai->prefixLength();
             // Set this to test rejection without having an extra
             // network.
-            if (GetNumSetting("DebugSubnet"))
+            if (GetBoolSetting("DebugSubnet"))
                 pfxlen += 4;
             if (peer.isInSubnet(qnai->ip(),pfxlen))
             {

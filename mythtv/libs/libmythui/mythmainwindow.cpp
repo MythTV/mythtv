@@ -975,7 +975,7 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;
 
-    bool inwindow = GetMythDB()->GetNumSetting("RunFrontendInWindow", 0);
+    bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
     bool fullscreen = d->does_fill_screen && !GetMythUI()->IsGeometryOverridden();
 
     // On Compiz/Unit, when the window is fullscreen and frameless changing
@@ -1009,7 +1009,7 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
         setWindowState(Qt::WindowNoState);
     }
 
-    if (gCoreContext->GetNumSetting("AlwaysOnTop", false))
+    if (gCoreContext->GetBoolSetting("AlwaysOnTop", false))
     {
         flags |= Qt::WindowStaysOnTopHint;
     }
@@ -1031,7 +1031,7 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
 
     Show();
 
-    if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
+    if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         setMouseTracking(true); // Required for mouse cursor auto-hide
     // Set cursor call must come after Show() to work on some systems.
     ShowMouseCursor(false);
@@ -1150,7 +1150,7 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     if (qApp->platformName().contains(EARLY_SHOW_PLATFORM_NAME_CHECK))
         qApp->processEvents();
 
-    if (!GetMythDB()->GetNumSetting("HideMouseCursor", 0))
+    if (!GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         d->paintwin->setMouseTracking(true); // Required for mouse cursor auto-hide
 
     GetMythUI()->UpdateImageCache();
@@ -1362,7 +1362,7 @@ void MythMainWindow::ReinitDone(void)
 
 void MythMainWindow::Show(void)
 {
-    bool inwindow = GetMythDB()->GetNumSetting("RunFrontendInWindow", 0);
+    bool inwindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
     bool fullscreen = d->does_fill_screen && !GetMythUI()->IsGeometryOverridden();
 
     if (fullscreen && !inwindow && !d->firstinit)
@@ -2946,7 +2946,7 @@ void MythMainWindow::LockInputDevices( bool locked )
 
 void MythMainWindow::ShowMouseCursor(bool show)
 {
-    if (show && GetMythDB()->GetNumSetting("HideMouseCursor", 0))
+    if (show && GetMythDB()->GetBoolSetting("HideMouseCursor", false))
         return;
 #ifdef QWS
     QWSServer::setCursorVisible(show);
@@ -3015,7 +3015,7 @@ void MythMainWindow::IdleTimeout(void)
                                         "%1 minutes of inactivity")
                                         .arg(d->idleTime));
         EnterStandby(false);
-        if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
+        if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) > 0)
         {
             d->enteringStandby = true;
             JumpTo("Standby Mode");
@@ -3068,7 +3068,7 @@ void MythMainWindow::ExitStandby(bool manual)
 
     if (manual)
         PauseIdleTimer(false);
-    else if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0))
+    else if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) > 0)
         JumpTo("Main Menu");
 
     if (!d->standby)

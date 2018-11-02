@@ -187,9 +187,9 @@ bool TVRec::Init(void)
         return false;
 
     transcodeFirst    =
-        gCoreContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
-    earlyCommFlag     = gCoreContext->GetNumSetting("AutoCommflagWhileRecording", 0);
-    runJobOnHostOnly  = gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0);
+        gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false);
+    earlyCommFlag     = gCoreContext->GetBoolSetting("AutoCommflagWhileRecording", false);
+    runJobOnHostOnly  = gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false);
     eitTransportTimeout =
         max(gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60, 6);
     eitCrawlIdleStart = gCoreContext->GetNumSetting("EITCrawIdleStart", 60);

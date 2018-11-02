@@ -224,7 +224,7 @@ void EditMetadataCommon::saveAll()
     saveToDatabase();
 
     // only write to the tag if it's enabled by the user
-    if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
+    if (GetMythDB()->GetBoolSetting("AllowTagWriting", false))
     {
         QStringList strList;
         strList << "MUSIC_TAG_UPDATE_METADATA %1 %2"
@@ -1089,7 +1089,7 @@ void EditAlbumartDialog::showMenu(void )
     {
         menu->AddButton(tr("Change Image Type"), nullptr, true);
 
-        if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
+        if (GetMythDB()->GetBoolSetting("AllowTagWriting", false))
         {
             MythUIButtonListItem *item = m_coverartList->GetItemCurrent();
             if (item)
@@ -1112,7 +1112,7 @@ void EditAlbumartDialog::showMenu(void )
         }
     }
 
-    if (GetMythDB()->GetNumSetting("AllowTagWriting", 0))
+    if (GetMythDB()->GetBoolSetting("AllowTagWriting", false))
     {
         if (tagger && tagger->supportsEmbeddedImages())
             menu->AddButton(tr("Copy Image To Tag"));

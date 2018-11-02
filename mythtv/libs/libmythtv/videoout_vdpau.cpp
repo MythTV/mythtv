@@ -65,7 +65,7 @@ VideoOutputVDPAU::VideoOutputVDPAU()
     m_sharpen(0.0f),
     m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
 {
-    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
     m_context = av_vdpau_alloc_context();
     memset(m_context, 0, sizeof(AVVDPAUContext));

@@ -104,7 +104,7 @@ void LCD::SetupLCD (void)
 
     lcd_host = GetMythDB()->GetSetting("LCDServerHost", "localhost");
     lcd_port = GetMythDB()->GetNumSetting("LCDServerPort", 6545);
-    m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0);
+    m_enabled = GetMythDB()->GetBoolSetting("LCDEnable", false);
 
     // workaround a problem with Ubuntu not resolving localhost properly
     if (lcd_host == "localhost")
@@ -136,7 +136,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     m_port = lport;
 
     // Don't even try to connect if we're currently disabled.
-    if (!(m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0)))
+    if (!(m_enabled = GetMythDB()->GetBoolSetting("LCDEnable", false)))
     {
         m_connected = false;
         m_serverUnavailable = true;

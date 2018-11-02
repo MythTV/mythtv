@@ -64,7 +64,7 @@ bool PrePostRollFlagger::go()
         return false;
 
     aggressiveDetection =
-        gCoreContext->GetNumSetting("AggressiveCommDetect", 1);
+        gCoreContext->GetBoolSetting("AggressiveCommDetect", true);
 
     if (!player->InitVideo())
     {

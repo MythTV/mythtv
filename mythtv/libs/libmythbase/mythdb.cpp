@@ -556,6 +556,14 @@ bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
 }
 
 
+bool MythDB::GetBoolSetting(const QString &key, bool defaultval)
+{
+    QString val = QString::number(defaultval);
+    QString retval = GetSetting(key, val);
+
+    return retval.toInt() > 0 ? true : false;
+}
+
 int MythDB::GetNumSetting(const QString &key, int defaultval)
 {
     QString val = QString::number(defaultval);
@@ -577,6 +585,15 @@ QString MythDB::GetSetting(const QString &key)
     QString sentinel = QString(kSentinelValue);
     QString retval = GetSetting(key, sentinel);
     return (retval == sentinel) ? "" : retval;
+}
+
+bool MythDB::GetBoolSetting(const QString &key)
+{
+    QString sentinel = QString(kSentinelValue);
+    QString retval = GetSetting(key, sentinel);
+    if (retval == sentinel)
+        return false;
+    return retval.toInt() > 0 ? true : false;
 }
 
 int MythDB::GetNumSetting(const QString &key)

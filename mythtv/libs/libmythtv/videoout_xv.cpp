@@ -156,7 +156,7 @@ VideoOutputXv::VideoOutputXv()
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "ctor");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));
 
-    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
 }
 

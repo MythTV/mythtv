@@ -1141,7 +1141,7 @@ nullptr
 
     if (dbver == "1260")
     {
-        if (gCoreContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
+        if (gCoreContext->GetBoolSetting("MythFillFixProgramIDsHasRunOnce", false))
         {
             LOG(VB_GENERAL, LOG_CRIT,
                 "Upgrading to MythTV schema version 1261");
@@ -1802,7 +1802,7 @@ nullptr
 nullptr
 };
 
-        if (gCoreContext->GetNumSetting("LastFreeCard", 0))
+        if (gCoreContext->GetBoolSetting("LastFreeCard", false))
         {
             updates[2] =
                 "UPDATE cardinput SET livetvorder = "
@@ -1978,7 +1978,7 @@ nullptr
         gCoreContext->SaveSettingOnHost("DeletedMaxAge", deletedMaxAge, nullptr);
 
         QString queryStr;
-        if (gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete", 0))
+        if (gCoreContext->GetBoolSetting("AutoExpireInsteadOfDelete", false))
         {
             queryStr = "UPDATE settings SET data='-1' WHERE "
                        "value='DeletedMaxAge' AND data='0'";
@@ -2053,24 +2053,24 @@ nullptr
                     "prefDupMethod", kDupCheckSubDesc));
         record.m_filter = RecordingRule::GetDefaultFilter();
         record.m_autoExpire =
-            gCoreContext->GetNumSetting("AutoExpireDefault", 0);
+            gCoreContext->GetBoolSetting("AutoExpireDefault", false);
         record.m_autoCommFlag =
-            gCoreContext->GetNumSetting("AutoCommercialFlag", 1);
+            gCoreContext->GetBoolSetting("AutoCommercialFlag", true);
         record.m_autoTranscode =
-            gCoreContext->GetNumSetting("AutoTranscode", 0);
+            gCoreContext->GetBoolSetting("AutoTranscode", false);
         record.m_transcoder =
             gCoreContext->GetNumSetting(
-                "DefaultTranscoder", RecordingProfile::TranscoderAutodetect);
+                "DefaultTranscoder", static_cast<int>(RecordingProfile::TranscoderAutodetect));
         record.m_autoUserJob1 =
-            gCoreContext->GetNumSetting("AutoRunUserJob1", 0);
+            gCoreContext->GetBoolSetting("AutoRunUserJob1", false);
         record.m_autoUserJob2 =
-            gCoreContext->GetNumSetting("AutoRunUserJob2", 0);
+            gCoreContext->GetBoolSetting("AutoRunUserJob2", false);
         record.m_autoUserJob3 =
-            gCoreContext->GetNumSetting("AutoRunUserJob3", 0);
+            gCoreContext->GetBoolSetting("AutoRunUserJob3", false);
         record.m_autoUserJob4 =
-            gCoreContext->GetNumSetting("AutoRunUserJob4", 0);
+            gCoreContext->GetBoolSetting("AutoRunUserJob4", false);
         record.m_autoMetadataLookup =
-            gCoreContext->GetNumSetting("AutoMetadataLookup", 1);
+            gCoreContext->GetBoolSetting("AutoMetadataLookup", true);
         record.Save(false);
 
         if (!UpdateDBVersionNumber("1302", dbver))

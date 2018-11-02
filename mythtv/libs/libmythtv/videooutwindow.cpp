@@ -91,7 +91,7 @@ VideoOutWindow::VideoOutWindow() :
 
     db_move = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
                      gCoreContext->GetNumSetting("yScanDisplacement", 0));
-    db_use_gui_size = gCoreContext->GetNumSetting("GuiSizeForTV", 0);
+    db_use_gui_size = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
 
     populateGeometry();
 }

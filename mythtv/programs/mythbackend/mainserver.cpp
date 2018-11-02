@@ -257,13 +257,13 @@ MainServer::MainServer(bool master, int port,
     threadPool.setMaxThreadCount(PRT_STARTUP_THREAD_COUNT);
 
     masterBackendOverride =
-        gCoreContext->GetNumSetting("MasterBackendOverride", 0);
+        gCoreContext->GetBoolSetting("MasterBackendOverride", false);
 
     mythserver = new MythServer();
     mythserver->setProxy(QNetworkProxy::NoProxy);
 
     QList<QHostAddress> listenAddrs = mythserver->DefaultListen();
-    if (!gCoreContext->GetNumSetting("ListenOnAllIps",1))
+    if (!gCoreContext->GetBoolSetting("ListenOnAllIps",true))
     {
         // test to make sure listen addresses are available
         // no reason to run the backend if the mainserver is not active
@@ -1258,7 +1258,7 @@ void MainServer::customEvent(QEvent *e)
                 // or already "deleted" programs
                 if (recInfo.GetRecordingGroup() != "LiveTV" &&
                     recInfo.GetRecordingGroup() != "Deleted" &&
-                    (gCoreContext->GetNumSetting("RerecordWatched", 0) ||
+                    (gCoreContext->GetBoolSetting("RerecordWatched", false) ||
                      !recInfo.IsWatched()))
                 {
                     recInfo.ForgetHistory();
@@ -2405,8 +2405,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     if (tvchain)
         tvchain->DeleteProgram(&pginfo);
 
-    bool followLinks = gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
-    bool slowDeletes = gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0);
+    bool followLinks = gCoreContext->GetBoolSetting("DeletesFollowLinks", false);
+    bool slowDeletes = gCoreContext->GetBoolSetting("TruncateDeletesSlowly", false);
     int fd = -1;
     off_t size = 0;
     bool errmsg = false;
@@ -5490,7 +5490,7 @@ void TruncateThread::run(void)
 
 void MainServer::DoTruncateThread(DeleteStruct *ds)
 {
-    if (gCoreContext->GetNumSetting("TruncateDeletesSlowly", 0))
+    if (gCoreContext->GetBoolSetting("TruncateDeletesSlowly", false))
     {
         TruncateAndClose(nullptr, ds->m_fd, ds->m_filename, ds->m_size);
     }
@@ -5541,7 +5541,7 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     }
 
     QFile checkFile(fullfile);
-    bool followLinks = gCoreContext->GetNumSetting("DeletesFollowLinks", 0);
+    bool followLinks = gCoreContext->GetBoolSetting("DeletesFollowLinks", false);
     off_t size = 0;
 
     // This will open the file and unlink the dir entry.  The actual file

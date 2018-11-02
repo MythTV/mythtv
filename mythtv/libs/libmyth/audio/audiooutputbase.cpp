@@ -119,7 +119,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memset(audiobuffer,        0, sizeof(audiobuffer));
 
     // Handle override of SRC quality settings
-    if (gCoreContext->GetNumSetting("SRCQualityOverride", false))
+    if (gCoreContext->GetBoolSetting("SRCQualityOverride", false))
     {
         src_quality = gCoreContext->GetNumSetting("SRCQuality", QUALITY_MEDIUM);
         // Extra test to keep backward compatibility with earlier SRC setting
@@ -189,7 +189,7 @@ void AudioOutputBase::InitSettings(const AudioSettings &settings)
     configured_channels = max_channels;
 
     upmix_default = max_channels > 2 ?
-        gCoreContext->GetNumSetting("AudioDefaultUpmix", false) :
+        gCoreContext->GetBoolSetting("AudioDefaultUpmix", false) :
         false;
     if (settings.upmixer == 1) // music, upmixer off
         upmix_default = false;
@@ -297,7 +297,7 @@ bool AudioOutputBase::CanPassthrough(int samplerate, int channels,
     ret &= output_settingsdigital->IsSupportedRate(samplerate);
     // if we must resample to 48kHz ; we can't passthrough
     ret &= !((samplerate != 48000) &&
-             gCoreContext->GetNumSetting("Audio48kOverride", false));
+             gCoreContext->GetBoolSetting("Audio48kOverride", false));
     // Don't know any cards that support spdif clocked at < 44100
     // Some US cable transmissions have 2ch 32k AC-3 streams
     ret &= samplerate >= 44100;
@@ -707,7 +707,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // Force resampling if we are encoding to AC3 and sr > 48k
     // or if 48k override was checked in settings
     if ((samplerate != 48000 &&
-         gCoreContext->GetNumSetting("Audio48kOverride", false)) ||
+         gCoreContext->GetBoolSetting("Audio48kOverride", false)) ||
          (enc && (samplerate > 48000)))
     {
         VBAUDIO("Forcing resample to 48 kHz");

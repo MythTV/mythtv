@@ -35,7 +35,7 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
       m_statusText(),
       m_playing(false),
       m_suspended(false),
-      m_showCaptions(gCoreContext->GetNumSetting("GalleryShowSlideCaptions", true)),
+      m_showCaptions(gCoreContext->GetBoolSetting("GalleryShowSlideCaptions", true)),
       m_transitioning(false),
       m_editsAllowed(editsAllowed)
 {
@@ -278,7 +278,7 @@ void GallerySlideView::MenuMain()
     else
         menu->AddItem(tr("Start SlideShow"), SLOT(Play()));
 
-    if (gCoreContext->GetNumSetting("GalleryRepeat", 0))
+    if (gCoreContext->GetBoolSetting("GalleryRepeat", false))
         menu->AddItem(tr("Turn Repeat Off"), SLOT(RepeatOff()));
     else
         menu->AddItem(tr("Turn Repeat On"), SLOT(RepeatOn()));
@@ -600,7 +600,7 @@ void GallerySlideView::SlideAvailable(int count)
     // and browsing with transitions turned off
     Transition &transition =
             (direction != 0 &&
-             (m_playing || gCoreContext->GetNumSetting("GalleryBrowseTransition", 0)))
+             (m_playing || gCoreContext->GetBoolSetting("GalleryBrowseTransition", false)))
             ? m_transition : m_updateTransition;
 
     // Reset any zoom before starting transition
@@ -688,7 +688,7 @@ void GallerySlideView::ShowNextSlide(int inc, bool useTransition)
 {
     // Browsing always wraps; slideshows depend on repeat setting
     if (m_playing && m_view->HasNext(inc) == nullptr
-            && !gCoreContext->GetNumSetting("GalleryRepeat", false))
+            && !gCoreContext->GetBoolSetting("GalleryRepeat", false))
     {
         // Don't stop due to jumping past end
         if (inc == 1)

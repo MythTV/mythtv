@@ -179,7 +179,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
     m_port = lport;
 
     // Don't even try to connect if we're currently disabled.
-    if (!gCoreContext->GetNumSetting("LCDEnable", 0))
+    if (!gCoreContext->GetBoolSetting("LCDEnable", false))
     {
         m_connected = false;
         return m_connected;

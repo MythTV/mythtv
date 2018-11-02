@@ -451,26 +451,26 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
     int pbOrder        = gCoreContext->GetNumSetting("PlayBoxOrdering", 1);
     // Split out sort order modes, wacky order for backward compatibility
     m_listOrder = (pbOrder >> 1) ^ (m_allOrder = pbOrder & 1);
-    m_watchListStart     = gCoreContext->GetNumSetting("PlaybackWLStart", 0);
+    m_watchListStart     = gCoreContext->GetBoolSetting("PlaybackWLStart", false);
 
-    m_watchListAutoExpire= gCoreContext->GetNumSetting("PlaybackWLAutoExpire", 0);
+    m_watchListAutoExpire= gCoreContext->GetBoolSetting("PlaybackWLAutoExpire", false);
     m_watchListMaxAge    = gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60);
     m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2);
 
-    bool displayCat  = gCoreContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
+    bool displayCat  = gCoreContext->GetBoolSetting("DisplayRecGroupIsCategory", false);
 
     m_viewMask = (ViewMask)gCoreContext->GetNumSetting(
                                     "DisplayGroupDefaultViewMask",
                                     VIEW_TITLES | VIEW_WATCHED);
 
     // Translate these external settings into mask values
-    if (gCoreContext->GetNumSetting("PlaybackWatchList", 1) &&
+    if (gCoreContext->GetBoolSetting("PlaybackWatchList", true) &&
         !(m_viewMask & VIEW_WATCHLIST))
     {
         m_viewMask = (ViewMask)(m_viewMask | VIEW_WATCHLIST);
         gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
-    else if (! gCoreContext->GetNumSetting("PlaybackWatchList", 1) &&
+    else if (! gCoreContext->GetBoolSetting("PlaybackWatchList", true) &&
              m_viewMask & VIEW_WATCHLIST)
     {
         m_viewMask = (ViewMask)(m_viewMask & ~VIEW_WATCHLIST);
@@ -479,14 +479,14 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
 
     // This setting is deprecated in favour of viewmask, this just ensures the
     // that it is converted over when upgrading from earlier versions
-    if (gCoreContext->GetNumSetting("LiveTVInAllPrograms",0) &&
+    if (gCoreContext->GetBoolSetting("LiveTVInAllPrograms",false) &&
         !(m_viewMask & VIEW_LIVETVGRP))
     {
         m_viewMask = (ViewMask)(m_viewMask | VIEW_LIVETVGRP);
         gCoreContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
 
-    if (gCoreContext->GetNumSetting("MasterBackendOverride", 0))
+    if (gCoreContext->GetBoolSetting("MasterBackendOverride", false))
         m_artHostOverride = gCoreContext->GetMasterHostName();
 
     if (player)
@@ -557,7 +557,7 @@ bool PlaybackBox::Create()
 
     if (m_recgroupList)
     {
-        if (gCoreContext->GetNumSetting("RecGroupsFocusable", 0))
+        if (gCoreContext->GetBoolSetting("RecGroupsFocusable", false))
         connect(m_recgroupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateRecGroup(MythUIButtonListItem*)));
         else
@@ -618,7 +618,7 @@ void PlaybackBox::Init()
         }
     }
 
-    if (!gCoreContext->GetNumSetting("PlaybackBoxStartInTitle", 0))
+    if (!gCoreContext->GetBoolSetting("PlaybackBoxStartInTitle", false))
         SetFocusWidget(m_recordingList);
 }
 
@@ -2552,7 +2552,7 @@ bool PlaybackBox::Play(
     m_playingSomething = true;
     int initIndex = m_recordingList->StopLoad();
 
-    if (!gCoreContext->GetNumSetting("UseProgStartMark", 0))
+    if (!gCoreContext->GetBoolSetting("UseProgStartMark", false))
         ignoreProgStart = true;
 
     uint flags =
@@ -3460,7 +3460,7 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
     else
     {
         QString jobHost;
-        if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
+        if (gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false))
             jobHost = pginfo->GetHostname();
 
         JobQueue::QueueJob(jobType, pginfo->GetChanID(),
@@ -3493,7 +3493,7 @@ void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
                 tmpItem->GetChanID(), tmpItem->GetRecordingStartTime())))
     {
             QString jobHost;
-            if (gCoreContext->GetNumSetting("JobsRunOnRecordHost", 0))
+            if (gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false))
                 jobHost = tmpItem->GetHostname();
 
             JobQueue::QueueJob(jobType, tmpItem->GetChanID(),
@@ -4688,7 +4688,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
 
     UpdateUILists();
 
-    if (gCoreContext->GetNumSetting("RememberRecGroup",1))
+    if (gCoreContext->GetBoolSetting("RememberRecGroup",true))
         gCoreContext->SaveSetting("DisplayRecGroup", m_recGroup);
 
     if (m_recGroupType[m_recGroup] == "recgroup")

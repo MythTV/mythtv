@@ -290,7 +290,7 @@ VideoOutputOMX::VideoOutputOMX() :
 #endif
     init(&av_pause_frame, FMT_YV12, nullptr, 0, 0, 0);
 
-    if (gCoreContext->GetNumSetting("UseVideoModes", 0))
+    if (gCoreContext->GetBoolSetting("UseVideoModes", false))
         display_res = DisplayRes::GetDisplayRes(true);
 
     if (OMX_ErrorNone != m_render.Init(OMX_IndexParamVideoInit))

@@ -763,7 +763,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         m_connections[session].was_playing = playing;
     }
 
-    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled", false))
+    if (gCoreContext->GetBoolSetting("AirPlayPasswordEnabled", false))
     {
         if (m_nonce.isEmpty())
         {

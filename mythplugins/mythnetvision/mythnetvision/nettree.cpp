@@ -53,10 +53,10 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     connect(m_gdt, SIGNAL(finished()), SLOT(DoTreeRefresh()));
     m_updateFreq = gCoreContext->GetNumSetting(
                        "mythNetTree.updateFreq", 6);
-    m_rssAutoUpdate = gCoreContext->GetNumSetting(
-                       "mythnetvision.rssBackgroundFetch", 0);
-    m_treeAutoUpdate = gCoreContext->GetNumSetting(
-                       "mythnetvision.backgroundFetch", 0);
+    m_rssAutoUpdate = gCoreContext->GetBoolSetting(
+                       "mythnetvision.rssBackgroundFetch", false);
+    m_treeAutoUpdate = gCoreContext->GetBoolSetting(
+                       "mythnetvision.backgroundFetch", false);
 }
 
 bool NetTree::Create()

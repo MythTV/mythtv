@@ -292,7 +292,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     {
         QRect bounds;
 
-        bool inWindow = GetMythDB()->GetNumSetting("RunFrontendInWindow", 0);
+        bool inWindow = GetMythDB()->GetBoolSetting("RunFrontendInWindow", false);
 
         if (inWindow)
             LOG(VB_GUI, LOG_INFO, LOC + "Running in a window");
@@ -480,7 +480,7 @@ void MythUIHelper::LoadQtConfig(void)
     gCoreContext->ResetLanguage();
     d->themecachedir.clear();
 
-    if (GetMythDB()->GetNumSetting("UseVideoModes", 0))
+    if (GetMythDB()->GetBoolSetting("UseVideoModes", false))
     {
         DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
 

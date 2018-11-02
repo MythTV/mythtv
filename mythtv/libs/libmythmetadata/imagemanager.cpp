@@ -1948,7 +1948,7 @@ ImageManagerFe& ImageManagerFe::getInstance()
         m_instance = new ImageManagerFe
                 (gCoreContext->GetNumSetting("GalleryImageOrder"),
                  gCoreContext->GetNumSetting("GalleryDirOrder"),
-                 gCoreContext->GetNumSetting("GalleryShowHidden"),
+                 gCoreContext->GetBoolSetting("GalleryShowHidden"),
                  gCoreContext->GetNumSetting("GalleryShowType"),
                  gCoreContext->GetSetting("GalleryDateFormat"));
     return *m_instance;

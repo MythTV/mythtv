@@ -1936,7 +1936,7 @@ SchedOptMixin::SchedOptMixin(MythScreenType &screen, RecordingRule *rule,
       m_dupmethodList(nullptr), m_dupscopeList(nullptr), m_inputList(nullptr),
       m_ruleactiveCheck(nullptr), m_newrepeatList(nullptr),
       m_screen(&screen), m_rule(rule), m_other(other), m_loaded(false),
-      m_haveRepeats(gCoreContext->GetNumSetting("HaveRepeats", 0))
+      m_haveRepeats(gCoreContext->GetBoolSetting("HaveRepeats", false))
 {
 }
 

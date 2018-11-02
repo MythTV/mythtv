@@ -2078,7 +2078,7 @@ void Scheduler::run(void)
     int       idleTimeoutSecs = 0;
     int       idleWaitForRecordingTime = 15; // in minutes
     bool      blockShutdown   =
-        gCoreContext->GetNumSetting("blockSDWUwithoutClient", 1);
+        gCoreContext->GetBoolSetting("blockSDWUwithoutClient", true);
     bool      firstRun        = true;
     QDateTime nextSleepCheck  = MythDate::current();
     RecIter   startIter       = reclist.begin();
@@ -3175,8 +3175,8 @@ void Scheduler::HandleIdleShutdown(
                 }
 
                 // If we're due to grab guide data, then block shutdown
-                if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime") &&
-                    gCoreContext->GetNumSetting("MythFillEnabled"))
+                if (gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime") &&
+                    gCoreContext->GetBoolSetting("MythFillEnabled"))
                 {
                     QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
                     QDateTime guideRunTime = MythDate::fromString(str);
@@ -3316,8 +3316,8 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                 // (needs a clientconnection again,
                 // before shutdown is executed)
                 blockShutdown =
-                    gCoreContext->GetNumSetting("blockSDWUwithoutClient",
-                                                1);
+                    gCoreContext->GetBoolSetting("blockSDWUwithoutClient",
+                                                 true);
                 idleSince = QDateTime();
                 break;
 #if 0
@@ -3364,8 +3364,8 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
     QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
     QDateTime guideRefreshTime = MythDate::fromString(str);
 
-    if (gCoreContext->GetNumSetting("MythFillEnabled")
-        && gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime")
+    if (gCoreContext->GetBoolSetting("MythFillEnabled")
+        && gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime")
         && guideRefreshTime.isValid()
         && (guideRefreshTime > MythDate::current())
         && (restarttime.isNull() || guideRefreshTime < restarttime))

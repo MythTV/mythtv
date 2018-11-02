@@ -678,7 +678,7 @@ int main(int argc, char *argv[])
     }
 
     if ((usingDataDirect) &&
-        (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
+        (gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", true)))
     {
         fill_data.ddprocessor.GrabNextSuggestedTime();
     }

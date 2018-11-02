@@ -1002,7 +1002,7 @@ void MythUIWebBrowser::Init(void)
                                                      false);
     }
 
-    if (!gCoreContext->GetNumSetting("WebBrowserEnableJavascript",1))
+    if (!gCoreContext->GetBoolSetting("WebBrowserEnableJavascript",true))
     {
         LOG(VB_GENERAL, LOG_INFO, "MythUIWebBrowser: disabling JavaScript");
         QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, false);

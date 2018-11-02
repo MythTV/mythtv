@@ -1094,7 +1094,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     if (!strcmp(fmt->name, "mpegts") &&
-        gCoreContext->GetNumSetting("FFMPEGTS", false))
+        gCoreContext->GetBoolSetting("FFMPEGTS", false))
     {
         AVInputFormat *fmt2 = av_find_input_format("mpegts-ffmpeg");
         if (fmt2)

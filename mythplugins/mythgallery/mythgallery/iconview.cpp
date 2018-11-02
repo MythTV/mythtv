@@ -136,10 +136,10 @@ IconView::IconView(MythScreenStack *parent, const char *name,
 {
     m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
     m_sortorder = gCoreContext->GetNumSetting("GallerySortOrder", 0);
-    m_useOpenGL = gCoreContext->GetNumSetting("SlideshowUseOpenGL", 0);
-    m_recurse = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    m_useOpenGL = gCoreContext->GetBoolSetting("SlideshowUseOpenGL", false);
+    m_recurse = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);
     m_paths = gCoreContext->GetSetting("GalleryImportDirs").split(":");
-    m_allowImportScripts = gCoreContext->GetNumSetting("GalleryAllowImportScripts", 0);
+    m_allowImportScripts = gCoreContext->GetBoolSetting("GalleryAllowImportScripts", false);
 
     QDir dir(m_galleryDir);
     if (!dir.exists() || !dir.isReadable())
@@ -1117,10 +1117,10 @@ void IconView::ReloadSettings(void)
     // reload settings
     m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
     m_sortorder   = gCoreContext->GetNumSetting("GallerySortOrder", 0);
-    m_useOpenGL   = gCoreContext->GetNumSetting("SlideshowUseOpenGL", 0);
-    m_recurse     = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    m_useOpenGL   = gCoreContext->GetBoolSetting("SlideshowUseOpenGL", false);
+    m_recurse     = gCoreContext->GetBoolSetting("GalleryRecursiveSlideshow", false);
     m_paths       = gCoreContext->GetSetting("GalleryImportDirs").split(":");
-    m_allowImportScripts = gCoreContext->GetNumSetting("GalleryAllowImportScripts", 0);
+    m_allowImportScripts = gCoreContext->GetBoolSetting("GalleryAllowImportScripts", false);
 
     // reload directory
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();

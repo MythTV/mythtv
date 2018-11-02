@@ -57,7 +57,7 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
              * AES2 = source and channel unspecified
              * AES3 = sample rate unspecified
              */
-        bool s48k = gCoreContext->GetNumSetting("SPDIFRateOverride", false);
+        bool s48k = gCoreContext->GetBoolSetting("SPDIFRateOverride", false);
         QString iecarg = QString("AES0=6,AES1=0x82,AES2=0x00") +
             (s48k ? QString() : QString(",AES3=0x01"));
         QString iecarg2 = QString("AES0=6 AES1=0x82 AES2=0x00") +

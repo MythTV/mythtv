@@ -165,14 +165,14 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     bool pbos    = gl_features & kGLExtPBufObj;
 
     #ifdef ANDROID
-    #define YV12DEFAULT 0
+    #define YV12DEFAULT false
     #else
-    #define YV12DEFAULT 1
+    #define YV12DEFAULT true
     #endif
 
-    bool yv12 = gCoreContext->GetNumSetting("OpenGLYV12", YV12DEFAULT)
+    bool yv12 = gCoreContext->GetBoolSetting("OpenGLYV12", YV12DEFAULT)
         && !getenv("OPENGL_NOYV12");
-    bool uyvy = gCoreContext->GetNumSetting("OpenGLUYVY", 1)
+    bool uyvy = gCoreContext->GetBoolSetting("OpenGLUYVY", true)
         && !getenv("OPENGL_NOUYVY");
     bool ycbcr   = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
 

@@ -393,13 +393,13 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
     // "~/.mythtv/mythgallery/january/.thumbcache"
     QString aPath = inDir + QString("/.thumbcache/");
     QDir dir(aPath);
-    if (gCoreContext->GetNumSetting("GalleryThumbnailLocation") &&
+    if (gCoreContext->GetBoolSetting("GalleryThumbnailLocation") &&
         !dir.exists() && inDir.startsWith(galleryDir))
     {
         dir.mkpath(aPath);
     }
 
-    if (!gCoreContext->GetNumSetting("GalleryThumbnailLocation") ||
+    if (!gCoreContext->GetBoolSetting("GalleryThumbnailLocation") ||
         !dir.exists() || !inDir.startsWith(galleryDir))
     {
         // Arrive here if storing thumbs in home dir,

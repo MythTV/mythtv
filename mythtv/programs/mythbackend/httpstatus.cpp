@@ -549,7 +549,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                        setting_to_localtime("mythfilldatabaseLastRunEnd"));
     guide.setAttribute("status",
         gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
-    if (gCoreContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))
+    if (gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", false))
     {
         guide.setAttribute("next",
             gCoreContext->GetSetting("MythFillSuggestedRunTime"));

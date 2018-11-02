@@ -91,7 +91,7 @@ VideoScannerThread::VideoScannerThread(QObject *parent) :
     m_parent = parent;
     m_dbmetadata = new VideoMetadataListManager;
     m_HasGUI = gCoreContext->HasGUI();
-    m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
+    m_ListUnknown = gCoreContext->GetBoolSetting("VideoListUnknownFiletypes", false);
 }
 
 VideoScannerThread::~VideoScannerThread()

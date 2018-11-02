@@ -132,7 +132,7 @@ LinuxFirewireDevice::LinuxFirewireDevice(
     if (!m_bufsz)
         m_bufsz = gCoreContext->GetNumSetting("HDRingbufferSize");
 
-    m_db_reset_disabled = gCoreContext->GetNumSetting("DisableFirewireReset", 0);
+    m_db_reset_disabled = gCoreContext->GetBoolSetting("DisableFirewireReset", false);
 
     UpdateDeviceList();
 }

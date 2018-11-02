@@ -178,7 +178,7 @@ bool MythRAOPDevice::RegisterForBonjour(void)
     txt.append(4); txt.append("ch=2");      // audio channels
     txt.append(5); txt.append("ss=16");     // sample size
     txt.append(8); txt.append("sr=44100");  // sample rate
-    if (gCoreContext->GetNumSetting("AirPlayPasswordEnabled"))
+    if (gCoreContext->GetBoolSetting("AirPlayPasswordEnabled"))
     {
         txt.append(7); txt.append("pw=true");
     }

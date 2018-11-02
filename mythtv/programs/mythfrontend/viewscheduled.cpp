@@ -49,7 +49,7 @@ ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool /*showTV*
                m_conflictDate(QDate()),
                m_schedulesList(nullptr),
                m_groupList(nullptr),
-               m_showAll(!gCoreContext->GetNumSetting("ViewSchedShowLevel", 0)),
+               m_showAll(!gCoreContext->GetBoolSetting("ViewSchedShowLevel", false)),
                m_inEvent(false),
                m_inFill(false),
                m_needFill(false),

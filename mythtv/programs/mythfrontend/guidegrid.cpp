@@ -502,7 +502,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
            m_startChanNum(channum),
            m_currentRow(0),
            m_currentCol(0),
-           m_sortReverse(gCoreContext->GetNumSetting("EPGSortReverse", 0)),
+           m_sortReverse(gCoreContext->GetBoolSetting("EPGSortReverse", false)),
            m_channelCount(5),
            m_timeCount(30),
            m_verticalLayout(false),
@@ -682,7 +682,7 @@ GuideGrid::~GuideGrid()
     if (m_player)
         m_player->UpdateChannelList(m_changrpid);
 
-    if (gCoreContext->GetNumSetting("ChannelGroupRememberLast", 0))
+    if (gCoreContext->GetBoolSetting("ChannelGroupRememberLast", false))
         gCoreContext->SaveSetting("ChannelGroupDefault", m_changrpid);
 }
 
