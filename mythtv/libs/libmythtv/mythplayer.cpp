@@ -2199,8 +2199,10 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
             if (videotimecode != buffer->timecode)
                 videotimecode = maxtcval;
         }
-        else
+
+        if (videotimecode == 0)
             videotimecode = audiotimecode;
+
         now = QDateTime::currentDateTimeUtc();
         unow = now.toMSecsSinceEpoch() * 1000;
         // first time or after a seek - setup of rtcbase
