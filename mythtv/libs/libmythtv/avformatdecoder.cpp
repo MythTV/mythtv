@@ -2635,9 +2635,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (private_dec)
                 thread_count = 1;
 
-            if (!codec_is_std(video_codec_id))
-                thread_count = 1;
-
             use_frame_timing = false;
             if (! ringBuffer->IsDVD()
                 && (codec_is_std(video_codec_id)
@@ -3938,6 +3935,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
     {
         AVFrame *tmp_frame = nullptr;
         AVFrame *use_frame = nullptr;
+        VideoFrame *xf = picframe;
+        picframe = m_parent->GetNextVideoFrame();
+        unsigned char *buf = picframe->buf;
 #ifdef USING_VAAPI2
         if (IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format))
         {
@@ -3945,6 +3945,18 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             tmp_frame = av_frame_alloc();
             use_frame = tmp_frame;
             /* retrieve data from GPU to CPU */
+            AVPixelFormat *formats = nullptr;
+            ret = av_hwframe_transfer_get_formats(mpa_pic->hw_frames_ctx,
+                AV_HWFRAME_TRANSFER_DIRECTION_FROM,
+                &formats, 0);
+            for (AVPixelFormat *format = formats; *format != AV_PIX_FMT_NONE; format++)
+            {
+                if (*format == AV_PIX_FMT_YUV420P)
+                {
+                    use_frame->format = AV_PIX_FMT_YUV420P;
+                    break;
+                }
+            }
             if ((ret = av_hwframe_transfer_data(use_frame, mpa_pic, 0)) < 0) {
                 LOG(VB_GENERAL, LOG_ERR, LOC
                     + QString("Error %1 transferring the data to system memory")
@@ -3952,6 +3964,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
                 av_frame_free(&use_frame);
                 return false;
             }
+            av_freep(&formats);
         }
         else
 #endif // USING_VAAPI2
@@ -3959,13 +3972,6 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 
         AVFrame tmppicture;
 
-        VideoFrame *xf = picframe;
-        picframe = m_parent->GetNextVideoFrame();
-
-        unsigned char *buf = picframe->buf;
-        av_image_fill_arrays(tmppicture.data, tmppicture.linesize,
-            buf, AV_PIX_FMT_YUV420P, use_frame->width,
-                       use_frame->height, IMAGE_ALIGN);
         tmppicture.data[0] = buf + picframe->offsets[0];
         tmppicture.data[1] = buf + picframe->offsets[1];
         tmppicture.data[2] = buf + picframe->offsets[2];

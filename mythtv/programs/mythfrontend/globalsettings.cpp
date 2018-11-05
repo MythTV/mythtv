@@ -734,7 +734,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     codecs    = new TransMythUIComboBoxSetting(true);
     framerate = new TransTextEditSetting();
     decoder   = new TransMythUIComboBoxSetting();
-    max_cpus  = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
+    max_cpus  = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? 8 : 1, 1, true);
     skiploop  = new TransMythUICheckBoxSetting();
     vidrend   = new TransMythUIComboBoxSetting();
     osdrend   = new TransMythUIComboBoxSetting();
