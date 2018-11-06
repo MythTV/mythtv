@@ -92,11 +92,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
         recordTable = "record";
     }
 
-    if (!VerifyCards())
-    {
-        error = true;
-        return;
-    }
+    VerifyCards();
 
     InitInputInfoMap();
 
@@ -176,7 +172,6 @@ bool Scheduler::VerifyCards(void)
     if (!query.exec("SELECT count(*) FROM capturecard") || !query.next())
     {
         MythDB::DBError("verifyCards() -- main query 1", query);
-        error = GENERIC_EXIT_DB_ERROR;
         return false;
     }
 
@@ -186,7 +181,6 @@ bool Scheduler::VerifyCards(void)
         LOG(VB_GENERAL, LOG_ERR, LOC +
                 "No capture cards are defined in the database.\n\t\t\t"
                 "Perhaps you should re-read the installation instructions?");
-        error = GENERIC_EXIT_SETUP_ERROR;
         return false;
     }
 
@@ -195,7 +189,6 @@ bool Scheduler::VerifyCards(void)
     if (!query.exec())
     {
         MythDB::DBError("verifyCards() -- main query 2", query);
-        error = GENERIC_EXIT_DB_ERROR;
         return false;
     }
 
@@ -231,7 +224,6 @@ bool Scheduler::VerifyCards(void)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "No channel sources defined in the database");
-        error = GENERIC_EXIT_SETUP_ERROR;
         return false;
     }
 
