@@ -3013,6 +3013,10 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
+static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
+{
+}
+
 #ifdef USING_VDPAU
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
 {
@@ -3938,6 +3942,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         VideoFrame *xf = picframe;
         picframe = m_parent->GetNextVideoFrame();
         unsigned char *buf = picframe->buf;
+        bool used_picframe=false;
 #ifdef USING_VAAPI2
         if (IS_VAAPI_PIX_FMT((AVPixelFormat)mpa_pic->format))
         {
@@ -3949,15 +3954,32 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
             ret = av_hwframe_transfer_get_formats(mpa_pic->hw_frames_ctx,
                 AV_HWFRAME_TRANSFER_DIRECTION_FROM,
                 &formats, 0);
-            for (AVPixelFormat *format = formats; *format != AV_PIX_FMT_NONE; format++)
+            if (ret==0)
             {
-                if (*format == AV_PIX_FMT_YUV420P)
+                for (AVPixelFormat *format = formats; *format != AV_PIX_FMT_NONE; format++)
                 {
-                    use_frame->format = AV_PIX_FMT_YUV420P;
-                    break;
+                    if (*format == AV_PIX_FMT_YUV420P)
+                    {
+                        // Retrieve the picture directly into the Video Frame Buffer
+                        used_picframe = true;
+                        use_frame->format = AV_PIX_FMT_YUV420P;
+                        for (int i = 0; i < 3; i++)
+                        {
+                            use_frame->data[i]     = buf + picframe->offsets[i];
+                            use_frame->linesize[i] = picframe->pitches[i];
+                        }
+                        // Dummy release method - we do not want to free the buffer
+                        AVBufferRef *buffer =
+                            av_buffer_create((uint8_t*)picframe, 0, dummy_release_avf_buffer, this, 0);
+                        use_frame->buf[0] = buffer;
+                        use_frame->width = mpa_pic->width;
+                        use_frame->height = mpa_pic->height;
+                        break;
+                    }
                 }
             }
-            if ((ret = av_hwframe_transfer_data(use_frame, mpa_pic, 0)) < 0) {
+            if ((ret = av_hwframe_transfer_data(use_frame, mpa_pic, 0)) < 0)
+            {
                 LOG(VB_GENERAL, LOG_ERR, LOC
                     + QString("Error %1 transferring the data to system memory")
                         .arg(ret));
@@ -3970,29 +3992,31 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
 #endif // USING_VAAPI2
             use_frame = mpa_pic;
 
-        AVFrame tmppicture;
-
-        tmppicture.data[0] = buf + picframe->offsets[0];
-        tmppicture.data[1] = buf + picframe->offsets[1];
-        tmppicture.data[2] = buf + picframe->offsets[2];
-        tmppicture.linesize[0] = picframe->pitches[0];
-        tmppicture.linesize[1] = picframe->pitches[1];
-        tmppicture.linesize[2] = picframe->pitches[2];
-
-        QSize dim = get_video_dim(*context);
-        sws_ctx = sws_getCachedContext(sws_ctx, use_frame->width,
-                                       use_frame->height, (AVPixelFormat)use_frame->format,
-                                       use_frame->width, use_frame->height,
-                                       AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                                       nullptr, nullptr, nullptr);
-        if (!sws_ctx)
+        if (!used_picframe)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate sws context");
-            return false;
-        }
-        sws_scale(sws_ctx, use_frame->data, use_frame->linesize, 0, dim.height(),
-                  tmppicture.data, tmppicture.linesize);
+            AVFrame tmppicture;
 
+            tmppicture.data[0] = buf + picframe->offsets[0];
+            tmppicture.data[1] = buf + picframe->offsets[1];
+            tmppicture.data[2] = buf + picframe->offsets[2];
+            tmppicture.linesize[0] = picframe->pitches[0];
+            tmppicture.linesize[1] = picframe->pitches[1];
+            tmppicture.linesize[2] = picframe->pitches[2];
+
+            QSize dim = get_video_dim(*context);
+            sws_ctx = sws_getCachedContext(sws_ctx, use_frame->width,
+                                        use_frame->height, (AVPixelFormat)use_frame->format,
+                                        use_frame->width, use_frame->height,
+                                        AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                                        nullptr, nullptr, nullptr);
+            if (!sws_ctx)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate sws context");
+                return false;
+            }
+            sws_scale(sws_ctx, use_frame->data, use_frame->linesize, 0, dim.height(),
+                    tmppicture.data, tmppicture.linesize);
+        }
         if (xf)
         {
             // Set the frame flags, but then discard it
