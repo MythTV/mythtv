@@ -540,16 +540,16 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
                                  .arg((result_list[i].ip_addr>> 8) & 0xFF)
                                  .arg((result_list[i].ip_addr>> 0) & 0xFF);
 
-            QString hwmodel = "";
+            QString model = "";
             hdhomerun_device_t *device = hdhomerun_device_create(
                 result_list[i].device_id, 0, 0, nullptr);
             if (device)
             {
-                hwmodel = hdhomerun_device_get_hw_model_str(device);
+                model = hdhomerun_device_get_model_str(device);
                 hdhomerun_device_destroy(device);
             }
 
-            QString hdhrdev = id.toUpper() + " " + ip + " " + hwmodel;
+            QString hdhrdev = id.toUpper() + " " + ip + " " + model;
             devs.push_back(hdhrdev);
         }
     }

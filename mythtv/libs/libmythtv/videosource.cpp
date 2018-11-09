@@ -1426,12 +1426,12 @@ class HDHomeRunEITScan : public MythUICheckBoxSetting
 class UseHDHomeRunDevice : public TransMythUICheckBoxSetting
 {
   public:
-    explicit UseHDHomeRunDevice(QString &deviceid, QString &hwmodel,
+    explicit UseHDHomeRunDevice(QString &deviceid, QString &model,
                                 QString &ipaddr) :
         TransMythUICheckBoxSetting()
     {
         setLabel(QObject::tr("Use HDHomeRun %1 (%2 %3)")
-                 .arg(deviceid).arg(hwmodel).arg(ipaddr));
+                 .arg(deviceid).arg(model).arg(ipaddr));
         setValue(false);
         setHelpText(
             QObject::tr("If enabled, use tuners from this HDHomeRun "
@@ -1455,7 +1455,7 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
     {
         HDHomeRunDevice &dev = *dit;
         dev.checkbox = new UseHDHomeRunDevice(
-            dev.deviceid, dev.hwmodel, dev.cardip);
+            dev.deviceid, dev.model, dev.cardip);
         a_cardtype.addTargetedChild("HDHOMERUN", dev.checkbox);
     }
     a_cardtype.addTargetedChild("HDHOMERUN", new EmptyAudioDevice(parent));
@@ -1486,10 +1486,10 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
         QStringList devinfo = dev.split(" ");
         QString devid = devinfo.at(0);
         QString devip = devinfo.at(1);
-        QString hwmodel = devinfo.at(2);
+        QString model = devinfo.at(2);
 
         HDHomeRunDevice tmpdevice;
-        tmpdevice.hwmodel  = hwmodel;
+        tmpdevice.model    = model;
         tmpdevice.cardip   = devip;
         tmpdevice.deviceid = devid;
         devicelist[tmpdevice.deviceid] = tmpdevice;
@@ -1501,7 +1501,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     for (debugit = devicelist.begin(); debugit != devicelist.end(); ++debugit)
     {
         LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2 %3")
-            .arg(debugit.key()).arg((*debugit).hwmodel)
+            .arg(debugit.key()).arg((*debugit).model)
             .arg((*debugit).cardip));
     }
 #endif

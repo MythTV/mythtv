@@ -387,7 +387,7 @@ class HDHomeRunDevice
 {
   public:
     QString deviceid;
-    QString hwmodel;
+    QString model;
     QString cardip;
     UseHDHomeRunDevice *checkbox;
 };
