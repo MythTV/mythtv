@@ -3404,6 +3404,27 @@ nullptr
         if (!performActualUpdate(updates, "1348", dbver))
             return false;
     }
+
+    // TODO: Enable the following update when the version 30.0 branch
+    // gets created.  It's highly desirable for the release but isn't
+    // strictly before then so don't break schema compatibility with
+    // version 29.x just yet.  For the time being, the same effective
+    // update can be made by running mythtv-setup, entering and
+    // exiting the capture card section and then saving the changes.
+#if 0
+    if (dbver == "1348")
+    {
+        const char *updates[] = {
+            "update capturecard "
+            "    set videodevice=regexp_replace(videodevice, '-.*$', '') "
+            "    where cardtype='HDHOMERUN'",
+            nullptr
+        };
+        if (!performActualUpdate(updates, "1349", dbver))
+            return false;
+    }
+#endif
+
     /*
      * TODO when consolidating database version 1348 into initialize, you can delete
      * from mythtv/libs/libmythtv/tv_play.cpp the upgrade code in the lines

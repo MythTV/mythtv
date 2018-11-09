@@ -51,7 +51,9 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
 
     AddFlags(kSigMon_WaitForSig);
 
-    streamHandler = HDHRStreamHandler::Get(channel->GetDevice(), inputid);
+    streamHandler = HDHRStreamHandler::Get(channel->GetDevice(),
+                                           channel->GetInputID(),
+                                           channel->GetMajorID());
 }
 
 /** \fn HDHRSignalMonitor::~HDHRSignalMonitor()

@@ -805,6 +805,7 @@ ChannelBase *ChannelBase::CreateChannel(
     {
         if (channel &&
             ((genOpt.inputtype == "DVB" && dvbOpt.dvb_on_demand) ||
+             genOpt.inputtype == "HDHOMERUN" ||
              CardUtil::IsV4L(genOpt.inputtype)))
         {
             channel->Close();
@@ -834,4 +835,9 @@ bool ChannelBase::IsExternalChannelChangeInUse(void)
     }
 
     return !m_externalChanger.isEmpty();
+}
+
+int ChannelBase::GetMajorID(void)
+{
+    return m_pParent ? m_pParent->GetMajorId() : m_inputid;
 }

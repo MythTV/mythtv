@@ -540,12 +540,17 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
                                  .arg((result_list[i].ip_addr>> 8) & 0xFF)
                                  .arg((result_list[i].ip_addr>> 0) & 0xFF);
 
-            for (int tuner = 0; tuner < result_list[i].tuner_count; tuner++)
+            QString hwmodel = "";
+            hdhomerun_device_t *device = hdhomerun_device_create(
+                result_list[i].device_id, 0, 0, nullptr);
+            if (device)
             {
-                QString hdhrdev = id.toUpper() + " " + ip + " " +
-                                  QString("%1").arg(tuner);
-                devs.push_back(hdhrdev);
+                hwmodel = hdhomerun_device_get_hw_model_str(device);
+                hdhomerun_device_destroy(device);
             }
+
+            QString hdhrdev = id.toUpper() + " " + ip + " " + hwmodel;
+            devs.push_back(hdhrdev);
         }
     }
 #endif // USING_HDHOMERUN
@@ -1396,7 +1401,8 @@ uint CardUtil::CreateDeviceInputGroup(uint inputid,
 {
     QString name = host + '|' + device;
     if (type == "FREEBOX" || type == "IMPORT" ||
-        type == "DEMO"    || type == "EXTERNAL")
+        type == "DEMO"    || type == "EXTERNAL" ||
+        type == "HDHOMERUN")
         name += QString("|%1").arg(inputid);
     return CreateInputGroup(name);
 }

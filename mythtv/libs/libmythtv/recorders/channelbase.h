@@ -100,6 +100,9 @@ class ChannelBase
     // \brief Set inputid for scanning
     void SetInputID(uint _inputid) { m_inputid = _inputid; }
 
+    // \brief Get major input ID
+    int GetMajorID(void);
+
     static ChannelBase *CreateChannel(
         TVRec                    *tv_rec,
         const GeneralDBOptions   &genOpt,

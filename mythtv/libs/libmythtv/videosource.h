@@ -380,24 +380,21 @@ public:
     static void fillSelections(MythUIComboBoxSetting* setting);
 };
 
+#ifdef USING_HDHOMERUN
+
+class UseHDHomeRunDevice;
 class HDHomeRunDevice
 {
   public:
-    QString mythdeviceid;
     QString deviceid;
-    QString desc;
+    QString hwmodel;
     QString cardip;
-    QString cardtuner;
-    bool    inuse;
-    bool    discovered;
+    UseHDHomeRunDevice *checkbox;
 };
 
 typedef QMap<QString, HDHomeRunDevice> HDHomeRunDeviceList;
 
-class HDHomeRunDeviceIDList;
 class HDHomeRunDeviceID;
-class HDHomeRunIP;
-class HDHomeRunTunerIndex;
 class HDHomeRunConfigurationGroup : public GroupSetting
 {
     Q_OBJECT
@@ -406,20 +403,33 @@ class HDHomeRunConfigurationGroup : public GroupSetting
 
   public:
     HDHomeRunConfigurationGroup(CaptureCard &parent, CardType &cardtype);
+    void SetDeviceCheckBoxes(QString devices);
+    QString GetDeviceCheckBoxes(void);
 
   private:
     void FillDeviceList(void);
-    bool ProbeCard(HDHomeRunDevice&);
 
   private:
     CaptureCard           &parent;
-    StandardSetting       *desc;
-    HDHomeRunDeviceIDList *deviceidlist;
     HDHomeRunDeviceID     *deviceid;
-    HDHomeRunIP           *cardip;
-    HDHomeRunTunerIndex   *cardtuner;
     HDHomeRunDeviceList    devicelist;
 };
+
+class HDHomeRunDeviceID : public MythUITextEditSetting
+{
+    Q_OBJECT
+
+  public:
+    HDHomeRunDeviceID(const CaptureCard &parent,
+                      HDHomeRunConfigurationGroup &_group);
+    void Load(void) override; // StandardSetting
+    void Save(void) override; // StandardSetting
+
+  private:
+    HDHomeRunConfigurationGroup &group;
+};
+
+#endif
 
 class VBoxDevice
 {
@@ -876,102 +886,6 @@ class CardInput : public GroupSetting
     InputGroup         *inputgrp1;
     MythUISpinBoxSetting  *instancecount;
     MythUICheckBoxSetting *schedgroup;
-};
-
-class HDHomeRunDeviceID;
-class HDHomeRunTunerIndex;
-
-class HDHomeRunIP : public MythUITextEditSetting
-{
-    Q_OBJECT
-
-  public:
-    HDHomeRunIP();
-
-    void setEnabled(bool e) override; // StandardSetting
-    void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
-
-  signals:
-    void NewIP(const QString&);
-
-  public slots:
-    void UpdateDevices(const QString&);
-
-  private:
-    QString _oldValue;
-};
-
-class HDHomeRunTunerIndex : public MythUITextEditSetting
-{
-    Q_OBJECT
-
-  public:
-    HDHomeRunTunerIndex();
-
-    void setEnabled(bool e) override; // StandardSetting
-    void SetOldValue(const QString &s)
-        { _oldValue = s; _oldValue.detach(); };
-
-  signals:
-    void NewTuner(const QString&);
-
-  public slots:
-    void UpdateDevices(const QString&);
-
-  private:
-    QString _oldValue;
-};
-
-
-class HDHomeRunDeviceIDList : public TransMythUIComboBoxSetting
-{
-    Q_OBJECT
-
-  public:
-    HDHomeRunDeviceIDList(HDHomeRunDeviceID *deviceid,
-                          StandardSetting *desc,
-                          HDHomeRunIP       *cardip,
-                          HDHomeRunTunerIndex *cardtuner,
-                          HDHomeRunDeviceList *devicelist,
-                          const CaptureCard &parent);
-
-    void fillSelections(const QString &current);
-
-    void Load(void) override; // StandardSetting
-
-  public slots:
-    void UpdateDevices(const QString&);
-
-  private:
-    HDHomeRunDeviceID   *_deviceid;
-    StandardSetting     *_desc;
-    HDHomeRunIP         *_cardip;
-    HDHomeRunTunerIndex *_cardtuner;
-    HDHomeRunDeviceList *_devicelist;
-    const CaptureCard &m_parent;
-
-    QString              _oldValue;
-};
-
-class HDHomeRunDeviceID : public MythUITextEditSetting
-{
-    Q_OBJECT
-
-  public:
-    explicit HDHomeRunDeviceID(const CaptureCard &parent);
-
-    void Load(void) override; // StandardSetting
-
-  public slots:
-    void SetIP(const QString&);
-    void SetTuner(const QString&);
-    void SetOverrideDeviceID(const QString&);
-
-  private:
-    QString _ip;
-    QString _tuner;
-    QString _overridedeviceid;
 };
 
 ///

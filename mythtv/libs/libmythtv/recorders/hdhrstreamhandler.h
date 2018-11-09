@@ -30,6 +30,7 @@ class DeviceReadBuffer;
 #endif
 #else
 struct hdhomerun_device_t { int dummy; };
+struct hdhomerun_device_selector_t { int dummy; };
 #endif
 
 enum HDHRTuneMode {
@@ -49,7 +50,8 @@ enum HDHRTuneMode {
 class HDHRStreamHandler : public StreamHandler
 {
   public:
-    static HDHRStreamHandler *Get(const QString &devicename, int inputid);
+    static HDHRStreamHandler *Get(const QString &devicename, int inputid,
+                                  int majorid);
     static void Return(HDHRStreamHandler * & ref, int inputid);
 
     void AddListener(MPEGStreamData *data,
@@ -68,10 +70,9 @@ class HDHRStreamHandler : public StreamHandler
     bool TuneChannel(const QString &chanid);
     bool TuneProgram(uint mpeg_prog_num);
     bool TuneVChannel(const QString &vchn);
-    bool EnterPowerSavingMode(void);
 
   private:
-    explicit HDHRStreamHandler(const QString &, int inputid);
+    explicit HDHRStreamHandler(const QString &, int inputid, int majorid);
 
     bool Connect(void);
 
@@ -91,16 +92,18 @@ class HDHRStreamHandler : public StreamHandler
 
   private:
     hdhomerun_device_t     *_hdhomerun_device;
+    hdhomerun_device_selector_t *_device_selector;
     int                     _tuner;
     vector<DTVTunerType>    _tuner_types;
     HDHRTuneMode            _tune_mode; // debug self check
+    int                     _majorid;
 
     mutable QMutex          _hdhr_lock;
 
     // for implementing Get & Return
     static QMutex                            _handlers_lock;
-    static QMap<QString, HDHRStreamHandler*> _handlers;
-    static QMap<QString, uint>               _handlers_refcnt;
+    static QMap<int, HDHRStreamHandler*>     _handlers;
+    static QMap<int, uint>                   _handlers_refcnt;
 };
 
 #endif // _HDHRSTREAMHANDLER_H_

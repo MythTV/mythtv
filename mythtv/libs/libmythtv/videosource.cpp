@@ -1379,262 +1379,175 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 }
 #endif
 
+#if USING_HDHOMERUN
+
 // -----------------------
 // HDHomeRun Configuration
 // -----------------------
 
-HDHomeRunIP::HDHomeRunIP()
+HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent,
+                                     HDHomeRunConfigurationGroup &_group) :
+    MythUITextEditSetting(
+        new CaptureCardDBStorage(this, parent, "videodevice")),
+    group(_group)
 {
-    setLabel(QObject::tr("IP Address"));
-    setEnabled(false);
-    connect(this, SIGNAL(valueChanged( const QString&)),
-            this, SLOT(  UpdateDevices(const QString&)));
-    _oldValue="";
+    setVisible(false);
 };
-
-void HDHomeRunIP::setEnabled(bool e)
-{
-    MythUITextEditSetting::setEnabled(e);
-    if (e)
-    {
-        if (!_oldValue.isEmpty())
-            setValue(_oldValue);
-        emit NewIP(getValue());
-    }
-    else
-    {
-        _oldValue = getValue();
-        _oldValue.detach();
-    }
-}
-
-void HDHomeRunIP::UpdateDevices(const QString &v)
-{
-   if (isEnabled())
-   {
-#if 0
-       LOG(VB_GENERAL, LOG_DEBUG, QString("Emitting NewIP(%1)").arg(v));
-#endif
-       emit NewIP(v);
-   }
-}
-
-HDHomeRunTunerIndex::HDHomeRunTunerIndex()
-{
-    setLabel(QObject::tr("Tuner"));
-    setEnabled(false);
-    connect(this, SIGNAL(valueChanged( const QString&)),
-            this, SLOT(  UpdateDevices(const QString&)));
-    _oldValue = "";
-};
-
-void HDHomeRunTunerIndex::setEnabled(bool e)
-{
-    MythUITextEditSetting::setEnabled(e);
-    if (e) {
-        if (!_oldValue.isEmpty())
-            setValue(_oldValue);
-        emit NewTuner(getValue());
-    }
-    else
-    {
-        _oldValue = getValue();
-    }
-}
-
-void HDHomeRunTunerIndex::UpdateDevices(const QString &v)
-{
-   if (isEnabled())
-   {
-#if 0
-       LOG(VB_GENERAL, LOG_DEBUG, QString("Emitting NewTuner(%1)").arg(v));
-#endif
-       emit NewTuner(v);
-   }
-}
-
-HDHomeRunDeviceID::HDHomeRunDeviceID(const CaptureCard &parent) :
-    MythUITextEditSetting(new CaptureCardDBStorage(this, parent, "videodevice"))
-{
-    setLabel(tr("Device ID"));
-    setHelpText(tr("Device ID of HDHomeRun device"));
-    setEnabled(false);
-}
-
-void HDHomeRunDeviceID::SetIP(const QString &ip)
-{
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting IP to %1").arg(ip));
-#endif
-    _ip = ip;
-    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Done Setting IP to %1").arg(ip));
-#endif
-}
-
-void HDHomeRunDeviceID::SetTuner(const QString &tuner)
-{
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Setting Tuner to %1").arg(tuner));
-#endif
-    _tuner = tuner;
-    setValue(QString("%1-%2").arg(_ip).arg(_tuner));
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Done Setting Tuner to %1").arg(tuner));
-#endif
-}
-
-void HDHomeRunDeviceID::SetOverrideDeviceID(const QString &deviceid)
-{
-    _overridedeviceid = deviceid;
-    setValue(deviceid);
-}
 
 void HDHomeRunDeviceID::Load(void)
 {
-    GetStorage()->Load();
-    if (!_overridedeviceid.isEmpty())
-    {
-        setValue(_overridedeviceid);
-        _overridedeviceid.clear();
-    }
+    MythUITextEditSetting::Load();
+    group.SetDeviceCheckBoxes(getValue());
 }
 
-HDHomeRunDeviceIDList::HDHomeRunDeviceIDList(
-    HDHomeRunDeviceID   *deviceid,
-    StandardSetting     *desc,
-    HDHomeRunIP         *cardip,
-    HDHomeRunTunerIndex *cardtuner,
-    HDHomeRunDeviceList *devicelist,
-    const CaptureCard &parent) :
-    _deviceid(deviceid),
-    _desc(desc),
-    _cardip(cardip),
-    _cardtuner(cardtuner),
-    _devicelist(devicelist),
-    m_parent(parent)
+void HDHomeRunDeviceID::Save(void)
 {
-    setLabel(QObject::tr("Available devices"));
-    setHelpText(
-        QObject::tr(
-            "Device ID and Tuner Number of available HDHomeRun devices."));
+    setValue(group.GetDeviceCheckBoxes());
+    MythUITextEditSetting::Save();
+}
 
-    connect(this, SIGNAL(valueChanged( const QString&)),
-            this, SLOT(  UpdateDevices(const QString&)));
-
-    _oldValue = "";
+class HDHomeRunEITScan : public MythUICheckBoxSetting
+{
+  public:
+    explicit HDHomeRunEITScan(const CaptureCard &parent) :
+        MythUICheckBoxSetting(
+            new CaptureCardDBStorage(this, parent, "dvb_eitscan"))
+    {
+        setLabel(QObject::tr("Use HD HomeRun for active EIT scan"));
+        setValue(true);
+        setHelpText(
+            QObject::tr("If enabled, activate active scanning for "
+                        "program data (EIT). When this option is enabled "
+                        "the HD HomeRun is constantly in-use."));
+    };
 };
 
-/// \brief Adds all available device-tuner combinations to list
-/// If current is >= 0 it will be considered available even
-/// if no device exists for it on the network
-void HDHomeRunDeviceIDList::fillSelections(const QString &cur)
+
+class UseHDHomeRunDevice : public TransMythUICheckBoxSetting
 {
-    clearSelections();
-
-    vector<QString> devs;
-    QMap<QString, bool> in_use;
-
-    QString current = cur;
-
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Filling List, current = '%1'")
-            .arg(current));
-#endif
-
-    HDHomeRunDeviceList::iterator it = _devicelist->begin();
-    for (; it != _devicelist->end(); ++it)
+  public:
+    explicit UseHDHomeRunDevice(QString &deviceid, QString &hwmodel,
+                                QString &ipaddr) :
+        TransMythUICheckBoxSetting()
     {
-        if ((*it).discovered)
-        {
-            devs.push_back(it.key());
-            in_use[it.key()] = (*it).inuse;
-        }
-    }
-
-    QString man_addr = HDHomeRunDeviceIDList::tr("Manually Enter IP Address");
-    QString sel = man_addr;
-    devs.push_back(sel);
-
-    if (3 == devs.size() && current.startsWith("FFFFFFFF", Qt::CaseInsensitive))
-    {
-        current = sel = (current.endsWith("0")) ?
-            *(devs.begin()) : *(++devs.begin());
-    }
-    else
-    {
-        vector<QString>::const_iterator it = devs.begin();
-        for (; it != devs.end(); ++it)
-            sel = (current == *it) ? *it : sel;
-    }
-
-    QString usestr = QString(" -- ");
-    usestr += QObject::tr("Warning: already in use");
-
-    for (uint i = 0; i < devs.size(); i++)
-    {
-        const QString dev = devs[i];
-        QString desc = dev + (in_use[devs[i]] ? usestr : "");
-        desc = (current == devs[i]) ? dev : desc;
-        addSelection(desc, dev, dev == sel);
-    }
-
-    if (current != cur)
-    {
-        _deviceid->SetOverrideDeviceID(current);
-    }
-    else if (sel == man_addr && !current.isEmpty())
-    {
-        // Populate the proper values for IP address and tuner
-        QStringList selection = current.split("-");
-
-        _cardip->SetOldValue(selection.first());
-        _cardtuner->SetOldValue(selection.last());
-
-        _cardip->setValue(selection.first());
-        _cardtuner->setValue(selection.last());
-    }
-}
-
-void HDHomeRunDeviceIDList::Load(void)
-{
-    clearSelections();
-
-    int cardid = m_parent.getCardID();
-    QString device = CardUtil::GetVideoDevice(cardid);
-    fillSelections(device);
-}
-
-void HDHomeRunDeviceIDList::UpdateDevices(const QString &v)
-{
-#if 0
-    LOG(VB_GENERAL, LOG_DEBUG, QString("Got signal with %1").arg(v));
-#endif
-    if (v == HDHomeRunDeviceIDList::tr("Manually Enter IP Address"))
-    {
-        _cardip->setEnabled(true);
-        _cardtuner->setEnabled(true);
-#if 0
-        LOG(VB_GENERAL, LOG_DEBUG, "Done");
-#endif
-    }
-    else if (!v.isEmpty())
-    {
-        if (_oldValue == HDHomeRunDeviceIDList::tr("Manually Enter IP Address"))
-        {
-            _cardip->setEnabled(false);
-            _cardtuner->setEnabled(false);
-        }
-        _deviceid->setValue(v);
-
-        // Update _cardip and cardtuner
-        _cardip->setValue((*_devicelist)[v].cardip);
-        _cardtuner->setValue(QString("%1").arg((*_devicelist)[v].cardtuner));
-        _desc->setValue((*_devicelist)[v].desc);
-    }
-    _oldValue = v;
+        setLabel(QObject::tr("Use HDHomeRun %1 (%2 %3)")
+                 .arg(deviceid).arg(hwmodel).arg(ipaddr));
+        setValue(false);
+        setHelpText(
+            QObject::tr("If enabled, use tuners from this HDHomeRun "
+                        "device."));
+    };
 };
+
+HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
+        (CaptureCard& a_parent, CardType &a_cardtype) :
+    parent(a_parent)
+{
+    setVisible(false);
+
+    // Fill Device list
+    FillDeviceList();
+
+    deviceid     = new HDHomeRunDeviceID(parent, *this);
+
+    QMap<QString, HDHomeRunDevice>::iterator dit;
+    for (dit = devicelist.begin(); dit != devicelist.end(); ++dit)
+    {
+        HDHomeRunDevice &dev = *dit;
+        dev.checkbox = new UseHDHomeRunDevice(
+            dev.deviceid, dev.hwmodel, dev.cardip);
+        a_cardtype.addTargetedChild("HDHOMERUN", dev.checkbox);
+    }
+    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyAudioDevice(parent));
+    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyVBIDevice(parent));
+    a_cardtype.addTargetedChild("HDHOMERUN", deviceid);
+
+    GroupSetting *buttonRecOpt = new GroupSetting();
+    buttonRecOpt->setLabel(tr("Recording Options"));
+    buttonRecOpt->addChild(new SignalTimeout(parent, 1000, 250));
+    buttonRecOpt->addChild(new ChannelTimeout(parent, 3000, 1750));
+    buttonRecOpt->addChild(new HDHomeRunEITScan(parent));
+    a_cardtype.addTargetedChild("HDHOMERUN", buttonRecOpt);
+};
+
+void HDHomeRunConfigurationGroup::FillDeviceList(void)
+{
+    devicelist.clear();
+
+    // Find physical devices first
+    // ProbeVideoDevices returns "deviceid ip" pairs
+    QStringList devs = CardUtil::ProbeVideoDevices("HDHOMERUN");
+
+    QStringList::const_iterator it;
+
+    for (it = devs.begin(); it != devs.end(); ++it)
+    {
+        QString dev = *it;
+        QStringList devinfo = dev.split(" ");
+        QString devid = devinfo.at(0);
+        QString devip = devinfo.at(1);
+        QString hwmodel = devinfo.at(2);
+
+        HDHomeRunDevice tmpdevice;
+        tmpdevice.hwmodel  = hwmodel;
+        tmpdevice.cardip   = devip;
+        tmpdevice.deviceid = devid;
+        devicelist[tmpdevice.deviceid] = tmpdevice;
+    }
+
+#if 0
+    // Debug dump of cards
+    QMap<QString, HDHomeRunDevice>::iterator debugit;
+    for (debugit = devicelist.begin(); debugit != devicelist.end(); ++debugit)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2 %3")
+            .arg(debugit.key()).arg((*debugit).hwmodel)
+            .arg((*debugit).cardip));
+    }
+#endif
+}
+
+void HDHomeRunConfigurationGroup::SetDeviceCheckBoxes(QString devices)
+{
+    QStringList devstrs = devices.split(",");
+    for (int i = 0; i < devstrs.size(); ++i)
+    {
+        // Get the HDHomeRun device ID using libhdhomerun.  We need to
+        // do it this way because legacy configurations could use an
+        // IP address and a tuner nubmer.
+        QByteArray ba = devstrs[i].toUtf8();
+        hdhomerun_device_t *device = hdhomerun_device_create_from_str(
+            ba.data(), nullptr);
+        if (!device)
+            continue;
+        QString devid = QString("%1").arg(
+            hdhomerun_device_get_device_id(device), 8, 16).toUpper();
+        hdhomerun_device_destroy(device);
+
+        // If we know about this device, set its checkbox to on.
+        QMap<QString, HDHomeRunDevice>::iterator dit;
+        dit = devicelist.find(devid);
+        if (dit != devicelist.end())
+            (*dit).checkbox->setValue(true);
+    }
+}
+
+QString HDHomeRunConfigurationGroup::GetDeviceCheckBoxes(void)
+{
+    // Return a string listing each HDHomeRun device with its checbox
+    // turned on.
+    QStringList devstrs;    
+    QMap<QString, HDHomeRunDevice>::iterator dit;
+    for (dit = devicelist.begin(); dit != devicelist.end(); ++dit)
+    {
+        if ((*dit).checkbox->boolValue())
+            devstrs << (*dit).deviceid;
+    }
+    QString devices = devstrs.join(",");
+    return devices;
+}
+
+#endif
 
 // -----------------------
 // VBOX Configuration
@@ -2059,183 +1972,6 @@ void ImportConfigurationGroup::probeCard(const QString &device)
 
     info->setValue(ci);
     size->setValue(cs);
-}
-
-class HDHomeRunEITScan : public MythUICheckBoxSetting
-{
-  public:
-    explicit HDHomeRunEITScan(const CaptureCard &parent) :
-        MythUICheckBoxSetting(
-            new CaptureCardDBStorage(this, parent, "dvb_eitscan"))
-    {
-        setLabel(QObject::tr("Use HD HomeRun for active EIT scan"));
-        setValue(true);
-        setHelpText(
-            QObject::tr("If enabled, activate active scanning for "
-                        "program data (EIT). When this option is enabled "
-                        "the HD HomeRun is constantly in-use."));
-    };
-};
-
-
-HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
-        (CaptureCard& a_parent, CardType &a_cardtype) :
-    parent(a_parent)
-{
-    setVisible(false);
-
-    // Fill Device list
-    FillDeviceList();
-
-    deviceid     = new HDHomeRunDeviceID(parent);
-    desc         = new GroupSetting();
-    desc->setLabel(tr("Description"));
-    cardip       = new HDHomeRunIP();
-    cardtuner    = new HDHomeRunTunerIndex();
-    deviceidlist = new HDHomeRunDeviceIDList(
-        deviceid, desc, cardip, cardtuner, &devicelist, parent);
-
-    a_cardtype.addTargetedChild("HDHOMERUN", deviceidlist);
-    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyAudioDevice(parent));
-    a_cardtype.addTargetedChild("HDHOMERUN", new EmptyVBIDevice(parent));
-    a_cardtype.addTargetedChild("HDHOMERUN", deviceid);
-    a_cardtype.addTargetedChild("HDHOMERUN", desc);
-    a_cardtype.addTargetedChild("HDHOMERUN", cardip);
-    a_cardtype.addTargetedChild("HDHOMERUN", cardtuner);
-
-    GroupSetting *buttonRecOpt = new GroupSetting();
-    buttonRecOpt->setLabel(tr("Recording Options"));
-    buttonRecOpt->addChild(new SignalTimeout(parent, 1000, 250));
-    buttonRecOpt->addChild(new ChannelTimeout(parent, 3000, 1750));
-    buttonRecOpt->addChild(new HDHomeRunEITScan(parent));
-    a_cardtype.addTargetedChild("HDHOMERUN", buttonRecOpt);
-
-    connect(cardip,    SIGNAL(NewIP(const QString&)),
-            deviceid,  SLOT(  SetIP(const QString&)));
-    connect(cardtuner, SIGNAL(NewTuner(const QString&)),
-            deviceid,  SLOT(  SetTuner(const QString&)));
-};
-
-void HDHomeRunConfigurationGroup::FillDeviceList(void)
-{
-    devicelist.clear();
-
-    // Find physical devices first
-    // ProbeVideoDevices returns "deviceid ip" pairs
-    QStringList devs = CardUtil::ProbeVideoDevices("HDHOMERUN");
-
-    QStringList::const_iterator it;
-
-    for (it = devs.begin(); it != devs.end(); ++it)
-    {
-        QString dev = *it;
-        QStringList devinfo = dev.split(" ");
-        QString devid = devinfo.at(0);
-        QString devip = devinfo.at(1);
-        QString devtuner = devinfo.at(2);
-
-        HDHomeRunDevice tmpdevice;
-        tmpdevice.deviceid   = devid;
-        tmpdevice.desc       = CardUtil::GetHDHRdesc(devid);
-        tmpdevice.cardip     = devip;
-        tmpdevice.inuse      = false;
-        tmpdevice.discovered = true;
-        tmpdevice.cardtuner = devtuner;
-        tmpdevice.mythdeviceid =
-            tmpdevice.deviceid + "-" + tmpdevice.cardtuner;
-        devicelist[tmpdevice.mythdeviceid] = tmpdevice;
-    }
-    uint found_device_count = devicelist.size();
-
-    // Now find configured devices
-
-    // returns "xxxxxxxx-n" or "ip.ip.ip.ip-n" values
-    QStringList db = CardUtil::GetVideoDevices("HDHOMERUN");
-
-    for (it = db.begin(); it != db.end(); ++it)
-    {
-        QMap<QString, HDHomeRunDevice>::iterator dit;
-
-        dit = devicelist.find(*it);
-
-        if (dit == devicelist.end())
-        {
-            if ((*it).toUpper() == "FFFFFFFF-0" && 2 == found_device_count)
-                dit = devicelist.begin();
-
-            if ((*it).toUpper() == "FFFFFFFF-1" && 2 == found_device_count)
-            {
-                dit = devicelist.begin();
-                ++dit;
-            }
-        }
-
-        if (dit != devicelist.end())
-        {
-            (*dit).inuse = true;
-            continue;
-        }
-
-        HDHomeRunDevice tmpdevice;
-        tmpdevice.mythdeviceid = *it;
-        tmpdevice.inuse        = true;
-        tmpdevice.discovered   = false;
-
-        if (ProbeCard(tmpdevice))
-            devicelist[tmpdevice.mythdeviceid] = tmpdevice;
-    }
-
-#if 0
-    // Debug dump of cards
-    QMap<QString, HDHomeRunDevice>::iterator debugit;
-    for (debugit = devicelist.begin(); debugit != devicelist.end(); ++debugit)
-    {
-        LOG(VB_GENERAL, LOG_DEBUG, QString("%1: %2 %3 %4 %5 %6 %7")
-                .arg(debugit.key())
-                .arg((*debugit).mythdeviceid)
-                .arg((*debugit).deviceid)
-                .arg((*debugit).cardip)
-                .arg((*debugit).cardtuner)
-                .arg((*debugit).inuse)
-                .arg((*debugit).discovered));
-    }
-#endif
-}
-
-bool HDHomeRunConfigurationGroup::ProbeCard(HDHomeRunDevice &tmpdevice)
-{
-#ifdef USING_HDHOMERUN
-    hdhomerun_device_t *thisdevice =
-        hdhomerun_device_create_from_str(
-            tmpdevice.mythdeviceid.toLocal8Bit().constData(), nullptr);
-
-    if (thisdevice)
-    {
-        uint device_id = hdhomerun_device_get_device_id(thisdevice);
-        uint device_ip = hdhomerun_device_get_device_ip(thisdevice);
-        uint tuner     = hdhomerun_device_get_tuner(thisdevice);
-        hdhomerun_device_destroy(thisdevice);
-
-        if (device_id == 0)
-            tmpdevice.deviceid = "NOTFOUND";
-        else
-        {
-            tmpdevice.deviceid = QString("%1").arg(device_id, 8, 16);
-            tmpdevice.desc     = CardUtil::GetHDHRdesc(tmpdevice.deviceid);
-        }
-
-        tmpdevice.deviceid = tmpdevice.deviceid.toUpper();
-
-        tmpdevice.cardip = QString("%1.%2.%3.%4")
-            .arg((device_ip>>24) & 0xFF).arg((device_ip>>16) & 0xFF)
-            .arg((device_ip>> 8) & 0xFF).arg((device_ip>> 0) & 0xFF);
-
-        tmpdevice.cardtuner = QString("%1").arg(tuner);
-        return true;
-    }
-#endif // USING_HDHOMERUN
-    Q_UNUSED(tmpdevice);
-    return false;
 }
 
 // -----------------------

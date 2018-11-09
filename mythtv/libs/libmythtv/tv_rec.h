@@ -240,6 +240,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     /// \brief Returns the inputid
     uint GetInputId(void) { return inputid; }
     uint GetParentId(void) { return parentid; }
+    uint GetMajorId(void) { return parentid ? parentid : inputid; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
