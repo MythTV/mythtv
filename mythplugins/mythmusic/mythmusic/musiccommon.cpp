@@ -613,7 +613,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
         if (gPlayer->isPlaying() && gCoreContext->GetSetting("MusicJumpPointAction", "stop") == "stop")
             gPlayer->stop(true);
 
-        return false;
+        return MythScreenType::keyPressEvent(e);
     }
 
     QStringList actions;
