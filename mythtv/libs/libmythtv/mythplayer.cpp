@@ -2200,20 +2200,25 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
                 videotimecode = maxtcval;
         }
 
-        if (videotimecode == 0)
-            videotimecode = audiotimecode;
-
         now = QDateTime::currentDateTimeUtc();
         unow = now.toMSecsSinceEpoch() * 1000;
         // first time or after a seek - setup of rtcbase
         if (rtcbase == 0)
         {
+            // cater for DVB radio
+            if (videotimecode == 0)
+                videotimecode = audiotimecode;
+            // On first frame we get nothing, so exit out.
+            if (videotimecode == 0)
+                return;
             rtcbase = unow - videotimecode * playspeed1000;
             maxtcval = 0;
             maxtcframes = 0;
             numdroppedframes = 0;
         }
 
+        if (videotimecode == 0)
+            videotimecode = maxtcval + frame_interval/1000;
         int64_t tcincr = videotimecode - maxtcval;
         if (tcincr > 0 || tcincr < -100)
         {
