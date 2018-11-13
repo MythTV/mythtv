@@ -363,7 +363,6 @@ void SSDPCache::Add( const QString &sURI,
     if (pEntry == nullptr)
     {
         QUrl url = sLocation;
-        PortChecker checker;
         QString host = url.host();
         QString hostport = QString("%1:%2").arg(host).arg(url.port(80));
         // Check if the port can be reached. If not we won't use it.

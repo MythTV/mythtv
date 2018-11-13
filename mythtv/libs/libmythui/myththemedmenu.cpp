@@ -883,7 +883,6 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 bool MythThemedMenu::findDepends(const QString &fileList)
 {
     QStringList files = fileList.split(" ");
-    QString filename;
     MythPluginManager *pluginManager = gCoreContext->GetPluginManager();
 
     for (QStringList::Iterator it = files.begin(); it != files.end(); ++it )
