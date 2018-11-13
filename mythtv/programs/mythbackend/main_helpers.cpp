@@ -567,7 +567,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (!UpgradeTVDatabaseSchema(ismaster, ismaster))
     {
-        LOG(VB_GENERAL, LOG_ERR, "Couldn't upgrade database to new schema");
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Couldn't upgrade database to new schema on %1 backend.")
+            .arg(ismaster ? "master" : "slave"));
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
