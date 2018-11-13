@@ -744,7 +744,7 @@ uint DBEvent::UpdateDB(
 
     if (!query.exec())
     {
-        MythDB::DBError("InsertDB", query);
+        MythDB::DBError("UpdateDB", query);
         return 0;
     }
 
