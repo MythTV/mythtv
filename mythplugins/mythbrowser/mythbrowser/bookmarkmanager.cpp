@@ -226,14 +226,14 @@ void BookmarkManager::UpdateURLList(void)
 
         if (group == site->category)
         {
-            MythUIButtonListItem *item = new MythUIButtonListItem(
+            MythUIButtonListItem *item2 = new MythUIButtonListItem(
                     m_bookmarkList, "", "", true, MythUIButtonListItem::NotChecked);
-            item->SetText(site->name, "name");
-            item->SetText(site->url, "url");
+            item2->SetText(site->name, "name");
+            item2->SetText(site->url, "url");
             if (site->isHomepage)
-                item->DisplayState("yes", "homepage");
-            item->SetData(qVariantFromValue(site));
-            item->setChecked(site->selected ?
+                item2->DisplayState("yes", "homepage");
+            item2->SetData(qVariantFromValue(site));
+            item2->setChecked(site->selected ?
                     MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
         }
     }

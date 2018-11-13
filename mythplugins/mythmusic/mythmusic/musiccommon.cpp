@@ -470,15 +470,15 @@ void MusicCommon::switchView(MusicView view)
     {
         case MV_PLAYLIST:
         {
-            PlaylistView *view = new PlaylistView(mainStack, this);
+            PlaylistView *plview = new PlaylistView(mainStack, this);
 
-            if (view->Create())
+            if (plview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(plview);
+                connect(plview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete plview;
 
             break;
         }
@@ -494,15 +494,15 @@ void MusicCommon::switchView(MusicView view)
 
             MythScreenType *parentScreen = (oldView != nullptr ? m_parentScreen : this);
 
-            PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "tree", restorePos);
+            PlaylistEditorView *pleview = new PlaylistEditorView(mainStack, parentScreen, "tree", restorePos);
 
-            if (view->Create())
+            if (pleview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(pleview);
+                connect(pleview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete pleview;
 
             if (oldView)
             {
@@ -524,15 +524,15 @@ void MusicCommon::switchView(MusicView view)
 
             MythScreenType *parentScreen = (oldView != nullptr ? m_parentScreen : this);
 
-            PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "gallery", restorePos);
+            PlaylistEditorView *pleview = new PlaylistEditorView(mainStack, parentScreen, "gallery", restorePos);
 
-            if (view->Create())
+            if (pleview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(pleview);
+                connect(pleview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete pleview;
 
             if (oldView)
             {
@@ -545,45 +545,45 @@ void MusicCommon::switchView(MusicView view)
 
         case MV_SEARCH:
         {
-            SearchView *view = new SearchView(mainStack, this);
+            SearchView *sview = new SearchView(mainStack, this);
 
-            if (view->Create())
+            if (sview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(sview);
+                connect(sview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete sview;
 
             break;
         }
 
         case MV_VISUALIZER:
         {
-            VisualizerView *view = new VisualizerView(mainStack, this);
+            VisualizerView *vview = new VisualizerView(mainStack, this);
 
-            if (view->Create())
+            if (vview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(vview);
+                connect(vview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete vview;
 
             break;
         }
 
         case MV_LYRICS:
         {
-            LyricsView *view = new LyricsView(mainStack, this);
+            LyricsView *lview = new LyricsView(mainStack, this);
 
-            if (view->Create())
+            if (lview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(lview);
+                connect(lview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete lview;
 
             break;
         }

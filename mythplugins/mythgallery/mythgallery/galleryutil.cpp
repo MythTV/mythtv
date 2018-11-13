@@ -740,8 +740,8 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
         path += QString(".thumbcache/");
         if (QFile::exists(path + oldName))
         {
-            QDir d(path);
-            d.rename(oldName, newName);
+            QDir d2(path);
+            d2.rename(oldName, newName);
         }
     }
 

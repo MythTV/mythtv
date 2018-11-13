@@ -312,11 +312,11 @@ void MythBurn::loadEncoderProfiles()
 
         }
 
-        EncoderProfile *item = new EncoderProfile;
-        item->name = name;
-        item->description = desc;
-        item->bitrate = bitrate.toFloat();
-        m_profileList.append(item);
+        EncoderProfile *item2 = new EncoderProfile;
+        item2->name = name;
+        item2->description = desc;
+        item2->bitrate = bitrate.toFloat();
+        m_profileList.append(item2);
     }
 }
 
@@ -636,11 +636,11 @@ void MythBurn::createConfigFile(const QString &filename)
             QDomElement thumbs = doc.createElement("thumbimages");
             file.appendChild(thumbs);
 
-            for (int x = 0; x < a->thumbList.size(); x++)
+            for (int y = 0; y < a->thumbList.size(); y++)
             {
                 QDomElement thumb = doc.createElement("thumb");
                 thumbs.appendChild(thumb);
-                ThumbImage *thumbImage = a->thumbList.at(x);
+                ThumbImage *thumbImage = a->thumbList.at(y);
                 thumb.setAttribute("caption", thumbImage->caption);
                 thumb.setAttribute("filename", thumbImage->filename);
                 thumb.setAttribute("frame", (int) thumbImage->frame);

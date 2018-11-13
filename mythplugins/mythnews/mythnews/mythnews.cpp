@@ -566,9 +566,9 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     NewsArticle::List::iterator it = articles.begin();
     for (; it != articles.end(); ++it)
     {
-        MythUIButtonListItem *item =
+        MythUIButtonListItem *blitem =
             new MythUIButtonListItem(m_articlesList, (*it).title());
-        m_articles[item] = *it;
+        m_articles[blitem] = *it;
     }
 
     updateInfoView(item);

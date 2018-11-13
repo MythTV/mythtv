@@ -426,7 +426,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         {
             QString medium;
             QString type;
-            QString url;
+            QString url2;
 
             QDomElement mediaElement = mediaNodes.at(x).toElement();
 
@@ -440,19 +440,19 @@ void NewsSite::parseRSS(QDomDocument domDoc)
                 type = mediaElement.attributeNode("type").value();
 
             if (mediaElement.hasAttribute("url"))
-                url = mediaElement.attributeNode("url").value();
+                url2 = mediaElement.attributeNode("url").value();
 
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("parseRSS found media:content: medium: %1, type: %2, url: %3")
-                        .arg(medium).arg(type).arg(url));
+                        .arg(medium).arg(type).arg(url2));
 
             // if this is an image use it as the thumbnail if we haven't found one yet
             if (thumbnail.isEmpty() && (medium == "image" || isImage(type)))
-                thumbnail = url;
+                thumbnail = url2;
 
             // if this is a video use it as the enclosure if we haven't found one yet
             if (enclosure.isEmpty() && (medium == "video" || isVideo(type)))
-                enclosure = url;
+                enclosure = url2;
         }
 
         insertNewsArticle(NewsArticle(title, description, url,

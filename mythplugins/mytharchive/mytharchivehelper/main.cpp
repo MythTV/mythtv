@@ -852,7 +852,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
     if (fileInfo.exists())
     {
         LOG(VB_JOBQUEUE, LOG_INFO, "Copying cover file");
-        bool res = copyFile(coverFile, saveDirectory + title
+        res = copyFile(coverFile, saveDirectory + title
                             + "/" + fileInfo.fileName());
         if (!res)
         {
@@ -955,7 +955,6 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     QDomNode n = nodeList.item(0);
     QDomElement recordedNode = n.toElement();
     QString startTime = findNodeText(recordedNode, "starttime");
-
     // check this recording doesn't already exist
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT * FROM recorded "
@@ -996,8 +995,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
 
     for (int x = 0; x < nodes.count(); x++)
     {
-        QDomNode n = nodes.item(x);
-        QString field = n.nodeName();
+        QDomNode n2 = nodes.item(x);
+        QString field = n2.nodeName();
         fieldList.append(field);
         bindList.append(":" + field.toUpper());
     }
@@ -1025,8 +1024,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     }
     else
     {
-        n = nodeList.item(0);
-        QDomElement markupNode = n.toElement();
+        QDomNode n3 = nodeList.item(0);
+        QDomElement markupNode = n3.toElement();
 
         nodeList = markupNode.elementsByTagName("mark");
         if (nodeList.count() < 1)
@@ -1048,8 +1047,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
             // add any new records for this recording
             for (int x = 0; x < nodeList.count(); x++)
             {
-                n = nodeList.item(x);
-                QDomElement e = n.toElement();
+                QDomNode n4 = nodeList.item(x);
+                QDomElement e = n4.toElement();
                 query.prepare("INSERT INTO recordedmarkup (chanid, starttime, "
                         "mark, type, data)"
                         "VALUES(:CHANID,:STARTTIME,:MARK,:TYPE,:DATA);");
@@ -1080,8 +1079,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     }
     else
     {
-        n = nodeList.item(0);
-        QDomElement markupNode = n.toElement();
+        QDomNode n5 = nodeList.item(0);
+        QDomElement markupNode = n5.toElement();
 
         nodeList = markupNode.elementsByTagName("mark");
         if (nodeList.count() < 1)
@@ -1101,8 +1100,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
             // add the new records for this recording
             for (int x = 0; x < nodeList.count(); x++)
             {
-                n = nodeList.item(x);
-                QDomElement e = n.toElement();
+                QDomNode n6 = nodeList.item(x);
+                QDomElement e = n6.toElement();
                 query.prepare("INSERT INTO recordedseek (chanid, starttime, "
                         "mark, offset, type)"
                         "VALUES(:CHANID,:STARTTIME,:MARK,:OFFSET,:TYPE);");

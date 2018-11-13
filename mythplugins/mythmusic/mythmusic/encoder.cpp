@@ -14,8 +14,8 @@ Encoder::Encoder(const QString &outfile, int qualitylevel, MusicMetadata *metada
 {
     if (!m_outfile.isEmpty())
     {
-        QByteArray outfile = m_outfile.toLocal8Bit();
-        m_out = fopen(outfile.constData(), "w+");
+        QByteArray loutfile = m_outfile.toLocal8Bit();
+        m_out = fopen(loutfile.constData(), "w+");
         if (!m_out)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error opening output file: '%1'")

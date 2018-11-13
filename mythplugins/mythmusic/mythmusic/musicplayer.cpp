@@ -661,8 +661,8 @@ void MusicPlayer::customEvent(QEvent *event)
                 {
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(getVolume());
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
                 else if (list[2] == "PLAY_FILE")
                 {
@@ -720,8 +720,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(mdataStr);
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
                 else if (list[2] == "GET_STATUS")
                 {
@@ -734,8 +734,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(statusStr);
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
             }
             else

@@ -678,8 +678,8 @@ void MythWebView::customEvent(QEvent *event)
                 else if (m_downloadAndPlay)
                     GetMythMainWindow()->HandleMedia("Internal", filename);
 
-                MythEvent me(QString("BROWSER_DOWNLOAD_FINISHED"), args);
-                gCoreContext->dispatch(me);
+                MythEvent me2(QString("BROWSER_DOWNLOAD_FINISHED"), args);
+                gCoreContext->dispatch(me2);
             }
         }
     }

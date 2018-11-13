@@ -2113,9 +2113,9 @@ void MythRenderVDPAU::Preempted(void)
         QHash<uint, VDPAULayer>::iterator layers;
         for (layers = m_layers.begin(); layers != m_layers.end(); ++layers)
         {
-            uint old = layers.value().m_layer.source_surface;
-            if (old_surfaces.contains(old))
-                layers.value().m_layer.source_surface = old_surfaces[old];
+            uint surface = layers.value().m_layer.source_surface;
+            if (old_surfaces.contains(surface))
+                layers.value().m_layer.source_surface = old_surfaces[surface];
         }
         if (ok)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Re-created output surfaces.");

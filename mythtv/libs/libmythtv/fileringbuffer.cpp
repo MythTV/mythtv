@@ -708,7 +708,6 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
             if (ignorereadpos >= 0)
             {
                 // seek should always succeed since we were at this position
-                int ret;
                 if (remotefile)
                     ret = remotefile->Seek(internalreadpos, SEEK_SET);
                 else
@@ -804,7 +803,6 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
 
             ignorereadpos = new_pos;
             errno = EINVAL;
-            long long ret;
             if (remotefile)
                 ret = remotefile->Seek(ignorereadpos, SEEK_SET);
             else
@@ -827,17 +825,17 @@ long long FileRingBuffer::SeekInternal(long long pos, int whence)
                     ret = lseek64(fd2, internalreadpos, SEEK_SET);
                 if (ret < 0)
                 {
-                    QString cmd = QString("Seek(%1, SEEK_SET) int ")
+                    QString cmd2 = QString("Seek(%1, SEEK_SET) int ")
                         .arg(internalreadpos);
-                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " Failed" + ENO);
+                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd2 + " Failed" + ENO);
                 }
                 else
                 {
-                    QString cmd = QString("Seek(%1, %2) int ")
+                    QString cmd2 = QString("Seek(%1, %2) int ")
                         .arg(internalreadpos)
                         .arg((SEEK_SET == whence) ? "SEEK_SET" :
                              ((SEEK_CUR == whence) ?"SEEK_CUR" : "SEEK_END"));
-                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd + " succeeded");
+                    LOG(VB_GENERAL, LOG_ERR, LOC + cmd2 + " succeeded");
                 }
                 ret = -1;
                 errno = tmp_eno;

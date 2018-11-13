@@ -1274,13 +1274,13 @@ void IconView::HandleShowDevices(void)
         {
             if (mon->ValidateAndLock(*it))
             {
-                item = new ThumbItem(
+                ThumbItem *item2 = new ThumbItem(
                     (*it)->getVolumeID().isEmpty() ?
                     (*it)->getDevicePath() : (*it)->getVolumeID(),
                     (*it)->getMountPath(), true, *it);
 
-                m_itemList.append(item);
-                m_itemHash.insert(item->GetName(), item);
+                m_itemList.append(item2);
+                m_itemHash.insert(item2->GetName(), item2);
 
                 mon->Unlock(*it);
             }
@@ -1289,13 +1289,13 @@ void IconView::HandleShowDevices(void)
 
     for (int x = 0; x < m_itemList.size(); x++)
     {
-        ThumbItem *thumbitem = m_itemList.at(x);
+        ThumbItem *item3 = m_itemList.at(x);
 
-        thumbitem->InitCaption(m_showcaption);
-        MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), nullptr,
+        item3->InitCaption(m_showcaption);
+        MythUIButtonListItem* menuitem =
+            new MythUIButtonListItem(m_imageList, item3->GetCaption(), nullptr,
                                      true, MythUIButtonListItem::NotChecked);
-        item->SetData(qVariantFromValue(thumbitem));
+        menuitem->SetData(qVariantFromValue(item3));
     }
 
     // exit from menu on show devices action..

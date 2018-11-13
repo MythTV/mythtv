@@ -110,10 +110,10 @@ void Synaesthesia::setupPalette(void)
             if (blue > 255) { excess += blue - 255; blue = 255; }
         }
 
-        double scale = (0.5 + (red + green + blue) / 768.0) / 1.5;
-        red *= scale;
-        green *= scale;
-        blue *= scale;
+        double scale2 = (0.5 + (red + green + blue) / 768.0) / 1.5;
+        red *= scale2;
+        green *= scale2;
+        blue *= scale2;
 
         m_palette[i * 3 + 0] = sBOUND(int(red));
         m_palette[i * 3 + 1] = sBOUND(int(green));
@@ -347,29 +347,29 @@ void Synaesthesia::fadeWave(void)
     for (y = 1, start = m_outWidth * 2 + 2, end = m_outWidth * 4 - 2; 
          y < m_outHeight - 1; y++, start += step, end += step) 
     {
-        int i = start;
+        int i2 = start;
         do
         {
-            short j = short((int(lastOutput[i - 2]) +
-                             int(lastOutput[i + 2]) +
-                             int(lastOutput[i - step]) +
-                             int(lastOutput[i + step])) >> 2) +
-                lastOutput[i];
-            if (!j)
+            short j2 = short((int(lastOutput[i2 - 2]) +
+                              int(lastOutput[i2 + 2]) +
+                              int(lastOutput[i2 - step]) +
+                              int(lastOutput[i2 + step])) >> 2) +
+                lastOutput[i2];
+            if (!j2)
             {
-                output[i] = 0;
+                output[i2] = 0;
             }
             else
             {
-                j = j - lastLastOutput[i] - 1;
-                if (j < 0)
-                    output[i] = 0;
-                else if (j & (255*256))
-                    output[i] = 255;
+                j2 = j2 - lastLastOutput[i2] - 1;
+                if (j2 < 0)
+                    output[i2] = 0;
+                else if (j2 & (255*256))
+                    output[i2] = 255;
                 else
-                    output[i] = j;
+                    output[i2] = j2;
             }
-        } while(++i < end);
+        } while(++i2 < end);
     }
 }
 
@@ -424,28 +424,28 @@ void Synaesthesia::fadeHeat(void)
     for(y = 1, start = m_outWidth * 2 + 2, end = m_outWidth * 4 - 2; 
         y < m_outHeight - 1; y++, start += step, end += step) 
     {
-        int i = start;
+        int i2 = start;
         do
         {
-            short j = short((int(lastOutput[i - 2]) +
-                             int(lastOutput[i + 2]) +
-                             int(lastOutput[i - step]) +
-                             int(lastOutput[i + step])) >> 2) +
-                lastOutput[i];
-            if (!j)
-                output[i] = 0;
+            short j2 = short((int(lastOutput[i2 - 2]) +
+                              int(lastOutput[i2 + 2]) +
+                              int(lastOutput[i2 - step]) +
+                              int(lastOutput[i2 + step])) >> 2) +
+                lastOutput[i2];
+            if (!j2)
+                output[i2] = 0;
             else
             {
-                j = j - lastLastOutput[i] +
-                    ((lastLastOutput[i] - lastOutput[i]) >> 2) - 1;
-                if (j < 0) 
-                    output[i] = 0;
-                else if (j & (255*256))
-                    output[i] = 255;
+                j2 = j2 - lastLastOutput[i2] +
+                    ((lastLastOutput[i2] - lastOutput[i2]) >> 2) - 1;
+                if (j2 < 0)
+                    output[i2] = 0;
+                else if (j2 & (255*256))
+                    output[i2] = 255;
                 else
-                    output[i] = j;
+                    output[i2] = j2;
             }
-        } while(++i < end);
+        } while(++i2 < end);
     }
 }
 
