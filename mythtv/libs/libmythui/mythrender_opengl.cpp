@@ -537,8 +537,11 @@ int MythRenderOpenGL::GetTextureType(bool &rect)
 
 bool MythRenderOpenGL::IsRectTexture(uint type)
 {
-    if (type == GL_TEXTURE_RECTANGLE_NV || type == GL_TEXTURE_RECTANGLE_ARB ||
-        type == GL_TEXTURE_RECTANGLE_EXT)
+    if (type == GL_TEXTURE_RECTANGLE_NV)
+        return true;
+    if (type == GL_TEXTURE_RECTANGLE_ARB)
+        return true;
+    if (type == GL_TEXTURE_RECTANGLE_EXT)
         return true;
     return false;
 }

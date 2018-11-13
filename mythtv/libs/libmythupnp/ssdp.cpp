@@ -351,7 +351,11 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
             didDoRead = true;
             if (ret < 0)
             {
-                if (errno == EAGAIN || errno == EWOULDBLOCK)
+                if (errno == EAGAIN
+#if EAGAIN != EWOULDBLOCK
+                    || errno == EWOULDBLOCK
+#endif
+                    )
                 {
                     if (retries == 3)
                     {
