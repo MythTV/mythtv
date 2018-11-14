@@ -280,7 +280,14 @@ bool Commands::ProcessCommand(const QString & cmd)
         return true;
     }
 
-    if (tokens[1].startsWith("APIVersion"))
+    if (tokens[1].startsWith("APIVersion?"))
+    {
+        if (m_parent->m_fatal)
+            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
+        else
+            SendStatus(cmd, tokens[0], "OK:2");
+    }
+    else if (tokens[1].startsWith("APIVersion"))
     {
         if (tokens.size() > 1)
         {

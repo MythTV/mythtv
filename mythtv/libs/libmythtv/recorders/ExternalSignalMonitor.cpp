@@ -160,7 +160,7 @@ bool ExternalSignalMonitor::HasLock(void)
 {
     QString result;
 
-    m_stream_handler->ProcessCommand("HasLock?", 500, result);
+    m_stream_handler->ProcessCommand("HasLock?", result);
     if (result.startsWith("OK:"))
     {
         return result.mid(3, 3) == "Yes";
@@ -176,7 +176,7 @@ int ExternalSignalMonitor::GetSignalStrengthPercent(void)
 {
     QString result;
 
-    m_stream_handler->ProcessCommand("SignalStrengthPercent?", 500, result);
+    m_stream_handler->ProcessCommand("SignalStrengthPercent?", result);
     if (result.startsWith("OK:"))
     {
         bool ok;
@@ -202,7 +202,7 @@ int ExternalSignalMonitor::GetLockTimeout(void)
 {
     QString result;
 
-    m_stream_handler->ProcessCommand("LockTimeout?", 500, result);
+    m_stream_handler->ProcessCommand("LockTimeout?", result);
     if (result.startsWith("OK:"))
     {
         bool ok;

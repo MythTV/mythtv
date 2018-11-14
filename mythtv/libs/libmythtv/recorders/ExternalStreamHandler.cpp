@@ -235,6 +235,7 @@ bool ExternIO::Run(void)
     LOG(VB_RECORD, LOG_INFO, QString("ExternIO::Run()"));
 
     Fork();
+    GetStatus(10);
 
     return true;
 }
@@ -623,7 +624,7 @@ void ExternalStreamHandler::run(void)
 
         if (!xon || m_poll_mode)
         {
-            ProcessCommand(ready_cmd, 1000, result);
+            ProcessCommand(ready_cmd, result);
             if (result.startsWith("ERR"))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Aborting: %1 -> %2")
@@ -708,13 +709,15 @@ void ExternalStreamHandler::run(void)
                     {
                         // Data is comming a little too fast, so XOFF
                         // to give us time to process it.
-                        ProcessCommand(QString("XOFF"), 50, result);
-                        if (result.startsWith("ERR"))
+                        if (ProcessCommand(QString("XOFF"), result))
                         {
-                            LOG(VB_GENERAL, LOG_ERR, LOC +
-                                QString("Aborting: XOFF -> %2")
-                                .arg(result));
-                            _error = true;
+                            if (result.startsWith("ERR"))
+                            {
+                                LOG(VB_GENERAL, LOG_ERR, LOC +
+                                    QString("Aborting: XOFF -> %2")
+                                    .arg(result));
+                                _error = true;
+                            }
                         }
                     }
                     xon = false;
@@ -782,6 +785,32 @@ void ExternalStreamHandler::run(void)
     RunEpilog();
 }
 
+bool ExternalStreamHandler::SetAPIVersion(void)
+{
+    QString result;
+
+    if (ProcessCommand("APIVersion?", result, 10000))
+    {
+        QStringList tokens = result.split(':', QString::SkipEmptyParts);
+
+        if (tokens.size() > 1)
+            m_apiVersion = tokens[1].toUInt();
+        m_apiVersion = min(m_apiVersion, static_cast<int>(MAX_API_VERSION));
+        if (m_apiVersion < 1)
+        {
+            LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("Bad response to 'APIVersion?' - '%1'. "
+                        "Expecting 1 or 2").arg(result));
+            m_apiVersion = 1;
+        }
+
+        ProcessCommand(QString("APIVersion:%1").arg(m_apiVersion), result);
+        return true;
+    }
+
+    return false;
+}
+
 bool ExternalStreamHandler::OpenApp(void)
 {
     {
@@ -818,22 +847,12 @@ bool ExternalStreamHandler::OpenApp(void)
 
     QString result;
 
-    if (ProcessCommand("APIVersion?", 1000, result))
+    if (!SetAPIVersion())
     {
-        QStringList tokens = result.split(':', QString::SkipEmptyParts);
-
-        if (tokens.size() > 1)
-            m_apiVersion = tokens[1].toUInt();
-        m_apiVersion = min(m_apiVersion, static_cast<int>(MAX_API_VERSION));
-        if (m_apiVersion < 1)
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC +
-                QString("Bad response to 'APIVersion?' - '%1'. "
-                        "Expecting 1 or 2").arg(result));
+        // Try again using API version 2
+        m_apiVersion = 2;
+        if (!SetAPIVersion())
             m_apiVersion = 1;
-        }
-
-        ProcessCommand(QString("APIVersion:%1").arg(m_apiVersion), 500, result);
     }
 
     if (!IsAppOpen())
@@ -844,19 +863,16 @@ bool ExternalStreamHandler::OpenApp(void)
     }
 
     // Gather capabilities
-    if (!ProcessCommand("HasTuner?", 500, result))
+    if (!ProcessCommand("HasTuner?", result))
     {
-        // Some apps can get confused by the APIVersion message
-        if (!ProcessCommand("HasTuner?", 500, result))
-        {
-            LOG(VB_RECORD, LOG_ERR, LOC +
-                QString("Bad response to 'HasTuner?' - '%1'").arg(result));
-            _error = true;
-            return false;
-        }
+        LOG(VB_RECORD, LOG_ERR, LOC +
+            QString("Bad response to 'HasTuner?' - '%1'").arg(result));
+        _error = true;
+        return false;
     }
     m_hasTuner = result.startsWith("OK:Yes");
-    if (!ProcessCommand("HasPictureAttributes?", 500, result))
+
+    if (!ProcessCommand("HasPictureAttributes?", result))
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("Bad response to 'HasPictureAttributes?' - '%1'")
@@ -867,7 +883,7 @@ bool ExternalStreamHandler::OpenApp(void)
     m_hasPictureAttributes = result.startsWith("OK:Yes");
 
     /* Operate in "poll" or "xon/xoff" mode */
-    m_poll_mode = ProcessCommand("FlowControl?", 500, result) &&
+    m_poll_mode = ProcessCommand("FlowControl?", result) &&
                   result.startsWith("OK:Poll");
 
     LOG(VB_RECORD, LOG_INFO, LOC + "App opened successfully");
@@ -881,7 +897,7 @@ bool ExternalStreamHandler::OpenApp(void)
         );
 
     /* Let the external app know how many bytes will read without blocking */
-    ProcessCommand(QString("BlockSize:%1").arg(PACKET_SIZE), 500, result);
+    ProcessCommand(QString("BlockSize:%1").arg(PACKET_SIZE), result);
 
     return true;
 }
@@ -896,7 +912,7 @@ bool ExternalStreamHandler::IsAppOpen(void)
     }
 
     QString result;
-    return ProcessCommand("Version?", 500, result, 10, 10);
+    return ProcessCommand("Version?", result, 10000);
 }
 
 bool ExternalStreamHandler::IsTSOpen(void)
@@ -906,7 +922,7 @@ bool ExternalStreamHandler::IsTSOpen(void)
 
     QString result;
 
-    if (!ProcessCommand("IsOpen?", 1000, result))
+    if (!ProcessCommand("IsOpen?", result))
         return false;
 
     m_tsopen = true;
@@ -922,7 +938,7 @@ void ExternalStreamHandler::CloseApp(void)
 
         LOG(VB_RECORD, LOG_INFO, LOC + "CloseRecorder");
         m_IO_lock.unlock();
-        ProcessCommand("CloseRecorder", 1000, result, 10, 3);
+        ProcessCommand("CloseRecorder", result, 10000);
         m_IO_lock.lock();
 
         if (!result.startsWith("OK"))
@@ -976,7 +992,7 @@ void ExternalStreamHandler::ReplayStream(void)
 
         // Let the external app know that we could be busy for a little while
         if (!m_poll_mode)
-            ProcessCommand(QString("XOFF"), 50, result);
+            ProcessCommand(QString("XOFF"), result);
 
         /* If the input is not a 'broadcast' it may only have one
          * copy of the SPS right at the beginning of the stream,
@@ -999,7 +1015,7 @@ void ExternalStreamHandler::ReplayStream(void)
 
         // Let the external app know that we are ready
         if (!m_poll_mode)
-            ProcessCommand(QString("XON"), 50, result);
+            ProcessCommand(QString("XON"), result);
     }
 }
 
@@ -1021,7 +1037,7 @@ bool ExternalStreamHandler::StartStreaming(void)
 
     if (StreamingCount() == 0)
     {
-        if (!ProcessCommand("StartStreaming", 1000, result, 10, 5))
+        if (!ProcessCommand("StartStreaming", result, 3000))
         {
             LogLevel_t level = LOG_ERR;
             if (result.toLower().startsWith("warn"))
@@ -1082,7 +1098,7 @@ bool ExternalStreamHandler::StopStreaming(void)
         return false;
     }
 
-    if (!ProcessCommand("StopStreaming", 1000, result, 10, 5))
+    if (!ProcessCommand("StopStreaming", result, 3000))
     {
         LogLevel_t level = LOG_ERR;
         if (result.toLower().startsWith("warn"))
@@ -1102,32 +1118,32 @@ bool ExternalStreamHandler::StopStreaming(void)
     return true;
 }
 
-bool ExternalStreamHandler::ProcessCommand(const QString & cmd, uint timeout,
-                                           QString & result,
-                                           uint retry_cnt, uint wait_cnt)
+bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
+                                           QString & result, int timeout,
+                                           uint retry_cnt)
 {
     QMutexLocker locker(&m_process_lock);
 
     if (m_apiVersion == 2)
-        return ProcessVer2(cmd, timeout, result, retry_cnt, wait_cnt);
+        return ProcessVer2(cmd, result, timeout, retry_cnt);
     else if (m_apiVersion == 1)
-        return ProcessVer1(cmd, timeout, result, retry_cnt, wait_cnt);
+        return ProcessVer1(cmd, result, timeout, retry_cnt);
 
     LOG(VB_RECORD, LOG_ERR, LOC +
         QString("Invalid API version %1.  Expected 1 or 2").arg(m_apiVersion));
     return false;
 }
 
-bool ExternalStreamHandler::ProcessVer1(const QString & cmd, uint timeout,
-                                        QString & result,
-                                        uint retry_cnt, uint wait_cnt)
+bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
+                                        QString & result, int timeout,
+                                        uint retry_cnt)
 {
     bool okay;
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer1('%1')")
         .arg(cmd));
 
-    for (uint idx = 0; idx < retry_cnt; ++idx)
+    for (uint cnt = 0; cnt < retry_cnt; ++cnt)
     {
         QMutexLocker locker(&m_IO_lock);
 
@@ -1154,7 +1170,8 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd, uint timeout,
         /* Send new query */
         m_IO->Write(buf);
 
-        for (uint cnt = 0; cnt < wait_cnt; ++cnt)
+        MythTimer timer(MythTimer::kStartRunning);
+        while (timer.elapsed() < timeout)
         {
             result = m_IO->GetStatus(timeout);
             if (m_IO->Error())
@@ -1169,6 +1186,8 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd, uint timeout,
             // Ignore them while waiting for a responds to a command
             if (!result.startsWith("STATUS"))
                 break;
+            LOG(VB_RECORD, LOG_INFO, LOC +
+                QString("Ignoring response '%1'").arg(result));
         }
 
         if (result.size() < 1)
@@ -1190,8 +1209,10 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd, uint timeout,
                     level = LOG_DEBUG;
 
                 LOG(VB_RECORD, level,
-                    LOC + QString("ProcessCommand('%1') = '%2' %3")
-                    .arg(cmd).arg(result).arg(okay ? "" : "<-- NOTE"));
+                    LOC + QString("ProcessCommand('%1') = '%2' took %3ms %4")
+                    .arg(cmd).arg(result)
+                    .arg(timer.elapsed())
+                    .arg(okay ? "" : "<-- NOTE"));
 
                 return okay;
             }
@@ -1207,29 +1228,27 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd, uint timeout,
             _error = true;
             break;
         }
-
-        usleep(timeout > 5000 ? 5000 : timeout);
     }
 
     return false;
 }
 
-bool ExternalStreamHandler::ProcessVer2(const QString & command, uint timeout,
-                                        QString & result,
-                                        uint retry_cnt, uint wait_cnt)
+bool ExternalStreamHandler::ProcessVer2(const QString & command,
+                                        QString & result, int timeout,
+                                        uint retry_cnt)
 {
     bool    okay;
     bool    err;
     QString status;
-    uint    cnt;
+    QString raw;
 
-    QString cmd = QString("%1:%2").arg(++m_serialNo).arg(command);
-
-    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer2('%1') serial(%2)")
-        .arg(cmd).arg(m_serialNo));
-
-    for (uint idx = 0; idx < retry_cnt; ++idx)
+    for (uint cnt = 0; cnt < retry_cnt; ++cnt)
     {
+        QString cmd = QString("%1:%2").arg(++m_serialNo).arg(command);
+
+        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer2('%1') serial(%2)")
+            .arg(cmd).arg(m_serialNo));
+
         QMutexLocker locker(&m_IO_lock);
 
         if (!m_IO)
@@ -1253,7 +1272,8 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command, uint timeout,
 
         QStringList tokens;
 
-        for (cnt = 0; cnt < wait_cnt; ++cnt)
+        MythTimer timer(MythTimer::kStartRunning);
+        while (timer.elapsed() < timeout)
         {
             result = m_IO->GetStatus(timeout);
             if (m_IO->Error())
@@ -1267,6 +1287,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command, uint timeout,
 
             if (!result.isEmpty())
             {
+                raw = result;
                 tokens = result.split(':', QString::SkipEmptyParts);
 
                 // Look for result with the serial number of this query
@@ -1277,16 +1298,15 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command, uint timeout,
                 tokens.removeFirst();
                 result = tokens.join(':');
                 err = (tokens.size() > 1 && tokens[1].startsWith("ERR"));
-                LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + result);
+                LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + raw);
             }
         }
 
-        if (cnt == wait_cnt)
+        if (timer.elapsed() >= timeout)
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("ProcessVer2: Giving up waiting for response for "
-                        "serial number %1 command '%2'")
-                .arg(m_serialNo).arg(cmd));
+                        "command '%2'").arg(cmd));
         }
         else if (tokens.size() < 2)
         {
@@ -1319,8 +1339,9 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command, uint timeout,
                     level = LOG_DEBUG;
 
                 LOG(VB_RECORD, level,
-                    LOC + QString("ProcessCommand('%1') = '%2' %3")
-                    .arg(cmd).arg(result).arg(okay ? "" : "<-- NOTE"));
+                    LOC + QString("ProcessCommand('%1') = '%2' took %3ms %4")
+                    .arg(cmd).arg(result).arg(timer.elapsed())
+                    .arg(okay ? "" : "<-- NOTE"));
 
                 return okay;
             }
@@ -1336,8 +1357,6 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command, uint timeout,
             _error = true;
             break;
         }
-
-        usleep(timeout > 5000 ? 5000 : timeout);
     }
 
     return false;
