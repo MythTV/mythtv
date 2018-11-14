@@ -454,7 +454,7 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
         return;
 
     float ydiff = abs(display_video_rect.height() - video_rect.height());
-    if ((ydiff / display_video_rect.height()) < 0.05)
+    if ((ydiff / display_video_rect.height()) < 0.05f)
     {
         display_video_rect.moveTop(
             display_video_rect.top() +
@@ -469,7 +469,7 @@ void VideoOutWindow::ApplySnapToVideoRect(void)
     }
 
     float xdiff = abs(display_video_rect.width() - video_rect.width());
-    if ((xdiff / display_video_rect.width()) < 0.05)
+    if ((xdiff / display_video_rect.width()) < 0.05f)
     {
         display_video_rect.moveLeft(
             display_video_rect.left() +

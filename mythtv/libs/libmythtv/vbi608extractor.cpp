@@ -65,12 +65,12 @@ static float find_clock_diff(const QList<float> &list)
     }
     if (list.size() >= 2)
         avg_diff /= (list.size() - 1);
-    if (avg_diff * 1.15 < max_diff)
+    if (avg_diff * 1.15f < max_diff)
     {
         LOG(VB_VBI, LOG_DEBUG, "max_diff too big");
         return 0.0f;
     }
-    if (avg_diff * 0.85 > max_diff)
+    if (avg_diff * 0.85f > max_diff)
     {
         LOG(VB_VBI, LOG_DEBUG, "min_diff too small");
         return 0.0f;

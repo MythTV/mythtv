@@ -69,16 +69,16 @@ void MythRect::CalculateArea(const MythRect & parentArea)
     int X = x();
     int Y = y();
 
-    if (m_percentX > 0.0)
+    if (m_percentX > 0.0f)
         X = (int) (m_percentX * (float)m_parentArea.width()) + m_offsetX;
-    if (m_percentY > 0.0)
+    if (m_percentY > 0.0f)
         Y = (int) (m_percentY * (float)m_parentArea.height()) + m_offsetY;
-    if (m_percentWidth > 0.0)
+    if (m_percentWidth > 0.0f)
         w = (int) (m_percentWidth * (float)(m_parentArea.width() - X))
             + m_offsetWidth;
     else if (m_offsetWidth != 0)
         w = m_parentArea.width() - X + m_offsetWidth;
-    if (m_percentHeight > 0.0)
+    if (m_percentHeight > 0.0f)
         h = (int) (m_percentHeight * (float)(m_parentArea.height() - Y))
             + m_offsetHeight;
     else if (m_offsetHeight != 0)
@@ -92,18 +92,18 @@ void MythRect::CalculateArea(const MythRect & parentArea)
 void MythRect::NormRect(void)
 {
 
-    if (m_percentWidth == 0.0)
+    if (m_percentWidth == 0.0f)
         QRect::setWidth(GetMythMainWindow()->NormX(width()));
 
-    if (m_percentHeight == 0.0)
+    if (m_percentHeight == 0.0f)
         QRect::setHeight(GetMythMainWindow()->NormY(height()));
 
     int X = 0;
-    if (m_percentX == 0.0)
+    if (m_percentX == 0.0f)
         X = GetMythMainWindow()->NormX(x());
 
     int Y = 0;
-    if (m_percentY == 0.0)
+    if (m_percentY == 0.0f)
         Y = GetMythMainWindow()->NormY(y());
 
     m_offsetX = GetMythMainWindow()->NormX(m_offsetX);
@@ -221,7 +221,7 @@ bool MythRect::parsePosition(float & percent, int & offset, int & absolute,
         return true;
     }
 
-    percent = static_cast<float>(number) / 100.0;
+    percent = static_cast<float>(number) / 100.0f;
     is >> offset;
     return false;
 }
@@ -305,7 +305,7 @@ void MythRect::moveTop(const QString &sY)
 QString MythRect::getX(void) const
 {
     QString stringX;
-    if (m_percentX > 0.0)
+    if (m_percentX > 0.0f)
         stringX = QString("%1%").arg((int)(m_percentX * 100));
     else
         stringX = QString("%1").arg(x() - m_offsetX);
@@ -321,7 +321,7 @@ QString MythRect::getX(void) const
 QString MythRect::getY(void) const
 {
     QString stringY;
-    if (m_percentY > 0.0)
+    if (m_percentY > 0.0f)
         stringY = QString("%1%").arg((int)(m_percentY * 100));
     else
         stringY = QString("%1").arg(y() - m_offsetY);
@@ -337,7 +337,7 @@ QString MythRect::getY(void) const
 QString MythRect::getWidth(void) const
 {
     QString stringWidth;
-    if (m_percentWidth > 0.0)
+    if (m_percentWidth > 0.0f)
         stringWidth = QString("%1%").arg((int)(m_percentWidth * 100));
     else
         stringWidth = QString("%1").arg(width() - m_offsetWidth);
@@ -353,7 +353,7 @@ QString MythRect::getWidth(void) const
 QString MythRect::getHeight(void) const
 {
     QString stringHeight;
-    if (m_percentHeight > 0.0)
+    if (m_percentHeight > 0.0f)
         stringHeight = QString("%1%").arg((int)(m_percentHeight * 100));
     else
         stringHeight = QString("%1").arg(height() - m_offsetHeight);
@@ -431,9 +431,9 @@ void MythPoint::CalculatePoint(const MythRect & parentArea)
     int X = x();
     int Y = y();
 
-    if (m_percentX > 0.0)
+    if (m_percentX > 0.0f)
         X = (int) (m_percentX * (float)m_parentArea.width()) + m_offsetX;
-    if (m_percentY > 0.0)
+    if (m_percentY > 0.0f)
         Y = (int) (m_percentY * (float)m_parentArea.height()) + m_offsetY;
 
     QPoint::setX(X);
@@ -445,10 +445,10 @@ void MythPoint::CalculatePoint(const MythRect & parentArea)
 
 void MythPoint::NormPoint(void)
 {
-    if (m_percentX == 0.0)
+    if (m_percentX == 0.0f)
         QPoint::setX(GetMythMainWindow()->NormX(x()));
 
-    if (m_percentY == 0.0)
+    if (m_percentY == 0.0f)
         QPoint::setY(GetMythMainWindow()->NormY(y()));
 
     m_offsetX = GetMythMainWindow()->NormX(m_offsetX);
@@ -497,7 +497,7 @@ bool MythPoint::parsePosition(float & percent, int & offset, int & absolute,
         return true;
     }
 
-    percent = static_cast<float>(number) / 100.0;
+    percent = static_cast<float>(number) / 100.0f;
     is >> offset;
     return false;
 }
@@ -525,7 +525,7 @@ void MythPoint::setY(const QString &sY)
 QString MythPoint::getX(void) const
 {
     QString stringX;
-    if (m_percentX > 0.0)
+    if (m_percentX > 0.0f)
         stringX = QString("%1%").arg((int)(m_percentX * 100));
     else
         stringX = QString("%1").arg(x() - m_offsetX);
@@ -541,7 +541,7 @@ QString MythPoint::getX(void) const
 QString MythPoint::getY(void) const
 {
     QString stringY;
-    if (m_percentY > 0.0)
+    if (m_percentY > 0.0f)
         stringY = QString("%1%").arg((int)(m_percentY * 100));
     else
         stringY = QString("%1").arg(y() - m_offsetY);

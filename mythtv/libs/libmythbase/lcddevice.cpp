@@ -541,10 +541,10 @@ void LCD::setVolumeLevel(float value)
     if (!m_lcdReady || !m_lcdShowVolume)
         return;
 
-    if (value < 0.0)
-        value = 0.0;
-    else if (value > 1.0)
-        value = 1.0;
+    if (value < 0.0f)
+        value = 0.0f;
+    else if (value > 1.0f)
+        value = 1.0f;
 
     sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));
 }

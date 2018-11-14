@@ -1165,7 +1165,7 @@ void MusicCommon::seek(int pos)
 
             if (LCD *lcd = LCD::Get())
             {
-                float percent_heard = m_maxTime <= 0 ? 0.0 : ((float)pos /
+                float percent_heard = m_maxTime <= 0 ? 0.0f : ((float)pos /
                                       (float)m_maxTime);
 
                 QString lcd_time_string = getTimeString(pos, m_maxTime);
@@ -1298,7 +1298,7 @@ void MusicCommon::customEvent(QEvent *event)
             if (LCD *lcd = LCD::Get())
             {
                 float percent_heard = m_maxTime <= 0 ?
-                    0.0:((float)rs / (float)curMeta->Length()) * 1000.0;
+                    0.0f:((float)rs / (float)curMeta->Length()) * 1000.0f;
 
                 QString lcd_time_string = time_string;
 

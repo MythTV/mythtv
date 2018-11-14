@@ -385,7 +385,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (m_zoom > 0.5f)
             {
                 SetZoom(m_zoom - 0.5f);
-                if (m_zoom > 1.0)
+                if (m_zoom > 1.0f)
                 {
                     m_source_loc.setY(m_source_loc.y() - (screenheight / 4));
                     m_source_loc.setX(m_source_loc.x() - (screenwidth / 4));
@@ -400,7 +400,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             if (m_zoom < 4.0f)
             {
                 SetZoom(m_zoom + 0.5f);
-                if (m_zoom > 1.0)
+                if (m_zoom > 1.0f)
                 {
                     m_source_loc.setY(m_source_loc.y() + (screenheight / 4));
                     m_source_loc.setX(m_source_loc.x() + (screenwidth / 4));

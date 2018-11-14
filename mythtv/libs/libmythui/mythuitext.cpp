@@ -1312,9 +1312,9 @@ void MythUIText::CycleColor(QColor startColor, QColor endColor, int numSteps)
     curG = startColor.green();
     curB = startColor.blue();
 
-    incR = (endColor.red() * 1.0 - curR) / m_numSteps;
-    incG = (endColor.green() * 1.0 - curG) / m_numSteps;
-    incB = (endColor.blue() * 1.0 - curB) / m_numSteps;
+    incR = (endColor.red() * 1.0f - curR) / m_numSteps;
+    incG = (endColor.green() * 1.0f - curG) / m_numSteps;
+    incB = (endColor.blue() * 1.0f - curB) / m_numSteps;
 
     m_colorCycling = true;
 }

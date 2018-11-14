@@ -420,8 +420,8 @@ void ProgDetails::loadPage(void)
     /* see #7810, was hardcoded to 4 star system, when every theme
      * uses 10 stars / 5 stars with half stars
      */
-        if (stars > 0.0)
-            attr += tr("%n star(s)", "", roundf(stars * 10.0)) + ", ";
+        if (stars > 0.0f)
+            attr += tr("%n star(s)", "", roundf(stars * 10.0f)) + ", ";
     }
     if (!colorcode.isEmpty())
         attr += colorcode + ", ";

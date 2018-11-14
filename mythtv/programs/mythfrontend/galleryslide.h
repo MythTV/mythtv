@@ -17,8 +17,8 @@
 
 
 // Min/max zoom extents available in slideshow
-#define MIN_ZOOM 0.1
-#define MAX_ZOOM 20.0
+#define MIN_ZOOM (0.1f)
+#define MAX_ZOOM (20.0f)
 
 class Slide;
 

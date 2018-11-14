@@ -461,7 +461,7 @@ QVariant PList::ParseBinaryDate(quint8 *data)
         return result;
 
     convert_float(data, 8);
-    quint64 msec = *((double*)data) * 1000.0f;
+    quint64 msec = *((double*)data) * 1000.0;
     result = QDateTime::fromMSecsSinceEpoch(msec, Qt::UTC);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
     return QVariant(result);

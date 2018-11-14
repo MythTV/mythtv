@@ -32,7 +32,7 @@ void ClassicSceneChangeDetector::processFrame(VideoFrame* frame)
                                  height-commdetectborder, xspacing, yspacing);
     float similar = histogram->calculateSimilarityWith(*previousHistogram);
 
-    bool isSceneChange = (similar < .85 && !previousFrameWasSceneChange);
+    bool isSceneChange = (similar < .85f && !previousFrameWasSceneChange);
 
     emit(haveNewInformation(frameNumber,isSceneChange,similar));
     previousFrameWasSceneChange = isSceneChange;

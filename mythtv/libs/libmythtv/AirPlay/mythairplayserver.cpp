@@ -745,7 +745,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         // not ours
         playing = false;
     }
-    if (playing && duration > 0.01f && position < 0.01f)
+    if (playing && duration > 0.01 && position < 0.01)
     {
         // Assume playback hasn't started yet, get saved position
         position = m_connections[session].position;

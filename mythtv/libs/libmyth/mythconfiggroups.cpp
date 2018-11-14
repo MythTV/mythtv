@@ -37,9 +37,9 @@ ConfigurationGroup::ConfigurationGroup(bool luselabel,   bool luseframe,
         GetMythUI()->GetScreenSettings(wmult, hmult);
 
         if (luselabel)
-            margin = (int)(28 * hmult * 0.5);
+            margin = (int)(28 * hmult * 0.5f);
         else
-            margin = (int)(10 * hmult * 0.5);
+            margin = (int)(10 * hmult * 0.5f);
     }
 
     space = (lzeroSpace) ? 2 : -1;

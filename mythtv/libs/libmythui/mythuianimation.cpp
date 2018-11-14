@@ -327,8 +327,8 @@ void MythUIAnimation::parsePosition(const QDomElement& element,
 void MythUIAnimation::parseZoom(const QDomElement& element,
                                 QVariant& startValue, QVariant& endValue)
 {
-    startValue = element.attribute("start", "0").toFloat() / 100.0;
-    endValue = element.attribute("end", "0").toFloat() /100.0;
+    startValue = element.attribute("start", "0").toFloat() / 100.0f;
+    endValue = element.attribute("end", "0").toFloat() /100.0f;
 }
 
 void MythUIAnimation::parseAngle(const QDomElement& element,

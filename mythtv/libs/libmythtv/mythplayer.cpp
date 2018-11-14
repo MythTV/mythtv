@@ -832,7 +832,7 @@ void MythPlayer::SetVideoParams(int width, int height, double fps,
         video_aspect   = (float)width / height;
     }
 
-    if (!qIsNaN(fps) && fps > 0.0f && fps < 121.0f)
+    if (!qIsNaN(fps) && fps > 0.0 && fps < 121.0)
     {
         paramsChanged    = true;
         video_frame_rate = fps;
@@ -2463,7 +2463,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         {
             float current   = ComputeSecs(framesPlayed, true);
             float length    = ComputeSecs(totalFrames, true);
-            if (length > current && length - current < 1.5
+            if ((length > current) && (length - current < 1.5f)
                 && !FlagIsSet(kMusicChoice))
             {
                 LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
@@ -2741,7 +2741,7 @@ void MythPlayer::VideoStart(void)
     EnableFrameRateMonitor();
     refreshrate = frame_interval;
 
-    float temp_speed = (play_speed == 0.0) ? audio.GetStretchFactor() : play_speed;
+    float temp_speed = (play_speed == 0.0f) ? audio.GetStretchFactor() : play_speed;
     int fr_int = (1000000.0 / video_frame_rate / temp_speed);
     int rf_int = MythDisplay::GetDisplayInfo(fr_int).Rate();
 
@@ -4030,7 +4030,7 @@ bool MythPlayer::UpdateFFRewSkip(void)
 {
     bool skip_changed;
 
-    float temp_speed = (play_speed == 0.0) ?
+    float temp_speed = (play_speed == 0.0f) ?
         audio.GetStretchFactor() : play_speed;
     if (play_speed >= 0.0f && play_speed <= 3.0f)
     {
@@ -4045,16 +4045,16 @@ bool MythPlayer::UpdateFFRewSkip(void)
     {
         skip_changed = true;
         frame_interval = 200000;
-        frame_interval = (fabs(play_speed) >=   3.0) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=   5.0) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=   8.0) ? 250250 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  10.0) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  16.0) ? 187687 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  20.0) ? 150150 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  30.0) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >=  60.0) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >= 120.0) ? 133466 : frame_interval;
-        frame_interval = (fabs(play_speed) >= 180.0) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=   3.0f) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=   5.0f) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=   8.0f) ? 250250 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  10.0f) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  16.0f) ? 187687 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  20.0f) ? 150150 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  30.0f) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >=  60.0f) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >= 120.0f) ? 133466 : frame_interval;
+        frame_interval = (fabs(play_speed) >= 180.0f) ? 133466 : frame_interval;
         float ffw_fps = fabs(play_speed) * video_frame_rate;
         float dis_fps = 1000000.0f / frame_interval;
         ffrew_skip = (int)ceil(ffw_fps / dis_fps);
@@ -4570,7 +4570,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
                 DoRewind(1, kInaccuracyNone);
             else if (seekamount > 0)
                 // Use fully-accurate seeks for less than 1 second.
-                DoRewindSecs(seekamount, seekamount < 1.0 ? kInaccuracyNone :
+                DoRewindSecs(seekamount, seekamount < 1.0f ? kInaccuracyNone :
                              kInaccuracyEditor, false);
             else
                 HandleArbSeek(false);
@@ -4581,7 +4581,7 @@ bool MythPlayer::HandleProgramEditorActions(QStringList &actions)
                 DoFastForward(1, kInaccuracyNone);
             else if (seekamount > 0)
                 // Use fully-accurate seeks for less than 1 second.
-                DoFastForwardSecs(seekamount, seekamount < 1.0 ? kInaccuracyNone :
+                DoFastForwardSecs(seekamount, seekamount < 1.0f ? kInaccuracyNone :
                              kInaccuracyEditor, false);
             else
                 HandleArbSeek(true);

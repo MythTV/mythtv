@@ -1283,7 +1283,7 @@ void VideoOutputVDPAU::ParseOptions(void)
         else if (name.contains("vdpaudenoise"))
         {
             float tmp = std::max(0.0f, std::min(1.0f, opts.toFloat()));
-            if (tmp != 0.0)
+            if (tmp != 0.0f)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("VDPAU Denoise %1").arg(tmp,4,'f',2,'0'));
@@ -1294,7 +1294,7 @@ void VideoOutputVDPAU::ParseOptions(void)
         else if (name.contains("vdpausharpen"))
         {
             float tmp = std::max(-1.0f, std::min(1.0f, opts.toFloat()));
-            if (tmp != 0.0)
+            if (tmp != 0.0f)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("VDPAU Sharpen %1").arg(tmp,4,'f',2,'0'));

@@ -398,7 +398,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                 QString date = getFirstText(info);
                 pginfo->airdate = date.left(4).toUInt();
             }
-            else if (info.tagName() == "star-rating" && pginfo->stars == 0.0)
+            else if (info.tagName() == "star-rating" && pginfo->stars == 0.0f)
             {
                 QDomNodeList values = info.elementsByTagName("value");
                 QDomElement item;
@@ -428,7 +428,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                     stars = getFirstText(item);
                     float num = stars.section('/', 0, 0).toFloat() + 1;
                     float den = stars.section('/', 1, 1).toFloat() + 1;
-                    if (0.0 < den)
+                    if (0.0f < den)
                         rating = num/den;
                 }
 

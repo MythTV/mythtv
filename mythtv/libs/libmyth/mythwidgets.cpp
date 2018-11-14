@@ -940,7 +940,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 
 void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
-    if (desired_interval < 0.5 || desired_interval > 10.0)
+    if (desired_interval < 0.5f || desired_interval > 10.0f)
     {
         LOG(VB_GENERAL, LOG_ALERT,
                  QString("cycle interval of %1 milliseconds ")

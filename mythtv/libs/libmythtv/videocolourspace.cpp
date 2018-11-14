@@ -250,7 +250,7 @@ void VideoColourSpace::SetContrast(int value)
 
 void VideoColourSpace::SetHue(int value)
 {
-    m_hue = value * (-3.6f * M_PI / 180.0f);
+    m_hue = value * (-3.6 * M_PI / 180.0);
     Update();
 }
 

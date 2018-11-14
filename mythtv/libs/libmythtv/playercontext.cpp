@@ -793,17 +793,17 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
 QString PlayerContext::GetPlayMessage(void) const
 {
     QString mesg = QObject::tr("Play");
-    if (ts_normal != 1.0)
+    if (ts_normal != 1.0f)
     {
-        if (ts_normal == 0.5)
+        if (ts_normal == 0.5f)
             mesg += QString(" 1/2x");
-        else if (0.32 < ts_normal && ts_normal < 0.34)
+        else if (0.32f < ts_normal && ts_normal < 0.34f)
             mesg += QString(" 1/3x");
-        else if (ts_normal == 0.25)
+        else if (ts_normal == 0.25f)
             mesg += QString(" 1/4x");
-        else if (ts_normal == 0.125)
+        else if (ts_normal == 0.125f)
             mesg += QString(" 1/8x");
-        else if (ts_normal == 0.0625)
+        else if (ts_normal == 0.0625f)
             mesg += QString(" 1/16x");
         else
             mesg += QString(" %1x").arg(ts_normal);

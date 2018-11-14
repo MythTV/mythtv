@@ -5346,7 +5346,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
                     if (ctx->ff_rew_state)
                         SetFFRew(ctx, index);
                 }
-                else if (0.48 <= tmpSpeed && tmpSpeed <= 2.0) {
+                else if (0.48f <= tmpSpeed && tmpSpeed <= 2.0f) {
                     StopFFRew(ctx);
 
                     ctx->ts_normal = tmpSpeed;   // alter speed before display
@@ -6674,7 +6674,7 @@ bool TV::DoPlayerSeek(PlayerContext *ctx, float time)
 
     if (time > 0.0f)
         res = ctx->player->FastForward(time);
-    else if (time < 0.0)
+    else if (time < 0.0f)
         res = ctx->player->Rewind(-time);
     ctx->UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -9004,7 +9004,7 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
 {
     const float kTimeStretchMin = 0.5;
     const float kTimeStretchMax = 2.0;
-    float new_ts_normal = ctx->ts_normal + 0.05*dir;
+    float new_ts_normal = ctx->ts_normal + (0.05f * dir);
     stretchAdjustment = allowEdit;
 
     if (new_ts_normal > kTimeStretchMax &&
@@ -10949,8 +10949,8 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         bool floatRead;
         float stretch = action.right(action.length() - 13).toFloat(&floatRead);
         if (floatRead &&
-            stretch <= 2.0 &&
-            stretch >= 0.48)
+            stretch <= 2.0f &&
+            stretch >= 0.48f)
         {
             actx->ts_normal = stretch;   // alter speed before display
         }

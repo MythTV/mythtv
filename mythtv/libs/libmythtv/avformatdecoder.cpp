@@ -1328,7 +1328,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         {
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)bitrate / 8 / 2;
-            float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+            float secs = ringBuffer->GetRealFileSize() * 1.0f / bytespersec;
             m_parent->SetFileLength((int)(secs), (int)(secs * fps));
         }
 
@@ -1417,17 +1417,17 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
         avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
 
     if (enc->time_base.den && enc->time_base.num) // tbc
-        codec_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
+        codec_fps = 1.0 / av_q2d(enc->time_base) / enc->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
     if (codec_fps > 121.0f && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
     {
         enc->time_base.num = 1001;  // seems pretty standard
         if (av_q2d(enc->time_base) > 0)
-            codec_fps = 1.0f / av_q2d(enc->time_base);
+            codec_fps = 1.0 / av_q2d(enc->time_base);
     }
     if (stream->time_base.den && stream->time_base.num) // tbn
-        container_fps = 1.0f / av_q2d(stream->time_base);
+        container_fps = 1.0 / av_q2d(stream->time_base);
     if (stream->r_frame_rate.den && stream->r_frame_rate.num) // tbr
         estimated_fps = av_q2d(stream->r_frame_rate);
 
@@ -3590,7 +3590,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             current_width  = width;
             current_height = height;
 
-            if (seqFPS > 0.0)
+            if (seqFPS > 0.0f)
                 fps = seqFPS;
 
             gopset = false;

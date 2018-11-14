@@ -731,7 +731,7 @@ void ZMServer::handleGetServerStatus(void)
     long long total, used;
     string eventsDir = g_webPath + "/events/";
     getDiskSpace(eventsDir, total, used);
-    sprintf(buf, "%d%%", (int) ((100.0 / ((float) total / used))));
+    sprintf(buf, "%d%%", (int) ((100.0f / ((float) total / used))));
     ADD_STR(outStr, buf)
 
     send(outStr);

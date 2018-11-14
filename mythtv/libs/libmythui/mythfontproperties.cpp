@@ -120,7 +120,7 @@ void MythFontProperties::SetPixelSize(float size)
 
 void MythFontProperties::SetPointSize(uint points)
 {
-    float pixels = (float)points / 72.0 * 100.0;
+    float pixels = (float)points / 72.0f * 100.0f;
     SetPixelSize(pixels);
 }
 

@@ -630,9 +630,9 @@ static subtitle_t *sub_read_line_mpsub (demux_sputext_t *demuxstr, subtitle_t *c
       return nullptr;
   } while (sscanf (line, "%f %f", &a, &b) !=2);
 
-  demuxstr->mpsub_position += (a*100.0);
+  demuxstr->mpsub_position += (a*100.0f);
   current->start = (int) demuxstr->mpsub_position;
-  demuxstr->mpsub_position += (b*100.0);
+  demuxstr->mpsub_position += (b*100.0f);
   current->end = (int) demuxstr->mpsub_position;
 
   while (num < SUB_MAX_TEXT) {

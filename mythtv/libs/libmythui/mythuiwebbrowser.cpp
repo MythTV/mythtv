@@ -1157,7 +1157,7 @@ void MythUIWebBrowser::SetActive(bool active)
  */
 void MythUIWebBrowser::ZoomIn(void)
 {
-    SetZoom(m_zoom + 0.1);
+    SetZoom(m_zoom + 0.1f);
 }
 
 /** \fn MythUIWebBrowser::ZoomOut(void)
@@ -1165,7 +1165,7 @@ void MythUIWebBrowser::ZoomIn(void)
  */
 void MythUIWebBrowser::ZoomOut(void)
 {
-    SetZoom(m_zoom - 0.1);
+    SetZoom(m_zoom - 0.1f);
 }
 
 /** \fn MythUIWebBrowser::SetZoom(float)
@@ -1177,11 +1177,11 @@ void MythUIWebBrowser::SetZoom(float zoom)
     if (!m_browser)
         return;
 
-    if (zoom < 0.3)
+    if (zoom < 0.3f)
         zoom = 0.3f;
 
-    if (zoom > 5.0)
-        zoom = 5.0;
+    if (zoom > 5.0f)
+        zoom = 5.0f;
 
     m_zoom = zoom;
     m_browser->setZoomFactor(m_zoom);

@@ -152,7 +152,7 @@ void MythQImagePainter::DrawImage(const QRect &r, MythImage *im,
     (void)alpha;
 
     CheckPaintMode(QRect(r.topLeft(), src.size()));
-    painter->setOpacity(static_cast<float>(alpha) / 255.0);
+    painter->setOpacity(static_cast<float>(alpha) / 255.0f);
     painter->drawImage(r.topLeft(), (QImage)(*im), src);
     painter->setOpacity(1.0);
 }

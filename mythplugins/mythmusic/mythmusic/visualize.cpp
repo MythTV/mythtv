@@ -1116,7 +1116,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             for (uint i = 0; i < n; i++)
             {
-                audio_data[i] = (piano_audio)(((piano_audio)node->left[i] + (piano_audio)node->right[i]) / 2.0 / short_to_bounded);
+                audio_data[i] = (piano_audio)(((piano_audio)node->left[i] + (piano_audio)node->right[i]) / 2.0f / short_to_bounded);
             }
         }
         else // This is only one channel of data
@@ -1168,7 +1168,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
             if (false) // Take logs everywhere, and shift up to [0, ??]
             {
-                if(magnitude_av > 0.0)
+                if(magnitude_av > 0.0f)
                 {
                     magnitude_av = log(magnitude_av);
                 }
@@ -1178,7 +1178,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
                 }
                 magnitude_av -= PIANO_MIN_VOL;
 
-                if (magnitude_av < 0.0)
+                if (magnitude_av < 0.0f)
                 {
                     magnitude_av = 0.0;
                 }

@@ -334,7 +334,7 @@ bool MythRenderVDPAU::IsHEVCAvailable(void)
 
 bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
 {
-    int mbs = ceil((double)width / 16.0f);
+    int mbs = ceil((double)width / 16.0);
     // see Appendix H of the NVIDIA proprietary driver README
     int check = (mbs == 49 ) || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
                 (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128);

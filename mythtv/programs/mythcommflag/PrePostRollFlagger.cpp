@@ -362,7 +362,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                 recordingStartedAt.secsTo(MythDate::current());
             int secondsFlagged = (int)(framesProcessed / fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
-            long usecPerFrame = (long)(1.0 / player->GetFrameRate() * 1000000);
+            long usecPerFrame = (long)(1.0f / player->GetFrameRate() * 1000000);
 
             struct timeval endTime;
             gettimeofday(&endTime, nullptr);
