@@ -93,15 +93,16 @@ class ExternalStreamHandler : public StreamHandler
 
     void PurgeBuffer(void);
 
-    bool ProcessCommand(const QString & cmd, uint timeout, QString & result,
-                        uint retry_cnt = 10, uint wait_cnt = 2);
-    bool ProcessVer1(const QString & cmd, uint timeout, QString & result,
-                     uint retry_cnt, uint wait_cnt);
-    bool ProcessVer2(const QString & cmd, uint timeout, QString & result,
-                     uint retry_cnt, uint wait_cnt);
+    bool ProcessCommand(const QString & cmd, QString & result,
+                        int timeout = 2000 /* ms */,uint retry_cnt = 3);
+    bool ProcessVer1(const QString & cmd, QString & result,
+                     int timeout /* ms */, uint retry_cnt);
+    bool ProcessVer2(const QString & cmd, QString & result,
+                     int timeout /* ms */, uint retry_cnt);
 
   private:
-    int StreamingCount(void) const;
+    int  StreamingCount(void) const;
+    bool SetAPIVersion(void);
     bool OpenApp(void);
     void CloseApp(void);
 
