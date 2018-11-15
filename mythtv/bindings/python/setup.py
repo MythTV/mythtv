@@ -1,5 +1,6 @@
-#!/usr/bin/env python
+##/usr/bin/env python
 
+from __future__ import print_function
 from distutils.core import setup
 from distutils.cmd import Command
 from distutils.sysconfig import get_python_lib, project_base
@@ -27,19 +28,19 @@ class uninstall(Command):
             for path,dirs,files in os.walk(mythtv_path, topdown=False):
                 for fname in files:
                     fname = os.path.join(path,fname)
-                    print 'unlinking '+fname
+                    print('unlinking '+fname)
                     os.unlink(fname)
-                print 'removing folder '+path
+                print('removing folder '+path)
                 os.rmdir(path)
             for fname in os.listdir(install_path):
                 if fname.endswith('.egg-info') and fname.startswith('MythTV'):
                     fname = os.path.join(install_path, fname)
-                    print 'unlinking '+fname
+                    print('unlinking '+fname)
                     os.unlink(fname)
             for fname in SCRIPTS:
                 fname = os.path.join(project_base, fname.split('/')[-1])
                 if os.access(fname, os.F_OK):
-                    print 'unlinking '+fname
+                    print('unlinking '+fname)
                     os.unlink(fname)
 
 class build(pybuild):
@@ -78,11 +79,12 @@ class build(pybuild):
 
 setup(
         name='MythTV',
-        version='0.28.-1',
+        version='30.0.-1',
         description='MythTV Python bindings.',
-        long_description='Provides canned database and protocol access to the MythTV database, mythproto, mythxml, and frontend remote control.',
+        long_description='Provides canned database and protocol access to the MythTV database, mythproto, mythxml, services_api and frontend remote control.',
         packages=['MythTV', 'MythTV/tmdb3', 'MythTV/ttvdb',
-                  'MythTV/wikiscripts', 'MythTV/utility'],
+                  'MythTV/wikiscripts', 'MythTV/utility',
+				  'MythTV/services_api'],
         package_dir={'MythTV/tmdb3':'./tmdb3/tmdb3'},
         data_files=[('MythTV/ttvdb/XSLT', glob.glob('MythTV/ttvdb/XSLT/*'))],
         url=['http://www.mythtv.org/'],
