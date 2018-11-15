@@ -1678,7 +1678,7 @@ QString RingBuffer::GetAvailableBuffer(void)
         return "N/A";
 
     int avail = (rbwpos >= rbrpos) ? rbwpos - rbrpos : bufferSize - rbrpos + rbwpos;
-    return QString("%1%").arg((int)(((float)avail / (float)bufferSize) * 100.0));
+    return QString("%1%").arg(lroundf((float)avail / (float)bufferSize * 100.0f));
 }
 
 uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)
