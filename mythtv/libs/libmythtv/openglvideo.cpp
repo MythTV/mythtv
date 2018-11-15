@@ -996,8 +996,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             }
             if ((bot && !first) || (top && first))
             {
-                trect.setTop((trueheight / 2) + (trect.top() / 2));
-                trect.setBottom((trueheight / 2) + (trect.bottom() / 2));
+                trect.setTop(static_cast<qreal>(trueheight / 2) + (trect.top() / 2));
+                trect.setBottom(static_cast<qreal>(trueheight / 2) + (trect.bottom() / 2));
                 trect.adjust(0, -bob, 0, -bob);
             }
         }

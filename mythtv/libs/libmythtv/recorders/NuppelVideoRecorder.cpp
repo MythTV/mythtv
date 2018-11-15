@@ -2047,7 +2047,7 @@ inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)
 
 void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
 {
-    if (newaspect == video_aspect)
+    if (newaspect == static_cast<double>(video_aspect))
         return;
 
     video_aspect = newaspect;

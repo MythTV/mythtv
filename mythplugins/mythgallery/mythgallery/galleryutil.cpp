@@ -16,6 +16,9 @@
  *
  * ============================================================ */
 
+// C++
+#include <cmath>
+
 // qt
 #include <QDir>
 #include <QApplication>
@@ -600,11 +603,11 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
     case kScaleToFill:
         // scale-max to dest width for most images
         scaleWidth = dest.width();
-        scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+        scaleHeight = lround(dest.width() * pixelAspect / imageAspect);
         if (scaleHeight < dest.height())
         {
             // scale-max to dest height for extra wide images
-            scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+            scaleWidth = lround(dest.height() * imageAspect / pixelAspect);
             scaleHeight = dest.height();
         }
         break;
@@ -617,13 +620,13 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
 
     case kScaleToFit:
         // scale-min to dest height for most images
-        scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+        scaleWidth = lround(dest.height() * imageAspect / pixelAspect);
         scaleHeight = dest.height();
         if (scaleWidth > dest.width())
         {
             // scale-min to dest width for extra wide images
             scaleWidth = dest.width();
-            scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+            scaleHeight = lround(dest.width() * pixelAspect / imageAspect);
         }
         break;
 

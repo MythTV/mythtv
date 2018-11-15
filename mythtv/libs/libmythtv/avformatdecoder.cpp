@@ -125,7 +125,8 @@ static float get_aspect(const AVCodecContext &ctx)
 
     if (ctx.sample_aspect_ratio.num && ctx.height)
     {
-        aspect_ratio = av_q2d(ctx.sample_aspect_ratio) * (float) ctx.width;
+        aspect_ratio = av_q2d(ctx.sample_aspect_ratio) *
+            static_cast<double>(ctx.width);
         aspect_ratio /= (float) ctx.height;
     }
 

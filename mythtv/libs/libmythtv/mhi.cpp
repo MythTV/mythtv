@@ -645,8 +645,9 @@ void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect, float asp
     // MHEG presumes square pixels
     enum { kNone, kHoriz, kBoth };
     int mode = gCoreContext->GetNumSetting("MhegAspectCorrection", kNone);
-    double const vz = (mode == kBoth) ? min(1.15, 1. / sqrt(aspect)) : 1.;
-    double const hz = (mode > kNone) ? vz * aspect : 1.;
+    double const aspectd = static_cast<double>(aspect);
+    double const vz = (mode == kBoth) ? min(1.15, 1. / sqrt(aspectd)) : 1.;
+    double const hz = (mode > kNone) ? vz * aspectd : 1.;
 
     m_displayRect = QRect( int(dispRect.width() * (1 - hz) / 2),
         int(dispRect.height() * (1 - vz) / 2),
