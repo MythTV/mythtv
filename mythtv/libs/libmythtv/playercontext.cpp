@@ -183,11 +183,11 @@ QRect PlayerContext::GetStandAlonePIPRect(void)
         float vaspect = player->GetVideoAspect();
 
         // Calculate new height or width according to relative aspect ratio
-        if ((int)((saspect + 0.05) * 10) > (int)((vaspect + 0.05) * 10))
+        if (lroundf(saspect * 10) > lroundf(vaspect * 10))
         {
             rect.setWidth((int) ceil(rect.width() * (vaspect / saspect)));
         }
-        else if ((int)((saspect + 0.05) * 10) < (int)((vaspect + 0.05) * 10))
+        else if (lroundf(saspect * 10) < lroundf(vaspect * 10))
         {
             rect.setHeight((int) ceil(rect.height() * (saspect / vaspect)));
         }

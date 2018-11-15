@@ -1684,8 +1684,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
         hscale = image_aspect / pixel_aspect;
         if (hscale < 0.99f || hscale > 1.01f)
         {
-            vid_rec.setLeft((int)(((float)vid_rec.left() * hscale) + 0.5f));
-            vid_rec.setWidth((int)(((float)vid_rec.width() * hscale) + 0.5f));
+            vid_rec.setLeft(lroundf((float)vid_rec.left() * hscale));
+            vid_rec.setWidth(lroundf((float)vid_rec.width() * hscale));
         }
 
         float vscale = (float)dvr_rec.width() / (float)image_width;
@@ -1708,8 +1708,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
     hscale = pixel_aspect / image_aspect;
     if (hscale < 0.99f || hscale > 1.01f)
     {
-        result.setLeft((int)(((float)rect1.left() * hscale) + 0.5f));
-        result.setWidth((int)(((float)rect1.width() * hscale) + 0.5f));
+        result.setLeft(lroundf((float)rect1.left() * hscale));
+        result.setWidth(lroundf((float)rect1.width() * hscale));
     }
 
     result.translate(-visible_osd.left(), -visible_osd.top());
@@ -1912,7 +1912,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
             gCoreContext->GetHostName(), pixel_aspect);
         if (disp_dim.height() <= 0)
             disp_dim.setHeight(300);
-        disp_dim.setWidth((int) ((disp_dim.height() * disp_aspect) + 0.5));
+        disp_dim.setWidth(lroundf(disp_dim.height() * disp_aspect));
     }
 
     if (disp_dim.isEmpty())
@@ -1920,7 +1920,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
         source = "Guessed!";
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Physical size of display unknown."
                 "\n\t\t\tAssuming 17\" monitor with square pixels.");
-        disp_dim = QSize((int) ((300 * pixel_aspect) + 0.5), 300);
+        disp_dim = QSize(lroundf(300 * pixel_aspect), 300);
     }
 
     disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();

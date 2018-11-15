@@ -1,5 +1,8 @@
 #include <set>
 
+// C++ headers
+#include <cmath>
+
 // qt
 #include <QBuffer>
 
@@ -308,8 +311,7 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     if (popm)
     {
         int rating = popm->rating();
-        rating = static_cast<int>(((static_cast<float>(rating)/255.0)
-                                                                * 10.0) + 0.5);
+        rating = lroundf(static_cast<float>(rating) / 255.0f * 10.0f);
         metadata->setRating(rating);
         metadata->setPlaycount(popm->counter());
     }
@@ -927,8 +929,7 @@ bool MetaIOID3::writeRating(TagLib::ID3v2::Tag *tag, int rating)
     if (!tag)
         return false;
 
-    int popmrating = static_cast<int>(((static_cast<float>(rating) / 10.0)
-                                                               * 255.0) + 0.5);
+    int popmrating = lroundf(static_cast<float>(rating) / 10.0f * 255.0f);
 
     // MythTV Specific Rating Tag
     PopularimeterFrame *popm = findPOPM(tag, email);

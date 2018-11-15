@@ -543,7 +543,7 @@ void MythPlayer::ReinitOSD(void)
         if (osd)
         {
             osd->SetPainter(videoOutput->GetOSDPainter());
-            int stretch = (int)((aspect * 100) + 0.5f);
+            int stretch = lroundf(aspect * 100);
             if ((osd->Bounds() != visible) ||
                 (osd->GetFontStretch() != stretch))
             {
@@ -1781,7 +1781,7 @@ void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
 {
     if (decoder)
         m_fpsMultiplier = decoder->GetfpsMultiplier();
-    frame_interval = (int)(1000000.0f * frame_period + 0.5f)
+    frame_interval = lround(1000000.0 * frame_period)
       / m_fpsMultiplier;
     if (!avsync_predictor_enabled)
         avsync_predictor = 0;
@@ -5337,12 +5337,12 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
                     TranslatePositionFrameToMs(framesWritten, use_cutlist);
             }
         }
-        uint64_t offset_ms = -offset * 1000 + 0.5;
+        uint64_t offset_ms = llroundf(-offset * 1000);
         position_ms = (offset_ms > length_ms) ? 0 : length_ms - offset_ms;
     }
     else
     {
-        position_ms = offset * 1000 + 0.5;
+        position_ms = llroundf(offset * 1000);
 
         if (offset > length_ms)
         {

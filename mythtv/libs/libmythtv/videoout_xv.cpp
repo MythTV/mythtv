@@ -1874,7 +1874,7 @@ int VideoOutputXv::SetXVPictureAttribute(PictureAttribute attribute, int newValu
     if (xv_set_defaults && range && (kPictureAttribute_Hue == attribute))
     {
         float tmp = (((float)(port_def - port_min) / (float)range) * 100.0f);
-        valAdj = (int)(tmp + 0.5);
+        valAdj = lroundf(tmp);
     }
 
     int tmpval2 = (newValue + valAdj) % 100;

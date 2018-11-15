@@ -340,7 +340,7 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         return;
 
     bool willstretch = stretchfactor < 0.99f || stretchfactor > 1.01f;
-    eff_stretchfactor = (int)(100000.0f * lstretchfactor + 0.5);
+    eff_stretchfactor = lroundf(100000.0f * lstretchfactor);
 
     if (pSoundStretch)
     {

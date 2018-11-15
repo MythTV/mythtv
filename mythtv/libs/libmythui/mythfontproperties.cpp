@@ -1,6 +1,8 @@
 
 #include "mythfontproperties.h"
 
+#include <cmath>
+
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QFontInfo>
@@ -103,7 +105,7 @@ void MythFontProperties::Rescale(void)
 
 void MythFontProperties::AdjustStretch(int stretch)
 {
-    int newStretch = (int)(((float)m_stretch * ((float)stretch / 100.0f)) + 0.5f);
+    int newStretch = lroundf((float)m_stretch * ((float)stretch / 100.0f));
 
     if (newStretch <= 0)
         newStretch = 1;
@@ -115,7 +117,7 @@ void MythFontProperties::SetPixelSize(float size)
 {
     QSize baseSize = GetMythUI()->GetBaseSize();
     m_relativeSize = size / (float)(baseSize.height());
-    m_face.setPixelSize(GetMythMainWindow()->NormY((int)(size + 0.5f)));
+    m_face.setPixelSize(GetMythMainWindow()->NormY(lroundf(size)));
 }
 
 void MythFontProperties::SetPointSize(uint points)

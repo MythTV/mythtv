@@ -164,7 +164,7 @@ int DisplayResScreen::FindBestMatch(const DisplayResVector& dsr,
                          precision < 2.0;
                          precision *= 10.0)
                     {
-                        double rounded = (double) ((int) (videorate + 0.5));
+                        double rounded = round(videorate);
                         for (uint j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do

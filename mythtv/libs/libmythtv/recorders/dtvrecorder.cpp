@@ -835,8 +835,8 @@ void DTVRecorder::HandleKeyframe(int64_t extra)
         {
             positionMapDelta[frameNum] = startpos;
             positionMap[frameNum]      = startpos;
-            durationMap[frameNum]      = _total_duration + 0.5;
-            durationMapDelta[frameNum] = _total_duration + 0.5;
+            durationMap[frameNum]      = llround(_total_duration);
+            durationMapDelta[frameNum] = llround(_total_duration);
         }
     }
     positionMapLock.unlock();
@@ -1066,8 +1066,8 @@ void DTVRecorder::HandleH264Keyframe(void)
     {
         positionMapDelta[frameNum] = startpos;
         positionMap[frameNum]      = startpos;
-        durationMap[frameNum]      = _total_duration + 0.5;
-        durationMapDelta[frameNum] = _total_duration + 0.5;
+        durationMap[frameNum]      = llround(_total_duration);
+        durationMapDelta[frameNum] = llround(_total_duration);
     }
     positionMapLock.unlock();
 }

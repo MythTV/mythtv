@@ -1,6 +1,8 @@
 
 #include "mythuitext.h"
 
+#include <cmath>
+
 #include <QCoreApplication>
 #include <QtGlobal>
 #include <QDomDocument>
@@ -1480,15 +1482,15 @@ bool MythUIText::ParseElement(
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollStartDelay = static_cast<int>(seconds *
-                      static_cast<float>(MythMainWindow::drawRefresh) + 0.5);
+                m_scrollStartDelay = lroundf(seconds *
+                      static_cast<float>(MythMainWindow::drawRefresh));
             }
             tmp = element.attribute("returndelay");
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollReturnDelay = static_cast<int>(seconds *
-                      static_cast<float>(MythMainWindow::drawRefresh) + 0.5);
+                m_scrollReturnDelay = lroundf(seconds *
+                      static_cast<float>(MythMainWindow::drawRefresh));
             }
             tmp = element.attribute("rate");
             if (!tmp.isEmpty())

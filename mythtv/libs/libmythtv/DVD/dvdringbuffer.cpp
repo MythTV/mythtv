@@ -1375,7 +1375,7 @@ void DVDRingBuffer::prevTrack(void)
  */
 uint DVDRingBuffer::GetTotalTimeOfTitle(void)
 {
-    return m_pgcLength / 90000.0 + 0.5;
+    return lround(m_pgcLength / 90000.0);
 }
 
 /** \brief get the start of the cell in seconds

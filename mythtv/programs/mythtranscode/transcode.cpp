@@ -1146,7 +1146,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             totalAudio += arb->GetSamples(frame.timecode);
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = frame.timecode - audbufTime;
-            int vidTime = (int)(curFrameNum * vidFrameTime + 0.5);
+            int vidTime = lroundf(curFrameNum * vidFrameTime);
             int viddelta = frame.timecode - vidTime;
             int delta = viddelta - auddelta;
             int absdelta = delta < 0 ? -delta : delta;

@@ -3408,8 +3408,7 @@ void AvFormatDecoder::HandleGopStart(
             if (trackTotalDuration)
             {
                 m_frameToDurMap[framesRead] =
-                    (int64_t)totalDuration.num * 1000.0 / totalDuration.den
-                    + 0.5;
+                    llround(totalDuration.num * 1000.0 / totalDuration.den);
                 m_durToFrameMap[m_frameToDurMap[framesRead]] = framesRead;
             }
         }

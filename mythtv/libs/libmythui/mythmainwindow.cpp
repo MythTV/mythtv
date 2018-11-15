@@ -2827,7 +2827,7 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     // adjust for myth GUI size relative to 800x600
     floatSize = floatSize * d->hmult;
     // round to the nearest point size
-    pointSize = (int)(floatSize + 0.5);
+    pointSize = lroundf(floatSize);
 
     return pointSize;
 }

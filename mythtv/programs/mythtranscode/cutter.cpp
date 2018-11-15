@@ -85,8 +85,8 @@ void Cutter::NewFrame(int64_t currentFrame)
                 // to drop
                 tracker.TrackerReset(jumpTo);
                 videoFramesToCut = jumpTo - currentFrame;
-                audioFramesToCut += (int64_t)(videoFramesToCut *
-                                    audioFramesPerVideoFrame + 0.5);
+                audioFramesToCut += llroundf(videoFramesToCut *
+                                    audioFramesPerVideoFrame);
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Clean cut: discarding frame from %1 to %2: "
                             "vid %3 aud %4")
@@ -159,7 +159,7 @@ bool Cutter::InhibitDummyFrame()
     {
         // If the cutter is in the process of dropping audio then
         // it is better to drop more audio rather than insert a dummy frame
-        audioFramesToCut += (int64_t)(audioFramesPerVideoFrame + 0.5);
+        audioFramesToCut += llroundf(audioFramesPerVideoFrame);
         return true;
     }
     else
@@ -170,12 +170,12 @@ bool Cutter::InhibitDummyFrame()
 
 bool Cutter::InhibitDropFrame()
 {
-    if (audioFramesToCut > (int64_t)(audioFramesPerVideoFrame + 0.5))
+    if (audioFramesToCut > llroundf(audioFramesPerVideoFrame))
     {
         // If the cutter is in the process of dropping audio and the
         // amount to drop is sufficient then we can drop less
         // audio rather than drop a frame
-        audioFramesToCut -= (int64_t)(audioFramesPerVideoFrame + 0.5);
+        audioFramesToCut -= llroundf(audioFramesPerVideoFrame);
 
         // But if it's a frame we are supposed to drop anyway, still do so,
         // and record that we have

@@ -1,6 +1,8 @@
 #ifndef MYTHDISPLAY_H
 #define MYTHDISPLAY_H
 
+#include <cmath>
+
 #include <QWidget> // for WId
 #include <QSize>
 
@@ -12,7 +14,7 @@ class DisplayInfo
     DisplayInfo(void)  : size(QSize(0,0)), res(QSize(0,0)), rate(-1) { }
     explicit DisplayInfo(int r) : size(QSize(0,0)), res(QSize(0,0)), rate(r)  { }
 
-    int Rate(void) const { return (int)(rate + 0.5); }
+    int Rate(void) const { return lroundf(rate); }
     QSize size;
     QSize res;
     float rate;

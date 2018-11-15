@@ -1796,7 +1796,7 @@ void MythRAOPConnection::SendNotification(bool update)
 {
     QImage image = m_artwork.isEmpty() ? QImage() : QImage::fromData(m_artwork);
     int duration  =
-        (float)(m_progressEnd-m_progressStart) / m_frameRate + 0.5f;
+        lroundf(static_cast<float>(m_progressEnd-m_progressStart) / m_frameRate);
     int position =
         (m_progressCurrent-m_progressStart) / m_frameRate;
 

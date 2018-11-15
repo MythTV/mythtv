@@ -178,7 +178,7 @@ void OSD::TearDown(void)
 bool OSD::Init(const QRect &rect, float font_aspect)
 {
     m_Rect = rect;
-    m_fontStretch = (int)((font_aspect * 100) + 0.5f);
+    m_fontStretch = lroundf(font_aspect * 100);
     OverrideUIScale();
     LoadWindows();
     RevertUIScale();
@@ -254,7 +254,7 @@ void OSD::RevertUIScale(void)
 bool OSD::Reinit(const QRect &rect, float font_aspect)
 {
     m_Refresh = true;
-    int new_stretch = (int)((font_aspect * 100) + 0.5f);
+    int new_stretch = lroundf(font_aspect * 100);
     if ((rect == m_Rect) && (new_stretch == m_fontStretch))
         return true;
     if (m_Dialog && m_Dialog->objectName() == OSD_DLG_NAVIGATE
