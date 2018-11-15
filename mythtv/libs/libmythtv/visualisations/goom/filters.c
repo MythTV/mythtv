@@ -733,8 +733,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 void
 pointFilter (Uint * pix1, Color c, float t1, float t2, float t3, float t4, Uint cycle)
 {
-	Uint    x = (Uint) ((int) (resolx/2) + (int) (t1 * cos ((float) cycle / t3)));
-	Uint    y = (Uint) ((int) (c_resoly/2) + (int) (t2 * sin ((float) cycle / t4)));
+	Uint    x = (Uint) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
+	Uint    y = (Uint) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
 
 	if ((x > 1) && (y > 1) && (x < resolx - 2) && (y < c_resoly - 2)) {
 		setPixelRGB (pix1, x + 1, y, c);

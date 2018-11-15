@@ -48,7 +48,7 @@ static inline unsigned char
 lighten (unsigned char value, float power)
 {
 	int     val = value;
-	float   t = (float) val * log10(power) / 2.0;
+	float   t = (float) val * log10f(power) / 2.0f;
 
 	if (t > 0) {
 		val = (int) t; // (32.0f * log (t));
@@ -117,34 +117,34 @@ static void pretty_move (float cycle, float *dist,float *dist2, float *rotangle)
 	tmp = happens?8.0f:0;
 	*dist2 = distt2 = (tmp + 15.0f*distt2)/16.0f;
 
-	tmp = 30+D-90.0f*(1.0f+sin(cycle*19/20));
+	tmp = 30+D-90.0f*(1.0f+sinf(cycle*19/20));
 	if (happens)
 		tmp *= 0.6f;
 
 	*dist = distt = (tmp + 3.0f*distt)/4.0f;
 
 	if (!happens){
-		tmp = M_PI*sin(cycle)/32+3*M_PI/2;
+		tmp = M_PI_F*sinf(cycle)/32+3*M_PI_F/2;
 	}
 	else {
 		rotation = iRAND(500)?rotation:iRAND(2);
 		if (rotation)
-			cycle *= 2.0f*M_PI;
+			cycle *= 2.0f*M_PI_F;
 		else
-			cycle *= -1.0f*M_PI;
-		tmp = cycle - (M_PI*2.0) * floor(cycle/(M_PI*2.0));
+			cycle *= -1.0f*M_PI_F;
+		tmp = cycle - (M_PI_F*2.0f) * floorf(cycle/(M_PI_F*2.0f));
 	}
 	
-	if (fabs(tmp-rot) > fabs(tmp-(rot+2.0*M_PI))) {
-		rot = (tmp + 15.0f*(rot+2*M_PI)) / 16.0f;
-		if (rot>2.0*M_PI)
-			rot -= 2.0*M_PI;
+	if (fabs(tmp-rot) > fabs(tmp-(rot+2.0f*M_PI_F))) {
+		rot = (tmp + 15.0f*(rot+2*M_PI_F)) / 16.0f;
+		if (rot>2.0f*M_PI_F)
+			rot -= 2.0f*M_PI_F;
 		*rotangle = rot;
 	}
-	else if (fabs(tmp-rot) > fabs(tmp-(rot-2.0*M_PI))) {
-		rot = (tmp + 15.0f*(rot-2.0*M_PI)) / 16.0f;
+	else if (fabs(tmp-rot) > fabs(tmp-(rot-2.0f*M_PI_F))) {
+		rot = (tmp + 15.0f*(rot-2.0f*M_PI_F)) / 16.0f;
 		if (rot<0.0f)
-			rot += 2.0*M_PI;
+			rot += 2.0f*M_PI_F;
 		*rotangle = rot;
 	}
 	else
