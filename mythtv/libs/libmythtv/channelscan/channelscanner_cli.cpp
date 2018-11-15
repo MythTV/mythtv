@@ -104,7 +104,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
     if (VERBOSE_LEVEL_NONE || VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_INFO))
     {
         msg.sprintf("%3i%% S/N %3.1f %s : %s (%s) %20s",
-                    status_complete, status_snr,
+                    status_complete, static_cast<double>(status_snr),
                     (status_lock) ? "l" : "L",
                     status_text.toLatin1().constData(),
                     status_last_log.toLatin1().constData(), "");

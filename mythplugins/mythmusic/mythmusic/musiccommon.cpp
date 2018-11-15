@@ -1316,13 +1316,13 @@ void MusicCommon::customEvent(QEvent *event)
         if (oe->bitrate() < 2000)
         {
             info_string.sprintf(QString("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch")).toUtf8().data(),
-                                oe->bitrate(), float(oe->frequency()) / 1000.0,
+                                oe->bitrate(), static_cast<double>(oe->frequency()) / 1000.0,
                                 oe->channels() > 1 ? "2" : "1");
         }
         else
         {
             info_string.sprintf(QString("%.1f "+ tr("kHz")+ "   %s "+ tr("ch")).toUtf8().data(),
-                                float(oe->frequency()) / 1000.0,
+                                static_cast<double>(oe->frequency()) / 1000.0,
                                 oe->channels() > 1 ? "2" : "1");
         }
 

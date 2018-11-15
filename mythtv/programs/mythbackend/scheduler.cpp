@@ -569,8 +569,10 @@ void Scheduler::FillRecordListFromDB(uint recordid)
     msg.sprintf("Speculative scheduled %d items in %.1f "
                 "= %.2f match + %.2f check + %.2f place",
                 (int)reclist.size(),
-                matchTime + checkTime + placeTime,
-                matchTime, checkTime, placeTime);
+                static_cast<double>(matchTime + checkTime + placeTime),
+                static_cast<double>(matchTime),
+                static_cast<double>(checkTime),
+                static_cast<double>(placeTime));
     LOG(VB_GENERAL, LOG_INFO, msg);
 }
 
@@ -2465,8 +2467,11 @@ bool Scheduler::HandleReschedule(void)
 
     msg.sprintf("Scheduled %d items in %.1f "
                 "= %.2f match + %.2f check + %.2f place",
-                (int)reclist.size(), matchTime + checkTime + placeTime,
-                matchTime, checkTime, placeTime);
+                (int)reclist.size(),
+                static_cast<double>(matchTime + checkTime + placeTime),
+                static_cast<double>(matchTime),
+                static_cast<double>(checkTime),
+                static_cast<double>(placeTime));
     LOG(VB_GENERAL, LOG_INFO, msg);
 
     fsInfoCacheFillTime = MythDate::current().addSecs(-1000);

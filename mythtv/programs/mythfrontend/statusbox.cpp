@@ -1351,7 +1351,10 @@ void StatusBox::doMachineStatus()
         {
             char buff[30];
 
-            sprintf(buff, "%0.2f, %0.2f, %0.2f", loads[0], loads[1], loads[2]);
+            sprintf(buff, "%0.2f, %0.2f, %0.2f",
+                    static_cast<double>(loads[0]),
+                    static_cast<double>(loads[1]),
+                    static_cast<double>(loads[2]));
             line.append(QString(buff));
         }
         else
