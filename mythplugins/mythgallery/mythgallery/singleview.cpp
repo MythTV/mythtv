@@ -1158,7 +1158,7 @@ void SingleView::EffectIncomingEdges(void)
 void SingleView::EffectMultiCircleOut(void)
 {
     int i;
-    double alpha;
+    float alpha;
 
     if (m_effect_current_frame == 0)
     {

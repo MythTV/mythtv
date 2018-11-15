@@ -978,7 +978,7 @@ void GLSingleView::EffectFlutter(void)
                 m_effect_flutter_points[x][y][1] =
                     (float) (y / 20.0f - 1.0f) * ta.GetTextureY();
                 m_effect_flutter_points[x][y][2] =
-                    (float) sin((x / 20.0f - 1.0f) * M_PI * 2.0f) / 5.0;
+                    (float) sin((x / 20.0f - 1.0f) * static_cast<float>(M_PI) * 2.0f) / 5.0f;
             }
         }
     }

@@ -263,7 +263,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
             break;
         }
 
-        double newAspect = currentFrame->aspect;
+        float newAspect = currentFrame->aspect;
         if (newAspect != aspect)
         {
             SetVideoParams(aspect);

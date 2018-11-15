@@ -1330,7 +1330,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)bitrate / 8 / 2;
             float secs = ringBuffer->GetRealFileSize() * 1.0f / bytespersec;
-            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+            m_parent->SetFileLength((int)(secs),
+                                    (int)(secs * static_cast<float>(fps)));
         }
 
         // we will not see a position map from db or remote encoder,
@@ -3469,7 +3470,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 current_aspect = aspect_override;
             float seqFPS = seq->fps();
 
-            bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
+            bool changed =
+                (seqFPS > static_cast<float>(fps)+0.01f) ||
+                (seqFPS < static_cast<float>(fps)-0.01f);
             changed |= (width  != (uint)current_width );
             changed |= (height != (uint)current_height);
 
@@ -3578,7 +3581,10 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         bool res_changed = ((width  != (uint)current_width) ||
                             (height != (uint)current_height));
-        bool fps_changed = seqFPS > 0.0 && ((seqFPS > fps + 0.01f) || (seqFPS < fps - 0.01f));
+        bool fps_changed =
+            (seqFPS > 0.0f) &&
+            ((seqFPS > static_cast<float>(fps) + 0.01f) ||
+             (seqFPS < static_cast<float>(fps) - 0.01f));
 
         if (fps_changed || res_changed)
         {

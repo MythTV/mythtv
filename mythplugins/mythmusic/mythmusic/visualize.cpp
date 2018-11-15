@@ -1245,7 +1245,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     double mag = PIANO_RMS_NEGLIGIBLE;
     for (key = 0; key < n; key++)
     {
-        if (piano_data[key].max_magnitude_seen < mag)
+        if (piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
             // Spread the previous value to this key
             piano_data[key].max_magnitude_seen = mag;
@@ -1263,7 +1263,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     for (int key_i = n - 1; key_i >= 0; key_i--)
     {
         key = key_i; // Wow, this is to avoid a zany error for ((unsigned)0)--
-        if (piano_data[key].max_magnitude_seen < mag)
+        if (piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
             // Spread the previous value to this key
             piano_data[key].max_magnitude_seen = mag;
