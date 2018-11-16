@@ -40,7 +40,7 @@ using namespace std;
 #endif
 #define SYSLOG_NAMES
 #ifndef _WIN32
-#include <syslog.h>
+#include <mythsyslog.h>
 #endif
 #include <unistd.h>
 
