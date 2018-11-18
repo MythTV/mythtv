@@ -19,7 +19,7 @@
 #include "cardutil.h"
 #include "mythlogging.h"
 
-#ifndef HDHOMERUN_V2
+#ifdef NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
 static int hdhomerun_device_selector_load_from_str(struct hdhomerun_device_selector_t *hds, char *device_str);
 #endif
 
@@ -539,10 +539,10 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
     return !TunerSet("vchannel", vchn).isEmpty();
 }
 
-#ifndef HDHOMERUN_V2
+#ifdef NEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
 
-// Provide functions we need that are not included in pre-V2 versions
-// of libhdhomerun, specifically, version 20140604.  These were taken
+// Provide functions we need that are not included in some versions of
+// libhdhomerun.  These were taken
 // from version 20180817 and modified as needed.
 
 struct hdhomerun_device_selector_t {

@@ -6079,6 +6079,13 @@ if enabled hdhomerun; then
     else
         disable hdhomerun
     fi
+
+    if check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun || \
+            check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun ; then
+        :
+    else
+        add_cxxflags -DNEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
+    fi
 fi
 
 check_header stdint.h
