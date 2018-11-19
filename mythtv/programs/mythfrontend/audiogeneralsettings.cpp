@@ -108,6 +108,7 @@ void AudioConfigScreen::Init(void)
 AudioConfigSettings::AudioConfigSettings() :
     GroupSetting()
 {
+    m_maxspeakers = 0;
     setLabel(tr("Audio System"));
 
     addChild((m_OutputDevice = new AudioDeviceComboBox(this)));
@@ -225,6 +226,10 @@ void AudioConfigSettings::Load()
 {
     StandardSetting::Load();
     AudioRescan();
+    // If this is the initial setup where there was nothing on the DB,
+    // set changed so that user can save.
+    if (gCoreContext->GetSetting(QString("AudioOutputDevice"),"").isEmpty())
+        setChanged(true);
 }
 
 void AudioConfigSettings::AudioRescan()
@@ -369,6 +374,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
     }
 
     // Remove everything and re-add available channels
+    bool chansChanged = m_MaxAudioChannels->haveChanged();
     m_MaxAudioChannels->clearSelections();
     for (int i = 1; i <= max_speakers; i++)
     {
@@ -395,6 +401,7 @@ AudioOutputSettings AudioConfigSettings::UpdateCapabilities(
                                              i == cur_speakers);
         }
     }
+    m_MaxAudioChannels->setChanged(chansChanged);
 
     setMPCMEnabled(settings.canPassthrough() >= 0);
 
