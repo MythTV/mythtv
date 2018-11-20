@@ -13,9 +13,9 @@ void MythCCExtractorCommandLineParser::LoadArguments(void)
     addSettingsOverride();
     addVersion();
     addLogging("none", LOG_ERR);
-    add(QStringList( QStringList() << "-d" << "--destdir" ), "destdir", "",
+    add(QStringList{"-d", "--destdir"}, "destdir", "",
         "destination directory", "");
-    add(QStringList( QStringList() << "-i" << "--infile" ), "inputfile", "",
+    add(QStringList{"-i", "--infile"}, "inputfile", "",
         "input file", "");
 }
 

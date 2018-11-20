@@ -2259,7 +2259,7 @@ void MythCommandLineParser::allowPassthrough(bool allow)
  */
 void MythCommandLineParser::addHelp(void)
 {
-    add(QStringList( QStringList() << "-h" << "--help" << "--usage" ),
+    add(QStringList{"-h", "--help", "--usage"},
             "showhelp", "", "Display this help printout, or give detailed "
                             "information of selected option.",
             "Displays a list of all commands available for use with "
@@ -2282,13 +2282,13 @@ void MythCommandLineParser::addVersion(void)
  */
 void MythCommandLineParser::addWindowed(void)
 {
-    add(QStringList( QStringList() << "-nw" << "--no-windowed" ),
+    add(QStringList{"-nw", "--no-windowed"},
             "notwindowed", false,
             "Prevent application from running in a window.", "")
         ->SetBlocks("windowed")
         ->SetGroup("User Interface");
 
-    add(QStringList( QStringList() << "-w" << "--windowed" ), "windowed",
+    add(QStringList{"-w", "--windowed"}, "windowed",
             false, "Force application to run in a window.", "")
         ->SetGroup("User Interface");
 }
@@ -2311,7 +2311,7 @@ void MythCommandLineParser::addMouse(void)
  */
 void MythCommandLineParser::addDaemon(void)
 {
-    add(QStringList( QStringList() << "-d" << "--daemon" ), "daemon", false,
+    add(QStringList{"-d", "--daemon"}, "daemon", false,
             "Fork application into background after startup.",
             "Fork application into background, detatching from "
             "the local terminal.\nOften used with: "
@@ -2323,7 +2323,7 @@ void MythCommandLineParser::addDaemon(void)
  */
 void MythCommandLineParser::addSettingsOverride(void)
 {
-    add(QStringList( QStringList() << "-O" << "--override-setting" ),
+    add(QStringList{"-O", "--override-setting"},
             "overridesettings", QVariant::Map,
             "Override a single setting defined by a key=value pair.",
             "Override a single setting from the database using "
@@ -2352,7 +2352,7 @@ void MythCommandLineParser::addRecording(void)
  */
 void MythCommandLineParser::addGeometry(void)
 {
-    add(QStringList( QStringList() << "-geometry" << "--geometry" ), "geometry",
+    add(QStringList{"-geometry", "--geometry"}, "geometry",
             "", "Specify window size and position (WxH[+X+Y])", "")
         ->SetGroup("User Interface");
 }
@@ -2387,7 +2387,7 @@ void MythCommandLineParser::addLogging(
 
     QString logLevelStr = logLevelGetName(defaultLogLevel);
 
-    add(QStringList( QStringList() << "-v" << "--verbose" ), "verbose",
+    add(QStringList{"-v", "--verbose"}, "verbose",
         defaultVerbosity,
         "Specify log filtering. Use '-v help' for level info.", "")
                 ->SetGroup("Logging");
@@ -2404,7 +2404,7 @@ void MythCommandLineParser::addLogging(
         "rotators, using the HUP call to inform MythTV to reload the "
         "file", "")
                 ->SetGroup("Logging");
-    add(QStringList( QStringList() << "-q" << "--quiet"), "quiet", 0,
+    add(QStringList{"-q", "--quiet"}, "quiet", 0,
         "Don't log to the console (-q).  Don't log anywhere (-q -q)", "")
                 ->SetGroup("Logging");
     add("--loglevel", "loglevel", logLevelStr,
@@ -2435,7 +2435,7 @@ void MythCommandLineParser::addLogging(
     add("--enable-dblog", "enabledblog", false, "Enable logging to database.", "")
                 ->SetGroup("Logging");
 
-    add(QStringList( QStringList() << "-l" << "--logfile" ),
+    add(QStringList{"-l", "--logfile"},
         "logfile", "", "", "")
                 ->SetGroup("Logging")
                 ->SetRemoved("This option has been removed as part of "
@@ -2455,7 +2455,7 @@ void MythCommandLineParser::addLogging(
  */
 void MythCommandLineParser::addPIDFile(void)
 {
-    add(QStringList( QStringList() << "-p" << "--pidfile" ), "pidfile", "",
+    add(QStringList{"-p", "--pidfile"}, "pidfile", "",
             "Write PID of application to filename.",
             "Write the PID of the currently running process as a single "
             "line to this file. Used for init scripts to know what "
@@ -2467,7 +2467,7 @@ void MythCommandLineParser::addPIDFile(void)
  */
 void MythCommandLineParser::addJob(void)
 {
-    add(QStringList( QStringList() << "-j" << "--jobid" ), "jobid", 0, "",
+    add(QStringList{"-j", "--jobid"}, "jobid", 0, "",
             "Intended for internal use only, specify the JobID to match "
             "up with in the database for additional information and the "
             "ability to update runtime status in the database.");

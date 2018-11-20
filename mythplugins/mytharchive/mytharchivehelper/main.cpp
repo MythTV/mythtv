@@ -2257,7 +2257,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
     addVersion();
     addLogging();
 
-    add(QStringList( QStringList() << "-t" << "--createthumbnail" ),
+    add(QStringList{"-t", "--createthumbnail"},
             "createthumbnail", false,
             "Create one or more thumbnails\n"
             "Requires: --infile, --thumblist, --outfile\n"
@@ -2280,7 +2280,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "Number of frames to grab (default 1)\n"
             "Used with: --createthumbnail", "");
 
-    add(QStringList( QStringList() << "-i" << "--getfileinfo" ),
+    add(QStringList{"-i", "--getfileinfo"},
             "getfileinfo", false,
             "Write file info about infile to outfile\n"
             "Requires: --infile, --outfile, --method", "");
@@ -2293,17 +2293,17 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "  2 = use position map in DB (quick, only works for MythTV "
             "recordings)", "");
 
-    add(QStringList( QStringList() << "-p" << "--getdbparameters" ),
+    add(QStringList{"-p", "--getdbparameters"},
             "getdbparameters", false,
             "Write the mysql database parameters to outfile\n"
             "Requires: --outfile", "");
 
-    add(QStringList( QStringList() << "-n" << "--nativearchive" ),
+    add(QStringList{"-n", "--nativearchive"},
             "nativearchive", false,
             "Archive files to a native archive format\n"
             "Requires: --outfile", "");
 
-    add(QStringList( QStringList() << "-f" << "--importarchive" ),
+    add(QStringList{"-f", "--importarchive"},
             "importarchive", false,
             "Import an archived file\n"
             "Requires: --infile, --chanid", "");
@@ -2311,7 +2311,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "Channel ID to use when inserting records in DB\n"
             "Used with: --importarchive", "");
 
-    add(QStringList( QStringList() << "-r" << "--isremote" ),
+    add(QStringList{"-r", "--isremote"},
             "isremote", false,
             "Check if infile is on a remote filesystem\n"
             "Requires: --infile\n"
@@ -2319,7 +2319,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "         - 1 file is on a local filesystem\n"
             "         - 2 file is on a remote filesystem", "");
 
-    add(QStringList( QStringList() << "-b" << "--burndvd" ),
+    add(QStringList{"-b", "--burndvd"},
             "burndvd", false,
             "Burn a created DVD to a blank disc\n"
             "Optional: --mediatype, --erasedvdrw, --nativeformat", "");
@@ -2336,7 +2336,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "Archive is a native archive format\n"
             "Used with: --burndvd (optional)", "");
 
-    add(QStringList( QStringList() << "-s" << "--sup2dast" ),
+    add(QStringList{"-s", "--sup2dast"},
             "sup2dast", false,
             "Convert projectX subtitles to DVD subtitles\n"
             "Requires: --infile, --ifofile, --delay", "");
