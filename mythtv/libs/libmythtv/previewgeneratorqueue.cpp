@@ -223,7 +223,7 @@ void PreviewGeneratorQueue::RemoveListener(QObject *listener)
  */
 bool PreviewGeneratorQueue::event(QEvent *e)
 {
-    if (e->type() != (QEvent::Type) MythEvent::MythEventMessage)
+    if (e->type() != MythEvent::MythEventMessage)
         return QObject::event(e);
 
     MythEvent *me = static_cast<MythEvent*>(e);

@@ -245,7 +245,7 @@ QString BrowserApi::GetMetadata(void)
 
 void BrowserApi::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
@@ -649,7 +649,7 @@ void MythWebView::customEvent(QEvent *event)
             }
         }
     }
-    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);

@@ -53,7 +53,7 @@ bool WebSocketMythEvent::HandleTextFrame(const WebSocketFrame &frame)
 
 void WebSocketMythEvent::customEvent(QEvent* event)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         if (!m_sendEvents)
             return;

@@ -2671,7 +2671,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     {
         d->m_udpListener->Enable();
     }
-    else if ((MythEvent::Type)(ce->type()) == MythEvent::MythEventMessage)
+    else if (ce->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(ce);
         QString message = me->Message();
@@ -2761,7 +2761,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             gCoreContext->AllowShutdown();
         }
     }
-    else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
+    else if (ce->type() == MythEvent::MythUserMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(ce);
         QString message = me->Message();
@@ -2769,7 +2769,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         if (!message.isEmpty())
             ShowOkPopup(message);
     }
-    else if ((MythEvent::Type)(ce->type()) == MythNotificationCenterEvent::kEventType)
+    else if (ce->type() == MythNotificationCenterEvent::kEventType)
     {
         GetNotificationCenter()->ProcessQueue();
     }

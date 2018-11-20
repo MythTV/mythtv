@@ -151,7 +151,7 @@ unsigned int NewsSite::timeSinceLastUpdate(void) const
 
 void NewsSite::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);

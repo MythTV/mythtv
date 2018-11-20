@@ -4043,7 +4043,7 @@ void PlaybackBox::customEvent(QEvent *event)
         if (resultid == "transcode" && dce->GetResult() >= 0)
             changeProfileAndTranscode(dce->GetData().toInt());
     }
-    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QString message = me->Message();

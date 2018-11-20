@@ -15,7 +15,7 @@ MessageHandler::MessageHandler(void) : SocketRequestHandler()
 
 void MessageHandler::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
+    if (e->type() != MythEvent::MythEventMessage)
         return;
 
     if (!gCoreContext->IsMasterBackend())

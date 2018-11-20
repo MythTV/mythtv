@@ -86,7 +86,7 @@ JobQueue::~JobQueue(void)
 
 void JobQueue::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();

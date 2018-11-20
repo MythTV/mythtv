@@ -39,14 +39,14 @@ class MBASE_PUBLIC MythEvent : public QEvent
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(const QString lmessage, const QStringList &lextradata)
-           : QEvent((QEvent::Type)MythEventMessage),
+           : QEvent(MythEventMessage),
            m_message(lmessage),    m_extradata(lextradata)
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
     MythEvent(const QString lmessage, const QString lextradata)
-           : QEvent((QEvent::Type)MythEventMessage),
+           : QEvent(MythEventMessage),
            m_message(lmessage),    m_extradata(lextradata)
     {
     }

@@ -646,7 +646,7 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
  */
 void UPNPScanner::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(event->type()) != MythEvent::MythEventMessage)
+    if (event->type() != MythEvent::MythEventMessage)
         return;
 
     // UPnP events

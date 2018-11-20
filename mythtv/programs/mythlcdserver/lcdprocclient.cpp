@@ -2451,7 +2451,7 @@ LCDProcClient::~LCDProcClient()
 
 void LCDProcClient::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
 

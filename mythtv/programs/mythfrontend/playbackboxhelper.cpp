@@ -162,7 +162,7 @@ bool PBHEventHandler::event(QEvent *e)
         }
         return true;
     }
-    else if (e->type() == (QEvent::Type) MythEvent::MythEventMessage)
+    else if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent*>(e);
         if (me->Message() == "UPDATE_FREE_SPACE")
