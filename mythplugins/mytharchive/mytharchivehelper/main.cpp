@@ -1745,7 +1745,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                     }
                 }
 
-                if (thumbCount >= (int) list.count())
+                if (thumbCount >= list.count())
                     break;
             }
         }

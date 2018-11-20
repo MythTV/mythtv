@@ -194,7 +194,7 @@ int BufferedSocketDevice::ReadBytes()
         nread = m_pSocket->readBlock(
             a->data(), maxToRead ? std::min(nbytes, maxToRead) : nbytes);
 
-        if (( nread > 0 ) && ( nread != (int)a->size() ))
+        if (( nread > 0 ) && ( nread != a->size() ))
         {
             // unexpected
             a->resize( nread );
@@ -273,7 +273,7 @@ void BufferedSocketDevice::Flush()
         int nwritten = 0;
         int i = 0;
 
-        if ( (int)a->size() - m_nWriteIndex < 1460 ) 
+        if ( a->size() - m_nWriteIndex < 1460 )
         {
             QByteArray out;
             out.resize(65536);
@@ -281,7 +281,7 @@ void BufferedSocketDevice::Flush()
             int j = m_nWriteIndex;
             int s = a->size() - j;
 
-            while ( a && i+s < (int)out.size() ) 
+            while ( a && i+s < out.size() )
             {
                 memcpy( out.data()+i, a->data()+j, s );
                 j = 0;

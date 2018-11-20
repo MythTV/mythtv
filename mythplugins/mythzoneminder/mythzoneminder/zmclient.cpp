@@ -436,7 +436,7 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
     }
 
     // sanity check
-    if ((int)(strList.size() - 2) / 6 != eventCount)
+    if ((strList.size() - 2) / 6 != eventCount)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient got a mismatch between the number of events and "
@@ -487,7 +487,7 @@ void ZMClient::getEventDates(const QString &monitorName, bool oldestFirst,
     }
 
     // sanity check
-    if ((int)(strList.size() - 3) != dateCount)
+    if ((strList.size() - 3) != dateCount)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient got a mismatch between the number of dates and "
@@ -528,7 +528,7 @@ void ZMClient::getFrameList(int eventID, vector<Frame*> *frameList)
     }
 
     // sanity check
-    if ((int)(strList.size() - 2) / 2 != frameCount)
+    if ((strList.size() - 2) / 2 != frameCount)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient got a mismatch between the number of frames and "
@@ -889,7 +889,7 @@ void ZMClient::doGetMonitorList(void)
     }
 
     // sanity check
-    if ((int)(strList.size() - 2) / 5 != monitorCount)
+    if ((strList.size() - 2) / 5 != monitorCount)
     {
         LOG(VB_GENERAL, LOG_ERR,
             "ZMClient got a mismatch between the number of monitors and "

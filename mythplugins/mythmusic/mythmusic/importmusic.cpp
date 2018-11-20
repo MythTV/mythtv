@@ -1103,7 +1103,7 @@ void ImportCoverArtDialog::prevPressed()
 
 void ImportCoverArtDialog::nextPressed()
 {
-    if (m_currentFile < (int) m_filelist.size() - 1)
+    if (m_currentFile < m_filelist.size() - 1)
     {
         m_currentFile++;
         updateTypeSelector();

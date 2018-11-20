@@ -1243,7 +1243,7 @@ void Ripper::updateTrackList(void)
         m_trackList->Reset();
 
         int i;
-        for (i = 0; i < (int)m_tracks->size(); i++)
+        for (i = 0; i < m_tracks->size(); i++)
         {
             if (i >= m_tracks->size())
                 break;

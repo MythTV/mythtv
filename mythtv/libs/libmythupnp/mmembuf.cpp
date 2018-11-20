@@ -126,7 +126,7 @@ bool MMembuf::scanNewline(QByteArray *store)
         if (store) {
             while (n-- > 0) {
                 *(store->data()+i) = *p;
-                if (++i == (int)store->size())
+                if (++i == store->size())
                     store->resize(store->size() < 256
                                    ? 1024 : store->size()*4);
                 if (*p == '\n') {

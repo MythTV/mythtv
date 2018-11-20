@@ -360,7 +360,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 
         if (restore)
         {
-            if (x <= (int) monList.size())
+            if (x <= monList.size())
             {
                 QString s = monList.at(x - 1);
                 int monID = s.toInt(); 

@@ -318,7 +318,7 @@ bool DecoderBase::PosMapFromEnc(void)
 unsigned long DecoderBase::GetPositionMapSize(void) const
 {
     QMutexLocker locker(&m_positionMapLock);
-    return (unsigned long) m_positionMap.size();
+    return m_positionMap.size();
 }
 
 /** \fn DecoderBase::SyncPositionMap()

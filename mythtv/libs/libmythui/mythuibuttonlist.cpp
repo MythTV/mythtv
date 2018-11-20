@@ -843,11 +843,11 @@ bool MythUIButtonList::DistributeButtons(void)
                 else if (!m_ButtonList.empty())
                 {
                     if (m_itemCount - m_selPosition - 1 <
-                        (static_cast<int>(m_ButtonList.size()) / 2))
+                        (m_ButtonList.size() / 2))
                         start_button = m_ButtonList.size() -
                                        (m_itemCount - m_selPosition) + 1;
                     else if (m_selPosition >
-                             (static_cast<int>(m_ButtonList.size()) / 2))
+                             (m_ButtonList.size() / 2))
                         start_button = (m_ButtonList.size() / 2);
                     else
                         start_button = m_selPosition;
@@ -886,11 +886,11 @@ bool MythUIButtonList::DistributeButtons(void)
              * Attempt to pick a start_button which will minimize the need
              * for new button allocations.
              */
-            start_button = qMax((int)m_ButtonList.size() / 2, 0);
+            start_button = qMax(m_ButtonList.size() / 2, 0);
             start_button = (start_button / qMax(m_columns, 1)) * m_columns;
 
             if (start_button < m_itemCount / 2 &&
-                m_itemCount - m_selPosition - 1 < (int)m_ButtonList.size() / 2)
+                m_itemCount - m_selPosition - 1 < m_ButtonList.size() / 2)
                 start_button += m_columns;
 
             first_button = last_button = start_button;
@@ -2069,7 +2069,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
             break;
 
         case MoveMid:
-            m_selPosition = (int)(m_itemList.size() / 2);
+            m_selPosition = m_itemList.size() / 2;
             FindEnabledUp(unit);
             break;
 

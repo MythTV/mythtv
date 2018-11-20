@@ -772,7 +772,7 @@ bool MythRenderOpenGL::CreateFrameBuffer(uint &fb, uint tex)
     m_glBindFramebuffer(GL_FRAMEBUFFER, glfb);
     glBindTexture(m_textures[tex].m_type, tex);
     glTexImage2D(m_textures[tex].m_type, 0, m_textures[tex].m_internal_fmt,
-                 (GLint) size.width(), (GLint) size.height(), 0,
+                 size.width(), size.height(), 0,
                  m_textures[tex].m_data_fmt, m_textures[tex].m_data_type, nullptr);
     m_glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                              m_textures[tex].m_type, tex, 0);
