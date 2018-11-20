@@ -520,7 +520,7 @@ bool RecordingRule::Delete(bool sendSig)
         MythDB::DBError("ScheduledRecording::remove -- oldfind", query);
     }
 
-    if (m_searchType == kManualSearch)
+    if (m_searchType == kManualSearch && m_recordID)
     {
         query.prepare("DELETE FROM program WHERE manualid = :RECORDID");
         query.bindValue(":RECORDID", m_recordID);
