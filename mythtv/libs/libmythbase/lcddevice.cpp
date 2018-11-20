@@ -243,7 +243,7 @@ void LCD::sendToServerSlot(const QString &someText)
     if (m_connected)
     {
         LOG(VB_NETWORK, LOG_DEBUG, LOC +
-            QString(LOC + "Sending to Server: %1").arg(someText));
+            QString("Sending to Server: %1").arg(someText));
 
         // Just stream the text out the socket
         os << someText << "\n";
