@@ -483,7 +483,7 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
 
         usleep(1000);
         uint64_t chd_timestamp = 0; // 100 nsec units
-        if (buffer->pts != (int64_t)AV_NOPTS_VALUE)
+        if (buffer->pts != AV_NOPTS_VALUE)
             chd_timestamp = (uint64_t)(av_q2d(stream->time_base) *
                                        buffer->pts * 10000000);
         LOG(VB_TIMESTAMP, LOG_DEBUG, LOC +

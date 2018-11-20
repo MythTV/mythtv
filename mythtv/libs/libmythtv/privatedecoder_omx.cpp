@@ -72,7 +72,7 @@ static const char *H264Profile2String(int profile);
 // Convert PTS <> OMX ticks
 static inline OMX_TICKS Pts2Ticks(AVStream *stream, int64_t pts)
 {
-    if (pts == int64_t(AV_NOPTS_VALUE))
+    if (pts == AV_NOPTS_VALUE)
         return S64_TO_TICKS(0);
 
     return S64_TO_TICKS( int64_t(

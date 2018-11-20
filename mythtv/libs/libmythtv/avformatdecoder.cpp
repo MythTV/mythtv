@@ -565,7 +565,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
     if (!st)
         return false;
 
-    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (ic->start_time != AV_NOPTS_VALUE)
         start_pts = av_rescale(ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
@@ -585,7 +585,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
 {
     int64_t start_pts = 0, pts;
 
-    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (ic->start_time != AV_NOPTS_VALUE)
         start_pts = av_rescale(ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
@@ -714,7 +714,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     }
 
     long long ts = 0;
-    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (ic->start_time != AV_NOPTS_VALUE)
         ts = ic->start_time;
 
     // convert framenumber to normalized timestamp
@@ -736,12 +736,12 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     int normalframes = 0;
 
-    if (st && st->cur_dts != (int64_t)AV_NOPTS_VALUE)
+    if (st && st->cur_dts != AV_NOPTS_VALUE)
     {
 
         int64_t adj_cur_dts = st->cur_dts;
 
-        if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+        if (ic->start_time != AV_NOPTS_VALUE)
         {
             int64_t st1 = av_rescale(ic->start_time,
                                     st->time_base.den,
@@ -1303,7 +1303,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (dur == 0)
     {
-        if ((ic->duration == (int64_t)AV_NOPTS_VALUE) &&
+        if ((ic->duration == AV_NOPTS_VALUE) &&
             (!livetv && !ringBuffer->IsDisc()))
             av_estimate_timings(ic, 0);
 
@@ -3701,7 +3701,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
     mpa_pic->reordered_opaque = AV_NOPTS_VALUE;
 
-    if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
+    if (pkt->pts != AV_NOPTS_VALUE)
         pts_detected = true;
 
     bool tryAgain = true;
@@ -3818,12 +3818,12 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             int64_t pts = 0;
 
             // Detect faulty video timestamps using logic from ffplay.
-            if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            if (pkt->dts != AV_NOPTS_VALUE)
             {
                 faulty_dts += (pkt->dts <= last_dts_for_fault_detection);
                 last_dts_for_fault_detection = pkt->dts;
             }
-            if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+            if (mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
             {
                 faulty_pts += (mpa_pic->reordered_opaque <= last_pts_for_fault_detection);
                 last_pts_for_fault_detection = mpa_pic->reordered_opaque;
@@ -3838,29 +3838,29 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             // more faulty or never detected.
             if (force_dts_timestamps)
             {
-                if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+                if (pkt->dts != AV_NOPTS_VALUE)
                     pts = pkt->dts;
                 pts_selected = false;
             }
             else if (ringBuffer->IsDVD())
             {
-                if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+                if (pkt->dts != AV_NOPTS_VALUE)
                     pts = pkt->dts;
                 pts_selected = false;
             }
             else if (private_dec && private_dec->NeedsReorderedPTS() &&
-                    mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+                    mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
             {
                 pts = mpa_pic->reordered_opaque;
                 pts_selected = true;
             }
             else if (faulty_pts <= faulty_dts && reordered_pts_detected)
             {
-                if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+                if (mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
                     pts = mpa_pic->reordered_opaque;
                 pts_selected = true;
             }
-            else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            else if (pkt->dts != AV_NOPTS_VALUE)
             {
                 pts = pkt->dts;
                 pts_selected = false;
@@ -4303,7 +4303,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     long long pts = 0;
 
-    if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+    if (pkt->dts != AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
     avcodeclock->lock();
@@ -5017,7 +5017,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             || !m_audio->HasAudioOut())
             break;
 
-        if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
+        if (firstloop && pkt->pts != AV_NOPTS_VALUE)
             lastapts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
 
         if (!use_frame_timing)
@@ -5423,7 +5423,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     break;
                 }
 
-                if (pkt->pts != (int64_t) AV_NOPTS_VALUE)
+                if (pkt->pts != AV_NOPTS_VALUE)
                 {
                     lastccptsu = (long long)
                                  (av_q2d(curstream->time_base)*pkt->pts*1000000);
@@ -5806,18 +5806,18 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
         return;
 
    duration = INT64_MIN;
-   if (st->start_time != (int64_t)AV_NOPTS_VALUE && st->time_base.den) {
+   if (st->start_time != AV_NOPTS_VALUE && st->time_base.den) {
        int64_t start_time1= av_rescale_q(st->start_time, st->time_base, AV_TIME_BASE_Q);
        if (start_time1 < start_time)
            start_time = start_time1;
-       if (st->duration != (int64_t)AV_NOPTS_VALUE) {
+       if (st->duration != AV_NOPTS_VALUE) {
            int64_t end_time1 = start_time1 +
                       av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
            if (end_time1 > end_time)
                end_time = end_time1;
        }
    }
-   if (st->duration != (int64_t)AV_NOPTS_VALUE) {
+   if (st->duration != AV_NOPTS_VALUE) {
        int64_t duration1 = av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
        if (duration1 > duration)
            duration = duration1;
