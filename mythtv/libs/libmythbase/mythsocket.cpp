@@ -1001,10 +1001,10 @@ void MythSocket::ResetReal(void)
     m_tcpSocket->waitForReadyRead(30);
     do
     {
-        uint avail = m_tcpSocket->bytesAvailable();
+        uint64_t avail = m_tcpSocket->bytesAvailable();
         if (avail)
         {
-            trash.resize(max((uint)trash.size(),avail));
+            trash.resize(max(trash.size(),avail));
             m_tcpSocket->read(trash.data(), avail);
         }
 

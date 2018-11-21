@@ -552,7 +552,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     nMX = (nMX > 120) ? 120 : nMX;
 
-    int nNewMX = (int)(0 + ((unsigned short)random() % nMX)) * 1000;
+    int nNewMX = (0 + ((unsigned short)random() % nMX)) * 1000;
 
     // ----------------------------------------------------------------------
     // See what they are looking for...

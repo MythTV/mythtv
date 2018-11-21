@@ -312,7 +312,7 @@ quint64 PList::GetBinaryUInt(quint8 *p, quint64 size)
     if (size == 1) return (quint64)(*(p));
     if (size == 2) return (quint64)(*((quint16*)convert_int(p, 2)));
     if (size == 4) return (quint64)(*((quint32*)convert_int(p, 4)));
-    if (size == 8) return (quint64)(*((quint64*)convert_int(p, 8)));
+    if (size == 8) return          (*((quint64*)convert_int(p, 8)));
 
     if (size == 3)
     {
@@ -497,7 +497,7 @@ QVariant PList::ParseBinaryUnicode(quint8 *data)
     QByteArray tmp;
     for (quint64 i = 0; i < count; i++, data += 2)
     {
-        quint16 twobyte = (quint16)(*((quint16*)convert_int(data, 2)));
+        quint16 twobyte = (*((quint16*)convert_int(data, 2)));
         tmp.append((quint8)(twobyte & 0xff));
         tmp.append((quint8)((twobyte >> 8) & 0xff));
     }

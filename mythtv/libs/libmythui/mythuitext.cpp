@@ -705,8 +705,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             if (lines >= 1)
             {
                 // Too wide?
-                width -= width *
-                         (lines / static_cast<qreal>(num_lines - 1 + lines));
+                width -= width * (lines / num_lines - 1 + lines);
                 if (static_cast<int>(width) == last_width)
                 {
                     m_Cutdown = cutdown;

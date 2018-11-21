@@ -418,7 +418,7 @@ private:
             bool ok = false;
             int result = elem.attribute(attrname).toInt(&ok);
             if (ok)
-                return int(result);
+                return result;
         }
         return int();
     }

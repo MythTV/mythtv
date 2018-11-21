@@ -1299,7 +1299,7 @@ quint16 UnzipPrivate::getUShort(const unsigned char* data, quint32 offset) const
 int UnzipPrivate::decryptByte(quint32 key2) const
 {
 	quint16 temp = ((quint16)(key2) & 0xffff) | 2;
-	return (int)(((temp * (temp ^ 1)) >> 8) & 0xff);
+	return ((temp * (temp ^ 1)) >> 8) & 0xff;
 }
 
 /*!

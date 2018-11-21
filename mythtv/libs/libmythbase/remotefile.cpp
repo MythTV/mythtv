@@ -800,15 +800,15 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         else
             return -1;
 
-        off64_t localpos = ::lseek64(localFile, (off64_t)pos, whence);
-        if (localpos != (off64_t)pos)
+        off64_t localpos = ::lseek64(localFile, pos, whence);
+        if (localpos != pos)
         {
             LOG(VB_FILE, LOG_ERR,
                 QString("RemoteFile::Seek(): Couldn't seek to offset %1")
                 .arg(offset));
             return -1;
         }
-        return (long long)localpos;
+        return localpos;
     }
 
     if (!CheckConnection(false))
@@ -864,7 +864,7 @@ int RemoteFile::Write(const void *data, int size)
                 "RemoteFile::Write(): File not opened");
             return -1;
         }
-        return (int)fileWriter->Write(data, size);
+        return fileWriter->Write(data, size);
     }
 
     QMutexLocker locker(&lock);

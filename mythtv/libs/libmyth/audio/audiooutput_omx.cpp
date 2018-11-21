@@ -378,7 +378,7 @@ bool AudioOutputOMX::OpenDevice(void)
         def.nBufferSize);
     def.nBufferCountActual = std::max(OMX_U32(10), def.nBufferCountActual);
     //def.bBuffersContiguous = OMX_FALSE;
-    def.nBufferAlignment = std::max(OMX_U32(sizeof(int)), def.nBufferAlignment);
+    def.nBufferAlignment = std::max(sizeof(int), def.nBufferAlignment);
     e = m_audiorender.SetParameter(OMX_IndexParamPortDefinition, &def);
     if (e != OMX_ErrorNone)
     {
