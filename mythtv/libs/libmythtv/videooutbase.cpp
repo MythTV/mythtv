@@ -1132,7 +1132,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             AVFrame img_in, img_out;
             av_image_fill_arrays(
                 img_out.data, img_out.linesize,
-                (uint8_t *)pip_tmp_buf, AV_PIX_FMT_YUV420P,
+                pip_tmp_buf, AV_PIX_FMT_YUV420P,
                 pip_display_size.width(), pip_display_size.height(),
                 IMAGE_ALIGN);
 
@@ -1148,7 +1148,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             {
                 AVFrame img_padded;
                 av_image_fill_arrays(img_padded.data, img_padded.linesize,
-                    (uint8_t *)pip_tmp_buf2,
+                    pip_tmp_buf2,
                     AV_PIX_FMT_YUV420P, pipw, piph, IMAGE_ALIGN);
 
                 int color[3] = { 20, 0, 200 }; //deep red YUV format
@@ -1263,10 +1263,10 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
         AVFrame img_in, img_out;
 
         av_image_fill_arrays(img_out.data, img_out.linesize,
-            (uint8_t *)vsz_tmp_buf, AV_PIX_FMT_YUV420P,
+            vsz_tmp_buf, AV_PIX_FMT_YUV420P,
             resize.width(), resize.height(),IMAGE_ALIGN);
         av_image_fill_arrays(img_in.data, img_in.linesize,
-            (uint8_t *)frame->buf, AV_PIX_FMT_YUV420P,
+            frame->buf, AV_PIX_FMT_YUV420P,
             frame->width, frame->height,IMAGE_ALIGN);
         img_in.data[0] = frame->buf + frame->offsets[0];
         img_in.data[1] = frame->buf + frame->offsets[1];

@@ -603,7 +603,7 @@ void TeletextScreen::DrawRect(int row, QRect rect)
 
     QBrush bgfill = QBrush(m_bgColor, Qt::SolidPattern);
     QPainter painter(image);
-    painter.setBrush(QBrush(bgfill));
+    painter.setBrush(bgfill);
     painter.setPen(QPen(Qt::NoPen));
     painter.drawRect(rect);
     painter.end();

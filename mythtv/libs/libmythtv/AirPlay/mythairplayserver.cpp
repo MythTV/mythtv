@@ -818,8 +818,8 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         {
             content_type = "text/parameters\r\n";
             body = QString("duration: %1\r\nposition: %2\r\n")
-                .arg((double)duration, 0, 'f', 6, '0')
-                .arg((double)position, 0, 'f', 6, '0');
+                .arg(duration, 0, 'f', 6, '0')
+                .arg(position, 0, 'f', 6, '0');
 
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Scrub: (get) returned %1 of %2")
@@ -968,9 +968,9 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         else
         {
             body = PLAYBACK_INFO;
-            body.replace("%1", QString("%1").arg((double)duration, 0, 'f', 6, '0'));
-            body.replace("%2", QString("%1").arg((double)duration, 0, 'f', 6, '0')); // cached
-            body.replace("%3", QString("%1").arg((double)position, 0, 'f', 6, '0'));
+            body.replace("%1", QString("%1").arg(duration, 0, 'f', 6, '0'));
+            body.replace("%2", QString("%1").arg(duration, 0, 'f', 6, '0')); // cached
+            body.replace("%3", QString("%1").arg(position, 0, 'f', 6, '0'));
             body.replace("%4", playerspeed > 0.0f ? "1.0" : "0.0");
             LOG(VB_GENERAL, LOG_DEBUG, body);
             SendReverseEvent(session, playerspeed > 0.0f ? AP_EVENT_PLAYING :
@@ -1260,7 +1260,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
             .arg(m_pathname));
 
         MythEvent* me = new MythEvent(ACTION_SEEKABSOLUTE,
-                                      QStringList(QString::number((uint64_t)position)));
+                                      QStringList(QString::number(position)));
         qApp->postEvent(GetMythMainWindow(), me);
         // Wait until we receive that the seek has completed
         gCoreContext->WaitUntilSignals(SIGNAL(TVPlaybackSought(qint64)),

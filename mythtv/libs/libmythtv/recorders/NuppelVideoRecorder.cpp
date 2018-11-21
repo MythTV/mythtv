@@ -3009,7 +3009,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         {
             int r = 0;
             if (raw)
-                r = lzo1x_1_compress((unsigned char*)frame->buf, frame->size,
+                r = lzo1x_1_compress(frame->buf, frame->size,
                                      out, &out_len, wrkmem);
             else
                 r = lzo1x_1_compress((unsigned char *)strm, tmp, out,

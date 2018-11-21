@@ -187,13 +187,13 @@ void MHIContext::Restart(int chanid, int sourceid, bool isLive)
         QString("[mhi] Restart ch=%1 source=%2 live=%3 tuneinfo=0x%4")
         .arg(chanid).arg(sourceid).arg(isLive).arg(tuneinfo,0,16));
 
-    if (m_currentSource != (int)sourceid)
+    if (m_currentSource != sourceid)
     {
         m_currentSource = sourceid;
         QMutexLocker locker(&m_channelMutex);
         m_channelCache.clear();
     }
-    m_currentStream = (chanid) ? (int)chanid : -1;
+    m_currentStream = (chanid) ? chanid : -1;
     if (!(tuneinfo & kTuneKeepChnl))
         m_currentChannel = m_currentStream;
 
@@ -258,7 +258,7 @@ void MHIContext::run(void)
         int key = 0;
         do
         {
-            (void)NetworkBootRequested();
+            NetworkBootRequested();
             ProcessDSMCCQueue();
             {
                 QMutexLocker locker(&m_keyLock);
@@ -1947,7 +1947,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
             nContentWidth, nContentHeight,IMAGE_ALIGN);
 
         AVFrame *tmp = picture;
-        m_copyCtx->Copy(&retbuf, AV_PIX_FMT_RGB24, (AVFrame*)tmp, c->pix_fmt,
+        m_copyCtx->Copy(&retbuf, AV_PIX_FMT_RGB24, tmp, c->pix_fmt,
                      nContentWidth, nContentHeight);
 
         uint8_t * buf = outputbuf;

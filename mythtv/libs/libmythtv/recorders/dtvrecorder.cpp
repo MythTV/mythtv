@@ -1152,18 +1152,18 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
             if ((stream_id >= PESStreamID::MPEGVideoStreamBegin) &&
                 (stream_id <= PESStreamID::MPEGVideoStreamEnd))
             { // ok-dvdinfo
-                _video_bytes_remaining = std::max(0, (int)pes_packet_length);
+                _video_bytes_remaining = std::max(0, pes_packet_length);
             }
             else if ((stream_id >= PESStreamID::MPEGAudioStreamBegin) &&
                      (stream_id <= PESStreamID::MPEGAudioStreamEnd))
             { // ok-dvdinfo
-                _audio_bytes_remaining = std::max(0, (int)pes_packet_length);
+                _audio_bytes_remaining = std::max(0, pes_packet_length);
             }
         }
 
         if (PESStreamID::PaddingStream == stream_id)
         { // ok-dvdinfo
-            _other_bytes_remaining = std::max(0, (int)pes_packet_length);
+            _other_bytes_remaining = std::max(0, pes_packet_length);
         }
 
         _start_code = 0xffffffff; // reset start code
@@ -1401,9 +1401,9 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
         // For now it's the 'best' codec, assuming mpeg stream types range
         // from worst to best, which it does
         if (!seenAudio && StreamID::IsAudio(pmt->StreamType(i)) &&
-            static_cast<uint>(pmt->StreamType(i)) > bestAudioCodec)
+            pmt->StreamType(i) > bestAudioCodec)
         {
-            bestAudioCodec = static_cast<uint>(pmt->StreamType(i));
+            bestAudioCodec = pmt->StreamType(i);
             switch (pmt->StreamType(i))
             {
                 case StreamID::MPEG1Audio:

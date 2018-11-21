@@ -665,8 +665,8 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
     int dfield = pict_attr_default[db_col_name];
     int field  = (cfield + sfield + dfield) & 0xFFFF;
     int value0 = (int) ((scl_range * field) + qctrl.minimum);
-    int value1 = min(value0, (int)qctrl.maximum);
-    ctrl.value = max(value1, (int)qctrl.minimum);
+    int value1 = min(value0, qctrl.maximum);
+    ctrl.value = max(value1, qctrl.minimum);
 
 #if DEBUG_ATTRIB
     LOG(VB_CHANNEL, LOG_DEBUG, loc + QString(" %1\n\t\t\t"

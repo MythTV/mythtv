@@ -22,8 +22,8 @@ uint64_t string_to_guid(const QString &guid)
     // QString::toULongLong() is not supported in older Qt's..
     QString guid_l = guid.right(8);
     QString guid_h = guid.left(guid.length() - 8);
-    return (((uint64_t)guid_h.toULong(nullptr, 16)) << 32 |
-            ((uint64_t)guid_l.toULong(nullptr, 16)));
+    return ((guid_h.toULong(nullptr, 16)) << 32 |
+            (guid_l.toULong(nullptr, 16)));
 }
 
 AVCInfo::AVCInfo() :

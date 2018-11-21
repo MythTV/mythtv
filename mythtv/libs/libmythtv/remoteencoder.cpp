@@ -605,7 +605,7 @@ void RemoteEncoder::ChangeDeinterlacer(int deint_mode)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "CHANGE_DEINTERLACER";
-    strlist << QString::number((int)deint_mode);
+    strlist << QString::number(deint_mode);
 
     SendReceiveStringList(strlist);
 }
@@ -713,7 +713,7 @@ void RemoteEncoder::GetNextProgram(int direction,
     strlist << "GET_NEXT_PROGRAM_INFO";
     strlist << channelname;
     strlist << chanid;
-    strlist << QString::number((int)direction);
+    strlist << QString::number(direction);
     strlist << starttime;
 
     if (!SendReceiveStringList(strlist, 12))

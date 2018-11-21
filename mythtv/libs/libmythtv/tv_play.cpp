@@ -2010,7 +2010,7 @@ void TV::ShowOSDAskAllow(PlayerContext *ctx)
         {
             if (!(*it).is_in_same_input_group)
                 (*it).is_conflicting = false;
-            else if (cardid == (uint)(*it).info->GetInputID())
+            else if (cardid == (*it).info->GetInputID())
                 (*it).is_conflicting = true;
             else if (!CardUtil::IsTunerShared(cardid, (*it).info->GetInputID()))
                 (*it).is_conflicting = true;
@@ -6851,7 +6851,7 @@ void TV::DoSeekAbsolute(PlayerContext *ctx, long long seconds,
     DoSeek(ctx, seconds, tr("Jump To"),
            /*timeIsOffset*/false,
            honorCutlist);
-    gCoreContext->emitTVPlaybackSought((qint64)seconds);
+    gCoreContext->emitTVPlaybackSought(seconds);
 }
 
 void TV::DoArbSeek(PlayerContext *ctx, ArbSeekWhence whence,
@@ -10145,7 +10145,7 @@ PictureAttribute TV::NextPictureAdjustType(
                kPictureAttributeSupported_Hue);
     }
 
-    return ::next((PictureAttributeSupported)sup, (PictureAttribute) attr);
+    return ::next((PictureAttributeSupported)sup, attr);
 }
 
 void TV::DoToggleStudioLevels(const PlayerContext *ctx)

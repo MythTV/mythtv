@@ -637,7 +637,7 @@ QRect VideoOutWindow::GetTotalOSDBounds(void) const
 void VideoOutWindow::ToggleAdjustFill(AdjustFillMode adjustFill)
 {
     if (adjustFill == kAdjustFill_Toggle)
-        adjustFill = (AdjustFillMode) ((int) (adjustfill + 1) % kAdjustFill_END);
+        adjustFill = (AdjustFillMode) ((adjustfill + 1) % kAdjustFill_END);
 
     adjustfill = adjustFill;
 
@@ -813,8 +813,7 @@ void VideoOutWindow::ToggleAspectOverride(AspectOverrideMode aspectMode)
 
     if (aspectMode == kAspect_Toggle)
     {
-        aspectMode = (AspectOverrideMode) ((int) (aspectoverride + 1)
-                                           % kAspect_END);
+        aspectMode = (AspectOverrideMode) ((aspectoverride + 1) % kAspect_END);
     }
 
     aspectoverride = aspectMode;
@@ -830,7 +829,7 @@ QRect VideoOutWindow::GetPIPRect(
 {
     QRect position;
 
-    float pipVideoAspect = pipplayer ? (float) pipplayer->GetVideoAspect()
+    float pipVideoAspect = pipplayer ? pipplayer->GetVideoAspect()
         : (4.0f / 3.0f);
     int tmph = (display_visible_rect.height() * db_pip_size) / 100;
     float pixel_adj = 1;

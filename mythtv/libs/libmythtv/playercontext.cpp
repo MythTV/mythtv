@@ -177,7 +177,7 @@ QRect PlayerContext::GetStandAlonePIPRect(void)
     QMutexLocker locker(&deletePlayerLock);
     if (player)
     {
-        rect = QRect(pipRect);
+        rect = pipRect;
 
         float saspect = (float)rect.width() / (float)rect.height();
         float vaspect = player->GetVideoAspect();
@@ -204,7 +204,7 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
 
     if (!useNullVideo && parentWidget)
     {
-        const QRect rect = QRect(pipRect);
+        const QRect rect = pipRect;
         ok = CreatePlayer(tv, parentWidget, desiredState,
                           true, rect);
     }

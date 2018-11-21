@@ -237,7 +237,7 @@ bool FileRingBuffer::OpenFile(const QString &lfilename, uint retry_ms)
             else
             {
                 int ret = read(fd2, buf, kReadTestSize);
-                if (ret != (int)kReadTestSize)
+                if (ret != kReadTestSize)
                 {
                     lasterror = 2;
                     close(fd2);

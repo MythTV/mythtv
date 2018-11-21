@@ -1005,7 +1005,7 @@ void RingBuffer::run(void)
         {
             // limit the read size
             if (readblocksize > totfree)
-                totfree = (long long)(totfree / KB32) * KB32; // must be multiple of 32KB
+                totfree = (totfree / KB32) * KB32; // must be multiple of 32KB
             else
                 totfree = readblocksize;
 

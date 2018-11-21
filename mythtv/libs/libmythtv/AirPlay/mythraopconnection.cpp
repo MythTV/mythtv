@@ -397,7 +397,7 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
 
     if (m_audioStarted)
     {
-        currentLatency = (int64_t)audiots - (int64_t)m_currentTimestamp;
+        currentLatency = audiots - (int64_t)m_currentTimestamp;
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -589,7 +589,7 @@ bool MythRAOPConnection::GetPacketType(const QByteArray &buf, uint8_t &type,
         return false;
     }
 
-    type = (char)buf[1];
+    type = buf[1];
     // Is it first sync packet?
     if ((uint8_t)buf[0] == 0x90 && type == FIRSTSYNC)
     {

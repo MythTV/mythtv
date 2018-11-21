@@ -957,7 +957,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             return true;
 
         AVFrame *tmp = mpa_pic;
-        copyFrame.Copy(frame, (AVFrame*)tmp, mpa_vidctx->pix_fmt);
+        copyFrame.Copy(frame, tmp, mpa_vidctx->pix_fmt);
     }
 
     return true;

@@ -1983,7 +1983,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
         lang_cc_cnt[type][nsi.language]++;
         nsi.language_index = lang_indx;
         tracks[(type) ? kTrackTypeCC708 : kTrackTypeCC608].push_back(nsi);
-        int key = (int)nsi.stream_id + ((type) ? 4 : -1);
+        int key = nsi.stream_id + ((type) ? 4 : -1);
         if (key < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "in_tracks key too small");

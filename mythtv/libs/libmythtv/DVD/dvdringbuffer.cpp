@@ -2148,7 +2148,7 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
     {
         unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, physical);
         if (channels != 0xff)
-            numChannels = (uint8_t)channels;
+            numChannels = channels;
     }
 
     return numChannels;

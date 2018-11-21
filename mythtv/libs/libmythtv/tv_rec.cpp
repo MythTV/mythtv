@@ -2448,7 +2448,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         if (fchannum[i] == prefix)
         {
             is_complete_valid_channel_on_rec = finputid[i];
-            if (finputid[i] == (uint)inputid)
+            if (finputid[i] == inputid)
                 break;
         }
     }

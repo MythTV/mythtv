@@ -1024,7 +1024,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
 
             AVFrame img_in, img_out;
             av_image_fill_arrays(img_out.data, img_out.linesize,
-                (uint8_t *)vf.buf, out_fmt, out_width,
+                vf.buf, out_fmt, out_width,
                 out_height, IMAGE_ALIGN);
             av_image_fill_arrays(img_in.data, img_in.linesize,
                 src, in_fmt, in_width, in_height, IMAGE_ALIGN);

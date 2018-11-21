@@ -973,7 +973,7 @@ DTC::LiveStreamInfo *HTTPLiveStream::GetLiveStreamInfo(
     if (!info)
         info = new DTC::LiveStreamInfo();
 
-    info->setId((int)m_streamid);
+    info->setId(m_streamid);
     info->setWidth((int)m_width);
     info->setHeight((int)m_height);
     info->setBitrate((int)m_bitrate);

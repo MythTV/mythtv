@@ -236,7 +236,7 @@ int AVFormatWriter::WriteVideoFrame(VideoFrame *frame)
     int framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
     av_frame_unref(m_picture);
-    AVPictureFill(reinterpret_cast<AVFrame*>(m_picture), frame);
+    AVPictureFill(m_picture, frame);
     m_picture->pts = framesEncoded + 1;
 
     if ((framesEncoded % m_keyFrameDist) == 0)
@@ -354,7 +354,7 @@ int AVFormatWriter::WriteAudioFrame(unsigned char *buf, int /*fnum*/, long long 
         // init AVFrame for planar data (input is interleaved)
         for (int j = 0, jj = 0; j < m_audioChannels; j++, jj += m_audioFrameSize)
         {
-            m_audPicture->data[j] = (uint8_t*)(m_audioInPBuf + jj * sampleSizeOut);
+            m_audPicture->data[j] = m_audioInPBuf + jj * sampleSizeOut;
         }
     }
     else

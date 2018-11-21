@@ -852,8 +852,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
 
     if (!ok && window.GetPIPState() == kPIPOff)
     {
-        use_xv     |= (bool) renderers.contains("xv-blit");
-        use_shm    |= (bool) renderers.contains("xshm");
+        use_xv     |= renderers.contains("xv-blit");
+        use_shm    |= renderers.contains("xshm");
         ok = InitVideoBuffers(use_xv, use_shm);
     }
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
@@ -1293,8 +1293,8 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
             xv_buffers[(unsigned char*) XJ_shm_infos[i]->shmaddr];
         if (image)
         {
-            if ((XImage*)image == (XImage*)XJ_non_xv_image)
-                XDestroyImage((XImage*)XJ_non_xv_image);
+            if ((XImage*)image == XJ_non_xv_image)
+                XDestroyImage(XJ_non_xv_image);
             else
                 XFree(image);
         }
@@ -1449,7 +1449,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         unsigned char *sbuf = (unsigned char*)av_malloc(size);
 
         av_image_fill_arrays(image_out.data, image_out.linesize,
-            (uint8_t *)sbuf, AV_PIX_FMT_YUV420P,
+            sbuf, AV_PIX_FMT_YUV420P,
             out_width, out_height, IMAGE_ALIGN);
         AVPictureFill(&image_in, buffer);
         QMutexLocker locker(&lock);
@@ -1520,7 +1520,7 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
     if (dispyoff < 0)
     {
         dest_y_incr = -dispyoff;
-        src_y_incr = (int) (dest_y_incr * imgh / disphoff);
+        src_y_incr = dest_y_incr * imgh / disphoff;
         xv_src_y_incr -= (int) (0.5 * dest_y_incr * imgh / disphoff);
     }
 

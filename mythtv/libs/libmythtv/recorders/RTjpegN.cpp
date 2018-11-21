@@ -143,7 +143,7 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t /*bt8*/)
  if (ci==0) {
    ustrm[1]= bitten;
    co = 2;
-   return (int)co;
+   return co;
  }
 
  /* bitoff=0 because the high 6bit contain first non zero position */
@@ -271,7 +271,7 @@ fprintf(stdout, "\n\n");
 }
 #endif
 
- return (int)co;
+ return co;
 }
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -1539,11 +1539,11 @@ void RTjpeg::Idct(uint8_t *odata, int16_t *data, int rskip)
 {
 #ifdef MMX
 
-static mmx_t fix_141;         fix_141.q = (long long)0x5a825a825a825a82LL;
-static mmx_t fix_184n261; fix_184n261.q = (long long)0xcf04cf04cf04cf04LL;
-static mmx_t fix_184;         fix_184.q = (long long)0x7641764176417641LL;
-static mmx_t fix_n184;       fix_n184.q = (long long)0x896f896f896f896fLL;
-static mmx_t fix_108n184; fix_108n184.q = (long long)0xcf04cf04cf04cf04LL;
+static mmx_t fix_141;         fix_141.q = 0x5a825a825a825a82LL;
+static mmx_t fix_184n261; fix_184n261.q = 0xcf04cf04cf04cf04LL;
+static mmx_t fix_184;         fix_184.q = 0x7641764176417641LL;
+static mmx_t fix_n184;       fix_n184.q = 0x896f896f896f896fLL;
+static mmx_t fix_108n184; fix_108n184.q = 0xcf04cf04cf04cf04LL;
 
   mmx_t *wsptr = (mmx_t *)ws;
   mmx_t *dataptr = (mmx_t *)odata;
@@ -2806,13 +2806,13 @@ RTjpeg::RTjpeg(void)
 
 #ifdef MMX
     lmask.q = cmask.q = 0;
-    RTjpeg_ones.q =(long long)0x0001000100010001LL;
-    RTjpeg_half.q =(long long)0x7fff7fff7fff7fffLL;
-    RTjpeg_C4.q   =(long long)0x2D412D412D412D41LL;
-    RTjpeg_C6.q   =(long long)0x187E187E187E187ELL;
-    RTjpeg_C2mC6.q=(long long)0x22A322A322A322A3LL;
-    RTjpeg_C2pC6.q=(long long)0x539F539F539F539FLL;
-    RTjpeg_zero.q =(long long)0x0000000000000000LL;
+    RTjpeg_ones.q = 0x0001000100010001LL;
+    RTjpeg_half.q = 0x7fff7fff7fff7fffLL;
+    RTjpeg_C4.q   = 0x2D412D412D412D41LL;
+    RTjpeg_C6.q   = 0x187E187E187E187ELL;
+    RTjpeg_C2mC6.q= 0x22A322A322A322A3LL;
+    RTjpeg_C2pC6.q= 0x539F539F539F539FLL;
+    RTjpeg_zero.q = 0x0000000000000000LL;
 #else
     lmask = cmask = 0;
 #endif
@@ -3094,7 +3094,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *old, mmx_t *mask)
  mmx_t *mold=(mmx_t *)old;
  mmx_t *mblock=(mmx_t *)rblock;
  volatile mmx_t result;
- static mmx_t neg= { (unsigned long long)0xffffffffffffffffULL };
+ static mmx_t neg= { 0xffffffffffffffffULL };
 
  movq_m2r(*mask, mm7);
  movq_m2r(neg, mm6);

@@ -2096,8 +2096,8 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
                 int delta = (int)((timecode - prevtc)/play_speed) -
                                   (frame_interval / 1000);
                 // If timecode is off by a frame (dropped frame) wait to sync
-                if (delta > (int) frame_interval / 1200 &&
-                    delta < (int) frame_interval / 1000 * 3 &&
+                if (delta > frame_interval / 1200 &&
+                    delta < frame_interval / 1000 * 3 &&
                     prevrp == 0)
                 {
                     // wait an extra frame interval
@@ -5450,15 +5450,15 @@ void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
         info.values.insert(relPrefix + "totalseconds", playbackLen);
         info.values[relPrefix + "position"] = pos;
 
-        int phours = (int)secsplayed / 3600;
-        int pmins = ((int)secsplayed - phours * 3600) / 60;
-        int psecs = ((int)secsplayed - phours * 3600 - pmins * 60);
+        int phours = secsplayed / 3600;
+        int pmins = (secsplayed - phours * 3600) / 60;
+        int psecs = (secsplayed - phours * 3600 - pmins * 60);
 
         int shours = playbackLen / 3600;
         int smins = (playbackLen - shours * 3600) / 60;
         int ssecs = (playbackLen - shours * 3600 - smins * 60);
 
-        int secsbehind = max((playbackLen - (int) secsplayed), 0);
+        int secsbehind = max((playbackLen - secsplayed), 0);
         int sbhours = secsbehind / 3600;
         int sbmins = (secsbehind - sbhours * 3600) / 60;
         int sbsecs = (secsbehind - sbhours * 3600 - sbmins * 60);
