@@ -757,7 +757,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 }
 
                 if (commDetectMethod == COMM_DETECT_UNINIT) {
-                    commDetectMethod = (SkipTypes) skipTypes->value(val);
+                    commDetectMethod = skipTypes->value(val);
                 } else {
                     commDetectMethod = (SkipTypes) ((int)commDetectMethod
                                                   | (int)skipTypes->value(val));

@@ -90,9 +90,9 @@ void Cutter::NewFrame(int64_t currentFrame)
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Clean cut: discarding frame from %1 to %2: "
                             "vid %3 aud %4")
-                    .arg((long)currentFrame).arg((long)jumpTo)
-                    .arg((long)videoFramesToCut)
-                    .arg((long)audioFramesToCut));
+                    .arg(currentFrame).arg((long)jumpTo)
+                    .arg(videoFramesToCut)
+                    .arg(audioFramesToCut));
             }
         }
     }
@@ -112,7 +112,7 @@ bool Cutter::InhibitUseVideoFrame()
         if(videoFramesToCut == 0)
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Clean cut: end of video cut; audio frames left "
-                        "to cut %1") .arg((long)audioFramesToCut));
+                        "to cut %1") .arg(audioFramesToCut));
 
         return true;
     }
@@ -136,7 +136,7 @@ bool Cutter::InhibitUseAudioFrames(int64_t frames, long *totalAudio)
         if(audioFramesToCut == 0)
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Clean cut: end of audio cut; vidio frames left "
-                        "to cut %1") .arg((long)videoFramesToCut));
+                        "to cut %1") .arg(videoFramesToCut));
         return true;
     }
     else
@@ -148,7 +148,7 @@ bool Cutter::InhibitUseAudioFrames(int64_t frames, long *totalAudio)
         audioFramesToCut = 0;
         LOG(VB_GENERAL, LOG_INFO,
             QString("Clean cut: end of audio cut; vidio frames left to "
-                    "cut %1") .arg((long)videoFramesToCut));
+                    "cut %1") .arg(videoFramesToCut));
         return false;
     }
 }

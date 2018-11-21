@@ -286,7 +286,7 @@ void PanAnimation::updateCurrentValue(const QVariant &value)
 {
     if (m_parent && m_running)
     {
-        Slide *image = dynamic_cast<Slide *>(m_parent);
+        Slide *image = m_parent;
         image->SetPan(value.toPoint());
     }
 }

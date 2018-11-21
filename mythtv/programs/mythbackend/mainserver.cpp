@@ -6444,7 +6444,7 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
         {
             AlbumArtImage oldImage = *image;
 
-            image->imageType = (ImageType) newType;
+            image->imageType = newType;
 
             if (image->imageType == oldImage.imageType)
             {

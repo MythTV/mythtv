@@ -426,9 +426,9 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
     pBlurayInfo->setThumbCount(bdmeta->GetThumbnailCount());
     pBlurayInfo->setTopMenuSupported(bdmeta->GetTopMenuSupported());
     pBlurayInfo->setFirstPlaySupported(bdmeta->GetFirstPlaySupported());
-    pBlurayInfo->setNumHDMVTitles((uint)bdmeta->GetNumHDMVTitles());
-    pBlurayInfo->setNumBDJTitles((uint)bdmeta->GetNumBDJTitles());
-    pBlurayInfo->setNumUnsupportedTitles((uint)bdmeta->GetNumUnsupportedTitles());
+    pBlurayInfo->setNumHDMVTitles(bdmeta->GetNumHDMVTitles());
+    pBlurayInfo->setNumBDJTitles(bdmeta->GetNumBDJTitles());
+    pBlurayInfo->setNumUnsupportedTitles(bdmeta->GetNumUnsupportedTitles());
     pBlurayInfo->setAACSDetected(bdmeta->GetAACSDetected());
     pBlurayInfo->setLibAACSDetected(bdmeta->GetLibAACSDetected());
     pBlurayInfo->setAACSHandled(bdmeta->GetAACSHandled());

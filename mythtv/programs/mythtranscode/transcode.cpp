@@ -1532,7 +1532,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Processed: %1 of %2 frames(%3 seconds)").
-                        arg((long)curFrameNum).arg((long)total_frame_count).
+                        arg(curFrameNum).arg((long)total_frame_count).
                         arg((long)(curFrameNum / video_frame_rate)));
             }
 

@@ -445,7 +445,7 @@ bool ThemeUpdateTask::LoadVersion(const QString &version, int download_log_level
 
     if (!result)
     {
-        LOG(VB_GENERAL, download_log_level,
+        LOG(VB_GENERAL, (LogLevel_t)download_log_level,
             QString("HouseKeeper: Failed to download %1 "
                     "remote themes info package.").arg(m_url));
         return false;

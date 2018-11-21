@@ -601,7 +601,7 @@ void GuideGrid::Load(void)
     fillChannelInfos();
 
     int maxchannel = max((int)GetChannelCount() - 1, 0);
-    setStartChannel((int)(m_currentStartChannel) - (int)(m_channelCount / 2));
+    setStartChannel((int)(m_currentStartChannel) - (m_channelCount / 2));
     m_channelCount = min(m_channelCount, maxchannel + 1);
 
     for (int y = 0; y < m_channelCount; ++y)
@@ -622,7 +622,7 @@ void GuideGrid::Load(void)
 
 void GuideGrid::Init(void)
 {
-    m_currentRow = (int)(m_channelCount / 2);
+    m_currentRow = m_channelCount / 2;
     m_currentCol = 0;
 
     fillTimeInfos();
@@ -1822,7 +1822,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             if (tempRect.bottom() + 2 >=  programRect.bottom())
                 tempRect.setBottom(programRect.bottom());
 
-            if (m_currentRow == (int)row && (m_currentCol >= x) &&
+            if (m_currentRow == row && (m_currentCol >= x) &&
                 (m_currentCol < (x + spread)))
                 isCurrent = true;
             else
