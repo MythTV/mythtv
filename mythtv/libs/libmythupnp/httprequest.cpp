@@ -2019,7 +2019,7 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-    QByteArray nonce = QByteArray(paramMap["nonce"].toLatin1());
+    QByteArray nonce = paramMap["nonce"].toLatin1();
     if (nonce.length() < 20)
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce is too short");
@@ -2031,7 +2031,7 @@ bool HTTPRequest::DigestAuthentication()
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce doesn't match reference");
         LOG(VB_HTTP, LOG_DEBUG, QString("%1  vs  %2").arg(QString(nonce))
-                                                     .arg(QString(CalculateDigestNonce(nonceTimeStampStr))));
+                                                     .arg(CalculateDigestNonce(nonceTimeStampStr)));
         return false;
     }
 

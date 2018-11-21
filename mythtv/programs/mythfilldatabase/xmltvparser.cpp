@@ -515,7 +515,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                         tmp = season.toUInt() + 1;
                         pginfo->season = tmp;
                         season = QString::number(tmp);
-                        pginfo->syndicatedepisodenumber = QString('S' + season);
+                        pginfo->syndicatedepisodenumber = 'S' + season;
                     }
 
                     if (!episode.isEmpty())
@@ -523,7 +523,7 @@ ProgInfo *XMLTVParser::parseProgram(QDomElement &element)
                         tmp = episode.toUInt() + 1;
                         pginfo->episode = tmp;
                         episode = QString::number(tmp);
-                        pginfo->syndicatedepisodenumber.append(QString('E' + episode));
+                        pginfo->syndicatedepisodenumber.append('E' + episode);
                     }
 
                     if (!totalepisodes.isEmpty())

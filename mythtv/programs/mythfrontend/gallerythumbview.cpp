@@ -2128,7 +2128,7 @@ void GalleryThumbView::Import()
 
     int error = thread.GetResult();
     if (error != 0)
-        ShowOkPopup(QString(tr("Import command failed.\nError: %1")).arg(error));
+        ShowOkPopup(tr("Import command failed.\nError: %1").arg(error));
 
     // Rescan local devices
     QString err = m_mgr.ScanImagesAction(true, true);

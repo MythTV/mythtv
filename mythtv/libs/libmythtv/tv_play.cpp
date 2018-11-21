@@ -5539,7 +5539,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
             else
             {
                 QRegExp re = QRegExp("Play (.*)x");
-                if (QString(ctx->GetPlayMessage()).contains(re))
+                if (ctx->GetPlayMessage().contains(re))
                 {
                     QStringList matches = re.capturedTexts();
                     speedStr = QString("%1x").arg(matches[1]);

@@ -449,8 +449,7 @@ void PrevRecordedList::LoadShowsByDate(void)
         bindings[":YEAR"] = dateParts[0];
         bindings[":MONTH"] = dateParts[1];
     }
-    sql = QString(sql + m_where + QString(
-        " ORDER BY starttime %1 ").arg(sortorder));
+    sql = sql + m_where + QString(" ORDER BY starttime %1 ").arg(sortorder);
     if (!m_title.isEmpty())
         bindings[":MTITLE"] = m_title;
     m_showData.clear();

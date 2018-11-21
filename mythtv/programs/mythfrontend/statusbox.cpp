@@ -62,7 +62,7 @@ StatusBox::StatusBox(MythScreenStack *parent)
 
     gCoreContext->SendReceiveStringList(strlist);
 
-    if (QString(strlist[0]) == "TRUE")
+    if (strlist[0] == "TRUE")
         m_isBackendActive = true;
     else
         m_isBackendActive = false;
@@ -1175,7 +1175,7 @@ static const QString uptimeStr(time_t uptime)
     int     days, hours, min, secs;
     QString str;
 
-    str = QString("   " + StatusBox::tr("Uptime") + ": ");
+    str = "   " + StatusBox::tr("Uptime") + ": ";
 
     if (uptime == 0)
         return str + StatusBox::tr("unknown", "unknown uptime");

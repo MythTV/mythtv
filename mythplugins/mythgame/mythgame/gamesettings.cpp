@@ -311,7 +311,7 @@ void MythGamePlayerSettings::fillSelections(SelectSetting* setting)
 
         while (result.next())
         {
-             setting->addSelection(QString(playerDisp)
+             setting->addSelection(playerDisp
                 .arg(result.value(0).toString())
                 .arg(GetGameTypeName(result.value(2).toString())),
                 result.value(1).toString());

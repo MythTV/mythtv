@@ -573,8 +573,8 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     query.prepare("UPDATE gallerymetadata "
                   "SET image = :IMAGENEW "
                   "WHERE image = :IMAGEOLD");
-    query.bindValue(":IMAGENEW", QString(currDir + '/' + newName));
-    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName));
+    query.bindValue(":IMAGENEW", currDir + '/' + newName);
+    query.bindValue(":IMAGEOLD", currDir + '/' + oldName);
     if (query.exec())
         return true;
 
@@ -752,7 +752,7 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT image, angle FROM gallerymetadata "
                   "WHERE image LIKE :IMAGEOLD");
-    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName + '%'));
+    query.bindValue(":IMAGEOLD", currDir + '/' + oldName + '%');
     if (query.exec())
     {
         while (query.next())

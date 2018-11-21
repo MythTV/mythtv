@@ -125,8 +125,7 @@ void NetBase::ShowWebVideo()
         }
         else
         {
-            args.replaceInStrings("%DIR%",
-                                  QString(GetConfDir() + "/MythNetvision"));
+            args.replaceInStrings("%DIR%", GetConfDir() + "/MythNetvision");
             args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
             args.replaceInStrings("%URL%", item->GetURL());
             args.replaceInStrings("%TITLE%", item->GetTitle());

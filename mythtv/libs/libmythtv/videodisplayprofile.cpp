@@ -33,7 +33,7 @@ bool ProfileItem::checkRange(QString key,
     bool isOK = true;
     if (isFloat)
         ivalue = int(fvalue * 1000.0f);
-    QString cmp = Get(QString(key));
+    QString cmp = Get(key);
     if (!cmp.isEmpty())
     {
         cmp.replace(QLatin1String(" "),QLatin1String(""));

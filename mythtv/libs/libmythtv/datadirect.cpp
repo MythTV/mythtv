@@ -588,7 +588,7 @@ DataDirectProcessor::~DataDirectProcessor()
 
     for (uint i = 0; i < d.count(); i++)
     {
-        QString    tmps = QString(m_tmpDir + "/" + d[i]);
+        QString    tmps = m_tmpDir + "/" + d[i];
         QByteArray tmpa = tmps.toLatin1();
         unlink(tmpa.constData());
     }

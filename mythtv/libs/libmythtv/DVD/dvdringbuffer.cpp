@@ -143,8 +143,8 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
 
 bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
-    name   = QString(m_name);
-    serial = QString(m_serialnumber);
+    name   = m_name;
+    serial = m_serialnumber;
     if (name.isEmpty() && serial.isEmpty())
         return false;
     return true;
@@ -2158,8 +2158,8 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
  */
 bool DVDRingBuffer::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
-    _name    = QString(m_dvdname);
-    _serial    = QString(m_serialnumber);
+    _name    = m_dvdname;
+    _serial  = m_serialnumber;
     if (_name.isEmpty() && _serial.isEmpty())
         return false;
     return true;

@@ -488,7 +488,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist)
 
                 if (chanid > 0)
                 {
-                    QString cstr = QString((*i).channum);
+                    QString cstr = (*i).channum;
                     if(m_channelPreset && cstr.isEmpty())
                         cstr = QString::number(chanid % 1000);
 

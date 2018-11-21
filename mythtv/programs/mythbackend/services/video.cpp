@@ -70,7 +70,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
         sql.append(" WHERE filename LIKE '" + Folder + "%'");
 
     sql.append(" ORDER BY ");
-    QString sort = QString(Sort.toLower());
+    QString sort = Sort.toLower();
     if (sort == "added")
         sql.append("insertdate");
     else if (sort == "released")

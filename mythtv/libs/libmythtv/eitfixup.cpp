@@ -1562,8 +1562,8 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
     tmpExp1 = m_mcaIncompleteTitle;
     if (tmpExp1.indexIn(event.title) != -1)
     {
-        tmpExp1 = QRegExp( QString(m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
-                                   m_mcaCompleteTitleb.pattern()));
+        tmpExp1 = QRegExp( m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
+                                   m_mcaCompleteTitleb.pattern());
         tmpExp1.setCaseSensitivity(Qt::CaseInsensitive);
         if (tmpExp1.indexIn(event.description) != -1)
         {
@@ -2789,7 +2789,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     if (position != -1)
     {
         event.description = event.description.replace(tmptitle, "");
-        if (QString(tmptitle.cap(0)) != event.title.trimmed())
+        if (tmptitle.cap(0) != event.title.trimmed())
         {
             event.description = "(" + event.title.trimmed() + "). " + event.description;
         }

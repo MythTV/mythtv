@@ -3866,16 +3866,16 @@ void Scheduler::BuildNewRecordsQueries(uint recordid, QStringList &from,
                       .arg(qphrase));
             break;
         case kTitleSearch:
-            bindings[bindlikephrase1] = QString(QString("%") + qphrase + "%");
+            bindings[bindlikephrase1] = QString("%") + qphrase + "%";
             from << "";
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid + " AND "
                       "program.manualid = 0 AND "
                       "program.title LIKE " + bindlikephrase1);
             break;
         case kKeywordSearch:
-            bindings[bindlikephrase1] = QString(QString("%") + qphrase + "%");
-            bindings[bindlikephrase2] = QString(QString("%") + qphrase + "%");
-            bindings[bindlikephrase3] = QString(QString("%") + qphrase + "%");
+            bindings[bindlikephrase1] = QString("%") + qphrase + "%";
+            bindings[bindlikephrase2] = QString("%") + qphrase + "%";
+            bindings[bindlikephrase3] = QString("%") + qphrase + "%";
             from << "";
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       " AND program.manualid = 0"

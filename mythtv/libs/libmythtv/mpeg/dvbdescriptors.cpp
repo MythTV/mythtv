@@ -624,7 +624,7 @@ QString DataBroadcastDescriptor::toString(void) const
     ret += QString("ISO_639_language_code(%1) ")
         .arg(LanguageString());
 
-    ret += QString("text(%1) ") + QString(Text());
+    ret += QString("text(%1) ") + Text();
 
     return ret;
 }

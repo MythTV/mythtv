@@ -912,14 +912,14 @@ bool JobQueue::SafeDeleteJob(int jobID, int jobType, int chanid,
         if( thisJob != jobID)
         {
             msg = QString("JobType, chanid and starttime don't match jobID %1");
-            LOG(VB_JOBQUEUE, LOG_ERR, LOC + QString(msg).arg(jobID));
+            LOG(VB_JOBQUEUE, LOG_ERR, LOC + msg.arg(jobID));
             return false;
         }
 
         if (JobQueue::IsJobRunning(jobType, chanid, recstartts))
         {
             msg = QString("Can't remove running JobID %1");
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString(msg).arg(jobID));
+            LOG(VB_GENERAL, LOG_ERR, LOC + msg.arg(jobID));
             return false;
         }
     }

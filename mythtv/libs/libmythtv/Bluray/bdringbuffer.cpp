@@ -292,8 +292,8 @@ void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
 
 bool BDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
-    name   = QString(m_name);
-    serial = QString(m_serialnumber);
+    name   = m_name;
+    serial = m_serialnumber;
     if (name.isEmpty() && serial.isEmpty())
         return false;
     return true;
