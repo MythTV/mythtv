@@ -1540,7 +1540,11 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     uint bytes;
     uint bpp;
 
-    if (fmt == GL_BGRA || fmt ==GL_RGBA)
+    if (fmt == GL_BGRA
+#if GL_BGRA != GL_RGBA
+        || fmt ==GL_RGBA
+#endif
+        )
     {
         bpp = 4;
     }
