@@ -397,7 +397,7 @@ bool ZMClient::updateAlarmStates(void)
                     QString("ZMClient monitor %1 changed state from %2 to %3")
                             .arg(mon->name).arg(stateToString(mon->state)).arg(stateToString(state)));
                 mon->previousState = mon->state;
-                mon->state = (State)state;
+                mon->state = state;
                 changed = true;
             }
         }

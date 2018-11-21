@@ -1702,11 +1702,9 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                             AV_PIX_FMT_RGB32, width, height, IMAGE_ALIGN);
 
                         AVFrame *tmp = frame;
-                        deinterlacer.DeinterlaceSingle((AVFrame*)tmp,
-                                                       (AVFrame*)tmp);
+                        deinterlacer.DeinterlaceSingle(tmp, tmp);
 
-                        copyframe.Copy(&retbuf, AV_PIX_FMT_RGB32,
-                                       (AVFrame*) tmp,
+                        copyframe.Copy(&retbuf, AV_PIX_FMT_RGB32, tmp,
                                        codecCtx->pix_fmt, width, height);
 
                         QImage img(outputbuf, width, height,

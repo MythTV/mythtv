@@ -475,8 +475,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
             every15 = 15;
 
             // updating the UITypes can be slow - only update if we need to:
-            int newOverallPct = (int) (100.0 /  (double) ((double) m_totalSectors /
-                    (double) (m_totalSectorsDone + curpos - start)));
+            int newOverallPct = (int) (100.0 /  ((double) m_totalSectors /
+                                                 (m_totalSectorsDone + curpos - start)));
             if (newOverallPct != m_lastOverallPct)
             {
                 m_lastOverallPct = newOverallPct;
@@ -490,8 +490,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
                                        m_totalSectorsDone + curpos - start));
             }
 
-            int newTrackPct = (int) (100.0 / (double) ((double) (end - start + 1) /
-                    (double) (curpos - start)));
+            int newTrackPct = (int) (100.0 / ((double) (end - start + 1) / (curpos - start)));
             if (newTrackPct != m_lastTrackPct)
             {
                 m_lastTrackPct = newTrackPct;

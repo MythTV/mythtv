@@ -210,7 +210,7 @@ void GLSingleView::initializeGL(void)
 void GLSingleView::resizeGL(int w, int h)
 {
     // Reset The Current Viewport And Perspective Transformation
-    glViewport(0, 0, (GLint)w, (GLint)h);
+    glViewport(0, 0, w, h);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -974,11 +974,11 @@ void GLSingleView::EffectFlutter(void)
             for (int y = 0; y < 40; y++)
             {
                 m_effect_flutter_points[x][y][0] =
-                    (float) (x / 20.0f - 1.0f) * ta.GetTextureX();
+                    (x / 20.0f - 1.0f) * ta.GetTextureX();
                 m_effect_flutter_points[x][y][1] =
-                    (float) (y / 20.0f - 1.0f) * ta.GetTextureY();
+                    (y / 20.0f - 1.0f) * ta.GetTextureY();
                 m_effect_flutter_points[x][y][2] =
-                    (float) sin((x / 20.0f - 1.0f) * static_cast<float>(M_PI) * 2.0f) / 5.0f;
+                    sin((x / 20.0f - 1.0f) * static_cast<float>(M_PI) * 2.0f) / 5.0f;
             }
         }
     }
