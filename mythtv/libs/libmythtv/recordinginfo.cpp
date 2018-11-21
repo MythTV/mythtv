@@ -942,7 +942,7 @@ void RecordingInfo::StartedRecording(QString ext)
 
     pathname = dirname + "/" + pathname;
 
-    LOG(VB_FILE, LOG_INFO, QString(LOC + "StartedRecording: Recording to '%1'")
+    LOG(VB_FILE, LOG_INFO, LOC + QString("StartedRecording: Recording to '%1'")
                              .arg(pathname));
 
 

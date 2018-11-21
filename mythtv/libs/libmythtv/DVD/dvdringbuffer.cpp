@@ -914,8 +914,8 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     m_curSubtitleTrack = dvdnav_get_active_spu_stream(m_dvdnav);
 
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG,
-                    QString(LOC + "DVDNAV_SPU_STREAM_CHANGE: "
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                          QString("DVDNAV_SPU_STREAM_CHANGE: "
                                   "physicalwide %1, physicalletterbox %2, "
                                   "physicalpanscan %3, currenttrack %4")
                         .arg(spu->physical_wide).arg(spu->physical_letterbox)

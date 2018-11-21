@@ -164,7 +164,7 @@ void ZMPlayer::getEventInfo()
 
     m_curFrame = 1;
 
-    m_eventText->SetText(QString(event->eventName() + " (%1/%2)")
+    m_eventText->SetText(event->eventName() + QString(" (%1/%2)")
             .arg((*m_currentEvent) + 1)
             .arg(m_eventList->size()));
     m_cameraText->SetText(event->monitorName());

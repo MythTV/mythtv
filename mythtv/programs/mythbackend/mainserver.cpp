@@ -6491,7 +6491,7 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
                 oldImage.filename = artGroup.FindFile("AlbumArt/" + image->filename);
 
                 QFileInfo fi(oldImage.filename);
-                image->filename = QString(fi.path() + "/%1-%2.jpg")
+                image->filename = fi.path() + QString("/%1-%2.jpg")
                                           .arg(mdata->ID())
                                           .arg(AlbumArtImages::getTypeFilename(image->imageType));
 
@@ -6522,7 +6522,7 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
                 QFileInfo fi(oldImage.filename);
 
                 // get the new images filename
-                image->filename = QString(fi.absolutePath() + "/%1.jpg")
+                image->filename = fi.absolutePath() + QString("/%1.jpg")
                         .arg(AlbumArtImages::getTypeFilename(image->imageType));
 
                 if (image->filename != oldImage.filename && QFile::exists(oldImage.filename))

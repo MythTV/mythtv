@@ -97,10 +97,10 @@ bool AnalogSignalMonitor::VerifyHDPVRaudio(int videofd)
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to changed audio "
-                                                   "encoding from %1 to %2."
-                                                   + ENO)
+                                                   "encoding from %1 to %2.")
                 .arg(current_audio)
                 .arg(audtype)
+                + ENO
                 );
         }
 

@@ -306,8 +306,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this,       SLOT(widgetDeleted(QObject*)));
 
     m_edit = new MythLineEdit(
-        m_settingValue, nullptr,
-        QString(QString(widgetName) + "-edit").toLatin1().constData());
+        m_settingValue, nullptr, qPrintable(QString(widgetName) + "-edit"));
     m_edit->setHelpText(getHelpText());
     m_edit->setText( getValue() );
     m_edit->setMinimumHeight(25);
@@ -407,7 +406,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     }
 
     MythSlider *slider = new MythSlider(
-        nullptr, QString(QString(widgetName) + "-slider").toLatin1().constData());
+        nullptr, qPrintable(QString(widgetName) + "-slider"));
     slider->setHelpText(getHelpText());
     slider->setMinimum(m_min);
     slider->setMaximum(m_max);
@@ -417,8 +416,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     layout->addWidget(slider);
 
     QLCDNumber *lcd = new QLCDNumber();
-    lcd->setObjectName(QString(QString(widgetName) + "-lcd")
-                       .toLatin1().constData());
+    lcd->setObjectName(qPrintable(QString(widgetName) + "-lcd"));
     lcd->setMode(QLCDNumber::Dec);
     lcd->setSegmentStyle(QLCDNumber::Flat);
     lcd->display(intValue());

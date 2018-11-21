@@ -158,8 +158,8 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
 
                 if (foundFile && fixSeektable)
                 {
-                    QString command = QString(GetAppBinDir() + "mythcommflag " +
-                                              "--rebuild --chanid %1 --starttime %2")
+                    QString command = GetAppBinDir() + "mythcommflag " +
+                                              QString("--rebuild --chanid %1 --starttime %2")
                                               .arg(p->GetChanID())
                                               .arg(p->GetRecordingStartTime(MythDate::ISODate));
                     cout << "Running - " << qPrintable(command) << endl;

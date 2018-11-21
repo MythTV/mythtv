@@ -293,10 +293,10 @@ void ProgDetails::PowerPriorities(const QString & ptable)
                        "INNER JOIN capturecard "
                        "      ON ( channel.sourceid = capturecard.sourceid AND "
                        "           ( capturecard.schedorder <> 0 OR "
-                       "             capturecard.parentid = 0 ) ) "
+                       "             capturecard.parentid = 0 ) ) ").arg(ptable)
                        + recmatch +
                        "WHERE  p.chanid = :CHANID AND"
-                       " p.starttime = :STARTTIME ;").arg(ptable));
+                       " p.starttime = :STARTTIME ;");
 
         query.bindValue(":CHANID",    m_progInfo.GetChanID());
         query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());

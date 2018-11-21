@@ -233,10 +233,12 @@ namespace
                 }
                 if (!isScreenshot)
                 {
-                sfn += fntm.arg(*dir).arg(QString(base_name + "_%1")
-                    .arg(suffix)).arg(*ext);
-                sfn += fntm.arg(*dir).arg(QString(video_uid + "_%1")
-                    .arg(suffix)).arg(*ext);
+                sfn += fntm.arg(*dir)
+                    .arg(base_name + QString("_%1").arg(suffix))
+                    .arg(*ext);
+                sfn += fntm.arg(*dir)
+                    .arg(video_uid + QString("_%1").arg(suffix))
+                    .arg(*ext);
                 }
 
                 for (QStringList::const_iterator i = sfn.begin();

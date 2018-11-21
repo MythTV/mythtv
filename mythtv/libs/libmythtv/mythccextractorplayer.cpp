@@ -748,7 +748,7 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 
         QString lang = iso639_key_to_str3(langCode);
         lang = iso639_is_key_undefined(langCode) ? "und" : lang;
-        QString dir_name = QString(m_baseName + "-%1.dvb-%2").arg(lang).arg(subit.key());
+        QString dir_name = m_baseName + QString("-%1.dvb-%2").arg(lang).arg(subit.key());
         if (!m_workingDir.exists(dir_name) && !m_workingDir.mkdir(dir_name))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Can't create directory '%1'")

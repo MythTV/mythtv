@@ -374,7 +374,7 @@ QString ThumbFinder::createThumbDir(void)
     QString path;
     for (int x = 1; dir.exists(); x++)
     {
-        path = QString(thumbDir + "/%1").arg(x);
+        path = thumbDir + QString("/%1").arg(x);
         dir.setPath(path);
     }
 
@@ -498,7 +498,7 @@ bool ThumbFinder::getThumbImages()
 
     for (int x = 1; x <= m_thumbCount; x++)
     {
-        m_frameFile = QString(m_thumbDir + "/chapter-%1.jpg").arg(x);
+        m_frameFile = m_thumbDir + QString("/chapter-%1.jpg").arg(x);
 
         thumb = nullptr;
 
