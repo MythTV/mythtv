@@ -304,7 +304,7 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
                                     timestamp.date().day()),
                               timestamp.time());
 
-            double range = abs(curYearAnniversary.secsTo(
+            double range = llabs(curYearAnniversary.secsTo(
                                    adjacentYearAnniversary)) + BETA_CLIP;
 
             // This calculation is not normalized, because that would require the
@@ -314,9 +314,9 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
                                            : adjacentYearAnniversary);
             QDateTime d2(isAnniversaryPast ? adjacentYearAnniversary
                                            : curYearAnniversary);
-            weight = std::pow(abs(now.secsTo(d1) + BETA_CLIP) / range,
+            weight = std::pow(llabs(now.secsTo(d1) + BETA_CLIP) / range,
                               TRAILING_BETA_SHAPE - 1)
-                    * std::pow(abs(now.secsTo(d2) + BETA_CLIP) / range,
+                    * std::pow(llabs(now.secsTo(d2) + BETA_CLIP) / range,
                                LEADING_BETA_SHAPE - 1);
         }
         totalWeight += weight;
