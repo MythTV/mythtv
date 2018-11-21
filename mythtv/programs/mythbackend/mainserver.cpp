@@ -3762,7 +3762,7 @@ void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
     if (GuideDataThrough.isNull())
         strlist << QString("0000-00-00 00:00");
     else
-        strlist << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
+        strlist << GuideDataThrough.toString("yyyy-MM-dd hh:mm");
 
     SendResponse(pbssock, strlist);
 }

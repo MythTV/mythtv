@@ -1247,8 +1247,8 @@ bool DataDirectProcessor::GrabLineupsOnly(void)
 
 bool DataDirectProcessor::GrabAllData(void)
 {
-    return GrabData(QDateTime(MythDate::current()).addDays(-2),
-                    QDateTime(MythDate::current()).addDays(15));
+    return GrabData(MythDate::current().addDays(-2),
+                    MythDate::current().addDays(15));
 }
 
 void DataDirectProcessor::CreateATempTable(const QString &ptablename,
