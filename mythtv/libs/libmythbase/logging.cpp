@@ -671,8 +671,13 @@ bool LoggerThread::logConsole(LoggingItem *item)
                 shortname = lev->shortname;
         }
 
+#if CONFIG_DEBUGTYPE
+        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s:%d:%s  %s\n", timestamp,
+                  shortname, item->m_file, item->m_line, item->m_function, item->m_message );
+#else
         snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
                   shortname, item->m_message );
+#endif
     }
 
 #ifdef Q_OS_ANDROID
