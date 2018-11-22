@@ -1419,7 +1419,7 @@ class OsdRender : public QRunnable
   private:
     inline void yv12()
     {
-#define ROUNDUP( _x,_z) ((_x) + ((-(int)(_x)) & ((_z) - 1)) )
+#define ROUNDUP( _x,_z) ((_x) + ((-(_x)) & ((_z) - 1)) )
 #define ROUNDDN( _x,_z) ((_x) & ~((_z) - 1))
         int left = m_vis.left();
         left = ROUNDUP(left, ALIGN_C);

@@ -1422,7 +1422,7 @@ static int reloadTheme(void)
             "getActivity",
             "(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;",
             activity.object(),
-            jint(0),
+            0,
             activityIntent.object(),
             QAndroidJniObject::getStaticField<jint>("android/content/Intent",
             "FLAG_ACTIVITY_CLEAR_TOP")  );

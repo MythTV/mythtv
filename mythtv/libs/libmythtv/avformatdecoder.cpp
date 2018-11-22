@@ -3015,9 +3015,11 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
+#ifdef USING_VAAPI2
 static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
 {
 }
+#endif
 
 #ifdef USING_VDPAU
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
