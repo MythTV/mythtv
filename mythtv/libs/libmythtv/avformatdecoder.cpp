@@ -3995,7 +3995,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *stream, AVFrame *mpa_pic)
         if (!used_picframe)
         {
             AVFrame tmppicture;
-
+            av_image_fill_arrays(tmppicture.data, tmppicture.linesize,
+                buf, AV_PIX_FMT_YUV420P, use_frame->width,
+                        use_frame->height, IMAGE_ALIGN);
             tmppicture.data[0] = buf + picframe->offsets[0];
             tmppicture.data[1] = buf + picframe->offsets[1];
             tmppicture.data[2] = buf + picframe->offsets[2];
