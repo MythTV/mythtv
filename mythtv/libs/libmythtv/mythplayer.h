@@ -699,7 +699,6 @@ class MTV_PUBLIC MythPlayer
     /// How often we have tried to wait for a video output buffer and failed
     int       videobuf_retries;
     uint64_t  framesPlayed;
-    uint64_t  prebufferFramesPlayed;
     // "Fake" frame counter for when the container frame rate doesn't
     // match the stream frame rate.
     uint64_t  framesPlayedExtra;

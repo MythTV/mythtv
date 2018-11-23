@@ -151,7 +151,6 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       fftime(0),
       // Playback misc.
       videobuf_retries(0),          framesPlayed(0),
-      prebufferFramesPlayed(0),
       framesPlayedExtra(0),
       totalFrames(0),               totalLength(0),
       totalDuration(0),
@@ -2241,7 +2240,7 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
         if (lateness > 30000)
             dropframe = !FlagIsSet(kMusicChoice) && numdroppedframes < 10;
 
-        if (lateness <= 30000 && audiotimecode > 0 && normal_speed)
+        if (lateness <= 30000 && audiotimecode > 0 && normal_speed && !FlagIsSet(kMusicChoice))
         {
             // Get video in sync with audio
             audio_adjustment = audiotimecode - videotimecode;
@@ -2257,7 +2256,8 @@ void MythPlayer::AVSync2(VideoFrame *buffer)
                 pause_audio = true;
         }
         // sanity check - reset rtcbase if time codes have gone crazy.
-        if (lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE)
+        if ((lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE)
+            && !FlagIsSet(kMusicChoice))
         {
             framedue = 0;
             rtcbase = 0;
@@ -2447,6 +2447,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (!videoOutput)
         return false;
 
+    bool paused_now = false;
     if (!(min_buffers ? (videoOutput->ValidVideoFrames() >= min_buffers) :
                         (GetEof() != kEofStateNone) ||
                         (videoOutput->hasHWAcceleration() ?
@@ -2454,24 +2455,27 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                             videoOutput->EnoughDecodedFrames())))
     {
         SetBuffering(true);
+
         // This piece of code is to address the problem, when starting
         // Live TV, of jerking and stuttering. Without this code
         // that could go on forever, but is cured by a pause and play.
         // This code inserts a brief pause and play when the potential
         // for the jerking is detected.
-        if (prebufferFramesPlayed != framesPlayed)
+
+        bool watchingTV = IsWatchingInprogress();
+        if (!paused_now && (livetv || watchingTV) && !FlagIsSet(kMusicChoice))
         {
-            float current   = ComputeSecs(framesPlayed, true);
-            float length    = ComputeSecs(totalFrames, true);
-            if (length > current && length - current < 1.5
-                && !FlagIsSet(kMusicChoice))
+            uint64_t frameCount = GetCurrentFrameCount();
+            uint64_t framesLeft = frameCount - framesPlayed;
+            uint64_t margin = (uint64_t) (video_frame_rate * 3);
+            if (framesLeft < margin)
             {
                 LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
                     QString("Pause to allow live tv catch up. Position in sec. Current: %2, Total: %3")
-                    .arg(current).arg(length));
+                    .arg(framesPlayed).arg(frameCount));
                 audio.Pause(true);
                 avsync_audiopaused = true;
-                prebufferFramesPlayed = framesPlayed;
+                paused_now = true;
             }
         }
         usleep(frame_interval >> 3);
@@ -2497,6 +2501,8 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 playerFlags = (PlayerFlags)(playerFlags | kMusicChoice);
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
                     "Music Choice program detected - disabling AV Sync.");
+                avsync_audiopaused = false;
+                audio.Pause(false);
             }
             if (waited_for > 7000 && audio.IsBufferAlmostFull()
                 && !FlagIsSet(kMusicChoice))
