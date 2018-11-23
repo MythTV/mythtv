@@ -1294,7 +1294,12 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
                 if (tokens.size() > 1 && tokens[0].toUInt() >= m_serialNo)
                     break;
 
-                // Other messages are "out of band"
+                /* Other messages are "out of band" */
+
+                // Check for error message missing serial#
+                if (tokens[0].startsWith("ERR"))
+                    break;
+
                 tokens.removeFirst();
                 result = tokens.join(':');
                 err = (tokens.size() > 1 && tokens[1].startsWith("ERR"));
