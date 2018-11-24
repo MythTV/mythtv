@@ -245,7 +245,7 @@ QString BrowserApi::GetMetadata(void)
 
 void BrowserApi::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
@@ -649,7 +649,7 @@ void MythWebView::customEvent(QEvent *event)
             }
         }
     }
-    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);
@@ -678,8 +678,8 @@ void MythWebView::customEvent(QEvent *event)
                 else if (m_downloadAndPlay)
                     GetMythMainWindow()->HandleMedia("Internal", filename);
 
-                MythEvent me(QString("BROWSER_DOWNLOAD_FINISHED"), args);
-                gCoreContext->dispatch(me);
+                MythEvent me2(QString("BROWSER_DOWNLOAD_FINISHED"), args);
+                gCoreContext->dispatch(me2);
             }
         }
     }
@@ -1157,7 +1157,7 @@ void MythUIWebBrowser::SetActive(bool active)
  */
 void MythUIWebBrowser::ZoomIn(void)
 {
-    SetZoom(m_zoom + 0.1);
+    SetZoom(m_zoom + 0.1f);
 }
 
 /** \fn MythUIWebBrowser::ZoomOut(void)
@@ -1165,7 +1165,7 @@ void MythUIWebBrowser::ZoomIn(void)
  */
 void MythUIWebBrowser::ZoomOut(void)
 {
-    SetZoom(m_zoom - 0.1);
+    SetZoom(m_zoom - 0.1f);
 }
 
 /** \fn MythUIWebBrowser::SetZoom(float)
@@ -1177,11 +1177,11 @@ void MythUIWebBrowser::SetZoom(float zoom)
     if (!m_browser)
         return;
 
-    if (zoom < 0.3)
+    if (zoom < 0.3f)
         zoom = 0.3f;
 
-    if (zoom > 5.0)
-        zoom = 5.0;
+    if (zoom > 5.0f)
+        zoom = 5.0f;
 
     m_zoom = zoom;
     m_browser->setZoomFactor(m_zoom);

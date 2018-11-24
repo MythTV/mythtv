@@ -50,8 +50,7 @@ bool BonjourRegister::Register(uint16_t port, const QByteArray &type,
 
     uint16_t qport = qToBigEndian(port);
     DNSServiceErrorType res =
-        DNSServiceRegister(&m_dnssref, 0, 0, (const char*)name.data(),
-                           (const char*)type.data(),
+        DNSServiceRegister(&m_dnssref, 0, 0, name.data(), type.data(),
                            nullptr, nullptr, qport, txt.size(), (void*)txt.data(),
                            BonjourCallback, this);
 

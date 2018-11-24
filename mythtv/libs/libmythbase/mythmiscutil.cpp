@@ -329,7 +329,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
         if (rlen==0)
             break;
 
-        total_bytes += (long long) rlen;
+        total_bytes += rlen;
 
         while ((rlen-off>0) && ok)
         {

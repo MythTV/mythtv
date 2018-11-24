@@ -100,7 +100,7 @@ MythPluginType MythPlugin::type(void)
 void MythPlugin::destroy(void)
 {
     typedef void (*PluginDestFunc)();
-    PluginDestFunc rfunc = (PluginDestFunc)QLibrary::resolve("mythplugin_destroy");
+    PluginDestFunc rfunc = QLibrary::resolve("mythplugin_destroy");
 
     if (rfunc)
         rfunc();

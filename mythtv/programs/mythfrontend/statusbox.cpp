@@ -62,7 +62,7 @@ StatusBox::StatusBox(MythScreenStack *parent)
 
     gCoreContext->SendReceiveStringList(strlist);
 
-    if (QString(strlist[0]) == "TRUE")
+    if (strlist[0] == "TRUE")
         m_isBackendActive = true;
     else
         m_isBackendActive = false;
@@ -1151,7 +1151,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     for (; it != prof2bps.end(); ++it)
     {
         const QString pro =
-                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0));
+                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0f));
 
         long long bytesPerMin = ((*it) >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
@@ -1175,7 +1175,7 @@ static const QString uptimeStr(time_t uptime)
     int     days, hours, min, secs;
     QString str;
 
-    str = QString("   " + StatusBox::tr("Uptime") + ": ");
+    str = "   " + StatusBox::tr("Uptime") + ": ";
 
     if (uptime == 0)
         return str + StatusBox::tr("unknown", "unknown uptime");
@@ -1351,7 +1351,10 @@ void StatusBox::doMachineStatus()
         {
             char buff[30];
 
-            sprintf(buff, "%0.2f, %0.2f, %0.2f", loads[0], loads[1], loads[2]);
+            sprintf(buff, "%0.2f, %0.2f, %0.2f",
+                    static_cast<double>(loads[0]),
+                    static_cast<double>(loads[1]),
+                    static_cast<double>(loads[2]));
             line.append(QString(buff));
         }
         else

@@ -267,12 +267,12 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
 
         QString sBaseUri = "http://" + pRequest->m_mapHeaders[ "host" ] + pRequest->m_sBaseUrl + "/xsd";
 
-        QMap<QString, TypeInfo>::const_iterator it = m_typesToInclude.constBegin();
-        while( it != m_typesToInclude.constEnd())
+        QMap<QString, TypeInfo>::const_iterator it2 = m_typesToInclude.constBegin();
+        while( it2 != m_typesToInclude.constEnd())
         {
             QDomElement oIncNode = createElement( "xs:import" );
-            QString     sType    = it.key();
-            TypeInfo    info     = it.value();
+            QString     sType    = it2.key();
+            TypeInfo    info     = it2.value();
 
             sType.remove( "DTC::" );
 
@@ -287,7 +287,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
             oIncNode.setAttribute( "namespace"     , "http://mythtv.org" );
     
             oImportNode.appendChild( oIncNode );
-            ++it;
+            ++it2;
         }
     }
 

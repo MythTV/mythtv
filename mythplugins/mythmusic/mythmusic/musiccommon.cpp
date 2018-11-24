@@ -470,15 +470,15 @@ void MusicCommon::switchView(MusicView view)
     {
         case MV_PLAYLIST:
         {
-            PlaylistView *view = new PlaylistView(mainStack, this);
+            PlaylistView *plview = new PlaylistView(mainStack, this);
 
-            if (view->Create())
+            if (plview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(plview);
+                connect(plview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete plview;
 
             break;
         }
@@ -494,15 +494,15 @@ void MusicCommon::switchView(MusicView view)
 
             MythScreenType *parentScreen = (oldView != nullptr ? m_parentScreen : this);
 
-            PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "tree", restorePos);
+            PlaylistEditorView *pleview = new PlaylistEditorView(mainStack, parentScreen, "tree", restorePos);
 
-            if (view->Create())
+            if (pleview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(pleview);
+                connect(pleview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete pleview;
 
             if (oldView)
             {
@@ -524,15 +524,15 @@ void MusicCommon::switchView(MusicView view)
 
             MythScreenType *parentScreen = (oldView != nullptr ? m_parentScreen : this);
 
-            PlaylistEditorView *view = new PlaylistEditorView(mainStack, parentScreen, "gallery", restorePos);
+            PlaylistEditorView *pleview = new PlaylistEditorView(mainStack, parentScreen, "gallery", restorePos);
 
-            if (view->Create())
+            if (pleview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(pleview);
+                connect(pleview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete pleview;
 
             if (oldView)
             {
@@ -545,45 +545,45 @@ void MusicCommon::switchView(MusicView view)
 
         case MV_SEARCH:
         {
-            SearchView *view = new SearchView(mainStack, this);
+            SearchView *sview = new SearchView(mainStack, this);
 
-            if (view->Create())
+            if (sview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(sview);
+                connect(sview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete sview;
 
             break;
         }
 
         case MV_VISUALIZER:
         {
-            VisualizerView *view = new VisualizerView(mainStack, this);
+            VisualizerView *vview = new VisualizerView(mainStack, this);
 
-            if (view->Create())
+            if (vview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(vview);
+                connect(vview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete vview;
 
             break;
         }
 
         case MV_LYRICS:
         {
-            LyricsView *view = new LyricsView(mainStack, this);
+            LyricsView *lview = new LyricsView(mainStack, this);
 
-            if (view->Create())
+            if (lview->Create())
             {
-                mainStack->AddScreen(view);
-                connect(view, SIGNAL(Exiting()), this, SLOT(viewExited()));
+                mainStack->AddScreen(lview);
+                connect(lview, SIGNAL(Exiting()), this, SLOT(viewExited()));
             }
             else
-                delete view;
+                delete lview;
 
             break;
         }
@@ -1165,7 +1165,7 @@ void MusicCommon::seek(int pos)
 
             if (LCD *lcd = LCD::Get())
             {
-                float percent_heard = m_maxTime <= 0 ? 0.0 : ((float)pos /
+                float percent_heard = m_maxTime <= 0 ? 0.0f : ((float)pos /
                                       (float)m_maxTime);
 
                 QString lcd_time_string = getTimeString(pos, m_maxTime);
@@ -1298,7 +1298,7 @@ void MusicCommon::customEvent(QEvent *event)
             if (LCD *lcd = LCD::Get())
             {
                 float percent_heard = m_maxTime <= 0 ?
-                    0.0:((float)rs / (float)curMeta->Length()) * 1000.0;
+                    0.0f:((float)rs / (float)curMeta->Length()) * 1000.0f;
 
                 QString lcd_time_string = time_string;
 
@@ -1315,14 +1315,14 @@ void MusicCommon::customEvent(QEvent *event)
         //  Hack around for cd bitrates
         if (oe->bitrate() < 2000)
         {
-            info_string.sprintf(QString("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch")).toUtf8().data(),
-                                oe->bitrate(), float(oe->frequency()) / 1000.0,
+            info_string.sprintf(qUtf8Printable("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch")),
+                                oe->bitrate(), static_cast<double>(oe->frequency()) / 1000.0,
                                 oe->channels() > 1 ? "2" : "1");
         }
         else
         {
-            info_string.sprintf(QString("%.1f "+ tr("kHz")+ "   %s "+ tr("ch")).toUtf8().data(),
-                                float(oe->frequency()) / 1000.0,
+            info_string.sprintf(qUtf8Printable("%.1f "+ tr("kHz")+ "   %s "+ tr("ch")),
+                                static_cast<double>(oe->frequency()) / 1000.0,
                                 oe->channels() > 1 ? "2" : "1");
         }
 

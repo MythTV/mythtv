@@ -17,7 +17,7 @@
 #define LOC      QString("DispInfo: ")
 #endif
 
-#define VALID_RATE(rate) ((rate) > 20.0 && (rate) < 200.0)
+#define VALID_RATE(rate) ((rate) > 20.0f && (rate) < 200.0f)
 
 static float fix_rate(int video_rate)
 {
@@ -142,7 +142,7 @@ DisplayInfo MythDisplay::GetDisplayInfo(int video_rate)
     ret.res = QSize((uint)width, (uint)height);
     ret.size = QSize((uint)width, (uint)height);
     if (xdpi > 0 && ydpi > 0)
-        ret.size = QSize((uint)width/xdpi*25.4, (uint)height/ydpi*25.4);
+        ret.size = QSize((uint)width/xdpi*25.4f, (uint)height/ydpi*25.4f);
 #endif
     return ret;
 }

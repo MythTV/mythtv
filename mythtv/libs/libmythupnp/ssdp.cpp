@@ -351,7 +351,11 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
             didDoRead = true;
             if (ret < 0)
             {
-                if (errno == EAGAIN || errno == EWOULDBLOCK)
+                if (errno == EAGAIN
+#if EAGAIN != EWOULDBLOCK
+                    || errno == EWOULDBLOCK
+#endif
+                    )
                 {
                     if (retries == 3)
                     {
@@ -548,7 +552,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     nMX = (nMX > 120) ? 120 : nMX;
 
-    int nNewMX = (int)(0 + ((unsigned short)random() % nMX)) * 1000;
+    int nNewMX = (0 + ((unsigned short)random() % nMX)) * 1000;
 
     // ----------------------------------------------------------------------
     // See what they are looking for...

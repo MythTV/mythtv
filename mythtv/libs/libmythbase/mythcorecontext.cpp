@@ -739,7 +739,7 @@ bool MythCoreContext::IsFrontendOnly(void)
 
     SendReceiveStringList(strlist);
 
-    if (QString(strlist[0]) == "FALSE")
+    if (strlist[0] == "FALSE")
         backendOnLocalhost = false;
     else
         backendOnLocalhost = true;

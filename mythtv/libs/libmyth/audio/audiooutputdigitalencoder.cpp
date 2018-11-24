@@ -273,7 +273,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
             m_spdifenc = new SPDIFEncoder("spdif", AV_CODEC_ID_AC3);
         }
 
-        m_spdifenc->WriteFrame((uint8_t *)pkt.data, pkt.size);
+        m_spdifenc->WriteFrame(pkt.data, pkt.size);
         av_packet_unref(&pkt);
 
         // Check if output buffer is big enough

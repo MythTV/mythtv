@@ -588,7 +588,7 @@ DataDirectProcessor::~DataDirectProcessor()
 
     for (uint i = 0; i < d.count(); i++)
     {
-        QString    tmps = QString(m_tmpDir + "/" + d[i]);
+        QString    tmps = m_tmpDir + "/" + d[i];
         QByteArray tmpa = tmps.toLatin1();
         unlink(tmpa.constData());
     }
@@ -1247,8 +1247,8 @@ bool DataDirectProcessor::GrabLineupsOnly(void)
 
 bool DataDirectProcessor::GrabAllData(void)
 {
-    return GrabData(QDateTime(MythDate::current()).addDays(-2),
-                    QDateTime(MythDate::current()).addDays(15));
+    return GrabData(MythDate::current().addDays(-2),
+                    MythDate::current().addDays(15));
 }
 
 void DataDirectProcessor::CreateATempTable(const QString &ptablename,

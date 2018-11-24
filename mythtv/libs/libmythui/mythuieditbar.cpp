@@ -1,6 +1,9 @@
 
 #include "mythuieditbar.h"
 
+// C++
+#include <cmath>
+
 // MythBase
 #include "mythlogging.h"
 
@@ -113,7 +116,7 @@ void MythUIEditBar::Display(void)
     if (position && keeparea.isValid())
     {
         int offset = position->GetArea().width() / 2;
-        int newx   = (int)(((float)keeparea.width() * m_editPosition) + 0.5f);
+        int newx   = lroundf((float)keeparea.width() * m_editPosition);
         int newy   = position->GetArea().top();
         position->SetPosition(newx - offset, newy);
         position->SetVisible(true);
@@ -141,8 +144,8 @@ void MythUIEditBar::Display(void)
     while (regions.hasNext() && cutarea.isValid())
     {
         QPair<float, float> region = regions.next();
-        int left  = (int)((region.first * cutarea.width()) + 0.5f);
-        int right = (int)((region.second * cutarea.width()) + 0.5f);
+        int left  = lroundf(region.first * cutarea.width());
+        int right = lroundf(region.second * cutarea.width());
 
         if (left >= right)
             right = left + 1;
@@ -174,8 +177,8 @@ void MythUIEditBar::Display(void)
     while (regions2.hasNext() && keeparea.isValid())
     {
         QPair<float, float> region = regions2.next();
-        int left  = (int)((region.first * keeparea.width()) + 0.5f);
-        int right = (int)((region.second * keeparea.width()) + 0.5f);
+        int left  = lroundf(region.first * keeparea.width());
+        int right = lroundf(region.second * keeparea.width());
 
         if (left >= right)
             right = left + 1;

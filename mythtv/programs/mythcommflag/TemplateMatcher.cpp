@@ -746,11 +746,11 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
      *      can cause even more of the broadcast segment can be misidentified
      *      as part of the end of the commercial break.
      */
-    const int BLANK_NEARBY = (int)roundf(0.5 * fps);
+    const int BLANK_NEARBY = (int)roundf(0.5f * fps);
     const int TEMPLATE_DISAPPEARS_EARLY = (int)roundf(25 * fps);
     const int TEMPLATE_DISAPPEARS_LATE = (int)roundf(0 * fps);
     const int TEMPLATE_REAPPEARS_LATE = (int)roundf(35 * fps);
-    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5 * fps);
+    const int TEMPLATE_REAPPEARS_EARLY = (int)roundf(1.5f * fps);
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TemplateMatcher adjusting for blanks"));
 

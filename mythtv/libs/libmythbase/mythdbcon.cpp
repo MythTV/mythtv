@@ -963,7 +963,7 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
     QVariant val;
     QString holder;
 
-    for (i = (int)holders.count() - 1; i >= 0; --i)
+    for (i = holders.count() - 1; i >= 0; --i)
     {
         holder = holders[(uint)i].holderName;
         val = bindings[holder];

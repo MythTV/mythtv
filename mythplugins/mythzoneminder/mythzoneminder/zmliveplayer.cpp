@@ -280,8 +280,7 @@ void ZMLivePlayer::updateFrame()
 
     // get a list of monitor id's that need updating
     QList<int> monList;
-    vector<Player*>::iterator i = m_players->begin();
-    for (; i != m_players->end(); ++i)
+    for (auto i = m_players->begin(); i != m_players->end(); ++i)
     {
         Player *p = *i;
         if (!monList.contains(p->getMonitor()->id))
@@ -296,10 +295,9 @@ void ZMLivePlayer::updateFrame()
         if (frameSize > 0 && !status.startsWith("ERROR"))
         {
             // update each player that is displaying this monitor
-            vector<Player*>::iterator i = m_players->begin();
-            for (; i != m_players->end(); ++i)
+            for (auto it = m_players->begin(); it != m_players->end(); ++it)
             {
-                Player *p = *i;
+                Player *p = *it;
                 if (p->getMonitor()->id == monList[x])
                 {
                     if (p->getMonitor()->status != status)
@@ -362,7 +360,7 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 
         if (restore)
         {
-            if (x <= (int) monList.size())
+            if (x <= monList.size())
             {
                 QString s = monList.at(x - 1);
                 int monID = s.toInt(); 

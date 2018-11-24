@@ -560,31 +560,30 @@ void NetTree::FillTree()
     }
 
     // Now let's add all the grabber trees
-    for (GrabberScript::scriptList::iterator i = m_grabberList.begin();
-            i != m_grabberList.end(); ++i)
+    for (GrabberScript::scriptList::iterator g = m_grabberList.begin();
+            g != m_grabberList.end(); ++g)
     {
 
         QMultiMap<QPair<QString,QString>, ResultItem*> treePathsNodes =
-                           getTreeArticles((*i)->GetTitle(), VIDEO_FILE);
+                           getTreeArticles((*g)->GetTitle(), VIDEO_FILE);
 
         QList< QPair<QString,QString> > paths = treePathsNodes.uniqueKeys();
 
         MythGenericTree *ret = new MythGenericTree(
-                   (*i)->GetTitle(), kSubFolder, false);
+                   (*g)->GetTitle(), kSubFolder, false);
         QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg((*i)->GetImage());
+                            .arg((*g)->GetImage());
         ret->SetData(qVariantFromValue(thumb));
 
         // Add an upfolder
         if (m_type != DLG_TREE)
             ret->addNode(tr("Back"), kUpFolder, true, false);
 
-        for (QList<QPair<QString, QString> >::iterator i = paths.begin();
-                i != paths.end(); ++i)
+        for (auto it2 = paths.begin(); it2 != paths.end(); ++it2)
         {
-            QStringList curPaths = (*i).first.split("/");
-            QString dirthumb = (*i).second;
-            QList<ResultItem*> videos = treePathsNodes.values(*i);
+            QStringList curPaths = (*it2).first.split("/");
+            QString dirthumb = (*it2).second;
+            QList<ResultItem*> videos = treePathsNodes.values(*it2);
             BuildGenericTree(ret, curPaths, dirthumb, videos);
         }
         m_siteGeneric->addNode(ret);
@@ -787,13 +786,13 @@ void NetTree::UpdateCurrentItem(void)
         else
         {
             QString url = thumb;
-            QString title;
+            QString title2;
             if (m_type == DLG_TREE)
-                title = m_siteMap->GetItemCurrent()->GetText();
+                title2 = m_siteMap->GetItemCurrent()->GetText();
             else
-                title = m_siteButtonList->GetItemCurrent()->GetText();
+                title2 = m_siteButtonList->GetItemCurrent()->GetText();
 
-            QString sFilename = GetDownloadFilename(title, url);
+            QString sFilename = GetDownloadFilename(title2, url);
 
             bool exists = QFile::exists(sFilename);
             if (exists && !url.isEmpty())

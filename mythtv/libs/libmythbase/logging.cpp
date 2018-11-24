@@ -40,7 +40,7 @@ using namespace std;
 #endif
 #define SYSLOG_NAMES
 #ifndef _WIN32
-#include <syslog.h>
+#include <mythsyslog.h>
 #endif
 #include <unistd.h>
 
@@ -98,7 +98,7 @@ QStringList             logPropagateArgList;
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
 
-LogLevel_t logLevel = (LogLevel_t)LOG_INFO;
+LogLevel_t logLevel = LOG_INFO;
 
 bool verboseInitialized = false;
 VerboseMap verboseMap;
@@ -146,7 +146,7 @@ void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
 LoggingItem::LoggingItem() :
         ReferenceCounter("LoggingItem", false),
         m_pid(-1), m_tid(-1), m_threadId(-1), m_usec(0), m_line(0),
-        m_type(kMessage), m_level((LogLevel_t)LOG_INFO), m_facility(0), m_epoch(0),
+        m_type(kMessage), m_level(LOG_INFO), m_facility(0), m_epoch(0),
         m_file(nullptr), m_function(nullptr), m_threadName(nullptr), m_appName(nullptr),
         m_table(nullptr), m_logFile(nullptr)
 {
@@ -237,7 +237,7 @@ void LoggingItem::setThreadTid(void)
 #if defined(Q_OS_ANDROID)
         m_tid = (int64_t)gettid();
 #elif defined(linux)
-        m_tid = (int64_t)syscall(SYS_gettid);
+        m_tid = syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
         long lwpid;
         int dummy = thr_self( &lwpid );
@@ -574,8 +574,8 @@ void LoggerThread::handleItem(LoggingItem *item)
             snprintf(item->m_message, LOGLINE_MAX,
                      "Thread 0x%" PREFIX64 "X (%" PREFIX64
                      "d) registered as \'%s\'",
-                     (long long unsigned int)item->m_threadId,
-                     (long long int)item->m_tid,
+                     item->m_threadId,
+                     item->m_tid,
                      logThreadHash[item->m_threadId]);
         }
     }
@@ -600,7 +600,7 @@ void LoggerThread::handleItem(LoggingItem *item)
                 snprintf(item->m_message, LOGLINE_MAX,
                          "Thread 0x%" PREFIX64 "X (%" PREFIX64
                          "d) deregistered as \'%s\'",
-                         (long long unsigned int)item->m_threadId,
+                         item->m_threadId,
                          (long long int)tid,
                          logThreadHash[item->m_threadId]);
             }
@@ -671,8 +671,13 @@ bool LoggerThread::logConsole(LoggingItem *item)
                 shortname = lev->shortname;
         }
 
+#if CONFIG_DEBUGTYPE
+        snprintf( line, MAX_STRING_LENGTH, "%s %c  %s:%d:%s  %s\n", timestamp,
+                  shortname, item->m_file, item->m_line, item->m_function, item->m_message );
+#else
         snprintf( line, MAX_STRING_LENGTH, "%s %c  %s\n", timestamp,
                   shortname, item->m_message );
+#endif
     }
 
 #ifdef Q_OS_ANDROID
@@ -975,7 +980,7 @@ void loggingRegisterThread(const QString &name)
     QMutexLocker qLock(&logQueueMutex);
 
     LoggingItem *item = LoggingItem::create(__FILE__, __FUNCTION__,
-                                            __LINE__, (LogLevel_t)LOG_DEBUG,
+                                            __LINE__, LOG_DEBUG,
                                             kRegistering);
     if (item)
     {
@@ -994,7 +999,7 @@ void loggingDeregisterThread(void)
     QMutexLocker qLock(&logQueueMutex);
 
     LoggingItem *item = LoggingItem::create(__FILE__, __FUNCTION__, __LINE__,
-                                            (LogLevel_t)LOG_DEBUG,
+                                            LOG_DEBUG,
                                             kDeregistering);
     if (item)
         logQueue.enqueue(item);

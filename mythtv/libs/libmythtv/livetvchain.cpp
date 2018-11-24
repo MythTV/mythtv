@@ -373,7 +373,7 @@ int LiveTVChain::GetLengthAtPos(int pos)
     LiveTVChainEntry entry, nextentry;
 
     entry = m_chain[pos];
-    if (pos == ((int)m_chain.count() - 1))
+    if (pos == (m_chain.count() - 1))
     {
         // We're on live program, it hasn't ended. Use current time as end time
         return entry.starttime.secsTo(MythDate::current());
@@ -407,7 +407,7 @@ void LiveTVChain::SetProgram(const ProgramInfo &pginfo)
 
 bool LiveTVChain::HasNext(void) const
 {
-    return ((int)m_chain.count() - 1 > m_curpos);
+    return (m_chain.count() - 1 > m_curpos);
 }
 
 void LiveTVChain::ClearSwitch(void)
@@ -465,13 +465,13 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
     {
         // try to find recordings during first pass
         // we'll skip dummy and empty recordings
-        while (!pginfo && newid < (int)m_chain.count() && newid >= 0)
+        while (!pginfo && newid < m_chain.count() && newid >= 0)
         {
             GetEntryAt(newid, entry);
 
             bool at_last_entry =
                 ((newid > curpos) &&
-                 (newid == (int)(m_chain.count()-1))) ||
+                 (newid == m_chain.count()-1)) ||
                 ((newid <= curpos) && (newid == 0));
 
             // Skip dummy recordings, if possible.
@@ -480,7 +480,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
 
             // Skip empty recordings, if possible
             if (pginfo && (0 == pginfo->GetFilesize()) &&
-                newid < (int)(m_chain.count()-1))
+                newid < m_chain.count()-1)
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("Skipping empty program %1")
@@ -507,7 +507,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
 
                 bool at_last_entry =
                     ((newid > curpos) &&
-                     (newid == (int)(m_chain.count()-1))) ||
+                     (newid == m_chain.count()-1)) ||
                     ((newid <= curpos) && (newid == 0));
 
                 // Skip dummy recordings, if possible.
@@ -516,7 +516,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
 
                 // Skip empty recordings, if possible
                 if (pginfo && (0 == pginfo->GetFilesize()) &&
-                    newid < (int)(m_chain.count()-1))
+                    newid < m_chain.count()-1)
                 {
                     LOG(VB_GENERAL, LOG_WARNING,
                         QString("Skipping empty program %1")
@@ -525,7 +525,7 @@ ProgramInfo *LiveTVChain::DoGetNextProgram(bool up, int curpos, int &newid,
                     pginfo = nullptr;
                 }
             }
-            while (!pginfo && newid < (int)m_chain.count() && newid >= 0);
+            while (!pginfo && newid < m_chain.count() && newid >= 0);
 
             if (!pginfo)
             {

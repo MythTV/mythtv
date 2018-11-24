@@ -1132,7 +1132,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             AVFrame img_in, img_out;
             av_image_fill_arrays(
                 img_out.data, img_out.linesize,
-                (uint8_t *)pip_tmp_buf, AV_PIX_FMT_YUV420P,
+                pip_tmp_buf, AV_PIX_FMT_YUV420P,
                 pip_display_size.width(), pip_display_size.height(),
                 IMAGE_ALIGN);
 
@@ -1148,7 +1148,7 @@ void VideoOutput::ShowPIP(VideoFrame  *frame,
             {
                 AVFrame img_padded;
                 av_image_fill_arrays(img_padded.data, img_padded.linesize,
-                    (uint8_t *)pip_tmp_buf2,
+                    pip_tmp_buf2,
                     AV_PIX_FMT_YUV420P, pipw, piph, IMAGE_ALIGN);
 
                 int color[3] = { 20, 0, 200 }; //deep red YUV format
@@ -1263,10 +1263,10 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
         AVFrame img_in, img_out;
 
         av_image_fill_arrays(img_out.data, img_out.linesize,
-            (uint8_t *)vsz_tmp_buf, AV_PIX_FMT_YUV420P,
+            vsz_tmp_buf, AV_PIX_FMT_YUV420P,
             resize.width(), resize.height(),IMAGE_ALIGN);
         av_image_fill_arrays(img_in.data, img_in.linesize,
-            (uint8_t *)frame->buf, AV_PIX_FMT_YUV420P,
+            frame->buf, AV_PIX_FMT_YUV420P,
             frame->width, frame->height,IMAGE_ALIGN);
         img_in.data[0] = frame->buf + frame->offsets[0];
         img_in.data[1] = frame->buf + frame->offsets[1];
@@ -1419,7 +1419,7 @@ class OsdRender : public QRunnable
   private:
     inline void yv12()
     {
-#define ROUNDUP( _x,_z) ((_x) + ((-(int)(_x)) & ((_z) - 1)) )
+#define ROUNDUP( _x,_z) ((_x) + ((-(_x)) & ((_z) - 1)) )
 #define ROUNDDN( _x,_z) ((_x) & ~((_z) - 1))
         int left = m_vis.left();
         left = ROUNDUP(left, ALIGN_C);
@@ -1684,8 +1684,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
         hscale = image_aspect / pixel_aspect;
         if (hscale < 0.99f || hscale > 1.01f)
         {
-            vid_rec.setLeft((int)(((float)vid_rec.left() * hscale) + 0.5f));
-            vid_rec.setWidth((int)(((float)vid_rec.width() * hscale) + 0.5f));
+            vid_rec.setLeft(lroundf((float)vid_rec.left() * hscale));
+            vid_rec.setWidth(lroundf((float)vid_rec.width() * hscale));
         }
 
         float vscale = (float)dvr_rec.width() / (float)image_width;
@@ -1708,8 +1708,8 @@ QRect VideoOutput::GetImageRect(const QRect &rect, QRect *display)
     hscale = pixel_aspect / image_aspect;
     if (hscale < 0.99f || hscale > 1.01f)
     {
-        result.setLeft((int)(((float)rect1.left() * hscale) + 0.5f));
-        result.setWidth((int)(((float)rect1.width() * hscale) + 0.5f));
+        result.setLeft(lroundf((float)rect1.left() * hscale));
+        result.setWidth(lroundf((float)rect1.width() * hscale));
     }
 
     result.translate(-visible_osd.left(), -visible_osd.top());
@@ -1912,7 +1912,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
             gCoreContext->GetHostName(), pixel_aspect);
         if (disp_dim.height() <= 0)
             disp_dim.setHeight(300);
-        disp_dim.setWidth((int) ((disp_dim.height() * disp_aspect) + 0.5));
+        disp_dim.setWidth(lroundf(disp_dim.height() * disp_aspect));
     }
 
     if (disp_dim.isEmpty())
@@ -1920,7 +1920,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
         source = "Guessed!";
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Physical size of display unknown."
                 "\n\t\t\tAssuming 17\" monitor with square pixels.");
-        disp_dim = QSize((int) ((300 * pixel_aspect) + 0.5), 300);
+        disp_dim = QSize(lroundf(300 * pixel_aspect), 300);
     }
 
     disp_aspect = (float) disp_dim.width() / (float) disp_dim.height();

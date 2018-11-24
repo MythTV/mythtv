@@ -64,7 +64,7 @@ public:
             rtcp[0] = RTP_VERSION << 6;         // RTP version
             rtcp[1] = RTCP_RR;                  // RTCP_RR
             qToBigEndian((qint16)1, &rtcp[2]);  // length in words - 1
-            qToBigEndian((qint32)0, &rtcp[4]);  // our own SSRC
+            qToBigEndian(        0, &rtcp[4]);  // our own SSRC
             buffer = QByteArray((char *)rtcp, 10);
         }
         else

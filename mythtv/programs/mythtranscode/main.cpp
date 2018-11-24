@@ -92,8 +92,8 @@ static int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
 static void UpdateJobQueue(float percent_done)
 {
     JobQueue::ChangeJobComment(glbl_jobID,
-                               QString("%1% " + QObject::tr("Completed"))
-                               .arg(percent_done, 0, 'f', 1));
+                               QString("%1% ").arg(percent_done, 0, 'f', 1) +
+                               QObject::tr("Completed"));
 }
 
 static int CheckJobQueue()

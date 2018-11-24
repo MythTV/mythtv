@@ -148,7 +148,7 @@ void MythDialog::AcceptItem(int i)
         return;
     }
 
-    done((DialogCode)((int)kDialogCodeListStart + (int)i));
+    done((DialogCode)((int)kDialogCodeListStart + i));
 }
 
 int MythDialog::CalcItemIndex(DialogCode code)
@@ -439,7 +439,7 @@ MythLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
         case Small: label->setFont(defaultSmallFont); break;
     }
 
-    label->setMaximumWidth((int)m_parent->width() / 2);
+    label->setMaximumWidth(m_parent->width() / 2);
     if (wrap)
     {
         QChar::Direction text_dir = QChar::DirL;
@@ -550,12 +550,12 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
     }
 
     if (destx == -1)
-        x = (int)(width / 2) - (int)(maxw / 2);
+        x = (width / 2) - (maxw / 2);
     else
         x = destx;
 
     if (desty == -1)
-        y = (int)(height / 2) - (int)(poph / 2);
+        y = (height / 2) - (poph / 2);
     else
         y = desty;
 

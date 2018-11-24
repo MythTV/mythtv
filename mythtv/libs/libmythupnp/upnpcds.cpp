@@ -409,7 +409,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     uint16_t       nTotalMatches   = 0;
     uint16_t       nUpdateID       = 0;
     QString        sResultXML;
-    FilterMap filter =  static_cast<FilterMap>(request.m_sFilter.split(','));
+    FilterMap filter =  request.m_sFilter.split(',');
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::HandleBrowse ObjectID=%1")
@@ -639,7 +639,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
         if (eErrorCode == UPnPResult_Success)
         {
-            FilterMap filter =  (FilterMap) request.m_sFilter.split(',');
+            FilterMap filter = request.m_sFilter.split(',');
             nNumberReturned = pResult->m_List.count();
             nTotalMatches   = pResult->m_nTotalMatches;
             nUpdateID       = pResult->m_nUpdateID;

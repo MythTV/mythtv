@@ -80,8 +80,8 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     {
         if (!result || !m_out)
             break;
-        int ret = write_page(&og, m_out);
-        if (ret != og.header_len + og.body_len)
+        int ret2 = write_page(&og, m_out);
+        if (ret2 != og.header_len + og.body_len)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 "Failed to write header to output stream.");

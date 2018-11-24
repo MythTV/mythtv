@@ -42,9 +42,9 @@ extern "C" {
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
         {                                                               \
-            LogPrintLine(_MASK_, (LogLevel_t)_LEVEL_,                   \
+            LogPrintLine(_MASK_, _LEVEL_,                               \
                          __FILE__, __LINE__, __FUNCTION__, 1,           \
-                         QString(_STRING_).toLocal8Bit().constData());  \
+                         qPrintable(_STRING_));                         \
         }                                                               \
     } while (false)
 #else
@@ -52,7 +52,7 @@ extern "C" {
     do {                                                                \
         if (VERBOSE_LEVEL_CHECK((_MASK_), (_LEVEL_)) && ((_LEVEL_)>=0)) \
         {                                                               \
-            LogPrintLine(_MASK_, (LogLevel_t)_LEVEL_,                   \
+            LogPrintLine(_MASK_, _LEVEL_,                               \
                          __FILE__, __LINE__, __FUNCTION__, 0,           \
                          (const char *)_FORMAT_, ##__VA_ARGS__);        \
         }                                                               \

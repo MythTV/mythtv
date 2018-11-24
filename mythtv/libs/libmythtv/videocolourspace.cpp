@@ -164,8 +164,8 @@ void VideoColourSpace::Update(void)
     float luma_offset   = m_studioLevels ? 0.0f   : -16.0f / 255.0f;
     float chroma_offset = -128.0f / 255.0f;
 
-    float uvcos         = m_saturation * cos(m_hue);
-    float uvsin         = m_saturation * sin(m_hue);
+    float uvcos         = m_saturation * cosf(m_hue);
+    float uvsin         = m_saturation * sinf(m_hue);
     float brightness    = m_brightness * 255.0f / luma_range;
     float luma_scale    = 255.0f / luma_range;
     float chroma_scale  = 255.0f / chroma_range;
@@ -250,7 +250,7 @@ void VideoColourSpace::SetContrast(int value)
 
 void VideoColourSpace::SetHue(int value)
 {
-    m_hue = value * (-3.6f * M_PI / 180.0f);
+    m_hue = value * (-3.6 * M_PI / 180.0);
     Update();
 }
 

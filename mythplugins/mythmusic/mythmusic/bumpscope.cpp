@@ -119,9 +119,9 @@ void BumpScope::generate_cmap(unsigned int color)
 {
     if (m_image)
     {
-        uint red = (unsigned int)(color / 0x10000);
-        uint green = (unsigned int)((color % 0x10000) / 0x100);
-        uint blue = (unsigned int)(color % 0x100);
+        uint red = color / 0x10000;
+        uint green = (color % 0x10000) / 0x100;
+        uint blue = color % 0x100;
 
         for (uint i = 255; i > 0; i--)
         {
@@ -189,6 +189,7 @@ void BumpScope::generate_phongdat(void)
     }
 }
 
+#define M_PI_F static_cast<float>(M_PI)
 void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
                           int *angle)
 {
@@ -200,7 +201,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting y to both maxes */
     *yo = HEIGHT/2;
-    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI/180.0));
+    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0f));
     *xo = (int)((x-(WIDTH/2))/cos(*angle*(M_PI/180.0)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
@@ -210,7 +211,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *yo = -*yo;
-    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI/180.0));
+    *angle = (int)(asin((float)(y-(HEIGHT/2))/(float)*yo)/(M_PI_F/180.0f));
     *xo = (int)((x-(WIDTH/2))/cos(*angle*(M_PI/180.0)));
 
     if (*xo >= -wd2 && *xo <= wd2) {
@@ -221,7 +222,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting x to both maxes */
     *xo = WIDTH/2;
-    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI/180.0));
+    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0f));
     *yo = (int)((y-(HEIGHT/2))/sin(*angle*(M_PI/180.0)));
 
     if (*yo >= -hd2 && *yo <= hd2) {
@@ -231,7 +232,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *xo = -*xo;
-    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI/180.0));
+    *angle = (int)(acos((float)(x-(WIDTH/2))/(float)*xo)/(M_PI_F/180.0f));
     *yo = (int)((y-(HEIGHT/2))/sin(*angle*(M_PI/180.0)));
 
     /* if this isn't right, it's out of our range and we don't care */
@@ -275,7 +276,7 @@ void BumpScope::render_light(int lx, int ly)
 
     prev_y = m_bpl + 1;
     out_y = 0;
-    unsigned char *outputbuf = (unsigned char *)(m_image->bits());
+    unsigned char *outputbuf = m_image->bits();
 
     for (dy = (-ly) + (PHONGRES / 2), j = 0; j < m_height; j++, dy++,
          prev_y += m_bpl - m_width)
@@ -365,7 +366,7 @@ void BumpScope::hsv_to_rgb(double h, double s, double v, unsigned int *color)
         }
     }
 
-  *color = ((unsigned int)((double)r*255)<<16) | ((unsigned int)((double)g*255)<<8) | ((unsigned int)((double)b*255));
+  *color = ((unsigned int)(r*255)<<16) | ((unsigned int)(g*255)<<8) | ((unsigned int)(b*255));
 }
 
 bool BumpScope::process(VisualNode *node)
@@ -377,8 +378,8 @@ bool BumpScope::process(VisualNode *node)
     if (node->length < 512)
         numSamps = node->length;
 
-    int prev_y = (int)m_height / 2 + ((int)node->left[0] * (int)m_height) /
-             (int)0x10000;
+    int prev_y = (int)m_height / 2 +
+        ((int)node->left[0] * (int)m_height) / 0x10000;
 
     if (prev_y < 0)
         prev_y = 0;
@@ -387,8 +388,8 @@ bool BumpScope::process(VisualNode *node)
     for (uint i = 0; i < m_width; i++)
     {
         int y = (i * numSamps) / (m_width - 1);
-        y = (int)m_height / 2 + ((int)node->left[y] * (int)m_height) /
-            (int)0x10000;
+        y = (int)m_height / 2 +
+            ((int)node->left[y] * (int)m_height) / 0x10000;
 
         if (y < 0)
             y = 0;
@@ -433,7 +434,7 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
             m_iangle = 0;
 
         m_ixo += m_ixd;
-        if ((int)m_ixo > ((int)m_width / 2) || (int)m_ixo < -((int)m_width / 2))
+        if (m_ixo > ((int)m_width / 2) || m_ixo < -((int)m_width / 2))
         {
             m_ixo = (m_ixo > 0) ? (m_width / 2) : -(m_width / 2);
             if (random() & 1)
@@ -449,7 +450,7 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
         }
 
         m_iyo += m_iyd;
-        if ((int)m_iyo > ((int)m_height / 2) || (int)m_iyo < -((int)m_height / 2))
+        if (m_iyo > ((int)m_height / 2) || m_iyo < -((int)m_height / 2))
         {
             m_iyo = (m_iyo > 0) ? (m_height / 2) : -(m_height / 2);
             if (random() & 1)

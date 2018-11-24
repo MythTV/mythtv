@@ -243,7 +243,7 @@ class CECAdapterPriv
     int LogMessage(const cec_log_message &message)
     {
         QString msg(message.message);
-        int lvl = LOG_UNKNOWN;
+        LogLevel_t lvl = LOG_UNKNOWN;
         switch (message.level)
         {
             case CEC_LOG_ERROR:   lvl = LOG_ERR;     break;
@@ -259,7 +259,7 @@ class CECAdapterPriv
     void LogMessage(const cec_log_message* message)
     {
         QString msg(message->message);
-        int lvl = LOG_UNKNOWN;
+        LogLevel_t lvl = LOG_UNKNOWN;
         switch (message->level)
         {
             case CEC_LOG_ERROR:   lvl = LOG_ERR;     break;

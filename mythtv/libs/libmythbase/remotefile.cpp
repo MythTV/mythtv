@@ -364,7 +364,7 @@ bool RemoteFile::ReOpen(QString newFilename)
         return false;
     }
 
-    QStringList strlist( QString(query).arg(recordernum) );
+    QStringList strlist( query.arg(recordernum) );
     strlist << "REOPEN";
     strlist << newFilename;
 
@@ -392,7 +392,7 @@ void RemoteFile::Close(bool haslock)
     if (!controlSock)
         return;
 
-    QStringList strlist( QString(query).arg(recordernum) );
+    QStringList strlist( query.arg(recordernum) );
     strlist << "DONE";
 
     if (!haslock)
@@ -800,15 +800,15 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         else
             return -1;
 
-        off64_t localpos = ::lseek64(localFile, (off64_t)pos, whence);
-        if (localpos != (off64_t)pos)
+        off64_t localpos = ::lseek64(localFile, pos, whence);
+        if (localpos != pos)
         {
             LOG(VB_FILE, LOG_ERR,
                 QString("RemoteFile::Seek(): Couldn't seek to offset %1")
                 .arg(offset));
             return -1;
         }
-        return (long long)localpos;
+        return localpos;
     }
 
     if (!CheckConnection(false))
@@ -817,7 +817,7 @@ long long RemoteFile::SeekInternal(long long pos, int whence, long long curpos)
         return -1;
     }
 
-    QStringList strlist( QString(query).arg(recordernum) );
+    QStringList strlist( query.arg(recordernum) );
     strlist << "SEEK";
     strlist << QString::number(pos);
     strlist << QString::number(whence);
@@ -864,7 +864,7 @@ int RemoteFile::Write(const void *data, int size)
                 "RemoteFile::Write(): File not opened");
             return -1;
         }
-        return (int)fileWriter->Write(data, size);
+        return fileWriter->Write(data, size);
     }
 
     QMutexLocker locker(&lock);
@@ -875,7 +875,7 @@ int RemoteFile::Write(const void *data, int size)
         return -1;
     }
 
-    QStringList strlist( QString(query).arg(recordernum) );
+    QStringList strlist( query.arg(recordernum) );
     strlist << "WRITE_BLOCK";
     strlist << QString::number(size);
     bool ok = controlSock->WriteStringList(strlist);
@@ -988,7 +988,7 @@ int RemoteFile::Read(void *data, int size)
         controlSock->Reset();
     }
 
-    QStringList strlist( QString(query).arg(recordernum) );
+    QStringList strlist( query.arg(recordernum) );
     strlist << "REQUEST_BLOCK";
     strlist << QString::number(size);
     bool ok = controlSock->WriteStringList(strlist);
@@ -1143,7 +1143,7 @@ long long RemoteFile::GetRealFileSize(void)
         return filesize;
     }
 
-    QStringList strlist(QString(query).arg(recordernum));
+    QStringList strlist(query.arg(recordernum));
     strlist << "REQUEST_SIZE";
 
     bool ok = controlSock->SendReceiveStringList(strlist);
@@ -1209,7 +1209,7 @@ void RemoteFile::SetTimeout(bool fast)
         return;
     }
 
-    QStringList strlist( QString(query).arg(recordernum) );
+    QStringList strlist( query.arg(recordernum) );
     strlist << "SET_TIMEOUT";
     strlist << QString::number((int)fast);
 

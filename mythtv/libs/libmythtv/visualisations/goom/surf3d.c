@@ -118,7 +118,7 @@ void grid3d_update (grid3d *g, float angle, float *vals, float dist) {
 	if (g->mode==0) {
 		if (vals)
 			for (i=0;i<g->defx;i++)
-				s->vertex[i].y = s->vertex[i].y*0.2 + vals[i]*0.8;
+				s->vertex[i].y = s->vertex[i].y*0.2f + vals[i]*0.8f;
 
 		for (i=g->defx;i<s->nbvertex;i++) {
 			s->vertex[i].y *= 0.255f;

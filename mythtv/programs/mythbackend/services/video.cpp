@@ -70,7 +70,7 @@ DTC::VideoMetadataInfoList* Video::GetVideoList( const QString &Folder,
         sql.append(" WHERE filename LIKE '" + Folder + "%'");
 
     sql.append(" ORDER BY ");
-    QString sort = QString(Sort.toLower());
+    QString sort = Sort.toLower();
     if (sort == "added")
         sql.append("insertdate");
     else if (sort == "released")
@@ -426,9 +426,9 @@ DTC::BlurayInfo* Video::GetBluray( const QString &sPath )
     pBlurayInfo->setThumbCount(bdmeta->GetThumbnailCount());
     pBlurayInfo->setTopMenuSupported(bdmeta->GetTopMenuSupported());
     pBlurayInfo->setFirstPlaySupported(bdmeta->GetFirstPlaySupported());
-    pBlurayInfo->setNumHDMVTitles((uint)bdmeta->GetNumHDMVTitles());
-    pBlurayInfo->setNumBDJTitles((uint)bdmeta->GetNumBDJTitles());
-    pBlurayInfo->setNumUnsupportedTitles((uint)bdmeta->GetNumUnsupportedTitles());
+    pBlurayInfo->setNumHDMVTitles(bdmeta->GetNumHDMVTitles());
+    pBlurayInfo->setNumBDJTitles(bdmeta->GetNumBDJTitles());
+    pBlurayInfo->setNumUnsupportedTitles(bdmeta->GetNumUnsupportedTitles());
     pBlurayInfo->setAACSDetected(bdmeta->GetAACSDetected());
     pBlurayInfo->setLibAACSDetected(bdmeta->GetLibAACSDetected());
     pBlurayInfo->setAACSHandled(bdmeta->GetAACSHandled());

@@ -138,9 +138,7 @@ bool MythExternRecApp::Open(void)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     qRegisterMetaType<QProcess::ProcessError>("QProcess::ProcessError");
-    QObject::connect(&m_proc,
-                     static_cast<void (QProcess::*)(QProcess::ProcessError)>
-                     (&QProcess::errorOccurred),
+    QObject::connect(&m_proc, &QProcess::errorOccurred,
                      this, &MythExternRecApp::ProcError);
 #endif
 

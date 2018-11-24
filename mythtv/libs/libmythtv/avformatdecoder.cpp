@@ -125,7 +125,8 @@ static float get_aspect(const AVCodecContext &ctx)
 
     if (ctx.sample_aspect_ratio.num && ctx.height)
     {
-        aspect_ratio = av_q2d(ctx.sample_aspect_ratio) * (float) ctx.width;
+        aspect_ratio = av_q2d(ctx.sample_aspect_ratio) *
+            static_cast<double>(ctx.width);
         aspect_ratio /= (float) ctx.height;
     }
 
@@ -564,7 +565,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
     if (!st)
         return false;
 
-    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (ic->start_time != AV_NOPTS_VALUE)
         start_pts = av_rescale(ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
@@ -584,7 +585,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
 {
     int64_t start_pts = 0, pts;
 
-    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (ic->start_time != AV_NOPTS_VALUE)
         start_pts = av_rescale(ic->start_time,
                                st->time_base.den,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
@@ -713,7 +714,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     }
 
     long long ts = 0;
-    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (ic->start_time != AV_NOPTS_VALUE)
         ts = ic->start_time;
 
     // convert framenumber to normalized timestamp
@@ -735,12 +736,12 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     int normalframes = 0;
 
-    if (st && st->cur_dts != (int64_t)AV_NOPTS_VALUE)
+    if (st && st->cur_dts != AV_NOPTS_VALUE)
     {
 
         int64_t adj_cur_dts = st->cur_dts;
 
-        if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+        if (ic->start_time != AV_NOPTS_VALUE)
         {
             int64_t st1 = av_rescale(ic->start_time,
                                     st->time_base.den,
@@ -1302,7 +1303,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (dur == 0)
     {
-        if ((ic->duration == (int64_t)AV_NOPTS_VALUE) &&
+        if ((ic->duration == AV_NOPTS_VALUE) &&
             (!livetv && !ringBuffer->IsDisc()))
             av_estimate_timings(ic, 0);
 
@@ -1328,8 +1329,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         {
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)bitrate / 8 / 2;
-            float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+            float secs = ringBuffer->GetRealFileSize() * 1.0f / bytespersec;
+            m_parent->SetFileLength((int)(secs),
+                                    (int)(secs * static_cast<float>(fps)));
         }
 
         // we will not see a position map from db or remote encoder,
@@ -1417,17 +1419,17 @@ float AvFormatDecoder::normalized_fps(AVStream *stream, AVCodecContext *enc)
         avg_fps = av_q2d(stream->avg_frame_rate); // MKV default_duration
 
     if (enc->time_base.den && enc->time_base.num) // tbc
-        codec_fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
+        codec_fps = 1.0 / av_q2d(enc->time_base) / enc->ticks_per_frame;
     // Some formats report fps waaay too high. (wrong time_base)
     if (codec_fps > 121.0f && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
     {
         enc->time_base.num = 1001;  // seems pretty standard
         if (av_q2d(enc->time_base) > 0)
-            codec_fps = 1.0f / av_q2d(enc->time_base);
+            codec_fps = 1.0 / av_q2d(enc->time_base);
     }
     if (stream->time_base.den && stream->time_base.num) // tbn
-        container_fps = 1.0f / av_q2d(stream->time_base);
+        container_fps = 1.0 / av_q2d(stream->time_base);
     if (stream->r_frame_rate.den && stream->r_frame_rate.num) // tbr
         estimated_fps = av_q2d(stream->r_frame_rate);
 
@@ -1981,7 +1983,7 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
         lang_cc_cnt[type][nsi.language]++;
         nsi.language_index = lang_indx;
         tracks[(type) ? kTrackTypeCC708 : kTrackTypeCC608].push_back(nsi);
-        int key = (int)nsi.stream_id + ((type) ? 4 : -1);
+        int key = nsi.stream_id + ((type) ? 4 : -1);
         if (key < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "in_tracks key too small");
@@ -3013,9 +3015,11 @@ void release_avf_buffer(void *opaque, uint8_t *data)
         nd->GetPlayer()->DeLimboFrame(frame);
 }
 
+#ifdef USING_VAAPI2
 static void dummy_release_avf_buffer(void * /*opaque*/, uint8_t * /*data*/)
 {
 }
+#endif
 
 #ifdef USING_VDPAU
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic, int /*flags*/)
@@ -3408,8 +3412,7 @@ void AvFormatDecoder::HandleGopStart(
             if (trackTotalDuration)
             {
                 m_frameToDurMap[framesRead] =
-                    (int64_t)totalDuration.num * 1000.0 / totalDuration.den
-                    + 0.5;
+                    llround(totalDuration.num * 1000.0 / totalDuration.den);
                 m_durToFrameMap[m_frameToDurMap[framesRead]] = framesRead;
             }
         }
@@ -3469,7 +3472,9 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                 current_aspect = aspect_override;
             float seqFPS = seq->fps();
 
-            bool changed = (seqFPS > fps+0.01f) || (seqFPS < fps-0.01f);
+            bool changed =
+                (seqFPS > static_cast<float>(fps)+0.01f) ||
+                (seqFPS < static_cast<float>(fps)-0.01f);
             changed |= (width  != (uint)current_width );
             changed |= (height != (uint)current_height);
 
@@ -3578,7 +3583,10 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
         bool res_changed = ((width  != (uint)current_width) ||
                             (height != (uint)current_height));
-        bool fps_changed = seqFPS > 0.0 && ((seqFPS > fps + 0.01f) || (seqFPS < fps - 0.01f));
+        bool fps_changed =
+            (seqFPS > 0.0f) &&
+            ((seqFPS > static_cast<float>(fps) + 0.01f) ||
+             (seqFPS < static_cast<float>(fps) - 0.01f));
 
         if (fps_changed || res_changed)
         {
@@ -3590,7 +3598,7 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             current_width  = width;
             current_height = height;
 
-            if (seqFPS > 0.0)
+            if (seqFPS > 0.0f)
                 fps = seqFPS;
 
             gopset = false;
@@ -3695,7 +3703,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     }
     mpa_pic->reordered_opaque = AV_NOPTS_VALUE;
 
-    if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
+    if (pkt->pts != AV_NOPTS_VALUE)
         pts_detected = true;
 
     bool tryAgain = true;
@@ -3812,12 +3820,12 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             int64_t pts = 0;
 
             // Detect faulty video timestamps using logic from ffplay.
-            if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            if (pkt->dts != AV_NOPTS_VALUE)
             {
                 faulty_dts += (pkt->dts <= last_dts_for_fault_detection);
                 last_dts_for_fault_detection = pkt->dts;
             }
-            if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+            if (mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
             {
                 faulty_pts += (mpa_pic->reordered_opaque <= last_pts_for_fault_detection);
                 last_pts_for_fault_detection = mpa_pic->reordered_opaque;
@@ -3832,29 +3840,29 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             // more faulty or never detected.
             if (force_dts_timestamps)
             {
-                if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+                if (pkt->dts != AV_NOPTS_VALUE)
                     pts = pkt->dts;
                 pts_selected = false;
             }
             else if (ringBuffer->IsDVD())
             {
-                if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+                if (pkt->dts != AV_NOPTS_VALUE)
                     pts = pkt->dts;
                 pts_selected = false;
             }
             else if (private_dec && private_dec->NeedsReorderedPTS() &&
-                    mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+                    mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
             {
                 pts = mpa_pic->reordered_opaque;
                 pts_selected = true;
             }
             else if (faulty_pts <= faulty_dts && reordered_pts_detected)
             {
-                if (mpa_pic->reordered_opaque != (int64_t)AV_NOPTS_VALUE)
+                if (mpa_pic->reordered_opaque != AV_NOPTS_VALUE)
                     pts = mpa_pic->reordered_opaque;
                 pts_selected = true;
             }
-            else if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+            else if (pkt->dts != AV_NOPTS_VALUE)
             {
                 pts = pkt->dts;
                 pts_selected = false;
@@ -4299,7 +4307,7 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 
     long long pts = 0;
 
-    if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+    if (pkt->dts != AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
     avcodeclock->lock();
@@ -5013,7 +5021,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             || !m_audio->HasAudioOut())
             break;
 
-        if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
+        if (firstloop && pkt->pts != AV_NOPTS_VALUE)
             lastapts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
 
         if (!use_frame_timing)
@@ -5419,7 +5427,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     break;
                 }
 
-                if (pkt->pts != (int64_t) AV_NOPTS_VALUE)
+                if (pkt->pts != AV_NOPTS_VALUE)
                 {
                     lastccptsu = (long long)
                                  (av_q2d(curstream->time_base)*pkt->pts*1000000);
@@ -5802,18 +5810,18 @@ void AvFormatDecoder::av_update_stream_timings_video(AVFormatContext *ic)
         return;
 
    duration = INT64_MIN;
-   if (st->start_time != (int64_t)AV_NOPTS_VALUE && st->time_base.den) {
+   if (st->start_time != AV_NOPTS_VALUE && st->time_base.den) {
        int64_t start_time1= av_rescale_q(st->start_time, st->time_base, AV_TIME_BASE_Q);
        if (start_time1 < start_time)
            start_time = start_time1;
-       if (st->duration != (int64_t)AV_NOPTS_VALUE) {
+       if (st->duration != AV_NOPTS_VALUE) {
            int64_t end_time1 = start_time1 +
                       av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
            if (end_time1 > end_time)
                end_time = end_time1;
        }
    }
-   if (st->duration != (int64_t)AV_NOPTS_VALUE) {
+   if (st->duration != AV_NOPTS_VALUE) {
        int64_t duration1 = av_rescale_q(st->duration, st->time_base, AV_TIME_BASE_Q);
        if (duration1 > duration)
            duration = duration1;

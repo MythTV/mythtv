@@ -87,10 +87,10 @@ bool BrowserConfig::Create()
 void BrowserConfig::slotSave(void)
 {
     float zoom = m_zoomEdit->GetText().toFloat();
-    if (zoom > 5.0)
-        zoom = 5.0;
-    if (zoom < 0.3)
-        zoom = 0.3; 
+    if (zoom > 5.0f)
+        zoom = 5.0f;
+    if (zoom < 0.3f)
+        zoom = 0.3f; 
     gCoreContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
     gCoreContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
     int checkstate = 0;
@@ -226,14 +226,14 @@ void BookmarkManager::UpdateURLList(void)
 
         if (group == site->category)
         {
-            MythUIButtonListItem *item = new MythUIButtonListItem(
+            MythUIButtonListItem *item2 = new MythUIButtonListItem(
                     m_bookmarkList, "", "", true, MythUIButtonListItem::NotChecked);
-            item->SetText(site->name, "name");
-            item->SetText(site->url, "url");
+            item2->SetText(site->name, "name");
+            item2->SetText(site->url, "url");
             if (site->isHomepage)
-                item->DisplayState("yes", "homepage");
-            item->SetData(qVariantFromValue(site));
-            item->setChecked(site->selected ?
+                item2->DisplayState("yes", "homepage");
+            item2->SetData(qVariantFromValue(site));
+            item2->setChecked(site->selected ?
                     MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
         }
     }

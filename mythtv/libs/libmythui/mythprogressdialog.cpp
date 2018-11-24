@@ -235,7 +235,7 @@ void MythUIProgressDialog::UpdateProgress()
          m_progressBar->SetUsed(m_count);
      }
 
-    uint percentage = (uint)(((float)m_count/(float)m_total) * 100.0);
+    uint percentage = (uint)(((float)m_count/(float)m_total) * 100.0f);
 
     if (m_progressText)
         m_progressText->SetText(QString("%1%").arg(percentage));

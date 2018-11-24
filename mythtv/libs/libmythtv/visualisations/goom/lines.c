@@ -15,7 +15,7 @@ static inline unsigned char
 lighten (unsigned char value, float power)
 {
 	int     val = value;
-	float   t = (float) val * log10(power) / 2.0;
+	float   t = (float) val * log10f(power) / 2.0f;
 
 	if (t > 0) {
 		val = (int) t; // (32.0f * log (t));
@@ -55,7 +55,7 @@ genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 		for (i = 0; i < 512; i++) {
 			l[i].x = ((float) i * rx) / 512.0f;
 			l[i].y = param;
-			l[i].angle = M_PI / 2.0f;
+			l[i].angle = M_PI_F / 2.0f;
 		}
 		return;
 	case GML_VLINE:
@@ -69,9 +69,9 @@ genline (int id, float param, GMUnitPointer * l, int rx, int ry)
 		for (i = 0; i < 512; i++) {
 			float   cosa, sina;
 
-			l[i].angle = 2.0f * M_PI * (float) i / 512.0f;
-			cosa = param * cos (l[i].angle);
-			sina = param * sin (l[i].angle);
+			l[i].angle = 2.0f * M_PI_F * (float) i / 512.0f;
+			cosa = param * cosf (l[i].angle);
+			sina = param * sinf (l[i].angle);
 			l[i].x = ((float) rx / 2.0f) + cosa;
 			l[i].y = (float) ry / 2.0f + sina;
 		}
@@ -218,8 +218,8 @@ goom_lines_draw (GMLine * line, gint16 data[512], unsigned int *p)
 		guint32 color = line->color;
 		GMUnitPointer *pt = &(line->points[0]);
 
-		float   cosa = cos (pt->angle) / 1000.0f;
-		float   sina = sin (pt->angle) / 1000.0f;
+		float   cosa = cosf (pt->angle) / 1000.0f;
+		float   sina = sinf (pt->angle) / 1000.0f;
 
 		lightencolor ((int *)&color, line->power);
 
@@ -230,8 +230,8 @@ goom_lines_draw (GMLine * line, gint16 data[512], unsigned int *p)
 			int     x2, y2;
 			GMUnitPointer *pt = &(line->points[i]);
 
-			float   cosa = cos (pt->angle) / 1000.0f;
-			float   sina = sin (pt->angle) / 1000.0f;
+			float   cosa = cosf (pt->angle) / 1000.0f;
+			float   sina = sinf (pt->angle) / 1000.0f;
 
 			x2 = (int) (pt->x + cosa * line->amplitude * data[i]);
 			y2 = (int) (pt->y + sina * line->amplitude * data[i]);

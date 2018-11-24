@@ -72,7 +72,7 @@ static const char *H264Profile2String(int profile);
 // Convert PTS <> OMX ticks
 static inline OMX_TICKS Pts2Ticks(AVStream *stream, int64_t pts)
 {
-    if (pts == int64_t(AV_NOPTS_VALUE))
+    if (pts == AV_NOPTS_VALUE)
         return S64_TO_TICKS(0);
 
     return S64_TO_TICKS( int64_t(
@@ -1024,7 +1024,7 @@ int PrivateDecoderOMX::GetBufferedFrame(AVStream *stream, AVFrame *picture)
 
             AVFrame img_in, img_out;
             av_image_fill_arrays(img_out.data, img_out.linesize,
-                (uint8_t *)vf.buf, out_fmt, out_width,
+                vf.buf, out_fmt, out_width,
                 out_height, IMAGE_ALIGN);
             av_image_fill_arrays(img_in.data, img_in.linesize,
                 src, in_fmt, in_width, in_height, IMAGE_ALIGN);

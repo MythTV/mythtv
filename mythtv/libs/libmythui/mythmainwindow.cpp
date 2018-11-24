@@ -2671,7 +2671,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     {
         d->m_udpListener->Enable();
     }
-    else if ((MythEvent::Type)(ce->type()) == MythEvent::MythEventMessage)
+    else if (ce->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(ce);
         QString message = me->Message();
@@ -2761,7 +2761,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             gCoreContext->AllowShutdown();
         }
     }
-    else if ((MythEvent::Type)(ce->type()) == MythEvent::MythUserMessage)
+    else if (ce->type() == MythEvent::MythUserMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(ce);
         QString message = me->Message();
@@ -2769,7 +2769,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         if (!message.isEmpty())
             ShowOkPopup(message);
     }
-    else if ((MythEvent::Type)(ce->type()) == MythNotificationCenterEvent::kEventType)
+    else if (ce->type() == MythNotificationCenterEvent::kEventType)
     {
         GetNotificationCenter()->ProcessQueue();
     }
@@ -2827,7 +2827,7 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
     // adjust for myth GUI size relative to 800x600
     floatSize = floatSize * d->hmult;
     // round to the nearest point size
-    pointSize = (int)(floatSize + 0.5);
+    pointSize = lroundf(floatSize);
 
     return pointSize;
 }
@@ -2864,12 +2864,12 @@ QSize MythMainWindow::NormSize(const QSize &size)
 
 int MythMainWindow::NormX(const int x)
 {
-    return (int)(qRound(x * d->wmult));
+    return qRound(x * d->wmult);
 }
 
 int MythMainWindow::NormY(const int y)
 {
-    return (int)(qRound(y * d->hmult));
+    return qRound(y * d->hmult);
 }
 
 void MythMainWindow::SetScalingFactors(float wmult, float hmult)

@@ -292,8 +292,8 @@ void BDInfo::GetNameAndSerialNum(BLURAY* bdnav,
 
 bool BDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
-    name   = QString(m_name);
-    serial = QString(m_serialnumber);
+    name   = m_name;
+    serial = m_serialnumber;
     if (name.isEmpty() && serial.isEmpty())
         return false;
     return true;
@@ -1630,11 +1630,11 @@ bool BDRingBuffer::RestoreBDStateSnapshot(const QString& state)
         settings.contains("time") )
     {
         uint32_t title = (uint32_t)settings["title"];
-        uint64_t time  = (uint64_t)settings["time"];
+        uint64_t time  = settings["time"];
         uint64_t angle = 0;
 
         if (settings.contains("angle"))
-            angle = (uint64_t)settings["angle"];
+            angle = settings["angle"];
 
         if(title != (uint32_t)m_currentTitle)
             SwitchTitle(title);

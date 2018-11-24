@@ -45,7 +45,7 @@ MHParseBinary::MHParseBinary(QByteArray &program)
 // and we throw an exception.
 unsigned char MHParseBinary::GetNextChar()
 {
-    if (m_p >= (int)m_data.size())
+    if (m_p >= m_data.size())
     {
         MHERROR("Unexpected end of file");
     }

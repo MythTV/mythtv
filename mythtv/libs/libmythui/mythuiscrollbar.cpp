@@ -1,6 +1,9 @@
 // Own Header
 #include "mythuiscrollbar.h"
 
+// C++
+#include <cmath>
+
 // QT
 #include <QCoreApplication>
 #include <QDomDocument>
@@ -116,17 +119,17 @@ void MythUIScrollBar::CalculatePosition(void)
 
     if (m_layout == LayoutHorizontal)
     {
-        int width = qMax((int)(fillArea.width() * relativeSize + 0.5),
+        int width = qMax((int)lroundf(fillArea.width() * relativeSize),
                          m_sliderArea.width());
         newSliderArea.setWidth(width);
-        endPos.setX((int)((fillArea.width() - width) * percentage + 0.5));
+        endPos.setX(lroundf((fillArea.width() - width) * percentage));
     }
     else
     {
-        int height = qMax((int)(fillArea.height() * relativeSize + 0.5),
+        int height = qMax((int)lroundf(fillArea.height() * relativeSize),
                           m_sliderArea.height());
         newSliderArea.setHeight(height);
-        endPos.setY((int)((fillArea.height() - height) * percentage + 0.5));
+        endPos.setY(lroundf((fillArea.height() - height) * percentage));
     }
 
     slider->SetArea(newSliderArea);

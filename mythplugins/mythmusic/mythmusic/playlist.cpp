@@ -771,7 +771,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
             for (; it != list.end(); ++it)
             {
                 int an_int = (*it).toInt();
-                tempList += "," + QString(*it);
+                tempList += "," + *it;
                 if (!bFound && an_int == currentTrackID)
                 {
                     bFound = true;
@@ -840,8 +840,8 @@ void Playlist::fillSonglistFromList(const QList<int> &songList,
             QString tempList;
             for (; it != list.end(); ++it)
             {
-                int an_int = QString(*it).toInt();
-                tempList += "," + QString(*it);
+                int an_int = (*it).toInt();
+                tempList += "," + *it;
                 if (!bFound && an_int == currentTrackID)
                 {
                     bFound = true;

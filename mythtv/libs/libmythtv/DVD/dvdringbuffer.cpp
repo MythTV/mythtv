@@ -143,8 +143,8 @@ void DVDInfo::GetNameAndSerialNum(dvdnav_t* nav,
 
 bool DVDInfo::GetNameAndSerialNum(QString &name, QString &serial)
 {
-    name   = QString(m_name);
-    serial = QString(m_serialnumber);
+    name   = m_name;
+    serial = m_serialnumber;
     if (name.isEmpty() && serial.isEmpty())
         return false;
     return true;
@@ -914,8 +914,8 @@ int DVDRingBuffer::safe_read(void *data, uint sz)
                     m_curSubtitleTrack = dvdnav_get_active_spu_stream(m_dvdnav);
 
                 // debug
-                LOG(VB_PLAYBACK, LOG_DEBUG,
-                    QString(LOC + "DVDNAV_SPU_STREAM_CHANGE: "
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                          QString("DVDNAV_SPU_STREAM_CHANGE: "
                                   "physicalwide %1, physicalletterbox %2, "
                                   "physicalpanscan %3, currenttrack %4")
                         .arg(spu->physical_wide).arg(spu->physical_letterbox)
@@ -1375,7 +1375,7 @@ void DVDRingBuffer::prevTrack(void)
  */
 uint DVDRingBuffer::GetTotalTimeOfTitle(void)
 {
-    return m_pgcLength / 90000.0 + 0.5;
+    return lround(m_pgcLength / 90000.0);
 }
 
 /** \brief get the start of the cell in seconds
@@ -2148,7 +2148,7 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
     {
         unsigned char channels = dvdnav_audio_stream_channels(m_dvdnav, physical);
         if (channels != 0xff)
-            numChannels = (uint8_t)channels;
+            numChannels = channels;
     }
 
     return numChannels;
@@ -2158,8 +2158,8 @@ uint8_t DVDRingBuffer::GetNumAudioChannels(int idx)
  */
 bool DVDRingBuffer::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
-    _name    = QString(m_dvdname);
-    _serial    = QString(m_serialnumber);
+    _name    = m_dvdname;
+    _serial  = m_serialnumber;
     if (_name.isEmpty() && _serial.isEmpty())
         return false;
     return true;

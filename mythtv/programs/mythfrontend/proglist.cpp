@@ -414,7 +414,7 @@ void ProgLister:: SwitchToNextView(void)
         return;
 
     m_curView++;
-    if (m_curView >= (int)m_viewList.size())
+    if (m_curView >= m_viewList.size())
         m_curView = 0;
 
     LoadInBackground();
@@ -1040,7 +1040,7 @@ void ProgLister::FillViewList(const QString &view)
             m_curView = m_viewList.indexOf(view);
     }
 
-    if (m_curView >= (int)m_viewList.size())
+    if (m_curView >= m_viewList.size())
         m_curView = m_viewList.size() - 1;
 }
 
@@ -1715,7 +1715,7 @@ void ProgLister::customEvent(QEvent *event)
                 ShowChooseViewMenu();
         }
     }
-    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QString message = me->Message();

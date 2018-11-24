@@ -415,7 +415,7 @@ void RecordingSelector::updateRecordingList(void)
                     p->GetScheduledStartTime().toLocalTime()
                     .toString("dd MMM yy (hh:mm)"));
                 item->setCheckable(true);
-                if (m_selectedList.indexOf((ProgramInfo *) p) != -1)
+                if (m_selectedList.indexOf(p) != -1)
                 {
                     item->setChecked(MythUIButtonListItem::FullChecked);
                 }

@@ -372,7 +372,7 @@ private:
         if (!elems.size())
             return QString();
 
-        return QString(elems.at(0).toElement().attribute("url"));
+        return elems.at(0).toElement().attribute("url");
     }
 
     QString GetTitle(const QDomElement& element)
@@ -384,7 +384,7 @@ private:
             return QString();
 
         QDomElement telem = elems.at(0).toElement();
-        return QString(Parse::UnescapeHTML(telem.text()));
+        return Parse::UnescapeHTML(telem.text());
     }
 
     QString GetDescription(const QDomElement& element)
@@ -396,7 +396,7 @@ private:
             return QString();
 
         QDomElement telem = elems.at(0).toElement();
-        return QString(Parse::UnescapeHTML(telem.text()));
+        return Parse::UnescapeHTML(telem.text());
     }
 
     QString GetKeywords(const QDomElement& element)
@@ -408,7 +408,7 @@ private:
             return QString();
 
         QDomElement telem = elems.at(0).toElement();
-        return QString(telem.text());
+        return telem.text();
     }
 
     int GetInt(const QDomElement& elem, const QString& attrname)
@@ -418,7 +418,7 @@ private:
             bool ok = false;
             int result = elem.attribute(attrname).toInt(&ok);
             if (ok)
-                return int(result);
+                return result;
         }
         return int();
     }

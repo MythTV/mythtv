@@ -558,7 +558,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     if (!GuideDataThrough.isNull())
     {
         guide.setAttribute("guideThru",
-            QDateTime(GuideDataThrough).toString(Qt::ISODate));
+            GuideDataThrough.toString(Qt::ISODate));
         guide.setAttribute("guideDays", qdtNow.daysTo(GuideDataThrough));
     }
 

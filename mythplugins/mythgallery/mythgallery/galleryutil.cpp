@@ -16,6 +16,9 @@
  *
  * ============================================================ */
 
+// C++
+#include <cmath>
+
 // qt
 #include <QDir>
 #include <QApplication>
@@ -570,8 +573,8 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     query.prepare("UPDATE gallerymetadata "
                   "SET image = :IMAGENEW "
                   "WHERE image = :IMAGEOLD");
-    query.bindValue(":IMAGENEW", QString(currDir + '/' + newName));
-    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName));
+    query.bindValue(":IMAGENEW", currDir + '/' + newName);
+    query.bindValue(":IMAGEOLD", currDir + '/' + oldName);
     if (query.exec())
         return true;
 
@@ -600,11 +603,11 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
     case kScaleToFill:
         // scale-max to dest width for most images
         scaleWidth = dest.width();
-        scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+        scaleHeight = lround(dest.width() * pixelAspect / imageAspect);
         if (scaleHeight < dest.height())
         {
             // scale-max to dest height for extra wide images
-            scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+            scaleWidth = lround(dest.height() * imageAspect / pixelAspect);
             scaleHeight = dest.height();
         }
         break;
@@ -617,13 +620,13 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, ScaleMax sca
 
     case kScaleToFit:
         // scale-min to dest height for most images
-        scaleWidth = (int)((float)dest.height() * imageAspect / pixelAspect);
+        scaleWidth = lround(dest.height() * imageAspect / pixelAspect);
         scaleHeight = dest.height();
         if (scaleWidth > dest.width())
         {
             // scale-min to dest width for extra wide images
             scaleWidth = dest.width();
-            scaleHeight = (int)((float)dest.width() * pixelAspect / imageAspect);
+            scaleHeight = lround(dest.width() * pixelAspect / imageAspect);
         }
         break;
 
@@ -740,8 +743,8 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
         path += QString(".thumbcache/");
         if (QFile::exists(path + oldName))
         {
-            QDir d(path);
-            d.rename(oldName, newName);
+            QDir d2(path);
+            d2.rename(oldName, newName);
         }
     }
 
@@ -749,7 +752,7 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT image, angle FROM gallerymetadata "
                   "WHERE image LIKE :IMAGEOLD");
-    query.bindValue(":IMAGEOLD", QString(currDir + '/' + oldName + '%'));
+    query.bindValue(":IMAGEOLD", currDir + '/' + oldName + '%');
     if (query.exec())
     {
         while (query.next())

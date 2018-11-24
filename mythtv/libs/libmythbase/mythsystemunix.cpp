@@ -721,10 +721,9 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
     {
         // search for absolute path
         QStringList path = QString(getenv("PATH")).split(':');
-        QStringList::const_iterator i = path.begin();
-        for (; i != path.end(); ++i)
+        for (auto pit = path.begin(); pit != path.end(); ++pit)
         {
-            QFile file(QString("%1/%2").arg(*i).arg(abscmd));
+            QFile file(QString("%1/%2").arg(*pit).arg(abscmd));
             if (file.exists())
             {
                 abscmd = file.fileName();
@@ -779,7 +778,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
 
     // For use in the child
     char locerr[MAX_BUFLEN];
-    strncpy(locerr, (const char *)LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
+    strncpy(locerr, LOC_ERR.toUtf8().constData(), MAX_BUFLEN);
     locerr[MAX_BUFLEN-1] = '\0';
 
     LOG(VB_SYSTEM, LOG_DEBUG, QString("Launching: %1").arg(GetLogCmd()));
@@ -891,11 +890,11 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     char *command = strdup(cmdUTF8.constData());
 
     char **cmdargs = (char **)malloc((args.size() + 1) * sizeof(char *));
-    int i;
     QStringList::const_iterator it;
 
     if (cmdargs)
     {
+        int i;
         for (i = 0, it = args.constBegin(); it != args.constEnd(); ++it)
         {
             cmdargs[i++] = strdup(it->toUtf8().constData());
@@ -1104,8 +1103,8 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
         }
 
         /* Close all open file descriptors except stdin/stdout/stderr */
-        for( int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i-- )
-            close(i);
+        for( int fd = sysconf(_SC_OPEN_MAX) - 1; fd > 2; fd-- )
+            close(fd);
 
         /* set directory */
         if( directory && chdir(directory) < 0 )
@@ -1143,7 +1142,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
 
     if( cmdargs )
     {
-        for (i = 0; cmdargs[i]; i++)
+        for (int i = 0; cmdargs[i]; i++)
             free( cmdargs[i] );
         free( cmdargs );
     }

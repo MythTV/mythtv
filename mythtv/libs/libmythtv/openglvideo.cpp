@@ -996,8 +996,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             }
             if ((bot && !first) || (top && first))
             {
-                trect.setTop((trueheight / 2) + (trect.top() / 2));
-                trect.setBottom((trueheight / 2) + (trect.bottom() / 2));
+                trect.setTop(static_cast<qreal>(trueheight / 2) + (trect.top() / 2));
+                trect.setBottom(static_cast<qreal>(trueheight / 2) + (trect.bottom() / 2));
                 trect.adjust(0, -bob, 0, -bob);
             }
         }
@@ -1006,11 +1006,11 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         if (filter->outputBuffer == kDefaultBuffer)
         {
             if (kStereoscopicModeSideBySideDiscard == stereo)
-                trect = QRectF(trect.left() / 2.0f,  trect.top(),
-                               trect.width() / 2.0f, trect.height());
+                trect = QRectF(trect.left() / 2.0,  trect.top(),
+                               trect.width() / 2.0, trect.height());
             if (kStereoscopicModeTopAndBottomDiscard == stereo)
-                trect = QRectF(trect.left(),  trect.top() / 2.0f,
-                               trect.width(), trect.height() / 2.0f);
+                trect = QRectF(trect.left(),  trect.top() / 2.0,
+                               trect.width(), trect.height() / 2.0);
         }
 
         // vertex coordinates
@@ -1447,11 +1447,11 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
 
     float maxheight  = (float)(min(inputTextureSize.height(), 2160) - 1) *
                        lineHeight;
-    float fieldSize = 1.0f / (lineHeight * 2.0);
+    float fieldSize = 1.0f / (lineHeight * 2.0f);
 
     string.replace("%2", QString::number(fieldSize, 'f', 8));
     string.replace("%3", QString::number(lineHeight, 'f', 8));
-    string.replace("%4", QString::number(lineHeight * 2.0, 'f', 8));
+    string.replace("%4", QString::number(lineHeight * 2.0f, 'f', 8));
     string.replace("%5", QString::number(colWidth, 'f', 8));
     string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));

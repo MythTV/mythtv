@@ -1709,10 +1709,10 @@ void LCDProcClient::setChannelProgress(const QString &time, float value)
     m_progress = value;
     m_channelTime = time;
 
-    if ( m_progress < 0.0)
-        m_progress = 0.0;
-    else if ( m_progress > 1.0)
-        m_progress = 1.0;
+    if ( m_progress < 0.0f)
+        m_progress = 0.0f;
+    else if ( m_progress > 1.0f)
+        m_progress = 1.0f;
 
     outputChannel();
 }
@@ -1724,10 +1724,10 @@ void LCDProcClient::setGenericProgress(bool b, float value)
 
     m_genericProgress = value;
 
-    if ( m_genericProgress < 0.0)
-        m_genericProgress = 0.0;
-    else if ( m_genericProgress > 1.0)
-        m_genericProgress = 1.0;
+    if ( m_genericProgress < 0.0f)
+        m_genericProgress = 0.0f;
+    else if ( m_genericProgress > 1.0f)
+        m_genericProgress = 1.0f;
 
     // Note, this will let us switch to/from busy indicator by
     // alternating between being passed true or false for b.
@@ -1760,10 +1760,10 @@ void LCDProcClient::setMusicProgress(QString time, float value)
     m_musicProgress = value;
     m_musicTime = time;
 
-    if ( m_musicProgress < 0.0)
-        m_musicProgress = 0.0;
-    else if ( m_musicProgress > 1.0)
-        m_musicProgress = 1.0;
+    if ( m_musicProgress < 0.0f)
+        m_musicProgress = 0.0f;
+    else if ( m_musicProgress > 1.0f)
+        m_musicProgress = 1.0f;
 
     outputMusic();
 }
@@ -1795,10 +1795,10 @@ void LCDProcClient::setVolumeLevel(float value)
 
     m_volumeLevel = value;
 
-    if ( m_volumeLevel < 0.0)
-        m_volumeLevel = 0.0;
-    if ( m_volumeLevel > 1.0)
-        m_volumeLevel = 1.0;
+    if ( m_volumeLevel < 0.0f)
+        m_volumeLevel = 0.0f;
+    if ( m_volumeLevel > 1.0f)
+        m_volumeLevel = 1.0f;
 
     outputVolume();
 }
@@ -2451,7 +2451,7 @@ LCDProcClient::~LCDProcClient()
 
 void LCDProcClient::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
 

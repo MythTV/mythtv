@@ -1494,11 +1494,11 @@ void MythUIType::ConnectDependants(bool recurse)
 
     if (recurse)
     {
-        QList<MythUIType *>::iterator it;
-        for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        QList<MythUIType *>::iterator child;
+        for (child = m_ChildrenList.begin(); child != m_ChildrenList.end(); ++child)
         {
-            if (*it)
-                (*it)->ConnectDependants(recurse);
+            if (*child)
+                (*child)->ConnectDependants(recurse);
         }
     }
 }

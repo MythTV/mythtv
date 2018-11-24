@@ -415,7 +415,7 @@ void MHListGroup::Preparation(MHEngine *engine)
         // Find the item and add it to the list if it isn't already there.
         try
         {
-            MHRoot *pItem = (MHRoot *)engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
+            MHRoot *pItem = engine->FindObject(m_TokenGrpItems.GetAt(i)->m_Object);
             MHListItem *p = nullptr;
             QList<MHListItem *>::iterator it = m_ItemList.begin();
 

@@ -286,7 +286,7 @@ SubtitleFormat::GetFont(const QString &family,
         alpha = attr.GetFGAlpha();
     if (IsUnlocked(prefix, kSubAttrShadowoffset))
     {
-        int off = scale * pixelSize / 20 + 0.5;
+        int off = lroundf(scale * pixelSize / 20);
         offset = QPoint(off, off);
         if (attr.edge_type == k708AttrEdgeLeftDropShadow)
         {
@@ -302,8 +302,8 @@ SubtitleFormat::GetFont(const QString &family,
     {
         offset = m_shadowOffsetMap[prefix];
         offset.NormPoint();
-        offset.setX(offset.x() * scale + 0.5);
-        offset.setY(offset.y() * scale + 0.5);
+        offset.setX(lroundf(offset.x() * scale));
+        offset.setY(lroundf(offset.y() * scale));
     }
     result->SetShadow(shadow, offset, color, alpha);
 
@@ -321,7 +321,7 @@ SubtitleFormat::GetFont(const QString &family,
             attr.edge_type == k708AttrEdgeDepressed)
         {
             outline = true;
-            off = scale * pixelSize / 20 + 0.5;
+            off = lroundf(scale * pixelSize / 20);
         }
         else
             outline = false;
@@ -331,7 +331,7 @@ SubtitleFormat::GetFont(const QString &family,
         off = m_outlineSizeMap[prefix];
         MythPoint point(off, off);
         point.NormPoint();
-        off = point.x() * scale + 0.5;
+        off = lroundf(point.x() * scale);
     }
     result->SetOutline(outline, color, off, alpha);
 

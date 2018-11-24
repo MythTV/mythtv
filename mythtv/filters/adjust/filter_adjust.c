@@ -195,8 +195,8 @@ static void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
     for (int i = 0; i < 256; i++)
     {
         float f = ((float)i - in_min) / (in_max - in_min);
-        f = f < 0.0 ? 0.0 : f;
-        f = f > 1.0 ? 1.0 : f;
+        f = f < 0.0f ? 0.0f : f;
+        f = f > 1.0f ? 1.0f : f;
         table[i] = (pow (f, gamma) * (out_max - out_min) + out_min + 0.5);
     }
 }
@@ -210,8 +210,8 @@ static int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
     fillTable(table, in_min, in_max, out_min, out_max, gamma);
     scalec = ((out_max - out_min) << 15)/(in_max - in_min);
-    if ((av_get_cpu_flags() & AV_CPU_FLAG_MMX) == 0 || gamma < 0.9999 || 
-        gamma > 1.00001 || scalec > 32767 << 7)
+    if ((av_get_cpu_flags() & AV_CPU_FLAG_MMX) == 0 || gamma < 0.9999f ||
+        gamma > 1.00001f || scalec > 32767 << 7)
         return 0;
     shiftc = 2;
     while (scalec > 32767)

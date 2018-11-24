@@ -864,7 +864,7 @@ void AudioOutputALSA::SetVolumeChannel(int channel, int volume)
     if (!(internal_vol && m_mixer.elem))
         return;
 
-    long mixervol = long((int64_t(volume) * m_mixer.volrange) / 100) + m_mixer.volmin;
+    long mixervol = (int64_t(volume) * m_mixer.volrange) / 100 + m_mixer.volmin;
     mixervol = max(mixervol, m_mixer.volmin);
     mixervol = min(mixervol, m_mixer.volmax);
 

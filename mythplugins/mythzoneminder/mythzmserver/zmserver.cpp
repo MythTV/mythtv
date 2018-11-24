@@ -54,7 +54,7 @@
 
 #define ADD_STR(list,s)  list += (s); (list) += "[]:[]";
 // TODO rewrite after we require C++11, see http://en.cppreference.com/w/cpp/string/basic_string/to_string
-#define ADD_INT(list,n)  sprintf(m_buf, "%d", (int)(n)); (list) += m_buf; (list) += "[]:[]";
+#define ADD_INT(list,n)  sprintf(m_buf, "%d", (n)); (list) += m_buf; (list) += "[]:[]";
 
 // error messages
 #define ERROR_TOKEN_COUNT      "Invalid token count"
@@ -731,7 +731,7 @@ void ZMServer::handleGetServerStatus(void)
     long long total, used;
     string eventsDir = g_webPath + "/events/";
     getDiskSpace(eventsDir, total, used);
-    sprintf(buf, "%d%%", (int) ((100.0 / ((float) total / used))));
+    sprintf(buf, "%d%%", (int) ((100.0f / ((float) total / used))));
     ADD_STR(outStr, buf)
 
     send(outStr);
@@ -743,7 +743,7 @@ void ZMServer::handleGetAlarmStates(void)
     ADD_STR(outStr, "OK")
 
     // add the monitor count
-    ADD_INT(outStr, m_monitors.size())
+    ADD_INT(outStr, (int)m_monitors.size())
 
     for (int x = 0; x < (int)m_monitors.size(); x++)
     {
@@ -1493,7 +1493,7 @@ void ZMServer::handleGetCameraList(void)
 
     ADD_STR(outStr, "OK")
 
-    ADD_INT(outStr, m_monitors.size())
+    ADD_INT(outStr, (int)m_monitors.size())
 
     for (uint x = 0; x < m_monitors.size(); x++)
     {
@@ -1512,7 +1512,7 @@ void ZMServer::handleGetMonitorList(void)
     if (m_debug)
         cout << "We have " << m_monitors.size() << " monitors" << endl;
 
-    ADD_INT(outStr, m_monitors.size())
+    ADD_INT(outStr, (int)m_monitors.size())
 
     for (uint x = 0; x < m_monitors.size(); x++)
     {

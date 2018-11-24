@@ -396,7 +396,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             if (len == 0 ||
                                 ccbuf[mode].startsWith("\b"))
                             {
-                                ccbuf[mode] += (char)'\b';
+                                ccbuf[mode] += '\b';
                                 len++;
                                 col[mode]--;
                             }
@@ -809,7 +809,7 @@ int CC608Decoder::NewRowCC(int mode, int len)
             {
                 // previous line was missing a row address
                 // - assume it was one row up
-                ccbuf[mode] += (char)'\n';
+                ccbuf[mode] += '\n';
                 len++;
                 if (row[mode] == 0)
                     row[mode] = newrow[mode] - 1;
@@ -822,7 +822,7 @@ int CC608Decoder::NewRowCC(int mode, int len)
             // next line can be more than one row away
             for (int i = 0; i < (newrow[mode] - lastrow[mode]); i++)
             {
-                ccbuf[mode] += (char)'\n';
+                ccbuf[mode] += '\n';
                 len++;
             }
             col[mode] = 0;
@@ -840,7 +840,7 @@ int CC608Decoder::NewRowCC(int mode, int len)
                 // more likely we have bad address codes
                 // - just move to next line; may exceed row 15
                 // but frontend will adjust
-                ccbuf[mode] += (char)'\n';
+                ccbuf[mode] += '\n';
                 len++;
                 col[mode] = 0;
             }

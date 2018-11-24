@@ -2108,8 +2108,8 @@ double DiSEqCDevRotor::CalculateAzimuth(double angle) const
     // http://www.angelfire.com/trek/ismail/theory.html
 
     // Earth Station Latitude and Longitude in radians
-    double P  = gCoreContext->GetSetting("Latitude",  "").toFloat() * TO_RADS;
-    double Ue = gCoreContext->GetSetting("Longitude", "").toFloat() * TO_RADS;
+    double P  = gCoreContext->GetSetting("Latitude",  "").toDouble() * TO_RADS;
+    double Ue = gCoreContext->GetSetting("Longitude", "").toDouble() * TO_RADS;
 
     // Satellite Longitude in radians
     double Us = angle * TO_RADS;

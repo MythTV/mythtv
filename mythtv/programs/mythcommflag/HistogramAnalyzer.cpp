@@ -120,7 +120,8 @@ writeData(QString filename, float *mean, unsigned char *median, float *stddev,
     {
         (void)fprintf(fp, "%3u %10.6f %3u %10.6f %5d %5d %5d %5d",
                       monochromatic[frameno],
-                      mean[frameno], median[frameno], stddev[frameno],
+                      static_cast<double>(mean[frameno]), median[frameno],
+                      static_cast<double>(stddev[frameno]),
                       fwidth[frameno], fheight[frameno],
                       fcol[frameno], frow[frameno]);
         for (unsigned int ii = 0; ii < UCHAR_MAX + 1; ii++)

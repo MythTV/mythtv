@@ -241,9 +241,9 @@ MusicPlayer::ResumeMode MusicPlayer::getResumeMode(void)
 
 void MusicPlayer::loadSettings(void)
 {
-    m_resumeModePlayback = (ResumeMode) gCoreContext->GetNumSetting("ResumeModePlayback", (ResumeMode) MusicPlayer::RESUME_EXACT);
-    m_resumeModeEditor = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeEditor", (ResumeMode) MusicPlayer::RESUME_OFF);
-    m_resumeModeRadio = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeRadio", (ResumeMode) MusicPlayer::RESUME_TRACK);
+    m_resumeModePlayback = (ResumeMode) gCoreContext->GetNumSetting("ResumeModePlayback", MusicPlayer::RESUME_EXACT);
+    m_resumeModeEditor = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeEditor", MusicPlayer::RESUME_OFF);
+    m_resumeModeRadio = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeRadio", MusicPlayer::RESUME_TRACK);
 
     m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
@@ -661,8 +661,8 @@ void MusicPlayer::customEvent(QEvent *event)
                 {
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(getVolume());
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
                 else if (list[2] == "PLAY_FILE")
                 {
@@ -720,8 +720,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(mdataStr);
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
                 else if (list[2] == "GET_STATUS")
                 {
@@ -734,8 +734,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
                             .arg(gCoreContext->GetHostName()).arg(statusStr);
-                    MythEvent me(message);
-                    gCoreContext->dispatch(me);
+                    MythEvent me2(message);
+                    gCoreContext->dispatch(me2);
                 }
             }
             else
@@ -1350,13 +1350,13 @@ void MusicPlayer::setSpeed(float newspeed)
 
 void MusicPlayer::incSpeed()
 {
-    m_playSpeed += 0.05;
+    m_playSpeed += 0.05f;
     setSpeed(m_playSpeed);
 }
 
 void MusicPlayer::decSpeed()
 {
-    m_playSpeed -= 0.05;
+    m_playSpeed -= 0.05f;
     setSpeed(m_playSpeed);
 }
 

@@ -911,7 +911,7 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
     if (!isValid())
         return -1;
 
-    if (fd >= static_cast<int>(FD_SETSIZE))
+    if (fd >= FD_SETSIZE)
         return -1;
 
     fd_set fds;

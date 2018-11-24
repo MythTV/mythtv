@@ -225,7 +225,7 @@ void Weather::screenReady(WeatherScreen *ws)
     {
         m_firstRun = false;
         showScreen(ws);
-        m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
+        m_nextpage_Timer->start(1000 * m_nextpageInterval);
     }
     disconnect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
                SLOT(screenReady(WeatherScreen *)));
@@ -363,7 +363,7 @@ void Weather::cursorRight()
         hideScreen();
         showScreen(ws);
         if (!m_paused)
-            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
+            m_nextpage_Timer->start(1000 * m_nextpageInterval);
     }
 }
 
@@ -375,7 +375,7 @@ void Weather::cursorLeft()
         hideScreen();
         showScreen(ws);
         if (!m_paused)
-            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
+            m_nextpage_Timer->start(1000 * m_nextpageInterval);
     }
 }
 
@@ -391,7 +391,7 @@ void Weather::nextpage_timeout()
     else
         LOG(VB_GENERAL, LOG_ERR, "Next screen not ready");
 
-    m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
+    m_nextpage_Timer->start(1000 * m_nextpageInterval);
 }
 
 /*

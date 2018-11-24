@@ -264,7 +264,7 @@ int pgm_convolve_radial(AVFrame *dst, AVFrame *s1, AVFrame *s2,
                 sum += mask[ii + mask_radius] *
                     s1->data[0][(rr + ii) * newwidth + cc];
             }
-            s2->data[0][rr * newwidth + cc] = (unsigned char)(sum + 0.5);
+            s2->data[0][rr * newwidth + cc] = lround(sum);
         }
     }
 
@@ -279,7 +279,7 @@ int pgm_convolve_radial(AVFrame *dst, AVFrame *s1, AVFrame *s2,
                 sum += mask[ii + mask_radius] *
                     s2->data[0][rr * newwidth + cc + ii];
             }
-            dst->data[0][rr * newwidth + cc] = (unsigned char)(sum + 0.5);
+            dst->data[0][rr * newwidth + cc] = lround(sum);
         }
     }
 

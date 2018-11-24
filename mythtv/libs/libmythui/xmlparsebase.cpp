@@ -583,8 +583,8 @@ MythUIType *XMLParseBase::ParseUIType(
 
                 if (!global && font)
                 {
-                    QString name = info.attribute("name");
-                    uitype->AddFont(name, font);
+                    QString name2 = info.attribute("name");
+                    uitype->AddFont(name2, font);
                 }
 
                 delete font;

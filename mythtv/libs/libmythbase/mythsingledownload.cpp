@@ -45,7 +45,7 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
 
     if (ret != 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, QString(LOC + "evenloop failed"));
+        LOG(VB_GENERAL, LOG_ERR, LOC + "evenloop failed");
     }
 
     m_replylock.lock();

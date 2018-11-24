@@ -429,17 +429,17 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         // If height or width are 0, then we need to calculate them
         if (newHeight == 0 && newWidth > 0)
-            newHeight = (int)(1.0 * newWidth / video_aspect);
+            newHeight = (int)(1.0f * newWidth / video_aspect);
         else if (newWidth == 0 && newHeight > 0)
-            newWidth = (int)(1.0 * newHeight * video_aspect);
+            newWidth = (int)(1.0f * newHeight * video_aspect);
         else if (newWidth == 0 && newHeight == 0)
         {
             newHeight = 480;
-            newWidth = (int)(1.0 * 480 * video_aspect);
+            newWidth = (int)(1.0f * 480 * video_aspect);
             if (newWidth > 640)
             {
                 newWidth = 640;
-                newHeight = (int)(1.0 * 640 / video_aspect);
+                newHeight = (int)(1.0f * 640 / video_aspect);
             }
         }
 
@@ -1146,7 +1146,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             totalAudio += arb->GetSamples(frame.timecode);
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = frame.timecode - audbufTime;
-            int vidTime = (int)(curFrameNum * vidFrameTime + 0.5);
+            int vidTime = lroundf(curFrameNum * vidFrameTime);
             int viddelta = frame.timecode - vidTime;
             int delta = viddelta - auddelta;
             int absdelta = delta < 0 ? -delta : delta;
@@ -1532,7 +1532,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Processed: %1 of %2 frames(%3 seconds)").
-                        arg((long)curFrameNum).arg((long)total_frame_count).
+                        arg(curFrameNum).arg((long)total_frame_count).
                         arg((long)(curFrameNum / video_frame_rate)));
             }
 

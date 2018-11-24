@@ -927,7 +927,7 @@ void MythRenderOpenGL2::SetMatrixView(void)
 void MythRenderOpenGL2::PushTransformation(const UIEffects &fx, QPointF &center)
 {
     QMatrix4x4 newtop = m_transforms.top();
-    if (fx.hzoom != 1.0 || fx.vzoom != 1.0 || fx.angle != 0.0)
+    if (fx.hzoom != 1.0f || fx.vzoom != 1.0f || fx.angle != 0.0f)
     {
         newtop.translate(center.x(), center.y());
         newtop.scale(fx.hzoom, fx.vzoom);

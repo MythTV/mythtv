@@ -940,7 +940,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 
 void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
-    if (desired_interval < 0.5 || desired_interval > 10.0)
+    if (desired_interval < 0.5f || desired_interval > 10.0f)
     {
         LOG(VB_GENERAL, LOG_ALERT,
                  QString("cycle interval of %1 milliseconds ")
@@ -1308,7 +1308,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
             else if (action == "DOWN")
             {
                 // Qt::Key_down at bottom of list allows focus to move to other widgets
-                if (currentRow() == (int) count() - 1)
+                if (currentRow() == count() - 1)
                 {
                     focusNextPrevChild(true);
                     handled = true;
@@ -1367,9 +1367,9 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
         else if (action == "NEXTVIEW")
         {
             int nextItem = currentRow();
-            if (nextItem < (int)count() - 1)
+            if (nextItem < count() - 1)
                 nextItem++;
-            while (nextItem < (int)count() - 1 && text(nextItem)[0] == ' ')
+            while (nextItem < count() - 1 && text(nextItem)[0] == ' ')
                 nextItem++;
             if (!itemVisible(nextItem))
                 setTopRow(nextItem);

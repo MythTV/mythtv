@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <cinttypes>
 #include <climits>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include "mythconfig.h"
@@ -492,7 +493,7 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
 
 #define SCALEBITS 8
 #define ONE_HALF  (1 << (SCALEBITS - 1))
-#define FIX(x)          ((int) ((x) * (1L<<SCALEBITS) + 0.5))
+#define FIX(x)    (lroundf((x) * (1L<<SCALEBITS)))
 
 /**
  * \brief Convert planar RGB to YUV420.

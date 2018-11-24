@@ -210,7 +210,7 @@ void GLSingleView::initializeGL(void)
 void GLSingleView::resizeGL(int w, int h)
 {
     // Reset The Current Viewport And Perspective Transformation
-    glViewport(0, 0, (GLint)w, (GLint)h);
+    glViewport(0, 0, w, h);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -335,8 +335,8 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
                 SetZoom(m_zoom - 0.5f);
                 if (m_zoom > 1.0f)
                 {
-                    m_source_x   -= m_source_x / ((m_zoom + 0.5) * 2.0f);
-                    m_source_y   -= m_source_y / ((m_zoom + 0.5) * 2.0f);
+                    m_source_x   -= m_source_x / ((m_zoom + 0.5f) * 2.0f);
+                    m_source_y   -= m_source_y / ((m_zoom + 0.5f) * 2.0f);
 
                     checkPosition();
                 }
@@ -801,7 +801,7 @@ void GLSingleView::EffectZoomBlend(void)
 
     float t = m_effect_frame_time.elapsed() * m_effect_transition_timeout_inv;
 
-    m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - t, 1.0f + (0.75 * t));
+    m_texItem[m_texCur ? 0 : 1].MakeQuad(1.0f - t, 1.0f + (0.75f * t));
     m_texItem[m_texCur].MakeQuad(t);
 
     m_effect_current_frame++;
@@ -974,11 +974,11 @@ void GLSingleView::EffectFlutter(void)
             for (int y = 0; y < 40; y++)
             {
                 m_effect_flutter_points[x][y][0] =
-                    (float) (x / 20.0f - 1.0f) * ta.GetTextureX();
+                    (x / 20.0f - 1.0f) * ta.GetTextureX();
                 m_effect_flutter_points[x][y][1] =
-                    (float) (y / 20.0f - 1.0f) * ta.GetTextureY();
+                    (y / 20.0f - 1.0f) * ta.GetTextureY();
                 m_effect_flutter_points[x][y][2] =
-                    (float) sin((x / 20.0f - 1.0f) * M_PI * 2.0f) / 5.0;
+                    sin((x / 20.0f - 1.0f) * static_cast<float>(M_PI) * 2.0f) / 5.0f;
             }
         }
     }
@@ -1242,7 +1242,7 @@ void GLSingleView::EffectKenBurns(void)
 {
 
     float single_image_pct = 0.75;
-    float trans_pct = 1.0 - single_image_pct;
+    float trans_pct = 1.0f - single_image_pct;
     float scale_max, x_loc, y_loc;
     float scale_factor = 0;
 
@@ -1524,12 +1524,12 @@ float GLSingleView::FindMaxScale(float x_loc, float y_loc)
 void GLSingleView::FindRandXY(float &x_loc, float &y_loc)
 {
     // Random number between .25 and .75
-    x_loc = (0.5 * random() / (RAND_MAX + 1.0f)) + 0.25;
-    if ((int)(2.0 * random() / (RAND_MAX + 1.0f)) == 0)
+    x_loc = (0.5f * random() / (RAND_MAX + 1.0f)) + 0.25f;
+    if ((int)(2.0f * random() / (RAND_MAX + 1.0f)) == 0)
         x_loc = -1 * x_loc;
     // Random number between .25 and .75
-    y_loc = (0.5 * random() / (RAND_MAX + 1.0f)) + 0.25;
-    if ((int)(2.0 * random() / (RAND_MAX + 1.0f)) == 0)
+    y_loc = (0.5f * random() / (RAND_MAX + 1.0f)) + 0.25f;
+    if ((int)(2.0f * random() / (RAND_MAX + 1.0f)) == 0)
         y_loc = -1 * y_loc;
 }
 

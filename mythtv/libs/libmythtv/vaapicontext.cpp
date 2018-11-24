@@ -462,7 +462,7 @@ int VAAPIContext::SetPictureAttribute(PictureAttribute attribute, int newValue)
         {
             int min = m_pictureAttributes[i].min_value;
             int max = m_pictureAttributes[i].max_value;
-            int val = min + (int)(((float)((newValue + adj) % 100) / 100.0) * (max - min));
+            int val = min + (int)(((float)((newValue + adj) % 100) / 100.0f) * (max - min));
             m_pictureAttributes[i].value = val;
             found = true;
             break;

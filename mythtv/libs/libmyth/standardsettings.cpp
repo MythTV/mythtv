@@ -325,8 +325,8 @@ void AutoIncrementSetting::Save(void)
     if (getValue() == "0")
     {
         // Generate a new, unique ID
-        QString querystr = QString("INSERT INTO " + m_table +
-                                   " (" + m_column + ") VALUES (0);");
+        QString querystr = "INSERT INTO " + m_table +
+                                   " (" + m_column + ") VALUES (0);";
 
         MSqlQuery query(MSqlQuery::InitCon());
 
@@ -348,8 +348,8 @@ void AutoIncrementSetting::Save(void)
             setValue(var.toInt());
         else
         {
-            querystr = QString("SELECT MAX(" + m_column + ") FROM " +
-                               m_table + ";");
+            querystr = "SELECT MAX(" + m_column + ") FROM " +
+                               m_table + ";";
             if (query.exec(querystr) && query.next())
             {
                 int lii = query.value(0).toInt();

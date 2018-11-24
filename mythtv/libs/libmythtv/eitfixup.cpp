@@ -750,7 +750,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
              uint nTitle=0;
              int nTitleMax=-1;
              int i;
-             for (i =0; (i<(int)strListColon.count()) && (nTitleMax==-1);i++)
+             for (i =0; (i<strListColon.count()) && (nTitleMax==-1);i++)
              {
                  const QStringList tmp = strListColon[i].split(" ");
 
@@ -769,7 +769,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
                  strPartial+=strListTmp[nTitleMax-1];
                  strListEnd.push_back(strPartial);
              }
-             for (i=nTitleMax+1;i<(int)strListColon.count();i++)
+             for (i=nTitleMax+1;i<strListColon.count();i++)
                  strListEnd.push_back(strListColon[i]);
              fColon = true;
          }
@@ -1122,7 +1122,7 @@ void EITFixUp::FixUK(DBEventEIT &event) const
 
     // Trim leading/trailing '.'
     event.subtitle.remove(m_ukDotSpaceStart);
-    if (event.subtitle.lastIndexOf("..") != (((int)event.subtitle.length())-2))
+    if (event.subtitle.lastIndexOf("..") != (event.subtitle.length()-2))
         event.subtitle.remove(m_ukDotEnd);
 
     // Reverse the subtitle and empty description
@@ -1562,8 +1562,8 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
     tmpExp1 = m_mcaIncompleteTitle;
     if (tmpExp1.indexIn(event.title) != -1)
     {
-        tmpExp1 = QRegExp( QString(m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
-                                   m_mcaCompleteTitleb.pattern()));
+        tmpExp1 = QRegExp( m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
+                                   m_mcaCompleteTitleb.pattern());
         tmpExp1.setCaseSensitivity(Qt::CaseInsensitive);
         if (tmpExp1.indexIn(event.description) != -1)
         {
@@ -1612,7 +1612,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 
     // Dolby Digital 5.1?
     position = event.description.indexOf(m_mcaDD);
-    if ((position > 0) && (position > (int) (event.description.length() - 7)))
+    if ((position > 0) && (position > event.description.length() - 7))
     {
         event.audioProps |= AUD_DOLBY;
         event.description.replace(m_mcaDD, "");
@@ -2789,7 +2789,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     if (position != -1)
     {
         event.description = event.description.replace(tmptitle, "");
-        if (QString(tmptitle.cap(0)) != event.title.trimmed())
+        if (tmptitle.cap(0) != event.title.trimmed())
         {
             event.description = "(" + event.title.trimmed() + "). " + event.description;
         }

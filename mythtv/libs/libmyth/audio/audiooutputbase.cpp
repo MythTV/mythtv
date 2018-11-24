@@ -340,7 +340,7 @@ void AudioOutputBase::SetStretchFactorLocked(float lstretchfactor)
         return;
 
     bool willstretch = stretchfactor < 0.99f || stretchfactor > 1.01f;
-    eff_stretchfactor = (int)(100000.0f * lstretchfactor + 0.5);
+    eff_stretchfactor = lroundf(100000.0f * lstretchfactor);
 
     if (pSoundStretch)
     {
@@ -1451,7 +1451,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
 
         // Check we have enough space to write the data
         if (need_resampler && src_ctx)
-            len = (int)ceilf(float(len) * src_data.src_ratio);
+            len = lround(ceil(static_cast<double>(len) * src_data.src_ratio));
 
         if (needs_upmix)
             len = (len * configured_channels ) / source_channels;

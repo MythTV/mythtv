@@ -961,9 +961,9 @@ void Piano::zero_analysis(void)
     for (key = 0; key < PIANO_N; key++)
     {
         // These get updated continously, and must be stored between chunks of audio data
-        piano_data[key].q2 = (goertzel_data)0.0f;
-        piano_data[key].q1 = (goertzel_data)0.0f;
-        piano_data[key].magnitude = (goertzel_data)0.0f;
+        piano_data[key].q2 = 0.0f;
+        piano_data[key].q1 = 0.0f;
+        piano_data[key].magnitude = 0.0f;
         piano_data[key].max_magnitude_seen =
             (goertzel_data)(PIANO_RMS_NEGLIGIBLE*PIANO_RMS_NEGLIGIBLE); // This is a guess - will be quickly overwritten
 
@@ -1116,7 +1116,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         {
             for (uint i = 0; i < n; i++)
             {
-                audio_data[i] = (piano_audio)(((piano_audio)node->left[i] + (piano_audio)node->right[i]) / 2.0 / short_to_bounded);
+                audio_data[i] = ((piano_audio)node->left[i] + (piano_audio)node->right[i]) / 2.0f / short_to_bounded;
             }
         }
         else // This is only one channel of data
@@ -1168,7 +1168,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
 
             if (false) // Take logs everywhere, and shift up to [0, ??]
             {
-                if(magnitude_av > 0.0)
+                if(magnitude_av > 0.0f)
                 {
                     magnitude_av = log(magnitude_av);
                 }
@@ -1178,7 +1178,7 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
                 }
                 magnitude_av -= PIANO_MIN_VOL;
 
-                if (magnitude_av < 0.0)
+                if (magnitude_av < 0.0f)
                 {
                     magnitude_av = 0.0;
                 }
@@ -1245,7 +1245,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     double mag = PIANO_RMS_NEGLIGIBLE;
     for (key = 0; key < n; key++)
     {
-        if (piano_data[key].max_magnitude_seen < mag)
+        if (piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
             // Spread the previous value to this key
             piano_data[key].max_magnitude_seen = mag;
@@ -1263,7 +1263,7 @@ bool Piano::draw(QPainter *p, const QColor &back)
     for (int key_i = n - 1; key_i >= 0; key_i--)
     {
         key = key_i; // Wow, this is to avoid a zany error for ((unsigned)0)--
-        if (piano_data[key].max_magnitude_seen < mag)
+        if (piano_data[key].max_magnitude_seen < static_cast<float>(mag))
         {
             // Spread the previous value to this key
             piano_data[key].max_magnitude_seen = mag;

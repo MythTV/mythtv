@@ -773,7 +773,7 @@ void MHEngine::BringToFront(const MHRoot *p)
 
     MHVisible *pVis = (MHVisible *)p; // Can now safely cast it.
     CurrentApp()->m_DisplayStack.RemoveAt(nPos); // Remove it from its present posn
-    CurrentApp()->m_DisplayStack.Append((MHVisible *)pVis); // Push it on the top.
+    CurrentApp()->m_DisplayStack.Append(pVis); // Push it on the top.
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 
@@ -847,7 +847,7 @@ void MHEngine::PutBehind(const MHRoot *p, const MHRoot *pRef)
         nRef--;    // The position of the reference may have shifted
     }
 
-    CurrentApp()->m_DisplayStack.InsertAt((MHVisible *)pVis, nRef); // Shift the reference and anything above up.
+    CurrentApp()->m_DisplayStack.InsertAt(pVis, nRef); // Shift the reference and anything above up.
     Redraw(pVis->GetVisibleArea()); // Request a redraw
 }
 

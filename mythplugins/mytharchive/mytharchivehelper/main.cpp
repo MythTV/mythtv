@@ -852,7 +852,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
     if (fileInfo.exists())
     {
         LOG(VB_JOBQUEUE, LOG_INFO, "Copying cover file");
-        bool res = copyFile(coverFile, saveDirectory + title
+        res = copyFile(coverFile, saveDirectory + title
                             + "/" + fileInfo.fileName());
         if (!res)
         {
@@ -955,7 +955,6 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     QDomNode n = nodeList.item(0);
     QDomElement recordedNode = n.toElement();
     QString startTime = findNodeText(recordedNode, "starttime");
-
     // check this recording doesn't already exist
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT * FROM recorded "
@@ -996,8 +995,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
 
     for (int x = 0; x < nodes.count(); x++)
     {
-        QDomNode n = nodes.item(x);
-        QString field = n.nodeName();
+        QDomNode n2 = nodes.item(x);
+        QString field = n2.nodeName();
         fieldList.append(field);
         bindList.append(":" + field.toUpper());
     }
@@ -1025,8 +1024,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     }
     else
     {
-        n = nodeList.item(0);
-        QDomElement markupNode = n.toElement();
+        QDomNode n3 = nodeList.item(0);
+        QDomElement markupNode = n3.toElement();
 
         nodeList = markupNode.elementsByTagName("mark");
         if (nodeList.count() < 1)
@@ -1048,8 +1047,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
             // add any new records for this recording
             for (int x = 0; x < nodeList.count(); x++)
             {
-                n = nodeList.item(x);
-                QDomElement e = n.toElement();
+                QDomNode n4 = nodeList.item(x);
+                QDomElement e = n4.toElement();
                 query.prepare("INSERT INTO recordedmarkup (chanid, starttime, "
                         "mark, type, data)"
                         "VALUES(:CHANID,:STARTTIME,:MARK,:TYPE,:DATA);");
@@ -1080,8 +1079,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     }
     else
     {
-        n = nodeList.item(0);
-        QDomElement markupNode = n.toElement();
+        QDomNode n5 = nodeList.item(0);
+        QDomElement markupNode = n5.toElement();
 
         nodeList = markupNode.elementsByTagName("mark");
         if (nodeList.count() < 1)
@@ -1101,8 +1100,8 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
             // add the new records for this recording
             for (int x = 0; x < nodeList.count(); x++)
             {
-                n = nodeList.item(x);
-                QDomElement e = n.toElement();
+                QDomNode n6 = nodeList.item(x);
+                QDomElement e = n6.toElement();
                 query.prepare("INSERT INTO recordedseek (chanid, starttime, "
                         "mark, offset, type)"
                         "VALUES(:CHANID,:STARTTIME,:MARK,:OFFSET,:TYPE);");
@@ -1703,11 +1702,9 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                             AV_PIX_FMT_RGB32, width, height, IMAGE_ALIGN);
 
                         AVFrame *tmp = frame;
-                        deinterlacer.DeinterlaceSingle((AVFrame*)tmp,
-                                                       (AVFrame*)tmp);
+                        deinterlacer.DeinterlaceSingle(tmp, tmp);
 
-                        copyframe.Copy(&retbuf, AV_PIX_FMT_RGB32,
-                                       (AVFrame*) tmp,
+                        copyframe.Copy(&retbuf, AV_PIX_FMT_RGB32, tmp,
                                        codecCtx->pix_fmt, width, height);
 
                         QImage img(outputbuf, width, height,
@@ -1746,7 +1743,7 @@ static int grabThumbnail(QString inFile, QString thumbList, QString outFile, int
                     }
                 }
 
-                if (thumbCount >= (int) list.count())
+                if (thumbCount >= list.count())
                     break;
             }
         }
@@ -2258,7 +2255,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
     addVersion();
     addLogging();
 
-    add(QStringList( QStringList() << "-t" << "--createthumbnail" ),
+    add(QStringList{"-t", "--createthumbnail"},
             "createthumbnail", false,
             "Create one or more thumbnails\n"
             "Requires: --infile, --thumblist, --outfile\n"
@@ -2281,7 +2278,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "Number of frames to grab (default 1)\n"
             "Used with: --createthumbnail", "");
 
-    add(QStringList( QStringList() << "-i" << "--getfileinfo" ),
+    add(QStringList{"-i", "--getfileinfo"},
             "getfileinfo", false,
             "Write file info about infile to outfile\n"
             "Requires: --infile, --outfile, --method", "");
@@ -2294,17 +2291,17 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "  2 = use position map in DB (quick, only works for MythTV "
             "recordings)", "");
 
-    add(QStringList( QStringList() << "-p" << "--getdbparameters" ),
+    add(QStringList{"-p", "--getdbparameters"},
             "getdbparameters", false,
             "Write the mysql database parameters to outfile\n"
             "Requires: --outfile", "");
 
-    add(QStringList( QStringList() << "-n" << "--nativearchive" ),
+    add(QStringList{"-n", "--nativearchive"},
             "nativearchive", false,
             "Archive files to a native archive format\n"
             "Requires: --outfile", "");
 
-    add(QStringList( QStringList() << "-f" << "--importarchive" ),
+    add(QStringList{"-f", "--importarchive"},
             "importarchive", false,
             "Import an archived file\n"
             "Requires: --infile, --chanid", "");
@@ -2312,7 +2309,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "Channel ID to use when inserting records in DB\n"
             "Used with: --importarchive", "");
 
-    add(QStringList( QStringList() << "-r" << "--isremote" ),
+    add(QStringList{"-r", "--isremote"},
             "isremote", false,
             "Check if infile is on a remote filesystem\n"
             "Requires: --infile\n"
@@ -2320,7 +2317,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "         - 1 file is on a local filesystem\n"
             "         - 2 file is on a remote filesystem", "");
 
-    add(QStringList( QStringList() << "-b" << "--burndvd" ),
+    add(QStringList{"-b", "--burndvd"},
             "burndvd", false,
             "Burn a created DVD to a blank disc\n"
             "Optional: --mediatype, --erasedvdrw, --nativeformat", "");
@@ -2337,7 +2334,7 @@ void MythArchiveHelperCommandLineParser::LoadArguments(void)
             "Archive is a native archive format\n"
             "Used with: --burndvd (optional)", "");
 
-    add(QStringList( QStringList() << "-s" << "--sup2dast" ),
+    add(QStringList{"-s", "--sup2dast"},
             "sup2dast", false,
             "Convert projectX subtitles to DVD subtitles\n"
             "Requires: --infile, --ifofile, --delay", "");

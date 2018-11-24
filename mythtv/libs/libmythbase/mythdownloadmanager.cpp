@@ -739,7 +739,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
         m_infoLock->unlock();
         if ((urlData.isValid()) &&
             ((!urlData.expirationDate().isValid()) ||
-             (QDateTime(urlData.expirationDate().toUTC()).secsTo(now) < 10)))
+             (urlData.expirationDate().toUTC().secsTo(now) < 10)))
         {
             QString dateString = getHeader(urlData, "Date");
 
@@ -1610,7 +1610,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
         ((!urlData.expirationDate().isValid()) ||
          (urlData.expirationDate().secsTo(now) < 0)))
     {
-        if (QDateTime(urlData.lastModified().toUTC()).secsTo(now) <= 3600) // 1 Hour
+        if (urlData.lastModified().toUTC().secsTo(now) <= 3600) // 1 Hour
         {
             result = urlData.lastModified().toUTC();
         }

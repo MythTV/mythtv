@@ -126,7 +126,7 @@ class MHListGroup : public MHTokenGroup
     void GetFirstItem(MHRoot *pResult, MHEngine *) override // MHRoot
         { pResult->SetVariableValue(m_nFirstItem); }
     void GetListSize(MHRoot *pResult, MHEngine *) override // MHRoot
-        { pResult->SetVariableValue((int)(m_ItemList.size())); }
+        { pResult->SetVariableValue(m_ItemList.size()); }
 
   protected:
     // MHEG Internal attributes.

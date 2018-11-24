@@ -195,15 +195,15 @@ void MythWizard::insertPage( QWidget * page, const QString & title, int index )
         return;
     }
 
-    if ( index < 0  || index > (int)d->pages.size() )
+    if ( index < 0  || index > d->pages.size() )
         index = d->pages.size();
 
-    if ( index > 0 && ( index == (int)d->pages.size() ) )
+    if ( index > 0 && ( index == d->pages.size() ) )
         d->pages[index - 1]->nextEnabled = true;
 
     MythWizardPrivate::Page * p = new MythWizardPrivate::Page( page, title );
     p->backEnabled = ( index > 0 );
-    p->nextEnabled = ( index < (int)d->pages.size() );
+    p->nextEnabled = ( index < d->pages.size() );
 
     d->ws->addWidget(page);
     d->pages.insert( index, p );
@@ -214,7 +214,7 @@ void MythWizard::showPage( QWidget * page )
     MythWizardPrivate::Page * p = d->page( page );
     if ( p ) {
         int i;
-        for( i = 0; i < (int)d->pages.size() && d->pages[i] != p; i++ );
+        for( i = 0; i < d->pages.size() && d->pages[i] != p; i++ );
         bool notFirst( false );
 
         if (i)
@@ -262,7 +262,7 @@ void MythWizard::back()
 {
     int i = 0;
 
-    while( i < (int)d->pages.size() && d->pages[i] &&
+    while( i < d->pages.size() && d->pages[i] &&
            d->current && d->pages[i]->w != d->current->w )
         i++;
 
@@ -279,14 +279,14 @@ void MythWizard::back()
 void MythWizard::next()
 {
     int i = 0;
-    while( i < (int)d->pages.size() && d->pages[i] &&
+    while( i < d->pages.size() && d->pages[i] &&
            d->current && d->pages[i]->w != d->current->w )
         i++;
     i++;
-    while( i <= (int)d->pages.size()-1 &&
+    while( i <= d->pages.size()-1 &&
            ( !d->pages[i] || !appropriate( d->pages[i]->w ) ) )
         i++;
-    while ( i > 0 && (i >= (int)d->pages.size() || !d->pages[i] ) )
+    while ( i > 0 && (i >= d->pages.size() || !d->pages[i] ) )
         i--;
     if ( d->pages[i] )
         showPage( d->pages[i]->w );
@@ -351,7 +351,7 @@ void MythWizard::updateButtons()
         return;
 
     int i;
-    for( i = 0; i < (int)d->pages.size() && d->pages[i] != d->current; i++ );
+    for( i = 0; i < d->pages.size() && d->pages[i] != d->current; i++ );
     bool notFirst( false );
     if ( i ) {
         i--;

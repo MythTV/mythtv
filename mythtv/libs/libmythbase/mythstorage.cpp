@@ -37,8 +37,8 @@ void SimpleDBStorage::Save(QString _table)
         return;
 
     MSqlBindings bindings;
-    QString querystr = QString("SELECT * FROM " + _table + " WHERE "
-                               + GetWhereClause(bindings) + ';');
+    QString querystr = "SELECT * FROM " + _table + " WHERE "
+                       + GetWhereClause(bindings) + ';';
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
@@ -56,8 +56,8 @@ void SimpleDBStorage::Save(QString _table)
         // Don"t change this QString. See the CVS logs rev 1.91.
         MSqlBindings bindings;
 
-        querystr = QString("UPDATE " + _table + " SET " + GetSetClause(bindings) +
-                           " WHERE " + GetWhereClause(bindings) + ';');
+        querystr = "UPDATE " + _table + " SET " + GetSetClause(bindings) +
+                   " WHERE " + GetWhereClause(bindings) + ';';
 
         query.prepare(querystr);
         query.bindValues(bindings);
@@ -70,8 +70,8 @@ void SimpleDBStorage::Save(QString _table)
         // Row does not exist yet
         MSqlBindings bindings;
 
-        querystr = QString("INSERT INTO " + _table + " SET "
-                           + GetSetClause(bindings) + ';');
+        querystr = "INSERT INTO " + _table + " SET "
+                   + GetSetClause(bindings) + ';';
 
         query.prepare(querystr);
         query.bindValues(bindings);

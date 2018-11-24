@@ -316,7 +316,7 @@ int AudioOutputPulseAudio::GetBufferedOnSoundcard(void) const
 
     pa_threaded_mainloop_unlock(mainloop);
 
-    return ((uint64_t)latency * samplerate *
+    return (latency * samplerate *
             output_bytes_per_frame / 1000000) + buffered;
 }
 

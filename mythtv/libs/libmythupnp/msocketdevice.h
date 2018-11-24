@@ -116,14 +116,14 @@ public:
                               const QHostAddress & host, quint16 port);
     inline qint64  writeBlock(const char *data, quint64 len)
     {
-        return qint64(write(data, qint64(len)));
+        return write(data, len);
     }
 
     inline qint64 readBlock(char *data, quint64 maxlen)
     {
         // read() does not correctly handle zero-byte udp packets
         // so call readData() directly which does
-        return maxlen ? qint64(read(data, qint64(maxlen))) : qint64(readData(data, qint64(maxlen)));
+        return maxlen ? read(data, maxlen) : readData(data, maxlen);
     }
 
     virtual quint16  port() const;

@@ -471,7 +471,7 @@ static void commDetectorGotNewCommercialBreakList(void)
 
 static void incomingCustomEvent(QEvent* e)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if (e->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(e);
         QString message = me->Message();
@@ -757,7 +757,7 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
                 }
 
                 if (commDetectMethod == COMM_DETECT_UNINIT) {
-                    commDetectMethod = (SkipTypes) skipTypes->value(val);
+                    commDetectMethod = skipTypes->value(val);
                 } else {
                     commDetectMethod = (SkipTypes) ((int)commDetectMethod
                                                   | (int)skipTypes->value(val));

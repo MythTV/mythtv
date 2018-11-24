@@ -904,10 +904,10 @@ QString Xsd::ReadPropertyMetadata( QObject *pObject, QString sPropName, QString 
 
         QString     sFullKey  = sKey + "=";
 
-        for (int nIdx = 0; nIdx < sOptions.size(); ++nIdx)
+        for (int nIdx2 = 0; nIdx2 < sOptions.size(); ++nIdx2)
         {
-            if (sOptions.at( nIdx ).startsWith( sFullKey ))
-                return sOptions.at( nIdx ).mid( sFullKey.length() );
+            if (sOptions.at( nIdx2 ).startsWith( sFullKey ))
+                return sOptions.at( nIdx2 ).mid( sFullKey.length() );
         }
     }
 

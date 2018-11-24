@@ -89,10 +89,10 @@ static inline bool sse2_check()
     if (nIds >= 0x00000001)
     {
         cpuid(info,0x00000001);
-        has_sse2  = (info[3] & ((int)1 << 26)) != 0;
-        has_sse3  = (info[2] & ((int)1 <<  0)) != 0;
-        has_ssse3 = (info[2] & ((int)1 <<  9)) != 0;
-        has_sse4  = (info[2] & ((int)1 << 19)) != 0;
+        has_sse2  = (info[3] & (1 << 26)) != 0;
+        has_sse3  = (info[2] & (1 <<  0)) != 0;
+        has_ssse3 = (info[2] & (1 <<  9)) != 0;
+        has_sse4  = (info[2] & (1 << 19)) != 0;
     }
     else
     {

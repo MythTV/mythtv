@@ -957,7 +957,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             return true;
 
         AVFrame *tmp = mpa_pic;
-        copyFrame.Copy(frame, (AVFrame*)tmp, mpa_vidctx->pix_fmt);
+        copyFrame.Copy(frame, tmp, mpa_vidctx->pix_fmt);
     }
 
     return true;
@@ -1224,7 +1224,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
                     videosizetotal /= videoframesread;
 
                     float bps = (videosizetotal * 8.0f / 1024.0f *
-                                 video_frame_rate);
+                                 static_cast<float>(video_frame_rate));
                     bitrate = (uint) (bps * 1.5f);
 
                     ringBuffer->UpdateRawBitrate(GetRawBitrate());

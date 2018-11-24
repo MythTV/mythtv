@@ -1603,7 +1603,7 @@ void ChannelScanSM::run(void)
 bool ChannelScanSM::HasTimedOut(void)
 {
     if (m_currentTestingDecryption &&
-        (m_timer.elapsed() > (int)kDecryptionTimeout))
+        (m_timer.elapsed() > kDecryptionTimeout))
     {
         m_currentTestingDecryption = false;
         return true;

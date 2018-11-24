@@ -1,6 +1,8 @@
 
 #include "mythuitext.h"
 
+#include <cmath>
+
 #include <QCoreApplication>
 #include <QtGlobal>
 #include <QDomDocument>
@@ -703,8 +705,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             if (lines >= 1)
             {
                 // Too wide?
-                width -= width *
-                         (lines / static_cast<qreal>(num_lines - 1 + lines));
+                width -= width * (lines / num_lines - 1 + lines);
                 if (static_cast<int>(width) == last_width)
                 {
                     m_Cutdown = cutdown;
@@ -1312,9 +1313,9 @@ void MythUIText::CycleColor(QColor startColor, QColor endColor, int numSteps)
     curG = startColor.green();
     curB = startColor.blue();
 
-    incR = (endColor.red() * 1.0 - curR) / m_numSteps;
-    incG = (endColor.green() * 1.0 - curG) / m_numSteps;
-    incB = (endColor.blue() * 1.0 - curB) / m_numSteps;
+    incR = (endColor.red() * 1.0f - curR) / m_numSteps;
+    incG = (endColor.green() * 1.0f - curG) / m_numSteps;
+    incB = (endColor.blue() * 1.0f - curB) / m_numSteps;
 
     m_colorCycling = true;
 }
@@ -1480,15 +1481,15 @@ bool MythUIText::ParseElement(
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollStartDelay = static_cast<int>(seconds *
-                      static_cast<float>(MythMainWindow::drawRefresh) + 0.5);
+                m_scrollStartDelay = lroundf(seconds *
+                      static_cast<float>(MythMainWindow::drawRefresh));
             }
             tmp = element.attribute("returndelay");
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollReturnDelay = static_cast<int>(seconds *
-                      static_cast<float>(MythMainWindow::drawRefresh) + 0.5);
+                m_scrollReturnDelay = lroundf(seconds *
+                      static_cast<float>(MythMainWindow::drawRefresh));
             }
             tmp = element.attribute("rate");
             if (!tmp.isEmpty())

@@ -38,7 +38,7 @@
 AudioInputOSS::AudioInputOSS(const QString &device) : AudioInput(device)
 {
     if (!device.isEmpty())
-        m_device_name = QByteArray(device.toLatin1());
+        m_device_name = device.toLatin1();
     else
         m_device_name = QByteArray();
     dsp_fd = -1;
@@ -243,7 +243,7 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
             }
             ++retries;
         }
-        if (num_bytes > (uint)bytes_read)
+        if (num_bytes > bytes_read)
             LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                 QString("GetSamples short read, %1 of %2 bytes")
                     .arg(bytes_read).arg(num_bytes));

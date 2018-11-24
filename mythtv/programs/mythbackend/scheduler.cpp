@@ -569,8 +569,10 @@ void Scheduler::FillRecordListFromDB(uint recordid)
     msg.sprintf("Speculative scheduled %d items in %.1f "
                 "= %.2f match + %.2f check + %.2f place",
                 (int)reclist.size(),
-                matchTime + checkTime + placeTime,
-                matchTime, checkTime, placeTime);
+                static_cast<double>(matchTime + checkTime + placeTime),
+                static_cast<double>(matchTime),
+                static_cast<double>(checkTime),
+                static_cast<double>(placeTime));
     LOG(VB_GENERAL, LOG_INFO, msg);
 }
 
@@ -2465,8 +2467,11 @@ bool Scheduler::HandleReschedule(void)
 
     msg.sprintf("Scheduled %d items in %.1f "
                 "= %.2f match + %.2f check + %.2f place",
-                (int)reclist.size(), matchTime + checkTime + placeTime,
-                matchTime, checkTime, placeTime);
+                (int)reclist.size(),
+                static_cast<double>(matchTime + checkTime + placeTime),
+                static_cast<double>(matchTime),
+                static_cast<double>(checkTime),
+                static_cast<double>(placeTime));
     LOG(VB_GENERAL, LOG_INFO, msg);
 
     fsInfoCacheFillTime = MythDate::current().addSecs(-1000);
@@ -3861,16 +3866,16 @@ void Scheduler::BuildNewRecordsQueries(uint recordid, QStringList &from,
                       .arg(qphrase));
             break;
         case kTitleSearch:
-            bindings[bindlikephrase1] = QString(QString("%") + qphrase + "%");
+            bindings[bindlikephrase1] = QString("%") + qphrase + "%";
             from << "";
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid + " AND "
                       "program.manualid = 0 AND "
                       "program.title LIKE " + bindlikephrase1);
             break;
         case kKeywordSearch:
-            bindings[bindlikephrase1] = QString(QString("%") + qphrase + "%");
-            bindings[bindlikephrase2] = QString(QString("%") + qphrase + "%");
-            bindings[bindlikephrase3] = QString(QString("%") + qphrase + "%");
+            bindings[bindlikephrase1] = QString("%") + qphrase + "%";
+            bindings[bindlikephrase2] = QString("%") + qphrase + "%";
+            bindings[bindlikephrase3] = QString("%") + qphrase + "%";
             from << "";
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       " AND program.manualid = 0"

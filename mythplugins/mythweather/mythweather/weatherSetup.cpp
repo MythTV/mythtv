@@ -515,7 +515,7 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
         TypeListMap types;
         for (; it != si->types.end(); ++it)
         {
-            types.insert(it.key(), TypeListInfo(*it));
+            types.insert(it.key(), *it);
             type_strs << it.key();
         }
         bool hasUnits = si->hasUnits;

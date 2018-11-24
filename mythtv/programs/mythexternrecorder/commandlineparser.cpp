@@ -27,7 +27,7 @@ void MythExternRecorderCommandLineParser::LoadArguments(void)
     add("--inputid", "inputid", "", "MythTV input this app is attached to.", "")
         ->SetGroup("ExternalRecorder");
 
-    add(QStringList(QStringList() << "--exec"),
+    add(QStringList{"--exec"},
         "exec", false,
         "Execute a program to retrieve Transport Stream from. "
         "Data is expected to be on stdout.", "")

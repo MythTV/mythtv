@@ -125,8 +125,7 @@ void NetBase::ShowWebVideo()
         }
         else
         {
-            args.replaceInStrings("%DIR%",
-                                  QString(GetConfDir() + "/MythNetvision"));
+            args.replaceInStrings("%DIR%", GetConfDir() + "/MythNetvision");
             args.replaceInStrings("%MEDIAURL%", item->GetMediaURL());
             args.replaceInStrings("%URL%", item->GetURL());
             args.replaceInStrings("%TITLE%", item->GetTitle());
@@ -225,7 +224,7 @@ void NetBase::DoDeleteVideo(bool remove)
 
 void NetBase::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QStringList tokens = me->Message().split(" ", QString::SkipEmptyParts);

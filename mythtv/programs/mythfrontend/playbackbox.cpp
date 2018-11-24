@@ -743,7 +743,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
 
         desc = tr("There is/are %n recording(s) in this display "
                   "group, which consume(s) %1 GiB.", "", countInGroup)
-               .arg(groupSize / 1024.0 / 1024.0 / 1024.0, 0, 'f', 2);
+               .arg(groupSize / 1024.0f / 1024.0f / 1024.0f, 0, 'f', 2);
     }
     else
     {
@@ -4043,7 +4043,7 @@ void PlaybackBox::customEvent(QEvent *event)
         if (resultid == "transcode" && dce->GetResult() >= 0)
             changeProfileAndTranscode(dce->GetData().toInt());
     }
-    else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    else if (event->type() == MythEvent::MythEventMessage)
     {
         MythEvent *me = static_cast<MythEvent *>(event);
         QString message = me->Message();

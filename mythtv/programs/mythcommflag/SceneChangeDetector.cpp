@@ -187,7 +187,7 @@ SceneChangeDetector::finished(long long nframes, bool final)
     const HistogramAnalyzer::Histogram *histogram =
         histogramAnalyzer->getHistograms();
     for (unsigned int frameno = 0; frameno < nframes; frameno++)
-        (void)scenechange_data_init(&scdata[frameno], &histogram[frameno]);
+        scenechange_data_init(&scdata[frameno], &histogram[frameno]);
     scdiff[0] = 0;
     for (unsigned int frameno = 1; frameno < nframes; frameno++)
         scdiff[frameno] = scenechange_data_diff(&scdata[frameno - 1],

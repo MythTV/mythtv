@@ -321,7 +321,7 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_compilation = (query.value(12).toInt() > 0);
         mdata->m_format = query.value(13).toString();
         mdata->m_trackCount = query.value(14).toInt();
-        mdata->m_fileSize = (quint64)query.value(15).toULongLong();
+        mdata->m_fileSize = query.value(15).toULongLong();
         mdata->m_dateadded = query.value(16).toDateTime();
         mdata->m_discnum = query.value(17).toInt();
         mdata->m_disccount = query.value(18).toInt();
@@ -1548,7 +1548,7 @@ void AllMusic::resync()
             dbMeta->setArtistId(query.value(1).toInt());
             dbMeta->setAlbumId(query.value(4).toInt());
             dbMeta->setTrackCount(query.value(19).toInt());
-            dbMeta->setFileSize((quint64)query.value(20).toULongLong());
+            dbMeta->setFileSize(query.value(20).toULongLong());
             dbMeta->setHostname(query.value(21).toString());
             dbMeta->setDiscNumber(query.value(22).toInt());
             dbMeta->setDiscCount(query.value(23).toInt());

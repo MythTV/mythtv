@@ -1475,14 +1475,14 @@ void NuppelVideoRecorder::DoV4L2(void)
         comp.gop_size = keyframedist;
         comp.max_b_frames = 0;
 
-        if (fabs(video_aspect - 1.33333) < 0.01f)
+        if (fabs(video_aspect - 1.33333f) < 0.01f)
         {
             if (ntsc)
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_NTSC;
             else
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_4_3_PAL;
         }
-        else if (fabs(video_aspect - 1.77777) < 0.01f)
+        else if (fabs(video_aspect - 1.77777f) < 0.01f)
         {
             if (ntsc)
                 comp.aspect_ratio = GO7007_ASPECT_RATIO_16_9_NTSC;
@@ -2047,7 +2047,7 @@ inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh)
 
 void NuppelVideoRecorder::SetNewVideoParams(double newaspect)
 {
-    if (newaspect == video_aspect)
+    if (newaspect == static_cast<double>(video_aspect))
         return;
 
     video_aspect = newaspect;
@@ -3009,7 +3009,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         {
             int r = 0;
             if (raw)
-                r = lzo1x_1_compress((unsigned char*)frame->buf, frame->size,
+                r = lzo1x_1_compress(frame->buf, frame->size,
                                      out, &out_len, wrkmem);
             else
                 r = lzo1x_1_compress((unsigned char *)strm, tmp, out,

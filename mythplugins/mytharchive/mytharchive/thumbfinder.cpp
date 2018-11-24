@@ -374,7 +374,7 @@ QString ThumbFinder::createThumbDir(void)
     QString path;
     for (int x = 1; dir.exists(); x++)
     {
-        path = QString(thumbDir + "/%1").arg(x);
+        path = thumbDir + QString("/%1").arg(x);
         dir.setPath(path);
     }
 
@@ -498,7 +498,7 @@ bool ThumbFinder::getThumbImages()
 
     for (int x = 1; x <= m_thumbCount; x++)
     {
-        m_frameFile = QString(m_thumbDir + "/chapter-%1.jpg").arg(x);
+        m_frameFile = m_thumbDir + QString("/chapter-%1.jpg").arg(x);
 
         thumb = nullptr;
 
@@ -805,7 +805,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
             keyFrame = pkt.flags & AV_PKT_FLAG_KEY;
 
-            if (m_startPTS == -1 && pkt.dts != (int64_t)AV_NOPTS_VALUE)
+            if (m_startPTS == -1 && pkt.dts != AV_NOPTS_VALUE)
             {
                 m_startPTS = pkt.dts;
                 m_frameTime = pkt.duration;
@@ -830,7 +830,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
                 frameFinished = 1;
             if (ret == 0 || ret == AVERROR(EAGAIN))
                 ret = avcodec_send_packet(m_codecCtx, &pkt);
-            if (requiredPTS != -1 && pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts < requiredPTS)
+            if (requiredPTS != -1 && pkt.dts != AV_NOPTS_VALUE && pkt.dts < requiredPTS)
                 frameFinished = false;
 
             m_currentPTS = pkt.dts;

@@ -293,10 +293,10 @@ void ProgDetails::PowerPriorities(const QString & ptable)
                        "INNER JOIN capturecard "
                        "      ON ( channel.sourceid = capturecard.sourceid AND "
                        "           ( capturecard.schedorder <> 0 OR "
-                       "             capturecard.parentid = 0 ) ) "
+                       "             capturecard.parentid = 0 ) ) ").arg(ptable)
                        + recmatch +
                        "WHERE  p.chanid = :CHANID AND"
-                       " p.starttime = :STARTTIME ;").arg(ptable));
+                       " p.starttime = :STARTTIME ;");
 
         query.bindValue(":CHANID",    m_progInfo.GetChanID());
         query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
@@ -420,8 +420,8 @@ void ProgDetails::loadPage(void)
     /* see #7810, was hardcoded to 4 star system, when every theme
      * uses 10 stars / 5 stars with half stars
      */
-        if (stars > 0.0)
-            attr += tr("%n star(s)", "", roundf(stars * 10.0)) + ", ";
+        if (stars > 0.0f)
+            attr += tr("%n star(s)", "", roundf(stars * 10.0f)) + ", ";
     }
     if (!colorcode.isEmpty())
         attr += colorcode + ", ";

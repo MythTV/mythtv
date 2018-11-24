@@ -1005,7 +1005,7 @@ void RingBuffer::run(void)
         {
             // limit the read size
             if (readblocksize > totfree)
-                totfree = (long long)(totfree / KB32) * KB32; // must be multiple of 32KB
+                totfree = (totfree / KB32) * KB32; // must be multiple of 32KB
             else
                 totfree = readblocksize;
 
@@ -1385,7 +1385,7 @@ int RingBuffer::ReadDirect(void *buf, int count, bool peek)
     int ret = safe_read(buf, count);
     int elapsed = timer.elapsed();
     uint64_t bps = !elapsed ? 1000000001 :
-                   (uint64_t)(((float)ret * 8000.0) / (float)elapsed);
+                   (uint64_t)(((float)ret * 8000.0f) / (float)elapsed);
     UpdateStorageRate(bps);
 
     poslock.lockForWrite();
@@ -1645,13 +1645,13 @@ QString RingBuffer::BitrateToString(uint64_t rate, bool hz)
     else if (rate >= 1000000)
     {
         msg = hz ? QObject::tr("%1MHz") : QObject::tr("%1Mbps");
-        bitrate  = (float)rate / (1000000.0);
+        bitrate  = (float)rate / (1000000.0f);
         range = hz ? 3 : 1;
     }
     else if (rate >= 1000)
     {
         msg = hz ? QObject::tr("%1kHz") : QObject::tr("%1kbps");
-        bitrate = (float)rate / 1000.0;
+        bitrate = (float)rate / 1000.0f;
         range = hz ? 1 : 0;
     }
     else
@@ -1678,7 +1678,7 @@ QString RingBuffer::GetAvailableBuffer(void)
         return "N/A";
 
     int avail = (rbwpos >= rbrpos) ? rbwpos - rbrpos : bufferSize - rbrpos + rbwpos;
-    return QString("%1%").arg((int)(((float)avail / (float)bufferSize) * 100.0));
+    return QString("%1%").arg(lroundf((float)avail / (float)bufferSize * 100.0f));
 }
 
 uint64_t RingBuffer::UpdateDecoderRate(uint64_t latest)

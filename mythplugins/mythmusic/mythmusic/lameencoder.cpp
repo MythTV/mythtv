@@ -154,7 +154,7 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
 
     if (length > 0)
     {
-        lameret = lame_encode_buffer_interleaved(gf, (short int *)bytes,
+        lameret = lame_encode_buffer_interleaved(gf, bytes,
                                                  samples_per_channel,
                                                  (unsigned char *)mp3buf,
                                                  mp3buf_size);

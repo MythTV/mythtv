@@ -177,17 +177,17 @@ QRect PlayerContext::GetStandAlonePIPRect(void)
     QMutexLocker locker(&deletePlayerLock);
     if (player)
     {
-        rect = QRect(pipRect);
+        rect = pipRect;
 
         float saspect = (float)rect.width() / (float)rect.height();
         float vaspect = player->GetVideoAspect();
 
         // Calculate new height or width according to relative aspect ratio
-        if ((int)((saspect + 0.05) * 10) > (int)((vaspect + 0.05) * 10))
+        if (lroundf(saspect * 10) > lroundf(vaspect * 10))
         {
             rect.setWidth((int) ceil(rect.width() * (vaspect / saspect)));
         }
-        else if ((int)((saspect + 0.05) * 10) < (int)((vaspect + 0.05) * 10))
+        else if (lroundf(saspect * 10) < lroundf(vaspect * 10))
         {
             rect.setHeight((int) ceil(rect.height() * (saspect / vaspect)));
         }
@@ -204,7 +204,7 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
 
     if (!useNullVideo && parentWidget)
     {
-        const QRect rect = QRect(pipRect);
+        const QRect rect = pipRect;
         ok = CreatePlayer(tv, parentWidget, desiredState,
                           true, rect);
     }
@@ -793,17 +793,17 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
 QString PlayerContext::GetPlayMessage(void) const
 {
     QString mesg = QObject::tr("Play");
-    if (ts_normal != 1.0)
+    if (ts_normal != 1.0f)
     {
-        if (ts_normal == 0.5)
+        if (ts_normal == 0.5f)
             mesg += QString(" 1/2x");
-        else if (0.32 < ts_normal && ts_normal < 0.34)
+        else if (0.32f < ts_normal && ts_normal < 0.34f)
             mesg += QString(" 1/3x");
-        else if (ts_normal == 0.25)
+        else if (ts_normal == 0.25f)
             mesg += QString(" 1/4x");
-        else if (ts_normal == 0.125)
+        else if (ts_normal == 0.125f)
             mesg += QString(" 1/8x");
-        else if (ts_normal == 0.0625)
+        else if (ts_normal == 0.0625f)
             mesg += QString(" 1/16x");
         else
             mesg += QString(" %1x").arg(ts_normal);

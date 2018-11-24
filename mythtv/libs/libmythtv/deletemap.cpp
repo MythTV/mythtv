@@ -408,8 +408,7 @@ void DeleteMap::NewCut(uint64_t frame)
 
     // find any existing temporary marker to determine cut range
     int64_t existing = -1;
-    frm_dir_map_t::Iterator it;
-    for (it = m_deleteMap.begin() ; it != m_deleteMap.end(); ++it)
+    for (auto it = m_deleteMap.begin() ; it != m_deleteMap.end(); ++it)
     {
         if (MARK_PLACEHOLDER == it.value())
         {
@@ -435,9 +434,9 @@ void DeleteMap::NewCut(uint64_t frame)
                 MarkTypes type = MARK_UNSET;
                 cut_start = GetNearestMark(frame, false);
                 cut_end = GetNearestMark(frame, true);
-                frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
-                if (it != m_deleteMap.end())
-                    type = it.value();
+                frm_dir_map_t::Iterator it2 = m_deleteMap.find(frame);
+                if (it2 != m_deleteMap.end())
+                    type = it2.value();
                 if (MARK_CUT_START == type)
                 {
                     cut_start = frame;

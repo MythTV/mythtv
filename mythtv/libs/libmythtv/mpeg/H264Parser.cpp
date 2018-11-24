@@ -1399,11 +1399,11 @@ uint H264Parser::aspectRatio(void) const
 
     if (aspect == 0.0)
         return 0;
-    if (fabs(aspect - 1.3333333333333333) < eps)
+    if (fabs(aspect - 1.3333333333333333) < static_cast<double>(eps))
         return 2;
-    if (fabs(aspect - 1.7777777777777777) < eps)
+    if (fabs(aspect - 1.7777777777777777) < static_cast<double>(eps))
         return 3;
-    if (fabs(aspect - 2.21) < eps)
+    if (fabs(aspect - 2.21) < static_cast<double>(eps))
         return 4;
 
     return aspect * 1000000;
