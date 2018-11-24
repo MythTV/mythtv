@@ -65,11 +65,12 @@ class ExternalStreamHandler : public StreamHandler
 
   public:
     static ExternalStreamHandler *Get(const QString &devicename,
-                                      int inputid);
+                                      int inputid, int majorid);
     static void Return(ExternalStreamHandler * & ref, int inputid);
 
   public:
-    explicit ExternalStreamHandler(const QString & path, int inputid);
+    explicit ExternalStreamHandler(const QString & path, int inputid,
+				   int majorid);
     ~ExternalStreamHandler(void) { CloseApp(); }
 
     void run(void) override; // MThread
@@ -106,6 +107,7 @@ class ExternalStreamHandler : public StreamHandler
     bool OpenApp(void);
     void CloseApp(void);
 
+    int            m_majorid;
     QMutex         m_IO_lock;
     ExternIO      *m_IO;
     QStringList    m_args;
@@ -124,9 +126,9 @@ class ExternalStreamHandler : public StreamHandler
     bool           m_replay;
 
     // for implementing Get & Return
-    static QMutex                           m_handlers_lock;
-    static QMap<QString, ExternalStreamHandler*> m_handlers;
-    static QMap<QString, uint>              m_handlers_refcnt;
+    static QMutex                            m_handlers_lock;
+    static QMap<int, ExternalStreamHandler*> m_handlers;
+    static QMap<int, uint>                   m_handlers_refcnt;
 
     QAtomicInt    m_streaming_cnt;
     QMutex        m_stream_lock;

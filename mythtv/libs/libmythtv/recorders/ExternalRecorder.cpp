@@ -143,7 +143,8 @@ bool ExternalRecorder::Open(void)
     ResetForNewFile();
 
     m_stream_handler = ExternalStreamHandler::Get(m_channel->GetDevice(),
-                                          (tvrec ? tvrec->GetInputId() : -1));
+						  m_channel->GetInputID(),
+						  m_channel->GetMajorID());
 
     if (m_stream_handler)
     {

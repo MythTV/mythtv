@@ -45,7 +45,8 @@ bool ExternalChannel::Open(void)
     if (!m_inputid)
         return false;
 
-    m_stream_handler = ExternalStreamHandler::Get(m_device, GetInputID());
+    m_stream_handler = ExternalStreamHandler::Get(m_device, GetInputID(),
+						  GetMajorID());
     if (!m_stream_handler || m_stream_handler->HasError())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");

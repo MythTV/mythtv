@@ -456,40 +456,38 @@ void ExternIO::Fork(void)
 }
 
 
-QMap<QString,ExternalStreamHandler*> ExternalStreamHandler::m_handlers;
-QMap<QString,uint>              ExternalStreamHandler::m_handlers_refcnt;
-QMutex                          ExternalStreamHandler::m_handlers_lock;
+QMap<int, ExternalStreamHandler*> ExternalStreamHandler::m_handlers;
+QMap<int, uint>                   ExternalStreamHandler::m_handlers_refcnt;
+QMutex                            ExternalStreamHandler::m_handlers_lock;
 
 ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
-                                                  int inputid)
+                                                  int inputid, int majorid)
 {
     QMutexLocker locker(&m_handlers_lock);
 
-    QString devkey = QString("[%1]%2").arg(inputid).arg(devname);
-
-    QMap<QString,ExternalStreamHandler*>::iterator it = m_handlers.find(devkey);
+    QMap<int, ExternalStreamHandler*>::iterator it = m_handlers.find(majorid);
 
     if (it == m_handlers.end())
     {
         ExternalStreamHandler *newhandler =
-            new ExternalStreamHandler(devname, inputid);
-        m_handlers[devkey] = newhandler;
-        m_handlers_refcnt[devkey] = 1;
+            new ExternalStreamHandler(devname, inputid, majorid);
+        m_handlers[majorid] = newhandler;
+        m_handlers_refcnt[majorid] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
             QString("ExternSH[%1]: Creating new stream handler %2 for %3")
-            .arg(inputid).arg(devkey).arg(devname));
+            .arg(inputid).arg(majorid).arg(devname));
     }
     else
     {
-        m_handlers_refcnt[devkey]++;
-        uint rcount = m_handlers_refcnt[devkey];
+        m_handlers_refcnt[majorid]++;
+        uint rcount = m_handlers_refcnt[majorid];
         LOG(VB_RECORD, LOG_INFO,
             QString("ExternSH[%1]: Using existing stream handler for %2")
-            .arg(inputid).arg(devkey) + QString(" (%1 in use)").arg(rcount));
+            .arg(inputid).arg(majorid) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return m_handlers[devkey];
+    return m_handlers[majorid];
 }
 
 void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
@@ -498,17 +496,17 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     QMutexLocker locker(&m_handlers_lock);
 
     QString devname = ref->_device;
-    QString devkey = QString("[%1]%2").arg(inputid).arg(devname);
+    int majorid = ref->m_majorid;
 
-    QMap<QString,uint>::iterator rit = m_handlers_refcnt.find(devkey);
+    QMap<int, uint>::iterator rit = m_handlers_refcnt.find(majorid);
     if (rit == m_handlers_refcnt.end())
         return;
 
-    QMap<QString, ExternalStreamHandler*>::iterator it =
-        m_handlers.find(devkey);
+    QMap<int, ExternalStreamHandler*>::iterator it =
+        m_handlers.find(majorid);
 
     LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Return '%2' in use %3")
-        .arg(inputid).arg(devkey).arg(*rit));
+        .arg(inputid).arg(majorid).arg(*rit));
 
     if (*rit > 1)
     {
@@ -520,7 +518,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     if ((it != m_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Closing handler for %2")
-            .arg(inputid).arg(devkey));
+            .arg(inputid).arg(majorid));
         delete *it;
         m_handlers.erase(it);
     }
@@ -528,7 +526,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("ExternSH[%1]: Error: Couldn't find handler for %2")
-            .arg(inputid).arg(devkey));
+            .arg(inputid).arg(majorid));
     }
 
     m_handlers_refcnt.erase(rit);
@@ -539,8 +537,11 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
   ExternalStreamHandler
  */
 
-ExternalStreamHandler::ExternalStreamHandler(const QString & path, int inputid)
+ExternalStreamHandler::ExternalStreamHandler(const QString & path,
+					     int inputid,
+					     int majorid)
     : StreamHandler(path, inputid)
+    , m_majorid(majorid)
     , m_IO(nullptr)
     , m_tsopen(false)
     , m_io_errcnt(0)
@@ -556,7 +557,7 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path, int inputid)
              logPropagateArgs.split(' ', QString::SkipEmptyParts);
     m_app = m_args.first();
     m_args.removeFirst();
-    m_args << "--inputid" << QString::number(inputid);
+    m_args << "--inputid" << QString::number(majorid);
     LOG(VB_RECORD, LOG_INFO, LOC + QString("args \"%1\"")
         .arg(m_args.join(" ")));
 
