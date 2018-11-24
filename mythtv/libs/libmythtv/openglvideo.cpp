@@ -312,6 +312,8 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     // UYVY packed pixels must be sampled exactly and any overscan settings will
     // break sampling - so always force an extra stage
     resize_down |= videoTextureType == MYTHTV_UYVY;
+    // Extra stage needed on Fire Stick 4k, maybe others, because of blank screen when playing.
+    resize_down |= gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
 
     if (resize_up && (defaultUpsize == kGLFilterBicubic))
     {
