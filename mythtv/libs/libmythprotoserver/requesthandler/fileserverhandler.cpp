@@ -13,6 +13,7 @@
 #include "mythsocket.h"
 #include "mythlogging.h"
 #include "programinfo.h"
+#include "recordinginfo.h"
 #include "storagegroup.h"
 #include "mythcorecontext.h"
 #include "mythdownloadmanager.h"
@@ -387,6 +388,8 @@ bool FileServerHandler::HandleQuery(SocketHandler *socket, QStringList &commands
         handled = HandleQueryFreeSpaceList(socket);
     else if (command == "QUERY_FREE_SPACE_SUMMARY")
         handled = HandleQueryFreeSpaceSummary(socket);
+    else if (command == "QUERY_CHECKFILE")
+        handled = HandleQueryCheckFile(socket, slist);
     else if (command == "QUERY_FILE_EXISTS")
         handled = HandleQueryFileExists(socket, slist);
     else if (command == "QUERY_FILE_HASH")
@@ -557,6 +560,35 @@ QList<FileSystemInfo> FileServerHandler::QueryAllFileSystems(void)
 
     return disks;
 }
+
+/**
+ * \addtogroup myth_network_protocol
+ * \par
+ * QUERY_CHECKFILE \e filename \e recordinginfo
+ */
+bool FileServerHandler::HandleQueryCheckFile(SocketHandler *socket,
+                                             QStringList &slist)
+{
+    QStringList::const_iterator it = slist.begin() + 2;
+    RecordingInfo recinfo(it, slist.end());
+
+    int exists = 0;
+
+    QString pburl;
+    if (recinfo.HasPathname())
+    {
+        pburl = GetPlaybackURL(&recinfo);
+        exists = QFileInfo(pburl).exists();
+        if (!exists)
+            pburl.clear();
+    }
+
+    QStringList res(QString::number(exists));
+    res << pburl;
+    socket->WriteStringList(res);
+    return true;
+}
+
 
 /**
  * \addtogroup myth_network_protocol

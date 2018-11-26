@@ -35,6 +35,7 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
     bool HandleQueryFreeSpaceList(SocketHandler *socket);
     bool HandleQueryFreeSpaceSummary(SocketHandler *socket);
 
+    bool HandleQueryCheckFile(SocketHandler *socket, QStringList &slist);
     bool HandleQueryFileExists(SocketHandler *socket, QStringList &slist);
     bool HandleQueryFileHash(SocketHandler *socket, QStringList &slist);
 

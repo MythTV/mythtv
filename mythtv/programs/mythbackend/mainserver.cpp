@@ -3574,7 +3574,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
         (recinfo.GetHostname() != gCoreContext->GetHostName()) &&
         (checkSlaves))
     {
-        PlaybackSock *slave = GetSlaveByHostname(recinfo.GetHostname());
+        PlaybackSock *slave = GetMediaServerByHostname(recinfo.GetHostname());
 
         if (slave)
         {
