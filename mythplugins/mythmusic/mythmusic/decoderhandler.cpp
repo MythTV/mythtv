@@ -31,8 +31,8 @@ QEvent::Type DecoderHandlerEvent::OperationStart = (QEvent::Type) QEvent::regist
 QEvent::Type DecoderHandlerEvent::OperationStop = (QEvent::Type) QEvent::registerEventType();
 QEvent::Type DecoderHandlerEvent::Error = (QEvent::Type) QEvent::registerEventType();
 
-DecoderHandlerEvent::DecoderHandlerEvent(Type t, const MusicMetadata &meta)
-    : MythEvent(t), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0)
+DecoderHandlerEvent::DecoderHandlerEvent(Type type, const MusicMetadata &meta)
+    : MythEvent(type), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0)
 { 
     m_meta = new MusicMetadata(meta);
 }

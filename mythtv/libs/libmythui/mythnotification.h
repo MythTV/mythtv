@@ -31,8 +31,8 @@ class MUI_PUBLIC MythNotification : public MythEvent
     static Type Check;
     static Type Busy;
 
-    MythNotification(Type t, void *parent = nullptr)
-        : MythEvent(t, "NOTIFICATION"), m_id(-1),
+    MythNotification(Type type, void *parent = nullptr)
+        : MythEvent(type, "NOTIFICATION"), m_id(-1),
         m_parent(parent), m_fullScreen(false),
         m_duration(0), m_visibility(kAll), m_priority(kDefault)
     {
@@ -60,10 +60,10 @@ class MUI_PUBLIC MythNotification : public MythEvent
         ToStringList();
     }
 
-    MythNotification(Type t, const QString &title, const QString &author,
+    MythNotification(Type type, const QString &title, const QString &author,
                      const QString &details = QString(),
                      const QString &extra   = QString())
-        : MythEvent(t, "NOTIFICATION"), m_id(-1), m_parent(nullptr),
+        : MythEvent(type, "NOTIFICATION"), m_id(-1), m_parent(nullptr),
         m_fullScreen(false), m_description(title), m_duration(0),
         m_visibility(kAll), m_priority(kDefault)
     {
@@ -76,8 +76,8 @@ class MUI_PUBLIC MythNotification : public MythEvent
         ToStringList();
     }
 
-    MythNotification(Type t, const DMAP &metadata)
-        : MythEvent(t, "NOTIFICATION"), m_id(-1), m_parent(nullptr),
+    MythNotification(Type type, const DMAP &metadata)
+        : MythEvent(type, "NOTIFICATION"), m_id(-1), m_parent(nullptr),
         m_fullScreen(false), m_duration(0), m_metadata(metadata),
         m_visibility(kAll), m_priority(kDefault)
     {
@@ -232,23 +232,23 @@ class MUI_PUBLIC MythNotification : public MythEvent
 class MUI_PUBLIC MythImageNotification : public virtual MythNotification
 {
   public:
-    MythImageNotification(Type t, const QImage &image)
-        : MythNotification(t), m_image(image)
+    MythImageNotification(Type type, const QImage &image)
+        : MythNotification(type), m_image(image)
     {
     }
 
-    MythImageNotification(Type t, const QString &imagePath)
-        : MythNotification(t), m_imagePath(imagePath)
+    MythImageNotification(Type type, const QString &imagePath)
+        : MythNotification(type), m_imagePath(imagePath)
     {
     }
 
-    MythImageNotification(Type t, const QImage &image, const DMAP &metadata)
-        : MythNotification(t, metadata), m_image(image)
+    MythImageNotification(Type type, const QImage &image, const DMAP &metadata)
+        : MythNotification(type, metadata), m_image(image)
     {
     }
 
-    MythImageNotification(Type t, const QString &imagePath, const DMAP &metadata)
-        : MythNotification(t, metadata), m_imagePath(imagePath)
+    MythImageNotification(Type type, const QString &imagePath, const DMAP &metadata)
+        : MythNotification(type, metadata), m_imagePath(imagePath)
     {
     }
 
@@ -283,20 +283,20 @@ class MUI_PUBLIC MythImageNotification : public virtual MythNotification
 class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
 {
   public:
-    MythPlaybackNotification(Type t, float progress, const QString &progressText)
-        : MythNotification(t), m_progress(progress), m_progressText(progressText)
+    MythPlaybackNotification(Type type, float progress, const QString &progressText)
+        : MythNotification(type), m_progress(progress), m_progressText(progressText)
     {
     }
 
-    MythPlaybackNotification(Type t, float progress, const QString &progressText,
+    MythPlaybackNotification(Type type, float progress, const QString &progressText,
                              const DMAP &metadata)
-        : MythNotification(t, metadata),
+        : MythNotification(type, metadata),
         m_progress(progress), m_progressText(progressText)
     {
     }
 
-    MythPlaybackNotification(Type t, int duration, int position)
-        : MythNotification(t)
+    MythPlaybackNotification(Type type, int duration, int position)
+        : MythNotification(type)
     {
         m_progress      = (float)position / (float)duration;
         m_progressText  = stringFromSeconds(duration);
@@ -340,31 +340,31 @@ class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
                                          public MythPlaybackNotification
 {
   public:
-    MythMediaNotification(Type t, const QImage &image, const DMAP &metadata,
+    MythMediaNotification(Type type, const QImage &image, const DMAP &metadata,
                           float progress, const QString &durationText)
-        : MythNotification(t, metadata), MythImageNotification(t, image),
-        MythPlaybackNotification(t, progress, durationText)
+        : MythNotification(type, metadata), MythImageNotification(type, image),
+        MythPlaybackNotification(type, progress, durationText)
     {
     }
 
-    MythMediaNotification(Type t, const QImage &image, const DMAP &metadata,
+    MythMediaNotification(Type type, const QImage &image, const DMAP &metadata,
                           int duration, int position)
-        : MythNotification(t, metadata), MythImageNotification(t, image),
-        MythPlaybackNotification(t, duration, position)
+        : MythNotification(type, metadata), MythImageNotification(type, image),
+        MythPlaybackNotification(type, duration, position)
     {
     }
 
-    MythMediaNotification(Type t, const QString &imagePath, const DMAP &metadata,
+    MythMediaNotification(Type type, const QString &imagePath, const DMAP &metadata,
                           float progress, const QString &durationText)
-        : MythNotification(t, metadata), MythImageNotification(t, imagePath),
-        MythPlaybackNotification(t, progress, durationText)
+        : MythNotification(type, metadata), MythImageNotification(type, imagePath),
+        MythPlaybackNotification(type, progress, durationText)
     {
     }
 
-    MythMediaNotification(Type t, const QString &imagePath, const DMAP &metadata,
+    MythMediaNotification(Type type, const QString &imagePath, const DMAP &metadata,
                           int duration, int position)
-        : MythNotification(t, metadata), MythImageNotification(t, imagePath),
-        MythPlaybackNotification(t, duration, position)
+        : MythNotification(type, metadata), MythImageNotification(type, imagePath),
+        MythPlaybackNotification(type, duration, position)
     {
     }
 

@@ -19,10 +19,10 @@ class Playlist;
 class MusicPlayerEvent : public MythEvent
 {
     public:
-        MusicPlayerEvent(Type t, int id) :
-            MythEvent(t), TrackID(id), Volume(0), IsMuted(false) {}
-        MusicPlayerEvent(Type t, uint vol, bool muted) :
-            MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
+        MusicPlayerEvent(Type type, int id) :
+            MythEvent(type), TrackID(id), Volume(0), IsMuted(false) {}
+        MusicPlayerEvent(Type type, uint vol, bool muted) :
+            MythEvent(type), TrackID(0), Volume(vol), IsMuted(muted) {}
         ~MusicPlayerEvent() = default;
 
          MythEvent *clone(void) const override //  MythEvent

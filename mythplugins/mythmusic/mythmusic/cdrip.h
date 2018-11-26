@@ -180,10 +180,10 @@ class Ripper : public MythScreenType
 class RipStatusEvent : public QEvent
 {
   public:
-    RipStatusEvent(Type t, int val) :
-        QEvent(t), text(""), value(val) {}
-    RipStatusEvent(Type t, const QString &val) :
-        QEvent(t), text(val), value(-1) {}
+    RipStatusEvent(Type type, int val) :
+        QEvent(type), text(""), value(val) {}
+    RipStatusEvent(Type type, const QString &val) :
+        QEvent(type), text(val), value(-1) {}
     ~RipStatusEvent() = default;
 
     QString text;

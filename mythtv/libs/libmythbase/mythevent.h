@@ -15,18 +15,18 @@
 class MBASE_PUBLIC MythEvent : public QEvent
 {
   public:
-    explicit MythEvent(int t) : QEvent((QEvent::Type)t)
+    explicit MythEvent(int type) : QEvent((QEvent::Type)type)
     { }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int t, const QString lmessage) : QEvent((QEvent::Type)t),
+    MythEvent(int type, const QString lmessage) : QEvent((QEvent::Type)type),
             m_message(lmessage),    m_extradata("empty")
     {
     }
 
     // lmessage is passed by value for thread safety reasons per DanielK
-    MythEvent(int t, const QString lmessage, const QStringList &lextradata)
-           : QEvent((QEvent::Type)t),
+    MythEvent(int type, const QString lmessage, const QStringList &lextradata)
+           : QEvent((QEvent::Type)type),
             m_message(lmessage),    m_extradata(lextradata)
     {
     }

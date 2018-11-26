@@ -29,8 +29,8 @@ class Visual;
 class MPUBLIC OutputEvent : public MythEvent
 {
   public:
-    explicit OutputEvent(Type t) :
-        MythEvent(t), error_msg(nullptr), elasped_seconds(0), written_bytes(0),
+    explicit OutputEvent(Type type) :
+        MythEvent(type), error_msg(nullptr), elasped_seconds(0), written_bytes(0),
         brate(0), freq(0), prec(0), chan(0)
     { ; }
 

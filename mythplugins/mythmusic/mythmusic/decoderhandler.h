@@ -26,17 +26,17 @@ class Decoder;
 class DecoderHandlerEvent : public MythEvent
 {
   public:
-    explicit DecoderHandlerEvent(Type t)
-        : MythEvent(t), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0) {}
+    explicit DecoderHandlerEvent(Type type)
+        : MythEvent(type), m_msg(nullptr), m_meta(nullptr), m_available(0), m_maxSize(0) {}
 
-    DecoderHandlerEvent(Type t, QString *e)
-        : MythEvent(t), m_msg(e), m_meta(nullptr), m_available(0), m_maxSize(0) {}
+    DecoderHandlerEvent(Type type, QString *e)
+        : MythEvent(type), m_msg(e), m_meta(nullptr), m_available(0), m_maxSize(0) {}
 
-    DecoderHandlerEvent(Type t, int available, int maxSize)
-        : MythEvent(t), m_msg(nullptr), m_meta(nullptr), 
+    DecoderHandlerEvent(Type type, int available, int maxSize)
+        : MythEvent(type), m_msg(nullptr), m_meta(nullptr), 
           m_available(available), m_maxSize(maxSize) {}
 
-    DecoderHandlerEvent(Type t, const MusicMetadata &m);
+    DecoderHandlerEvent(Type type, const MusicMetadata &m);
     ~DecoderHandlerEvent();
 
     QString *getMessage(void) const { return m_msg; }
