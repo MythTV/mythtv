@@ -51,7 +51,7 @@ void MythTranslation::load(const QString &module_name)
 
     if (lang == "en")
     {
-        gCoreContext->SaveSettingOnHost("Language", "en_US", nullptr);
+        gCoreContext->OverrideSettingForSession("Language", "en_US");
         lang = "en_us";
     }
 
