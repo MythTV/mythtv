@@ -2248,8 +2248,8 @@ void VideoDialog::searchComplete(QString string)
 
     if (m_d->m_type == DLG_TREE)
     {
-        MythGenericTree *parent = m_videoButtonTree->GetCurrentNode()->getParent();
-        MythGenericTree *new_node = parent->getChildAt(idTitle.key(string));
+        MythGenericTree *dlgParent = m_videoButtonTree->GetCurrentNode()->getParent();
+        MythGenericTree *new_node = dlgParent->getChildAt(idTitle.key(string));
         if (new_node)
         {
             m_videoButtonTree->SetCurrentNode(new_node);

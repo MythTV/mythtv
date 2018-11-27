@@ -2429,7 +2429,7 @@ int MPEG2fixup::Start()
                         // and lVpkt_head will be adjusted accordingly
 
                         vFrame.at(frame_pos)->pkt.pts = lastPTS / 300;
-                        int ret = InsertFrame(GetFrameNum(vFrame.at(frame_pos)),
+                        ret = InsertFrame(GetFrameNum(vFrame.at(frame_pos)),
                                               deltaPTS, ptsIncrement, 0);
                         
                         if (ret < 0)
@@ -2628,14 +2628,14 @@ int MPEG2fixup::Start()
                     continue;
                 }
 
-                int64_t deltaPTS = poq.Get(it.key(), &af->first()->pkt);
+                int64_t deltaPTS2 = poq.Get(it.key(), &af->first()->pkt);
 
-                if (udiff2x33(nextPTS, deltaPTS) * 300 > expectedDTS &&
+                if (udiff2x33(nextPTS, deltaPTS2) * 300 > expectedDTS &&
                     cutState[it.key()] != 1)
                 {
 #ifdef DEBUG_AUDIO
                     LOG(VB_PROCESS, LOG_INFO, QString("Aud not ready: %1 > %2")
-                            .arg(PtsTime(udiff2x33(nextPTS, deltaPTS)))
+                            .arg(PtsTime(udiff2x33(nextPTS, deltaPTS2)))
                             .arg(PtsTime(expectedDTS / 300)));
 #endif
                     break;
@@ -2646,7 +2646,7 @@ int MPEG2fixup::Start()
 
                 ptsinc((uint64_t *)&origaPTS[it.key()], incPTS * 300);
 
-                dec2x33(&af->first()->pkt.pts, deltaPTS);
+                dec2x33(&af->first()->pkt.pts, deltaPTS2);
 
 #if 0
                 expectedPTS[it.key()] = udiff2x33(nextPTS, initPTS);

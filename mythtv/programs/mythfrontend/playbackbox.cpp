@@ -3086,7 +3086,6 @@ MythMenu* PlaybackBox::createJobMenu()
 
     MythMenu *menu = new MythMenu(title, this, "slotmenu");
 
-    QString jobTitle;
     QString command;
 
     bool add[7] =

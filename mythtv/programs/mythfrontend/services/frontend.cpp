@@ -251,7 +251,7 @@ QStringList Frontend::GetContextList(void)
     return gActionDescriptions.keys();
 }
 
-DTC::FrontendActionList* Frontend::GetActionList(const QString &Context)
+DTC::FrontendActionList* Frontend::GetActionList(const QString &lContext)
 {
     DTC::FrontendActionList *list = new DTC::FrontendActionList();
 
@@ -261,7 +261,7 @@ DTC::FrontendActionList* Frontend::GetActionList(const QString &Context)
     while (contexts.hasNext())
     {
         contexts.next();
-        if (!Context.isEmpty() && contexts.key() != Context)
+        if (!lContext.isEmpty() && contexts.key() != lContext)
             continue;
 
         // TODO can we keep the context data with QMap<QString, QStringList>?

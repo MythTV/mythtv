@@ -980,9 +980,9 @@ int Transcode::TranscodeFile(const QString &inputname,
             int did_ff;
             GetPlayer()->TranscodeGetNextFrame(did_ff, is_key, true);
 
-            QSize buf_size = GetPlayer()->GetVideoBufferSize();
-            video_width = buf_size.width();
-            video_height = buf_size.height();
+            QSize buf_size2 = GetPlayer()->GetVideoBufferSize();
+            video_width = buf_size2.width();
+            video_height = buf_size2.height();
             video_aspect = GetPlayer()->GetVideoAspect();
             video_frame_rate = GetPlayer()->GetFrameRate();
         }
@@ -1316,13 +1316,13 @@ int Transcode::TranscodeFile(const QString &inputname,
                     nvr->SetNewVideoParams(video_aspect);
                 }
 
-                QSize buf_size = GetPlayer()->GetVideoBufferSize();
+                QSize buf_size3 = GetPlayer()->GetVideoBufferSize();
 
-                if (video_width != buf_size.width() ||
-                    video_height != buf_size.height())
+                if (video_width != buf_size3.width() ||
+                    video_height != buf_size3.height())
                 {
-                    video_width = buf_size.width();
-                    video_height = buf_size.height();
+                    video_width = buf_size3.width();
+                    video_height = buf_size3.height();
 
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Resizing from %1x%2 to %3x%4")
@@ -1382,13 +1382,13 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
 
 
-            QSize buf_size = GetPlayer()->GetVideoBufferSize();
+            QSize buf_size4 = GetPlayer()->GetVideoBufferSize();
 
-            if (video_width != buf_size.width() ||
-                video_height != buf_size.height())
+            if (video_width != buf_size4.width() ||
+                video_height != buf_size4.height())
             {
-                video_width = buf_size.width();
-                video_height = buf_size.height();
+                video_width = buf_size4.width();
+                video_height = buf_size4.height();
 
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Resizing from %1x%2 to %3x%4")

@@ -1945,9 +1945,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     InputInfo busy_input;
 
-    EncoderLink *rctv = (*m_tvList)[rcinfo->GetInputID()];
+    EncoderLink *rctv1 = (*m_tvList)[rcinfo->GetInputID()];
     // first check the input we will be recording on...
-    bool is_busy = rctv->IsBusy(&busy_input, -1);
+    bool is_busy = rctv1->IsBusy(&busy_input, -1);
     if (is_busy &&
         (rcinfo->GetRecordingStatus() == RecStatus::Pending ||
          !sinputinfomap[rcinfo->GetInputID()].schedgroup ||
@@ -1973,8 +1973,8 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
             return true;
         }
 
-        EncoderLink *rctv = (*m_tvList)[inputids[i]];
-        if (rctv->IsBusy(&busy_input, -1))
+        EncoderLink *rctv2 = (*m_tvList)[inputids[i]];
+        if (rctv2->IsBusy(&busy_input, -1))
         {
             if ((!busy_input.mplexid ||
                  busy_input.mplexid != rcinfo->mplexid) &&
@@ -3465,7 +3465,6 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 {
     int prerollseconds = 0;
     int secsleft = 0;
-    EncoderLink *enc = nullptr;
 
     QReadLocker tvlocker(&TVRec::inputsLock);
 
@@ -3514,7 +3513,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 
         if (m_tvList->find(pginfo->GetInputID()) != m_tvList->end())
         {
-            enc = (*m_tvList)[pginfo->GetInputID()];
+            EncoderLink *enc = (*m_tvList)[pginfo->GetInputID()];
             if ((!enc->IsLocal()) &&
                 (!SlavesInUse.contains(enc->GetHostName())))
             {
@@ -3557,7 +3556,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
     {
-        enc = *enciter;
+        EncoderLink *enc = *enciter;
 
         if ((!enc->IsLocal()) &&
             (enc->IsAwake()) &&
@@ -4075,7 +4074,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
 
     for (clause = 0; clause < fromclauses.count(); ++clause)
     {
-        QString query = QString(
+        QString query2 = QString(
 "REPLACE INTO recordmatch (recordid, chanid, starttime, manualid, "
 "                          oldrecduplicate, findid) "
 "SELECT RECTABLE.recordid, program.chanid, program.starttime, "
@@ -4109,18 +4108,18 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
             .arg(kOverrideRecord)
             .arg(kDontRecord);
 
-        query.replace("RECTABLE", recordTable);
+        query2.replace("RECTABLE", recordTable);
 
         LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query %1...")
                 .arg(clause));
 
         gettimeofday(&dbstart, nullptr);
         MSqlQuery result(dbConn);
-        result.prepare(query);
+        result.prepare(query2);
 
         for (it = bindings.begin(); it != bindings.end(); ++it)
         {
-            if (query.contains(it.key()))
+            if (query2.contains(it.key()))
                 result.bindValue(it.key(), it.value());
         }
 

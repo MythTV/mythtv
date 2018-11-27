@@ -275,7 +275,7 @@ bool PrevRecordedList::LoadDates(void)
     {
         int year(query.value(0).toInt());
         int month(query.value(1).toInt());
-        ProgramInfo *program = new ProgramInfo();
+        program = new ProgramInfo();
         QDate startdate(year,month,1);
         QDateTime starttime(startdate);
         program->SetRecordingStartTime(starttime);

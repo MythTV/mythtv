@@ -260,7 +260,7 @@ bool Commands::ProcessCommand(const QString & cmd)
 {
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Processing '%1'").arg(cmd));
 
-    std::unique_lock<std::mutex> lk(m_parent->m_msg_mutex);
+    std::unique_lock<std::mutex> lk1(m_parent->m_msg_mutex);
 
     if (cmd.startsWith("APIVersion?"))
     {
@@ -389,7 +389,7 @@ bool Commands::ProcessCommand(const QString & cmd)
     }
     else if (tokens[1].startsWith("IsOpen?"))
     {
-        std::unique_lock<std::mutex> lk(m_parent->m_run_mutex);
+        std::unique_lock<std::mutex> lk2(m_parent->m_run_mutex);
         if (m_parent->m_fatal)
             SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
         else if (m_parent->m_ready)

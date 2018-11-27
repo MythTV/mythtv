@@ -124,16 +124,16 @@ static int SendMessage(const MythUtilCommandLineParser &cmdline)
     QMap<QString,QString> extras = cmdline.GetExtra();
     for (i = extras.begin(); i != extras.end(); ++i)
     {
-        QString name = i.key();
-        QString value = i.value();
+        QString kv_name = i.key();
+        QString kv_value = i.value();
 
-        name.replace("--", "");
-        cerr << "name: " << name.toLocal8Bit().constData()
-             << " -- value: " << value.toLocal8Bit().constData() << endl;
+        kv_name.replace("--", "");
+        cerr << "name: " << kv_name.toLocal8Bit().constData()
+             << " -- value: " << kv_value.toLocal8Bit().constData() << endl;
 
-        name.append("%");
-        name.prepend("%");
-        message.replace(name, value);
+        kv_name.append("%");
+        kv_name.prepend("%");
+        message.replace(kv_name, kv_value);
     }
 
     cout << "output:\n" << message.toLocal8Bit().constData() << endl;

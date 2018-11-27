@@ -4629,9 +4629,9 @@ void ChannelGroupSetting::Save()
             else
             {
                 //update m_groupId
-                QString qstr = "SELECT grpid FROM channelgroupnames "
+                QString qstr2 = "SELECT grpid FROM channelgroupnames "
                                 "WHERE name = :NEWNAME;";
-                query.prepare(qstr);
+                query.prepare(qstr2);
                 query.bindValue(":NEWNAME", m_groupName->getValue());
                 if (!query.exec())
                     MythDB::DBError("ChannelGroupSetting::Close", query);

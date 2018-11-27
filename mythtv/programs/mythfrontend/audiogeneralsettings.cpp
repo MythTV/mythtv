@@ -210,15 +210,15 @@ void AudioConfigSettings::CheckConfiguration(void)
 
     if (!CheckPassthrough())
     {
-        QString name = m_PassThroughDeviceOverride->getValue();
-        QString msg = tr("Passthrough device is invalid or not useable. Check "
+        QString pt_name = m_PassThroughDeviceOverride->getValue();
+        QString pt_msg = tr("Passthrough device is invalid or not useable. Check "
                          "configuration in Advanced Settings:") +
-            name;
+            pt_name;
 
-        ShowOkPopup(msg);
+        ShowOkPopup(pt_msg);
 
         LOG(VB_GENERAL, LOG_ERR, QString("Audio device %1 isn't usable")
-            .arg(name));
+            .arg(pt_name));
     }
 }
 

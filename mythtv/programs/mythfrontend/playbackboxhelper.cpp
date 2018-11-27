@@ -60,18 +60,18 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 {
     QTime tm = QTime::currentTime();
 
-    QStringList::const_iterator it = slist.begin();
-    ProgramInfo evinfo(it, slist.end());
+    QStringList::const_iterator it2 = slist.begin();
+    ProgramInfo evinfo(it2, slist.end());
     QSet<CheckAvailabilityType> cats;
-    for (; it != slist.end(); ++it)
-        cats.insert((CheckAvailabilityType)(*it).toUInt());
+    for (; it2 != slist.end(); ++it2)
+        cats.insert((CheckAvailabilityType)(*it2).toUInt());
 
     {
         QMutexLocker locker(&m_pbh.m_lock);
-        QHash<uint, QStringList>::iterator it =
+        QHash<uint, QStringList>::iterator cit =
             m_checkAvailability.find(evinfo.GetRecordingID());
-        if (it != m_checkAvailability.end())
-            m_checkAvailability.erase(it);
+        if (cit != m_checkAvailability.end())
+            m_checkAvailability.erase(cit);
         if (m_checkAvailability.empty() && m_checkAvailabilityTimerId)
         {
             killTimer(m_checkAvailabilityTimerId);
@@ -200,13 +200,13 @@ bool PBHEventHandler::event(QEvent *e)
             }
             if (!successes.empty())
             {
-                MythEvent *e = new MythEvent("DELETE_SUCCESSES", successes);
-                QCoreApplication::postEvent(m_pbh.m_listener, e);
+                MythEvent *oe = new MythEvent("DELETE_SUCCESSES", successes);
+                QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
             if (!failures.empty())
             {
-                MythEvent *e = new MythEvent("DELETE_FAILURES", failures);
-                QCoreApplication::postEvent(m_pbh.m_listener, e);
+                MythEvent *oe = new MythEvent("DELETE_FAILURES", failures);
+                QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
 
             return true;
@@ -229,13 +229,13 @@ bool PBHEventHandler::event(QEvent *e)
             }
             if (!successes.empty())
             {
-                MythEvent *e = new MythEvent("UNDELETE_SUCCESSES", successes);
-                QCoreApplication::postEvent(m_pbh.m_listener, e);
+                MythEvent *oe = new MythEvent("UNDELETE_SUCCESSES", successes);
+                QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
             if (!failures.empty())
             {
-                MythEvent *e = new MythEvent("UNDELETE_FAILURES", failures);
-                QCoreApplication::postEvent(m_pbh.m_listener, e);
+                MythEvent *oe = new MythEvent("UNDELETE_FAILURES", failures);
+                QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
 
             return true;
@@ -303,8 +303,8 @@ bool PBHEventHandler::event(QEvent *e)
             {
                 QStringList list = me->ExtraDataList();
                 list.push_back(foundFile);
-                MythEvent *e = new MythEvent("FOUND_ARTWORK", list);
-                QCoreApplication::postEvent(m_pbh.m_listener, e);
+                MythEvent *oe = new MythEvent("FOUND_ARTWORK", list);
+                QCoreApplication::postEvent(m_pbh.m_listener, oe);
             }
 
             return true;

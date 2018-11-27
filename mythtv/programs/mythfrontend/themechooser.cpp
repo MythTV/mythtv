@@ -406,15 +406,15 @@ void ThemeChooser::LoadVersion(const QString &version,
                     .arg(remoteTheme.GetMajorVersion())
                     .arg(remoteTheme.GetMinorVersion()));
 
-                ThemeInfo *remoteTheme = loadThemeInfo(*it);
-                if (remoteTheme)
+                ThemeInfo *tmpTheme = loadThemeInfo(*it);
+                if (tmpTheme)
                 {
-                    themeName = remoteTheme->GetName();
+                    themeName = tmpTheme->GetName();
                     themesSeen << dirName;
                     m_infoList << *it;
                     m_themeStatuses[themeName] = "updateavailable";
 
-                    QFileInfo finfo(remoteTheme->GetPreviewPath());
+                    QFileInfo finfo(tmpTheme->GetPreviewPath());
                     GetMythDownloadManager()->queueDownload(
                         remoteDir.append("/").append(finfo.fileName()),
                         localDir.append("/").append(finfo.fileName()),
@@ -923,8 +923,8 @@ void ThemeChooser::customEvent(QEvent *e)
             gCoreContext->SaveSetting("Theme", m_downloadTheme->GetDirectoryName());
 
             // Send a message to ourself so we trigger a reload our next chance
-            MythEvent *me = new MythEvent("THEME_RELOAD");
-            qApp->postEvent(this, me);
+            MythEvent *me2 = new MythEvent("THEME_RELOAD");
+            qApp->postEvent(this, me2);
         }
         else if ((me->Message() == "THEME_RELOAD") &&
                  (m_downloadState == dsIdle))

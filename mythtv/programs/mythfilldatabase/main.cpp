@@ -558,29 +558,29 @@ int main(int argc, char *argv[])
 
         int newEpiWindow = gCoreContext->GetNumSetting( "NewEpisodeWindow", 14);
 
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("UPDATE program SET previouslyshown = 1 "
+        MSqlQuery query2(MSqlQuery::InitCon());
+        query2.prepare("UPDATE program SET previouslyshown = 1 "
                       "WHERE previouslyshown = 0 "
                       "AND originalairdate is not null "
                       "AND (to_days(starttime) - to_days(originalairdate)) "
                       "    > :NEWWINDOW;");
-        query.bindValue(":NEWWINDOW", newEpiWindow);
+        query2.bindValue(":NEWWINDOW", newEpiWindow);
 
-        if (query.exec())
+        if (query2.exec())
             LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1").arg(query.numRowsAffected()));
+                QString("    Found %1").arg(query2.numRowsAffected()));
 
         LOG(VB_GENERAL, LOG_INFO, "Unmarking new episode rebroadcast repeats.");
-        query.prepare("UPDATE program SET previouslyshown = 0 "
+        query2.prepare("UPDATE program SET previouslyshown = 0 "
                       "WHERE previouslyshown = 1 "
                       "AND originalairdate is not null "
                       "AND (to_days(starttime) - to_days(originalairdate)) "
                       "    <= :NEWWINDOW;");
-        query.bindValue(":NEWWINDOW", newEpiWindow);
+        query2.bindValue(":NEWWINDOW", newEpiWindow);
 
-        if (query.exec())
+        if (query2.exec())
             LOG(VB_GENERAL, LOG_INFO,
-                QString("    Found %1").arg(query.numRowsAffected()));
+                QString("    Found %1").arg(query2.numRowsAffected()));
     }
 
     // Mark first and last showings
@@ -663,12 +663,12 @@ int main(int argc, char *argv[])
 
     if (true) // limit MSqlQuery's lifetime
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT count(previouslyshown) "
+        MSqlQuery query2(MSqlQuery::InitCon());
+        query2.prepare("SELECT count(previouslyshown) "
                       "FROM program WHERE previouslyshown = 1;");
-        if (query.exec() && query.next())
+        if (query2.exec() && query2.next())
         {
-            if (query.value(0).toInt() != 0)
+            if (query2.value(0).toInt() != 0)
                 gCoreContext->SaveSettingOnHost("HaveRepeats", "1", nullptr);
             else
                 gCoreContext->SaveSettingOnHost("HaveRepeats", "0", nullptr);

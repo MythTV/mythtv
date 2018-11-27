@@ -902,14 +902,14 @@ void ProgLister::FillViewList(const QString &view)
             {
                 QString qphrase = view;
 
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.prepare("REPLACE INTO keyword (phrase, searchtype)"
+                MSqlQuery query2(MSqlQuery::InitCon());
+                query2.prepare("REPLACE INTO keyword (phrase, searchtype)"
                               "VALUES(:VIEW, :SEARCHTYPE );");
-                query.bindValue(":VIEW", qphrase);
-                query.bindValue(":SEARCHTYPE", m_searchType);
-                if (!query.exec())
+                query2.bindValue(":VIEW", qphrase);
+                query2.bindValue(":SEARCHTYPE", m_searchType);
+                if (!query2.exec())
                     MythDB::DBError("ProgLister::FillViewList -- "
-                                    "replace keyword", query);
+                                    "replace keyword", query2);
 
                 m_viewList.push_back(qphrase);
                 m_viewTextList.push_back(qphrase);

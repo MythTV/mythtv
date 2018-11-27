@@ -198,9 +198,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     TVRec::inputsLock.lockForRead();
 
-    QMap<int, EncoderLink *>::Iterator iter = m_pEncoders->begin();
-
-    for (; iter != m_pEncoders->end(); ++iter)
+    for (auto iter = m_pEncoders->begin(); iter != m_pEncoders->end(); ++iter)
     {
         EncoderLink *elink = *iter;
 
@@ -590,8 +588,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QStringList output = QString(input).split('\n',
                                                   QString::SkipEmptyParts);
 
-        QStringList::iterator iter;
-        for (iter = output.begin(); iter != output.end(); ++iter)
+        for (auto iter = output.begin(); iter != output.end(); ++iter)
         {
             QDomElement info = pDoc->createElement("Information");
 

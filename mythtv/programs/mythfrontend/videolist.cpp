@@ -805,8 +805,8 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
 
     meta_dir_node *video_root = &m_metadata_tree;
 
-    smart_dir_node sdn = video_root->addSubDir("All");
-    meta_dir_node* all_group_node = sdn.get();
+    smart_dir_node sdn1 = video_root->addSubDir("All");
+    meta_dir_node* all_group_node = sdn1.get();
 
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
     {
@@ -890,8 +890,8 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
 
             if (group_node == nullptr)
             {
-                smart_dir_node sdn = video_root->addSubDir("Unknown");
-                group_node = sdn.get();
+                smart_dir_node sdn2 = video_root->addSubDir("Unknown");
+                group_node = sdn2.get();
                 gtnm["Unknown"] = group_node;
             }
 
@@ -907,8 +907,8 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
 
             if (group_node == nullptr)
             {
-                smart_dir_node sdn = video_root->addSubDir(item);
-                group_node = sdn.get();
+                smart_dir_node sdn2 = video_root->addSubDir(item);
+                group_node = sdn2.get();
                 gtnm[item] = group_node;
             }
 
@@ -935,8 +935,8 @@ void VideoListImp::buildTVList(void)
 
     meta_dir_node *video_root = &m_metadata_tree;
 
-    smart_dir_node sdn = video_root->addSubDir(QObject::tr("Television"));
-    meta_dir_node* television_node = sdn.get();
+    smart_dir_node sdn1 = video_root->addSubDir(QObject::tr("Television"));
+    meta_dir_node* television_node = sdn1.get();
 
     smart_dir_node vdn = video_root->addSubDir(QObject::tr("Movies"));
     meta_dir_node* movie_node = vdn.get();
@@ -947,8 +947,8 @@ void VideoListImp::buildTVList(void)
 
         if (((*p)->GetSeason() > 0) || ((*p)->GetEpisode() > 0))
         {
-            smart_dir_node sdn = television_node->addSubDir((*p)->GetTitle());
-            meta_dir_node* title_node = sdn.get();
+            smart_dir_node sdn2 = television_node->addSubDir((*p)->GetTitle());
+            meta_dir_node* title_node = sdn2.get();
 
             smart_dir_node ssdn = title_node->addSubDir(
                 QObject::tr("Season %1").arg((*p)->GetSeason()));

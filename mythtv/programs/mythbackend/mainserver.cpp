@@ -236,15 +236,15 @@ const int FreeSpaceUpdater::kRequeryTimeout = 15000;
 const int FreeSpaceUpdater::kExitTimeout = 61000;
 
 MainServer::MainServer(bool master, int port,
-                       QMap<int, EncoderLink *> *tvList,
-                       Scheduler *sched, AutoExpire *expirer) :
-    encoderList(tvList), mythserver(nullptr),
+                       QMap<int, EncoderLink *> *_tvList,
+                       Scheduler *sched, AutoExpire *_expirer) :
+    encoderList(_tvList), mythserver(nullptr),
     metadatafactory(nullptr),
     masterFreeSpaceListUpdater(nullptr),
     masterServerReconnect(nullptr),
     masterServer(nullptr), ismaster(master), threadPool("ProcessRequestPool"),
     masterBackendOverride(false),
-    m_sched(sched), m_expirer(expirer), m_addChildInputLock(),
+    m_sched(sched), m_expirer(_expirer), m_addChildInputLock(),
     deferredDeleteTimer(nullptr),
     autoexpireUpdateTimer(nullptr), m_exitCode(GENERIC_EXIT_OK),
     m_stopped(false)
@@ -1721,8 +1721,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
 
     sockListLock.lockForRead();
-    vector<PlaybackSock *>::iterator iter = playbackList.begin();
-    for (; iter != playbackList.end(); ++iter)
+    for (auto iter = playbackList.begin(); iter != playbackList.end(); ++iter)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->getSocket() == socket)
@@ -1864,8 +1863,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         bool wasAsleep = true;
         TVRec::inputsLock.lockForRead();
-        QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-        for (; iter != encoderList->end(); ++iter)
+        for (auto iter = encoderList->begin(); iter != encoderList->end(); ++iter)
         {
             EncoderLink *elink = *iter;
             if (elink->GetHostName() == commands[2])
@@ -2989,14 +2987,14 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
 
 void MainServer::DoHandleDeleteRecording(
     RecordingInfo &recinfo, PlaybackSock *pbs,
-    bool forceMetadataDelete, bool expirer, bool forgetHistory)
+    bool forceMetadataDelete, bool lexpirer, bool forgetHistory)
 {
     int resultCode = -1;
     MythSocket *pbssock = nullptr;
     if (pbs)
         pbssock = pbs->getSocket();
 
-    bool justexpire = expirer ? false :
+    bool justexpire = lexpirer ? false :
             ( //gCoreContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
              (recinfo.GetRecordingGroup() != "Deleted") &&
              (recinfo.GetRecordingGroup() != "LiveTV"));
@@ -7874,11 +7872,9 @@ void MainServer::connectionClosed(MythSocket *socket)
                 if (chain->HostSocketCount() == 0)
                 {
                     TVRec::inputsLock.lockForRead();
-                    QMap<int, EncoderLink *>::iterator it =
-                        encoderList->begin();
-                    for (; it != encoderList->end(); ++it)
+                    for (auto it2 = encoderList->begin(); it2 != encoderList->end(); ++it2)
                     {
-                        EncoderLink *enc = *it;
+                        EncoderLink *enc = *it2;
                         if (enc->IsLocal())
                         {
                             while (enc->GetState() == kState_ChangingState)

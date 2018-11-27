@@ -1346,15 +1346,15 @@ void StatusBox::doMachineStatus()
 
         // weighted average loads
         line.append(".   " + tr("Load") + ": ");
-        float loads[3];
-        if (RemoteGetLoad(loads))
+        float floads[3];
+        if (RemoteGetLoad(floads))
         {
             char buff[30];
 
             sprintf(buff, "%0.2f, %0.2f, %0.2f",
-                    static_cast<double>(loads[0]),
-                    static_cast<double>(loads[1]),
-                    static_cast<double>(loads[2]));
+                    static_cast<double>(floads[0]),
+                    static_cast<double>(floads[1]),
+                    static_cast<double>(floads[2]));
             line.append(QString(buff));
         }
         else
