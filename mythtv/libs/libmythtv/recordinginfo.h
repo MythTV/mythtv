@@ -34,7 +34,7 @@ typedef AutoDeleteDeque<RecordingInfo*> RecordingList;
 class MTV_PUBLIC RecordingInfo : public ProgramInfo
 {
   public:
-    RecordingInfo(void) : 
+    RecordingInfo(void) :
         oldrecstatus(RecStatus::Unknown),
         savedrecstatus(RecStatus::Unknown),
         future(false),
@@ -263,6 +263,8 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     // Used to query and set RecordingRule info
     RecordingRule *GetRecordingRule(void);
     int getRecordID(void);
+    static bool QueryRecordedIdForKey(int & recordedid,
+                                      uint chanid, QDateTime recstartts);
     int GetAutoRunJobs(void) const;
     RecordingType GetProgramRecordingStatus(void);
     QString GetProgramRecordingProfile(void) const;
@@ -277,7 +279,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     QDateTime GetDesiredEndTime(void) const { return desiredrecendts; }
 
     // these five can be moved to programinfo
-    void AddHistory(bool resched = true, bool forcedup = false, 
+    void AddHistory(bool resched = true, bool forcedup = false,
                     bool future = false);//pi
     void DeleteHistory(void);//pi
     void ForgetHistory(void);//pi

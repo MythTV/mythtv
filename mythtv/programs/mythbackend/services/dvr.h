@@ -254,6 +254,9 @@ class Dvr : public DvrServices
 
         bool              DisableRecordSchedule( uint             RecordId   ) override; // DvrServices
 
+        int               RecordedIdForKey( int              ChanId,
+                                            const QDateTime &StartTime ) override; // DvrServices
+
         int               RecordedIdForPathname( const QString   &Filename ) override; // DvrServices
 
         QString           RecStatusToString    ( int              RecStatus ) override; // DvrServices

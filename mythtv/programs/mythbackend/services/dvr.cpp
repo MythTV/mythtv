@@ -1562,6 +1562,17 @@ bool Dvr::DisableRecordSchedule( uint nRecordId )
     return bResult;
 }
 
+int Dvr::RecordedIdForKey(int chanid, const QDateTime &recstarttsRaw)
+{
+    int recordedid;
+
+    if (!RecordingInfo::QueryRecordedIdForKey(recordedid, chanid,
+                                              recstarttsRaw))
+        return -1;
+
+    return recordedid;
+}
+
 int Dvr::RecordedIdForPathname(const QString & pathname)
 {
     uint recordedid;
