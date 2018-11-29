@@ -669,6 +669,19 @@ void CustomEdit::testClicked(void)
         delete pl;
 }
 
+/**
+ * The user clicked on the 'Record' button in the 'Custom Edit'
+ * window.  The fields provided from this dialog, and the names of
+ * their edit widgets, are:
+ *
+ *  Rule Name         => m_titleEdit
+ *  (main box)        => m_descriptionEdit
+ *  Additional Tables => m_subtitleEdit
+ *
+ * If you are creating a new custom rule, then cur_recid will be zero
+ * and the LoadBySearch funciton will be invoked.  If you are
+ * modifying an existing rule then ModifyPowerSearchByID is invoked.
+ */
 void CustomEdit::recordClicked(void)
 {
     if (!checkSyntax())

@@ -41,11 +41,11 @@ class MTV_PUBLIC RecordingRule
     bool Load(bool asTemplate = false);
     bool LoadByProgram(const ProgramInfo* proginfo);
     bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
-                      QString from = "", ProgramInfo *pginfo = nullptr);
+                      QString joininfo = "", ProgramInfo *pginfo = nullptr);
     bool LoadTemplate(QString category, QString categoryType = "Default");
 
     bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,
-                               QString from = "");
+                               QString joininfo = "");
     bool MakeOverride(void);
     bool MakeTemplate(QString category);
 

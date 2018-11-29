@@ -79,6 +79,9 @@ RecordingRule::RecordingRule()
     m_endtime = m_starttime = dt.time();
 }
 
+/** Load a single rule from the recorded table.  Which rule is
+ *  specified in the member variable m_recordID.
+ */
 bool RecordingRule::Load(bool asTemplate)
 {
     if (m_recordID <= 0)
@@ -223,8 +226,24 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
     return true;
 }
 
+/**
+ *  Load a recording rule based on search parameters.
+ *
+ *  \param lsearch The type of search.
+ *  \param textname Unused.  This is the raw text from a power search
+ *                  box, or the title from a custom search box.
+ *  \param forwhat  Sql describing the program search.  I.E. Somthing
+ *                  like "program.title LIKE '%title%'".
+ *  \param joininfo Sql used to join additional tables into the
+ *                  search.  It is inserted into a query after the
+ *                  FROM clause and before the WHERE clause.  For an
+ *                  example, see the text inserted when matching on a
+ *                  datadirect genre.
+ *  \param pginfo   A pointer to an existing ProgramInfo structure.
+ *  \return True if search data was successfully loaded.
+ */
 bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
-                                 QString forwhat, QString from,
+                                 QString forwhat, QString joininfo,
                                  ProgramInfo *pginfo)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -263,7 +282,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
 
         QString ltitle = QString("%1 (%2)").arg(textname).arg(searchType);
         m_title = ltitle;
-        m_subtitle = from;
+        m_subtitle = joininfo;
         m_description = forwhat;
 
         if (pginfo)
@@ -343,7 +362,7 @@ bool RecordingRule::MakeTemplate(QString category)
 }
 
 bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
-                                          QString forwhat, QString from)
+                                          QString forwhat, QString joininfo)
 {
     if (rid <= 0)
         return false;
@@ -355,7 +374,7 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
     QString ltitle = QString("%1 (%2)").arg(textname)
                                        .arg(tr("Power Search"));
     m_title = ltitle;
-    m_subtitle = from;
+    m_subtitle = joininfo;
     m_description = forwhat;
 
     m_loaded = true;

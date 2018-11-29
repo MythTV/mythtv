@@ -10,6 +10,10 @@ class MythUIButton;
 class MythUIButtonList;
 class MythUIButtonListItem;
 
+/**
+ * A screen to create a fully custom recording.  The recording will be
+ * created as a power search.
+ */
 class CustomEdit : public MythScreenType
 {
     Q_OBJECT
