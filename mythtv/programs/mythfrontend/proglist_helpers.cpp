@@ -173,9 +173,8 @@ void PhrasePopup::deleteClicked(void)
 void PhrasePopup::recordClicked(void)
 {
     QString text = m_phraseEdit->GetText();
-    bool genreflag = false;
-
     QString what = text;
+    QString fromgenre;
 
     if (text.trimmed().isEmpty())
         return;
@@ -192,7 +191,10 @@ void PhrasePopup::recordClicked(void)
             return;
 
         MSqlBindings bindings;
-        genreflag = m_parent->PowerStringToSQL(text, what, bindings);
+        if (m_parent->PowerStringToSQL(text, what, bindings))
+            fromgenre = QString("LEFT JOIN programgenres ON "
+                                "program.chanid = programgenres.chanid AND "
+                                "program.starttime = programgenres.starttime ");
 
         if (what.isEmpty())
             return;
@@ -202,17 +204,7 @@ void PhrasePopup::recordClicked(void)
 
     RecordingRule *record = new RecordingRule();
 
-    if (genreflag)
-    {
-        QString fromgenre = QString("LEFT JOIN programgenres ON "
-                                    "program.chanid = programgenres.chanid AND "
-                                    "program.starttime = programgenres.starttime ");
-        record->LoadBySearch(m_searchType, text, what, fromgenre);
-    }
-    else
-    {
-        record->LoadBySearch(m_searchType, text, what);
-    }
+    record->LoadBySearch(m_searchType, text, what, fromgenre);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
@@ -375,9 +367,8 @@ void PowerSearchPopup::deleteClicked(void)
 void PowerSearchPopup::recordClicked(void)
 {
     QString text = m_phraseList->GetValue();
-    bool genreflag = false;
-
     QString what = text;
+    QString fromgenre;
 
     if (text.trimmed().isEmpty())
         return;
@@ -394,7 +385,11 @@ void PowerSearchPopup::recordClicked(void)
             return;
 
         MSqlBindings bindings;
-        genreflag = m_parent->PowerStringToSQL(text, what, bindings);
+        if (m_parent->PowerStringToSQL(text, what, bindings))
+            fromgenre = QString(
+                "LEFT JOIN programgenres ON "
+                "program.chanid = programgenres.chanid AND "
+                "program.starttime = programgenres.starttime ");
 
         if (what.isEmpty())
             return;
@@ -404,18 +399,7 @@ void PowerSearchPopup::recordClicked(void)
 
     RecordingRule *record = new RecordingRule();
 
-    if (genreflag)
-    {
-        QString fromgenre = QString(
-            "LEFT JOIN programgenres ON "
-            "program.chanid = programgenres.chanid AND "
-            "program.starttime = programgenres.starttime ");
-        record->LoadBySearch(m_searchType, text, what, fromgenre);
-    }
-    else
-    {
-        record->LoadBySearch(m_searchType, text, what);
-    }
+    record->LoadBySearch(m_searchType, text, what, fromgenre);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
