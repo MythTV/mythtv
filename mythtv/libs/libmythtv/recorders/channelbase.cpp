@@ -493,13 +493,14 @@ void ChannelBase::HandleScriptEnd(bool ok)
     }
 }
 
-int ChannelBase::GetChanID() const
+int ChannelBase::GetChanID(void) const
 {
     if (!m_inputid)
         return false;
 
-    int found = 0;
-    int id = -1;
+    int found   = 0;
+    int visible = -1;
+    int id      = -1;
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT chanid,visible FROM channel "
@@ -516,26 +517,30 @@ int ChannelBase::GetChanID() const
 
     while (query.next())
     {
-        found += query.value(1).toInt();
-        if (id == -1 || found)
+        if (query.value(1).toInt())
+        {
+            ++found;
+            visible = query.value(0).toInt();
+        }
+        else
             id = query.value(0).toInt();
     }
 
     if (!found)
     {
         LOG(VB_GENERAL, LOG_INFO,
-            QString("No visible channel ids for %1")
-            .arg(m_curchannelname));
+            QString("No visible channel ids for %1 on sourceid %2")
+            .arg(m_curchannelname).arg(m_sourceid));
     }
 
     if (found > 1)
     {
         LOG(VB_GENERAL, LOG_WARNING,
-            QString("Found multiple visible channel ids for %1")
-            .arg(m_curchannelname));
+            QString("Found multiple visible channel ids for %1 on sourceid %2")
+            .arg(m_curchannelname).arg(m_sourceid));
     }
 
-    return id;
+    return (visible >= 0 ? visible : id);
 }
 
 /**
