@@ -94,7 +94,6 @@ void ExternalRecorder::run(void)
     m_stream_handler->ReplayStream();
     m_stream_handler->UnlockReplay();
 
-
     while (IsRecordingRequested() && !IsErrored())
     {
         if (PauseAndWait())
@@ -143,8 +142,8 @@ bool ExternalRecorder::Open(void)
     ResetForNewFile();
 
     m_stream_handler = ExternalStreamHandler::Get(m_channel->GetDevice(),
-						  m_channel->GetInputID(),
-						  m_channel->GetMajorID());
+                                                  m_channel->GetInputID(),
+                                                  m_channel->GetMajorID());
 
     if (m_stream_handler)
     {

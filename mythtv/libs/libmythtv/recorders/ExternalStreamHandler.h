@@ -60,8 +60,8 @@ class ExternIO
 class ExternalStreamHandler : public StreamHandler
 {
     enum constants { MAX_API_VERSION = 2,
-                     PACKET_SIZE = 188 * 32768,
-                     TOO_FAST_SIZE = 188 * 4196 };
+                     PACKET_SIZE = 188 * 8192,
+                     TOO_FAST_SIZE = 188 * 32768 };
 
   public:
     static ExternalStreamHandler *Get(const QString &devicename,
@@ -70,7 +70,7 @@ class ExternalStreamHandler : public StreamHandler
 
   public:
     explicit ExternalStreamHandler(const QString & path, int inputid,
-				   int majorid);
+                                   int majorid);
     ~ExternalStreamHandler(void) { CloseApp(); }
 
     void run(void) override; // MThread
@@ -124,6 +124,7 @@ class ExternalStreamHandler : public StreamHandler
 
     QByteArray     m_replay_buffer;
     bool           m_replay;
+    bool           m_xon;
 
     // for implementing Get & Return
     static QMutex                            m_handlers_lock;

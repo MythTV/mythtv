@@ -538,8 +538,8 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
  */
 
 ExternalStreamHandler::ExternalStreamHandler(const QString & path,
-					     int inputid,
-					     int majorid)
+                                             int inputid,
+                                             int majorid)
     : StreamHandler(path, inputid)
     , m_majorid(majorid)
     , m_IO(nullptr)
@@ -550,6 +550,7 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
     , m_apiVersion(1)
     , m_serialNo(0)
     , m_replay(true)
+    , m_xon(false)
 {
     setObjectName("ExternSH");
 
@@ -578,7 +579,6 @@ void ExternalStreamHandler::run(void)
     QString    cmd;
     QString    result;
     QString    ready_cmd;
-    bool       xon = false;
     QByteArray buffer;
     uint       len, read_len;
     uint       empty_cnt = 0;
@@ -623,7 +623,7 @@ void ExternalStreamHandler::run(void)
 
         UpdateFiltersFromStreamData();
 
-        if (!xon || m_poll_mode)
+        if (!m_xon || m_poll_mode)
         {
             ProcessCommand(ready_cmd, result);
             if (result.startsWith("ERR"))
@@ -633,7 +633,7 @@ void ExternalStreamHandler::run(void)
                 _error = true;
             }
             else
-                xon = true;
+                m_xon = true;
         }
 
         if (buffer.isEmpty())
@@ -649,7 +649,7 @@ void ExternalStreamHandler::run(void)
                         std::this_thread::sleep_for(std::chrono::seconds(20));
                     if (!RestartStream())
                         _error = true;
-                    xon = false;
+                    m_xon = false;
                     continue;
                 }
             }
@@ -660,7 +660,7 @@ void ExternalStreamHandler::run(void)
             m_notify = false;
         }
 
-        if (xon)
+        if (m_xon)
         {
             if (status_timer.elapsed() >= 2000)
             {
@@ -673,7 +673,7 @@ void ExternalStreamHandler::run(void)
                         std::this_thread::sleep_for(std::chrono::seconds(20));
                     if (!RestartStream())
                         _error = true;
-                    xon = false;
+                    m_xon = false;
                     continue;
                 }
 
@@ -681,8 +681,8 @@ void ExternalStreamHandler::run(void)
             }
         }
 
-        while ((read_len = m_IO->Read(buffer, PACKET_SIZE - remainder, 100)) > 0 ||
-               !buffer.isEmpty())
+        while ((read_len = m_IO->Read(buffer, PACKET_SIZE - remainder, 100))
+               > 0 || !buffer.isEmpty())
         {
             if (m_IO->Error())
             {
@@ -702,7 +702,7 @@ void ExternalStreamHandler::run(void)
                 restart_cnt = 0;
             }
 
-            if (xon)
+            if (m_xon)
             {
                 if (buffer.size() > TOO_FAST_SIZE)
                 {
@@ -721,8 +721,13 @@ void ExternalStreamHandler::run(void)
                             }
                         }
                     }
-                    xon = false;
+                    m_xon = false;
                 }
+            }
+            else if (!m_poll_mode && read_len)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    "Sill receiving data from external application after XOFF.");
             }
 
             len = remainder = buffer.size();
@@ -759,6 +764,9 @@ void ExternalStreamHandler::run(void)
                 buffer.clear();
             else if (len > remainder) // leftover bytes
                 buffer.remove(0, len - remainder);
+            else if (len == remainder)
+                LOG(VB_RECORD, LOG_WARNING, LOC +
+                    "Failed to process any of the data received.");
         }
 
         if (m_IO == nullptr)
@@ -993,7 +1001,10 @@ void ExternalStreamHandler::ReplayStream(void)
 
         // Let the external app know that we could be busy for a little while
         if (!m_poll_mode)
+        {
             ProcessCommand(QString("XOFF"), result);
+            m_xon = false;
+        }
 
         /* If the input is not a 'broadcast' it may only have one
          * copy of the SPS right at the beginning of the stream,
@@ -1016,7 +1027,10 @@ void ExternalStreamHandler::ReplayStream(void)
 
         // Let the external app know that we are ready
         if (!m_poll_mode)
+        {
             ProcessCommand(QString("XON"), result);
+            m_xon = true;
+        }
     }
 }
 
