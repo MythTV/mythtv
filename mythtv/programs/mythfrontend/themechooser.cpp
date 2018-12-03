@@ -293,7 +293,7 @@ void ThemeChooser::LoadVersion(const QString &version,
         QDir dir;
         if (!dir.mkpath(destdir))
             ShowOkPopup(tr("Unable to create '%1'").arg(destdir));
-        bool result = GetMythDownloadManager()->download(url, remoteThemesFile);
+        bool result = GetMythDownloadManager()->download(url, remoteThemesFile, true);
 
         LOG(VB_GUI, LOG_INFO, LOC +
             QString("Downloading '%1' to '%2'").arg(url).arg(remoteThemesFile));
