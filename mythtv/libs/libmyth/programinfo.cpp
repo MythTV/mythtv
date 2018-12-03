@@ -5571,18 +5571,18 @@ static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
     count = 0;
 
     QString columns = QString(
-        "program.chanid, program.starttime, program.endtime, "
-        "program.title, program.subtitle, program.description, "
-        "program.category, channel.channum, channel.callsign, "
-        "channel.name, program.previouslyshown, channel.commmethod, "
-        "channel.outputfilters, program.seriesid, program.programid, "
-        "program.airdate, program.stars, program.originalairdate, "
-        "program.category_type, oldrecstatus.recordid, "
-        "oldrecstatus.rectype, oldrecstatus.recstatus, "
-        "oldrecstatus.findid, program.videoprop+0, program.audioprop+0, "
-        "program.subtitletypes+0, program.syndicatedepisodenumber, "
-        "program.partnumber, program.parttotal, "
-        "program.season, program.episode, program.totalepisodes ");
+        "program.chanid,          program.starttime,       program.endtime,         " //  0-2
+        "program.title,           program.subtitle,        program.description,     " //  3-5
+        "program.category,        channel.channum,         channel.callsign,        " //  6-8
+        "channel.name,            program.previouslyshown, channel.commmethod,      " //  9-11
+        "channel.outputfilters,   program.seriesid,        program.programid,       " // 12-14
+        "program.airdate,         program.stars,           program.originalairdate, " // 15-17
+        "program.category_type,   oldrecstatus.recordid,                            " // 18-19
+        "oldrecstatus.rectype,    oldrecstatus.recstatus,                           " // 20-21
+        "oldrecstatus.findid,     program.videoprop+0,     program.audioprop+0,     " // 22-24
+        "program.subtitletypes+0, program.syndicatedepisodenumber,                  " // 25-26
+        "program.partnumber,      program.parttotal,                                " // 27-28
+        "program.season,          program.episode,         program.totalepisodes ");  // 29-31
 
     QString querystr = QString(
         "SELECT %1 "
