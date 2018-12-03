@@ -5712,7 +5712,7 @@ bool Scheduler::WasStartedAutomatically()
     return autoStart;
 }
 
-void Scheduler::CreateConflictLists(void)
+bool Scheduler::CreateConflictLists(void)
 {
     // For each input, create a set containing all of the inputs
     // (including itself) that are grouped with it.
@@ -5728,8 +5728,8 @@ void Scheduler::CreateConflictLists(void)
                   "ORDER BY ci1.cardid, ci2.cardid");
     if (!query.exec())
     {
-        MythDB::DBError("BuildConflictLists", query);
-        return;
+        MythDB::DBError("CreateConflictLists1", query);
+        return false;
     }
     while (query.next())
     {
@@ -5769,12 +5769,40 @@ void Scheduler::CreateConflictLists(void)
             LOG(VB_SCHEDULE, LOG_INFO,
                 QString("Assigning input %1 to conflict set %2")
                 .arg(*sit).arg(conflictlists.size()));
-            sinputinfomap[*sit].conflictlist = conflictlists.back();
+            sinputinfomap[*sit].conflictlist = conflictlist;
         }
     }
+
+    bool result = true;
+    
+    query.prepare("SELECT ci.cardid "
+                  "FROM capturecard ci "
+                  "LEFT JOIN inputgroup ig "
+                  "    ON ci.cardid = ig.cardinputid "
+                  "WHERE ig.cardinputid IS NULL");
+    if (!query.exec())
+    {
+        MythDB::DBError("CreateConflictLists2", query);
+        return false;
+    }
+    while (query.next())
+    {
+        result = false;
+        uint id = query.value(0).toUInt();
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Input %1 is not assigned to any input group").arg(id));
+        RecList *conflictlist = new RecList();
+        conflictlists.push_back(conflictlist);
+        LOG(VB_SCHEDULE, LOG_INFO,
+            QString("Assigning input %1 to conflict set %2")
+            .arg(id).arg(conflictlists.size()));
+        sinputinfomap[id].conflictlist = conflictlist;
+    }                  
+
+    return result;
 }
 
-void Scheduler::InitInputInfoMap(void)
+bool Scheduler::InitInputInfoMap(void)
 {
     // Cache some input related info so we don't have to keep
     // rereading it from the database.
@@ -5786,7 +5814,7 @@ void Scheduler::InitInputInfoMap(void)
     if (!query.exec())
     {
         MythDB::DBError("InitRecLimitMap", query);
-        return;
+        return false;
     }
 
     while (query.next())
@@ -5814,7 +5842,7 @@ void Scheduler::InitInputInfoMap(void)
             .arg(inputid).arg(siinfo.sgroupid).arg(siinfo.schedgroup));
     }
 
-    CreateConflictLists();
+    return CreateConflictLists();
 }
 
 void Scheduler::AddChildInput(uint parentid, uint inputid)

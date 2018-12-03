@@ -138,7 +138,7 @@ class Scheduler : public MThread, public MythScheduler
 
     bool VerifyCards(void);
 
-    void InitInputInfoMap(void);
+    bool InitInputInfoMap(void);
     void CreateTempTables(void);
     void DeleteTempTables(void);
     void UpdateDuplicates(void);
@@ -237,7 +237,7 @@ class Scheduler : public MThread, public MythScheduler
     void ClearRequestQueue(void)
     { reschedQueue.clear(); };
 
-    void CreateConflictLists(void);
+    bool CreateConflictLists(void);
 
     MythDeque<QStringList> reschedQueue;
     mutable QMutex schedLock;
