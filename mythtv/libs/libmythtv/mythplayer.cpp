@@ -202,6 +202,7 @@ MythPlayer::MythPlayer(PlayerFlags flags)
       frame_interval((int)(1000000.0f / 30)), m_frame_interval(0),
       m_fpsMultiplier(1),
       ffrew_skip(1),ffrew_adjust(0),
+      fileChanged(false),
       // Audio and video synchronization stuff
       videosync(nullptr),           avsync_delay(0),
       avsync_adjustment(0),         avsync_avg(0),
@@ -3055,9 +3056,19 @@ void MythPlayer::SwitchToProgram(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - end");
 }
 
+// This is called from decoder thread. Set an indicator that will
+// be checked and actioned in the player thread.
 void MythPlayer::FileChangedCallback(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "FileChangedCallback");
+    fileChanged = true;
+}
+
+// Called from the player thread.
+void MythPlayer::FileChanged(void)
+{
+    fileChanged = false;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "FileChanged");
 
     Pause();
     ChangeSpeed();
@@ -3079,6 +3090,9 @@ void MythPlayer::FileChangedCallback(void)
     CheckTVChain();
     forcePositionMapSync = true;
 }
+
+
+
 
 void MythPlayer::JumpToProgram(void)
 {
@@ -3295,6 +3309,10 @@ void MythPlayer::EventStart(void)
 
 void MythPlayer::EventLoop(void)
 {
+    // Live TV program change
+    if (fileChanged)
+        FileChanged();
+
     // recreate the osd if a reinit was triggered by another thread
     if (reinit_osd)
         ReinitOSD();

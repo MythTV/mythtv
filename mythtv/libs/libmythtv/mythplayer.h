@@ -393,6 +393,8 @@ class MTV_PUBLIC MythPlayer
     FrameScanType GetScanType(void) const { return m_scan; }
     bool IsScanTypeLocked(void) const { return m_scan_locked; }
     void Zoom(ZoomDirection direction);
+    void FileChanged(void);
+
 
     // Windowing stuff
     void EmbedInWidget(QRect rect);
@@ -818,6 +820,7 @@ class MTV_PUBLIC MythPlayer
 
     int        ffrew_skip;
     int        ffrew_adjust;
+    bool       fileChanged;
 
     // Audio and video synchronization stuff
     VideoSync *videosync;
