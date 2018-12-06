@@ -2548,6 +2548,22 @@ static HostSpinBoxSetting *StartupScreenDelay()
 }
 
 
+static HostSpinBoxSetting *GUIFontZoom()
+{
+    HostSpinBoxSetting *gs = new HostSpinBoxSetting("GUITEXTZOOM",
+                                                    50, 150, 1, 1);
+
+    gs->setLabel(AppearanceSettings::tr("GUI text zoom percentage"));
+
+    gs->setValue(100);
+
+    gs->setHelpText(AppearanceSettings::tr
+                    ("Adjust the themed defined font size by this percentage. "
+                     "mythfrontend needs restart for this to take effect."));
+    return gs;
+}
+
+
 static HostComboBoxSetting *MythDateFormatCB()
 {
     HostComboBoxSetting *gc = new HostComboBoxSetting("DateFormat");
@@ -4549,6 +4565,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(UseFixedWindowSize());
     screen->addChild(AlwaysOnTop());
     screen->addChild(StartupScreenDelay());
+    screen->addChild(GUIFontZoom());
 #ifdef USING_AIRPLAY
     screen->addChild(AirPlayFullScreen());
 #endif

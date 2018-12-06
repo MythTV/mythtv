@@ -6,13 +6,14 @@
 #include <QBrush>
 #include <QPoint>
 #include <QMap>
+#include <QMutex>
 
 #include "xmlparsebase.h"
 
 class MUI_PUBLIC MythFontProperties: public XMLParseBase
 {
   public:
-    MythFontProperties();
+    MythFontProperties(void);
 
     QFont* GetFace(void) { return &m_face; }
 
@@ -21,7 +22,7 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
     void SetShadow(bool on, const QPoint &offset, const QColor &color, int alpha);
     void SetOutline(bool on, const QColor &color, int size, int alpha);
 
-    QFont face(void) const { return m_face; }
+    QFont face(void) const;
     QColor color(void) const { return m_brush.color(); }
     QBrush GetBrush(void) const { return m_brush; }
 
@@ -45,6 +46,9 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
     void Rescale(void);
     void Rescale(int height);
     void AdjustStretch(int stretch);
+
+    static void Zoom(void);
+    static void SetZoom(uint zoom_percent);
 
   private:
     void Freeze(void); // no hash updates
@@ -72,6 +76,9 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
     bool    m_bFreeze;
 
     int     m_stretch;
+
+    static QMutex m_zoom_lock;
+    static uint   m_zoom_percent;
 
     friend class FontMap;
 };

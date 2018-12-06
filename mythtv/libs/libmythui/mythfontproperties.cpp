@@ -1,5 +1,6 @@
 
 #include "mythfontproperties.h"
+#include "mythcorecontext.h"
 
 #include <cmath>
 
@@ -18,11 +19,15 @@
 
 #define LOC      QString("MythFontProperties: ")
 
-MythFontProperties::MythFontProperties() :
+QMutex MythFontProperties::m_zoom_lock;
+uint MythFontProperties::m_zoom_percent = 0;
+
+MythFontProperties::MythFontProperties(void) :
     m_brush(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
     m_hasOutline(false), m_outlineSize(0), m_outlineAlpha(255),
     m_relativeSize(0.05f), m_bFreeze(false), m_stretch(100)
 {
+    Zoom();
     CalcHash();
 }
 
@@ -30,6 +35,15 @@ void MythFontProperties::SetFace(const QFont &face)
 {
     m_face = face;
     CalcHash();
+}
+
+QFont MythFontProperties::face(void) const
+{
+    QFont face = m_face;
+
+    face.setPixelSize(face.pixelSize() *
+                      (static_cast<double>(m_zoom_percent) / 100.0));
+    return face;
 }
 
 void MythFontProperties::SetColor(const QColor &color)
@@ -90,6 +104,23 @@ void MythFontProperties::CalcHash(void)
     if (m_hasOutline)
         m_hash += QString("%1%2%3").arg(m_outlineColor.name())
                  .arg(m_outlineSize).arg(m_outlineAlpha);
+
+    m_hash += QString("Z%1").arg(m_zoom_percent);
+}
+
+void MythFontProperties::Zoom(void)
+{
+    QMutexLocker locker(&m_zoom_lock);
+    if (m_zoom_percent == 0)
+        m_zoom_percent = gCoreContext->GetNumSetting("GUITEXTZOOM", 100);
+}
+
+void MythFontProperties::SetZoom(uint percent)
+{
+    QMutexLocker locker(&m_zoom_lock);
+
+    gCoreContext->SaveSetting("GUITEXTZOOM", QString::number(percent));
+    m_zoom_percent = percent;
 }
 
 void MythFontProperties::Rescale(int height)

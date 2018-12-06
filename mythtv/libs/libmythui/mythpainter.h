@@ -19,7 +19,7 @@ class QColor;
 #include <list>
 
 #ifdef _MSC_VER
-#  include <cstdint>	// int64_t
+#  include <cstdint>    // int64_t
 #endif
 
 class MythFontProperties;
