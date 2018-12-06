@@ -107,6 +107,7 @@ class ExternalStreamHandler : public StreamHandler
     bool OpenApp(void);
     void CloseApp(void);
 
+    QString        m_loc;
     int            m_majorid;
     QMutex         m_IO_lock;
     ExternIO      *m_IO;

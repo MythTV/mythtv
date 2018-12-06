@@ -541,6 +541,7 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
                                              int inputid,
                                              int majorid)
     : StreamHandler(path, inputid)
+    , m_loc(LOC)
     , m_majorid(majorid)
     , m_IO(nullptr)
     , m_tsopen(false)
@@ -559,12 +560,12 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
     m_app = m_args.first();
     m_args.removeFirst();
     m_args << "--inputid" << QString::number(majorid);
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("args \"%1\"")
+    LOG(VB_RECORD, LOG_INFO, m_loc + QString("args \"%1\"")
         .arg(m_args.join(" ")));
 
     if (!OpenApp())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, m_loc +
             QString("Failed to start %1").arg(_device));
     }
 }
@@ -587,7 +588,7 @@ void ExternalStreamHandler::run(void)
 
     if (!m_IO)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
+        LOG(VB_GENERAL, LOG_ERR, m_loc +
             QString("%1 is not running.").arg(_device));
     }
 
@@ -595,7 +596,7 @@ void ExternalStreamHandler::run(void)
 
     RunProlog();
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "run(): begin");
+    LOG(VB_RECORD, LOG_INFO, m_loc + "run(): begin");
 
     SetRunning(true, true, false);
     m_notify = false;
@@ -610,7 +611,7 @@ void ExternalStreamHandler::run(void)
     {
         if (!IsTSOpen())
         {
-            LOG(VB_RECORD, LOG_WARNING, LOC + "TS not open yet.");
+            LOG(VB_RECORD, LOG_WARNING, m_loc + "TS not open yet.");
             usleep(1000);
             continue;
         }
@@ -628,7 +629,7 @@ void ExternalStreamHandler::run(void)
             ProcessCommand(ready_cmd, result);
             if (result.startsWith("ERR"))
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Aborting: %1 -> %2")
+                LOG(VB_GENERAL, LOG_ERR, m_loc + QString("Aborting: %1 -> %2")
                     .arg(ready_cmd).arg(result));
                 _error = true;
             }
@@ -640,7 +641,7 @@ void ExternalStreamHandler::run(void)
         {
             if (++empty_cnt % 1000 == 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "No data from external app");
+                LOG(VB_GENERAL, LOG_ERR, m_loc + "No data from external app");
                 m_notify = true;
 
                 if (empty_cnt % 5000)
@@ -686,7 +687,7 @@ void ExternalStreamHandler::run(void)
         {
             if (m_IO->Error())
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
+                LOG(VB_GENERAL, LOG_ERR, m_loc +
                     QString("Failed to read from External Recorder: %1")
                     .arg(m_IO->ErrorString()));
                 _error = true;
@@ -714,7 +715,7 @@ void ExternalStreamHandler::run(void)
                         {
                             if (result.startsWith("ERR"))
                             {
-                                LOG(VB_GENERAL, LOG_ERR, LOC +
+                                LOG(VB_GENERAL, LOG_ERR, m_loc +
                                     QString("Aborting: XOFF -> %2")
                                     .arg(result));
                                 _error = true;
@@ -726,7 +727,7 @@ void ExternalStreamHandler::run(void)
             }
             else if (!m_poll_mode && read_len)
             {
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                LOG(VB_GENERAL, LOG_WARNING, m_loc +
                     "Sill receiving data from external application after XOFF.");
             }
 
@@ -752,7 +753,7 @@ void ExternalStreamHandler::run(void)
                 if (m_replay_buffer.size() > (50 * PACKET_SIZE))
                 {
                     m_replay_buffer.remove(0, len - remainder);
-                    LOG(VB_RECORD, LOG_WARNING, LOC +
+                    LOG(VB_RECORD, LOG_WARNING, m_loc +
                         QString("Replay size truncated to %1 bytes")
                         .arg(m_replay_buffer.size()));
                 }
@@ -766,11 +767,11 @@ void ExternalStreamHandler::run(void)
                 buffer.remove(0, len - remainder);
             else if (len == remainder)
             {
-                LOG(VB_RECORD, LOG_WARNING, LOC +
+                LOG(VB_RECORD, LOG_WARNING, m_loc +
                     QString("Failed to process any of the data received."));
                 if (len < 188)
                 {
-                    LOG(VB_RECORD, LOG_WARNING, LOC +
+                    LOG(VB_RECORD, LOG_WARNING, m_loc +
                         QString("Purging %1 bytes of probable garbage.")
                         .arg(buffer.size()));
                     buffer.clear(); // garbage?
@@ -780,25 +781,25 @@ void ExternalStreamHandler::run(void)
 
         if (m_IO == nullptr)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "I/O thread has disappeared!");
+            LOG(VB_GENERAL, LOG_ERR, m_loc + "I/O thread has disappeared!");
             _error = true;
         }
         else if (m_IO->Error())
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
+            LOG(VB_GENERAL, LOG_ERR, m_loc +
                 QString("Fatal Error from External Recorder: %1")
                 .arg(m_IO->ErrorString()));
             CloseApp();
             _error = true;
         }
     }
-    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " +
+    LOG(VB_RECORD, LOG_INFO, m_loc + "run(): " +
         QString("%1 shutdown").arg(_error ? "Error" : "Normal"));
 
     RemoveAllPIDFilters();
     SetRunning(false, true, false);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "end");
+    LOG(VB_RECORD, LOG_INFO, m_loc + "run(): " + "end");
 
     RunEpilog();
 }
@@ -816,7 +817,7 @@ bool ExternalStreamHandler::SetAPIVersion(void)
         m_apiVersion = min(m_apiVersion, static_cast<int>(MAX_API_VERSION));
         if (m_apiVersion < 1)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
+            LOG(VB_RECORD, LOG_ERR, m_loc +
                 QString("Bad response to 'APIVersion?' - '%1'. "
                         "Expecting 1 or 2").arg(result));
             m_apiVersion = 1;
@@ -836,7 +837,7 @@ bool ExternalStreamHandler::OpenApp(void)
 
         if (m_IO)
         {
-            LOG(VB_RECORD, LOG_WARNING, LOC + "OpenApp: already open!");
+            LOG(VB_RECORD, LOG_WARNING, m_loc + "OpenApp: already open!");
             return true;
         }
 
@@ -844,12 +845,12 @@ bool ExternalStreamHandler::OpenApp(void)
 
         if (m_IO == nullptr)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "ExternIO failed: " + ENO);
+            LOG(VB_GENERAL, LOG_ERR, m_loc + "ExternIO failed: " + ENO);
             _error = true;
         }
         else
         {
-            LOG(VB_RECORD, LOG_INFO, LOC + QString("Spawn '%1'").arg(_device));
+            LOG(VB_RECORD, LOG_INFO, m_loc + QString("Spawn '%1'").arg(_device));
             m_IO->Run();
             if (m_IO->Error())
             {
@@ -875,15 +876,24 @@ bool ExternalStreamHandler::OpenApp(void)
 
     if (!IsAppOpen())
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + "Application is not responding.");
+        LOG(VB_RECORD, LOG_ERR, m_loc + "Application is not responding.");
         _error = true;
         return false;
+    }
+
+    if (m_apiVersion > 1)
+    {
+        if (ProcessCommand("Description?", result))
+            m_loc = QString("ExternSH[%1](%2): ")
+                    .arg(_inputid).arg(result.mid(3));
+        else
+            m_loc = LOC;
     }
 
     // Gather capabilities
     if (!ProcessCommand("HasTuner?", result))
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        LOG(VB_RECORD, LOG_ERR, m_loc +
             QString("Bad response to 'HasTuner?' - '%1'").arg(result));
         _error = true;
         return false;
@@ -892,7 +902,7 @@ bool ExternalStreamHandler::OpenApp(void)
 
     if (!ProcessCommand("HasPictureAttributes?", result))
     {
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        LOG(VB_RECORD, LOG_ERR, m_loc +
             QString("Bad response to 'HasPictureAttributes?' - '%1'")
             .arg(result));
         _error = true;
@@ -904,8 +914,8 @@ bool ExternalStreamHandler::OpenApp(void)
     m_poll_mode = ProcessCommand("FlowControl?", result) &&
                   result.startsWith("OK:Poll");
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "App opened successfully");
-    LOG(VB_RECORD, LOG_INFO, LOC +
+    LOG(VB_RECORD, LOG_INFO, m_loc + "App opened successfully");
+    LOG(VB_RECORD, LOG_INFO, m_loc +
         QString("Capabilities: tuner(%1) "
                 "Picture attributes(%2) "
                 "Flow control(%3)")
@@ -924,7 +934,7 @@ bool ExternalStreamHandler::IsAppOpen(void)
 {
     if (m_IO == nullptr)
     {
-        LOG(VB_RECORD, LOG_WARNING, LOC +
+        LOG(VB_RECORD, LOG_WARNING, m_loc +
             "WARNING: Unable to communicate with external app.");
         return false;
     }
@@ -954,14 +964,14 @@ void ExternalStreamHandler::CloseApp(void)
     {
         QString result;
 
-        LOG(VB_RECORD, LOG_INFO, LOC + "CloseRecorder");
+        LOG(VB_RECORD, LOG_INFO, m_loc + "CloseRecorder");
         m_IO_lock.unlock();
         ProcessCommand("CloseRecorder", result, 10000);
         m_IO_lock.lock();
 
         if (!result.startsWith("OK"))
         {
-            LOG(VB_RECORD, LOG_INFO, LOC +
+            LOG(VB_RECORD, LOG_INFO, m_loc +
                 "CloseRecorder failed, sending kill.");
 
             QString full_command = QString("%1").arg(m_args.join(" "));
@@ -989,7 +999,7 @@ bool ExternalStreamHandler::RestartStream(void)
 {
     bool streaming = (StreamingCount() > 0);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "Restarting stream.");
+    LOG(VB_RECORD, LOG_INFO, m_loc + "Restarting stream.");
 
     if (streaming)
         StopStreaming();
@@ -1029,7 +1039,7 @@ void ExternalStreamHandler::ReplayStream(void)
                                        (m_replay_buffer.constData()),
                                        m_replay_buffer.size());
         }
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("Replayed %1 bytes")
+        LOG(VB_RECORD, LOG_INFO, m_loc + QString("Replayed %1 bytes")
             .arg(m_replay_buffer.size()));
         m_replay_buffer.clear();
         m_replay = false;
@@ -1049,13 +1059,22 @@ bool ExternalStreamHandler::StartStreaming(void)
 
     QMutexLocker locker(&m_stream_lock);
 
-    LOG(VB_RECORD, LOG_INFO, LOC +
+    if (m_apiVersion > 1)
+    {
+        if (ProcessCommand("Description?", result))
+            m_loc = QString("ExternSH[%1](%2): ")
+                    .arg(_inputid).arg(result.mid(3));
+        else
+            m_loc = LOC;
+    }
+
+    LOG(VB_RECORD, LOG_INFO, m_loc +
         QString("StartStreaming with %1 current listeners")
         .arg(StreamingCount()));
 
     if (!IsAppOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder not started.");
+        LOG(VB_GENERAL, LOG_ERR, m_loc + "External Recorder not started.");
         return false;
     }
 
@@ -1069,20 +1088,20 @@ bool ExternalStreamHandler::StartStreaming(void)
             else
                 _error = true;
 
-            LOG(VB_GENERAL, level, LOC + QString("StartStreaming failed: '%1'")
+            LOG(VB_GENERAL, level, m_loc + QString("StartStreaming failed: '%1'")
                 .arg(result));
 
             return false;
         }
 
-        LOG(VB_RECORD, LOG_INFO, LOC + "Streaming started");
+        LOG(VB_RECORD, LOG_INFO, m_loc + "Streaming started");
     }
     else
-        LOG(VB_RECORD, LOG_INFO, LOC + "Already streaming");
+        LOG(VB_RECORD, LOG_INFO, m_loc + "Already streaming");
 
     m_streaming_cnt.ref();
 
-    LOG(VB_RECORD, LOG_INFO, LOC +
+    LOG(VB_RECORD, LOG_INFO, m_loc +
         QString("StartStreaming %1 listeners")
         .arg(StreamingCount()));
 
@@ -1095,30 +1114,30 @@ bool ExternalStreamHandler::StopStreaming(void)
 
     QMutexLocker locker(&m_stream_lock);
 
-    LOG(VB_RECORD, LOG_INFO, LOC +
+    LOG(VB_RECORD, LOG_INFO, m_loc +
         QString("StopStreaming %1 listeners")
         .arg(StreamingCount()));
 
     if (StreamingCount() == 0)
     {
-        LOG(VB_RECORD, LOG_INFO, LOC +
+        LOG(VB_RECORD, LOG_INFO, m_loc +
             "StopStreaming requested, but we are not streaming!");
         return true;
     }
 
     if (m_streaming_cnt.deref())
     {
-        LOG(VB_RECORD, LOG_INFO, LOC +
+        LOG(VB_RECORD, LOG_INFO, m_loc +
             QString("StopStreaming delayed, still have %1 listeners")
             .arg(StreamingCount()));
         return true;
     }
 
-    LOG(VB_RECORD, LOG_INFO, LOC + "StopStreaming");
+    LOG(VB_RECORD, LOG_INFO, m_loc + "StopStreaming");
 
     if (!IsAppOpen())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder not started.");
+        LOG(VB_GENERAL, LOG_ERR, m_loc + "External Recorder not started.");
         return false;
     }
 
@@ -1130,14 +1149,14 @@ bool ExternalStreamHandler::StopStreaming(void)
         else
             _error = true;
 
-        LOG(VB_GENERAL, level, LOC + QString("StopStreaming: '%1'")
+        LOG(VB_GENERAL, level, m_loc + QString("StopStreaming: '%1'")
             .arg(result));
 
         return false;
     }
 
     PurgeBuffer();
-    LOG(VB_RECORD, LOG_INFO, LOC + "Streaming stopped");
+    LOG(VB_RECORD, LOG_INFO, m_loc + "Streaming stopped");
 
     return true;
 }
@@ -1153,7 +1172,7 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
     else if (m_apiVersion == 1)
         return ProcessVer1(cmd, result, timeout, retry_cnt);
 
-    LOG(VB_RECORD, LOG_ERR, LOC +
+    LOG(VB_RECORD, LOG_ERR, m_loc +
         QString("Invalid API version %1.  Expected 1 or 2").arg(m_apiVersion));
     return false;
 }
@@ -1164,7 +1183,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 {
     bool okay;
 
-    LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer1('%1')")
+    LOG(VB_RECORD, LOG_DEBUG, m_loc + QString("ProcessVer1('%1')")
         .arg(cmd));
 
     for (uint cnt = 0; cnt < retry_cnt; ++cnt)
@@ -1173,7 +1192,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 
         if (!m_IO)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC + "External I/O not ready!");
+            LOG(VB_RECORD, LOG_ERR, m_loc + "External I/O not ready!");
             return false;
         }
 
@@ -1182,7 +1201,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 
         if (m_IO->Error())
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder in bad state: " +
+            LOG(VB_GENERAL, LOG_ERR, m_loc + "External Recorder in bad state: " +
                 m_IO->ErrorString());
             return false;
         }
@@ -1200,7 +1219,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
             result = m_IO->GetStatus(timeout);
             if (m_IO->Error())
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
+                LOG(VB_GENERAL, LOG_ERR, m_loc +
                     "Failed to read from External Recorder: " +
                     m_IO->ErrorString());
                     _error = true;
@@ -1210,13 +1229,13 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
             // Ignore them while waiting for a responds to a command
             if (!result.startsWith("STATUS"))
                 break;
-            LOG(VB_RECORD, LOG_INFO, LOC +
+            LOG(VB_RECORD, LOG_INFO, m_loc +
                 QString("Ignoring response '%1'").arg(result));
         }
 
         if (result.size() < 1)
         {
-            LOG(VB_GENERAL, LOG_WARNING, LOC +
+            LOG(VB_GENERAL, LOG_WARNING, m_loc +
                 QString("External Recorder did not respond to '%1'").arg(cmd));
         }
         else
@@ -1233,7 +1252,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
                     level = LOG_DEBUG;
 
                 LOG(VB_RECORD, level,
-                    LOC + QString("ProcessCommand('%1') = '%2' took %3ms %4")
+                    m_loc + QString("ProcessCommand('%1') = '%2' took %3ms %4")
                     .arg(cmd).arg(result)
                     .arg(timer.elapsed())
                     .arg(okay ? "" : "<-- NOTE"));
@@ -1241,14 +1260,14 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
                 return okay;
             }
             else
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                LOG(VB_GENERAL, LOG_WARNING, m_loc +
                     QString("External Recorder invalid response to '%1': '%2'")
                     .arg(cmd).arg(result));
         }
 
         if (++m_io_errcnt > 10)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Too many I/O errors.");
+            LOG(VB_GENERAL, LOG_ERR, m_loc + "Too many I/O errors.");
             _error = true;
             break;
         }
@@ -1270,14 +1289,14 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
     {
         QString cmd = QString("%1:%2").arg(++m_serialNo).arg(command);
 
-        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer2('%1') serial(%2)")
+        LOG(VB_RECORD, LOG_DEBUG, m_loc + QString("ProcessVer2('%1') serial(%2)")
             .arg(cmd).arg(m_serialNo));
 
         QMutexLocker locker(&m_IO_lock);
 
         if (!m_IO)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC + "External I/O not ready!");
+            LOG(VB_RECORD, LOG_ERR, m_loc + "External I/O not ready!");
             return false;
         }
 
@@ -1286,7 +1305,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
 
         if (m_IO->Error())
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "External Recorder in bad state: " +
+            LOG(VB_GENERAL, LOG_ERR, m_loc + "External Recorder in bad state: " +
                 m_IO->ErrorString());
             return false;
         }
@@ -1302,7 +1321,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
             result = m_IO->GetStatus(timeout);
             if (m_IO->Error())
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
+                LOG(VB_GENERAL, LOG_ERR, m_loc +
                     "Failed to read from External Recorder: " +
                     m_IO->ErrorString());
                     _error = true;
@@ -1327,25 +1346,25 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
                 tokens.removeFirst();
                 result = tokens.join(':');
                 err = (tokens.size() > 1 && tokens[1].startsWith("ERR"));
-                LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + raw);
+                LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), m_loc + raw);
             }
         }
 
         if (timer.elapsed() >= timeout)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
+            LOG(VB_RECORD, LOG_ERR, m_loc +
                 QString("ProcessVer2: Giving up waiting for response for "
                         "command '%2'").arg(cmd));
         }
         else if (tokens.size() < 2)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
+            LOG(VB_RECORD, LOG_ERR, m_loc +
                 QString("Did not receive a valid response "
                         "for command '%1', received '%2'").arg(cmd).arg(result));
         }
         else if (tokens[0].toUInt() > m_serialNo)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC +
+            LOG(VB_RECORD, LOG_ERR, m_loc +
                 QString("ProcessVer2: Looking for serial no %1, "
                         "but received %2 for command '%2'")
                 .arg(m_serialNo).arg(tokens[0]).arg(cmd));
@@ -1368,21 +1387,21 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
                     level = LOG_DEBUG;
 
                 LOG(VB_RECORD, level,
-                    LOC + QString("ProcessCommand('%1') = '%2' took %3ms %4")
+                    m_loc + QString("ProcessV2('%1') = '%2' took %3ms %4")
                     .arg(cmd).arg(result).arg(timer.elapsed())
                     .arg(okay ? "" : "<-- NOTE"));
 
                 return okay;
             }
             else
-                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                LOG(VB_GENERAL, LOG_WARNING, m_loc +
                     QString("External Recorder invalid response to '%1': '%2'")
                     .arg(cmd).arg(result));
         }
 
         if (++m_io_errcnt > 10)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Too many I/O errors.");
+            LOG(VB_GENERAL, LOG_ERR, m_loc + "Too many I/O errors.");
             _error = true;
             break;
         }
@@ -1400,7 +1419,7 @@ bool ExternalStreamHandler::CheckForError(void)
 
     if (!m_IO)
     {
-        LOG(VB_RECORD, LOG_ERR, LOC + "External I/O not ready!");
+        LOG(VB_RECORD, LOG_ERR, m_loc + "External I/O not ready!");
         return true;
     }
 
@@ -1428,7 +1447,7 @@ bool ExternalStreamHandler::CheckForError(void)
             else
                 err |= result.startsWith("STATUS:ERR");
 
-            LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + result);
+            LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), m_loc + result);
         }
     }
     while (!result.isEmpty());

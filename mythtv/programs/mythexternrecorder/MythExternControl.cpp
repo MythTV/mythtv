@@ -304,6 +304,15 @@ bool Commands::ProcessCommand(const QString & cmd)
         else
             SendStatus(cmd, tokens[0], "OK:" + VERSION);
     }
+    else if (tokens[1].startsWith("Description?"))
+    {
+        if (m_parent->m_fatal)
+            SendStatus(cmd, tokens[0], "ERR:" + m_parent->ErrorString());
+        else if (m_parent->m_desc.trimmed().isEmpty())
+            SendStatus(cmd, tokens[0], "WARN:Not set");
+        else
+            SendStatus(cmd, tokens[0], "OK:" + m_parent->m_desc.trimmed());
+    }
     else if (tokens[1].startsWith("HasLock?"))
     {
         if (m_parent->m_ready)

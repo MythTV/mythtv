@@ -566,7 +566,7 @@ Q_SLOT void MythExternRecApp::ProcReadStandardError(void)
     QString    msg = QString::fromUtf8(buf).trimmed();
 
     // Log any error messages
-    if (!buf.isEmpty())
+    if (!msg.isEmpty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString(">>> %1")
             .arg(msg));
