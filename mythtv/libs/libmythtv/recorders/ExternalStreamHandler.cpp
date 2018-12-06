@@ -28,7 +28,7 @@
 #include "cardutil.h"
 #include "exitcodes.h"
 
-#define LOC QString("ExternalRec[%1](%2): ").arg(_inputid).arg(_device)
+#define LOC QString("ExternSH[%1](%2): ").arg(_inputid).arg(_device)
 
 ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
@@ -765,8 +765,17 @@ void ExternalStreamHandler::run(void)
             else if (len > remainder) // leftover bytes
                 buffer.remove(0, len - remainder);
             else if (len == remainder)
+            {
                 LOG(VB_RECORD, LOG_WARNING, LOC +
-                    "Failed to process any of the data received.");
+                    QString("Failed to process any of the data received."));
+                if (len < 188)
+                {
+                    LOG(VB_RECORD, LOG_WARNING, LOC +
+                        QString("Purging %1 bytes of probable garbage.")
+                        .arg(buffer.size()));
+                    buffer.clear(); // garbage?
+                }
+            }
         }
 
         if (m_IO == nullptr)

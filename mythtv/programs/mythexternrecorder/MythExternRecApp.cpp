@@ -30,7 +30,8 @@
 #define LOC Desc()
 
 MythExternRecApp::MythExternRecApp(const QString & command,
-                                   const QString & conf_file)
+                                   const QString & conf_file,
+                                   const QString & log_file)
     : QObject()
     , m_fatal(false)
     , m_run(true)
@@ -41,6 +42,7 @@ MythExternRecApp::MythExternRecApp(const QString & command,
     , m_rec_command(command)
     , m_lock_timeout(0)
     , m_scan_timeout(120000)
+    , m_log_file(log_file)
     , m_config_ini(conf_file)
     , m_tuned(false)
     , m_chan_settings(nullptr)
@@ -560,14 +562,18 @@ Q_SLOT void MythExternRecApp::ProcError(QProcess::ProcessError /*error */)
 
 Q_SLOT void MythExternRecApp::ProcReadStandardError(void)
 {
-    MythLog("Application message: see external recorder log");
+    QByteArray buf = m_proc.readAllStandardError();
+    QString    msg = QString::fromUtf8(buf).trimmed();
 
     // Log any error messages
-    QByteArray buf = m_proc.readAllStandardError();
     if (!buf.isEmpty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString(">>> %1")
-            .arg(QString::fromUtf8(buf).trimmed()));
+            .arg(msg));
+        if (msg.size() > 79)
+            msg = QString("Application message: see '%1'").arg(m_log_file);
+
+        MythLog(msg);
     }
 }
 
