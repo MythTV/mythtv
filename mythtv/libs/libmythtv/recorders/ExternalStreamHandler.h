@@ -77,6 +77,8 @@ class ExternalStreamHandler : public StreamHandler
     void run(void) override; // MThread
     void PriorityEvent(int fd) override; // DeviceReaderCB
 
+    QString GetDescription(void) { return m_loc; }
+    QString UpdateDescription(void);
     bool IsAppOpen(void);
     bool IsTSOpen(void);
     bool HasTuner(void) const { return m_hasTuner; }

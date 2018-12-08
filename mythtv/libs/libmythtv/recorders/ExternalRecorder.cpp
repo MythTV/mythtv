@@ -29,8 +29,8 @@
 #include "tv_rec.h"
 
 #define LOC QString("ExternalRec[%1](%2): ") \
-            .arg(tvrec ? tvrec->GetInputId() : -1) \
-            .arg(m_channel->GetDevice())
+            .arg(m_channel->GetInputID())    \
+            .arg(m_channel->GetDescription())
 
 ExternalRecorder::ExternalRecorder(TVRec *rec, ExternalChannel *channel) :
     DTVRecorder(rec), m_channel(channel), m_stream_handler(nullptr)

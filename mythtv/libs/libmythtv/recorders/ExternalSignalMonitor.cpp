@@ -21,7 +21,7 @@
 #include "ExternalStreamHandler.h"
 
 #define LOC QString("ExternSigMon[%1](%2): ") \
-    .arg(inputid).arg(channel->GetDevice())
+    .arg(inputid).arg(static_cast<ExternalChannel *>(channel)->GetDescription())
 
 /**
  *  \brief Initializes signal lock and signal values.
@@ -41,15 +41,17 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
                                              ExternalChannel *_channel,
                                              bool _release_stream,
                                              uint64_t _flags)
-    : DTVSignalMonitor(db_cardnum, _channel, _flags, _release_stream),
-      m_stream_handler(nullptr), m_stream_handler_started(false), m_lock_timeout(0)
+    : DTVSignalMonitor(db_cardnum, _channel, _flags, _release_stream)
+    , m_stream_handler(nullptr)
+    , m_stream_handler_started(false)
+    , m_lock_timeout(0)
 {
     QString result;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
     m_stream_handler = ExternalStreamHandler::Get(channel->GetDevice(),
-						  channel->GetInputID(),
-						  channel->GetMajorID());
+                                                  channel->GetInputID(),
+                                                  channel->GetMajorID());
     if (!m_stream_handler || m_stream_handler->HasError())
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
     else
