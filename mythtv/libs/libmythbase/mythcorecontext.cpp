@@ -754,11 +754,9 @@ QString MythCoreContext::GenMythURL(QString host, QString port, QString path, QS
 
 QString MythCoreContext::GenMythURL(QString host, int port, QString path, QString storageGroup)
 {
-    QString ret;
+    QUrl ret;
 
-    QString m_storageGroup;
     QString m_host;
-    QString m_port;
 
     QHostAddress addr(host);
     if (!addr.isNull())
@@ -768,35 +766,28 @@ QString MythCoreContext::GenMythURL(QString host, int port, QString path, QStrin
                                           "(ID). This is invalid.").arg(host).arg(path));
     }
 
-
-    if (!storageGroup.isEmpty())
-        m_storageGroup = storageGroup + "@";
-
     m_host = host;
 
     // Basically if it appears to be an IPv6 IP surround the IP with [] otherwise don't bother
     if (!addr.isNull() && addr.protocol() == QAbstractSocket::IPv6Protocol)
         m_host = "[" + addr.toString().toLower() + "]";
 
+    ret.setScheme("myth");
+    if (!storageGroup.isEmpty())
+        ret.setUserName(storageGroup);
+    ret.setHost(m_host);
     if (port > 0 && port != 6543)
-        m_port = QString(":%1").arg(port);
-    else
-        m_port = "";
-
-    QString seperator = "/";
-    if (path.startsWith("/"))
-        seperator = "";
-
-    // IPv6 addresses may contain % followed by a digit which causes .arg()
-    // to fail, so use append instead.
-    ret = QString("myth://").append(m_storageGroup).append(m_host).append(m_port).append(seperator).append(path);
+        ret.setPort(port);
+  if (!path.startsWith("/"))
+	  path = QString("/") + path;
+    ret.setPath(path);
 
 #if 0
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
-        QString("GenMythURL returning %1").arg(ret));
+        QString("GenMythURL returning %1").arg(ret.toString()));
 #endif
 
-    return ret;
+    return ret.toString();
 }
 
 QString MythCoreContext::GetMasterHostPrefix(const QString &storageGroup,

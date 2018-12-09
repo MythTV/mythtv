@@ -34,7 +34,6 @@ using namespace std;
 #include <QWriteLocker>
 #include <QRegExp>
 #include <QEvent>
-#include <QUrl>
 #include <QTcpServer>
 #include <QTimer>
 #include <QNetworkInterface>
@@ -1909,10 +1908,11 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         LOG(VB_NETWORK, LOG_INFO, LOC +
             QString("adding: %1 as a remote file transfer") .arg(commands[2]));
         QStringList::const_iterator it = slist.begin();
-        QUrl qurl = *(++it);
+        QString path = *(++it);
         QString wantgroup = *(++it);
         QString filename;
         QStringList checkfiles;
+
         for (++it; it != slist.end(); ++it)
             checkfiles += *it;
 
@@ -1945,35 +1945,31 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 return;
             }
 
-            QString basename = qurl.path();
-            if (qurl.hasFragment())
-                basename += "#" + qurl.fragment();
-
-            if (basename.isEmpty())
+            if (path.isEmpty())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("FileTransfer write filename is empty in url '%1'.")
-                        .arg(qurl.toString()));
+                    QString("FileTransfer write filename is empty in path '%1'.")
+                        .arg(path));
                 errlist << "filetransfer_filename_empty";
                 socket->WriteStringList(errlist);
                 return;
             }
 
-            if ((basename.contains("/../")) ||
-                (basename.startsWith("../")))
+            if ((path.contains("/../")) ||
+                (path.startsWith("../")))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("FileTransfer write filename '%1' does not pass "
-                            "sanity checks.") .arg(basename));
+                            "sanity checks.") .arg(path));
                 errlist << "filetransfer_filename_dangerous";
                 socket->WriteStringList(errlist);
                 return;
             }
 
-            filename = dir + "/" + basename;
+            filename = dir + "/" + path;
         }
         else
-            filename = LocalFilePath(qurl, wantgroup);
+            filename = LocalFilePath(path, wantgroup);
 
         if (filename.isEmpty())
         {
@@ -8145,12 +8141,9 @@ void MainServer::SetExitCode(int exitCode, bool closeApplication)
         QCoreApplication::exit(m_exitCode);
 }
 
-QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
+QString MainServer::LocalFilePath(const QString &path, const QString &wantgroup)
 {
-    QString lpath = url.path();
-
-    if (url.hasFragment())
-        lpath += "#" + url.fragment();
+    QString lpath = QString(path);
 
     if (lpath.section('/', -2, -2) == "channels")
     {
@@ -8209,7 +8202,7 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
             if (!wantgroup.isEmpty())
             {
                 sgroup.Init(wantgroup);
-                lpath = url.toString();
+                lpath = QString(path);
             }
             else
             {
@@ -8223,12 +8216,12 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
                 LOG(VB_FILE, LOG_INFO, LOC +
                     QString("LocalFilePath(%1 '%2'), found file through "
                             "exhaustive search at '%3'")
-                        .arg(url.toString()).arg(opath).arg(lpath));
+                        .arg(path).arg(opath).arg(lpath));
             }
             else
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("ERROR: LocalFilePath "
-                    "unable to find local path for '%1'.") .arg(url.toString()));
+                    "unable to find local path for '%1'.") .arg(path));
                 lpath = "";
             }
 

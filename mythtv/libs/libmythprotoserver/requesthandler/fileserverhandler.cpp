@@ -60,10 +60,10 @@ void FileServerHandler::connectionClosed(MythSocket *socket)
     }
 }
 
-QString FileServerHandler::LocalFilePath(const QUrl &url,
+QString FileServerHandler::LocalFilePath(const QString &path,
                                            const QString &wantgroup)
 {
-    QString lpath = url.path();
+    QString lpath = QString(path);
 
     if (lpath.section('/', -2, -2) == "channels")
     {
@@ -122,7 +122,7 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
             if (!wantgroup.isEmpty())
             {
                 sgroup.Init(wantgroup);
-                lpath = url.toString();
+                lpath = QString(path);
             }
             else
             {
@@ -136,7 +136,7 @@ QString FileServerHandler::LocalFilePath(const QUrl &url,
                 LOG(VB_FILE, LOG_INFO,
                         QString("LocalFilePath(%1 '%2'), found through "
                                 "exhaustive search at '%3'")
-                            .arg(url.toString()).arg(opath).arg(lpath));
+                            .arg(path).arg(opath).arg(lpath));
             }
             else
             {
@@ -229,7 +229,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     }
 
     QStringList::const_iterator it = slist.begin();
-    QUrl qurl           = *(++it);
+    QString path        = *(++it);
     QString wantgroup   = *(++it);
 
     QStringList checkfiles;
@@ -259,34 +259,33 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
             return true;
         }
 
-        QString basename = qurl.path();
-        if (basename.isEmpty())
+        if (path.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, QString("FileTransfer write "
-                    "filename is empty in url '%1'.")
-                    .arg(qurl.toString()));
+                    "filename is empty in path '%1'.")
+                    .arg(path));
 
             slist << "ERROR" << "filetransfer_filename_empty";
             socket->WriteStringList(slist);
             return true;
         }
 
-        if ((basename.contains("/../")) ||
-            (basename.startsWith("../")))
+        if ((path.contains("/../")) ||
+            (path.startsWith("../")))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("FileTransfer write "
                     "filename '%1' does not pass sanity checks.")
-                    .arg(basename));
+                    .arg(path));
 
             slist << "ERROR" << "filetransfer_filename_dangerous";
             socket->WriteStringList(slist);
             return true;
         }
 
-        filename = dir + "/" + basename;
+        filename = dir + "/" + path;
     }
     else
-        filename = LocalFilePath(qurl, wantgroup);
+        filename = LocalFilePath(path, wantgroup);
 
     QFileInfo finfo(filename);
     if (finfo.isDir())

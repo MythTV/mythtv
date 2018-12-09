@@ -278,7 +278,7 @@ class MainServer : public QObject, public MythSocketCBs
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);
 
-    QString LocalFilePath(const QUrl &url, const QString &wantgroup);
+    QString LocalFilePath(const QString &path, const QString &wantgroup);
 
     int GetfsID(QList<FileSystemInfo>::iterator fsInfo);
 

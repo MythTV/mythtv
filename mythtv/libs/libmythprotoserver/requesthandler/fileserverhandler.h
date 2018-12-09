@@ -51,7 +51,7 @@ class PROTOSERVER_PUBLIC FileServerHandler : public SocketRequestHandler
                                  QStringList &slist);
     bool HandleDownloadFile(SocketHandler *socket, QStringList &slist);
 
-    QString LocalFilePath(const QUrl &url, const QString &wantgroup);
+    QString LocalFilePath(const QString &path, const QString &wantgroup);
     void RunDeleteThread(void);
 
     QMap<int, FileTransfer*>        m_ftMap;
