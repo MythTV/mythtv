@@ -1227,7 +1227,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
             }
             // STATUS message are "out of band".
             // Ignore them while waiting for a responds to a command
-            if (!result.startsWith("STATUS"))
+            if (!result.startsWith("STATUS") && !result.startsWith("0:STATUS"))
                 break;
             LOG(VB_RECORD, LOG_INFO, m_loc +
                 QString("Ignoring response '%1'").arg(result));
