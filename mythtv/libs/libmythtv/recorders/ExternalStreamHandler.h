@@ -60,8 +60,9 @@ class ExternIO
 class ExternalStreamHandler : public StreamHandler
 {
     enum constants { MAX_API_VERSION = 2,
-                     PACKET_SIZE = 188 * 8192,
-                     TOO_FAST_SIZE = 188 * 32768 };
+                     TS_PACKET_SIZE = 188,
+                     PACKET_SIZE = TS_PACKET_SIZE * 8192,
+                     TOO_FAST_SIZE = TS_PACKET_SIZE * 32768 };
 
   public:
     static ExternalStreamHandler *Get(const QString &devicename,
@@ -116,7 +117,6 @@ class ExternalStreamHandler : public StreamHandler
     bool           m_tsopen;
     int            m_io_errcnt;
     bool           m_poll_mode;
-    bool           m_notify;
 
     int            m_apiVersion;
     uint           m_serialNo;

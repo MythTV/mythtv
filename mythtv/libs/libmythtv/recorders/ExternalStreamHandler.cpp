@@ -280,7 +280,7 @@ bool ExternIO::KillIfRunning(const QString & cmd)
         return true;
     }
 
-    usleep(50000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     kil = QString("pkill --signal 9 -x -f \"%1\" 2>&1 > /dev/null").arg(cmd);
     res_kil = system(kil.toUtf8().constData());
@@ -312,7 +312,7 @@ void ExternIO::Fork(void)
     if (!KillIfRunning(full_command))
     {
         // Give it one more chance.
-        usleep(50000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         if (!KillIfRunning(full_command))
         {
             m_error = QString("Unable to kill existing '%1'.")
@@ -377,7 +377,7 @@ void ExternIO::Fork(void)
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 "ExternIO::Fork(): Failed to set O_NONBLOCK for FD: " + ENO);
-            sleep(2);
+            std::this_thread::sleep_for(std::chrono::seconds(2));
             _exit(GENERIC_EXIT_PIPE_FAILURE);
         }
 
@@ -547,7 +547,6 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
     , m_tsopen(false)
     , m_io_errcnt(0)
     , m_poll_mode(false)
-    , m_notify(false)
     , m_apiVersion(1)
     , m_serialNo(0)
     , m_replay(true)
@@ -581,10 +580,11 @@ void ExternalStreamHandler::run(void)
     QString    result;
     QString    ready_cmd;
     QByteArray buffer;
+    int        sz;
     uint       len, read_len;
-    uint       empty_cnt = 0;
     uint       restart_cnt = 0;
     MythTimer  status_timer;
+    MythTimer  nodata_timer;
 
     if (!m_IO)
     {
@@ -599,7 +599,6 @@ void ExternalStreamHandler::run(void)
     LOG(VB_RECORD, LOG_INFO, m_loc + "run(): begin");
 
     SetRunning(true, true, false);
-    m_notify = false;
 
     if (m_poll_mode)
         ready_cmd = "SendBytes";
@@ -612,13 +611,13 @@ void ExternalStreamHandler::run(void)
         if (!IsTSOpen())
         {
             LOG(VB_RECORD, LOG_WARNING, m_loc + "TS not open yet.");
-            usleep(1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
 
         if (StreamingCount() == 0)
         {
-            usleep(1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
 
@@ -626,39 +625,25 @@ void ExternalStreamHandler::run(void)
 
         if (!m_xon || m_poll_mode)
         {
-            ProcessCommand(ready_cmd, result);
-            if (result.startsWith("ERR"))
+            if (buffer.size() > TOO_FAST_SIZE)
             {
-                LOG(VB_GENERAL, LOG_ERR, m_loc + QString("Aborting: %1 -> %2")
-                    .arg(ready_cmd).arg(result));
-                _error = true;
+                LOG(VB_RECORD, LOG_WARNING, m_loc +
+                    "Internal buffer too full to accept more data from "
+                    "external application.");
             }
             else
-                m_xon = true;
-        }
-
-        if (buffer.isEmpty())
-        {
-            if (++empty_cnt % 1000 == 0)
             {
-                LOG(VB_GENERAL, LOG_ERR, m_loc + "No data from external app");
-                m_notify = true;
-
-                if (empty_cnt % 5000)
+                ProcessCommand(ready_cmd, result);
+                if (result.startsWith("ERR"))
                 {
-                    if (restart_cnt++)
-                        std::this_thread::sleep_for(std::chrono::seconds(20));
-                    if (!RestartStream())
-                        _error = true;
-                    m_xon = false;
+                    LOG(VB_GENERAL, LOG_ERR, m_loc + QString("Aborting: %1 -> %2")
+                        .arg(ready_cmd).arg(result));
+                    _error = true;
                     continue;
                 }
+                else
+                    m_xon = true;
             }
-        }
-        else
-        {
-            empty_cnt = 0;
-            m_notify = false;
         }
 
         if (m_xon)
@@ -673,110 +658,128 @@ void ExternalStreamHandler::run(void)
                     if (restart_cnt++)
                         std::this_thread::sleep_for(std::chrono::seconds(20));
                     if (!RestartStream())
+                    {
+                        LOG(VB_RECORD, LOG_ERR, LOC + "Failed to restart stream.");
                         _error = true;
-                    m_xon = false;
+                    }
                     continue;
                 }
 
                 status_timer.restart();
             }
-        }
 
-        while ((read_len = m_IO->Read(buffer, PACKET_SIZE - remainder, 100))
-               > 0 || !buffer.isEmpty())
-        {
-            if (m_IO->Error())
+            if (buffer.size() > TOO_FAST_SIZE)
             {
-                LOG(VB_GENERAL, LOG_ERR, m_loc +
-                    QString("Failed to read from External Recorder: %1")
-                    .arg(m_IO->ErrorString()));
-                _error = true;
-                break;
-            }
-
-            if (!_running_desired || _error)
-                break;
-
-            if (read_len > 0)
-            {
-                empty_cnt = 0;
-                restart_cnt = 0;
-            }
-
-            if (m_xon)
-            {
-                if (buffer.size() > TOO_FAST_SIZE)
+                if (!m_poll_mode)
                 {
-                    if (!m_poll_mode)
+                    // Data is comming a little too fast, so XOFF
+                    // to give us time to process it.
+                    if (ProcessCommand(QString("XOFF"), result))
                     {
-                        // Data is comming a little too fast, so XOFF
-                        // to give us time to process it.
-                        if (ProcessCommand(QString("XOFF"), result))
+                        if (result.startsWith("ERR"))
                         {
-                            if (result.startsWith("ERR"))
-                            {
-                                LOG(VB_GENERAL, LOG_ERR, m_loc +
-                                    QString("Aborting: XOFF -> %2")
-                                    .arg(result));
-                                _error = true;
-                            }
+                            LOG(VB_GENERAL, LOG_ERR, m_loc +
+                                QString("Aborting: XOFF -> %2")
+                                .arg(result));
+                            _error = true;
                         }
                     }
                     m_xon = false;
                 }
             }
-            else if (!m_poll_mode && read_len)
+
+            if ((sz = PACKET_SIZE - remainder) > 0)
+                read_len = m_IO->Read(buffer, sz, 100);
+            else
+                read_len = 0;
+        }
+        else
+            read_len = 0;
+
+        if (read_len == 0)
+        {
+            std::this_thread::sleep_for(std::chrono::microseconds(50));
+
+            if (!nodata_timer.isRunning())
+                nodata_timer.start();
+            else
             {
-                LOG(VB_GENERAL, LOG_WARNING, m_loc +
-                    "Sill receiving data from external application after XOFF.");
-            }
-
-            len = remainder = buffer.size();
-
-            if (!m_stream_lock.tryLock())
-                continue;
-
-            if (!_listener_lock.tryLock())
-                continue;
-
-            StreamDataList::const_iterator sit = _stream_data_list.begin();
-            for (; sit != _stream_data_list.end(); ++sit)
-                remainder = sit.key()->ProcessData
-                            (reinterpret_cast<const uint8_t *>
-                             (buffer.constData()), buffer.size());
-
-            _listener_lock.unlock();
-
-            if (m_replay)
-            {
-                m_replay_buffer += buffer.left(len - remainder);
-                if (m_replay_buffer.size() > (50 * PACKET_SIZE))
+                if (nodata_timer.elapsed() >= 50000)
                 {
-                    m_replay_buffer.remove(0, len - remainder);
-                    LOG(VB_RECORD, LOG_WARNING, m_loc +
-                        QString("Replay size truncated to %1 bytes")
-                        .arg(m_replay_buffer.size()));
+                    LOG(VB_GENERAL, LOG_WARNING, m_loc +
+                        "No data for 50 seconds, Restarting stream.");
+                    if (!RestartStream())
+                    {
+                        LOG(VB_RECORD, LOG_ERR, LOC + "Failed to restart stream.");
+                        _error = true;
+                    }
+                    nodata_timer.stop();
+                    continue;
                 }
             }
+        }
+        else
+        {
+            nodata_timer.stop();
+            restart_cnt = 0;
+        }
 
-            m_stream_lock.unlock();
+        if (m_IO->Error())
+        {
+            LOG(VB_GENERAL, LOG_ERR, m_loc +
+                QString("Failed to read from External Recorder: %1")
+                .arg(m_IO->ErrorString()));
+            _error = true;
+            break;
+        }
 
-            if (remainder == 0)
-                buffer.clear();
-            else if (len > remainder) // leftover bytes
-                buffer.remove(0, len - remainder);
-            else if (len == remainder)
+        len = remainder = buffer.size();
+
+        if (len == 0)
+            continue;
+
+        if (len < TS_PACKET_SIZE)
+        {
+            LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for a full TS packet.");
+            continue;
+        }
+
+        if (!m_stream_lock.tryLock())
+            continue;
+
+        if (!_listener_lock.tryLock())
+            continue;
+
+        StreamDataList::const_iterator sit = _stream_data_list.begin();
+        for (; sit != _stream_data_list.end(); ++sit)
+            remainder = sit.key()->ProcessData
+                        (reinterpret_cast<const uint8_t *>
+                         (buffer.constData()), buffer.size());
+
+        _listener_lock.unlock();
+
+        if (m_replay)
+        {
+            m_replay_buffer += buffer.left(len - remainder);
+            if (m_replay_buffer.size() > (50 * PACKET_SIZE))
             {
+                m_replay_buffer.remove(0, len - remainder);
                 LOG(VB_RECORD, LOG_WARNING, m_loc +
-                    QString("Failed to process any of the data received."));
-                if (len < 188)
-                {
-                    LOG(VB_RECORD, LOG_WARNING, m_loc +
-                        QString("Purging %1 bytes of probable garbage.")
-                        .arg(buffer.size()));
-                    buffer.clear(); // garbage?
-                }
+                    QString("Replay size truncated to %1 bytes")
+                    .arg(m_replay_buffer.size()));
             }
+        }
+
+        m_stream_lock.unlock();
+
+        if (remainder == 0)
+            buffer.clear();
+        else if (len > remainder) // leftover bytes
+            buffer.remove(0, len - remainder);
+        else if (len == remainder)
+        {
+            LOG(VB_RECORD, LOG_WARNING, m_loc +
+                QString("Failed to process any of the data received."));
         }
 
         if (m_IO == nullptr)
@@ -979,7 +982,7 @@ void ExternalStreamHandler::CloseApp(void)
             if (!m_IO->KillIfRunning(full_command))
             {
                 // Give it one more chance.
-                usleep(50000);
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
                 if (!m_IO->KillIfRunning(full_command))
                 {
                     LOG(VB_GENERAL, LOG_ERR,
@@ -1001,10 +1004,17 @@ bool ExternalStreamHandler::RestartStream(void)
 
     LOG(VB_RECORD, LOG_INFO, m_loc + "Restarting stream.");
 
+    if (!m_poll_mode && m_xon)
+    {
+        QString result;
+        ProcessCommand(QString("XOFF"), result);
+        m_xon = false;
+    }
+
     if (streaming)
         StopStreaming();
 
-    usleep(1000000);  // 1 second
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     if (streaming)
         return StartStreaming();
