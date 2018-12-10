@@ -217,14 +217,10 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                 // because it returns all tables visible to the user in *all*
                 // databases (not just the current DB).
                 bool have_schema = false;
-                QString sql = "SELECT COUNT( "
-                              "         INFORMATION_SCHEMA.TABLES.TABLE_NAME "
-                              "       ) "
+                QString sql = "SELECT COUNT(TABLE_NAME) "
                               "  FROM INFORMATION_SCHEMA.TABLES "
-                              " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA "
-                              "       = DATABASE() "
-                              "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = "
-                              "       'BASE TABLE';";
+                              " WHERE TABLE_SCHEMA = DATABASE() "
+                              "   AND TABLE_TYPE = 'BASE TABLE';";
                 // We can't use MSqlQuery to determine if we have a schema,
                 // since it will open a new connection, which will try to check
                 // if we have a schema

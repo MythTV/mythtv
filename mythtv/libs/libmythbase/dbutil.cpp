@@ -439,14 +439,14 @@ QStringList DBUtil::GetTables(const QStringList &engines)
     if (!query.isConnected())
         return result;
 
-    QString sql = "SELECT CONCAT('`', INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA, "
-                  "              '`.`', INFORMATION_SCHEMA.TABLES.TABLE_NAME, "
+    QString sql = "SELECT CONCAT('`', TABLE_SCHEMA, "
+                  "              '`.`', TABLE_NAME, "
                   "              '`') AS `TABLE_NAME` "
                   "  FROM INFORMATION_SCHEMA.TABLES "
-                  " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = DATABASE() "
-                  "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = 'BASE TABLE'";
+                  " WHERE TABLE_SCHEMA = DATABASE() "
+                  "   AND TABLE_TYPE = 'BASE TABLE'";
     if (!engines.empty())
-        sql.append(QString("   AND INFORMATION_SCHEMA.TABLES.ENGINE IN ('%1')")
+        sql.append(QString("   AND ENGINE IN ('%1')")
                            .arg(engines.join("', '")));
     if (!query.exec(sql))
     {

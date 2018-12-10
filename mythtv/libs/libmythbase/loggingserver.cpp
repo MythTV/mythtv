@@ -671,14 +671,11 @@ bool DatabaseLogger::tableExists(const QString &table)
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
-        QString sql = "SELECT INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME "
+        QString sql = "SELECT COLUMN_NAME "
                       "  FROM INFORMATION_SCHEMA.COLUMNS "
-                      " WHERE INFORMATION_SCHEMA.COLUMNS.TABLE_SCHEMA = "
-                      "       DATABASE() "
-                      "   AND INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = "
-                      "       :TABLENAME "
-                      "   AND INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME = "
-                      "       :COLUMNNAME;";
+                      " WHERE TABLE_SCHEMA = DATABASE() "
+                      "   AND TABLE_NAME = :TABLENAME "
+                      "   AND COLUMN_NAME = :COLUMNNAME;";
         if (query.prepare(sql))
         {
             query.bindValue(":TABLENAME", table);
