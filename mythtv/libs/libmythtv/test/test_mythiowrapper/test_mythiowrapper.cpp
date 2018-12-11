@@ -1,5 +1,5 @@
 /*
- *  Class TestEITFixups
+ *  Class TestMythIOWrapper
  *
  *  Copyright (C) David Hampton 2018
  *
