@@ -2,7 +2,9 @@
 
 // MythTV headers
 #include "avcinfo.h"
+#ifndef GUID_ONLY
 #include "firewiredevice.h"
+#endif
 
 QString guid_to_string(uint64_t guid)
 {
@@ -26,6 +28,7 @@ uint64_t string_to_guid(const QString &guid)
             (guid_l.toULong(nullptr, 16)));
 }
 
+#ifndef GUID_ONLY
 AVCInfo::AVCInfo() :
     port(-1), node(-1),
     guid(0), specid(0), vendorid(0), modelid(0),
@@ -143,3 +146,4 @@ QString AVCInfo::GetSubunitInfoString(void) const
 
     return str;
 }
+#endif
