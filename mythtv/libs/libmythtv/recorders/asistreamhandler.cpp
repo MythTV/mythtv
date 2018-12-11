@@ -101,7 +101,7 @@ void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)
     ref = nullptr;
 }
 
-ASIStreamHandler::ASIStreamHandler(const QString &device, int inputd)
+ASIStreamHandler::ASIStreamHandler(const QString &device, int inputid)
     : StreamHandler(device, inputid)
     , _device_num(-1), _buf_size(-1), _fd(-1)
     , _packet_size(TSPacket::kSize)
