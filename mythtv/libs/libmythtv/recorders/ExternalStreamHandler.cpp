@@ -636,7 +636,7 @@ void ExternalStreamHandler::run(void)
                 ProcessCommand(ready_cmd, result);
                 if (result.startsWith("ERR"))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, m_loc + QString("Aborting: %1 -> %2")
+                    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Aborting: %1 -> %2")
                         .arg(ready_cmd).arg(result));
                     _error = true;
                     continue;
