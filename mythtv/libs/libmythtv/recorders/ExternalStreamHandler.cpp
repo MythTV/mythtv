@@ -716,6 +716,8 @@ void ExternalStreamHandler::run(void)
                     nodata_timer.stop();
                     continue;
                 }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
         }
         else
@@ -741,6 +743,7 @@ void ExternalStreamHandler::run(void)
         if (len < TS_PACKET_SIZE)
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for a full TS packet.");
+            std::this_thread::sleep_for(std::chrono::microseconds(50));
             continue;
         }
 
