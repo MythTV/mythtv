@@ -8,24 +8,12 @@
 
 QString guid_to_string(uint64_t guid)
 {
-    QString g0 = QString("%1").arg((uint32_t) (guid >> 32), 0, 16);
-    QString g1 = QString("%1").arg((uint32_t) guid, 0, 16);
-
-    while (g0.length() < 8)
-        g0 = "0" + g0;
-    while (g1.length() < 8)
-        g1 = "0" + g1;
-
-    return g0.toUpper() + g1.toUpper();
+    return QString("%1").arg(guid, 16, 16, QLatin1Char('0')).toUpper();
 }
 
 uint64_t string_to_guid(const QString &guid)
 {
-    // QString::toULongLong() is not supported in older Qt's..
-    QString guid_l = guid.right(8);
-    QString guid_h = guid.left(guid.length() - 8);
-    return ((guid_h.toULong(nullptr, 16)) << 32 |
-            (guid_l.toULong(nullptr, 16)));
+    return guid.toULongLong(nullptr, 16);
 }
 
 #ifndef GUID_ONLY
