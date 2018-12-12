@@ -190,11 +190,7 @@ void HttpServer::LoadSSLConfig()
     m_sslConfig.setSslOption(QSsl::SslOptionDisableLegacyRenegotiation, true); // Potential DoS multiplier
     m_sslConfig.setSslOption(QSsl::SslOptionDisableCompression, true); // CRIME attack
 
-#if QT_VERSION < QT_VERSION_CHECK(5,5,0)
-    QList<QSslCipher> availableCiphers = QSslSocket::supportedCiphers();
-#else
     QList<QSslCipher> availableCiphers = QSslConfiguration::supportedCiphers();
-#endif
     QList<QSslCipher> secureCiphers;
     QList<QSslCipher>::iterator it;
     for (it = availableCiphers.begin(); it != availableCiphers.end(); ++it)
