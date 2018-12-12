@@ -21,25 +21,9 @@
 
 #include "Json.h"
 
-// Qt version specific includes
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
-    #include <QJsonDocument>
-    #include <QMetaProperty>
-    #include <QVariantHash>
-#else
-
-#ifdef _MSC_VER
-    // This is needed to avoid creating a reparse point which git on windows doesn't like
-    #include "QJson/src/QObjectHelper"
-    #include "QJson/src/Serializer"
-    #include "QJson/src/Parser"
-#else
-    #include "QJson/QObjectHelper"
-    #include "QJson/Serializer"
-    #include "QJson/Parser"
-#endif
-
-#endif
+#include <QJsonDocument>
+#include <QMetaProperty>
+#include <QVariantHash>
 
 namespace QJsonWrapper
 {
@@ -47,7 +31,6 @@ namespace QJsonWrapper
 QVariantMap
 qobject2qvariant( const QObject* object )
 {
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
     QVariantMap map;
     if ( object == nullptr )
     {
@@ -64,16 +47,12 @@ qobject2qvariant( const QObject* object )
         }
     }
     return map;
-#else
-    return QJson::QObjectHelper::qobject2qvariant( object );
-#endif
 }
 
 
 void
 qvariant2qobject( const QVariantMap& variant, QObject* object )
 {
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
     for ( QVariantMap::const_iterator iter = variant.begin(); iter != variant.end(); ++iter )
     {
         QVariant property = object->property( iter.key().toLatin1() );
@@ -90,16 +69,12 @@ qvariant2qobject( const QVariantMap& variant, QObject* object )
             }
         }
     }
-#else
-    QJson::QObjectHelper::qvariant2qobject( variant, object );
-#endif
 }
 
 
 QVariant
 parseJson( const QByteArray& jsonData, bool* ok )
 {
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson( jsonData, &error );
     if ( ok != nullptr )
@@ -107,17 +82,12 @@ parseJson( const QByteArray& jsonData, bool* ok )
         *ok = ( error.error == QJsonParseError::NoError );
     }
     return doc.toVariant();
-#else
-    QJson::Parser p;
-    return p.parse( jsonData, ok );
-#endif
 }
 
 
 QByteArray
 toJson( const QVariant &variant )
 {
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 0, 0 )
     QVariant _variant = variant;
     if ( variant.type() == QVariant::Hash )
     {
@@ -135,10 +105,6 @@ toJson( const QVariant &variant )
 
     QJsonDocument doc = QJsonDocument::fromVariant( _variant );
     return doc.toJson();
-#else
-    QJson::Serializer serializer;
-    return serializer.serialize( variant );
-#endif
 }
 
 }
