@@ -323,16 +323,7 @@ void TransportListEditor::Delete(TransportSetting *transport)
                 MythDB::DBError("TransportEditor -- delete channels", query);
 
             removeChild(transport);
-            // m_list.removeAll(transport);
-            // Following for QT 5.3 which does not have the removeAll
-            // method in QVector
-            int ix;
-            do
-            {
-                ix = m_list.indexOf(transport);
-                if (ix != -1)
-                    m_list.remove(ix);
-            } while (ix != -1);
+            m_list.removeAll(transport);
         },
         true);
 }

@@ -5171,7 +5171,7 @@ version2num(){
 }
 
 # Minimum supported Qt version
-QT_MIN_VERSION_STR="5.5"
+QT_MIN_VERSION_STR="5.7"
 QT_MIN_VERSION=$(version2num $QT_MIN_VERSION_STR)
 QT_MIN_VERSION_HEX=$(printf "0x%06x" $QT_MIN_VERSION)
 
