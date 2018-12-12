@@ -617,11 +617,7 @@ bool DatabaseLogger::logqmsg(MSqlQuery &query, LoggingItem *item)
         // previous error (to avoid spamming the log).
         QSqlError err = query.lastError();
         if ((err.type() != 1
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-             || err.number() != -1
-#else
              || !err.nativeErrorCode().isEmpty()
-#endif
                 ) &&
             (!m_errorLoggingTime.isValid() ||
              (m_errorLoggingTime.elapsed() > 1000)))

@@ -655,11 +655,7 @@ bool MSqlQuery::exec()
     // Close and reopen the database connection and retry the query if it
     // connects again
     if (!result
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-        && QSqlQuery::lastError().number() == 2006
-#else
         && QSqlQuery::lastError().nativeErrorCode() == "2006"
-#endif
         && Reconnect())
         result = QSqlQuery::exec();
 
@@ -747,11 +743,7 @@ bool MSqlQuery::exec(const QString &query)
     // Close and reopen the database connection and retry the query if it
     // connects again
     if (!result
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-        && QSqlQuery::lastError().number() == 2006
-#else
         && QSqlQuery::lastError().nativeErrorCode() == "2006"
-#endif
         && Reconnect())
         result = QSqlQuery::exec(query);
 
@@ -854,11 +846,7 @@ bool MSqlQuery::prepare(const QString& query)
     // Close and reopen the database connection and retry the query if it
     // connects again
     if (!ok
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-        && QSqlQuery::lastError().number() == 2006
-#else
         && QSqlQuery::lastError().nativeErrorCode() == "2006"
-#endif
         && Reconnect())
         ok = true;
 

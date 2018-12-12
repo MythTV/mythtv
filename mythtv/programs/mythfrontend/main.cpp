@@ -1874,9 +1874,7 @@ int main(int argc, char **argv)
 #ifdef Q_OS_ANDROID
     //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
-#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     QApplication::setSetuidAllowed(true);
-#endif
     new QApplication(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
 
@@ -1982,9 +1980,7 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     qApp->setSetuidAllowed(true);
-#endif
 
     if (revokeRoot() != 0)
     {
