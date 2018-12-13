@@ -81,8 +81,6 @@ void ExternalRecorder::run(void)
 
     StartNewFile();
 
-    m_stream_handler->LockReplay();
-
     m_h264_parser.Reset();
     _wait_for_keyframe_option = true;
     _seen_sps = false;
@@ -91,8 +89,7 @@ void ExternalRecorder::run(void)
     _stream_data->AddWritingListener(this);
     m_stream_handler->AddListener(_stream_data, false, true);
 
-    m_stream_handler->ReplayStream();
-    m_stream_handler->UnlockReplay();
+    StartStreaming();
 
     while (IsRecordingRequested() && !IsErrored())
     {

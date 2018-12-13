@@ -549,7 +549,7 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
     , m_poll_mode(false)
     , m_apiVersion(1)
     , m_serialNo(0)
-    , m_replay(true)
+    , m_replay(false)
     , m_xon(false)
 {
     setObjectName("ExternSH");
@@ -633,16 +633,28 @@ void ExternalStreamHandler::run(void)
             }
             else
             {
-                ProcessCommand(ready_cmd, result);
-                if (result.startsWith("ERR"))
+                if (!ProcessCommand(ready_cmd, result))
                 {
-                    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Aborting: %1 -> %2")
-                        .arg(ready_cmd).arg(result));
-                    _error = true;
+                    if (result.startsWith("ERR"))
+                    {
+                        LOG(VB_GENERAL, LOG_ERR, LOC +
+                            QString("Aborting: %1 -> %2")
+                            .arg(ready_cmd).arg(result));
+                        _error = true;
+                        continue;
+                    }
+
+                    if (restart_cnt++)
+                        std::this_thread::sleep_for(std::chrono::seconds(20));
+                    if (!RestartStream())
+                    {
+                        LOG(VB_RECORD, LOG_ERR, LOC +
+                            "Failed to restart stream.");
+                        _error = true;
+                    }
                     continue;
                 }
-                else
-                    m_xon = true;
+                m_xon = true;
             }
         }
 
@@ -674,7 +686,7 @@ void ExternalStreamHandler::run(void)
                 {
                     // Data is comming a little too fast, so XOFF
                     // to give us time to process it.
-                    if (ProcessCommand(QString("XOFF"), result))
+                    if (!ProcessCommand(QString("XOFF"), result))
                     {
                         if (result.startsWith("ERR"))
                         {
@@ -1008,13 +1020,6 @@ bool ExternalStreamHandler::RestartStream(void)
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Restarting stream.");
 
-    if (!m_poll_mode && m_xon)
-    {
-        QString result;
-        ProcessCommand(QString("XOFF"), result);
-        m_xon = false;
-    }
-
     if (streaming)
         StopStreaming();
 
@@ -1061,8 +1066,8 @@ void ExternalStreamHandler::ReplayStream(void)
         // Let the external app know that we are ready
         if (!m_poll_mode)
         {
-            ProcessCommand(QString("XON"), result);
-            m_xon = true;
+            if (ProcessCommand(QString("XON"), result))
+                m_xon = true;
         }
     }
 }
@@ -1120,6 +1125,13 @@ bool ExternalStreamHandler::StopStreaming(void)
     QString result;
 
     QMutexLocker locker(&m_stream_lock);
+
+    if (!m_poll_mode && m_xon)
+    {
+        QString result;
+        ProcessCommand(QString("XOFF"), result);
+        m_xon = false;
+    }
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("StopStreaming %1 listeners")
@@ -1230,6 +1242,15 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
                     "Failed to read from External Recorder: " +
                     m_IO->ErrorString());
                     _error = true;
+                return false;
+            }
+
+            // Out-of-band error message
+            if (result.startsWith("STATUS:ERR") ||
+                result.startsWith("0:STATUS:ERR"))
+            {
+                LOG(VB_RECORD, LOG_ERR, LOC + result);
+                result.remove(0, result.indexOf(":ERR") + 1);
                 return false;
             }
             // STATUS message are "out of band".
@@ -1350,10 +1371,18 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
                 if (tokens[0].startsWith("ERR"))
                     break;
 
+                // Remove serial#
                 tokens.removeFirst();
                 result = tokens.join(':');
                 err = (tokens.size() > 1 && tokens[1].startsWith("ERR"));
                 LOG(VB_RECORD, (err ? LOG_WARNING : LOG_INFO), LOC + raw);
+                if (err)
+                {
+                    // Remove "STATUS"
+                    tokens.removeFirst();
+                    result = tokens.join(':');
+                    return false;
+                }
             }
         }
 

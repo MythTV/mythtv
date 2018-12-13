@@ -463,14 +463,24 @@ Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
     m_proc.setTextModeEnabled(false);
     m_proc.setReadChannel(QProcess::StandardOutput);
 
-    LOG(VB_RECORD, LOG_INFO, LOC + QString(": Starting process '%1'")
-        .arg(m_proc.program()));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString(": Starting process '%1' args: '%2'")
+        .arg(m_proc.program()).arg(m_proc.arguments().join(' ')));
 
     if (!m_proc.waitForStarted())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to start application.");
         emit SendMessage("StartStreaming", serial,
                          "ERR:Failed to start application.");
+        return;
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+    if (m_proc.state() != QProcess::Running)
+    {
+        LOG(VB_RECORD, LOG_ERR, LOC + ": Application failed to start");
+        emit SendMessage("StartStreaming", serial,
+                         "ERR:Application failed to start");
         return;
     }
 
@@ -523,10 +533,14 @@ Q_SLOT void MythExternRecApp::ProcFinished(int exitCode,
 {
     m_result = exitCode;
     QString msg = QString("%1Finished: %2 (exit code: %3)")
-                  .arg(exitStatus != QProcess::NormalExit ? "ERR " : "")
-                  .arg(exitStatus == QProcess::NormalExit ? "OK" : "Failed")
+                  .arg(exitStatus != QProcess::NormalExit ? "WARN:" : "")
+                  .arg(exitStatus == QProcess::NormalExit ? "OK" :
+                       "Abnormal exit")
                   .arg(m_result);
     LOG(VB_RECORD, LOG_INFO, LOC + ": " + msg);
+
+    if (m_streaming)
+        emit Streaming(false);
     MythLog(msg);
 }
 
@@ -550,7 +564,10 @@ Q_SLOT void MythExternRecApp::ProcStateChanged(QProcess::ProcessState newState)
 
     LOG(VB_RECORD, LOG_INFO, LOC + msg);
     if (unexpected)
+    {
+        emit Streaming(false);
         MythLog("ERR Unexpected " + msg);
+    }
 }
 
 Q_SLOT void MythExternRecApp::ProcError(QProcess::ProcessError /*error */)
