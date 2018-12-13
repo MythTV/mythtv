@@ -7,6 +7,7 @@ using namespace std;
 
 // MythTV headers
 #include <QObject>
+#include <mythmiscutil.h>
 
 // QT headers
 #include <QDomDocument>
@@ -101,7 +102,7 @@ class NewsSite : public QObject
     void parseRSS(QDomDocument domDoc);
     void parseAtom(QDomDocument domDoc);
     static inline bool sortByName(NewsSite *a, NewsSite *b)
-        { return a->m_sortName < b->m_sortName; }
+        { return naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 
     bool     successful(void) const;
     QString  errorMsg(void) const;

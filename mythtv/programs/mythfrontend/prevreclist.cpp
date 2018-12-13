@@ -32,6 +32,7 @@ using namespace std;
 //MythTV
 #include "mythcorecontext.h"
 #include "mythdb.h"
+#include "mythmiscutil.h"
 #include "xmlparsebase.h"
 #include "recordinginfo.h"
 #include "recordingrule.h"
@@ -182,7 +183,7 @@ static bool comp_sorttitle_lt(
 {
     QString a_st = a->GetSortTitle();
     QString b_st = b->GetSortTitle();
-    return a_st.compare(b_st,Qt::CaseInsensitive) < 0;
+    return naturalCompare(a_st,b_st) < 0;
 }
 
 static bool comp_sorttitle_lt_rev(
@@ -190,7 +191,7 @@ static bool comp_sorttitle_lt_rev(
 {
     QString a_st = a->GetSortTitle();
     QString b_st = b->GetSortTitle();
-    return b_st.compare(a_st,Qt::CaseInsensitive) < 0;
+    return naturalCompare(b_st, a_st) < 0;
 }
 
 static bool comp_sortdate_lt(

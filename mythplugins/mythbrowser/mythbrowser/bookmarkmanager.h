@@ -1,6 +1,9 @@
 #ifndef BOOKMARKMANAGER_H
 #define BOOKMARKMANAGER_H
 
+// libmythbase
+#include <mythmiscutil.h>
+
 // libmythui
 #include <mythscreentype.h>
 
@@ -28,7 +31,7 @@ class Bookmark
         return category == b.category && name == b.name && url == b.url;
     }
     static inline bool sortByName(Bookmark *a, Bookmark *b)
-        { return a->sortName < b->sortName; }
+        { return naturalCompare(a->sortName, b->sortName) < 0; }
 };
 
 class BrowserConfig : public MythScreenType

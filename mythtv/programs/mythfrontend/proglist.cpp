@@ -14,6 +14,7 @@ using namespace std;
 #include <QLocale>
 
 // MythTV
+#include "mythmiscutil.h"
 #include "scheduledrecording.h"
 #include "mythuibuttonlist.h"
 #include "mythuistatetype.h"
@@ -1057,9 +1058,9 @@ class plTitleSort : public plCompare
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
         if (a->GetSortTitle() != b->GetSortTitle())
-            return (a->GetSortTitle() < b->GetSortTitle());
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
         if (a->GetSortSubtitle() != b->GetSortSubtitle())
-            return (a->GetSortSubtitle() < b->GetSortSubtitle());
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
 
         if (a->GetRecordingStatus() == b->GetRecordingStatus())
             return a->GetScheduledStartTime() < b->GetScheduledStartTime();
@@ -1092,9 +1093,9 @@ class plPrevTitleSort : public plCompare
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
         if (a->GetSortTitle() != b->GetSortTitle())
-            return (a->GetSortTitle() < b->GetSortTitle());
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
         if (a->GetSortSubtitle() != b->GetSortSubtitle())
-            return (a->GetSortSubtitle() < b->GetSortSubtitle());
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
 
         if (a->GetProgramID() != b->GetProgramID())
             return a->GetProgramID() < b->GetProgramID();
