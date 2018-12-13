@@ -505,7 +505,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     QMap<int, ExternalStreamHandler*>::iterator it =
         m_handlers.find(majorid);
 
-    LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Return '%2' in use %3")
+    LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Return %2 in use %3")
         .arg(inputid).arg(majorid).arg(*rit));
 
     if (*rit > 1)
@@ -688,7 +688,7 @@ void ExternalStreamHandler::run(void)
                 }
             }
 
-            if ((sz = PACKET_SIZE - remainder) > 0)
+            if (m_IO && (sz = PACKET_SIZE - remainder) > 0)
                 read_len = m_IO->Read(buffer, sz, 100);
             else
                 read_len = 0;
@@ -726,11 +726,18 @@ void ExternalStreamHandler::run(void)
             restart_cnt = 0;
         }
 
+        if (m_IO == nullptr)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "I/O thread has disappeared!");
+            _error = true;
+            break;
+        }
         if (m_IO->Error())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to read from External Recorder: %1")
+                QString("Fatal Error from External Recorder: %1")
                 .arg(m_IO->ErrorString()));
+            CloseApp();
             _error = true;
             break;
         }
@@ -782,21 +789,7 @@ void ExternalStreamHandler::run(void)
         else if (len == remainder)
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
-                QString("Failed to process any of the data received."));
-        }
-
-        if (m_IO == nullptr)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "I/O thread has disappeared!");
-            _error = true;
-        }
-        else if (m_IO->Error())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Fatal Error from External Recorder: %1")
-                .arg(m_IO->ErrorString()));
-            CloseApp();
-            _error = true;
+                "Failed to process any of the data received.");
         }
     }
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): " +

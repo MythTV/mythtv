@@ -3863,7 +3863,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                     // has been marked as failed) until the scheduled
                     // end time.
                     signalMonitorDeadline =
-                        curRecording->GetRecordingEndTime();
+                        curRecording->GetRecordingEndTime().addSecs(-10);
 
                     LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                         QString("Pre-fail start deadline: %1 "

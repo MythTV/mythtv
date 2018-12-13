@@ -78,7 +78,7 @@ void ExternalSignalMonitor::Stop(void)
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Stop() -- begin");
 
     SignalMonitor::Stop();
-    if (release_stream && GetStreamData())
+    if (GetStreamData())
     {
         m_stream_handler->StopStreaming();
         m_stream_handler->RemoveListener(GetStreamData());
