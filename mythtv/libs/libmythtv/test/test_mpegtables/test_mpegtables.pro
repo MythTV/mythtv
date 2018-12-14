@@ -32,13 +32,6 @@ contains(QMAKE_CXX, "g++") {
   QMAKE_LFLAGS += -fprofile-arcs
 }
 
-contains(CONFIG_MYTHLOGSERVER, "yes") {
-  LIBS += -L../../../../external/zeromq/src/.libs -lmythzmq
-  LIBS += -L../../../../external/nzmqt/src -lmythnzmqt
-  QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/zeromq/src/.libs/
-  QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/nzmqt/src/
-}
-
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswresample
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswscale

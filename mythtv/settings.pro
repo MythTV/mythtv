@@ -121,11 +121,6 @@ win32 {
         INCLUDEPATH += ./
         INCLUDEPATH += $$SRC_PATH_BARE/external
 
-        contains( CONFIG_MYTHLOGSERVER, "yes" ) {
-            INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-            INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
-        }
-
         INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/include
         INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/pthreads.2
         INCLUDEPATH += $$SRC_PATH_BARE/../platform/win32/msvc/external/zlib
@@ -235,15 +230,6 @@ win32 {
         # Replace FFmpeg's OpenGL with OpenGLES
         EXTRA_LIBS -= -lGL
         EXTRA_LIBS += $$CONFIG_OPENGL_LIBS
-    }
-
-
-    contains( CONFIG_MYTHLOGSERVER, "yes" ) {
-        INCLUDEPATH += $$SRC_PATH_BARE/external/zeromq/include
-        INCLUDEPATH += $$SRC_PATH_BARE/external/nzmqt/include/nzmqt
-
-        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/zeromq/src/.libs -lmythzmq
-        EXTRA_LIBS += -L$$SRC_PATH_BARE/external/nzmqt/src -lmythnzmqt
     }
 
     # remove warn_{on|off} from CONFIG since we set it in our CFLAGS

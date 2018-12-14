@@ -2,9 +2,6 @@ include ../config.mak
 
 SUBDIRS = FFmpeg libmythdvdnav libudfread
 SUBDIRS += libmythsoundtouch
-ifeq ($(CONFIG_MYTHLOGSERVER),yes)
-    SUBDIRS += zeromq nzmqt
-endif
 
 ifneq ($(CONFIG_XNVCTRL_EXTERNAL),yes)
     SUBDIRS += libXNVCtrl
@@ -29,22 +26,6 @@ distclean:	${SUBDIRS_DISTCLEAN}
 
 FFmpeg-all FFmpeg-install FFmpeg-uninstall FFmpeg-clean FFmpeg-distclean:
 	${MAKE} -C FFmpeg ${@:FFmpeg-%=%} DESTDIR=${INSTALL_ROOT}
-
-zeromq-all:	zeromq/Makefile
-	${MAKE} -C zeromq all
-ifeq ($(CONFIG_DARWIN),yes)
-	install_name_tool -id "@rpath/$(LIBPREF)zmq.1$(SLIBSUF)" zeromq/src/.libs/$(LIBPREF)zmq.1$(SLIBSUF)
-endif
-
-zeromq-install zeromq-uninstall zeromq-clean zeromq-distclean:
-	${MAKE} -C zeromq ${@:zeromq-%=%} DESTDIR=${INSTALL_ROOT}
-
-nzmqt-all:	zeromq-all
-	(cd nzmqt/src ; ${QMAKE} -o Makefile)
-	${MAKE} -C nzmqt/src all
-
-nzmqt-install nzmqt-uninstall nzmqt-clean nzmqt-distclean:
-	${MAKE} -C nzmqt/src ${@:nzmqt-%=%}
 
 libmythbluray-all libmythbluray-clean libmythbluray-distclean libmythbluray-install libmythbluray-uninstall:
 	${MAKE} -C libmythbluray ${@:libmythbluray-%=%}
