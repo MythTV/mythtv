@@ -2423,9 +2423,6 @@ void MythCommandLineParser::addLogging(
         "Use systemd-journal instead of syslog.", "")
                 ->SetBlocks(QStringList()
                             << "syslog"
-#if CONFIG_MYTHLOGSERVER
-                            << "disablemythlogserver"
-#endif
                 )
                 ->SetGroup("Logging");
 #endif
@@ -2443,12 +2440,6 @@ void MythCommandLineParser::addLogging(
             "scripts to use --syslog to interface with your system's "
             "existing system logging daemon, or --logpath to specify a "
             "dirctory for MythTV to write its logs to.", "0.25");
-#if CONFIG_MYTHLOGSERVER
-    add("--disable-mythlogserver", "disablemythlogserver", false,
-                "Disable all logging but console.", "")
-                ->SetBlocks(QStringList() << "logpath" << "syslog" << "enabledblog")
-                ->SetGroup("Logging");
-#endif
 }
 
 /** \brief Canned argument definition for --pidfile

@@ -18,9 +18,7 @@
 #include "mthread.h"
 
 #undef NOLOGSERVER
-#if !CONFIG_MYTHLOGSERVER
 #define NOLOGSERVER
-#endif
 
 // ZMQ forward declarations
 namespace nzmqt {
