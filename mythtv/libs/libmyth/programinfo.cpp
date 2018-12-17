@@ -1397,18 +1397,14 @@ void ProgramInfo::ensureSortFields(void)
 void ProgramInfo::SetTitle(const QString &t, const QString &st)
 {
     title = t;
-    title.detach();
     sortTitle = st;
-    sortTitle.detach();
     ensureSortFields();
 }
 
 void ProgramInfo::SetSubtitle(const QString &st, const QString &sst)
 {
     subtitle = st;
-    subtitle.detach();
     sortSubtitle = sst;
-    sortSubtitle.detach();
     ensureSortFields();
 }
 
