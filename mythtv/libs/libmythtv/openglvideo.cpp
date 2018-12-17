@@ -1757,20 +1757,20 @@ SAMPLEYVU
 "}\n";
 
 #define KERNELYVU "\
-vec3 kernelYVU(in vec3 yvu)\n\
+vec3 kernelYVU(in vec3 yvu, GLSL_SAMPLER texture1, GLSL_SAMPLER texture2)\n\
 {\n\
     vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n\
     vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n\
     twodown.t = min(twodown.t, %HEIGHT% - %3);\n\
     vec2 onedown = v_texcoord0 + vec2(0.0, %3);\n\
     onedown.t = min(onedown.t, %HEIGHT% - %3);\n\
-    vec3 line0   = sampleYVU(s_texture0, twoup);\n\
-    vec3 line1   = sampleYVU(s_texture0, v_texcoord0 - vec2(0.0, %3));\n\
-    vec3 line3   = sampleYVU(s_texture0, onedown);\n\
-    vec3 line4   = sampleYVU(s_texture0, twodown);\n\
-    vec3 line00  = sampleYVU(s_texture1, twoup);\n\
-    vec3 line20  = sampleYVU(s_texture1, v_texcoord0);\n\
-    vec3 line40  = sampleYVU(s_texture1, twodown);\n\
+    vec3 line0   = sampleYVU(texture1, twoup);\n\
+    vec3 line1   = sampleYVU(texture1, v_texcoord0 - vec2(0.0, %3));\n\
+    vec3 line3   = sampleYVU(texture1, onedown);\n\
+    vec3 line4   = sampleYVU(texture1, twodown);\n\
+    vec3 line00  = sampleYVU(texture2, twoup);\n\
+    vec3 line20  = sampleYVU(texture2, v_texcoord0);\n\
+    vec3 line40  = sampleYVU(texture2, twodown);\n\
     yvu *=           0.125;\n\
     yvu += line20 *  0.125;\n\
     yvu += line1  *  0.5;\n\
@@ -1785,16 +1785,16 @@ vec3 kernelYVU(in vec3 yvu)\n\
 static const QString YV12RGBKernelShader[2] = {
 "//YV12RGBKernelShader 1\n"
 "GLSL_DEFINES"
-"uniform GLSL_SAMPLER s_texture0, s_texture1; // 4:1:1 YVU planar\n"
+"uniform GLSL_SAMPLER s_texture1, s_texture2; // 4:1:1 YVU planar\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
 "varying vec2 v_texcoord0;\n"
 SAMPLEYVU
 KERNELYVU
 "void main(void)\n"
 "{\n"
-"    vec3 yvu = sampleYVU(s_texture0, v_texcoord0);\n"
+"    vec3 yvu = sampleYVU(s_texture1, v_texcoord0);\n"
 "    if (fract(v_texcoord0.t * %2) >= 0.5)\n"
-"        yvu = kernelYVU(yvu);\n"
+"        yvu = kernelYVU(yvu, s_texture1, s_texture2);\n"
 "    gl_FragColor = vec4(yvu, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
@@ -1807,9 +1807,9 @@ SAMPLEYVU
 KERNELYVU
 "void main(void)\n"
 "{\n"
-"    vec3 yvu = sampleYVU(s_texture0, v_texcoord0);\n"
+"    vec3 yvu = sampleYVU(s_texture1, v_texcoord0);\n"
 "    if (fract(v_texcoord0.t * %2) < 0.5)\n"
-"        yvu = kernelYVU(yvu);\n"
+"        yvu = kernelYVU(yvu, s_texture1, s_texture0);\n"
 "    gl_FragColor = vec4(yvu, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
