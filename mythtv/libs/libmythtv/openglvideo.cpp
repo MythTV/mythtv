@@ -1736,8 +1736,8 @@ static const QString YV12RGBOneFieldVertexShader[2] = {
 "}\n"
 };
 
-static const QString YV12RGBLinearBlendFragmentShader =
-"//YV12RGBLinearBlendFragmentShader\n"
+static const QString YV12RGBLinearBlendFragmentShader[2] = {
+"// YV12RGBLinearBlendFragmentShader - Top\n"
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
 "uniform mat4 COLOUR_UNIFORM;\n"
@@ -1745,16 +1745,33 @@ static const QString YV12RGBLinearBlendFragmentShader =
 SAMPLEYVU
 "void main(void)\n"
 "{\n"
-"    vec2 texcoord;\n"
-"    texcoord = v_texcoord0 - vec2(0.0, %3);\n"
-"    vec3 yvu1 = sampleYVU(s_texture0, texcoord);\n"
-"    vec3 yvu2 = sampleYVU(s_texture0, v_texcoord0);\n"
-"    texcoord = v_texcoord0 + vec2(0.0, %3);\n"
-"    texcoord.t = min(texcoord.t, %HEIGHT% - %3);\n"
-"    vec3 yvu3 = sampleYVU(s_texture0, texcoord);\n"
-"    vec3 yvu = (yvu1 + 2.0 * yvu2 + yvu3) / 4.0;\n"
-"    gl_FragColor = vec4(yvu, 1.0) * COLOUR_UNIFORM;\n"
-"}\n";
+"    vec3 current = sampleYVU(s_texture0, v_texcoord0);\n"
+"    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
+"    {\n"
+"        vec3 above = sampleYVU(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %HEIGHT% - %3)));\n"
+"        vec3 below = sampleYVU(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, 0.0)));\n"
+"        current = mix(above, below, 0.5);\n"
+"    }\n"
+"    gl_FragColor = vec4(current, 1.0) * COLOUR_UNIFORM;\n"
+"}\n",
+
+"// YV12RGBLinearBlendFragmentShader - Bottom\n"
+"GLSL_DEFINES"
+"uniform GLSL_SAMPLER s_texture0; // 4:1:1 YVU planar\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
+"varying vec2 v_texcoord0;\n"
+SAMPLEYVU
+"void main(void)\n"
+"{\n"
+"    vec3 current = sampleYVU(s_texture0, v_texcoord0);\n"
+"    if (fract(v_texcoord0.y * %2) < 0.5)\n"
+"    {\n"
+"        vec3 above = sampleYVU(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %HEIGHT% - %3)));\n"
+"        vec3 below = sampleYVU(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, 0.0)));\n"
+"        current = mix(above, below, 0.5);\n"
+"    }\n"
+"    gl_FragColor = vec4(current, 1.0) * COLOUR_UNIFORM;\n"
+"}\n"};
 
 #define KERNELYVU "\
 vec3 kernelYVU(in vec3 yvu, GLSL_SAMPLER texture1, GLSL_SAMPLER texture2)\n\
@@ -1849,7 +1866,7 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                      deint == "opengldoubleratelinearblend")
             {
                 vertex = YV12RGBVertexShader;
-                fragment = YV12RGBLinearBlendFragmentShader;
+                fragment = YV12RGBLinearBlendFragmentShader[bottom];
             }
             else if (deint == "openglkerneldeint" ||
                      deint == "opengldoubleratekerneldeint")
