@@ -206,7 +206,7 @@ int ExternalSignalMonitor::GetLockTimeout(void)
 {
     QString result;
 
-    m_stream_handler->ProcessCommand("LockTimeout?", result);
+    m_stream_handler->ProcessCommand("LockTimeout?", result, 10000);
     if (result.startsWith("OK:"))
     {
         bool ok;
