@@ -63,7 +63,6 @@ typedef enum
     kGLMaxFeat     = 0x2000,
 } GLFeatures;
 
-#define MYTHTV_UYVY 0x8A1F
 #define TEX_OFFSET 8
 
 class MythGLTexture

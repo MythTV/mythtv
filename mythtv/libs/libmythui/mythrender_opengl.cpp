@@ -1552,8 +1552,7 @@ uint MythRenderOpenGL::GetBufferSize(QSize size, uint fmt, uint type)
     {
         bpp = 3;
     }
-    else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE ||
-             fmt == MYTHTV_UYVY)
+    else if (fmt == GL_YCBCR_MESA || fmt == GL_YCBCR_422_APPLE)
     {
         bpp = 2;
     }

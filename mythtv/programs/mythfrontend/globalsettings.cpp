@@ -138,20 +138,6 @@ static HostCheckBoxSetting *OpenGLYV12()
     return gc;
 }
 
-static HostCheckBoxSetting *OpenGLUYVY()
-{
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLUYVY");
-
-    gc->setLabel(PlaybackSettings::tr("Allow UYVY (YUV 4:2:2) pixel format for OpenGL"));
-
-    gc->setHelpText(PlaybackSettings::tr("Disabling one or more pixel formats may help with picture "
-                                         "problems when using "
-                                         "OpenGL video rendering. By default UYVY is enabled. "));
-    gc->setValue(true);
-
-    return gc;
-}
-
 static HostCheckBoxSetting *OpenGLExtraStage()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLExtraStage");
@@ -4270,7 +4256,6 @@ void PlaybackSettings::Load(void)
     advanced->addChild(avsync2);
     avsync2->addTargetedChild("1",AVSync2AdjustMS());
     advanced->addChild(OpenGLYV12());
-    advanced->addChild(OpenGLUYVY());
     advanced->addChild(OpenGLExtraStage());
     addChild(advanced);
 
