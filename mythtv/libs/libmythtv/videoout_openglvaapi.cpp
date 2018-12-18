@@ -222,12 +222,11 @@ bool VideoOutputOpenGLVAAPI::SetDeinterlacingEnabled(bool enable)
     return m_deinterlacing;
 }
 
-bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool interlaced,
-                                              const QString& /*overridefilter*/)
+bool VideoOutputOpenGLVAAPI::SetupDeinterlace(bool interlaced, const QString& overridefilter)
 {
-    //m_deintfiltername = !db_vdisp_profile ? "" :
-    //                     db_vdisp_profile->GetFilteredDeint(ovrf);
-    m_deinterlacing = interlaced;
+    if (db_vdisp_profile)
+        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+    m_deinterlacing = m_deintfiltername.contains("vaapi") ? interlaced : false;
     return m_deinterlacing;
 }
 
@@ -274,23 +273,21 @@ void VideoOutputOpenGLVAAPI::UpdatePauseFrame(int64_t &disp_timecode)
     vbuffers.end_lock();
 }
 
-void VideoOutputOpenGLVAAPI::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                          FilterChain *filterList,
-                                          const PIPMap &pipPlayers,
-                                          FrameScanType scan)
+void VideoOutputOpenGLVAAPI::PrepareFrame(VideoFrame *frame, FrameScanType scan, OSD *osd)
 {
-    QMutexLocker locker(&gl_context_lock);
-    VideoOutputOpenGL::ProcessFrame(frame, osd, filterList, pipPlayers, scan);
-
-    if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
     {
-        gl_context->makeCurrent();
-        m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer,
-                                    gl_videochain->GetInputTexture(),
-                                    gl_videochain->GetTextureType(), scan);
-        gl_videochain->SetInputUpdated();
-        gl_context->doneCurrent();
+        QMutexLocker locker(&gl_context_lock);
+        if (codec_is_vaapi(video_codec_id) && m_ctx && gl_videochain)
+        {
+            gl_context->makeCurrent();
+            m_ctx->CopySurfaceToTexture(frame ? frame->buf : m_pauseBuffer,
+                                        gl_videochain->GetInputTexture(),
+                                        gl_videochain->GetTextureType(), scan);
+            gl_videochain->SetInputUpdated();
+            gl_context->doneCurrent();
+        }
     }
+    VideoOutputOpenGL::PrepareFrame(frame, scan, osd);
 }
 
 QStringList VideoOutputOpenGLVAAPI::GetAllowedRenderers(

@@ -30,10 +30,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
                        MythCodecID  av_codec_id, void *codec_private,
                        bool &aspect_only) override; // VideoOutputOpenGL
     void  UpdatePauseFrame(int64_t &disp_timecode) override; // VideoOutputOpenGL
-    void  ProcessFrame(VideoFrame *frame, OSD *osd,
-                       FilterChain *filterList,
-                       const PIPMap &pipPlayers,
-                       FrameScanType scan) override; // VideoOutputOpenGL
+    void  PrepareFrame(VideoFrame *frame, FrameScanType scan, OSD *osd) override; // VideoOutputOpenGL
     bool  ApproveDeintFilter(const QString& filtername) const override; // VideoOutputOpenGL
     bool  SetDeinterlacingEnabled(bool enable) override; // VideoOutputOpenGL
     bool  SetupDeinterlace(bool interlaced, const QString& overridefilter="") override; // VideoOutputOpenGL

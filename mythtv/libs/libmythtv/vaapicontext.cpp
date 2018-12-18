@@ -870,9 +870,9 @@ bool VAAPIContext::CopySurfaceToTexture(const void* buf, uint texture,
 
     int field = VA_FRAME_PICTURE;
     if (scan == kScan_Interlaced)
-        field = VA_TOP_FIELD;
-    else if (scan == kScan_Intr2ndField)
         field = VA_BOTTOM_FIELD;
+    else if (scan == kScan_Intr2ndField)
+        field = VA_TOP_FIELD;
 
     m_display->m_x_disp->Lock();
     INIT_ST;
