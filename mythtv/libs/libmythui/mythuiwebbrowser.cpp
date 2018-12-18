@@ -2,9 +2,6 @@
  * \file mythuiwebbrowser.cpp
  * \author Paul Harrison <pharrison@mythtv.org>
  * \brief Provide a web browser widget.
- *
- * This requires qt4.6.0 or later to function properly.
- *
  */
 
 #include "mythuiwebbrowser.h"
@@ -790,8 +787,6 @@ QWebView *MythWebView::createWindow(QWebPage::WebWindowType /* type */)
 /**
  * \class MythUIWebBrowser
  * \brief Provide a web browser widget.
- *
- * Uses QtWebKit and so requires Qt4.4.0 or later.
  *
  * This widget can display HTML documents from the net, a file or passed to it
  * as a QString.

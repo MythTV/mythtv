@@ -66,7 +66,6 @@ INSTALLS +=  scriptfiles introfiles themefiles imagefiles musicfiles
 INSTALLS +=  profilefiles burnuifiles
 INSTALLS +=  nativeuifiles
 
-#The following line was inserted by qt3to4
 QT += xml sql opengl network
 
 DEFINES += MPLUGIN_API

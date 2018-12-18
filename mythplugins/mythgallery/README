@@ -40,8 +40,8 @@ main distribution directory.
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
-                 variable set.  On Debian, this should be set to /usr/share/qt3.
-                 On Mandrake, it's /usr/lib/qt3.  You'll need to figure
+                 variable set.  On Debian, this should be set to /usr/share/qt5.
+                 On Mandrake, it's /usr/lib/qt5.  You'll need to figure
                  out what it should be on your system, set the variable,
                  and attempt to compile again.
 
