@@ -1,3 +1,5 @@
+#include <QtCore/qglobal.h> // for QT_VERSION for QStringToTString
+
 #include <cmath>
 
 #include <apetag.h>
