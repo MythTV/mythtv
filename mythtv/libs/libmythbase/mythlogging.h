@@ -78,8 +78,7 @@ extern MBASE_PUBLIC QString     verboseString;
 
 MBASE_PUBLIC void logStart(QString logfile, int progress = 0, int quiet = 0,
                            int facility = 0, LogLevel_t level = LOG_INFO,
-                           bool dblog = true, bool propagate = false,
-                           bool noserver = false);
+                           bool dblog = true, bool propagate = false);
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void logPropagateCalc(void);
 MBASE_PUBLIC bool logPropagateQuiet(void);
