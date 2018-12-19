@@ -44,7 +44,7 @@ static int init_tr(void);
 int pginfo_init_statics() { return ProgramInfo::InitStatics(); }
 QMutex ProgramInfo::staticDataLock;
 ProgramInfoUpdater *ProgramInfo::updater;
-int dummy = pginfo_init_statics();
+int force_init = pginfo_init_statics();
 bool ProgramInfo::usingProgIDAuth = true;
 
 const static uint kInvalidDateTime = (uint)-1;

@@ -220,40 +220,40 @@ bool NetStream::Request(const QUrl& url)
         QString fname = gCoreContext->GetSetting("MhegClientCert", "");
         if (!fname.isEmpty())
         {
-            QFile f(QFile::exists(fname) ? fname : GetShareDir() + fname);
-            if (f.open(QIODevice::ReadOnly))
+            QFile f1(QFile::exists(fname) ? fname : GetShareDir() + fname);
+            if (f1.open(QIODevice::ReadOnly))
             {
-                QSslCertificate cert(&f, QSsl::Pem);
+                QSslCertificate cert(&f1, QSsl::Pem);
                 if (!cert.isNull())
                     ssl.setLocalCertificate(cert);
                 else
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
-                        QString("'%1' is an invalid certificate").arg(f.fileName()) );
+                        QString("'%1' is an invalid certificate").arg(f1.fileName()) );
             }
             else
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Opening client certificate '%1': %2")
-                    .arg(f.fileName()).arg(f.errorString()) );
+                    .arg(f1.fileName()).arg(f1.errorString()) );
 
             // Get the private key
             fname = gCoreContext->GetSetting("MhegClientKey", "");
             if (!fname.isEmpty())
             {
-                QFile f(QFile::exists(fname) ? fname : GetShareDir() + fname);
-                if (f.open(QIODevice::ReadOnly))
+                QFile f2(QFile::exists(fname) ? fname : GetShareDir() + fname);
+                if (f2.open(QIODevice::ReadOnly))
                 {
-                    QSslKey key(&f, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey,
+                    QSslKey key(&f2, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey,
                         gCoreContext->GetSetting("MhegClientKeyPass", "").toLatin1());
                     if (!key.isNull())
                         ssl.setPrivateKey(key);
                     else
                         LOG(VB_GENERAL, LOG_WARNING, LOC +
-                            QString("'%1' is an invalid key").arg(f.fileName()) );
+                            QString("'%1' is an invalid key").arg(f2.fileName()) );
                 }
                 else
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Opening private key '%1': %2")
-                        .arg(f.fileName()).arg(f.errorString()) );
+                        .arg(f2.fileName()).arg(f2.errorString()) );
             }
         }
 

@@ -81,8 +81,7 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     bool msg_error = true;
 
     // Attempt to find the requested startchannel
-    ChannelInfoList::const_iterator cit = m_channels.begin();
-    for (; cit != m_channels.end(); ++cit)
+    for (auto cit = m_channels.begin(); cit != m_channels.end(); ++cit)
     {
         if ((*cit).channum == startchannel &&
             IsTunable(startchannel))

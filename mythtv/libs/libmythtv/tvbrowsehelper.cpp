@@ -122,7 +122,7 @@ void TVBrowseHelper::BrowseEnd(PlayerContext *ctx, bool change_channel)
         return;
 
     {
-        QMutexLocker locker(&m_tv->timerIdLock);
+        QMutexLocker locker2(&m_tv->timerIdLock);
         if (m_tv->browseTimerId)
         {
             m_tv->KillTimer(m_tv->browseTimerId);

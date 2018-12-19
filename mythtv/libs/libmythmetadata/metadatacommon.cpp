@@ -1480,11 +1480,11 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
         tmp.removeFirst();
     if (tmp.size() != 5)
         return QDateTime();
-    QString timezone = tmp.takeAt(tmp.size() -1);
-    if (timezone.size() == 5)
+    QString ltimezone = tmp.takeAt(tmp.size() -1);
+    if (ltimezone.size() == 5)
     {
         bool ok;
-        int tz = timezone.toInt(&ok);
+        int tz = ltimezone.toInt(&ok);
         if(ok)
         {
             hoursShift = tz / 100;
@@ -1492,7 +1492,7 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
         }
     }
     else
-        hoursShift = TimezoneOffsets.value(timezone, 0);
+        hoursShift = TimezoneOffsets.value(ltimezone, 0);
 
     if (tmp.at(0).size() == 1)
         tmp[0].prepend("0");

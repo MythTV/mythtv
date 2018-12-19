@@ -1904,7 +1904,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
     const uint_vec_t &pnums = _encryption_pid_to_pnums[pid];
     for (uint i = 0; i < pnums.size(); i++)
     {
-        CryptStatus status = _encryption_pnum_to_status[pnums[i]];
+        status = _encryption_pnum_to_status[pnums[i]];
 
         const uint_vec_t &pids = _encryption_pnum_to_pids[pnums[i]];
         if (!pids.empty())

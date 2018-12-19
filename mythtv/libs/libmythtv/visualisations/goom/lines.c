@@ -227,14 +227,13 @@ goom_lines_draw (GMLine * line, gint16 data[512], unsigned int *p)
 		y1 = (int) (pt->y + sina * line->amplitude * data[0]);
 
 		for (i = 1; i < 512; i++) {
-			int     x2, y2;
-			GMUnitPointer *pt = &(line->points[i]);
+			pt = &(line->points[i]);
 
-			float   cosa = cosf (pt->angle) / 1000.0f;
-			float   sina = sinf (pt->angle) / 1000.0f;
+			cosa = cosf (pt->angle) / 1000.0f;
+			sina = sinf (pt->angle) / 1000.0f;
 
-			x2 = (int) (pt->x + cosa * line->amplitude * data[i]);
-			y2 = (int) (pt->y + sina * line->amplitude * data[i]);
+			int x2 = (int) (pt->x + cosa * line->amplitude * data[i]);
+			int y2 = (int) (pt->y + sina * line->amplitude * data[i]);
 
 			draw_line ((int *)p, x1, y1, x2, y2, color, line->screenX, line->screenY);
 			DRAWMETHOD_DONE ();

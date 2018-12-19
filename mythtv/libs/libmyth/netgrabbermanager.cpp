@@ -340,12 +340,12 @@ void Search::process()
     }
     else
     {
-        QDomNodeList entries = m_document.elementsByTagName("item");
+        QDomNodeList items = m_document.elementsByTagName("item");
 
-        if (entries.count() == 0)
+        if (items.count() == 0)
             m_numReturned = 0;
         else
-            m_numReturned = entries.count();
+            m_numReturned = items.count();
     }
 
     Node = itemNode.namedItem(QString("startindex"));

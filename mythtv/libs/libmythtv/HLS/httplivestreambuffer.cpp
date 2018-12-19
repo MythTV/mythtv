@@ -2302,9 +2302,9 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 err = ParseDiscontinuity(hls, line);
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
-                int version;
-                err = ParseVersion(line, version);
-                hls->SetVersion(version);
+                int version2;
+                err = ParseVersion(line, version2);
+                hls->SetVersion(version2);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-ENDLIST")))
                 err = ParseEndList(hls);

@@ -187,14 +187,14 @@ desc_list_t MPEGDescriptor::FindBestMatches(
     if (match_pri == UINT_MAX)
         return tmp;
 
-    for (uint i = 0; i < parsed.size(); i++)
+    for (uint j = 0; j < parsed.size(); j++)
     {
         if ((DescriptorID::extended_event == desc_tag) &&
-            (DescriptorID::extended_event == parsed[i][0]))
+            (DescriptorID::extended_event == parsed[j][0]))
         {
-            ExtendedEventDescriptor eed(parsed[i]);
+            ExtendedEventDescriptor eed(parsed[j]);
             if (eed.LanguageKey() == match_key)
-                tmp.push_back(parsed[i]);
+                tmp.push_back(parsed[j]);
         }
     }
 

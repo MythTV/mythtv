@@ -284,7 +284,6 @@ static int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
     // filter the leftovers from the mmx rutine
     for (i = 0; i < 3; i++)
     {
-        int thr1[3], thr2[3], height[3];
         uint8_t *avg8[3], *buf8[3];
         int end, beg;
 

@@ -199,10 +199,10 @@ void IPTVStreamHandler::run(void)
             }
             else
             {
-                for (int i=0; i < list.size(); i++)
+                for (int j=0; j < list.size(); j++)
                 {
-                    dest_addr = list[i];
-                    if (list[i].protocol() == QAbstractSocket::IPv6Protocol)
+                    dest_addr = list[j];
+                    if (list[j].protocol() == QAbstractSocket::IPv6Protocol)
                     {
                         // We prefer first IPv4
                         break;

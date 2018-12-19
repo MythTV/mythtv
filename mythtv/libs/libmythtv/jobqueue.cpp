@@ -2025,7 +2025,6 @@ void JobQueue::DoTranscodeThread(int jobID)
         }
     }
 
-    QString msg;
     bool retry = true;
     int retrylimit = 3;
     while (retry)

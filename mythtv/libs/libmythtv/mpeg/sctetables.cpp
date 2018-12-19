@@ -448,9 +448,9 @@ QString VirtualChannelMapSubtable::toStringXML(uint indent_level) const
 
         vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
-        for (uint i = 0; i < desc.size(); i++)
+        for (uint j = 0; j < desc.size(); j++)
         {
-            str += MPEGDescriptor(desc[i], 300)
+            str += MPEGDescriptor(desc[j], 300)
                 .toStringXML(indent_level + 2) + "\n";
         }
         str += indent_1 + "</Channel>";

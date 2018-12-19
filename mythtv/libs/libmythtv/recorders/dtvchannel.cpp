@@ -261,8 +261,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         if (IsIPTV())
         {
-            int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
-            IPTVTuningData tuning = ChannelUtil::GetIPTVTuningData(chanid);
+            int chanid2 = ChannelUtil::GetChanID(m_sourceid, channum);
+            IPTVTuningData tuning = ChannelUtil::GetIPTVTuningData(chanid2);
             if (!Tune(tuning, false))
             {
                 LOG(VB_GENERAL, LOG_ERR, loc + "Tuning to IPTV URL");
@@ -329,8 +329,8 @@ bool DTVChannel::SetChannelByString(const QString &channum)
     {
         // We need to pull the pid_cache since there are no tuning tables
         pid_cache_t pid_cache;
-        int chanid = ChannelUtil::GetChanID(m_sourceid, channum);
-        ChannelUtil::GetCachedPids(chanid, pid_cache);
+        int chanid3 = ChannelUtil::GetChanID(m_sourceid, channum);
+        ChannelUtil::GetCachedPids(chanid3, pid_cache);
         if (pid_cache.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, loc + "PID cache is empty");

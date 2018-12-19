@@ -32,7 +32,7 @@ extern "C" {
 enum lirc_flags {none=0x00,
 		 once=0x01,
 		 quit=0x02,
-		 mode=0x04,
+		 modex=0x04,
 		 ecno=0x08,
 		 startup_mode=0x10,
 		 toggle_reset=0x20,

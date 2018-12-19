@@ -1047,7 +1047,6 @@ void NuppelDecoder::ClearStoredData()
 bool NuppelDecoder::GetFrame(DecodeType decodetype)
 {
     bool gotvideo = false;
-    bool ret = false;
     int seeklen = 0;
     AVPacket pkt;
 
@@ -1191,7 +1190,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             if (!buf)
                 continue;
 
-            ret = DecodeFrame(&frameheader, strm, buf);
+            bool ret = DecodeFrame(&frameheader, strm, buf);
             if (!ret)
             {
                 GetPlayer()->DiscardVideoFrame(buf);

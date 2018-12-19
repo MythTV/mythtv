@@ -651,10 +651,10 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
                     "FROM %1 WHERE filename LIKE :PREFIX "
                     "ORDER BY depth;").arg(m_table);
 
-    foreach (const ImagePtr &im, dirs)
+    foreach (const ImagePtr &im1, dirs)
     {
         query.prepare(sql);
-        query.bindValue(":PREFIX", im->m_filePath + "/%");
+        query.bindValue(":PREFIX", im1->m_filePath + "/%");
 
         if (!query.exec())
         {
@@ -664,11 +664,11 @@ bool ImageDb<FS>::GetDescendants(const QString &ids,
 
         while (query.next())
         {
-            ImagePtr im(CreateImage(query));
-            if (im->IsDirectory())
-                dirs.append(im);
+            ImagePtr im2(CreateImage(query));
+            if (im2->IsDirectory())
+                dirs.append(im2);
             else
-                files.append(im);
+                files.append(im2);
         }
     }
     return true;

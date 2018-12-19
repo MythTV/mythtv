@@ -70,13 +70,13 @@ void StreamHandler::AddListener(MPEGStreamData *data,
 
     if (_stream_data_list.empty())
     {
-        QMutexLocker locker(&_start_stop_lock);
+        QMutexLocker locker2(&_start_stop_lock);
         _allow_section_reader = allow_section_reader;
         _needs_buffering      = needs_buffering;
     }
     else
     {
-        QMutexLocker locker(&_start_stop_lock);
+        QMutexLocker locker2(&_start_stop_lock);
         _allow_section_reader &= allow_section_reader;
         _needs_buffering      |= needs_buffering;
     }
@@ -272,19 +272,19 @@ void StreamHandler::UpdateListeningForEIT(void)
 
     QMutexLocker read_locker(&_listener_lock);
 
-    StreamDataList::const_iterator it = _stream_data_list.begin();
-    for (; it != _stream_data_list.end(); ++it)
+    StreamDataList::const_iterator it1 = _stream_data_list.begin();
+    for (; it1 != _stream_data_list.end(); ++it1)
     {
-        MPEGStreamData *sd = it.key();
+        MPEGStreamData *sd = it1.key();
         if (sd->HasEITPIDChanges(_eit_pids) &&
             sd->GetEITPIDChanges(_eit_pids, add_eit, del_eit))
         {
             for (uint i = 0; i < del_eit.size(); i++)
             {
-                uint_vec_t::iterator it;
-                it = find(_eit_pids.begin(), _eit_pids.end(), del_eit[i]);
-                if (it != _eit_pids.end())
-                    _eit_pids.erase(it);
+                uint_vec_t::iterator it2;
+                it2 = find(_eit_pids.begin(), _eit_pids.end(), del_eit[i]);
+                if (it2 != _eit_pids.end())
+                    _eit_pids.erase(it2);
                 sd->RemoveListeningPID(del_eit[i]);
             }
 

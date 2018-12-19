@@ -200,10 +200,10 @@ void MythUIEditBar::Display(void)
         position->MoveToTop();
 }
 
-void MythUIEditBar::AddBar(MythUIShape *shape, MythUIImage *image,
+void MythUIEditBar::AddBar(MythUIShape *_shape, MythUIImage *_image,
                            const QRect &area)
 {
-    MythUIType *add = GetNew(shape, image);
+    MythUIType *add = GetNew(_shape, _image);
 
     if (add)
     {

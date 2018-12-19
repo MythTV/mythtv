@@ -989,11 +989,11 @@ bool BDRingBuffer::UpdateTitleInfo(void)
     {
         for (uint i = 0; i < chapter_count; i++)
         {
-            uint64_t total_secs = GetChapterStartTime(i);
             uint64_t framenum   = GetChapterStartFrame(i);
-            int hours = (int)total_secs / 60 / 60;
-            int minutes = ((int)total_secs / 60) - (hours * 60);
-            double secs = (double)total_secs -
+            total_secs = GetChapterStartTime(i);
+            hours = (int)total_secs / 60 / 60;
+            minutes = ((int)total_secs / 60) - (hours * 60);
+            secs = (double)total_secs -
                           (double)(hours * 60 * 60 + minutes * 60);
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Chapter %1 found @ [%2:%3:%4]->%5")

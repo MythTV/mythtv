@@ -54,8 +54,6 @@ void SimpleDBStorage::Save(QString _table)
     {
         // Row already exists
         // Don"t change this QString. See the CVS logs rev 1.91.
-        MSqlBindings bindings;
-
         querystr = "UPDATE " + _table + " SET " + GetSetClause(bindings) +
                    " WHERE " + GetWhereClause(bindings) + ';';
 
@@ -68,8 +66,6 @@ void SimpleDBStorage::Save(QString _table)
     else
     {
         // Row does not exist yet
-        MSqlBindings bindings;
-
         querystr = "INSERT INTO " + _table + " SET "
                    + GetSetClause(bindings) + ';';
 

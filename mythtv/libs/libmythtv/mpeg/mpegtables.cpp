@@ -892,12 +892,11 @@ QString ProgramMapTable::toString(void) const
                    .arg(i).arg(StreamPID(i), 0, 16)
                    .arg(StreamType(i), 2, 16, QChar('0'))
                    .arg(StreamTypeString(i)));
-        vector<const unsigned char*> desc =
-            MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
-        for (uint i = 0; i < desc.size(); i++)
+        desc = MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
+        for (uint j = 0; j < desc.size(); j++)
         {
             str.append(QString("    %1\n")
-                       .arg(MPEGDescriptor(desc[i], 300).toString()));
+                       .arg(MPEGDescriptor(desc[j], 300).toString()));
         }
     }
     return str;
@@ -939,9 +938,9 @@ QString ProgramMapTable::toStringXML(uint indent_level) const
         vector<const unsigned char*> ldesc =
             MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
         str += (ldesc.empty()) ? " />\n" : ">\n";
-        for (uint i = 0; i < ldesc.size(); i++)
+        for (uint j = 0; j < ldesc.size(); j++)
         {
-            str += MPEGDescriptor(ldesc[i], 300)
+            str += MPEGDescriptor(ldesc[j], 300)
                 .toStringXML(indent_level + 2) + "\n";
         }
         if (!ldesc.empty())

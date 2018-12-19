@@ -1122,8 +1122,6 @@ bool ExternalStreamHandler::StartStreaming(void)
 
 bool ExternalStreamHandler::StopStreaming(void)
 {
-    QString result;
-
     QMutexLocker locker(&m_stream_lock);
 
     if (!m_poll_mode && m_xon)
@@ -1160,6 +1158,7 @@ bool ExternalStreamHandler::StopStreaming(void)
         return false;
     }
 
+    QString result;
     if (!ProcessCommand("StopStreaming", result, 6000))
     {
         LogLevel_t level = LOG_ERR;

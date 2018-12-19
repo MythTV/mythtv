@@ -285,16 +285,15 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 
 	if ((!abiggoom) && (speedvar > 4) && (goomlimit > 4) &&
 			((accelvar > goomlimit*9/8+7)||(accelvar < -goomlimit*9/8-7))) {
-		int size,i;
 		static int couleur =
 			 (0xc0<<(ROUGE*8))
 			|(0xc0<<(VERT*8))
 			|(0xf0<<(BLEU*8))
 			|(0xf0<<(ALPHA*8));
 		abiggoom = 100;
-		size = resolx*c_resoly;
-		for (i=0;i<size;i++)
-			(p1+c_offset)[i] = (~(p1+c_offset)[i]) | couleur;
+		int size = resolx*c_resoly;
+		for (int j=0;j<size;j++)
+			(p1+c_offset)[j] = (~(p1+c_offset)[j]) | couleur;
 	}
 
 	// on verifie qu'il ne se pas un truc interressant avec le son.
@@ -395,7 +394,7 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 		// reperage de goom (acceleration forte de l'acceleration du volume)
 		// -> coup de boost de la vitesse si besoin..
 		if ((accelvar > goomlimit) || (accelvar < -goomlimit)) {
-			static int rndn = 0 ,i;
+			static int rndn = 0;
 			static int blocker = 0;
 			goomvar++;
 
@@ -406,10 +405,10 @@ guint32 * goom_update (gint16 data[2][512], int forceMode) {
 			}
 			else if (blocker) blocker--;
 
-			for (i=0;i<STATES_NB;i++)
-				if ((rndn >= states[i].rangemin)
-						&& (rndn <= states[i].rangemax))
-					curGState = states+i;
+			for (int j=0;j<STATES_NB;j++)
+				if ((rndn >= states[j].rangemin)
+						&& (rndn <= states[j].rangemax))
+					curGState = states+j;
 
 			if ((curGState->drawIFS) && (ifs_incr<=0)) {
 				recay_ifs = 5;

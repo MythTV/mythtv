@@ -734,7 +734,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     if (current_choice == "X" && !pre_cycle_text_before_cursor.isEmpty())
     {
         //  If current selection is delete, select the character to be deleted
-        QTextCursor tmp = textCursor();
+        tmp = textCursor();
         tmp.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
         tmp.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor,
                          pre_cycle_pos - 1);
@@ -744,7 +744,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     else
     {
         // Restore original cursor location
-        QTextCursor tmp = textCursor();
+        tmp = textCursor();
         tmp.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
         tmp.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor,
                          pre_cycle_pos);

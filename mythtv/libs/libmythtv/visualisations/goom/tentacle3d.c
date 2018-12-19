@@ -96,7 +96,7 @@ int evolutecolor (unsigned int src,unsigned int dest, unsigned int mask, unsigne
 	return (src&mask)|color;
 }
 
-static void pretty_move (float cycle, float *dist,float *dist2, float *rotangle) {
+static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle) {
 	static float distt = 10.0f;
 	static float distt2 = 0.0f;
 	static float rot = 0.0f; // entre 0 et 2 * M_PI
@@ -117,22 +117,22 @@ static void pretty_move (float cycle, float *dist,float *dist2, float *rotangle)
 	tmp = happens?8.0f:0;
 	*dist2 = distt2 = (tmp + 15.0f*distt2)/16.0f;
 
-	tmp = 30+D-90.0f*(1.0f+sinf(cycle*19/20));
+	tmp = 30+D-90.0f*(1.0f+sinf(lcycle*19/20));
 	if (happens)
 		tmp *= 0.6f;
 
 	*dist = distt = (tmp + 3.0f*distt)/4.0f;
 
 	if (!happens){
-		tmp = M_PI_F*sinf(cycle)/32+3*M_PI_F/2;
+		tmp = M_PI_F*sinf(lcycle)/32+3*M_PI_F/2;
 	}
 	else {
 		rotation = iRAND(500)?rotation:iRAND(2);
 		if (rotation)
-			cycle *= 2.0f*M_PI_F;
+			lcycle *= 2.0f*M_PI_F;
 		else
-			cycle *= -1.0f*M_PI_F;
-		tmp = cycle - (M_PI_F*2.0f) * floorf(cycle/(M_PI_F*2.0f));
+			lcycle *= -1.0f*M_PI_F;
+		tmp = lcycle - (M_PI_F*2.0f) * floorf(lcycle/(M_PI_F*2.0f));
 	}
 	
 	if (fabs(tmp-rot) > fabs(tmp-(rot+2.0f*M_PI_F))) {

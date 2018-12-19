@@ -385,7 +385,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
     db_vdisp_profile->SetInput(QSize(width, height));
     if (db_vdisp_profile->GetOSDRenderer() == "chromakey")
     {
-        uint end = req.size();
+        end = req.size();
         for (uint i = 0; i < end; i++)
         {
             req.push_back(req[i]);
@@ -818,21 +818,21 @@ bool VideoOutputXv::InitSetupBuffers(void)
                                 video_codec_id, disp, XJ_curwin);
     QString     renderer;
 
-    QString tmp = db_vdisp_profile->GetVideoRenderer();
+    QString tmp1 = db_vdisp_profile->GetVideoRenderer();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "InitSetupBuffers() " +
         QString("render: %1, allowed: %2")
-            .arg(tmp).arg(toCommaList(renderers)));
+            .arg(tmp1).arg(toCommaList(renderers)));
 
-    if (renderers.contains(tmp))
-        renderer = tmp;
+    if (renderers.contains(tmp1))
+        renderer = tmp1;
     else if (renderers.empty())
         XV_INIT_FATAL_ERROR_TEST(false, "Failed to find a video renderer");
     else
     {
-        QString tmp;
+        QString tmp2;
         QStringList::const_iterator it = renderers.begin();
         for (; it != renderers.end(); ++it)
-            tmp += *it + ",";
+            tmp2 += *it + ",";
 
         renderer = renderers[0];
 
@@ -840,7 +840,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
             QString("Desired video renderer '%1' not available.\n\t\t\t"
                     "codec '%2' makes '%3' available, using '%4' instead.")
                 .arg(db_vdisp_profile->GetVideoRenderer())
-                .arg(toString(video_codec_id)).arg(tmp).arg(renderer));
+                .arg(toString(video_codec_id)).arg(tmp2).arg(renderer));
         db_vdisp_profile->SetVideoRenderer(renderer);
     }
 

@@ -18,7 +18,7 @@
 
 // Matches Season 2, S 2 and "Series 2," etc but not "hits 2"
 // cap1 = season
-const QString season = "\\b(?:Season|Series|S)\\s*(\\d+)\\s*,?";
+const QString seasonStr = "\\b(?:Season|Series|S)\\s*(\\d+)\\s*,?";
 
 // Matches Episode 3, Ep 3/4, Ep 3 of 4 etc but not "step 1"
 // cap1 = ep, cap2 = total
@@ -26,7 +26,7 @@ const QString longEp = "\\b(?:Ep|Episode)\\s*(\\d+)\\s*(?:(?:/|of)\\s*(\\d*))?";
 
 // Matches S2 Ep 3/4, "Season 2, Ep 3 of 4", Episode 3 etc
 // cap1 = season, cap2 = ep, cap3 = total
-const QString longSeasEp = QString("\\(?(?:%1)?\\s*%2").arg(season, longEp);
+const QString longSeasEp = QString("\\(?(?:%1)?\\s*%2").arg(seasonStr, longEp);
 
 // Matches long seas/ep with surrounding parenthesis & trailing period
 // cap1 = season, cap2 = ep, cap3 = total
@@ -1327,13 +1327,13 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
     // shorter than 55 characters or we risk picking up the wrong thing.
     if (process_subtitle)
     {
-        int pos = event.description.indexOf(m_comHemSub);
-        bool pvalid = pos != -1 && pos <= 55;
-        if (pvalid && (event.description.length() - (pos + 2)) > 0)
+        int pos2 = event.description.indexOf(m_comHemSub);
+        bool pvalid = pos2 != -1 && pos2 <= 55;
+        if (pvalid && (event.description.length() - (pos2 + 2)) > 0)
         {
             event.subtitle = event.description.left(
-                pos + (event.description[pos] == '?' ? 1 : 0));
-            event.description = event.description.mid(pos + 2);
+                pos2 + (event.description[pos2] == '?' ? 1 : 0));
+            event.description = event.description.mid(pos2 + 2);
         }
     }
 
@@ -1547,7 +1547,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event) const
 void EITFixUp::FixMCA(DBEventEIT &event) const
 {
     const uint SUBTITLE_PCT     = 60; // % of description to allow subtitle to
-    const uint SUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
+    const uint lSUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
     int        position;
     QRegExp    tmpExp1;
 
@@ -1580,7 +1580,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         uint tmpExp1Len = tmpExp1.cap(1).length();
         uint evDescLen = max(event.description.length(), 1);
 
-        if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
+        if ((tmpExp1Len < lSUBTITLE_MAX_LEN) &&
             ((tmpExp1Len * 100 / evDescLen) < SUBTITLE_PCT))
         {
             event.subtitle    = tmpExp1.cap(1);
@@ -1765,14 +1765,14 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
     if (event.subtitle.length() == 0)
     {
         const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
-        const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
+        const uint lSUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
 
         if (tmpExp1.indexIn(event.description) != -1)
         {
             uint tmpExp1Len = tmpExp1.cap(1).length();
             uint evDescLen = max(event.description.length(), 1);
 
-            if ((tmpExp1Len < SUBTITLE_MAX_LEN) &&
+            if ((tmpExp1Len < lSUBTITLE_MAX_LEN) &&
                 (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))
             {
                 event.subtitle    = tmpExp1.cap(1);

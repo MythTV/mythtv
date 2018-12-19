@@ -656,14 +656,14 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
         }
         /// INFO -- end
 
-        AVSubtitles *subtitles = (*subit).reader->GetAVSubtitles();
+        AVSubtitles *avsubtitles = (*subit).reader->GetAVSubtitles();
 
-        QMutexLocker locker(&(subtitles->lock));
+        QMutexLocker locker(&(avsubtitles->lock));
 
-        while (!subtitles->buffers.empty())
+        while (!avsubtitles->buffers.empty())
         {
-            const AVSubtitle subtitle = subtitles->buffers.front();
-            subtitles->buffers.pop_front();
+            const AVSubtitle subtitle = avsubtitles->buffers.front();
+            avsubtitles->buffers.pop_front();
 
             const QSize v_size =
                 QSize(GetVideoSize().width()*4, GetVideoSize().height()*4);
@@ -692,8 +692,8 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 
                     QImage img(data, w, h, QImage::Format_Indexed8);
                     img.setColorCount(cc);
-                    for (int i = 0; i < cc; ++i)
-                        img.setColor(i, palette[i]);
+                    for (int j = 0; j < cc; ++j)
+                        img.setColor(j, palette[j]);
 
                     painter.drawImage(x, y, img);
 

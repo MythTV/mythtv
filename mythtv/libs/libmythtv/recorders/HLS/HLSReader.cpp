@@ -511,10 +511,10 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
             }
             else if (line.startsWith(QLatin1String("#EXT-X-VERSION")))
             {
-                int version;
-                if (!M3U::ParseVersion(line, StreamURL(), version))
+                int version2;
+                if (!M3U::ParseVersion(line, StreamURL(), version2))
                     return false;
-                hls->SetVersion(version);
+                hls->SetVersion(version2);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-ENDLIST")))
             {

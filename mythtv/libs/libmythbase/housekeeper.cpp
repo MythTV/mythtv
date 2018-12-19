@@ -731,8 +731,7 @@ void HouseKeeper::Run(void)
     QDateTime now = MythDate::current();
 
     QMutexLocker mapLock(&m_mapLock);
-    QMap<QString,HouseKeeperTask*>::const_iterator it;
-    for (it = m_taskMap.begin(); it != m_taskMap.end(); ++it)
+    for (auto it = m_taskMap.begin(); it != m_taskMap.end(); ++it)
     {
         if ((*it)->CheckRun(now))
         {
@@ -755,7 +754,7 @@ void HouseKeeper::Run(void)
         QMutexLocker threadLock(&m_threadLock);
         int count1 = m_threadList.size();
 
-        QList<HouseKeepingThread*>::iterator it = m_threadList.begin();
+        auto it = m_threadList.begin();
         ++it; // skip the primary thread
         while (it != m_threadList.end())
         {

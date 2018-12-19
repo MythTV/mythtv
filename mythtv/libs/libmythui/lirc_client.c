@@ -669,7 +669,7 @@ unsigned int lirc_flags(const struct lirc_state *state, char *string)
 		}
 		else if(strcasecmp(s,"mode")==0)
 		{
-			flags|=mode;
+			flags|=modex;
 		}
 		else if(strcasecmp(s,"startup_mode")==0)
 		{
@@ -1519,7 +1519,7 @@ static char *lirc_execute(const struct lirc_state *state,
 	char *s;
 	int do_once=1;
 	
-	if(scan->flags&mode)
+	if(scan->flags&modex)
 	{
 		lirc_clearmode(config);
 	}

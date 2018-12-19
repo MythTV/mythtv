@@ -1470,7 +1470,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &hostname)
 
     if (!profiles.contains("OpenMAX Normal")) {
         (void) QObject::tr("OpenMAX Normal", "Sample: OpenMAX Normal");
-        uint groupid = CreateProfileGroup("OpenMAX Normal", hostname);
+        groupid = CreateProfileGroup("OpenMAX Normal", hostname);
         CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
                       "openmax", 4, true, "openmax", "softblend", false,
                       "openmaxadvanced", "onefield",

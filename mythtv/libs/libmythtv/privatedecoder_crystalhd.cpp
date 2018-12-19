@@ -429,31 +429,31 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
     if (!avctx)
         return result;
 
-    PacketBuffer *buffer = new PacketBuffer();
-    if (!buffer)
+    PacketBuffer *buffer1 = new PacketBuffer();
+    if (!buffer1)
         return result;
 
-    buffer->buf  = (unsigned char*)av_malloc(pkt->size);
-    buffer->size = pkt->size;
-    buffer->pts  = pkt->pts;
-    memcpy(buffer->buf, pkt->data, pkt->size);
+    buffer1->buf  = (unsigned char*)av_malloc(pkt->size);
+    buffer1->size = pkt->size;
+    buffer1->pts  = pkt->pts;
+    memcpy(buffer1->buf, pkt->data, pkt->size);
 
-    m_packet_buffers.insert(0, buffer);
+    m_packet_buffers.insert(0, buffer1);
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("%1 packet buffers queued up").arg(m_packet_buffers.size()));
 
     while (m_packet_buffers.size() > 0)
     {
-        PacketBuffer *buffer = m_packet_buffers.last();
-        if (GetTxFreeSize(false) < buffer->size)
+        PacketBuffer *buffer2 = m_packet_buffers.last();
+        if (GetTxFreeSize(false) < buffer2->size)
         {
             usleep(10000);
             return 0;
         }
 
-        buffer = m_packet_buffers.takeLast();
-        uint8_t* buf    = buffer->buf;
-        int size        = buffer->size;
+        buffer2 = m_packet_buffers.takeLast();
+        uint8_t* buf    = buffer2->buf;
+        int size        = buffer2->size;
         bool free_buf   = false;
         int outbuf_size = 0;
         uint8_t *outbuf = nullptr;
@@ -483,12 +483,12 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
 
         usleep(1000);
         uint64_t chd_timestamp = 0; // 100 nsec units
-        if (buffer->pts != AV_NOPTS_VALUE)
+        if (buffer2->pts != AV_NOPTS_VALUE)
             chd_timestamp = (uint64_t)(av_q2d(stream->time_base) *
-                                       buffer->pts * 10000000);
+                                       buffer2->pts * 10000000);
         LOG(VB_TIMESTAMP, LOG_DEBUG, LOC +
             QString("decoder input timecode %1 ms (pts %2)")
-                .arg(chd_timestamp / 10000).arg(buffer->pts));
+                .arg(chd_timestamp / 10000).arg(buffer2->pts));
 
         // TODO check for busy state
         INIT_ST;
@@ -501,9 +501,9 @@ int PrivateDecoderCrystalHD::ProcessPacket(AVStream *stream, AVPacket *pkt)
         if (!ok)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to send packet to decoder.");
 
-        result = buffer->size;
+        result = buffer2->size;
 
-        free_buffer(buffer);
+        free_buffer(buffer2);
     }
     return result;
 }

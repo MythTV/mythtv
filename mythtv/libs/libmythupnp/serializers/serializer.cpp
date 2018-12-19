@@ -164,7 +164,7 @@ QString Serializer::ReadPropertyMetadata( const QObject *pObject,
 
         QString     sFullKey  = sKey + "=";
 
-        for (int nIdx = 0; nIdx < sOptions.size(); ++nIdx)
+        for (nIdx = 0; nIdx < sOptions.size(); ++nIdx)
         {
             if (sOptions.at( nIdx ).startsWith( sFullKey ))
                 return sOptions.at( nIdx ).mid( sFullKey.length() );

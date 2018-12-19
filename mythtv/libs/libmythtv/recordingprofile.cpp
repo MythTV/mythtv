@@ -445,8 +445,7 @@ class AudioCompressionSettings : public GroupSetting
                  * to the same setting configuration, so we need to do
                  * this in two passes. */
 
-                DriverOption::Options::iterator Iopt = options.begin();
-                for ( ; Iopt != options.end(); ++Iopt)
+                for (auto Iopt = options.begin(); Iopt != options.end(); ++Iopt)
                 {
                     if ((*Iopt).category == DriverOption::AUDIO_ENCODING)
                     {
@@ -463,8 +462,7 @@ class AudioCompressionSettings : public GroupSetting
                 QStringList::iterator Icodec = m_v4l2codecs.begin();
                 for ( ; Icodec < m_v4l2codecs.end(); ++Icodec)
                 {
-                    DriverOption::Options::iterator Iopt = options.begin();
-                    for ( ; Iopt != options.end(); ++Iopt)
+                    for (auto Iopt = options.begin(); Iopt != options.end(); ++Iopt)
                     {
                         if ((*Iopt).category == DriverOption::AUDIO_BITRATE_MODE)
                         {
@@ -989,8 +987,7 @@ class VideoCompressionSettings : public GroupSetting
                  * to the same setting configuration, so we need to do
                  * this in two passes. */
 
-                DriverOption::Options::iterator Iopt = options.begin();
-                for ( ; Iopt != options.end(); ++Iopt)
+                for (auto Iopt = options.begin(); Iopt != options.end(); ++Iopt)
                 {
                     if ((*Iopt).category == DriverOption::VIDEO_ENCODING)
                     {
@@ -1012,8 +1009,7 @@ class VideoCompressionSettings : public GroupSetting
                     GroupSetting* bit_high   = new GroupSetting();
                     bool dynamic_res = !v4l2->UserAdjustableResolution();
 
-                    DriverOption::Options::iterator Iopt = options.begin();
-                    for ( ; Iopt != options.end(); ++Iopt)
+                    for (auto Iopt = options.begin() ; Iopt != options.end(); ++Iopt)
                     {
                         if ((*Iopt).category == DriverOption::STREAM_TYPE)
                         {

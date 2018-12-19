@@ -407,52 +407,54 @@ getPixelRGB_ (Uint * buffer, Uint x, Color * c)
 }
 
 
-void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD)
+void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
+             unsigned int lprevX, unsigned int lprevY,
+             signed int *lbrutS, signed int *lbrutD)
 {
 	int     myPos, myPos2;
 	Color   couleur;
 //	unsigned int coefv, coefh;
 
-	unsigned int ax = (prevX - 1) << PERTEDEC, ay = (prevY - 1) << PERTEDEC;
+	unsigned int ax = (lprevX - 1) << PERTEDEC, ay = (lprevY - 1) << PERTEDEC;
 
-	int     bufsize = prevX * prevY * 2;
-	int     bufwidth = prevX;
+	int     bufsize = lprevX * lprevY * 2;
+	int     bufwidth = lprevX;
 
-	expix1[0]=expix1[prevX-1]=expix1[prevX*prevY-1]=expix1[prevX*prevY-prevX]=0;
+	lexpix1[0]=lexpix1[lprevX-1]=lexpix1[lprevX*lprevY-1]=lexpix1[lprevX*lprevY-lprevX]=0;
 
 	for (myPos = 0; myPos < bufsize; myPos += 2) {
 		Color   col1, col2, col3, col4;
 		int     c1, c2, c3, c4, px, py;
 		int     pos;
-		int     coeffs;
+		int     lcoeffs;
 
-		int     brutSmypos = brutS[myPos];
+		int     brutSmypos = lbrutS[myPos];
 
 		myPos2 = myPos + 1;
 
-		px = brutSmypos + (((brutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
-		brutSmypos = brutS[myPos2];
-		py = brutSmypos + (((brutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		px = brutSmypos + (((lbrutD[myPos] - brutSmypos) * buffratio) >> BUFFPOINTNB);
+		brutSmypos = lbrutS[myPos2];
+		py = brutSmypos + (((lbrutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 
                 if (px < 0)
                     px = 0;
                 if (py < 0)
                     py = 0;
 
-		pos = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC));
+		pos = ((px >> PERTEDEC) + lprevX * (py >> PERTEDEC));
 		// coef en modulo 15
-		coeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];
+		lcoeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];
 
 		if ((py >= (int)ay) || (px >= (int)ax)) {
-			pos = coeffs = 0;
+			pos = lcoeffs = 0;
 		}
 		
-		getPixelRGB_ (expix1, pos, &col1);
-		getPixelRGB_ (expix1, pos + 1, &col2);
-		getPixelRGB_ (expix1, pos + bufwidth, &col3);
-		getPixelRGB_ (expix1, pos + bufwidth + 1, &col4);
+		getPixelRGB_ (lexpix1, pos, &col1);
+		getPixelRGB_ (lexpix1, pos + 1, &col2);
+		getPixelRGB_ (lexpix1, pos + bufwidth, &col3);
+		getPixelRGB_ (lexpix1, pos + bufwidth + 1, &col4);
 
-		c1 = coeffs;
+		c1 = lcoeffs;
 		c2 = (c1 & 0x0000ff00) >> 8;
 		c3 = (c1 & 0x00ff0000) >> 16;
 		c4 = (c1 & 0xff000000) >> 24;
@@ -473,7 +475,7 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 			couleur.b -= 5;
 		couleur.b >>= 8;
 
-		setPixelRGB_ (expix2, myPos >> 1, couleur);
+		setPixelRGB_ (lexpix2, myPos >> 1, couleur);
 	}
 }
 

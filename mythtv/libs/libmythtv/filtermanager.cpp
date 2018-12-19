@@ -215,14 +215,12 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     VideoFilter *NewFilt = nullptr;
     FmtConv *FC, *FC2, *S1, *S2, *S3;
     VideoFrameType ifmt;
-    unsigned int i;
     int nbufsize;
     int cbufsize;
     int postfilt_width = width;
     int postfilt_height = height;
 
-    for (QStringList::Iterator i = FilterList.begin();
-         i != FilterList.end(); ++i)
+    for (auto i = FilterList.begin(); i != FilterList.end(); ++i)
     {
         QString FiltName = (*i).section('=', 0, 0);
         QString FiltOpts = (*i).section('=', 1);
@@ -249,7 +247,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     }
 
     ifmt = inpixfmt;
-    for (i = 0; i < FiltInfoChain.size(); i++)
+    for (uint i = 0; i < FiltInfoChain.size(); i++)
     {
         S1 = S2 = S3 = nullptr;
         FI = FiltInfoChain[i];
@@ -380,7 +378,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         FiltChain = nullptr;
     }
 
-    for (i = 0; i < FiltInfoChain.size(); i++)
+    for (uint i = 0; i < FiltInfoChain.size(); i++)
     {
         QByteArray tmp = OptsList[i].toLocal8Bit();
         NewFilt = LoadFilter(FiltInfoChain[i], FmtList[i]->in,

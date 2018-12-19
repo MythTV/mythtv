@@ -646,11 +646,11 @@ private:
                     "starRating");
                 if (stars.size())
                 {
-                    QDomElement rating = stars.at(0).toElement();
-                    raverage = GetInt(rating, "average");
-                    rcount = GetInt(rating, "count");
-                    rmin = GetInt(rating, "min");
-                    rmax = GetInt(rating, "max");
+                    QDomElement ratingDom = stars.at(0).toElement();
+                    raverage = GetInt(ratingDom, "average");
+                    rcount = GetInt(ratingDom, "count");
+                    rmin = GetInt(ratingDom, "min");
+                    rmax = GetInt(ratingDom, "max");
                 }
 
                 QDomNodeList stats = comm.elementsByTagNameNS(Parse::MediaRSS,
@@ -1027,11 +1027,11 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
         tmp.removeFirst();
     if (tmp.size() != 5)
         return QDateTime();
-    QString timezone = tmp.takeAt(tmp.size() -1);
-    if (timezone.size() == 5)
+    QString tmpTimezone = tmp.takeAt(tmp.size() -1);
+    if (tmpTimezone.size() == 5)
     {
         bool ok;
-        int tz = timezone.toInt(&ok);
+        int tz = tmpTimezone.toInt(&ok);
         if(ok)
         {
             hoursShift = tz / 100;
@@ -1039,7 +1039,7 @@ QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
         }
     }
     else
-        hoursShift = TimezoneOffsets.value(timezone, 0);
+        hoursShift = TimezoneOffsets.value(tmpTimezone, 0);
 
     if (tmp.at(0).size() == 1)
         tmp[0].prepend("0");

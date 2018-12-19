@@ -294,9 +294,9 @@ void LyricsData::loadLyrics(const QString &xmlData)
             }
             if (!times.isEmpty())
             {
-                for (int x = 0; x < times.count(); x++)
+                for (int y = 0; y < times.count(); y++)
                 {
-                    lyrics.append(times.at(x) + lyric.mid(lastind));
+                    lyrics.append(times.at(y) + lyric.mid(lastind));
                 }
             }
             else

@@ -850,13 +850,13 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
  * \returns Pointer to frame
  */
 PopularimeterFrame* MetaIOID3::findPOPM(TagLib::ID3v2::Tag *tag,
-                                        const String &email)
+                                        const String &_email)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("POPM");
   for(TagLib::ID3v2::FrameList::Iterator it = l.begin(); it != l.end(); ++it)
   {
     PopularimeterFrame *f = static_cast<PopularimeterFrame *>(*it);
-    if (f && f->email() == email)
+    if (f && f->email() == _email)
       return f;
   }
   return nullptr;

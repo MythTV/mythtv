@@ -741,7 +741,7 @@ void MythRAOPConnection::ProcessAudio()
             {
                 AudioData *data = &(*it);
                 int offset = 0;
-                int frames = 0;
+                int framecnt = 0;
 
                 if (m_adjustedLatency > 0)
                 {
@@ -750,17 +750,17 @@ void MythRAOPConnection::ProcessAudio()
                         m_audio->GetBytesPerFrame();
                     if (offset > data->length)
                         offset = data->length;
-                    frames = offset / m_audio->GetBytesPerFrame();
-                    m_adjustedLatency -= framesToMs(frames+1);
+                    framecnt = offset / m_audio->GetBytesPerFrame();
+                    m_adjustedLatency -= framesToMs(framecnt+1);
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                         QString("ProcessAudio: Dropping %1 frames to catch up "
                                 "(%2ms to go)")
-                        .arg(frames).arg(m_adjustedLatency));
-                    timestamp += framesToMs(frames);
+                        .arg(framecnt).arg(m_adjustedLatency));
+                    timestamp += framesToMs(framecnt);
                 }
                 m_audio->AddData((char *)data->data + offset,
                                  data->length - offset,
-                                 timestamp, frames);
+                                 timestamp, framecnt);
                 timestamp += m_audio->LengthLastData();
             }
             i++;
@@ -1113,8 +1113,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
             {
                 m_audioFormat.clear();
                 QString format = line.mid(7).trimmed();
-                QList<QString> fmts = format.split(' ');
-                foreach (QString fmt, fmts)
+                QList<QString> formats = format.split(' ');
+                foreach (QString fmt, formats)
                     m_audioFormat.append(fmt.toInt());
 
                 foreach (int fmt, m_audioFormat)

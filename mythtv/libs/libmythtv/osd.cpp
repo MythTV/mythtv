@@ -1547,7 +1547,7 @@ bool OsdNavigation::keyPressEvent(QKeyEvent *event)
     if (!handled)
     {
         QStringList actions;
-        bool handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
+        handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
 
         for (int i = 0; i < actions.size() && !handled; i++)
         {

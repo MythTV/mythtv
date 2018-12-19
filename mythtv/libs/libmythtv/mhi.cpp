@@ -261,7 +261,7 @@ void MHIContext::run(void)
             NetworkBootRequested();
             ProcessDSMCCQueue();
             {
-                QMutexLocker locker(&m_keyLock);
+                QMutexLocker locker2(&m_keyLock);
                 key = m_keyQueue.dequeue();
             }
 

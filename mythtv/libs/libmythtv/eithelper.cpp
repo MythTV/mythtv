@@ -792,17 +792,17 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 
         for (uint k=0; k<transmission.TransmissionCount(); ++k)
         {
-            QDateTime starttime = transmission.StartTimeUTC(k);
-            // fix starttime only if the duration is a multiple of a minute
+            QDateTime txstart = transmission.StartTimeUTC(k);
+            // fix txstart only if the duration is a multiple of a minute
             if (!(cit->DurationInSeconds() % 60))
-                EITFixUp::TimeFix(starttime);
-            QDateTime endtime   = starttime.addSecs(cit->DurationInSeconds());
+                EITFixUp::TimeFix(txstart);
+            QDateTime txend = txstart.addSecs(cit->DurationInSeconds());
 
             DBEventEIT *event = new DBEventEIT(
                 chanid,
                 title,     subtitle,      description,
                 category,  category_type,
-                starttime, endtime,       fix,
+                txstart,   txend,         fix,
                 subtitle_type,
                 audio_props,
                 video_props, 0.0,
@@ -974,7 +974,7 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
     if (query.size() == 0) {
         // Attempt fuzzy matching, by skipping the tsid
         // DVB Link to chanid
-        QString qstr =
+        qstr =
             "SELECT chanid, useonairguide, channel.sourceid "
             "FROM channel, dtv_multiplex "
             "WHERE serviceid        = :SERVICEID   AND "
