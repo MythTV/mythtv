@@ -1369,10 +1369,10 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
 
             // only show the Comp. Artist if it differs from the Artist
             bool found = false;
-            MetadataPtrList *tracks = node->GetData().value<MetadataPtrList*>();
-            for (int x = 0; x < tracks->count(); x++)
+            MetadataPtrList *tracks2 = node->GetData().value<MetadataPtrList*>();
+            for (int x = 0; x < tracks2->count(); x++)
             {
-                MusicMetadata *mdata = tracks->at(x);
+                MusicMetadata *mdata = tracks2->at(x);
                 if (mdata)
                 {
                     if (mdata->Artist() != mdata->CompilationArtist())

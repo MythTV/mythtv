@@ -64,24 +64,22 @@ void GameScannerThread::verifyFiles()
                           GameScanner::tr("Verifying game files..."));
 
     // For every file we know about, check to see if it still exists.
-    for (QList<RomInfo*>::iterator p = m_dbgames.begin();
-             p != m_dbgames.end(); ++p)
+    for (auto p1 = m_dbgames.begin(); p1 != m_dbgames.end(); ++p1)
     {
-        RomInfo *info = *p;
+        RomInfo *info = *p1;
         QString romfile = info->Romname();
         QString system = info->System();
         QString gametype = info->GameType();
         if (!romfile.isEmpty())
         {
             bool found = false;
-            for (QList<RomFileInfo>::iterator p = m_files.begin();
-                                     p != m_files.end(); ++p)
+            for (auto p2 = m_files.begin(); p2 != m_files.end(); ++p2)
             {
-                if ((*p).romfile == romfile &&
-                    (*p).gametype == gametype)
+                if ((*p2).romfile == romfile &&
+                    (*p2).gametype == gametype)
                 {
                     // We're done here, this file matches one in the DB
-                    (*p).indb = true;
+                    (*p2).indb = true;
                     found = true;
                     continue;
                 }
