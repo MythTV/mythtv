@@ -17,7 +17,6 @@ using namespace std;
 
 #include "mythlogging.h"
 #include "logging.h"
-#include "loggingserver.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"
@@ -274,13 +273,6 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     }
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
 
-#ifdef NOLOGSERVER
-    if (!m_noserver && !logServerStart())
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "Failed to start LogServer thread");
-    }
-#endif
     moveToThread(qthread());
 }
 
@@ -290,12 +282,6 @@ LoggerThread::~LoggerThread()
     stop();
     wait();
 
-#ifdef NOLOGSERVER
-    if (!m_noserver)
-    {
-        logServerStop();
-    }
-#endif
     delete m_waitNotEmpty;
     delete m_waitEmpty;
 }
@@ -313,76 +299,6 @@ void LoggerThread::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Added logging to the console");
 
     bool dieNow = false;
-
-    if (!m_noserver)
-    {
-#ifndef NOLOGSERVER
-        try
-        {
-            if (m_locallogs)
-            {
-                logServerWait();
-                m_zmqContext = logServerThread->getZMQContext();
-            }
-            else
-            {
-                m_zmqContext = nzmqt::createDefaultContext(NULL);
-                m_zmqContext->start();
-            }
-
-            if (!m_zmqContext)
-            {
-                m_aborted = true;
-                dieNow = true;
-            }
-            else
-            {
-                qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
-
-                m_zmqSocket =
-                    m_zmqContext->createSocket(nzmqt::ZMQSocket::TYP_DEALER, this);
-                connect(m_zmqSocket,
-                        SIGNAL(messageReceived(const QList<QByteArray>&)),
-                        SLOT(messageReceived(const QList<QByteArray>&)),
-                        Qt::QueuedConnection);
-
-                if (m_locallogs)
-                    m_zmqSocket->connectTo("inproc://mylogs");
-                else
-                    m_zmqSocket->connectTo("tcp://127.0.0.1:35327");
-            }
-        }
-        catch (nzmqt::ZMQException &e)
-        {
-            cerr << "Exception during logging socket setup: " << e.what() << endl;
-            m_aborted = true;
-            dieNow = true;
-        }
-
-        if (!m_aborted)
-        {
-            if (!m_locallogs)
-            {
-                m_initialWaiting = true;
-                pingLogServer();
-
-                // wait up to 150ms for mythlogserver to respond
-                m_initialTimer = new MythSignalingTimer(this,
-                                                        SLOT(initialTimeout()));
-                m_initialTimer->start(150);
-            }
-            else
-                LOG(VB_GENERAL, LOG_INFO, "Added logging to mythlogserver locally");
-
-            loggingGetTimeStamp(&m_epoch, NULL);
-
-            m_heartbeatTimer = new MythSignalingTimer(this, SLOT(checkHeartBeat()));
-            m_heartbeatTimer->start(1000);
-        }
-    #else
-        logServerWait();
-    #endif
-    }
 
     QMutexLocker qLock(&logQueueMutex);
 
@@ -607,28 +523,6 @@ void LoggerThread::handleItem(LoggingItem *item)
             char *threadName = logThreadHash.take(item->m_threadId);
             free(threadName);
         }
-    }
-
-    if (m_noserver)
-    {
-        return;
-    }
-
-    if (item->m_message[0] != '\0')
-    {
-#ifndef NOLOGSERVER
-        // Send it to mythlogserver
-        if (!logThreadFinished && m_zmqSocket)
-            m_zmqSocket->sendMessage(item->toByteArray());
-#else
-        if (logServerThread)
-        {
-            QList<QByteArray> list;
-            list.append(QByteArray());
-            list.append(item->toByteArray());
-            logServerThread->receivedMessage(list);
-        }
-#endif
     }
 }
 

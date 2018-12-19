@@ -20,7 +20,6 @@
 #include "lcddevice.h"
 #include "commandlineparser.h"
 #include "tv.h"
-#include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
 
@@ -88,7 +87,6 @@ int main(int argc, char **argv)
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
