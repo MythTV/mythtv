@@ -3409,8 +3409,10 @@ nullptr
     {
         const char *updates[] = {
             "update capturecard "
-            "    set videodevice=regexp_replace(videodevice, '-.*$', '') "
-            "    where cardtype='HDHOMERUN'",
+            "    set videodevice=left(videodevice, "
+            "                         locate('-', videodevice)-1) "
+            "    where cardtype='HDHOMERUN' "
+            "          and videodevice like '%-%'",
             nullptr
         };
         if (!performActualUpdate(updates, "1349", dbver))
