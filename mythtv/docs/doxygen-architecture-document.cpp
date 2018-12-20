@@ -230,10 +230,6 @@ The database schema is documented \ref db_schema "here".
   <dt>mythwelcome/mythshutdown
       <dd>These programs manage Power Saving (shutdown/wakeup) on your %MythTV
           PCs.
-  <dt>mythlogserver
-      <dd>A tool that records log messages from a number of other myth
-          applications in one stream, storing them in any or all of;
-          a logfile, the Unix system log (if availale), and the MySQL database.
 </dl>
 
 \section fe_plugins Frontend Plugins

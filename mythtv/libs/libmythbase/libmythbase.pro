@@ -16,7 +16,7 @@ HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h
 HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h
 HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
-HEADERS += lcddevice.h mythstorage.h remotefile.h logging.h loggingserver.h
+HEADERS += lcddevice.h mythstorage.h remotefile.h logging.h
 HEADERS += mythcorecontext.h mythsystem.h mythsystemprivate.h
 HEADERS += mythlocale.h storagegroup.h
 HEADERS += mythcoreutil.h mythdownloadmanager.h mythtranslation.h
@@ -46,7 +46,7 @@ SOURCES += mythcorecontext.cpp mythsystem.cpp mythlocale.cpp storagegroup.cpp
 SOURCES += mythcoreutil.cpp mythdownloadmanager.cpp mythtranslation.cpp
 SOURCES += unzip.cpp iso639.cpp iso3166.cpp mythmedia.cpp mythmiscutil.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp dbutil.cpp
-SOURCES += logging.cpp loggingserver.cpp
+SOURCES += logging.cpp
 SOURCES += referencecounter.cpp mythcommandlineparser.cpp
 SOURCES += filesysteminfo.cpp hardwareprofile.cpp serverpool.cpp
 SOURCES += plist.cpp signalhandling.cpp mythtimezone.cpp mythdate.cpp
@@ -75,7 +75,7 @@ inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak version.h
 inc.files += mythobservable.h mythevent.h verbosedefs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
 inc.files += mythsocket.h mythsocket_cb.h mythlogging.h
-inc.files += mythcorecontext.h mythsystem.h storagegroup.h loggingserver.h
+inc.files += mythcorecontext.h mythsystem.h storagegroup.h
 inc.files += mythcoreutil.h mythlocale.h mythdownloadmanager.h
 inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h mythmiscutil.h
 inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythdeque.h
@@ -143,7 +143,6 @@ win32-msvc* {
 
     LIBS += -lws2_32
     EXTRA_LIBS += -lzlib
-    DEFINES += NOLOGSERVER
 
     # we need to make sure version.h is generated.
 

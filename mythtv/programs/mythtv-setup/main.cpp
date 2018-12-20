@@ -14,7 +14,6 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dbutil.h"
-#include "loggingserver.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "langsettings.h"
@@ -337,7 +336,6 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     if (cmdline.toBool("display"))

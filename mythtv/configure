@@ -160,7 +160,6 @@ Advanced options (experts only):
   --python=PATH            Force a specific python executable to use [$python_default]
   --perl-config-opts=OPTS  Additional options to pass when generating
                            Makefile.perl for building Perl bindings.
-  --enable-mythlogserver   Enable mythlogserver logging daemon facility
   --enable-bdjava          Enable BD-J support for Blu-ray discs
 
 External codec library options (used for mythffmpeg and streaming transcode):
@@ -1992,7 +1991,6 @@ MYTHTV_CONFIG_LIST='
     xv
     profiletype
     debugtype
-    mythlogserver
     systemd_notify
     systemd_journal
 '
@@ -2791,7 +2789,6 @@ enable xv
 disable indevs
 enable libfftw3
 enable taglib
-disable mythlogserver
 enable exiv2
 enable systemd_notify
 enable systemd_journal
@@ -3011,10 +3008,6 @@ for opt do
         --disable-backend)
         ;;
         --enable-mac-bundle) enable mac_bundle
-        ;;
-        --disable-mythlogserver) disable mythlogserver
-        ;;
-        --enable-mythlogserver) enable mythlogserver
         ;;
         --previous|--prev)
             echo "No history of previous configure parameters."
@@ -5898,15 +5891,6 @@ fi
 
 enabled ffmpeg_pthreads && enable pthreads
 
-# Check for libuuid for zeromq
-enabled mythlogserver || disable libuuid
-if enabled libuuid ; then
-  check_lib uuid uuid/uuid.h uuid_generate -luuid || disable libuuid
-  if disabled libuuid ; then
-    die "ERROR: can not find libuuid. (debian uuid-dev; RedHat libuuid-devel)"
-  fi
-fi
-
 # Check for taglib for libmythmetadata
 if enabled taglib; then
     taglib_minor="0"
@@ -7417,7 +7401,6 @@ fi
 echo "# Misc Features"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
-echo "mythlogserver             ${mythlogserver-no}"
 echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
@@ -7893,32 +7876,6 @@ if [ -e libs/libmyth/mythconfig.h ] ; then
     rm -f libs/libmyth/mythconfig.h
 fi
 
-if enabled mythlogserver; then
-    # configure zeromq
-    echo "Configuring zeromq..."
-    if [ ! `which libtool` ]
-    then
-        echo libtool not found. please install it.
-        exit 1
-    fi
-    if [ ! `which autoreconf` ]
-    then
-        echo autoreconf not found. please install it.
-        exit 1
-    fi
-    (cd external/zeromq ; ./autogen.sh 2> /dev/null > /dev/null)
-    if [ $? -ne 0 ]; then
-	echo external/zeromq/autogen.sh failed.
-	exit 1
-    fi
-    (cd external/zeromq ; \
-             ./configure --quiet --without-documentation --prefix=${prefix} \
-                         --includedir=${prefix}/include/mythtv/zeromq \
-                         --libdir=${libdir-name})
-    echo "Configuring nzmqt..."
-    (cd external/nzmqt/src ; \
-           ${qmakeconf} -o Makefile)
-fi
 if ! enabled libbluray_external; then
     echo "Configuring libmythbluray..."
     (cd external/libmythbluray ; \

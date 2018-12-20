@@ -22,7 +22,6 @@ using namespace std;
 #include "mpeg2fix.h"
 #include "remotefile.h"
 #include "mythtranslation.h"
-#include "loggingserver.h"
 #include "mythlogging.h"
 #include "commandlineparser.h"
 #include "recordinginfo.h"
@@ -378,7 +377,6 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     //  Load the context

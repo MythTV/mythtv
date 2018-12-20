@@ -17,7 +17,6 @@
 #include "exitcodes.h"
 #include "dbcheck.h"
 #include "mythdbcon.h"
-#include "loggingserver.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "mythsystemevent.h"
@@ -96,7 +95,6 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
-    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
