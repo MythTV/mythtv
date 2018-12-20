@@ -84,7 +84,9 @@ class Dvr : public DvrServices
 
         bool              StopRecording       ( int              RecordedId ) override; // DvrServices
 
-        bool              ReactivateRecording ( int              RecordedId ) override; // DvrServices
+        bool              ReactivateRecording ( int              RecordedId,
+                                                int              ChanId,
+                                                const QDateTime &StartTime ) override; // DvrServices
 
         bool              RescheduleRecordings( void ) override; // DvrServices
 

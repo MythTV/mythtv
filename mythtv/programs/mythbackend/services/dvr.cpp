@@ -390,16 +390,26 @@ bool Dvr::StopRecording(int RecordedId)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Dvr::ReactivateRecording(int RecordedId)
+bool Dvr::ReactivateRecording(int RecordedId,
+                              int chanid, const QDateTime &recstarttsRaw)
 {
-    if (RecordedId <= 0)
-        throw QString("RecordedId param is invalid.");
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
-    RecordingInfo ri = RecordingInfo(RecordedId);
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
 
-    ri.ReactivateRecording();
+    if (ri.GetChanID() && ri.HasPathname())
+    {
+        ri.ReactivateRecording();
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -122,7 +122,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual bool               StopRecording         ( int              RecordedId ) = 0;
 
-        virtual bool               ReactivateRecording   ( int              RecordedId ) = 0;
+        virtual bool               ReactivateRecording   ( int              RecordedId,
+                                                           int              ChanId,
+                                                           const QDateTime &StartTime ) = 0;
 
         virtual bool               RescheduleRecordings  ( void ) = 0;
 
