@@ -586,6 +586,10 @@ void ExternalStreamHandler::run(void)
     MythTimer  status_timer;
     MythTimer  nodata_timer;
 
+    bool       good_data = false;
+    uint       data_proc_err = 0;
+    uint       data_short_err = 0;
+
     if (!m_IO)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -761,9 +765,20 @@ void ExternalStreamHandler::run(void)
 
         if (len < TS_PACKET_SIZE)
         {
-            LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for a full TS packet.");
+            if (data_short_err++ == 0)
+                LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for a full TS packet.");
             std::this_thread::sleep_for(std::chrono::microseconds(50));
             continue;
+        }
+        else if (data_short_err)
+        {
+            if (data_short_err > 1)
+            {
+                LOG(VB_RECORD, LOG_INFO, LOC +
+                    QString("Waited for a full TS packet %1 times.")
+                    .arg(data_short_err));
+            }
+            data_short_err = 0;
         }
 
         if (!m_stream_lock.tryLock())
@@ -795,15 +810,41 @@ void ExternalStreamHandler::run(void)
         m_stream_lock.unlock();
 
         if (remainder == 0)
-            buffer.clear();
-        else if (len > remainder) // leftover bytes
-            buffer.remove(0, len - remainder);
-        else if (len == remainder)
         {
-            LOG(VB_RECORD, LOG_WARNING, LOC +
-                "Failed to process any of the data received.");
+            buffer.clear();
+            good_data = len;
+        }
+        else if (len > remainder) // leftover bytes
+        {
+            buffer.remove(0, len - remainder);
+            good_data = len;
+        }
+        else if (len == remainder)
+            good_data = false;
+
+        if (good_data)
+        {
+            if (data_proc_err)
+            {
+                if (data_proc_err > 1)
+                {
+                    LOG(VB_RECORD, LOG_WARNING, LOC +
+                        QString("Failed to process the data received %1 times.")
+                        .arg(data_proc_err));
+                }
+                data_proc_err = 0;
+            }
+        }
+        else
+        {
+            if (data_proc_err++ == 0)
+            {
+                LOG(VB_RECORD, LOG_WARNING, LOC +
+                    "Failed to process the data received");
+            }
         }
     }
+
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): " +
         QString("%1 shutdown").arg(_error ? "Error" : "Normal"));
 
@@ -1122,6 +1163,8 @@ bool ExternalStreamHandler::StartStreaming(void)
 
 bool ExternalStreamHandler::StopStreaming(void)
 {
+    QString result;
+
     QMutexLocker locker(&m_stream_lock);
 
     if (!m_poll_mode && m_xon)
@@ -1158,7 +1201,6 @@ bool ExternalStreamHandler::StopStreaming(void)
         return false;
     }
 
-    QString result;
     if (!ProcessCommand("StopStreaming", result, 6000))
     {
         LogLevel_t level = LOG_ERR;
