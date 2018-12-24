@@ -221,7 +221,11 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
     if (handled)
         return true;
 
-    QString initialEntry = GetItemCurrent()->GetText();
+    MythUIButtonListItem *item = GetItemCurrent();
+    if (item == nullptr)
+        return MythUIButtonList::keyPressEvent(event);
+
+    QString initialEntry = item->GetText();
     bool doEntry = false;
 
     // Only invoke the entry dialog if the entry is a number
