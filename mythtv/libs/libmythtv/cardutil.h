@@ -137,7 +137,8 @@ class MTV_PUBLIC CardUtil
 
     static bool         IsChannelChangeDiscontinuous(const QString &rawtype)
     {
-        return !IsEncoder(rawtype) || (rawtype == "HDPVR");
+        return (!IsEncoder(rawtype) || rawtype == "HDPVR" ||
+                rawtype == "EXTERNAL");
     }
 
     static bool         IsUnscanable(const QString &rawtype)
