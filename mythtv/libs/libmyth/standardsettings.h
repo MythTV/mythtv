@@ -281,6 +281,30 @@ class MPUBLIC HostTimeBoxSetting : public HostComboBoxSetting
     }
 };
 
+class MPUBLIC GlobalTimeBoxSetting : public GlobalComboBoxSetting
+{
+  public:
+    GlobalTimeBoxSetting(const QString &name,
+                       const QString &defaultTime = "00:00",
+                       const int interval = 1) :
+        GlobalComboBoxSetting(name, false)
+    {
+        int hour;
+        int minute;
+        QString timeStr;
+
+        for (hour = 0; hour < 24; hour++)
+        {
+            for (minute = 0; minute < 60; minute += interval)
+            {
+                timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
+                addSelection(timeStr, timeStr,
+                             timeStr == defaultTime);
+            }
+        }
+    }
+};
+
 /*******************************************************************************
 *                           SpinBox Setting                                    *
 *******************************************************************************/

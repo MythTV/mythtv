@@ -16,6 +16,8 @@
 #include "mythuitext.h"
 #include "mythdialogbox.h"
 
+class GroupSetting;
+
 class WelcomeDialog : public MythScreenType
 {
 
@@ -50,6 +52,7 @@ class WelcomeDialog : public MythScreenType
     bool checkConnectionToServer(void);
     void checkAutoStart(void);
     void runMythFillDatabase(void);
+    void ShowSettings(GroupSetting* screen);
 
     //
     //  GUI stuff
@@ -67,8 +70,6 @@ class WelcomeDialog : public MythScreenType
     QTimer        *m_updateScreenTimer; // audited ref #5318
 
     QString        m_appBinDir;
-    QString        m_timeFormat;
-    QString        m_dateFormat;
     bool           m_isRecording;
     bool           m_hasConflicts;
     bool           m_bWillShutdown;

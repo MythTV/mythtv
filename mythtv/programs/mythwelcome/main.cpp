@@ -1,25 +1,14 @@
-#include <cstdlib>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <chrono> // for milliseconds
-#include <thread> // for sleep_for
-
 // Qt
 #include <QApplication>
-#include <QFileInfo>
-#include <QDir>
 
 // MythTV
 #include "mythcontext.h"
 #include "mythversion.h"
 #include "mythtranslation.h"
-#include "mythdbcon.h"
 #include "exitcodes.h"
 #include "compat.h"
 #include "lcddevice.h"
 #include "commandlineparser.h"
-#include "tv.h"
 #include "loggingserver.h"
 #include "mythlogging.h"
 #include "signalhandling.h"
@@ -132,32 +121,26 @@ int main(int argc, char **argv)
     // Provide systemd ready notification (for type=notify units)
     mw_sd_notify("READY=1");
 
+    MythScreenStack *mainStack = mainWindow->GetMainStack();
+
+    MythScreenType *screen;
     if (bShowSettings)
-    {
-        MythShutdownSettings settings;
-        settings.exec();
-    }
+        screen = new StandardSettingDialog(mainStack, "shutdown",
+                                           new MythShutdownSettings());
     else
+        screen = new WelcomeDialog(mainStack, "mythwelcome");
+
+    bool ok = screen->Create();
+    if (ok)
     {
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        mainStack->AddScreen(screen, false);
 
-        WelcomeDialog *welcome = new WelcomeDialog(mainStack, "mythwelcome");
-
-        if (welcome->Create())
-            mainStack->AddScreen(welcome, false);
-        else
-        {
-            DestroyMythMainWindow();
-            delete gContext;
-            SignalHandler::Done();
-            return -1;
-        }
-
-        do
-        {
-            qApp->processEvents();
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        } while (mainStack->TotalScreens() > 0);
+        // Block by running an event loop until last screen is removed
+        QEventLoop block;
+        QObject::connect(mainStack, &MythScreenStack::topScreenChanged,
+                         &block, [&](MythScreenType* screen)
+        { if (!screen) block.quit(); });
+        block.exec();
     }
 
     mw_sd_notify("STOPPING=1\nSTATUS=Exiting");
@@ -167,5 +150,5 @@ int main(int argc, char **argv)
 
     SignalHandler::Done();
 
-    return 0;
+    return ok ? 0 : -1;
 }
