@@ -1612,45 +1612,52 @@ void GalleryThumbView::DeleteMarked()
 */
 void GalleryThumbView::ShowSettings()
 {
-    QString oldDate       = gCoreContext->GetSetting("GalleryDateFormat");
-    QString oldExclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
-    int oldSortIm         = gCoreContext->GetNumSetting("GalleryImageOrder");
-    int oldSortDir        = gCoreContext->GetNumSetting("GalleryDirOrder");
-
     // Show settings dialog
-    GalleryConfig config = GalleryConfig(m_editsAllowed);
-    connect(config.GetClearPage(), SIGNAL(ClearDbPressed()),
-            this, SLOT(ClearSgDb()));
-
-    config.exec();
-    gCoreContext->ClearSettingsCache();
-
-    // Effect any changes
-    QString date = gCoreContext->GetSetting("GalleryDateFormat");
-    if (date != oldDate)
+    GallerySettings *config = new GallerySettings(m_editsAllowed);
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    StandardSettingDialog *ssd = new StandardSettingDialog(mainStack,
+                                                           "gallerysettings",
+                                                           config);
+    if (!ssd->Create())
     {
+        delete ssd;
+        return;
+    }
+
+    mainStack->AddScreen(ssd);
+
+    // Effect setting changes when dialog saves on exit
+
+    connect(config, &GallerySettings::ClearDbPressed,
+            this,   &GalleryThumbView::ClearSgDb);
+
+    connect(config, &GallerySettings::OrderChanged,
+            this,   [this]()
+    {
+        // Update db view, reset cover cache & reload
+        int sortIm  = gCoreContext->GetNumSetting("GalleryImageOrder");
+        int sortDir = gCoreContext->GetNumSetting("GalleryDirOrder");
+        m_mgr.SetSortOrder(sortIm, sortDir);
+        m_view->ClearCache();
+        LoadData(m_view->GetParentId());
+    });
+
+    connect(config, &GallerySettings::DateChanged,
+            this,   [this]()
+    {
+        QString date = gCoreContext->GetSetting("GalleryDateFormat");
         m_mgr.SetDateFormat(date);
         BuildImageList();
-    }
+    });
 
-    int sortIm  = gCoreContext->GetNumSetting("GalleryImageOrder");
-    int sortDir = gCoreContext->GetNumSetting("GalleryDirOrder");
-
-    if (sortIm != oldSortIm || sortDir != oldSortDir)
+    connect(config, &GallerySettings::ExclusionsChanged,
+            this,   [this]()
     {
-        // Order changed: Update db view, reset cover cache & reload
-        m_mgr.SetSortOrder(sortIm, sortDir);
-        m_view->ClearCache();;
-        LoadData(m_view->GetParentId());
-    }
-
-    QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
-    if (exclusions != oldExclusions)
-    {
-        // Exclusions changed: request rescan
-        m_view->ClearCache();;
+        // Request rescan
+        QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");
+        m_view->ClearCache();
         m_mgr.IgnoreDirs(exclusions);
-    }
+    });
 }
 
 
