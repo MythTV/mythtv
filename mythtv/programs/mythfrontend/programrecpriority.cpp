@@ -125,17 +125,17 @@ class TitleSort
         if (a->GetSortTitle() != b->GetSortTitle())
         {
             if (m_reverse)
-                return naturalCompare(b->GetSortTitle(), a->GetSortTitle());
+                return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
             else
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
         }
 
         if (a->GetSortSubtitle() != b->GetSortSubtitle())
         {
             if (m_reverse)
-                return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle());
+                return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
             else
-                return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+                return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
         }
 
         int finalA = a->GetRecordingPriority();
@@ -288,14 +288,14 @@ class ProgramCountSort
         if (m_reverse)
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(b->GetSortTitle(), a->GetSortTitle());
-            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle());
+                return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
+            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
         else
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
         }
     }
 
@@ -335,14 +335,14 @@ class ProgramRecCountSort
         if (m_reverse)
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(b->GetSortTitle(), a->GetSortTitle());
-            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle());
+                return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
+            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
         else
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
         }
     }
 
@@ -372,14 +372,14 @@ class ProgramLastRecordSort
         if (m_reverse)
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(b->GetSortTitle(), a->GetSortTitle());
-            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle());
+                return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
+            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
         else
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
         }
     }
 
@@ -409,14 +409,14 @@ class ProgramAvgDelaySort
         if (m_reverse)
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(b->GetSortTitle(), a->GetSortTitle());
-            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle());
+                return naturalCompare(b->GetSortTitle(), a->GetSortTitle()) < 0;
+            return naturalCompare(b->GetSortSubtitle(), a->GetSortSubtitle()) < 0;
         }
         else
         {
             if (a->GetSortTitle() != b->GetSortTitle())
-                return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+                return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
         }
     }
 

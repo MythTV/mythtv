@@ -1058,9 +1058,9 @@ class plTitleSort : public plCompare
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
         if (a->GetSortTitle() != b->GetSortTitle())
-            return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
         if (a->GetSortSubtitle() != b->GetSortSubtitle())
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
 
         if (a->GetRecordingStatus() == b->GetRecordingStatus())
             return a->GetScheduledStartTime() < b->GetScheduledStartTime();
@@ -1093,9 +1093,9 @@ class plPrevTitleSort : public plCompare
     bool operator()(const ProgramInfo *a, const ProgramInfo *b) override // plCompare
     {
         if (a->GetSortTitle() != b->GetSortTitle())
-            return naturalCompare(a->GetSortTitle(), b->GetSortTitle());
+            return naturalCompare(a->GetSortTitle(), b->GetSortTitle()) < 0;
         if (a->GetSortSubtitle() != b->GetSortSubtitle())
-            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle());
+            return naturalCompare(a->GetSortSubtitle(), b->GetSortSubtitle()) < 0;
 
         if (a->GetProgramID() != b->GetProgramID())
             return a->GetProgramID() < b->GetProgramID();
