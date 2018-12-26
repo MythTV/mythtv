@@ -27,6 +27,7 @@ using namespace std;
 #include <mythscreentype.h>
 #include <mythuiimage.h>
 #include <mythuitext.h>
+#include <mythdialogbox.h>
 
 // mythzoneminder
 #include "zmdefines.h"
@@ -67,6 +68,9 @@ class ZMLivePlayer : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
+
+    void showMenu();
 
     void setMonitorLayout(int layout, bool restore = false);
 
@@ -79,6 +83,7 @@ class ZMLivePlayer : public MythScreenType
     bool hideAll();
     void stopPlayers(void);
     void changePlayerMonitor(int playerNo);
+    void changeView(void);
 
     QTimer               *m_frameTimer;
     bool                  m_paused;
@@ -89,6 +94,8 @@ class ZMLivePlayer : public MythScreenType
 
     bool                  m_isMiniPlayer;
     int                   m_alarmMonitor;
+
+    MythDialogBox        *m_menuPopup;
 };
 
 #endif

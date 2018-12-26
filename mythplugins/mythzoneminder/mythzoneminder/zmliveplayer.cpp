@@ -217,15 +217,16 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "INFO" && !m_isMiniPlayer)
         {
-            m_monitorLayout++;
-            if (m_monitorLayout > 5)
-                m_monitorLayout = 1;
-            setMonitorLayout(m_monitorLayout);
+            changeView();
         }
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4" || action == "5" || action == "6" ||
                  action == "7" || action == "8" || action == "9")
             changePlayerMonitor(action.toInt());
+        else if (action == "MENU")
+        {
+            showMenu();
+        }
         else
             handled = false;
     }
@@ -234,6 +235,77 @@ bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
+}
+
+void ZMLivePlayer::showMenu()
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    m_menuPopup = new MythDialogBox("Menu", popupStack, "mainmenu");
+
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "mainmenu");
+
+    m_menuPopup->AddButton(tr("Change View"),     qVariantFromValue(QString("VIEW")));
+    m_menuPopup->AddButton(tr("Change Camera 1"), qVariantFromValue(QString("CAMERA1")));
+
+    if (m_monitorLayout > 1)
+        m_menuPopup->AddButton(tr("Change Camera 2"), qVariantFromValue(QString("CAMERA2")));
+
+    if (m_monitorLayout > 2)
+    {
+        m_menuPopup->AddButton(tr("Change Camera 3"), qVariantFromValue(QString("CAMERA3")));
+        m_menuPopup->AddButton(tr("Change Camera 4"), qVariantFromValue(QString("CAMERA4")));
+    }
+
+    if (m_monitorLayout > 3)
+    {
+        m_menuPopup->AddButton(tr("Change Camera 5"), qVariantFromValue(QString("CAMERA5")));
+        m_menuPopup->AddButton(tr("Change Camera 6"), qVariantFromValue(QString("CAMERA6")));
+    }
+
+    if (m_monitorLayout > 4)
+    {
+        m_menuPopup->AddButton(tr("Change Camera 7"), qVariantFromValue(QString("CAMERA7")));
+        m_menuPopup->AddButton(tr("Change Camera 8"), qVariantFromValue(QString("CAMERA8")));
+    }
+}
+
+void ZMLivePlayer::customEvent(QEvent *event)
+{
+    if (event->type() == DialogCompletionEvent::kEventType)
+    {
+        DialogCompletionEvent *dce = static_cast<DialogCompletionEvent*>(event);
+
+        // make sure the user didn't ESCAPE out of the menu
+        if (dce->GetResult() < 0)
+            return;
+
+        QString resultid   = dce->GetId();
+        QString data = dce->GetData().toString();
+
+        if (resultid == "mainmenu")
+        {
+            if (data == "VIEW")
+                changeView();
+            else if (data.startsWith("CAMERA"))
+            {
+                data = data.remove("CAMERA");
+                int monitor = data.toInt();
+                changePlayerMonitor(monitor);
+            }
+        }
+    }
+}
+
+void ZMLivePlayer::changeView(void)
+{
+    m_monitorLayout++;
+    if (m_monitorLayout > 5)
+        m_monitorLayout = 1;
+    setMonitorLayout(m_monitorLayout);
 }
 
 void ZMLivePlayer::changePlayerMonitor(int playerNo)
