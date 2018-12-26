@@ -235,19 +235,22 @@ void StandardSetting::Load(void)
 
 void StandardSetting::Save(void)
 {
-    m_haveChanged = false;
-
     if (m_storage)
         m_storage->Save();
 
     //we save only the relevant children
     QList<StandardSetting *> *children = getSubSettings();
-    if (!children)
+    if (children)
+    {
+        for (auto i = children->constBegin(); i != children->constEnd(); ++i)
+            (*i)->Save();
+    }
+
+    if (!m_haveChanged)
         return;
 
-    QList<StandardSetting *>::const_iterator i;
-    for (i = children->constBegin(); i != children->constEnd(); ++i)
-        (*i)->Save();
+    m_haveChanged = false;
+    emit ChangeSaved();
 }
 
 void StandardSetting::setName(const QString &name)

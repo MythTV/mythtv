@@ -39,7 +39,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     QString getName(void) const { return m_name; }
     StandardSetting * byName(const QString &name);
 
-    bool isVisible(void) const { return m_visible; };
+    bool isVisible(void) const { return m_visible; }
     bool isEnabled() const { return m_enabled; }
     bool haveChanged();
     void setChanged(bool changed);
@@ -96,6 +96,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void valueChanged(StandardSetting *);
     void ShouldRedraw(StandardSetting *);
     void settingsChanged(StandardSetting *selectedSetting = nullptr);
+    void ChangeSaved();
 
   protected:
     explicit StandardSetting(Storage *_storage = nullptr);
