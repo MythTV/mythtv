@@ -30,7 +30,6 @@
 #ifndef _MISC_SETTINGS_H_
 #define _MISC_SETTINGS_H_
 
-#include "settings.h"
 #include "standardsettings.h"
 #include "channelscantypes.h"
 

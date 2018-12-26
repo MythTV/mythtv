@@ -35,11 +35,11 @@
 using namespace std;
 
 // MythTV headers
+#include <mythdialogs.h>
 #include "mythdialogbox.h"
 #include "channelscanner_gui.h"
 #include "channelscanner_gui_scan_pane.h"
 #include "channelimporter.h"
-#include "loglist.h"
 #include "channelscan_sm.h"
 
 #include "channelbase.h"

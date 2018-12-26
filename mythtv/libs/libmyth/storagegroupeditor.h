@@ -2,7 +2,6 @@
 #define _STORAGEGROUPEDITOR_H
 
 #include "storagegroup.h"
-#include "settings.h"
 #include "standardsettings.h"
 #include "mythwidgets.h"
 #include "mythexp.h"

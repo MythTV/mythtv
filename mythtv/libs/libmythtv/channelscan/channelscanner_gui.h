@@ -34,10 +34,8 @@
 #include <QStringList>
 
 // MythTV headers
-#include "settings.h"
 #include "channelscanner.h"
 
-class LogList;
 class ChannelScannerGUIScanPane;
 class DeleteStage;
 class InsertStage;

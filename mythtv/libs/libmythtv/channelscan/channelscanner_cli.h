@@ -35,7 +35,6 @@
 
 // MythTV headers
 #include "mythtvexp.h"
-#include "settings.h"
 #include "channelscanner.h"
 
 class MTV_PUBLIC ChannelScannerCLI : public ChannelScanner

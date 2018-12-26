@@ -34,7 +34,7 @@
 #include <QCoreApplication>
 
 // MythTV headers
-#include "settings.h"
+#include <standardsettings.h>
 
 class ScanATSCModulation: public TransMythUIComboBoxSetting
 {

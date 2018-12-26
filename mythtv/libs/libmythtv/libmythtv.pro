@@ -585,7 +585,6 @@ using_backend {
     HEADERS += channelscan/channelscanner_cli.h
     HEADERS += channelscan/frequencytablesetting.h
     HEADERS += channelscan/inputselectorsetting.h
-    HEADERS += channelscan/loglist.h
     HEADERS += channelscan/channelscanmiscsettings.h
     HEADERS += channelscan/modulationsetting.h
     HEADERS += channelscan/multiplexsetting.h
@@ -608,7 +607,6 @@ using_backend {
     SOURCES += channelscan/channelscanner_cli.cpp
     SOURCES += channelscan/frequencytablesetting.cpp
     SOURCES += channelscan/inputselectorsetting.cpp
-    SOURCES += channelscan/loglist.cpp
     SOURCES += channelscan/multiplexsetting.cpp
     SOURCES += channelscan/paneanalog.cpp
     SOURCES += channelscan/scanmonitor.cpp

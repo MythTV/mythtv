@@ -51,6 +51,9 @@ using namespace std;
 #include "tv_actions.h"                 // for ACTION_BIGJUMPFWD, etc
 #include "mythcodeccontext.h"
 
+// MythUI headers
+#include <mythmainwindow.h>
+
 extern "C" {
 #include "vsync.h"
 #include "libavcodec/avcodec.h"

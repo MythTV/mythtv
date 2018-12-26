@@ -13,7 +13,6 @@ using namespace std;
 #include <QMap>
 
 // MythTV headers
-#include "settings.h"
 #include "mythtvexp.h"
 
 class InputInfo;

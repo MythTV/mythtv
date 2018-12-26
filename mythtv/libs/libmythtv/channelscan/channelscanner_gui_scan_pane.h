@@ -31,7 +31,6 @@
 #define _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
 
 // MythTV headers
-#include "settings.h"
 #include "mythscreentype.h"
 #include "mythuiprogressbar.h"
 

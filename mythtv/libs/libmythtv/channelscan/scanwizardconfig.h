@@ -31,7 +31,6 @@
 #define _SCAN_WIZARD_CONFIG_H_
 
 // MythTV headers
-#include "settings.h"
 #include "standardsettings.h"
 #include "inputselectorsetting.h"
 #include "channelscantypes.h"
