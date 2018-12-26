@@ -1636,7 +1636,7 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT xmltvid, useonairguide "
+        "SELECT xmltvid, useonairguide, visible "
         "FROM channel "
         "WHERE chanid = :ID");
     query.bindValue(":ID", chan.channel_id);
@@ -1651,6 +1651,7 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
     {
         QString xmltvid = query.value(0).toString();
         bool useeit     = query.value(1).toInt();
+        bool visible    = query.value(2).toInt();
 
         if (!xmltvid.isEmpty())
         {
@@ -1661,6 +1662,8 @@ void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
             chan.xmltvid = xmltvid;
             chan.use_on_air_guide = useeit;
         }
+
+        chan.hidden = !visible;
     }
 }
 
