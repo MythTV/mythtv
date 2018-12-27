@@ -23,10 +23,6 @@ class QString;
 class MSqlQuery;
 class LoggingItem;
 
-MBASE_PUBLIC bool logServerStart(void);
-MBASE_PUBLIC void logServerStop(void);
-void logServerWait(void);
-
 /// \brief Base class for the various logging mechanisms
 class LoggerBase : public QObject
 {
@@ -62,8 +58,6 @@ class FileLogger : public LoggerBase
   private:
     bool m_opened;      ///< true when the logfile is opened
     int  m_fd;          ///< contains the file descriptor for the logfile
-  protected slots:
-    void receivedMessage(const QList<QByteArray>&);
 };
 
 /// \brief Syslog-based logger (not available in Windows)
@@ -81,8 +75,6 @@ class SyslogLogger : public LoggerBase
     static SyslogLogger *create(QMutex *mutex, bool open = true);
   private:
     bool m_opened;          ///< true when syslog channel open.
-  protected slots:
-    void receivedMessage(const QList<QByteArray>&);
 };
 
 class DBLoggerThread;
@@ -116,41 +108,10 @@ class DatabaseLogger : public LoggerBase
     QTime m_errorLoggingTime;   ///< Time when DB error logging was last done
     static const int kMinDisabledTime; ///< Minimum time to disable DB logging
                                        ///  (in ms)
-  protected slots:
-    void receivedMessage(const QList<QByteArray>&);
 };
 
 typedef QList<QByteArray> LogMessage;
 typedef QList<LogMessage *> LogMessageList;
-
-/// \brief The logging thread that received the messages from the clients via
-///        ZeroMQ and dispatches each LoggingItem to each logger instance via
-///        ZeroMQ.
-class LogServerThread : public QObject, public MThread
-{
-    Q_OBJECT
-    friend class LogForwardThread;
-    friend class FileLogger;
-    friend class SyslogLogger;
-    friend class DatabaseLogger;
-
-  public:
-    LogServerThread();
-    ~LogServerThread();
-    void run(void) override; // MThread
-    void stop(void);
-
-  public slots:
-    void receivedMessage(const QList<QByteArray>&);
-
-  private:
-    MythSignalingTimer *m_heartbeatTimer; ///< 1s repeating timer for client
-                                          ///  heartbeats
-
-  protected slots:
-    void checkHeartBeats(void);
-    void pingClient(QString clientId);
-};
 
 /// \brief The logging thread that forwards received messages to the consuming
 ///        loggers via ZeroMQ
@@ -167,20 +128,16 @@ class LogForwardThread : public QObject, public MThread
   private:
     bool m_aborted;                  ///< Flag to abort the thread.
 
-    MythSignalingTimer *m_shutdownTimer;    ///< 5 min timer to shut down if no
-                                            /// clients
-
     void forwardMessage(LogMessage *msg);
-    void expireClients(void);
   signals:
     void incomingSigHup(void);
   protected slots:
     void handleSigHup(void);
-    void shutdownTimerExpired(void);
-
-  signals:
-    void pingClient(QString);
 };
+
+MBASE_PUBLIC bool logForwardStart(void);
+MBASE_PUBLIC void logForwardStop(void);
+MBASE_PUBLIC void logForwardMessage(const QList<QByteArray> &msg);
 
 
 class QWaitCondition;
@@ -220,8 +177,6 @@ class DBLoggerThread : public MThread
                                     ///  that the thread should stop ASAP.
                                     ///  Protected by m_queueMutex
 };
-
-extern LogServerThread *logServerThread;
 
 #ifndef _WIN32
 MBASE_PUBLIC void logSigHup(void);

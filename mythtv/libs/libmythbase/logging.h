@@ -189,8 +189,6 @@ class LoggerThread : public QObject, public MThread
                                     ///  Protected by logQueueMutex
     bool m_aborted;                 ///< Flag to abort the thread.
                                     ///  Protected by logQueueMutex
-    volatile bool m_initialWaiting; ///< Waiting for the initial response from
-                                    ///  mythlogserver
     QString m_filename; ///< Filename of debug logfile
     bool m_progress;    ///< show only LOG_ERR and more important (console only)
     int  m_quiet;       ///< silence the console (console only)
@@ -198,24 +196,9 @@ class LoggerThread : public QObject, public MThread
     QString m_tablename;    ///< Cached table name for db logging
     int m_facility;         ///< Cached syslog facility (or -1 to disable)
     pid_t m_pid;            ///< Cached pid value
-    bool m_locallogs;       ///< Are we logging locally (i.e. this is the
-                            ///  mythlogserver itself)
-    qlonglong m_epoch;      ///< Time last heard from the server (seconds)
-
-    MythSignalingTimer *m_initialTimer; ///< Timer for the initial startup
-    MythSignalingTimer *m_heartbeatTimer;   ///< Timer for 1s heartbeats
-
-    bool m_noserver;
 
   protected:
     bool logConsole(LoggingItem *item);
-    void launchLogServer(void);
-    void pingLogServer(void);
-
-  protected slots:
-    void messageReceived(const QList<QByteArray> &msg);
-    void checkHeartBeat(void);
-    void initialTimeout(void);
 };
 
 #endif

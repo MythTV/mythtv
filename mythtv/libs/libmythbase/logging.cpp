@@ -252,11 +252,9 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
-    m_aborted(false), m_initialWaiting(true),
-    m_filename(filename), m_progress(progress),
+    m_aborted(false), m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
-    m_tablename(table), m_facility(facility), m_pid(getpid()), m_epoch(0),
-    m_initialTimer(nullptr), m_heartbeatTimer(nullptr)
+    m_tablename(table), m_facility(facility), m_pid(getpid())
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != nullptr)
@@ -265,9 +263,8 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
             "Logging thread registration/deregistration enabled!");
         debugRegistration = true;
     }
-    m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
 
-    if (!logServerStart())
+    if (!logForwardStart())
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Failed to start LogServer thread");
@@ -280,7 +277,7 @@ LoggerThread::~LoggerThread()
 {
     stop();
     wait();
-    logServerStop();
+    logForwardStop();
 
     delete m_waitNotEmpty;
     delete m_waitEmpty;
@@ -300,7 +297,6 @@ void LoggerThread::run(void)
 
     bool dieNow = false;
 
-    logServerWait();
     QMutexLocker qLock(&logQueueMutex);
 
     while (!m_aborted || !logQueue.isEmpty())
@@ -342,46 +338,6 @@ void LoggerThread::run(void)
         qApp->processEvents();
     }
 }
-
-/// \brief  Handles the initial startup timeout when waiting for the log server
-///         to show signs of life
-void LoggerThread::initialTimeout(void)
-{
-}
-
-/// \brief  Handles heartbeat checking once a second.  If the server is not
-///         heard from for at least 5s, restart it
-void LoggerThread::checkHeartBeat(void)
-{
-}
-
-/// \brief  Send a ping to the log server
-void LoggerThread::pingLogServer(void)
-{
-}
-
-/// \brief  Launches the logging server daemon
-void LoggerThread::launchLogServer(void)
-{
-}
-
-/// \brief  Handles messages received back from mythlogserver via ZeroMQ.
-///         This is particularly used to receive the acknowledgement of the
-///         kInitializing message which contains the filename of the log to
-///         create and whether to log to db and syslog.  If this is not
-///         received during startup, it is assumed that mythlogserver needs
-///         to be started.  Also, the server will hit us with an empty message
-///         when it hasn't heard from us within a second.  After no responses
-///         from us for 5s, the logs will be closed.
-/// \param  msg    The message received (can be multi-part)
-void LoggerThread::messageReceived(const QList<QByteArray> &/*msg*/)
-{
-    m_initialWaiting = false;
-    // cout << "ping" << endl;
-    loggingGetTimeStamp(&m_epoch, nullptr);
-    pingLogServer();
-}
-
 
 /// \brief  Handles each LoggingItem, generally by handing it off to
 ///         mythlogserver via ZeroMQ.  There is a special case for
@@ -445,13 +401,17 @@ void LoggerThread::handleItem(LoggingItem *item)
 
     if (item->m_message[0] != '\0')
     {
-        if (logServerThread)
-        {
-            QList<QByteArray> list;
-            list.append(QByteArray());
-            list.append(item->toByteArray());
-            logServerThread->receivedMessage(list);
-        }
+        /// TODO: This converts the LoggingItem to json for sending to
+        /// the log server.  Now that the log server is gone, it just
+        /// passed the json to the logForwardThread, where it will
+        /// eventually be converted back to a LoggingItem.  It should
+        /// be possible to eliminate the double conversion now that
+        /// the log server is gone and all logging happens in one
+        /// process.
+        QList<QByteArray> list;
+        list.append(QByteArray());
+        list.append(item->toByteArray());
+        logForwardMessage(list);
     }
 }
 

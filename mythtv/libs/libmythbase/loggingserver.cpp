@@ -60,13 +60,7 @@ extern "C" {
 static QMutex                      loggerMapMutex;
 static QMap<QString, LoggerBase *> loggerMap;
 
-LogServerThread                    *logServerThread = nullptr;
 LogForwardThread                   *logForwardThread = nullptr;
-
-static QMutex                       logThreadStartedMutex;
-static QWaitCondition               logThreadStarted;
-static bool                         logThreadFinished = false;
-static bool                         logThreadStarting = true;
 
 typedef QList<LoggerBase *> LoggerList;
 
@@ -81,7 +75,6 @@ typedef QMap<LoggerBase *, ClientList *> RevClientMap;
 
 static QMutex                       logClientMapMutex;
 static ClientMap                    logClientMap;
-
 static QAtomicInt                   logClientCount;
 
 static QMutex                       logRevClientMapMutex;
@@ -90,11 +83,6 @@ static RevClientMap                 logRevClientMap;
 static QMutex                       logMsgListMutex;
 static LogMessageList               logMsgList;
 static QWaitCondition               logMsgListNotEmpty;
-
-static ClientList                   logClientToDel;
-static QMutex                       logClientToDelMutex;
-
-static QAtomicInt                   msgsSinceHeartbeat;
 
 #define TIMESTAMP_MAX 30
 #define MAX_STRING_LENGTH (LOGLINE_MAX+120)
@@ -688,214 +676,9 @@ void logSigHup(void)
 #endif
 
 
-/// \brief LogServerThread constructor.
-LogServerThread::LogServerThread() :
-    MThread("LogServer"), m_heartbeatTimer(nullptr)
-{
-    moveToThread(qthread());
-}
-
-/// \brief LogServerThread destructor.
-LogServerThread::~LogServerThread()
-{
-    stop();
-    wait();
-}
-
-/// \brief Run the logging thread.  This thread reads from ZeroMQ (TCP:35327)
-///        and handles distributing the LoggingItems to each logger instance
-///        via ZeroMQ (inproc).
-void LogServerThread::run(void)
-{
-    RunProlog();
-
-    logThreadFinished = false;
-    QMutexLocker locker(&logThreadStartedMutex);
-
-    qRegisterMetaType<QList<QByteArray> >("QList<QByteArray>");
-
-    bool abortThread = false;
-
-    // cppcheck-suppress knownConditionTrueFalse
-    if (!abortThread)
-    {
-        logForwardThread = new LogForwardThread();
-        logForwardThread->start();
-
-        connect(logForwardThread, SIGNAL(pingClient(QString)),
-                this, SLOT(pingClient(QString)), Qt::QueuedConnection);
-
-        // cerr << "wake all" << endl;
-        logThreadStarting = false;
-        locker.unlock();
-        logThreadStarted.wakeAll();
-        // cerr << "unlock" << endl;
-
-        msgsSinceHeartbeat = 0;
-
-        exec();
-    }
-
-    logThreadFinished = true;
-
-    if (logForwardThread)
-    {
-        logForwardThread->stop();
-        delete logForwardThread;
-        logForwardThread = nullptr;
-    }
-
-    RunEpilog();
-
-    if (abortThread)
-    {
-        // cerr << "wake all" << endl;
-        logThreadStarting = false;
-        locker.unlock();
-        logThreadStarted.wakeAll();
-        qApp->processEvents();
-        // cerr << "unlock" << endl;
-    }
-}
-
-/// \brief  Sends a ping message to the given client
-/// \param clientId The clientID for the logging client we wish to ping
-void LogServerThread::pingClient(QString clientId)
-{
-    Q_UNUSED(clientId)
-}
-
-
-/// \brief  Handles heartbeat checking once a second.  If a client is not heard
-///         from for at least 1 second, send it a heartbeat message which it
-///         should send back.  If we haven't heard from it in 5s, shut down its
-///         logging.
-void LogServerThread::checkHeartBeats(void)
-{
-}
-
-/// \brief  Handles messages received from logging clients
-/// \param  msg    The message received (can be multi-part)
-void LogServerThread::receivedMessage(const QList<QByteArray> &msg)
-{
-    LogMessage *message = new LogMessage(msg);
-    QMutexLocker lock(&logMsgListMutex);
-
-    bool wasEmpty = logMsgList.isEmpty();
-    logMsgList.append(message);
-
-    if (wasEmpty)
-        logMsgListNotEmpty.wakeAll();
-}
-
-/// \brief Stop the thread
-void LogServerThread::stop(void)
-{
-    quit();
-}
-
-/// \brief  Entry point to start logging for the application.  This will
-///         start up all of the threads needed.
-/// \return TRUE on success, FALSE on failure
-///
-/// \todo   Implement the following parameters to customise behaviour?...
-/// \\param  logfile Filename of the logfile to create.  Empty if no file.
-/// \\param  progress    non-zero if progress output will be sent to the console.
-///                     This squelches all messages less important than LOG_ERR
-///                     on the console
-/// \\param  quiet       quiet level requested (squelches all console output)
-/// \\param  facility    Syslog facility to use.  -1 to disable syslog output
-/// \\param  level       Minimum logging level to put into the logs
-/// \\param  dblog       true if database logging is requested
-/// \\param  propagate   true if the logfile path needs to be propagated to child
-///                     processes.
-bool logServerStart(void)
-{
-    if (logServerThread && logServerThread->isRunning())
-        return true;
-
-    logThreadStarting = true;
-
-    if (!logServerThread)
-        logServerThread = new LogServerThread();
-
-    // cerr << "starting server" << endl;
-    QMutexLocker locker(&logThreadStartedMutex);
-    logServerThread->start();
-    logThreadStarted.wait(locker.mutex());
-    locker.unlock();
-    // cerr << "done starting server" << endl;
-
-    usleep(10000);
-    return (logServerThread && logServerThread->isRunning());
-}
-
-/// \brief  Entry point for stopping logging for an application
-void logServerStop(void)
-{
-    if (logServerThread)
-    {
-        logServerThread->stop();
-        logServerThread->wait();
-    }
-
-    QMutexLocker locker(&loggerMapMutex);
-    QMap<QString, LoggerBase *>::iterator it;
-    for (it = loggerMap.begin(); it != loggerMap.end(); ++it)
-    {
-        it.value()->stopDatabaseAccess();
-    }
-}
-
-void logServerWait(void)
-{
-    // cerr << "waiting" << endl;
-    QMutexLocker locker(&logThreadStartedMutex);
-    while (!logThreadStarted.wait(locker.mutex(), 100) && logThreadStarting);
-    locker.unlock();
-    // cerr << "done waiting" << endl;
-}
-
-void FileLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-    QByteArray json     = msg.at(1);
-    LoggingItem *item   = LoggingItem::create(json);
-    logmsg(item);
-    item->DecrRef();
-}
-
-#ifndef _WIN32
-void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-    QByteArray json     = msg.at(1);
-    LoggingItem *item   = LoggingItem::create(json);
-    logmsg(item);
-    item->DecrRef();
-}
-
-#else
-
-// Windows doesn't have syslog support
-
-void SyslogLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-    (void)msg;
-}
-
-#endif
-
-void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
-{
-    QByteArray json     = msg.at(1);
-    LoggingItem *item   = LoggingItem::create(json);
-    logmsg(item);
-    item->DecrRef();
-}
-
-
 /// \brief LogForwardThread constructor.
 LogForwardThread::LogForwardThread() :
-    MThread("LogForward"), m_aborted(false), m_shutdownTimer(nullptr)
+    MThread("LogForward"), m_aborted(false)
 {
     moveToThread(qthread());
 }
@@ -952,8 +735,6 @@ void LogForwardThread::run(void)
                 lock.relock();
             }
         }
-
-        expireClients();
     }
 
     LoggerList loggers;
@@ -972,17 +753,6 @@ void LogForwardThread::run(void)
     RunEpilog();
 }
 
-
-/// \brief  Fires off when no clients are left (other than the current daemon)
-///         for 5 minutes.
-void LogForwardThread::shutdownTimerExpired(void)
-{
-}
-
-/// \brief Expire any clients in the delete list
-void LogForwardThread::expireClients(void)
-{
-}
 
 /// \brief  SIGHUP handler - reopen all open logfiles for logrollers
 void LogForwardThread::handleSigHup(void)
@@ -1014,8 +784,6 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     }
 #endif
 
-    msgsSinceHeartbeat.ref();
-
     // First section is the client id
     QByteArray clientBa = msg->first();
     QString clientId = QString(clientBa.toHex());
@@ -1024,20 +792,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 
     if (json.size() == 0)
     {
-        // This is either a ping response or a first gasp
-        logClientMapMutex.lock();
-        LoggerListItem *logItem = logClientMap.value(clientId, nullptr);
-        logClientMapMutex.unlock();
-        if (!logItem)
-        {
-            // Send an initial ping so the client knows we are in the house
-            emit pingClient(clientId);
-        }
-        else
-        {
-            // cout << "pong " << clientId.toLocal8Bit().constData() << endl;
-            loggingGetTimeStamp(&logItem->epoch, nullptr);
-        }
+        // cout << "invalid msg, no json data " << qPrintable(clientId) << endl;
         return;
     }
 
@@ -1143,6 +898,43 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 void LogForwardThread::stop(void)
 {
     m_aborted = true;
+}
+
+bool logForwardStart(void)
+{
+    logForwardThread = new LogForwardThread();
+    logForwardThread->start();
+
+    usleep(10000);
+    return (logForwardThread && logForwardThread->isRunning());
+}
+
+void logForwardStop(void)
+{
+    if (!logForwardThread)
+        return;
+
+    logForwardThread->stop();
+    delete logForwardThread;
+    logForwardThread = nullptr;
+
+    QMutexLocker locker(&loggerMapMutex);
+    for (auto it = loggerMap.begin(); it != loggerMap.end(); ++it)
+    {
+        it.value()->stopDatabaseAccess();
+    }
+}
+
+void logForwardMessage(const QList<QByteArray> &msg)
+{
+    LogMessage *message = new LogMessage(msg);
+    QMutexLocker lock(&logMsgListMutex);
+
+    bool wasEmpty = logMsgList.isEmpty();
+    logMsgList.append(message);
+
+    if (wasEmpty)
+        logMsgListNotEmpty.wakeAll();
 }
 
 /*
