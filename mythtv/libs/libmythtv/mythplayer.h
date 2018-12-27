@@ -393,6 +393,8 @@ class MTV_PUBLIC MythPlayer
     FrameScanType GetScanType(void) const { return m_scan; }
     bool IsScanTypeLocked(void) const { return m_scan_locked; }
     void Zoom(ZoomDirection direction);
+    void ToggleMoveBottomLine(void);
+    void SaveBottomLine(void);
     void FileChanged(void);
 
 

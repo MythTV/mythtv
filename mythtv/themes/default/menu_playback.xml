@@ -44,6 +44,8 @@
       <itemlist actiongroup="TOGGLEFILL" current="active" />
     </menu>
     <item action="TOGGLEMANUALZOOM" XXXtext="Manual Zoom Mode" />
+    <item action="BOTTOMLINEMOVE" XXXtext="Toggle BottomLine" />
+    <item action="BOTTOMLINESAVE" XXXtext="Save BottomLine" />
     <menu text="Adjust Picture">
       <itemlist actiongroup="TOGGLEPICCONTROLS" />
       <!-- Alternatively:

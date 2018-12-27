@@ -691,6 +691,12 @@ void TV::InitKeys(void)
             "Swap PBP/PIP Windows"), "N");
     REG_KEY("TV Playback", "TOGGLEPIPSTATE", QT_TRANSLATE_NOOP("MythControls",
             "Change PxP view"), "");
+    REG_KEY("TV Playback", ACTION_BOTTOMLINEMOVE,
+            QT_TRANSLATE_NOOP("MythControls", "Move BottomLine off screen"),
+            "L");
+    REG_KEY("TV Playback", ACTION_BOTTOMLINESAVE,
+            QT_TRANSLATE_NOOP("MythControls", "Save manual zoom for BottomLine"),
+            ""),
     REG_KEY("TV Playback", "TOGGLEASPECT", QT_TRANSLATE_NOOP("MythControls",
             "Toggle the video aspect ratio"), "Ctrl+W");
     REG_KEY("TV Playback", "TOGGLEFILL", QT_TRANSLATE_NOOP("MythControls",
@@ -1001,7 +1007,7 @@ void TV::InitKeys(void)
   Teletext     F2,F3,F4,F5,F6,F7,F8
   ITV          F2,F3,F4,F5,F6,F7,F12
 
-  Playback: Ctrl-B,Ctrl-G,Ctrl-Y,Ctrl-U
+  Playback: Ctrl-B,Ctrl-G,Ctrl-Y,Ctrl-U,L
 */
 }
 
@@ -2659,7 +2665,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
 /**
  *  \brief Starts recorder, must be called before StartPlayer().
- *  \param ctx The player context requesting recording. 
+ *  \param ctx The player context requesting recording.
  *  \param maxWait How long to wait for RecorderBase to start recording. If
  *                 not provided, this defaults to 40 seconds.
  *  \return true when successful, false otherwise.
@@ -4301,6 +4307,8 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
           has_action("STRETCHDEC",      actions) ||
           has_action(ACTION_MUTEAUDIO,  actions) ||
           has_action("CYCLEAUDIOCHAN",  actions) ||
+          has_action("BOTTOMLINEMOVE",  actions) ||
+          has_action("BOTTOMLINESAVE",  actions) ||
           has_action("TOGGLEASPECT",    actions) ||
           has_action("TOGGLEPIPMODE",   actions) ||
           has_action("TOGGLEPIPSTATE",  actions) ||
@@ -4915,7 +4923,11 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
     bool handled = true;
     bool islivetv = StateIsLiveTV(GetState(ctx));
 
-    if (has_action("TOGGLEASPECT", actions))
+    if (has_action(ACTION_BOTTOMLINEMOVE, actions))
+        ToggleMoveBottomLine(ctx);
+    else if (has_action(ACTION_BOTTOMLINESAVE, actions))
+        SaveBottomLine(ctx);
+    else if (has_action("TOGGLEASPECT", actions))
         ToggleAspectOverride(ctx);
     else if (has_action("TOGGLEFILL", actions))
         ToggleAdjustFill(ctx);
@@ -9325,6 +9337,39 @@ void TV::IdleDialogTimeout(void)
     ReturnPlayerLock(mctx);
 }
 
+void TV::ToggleMoveBottomLine(PlayerContext *ctx)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (!ctx->player)
+    {
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        return;
+    }
+
+    ctx->player->ToggleMoveBottomLine();
+    QString msg = ctx->player->GetVideoOutput()->GetZoomString();
+
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+    SetOSDMessage(ctx, msg);
+}
+
+void TV::SaveBottomLine(PlayerContext *ctx)
+{
+    ctx->LockDeletePlayer(__FILE__, __LINE__);
+    if (!ctx->player)
+    {
+        ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+        return;
+    }
+
+    ctx->player->SaveBottomLine();
+
+    ctx->UnlockDeletePlayer(__FILE__, __LINE__);
+
+    SetOSDMessage(ctx, "Current 'Manual Zoom' saved for 'BottomLine'.");
+}
+
 void TV::ToggleAspectOverride(PlayerContext *ctx, AspectOverrideMode aspectMode)
 {
     ctx->LockDeletePlayer(__FILE__, __LINE__);
@@ -10898,6 +10943,10 @@ void TV::OSDDialogEvent(int result, QString text, QString action)
         ToggleOSDDebug(actx);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
+    else if (action == ACTION_BOTTOMLINEMOVE)
+        ToggleMoveBottomLine(actx);
+    else if (action == ACTION_BOTTOMLINESAVE)
+        SaveBottomLine(actx);
     else if (action == "TOGGLESTRETCH")
         ToggleTimeStretch(actx);
     else if (action == ACTION_ENABLEUPMIX)

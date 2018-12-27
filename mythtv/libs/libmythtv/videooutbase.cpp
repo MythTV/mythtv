@@ -919,6 +919,25 @@ void VideoOutput::Zoom(ZoomDirection direction)
 }
 
 /**
+ * \fn VideoOutput::ToogleMoveBottomLine(void)
+ * \brief Toggle "zooming" the bottomline (sports tickers) off the screen.
+ *        Applied in MoveResize().
+ */
+void VideoOutput::ToggleMoveBottomLine(void)
+{
+    window.ToggleMoveBottomLine();
+}
+
+/**
+ * \fn VideoOutput::SaveBottomLine(void)
+ * \brief Save current Manual Zoom settings as BottomLine adjustment.
+ */
+void VideoOutput::SaveBottomLine(void)
+{
+    window.SaveBottomLine();
+}
+
+/**
  * \fn VideoOutput::ToggleAspectOverride(AspectOverrideMode)
  * \brief Enforce different aspect ration than detected,
  *        then calls VideoAspectRatioChanged(float)

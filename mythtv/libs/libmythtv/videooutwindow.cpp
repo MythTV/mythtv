@@ -85,7 +85,8 @@ VideoOutWindow::VideoOutWindow() :
 
     // Various state variables
     embedding(false), needrepaint(false),
-    allowpreviewepg(true), pip_state(kPIPOff)
+    allowpreviewepg(true), bottomline(false),
+    pip_state(kPIPOff)
 {
     db_pip_size = gCoreContext->GetNumSetting("PIPSize", 26);
 
@@ -945,6 +946,36 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
 
     mz_scale_v = snap(mz_scale_v, 1.0f, zf / 2);
     mz_scale_h = snap(mz_scale_h, 1.0f, zf / 2);
+}
+
+void VideoOutWindow::ToggleMoveBottomLine(void)
+{
+    if (bottomline)
+    {
+        mz_move.setY(0);
+        mz_scale_v = 1.0;
+        bottomline = false;
+    }
+    else
+    {
+        const float zf = 0.02;
+
+        int y = gCoreContext->GetNumSetting("OSDMoveBottomLine", 4);
+        mz_move.setY(y);
+        double z = static_cast<double>
+                   (gCoreContext->GetNumSetting("OSDZoomBottomLine", 112)) / 100.0;
+        mz_scale_v = snap(z, 1.0f, zf / 2);
+
+        bottomline = true;
+    }
+
+    MoveResize();
+}
+
+void VideoOutWindow::SaveBottomLine(void)
+{
+    gCoreContext->SaveSetting("OSDMoveBottomLine", GetMzMove().y());
+    gCoreContext->SaveSetting("OSDZoomBottomLine", GetMzScaleV() * 100.0);
 }
 
 QString VideoOutWindow::GetZoomString(void) const

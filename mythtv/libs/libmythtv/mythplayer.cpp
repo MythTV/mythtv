@@ -1946,10 +1946,10 @@ void MythPlayer::AVSync(VideoFrame *buffer, bool limit_delay)
 
     if (!dropframe)
     {
-        // PGB this was orignally in the calling methods 
+        // PGB this was orignally in the calling methods
         // MythPlayer::DisplayNormalFrame and MythDVDPlayer::DisplayLastFrame
         // Moved here to reduce CPU usage since the OSD was being merged
-        // into frames that were not being displayed, thereby causing 
+        // into frames that were not being displayed, thereby causing
         // interruptions and slowdowns.
         osdLock.lock();
         videofiltersLock.lock();
@@ -2487,7 +2487,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             if (bufferingCounter >= 10)
                 LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
                     QString("Waited %1ms for video buffers %2")
-                    .arg(waited_for).arg(videoOutput->GetFrameStatus())); 
+                    .arg(waited_for).arg(videoOutput->GetFrameStatus()));
             else
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
                     QString("Waited %1ms for video buffers %2")
@@ -4801,6 +4801,21 @@ void MythPlayer::Zoom(ZoomDirection direction)
         videoOutput->Zoom(direction);
         ReinitOSD();
     }
+}
+
+void MythPlayer::ToggleMoveBottomLine(void)
+{
+    if (videoOutput)
+    {
+        videoOutput->ToggleMoveBottomLine();
+        ReinitOSD();
+    }
+}
+
+void MythPlayer::SaveBottomLine(void)
+{
+    if (videoOutput)
+        videoOutput->SaveBottomLine();
 }
 
 void MythPlayer::ExposeEvent(void)

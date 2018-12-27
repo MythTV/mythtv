@@ -51,6 +51,8 @@ class VideoOutWindow
 
     void MoveResize(void);
     void Zoom(ZoomDirection direction);
+    void ToggleMoveBottomLine(void);
+    void SaveBottomLine(void);
 
     // Sets
     void SetVideoScalingAllowed(bool change);
@@ -174,6 +176,7 @@ class VideoOutWindow
     bool     embedding;
     bool     needrepaint;
     bool     allowpreviewepg;
+    bool     bottomline;
     PIPState pip_state;
 
     // Constants
@@ -185,4 +188,3 @@ class VideoOutWindow
 };
 
 #endif /* VIDEOOUTWINDOW_H_ */
-

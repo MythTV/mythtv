@@ -111,6 +111,8 @@ class VideoOutput
 
     virtual void MoveResize(void);
     virtual void Zoom(ZoomDirection direction);
+    virtual void ToggleMoveBottomLine(void);
+    virtual void SaveBottomLine(void);
 
     virtual void GetOSDBounds(QRect &total, QRect &visible,
                               float &visibleAspect, float &fontScale,
