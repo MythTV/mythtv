@@ -37,6 +37,7 @@ class ClassicLogoDetector : public LogoDetectorBase
     int commDetectLogoSecondsNeeded;
     int commDetectLogoWidthRatio;
     int commDetectLogoHeightRatio;
+    int commDetectLogoMinPixels;
     double commDetectLogoGoodEdgeThreshold;
     double commDetectLogoBadEdgeThreshold;
     QString commDetectLogoLocation;
