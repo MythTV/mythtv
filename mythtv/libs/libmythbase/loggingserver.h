@@ -17,12 +17,6 @@
 #include "mythsignalingtimer.h"
 #include "mthread.h"
 
-// ZMQ forward declarations
-namespace nzmqt {
-    class ZMQSocket;
-    class ZMQContext;
-}
-
 #define LOGLINE_MAX (2048-120)
 
 class QString;
@@ -51,7 +45,6 @@ class LoggerBase : public QObject
     /// \brief Stop logging to the database
     virtual void stopDatabaseAccess(void) { }
   protected:
-    virtual bool setupZMQSocket(void) = 0;
     char *m_handle; ///< semi-opaque handle for identifying instance
 };
 
@@ -66,12 +59,9 @@ class FileLogger : public LoggerBase
     bool logmsg(LoggingItem *item) override; // LoggerBase
     void reopen(void) override; // LoggerBase
     static FileLogger *create(QString filename, QMutex *mutex);
-  protected:
-    bool setupZMQSocket(void) override; // LoggerBase
   private:
     bool m_opened;      ///< true when the logfile is opened
     int  m_fd;          ///< contains the file descriptor for the logfile
-    nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
 };
@@ -89,11 +79,8 @@ class SyslogLogger : public LoggerBase
     /// \brief Unused for this logger.
     void reopen(void) override { }; // LoggerBase
     static SyslogLogger *create(QMutex *mutex, bool open = true);
-  protected:
-    bool setupZMQSocket(void) override; // LoggerBase
   private:
     bool m_opened;          ///< true when syslog channel open.
-    nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
 };
@@ -114,8 +101,6 @@ class DatabaseLogger : public LoggerBase
     void stopDatabaseAccess(void) override; // LoggerBase
     static DatabaseLogger *create(QString table, QMutex *mutex);
   protected:
-    bool setupZMQSocket(void) override; // LoggerBase
-  protected:
     bool logqmsg(MSqlQuery &query, LoggingItem *item);
     void prepare(MSqlQuery &query);
   private:
@@ -131,7 +116,6 @@ class DatabaseLogger : public LoggerBase
     QTime m_errorLoggingTime;   ///< Time when DB error logging was last done
     static const int kMinDisabledTime; ///< Minimum time to disable DB logging
                                        ///  (in ms)
-    nzmqt::ZMQSocket *m_zmqSock;  ///< ZeroMQ feeding socket
   protected slots:
     void receivedMessage(const QList<QByteArray>&);
 };
@@ -155,15 +139,11 @@ class LogServerThread : public QObject, public MThread
     ~LogServerThread();
     void run(void) override; // MThread
     void stop(void);
-    nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
 
   public slots:
     void receivedMessage(const QList<QByteArray>&);
 
   private:
-    nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
-    nzmqt::ZMQSocket *m_zmqInSock;   ///< ZeroMQ feeding socket
-
     MythSignalingTimer *m_heartbeatTimer; ///< 1s repeating timer for client
                                           ///  heartbeats
 
@@ -184,11 +164,8 @@ class LogForwardThread : public QObject, public MThread
     ~LogForwardThread();
     void run(void) override; // MThread
     void stop(void);
-    nzmqt::ZMQContext *getZMQContext(void) { return m_zmqContext; };
   private:
     bool m_aborted;                  ///< Flag to abort the thread.
-    nzmqt::ZMQContext *m_zmqContext; ///< ZeroMQ context
-    nzmqt::ZMQSocket *m_zmqPubSock;  ///< ZeroMQ publishing socket
 
     MythSignalingTimer *m_shutdownTimer;    ///< 5 min timer to shut down if no
                                             /// clients

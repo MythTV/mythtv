@@ -22,12 +22,6 @@
 #  include <unistd.h>	// pid_t
 #endif
 
-// ZMQ forward declarations
-namespace nzmqt {
-    class ZMQSocket;
-    class ZMQContext;
-}
-
 #if CONFIG_SYSTEMD_JOURNAL
 #define SYSTEMD_JOURNAL_FACILITY -99
 #endif
@@ -207,10 +201,6 @@ class LoggerThread : public QObject, public MThread
     bool m_locallogs;       ///< Are we logging locally (i.e. this is the
                             ///  mythlogserver itself)
     qlonglong m_epoch;      ///< Time last heard from the server (seconds)
-
-    nzmqt::ZMQContext *m_zmqContext;    ///< ZeroMQ context to use
-    nzmqt::ZMQSocket  *m_zmqSocket;     ///< ZeroMQ socket to talk to
-                                        /// mythlogserver
 
     MythSignalingTimer *m_initialTimer; ///< Timer for the initial startup
     MythSignalingTimer *m_heartbeatTimer;   ///< Timer for 1s heartbeats

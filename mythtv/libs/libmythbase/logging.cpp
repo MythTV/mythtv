@@ -257,7 +257,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
     m_tablename(table), m_facility(facility), m_pid(getpid()), m_epoch(0),
-    m_zmqContext(nullptr), m_zmqSocket(nullptr), m_initialTimer(nullptr),
+    m_initialTimer(nullptr),
     m_heartbeatTimer(nullptr), m_noserver(noserver)
 {
     char *debug = getenv("VERBOSE_THREADS");

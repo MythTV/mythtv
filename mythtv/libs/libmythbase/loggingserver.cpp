@@ -133,7 +133,7 @@ LoggerBase::~LoggerBase()
 /// \brief FileLogger constructor
 /// \param filename Filename of the logfile.
 FileLogger::FileLogger(const char *filename) :
-        LoggerBase(filename), m_opened(false), m_fd(-1), m_zmqSock(nullptr)
+        LoggerBase(filename), m_opened(false), m_fd(-1)
 {
     m_fd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
     m_opened = (m_fd != -1);
@@ -170,12 +170,6 @@ FileLogger *FileLogger::create(QString filename, QMutex *mutex)
     // inserts into loggerMap
     logger = new FileLogger(file);
     mutex->lock();
-
-    if (!logger->setupZMQSocket())
-    {
-        delete logger;
-        return nullptr;
-    }
 
     ClientList *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
@@ -249,17 +243,11 @@ bool FileLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-bool FileLogger::setupZMQSocket(void)
-{
-    return true;
-}
-
-
 #ifndef _WIN32
 /// \brief SyslogLogger constructor
 /// \param facility Syslog facility to use in logging
 SyslogLogger::SyslogLogger(bool open) :
-    LoggerBase(nullptr), m_opened(false), m_zmqSock(nullptr)
+    LoggerBase(nullptr), m_opened(false)
 {
     if (open)
     {
@@ -291,12 +279,6 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
     // inserts into loggerMap
     logger = new SyslogLogger(open);
     mutex->lock();
-
-    if (!logger->setupZMQSocket())
-    {
-        delete logger;
-        return nullptr;
-    }
 
     ClientList *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
@@ -347,16 +329,12 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-bool SyslogLogger::setupZMQSocket(void)
-{
-    return true;
-}
 #else
 
 // Windows doesn't have syslog support
 
 SyslogLogger::SyslogLogger() :
-    LoggerBase(NULL), m_opened(false), m_zmqSock(NULL)
+    LoggerBase(NULL), m_opened(false)
 {
 }
 
@@ -375,11 +353,6 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     return false;
 }
 
-bool SyslogLogger::setupZMQSocket(void)
-{
-    return false;
-}
-
 #endif
 
 const int DatabaseLogger::kMinDisabledTime = 1000;
@@ -387,8 +360,7 @@ const int DatabaseLogger::kMinDisabledTime = 1000;
 /// \brief DatabaseLogger constructor
 /// \param table C-string of the database table to log to
 DatabaseLogger::DatabaseLogger(const char *table) :
-    LoggerBase(table), m_opened(false), m_loggingTableExists(false),
-    m_zmqSock(nullptr)
+    LoggerBase(table), m_opened(false), m_loggingTableExists(false)
 {
     m_query = QString(
         "INSERT INTO %1 "
@@ -431,12 +403,6 @@ DatabaseLogger *DatabaseLogger::create(QString table, QMutex *mutex)
     // inserts into loggerMap
     logger = new DatabaseLogger(tble);
     mutex->lock();
-
-    if (!logger->setupZMQSocket())
-    {
-        delete logger;
-        return nullptr;
-    }
 
     ClientList *clients = new ClientList;
     logRevClientMap.insert(logger, clients);
@@ -490,11 +456,6 @@ bool DatabaseLogger::logmsg(LoggingItem *item)
         return false;
 
     m_thread->enqueue(item);
-    return true;
-}
-
-bool DatabaseLogger::setupZMQSocket(void)
-{
     return true;
 }
 
@@ -729,8 +690,7 @@ void logSigHup(void)
 
 /// \brief LogServerThread constructor.
 LogServerThread::LogServerThread() :
-    MThread("LogServer"), m_zmqContext(nullptr), m_zmqInSock(nullptr),
-    m_heartbeatTimer(nullptr)
+    MThread("LogServer"), m_heartbeatTimer(nullptr)
 {
     moveToThread(qthread());
 }
@@ -935,8 +895,7 @@ void DatabaseLogger::receivedMessage(const QList<QByteArray> &msg)
 
 /// \brief LogForwardThread constructor.
 LogForwardThread::LogForwardThread() :
-    MThread("LogForward"), m_aborted(false), m_zmqContext(nullptr),
-    m_zmqPubSock(nullptr), m_shutdownTimer(nullptr)
+    MThread("LogForward"), m_aborted(false), m_shutdownTimer(nullptr)
 {
     moveToThread(qthread());
 }
