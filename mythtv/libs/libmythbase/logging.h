@@ -173,7 +173,7 @@ class LoggerThread : public QObject, public MThread
                              const char *, int, const char *, ... );
   public:
     LoggerThread(QString filename, bool progress, bool quiet, QString table,
-                 int facility, bool noserver);
+                 int facility);
     ~LoggerThread();
     void run(void) override; // MThread
     void stop(void);

@@ -83,7 +83,6 @@ typedef struct {
     int     facility;
     bool    dblog;
     QString path;
-    bool    noserver;
 } LogPropagateOpts;
 
 LogPropagateOpts        logPropagateOpts;
@@ -249,7 +248,7 @@ void LoggingItem::setThreadTid(void)
 ///        and deregistration if the VERBOSE_THREADS environment variable is
 ///        set.
 LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
-                           QString table, int facility, bool noserver) :
+                           QString table, int facility) :
     MThread("Logger"),
     m_waitNotEmpty(new QWaitCondition()),
     m_waitEmpty(new QWaitCondition()),
@@ -257,8 +256,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
     m_tablename(table), m_facility(facility), m_pid(getpid()), m_epoch(0),
-    m_initialTimer(nullptr),
-    m_heartbeatTimer(nullptr), m_noserver(noserver)
+    m_initialTimer(nullptr), m_heartbeatTimer(nullptr)
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != nullptr)
@@ -269,7 +267,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     }
     m_locallogs = (m_appname == MYTH_APPNAME_MYTHLOGSERVER);
 
-    if (!m_noserver && !logServerStart())
+    if (!logServerStart())
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Failed to start LogServer thread");
@@ -282,11 +280,8 @@ LoggerThread::~LoggerThread()
 {
     stop();
     wait();
+    logServerStop();
 
-    if (!m_noserver)
-    {
-        logServerStop();
-    }
     delete m_waitNotEmpty;
     delete m_waitEmpty;
 }
@@ -305,11 +300,7 @@ void LoggerThread::run(void)
 
     bool dieNow = false;
 
-    if (!m_noserver)
-    {
-        logServerWait();
-    }
-
+    logServerWait();
     QMutexLocker qLock(&logQueueMutex);
 
     while (!m_aborted || !logQueue.isEmpty())
@@ -450,11 +441,6 @@ void LoggerThread::handleItem(LoggingItem *item)
             char *threadName = logThreadHash.take(item->m_threadId);
             free(threadName);
         }
-    }
-
-    if (m_noserver)
-    {
-        return;
     }
 
     if (item->m_message[0] != '\0')
@@ -725,12 +711,6 @@ void logPropagateCalc(void)
     }
 #endif
 #endif
-
-    if (logPropagateOpts.noserver)
-    {
-        logPropagateArgs += " --disable-mythlogserver";
-        logPropagateArgList << "--disable-mythlogserver";
-    }
 }
 
 /// \brief Check if we are propagating a "--quiet"
@@ -738,13 +718,6 @@ void logPropagateCalc(void)
 bool logPropagateQuiet(void)
 {
     return logPropagateOpts.quiet;
-}
-
-/// \brief Check if we are propagating a "--disable-mythlogserver"
-/// \return true if --disable-mythlogserver is being propagated
-bool logPropagateNoServer(void)
-{
-    return logPropagateOpts.noserver;
 }
 
 /// \brief  Entry point to start logging for the application.  This will
@@ -759,9 +732,8 @@ bool logPropagateNoServer(void)
 /// \param  dblog       true if database logging is requested
 /// \param  propagate   true if the logfile path needs to be propagated to child
 ///                     processes.
-/// \param  noserver    true if messages should *not* be sent to mythlogserver
 void logStart(QString logfile, int progress, int quiet, int facility,
-              LogLevel_t level, bool dblog, bool propagate, bool noserver)
+              LogLevel_t level, bool dblog, bool propagate)
 {
     if (logThread && logThread->isRunning())
         return;
@@ -774,7 +746,6 @@ void logStart(QString logfile, int progress, int quiet, int facility,
     logPropagateOpts.quiet = quiet;
     logPropagateOpts.facility = facility;
     logPropagateOpts.dblog = dblog;
-    logPropagateOpts.noserver = noserver;
 
     if (propagate)
     {
@@ -788,7 +759,7 @@ void logStart(QString logfile, int progress, int quiet, int facility,
     QString table = dblog ? QString("logging") : QString("");
 
     if (!logThread)
-        logThread = new LoggerThread(logfile, progress, quiet, table, facility, noserver);
+        logThread = new LoggerThread(logfile, progress, quiet, table, facility);
 
     logThread->start();
 }

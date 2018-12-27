@@ -2598,7 +2598,6 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     }
 #endif
     bool dblog = toBool("enabledblog");
-    bool noserver = toBool("disablemythlogserver");
     LogLevel_t level = GetLogLevel();
     if (level == LOG_UNKNOWN)
         return GENERIC_EXIT_INVALID_CMDLINE;
@@ -2618,7 +2617,7 @@ int MythCommandLineParser::ConfigureLogging(QString mask, unsigned int progress)
     if (toBool("daemon"))
         quiet = max(quiet, 1);
 
-    logStart(logfile, progress, quiet, facility, level, dblog, propagate, noserver);
+    logStart(logfile, progress, quiet, facility, level, dblog, propagate);
 
     return GENERIC_EXIT_OK;
 }
