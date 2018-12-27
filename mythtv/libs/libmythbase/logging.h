@@ -22,9 +22,6 @@
 #  include <unistd.h>	// pid_t
 #endif
 
-#undef NOLOGSERVER
-#define NOLOGSERVER
-
 // ZMQ forward declarations
 namespace nzmqt {
     class ZMQSocket;

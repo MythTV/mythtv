@@ -17,9 +17,6 @@
 #include "mythsignalingtimer.h"
 #include "mthread.h"
 
-#undef NOLOGSERVER
-#define NOLOGSERVER
-
 // ZMQ forward declarations
 namespace nzmqt {
     class ZMQSocket;

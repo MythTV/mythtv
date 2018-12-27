@@ -143,7 +143,6 @@ win32-msvc* {
 
     LIBS += -lws2_32
     EXTRA_LIBS += -lzlib
-    DEFINES += NOLOGSERVER
 
     # we need to make sure version.h is generated.
 
