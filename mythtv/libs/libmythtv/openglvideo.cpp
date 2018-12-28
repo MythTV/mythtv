@@ -300,7 +300,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
 void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 {
-    // to improve performance on slower cards
+    // to improve performance on slower cards when deinterlacing
     bool resize_up = ((video_disp_dim.height() < display_video_rect.height()) ||
                      (video_disp_dim.width() < display_video_rect.width())) && allow;
 
@@ -327,6 +327,12 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
         AddFilter(kGLFilterResize);
         OptimiseFilters();
         return;
+    }
+
+    if (!resize_down)
+    {
+        RemoveFilter(kGLFilterResize);
+        filters.erase(kGLFilterResize);
     }
 
     RemoveFilter(kGLFilterBicubic);
