@@ -1065,6 +1065,7 @@ bool MythRenderOpenGL::InitFeatures(void)
     static bool fences        = true;
     static bool ycbcrtextures = true;
     static bool mipmapping    = true;
+    static bool rgba16        = true;
     static bool check         = true;
 
     if (check)
@@ -1078,6 +1079,7 @@ bool MythRenderOpenGL::InitFeatures(void)
         fences        = !getenv("OPENGL_NOFENCE");
         ycbcrtextures = !getenv("OPENGL_NOYCBCR");
         mipmapping    = !getenv("OPENGL_NOMIPMAP");
+        rgba16        = !getenv("OPENGL_NORGBA16");
         if (!multitexture)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling multi-texturing.");
         if (!vertexarrays)
@@ -1094,6 +1096,8 @@ bool MythRenderOpenGL::InitFeatures(void)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling YCbCr textures.");
         if (!mipmapping)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling mipmapping.");
+        if (!rgba16)
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling RGBA16 textures");
     }
 
     GLint maxtexsz = 0;
@@ -1108,6 +1112,10 @@ bool MythRenderOpenGL::InitFeatures(void)
     m_default_texture_type = GetTextureType(rects);
     if (rects)
         m_exts_supported += kGLExtRect;
+
+    // GL 1.1
+    if (rgba16)
+        m_exts_supported += kGLExtRGBA16;
 
     if (m_extensions.contains("GL_ARB_multitexture") &&
         m_glActiveTexture && multitexture)

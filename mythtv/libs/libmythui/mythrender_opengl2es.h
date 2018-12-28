@@ -190,6 +190,17 @@ class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
             // so kGLExtPBufObj is not enabled
             LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: OES mapbuffer available.");
         }
+
+        // GL_EXT_texture_norm16 for GL_RGBA16 support
+        if (m_extensions.contains("GL_EXT_texture_norm16"))
+        {
+            static bool rgba16 = !getenv("OPENGL_NORGBA16");
+            if (rgba16)
+                m_exts_supported += kGLExtRGBA16;
+            else
+                LOG(VB_GENERAL, LOG_INFO, "OpenGL2ES: Disabling RGBA16 textures");
+        }
+
         m_exts_used = m_exts_supported;
 
         static bool debugged = false;

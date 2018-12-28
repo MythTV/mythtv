@@ -210,7 +210,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     // turn on bicubic filtering
     if (options.contains("openglbicubic"))
     {
-        if (shaders && fbos)
+        if (shaders && fbos && (gl_features & kGLExtRGBA16))
             defaultUpsize = kGLFilterBicubic;
         else
             LOG(VB_PLAYBACK, LOG_ERR, LOC +

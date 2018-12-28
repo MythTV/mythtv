@@ -60,7 +60,8 @@ typedef enum
     kGLSL          = 0x0400,
     kGLVertexArray = 0x0800,
     kGLExtVBO      = 0x1000,
-    kGLMaxFeat     = 0x2000,
+    kGLExtRGBA16   = 0x2000,
+    kGLMaxFeat     = 0x4000,
 } GLFeatures;
 
 #define TEX_OFFSET 8
