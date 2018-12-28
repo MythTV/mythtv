@@ -113,10 +113,6 @@
 #define APIENTRY
 #endif
 
-typedef void (APIENTRY * MYTH_GLTEXIMAGE1DPROC)
-    (GLenum target, GLint level, GLenum internalformat, GLsizei width,
-     GLint border, GLenum format, GLenum type, const GLvoid *pixels);
-
 typedef void (APIENTRY * MYTH_GLACTIVETEXTUREPROC)
     (GLenum texture);
 

@@ -707,8 +707,7 @@ void MythRenderOpenGL::SetTextureFilters(uint tex, uint filt, uint wrap)
     glTexParameteri(type, GL_TEXTURE_MIN_FILTER, filt);
     glTexParameteri(type, GL_TEXTURE_MAG_FILTER, mag_filt);
     glTexParameteri(type, GL_TEXTURE_WRAP_S, wrap);
-    if (type != GL_TEXTURE_1D)
-        glTexParameteri(type, GL_TEXTURE_WRAP_T, wrap);
+    glTexParameteri(type, GL_TEXTURE_WRAP_T, wrap);
     doneCurrent();
 }
 
