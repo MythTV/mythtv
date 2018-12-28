@@ -1227,9 +1227,9 @@ static const QString var_fast =
 "TEMP tmp, res;\n";
 
 static const QString end_fast =
-"DPH tmp.r, res.arbg, yuv[0];\n"
-"DPH tmp.g, res.arbg, yuv[1];\n"
-"DPH tmp.b, res.arbg, yuv[2];\n"
+"DPH tmp.r, res.abrg, yuv[0];\n"
+"DPH tmp.g, res.abrg, yuv[1];\n"
+"DPH tmp.b, res.abrg, yuv[2];\n"
 "MOV tmp.a, 1.0;\n"
 "MOV result.color, tmp;\n";
 
@@ -1481,7 +1481,7 @@ static const QString YUV2RGBFragmentShader =
 "void main(void)\n"
 "{\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
+"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
 "}\n";
 
 static const QString OneFieldShader[2] = {
@@ -1494,7 +1494,7 @@ static const QString OneFieldShader[2] = {
 "    float field = v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * %2)) * %3);\n"
 "    field       = clamp(field, 0.0, %9);\n"
 "    vec4 yuva   = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, field));\n"
-"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
+"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1505,7 +1505,7 @@ static const QString OneFieldShader[2] = {
 "{\n"
 "    vec2 field   = vec2(0.0, step(0.5, 1.0 - fract(v_texcoord0.y * %2)) * %3);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
-"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
+"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1523,7 +1523,7 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
+"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1538,7 +1538,7 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
+"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1572,7 +1572,7 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
+"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1603,7 +1603,7 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    gl_FragColor = vec4(yuva.arb, 1.0) * COLOUR_UNIFORM;\n"
+"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
