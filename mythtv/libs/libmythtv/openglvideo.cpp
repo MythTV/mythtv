@@ -37,7 +37,7 @@ class OpenGLFilter
  *  (faster CPU->GPU memory transfers).
  *
  *  In the most basic case, for example, a YV12 frame pre-converted in software
- *  to BGRA format is simply blitted to the frame buffer.
+ *  to RGBA format is simply blitted to the frame buffer.
  *  Currently, the most complicated example is the rendering of a standard
  *  definition, interlaced frame to a high(er) definition display using
  *  OpenGL (i.e. hardware based) deinterlacing, colourspace conversion and
@@ -74,7 +74,7 @@ OpenGLVideo::OpenGLVideo() :
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
-    gl_features(0),           videoTextureType(GL_BGRA),
+    gl_features(0),           videoTextureType(GL_RGBA),
     preferYCBCR(false)
 {
 }
@@ -181,23 +181,31 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
             "extensions are available.");
     }
 
-    // decide on best video input texture format
-    videoTextureType = GL_BGRA;
-    if (hw_accel)
-        videoTextureType = GL_RGBA;
-    else if ((!shaders || preferYCBCR) && (gl_features & kGLMesaYCbCr))
-        videoTextureType = GL_YCBCR_MESA;
-    else if ((!shaders || preferYCBCR) && (gl_features & kGLAppleYCbCr))
-        videoTextureType = GL_YCBCR_422_APPLE;
-    else if (glsl && fbos && yv12)
-        videoTextureType = MYTHTV_YV12;
-
+    // decide on best video input texture format and supported picture attributes
     // colourspace adjustments require shaders to operate on YUV textures
-    if ((GL_BGRA != videoTextureType) &&
-        (MYTHTV_YV12 != videoTextureType))
+    videoTextureType = GL_RGBA;
+    PictureAttributeSupported pictureattribs = colourSpace->SupportedAttributes();
+
+    if (hw_accel)
     {
-        colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
+        // a hardware decoded frame - hopefully this is handled elsewhere
+        pictureattribs = kPictureAttributeSupported_None;
     }
+    else if ((!shaders || preferYCBCR) && (gl_features & kGLMesaYCbCr))
+    {
+        videoTextureType = GL_YCBCR_MESA;
+        pictureattribs = kPictureAttributeSupported_None;
+    }
+    else if ((!shaders || preferYCBCR) && (gl_features & kGLAppleYCbCr))
+    {
+        videoTextureType = GL_YCBCR_422_APPLE;
+        pictureattribs = kPictureAttributeSupported_None;
+    }
+    else if (glsl && fbos && yv12)
+    {
+        videoTextureType = MYTHTV_YV12;
+    }
+    colourSpace->SetSupportedAttributes(pictureattribs);
 
     // turn on bicubic filtering
     if (options.contains("openglbicubic"))
@@ -210,7 +218,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     }
 
     // decide on best input texture type
-    if ((GL_RGBA != videoTextureType) &&
+    if (!hw_accel &&
         (MYTHTV_YV12 != videoTextureType) &&
         (defaultUpsize != kGLFilterBicubic) &&
         (gl_features & kGLExtRect))
@@ -222,21 +230,21 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
     bool    ok = false;
 
-    if ((GL_BGRA == videoTextureType))
-        ok = tex && AddFilter(kGLFilterYUV2RGB);
-    else if (MYTHTV_YV12 == videoTextureType)
+    if (MYTHTV_YV12 == videoTextureType)
         ok = tex && AddFilter(kGLFilterYV12RGB);
+    else if (!hw_accel)
+        ok = tex && AddFilter(kGLFilterYUV2RGB);
     else
         ok = tex && AddFilter(kGLFilterResize);
 
     if (ok)
     {
-        if (GL_RGBA == videoTextureType)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Using raw RGBA input textures.");
+        if (hw_accel)
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Using hardware decoded input textures.");
         else if ((GL_YCBCR_MESA == videoTextureType) ||
                  (GL_YCBCR_422_APPLE == videoTextureType))
             LOG(VB_GENERAL, LOG_INFO, LOC +
-                "Using YCbCr->BGRA input textures.");
+                "Using YCbCr->RGBA input textures.");
         else if (MYTHTV_YV12 == videoTextureType)
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 "Using YV12 input textures.");
@@ -255,12 +263,12 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                 "Falling back to software conversion.\n\t\t\t"
                 "Any opengl filters will also be disabled.");
 
-        videoTextureType = GL_BGRA;
-        GLuint bgra32tex = CreateVideoTexture(video_dim, inputTextureSize);
+        videoTextureType = GL_RGBA;
+        GLuint rgba32tex = CreateVideoTexture(video_dim, inputTextureSize);
 
-        if (bgra32tex && AddFilter(kGLFilterResize))
+        if (rgba32tex && AddFilter(kGLFilterResize))
         {
-            inputTextures.push_back(bgra32tex);
+            inputTextures.push_back(rgba32tex);
             colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
         }
         else
@@ -865,7 +873,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     {
         // software conversion
         AVFrame img_out;
-        AVPixelFormat out_fmt = AV_PIX_FMT_BGRA;
+        AVPixelFormat out_fmt = AV_PIX_FMT_RGBA;
         if ((GL_YCBCR_MESA == videoTextureType) ||
             (GL_YCBCR_422_APPLE == videoTextureType))
         {
