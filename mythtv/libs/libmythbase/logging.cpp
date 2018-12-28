@@ -788,11 +788,6 @@ int syslogGetFacility(QString facility)
         "Android does not support syslog, disabling" );
     Q_UNUSED(facility);
     return( -2 );
-#elif defined(Q_OS_ANDROID)
-    LOG(VB_GENERAL, LOG_NOTICE,
-        "Android does not support syslog, disabling" );
-    Q_UNUSED(facility);
-    return( -2 );
 #else
     const CODE *name;
     int i;
