@@ -70,7 +70,7 @@ class MythGLTexture
   public:
     MythGLTexture() :
         m_type(GL_TEXTURE_2D), m_data(nullptr), m_data_size(0),
-        m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_BGRA),
+        m_data_type(GL_UNSIGNED_BYTE), m_data_fmt(GL_RGBA),
         m_internal_fmt(GL_RGBA8), m_pbo(0), m_vbo(0),
         m_filter(GL_LINEAR), m_wrap(GL_CLAMP_TO_EDGE),
         m_size(0,0), m_act_size(0,0)
@@ -177,7 +177,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     uint  CreateHelperTexture(void);
     uint  CreateTexture(QSize act_size, bool use_pbo, uint type,
                         uint data_type = GL_UNSIGNED_BYTE,
-                        uint data_fmt = GL_BGRA, uint internal_fmt = GL_RGBA8,
+                        uint data_fmt = GL_RGBA, uint internal_fmt = GL_RGBA8,
                         uint filter = GL_LINEAR, uint wrap = GL_CLAMP_TO_EDGE);
     QSize GetTextureSize(uint type, const QSize &size);
     QSize GetTextureSize(uint tex);
