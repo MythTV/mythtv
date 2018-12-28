@@ -19,11 +19,8 @@ class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
     void DeleteShaderObject(uint obj) override; // MythRenderOpenGL
     void EnableShaderObject(uint obj) override; // MythRenderOpenGL
     void SetShaderParams(uint obj, const QMatrix4x4 &m, const char* uniform) override; // MythRenderOpenGL
-
-    uint CreateHelperTexture(void) override; // MythRenderOpenGL
-
-    void  PushTransformation(const UIEffects &fx, QPointF &center) override; // MythRenderOpenGL
-    void  PopTransformation(void) override; // MythRenderOpenGL
+    void PushTransformation(const UIEffects &fx, QPointF &center) override; // MythRenderOpenGL
+    void PopTransformation(void) override; // MythRenderOpenGL
 
 
   protected:

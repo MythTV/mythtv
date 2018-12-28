@@ -473,7 +473,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         break;
 
       case kGLFilterBicubic:
-        if (!(gl_features & kGLExtFragProg) || !(gl_features & kGLExtFBufObj))
+        if ((!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL)) || !(gl_features & kGLExtFBufObj))
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 "Features not available for bicubic filter.");

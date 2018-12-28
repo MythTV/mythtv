@@ -174,6 +174,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     void  UpdateTexture(uint tex, void *buf);
     int   GetTextureType(bool &rect);
     bool  IsRectTexture(uint type);
+    uint  CreateHelperTexture(void);
     uint  CreateTexture(QSize act_size, bool use_pbo, uint type,
                         uint data_type = GL_UNSIGNED_BYTE,
                         uint data_fmt = GL_BGRA, uint internal_fmt = GL_RGBA8,
@@ -183,7 +184,6 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     int   GetTextureDataSize(uint tex);
     void  SetTextureFilters(uint tex, uint filt, uint wrap);
     void  ActiveTexture(int active_tex);
-    virtual uint CreateHelperTexture(void) { return 0; }
     void  EnableTextures(uint type, uint tex_type = 0);
     void  DisableTextures(void);
     void  DeleteTexture(uint tex);
@@ -285,9 +285,6 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     // For Performance improvement set false to disable glFlush.
     // Needed for Raspberry pi
     bool    m_flushEnabled;
-
-    // 1D Textures (not available on GL ES 2.0)
-    MYTH_GLTEXIMAGE1DPROC                m_glTexImage1D;
 
     // Multi-texturing
     MYTH_GLACTIVETEXTUREPROC             m_glActiveTexture;
