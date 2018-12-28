@@ -1412,7 +1412,7 @@ static HostComboBoxSetting *PlayBoxOrdering()
     for (int i = 0; i < 4; ++i)
         gc->addSelection(str[i], QString::number(i));
 
-    gc->setValue(1);
+    gc->setValue(3);
     gc->setHelpText(help);
 
     return gc;

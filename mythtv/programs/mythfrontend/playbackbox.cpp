@@ -132,26 +132,24 @@ static int comp_recordDate_rev(const ProgramInfo *a, const ProgramInfo *b)
 
 static int comp_season(const ProgramInfo *a, const ProgramInfo *b)
 {
-    if (((a->GetSeason() == 0) && (a->GetEpisode() == 0)) && ((b->GetSeason() == 0) && (b->GetEpisode() == 0)))
-        return comp_recordDate(a,b);
-    if (a->GetSeason() == b->GetSeason())
-        return (a->GetEpisode() <
-                b->GetEpisode() ? 1 : -1);
-    else
-        return (a->GetSeason() <
-                b->GetSeason() ? 1 : -1);
+    if (a->GetSeason() == 0 || b->GetSeason() == 0)
+        return comp_originalAirDate(a, b);
+    if (a->GetSeason() != b->GetSeason())
+        return (a->GetSeason() < b->GetSeason() ? 1 : -1);
+    if (a->GetEpisode() == 0 && b->GetEpisode() == 0)
+        return comp_originalAirDate(a, b);
+    return (a->GetEpisode() < b->GetEpisode() ? 1 : -1);
 }
 
 static int comp_season_rev(const ProgramInfo *a, const ProgramInfo *b)
 {
-    if (((a->GetSeason() == 0) && (a->GetEpisode() == 0)) && ((b->GetSeason() == 0) && (b->GetEpisode() == 0)))
-        return comp_recordDate_rev(a,b);
-    if (a->GetSeason() == b->GetSeason())
-        return (a->GetEpisode() >
-                b->GetEpisode() ? 1 : -1);
-    else
-        return (a->GetSeason() >
-                b->GetSeason() ? 1 : -1);
+    if (a->GetSeason() == 0 || b->GetSeason() == 0)
+        return comp_originalAirDate_rev(a, b);
+    if (a->GetSeason() != b->GetSeason())
+        return (a->GetSeason() > b->GetSeason() ? 1 : -1);
+    if (a->GetEpisode() == 0 && b->GetEpisode() == 0)
+        return comp_originalAirDate_rev(a, b);
+    return (a->GetEpisode() > b->GetEpisode() ? 1 : -1);
 }
 
 static bool comp_programid_less_than(
@@ -445,7 +443,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name,
 
     m_recGroup           = gCoreContext->GetSetting("DisplayRecGroup",
                                                 "All Programs");
-    int pbOrder        = gCoreContext->GetNumSetting("PlayBoxOrdering", 1);
+    int pbOrder        = gCoreContext->GetNumSetting("PlayBoxOrdering", 3);
     // Split out sort order modes, wacky order for backward compatibility
     m_listOrder = (pbOrder >> 1) ^ (m_allOrder = pbOrder & 1);
     m_watchListStart     = gCoreContext->GetBoolSetting("PlaybackWLStart", false);
