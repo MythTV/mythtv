@@ -144,7 +144,7 @@ win32 {
             QMAKE_CXXFLAGS *= /MDd /MP /wd4100 /wd4996
 
             LIBS           += -L$$SRC_PATH_BARE/bin/debug
-            EXTRA_LIBS     += -lpthreadVC2d -llibzmq -L$$SRC_PATH_BARE/bin/debug
+            EXTRA_LIBS     += -lpthreadVC2d -L$$SRC_PATH_BARE/bin/debug
 
         } else {
 
@@ -158,12 +158,9 @@ win32 {
             QMAKE_CXXFLAGS *= /MD /MP /wd4100 /wd4996
 
             LIBS           += -L$$SRC_PATH_BARE/bin/release
-            EXTRA_LIBS     += -lpthreadVC2 -llibzmq -L$$SRC_PATH_BARE/bin/release
+            EXTRA_LIBS     += -lpthreadVC2 -L$$SRC_PATH_BARE/bin/release
 
         }
-
-        EXTRA_LIBS += -lmythnzmqt
-
 
     }
 

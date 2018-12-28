@@ -7297,8 +7297,6 @@ if enabled source_path_used; then
         libswscale/$arch
         tests
         tools
-        external/zeromq
-        external/nzmqt/src
         external/libmythbluray
         external/libmythdvdnav
         external/libudfread
@@ -7317,8 +7315,6 @@ if enabled source_path_used; then
         libavutil/Makefile
         libpostproc/Makefile
         libswscale/Makefile
-        external/zeromq/Makefile
-        external/nzmqt/src/Makefile
         external/libmythbluray/Makefile
         external/libmythdvdnav/Makefile
         external/libudfread/Makefile

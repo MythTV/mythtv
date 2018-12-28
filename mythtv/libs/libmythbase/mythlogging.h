@@ -82,7 +82,6 @@ MBASE_PUBLIC void logStart(QString logfile, int progress = 0, int quiet = 0,
 MBASE_PUBLIC void logStop(void);
 MBASE_PUBLIC void logPropagateCalc(void);
 MBASE_PUBLIC bool logPropagateQuiet(void);
-MBASE_PUBLIC bool logPropagateNoServer(void);
 
 MBASE_PUBLIC int  syslogGetFacility(QString facility);
 MBASE_PUBLIC LogLevel_t logLevelGet(QString level);

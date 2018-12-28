@@ -17,6 +17,7 @@ using namespace std;
 
 #include "mythlogging.h"
 #include "logging.h"
+#include "loggingserver.h"
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"
@@ -253,7 +254,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_waitEmpty(new QWaitCondition()),
     m_aborted(false), m_filename(filename), m_progress(progress),
     m_quiet(quiet), m_appname(QCoreApplication::applicationName()),
-    m_tablename(table), m_facility(facility), m_pid(getpid()), m_epoch(0)
+    m_tablename(table), m_facility(facility), m_pid(getpid())
 {
     char *debug = getenv("VERBOSE_THREADS");
     if (debug != nullptr)
@@ -263,6 +264,11 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
         debugRegistration = true;
     }
 
+    if (!logForwardStart())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            "Failed to start LogServer thread");
+    }
     moveToThread(qthread());
 }
 
@@ -271,6 +277,7 @@ LoggerThread::~LoggerThread()
 {
     stop();
     wait();
+    logForwardStop();
 
     delete m_waitNotEmpty;
     delete m_waitEmpty;
@@ -389,6 +396,21 @@ void LoggerThread::handleItem(LoggingItem *item)
             char *threadName = logThreadHash.take(item->m_threadId);
             free(threadName);
         }
+    }
+
+    if (item->m_message[0] != '\0')
+    {
+        /// TODO: This converts the LoggingItem to json for sending to
+        /// the log server.  Now that the log server is gone, it just
+        /// passed the json to the logForwardThread, where it will
+        /// eventually be converted back to a LoggingItem.  It should
+        /// be possible to eliminate the double conversion now that
+        /// the log server is gone and all logging happens in one
+        /// process.
+        QList<QByteArray> list;
+        list.append(QByteArray());
+        list.append(item->toByteArray());
+        logForwardMessage(list);
     }
 }
 

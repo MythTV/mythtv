@@ -196,7 +196,6 @@ class LoggerThread : public QObject, public MThread
     QString m_tablename;    ///< Cached table name for db logging
     int m_facility;         ///< Cached syslog facility (or -1 to disable)
     pid_t m_pid;            ///< Cached pid value
-    qlonglong m_epoch;      ///< Time last heard from the server (seconds)
 
   protected:
     bool logConsole(LoggingItem *item);

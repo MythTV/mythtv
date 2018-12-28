@@ -13,8 +13,6 @@ contains(QMAKE_CXX, "g++") {
   QMAKE_LFLAGS += -fprofile-arcs
 }
 
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/zeromq/src/.libs/
-QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/nzmqt/src/
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../..
 
 # Input
