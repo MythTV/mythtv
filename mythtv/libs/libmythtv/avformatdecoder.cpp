@@ -2523,14 +2523,19 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #endif
             if (averror_count > SEQ_PKT_ERR_MAX || force_sw_decode(enc))
             {
+                bool wasgpu = dec != "ffmpeg";
+                if (FlagIsSet(kDecodeAllowGPU) && force_sw_decode(enc) && wasgpu)
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, LOC +
+                        "Unsupported Video Profile - forcing software decode");
+                }
+                if (FlagIsSet(kDecodeAllowGPU) && averror_count > SEQ_PKT_ERR_MAX & wasgpu)
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, LOC +
+                        "GPU decoding failed - forcing software decode");
+                }
                 averror_count = 0;
                 dec = "ffmpeg";
-                if (FlagIsSet(kDecodeAllowGPU))
-                {
-                    LOG(VB_PLAYBACK, LOG_WARNING, LOC +
-                        QString("Unsupported Video Profile, "
-                                "forcing software decode"));
-                }
             }
 
             if (version && FlagIsSet(kDecodeAllowGPU))
