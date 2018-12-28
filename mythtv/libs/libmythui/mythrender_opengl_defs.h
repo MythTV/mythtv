@@ -8,9 +8,6 @@
 #ifndef GL_RGBA
 #define GL_RGBA 0x1908
 #endif
-#ifndef GL_BGRA
-#define GL_BGRA  GL_RGBA
-#endif
 #ifndef GL_RGBA8
 #define GL_RGBA8 GL_RGBA
 #endif
