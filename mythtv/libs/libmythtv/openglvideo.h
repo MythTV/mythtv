@@ -55,7 +55,7 @@ class OpenGLVideo
     bool AddDeinterlacer(const QString &deinterlacer);
     void SetDeinterlacing(bool deinterlacing);
     QString GetDeinterlacer(void) const
-         { return hardwareDeinterlacer; };
+         { return hardwareDeinterlacer; }
     void SetSoftwareDeinterlacer(const QString &filter);
 
     void PrepareFrame(bool topfieldfirst, FrameScanType scan,
@@ -65,8 +65,7 @@ class OpenGLVideo
 
     void  SetMasterViewport(QSize size)   { masterViewportSize = size; }
     QSize GetViewPort(void)         const { return viewportSize; }
-    void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
-                      { display_video_rect = dispvidrect; video_rect = vidrect;}
+    void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect);
     QSize GetVideoSize(void)        const { return video_dim;}
 
   private:

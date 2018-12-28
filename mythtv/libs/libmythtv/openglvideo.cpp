@@ -340,6 +340,15 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     OptimiseFilters();
 }
 
+void OpenGLVideo::SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
+{
+    display_video_rect = dispvidrect;
+    video_rect = vidrect;
+    gl_context->makeCurrent();
+    CheckResize(hardwareDeinterlacing, softwareDeinterlacer.isEmpty() ? true : softwareDeinterlacer != "bobdeint");
+    gl_context->doneCurrent();
+}
+
 /**
  *  Ensure the current chain of OpenGLFilters is logically correct
  *  and has the resources required to complete rendering.
@@ -912,7 +921,11 @@ void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
 void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 {
     if (softwareDeinterlacer != filter)
+    {
+        gl_context->makeCurrent();
         CheckResize(false, filter != "bobdeint");
+        gl_context->doneCurrent();
+    }
     softwareDeinterlacer = filter;
 }
 
