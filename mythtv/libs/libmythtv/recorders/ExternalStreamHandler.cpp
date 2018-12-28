@@ -558,6 +558,11 @@ ExternalStreamHandler::ExternalStreamHandler(const QString & path,
              logPropagateArgs.split(' ', QString::SkipEmptyParts);
     m_app = m_args.first();
     m_args.removeFirst();
+
+    // Pass one (and only one) 'quiet'
+    if (!m_args.contains("--quiet") && !m_args.contains("-q"))
+        m_args << "--quiet";
+
     m_args << "--inputid" << QString::number(majorid);
     LOG(VB_RECORD, LOG_INFO, LOC + QString("args \"%1\"")
         .arg(m_args.join(" ")));
