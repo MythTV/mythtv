@@ -2,7 +2,9 @@
 #define VIDEOOUT_OMX_H
 
 #ifdef USING_OPENGLES
+#ifdef USING_BROADCOM
 #define OSD_EGL // OSD with EGL
+#endif
 #endif
 
 #include <OMX_Types.h>
