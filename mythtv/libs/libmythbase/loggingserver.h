@@ -77,6 +77,21 @@ class SyslogLogger : public LoggerBase
     bool m_opened;          ///< true when syslog channel open.
 };
 
+#if CONFIG_SYSTEMD_JOURNAL
+class JournalLogger : public LoggerBase
+{
+    Q_OBJECT
+
+  public:
+    JournalLogger();
+    ~JournalLogger();
+    bool logmsg(LoggingItem *item) override; // LoggerBase
+    /// \brief Unused for this logger.
+    void reopen(void) override { }; // LoggerBase
+    static JournalLogger *create(QMutex *mutex);
+};
+#endif
+
 class DBLoggerThread;
 
 /// \brief Database logger - logs to the MythTV database

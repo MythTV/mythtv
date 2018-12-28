@@ -232,8 +232,8 @@ bool FileLogger::logmsg(LoggingItem *item)
 }
 
 #ifndef _WIN32
-/// \brief SyslogLogger constructor
-/// \param facility Syslog facility to use in logging
+/// \brief SyslogLogger constructor \param facility Syslog facility to
+/// use in logging
 SyslogLogger::SyslogLogger(bool open) :
     LoggerBase(nullptr), m_opened(false)
 {
@@ -278,24 +278,6 @@ SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
 /// \param item LoggingItem containing the log message to process
 bool SyslogLogger::logmsg(LoggingItem *item)
 {
-#if CONFIG_SYSTEMD_JOURNAL
-    if (item->facility() == SYSTEMD_JOURNAL_FACILITY)
-    {
-        sd_journal_send(
-            "MESSAGE=%s", item->rawMessage(),
-            "PRIORITY=%d", item->level(),
-            "CODE_FILE=%s", item->rawFile(),
-            "CODE_LINE=%d", item->line(),
-            "CODE_FUNC=%s", item->rawFunction(),
-            "SYSLOG_IDENTIFIER=%s", item->rawAppName(),
-            "SYSLOG_PID=%d", item->pid(),
-            "MYTH_THREAD=%s", item->rawThreadName(),
-	    NULL
-        );
-        return true;
-    }
-    else
-#endif
     if (!m_opened || item->facility() <= 0)
         return false;
 
@@ -317,30 +299,58 @@ bool SyslogLogger::logmsg(LoggingItem *item)
     return true;
 }
 
-#else
-
-// Windows doesn't have syslog support
-
-SyslogLogger::SyslogLogger() :
-    LoggerBase(NULL), m_opened(false)
+#if CONFIG_SYSTEMD_JOURNAL
+/// \brief JournalLogger constructor
+JournalLogger::JournalLogger() :
+    LoggerBase(nullptr)
 {
+    LOG(VB_GENERAL, LOG_INFO, "Added journal logging");
 }
 
-SyslogLogger::~SyslogLogger()
+/// \brief JournalLogger deconstructor.
+JournalLogger::~JournalLogger()
 {
+    LOG(VB_GENERAL, LOG_INFO, "Removing journal logging");
 }
 
-SyslogLogger *SyslogLogger::create(QMutex *mutex, bool open)
+JournalLogger *JournalLogger::create(QMutex *mutex)
 {
-    return NULL;
+    JournalLogger *logger =
+        dynamic_cast<JournalLogger *>(loggerMap.value("", nullptr));
+
+    if (logger)
+        return logger;
+
+    // Need to add a new FileLogger
+    mutex->unlock();
+    // inserts into loggerMap
+    logger = new JournalLogger();
+    mutex->lock();
+
+    ClientList *clients = new ClientList;
+    logRevClientMap.insert(logger, clients);
+    return logger;
 }
 
-bool SyslogLogger::logmsg(LoggingItem *item)
-{
-    (void)item;
-    return false;
-}
 
+/// \brief Process a log message, logging to syslog
+/// \param item LoggingItem containing the log message to process
+bool JournalLogger::logmsg(LoggingItem *item)
+{
+    sd_journal_send(
+        "MESSAGE=%s", item->rawMessage(),
+        "PRIORITY=%d", item->level(),
+        "CODE_FILE=%s", item->rawFile(),
+        "CODE_LINE=%d", item->line(),
+        "CODE_FUNC=%s", item->rawFunction(),
+        "SYSLOG_IDENTIFIER=%s", item->rawAppName(),
+        "SYSLOG_PID=%d", item->pid(),
+        "MYTH_THREAD=%s", item->rawThreadName(),
+        NULL
+        );
+    return true;
+}
+#endif
 #endif
 
 const int DatabaseLogger::kMinDisabledTime = 1000;
@@ -837,15 +847,9 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
 #ifndef _WIN32
         // SyslogLogger from facility
         int facility = item->facility();
-#if CONFIG_SYSTEMD_JOURNAL
-        if ((facility > 0) || (facility == SYSTEMD_JOURNAL_FACILITY))
-        {
-            logger = SyslogLogger::create(lock2.mutex(), facility > 0);
-#else
         if (facility > 0)
         {
             logger = SyslogLogger::create(lock2.mutex());
-#endif
 
             ClientList *clients = logRevClientMap.value(logger);
 
@@ -855,6 +859,22 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
             if (logger && loggers)
                 loggers->insert(0, logger);
         }
+
+#if CONFIG_SYSTEMD_JOURNAL
+        // Journal Logger
+        if (facility == SYSTEMD_JOURNAL_FACILITY)
+        {
+            logger = JournalLogger::create(lock2.mutex());
+
+            ClientList *clients = logRevClientMap.value(logger);
+
+            if (clients)
+                clients->insert(0, clientId);
+
+            if (logger && loggers)
+                loggers->insert(0, logger);
+        }
+#endif
 #endif
 
         // DatabaseLogger from table
