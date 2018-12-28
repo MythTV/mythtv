@@ -2529,7 +2529,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         "Unsupported Video Profile - forcing software decode");
                 }
-                if (FlagIsSet(kDecodeAllowGPU) && averror_count > SEQ_PKT_ERR_MAX & wasgpu)
+                if (FlagIsSet(kDecodeAllowGPU) && averror_count > SEQ_PKT_ERR_MAX && wasgpu)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         "GPU decoding failed - forcing software decode");
