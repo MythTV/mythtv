@@ -94,8 +94,6 @@ class ZMLivePlayer : public MythScreenType
 
     bool                  m_isMiniPlayer;
     int                   m_alarmMonitor;
-
-    MythDialogBox        *m_menuPopup;
 };
 
 #endif
