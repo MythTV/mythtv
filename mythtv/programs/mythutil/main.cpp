@@ -10,6 +10,7 @@
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythversion.h"
+#include "loggingserver.h"
 #include "mythlogging.h"
 
 // Local includes
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     gContext = new MythContext(MYTH_BINARY_VERSION);

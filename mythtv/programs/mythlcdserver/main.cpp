@@ -17,6 +17,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "loggingserver.h"
 #include "mythlogging.h"
 #include "mythversion.h"
 #include "tv_play.h"
@@ -105,6 +106,7 @@ int main(int argc, char **argv)
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
+    SignalHandler::SetHandler(SIGHUP, logSigHup);
 #endif
 
     //  Get the MythTV context and db hooks
