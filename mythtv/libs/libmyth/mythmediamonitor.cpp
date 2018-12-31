@@ -17,7 +17,6 @@ using namespace std;
 #include "mythmediamonitor.h"
 #include "mythcdrom.h"
 #include "mythcorecontext.h"
-#include "mythdialogs.h"
 #include "mythconfig.h"
 #include "mythdialogbox.h"
 #include "mythdate.h"
@@ -205,27 +204,45 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString &label,
         return drives.front();
     }
 
-    QList <MythMediaDevice *>::iterator it;
-    QStringList buttonmsgs;
-    for (it = drives.begin(); it != drives.end(); ++it)
-        buttonmsgs += DevName(*it);
-    buttonmsgs += tr("Cancel");
-    const DialogCode cancelbtn = (DialogCode)
-        (((int)kDialogCodeButton0) + buttonmsgs.size() - 1);
+    MythMainWindow *win = GetMythMainWindow();
+    if (!win)
+        return nullptr;
 
-    DialogCode ret = MythPopupBox::ShowButtonPopup(
-        GetMythMainWindow(), "select drive", label,
-        buttonmsgs, cancelbtn);
+    MythScreenStack *stack = win->GetMainStack();
+    if (!stack)
+        return nullptr;
+
+    // Ignore MENU dialog actions
+    int btnIndex = -2;
+    while (btnIndex < -1)
+    {
+        auto dlg = new MythDialogBox(label, stack, "select drive");
+        if (!dlg->Create())
+        {
+            delete dlg;
+            return nullptr;
+        }
+
+        // Add button for each drive
+        for (auto drive : drives)
+            dlg->AddButton(DevName(drive));
+
+        dlg->AddButton(tr("Cancel"));
+
+        stack->AddScreen(dlg);
+
+        // Wait in local event loop so events are processed
+        QEventLoop block;
+        connect(dlg,    &MythDialogBox::Closed,
+                &block, [&](QString, int result) { block.exit(result); });
+
+        // Block until dialog closes
+        btnIndex = block.exec();
+    }
 
     // If the user cancelled, return a special value
-    if ((kDialogCodeRejected == ret) || (cancelbtn == ret))
-        return (MythMediaDevice *)-1;
-
-    int idx = MythDialog::CalcItemIndex(ret);
-    if (idx < drives.count())
-        return drives[idx];
-
-    return nullptr;
+    return btnIndex < 0 || btnIndex >= drives.size() ? (MythMediaDevice *)-1
+                                                     : drives.at(btnIndex);
 }
 
 
