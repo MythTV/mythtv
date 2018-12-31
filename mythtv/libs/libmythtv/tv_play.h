@@ -45,7 +45,6 @@ class MythPlayer;
 class DetectLetterbox;
 class RingBuffer;
 class ProgramInfo;
-class MythDialog;
 class PlayerContext;
 class TvPlayWindow;
 class TV;

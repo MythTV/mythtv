@@ -32,7 +32,6 @@
 #include "remoteutil.h"
 #include "ringbuffer.h"
 #include "v4lchannel.h"
-#include "dialogbox.h"
 #include "cardutil.h"
 #include "jobqueue.h"
 #include "mythdb.h"

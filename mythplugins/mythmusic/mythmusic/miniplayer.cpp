@@ -3,6 +3,7 @@
 
 // mythtv
 #include <mythcontext.h>
+#include <mythmainwindow.h>
 #include <lcddevice.h>
 
 // mythmusic

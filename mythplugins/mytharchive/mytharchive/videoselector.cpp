@@ -8,7 +8,6 @@
 
 // mythtv
 #include <mythcontext.h>
-#include <dialogbox.h>
 #include <mythdb.h>
 #include <mythuitext.h>
 #include <mythuibutton.h>

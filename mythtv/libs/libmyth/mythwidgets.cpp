@@ -12,7 +12,6 @@
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "mythdate.h"
-#include "mythdialogs.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
 

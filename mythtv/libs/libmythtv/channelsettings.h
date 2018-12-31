@@ -11,7 +11,6 @@
 // MythTV
 #include "mythtvexp.h"
 #include "standardsettings.h"
-#include "mythwidgets.h"
 #include "mythdb.h"
 #include "mythlogging.h"
 

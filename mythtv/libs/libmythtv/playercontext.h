@@ -28,7 +28,6 @@ class MythPlayer;
 class RingBuffer;
 class ProgramInfo;
 class LiveTVChain;
-class MythDialog;
 class QPainter;
 
 struct osdInfo

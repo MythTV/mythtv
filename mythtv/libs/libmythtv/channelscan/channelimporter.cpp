@@ -13,9 +13,7 @@ using namespace std;
 
 // MythTV headers
 #include "channelimporter.h"
-#include "mythdialogs.h"
 #include "mythdialogbox.h"
-#include "mythwidgets.h"
 #include "mythdb.h"
 #include "mpegstreamdata.h" // for kEncDecrypted
 #include "channelutil.h"

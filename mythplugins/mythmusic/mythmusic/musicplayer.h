@@ -2,7 +2,6 @@
 #define MUSICPLAYER_H_
 
 // mythtv
-#include <mythdialogs.h>
 #include <audiooutput.h>
 #include <mythobservable.h>
 
