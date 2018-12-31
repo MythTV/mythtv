@@ -190,7 +190,8 @@ class MTV_PUBLIC ChannelUtil
     enum OrderBy
     {
         kChanOrderByChanNum,
-        kChanOrderByName
+        kChanOrderByName,
+        kChanOrderByLiveTV,
     };
 
     enum GroupBy
@@ -221,7 +222,10 @@ class MTV_PUBLIC ChannelUtil
                                         OrderBy orderBy = kChanOrderByChanNum,
                                         GroupBy groupBy = kChanGroupByChanid,
                                         uint sourceID = 0,
-                                        uint channelGroupID = 0 );
+                                        uint channelGroupID = 0,
+                                        bool liveTVOnly = false,
+                                        QString callsign = "",
+                                        QString channum = "");
 
     /**
      * \deprecated Use LoadChannels instead

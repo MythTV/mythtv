@@ -73,6 +73,7 @@ using namespace std;
 #include "mythtranslation.h"
 #include "commandlineparser.h"
 #include "tvremoteutil.h"
+#include "channelutil.h"
 
 #include "myththemedmenu.h"
 #include "mediarenderer.h"
@@ -605,8 +606,30 @@ static bool isLiveTVAvailable(void)
 
 static void startTVNormal(void)
 {
-    if (isLiveTVAvailable())
-        TV::StartTV(nullptr, kStartTVNoFlags);
+    if (!isLiveTVAvailable())
+        return;
+
+    // Get the default channel keys (callsign(0) and channum(1)) and
+    // use them to generate the ordered list of channels.
+    QStringList keylist = gCoreContext->GetSettingOnHost(
+        "DefaultChanKeys", gCoreContext->GetHostName()).split("[]:[]");
+    while (keylist.size() < 2)
+        keylist << "";
+    uint dummy;
+    ChannelInfoList livetvchannels = ChannelUtil::LoadChannels(
+        0,                      // startIndex
+        0,                      // count
+        dummy,                  // totalAvailable
+        true,                   // ignoreHidden
+        ChannelUtil::kChanOrderByLiveTV, // orderBy
+        ChannelUtil::kChanGroupByChanid, // groupBy
+        0,                      // sourceID
+        0,                      // channelGroupID
+        true,                   // liveTVOnly
+        keylist[0],             // callsign
+        keylist[1]);            // channum
+
+    TV::StartTV(nullptr, kStartTVNoFlags, livetvchannels);
 }
 
 static void showStatus(void)

@@ -2373,7 +2373,10 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                                           ChannelUtil::OrderBy orderBy,
                                           ChannelUtil::GroupBy groupBy,
                                           uint sourceID,
-                                          uint channelGroupID)
+                                          uint channelGroupID,
+                                          bool liveTVOnly,
+                                          QString callsign,
+                                          QString channum)
 {
     ChannelInfoList channelList;
 
@@ -2386,8 +2389,11 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
                   "serviceid, atsc_major_chan, atsc_minor_chan, last_record, "
                   "default_authority, commmethod, tmoffset, iptvid, "
                   "channel.chanid, "
-                  "GROUP_CONCAT(DISTINCT channelgroup.grpid), " // Creates a CSV list of channel groupids for this channel
-                  "GROUP_CONCAT(DISTINCT capturecard.cardid) " // Creates a CSV list of inputids for this channel
+                  "GROUP_CONCAT(DISTINCT channelgroup.grpid "
+                  "             ORDER BY channelgroup.grpid), " // Creates a CSV list of channel groupids for this channel
+                  "GROUP_CONCAT(DISTINCT capturecard.cardid "
+                  "             ORDER BY livetvorder), " // Creates a CSV list of inputids for this channel
+                  "MIN(livetvorder) livetvorder "
                   "FROM channel "
                   "LEFT JOIN channelgroup ON channel.chanid = channelgroup.chanid "
                   "LEFT JOIN capturecard  ON capturecard.sourceid = channel.sourceid ";
@@ -2402,6 +2408,9 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
     if (sourceID > 0)
         cond << "channel.sourceid = :SOURCEID ";
 
+    if (liveTVOnly)
+        cond << "channel.livetvorder > 0 ";
+
     if (!cond.isEmpty())
         sql += QString("WHERE %1").arg(cond.join("AND "));
 
@@ -2412,11 +2421,19 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     if (orderBy == kChanOrderByName)
         sql += "ORDER BY channel.name ";
-    else // kChanOrderByChanNum
+    else if (orderBy == kChanOrderByChanNum)
     {
         // Natural sorting including subchannels e.g. 2_4, 1.3
         sql += "ORDER BY LPAD(CAST(channel.channum AS UNSIGNED), 10, 0), "
                "         LPAD(channel.channum,  10, 0) ";
+    }
+    else // kChanOrderByLiveTV
+    {
+        sql += "ORDER BY callsign = :CALLSIGN1 AND channum = :CHANNUM, "
+               "         callsign = :CALLSIGN2 DESC, "
+               "         livetvorder, "
+               "         channel.recpriority DESC, "
+               "         chanid ";
     }
 
     if (count > 0)
@@ -2447,6 +2464,13 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
 
     if (startIndex > 0)
         query.bindValue(":STARTINDEX", startIndex);
+
+    if (orderBy == kChanOrderByLiveTV)
+    {
+        query.bindValue(":CALLSIGN1", callsign);
+        query.bindValue(":CHANNUM", channum);
+        query.bindValue(":CALLSIGN2", callsign);
+    }
 
     if (!query.exec())
     {

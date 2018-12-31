@@ -1045,10 +1045,13 @@ int MythPlayer::OpenFile(uint retries)
     {
         gCoreContext->SaveSetting(
             "DefaultChanid", player_ctx->playingInfo->GetChanID());
+        QString callsign = player_ctx->playingInfo->GetChannelSchedulingID();
+        QString channum = player_ctx->playingInfo->GetChanNum();
+        gCoreContext->SaveSetting(
+            "DefaultChanKeys", callsign + "[]:[]" + channum);
         if (player_ctx->recorder && player_ctx->recorder->IsValidRecorder())
         {
             int cardid = player_ctx->recorder->GetRecorderNumber();
-            QString channum = player_ctx->playingInfo->GetChanNum();
             CardUtil::SetStartChannel(cardid, channum);
         }
     }
