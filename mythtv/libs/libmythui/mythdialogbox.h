@@ -467,6 +467,9 @@ MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject 
     return pop;
 }
 
+/// Blocks until confirmation dialog exits
+bool MUI_PUBLIC WaitFor(MythConfirmationDialog* dialog);
+
 Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
 Q_DECLARE_METATYPE(MythUIButtonCallback)
