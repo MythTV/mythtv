@@ -217,14 +217,10 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                 "No OpenGL feature support for Bicubic filter.");
     }
 
-    // decide on best input texture type
-    if (!hw_accel &&
-        (MYTHTV_YV12 != videoTextureType) &&
-        (defaultUpsize != kGLFilterBicubic) &&
-        (gl_features & kGLExtRect))
-    {
+    // decide on best input texture type - GLX surfaces (for VAAPI) and the
+    // bicubic filter do not work with rectangular textures
+    if (!hw_accel && (defaultUpsize != kGLFilterBicubic) && (gl_features & kGLExtRect))
         textureType = gl_context->GetTextureType(textureRects);
-    }
 
     // Create initial input texture and associated filter stage
     GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
@@ -1430,7 +1426,9 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     float lineHeight = 1.0f;
     float colWidth   = 1.0f;
     float yselect    = 1.0f;
+    float maxwidth   = inputTextureSize.width();
     float maxheight  = inputTextureSize.height();
+    float yv12height = video_dim.height();
     QSize fb_size = GetTextureSize(video_disp_dim);
 
     if (!textureRects &&
@@ -1439,7 +1437,9 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
         lineHeight /= inputTextureSize.height();
         colWidth   /= inputTextureSize.width();
         yselect    /= ((float)inputTextureSize.width() / 2.0f);
+        maxwidth    = video_dim.width()  / (float)inputTextureSize.width();
         maxheight   = video_dim.height() / (float)inputTextureSize.height();
+        yv12height  = maxheight;
     }
 
     float fieldSize = 1.0f / (lineHeight * 2.0f);
@@ -1452,13 +1452,8 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));
     string.replace("%8", QString::number(1.0f / yselect, 'f', 8));
     string.replace("%9", QString::number(maxheight - lineHeight, 'f', 8));
-
-    float width = float(video_dim.width()) / inputTextureSize.width();
-    string.replace("%WIDTH%", QString::number(width, 'f', 8));
-
-    float height = float(video_dim.height()) / inputTextureSize.height();
-    string.replace("%HEIGHT%", QString::number(height, 'f', 8));
-
+    string.replace("%WIDTH%", QString::number(maxwidth, 'f', 8));
+    string.replace("%HEIGHT%", QString::number(yv12height, 'f', 8));
     string.replace("COLOUR_UNIFORM", COLOUR_UNIFORM);
 }
 
