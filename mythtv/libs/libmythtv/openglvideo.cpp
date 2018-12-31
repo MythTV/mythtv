@@ -1682,34 +1682,31 @@ SAMPLEYVU
 "    gl_FragColor = vec4(yvu, 1.0) * COLOUR_UNIFORM;\n"
 "}\n";
 
-static const QString YV12RGBOneFieldVertexShader[2] = {
-"//YV12RGBOneFieldVertexShader 1\n"
+static const QString YV12RGBOneFieldFragmentShader[2] = {
+"//YV12RGBOneFieldFragmentShader 1\n"
 "GLSL_DEFINES"
-"attribute vec2 a_position;\n"
-"attribute vec2 a_texcoord0;\n"
-"varying   vec2 v_texcoord0;\n"
-"uniform   mat4 u_projection;\n"
-"void main() {\n"
-"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
-"    v_texcoord0 = a_texcoord0;\n"
-"    if (fract(v_texcoord0.t * %2) >= 0.5)\n"
-"        v_texcoord0.t -= %3;\n"
+"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
+"varying vec2 v_texcoord0;\n"
+SAMPLEYVU
+"void main(void)\n"
+"{\n"
+"    float field  = min(v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * %2))) * %3, %HEIGHT% - %3);\n"
+"    vec3 yvu     = sampleYVU(s_texture0, vec2(v_texcoord0.x, field));\n"
+"    gl_FragColor = vec4(yvu, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
-"//YV12RGBOneFieldVertexShader 2\n"
+"//YV12RGBOneFieldFragmentShader 2\n"
 "GLSL_DEFINES"
-"attribute vec2 a_position;\n"
-"attribute vec2 a_texcoord0;\n"
-"varying   vec2 v_texcoord0;\n"
-"uniform   mat4 u_projection;\n"
-"void main() {\n"
-"    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
-"    v_texcoord0 = a_texcoord0;\n"
-"    if (fract(v_texcoord0.t * %2) < 0.5)\n"
-"    {\n"
-"        v_texcoord0.t += %3;\n"
-"        v_texcoord0.t = min(v_texcoord0.t, %HEIGHT% - %3);\n"
-"    }\n"
+"uniform GLSL_SAMPLER s_texture0;\n"
+"uniform mat4 COLOUR_UNIFORM;\n"
+"varying vec2 v_texcoord0;\n"
+SAMPLEYVU
+"void main(void)\n"
+"{\n"
+"    float field  = max(v_texcoord0.y + (step(0.5, 1.0 - fract(v_texcoord0.y * %2))) * %3, 0.0);\n"
+"    vec3 yvu     = sampleYVU(s_texture0, vec2(v_texcoord0.x, field));\n"
+"    gl_FragColor = vec4(yvu, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1831,28 +1828,15 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
             break;
         }
         case kGLFilterYV12RGB:
+            vertex = YV12RGBVertexShader;
             if (deint == "openglonefield" || deint == "openglbobdeint")
-            {
-                vertex = YV12RGBOneFieldVertexShader[bottom];
-                fragment = YV12RGBFragmentShader;
-            }
-            else if (deint == "opengllinearblend" ||
-                     deint == "opengldoubleratelinearblend")
-            {
-                vertex = YV12RGBVertexShader;
+                fragment = YV12RGBOneFieldFragmentShader[bottom];
+            else if (deint == "opengllinearblend" || deint == "opengldoubleratelinearblend")
                 fragment = YV12RGBLinearBlendFragmentShader[bottom];
-            }
-            else if (deint == "openglkerneldeint" ||
-                     deint == "opengldoubleratekerneldeint")
-            {
-                vertex = YV12RGBVertexShader;
+            else if (deint == "openglkerneldeint" || deint == "opengldoubleratekerneldeint")
                 fragment = YV12RGBKernelShader[bottom];
-            }
             else
-            {
-                vertex = YV12RGBVertexShader;
                 fragment = YV12RGBFragmentShader;
-            }
             break;
         case kGLFilterNone:
             break;
