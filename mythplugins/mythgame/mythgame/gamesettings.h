@@ -1,148 +1,47 @@
 #ifndef GAMESETTINGS_H
 #define GAMESETTINGS_H
 
-// Qt headers
-#include <QString>
-#include <QCoreApplication>
-
 // MythTV headers
 #include <standardsettings.h>
-#include <mythcontext.h>
-#include <settings.h>
-
-// The real work.
-
-struct GameTypes {
-    QString   nameStr;
-    QString   idStr;
-    QString   extensions;
-};
-
-#define MAX_GAME_TYPES 12
-
-const GameTypes GameTypeList[MAX_GAME_TYPES] =
-{
-    { QT_TRANSLATE_NOOP("(GameTypes)", "OTHER"),   "OTHER",  "" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "AMIGA"),   "AMIGA",  "adf,ipf" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "ATARI"),   "ATARI",  "bin,a26" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "GAMEGEAR"),    "GAMEGEAR",   "gg" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "MAME"),    "MAME",   "" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "N64"),     "N64",    "v64,n64" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "NES"),     "NES",    "zip,nes" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "PC GAME"), "PC",     "" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "PCE/TG16"),"PCE",    "pce" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "SEGA/MASTER SYSTEM"), "SEGA", "sms" },
-    { QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    "SNES",   "zip,smc,sfc,fig,swc" }
-};
 
 const QString GetGameTypeName(const QString &GameType);
 const QString GetGameTypeExtensions(const QString &GameType);
 
-class MythGameGeneralSettings;
-class MythGamePlayerSettings;
-class MythGamePlayerEditor;
-
-class GameDBStorage : public SimpleDBStorage
+struct MPUBLIC GameGeneralSettings : public GroupSetting
 {
-  protected:
-    GameDBStorage(StorageUser                  *_user,
-                  const MythGamePlayerSettings &_parent,
-                  const QString                &_name) :
-        SimpleDBStorage(_user, "gameplayers", _name), parent(_parent)
-    {
-    }
-
-    QString GetSetClause(MSqlBindings &bindings) const override; // SimpleDBStorage
-    QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
-
-    const MythGamePlayerSettings &parent;
+    GameGeneralSettings();
 };
 
-class MythGameGeneralSettings : public GroupSetting
+struct PlayerId : public AutoIncrementSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MythGameGeneralSettings);
+    PlayerId(uint id) : AutoIncrementSetting("gameplayers", "gameplayerid")
+    { setValue(id); }
 
-  public:
-    MythGameGeneralSettings();
+    int Value() const { return getValue().toInt(); }
 };
 
-class MythGamePlayerSettings : public QObject, public ConfigurationWizard
+class GamePlayerSetting : public GroupSetting
 {
-    Q_OBJECT
+public:
+    GamePlayerSetting(QString name, uint id = 0);
 
-  public:
-    MythGamePlayerSettings();
+    void Save()         override;                   // StandardSetting
+    bool canDelete()    override { return true; }   // GroupSetting
+    void deleteEntry()  override;                   // GroupSetting
 
-    int getGamePlayerID(void) const { return id->intValue(); };
-
-    void loadByID(int id);
-
-    static void fillSelections(SelectSetting* setting);
-    static QString idToName(int id);
-
-    QString getSourceName(void) const { return name->getValue(); };
-
-    void Save(void) override // ConfigurationDialog
-    {
-        if (name)
-            ConfigurationWizard::Save();
-    }
-
-    void Save(QString /*destination*/) override { } // ConfigurationDialog
-
-  private:
-    class ID : public AutoIncrementDBSetting
-    {
-      public:
-        ID() : AutoIncrementDBSetting("gameplayers", "gameplayerid")
-        {
-            setName("GamePlayerName");
-            setVisible(false);
-        }
-    };
-
-    class Name : public LineEditSetting, public GameDBStorage
-    {
-      public:
-        explicit Name(const MythGamePlayerSettings &parent) :
-            LineEditSetting(this), GameDBStorage(this, parent, "playername")
-        {
-            setLabel(MythGamePlayerSettings::tr("Player Name"));
-            setHelpText(MythGamePlayerSettings::tr("Name of this Game and or "
-                                                   "Emulator"));
-        }
-    };
-
-  private:
-    QString settingValue;
-    ID     *id;
-    Name   *name;
+private:
+    PlayerId m_id;
 };
 
-class MPUBLIC MythGamePlayerEditor : public QObject, public ConfigurationDialog
+class MPUBLIC GamePlayersList : public GroupSetting
 {
-    Q_OBJECT
+public:
+    GamePlayersList();
 
-  public:
-    MythGamePlayerEditor();
-
-    MythDialog *dialogWidget(MythMainWindow *parent,
-                             const char     *widgetName=nullptr) override; // ConfigurationDialog
-
-    DialogCode exec(bool saveOnExec = true, bool doLoad = true) override; // ConfigurationDialog
-
-    void Load(void) override; // ConfigurationDialog
-    void Save(void) override { } // ConfigurationDialog
-    void Save(QString /*destination*/) override { } // ConfigurationDialog
-
-public slots:
-    void menu();
-    void edit();
-    void del();
-
-  private:
-    ListBoxSetting *listbox;
+private:
+    void Load() override; // StandardSetting
+    void NewPlayerDialog();
+    void CreateNewPlayer(QString name);
 };
 
 #endif
