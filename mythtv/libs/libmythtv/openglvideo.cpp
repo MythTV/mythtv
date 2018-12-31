@@ -1430,6 +1430,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     float lineHeight = 1.0f;
     float colWidth   = 1.0f;
     float yselect    = 1.0f;
+    float maxheight  = inputTextureSize.height();
     QSize fb_size = GetTextureSize(video_disp_dim);
 
     if (!textureRects &&
@@ -1438,10 +1439,9 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
         lineHeight /= inputTextureSize.height();
         colWidth   /= inputTextureSize.width();
         yselect    /= ((float)inputTextureSize.width() / 2.0f);
+        maxheight   = video_dim.height() / (float)inputTextureSize.height();
     }
 
-    float maxheight  = (float)(min(inputTextureSize.height(), 2160) - 1) *
-                       lineHeight;
     float fieldSize = 1.0f / (lineHeight * 2.0f);
 
     string.replace("%2", QString::number(fieldSize, 'f', 8));
@@ -1451,7 +1451,7 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));
     string.replace("%8", QString::number(1.0f / yselect, 'f', 8));
-    string.replace("%9", QString::number(maxheight, 'f', 8));
+    string.replace("%9", QString::number(maxheight - lineHeight, 'f', 8));
 
     float width = float(video_dim.width()) / inputTextureSize.width();
     string.replace("%WIDTH%", QString::number(width, 'f', 8));
@@ -1516,11 +1516,9 @@ static const QString LinearBlendShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec2 line  = vec2(0.0, %3);\n"
-"    vec2 line2 = vec2(v_texcoord0.x, clamp(v_texcoord0.y + %3, 0.0, %9));\n"
 "    vec4 yuva  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    vec4 above = GLSL_TEXTURE(s_texture0, line2);\n"
-"    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
+"    vec4 above = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9)));\n"
+"    vec4 below = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
 "    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
@@ -1532,10 +1530,9 @@ static const QString LinearBlendShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec2 line  = vec2(0.0, %3);\n"
 "    vec4 yuva  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    vec4 above = GLSL_TEXTURE(s_texture0, v_texcoord0 + line);\n"
-"    vec4 below = GLSL_TEXTURE(s_texture0, v_texcoord0 - line);\n"
+"    vec4 above = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9)));\n"
+"    vec4 below = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
 "    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
@@ -1550,14 +1547,15 @@ static const QString KernelShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec4 yuva    = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
+"    vec4 yuva = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "    {\n"
-"        vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
-"        vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
-"        vec2 onedown = vec2(v_texcoord0.x, clamp(v_texcoord0.y + %3, 0.0, %9));\n"
+"        vec2 oneup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3));\n"
+"        vec2 twoup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %4, %3));\n"
+"        vec2 onedown = vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9));\n"
+"        vec2 twodown = vec2(v_texcoord0.x, min(v_texcoord0.y + %4, %9));\n"
 "        vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
-"        vec4 line1   = GLSL_TEXTURE(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
+"        vec4 line1   = GLSL_TEXTURE(s_texture1, oneup);\n"
 "        vec4 line3   = GLSL_TEXTURE(s_texture1, onedown);\n"
 "        vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
 "        vec4 line00  = GLSL_TEXTURE(s_texture2, twoup);\n"
@@ -1582,14 +1580,16 @@ static const QString KernelShader[2] = {
 "varying vec2 v_texcoord0;\n"
 "void main(void)\n"
 "{\n"
-"    vec4 yuva    = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
+"    vec4 yuva = GLSL_TEXTURE(s_texture1, v_texcoord0);\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "    {\n"
-"        vec2 twoup   = v_texcoord0 - vec2(0.0, %4);\n"
-"        vec2 twodown = v_texcoord0 + vec2(0.0, %4);\n"
+"        vec2 oneup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3));\n"
+"        vec2 twoup   = vec2(v_texcoord0.x, max(v_texcoord0.y - %4, %3));\n"
+"        vec2 onedown = vec2(v_texcoord0.x, min(v_texcoord0.y + %3, %9));\n"
+"        vec2 twodown = vec2(v_texcoord0.x, min(v_texcoord0.y + %4, %9));\n"
 "        vec4 line0   = GLSL_TEXTURE(s_texture1, twoup);\n"
-"        vec4 line1   = GLSL_TEXTURE(s_texture1, v_texcoord0 - vec2(0.0, %3));\n"
-"        vec4 line3   = GLSL_TEXTURE(s_texture1, v_texcoord0 + vec2(0.0, %3));\n"
+"        vec4 line1   = GLSL_TEXTURE(s_texture1, oneup);\n"
+"        vec4 line3   = GLSL_TEXTURE(s_texture1, onedown);\n"
 "        vec4 line4   = GLSL_TEXTURE(s_texture1, twodown);\n"
 "        vec4 line00  = GLSL_TEXTURE(s_texture0, twoup);\n"
 "        vec4 line20  = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
