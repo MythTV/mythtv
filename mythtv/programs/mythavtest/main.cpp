@@ -24,6 +24,7 @@ using namespace std;
 #include "mythlogging.h"
 #include "signalhandling.h"
 #include "mythmiscutil.h"
+#include "videooutbase.h"
 
 // libmythui
 #include "mythuihelper.h"
@@ -33,9 +34,9 @@ class VideoPerformanceTest
 {
   public:
     VideoPerformanceTest(const QString &filename, bool novsync, bool onlydecode,
-                         int runfor, bool deint)
+                         int runfor, bool deint, bool gpu)
       : file(filename), novideosync(novsync), decodeonly(onlydecode),
-        secondstorun(runfor), deinterlace(deint), ctx(nullptr)
+        secondstorun(runfor), deinterlace(deint), allowgpu(gpu), ctx(nullptr)
     {
         if (secondstorun < 1)
             secondstorun = 1;
@@ -56,7 +57,7 @@ class VideoPerformanceTest
             LOG(VB_GENERAL, LOG_INFO, "Will attempt to disable sync-to-vblank.");
 
         RingBuffer *rb  = RingBuffer::Create(file, false, true, 2000);
-        MythPlayer  *mp  = new MythPlayer(kAudioMuted);
+        MythPlayer  *mp  = new MythPlayer((PlayerFlags)(kAudioMuted | (allowgpu ? kDecodeAllowGPU : kNoFlags)));
         mp->GetAudio()->SetAudioInfo("NULL", "NULL", 0, 0);
         mp->GetAudio()->SetNoAudio();
         ctx = new PlayerContext("VideoPerformanceTest");
@@ -64,6 +65,7 @@ class VideoPerformanceTest
         ctx->SetPlayer(mp);
         ctx->SetPlayingInfo(new ProgramInfo(file));
         mp->SetPlayerInfo(nullptr, GetMythMainWindow(), ctx);
+
         FrameScanType scan = deinterlace ? kScan_Interlaced : kScan_Progressive;
         if (!mp->StartPlaying())
         {
@@ -79,6 +81,9 @@ class VideoPerformanceTest
         }
 
         LOG(VB_GENERAL, LOG_INFO, "-----------------------------------");
+        LOG(VB_GENERAL, LOG_INFO, "Ensure Sync to VBlank is disabled.");
+        LOG(VB_GENERAL, LOG_INFO, "Otherwise rate will be limited to that of the display.");
+        LOG(VB_GENERAL, LOG_INFO, "-----------------------------------");
         LOG(VB_GENERAL, LOG_INFO, QString("Starting video performance test for '%1'.")
             .arg(file));
         LOG(VB_GENERAL, LOG_INFO, QString("Test will run for %1 seconds.")
@@ -86,10 +91,25 @@ class VideoPerformanceTest
 
         if (decodeonly)
             LOG(VB_GENERAL, LOG_INFO, "Decoding frames only - skipping display.");
-        LOG(VB_GENERAL, LOG_INFO, QString("Deinterlacing %1")
-            .arg(deinterlace ? "enabled" : "disabled"));
 
-        Jitterometer *jitter = new Jitterometer("Performance: ", mp->GetFrameRate());
+        bool doublerate = vo->NeedsDoubleFramerate();
+        if (deinterlace)
+        {
+            LOG(VB_GENERAL, LOG_INFO, QString("Deinterlacing: %1")
+                .arg(doublerate ? "doublerate" : "singlerate"));
+            if (doublerate)
+                LOG(VB_GENERAL, LOG_INFO, "Output will show fields per second");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Deinterlacing disabled");
+        }
+
+        DecoderBase* dec = mp->GetDecoder();
+        if (dec)
+            LOG(VB_GENERAL, LOG_INFO, QString("Using decoder: %1").arg(dec->GetCodecDecoderName()));
+
+        Jitterometer *jitter = new Jitterometer("Performance: ", mp->GetFrameRate() * (doublerate ? 2 : 1));
 
         int ms = secondstorun * 1000;
         QTime start = QTime::currentTime();
@@ -127,6 +147,12 @@ class VideoPerformanceTest
                 vo->ProcessFrame(frame, nullptr, nullptr, dummy, scan);
                 vo->PrepareFrame(frame, scan, nullptr);
                 vo->Show(scan);
+
+                if (vo->NeedsDoubleFramerate() && deinterlace)
+                {
+                    vo->PrepareFrame(frame, kScan_Intr2ndField, nullptr);
+                    vo->Show(scan);
+                }
             }
             vo->DoneDisplayingFrame(frame);
             jitter->RecordCycleTime();
@@ -141,6 +167,7 @@ class VideoPerformanceTest
     bool    decodeonly;
     int     secondstorun;
     bool    deinterlace;
+    bool    allowgpu;
     PlayerContext *ctx;
 };
 
@@ -202,18 +229,6 @@ int main(int argc, char *argv[])
 
     cmdline.ApplySettingsOverride();
 
-    qApp->setSetuidAllowed(true);
-
-    // If Qt graphics platform is egl (Raspberry Pi) then setuid hangs
-    LOG(VB_GENERAL, LOG_NOTICE, "QT_QPA_PLATFORM=" + qApp->platformName());
-    if (qApp->platformName().contains("egl"))
-      ;
-    else if (setuid(getuid()) != 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Failed to setuid(), exiting.");
-        return GENERIC_EXIT_NOT_OK;
-    }
-
     QString themename = gCoreContext->GetSetting("Theme");
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
@@ -263,7 +278,8 @@ int main(int argc, char *argv[])
             seconds = cmdline.toInt("seconds");
         VideoPerformanceTest *test = new VideoPerformanceTest(filename, false,
                     cmdline.toBool("decodeonly"), seconds,
-                    cmdline.toBool("deinterlace"));
+                    cmdline.toBool("deinterlace"),
+                    cmdline.toBool("gpu"));
         test->Test();
         delete test;
     }

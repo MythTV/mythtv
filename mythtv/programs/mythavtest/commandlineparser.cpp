@@ -37,6 +37,9 @@ void MythAVTestCommandLineParser::LoadArguments(void)
                     "")
                     ->SetGroup("Video Performance Testing")
                     ->SetChildOf("test");
+    add(QStringList{"-gpu"}, "gpu", false, "Allow GPU video decoders", "")
+                    ->SetGroup("Video Performance Testing")
+                    ->SetChildOf("test");
     add(QStringList{"--deinterlace"},
                     "deinterlace", false,
                     "Deinterlace video frames (even if progressive).",
