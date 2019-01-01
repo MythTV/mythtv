@@ -75,8 +75,9 @@ OpenGLVideo::OpenGLVideo() :
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
     gl_features(0),           videoTextureType(GL_RGBA),
-    preferYCBCR(false)
+    preferYCBCR(false),       forceResize(false)
 {
+    forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
 }
 
 OpenGLVideo::~OpenGLVideo()
@@ -308,7 +309,7 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
                         deinterlacing && allow;
 
     // Extra stage needed on Fire Stick 4k, maybe others, because of blank screen when playing.
-    resize_down |= gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
+    resize_down |= forceResize;
 
     if (resize_up && (defaultUpsize == kGLFilterBicubic))
     {
