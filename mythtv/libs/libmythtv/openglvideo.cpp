@@ -219,8 +219,11 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     // decide on best input texture type - GLX surfaces (for VAAPI) and the
     // bicubic filter do not work with rectangular textures
-    if (!hw_accel && (defaultUpsize != kGLFilterBicubic) && (gl_features & kGLExtRect))
+    if (!hw_accel && (MYTHTV_YV12 != videoTextureType) &&
+        (defaultUpsize != kGLFilterBicubic) && (gl_features & kGLExtRect))
+    {
         textureType = gl_context->GetTextureType(textureRects);
+    }
 
     // Create initial input texture and associated filter stage
     GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
