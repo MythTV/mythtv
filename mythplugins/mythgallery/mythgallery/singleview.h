@@ -32,10 +32,8 @@ using namespace std;
 #include <QKeyEvent>
 #include <QPaintEvent>
 
-
-// MythTV plugin headers
-#include <mythdialogs.h>
-
+// MythGallery headers
+#include "mythdialogs.h"
 #include "galleryutil.h"
 #include "imageview.h"
 #include "iconview.h"
