@@ -9,6 +9,7 @@ class VideoOutputOpenGLVAAPI : public VideoOutputOpenGL
 {
   public:
     static void GetRenderOptions(render_opts &opts);
+    static bool AllowVAAPIDisplay();
 
     VideoOutputOpenGLVAAPI();
    ~VideoOutputOpenGLVAAPI();

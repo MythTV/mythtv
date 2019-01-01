@@ -3,6 +3,11 @@
 #include "openglvideo.h"
 #include "vaapicontext.h"
 #include "mythpainter.h"
+#ifdef USING_OPENGLES
+#include "mythrender_opengl2es.h"
+#include "mythmainwindow.h"
+#endif
+#include <QGuiApplication>
 
 #define LOC QString("VidOutGLVAAPI: ")
 #define ERR QString("VidOutGLVAAPI Error: ")
@@ -296,7 +301,7 @@ QStringList VideoOutputOpenGLVAAPI::GetAllowedRenderers(
     (void) video_dim;
     QStringList list;
     if ((codec_is_std(myth_codec_id) || (codec_is_vaapi(myth_codec_id))) &&
-         !getenv("NO_VAAPI"))
+         !getenv("NO_VAAPI") && AllowVAAPIDisplay())
     {
         list += "openglvaapi";
     }
@@ -312,7 +317,7 @@ MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
     bool use_cpu = no_acceleration;
     AVPixelFormat fmt = AV_PIX_FMT_YUV420P;
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VAAPI + (stream_type - 1));
-    if (codec_is_vaapi(test_cid) && decoder == "vaapi" && !getenv("NO_VAAPI"))
+    if (codec_is_vaapi(test_cid) && decoder == "vaapi" && !getenv("NO_VAAPI") && AllowVAAPIDisplay())
         use_cpu |= !VAAPIContext::IsFormatAccelerated(size, test_cid, fmt);
     else
         use_cpu = true;
@@ -322,4 +327,31 @@ MythCodecID VideoOutputOpenGLVAAPI::GetBestSupportedCodec(
 
     pix_fmt = fmt;
     return test_cid;
+}
+
+// We currently (v30) only support rendering to a GLX surface.
+// Disallow OpenGL ES (crashes hard) and EGL (fails to initialise) with Intel.
+// This needs extending when EGL etc support is added and also generalising
+// for other video output classes.
+bool VideoOutputOpenGLVAAPI::AllowVAAPIDisplay()
+{
+    if (qApp->platformName().contains("egl", Qt::CaseInsensitive))
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Disabling VAAPI display with EGL");
+        return false;
+    }
+
+#ifdef USING_OPENGLES
+    MythMainWindow* win = MythMainWindow::getMainWindow();
+    if (win)
+    {
+        MythRender *render = win->GetRenderDevice();
+        if (static_cast<MythRenderOpenGL2ES*>(render))
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Disabling VAAPI display with OpenGLES");
+            return false;
+        }
+    }
+#endif
+    return true;
 }
