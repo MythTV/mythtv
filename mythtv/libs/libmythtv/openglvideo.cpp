@@ -157,7 +157,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     if (viewportControl)
         gl_context->SetFence();
 
-    SetViewPort(display_visible_rect.size());
+    SetViewPort(masterViewportSize);
 
     bool glsl    = gl_features & kGLSL;
     bool shaders = glsl || (gl_features & kGLExtFragProg);
@@ -338,6 +338,9 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 
 void OpenGLVideo::SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
 {
+    if (vidrect == video_rect && dispvidrect == display_video_rect)
+        return;
+
     display_video_rect = dispvidrect;
     video_rect = vidrect;
     gl_context->makeCurrent();
