@@ -96,10 +96,7 @@ void OpenGLVideo::Teardown(void)
     DeleteTextures(&referenceTextures);
 
     while (!filters.empty())
-    {
         RemoveFilter(filters.begin()->first);
-        filters.erase(filters.begin());
-    }
 }
 
 /**
@@ -317,29 +314,21 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     if (resize_up && (defaultUpsize == kGLFilterBicubic))
     {
         RemoveFilter(kGLFilterResize);
-        filters.erase(kGLFilterResize);
         AddFilter(kGLFilterBicubic);
-        OptimiseFilters();
         return;
     }
 
     if ((resize_up && (defaultUpsize == kGLFilterResize)) || resize_down)
     {
         RemoveFilter(kGLFilterBicubic);
-        filters.erase(kGLFilterBicubic);
         AddFilter(kGLFilterResize);
-        OptimiseFilters();
         return;
     }
 
     if (!resize_down)
-    {
         RemoveFilter(kGLFilterResize);
-        filters.erase(kGLFilterResize);
-    }
 
     RemoveFilter(kGLFilterBicubic);
-    filters.erase(kGLFilterBicubic);
     OptimiseFilters();
 }
 
@@ -550,8 +539,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     if (!success)
     {
         RemoveFilter(filter);
-        filters.erase(filter);
-        delete temp; // If temp wasn't added to the filter list, we need to delete
+        delete temp;
         return false;
     }
 
@@ -582,8 +570,7 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
     DeleteTextures(&(filters[filter]->frameBufferTextures));
 
     delete filters[filter];
-    filters[filter] = nullptr;
-
+    filters.erase(filter);
     return true;
 }
 
