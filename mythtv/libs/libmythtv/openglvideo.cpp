@@ -280,16 +280,19 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     }
 
     bool mmx = false;
+    bool neon = false;
 #ifdef MMX
     // cppcheck-suppress redundantAssignment
     mmx = true;
 #endif
+#ifdef HAVE_NEON
+    neon = true;
+#endif
 
     CheckResize(false);
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 PBO: %2")
-            .arg(mmx).arg((gl_features & kGLExtPBufObj) > 0));
-
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("MMX: %1 NEON: %2 PBO: %3 ForceResize: %4 Rects: %5")
+            .arg(mmx).arg(neon).arg((gl_features & kGLExtPBufObj) > 0)
+            .arg(forceResize).arg(textureType != GL_TEXTURE_2D));
     return true;
 }
 
