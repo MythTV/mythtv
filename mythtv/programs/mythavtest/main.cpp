@@ -178,6 +178,10 @@ int main(int argc, char *argv[])
     setenv("QT_XCB_GL_INTEGRATION","none",0);
 #endif
 
+    // try and disable sync to vblank on linux x11
+    qputenv("vblank_mode", "0"); // Intel and AMD
+    qputenv("__GL_SYNC_TO_VBLANK", "0"); // NVidia
+
     MythAVTestCommandLineParser cmdline;
     if (!cmdline.Parse(argc, argv))
     {
