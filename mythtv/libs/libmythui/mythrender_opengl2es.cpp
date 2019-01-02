@@ -18,7 +18,9 @@ void MythRenderOpenGL2ES::InitProcs()
     // GLSL version
     m_GLSLVersion = "#version 100\n";
     // GLSL ES precision qualifiers
-    m_qualifiers = "precision highp float;\n";
+    m_qualifiers = "#ifdef GL_FRAGMENT_PRECISION_HIGH\n"
+                   "precision highp float;\n"
+                   "#endif\n";
 
     // Default OpenGL ES 2.0
     m_glCreateShader     = (MYTH_GLCREATESHADERPROC)
