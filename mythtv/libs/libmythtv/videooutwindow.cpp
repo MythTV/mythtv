@@ -975,7 +975,7 @@ void VideoOutWindow::ToggleMoveBottomLine(void)
 void VideoOutWindow::SaveBottomLine(void)
 {
     gCoreContext->SaveSetting("OSDMoveBottomLine", GetMzMove().y());
-    gCoreContext->SaveSetting("OSDZoomBottomLine", GetMzScaleV() * 100.0);
+    gCoreContext->SaveSetting("OSDZoomBottomLine", GetMzScaleV() * 100.0f);
 }
 
 QString VideoOutWindow::GetZoomString(void) const
