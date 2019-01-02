@@ -3,13 +3,13 @@
 
 #define LOC QString("OpenGL2ES: ")
 
-MythRenderOpenGL2ES(const MythRenderFormat& format, QPaintDevice* device)
-    : MythRenderOpenGL2(format, device, kRenderOpenGL2ES)
+MythRenderOpenGL2ES::MythRenderOpenGL2ES(const MythRenderFormat& format, QPaintDevice* device)
+  : MythRenderOpenGL2(format, device, kRenderOpenGL2ES)
 {
 }
 
-explicit MythRenderOpenGL2ES(const MythRenderFormat& format)
-    : MythRenderOpenGL2(format, kRenderOpenGL2ES)
+MythRenderOpenGL2ES::MythRenderOpenGL2ES(const MythRenderFormat& format)
+  : MythRenderOpenGL2(format, kRenderOpenGL2ES)
 {
 }
 
