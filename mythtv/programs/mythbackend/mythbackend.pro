@@ -63,8 +63,6 @@ using_valgrind:DEFINES += USING_VALGRIND
 
 using_libdns_sd:DEFINES += USING_LIBDNS_SD
 
-using_systemd_notify:DEFINES += USING_SYSTEMD_NOTIFY
-
 xml_conf.path = $${PREFIX}/share/mythtv/backend-config/
 xml_conf.files = config_backend_general.xml config_backend_database.xml
 
