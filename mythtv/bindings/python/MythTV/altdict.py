@@ -101,7 +101,7 @@ class DictData( OrdDict ):
                 locale.atof,
                 bool,
                 lambda x: x,
-                lambda x: datetime.fromtimestamp(x, datetime.UTCTZ())\
+                lambda x: datetime.fromtimestamp(x if x != '4294967295' else '0', datetime.UTCTZ())\
                                   .astimezone(datetime.localTZ()),
                 lambda x: date(*[int(y) for y in x.split('-')]),
                 lambda x: datetime.fromRfc(x, datetime.UTCTZ())\
