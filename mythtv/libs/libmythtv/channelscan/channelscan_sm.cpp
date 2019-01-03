@@ -1207,7 +1207,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     uint    mplexid   = (*trans_info).mplexid;
     int     freqid    = (*trans_info).friendlyNum;
-    QString freqidStr = (freqid) ? QString::number(freqid) : QString();
+    QString freqidStr = (freqid) ? QString::number(freqid) : QString("");
     QString iptv_channel = (*trans_info).iptv_channel;
 
     // channels.conf
