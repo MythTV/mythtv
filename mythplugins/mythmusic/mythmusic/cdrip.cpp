@@ -7,10 +7,6 @@
 #include <fcntl.h>
 
 #include "config.h"
-#ifdef HAVE_CDIO
-# include <cdio/cdda.h>
-# include <cdio/paranoia.h>
-#endif //def HAVE_CDIO
 
 // C++ includes
 #include <iostream>

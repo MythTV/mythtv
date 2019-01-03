@@ -14,7 +14,7 @@
 #include <QString>
 
 // libcdio
-#include <cdio/cdda.h>
+// cdda already included via cddecoder.h
 #include <cdio/logging.h>
 
 // MythTV

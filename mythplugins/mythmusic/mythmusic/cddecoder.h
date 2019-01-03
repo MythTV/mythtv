@@ -4,6 +4,7 @@
 #include "decoder.h"
 
 #include <mythconfig.h>
+#include "config.h"
 
 #if CONFIG_DARWIN
 #include <vector>
@@ -11,8 +12,13 @@ using std::vector;
 #endif
 
 #ifdef HAVE_CDIO
-# include <cdio/cdda.h>
-# include <cdio/paranoia.h>
+# ifdef HAVE_CDPARANOIA_SUBDIR
+#  include <cdio/paranoia/cdda.h>
+#  include <cdio/paranoia/paranoia.h>
+# else
+#  include <cdio/cdda.h>
+#  include <cdio/paranoia.h>
+# endif
 #endif
 
 class MusicMetadata;
