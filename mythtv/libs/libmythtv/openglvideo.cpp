@@ -576,25 +576,18 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
 
 void OpenGLVideo::TearDownDeinterlacer(void)
 {
-    glfilt_map_t::iterator it;
-    if (filters.end() == (it = filters.find(kGLFilterYUV2RGB)) &&
-        filters.end() == (it = filters.find(kGLFilterYV12RGB)) )
+    glfilt_map_t::const_iterator it = filters.cbegin();
+    for ( ; it != filters.cend(); ++it)
     {
-        return;
-    }
+        if (it->first != kGLFilterYUV2RGB && it->first != kGLFilterYV12RGB)
+            continue;
 
-    OpenGLFilter *tmp = it->second;
-
-    if (tmp->fragmentPrograms.size() == 3)
-    {
-        gl_context->DeleteShaderObject(tmp->fragmentPrograms[2]);
-        tmp->fragmentPrograms.pop_back();
-    }
-
-    if (tmp->fragmentPrograms.size() == 2)
-    {
-        gl_context->DeleteShaderObject(tmp->fragmentPrograms[1]);
-        tmp->fragmentPrograms.pop_back();
+        OpenGLFilter *tmp = it->second;
+        while (tmp->fragmentPrograms.size() > 1)
+        {
+            gl_context->DeleteShaderObject(tmp->fragmentPrograms.back());
+            tmp->fragmentPrograms.pop_back();
+        }
     }
 
     DeleteTextures(&referenceTextures);
