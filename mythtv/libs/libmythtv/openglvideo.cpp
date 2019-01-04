@@ -308,6 +308,10 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     bool resize_down = (video_disp_dim.height() > display_video_rect.height()) &&
                         deinterlacing && allow;
 
+    // we always need at least one filter (i.e. a resize that simply blits the texture
+    // to screen)
+    resize_down |= !filters.count(kGLFilterYUV2RGB) && !filters.count(kGLFilterYV12RGB);
+
     // Extra stage needed on Fire Stick 4k, maybe others, because of blank screen when playing.
     resize_down |= forceResize;
 
