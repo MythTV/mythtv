@@ -9,6 +9,8 @@ const QString GetGameTypeExtensions(const QString &GameType);
 
 struct MPUBLIC GameGeneralSettings : public GroupSetting
 {
+    Q_OBJECT
+public:
     GameGeneralSettings();
 };
 
@@ -22,6 +24,7 @@ struct PlayerId : public AutoIncrementSetting
 
 class GamePlayerSetting : public GroupSetting
 {
+    Q_OBJECT
 public:
     GamePlayerSetting(QString name, uint id = 0);
 
@@ -35,6 +38,7 @@ private:
 
 class MPUBLIC GamePlayersList : public GroupSetting
 {
+    Q_OBJECT
 public:
     GamePlayersList();
 

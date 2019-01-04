@@ -4,19 +4,17 @@
 // MythTV headers
 #include <standardsettings.h>
 
-class MythWelcomeSettings : public GroupSetting
+class MPUBLIC MythWelcomeSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MythWelcomeSettings);
-
+    Q_OBJECT
   public:
     MythWelcomeSettings();
 };
 
-class MythShutdownSettings : public GroupSetting
+class MPUBLIC MythShutdownSettings : public GroupSetting
 {
-    Q_DECLARE_TR_FUNCTIONS(MythShutdownSettings);
-
-  public:
+    Q_OBJECT
+public:
     MythShutdownSettings();
 };
 
