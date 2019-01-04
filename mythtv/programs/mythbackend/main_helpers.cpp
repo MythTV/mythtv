@@ -4,6 +4,10 @@
 #endif
 #if CONFIG_SYSTEMD_NOTIFY
     #include <systemd/sd-daemon.h>
+    #define be_sd_notify(x) \
+        (void)sd_notify(0, x);
+#else
+    #define be_sd_notify(x)
 #endif
 
 // C++ headers
@@ -565,7 +569,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     bool ismaster = gCoreContext->IsMasterHost();
 
-    if (!UpgradeTVDatabaseSchema(ismaster, ismaster))
+    if (!UpgradeTVDatabaseSchema(ismaster, ismaster, true))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Couldn't upgrade database to new schema on %1 backend.")
@@ -573,15 +577,18 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
+    be_sd_notify("STATUS=Loading translation");
     MythTranslation::load("mythfrontend");
 
     if (!ismaster)
     {
+        be_sd_notify("STATUS=Connecting to master backend");
         int ret = connect_to_master();
         if (ret != GENERIC_EXIT_OK)
             return ret;
     }
 
+    be_sd_notify("STATUS=Get backend server port");
     int     port = gCoreContext->GetBackendServerPort();
     if (gCoreContext->GetBackendServerIP().isEmpty())
     {
@@ -617,6 +624,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     {
         if (runsched)
         {
+            be_sd_notify("STATUS=Creating scheduler");
             sched = new Scheduler(true, &tvList);
             int err = sched->GetError();
             if (err)
@@ -637,6 +645,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (!cmdline.toBool("nohousekeeper"))
     {
+        be_sd_notify("STATUS=Creating housekeeper");
         housekeeping = new HouseKeeper();
 
         if (ismaster)
@@ -671,6 +680,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     if (g_pUPnp == nullptr)
     {
+        be_sd_notify("STATUS=Creating UPnP media server");
         g_pUPnp = new MediaServer();
 
         g_pUPnp->Init(ismaster, cmdline.toBool("noupnp"));
@@ -686,11 +696,13 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (pHS)
     {
         LOG(VB_GENERAL, LOG_INFO, "Main::Registering HttpStatus Extension");
+        be_sd_notify("STATUS=Registering HttpStatus Extension");
 
         httpStatus = new HttpStatus( &tvList, sched, expirer, ismaster );
         pHS->RegisterExtension( httpStatus );
     }
 
+    be_sd_notify("STATUS=Creating main server");
     mainServer = new MainServer(
         ismaster, port, &tvList, sched, expirer);
 
@@ -706,15 +718,15 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (httpStatus && mainServer)
         httpStatus->SetMainServer(mainServer);
 
+    be_sd_notify("STATUS=Check all storage groups");
     StorageGroup::CheckAllStorageGroupDirs();
 
+    be_sd_notify("STATUS=Sending \"master started\" message");
     if (gCoreContext->IsMasterBackend())
         gCoreContext->SendSystemEvent("MASTER_STARTED");
 
-#if CONFIG_SYSTEMD_NOTIFY
     // Provide systemd ready notification (for type=notify units)
-    (void)sd_notify(0, "READY=1");
-#endif
+    be_sd_notify("READY=1");
 
     ///////////////////////////////
     ///////////////////////////////
@@ -729,6 +741,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     }
 
     LOG(VB_GENERAL, LOG_NOTICE, "MythBackend exiting");
+    be_sd_notify("STOPPING=1\nSTATUS=Exiting");
 
     delete sysEventHandler;
 

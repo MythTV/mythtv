@@ -15,6 +15,9 @@ using namespace std;
 #ifndef _WIN32
 #include <sys/ioctl.h>
 #endif
+#if CONFIG_SYSTEMD_NOTIFY
+#include <systemd/sd-daemon.h>
+#endif
 
 #include <sys/stat.h>
 #ifdef __linux__
@@ -1444,6 +1447,8 @@ void MainServer::customEvent(QEvent *e)
             QDateTime recendts = MythDate::fromString(tokens[5]);
             m_sched->UpdateRecStatus(cardid, chanid, startts,
                                      recstatus, recendts);
+
+            UpdateSystemdStatus();
             return;
         }
 
@@ -2030,6 +2035,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             return;
         }
         ft->IncrRef();
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("adding: %1(%2) as a file transfer")
+                                      .arg(commands[2])
+                                      .arg(quintptr(socket),0,16));
         fileTransferList.push_back(ft);
 
         retlist << QString::number(socket->GetSocketDescriptor());
@@ -2054,6 +2063,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
 
     socket->WriteStringList(retlist);
+    UpdateSystemdStatus();
 }
 
 /**
@@ -2064,6 +2074,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 void MainServer::HandleDone(MythSocket *socket)
 {
     socket->DisconnectFromHost();
+    UpdateSystemdStatus();
 }
 
 void MainServer::SendErrorResponse(PlaybackSock *pbs, const QString &error)
@@ -7922,6 +7933,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                 gCoreContext->dispatch(me);
             }
 
+            UpdateSystemdStatus();
             return;
         }
     }
@@ -7937,6 +7949,7 @@ void MainServer::connectionClosed(MythSocket *socket)
             (*ft)->DecrRef();
             fileTransferList.erase(ft);
             sockListLock.unlock();
+            UpdateSystemdStatus();
             return;
         }
     }
@@ -7949,6 +7962,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         (*cs)->DecrRef();
         controlSocketList.erase(cs);
         sockListLock.unlock();
+        UpdateSystemdStatus();
         return;
     }
 
@@ -7957,6 +7971,7 @@ void MainServer::connectionClosed(MythSocket *socket)
     LOG(VB_GENERAL, LOG_WARNING, LOC +
         QString("Unknown socket closing MythSocket(0x%1)")
             .arg((intptr_t)socket,0,16));
+    UpdateSystemdStatus();
 }
 
 PlaybackSock *MainServer::GetSlaveByHostname(const QString &hostname)
@@ -8392,6 +8407,98 @@ void MainServer::SendSlaveDisconnectedEvent(
 
     MythEvent me("LOCAL_SLAVE_BACKEND_ENCODERS_OFFLINE", extraData);
     gCoreContext->dispatch(me);
+}
+
+void MainServer::UpdateSystemdStatus (void)
+{
+#if CONFIG_SYSTEMD_NOTIFY
+    QStringList status2;
+
+    if (ismaster)
+        status2 << QString("Master backend.");
+    else
+        status2 << QString("Slave backend.");
+
+#if 0
+    // Count connections
+    {
+        int playback = 0, frontend = 0, monitor = 0, slave = 0, media = 0;
+        QReadLocker rlock(&sockListLock);
+
+        for (auto iter = playbackList.begin(); iter != playbackList.end(); ++iter)
+        {
+            PlaybackSock *pbs = *iter;
+            if (pbs->IsDisconnected())
+                continue;
+            if (pbs->isSlaveBackend())
+                slave += 1;
+            else if (pbs->isMediaServer())
+                media += 1;
+            else if (pbs->IsFrontend())
+                frontend += 1;
+            else if (pbs->getBlockShutdown())
+                playback += 1;
+            else
+                monitor += 1;
+        }
+        status2 << QString("Connections: Pl %1, Fr %2, Mo %3, Sl %4, MS %5, FT %6, Co %7")
+            .arg(playback).arg(frontend).arg(monitor).arg(slave).arg(media)
+            .arg(fileTransferList.size()).arg(controlSocketList.size());
+    }
+#endif
+
+    // Count active recordings
+    {
+        int active = 0;
+        TVRec::inputsLock.lockForRead();
+        for (auto iter = encoderList->begin(); iter != encoderList->end(); ++iter)
+        {
+            EncoderLink *elink = *iter;
+            if (not elink->IsLocal())
+                continue;
+            switch (elink->GetState())
+            {
+            case kState_WatchingLiveTV:
+            case kState_RecordingOnly:
+            case kState_WatchingRecording:
+                active += 1;
+                break;
+            default:
+                break;
+            }
+        }
+        TVRec::inputsLock.unlock();
+
+        // Count scheduled recordings
+        int scheduled = 0;
+        if (m_sched) {
+            RecList recordings;
+
+            m_sched->GetAllPending(recordings);
+            for (auto it = recordings.begin(); it != recordings.end(); ++it)
+            {
+                if (((*it)->GetRecordingStatus() <= RecStatus::WillRecord) &&
+                    ((*it)->GetRecordingStartTime() >= MythDate::current()))
+                {
+                    scheduled++;
+                }
+            }
+            while (!recordings.empty())
+            {
+                ProgramInfo *pginfo = recordings.back();
+                delete pginfo;
+                recordings.pop_back();
+            }
+        }
+        status2 <<
+            QString("Recordings: active %1, scheduled %2")
+            .arg(active).arg(scheduled);
+    }
+
+    // Systemd only allows a single line for status
+    QString status("STATUS=" + status2.join(' '));
+    (void)sd_notify(0, qPrintable(status));
+#endif
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

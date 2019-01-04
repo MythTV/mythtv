@@ -32,6 +32,13 @@
 #include "welcomedialog.h"
 #include "welcomesettings.h"
 
+#if CONFIG_SYSTEMD_NOTIFY
+#include <systemd/sd-daemon.h>
+#define mw_sd_notify(x) \
+    (void)sd_notify(0, x);
+#else
+#define mw_sd_notify(x)
+#endif
 
 static void initKeys(void)
 {
@@ -122,6 +129,8 @@ int main(int argc, char **argv)
     mainWindow->DisableIdleTimer();
 
     initKeys();
+    // Provide systemd ready notification (for type=notify units)
+    mw_sd_notify("READY=1");
 
     if (bShowSettings)
     {
@@ -151,6 +160,7 @@ int main(int argc, char **argv)
         } while (mainStack->TotalScreens() > 0);
     }
 
+    mw_sd_notify("STOPPING=1\nSTATUS=Exiting");
     DestroyMythMainWindow();
 
     delete gContext;

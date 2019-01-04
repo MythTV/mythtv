@@ -147,6 +147,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     int GetExitCode() const { return m_exitCode; }
 
+    void UpdateSystemdStatus(void);
+
   protected slots:
     void reconnectTimeout(void);
     void deferredDeleteSlot(void);

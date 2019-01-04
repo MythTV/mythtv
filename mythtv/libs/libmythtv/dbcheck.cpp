@@ -1,3 +1,5 @@
+#include "mythconfig.h"
+
 #include <cstdio>
 #include <iostream>
 using namespace std;
@@ -29,6 +31,15 @@ static bool UpdateDBVersionNumber(const QString &newnumber, QString &dbver);
 static bool performActualUpdate(
     const char **updates, const char *version, QString &dbver);
 static bool doUpgradeTVDatabaseSchema(void);
+
+#if CONFIG_SYSTEMD_NOTIFY
+#include <systemd/sd-daemon.h>
+#define db_sd_notify(x) \
+    if (informSystemd) \
+        (void)sd_notify(0, "STATUS=Database update " x);
+#else
+#define db_sd_notify(x)
+#endif
 
 /** \defgroup db_schema MythTV Database Schema
 
@@ -460,10 +471,14 @@ static bool performActualUpdate(
  *  \return false on failure, error, or if the user selected "Exit."
  */
 bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
-                             const bool upgradeIfNoUI)
+                             const bool upgradeIfNoUI,
+                             const bool informSystemd)
 {
 #ifdef IGNORE_SCHEMA_VER_MISMATCH
     return true;
+#endif
+#if CONFIG_SYSTEMD_NOTIFY == 0
+    Q_UNUSED(informSystemd);
 #endif
     SchemaUpgradeWizard *schema_wizard = nullptr;
 
@@ -477,6 +492,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     bool locked = DBUtil::TryLockSchema(query, 1);
     for (uint i = 0; i < 2*60 && !locked; i++)
     {
+        db_sd_notify("waiting for lock");
         LOG(VB_GENERAL, LOG_INFO, "Waiting for database schema upgrade lock");
         locked = DBUtil::TryLockSchema(query, 1);
         if (locked)
@@ -497,6 +513,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (!upgradeAllowed)
         LOG(VB_GENERAL, LOG_WARNING, "Not allowed to upgrade the database.");
 
+    db_sd_notify("waiting for user input");
     // Pop up messages, questions, warnings, etc.
     switch (schema_wizard->PromptForUpgrade(
                 "TV", upgradeAllowed, upgradeIfNoUI, MINIMUM_DBMS_VERSION))
@@ -514,6 +531,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
         .arg(currentDatabaseVersion));
 
     // Upgrade the schema
+    db_sd_notify("upgrading database");
     if (!doUpgradeTVDatabaseSchema())
     {
         LOG(VB_GENERAL, LOG_ERR, "Database schema upgrade failed.");
@@ -528,6 +546,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     // lock. We use gotos with labels so it's impossible to miss
     // these steps.
   upgrade_ok_exit:
+    db_sd_notify("success");
     GetMythDB()->SetSuppressDBMessages(false);
     gCoreContext->ActivateSettingsCache(true);
     if (locked)
@@ -535,6 +554,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     return true;
 
   upgrade_error_exit:
+    db_sd_notify("failed");
     GetMythDB()->SetSuppressDBMessages(false);
     gCoreContext->ActivateSettingsCache(true);
     if (locked)

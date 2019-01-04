@@ -116,6 +116,13 @@ using namespace std;
 #include <QScopedPointer>
 #include "bonjourregister.h"
 #endif
+#if CONFIG_SYSTEMD_NOTIFY
+#include <systemd/sd-daemon.h>
+#define fe_sd_notify(x) \
+    (void)sd_notify(0, x);
+#else
+#define fe_sd_notify(x)
+#endif
 
 static ExitPrompter   *g_exitPopup = nullptr;
 static MythThemedMenu *g_menu;
@@ -1946,6 +1953,7 @@ int main(int argc, char **argv)
         MythUIHelper::ParseGeometryOverride(cmdline.toString("geometry"));
     }
 
+    fe_sd_notify("STATUS=Connecting to database.");
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
     gCoreContext->SetAsFrontend(true);
 
@@ -1970,6 +1978,7 @@ int main(int argc, char **argv)
 
     if (!cmdline.toBool("noupnp"))
     {
+        fe_sd_notify("STATUS=Creating UPnP media renderer");
         g_pUPnp  = new MediaRenderer();
         if (!g_pUPnp->isInitialized())
         {
@@ -2016,6 +2025,7 @@ int main(int argc, char **argv)
     QScopedPointer<BonjourRegister> bonjour(new BonjourRegister());
     if (bonjour.data())
     {
+        fe_sd_notify("STATUS=Registering frontend with bonjour");
         QByteArray dummy;
         int port = gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547);
         QByteArray name("Mythfrontend on ");
@@ -2025,12 +2035,15 @@ int main(int argc, char **argv)
     }
 #endif
 
+    fe_sd_notify("STATUS=Initializing LCD");
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
         lcd->setupLEDs(RemoteGetRecordingMask);
 
+    fe_sd_notify("STATUS=Loading translation");
     MythTranslation::load("mythfrontend");
 
+    fe_sd_notify("STATUS=Loading themes");
     QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
 
     QString themedir = GetMythUI()->FindThemeDir(themename);
@@ -2065,6 +2078,7 @@ int main(int argc, char **argv)
 #ifdef USING_AIRPLAY
     if (gCoreContext->GetBoolSetting("AirPlayEnabled", true))
     {
+        fe_sd_notify("STATUS=Initializing AirPlay");
         MythRAOPDevice::Create();
         if (!gCoreContext->GetBoolSetting("AirPlayAudioOnly", false))
         {
@@ -2082,7 +2096,7 @@ int main(int argc, char **argv)
             return GENERIC_EXIT_NO_THEME;
     }
 
-    if (!UpgradeTVDatabaseSchema(false))
+    if (!UpgradeTVDatabaseSchema(false, false, true))
     {
         LOG(VB_GENERAL, LOG_ERR,
             "Couldn't upgrade database to new schema, exiting.");
@@ -2095,6 +2109,7 @@ int main(int argc, char **argv)
     // when they were written originally
     mainWindow->ReloadKeys();
 
+    fe_sd_notify("STATUS=Initializing jump points");
     InitJumpPoints();
     InitKeys();
     TV::InitKeys();
@@ -2106,9 +2121,11 @@ int main(int argc, char **argv)
 
     setHttpProxy();
 
+    fe_sd_notify("STATUS=Initializing plugins");
     g_pmanager = new MythPluginManager();
     gCoreContext->SetPluginManager(g_pmanager);
 
+    fe_sd_notify("STATUS=Initializing media monitor");
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
     {
@@ -2116,6 +2133,7 @@ int main(int argc, char **argv)
         mainWindow->installEventFilter(mon);
     }
 
+    fe_sd_notify("STATUS=Initializing network control");
     NetworkControl *networkControl = nullptr;
     if (gCoreContext->GetBoolSetting("NetworkControlEnabled", false))
     {
@@ -2138,6 +2156,7 @@ int main(int argc, char **argv)
     {
         return GENERIC_EXIT_NO_THEME;
     }
+    fe_sd_notify("STATUS=Loading theme updates");
     ThemeUpdateChecker *themeUpdateChecker = nullptr;
     if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
         themeUpdateChecker = new ThemeUpdateChecker();
@@ -2149,6 +2168,7 @@ int main(int argc, char **argv)
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
         PreviewGenerator::kRemote, 50, 60);
 
+    fe_sd_notify("STATUS=Creating housekeeper");
     HouseKeeper *housekeeping = new HouseKeeper();
 #ifdef __linux__
  #ifdef CONFIG_BINDINGS_PYTHON
@@ -2203,8 +2223,13 @@ int main(int argc, char **argv)
         standbyScreen();
     }
 
+    // Provide systemd ready notification (for type=notify units)
+    fe_sd_notify("STATUS=");
+    fe_sd_notify("READY=1");
+
     int ret = qApp->exec();
 
+    fe_sd_notify("STOPPING=1\nSTATUS=Exiting");
     if (ret==0)
         gContext-> saveSettingsCache();
 
