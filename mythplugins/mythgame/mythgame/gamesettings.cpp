@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+
 #include <mythdb.h>
 #include <mythdirs.h>
 
