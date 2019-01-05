@@ -3527,9 +3527,7 @@ void VideoDialog::OnVideoSearchListSelection(RefCountHandler<MetadataLookup> loo
     if (!lookup)
         return;
 
-    lookup->SetStep(kLookupData);
-    lookup->IncrRef();
-    m_metadataFactory->Lookup(lookup);
+    OnVideoSearchDone(lookup);
 }
 
 void VideoDialog::OnParentalChange(int amount)
