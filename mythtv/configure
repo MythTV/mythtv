@@ -6579,7 +6579,10 @@ enabled libfftw3 && check_lib fftw3_threads fftw3.h fftw_init_threads -lfftw3_th
     disable libfftw3
 
 # ass_flush_events was added in 0.9.10
-enabled libass && check_lib ass ass/ass.h ass_flush_events -lass  || disable libass
+if test $target_os = "android"; then
+	ASS_EXTRA_LIBS="-liconv -lfribidi -lfreetype"
+fi
+enabled libass && check_lib ass ass/ass.h ass_flush_events "-lass $ASS_EXTRA_LIBS" || disable libass
 
 if enabled libcec ; then
     if pkg-config --exists libcec; then
@@ -7000,6 +7003,12 @@ enabled threads && ! enabled pthreads && ! enabled atomics_native && die "non pt
 if test $target_os = "haiku"; then
     disable memalign
     disable posix_memalign
+fi
+
+if test $target_os = "android"; then
+	# freetype must be last
+	extralibs=${extralibs//-lfreetype/}
+	extralibs="${extralibs} -lfreetype"
 fi
 
 # add_dep lib dep
