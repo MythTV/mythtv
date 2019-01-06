@@ -7005,12 +7005,6 @@ if test $target_os = "haiku"; then
     disable posix_memalign
 fi
 
-if test $target_os = "android"; then
-	# freetype must be last
-	extralibs=${extralibs//-lfreetype/}
-	extralibs="${extralibs} -lfreetype"
-fi
-
 # add_dep lib dep
 # -> enable ${lib}_deps_${dep}
 # -> add $dep to ${lib}_deps only once
@@ -7446,8 +7440,10 @@ echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo ""
 
 # Remove redundant elements from variables
+# keep first instance
 unique2 CFLAGS
-unique2 extralibs
+# keep last instance for correct lib ordering
+unique extralibs
 
 if test $target_os = "freebsd"; then
     #Strip certain paths (qmake will add them back at the end of the list)
