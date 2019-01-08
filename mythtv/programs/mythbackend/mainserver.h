@@ -292,6 +292,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     void SetExitCode(int exitCode, bool closeApplication);
 
+    static bool removeDir(const QString &dirname);
     static int  DeleteFile(const QString &filename, bool followLinks,
                            bool deleteBrokenSymlinks = false);
     static int  OpenAndUnlink(const QString &filename);

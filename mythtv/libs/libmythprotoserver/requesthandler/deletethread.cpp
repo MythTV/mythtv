@@ -86,6 +86,35 @@ bool DeleteThread::AddFile(DeleteHandler *handler)
     return true;
 }
 
+bool DeleteThread::removeDir(const QString &dirname)
+{
+    QDir dir(dirname);
+
+    if (!dir.exists())
+        return false;
+
+    dir.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    QFileInfoList list = dir.entryInfoList();
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
+
+    while (it != list.end())
+    {
+        fi = &(*it++);
+        if (fi->isFile() && !fi->isSymLink())
+        {
+            QFile::remove(fi->absoluteFilePath());
+        }
+        else if (fi->isDir() && !fi->isSymLink())
+        {
+            if(!removeDir(fi->absoluteFilePath())) return false;
+        }
+    }
+
+    dir.rmdir(dirname);
+	return true;
+}
+
 void DeleteThread::ProcessNew(void)
 {
     // loop through new files, unlinking and adding for deletion
@@ -171,17 +200,21 @@ void DeleteThread::ProcessNew(void)
         int fd = open(cpath, O_WRONLY);
         if (fd == -1)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                QString("Error deleting '%1': could not open ")
-                    .arg(handler->m_path) + ENO);
-            handler->DeleteFailed();
-            handler->DecrRef();
-            continue;
-        }
+            LOG(VB_FILE, LOG_INFO, QString("About to unlink/delete file"));
 
+		if(!removeDir(cpath))
+		{
+			LOG(VB_GENERAL, LOG_ERR,
+			QString("Error deleting '%1': is no directory ")
+				.arg(cpath) + ENO);
+			handler->DeleteFailed();
+			handler->DecrRef();
+			continue;
+		} 
+        }
         // unlink the file so as soon as it is closed, the system will
         // delete it from the filesystem
-        if (unlink(cpath))
+        else if (unlink(cpath))
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Error deleting '%1': could not unlink ")
