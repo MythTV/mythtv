@@ -117,27 +117,6 @@ static HostSpinBoxSetting *AVSync2AdjustMS()
     return gc;
 }
 
-static HostCheckBoxSetting *OpenGLYV12()
-{
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLYV12");
-
-    gc->setLabel(PlaybackSettings::tr("Allow YV12 (YUV 4:2:0) pixel format for OpenGL"));
-
-    gc->setHelpText(PlaybackSettings::tr("Disabling one or more pixel formats may help with picture "
-                                         "problems when using "
-                                         "OpenGL video rendering. By default YV12 is disabled for "
-                                         "android and enabled for other systems."));
-#ifdef ANDROID
-#define YV12DEFAULT false
-#else
-#define YV12DEFAULT true
-#endif
-
-    gc->setValue(YV12DEFAULT);
-
-    return gc;
-}
-
 static HostCheckBoxSetting *OpenGLExtraStage()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("OpenGLExtraStage");
@@ -4271,7 +4250,6 @@ void PlaybackSettings::Load(void)
     HostCheckBoxSetting *avsync2 = PlaybackAVSync2();
     advanced->addChild(avsync2);
     avsync2->addTargetedChild("1",AVSync2AdjustMS());
-    advanced->addChild(OpenGLYV12());
     advanced->addChild(OpenGLExtraStage());
     addChild(advanced);
 

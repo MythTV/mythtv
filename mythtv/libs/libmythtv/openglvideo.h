@@ -33,14 +33,24 @@ class OpenGLVideo
     typedef map<OpenGLFilterType,OpenGLFilter*> glfilt_map_t;
 
   public:
+    enum VideoType
+    {
+        kGLGPU,   // Frame is already in GPU memory
+        kGLYCbCr, // Use Mesa or Apple YCbCr extensions (UYVY) - 16bpp
+        kGLUYVY,  // CPU conversion to UYVY422 format - 16bpp
+        kGLYV12,  // All processing on GPU - 12bpp
+        kGLHQUYV, // High quality interlaced CPU conversion to UYV - 32bpp
+        kGLRGBA   // fallback software YV12 to RGB - 32bpp
+    };
+
     OpenGLVideo();
    ~OpenGLVideo();
 
     bool Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspace,
               QSize videoDim, QSize videoDispDim, QRect displayVisibleRect,
               QRect displayVideoRect, QRect videoRect,
-              bool viewport_control,  QString options,
-              bool hwaccel);
+              bool viewport_control,  VideoType type,
+              QString options);
 
     uint GetInputTexture(void) const;
     uint GetTextureType(void) const;
@@ -68,6 +78,9 @@ class OpenGLVideo
     QSize GetViewPort(void)         const { return viewportSize; }
     void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect);
     QSize GetVideoSize(void)        const { return video_dim;}
+    static VideoType StringToType(const QString &Type);
+    static QString TypeToString(VideoType Type);
+    VideoType GetType() { return videoType; }
 
   private:
     void Teardown(void);
@@ -99,6 +112,7 @@ class OpenGLVideo
     void DeleteTextures(vector<GLuint> *textures);
     void TearDownDeinterlacer(void);
 
+    VideoType      videoType;
     MythRenderOpenGL *gl_context;
     QSize          video_disp_dim;       ///< Useful video frame size e.g. 1920x1080
     QSize          video_dim;            ///< Total video frame size e.g. 1920x1088
@@ -125,9 +139,7 @@ class OpenGLVideo
     uint           helperTexture;        ///< Extra texture for bicubic filter
     OpenGLFilterType defaultUpsize;      ///< Regular or bicubic upsizing
     uint           gl_features;          ///< OR'd list of GLFeatures in use
-    uint           videoTextureType;     ///< Underlying texture type for current YUV to RGB method
-    bool           preferYCBCR;          ///< Use of YCbCr textures is preferred (OpenGL-Lite profile)
-    MythAVCopy     m_copyCtx;            ///< Conversion context for YV12 to UYVY (OpenGL-Lite profile)
+    MythAVCopy     m_copyCtx;            ///< Conversion context for YV12 to UYVY
     bool           forceResize;          ///< Global setting to force a resize stage
 };
 #endif // _OPENGL_VIDEO_H__

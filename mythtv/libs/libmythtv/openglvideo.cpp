@@ -64,6 +64,7 @@ class OpenGLFilter
  */
 
 OpenGLVideo::OpenGLVideo() :
+    videoType(kGLUYVY),
     gl_context(nullptr),      video_disp_dim(0,0),
     video_dim(0,0),           viewportSize(0,0),
     masterViewportSize(0,0),  display_visible_rect(0,0,0,0),
@@ -74,8 +75,7 @@ OpenGLVideo::OpenGLVideo() :
     inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
-    gl_features(0),           videoTextureType(GL_RGBA),
-    preferYCBCR(false),       forceResize(false)
+    gl_features(0),           forceResize(false)
 {
     forceResize = gCoreContext->GetBoolSetting("OpenGLExtraStage", false);
 }
@@ -121,8 +121,9 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
                        QSize videoDim, QSize videoDispDim,
                        QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
-                       bool viewport_control, QString options,
-                       bool hw_accel)
+                       bool viewport_control,
+                       VideoType Type,
+                       QString options)
 {
     if (!glcontext)
         return false;
@@ -144,10 +145,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     inputTextureSize      = QSize(0,0);
     currentFrameNum       = -1;
     inputUpdated          = false;
-
-    // OpenGL-Lite - use implementation specific extensions for updating frames
-    if (options.contains("preferycbcr"))
-        preferYCBCR = true;
+    videoType             = Type;
 
     // Set OpenGL feature support
     gl_features = gl_context->GetFeatures();
@@ -160,50 +158,27 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     bool glsl    = gl_features & kGLSL;
     bool shaders = glsl || (gl_features & kGLExtFragProg);
     bool fbos    = gl_features & kGLExtFBufObj;
-
-    #ifdef ANDROID
-    #define YV12DEFAULT false
-    #else
-    #define YV12DEFAULT true
-    #endif
-
-    bool yv12 = gCoreContext->GetBoolSetting("OpenGLYV12", YV12DEFAULT)
-        && !getenv("OPENGL_NOYV12");
     bool ycbcr   = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
+    VideoType fallback = shaders ? (glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLHQUYV) : ycbcr ? kGLYCbCr : kGLRGBA;
 
-    // warn about the lite profile when it offers no benefit
-    if (!ycbcr && preferYCBCR)
+    // check for feature support
+    bool unsupported = (kGLYCbCr == videoType) && !ycbcr;
+    unsupported     |= (kGLYV12  == videoType) && !glsl;
+    unsupported     |= (kGLUYVY  == videoType) && (!shaders || !fbos);
+    unsupported     |= (kGLHQUYV == videoType) && !shaders;
+
+    if (unsupported)
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "You have selected the opengl-lite profile but no required OpenGL "
-            "extensions are available.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + QString(
+                "'%1' OpenGLVideo type not available - falling back to '%2'")
+                .arg(TypeToString(videoType)).arg(TypeToString(fallback)));
+        videoType = fallback;
     }
 
-    // decide on best video input texture format and supported picture attributes
-    // colourspace adjustments require shaders to operate on YUV textures
-    videoTextureType = GL_RGBA;
-    PictureAttributeSupported pictureattribs = colourSpace->SupportedAttributes();
-
-    if (hw_accel)
-    {
-        // a hardware decoded frame - hopefully this is handled elsewhere
-        pictureattribs = kPictureAttributeSupported_None;
-    }
-    else if ((!shaders || preferYCBCR) && (gl_features & kGLMesaYCbCr))
-    {
-        videoTextureType = GL_YCBCR_MESA;
-        pictureattribs = kPictureAttributeSupported_None;
-    }
-    else if ((!shaders || preferYCBCR) && (gl_features & kGLAppleYCbCr))
-    {
-        videoTextureType = GL_YCBCR_422_APPLE;
-        pictureattribs = kPictureAttributeSupported_None;
-    }
-    else if (glsl && fbos && yv12)
-    {
-        videoTextureType = MYTHTV_YV12;
-    }
-    colourSpace->SetSupportedAttributes(pictureattribs);
+    // check picture attributes support - colourspace adjustments require
+    // shaders to operate on YUV textures
+    if (kGLRGBA == videoType || kGLGPU == videoType || kGLYCbCr == videoType)
+        colourspace->SetSupportedAttributes(kPictureAttributeSupported_None);
 
     // turn on bicubic filtering
     if (options.contains("openglbicubic"))
@@ -211,14 +186,14 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
         if (shaders && fbos && (gl_features & kGLExtRGBA16))
             defaultUpsize = kGLFilterBicubic;
         else
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                "No OpenGL feature support for Bicubic filter.");
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL feature support for Bicubic filter.");
     }
 
     // decide on best input texture type - GLX surfaces (for VAAPI) and the
-    // bicubic filter do not work with rectangular textures
-    if (!hw_accel && (MYTHTV_YV12 != videoTextureType) &&
-        (defaultUpsize != kGLFilterBicubic) && (gl_features & kGLExtRect))
+    // bicubic filter do not work with rectangular textures. YV12 now supports
+    // rectangular textures but POT textures are retained for the time being.
+    if ((gl_features & kGLExtRect) && (kGLGPU != videoType) &&
+        (kGLYV12 != videoType) && (kGLFilterBicubic != defaultUpsize))
     {
         textureType = gl_context->GetTextureType(textureRects);
     }
@@ -227,48 +202,47 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     GLuint tex = CreateVideoTexture(video_dim, inputTextureSize);
     bool    ok = false;
 
-    if (MYTHTV_YV12 == videoTextureType)
+    if (kGLYV12 == videoType)
         ok = tex && AddFilter(kGLFilterYV12RGB);
-    else if (!hw_accel)
+    else if ((kGLUYVY == videoType) || (kGLHQUYV == videoType) || (kGLYCbCr == videoType))
         ok = tex && AddFilter(kGLFilterYUV2RGB);
     else
         ok = tex && AddFilter(kGLFilterResize);
 
     if (ok)
     {
-        if (hw_accel)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Using hardware decoded input textures.");
-        else if ((GL_YCBCR_MESA == videoTextureType) ||
-                 (GL_YCBCR_422_APPLE == videoTextureType))
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                "Using YCbCr->RGBA input textures.");
-        else if (MYTHTV_YV12 == videoTextureType)
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                "Using YV12 input textures.");
-        else
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                "Using plain UYVY input textures.");
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using '%1' for OpenGL video type")
+            .arg(TypeToString(videoType)));
         inputTextures.push_back(tex);
     }
     else
+    {
         Teardown();
+    }
 
     if (filters.empty())
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                "Failed to setup colourspace conversion.\n\t\t\t"
-                "Falling back to software conversion.\n\t\t\t"
-                "Any opengl filters will also be disabled.");
+        bool fatalerror = kGLRGBA == videoType;
 
-        videoTextureType = GL_RGBA;
-        GLuint rgba32tex = CreateVideoTexture(video_dim, inputTextureSize);
-
-        if (rgba32tex && AddFilter(kGLFilterResize))
+        if (!fatalerror)
         {
-            inputTextures.push_back(rgba32tex);
-            colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    "Failed to setup colourspace conversion.\n\t\t\t"
+                    "Falling back to software conversion.\n\t\t\t"
+                    "Any opengl filters will also be disabled.");
+            GLuint rgba32tex = CreateVideoTexture(video_dim, inputTextureSize);
+
+            if (rgba32tex && AddFilter(kGLFilterResize))
+            {
+                inputTextures.push_back(rgba32tex);
+                colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
+            }
+            else
+            {
+                fatalerror = true;
+            }
         }
-        else
+        if (fatalerror)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
             Teardown();
@@ -297,7 +271,6 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
  *   Determine if the output is to be scaled at all and create or destroy
  *   the appropriate filter as necessary.
  */
-
 void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 {
     // to improve performance on slower cards when deinterlacing
@@ -307,6 +280,11 @@ void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
     // to ensure deinterlacing works correctly
     bool resize_down = (video_disp_dim.height() > display_video_rect.height()) &&
                         deinterlacing && allow;
+
+    // UYVY packed pixels must be sampled exactly and any overscan settings will
+    // break sampling - so always force an extra stage
+    // TODO optimise this away when 1 for 1 mapping is guaranteed
+    resize_down |= (kGLUYVY == videoType);
 
     // we always need at least one filter (i.e. a resize that simply blits the texture
     // to screen)
@@ -659,8 +637,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
         }
     }
 
-    OpenGLFilterType type = (MYTHTV_YV12 == videoTextureType) ?
-                            kGLFilterYV12RGB : kGLFilterYUV2RGB;
+    OpenGLFilterType type = (kGLYV12 == videoType) ? kGLFilterYV12RGB : kGLFilterYUV2RGB;
 
     uint prog1 = AddFragmentProgram(type, deinterlacer, kScan_Interlaced);
     uint prog2 = AddFragmentProgram(type, deinterlacer, kScan_Intr2ndField);
@@ -757,26 +734,19 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
  *  Create and initialise an OpenGL texture suitable for a YV12 video frame
  *  of the given size.
  */
-
 uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
 {
     uint tmp_tex = 0;
     bool use_pbo = gl_features & kGLExtPBufObj;
-    if (GL_YCBCR_MESA == videoTextureType)
+    if (kGLYCbCr == videoType)
     {
+        uint type = (gl_features & kGLMesaYCbCr) ? GL_YCBCR_MESA : GL_YCBCR_422_APPLE;
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
                                             GL_UNSIGNED_SHORT_8_8_MESA,
-                                            GL_YCBCR_MESA, GL_RGBA);
+                                            type, GL_RGBA);
     }
-    else if (GL_YCBCR_422_APPLE == videoTextureType)
+    else if (kGLYV12 == videoType)
     {
-        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
-                                            GL_UNSIGNED_SHORT_8_8_MESA,
-                                            GL_YCBCR_422_APPLE, GL_RGBA);
-    }
-    else if (MYTHTV_YV12 == videoTextureType)
-    {
-        // 4:1:1 YVU planar (12bpp)
         size.setHeight((3 * size.height() + 1) / 2);
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
                                             GL_UNSIGNED_BYTE,   // data_type
@@ -784,13 +754,18 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size)
                                             GL_LUMINANCE        // internal_fmt
                                             );
     }
-    else
+    else if (kGLUYVY == videoType)
+    {
+        size.setWidth(size.width() >> 1);
+        tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType,
+                                            GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA);
+    }
+    else if ((kGLHQUYV == videoType) || (kGLGPU == videoType) || (kGLRGBA == videoType))
+    {
         tmp_tex = gl_context->CreateTexture(size, use_pbo, textureType);
+    }
 
     tex_size = gl_context->GetTextureSize(textureType, size);
-    if (!tmp_tex)
-        return 0;
-
     return tmp_tex;
 }
 
@@ -843,7 +818,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     if (frame->width  != video_dim.width()  ||
         frame->height != video_dim.height() ||
         frame->width  < 1 || frame->height < 1 ||
-        frame->codec != FMT_YV12)
+        frame->codec != FMT_YV12 || (kGLGPU == videoType))
     {
         return;
     }
@@ -855,9 +830,8 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     if (!buf)
         return;
 
-    if (MYTHTV_YV12 == videoTextureType)
+    if (kGLYV12 == videoType)
     {
-
         if (gl_features & kGLExtPBufObj)
         {
             // Copy the frame to the pixel buffer which updates the texture
@@ -874,24 +848,22 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
             buf = frame->buf;
         }
     }
-    else if (!filters.count(kGLFilterYUV2RGB))
+    else if ((kGLYCbCr == videoType) || (kGLUYVY == videoType))
     {
-        // software conversion
         AVFrame img_out;
-        AVPixelFormat out_fmt = AV_PIX_FMT_RGBA;
-        if ((GL_YCBCR_MESA == videoTextureType) ||
-            (GL_YCBCR_422_APPLE == videoTextureType))
-        {
-            out_fmt = AV_PIX_FMT_UYVY422;
-        }
-        m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, out_fmt);
+        m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_UYVY422);
     }
-    else if (frame->interlaced_frame && !soft_bob)
+    else if (kGLRGBA == videoType)
+    {
+        AVFrame img_out;
+        m_copyCtx.Copy(&img_out, frame, (unsigned char*)buf, AV_PIX_FMT_RGBA);
+    }
+    else if (kGLHQUYV == videoType && frame->interlaced_frame && !soft_bob)
     {
         pack_yv12interlaced(frame->buf, (unsigned char*)buf, frame->offsets,
                             frame->pitches, video_dim);
     }
-    else
+    else if (kGLHQUYV == videoType)
     {
         pack_yv12progressive(frame->buf, (unsigned char*)buf, frame->offsets,
                              frame->pitches, video_dim);
@@ -963,6 +935,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         float trueheight = (float)(actual ? video_dim.height() :
                                             video_disp_dim.height());
         float width = video_disp_dim.width();
+        if (kGLUYVY == videoType)
+            width /= 2.0f;
 
         QRectF trect(QPoint(0, 0), QSize(width, trueheight));
 
@@ -1206,6 +1180,31 @@ QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
     return "";
 }
 
+OpenGLVideo::VideoType OpenGLVideo::StringToType(const QString &Type)
+{
+    QString type = Type.toLower().trimmed();
+    if ("opengl-yv12" == type)  return kGLYV12;
+    if ("opengl-hquyv" == type) return kGLHQUYV;
+    if ("opengl-rgba" == type)  return kGLRGBA;
+    if ("opengl-lite" == type)  return kGLYCbCr;
+    if ("opengl-gpu" == type)   return kGLGPU;
+    return kGLUYVY; // opengl
+}
+
+QString OpenGLVideo::TypeToString(VideoType Type)
+{
+    switch (Type)
+    {
+        case kGLGPU:   return "opengl-gpu";
+        case kGLYCbCr: return "opengl-lite"; // compatibility with old profiles
+        case kGLUYVY:  return "opengl";      // compatibility with old profiles
+        case kGLYV12:  return "opengl-yv12";
+        case kGLHQUYV: return "opengl-hquyv";
+        case kGLRGBA:  return "opengl-rgba";
+    }
+    return "opengl";
+}
+
 static const QString attrib_fast =
 "ATTRIB tex   = fragment.texcoord[0];\n"
 "PARAM yuv[3] = { program.local[0..2] };\n";
@@ -1216,10 +1215,19 @@ static const QString tex_fast =
 static const QString var_fast =
 "TEMP tmp, res;\n";
 
+static const QString var_col =
+"TEMP col;\n";
+
+static const QString select_col =
+"MUL col, tex.xxxx, %8;\n"
+"FRC col, col;\n"
+"SUB col, col, 0.5;\n"
+"CMP res, col, res.rabg, res.rgba;\n";
+
 static const QString end_fast =
-"DPH tmp.r, res.abrg, yuv[0];\n"
-"DPH tmp.g, res.abrg, yuv[1];\n"
-"DPH tmp.b, res.abrg, yuv[2];\n"
+"DPH tmp.r, res.%SWIZZLE%g, yuv[0];\n"
+"DPH tmp.g, res.%SWIZZLE%g, yuv[1];\n"
+"DPH tmp.b, res.%SWIZZLE%g, yuv[2];\n"
 "MOV tmp.a, 1.0;\n"
 "MOV result.color, tmp;\n";
 
@@ -1344,6 +1352,7 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
         case kGLFilterYUV2RGB:
         {
             bool need_tex = true;
+            bool packed = (kGLUYVY == videoType);
             QString deint_bit = "";
             if (deint != "")
             {
@@ -1377,8 +1386,10 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
 
             ret += attrib_fast;
             ret += (deint != "") ? var_deint : "";
+            ret += packed ? var_col : "";
             ret += var_fast + (need_tex ? tex_fast : "");
             ret += deint_bit;
+            ret += packed ? select_col : "";
             ret += end_fast;
         }
             break;
@@ -1425,12 +1436,11 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     float yv12height = video_dim.height();
     QSize fb_size = GetTextureSize(video_disp_dim);
 
-    if (!textureRects &&
-       (inputTextureSize.height() > 0))
+    if (!textureRects && (inputTextureSize.height() > 0) && (inputTextureSize.width() > 0))
     {
         lineHeight /= inputTextureSize.height();
         colWidth   /= inputTextureSize.width();
-        yselect    /= ((float)inputTextureSize.width() / 2.0f);
+        yselect     = (float)inputTextureSize.width();
         maxwidth    = video_dim.width()  / (float)inputTextureSize.width();
         maxheight   = video_dim.height() / (float)inputTextureSize.height();
         yv12height  = maxheight;
@@ -1444,11 +1454,13 @@ void OpenGLVideo::CustomiseProgramString(QString &string)
     string.replace("%5", QString::number(colWidth, 'f', 8));
     string.replace("%6", QString::number((float)fb_size.width(), 'f', 1));
     string.replace("%7", QString::number((float)fb_size.height(), 'f', 1));
-    string.replace("%8", QString::number(1.0f / yselect, 'f', 8));
+    string.replace("%8", QString::number(yselect, 'f', 8));
     string.replace("%9", QString::number(maxheight - lineHeight, 'f', 8));
     string.replace("%WIDTH%", QString::number(maxwidth, 'f', 8));
     string.replace("%HEIGHT%", QString::number(yv12height, 'f', 8));
     string.replace("COLOUR_UNIFORM", COLOUR_UNIFORM);
+    // TODO fix alternative swizzling by changing the YUVA packing code
+    string.replace("%SWIZZLE%", kGLUYVY == videoType ? "arb" : "abr");
 }
 
 static const QString YUV2RGBVertexShader =
@@ -1462,6 +1474,10 @@ static const QString YUV2RGBVertexShader =
 "    v_texcoord0 = a_texcoord0;\n"
 "}\n";
 
+static const QString SelectColumn =
+"    if (fract(v_texcoord0.x * %8) < 0.5)\n"
+"        yuva = yuva.rabg;\n";
+
 static const QString YUV2RGBFragmentShader =
 "GLSL_DEFINES"
 "uniform GLSL_SAMPLER s_texture0;\n"
@@ -1470,7 +1486,8 @@ static const QString YUV2RGBFragmentShader =
 "void main(void)\n"
 "{\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0);\n"
-"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n";
 
 static const QString OneFieldShader[2] = {
@@ -1483,7 +1500,8 @@ static const QString OneFieldShader[2] = {
 "    float field = v_texcoord0.y + (step(0.5, fract(v_texcoord0.y * %2)) * %3);\n"
 "    field       = clamp(field, 0.0, %9);\n"
 "    vec4 yuva   = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, field));\n"
-"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1494,7 +1512,8 @@ static const QString OneFieldShader[2] = {
 "{\n"
 "    vec2 field   = vec2(0.0, step(0.5, 1.0 - fract(v_texcoord0.y * %2)) * %3);\n"
 "    vec4 yuva    = GLSL_TEXTURE(s_texture0, v_texcoord0 + field);\n"
-"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1510,7 +1529,8 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
 "    if (fract(v_texcoord0.y * %2) >= 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1524,7 +1544,8 @@ static const QString LinearBlendShader[2] = {
 "    vec4 below = GLSL_TEXTURE(s_texture0, vec2(v_texcoord0.x, max(v_texcoord0.y - %3, %3)));\n"
 "    if (fract(v_texcoord0.y * %2) < 0.5)\n"
 "        yuva = mix(above, below, 0.5);\n"
-"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1559,7 +1580,8 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n",
 
 "GLSL_DEFINES"
@@ -1592,7 +1614,8 @@ static const QString KernelShader[2] = {
 "        yuva = (line00 * -0.0625) + yuva;\n"
 "        yuva = (line40 * -0.0625) + yuva;\n"
 "    }\n"
-"    gl_FragColor = vec4(yuva.abr, 1.0) * COLOUR_UNIFORM;\n"
+"SELECT_COLUMN"
+"    gl_FragColor = vec4(yuva.%SWIZZLE%, 1.0) * COLOUR_UNIFORM;\n"
 "}\n"
 };
 
@@ -1819,6 +1842,7 @@ void OpenGLVideo::GetProgramStrings(QString &vertex, QString &fragment,
                 fragment = KernelShader[bottom];
             else
                 fragment = YUV2RGBFragmentShader;
+            fragment.replace("SELECT_COLUMN", (kGLUYVY == videoType) ? SelectColumn : "");
             break;
         }
         case kGLFilterYV12RGB:

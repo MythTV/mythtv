@@ -3,9 +3,9 @@
 
 // MythTV headers
 #include "videooutbase.h"
+#include "openglvideo.h"
 
 class MythRenderOpenGL;
-class OpenGLVideo;
 class MythOpenGLPainter;
 
 class VideoOutputOpenGL : public VideoOutput
@@ -27,7 +27,7 @@ class VideoOutputOpenGL : public VideoOutput
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
                       FrameScanType scan) override; // VideoOutput
-    void Show(FrameScanType ) override; // VideoOutput
+    virtual void Show(FrameScanType ) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
                       float aspect,
@@ -89,7 +89,8 @@ class VideoOutputOpenGL : public VideoOutput
 
     MythOpenGLPainter *gl_painter;
     bool               gl_created_painter;
-    bool               gl_opengl_lite;
+    QString            gl_opengl_profile;
+    OpenGLVideo::VideoType gl_opengl_type;
 };
 
 #endif

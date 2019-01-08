@@ -1559,16 +1559,42 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     if (renderer == "opengl")
     {
         msg = QObject::tr(
-            "This video renderer uses OpenGL for scaling and color conversion "
-            "with full picture controls. The GPU can be used for deinterlacing. "
-            "This requires a faster GPU than XVideo.");
+            "Video is converted to an intermediate format by the CPU (UYVY) "
+            "before OpenGL is used for color conversion, scaling, picture controls"
+            " and optionally deinterlacing. Processing is balanced between the CPU"
+            "and GPU.");
     }
 
     if (renderer == "opengl-lite")
         msg = QObject::tr(
-            "This video renderer uses OpenGL for scaling and color conversion. "
+            "OpenGL is used for scaling and color conversion. "
             "It uses faster OpenGL functionality when available but at the "
             "expense of picture controls and GPU based deinterlacing.");
+
+    if (renderer == "opengl-yv12")
+    {
+        msg = QObject::tr(
+            "OpenGL is used for all color conversion, scaling, picture "
+            "controls and optionally deinterlacing. CPU load is low but a more "
+            "powerful GPU is needed for deinterlacing.");
+    }
+
+    if (renderer == "opengl-hquyv")
+    {
+        msg = QObject::tr(
+            "This renderer uses a higher quality CPU conversion for interlaced "
+            "content before using OpenGL for color conversion, scaling, picture"
+            " controls and optionally deinterlacing. CPU load is higher "
+            "particularly on embedded systems.");
+    }
+
+    if (renderer == "opengl-rgba")
+    {
+        msg = QObject::tr(
+            "All video processing is performed by the CPU. OpenGL is used "
+            "for display only. Does not support picture controls or GPU "
+            "deinterlacing. Requires a significantly faster CPU.");
+    }
 
     if (renderer == "vdpau")
     {
