@@ -1273,7 +1273,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             RegistrationDescriptor reg(descs[i]);
             if (reg.FormatIdentifierString() == "CUEI" ||
                 reg.FormatIdentifierString() == "SCTE")
-                info.is_opencable = true;
+                info.could_be_opencable = true;
         }
 
         info.is_encrypted |= pmt->IsEncrypted(GetDTVChannel()->GetSIStandard());
