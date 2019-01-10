@@ -2541,6 +2541,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             if (version && FlagIsSet(kDecodeAllowGPU))
             {
                 bool foundgpudecoder = false;
+		Q_UNUSED(foundgpudecoder); // Prevent warning if no GPU decoders
 
 #ifdef USING_VDPAU
                 MythCodecID vdpau_mcid;

@@ -316,7 +316,7 @@ MythMediaError MythMediaDevice::eject(bool open_close)
 #if CONFIG_DARWIN
     QString  command = "diskutil eject " + m_DevicePath;
 
-    int ret = myth_system(command, kMSRunBackground);
+    myth_system(command, kMSRunBackground);
     return MEDIAERR_OK;
 #endif
 
