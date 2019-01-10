@@ -6498,7 +6498,7 @@ case "$cc_type" in
         if test $target_os = "freebsd"; then
             disable enforce_nullptr
         fi
-        ## Not yet tested on MacOSX.
+        ## Clang on MacOSX also doesn't ignore warnings in system headers.
         if test $target_os = "darwin"; then
             disable enforce_nullptr
         fi
@@ -6928,15 +6928,21 @@ elif enabled clangxx; then
     # Clang needs this to link on Fedora
     add_extralibs -lstdc++
     # Don't complain about over-aligned types.
-    if test $target_os = "freebsd"; then
-        # The libc++ library on FreeBSD 10 is missing the required
-        # new() function and doesn't work with this flag enabled.
-        if test $(uname -K) -gt 1100000; then
+    case $target_os in
+        freebsd)
+            # The libc++ library on FreeBSD 10 is missing the required
+            # new() function and doesn't work with this flag enabled.
+            if test $(uname -K) -gt 1100000; then
+                check_cxxflags -faligned-allocation
+            fi
+            ;;
+        darwin)
+            # OSX compiles aren't happy with aligned allocation.
+            ;;
+        *)
             check_cxxflags -faligned-allocation
-        fi
-    else
-        check_cxxflags -faligned-allocation
-    fi
+            ;;
+    esac
     if enabled enforce_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
     fi
