@@ -6050,25 +6050,30 @@ if enabled libmpeg2external; then
 fi
 
 if enabled hdhomerun; then
-    # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
-    # Fedora and Debian/Ubuntu use different include directories.
-    if check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
-        :
-    elif check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
-        add_cxxflags -DHDHOMERUN_LIBPREFIX
-    elif check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
-        add_cxxflags -DHDHOMERUN_V2
-    elif check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
-        add_cxxflags -DHDHOMERUN_V2 -DHDHOMERUN_LIBPREFIX
+    # Fedora and Debian/Ubuntu use different include directories.  So does OSX.
+    if check_header hdhomerun.h ; then
+	HDHOMERUN_PREFIX=
+    elif check_header hdhomerun/hdhomerun.h ; then
+	HDHOMERUN_PREFIX=hdhomerun/
+    elif check_header libhdhomerun/hdhomerun.h ; then
+	HDHOMERUN_PREFIX=libhdhomerun/
     else
         disable hdhomerun
     fi
 
-    if check_lib libhdhomerun hdhomerun/hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun || \
-            check_lib libhdhomerun libhdhomerun/hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun ; then
-        :
+    # The switch from v1 to v2 occurred between the 20150615 and 20150826 releases.
+    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices -lhdhomerun; then
+        HDHOMERUN_V2=no
+    elif check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_discover_find_devices_v2 -lhdhomerun; then
+        HDHOMERUN_V2=yes
     else
-        add_cxxflags -DNEED_HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
+        disable hdhomerun
+    fi
+
+    if check_lib libhdhomerun ${HDHOMERUN_PREFIX}hdhomerun.h hdhomerun_device_selector_load_from_str -lhdhomerun ; then
+        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=no
+    else
+        HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR=yes
     fi
 fi
 
@@ -7835,6 +7840,12 @@ if test x"$CONFIG_INCLUDEPATH" != x"" ; then
 fi
 
 echo "#endif /* MYTHTV_CONFIG_H */" >> $TMPH
+
+enabled hdhomerun && cat >> $TMPMAK <<EOF
+HDHOMERUN_PREFIX=$HDHOMERUN_PREFIX
+HDHOMERUN_V2=$HDHOMERUN_V2
+HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR = $HDHOMERUN_DEVICE_SELECTOR_LOAD_FROM_STR
+EOF
 
 cat <<EOF >> $TMPMAK
 # HACK: If Qt 4 and MythTV's installed library dirs are the same, remove the

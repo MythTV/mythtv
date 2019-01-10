@@ -38,11 +38,7 @@
 #endif
 
 #ifdef USING_HDHOMERUN
-#ifdef HDHOMERUN_LIBPREFIX
-#include "libhdhomerun/hdhomerun.h"
-#else
-#include "hdhomerun/hdhomerun.h"
-#endif
+#include HDHOMERUN_HEADERFILE
 #endif
 
 #ifdef USING_VBOX
