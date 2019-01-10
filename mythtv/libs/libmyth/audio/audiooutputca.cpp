@@ -990,7 +990,7 @@ int *CoreAudioData::RatesList(AudioDeviceID d)
     return finallist;
 }
 
-bool *CoreAudioData::ChannelsList(AudioDeviceID d, bool passthru)
+bool *CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru)
 {
     AudioStreamID               *streams;
     AudioStreamBasicDescription *formats;
@@ -1690,7 +1690,7 @@ void CoreAudioData::ResetStream(AudioStreamID s)
     }
 }
 
-QMap<QString, QString> *AudioOutputCA::GetDevices(const char *type)
+QMap<QString, QString> *AudioOutputCA::GetDevices(const char */*type*/)
 {
     QMap<QString, QString> *devs = new QMap<QString, QString>();
 

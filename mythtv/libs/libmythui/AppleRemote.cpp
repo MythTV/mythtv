@@ -544,7 +544,7 @@ void AppleRemote::_handleEventWithCookieString(std::string cookieString,
 // We need to simulate the key up and hold events
 
 void AppleRemote::_handleEventATV23(std::string cookieString,
-                                    SInt32      sumOfValues)
+                                    SInt32      /*sumOfValues*/)
 {
     std::map<std::string,AppleRemote::Event>::iterator ii;
     ii = cookieToButtonMapping.find(cookieString);
