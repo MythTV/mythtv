@@ -72,8 +72,8 @@ isEmpty( LIBDIR ) {
     LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
 }
 
-LIBVERSION = 30
-VERSION = 30.0
+LIBVERSION = 31
+VERSION = 31.0
 
 # Die on the (common) case where OS X users inadvertently use Fink's
 # Qt/X11 install instead of Qt/Mac. '
