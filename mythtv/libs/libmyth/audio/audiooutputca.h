@@ -16,7 +16,7 @@ public:
     explicit AudioOutputCA(const AudioSettings &settings);
     virtual ~AudioOutputCA();
     
-    AudioOutputSettings* GetOutputSettings(bool digital);
+    AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
     static QMap<QString, QString> *GetDevices(const char *type = nullptr);
 
     int64_t GetAudiotime(void) override; // AudioOutputBase
