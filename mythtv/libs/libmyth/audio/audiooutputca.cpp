@@ -1562,7 +1562,7 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
           .arg(s)
           .arg(StreamDescriptionToString(format)));
 
-    OSStatus err = AudioStreamSetProperty(s, 0, 0,
+    OSStatus err = AudioStreamSetProperty(s, nullptr, 0,
                                           kAudioStreamPropertyPhysicalFormat,
                                           sizeof(format), &format);
     if (err != noErr)
