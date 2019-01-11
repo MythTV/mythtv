@@ -33,24 +33,24 @@
         <translation>Κατεβάζω την Ταινία...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="152"/>
+        <location filename="../mythnetvision/netbase.cpp" line="151"/>
         <source>No browser command set! MythNetTree needs MythBrowser installed to display the video.</source>
         <translation>Δεν έχει οριστεί πρόγραμμα φυλλομετρητή. Το MythNetTree χρειάζεται το MythBrowser για προβολή της ταινίας.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="189"/>
+        <location filename="../mythnetvision/netbase.cpp" line="188"/>
         <source>Are you sure you want to delete this file?</source>
         <translation>Σίγουρα θέλετε να διαγράψετε το αρχείο;</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="245"/>
+        <location filename="../mythnetvision/netbase.cpp" line="244"/>
         <source>Downloading Video...
 (%1 of %2 MB)</source>
         <translation>Κατεβάζω την Ταινία...
 (%1 από %2 MB)</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netbase.cpp" line="275"/>
+        <location filename="../mythnetvision/netbase.cpp" line="274"/>
         <source>Error downloading video to backend.</source>
         <translation>Σφάλμα κατά το κατέβασμα της ταινίας στον backend.</translation>
     </message>
@@ -66,73 +66,73 @@
 <context>
     <name>NetSearch</name>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="177"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="178"/>
         <source>Search Options</source>
         <translation>Επιλογές Αναζήτησης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="194"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="195"/>
         <source>Stream Video</source>
         <translation>Ροή Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="196"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="197"/>
         <source>Open Web Link</source>
         <translation>Άνοιγμα Σύνδεσης Ιστού</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="211"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="212"/>
         <source>Play</source>
         <translation>Αναπαραγωγή</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="214"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="215"/>
         <source>Save This Video</source>
         <translation>Αποθήκευση αυτής της Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="222"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="223"/>
         <source>Delete</source>
         <translation>Διαγραφή</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="228"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="229"/>
         <source>Previous Page</source>
         <translation>Προηγούμενη Σελίδα</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="230"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="231"/>
         <source>Next Page</source>
         <translation>Επόμενη Σελίδα</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="232"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="233"/>
         <source>Skip 10 Pages Back</source>
         <translation>Πήγαινε 10 Σελίδες Πίσω</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="236"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="237"/>
         <source>Skip 10 Pages Forward</source>
         <translation>Πήγαινε 10 Σελίδες Μπροστά</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="239"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="240"/>
         <source>Manage Search Scripts</source>
         <translation>Διαχείριση script Αναζήτησης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="289"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="290"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
         <translation>Ψάχνω το %1 για &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="313"/>
-        <location filename="../mythnetvision/netsearch.cpp" line="332"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="314"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="333"/>
         <source>Changing to page %1 of search &quot;%2&quot;...</source>
         <translation>Γυρίζω στη σελίδα %1 της αναζήτησης &quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/netsearch.cpp" line="409"/>
+        <location filename="../mythnetvision/netsearch.cpp" line="410"/>
         <source>Timed out waiting for query to finish.  API might be down.</source>
         <translation>Τέλος ορίου αναμονής για ολοκλήρωση αναζήτησης. Πιθανό σφάλμα API.</translation>
     </message>
@@ -140,105 +140,105 @@
 <context>
     <name>NetTree</name>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="405"/>
+        <location filename="../mythnetvision/nettree.cpp" line="406"/>
         <source>Playback/Download Options</source>
         <translation>Επιλογές Αναπαραγωγής / Μεταφόρτωσης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="429"/>
+        <location filename="../mythnetvision/nettree.cpp" line="430"/>
         <source>Stream Video</source>
         <translation>Ροή Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="430"/>
+        <location filename="../mythnetvision/nettree.cpp" line="431"/>
         <source>Open Web Link</source>
         <translation>Άνοιγμα Συνδέσμου</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="433"/>
+        <location filename="../mythnetvision/nettree.cpp" line="434"/>
         <source>Save This Video</source>
         <translation>Αποθήκευση της Ταινίας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="436"/>
+        <location filename="../mythnetvision/nettree.cpp" line="437"/>
         <source>Scan/Manage Subscriptions</source>
         <translation>Ανίχνευση / Διαχείριση Συνδρομών</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="437"/>
+        <location filename="../mythnetvision/nettree.cpp" line="438"/>
         <source>Change View</source>
         <translation>Αλλαγή Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="450"/>
+        <location filename="../mythnetvision/nettree.cpp" line="451"/>
         <source>View Options</source>
         <translation>Επιλογές Προβολής</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="455"/>
+        <location filename="../mythnetvision/nettree.cpp" line="456"/>
         <source>Switch to List View</source>
         <translation>Προβολή Λίστας</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="457"/>
+        <location filename="../mythnetvision/nettree.cpp" line="458"/>
         <source>Switch to Gallery View</source>
         <translation>Προβολή Γκαλερί</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="459"/>
+        <location filename="../mythnetvision/nettree.cpp" line="460"/>
         <source>Switch to Browse View</source>
         <translation>Προβολή Περιήγησης</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="466"/>
+        <location filename="../mythnetvision/nettree.cpp" line="467"/>
         <source>Subscription Management</source>
         <translation>Διαχείριση Συνδρομών</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="470"/>
+        <location filename="../mythnetvision/nettree.cpp" line="471"/>
         <source>Update Site Maps</source>
         <translation>Ενημέρ. Χαρτών Ιστοσελίδων</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="471"/>
+        <location filename="../mythnetvision/nettree.cpp" line="472"/>
         <source>Update RSS</source>
         <translation>Ενημέρωση RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="472"/>
+        <location filename="../mythnetvision/nettree.cpp" line="473"/>
         <source>Manage Site Subscriptions</source>
         <translation>Διαχ. Συνδρ. Ιστοσελίδων</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="473"/>
+        <location filename="../mythnetvision/nettree.cpp" line="474"/>
         <source>Manage RSS Subscriptions</source>
         <translation>Διαχείριση Συνδρομών RSS</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="475"/>
+        <location filename="../mythnetvision/nettree.cpp" line="476"/>
         <source>Enable Automatic Site Updates</source>
         <translation>Αυτόματες Ενημερώσεις Ιστοσελ.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="478"/>
+        <location filename="../mythnetvision/nettree.cpp" line="479"/>
         <source>Disable Automatic Site Updates</source>
         <translation>Όχι Αυτόματες Ενημερώσεις Ιστοσ.</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="533"/>
-        <location filename="../mythnetvision/nettree.cpp" line="550"/>
-        <location filename="../mythnetvision/nettree.cpp" line="580"/>
-        <location filename="../mythnetvision/nettree.cpp" line="622"/>
+        <location filename="../mythnetvision/nettree.cpp" line="534"/>
+        <location filename="../mythnetvision/nettree.cpp" line="551"/>
+        <location filename="../mythnetvision/nettree.cpp" line="581"/>
+        <location filename="../mythnetvision/nettree.cpp" line="623"/>
         <source>Back</source>
         <translation>Πίσω</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="901"/>
+        <location filename="../mythnetvision/nettree.cpp" line="908"/>
         <source>Updating RSS.  This could take a while...</source>
         <translation>Ενημερώνω τα RSS. Μπορεί να πάρει λίγη ώρα...</translation>
     </message>
     <message>
-        <location filename="../mythnetvision/nettree.cpp" line="915"/>
+        <location filename="../mythnetvision/nettree.cpp" line="922"/>
         <source>Updating Site Maps.  This could take a while...</source>
         <translation>Ενημερώνω τους χάρτες των Ιστοσελίδων. Μπορεί να πάρει λίγη ώρα...</translation>
     </message>
@@ -246,7 +246,7 @@
 <context>
     <name>RSSEditor</name>
     <message>
-        <location filename="../mythnetvision/rsseditor.cpp" line="504"/>
+        <location filename="../mythnetvision/rsseditor.cpp" line="510"/>
         <source>Are you sure you want to unsubscribe from this feed?</source>
         <translation>Σίγουρα θέλετε να ακυρώσετε τη συνδρομή σας;</translation>
     </message>
