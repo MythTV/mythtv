@@ -86,10 +86,14 @@ void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
 }
 
 VideoOutputOpenGL::VideoOutputOpenGL(const QString &profile)
-    : VideoOutput(),
-    gl_context_lock(QMutex::Recursive), gl_context(nullptr), gl_valid(true),
-    gl_videochain(nullptr), gl_pipchain_active(nullptr),
-    gl_parent_win(0),    gl_painter(nullptr), gl_created_painter(false),
+  : VideoOutput(),
+    gl_context_lock(QMutex::Recursive),
+    gl_context(nullptr),
+    gl_valid(true),
+    gl_videochain(nullptr),
+    gl_pipchain_active(nullptr),
+    gl_parent_win(0),
+    gl_painter(nullptr),
     gl_opengl_profile(profile),
     gl_opengl_type(OpenGLVideo::StringToType(profile))
 {
@@ -104,7 +108,6 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
 {
     gl_context_lock.lock();
     TearDown();
-
     if (gl_context)
         gl_context->DecrRef();
     gl_context = nullptr;
@@ -169,33 +172,11 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
     gl_context_lock.lock();
     if (gl_context)
         gl_context->makeCurrent();
-
-    if (gl_created_painter)
-    {
-        QWidget *device = QWidget::find(gl_parent_win);
-        if (device)
-            device->setAttribute(Qt::WA_PaintOnScreen, false);
-    }
-
-    if (gl_created_painter)
-    {
-        // Hack to ensure that the osd painter is not
-        // deleted while image load thread is still busy
-        // loading images with that painter
-        gl_painter->Teardown();
-        if (invalid_osd_painter)
-            delete invalid_osd_painter;
-        invalid_osd_painter = gl_painter;
-    }
-    else if (gl_painter)
+    if (gl_painter)
         gl_painter->SetSwapControl(true);
-
     gl_painter = nullptr;
-    gl_created_painter = false;
-
     if (gl_context)
         gl_context->doneCurrent();
-
     gl_context_lock.unlock();
 }
 
@@ -361,35 +342,7 @@ bool VideoOutputOpenGL::SetupContext(void)
         return true;
     }
 
-    // This code does not work.
-    // Using OpenGL video renderer with QT Theme painter - the moment
-    // the code below calls gl_context->create() the main window disappears
-    // and after that the video renderer complains about rendering on a non
-    // visible window. The window never comes back and you have to kill
-    // the frontend.
-
-/*
-    QWidget *device = QWidget::find(gl_parent_win);
-    if (!device)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to find parent to windowID");
-        return false;
-    }
-
-    gl_context = MythRenderOpenGL::Create(QString(), device);
-    if (gl_context && gl_context->create())
-    {
-        gl_context->Init();
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Created MythRenderOpenGL device.");
-        return true;
-    }
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create MythRenderOpenGL device.");
-    if (gl_context)
-        gl_context->DecrRef();
-    gl_context = nullptr;
-*/
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to use OpenGL when ThemePainter is set to QT.");
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to use OpenGL without OpenGL UI");
     return false;
 }
 
@@ -467,32 +420,14 @@ bool VideoOutputOpenGL::SetupOpenGL(void)
 void VideoOutputOpenGL::CreatePainter(void)
 {
     QMutexLocker locker(&gl_context_lock);
-
-    gl_created_painter = false;
     MythMainWindow *win = MythMainWindow::getMainWindow();
-    if (gl_context && !gl_context->IsShared())
+    gl_painter = (MythOpenGLPainter*)win->GetCurrentPainter();
+    if (!gl_painter)
     {
-        QWidget *device = QWidget::find(gl_parent_win);
-        gl_painter = new MythOpenGLPainter(gl_context, device);
-        if (!gl_painter)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create painter");
-            return;
-        }
-        gl_created_painter = true;
-        if (device)
-            device->setAttribute(Qt::WA_PaintOnScreen);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get painter");
+        return;
     }
-    else
-    {
-        gl_painter = (MythOpenGLPainter*)win->GetCurrentPainter();
-        if (!gl_painter)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to get painter");
-            return;
-        }
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using main UI painter");
-    }
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Using main UI painter");
     gl_painter->SetSwapControl(false);
 }
 
@@ -649,6 +584,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t,
         second = first.translated(0, main.height() / 2);
     }
 
+    // TODO this shouldn't be necessary anymore
     // main UI when embedded
     MythMainWindow *mwnd = GetMythMainWindow();
     if (mwnd && mwnd->GetPaintWindow() && window.IsEmbedding())

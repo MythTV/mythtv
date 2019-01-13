@@ -88,7 +88,6 @@ class VideoOutputOpenGL : public VideoOutput
     VideoFrame        av_pause_frame;
 
     MythOpenGLPainter *gl_painter;
-    bool               gl_created_painter;
     QString            gl_opengl_profile;
     OpenGLVideo::VideoType gl_opengl_type;
 };
