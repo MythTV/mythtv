@@ -1,31 +1,24 @@
-#include "mythrender_opengl.h"
-
+// Std
 #include <algorithm>
 using std::min;
 
+// Qt
 #include <QLibrary>
 #include <QPainter>
-#ifdef USE_OPENGL_QT5
 #include <QWindow>
 #include <QGLFormat>
-#endif
-#include <QWidget>
 
+// MythTV
+#include "mythrender_opengl.h"
 #include "mythlogging.h"
 #include "mythuitype.h"
 #include "mythxdisplay.h"
-
 #define LOC QString("OpenGL: ")
-
 #include "mythrender_opengl2.h"
 #ifdef USING_OPENGLES
 #include "mythrender_opengl2es.h"
 #else
 #include "mythrender_opengl1.h"
-#endif
-
-#ifdef CONFIG_XNVCTRL
-#include "util-nvctrl.h"
 #endif
 
 #ifdef Q_OS_ANDROID
@@ -61,8 +54,7 @@ OpenGLLocker::~OpenGLLocker()
         m_render->doneCurrent();
 }
 
-MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
-                                           QPaintDevice* device)
+MythRenderOpenGL* MythRenderOpenGL::Create(const QString&, QPaintDevice* device)
 {
     QString display = getenv("DISPLAY");
     // Determine if we are running a remote X11 session
@@ -81,102 +73,21 @@ MythRenderOpenGL* MythRenderOpenGL::Create(const QString &painter,
         LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is disabled for Remote X Session");
         return nullptr;
     }
-#ifdef USE_OPENGL_QT5
-    MythRenderFormat format = QSurfaceFormat::defaultFormat();
+
+    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
     format.setDepthBufferSize(0);
+    format.setStencilBufferSize(0);
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-# ifdef USING_OPENGLES
-    format.setRenderableType(QSurfaceFormat::OpenGLES);
-# endif
-#else
-    MythRenderFormat format = QGLFormat(QGL::NoDepthBuffer);
-#endif
-
-    bool setswapinterval = false;
-    int synctovblank = -1;
-
-#ifdef CONFIG_XNVCTRL
-    synctovblank = CheckNVOpenGLSyncToVBlank();
-#endif
-
-    if (synctovblank < 0)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "Could not determine whether Sync "
-                                           "to VBlank is enabled.");
-    }
-    else if (synctovblank == 0)
-    {
-        // currently only Linux NVidia is supported and there is no way of
-        // forcing sync to vblank after the app has started. util-nvctrl will
-        // warn the user and offer advice on settings.
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Sync to VBlank is enabled (good!)");
-    }
-
-#if defined(Q_OS_MAC)
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Forcing swap interval for OS X.");
-    setswapinterval = true;
-#endif
-
-    if (setswapinterval)
-        format.setSwapInterval(1);
-
-#if ANDROID
-    int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
-    LOG(VB_GENERAL, LOG_INFO, "OpenGL ES2 forced for Android");
-#elif defined USE_OPENGL_QT5 && defined USING_OPENGLES
-    int openGLVersionFlags = QGLFormat::OpenGL_ES_Version_2_0;
-#else
-    // Check OpenGL version supported
-    QGLWidget *dummy = new QGLWidget;
-    dummy->makeCurrent();
-    QGLFormat qglFormat = dummy->format();
-    int openGLVersionFlags = qglFormat.openGLVersionFlags();
-    delete dummy;
-#endif
-
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSwapInterval(1);
 #ifdef USING_OPENGLES
-    Q_UNUSED(painter);
-    if (!(openGLVersionFlags & QGLFormat::OpenGL_ES_Version_2_0))
-    {
-        LOG(VB_GENERAL, LOG_WARNING,
-            "Using OpenGL ES 2.0 render, however OpenGL ES 2.0 "
-            "version not supported");
-    }
-    if (device)
-        return new MythRenderOpenGL2ES(format, device);
-    return new MythRenderOpenGL2ES(format);
-#else
-    if ((openGLVersionFlags & QGLFormat::OpenGL_Version_2_0) &&
-        (painter.contains(OPENGL2_PAINTER) || painter.contains(AUTO_PAINTER) ||
-         painter.isEmpty()))
-    {
-        LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL 2.0 render");
-        format.setVersion(2,0);
-        if (device)
-            return new MythRenderOpenGL2(format, device);
-        return new MythRenderOpenGL2(format);
-    }
-
-    if (!(openGLVersionFlags & QGLFormat::OpenGL_Version_1_2))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "OpenGL 1.2 not supported, get new hardware!");
-        return nullptr;
-    }
-
-    LOG(VB_GENERAL, LOG_INFO, "Trying the OpenGL 1.2 render");
-    format.setVersion(1,3);
-    if (device)
-        return new MythRenderOpenGL1(format, device);
-    return new MythRenderOpenGL1(format);
-
+    format.setRenderableType(QSurfaceFormat::OpenGLES);
+    return new MythRenderOpenGL2ES(format, device);
 #endif
+    return new MythRenderOpenGL2(format, device);
 }
 
-#ifdef USE_OPENGL_QT5
-MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice* device,
+MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& format, QPaintDevice* device,
                                    RenderType type)
   : MythRender(type), m_lock(QMutex::Recursive)
 {
@@ -187,29 +98,14 @@ MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice*
     setFormat(format);
 }
 
-MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
+MythRenderOpenGL::MythRenderOpenGL(const QSurfaceFormat& format, RenderType type)
   : MythRender(type), m_lock(QMutex::Recursive), m_window(nullptr)
 {
     ResetVars();
     ResetProcs();
     setFormat(format);
 }
-#else
-MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, QPaintDevice* device,
-                                   RenderType type)
-  : QGLContext(format, device), MythRender(type), m_lock(QMutex::Recursive)
-{
-    ResetVars();
-    ResetProcs();
-}
 
-MythRenderOpenGL::MythRenderOpenGL(const MythRenderFormat& format, RenderType type)
-  : QGLContext(format), MythRender(type), m_lock(QMutex::Recursive)
-{
-    ResetVars();
-    ResetProcs();
-}
-#endif
 
 void MythRenderOpenGL::Init(void)
 {
@@ -236,15 +132,12 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
 
     if (!IsDirectRendering())
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "OpenGL is using software rendering.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is using software rendering.");
         recommended = false;
     }
-    else
-    if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
+    else if (renderer.contains("Software Rasterizer", Qt::CaseInsensitive))
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "OpenGL is using software rasterizer.");
+        LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenGL is using software rasterizer.");
         recommended = false;
     }
     else if (renderer.contains("softpipe", Qt::CaseInsensitive))
@@ -257,7 +150,6 @@ bool MythRenderOpenGL::IsRecommendedRenderer(void)
     return recommended;
 }
 
-#ifdef USE_OPENGL_QT5
 bool MythRenderOpenGL::IsDirectRendering() const
 {
     return QGLFormat::fromSurfaceFormat(format()).directRendering();
@@ -296,58 +188,19 @@ void MythRenderOpenGL::setWidget(QWidget *w)
     else if (w)
         w->setAttribute(Qt::WA_PaintOnScreen);
 }
-#else
-bool MythRenderOpenGL::IsDirectRendering() const
-{
-    return format().directRendering();
-}
-
-void MythRenderOpenGL::setWidget(QGLWidget *w)
-{
-    setDevice(w);
-
-#ifdef ANDROID
-    // change all window surfacetypes to OpenGLSurface
-    // otherwise the raster gets painted on top of the GL surface
-    m_window->setSurfaceType(QWindow::OpenGLSurface);
-    QWidget* wNativeParent = w->nativeParentWidget();
-    if (wNativeParent)
-        wNativeParent->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
-#endif
-
-    w->setContext(this);
-}
-#endif
 
 void MythRenderOpenGL::makeCurrent()
 {
     m_lock.lock();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
-    // Testing MythRenderOpenGL::currentContext is not reliable
     if (!m_lock_level++)
-    {
-#ifdef USE_OPENGL_QT5
         QOpenGLContext::makeCurrent(m_window);
-#else
-        QGLContext::makeCurrent();
-#endif
-    }
-#else
-    if (this != MythRenderOpenGL::currentContext())
-        QGLContext::makeCurrent();
-    m_lock_level++;
- #endif
 }
 
 void MythRenderOpenGL::doneCurrent()
 {
+    // TODO add back QOpenGLContext::doneCurrent call
+    // once calls are better pipelined
     m_lock_level--;
-    // Calling doneCurrent is strictly not necessary and causes the next call
-    // to makeCurrent to take considerably longer
-#if 0
-    if (m_lock_level == 0)
-        QGLContext::doneCurrent();
-#endif
     if (m_lock_level < 0)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Mis-matched calls to makeCurrent()");
     m_lock.unlock();
@@ -363,13 +216,8 @@ void MythRenderOpenGL::Release(void)
 
 void MythRenderOpenGL::MoveResizeWindow(const QRect &rect)
 {
-#ifdef USE_OPENGL_QT5
-    QWindow *parent = m_window;
-#else
-    QWidget *parent = dynamic_cast<QWidget* >(this->device());
-#endif
-    if (parent)
-        parent->setGeometry(rect);
+    if (m_window)
+        m_window->setGeometry(rect);
 }
 
 void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
@@ -387,6 +235,9 @@ void MythRenderOpenGL::SetViewPort(const QRect &rect, bool viewportonly)
 
 void MythRenderOpenGL::Flush(bool use_fence)
 {
+    if (!m_flushEnabled)
+        return;
+
     makeCurrent();
 
     if ((m_exts_used & kGLAppleFence) &&
@@ -403,8 +254,7 @@ void MythRenderOpenGL::Flush(bool use_fence)
     }
     else
     {
-        if (m_flushEnabled)
-            glFlush();
+        glFlush();
     }
 
     doneCurrent();
@@ -435,6 +285,9 @@ void MythRenderOpenGL::SetBackground(int r, int g, int b, int a)
 
 void MythRenderOpenGL::SetFence(void)
 {
+    if (!m_flushEnabled)
+        return;
+
     makeCurrent();
     if (m_exts_used & kGLAppleFence)
     {

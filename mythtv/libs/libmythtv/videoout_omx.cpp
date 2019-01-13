@@ -89,13 +89,7 @@ class MythRenderEGL : public MythRenderOpenGL2ES
 
     void makeCurrent() override; // MythRenderOpenGL
     void doneCurrent() override; // MythRenderOpenGL
-#ifdef USE_OPENGL_QT5
     void swapBuffers() override; // MythRenderOpenGL
-#else
-    void swapBuffers() const override; // QGLContext
-    bool create(const QGLContext * = nullptr) override // QGLContext
-        { return isValid(); }
-#endif
 
   protected:
     virtual ~MythRenderEGL(); // Use MythRenderOpenGL2ES::DecrRef to delete
@@ -1489,11 +1483,9 @@ MythRenderEGL::MythRenderEGL() :
         return;
     }
 
-#ifdef USE_OPENGL_QT5
     QVariant v;
     v.setValue(QEGLNativeContext(m_context, m_display));
     setNativeHandle(v);
-#endif
 
     m_window = createNativeWindow();
 
@@ -1523,18 +1515,10 @@ MythRenderEGL::MythRenderEGL() :
     b = eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     if (!b)
         LOG(VB_GENERAL, LOG_ERR, "eglMakeCurrent EGL_NO_SURFACE failed");
-
-#ifndef USE_OPENGL_QT5
-    setValid(true);
-#endif
 }
 
 MythRenderEGL::~MythRenderEGL()
 {
-#ifndef USE_OPENGL_QT5
-    setValid(false);
-#endif
-
     if (m_display == EGL_NO_DISPLAY)
         return;
 
@@ -1678,11 +1662,7 @@ void MythRenderEGL::doneCurrent()
 }
 
 // virtual
-#ifdef USE_OPENGL_QT5
 void MythRenderEGL::swapBuffers()
-#else
-void MythRenderEGL::swapBuffers() const
-#endif
 {
     eglSwapBuffers(m_display, m_surface);
 }

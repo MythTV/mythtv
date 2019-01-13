@@ -5,14 +5,14 @@
 
 #define LOC QString("OpenGL1: ")
 
-MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format, QPaintDevice* device)
+MythRenderOpenGL1::MythRenderOpenGL1(const QSurfaceFormat& format, QPaintDevice* device)
   : MythRenderOpenGL(format, device, kRenderOpenGL1)
 {
     ResetVars();
     ResetProcs();
 }
 
-MythRenderOpenGL1::MythRenderOpenGL1(const MythRenderFormat& format)
+MythRenderOpenGL1::MythRenderOpenGL1(const QSurfaceFormat& format)
   : MythRenderOpenGL(format, kRenderOpenGL1)
 {
     ResetVars();

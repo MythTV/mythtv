@@ -170,14 +170,12 @@ void VideoOutputOpenGL::DestroyGPUResources(void)
     if (gl_context)
         gl_context->makeCurrent();
 
-#ifdef USE_OPENGL_QT5
     if (gl_created_painter)
     {
         QWidget *device = QWidget::find(gl_parent_win);
         if (device)
             device->setAttribute(Qt::WA_PaintOnScreen, false);
     }
-#endif
 
     if (gl_created_painter)
     {
@@ -482,10 +480,8 @@ void VideoOutputOpenGL::CreatePainter(void)
             return;
         }
         gl_created_painter = true;
-#ifdef USE_OPENGL_QT5
         if (device)
             device->setAttribute(Qt::WA_PaintOnScreen);
-#endif
     }
     else
     {

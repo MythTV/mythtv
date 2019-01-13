@@ -10,8 +10,8 @@
 class MUI_PUBLIC MythRenderOpenGL1 : public MythRenderOpenGL
 {
   public:
-    MythRenderOpenGL1(const MythRenderFormat& format, QPaintDevice* device);
-    explicit MythRenderOpenGL1(const MythRenderFormat& format);
+    MythRenderOpenGL1(const QSurfaceFormat& format, QPaintDevice* device);
+    explicit MythRenderOpenGL1(const QSurfaceFormat& format);
 
     void SetColor(int r, int g, int b, int a) override; // MythRenderOpenGL
 

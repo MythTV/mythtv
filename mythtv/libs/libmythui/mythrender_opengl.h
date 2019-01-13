@@ -1,47 +1,21 @@
 #ifndef MYTHRENDER_OPENGL_H_
 #define MYTHRENDER_OPENGL_H_
 
+// Std
 #include <cstdint>
 
+// Qt
 #include <QtGlobal>
-// The below is commented because it causes raspberry Pi with OpenMAX
-// to fail. If commenting it out causes problems with other
-// platforms we can add it back with additional conditions that
-// will exclude it for Raspberry Pi. With this commented, all
-// code that depends on USE_OPENGL_QT5 will be bypassed and maybe can
-// be removed later.
-#if defined USING_OPENGLES && QT_VERSION >= QT_VERSION_CHECK(5, 4, 0) && defined(ANDROID)
-#define USE_OPENGL_QT5
 #include <QOpenGLContext>
-#else
-#include <QGLContext>
-#endif
 #include <QHash>
 #include <QMutex>
 #include <QMatrix4x4>
 
-#define GL_GLEXT_PROTOTYPES
-
-#ifdef USING_X11
-#define GLX_GLXEXT_PROTOTYPES
-#define XMD_H 1
-#undef GLX_ARB_get_proc_address
-#endif // USING_X11
-
-#ifdef _WIN32
-#include <GL/glext.h>
-#endif
-
-#ifdef Q_OS_MAC
-#include "util-osx.h"
-#import <AGL/agl.h>
-#endif
-
+// MythTV
 #include "mythuiexp.h"
 #include "mythlogging.h"
 #include "mythrender_base.h"
 #include "mythrender_opengl_defs.h"
-
 #include "mythuianimation.h"
 
 typedef enum
@@ -109,48 +83,27 @@ class MUI_PUBLIC OpenGLLocker
     MythRenderOpenGL *m_render;
 };
 
-#ifdef USE_OPENGL_QT5
-typedef class QSurfaceFormat MythRenderFormat;
-typedef class QOpenGLContext MythRenderContext;
 class QWindow;
-#else
-typedef class QGLFormat MythRenderFormat;
-typedef class QGLContext MythRenderContext;
-#endif
-
 class QPaintDevice;
 
-class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRender
+class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
 {
   public:
-    static MythRenderOpenGL* Create(const QString &painter,
-                                    QPaintDevice* device = nullptr);
+    static MythRenderOpenGL* Create(const QString &painter, QPaintDevice* device = nullptr);
+    MythRenderOpenGL(const QSurfaceFormat &format, QPaintDevice* device, RenderType type = kRenderUnknown);
+    MythRenderOpenGL(const QSurfaceFormat &format, RenderType type = kRenderUnknown);
 
-    MythRenderOpenGL(const MythRenderFormat &format, QPaintDevice* device,
-                     RenderType type = kRenderUnknown);
-    MythRenderOpenGL(const MythRenderFormat &format, RenderType type = kRenderUnknown);
+    // MythRender
+    void Release(void) override;
 
-#ifdef USE_OPENGL_QT5
     // These functions are not virtual in the base QOpenGLContext
     // class, so these are not overrides but new functions.
+    // TODO remove
     virtual void makeCurrent();
     virtual void doneCurrent();
-#else
-    // These functions are virtual in the base QGLContext class, so
-    // these are overrides of those functions.
-    void makeCurrent() override; // MythRenderContext
-    void doneCurrent() override; // MythRenderContext
-#endif
-    void Release(void) override; // MythRender
 
-    using MythRenderContext::create;
-#ifdef USE_OPENGL_QT5
     virtual void swapBuffers();
     void setWidget(QWidget *w);
-#else
-    using MythRenderContext::swapBuffers;
-    void setWidget(QGLWidget *w);
-#endif
     bool IsDirectRendering() const;
 
     void  Init(void);
@@ -314,10 +267,8 @@ class MUI_PUBLIC MythRenderOpenGL : protected MythRenderContext, public MythRend
     MYTH_GLSETFENCEAPPLEPROC             m_glSetFenceAPPLE;
     MYTH_GLFINISHFENCEAPPLEPROC          m_glFinishFenceAPPLE;
 
-#ifdef USE_OPENGL_QT5
   private:
     QWindow *m_window;
-#endif
 };
 
 /**

@@ -6,8 +6,8 @@
 class MUI_PUBLIC MythRenderOpenGL2ES : public MythRenderOpenGL2
 {
   public:
-    MythRenderOpenGL2ES(const MythRenderFormat& format, QPaintDevice* device);
-    explicit MythRenderOpenGL2ES(const MythRenderFormat& format);
+    MythRenderOpenGL2ES(const QSurfaceFormat& format, QPaintDevice* device);
+    explicit MythRenderOpenGL2ES(const QSurfaceFormat& format);
 
     // MythRenderOpenGL2
     void InitProcs(void) override;

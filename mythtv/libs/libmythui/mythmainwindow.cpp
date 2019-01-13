@@ -10,10 +10,6 @@
 using namespace std;
 
 // QT headers
-#ifdef USE_OPENGL_PAINTER
-#include <QGLFormat>
-#endif
-
 #include <QWaitCondition>
 #include <QApplication>
 #include <QTimer>
@@ -28,12 +24,6 @@ using namespace std;
 
 // Platform headers
 #include "unistd.h"
-#ifdef QWS
-#include <qwindowsystem_qws.h>
-#endif
-#ifdef Q_WS_MACX_OLDQT
-#include <HIToolbox/Menus.h>   // For GetMBarHeight()
-#endif
 
 // libmythbase headers
 #include "mythdb.h"
@@ -336,17 +326,12 @@ MythNotificationCenter *GetNotificationCenter(void)
 MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
                                          MythMainWindowPrivate *priv,
                                          MythRenderOpenGL *rend)
-            : MythPainterWindowWidget(win), parent(win), d(priv), render(rend)
+            : QWidget(win), parent(win), d(priv), render(rend)
 {
     rend->setWidget(this);
-#ifdef USE_OPENGL_QT5
     setAttribute(Qt::WA_NoSystemBackground);
-#else
-    setAutoBufferSwap(false);
-#endif
 }
 
-#ifdef USE_OPENGL_QT5
 QPaintEngine *MythPainterWindowGL::paintEngine() const
 {
     return testAttribute(Qt::WA_PaintOnScreen) ? nullptr : parent->paintEngine();
@@ -360,7 +345,6 @@ MythPainterWindowGL::~MythPainterWindowGL()
         render = nullptr;
     }
 }
-#endif
 
 void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
 {
@@ -372,7 +356,7 @@ void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
 #ifdef _WIN32
 MythPainterWindowD3D9::MythPainterWindowD3D9(MythMainWindow *win,
                                              MythMainWindowPrivate *priv)
-                   : QGLWidget(win),
+                   : QWidget(win),
                      parent(win), d(priv)
 {
     setAutoBufferSwap(false);
@@ -390,9 +374,7 @@ MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *win,
                    : QWidget(win),
                      parent(win), d(priv)
 {
-#ifdef USE_OPENGL_QT5
     setAttribute(Qt::WA_NoSystemBackground);
-#endif
 }
 
 void MythPainterWindowQt::paintEvent(QPaintEvent *pe)
@@ -824,11 +806,7 @@ void MythMainWindow::draw(MythPainter *painter /* = 0 */)
 // virtual
 QPaintEngine *MythMainWindow::paintEngine() const
 {
-#ifdef USE_OPENGL_QT5
     return testAttribute(Qt::WA_PaintOnScreen) ? nullptr : QWidget::paintEngine();
-#else
-    return QWidget::paintEngine();
-#endif
 }
 
 void MythMainWindow::closeEvent(QCloseEvent *e)
@@ -1068,26 +1046,6 @@ void MythMainWindow::Init(QString forcedpainter, bool mayReInit)
     }
 #endif
 #ifdef USE_OPENGL_PAINTER
-    if (!QGLFormat::hasOpenGL())
-    {
-        if (painter.contains(OPENGL_PAINTER))
-            LOG(VB_GENERAL, LOG_WARNING,
-                "OpenGL not available. Falling back to Qt painter.");
-    }
-    else
-# if !defined USE_OPENGL_QT5
-    // On an EGLFS platform can't mix QWidget based MythMainWindow with a
-    // QGLWidget based paintwin - MythPainterWindowGL ctor aborts:
-    //   EGLFS: OpenGL windows cannot be mixed with others.
-    if (qApp->platformName().contains("egl"))
-    {
-        if (painter.contains(OPENGL_PAINTER))
-            LOG(VB_GENERAL, LOG_WARNING,
-                "OpenGL is incompatible with the EGLFS platform. "
-                "Falling back to Qt painter.");
-    }
-    else
-# endif
     if ((!d->painter && !d->paintwin) &&
         (painter == AUTO_PAINTER || painter.contains(OPENGL_PAINTER)))
     {
@@ -1419,14 +1377,12 @@ void MythMainWindow::attach(QWidget *child)
             }
         }
     }
-#ifdef USE_OPENGL_QT5
     else
     {
         // Save & disable WA_PaintOnScreen, used by OpenGL GUI painter
         if ((d->m_bSavedPOS = testAttribute(Qt::WA_PaintOnScreen)))
             setAttribute(Qt::WA_PaintOnScreen, false);
     }
-#endif
 
     d->widgetList.push_back(child);
     child->winId();
@@ -1454,12 +1410,10 @@ void MythMainWindow::detach(QWidget *child)
         current = this;
         // We're be to the main window, enable it just in case
         setEnabled(true);
-#ifdef USE_OPENGL_QT5
         // Restore WA_PaintOnScreen, used by OpenGL GUI painter
         setAttribute(Qt::WA_PaintOnScreen, d->m_bSavedPOS);
         // Need to repaint the UI or it remains black
         QTimer::singleShot(2, d->paintwin, SLOT(update()));
-#endif
     }
     else
     {

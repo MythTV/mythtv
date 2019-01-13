@@ -150,7 +150,7 @@ class MythGLShaderObject
     GLuint m_fragment_shader {0};
 };
 
-MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format,
+MythRenderOpenGL2::MythRenderOpenGL2(const QSurfaceFormat& format,
                                      QPaintDevice* device,
                                      RenderType type)
   : MythRenderOpenGL(format, device, type)
@@ -159,7 +159,7 @@ MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format,
     ResetProcs();
 }
 
-MythRenderOpenGL2::MythRenderOpenGL2(const MythRenderFormat& format, RenderType type)
+MythRenderOpenGL2::MythRenderOpenGL2(const QSurfaceFormat& format, RenderType type)
   : MythRenderOpenGL(format, type)
 {
     ResetVars();
