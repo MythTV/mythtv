@@ -6,6 +6,7 @@
 
 // QT headers
 #include <QCoreApplication>
+#include <QOpenGLWidget>
 #include <QPainter>
 #include <QGLWidget>
 
@@ -17,14 +18,15 @@
 
 using namespace std;
 
-MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render,
-                                     QWidget *parent) :
-    MythPainter(), realParent(parent), realRender(render),
-    target(0), swapControl(true)
+MythOpenGLPainter::MythOpenGLPainter(MythRenderOpenGL *render, QWidget *parent)
+  : MythPainter(),
+    realParent(parent),
+    realRender(render),
+    target(0),
+    swapControl(true)
 {
     if (realRender)
-        LOG(VB_GENERAL, LOG_INFO,
-            "OpenGL painter using existing OpenGL context.");
+        LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing OpenGL context.");
     if (realParent)
         LOG(VB_GENERAL, LOG_INFO, "OpenGL painter using existing QWidget.");
 }
@@ -81,22 +83,17 @@ void MythOpenGLPainter::Begin(QPaintDevice *parent)
 
     if (!realRender)
     {
-        QGLWidget *glw = dynamic_cast<QGLWidget *>(realParent);
-        if (!glw)
-            glw = dynamic_cast<QGLWidget *>(parent);
-
+        QOpenGLWidget *glw = qobject_cast<QOpenGLWidget *>(realParent);
         if (!glw)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                "FATAL ERROR: Failed to cast parent to QGLWidget");
+            LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to cast parent to QOpenGLWidget");
             return;
         }
 
         realRender = (MythRenderOpenGL*)(glw->context());
         if (!realRender)
         {
-            LOG(VB_GENERAL, LOG_ERR,
-                "FATAL ERROR: Failed to get MythRenderOpenGL");
+            LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: Failed to get MythRenderOpenGL");
             return;
         }
     }
@@ -154,6 +151,7 @@ int MythOpenGLPainter::GetTextureFromCache(MythImage *im)
 
     im->SetChanged(false);
 
+    // TODO Remove QGLWidget use when we are using QOpenGLTexture
     QImage tx = QGLWidget::convertToGLFormat(*im);
     GLuint tx_id = 0;
     for (;;)
