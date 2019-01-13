@@ -160,18 +160,17 @@ void MythRenderOpenGL::swapBuffers()
     QOpenGLContext::swapBuffers(m_window);
 }
 
-void MythRenderOpenGL::setWidget(QWidget *w)
+void MythRenderOpenGL::setWidget(QWidget *Widget)
 {
-    if (!w)
+    if (!Widget)
         return;
 
-    w->winId(); // Ensure native window
-    m_window = w->windowHandle();
+    m_window = Widget->windowHandle();
     if (!m_window)
     {
-        w = w->nativeParentWidget();
-        if (w)
-            m_window = w->windowHandle();
+        Widget = Widget->nativeParentWidget();
+        if (Widget)
+            m_window = Widget->windowHandle();
     }
 
 #ifdef ANDROID
@@ -185,8 +184,8 @@ void MythRenderOpenGL::setWidget(QWidget *w)
 
     if (!create())
         LOG(VB_GENERAL, LOG_WARNING, LOC + "setWidget create failed");
-    else if (w)
-        w->setAttribute(Qt::WA_PaintOnScreen);
+    else if (Widget)
+        Widget->setAttribute(Qt::WA_PaintOnScreen);
 }
 
 void MythRenderOpenGL::makeCurrent()

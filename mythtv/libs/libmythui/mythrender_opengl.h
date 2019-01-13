@@ -103,7 +103,7 @@ class MUI_PUBLIC MythRenderOpenGL : protected QOpenGLContext, public MythRender
     virtual void doneCurrent();
 
     virtual void swapBuffers();
-    void setWidget(QWidget *w);
+    void setWidget(QWidget *Widget);
     bool IsDirectRendering() const;
 
     void  Init(void);

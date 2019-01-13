@@ -326,10 +326,16 @@ MythNotificationCenter *GetNotificationCenter(void)
 MythPainterWindowGL::MythPainterWindowGL(MythMainWindow *win,
                                          MythMainWindowPrivate *priv,
                                          MythRenderOpenGL *rend)
-            : QWidget(win), parent(win), d(priv), render(rend)
+  : QWidget(win),
+    parent(win),
+    d(priv),
+    render(rend)
 {
-    rend->setWidget(this);
     setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_NativeWindow);
+    setAttribute(Qt::WA_DontCreateNativeAncestors);
+    winId();
+    render->setWidget(this);
 }
 
 QPaintEngine *MythPainterWindowGL::paintEngine() const
