@@ -155,17 +155,16 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
 
     SetViewPort(masterViewportSize);
 
-    bool glsl    = gl_features & kGLSL;
-    bool shaders = glsl || (gl_features & kGLExtFragProg);
-    bool fbos    = gl_features & kGLExtFBufObj;
-    bool ycbcr   = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
-    VideoType fallback = shaders ? (glsl ? (fbos ? kGLUYVY : kGLYV12) : kGLHQUYV) : ycbcr ? kGLYCbCr : kGLRGBA;
+    bool glsl  = gl_features & kGLSL;
+    bool fbos  = gl_features & kGLExtFBufObj;
+    bool ycbcr = (gl_features & kGLMesaYCbCr) || (gl_features & kGLAppleYCbCr);
+    VideoType fallback = glsl ? (fbos ? kGLUYVY : kGLYV12) : ycbcr ? kGLYCbCr : kGLRGBA;
 
     // check for feature support
     bool unsupported = (kGLYCbCr == videoType) && !ycbcr;
     unsupported     |= (kGLYV12  == videoType) && !glsl;
-    unsupported     |= (kGLUYVY  == videoType) && (!shaders || !fbos);
-    unsupported     |= (kGLHQUYV == videoType) && !shaders;
+    unsupported     |= (kGLUYVY  == videoType) && (!glsl || !fbos);
+    unsupported     |= (kGLHQUYV == videoType) && !glsl;
 
     if (unsupported)
     {
@@ -183,7 +182,7 @@ bool OpenGLVideo::Init(MythRenderOpenGL *glcontext, VideoColourSpace *colourspac
     // turn on bicubic filtering
     if (options.contains("openglbicubic"))
     {
-        if (shaders && fbos && (gl_features & kGLExtRGBA16))
+        if (glsl && fbos && (gl_features & kGLExtRGBA16))
             defaultUpsize = kGLFilterBicubic;
         else
             LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL feature support for Bicubic filter.");
@@ -450,16 +449,15 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         break;
 
       case kGLFilterBicubic:
-        if ((!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL)) || !(gl_features & kGLExtFBufObj))
+        if (!(gl_features & kGLSL) || !(gl_features & kGLExtFBufObj))
         {
-            LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                "Features not available for bicubic filter.");
+            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Features not available for bicubic filter.");
             return false;
         }
         break;
 
       case kGLFilterYUV2RGB:
-        if (!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL))
+        if (!(gl_features & kGLSL))
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
                 "No shader support for OpenGL deinterlacing.");
@@ -585,10 +583,9 @@ void OpenGLVideo::TearDownDeinterlacer(void)
 
 bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 {
-    if (!(gl_features & kGLExtFragProg) && !(gl_features & kGLSL))
+    if (!(gl_features & kGLSL))
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC +
-            "No shader support for OpenGL deinterlacing.");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "No shader support for OpenGL deinterlacing.");
         return false;
     }
 
@@ -680,13 +677,9 @@ uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
     {
         GetProgramStrings(vertex, fragment, name, deint, field);
     }
-    else if (gl_features & kGLExtFragProg)
-    {
-        fragment = GetProgramString(name, deint, field);
-    }
     else
     {
-        LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL shader/program support");
+        LOG(VB_PLAYBACK, LOG_ERR, LOC + "No OpenGL GLSL support");
         return 0;
     }
 
@@ -1203,219 +1196,6 @@ QString OpenGLVideo::TypeToString(VideoType Type)
         case kGLRGBA:  return "opengl-rgba";
     }
     return "opengl";
-}
-
-static const QString attrib_fast =
-"ATTRIB tex   = fragment.texcoord[0];\n"
-"PARAM yuv[3] = { program.local[0..2] };\n";
-
-static const QString tex_fast =
-"TEX res, tex, texture[0], %1;\n";
-
-static const QString var_fast =
-"TEMP tmp, res;\n";
-
-static const QString var_col =
-"TEMP col;\n";
-
-static const QString select_col =
-"MUL col, tex.xxxx, %8;\n"
-"FRC col, col;\n"
-"SUB col, col, 0.5;\n"
-"CMP res, col, res.rabg, res.rgba;\n";
-
-static const QString end_fast =
-"DPH tmp.r, res.%SWIZZLE%g, yuv[0];\n"
-"DPH tmp.g, res.%SWIZZLE%g, yuv[1];\n"
-"DPH tmp.b, res.%SWIZZLE%g, yuv[2];\n"
-"MOV tmp.a, 1.0;\n"
-"MOV result.color, tmp;\n";
-
-static const QString var_deint =
-"TEMP other, current, mov, prev;\n";
-
-static const QString field_calc =
-"MUL prev, tex.yyyy, %2;\n"
-"FRC prev, prev;\n"
-"SUB prev, prev, 0.5;\n";
-
-static const QString bobdeint[2] = {
-field_calc +
-"ADD other, tex, {0.0, %3, 0.0, 0.0};\n"
-"MIN other, other, {10000.0, %9, 10000.0, 10000.0};\n"
-"TEX other, other, texture[0], %1;\n"
-"CMP res, prev, res, other;\n",
-field_calc +
-"SUB other, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX other, other, texture[0], %1;\n"
-"CMP res, prev, other, res;\n"
-};
-
-static const QString deint_end_top =
-"CMP res,  prev, current, other;\n";
-
-static const QString deint_end_bot =
-"CMP res,  prev, other, current;\n";
-
-static const QString linearblend[2] = {
-"TEX current, tex, texture[0], %1;\n"
-"ADD other, tex, {0.0, %3, 0.0, 0.0};\n"
-"MIN other, other, {10000.0, %9, 10000.0, 10000.0};\n"
-"TEX other, other, texture[0], %1;\n"
-"SUB mov, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX mov, mov, texture[0], %1;\n"
-"LRP other, 0.5, other, mov;\n"
-+ field_calc + deint_end_top,
-
-"TEX current, tex, texture[0], %1;\n"
-"SUB other, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX other, other, texture[0], %1;\n"
-"ADD mov, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX mov, mov, texture[0], %1;\n"
-"LRP other, 0.5, other, mov;\n"
-+ field_calc + deint_end_bot
-};
-
-static const QString kerneldeint[2] = {
-"TEX current, tex, texture[1], %1;\n"
-"TEX prev, tex, texture[2], %1;\n"
-"MUL other, 0.125, prev;\n"
-"MAD other, 0.125, current, other;\n"
-"ADD prev, tex, {0.0, %3, 0.0, 0.0};\n"
-"MIN prev, prev, {10000.0, %9, 10000.0, 10000.0};\n"
-"TEX prev, prev, texture[1], %1;\n"
-"MAD other, 0.5, prev, other;\n"
-"SUB prev, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX prev, prev, texture[1], %1;\n"
-"MAD other, 0.5, prev, other;\n"
-"ADD prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX tmp, prev, texture[1], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-"TEX tmp, prev, texture[2], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-"SUB prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX tmp, prev, texture[1], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-"TEX tmp, prev, texture[2], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-+ field_calc + deint_end_top,
-
-"TEX current, tex, texture[1], %1;\n"
-"MUL other, 0.125, res;\n"
-"MAD other, 0.125, current, other;\n"
-"ADD prev, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX prev, prev, texture[1], %1;\n"
-"MAD other, 0.5, prev, other;\n"
-"SUB prev, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX prev, prev, texture[1], %1;\n"
-"MAD other, 0.5, prev, other;\n"
-"ADD prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX tmp, prev, texture[1], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-"TEX tmp, prev, texture[0], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-"SUB prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX tmp, prev, texture[1], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-"TEX tmp, prev, texture[0], %1;\n"
-"MAD other, -0.0625, tmp, other;\n"
-+ field_calc + deint_end_bot
-};
-
-static const QString bicubic =
-"TEMP coord, coord2, cdelta, parmx, parmy, a, b, c, d;\n"
-"MAD coord.xy, fragment.texcoord[0], {%6, 0.0}, {0.5, 0.5};\n"
-"MAD coord2.xy, fragment.texcoord[0], {0.0, %7}, {0.5, 0.5};\n"
-"TEX parmx, coord.xy, texture[1], 2D;\n"
-"TEX parmy, coord2.yx, texture[1], 2D;\n"
-"MUL cdelta.xz, parmx.rrgg, {-%5, 0, %5, 0};\n"
-"MUL cdelta.yw, parmy.rrgg, {0, -%3, 0, %3};\n"
-"ADD coord, fragment.texcoord[0].xyxy, cdelta.xyxw;\n"
-"ADD coord2, fragment.texcoord[0].xyxy, cdelta.zyzw;\n"
-"TEX a, coord.xyxy, texture[0], 2D;\n"
-"TEX b, coord.zwzw, texture[0], 2D;\n"
-"TEX c, coord2.xyxy, texture[0], 2D;\n"
-"TEX d, coord2.zwzw, texture[0], 2D;\n"
-"LRP a, parmy.b, a, b;\n"
-"LRP c, parmy.b, c, d;\n"
-"LRP result.color, parmx.b, a, c;\n";
-
-QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
-                                      QString deint, FrameScanType field)
-{
-    QString ret =
-        "!!ARBfp1.0\n"
-        "OPTION ARB_precision_hint_fastest;\n";
-
-    switch (name)
-    {
-        case kGLFilterYUV2RGB:
-        {
-            bool need_tex = true;
-            bool packed = (kGLUYVY == videoType);
-            QString deint_bit = "";
-            if (deint != "")
-            {
-                uint tmp_field = 0;
-                if (field == kScan_Intr2ndField)
-                    tmp_field = 1;
-                if (deint == "openglbobdeint" ||
-                    deint == "openglonefield" ||
-                    deint == "opengldoubleratefieldorder")
-                {
-                    deint_bit = bobdeint[tmp_field];
-                }
-                else if (deint == "opengllinearblend" ||
-                         deint == "opengldoubleratelinearblend")
-                {
-                    deint_bit = linearblend[tmp_field];
-                    if (!tmp_field) { need_tex = false; }
-                }
-                else if (deint == "openglkerneldeint" ||
-                         deint == "opengldoubleratekerneldeint")
-                {
-                    deint_bit = kerneldeint[tmp_field];
-                    if (!tmp_field) { need_tex = false; }
-                }
-                else
-                {
-                    LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                        "Unrecognised OpenGL deinterlacer");
-                }
-            }
-
-            ret += attrib_fast;
-            ret += (deint != "") ? var_deint : "";
-            ret += packed ? var_col : "";
-            ret += var_fast + (need_tex ? tex_fast : "");
-            ret += deint_bit;
-            ret += packed ? select_col : "";
-            ret += end_fast;
-        }
-            break;
-
-        case kGLFilterNone:
-        case kGLFilterResize:
-            break;
-
-        case kGLFilterBicubic:
-
-            ret += bicubic;
-            break;
-
-        case kGLFilterYV12RGB: // TODO: extend this for opengl1
-        default:
-            LOG(VB_PLAYBACK, LOG_ERR, LOC + "Unknown fragment program.");
-            break;
-    }
-
-    CustomiseProgramString(ret);
-    ret += "END";
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 fragment program %2")
-                .arg(FilterToString(name)).arg(deint));
-
-    return ret;
 }
 
 void OpenGLVideo::CustomiseProgramString(QString &string)

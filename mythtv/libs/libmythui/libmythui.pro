@@ -196,10 +196,6 @@ using_opengl {
             LIBS += -L/opt/vc/include -lbrcmGLESv2 -lbrcmEGL
         }
     }
-    !using_opengles {
-        SOURCES += mythrender_opengl1.cpp
-        HEADERS += mythrender_opengl1.h mythrender_opengl_defs1.h
-    }
     inc.files += mythpainter_ogl.h
     QT += opengl
 

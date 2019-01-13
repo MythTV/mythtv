@@ -17,8 +17,6 @@ using std::min;
 #include "mythrender_opengl2.h"
 #ifdef USING_OPENGLES
 #include "mythrender_opengl2es.h"
-#else
-#include "mythrender_opengl1.h"
 #endif
 
 #ifdef Q_OS_ANDROID

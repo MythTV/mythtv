@@ -94,9 +94,6 @@ class OpenGLVideo
                             QString deint = QString(),
                             FrameScanType field = kScan_Progressive);
     uint CreateVideoTexture(QSize size, QSize &tex_size);
-    QString GetProgramString(OpenGLFilterType filter,
-                             QString deint = QString(),
-                             FrameScanType field = kScan_Progressive);
     void GetProgramStrings(QString &vertex, QString &fragment,
                            OpenGLFilterType filter,
                            QString deint = QString(),
