@@ -487,9 +487,6 @@ QString NetworkControl::processKey(NetworkCommand *nc)
     else
         return QString("ERROR: Application has no main window!\n");
 
-    if (GetMythMainWindow()->currentWidget())
-        keyDest = GetMythMainWindow()->currentWidget()->focusWidget();
-
     int curToken = 1;
     while (curToken < nc->getArgCount())
     {

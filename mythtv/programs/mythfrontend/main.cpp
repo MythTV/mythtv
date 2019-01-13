@@ -810,8 +810,6 @@ static void playDisc()
             {
                 GetMythMainWindow()->raise();
                 GetMythMainWindow()->activateWindow();
-                if (GetMythMainWindow()->currentWidget())
-                    GetMythMainWindow()->currentWidget()->setFocus();
             }
         }
         GetMythUI()->RemoveCurrentLocation();

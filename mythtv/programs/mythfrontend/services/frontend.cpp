@@ -423,9 +423,6 @@ bool Frontend::SendKey(const QString &sKey)
         return ret;
     }
 
-    if (GetMythMainWindow()->currentWidget())
-        keyDest = GetMythMainWindow()->currentWidget()->focusWidget();
-
     if (keyMap.contains(sKey.toLower()))
     {
         keyCode = keyMap[sKey.toLower()];

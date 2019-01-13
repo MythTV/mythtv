@@ -119,15 +119,7 @@ class MUI_PUBLIC MythMainWindow : public QWidget
     int NormX(const int x);
     int NormY(const int y);
     void SetScalingFactors(float wmult, float hmult);
-
     void StartLIRC(void);
-
-    /* compatibility functions, to go away once everything's mythui */
-    void attach(QWidget *child);
-    void detach(QWidget *child);
-
-    QWidget *currentWidget(void);
-
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);
     void SetEffectsEnabled(bool enable);

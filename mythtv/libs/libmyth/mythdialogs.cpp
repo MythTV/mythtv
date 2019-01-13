@@ -76,7 +76,8 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
 
     setAutoFillBackground(true);
 
-    parent->attach(this);
+    // Temporary hack:)
+    //parent->attach(this);
     m_parent = parent;
 }
 
@@ -96,7 +97,8 @@ void MythDialog::TeardownAll(void)
 {
     if (m_parent)
     {
-        m_parent->detach(this);
+        // Temporary hack
+        //m_parent->detach(this);
         m_parent = nullptr;
     }
 }

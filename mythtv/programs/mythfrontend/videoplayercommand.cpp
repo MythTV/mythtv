@@ -419,8 +419,6 @@ void VideoPlayerCommand::Play() const
     GetMythMainWindow()->PauseIdleTimer(false);
     GetMythMainWindow()->raise();
     GetMythMainWindow()->activateWindow();
-    if (GetMythMainWindow()->currentWidget())
-        GetMythMainWindow()->currentWidget()->setFocus();
     if (lcd)
         lcd->setFunctionLEDs(FUNC_MOVIE, false);
 }

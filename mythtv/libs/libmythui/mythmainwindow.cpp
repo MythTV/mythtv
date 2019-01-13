@@ -665,11 +665,7 @@ MythScreenStack* MythMainWindow::GetStackAt(int pos)
 
 void MythMainWindow::animate(void)
 {
-    /* FIXME: remove */
-    if (currentWidget() || !d->m_drawEnabled)
-        return;
-
-    if (!d->paintwin)
+    if (!d->m_drawEnabled || !d->paintwin)
         return;
 
     d->drawTimer->blockSignals(true);
@@ -712,8 +708,7 @@ void MythMainWindow::animate(void)
 
 void MythMainWindow::drawScreen(void)
 {
-    /* FIXME: remove */
-    if (currentWidget() || !d->m_drawEnabled)
+    if (!d->m_drawEnabled)
         return;
 
     if (!d->painter->SupportsClipping())
@@ -1347,112 +1342,6 @@ void MythMainWindow::Show(void)
 #endif
 }
 
-/* FIXME compatibility only */
-void MythMainWindow::attach(QWidget *child)
-{
-#ifdef _WIN32
-# ifdef _MSC_VER
-#  pragma message( "TODO FIXME MythMainWindow::attach() does not always work on MS Windows!")
-# else
-#  warning TODO FIXME MythMainWindow::attach() does not always work on MS Windows!
-# endif
-
-    // if windows are created on different threads,
-    // or if setFocus() is called from a thread other than the main UI thread,
-    // setFocus() hangs the thread that called it
-    LOG(VB_GENERAL, LOG_ERR,
-            QString("MythMainWindow::attach old: %1, new: %2, thread: %3")
-            .arg(currentWidget() ? currentWidget()->objectName() : "none")
-            .arg(child->objectName())
-            .arg(::GetCurrentThreadId()));
-#endif
-    if (currentWidget())
-    {
-        // don't disable the current widget, instead we disable all its children
-        // on mac, disabling the current active widget entirely prevent keyboard to
-        // work on the newly opened widget.
-        QList<QWidget*> list = currentWidget()->findChildren<QWidget *>();
-
-        foreach(QWidget *w, list)
-        {
-            if (w->isEnabled())
-            {
-                w->setEnabled(false);
-                // mark it as previously enabled
-                d->enabledWidgets[w] = true;
-            }
-        }
-    }
-    else
-    {
-        // Save & disable WA_PaintOnScreen, used by OpenGL GUI painter
-        if ((d->m_bSavedPOS = testAttribute(Qt::WA_PaintOnScreen)))
-            setAttribute(Qt::WA_PaintOnScreen, false);
-    }
-
-    d->widgetList.push_back(child);
-    child->winId();
-    child->raise();
-    child->setFocus();
-    child->setMouseTracking(true);
-}
-
-
-void MythMainWindow::detach(QWidget *child)
-{
-    std::vector<QWidget*>::iterator it =
-        std::find(d->widgetList.begin(), d->widgetList.end(), child);
-
-    if (it == d->widgetList.end())
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Could not find widget to detach");
-        return;
-    }
-
-    d->widgetList.erase(it);
-    QWidget *current = currentWidget();
-    if (!current)
-    {
-        current = this;
-        // We're be to the main window, enable it just in case
-        setEnabled(true);
-        // Restore WA_PaintOnScreen, used by OpenGL GUI painter
-        setAttribute(Qt::WA_PaintOnScreen, d->m_bSavedPOS);
-        // Need to repaint the UI or it remains black
-        QTimer::singleShot(2, d->paintwin, SLOT(update()));
-    }
-    else
-    {
-        QList<QWidget*> list = current->findChildren<QWidget *>();
-
-        foreach(QWidget *w, list)
-        {
-            if (d->enabledWidgets.contains(w))
-            {
-                w->setEnabled(true);
-                d->enabledWidgets.remove(w);
-            }
-        }
-    }
-    current->raise();
-    current->setFocus();
-    current->setMouseTracking(true);
-
-    if (d->exitingtomain)
-    {
-        QCoreApplication::postEvent(
-            this, new QEvent(MythEvent::kExitToMainMenuEventType));
-    }
-}
-
-QWidget *MythMainWindow::currentWidget(void)
-{
-    if (d->widgetList.size() > 0)
-        return d->widgetList.back();
-    return nullptr;
-}
-/* FIXME: end compatibility */
-
 uint MythMainWindow::PushDrawDisabled(void)
 {
     QMutexLocker locker(&d->m_drawDisableLock);
@@ -1524,31 +1413,6 @@ void MythMainWindow::ExitToMainMenu(void)
     bool jumpdone = !(d->popwindows);
 
     d->exitingtomain = true;
-
-    /* compatibility code, remove, FIXME */
-    QWidget *current = currentWidget();
-    if (current && d->exitingtomain && d->popwindows)
-    {
-        if (current->objectName() != QString("mainmenu"))
-        {
-            if (current->objectName() == QString("video playback window"))
-            {
-                MythEvent *me = new MythEvent("EXIT_TO_MENU");
-                QCoreApplication::postEvent(current, me);
-            }
-            else if (current->inherits("MythDialog"))
-            {
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
-                                               Qt::NoModifier);
-                QObject *key_target = getTarget(*key);
-                QCoreApplication::postEvent(key_target, key);
-            }
-            return;
-        }
-        else
-            jumpdone = true;
-    }
-
     MythScreenStack *toplevel = GetMainStack();
     if (toplevel && d->popwindows)
     {
@@ -2211,16 +2075,6 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             }
 #endif
 
-            if (currentWidget())
-            {
-                ke->accept();
-                QWidget *current = currentWidget();
-                if (current && current->isEnabled())
-                    qApp->notify(current, ke);
-
-                break;
-            }
-
             QVector<MythScreenStack *>::Iterator it;
             for (it = d->stackList.end()-1; it != d->stackList.begin()-1; --it)
             {
@@ -2263,9 +2117,6 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             ShowMouseCursor(true);
             if (d->gestureTimer->isActive())
                 d->gestureTimer->stop();
-
-            if (currentWidget())
-                break;
 
             if (d->gesture.recording())
             {
@@ -2447,7 +2298,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     {
         MythGestureEvent *ge = static_cast<MythGestureEvent*>(ce);
         MythScreenStack *toplevel = GetMainStack();
-        if (toplevel && !currentWidget())
+        if (toplevel)
         {
             MythScreenType *screen = toplevel->GetTopScreen();
             if (screen)
@@ -2738,9 +2589,6 @@ void MythMainWindow::customEvent(QEvent *ce)
 QObject *MythMainWindow::getTarget(QKeyEvent &key)
 {
     QObject *key_target = nullptr;
-
-    if (!currentWidget())
-        return key_target;
 
     key_target = QWidget::keyboardGrabber();
 
