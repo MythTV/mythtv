@@ -174,6 +174,7 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_rtlSubtitle5;
     const QRegExp m_rtlEpisodeNo1;
     const QRegExp m_rtlEpisodeNo2;
+    const QRegExp m_superRTLSubtitle;
     const QRegExp m_fiRerun;
     const QRegExp m_fiRerun2;
     const QRegExp m_fiAgeLimit;

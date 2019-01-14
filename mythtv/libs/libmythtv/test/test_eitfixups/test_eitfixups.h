@@ -43,6 +43,7 @@ class TestEITFixups : public QObject
     static void testDEPro7Sat1(void);
     static void testHTMLFixup(void);
     static void testSkyEpisodes(void);
+    static void testRTLEpisodes(void);
     static void testUnitymedia(void);
     static void testDeDisneyChannel(void);
     static void testATV(void);

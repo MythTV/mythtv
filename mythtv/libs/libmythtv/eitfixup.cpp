@@ -163,6 +163,7 @@ EITFixUp::EITFixUp()
       m_rtlSubtitle5("^'(.+)'\\.\\s*"),
       m_rtlEpisodeNo1(R"(^(Folge\s\d{1,4})\.*\s*)"),
       m_rtlEpisodeNo2(R"(^(\d{1,2}\/[IVX]+)\.*\s*)"),
+      m_superRTLSubtitle("^Folge\\s(\\d{1,3}):\\s'(.*)'"),
       m_fiRerun(R"(\ ?Uusinta[a-zA-Z\ ]*\.?)"),
       m_fiRerun2("\\([Uu]\\)"),
       m_fiAgeLimit("\\(((1?[0-9]?)|[ST])\\)$"),
@@ -1712,6 +1713,16 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 void EITFixUp::FixRTL(DBEventEIT &event) const
 {
     int pos = 0;
+
+    QRegExp tmpExpSubtitleSRTL = m_superRTLSubtitle;
+
+    // subtitle with episode number: "Folge *: 'subtitle'
+    if (tmpExpSubtitleSRTL.indexIn(event.m_subtitle) != -1)
+    {
+        event.m_season = 0;
+        event.m_episode = tmpExpSubtitleSRTL.cap(1).toUInt();
+        event.m_subtitle = tmpExpSubtitleSRTL.cap(2);
+    }
 
     // No need to continue without a description or with an subtitle.
     if (event.m_description.length() <= 0 || event.m_subtitle.length() > 0)

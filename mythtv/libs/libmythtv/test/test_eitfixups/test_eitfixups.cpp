@@ -689,6 +689,25 @@ void TestEITFixups::testSkyEpisodes()
     delete event5;
 }
 
+void TestEITFixups::testRTLEpisodes()
+{
+    EITFixUp fixup;
+
+    DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixRTL,
+                                         "Titel",
+                                         "Folge 9: 'Leckerlis auf Eis / Rettung aus höchster Not'",
+                                         "Description")
+
+    PRINT_EVENT(*event);
+    fixup.Fix(*event);
+    PRINT_EVENT(*event);
+    QCOMPARE(event->m_subtitle, QString("Leckerlis auf Eis / Rettung aus höchster Not"));
+    QCOMPARE(event->m_season,   0u);
+    QCOMPARE(event->m_episode, 9u);
+
+    delete event;
+}
+
 void TestEITFixups::testUnitymedia()
 {
     EITFixUp fixup;
