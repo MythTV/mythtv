@@ -11,7 +11,6 @@
 #include <mythdbcon.h>
 #include <mythsystemlegacy.h>
 #include <mythcontext.h>
-#include <mythdialogs.h>
 #include <mythuihelper.h>
 #include <mythdialogbox.h>
 #include <mythmainwindow.h>

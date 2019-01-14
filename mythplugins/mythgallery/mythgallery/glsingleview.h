@@ -24,11 +24,11 @@
 #ifdef USING_OPENGL
 
 // MythTV plugin headers
-#include <mythdialogs.h>
 #include <mthread.h>
 #include <mythdate.h>
 
 // MythGallery headers
+#include "mythdialogs.h"
 #include "imageview.h"
 #include "iconview.h"
 #include "sequence.h"

@@ -673,6 +673,23 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     return pop;
 }
 
+bool WaitFor(MythConfirmationDialog *dialog)
+{
+    if (!dialog)
+        return true; // No dialog is treated as user pressing OK
+
+    // Local event loop processes events whilst we wait
+    QEventLoop block;
+
+    // Quit when dialog exits
+    QObject::connect(dialog, &MythConfirmationDialog::haveResult,
+                     &block, [&block](bool result)
+    { block.exit(result ? 1 : 0); });
+
+    // Block and return dialog result
+    return block.exec();
+}
+
 /////////////////////////////////////////////////////////////////
 
 MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,

@@ -35,7 +35,6 @@
 // MythTV headers
 #include "mythtvexp.h"
 #include "mythdbcon.h"
-#include "mythwizard.h"
 #include "standardsettings.h"
 #include "scanwizardconfig.h"
 

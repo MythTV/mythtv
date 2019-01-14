@@ -3,7 +3,6 @@
 
 #include "storagegroup.h"
 #include "standardsettings.h"
-#include "mythwidgets.h"
 #include "mythexp.h"
 
 class MPUBLIC StorageGroupEditor :

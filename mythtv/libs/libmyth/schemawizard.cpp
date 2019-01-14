@@ -4,7 +4,9 @@ using std::endl;
 
 #include <unistd.h>      // for isatty() on Windows
 
-#include "dialogbox.h"
+#include <QEventLoop>
+
+#include "mythdialogbox.h"
 #include "mythcorecontext.h"
 #include "schemawizard.h"
 #include "mythdate.h"
@@ -146,35 +148,55 @@ int SchemaUpgradeWizard::Compare(void)
 MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
                                                  bool upgradable, bool expert)
 {
-    DialogBox   * dlg;
-    MythMainWindow  * win = GetMythMainWindow();
-
+    MythMainWindow *win = GetMythMainWindow();
     if (!win)
         return MYTH_SCHEMA_ERROR;
 
-    dlg = new DialogBox(win, message);
-    dlg->AddButton(tr("Exit"));
-    if (upgradable)
-        dlg->AddButton(tr("Upgrade"));
-    if (expert)
-        // Not translated. This string can't appear in released builds.
-        dlg->AddButton("Use current schema");
+    MythScreenStack *stack = win->GetMainStack();
+    if (!stack)
+        return MYTH_SCHEMA_ERROR;
 
-    DialogCode selected = dlg->exec();
-    dlg->deleteLater();
-
-    switch (selected)
+    // Ignore MENU & ESCAPE dialog actions
+    int btnIndex = -1;
+    while (btnIndex < 0)
     {
-        case kDialogCodeRejected:
-        case kDialogCodeButton0:
-            return MYTH_SCHEMA_EXIT;
-        case kDialogCodeButton1:
-            return upgradable ? MYTH_SCHEMA_UPGRADE: MYTH_SCHEMA_USE_EXISTING;
-        case kDialogCodeButton2:
-            return MYTH_SCHEMA_USE_EXISTING;
-        default:
+        auto dlg = new MythDialogBox(message, stack, "upgrade");
+        if (!dlg->Create())
+        {
+            delete dlg;
             return MYTH_SCHEMA_ERROR;
+        }
+
+        dlg->AddButton(tr("Exit"));
+
+        if (upgradable)
+            dlg->AddButton(tr("Upgrade"));
+
+        if (expert)
+            // Not translated. This string can't appear in released builds.
+            dlg->AddButton("Use current schema");
+
+        stack->AddScreen(dlg);
+
+        // Wait in local event loop so events are processed
+        QEventLoop block;
+        connect(dlg,    &MythDialogBox::Closed,
+                &block, [&](QString, int result) { block.exit(result); });
+
+        // Block until dialog closes
+        btnIndex = block.exec();
     }
+
+    switch (btnIndex)
+    {
+    case 0  : return MYTH_SCHEMA_EXIT;
+    case 1  : return upgradable ? MYTH_SCHEMA_UPGRADE
+                                : MYTH_SCHEMA_USE_EXISTING;
+    case 2  : return MYTH_SCHEMA_USE_EXISTING;
+    default : break;
+    }
+
+    return MYTH_SCHEMA_ERROR;
 }
 
 /**
@@ -374,12 +396,14 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     {
         if (returnValue == MYTH_SCHEMA_ERROR)
         {
-            // Display error, return warning to caller
-            MythPopupBox::showOkPopup(GetMythMainWindow(), "", message);
+            // Display error, wait for acknowledgement
+            // and return warning to caller
+            WaitFor(ShowOkPopup(message));
             return MYTH_SCHEMA_ERROR;
         }
 
         returnValue = GuiPrompt(message, upgradable, m_expertMode);
+
         if (returnValue == MYTH_SCHEMA_EXIT)
             return MYTH_SCHEMA_EXIT;
 

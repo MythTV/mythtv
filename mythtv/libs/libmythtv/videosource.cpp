@@ -27,8 +27,6 @@ using namespace std;
 
 // MythTV headers
 #include "mythconfig.h"
-#include "mythwidgets.h"
-#include "mythdialogs.h"
 #include "mythcorecontext.h"
 #include "videosource.h"
 #include "datadirect.h"

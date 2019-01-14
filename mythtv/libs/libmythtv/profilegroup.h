@@ -6,7 +6,6 @@
 
 #include "mythtvexp.h"
 #include "standardsettings.h"
-#include "mythwidgets.h"
 
 class ProfileGroup;
 

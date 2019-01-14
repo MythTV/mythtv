@@ -4,8 +4,6 @@
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "mythwizard.h"
-#include "mythwidgets.h" // for MythLineEdit
 #include "v4l2util.h"
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const

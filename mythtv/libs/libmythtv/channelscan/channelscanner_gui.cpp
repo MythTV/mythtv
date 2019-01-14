@@ -35,7 +35,6 @@
 using namespace std;
 
 // MythTV headers
-#include <mythdialogs.h>
 #include "mythdialogbox.h"
 #include "channelscanner_gui.h"
 #include "channelscanner_gui_scan_pane.h"
@@ -49,6 +48,9 @@ using namespace std;
 
 #define LOC QString("ChScanGUI: ")
 
+static const int kCodeRejected  = 0;
+static const int kCodeAccepted  = 1;
+
 ChannelScannerGUI::ChannelScannerGUI(void)
     : m_scanStage(nullptr)
 {
@@ -59,8 +61,7 @@ ChannelScannerGUI::~ChannelScannerGUI()
     Teardown();
     if (scanMonitor)
     {
-        post_event(scanMonitor, ScannerEvent::ScanShutdown,
-                   MythDialog::Rejected);
+        post_event(scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
     }
 }
 
@@ -74,8 +75,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         InformUser(tr("Scan complete"));
 
         // HACK: make channel insertion work after [21644]
-        post_event(scanMonitor, ScannerEvent::ScanShutdown,
-                   kDialogCodeAccepted);
+        post_event(scanMonitor, ScannerEvent::ScanShutdown, kCodeAccepted);
     }
     else if (scanEvent->type() == ScannerEvent::ScanShutdown ||
              scanEvent->type() == ScannerEvent::ScanErrored)
@@ -106,7 +106,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
         else
         {
             int ret = scanEvent->intValue();
-            if (!transports.empty() || (MythDialog::Rejected != ret))
+            if (!transports.empty() || (kCodeRejected != ret))
             {
                 Process(transports, success);
             }
@@ -157,8 +157,7 @@ void ChannelScannerGUI::quitScanning(void)
 
     if (scanMonitor)
     {
-        post_event(scanMonitor, ScannerEvent::ScanShutdown,
-                   MythDialog::Rejected);
+        post_event(scanMonitor, ScannerEvent::ScanShutdown, kCodeRejected);
     }
 }
 
