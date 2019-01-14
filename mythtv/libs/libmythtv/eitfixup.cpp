@@ -142,6 +142,7 @@ EITFixUp::EITFixUp()
       m_DisneyChannelSubtitle(",([^,]+)\\s{0,1}(\\d{4})$"),
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
+      m_SuperRTLSubtitle("^Folge\\s(\\d{1,3}):\\s'(.*)'"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
       m_fiRerun2("\\([Uu]\\)"),
       m_dePremiereLength("\\s?[0-9]+\\sMin\\."),
@@ -1676,6 +1677,16 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 void EITFixUp::FixRTL(DBEventEIT &event) const
 {
     int        pos;
+
+    QRegExp tmpExpSubtitleSRTL = m_SuperRTLSubtitle;
+
+    // subtitle with episode number: "Folge *: 'subtitle'
+    if (tmpExpSubtitleSRTL.indexIn(event.subtitle) != -1)
+    {
+        event.season = 0;
+        event.episode = tmpExpSubtitleSRTL.cap(1).toUInt();
+        event.subtitle    = tmpExpSubtitleSRTL.cap(2);
+    }
 
     // No need to continue without a description or with an subtitle.
     if (event.description.length() <= 0 || event.subtitle.length() > 0)

@@ -210,6 +210,7 @@ class EITFixUp
     const QRegExp m_DisneyChannelSubtitle;
     const QRegExp m_RTLEpisodeNo1;
     const QRegExp m_RTLEpisodeNo2;
+    const QRegExp m_SuperRTLSubtitle;
     const QRegExp m_fiRerun;
     const QRegExp m_fiRerun2;
     const QRegExp m_dePremiereLength;
